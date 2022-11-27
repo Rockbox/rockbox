@@ -276,7 +276,14 @@ static int browser(void* param)
 
     browse_context_init(&browse, filter, 0, NULL, NOICON, folder, NULL);
     ret_val = rockbox_browse(&browse);
-    pop_current_activity();
+
+    if (ret_val == GO_TO_WPS
+        || ret_val == GO_TO_PREVIOUS_MUSIC
+        || ret_val == GO_TO_PLUGIN)
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+    else
+        pop_current_activity(ACTIVITY_REFRESH_NOW);
+
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
@@ -336,7 +343,23 @@ static int wpsscrn(void* param)
     {
         splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
     }
-    pop_current_activity();
+
+    if (ret_val == GO_TO_PLAYLIST_VIEWER
+        || ret_val == GO_TO_PLUGIN
+        || ret_val == GO_TO_WPS
+        || ret_val == GO_TO_PREVIOUS_MUSIC
+        || ret_val == GO_TO_PREVIOUS_BROWSER
+        || (ret_val == GO_TO_PREVIOUS
+               && (last_screen == GO_TO_MAINMENU /* Settings */
+                || last_screen == GO_TO_BROWSEPLUGINS
+                || last_screen == GO_TO_SYSTEM_SCREEN
+                || last_screen == GO_TO_PLAYLISTS_SCREEN)))
+    {
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+    }
+    else
+        pop_current_activity(ACTIVITY_REFRESH_NOW);
+
     return ret_val;
 }
 #if CONFIG_TUNER
@@ -370,10 +393,14 @@ static int playlist_view_catalog(void * param)
     (void)param;
     push_current_activity(ACTIVITY_PLAYLISTBROWSER);
     bool item_was_selected = catalog_view_playlists();
-    pop_current_activity();
+
     if (item_was_selected)
+    {
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
         return GO_TO_WPS;
-    return GO_TO_PREVIOUS;
+    }
+    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    return GO_TO_ROOT;
 }
 
 static int playlist_view(void * param)
@@ -381,9 +408,7 @@ static int playlist_view(void * param)
     (void)param;
     int val;
 
-    push_current_activity(ACTIVITY_PLAYLISTVIEWER);
     val = playlist_viewer();
-    pop_current_activity();
     switch (val)
     {
         case PLAYLIST_VIEWER_MAINMENU:
@@ -682,7 +707,15 @@ static inline int load_screen(int screen)
     ret_val = items[screen].function(items[screen].param);
 
     if (activity != ACTIVITY_UNKNOWN)
-        pop_current_activity();
+    {
+        if (ret_val == GO_TO_WPS
+            || ret_val == GO_TO_PREVIOUS_MUSIC)
+        {
+            pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+        }
+        else
+            pop_current_activity(ACTIVITY_REFRESH_NOW);
+    }
 
     last_screen = screen;
     if (ret_val == GO_TO_PREVIOUS)
@@ -708,7 +741,7 @@ static int load_context_screen(int selection)
 
     if (context_menu)
         retval = do_menu(context_menu, NULL, NULL, false);
-    pop_current_activity();
+    pop_current_activity(ACTIVITY_REFRESH_NOW);
     return retval;
 }
 

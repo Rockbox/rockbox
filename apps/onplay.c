@@ -144,6 +144,15 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
 /* interface function.                                                     */
 /* ----------------------------------------------------------------------- */
 
+
+static int bookmark_load_menu_wrapper(void)
+{
+    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+
+    return bookmark_load_menu();
+}
+
 static int bookmark_menu_callback(int action,
                                   const struct menu_item_ex *this_item,
                                   struct gui_synclist *this_list);
@@ -153,7 +162,7 @@ MENUITEM_FUNCTION(bookmark_create_menu_item, 0,
                   bookmark_menu_callback, Icon_Bookmark);
 MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_LIST),
-                  bookmark_load_menu, NULL,
+                  bookmark_load_menu_wrapper, NULL,
                   bookmark_menu_callback, Icon_Bookmark);
 MAKE_ONPLAYMENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU),
                 bookmark_menu_callback, Icon_Bookmark,
@@ -462,7 +471,18 @@ static bool save_playlist(void)
     return false;
 }
 
-extern struct menu_item_ex view_cur_playlist; /* from playlist_menu.c */
+static int wps_view_cur_playlist(void)
+{
+    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+
+    playlist_viewer_ex(NULL, NULL);
+
+    return 0;
+}
+
+MENUITEM_FUNCTION(wps_view_cur_playlist_item, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
+                  wps_view_cur_playlist, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(search_playlist_item, 0, ID2P(LANG_SEARCH_IN_PLAYLIST),
                   search_playlist, NULL, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
@@ -473,7 +493,7 @@ MENUITEM_FUNCTION(playing_time_item, 0, ID2P(LANG_PLAYING_TIME),
                   playing_time, NULL, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
                  NULL, Icon_Playlist,
-                 &view_cur_playlist, &search_playlist_item,
+                 &wps_view_cur_playlist_item, &search_playlist_item,
                  &playlist_save_item, &reshuffle_item, &playing_time_item
                );
 
@@ -1499,6 +1519,9 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 
 static int browse_id3_wrapper(void)
 {
+    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+
     if (browse_id3(audio_current_track(),
             playlist_get_display_index(),
             playlist_amount()))
@@ -1954,7 +1977,9 @@ int onplay(char* file, int attr, int from, bool hotkey)
     else
         menu = &tree_onplay_menu;
     menu_selection = do_menu(menu, NULL, NULL, false);
-    pop_current_activity();
+
+    if (get_current_activity() == ACTIVITY_CONTEXTMENU) /* Activity may have been      */
+        pop_current_activity(ACTIVITY_REFRESH_NOW);     /* popped already by menu item */
 
     switch (menu_selection)
     {

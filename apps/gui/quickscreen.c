@@ -406,10 +406,13 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
     {   /* stop scrolling before exiting */
         for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
             screens[i].scroll_stop_viewport(&vps[i][j]);
-        viewportmanager_theme_undo(i, true);
+        viewportmanager_theme_undo(i, !(ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
     }
 
-    pop_current_activity();
+    if (ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU) /* Eliminate flashing of parent during */
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);   /* transition to Shortcuts */
+    else
+        pop_current_activity(ACTIVITY_REFRESH_NOW);
 
     return ret;
 }

@@ -1015,7 +1015,14 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
             case ACTION_STD_QUICKSCREEN:
                     if (!global_settings.shortcuts_replaces_qs)
                     {
-                        quick_screen_quick(button);
+                        if (quick_screen_quick(button) ==
+                            QUICKSCREEN_GOTO_SHORTCUTS_MENU) /* currently disabled */
+                        {
+                            /* QuickScreen defers skin updates when popping its activity
+                               to switch to Shortcuts Menu, so make up for that here: */
+                            FOR_NB_SCREENS(i)
+                                skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+                        }
                         update_playlist(true);
                         prepare_lists(&playlist_lists);
                     }
@@ -1092,7 +1099,7 @@ exit:
 static void close_playlist_viewer(void)
 {
     talk_shutup();
-    pop_current_activity();
+    pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
     if (viewer.playlist)
     {
         if (viewer.initial_selection)

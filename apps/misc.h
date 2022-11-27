@@ -214,8 +214,14 @@ struct mp3entry;
 int id3_get_replaygain_mode(const struct mp3entry *id3);
 void replaygain_update(void);
 
+enum activity_refresh
+{
+    ACTIVITY_REFRESH_DEFERRED = 0,
+    ACTIVITY_REFRESH_NOW,
+};
+
 void push_current_activity(enum current_activity screen);
-void pop_current_activity(void);
+void pop_current_activity(enum activity_refresh refresh);
 enum current_activity get_current_activity(void);
 
 /* format a sound value like: -1.05 dB */

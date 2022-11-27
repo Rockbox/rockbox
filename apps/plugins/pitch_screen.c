@@ -1109,7 +1109,7 @@ int gui_syncpitchscreen_run(void)
     }
 
     //rb->pcmbuf_set_low_latency(false);
-    //pop_current_activity();
+    //pop_current_activity(ACTIVITY_REFRESH_NOW);
 
     /* Clean up */
     FOR_NB_SCREENS(i)

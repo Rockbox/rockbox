@@ -718,7 +718,10 @@ int do_shortcut_menu(void *ignored)
             }
         }
     }
-    pop_current_activity();
+    if (GO_TO_PLUGIN == done)
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+    else
+        pop_current_activity(ACTIVITY_REFRESH_NOW);
     --buflib_move_lock;
 
     return done;

@@ -1579,13 +1579,14 @@ void push_current_activity(enum current_activity screen)
     }
 }
 
-void pop_current_activity(void)
+void pop_current_activity(enum activity_refresh refresh)
 {
     current_activity_top--;
     FOR_NB_SCREENS(i)
     {
         skinlist_set_cfg(i, NULL);
-        skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+        if (ACTIVITY_REFRESH_NOW == refresh)
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
 }
 enum current_activity get_current_activity(void)

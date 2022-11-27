@@ -1844,7 +1844,7 @@ rec_abort:
 #endif
 
     settings_save();
-    pop_current_activity();
+    pop_current_activity(ACTIVITY_REFRESH_NOW);
     return (rec_status & RCSTAT_BEEN_IN_USB_MODE) != 0;
 } /* recording_screen */
 

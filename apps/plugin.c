@@ -919,7 +919,7 @@ int plugin_load(const char* plugin, const void* parameter)
     int rc = p_hdr->entry_point(parameter);
 
     tree_unlock_cache(tree_get_context());
-    pop_current_activity();
+    pop_current_activity(ACTIVITY_REFRESH_NOW);
 
     if (!pfn_tsr_exit)
     {   /* close handle if plugin is no tsr one */

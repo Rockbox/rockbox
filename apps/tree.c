@@ -763,7 +763,7 @@ static int dirbrowse(void)
                     else if (ret == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
                         enter_shortcuts_menu = true;
                 }
-                
+
                 if (enter_shortcuts_menu && *tc.dirfilter < NUM_FILTER_MODES)
                 {
                     int last_screen = global_status.last_screen;
@@ -774,7 +774,14 @@ static int dirbrowse(void)
                     else
                         return shortcut_ret;
                 }
-                
+                else if (enter_shortcuts_menu) /* currently disabled */
+                {
+                    /* QuickScreen defers skin updates, popping its activity, when
+                       switching to Shortcuts Menu, so make up for that here:   */
+                    FOR_NB_SCREENS(i)
+                        skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+                }
+
                 restore = true;
                 break;
             }
