@@ -626,19 +626,19 @@ static int treeplaylist_callback(int action,
                                  struct gui_synclist *this_list);
 
 /* insert items */
-MENUITEM_FUNCTION_W_PARAM(i_pl_item, 0, ID2P(LANG_INSERT),
+MENUITEM_FUNCTION_W_PARAM(i_pl_item, 0, ID2P(LANG_ADD),
                   add_to_playlist, &addtopl_insert,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION_W_PARAM(i_first_pl_item, 0, ID2P(LANG_INSERT_FIRST),
+MENUITEM_FUNCTION_W_PARAM(i_first_pl_item, 0, ID2P(LANG_PLAY_NEXT),
                   add_to_playlist, &addtopl_insert_first,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION_W_PARAM(i_last_pl_item, 0, ID2P(LANG_INSERT_LAST),
+MENUITEM_FUNCTION_W_PARAM(i_last_pl_item, 0, ID2P(LANG_PLAY_LAST),
                   add_to_playlist, &addtopl_insert_last,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION_W_PARAM(i_shuf_pl_item, 0, ID2P(LANG_INSERT_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(i_shuf_pl_item, 0, ID2P(LANG_ADD_SHUFFLED),
                   add_to_playlist, &addtopl_insert_shuf,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION_W_PARAM(i_last_shuf_pl_item, 0, ID2P(LANG_INSERT_LAST_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(i_last_shuf_pl_item, 0, ID2P(LANG_PLAY_LAST_SHUFFLED),
                   add_to_playlist, &addtopl_insert_last_shuf,
                   treeplaylist_callback, Icon_Playlist);
 /* queue items */
@@ -661,10 +661,10 @@ MENUITEM_FUNCTION_W_PARAM(q_last_shuf_pl_item, 0, ID2P(LANG_QUEUE_LAST_SHUFFLED)
 /* queue submenu */
 MAKE_ONPLAYMENU(queue_menu, ID2P(LANG_QUEUE_MENU),
                 treeplaylist_callback, Icon_Playlist,
-                &q_pl_item,
                 &q_first_pl_item,
-                &q_last_pl_item,
+                &q_pl_item,
                 &q_shuf_pl_item,
+                &q_last_pl_item,
                 &q_last_shuf_pl_item);
 
 /* replace playlist */
@@ -680,15 +680,15 @@ MAKE_ONPLAYMENU(tree_playlist_menu, ID2P(LANG_PLAYING_NEXT),
                 treeplaylist_callback, Icon_Playlist,
 
                 /* insert */
-                &i_pl_item,
                 &i_first_pl_item,
+                &i_pl_item,
                 &i_last_pl_item,
                 &i_shuf_pl_item,
                 &i_last_shuf_pl_item,
 
                 /* queue */
-                &q_pl_item,
                 &q_first_pl_item,
+                &q_pl_item,
                 &q_last_pl_item,
                 &q_shuf_pl_item,
                 &q_last_shuf_pl_item,

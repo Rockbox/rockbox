@@ -20,16 +20,12 @@ playlists:
   \setting{Playing Next Submenu} (see \reference{ref:playingnext_submenu}), you are
   creating (or adding to) a dynamic playlist.
 
-\item[Insert.] In Rockbox, to \setting{Insert} an item into a playlist means
-  putting an item into a playlist and leaving it there, even after it is
-  played. As you will see later in this chapter, Rockbox can \setting{Insert}
-  into a playlist in several places.
+\item[Play/Add.] In Rockbox, to \setting{Play} or \setting{Add} an item means
+  putting it into a playlist and leaving it there, even after it is
+  played.
 
-\item[Queue.] In Rockbox, to \setting{Queue} a song means to put the song
-  into a playlist and then to remove the song from the playlist once it has
-  been played. The only difference between \setting{Insert} and
-  \setting{Queue} is that the \setting{Queue} option removes the song from the
-  playlist once it has been played, and the \setting{Insert} option does not.
+\item[Queue.] To \setting{Queue} a song means to put it into a playlist, but then
+  to remove the song from the playlist once it has been played.
 \end{description}
 
 \subsection{Creating playlists}
@@ -84,33 +80,16 @@ selected tracks are added to the playlist is determined by these
 options:
 
 \begin{description}
-\item [Insert.] Add track(s) after the most recently added tracks or, if tracks
+\item [Play Next.] Play track(s) immediately after the currently playing track.
+
+\item [Add.] Add track(s) after the most recently added tracks or, if tracks
 have not been added yet, immediately after the currently playing track.
 
-\item [Insert Next.] Add track(s) immediately after the currently playing track.
+\item [Play Last.] Add track(s) to the end of the playlist.
 
-\item [Insert Last.] Add track(s) to the end of the playlist.
+\item [Add Shuffled.] Add track(s) to the playlist at random positions.
 
-\item [Insert Shuffled.] Add track(s) to the playlist at random positions.
-
-\item [Insert Last Shuffled.] Add tracks in a random order to the end of the playlist.
-\end{description}
-
-Another possibility is to add tracks \emph{temporarily} to the dynamic playlist.
-In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
-removed from the playlist after they have been played. They are also not saved
-to the playlist file (see \reference{ref:playlistoptions}).
-
-\begin{description}
-\item [Queue.] Corresponds to \setting{Insert}.
-
-\item [Queue Next.] Corresponds to \setting{Insert Next}.
-
-\item [Queue Last.] Corresponds to \setting{Insert Last}.
-
-\item [Queue Shuffled.] Corresponds to \setting{Insert Shuffled}.
-
-\item [Queue Last Shuffled.] Corresponds to \setting{Insert Last Shuffled}.
+\item [Play Last Shuffled.] Add tracks in a random order to the end of the playlist.
 \end{description}
 
 If you'd like to replace the current playlist with the new selection, the
@@ -127,10 +106,26 @@ following two options will achieve that effect.
   playlist in random order.
 \end{description}
 
-\note{You can hide the options to add shuffled tracks or to queue tracks, if you wish.
-The latter can also be put into its own submenu.  Simply go to
+Another possibility is to add tracks \emph{temporarily} to the dynamic playlist.
+In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
+removed from the playlist after they have been played. They are also not saved
+to the playlist file (see \reference{ref:playlistoptions}).
+
+\begin{description}
+\item [Queue Next.] Corresponds to \setting{Play Next}.
+
+\item [Queue.] Corresponds to \setting{Add}.
+
+\item [Queue Last.] Corresponds to \setting{Play Last}.
+
+\item [Queue Shuffled.] Corresponds to \setting{Add Shuffled}.
+
+\item [Queue Last Shuffled.] Corresponds to \setting{Play Last Shuffled}.
+\end{description}
+
+\note{Visibility of options to add shuffled tracks or to queue tracks can be toggled by going to
 \setting{Settings} $\rightarrow$ \setting{General Settings} $\rightarrow$ \setting{Playlists}
-$\rightarrow$ \setting{Current Playlist} and select either \setting{Show Shuffled Adding Options}
+$\rightarrow$ \setting{Current Playlist}. Select either \setting{Show Shuffled Adding Options}
 or \setting{Show Queue Options} to customize the displayed set of options.}
 
 The \setting{Playing Next Submenu}  can be used to add either single tracks or

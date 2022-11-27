@@ -6228,58 +6228,58 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Insert"
+    *: ""
   </dest>
   <voice>
-    *: "Insert"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Insert Next"
+    *: ""
   </dest>
   <voice>
-    *: "Insert Next"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Insert Last"
+    *: ""
   </dest>
   <voice>
-    *: "Insert Last"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Insert Shuffled"
+    *: ""
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10980,16 +10980,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Insert Last Shuffled"
+    *: ""
   </dest>
   <voice>
-    *: "Insert Last Shuffled"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16503,4 +16503,59 @@
     *: "Playing Next..."
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Play Next"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Add Shuffled"
+  </dest>
+  <voice>
+    *: "Add Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Play Last"
+  </dest>
+  <voice>
+    *: "Play Last"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Play Last Shuffled"
+  </dest>
+  <voice>
+    *: "Play Last Shuffled"
+  </voice>
+</phrase>
