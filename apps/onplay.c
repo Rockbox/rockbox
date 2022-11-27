@@ -491,7 +491,7 @@ MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
                   shuffle_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(playing_time_item, 0, ID2P(LANG_PLAYING_TIME),
                   playing_time, NULL, Icon_Playlist);
-MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
+MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  NULL, Icon_Playlist,
                  &wps_view_cur_playlist_item, &search_playlist_item,
                  &playlist_save_item, &reshuffle_item, &playing_time_item
@@ -676,7 +676,7 @@ MENUITEM_FUNCTION_W_PARAM(replace_shuf_pl_item, 0, ID2P(LANG_PLAY_SHUFFLED),
                   add_to_playlist, &addtopl_replace_shuffled,
                   treeplaylist_callback, Icon_Playlist);
 
-MAKE_ONPLAYMENU(tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
+MAKE_ONPLAYMENU(tree_playlist_menu, ID2P(LANG_PLAYING_NEXT),
                 treeplaylist_callback, Icon_Playlist,
 
                 /* insert */
@@ -801,11 +801,11 @@ static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list);
 
-MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO),
+MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_ADD_TO_EXISTING_PL),
                   cat_add_to_a_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW),
                   cat_add_to_a_new_playlist, NULL, Icon_Playlist);
-MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
+MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_ADD_TO_PL),
                 cat_playlist_callback, Icon_Playlist,
                 &cat_add_to_list, &cat_add_to_new);
 

@@ -598,7 +598,7 @@ static enum pv_onplay_result onplay_menu(int index)
     struct playlist_entry * current_track =
         playlist_buffer_get_track(&viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
-                        ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
+                        ID2P(LANG_PLAYING_NEXT), ID2P(LANG_ADD_TO_PL),
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_MENU_SHOW_ID3_INFO),
                         ID2P(LANG_SHUFFLE),
                         ID2P(LANG_SAVE),

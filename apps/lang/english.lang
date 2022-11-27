@@ -6452,16 +6452,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Add to Playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16461,3 +16461,46 @@
     recording: "Recording Directory"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Add to Playlist..."
+  </dest>
+  <voice>
+    *: "Add to Playlist..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Add to Existing Playlist"
+  </dest>
+  <voice>
+    *: "Add to Existing Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Playing Next..."
+  </dest>
+  <voice>
+    *: "Playing Next..."
+  </voice>
+</phrase>
+

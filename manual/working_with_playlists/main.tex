@@ -17,7 +17,7 @@ playlists:
 
 \item[Dynamic playlist.]  A dynamic playlist is a playlist that is created
   ``On the fly.'' Any time you insert or queue tracks using the
-  \setting{Current Playlist submenu} (see \reference{ref:currentplaylist_submenu}), you are
+  \setting{Playing Next Submenu} (see \reference{ref:playingnext_submenu}), you are
   creating (or adding to) a dynamic playlist.
 
 \item[Insert.] In Rockbox, to \setting{Insert} an item into a playlist means
@@ -49,17 +49,17 @@ song.
   playlist, see the section below on how to add music to a playlist.}
 
 \subsubsection{By using the Play or Play Shuffled functions}
-The \setting{Play} function as described in \ref{ref:currentplaylist_submenu}
+The \setting{Play} function as described in \ref{ref:playingnext_submenu}
 will replace the dynamic playlist with the selected tracks. The \setting{Play
 Shuffled} function is similar, except the selected tracks will be added to the
 playlist in a random order.
 
-\subsubsection{\label{ref:playlist_catalogue}By using the Playlist catalogue}
-The \setting{Playlist catalogue} makes it possible to modify and create
-playlists that are not currently playing. To do this select \setting{Playlist
-catalogue} in the \setting{Context Menu}. There you will have two choices,
-\setting{Add to playlist} adds the selected track or directory to an existing
-playlist and \setting{Add to a new playlist} creates a new playlist containing
+\subsubsection{\label{ref:addtoplaylist_submenu}By using the Add to Playlist submenu}
+The \setting{Add to Playlist submenu} makes it possible to modify and create
+playlists that are not currently playing. To do this select \setting{Add to Playlist...}
+in the \setting{Context Menu}. There you will have two choices,
+\setting{Add to Existing Playlist} adds the selected track or directory to an existing
+playlist and \setting{Add to New Playlist} creates a new playlist containing
 the selected track or directory.
 
 \note{All playlists in the \setting{Playlist catalogue} are stored by default
@@ -75,9 +75,9 @@ To create a playlist containing some or all of the music on your \dap{}, you can
 
 \subsection{Adding music to playlists}
 
-\subsubsection{\label{ref:currentplaylist_submenu}Adding music to a dynamic playlist}
-\screenshot{rockbox_interface/images/ss-playlist-menu}{The Current Playlist Submenu}{}
-The \setting{Current Playlist Submenu} is a submenu in the \setting{Context Menu} (see
+\subsubsection{\label{ref:playingnext_submenu}Adding music to a dynamic playlist}
+\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playing Next Submenu}{}
+The \setting{Playing Next Submenu} is a submenu in the \setting{Context Menu} (see
 \reference{ref:Contextmenu}), it allows you to put tracks into a
 ``dynamic playlist''. The place in which the newly
 selected tracks are added to the playlist is determined by these
@@ -133,10 +133,10 @@ The latter can also be put into its own submenu.  Simply go to
 $\rightarrow$ \setting{Current Playlist} and select either \setting{Show Shuffled Adding Options}
 or \setting{Show Queue Options} to customize the displayed set of options.}
 
-The \setting{Current Playlist Submenu}  can be used to add either single tracks or
-entire directories to a playlist. If the \setting{Current Playlist Submenu} is
+The \setting{Playing Next Submenu}  can be used to add either single tracks or
+entire directories to a playlist. If the \setting{Playing Next Submenu} is
 invoked on a single track, it will put only that track into the playlist.
-On the other hand, if the \setting{Current Playlist Submenu} is invoked on a
+On the other hand, if the \setting{Playing Next Submenu} is invoked on a
 directory, Rockbox adds all of the tracks in that directory to the
 playlist.
 
@@ -157,13 +157,13 @@ were before shutdown.
 
 \subsection{Modifying playlists}
 \subsubsection{Reshuffling}
-Reshuffling the current playlist is easily done from the \setting{Playlist}
+Reshuffling the current playlist is easily done from the \setting{Current Playlist}
 sub menu in the WPS, just select \setting{Reshuffle}.
 
 \subsubsection{Moving and removing tracks}
 To move or remove a track from the current playlist enter the
 \setting{Playlist Viewer} by selecting \setting{View Current Playlist} in the
-\setting{Playlist} submenu in the WPS context menu or the \setting{Main Menu}.
+\setting{Current Playlist} submenu in the WPS context menu or the \setting{Main Menu}.
 Once in the \setting{Playlist Viewer} open the context menu on the track you
 want to move or remove. If you want to move the track, select \setting{Move} in
 the context menu and then move the blinking cursor to the place where you want
@@ -171,10 +171,10 @@ the track to be moved and confirm with \ActionStdOk. To remove a track, simply
 select \setting{Remove} in the context menu.
 
 \subsection{Saving playlists}
-To save the current playlist either enter the \setting{Playlist} submenu
+To save the current playlist either enter the \setting{Current Playlist} submenu
 in the \setting{WPS Context Menu} (see \reference{sec:contextmenu}) and
-select \setting{Save Current Playlist} or enter the
-\setting{Playlist Options} menu in the \setting{Main Menu} and select
+select \setting{Save Current Playlist} or enter the context menu for the
+\setting{Playlist catalogue} in the \setting{Main Menu} and select
 \setting{Save Current Playlist}.
 Either method will bring you to the \setting{Virtual Keyboard} (see
 \reference{sec:virtual_keyboard}), enter a filename for your playlist and
