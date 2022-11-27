@@ -5411,19 +5411,19 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -11587,16 +11587,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Start File Browser Here"
+    *: ""
   </dest>
   <voice>
-    *: "Start File Browser Here"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11702,16 +11702,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </dest>
   <voice>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16400,5 +16400,64 @@
   </dest>
   <voice>
     *: "Rewind across tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Set As..."
+  </dest>
+  <voice>
+    *: "Set As..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Playlist Directory"
+  </dest>
+  <voice>
+    *: "Playlist Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Start Directory"
+  </dest>
+  <voice>
+    *: "Start Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
   </voice>
 </phrase>

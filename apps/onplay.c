@@ -796,18 +796,6 @@ static bool cat_add_to_a_new_playlist(void)
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
                                      true, NULL);
 }
-static int clipboard_callback(int action,
-                              const struct menu_item_ex *this_item,
-                              struct gui_synclist *this_list);
-
-static bool set_catalogdir(void)
-{
-    catalog_set_directory(selected_file);
-    settings_save();
-    return false;
-}
-MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_SET_AS_PLAYLISTCAT_DIR),
-                  set_catalogdir, clipboard_callback, Icon_Playlist);
 
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item,
@@ -819,7 +807,7 @@ MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW),
                   cat_add_to_a_new_playlist, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
                 cat_playlist_callback, Icon_Playlist,
-                &cat_add_to_list, &cat_add_to_new, &set_catalogdir_item);
+                &cat_add_to_list, &cat_add_to_new);
 
 void onplay_show_playlist_cat_menu(char* track_name)
 {
@@ -1621,7 +1609,7 @@ static bool set_recdir(void)
     settings_save();
     return false;
 }
-MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
+MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_RECORDING_DIR),
                   set_recdir, clipboard_callback, Icon_Recording);
 #endif
 static bool set_startdir(void)
@@ -1632,8 +1620,25 @@ static bool set_startdir(void)
     settings_save();
     return false;
 }
-MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_SET_AS_START_DIR),
+MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_START_DIR),
                   set_startdir, clipboard_callback, Icon_file_view_menu);
+
+static bool set_catalogdir(void)
+{
+    catalog_set_directory(selected_file);
+    settings_save();
+    return false;
+}
+MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_PLAYLIST_DIR),
+                  set_catalogdir, clipboard_callback, Icon_Playlist);
+
+MAKE_ONPLAYMENU(set_as_dir_menu, ID2P(LANG_SET_AS),
+                clipboard_callback, Icon_NOICON,
+                &set_catalogdir_item,
+#ifdef HAVE_RECORDING
+                &set_recdir_item,
+#endif
+                &set_startdir_item);
 
 static int clipboard_callback(int action,
                               const struct menu_item_ex *this_item,
@@ -1692,7 +1697,8 @@ static int clipboard_callback(int action,
                     /* only for directories */
                     if (this_item == &delete_dir_item ||
                         this_item == &set_startdir_item ||
-                        this_item == &set_catalogdir_item
+                        this_item == &set_catalogdir_item ||
+                        this_item == &set_as_dir_menu
 #ifdef HAVE_RECORDING
                      || this_item == &set_recdir_item
 #endif
@@ -1756,17 +1762,14 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &view_playlist_item, &tree_playlist_menu, &cat_playlist_menu,
            &rename_file_item, &clipboard_cut_item, &clipboard_copy_item,
            &clipboard_paste_item, &delete_file_item, &delete_dir_item,
-#if LCD_DEPTH > 1
-           &set_backdrop_item,
-#endif
            &list_viewers_item, &create_dir_item, &properties_item, &track_info_item,
 #ifdef HAVE_TAGCACHE
            &pictureflow_item,
 #endif
-#ifdef HAVE_RECORDING
-           &set_recdir_item,
+#if LCD_DEPTH > 1
+           &set_backdrop_item,
 #endif
-           &set_startdir_item, &add_to_faves_item, &file_menu,
+           &add_to_faves_item, &set_as_dir_menu, &file_menu,
          );
 static int onplaymenu_callback(int action,
                                const struct menu_item_ex *this_item,

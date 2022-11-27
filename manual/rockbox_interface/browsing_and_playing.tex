@@ -148,11 +148,6 @@ each option pertains both to files and directories):
   Deletes the currently selected directory and all of the files and subdirectories
   it may contain. Deleted directories cannot be recovered. Use this feature with
   caution!
-\opt{lcd_non-mono}{
-\item [Set As Backdrop.]
-  Set the selected \fname{bmp} file as background image. The bitmaps need to meet the
-  conditions explained in \reference{ref:LoadingBackdrops}.
-}
 \item [Open with.]
   Runs a viewer plugin on the file. Normally, when a file is selected in Rockbox,
   Rockbox automatically detects the file type and runs the appropriate plugin.
@@ -168,22 +163,32 @@ each option pertains both to files and directories):
   Shows properties such as size and the time and date of the last modification
   for the selected file. If used on a directory, the number of files and
   subdirectories will be shown, as well as the total size.
-\opt{recording}{
-  \item [Set As Recording Directory.]
-    Save recordings in the selected directory.
+\opt{lcd_non-mono}{
+\item [Set As Backdrop.]
+  Set the selected \fname{bmp} file as background image. The bitmaps need to meet the
+  conditions explained in \reference{ref:LoadingBackdrops}.
 }
-\item [\label{ref:StartFileBrowserHere}Start File Browser Here.]
-  This option allows users to set the currently selected directory as the default
-  start directory for the file browser. This option is not available for files.
-  \note{If you have \setting{Auto-Change Directory} and
-  \setting{Constrain Auto-Change} enabled, the directories returned will
-  be constrained to the directory you have chosen here and those below it.
-  See \reference{ref:ConstrainAutoChange}}
 \item [Add to Shortcuts.]
   Adds a link to the selected item in the \fname{shortcuts.link} file.
   If the file does not already exist it will be created in the root directory.
   Note that if you create a shortcut to a file, Rockbox will not open it upon
   selecting, but simply bring you to its location in the \setting{File Browser}.
+\end{description}
+
+\subsubsection{Set As...}
+\begin{description}
+  \item [Playlist Directory.]
+     Set as default directory for the Playlist Catalogue.
+  \opt{recording}{
+    \item [Recording Directory.]
+     Save recordings in the selected directory.
+  }
+  \item [\label{ref:StartDirectory}Start Directory.]
+   Set as default start directory for the File Browser.
+   \note{If you have \setting{Auto-Change Directory} and
+   \setting{Constrain Auto-Change} enabled, the directories returned will
+   be constrained to the directory you have chosen here and those below it.
+   See \reference{ref:ConstrainAutoChange}}
 \end{description}
 
 \subsection{\label{sec:virtual_keyboard}Virtual Keyboard}
