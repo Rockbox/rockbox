@@ -561,22 +561,31 @@ struct kinetic {
 static struct kinetic kinetic;
 static struct gesture_vel list_gvel;
 
+/*
+ * NOTE: defaults were chosen for the Shanling Q1, and may need
+ *       tuning for other devices
+ */
+
 const struct list_kinetic_scroll_settings list_kinetic_scroll_accel_default = {
-    .a0 = 1000 << LIST_KINETIC_FRACBITS,
-    .a1 = 1 << (LIST_KINETIC_FRACBITS - 1),
-    /* delay is ignored for this one */
+    .a0 = 200 << LIST_KINETIC_FRACBITS,         /* 200.0 */
+    .a1 = (6 << LIST_KINETIC_FRACBITS) / 5,     /* 1.2 */
+};
+
+const struct list_kinetic_scroll_settings list_kinetic_scroll_brake_default = {
+    .a0 = 200 << LIST_KINETIC_FRACBITS,         /* 200.0 */
+    .a1 = (1 << LIST_KINETIC_FRACBITS) / 2,     /* 0.5 */
 };
 
 const struct list_kinetic_scroll_settings list_kinetic_scroll_decel_default = {
-    .a0 = 3000 << LIST_KINETIC_FRACBITS,
-    .a1 = 1 << (LIST_KINETIC_FRACBITS - 1),
-    .delay = 125 * HZ / 1000,
+    .a0 = 2000 << LIST_KINETIC_FRACBITS,        /* 2000.0 */
+    .a1 = (1 << LIST_KINETIC_FRACBITS) / 2,     /* 0.5 */
+    .delay = 125 * HZ / 1000,                   /* 125 ms */
 };
 
 const struct list_kinetic_scroll_settings list_kinetic_scroll_press_default = {
-    .a0 = 35000 << LIST_KINETIC_FRACBITS,
-    .a1 = 4 << LIST_KINETIC_FRACBITS,
-    .delay = 250 * HZ / 1000,
+    .a0 = 35000 << LIST_KINETIC_FRACBITS,       /* 35000.0 */
+    .a1 = 4 << LIST_KINETIC_FRACBITS,           /* 4.0 */
+    .delay = 250 * HZ / 1000,                   /* 250 ms */
 };
 
 static void kinetic_stop_scrolling(struct kinetic *k, struct gui_synclist *list)
@@ -683,22 +692,26 @@ static bool kinetic_start_scrolling(struct kinetic *k, struct gui_synclist *list
         return false;
 
     long yvel_fp = yvel << LIST_KINETIC_FRACBITS;
+    int vel_sgn = SIGN(k->cb_data.velocity);
+
     if (list->scroll_mode == SCROLL_KINETIC)
     {
-        long accel = kinetic_calc_accel(k->cb_data.velocity, LONG_MAX,
-                                        &global_settings.kinetic_scroll_accel);
-        accel = fp_mul(accel, RELOAD_INTERVAL_FP, LIST_KINETIC_FRACBITS);
-
-        /* the acceleration is in the direction of the swipe */
-        if (SIGN(accel) != SIGN(yvel_fp))
-            accel = -accel;
+        long accel;
+        if (SIGN(yvel) == vel_sgn)
+            accel = kinetic_calc_accel(k->cb_data.velocity, LONG_MAX,
+                                       &global_settings.kinetic_scroll_accel);
+        else
+            accel = -kinetic_calc_accel(k->cb_data.velocity, LONG_MAX,
+                                        &global_settings.kinetic_scroll_brake);
 
         yvel_fp += accel;
     }
 
     k->cb_data.list = list;
     k->cb_data.velocity += yvel_fp;
-    if (list->scroll_mode != SCROLL_KINETIC)
+    /* also reset distance & scroll duration after a direction change */
+    if (list->scroll_mode != SCROLL_KINETIC ||
+        vel_sgn != SIGN(k->cb_data.velocity))
     {
         k->cb_data.distance = 0;
         k->cb_data.scroll_duration = 0;

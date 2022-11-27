@@ -203,20 +203,25 @@ struct list_kinetic_scroll_settings
     long delay;
 };
 
-/* Acceleration applied to the scroll velocity when a swipe occurs during
- * kinetic scrolling. This is needed to counteract the deceleration term
- * for high scrolling speeds, since the user can only input a low constant
- * acceleration from swiping alone. Delay is ignored. */
+/*
+ * accel: Extra impulse applied when swiping in the direction of scrolling,
+ *        proportional to the current velocity. This is what allows for high
+ *        scroll speeds. Delay is ignored.
+ *
+ * brake: Braking impulse applied when swiping in the opposite direction of
+ *        scrolling, which helps to change direction quickly even at high
+ *        speed. Delay is ignored.
+ *
+ * decel: Deceleration applied during scrolling. The delay is measured from
+ *        the start of scrolling or last change of direction.
+ *
+ * press: Deceleration applied while the screen is pressed (motion is not
+ *        needed to trigger). Additive with "decel". The delay is measured
+ *        from the start of the press.
+ */
 extern const struct list_kinetic_scroll_settings list_kinetic_scroll_accel_default;
-
-/* Deceleration applied to the scroll velocity during kinetic scrolling.
- * The delay occurs right at the beginning of scrolling, eg. a delay of
- * 1 second means deceleration starts 1 second after scrolling. */
+extern const struct list_kinetic_scroll_settings list_kinetic_scroll_brake_default;
 extern const struct list_kinetic_scroll_settings list_kinetic_scroll_decel_default;
-
-/* Deceleration applied during kinetic scrolling when the screen is
- * pressed for longer than the delay interval (motion is not required).
- * This is additive with list_kinetic_scroll_decel. */
 extern const struct list_kinetic_scroll_settings list_kinetic_scroll_press_default;
 #endif
 

@@ -801,6 +801,7 @@ struct user_settings
     int touch_mode;
     struct touchscreen_parameter ts_calibration_data;
     struct list_kinetic_scroll_settings kinetic_scroll_accel;
+    struct list_kinetic_scroll_settings kinetic_scroll_brake;
     struct list_kinetic_scroll_settings kinetic_scroll_decel;
     struct list_kinetic_scroll_settings kinetic_scroll_press;
 #endif
