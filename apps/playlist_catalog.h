@@ -22,7 +22,7 @@
 #define _PLAYLIST_CATALOG_H_
 
 /* Gets the configured playlist catalog dir */
-const char* catalog_get_directory(void);
+void catalog_get_directory(char* dirbuf, size_t dirbuf_sz);
 
 /* Set the playlist catalog dir */
 void catalog_set_directory(const char* directory);

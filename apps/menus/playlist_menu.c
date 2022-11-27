@@ -61,8 +61,8 @@ int save_playlist_screen(struct playlist_info* playlist)
 
     if (!dot && len <= 1)
     {
-        snprintf(temp, sizeof(temp), "%s%s",
-                 catalog_get_directory(), DEFAULT_DYNAMIC_PLAYLIST_NAME);
+        catalog_get_directory(temp, sizeof(temp));
+        strlcat(temp, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(temp));
     }
 
     dot = strrchr(temp, '.');
