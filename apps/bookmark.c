@@ -43,7 +43,7 @@
 #include "file.h"
 #include "pathfuncs.h"
 
-/* #define LOGF_ENABLE */
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define MAX_BOOKMARKS 10
@@ -351,11 +351,16 @@ static bool generate_bookmark_file_name(char *filenamebuf,
         strmemccpy(filenamebuf, "/root_dir.bmark", filenamebufsz);
     else
     {
-        filenamebufsz--; /* strlcpy considers the NULL so bmarknamelen is one off */
-        size_t len = strlcpy(filenamebuf, bmarknamein,
-                             MIN(filenamebufsz, bmarknamelen) + 1);
-        if(len >= filenamebufsz)
+        size_t buflen, len;
+        /* strmemccpy considers the NULL so bmarknamelen is one off */
+        buflen = MIN(filenamebufsz -1 , bmarknamelen);
+        if (buflen >= filenamebufsz)
             return false;
+
+        strmemccpy(filenamebuf, bmarknamein, buflen + 1);
+
+        len = strlen(filenamebuf);
+
 #ifdef HAVE_MULTIVOLUME
         /* The "root" of an extra volume need special handling too. */
         const char *filename;
@@ -404,7 +409,7 @@ static char* create_bookmark(char **name, size_t *namelen)
     if(!resume_info.id3)
         return NULL;
 
-    size_t bmsz =   snprintf(buf, bufsz,
+    size_t bmarksz= snprintf(buf, bufsz,
                              /* new optional bookmark token descriptors should
                                 be inserted just after ';"' in this line... */
 #if defined(HAVE_PITCHCONTROL)
@@ -431,20 +436,20 @@ static char* create_bookmark(char **name, size_t *namelen)
 #endif
                     ); /*sprintf*/
 /* mandatory tokens */
-    if (bmsz >= bufsz) /* include NULL*/
+    if (bmarksz >= bufsz) /* include NULL*/
         return NULL;
-    buf += bmsz;
-    bufsz -= bmsz;
+    buf += bmarksz;
+    bufsz -= bmarksz;
 
     /* create the bookmark */
-    playlist_get_name(NULL, buf, bmsz);
-    bmsz = strlen(buf);
+    playlist_get_name(NULL, buf, bufsz);
+    bmarksz = strlen(buf);
 
-    if (bmsz == 0 || (bmsz + 1) >= bufsz) /* include the separator & NULL*/
+    if (bmarksz == 0 || (bmarksz + 1) >= bufsz) /* include the separator & NULL*/
         return NULL;
 
     *name = buf;     /* return the playlist name through the *pointer */
-    *namelen = bmsz; /* return the name length through the pointer */
+    *namelen = bmarksz; /* return the name length through the pointer */
 
     /* Get the currently playing file minus the path */
     /* This is used when displaying the available bookmarks */
@@ -452,12 +457,12 @@ static char* create_bookmark(char **name, size_t *namelen)
     if(NULL == file)
         return NULL;
 
-    if (buf[bmsz - 1] != '/')
+    if (buf[bmarksz - 1] != '/')
         file = resume_info.id3->path;
     else file++;
 
-    buf += bmsz;
-    bufsz -= (bmsz + 1);
+    buf += bmarksz;
+    bufsz -= (bmarksz + 1);
     buf[0] = ';';
     buf[1] = '\0';
 
