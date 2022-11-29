@@ -562,6 +562,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
 static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, size_t buflen)
 {
+    int playlist_fd;
     ssize_t nread;
     unsigned int i = 0;
     unsigned int count = 0;
@@ -572,10 +573,14 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if (!buflen)
         buffer = alloca((buflen = 64));
 
+    mutex_lock(playlist->control_mutex); /* read can yield! */
+
     if(-1 == playlist->fd)
         playlist->fd = open_utf8(playlist->filename, O_RDONLY);
     if(playlist->fd < 0)
         return -1; /* failure */
+    playlist_fd = playlist->fd;
+
     if((i = lseek(playlist->fd, 0, SEEK_CUR)) > 0)
         playlist->utf8 = true; /* Override any earlier indication. */
 
@@ -583,9 +588,17 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
     store_index = true;
 
+    playlist->fd = -2; /* DEBUGGING Remove me! */ 
+
+    /* invalidate playlist in case we yield */
+    int amount = playlist->amount;
+    playlist->amount = -1;
+    int max_playlist_size = playlist->max_playlist_size;
+    playlist->max_playlist_size = 0;
+
     while(1)
     {
-        nread = read(playlist->fd, buffer, buflen);
+        nread = read(playlist_fd, buffer, buflen);
         /* Terminate on EOF */
         if(nread <= 0)
             break;
@@ -605,18 +618,18 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
                 if(*p != '#')
                 {
-                    if ( playlist->amount >= playlist->max_playlist_size ) {
+                    if ( amount >= max_playlist_size ) {
                         display_buffer_full();
                         result = -1;
                         goto exit;
                     }
 
                     /* Store a new entry */
-                    playlist->indices[ playlist->amount ] = i+count;
+                    playlist->indices[ amount ] = i+count;
                 #ifdef HAVE_DIRCACHE
-                    copy_filerefs(&playlist->dcfrefs[playlist->amount], NULL, 1);
+                    copy_filerefs(&playlist->dcfrefs[amount], NULL, 1);
                 #endif
-                    playlist->amount++;
+                    amount++;
                 }
             }
         }
@@ -625,6 +638,14 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     }
 
 exit:
+/* v DEBUGGING Remove me! */ 
+    if (playlist->fd != -2) 
+        splashf(HZ, "Error playlist fd"); 
+    playlist->fd = playlist_fd; 
+/* ^ DEBUGGING Remove me! */ 
+    playlist->amount = amount;
+    playlist->max_playlist_size = max_playlist_size;
+    mutex_unlock(playlist->control_mutex);
 #ifdef HAVE_DIRCACHE
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
@@ -2122,7 +2143,6 @@ int playlist_create(const char *dir, const char *file)
             void* buf = core_get_data(handle);
             STORAGE_ALIGN_BUFFER(buf, buflen);
             buflen = ALIGN_DOWN(buflen, 512); /* to avoid partial sector I/O */
-
             /* load the playlist file */
             add_indices_to_playlist(playlist, buf, buflen);
             core_free(handle);
