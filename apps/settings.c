@@ -262,6 +262,52 @@ bool cfg_string_to_int(int setting_id, int* out, const char* str)
     return false;
 }
 
+/**
+ * Copy an input string to an output buffer, stripping the prefix and
+ * suffix listed in the filename setting. Returns false if the output
+ * string does not fit in the buffer or is longer than the setting's
+ * max_len, and the output buffer will not be modified.
+ *
+ * Returns true if the setting was copied successfully. The input and
+ * output buffers are allowed to alias.
+ */
+bool copy_filename_setting(char *buf, size_t buflen, const char *input,
+                           const struct filename_setting *fs)
+{
+    size_t input_len = strlen(input);
+    size_t len;
+
+    if (fs->prefix)
+    {
+        len = strlen(fs->prefix);
+        if (len <= input_len && !strncasecmp(input, fs->prefix, len))
+        {
+            input += len;
+            input_len -= len;
+        }
+    }
+
+    if (fs->suffix)
+    {
+        len = strlen(fs->suffix);
+        if (len <= input_len &&
+            !strcasecmp(input + input_len - len, fs->suffix))
+        {
+            input_len -= len;
+        }
+    }
+
+    /* Make sure it fits the output buffer and repsects the setting's max_len.
+     * Note that max_len is a buffer size and thus includes a null terminator */
+    if (input_len >= (size_t)fs->max_len || input_len >= buflen)
+        return false;
+
+    /* Copy what remains into buf - use memmove in case of aliasing */
+    memmove(buf, input, input_len);
+    buf[input_len] = '\0';
+    return true;
+}
+
 bool settings_load_config(const char* file, bool apply)
 {
     int fd;
@@ -335,29 +381,9 @@ bool settings_load_config(const char* file, bool apply)
                     case F_T_CHARPTR:
                     case F_T_UCHARPTR:
                     {
-                        char storage[MAX_PATH];
-                        if (settings[i].filename_setting->prefix)
-                        {
-                            const char *dir = settings[i].filename_setting->prefix;
-                            size_t len = strlen(dir);
-                            if (!strncasecmp(value, dir, len))
-                            {
-                                strmemccpy(storage, &value[len], MAX_PATH);
-                            }
-                            else
-                                strmemccpy(storage, value, MAX_PATH);
-
-                        }
-                        else
-                            strmemccpy(storage, value, MAX_PATH);
-
-                        if (settings[i].filename_setting->suffix)
-                        {
-                            char *s = strcasestr(storage,settings[i].filename_setting->suffix);
-                            if (s) *s = '\0';
-                        }
-                        strmemccpy((char*)settings[i].setting, storage,
-                                   settings[i].filename_setting->max_len);
+                        const struct filename_setting *fs = settings[i].filename_setting;
+                        copy_filename_setting((char*)settings[i].setting,
+                                              fs->max_len, value, fs);
                         break;
                     }
                 }

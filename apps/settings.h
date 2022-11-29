@@ -247,6 +247,7 @@ enum {
 bool settings_save_config(int options);
 
 struct settings_list;
+struct filename_setting;
 void reset_setting(const struct settings_list *setting, void *var);
 void settings_reset(void);
 void sound_settings_apply(void);
@@ -267,6 +268,8 @@ const struct settings_list* find_setting_by_cfgname(const char* name, int *id);
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
 bool cfg_string_to_int(int setting_id, int* out, const char* str);
 bool cfg_to_string(int setting_id, char* buf, int buf_len);
+bool copy_filename_setting(char *buf, size_t buflen, const char *input,
+                           const struct filename_setting *fs);
 bool set_bool_options(const char* string, const bool* variable,
                       const char* yes_str, int yes_voice,
                       const char* no_str, int no_voice,
