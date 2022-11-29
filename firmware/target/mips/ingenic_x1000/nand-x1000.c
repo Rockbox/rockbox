@@ -93,11 +93,15 @@ static const struct nand_chip chip_gd5f1gq4xexx = {
     .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
 };
 
+#define chip_ds35x1gaxxx chip_gd5f1gq4xexx
+
 const struct nand_chip_id supported_nand_chips[] = {
     NAND_CHIP_ID(&chip_ato25d1ga, NAND_READID_ADDR, 0x9b, 0x12),
     NAND_CHIP_ID(&chip_w25n01gvxx, NAND_READID_ADDR, 0xef, 0xaa, 0x21),
     NAND_CHIP_ID(&chip_gd5f1gq4xexx, NAND_READID_ADDR, 0xc8, 0xd1),
     NAND_CHIP_ID(&chip_gd5f1gq4xexx, NAND_READID_ADDR, 0xc8, 0xc1),
+    NAND_CHIP_ID(&chip_ds35x1gaxxx, NAND_READID_ADDR, 0xe5, 0x71), /* 3.3 V */
+    NAND_CHIP_ID(&chip_ds35x1gaxxx, NAND_READID_ADDR, 0xe5, 0x21), /* 1.8 V */
 };
 
 const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
