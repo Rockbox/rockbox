@@ -310,12 +310,14 @@ bool copy_filename_setting(char *buf, size_t buflen, const char *input,
 
 bool settings_load_config(const char* file, bool apply)
 {
+    const struct settings_list *setting;
+    int index;
     int fd;
     char line[128];
     char* name;
     char* value;
-    int i;
     bool theme_changed = false;
+
     fd = open_utf8(file, O_RDONLY);
     if (fd < 0)
         return false;
@@ -324,72 +326,70 @@ bool settings_load_config(const char* file, bool apply)
     {
         if (!settings_parseline(line, &name, &value))
             continue;
-        for(i=0; i<nb_settings; i++)
+
+        setting = find_setting_by_cfgname(name, &index);
+        if (!setting)
+            continue;
+
+        if (setting->flags & F_THEMESETTING)
+            theme_changed = true;
+
+        switch (setting->flags & F_T_MASK)
         {
-            if (settings[i].cfg_name == NULL)
-                continue;
-            if (!strcasecmp(name,settings[i].cfg_name))
-            {
-                if (settings[i].flags&F_THEMESETTING)
-                    theme_changed = true;
-                switch (settings[i].flags&F_T_MASK)
-                {
-                    case F_T_CUSTOM:
-                        settings[i].custom_setting->load_from_cfg(settings[i].setting, value);
-                        break;
-                    case F_T_INT:
-                    case F_T_UINT:
+        case F_T_CUSTOM:
+            setting->custom_setting->load_from_cfg(setting->setting, value);
+            break;
+        case F_T_INT:
+        case F_T_UINT:
 #ifdef HAVE_LCD_COLOR
-                        if (settings[i].flags&F_RGB)
-                            hex_to_rgb(value, (int*)settings[i].setting);
-                        else
+            if (setting->flags & F_RGB)
+                hex_to_rgb(value, (int*)setting->setting);
+            else
 #endif
-                            if (settings[i].cfg_vals == NULL)
-                        {
-                            *(int*)settings[i].setting = atoi(value);
-                        }
+                if (setting->cfg_vals == NULL)
+                {
+                    *(int*)setting->setting = atoi(value);
+                }
+                else
+                {
+                    int temp, *v = (int*)setting->setting;
+                    bool found = cfg_string_to_int(index, &temp, value);
+                    if (found)
+                    {
+                        if (setting->flags & F_TABLE_SETTING)
+                            *v = setting->table_setting->values[temp];
                         else
-                        {
-                            int temp, *v = (int*)settings[i].setting;
-                            bool found = cfg_string_to_int(i, &temp, value);
-                            if (found)
-                            {
-                                if (settings[i].flags&F_TABLE_SETTING)
-                                    *v = settings[i].table_setting->values[temp];
-                                else
-                                    *v = temp;
-                            }
-                            else
-                            {   /* atoi breaks choice settings because they
-                                 * don't have int-like values, and would
-                                 * fall back to the first value (i.e. 0)
-                                 * due to atoi */
-                                if (!(settings[i].flags&F_CHOICE_SETTING))
-                                    *v = atoi(value);
-                            }
-                        }
-                        break;
-                    case F_T_BOOL:
-                    {
-                        int temp;
-                        if (cfg_string_to_int(i,&temp,value))
-                            *(bool*)settings[i].setting = (temp!=0);
-                        if (settings[i].bool_setting->option_callback)
-                            settings[i].bool_setting->option_callback(temp!=0);
-                        break;
+                            *v = temp;
                     }
-                    case F_T_CHARPTR:
-                    case F_T_UCHARPTR:
-                    {
-                        const struct filename_setting *fs = settings[i].filename_setting;
-                        copy_filename_setting((char*)settings[i].setting,
-                                              fs->max_len, value, fs);
-                        break;
+                    else
+                    {   /* atoi breaks choice settings because they
+                         * don't have int-like values, and would
+                         * fall back to the first value (i.e. 0)
+                         * due to atoi */
+                        if (setting->flags & F_CHOICE_SETTING)
+                            *v = atoi(value);
                     }
                 }
-                break;
-            } /* if (!strcmp(name,settings[i].cfg_name)) */
-        } /* for(...) */
+            break;
+        case F_T_BOOL:
+        {
+            int temp;
+            if (cfg_string_to_int(index, &temp, value))
+                *(bool*)setting->setting = !!temp;
+            if (setting->bool_setting->option_callback)
+                setting->bool_setting->option_callback(!!temp);
+            break;
+        }
+        /* these can be plain text, filenames, or dirnames */
+        case F_T_CHARPTR:
+        case F_T_UCHARPTR:
+        {
+            const struct filename_setting *fs = setting->filename_setting;
+            copy_filename_setting((char*)setting->setting,
+                                  fs->max_len, value, fs);
+            break;
+        }
+        }
     } /* while(...) */
 
     close(fd);
@@ -1145,7 +1145,7 @@ const struct settings_list* find_setting_by_cfgname(const char* name, int *id)
     for (i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name &&
-            !strcmp(settings[i].cfg_name, name))
+            !strcasecmp(settings[i].cfg_name, name))
         {
             if (id) *id = i;
             return &settings[i];
