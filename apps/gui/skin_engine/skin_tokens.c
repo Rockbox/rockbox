@@ -1371,7 +1371,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_SETTING:
         {
-            const struct settings_list *s = settings+token->value.i;
+            const struct settings_list *s = token->value.xdata;
             if (intval)
             {
                 /* Handle contionals */

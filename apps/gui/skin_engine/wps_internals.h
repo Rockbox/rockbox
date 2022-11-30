@@ -73,6 +73,7 @@ struct wps_token {
         unsigned short i;
         long l;
         OFFSETTYPE(void*) data;
+        void *xdata;
     } value;
 
     enum skin_token_type type; /* enough to store the token type */
@@ -131,7 +132,7 @@ struct progressbar {
     OFFSETTYPE(struct gui_img *) slider;
     bool horizontal;
     OFFSETTYPE(struct gui_img *) backdrop;
-    int setting_id; /* for the setting bar type */
+    const struct settings_list *setting;
 
 };
 

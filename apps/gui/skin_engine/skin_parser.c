@@ -803,14 +803,14 @@ static int parse_setting_and_lang(struct skin_element *element,
      */
     (void)wps_data;
     char *temp = get_param_text(element, 0);
-    int i;
 
     if (token->type == SKIN_TOKEN_TRANSLATEDSTRING)
     {
 #ifndef __PCTOOL__
-        i = lang_english_to_id(temp);
+        int i = lang_english_to_id(temp);
         if (i < 0)
             i = LANG_LAST_INDEX_IN_ARRAY;
+        token->value.i = i;
 #endif
     }
     else if (element->params_count > 1)
@@ -823,12 +823,13 @@ static int parse_setting_and_lang(struct skin_element *element,
     else
     {
 #ifndef __PCTOOL__
-        if (find_setting_by_cfgname(temp, &i) == NULL)
+        const struct settings_list *setting = find_setting_by_cfgname(temp, NULL);
+        if (!setting)
             return WPS_ERROR_INVALID_PARAM;
+
+        token->value.xdata = (void *)setting;
 #endif
     }
-    /* Store the setting number */
-    token->value.i = i;
     return 0;
 }
 
@@ -972,7 +973,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->image = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->slider = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->backdrop = PTRTOSKINOFFSET(skin_buffer, NULL);
-    pb->setting_id = -1;
+    pb->setting = NULL;
     pb->invert_fill_direction = false;
     pb->horizontal = true;
 
@@ -1157,7 +1158,8 @@ static int parse_progressbar_tag(struct skin_element* element,
                 param++;
                 text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
 #ifndef __PCTOOL__
-                if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
+                pb->setting = find_setting_by_cfgname(text, NULL);
+                if (!pb->setting)
                     return WPS_ERROR_INVALID_PARAM;
 #endif
             }

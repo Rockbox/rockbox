@@ -313,9 +313,9 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
                 if (bar && edge_offset)
                 {                    
                     int val, count;
-                    get_setting_info_for_bar(bar->setting_id, &count, &val);
+                    get_setting_info_for_bar(bar->setting, &count, &val);
                     val = *edge_offset * count / 1000;
-                    update_setting_value_from_touch(bar->setting_id, val);
+                    update_setting_value_from_touch(bar->setting, val);
                 }
             }
             break;
