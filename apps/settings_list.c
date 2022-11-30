@@ -593,52 +593,34 @@ static void eq_set_default(void* setting, void* defaultval)
 }
 
 #ifdef HAVE_QUICKSCREEN
-static int find_setting_by_name(char*name)
+static void qs_load_from_cfg(void *var, char *value)
 {
-    int i = 0;
-    const struct settings_list *setting;
-    if (!strcmp(name, "-"))
-        return -1;
-    while (i<nb_settings)
-    {
-        setting = &settings[i];
-        if (setting->cfg_name && !strcmp(setting->cfg_name, name))
-        {
-            return i;
-        }
-        i++;
-    }
-    return -1;
+    const struct settings_list **item = var;
+
+    if (*value == '-')
+        *item = NULL;
+    else
+        *item = find_setting_by_cfgname(value, NULL);
 }
-static void qs_load_from_cfg(void* var, char*value)
+
+static char* qs_write_to_cfg(void *var, char *buf, int buf_len)
 {
-    *(int*)var = find_setting_by_name(value);
-}
-static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
-{
-    int index = *(int*)setting;
-    if (index < 0 || index >= nb_settings)
-    {
-        strmemccpy(buf, "-", buf_len);
-        return buf;
-    }
-    const struct settings_list *var = &settings[index];
-    strmemccpy(buf, var->cfg_name, buf_len);
+    const struct settings_list *setting = *(const struct settings_list **)var;
+
+    strmemccpy(buf, setting ? setting->cfg_name : "-", buf_len);
     return buf;
 }
-static bool qs_is_changed(void* setting, void* defaultval)
+
+static bool qs_is_changed(void* var, void* defaultval)
 {
-    int i = *(int*)setting;
-    if (i < 0 || i >= nb_settings)
-        return false;
-    const struct settings_list *var = &settings[i];
-    return var != find_setting(defaultval, NULL);
+    const struct settings_list *defaultsetting = find_setting(defaultval, NULL);
+
+    return var != defaultsetting;
 }
-static void qs_set_default(void* setting, void* defaultval)
+
+static void qs_set_default(void* var, void* defaultval)
 {
-    if (defaultval == NULL)
-        *(int*)setting = -1;
-    find_setting(defaultval, (int*)setting);
+    *(const struct settings_list **)var = find_setting(defaultval, NULL);
 }
 #endif
 #ifdef HAVE_TOUCHSCREEN

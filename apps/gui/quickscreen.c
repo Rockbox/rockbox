@@ -417,15 +417,6 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
     return ret;
 }
 
-static const struct settings_list *get_setting(int gs_value,
-                                        const struct settings_list *defaultval)
-{
-    if (gs_value != -1 && gs_value < nb_settings &&
-        is_setting_quickscreenable(&settings[gs_value]))
-        return &settings[gs_value];
-    return defaultval;
-}
-
 int quick_screen_quick(int button_enter)
 {
     struct gui_quickscreen qs;
@@ -436,16 +427,13 @@ int quick_screen_quick(int button_enter)
 #endif
     bool usb = false;
 
-    qs.items[QUICKSCREEN_TOP] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_TOP], NULL);
-    qs.items[QUICKSCREEN_LEFT] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_LEFT],
-                        find_setting(&global_settings.playlist_shuffle, NULL));
-    qs.items[QUICKSCREEN_RIGHT] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_RIGHT],
-                        find_setting(&global_settings.repeat_mode, NULL));
-    qs.items[QUICKSCREEN_BOTTOM] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM], NULL);
+    for (int i = 0; i < 4; ++i)
+    {
+        qs.items[i] = global_settings.qs_items[i];
+
+        if (!is_setting_quickscreenable(qs.items[i]))
+            qs.items[i] = NULL;
+    }
 
     qs.callback = NULL;
     int ret = gui_syncquickscreen_run(&qs, button_enter, &usb);
@@ -481,10 +469,14 @@ int quick_screen_quick(int button_enter)
 /* stuff to make the quickscreen configurable */
 bool is_setting_quickscreenable(const struct settings_list *setting)
 {
+    if (!setting)
+        return true;
+
     /* to keep things simple, only settings which have a lang_id set are ok */
-    if (setting->lang_id < 0 || (setting->flags&F_BANFROMQS))
+    if (setting->lang_id < 0 || (setting->flags & F_BANFROMQS))
         return false;
-    switch (setting->flags&F_T_MASK)
+
+    switch (setting->flags & F_T_MASK)
     {
         case F_T_BOOL:
             return true;
@@ -494,17 +486,4 @@ bool is_setting_quickscreenable(const struct settings_list *setting)
         default:
             return false;
     }
-}
-
-void set_as_qs_item(const struct settings_list *setting,
-                    enum quickscreen_item item)
-{
-    int i;
-    for (i = 0; i < nb_settings; i++)
-    {
-        if (&settings[i] == setting)
-            break;
-    }
-
-    global_settings.qs_items[item] = i;
 }

@@ -486,7 +486,7 @@ struct user_settings
 #endif
 
 #ifdef HAVE_QUICKSCREEN
-    int qs_items[QUICKSCREEN_ITEM_COUNT];
+    const struct settings_list *qs_items[QUICKSCREEN_ITEM_COUNT];
 #endif
 
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */

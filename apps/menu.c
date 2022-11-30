@@ -544,16 +544,16 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                             break;
 #ifdef HAVE_QUICKSCREEN
                         case 1: /* set as top QS item */
-                            set_as_qs_item(setting, QUICKSCREEN_TOP);
+                            global_settings.qs_items[QUICKSCREEN_TOP] = setting;
                             break;
                         case 2: /* set as left QS item */
-                            set_as_qs_item(setting, QUICKSCREEN_LEFT);
+                            global_settings.qs_items[QUICKSCREEN_LEFT] = setting;
                             break;
                         case 3: /* set as bottom QS item */
-                            set_as_qs_item(setting, QUICKSCREEN_BOTTOM);
+                            global_settings.qs_items[QUICKSCREEN_BOTTOM] = setting;
                             break;
                         case 4: /* set as right QS item */
-                            set_as_qs_item(setting, QUICKSCREEN_RIGHT);
+                            global_settings.qs_items[QUICKSCREEN_RIGHT] = setting;
                             break;
                         case 5: /* Add to faves. Same limitation on which can be
                                   added to the shortcuts menu as the quickscreen */
