@@ -335,7 +335,6 @@ bool settings_load_config(const char* file, bool apply)
 {
     logf("%s()\r\n", __func__);
     const struct settings_list *setting;
-    int index;
     int fd;
     char line[128];
     char* name;
@@ -351,7 +350,7 @@ bool settings_load_config(const char* file, bool apply)
         if (!settings_parseline(line, &name, &value))
             continue;
 
-        setting = find_setting_by_cfgname(name, &index);
+        setting = find_setting_by_cfgname(name);
         if (!setting)
             continue;
 
@@ -1158,36 +1157,32 @@ void settings_reset(void)
 }
 
 /** Changing setting values **/
-const struct settings_list* find_setting(const void* variable, int *id)
+const struct settings_list* find_setting(const void* variable)
 {
-    int i;
-    for(i=0;i<nb_settings;i++)
+    for(int i = 0; i < nb_settings; i++)
     {
-        if (settings[i].setting == variable)
-        {
-            if (id)
-                *id = i;
-            return &settings[i];
-        }
+        const struct settings_list *setting = &settings[i];
+        if (setting->setting == variable)
+            return setting;
     }
+
     return NULL;
 }
 
-const struct settings_list* find_setting_by_cfgname(const char* name, int *id)
+const struct settings_list* find_setting_by_cfgname(const char* name)
 {
-    int i;
     logf("Searching for Setting: '%s'",name);
-    for (i=0; i<nb_settings; i++)
+    for(int i = 0; i < nb_settings; i++)
     {
-        if (settings[i].cfg_name &&
-            !strcasecmp(settings[i].cfg_name, name))
+        const struct settings_list *setting = &settings[i];
+        if (setting->cfg_name && !strcasecmp(setting->cfg_name, name))
         {
             logf("Found, flags: %s", debug_get_flags(settings[i].flags));
-            if (id) *id = i;
-            return &settings[i];
+            return setting;
         }
     }
     logf("Setting: '%s' Not Found!",name);
+
     return NULL;
 }
 

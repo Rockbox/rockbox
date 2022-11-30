@@ -669,10 +669,13 @@ static const struct plugin_api rockbox_api = {
     tagcache_retrieve,
     tagcache_search_finish,
     tagcache_get_numeric,
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    tagcache_get_stat,
+#if defined(HAVE_TC_RAMCACHE)
+    tagcache_is_in_ram,
+#if defined(HAVE_DIRCACHE)
     tagcache_fill_tags,
 #endif
-    tagcache_get_stat,
+#endif
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -820,11 +823,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-#ifdef HAVE_TC_RAMCACHE
-    tagcache_is_in_ram,
-#endif
-#endif
 };
 
 static int plugin_buffer_handle;

@@ -300,7 +300,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             case ACTION_TOUCH_REPMODE: /* cycle the repeat mode setting */
             {
                 const struct settings_list *rep_setting = 
-                                find_setting(&global_settings.repeat_mode, NULL);
+                                find_setting(&global_settings.repeat_mode);
                 option_select_next_val(rep_setting, false, true);
                 audio_flush_and_reload_tracks();
                 returncode = ACTION_REDRAW;

@@ -823,7 +823,7 @@ static int parse_setting_and_lang(struct skin_element *element,
     else
     {
 #ifndef __PCTOOL__
-        const struct settings_list *setting = find_setting_by_cfgname(temp, NULL);
+        const struct settings_list *setting = find_setting_by_cfgname(temp);
         if (!setting)
             return WPS_ERROR_INVALID_PARAM;
 
@@ -1158,7 +1158,7 @@ static int parse_progressbar_tag(struct skin_element* element,
                 param++;
                 text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
 #ifndef __PCTOOL__
-                pb->setting = find_setting_by_cfgname(text, NULL);
+                pb->setting = find_setting_by_cfgname(text);
                 if (!pb->setting)
                     return WPS_ERROR_INVALID_PARAM;
 #endif
@@ -1548,7 +1548,7 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
 #ifndef __PCTOOL__
     int p = param_no;
     char *name = get_param_text(element, p++);
-    const struct settings_list *setting = find_setting_by_cfgname(name, NULL);
+    const struct settings_list *setting = find_setting_by_cfgname(name);
     if (!setting)
         return WPS_ERROR_INVALID_PARAM;
 

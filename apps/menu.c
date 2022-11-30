@@ -147,7 +147,7 @@ static const char* get_menu_item_name(int selected_item,
     type = (menu->flags&MENU_TYPE_MASK);
     if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
     {
-        const struct settings_list *v = find_setting(menu->variable, NULL);
+        const struct settings_list *v = find_setting(menu->variable);
         if (v)
             return str(v->lang_id);
         else return "Not Done yet!";
@@ -356,14 +356,12 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
 {
     char *title;
-    int setting_id;
     if (!temp)
     {
         panicf("do_setting_from_menu, NULL pointer");
         return;
     }
-    const struct settings_list *setting =
-        find_setting(temp->variable, &setting_id);
+    const struct settings_list *setting = find_setting(temp->variable);
 
     if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
         title = temp->callback_and_desc->desc;
@@ -523,7 +521,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                         ID2P(LANG_RESET_SETTING));
                     const struct menu_item_ex *context_menu;
                     const struct settings_list *setting =
-                            find_setting(temp->variable, NULL);
+                            find_setting(temp->variable);
 #ifdef HAVE_QUICKSCREEN
                     if (is_setting_quickscreenable(setting))
                         context_menu = &quickscreen_able_option;

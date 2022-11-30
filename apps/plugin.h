@@ -157,12 +157,12 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 256
+#define PLUGIN_API_VERSION 257
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 255
+#define PLUGIN_MIN_API_VERSION 257
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -766,10 +766,13 @@ struct plugin_api {
                            int tag, char *buf, long size);
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
     long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    struct tagcache_stat* (*tagcache_get_stat)(void);
+#if defined(HAVE_TC_RAMCACHE)
+    bool (*tagcache_is_in_ram)(void);
+#if defined(HAVE_DIRCACHE)
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
-    struct tagcache_stat* (*tagcache_get_stat)(void);
+#endif
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -824,7 +827,7 @@ struct plugin_api {
 
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
-    const struct settings_list* (*find_setting)(const void* variable, int *id);
+    const struct settings_list* (*find_setting)(const void* variable);
     int (*settings_save)(void);
     bool (*option_screen)(const struct settings_list *setting,
                           struct viewport parent[NB_SCREENS],
@@ -946,11 +949,6 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-#ifdef HAVE_TC_RAMCACHE
-    bool (*tagcache_is_in_ram)(void);
-#endif
-#endif
 };
 
 /* plugin header */

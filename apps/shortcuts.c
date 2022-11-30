@@ -342,7 +342,7 @@ static int readline_cb(int n, char *buf, void *parameters)
                     strmemccpy(sc->u.path, value, MAX_PATH);
                     break;
                 case SHORTCUT_SETTING:
-                    sc->u.setting = find_setting_by_cfgname(value, NULL);
+                    sc->u.setting = find_setting_by_cfgname(value);
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC

@@ -600,7 +600,7 @@ static void qs_load_from_cfg(void *var, char *value)
     if (*value == '-')
         *item = NULL;
     else
-        *item = find_setting_by_cfgname(value, NULL);
+        *item = find_setting_by_cfgname(value);
 }
 
 static char* qs_write_to_cfg(void *var, char *buf, int buf_len)
@@ -613,14 +613,14 @@ static char* qs_write_to_cfg(void *var, char *buf, int buf_len)
 
 static bool qs_is_changed(void* var, void* defaultval)
 {
-    const struct settings_list *defaultsetting = find_setting(defaultval, NULL);
+    const struct settings_list *defaultsetting = find_setting(defaultval);
 
     return var != defaultsetting;
 }
 
 static void qs_set_default(void* var, void* defaultval)
 {
-    *(const struct settings_list **)var = find_setting(defaultval, NULL);
+    *(const struct settings_list **)var = find_setting(defaultval);
 }
 #endif
 #ifdef HAVE_TOUCHSCREEN

@@ -1488,7 +1488,7 @@ void talk_setting(const void *global_settings_variable)
     const struct settings_list *setting;
     if (!global_settings.talk_menu)
         return;
-    setting = find_setting(global_settings_variable, NULL);
+    setting = find_setting(global_settings_variable);
     if (setting == NULL)
         return;
     if (setting->lang_id)

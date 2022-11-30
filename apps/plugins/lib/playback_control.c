@@ -65,21 +65,21 @@ static bool nexttrack(void)
 static bool volume(void)
 {
     const struct settings_list* vol = 
-        rb->find_setting(&rb->global_settings->volume, NULL);
+        rb->find_setting(&rb->global_settings->volume);
     return rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
 }
 
 static bool shuffle(void)
 {
     const struct settings_list* shuffle = 
-        rb->find_setting(&rb->global_settings->playlist_shuffle, NULL);
+        rb->find_setting(&rb->global_settings->playlist_shuffle);
     return rb->option_screen((struct settings_list*)shuffle, parentvp, false, "Shuffle");
 }
 
 static bool repeat_mode(void)
 {
     const struct settings_list* repeat = 
-        rb->find_setting(&rb->global_settings->repeat_mode, NULL);
+        rb->find_setting(&rb->global_settings->repeat_mode);
     int old_repeat = rb->global_settings->repeat_mode;
   
     rb->option_screen((struct settings_list*)repeat, parentvp, false, "Repeat");

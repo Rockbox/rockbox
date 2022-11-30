@@ -462,30 +462,30 @@ int rectrigger(void)
     /* TODO: what to do if there is < 4 lines on the screen? */
 
     settings[TRIGGER_MODE] =
-            find_setting(&global_settings.rec_trigger_mode, NULL);
+            find_setting(&global_settings.rec_trigger_mode);
     settings[TRIGGER_TYPE] =
-            find_setting(&global_settings.rec_trigger_type, NULL);
+            find_setting(&global_settings.rec_trigger_type);
     settings[PRERECORD_TIME] =
-            find_setting(&global_settings.rec_prerecord_time, NULL);
+            find_setting(&global_settings.rec_prerecord_time);
     settings[START_DURATION] =
-            find_setting(&global_settings.rec_start_duration, NULL);
+            find_setting(&global_settings.rec_start_duration);
     settings[STOP_POSTREC] =
-            find_setting(&global_settings.rec_stop_postrec, NULL);
+            find_setting(&global_settings.rec_stop_postrec);
     settings[STOP_GAP] =
-            find_setting(&global_settings.rec_stop_gap, NULL);
+            find_setting(&global_settings.rec_stop_gap);
     if (global_settings.peak_meter_dbfs) /* show the dB settings */
     {
         settings[START_THRESHOLD] =
-                find_setting(&global_settings.rec_start_thres_db, NULL);
+                find_setting(&global_settings.rec_start_thres_db);
         settings[STOP_THRESHOLD] =
-                find_setting(&global_settings.rec_stop_thres_db, NULL);
+                find_setting(&global_settings.rec_stop_thres_db);
     }
     else
     {
         settings[START_THRESHOLD] =
-                find_setting(&global_settings.rec_start_thres_linear, NULL);
+                find_setting(&global_settings.rec_start_thres_linear);
         settings[STOP_THRESHOLD] =
-                find_setting(&global_settings.rec_stop_thres_linear, NULL);
+                find_setting(&global_settings.rec_stop_thres_linear);
     }
     gui_synclist_init(&lists, trigger_get_name, settings, false, 2, vp);
     gui_synclist_set_nb_items(&lists, TRIG_OPTION_COUNT*2);

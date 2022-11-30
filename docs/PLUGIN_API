@@ -1759,7 +1759,7 @@ void semaphore_wait(struct semaphore *s)
     \param s
     \description
 
-const struct settings_list* find_setting(const void* variable, int *id)
+const struct settings_list* find_setting(const void* variable)
     \group options
     \param variable
     \param id
