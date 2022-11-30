@@ -96,7 +96,14 @@ with logging
   Allows the \fname{/.rockbox/database\_changelog.txt} backup to be 
   conveniently loaded into the database. If \setting{Auto Update} is
   enabled this is performed automatically when the database is initialized.
-  
+
+\item[Select directories to scan.]
+  The database normally scans all directories for audio files. This setting
+  allows you to limit the scan to a specified list of directories, so only
+  files contained in one of these directories will be added to the database.
+  Scanning is recursive -- all subdirectories of a selected directory will
+  be scanned as well.
+
 \end{description}
 
 \subsection{Using the Database}
