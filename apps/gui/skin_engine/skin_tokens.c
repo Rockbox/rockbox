@@ -1442,7 +1442,7 @@ const char *get_token_value(struct gui_wps *gwps,
                     goto gtv_ret_numeric_tag_info;
                 }
             }
-            cfg_to_string(token->value.i,buf,buf_size);
+            cfg_to_string(s, buf, buf_size);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }

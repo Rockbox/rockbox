@@ -117,7 +117,6 @@ const char *option_get_valuestring(const struct settings_list *setting,
     {
         if (setting->flags & F_CHOICETALKS)
         {
-            int setting_id;
             const struct choice_setting *info = setting->choice_setting;
             if (info->talks[(int)temp_var] < LANG_LAST_INDEX_IN_ARRAY)
             {
@@ -125,8 +124,7 @@ const char *option_get_valuestring(const struct settings_list *setting,
             }
             else
             {
-                find_setting(setting->setting, &setting_id);
-                cfg_int_to_string(setting_id, (int)temp_var, buffer, buf_len);
+                cfg_int_to_string(setting, (int)temp_var, buffer, buf_len);
             }
         }
         else

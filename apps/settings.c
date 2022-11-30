@@ -401,17 +401,16 @@ bool settings_load_config(const char* file, bool apply)
 
 /** Writing to a config file and saving settings **/
 
-bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
+bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, int buf_len)
 {
-    int flags = settings[setting_id].flags;
-    const char* start = settings[setting_id].cfg_vals;
+    const char* start = setting->cfg_vals;
     char* end = NULL;
     int count = 0;
 
-    if ((flags&F_T_MASK)==F_T_INT &&
-        flags&F_TABLE_SETTING)
+    if ((setting->flags & F_T_MASK) == F_T_INT &&
+        (setting->flags & F_TABLE_SETTING))
     {
-        const int *value = settings[setting_id].table_setting->values;
+        const int *value = setting->table_setting->values;
         while (start)
         {
             end = strchr(start,',');
@@ -455,20 +454,19 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     return true;
 }
 
-bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
+void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len)
 {
-    switch (settings[i].flags&F_T_MASK)
+    switch (setting->flags & F_T_MASK)
     {
         case F_T_CUSTOM:
-            settings[i].custom_setting->write_to_cfg(settings[i].setting,
-                                                     buf, buf_len);
+            setting->custom_setting->write_to_cfg(setting->setting, buf, buf_len);
             break;
         case F_T_INT:
         case F_T_UINT:
 #ifdef HAVE_LCD_COLOR
-            if (settings[i].flags&F_RGB)
+            if (setting->flags & F_RGB)
             {
-                int colour = *(int*)settings[i].setting;
+                int colour = *(int*)setting->setting;
                 snprintf(buf,buf_len,"%02x%02x%02x",
                             (int)RGB_UNPACK_RED(colour),
                             (int)RGB_UNPACK_GREEN(colour),
@@ -476,57 +474,50 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
             }
             else
 #endif
-            if (settings[i].cfg_vals == NULL)
+            if (setting->cfg_vals == NULL)
             {
-                snprintf(buf,buf_len,"%d",*(int*)settings[i].setting);
+                snprintf(buf, buf_len, "%d", *(int*)setting->setting);
             }
             else
             {
-                if (cfg_int_to_string(i, *(int*)settings[i].setting,
-                                    buf, buf_len) == false)
-                {
-                    snprintf(buf,buf_len,"%d",*(int*)settings[i].setting);
-                }
-                else
-                    return false;
+                if (!cfg_int_to_string(setting, *(int*)setting->setting,
+                                       buf, buf_len))
+                    snprintf(buf, buf_len, "%d", *(int*)setting->setting);
             }
             break;
         case F_T_BOOL:
-            cfg_int_to_string(i,
-                    *(bool*)settings[i].setting==false?0:1, buf, buf_len);
+            cfg_int_to_string(setting, *(bool*)setting->setting, buf, buf_len);
             break;
         case F_T_CHARPTR:
         case F_T_UCHARPTR:
-            if (((char*)settings[i].setting)[0]
-                && settings[i].filename_setting->prefix)
+        {
+            char *value = setting->setting;
+            const struct filename_setting *fs = setting->filename_setting;
+            if (value[0] && fs->prefix)
             {
-                if (((char*)settings[i].setting)[0] == '-')
+                if (value[0] == '-')
                 {
                     buf[0] = '-';
                     buf[1] = '\0';
                 }
                 else
                 {
-                    snprintf(buf,buf_len,"%s%s%s",
-                            settings[i].filename_setting->prefix,
-                            (char*)settings[i].setting,
-                            settings[i].filename_setting->suffix);
+                    snprintf(buf, buf_len, "%s%s%s",
+                             fs->prefix, value, fs->suffix);
                 }
             }
             else
             {
-                int len = MIN(buf_len, settings[i].filename_setting->max_len);
-                strmemccpy(buf,(char*)settings[i].setting,len);
+                strmemccpy(buf, value, buf_len);
             }
             break;
+        }
     } /* switch () */
-    return true;
 }
 
 
-static bool is_changed(int setting_id)
+static bool is_changed(const struct settings_list *setting)
 {
-    const struct settings_list *setting = &settings[setting_id];
     switch (setting->flags&F_T_MASK)
     {
     case F_T_CUSTOM:
@@ -574,40 +565,38 @@ static bool settings_write_config(const char* filename, int options)
                  "http://www.rockbox.org\r\n\r\n", rbversion);
     for(i=0; i<nb_settings; i++)
     {
-        if (settings[i].cfg_name == NULL)
-            continue;
-        value[0] = '\0';
-        if (settings[i].flags & F_DEPRECATED)
+        const struct settings_list *setting = &settings[i];
+        if (!setting->cfg_name || (setting->flags & F_DEPRECATED))
             continue;
 
         switch (options)
         {
             case SETTINGS_SAVE_CHANGED:
-                if (!is_changed(i))
+                if (!is_changed(setting))
                     continue;
                 break;
             case SETTINGS_SAVE_SOUND:
-                if ((settings[i].flags&F_SOUNDSETTING) == 0)
+                if (!(setting->flags & F_SOUNDSETTING))
                     continue;
                 break;
             case SETTINGS_SAVE_THEME:
-                if ((settings[i].flags&F_THEMESETTING) == 0)
+                if (!(setting->flags & F_THEMESETTING))
                     continue;
                 break;
 #ifdef HAVE_RECORDING
             case SETTINGS_SAVE_RECPRESETS:
-                if ((settings[i].flags&F_RECSETTING) == 0)
+                if (!(setting->flags & F_RECSETTING))
                     continue;
                 break;
 #endif
             case SETTINGS_SAVE_EQPRESET:
-                if ((settings[i].flags&F_EQSETTING) == 0)
+                if (!(setting->flags & F_EQSETTING))
                     continue;
                 break;
         }
 
-        cfg_to_string(i, value, MAX_PATH);
-        fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
+        cfg_to_string(setting, value, MAX_PATH);
+        fdprintf(fd,"%s: %s\r\n",setting->cfg_name,value);
     } /* for(...) */
     close(fd);
     return true;
