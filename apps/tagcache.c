@@ -5367,7 +5367,7 @@ bool tagcache_update(void)
     return false;
 }
 
-bool tagcache_rebuild()
+bool tagcache_rebuild(void)
 {
     queue_post(&tagcache_queue, Q_REBUILD, 0);
     return false;
