@@ -240,32 +240,34 @@ void settings_load(int which)
 
 bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str)
 {
-    const char* start = setting->cfg_vals;
-    char* end = NULL;
-    char temp[MAX_PATH];
-    int count = 0;
-    while (1)
+    const char* ptr = setting->cfg_vals;
+    size_t len = strlen(str);
+    int index = 0;
+
+    while (true)
     {
-        end = strchr(start, ',');
-        if (!end)
+        if (!strncmp(ptr, str, len))
         {
-            if (!strcmp(str, start))
+            ptr += len;
+            /* if the next character is not a comma or end of string,
+             * it means the comparison was only a partial match. */
+            if (*ptr == ',' || *ptr == '\0')
             {
-                *out = count;
+                *out = index;
                 return true;
             }
-            else return false;
         }
-        strmemccpy(temp, start, end-start+1);
-        if (!strcmp(str, temp))
+
+        while (*ptr != ',')
         {
-            *out = count;
-            return true;
+            if (!*ptr)
+                return false;
+            ptr++;
         }
-        start = end +1;
-        count++;
+
+        ptr++;
+        index++;
     }
-    return false;
 }
 
 /**
@@ -409,55 +411,36 @@ bool settings_load_config(const char* file, bool apply)
 
 bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, int buf_len)
 {
-    const char* start = setting->cfg_vals;
-    char* end = NULL;
-    int count = 0;
+    const char* ptr = setting->cfg_vals;
+    const int *values = NULL;
+    int index = 0;
 
-    if ((setting->flags & F_T_MASK) == F_T_INT &&
-        (setting->flags & F_TABLE_SETTING))
+    if (setting->flags & F_TABLE_SETTING)
+        values = setting->table_setting->values;
+
+    while (true)
     {
-        const int *value = setting->table_setting->values;
-        while (start)
+        if ((values && values[index] == val) ||
+            (!values && index == val))
         {
-            end = strchr(start,',');
-            if (value[count] == val)
-            {
-                if (end == NULL)
-                    strmemccpy(buf, start, buf_len);
-                else
-                {
-                    int len = MIN(buf_len, (end-start) + 1);
-                    strmemccpy(buf, start, len);
-                }
-                return true;
-            }
-            count++;
+            char *buf_end = buf + buf_len - 1;
+            while (*ptr && *ptr != ',' && buf != buf_end)
+                *buf++ = *ptr++;
 
-            if (end)
-                start = end+1;
-            else
-                break;
+            *buf++ = '\0';
+            return true;
         }
-        return false;
-    }
 
-    while (count < val)
-    {
-        start = strchr(start,',');
-        if (!start)
-            return false;
-        count++;
-        start++;
+        while (*ptr != ',')
+        {
+            if (!*ptr)
+                return false;
+            ptr++;
+        }
+
+        ptr++;
+        index++;
     }
-    end = strchr(start,',');
-    if (end == NULL)
-        strmemccpy(buf, start, buf_len);
-    else
-    {
-        int len = MIN(buf_len, (end-start) + 1);
-        strmemccpy(buf, start, len);
-    }
-    return true;
 }
 
 void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len)
