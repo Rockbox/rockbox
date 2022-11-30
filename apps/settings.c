@@ -361,13 +361,9 @@ bool settings_load_config(const char* file, bool apply)
                         else
                             *v = temp;
                     }
-                    else
-                    {   /* atoi breaks choice settings because they
-                         * don't have int-like values, and would
-                         * fall back to the first value (i.e. 0)
-                         * due to atoi */
-                        if (setting->flags & F_CHOICE_SETTING)
-                            *v = atoi(value);
+                    else if (setting->flags & F_ALLOW_ARBITRARY_VALS)
+                    {
+                        *v = atoi(value);
                     }
                 }
             break;
