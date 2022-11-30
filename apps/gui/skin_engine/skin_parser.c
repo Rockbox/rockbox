@@ -1546,48 +1546,48 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
 #ifndef __PCTOOL__
     int p = param_no;
     char *name = get_param_text(element, p++);
-    int j;
-
-    region->setting_data.setting = find_setting_by_cfgname(name, &j);
-    if (region->setting_data.setting == NULL)
+    const struct settings_list *setting = find_setting_by_cfgname(name, NULL);
+    if (!setting)
         return WPS_ERROR_INVALID_PARAM;
+
+    region->setting_data.setting = setting;
 
     if (region->action == ACTION_SETTINGS_SET)
     {
         char* text;
         int temp;
-        struct touchsetting *setting =
+        struct touchsetting *touchsetting =
             &region->setting_data;
         if (element->params_count < p+1)
             return -1;
 
         text = get_param_text(element, p++);
-        switch (settings[j].flags&F_T_MASK)
+        switch (setting->flags & F_T_MASK)
         {
         case F_T_CUSTOM:
-            setting->value.text = PTRTOSKINOFFSET(skin_buffer, text);
+            touchsetting->value.text = PTRTOSKINOFFSET(skin_buffer, text);
             break;
         case F_T_INT:
         case F_T_UINT:
-            if (settings[j].cfg_vals == NULL)
+            if (setting->cfg_vals == NULL)
             {
-                setting->value.number = atoi(text);
+                touchsetting->value.number = atoi(text);
             }
-            else if (cfg_string_to_int(j, &temp, text))
+            else if (cfg_string_to_int(setting, &temp, text))
             {
-                if (settings[j].flags&F_TABLE_SETTING)
-                    setting->value.number =
-                        settings[j].table_setting->values[temp];
+                if (setting->flags & F_TABLE_SETTING)
+                    touchsetting->value.number =
+                        setting->table_setting->values[temp];
                 else
-                    setting->value.number = temp;
+                    touchsetting->value.number = temp;
             }
             else
                 return -1;
             break;
         case F_T_BOOL:
-            if (cfg_string_to_int(j, &temp, text))
+            if (cfg_string_to_int(setting, &temp, text))
             {
-                setting->value.number = temp;
+                touchsetting->value.number = temp;
             }
             else
                 return -1;

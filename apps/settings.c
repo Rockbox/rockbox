@@ -232,9 +232,9 @@ void settings_load(int which)
     }
 }
 
-bool cfg_string_to_int(int setting_id, int* out, const char* str)
+bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str)
 {
-    const char* start = settings[setting_id].cfg_vals;
+    const char* start = setting->cfg_vals;
     char* end = NULL;
     char temp[MAX_PATH];
     int count = 0;
@@ -353,7 +353,7 @@ bool settings_load_config(const char* file, bool apply)
                 else
                 {
                     int temp, *v = (int*)setting->setting;
-                    bool found = cfg_string_to_int(index, &temp, value);
+                    bool found = cfg_string_to_int(setting, &temp, value);
                     if (found)
                     {
                         if (setting->flags & F_TABLE_SETTING)
@@ -370,7 +370,7 @@ bool settings_load_config(const char* file, bool apply)
         case F_T_BOOL:
         {
             int temp;
-            if (cfg_string_to_int(index, &temp, value))
+            if (cfg_string_to_int(setting, &temp, value))
                 *(bool*)setting->setting = !!temp;
             if (setting->bool_setting->option_callback)
                 setting->bool_setting->option_callback(!!temp);
