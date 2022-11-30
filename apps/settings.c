@@ -123,97 +123,103 @@ long lasttime = 0;
 
 /** NVRAM stuff, if the target doesnt have NVRAM it is saved in ROCKBOX_DIR /nvram.bin **/
 /* NVRAM is set out as
-[0] 'R'
-[1] 'b'
-[2] version
-[3] stored variable count
-[4-7] crc32 checksum
-[8-NVRAM_BLOCK_SIZE] data
-*/
-static char nvram_buffer[NVRAM_BLOCK_SIZE];
+ *
+ * [0]   'R'
+ * [1]   'b'
+ * [2]   version
+ * [3]   stored variable count
+ * [4-7] crc32 checksum in host endian order
+ * [8+]  data
+ */
 
-static bool read_nvram_data(char* buf, int max_len)
+static unsigned int nvram_crc(char *buf, int max_len)
+{
+    return crc_32(&buf[NVRAM_DATA_START], max_len - NVRAM_DATA_START - 1, 0xffffffff);
+}
+
+static void read_nvram_data(void)
 {
     rename_temp_file(NVRAM_FILE_TEMP, NVRAM_FILE, NVRAM_FILE".old");
-    unsigned crc32 = 0xffffffff;
-    int var_count = 0, i = 0, buf_pos = 0;
+
     int fd = open(NVRAM_FILE, O_RDONLY);
-    int bytes;
     if (fd < 0)
-        return false;
-    memset(buf,0,max_len);
-    bytes = read(fd,buf,max_len);
+        return;
+
+    char buf[NVRAM_BLOCK_SIZE];
+    memset(buf, 0, sizeof(buf));
+
+    ssize_t bytes = read(fd, buf, sizeof(buf));
     close(fd);
+
     if (bytes < 8) /* min is 8 bytes,magic, ver, vars, crc32 */
-        return false;
+        return;
+
     /* check magic, version */
-    if ((buf[0] != 'R') || (buf[1] != 'b')
-        || (buf[2] != NVRAM_CONFIG_VERSION))
-        return false;
+    if (buf[0] != 'R' || buf[1] != 'b' || buf[2] != NVRAM_CONFIG_VERSION)
+        return;
+
     /* check crc32 */
-    crc32 = crc_32(&buf[NVRAM_DATA_START],
-                    max_len-NVRAM_DATA_START-1,0xffffffff);
-    if (memcmp(&crc32,&buf[4],4))
-        return false;
+    unsigned int crc32 = nvram_crc(buf, sizeof(buf));
+    if (crc32 != load_h32(&buf[4]))
+        return;
+
     /* all good, so read in the settings */
-    var_count = buf[3];
-    buf_pos = NVRAM_DATA_START;
-    for(i=0; i<nb_settings; i++)
+    int var_count = buf[3];
+    size_t buf_pos = NVRAM_DATA_START;
+    for(int i = 0; i < nb_settings; i++)
     {
-        int nvram_bytes = (settings[i].flags&F_NVRAM_BYTES_MASK)
-                                >>F_NVRAM_MASK_SHIFT;
+        const struct settings_list *setting = &settings[i];
+        int nvram_bytes = (setting->flags & F_NVRAM_BYTES_MASK) >> F_NVRAM_MASK_SHIFT;
         if (nvram_bytes)
         {
-            if ((var_count>0) && (buf_pos<max_len))
+            if (var_count > 0 && buf_pos < (size_t)bytes)
             {
-                memcpy(settings[i].setting,&buf[buf_pos],nvram_bytes);
+                memcpy(setting->setting, &buf[buf_pos], nvram_bytes);
                 buf_pos += nvram_bytes;
                 var_count--;
             }
             else /* should only happen when new items are added to the end */
             {
-                memcpy(settings[i].setting, &settings[i].default_val, nvram_bytes);
+                memcpy(setting->setting, &setting->default_val, nvram_bytes);
             }
         }
     }
-    return true;
 }
-static bool write_nvram_data(char* buf, int max_len)
+
+static void write_nvram_data(void)
 {
-    unsigned crc32 = 0xffffffff;
-    int i = 0, buf_pos = 0;
-    char var_count = 0;
-    int fd;
-    memset(buf,0,max_len);
+    char buf[NVRAM_BLOCK_SIZE];
+    memset(buf, 0, sizeof(buf));
+
     /* magic, version */
-    buf[0] = 'R'; buf[1] = 'b';
+    buf[0] = 'R';
+    buf[1] = 'b';
     buf[2] = NVRAM_CONFIG_VERSION;
-    buf_pos = NVRAM_DATA_START;
-    for(i=0; (i<nb_settings) && (buf_pos<max_len); i++)
+
+    size_t buf_pos = NVRAM_DATA_START;
+    int var_count = 0;
+    for(int i = 0; i < nb_settings && buf_pos < sizeof(buf); i++)
     {
-        int nvram_bytes = (settings[i].flags&F_NVRAM_BYTES_MASK)
-                                >>F_NVRAM_MASK_SHIFT;
+        const struct settings_list *setting = &settings[i];
+        int nvram_bytes = (setting->flags & F_NVRAM_BYTES_MASK) >> F_NVRAM_MASK_SHIFT;
         if (nvram_bytes)
         {
-            memcpy(&buf[buf_pos],settings[i].setting,nvram_bytes);
+            memcpy(&buf[buf_pos], setting->setting, nvram_bytes);
             buf_pos += nvram_bytes;
             var_count++;
         }
     }
+
     /* count and crc32 */
     buf[3] = var_count;
-    crc32 = crc_32(&buf[NVRAM_DATA_START],
-                    max_len-NVRAM_DATA_START-1,0xffffffff);
-    memcpy(&buf[4],&crc32,4);
-    fd = open(NVRAM_FILE_TEMP,O_CREAT|O_TRUNC|O_WRONLY, 0666);
-    if (fd >= 0)
-    {
-        int len = write(fd,buf,max_len);
-        close(fd);
-        if (len < 8)
-            return false;
-    }
-    return true;
+    store_h32(&buf[4], nvram_crc(buf, sizeof(buf)));
+
+    int fd = open(NVRAM_FILE_TEMP,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    if (fd < 0)
+        return;
+
+    write(fd, buf, sizeof(buf));
+    close(fd);
 }
 
 /** Reading from a config file **/
@@ -222,9 +228,9 @@ static bool write_nvram_data(char* buf, int max_len)
  */
 void settings_load(int which)
 {
-    if (which&SETTINGS_RTC)
-        read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    if (which&SETTINGS_HD)
+    if (which & SETTINGS_RTC)
+        read_nvram_data();
+    if (which & SETTINGS_HD)
     {
         rename_temp_file(CONFIGFILE_TEMP, CONFIGFILE, CONFIGFILE".old");
         settings_load_config(CONFIGFILE, false);
@@ -604,16 +610,17 @@ static bool settings_write_config(const char* filename, int options)
 
 static void flush_global_status_callback(void)
 {
-    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+    write_nvram_data();
 }
 
 static void flush_config_block_callback(void)
 {
-    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
+    write_nvram_data();
     settings_write_config(CONFIGFILE_TEMP, SETTINGS_SAVE_CHANGED);
 }
 
-void reset_runtime(void) {
+void reset_runtime(void)
+{
     lasttime = current_tick;
     global_status.runtime = 0;
 }
