@@ -162,12 +162,6 @@
     unit is the UNIT_ define to display/talk.
     the first one saves a string to the config file,
     the second one saves the variable value to the config file */
-#define INT_SETTING_W_CFGVALS(flags, var, lang_id, default, name, cfg_vals, \
-                    unit, min, max, step, formatter, get_talk_id, cb)       \
-            {flags|F_INT_SETTING|F_T_INT, &global_settings.var,             \
-                lang_id, INT(default), name, cfg_vals,                      \
-                 {.int_setting = (struct int_setting[]){                    \
-                    {cb, unit, step, min, max, formatter, get_talk_id}}}}
 #define INT_SETTING(flags, var, lang_id, default, name,                 \
                     unit, min, max, step, formatter, get_talk_id, cb)   \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
