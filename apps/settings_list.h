@@ -163,8 +163,9 @@ struct settings_list {
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;
     const char          *cfg_name; /* this settings name in the cfg file   */
-    const char          *cfg_vals; /*comma seperated legal values, or NULL */
-                                   /* used with F_T_UCHARPTR this is the folder prefix */
+    const char          *cfg_vals; /* comma seperated symbolic values for bool
+                                    * or choice/table settings -- the i'th value
+                                    * maps to the integer i */
     union {
         const void *RESERVED; /* to stop compile errors, will be removed */
         const struct sound_setting *sound_setting; /* use F_T_SOUND for this */
