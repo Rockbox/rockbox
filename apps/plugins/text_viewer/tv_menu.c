@@ -200,16 +200,19 @@ static bool tv_statusbar_setting(void)
 
 static bool tv_font_setting(void)
 {
-    struct browse_context browse;
     char font[MAX_PATH], name[MAX_FILENAME+10];
-
     rb->snprintf(name, sizeof(name), "%s.fnt", new_prefs.font_name);
-    rb->browse_context_init(&browse, SHOW_FONT,
-                            BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
-                            "Font", Icon_Menu_setting, FONT_DIR, name);
 
-    browse.buf = font;
-    browse.bufsize = sizeof(font);
+    struct browse_context browse = {
+        .dirfilter = SHOW_FONT,
+        .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
+        .title = "Font", /* XXX: Translate? */
+        .icon = Icon_Menu_setting,
+        .root = FONT_DIR,
+        .selected = name,
+        .buf = font,
+        .bufsize = sizeof(font),
+    };
 
     rb->rockbox_browse(&browse);
 

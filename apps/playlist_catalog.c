@@ -150,7 +150,6 @@ static int display_playlists(char* playlist, enum catbrowse_status_flags status)
 {
     static bool reopen_last_playlist = false;
     static int most_recent_selection = 0;
-    struct browse_context browse;
     int result = -1;
     char selected_playlist[MAX_PATH];
     selected_playlist[0] = '\0';
@@ -158,14 +157,16 @@ static int display_playlists(char* playlist, enum catbrowse_status_flags status)
     browser_status |= status;
     bool view = (status == CATBROWSE_CATVIEW);
 
-    browse_context_init(&browse, SHOW_M3U,
-                        BROWSE_SELECTONLY|(view? 0: BROWSE_NO_CONTEXT_MENU),
-                        str(LANG_CATALOG), NOICON,
-                        selected_playlist,
-                        playlist_dir_length + 1 + most_recent_playlist);
-
-    browse.buf = selected_playlist;
-    browse.bufsize = sizeof(selected_playlist);
+    struct browse_context browse = {
+        .dirfilter = SHOW_M3U,
+        .flags = BROWSE_SELECTONLY | (view ? 0 : BROWSE_NO_CONTEXT_MENU),
+        .title = str(LANG_CATALOG),
+        .icon = Icon_NOICON,
+        .root = selected_playlist,
+        .selected = &most_recent_playlist[playlist_dir_length + 1],
+        .buf = selected_playlist,
+        .bufsize = sizeof(selected_playlist),
+    };
 
 restart:
     /* set / restore the root directory for the browser */

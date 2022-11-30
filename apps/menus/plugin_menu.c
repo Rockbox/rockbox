@@ -54,11 +54,14 @@ static void pm_handler(unsigned short id, void *data)
 static int plugins_menu(void* param)
 {
     intptr_t item = (intptr_t)param;
-    struct browse_context browse;
     int ret;
 
-    browse_context_init(&browse, SHOW_PLUGINS, 0, str(items[item].id),
-                         Icon_Plugin, items[item].path, NULL);
+    struct browse_context browse = {
+        .dirfilter = SHOW_PLUGINS,
+        .title = str(items[item].id),
+        .icon = Icon_Plugin,
+        .root = items[item].path,
+    };
 
     ret = rockbox_browse(&browse);
 

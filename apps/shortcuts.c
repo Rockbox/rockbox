@@ -660,9 +660,11 @@ int do_shortcut_menu(void *ignored)
                         done = GO_TO_PLUGIN;
                         break;
                     }
-                    struct browse_context browse;
-                    browse_context_init(&browse, global_settings.dirfilter, 0,
-                            NULL, NOICON, sc->u.path, NULL);
+                    struct browse_context browse = {
+                        .dirfilter = global_settings.dirfilter,
+                        .icon = Icon_NOICON,
+                        .root = sc->u.path,
+                    };
                     if (sc->type == SHORTCUT_FILE)
                         browse.flags |= BROWSE_RUNFILE;
                     done = rockbox_browse(&browse);

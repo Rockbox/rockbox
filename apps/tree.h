@@ -106,10 +106,6 @@ void tree_init(void) INIT_ATTR;
 char* get_current_file(char* buffer, size_t buffer_len);
 void set_dirfilter(int l_dirfilter);
 void set_current_file(const char *path);
-void browse_context_init(struct browse_context *browse,
-                         int dirfilter, unsigned flags,
-                         char *title, enum themable_icons icon,
-                         const char *root, const char *selected);
 int rockbox_browse(struct browse_context *browse);
 int create_playlist(void);
 void resume_directory(const char *dir);

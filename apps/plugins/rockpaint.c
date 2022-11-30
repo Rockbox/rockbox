@@ -1084,15 +1084,15 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
 
 static bool browse( char *dst, int dst_size, const char *start )
 {
-    struct browse_context browse;
-
-    rb->browse_context_init(&browse, SHOW_ALL,
-                            BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
-                            NULL, NOICON, start, NULL);
-
-    browse.callback_show_item = callback_show_item;
-    browse.buf = dst;
-    browse.bufsize = dst_size;
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
+        .icon = Icon_NOICON,
+        .root = start,
+        .buf = dst,
+        .bufsize = dst_size,
+        .callback_show_item = callback_show_item,
+    };
 
     rb->rockbox_browse(&browse);
 

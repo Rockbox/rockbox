@@ -613,13 +613,14 @@ static void keyremap_export_user_keys(void)
 static void keyremap_import_user_keys(void)
 {
     char buf[MAX_PATH];
-    struct browse_context browse;
-
-    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "Select Keymap",
-                         Icon_Plugin, "/", NULL);
-
-    browse.buf = buf;
-    browse.bufsize = sizeof(buf);
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY,
+        .title = "Select Keymap",
+        .icon = Icon_Plugin,
+        .buf = buf,
+        .bufsize = sizeof(buf),
+    };
 
     if (rb->rockbox_browse(&browse) == GO_TO_PREVIOUS)
     {

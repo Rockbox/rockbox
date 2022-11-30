@@ -352,7 +352,7 @@ retnhash:
 void open_plugin_browse(const char *key)
 {
     logf("%s", __func__);
-    struct browse_context browse;
+
     char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
     open_plugin_load_entry(key);
     struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
@@ -364,11 +364,15 @@ void open_plugin_browse(const char *key)
     if (op_entry->path[0] == '\0')
         strcpy(op_entry->path, PLUGIN_DIR"/");
 
-    browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "",
-                         Icon_Plugin, op_entry->path, NULL);
-
-    browse.buf = tmp_buf;
-    browse.bufsize = OPEN_PLUGIN_BUFSZ;
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY,
+        .title = str(LANG_OPEN_PLUGIN),
+        .icon = Icon_Plugin,
+        .root = op_entry->path,
+        .buf = tmp_buf,
+        .bufsize = sizeof(tmp_buf),
+    };
 
     if (rockbox_browse(&browse) == GO_TO_PREVIOUS)
         open_plugin_add_path(key, tmp_buf, NULL);

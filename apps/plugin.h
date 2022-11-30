@@ -157,12 +157,12 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 257
+#define PLUGIN_API_VERSION 258
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 257
+#define PLUGIN_MIN_API_VERSION 258
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -479,10 +479,6 @@ struct plugin_api {
     struct dirinfo (*dir_get_info)(DIR *dirp, struct dirent *entry);
 
     /* browsing */
-    void (*browse_context_init)(struct browse_context *browse,
-                                int dirfilter, unsigned flags,
-                                char *title, enum themable_icons icon,
-                                const char *root, const char *selected);
     int (*rockbox_browse)(struct browse_context *browse);
     struct tree_context* (*tree_get_context)(void);
     struct entry* (*tree_get_entries)(struct tree_context* t);

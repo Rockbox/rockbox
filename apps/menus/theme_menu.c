@@ -249,9 +249,12 @@ int browse_folder(void *param)
     char selected[MAX_FILENAME+10];
     const struct browse_folder_info *info =
         (const struct browse_folder_info*)param;
-    struct browse_context browse;
-    browse_context_init(&browse, info->show_options, 0,
-                        NULL, NOICON, info->dir, NULL);
+
+    struct browse_context browse = {
+        .dirfilter = info->show_options,
+        .icon = Icon_NOICON,
+        .root = info->dir,
+    };
 
     /* if we are in a special settings folder, center the current setting */
     switch(info->show_options)

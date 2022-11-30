@@ -429,7 +429,6 @@ static const struct plugin_api rockbox_api = {
     dir_get_info,
 
     /* browsing */
-    browse_context_init,
     rockbox_browse,
     tree_get_context,
     tree_get_entries,

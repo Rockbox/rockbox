@@ -962,22 +962,6 @@ int create_playlist(void)
     return (ret) ? 1 : 0;
 }
 
-void browse_context_init(struct browse_context *browse,
-                         int dirfilter, unsigned flags,
-                         char *title, enum themable_icons icon,
-                         const char *root, const char *selected)
-{
-    browse->dirfilter = dirfilter;
-    browse->flags = flags;
-    browse->callback_show_item = NULL;
-    browse->title = title;
-    browse->icon = icon;
-    browse->root = root;
-    browse->selected = selected;
-    browse->buf = NULL;
-    browse->bufsize = 0;
-}
-
 #define NUM_TC_BACKUP   3
 static struct tree_context backups[NUM_TC_BACKUP];
 /* do not make backup if it is not recursive call */

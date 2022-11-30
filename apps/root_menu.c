@@ -115,7 +115,6 @@ static int browser(void* param)
 #ifdef HAVE_TAGCACHE
     struct tree_context* tc = tree_get_context();
 #endif
-    struct browse_context browse;
     int filter = SHOW_SUPPORTED;
     char folder[MAX_PATH] = "/";
     /* stuff needed to remember position in file browser */
@@ -274,7 +273,12 @@ static int browser(void* param)
 #endif /*HAVE_TAGCACHE*/
     }
 
-    browse_context_init(&browse, filter, 0, NULL, NOICON, folder, NULL);
+    struct browse_context browse = {
+        .dirfilter = filter,
+        .icon = Icon_NOICON,
+        .root = folder,
+    };
+
     ret_val = rockbox_browse(&browse);
 
     if (ret_val == GO_TO_WPS

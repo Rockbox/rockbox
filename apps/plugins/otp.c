@@ -208,17 +208,16 @@ static int base32_encode(const uint8_t *data, int length, uint8_t *result,
 
 static bool browse( char *dst, int dst_size, const char *start )
 {
-    struct browse_context browse;
-
-    rb->browse_context_init(&browse, SHOW_ALL,
-                            BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
-                            NULL, NOICON, start, NULL);
-
-    browse.buf = dst;
-    browse.bufsize = dst_size;
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
+        .icon = Icon_NOICON,
+        .root = start,
+        .buf = dst,
+        .bufsize = dst_size,
+    };
 
     rb->rockbox_browse(&browse);
-
     return (browse.flags & BROWSE_SELECTED);
 }
 

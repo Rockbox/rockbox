@@ -189,17 +189,20 @@ static void op_entry_set_name(void)
 static int op_entry_set_path(void)
 {
     int ret = 0;
-    struct browse_context browse;
     char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
 
     if (op_entry.path[0] == '\0')
         rb->strcpy(op_entry.path, PLUGIN_DIR"/");
 
-    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, rb->str(LANG_ADD),
-                         Icon_Plugin, op_entry.path, NULL);
-
-    browse.buf = tmp_buf;
-    browse.bufsize = OPEN_PLUGIN_BUFSZ;
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY,
+        .title = rb->str(LANG_ADD),
+        .icon = Icon_Plugin,
+        .root = op_entry.path,
+        .buf = tmp_buf,
+        .bufsize = sizeof(tmp_buf),
+    };
 
     if (rb->rockbox_browse(&browse) == GO_TO_PREVIOUS)
     {
@@ -213,7 +216,6 @@ static int op_entry_set_path(void)
 static int op_entry_set_param_path(void)
 {
     int ret = 0;
-    struct browse_context browse;
     char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
 
     if (op_entry.param[0] == '\0')
@@ -221,11 +223,15 @@ static int op_entry_set_param_path(void)
     else
         rb->strcpy(tmp_buf, op_entry.param);
 
-    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "",
-                         Icon_Plugin, tmp_buf, NULL);
-
-    browse.buf = tmp_buf;
-    browse.bufsize = OPEN_PLUGIN_BUFSZ;
+    struct browse_context browse = {
+        .dirfilter = SHOW_ALL,
+        .flags = BROWSE_SELECTONLY,
+        .title = rb->str(LANG_PARAMETER),
+        .icon = Icon_Plugin,
+        .root = tmp_buf,
+        .buf = tmp_buf,
+        .bufsize = sizeof(tmp_buf),
+    };
 
     if (rb->rockbox_browse(&browse) == GO_TO_PREVIOUS)
     {
