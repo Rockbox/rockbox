@@ -333,10 +333,7 @@ void do_setting_screen(const struct settings_list *setting, const char * title,
     if (setting->flags&F_PADTITLE)
     {
         int i = 0, len;
-        if (setting->lang_id == -1)
-            title = (char*)setting->cfg_vals;
-        else
-            title = P2STR((unsigned char*)title);
+        title = P2STR((unsigned char*)title);
         len = strlen(title);
         while (i < MAX_PATH-1)
         {
