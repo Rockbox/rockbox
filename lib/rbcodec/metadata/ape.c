@@ -27,11 +27,8 @@
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "structec.h"
 
 #define APETAG_HEADER_LENGTH        32
-#define APETAG_HEADER_FORMAT        "8llll8"
-#define APETAG_ITEM_HEADER_FORMAT   "ll"
 #define APETAG_ITEM_TYPE_MASK       3
 
 struct apetag_header 
@@ -57,12 +54,22 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
 {
     struct apetag_header header;
 
-    if ((lseek(fd, -APETAG_HEADER_LENGTH, SEEK_END) < 0)
-        || (ecread(fd, &header, 1, APETAG_HEADER_FORMAT, IS_BIG_ENDIAN)
-            != APETAG_HEADER_LENGTH)
-        || (memcmp(header.id, "APETAGEX", sizeof(header.id))))
-    {
+    if (lseek(fd, -APETAG_HEADER_LENGTH, SEEK_END) < 0)
         return false;
+
+    if (read(fd, &header, sizeof(header)) != APETAG_HEADER_LENGTH)
+        return false;
+
+    if (memcmp(header.id, "APETAGEX", sizeof(header.id)))
+        return false;
+
+    /* APE tag is little endian - convert to native byte order if needed */
+    if (IS_BIG_ENDIAN)
+    {
+        header.version = swap32(header.version);
+        header.length = swap32(header.version);
+        header.item_count = swap32(header.version);
+        header.flags = swap32(header.version);
     }
 
     if ((header.version == 2000) && (header.item_count > 0)
@@ -90,13 +97,16 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
             {
                 break;
             }
-            
-            if (ecread(fd, &item, 1, APETAG_ITEM_HEADER_FORMAT, IS_BIG_ENDIAN)
-                < (long) sizeof(item))
-            {
+
+            if (read(fd, &item, sizeof(item)) != sizeof(item))
                 return false;
+
+            if (IS_BIG_ENDIAN)
+            {
+                item.length = swap32(item.length);
+                item.flags = swap32(item.flags);
             }
-            
+
             tag_remaining -= sizeof(item);
             r = read_string(fd, name, sizeof(name), 0, tag_remaining);
             

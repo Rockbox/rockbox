@@ -2,7 +2,6 @@ warble.c
 ../../../firmware/common/strmemccpy.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
-../../../firmware/common/structec.c
 ../../../firmware/common/pathfuncs.c
 ../../../firmware/common/crc32.c
 ../../../firmware/buflib_mempool.c

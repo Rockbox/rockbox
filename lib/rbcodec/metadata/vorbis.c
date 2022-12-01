@@ -27,7 +27,6 @@
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "structec.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
