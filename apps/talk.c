@@ -41,7 +41,6 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "bitswap.h"
-#include "structec.h"
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
 #include "panic.h"
@@ -502,23 +501,24 @@ static bool load_index_table(int fd, const struct voicefile_header *hdr)
         return false;
 
     ret = read_to_handle(fd, index_handle, 0, alloc_size);
-
-    if (ret == alloc_size)
+    if (ret != alloc_size)
     {
-#ifdef ROCKBOX_LITTLE_ENDIAN
-        struct clip_entry *buf;
-        buf = core_get_data(index_handle);
-        for (int i = 0; i < hdr->id1_max + hdr->id2_max; i++)
-        {
-            /* doesn't yield() */
-            structec_convert(&buf[i], "ll", 1, true);
-        }
-#endif
-    }
-    else
         index_handle = core_free(index_handle);
+        return false;
+    }
 
-    return ret == alloc_size;
+#ifdef ROCKBOX_LITTLE_ENDIAN
+    struct clip_entry *buf, *end;
+    buf = core_get_data(index_handle);
+    end = buf + hdr->id1_max + hdr->id2_max;
+    for (; buf != end; buf++)
+    {
+        buf->offset = swap32(buf->offset);
+        buf->size = swap32(buf->size);
+    }
+#endif
+
+    return true;
 }
 
 static bool load_header(int fd, struct voicefile_header *hdr)
@@ -528,8 +528,11 @@ static bool load_header(int fd, struct voicefile_header *hdr)
         return false;
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
-    logf("Byte swapping voice file");
-    structec_convert(&voicefile, "lllll", 1, true);
+    hdr->version = swap32(hdr->version);
+    hdr->target_id = swap32(hdr->target_id);
+    hdr->table = swap32(hdr->table);
+    hdr->id1_max = swap32(hdr->id1_max);
+    hdr->id2_max = swap32(hdr->id2_max);
 #endif
     return true;
 }
