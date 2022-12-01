@@ -29,7 +29,6 @@
 #include "menu.h"
 #include "debug_menu.h"
 #include "kernel.h"
-#include "structec.h"
 #include "action.h"
 #include "debug.h"
 #include "thread.h"
@@ -1752,10 +1751,16 @@ static bool dbg_identify_info(void)
     int fd = creat("/identify_info.bin", 0666);
     if(fd >= 0)
     {
+        const unsigned short *identify_info = ata_get_identify();
 #ifdef ROCKBOX_LITTLE_ENDIAN
-        ecwrite(fd, ata_get_identify(), SECTOR_SIZE/2, "s", true);
+        /* this is a pointer to a driver buffer so we can't modify it */
+        for (int i = 0; i < SECTOR_SIZE/2; ++i)
+        {
+            unsigned short word = swap16(identify_info[i]);
+            write(fd, &word, 2);
+        }
 #else
-        write(fd, ata_get_identify(), SECTOR_SIZE);
+        write(fd, identify_info, SECTOR_SIZE);
 #endif
         close(fd);
     }
