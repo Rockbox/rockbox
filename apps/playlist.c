@@ -576,19 +576,23 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     mutex_lock(playlist->control_mutex); /* read can yield! */
 
     if(-1 == playlist->fd)
+    {
         playlist->fd = open_utf8(playlist->filename, O_RDONLY);
+        if(playlist->fd >= 0 && lseek(playlist->fd, 0, SEEK_CUR) > 0)
+            playlist->utf8 = true; /* Override any earlier indication. */
+    }
+
     if(playlist->fd < 0)
         return -1; /* failure */
-    playlist_fd = playlist->fd;
 
-    if((i = lseek(playlist->fd, 0, SEEK_CUR)) > 0)
-        playlist->utf8 = true; /* Override any earlier indication. */
+    i = lseek(playlist->fd, playlist->utf8 ? BOM_UTF_8_SIZE : 0, SEEK_SET);
+
+    playlist_fd = playlist->fd;
+    playlist->fd = -2; /* DEBUGGING Remove me! */ 
 
     splash(0, ID2P(LANG_WAIT));
 
     store_index = true;
-
-    playlist->fd = -2; /* DEBUGGING Remove me! */ 
 
     /* invalidate playlist in case we yield */
     int amount = playlist->amount;
