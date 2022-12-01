@@ -7,7 +7,6 @@ database.c
 ../../firmware/common/strmemccpy.c
 ../../firmware/common/strlcpy.c
 ../../firmware/common/strcasestr.c
-../../firmware/common/structec.c
 ../../firmware/common/unicode.c
 ../../firmware/target/hosted/debug-hosted.c
 ../../firmware/logf.c
