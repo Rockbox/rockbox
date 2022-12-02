@@ -233,6 +233,7 @@ int button_read_device(void)
          * Rockbox treats these buttons differently. */
         queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
         enc_position = 0;
+        reset_poweroff_timer();
     }
     else if (enc_position < -1)
     {
@@ -240,6 +241,7 @@ int button_read_device(void)
          * Rockbox treats these buttons differently. */
         queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
         enc_position = 0;
+        reset_poweroff_timer();
     }
 
     return r;
