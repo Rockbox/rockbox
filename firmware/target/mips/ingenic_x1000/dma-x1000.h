@@ -64,7 +64,7 @@ typedef struct dma_desc dma_desc;
 
 typedef void(*dma_cb_func)(int event);
 
-extern void dma_init(void);
+extern void dma_init(void) INIT_ATTR;
 extern void dma_set_callback(int chn, dma_cb_func cb);
 
 #endif /* __DMA_X1000_H__ */

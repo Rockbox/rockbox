@@ -23,6 +23,7 @@
 #define __GPIO_X1000_H__
 
 #include "x1000/gpio.h"
+#include "config.h"
 
 /* GPIO port numbers */
 #define GPIO_A 0
@@ -103,16 +104,8 @@ enum {
     PINGROUP_COUNT,
 };
 
-/* arrays which define the target's GPIO settings */
-extern const struct gpio_setting gpio_settings[PIN_COUNT];
-extern const struct pingroup_setting pingroup_settings[PINGROUP_COUNT];
-
-/* stringified names for use in debug menus */
-extern const char* const gpio_names[PIN_COUNT];
-extern const char* const pingroup_names[PINGROUP_COUNT];
-
 /* called at early init to set up GPIOs */
-extern void gpio_init(void);
+extern void gpio_init(void) INIT_ATTR;
 
 /* Use GPIO Z to reconfigure several pins atomically */
 extern void gpioz_configure(int port, uint32_t pins, int func);

@@ -44,6 +44,7 @@ uint32_t __cpu_idle_reftick = 0;
 #endif
 
 /* Prepare the CPU to process interrupts, but don't enable them yet */
+static void system_init_irq(void) INIT_ATTR;
 static void system_init_irq(void)
 {
     /* Mask all interrupts */

@@ -97,6 +97,8 @@ extern irq_handler_t system_set_irq_handler(int irq, irq_handler_t handler);
 extern void system_enable_irq(int irq);
 extern void system_disable_irq(int irq);
 
+extern void system_early_init(void) INIT_ATTR;
+
 /* Simple delay API */
 #define OST_FREQUENCY       (X1000_EXCLK_FREQ / 4)
 #define OST_TICKS_PER_US    (OST_FREQUENCY / 1000000)

@@ -22,8 +22,9 @@
 #ifndef __CLK_X1000_H__
 #define __CLK_X1000_H__
 
-#include <stdint.h>
+#include "config.h"
 #include "x1000/cpm.h"
+#include <stdint.h>
 
 /* Used as arguments to clk_set_ccr_mux() */
 #define CLKMUX_SCLK_A(x) jz_orf(CPM_CCR, SEL_SRC_V(x))
@@ -67,17 +68,17 @@ extern uint32_t clk_get(x1000_clk_t clk);
 extern const char* clk_get_name(x1000_clk_t clk);
 
 /* Clock initialization */
-extern void clk_init_early(void);
-extern void clk_init(void);
+extern void clk_init_early(void) INIT_ATTR;
+extern void clk_init(void) INIT_ATTR;
 
 /* Sets system clock multiplexers */
-extern void clk_set_ccr_mux(uint32_t muxbits);
+extern void clk_set_ccr_mux(uint32_t muxbits) INIT_ATTR;
 
 /* Sets system clock dividers */
-extern void clk_set_ccr_div(uint32_t divbits);
+extern void clk_set_ccr_div(uint32_t divbits) INIT_ATTR;
 
 /* Sets DDR clock source and divider */
-extern void clk_set_ddr(x1000_clk_t src, uint32_t div);
+extern void clk_set_ddr(x1000_clk_t src, uint32_t div) INIT_ATTR;
 
 /* Returns the smallest n such that infreq/n <= outfreq */
 static inline uint32_t clk_calc_div(uint32_t infreq, uint32_t outfreq)

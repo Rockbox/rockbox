@@ -21,7 +21,7 @@
 
 #include "gpio-x1000.h"
 
-const struct gpio_setting gpio_settings[PIN_COUNT] = {
+static const struct gpio_setting gpio_settings[PIN_COUNT] INITDATA_ATTR = {
 #define DEFINE_GPIO(_name, _gpio, _func) \
     {.gpio = _gpio, .func = _func},
 #define DEFINE_PINGROUP(...)
@@ -30,7 +30,7 @@ const struct gpio_setting gpio_settings[PIN_COUNT] = {
 #undef DEFINE_PINGROUP
 };
 
-const struct pingroup_setting pingroup_settings[PINGROUP_COUNT] = {
+static const struct pingroup_setting pingroup_settings[PINGROUP_COUNT] INITDATA_ATTR = {
 #define DEFINE_GPIO(...)
 #define DEFINE_PINGROUP(_name, _port, _pins, _func) \
     {.port = _port, .pins = _pins, .func = _func},
@@ -39,7 +39,8 @@ const struct pingroup_setting pingroup_settings[PINGROUP_COUNT] = {
 #undef DEFINE_PINGROUP
 };
 
-const char* const gpio_names[PIN_COUNT] = {
+#if 0 /* not needed for the time being */
+static const char* const gpio_names[PIN_COUNT] = {
 #define DEFINE_GPIO(_name, ...) #_name,
 #define DEFINE_PINGROUP(...)
 #include "gpio-target.h"
@@ -47,13 +48,14 @@ const char* const gpio_names[PIN_COUNT] = {
 #undef DEFINE_PINGROUP
 };
 
-const char* const pingroup_names[PINGROUP_COUNT] = {
+static const char* const pingroup_names[PINGROUP_COUNT] = {
 #define DEFINE_GPIO(...)
 #define DEFINE_PINGROUP(_name, ...) #_name,
 #include "gpio-target.h"
 #undef DEFINE_GPIO
 #undef DEFINE_PINGROUP
 };
+#endif
 
 void gpio_init(void)
 {
