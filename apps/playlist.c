@@ -203,10 +203,10 @@ static void copy_filerefs(struct dircache_fileref *dcfto,
 /* Check if the filename suggests M3U or M3U8 format. */
 static bool is_m3u8(const char* filename)
 {
-    int len = strlen(filename);
+    char *dot = strrchr(filename, '.');
 
     /* Default to M3U8 unless explicitly told otherwise. */
-    return !(len > 4 && strcasecmp(&filename[len - 4], ".m3u") == 0);
+    return (!dot || strcasecmp(dot, ".m3u") != 0);
 }
 
 
@@ -468,20 +468,21 @@ static void update_playlist_filename(struct playlist_info* playlist,
  */
 static void empty_playlist(struct playlist_info* playlist, bool resume)
 {
-    playlist->filename[0] = '\0';
     playlist->utf8 = true;
+    playlist->control_created = false;
+    playlist->in_ram = false;
 
-    if(playlist->fd >= 0)
-        /* If there is an already open playlist, close it. */
+    if(playlist->fd >= 0) /* If there is an already open playlist, close it. */
+    {
         close(playlist->fd);
+    }
     playlist->fd = -1;
 
     if(playlist->control_fd >= 0)
         close(playlist->control_fd);
     playlist->control_fd = -1;
-    playlist->control_created = false;
 
-    playlist->in_ram = false;
+    playlist->num_inserted_tracks = 0;
 
     if (playlist->buffer)
         playlist->buffer[0] = 0;
@@ -492,14 +493,16 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
     playlist->first_index = 0;
     playlist->amount = 0;
     playlist->last_insert_pos = -1;
-    playlist->seed = 0;
-    playlist->shuffle_modified = false;
-    playlist->deleted = false;
-    playlist->num_inserted_tracks = 0;
-    playlist->started = false;
 
-    playlist->num_cached = 0;
+    playlist->deleted = false;
+    playlist->started = false;
     playlist->pending_control_sync = false;
+    playlist->shuffle_modified = false;
+
+    playlist->seed = 0;
+    playlist->num_cached = 0;
+
+    playlist->filename[0] = '\0';
 
     if (!resume && playlist->current)
     {
@@ -656,19 +659,23 @@ static void display_playlist_count(int count, const unsigned char *fmt,
 {
     static long talked_tick = 0;
     long id = P2ID(fmt);
-    if(global_settings.talk_menu && id>=0)
+
+    if(id >= 0 && global_settings.talk_menu)
     {
-        if(final || (count && (talked_tick == 0
-                               || TIME_AFTER(current_tick, talked_tick+5*HZ))))
+        long next_tick = talked_tick + (HZ * 5);
+
+        if (final || talked_tick == 0)
+            next_tick = current_tick - 1;
+
+        if(count && TIME_AFTER(current_tick, next_tick))
         {
             talked_tick = current_tick;
             talk_number(count, false);
             talk_id(id, true);
         }
     }
-    fmt = P2STR(fmt);
 
-    splashf(0, fmt, count, str(LANG_OFF_ABORT));
+    splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT));
 }
 
 

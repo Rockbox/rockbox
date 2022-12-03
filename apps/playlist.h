@@ -103,7 +103,7 @@ struct playlist_info
        to disk                                                      */
     struct playlist_control_cache control_cache[PLAYLIST_MAX_CACHE];
     int num_cached;      /* number of cached entries                */
-    struct mutex mutex; /* mutex for control file access    */
+    struct mutex *control_mutex; /* mutex for control file access    */
 #ifdef HAVE_DIRCACHE
     struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
 #endif
