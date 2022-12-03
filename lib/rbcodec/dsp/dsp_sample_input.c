@@ -49,11 +49,6 @@
  * behave.
  */
 
-extern void dsp_sample_output_init(struct sample_io_data *this);
-extern void dsp_sample_output_flush(struct sample_io_data *this);
-extern void dsp_sample_output_format_change(struct sample_io_data *this,
-                                            struct sample_format *format);
-
 #define SAMPLE_BUF_COUNT 128 /* Per channel, per DSP */
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
 static int32_t sample_bufs[3][SAMPLE_BUF_COUNT] IBSS_ATTR;
@@ -241,24 +236,14 @@ void dsp_sample_input_format_change(struct sample_io_data *this,
                              [this->sample_depth > NATIVE_DEPTH ? 1 : 0];
 }
 
-/* increment the format version counter */
-static void format_change_set(struct sample_io_data *this)
-{
-    if (this->format_dirty)
-        return;
-
-    this->format.version = (uint8_t)(this->format.version + 1) ?: 1;
-    this->format_dirty = 1;
-}
-
 /* discard the sample buffer */
-static void dsp_sample_input_flush(struct sample_io_data *this)
+void dsp_sample_input_flush(struct sample_io_data *this)
 {
     this->sample_buf.remcount = 0;
 }
 
-static void dsp_sample_input_init(struct sample_io_data *this,
-                                  enum dsp_ids dsp_id)
+void dsp_sample_input_init(struct sample_io_data *this,
+                           enum dsp_ids dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -281,89 +266,4 @@ static void dsp_sample_input_init(struct sample_io_data *this,
 
     this->sample_buf_p[0] = lbuf;
     this->sample_buf_p[1] = rbuf;
-}
-
-static void dsp_sample_io_init(struct sample_io_data *this,
-                               enum dsp_ids dsp_id)
-{
-    this->output_sampr = DSP_OUT_DEFAULT_HZ;
-    dsp_sample_input_init(this, dsp_id);
-    dsp_sample_output_init(this);
-}
-
-bool dsp_sample_io_configure(struct sample_io_data *this,
-                             unsigned int setting,
-                             intptr_t *value_p)
-{
-    intptr_t value = *value_p;
-
-    switch (setting)
-    {
-    case DSP_INIT:
-        dsp_sample_io_init(this, (enum dsp_ids)value);
-        break;
-
-    case DSP_RESET:
-        /* Reset all sample descriptions to default */
-        format_change_set(this);
-        this->format.num_channels = 2;
-        this->format.frac_bits = WORD_FRACBITS;
-        this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
-        this->format.frequency = this->output_sampr;
-        this->format.codec_frequency = this->output_sampr;
-        this->sample_depth = NATIVE_DEPTH;
-        this->stereo_mode = STEREO_NONINTERLEAVED;
-        break;
-
-    case DSP_SET_FREQUENCY:
-        format_change_set(this);
-        value = value > 0 ? (unsigned int)value : this->output_sampr;
-        this->format.frequency = value;
-        this->format.codec_frequency = value;
-        break;
-
-    case DSP_SET_SAMPLE_DEPTH:
-        format_change_set(this);
-        this->format.frac_bits =
-            value <= NATIVE_DEPTH ? WORD_FRACBITS : value;
-        this->format.output_scale =
-            this->format.frac_bits + 1 - NATIVE_DEPTH;
-        this->sample_depth = value;
-        break;
-
-    case DSP_SET_STEREO_MODE:
-        format_change_set(this);
-        this->format.num_channels = value == STEREO_MONO ? 1 : 2;
-        this->stereo_mode = value;
-        break;
-
-    case DSP_FLUSH:
-        dsp_sample_input_flush(this);
-        dsp_sample_output_flush(this);
-        break;
-
-    case DSP_SET_PITCH:
-        format_change_set(this);
-        value = value > 0 ? value : (1 << 16);
-        this->format.frequency =
-            fp_mul(value, this->format.codec_frequency, 16);
-        break;
-
-    case DSP_SET_OUT_FREQUENCY:
-        value = value > 0 ? value : DSP_OUT_DEFAULT_HZ;
-        value = MIN(DSP_OUT_MAX_HZ, MAX(DSP_OUT_MIN_HZ, value));
-        *value_p = value;
-
-        if ((unsigned int)value == this->output_sampr)
-            return true; /* No change; don't broadcast */
-
-        this->output_sampr = value;
-        break;
-
-    case DSP_GET_OUT_FREQUENCY:
-        *value_p = this->output_sampr;
-        return true; /* Only I/O handles it */
-    }
-
-    return false;
 }
