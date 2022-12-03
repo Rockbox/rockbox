@@ -56,7 +56,7 @@ struct sample_io_data
     uint8_t output_version;       /* Format version of src buffer at output */
 };
 
-void dsp_sample_input_init(struct sample_io_data *this, enum dsp_ids dsp_id);
+void dsp_sample_input_init(struct sample_io_data *this, unsigned int dsp_id);
 void dsp_sample_input_flush(struct sample_io_data *this);
 void dsp_sample_input_format_change(struct sample_io_data *this,
                                     struct sample_format *format);

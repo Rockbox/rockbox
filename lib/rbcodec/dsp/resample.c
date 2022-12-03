@@ -262,8 +262,7 @@ static intptr_t resample_new_format(struct dsp_proc_entry *this,
     return PROC_NEW_FORMAT_DEACTIVATED;
 }
 
-static void resample_dsp_init(struct dsp_config *dsp,
-                              enum dsp_ids dsp_id)
+static void resample_dsp_init(struct dsp_config *dsp, unsigned int dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -280,7 +279,7 @@ static void resample_dsp_init(struct dsp_config *dsp,
 
     default:
         /* huh? */
-        DEBUGF("DSP_PROC_RESAMPLE- unknown DSP %d\n", (int)dsp_id);
+        DEBUGF("DSP_PROC_RESAMPLE- unknown DSP %u\n", dsp_id);
         return;
     }
 
@@ -312,7 +311,7 @@ static intptr_t resample_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_INIT:
-        resample_dsp_init(dsp, (enum dsp_ids)value);
+        resample_dsp_init(dsp, value);
         break;
 
     case DSP_FLUSH:

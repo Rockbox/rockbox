@@ -149,7 +149,7 @@ unsigned int dsp_get_output_frequency(struct dsp_config *dsp)
     return dsp_configure(dsp, DSP_GET_OUT_FREQUENCY, 0);
 }
 
-static void misc_dsp_init(struct dsp_config *dsp, enum dsp_ids dsp_id)
+static void misc_dsp_init(struct dsp_config *dsp, unsigned int dsp_id)
 {
     /* Enable us for the audio DSP at startup */
     if (dsp_id == CODEC_IDX_AUDIO)
@@ -168,7 +168,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_INIT:
-        misc_dsp_init(dsp, (enum dsp_ids)value);
+        misc_dsp_init(dsp, value);
         break;
 
     case DSP_PROC_CLOSE:

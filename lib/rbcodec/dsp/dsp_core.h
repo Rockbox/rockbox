@@ -128,10 +128,10 @@ static inline void dsp_advance_buffer32(struct dsp_buffer *buf,
 }
 
 /* Get DSP pointer */
-struct dsp_config * dsp_get_config(enum dsp_ids id);
+struct dsp_config *dsp_get_config(unsigned int dsp_id);
 
 /* Get DSP id */
-enum dsp_ids dsp_get_id(const struct dsp_config *dsp);
+unsigned int dsp_get_id(const struct dsp_config *dsp);
 
 /** General DSP processing **/
 

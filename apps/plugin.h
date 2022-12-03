@@ -714,7 +714,7 @@ struct plugin_api {
 #endif
     intptr_t (*dsp_configure)(struct dsp_config *dsp,
                               unsigned int setting, intptr_t value);
-    struct dsp_config * (*dsp_get_config)(enum dsp_ids id);
+    struct dsp_config * (*dsp_get_config)(unsigned int dsp_id);
     void (*dsp_process)(struct dsp_config *dsp, struct dsp_buffer *src,
                         struct dsp_buffer *dst);
 

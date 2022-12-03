@@ -483,24 +483,19 @@ intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
     return proc_broadcast(dsp, setting, value);
 }
 
-struct dsp_config * dsp_get_config(enum dsp_ids id)
+struct dsp_config *dsp_get_config(unsigned int dsp_id)
 {
-    if (id >= DSP_COUNT)
+    if (dsp_id >= DSP_COUNT)
         return NULL;
 
-    return &dsp_conf[id];
+    return &dsp_conf[dsp_id];
 }
 
 /* Return the id given a dsp pointer (or even via something within
    the struct itself) */
-enum dsp_ids dsp_get_id(const struct dsp_config *dsp)
+unsigned int dsp_get_id(const struct dsp_config *dsp)
 {
-    ptrdiff_t id = dsp - dsp_conf;
-
-    if (id < 0 || id >= DSP_COUNT)
-        return DSP_COUNT; /* obviously invalid */
-
-    return (enum dsp_ids)id;
+    return dsp - dsp_conf;
 }
 
 /* Do what needs initializing before enable/disable calls can be made.

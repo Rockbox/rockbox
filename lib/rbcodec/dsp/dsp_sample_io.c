@@ -46,7 +46,7 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
     {
     case DSP_INIT:
         this->output_sampr = DSP_OUT_DEFAULT_HZ;
-        dsp_sample_input_init(this, (enum dsp_ids)value);
+        dsp_sample_input_init(this, value);
         dsp_sample_output_init(this);
         break;
 

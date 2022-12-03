@@ -521,8 +521,7 @@ static intptr_t tdspeed_new_format(struct dsp_proc_entry *this,
     (void)this;
 }
 
-static void tdspeed_dsp_init(struct tdspeed_state_s *st,
-                             enum dsp_ids dsp_id)
+static void tdspeed_dsp_init(struct tdspeed_state_s *st, unsigned int dsp_id)
 {
     /* everything is at 100% until dsp_set_timestretch is called with
        some other value and timestretch is enabled at the time */
@@ -543,7 +542,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_INIT:
-        tdspeed_dsp_init(st, (enum dsp_ids)value);
+        tdspeed_dsp_init(st, value);
         break;
 
     case DSP_FLUSH:

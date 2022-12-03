@@ -242,8 +242,7 @@ void dsp_sample_input_flush(struct sample_io_data *this)
     this->sample_buf.remcount = 0;
 }
 
-void dsp_sample_input_init(struct sample_io_data *this,
-                           enum dsp_ids dsp_id)
+void dsp_sample_input_init(struct sample_io_data *this, unsigned int dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -260,7 +259,7 @@ void dsp_sample_input_init(struct sample_io_data *this,
 
     default:
         /* orly */
-        DEBUGF("DSP Input- unknown dsp %d\n", (int)dsp_id);
+        DEBUGF("DSP Input- unknown dsp %u\n", dsp_id);
         return;
     }
 
