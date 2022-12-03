@@ -262,8 +262,8 @@ static intptr_t resample_new_format(struct dsp_proc_entry *this,
     return PROC_NEW_FORMAT_DEACTIVATED;
 }
 
-static void INIT_ATTR resample_dsp_init(struct dsp_config *dsp,
-                                        enum dsp_ids dsp_id)
+static void resample_dsp_init(struct dsp_config *dsp,
+                              enum dsp_ids dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -291,8 +291,8 @@ static void INIT_ATTR resample_dsp_init(struct dsp_config *dsp,
     resample_data[dsp_id].resample_out_p[1] = rbuf;
 }
 
-static void INIT_ATTR resample_proc_init(struct dsp_proc_entry *this,
-                                         struct dsp_config *dsp)
+static void resample_proc_init(struct dsp_proc_entry *this,
+                               struct dsp_config *dsp)
 {
     struct resample_data *data = &resample_data[dsp_get_id(dsp)];
     this->data = (intptr_t)data;

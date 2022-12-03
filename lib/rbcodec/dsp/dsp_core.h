@@ -144,6 +144,6 @@ intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
                        intptr_t value);
 
 /* One-time startup init that must come before settings reset/apply */
-void dsp_init(void);
+void dsp_init(void) INIT_ATTR;
 
 #endif /* _DSP_H */

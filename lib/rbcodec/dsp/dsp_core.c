@@ -505,7 +505,7 @@ enum dsp_ids dsp_get_id(const struct dsp_config *dsp)
 
 /* Do what needs initializing before enable/disable calls can be made.
  * Must be done before changing settings for the first time. */
-void INIT_ATTR dsp_init(void)
+void dsp_init(void)
 {
     static const uint8_t slot_count[DSP_COUNT] INITDATA_ATTR =
     {

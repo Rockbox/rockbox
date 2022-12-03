@@ -181,7 +181,7 @@ void dsp_sample_output_format_change(struct sample_io_data *this,
     this->output_version = format->version;
 }
 
-void INIT_ATTR dsp_sample_output_init(struct sample_io_data *this)
+void dsp_sample_output_init(struct sample_io_data *this)
 {
     this->output_version = 0;
     this->output_samples = sample_output_stereo;

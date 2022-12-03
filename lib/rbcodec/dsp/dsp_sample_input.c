@@ -257,8 +257,8 @@ static void dsp_sample_input_flush(struct sample_io_data *this)
     this->sample_buf.remcount = 0;
 }
 
-static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
-                                            enum dsp_ids dsp_id)
+static void dsp_sample_input_init(struct sample_io_data *this,
+                                  enum dsp_ids dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -283,8 +283,8 @@ static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
     this->sample_buf_p[1] = rbuf;
 }
 
-static void INIT_ATTR dsp_sample_io_init(struct sample_io_data *this,
-                                         enum dsp_ids dsp_id)
+static void dsp_sample_io_init(struct sample_io_data *this,
+                               enum dsp_ids dsp_id)
 {
     this->output_sampr = DSP_OUT_DEFAULT_HZ;
     dsp_sample_input_init(this, dsp_id);
