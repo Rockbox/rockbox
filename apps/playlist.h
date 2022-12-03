@@ -74,22 +74,16 @@ struct playlist_control_cache {
 struct playlist_info
 {
     bool current;        /* current playing playlist                */
-    char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
-    char control_filename[MAX_PATH]; /* full path of control file   */
     bool utf8;           /* playlist is in .m3u8 format             */
+    bool control_created; /* has control file been created?         */
+    bool in_ram;         /* playlist stored in ram (dirplay)        */
     int  fd;             /* descriptor of the open playlist file    */
     int  control_fd;     /* descriptor of the open control file     */
-    bool control_created; /* has control file been created?         */
-    int  dirlen;         /* Length of the path to the playlist file */
-    volatile unsigned long *indices; /* array of indices            */
-#ifdef HAVE_DIRCACHE
-    struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
-#endif
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
-    bool in_ram;         /* playlist stored in ram (dirplay)        */
+    int  num_inserted_tracks; /* number of tracks inserted           */
+    volatile unsigned long *indices; /* array of indices            */
     int buffer_handle;   /* handle to the below buffer (-1 if non-buflib) */
-
     volatile char *buffer;/* buffer for in-ram playlists        */
     int  buffer_size;    /* size of buffer                          */
     int  buffer_end_pos; /* last position where buffer was written  */
@@ -97,22 +91,25 @@ struct playlist_info
     int  first_index;    /* index of first song in playlist         */
     int  amount;         /* number of tracks in the index           */
     int  last_insert_pos; /* last position we inserted a track      */
-    int  seed;           /* shuffle seed                            */
+    bool deleted;        /* have any tracks been deleted?           */
+    bool started;       /* has playlist been started?               */
+    bool pending_control_sync; /* control file needs to be synced   */
     bool shuffle_modified; /* has playlist been shuffled with
                               inserted tracks?                      */
-    bool deleted;        /* have any tracks been deleted?           */
-    int num_inserted_tracks; /* number of tracks inserted           */
-    bool started;       /* has playlist been started?               */
-
+    int last_shuffled_start; /* number of tracks when insert last
+                                    shuffled command start */
+    int  seed;           /* shuffle seed                            */
     /* cache of playlist control commands waiting to be flushed to
        to disk                                                      */
     struct playlist_control_cache control_cache[PLAYLIST_MAX_CACHE];
     int num_cached;      /* number of cached entries                */
-    bool pending_control_sync; /* control file needs to be synced   */
-
-    struct mutex *control_mutex; /* mutex for control file access    */
-    int last_shuffled_start; /* number of tracks when insert last
-                                    shuffled command start */
+    struct mutex mutex; /* mutex for control file access    */
+#ifdef HAVE_DIRCACHE
+    struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
+#endif
+    int  dirlen;         /* Length of the path to the playlist file */
+    char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
+    char control_filename[MAX_PATH]; /* full path of control file   */
 };
 
 struct playlist_track_info
