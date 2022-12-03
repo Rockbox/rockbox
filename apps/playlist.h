@@ -27,6 +27,7 @@
 #include "file.h"
 #include "kernel.h"
 #include "metadata.h"
+#include "rbpaths.h"
 
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02
@@ -103,13 +104,14 @@ struct playlist_info
        to disk                                                      */
     struct playlist_control_cache control_cache[PLAYLIST_MAX_CACHE];
     int num_cached;      /* number of cached entries                */
-    struct mutex *control_mutex; /* mutex for control file access    */
+    struct mutex mutex; /* mutex for control file access    */
 #ifdef HAVE_DIRCACHE
     struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
 #endif
     int  dirlen;         /* Length of the path to the playlist file */
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
-    char control_filename[MAX_PATH]; /* full path of control file   */
+    /* full path of control file (with extra room for extensions) */
+    char control_filename[sizeof(PLAYLIST_CONTROL_FILE) + 8];
 };
 
 struct playlist_track_info
