@@ -484,12 +484,12 @@ static int NO_INLINE open_db_fd(const char* filename, int mode)
 
     if(mode & O_CREAT)
     {
-        if (mkdir(global_settings.tagcache_db_path) < 0 && errno != EEXIST)
+        if (mkdir(tc_stat.db_path) < 0 && errno != EEXIST)
             return -1;
     }
 
     return open_pathfmt(buf, sizeof(buf), mode, "%s/%s",
-                        global_settings.tagcache_db_path, filename);
+                        tc_stat.db_path, filename);
 }
 
 static int NO_INLINE remove_db_file(const char* filename)
@@ -497,7 +497,7 @@ static int NO_INLINE remove_db_file(const char* filename)
     char buf[MAX_PATH];
 
     snprintf(buf, sizeof(buf), "%s/%s",
-             global_settings.tagcache_db_path, filename);
+             tc_stat.db_path, filename);
 
     return remove(buf);
 }
@@ -513,7 +513,7 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 
     fd = open_pathfmt(fname, sizeof(fname),
                       write ? O_RDWR : O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
-                      global_settings.tagcache_db_path, tag);
+                      tc_stat.db_path, tag);
     if (fd < 0)
     {
         logf("tag file open failed: tag=%d write=%d file= " TAGCACHE_FILE_INDEX,
@@ -891,7 +891,7 @@ static bool open_files(struct tagcache_search *tcs, int tag)
         char fname[MAX_PATH];
         tcs->idxfd[tag] = open_pathfmt(fname, sizeof(fname),
                                        O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
-                                       global_settings.tagcache_db_path, tag);
+                                       tc_stat.db_path, tag);
     }
 
     if (tcs->idxfd[tag] < 0)
@@ -1516,7 +1516,7 @@ static void remove_files(void)
             continue;
 
         snprintf(buf, bufsz, "%s/" TAGCACHE_FILE_INDEX,
-                 global_settings.tagcache_db_path, i);
+                 tc_stat.db_path, i);
         remove(buf);
     }
 }
@@ -1676,7 +1676,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
             char fname[MAX_PATH];
             tcs->idxfd[clause->tag] = open_pathfmt(fname, sizeof(fname), O_RDONLY,
                                                    "%s/" TAGCACHE_FILE_INDEX,
-                                                   global_settings.tagcache_db_path, clause->tag);
+                                                   tc_stat.db_path, clause->tag);
         }
     }
 
@@ -2830,7 +2830,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          */
         fd = open_pathfmt(buf, bufsz, O_WRONLY | O_CREAT | O_TRUNC,
                           "%s/" TAGCACHE_FILE_INDEX,
-                          global_settings.tagcache_db_path, index_type);
+                          tc_stat.db_path, index_type);
         if (fd < 0)
         {
             logf(TAGCACHE_FILE_INDEX " open fail", index_type);
@@ -4487,7 +4487,7 @@ static bool check_deleted_files(void)
 
     logf("reverse scan...");
     fd = open_pathfmt(buf, bufsz, O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
-                      global_settings.tagcache_db_path, tag_filename);
+                      tc_stat.db_path, tag_filename);
     if (fd < 0)
     {
         logf(TAGCACHE_FILE_INDEX " open fail", tag_filename);
@@ -5126,6 +5126,8 @@ void tagcache_init(void)
     write_lock = read_lock = 0;
 
 #ifndef __PCTOOL__
+    strmemccpy(tc_stat.db_path, global_settings.tagcache_db_path,
+               sizeof(tc_stat.db_path));
     mutex_init(&command_queue_mutex);
     queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
@@ -5133,6 +5135,8 @@ void tagcache_init(void)
                   IF_PRIO(, PRIORITY_BACKGROUND)
                   IF_COP(, CPU));
 #else
+    /* use default DB path */
+    strcpy(tc_stat.db_path, ROCKBOX_DIR);
     tc_stat.initialized = true;
     allocate_tempbuf();
     commit();

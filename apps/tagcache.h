@@ -25,6 +25,7 @@
 #include "config.h"
 #include "system.h"
 #include "metadata.h"
+#include "settings.h"
 
 /**
  Note: When adding new tags, make sure to update index_entry_ec and tags_str in 
@@ -89,6 +90,7 @@ struct tagcache_stat {
         *curentry;           /* Path of the current entry being scanned. */
     volatile bool syncscreen;/* Synchronous operation with debug screen? */
     // const char *uimessage;   /* Pending error message. Implement soon. */
+    char db_path[MAX_PATHNAME+1];  /* Path to DB root directory */
 };
 
 enum source_type {source_constant, 
