@@ -23,7 +23,7 @@
 
 #include "config.h"
 #include "system.h" /* for NULL */
-extern void init_tick(void);
+extern void init_tick(void) INIT_ATTR;
 
 #define HZ      100 /* number of ticks per second */
 
