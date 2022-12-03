@@ -51,7 +51,13 @@ SECTIONS
         *(.sdata*);
     } > DRAM
 
-    .iram X1000_IRAM_BASE: AT (_bssbegin)
+    /*
+     * The following sections are loaded after normal DRAM sections
+     * but are copied elsewhere by the startup code.
+     */
+    _noloaddram = .;
+
+    .iram :
     {
         _iramstart = .;
         . = 0x000; /* TLB refill */
@@ -68,16 +74,18 @@ SECTIONS
         *(.irodata);
         *(.idata);
         _iramend = .;
-    } > IRAM
+    } > IRAM AT> DRAM
     _iramcopy = LOADADDR(.iram);
 
-    .tcsm X1000_TCSM_BASE: AT (_bssbegin + SIZEOF(.iram))
+    .tcsm :
     {
         _tcsmstart = .;
         KEEP(*(.tcsm*));
         _tcsmend = .;
-    } > TCSM
+    } > TCSM AT> DRAM
     _tcsmcopy = LOADADDR(.tcsm);
+
+    /* Sections below have no data. */
 
     . = ALIGN(4);
     .stack (NOLOAD) :
@@ -91,7 +99,7 @@ SECTIONS
          _irqstackend = .;
     } > IRAM
 
-    .bss (NOLOAD) :
+    .bss _noloaddram (NOLOAD) :
     {
         _bssbegin = .;
         *(.sbss*);
