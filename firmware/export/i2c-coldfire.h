@@ -30,7 +30,7 @@
 
 #include "cpu.h"
 
-void i2c_init(void);
+void i2c_init(void) INIT_ATTR;
 int i2c_read (volatile unsigned char *iface, unsigned char addr, 
               unsigned char *buf, int count);
 int i2c_write(volatile unsigned char *iface, unsigned char addr, 

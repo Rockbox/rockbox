@@ -367,7 +367,7 @@ int i2c_write(struct i2c_node *node, const unsigned char *data,
     return -1;
 }
 
-void INIT_ATTR i2c_init(void)
+void i2c_init(void)
 {
     /* Do one-time inits for each module that will be used - leave
      * module disabled and unclocked until something wants it. */

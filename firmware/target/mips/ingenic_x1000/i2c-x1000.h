@@ -27,7 +27,7 @@
 #define I2C_FREQ_100K 100000
 #define I2C_FREQ_400K 400000
 
-extern void i2c_init(void);
+extern void i2c_init(void) INIT_ATTR;
 
 /* Configure the I2C controller prior to use.
  *

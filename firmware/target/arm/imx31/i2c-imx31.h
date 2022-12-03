@@ -76,7 +76,7 @@ struct i2c_sync_transfer_desc
 };
 
 /* One-time init of i2c driver */
-void i2c_init(void);
+void i2c_init(void) INIT_ATTR;
 
 /* Enable or disable the node - modules will be switched on/off accordingly. */
 void i2c_enable_node(struct i2c_node *node, bool enable);

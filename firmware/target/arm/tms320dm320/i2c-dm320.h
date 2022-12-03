@@ -24,7 +24,7 @@
 
 #include "system.h"
 
-void i2c_init(void);
+void i2c_init(void) INIT_ATTR;
 int i2c_write(unsigned short address, const unsigned char *data, int count);
 int i2c_read(unsigned short address, unsigned char* buf, int count);
 

@@ -21,7 +21,7 @@
 #ifndef I2C_H
 #define I2C_H
 
-extern void i2c_init(void);
+extern void i2c_init(void) INIT_ATTR;
 extern void i2c_begin(void);
 extern void i2c_end(void);
 extern int i2c_write(int device, const unsigned char* buf, int count );

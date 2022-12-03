@@ -24,7 +24,7 @@
 
 #include "config.h"
 
-void i2c_init(void);
+void i2c_init(void) INIT_ATTR;
 int i2c_write(unsigned char slave, int address, int len, const unsigned char *data);
 int i2c_read(unsigned char slave, int address, int len, unsigned char *data);
 
