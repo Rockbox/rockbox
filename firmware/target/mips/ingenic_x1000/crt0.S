@@ -34,7 +34,7 @@
     .set noreorder
     .set noat
 
-    .section .init.text
+    .section .startup.text,"ax",%progbits
 
 _start:
     b       _realstart

@@ -15,7 +15,7 @@ SECTIONS
 {
     .text :
     {
-        *(.init.spl);
+        *(.startup.spl);
         *(.text*);
         *(.icode*);
     } > TCSM

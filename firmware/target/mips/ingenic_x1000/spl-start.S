@@ -31,7 +31,7 @@
     .set noreorder
     .set noat
 
-    .section .init.spl
+    .section .startup.spl
 
 _spl_start:
     /* Clear data watchpoint */

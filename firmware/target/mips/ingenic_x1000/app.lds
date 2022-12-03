@@ -30,11 +30,15 @@ MEMORY
 
 SECTIONS
 {
-    .text :
+    .startup :
     {
         loadaddress = .;
         _loadaddress = .;
-        *(.init.text);
+        *(.startup.text);
+    } > DRAM
+
+    .text :
+    {
         *(.text*);
     } > DRAM
 
