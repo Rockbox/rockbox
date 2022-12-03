@@ -1248,7 +1248,7 @@ static void tagtree_unload(struct tree_context *c)
         tree_unlock_cache(c);
 }
 
-void tagtree_init(void)
+static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 'custom view'*/
 {
     max_history_level = 0;
     format_count = 0;
@@ -1269,7 +1269,7 @@ void tagtree_init(void)
     if (!parse_menu(tagnavi_file))
     {
         tagtree_unload(NULL);
-        return;
+        return false;
     }
 
     /* safety check since tree.c needs to cast tagentry to entry */
@@ -1286,6 +1286,12 @@ void tagtree_init(void)
     add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
 
     core_shrink(tagtree_handle, core_get_data(tagtree_handle), tagtree_buf_used);
+    return true;
+}
+
+void tagtree_init(void)
+{
+    initialize_tagtree();
 }
 
 static bool show_search_progress(bool init, int count)
@@ -1815,7 +1821,8 @@ int tagtree_load(struct tree_context* c)
         {
             splash(HZ, str(LANG_WAIT));
             tagtree_unload(c);
-            tagtree_init();
+            if (!initialize_tagtree())
+                return 0;
         }
         c->dirlevel = 0;
         count = load_root(c);
