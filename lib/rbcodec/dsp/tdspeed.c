@@ -521,8 +521,12 @@ static intptr_t tdspeed_new_format(struct dsp_proc_entry *this,
     (void)this;
 }
 
-static void tdspeed_dsp_init(struct tdspeed_state_s *st, unsigned int dsp_id)
+void dsp_timestretch_init(struct dsp_config *dsp, unsigned int dsp_id)
 {
+    (void)dsp;
+
+    struct tdspeed_state_s *st = &tdspeed_state;
+
     /* everything is at 100% until dsp_set_timestretch is called with
        some other value and timestretch is enabled at the time */
     if (dsp_id == CODEC_IDX_AUDIO)
@@ -541,10 +545,6 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
 
     switch (setting)
     {
-    case DSP_INIT:
-        tdspeed_dsp_init(st, value);
-        break;
-
     case DSP_FLUSH:
         tdspeed_flush();
         break;

@@ -36,6 +36,13 @@ static void format_change_set(struct sample_io_data *this)
     this->format_dirty = 1;
 }
 
+void dsp_sample_io_init(struct sample_io_data *this, unsigned int dsp_id)
+{
+    this->output_sampr = DSP_OUT_DEFAULT_HZ;
+    dsp_sample_input_init(this, dsp_id);
+    dsp_sample_output_init(this);
+}
+
 bool dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
                              intptr_t *value_p)
@@ -44,12 +51,6 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
 
     switch (setting)
     {
-    case DSP_INIT:
-        this->output_sampr = DSP_OUT_DEFAULT_HZ;
-        dsp_sample_input_init(this, value);
-        dsp_sample_output_init(this);
-        break;
-
     case DSP_RESET:
         /* Reset all sample descriptions to default */
         format_change_set(this);

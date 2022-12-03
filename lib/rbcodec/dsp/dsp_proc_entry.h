@@ -127,6 +127,8 @@ typedef intptr_t (*dsp_proc_config_fn_type)(struct dsp_proc_entry *this,
                                             struct dsp_config *dsp,
                                             unsigned int setting,
                                             intptr_t value);
+typedef void (*dsp_proc_init_fn_type)(struct dsp_config *dsp,
+                                      unsigned int dsp_id);
 
 /* Enable/disable a processing stage - not to be called during processing
  * by processing code! */

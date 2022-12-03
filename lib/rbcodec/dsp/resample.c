@@ -26,6 +26,7 @@
 #include "fixedpoint.h"
 #include "dsp_proc_entry.h"
 #include "dsp_misc.h"
+#include "resample.h"
 #include <string.h>
 
 /**
@@ -262,7 +263,7 @@ static intptr_t resample_new_format(struct dsp_proc_entry *this,
     return PROC_NEW_FORMAT_DEACTIVATED;
 }
 
-static void resample_dsp_init(struct dsp_config *dsp, unsigned int dsp_id)
+void dsp_resample_init(struct dsp_config *dsp, unsigned int dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -310,10 +311,6 @@ static intptr_t resample_configure(struct dsp_proc_entry *this,
 
     switch (setting)
     {
-    case DSP_INIT:
-        resample_dsp_init(dsp, value);
-        break;
-
     case DSP_FLUSH:
         resample_flush(this);
         break;

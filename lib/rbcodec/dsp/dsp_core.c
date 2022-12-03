@@ -24,6 +24,9 @@
 #include "dsp_core.h"
 #include "dsp_sample_io.h"
 
+#include "tdspeed.h"
+#include "resample.h"
+
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
@@ -69,6 +72,11 @@ dsp_proc_slot_arr[DSP_NUM_PROC_STAGES+DSP_VOICE_NUM_PROC_STAGES] IBSS_ATTR;
 
 /* General DSP config */
 static struct dsp_config dsp_conf[DSP_COUNT] IBSS_ATTR;
+
+static const dsp_proc_init_fn_type dsp_init_fn[] INITDATA_ATTR = {
+    &dsp_timestretch_init,
+    &dsp_resample_init,
+};
 
 /** Processing stages support functions **/
 static const struct dsp_proc_db_entry *
@@ -517,12 +525,15 @@ void dsp_init(void)
         count = slot_count[i];
         dsp->slot_free_mask = MASK_N(uint32_t, count, shift);
 
-        intptr_t value = i;
-        dsp_sample_io_configure(&dsp->io_data, DSP_INIT, &value);
+        dsp_sample_io_init(&dsp->io_data, i);
 
-        /* Notify each db entry of global init for each DSP */
-        for (unsigned int j = 0; j < DSP_NUM_PROC_STAGES; j++)
-            dsp_proc_database[j]->configure(NULL, dsp, DSP_INIT, i);
+        /* Enable misc handler by default for the audio DSP */
+        if (i == CODEC_IDX_AUDIO)
+            dsp_proc_enable(dsp, DSP_PROC_MISC_HANDLER, true);
+
+        /* Call global init for DSPs that need it */
+        for (unsigned int j = 0; j < ARRAYLEN(dsp_init_fn); ++j)
+            dsp_init_fn[j](dsp, i);
 
         dsp_configure(dsp, DSP_RESET, 0);
     }
