@@ -31,7 +31,13 @@ extern void system_reboot (void);
 /* Called from any UIE handler and panicf - wait for a key and return
  * to reboot system. */
 extern void system_exception_wait(void);
+
+#if NUM_CORES == 1
+extern void system_init(void) INIT_ATTR;
+#else
+/* TODO: probably safe to use INIT_ATTR on multicore but this needs checking */
 extern void system_init(void);
+#endif
 
 extern long cpu_frequency;
 

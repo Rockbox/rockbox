@@ -199,7 +199,7 @@ void system_exception_wait(void)
     system_halt();
 }
 
-void INIT_ATTR system_init(void)
+void system_init(void)
 {
     static const enum IMX31_CG_LIST disable_clocks[] INITDATA_ATTR =
     {
