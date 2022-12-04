@@ -1213,18 +1213,11 @@ int bookmark_autoload(const char* file)
         if (bookmark != NULL)
         {
             if (!play_bookmark(bookmark))
-            {
-                /* Selected bookmark not found. */
-                splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
-            }
-
-            /* Act as if autoload was done even if it failed, since the
-             * user did make an active selection.
-             */
+                return BOOKMARK_CANCEL;
             return BOOKMARK_DO_RESUME;
         }
 
-        return ret != (BOOKMARK_SUCCESS ? BOOKMARK_CANCEL : BOOKMARK_DONT_RESUME);
+        return (ret != BOOKMARK_SUCCESS) ? BOOKMARK_CANCEL : BOOKMARK_DONT_RESUME;
     }
 }
 

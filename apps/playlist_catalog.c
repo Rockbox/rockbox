@@ -217,6 +217,8 @@ restart:
             int res = bookmark_autoload(selected_playlist);
             if (res == BOOKMARK_DO_RESUME)
                result = 0;
+            else if (res == BOOKMARK_CANCEL)
+                goto restart;
             else
             {
                 switch (playlist_viewer_ex(selected_playlist, &most_recent_selection)) {
