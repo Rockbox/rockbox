@@ -4363,6 +4363,17 @@ else
  ldver=`$LD --version | head -n 1 | sed -e 's/\ /\n/g' | tail -n 1`
 fi
 
+# Convert LD version to a number major*100 + minor
+ldnum1=`echo $ldver | cut -d . -f1`
+ldnum2=`echo $ldver | cut -d . -f2`
+ldnum=`(expr $ldnum1 "*" 100 + $ldnum2) 2>/dev/null`
+
+if test "$ldnum" -ge "227"; then
+  have_nocrossrefs_to="#define HAVE_NOCROSSREFS_TO"
+else
+  have_nocrossrefs_to="#undef HAVE_NOCROSSREFS_TO"
+fi
+
 if [ -z "$gccver" ]; then
   echo "[WARNING] The compiler you must use ($CC) is not in your path!"
   echo "[WARNING] this may cause your build to fail since we cannot do the"
@@ -4599,6 +4610,9 @@ ${app_lcd_height}
 #define ROCKBOX_SHARE_PATH "${sharedir}"
 #define ROCKBOX_BINARY_PATH "${bindir}"
 #define ROCKBOX_LIBRARY_PATH "${libdir}"
+
+/* linker feature test macro for validating cross-section references */
+${have_nocrossrefs_to}
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
