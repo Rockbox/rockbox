@@ -466,6 +466,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     done = true;
                 }
             }
+            if (!done)
+                init_menu_lists(menu, &lists, lists.selected_item, false, vps);
             redraw_lists = true;
         }
 #endif
@@ -670,7 +672,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 case MT_SETTING_W_TEXT:
                 {
                     do_setting_from_menu(temp, vps);
-                    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
+                    init_menu_lists(menu, &lists, selected, false, vps);
+                    redraw_lists = true;
+
                     break;
                 }
                 case MT_RETURN_ID:

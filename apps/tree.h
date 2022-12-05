@@ -102,7 +102,7 @@ struct entry* tree_get_entries(struct tree_context *t);
 struct entry* tree_get_entry_at(struct tree_context *t, int index);
 
 void tree_mem_init(void) INIT_ATTR;
-void tree_gui_init(void) INIT_ATTR;
+void tree_init(void) INIT_ATTR;
 char* get_current_file(char* buffer, size_t buffer_len);
 void set_dirfilter(int l_dirfilter);
 void set_current_file(const char *path);
@@ -133,5 +133,4 @@ void tree_restore(void);
 bool bookmark_play(char* resume_file, int index, unsigned long elapsed,
                    unsigned long offset, int seed, char *filename);
 
-extern struct gui_synclist tree_lists;
 #endif

@@ -1017,7 +1017,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                     {
                         quick_screen_quick(button);
                         update_playlist(true);
-                        update_lists(&playlist_lists);
+                        prepare_lists(&playlist_lists);
                     }
                     break;
 #endif

@@ -80,7 +80,7 @@
 static const struct filetype *filetypes;
 static int filetypes_count;
 
-struct gui_synclist tree_lists;
+static struct gui_synclist tree_lists;
 
 /* I put it here because other files doesn't use it yet,
  * but should be elsewhere since it will be used mostly everywhere */
@@ -301,19 +301,10 @@ bool check_rockboxdir(void)
 }
 
 /* do this really late in the init sequence */
-void tree_gui_init(void)
+void tree_init(void)
 {
     check_rockboxdir();
-
     strcpy(tc.currdir, "/");
-
-    gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
-    gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
-    gui_synclist_set_icon_callback(&tree_lists,
-                                    global_settings.show_icons?&tree_get_fileicon:NULL);
-#ifdef HAVE_LCD_COLOR
-    gui_synclist_set_color_callback(&tree_lists, &tree_get_filecolor);
-#endif
 }
 
 
@@ -419,6 +410,9 @@ static int update_dir(void)
             splash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
+
+    gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
+
 #ifdef HAVE_TAGCACHE
     if (id3db)
     {
@@ -472,6 +466,10 @@ static int update_dir(void)
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
     gui_synclist_set_icon_callback(&tree_lists,
                                    global_settings.show_icons?tree_get_fileicon:NULL);
+    gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
+#ifdef HAVE_LCD_COLOR
+    gui_synclist_set_color_callback(&tree_lists, &tree_get_filecolor);
+#endif
     if( tc.selected_item >= tc.filesindir)
         tc.selected_item=tc.filesindir-1;
 
@@ -657,8 +655,6 @@ static int dirbrowse(void)
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
 
-    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
-    gui_synclist_draw(&tree_lists);
     while(1) {
         bool restore = false;
         if (tc.dirlevel < 0)
@@ -706,9 +702,6 @@ static int dirbrowse(void)
 #endif
                     case GO_TO_ROOT: exit_func = true; break;
                     default:
-                        if (*tc.dirfilter == SHOW_CFG) /* theme changed */
-                            gui_synclist_init_display_settings(&tree_lists);
-
                         break;
                 }
                 restore = true;
@@ -999,8 +992,6 @@ int rockbox_browse(struct browse_context *browse)
 
     tc.dirfilter = &dirfilter;
     tc.sort_dir = global_settings.sort_dir;
-
-    gui_synclist_init_display_settings(&tree_lists); /* grab updated settings */
 
     reload_dir = true;
     if (*tc.dirfilter >= NUM_FILTER_MODES)

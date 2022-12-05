@@ -167,7 +167,7 @@ int main(void)
         screens[i].update();
     }
     list_init();
-    tree_gui_init();
+    tree_init();
     /* Keep the order of this 3
      * Must be done before any code uses the multi-screen API */
 #ifdef HAVE_USBSTACK
