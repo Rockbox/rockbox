@@ -902,8 +902,6 @@ static int select_bookmark(const char* bookmark_file_name,
 
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
-    gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK),
-        Icon_Bookmark);
 
     while (!exit)
     {
