@@ -938,6 +938,8 @@ static int select_bookmark(const char* bookmark_file_name,
             }
 
             buffer_bookmarks(bookmarks, bookmarks->start);
+            gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK),
+                                   Icon_Bookmark);
             gui_synclist_draw(&list);
             cond_talk_ids_fq(VOICE_EXT_BMARK);
             gui_synclist_speak_item(&list);
