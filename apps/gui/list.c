@@ -123,7 +123,7 @@ void list_init_item_height(struct gui_synclist *list, enum screen_type screen)
 #endif
 }
 
-void gui_synclist_init_display_settings(struct gui_synclist * list)
+static void gui_synclist_init_display_settings(struct gui_synclist * list)
 {
     struct user_settings *gs = &global_settings;
     list->scrollbar = gs->scrollbar;

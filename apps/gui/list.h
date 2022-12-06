@@ -190,7 +190,6 @@ struct gui_synclist
 
 extern void list_init(void);
 
-extern void gui_synclist_init_display_settings(struct gui_synclist * list);
 extern void gui_synclist_init(
     struct gui_synclist * lists,
     list_get_name callback_get_item_name,

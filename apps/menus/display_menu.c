@@ -335,22 +335,7 @@ MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 MENUITEM_SETTING(offset_out_of_view, &global_settings.offset_out_of_view, NULL);
 MENUITEM_SETTING(screen_scroll_step, &global_settings.screen_scroll_step, NULL);
 MENUITEM_SETTING(scroll_paginated, &global_settings.scroll_paginated, NULL);
-
-static int listwraparound_callback(int action,
-                                   const struct menu_item_ex *this_item,
-                                   struct gui_synclist *this_list)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM:
-            gui_synclist_init_display_settings(this_list);
-            break;
-    }
-    return action;
-}
-
-MENUITEM_SETTING(list_wraparound, &global_settings.list_wraparound, listwraparound_callback);
+MENUITEM_SETTING(list_wraparound, &global_settings.list_wraparound, NULL);
 MENUITEM_SETTING(list_order, &global_settings.list_order, NULL);
 
 MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,

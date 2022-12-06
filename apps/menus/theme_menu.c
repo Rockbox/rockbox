@@ -165,16 +165,6 @@ MAKE_MENU(colors_settings, ID2P(LANG_COLORS_MENU),
 /*    BARS MENU                     */
 /*                                  */
 
-static int list_update_callback(int action,
-                             const struct menu_item_ex *this_item,
-                             struct gui_synclist *this_list)
-{
-    (void)this_item;
-    if (action == ACTION_EXIT_MENUITEM)
-        gui_synclist_init_display_settings(this_list);
-    return ACTION_REDRAW;
-}
-
 static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item,
                                 enum screen_type screen)
 {
@@ -213,7 +203,7 @@ static int statusbar_callback(int action,
     return statusbar_callback_ex(action, this_item, SCREEN_MAIN);
 }
 
-MENUITEM_SETTING(scrollbar_item, &global_settings.scrollbar, list_update_callback);
+MENUITEM_SETTING(scrollbar_item, &global_settings.scrollbar, NULL);
 MENUITEM_SETTING(scrollbar_width, &global_settings.scrollbar_width, NULL);
 MENUITEM_SETTING(statusbar, &global_settings.statusbar, statusbar_callback);
 #ifdef HAVE_REMOTE_LCD
@@ -367,6 +357,7 @@ static int showicons_callback(int action,
                              struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     static bool old_icons;
     switch (action)
     {
@@ -376,7 +367,6 @@ static int showicons_callback(int action,
         case ACTION_EXIT_MENUITEM:
             if (old_icons != global_settings.show_icons)
                 icons_init();
-            gui_synclist_init_display_settings(this_list);
             break;
     }
     return ACTION_REDRAW;
@@ -386,7 +376,7 @@ MENUITEM_SETTING(show_icons, &global_settings.show_icons, showicons_callback);
 MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, 
         ID2P(LANG_CUSTOM_THEME), 
         browse_folder, (void*)&themes, NULL, Icon_Config);
-MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, list_update_callback);
+MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);
 #if LCD_DEPTH > 1
 MENUITEM_SETTING(sep_menu, &global_settings.list_separator_height, NULL);
 #endif
