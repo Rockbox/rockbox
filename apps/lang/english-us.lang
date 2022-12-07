@@ -12548,10 +12548,10 @@
     *: "Exempt Seek"
   </source>
   <dest>
-    *: "Seek"
+    *: "Exempt Seek"
   </dest>
   <voice>
-    *: "Seek"
+    *: "Exempt Seek"
   </voice>
 </phrase>
 <phrase>
@@ -12621,10 +12621,10 @@
     *: "Exempt Play"
   </source>
   <dest>
-    *: "Play"
+    *: "Exempt Play"
   </dest>
   <voice>
-    *: "Play"
+    *: "Exempt Play"
   </voice>
 </phrase>
 <phrase>
@@ -12910,10 +12910,10 @@
     *: "Exempt Skip"
   </source>
   <dest>
-    *: "Skip"
+    *: "Exempt Skip"
   </dest>
   <voice>
-    *: "Skip"
+    *: "Exempt Skip"
   </voice>
 </phrase>
 <phrase>
@@ -13873,10 +13873,10 @@
     *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </dest>
   <voice>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </voice>
 </phrase>
 <phrase>
