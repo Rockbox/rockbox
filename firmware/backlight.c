@@ -123,7 +123,7 @@ static int backlight_timeout_plugged = 5*HZ;
 #ifdef HAS_BUTTON_HOLD
 static int backlight_on_button_hold = 0;
 #endif
-static void backlight_timeout_handler(void);
+static void backlight_handle_timeout(void);
 
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
@@ -551,6 +551,17 @@ static void remote_backlight_update_state(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
+static void backlight_queue_wait(struct queue_event *ev)
+{
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+    if (backlight_fading_state != NOT_FADING)
+        queue_wait_w_tmo(&backlight_queue, ev, FADE_DELAY);
+    else
+#endif
+        queue_wait_w_tmo(&backlight_queue, ev, BACKLIGHT_THREAD_TIMEOUT);
+}
+
 void backlight_thread(void)
 {
     struct queue_event ev;
@@ -558,13 +569,7 @@ void backlight_thread(void)
 
     while(1)
     {
-#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
-    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-        if (backlight_fading_state != NOT_FADING)
-            queue_wait_w_tmo(&backlight_queue, &ev, FADE_DELAY);
-        else
-#endif
-            queue_wait_w_tmo(&backlight_queue, &ev, BACKLIGHT_THREAD_TIMEOUT);
+        backlight_queue_wait(&ev);
         switch(ev.id)
         {   /* These events must always be processed */
 #ifdef _BACKLIGHT_FADE_BOOST
@@ -686,24 +691,7 @@ void backlight_thread(void)
 #endif
                 break;
             case SYS_TIMEOUT:
-#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
-    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
-                if (backlight_fading_state != NOT_FADING)
-                {
-                    if ((_backlight_fade_step(backlight_fading_state)))
-                    {   /* finished fading */
-#ifdef HAVE_LCD_SLEEP
-                        if (backlight_fading_state == FADING_DOWN)
-                        {   /* start sleep countdown */
-                             backlight_lcd_sleep_countdown(true);
-                        }
-#endif
-                        backlight_fading_state = NOT_FADING;
-                    }
-                }
-                else
-#endif /* CONFIG_BACKLIGHT_FADING */
-                    backlight_timeout_handler();
+                backlight_handle_timeout();
                 break;
         }
     } /* end while */
@@ -761,6 +749,28 @@ static void backlight_timeout_handler(void)
         if (backlight_ignored_timer <= 0)
             ignore_backlight_on = false;
     }
+}
+
+static void backlight_handle_timeout(void)
+{
+#if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
+    || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
+    if (backlight_fading_state != NOT_FADING)
+    {
+        if ((_backlight_fade_step(backlight_fading_state)))
+        {   /* finished fading */
+#ifdef HAVE_LCD_SLEEP
+            if (backlight_fading_state == FADING_DOWN)
+            {   /* start sleep countdown */
+                 backlight_lcd_sleep_countdown(true);
+            }
+#endif
+            backlight_fading_state = NOT_FADING;
+        }
+    }
+    else
+#endif /* CONFIG_BACKLIGHT_FADING */
+        backlight_timeout_handler();
 }
 
 void backlight_init(void)
