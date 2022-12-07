@@ -1246,14 +1246,14 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
                         [UNIT_IDX_SEC] = 4,/* 999.59:59:0  RTL offsets    */
                         [UNIT_IDX_MS]  = 0,/* 0  .4 :7 :10 won't change   */
                    }; /* {10,7,4,0}; Offsets */
-    const uint16_t unitlock[UNIT_IDX_TIME_COUNT] =
+    static const uint16_t unitlock[UNIT_IDX_TIME_COUNT] =
                    {
                         [UNIT_IDX_HR]  = UNIT_LOCK_HR,
                         [UNIT_IDX_MIN] = UNIT_LOCK_MIN,
                         [UNIT_IDX_SEC] = UNIT_LOCK_SEC,
                         [UNIT_IDX_MS]  = 0,
                    }; /* unitlock */
-    const uint16_t units[UNIT_IDX_TIME_COUNT] =
+    static const uint16_t units[UNIT_IDX_TIME_COUNT] =
                    {
                         [UNIT_IDX_HR]  = UNIT_HOUR,
                         [UNIT_IDX_MIN] = UNIT_MIN,
