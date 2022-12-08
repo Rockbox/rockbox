@@ -268,17 +268,18 @@ bool settings_parseline(char* line, char** name, char** value)
         return false;
 
     *name = line;
-    *ptr = 0;
+    *ptr = '\0'; /* terminate previous */
     ptr++;
     ptr = skip_whitespace(ptr);
     *value = ptr;
 
     /* strip whitespace from the right side of value */
     ptr += strlen(ptr);
-    for (ptr--; ptr >= *value; ptr--)
+    ptr--;
+    while ((ptr > (*value) - 1) && isspace(*ptr))
     {
-        if (isspace(*ptr))
-            *ptr = '\0';
+        *ptr = '\0';
+        ptr--;
     }
 
     return true;
