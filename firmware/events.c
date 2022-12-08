@@ -43,30 +43,30 @@ static struct sysevent events[MAX_SYS_EVENTS];
 static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
                          void *handler, void *user_data)
 {
-    int i;
-    
-    /* Check if the event already exists. */
-    for (i = 0; i < MAX_SYS_EVENTS; i++)
+    int free = -1;
+    /* Check if the event already exists. & lowest free slot available */
+    for (int i = MAX_SYS_EVENTS - 1; i >= 0; i--)
     {
         if (events[i].handler.callback == handler && events[i].id == id
-                && (!user_data_valid || (user_data == events[i].handler.user_data)))
-            return false;
-    }
-    
-    /* Try to find a free slot. */
-    for (i = 0; i < MAX_SYS_EVENTS; i++)
-    {
-        if (events[i].handler.callback == NULL)
+            && (!user_data_valid || (user_data == events[i].handler.user_data)))
         {
-            events[i].id = id;
-            events[i].oneshot = oneshot;
-            if ((events[i].has_user_data = user_data_valid))
-                events[i].handler.user_data = user_data;
-            events[i].handler.callback = handler;
-            return true;
+            return false;
         }
+        else if (events[i].handler.callback == NULL)
+            free = i;
     }
-    
+
+    /* is there a free slot? */
+    if (free >= 0)
+    {
+        events[free].id = id;
+        events[free].oneshot = oneshot;
+        if ((events[free].has_user_data = user_data_valid))
+            events[free].handler.user_data = user_data;
+        events[free].handler.callback = handler;
+        return true;
+    }
+
     panicf("event line full");
     return false;
 }
