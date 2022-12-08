@@ -86,6 +86,11 @@ struct resume_info{
 #define TEMP_BUF_SIZE (MAX(MAX_BOOKMARK_SIZE, MAX_PATH + 1))
 static char global_temp_buffer[TEMP_BUF_SIZE];
 
+static inline void get_hash(const char *key, uint32_t *hash, int len)
+{
+    *hash = crc_32(key, len, *hash); /* this is probably sufficient */
+}
+
 static const char* skip_tokens(const char* s, int ntokens)
 {
     for (int i = 0; i < ntokens; i++)
@@ -120,17 +125,33 @@ static long long_token(const char **s)
 /* Get the name of the playlist and the name of the track from a bookmark. */
 /* Returns true iff both were extracted.                                   */
 /*-------------------------------------------------------------------------*/
-static bool bookmark_get_playlist_and_track(const char *bookmark,
-                                            const char **pl_start,
-                                            const char **pl_end,
-                                            const char **track)
+static bool bookmark_get_playlist_and_track_hash(const char *bookmark,
+                                            uint32_t *pl_hash,
+                                            uint32_t *track_hash)
 {
+    *pl_hash = 0;
+    *track_hash = 0;
+    int  pl_len;
+    const char *pl_start, *pl_end, *track;
+
     logf("%s", __func__);
-    *pl_start = strchr(bookmark,'/');
-    if (!(*pl_start))
+
+    pl_start = strchr(bookmark,'/');
+    if (!(pl_start))
         return false;
-    *pl_end = skip_tokens(*pl_start, 1) - 1;
-    *track = *pl_end + 1;
+
+    pl_end = skip_tokens(pl_start, 1) - 1;
+    pl_len = pl_end - pl_start;
+
+    track = pl_end + 1;
+    get_hash(pl_start, pl_hash, pl_len);
+
+    if (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)
+    {
+        get_hash(track, track_hash, strlen(track));
+    }
+
+
     return true;
 }
 
@@ -262,13 +283,11 @@ static bool add_bookmark(const char* bookmark_file_name,
     int  temp_bookmark_file = 0;
     int  bookmark_file = 0;
     int  bookmark_count = 0;
-    int  pl_len = 0, bm_pl_len;
-    const char *pl_start = NULL, *bm_pl_start;
-    const char *pl_end = NULL, *bm_pl_end;
-    const char *track = NULL, *bm_track;
     bool comp_playlist = false;
     bool comp_track = false;
     bool equal;
+    uint32_t pl_hash, pl_track_hash;
+    uint32_t bm_pl_hash, bm_pl_track_hash;
 
     /* Opening up a temp bookmark file */
     temp_bookmark_file = open_temp_bookmark(fnamebuf,
@@ -282,19 +301,21 @@ static bool add_bookmark(const char* bookmark_file_name,
     if (most_recent && ((global_settings.usemrb == BOOKMARK_ONE_PER_PLAYLIST)
                       || (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)))
     {
-        if (bookmark_get_playlist_and_track(bookmark, &pl_start, &pl_end, &track))
+
+        if (bookmark_get_playlist_and_track_hash(bookmark, &pl_hash, &pl_track_hash))
         {
             comp_playlist = true;
-            pl_len = pl_end - pl_start;
-            if (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)
-                comp_track = true;
+            comp_track = (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK);
         }
     }
+
     logf("adding bookmark to %s [%s]", fnamebuf, bookmark);
     /* Writing the new bookmark to the begining of the temp file */
     write(temp_bookmark_file, bookmark, strlen(bookmark));
     write(temp_bookmark_file, "\n", 1);
     bookmark_count++;
+
+    /* WARNING underlying buffer to *bookmrk gets overwritten after this point! */
 
     /* Reading in the previous bookmarks and writing them to the temp file */
     logf("opening old bookmark %s", bookmark_file_name);
@@ -315,15 +336,14 @@ static bool add_bookmark(const char* bookmark_file_name,
             equal = false;
             if (comp_playlist)
             {
-                if (bookmark_get_playlist_and_track(global_temp_buffer,
-                                           &bm_pl_start, &bm_pl_end, &bm_track))
+                if (bookmark_get_playlist_and_track_hash(global_temp_buffer,
+                                                &bm_pl_hash, &bm_pl_track_hash))
                 {
-                    bm_pl_len = bm_pl_end - bm_pl_start;
-                    equal = (pl_len == bm_pl_len) &&
-                            !strncmp(pl_start, bm_pl_start, pl_len);
-
+                    equal = (pl_hash == bm_pl_hash);
                     if (equal && comp_track)
-                        equal = !strcmp(track, bm_track);
+                    {
+                         equal = (pl_track_hash == bm_pl_track_hash);
+                    }
                 }
             }
             if (!equal)
@@ -339,11 +359,6 @@ static bool add_bookmark(const char* bookmark_file_name,
     }
     close(temp_bookmark_file);
 
-    /* only retrieve the path*/
-    open_temp_bookmark(fnamebuf,
-                       sizeof(fnamebuf),
-                       O_PATH,
-                       bookmark_file_name);
     remove(bookmark_file_name);
     rename(fnamebuf, bookmark_file_name);
 
