@@ -125,7 +125,7 @@ static bool is_action_filtered(int action, unsigned int mask, int context)
     {
         case ACTION_NONE:
             break;
-/*Actions that are not mapped will not turn on the backlight option NOUNMAPPED*/
+        /* Actions that are not mapped will not turn on the backlight */
         case ACTION_UNKNOWN:
             match = has_flag(mask, SEL_ACTION_NOUNMAPPED);
             break;
@@ -133,15 +133,15 @@ static bool is_action_filtered(int action, unsigned int mask, int context)
         case ACTION_FM_PLAY:
             match = has_flag(mask, SEL_ACTION_PLAY);
             break;
-        //case ACTION_STD_PREVREPEAT: // seek not exempted outside of WPS
-        //case ACTION_STD_NEXTREPEAT:
+        /* case ACTION_STD_PREVREPEAT:*/ /* seek not exempted outside of WPS */
+        /* case ACTION_STD_NEXTREPEAT: */
         case ACTION_WPS_SEEKBACK:
         case ACTION_WPS_SEEKFWD:
         case ACTION_WPS_STOPSEEK:
             match = has_flag(mask, SEL_ACTION_SEEK);
             break;
-        //case ACTION_STD_PREV: // skip/scrollwheel not exempted outside of WPS
-        //case ACTION_STD_NEXT:
+        /* case ACTION_STD_PREV: */ /* skip/scrollwheel not */
+        /* case ACTION_STD_NEXT: */ /* exempted outside of WPS */
         case ACTION_WPS_SKIPNEXT:
         case ACTION_WPS_SKIPPREV:
         case ACTION_FM_NEXT_PRESET:
@@ -149,8 +149,8 @@ static bool is_action_filtered(int action, unsigned int mask, int context)
             match = has_flag(mask, SEL_ACTION_SKIP);
             break;
 #ifdef HAVE_VOLUME_IN_LIST
-        case ACTION_LIST_VOLUP: // volume exempted outside of WPS if the device supports it
-        case ACTION_LIST_VOLDOWN:
+        case ACTION_LIST_VOLUP:   /* volume exempted outside of WPS */
+        case ACTION_LIST_VOLDOWN: /* ( if the device supports it )*/
 #endif
         case ACTION_WPS_VOLUP:
         case ACTION_WPS_VOLDOWN:
@@ -1001,7 +1001,8 @@ static inline int do_backlight(action_last_t *last, action_cur_t *cur, int actio
                      && power_input_present());
 #endif
     /* skip if backlight on | incorrect context | SEL_ACTION_NOEXT + ext pwr */
-    if ((cur->context == CONTEXT_FM || cur->context == CONTEXT_WPS) && bl_is_off)
+    if (bl_is_off && (cur->context == CONTEXT_FM || cur->context == CONTEXT_WPS ||
+       cur->context == CONTEXT_MAINMENU))
     {
         filtered = is_action_filtered(action, last->backlight_mask, cur->context);
         bl_activate = !is_action_discarded(cur, filtered, &last->bl_filter_tick);

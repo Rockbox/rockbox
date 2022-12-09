@@ -95,7 +95,7 @@ void set_selective_backlight_actions(bool selective, unsigned int mask,
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
-    there values may have significance, so dont touch! */
+    their values may have significance, so dont touch! */
     CONTEXT_WPS = 1,
     CONTEXT_TREE = 2,
     CONTEXT_RECORD = 3,
