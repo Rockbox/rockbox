@@ -760,9 +760,11 @@ static int load_plugin_screen(char *key)
 
     while(loops-- > 0) /* just to keep things from getting out of hand */
     {
-        int opret = open_plugin_get_entry(key, &open_plugin_entry);
-        char *path = open_plugin_entry.path;
-        char *param = open_plugin_entry.param;
+        
+        int opret = open_plugin_load_entry(key);
+        struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
+        char *path = op_entry->path;
+        char *param = op_entry->param;
         if (param[0] == '\0')
             param = NULL;
         if (path[0] == '\0' && key)
@@ -792,8 +794,8 @@ static int load_plugin_screen(char *key)
         if (opret != OPEN_PLUGIN_NEEDS_FLUSHED || last_screen != GO_TO_WPS)
         {
             /* Keep the entry in case of GO_TO_PREVIOUS */
-            open_plugin_entry.hash = 0; /*remove hash -- prevents flush to disk */
-            open_plugin_entry.lang_id = LANG_PREVIOUS_SCREEN;
+            op_entry->hash = 0; /*remove hash -- prevents flush to disk */
+            op_entry->lang_id = LANG_PREVIOUS_SCREEN;
             /*open_plugin_add_path(NULL, NULL, NULL);// clear entry */
         }
         break;
@@ -962,8 +964,9 @@ void root_menu(void)
                 char *key;
                 if (global_status.last_screen == GO_TO_SHORTCUTMENU)
                 {
-                    if (open_plugin_entry.lang_id == LANG_OPEN_PLUGIN)
-                        open_plugin_entry.lang_id = LANG_SHORTCUTS;
+                    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
+                    if (op_entry->lang_id == LANG_OPEN_PLUGIN)
+                        op_entry->lang_id = LANG_SHORTCUTS;
                     shortcut_origin = last_screen;
                     key = ID2P(LANG_SHORTCUTS);
                 }

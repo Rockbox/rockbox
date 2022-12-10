@@ -64,7 +64,6 @@ struct open_plugin_entry_t
     offsetof(struct open_plugin_entry_t, lang_id)  + \
     offsetof(struct open_plugin_entry_t, checksum) + \
     offsetof(struct open_plugin_entry_t, name)     + \
-    /*offsetof(struct open_plugin_entry_t, key)+*/   \
     offsetof(struct open_plugin_entry_t, path)     + \
     offsetof(struct open_plugin_entry_t, param))
 
@@ -79,9 +78,9 @@ inline static void open_plugin_get_hash(const char *key, uint32_t *hash)
 }
 
 #ifndef PLUGIN
-extern struct open_plugin_entry_t open_plugin_entry;
+struct open_plugin_entry_t* open_plugin_get_entry(void);
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter);
-int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry);
+int open_plugin_load_entry(const char *key);
 void open_plugin_browse(const char *key);
 int open_plugin_run(const char *key);
 void open_plugin_cache_flush(void); /* flush to disk */

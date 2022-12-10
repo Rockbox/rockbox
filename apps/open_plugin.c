@@ -32,11 +32,9 @@
 #include "logf.h"
 
 #define ROCK_EXT "rock"
-#define ROCK_LEN 5
+#define ROCK_LEN sizeof(ROCK_EXT)
 #define OP_EXT "opx"
-#define OP_LEN 4
-
-struct open_plugin_entry_t open_plugin_entry = {0};
+#define OP_LEN sizeof(OP_EXT)
 
 static const uint32_t open_plugin_csum = OPEN_PLUGIN_CHECKSUM;
 
@@ -44,7 +42,7 @@ static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
 
 static const char* strip_rockbox_root(const char *path)
 {
-    int dlen = strlen(ROCKBOX_DIR);
+    int dlen = ROCKBOX_DIR_LEN;
     if (strncmp(path, ROCKBOX_DIR, dlen) == 0)
         path+= dlen;
     return path;
@@ -55,11 +53,14 @@ static inline void op_clear_entry(struct open_plugin_entry_t *entry)
     if (entry == NULL)
         return;
     memset(entry, 0, op_entry_sz);
-    entry->lang_id = -1;
+    entry->lang_id = OPEN_PLUGIN_LANG_INVALID;
 }
 
 static int op_entry_checksum(struct open_plugin_entry_t *entry)
 {
+/*Note: since we use langids as checksums everytime someone moves the lang file
+* around it could mess with our indexing so invalidate entries when this occurs
+*/
     if (entry == NULL || entry->checksum != open_plugin_csum +
         (entry->lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY))
     {
@@ -117,7 +118,7 @@ static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
 #endif
        (ret > OPEN_PLUGIN_NOT_FOUND && op_entry_checksum(entry) <= 0))
     {
-        splash(HZ * 2, "OpenPlugin Invalid entry");
+        splashf(HZ * 2, "%s Invalid entry", str(LANG_OPEN_PLUGIN));
         ret = OPEN_PLUGIN_NOT_FOUND;
     }
     if (ret == OPEN_PLUGIN_NOT_FOUND)
@@ -215,7 +216,7 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     return 0;
 }
 
-static int op_get_entry(uint32_t hash, int32_t lang_id,
+static int op_load_entry(uint32_t hash, int32_t lang_id,
                         struct open_plugin_entry_t *entry, const char *dat_file)
 {
     int opret = OPEN_PLUGIN_NOT_FOUND;
@@ -238,7 +239,8 @@ static int op_get_entry(uint32_t hash, int32_t lang_id,
         }
 
         /* if another entry is loaded; flush it to disk before we destroy it */
-        op_update_dat(&open_plugin_entry, true);
+
+        op_update_dat(open_plugin_get_entry(), true);
 
         logf("OP get_entry hash: %x lang id: %d db: %s", hash, lang_id, dat_file);
 
@@ -252,17 +254,41 @@ static int op_get_entry(uint32_t hash, int32_t lang_id,
     return opret;
 }
 
+/******************************************************************************/
+/******************************************************************************/
+/* ************************************************************************** */
+/* * PUBLIC INTERFACE FUNCTIONS * *********************************************/
+/* ************************************************************************** */
+/******************************************************************************/
+/******************************************************************************/
+
+/* open_plugin_get_entry()
+* returns the internal open_plugin_entry
+*/
+struct open_plugin_entry_t * open_plugin_get_entry(void)
+{
+    /* holds entry data to load/run/store */
+    static struct open_plugin_entry_t open_plugin_entry = {0};
+    return &open_plugin_entry;
+}
+
+/* open_plugin_add_path()
+* adds a plugin path and calling parameters to open_plugin_entry
+* hash of the key is created for later recall of the plugin path and parameters
+* returns hash of the key or 0 on error
+*/
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
-    int len;
+    size_t len;
     uint32_t hash;
     int32_t lang_id;
     char *pos = "\0";
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
 
     if(key == NULL)
     {
         logf("OP add_path No Key, *Clearing entry*");
-        op_clear_entry(&open_plugin_entry);
+        op_clear_entry(op_entry);
         return 0;
     }
 
@@ -271,37 +297,37 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
     logf("OP add_path key: %s lang id: %d", skey, lang_id);
     open_plugin_get_hash(strip_rockbox_root(skey), &hash);
 
-    if(open_plugin_entry.hash != hash)
+    if(op_entry->hash != hash)
     {
         logf("OP add_path *Flush entry*");
         /* the entry in ram needs saved */
-        op_update_dat(&open_plugin_entry, true);
+        op_update_dat(op_entry, true);
     }
 
     if (plugin)
     {
-        open_plugin_entry.hash     = hash;
-        open_plugin_entry.lang_id  = lang_id;
-        open_plugin_entry.checksum = open_plugin_csum +
+        op_entry->hash     = hash;
+        op_entry->lang_id  = lang_id;
+        op_entry->checksum = open_plugin_csum +
             (lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
         /* name */
         if (path_basename(plugin, (const char **)&pos) == 0)
             pos = "\0";
 
-        len = strlcpy(open_plugin_entry.name, pos, OPEN_PLUGIN_NAMESZ);
+        len = strlcpy(op_entry->name, pos, OPEN_PLUGIN_NAMESZ);
         if (len > ROCK_LEN && strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
         {
             /* path */
-            strmemccpy(open_plugin_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
+            strmemccpy(op_entry->path, plugin, OPEN_PLUGIN_BUFSZ);
 
             if(!parameter)
                 parameter = "";
-            strmemccpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
+            strmemccpy(op_entry->param, parameter, OPEN_PLUGIN_BUFSZ);
             goto retnhash;
         }
         else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
         {
-            op_get_entry(0, OPEN_PLUGIN_LANG_IGNORE, &open_plugin_entry, plugin);
+            op_load_entry(0, OPEN_PLUGIN_LANG_IGNORE, op_entry, plugin);
             goto retnhash;
         }
     }
@@ -309,33 +335,37 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
     logf("OP add_path Invalid, *Clearing entry*");
     if (lang_id != LANG_SHORTCUTS) /* from shortcuts menu */
         splashf(HZ * 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
-    op_clear_entry(&open_plugin_entry);
+    op_clear_entry(op_entry);
     hash = 0;
 
 retnhash:
     logf("OP add_path name: %s %s %s",
-         open_plugin_entry.name,
-         open_plugin_entry.path,
-         open_plugin_entry.param);
+         op_entry->name, op_entry->path, op_entry->param);
     return hash;
 }
 
+/* open_plugin_browse()
+* allows fthe user to browse for a plugin to set to a supplied key
+* if key is a lang_id that is used otherwise a hash of the key is created
+* for later recall of the plugin path
+*/
 void open_plugin_browse(const char *key)
 {
-    logf("OP browse");
+    logf("%s", __func__);
     struct browse_context browse;
     char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
-    open_plugin_get_entry(key, &open_plugin_entry);
+    open_plugin_load_entry(key);
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
 
     logf("OP browse key: %s name: %s",
-        (key ? P2STR((unsigned char *)key):"No Key") ,open_plugin_entry.name);
-    logf("OP browse %s %s", open_plugin_entry.path, open_plugin_entry.param);
+        (key ? P2STR((unsigned char *)key):"No Key"), open_plugin_entry.name);
+    logf("OP browse %s %s", op_entry->path, op_entry->param);
 
-    if (open_plugin_entry.path[0] == '\0')
-        strcpy(open_plugin_entry.path, PLUGIN_DIR"/");
+    if (op_entry->path[0] == '\0')
+        strcpy(op_entry->path, PLUGIN_DIR"/");
 
     browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "",
-                         Icon_Plugin, open_plugin_entry.path, NULL);
+                         Icon_Plugin, op_entry->path, NULL);
 
     browse.buf = tmp_buf;
     browse.bufsize = OPEN_PLUGIN_BUFSZ;
@@ -344,45 +374,59 @@ void open_plugin_browse(const char *key)
         open_plugin_add_path(key, tmp_buf, NULL);
 }
 
-int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry)
+/* open_plugin_load_entry()
+* recall of the plugin path and parameters based on supplied key
+* returns the index in OPEN_PLUGIN_DAT where the entry was found (>= 0)
+* if the entry was found but has not been saved returns OPEN_PLUGIN_NEEDS_FLUSHED 
+* otherwise returns OPEN_PLUGIN_NOT_FOUND (< 0) if key was not found
+*/
+int open_plugin_load_entry(const char *key)
 {
-    if (key == NULL || entry == NULL)
-        return OPEN_PLUGIN_NOT_FOUND;
+    if (key == NULL)
+        key = ID2P(LANG_OPEN_PLUGIN_NOT_A_PLUGIN); /* won't be found */
+
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
     int opret;
     uint32_t hash = 0;
     int32_t lang_id = P2ID((unsigned char *)key);
     const char* skey = P2STR((unsigned char *)key); /* string|LANGPTR => string */
 
+    /*Note: P2ID() returns -1 if key isnt a valid lang_id */
     if (lang_id <= OPEN_PLUGIN_LANG_INVALID)
         open_plugin_get_hash(strip_rockbox_root(skey), &hash); /* in open_plugin.h */
 
-    opret = op_get_entry(hash, lang_id, entry, OPEN_PLUGIN_DAT);
+    opret = op_load_entry(hash, lang_id, op_entry, OPEN_PLUGIN_DAT);
     logf("OP entry hash: %x lang id: %d ret: %d key: %s", hash, lang_id, opret, skey);
 
     if (opret == OPEN_PLUGIN_NOT_FOUND && lang_id > OPEN_PLUGIN_LANG_INVALID)
     {   /* try rb defaults */
-        opret = op_get_entry(hash, lang_id, entry, OPEN_RBPLUGIN_DAT);
+        opret = op_load_entry(hash, lang_id, op_entry, OPEN_RBPLUGIN_DAT);
         logf("OP rb_entry hash: %x lang id: %d ret: %d key: %s", hash, lang_id, opret, skey);
         /* add to the user plugin.dat file if found */
-        op_update_dat(entry, false);
+        op_update_dat(op_entry, false);
 
     }
     logf("OP entry ret: %s", (opret == OPEN_PLUGIN_NOT_FOUND ? "Not Found":"Found"));
     return opret;
 }
 
+/* open_plugin_run()
+* recall of the plugin path and parameters based on supplied key
+* runs the plugin using plugin_load see plugin_load for return values
+*/
 int open_plugin_run(const char *key)
 {
     int ret = 0;
-    int opret = open_plugin_get_entry(key, &open_plugin_entry);
+    int opret = open_plugin_load_entry(key);
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
     if (opret == OPEN_PLUGIN_NEEDS_FLUSHED)
-        op_update_dat(&open_plugin_entry, false);
-    const char *path = open_plugin_entry.path;
-    const char *param = open_plugin_entry.param;
+        op_update_dat(op_entry, false);
+    const char *path = op_entry->path;
+    const char *param = op_entry->param;
 
     logf("OP run key: %s ret: %d name: %s",
-        (key ? P2STR((unsigned char *)key):"No Key"), opret, open_plugin_entry.name);
-    logf("OP run: %s %s %s", open_plugin_entry.name, path, param);
+        (key ? P2STR((unsigned char *)key):"No Key"), opret, op_entry->name);
+    logf("OP run: %s %s %s", op_entry->name, path, param);
 
     if (param[0] == '\0')
         param = NULL;
@@ -392,24 +436,28 @@ int open_plugin_run(const char *key)
     ret = plugin_load(path, param);
 
     if (ret != GO_TO_PLUGIN)
-        op_clear_entry(&open_plugin_entry);
+        op_clear_entry(op_entry);
 
     return ret;
 }
 
+/* open_plugin_cache_flush()
+* saves the current open_plugin_entry to disk
+*/
 void open_plugin_cache_flush(void)
 {
-    logf("OP *cache flush*");
+    logf("%s", __func__);
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
     /* start_in_screen == 0 is 'Previous Screen' it is actually
      *  defined as (GO_TO_PREVIOUS = -2) + 2 for *Legacy?* reasons AFAICT */
     if (global_settings.start_in_screen == 0 &&
         global_status.last_screen == GO_TO_PLUGIN &&
-        open_plugin_entry.lang_id > OPEN_PLUGIN_LANG_INVALID)
+        op_entry->lang_id > OPEN_PLUGIN_LANG_INVALID)
     {
         /* flush the last item as LANG_PREVIOUS_SCREEN if the user wants to resume */
-        open_plugin_entry.lang_id = LANG_PREVIOUS_SCREEN;
+        op_entry->lang_id = LANG_PREVIOUS_SCREEN;
     }
-    op_update_dat(&open_plugin_entry, true);
+    op_update_dat(op_entry, true);
 }
 
 #endif /* ndef __PCTOOL__ */
