@@ -77,9 +77,6 @@
 
 #include "root_menu.h"
 
-static const struct filetype *filetypes;
-static int filetypes_count;
-
 static struct gui_synclist tree_lists;
 
 /* I put it here because other files doesn't use it yet,
@@ -1090,7 +1087,6 @@ void tree_mem_init(void)
     cache->entries_handle = core_alloc_ex("tree entries",
                                     cache->max_entries*(sizeof(struct entry)),
                                     &ops);
-    tree_get_filetypes(&filetypes, &filetypes_count);
 }
 
 bool bookmark_play(char *resume_file, int index, unsigned long elapsed,

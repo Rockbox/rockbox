@@ -46,6 +46,10 @@
 /* max viewer plugins */
 #define MAX_VIEWERS 56
 
+static void read_builtin_types_init(void) INIT_ATTR;
+static void read_viewers_config_init(void) INIT_ATTR;
+static void read_config_init(int fd) INIT_ATTR;
+
 /* a table for the known file types */
 static const struct filetype inbuilt_filetypes[] = {
     { "mp3",  FILE_ATTR_AUDIO },
@@ -187,12 +191,6 @@ static const struct fileattr_icon_voice inbuilt_attr_icons_voices[] = {
 #endif
 };
 
-void tree_get_filetypes(const struct filetype** types, int* count)
-{
-    *types = inbuilt_filetypes;
-    *count = sizeof(inbuilt_filetypes) / sizeof(*inbuilt_filetypes);
-}
-
 long tree_get_filetype_voiceclip(int attr)
 {
     if (global_settings.talk_filetype)
@@ -306,8 +304,6 @@ static int find_extension(const char* extension)
     return -1;
 }
 
-static void read_builtin_types(void);
-static void read_config(int fd);
 #ifdef HAVE_LCD_COLOR
 /* Colors file format is similar to icons:
  * ext:hex_color
@@ -401,7 +397,7 @@ void read_viewer_theme_file(void)
     custom_icons_loaded = true;
 }
 
-static void read_viewers_config(void)
+static void read_viewers_config_init(void)
 {
     int fd = open(VIEWERS_CONFIG, O_RDONLY);
     if(fd < 0)
@@ -417,14 +413,14 @@ static void read_viewers_config(void)
     if(strdup_handle <= 0)
         goto out;
 
-    read_config(fd);
+    read_config_init(fd);
     core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
 
   out:
     close(fd);
 }
 
-void  filetype_init(void)
+void filetype_init(void)
 {
     /* set the directory item first */
     filetypes[0].extension = NULL;
@@ -435,8 +431,8 @@ void  filetype_init(void)
     viewer_count = 0;
     filetype_count = 1;
 
-    read_builtin_types();
-    read_viewers_config();
+    read_builtin_types_init();
+    read_viewers_config_init();
     read_viewer_theme_file();
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
@@ -459,7 +455,7 @@ static void rm_whitespaces(char* str)
     *s = '\0';
 }
 
-static void read_builtin_types(void)
+static void read_builtin_types_init(void)
 {
     int tree_attr; 
     size_t count = ARRAY_SIZE(inbuilt_filetypes);
@@ -487,7 +483,7 @@ static void read_builtin_types(void)
     }
 }
 
-static void read_config(int fd)
+static void read_config_init(int fd)
 {
     char line[64], *s, *e;
     char *extension, *plugin;
