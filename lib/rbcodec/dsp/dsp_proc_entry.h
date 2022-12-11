@@ -103,7 +103,7 @@ typedef void (*dsp_proc_fn_type)(struct dsp_proc_entry *this,
  *
  * default settings:
  *  .data    = 0
- *  .process = NULL
+ *  .process = dsp_empty_process (dsp_core.c)
  *
  * DSP_PROC_INIT handler just has to change what it needs to change. It may
  * also be modified at any time to implement the stage's demands.

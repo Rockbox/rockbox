@@ -214,6 +214,13 @@ dsp_proc_enable_delink(struct dsp_config *dsp, uint32_t mask)
     }
 }
 
+static void dsp_empty_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
+{
+    (void)this;
+    (void)buf_p;
+    logf("%s", __func__);
+}
+
 void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
                      bool enable)
 {
@@ -236,7 +243,7 @@ void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
         {
             /* New entry - set defaults */
             s->proc_entry.data = 0;
-            s->proc_entry.process = NULL;
+            s->proc_entry.process = dsp_empty_process;
         }
 
         enabled = proc_db_entry(s)->configure(&s->proc_entry, dsp,
