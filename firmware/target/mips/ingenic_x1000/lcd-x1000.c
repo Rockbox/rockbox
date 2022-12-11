@@ -428,7 +428,10 @@ void lcd_enable(bool en)
 
     /* Handle turning the LCD back on */
     if(!bit && en)
+    {
+        send_event(LCD_EVENT_ACTIVATION, NULL);
         lcd_dma_start();
+    }
 }
 #endif
 
