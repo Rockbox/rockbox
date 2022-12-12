@@ -894,14 +894,16 @@ int plugin_load(const char* plugin, const void* parameter)
     *(p_hdr->api) = &rockbox_api;
     lcd_set_viewport(NULL);
     lcd_clear_display();
-    lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_viewport(NULL);
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
-    push_current_activity(ACTIVITY_PLUGIN);
+    if (get_current_activity() == ACTIVITY_WPS)
+        push_activity_without_refresh(ACTIVITY_PLUGIN);
+    else
+        push_current_activity(ACTIVITY_PLUGIN);
     /* some plugins assume the entry cache doesn't move and save pointers to it
      * they should be fixed properly instead of this lock */
     tree_lock_cache(tree_get_context());
@@ -922,7 +924,16 @@ int plugin_load(const char* plugin, const void* parameter)
     int rc = p_hdr->entry_point(parameter);
 
     tree_unlock_cache(tree_get_context());
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+
+    pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+    int curr_activity = get_current_activity();
+    if ((curr_activity != ACTIVITY_PLAYLISTVIEWER) &&
+        (curr_activity != ACTIVITY_WPS) &&
+        (rc != PLUGIN_GOTO_WPS))
+    {
+        FOR_NB_SCREENS(i)
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+    }
 
     if (!pfn_tsr_exit)
     {   /* close handle if plugin is no tsr one */

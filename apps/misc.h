@@ -221,6 +221,7 @@ enum activity_refresh
 };
 
 void push_current_activity(enum current_activity screen);
+void push_activity_without_refresh(enum current_activity screen);
 void pop_current_activity(enum activity_refresh refresh);
 enum current_activity get_current_activity(void);
 

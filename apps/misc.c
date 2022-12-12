@@ -1579,6 +1579,13 @@ void push_current_activity(enum current_activity screen)
     }
 }
 
+void push_activity_without_refresh(enum current_activity screen)
+{
+    current_activity[current_activity_top++] = screen;
+    FOR_NB_SCREENS(i)
+        skinlist_set_cfg(i, NULL);
+}
+
 void pop_current_activity(enum activity_refresh refresh)
 {
     current_activity_top--;

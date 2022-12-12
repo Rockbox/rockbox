@@ -708,8 +708,11 @@ static inline int load_screen(int screen)
 
     if (activity != ACTIVITY_UNKNOWN)
     {
-        if (ret_val == GO_TO_WPS
-            || ret_val == GO_TO_PREVIOUS_MUSIC)
+        if (ret_val == GO_TO_PLUGIN
+            || ret_val == GO_TO_WPS
+            || ret_val == GO_TO_PREVIOUS_MUSIC
+            || ret_val == GO_TO_PREVIOUS_BROWSER
+            || ret_val == GO_TO_FILEBROWSER)
         {
             pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
         }
@@ -986,7 +989,10 @@ void root_menu(void)
                     }
                 }
 
-                next_screen = load_plugin_screen(key);
+
+                push_activity_without_refresh(ACTIVITY_UNKNOWN); /* prevent plugin_load */
+                next_screen = load_plugin_screen(key);           /* from flashing root  */
+                pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* menu activity       */
 
                 if (next_screen == GO_TO_PREVIOUS)
                 {

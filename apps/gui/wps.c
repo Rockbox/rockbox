@@ -63,6 +63,7 @@
 #include "wps.h"
 #include "statusbar-skinned.h"
 #include "skin_engine/wps_internals.h"
+#include "open_plugin.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))
@@ -514,16 +515,19 @@ static void wps_lcd_activation_hook(unsigned short id, void *param)
 }
 #endif
 
-static void gwps_leave_wps(void)
+static void gwps_leave_wps(bool theme_enabled)
 {
     FOR_NB_SCREENS(i)
     {
         struct gui_wps *gwps = skin_get_gwps(WPS, i);
         gwps->display->scroll_stop();
+        if (theme_enabled)
+        {
 #ifdef HAVE_BACKDROP_IMAGE
-        skin_backdrop_show(sb_get_backdrop(i));
+            skin_backdrop_show(sb_get_backdrop(i));
 #endif
-        viewportmanager_theme_undo(i, skin_has_sbs(gwps));
+            viewportmanager_theme_undo(i, skin_has_sbs(gwps));
+        }
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -539,7 +543,7 @@ static void gwps_leave_wps(void)
 
 /*
  * display the wps on entering or restoring */
-static void gwps_enter_wps(void)
+static void gwps_enter_wps(bool theme_enabled)
 {
     struct gui_wps *gwps;
     struct screen *display;
@@ -548,7 +552,8 @@ static void gwps_enter_wps(void)
         gwps = skin_get_gwps(WPS, i);
         display = gwps->display;
         display->scroll_stop();
-        viewportmanager_theme_enable(i, skin_has_sbs(gwps), NULL);
+        if (theme_enabled)
+            viewportmanager_theme_enable(i, skin_has_sbs(gwps), NULL);
 
         /* Update the values in the first (default) viewport - in case the user
            has modified the statusbar or colour settings */
@@ -609,7 +614,7 @@ void wps_do_playpause(bool updatewps)
  *      b)  return with a value evaluated by root_menu.c, in this case the wps
  *          is really left, and root_menu will handle the next screen
  *
- * In either way, call gwps_leave_wps(), in order to restore the correct
+ * In either way, call gwps_leave_wps(true), in order to restore the correct
  * "main screen" backdrops and statusbars
  */
 long gui_wps_show(void)
@@ -632,6 +637,7 @@ long gui_wps_show(void)
 
     while ( 1 )
     {
+        bool theme_enabled = true;
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
 
         /* did someone else (i.e power thread) change audio pause mode? */
@@ -693,23 +699,59 @@ long gui_wps_show(void)
             case ACTION_WPS_CONTEXT:
             {
                 bool hotkey = button == ACTION_WPS_HOTKEY;
-                gwps_leave_wps();
-                int retval = onplay(state->id3->path,
+
+#ifdef HAVE_HOTKEY
+                if (hotkey && global_settings.hotkey_wps == HOTKEY_PLUGIN)
+                {
+                    /* leave WPS without re-enabling theme */
+                    theme_enabled = false;
+                    gwps_leave_wps(theme_enabled);
+                    onplay(state->id3->path,
                            FILE_ATTR_AUDIO, CONTEXT_WPS, hotkey);
-                /* if music is stopped in the context menu we want to exit the wps */
-                if (retval == ONPLAY_MAINMENU
-                    || !audio_status())
-                    return GO_TO_ROOT;
-                else if (retval == ONPLAY_PLAYLIST)
-                    return GO_TO_PLAYLIST_VIEWER;
-                else if (retval == ONPLAY_PLUGIN)
-                    return GO_TO_PLUGIN;
+                    if (!audio_status())
+                    {
+                        /* re-enable theme since we're returning to SBS */
+                        FOR_NB_SCREENS(i)
+                        {
+                            struct gui_wps *gwps = skin_get_gwps(WPS, i);
+#ifdef HAVE_BACKDROP_IMAGE
+                            skin_backdrop_show(sb_get_backdrop(i));
+#endif
+                            viewportmanager_theme_undo(i, skin_has_sbs(gwps));
+                        }
+                        return GO_TO_ROOT;
+                    }
+                }
+                else
+#endif
+                {
+                    gwps_leave_wps(true);
+                    int retval = onplay(state->id3->path,
+                           FILE_ATTR_AUDIO, CONTEXT_WPS, hotkey);
+                    /* if music is stopped in the context menu we want to exit the wps */
+                    if (retval == ONPLAY_MAINMENU
+                        || !audio_status())
+                        return GO_TO_ROOT;
+                    else if (retval == ONPLAY_PLAYLIST)
+                        return GO_TO_PLAYLIST_VIEWER;
+                    else if (retval == ONPLAY_PLUGIN)
+                    {
+                        FOR_NB_SCREENS(i)
+                        {
+                            struct gui_wps *gwps = skin_get_gwps(WPS, i);
+                            viewportmanager_theme_enable(i, skin_has_sbs(gwps), NULL);
+                        }
+                        theme_enabled = false;
+                        open_plugin_run(ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN));
+                    }
+                }
+
                 restore = true;
             }
             break;
 
             case ACTION_WPS_BROWSE:
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 return GO_TO_PREVIOUS_BROWSER;
                 break;
 
@@ -852,7 +894,7 @@ long gui_wps_show(void)
                 break;
             /* menu key functions */
             case ACTION_WPS_MENU:
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 return GO_TO_ROOT;
                 break;
 
@@ -860,7 +902,7 @@ long gui_wps_show(void)
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
             {
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 bool enter_shortcuts_menu = global_settings.shortcuts_replaces_qs;
                 if (!enter_shortcuts_menu)
                 {
@@ -889,7 +931,7 @@ long gui_wps_show(void)
 #ifdef HAVE_PITCHCONTROL
             case ACTION_WPS_PITCHSCREEN:
             {
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 if (1 == gui_syncpitchscreen_run())
                     return GO_TO_ROOT;
                 restore = true;
@@ -917,7 +959,7 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_LIST_BOOKMARKS:
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 if (bookmark_load_menu() == BOOKMARK_USB_CONNECTED)
                 {
                     return GO_TO_ROOT;
@@ -926,14 +968,14 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_CREATE_BOOKMARK:
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 bookmark_create_menu();
                 restore = true;
                 break;
 
             case ACTION_WPS_ID3SCREEN:
             {
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 if (browse_id3(audio_current_track(),
                         playlist_get_display_index(),
                         playlist_amount()))
@@ -956,7 +998,7 @@ long gui_wps_show(void)
                 break;
 #endif
             case ACTION_WPS_VIEW_PLAYLIST:
-                gwps_leave_wps();
+                gwps_leave_wps(true);
                 return GO_TO_PLAYLIST_VIEWER;
                 break;
             default:
@@ -965,7 +1007,7 @@ long gui_wps_show(void)
                     case SYS_USB_CONNECTED:
                     case SYS_CALL_INCOMING:
                     case BUTTON_MULTIMEDIA_STOP:
-                        gwps_leave_wps();
+                        gwps_leave_wps(true);
                         return GO_TO_ROOT;
                 }
                 update = true;
@@ -1003,7 +1045,7 @@ long gui_wps_show(void)
             sb_skin_set_update_delay(0);
             skin_request_full_update(WPS);
             update = true;
-            gwps_enter_wps();
+            gwps_enter_wps(theme_enabled);
         }
         else
         {
@@ -1038,7 +1080,7 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();
 #endif
-            gwps_leave_wps();
+            gwps_leave_wps(true);
 #ifdef HAVE_RECORDING
             if (button == ACTION_WPS_REC)
                 return GO_TO_RECSCREEN;

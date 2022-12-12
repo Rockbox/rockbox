@@ -143,7 +143,7 @@ static void format_line(const struct playlist_entry* track, char* str,
 static bool update_playlist(bool force);
 static enum pv_onplay_result onplay_menu(int index);
 
-static void close_playlist_viewer(void);
+static void close_playlist_viewer(bool pop_activity);
 
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
                                  int names_buffer_size)
@@ -525,11 +525,12 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
 static enum pv_onplay_result open_with(const struct playlist_entry *current_track)
 {
     char selected_track[MAX_PATH];
-    close_playlist_viewer();
+    close_playlist_viewer(false); /* don't pop activity yet – relevant for plugin_load */
 
     strmemccpy(selected_track, current_track->name, sizeof(selected_track));
 
     int plugin_return = filetype_list_viewers(selected_track);
+    pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
 
     switch (plugin_return)
     {
@@ -547,11 +548,11 @@ static enum pv_onplay_result open_with(const struct playlist_entry *current_trac
 static enum pv_onplay_result open_pictureflow(const struct playlist_entry *current_track)
 {
     char selected_track[MAX_PATH];
-    close_playlist_viewer();
+    close_playlist_viewer(false); /* don't pop activity yet – relevant for plugin_load */
 
     strmemccpy(selected_track, current_track->name, sizeof(selected_track));
-
     int plugin_return = filetype_load_plugin((void *)"pictureflow", selected_track);
+    pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
 
     switch (plugin_return)
     {
@@ -1092,14 +1093,15 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
     }
 
 exit:
-    close_playlist_viewer();
+    close_playlist_viewer(true);
     return ret;
 }
 
-static void close_playlist_viewer(void)
+static void close_playlist_viewer(bool pop_activity)
 {
     talk_shutup();
-    pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+    if (pop_activity)
+        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
     if (viewer.playlist)
     {
         if (viewer.initial_selection)
