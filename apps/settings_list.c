@@ -1640,8 +1640,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
     /* surround */
-     TABLE_SETTING(F_TIME_SETTING | F_SOUNDSETTING, surround_enabled,
-                  LANG_SURROUND, 0, "surround enabled", off,
+     TABLE_SETTING(F_TIME_SETTING | F_SOUNDSETTING | F_ALLOW_ARBITRARY_VALS,
+                  surround_enabled, LANG_SURROUND, 0, "surround enabled", off,
                   UNIT_MS, formatter_time_unit_0_is_off,
                   getlang_time_unit_0_is_off,
                   dsp_surround_enable, 6,
