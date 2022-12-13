@@ -394,8 +394,28 @@ bool settings_load_config(const char* file, bool apply)
                     else if (setting->flags & F_ALLOW_ARBITRARY_VALS)
                     {
                         *v = atoi(value);
-                        logf("Val: %s\r\n",value);
+                        logf("Val: %s = %d\r\n", value, *v);
                     }
+                    else if (setting->flags & F_TABLE_SETTING)
+                    {
+                        const struct table_setting *info = setting->table_setting;
+                        temp = atoi(value);
+                        *v = setting->default_val.int_;
+                        if (info->values)
+                        {
+                            for(int i = 0; i < info->count; i++)
+                            {
+                                if (info->values[i] == temp)
+                                {
+                                    *v = temp;
+                                    break;
+                                }
+                            }
+                        }
+                        logf("Val: %s", *v == temp ? "Found":"Error Not Found");
+                        logf("Val: %s = %d\r\n", value, *v);
+                    }
+
                     else
                     {
                         logf("Error: %s: Not Found! [%s]\r\n",
