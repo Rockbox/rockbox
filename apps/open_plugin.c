@@ -155,10 +155,14 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     /* Only read the hash lang id and checksum */
     uint32_t hash_langid_csum[3] = {0};
     const off_t hlc_sz = sizeof(hash_langid_csum);
+
+    uint32_t csum = open_plugin_csum +
+           (lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
+
     while (read(fd, &hash_langid_csum, hlc_sz) == hlc_sz)
     {
         if ((hash_langid_csum[0] == hash || (int32_t)hash_langid_csum[1] == lang_id) &&
-             hash_langid_csum[2] == open_plugin_csum)
+             hash_langid_csum[2] == csum)
         {
             logf("OP update *Entry Exists* hash: %x langid: %d",
                 hash_langid_csum[0], (int32_t)hash_langid_csum[1]);
