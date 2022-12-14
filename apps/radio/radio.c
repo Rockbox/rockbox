@@ -729,7 +729,7 @@ void radio_screen(void)
     cpu_idle_mode(false);
 #endif
     fms_fix_displays(FMS_EXIT);
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     in_screen = false;
 } /* radio_screen */
 

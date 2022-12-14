@@ -148,7 +148,7 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
 static int bookmark_load_menu_wrapper(void)
 {
     if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+        pop_current_activity_without_refresh(); /* when called from ctxt menu */
 
     return bookmark_load_menu();
 }
@@ -474,7 +474,7 @@ static bool save_playlist(void)
 static int wps_view_cur_playlist(void)
 {
     if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+        pop_current_activity_without_refresh(); /* when called from ctxt menu */
 
     playlist_viewer_ex(NULL, NULL);
 
@@ -1520,7 +1520,7 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 static int browse_id3_wrapper(void)
 {
     if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* when called from ctxt menu */
+        pop_current_activity_without_refresh(); /* when called from ctxt menu */
 
     if (browse_id3(audio_current_track(),
             playlist_get_display_index(),
@@ -1979,7 +1979,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
     menu_selection = do_menu(menu, NULL, NULL, false);
 
     if (get_current_activity() == ACTIVITY_CONTEXTMENU) /* Activity may have been      */
-        pop_current_activity(ACTIVITY_REFRESH_NOW);     /* popped already by menu item */
+        pop_current_activity();     /* popped already by menu item */
 
     switch (menu_selection)
     {

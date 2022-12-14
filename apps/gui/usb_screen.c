@@ -315,5 +315,5 @@ void gui_usb_screen_run(bool early_usb)
         viewportmanager_theme_undo(i, false);
     }
 
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
 }

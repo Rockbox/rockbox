@@ -1122,7 +1122,7 @@ int bookmark_load_menu(void)
         }
     }
 
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return ret;
 }
 
@@ -1143,7 +1143,7 @@ bool bookmark_mrb_load()
         ret = play_bookmark(bookmark);
     }
 
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return ret;
 }
 

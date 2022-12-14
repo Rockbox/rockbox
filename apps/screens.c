@@ -733,7 +733,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
         }
     }
 
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return ret;
 }
 

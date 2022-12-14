@@ -574,7 +574,7 @@ bool option_screen(const struct settings_list *setting,
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;
     }
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return false;
 }
 

@@ -1569,25 +1569,43 @@ int clamp_value_wrap(int value, int max, int min)
 static enum current_activity
         current_activity[MAX_ACTIVITY_DEPTH] = {ACTIVITY_UNKNOWN};
 static int current_activity_top = 0;
-void push_current_activity(enum current_activity screen)
+
+static void push_current_activity_refresh(enum current_activity screen, bool refresh)
 {
     current_activity[current_activity_top++] = screen;
     FOR_NB_SCREENS(i)
     {
         skinlist_set_cfg(i, NULL);
-        skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+        if (refresh)
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
+}
+
+static void pop_current_activity_refresh(bool refresh)
+{
+    current_activity_top--;
+    FOR_NB_SCREENS(i)
+    {
+        skinlist_set_cfg(i, NULL);
+        if (refresh)
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+    }
+}
+
+void push_current_activity(enum current_activity screen)
+{
+    push_current_activity_refresh(screen, true);
 }
 
 void push_activity_without_refresh(enum current_activity screen)
 {
-    current_activity[current_activity_top++] = screen;
-    FOR_NB_SCREENS(i)
-        skinlist_set_cfg(i, NULL);
+    push_current_activity_refresh(screen, false);
 }
 
-void pop_current_activity(enum activity_refresh refresh)
+void pop_current_activity(void)
 {
+    pop_current_activity_refresh(true);
+#if 0
     current_activity_top--;
     FOR_NB_SCREENS(i)
     {
@@ -1595,7 +1613,14 @@ void pop_current_activity(enum activity_refresh refresh)
         if (ACTIVITY_REFRESH_NOW == refresh)
             skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
+#endif
 }
+
+void pop_current_activity_without_refresh(void)
+{
+    pop_current_activity_refresh(false);
+}
+
 enum current_activity get_current_activity(void)
 {
     return current_activity[current_activity_top?current_activity_top-1:0];

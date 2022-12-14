@@ -304,7 +304,7 @@ int time_screen(void* ignored)
 #endif
 
     ret = do_menu(&time_menu, NULL, menu, false);
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     /* see comments above in the button callback */
     if (!menu_was_pressed && ret == GO_TO_PREVIOUS)
         return 0;

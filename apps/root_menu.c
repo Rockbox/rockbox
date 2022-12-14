@@ -280,9 +280,9 @@ static int browser(void* param)
     if (ret_val == GO_TO_WPS
         || ret_val == GO_TO_PREVIOUS_MUSIC
         || ret_val == GO_TO_PLUGIN)
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+        pop_current_activity_without_refresh();
     else
-        pop_current_activity(ACTIVITY_REFRESH_NOW);
+        pop_current_activity();
 
     switch ((intptr_t)param)
     {
@@ -355,10 +355,10 @@ static int wpsscrn(void* param)
                 || last_screen == GO_TO_SYSTEM_SCREEN
                 || last_screen == GO_TO_PLAYLISTS_SCREEN)))
     {
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+        pop_current_activity_without_refresh();
     }
     else
-        pop_current_activity(ACTIVITY_REFRESH_NOW);
+        pop_current_activity();
 
     return ret_val;
 }
@@ -396,10 +396,10 @@ static int playlist_view_catalog(void * param)
 
     if (item_was_selected)
     {
-        pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+        pop_current_activity_without_refresh();
         return GO_TO_WPS;
     }
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return GO_TO_ROOT;
 }
 
@@ -714,10 +714,10 @@ static inline int load_screen(int screen)
             || ret_val == GO_TO_PREVIOUS_BROWSER
             || ret_val == GO_TO_FILEBROWSER)
         {
-            pop_current_activity(ACTIVITY_REFRESH_DEFERRED);
+            pop_current_activity_without_refresh();
         }
         else
-            pop_current_activity(ACTIVITY_REFRESH_NOW);
+            pop_current_activity();
     }
 
     last_screen = screen;
@@ -744,7 +744,7 @@ static int load_context_screen(int selection)
 
     if (context_menu)
         retval = do_menu(context_menu, NULL, NULL, false);
-    pop_current_activity(ACTIVITY_REFRESH_NOW);
+    pop_current_activity();
     return retval;
 }
 
@@ -992,7 +992,7 @@ void root_menu(void)
 
                 push_activity_without_refresh(ACTIVITY_UNKNOWN); /* prevent plugin_load */
                 next_screen = load_plugin_screen(key);           /* from flashing root  */
-                pop_current_activity(ACTIVITY_REFRESH_DEFERRED); /* menu activity       */
+                pop_current_activity_without_refresh();          /* menu activity       */
 
                 if (next_screen == GO_TO_PREVIOUS)
                 {
