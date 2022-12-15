@@ -700,7 +700,7 @@ static void hotkey_callback(int var)
 {
     if (get_current_activity() != ACTIVITY_QUICKSCREEN)
     {
-        if (get_hotkey_lang_id(var) == LANG_OPEN_PLUGIN)
+        if (get_hotkey(var)->action == HOTKEY_PLUGIN)
             open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
     }
 }
@@ -710,12 +710,12 @@ static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
     (void)buffer;
     (void)buffer_size;
     (void)unit;
-    return str(get_hotkey_lang_id(value));
+    return str(get_hotkey(value)->lang_id);
 }
 static int32_t hotkey_getlang(int value, int unit)
 {
     (void)unit;
-    return get_hotkey_lang_id(value);
+    return get_hotkey(value)->lang_id;
 }
 #endif /* HAVE_HOTKEY */
 

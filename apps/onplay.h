@@ -21,6 +21,10 @@
 #ifndef _ONPLAY_H_
 #define _ONPLAY_H_
 
+#ifdef HAVE_HOTKEY
+#include "menu.h"
+#endif
+
 int onplay(char* file, int attr, int from_screen, bool hotkey);
 int get_onplay_context(void);
 
@@ -37,15 +41,12 @@ enum {
 };
 
 #ifdef HAVE_HOTKEY
-int get_hotkey_lang_id(int action);
 
 enum hotkey_action {
     HOTKEY_OFF = 0,
     HOTKEY_VIEW_PLAYLIST,
     HOTKEY_PROPERTIES,
-#ifdef HAVE_TAGCACHE
     HOTKEY_PICTUREFLOW,
-#endif
     HOTKEY_SHOW_TRACK_INFO,
     HOTKEY_PITCHSCREEN,
     HOTKEY_OPEN_WITH,
@@ -55,6 +56,22 @@ enum hotkey_action {
     HOTKEY_INSERT,
     HOTKEY_INSERT_SHUFFLED,
 };
+enum hotkey_flags {
+    HOTKEY_FLAG_NONE = 0x0,
+    HOTKEY_FLAG_WPS = 0x1,
+    HOTKEY_FLAG_TREE = 0x2,
+    HOTKEY_FLAG_NOSBS = 0x4,
+};
+
+struct hotkey_assignment {
+    int action;             /* hotkey_action */
+    int lang_id;            /* Language ID */
+    struct menu_func func;  /* Function to run if this entry is selected */
+    int16_t return_code;    /* What to return after the function is run. */
+    uint16_t flags;         /* Flags what context, display options */
+};                          /* (Pick ONPLAY_FUNC_RETURN to use function's return value) */
+
+const struct hotkey_assignment *get_hotkey(int action);
 #endif
 
 /* needed for the playlist viewer.. eventually clean this up */

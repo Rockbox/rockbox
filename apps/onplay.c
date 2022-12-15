@@ -1846,106 +1846,113 @@ static int hotkey_wps_run_plugin(void)
     open_plugin_run(ID2P(LANG_HOTKEY_WPS));
     return ONPLAY_OK;
 }
-
-struct hotkey_assignment {
-    int action;             /* hotkey_action */
-    int lang_id;            /* Language ID */
-    struct menu_func func;  /* Function to run if this entry is selected */
-    int return_code;        /* What to return after the function is run. */
-};                          /* (Pick ONPLAY_FUNC_RETURN to use function's return value) */
-
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
 
 /* Any desired hotkey functions go here, in the enum in onplay.h,
    and in the settings menu in settings_list.c.  The order here
    is not important. */
-static struct hotkey_assignment hotkey_items[] = {
-    { HOTKEY_VIEW_PLAYLIST,     LANG_VIEW_DYNAMIC_PLAYLIST,
-            HOTKEY_FUNC(NULL, NULL),
-            ONPLAY_PLAYLIST },
-    { HOTKEY_SHOW_TRACK_INFO,   LANG_MENU_SHOW_ID3_INFO,
-            HOTKEY_FUNC(browse_id3_wrapper, NULL),
-            ONPLAY_RELOAD_DIR },
+static const struct hotkey_assignment hotkey_items[] = {
+ [0]{ .action = HOTKEY_OFF,
+      .lang_id = LANG_OFF,
+      .func = HOTKEY_FUNC(NULL,NULL),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_TREE },
+    { .action = HOTKEY_VIEW_PLAYLIST,
+      .lang_id = LANG_VIEW_DYNAMIC_PLAYLIST,
+      .func = HOTKEY_FUNC(NULL, NULL),
+      .return_code = ONPLAY_PLAYLIST,
+      .flags = HOTKEY_FLAG_WPS },
+    { .action = HOTKEY_SHOW_TRACK_INFO,
+      .lang_id = LANG_MENU_SHOW_ID3_INFO,
+      .func = HOTKEY_FUNC(browse_id3_wrapper, NULL),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_WPS },
 #ifdef HAVE_PITCHCONTROL
-    { HOTKEY_PITCHSCREEN,       LANG_PITCH,
-            HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
-            ONPLAY_RELOAD_DIR },
+    { .action = HOTKEY_PITCHSCREEN,
+      .lang_id = LANG_PITCH,
+      .func = HOTKEY_FUNC(gui_syncpitchscreen_run, NULL),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_NOSBS },
 #endif
-    { HOTKEY_OPEN_WITH,         LANG_ONPLAY_OPEN_WITH,
-            HOTKEY_FUNC(hotkey_open_with, NULL),
-            ONPLAY_RELOAD_DIR },
-    { HOTKEY_DELETE,            LANG_DELETE,
-            HOTKEY_FUNC(hotkey_delete_item, NULL),
-            ONPLAY_RELOAD_DIR },
-    { HOTKEY_INSERT,            LANG_INSERT,
-            HOTKEY_FUNC(add_to_playlist, (intptr_t*)&addtopl_insert),
-            ONPLAY_RELOAD_DIR },
-    { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
-            HOTKEY_FUNC(hotkey_tree_pl_insert_shuffled, NULL),
-            ONPLAY_FUNC_RETURN },
-    { HOTKEY_PLUGIN,            LANG_OPEN_PLUGIN,
-            HOTKEY_FUNC(hotkey_wps_run_plugin, NULL),
-            ONPLAY_FUNC_RETURN },
-    { HOTKEY_BOOKMARK,          LANG_BOOKMARK_MENU_CREATE,
-            HOTKEY_FUNC(bookmark_create_menu, NULL),
-            ONPLAY_OK },
-    { HOTKEY_PROPERTIES,        LANG_PROPERTIES,
-            HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"properties"),
-            ONPLAY_FUNC_RETURN },
+    { .action = HOTKEY_OPEN_WITH,
+      .lang_id = LANG_ONPLAY_OPEN_WITH,
+      .func = HOTKEY_FUNC(hotkey_open_with, NULL),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_TREE },
+    { .action = HOTKEY_DELETE,
+      .lang_id = LANG_DELETE,
+      .func = HOTKEY_FUNC(hotkey_delete_item, NULL),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_TREE },
+    { .action = HOTKEY_INSERT,
+      .lang_id = LANG_INSERT,
+      .func = HOTKEY_FUNC(add_to_playlist, (intptr_t*)&addtopl_insert),
+      .return_code = ONPLAY_RELOAD_DIR,
+      .flags = HOTKEY_FLAG_TREE },
+    { .action = HOTKEY_INSERT_SHUFFLED,
+      .lang_id = LANG_INSERT_SHUFFLED,
+      .func = HOTKEY_FUNC(hotkey_tree_pl_insert_shuffled, NULL),
+      .return_code = ONPLAY_FUNC_RETURN,
+      .flags = HOTKEY_FLAG_TREE },
+    { .action = HOTKEY_PLUGIN,
+      .lang_id = LANG_OPEN_PLUGIN,
+      .func = HOTKEY_FUNC(hotkey_wps_run_plugin, NULL),
+      .return_code = ONPLAY_FUNC_RETURN,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_NOSBS },
+    { .action = HOTKEY_BOOKMARK,
+      .lang_id = LANG_BOOKMARK_MENU_CREATE,
+      .func = HOTKEY_FUNC(bookmark_create_menu, NULL),
+      .return_code = ONPLAY_OK,
+      .flags = HOTKEY_FLAG_WPS | HOTKEY_FLAG_NOSBS },
+    { .action = HOTKEY_PROPERTIES,
+      .lang_id = LANG_PROPERTIES,
+      .func = HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"properties"),
+      .return_code = ONPLAY_FUNC_RETURN,
+      .flags = HOTKEY_FLAG_TREE },
 #ifdef HAVE_TAGCACHE
-    { HOTKEY_PICTUREFLOW,       LANG_ONPLAY_PICTUREFLOW,
-            HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"pictureflow"),
-            ONPLAY_FUNC_RETURN },
+    { .action = HOTKEY_PICTUREFLOW,
+      .lang_id = LANG_ONPLAY_PICTUREFLOW,
+      .func = HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"pictureflow"),
+      .return_code = ONPLAY_FUNC_RETURN,
+      .flags = HOTKEY_FLAG_TREE },
 #endif
 };
 
-/* Return the language ID for this action */
-int get_hotkey_lang_id(int action)
+const struct hotkey_assignment *get_hotkey(int action)
 {
-    int i = ARRAYLEN(hotkey_items);
-    while (i--)
+    for (size_t i = ARRAYLEN(hotkey_items) - 1; i < ARRAYLEN(hotkey_items); i--)
     {
         if (hotkey_items[i].action == action)
-            return hotkey_items[i].lang_id;
+            return &hotkey_items[i];
     }
-
-    return LANG_OFF;
+    return &hotkey_items[0]; /* no valid hotkey set, return HOTKEY_OFF*/
 }
 
 /* Execute the hotkey function, if listed */
 static int execute_hotkey(bool is_wps)
 {
-    int i = ARRAYLEN(hotkey_items);
-    struct hotkey_assignment *this_item;
     const int action = (is_wps ? global_settings.hotkey_wps :
                                  global_settings.hotkey_tree);
 
     /* search assignment struct for a match for the hotkey setting */
-    while (i--)
+    const struct hotkey_assignment *this_item = get_hotkey(action);
+
+    /* run the associated function (with optional param), if any */
+    const struct menu_func func = this_item->func;
+
+    int func_return = ONPLAY_RELOAD_DIR;
+    if (func.function != NULL)
     {
-        this_item = &hotkey_items[i];
-        if (this_item->action == action)
-        {
-            /* run the associated function (with optional param), if any */
-            const struct menu_func func = this_item->func;
-            int func_return = ONPLAY_RELOAD_DIR;
-            if (func.function != NULL)
-            {
-                if (func.param != NULL)
-                    func_return = (*func.function_w_param)(func.param);
-                else
-                    func_return = (*func.function)();
-            }
-            const int return_code = this_item->return_code;
-
-            if (return_code == ONPLAY_FUNC_RETURN)
-                return func_return;  /* Use value returned by function */
-            return return_code;      /* or return the associated value */
-        }
+        if (func.param != NULL)
+            func_return = (*func.function_w_param)(func.param);
+        else
+            func_return = (*func.function)();
     }
+    const int return_code = this_item->return_code;
 
-    /* no valid hotkey set, ignore hotkey */
-    return ONPLAY_RELOAD_DIR;
+    if (return_code == ONPLAY_FUNC_RETURN)
+        return func_return;  /* Use value returned by function */
+    return return_code;      /* or return the associated value */
 }
 #endif /* HOTKEY */
 
