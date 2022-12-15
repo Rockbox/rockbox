@@ -787,7 +787,7 @@ long gui_wps_show(void)
                 hotkey = true;
                 if (!global_settings.hotkey_wps)
                     break;
-                if (global_settings.hotkey_wps == HOTKEY_PLUGIN)
+                if (get_hotkey(global_settings.hotkey_wps)->flags & HOTKEY_FLAG_NOSBS)
                 {
                     /* leave WPS without re-enabling theme */
                     theme_enabled = false;
