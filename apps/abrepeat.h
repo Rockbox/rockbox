@@ -20,9 +20,38 @@
  ****************************************************************************/
 #ifndef _ABREPEAT_H_
 #define _ABREPEAT_H_
-
-#ifdef AB_REPEAT_ENABLE
 #include <stdbool.h>
+
+#ifndef AB_REPEAT_ENABLE /* Dummy functions */
+static inline bool ab_repeat_mode_enabled(void)
+{
+    return false;
+}
+static inline bool ab_bool_dummy_marker(unsigned int song_position)
+{
+    (void) song_position;
+    return false;
+}
+static inline void ab_void_dummy_marker(unsigned int song_position)
+{
+    (void) song_position;
+}
+static inline void ab_dummy_voidfn(void){}
+
+#define ab_repeat_init         ab_dummy_voidfn
+#define ab_before_A_marker     ab_bool_dummy_marker
+#define ab_after_A_marker      ab_bool_dummy_marker
+#define ab_jump_to_A_marker    ab_dummy_voidfn
+#define ab_reset_markers       ab_dummy_voidfn
+#define ab_set_A_marker        ab_void_dummy_marker
+#define ab_set_B_marker        ab_void_dummy_marker
+#define ab_get_A_marker        ab_bool_dummy_marker
+#define ab_get_B_marker        ab_bool_dummy_marker
+#define ab_end_of_track_report ab_dummy_voidfn
+#define ab_reached_B_marker    ab_bool_dummy_marker
+#define ab_position_report     ab_void_dummy_marker
+
+#else /*def AB_REPEAT_ENABLE*/
 #include "audio.h"
 #include "kernel.h" /* needed for HZ */
 

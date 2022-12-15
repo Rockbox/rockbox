@@ -613,9 +613,9 @@ static long do_wps_exit(long action, bool bookmark)
     if (bookmark)
         bookmark_autobookmark(true);
     audio_stop();
-#ifdef AB_REPEAT_ENABLE
+
     ab_reset_markers();
-#endif
+
     gwps_leave_wps(true);
 #ifdef HAVE_RECORDING
     if (action == ACTION_WPS_REC)
@@ -678,10 +678,9 @@ long gui_wps_show(void)
     long last_left = 0, last_right = 0;
     struct wps_state *state = get_wps_state();
 
-#ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
     ab_reset_markers();
-#endif
+
     wps_state_init();
     while ( 1 )
     {
@@ -904,7 +903,7 @@ long gui_wps_show(void)
                 /* prev / restart */
             case ACTION_WPS_SKIPPREV:
                 last_left = current_tick;
-#ifdef AB_REPEAT_ENABLE
+
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
                 if ( ab_repeat_mode_enabled() && ab_after_A_marker(state->id3->elapsed) )
@@ -912,9 +911,7 @@ long gui_wps_show(void)
                     ab_jump_to_A_marker();
                     break;
                 }
-                else
-                /* ...otherwise, do it normally */
-#endif
+                else /* ...otherwise, do it normally */
                     play_hop(-1);
                 break;
 
@@ -922,7 +919,7 @@ long gui_wps_show(void)
                    OR if skip length set, hop by predetermined amount. */
             case ACTION_WPS_SKIPNEXT:
                 last_right = current_tick;
-#ifdef AB_REPEAT_ENABLE
+
                 /* if we're in A/B repeat mode and the current position is
                    before the A marker, jump to the A marker... */
                 if ( ab_repeat_mode_enabled() )
@@ -933,32 +930,26 @@ long gui_wps_show(void)
                         break;
                     }
                 }
-                else
-                /* ...otherwise, do it normally */
-#endif
+                else /* ...otherwise, do it normally */
                     play_hop(1);
                 break;
                 /* next / prev directories */
                 /* and set A-B markers if in a-b mode */
             case ACTION_WPS_ABSETB_NEXTDIR:
-#if defined(AB_REPEAT_ENABLE)
                 if (ab_repeat_mode_enabled())
                 {
                     ab_set_B_marker(state->id3->elapsed);
                     ab_jump_to_A_marker();
                 }
                 else
-#endif
                 {
                     change_dir(1);
                 }
                 break;
             case ACTION_WPS_ABSETA_PREVDIR:
-#if defined(AB_REPEAT_ENABLE)
                 if (ab_repeat_mode_enabled())
                     ab_set_A_marker(state->id3->elapsed);
                 else
-#endif
                 {
                     change_dir(-1);
                 }
@@ -1010,7 +1001,6 @@ long gui_wps_show(void)
             break;
 #endif /* HAVE_PITCHCONTROL */
 
-#ifdef AB_REPEAT_ENABLE
             /* reset A&B markers */
             case ACTION_WPS_ABRESET:
                 if (ab_repeat_mode_enabled())
@@ -1019,7 +1009,6 @@ long gui_wps_show(void)
                     update = true;
                 }
                 break;
-#endif /* AB_REPEAT_ENABLE */
 
                 /* stop and exit wps */
             case ACTION_WPS_STOP:

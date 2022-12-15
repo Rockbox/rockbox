@@ -3479,9 +3479,8 @@ static void buffer_event_finished_callback(unsigned short id, void *ev_data)
 /* Update elapsed time for next PCM insert */
 void audio_codec_update_elapsed(unsigned long elapsed)
 {
-#ifdef AB_REPEAT_ENABLE
     ab_position_report(elapsed);
-#endif
+
     /* Save in codec's id3 where it is used at next pcm insert */
     id3_get(CODEC_ID3)->elapsed = elapsed;
 }
