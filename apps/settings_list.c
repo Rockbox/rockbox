@@ -60,6 +60,7 @@
 #endif
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
+#include "misc.h" /* current activity */
 #endif
 
 #include "voice_thread.h"
@@ -697,8 +698,11 @@ static void tsc_set_default(void* setting, void* defaultval)
 #ifdef HAVE_HOTKEY
 static void hotkey_callback(int var)
 {
-    if (get_hotkey_lang_id(var) == LANG_OPEN_PLUGIN)
-        open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
+    if (get_current_activity() != ACTIVITY_QUICKSCREEN)
+    {
+        if (get_hotkey_lang_id(var) == LANG_OPEN_PLUGIN)
+            open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
+    }
 }
 static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
                               const char* unit)
