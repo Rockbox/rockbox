@@ -926,15 +926,10 @@ int plugin_load(const char* plugin, const void* parameter)
     tree_unlock_cache(tree_get_context());
 
     pop_current_activity_without_refresh();
-    if (rc != PLUGIN_GOTO_WPS)
+    if ((rc != PLUGIN_GOTO_WPS) && (get_current_activity() != ACTIVITY_WPS))
     {
-        int curr_activity = get_current_activity();
-        if ((curr_activity != ACTIVITY_PLAYLISTVIEWER) &&
-            (curr_activity != ACTIVITY_WPS))
-        {
-            FOR_NB_SCREENS(i)
+        FOR_NB_SCREENS(i)
                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
-        }
     }
 
     if (!pfn_tsr_exit)
