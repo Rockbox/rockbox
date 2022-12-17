@@ -94,8 +94,8 @@ static int recsource_func(void)
                       &global_settings.rec_source, INT, names,
                       n_opts, NULL );
 }
-MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE), 
-                    recsource_func, NULL, recmenu_callback, Icon_Menu_setting);
+MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE),
+                  recsource_func, recmenu_callback, Icon_Menu_setting);
 
 /* Makes an options list from a source list of options and indexes */
 static void make_options_from_indexes(const struct opt_items *src_names,
@@ -188,7 +188,7 @@ static int recfrequency_func(void)
     return ret;
 } /* recfrequency */
 MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_FREQUENCY),
-                    recfrequency_func, NULL, NULL, Icon_Menu_setting);
+                  recfrequency_func, NULL, Icon_Menu_setting);
 
 
 static int recchannels_func(void)
@@ -229,7 +229,7 @@ static int recchannels_func(void)
     return ret;
 }
 MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_CHANNELS),
-                    recchannels_func, NULL, NULL, Icon_Menu_setting);
+                  recchannels_func, NULL, Icon_Menu_setting);
 
 static int recmonomode_func(void)
 {
@@ -249,7 +249,7 @@ static int recmonomode_func(void)
     return ret;
 }
 MENUITEM_FUNCTION(recmonomode, 0, ID2P(LANG_RECORDING_MONO_MODE),
-                  recmonomode_func, NULL, NULL, Icon_Menu_setting);
+                  recmonomode_func, NULL, Icon_Menu_setting);
 
 static int recformat_func(void)
 {
@@ -273,11 +273,10 @@ static int recformat_func(void)
     return res;
 } /* recformat */
 MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_FORMAT),
-                    recformat_func, NULL, NULL, Icon_Menu_setting);
+                  recformat_func, NULL, Icon_Menu_setting);
 
 MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
-                     enc_global_config_menu,
-                     NULL, NULL, Icon_Submenu);
+                  enc_global_config_menu, NULL, Icon_Submenu);
 
 static int recmenu_callback(int action,
                              const struct menu_item_ex *this_item,
@@ -311,8 +310,8 @@ static int clear_rec_directory(void)
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
-MENUITEM_FUNCTION(clear_rec_directory_item, 0, ID2P(LANG_CLEAR_REC_DIR), 
-                  clear_rec_directory, NULL, NULL, Icon_Folder);
+MENUITEM_FUNCTION(clear_rec_directory_item, 0, ID2P(LANG_CLEAR_REC_DIR),
+                  clear_rec_directory, NULL, Icon_Folder);
 
 MENUITEM_SETTING(cliplight, &global_settings.cliplight, NULL);
 
@@ -350,10 +349,10 @@ static int agc_cliptime_func(void)
                       &global_settings.rec_agc_cliptime,
                       INT, names, 5, NULL );
 }
-MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORDING_AGC_PRESET), 
-                    agc_preset_func, NULL, NULL, Icon_Menu_setting);
-MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORDING_AGC_CLIPTIME), 
-                    agc_cliptime_func, NULL, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORDING_AGC_PRESET),
+                  agc_preset_func, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORDING_AGC_CLIPTIME),
+                  agc_cliptime_func, NULL, Icon_Menu_setting);
 #endif /* HAVE_AGC */
 
 /** Rec trigger **/
@@ -571,18 +570,19 @@ int rectrigger(void)
     settings_save();
     return 0;
 }
-MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER), 
-                  rectrigger, NULL, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER),
+                  rectrigger, NULL, Icon_Menu_setting);
 
 static struct browse_folder_info rec_config_browse = {RECPRESETS_DIR, SHOW_CFG};
-MENUITEM_FUNCTION_W_PARAM(browse_recconfigs, 0, ID2P(LANG_CUSTOM_CFG), 
-                  browse_folder, (void*)&rec_config_browse, NULL, Icon_Config);
+MENUITEM_FUNCTION_W_PARAM(browse_recconfigs, 0, ID2P(LANG_CUSTOM_CFG),
+                          browse_folder, (void*)&rec_config_browse,
+                          NULL, Icon_Config);
 static int write_settings_file(void)
 {
     return settings_save_config(SETTINGS_SAVE_RECPRESETS);
 }
-MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS), 
-                  write_settings_file, NULL, NULL, Icon_Config);
+MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS),
+                  write_settings_file, NULL, Icon_Config);
 
 MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             NULL, Icon_Recording,

@@ -81,12 +81,12 @@ static int timedate_set(void)
     return result;
 }
 
-MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME), 
-                  timedate_set, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME),
+                  timedate_set, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, 0, ID2P(LANG_ALARM_MOD_ALARM_MENU),
-                  alarm_screen, NULL, NULL, Icon_NOICON);
+                  alarm_screen, NULL, Icon_NOICON);
 #if CONFIG_TUNER || defined(HAVE_RECORDING)
 
 #if CONFIG_TUNER && !defined(HAVE_RECORDING)
@@ -139,7 +139,7 @@ static int alarm_setting(void)
 }
 
 MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
-                  alarm_setting, NULL, alarm_callback, Icon_Menu_setting);
+                  alarm_setting, alarm_callback, Icon_Menu_setting);
 #endif /* CONFIG_TUNER || defined(HAVE_RECORDING) */
 
 #endif /* HAVE_RTC_ALARM */

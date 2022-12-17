@@ -236,9 +236,9 @@ static bool set_option_dithering(void)
 }
 
 MENUITEM_FUNCTION(grayscale_item, 0, ID2P(LANG_GRAYSCALE),
-                  set_option_grayscale, NULL, NULL, Icon_NOICON);
+                  set_option_grayscale, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(dithering_item, 0, ID2P(LANG_DITHERING),
-                  set_option_dithering, NULL, NULL, Icon_NOICON);
+                  set_option_dithering, NULL, Icon_NOICON);
 MAKE_MENU(display_menu, "Display Options", NULL, Icon_NOICON,
             &grayscale_item, &dithering_item);
 

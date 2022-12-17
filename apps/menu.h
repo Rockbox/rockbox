@@ -195,8 +195,7 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
     When the user selects this item the function will be run,
     if MENU_FUNC_CHECK_RETVAL is set, the return value
     will be checked, returning 1 will exit do_menu(); */
-#define MENUITEM_FUNCTION(name, flags, str, func, reserved,                    \
-                              callback, icon)                                  \
+#define MENUITEM_FUNCTION(name, flags, str, func, callback, icon)              \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
     static const struct menu_func name##__ = {(void*)func};                    \
     /* should be const, but recording_settings wont let us do that */          \
@@ -205,14 +204,14 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
          { .function = & name##__}, {.callback_and_desc = & name##_}};
 
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, reserved,              \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func,                        \
                                   text_callback, voice_callback,            \
                                   text_cb_data, callback, icon)             \
     static const struct menu_get_name_and_icon name##_                      \
         = {callback,text_callback,voice_callback,text_cb_data,icon};        \
     static const struct menu_func name##__ = {(void*)func};                 \
     const struct menu_item_ex name   =                                      \
-        { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                   \
+        { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                         \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
 
 /*  Use this to put a function call into the menu.

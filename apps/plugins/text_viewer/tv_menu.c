@@ -51,10 +51,9 @@ static bool tv_horizontal_scroll_mode_setting(void)
 }
 
 MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Scrollbar",
-                  tv_horizontal_scrollbar_setting,
-                  NULL, NULL, Icon_NOICON);
+                  tv_horizontal_scrollbar_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(horizontal_scroll_mode_item, 0, "Scroll Mode",
-                  tv_horizontal_scroll_mode_setting, NULL, NULL, Icon_NOICON);
+                  tv_horizontal_scroll_mode_setting, NULL, Icon_NOICON);
 
 MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
           &horizontal_scrollbar_item,
@@ -103,16 +102,14 @@ static bool tv_narrow_mode_setting(void)
 }
 
 MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
-                  tv_vertical_scrollbar_setting,
-                  NULL, NULL, Icon_NOICON);
+                  tv_vertical_scrollbar_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(vertical_scroll_mode_item, 0, "Scroll Mode",
-                  tv_vertical_scroll_mode_setting, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(overlap_page_mode_item, 0, "Overlap Pages", tv_overlap_page_mode_setting,
-                  NULL, NULL, Icon_NOICON);
+                  tv_vertical_scroll_mode_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(overlap_page_mode_item, 0, "Overlap Pages", tv_overlap_page_mode_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(autoscroll_speed_item, 0, "Auto-Scroll Speed",
-                  tv_autoscroll_speed_setting, NULL, NULL, Icon_NOICON);
+                  tv_autoscroll_speed_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(narrow_mode_item, 0, "Left/Right Key (Narrow mode)",
-                  tv_narrow_mode_setting, NULL, NULL, Icon_NOICON);
+                  tv_narrow_mode_setting, NULL, Icon_NOICON);
 
 MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
           &vertical_scrollbar_item,
@@ -240,29 +237,29 @@ static bool tv_night_mode_setting(void)
 }
 #endif
 
-MENUITEM_FUNCTION(encoding_item, 0, "Encoding", tv_encoding_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", tv_word_wrap_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(line_mode_item, 0, "Line Mode", tv_line_mode_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page", tv_windows_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(alignment_item, 0, "Alignment", tv_alignment_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(header_item, 0, "Show Header", tv_header_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(statusbar_item, 0, "Show Statusbar", tv_statusbar_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
-                  NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces", tv_indent_spaces_setting,
-                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(encoding_item, 0, "Encoding",
+                  tv_encoding_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap",
+                  tv_word_wrap_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(line_mode_item, 0, "Line Mode",
+                  tv_line_mode_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page",
+                  tv_windows_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(alignment_item, 0, "Alignment",
+                  tv_alignment_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(header_item, 0, "Show Header",
+                  tv_header_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(footer_item, 0, "Show Footer",
+                  tv_footer_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(statusbar_item, 0, "Show Statusbar",
+                  tv_statusbar_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(font_item, 0, "Font",
+                  tv_font_setting, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces",
+                  tv_indent_spaces_setting, NULL, Icon_NOICON);
 #ifdef HAVE_LCD_COLOR
-MENUITEM_FUNCTION(night_mode_item, 0, "Night Mode", tv_night_mode_setting,
-                  NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(night_mode_item, 0, "Night Mode",
+                  tv_night_mode_setting, NULL, Icon_NOICON);
 #endif
 
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,

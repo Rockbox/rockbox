@@ -52,7 +52,7 @@ static int fm_recording_screen(void)
 }
 
 MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING),
-                    fm_recording_screen, NULL, NULL, Icon_Recording);
+                  fm_recording_screen, NULL, Icon_Recording);
 #endif /* defined(HAVE_FMRADIO_REC) */
 
 #if defined(HAVE_FMRADIO_REC)
@@ -65,25 +65,25 @@ static int fm_recording_settings(void)
 }
 
 MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
-                    fm_recording_settings, NULL, NULL, Icon_Recording);
+                  fm_recording_settings, NULL, Icon_Recording);
 #endif /* defined(HAVE_FMRADIO_REC) */
 #endif /* HAVE_RECORDING */
 
 #ifndef FM_PRESET
 MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET),
-                    handle_radio_presets, NULL, NULL, Icon_NOICON);
+                  handle_radio_presets, NULL, Icon_NOICON);
 #endif
 #ifndef FM_PRESET_ADD
 MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET),
-                    handle_radio_add_preset, NULL, NULL, Icon_NOICON);
+                  handle_radio_add_preset, NULL, Icon_NOICON);
 #endif
 
 MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD),
-                    preset_list_load, NULL, NULL, Icon_NOICON);
+                  preset_list_load, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE),
-                    preset_list_save, NULL, NULL, Icon_NOICON);
+                  preset_list_save, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR),
-                    preset_list_clear, NULL, NULL, Icon_NOICON);
+                  preset_list_clear, NULL, Icon_NOICON);
 
 MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);
 MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
@@ -120,15 +120,14 @@ static int toggle_radio_mode(void)
                  RADIO_PRESET_MODE : RADIO_SCAN_MODE;
     return 0;
 }
-MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
-                                 toggle_radio_mode, NULL, 
-                                 get_mode_text, mode_speak_item,
-                                 NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0, toggle_radio_mode,
+                          get_mode_text, mode_speak_item,
+                          NULL, NULL, Icon_NOICON);
 #endif
 
 MENUITEM_FUNCTION_W_PARAM(scan_presets_item, 0,
-                    ID2P(LANG_FM_SCAN_PRESETS),
-                    presets_scan, NULL, NULL, Icon_NOICON);
+                          ID2P(LANG_FM_SCAN_PRESETS),
+                          presets_scan, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
             Icon_Radio_screen,

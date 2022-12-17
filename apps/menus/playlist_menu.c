@@ -143,12 +143,12 @@ static int playlist_view_(void)
     return 0;
 }
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),
-                  create_playlist, NULL, NULL, Icon_NOICON);
+                  create_playlist, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(view_cur_playlist, 0,
                   ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
-                  playlist_view_, NULL, NULL, Icon_NOICON);
+                  playlist_view_, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(save_playlist, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
-                  save_playlist_screen, NULL, NULL, Icon_NOICON);
+                          save_playlist_screen, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 static int clear_catalog_directory(void)
 {
@@ -158,7 +158,7 @@ static int clear_catalog_directory(void)
     return false;
 }
 MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR),
-                  clear_catalog_directory, NULL, NULL, Icon_file_view_menu);
+                  clear_catalog_directory, NULL, Icon_file_view_menu);
 
 /* Playlist viewer settings submenu */
 MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);

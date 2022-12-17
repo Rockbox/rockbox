@@ -151,22 +151,20 @@ MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 #endif
 MENUITEM_SETTING(tagcache_autoupdate, &global_settings.tagcache_autoupdate, NULL);
 MENUITEM_FUNCTION(tc_init, 0, ID2P(LANG_TAGCACHE_FORCE_UPDATE),
-                    (int(*)(void))tagcache_rebuild_with_splash,
-                    NULL, NULL, Icon_NOICON);
+                  (int(*)(void))tagcache_rebuild_with_splash, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_update, 0, ID2P(LANG_TAGCACHE_UPDATE),
-                    (int(*)(void))tagcache_update_with_splash,
-                    NULL, NULL, Icon_NOICON);
+                  (int(*)(void))tagcache_update_with_splash, NULL, Icon_NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
 
 MENUITEM_FUNCTION(tc_export, 0, ID2P(LANG_TAGCACHE_EXPORT),
-                    tagtree_export, NULL,
-                    NULL, Icon_NOICON);
+                  tagtree_export,
+                  NULL, Icon_NOICON);
 
 MENUITEM_FUNCTION(tc_import, 0, ID2P(LANG_TAGCACHE_IMPORT),
-                    tagtree_import, NULL,
-                    NULL, Icon_NOICON);
+                  tagtree_import,
+                  NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_paths, 0, ID2P(LANG_SELECT_DATABASE_DIRS),
-                    dirs_to_scan, NULL, NULL, Icon_NOICON);
+                  dirs_to_scan, NULL, Icon_NOICON);
 
 MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 #ifdef HAVE_TC_RAMCACHE
@@ -201,7 +199,7 @@ static int clear_start_directory(void)
     return false;
 }
 MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR),
-                  clear_start_directory, NULL, NULL, Icon_file_view_menu);
+                  clear_start_directory, NULL, Icon_file_view_menu);
 static int fileview_callback(int action,
                              const struct menu_item_ex *this_item,
                              struct gui_synclist *this_list)
@@ -406,8 +404,8 @@ MENUITEM_SETTING(bt_selective_actions,
                  &global_settings.bt_selective_softlock_actions,
                                                     selectivesoftlock_callback);
 MENUITEM_FUNCTION(sel_softlock_mask, 0, ID2P(LANG_SETTINGS),
-                  selectivesoftlock_set_mask, NULL,
-                                 selectivesoftlock_callback, Icon_Menu_setting);
+	              selectivesoftlock_set_mask, selectivesoftlock_callback,
+	              Icon_Menu_setting);
 
 MAKE_MENU(sel_softlock, ID2P(LANG_SOFTLOCK_SELECTIVE),
           NULL, Icon_Menu_setting, &bt_selective_actions, &sel_softlock_mask);
@@ -572,7 +570,7 @@ static int sleeptimer_duration_cb(int action,
 
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
-MENUITEM_FUNCTION_DYNTEXT(sleeptimer_toggle, 0, toggle_sleeptimer, NULL,
+MENUITEM_FUNCTION_DYNTEXT(sleeptimer_toggle, 0, toggle_sleeptimer,
                           sleep_timer_getname, sleep_timer_voice, NULL,
                           NULL, Icon_NOICON);
 MENUITEM_SETTING(sleeptimer_duration,
@@ -762,7 +760,7 @@ static void wps_plugin_cb(void)
 }
 MENUITEM_FUNCTION(wps_set_context_plugin, 0,
                   ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN),
-                  wps_plugin_cb, NULL, NULL, Icon_Plugin);
+                  wps_plugin_cb, NULL, Icon_Plugin);
 
 /*    WPS_CONTEXT_PLUGIN           */
 /***********************************/
@@ -785,7 +783,7 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 static struct browse_folder_info langs = { LANG_DIR, SHOW_LNG };
 
 MENUITEM_FUNCTION_W_PARAM(browse_langs, 0, ID2P(LANG_LANGUAGE),
-                  browse_folder, (void*)&langs, NULL, Icon_Language);
+                          browse_folder, (void*)&langs, NULL, Icon_Language);
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,

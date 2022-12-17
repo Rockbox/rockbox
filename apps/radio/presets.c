@@ -428,11 +428,11 @@ int preset_list_clear(void)
 }
 
 MENUITEM_FUNCTION(radio_edit_preset_item, MENU_FUNC_CHECK_RETVAL,
-                    ID2P(LANG_FM_EDIT_PRESET),
-                    radio_edit_preset, NULL, NULL, Icon_NOICON);
+                  ID2P(LANG_FM_EDIT_PRESET),
+                  radio_edit_preset, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(radio_delete_preset_item, MENU_FUNC_CHECK_RETVAL,
-                    ID2P(LANG_FM_DELETE_PRESET),
-                    radio_delete_preset, NULL, NULL, Icon_NOICON);
+                  ID2P(LANG_FM_DELETE_PRESET),
+                  radio_delete_preset, NULL, Icon_NOICON);
 static int radio_preset_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list)

@@ -194,8 +194,8 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
 
 /* mp3_enc configuration menu */
 MENUITEM_FUNCTION_W_PARAM(mp3_bitrate, 0, ID2P(LANG_BITRATE),
-                   mp3_enc_bitrate,
-                   &menu_callback_data, enc_menuitem_callback, Icon_NOICON);
+                   mp3_enc_bitrate, &menu_callback_data,
+                   enc_menuitem_callback, Icon_NOICON);
 MAKE_MENU( mp3_enc_menu, ID2P(LANG_ENCODER_SETTINGS),
            enc_menuitem_enteritem, Icon_NOICON,
            &mp3_bitrate);

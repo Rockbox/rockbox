@@ -93,14 +93,15 @@ static int menu_callback(int action,
     return action;
 }
 
-#define ITEM_FLAG (MENU_FUNC_USEPARAM|MENU_FUNC_CHECK_RETVAL)
+#define ITEM_FLAG (MENU_FUNC_CHECK_RETVAL)
 
-MENUITEM_FUNCTION(games_item, ITEM_FLAG, ID2P(LANG_PLUGIN_GAMES), 
-                  plugins_menu, (void*)GAMES, NULL, Icon_Folder);
-MENUITEM_FUNCTION(apps_item,  ITEM_FLAG, ID2P(LANG_PLUGIN_APPS), 
-                  plugins_menu, (void*)APPS,  NULL, Icon_Folder);
-MENUITEM_FUNCTION(demos_item, ITEM_FLAG, ID2P(LANG_PLUGIN_DEMOS), 
-                  plugins_menu, (void*)DEMOS, NULL, Icon_Folder);
+MENUITEM_FUNCTION_W_PARAM(games_item, ITEM_FLAG, ID2P(LANG_PLUGIN_GAMES),
+                          plugins_menu, (void*)GAMES, NULL, Icon_Folder);
+MENUITEM_FUNCTION_W_PARAM(apps_item,  ITEM_FLAG, ID2P(LANG_PLUGIN_APPS),
+                          plugins_menu, (void*)APPS,  NULL, Icon_Folder);
+MENUITEM_FUNCTION_W_PARAM(demos_item, ITEM_FLAG, ID2P(LANG_PLUGIN_DEMOS),
+                          plugins_menu, (void*)DEMOS, NULL, Icon_Folder);
+
 
 MAKE_MENU(plugin_menu, ID2P(LANG_PLUGINS), &menu_callback,
           Icon_Plugin,

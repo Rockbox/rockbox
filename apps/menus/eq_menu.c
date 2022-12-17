@@ -222,8 +222,8 @@ static int eq_do_simple_menu(void * param)
     }
     return 0;
 }
-MENUITEM_FUNCTION(gain_menu, 0, ID2P(LANG_EQUALIZER_GAIN), eq_do_simple_menu,
-                    NULL, NULL, Icon_Submenu);
+MENUITEM_FUNCTION(gain_menu, 0, ID2P(LANG_EQUALIZER_GAIN),
+	              eq_do_simple_menu, NULL, Icon_Submenu);
 
 static void selection_to_banditem(int selection, int expanded_band, int *band, int *item)
 {
@@ -426,7 +426,7 @@ static int eq_do_advanced_menu(void * param)
     return 0;
 }
 MENUITEM_FUNCTION(advanced_menu, 0, ID2P(LANG_EQUALIZER_ADVANCED),
-                  eq_do_advanced_menu, NULL, NULL, Icon_EQ);
+                  eq_do_advanced_menu, NULL, Icon_EQ);
 
 enum eq_slider_mode {
     GAIN,
@@ -783,13 +783,12 @@ static int eq_save_preset(void)
 static struct browse_folder_info eqs = { EQS_DIR, SHOW_CFG };
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
-                    eq_menu_graphical, NULL, lowlatency_callback,
-                    Icon_EQ);
+                  eq_menu_graphical, lowlatency_callback, Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
-                    eq_save_preset, NULL, NULL, Icon_NOICON);
+                  eq_save_preset, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
-                    browse_folder, (void*)&eqs, lowlatency_callback,
-                    Icon_NOICON);
+                          browse_folder, (void*)&eqs,
+                          lowlatency_callback, Icon_NOICON);
 
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu,

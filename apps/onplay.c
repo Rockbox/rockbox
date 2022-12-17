@@ -158,11 +158,11 @@ static int bookmark_menu_callback(int action,
                                   struct gui_synclist *this_list);
 MENUITEM_FUNCTION(bookmark_create_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_CREATE),
-                  bookmark_create_menu, NULL,
+                  bookmark_create_menu,
                   bookmark_menu_callback, Icon_Bookmark);
 MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_LIST),
-                  bookmark_load_menu_wrapper, NULL,
+                  bookmark_load_menu_wrapper,
                   bookmark_menu_callback, Icon_Bookmark);
 MAKE_ONPLAYMENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU),
                 bookmark_menu_callback, Icon_Bookmark,
@@ -482,15 +482,15 @@ static int wps_view_cur_playlist(void)
 }
 
 MENUITEM_FUNCTION(wps_view_cur_playlist_item, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
-                  wps_view_cur_playlist, NULL, NULL, Icon_NOICON);
+                  wps_view_cur_playlist, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(search_playlist_item, 0, ID2P(LANG_SEARCH_IN_PLAYLIST),
-                  search_playlist, NULL, NULL, Icon_Playlist);
+                  search_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
-                  save_playlist, NULL, NULL, Icon_Playlist);
+                  save_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
-                  shuffle_playlist, NULL, NULL, Icon_Playlist);
+                  shuffle_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(playing_time_item, 0, ID2P(LANG_PLAYING_TIME),
-                  playing_time, NULL, NULL, Icon_Playlist);
+                  playing_time, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
                  NULL, Icon_Playlist,
                  &wps_view_cur_playlist_item, &search_playlist_item,
@@ -807,16 +807,16 @@ static bool set_catalogdir(void)
     return false;
 }
 MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_SET_AS_PLAYLISTCAT_DIR),
-                  set_catalogdir, NULL, clipboard_callback, Icon_Playlist);
+                  set_catalogdir, clipboard_callback, Icon_Playlist);
 
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list);
 
 MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO),
-                  cat_add_to_a_playlist, 0, NULL, Icon_Playlist);
+                  cat_add_to_a_playlist, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW),
-                  cat_add_to_a_new_playlist, 0, NULL, Icon_Playlist);
+                  cat_add_to_a_new_playlist, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
                 cat_playlist_callback, Icon_Playlist,
                 &cat_add_to_list, &cat_add_to_new, &set_catalogdir_item);
@@ -1481,7 +1481,7 @@ static int ratingitem_callback(int action,
     return action;
 }
 MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
-                  set_rating_inline, NULL,
+                  set_rating_inline,
                   ratingitem_callback, Icon_Questionmark);
 #endif
 MENUITEM_RETURNVALUE(plugin_item, ID2P(LANG_OPEN_PLUGIN),
@@ -1514,7 +1514,7 @@ static int view_cue_item_callback(int action,
     return action;
 }
 MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
-                  view_cue, NULL, view_cue_item_callback, Icon_NOICON);
+                  view_cue, view_cue_item_callback, Icon_NOICON);
 
 
 static int browse_id3_wrapper(void)
@@ -1531,10 +1531,10 @@ static int browse_id3_wrapper(void)
 
 /* CONTEXT_WPS items */
 MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_MENU_SHOW_ID3_INFO),
-                  browse_id3_wrapper, NULL, NULL, Icon_NOICON);
+                  browse_id3_wrapper, NULL, Icon_NOICON);
 #ifdef HAVE_PITCHCONTROL
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
-                  gui_syncpitchscreen_run, NULL, NULL, Icon_Audio);
+                  gui_syncpitchscreen_run, NULL, Icon_Audio);
 #endif
 
 /* CONTEXT_[TREE|ID3DB] items */
@@ -1543,19 +1543,19 @@ static int clipboard_callback(int action,
                               struct gui_synclist *this_list);
 
 MENUITEM_FUNCTION(rename_file_item, 0, ID2P(LANG_RENAME),
-                  rename_file, NULL, clipboard_callback, Icon_NOICON);
+                  rename_file, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_cut_item, 0, ID2P(LANG_CUT),
-                  clipboard_cut, NULL, clipboard_callback, Icon_NOICON);
+                  clipboard_cut, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_copy_item, 0, ID2P(LANG_COPY),
-                  clipboard_copy, NULL, clipboard_callback, Icon_NOICON);
+                  clipboard_copy, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_paste_item, 0, ID2P(LANG_PASTE),
-                  clipboard_paste, NULL, clipboard_callback, Icon_NOICON);
+                  clipboard_paste, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(delete_file_item, 0, ID2P(LANG_DELETE),
-                  delete_file_dir, NULL, clipboard_callback, Icon_NOICON);
+                  delete_file_dir, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(delete_dir_item, 0, ID2P(LANG_DELETE_DIR),
-                  delete_file_dir, NULL, clipboard_callback, Icon_NOICON);
+                  delete_file_dir, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(create_dir_item, 0, ID2P(LANG_CREATE_DIR),
-                  create_dir, NULL, clipboard_callback, Icon_NOICON);
+                  create_dir, clipboard_callback, Icon_NOICON);
 
 /* other items */
 static bool list_viewers(void)
@@ -1579,7 +1579,7 @@ static bool onplay_load_plugin(void *param)
 }
 
 MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
-                  list_viewers, NULL, clipboard_callback, Icon_NOICON);
+                  list_viewers, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(properties_item, 0, ID2P(LANG_PROPERTIES),
                   onplay_load_plugin, (void *)"properties",
                   clipboard_callback, Icon_NOICON);
@@ -1597,7 +1597,7 @@ static bool onplay_add_to_shortcuts(void)
     return false;
 }
 MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
-                  onplay_add_to_shortcuts, NULL,
+                  onplay_add_to_shortcuts,
                   clipboard_callback, Icon_NOICON);
 
 #if LCD_DEPTH > 1
@@ -1611,7 +1611,7 @@ static bool set_backdrop(void)
     return true;
 }
 MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
-                  set_backdrop, NULL, clipboard_callback, Icon_NOICON);
+                  set_backdrop, clipboard_callback, Icon_NOICON);
 #endif
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
@@ -1622,7 +1622,7 @@ static bool set_recdir(void)
     return false;
 }
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
-                  set_recdir, NULL, clipboard_callback, Icon_Recording);
+                  set_recdir, clipboard_callback, Icon_Recording);
 #endif
 static bool set_startdir(void)
 {
@@ -1633,7 +1633,7 @@ static bool set_startdir(void)
     return false;
 }
 MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_SET_AS_START_DIR),
-                  set_startdir, NULL, clipboard_callback, Icon_file_view_menu);
+                  set_startdir, clipboard_callback, Icon_file_view_menu);
 
 static int clipboard_callback(int action,
                               const struct menu_item_ex *this_item,
@@ -1747,7 +1747,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
          );
 
 MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
-                  view_playlist, NULL,
+                  view_playlist,
                   onplaymenu_callback, Icon_Playlist);
 
 /* used when onplay() is not called in the CONTEXT_WPS context */

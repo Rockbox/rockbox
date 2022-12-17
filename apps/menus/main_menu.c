@@ -91,15 +91,18 @@ static int write_settings_file(void* param)
 }
 
 MENUITEM_FUNCTION_W_PARAM(browse_configs, 0, ID2P(LANG_CUSTOM_CFG),
-        browse_folder, (void*)&config, NULL, Icon_NOICON);
+                          browse_folder, (void*)&config, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(save_settings_item, 0, ID2P(LANG_SAVE_SETTINGS),
-        write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
+                          write_settings_file, (void*)SETTINGS_SAVE_ALL,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(save_theme_item, 0, ID2P(LANG_SAVE_THEME),
-        write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
+                          write_settings_file, (void*)SETTINGS_SAVE_THEME,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(save_sound_item, 0, ID2P(LANG_SAVE_SOUND),
-        write_settings_file, (void*)SETTINGS_SAVE_SOUND, NULL, Icon_NOICON);
+                          write_settings_file, (void*)SETTINGS_SAVE_SOUND,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
-                  reset_settings, NULL, NULL, Icon_NOICON);
+                  reset_settings, NULL, Icon_NOICON);
 
 MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
           &browse_configs, &reset_settings_item,
@@ -466,22 +469,22 @@ static int show_info(void)
 
 
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
-                   show_info, NULL, NULL, Icon_NOICON);
+                  show_info, NULL, Icon_NOICON);
 
 #if CONFIG_RTC
 int time_screen(void* ignored);
 MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
-                    time_screen, NULL,  NULL, Icon_Menu_setting );
+                  time_screen,  NULL, Icon_Menu_setting );
 #endif
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
-                   show_credits, NULL, NULL, Icon_NOICON);
+                  show_credits, NULL, Icon_NOICON);
 
 MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
-                   view_runtime, NULL, NULL, Icon_NOICON);
+                  view_runtime, NULL, Icon_NOICON);
 
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
-                   debug_menu, NULL, NULL, Icon_NOICON);
+                  debug_menu, NULL, Icon_NOICON);
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
           &show_info_item, &show_credits_item,

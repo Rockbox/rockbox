@@ -168,8 +168,8 @@ MENUITEM_SETTING(bl_selective_actions,
                                                     selectivebacklight_callback);
 
 MENUITEM_FUNCTION(sel_backlight_mask, 0, ID2P(LANG_SETTINGS),
-                  selectivebacklight_set_mask, NULL,
-                                selectivebacklight_callback, Icon_Menu_setting);
+                  selectivebacklight_set_mask, selectivebacklight_callback,
+                  Icon_Menu_setting);
 
 MAKE_MENU(sel_backlight, ID2P(LANG_BACKLIGHT_SELECTIVE),
           NULL, Icon_Menu_setting, &bl_selective_actions, &sel_backlight_mask);
@@ -520,18 +520,17 @@ static bool history_interval(void)
                           INT, names, 4, NULL );
 }
 
-MENUITEM_FUNCTION(histogram, 0,
-                  ID2P(LANG_HISTOGRAM_INTERVAL),
-                  history_interval, NULL, NULL, Icon_Menu_setting);
+MENUITEM_FUNCTION(histogram, 0, ID2P(LANG_HISTOGRAM_INTERVAL),
+                  history_interval, NULL, Icon_Menu_setting);
 
 #endif
 
 MENUITEM_FUNCTION(peak_meter_scale_item, 0, ID2P(LANG_PM_SCALE),
-                    peak_meter_scale, NULL, NULL, Icon_NOICON);
+                  peak_meter_scale, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(peak_meter_min_item, 0, ID2P(LANG_PM_MIN),
-                    peak_meter_min, NULL, NULL, Icon_NOICON);
+                  peak_meter_min, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(peak_meter_max_item, 0, ID2P(LANG_PM_MAX),
-                    peak_meter_max, NULL, NULL, Icon_NOICON);
+                  peak_meter_max, NULL, Icon_NOICON);
 MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
           &peak_meter_release, &peak_meter_hold,
           &peak_meter_clip_hold,
@@ -575,10 +574,11 @@ static int line_padding_callback(int action,
 
 MENUITEM_SETTING(touch_mode, &global_settings.touch_mode, touch_mode_callback);
 
-MENUITEM_FUNCTION(touchscreen_menu_calibrate, 0, ID2P(LANG_TOUCHSCREEN_CALIBRATE), calibrate,
-                    NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0, ID2P(LANG_TOUCHSCREEN_RESET_CALIBRATION), reset_mapping,
-                    NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(touchscreen_menu_calibrate, 0,
+	              ID2P(LANG_TOUCHSCREEN_CALIBRATE), calibrate, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0,
+	              ID2P(LANG_TOUCHSCREEN_RESET_CALIBRATION),
+	              reset_mapping, NULL, Icon_NOICON);
 MENUITEM_SETTING(list_line_padding, &global_settings.list_line_padding, line_padding_callback);
 
 MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &list_line_padding, &touch_mode,
