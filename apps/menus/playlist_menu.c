@@ -147,7 +147,7 @@ MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),
 MENUITEM_FUNCTION(view_cur_playlist, 0,
                   ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
                   playlist_view_, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
+MENUITEM_FUNCTION_W_PARAM(save_playlist, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
                   save_playlist_screen, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 static int clear_catalog_directory(void)

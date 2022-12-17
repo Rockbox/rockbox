@@ -66,7 +66,7 @@ enum hotkey_flags {
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
-    struct menu_func func;  /* Function to run if this entry is selected */
+    struct menu_func_param func;  /* Function to run if this entry is selected */
     int16_t return_code;    /* What to return after the function is run. */
     uint16_t flags;         /* Flags what context, display options */
 };                          /* (Pick ONPLAY_FUNC_RETURN to use function's return value) */

@@ -37,18 +37,23 @@ enum menu_item_type {
                           text for the setting title,
                           ID2P() or "literal" for the str param */
     MT_FUNCTION_CALL, /* call a function from the menus */
+    MT_FUNCTION_CALL_W_PARAM, /* call a function from the menus */
     MT_RETURN_ID, /* returns the position of the selected item (starting at 0)*/
     MT_RETURN_VALUE, /* returns a value associated with an item */
 };
 #define MENU_TYPE_MASK 0xF /* MT_* type */
 
-struct menu_func {
+struct menu_func_param {
     union {
         int (*function_w_param)(void* param); /* intptr_t instead of void*
                                                     for 64bit systems */
         int (*function)(void);
     };
     void *param; /* passed to function_w_param */
+};
+
+struct menu_func {
+    int (*function)(void);
 };
 
 /* these next two are mutually exclusive */
@@ -75,6 +80,7 @@ struct menu_item_ex {
         void *variable; /* used with MT_SETTING,
                            must be in the settings_list.c list */
         const struct menu_func *function; /* MT_FUNCTION_* */
+        const struct menu_func_param *function_param; /* MT_FUNCTION_*_W_PARAM */
         const char **strings; /* used with MT_RETURN_ID */
         int value; /* MT_RETURN_VALUE */
     };
@@ -185,30 +191,54 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
         { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
         {.menu_get_name_and_icon = & name##_}};
         
-/*  Use this to put a function call into the menu.
+/*  Use this to put a function call expecting no arguments into the menu.
     When the user selects this item the function will be run,
     if MENU_FUNC_CHECK_RETVAL is set, the return value
-    will be checked, returning 1 will exit do_menu();
-    if MENU_FUNC_USEPARAM is set, param will be passed to the function */
-#define MENUITEM_FUNCTION(name, flags, str, func, param,                       \
+    will be checked, returning 1 will exit do_menu(); */
+#define MENUITEM_FUNCTION(name, flags, str, func, reserved,                    \
                               callback, icon)                                  \
     static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
-    static const struct menu_func name##__ = {{(void*)func}, param};           \
+    static const struct menu_func name##__ = {(void*)func};                    \
     /* should be const, but recording_settings wont let us do that */          \
     const struct menu_item_ex name   =                                         \
         { MT_FUNCTION_CALL|MENU_HAS_DESC|flags,                                \
          { .function = & name##__}, {.callback_and_desc = & name##_}};
-            
+
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,                 \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, reserved,              \
                                   text_callback, voice_callback,            \
                                   text_cb_data, callback, icon)             \
     static const struct menu_get_name_and_icon name##_                      \
         = {callback,text_callback,voice_callback,text_cb_data,icon};        \
-    static const struct menu_func name##__ = {{(void*)func}, param};           \
-    const struct menu_item_ex name   =                                  \
-        { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
+    static const struct menu_func name##__ = {(void*)func};                 \
+    const struct menu_item_ex name   =                                      \
+        { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                   \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
+
+/*  Use this to put a function call into the menu.
+    When the user selects this item the function will be run,
+    if MENU_FUNC_CHECK_RETVAL is set, the return value
+    will be checked, returning 1 will exit do_menu();
+    param will be passed to the function */
+#define MENUITEM_FUNCTION_W_PARAM(name, flags, str, func, param,               \
+                              callback, icon)                                  \
+    static const struct menu_callback_with_desc name##_ = {callback,str,icon}; \
+    static const struct menu_func_param name##__ = {{(void*)func}, param};     \
+    /* should be const, but recording_settings wont let us do that */          \
+    const struct menu_item_ex name   =                                         \
+        { MT_FUNCTION_CALL_W_PARAM|MENU_HAS_DESC|MENU_FUNC_USEPARAM|flags,     \
+         { .function_param = & name##__}, {.callback_and_desc = & name##_}};
+
+/* As above, except the text is dynamic */
+#define MENUITEM_FUNCTION_DYNTEXT_W_PARAM(name, flags, func, param,         \
+                                  text_callback, voice_callback,            \
+                                  text_cb_data, callback, icon)             \
+    static const struct menu_get_name_and_icon name##_                      \
+        = {callback,text_callback,voice_callback,text_cb_data,icon};        \
+    static const struct menu_func_param name##__ = {{(void*)func}, param};  \
+    const struct menu_item_ex name   =                                      \
+        { MT_FUNCTION_CALL_W_PARAM|MENU_DYNAMIC_DESC|flags,                 \
+         { .function_param = & name##__}, {.menu_get_name_and_icon = & name##_}};
 
 /*  Use this to actually create a menu. the ... argument is a list of pointers 
     to any of the above macro'd variables. 

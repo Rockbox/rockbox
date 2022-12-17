@@ -644,14 +644,19 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                         init_menu_lists(menu, &lists, 0, true, vps);
                     }
                     break;
+                case MT_FUNCTION_CALL_W_PARAM:
                 case MT_FUNCTION_CALL:
                 {
                     int return_value;
-                    if (temp->flags&MENU_FUNC_USEPARAM)
-                        return_value = temp->function->function_w_param(
-                                    temp->function->param);
+                    if (type == MT_FUNCTION_CALL_W_PARAM)
+                    {
+                        return_value = temp->function_param->function_w_param(
+                                    temp->function_param->param);
+                    }
                     else
+                    {
                         return_value = temp->function->function();
+                    }
                     if (!(menu->flags&MENU_EXITAFTERTHISMENU) ||
                             (temp->flags&MENU_EXITAFTERTHISMENU))
                     {

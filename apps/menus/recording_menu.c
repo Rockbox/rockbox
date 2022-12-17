@@ -575,7 +575,7 @@ MENUITEM_FUNCTION(rectrigger_item, 0, ID2P(LANG_RECORD_TRIGGER),
                   rectrigger, NULL, NULL, Icon_Menu_setting);
 
 static struct browse_folder_info rec_config_browse = {RECPRESETS_DIR, SHOW_CFG};
-MENUITEM_FUNCTION(browse_recconfigs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
+MENUITEM_FUNCTION_W_PARAM(browse_recconfigs, 0, ID2P(LANG_CUSTOM_CFG), 
                   browse_folder, (void*)&rec_config_browse, NULL, Icon_Config);
 static int write_settings_file(void)
 {
@@ -614,5 +614,5 @@ int recording_menu(bool no_source)
     return retval;
 };
 
-MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
+MENUITEM_FUNCTION_W_PARAM(recording_settings, 0, ID2P(LANG_RECORDING_SETTINGS),
                           recording_menu, 0, NULL, Icon_Recording);

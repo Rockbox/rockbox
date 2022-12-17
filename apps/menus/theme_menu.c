@@ -129,17 +129,17 @@ static int reset_color(void)
     settings_apply_skins();
     return 0;
 }
-MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
                   set_color_func, (void*)COLOR_BG, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_fg_col, MENU_FUNC_USEPARAM, ID2P(LANG_FOREGROUND_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
                   set_color_func, (void*)COLOR_FG, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lss_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_START_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_lss_col, 0, ID2P(LANG_SELECTOR_START_COLOR),
                   set_color_func, (void*)COLOR_LSS, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lse_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_END_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_lse_col, 0, ID2P(LANG_SELECTOR_END_COLOR),
                   set_color_func, (void*)COLOR_LSE, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lst_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_TEXT_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_lst_col, 0, ID2P(LANG_SELECTOR_TEXT_COLOR),
                   set_color_func, (void*)COLOR_LST, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_sep_col, MENU_FUNC_USEPARAM, ID2P(LANG_LIST_SEPARATOR_COLOR),
+MENUITEM_FUNCTION_W_PARAM(set_sep_col, 0, ID2P(LANG_LIST_SEPARATOR_COLOR),
                   set_color_func, (void*)COLOR_SEP, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
                     reset_color, NULL, NULL, Icon_NOICON);
@@ -323,30 +323,30 @@ int browse_folder(void *param)
     return rockbox_browse(&browse);
 }
 
-MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_fonts, 0, 
         ID2P(LANG_CUSTOM_FONT), 
         browse_folder, (void*)&fonts, NULL, Icon_Font);
 
-MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_sbs, 0, 
         ID2P(LANG_BASE_SKIN), 
         browse_folder, (void*)&sbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
-MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_fms, 0, 
         ID2P(LANG_RADIOSCREEN), 
         browse_folder, (void*)&fms, NULL, Icon_Wps);
 #endif
-MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_wps, 0, 
         ID2P(LANG_WHILE_PLAYING), 
         browse_folder, (void*)&wps, NULL, Icon_Wps);
 #ifdef HAVE_REMOTE_LCD
-MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_rwps, 0, 
         ID2P(LANG_REMOTE_WHILE_PLAYING), 
         browse_folder, (void*)&rwps, NULL, Icon_Wps);
-MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_rsbs, 0, 
         ID2P(LANG_REMOTE_BASE_SKIN), 
         browse_folder, (void*)&rsbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
-MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_rfms, 0, 
         ID2P(LANG_REMOTE_RADIOSCREEN), 
         browse_folder, (void*)&rfms, NULL, Icon_Wps);
 #endif
@@ -373,7 +373,7 @@ static int showicons_callback(int action,
 }
 
 MENUITEM_SETTING(show_icons, &global_settings.show_icons, showicons_callback);
-MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, 
+MENUITEM_FUNCTION_W_PARAM(browse_themes, 0, 
         ID2P(LANG_CUSTOM_THEME), 
         browse_folder, (void*)&themes, NULL, Icon_Config);
 MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);

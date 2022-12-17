@@ -90,13 +90,13 @@ static int write_settings_file(void* param)
     return settings_save_config((intptr_t)param);
 }
 
-MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG),
+MENUITEM_FUNCTION_W_PARAM(browse_configs, 0, ID2P(LANG_CUSTOM_CFG),
         browse_folder, (void*)&config, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS),
+MENUITEM_FUNCTION_W_PARAM(save_settings_item, 0, ID2P(LANG_SAVE_SETTINGS),
         write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME),
+MENUITEM_FUNCTION_W_PARAM(save_theme_item, 0, ID2P(LANG_SAVE_THEME),
         write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND),
+MENUITEM_FUNCTION_W_PARAM(save_sound_item, 0, ID2P(LANG_SAVE_SOUND),
         write_settings_file, (void*)SETTINGS_SAVE_SOUND, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
                   reset_settings, NULL, NULL, Icon_NOICON);

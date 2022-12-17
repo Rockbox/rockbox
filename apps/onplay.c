@@ -626,35 +626,35 @@ static int treeplaylist_callback(int action,
                                  struct gui_synclist *this_list);
 
 /* insert items */
-MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
+MENUITEM_FUNCTION_W_PARAM(i_pl_item, 0, ID2P(LANG_INSERT),
                   add_to_playlist, &addtopl_insert,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
+MENUITEM_FUNCTION_W_PARAM(i_first_pl_item, 0, ID2P(LANG_INSERT_FIRST),
                   add_to_playlist, &addtopl_insert_first,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_LAST),
+MENUITEM_FUNCTION_W_PARAM(i_last_pl_item, 0, ID2P(LANG_INSERT_LAST),
                   add_to_playlist, &addtopl_insert_last,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(i_shuf_pl_item, 0, ID2P(LANG_INSERT_SHUFFLED),
                   add_to_playlist, &addtopl_insert_shuf,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(i_last_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_LAST_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(i_last_shuf_pl_item, 0, ID2P(LANG_INSERT_LAST_SHUFFLED),
                   add_to_playlist, &addtopl_insert_last_shuf,
                   treeplaylist_callback, Icon_Playlist);
 /* queue items */
-MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
+MENUITEM_FUNCTION_W_PARAM(q_pl_item, 0, ID2P(LANG_QUEUE),
                   add_to_playlist, &addtopl_queue,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_FIRST),
+MENUITEM_FUNCTION_W_PARAM(q_first_pl_item, 0, ID2P(LANG_QUEUE_FIRST),
                   add_to_playlist, &addtopl_queue_first,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST),
+MENUITEM_FUNCTION_W_PARAM(q_last_pl_item, 0, ID2P(LANG_QUEUE_LAST),
                   add_to_playlist, &addtopl_queue_last,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(q_shuf_pl_item, 0, ID2P(LANG_QUEUE_SHUFFLED),
                   add_to_playlist, &addtopl_queue_shuf,
                   treeplaylist_callback, Icon_Playlist);
-MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(q_last_shuf_pl_item, 0, ID2P(LANG_QUEUE_LAST_SHUFFLED),
                   add_to_playlist, &addtopl_queue_last_shuf,
                   treeplaylist_callback, Icon_Playlist);
 
@@ -668,11 +668,11 @@ MAKE_ONPLAYMENU(queue_menu, ID2P(LANG_QUEUE_MENU),
                 &q_last_shuf_pl_item);
 
 /* replace playlist */
-MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_PLAY),
+MENUITEM_FUNCTION_W_PARAM(replace_pl_item, 0, ID2P(LANG_PLAY),
                   add_to_playlist, &addtopl_replace,
                   treeplaylist_callback, Icon_Playlist);
 
-MENUITEM_FUNCTION(replace_shuf_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_PLAY_SHUFFLED),
+MENUITEM_FUNCTION_W_PARAM(replace_shuf_pl_item, 0, ID2P(LANG_PLAY_SHUFFLED),
                   add_to_playlist, &addtopl_replace_shuffled,
                   treeplaylist_callback, Icon_Playlist);
 
@@ -726,10 +726,10 @@ static int treeplaylist_callback(int action,
             if (!(audio_status() & AUDIO_STATUS_PLAY))
                 return ACTION_EXIT_MENUITEM;
         }
-        else if ((this_item->flags & MENU_TYPE_MASK) == MT_FUNCTION_CALL &&
-                 this_item->function->function_w_param == add_to_playlist)
+        else if ((this_item->flags & MENU_TYPE_MASK) == MT_FUNCTION_CALL_W_PARAM &&
+                 this_item->function_param->function_w_param == add_to_playlist)
         {
-            struct add_to_pl_param *param = this_item->function->param;
+            struct add_to_pl_param *param = this_item->function_param->param;
 
             if (param->queue)
             {
@@ -1580,14 +1580,14 @@ static bool onplay_load_plugin(void *param)
 
 MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
                   list_viewers, NULL, clipboard_callback, Icon_NOICON);
-MENUITEM_FUNCTION(properties_item, MENU_FUNC_USEPARAM, ID2P(LANG_PROPERTIES),
+MENUITEM_FUNCTION_W_PARAM(properties_item, 0, ID2P(LANG_PROPERTIES),
                   onplay_load_plugin, (void *)"properties",
                   clipboard_callback, Icon_NOICON);
-MENUITEM_FUNCTION(track_info_item, MENU_FUNC_USEPARAM, ID2P(LANG_MENU_SHOW_ID3_INFO),
+MENUITEM_FUNCTION_W_PARAM(track_info_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   onplay_load_plugin, (void *)"properties",
                   clipboard_callback, Icon_NOICON);
 #ifdef HAVE_TAGCACHE
-MENUITEM_FUNCTION(pictureflow_item, MENU_FUNC_USEPARAM, ID2P(LANG_ONPLAY_PICTUREFLOW),
+MENUITEM_FUNCTION_W_PARAM(pictureflow_item, 0, ID2P(LANG_ONPLAY_PICTUREFLOW),
                   onplay_load_plugin, (void *)"pictureflow",
                   clipboard_callback, Icon_NOICON);
 #endif
@@ -1938,7 +1938,7 @@ static int execute_hotkey(bool is_wps)
     const struct hotkey_assignment *this_item = get_hotkey(action);
 
     /* run the associated function (with optional param), if any */
-    const struct menu_func func = this_item->func;
+    const struct menu_func_param func = this_item->func;
 
     int func_return = ONPLAY_RELOAD_DIR;
     if (func.function != NULL)

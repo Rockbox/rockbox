@@ -193,7 +193,7 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
 } /* mp3_enc_bitrate */
 
 /* mp3_enc configuration menu */
-MENUITEM_FUNCTION(mp3_bitrate, MENU_FUNC_USEPARAM, ID2P(LANG_BITRATE),
+MENUITEM_FUNCTION_W_PARAM(mp3_bitrate, 0, ID2P(LANG_BITRATE),
                    mp3_enc_bitrate,
                    &menu_callback_data, enc_menuitem_callback, Icon_NOICON);
 MAKE_MENU( mp3_enc_menu, ID2P(LANG_ENCODER_SETTINGS),
@@ -286,7 +286,7 @@ static int enc_menuitem_callback(int action,
 {
     (void)this_list;
     struct menucallback_data *data = 
-            (struct menucallback_data*)this_item->function->param;
+            (struct menucallback_data*)this_item->function_param->param;
     
     if (action == ACTION_EXIT_MENUITEM)
     {

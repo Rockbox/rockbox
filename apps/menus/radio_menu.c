@@ -126,7 +126,7 @@ MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
                                  NULL, NULL, Icon_NOICON);
 #endif
 
-MENUITEM_FUNCTION(scan_presets_item, MENU_FUNC_USEPARAM,
+MENUITEM_FUNCTION_W_PARAM(scan_presets_item, 0,
                     ID2P(LANG_FM_SCAN_PRESETS),
                     presets_scan, NULL, NULL, Icon_NOICON);
 
