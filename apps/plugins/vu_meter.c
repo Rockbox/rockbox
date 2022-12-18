@@ -20,6 +20,8 @@
 #include "plugin.h"
 #include "fixedpoint.h"
 #include "lib/playback_control.h"
+#include "lib/helper.h"
+#include "lib/pluginlib_exit.h"
 
 
 
@@ -910,6 +912,12 @@ static void digital_meter(void) {
     rb->lcd_hline(0,LCD_WIDTH-1,half_height+3);
 }
 
+static void vu_meter_cleanup(void)
+{
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings();
+}
+
 enum plugin_status plugin_start(const void* parameter) {
     int button;
 #if defined(VUMETER_HELP_PRE) || defined(VUMETER_MENU_PRE)
@@ -920,11 +928,16 @@ enum plugin_status plugin_start(const void* parameter) {
 
     calc_scales();
 
+    atexit(vu_meter_cleanup);
+
     load_settings();
     rb->lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
     screen_foreground = rb->lcd_get_foreground();
 #endif
+
+     /* Turn off backlight timeout */
+    backlight_ignore_timeout();
 
     while (1)
     {
