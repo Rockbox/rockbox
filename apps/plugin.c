@@ -788,7 +788,6 @@ static const struct plugin_api rockbox_api = {
     read_jpeg_fd,
 #endif
     screen_dump_set_hook,
-    show_logo,
 
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,

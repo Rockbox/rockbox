@@ -930,12 +930,6 @@ RB_WRAP(restart_lua)
     return -1;
 }
 
-RB_WRAP(show_logo)
-{
-    rb->show_logo();
-    return 0;
-}
-
 RB_WRAP(mem_stats)
 {
     /* used, allocd, free = rb.mem_stats() */
@@ -1032,7 +1026,6 @@ static const luaL_Reg rocklib[] =
 
     /* MISC */
     RB_FUNC(restart_lua),
-    RB_FUNC(show_logo),
     RB_FUNC(mem_stats),
 
     {NULL, NULL}

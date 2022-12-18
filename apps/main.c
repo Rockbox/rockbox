@@ -21,6 +21,7 @@
 #include "config.h"
 #include "system.h"
 
+#include "version.h"
 #include "gcc_extensions.h"
 #include "storage.h"
 #include "disk.h"
@@ -208,6 +209,50 @@ int main(void)
     root_menu();
 }
 
+/* The disk isn't ready at boot, rblogo is stored in bin and erased after boot */
+int show_logo_boot( void ) INIT_ATTR;
+int show_logo_boot( void )
+{
+    unsigned char version[32];
+    int font_h, ver_w;
+    snprintf(version, sizeof(version), "Ver. %s", rbversion);
+    ver_w = font_getstringsize(version, NULL, &font_h, FONT_SYSFIXED);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
+    /* display the logo in the blue area of the screen (bottom 48 pixels) */
+    if (ver_w > LCD_WIDTH)
+        lcd_putsxy(0, 0, rbversion);
+    else
+        lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), 0, version);
+    lcd_bmp(&bm_rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 16);
+#else
+    lcd_bmp(&bm_rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 10);
+    if (ver_w > LCD_WIDTH)
+        lcd_putsxy(0, LCD_HEIGHT-font_h, rbversion);
+    else
+        lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), LCD_HEIGHT-font_h, version);
+#endif
+    lcd_setfont(FONT_UI);
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_bmp(&bm_remote_rockboxlogo, 0, 10);
+    lcd_remote_setfont(FONT_SYSFIXED);
+    if (ver_w > LCD_REMOTE_WIDTH)
+        lcd_remote_putsxy(0, LCD_REMOTE_HEIGHT-font_h, rbversion);
+    else
+        lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - (ver_w/2),
+                      LCD_REMOTE_HEIGHT-font_h, version);
+    lcd_remote_setfont(FONT_UI);
+    lcd_remote_update();
+#endif
+#ifdef SIMULATOR
+    sleep(HZ); /* sim is too fast to see logo */
+#endif
+    return 0;
+}
+
 #ifdef HAVE_DIRCACHE
 static int INIT_ATTR init_dircache(bool preinit)
 {
@@ -241,7 +286,7 @@ static int INIT_ATTR init_dircache(bool preinit)
                 splash(0, str(LANG_SCANNING_DISK));
                 dircache_wait();
                 backlight_on();
-                show_logo();
+                show_logo_boot();
             }
 
             struct dircache_info info;
@@ -307,7 +352,7 @@ static void init_tagcache(void)
     if (clear)
     {
         backlight_on();
-        show_logo();
+        show_logo_boot();
     }
 }
 #endif /* HAVE_TAGCACHE */
@@ -330,7 +375,7 @@ static void init(void)
     FOR_NB_SCREENS(i)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
-    show_logo();
+    show_logo_boot();
     button_init();
     powermgmt_init();
     backlight_init();
@@ -434,7 +479,7 @@ static void init(void)
     settings_reset();
 
     CHART(">show_logo");
-    show_logo();
+    show_logo_boot();
     CHART("<show_logo");
     lang_init(core_language_builtin, language_strings,
               LANG_LAST_INDEX_IN_ARRAY);

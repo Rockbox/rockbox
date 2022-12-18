@@ -112,7 +112,6 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 long default_event_handler(long event);
 bool list_stop_handler(void);
 void car_adapter_mode_init(void) INIT_ATTR;
-extern int show_logo(void);
 
 /* Unicode byte order mark sequences and lengths */
 #define BOM_UTF_8 "\xef\xbb\xbf"

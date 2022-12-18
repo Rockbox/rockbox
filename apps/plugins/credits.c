@@ -21,7 +21,19 @@
 #include "plugin.h"
 #include "lib/helper.h"
 
+#ifdef HAVE_REMOTE_LCD
+#define REMOTE_WIDTH LCD_REMOTE_WIDTH
+#define REMOTE_HEIGHT LCD_REMOTE_HEIGHT
+#include "pluginbitmaps/remote_rockboxlogo.h"
+#define REMOTE_LOGO_WIDTH BMPWIDTH_remote_rockboxlogo
+#define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_rockboxlogo
+#define REMOTE_LOGO (const fb_remote_data*)remote_rockboxlogo
+#endif /* HAVE_REMOTE_LCD */
 
+#define LOGO (const fb_data*)rockboxlogo
+#include "pluginbitmaps/rockboxlogo.h"
+#define LOGO_WIDTH BMPWIDTH_rockboxlogo
+#define LOGO_HEIGHT BMPHEIGHT_rockboxlogo
 
 static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
@@ -299,6 +311,49 @@ static void roll_credits(void)
     }
 }
 
+int show_logo(void)
+{
+    unsigned char version[32];
+    int font_h, ver_w;
+    rb->snprintf(version, sizeof(version), "Ver. %s", rb->rbversion);
+    ver_w = rb->font_getstringsize(version, NULL, &font_h, FONT_SYSFIXED);
+    rb->lcd_clear_display();
+    rb->lcd_setfont(FONT_SYSFIXED);
+#if defined(SANSA_CLIP) || defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
+    /* display the logo in the blue area of the screen (bottom 48 pixels) */
+    if (ver_w > LCD_WIDTH)
+        rb->lcd_puts_scroll(0, 0, version);
+    else
+        rb->lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), 0, version);
+    rb->lcd_bitmap(LOGO, (LCD_WIDTH - LOGO_WIDTH) / 2, 16,
+                   LOGO_WIDTH, LOGO_HEIGHT);
+#else
+    rb->lcd_bitmap(LOGO, (LCD_WIDTH - LOGO_WIDTH) / 2, 10,
+                   LOGO_WIDTH, LOGO_HEIGHT);
+    if (ver_w > LCD_WIDTH)
+        rb->lcd_puts_scroll(0, (LCD_HEIGHT-font_h) / font_h, version);
+    else
+        rb->lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), LCD_HEIGHT-font_h, version);
+#endif
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_clear_display();
+    rb->lcd_remote_bitmap(REMOTE_LOGO, 0, 10,
+                          REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT);
+    rb->lcd_remote_setfont(FONT_SYSFIXED);
+    if (ver_w > LCD_REMOTE_WIDTH)
+        rb->lcd_remote_puts_scroll(0, (LCD_REMOTE_HEIGHT-font_h) / font_h, version);
+    else
+        rb->lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - (ver_w/2),
+                      LCD_REMOTE_HEIGHT-font_h, version);
+    rb->lcd_remote_setfont(FONT_UI);
+    rb->lcd_remote_update();
+#endif
+
+    return 0;
+}
+
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
@@ -307,17 +362,28 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
-
-#if LCD_DEPTH>=16
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground (LCD_WHITE);
     rb->lcd_set_background (LCD_BLACK);
 #endif
-    rb->show_logo();
+#ifdef HAVE_REMOTE_LCD
+#if (LCD_REMOTE_DEPTH > 1)
+    rb->lcd_remote_set_foreground (LCD_WHITE);
+    rb->lcd_remote_set_background (LCD_BLACK);
+#endif
+#endif
+    show_logo();
 
-    /* Show the logo for about 3 secs allowing the user to stop */
-    if(!rb->action_userabort(3*HZ))
+    /* Show the logo for about 5 secs allowing the user to stop */
+    if(!rb->action_userabort(5*HZ))
+    {
+        rb->lcd_scroll_stop();
         roll_credits();
+    }
 
+#ifdef HAVE_REMOTE_LCD
+        rb->lcd_remote_scroll_stop();
+#endif
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();

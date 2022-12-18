@@ -51,7 +51,7 @@
 #include "disk.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
-
+static int show_info(void);
 /***********************************/
 /*    MANAGE SETTINGS MENU        */
 
@@ -113,18 +113,10 @@ MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
 /***********************************/
 /*      INFO MENU                  */
 
-
 static int show_credits(void)
 {
-    char credits[MAX_PATH] = { '\0' };
-    snprintf(credits, MAX_PATH, "%s/credits.rock", VIEWERS_DIR);
-    if (plugin_load(credits, NULL) != PLUGIN_OK)
-    {
-        /* show the rockbox logo and version untill a button is pressed */
-        show_logo();
-        while (IS_SYSEVENT(get_action(CONTEXT_STD, TIMEOUT_BLOCK)))
-            ;
-    }
+    if (plugin_load(VIEWERS_DIR "/credits.rock", NULL) != PLUGIN_OK)
+        show_info();
     return 0;
 }
 
