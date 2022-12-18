@@ -91,8 +91,15 @@ static const int BACKGROUND_Y = (BASE_Y-MIN_SPACE);
 #define KEY_DOWN PLA_DOWN
 #define KEY_LEFT PLA_LEFT
 #define KEY_RIGHT PLA_RIGHT
-#define KEY_EXIT PLA_CANCEL
 #define KEY_UNDO PLA_SELECT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define KEY_EXIT PLA_SELECT_REPEAT
+#else
+#define KEY_EXIT PLA_CANCEL
+#endif
 
 /* notice how "color" is spelled :P */
 #ifdef HAVE_LCD_COLOR

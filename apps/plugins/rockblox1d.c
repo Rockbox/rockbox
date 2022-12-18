@@ -28,7 +28,14 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #define ONEDROCKBLOX_DOWN              PLA_DOWN
 #define ONEDROCKBLOX_DOWN_REPEAT       PLA_DOWN_REPEAT
 #define ONEDROCKBLOX_QUIT              PLA_EXIT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define ONEDROCKBLOX_QUIT2             PLA_UP
+#else
 #define ONEDROCKBLOX_QUIT2             PLA_CANCEL
+#endif
 
 #define mrand(max) (short)(rb->rand()%max)
 

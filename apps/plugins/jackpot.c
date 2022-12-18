@@ -25,6 +25,13 @@
 #include "lib/pluginlib_exit.h"
 
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define JACKPOT_QUIT PLA_UP
+#else
+#define JACKPOT_QUIT PLA_CANCEL
+#endif
 
 const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 #define NB_PICTURES 9
@@ -248,7 +255,7 @@ enum plugin_status plugin_start(const void* parameter)
                                 plugin_contexts, ARRAYLEN(plugin_contexts));
         switch ( action )
         {
-            case PLA_CANCEL:
+            case JACKPOT_QUIT:
                 return PLUGIN_OK;
             case PLA_SELECT:
                 jackpot_play_turn(&game);

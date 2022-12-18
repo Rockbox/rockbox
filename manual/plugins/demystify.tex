@@ -9,11 +9,13 @@ Demystify is a screen saver like demo.\\
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCLeft{} / \PluginRCRight}
     & Increase / decrease speed\\
 
-    \PluginUp{} / \PluginDown
+    \nopt{scrollwheel}{\PluginUp{} / \PluginDown}
+    \opt{scrollwheel}{\PluginLeft{} / \PluginRight}
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp{} / \PluginRCDown}
     & Add / remove polygon\\
 
-    \PluginCancel
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp}
         \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
     & Quit\\
 \end{btnmap}

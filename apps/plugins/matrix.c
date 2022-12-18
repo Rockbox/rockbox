@@ -52,6 +52,14 @@
 /* this set the context to use with PLA */
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define MATRIX_EXIT2               PLA_UP
+#else
+#define MATRIX_EXIT2               PLA_CANCEL
+#endif
+
 #ifdef HAVE_SCROLLWHEEL
 #define MATRIX_SLEEP_MORE          PLA_SCROLL_BACK
 #define MATRIX_SLEEP_MORE_REPEAT   PLA_SCROLL_BACK_REPEAT
@@ -65,7 +73,6 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #endif /* HAVE_SCROLLWHEEL */
 #define MATRIX_PAUSE               PLA_SELECT
 #define MATRIX_EXIT                PLA_EXIT
-#define MATRIX_EXIT2               PLA_CANCEL
 
 #define SLEEP HZ/50
 

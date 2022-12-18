@@ -52,12 +52,14 @@
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define CUBE_QUIT          (BUTTON_SELECT | BUTTON_MENU)
+#define CUBE_QUIT_PRE      BUTTON_MENU
+#define CUBE_QUIT          (BUTTON_MENU | BUTTON_REL)
 #define CUBE_NEXT          BUTTON_RIGHT
 #define CUBE_PREV          BUTTON_LEFT
 #define CUBE_INC           BUTTON_SCROLL_FWD
 #define CUBE_DEC           BUTTON_SCROLL_BACK
-#define CUBE_MODE          BUTTON_MENU
+#define CUBE_MODE_PRE      BUTTON_MENU
+#define CUBE_MODE          (BUTTON_MENU | BUTTON_REPEAT)
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED_PRE BUTTON_SELECT
 #define CUBE_HIGHSPEED     (BUTTON_SELECT | BUTTON_REL)
@@ -729,6 +731,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     int button;
 #if defined(CUBE_MODE_PRE) || \
+    defined(CUBE_QUIT_PRE) || \
     defined(CUBE_PAUSE_PRE) || \
     defined(CUBE_HIGHSPEED_PRE)
     int lastbutton = BUTTON_NONE;
@@ -903,6 +906,10 @@ enum plugin_status plugin_start(const void* parameter)
             case CUBE_RC_QUIT:
 #endif
             case CUBE_QUIT:
+#ifdef CUBE_QUIT_PRE
+                if (lastbutton != CUBE_QUIT_PRE)
+                    break;
+#endif
                 quit = true;
                 break;
 
@@ -911,6 +918,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
         }
 #if defined(CUBE_MODE_PRE) || \
+    defined(CUBE_QUIT_PRE) || \
     defined(CUBE_PAUSE_PRE) || \
     defined(CUBE_HIGHSPEED_PRE)
         if (button != BUTTON_NONE)

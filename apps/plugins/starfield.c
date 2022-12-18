@@ -27,11 +27,21 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 /* Key assignement */
 #define STARFIELD_QUIT                        PLA_EXIT
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define STARFIELD_QUIT2                       PLA_UP
+#define STARFIELD_INCREASE_ZMOVE              PLA_SCROLL_FWD
+#define STARFIELD_INCREASE_ZMOVE_REPEAT       PLA_SCROLL_FWD_REPEAT
+#define STARFIELD_DECREASE_ZMOVE              PLA_SCROLL_BACK
+#define STARFIELD_DECREASE_ZMOVE_REPEAT       PLA_SCROLL_BACK_REPEAT
+#else
 #define STARFIELD_QUIT2                       PLA_CANCEL
 #define STARFIELD_INCREASE_ZMOVE              PLA_UP
 #define STARFIELD_INCREASE_ZMOVE_REPEAT       PLA_UP_REPEAT
 #define STARFIELD_DECREASE_ZMOVE              PLA_DOWN
 #define STARFIELD_DECREASE_ZMOVE_REPEAT       PLA_DOWN_REPEAT
+#endif
 #define STARFIELD_INCREASE_NB_STARS           PLA_RIGHT
 #define STARFIELD_INCREASE_NB_STARS_REPEAT    PLA_RIGHT_REPEAT
 #define STARFIELD_DECREASE_NB_STARS           PLA_LEFT

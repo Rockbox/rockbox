@@ -29,7 +29,15 @@ static bool cancel;
 
 /* we use PLA */
 #define STATS_STOP PLA_EXIT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define STATS_STOP2 PLA_UP
+#else
 #define STATS_STOP2 PLA_CANCEL
+#endif
+
 /* this set the context to use with PLA */
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
@@ -149,7 +157,7 @@ static void traversedir(char* location, char* name)
                 lasttick = *rb->current_tick;
                 button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
                                ARRAYLEN(plugin_contexts));
-                if (button == STATS_STOP) {
+                if (button == STATS_STOP || button == STATS_STOP2) {
                     cancel = true;
                     break;
                 }

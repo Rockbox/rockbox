@@ -39,14 +39,12 @@
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define CALENDAR_QUIT       (BUTTON_SELECT|BUTTON_MENU)
+#define CALENDAR_QUIT       (BUTTON_MENU|BUTTON_REL)
 #define CALENDAR_SELECT     (BUTTON_SELECT|BUTTON_REL)
 #define CALENDAR_NEXT_WEEK  BUTTON_SCROLL_FWD
 #define CALENDAR_PREV_WEEK  BUTTON_SCROLL_BACK
 #define CALENDAR_NEXT_DAY   BUTTON_RIGHT
 #define CALENDAR_PREV_DAY   BUTTON_LEFT
-#define CALENDAR_NEXT_MONTH BUTTON_PLAY
-#define CALENDAR_PREV_MONTH (BUTTON_MENU|BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define CALENDAR_QUIT       BUTTON_POWER
@@ -1095,17 +1093,18 @@ enum plugin_status plugin_start(const void* parameter)
             case CALENDAR_QUIT:
                 exit = true;
                 break;
-
+#ifdef CALENDAR_NEXT_MONTH
             case CALENDAR_NEXT_MONTH:
             case CALENDAR_NEXT_MONTH | BUTTON_REPEAT:
                 next_month(&shown, 0);
                 break;
-
+#endif
+#ifdef CALENDAR_PREV_MONTH
             case CALENDAR_PREV_MONTH:
             case CALENDAR_PREV_MONTH | BUTTON_REPEAT:
                 prev_month(&shown, 0);
                 break;
-
+#endif
             case CALENDAR_NEXT_WEEK:
             case CALENDAR_NEXT_WEEK | BUTTON_REPEAT:
                 next_day(&shown, 7);

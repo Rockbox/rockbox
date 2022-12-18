@@ -469,7 +469,13 @@ static char* messages[] =
 
 #define RFK_VERSION "v1.4142135.406"
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#   define RFK_QUIT     PLA_SELECT_REPEAT
+#else
 #   define RFK_QUIT     PLA_CANCEL
+#endif
 #   define RFK_RIGHT    PLA_RIGHT
 #   define RFK_LEFT     PLA_LEFT
 #   define RFK_UP       PLA_UP

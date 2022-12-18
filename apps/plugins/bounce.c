@@ -34,10 +34,6 @@
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 /* We set button maping with PLA */
-#define BOUNCE_UP             PLA_UP
-#define BOUNCE_UP_REPEAT      PLA_UP_REPEAT
-#define BOUNCE_DOWN           PLA_DOWN
-#define BOUNCE_DOWN_REPEAT    PLA_DOWN_REPEAT
 
 #ifdef HAVE_SCROLLWHEEL
 #define BOUNCE_LEFT           PLA_SCROLL_BACK
@@ -52,7 +48,22 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #endif
 
 #define BOUNCE_QUIT           PLA_EXIT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define BOUNCE_QUIT2          PLA_UP
+#define BOUNCE_DOWN           PLA_LEFT
+#define BOUNCE_DOWN_REPEAT    PLA_LEFT_REPEAT
+#define BOUNCE_UP             PLA_RIGHT
+#define BOUNCE_UP_REPEAT      PLA_RIGHT_REPEAT
+#else
 #define BOUNCE_QUIT2          PLA_CANCEL
+#define BOUNCE_DOWN           PLA_DOWN
+#define BOUNCE_DOWN_REPEAT    PLA_DOWN_REPEAT
+#define BOUNCE_UP             PLA_UP
+#define BOUNCE_UP_REPEAT      PLA_UP_REPEAT
+#endif
 #define BOUNCE_MODE           PLA_SELECT
 
 #define LETTER_WIDTH  11
@@ -471,6 +482,10 @@ enum plugin_status plugin_start(const void* parameter)
 #if (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD) || \
     (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
         "[Rew] to stop";
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+        "[Menu] to stop";
 #else
         "[Off] to stop";
 #endif

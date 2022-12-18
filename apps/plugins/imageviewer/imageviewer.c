@@ -353,7 +353,7 @@ static int show_menu(void) /* return 1 to quit */
 static int ask_and_get_audio_buffer(const char *filename)
 {
     int button;
-#if defined(IMGVIEW_ZOOM_PRE)
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_QUIT_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -392,6 +392,10 @@ static int ask_and_get_audio_buffer(const char *filename)
 #endif
 #ifdef IMGVIEW_QUIT
             case IMGVIEW_QUIT:
+#ifdef IMGVIEW_QUIT_PRE
+            if (lastbutton != IMGVIEW_QUIT_PRE)
+                break;
+#endif
 #endif
             case IMGVIEW_MENU:
                 return PLUGIN_OK;
@@ -424,7 +428,7 @@ static int ask_and_get_audio_buffer(const char *filename)
                         == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
-#if defined(IMGVIEW_ZOOM_PRE)
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_QUIT_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
 #endif
@@ -572,14 +576,19 @@ static void pan_view_down(struct image_info *info)
 }
 
 /* interactively scroll around the image */
-static int scroll_bmp(struct image_info *info)
+static int scroll_bmp(struct image_info *info, bool initial_frame)
 {
     static long ss_timeout = 0;
 
     int button;
 #if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE) \
-    || defined(IMGVIEW_SLIDE_SHOW_PRE)
-    int lastbutton = BUTTON_NONE;
+    || defined(IMGVIEW_SLIDE_SHOW_PRE) || defined(IMGVIEW_QUIT_PRE)
+    static int lastbutton;
+    if (initial_frame)
+        lastbutton = BUTTON_NONE;
+
+#else
+    (void) initial_frame;
 #endif
 
     if (!ss_timeout && iv_api.slideshow_enabled)
@@ -745,6 +754,10 @@ static int scroll_bmp(struct image_info *info)
 
 #ifdef IMGVIEW_QUIT
             case IMGVIEW_QUIT:
+#ifdef IMGVIEW_QUIT_PRE
+            if (lastbutton != IMGVIEW_QUIT_PRE)
+                break;
+#endif
             return PLUGIN_OK;
             break;
 #endif
@@ -756,7 +769,8 @@ static int scroll_bmp(struct image_info *info)
             break;
 
         } /* switch */
-#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE) || defined(IMGVIEW_SLIDE_SHOW_PRE)
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE) ||\
+    defined(IMGVIEW_SLIDE_SHOW_PRE) || defined(IMGVIEW_QUIT_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
 #endif
@@ -922,6 +936,7 @@ static int load_and_show(char* filename, struct image_info *info)
 
     /* used to loop through subimages in animated gifs */
     int frame = 0;
+    bool initial_frame = true;
     do  /* loop the image prepare and decoding when zoomed */
     {
         status = imgdec->get_image(info, frame, ds); /* decode or fetch from cache */
@@ -954,7 +969,8 @@ static int load_and_show(char* filename, struct image_info *info)
          */
         while (1)
         {
-            status = scroll_bmp(info);
+            status = scroll_bmp(info, initial_frame);
+            initial_frame = false;
 
             if (status == ZOOM_IN)
             {

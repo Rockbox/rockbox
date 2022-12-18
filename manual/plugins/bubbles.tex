@@ -10,7 +10,8 @@ fired. Points are awarded depending on how quickly the level was completed.
 
     \begin{btnmap}
     \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\PluginSelect}
-    \nopt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\PluginUp}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay}
+    \nopt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp}
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp}
         & Pause game\\
 
@@ -24,7 +25,8 @@ fired. Points are awarded depending on how quickly the level was completed.
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelect}
         & Fire bubble\\
 
-    \PluginCancel{} or \PluginExit
+    \nopt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel{} or \PluginExit}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
         & Exit to menu\\
     \end{btnmap}

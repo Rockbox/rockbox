@@ -1013,6 +1013,11 @@ static void record_and_get_pitch(void)
                     break;
 
                 case PLA_CANCEL:
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+                case PLA_UP:
+#endif
                     rb->pcm_stop_recording();
                     quit = main_menu();
                     if(!quit)

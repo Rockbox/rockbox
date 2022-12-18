@@ -44,13 +44,19 @@ const struct button_mapping* plugin_contexts[]={
 
 #define ACTION_COUNTER_TOGGLE           PLA_SELECT
 #define ACTION_COUNTER_RESET            PLA_SELECT_REPEAT
-#define ACTION_MENU                     PLA_CANCEL
 #define ACTION_MODE_NEXT                PLA_RIGHT
 #define ACTION_MODE_NEXT_REPEAT         PLA_RIGHT_REPEAT
 #define ACTION_MODE_PREV                PLA_LEFT
 #define ACTION_MODE_PREV_REPEAT         PLA_LEFT_REPEAT
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define ACTION_MENU                     PLA_UP
+#else
+#define ACTION_MENU                     PLA_CANCEL
 #define ACTION_SKIN_NEXT                PLA_UP
 #define ACTION_SKIN_NEXT_REPEAT         PLA_UP_REPEAT
+#endif
 #define ACTION_SKIN_PREV                PLA_DOWN
 #define ACTION_SKIN_PREV_REPEAT         PLA_DOWN_REPEAT
 
@@ -165,10 +171,12 @@ enum plugin_status plugin_start(const void* parameter){
             case ACTION_SKIN_PREV:
                 clock_settings_skin_next(&clock_settings);
                 break;
+#if defined(ACTION_SKIN_NEXT) && defined(ACTION_SKIN_NEXT_REPEAT)
             case ACTION_SKIN_NEXT_REPEAT:
             case ACTION_SKIN_NEXT:
                 clock_settings_skin_previous(&clock_settings);
                 break;
+#endif
             case ACTION_MENU:
                 clock_draw_restore_colors();
                 exit_clock=main_menu();

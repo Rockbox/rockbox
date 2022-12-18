@@ -49,7 +49,7 @@
 #define FLIPIT_DOWN         BUTTON_PLAY
 #define FLIPIT_NEXT         BUTTON_SCROLL_FWD
 #define FLIPIT_PREV         BUTTON_SCROLL_BACK
-#define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
+#define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_REPEAT)
 #define FLIPIT_SHUFFLE      (BUTTON_SELECT | BUTTON_LEFT)
 #define FLIPIT_SOLVE        (BUTTON_SELECT | BUTTON_PLAY)
 #define FLIPIT_STEP_BY_STEP (BUTTON_SELECT | BUTTON_RIGHT)
@@ -841,7 +841,7 @@ enum plugin_status plugin_start(const void* parameter)
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-    rb->lcd_putsxy(2, 8, "[S-MENU] to stop");
+    rb->lcd_putsxy(2, 8, "Long [SELECT] to stop");
     rb->lcd_putsxy(2, 18, "[SELECT] toggle");
     rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[S-PLAY] solution");

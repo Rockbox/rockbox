@@ -8,7 +8,8 @@ Starfield simulation (like the classic screensaver).
   \opt{HAVEREMOTEKEYMAP}{& }
     & Increase / decrease number of stars\\
     
-    \PluginUp{} / \PluginDown
+  \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp{} / \PluginDown}
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Increase / decrease speed\\
     \opt{lcd_color}{%
@@ -16,7 +17,8 @@ Starfield simulation (like the classic screensaver).
        \opt{HAVEREMOTEKEYMAP}{& }
         & Change colours\\%
     }%
-    \PluginCancel{} or \PluginExit
+  \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel{} or \PluginExit}
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
   \opt{HAVEREMOTEKEYMAP}{& }
     & Quit\\
 \end{btnmap}

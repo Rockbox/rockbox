@@ -40,13 +40,22 @@ GREY_INFO_STRUCT
 
 /* this set the context to use with PLA */
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
-#define FFT_PREV_GRAPH   PLA_LEFT
-#define FFT_NEXT_GRAPH   PLA_RIGHT
-#define FFT_ORIENTATION  PLA_CANCEL
-#define FFT_WINDOW       PLA_SELECT
-#define FFT_AMP_SCALE    PLA_UP
-#define FFT_FREQ_SCALE   PLA_DOWN
-#define FFT_QUIT         PLA_EXIT
+#define FFT_PREV_GRAPH      PLA_LEFT
+#define FFT_NEXT_GRAPH      PLA_RIGHT
+#define FFT_ORIENTATION     PLA_CANCEL
+#define FFT_WINDOW          PLA_SELECT_REL
+#define FFT_AMP_SCALE       PLA_SELECT_REPEAT
+#define FFT_AMP_SCALE_PRE   PLA_SELECT
+#define FFT_FREQ_SCALE      PLA_DOWN
+
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define FFT_QUIT            PLA_UP
+#else
+#define FFT_QUIT            PLA_EXIT
+#endif
 
 #ifdef HAVE_LCD_COLOR
 #include "pluginbitmaps/fft_colors.h"
@@ -1257,6 +1266,10 @@ enum plugin_status plugin_start(const void* parameter)
     if(!fft_setup())
         return PLUGIN_ERROR;
 
+#if defined(FFT_AMP_SCALE_PRE)
+    int lastbutton = BUTTON_NONE;
+#endif
+
     while(run)
     {
         long delay = fft_draw();
@@ -1300,6 +1313,10 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
             case FFT_AMP_SCALE:
+#ifdef FFT_AMP_SCALE_PRE
+                if (lastbutton != FFT_AMP_SCALE_PRE)
+                    break;
+#endif
                 if (++fft.amp_scale >= FFT_MAX_AS)
                     fft.amp_scale = FFT_MIN_AS;
 
@@ -1328,6 +1345,11 @@ enum plugin_status plugin_start(const void* parameter)
                 exit_on_usb(button);
                 break;
         }
+
+#if defined(FFT_AMP_SCALE_PRE)
+        if (button != BUTTON_NONE)
+            lastbutton = button;
+#endif
     }
 
     return PLUGIN_OK;

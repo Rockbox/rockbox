@@ -4,7 +4,7 @@
 Plasma is a demo displaying a 80's style retro plasma effect.
 
       \begin{btnmap}
-          \PluginUp{} / \PluginDown
+          \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp{} / \PluginDown}
           \opt{scrollwheel}{/ \PluginScrollFwd{} / \PluginScrollBack}
               &
           \opt{HAVEREMOTEKEYMAP}{\PluginRCUp{} / \PluginRCDown
@@ -21,7 +21,8 @@ Plasma is a demo displaying a 80's style retro plasma effect.
                   \\
           }%
        
-          \PluginCancel{} / \PluginExit
+          \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel{} / \PluginExit}
+          \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
               &
           \opt{HAVEREMOTEKEYMAP}{\PluginRCCancel
               \opt{IAUDIO_RC_PAD}{ / \PluginRCExit}

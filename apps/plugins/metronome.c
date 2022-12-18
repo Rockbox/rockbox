@@ -82,7 +82,13 @@ enum metronome_errors
 #define MET_SYNC
 #endif
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define METRONOME_QUIT          PLA_UP
+#else
 #define METRONOME_QUIT          PLA_EXIT
+#endif
 
 #ifdef HAVE_SCROLLWHEEL
 #define METRONOME_VOL_UP        PLA_SCROLL_FWD

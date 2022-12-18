@@ -438,6 +438,13 @@ enum plugin_status plugin_start(const void* parameter) {
                 if (button == PLA_SELECT)
                     break;
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+                if (button == PLA_UP) /* Menu button */
+                    button = PLA_CANCEL;
+#endif
+
                 switch (button) {
 
                     /* Exit */

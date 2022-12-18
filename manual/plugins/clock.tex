@@ -10,11 +10,13 @@ This is a fully featured analogue and digital clock plugin.
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCLeft{} / \PluginRCRight}
     & Cycle through modes \\
 
-    \PluginUp{} / \PluginDown
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp{} / \PluginDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginDown}
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp{} / \PluginRCDown}
     & Cycle through skins \\
 
-    \PluginCancel
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
     & Main Menu \\
 

@@ -268,6 +268,11 @@ int main(void)
 
         switch(action)
         {
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+            case PLA_UP:
+#endif
             case PLA_EXIT:
             case PLA_CANCEL:
                 return PLUGIN_OK;
@@ -277,7 +282,11 @@ int main(void)
             case PLA_SCROLL_FWD:
             case PLA_SCROLL_FWD_REPEAT:
 #endif
+#if (CONFIG_KEYPAD != IPOD_1G2G_PAD) \
+    && (CONFIG_KEYPAD != IPOD_3G_PAD) \
+    && (CONFIG_KEYPAD != IPOD_4G_PAD)
             case PLA_UP:
+#endif
             case PLA_UP_REPEAT:
                 ++plasma_frequency;
                 wave_table_generate();

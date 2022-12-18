@@ -79,7 +79,6 @@ enum {
 #define ANGLE_STEP_REP      6
 
 #define BUBBLES_QUIT1       PLA_EXIT
-#define BUBBLES_QUIT2       PLA_CANCEL
 
 /* these are better off shooting with up */
 #if (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
@@ -92,10 +91,19 @@ enum {
 #define BUBBLES_FIRE        PLA_UP
 #define BUBBLES_FIRE_REPEAT PLA_UP_REPEAT
 #define BUBBLES_PAUSE       PLA_SELECT
+#define BUBBLES_QUIT2       PLA_CANCEL
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define BUBBLES_FIRE        PLA_SELECT
+#define BUBBLES_FIRE_REPEAT PLA_SELECT_REPEAT
+#define BUBBLES_PAUSE       PLA_DOWN
+#define BUBBLES_QUIT2       PLA_UP
 #else
 #define BUBBLES_FIRE        PLA_SELECT
 #define BUBBLES_FIRE_REPEAT PLA_SELECT_REPEAT
 #define BUBBLES_PAUSE       PLA_UP
+#define BUBBLES_QUIT2       PLA_CANCEL
 #endif
 
 /* external bitmaps */

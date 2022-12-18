@@ -66,9 +66,7 @@
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define CLIX_BUTTON_QUIT        (BUTTON_SELECT | BUTTON_MENU)
-#define CLIX_BUTTON_UP          BUTTON_MENU
-#define CLIX_BUTTON_DOWN        BUTTON_PLAY
+#define CLIX_BUTTON_QUIT        BUTTON_MENU
 #define CLIX_BUTTON_SCROLL_FWD  BUTTON_SCROLL_FWD
 #define CLIX_BUTTON_SCROLL_BACK BUTTON_SCROLL_BACK
 #define CLIX_BUTTON_CLICK       BUTTON_SELECT
@@ -921,8 +919,10 @@ static int clix_handle_game(struct clix_game_state_t* state)
                 case CLIX_BUTTON_SCROLL_BACK:
                 case CLIX_BUTTON_SCROLL_BACK|BUTTON_REPEAT:
 #endif
+#ifdef CLIX_BUTTON_UP
                 case CLIX_BUTTON_UP:
                 case CLIX_BUTTON_UP|BUTTON_REPEAT:
+#endif
                     if( state->y == 0 ||
                         state->board[ XYPOS( state->x, state->y - 1)] ==
                             CC_BLACK
@@ -938,8 +938,10 @@ static int clix_handle_game(struct clix_game_state_t* state)
                 case CLIX_BUTTON_SCROLL_FWD:
                 case CLIX_BUTTON_SCROLL_FWD|BUTTON_REPEAT:
 #endif
+#ifdef CLIX_BUTTON_DOWN
                 case CLIX_BUTTON_DOWN:
                 case CLIX_BUTTON_DOWN|BUTTON_REPEAT:
+#endif
                     if( state->y == (BOARD_HEIGHT - 1))
                         state->y = 0;
                     else

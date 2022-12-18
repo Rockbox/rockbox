@@ -37,9 +37,16 @@
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 #define MOSAIQUE_QUIT        PLA_EXIT
-#define MOSAIQUE_QUIT2       PLA_CANCEL
-#define MOSAIQUE_SPEED       PLA_UP
+#define MOSAIQUE_SPEED       PLA_RIGHT
 #define MOSAIQUE_RESTART     PLA_SELECT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define MOSAIQUE_QUIT2             PLA_UP
+#else
+#define MOSAIQUE_QUIT2             PLA_CANCEL
+#endif
 
 enum plugin_status plugin_start(const void* parameter)
 {

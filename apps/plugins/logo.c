@@ -49,15 +49,27 @@ static const struct button_mapping *plugin_contexts[]
 
 /* We use PLA */
 #define LP_QUIT              PLA_EXIT
-#define LP_QUIT2             PLA_CANCEL
 #define LP_DEC_X             PLA_LEFT
 #define LP_DEC_X_REPEAT      PLA_LEFT_REPEAT
 #define LP_INC_X             PLA_RIGHT
 #define LP_INC_X_REPEAT      PLA_RIGHT_REPEAT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define LP_QUIT2             PLA_UP
+#define LP_DEC_Y             PLA_SCROLL_BACK
+#define LP_DEC_Y_REPEAT      PLA_SCROLL_BACK_REPEAT
+#define LP_INC_Y             PLA_SCROLL_FWD
+#define LP_INC_Y_REPEAT      PLA_SCROLL_FWD_REPEAT
+#else
+#define LP_QUIT2             PLA_CANCEL
 #define LP_DEC_Y             PLA_DOWN
 #define LP_DEC_Y_REPEAT      PLA_DOWN_REPEAT
 #define LP_INC_Y             PLA_UP
 #define LP_INC_Y_REPEAT      PLA_UP_REPEAT
+#endif
+
 
 enum plugin_status plugin_start(const void* parameter) {
     int button;

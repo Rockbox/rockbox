@@ -36,7 +36,7 @@
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define PUZZLE_QUIT    (BUTTON_SELECT | BUTTON_MENU)
+#define PUZZLE_QUIT    (BUTTON_SELECT | BUTTON_REPEAT)
 #define PUZZLE_LEFT BUTTON_LEFT
 #define PUZZLE_RIGHT BUTTON_RIGHT
 #define PUZZLE_UP      BUTTON_MENU
@@ -848,7 +848,7 @@ enum plugin_status plugin_start(
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-        rb->lcd_putsxy(0, 18, "[S-MENU] to stop");
+        rb->lcd_putsxy(0, 18, "Long [SELECT] to stop");
         rb->lcd_putsxy(0, 28, "[S-LEFT] shuffle");
         rb->lcd_putsxy(0, 38, "[S-RIGHT] change pic");
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \

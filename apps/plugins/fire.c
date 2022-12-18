@@ -56,9 +56,16 @@ const struct button_mapping* plugin_contexts[]= {
 };
 
 #define FIRE_QUIT                   PLA_CANCEL
-#define FIRE_QUIT2                  PLA_EXIT
 #define FIRE_SWITCH_FLAMES_TYPE     PLA_LEFT
 #define FIRE_SWITCH_FLAMES_MOVING   PLA_RIGHT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define FIRE_QUIT2                  PLA_UP
+#else
+#define FIRE_QUIT2                  PLA_EXIT
+#endif
 
 #ifdef HAVE_SCROLLWHEEL
 #define FIRE_INCREASE_MULT          PLA_SCROLL_FWD

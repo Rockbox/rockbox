@@ -28,7 +28,14 @@
 #define INITIAL_NB_DICES 1
 #define INITIAL_NB_SIDES 2 /* corresponds to 6 sides in the array */
 
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define DICE_QUIT PLA_UP
+#else
 #define DICE_QUIT PLA_CANCEL
+#endif
 #define DICE_ROLL PLA_SELECT
 
 

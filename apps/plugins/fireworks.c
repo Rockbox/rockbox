@@ -35,9 +35,16 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 /* We use PLA */
 #define BTN_EXIT           PLA_EXIT
-#define BTN_MENU           PLA_CANCEL
 #define BTN_FIRE           PLA_SELECT
 #define BTN_FIRE_REPEAT    PLA_SELECT_REPEAT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define BTN_MENU           PLA_UP
+#else
+#define BTN_MENU           PLA_CANCEL
+#endif
 
 /* The lowdown on source terminology:
  * a ROCKET is launched from the LCD bottom.

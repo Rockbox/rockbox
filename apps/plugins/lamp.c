@@ -58,7 +58,14 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 
 #define LAMP_EXIT        PLA_EXIT
+
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define LAMP_EXIT2       PLA_UP
+#else
 #define LAMP_EXIT2       PLA_CANCEL
+#endif
 
 
 #ifdef HAVE_LCD_COLOR

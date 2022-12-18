@@ -40,7 +40,7 @@
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define FRACTAL_QUIT            (BUTTON_SELECT | BUTTON_MENU)
+#define FRACTAL_QUIT            (BUTTON_SELECT | BUTTON_REPEAT)
 #define FRACTAL_UP              BUTTON_MENU
 #define FRACTAL_DOWN            BUTTON_PLAY
 #define FRACTAL_LEFT            BUTTON_LEFT

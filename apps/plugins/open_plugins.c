@@ -904,6 +904,7 @@ reopen_datfile:
                     }
                     break;
                 case ACTION_STD_CANCEL:
+                case ACTION_STD_MENU:
                 {
                     selection = -2;
                     exit = true;

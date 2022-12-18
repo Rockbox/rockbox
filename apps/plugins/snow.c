@@ -30,8 +30,14 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 /* PLA definitions */
 #define SNOW_QUIT    PLA_EXIT
-#define SNOW_QUIT2   PLA_CANCEL
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define SNOW_QUIT2   PLA_UP
+#else
+#define SNOW_QUIT2   PLA_CANCEL
+#endif
 static short particles[NUM_PARTICLES][2];
 
 #if LCD_WIDTH >= 160

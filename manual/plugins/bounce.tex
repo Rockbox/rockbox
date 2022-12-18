@@ -6,7 +6,8 @@ In \setting{Scroll mode} the bouncing text is replaced by a different one
 scrolling from right to left.
 
 \begin{btnmap}
-    \PluginUp / \PluginDown
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp{} / \PluginDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginLeft{} / \PluginRight}
         \opt{HAVEREMOTEKEYMAP}{& }
     & Moves to next/previous option\\
     \nopt{scrollwheel} {
@@ -20,7 +21,8 @@ scrolling from right to left.
     \PluginSelect
        \opt{HAVEREMOTEKEYMAP}{& }
     & Toggles Scroll mode\\
-    \PluginCancel{} or \PluginExit
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel{} or \PluginExit}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginUp}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Exits bounce demo\\
 \end{btnmap}
