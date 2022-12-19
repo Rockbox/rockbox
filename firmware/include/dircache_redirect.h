@@ -150,7 +150,13 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
         /* we need to mount the drive before we can access it */
         root_mount_path(path, 0); /* root could be different folder don't hide */
 
+/*BUGFIX bootloader is less selective about which drives it will mount -- revisit */
+#if defined(HAVE_MULTIDRIVE) && (NUM_VOLUMES_PER_DRIVE == 1)
+        if (volume_drive(volume) == boot_data.boot_volume
+            || volume == boot_data.boot_volume)
+#else
         if (volume == boot_data.boot_volume) /* boot volume contained in uint8_t payload */
+#endif
         {
             int rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
             while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
