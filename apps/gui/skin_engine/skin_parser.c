@@ -1908,77 +1908,60 @@ static int buflib_move_callback(int handle, void* current, void* new)
 
     return BUFLIB_CB_OK;
 }
-static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 #endif
 
 static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
 {
+    static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
     (void)wps_data; /* only needed for remote targets */
     char img_path[MAX_PATH];
-    int fd;
-    int handle;
+
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
 
-    /* load the image */
-    int format;
-#ifdef HAVE_REMOTE_LCD
-    if (curr_screen == SCREEN_REMOTE)
-        format = FORMAT_ANY|FORMAT_REMOTE;
-    else
-#endif
-        format = FORMAT_ANY|FORMAT_TRANSPARENT;
-
-    fd = open(img_path, O_RDONLY);
+#ifdef __PCTOOL__ /* just check if image exists */
+    int fd = open(img_path, O_RDONLY);
     if (fd < 0)
     {
         DEBUGF("Couldn't open %s\n", img_path);
         return fd;
     }
-#ifndef __PCTOOL__
-    int buf_size = read_bmp_fd(fd, bitmap, 0,
-                               format|FORMAT_RETURN_SIZE, NULL);
-    if(buf_size < 0)
+    close(fd);
+    return 1;
+#else /* load the image */
+    int handle;
+    int bmpformat;
+    ssize_t buf_reqd;
+#ifdef HAVE_REMOTE_LCD
+    if (curr_screen == SCREEN_REMOTE)
+        bmpformat = FORMAT_ANY|FORMAT_REMOTE;
+    else
+#endif
+        bmpformat = FORMAT_ANY|FORMAT_TRANSPARENT;
+
+    handle = core_load_bmp(img_path, bitmap, bmpformat, &buf_reqd, &buflib_ops);
+    if (handle != CLB_ALOC_ERR)
     {
-        close(fd);
-        return buf_size;
+        /* NOTE!: bitmap->data == NULL to force a crash later if the
+           caller doesnt call core_get_data() */
+        _stats->buflib_handles++;
+        _stats->images_size += buf_reqd;
+        return handle;
     }
 
-    handle = core_alloc_ex(bitmap->data, buf_size, &buflib_ops);
-    if (handle <= 0)
+    if (buf_reqd == CLB_READ_ERR)
     {
-        DEBUGF("Not enough skin buffer: need %zd more.\n",
-                buf_size - skin_buffer_freespace());
-        close(fd);
-        return handle;
-    }
-    _stats->buflib_handles++;
-    _stats->images_size += buf_size;
-    lseek(fd, 0, SEEK_SET);
-    core_pin(handle);
-    bitmap->data = core_get_data(handle);
-    int ret = read_bmp_fd(fd, bitmap, buf_size, format, NULL);
-    bitmap->data = NULL; /* do this to force a crash later if the
-                            caller doesnt call core_get_data() */
-    core_unpin(handle);
-    close(fd);
-    if (ret > 0)
-    {
-        /* free unused alpha channel, if any */
-        core_shrink(handle, core_get_data(handle), ret);
-        return handle;
+        /* Abort if we can't load an image */
+        DEBUGF("Couldn't load '%s' (%ld)\n", img_path, buf_reqd);
     }
     else
     {
-        /* Abort if we can't load an image */
-        DEBUGF("Couldn't load '%s'\n", img_path);
-        core_free(handle);
-        return -1;
+        DEBUGF("Not enough skin buffer: need %zd more.\n",
+                buf_reqd - skin_buffer_freespace());
     }
-#else /* !__PCTOOL__ */
-    close(fd);
-    return 1;
-#endif
+
+    return -1;
+#endif/* !__PCTOOL__ */
 }
 
 static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)

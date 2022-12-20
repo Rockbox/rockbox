@@ -167,57 +167,27 @@ static int buflib_move_callback(int handle, void* current, void* new)
     }
     return BUFLIB_CB_OK;
 }
-static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 
 static void load_icons(const char* filename, enum Iconset iconset,
                         enum screen_type screen)
 {
-    ssize_t size_read;
-    ssize_t buf_size;
-    int fd;
-    int bmpformat = (FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT);
+    static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
+    const int bmpformat = (FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT);
     struct iconset *ic = &iconsets[iconset][screen];
+    ssize_t buf_reqd;
 
     ic->loaded = false;
-    ic->handle = 0;
+    ic->handle = CLB_ALOC_ERR;
     if (filename[0] && filename[0] != '-')
     {
         char fname[MAX_PATH];
-        fd = open_pathfmt(fname, sizeof(fname), O_RDONLY,
-                          ICON_DIR "/%s.bmp", filename);
-        if (fd < 0)
-            return;
-        buf_size = read_bmp_fd(fd, &ic->bmp, 0,
-                                        bmpformat|FORMAT_RETURN_SIZE, NULL);
-        if (buf_size > 0)
-            ic->handle = core_alloc_ex(filename, (size_t) buf_size, &buflib_ops);
-
-        if (ic->handle <= 0)
+        snprintf(fname, sizeof(fname), ICON_DIR "/%s.bmp", filename);
+        ic->handle = core_load_bmp(fname, &ic->bmp, bmpformat, &buf_reqd, &buflib_ops);
+        if (ic->handle != CLB_ALOC_ERR)
         {
-            /* error */
-            goto finished;
-        }
-        lseek(fd, 0, SEEK_SET);
-        core_pin(ic->handle);
-        ic->bmp.data = core_get_data(ic->handle);
-        size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
-        core_unpin(ic->handle);
-
-        if (size_read < 0)
-        {
-            /* error */
-            size_read = 0;
-        }
-        /* free unused alpha channel, if any */
-        core_shrink(ic->handle, ic->bmp.data, size_read);
-
-        if (size_read == 0)
-            ic->handle = core_free(ic->handle);
-        else
+            ic->bmp.data = core_get_data(ic->handle);
             ic->loaded = true;
-finished:
-        close(fd);
-        return;
+        }
     }
 }
 

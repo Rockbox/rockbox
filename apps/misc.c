@@ -99,6 +99,10 @@
 #endif
 #endif
 
+#ifndef PLUGIN
+#include "core_alloc.h" /*core_load_bmp()*/
+#endif
+
 #ifdef HAVE_HARDWARE_CLICK
 #include "piezo.h"
 #endif
@@ -1572,4 +1576,67 @@ enum current_activity get_current_activity(void)
     return current_activity[current_activity_top?current_activity_top-1:0];
 }
 
-#endif
+/* core_load_bmp opens bitmp filename and allocates space for it
+*  you must set bm->data with the result from core_get_data(handle)
+*  you must also call core_free(handle) when finished with the bitmap
+*  returns handle, ALOC_ERR(0) on failure
+* ** Extended error info truth table **
+*  [ Handle ][buf_reqd]
+*  [  > 0   ][  > 0   ] buf_reqd indicates how many bytes were used
+*  [ALOC_ERR][  > 0   ] buf_reqd indicates how many bytes are needed 
+*  [ALOC_ERR][READ_ERR] there was an error reading the file or it is empty
+*/
+int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
+                  ssize_t *buf_reqd, struct buflib_callbacks *ops)
+{
+    ssize_t buf_size;
+    ssize_t size_read = 0;
+    int handle = CLB_ALOC_ERR;
+
+    int fd = open(filename, O_RDONLY);
+    *buf_reqd = CLB_READ_ERR;
+
+    if (fd < 0) /* Exit if file opening failed */
+    {
+        DEBUGF("read_bmp_file: can't open '%s', rc: %d\n", filename, fd);
+        return CLB_ALOC_ERR;
+    }
+
+    buf_size = read_bmp_fd(fd, bm, 0, bmformat|FORMAT_RETURN_SIZE, NULL);
+
+    if (buf_size > 0)
+    {
+        
+        handle = core_alloc_ex(filename, (size_t) buf_size, ops);
+
+        if (handle > 0)
+        {
+            core_pin(handle);
+            bm->data = core_get_data(handle);
+            lseek(fd, 0, SEEK_SET); /* reset to beginning of file */
+            size_read = read_bmp_fd(fd, bm, buf_size, bmformat, NULL);
+
+            if (size_read > 0) /* free unused alpha channel, if any */
+            {
+                core_shrink(handle, bm->data, size_read);
+                *buf_reqd = size_read;
+            }
+            bm->data = NULL; /* do this to force a crash later if the
+                                    caller doesnt call core_get_data() */
+            core_unpin(handle);
+        }
+        else
+            *buf_reqd = buf_size; /* couldn't allocate pass bytes needed */
+
+        if (size_read <= 0)
+        {
+            /* error reading file */
+            core_free(handle); /* core_free() ignores free handles (<= 0) */
+            handle = CLB_ALOC_ERR;
+        }
+    }
+
+    close(fd);
+    return handle;
+}
+#endif /* ndef __PCTOOL__ */

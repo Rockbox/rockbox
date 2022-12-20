@@ -222,4 +222,15 @@ enum current_activity get_current_activity(void);
 /* format a sound value like: -1.05 dB */
 int format_sound_value(char *buf, size_t len, int snd, int val);
 
+#ifndef PLUGIN
+enum core_load_bmp_error
+{
+    CLB_ALOC_ERR = 0,
+    CLB_READ_ERR = -1,
+};
+struct buflib_callbacks;
+int core_load_bmp(const char *filename, struct bitmap *bm, const int bmformat,
+                  ssize_t *buf_reqd, struct buflib_callbacks *ops);
+#endif
+
 #endif /* MISC_H */
