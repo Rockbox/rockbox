@@ -362,16 +362,11 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
-#if LCD_DEPTH > 1
+#if LCD_DEPTH >= 16
     rb->lcd_set_foreground (LCD_WHITE);
     rb->lcd_set_background (LCD_BLACK);
 #endif
-#ifdef HAVE_REMOTE_LCD
-#if (LCD_REMOTE_DEPTH > 1)
-    rb->lcd_remote_set_foreground (LCD_WHITE);
-    rb->lcd_remote_set_background (LCD_BLACK);
-#endif
-#endif
+
     show_logo();
 
     /* Show the logo for about 5 secs allowing the user to stop */
