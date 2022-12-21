@@ -1912,7 +1912,7 @@ static int buflib_move_callback(int handle, void* current, void* new)
 
 static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
 {
-    static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
+
     (void)wps_data; /* only needed for remote targets */
     char img_path[MAX_PATH];
 
@@ -1929,6 +1929,7 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
     close(fd);
     return 1;
 #else /* load the image */
+    static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
     int handle;
     int bmpformat;
     ssize_t buf_reqd;
