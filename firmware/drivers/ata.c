@@ -155,7 +155,8 @@ static inline bool ata_sleep_timed_out(void)
 static inline void schedule_ata_power_off(void)
 {
 #ifdef HAVE_ATA_POWER_OFF
-    power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
+    if (!ata_disk_can_poweroff())
+        power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
 #endif
 }
 
@@ -399,8 +400,8 @@ int ata_disk_isssd(void)
         However, this is a relatively recent change, and we can't rely on it,
         especially for the FC1307A CF->SD adapters!
 
-       Offset 167 is "Nominal Form Factor"
-        all values >= 0x06 are guaranteed to be solid State.
+       Offset 168 is "Nominal Form Factor"
+        all values >= 0x06 are guaranteed to be Solid State (mSATA, m.2, etc)
 
        Offset 83 b2 and/or 86 b2 is set to show device implementes CFA commands
 
@@ -412,6 +413,19 @@ int ata_disk_isssd(void)
             (identify_info[168] & 0x0f) >= 0x06 ||
             identify_info[169] & (1<<0) ||
             identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
+}
+
+int ata_disk_can_poweroff(void)
+{
+    /* Some SSDs don't like getting powered off, presumably because
+       in the real world they're not in removable form factors and
+       don't expect to have power removed.
+
+       In particular, mSATA, m.2, and MicroSSD are suspect.
+    */
+
+    return ((identify_info[168] & 0x0f) < 0x06 ||
+            (identify_info[168] & 0x0f) > 0x08);
 }
 
 static int ata_transfer_sectors(unsigned long start,

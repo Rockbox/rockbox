@@ -168,6 +168,9 @@ int ata_spinup_time(void); /* ticks */
 /* Returns 1 if drive is solid-state */
 int ata_disk_isssd(void);
 
+/* Returns 1 if the drive can be powered off safely */
+int ata_disk_can_poweroff(void);
+
 #ifdef HAVE_ATA_DMA
 /* Returns current DMA mode */
 int ata_get_dma_mode(void);
