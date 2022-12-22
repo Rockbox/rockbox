@@ -107,6 +107,7 @@
 struct volumeinfo
 {
     int drive;      /* drive number */
+    int partition;  /* partition number (0 for superfloppy drives) */
 };
 
 /* Volume-centric functions (in disk.c) */
@@ -130,5 +131,7 @@ static inline int volume_drive(int volume)
     (void)volume;
 }
 #endif /* HAVE_MULTIDRIVE */
+
+int volume_partition(int volume);
 
 #endif /* __MV_H__ */

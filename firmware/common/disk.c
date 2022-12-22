@@ -91,6 +91,7 @@ static bool is_free_volume(const struct volumeinfo *vi)
 static void mark_free_volume(struct volumeinfo *vi)
 {
     vi->drive = -1;
+    vi->partition = -1;
 }
 
 static int get_free_volume(void)
@@ -100,6 +101,12 @@ static int get_free_volume(void)
             return i;
 
     return -1; /* none found */
+}
+
+static void init_volume(struct volumeinfo *vi, int drive, int part)
+{
+    vi->drive = drive;
+    vi->partition = part;
 }
 
 #ifdef MAX_LOG_SECTOR_SIZE
@@ -328,7 +335,7 @@ int disk_mount(int drive)
                 fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
         #endif
             mounted = 1;
-            volumes[volume].drive = drive;
+            init_volume(&volumes[volume], drive, 0);
             volume_onmount_internal(IF_MV(volume));
         }
 
@@ -351,7 +358,7 @@ int disk_mount(int drive)
                     pinfo[i].start *= j;
                     pinfo[i].size *= j;
                     mounted++;
-                    volumes[volume].drive = drive;
+                    init_volume(&volumes[volume], drive, i);
                     disk_sector_multiplier[drive] = j;
                     volume_onmount_internal(IF_MV(volume));
                     volume = get_free_volume(); /* prepare next entry */
@@ -362,7 +369,7 @@ int disk_mount(int drive)
             if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
             {
                 mounted++;
-                volumes[volume].drive = drive;
+                init_volume(&volumes[volume], drive, i);
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
             }
@@ -516,6 +523,7 @@ enum volume_info_type
 #if defined (HAVE_MULTIDRIVE) || defined (HAVE_DIRCACHE)
     VP_DRIVE,
 #endif
+    VP_PARTITION,
 };
 
 static int volume_properties(int volume, enum volume_info_type infotype)
@@ -542,6 +550,9 @@ static int volume_properties(int volume, enum volume_info_type infotype)
             res = vi->drive;
             break;
     #endif
+        case VP_PARTITION:
+            res = vi->partition;
+            break;
         }
     }
 
@@ -568,11 +579,17 @@ int volume_drive(int volume)
 }
 #endif /* HAVE_MULTIDRIVE */
 
+int volume_partition(int volume)
+{
+    return volume_properties(volume, VP_PARTITION);
+}
+
 #ifdef HAVE_DIRCACHE
 bool volume_ismounted(IF_MV_NONVOID(int volume))
 {
     return volume_properties(IF_MV_VOL(volume), VP_DRIVE) >= 0;
 }
 #endif /* HAVE_DIRCACHE */
+
 
 #endif /* HAVE_HOTSWAP || HAVE_MULTIDRIVE || HAVE_DIRCACHE */
