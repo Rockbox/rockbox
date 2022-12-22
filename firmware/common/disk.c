@@ -78,18 +78,26 @@
     (((uint16_t)array[pos+0] << 0) | \
      ((uint16_t)array[pos+1] << 8))
 
-/* space for 4 partitions on 2 drives */
 static struct partinfo part[NUM_DRIVES*MAX_PARTITIONS_PER_DRIVE];
-/* mounted to which drive (-1 if none) */
-static int vol_drive[NUM_VOLUMES];
+static struct volumeinfo volumes[NUM_VOLUMES];
+
+/* check if the entry points to a free volume */
+static bool is_free_volume(const struct volumeinfo *vi)
+{
+    return vi->drive < 0;
+}
+
+/* mark a volume entry as free */
+static void mark_free_volume(struct volumeinfo *vi)
+{
+    vi->drive = -1;
+}
 
 static int get_free_volume(void)
 {
     for (int i = 0; i < NUM_VOLUMES; i++)
-    {
-        if (vol_drive[i] == -1) /* unassigned? */
+        if (is_free_volume(&volumes[i]))
             return i;
-    }
 
     return -1; /* none found */
 }
@@ -320,7 +328,7 @@ int disk_mount(int drive)
                 fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
         #endif
             mounted = 1;
-            vol_drive[volume] = drive; /* remember the drive for this volume */
+            volumes[volume].drive = drive;
             volume_onmount_internal(IF_MV(volume));
         }
 
@@ -343,7 +351,7 @@ int disk_mount(int drive)
                     pinfo[i].start *= j;
                     pinfo[i].size *= j;
                     mounted++;
-                    vol_drive[volume] = drive; /* remember the drive for this volume */
+                    volumes[volume].drive = drive;
                     disk_sector_multiplier[drive] = j;
                     volume_onmount_internal(IF_MV(volume));
                     volume = get_free_volume(); /* prepare next entry */
@@ -354,7 +362,7 @@ int disk_mount(int drive)
             if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
             {
                 mounted++;
-                vol_drive[volume] = drive; /* remember the drive for this volume */
+                volumes[volume].drive = drive;
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
             }
@@ -376,8 +384,9 @@ int disk_mount_all(void)
     volume_onunmount_internal(IF_MV(-1));
     fat_init();
 
+    /* mark all volumes as free */
     for (int i = 0; i < NUM_VOLUMES; i++)
-        vol_drive[i] = -1; /* mark all as unassigned */
+        mark_free_volume(&volumes[i]);
 
     for (int i = 0; i < NUM_DRIVES; i++)
     {
@@ -402,13 +411,13 @@ int disk_unmount(int drive)
 
     for (int i = 0; i < NUM_VOLUMES; i++)
     {
-        if (vol_drive[i] == drive)
-        {   /* force releasing resources */
-            vol_drive[i] = -1; /* mark unused */
-
+        struct volumeinfo *vi = &volumes[i];
+        /* unmount any volumes on the drive */
+        if (vi->drive == drive)
+        {
+            mark_free_volume(vi); /* FIXME: should do this after unmount? */
             volume_onunmount_internal(IF_MV(i));
             fat_unmount(IF_MV(i));
-
             unmounted++;
         }
     }
@@ -517,20 +526,20 @@ static int volume_properties(int volume, enum volume_info_type infotype)
 
     if (CHECK_VOL(volume))
     {
-        int vd = vol_drive[volume];
+        struct volumeinfo *vi = &volumes[volume];
         switch (infotype)
         {
     #ifdef HAVE_HOTSWAP
         case VP_REMOVABLE:
-            res = storage_removable(vd) ? 1 : 0;
+            res = storage_removable(vi->drive) ? 1 : 0;
             break;
         case VP_PRESENT:
-            res = storage_present(vd) ? 1 : 0;
+            res = storage_present(vi->drive) ? 1 : 0;
             break;
     #endif
     #if defined(HAVE_MULTIDRIVE) || defined(HAVE_DIRCACHE)
         case VP_DRIVE:
-            res = vd;
+            res = vi->drive;
             break;
     #endif
         }

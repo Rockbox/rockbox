@@ -103,6 +103,12 @@
 #define CHECK_DRV(drive) \
     ((unsigned int)IF_MD_DRV(drive) < NUM_DRIVES)
 
+/* contains info about a volume */
+struct volumeinfo
+{
+    int drive;      /* drive number */
+};
+
 /* Volume-centric functions (in disk.c) */
 void volume_recalc_free(IF_MV_NONVOID(int volume));
 unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume));
