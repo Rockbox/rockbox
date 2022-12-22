@@ -264,7 +264,9 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 };
 
 #ifdef USB_LEGACY_CONTROL_API
+static struct usb_ctrlrequest buffered_request;
 static struct usb_ctrlrequest* volatile active_request = NULL;
+static volatile unsigned int num_active_requests = 0;
 static void* volatile control_write_data = NULL;
 static volatile bool control_write_data_done = false;
 #endif
@@ -1019,20 +1021,51 @@ void usb_core_control_complete(int status)
 /* Only needed if the driver does not support the new API yet */
 void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
 {
-    active_request = req;
-    control_write_data = NULL;
-    control_write_data_done = false;
+    /* Only submit non-overlapping requests */
+    if (num_active_requests++ == 0)
+    {
+        buffered_request = *req;
+        active_request = &buffered_request;
+        control_write_data = NULL;
+        control_write_data_done = false;
 
-    usb_core_control_request(req, NULL);
+        usb_core_control_request(req, NULL);
+    }
 }
 
 void usb_drv_control_response(enum usb_control_response resp,
                               void* data, int length)
 {
     struct usb_ctrlrequest* req = active_request;
+    unsigned int num_active = num_active_requests--;
 
-    if(!req)
+    /*
+     * There must have been a prior request submission, at least.
+     */
+    if (num_active == 0)
         panicf("null ctrl req");
+
+    /*
+     * This can happen because an active request was already pending when
+     * the driver submitted a new one in usb_core_legacy_control_request().
+     * This could mean two things: (a) a driver bug; or (b) the host sent
+     * another request because we were too slow in handling an earlier one.
+     *
+     * The USB spec requires we respond to the latest request and drop any
+     * earlier ones, but that's not easy to do with the current design of
+     * the USB stack. Thus, the host will be expecting a response for the
+     * latest request, but this response is for the _earliest_ request.
+     *
+     * Play it safe and return a STALL. At this point we've recovered from
+     * the error on our end and will be ready to handle the next request.
+     */
+    if (num_active > 1)
+    {
+        active_request = NULL;
+        num_active_requests = 0;
+        usb_drv_stall(EP_CONTROL, true, true);
+        return;
+    }
 
     if(req->wLength == 0)
     {
