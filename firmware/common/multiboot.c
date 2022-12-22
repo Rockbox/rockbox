@@ -26,44 +26,57 @@
 #include <string.h>
 #include <stdio.h>
 
+static void write_bootdata_v0(struct boot_data_t *data, unsigned int boot_volume)
+{
+    memset(data->payload, data->length, 0);
+
+    data->boot_volume = boot_volume;
+    data->version = 0;
+}
+
 /* Write bootdata into location in FIRMWARE marked by magic header
  * Assumes buffer is already loaded with the firmware image
  * We just need to find the location and write data into the
  * payload region along with the crc for later verification and use.
  * Returns payload len on success,
- * On error returns EKEY_NOT_FOUND
+ * On error returns false
  */
-int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
+bool write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
 {
-    struct boot_data_t bl_boot_data;
-    struct boot_data_t *fw_boot_data = NULL;
     int search_len = MIN(len, BOOT_DATA_SEARCH_SIZE) - sizeof(struct boot_data_t);
-    int payload_len = EKEY_NOT_FOUND;
 
     /* search for boot data header prior to search_len */
     for(int i = 0; i < search_len; i++)
     {
-        fw_boot_data = (struct boot_data_t*) &buf[i];
-        if (fw_boot_data->magic[0] != BOOT_DATA_MAGIC0 ||
-            fw_boot_data->magic[1] != BOOT_DATA_MAGIC1)
+        struct boot_data_t *data = (struct boot_data_t *)&buf[i];
+        if (data->magic[0] != BOOT_DATA_MAGIC0 ||
+            data->magic[1] != BOOT_DATA_MAGIC1)
             continue;
 
-        memset(&bl_boot_data.payload, 0, BOOT_DATA_PAYLOAD_SIZE);
-        bl_boot_data.boot_volume = boot_volume;
+        /* Ignore it if the length extends past the end of the buffer. */
+        int data_len = offsetof(struct boot_data_t, payload) + data->length;
+        if (i + data_len > len)
+            continue;
 
-        memset(fw_boot_data->payload, 0, fw_boot_data->length);
-        /* determine maximum bytes we can write to firmware
-           BOOT_DATA_PAYLOAD_SIZE is the size the bootloader expects */
-        payload_len = MIN(BOOT_DATA_PAYLOAD_SIZE, fw_boot_data->length);
-        fw_boot_data->length = payload_len;
-        /* copy data to FIRMWARE bootdata struct */
-        memcpy(fw_boot_data->payload, &bl_boot_data.payload, payload_len);
-        /* crc will be used within the firmware to check validity of bootdata */
-        fw_boot_data->crc = crc_32(fw_boot_data->payload, payload_len, 0xffffffff);
-        break;
+        /* Determine the maximum supported boot protocol version.
+         * Version 0 firmware may use 0 or 0xff, all other versions
+         * declare the highest supported version in the version byte. */
+        int proto_version = 0;
+        if (data->version < 0xff)
+            proto_version = MIN(BOOT_DATA_VERSION, data->version);
 
+        /* Write boot data according to the selected protocol */
+        if (proto_version == 0)
+            write_bootdata_v0(data, boot_volume);
+        else
+            break;
+
+        /* Calculate payload CRC, used by all protocol versions. */
+        data->crc = crc_32(data->payload, data->length, 0xffffffff);
+        return true;
     }
-    return payload_len;
+
+    return false;
 }
 
 #ifdef HAVE_MULTIBOOT

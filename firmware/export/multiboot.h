@@ -21,7 +21,7 @@
 #ifndef __MULTIBOOT_H__
 #define __MULTIBOOT_H__
 
-extern int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume);
+extern bool write_bootdata(unsigned char* buf, int len, unsigned int boot_volume);
 #ifdef HAVE_MULTIBOOT
 extern int get_redirect_dir(char* buf, int buffer_size, int volume,
                             const char* rootdir, const char* firmware);

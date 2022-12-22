@@ -2530,38 +2530,31 @@ static bool dbg_pic(void)
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 static bool dbg_boot_data(void)
 {
-    unsigned int crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
     struct simplelist_info info;
     info.scroll_all = true;
     simplelist_info_init(&info, "Boot data", 1, NULL);
     simplelist_set_line_count(0);
 
-#if defined(HAVE_MULTIBOOT)
-    char rootpath[MAX_PATH / 2] = RB_ROOT_CONTENTS_DIR;
-    int boot_volume = 0;
-    if(crc == boot_data.crc)
+    if (!boot_data_valid)
     {
-        boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
-        int rtlen = get_redirect_dir(rootpath, sizeof(rootpath), boot_volume, "", "");
-        while (rtlen > 0 && rootpath[--rtlen] == PATH_SEPCH) /* remove extra separators */
-            rootpath[rtlen] = '\0';
+        simplelist_addline("Boot data invalid");
+        simplelist_addline("Magic[0]: %08lx", boot_data.magic[0]);
+        simplelist_addline("Magic[1]: %08lx", boot_data.magic[1]);
+        simplelist_addline("Length: %lu", boot_data.length);
     }
-    simplelist_addline("Boot Volume: <%lu>", boot_volume);
-    simplelist_addline("Root:");
-    simplelist_addline("%s", rootpath);
-    simplelist_addline("");
-#endif
-    simplelist_addline("Bootdata RAW:");
-    if (crc != boot_data.crc)
-        simplelist_addline("Magic: %.8s", boot_data.magic);
-    simplelist_addline("Length: %lu", boot_data.length);
-    simplelist_addline("CRC: %lx", boot_data.crc);
-    (crc == boot_data.crc) ? simplelist_addline("CRC: OK!") :
-                             simplelist_addline("CRC: BAD");
-    for (unsigned i = 0; i < boot_data.length; i += 4)
+    else
     {
-        simplelist_addline("%02x: %02x %02x %02x %02x", i, boot_data.payload[i],
-            boot_data.payload[i+1], boot_data.payload[i+2], boot_data.payload[i+3]);
+        simplelist_addline("Boot data valid");
+        simplelist_addline("Version: %d", (int)boot_data.version);
+        simplelist_addline("Boot volume: %d", (int)boot_data.boot_volume);
+    }
+
+    simplelist_addline("Bootdata RAW:");
+    for (size_t i = 0; i < boot_data.length; i += 4)
+    {
+        simplelist_addline("%02x: %02x %02x %02x %02x", i,
+                           boot_data.payload[i + 0], boot_data.payload[i + 1],
+                           boot_data.payload[i + 2], boot_data.payload[i + 3]);
     }
 
     return simplelist_show_list(&info);

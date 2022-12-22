@@ -256,7 +256,7 @@ int load_mi4(unsigned char* buf, const char* firmware, unsigned int buffer_size)
             {
                 ret = load_mi4_filename(buf, filename, buffer_size);
             /* if firmware has no boot_data don't load from external drive */
-                if (write_bootdata(buf, ret, i) <= 0)
+                if (!write_bootdata(buf, ret, i))
                     ret = EKEY_NOT_FOUND;
             }
             /* if ret is valid breaks from loop to continue loading */

@@ -77,6 +77,7 @@
 #include "statusbar-skinned.h"
 #include "bootchart.h"
 #include "logdiskf.h"
+#include "bootdata.h"
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
@@ -444,6 +445,10 @@ static void init(void)
     system_init();
     core_allocator_init();
     kernel_init();
+
+#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
+    verify_boot_data();
+#endif
 
     /* early early early! */
     filesystem_init();

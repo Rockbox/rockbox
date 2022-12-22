@@ -29,7 +29,6 @@
 #include "rb-loader.h"
 #include "multiboot.h"
 #include "bootdata.h"
-#include "crc32.h"
 #endif
 
 #ifndef RB_ROOT_VOL_HIDDEN
@@ -144,8 +143,7 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
     char rtpath[MAX_PATH / 2];
     make_volume_root(volume, path);
 
-    unsigned int crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
-    if (crc > 0 && crc == boot_data.crc)
+    if (boot_data_valid)
     {
         /* we need to mount the drive before we can access it */
         root_mount_path(path, 0); /* root could be different folder don't hide */
@@ -174,7 +172,7 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
             root_mount_path(rtpath, NSITEM_CONTENTS);
         }
 
-    } /*CRC OK*/
+    }
     else
     {
 standard_redirect:

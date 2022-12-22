@@ -57,6 +57,9 @@ target/hosted/rolo.c
 
 #if defined(HAVE_BOOTDATA) || defined(HAVE_MULTIBOOT)
 common/multiboot.c
+#ifndef BOOTLOADER
+common/bootdata.c
+#endif
 #endif
 
 #ifdef HAVE_SDL
