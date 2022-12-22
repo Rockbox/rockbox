@@ -23,6 +23,7 @@
 #include "crc32.h"
 #include "loader_strerror.h"
 #include "file.h"
+#include "disk.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -30,8 +31,18 @@ static void write_bootdata_v0(struct boot_data_t *data, unsigned int boot_volume
 {
     memset(data->payload, data->length, 0);
 
-    data->boot_volume = boot_volume;
+    data->_boot_volume = boot_volume;
     data->version = 0;
+}
+
+static void write_bootdata_v1(struct boot_data_t *data, unsigned int boot_volume)
+{
+    memset(data->payload, data->length, 0);
+
+    data->_boot_volume = 0xff;
+    data->version = 1;
+    data->boot_drive = volume_drive(boot_volume);
+    data->boot_partition = volume_partition(boot_volume);
 }
 
 /* Write bootdata into location in FIRMWARE marked by magic header
@@ -68,6 +79,8 @@ bool write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
         /* Write boot data according to the selected protocol */
         if (proto_version == 0)
             write_bootdata_v0(data, boot_volume);
+        else if (proto_version == 1)
+            write_bootdata_v1(data, boot_volume);
         else
             break;
 

@@ -37,7 +37,7 @@
 
 #define BOOT_DATA_MAGIC0    ('r' | 'b' << 8 | 'm' << 16 | 'a' << 24)
 #define BOOT_DATA_MAGIC1    ('g' | 'i' << 8 | 'c' << 16 | '!' << 24)
-#define BOOT_DATA_VERSION   0
+#define BOOT_DATA_VERSION   1
 
 /* maximum size of payload */
 #define BOOT_DATA_PAYLOAD_SIZE  4
@@ -59,8 +59,10 @@ struct boot_data_t
     {
         struct
         {
-            uint8_t boot_volume;
+            uint8_t _boot_volume; /* IGNORED */
             uint8_t version;
+            uint8_t boot_drive;
+            uint8_t boot_partition;
         };
         uint8_t payload[BOOT_DATA_PAYLOAD_SIZE];
     };

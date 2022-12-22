@@ -42,6 +42,20 @@ static bool verify_boot_data_v0(void)
     return true;
 }
 
+static bool verify_boot_data_v1(void) INIT_ATTR;
+static bool verify_boot_data_v1(void)
+{
+    /* validate protocol version */
+    if (boot_data.version != 1)
+        return false;
+
+    /* validate length */
+    if (boot_data.length != 4)
+        return false;
+
+    return true;
+}
+
 struct verify_bd_entry
 {
     int version;
@@ -50,6 +64,7 @@ struct verify_bd_entry
 
 static const struct verify_bd_entry verify_bd[] INITDATA_ATTR = {
     { 0, verify_boot_data_v0 },
+    { 1, verify_boot_data_v1 },
 };
 
 void verify_boot_data(void)

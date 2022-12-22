@@ -2546,7 +2546,16 @@ static bool dbg_boot_data(void)
     {
         simplelist_addline("Boot data valid");
         simplelist_addline("Version: %d", (int)boot_data.version);
-        simplelist_addline("Boot volume: %d", (int)boot_data.boot_volume);
+
+        if (boot_data.version == 0)
+        {
+            simplelist_addline("Boot volume: %d", (int)boot_data._boot_volume);
+        }
+        else if (boot_data.version == 1)
+        {
+            simplelist_addline("Boot drive: %d", (int)boot_data.boot_drive);
+            simplelist_addline("Boot partition: %d", (int)boot_data.boot_partition);
+        }
     }
 
     simplelist_addline("Bootdata RAW:");

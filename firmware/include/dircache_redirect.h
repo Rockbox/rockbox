@@ -136,6 +136,41 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 #endif
 }
 
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+static inline bool multiboot_is_boot_volume(int volume)
+{
+    if (boot_data.version == 0)
+    {
+        /*
+         * Version 0 bootloaders just pass the volume number, but that's
+         * dynamically assigned and sometimes differs by the time we get
+         * into the firmware. So we can't rely on the volume passed by
+         * the bootloader.
+         */
+#if CONFIG_CPU == X1000
+        /* The affected X1000 players only have one drive to begin with */
+        return volume_drive(volume) == 0;
+#else
+        /* FIXME: Anything else that can get here is a Sansa. */
+        return volume_drive(volume) == boot_data.boot_volume ||
+               volume == boot_data.boot_volume;
+#endif
+    }
+
+    if (boot_data.version == 1)
+    {
+        /*
+         * Since version 1 the bootloader passes drive and partition
+         * number which unambiguously identifies the boot volume.
+         */
+        return volume_drive(volume) == boot_data.boot_drive &&
+               volume_partition(volume) == boot_data.boot_partition;
+    }
+
+    return false;
+}
+#endif
+
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
 #if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
@@ -148,13 +183,7 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
         /* we need to mount the drive before we can access it */
         root_mount_path(path, 0); /* root could be different folder don't hide */
 
-/*BUGFIX bootloader is less selective about which drives it will mount -- revisit */
-#if defined(HAVE_MULTIDRIVE) && (NUM_VOLUMES_PER_DRIVE == 1)
-        if (volume_drive(volume) == boot_data.boot_volume
-            || volume == boot_data.boot_volume)
-#else
-        if (volume == boot_data.boot_volume) /* boot volume contained in uint8_t payload */
-#endif
+        if (multiboot_is_boot_volume(IF_MV_VOL(volume)))
         {
             int rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
             while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)

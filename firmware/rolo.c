@@ -253,7 +253,26 @@ int rolo_load(const char* filename)
     /* write the bootdata as if rolo were the bootloader
      * FIXME: this won't work for root redirect... */
     if (!strcmp(filename, BOOTDIR "/" BOOTFILE) && boot_data_valid)
-        write_bootdata(filebuf, filebuf_size, boot_data.boot_volume); /* rb-loader.c */
+    {
+        int volume = 0;
+
+        if (boot_data.version == 0)
+            volume = boot_data._boot_volume;
+        else if (boot_data.version == 1)
+        {
+            for (int i = 0; i < NUM_VOLUMES; ++i)
+            {
+                if (volume_drive(i) == boot_data.boot_drive &&
+                    volume_partition(i) == boot_data.boot_partition)
+                {
+                    volume = i;
+                    break;
+                }
+            }
+        }
+
+        write_bootdata(filebuf, filebuf_size, volume);
+    }
 #endif
 
     if (err <= 0)
