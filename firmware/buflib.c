@@ -35,7 +35,6 @@
 #include "panic.h"
 #include "crc32.h"
 #include "system.h" /* for ALIGN_*() */
-#include "pathfuncs.h" /* path_basename() */
 
 /* The main goal of this design is fast fetching of the pointer for a handle.
  * For that reason, the handles are stored in a table at the end of the buffer
@@ -659,9 +658,6 @@ int
 buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
                 struct buflib_callbacks *ops)
 {
-    if (name) /* if name is a path strip everything but the filename */
-        path_basename(name, &name);
-
     union buflib_data *handle, *block;
     size_t name_len = name ? B_ALIGN_UP(strlen(name)+1) : 0;
     bool last;
