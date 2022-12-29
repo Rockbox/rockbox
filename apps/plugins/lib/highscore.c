@@ -124,11 +124,16 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
                     bool show_level)
 {
     int i, w, h;
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) || LCD_DEPTH >= 2
     unsigned bgcolor = rb->lcd_get_background();
     unsigned fgcolor = rb->lcd_get_foreground();
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
+#else
+    rb->lcd_set_background(LCD_WHITE);
+    rb->lcd_set_foreground(LCD_BLACK);
+#endif
 #endif
     rb->lcd_clear_display();
 
@@ -173,7 +178,7 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
     rb->button_clear_queue();
     rb->button_get(true);
     rb->lcd_setfont(FONT_SYSFIXED);
-#ifdef HAVE_LCD_COLOR
+#if defined(HAVE_LCD_COLOR) || LCD_DEPTH >= 2
     rb->lcd_set_background(bgcolor);
     rb->lcd_set_foreground(fgcolor);
 #endif
