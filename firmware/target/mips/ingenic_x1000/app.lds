@@ -13,6 +13,10 @@ INPUT(target/mips/system-mips.o)
 # undef CODEC_SIZE
 # define PLUGIN_BUFFER_SIZE 0
 # define CODEC_SIZE 0
+# if defined(HAVE_INIT_ATTR)
+/* This needs to be fixed for the bootloader */
+#  error "bootloader does not support INIT_ATTR"
+# endif
 #endif
 
 /* End of the audio buffer, where the codec buffer starts */
@@ -21,11 +25,16 @@ INPUT(target/mips/system-mips.o)
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDCODECADDR  (ENDAUDIOADDR + CODEC_SIZE)
 
+/* Place init code in the codec buffer */
+#define INIT_BASE   ENDAUDIOADDR
+#define INIT_SIZE   CODEC_SIZE
+
 MEMORY
 {
     IRAM : ORIGIN = X1000_IRAM_BASE, LENGTH = X1000_IRAM_SIZE
     DRAM : ORIGIN = X1000_DRAM_BASE, LENGTH = X1000_DRAM_SIZE
     TCSM : ORIGIN = X1000_TCSM_BASE, LENGTH = X1000_TCSM_SIZE
+    INIT : ORIGIN = INIT_BASE, LENGTH = INIT_SIZE
 }
 
 SECTIONS
@@ -40,6 +49,9 @@ SECTIONS
     .text :
     {
         *(.text*);
+#ifndef HAVE_INIT_ATTR
+        *(.init*);
+#endif
     } > DRAM
 
     . = ALIGN(4);
@@ -88,6 +100,16 @@ SECTIONS
         _tcsmend = .;
     } > TCSM AT> DRAM
     _tcsmcopy = LOADADDR(.tcsm);
+
+#ifdef HAVE_INIT_ATTR
+    .init :
+    {
+        _initstart = .;
+        *(.init*);
+        _initend = .;
+    } > INIT AT> DRAM
+    _initcopy = LOADADDR(.init);
+#endif
 
     /* Sections below have no data. */
 

@@ -18,6 +18,7 @@ SECTIONS
         *(.startup.spl);
         *(.text*);
         *(.icode*);
+        *(.init*);
     } > TCSM
 
     . = ALIGN(4);

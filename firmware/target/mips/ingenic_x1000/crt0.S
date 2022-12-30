@@ -75,6 +75,15 @@ _realstart:
     bal     _copy
     nop
 
+#ifdef HAVE_INIT_ATTR
+    /* Copy init code */
+    la      a0, _initcopy
+    la      a1, _initstart
+    la      a2, _initend
+    bal     _copy
+    nop
+#endif
+
     /* Clear the BSS segment (needed to zero-initialize C static values) */
     la      a0, _bssbegin
     la      a1, _bssend
