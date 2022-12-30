@@ -153,3 +153,8 @@ SECTIONS
         *(.rel.dyn);
     }
 }
+
+#if defined(HAVE_NOCROSSREFS_TO) && defined(HAVE_INIT_ATTR)
+/* Prevent accidental references to the .init section from other sections */
+NOCROSSREFS_TO(.init .text .iram .tcsm);
+#endif
