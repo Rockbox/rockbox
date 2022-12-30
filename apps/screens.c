@@ -699,7 +699,10 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     info.playlist_display_index = playlist_display_index;
     info.playlist_amount = playlist_amount;
     bool ret = false;
-    push_current_activity(ACTIVITY_ID3SCREEN);
+    int curr_activity = get_current_activity();
+    if (curr_activity != ACTIVITY_PLUGIN &&
+        curr_activity != ACTIVITY_PLAYLISTVIEWER)
+        push_current_activity(ACTIVITY_ID3SCREEN);
     for (i = 0; i < ARRAYLEN(id3_headers); i++)
     {
         char temp[8];
@@ -732,8 +735,9 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
             }
         }
     }
-
-    pop_current_activity();
+    if (curr_activity != ACTIVITY_PLUGIN &&
+        curr_activity != ACTIVITY_PLAYLISTVIEWER)
+        pop_current_activity();
     return ret;
 }
 
