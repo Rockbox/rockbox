@@ -565,7 +565,10 @@ bool option_screen(const struct settings_list *setting,
                 function(*variable);
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
+        {
+            pop_current_activity();
             return true;
+        }
         /* callback */
         if (function && !cb_on_select_only)
             function(*variable);
