@@ -192,7 +192,9 @@ static inline int calcvisible(int screen, int vp_w, int text_offset, int sbwidth
     uint16_t *screencolwidth = printcell.colw[screen];
     int screenicnwidth = printcell.iconw[screen];
     int offset = 0;
-    int selcellw = screencolwidth[printcell.selcol] + text_offset;
+    int selcellw = 0;
+    if (printcell.selcol >= 0)
+        selcellw = screencolwidth[printcell.selcol] + text_offset;
     int maxw = vp_w - (sbwidth + selcellw + 1);
 
     for (int i = printcell.selcol - 1; i >= 0; i--)
@@ -304,7 +306,11 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
 
         if (selected_flag & SELECTED_FLAG)
         {
-            printcell.selcol_index = sidx[printcell.selcol]; /* save the item offset*/
+            if (printcell.selcol >= 0)
+                printcell.selcol_index = sidx[printcell.selcol]; /* save the item offset*/
+            else
+                printcell.selcol_index = -1;
+
             cursor = Icon_Cursor;
             /* limit length of selection if columns don't reach end */
             int maxw = nx + printcell.totalcolw[screen] + printcell.iconw[screen];
