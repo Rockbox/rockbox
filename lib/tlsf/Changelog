@@ -1,25 +1,38 @@
   Version History
   ---------------
-  -v2.4.4 (October 13 2008) 
+
+
+  -v2.4.6 (September 10 2009)
+	* Fixed a bug in the realloc func (discovered by the rockbox
+  	  project: www.rockbox.org).
+
+
+  -v2.4.5 (November 24 2008)
+	* Working on OSX/FreeBSD (may be for OpenBSD/NetBSD too).
+	  Reported by Younès HAFRI.
+          printf (and stdio.h include) is now optional.
+	  Reported by Masaki Muranaka
+
+  -v2.4.4 (October 13 2008)
 	* Corrected minor syntactic bug on statistic gathering code.
  	  Reported by Tim Cussins and P. Mantegazza.
-	
-  -v2.4.3 (July 30 2008) 
-	* Minor fixes to compile with the greenhills compiler. 
+
+  -v2.4.3 (July 30 2008)
+	* Minor fixes to compile with the greenhills compiler.
 	  Reported by "Kaya, Sinan SEA" <sinan.kaya@siemens.com>
-	* Small change in the license in order to include TLSF in the RTEMS 
+	* Small change in the license in order to include TLSF in the RTEMS
 	  project.
-	
+
   -v2.4.2 (May 16 2008) (Herman ten Brugge)
 	* Memory usage statistics added again, with cleaner and more compacted
-	  code. 
-	
+	  code.
+
   -v2.4.1 (April 30 2008)
 	* Fixed a bug in the tlsf_realloc function: init the pool automatically
-	  on the first call. 
+	  on the first call.
 	  Reported by: Alejandro Mery <amery@geeks.cl>
-	
-  -v2.4  (Feb 19 2008) 
+
+  -v2.4  (Feb 19 2008)
 	* "rtl_*" functions renamed to "tlsf_*".
 	* Added the add_new_area function to insert new memory areas to an
   	  existing memory pool.
@@ -114,6 +127,6 @@
 		    as its default memory allocator.
 
   - v0.1 ... v1.0: First  implementations were created for testing and
-		   research purposes.  Basically TLSF is implemented to 
-                   be used by  RTLinux-GPL  (www.rtlinux-gpl.org),  so  
+		   research purposes.  Basically TLSF is implemented to
+                   be used by  RTLinux-GPL  (www.rtlinux-gpl.org),  so
                    it  is RTLinux-oriented.
