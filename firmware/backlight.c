@@ -1065,3 +1065,14 @@ void buttonlight_set_brightness(int val) { (void)val; }
 #endif /* HAVE_BUTTON_LIGHT */
 
 #endif /* defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT) */
+
+#ifndef HAVE_BUTTON_LIGHT /* Dummy Functions */
+void buttonlight_on(void) {}
+void buttonlight_on_ignore(bool value, int timeout){(void)value;(void)timeout;}
+void buttonlight_off(void) {}
+void buttonlight_set_timeout(int value) {(void)value;}
+#endif /* ndef HAVE_BUTTON_LIGHT */
+
+#ifndef HAVE_BUTTONLIGHT_BRIGHTNESS  /* Dummy Functions */
+void buttonlight_set_brightness(int val) { (void)val; }
+#endif /* ndef HAVE_BUTTONLIGHT_BRIGHTNESS */

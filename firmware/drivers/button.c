@@ -51,18 +51,14 @@ static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
 static intptr_t button_data; /* data value from last message dequeued */
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
-#ifdef HAVE_BACKLIGHT
-static bool filter_first_keypress;
+
+#ifdef HAVE_BACKLIGHT /* Filter first keypress function pointer */
+static bool (*keypress_filter_fn)(int, int);
 #ifdef HAVE_REMOTE_LCD
-static bool remote_filter_first_keypress;
+static bool (*remote_keypress_filter_fn)(int, int);
 #endif
 #endif /* HAVE_BACKLIGHT */
-#ifdef HAVE_HEADPHONE_DETECTION
-static bool phones_present = false;
-#endif
-#ifdef HAVE_LINEOUT_DETECTION
-static bool lineout_present = false;
-#endif
+
 #ifdef HAVE_SW_POWEROFF
 static bool enable_sw_poweroff = true;
 #endif
@@ -72,7 +68,7 @@ static bool enable_sw_poweroff = true;
 
 /* The next two make repeat "accelerate", which is nice for lists
  * which begin to scroll a bit faster when holding until the
- * real list accerelation kicks in (this smooths acceleration).
+ * real list acceleration kicks in (this smooths acceleration).
  *
  * Note that touchscreen pointing events are not subject to this
  * acceleration and always use REPEAT_INTERVAL_TOUCH. (Do repeat
@@ -86,19 +82,24 @@ static bool enable_sw_poweroff = true;
 /* repeat interval for touch events */
 #define REPEAT_INTERVAL_TOUCH   (5*HZ/100)
 
-#ifdef HAVE_BUTTON_DATA
-static int button_read(int *data);
 static int lastdata = 0;
-#else
-static int button_read(void);
-#endif
+static int button_read(int *data);
 
 #ifdef HAVE_TOUCHSCREEN
 static long last_touchscreen_touch;
 #endif
-#if defined(HAVE_HEADPHONE_DETECTION)
-static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 
+static void button_remote_post(void)
+{
+#if defined(HAS_SERIAL_REMOTE) && !defined(SIMULATOR)
+    /* Post events for the remote control */
+    int btn = remote_control_rx();
+    if(btn)
+        button_try_post(btn, 0);
+#endif
+}
+
+#if defined(HAVE_HEADPHONE_DETECTION)
 static int hp_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
@@ -111,8 +112,6 @@ static int hp_detect_callback(struct timeout *tmo)
 #endif
 
 #if defined(HAVE_LINEOUT_DETECTION)
-static struct timeout lo_detect_timeout; /* Debouncer for lineout plug/unplug */
-
 static int lo_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
@@ -123,6 +122,34 @@ static int lo_detect_callback(struct timeout *tmo)
     /*misc.c:lo_unplug_change*/
 }
 #endif
+
+static void check_audio_peripheral_state(void)
+{
+#if defined(HAVE_HEADPHONE_DETECTION)
+    static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
+    static bool phones_present = false;
+
+    if (headphones_inserted() != phones_present)
+    {
+        /* Use the autoresetting oneshot to debounce the detection signal */
+        phones_present = !phones_present;
+        timeout_register(&hp_detect_timeout, hp_detect_callback,
+                         HZ/2, phones_present);
+    }
+#endif
+#if defined(HAVE_LINEOUT_DETECTION)
+    static struct timeout lo_detect_timeout; /* Debouncer for lineout plug/unplug */
+    static bool lineout_present = false;
+
+    if (lineout_inserted() != lineout_present)
+    {
+        /* Use the autoresetting oneshot to debounce the detection signal */
+        lineout_present = !lineout_present;
+        timeout_register(&lo_detect_timeout, lo_detect_callback,
+                         HZ/2, lineout_present);
+    }
+#endif
+}
 
 static bool button_try_post(int button, int data)
 {
@@ -153,6 +180,43 @@ static bool button_try_post(int button, int data)
     return ret;
 }
 
+#ifdef HAVE_BACKLIGHT
+/* disabled function is shared between Main & Remote LCDs */
+static bool filter_first_keypress_disabled(int button, int data)
+{
+    button_try_post(button, data);
+    return false;
+}
+
+static bool filter_first_keypress_enabled(int button, int data)
+{
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
+    if (is_backlight_on(false) && lcd_active())
+#else
+    if (is_backlight_on(false))
+#endif
+    {
+        return filter_first_keypress_disabled(button, data);
+    }
+    return true;
+}
+
+#ifdef HAVE_REMOTE_LCD
+static bool filter_first_remote_keypress_enabled(int button, int data)
+{
+    if (is_remote_backlight_on(false)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+        || (remote_type()==REMOTETYPE_H300_NONLCD)
+#endif
+    )
+    {
+        return filter_first_keypress_disabled(button, data);
+    }
+    return true;
+}
+#endif /* def HAVE_REMOTE_LCD */
+#endif /* def HAVE_BACKLIGHT */
+
 static void button_tick(void)
 {
     static int count = 0;
@@ -168,42 +232,13 @@ static void button_tick(void)
 #endif
     int diff;
     int btn;
-#ifdef HAVE_BUTTON_DATA
     int data = 0;
-#else
-    const int data = 0;
-#endif
 
-#if defined(HAS_SERIAL_REMOTE) && !defined(SIMULATOR)
-    /* Post events for the remote control */
-    btn = remote_control_rx();
-    if(btn)
-        button_try_post(btn, 0);
-#endif
+    button_remote_post();
 
-#ifdef HAVE_BUTTON_DATA
     btn = button_read(&data);
-#else
-    btn = button_read();
-#endif
-#if defined(HAVE_HEADPHONE_DETECTION)
-    if (headphones_inserted() != phones_present)
-    {
-        /* Use the autoresetting oneshot to debounce the detection signal */
-        phones_present = !phones_present;
-        timeout_register(&hp_detect_timeout, hp_detect_callback,
-                         HZ/2, phones_present);
-    }
-#endif
-#if defined(HAVE_LINEOUT_DETECTION)
-    if (lineout_inserted() != lineout_present)
-    {
-        /* Use the autoresetting oneshot to debounce the detection signal */
-        lineout_present = !lineout_present;
-        timeout_register(&lo_detect_timeout, lo_detect_callback,
-                         HZ/2, lineout_present);
-    }
-#endif
+
+    check_audio_peripheral_state();
 
     /* Find out if a key has been released */
     diff = btn ^ lastbtn;
@@ -348,48 +383,21 @@ static void button_tick(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
-                        if (!remote_filter_first_keypress
-                            || is_remote_backlight_on(false)
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-                            || (remote_type()==REMOTETYPE_H300_NONLCD)
-#endif
-                            )
-                            button_try_post(btn, data);
-                        else
-                            skip_remote_release = true;
+                        skip_remote_release = remote_keypress_filter_fn(btn, data);
+                        remote_backlight_on();
                     }
                     else
 #endif
-                        if (!filter_first_keypress
-#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
-                                || (is_backlight_on(false) && lcd_active())
-#else
-                                || is_backlight_on(false)
-#endif
-#if BUTTON_REMOTE
-                                || (btn & BUTTON_REMOTE)
-#endif
-                           )
-                            button_try_post(btn, data);
-                        else
-                            skip_release = true;
+                    {
+                        skip_release = keypress_filter_fn(btn, data);
+                        backlight_on();
+                        buttonlight_on();
+                    }
 #else /* no backlight, nothing to skip */
                     button_try_post(btn, data);
 #endif
                     post = false;
                 }
-#ifdef HAVE_REMOTE_LCD
-                if(btn & BUTTON_REMOTE)
-                    remote_backlight_on();
-                else
-#endif
-                {
-                    backlight_on();
-#ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
-#endif
-                }
-
                 reset_poweroff_timer();
             }
         }
@@ -400,9 +408,8 @@ static void button_tick(void)
         }
     }
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
-#ifdef HAVE_BUTTON_DATA
+
     lastdata = data;
-#endif
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -515,30 +522,23 @@ intptr_t button_get_data(void)
 
 void button_init(void)
 {
+    int temp;
     /* Init used objects first */
     queue_init(&button_queue, true);
 
-#ifdef HAVE_BUTTON_DATA
-    int temp;
-#endif
     /* hardware inits */
     button_init_device();
 
-#ifdef HAVE_BUTTON_DATA
     button_read(&temp);
     lastbtn = button_read(&temp);
-#else
-    button_read();
-    lastbtn = button_read();
-#endif
 
     reset_poweroff_timer();
 
     flipped = false;
 #ifdef HAVE_BACKLIGHT
-    filter_first_keypress = false;
+    set_backlight_filter_keypress(false);
 #ifdef HAVE_REMOTE_LCD
-    remote_filter_first_keypress = false;
+    set_remote_backlight_filter_keypress(false);
 #endif
 #endif
 #ifdef HAVE_TOUCHSCREEN
@@ -649,12 +649,18 @@ void button_set_flip(bool flip)
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value)
 {
-    filter_first_keypress = value;
+    if (!value)
+        keypress_filter_fn = filter_first_keypress_disabled;
+    else
+        keypress_filter_fn = filter_first_keypress_enabled;
 }
 #ifdef HAVE_REMOTE_LCD
 void set_remote_backlight_filter_keypress(bool value)
 {
-    remote_filter_first_keypress = value;
+    if (!value)
+        remote_keypress_filter_fn = filter_first_keypress_disabled;
+    else
+        remote_keypress_filter_fn = filter_first_remote_keypress_enabled;
 }
 #endif
 #endif
@@ -662,13 +668,13 @@ void set_remote_backlight_filter_keypress(bool value)
 /*
  * Get button pressed from hardware
  */
-#ifdef HAVE_BUTTON_DATA
+
 static int button_read(int *data)
 {
+#ifdef HAVE_BUTTON_DATA
     int btn = button_read_device(data);
 #else
-static int button_read(void)
-{
+    (void) data;
     int btn = button_read_device();
 #endif
     int retval;

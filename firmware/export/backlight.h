@@ -98,16 +98,12 @@ extern int backlight_brightness;
 void backlight_set_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_set_brightness(int val);
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
-#ifdef HAVE_BUTTON_LIGHT
 void buttonlight_on_ignore(bool value, int timeout);
 void buttonlight_on(void);
 void buttonlight_off(void);
 void buttonlight_set_timeout(int value);
-#endif
 
 /* Private API for use in target tree backlight code only */
 #ifdef HAVE_BUTTON_LIGHT
