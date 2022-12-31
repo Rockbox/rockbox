@@ -521,9 +521,11 @@ static int keyremap_export_current(char *filenamebuf, size_t bufsz)
 
     int entry_count = ctx_data.ctx_count + ctx_data.act_count + 1;;/* (ctx_count + ctx_count + act_count + 1) */
 
-    if (entry_count <= 3)
+    if (entry_count < 3)
+    {
+        logf("%s: Not enough entries", __func__);
         return 0;
-
+    }
     int fd = rb->open(filenamebuf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
     if (fd < 0)
@@ -620,6 +622,7 @@ static void keyremap_import_user_keys(void)
         .icon = Icon_Plugin,
         .buf = buf,
         .bufsize = sizeof(buf),
+        .root = "/",
     };
 
     if (rb->rockbox_browse(&browse) == GO_TO_PREVIOUS)
