@@ -605,12 +605,10 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
         /* attempt to look up the button in user supplied remap */
         if(last->key_remap && (context & CONTEXT_PLUGIN) == 0)
         {
-#if 0 /*Disable the REMOTE context for remap for now (BUTTON_REMOTE != 0)*/
             if ((cur->button & BUTTON_REMOTE) != 0)
             {
                 context |= CONTEXT_REMOTE;
             }
-#endif
             cur->items = core_get_data(last->key_remap);
             i = 0;
             action = ACTION_UNKNOWN;

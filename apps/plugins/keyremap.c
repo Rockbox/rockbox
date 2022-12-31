@@ -42,7 +42,28 @@
 #define KMFUSER "user_keyremap"
 #define MAX_BUTTON_COMBO 5
 #define MAX_BUTTON_NAME 32
+#define MAX_MENU_NAME 64
 #define TEST_COUNTDOWN_MS 1590
+
+struct context_flags {
+    char * name;
+    int flag;
+};
+
+/* flags added to context_name[] */
+static struct context_flags context_flags[] = {
+    {"UNKNOWN", 0},/* index 0 is an Error */
+#ifdef HAVE_LOCKED_ACTIONS
+    {"LOCKED", CONTEXT_LOCKED},
+#endif
+    /*{"PLUGIN", CONTEXT_PLUGIN}, need a custom action list and a way to supply */
+#if BUTTON_REMOTE != 0
+    {"REMOTE", CONTEXT_REMOTE},
+#ifdef HAVE_LOCKED_ACTIONS
+    {"REMOTE_LOCKED", CONTEXT_REMOTE | CONTEXT_LOCKED},
+#endif
+#endif /* BUTTON_REMOTE != 0 */
+};
 
 static struct keyremap_buffer_t {
     char * buffer;
@@ -138,7 +159,7 @@ MENU_ITEM(M_DELCORE, "Remove Core Remap", 1),
 MENU_ITEM(M_EXIT, ID2P(LANG_MENU_QUIT), 0),
 MENU_ITEM(M_ACTIONS, "Actions", LAST_ACTION_PLACEHOLDER),
 MENU_ITEM(M_BUTTONS, "Buttons", -1), /* Set at runtime in plugin_start: */
-MENU_ITEM(M_CONTEXTS, "Contexts", LAST_CONTEXT_PLACEHOLDER ),
+MENU_ITEM(M_CONTEXTS, "Contexts", LAST_CONTEXT_PLACEHOLDER * ARRAYLEN(context_flags)),
 MENU_ITEM(M_CONTEXT_EDIT, "", 5),
 #undef MENU_ITEM
 };
@@ -198,6 +219,47 @@ static void synclist_set_update(int id, int selected_item, int items, int sel_si
 {
     SET_MENU_ITEM(lists.selected_item + 1); /* update selected for previous menu*/
     synclist_set(id, selected_item, items, sel_size);
+}
+
+/* returns the actual context & index of the flag is passed in *flagidx */
+static int ctx_strip_flagidx(int ctx, int *flagidx)
+{
+    int ctx_out = ctx % (LAST_CONTEXT_PLACEHOLDER);
+    *flagidx = 0;
+    if (ctx_out != ctx)
+    {
+        while (ctx >= LAST_CONTEXT_PLACEHOLDER)
+        {
+            (*flagidx)++;
+            ctx -= LAST_CONTEXT_PLACEHOLDER;
+        }
+        if (*flagidx >= (int)ARRAYLEN(context_flags))
+            *flagidx = 0; /* unknown flag */
+
+        logf("%s ctx: (%d) %s flag idx: (%d) %s\n", __func__,
+             ctx, context_name(ctx), *flagidx, context_flags[*flagidx].name);
+    }
+    return ctx_out;
+}
+
+/* combines context name and flag name using '_' to join them */
+static char *ctx_name_and_flag(int index)
+{
+    static char ctx_namebuf[MAX_MENU_NAME];
+    char *ctx_name = "?";
+    int flagidx;
+    int ctx = ctx_strip_flagidx(index, &flagidx);
+    if (flagidx == 0)
+    {
+        ctx_name = context_name(ctx);
+    }
+    else if (flagidx >= 0 && flagidx < (int)ARRAYLEN(context_flags))
+    {
+        rb->snprintf(ctx_namebuf, sizeof(ctx_namebuf), "%s_%s",
+        context_name(ctx), context_flags[flagidx].name);
+        ctx_name = ctx_namebuf;
+    }
+    return ctx_name;
 }
 
 static int btnval_to_index(unsigned int btnvalue)
@@ -361,6 +423,7 @@ static int keyremap_map_is_valid(struct action_mapping_t *amap, int context)
 
 static struct button_mapping *keyremap_create_temp(int *entries)
 {
+    logf("%s()", __func__);
     struct button_mapping *tempkeymap;
     int action_offset = 1; /* start of action entries (ctx_count + 1)*/
     int entry_count = 1;/* (ctx_count + ctx_count + act_count) */
@@ -390,7 +453,7 @@ static struct button_mapping *keyremap_create_temp(int *entries)
     }
     size_t keymap_bytes = (entry_count) * sizeof(struct button_mapping);
     *entries = entry_count;
-    logf("keyremap create temp entry count: %d", entry_count);
+    logf("%s() entry count: %d", __func__, entry_count);
     logf("keyremap bytes: %zu, avail: %zu", keymap_bytes,
          (keyremap_buffer.end - keyremap_buffer.front));
     if (keyremap_buffer.front + keymap_bytes < keyremap_buffer.end)
@@ -401,6 +464,7 @@ static struct button_mapping *keyremap_create_temp(int *entries)
         for (i = 0; i < ctx_data.ctx_count; i++)
         {
             int actions_this_ctx = 0;
+            int flagidx;
             int context = ctx_data.ctx_map[i].context;
             /* how many actions are contained in each context? */
             for (j = 0; j < ctx_data.act_count; j++)
@@ -412,6 +476,10 @@ static struct button_mapping *keyremap_create_temp(int *entries)
             }
             /*Don't save contexts with no actions */
             if (actions_this_ctx == 0){ continue; }
+
+            /* convert context x flag to context | flag */
+            context = ctx_strip_flagidx(ctx_data.ctx_map[i].context, &flagidx);
+            context |= context_flags[flagidx].flag;
 
             entry->action_code = CORE_CONTEXT_REMAP(context);
             entry->button_code = action_offset; /* offset of first action entry */
@@ -431,6 +499,7 @@ static struct button_mapping *keyremap_create_temp(int *entries)
         {
             int actions_this_ctx = 0;
             int context = ctx_data.ctx_map[i].context;
+
             for (int j = 0; j < ctx_data.act_count; j++)
             {
                 if (keyremap_map_is_valid(&ctx_data.act_map[j], context) > 0)
@@ -473,7 +542,7 @@ static int keyremap_save_current(const char *filename)
 
     struct button_mapping *keymap = keyremap_create_temp(&entry_count);
 
-    if (keymap == NULL || entry_count <= 3)
+    if (keymap == NULL || entry_count <= 3) /* there should be atleast 4 entries */
         return status;
     keyset.crc32 =
      rb->crc_32(keymap, entry_count * sizeof(struct button_mapping), 0xFFFFFFFF);
@@ -505,6 +574,7 @@ static void keyremap_save_user_keys(bool notify)
 
     if (keyremap_save_current(buf) == 0)
     {
+        logf("Error Saving");
         if(notify)
             rb->splash(HZ *2, "Error Saving");
     }
@@ -519,9 +589,9 @@ static int keyremap_export_current(char *filenamebuf, size_t bufsz)
     int ctx_count = 0;
     size_t entrylen;
 
-    int entry_count = ctx_data.ctx_count + ctx_data.act_count + 1;;/* (ctx_count + ctx_count + act_count + 1) */
+    int entry_count = ctx_data.ctx_count + ctx_data.act_count + 1;
 
-    if (entry_count < 3)
+    if (entry_count < 3) /* the header is not counted should be at least 3 entries */
     {
         logf("%s: Not enough entries", __func__);
         return 0;
@@ -932,9 +1002,13 @@ next_line:
                 {
                     bufleft = bufsz - (pctx - filenamebuf);
                     ctx = -1;
-                    for (int i=0;i < LAST_CONTEXT_PLACEHOLDER;i++)
+                    int ctx_x_flag_count = (LAST_CONTEXT_PLACEHOLDER 
+                                           * ARRAYLEN(context_flags));
+
+                    for (int i=0;i < ctx_x_flag_count ;i++)
                     {
-                        if (rb->strncasecmp(pctx, context_name(i), bufleft) == 0)
+                        /* context x flag */
+                        if (rb->strncasecmp(pctx, ctx_name_and_flag(i), bufleft) == 0)
                         {
                             logf("ln: %d: Context Found: %s (%d)", line, pctx, i);
                             if (keymap_add_context_entry(i) <= 0)
@@ -1044,8 +1118,17 @@ static int keyremap_load_file(const char *filename)
             }
             if ((entry.action_code & CONTEXT_REMAPPED) == CONTEXT_REMAPPED)
             {
-
                 int context = (entry.action_code & ~CONTEXT_REMAPPED);
+                for (int i = ARRAYLEN(context_flags) - 1; i > 0; i--) /* don't check idx 0*/
+                {
+                    /* convert context | flag to context x flag */
+                    if ((context & context_flags[i].flag) ==  context_flags[i].flag)
+                    {
+                        logf("found ctx flag %s", context_flags[i].name);
+                        context &= ~context_flags[i].flag;
+                        context += i * LAST_CONTEXT_PLACEHOLDER;
+                    }
+                }
                 int offset = entry.button_code;
                 int entries = entry.pre_button_code;
                 if (offset == 0 || entries <= 0)
@@ -1201,10 +1284,10 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
         {
             if (ctx_data.act_count == 0)
                 rb->snprintf(buf, buf_len, "%s$%s",
-                    context_name(ctx_data.ctx_map[i].context),
+                    ctx_name_and_flag(ctx_data.ctx_map[i].context),
                     "Select$to add$actions");
             else
-                rb->snprintf(buf, buf_len, ctxfmt, context_name(ctx_data.ctx_map[i].context));
+                rb->snprintf(buf, buf_len, ctxfmt, ctx_name_and_flag(ctx_data.ctx_map[i].context));
             return buf;
         }
     }
@@ -1219,7 +1302,7 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
             if (data != MENU_ID(M_EXPORTKEYS))
             {
                 pctxbuf = ctxbuf;
-                rb->snprintf(ctxbuf, sizeof(ctxbuf), ctxfmt, context_name(context));
+                rb->snprintf(ctxbuf, sizeof(ctxbuf), ctxfmt, ctx_name_and_flag(context));
                 pctxbuf += szctx;//sizeof("CONTEXT")
             }
             struct button_mapping * bm = &ctx_data.act_map[i].map;
@@ -1263,7 +1346,7 @@ static const char *test_keymap_name_cb(int selected_item, void* data,
     if (keytest.context >= 0)
     {
         if (selected_item == 0)
-            rb->snprintf(buf, buf_len, "< %s >", context_name(keytest.context));
+            rb->snprintf(buf, buf_len, "< %s >", ctx_name_and_flag(keytest.context));
         else if (selected_item == 1)
         {
             if (keytest.countdown >= 10)
@@ -1304,7 +1387,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
     }
     else if (data == MENU_ID(M_CONTEXTS))
     {
-        return context_name(selected_item);
+        return ctx_name_and_flag(selected_item);
     }
     else if (data == MENU_ID(M_DELKEYS) || data == MENU_ID(M_LOADKEYS))
     {
@@ -1341,7 +1424,7 @@ static int list_voice_cb(int list_index, void* data)
     }
     else
     {
-        char buf[64];
+        char buf[MAX_MENU_NAME];
         const char* name = list_get_name_cb(list_index, data, buf, sizeof(buf));
         long id = P2ID((const unsigned char *)name);
         if(id>=0)

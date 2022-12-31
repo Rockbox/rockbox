@@ -401,9 +401,11 @@ const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
     {
+        case CONTEXT_STD | CONTEXT_LOCKED:
         case CONTEXT_STD:
             return button_context_standard;
 
+        case CONTEXT_WPS | CONTEXT_LOCKED:
         case CONTEXT_WPS:
             return button_context_wps;
 
@@ -414,6 +416,7 @@ const struct button_mapping* get_context_mapping(int context)
                 return button_context_listtree_scroll_without_combo;
             else
                 return button_context_listtree_scroll_with_combo;
+        case CONTEXT_MAINMENU | CONTEXT_LOCKED:
         case CONTEXT_MAINMENU:
             return button_context_mainmenu;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
