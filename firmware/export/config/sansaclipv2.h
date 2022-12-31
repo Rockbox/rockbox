@@ -69,7 +69,6 @@
 #define HAVE_LCD_ENABLE
 
 #ifndef BOOTLOADER
-#define HAVE_LOCKED_ACTIONS
 /* Define this if your LCD can be put to sleep.
  * HAVE_LCD_ENABLE should be defined as well. */
 //#define HAVE_LCD_SLEEP
