@@ -423,7 +423,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
                                            0,
                                            EVENT_THREAD
                                            IF_PRIO(, PRIORITY_SYSTEM)
-                                           IF_COP(, COP));
+                                           IF_COP(, CPU));
 
     /* Timer is used to poll waiting events */
     if (!rb->timer_register(1, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU)))
