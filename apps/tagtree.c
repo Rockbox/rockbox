@@ -2035,12 +2035,16 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
 void tagtree_exit(struct tree_context* c, bool is_visible)
 {
     if (is_visible) /* update selection history only for user-selected items */
+    {
+        if (c->selected_item != selected_item_history[c->dirlevel])
+            max_history_level = c->dirlevel; /* discard descending item history */
         selected_item_history[c->dirlevel] = c->selected_item;
+    }
     c->dirfull = false;
     if (c->dirlevel > 0)
         c->dirlevel--;
     if (is_visible)
-        c->selected_item=selected_item_history[c->dirlevel];
+        c->selected_item = selected_item_history[c->dirlevel];
     c->currtable = table_history[c->dirlevel];
     c->currextra = extra_history[c->dirlevel];
 }
