@@ -594,13 +594,6 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     int  context = cur->context;
     cur->is_prebutton = false;
 
-#ifdef HAVE_LOCKED_ACTIONS
-    /* This only applies to the first context, to allow locked contexts to
-     * specify a fall through to their non-locked version */
-    if (is_keys_locked())
-        context |= CONTEXT_LOCKED;
-#endif
-
 #ifndef DISABLE_ACTION_REMAP
         /* attempt to look up the button in user supplied remap */
         if(last->key_remap && (context & CONTEXT_PLUGIN) == 0)
@@ -630,6 +623,13 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
                 i++;
             }
         }
+#endif
+
+#ifdef HAVE_LOCKED_ACTIONS
+    /* This only applies to the first context, to allow locked contexts to
+     * specify a fall through to their non-locked version */
+    if (is_keys_locked())
+        context |= CONTEXT_LOCKED;
 #endif
 
     i = 0;
