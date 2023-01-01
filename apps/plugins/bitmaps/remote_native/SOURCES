@@ -22,3 +22,10 @@ remote_rockboxlogo.91x32x1.bmp
 #elif (LCD_REMOTE_DEPTH == 2)
 remote_rockboxlogo.91x32x2.bmp
 #endif
+
+*/ Credits logo */
+#if (LCD_REMOTE_DEPTH == 1)
+remote_creditslogo.128x42x1.bmp
+#elif (LCD_REMOTE_DEPTH == 2)
+remote_creditslogo.128x42x2.bmp
+#endif

@@ -973,6 +973,45 @@ rockboxlogo.91x32x1.bmp
 #endif
 #endif
 
+/* Credits logo */
+#if (LCD_DEPTH == 1)
+#if (LCD_WIDTH == 160)
+creditslogo.160x53x1.bmp
+#elif (LCD_WIDTH == 128)
+creditslogo.128x42x1.bmp
+#else
+creditslogo.112x30x1.bmp
+#endif
+#elif (LCD_WIDTH == 96) && (LCD_DEPTH >= 16)
+creditslogo.96x30x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_DEPTH == 2)
+creditslogo.128x42x2.bmp
+#elif (LCD_WIDTH == 128) && (LCD_DEPTH >= 16)
+creditslogo.128x40x16.bmp
+#elif (LCD_WIDTH == 132) && (LCD_DEPTH >= 16)
+creditslogo.132x40x16.bmp
+#elif (LCD_WIDTH == 138) && (LCD_DEPTH >= 2)
+creditslogo.138x46x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
+creditslogo.160x53x2.bmp
+#elif (LCD_WIDTH == 320) && (LCD_DEPTH == 2)
+creditslogo.160x53x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_DEPTH >= 16)
+creditslogo.160x50x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_DEPTH >= 16)
+creditslogo.176x54x16.bmp
+#elif (LCD_WIDTH == 220) && (LCD_DEPTH >= 16)
+creditslogo.220x68x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_DEPTH >= 16)
+creditslogo.240x74x16.bmp
+#elif (LCD_WIDTH >= 320) && (LCD_WIDTH < 480)  && (LCD_DEPTH >= 16)
+creditslogo.320x98x16.bmp
+#elif (LCD_WIDTH >= 480) && (LCD_WIDTH < 640) && (LCD_DEPTH >= 16)
+creditslogo.480x149x16.bmp
+#elif (LCD_WIDTH >= 640) && (LCD_DEPTH >= 16)
+creditslogo.640x198x16.bmp
+#endif
+
 /* Pitch detector */
 /* The following preprocessor condition must match the condition */
 /* for pitch detector from plugins/SOURCES                       */

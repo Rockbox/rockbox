@@ -24,16 +24,16 @@
 #ifdef HAVE_REMOTE_LCD
 #define REMOTE_WIDTH LCD_REMOTE_WIDTH
 #define REMOTE_HEIGHT LCD_REMOTE_HEIGHT
-#include "pluginbitmaps/remote_rockboxlogo.h"
-#define REMOTE_LOGO_WIDTH BMPWIDTH_remote_rockboxlogo
-#define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_rockboxlogo
-#define REMOTE_LOGO (const fb_remote_data*)remote_rockboxlogo
+#include "pluginbitmaps/remote_creditslogo.h"
+#define REMOTE_LOGO_WIDTH BMPWIDTH_remote_creditslogo
+#define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_creditslogo
+#define REMOTE_LOGO (const fb_remote_data*)remote_creditslogo
 #endif /* HAVE_REMOTE_LCD */
 
-#define LOGO (const fb_data*)rockboxlogo
-#include "pluginbitmaps/rockboxlogo.h"
-#define LOGO_WIDTH BMPWIDTH_rockboxlogo
-#define LOGO_HEIGHT BMPHEIGHT_rockboxlogo
+#define LOGO (const fb_data*)creditslogo
+#include "pluginbitmaps/creditslogo.h"
+#define LOGO_WIDTH BMPWIDTH_creditslogo
+#define LOGO_HEIGHT BMPHEIGHT_creditslogo
 
 static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
