@@ -103,15 +103,17 @@ This sub menu relates to limits in the Rockbox operating system.
     \item [Max Entries in File Browser.] This setting controls the limit on
     the number of files that you can see in any particular directory in the
     file browser. You can configure the size to be between 50 and
-    10,000 files in steps of 50. The default is 400. Higher values will shorten
-    the music buffer, so you should increase this setting \emph{only} if you have
-    directories with a large number of files.
+    10,000 files in steps of 50. The default is 400. \opt{HAVE_DISK_STORAGE}{
+    Higher values will shorten the music buffer, which can negatively affect
+    battery life by forcing the disk to spin up more often. Increase this
+    setting \emph{only} if you need to.}
 
     \item [Max Playlist Size.] This setting controls the maximum size of
     a playlist. The playlist size can be between 1,000 and 32,000 files,
-    in steps of 1,000 (default is 10,000). Higher values will shorten the
-    music buffer, so you should increase this setting \emph{only} if you
-    have very large playlists.
+    in steps of 1,000 (default is 10,000). \opt{HAVE_DISK_STORAGE}{Higher
+    values will shorten the music buffer, which can negatively affect battery
+    life by forcing the disk to spin up more often. Increase this setting
+    \emph{only} if you use very large playlists.}
 
     \item [Glyphs To Cache.] This sets the default memory allocation size
     for fonts in unique glyphs. This should be set to the number of unique
