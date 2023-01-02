@@ -380,6 +380,9 @@ Lyre prototype 1 */
 #define IMX233_FREESCALE    (1 << 0) /* Freescale I.MX233 nonstandard two-level MBR */
 #define IMX233_CREATIVE     (1 << 1) /* Creative MBLK windowing */
 
+/* CONFIG_BUFLIB_BACKEND */
+#define BUFLIB_BACKEND_MEMPOOL      0 /* Default memory pool backed buflib */
+
 /* now go and pick yours */
 #if defined(IRIVER_H100)
 #include "config/iriverh100.h"
@@ -604,6 +607,10 @@ Lyre prototype 1 */
 #undef HAVE_MULTIDRIVE
 #undef CONFIG_STORAGE_MULTI
 #undef CONFIG_STORAGE
+#endif
+
+#ifndef CONFIG_BUFLIB_BACKEND
+# define CONFIG_BUFLIB_BACKEND BUFLIB_BACKEND_MEMPOOL
 #endif
 
 #ifdef APPLICATION

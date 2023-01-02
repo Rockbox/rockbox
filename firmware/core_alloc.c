@@ -3,7 +3,7 @@
 #include <string.h>
 #include "system.h"
 #include "core_alloc.h"
-#include "buflib_mempool.h"
+#include "buflib.h"
 
 /* not static so it can be discovered by core_get_data() */
 struct buflib_context core_ctx;

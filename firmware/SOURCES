@@ -4,7 +4,9 @@
 ata_idle_notify.c
 events.c
 backlight.c
+#if CONFIG_BUFLIB_BACKEND == BUFLIB_BACKEND_MEMPOOL
 buflib_mempool.c
+#endif
 core_alloc.c
 general.c
 powermgmt.c

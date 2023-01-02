@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "config.h"
-#include "buflib_mempool.h"
+#include "buflib.h"
 #include "chunk_alloc.h"
 
 /* All functions below are wrappers for functions in buflib.h, except

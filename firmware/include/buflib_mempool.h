@@ -26,6 +26,10 @@
 #ifndef _BUFLIB_MEMPOOL_H_
 #define _BUFLIB_MEMPOOL_H_
 
+#ifndef _BUFLIB_H_
+# error "include buflib.h instead"
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
