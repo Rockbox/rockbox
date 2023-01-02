@@ -163,7 +163,7 @@ void abort(void);
 #define TLSF_SIGNATURE  (0x2A59FA59)
 
 #define PTR_MASK        (sizeof(void *) - 1)
-#define BLOCK_SIZE      (0xFFFFFFFF - PTR_MASK)
+#define BLOCK_SIZE      (~PTR_MASK) /* BUGFIX (0xFFFFFFFF - PTR_MASK) */
 
 
 /* Dereferencing type-punned pointers will break strict aliasing.*/
@@ -342,12 +342,12 @@ static __inline__ int ms_bit(int i)
 
 static __inline__ void set_bit(int nr, u32_t * addr)
 {
-    addr[nr >> 5] |= 1 << (nr & 0x1f);
+    addr[nr >> 5] |= 1u << (nr & 0x1f);
 }
 
 static __inline__ void clear_bit(int nr, u32_t * addr)
 {
-    addr[nr >> 5] &= ~(1 << (nr & 0x1f));
+    addr[nr >> 5] &= ~(1u << (nr & 0x1f));
 }
 
 static __inline__ void MAPPING_SEARCH(size_t * _r, int *_fl, int *_sl)
@@ -871,7 +871,7 @@ void free_ex(void *ptr, void *mem_pool)
     }
     if (b->size & PREV_FREE) {
         /* Coalesce previous block */
-        tmp_b = (bhdr_t*) ( (intptr_t)b->prev_hdr & BLOCK_SIZE );
+        tmp_b = (bhdr_t*) ( (intptr_t)b->prev_hdr & ~STATE_MASK );
         MAPPING_INSERT(tmp_b->size & BLOCK_SIZE, &fl, &sl);
         EXTRACT_BLOCK(tmp_b, tlsf, fl, sl);
         tmp_b->size += (b->size & BLOCK_SIZE) + BHDR_OVERHEAD;
