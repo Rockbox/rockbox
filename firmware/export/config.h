@@ -382,6 +382,7 @@ Lyre prototype 1 */
 
 /* CONFIG_BUFLIB_BACKEND */
 #define BUFLIB_BACKEND_MEMPOOL      0 /* Default memory pool backed buflib */
+#define BUFLIB_BACKEND_MALLOC       1 /* malloc() buflib (for debugging) */
 
 /* now go and pick yours */
 #if defined(IRIVER_H100)

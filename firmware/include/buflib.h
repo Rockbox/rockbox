@@ -380,6 +380,8 @@ void buflib_check_valid(struct buflib_context *ctx);
 
 #if CONFIG_BUFLIB_BACKEND == BUFLIB_BACKEND_MEMPOOL
 #include "buflib_mempool.h"
+#elif CONFIG_BUFLIB_BACKEND == BUFLIB_BACKEND_MALLOC
+#include "buflib_malloc.h"
 #endif
 
 #ifndef BUFLIB_ALLOC_OVERHEAD

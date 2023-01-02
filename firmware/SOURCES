@@ -6,6 +6,8 @@ events.c
 backlight.c
 #if CONFIG_BUFLIB_BACKEND == BUFLIB_BACKEND_MEMPOOL
 buflib_mempool.c
+#elif CONFIG_BUFLIB_BACKEND == BUFLIB_BACKEND_MALLOC
+buflib_malloc.c
 #endif
 core_alloc.c
 general.c
