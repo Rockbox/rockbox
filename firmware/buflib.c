@@ -991,8 +991,7 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
     return data[idx_PIN].pincount;
 }
 
-#ifdef DEBUG
-
+#ifdef BUFLIB_DEBUG_GET_DATA
 void *buflib_get_data(struct buflib_context *ctx, int handle)
 {
     if (handle <= 0)
@@ -1000,7 +999,9 @@ void *buflib_get_data(struct buflib_context *ctx, int handle)
 
     return (void*)(ctx->handle_table[-handle].alloc);
 }
+#endif
 
+#ifdef BUFLIB_DEBUG_CHECK_VALID
 void buflib_check_valid(struct buflib_context *ctx)
 {
     for(union buflib_data *block = ctx->buf_start;
@@ -1016,10 +1017,11 @@ void buflib_check_valid(struct buflib_context *ctx)
 }
 #endif
 
-#ifdef BUFLIB_DEBUG_BLOCK_SINGLE
+#ifdef BUFLIB_DEBUG_PRINT
 int buflib_get_num_blocks(struct buflib_context *ctx)
 {
     int i = 0;
+
     for(union buflib_data *block = ctx->buf_start;
         block < ctx->alloc_end;
         block += abs(block->val))
@@ -1027,11 +1029,12 @@ int buflib_get_num_blocks(struct buflib_context *ctx)
         check_block_length(ctx, block);
         ++i;
     }
+
     return i;
 }
 
-void buflib_print_block_at(struct buflib_context *ctx, int block_num,
-                           char* buf, size_t bufsize)
+bool buflib_print_block_at(struct buflib_context *ctx, int block_num,
+                           char *buf, size_t bufsize)
 {
     for(union buflib_data *block = ctx->buf_start;
         block < ctx->alloc_end;
@@ -1044,8 +1047,13 @@ void buflib_print_block_at(struct buflib_context *ctx, int block_num,
             snprintf(buf, bufsize, "%8p: val: %4ld (%sallocated)",
                      block, (long)block->val,
                      block->val > 0 ? "" : "un");
+            return true;
         }
     }
+
+    if (bufsize > 0)
+        *buf = '\0';
+    return false;
 }
 #endif
 

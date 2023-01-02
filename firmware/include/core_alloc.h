@@ -21,21 +21,23 @@ unsigned core_pin_count(int handle);
 int core_free(int handle);
 size_t core_available(void);
 size_t core_allocatable(void);
-#ifdef DEBUG
+
+#ifdef BUFLIB_DEBUG_CHECK_VALID
 void core_check_valid(void);
 #endif
 
 /* DO NOT ADD wrappers for buflib_buffer_out/in. They do not call
  * the move callbacks and are therefore unsafe in the core */
 
-#ifdef BUFLIB_DEBUG_BLOCK_SINGLE
-int  core_get_num_blocks(void);
-void core_print_block_at(int block_num, char* buf, size_t bufsize);
-#endif
+#ifdef BUFLIB_DEBUG_PRINT
+int core_get_num_blocks(void);
+bool core_print_block_at(int block_num, char* buf, size_t bufsize);
 
 /* frees the debug test alloc created at initialization,
- * since this is the first any further alloc should force a compaction run */
+ * since this is the first any further alloc should force a compaction run
+ * only used if debug print is active */
 bool core_test_free(void);
+#endif
 
 static inline void* core_get_data(int handle)
 {

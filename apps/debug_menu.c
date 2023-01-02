@@ -496,6 +496,7 @@ static bool dbg_buffering_thread(void)
 #undef STR_DATAREM
 }
 
+#ifdef BUFLIB_DEBUG_PRINT
 static const char* bf_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
@@ -536,6 +537,7 @@ static bool dbg_buflib_allocs(void)
     info.timeout = HZ;
     return simplelist_show_list(&info);
 }
+#endif /* BUFLIB_DEBUG_PRINT */
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static const char* dbg_partitions_getname(int selected_item, void *data,
@@ -2619,7 +2621,9 @@ static const struct {
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
+#ifdef BUFLIB_DEBUG_PRINT
         { "View buflib allocs", dbg_buflib_allocs },
+#endif
 #ifndef SIMULATOR
 #if CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },

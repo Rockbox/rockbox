@@ -1019,7 +1019,7 @@ void switch_thread(void)
 #ifdef RB_PROFILE
         profile_thread_stopped(THREAD_ID_SLOT(thread->id));
 #endif
-#ifdef DEBUG
+#ifdef BUFLIB_DEBUG_CHECK_VALID
         /* Check core_ctx buflib integrity */
         core_check_valid();
 #endif

@@ -35,8 +35,11 @@ unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 extern unsigned char *audiobufend;
 #endif
 
+#ifdef BUFLIB_DEBUG_PRINT
 /* debug test alloc */
 static int test_alloc;
+#endif
+
 void core_allocator_init(void)
 {
     unsigned char *start = ALIGN_UP(audiobuffer, sizeof(intptr_t));
@@ -51,16 +54,9 @@ void core_allocator_init(void)
 
     buflib_init(&core_ctx, start, audiobufend - start);
 
+#ifdef BUFLIB_DEBUG_PRINT
     test_alloc = core_alloc(112);
-}
-
-bool core_test_free(void)
-{
-    bool ret = test_alloc > 0;
-    if (ret)
-        test_alloc = core_free(test_alloc);
-
-    return ret;
+#endif
 }
 
 /* Allocate memory in the "core" context. See documentation
@@ -119,17 +115,28 @@ unsigned core_pin_count(int handle)
     return buflib_pin_count(&core_ctx, handle);
 }
 
+#ifdef BUFLIB_DEBUG_PRINT
 int core_get_num_blocks(void)
 {
     return buflib_get_num_blocks(&core_ctx);
 }
 
-void core_print_block_at(int block_num, char* buf, size_t bufsize)
+bool core_print_block_at(int block_num, char* buf, size_t bufsize)
 {
-    buflib_print_block_at(&core_ctx, block_num, buf, bufsize);
+    return buflib_print_block_at(&core_ctx, block_num, buf, bufsize);
 }
 
-#ifdef DEBUG
+bool core_test_free(void)
+{
+    bool ret = test_alloc > 0;
+    if (ret)
+        test_alloc = core_free(test_alloc);
+
+    return ret;
+}
+#endif
+
+#ifdef BUFLIB_DEBUG_CHECK_VALID
 void core_check_valid(void)
 {
     buflib_check_valid(&core_ctx);

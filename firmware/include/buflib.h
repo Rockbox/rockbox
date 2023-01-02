@@ -23,15 +23,21 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-
 #ifndef _BUFLIB_H_
 #define _BUFLIB_H_
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
-/* enable single block debugging */
-#define BUFLIB_DEBUG_BLOCK_SINGLE
+/* add extra checks to buflib_get_data to catch bad handles */
+//#define BUFLIB_DEBUG_GET_DATA
+
+/* support integrity check */
+//#define BUFLIB_DEBUG_CHECK_VALID
+
+/* support debug printing of memory blocks */
+//#define BUFLIB_DEBUG_PRINT
 
 union buflib_data
 {
@@ -260,12 +266,12 @@ int buflib_alloc_maximum(struct buflib_context* ctx,
  *
  * Returns: The start pointer of the allocation
  */
-#ifdef DEBUG
-void* buflib_get_data(struct buflib_context *ctx, int handle);
+#ifdef BUFLIB_DEBUG_GET_DATA
+void *buflib_get_data(struct buflib_context *ctx, int handle);
 #else
-static inline void* buflib_get_data(struct buflib_context *ctx, int handle)
+static inline void *buflib_get_data(struct buflib_context *ctx, int handle)
 {
-    return (void*)(ctx->handle_table[-handle].alloc);
+    return (void *)ctx->handle_table[-handle].alloc;
 }
 #endif
 
@@ -342,29 +348,34 @@ void* buflib_buffer_out(struct buflib_context *ctx, size_t *size);
  */
 void buflib_buffer_in(struct buflib_context *ctx, int size);
 
-/* debugging */
-
+#ifdef BUFLIB_DEBUG_PRINT
 /**
- * Gets the number of blocks in the entire buffer, allocated or unallocated
+ * Return the number of blocks in the buffer, allocated or unallocated.
  *
- * Only available if BUFLIB_DEBUG_BLOCK_SIGNLE is defined
+ * Only available if BUFLIB_DEBUG_PRINT is defined.
  */
 int buflib_get_num_blocks(struct buflib_context *ctx);
 
 /**
- * Print information about a single block as indicated by block_num
- * into buf
+ * Write a string describing the block at index block_num to the
+ * provided buffer. The buffer will always be null terminated and
+ * there is no provision to detect truncation. (A 40-byte buffer
+ * is enough to contain any returned string.)
  *
- * buflib_get_num_blocks() beforehand to get the total number of blocks,
- * as passing an block_num higher than that is undefined
+ * Returns false if the block index is out of bounds, and writes
+ * an empty string.
  *
- * Only available if BUFLIB_DEBUG_BLOCK_SIGNLE is defined
+ * Only available if BUFLIB_DEBUG_PRINT is defined.
  */
-void buflib_print_block_at(struct buflib_context *ctx, int block_num,
-                            char* buf, size_t bufsize);
+bool buflib_print_block_at(struct buflib_context *ctx, int block_num,
+                           char *buf, size_t bufsize);
+#endif
 
+#ifdef BUFLIB_DEBUG_CHECK_VALID
 /**
  * Check integrity of given buflib context
  */
 void buflib_check_valid(struct buflib_context *ctx);
 #endif
+
+#endif /* _BUFLIB_H_ */
