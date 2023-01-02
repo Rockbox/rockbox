@@ -354,6 +354,31 @@ static const char graphic_numeric[] = "graphic,numeric";
 # endif
 #endif
 
+/*
+ * Total buffer size due to this setting = max files in dir * 52 bytes
+ * Keep this in mind when selecting the maximum - if the maximum is too
+ * high it's possible rockbox could hit OOM and become unusable until
+ * the config file is deleted manually.
+ *
+ * Note the FAT32 limit is 65534 files per directory, but this limit
+ * also applies to the database browser so it makes sense to support
+ * larger maximums.
+ */
+#if MEMORYSIZE >= 16
+# define MAX_FILES_IN_DIR_DEFAULT   5000
+# define MAX_FILES_IN_DIR_MAX       100000
+# define MAX_FILES_IN_DIR_STEP      1000
+#elif MEMORYSIZE >= 8
+# define MAX_FILES_IN_DIR_DEFAULT   5000
+# define MAX_FILES_IN_DIR_MAX       40000
+# define MAX_FILES_IN_DIR_STEP      500
+#else
+/* historical defaults, only for 2 MiB targets these days */
+# define MAX_FILES_IN_DIR_DEFAULT   1000
+# define MAX_FILES_IN_DIR_MAX       10000
+# define MAX_FILES_IN_DIR_STEP      50
+#endif
+
 #if LCD_DEPTH > 1
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -1028,13 +1053,10 @@ const struct settings_list settings[] = {
                   "max files in playlist", UNIT_INT, 1000, 32000, 1000,
                   NULL, NULL, NULL),
     INT_SETTING(F_BANFROMQS, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
-#if MEMORYSIZE > 1
-                  1000,
-#else
-                  200,
-#endif
-                  "max files in dir", UNIT_INT, 50, 10000, 50,
-                  NULL, NULL, NULL),
+                MAX_FILES_IN_DIR_DEFAULT, "max files in dir", UNIT_INT,
+                MAX_FILES_IN_DIR_STEP /* min */, MAX_FILES_IN_DIR_MAX,
+                MAX_FILES_IN_DIR_STEP,
+                NULL, NULL, NULL),
 /* use this setting for user code even if there's no exchangable battery
  * support enabled */
 #if BATTERY_CAPACITY_INC > 0
