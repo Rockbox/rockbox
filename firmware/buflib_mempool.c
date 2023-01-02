@@ -29,7 +29,7 @@
 #include <stdlib.h> /* for abs() */
 #include <stdio.h> /* for snprintf() */
 #include <stddef.h> /* for ptrdiff_t */
-#include "buflib.h"
+#include "buflib_mempool.h"
 #include "string-extra.h" /* strmemccpy() */
 #include "debug.h"
 #include "panic.h"

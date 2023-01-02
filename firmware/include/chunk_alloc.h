@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "config.h"
-#include "buflib.h"
+#include "buflib_mempool.h"
 
 #define CHUNK_ALLOC_INVALID ((size_t)-1)
 

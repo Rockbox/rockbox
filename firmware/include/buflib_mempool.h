@@ -23,8 +23,8 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-#ifndef _BUFLIB_H_
-#define _BUFLIB_H_
+#ifndef _BUFLIB_MEMPOOL_H_
+#define _BUFLIB_MEMPOOL_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -378,4 +378,4 @@ bool buflib_print_block_at(struct buflib_context *ctx, int block_num,
 void buflib_check_valid(struct buflib_context *ctx);
 #endif
 
-#endif /* _BUFLIB_H_ */
+#endif /* _BUFLIB_MEMPOOL_H_ */

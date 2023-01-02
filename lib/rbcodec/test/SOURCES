@@ -5,5 +5,5 @@ warble.c
 ../../../firmware/common/structec.c
 ../../../firmware/common/pathfuncs.c
 ../../../firmware/common/crc32.c
-../../../firmware/buflib.c
+../../../firmware/buflib_mempool.c
 ../../../firmware/core_alloc.c
