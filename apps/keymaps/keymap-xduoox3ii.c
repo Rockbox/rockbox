@@ -188,6 +188,7 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_LIST:
             return button_context_list;
+        case CONTEXT_STD | CONTEXT_LOCKED:
         case CONTEXT_STD:
             return button_context_standard;
         case CONTEXT_BOOKMARKSCREEN:
@@ -206,8 +207,10 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_vol_is_inc;
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU | CONTEXT_LOCKED:
         case CONTEXT_MAINMENU:
             return button_context_tree;
+        case CONTEXT_WPS | CONTEXT_LOCKED:
         case CONTEXT_WPS:
             return button_context_wps;
         case CONTEXT_YESNOSCREEN:

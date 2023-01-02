@@ -192,6 +192,7 @@ const struct button_mapping* get_context_mapping(int context)
     {
         /* anything that uses button_context_standard */
         case CONTEXT_LIST:
+        case CONTEXT_STD | CONTEXT_LOCKED:
         case CONTEXT_STD:
         default:
             return button_context_standard;
@@ -220,13 +221,14 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_settings_r_is_inc;
 
         case CONTEXT_TREE:
+        case CONTEXT_MAINMENU | CONTEXT_LOCKED:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
             /* else fall through to CONTEXT_TREE|CONTEXT_CUSTOM */
         case CONTEXT_TREE|CONTEXT_CUSTOM:
             return button_context_tree;
-
+        case CONTEXT_WPS | CONTEXT_LOCKED:
         case CONTEXT_WPS:
             return button_context_wps;
 

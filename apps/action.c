@@ -595,7 +595,7 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     int  context = cur->context;
     cur->is_prebutton = false;
 
-#if defined(HAVE_LOCKED_ACTIONS) && !defined(HAS_BUTTON_HOLD)
+#if !defined(HAS_BUTTON_HOLD) && !defined(BOOTLOADER)
     /* This only applies to the first context, to allow locked contexts to
      * specify a fall through to their non-locked version */
     if (is_keys_locked())

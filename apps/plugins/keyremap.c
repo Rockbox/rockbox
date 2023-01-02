@@ -53,13 +53,13 @@ struct context_flags {
 /* flags added to context_name[] */
 static struct context_flags context_flags[] = {
     {"UNKNOWN", 0},/* index 0 is an Error */
-#ifdef HAVE_LOCKED_ACTIONS
+#ifndef HAS_BUTTON_HOLD
     {"LOCKED", CONTEXT_LOCKED},
 #endif
     /*{"PLUGIN", CONTEXT_PLUGIN}, need a custom action list and a way to supply */
 #if BUTTON_REMOTE != 0
     {"REMOTE", CONTEXT_REMOTE},
-#ifdef HAVE_LOCKED_ACTIONS
+#ifndef HAS_BUTTON_HOLD
     {"REMOTE_LOCKED", CONTEXT_REMOTE | CONTEXT_LOCKED},
 #endif
 #endif /* BUTTON_REMOTE != 0 */
