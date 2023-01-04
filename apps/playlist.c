@@ -1828,7 +1828,8 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
     }
 
     /* No luck if the whole playlist was bad. */
-    if (playlist->indices[next_index] & PLAYLIST_SKIPPED)
+    if (next_index < 0 || next_index >= playlist->amount ||
+        playlist->indices[next_index] & PLAYLIST_SKIPPED)
         return -1;
 
     return next_index;
