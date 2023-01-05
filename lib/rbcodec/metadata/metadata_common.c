@@ -148,17 +148,20 @@ int read_uint64le(int fd, uint64_t* buf)
 uint64_t get_uint64_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
-
-    return ((uint64_t)p[0]) | ((uint64_t)p[1] << 8)  | ((uint64_t)p[2] << 16) | ((uint64_t)p[3] << 24) | ((uint64_t)p[4] << 32) |
-                  ((uint64_t)p[5] << 40) | ((uint64_t)p[6] << 48) | ((uint64_t)p[7] << 56);
+    #define u64(v) (uint64_t)v
+    return (u64(p[0])) | ((u64(p[1])) << 8)  | ((u64(p[2])) << 16)
+        | ((u64(p[3])) << 24) | ((u64(p[4])) << 32) |((u64(p[5])) << 40)
+        | ((u64(p[6])) << 48) | ((u64(p[7])) << 56);
+    #undef u64
 }
 
 /* Read an unaligned 32-bit little endian long from buffer. */
 uint32_t get_long_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
-
-    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+    #define u32(v) (uint32_t)v
+    return (u32(p[0])) | ((u32(p[1])) << 8) | ((u32(p[2])) << 16) | ((u32(p[3])) << 24);
+    #undef u32
 }
 
 /* Read an unaligned 16-bit little endian short from buffer. */
@@ -166,15 +169,16 @@ uint16_t get_short_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
-    return p[0] | (p[1] << 8);
+    return ((uint16_t)p[0]) | (((uint16_t)p[1]) << 8);
 }
 
 /* Read an unaligned 32-bit big endian long from buffer. */
 uint32_t get_long_be(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
-
-    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+    #define u32(v) (uint32_t)v
+    return ((u32(p[0])) << 24) | ((u32(p[1])) << 16) | ((u32(p)[2]) << 8) | (u32(p[3]));
+    #undef u32
 }
 
 /* Read an unaligned 16-bit little endian short from buffer. */
@@ -182,15 +186,16 @@ uint16_t get_short_be(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
-    return (p[0] << 8) | p[1];
+    return (((uint16_t)p[0]) << 8) | ((uint16_t)p[1]);
 }
 
 /* Read an unaligned 32-bit little endian long from buffer. */
 int32_t get_slong(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
-
-    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+    #define i32(v) (int32_t)v
+    return (i32(p[0])) | ((i32(p[1])) << 8) | ((i32(p[2])) << 16) | ((i32(p[3])) << 24);
+    #undef i32
 }
 
 uint32_t get_itunes_int32(char* value, int count)

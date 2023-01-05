@@ -427,10 +427,10 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 
 #ifdef CONFIG_SAMPR_TYPES
 
-#define SAMPR_TYPE_MASK (0xff << 24)
-#define SAMPR_TYPE_PLAY (0x00 << 24)
+#define SAMPR_TYPE_MASK (0xffu << 24)
+#define SAMPR_TYPE_PLAY (0x00u << 24)
 #ifdef HAVE_RECORDING
-#define SAMPR_TYPE_REC  (0x01 << 24)
+#define SAMPR_TYPE_REC  (0x01u << 24)
 #endif
 
 #ifndef PCM_SAMPR_CONFIG_ONLY

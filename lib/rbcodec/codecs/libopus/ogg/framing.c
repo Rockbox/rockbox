@@ -235,8 +235,9 @@ static int _os_lacing_expand(ogg_stream_state *os,long needed){
    perform the checksum simultaneously with other copies */
 
 static ogg_uint32_t _os_update_crc(ogg_uint32_t crc, unsigned char *buffer, int size){
+  #define u32(v) (uint32_t)v
   while (size>=8){
-    crc^=buffer[0]<<24|buffer[1]<<16|buffer[2]<<8|buffer[3];
+    crc^=((u32(buffer[0]))<<24)|((u32(buffer[1]))<<16)|((u32(buffer[2]))<<8)|(u32(buffer[3]));
 
     crc=crc_lookup[7][ crc>>24      ]^crc_lookup[6][(crc>>16)&0xFF]^
         crc_lookup[5][(crc>> 8)&0xFF]^crc_lookup[4][ crc     &0xFF]^
@@ -246,7 +247,7 @@ static ogg_uint32_t _os_update_crc(ogg_uint32_t crc, unsigned char *buffer, int 
     buffer+=8;
     size-=8;
   }
-
+  #undef u32
   while (size--)
     crc=(crc<<8)^crc_lookup[0][((crc >> 24)&0xff)^*buffer++];
   return crc;
