@@ -40,7 +40,7 @@
 
     .text
 
-    .extern system_main
+    .extern system_early_init
     .extern main
     .global _start
 
@@ -139,6 +139,19 @@ _iram_loop:
     bne    t1, t2, _iram_loop
     sw     t3, -4(t1)
 
+#ifdef HAVE_INIT_ATTR
+    /* Copy init code */
+    la      t0, _initcopy
+    la      t1, _initstart
+    la      t2, _initend
+_init_loop:
+    lw     t3, 0(t0)
+    addiu  t1, 4
+    addiu  t0, 4
+    bne    t1, t2, _init_loop
+    sw     t3, -4(t1)
+#endif
+
     /*
       ----------------------------------------------------
        Clear BSS section
@@ -183,7 +196,7 @@ _irq_stack_loop:
        Jump to C code
       ----------------------------------------------------
     */
-    jal     system_main  /* Init clocks etc first */
+    jal     system_early_init  /* Init clocks etc first */
     ssnop
     j       main
     move    ra, zero     /* init backtrace root */

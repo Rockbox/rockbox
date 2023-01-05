@@ -434,7 +434,7 @@ static void sdram_init(void)
 }
 
 /* Gets called *before* main */
-void ICODE_ATTR system_main(void)
+void ICODE_ATTR system_early_init(void)
 {
     int i;
 

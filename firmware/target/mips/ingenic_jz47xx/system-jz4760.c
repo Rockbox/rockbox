@@ -533,7 +533,7 @@ static void serial_setbrg(void)
     *uart_lcr = tmp;
 }
 
-int serial_preinit(void)
+static int serial_preinit(void);
 {
     volatile u8 *uart_fcr = (volatile u8 *)(CFG_UART_BASE + OFF_FCR);
     volatile u8 *uart_lcr = (volatile u8 *)(CFG_UART_BASE + OFF_LCR);
@@ -569,7 +569,7 @@ int serial_preinit(void)
 #define cpu_frequency CPU_FREQ
 #endif
 
-void usb_preinit(void)
+static void usb_preinit(void)
 {
     /* Clear ECS bit of CPCCR, 0:clock source is EXCLK, 1:clock source is EXCLK/2 */
     REG_CPM_CPCCR &= ~CPCCR_ECS;
@@ -621,7 +621,7 @@ void usb_preinit(void)
     udelay(300);
 }
 
-void dma_preinit(void)
+static void dma_preinit(void)
 {
     __cpm_start_mdma();
     __cpm_start_dmac();
@@ -636,7 +636,7 @@ void dma_preinit(void)
 }
 
 /* Gets called *before* main */
-void ICODE_ATTR system_main(void)
+void ICODE_ATTR system_early_init(void)
 {
     int i;
 
