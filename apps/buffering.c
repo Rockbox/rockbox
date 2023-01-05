@@ -416,7 +416,8 @@ add_handle(unsigned int flags, size_t data_size, const char *path,
     h->signaled = 0; /* Data can be waited for */
 
     /* Save the provided path */
-    memcpy(h->path, path, pathsize);
+    if (path)
+        memcpy(h->path, path, pathsize);
 
     /* Return the start of the data area */
     *data_out = ringbuf_add(index, handlesize);
