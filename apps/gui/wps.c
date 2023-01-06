@@ -1035,7 +1035,7 @@ long gui_wps_show(void)
                 gwps_leave_wps(true);
                 if (browse_id3(audio_current_track(),
                         playlist_get_display_index(),
-                        playlist_amount()))
+                        playlist_amount(), NULL))
                     return GO_TO_ROOT;
                 restore = true;
             }

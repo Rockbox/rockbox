@@ -39,7 +39,8 @@ int mmc_remove_request(void);
 bool set_time_screen(const char* title, struct tm *tm, bool set_date);
 #endif
 
-bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount);
+bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
+                struct tm *modified);
 int  view_runtime(void);
 
 #ifdef HAVE_TOUCHSCREEN

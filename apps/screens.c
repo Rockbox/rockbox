@@ -387,10 +387,13 @@ static const int id3_headers[]=
     LANG_ID3_ALBUM_GAIN,
     LANG_FILESIZE,
     LANG_ID3_PATH,
+    LANG_DATE,
+    LANG_TIME,
 };
 
 struct id3view_info {
     struct mp3entry* id3;
+    struct tm *modified;
     int count;
     int playlist_display_index;
     int playlist_amount;
@@ -488,6 +491,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
 {
     struct id3view_info *info = (struct id3view_info*)data;
     struct mp3entry* id3 =info->id3;
+    struct tm *tm = info->modified;
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
@@ -662,6 +666,28 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if(say_it && val)
                     output_dyn_value(NULL, 0, id3->filesize, byte_units, 4, true);
                 break;
+            case LANG_DATE:
+                if (!tm)
+                    return NULL;
+
+                snprintf(buffer, buffer_len, "%04d/%02d/%02d",
+                         tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+
+                val = buffer;
+                if (say_it)
+                    talk_date(tm, true);
+                break;
+            case LANG_TIME:
+                if (!tm)
+                    return NULL;
+
+                snprintf(buffer, buffer_len, "%02d:%02d:%02d",
+                         tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+                val = buffer;
+                if (say_it)
+                    talk_time(tm, true);
+                break;
         }
         if((!val || !*val) && say_it)
             talk_id(LANG_ID3_NO_INFO, true);
@@ -688,7 +714,8 @@ static int id3_speak_item(int selected_item, void* data)
     return 0;
 }
 
-bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount)
+bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
+                struct tm *modified)
 {
     struct gui_synclist id3_lists;
     int key;
@@ -696,6 +723,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     struct id3view_info info;
     info.count = 0;
     info.id3 = id3;
+    info.modified = modified;
     info.playlist_display_index = playlist_display_index;
     info.playlist_amount = playlist_amount;
     bool ret = false;

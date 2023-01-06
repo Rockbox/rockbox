@@ -412,7 +412,7 @@ enum plugin_status plugin_start(const void* parameter)
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
-    bool usb = props_type == PROPS_ID3 ? rb->browse_id3(&id3, 0, 0) :
+    bool usb = props_type == PROPS_ID3 ? rb->browse_id3(&id3, 0, 0, &tm) :
                                              browse_file_or_dir(&stats);
 
     FOR_NB_SCREENS(i)
