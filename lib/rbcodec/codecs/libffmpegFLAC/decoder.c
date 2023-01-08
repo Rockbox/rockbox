@@ -182,8 +182,8 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
     return 0;
 }
 
-static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order, int bps) ICODE_ATTR_FLAC;
-static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order, int bps)
+//static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order, int bps) ICODE_ATTR_FLAC;
+int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order, int bps)
 {
     const int blocksize = s->blocksize;
     unsigned a, b, c, d;
@@ -198,28 +198,33 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
     if (decode_residuals(s, decoded, pred_order) < 0)
         return -4;
 
-    a = decoded[pred_order-1];
-    b = a - decoded[pred_order-2];
-    c = b - decoded[pred_order-2] + decoded[pred_order-3];
-    d = c - decoded[pred_order-2] + 2U*decoded[pred_order-3] - decoded[pred_order-4];
-
     switch(pred_order)
     {
         case 0:
             break;
         case 1:
+            a = decoded[pred_order-1];
             for (i = pred_order; i < blocksize; i++)
                 decoded[i] = a += decoded[i];
             break;
         case 2:
+            a = decoded[pred_order-1];
+            b = a - decoded[pred_order-2];
             for (i = pred_order; i < blocksize; i++)
                 decoded[i] = a += b += decoded[i];
             break;
         case 3:
+            a = decoded[pred_order-1];
+            b = a - decoded[pred_order-2];
+            c = b - decoded[pred_order-2] + decoded[pred_order-3];
             for (i = pred_order; i < blocksize; i++)
                 decoded[i] = a += b += c += decoded[i];
             break;
         case 4:
+            a = decoded[pred_order-1];
+            b = a - decoded[pred_order-2];
+            c = b - decoded[pred_order-2] + decoded[pred_order-3];
+            d = c - decoded[pred_order-2] + 2U*decoded[pred_order-3] - decoded[pred_order-4];
             for (i = pred_order; i < blocksize; i++)
                 decoded[i] = a += b += c += d += decoded[i];
             break;
