@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "buflib.h"
+#include "chunk_alloc.h"
 
 /* All functions below are wrappers for functions in buflib.h, except
  * they have a predefined context
@@ -43,4 +44,11 @@ static inline void* core_get_data(int handle)
     return buflib_get_data(&core_ctx, handle);
 }
 
+/* core context chunk_alloc */
+static inline bool core_chunk_alloc_init(struct chunk_alloc_header *hdr,
+                                         size_t chunk_size, size_t max_chunks)
+{
+    extern struct buflib_context core_ctx;
+    return chunk_alloc_init(hdr, &core_ctx, chunk_size, max_chunks);
+}
 #endif /* __CORE_ALLOC_H__ */
