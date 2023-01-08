@@ -2082,8 +2082,13 @@ int playlist_add(const char *filename)
     struct playlist_info* playlist = &current_playlist;
     int len = strlen(filename);
 
-    if((len+1 > playlist->buffer_size - playlist->buffer_end_pos) ||
-       (playlist->amount >= playlist->max_playlist_size))
+    if(len+1 > playlist->buffer_size - playlist->buffer_end_pos)
+    {
+        notify_buffer_full();
+        return -2;
+    }
+
+    if(playlist->amount >= playlist->max_playlist_size)
     {
         notify_buffer_full();
         return -1;

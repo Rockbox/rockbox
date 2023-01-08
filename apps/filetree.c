@@ -72,6 +72,7 @@ static int strnatcasecmp_n(const char *a, const char *b, size_t n)
 int ft_build_playlist(struct tree_context* c, int start_index)
 {
     int i;
+    int res = 0;
     int start=start_index;
 
     tree_lock_cache(c);
@@ -81,7 +82,8 @@ int ft_build_playlist(struct tree_context* c, int start_index)
     {
         if((entries[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
-            if (playlist_add(entries[i].name) < 0)
+            res = playlist_add(entries[i].name);
+            if (res < 0)
                 break;
         }
         else
@@ -92,7 +94,22 @@ int ft_build_playlist(struct tree_context* c, int start_index)
         }
     }
 
-    tree_unlock_cache(c);
+    if (res == -2) /* name buffer is full store to disk? */
+    {
+        if (yesno_pop(ID2P(LANG_CATALOG_ADD_TO_NEW)))
+        {
+            char playlist_dir[MAX_PATH];
+            strmemccpy(playlist_dir, c->currdir, sizeof(playlist_dir));
+            tree_unlock_cache(c);
+            if (playlist_create(playlist_dir, "dynamic.m3u8") >= 0)
+            {
+                playlist_insert_directory(NULL, playlist_dir,
+                                          PLAYLIST_REPLACE, false, false);
+            }
+        }
+    }
+    else
+        tree_unlock_cache(c);
 
     return start_index;
 }
