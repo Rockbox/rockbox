@@ -498,10 +498,11 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(
         if (stride_alpha) { \
             alpha_pixels = stride_alpha - alpha_pixels; \
             alpha += alpha_pixels / ALPHA_PIXELS_PER_BYTE; \
-            alpha_data = *alpha++ ^ dmask; \
             alpha_pixels &= 1; \
-            if (alpha_pixels) \
+            if (alpha_pixels) { \
+                alpha_data = *alpha++ ^ dmask; \
                 alpha_data >>= ALPHA_BPP; \
+            } \
         } \
     } while(0)
 #define READ_ALPHA() \
