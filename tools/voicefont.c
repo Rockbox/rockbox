@@ -29,8 +29,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define HEADER_SIZE 20
-
+#define HEADER_SIZE (20)
+#define MAX_NAME_LEN (80)
+#define MAX_VOICE_ENTRIES (2048)
 /* endian conversion macros */
 #if defined(__BIG_ENDIAN__)
 #define UINT_TO_BE(x) (x)
@@ -47,11 +48,11 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     int i,j;
 
     /* two tables, one for normal strings, one for voice-only (>0x8000) */
-    static char names[1000][80]; /* worst-case space */
-    char name[80]; /* one string ID */
-    static int pos[1000]; /* position of sample */
-    static int size[1000]; /* length of clip */
-    int voiceonly[1000]; /* flag if this is voice only */
+    static char names[MAX_VOICE_ENTRIES][MAX_NAME_LEN]; /* worst-case space */
+    char name[MAX_NAME_LEN]; /* one string ID */
+    static int pos[MAX_VOICE_ENTRIES]; /* position of sample */
+    static int size[MAX_VOICE_ENTRIES]; /* length of clip */
+    int voiceonly[MAX_VOICE_ENTRIES]; /* flag if this is voice only */
     int count = 0;
     int count_voiceonly = 0;
     unsigned int value; /* value to be written to file */
@@ -85,6 +86,11 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
         }
     }
     fclose(voicefontids);
+
+    if (count > MAX_VOICE_ENTRIES)
+    {
+        return -1;
+    }
 
     fseek(output, HEADER_SIZE + count*8, SEEK_SET); /* space for header */
 
@@ -161,6 +167,9 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
             fwrite(&value, sizeof(value), 1,output);
             value = UINT_TO_BE(size[i]); /* size */
             fwrite(&value, sizeof(value), 1, output);
+            printf(": [%d]%s : %s {%x, %x}\n", i,
+                   (voiceonly[i] ==1 ? "[V]":""), names[i],
+                   UINT_TO_BE(pos[i]), UINT_TO_BE(size[i])); /* debug */
         } /* for i */
     } /* for j */
 
@@ -199,7 +208,11 @@ int main (int argc, char** argv)
         return -2;
     }
     
-    voicefont(ids, atoi(argv[2]),argv[3],output, 400);
+    if (voicefont(ids, atoi(argv[2]),argv[3],output, 400) < 0)
+    {
+        printf("Error too many voicefont entries!\n");
+        return -3;
+    }
     return 0;
 }
 #endif
