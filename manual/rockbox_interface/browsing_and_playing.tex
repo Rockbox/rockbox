@@ -159,18 +159,20 @@ each option pertains both to files and directories):
   for more details on viewers.
 \item [Create Directory.]
   Create a new directory in the current directory on the disk.
-\item [Properties.]
+\item [Properties / Show Track Info.]
   Shows properties such as size and the time and date of the last modification
   for the selected file. If used on a directory, the number of files and
-  subdirectories will be shown, as well as the total size.
+  subdirectories will be shown, as well as the total size. If used on a supported
+  audio file, its metadata will be displayed.
 \opt{lcd_non-mono}{
 \item [Set As Backdrop.]
   Set the selected \fname{bmp} file as background image. The bitmaps need to meet the
   conditions explained in \reference{ref:LoadingBackdrops}.
 }
 \item [Add to Shortcuts.]
-  Adds a link to the selected item in the \fname{shortcuts.link} file.
-  If the file does not already exist it will be created in the root directory.
+  Adds a link to the selected item in the \fname{shortcuts.txt} file
+  (see \reference{ref:MainMenuShortcuts}).
+  If the file does not already exist it will be created in your Rockbox directory.
   Note that if you create a shortcut to a file, Rockbox will not open it upon
   selecting, but simply bring you to its location in the \setting{File Browser}.
 \end{description}

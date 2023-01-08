@@ -2,85 +2,66 @@
 \section{\label{ref:working_with_playlists}Working with Playlists}
 
 \subsection{Playlist terminology}
-Some common terms that are used in Rockbox when referring to
-playlists:
 
 \begin{description}
-\item[Directory.] A playlist! One of the keys to getting the most out of
-  Rockbox is understanding that Rockbox \emph{always} considers the song that
-  it is playing to be part of a playlist, and in some situations, Rockbox will
-  create a playlist automatically. For example, if you are playing the
-  contents of a directory, Rockbox will automatically create a playlist
-  containing all songs in it. This means that just about anything
-  that is described in this chapter with respect to playlists also applies to
-  directories.
+\item[Directory.] Rockbox always considers the song that is playing to be part of
+  a playlist, and will create a playlist automatically when you are playing the
+  contents of a directory. Meaning, just about anything that is described in this
+  chapter with respect to playlists also applies to directories.
 
-\item[Dynamic playlist.]  A dynamic playlist is a playlist that is created
-  ``On the fly.'' Any time you insert or queue tracks using the
-  \setting{Playing Next Submenu} (see \reference{ref:playingnext_submenu}), you are
-  creating (or adding to) a dynamic playlist.
+\item[Dynamic playlist.]  A dynamic playlist is a playlist created
+  ``on the fly.'' Any time you use the \setting{Playing Next...} menu
+  (see \reference{ref:playingnext_submenu}), or play something
+  from the database, you are creating or adding to a dynamic playlist.
 
-\item[Play/Add.] In Rockbox, to \setting{Play} or \setting{Add} an item means
-  putting it into a playlist and leaving it there, even after it is
-  played.
+\item[Play / Add.] \setting{Play} or \setting{Add} a track to
+  put it into the current (dynamic) playlist.
 
-\item[Queue.] To \setting{Queue} a song means to put it into a playlist, but then
-  to remove the song from the playlist once it has been played.
+\item[Queue.] \setting{Queued} tracks are also put into the dynamic playlist,
+  but removed again as soon as they've been played.
+  Note: Options for queuing tracks are hidden by default (see \reference{ref:queuing} for more details).
 \end{description}
 
 \subsection{Creating playlists}
 
-Rockbox can create playlists in four different ways.
+\subsubsection{By selecting a song for playback}
+When a song is selected from the \setting{File Browser} or \setting{Database} by pressing
+\ActionTreeEnter, Rockbox will automatically create a playlist containing all of the
+listed songs and will start playback.
 
-\subsubsection{By selecting (``playing'') a song from the File Browser}
-Whenever a song is selected from the \setting{File Browser} with
-\ActionTreeEnter, Rockbox will automatically create a playlist containing
-all of the songs in that directory and start playback with the selected
-song.
+\note{Playing a new song will erase the existing dynamic playlist
+  and create a new one. If you want to \emph{add} a song to it instead,
+  see \reference{ref:playingnext_submenu} on how to choose what's playing next.}
 
-\note{If you already have created a dynamic playlist, playing a new
-  song will \emph{erase} the current dynamic playlist and create a new one.
-  If you want to add a song to the current playlist
-  rather than erasing the current
-  playlist, see the section below on how to add music to a playlist.}
+\subsubsection{By choosing ``Play`` or ``Play Shuffled`` from ``Playing Next...``}
+Replaces an existing dynamic playlist with the selected tracks.
 
-\subsubsection{By using the Play or Play Shuffled functions}
-The \setting{Play} function as described in \ref{ref:playingnext_submenu}
-will replace the dynamic playlist with the selected tracks. The \setting{Play
-Shuffled} function is similar, except the selected tracks will be added to the
-playlist in a random order.
-
-\subsubsection{\label{ref:addtoplaylist_submenu}By using the Add to Playlist submenu}
-The \setting{Add to Playlist submenu} makes it possible to modify and create
-playlists that are not currently playing. To do this select \setting{Add to Playlist...}
-in the \setting{Context Menu}. There you will have two choices,
-\setting{Add to Existing Playlist} adds the selected track or directory to an existing
-playlist and \setting{Add to New Playlist} creates a new playlist containing
-the selected track or directory.
+\subsubsection{\label{ref:addtoplaylist_submenu}By choosing  ``Add to Playlist...``}
+Choose \setting{Add to Playlist...} from the \setting{Context Menu} to
+add selected track(s) or directory to a new or existing playlist that is not currently
+playing.
 
 \note{All playlists in the \setting{Playlist catalogue} are stored by default
   in the \fname{/Playlists} directory in the root of your \daps{} disk and
   playlists stored in other locations are not included in the catalogue. It is
-  however possible to move existing playlists there (see
-  \reference{ref:Contextmenu}).}
+  however possible to move existing playlists there or change the default playlist
+  directory (see \reference{ref:Contextmenu}).}
 
 \subsubsection{By using the Main Menu}
 To create a playlist containing some or all of the music on your \dap{}, you can use the
 \setting{Create Playlist} command in the \setting{Playlist Catalogue Context Menu}
 (see \reference{ref:playlistcatalogue_contextmenu}).
 
-\subsection{Adding music to playlists}
+\subsection{Choosing what's playing next}
 
 \subsubsection{\label{ref:playingnext_submenu}Adding music to a dynamic playlist}
-\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playing Next Submenu}{}
-The \setting{Playing Next Submenu} is a submenu in the \setting{Context Menu} (see
-\reference{ref:Contextmenu}), it allows you to put tracks into a
-``dynamic playlist''. The place in which the newly
-selected tracks are added to the playlist is determined by these
-options:
+\screenshot{rockbox_interface/images/ss-playlist-menu}{Playing Next...}{}
+\setting{Playing Next...} is a submenu in the \setting{Context Menu} (see
+\reference{ref:Contextmenu}) that can be invoked on a selection of tracks in various
+places, such as the File Browser, Database, or even PictureFlow:
 
 \begin{description}
-\item [Play Next.] Play track(s) immediately after the currently playing track.
+\item [Play Next.] Track(s) will play immediately after the currently playing track.
 
 \item [Add.] Add track(s) after the most recently added tracks or, if tracks
 have not been added yet, immediately after the currently playing track.
@@ -92,8 +73,7 @@ have not been added yet, immediately after the currently playing track.
 \item [Play Last Shuffled.] Add tracks in a random order to the end of the playlist.
 \end{description}
 
-If you'd like to replace the current playlist with the new selection, the
-following two options will achieve that effect.
+To replace the current dynamic playlist with your selection, choose:
 
 \begin{description}
 \item [Play.] Replace all entries in the dynamic playlist with the selected
@@ -106,10 +86,12 @@ following two options will achieve that effect.
   playlist in random order.
 \end{description}
 
-Another possibility is to add tracks \emph{temporarily} to the dynamic playlist.
-In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
-removed from the playlist after they have been played. They are also not saved
-to the playlist file (see \reference{ref:playlistoptions}).
+\label{ref:queuing}The following options are hidden by default, due to their
+more complicated behavior. Queued tracks are temporarily added to the dynamic
+playlist, but are automatically removed as soon as the tracks have been played.
+Queued tracks will not be saved to a playlist file.
+A current playlist containing queued tracks can not be bookmarked, even after saving it,
+unless you confirm the tracks' removal first (see \reference{ref:createbookmark}).
 
 \begin{description}
 \item [Queue Next.] Corresponds to \setting{Play Next}.
@@ -128,12 +110,8 @@ to the playlist file (see \reference{ref:playlistoptions}).
 $\rightarrow$ \setting{Current Playlist}. Select either \setting{Show Shuffled Adding Options}
 or \setting{Show Queue Options} to customize the displayed set of options.}
 
-The \setting{Playing Next Submenu}  can be used to add either single tracks or
-entire directories to a playlist. If the \setting{Playing Next Submenu} is
-invoked on a single track, it will put only that track into the playlist.
-On the other hand, if the \setting{Playing Next Submenu} is invoked on a
-directory, Rockbox adds all of the tracks in that directory to the
-playlist.
+If \setting{Playing Next...} is invoked on a directory, Rockbox adds all of the tracks in
+that directory to the playlist.
 
 \note{You can control whether or not Rockbox includes the contents of
   subdirectories when adding an entire directory to a playlist. Set the
@@ -142,23 +120,22 @@ playlist.
   you would like Rockbox to include tracks in subdirectories as well as tracks
   in the currently-selected directory.}
 
-Dynamic playlists are saved so resume will restore them exactly as they
+Dynamic playlists are saved, so resume will restore them exactly as they
 were before shutdown.
 
 \note{To view, save, reshuffle, or display the play time of the current
   dynamic playlist use the
-  \setting{Playlist} sub menu in the WPS context menu or in the
-  \setting{Main Menu}.}
+  \setting{Current Playlist} sub menu in the WPS context menu.}
 
 \subsection{Modifying playlists}
 \subsubsection{Reshuffling}
 Reshuffling the current playlist is easily done from the \setting{Current Playlist}
-sub menu in the WPS, just select \setting{Reshuffle}.
+sub menu in the WPS.
 
 \subsubsection{Moving and removing tracks}
-To move or remove a track from the current playlist enter the
+To move or remove a track from the current playlist, enter the
 \setting{Playlist Viewer} by selecting \setting{View Current Playlist} in the
-\setting{Current Playlist} submenu in the WPS context menu or the \setting{Main Menu}.
+\setting{Current Playlist} submenu in the WPS context menu.
 Once in the \setting{Playlist Viewer} open the context menu on the track you
 want to move or remove. If you want to move the track, select \setting{Move} in
 the context menu and then move the blinking cursor to the place where you want
@@ -166,9 +143,9 @@ the track to be moved and confirm with \ActionStdOk. To remove a track, simply
 select \setting{Remove} in the context menu.
 
 \subsection{Saving playlists}
-To save the current playlist either enter the \setting{Current Playlist} submenu
+To save the current playlist, either enter the \setting{Current Playlist} submenu
 in the \setting{WPS Context Menu} (see \reference{sec:contextmenu}) and
-select \setting{Save Current Playlist} or enter the context menu for the
+select \setting{Save Current Playlist}, or enter the context menu for the
 \setting{Playlist catalogue} in the \setting{Main Menu} and select
 \setting{Save Current Playlist}.
 Either method will bring you to the \setting{Virtual Keyboard} (see

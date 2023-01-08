@@ -224,19 +224,24 @@ to a track which can be displayed in the WPS and used in the Database
 browser. The value wraps at 10.
 
 \subsubsection{\label{ref:createbookmark}Bookmarks}
-This allows you to create a bookmark in the currently-playing track. Note that bookmarks
-can only be created for directories, or for playlists stored on disk. Unsaved or modified
-lists must be saved first. Queued tracks, which are automatically removed after playback,
-do not get stored to the playlist file. When saving, Rockbox will offer to purge the
-current playlist of such tracks, so that you'll be able to create bookmarks afterwards.
-See \reference{ref:Bookmarkconfigactual} for more information on bookmarks.
+Create a bookmark in the currently playing track, or display existing entries.
+Bookmarks can only be used with directories, or playlists stored on
+disk. If you don't see the option to create a bookmark, try saving the
+current playlist first.
+
+\note{If you've enabled options for queuing tracks (see \reference{ref:queuing}), keep
+in mind that those are not saved to a playlist file.
+When saving, Rockbox will offer to remove queued tracks, so that bookmarking the
+current playlist becomes possible.}
+
+Refer to \reference{ref:Bookmarkconfigactual} for more information on bookmarks.
 
 \subsubsection{\label{ref:trackinfoviewer}Show Track Info}
 \screenshot{rockbox_interface/images/ss-id3-viewer}{The track info viewer}{}
-This screen is accessible from the WPS screen, and provides a detailed view of
-all the identity information about the current track. This info is known as
-meta data and is stored in audio file formats to keep information on artist,
-album etc. To access this screen, %
+Provides a detailed view of all the identity information about the current
+or selected track. This info is known as meta data and is stored in audio
+file formats to keep information on artist, album etc. To get to this screen
+from the WPS, %
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,%
       SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}{
   press \ActionWpsIdThreeScreen. }%
@@ -244,7 +249,8 @@ album etc. To access this screen, %
       GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_CLIP_PAD,PBELL_VIBE500_PAD,%
       MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,XDUOO_X3_PAD}%
       {press \ActionWpsContext{} to access the
-      \setting{WPS Context Menu} and select \setting{Show Track Info}. }
+      \setting{Context Menu}. Then select \setting{Show Track Info}. The same steps
+      work in the Playlist Viewer as well.}
 
 \subsubsection{Open With...}
 This \setting{Open With} function is the same as the \setting{Open With}

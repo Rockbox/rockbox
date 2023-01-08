@@ -53,10 +53,9 @@ If the \setting{Save a list of recently created bookmarks} option is enabled
 then you can view a list of several recent bookmarks here and select one to 
 jump straight to that track.\\*
 
- \note{Bookmarking only works when tracks are launched from the file browser,
-        and does not currently work for tracks launched via the
-        database. In addition, they do not currently work with dynamic
-        playlists.\\*} 
+ \note{A track launched from the file browser can be bookmarked as is. If
+       tracks are launched via the database, or the current playlist has been modified,
+       creating a bookmark requires that you save the playlist first.\\*} 
 
   \begin{btnmap}
     \ActionStdNext
@@ -319,7 +318,7 @@ Available types are:
 \item[file] \config{data} is the name of the file to ``run''
 \item[browse] \config{data} is the file or the folder to open the file browser at
 \item[playlist menu] \config{data} is the file or the folder to open the
-  ``Current Playlist'' context menu item on
+  ``Playing Next...'' context menu item on (see \reference{ref:playingnext_submenu})
 \item[setting] \config{data} is the config name of the setting you want to change
   (see \reference{ref:config_file_options} for the list of the possible settings)
 \item[debug] \config{data} is the name of the debug menu item to display
