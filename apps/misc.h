@@ -187,6 +187,9 @@ enum current_activity {
     ACTIVITY_USBSCREEN
 };
 
+/* custom string representation of activity */
+#define MAKE_ACT_STR(act) ((char[3]){'>', 'A'+ (act), 0x0})
+
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude);
 

@@ -103,6 +103,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "buflib.h"
 #include "buffering.h"
 #include "tagcache.h"
+#include "tagtree.h"
 #include "viewport.h"
 #include "ata_idle_notify.h"
 #include "settings_list.h"
@@ -157,7 +158,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 263
+#define PLUGIN_API_VERSION 264
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -950,6 +951,9 @@ struct plugin_api {
     void (*fix_path_part)(char* path, int offset, int count);
     void (*onplay_show_playlist_cat_menu)(const char* track_name, int attr,
                                           void (*add_to_pl_cb));
+#ifdef HAVE_TAGCACHE
+    bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
+#endif
 };
 
 /* plugin header */

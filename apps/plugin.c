@@ -825,6 +825,9 @@ static const struct plugin_api rockbox_api = {
     splash_progress_set_delay,
     fix_path_part,
     onplay_show_playlist_cat_menu,
+#if defined(HAVE_TAGCACHE)
+    tagtree_subentries_do_action,
+#endif
 };
 
 static int plugin_buffer_handle;

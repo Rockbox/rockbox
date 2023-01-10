@@ -1611,8 +1611,33 @@ static bool list_viewers(void)
     return false;
 }
 
+#ifdef HAVE_TAGCACHE
+static bool prepare_database_sel(void *param)
+{
+    if (context == CONTEXT_ID3DB &&
+        (selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
+    {
+        if (!strcmp(param, "properties"))
+            strmemccpy(selected_file_path, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER),
+                       sizeof(selected_file_path));
+        else if (!tagtree_get_subentry_filename(selected_file_path, MAX_PATH))
+        {
+            onplay_result = ONPLAY_RELOAD_DIR;
+            return false;
+        }
+
+        selected_file = selected_file_path;
+    }
+    return true;
+}
+#endif
+
 static bool onplay_load_plugin(void *param)
 {
+#ifdef HAVE_TAGCACHE
+    if (!prepare_database_sel(param))
+        return false;
+#endif
     int ret = filetype_load_plugin((const char*)param, selected_file);
     if (ret == PLUGIN_USB_CONNECTED)
         onplay_result = ONPLAY_RELOAD_DIR;
@@ -1717,10 +1742,8 @@ static int clipboard_callback(int action,
 #ifdef HAVE_TAGCACHE
             if (context == CONTEXT_ID3DB)
             {
-                if (((selected_file_attr & FILE_ATTR_MASK) ==
-                        FILE_ATTR_AUDIO) &&
-                    (this_item == &track_info_item ||
-                     this_item == &pictureflow_item))
+                if (this_item == &track_info_item ||
+                    this_item == &pictureflow_item)
                     return action;
                 return ACTION_EXIT_MENUITEM;
             }
@@ -1895,6 +1918,10 @@ static int hotkey_tree_pl_insert_shuffled(void)
 
 static int hotkey_tree_run_plugin(void *param)
 {
+#ifdef HAVE_TAGCACHE
+    if (!prepare_database_sel(param))
+        return ONPLAY_RELOAD_DIR;
+#endif
     if (filetype_load_plugin((const char*)param, selected_file) == PLUGIN_GOTO_WPS)
         return ONPLAY_START_PLAY;
 

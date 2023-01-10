@@ -19,6 +19,11 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/id3.h"
+
+#ifdef HAVE_TAGCACHE
+#include "lib/mul_id3.h"
+#endif
 
 #if !defined(ARRAY_SIZE)
     #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
@@ -35,12 +40,16 @@ struct dir_stats {
 enum props_types {
     PROPS_FILE = 0,
     PROPS_ID3,
+    PROPS_MUL_ID3,
     PROPS_DIR
 };
 
 static int props_type = PROPS_FILE;
 
 static struct mp3entry id3;
+#ifdef HAVE_TAGCACHE
+static int mul_id3_count;
+#endif
 
 static char str_filename[MAX_PATH];
 static char str_dirname[MAX_PATH];
@@ -118,14 +127,8 @@ static bool file_properties(const char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
                     tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-                int fd = rb->open(selected_file, O_RDONLY);
-                if (fd >= 0)
-                {
-                    if (rb->get_metadata(&id3, fd, selected_file))
-                        props_type = PROPS_ID3;
-
-                    rb->close(fd);
-                }
+                if (retrieve_id3(&id3, selected_file, false))
+                    props_type = PROPS_ID3;
                 found = true;
                 break;
             }
@@ -369,6 +372,19 @@ static bool determine_file_or_dir(void)
     return false;
 }
 
+#ifdef HAVE_TAGCACHE
+bool mul_id3_add(const char *file_name)
+{
+    if (!retrieve_id3(&id3, file_name, false))
+        return false;
+
+    collect_id3(&id3, mul_id3_count == 0);
+    mul_id3_count++;
+
+    return true;
+}
+#endif
+
 enum plugin_status plugin_start(const void* parameter)
 {
     static struct dir_stats stats =
@@ -380,40 +396,62 @@ enum plugin_status plugin_start(const void* parameter)
     };
 
     const char *file = parameter;
-    if(!parameter || (file[0] != '/')) return PLUGIN_ERROR;
+    if(!parameter)
+        return PLUGIN_ERROR;
 
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
 
-    const char* file_name = rb->strrchr(file, '/') + 1;
-    int dirlen = (file_name - file);
-
-    rb->strlcpy(str_dirname, file, dirlen + 1);
-    rb->snprintf(str_filename, sizeof str_filename, "%s", file+dirlen);
-
-    if(!determine_file_or_dir())
+#ifdef HAVE_TAGCACHE
+    if (!rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))) /* db table selected */
     {
-        /* weird: we couldn't find the entry. This Should Never Happen (TM) */
-        rb->splashf(0, "File/Dir not found: %s", file);
-        rb->action_userabort(TIMEOUT_BLOCK);
-        return PLUGIN_OK;
-    }
+        props_type = PROPS_MUL_ID3;
+        init_mul_id3();
+        mul_id3_count = 0;
 
-    /* get the info depending on its_a_dir */
-    if(!(props_type == PROPS_DIR ? dir_properties(file, &stats) : file_properties(file)))
-    {
-        /* something went wrong (to do: tell user what it was (nesting,...) */
-        rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
-        rb->action_userabort(TIMEOUT_BLOCK);
-        return PLUGIN_OK;
+        if (!rb->tagtree_subentries_do_action(&mul_id3_add) || mul_id3_count == 0)
+            return PLUGIN_ERROR;
+
+        if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
+            write_id3_mul_tracks(&id3);
     }
+    else
+#endif
+    if (file[0] == '/') /* single track selected */
+    {
+        const char* file_name = rb->strrchr(file, '/') + 1;
+        int dirlen = (file_name - file);
+
+        rb->strlcpy(str_dirname, file, dirlen + 1);
+        rb->snprintf(str_filename, sizeof str_filename, "%s", file+dirlen);
+
+        if(!determine_file_or_dir())
+        {
+            /* weird: we couldn't find the entry. This Should Never Happen (TM) */
+            rb->splashf(0, "File/Dir not found: %s", file);
+            rb->action_userabort(TIMEOUT_BLOCK);
+            return PLUGIN_OK;
+        }
+
+        /* get the info depending on its_a_dir */
+        if(!(props_type == PROPS_DIR ? dir_properties(file, &stats) : file_properties(file)))
+        {
+            /* something went wrong (to do: tell user what it was (nesting,...) */
+            rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
+            rb->action_userabort(TIMEOUT_BLOCK);
+            return PLUGIN_OK;
+        }
+    }
+    else
+        return PLUGIN_ERROR;
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
-    bool usb = props_type == PROPS_ID3 ? rb->browse_id3(&id3, 0, 0, &tm) :
-                                             browse_file_or_dir(&stats);
+    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm)  :
+               (props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL) :
+                                              browse_file_or_dir(&stats));
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);

@@ -407,7 +407,7 @@ static int get_tag(int *tag)
 
 static int get_clause(int *condition)
 {
-    /* one or two operator conditionals */ 
+    /* one or two operator conditionals */
     #define OPS2VAL(op1, op2) ((int)op1 << 8 | (int)op2)
     #define CLAUSE(op1, op2, symbol) {OPS2VAL(op1, op2), symbol }
 
@@ -2160,6 +2160,27 @@ static bool insert_all_playlist(struct tree_context *c,
     return true;
 }
 
+static bool goto_allsubentries(int newtable)
+{
+    int i = 0;
+    while (i < 2 && (newtable == NAVIBROWSE || newtable == ALLSUBENTRIES))
+    {
+        tagtree_enter(tc, false);
+        tagtree_load(tc);
+        newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
+        i++;
+    }
+    return (newtable == PLAYTRACK);
+}
+
+static void reset_tc_to_prev(int dirlevel, int selected_item)
+{
+    while (tc->dirlevel > dirlevel)
+        tagtree_exit(tc, false);
+    tc->selected_item = selected_item;
+    tagtree_load(tc);
+}
+
 static bool tagtree_insert_selection(int position, bool queue,
                                      const char* playlist, bool new_playlist)
 {
@@ -2167,6 +2188,7 @@ static bool tagtree_insert_selection(int position, bool queue,
     int dirlevel = tc->dirlevel;
     int selected_item = tc->selected_item;
     int newtable;
+    int ret;
 
     show_search_progress(
 #ifdef HAVE_DISK_STORAGE
@@ -2176,71 +2198,101 @@ static bool tagtree_insert_selection(int position, bool queue,
 #endif
         , 0);
 
-
-    /* We need to set the table to allsubentries. */
     newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
 
-    /* Insert a single track? */
-    if (newtable == PLAYTRACK)
+    if (newtable == PLAYTRACK) /* Insert a single track? */
     {
         if (tagtree_get_filename(tc, buf, sizeof buf) < 0)
-        {
-            logf("tagtree_get_filename failed");
             return false;
-        }
+
         playlist_insert_track(NULL, buf, position, queue, true);
 
         return true;
     }
 
-    if (newtable == NAVIBROWSE)
+    ret = goto_allsubentries(newtable);
+    if (ret)
     {
-        tagtree_enter(tc, false);
-        tagtree_load(tc);
-        newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
-    }
-    else if (newtable != ALLSUBENTRIES)
-    {
-        logf("unsupported table: %d", newtable);
-        return false;
-    }
-
-    /* Now the current table should be allsubentries. */
-    if (newtable != PLAYTRACK)
-    {
-        tagtree_enter(tc, false);
-        tagtree_load(tc);
-        newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
-
-        /* And now the newtable should be playtrack. */
-        if (newtable != PLAYTRACK)
-        {
-            logf("newtable: %d !!", newtable);
-            while (tc->dirlevel > dirlevel)
-                tagtree_exit(tc, false);
-            tagtree_load(tc);
-            return false;
-        }
-    }
-
-    if (tc->filesindir <= 0)
-        splash(HZ, ID2P(LANG_END_PLAYLIST));
-    else
-    {
-        logf("insert_all_playlist");
-        if (!insert_all_playlist(tc, playlist, new_playlist, position, queue))
+        if (tc->filesindir <= 0)
+            splash(HZ, ID2P(LANG_END_PLAYLIST));
+        else if (!insert_all_playlist(tc, playlist, new_playlist, position, queue))
             splash(HZ*2, ID2P(LANG_FAILED));
     }
 
-    /* Finally return the dirlevel to its original value. */
-    while (tc->dirlevel > dirlevel)
-        tagtree_exit(tc, false);
-    tc->selected_item = selected_item;
-    tagtree_load(tc);
-
-    return true;
+    reset_tc_to_prev(dirlevel, selected_item);
+    return ret;
 }
 
+/* Execute action_cb for all subentries of the current table's
+ * selected item, handing over each entry's filename in the
+ * callback function parameter.
+ */
+bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
+{
+    struct tagcache_search tcs;
+    int i, n;
+    unsigned long last_tick;
+    char buf[MAX_PATH];
+    int ret = true;
+    int dirlevel = tc->dirlevel;
+    int selected_item = tc->selected_item;
+    int newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
+
+    cpu_boost(true);
+    if (!goto_allsubentries(newtable))
+        ret = false;
+    else if (tagcache_search(&tcs, tag_filename))
+    {
+        last_tick = current_tick + HZ/2;
+        splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
+        n = tc->filesindir;
+        for (i = 0; i < n; i++)
+        {
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            if (TIME_AFTER(current_tick, last_tick + HZ/4))
+            {
+                if (action_userabort(TIMEOUT_NOBLOCK))
+                    break;
+                last_tick = current_tick;
+            }
+
+            if (!tagcache_retrieve(&tcs, tagtree_get_entry(tc, i)->extraseek,
+                                   tcs.type, buf, sizeof buf)
+                || !action_cb(buf))
+            {
+                ret = false;
+                break;
+            }
+            yield();
+        }
+
+        tagcache_search_finish(&tcs);
+    }
+    else
+    {
+        splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
+        ret = false;
+    }
+    reset_tc_to_prev(dirlevel, selected_item);
+    cpu_boost(false);
+    return ret;
+}
+
+/* Try to return first subentry's filename for current selection
+ */
+bool tagtree_get_subentry_filename(char *buf, size_t bufsize)
+{
+    int ret = true;
+    int dirlevel = tc->dirlevel;
+    int selected_item = tc->selected_item;
+    int newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
+
+    if (!goto_allsubentries(newtable) || tagtree_get_filename(tc, buf, bufsize) < 0)
+        ret = false;
+
+    reset_tc_to_prev(dirlevel, selected_item);
+    return ret;
+}
 
 bool tagtree_current_playlist_insert(int position, bool queue)
 {
