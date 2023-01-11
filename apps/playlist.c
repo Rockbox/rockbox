@@ -507,8 +507,10 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
 
     playlist->filename[0] = '\0';
 
-    chunk_alloc_free(&playlist->name_chunk_buffer);
+    if (playlist->buffer)
+        playlist->buffer[0] = 0;
 
+    playlist->buffer_end_pos = 0;
     playlist->seed = 0;
     playlist->num_cached = 0;
 
@@ -1182,19 +1184,12 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
     {
         max = dircache_get_fileref_path(&playlist->dcfrefs[index],
                                         tmp_buf, sizeof(tmp_buf));
-
-        NOTEF("%s [in DCache]: 0x%x %s", __func__,
-              playlist->dcfrefs[index], tmp_buf);
     }
 #endif /* HAVE_DIRCACHE */
 
     if (playlist->in_ram && !control_file && max < 0)
     {
-        char *namebuf = chunk_get_data(&playlist->name_chunk_buffer, seek);
-        strmemccpy(tmp_buf, namebuf, sizeof(tmp_buf));
-        chunk_put_data(&playlist->name_chunk_buffer, seek);
-        NOTEF("%s [in Ram]: 0x%x %s", __func__, seek, tmp_buf);
-        
+        strmemccpy(tmp_buf, (char*)&playlist->buffer[seek], sizeof(tmp_buf));
     }
     else if (max < 0)
     {
@@ -1233,7 +1228,6 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
                         max = convert_m3u_name(tmp_buf, max,
                                                sizeof(tmp_buf), dir_buf);
                 }
-                NOTEF("%s [in File]: 0x%x %s", __func__, seek, tmp_buf);
             }
         }
 
@@ -1976,25 +1970,6 @@ static void dc_thread_playlist(void)
 #endif
 
 /*
- * Allocate name chunk buffer header for in-ram playlists
- */
-static void alloc_namebuffer(void)
-{
-#if MEMORYSIZE >= 16
-# define NAME_CHUNK_SZ (200 << 10) /*200K*/
-#elif MEMORYSIZE >= 8
-# define NAME_CHUNK_SZ (100 << 10) /*100K*/
-#else
-# define NAME_CHUNK_SZ (50 << 10) /*50K*/
-#endif
-    struct playlist_info* playlist = &current_playlist;
-    size_t namebufsz = (AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir);
-    size_t name_chunks = (namebufsz + NAME_CHUNK_SZ - 1) / NAME_CHUNK_SZ;
-    core_chunk_alloc_init(&playlist->name_chunk_buffer, NAME_CHUNK_SZ, name_chunks);
-#undef NAME_CHUNK_SZ
-}
-
-/*
  * Allocate a temporary buffer for loading playlists
  */
 static int alloc_tempbuf(size_t* buflen)
@@ -2021,6 +1996,8 @@ static int move_callback(int handle, void* current, void* new)
     struct playlist_info* playlist = &current_playlist;
     if (current == playlist->indices)
         playlist->indices = new;
+    else if (current == playlist->buffer)
+        playlist->buffer = new;
 #ifdef HAVE_DIRCACHE
     else if (current == playlist->dcfrefs)
         playlist->dcfrefs = new;
@@ -2059,6 +2036,13 @@ void playlist_init(void)
                 playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
 
     playlist->indices = core_get_data(handle);
+    playlist->buffer_size =
+        AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
+
+    handle = core_alloc_ex("playlist buf",
+                                playlist->buffer_size, &ops);
+    playlist->buffer = core_get_data(handle);
+    playlist->buffer_handle = handle;
 
     initalize_new_playlist(playlist, true);
 
@@ -2095,21 +2079,15 @@ void playlist_shutdown(void)
  */
 int playlist_add(const char *filename)
 {
-    size_t indice = CHUNK_ALLOC_INVALID;
     struct playlist_info* playlist = &current_playlist;
     int len = strlen(filename);
 
-    if (!chunk_alloc_is_initialized(&playlist->name_chunk_buffer))
-        alloc_namebuffer();
-
-    if (chunk_alloc_is_initialized(&playlist->name_chunk_buffer))
-        indice = chunk_alloc(&playlist->name_chunk_buffer, len + 1);
-
-    if(indice == CHUNK_ALLOC_INVALID)
+    if(len+1 > playlist->buffer_size - playlist->buffer_end_pos)
     {
         notify_buffer_full();
         return -2;
     }
+
     if(playlist->amount >= playlist->max_playlist_size)
     {
         notify_buffer_full();
@@ -2118,18 +2096,16 @@ int playlist_add(const char *filename)
 
     playlist_mutex_lock(&(playlist->mutex));
 
-    playlist->indices[playlist->amount] = indice;
+    playlist->indices[playlist->amount] = playlist->buffer_end_pos;
 #ifdef HAVE_DIRCACHE
     dc_copy_filerefs(&playlist->dcfrefs[playlist->amount], NULL, 1);
 #endif
 
     playlist->amount++;
 
-    char *namebuf = (char*)chunk_get_data(&playlist->name_chunk_buffer, indice);
-    strcpy(namebuf, filename);
-    namebuf += len;
-    namebuf[0] = '\0';
-    chunk_put_data(&playlist->name_chunk_buffer, indice);
+    strcpy((char*)&playlist->buffer[playlist->buffer_end_pos], filename);
+    playlist->buffer_end_pos += len;
+    playlist->buffer[playlist->buffer_end_pos++] = '\0';
 
     playlist_mutex_unlock(&(playlist->mutex));
 
@@ -2204,7 +2180,9 @@ int playlist_create_ex(struct playlist_info* playlist,
 #endif
         }
 
-        chunk_alloc_free(&playlist->name_chunk_buffer);
+        playlist->buffer_size = 0;
+        playlist->buffer_handle = -1;
+        playlist->buffer = NULL;
     }
 
     new_playlist_unlocked(playlist, dir, file);
@@ -3684,7 +3662,9 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     if (strlcat(path, "_temp", sizeof(path)) >= sizeof (path))
         return -1;
 
-    struct chunk_alloc_header old_name_chunk_buffer = playlist->name_chunk_buffer;
+    /* can ignore volatile here, because core_get_data() is called later */
+    char* old_buffer = (char*)playlist->buffer;
+    size_t old_buffer_size = playlist->buffer_size;
 
     if (is_m3u8_name(path))
     {
@@ -3819,7 +3799,11 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     cpu_boost(false);
 
 reset_old_buffer:
-    playlist->name_chunk_buffer = old_name_chunk_buffer;
+    if (playlist->buffer_handle > 0)
+        old_buffer = core_get_data(playlist->buffer_handle);
+
+    playlist->buffer = old_buffer;
+    playlist->buffer_size = old_buffer_size;
 
     return result;
 }

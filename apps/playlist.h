@@ -28,7 +28,6 @@
 #include "kernel.h"
 #include "metadata.h"
 #include "rbpaths.h"
-#include "chunk_alloc.h"
 
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02
@@ -85,10 +84,10 @@ struct playlist_info
                               global_settings.max_files_in_playlist */
     int  num_inserted_tracks; /* number of tracks inserted           */
     volatile unsigned long *indices; /* array of indices            */
-
-    struct chunk_alloc_header name_chunk_buffer; /* chunk buffer for
-                                                    in-ram playlist */
-
+    int buffer_handle;   /* handle to the below buffer (-1 if non-buflib) */
+    volatile char *buffer;/* buffer for in-ram playlists        */
+    int  buffer_size;    /* size of buffer                          */
+    int  buffer_end_pos; /* last position where buffer was written  */
     int  index;          /* index of current playing track          */
     int  first_index;    /* index of first song in playlist         */
     int  amount;         /* number of tracks in the index           */
