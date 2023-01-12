@@ -229,7 +229,7 @@ enum plugin_status plugin_start(const void* parameter)
                           0, /* FIXME Which flags? */
                           "PD core"
                           IF_PRIO(, PRIORITY_REALTIME)
-                          IF_COP(, COP));
+                          IF_COP(, CPU));
 
     gui_thread_id =
         rb->create_thread(&gui_thread,
