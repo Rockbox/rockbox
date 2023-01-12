@@ -21,6 +21,8 @@
 #ifndef I2C_H
 #define I2C_H
 
+#include "config.h"
+
 extern void i2c_init(void) INIT_ATTR;
 extern void i2c_begin(void);
 extern void i2c_end(void);
