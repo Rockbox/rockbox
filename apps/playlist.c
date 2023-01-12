@@ -172,6 +172,8 @@ static struct playlist_info current_playlist;
 
 #ifdef HAVE_DIRCACHE
 #define PLAYLIST_LOAD_POINTERS 1
+#define PLAYLIST_CLEAN_POINTERS 2
+static bool dc_has_dirty_pointers = false;
 
 static struct event_queue playlist_queue SHAREDBSS_ATTR;
 static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
@@ -217,6 +219,16 @@ static void dc_load_playlist_pointers(void)
 {
 #ifdef HAVE_DIRCACHE
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
+/* No-Op for non dircache targets */
+}
+
+static void dc_discard_playlist_pointers(void)
+{
+#ifdef HAVE_DIRCACHE
+    /* dump any pointers currently waiting */
+    if (dc_has_dirty_pointers)
+        queue_send(&playlist_queue, PLAYLIST_CLEAN_POINTERS, 0);
 #endif
 /* No-Op for non dircache targets */
 }
@@ -494,6 +506,7 @@ static void update_playlist_filename_unlocked(struct playlist_info* playlist,
  */
 static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
 {
+    dc_discard_playlist_pointers();
 
     if(playlist->fd >= 0) /* If there is an already open playlist, close it. */
     {
@@ -884,7 +897,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 exit:
 
     playlist_mutex_unlock(&(playlist->mutex));
-    dc_load_playlist_pointers();
 
     return result;
 }
@@ -1512,6 +1524,7 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
         return -1;
 
     playlist_mutex_lock(&(playlist->mutex));
+
     inserted = playlist->indices[position] & PLAYLIST_INSERT_TYPE_MASK;
 
     /* shift indices now that track has been removed */
@@ -1589,6 +1602,8 @@ static int randomise_playlist(struct playlist_info* playlist,
     unsigned int current = playlist->indices[playlist->index];
 
     playlist_mutex_lock(&(playlist->mutex));
+
+    dc_discard_playlist_pointers();
 
     /* seed 0 is used to identify sorted playlist for resume purposes */
     if (seed == 0)
@@ -1673,8 +1688,9 @@ static int sort_compare_fn(const void* p1, const void* p2)
 static int sort_playlist_unlocked(struct playlist_info* playlist,
                                   bool start_current, bool write)
 {
-
     unsigned int current = playlist->indices[playlist->index];
+
+    dc_discard_playlist_pointers();
 
     if (playlist->amount > 0)
         qsort((void*)playlist->indices, playlist->amount,
@@ -1875,7 +1891,6 @@ static void dc_flush_playlist_callback(void)
 static void dc_thread_playlist(void)
 {
     struct queue_event ev;
-    bool dirty_pointers = false;
     static char tmp[MAX_PATH+1];
 
     struct playlist_info *playlist;
@@ -1897,8 +1912,13 @@ static void dc_thread_playlist(void)
 
         switch (ev.id)
         {
+            case PLAYLIST_CLEAN_POINTERS:
+                dc_has_dirty_pointers = false;
+                queue_reply(&playlist_queue, 0);
+                break;
+
             case PLAYLIST_LOAD_POINTERS:
-                dirty_pointers = true;
+                dc_has_dirty_pointers = true;
                 break ;
 
             /* Start the background scanning after either the disk spindown
@@ -1916,7 +1936,7 @@ static void dc_thread_playlist(void)
                     break ;
 
                 /* Check if previously loaded pointers are intact. */
-                if (!dirty_pointers)
+                if (!dc_has_dirty_pointers)
                     break ;
 
                 struct dircache_info info;
@@ -1955,7 +1975,7 @@ static void dc_thread_playlist(void)
                 cancel_cpu_boost();
 
                 if (index == playlist->amount)
-                    dirty_pointers = false;
+                    dc_has_dirty_pointers = false;
 
                 break ;
             }
@@ -2188,9 +2208,11 @@ int playlist_create_ex(struct playlist_info* playlist,
     new_playlist_unlocked(playlist, dir, file);
 
     if (file)
+    {
         /* load the playlist file */
         add_indices_to_playlist(playlist, temp_buffer, temp_buffer_size);
-
+        dc_load_playlist_pointers();
+    }
     return 0;
 }
 
@@ -2215,6 +2237,7 @@ int playlist_create(const char *dir, const char *file)
             buflen = ALIGN_DOWN(buflen, 512); /* to avoid partial sector I/O */
             /* load the playlist file */
             add_indices_to_playlist(playlist, buf, buflen);
+            dc_load_playlist_pointers();
             core_free(handle);
         }
         else
@@ -2284,6 +2307,8 @@ int playlist_delete(struct playlist_info* playlist, int index)
         notify_control_access_error();
         return -1;
     }
+
+    dc_discard_playlist_pointers();
 
     if (index == PLAYLIST_DELETE_CURRENT)
         index = playlist->index;
@@ -2570,6 +2595,8 @@ int playlist_insert_directory(struct playlist_info* playlist,
             return -1;
     }
 
+    dc_discard_playlist_pointers();
+
     if (queue)
         count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
     else
@@ -2621,6 +2648,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         playlist = &current_playlist;
 
     playlist_mutex_lock(&(playlist->mutex));
+
+    dc_discard_playlist_pointers();
 
     cpu_boost(true);
 
@@ -2750,6 +2779,8 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
 
     playlist_mutex_lock(&(playlist->mutex));
 
+    dc_discard_playlist_pointers();
+
     if (check_control(playlist) < 0)
     {
         notify_control_access_error();
@@ -2763,7 +2794,9 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
      * bunch of files from tagcache, syncing after every file wouldn't be
      * a good thing to do. */
     if (sync && result >= 0)
+    {
         playlist_sync(playlist);
+    }
 
     playlist_mutex_unlock(&(playlist->mutex));
 
@@ -2859,6 +2892,8 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
     {
         goto out;
     }
+
+    dc_discard_playlist_pointers();
 
     /* We want to insert the track at the position that was specified by
        new_index.  This may be different then new_index because of the
@@ -2974,6 +3009,8 @@ int playlist_next(int steps)
     && (global_settings.repeat_mode != REPEAT_ONE) )
     {
         int i, j;
+
+        dc_discard_playlist_pointers();
 
         /* We need to delete all the queued songs */
         for (i=0, j=steps; i<j; i++)
@@ -3152,6 +3189,8 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
 
     if (playlist == NULL)
         playlist = &current_playlist;
+
+    dc_discard_playlist_pointers();
 
     while (playlist->index > 0)
         if ((result = remove_track_from_playlist(playlist, 0, true)) < 0)
@@ -3762,6 +3801,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
                 close(playlist->fd);
                 playlist->fd = fd;
                 fd = -1;
+                dc_discard_playlist_pointers();
 
                 if (!reparse)
                 {
@@ -3787,6 +3827,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
                 /* we need to recreate control because inserted tracks are
                    now part of the playlist and shuffle has been invalidated */
                 result = recreate_control_unlocked(playlist);
+                dc_load_playlist_pointers();
             }
         }
 
