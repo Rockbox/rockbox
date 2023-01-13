@@ -1285,7 +1285,7 @@ static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 
     add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
     add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
 
-    core_shrink(tagtree_handle, core_get_data(tagtree_handle), tagtree_buf_used);
+    core_shrink(tagtree_handle, NULL, tagtree_buf_used);
     return true;
 }
 

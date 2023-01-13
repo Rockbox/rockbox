@@ -894,7 +894,7 @@ bool
 buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t new_size)
 {
     char* oldstart = buflib_get_data(ctx, handle);
-    char* newstart = new_start;
+    char* newstart = new_start != NULL ? new_start : oldstart;
     char* newend = newstart + new_size;
 
     /* newstart must be higher and new_size not "negative" */

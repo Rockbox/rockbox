@@ -172,12 +172,10 @@ static void finalize(struct chunk_alloc_header *hdr, struct chunk *chunk_array)
     int handle = chunk_array[idx].handle;
     struct buflib_context *ctx = hdr->context;
 
-    void* chunk_start = buflib_get_data(ctx, handle);
-
     hdr->chunk_bytes_total -= hdr->chunk_bytes_free;
     hdr->chunk_bytes_free = 0;
 
-    buflib_shrink(ctx, handle, chunk_start, hdr->chunk_bytes_total);
+    buflib_shrink(ctx, handle, NULL, hdr->chunk_bytes_total);
 
     logf("%s shrink hdr idx[%ld] offset[%ld]: new size: %ld",
     __func__, idx, chunk_array[idx].max_start_offset, hdr->chunk_bytes_total);

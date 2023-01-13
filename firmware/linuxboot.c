@@ -217,7 +217,7 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
     if(ret)
         goto err;
 
-    core_shrink(out_h, core_get_data(out_h), *out_size);
+    core_shrink(out_h, NULL, *out_size);
     ret = 0;
 
   err:

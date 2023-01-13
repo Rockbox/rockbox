@@ -414,7 +414,7 @@ static void read_viewers_config_init(void)
         goto out;
 
     read_config_init(fd);
-    core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
+    core_shrink(strdup_handle, NULL, strdup_cur_idx);
 
   out:
     close(fd);
