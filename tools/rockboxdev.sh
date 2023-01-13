@@ -843,7 +843,7 @@ do
             (cd $prefix/$target/sysroot/usr/include ; ln -sf ../lib/libffi-$libffi_ver/include/ffi.h . ;  ln -sf ../lib/libffi-$libffi_ver/include/ffitarget.h . )
 
             # build zlib
-	    zlib_ver="1.2.12"  # Target uses 1.2.8!
+	    zlib_ver="1.2.13"  # Target uses 1.2.8!
 	    gettool "zlib" "$zlib_ver"
 	    extract "zlib-$zlib_ver"
 	    CHOST=$target prefix="/usr" buildtool "zlib" "$zlib_ver" \
