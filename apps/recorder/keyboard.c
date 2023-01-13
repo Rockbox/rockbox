@@ -169,7 +169,7 @@ static void keyboard_layout(struct viewport *kbd_vp,
     vp->y = 0; /* TOP */
     vp->width = sc_w;
     vp->height = text_height;
-    vp->font = pm->curfont;
+    vp->font = sc->getuifont();//pm->curfont;
     text_height += vp->x + 3;
 
     /* MENU */
@@ -1052,7 +1052,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     sc->hline(0, sc_w - 1, y);
 #endif
     /* write out the text */
-    sc->setfont(pm->curfont);
+    sc->setfont(vp->font); //pm->curfont
 
     pm->leftpos = MAX(0, MIN(state->len_utf8, state->editpos + 2)
                             - pm->max_chars_text);
