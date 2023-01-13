@@ -533,7 +533,7 @@ static void serial_setbrg(void)
     *uart_lcr = tmp;
 }
 
-static int serial_preinit(void);
+static int serial_preinit(void)
 {
     volatile u8 *uart_fcr = (volatile u8 *)(CFG_UART_BASE + OFF_FCR);
     volatile u8 *uart_lcr = (volatile u8 *)(CFG_UART_BASE + OFF_LCR);

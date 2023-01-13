@@ -4986,6 +4986,7 @@ do{                                 \
 #define IPU_V_BASE  0xB3080000
 #define IPU__SIZE   0x00001000
 
+#ifndef __ASSEMBLY__
 struct ipu_module
 {
     unsigned int reg_ctrl;             // 0x0
@@ -5022,7 +5023,7 @@ struct Ration2m
     float ratio;
     int n, m;
 };
-
+#endif /* !__ASSEMBLY__ */
 
 // Register offset
 #define  REG_CTRL           0x0
