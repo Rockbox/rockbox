@@ -823,6 +823,7 @@ static const struct plugin_api rockbox_api = {
 
     splash_progress,
     splash_progress_set_delay,
+    fix_path_part,
 };
 
 static int plugin_buffer_handle;

@@ -53,6 +53,7 @@
 #define strlen rb->strlen
 #define strlcpy rb->strlcpy
 #define strrchr rb->strrchr
+#define fix_path_part rb->fix_path_part
 
 #endif
 

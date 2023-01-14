@@ -157,7 +157,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 261
+#define PLUGIN_API_VERSION 262
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -947,6 +947,7 @@ struct plugin_api {
        
     void (*splash_progress)(int current, int total, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4);
     void (*splash_progress_set_delay)(long delay_ticks);
+    void (*fix_path_part)(char* path, int offset, int count);
 };
 
 /* plugin header */
