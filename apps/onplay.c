@@ -367,11 +367,13 @@ static int playing_time_speak_info(int selected_item, void * data)
    other stats */
 static bool playing_time(void)
 {
+    int error_count = 0;
     unsigned long talked_tick = current_tick;
     struct playing_time_info pti;
     struct playlist_track_info pltrack;
     struct mp3entry id3;
-    int i, fd, ret;
+    int i, fd;
+    bool ret;
 
     pti.nb_tracks = playlist_amount();
     playlist_get_resume_info(&pti.curr_playing);
@@ -407,24 +409,44 @@ static bool playing_time(void)
         if (i == pti.curr_playing)
             continue;
 
-        if (playlist_get_track_info(NULL, i, &pltrack) < 0)
-            goto error;
-        if ((fd = open(pltrack.filename, O_RDONLY)) < 0)
-            goto error;
-        ret = get_metadata(&id3, fd, pltrack.filename);
-        close(fd);
-        if (!ret)
-            goto error;
+        if (playlist_get_track_info(NULL, i, &pltrack) >= 0)
+        {
+            ret = false;
+            if ((fd = open(pltrack.filename, O_RDONLY)) >= 0)
+            {
+                ret = get_metadata(&id3, fd, pltrack.filename);
+                close(fd);
+                if (ret)
+                {
+                    if (i < pti.curr_playing) {
+                        pti.secs_bef += id3.length/1000;
+                        pti.kbs_bef += id3.filesize/1024;
+                    } else {
+                        pti.secs_aft += id3.length/1000;
+                        pti.kbs_aft += id3.filesize/1024;
+                    }
+                }
+            }
 
-        if (i < pti.curr_playing) {
-            pti.secs_bef += id3.length/1000;
-            pti.kbs_bef += id3.filesize/1024;
-        } else {
-            pti.secs_aft += id3.length/1000;
-            pti.kbs_aft += id3.filesize/1024;
+            if (!ret)
+            {
+                error_count++;
+                continue;
+            }
+        }
+        else
+        {
+            error_count++;
+            break;
         }
     }
 
+    if (error_count > 0)
+    {
+        splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
+    }
+
+    pti.nb_tracks -= error_count;
     pti.secs_ttl = pti.secs_bef +pti.secs_aft;
     pti.trk_secs_ttl = pti.trk_secs_bef +pti.trk_secs_aft;
     pti.kbs_ttl = pti.kbs_bef +pti.kbs_aft;
@@ -447,8 +469,7 @@ static bool playing_time(void)
             return(default_event_handler(key) == SYS_USB_CONNECTED);
         }
     }
- error:
-    splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
+
  exit:
     return false;
 }
