@@ -643,22 +643,6 @@ static void init_time_tag(void)
  * /ddd.lrc
  */
 
-/* taken from apps/recorder/albumart.c */
-static void fix_filename(char* name)
-{
-    static const char invalid_chars[] = "*/:<>?\\|";
-
-    while (1)
-    {
-        if (*name == 0)
-            return;
-        if (*name == '"')
-            *name = '\'';
-        else if (rb->strchr(invalid_chars, *name))
-            *name = '_';
-        name++;
-    }
-}
 static bool find_lrc_file_helper(const char *base_dir)
 {
     char fname[MAX_PATH];
@@ -678,7 +662,7 @@ static bool find_lrc_file_helper(const char *base_dir)
     if (current.id3->title && rb->strcmp(names[0], current.id3->title))
     {
         rb->strlcpy(fname, current.id3->title, sizeof(fname));
-        fix_filename(fname);
+        rb->fix_path_part(fname, 0, sizeof(fname) - 1);
         names[1] = fname;
     }
 
