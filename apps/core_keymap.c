@@ -80,11 +80,12 @@ int core_load_key_remap(const char *filename)
     int handle = core_alloc(bufsize);
     if (handle > 0)
     {
-        core_pin(handle);
-        if (read(fd, core_get_data(handle), bufsize) == (ssize_t)bufsize)
+        void *data = core_get_data_pinned(handle);
+
+        if (read(fd, data, bufsize) == (ssize_t)bufsize)
             count = action_set_keymap_handle(handle, count);
 
-        core_unpin(handle);
+        core_put_data_pinned(data);
     }
 
     close(fd);

@@ -45,6 +45,18 @@ static inline void* core_get_data(int handle)
     return buflib_get_data(&core_ctx, handle);
 }
 
+static inline void* core_get_data_pinned(int handle)
+{
+    extern struct buflib_context core_ctx;
+    return buflib_get_data_pinned(&core_ctx, handle);
+}
+
+static inline void core_put_data_pinned(void *data)
+{
+    extern struct buflib_context core_ctx;
+    buflib_put_data_pinned(&core_ctx, data);
+}
+
 /* core context chunk_alloc */
 static inline bool core_chunk_alloc_init(struct chunk_alloc_header *hdr,
                                          size_t chunk_size, size_t max_chunks)

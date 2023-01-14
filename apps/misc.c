@@ -1635,8 +1635,7 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
         handle = core_alloc_ex(buf_size, ops);
         if (handle > 0)
         {
-            core_pin(handle);
-            bm->data = core_get_data(handle);
+            bm->data = core_get_data_pinned(handle);
             lseek(fd, 0, SEEK_SET); /* reset to beginning of file */
             size_read = read_bmp_fd(fd, bm, buf_size, bmformat, NULL);
 
@@ -1645,9 +1644,10 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
                 core_shrink(handle, bm->data, size_read);
                 *buf_reqd = size_read;
             }
+
+            core_put_data_pinned(bm->data);
             bm->data = NULL; /* do this to force a crash later if the
                                     caller doesnt call core_get_data() */
-            core_unpin(handle);
         }
         else
             *buf_reqd = buf_size; /* couldn't allocate pass bytes needed */
