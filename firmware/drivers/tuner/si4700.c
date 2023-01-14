@@ -599,7 +599,7 @@ static void NORETURN_ATTR rds_thread(void)
                 /* power up: timeout after 1 tick, else block indefinitely */
                 timeout = ev.data ? CONFIG_RDS_POLL_TICKS : TIMEOUT_BLOCK;
                 break;
-            case SYS_TIMEOUT:;
+            case SYS_TIMEOUT:
                 /* Captures RDS data and processes it */
                 si4700_rds_process();
                 break;
