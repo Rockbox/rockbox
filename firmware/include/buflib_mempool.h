@@ -30,6 +30,17 @@
 # error "include buflib.h instead"
 #endif
 
+#include "system.h"
+
+/* Indices used to access block fields as block[BUFLIB_IDX_XXX] */
+enum {
+    BUFLIB_IDX_LEN,     /* length of the block, must come first */
+    BUFLIB_IDX_HANDLE,  /* pointer to entry in the handle table */
+    BUFLIB_IDX_OPS,     /* pointer to an ops struct */
+    BUFLIB_IDX_PIN,     /* pin count */
+    BUFLIB_NUM_FIELDS,
+};
+
 union buflib_data
 {
     intptr_t val;                 /* length of the block in n*sizeof(union buflib_data).
@@ -52,7 +63,7 @@ struct buflib_context
     bool compact;
 };
 
-#define BUFLIB_ALLOC_OVERHEAD (4 * sizeof(union buflib_data))
+#define BUFLIB_ALLOC_OVERHEAD (BUFLIB_NUM_FIELDS * sizeof(union buflib_data))
 
 #ifndef BUFLIB_DEBUG_GET_DATA
 static inline void *buflib_get_data(struct buflib_context *ctx, int handle)
@@ -60,5 +71,27 @@ static inline void *buflib_get_data(struct buflib_context *ctx, int handle)
     return (void *)ctx->handle_table[-handle].alloc;
 }
 #endif
+
+static inline union buflib_data *_buflib_get_block_header(void *data)
+{
+    union buflib_data *bd = ALIGN_DOWN(data, sizeof(*bd));
+    return bd - BUFLIB_NUM_FIELDS;
+}
+
+static inline void *buflib_get_data_pinned(struct buflib_context *ctx, int handle)
+{
+    void *data = buflib_get_data(ctx, handle);
+    union buflib_data *bd = _buflib_get_block_header(data);
+
+    bd[BUFLIB_IDX_PIN].pincount++;
+    return data;
+}
+
+static inline void buflib_put_data_pinned(struct buflib_context *ctx, void *data)
+{
+    (void)ctx;
+    union buflib_data *bd = _buflib_get_block_header(data);
+    bd[BUFLIB_IDX_PIN].pincount--;
+}
 
 #endif /* _BUFLIB_MEMPOOL_H_ */

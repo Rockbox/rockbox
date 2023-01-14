@@ -107,22 +107,14 @@
     (PARANOIA_CHECK_LENGTH | \
      PARANOIA_CHECK_BLOCK_HANDLE | PARANOIA_CHECK_PINNING)
 
-/* Indices used to access block fields as block[idx_XXX] */
-enum {
-    idx_LEN,        /* length of the block, must come first */
-    idx_HANDLE,     /* pointer to entry in the handle table */
-    idx_OPS,        /* pointer to an ops struct */
-    idx_PIN,        /* pin count */
-    BUFLIB_NUM_FIELDS,
-};
-
 struct buflib_callbacks buflib_ops_locked = {
     .move_callback = NULL,
     .shrink_callback = NULL,
     .sync_callback = NULL,
 };
 
-#define IS_MOVABLE(a) (!a[idx_OPS].ops || a[idx_OPS].ops->move_callback)
+#define IS_MOVABLE(a) \
+    (!a[BUFLIB_IDX_OPS].ops || a[BUFLIB_IDX_OPS].ops->move_callback)
 
 static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,
@@ -281,8 +273,7 @@ union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
     if (!ptr)
         return NULL;
 
-    union buflib_data *data = ALIGN_DOWN(ptr, sizeof(*data));
-    return data - BUFLIB_NUM_FIELDS;
+    return _buflib_get_block_header(ptr);
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -318,9 +309,9 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     union buflib_data *new_block;
 
     check_block_handle(ctx, block);
-    union buflib_data *h_entry = block[idx_HANDLE].handle;
+    union buflib_data *h_entry = block[BUFLIB_IDX_HANDLE].handle;
 
-    if (!IS_MOVABLE(block) || block[idx_PIN].pincount > 0)
+    if (!IS_MOVABLE(block) || block[BUFLIB_IDX_PIN].pincount > 0)
         return false;
 
     int handle = ctx->handle_table - h_entry;
@@ -329,7 +320,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     new_block = block + shift;
     new_start = h_entry->alloc + shift*sizeof(union buflib_data);
 
-    struct buflib_callbacks *ops = block[idx_OPS].ops;
+    struct buflib_callbacks *ops = block[BUFLIB_IDX_OPS].ops;
 
     /* If move must be synchronized with use, user should have specified a
        callback that handles this */
@@ -459,12 +450,12 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
             if (this->val < 0)
                 continue;
 
-            struct buflib_callbacks *ops = this[idx_OPS].ops;
+            struct buflib_callbacks *ops = this[BUFLIB_IDX_OPS].ops;
             if (!ops || !ops->shrink_callback)
                 continue;
 
             check_block_handle(ctx, this);
-            union buflib_data* h_entry = this[idx_HANDLE].handle;
+            union buflib_data* h_entry = this[BUFLIB_IDX_HANDLE].handle;
             int handle = ctx->handle_table - h_entry;
 
             unsigned pos_hints = shrink_hints & BUFLIB_SHRINK_POS_MASK;
@@ -596,7 +587,7 @@ handle_alloc:
          */
         union buflib_data* last_block = find_block_before(ctx,
                                             ctx->alloc_end, false);
-        struct buflib_callbacks* ops = last_block[idx_OPS].ops;
+        struct buflib_callbacks* ops = last_block[BUFLIB_IDX_OPS].ops;
         unsigned hints = 0;
         if (!ops || !ops->shrink_callback)
         {   /* the last one isn't shrinkable
@@ -666,10 +657,10 @@ buffer_alloc:
     /* Set up the allocated block, by marking the size allocated, and storing
      * a pointer to the handle.
      */
-    block[idx_LEN].val = size;
-    block[idx_HANDLE].handle = handle;
-    block[idx_OPS].ops = ops;
-    block[idx_PIN].pincount = 0;
+    block[BUFLIB_IDX_LEN].val = size;
+    block[BUFLIB_IDX_HANDLE].handle = handle;
+    block[BUFLIB_IDX_OPS].ops = ops;
+    block[BUFLIB_IDX_PIN].pincount = 0;
 
     handle->alloc = (char*)&block[BUFLIB_NUM_FIELDS];
 
@@ -916,10 +907,10 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     metadata_size.val = aligned_oldstart - block;
     /* update val and the handle table entry */
     new_block = aligned_newstart - metadata_size.val;
-    block[idx_LEN].val = new_next_block - new_block;
+    block[BUFLIB_IDX_LEN].val = new_next_block - new_block;
 
     check_block_handle(ctx, block);
-    block[idx_HANDLE].handle->alloc = newstart;
+    block[BUFLIB_IDX_HANDLE].handle->alloc = newstart;
     if (block != new_block)
     {
         /* move metadata over, i.e. pointer to handle table entry and name
@@ -964,7 +955,7 @@ void buflib_pin(struct buflib_context *ctx, int handle)
         buflib_panic(ctx, "invalid handle pin: %d", handle);
 
     union buflib_data *data = handle_to_block(ctx, handle);
-    data[idx_PIN].pincount++;
+    data[BUFLIB_IDX_PIN].pincount++;
 }
 
 void buflib_unpin(struct buflib_context *ctx, int handle)
@@ -975,11 +966,11 @@ void buflib_unpin(struct buflib_context *ctx, int handle)
     union buflib_data *data = handle_to_block(ctx, handle);
     if (BUFLIB_PARANOIA & PARANOIA_CHECK_PINNING)
     {
-        if (data[idx_PIN].pincount == 0)
+        if (data[BUFLIB_IDX_PIN].pincount == 0)
             buflib_panic(ctx, "handle pin underflow: %d", handle);
     }
 
-    data[idx_PIN].pincount--;
+    data[BUFLIB_IDX_PIN].pincount--;
 }
 
 unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
@@ -988,7 +979,7 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
         buflib_panic(ctx, "invalid handle: %d", handle);
 
     union buflib_data *data = handle_to_block(ctx, handle);
-    return data[idx_PIN].pincount;
+    return data[BUFLIB_IDX_PIN].pincount;
 }
 
 #ifdef BUFLIB_DEBUG_GET_DATA
@@ -1062,13 +1053,13 @@ static void check_block_length(struct buflib_context *ctx,
 {
     if (BUFLIB_PARANOIA & PARANOIA_CHECK_LENGTH)
     {
-        intptr_t length = block[idx_LEN].val;
+        intptr_t length = block[BUFLIB_IDX_LEN].val;
 
         /* Check the block length does not pass beyond the end */
         if (length == 0 || block > ctx->alloc_end - abs(length))
         {
             buflib_panic(ctx, "block len wacky [%p]=%ld",
-                         (void*)&block[idx_LEN], (long)length);
+                         (void*)&block[BUFLIB_IDX_LEN], (long)length);
         }
     }
 }
@@ -1078,8 +1069,8 @@ static void check_block_handle(struct buflib_context *ctx,
 {
     if (BUFLIB_PARANOIA & PARANOIA_CHECK_BLOCK_HANDLE)
     {
-        intptr_t length = block[idx_LEN].val;
-        union buflib_data *h_entry = block[idx_HANDLE].handle;
+        intptr_t length = block[BUFLIB_IDX_LEN].val;
+        union buflib_data *h_entry = block[BUFLIB_IDX_HANDLE].handle;
 
         /* Check the handle pointer is properly aligned */
         /* TODO: Can we ensure the compiler doesn't optimize this out?
@@ -1088,14 +1079,14 @@ static void check_block_handle(struct buflib_context *ctx,
         if (!IS_ALIGNED((uintptr_t)h_entry, alignof(*h_entry)))
         {
             buflib_panic(ctx, "handle unaligned [%p]=%p",
-                         &block[idx_HANDLE], h_entry);
+                         &block[BUFLIB_IDX_HANDLE], h_entry);
         }
 
         /* Check the pointer is actually inside the handle table */
         if (h_entry < ctx->last_handle || h_entry >= ctx->handle_table)
         {
             buflib_panic(ctx, "handle out of bounds [%p]=%p",
-                         &block[idx_HANDLE], h_entry);
+                         &block[BUFLIB_IDX_HANDLE], h_entry);
         }
 
         /* Now check the allocation is within the block.

@@ -168,6 +168,18 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
     return h->pin_count;
 }
 
+void _buflib_malloc_put_data_pinned(struct buflib_context *ctx, void *data)
+{
+    for (int i = 0; i < ctx->num_allocs; ++i)
+    {
+        if (ctx->allocs[i].user == data)
+        {
+            ctx->allocs[i].pin_count--;
+            break;
+        }
+    }
+}
+
 int buflib_free(struct buflib_context *ctx, int handle)
 {
     if (handle <= 0)

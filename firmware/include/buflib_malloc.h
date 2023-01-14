@@ -50,4 +50,16 @@ static inline void *buflib_get_data(struct buflib_context *ctx, int handle)
 }
 #endif
 
+static inline void *buflib_get_data_pinned(struct buflib_context *ctx, int handle)
+{
+    buflib_pin(ctx, handle);
+    return buflib_get_data(ctx, handle);
+}
+
+void _buflib_malloc_put_data_pinned(struct buflib_context *ctx, void *data);
+static inline void buflib_put_data_pinned(struct buflib_context *ctx, void *data)
+{
+    _buflib_malloc_put_data_pinned(ctx, data);
+}
+
 #endif /* _BUFLIB_MALLOC_H_ */

@@ -317,6 +317,32 @@ static inline void *buflib_get_data(struct buflib_context *ctx, int handle);
 #endif
 
 /**
+ * \brief Get a pinned pointer to a buflib allocation
+ * \param ctx       Buflib context of the allocation
+ * \param handle    Handle identifying the allocation
+ * \return Pointer to the allocation's memory.
+ *
+ * Functionally equivalent to buflib_pin() followed by buflib_get_data(),
+ * but this call is more efficient and should be preferred over separate
+ * calls.
+ *
+ * To unpin the data, call buflib_put_data_pinned() and pass the pointer
+ * returned by this function.
+ */
+static inline void *buflib_get_data_pinned(struct buflib_context *ctx, int handle);
+
+/**
+ * \brief Release a pinned pointer to a buflib allocation
+ * \param ctx       Buflib context of the allocation
+ * \param data      Pointer returned by buflib_get_data()
+ *
+ * Decrements the pin count, allowing the buffer to be moved once the
+ * pin count drops to zero. This is more efficient than buflib_unpin()
+ * and should be preferred when you have a pointer to the buflib data.
+ */
+static inline void buflib_put_data_pinned(struct buflib_context *ctx, void *data);
+
+/**
  * \brief Shift allocations up to free space at the start of the pool
  * \param ctx       Context to operate on
  * \param size      Indicates number of bytes to free up, or 0 to free
