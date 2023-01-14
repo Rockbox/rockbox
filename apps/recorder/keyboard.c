@@ -176,7 +176,11 @@ static void keyboard_layout(struct viewport *kbd_vp,
     vp = &kbd_vp[eKBD_VP_MENU];
     int menu_w = 0;//pm->font_w * MENU_CHARS; /* NOT IMPLEMENTED */
     vp->x = 0; /* LEFT */
+#ifdef HAVE_LCD_SPLIT
+    vp->y = MAX(LCD_SPLIT_POS, text_height); /* Sansa Clip/Clip+ */
+#else
     vp->y = text_height; /* TOP */
+#endif
     vp->width = menu_w;
     vp->height = 0;
     vp->font = pm->curfont;
@@ -185,7 +189,11 @@ static void keyboard_layout(struct viewport *kbd_vp,
     /* PICKER */
     vp = &kbd_vp[eKBD_VP_PICKER];
     vp->x = menu_w; /* LEFT */
+#ifdef HAVE_LCD_SPLIT
+    vp->y = MAX(LCD_SPLIT_POS, text_height - 2); /* Sansa Clip/Clip+ */
+#else
     vp->y = text_height - 2; /* TOP */
+#endif
     vp->width = sc_w - menu_w;
     vp->height = sc_h - vp->y; /* (MAX SIZE) - OVERWRITTEN */
     vp->font = pm->curfont;
