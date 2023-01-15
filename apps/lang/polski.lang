@@ -5330,19 +5330,17 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Ustaw jako katalog nagrywania"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: "Ustaw jako katalog nagrywania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11475,16 +11473,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Rozpocznij przeglądanie plików tutaj"
+    *: ""
   </dest>
   <voice>
-    *: "Rozpocznij przeglądanie plików tutaj"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11590,16 +11588,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Ustaw jako katalog list odtwarzania"
+    *: ""
   </dest>
   <voice>
-    *: "Ustaw jako katalog list odtwarzania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16319,5 +16317,78 @@
     *: none
     clear_settings_on_hold,iriverh10: "Wyczyść ustawienia, gdy przycisk resetowania będzie przytrzymany podczas uruchamiania"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Wyczyść ustawienia, gdy przełącznik blokady będzie włączony podczas uruchamiania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Przewiń poprzez utwory"
+  </dest>
+  <voice>
+    *: "Przewiń poprzez utwory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Ustaw jako..."
+  </dest>
+  <voice>
+    *: "Ustaw jako..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Katalog list odtwarzania"
+  </dest>
+  <voice>
+    *: "Katalog list odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Katalog startowy"
+  </dest>
+  <voice>
+    *: "Katalog startowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Katalog nagrywania"
+  </dest>
+  <voice>
+    *: none
+    recording: "Katalog nagrywania"
   </voice>
 </phrase>
