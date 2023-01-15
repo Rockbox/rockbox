@@ -33,6 +33,7 @@
 #include "lib/grey.h"
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
+#include "lib/id3.h"
 
 /******************************* Globals ***********************************/
 static fb_data *lcd_fb;
@@ -44,6 +45,7 @@ static fb_data *lcd_fb;
 
 #if PF_PLAYBACK_CAPABLE
 #include "lib/playback_control.h"
+#include "lib/mul_id3.h"
 #endif
 
 #define PF_PREV ACTION_STD_PREV
@@ -396,26 +398,6 @@ struct track_data {
     int filename_idx;
 #endif
 };
-
-#if PF_PLAYBACK_CAPABLE
-struct multiple_tracks_id3 {
-    unsigned long length;
-    unsigned long filesize;
-    unsigned long frequency;
-    unsigned int artist_hash;
-    unsigned int composer_hash;
-    unsigned int albumartist_hash;
-    unsigned int grouping_hash;
-    unsigned int comment_hash;
-    unsigned int album_hash;
-    unsigned int genre_hash;
-    unsigned int codectype;
-    unsigned int bitrate;
-    bool filesize_ovf;
-    bool length_ovf;
-    bool vbr;
-};
-#endif
 
 struct rect {
     int left;
@@ -2096,15 +2078,13 @@ static inline void free_borrowed_tracks(void)
 static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                     int buflen)
 {
-    if ( slide_index == -1 )
-    {
-        rb->strlcpy( buf, EMPTY_SLIDE, buflen );
-    }
+    bool ret;
+    if (slide_index == -1)
+        rb->strlcpy(buf, EMPTY_SLIDE, buflen);
 
     if (tcs.valid || !rb->tagcache_search(&tcs, tag_filename))
         return false;
 
-    bool result;
     /* find the first track of the album */
     rb->tagcache_search_add_filter(&tcs, tag_album,
                                    pf_idx.album_index[slide_index].seek);
@@ -2112,35 +2092,12 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
     rb->tagcache_search_add_filter(&tcs, tag_albumartist,
                                    pf_idx.album_index[slide_index].artist_seek);
 
-    if ( rb->tagcache_get_next(&tcs) ) {
-        int fd;
+    ret = rb->tagcache_get_next(&tcs) &&
+          retrieve_id3(&id3, tcs.result, true) &&
+          search_albumart_files(&id3, ":", buf, buflen);
 
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-        if (rb->tagcache_fill_tags(&id3, tcs.result))
-        {
-            rb->strlcpy(id3.path, tcs.result, sizeof(id3.path));
-        }
-        else
-#endif
-        {
-            fd = rb->open(tcs.result, O_RDONLY);
-            if (fd) {
-                rb->get_metadata(&id3, fd, tcs.result);
-                rb->close(fd);
-            }
-        }
-
-        if ( search_albumart_files(&id3, ":", buf, buflen) )
-            result = true;
-        else
-            result = false;
-    }
-    else {
-        /* did not find a matching track */
-        result = false;
-    }
     rb->tagcache_search_finish(&tcs);
-    return result;
+    return ret;
 }
 
 /**
@@ -4032,145 +3989,21 @@ static void select_prev_album(void)
 }
 
 #if PF_PLAYBACK_CAPABLE
-static void collect_id3(struct multiple_tracks_id3 *mul_id3, bool is_first_track)
-{
-    if (is_first_track)
-    {
-        mul_id3->artist_hash = mfnv(id3.artist);
-        mul_id3->album_hash = mfnv(id3.album);
-        mul_id3->genre_hash = mfnv(id3.genre_string);
-        mul_id3->composer_hash = mfnv(id3.composer);
-        mul_id3->albumartist_hash = mfnv(id3.albumartist);
-        mul_id3->grouping_hash = mfnv(id3.grouping);
-        mul_id3->comment_hash = mfnv(id3.comment);
-        mul_id3->codectype = id3.codectype;
-        mul_id3->vbr = id3.vbr;
-        mul_id3->bitrate = id3.bitrate;
-        mul_id3->frequency = id3.frequency;
-    }
-    else
-    {
-        if (mul_id3->artist_hash && (mfnv(id3.artist) != mul_id3->artist_hash))
-            mul_id3->artist_hash = 0;
-        if (mul_id3->album_hash && (mfnv(id3.album) != mul_id3->album_hash))
-            mul_id3->album_hash = 0;
-        if (mul_id3->genre_hash && (mfnv(id3.genre_string) != mul_id3->genre_hash))
-            mul_id3->genre_hash = 0;
-        if (mul_id3->composer_hash && (mfnv(id3.composer) != mul_id3->composer_hash))
-            mul_id3->composer_hash = 0;
-        if (mul_id3->albumartist_hash && (mfnv(id3.albumartist) !=
-                                          mul_id3->albumartist_hash))
-            mul_id3->albumartist_hash = 0;
-        if (mul_id3->grouping_hash && (mfnv(id3.grouping) != mul_id3->grouping_hash))
-            mul_id3->grouping_hash = 0;
-        if (mul_id3->comment_hash && (mfnv(id3.comment) != mul_id3->comment_hash))
-            mul_id3->comment_hash = 0;
-
-        if (mul_id3->codectype && (id3.codectype != mul_id3->codectype))
-            mul_id3->codectype = AFMT_UNKNOWN;
-        if (mul_id3->bitrate && (id3.bitrate != mul_id3->bitrate ||
-                                 id3.vbr != mul_id3->vbr))
-            mul_id3->bitrate = 0;
-        if (mul_id3->frequency && (id3.frequency != mul_id3->frequency))
-            mul_id3->frequency = 0;
-    }
-
-    if (ULONG_MAX - mul_id3->length < id3.length)
-    {
-        mul_id3->length_ovf = true;
-        mul_id3->length = 0;
-    }
-    else if (!mul_id3->length_ovf)
-        mul_id3->length += id3.length;
-
-    if (INT_MAX - mul_id3->filesize < id3.filesize) /* output_dyn_value expects int */
-    {
-        mul_id3->filesize_ovf = true;
-        mul_id3->filesize = 0;
-    }
-    else if (!mul_id3->filesize_ovf)
-        mul_id3->filesize += id3.filesize;
-}
-
-
-static void write_id3_mul_tracks(struct multiple_tracks_id3 *mul_id3)
-{
-    id3.path[0] = '\0';
-    id3.title = NULL;
-    if (!mul_id3->artist_hash)
-        id3.artist = NULL;
-    if (!mul_id3->album_hash)
-        id3.album = NULL;
-    if (!mul_id3->genre_hash)
-        id3.genre_string = NULL;
-    if (!mul_id3->composer_hash)
-        id3.composer = NULL;
-    if (!mul_id3->albumartist_hash)
-        id3.albumartist = NULL;
-    if (!mul_id3->grouping_hash)
-        id3.grouping = NULL;
-    if (!mul_id3->comment_hash)
-        id3.comment = NULL;
-    id3.disc_string = NULL;
-    id3.track_string = NULL;
-    id3.year_string = NULL;
-    id3.year = pf_idx.album_index[center_index].year;
-    id3.length = mul_id3->length;
-    id3.filesize = mul_id3->filesize;
-    id3.frequency = mul_id3->frequency;
-    id3.bitrate = mul_id3->bitrate;
-    id3.codectype = mul_id3->codectype;
-    id3.vbr = mul_id3->vbr;
-    id3.discnum = 0;
-    id3.tracknum = 0;
-    id3.track_level = 0;
-    id3.album_level = 0;
-}
-
-static void init_mul_id3(struct multiple_tracks_id3 *mul_id3)
-{
-    mul_id3->artist_hash = 0;
-    mul_id3->album_hash = 0;
-    mul_id3->genre_hash = 0;
-    mul_id3->composer_hash = 0;
-    mul_id3->albumartist_hash = 0;
-    mul_id3->grouping_hash = 0;
-    mul_id3->comment_hash = 0;
-    mul_id3->codectype = 0;
-    mul_id3->vbr = false;
-    mul_id3->bitrate = 0;
-    mul_id3->frequency = 0;
-    mul_id3->length = 0;
-    mul_id3->filesize = 0;
-    mul_id3->length_ovf = false;
-    mul_id3->filesize_ovf = false;
-}
-
 static int show_id3_info(const char *selected_file)
 {
-    int fd, i;
+    int i;
     unsigned long last_tick;
     const char *file_name;
-    bool id3_retrieval_successful;
     bool is_multiple_tracks = insert_whole_album && pf_tracks.count > 1;
-    struct multiple_tracks_id3 mul_id3;
 
-    init_mul_id3(&mul_id3);
+    init_mul_id3();
 
     last_tick = *(rb->current_tick) + HZ/2;
     rb->splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     i = 0;
     do {
-        id3_retrieval_successful = false;
         file_name = i == 0 ? selected_file : get_track_filename(i);
-        fd = rb->open(file_name, O_RDONLY);
-        if (fd >= 0)
-        {
-            if (rb->get_metadata(&id3, fd, file_name))
-                id3_retrieval_successful = true;
-            rb->close(fd);
-        }
-        if (!id3_retrieval_successful)
+        if (!retrieve_id3(&id3, file_name, false))
             return 0;
 
         if (is_multiple_tracks)
@@ -4184,13 +4017,13 @@ static int show_id3_info(const char *selected_file)
                 last_tick = *(rb->current_tick);
             }
 
-            collect_id3(&mul_id3, i == 0);
+            collect_id3(&id3, i == 0);
             rb->yield();
         }
     } while (++i < pf_tracks.count && is_multiple_tracks);
 
     if (is_multiple_tracks)
-        write_id3_mul_tracks(&mul_id3);
+        write_id3_mul_tracks(&id3);
 
     return rb->browse_id3(&id3, 0, 0, NULL) ? PLUGIN_USB_CONNECTED : 0;
 }
@@ -4520,31 +4353,15 @@ static void draw_album_text(void)
 
 static void set_initial_slide(const char* selected_file)
 {
-    if (selected_file == NULL)
+    if (selected_file)
+        set_current_slide(retrieve_id3(&id3, selected_file, true) ?
+                            id3_get_index(&id3) :
+                            pf_cfg.last_album);
+    else
         set_current_slide(rb->audio_status() ?
                             id3_get_index(rb->audio_current_track()) :
                             pf_cfg.last_album);
-    else
-    {
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-        if (rb->tagcache_fill_tags(&id3, selected_file))
-            set_current_slide(id3_get_index(&id3));
-        else
-#endif
-        {
-            int fd = rb->open(selected_file, O_RDONLY);
-            if (fd >= 0)
-            {
-                if (rb->get_metadata(&id3, fd, selected_file))
-                    set_current_slide(id3_get_index(&id3));
-                else
-                    set_current_slide(pf_cfg.last_album);
-                rb->close(fd);
-            }
-            else
-                set_current_slide(pf_cfg.last_album);
-        }
-    }
+
 }
 
 /**

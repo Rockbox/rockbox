@@ -69,3 +69,9 @@ kbd_helper.c
 #ifdef HAVE_TOUCHSCREEN
 pluginlib_touchscreen.c
 #endif
+
+id3.c
+
+#ifdef HAVE_TAGCACHE
+mul_id3.c
+#endif
