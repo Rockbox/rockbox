@@ -652,7 +652,7 @@ static inline void buf_ctx_unlock(void)
     buf_ctx_locked = false;
 }
 
-static bool check_database(bool prompt)
+static bool check_database(void)
 {
     bool needwarn = true;
     int spin = 5;
@@ -670,9 +670,7 @@ static bool check_database(bool prompt)
             needwarn = false;
             rb->splash(0, ID2P(LANG_TAGCACHE_BUSY));
         }
-        else if (!prompt)
-            return false;
-        else if (rb->action_userabort(HZ/5))
+        else
             return false;
 
         rb->yield();
@@ -4952,17 +4950,12 @@ enum plugin_status plugin_start(const void *parameter)
 
     void * buf;
     size_t buf_size;
-    bool prompt = (parameter && (((char *) parameter)[0] == ACTIVITY_MAINMENU));
     bool file_id3 = (parameter && (((char *) parameter)[0] == '/'));
 
-    if (!check_database(prompt))
+    if (!check_database())
     {
-        if (prompt)
-            return PLUGIN_OK;
-        else
-            error_wait("Please enable database");
-
-        return PLUGIN_ERROR;
+        error_wait("Please enable database");
+        return PLUGIN_OK;
     }
 
     atexit(cleanup);
