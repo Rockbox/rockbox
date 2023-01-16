@@ -107,7 +107,7 @@ struct playlist_info
     int num_cached;      /* number of cached entries                */
     struct mutex mutex; /* mutex for control file access    */
 #ifdef HAVE_DIRCACHE
-    struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
+    int dcfrefs_handle;
 #endif
     int  dirlen;         /* Length of the path to the playlist file */
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
