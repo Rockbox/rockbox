@@ -170,7 +170,7 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
 
 void _buflib_malloc_put_data_pinned(struct buflib_context *ctx, void *data)
 {
-    for (int i = 0; i < ctx->num_allocs; ++i)
+    for (size_t i = 0; i < ctx->num_allocs; ++i)
     {
         if (ctx->allocs[i].user == data)
         {
