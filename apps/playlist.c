@@ -176,6 +176,7 @@ static struct playlist_info current_playlist;
 static bool dc_has_dirty_pointers = false;
 
 static struct event_queue playlist_queue SHAREDBSS_ATTR;
+static struct queue_sender_list playlist_queue_sender_list SHAREDBSS_ATTR;
 static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char dc_thread_playlist_name[] = "playlist cachectrl";
 
@@ -2086,11 +2087,14 @@ void playlist_init(void)
         playlist->max_playlist_size * sizeof(*playlist->dcfrefs), &ops);
     playlist->dcfrefs = core_get_data(handle);
     dc_copy_filerefs(playlist->dcfrefs, NULL, playlist->max_playlist_size);
-    create_thread(dc_thread_playlist, playlist_stack, sizeof(playlist_stack),
-                  0, dc_thread_playlist_name IF_PRIO(, PRIORITY_BACKGROUND)
-                       IF_COP(, CPU));
+    unsigned int playlist_thread_id =
+        create_thread(dc_thread_playlist, playlist_stack, sizeof(playlist_stack),
+                      0, dc_thread_playlist_name IF_PRIO(, PRIORITY_BACKGROUND)
+                      IF_COP(, CPU));
 
     queue_init(&playlist_queue, true);
+    queue_enable_queue_send(&playlist_queue,
+                            &playlist_queue_sender_list, playlist_thread_id);
 #endif /* HAVE_DIRCACHE */
 }
 
