@@ -6145,58 +6145,58 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Wstaw"
+    *: ""
   </dest>
   <voice>
-    *: "Wstaw"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Wstaw następne"
+    *: ""
   </dest>
   <voice>
-    *: "Wstaw następne"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Wstaw ostatnie"
+    *: ""
   </dest>
   <voice>
-    *: "Wstaw ostatnie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Wstaw losowo"
+    *: ""
   </dest>
   <voice>
-    *: "Wstaw losowo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6369,16 +6369,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Dołącz do listy"
+    *: ""
   </dest>
   <voice>
-    *: "Dołącz do listy odtwarzania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10689,16 +10689,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Wstaw losowo na koniec"
+    *: ""
   </dest>
   <voice>
-    *: "Wstaw losowo na koniec"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16390,5 +16390,176 @@
   <voice>
     *: none
     recording: "Katalog nagrywania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Przewiń poprzez utwory"
+  </dest>
+  <voice>
+    *: "Przewiń poprzez utwory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Ustaw jako..."
+  </dest>
+  <voice>
+    *: "Ustaw jako..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Katalog list odtwarzania"
+  </dest>
+  <voice>
+    *: "Katalog list odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Katalog startowy"
+  </dest>
+  <voice>
+    *: "Katalog startowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Katalog nagrywania"
+  </dest>
+  <voice>
+    *: none
+    recording: "Katalog nagrywania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Dodaj do listy odtwarzania..."
+  </dest>
+  <voice>
+    *: "Dodaj do listy odtwarzania..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Dodaj do istniejącej listy odtwarzania"
+  </dest>
+  <voice>
+    *: "Dodaj do istniejącej listy odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Odtwarzanie następnego..."
+  </dest>
+  <voice>
+    *: "Odtwarzanie następnego..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Odtwórz następny"
+  </dest>
+  <voice>
+    *: "Odtwórz następny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Dodaj losowy"
+  </dest>
+  <voice>
+    *: "Dodaj losowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Odtwórz ostatni"
+  </dest>
+  <voice>
+    *: "Odtwórz ostatni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Odtwórz ostatni losowy"
+  </dest>
+  <voice>
+    *: "Odtwórz ostatni losowy"
   </voice>
 </phrase>
