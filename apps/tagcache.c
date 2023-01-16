@@ -5084,6 +5084,7 @@ static int get_progress(void)
 
 struct tagcache_stat* tagcache_get_stat(void)
 {
+    tc_stat.total_entries = current_tcmh.tch.entry_count;
     tc_stat.progress = get_progress();
     tc_stat.processed_entries = processed_dir_count;
 

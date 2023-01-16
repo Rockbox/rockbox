@@ -1865,6 +1865,8 @@ static int database_callback(int btn, struct gui_synclist *lists)
              stat->ramcache ? "Yes" : "No");
     simplelist_addline("RAM: %d/%d B",
              stat->ramcache_used, stat->ramcache_allocated);
+    simplelist_addline("Total entries: %d",
+                       stat->total_entries);
     simplelist_addline("Progress: %d%% (%d entries)",
              stat->progress, stat->processed_entries);
     simplelist_addline("Curfile: %s",

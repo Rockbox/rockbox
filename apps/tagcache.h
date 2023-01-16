@@ -85,6 +85,7 @@ struct tagcache_stat {
     int  ramcache_used;      /* How much ram has been really used */
     int  progress;           /* Current progress of disk scan */
     int  processed_entries;  /* Scanned disk entries so far */
+    int  total_entries;      /* Total entries in tagcache */
     int  queue_length;       /* Command queue length */
     volatile const char 
         *curentry;           /* Path of the current entry being scanned. */
