@@ -40,17 +40,22 @@
  * offset / sizeof(data) or index * sizeof(data) to convert
  */
 
-struct chunk
+struct chunk_alloc
 {
     int handle; /* data handle of buflib allocated bytes */
     size_t max_start_offset; /* start of last allocation */
 };
 
-#define CHUNK_ARRSZ(n) (sizeof(struct chunk) * n)
+#define CHUNK_ARRSZ(n) (sizeof(struct chunk_alloc) * n)
 
-static struct chunk* get_chunk_array(struct buflib_context *ctx, int handle)
+static struct chunk_alloc* get_chunk_array(struct buflib_context *ctx, int handle)
 {
-    return (struct chunk*)buflib_get_data(ctx, handle);
+    return (struct chunk_alloc*)buflib_get_data_pinned(ctx, handle);
+}
+
+static void put_chunk_array(struct buflib_context *ctx, struct chunk_alloc *data)
+{
+    buflib_put_data_pinned(ctx, data);
 }
 
 /* shrink or grow chunk allocation
@@ -63,8 +68,8 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
                    size_t chunk_size, size_t max_chunks)
 {
     struct buflib_context *ctx = hdr->context;
-    struct chunk *new_chunk = NULL;
-    struct chunk *old_chunk;
+    struct chunk_alloc *new_chunk = NULL;
+    struct chunk_alloc *old_chunk;
     size_t min_chunk = 1;
     int new_handle = 0;
 
@@ -83,10 +88,8 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
     }
     if (hdr->chunk_handle > 0) /* handle existing chunk */
     {
-        logf("%s %ld chunks (%ld bytes) => %ld chunks (%ld bytes)", __func__,
-         hdr->count, CHUNK_ARRSZ(hdr->count), max_chunks, CHUNK_ARRSZ(max_chunks));
+        logf("%s %ld chunks => %ld chunks", __func__, hdr->count, max_chunks);
 
-        buflib_pin(ctx, hdr->chunk_handle);
         old_chunk = get_chunk_array(ctx, hdr->chunk_handle);
 
         if (new_chunk != NULL) /* copy any valid old chunks to new */
@@ -94,6 +97,7 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
             min_chunk = MIN(max_chunks, hdr->current + 1);
             logf("%s copying %ld chunks", __func__, min_chunk);
             memcpy(new_chunk, old_chunk, CHUNK_ARRSZ(min_chunk));
+            put_chunk_array(ctx, new_chunk);
         }
         /* free any chunks that no longer fit */
         for (size_t i = max_chunks; i <= hdr->current; i++)
@@ -101,7 +105,7 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
             logf("%s discarding chunk[%ld]", __func__, i);
             buflib_free(ctx, old_chunk[i].handle);
         }
-        buflib_unpin(ctx, hdr->chunk_handle);
+        put_chunk_array(ctx, old_chunk);
 
         if (max_chunks < hdr->count && max_chunks > 0)
         {
@@ -122,10 +126,9 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
     }
     else
     {
-        logf("chunk_alloc_init %ld chunks (%ld bytes)",
-                   hdr->count, (hdr->count));
+        logf("chunk_alloc_init %ld chunks", hdr->count);
     }
-
+    hdr->cached_chunk.handle = 0; /* reset last chunk to force new lookup */
     hdr->chunk_handle = new_handle;
     hdr->chunk_size = chunk_size;
     hdr->count = max_chunks;
@@ -152,20 +155,16 @@ bool chunk_alloc_init(struct chunk_alloc_header *hdr,
                       size_t chunk_size, size_t max_chunks)
 {
     /* initialize header */
-    hdr->chunk_handle = 0;
-    hdr->chunk_bytes_total = 0;
-    hdr->chunk_bytes_free = 0;
-    hdr->current = 0;
+    memset(hdr, 0, sizeof(struct chunk_alloc_header));
     hdr->context = ctx;
-    hdr->count = 0;
 
     return chunk_realloc(hdr, chunk_size, max_chunks);
 }
 
 /* shrink current chunk to size used */
-static void finalize(struct chunk_alloc_header *hdr, struct chunk *chunk_array)
+static void finalize(struct chunk_alloc_header *hdr, struct chunk_alloc *chunk_array)
 {
-    /*Note calling functions check if chunk_bytes_free > 0*/
+    /* Note calling functions check if chunk_bytes_free > 0 */
     size_t idx = hdr->current;
     if (idx >= hdr->count)
         return;
@@ -186,8 +185,10 @@ void chunk_alloc_finalize(struct chunk_alloc_header *hdr)
 {
     if (hdr->chunk_bytes_free > 0)
     {
-        struct chunk *chunk = get_chunk_array(hdr->context, hdr->chunk_handle);
+        struct chunk_alloc *chunk;
+        chunk = get_chunk_array(hdr->context, hdr->chunk_handle);
         finalize(hdr, chunk);
+        put_chunk_array(hdr->context, chunk);
     }
 }
 
@@ -197,19 +198,19 @@ void chunk_alloc_finalize(struct chunk_alloc_header *hdr)
 */
 size_t chunk_alloc(struct chunk_alloc_header *hdr, size_t size)
 {
+    size_t virtual_offset = CHUNK_ALLOC_INVALID;
     size_t idx = hdr->current;
     int handle = hdr->chunk_handle;
     struct buflib_context *ctx = hdr->context;
 
-    buflib_pin(ctx, handle);
-    struct chunk *chunk = get_chunk_array(ctx, handle);
+    struct chunk_alloc *chunk = get_chunk_array(ctx, handle);
 
     while (size > 0)
     {
         if (idx >= hdr->count)
         {
             logf("%s Error OOM -- out of chunks", __func__);
-            break;
+            break; /* Out of chunks */
         }
         hdr->current = idx;
 
@@ -222,7 +223,7 @@ size_t chunk_alloc(struct chunk_alloc_header *hdr, size_t size)
             if (chunk[idx].handle <= 0)
             {
                 logf("%s Error OOM", __func__);
-                goto fail; /* OOM */
+                break; /* OOM */
             }
 
             hdr->chunk_bytes_total = new_alloc_size;
@@ -237,14 +238,17 @@ size_t chunk_alloc(struct chunk_alloc_header *hdr, size_t size)
 
         if(size <= hdr->chunk_bytes_free) /* request will fit */
         {
-            size_t offset = chunk[idx].max_start_offset;
+            virtual_offset = chunk[idx].max_start_offset;
             chunk[idx].max_start_offset += size;
             hdr->chunk_bytes_free -= size;
-            /*logf("%s hdr idx[%ld] offset[%ld] size: %ld",
-                                __func__, idx, offset, size);*/
 
-            buflib_unpin(ctx, handle);
-            return offset;
+            if (hdr->cached_chunk.handle == chunk[idx].handle)
+                hdr->cached_chunk.max_offset = chunk[idx].max_start_offset;
+
+            /*logf("%s hdr idx[%ld] offset[%ld] size: %ld",
+                   __func__, idx, offset, size);*/
+
+            break; /* Success */
         }
         else if (hdr->chunk_bytes_free > 0) /* shrink the current chunk */
         {
@@ -252,26 +256,42 @@ size_t chunk_alloc(struct chunk_alloc_header *hdr, size_t size)
         }
         idx++;
     }
-fail:
-    buflib_unpin(ctx, handle);
-    return CHUNK_ALLOC_INVALID;
+
+    put_chunk_array(ctx, chunk);
+    return virtual_offset;
 }
 
-/* returns chunk idx given virtual offset */
-static size_t chunk_find_data_idx(struct chunk_alloc_header *hdr,
-                                  size_t offset, struct chunk **chunk)
+/* retrieves chunk given virtual offset
+ * returns actual offset
+*/
+static size_t chunk_get_at_offset(struct chunk_alloc_header *hdr, size_t offset)
 {
-    size_t idx;
-    *chunk = get_chunk_array(hdr->context, hdr->chunk_handle);
-    /*logf("%s search for offset[%ld]", __func__, offset);*/
-    for (idx = hdr->current; idx < hdr->count; idx--)
+    if ((hdr->cached_chunk.handle > 0)
+        && (offset >= hdr->cached_chunk.min_offset)
+        && (offset < hdr->cached_chunk.max_offset))
     {
-        if (offset < (*chunk)[idx].max_start_offset
-           && (idx == 0 || offset >= (*chunk)[idx - 1].max_start_offset))
+        /* convert virtual offset to real internal offset */
+        return offset - hdr->cached_chunk.min_offset;
+    }
+
+    /* chunk isn't cached perform new lookup */
+    struct chunk_alloc *chunk = get_chunk_array(hdr->context, hdr->chunk_handle);
+    logf("%s search for offset[%ld]", __func__, offset);
+    for (size_t idx = hdr->current; idx < hdr->count; idx--)
+    {
+        size_t min_offset = (idx == 0 ? 0 : chunk[idx - 1].max_start_offset);
+        if (offset < chunk[idx].max_start_offset && offset >= min_offset)
         {
-            /*logf("%s found hdr idx[%ld] max offset[%ld]",
-                 __func__, idx, (*chunk)[idx].max_start_offset);*/
-            return idx;
+            logf("%s found hdr idx[%ld] min offset[%ld] max offset[%ld]",
+                 __func__, idx, min_offset, chunk[idx].max_start_offset);
+
+            /* store found chunk */
+            hdr->cached_chunk.handle = chunk[idx].handle;
+            hdr->cached_chunk.max_offset = chunk[idx].max_start_offset;
+            hdr->cached_chunk.min_offset = min_offset;
+            put_chunk_array(hdr->context, chunk);
+            /* convert virtual offset to real internal offset */
+            return offset - hdr->cached_chunk.min_offset;
         }
     }
     panicf("%s Error offset %d does not exist", __func__, (unsigned int)offset);
@@ -284,19 +304,14 @@ static size_t chunk_find_data_idx(struct chunk_alloc_header *hdr,
 */
 void* chunk_get_data(struct chunk_alloc_header *hdr, size_t offset)
 {
-    struct chunk *chunk;
-    size_t idx = chunk_find_data_idx(hdr, offset, &chunk);
-    if (idx > 0)
-        offset -= chunk[idx - 1].max_start_offset;
-    logf("%s adjusted offset: %ld", __func__, offset);
-    buflib_pin(hdr->context, chunk[idx].handle);
-    return buflib_get_data(hdr->context, chunk[idx].handle) + offset;
+    size_t real = chunk_get_at_offset(hdr, offset);
+    logf("%s offset: %ld real: %ld", __func__, offset, real);
+    return buflib_get_data_pinned(hdr->context, hdr->cached_chunk.handle) + real;
 }
 
 /* release a pinned buffer, chunk can't be moved till pin count == 0 */
-void chunk_put_data(struct chunk_alloc_header *hdr, size_t offset)
+void chunk_put_data(struct chunk_alloc_header *hdr, void* data, size_t offset)
 {
-    struct chunk *chunk;
-    size_t idx = chunk_find_data_idx(hdr, offset, &chunk);
-    buflib_unpin(hdr->context, chunk[idx].handle);
+    size_t real = chunk_get_at_offset(hdr, offset);
+    buflib_put_data_pinned(hdr->context, data - real);
 }

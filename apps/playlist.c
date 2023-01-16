@@ -1205,7 +1205,7 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
     {
         char *namebuf = chunk_get_data(&playlist->name_chunk_buffer, seek);
         strmemccpy(tmp_buf, namebuf, sizeof(tmp_buf));
-        chunk_put_data(&playlist->name_chunk_buffer, seek);
+        chunk_put_data(&playlist->name_chunk_buffer, namebuf, seek);
         NOTEF("%s [in Ram]: 0x%x %s", __func__, seek, tmp_buf);
     }
     else if (max < 0)
@@ -2145,11 +2145,9 @@ int playlist_add(const char *filename)
 
     char *namebuf = (char*)chunk_get_data(&playlist->name_chunk_buffer, indice);
     strcpy(namebuf, filename);
+    namebuf[len] = '\0';
+    chunk_put_data(&playlist->name_chunk_buffer, namebuf, indice);
 
-    namebuf += len;
-    namebuf[0] = '\0';
-
-    chunk_put_data(&playlist->name_chunk_buffer, indice);
     playlist->indices[playlist->amount] = indice;
 
 #ifdef HAVE_DIRCACHE

@@ -28,16 +28,23 @@
 
 #define CHUNK_ALLOC_INVALID ((size_t)-1)
 
+
 struct chunk_alloc_header
 {
+    struct buflib_context *context; /* buflib context for all allocations */
+    int chunk_handle; /* data handle of buflib allocated array of struct chunk */
+
     size_t chunk_bytes_total; /* total bytes in current chunk */
     size_t chunk_bytes_free;  /* free bytes in current chunk  */
     size_t chunk_size;        /* default chunk size    */
     size_t count;             /* total chunks possible */
     size_t current;           /* current chunk in use  */
 
-    struct buflib_context *context; /* buflib context for all allocations */
-    int chunk_handle; /* data handle of buflib allocated array of struct chunk */
+    struct {
+        int handle;
+        size_t min_offset;
+        size_t max_offset;
+    } cached_chunk;
 };
 
 void chunk_alloc_free(struct chunk_alloc_header *hdr);
@@ -55,7 +62,7 @@ size_t chunk_alloc(struct chunk_alloc_header *hdr, size_t size); /* Returns offs
 
 void* chunk_get_data(struct chunk_alloc_header *hdr, size_t offset); /* Returns data */
 
-void chunk_put_data(struct chunk_alloc_header *hdr, size_t offset);
+void chunk_put_data(struct chunk_alloc_header *hdr, void* data, size_t offset);
 
 static inline bool chunk_alloc_is_initialized(struct chunk_alloc_header *hdr)
 {
