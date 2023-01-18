@@ -1661,7 +1661,7 @@ entry_skip_formatter:
             break ;
         }
 
-        if (init && !tcs.ramsearch)
+        if (init)
         {
             if (!show_search_progress(false, total_count))
             {   /* user aborted */
@@ -1697,11 +1697,8 @@ entry_skip_formatter:
 
     while (tagcache_get_next(&tcs))
     {
-        if (!tcs.ramsearch)
-        {
-            if (!show_search_progress(false, total_count))
-                break;
-        }
+        if (!show_search_progress(false, total_count))
+            break;
         total_count++;
     }
 

@@ -444,25 +444,46 @@ static ssize_t ecread_tagfile_entry(int fd, struct tagfile_entry *buf)
     return ecread(fd, buf, 1, tagfile_entry_ec, tc_stat.econ);
 }
 
-enum e_ecread_errors {e_SUCCESS = 0, e_ENTRY_SIZEMISMATCH = 1, e_TAG_TOOLONG, e_TAG_SIZEMISMATCH};
+
+enum e_ecread_errors
+{
+    e_SUCCESS = 0,
+    e_SUCCESS_LEN_ZERO = 1,
+    e_ENTRY_SIZEMISMATCH,
+    e_TAG_TOOLONG,
+    e_TAG_SIZEMISMATCH
+};
 static enum e_ecread_errors ecread_tagfile_entry_and_tag
                        (int fd, struct tagfile_entry *tfe, char* buf, int bufsz)
 {
-    long tag_length;
-    str_setlen(buf, 0);
+    enum e_ecread_errors e_res = e_SUCCESS;
+    long tag_length = 0;
+
     if (ecread_tagfile_entry(fd, tfe)!= sizeof(struct tagfile_entry))
     {
-        return e_ENTRY_SIZEMISMATCH;
+        e_res = e_ENTRY_SIZEMISMATCH;
     }
-    tag_length = tfe->tag_length;
-    if (tag_length >= bufsz)
-        return e_TAG_TOOLONG;
-
-    if (read(fd, buf, tag_length) != tag_length)
-        return e_TAG_SIZEMISMATCH;
-
+    else
+    {
+        if (tfe->tag_length == 0)
+        {
+            e_res = e_SUCCESS_LEN_ZERO;
+        }
+        else if (tfe->tag_length >= bufsz)
+        {
+            e_res = e_TAG_TOOLONG;
+        }
+        else if(read(fd, buf, tfe->tag_length) != tfe->tag_length)
+        {
+            e_res = e_TAG_SIZEMISMATCH;
+        }
+        else
+        {
+            tag_length = tfe->tag_length;
+        }
+    }
     str_setlen(buf, tag_length);
-    return e_SUCCESS;
+    return e_res;
 }
 
 static ssize_t ecread_index_entry(int fd, struct index_entry *buf)
@@ -583,7 +604,7 @@ static bool do_timed_yield(void)
     if (TIME_AFTER(current_tick, wakeup_tick))
     {
         yield();
-        wakeup_tick = current_tick + (HZ/50);
+        wakeup_tick = current_tick + (HZ/25);
         return true;
     }
     return false;
@@ -644,19 +665,24 @@ static long find_entry_ram(const char *filename)
 
 static long find_entry_disk(const char *filename_raw, bool localfd)
 {
+    struct tagfile_entry tfe;
     struct tagcache_header tch;
     static long last_pos = -1;
     long pos_history[POS_HISTORY_COUNT];
-    long pos_history_idx = 0;
-    bool found = false;
-    struct tagfile_entry tfe;
-    int fd;
+    unsigned int pos_history_idx = 0;
+    unsigned int i;
+
     char buf[TAGCACHE_BUFSZ];
     const long bufsz = sizeof(buf);
-    int i;
+
+    int fd;
     int pos = -1;
+    long idx = -1;
+
+    bool found = false;
 
     const char *filename = filename_raw;
+
 #ifdef APPLICATION
     char pathbuf[PATH_MAX]; /* Note: Don't use MAX_PATH here, it's too small */
     if (realpath(filename, pathbuf) == pathbuf)
@@ -676,53 +702,51 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
 
     check_again:
 
-    if (last_pos > 0)
-        lseek(fd, last_pos, SEEK_SET);
-    else
-        lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
+    if (last_pos > 0) /* pos gets cached to prevent reading from beginning */
+        pos = lseek(fd, last_pos, SEEK_SET);
+    else /* start back at beginning */
+        pos = lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
 
-    while (true)
+    long tag_length = strlen(filename);
+
+    if (tag_length < bufsz)
     {
-        pos = lseek(fd, 0, SEEK_CUR);
-        for (i = pos_history_idx-1; i >= 0; i--)
-            pos_history[i+1] = pos_history[i];
-        pos_history[0] = pos;
-
-        int res = ecread_tagfile_entry_and_tag(fd, &tfe, buf, bufsz);
-        if (res == e_SUCCESS)
-        {;;}
-        else if (res == e_ENTRY_SIZEMISMATCH)
-            break;
-        else
+        while (true)
         {
-            switch (res)
+            for (i = pos_history_idx-1; i < pos_history_idx; i--)
+                pos_history[i+1] = pos_history[i];
+            pos_history[0] = pos;
+
+            if (ecread_tagfile_entry(fd, &tfe)!= sizeof(struct tagfile_entry))
             {
-                case e_TAG_TOOLONG:
-                    logf("too long tag #1");
-                    close(fd);
-                    if (!localfd)
-                        filenametag_fd = -1;
-                    last_pos = -1;
-                    return -2;
-                case e_TAG_SIZEMISMATCH:
-                    logf("read error #2");
-                    close(fd);
-                    if (!localfd)
-                        filenametag_fd = -1;
-                    last_pos = -1;
-                    return -3;
-                default:
-                    break;
+                logf("size mismatch find entry");
+                break;
+            }
+            else
+            {
+                /* don't read the entry unless the length matches */
+                if (tfe.tag_length == tag_length)
+                {
+                    if(read(fd, buf, tfe.tag_length) != tag_length)
+                    {
+                        logf("read error #2");
+                        close(fd);
+                        if (!localfd)
+                            filenametag_fd = -1;
+                        last_pos = -1;
+                        return -3;
+                    }
+                    if (!strncmp(filename, buf, tag_length))
+                    {
+                        last_pos = pos_history[pos_history_idx];
+                        found = true;
+                        idx = tfe.idx_id;
+                        break ;
+                    }
+                }
+                pos += sizeof(struct tagfile_entry) + tfe.tag_length;
             }
         }
-
-        if (!strcmp(filename, buf))
-        {
-            last_pos = pos_history[pos_history_idx];
-            found = true;
-            break ;
-        }
-
         if (pos_history_idx < POS_HISTORY_COUNT - 1)
             pos_history_idx++;
     }
@@ -730,22 +754,20 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
     /* Not found? */
     if (!found)
     {
-        if (last_pos > 0)
+        if (last_pos > 0) /* start back at the beginning */
         {
             last_pos = -1;
             logf("seek again");
             goto check_again;
         }
 
-        if (fd != filenametag_fd || localfd)
-            close(fd);
-        return -4;
-    }
+        idx = -4;
+    }     
 
     if (fd != filenametag_fd || localfd)
         close(fd);
 
-    return tfe.idx_id;
+    return idx;
 }
 
 static int find_index(const char *filename)
@@ -892,12 +914,11 @@ static bool open_files(struct tagcache_search *tcs, int tag)
         tcs->idxfd[tag] = open_pathfmt(fname, sizeof(fname),
                                        O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
                                        tc_stat.db_path, tag);
-    }
-
-    if (tcs->idxfd[tag] < 0)
-    {
-        logf("File not open!");
-        return false;
+        if (tcs->idxfd[tag] < 0)
+        {
+            logf("File not open!");
+            return false;
+        }
     }
 
     return true;
@@ -909,16 +930,14 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
     struct tagfile_entry tfe;
     long seek;
 
-    str_setlen(buf, 0);
-
     if (TAGCACHE_IS_NUMERIC(tag))
-        return false;
+        goto failure;
 
     seek = idx->tag_seek[tag];
     if (seek < 0)
     {
         logf("Retrieve failed");
-        return false;
+        goto failure;
     }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -943,29 +962,32 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
     }
 #endif /* HAVE_TC_RAMCACHE */
 
-    if (!open_files(tcs, tag))
-        return false;
-
-    lseek(tcs->idxfd[tag], seek, SEEK_SET);
-    switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tag], &tfe, buf, bufsz))
+    if (open_files(tcs, tag))
     {
-        case e_SUCCESS:
-             break;
-        case e_ENTRY_SIZEMISMATCH:
-            logf("read error #5");
-            return false;
-        case e_TAG_TOOLONG:
-            logf("too long tag #5");
-            return false;
-        case e_TAG_SIZEMISMATCH:
-            logf("read error #6");
-            return false;
-        default:
-            logf("unknown_error");
-            break;;
+        lseek(tcs->idxfd[tag], seek, SEEK_SET);
+        switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tag], &tfe, buf, bufsz))
+        {
+            case e_ENTRY_SIZEMISMATCH:
+                logf("read error #5");
+                break;
+            case e_TAG_TOOLONG:
+                logf("too long tag #5");
+                break;
+            case e_TAG_SIZEMISMATCH:
+                logf("read error #6");
+                break;
+            default:
+                logf("unknown_error");
+                break;
+            case e_SUCCESS_LEN_ZERO:
+            case e_SUCCESS:
+                return true;
+        }
     }
 
-    return true;
+failure:
+    str_setlen(buf, 0);
+    return false;
 }
 
 #define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
@@ -1288,6 +1310,8 @@ static bool check_clauses(struct tagcache_search *tcs,
 
                 switch (ecread_tagfile_entry_and_tag(fd, &tfe, str, bufsz))
                 {
+                    case e_SUCCESS_LEN_ZERO: /* Check if entry has been deleted. */
+                        return false;
                     case e_SUCCESS:
                          break;
                     case e_ENTRY_SIZEMISMATCH:
@@ -1303,10 +1327,6 @@ static bool check_clauses(struct tagcache_search *tcs,
                         logf("unknown_error");
                         break;;
                 }
-  
-                /* Check if entry has been deleted. */
-                if (str[0] == '\0')
-                    return false;
             }
         }
 
@@ -1699,7 +1719,9 @@ static bool get_next(struct tagcache_search *tcs)
     if (!tcs->valid || !tc_stat.ready)
         return false;
 
-    if (tcs->idxfd[tcs->type] < 0 && !TAGCACHE_IS_NUMERIC(tcs->type)
+    bool is_numeric = TAGCACHE_IS_NUMERIC(tcs->type);
+
+    if (tcs->idxfd[tcs->type] < 0 && !is_numeric
 #ifdef HAVE_TC_RAMCACHE
         && !tcs->ramsearch
 #endif
@@ -1707,8 +1729,7 @@ static bool get_next(struct tagcache_search *tcs)
         return false;
 
     /* Relative fetch. */
-    if (tcs->filter_count > 0 || tcs->clause_count > 0
-        || TAGCACHE_IS_NUMERIC(tcs->type)
+    if (tcs->filter_count > 0 || tcs->clause_count > 0 || is_numeric
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         /* We need to retrieve flag status for dircache. */
         || (tcs->ramsearch && tcs->type == tag_filename)
@@ -1751,7 +1772,7 @@ static bool get_next(struct tagcache_search *tcs)
 
     tcs->result_seek = tcs->position;
 
-    if (TAGCACHE_IS_NUMERIC(tcs->type))
+    if (is_numeric)
     {
         snprintf(buf, bufsz, "%ld", tcs->position);
         tcs->result = buf;
@@ -1809,6 +1830,7 @@ static bool get_next(struct tagcache_search *tcs)
 
     switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tcs->type], &entry, buf, bufsz))
     {
+        case e_SUCCESS_LEN_ZERO:
         case e_SUCCESS:
              break;
         case e_ENTRY_SIZEMISMATCH:
@@ -1837,7 +1859,7 @@ static bool get_next(struct tagcache_search *tcs)
     str_setlen(buf, entry.tag_length);
 
     tcs->result = buf;
-    tcs->result_len = strlen(tcs->result) + 1;
+    tcs->result_len = entry.tag_length + 1;
     tcs->idx_id = entry.idx_id;
     tcs->ramresult = false;
 
@@ -2776,6 +2798,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 bool ret;
                 switch (ecread_tagfile_entry_and_tag(fd, &entry, buf, bufsz))
                 {
+                    case e_SUCCESS_LEN_ZERO: /* Skip deleted entries. */
+                        continue;
                     case e_SUCCESS:
                          break;
                     case e_ENTRY_SIZEMISMATCH:
@@ -2794,10 +2818,6 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                         logf("unknown_error");
                         break;;
                 }
-
-                /* Skip deleted entries. */
-                if (buf[0] == '\0')
-                    continue;
 
                 /**
                  * Save the tag and tag id in the memory buffer. Tag id
@@ -3957,6 +3977,9 @@ static bool delete_entry(long idx_id)
 
             switch (ecread_tagfile_entry_and_tag(fd, &tfe, buf, bufsz))
             {
+                case e_SUCCESS_LEN_ZERO:
+                    logf("deleted_entry(): SUCCESS");
+                    /* FALL THROUGH */
                 case e_SUCCESS:
                      break;
                 case e_ENTRY_SIZEMISMATCH:
@@ -4228,8 +4251,6 @@ static bool load_tagcache(void)
     /* DEBUG: After tagcache commit and dircache rebuild, hdr-sturcture
      * may become corrupt. */
 
-    bool const auto_update = global_settings.tagcache_autoupdate;
-
     bool ok = false;
     ssize_t bytesleft = tc_stat.ramcache_allocated - sizeof(struct ramcache_header);
     int fd;
@@ -4404,30 +4425,6 @@ static bool load_tagcache(void)
                     logf("read error #12");
                     goto failure;
                 }
-
-            #ifdef HAVE_DIRCACHE
-                /* If auto updating, check storage too, otherwise simply
-                   attempt to load cache references */
-                unsigned int searchflag = auto_update ? DCS_STORAGE_PATH :
-                                                        DCS_CACHED_PATH;
-
-                int rc_cache = dircache_search(searchflag | DCS_UPDATE_FILEREF,
-                                               &tcrc_dcfrefs[idx_id], filename);
-                if (rc_cache > 0)           /* in cache and we have fileref */
-                    idx->flag |= FLAG_DIRCACHE;
-                else if (rc_cache == 0)     /* not in cache but okay */
-                    ;
-                else if (auto_update)
-            #else /* ndef HAVE_DIRCACHE */
-                /* Check if path is no longer valid */
-                if (!file_exists(filename))
-            #endif /* HAVE_DIRCACHE */
-                {
-                    logf("Entry no longer valid.");
-                    logf("-> %s", filename);
-                    delete_entry(idx_id);
-                }
-
                 continue;
             }
 
@@ -4478,63 +4475,123 @@ failure:
 }
 #endif /* HAVE_TC_RAMCACHE */
 
-static bool check_deleted_files(void)
+static bool check_file_refs(bool auto_update)
 {
     int fd;
+    bool ret = true;
     char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     struct tagfile_entry tfe;
-
+    struct tagcache_header hdr;
+    
     logf("reverse scan...");
-    fd = open_pathfmt(buf, bufsz, O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
-                      tc_stat.db_path, tag_filename);
+
+#ifdef HAVE_DIRCACHE
+    if (tcramcache.handle > 0)
+        tcrc_buffer_lock();
+    else
+        return false;
+    /* Wait for any in-progress dircache build to complete */
+    dircache_wait();
+#else
+    if (!auto_update)
+        return false;
+#endif
+
+    fd = open_tag_fd(&hdr, tag_filename, false); /* open read only*/
+
     if (fd < 0)
     {
         logf(TAGCACHE_FILE_INDEX " open fail", tag_filename);
         return false;
     }
 
-    lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
-    while (ecread_tagfile_entry(fd, &tfe) == sizeof(struct tagfile_entry)
-           && !check_event_queue())
+    processed_dir_count = 0;
+
+    while (!check_event_queue())
     {
-        if (tfe.tag_length >= (long)bufsz-1)
+        int res = ecread_tagfile_entry_and_tag(fd, &tfe, buf, bufsz);
+        processed_dir_count++;
+
+        switch (res)
         {
-            logf("too long tag");
-            close(fd);
-            return false;
+            default:
+                logf("read error");
+                ret = false;
+                goto wend_finished;
+            case e_ENTRY_SIZEMISMATCH:
+                logf("size mismatch entry");
+                ret = false;
+                goto wend_finished;
+            case e_TAG_TOOLONG:
+                logf("too long tag");
+                ret = false;
+                goto wend_finished;
+            case e_TAG_SIZEMISMATCH:
+                logf("size mismatch tag - read error #14");
+                ret = false;
+                goto wend_finished;
+            case e_SUCCESS:
+                break;
+            case e_SUCCESS_LEN_ZERO:
+                continue;
         }
 
-        if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
+        int idx_id = tfe.idx_id; /* dircache reference clobbers *tfe */
+#ifdef HAVE_DIRCACHE
+        struct index_entry *idx = &tcramcache.hdr->indices[idx_id];
+        unsigned int searchflag;
+        if (!auto_update)
         {
-            logf("read error #14");
-            close(fd);
-            return false;
+            if(idx->flag & FLAG_DIRCACHE) /* already found */
+            {
+                continue;
+            }
+            searchflag = DCS_CACHED_PATH; /* attempt to load cache references */
         }
-        str_setlen(buf, tfe.tag_length);
+        else /* If auto updating, check storage too */
+        {
+            searchflag = DCS_STORAGE_PATH;
+        }
 
-        /* Check if the file has already deleted from the db. */
-        if (*buf == '\0')
-            continue;
+        int rc_cache = dircache_search(searchflag | DCS_UPDATE_FILEREF,
+                                   &tcrc_dcfrefs[idx_id], buf);
 
-        /* Now check if the file exists. */
+        if (rc_cache > 0)           /* in cache and we have fileref */
+        {
+            idx->flag |= FLAG_DIRCACHE;
+        }
+        else if (rc_cache == 0)     /* not in cache but okay */
+        {;}
+        else if (auto_update)
+#else
         if (!file_exists(buf))
+#endif /* HAVE_DIRCACHE */
         {
             logf("Entry no longer valid.");
             logf("-> %s / %ld", buf, tfe.tag_length);
-            delete_entry(tfe.idx_id);
+            delete_entry(idx_id);
         }
 
         do_timed_yield();
     }
 
-    close(fd);
+wend_finished:
 
+#ifdef HAVE_DIRCACHE
+    if (tcramcache.handle > 0)
+        tcrc_buffer_unlock();
+#endif
+    close(fd);
     logf("done");
 
-    return true;
+    return ret;
 }
 
+static bool check_deleted_files(void)
+{
+    return check_file_refs(true);
+}
 
 /* Note that this function must not be inlined, otherwise the whole point
  * of having the code in a separate function is lost.
@@ -4988,6 +5045,7 @@ static void tagcache_thread(void)
                 if (!tc_stat.ramcache && global_settings.tagcache_ram)
                 {
                     load_ramcache();
+                    check_file_refs(global_settings.tagcache_autoupdate);
                     if (tc_stat.ramcache && global_settings.tagcache_autoupdate)
                         tagcache_build();
                 }
@@ -5059,7 +5117,8 @@ static int get_progress(void)
 #ifdef HAVE_DIRCACHE
     struct dircache_info dcinfo;
     dircache_get_info(&dcinfo);
-    if (dcinfo.status != DIRCACHE_IDLE)
+    if (dcinfo.status != DIRCACHE_IDLE &&
+        ((!tc_stat.ramcache) || current_tcmh.tch.entry_count == 0))
     {
         total_count = dcinfo.entry_count;
     }

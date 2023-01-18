@@ -74,12 +74,18 @@ enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
     clause_logical_or };
 
 struct tagcache_stat {
+    char db_path[MAX_PATHNAME+1];  /* Path to DB root directory */
+
     bool initialized;        /* Is tagcache currently busy? */
     bool readyvalid;         /* Has tagcache ready status been ascertained */
     bool ready;              /* Is tagcache ready to be used? */
     bool ramcache;           /* Is tagcache loaded in ram? */
     bool commit_delayed;     /* Has commit been delayed until next reboot? */
     bool econ;               /* Is endianess correction enabled? */
+    volatile bool syncscreen;/* Synchronous operation with debug screen? */
+    volatile const char 
+        *curentry;           /* Path of the current entry being scanned. */
+
     int  commit_step;        /* Commit progress */
     int  ramcache_allocated; /* Has ram been allocated for ramcache? */
     int  ramcache_used;      /* How much ram has been really used */
@@ -87,11 +93,8 @@ struct tagcache_stat {
     int  processed_entries;  /* Scanned disk entries so far */
     int  total_entries;      /* Total entries in tagcache */
     int  queue_length;       /* Command queue length */
-    volatile const char 
-        *curentry;           /* Path of the current entry being scanned. */
-    volatile bool syncscreen;/* Synchronous operation with debug screen? */
-    // const char *uimessage;   /* Pending error message. Implement soon. */
-    char db_path[MAX_PATHNAME+1];  /* Path to DB root directory */
+
+    //const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
 enum source_type {source_constant, 
