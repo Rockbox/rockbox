@@ -32,7 +32,6 @@ enum dsp_ids
 
 enum dsp_settings
 {
-    DSP_INIT,
     DSP_RESET,
     DSP_SET_FREQUENCY,
     DSP_SET_SAMPLE_DEPTH,

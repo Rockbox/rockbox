@@ -535,16 +535,6 @@ void dsp_init(void)
         for (unsigned int j = 0; j < ARRAYLEN(dsp_init_fn); ++j)
             dsp_init_fn[j](dsp, i);
 
-        /*
-         * FIXME: This is a no-op and should not be needed, but it
-         *        appears there is a race condition here that causes
-         *        prefetch abort panics on the Clip+. See FS#13386.
-         *        Replacing the loop with mdelay(1) also suppresses
-         *        the crash.
-         */
-        for (unsigned int j = 0; j < DSP_NUM_PROC_STAGES; j++)
-            dsp_proc_database[j]->configure(NULL, dsp, DSP_INIT, i);
-
         dsp_configure(dsp, DSP_RESET, 0);
     }
 }
