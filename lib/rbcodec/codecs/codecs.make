@@ -65,6 +65,7 @@ include $(RBCODECLIB_DIR)/codecs/libgme/libvgm.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libkss.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libemu2413.make
 include $(RBCODECLIB_DIR)/codecs/libopus/libopus.make
+include $(RBCODECLIB_DIR)/codecs/cRSID/cRSID.make
 
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
@@ -101,6 +102,7 @@ $(WAVPACKLIB) : CODECFLAGS += -O1
 $(WMALIB) : CODECFLAGS += -O2
 $(WMAPROLIB) : CODECFLAGS += -O1
 $(WMAVOICELIB) : CODECFLAGS += -O1
+$(CRSID) : CODECFLAGS += -O3
 
 # fine-tuning of CODECFLAGS per cpu arch
 ifeq ($(ARCH),arch_arm)
@@ -192,6 +194,7 @@ $(CODECDIR)/sgc.codec : $(CODECDIR)/libsgc.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/vgm.codec : $(CODECDIR)/libvgm.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/kss.codec : $(CODECDIR)/libkss.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/opus.codec : $(CODECDIR)/libopus.a $(TLSFLIB)
+$(CODECDIR)/sid.codec : $(CODECDIR)/cRSID.a
 $(CODECDIR)/aac_bsf.codec : $(CODECDIR)/libfaad.a
 
 $(CODECS): $(CODEC_LIBS) # this must be last in codec dependency list

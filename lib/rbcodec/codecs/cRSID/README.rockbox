@@ -1,0 +1,19 @@
+Some notes about cRSID usage in Rockbox
+by Ninja (Wolfram Sang) in 2023
+
+The cRSID codebase is from v1.0. The only change made was a separation of the
+cRSID header into a public and private one, so it could be compiled as a
+library. You can find it as a separate commit in the git repository. This
+likely needs to be updated whenever a newer version of cRSID shall be used.
+
+Currently, newer versions of cRSID are available but they have been discarded.
+v1.1 mainly adds a high quality playback mode using 7x oversampling. This is
+too much for a Sansa Clip. Because the old playback mode still exists, it might
+be possible to add a runtime option to let the user choose. As a first step
+however, it was decided to give the user a working codec without having to deal
+with options. v1.2 mainly adds a SDL-based GUI player, no bigger changes in SID
+emulation. Staying with v1.0 also keeps the codec size significantly lower
+(~50KB for v1.0 vs ~90KB for v1.2 on the Sansa Clip).
+
+cRSID Releases can be found here:
+https://csdb.dk/search/?seinsel=releases&search=crsid
