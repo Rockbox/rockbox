@@ -368,26 +368,40 @@ static void sync_control(struct playlist_info* playlist, bool force)
     }
 }
 
+static int flush_cached_control_unlocked(struct playlist_info* playlist);
+
+#if USING_STORAGE_CALLBACK
+static void flush_control_cache_idle_cb(unsigned short id, void *ev, void *ud)
+{
+    (void)id;
+    (void)ev;
+
+    struct playlist_info *playlist = ud;
+    playlist_mutex_lock(&playlist->mutex);
+
+    if (playlist->control_fd >= 0)
+        flush_cached_control_unlocked(playlist);
+
+    playlist_mutex_unlock(&playlist->mutex);
+}
+#endif
+
 /*
  * Flush any cached control commands to disk.  Called when playlist is being
  * modified.  Returns 0 on success and -1 on failure.
  */
-static int flush_cached_control(struct playlist_info* playlist)
+static int flush_cached_control_unlocked(struct playlist_info* playlist)
 {
     int result = 0;
-    int i;
 
     if (playlist->num_cached <= 0)
         return 0;
 
-    playlist_mutex_lock(&(playlist->mutex));
-
     lseek(playlist->control_fd, 0, SEEK_END);
 
-    for (i=0; i<playlist->num_cached; i++)
+    for (int i = 0; i < playlist->num_cached; i++)
     {
-        struct playlist_control_cache* cache = &(playlist->control_cache[i]);
-
+        struct playlist_control_cache* cache = &playlist->control_cache[i];
         switch (cache->command)
         {
             case PLAYLIST_COMMAND_PLAYLIST:
@@ -432,16 +446,24 @@ static int flush_cached_control(struct playlist_info* playlist)
     {
         playlist->num_cached = 0;
         playlist->pending_control_sync = true;
-
         result = 0;
     }
     else
     {
+        /* At this point the control file is likely corrupted. We still
+         * need to clear the cache to avoid a buffer overflow from the
+         * next command. It's unsafe to splash() because this function
+         * can be called off the main thread.
+         *
+         * TODO: recover from failed playlist control file writes.
+         */
+        playlist->num_cached = 0;
         result = -1;
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
     }
 
-    playlist_mutex_unlock(&(playlist->mutex));
+#if USING_STORAGE_CALLBACK
+    remove_event_ex(DISK_EVENT_SPINUP, flush_control_cache_idle_cb, playlist);
+#endif
     return result;
 }
 
@@ -457,9 +479,8 @@ static int update_control(struct playlist_info* playlist,
     struct playlist_control_cache* cache;
     bool flush = false;
 
-    playlist_mutex_lock(&(playlist->mutex));
-
-    cache = &(playlist->control_cache[playlist->num_cached++]);
+    playlist_mutex_lock(&playlist->mutex);
+    cache = &playlist->control_cache[playlist->num_cached++];
 
     cache->command = command;
     cache->i1 = i1;
@@ -473,23 +494,26 @@ static int update_control(struct playlist_info* playlist,
         case PLAYLIST_COMMAND_PLAYLIST:
         case PLAYLIST_COMMAND_ADD:
         case PLAYLIST_COMMAND_QUEUE:
-#ifndef HAVE_DIRCACHE
-        case PLAYLIST_COMMAND_DELETE:
-        case PLAYLIST_COMMAND_RESET:
-#endif
+            /*
+             * These commands can use s1/s2, which may point to
+             * stack allocated buffers, so flush them immediately.
+             */
             flush = true;
             break;
-        case PLAYLIST_COMMAND_SHUFFLE:
-        case PLAYLIST_COMMAND_UNSHUFFLE:
-        default: /* only flush when needed */
+        default:
             break;
     }
 
     if (flush || playlist->num_cached == PLAYLIST_MAX_CACHE)
-        result = flush_cached_control(playlist);
+        result = flush_cached_control_unlocked(playlist);
+    else
+    {
+#if USING_STORAGE_CALLBACK
+        add_event_ex(DISK_EVENT_SPINUP, true, flush_control_cache_idle_cb, playlist);
+#endif
+    }
 
-    playlist_mutex_unlock(&(playlist->mutex));
-
+    playlist_mutex_unlock(&playlist->mutex);
     return result;
 }
 
@@ -1885,30 +1909,16 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
 }
 
 #ifdef HAVE_DIRCACHE
-static void dc_flush_playlist_callback(void)
-{
-    struct playlist_info *playlist;
-    playlist = &current_playlist;
-    if (playlist->control_fd >= 0)
-    {
-        flush_cached_control(playlist);
-        sync_control(playlist, true);
-    }
-    else if (playlist->control_fd < 0 || playlist->num_cached <= 0)
-        unregister_storage_idle_func(dc_flush_playlist_callback, false);
-}
-
 /**
  * Thread to update filename pointers to dircache on background
- * without affecting playlist load up performance.  This thread also flushes
- * any pending control commands when the disk spins up.
+ * without affecting playlist load up performance.
  */
 static void dc_thread_playlist(void)
 {
     struct queue_event ev;
     static char tmp[MAX_PATH+1];
 
-    struct playlist_info *playlist;
+    struct playlist_info *playlist = &current_playlist;
     struct dircache_fileref *dcfrefs;
     int index;
     int seek;
@@ -1941,13 +1951,6 @@ static void dc_thread_playlist(void)
                timeout or 5s, whichever is less */
             case SYS_TIMEOUT:
             {
-                playlist = &current_playlist;
-                if (playlist->control_fd >= 0)
-                {
-                    if (playlist->num_cached > 0)
-                        register_storage_idle_func(dc_flush_playlist_callback);
-                }
-
                 if (!playlist->dcfrefs_handle || playlist->amount <= 0)
                     break ;
 
@@ -2110,13 +2113,15 @@ void playlist_init(void)
 void playlist_shutdown(void)
 {
     struct playlist_info* playlist = &current_playlist;
+    playlist_mutex_lock(&playlist->mutex);
 
     if (playlist->control_fd >= 0)
     {
-        flush_cached_control(playlist);
-
+        flush_cached_control_unlocked(playlist);
         close_playlist_control_file(playlist);
     }
+
+    playlist_mutex_unlock(&playlist->mutex);
 }
 
 /*
