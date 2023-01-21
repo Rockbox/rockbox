@@ -83,7 +83,7 @@ struct playlist_info
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     int  num_inserted_tracks; /* number of tracks inserted           */
-    volatile unsigned long *indices; /* array of indices            */
+    unsigned long *indices; /* array of indices            */
 
     struct chunk_alloc_header name_chunk_buffer; /* chunk buffer for 
                                                     in-ram playlist */
