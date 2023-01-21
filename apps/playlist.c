@@ -560,7 +560,7 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
     playlist->pending_control_sync = false;
     playlist->shuffle_modified = false;
 
-    if (!resume && playlist->current)
+    if (!resume && playlist == &current_playlist)
     {
         /* start with fresh playlist control file when starting new
            playlist */
@@ -650,7 +650,8 @@ static void new_playlist_unlocked(struct playlist_info* playlist,
     {
         fileused = "";
 
-        if (dirused && playlist->current) /* !current cannot be in_ram */
+        /* only the current playlist can be in RAM */
+        if (dirused && playlist == &current_playlist)
             playlist->in_ram = true;
         else
             dirused = ""; /* empty playlist */
@@ -2076,7 +2077,6 @@ void playlist_init(void)
     int handle;
     struct playlist_info* playlist = &current_playlist;
 
-    playlist->current = true;
     strmemccpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
     playlist->fd = -1;
@@ -2201,7 +2201,6 @@ int playlist_create_ex(struct playlist_info* playlist,
     {
         /* Initialize playlist structure */
         int r = rand() % 10;
-        playlist->current = false;
 
         /* Use random name for control file */
         snprintf(playlist->control_filename, sizeof(playlist->control_filename),

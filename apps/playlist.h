@@ -75,7 +75,6 @@ struct playlist_control_cache {
 
 struct playlist_info
 {
-    bool current;        /* current playing playlist                */
     bool utf8;           /* playlist is in .m3u8 format             */
     bool control_created; /* has control file been created?         */
     bool in_ram;         /* playlist stored in ram (dirplay)        */
