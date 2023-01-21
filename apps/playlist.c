@@ -592,13 +592,6 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
     }
 }
 
-/* initializes the mutex for a new playlist and sets it as empty */
-static void initalize_new_playlist(struct playlist_info* playlist, bool resume)
-{
-    mutex_init(&(playlist->mutex));
-    empty_playlist_unlocked(playlist, resume);
-}
-
 /*
  * Returns absolute path of track
  *
@@ -668,7 +661,7 @@ static void new_playlist_unlocked(struct playlist_info* playlist,
     const char *fileused = file;
     const char *dirused = dir;
 
-    initalize_new_playlist(playlist, false);
+    empty_playlist_unlocked(playlist, false);
 
     if (!fileused)
     {
@@ -2079,6 +2072,7 @@ void playlist_init(void)
 {
     int handle;
     struct playlist_info* playlist = &current_playlist;
+    mutex_init(&playlist->mutex);
 
     strmemccpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
@@ -2089,7 +2083,7 @@ void playlist_init(void)
     handle = core_alloc_ex(playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
     playlist->indices = core_get_data(handle);
 
-    initalize_new_playlist(playlist, true);
+    empty_playlist_unlocked(playlist, true);
 
 #ifdef HAVE_DIRCACHE
     playlist->dcfrefs_handle = core_alloc(

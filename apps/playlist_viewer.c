@@ -119,6 +119,7 @@ static struct playlist_viewer  viewer;
 
 /* Used when viewing playlists on disk */
 static struct playlist_info temp_playlist;
+static bool temp_playlist_init = false;
 
 static bool dirty = false;
 
@@ -364,6 +365,14 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         char *temp_ptr;
         char *index_buffer = NULL;
         ssize_t index_buffer_size = 0;
+
+        /* Initialize temp playlist
+         * TODO - move this to playlist.c */
+        if (!temp_playlist_init)
+        {
+            mutex_init(&temp_playlist.mutex);
+            temp_playlist_init = true;
+        }
 
         viewer->playlist = &temp_playlist;
 
