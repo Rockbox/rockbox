@@ -204,15 +204,10 @@ static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char dc_thread_playlist_name[] = "playlist cachectrl";
 #endif
 
-#if defined(PLAYLIST_DEBUG_MUTEX)
-#define playlist_mutex_lock(m) {splashf(0, "%s lock", __func__); \
-                                mutex_lock(m);}
-#define playlist_mutex_unlock(m) {splashf(0, "%s unlock", __func__); \
-                                  mutex_unlock(m);}
-#else
-static void playlist_mutex_lock(struct mutex *m) { mutex_lock(m); }
-static void playlist_mutex_unlock(struct mutex *m) { mutex_unlock(m); }
-#endif
+#define playlist_read_lock(p)       mutex_lock(&(p)->mutex)
+#define playlist_read_unlock(p)     mutex_unlock(&(p)->mutex)
+#define playlist_write_lock(p)      mutex_lock(&(p)->mutex)
+#define playlist_write_unlock(p)    mutex_unlock(&(p)->mutex)
 
 #if defined(PLAYLIST_DEBUG_ACCESS_ERRORS)
 #define notify_access_error() (splashf(HZ*2, "%s %s", \
@@ -259,13 +254,15 @@ static void dc_thread_stop(struct playlist_info *playlist)
 
 static void close_playlist_control_file(struct playlist_info *playlist)
 {
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
+
     if (playlist->control_fd >= 0)
     {
         close(playlist->control_fd);
         playlist->control_fd = -1;
     }
-    playlist_mutex_unlock(&(playlist->mutex));
+
+    playlist_write_unlock(playlist);
 }
 
 /* Check if the filename suggests M3U or M3U8 format. */
@@ -367,10 +364,12 @@ static void sync_control(struct playlist_info* playlist, bool force)
     {
         if (playlist->pending_control_sync)
         {
-            playlist_mutex_lock(&(playlist->mutex));
+            playlist_write_lock(playlist);
+
             fsync(playlist->control_fd);
             playlist->pending_control_sync = false;
-            playlist_mutex_unlock(&(playlist->mutex));
+
+            playlist_write_unlock(playlist);
         }
     }
 }
@@ -384,12 +383,12 @@ static void flush_control_cache_idle_cb(unsigned short id, void *ev, void *ud)
     (void)ev;
 
     struct playlist_info *playlist = ud;
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     if (playlist->control_fd >= 0)
         flush_cached_control_unlocked(playlist);
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
 }
 #endif
 
@@ -489,7 +488,7 @@ static int update_control(struct playlist_info* playlist,
     struct playlist_control_cache* cache;
     bool flush = false;
 
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
     cache = &playlist->control_cache[playlist->num_cached++];
 
     cache->command = command;
@@ -523,7 +522,7 @@ static int update_control(struct playlist_info* playlist,
 #endif
     }
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     return result;
 }
 
@@ -699,7 +698,8 @@ static void new_playlist_unlocked(struct playlist_info* playlist,
 static int check_control(struct playlist_info* playlist)
 {
     int ret = 0;
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
+
     if (!playlist->control_created)
     {
         create_control_unlocked(playlist);
@@ -722,8 +722,7 @@ static int check_control(struct playlist_info* playlist)
     if (playlist->control_fd < 0)
         ret = -1;
 
-    playlist_mutex_unlock(&(playlist->mutex));
-
+    playlist_write_unlock(playlist);
     return ret;
 }
 
@@ -873,7 +872,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if (!buflen)
         buffer = alloca((buflen = 64));
 
-    playlist_mutex_lock(&(playlist->mutex)); /* read can yield! */
+    playlist_write_lock(playlist);
 
     if(-1 == playlist->fd)
     {
@@ -884,9 +883,10 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
     if(playlist->fd < 0)
     {
-        playlist_mutex_unlock(&(playlist->mutex));
-        return -1; /* failure */
+        result = -1;
+        goto exit;
     }
+
     /* seek to the beginning of the file get_filename leaves it elsewhere */
     i = lseek(playlist->fd, playlist->utf8 ? BOM_UTF_8_SIZE : 0, SEEK_SET);
 
@@ -934,9 +934,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     }
 
 exit:
-
-    playlist_mutex_unlock(&(playlist->mutex));
-
+    playlist_write_unlock(playlist);
     return result;
 }
 
@@ -1251,7 +1249,7 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
     }
     else if (max < 0)
     {
-        playlist_mutex_lock(&(playlist->mutex));
+        playlist_write_lock(playlist);
 
         if (control_file)
         {
@@ -1291,7 +1289,7 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
             }
         }
 
-        playlist_mutex_unlock(&(playlist->mutex));
+        playlist_write_unlock(playlist);
 
         if (max < 0)
         {
@@ -2183,7 +2181,7 @@ void playlist_init(void)
 void playlist_shutdown(void)
 {
     struct playlist_info* playlist = &current_playlist;
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     if (playlist->control_fd >= 0)
     {
@@ -2191,7 +2189,7 @@ void playlist_shutdown(void)
         close_playlist_control_file(playlist);
     }
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
 }
 
 /*
@@ -2222,7 +2220,7 @@ int playlist_add(const char *filename)
         return -1;
     }
 
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     char *namebuf = (char*)chunk_get_data(&playlist->name_chunk_buffer, indice);
     strcpy(namebuf, filename);
@@ -2234,8 +2232,7 @@ int playlist_add(const char *filename)
 
     playlist->amount++;
 
-    playlist_mutex_unlock(&(playlist->mutex));
-
+    playlist_write_unlock(playlist);
     return 0;
 }
 
@@ -2321,7 +2318,7 @@ int playlist_create(const char *dir, const char *file)
     int status = 0;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     new_playlist_unlocked(playlist, dir, file);
 
@@ -2347,7 +2344,7 @@ int playlist_create(const char *dir, const char *file)
         }
     }
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return status;
@@ -2404,7 +2401,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     if (check_control(playlist) < 0)
     {
@@ -2416,7 +2413,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
     result = remove_track_unlocked(playlist, index, true);
 
 out:
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, false);
 
     if (result != -1 && (audio_status() & AUDIO_STATUS_PLAY) &&
@@ -2683,7 +2680,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     if (check_control(playlist) < 0)
     {
@@ -2727,7 +2724,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     display_playlist_count(context.count, count_str, true);
 
 out:
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
@@ -2756,7 +2753,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     cpu_boost(true);
 
@@ -2866,7 +2863,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 out:
     cpu_boost(false);
 
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return result;
@@ -2885,7 +2882,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     if (check_control(playlist) < 0)
     {
@@ -2902,7 +2899,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
     if (sync && result >= 0)
         playlist_sync(playlist);
 
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return result;
@@ -2947,7 +2944,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     if (check_control(playlist) < 0)
     {
@@ -3055,7 +3052,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
     }
 
 out:
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     if (result != -1 && playlist->started && (audio_status() & AUDIO_STATUS_PLAY))
@@ -3094,7 +3091,7 @@ int playlist_next(int steps)
     struct playlist_info* playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     int index;
 
@@ -3176,7 +3173,7 @@ int playlist_next(int steps)
     }
 
 out:
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return index;
@@ -3188,9 +3185,6 @@ bool playlist_next_dir(int direction)
     /* not to mess up real playlists */
     if(!current_playlist.in_ram)
        return false;
-
-    playlist_mutex_lock(&(current_playlist.mutex));
-    playlist_mutex_unlock(&(current_playlist.mutex));
 
     return create_and_play_dir(direction, false) >= 0;
 }
@@ -3260,7 +3254,7 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     check_control(playlist);
 
@@ -3271,7 +3265,7 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
         audio_flush_and_reload_tracks();
     }
 
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return result;
@@ -3289,11 +3283,11 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     result = remove_all_tracks_unlocked(playlist, true);
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, false);
     return result;
 }
@@ -3319,7 +3313,7 @@ int playlist_resume(void)
 
     struct playlist_info* playlist = &current_playlist;
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     if (core_allocatable() < (1 << 10))
         talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
@@ -3735,7 +3729,7 @@ int playlist_resume(void)
     }
 
 out:
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
@@ -3897,7 +3891,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
         strmemcpy(tmp_buf, path, pathlen); /* remove "_temp" */
 
         dc_thread_stop(playlist);
-        playlist_mutex_lock(&playlist->mutex);
+        playlist_write_lock(playlist);
 
         if (!rename(path, tmp_buf))
         {
@@ -3937,7 +3931,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
             }
         }
 
-        playlist_mutex_unlock(&playlist->mutex);
+        playlist_write_unlock(playlist);
         dc_thread_start(playlist, true);
     }
 
@@ -3963,7 +3957,7 @@ int playlist_set_current(struct playlist_info* playlist)
         return result;
 
     dc_thread_stop(&current_playlist);
-    playlist_mutex_lock(&current_playlist.mutex);
+    playlist_write_lock(&current_playlist);
 
     empty_playlist_unlocked(&current_playlist, false);
 
@@ -4014,7 +4008,7 @@ int playlist_set_current(struct playlist_info* playlist)
     result = 0;
 
 out:
-    playlist_mutex_unlock(&current_playlist.mutex);
+    playlist_write_unlock(&current_playlist);
     dc_thread_start(&current_playlist, true);
 
     return result;
@@ -4025,9 +4019,9 @@ out:
 void playlist_set_last_shuffled_start(void)
 {
     struct playlist_info* playlist = &current_playlist;
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
     playlist->last_shuffled_start = playlist->amount;
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
 }
 
 /* shuffle newly created playlist using random seed. */
@@ -4037,7 +4031,7 @@ int playlist_shuffle(int random_seed, int start_index)
     bool start_current = false;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     if (start_index >= 0 && global_settings.play_selected)
     {
@@ -4048,7 +4042,7 @@ int playlist_shuffle(int random_seed, int start_index)
 
     randomise_playlist_unlocked(playlist, random_seed, start_current, true);
 
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     return playlist->index;
@@ -4063,7 +4057,8 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
 
     if (playlist == NULL)
         playlist = &current_playlist;
-    playlist_mutex_lock(&(playlist->mutex));
+
+    playlist_write_lock(playlist);
 
     /* need to account for already skipped tracks */
     steps = calculate_step_count(playlist, steps);
@@ -4075,7 +4070,7 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
         index -= playlist->amount;
 
     playlist->indices[index] |= PLAYLIST_SKIPPED;
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
 }
 
 /* sort currently playing playlist */
@@ -4087,7 +4082,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
         playlist = &current_playlist;
 
     dc_thread_stop(playlist);
-    playlist_mutex_lock(&playlist->mutex);
+    playlist_write_lock(playlist);
 
     check_control(playlist);
     result = sort_playlist_unlocked(playlist, start_current, true);
@@ -4095,7 +4090,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
     if (result != -1 && (audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
 
-    playlist_mutex_unlock(&playlist->mutex);
+    playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
     return result;
 }
@@ -4106,14 +4101,14 @@ void playlist_start(int start_index, unsigned long elapsed,
 {
     struct playlist_info* playlist = &current_playlist;
 
-    playlist_mutex_lock(&(playlist->mutex));
+    playlist_write_lock(playlist);
 
     playlist->index = start_index;
     playlist->started = true;
 
     sync_control(playlist, false);
 
-    playlist_mutex_unlock(&(playlist->mutex));
+    playlist_write_unlock(playlist);
 
     audio_play(elapsed, offset);
     audio_resume();
