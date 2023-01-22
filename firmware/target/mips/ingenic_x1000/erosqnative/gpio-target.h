@@ -24,26 +24,26 @@ DEFINE_PINGROUP(I2S,            GPIO_B,   0x1f <<  0,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(I2C2,           GPIO_D,      3 <<  0,   GPIOF_DEVICE(1))
 
 /*          Name                Pin             Function */
-/* mute DAC - 0 - mute, 1 - play. Affects both HP and LO. */
-DEFINE_GPIO(PCM5102A_XMIT,      GPIO_PB(12),    GPIOF_OUTPUT(0))
+/* mute DAC: 0 - mute, 1 - play */
+DEFINE_GPIO(DAC_XMIT,           GPIO_PB(12),    GPIOF_OUTPUT(0))
 
-/* mute HP amp, no effect on LO. 0 - mute, 1 - play */
-DEFINE_GPIO(MAX97220_SHDN,      GPIO_PB(8),     GPIOF_OUTPUT(0))
+/* mute HP amp: 0 - mute, 1 - play */
+DEFINE_GPIO(HPAMP_SHDN,         GPIO_PB(8),     GPIOF_OUTPUT(0))
 
-/* mute audio mux, only affects Headphone out.
- * 0 - play, 1 - mute */
-DEFINE_GPIO(ISL54405_MUTE,      GPIO_PB(15),    GPIOF_OUTPUT(1))
+/* mute audio mux: 0 - play, 1 - mute */
+DEFINE_GPIO(STEREOSW_MUTE,      GPIO_PB(15),    GPIOF_OUTPUT(1))
 
-/* switches HP on/off - 0 HP on, 1 hp off, has no effect on LO.
- * As best I can tell, it switches HP Out sources between HP amp and something
- * not implemented - there seem to be resistors missing. */
-DEFINE_GPIO(ISL54405_SEL,       GPIO_PB(5),     GPIOF_OUTPUT(0))
+/*
+ * Original devices: switches HP on/off - 0 HP on, 1 HP off, no effect on LO.
+ * Newer devices: switches between HP and LO - 0 HP, 1 LO.
+ */
+DEFINE_GPIO(STEREOSW_SEL,       GPIO_PB(5),     GPIOF_OUTPUT(0))
 
 /* DAC AVDD */
-DEFINE_GPIO(PCM5102A_ANALOG_PWR,       GPIO_PB(9),     GPIOF_OUTPUT(0))
+DEFINE_GPIO(DAC_ANALOG_PWR,     GPIO_PB(9),     GPIOF_OUTPUT(0))
 
 /* Headphone Amp power */
-DEFINE_GPIO(MAX97220_POWER,     GPIO_PB(6),     GPIOF_OUTPUT(0))
+DEFINE_GPIO(HPAMP_POWER,        GPIO_PB(6),     GPIOF_OUTPUT(0))
 
 /* SD card */
 DEFINE_GPIO(MSC0_CD,            GPIO_PB(11),    GPIOF_INPUT)

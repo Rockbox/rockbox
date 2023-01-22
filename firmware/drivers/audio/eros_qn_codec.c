@@ -31,10 +31,10 @@
 static long int vol_l_hw = 0;
 static long int vol_r_hw = 0;
 
-/* internal: mute the headphone amp. 0 - unmuted, 1 - muted */
-void audiohw_mute_hp(int mute);
+/* internal: Switch the output sink. 0 - headphones, 1 - line out */
+void audiohw_switch_output(int select);
 
-void pcm5102_set_outputs(void)
+void dac_set_outputs(void)
 {
     audiohw_set_volume(vol_l_hw, vol_r_hw);
 }
@@ -56,15 +56,14 @@ void audiohw_set_volume(int vol_l, int vol_r)
      * blow out our eardrums cranking it to full */
     if (lineout_inserted() && !headphones_inserted())
     {
-        l = r = global_settings.volume_limit * 10;
+        audiohw_switch_output(1);
 
-        /* mute the headphone amp if not plugged in */
-        audiohw_mute_hp(1);
+        l = r = global_settings.volume_limit * 10;
     }
     else
     {
-        /* unmute the headphone amp when plugged in */
-        audiohw_mute_hp(0);
+        audiohw_switch_output(0);
+        
         l = vol_l;
         r = vol_r;
     }
@@ -76,14 +75,14 @@ void audiohw_set_volume(int vol_l, int vol_r)
     pcm_set_master_volume(l, r);
 }
 
-void audiohw_mute_hp(int mute)
+void audiohw_switch_output(int select)
 {
-    if (mute == 0)
+    if (select == 0)
     {
-        gpio_set_level(GPIO_MAX97220_SHDN, 1);
+        gpio_set_level(GPIO_STEREOSW_SEL, 0);
     }
     else
     {
-        gpio_set_level(GPIO_MAX97220_SHDN, 0);
+        gpio_set_level(GPIO_STEREOSW_SEL, 1);
     }
 }

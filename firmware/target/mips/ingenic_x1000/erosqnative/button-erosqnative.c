@@ -127,7 +127,7 @@ bool headphones_inserted(void)
     {
         hp_detect_reg_old = hp_detect_reg;
 #if !defined(BOOTLOADER)
-        pcm5102_set_outputs();
+        dac_set_outputs();
 #endif
     }
     return hp_detect_reg & 0x10 ? false : true;
@@ -140,7 +140,7 @@ bool lineout_inserted(void)
     {
         hp_detect_reg_old = hp_detect_reg;
 #if !defined(BOOTLOADER)
-        pcm5102_set_outputs();
+        dac_set_outputs();
 #endif
     }
     return hp_detect_reg & 0x20 ? false : true;

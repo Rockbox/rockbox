@@ -27,20 +27,22 @@
 #include "gpio-x1000.h"
 #include "logf.h"
 
-/* Audio path appears to be:
- * DAC --> HP Amp --> Stereo Switch --> HP OUT
- *     \--> LO OUT
+/*
+ * Earlier devices audio path appears to be:
+ * DAC \--> HP Amp --> Stereo Switch --> HP OUT
+ *      \-> LO OUT
  *
- * The real purpose of the Stereo Switch is not clear.
- * It appears to switch sources between the HP amp and something,
- * likely something unimplemented. */
+ * Recent devices, the audio path seems to have changed to:
+ * DAC --> HP Amp --> Stereo Switch \--> HP OUT
+ *                                   \-> LO OUT
+ */
 
 void audiohw_init(void)
 {
     /* explicitly mute everything */
-    gpio_set_level(GPIO_MAX97220_SHDN, 0);
-    gpio_set_level(GPIO_ISL54405_MUTE, 1);
-    gpio_set_level(GPIO_PCM5102A_XMIT, 0);
+    gpio_set_level(GPIO_HPAMP_SHDN, 0);
+    gpio_set_level(GPIO_STEREOSW_MUTE, 1);
+    gpio_set_level(GPIO_DAC_XMIT, 0);
 
     aic_set_play_last_sample(true);
     aic_set_external_codec(true);
@@ -53,8 +55,8 @@ void audiohw_init(void)
     mdelay(10);
 
     /* power on DAC and HP Amp */
-    gpio_set_level(GPIO_PCM5102A_ANALOG_PWR, 1);
-    gpio_set_level(GPIO_MAX97220_POWER, 1);
+    gpio_set_level(GPIO_DAC_ANALOG_PWR, 1);
+    gpio_set_level(GPIO_HPAMP_POWER, 1);
 }
 
 void audiohw_postinit(void)
@@ -76,23 +78,23 @@ void audiohw_postinit(void)
     jz_writef(AIC_CCR, ERPL(0));
 
     /* unmute - attempt to make power-on pop-free */
-    gpio_set_level(GPIO_ISL54405_SEL, 0);
-    gpio_set_level(GPIO_MAX97220_SHDN, 1);
+    gpio_set_level(GPIO_STEREOSW_SEL, 0);
+    gpio_set_level(GPIO_HPAMP_SHDN, 1);
     mdelay(10);
-    gpio_set_level(GPIO_PCM5102A_XMIT, 1);
+    gpio_set_level(GPIO_DAC_XMIT, 1);
     mdelay(10);
-    gpio_set_level(GPIO_ISL54405_MUTE, 0);
+    gpio_set_level(GPIO_STEREOSW_MUTE, 0);
 }
 
 /* TODO: get shutdown just right according to dac datasheet */
 void audiohw_close(void)
 {
     /* mute - attempt to make power-off pop-free */
-    gpio_set_level(GPIO_ISL54405_MUTE, 1);
+    gpio_set_level(GPIO_STEREOSW_MUTE, 1);
     mdelay(10);
-    gpio_set_level(GPIO_PCM5102A_XMIT, 0);
+    gpio_set_level(GPIO_DAC_XMIT, 0);
     mdelay(10);
-    gpio_set_level(GPIO_MAX97220_SHDN, 0);
+    gpio_set_level(GPIO_HPAMP_SHDN, 0);
 }
 
 void audiohw_set_frequency(int fsel)

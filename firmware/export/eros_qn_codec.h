@@ -39,6 +39,6 @@ AUDIOHW_SETTING(VOLUME, "dB", 0, 2, PCM5102A_VOLUME_MIN/10, PCM5102A_VOLUME_MAX/
 
 /* this just calls audiohw_set_volume() with the last (locally) known volume,
  * used for switching to/from fixed line out volume. */
-void pcm5102_set_outputs(void);
+void dac_set_outputs(void);
 
 #endif
