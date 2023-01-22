@@ -60,10 +60,6 @@ enum {
     PLAYLIST_INSERT_LAST_SHUFFLED = -7
 };
 
-enum {
-    PLAYLIST_DELETE_CURRENT = -1
-};
-
 struct playlist_control_cache {
     enum playlist_command command;
     int i1;

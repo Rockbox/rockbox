@@ -2335,8 +2335,7 @@ void playlist_close(struct playlist_info* playlist)
 }
 
 /*
- * Delete track at specified index.  If index is PLAYLIST_DELETE_CURRENT then
- * we want to delete the current playing track.
+ * Delete track at specified index.
  */
 int playlist_delete(struct playlist_info* playlist, int index)
 {
@@ -2354,9 +2353,6 @@ int playlist_delete(struct playlist_info* playlist, int index)
         result = -1;
         goto out;
     }
-
-    if (index == PLAYLIST_DELETE_CURRENT)
-        index = playlist->index;
 
     result = remove_track_unlocked(playlist, index, true);
 
