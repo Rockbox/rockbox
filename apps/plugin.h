@@ -954,6 +954,7 @@ struct plugin_api {
     bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
 #endif
     void (*adjust_volume)(int steps);
+    void (*playlist_set_modified)(struct playlist_info *playlist, bool modified);
 };
 
 /* plugin header */

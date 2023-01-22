@@ -576,20 +576,18 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
     playlist->utf8 = true;
     playlist->control_created = false;
     playlist->in_ram = false;
+    playlist->modified = false;
 
     playlist->fd = -1;
     playlist->control_fd = -1;
-    playlist->num_inserted_tracks = 0;
 
     playlist->index = 0;
     playlist->first_index = 0;
     playlist->amount = 0;
     playlist->last_insert_pos = -1;
 
-    playlist->deleted = false;
     playlist->started = false;
     playlist->pending_control_sync = false;
-    playlist->shuffle_modified = false;
 
     if (!resume && playlist == &current_playlist)
     {
@@ -810,9 +808,7 @@ static int recreate_control_unlocked(struct playlist_info* playlist)
     }
 
     playlist->seed = 0;
-    playlist->shuffle_modified = false;
-    playlist->deleted = false;
-    playlist->num_inserted_tracks = 0;
+    playlist->modified = true;
 
     for (i=0; i<playlist->amount; i++)
     {
@@ -841,8 +837,6 @@ static int recreate_control_unlocked(struct playlist_info* playlist)
 
             if (result < 0)
                 break;
-
-            playlist->num_inserted_tracks++;
         }
     }
 
@@ -1373,18 +1367,11 @@ static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write
 #endif
 
     /* Update playlist state as if by remove_track_unlocked() */
-    bool inserted = playlist->indices[0] & PLAYLIST_INSERT_TYPE_MASK;
-
     playlist->index = 0;
+    playlist->first_index = 0;
     playlist->amount = 1;
     playlist->indices[0] |= PLAYLIST_QUEUED;
-
-    if (inserted)
-        playlist->num_inserted_tracks = 1;
-    else
-        playlist->deleted = true;
-
-    playlist->first_index = 0;
+    playlist->modified = true;
 
     if (playlist->last_insert_pos == 0)
         playlist->last_insert_pos = -1;
@@ -1558,7 +1545,7 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
     dc_init_filerefs(playlist, insert_position, 1);
 
     playlist->amount++;
-    playlist->num_inserted_tracks++;
+    playlist->modified = true;
 
     return insert_position;
 }
@@ -1614,12 +1601,9 @@ static int remove_track_unlocked(struct playlist_info* playlist,
 {
     int i;
     int result = 0;
-    bool inserted;
 
     if (playlist->amount <= 0)
         return -1;
-
-    inserted = playlist->indices[position] & PLAYLIST_INSERT_TYPE_MASK;
 
 #ifdef HAVE_DIRCACHE
     struct dircache_fileref *dcfrefs = NULL;
@@ -1638,11 +1622,7 @@ static int remove_track_unlocked(struct playlist_info* playlist,
     }
 
     playlist->amount--;
-
-    if (inserted)
-        playlist->num_inserted_tracks--;
-    else
-        playlist->deleted = true;
+    playlist->modified = true;
 
     /* update stored indices if needed */
     if (position < playlist->index)
@@ -1735,8 +1715,7 @@ static int randomise_playlist_unlocked(struct playlist_info* playlist,
     playlist->last_insert_pos = -1;
 
     playlist->seed = seed;
-    if (playlist->num_inserted_tracks > 0 || playlist->deleted)
-        playlist->shuffle_modified = true;
+    playlist->modified = true;
 
     if (write)
     {
@@ -1800,9 +1779,8 @@ static int sort_playlist_unlocked(struct playlist_info* playlist,
 
     /* indices have been moved so last insert position is no longer valid */
     playlist->last_insert_pos = -1;
+    playlist->modified = true;
 
-    if (!playlist->num_inserted_tracks && !playlist->deleted)
-        playlist->shuffle_modified = false;
     if (write && playlist->control_fd >= 0)
     {
         playlist->first_index = 0;
@@ -2905,20 +2883,25 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
     return result;
 }
 
-/* returns true if playlist has been modified */
+/* returns true if playlist has been modified by the user */
 bool playlist_modified(const struct playlist_info* playlist)
 {
     if (!playlist)
         playlist = &current_playlist;
 
-    if (playlist->shuffle_modified ||
-        playlist->deleted ||
-        playlist->num_inserted_tracks > 0)
-    {
-        return true;
-    }
+    return playlist->modified;
+}
 
-    return false;
+/*
+ * Set the playlist modified status. Useful for clearing the modified status
+ * after dynamically building a playlist.
+ */
+void playlist_set_modified(struct playlist_info *playlist, bool modified)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+
+    playlist->modified = modified;
 }
 
 /*
@@ -3938,6 +3921,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     if (fd >= 0)
         close(fd);
 
+    playlist->modified = false;
     cpu_boost(false);
 
     return result;
@@ -3996,9 +3980,7 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.amount = playlist->amount;
     current_playlist.last_insert_pos = playlist->last_insert_pos;
     current_playlist.seed = playlist->seed;
-    current_playlist.shuffle_modified = playlist->shuffle_modified;
-    current_playlist.deleted = playlist->deleted;
-    current_playlist.num_inserted_tracks = playlist->num_inserted_tracks;
+    current_playlist.modified = playlist->modified;
 
     memcpy(current_playlist.control_cache, playlist->control_cache,
         sizeof(current_playlist.control_cache));

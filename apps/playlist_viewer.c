@@ -975,6 +975,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                     if (global_settings.playlist_shuffle)
                         start_index = playlist_shuffle(current_tick, start_index);
                     playlist_start(start_index, 0, 0);
+                    playlist_set_modified(NULL, false);
 
                     if (viewer.initial_selection)
                         *(viewer.initial_selection) = viewer.selected_track;

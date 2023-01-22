@@ -75,11 +75,11 @@ struct playlist_info
     bool utf8;           /* playlist is in .m3u8 format             */
     bool control_created; /* has control file been created?         */
     bool in_ram;         /* playlist stored in ram (dirplay)        */
+    bool modified;       /* has playlist been modified by the user? */
     int  fd;             /* descriptor of the open playlist file    */
     int  control_fd;     /* descriptor of the open control file     */
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
-    int  num_inserted_tracks; /* number of tracks inserted           */
     unsigned long *indices; /* array of indices            */
 
     struct chunk_alloc_header name_chunk_buffer; /* chunk buffer for 
@@ -89,11 +89,8 @@ struct playlist_info
     int  first_index;    /* index of first song in playlist         */
     int  amount;         /* number of tracks in the index           */
     int  last_insert_pos; /* last position we inserted a track      */
-    bool deleted;        /* have any tracks been deleted?           */
     bool started;       /* has playlist been started?               */
     bool pending_control_sync; /* control file needs to be synced   */
-    bool shuffle_modified; /* has playlist been shuffled with
-                              inserted tracks?                      */
     int last_shuffled_start; /* number of tracks when insert last
                                     shuffled command start */
     int  seed;           /* shuffle seed                            */
@@ -166,6 +163,7 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
                        bool start_current);
 int playlist_sort(struct playlist_info* playlist, bool start_current);
 bool playlist_modified(const struct playlist_info* playlist);
+void playlist_set_modified(struct playlist_info* playlist, bool modified);
 int playlist_get_first_index(const struct playlist_info* playlist);
 int playlist_get_seed(const struct playlist_info* playlist);
 int playlist_amount_ex(const struct playlist_info* playlist);

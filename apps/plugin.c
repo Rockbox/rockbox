@@ -829,6 +829,7 @@ static const struct plugin_api rockbox_api = {
     tagtree_subentries_do_action,
 #endif
     adjust_volume,
+    playlist_set_modified,
 };
 
 static int plugin_buffer_handle;
