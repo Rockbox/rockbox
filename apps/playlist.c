@@ -123,7 +123,16 @@
 /* default load buffer size (should be at least 1 KiB) */
 #define PLAYLIST_LOAD_BUFLEN    (32*1024)
 
-#define PLAYLIST_CONTROL_FILE_VERSION 2
+/*
+ * Minimum supported version and current version of the control file.
+ * Any versions outside of this range will be rejected by the loader.
+ *
+ * v1 was the initial version when dynamic playlists were first implemented.
+ * v2 was added shortly thereafter and has been used since 2003.
+ * v3 added the (C)lear command and is otherwise identical to v2.
+ */
+#define PLAYLIST_CONTROL_FILE_MIN_VERSION   2
+#define PLAYLIST_CONTROL_FILE_VERSION       3
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
 
@@ -431,6 +440,9 @@ static int flush_cached_control_unlocked(struct playlist_info* playlist)
                 break;
             case PLAYLIST_COMMAND_RESET:
                 result = fdprintf(playlist->control_fd, "%s\n", "R");
+                break;
+            case PLAYLIST_COMMAND_CLEAR:
+                result = fdprintf(playlist->control_fd, "%s\n", "C");
                 break;
             default:
                 break;
@@ -1344,6 +1356,53 @@ static int create_and_play_dir(int direction, bool play_last)
 }
 
 /*
+ * remove all tracks, leaving the current track queued
+ */
+static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write)
+{
+    if (playlist->amount <= 0)
+        return 0;
+
+    /* Move current track down to position 0 */
+    playlist->indices[0] = playlist->indices[playlist->index];
+#ifdef HAVE_DIRCACHE
+    if (playlist->dcfrefs_handle)
+    {
+        struct dircache_fileref *dcfrefs =
+            core_get_data(playlist->dcfrefs_handle);
+        dcfrefs[0] = dcfrefs[playlist->index];
+    }
+#endif
+
+    /* Update playlist state as if by remove_track_unlocked() */
+    bool inserted = playlist->indices[0] & PLAYLIST_INSERT_TYPE_MASK;
+
+    playlist->index = 0;
+    playlist->amount = 1;
+    playlist->indices[0] |= PLAYLIST_QUEUED;
+
+    if (inserted)
+        playlist->num_inserted_tracks = 1;
+    else
+        playlist->deleted = true;
+
+    playlist->first_index = 0;
+
+    if (playlist->last_insert_pos == 0)
+        playlist->last_insert_pos = -1;
+    else
+        playlist->last_insert_pos = 0;
+
+    if (write && playlist->control_fd >= 0)
+    {
+        update_control(playlist, PLAYLIST_COMMAND_CLEAR, -1, -1, NULL, NULL, NULL);
+        sync_control(playlist, false);
+    }
+
+    return 0;
+}
+
+/*
  * Add track to playlist at specified position. There are seven special
  * positions that can be specified:
  *  PLAYLIST_PREPEND              - Add track at beginning of playlist
@@ -1444,7 +1503,7 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
             break;
         }
         case PLAYLIST_REPLACE:
-            if (playlist_remove_all_tracks(playlist) < 0)
+            if (remove_all_tracks_unlocked(playlist, true) < 0)
                 return -1;
             int newpos = playlist->index + 1;
             playlist->last_insert_pos = position = insert_position = newpos;
@@ -2635,7 +2694,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     if (position == PLAYLIST_REPLACE)
     {
-        if (playlist_remove_all_tracks(playlist) == 0)
+        if (remove_all_tracks_unlocked(playlist, true) == 0)
             position = PLAYLIST_INSERT_LAST;
         else
         {
@@ -2727,7 +2786,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
     if (position == PLAYLIST_REPLACE)
     {
-        if (playlist_remove_all_tracks(playlist) == 0)
+        if (remove_all_tracks_unlocked(playlist, true) == 0)
             position = PLAYLIST_INSERT_LAST;
         else
         {
@@ -3221,8 +3280,6 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
 /*
  * Removes all tracks, from the playlist, leaving the presently playing
  * track queued.
- *
- * TODO: This is insanely slow for huge playlists. Must fix.
  */
 int playlist_remove_all_tracks(struct playlist_info *playlist)
 {
@@ -3234,23 +3291,11 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
     dc_thread_stop(playlist);
     playlist_mutex_lock(&playlist->mutex);
 
-    while (playlist->index > 0)
-        if ((result = remove_track_unlocked(playlist, 0, true)) < 0)
-            goto out;
+    result = remove_all_tracks_unlocked(playlist, true);
 
-    while (playlist->amount > 1)
-        if ((result = remove_track_unlocked(playlist, 1, true)) < 0)
-            goto out;
-
-    if (playlist->amount == 1) {
-        playlist->indices[0] |= PLAYLIST_QUEUED;
-    }
-
-out:
     playlist_mutex_unlock(&playlist->mutex);
     dc_thread_start(playlist, false);
-
-    return 0;
+    return result;
 }
 
 /*
@@ -3384,7 +3429,17 @@ int playlist_resume(void)
 
                         version = atoi(str1);
 
-                        if (version != PLAYLIST_CONTROL_FILE_VERSION)
+                        /*
+                         * TODO: Playlist control file version upgrades
+                         *
+                         * If an older version control file is loaded then
+                         * the header should be updated to the latest version
+                         * in case any incompatible commands are written out.
+                         * (It's not a big deal since the error message will
+                         * be practically the same either way...)
+                         */
+                        if (version < PLAYLIST_CONTROL_FILE_MIN_VERSION ||
+                            version > PLAYLIST_CONTROL_FILE_VERSION)
                         {
                             result = -3;
                             goto out;
@@ -3523,6 +3578,15 @@ int playlist_resume(void)
                         playlist->last_insert_pos = -1;
                         break;
                     }
+                    case PLAYLIST_COMMAND_CLEAR:
+                    {
+                        if (remove_all_tracks_unlocked(playlist, false) < 0)
+                        {
+                            result = -16;
+                            goto out;
+                        }
+                        break;
+                    }
                     case PLAYLIST_COMMAND_COMMENT:
                     default:
                         break;
@@ -3569,6 +3633,9 @@ int playlist_resume(void)
                         break;
                     case 'R':
                         current_command = PLAYLIST_COMMAND_RESET;
+                        break;
+                    case 'C':
+                        current_command = PLAYLIST_COMMAND_CLEAR;
                         break;
                     case '#':
                         current_command = PLAYLIST_COMMAND_COMMENT;
