@@ -1663,7 +1663,6 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
     close(fd);
     return handle;
 }
-#endif /* ndef __PCTOOL__ */
 
 /*
  * Normalized volume routines adapted from alsamixer volume_mapping.c
@@ -1766,3 +1765,4 @@ long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm
 
     return vol >> NVOL_FRACBITS;
 }
+#endif /* ndef __PCTOOL__ */
