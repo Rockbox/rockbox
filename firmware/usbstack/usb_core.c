@@ -1040,10 +1040,15 @@ void usb_drv_control_response(enum usb_control_response resp,
     unsigned int num_active = num_active_requests--;
 
     /*
-     * There must have been a prior request submission, at least.
+     * There should have been a prior request submission, at least.
+     * FIXME: It seems the iPod video can get here and ignoring it
+     * allows the connection to succeed??
      */
     if (num_active == 0)
-        panicf("null ctrl req");
+    {
+        //panicf("null ctrl req");
+        return;
+    }
 
     /*
      * This can happen because an active request was already pending when
