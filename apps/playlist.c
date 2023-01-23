@@ -232,6 +232,9 @@ static void dc_thread_start(struct playlist_info *playlist, bool is_dirty)
 #ifdef HAVE_DIRCACHE
     if (playlist == &current_playlist)
         queue_post(&playlist_queue, PLAYLIST_DC_SCAN_START, is_dirty);
+#else
+    (void)playlist;
+    (void)is_dirty;
 #endif
 }
 
@@ -240,6 +243,8 @@ static void dc_thread_stop(struct playlist_info *playlist)
 #ifdef HAVE_DIRCACHE
     if (playlist == &current_playlist)
         queue_send(&playlist_queue, PLAYLIST_DC_SCAN_STOP, 0);
+#else
+    (void)playlist;
 #endif
 }
 
