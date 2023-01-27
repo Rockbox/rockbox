@@ -4409,7 +4409,7 @@ static bool load_tagcache(void)
                 }
 
                 if ((idx->flag & FLAG_DELETED)
-                    IFN_DIRCACHE( || !global_settings.tagcache_autoupdate; ))
+                    IFN_DIRCACHE( || !global_settings.tagcache_autoupdate ))
                 {
                     /* seek over tag data instead of reading */
                     if (lseek(fd, fe->tag_length, SEEK_CUR) < 0)
