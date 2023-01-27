@@ -1854,6 +1854,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
     (void)lists;
     struct tagcache_stat *stat = tagcache_get_stat();
     static bool synced = false;
+    static int update_entries = 0;
 
     simplelist_set_line_count(0);
 
@@ -1888,12 +1889,19 @@ static int database_callback(int btn, struct gui_synclist *lists)
     if (!btn && stat->curentry)
     {
         synced = true;
-        return ACTION_REDRAW;
+        if (update_entries <= stat->processed_entries)
+        {
+            update_entries = stat->processed_entries + 100;
+            return ACTION_REDRAW;
+        }
+        return ACTION_NONE;
     }
 
     if (btn == ACTION_STD_CANCEL)
+    {
+        update_entries = 0;
         tagcache_screensync_enable(false);
-
+    }
     return btn;
 }
 static bool dbg_tagcache_info(void)
