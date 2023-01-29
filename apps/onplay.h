@@ -55,6 +55,7 @@ enum hotkey_action {
     HOTKEY_PLUGIN,
     HOTKEY_INSERT,
     HOTKEY_INSERT_SHUFFLED,
+    HOTKEY_BOOKMARK_LIST,
 };
 enum hotkey_flags {
     HOTKEY_FLAG_NONE = 0x0,
