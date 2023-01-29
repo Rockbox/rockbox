@@ -84,9 +84,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ID3SCREEN,     BUTTON_SELECT|BUTTON_DOWN,      BUTTON_SELECT },
 
 #ifdef HAVE_HOTKEY /* down|repeat doesn't work in the file browser */
-    { ACTION_WPS_HOTKEY,        BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_WPS_HOTKEY,        BUTTON_DOWN|BUTTON_REPEAT,                    BUTTON_DOWN },
 #endif
-    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_DOWN|BUTTON_REL,      BUTTON_DOWN },
 
 #ifndef HAS_BUTTON_HOLD /* Clip+ */
     { ACTION_STD_KEYLOCK,       BUTTON_HOME|BUTTON_SELECT,      BUTTON_NONE },
