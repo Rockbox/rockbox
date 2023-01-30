@@ -44,7 +44,14 @@
 #include "diacritic.h"
 #include "rbpaths.h"
 
+/* Define LOGF_ENABLE to enable logf output in this file */
+//#define LOGF_ENABLE
+#include "logf.h"
+
 #define MAX_FONTSIZE_FOR_16_BIT_OFFSETS 0xFFDB
+
+#define FONT_EXT "fnt"
+#define GLYPH_CACHE_EXT "gc"
 
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
@@ -90,7 +97,8 @@ extern struct font sysfont;
 
 struct buflib_alloc_data {
     struct font font;    /* must be the first member! */
-    char path[MAX_PATH]; /* font path and filename */
+    char *path; /* font path and filename (allocd at end of buffer) */
+    size_t path_bufsz; /* size of path buffer */
     int refcount;        /* how many times has this font been loaded? */
     unsigned char buffer[];
 };
@@ -116,10 +124,11 @@ static int buflibmove_callback(int handle, void* current, void* new)
     UPDATE(alloc->font.buffer_start);
     UPDATE(alloc->font.buffer_end);
     UPDATE(alloc->font.buffer_position);
+    UPDATE(alloc->path);
 
     UPDATE(alloc->font.cache._index);
     UPDATE(alloc->font.cache._lru._base);
-
+    logf("%s %s", __func__, alloc->path);
     return BUFLIB_CB_OK;
 }
 static void lock_font_handle(int handle, bool lock)
@@ -336,11 +345,16 @@ static int find_font_index(const char* path)
         {
             struct buflib_alloc_data *data = core_get_data(handle);
             if(!strcmp(data->path, path))
+            {
+                logf("%s Found id: [%d], %s", __func__, index, path);
                 return index;
+            }
         }
 
         index++;
     }
+    logf("%s %s Not found using id: [%d], FONT_SYSFIXED",
+         __func__, path, FONT_SYSFIXED);
     return FONT_SYSFIXED;
 }
 
@@ -352,6 +366,7 @@ const char* font_filename(int font_id)
     if (handle > 0)
     {
         struct buflib_alloc_data *data = core_get_data(handle);
+        logf("%s id: [%d], %s", __func__, font_id, data->path);
         return data->path;
     }
 
@@ -468,7 +483,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     {
         /* already loaded, no need to reload */
         struct buflib_alloc_data *pd = core_get_data(buflib_allocations[font_id]);
-        if (pd->font.buffer_size < bufsize)
+        if (pd->font.buffer_size < bufsize || pd->path_bufsz < path_len)
         {
             int old_refcount, old_id;
             size_t old_bufsize = pd->font.buffer_size;
@@ -523,10 +538,10 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     if ( open_slot == -1 )
         return -1;
     font_id = open_slot;
-
+    size_t path_bufsz = MAX(path_len + 1, 64); /* enough size for common case */
     /* allocate mem */    
     int handle = core_alloc_ex(
-                     bufsize + sizeof( struct buflib_alloc_data ), 
+                     bufsize + path_bufsz + sizeof( struct buflib_alloc_data ),
                      &buflibops );
     if ( handle <= 0 )
     {
@@ -536,7 +551,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     core_pin(handle);
     pdata = core_get_data(handle);
     pdata->refcount     = 1;
-
+    pdata->path = pdata->buffer + bufsize;
     /* save load path so we can recognize this font later */
     memcpy(pdata->path, path, path_len+1);
 
@@ -592,6 +607,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     buflib_allocations[font_id] = handle;
     //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
     lock_font_handle( handle, false );
+    logf("%s id: [%d], %s", __func__, font_id, path);
     return font_id; /* success!*/
 }
 
@@ -612,6 +628,7 @@ void font_unload(int font_id)
     pdata->refcount--;
     if (pdata->refcount < 1)
     {
+        logf("%s %s", __func__, pdata->path);
         if (pf && pf->fd >= 0)
         {
             glyph_cache_save(font_id);
@@ -872,8 +889,8 @@ static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
 {
     /* take full file name, cut extension, and add .glyphcache */
     strmemccpy(glyph_path, font_path, MAX_PATH);
-    glyph_path[strlen(glyph_path)-4] = '\0';
-    strcat(glyph_path, ".gc");
+    glyph_path[strlen(glyph_path)- sizeof(FONT_EXT)] = '\0';
+    strcat(glyph_path, "." GLYPH_CACHE_EXT);
 }
 
 /* call with NULL to flush */
