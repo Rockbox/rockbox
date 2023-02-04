@@ -707,7 +707,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
     else /* start back at beginning */
         pos = lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
 
-    long tag_length = strlen(filename);
+    long tag_length = strlen(filename) + 1; /* include NULL */
 
     if (tag_length < bufsz)
     {
@@ -724,6 +724,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
             }
             else
             {
+                pos += sizeof(struct tagfile_entry) + tfe.tag_length;
                 /* don't read the entry unless the length matches */
                 if (tfe.tag_length == tag_length)
                 {
@@ -744,7 +745,9 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
                         break ;
                     }
                 }
-                pos += sizeof(struct tagfile_entry) + tfe.tag_length;
+                else
+                    lseek(fd, pos, SEEK_SET);
+
             }
         }
         if (pos_history_idx < POS_HISTORY_COUNT - 1)
@@ -4521,7 +4524,7 @@ static bool check_file_refs(bool auto_update)
                 ret = false;
                 goto wend_finished;
             case e_ENTRY_SIZEMISMATCH:
-                logf("size mismatch entry");
+                logf("size mismatch entry EOF?"); /* likely EOF */
                 ret = false;
                 goto wend_finished;
             case e_TAG_TOOLONG:
@@ -4564,7 +4567,7 @@ static bool check_file_refs(bool auto_update)
         }
         else if (rc_cache == 0)     /* not in cache but okay */
         {;}
-        else if (auto_update)
+        else if (auto_update && rc_cache == ENOENT)
 #else
         if (!file_exists(buf))
 #endif /* HAVE_DIRCACHE */
