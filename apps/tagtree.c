@@ -1328,7 +1328,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
     int buf_pos = 0;
     int i;
 
-    memset(buf, 0, buf_size);
+    /* memset(buf, 0, buf_size); probably uneeded */
     for (i = 0; fmt->formatstr[i] != '\0'; i++)
     {
         if (fmt->formatstr[i] == '%')
@@ -1375,21 +1375,13 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                         int tag = fmt->tags[parpos];
 
                         if (!tagcache_retrieve(tcs, tcs->idx_id,
-                                               (tag == tag_virt_basename ?
-                                                tag_filename : tag),
-                                               tmpbuf, sizeof tmpbuf))
+                                               tag, tmpbuf, sizeof tmpbuf))
                         {
                             logf("retrieve failed");
                             return -3;
                         }
 
-                        if (tag == tag_virt_basename
-                            && (result = strrchr(tmpbuf, '/')) != NULL)
-                        {
-                            result++;
-                        }
-                        else
-                            result = tmpbuf;
+                        result = tmpbuf;
                     }
                     buf_pos +=
                         snprintf(&buf[buf_pos], space_left, fmtbuf, result);
@@ -1424,6 +1416,19 @@ static struct tagentry* get_entries(struct tree_context *tc)
     return core_get_data(tc->cache.entries_handle);
 }
 
+static void tcs_get_basename(struct tagcache_search *tcs, bool is_basename)
+{
+    if (is_basename)
+    {
+        char* basename = strrchr(tcs->result, '/');
+        if (basename != NULL)
+        {
+            tcs->result = basename + 1;
+            tcs->result_len = strlen(tcs->result) + 1;
+        }
+    }
+}
+
 static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
     struct tagcache_search tcs;
@@ -1436,6 +1441,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     int tag;
     bool sort = false;
     bool sort_inverse;
+    bool is_basename = false;
     int sort_limit;
     int strip;
 
@@ -1463,13 +1469,19 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     if (tag == menu_reload)
         return RELOAD_TAGTREE;
 
+    if (tag == tag_virt_basename) /* basename shortcut */
+    {
+        is_basename = true;
+        tag = tag_filename;
+    }
+
     if (!tagcache_search(&tcs, tag))
         return -1;
 
     /* Prevent duplicate entries in the search list. */
     tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
 
-    if (level || csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
+    if (level || is_basename|| csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
         sort = true;
 
     for (i = 0; i < level; i++)
@@ -1589,10 +1601,10 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         if (strcmp(tcs.result, UNTAGGED) == 0)
         {
             if (tag == tag_title && tcs.type == tag_title && tcs.filter_count <= 1)
-            { /* Fallback to filename */
+            { /* Fallback to basename */
                 char *lastname = dptr->name;
                 dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
-                if (tagcache_retrieve(&tcs, tcs.idx_id, tag_filename, dptr->name,
+                if (tagcache_retrieve(&tcs, tcs.idx_id, tag_virt_basename, dptr->name,
                                       c->cache.name_buffer_size - namebufused))
                 {
                     namebufused += strlen(dptr->name)+1;
@@ -1614,26 +1626,31 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             {
                 int ret = format_str(&tcs, fmt, dptr->name,
                                      c->cache.name_buffer_size - namebufused);
-                if (ret == -4)          /* buffer full */
+                if (ret >= 0)
                 {
-                    logf("chunk mode #2: %d", current_entry_count);
-                    c->dirfull = true;
-                    sort = false;
-                    break ;
+                    namebufused += strlen(dptr->name)+1; /* include NULL */
                 }
-                else if (ret < 0)
+                else
                 {
+                    dptr->name[0] = '\0';
+                    if (ret == -4)          /* buffer full */
+                    {
+                        logf("chunk mode #2: %d", current_entry_count);
+                        c->dirfull = true;
+                        sort = false;
+                        break ;
+                    }
+
                     logf("format_str() failed");
                     tagcache_search_finish(&tcs);
                     tree_unlock_cache(c);
                     core_unpin(tagtree_handle);
                     return 0;
                 }
-                else
-                    namebufused += strlen(dptr->name)+1;
             }
             else
             {
+                tcs_get_basename(&tcs, is_basename);
                 namebufused += tcs.result_len;
                 if (namebufused < c->cache.name_buffer_size)
                     strcpy(dptr->name, tcs.result);
@@ -1647,8 +1664,10 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             }
         }
         else
+        {
+            tcs_get_basename(&tcs, is_basename);
             dptr->name = tcs.result;
-
+        }
 entry_skip_formatter:
         dptr++;
         current_entry_count++;

@@ -1934,17 +1934,10 @@ static int pf_tcs_retrieve_track_title(int string_index, int disc_num, int track
     if (rb->strcmp(UNTAGGED, tcs.result) == 0)
     {
         /* show filename instead of <untaggged> */
-        if (!rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+        if (!rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_virt_basename,
                                 file_name, MAX_PATH))
             return 0;
         track_title = file_name;
-        if (track_title)
-        {
-            /* if filename remove the '/' */
-            track_title = rb->strrchr(track_title, PATH_SEPCH);
-            if (track_title)
-                track_title++;
-        }
     }
 
     if (!track_title)

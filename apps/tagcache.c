@@ -930,8 +930,16 @@ static bool open_files(struct tagcache_search *tcs, int tag)
 static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
                      struct index_entry *idx, int tag, char *buf, long bufsz)
 {
+    bool success = false;
+    bool is_basename = false;
     struct tagfile_entry tfe;
     long seek;
+
+    if (tag == tag_virt_basename)
+    {
+        tag = tag_filename;
+        is_basename = true;
+    }
 
     if (TAGCACHE_IS_NUMERIC(tag))
         goto failure;
@@ -950,7 +958,7 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
         if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE))
         {
             if (dircache_get_fileref_path(&tcrc_dcfrefs[idx_id], buf, bufsz) >= 0)
-                return true;
+                success = true;
         }
         else
 #endif /* HAVE_DIRCACHE */
@@ -959,13 +967,12 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
             struct tagfile_entry *ep =
                 (struct tagfile_entry *)&tcramcache.hdr->tags[tag][seek];
             strmemccpy(buf, ep->tag_data, bufsz);
-
-            return true;
+            success = true;
         }
     }
 #endif /* HAVE_TC_RAMCACHE */
 
-    if (open_files(tcs, tag))
+    if (!success && open_files(tcs, tag))
     {
         lseek(tcs->idxfd[tag], seek, SEEK_SET);
         switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tag], &tfe, buf, bufsz))
@@ -984,8 +991,20 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
                 break;
             case e_SUCCESS_LEN_ZERO:
             case e_SUCCESS:
-                return true;
+                success = true;
+                break;
         }
+    }
+
+    if (success)
+    {
+        if (is_basename)
+        {
+            char* basename = strrchr(buf, '/');
+            if (basename != NULL)
+                memmove(buf, basename + 1, strlen(basename)); /* includes NULL */
+        }
+        return true;
     }
 
 failure:
@@ -1284,7 +1303,7 @@ static bool check_clauses(struct tagcache_search *tcs,
                 if (clause->tag == tag_filename
                     || clause->tag == tag_virt_basename)
                 {
-                    retrieve(tcs, IF_DIRCACHE(tcs->idx_id,) idx, tag_filename,
+                    retrieve(tcs, IF_DIRCACHE(tcs->idx_id,) idx, clause->tag,
                              buf, bufsz);
                 }
                 else
@@ -1316,7 +1335,13 @@ static bool check_clauses(struct tagcache_search *tcs,
                     case e_SUCCESS_LEN_ZERO: /* Check if entry has been deleted. */
                         return false;
                     case e_SUCCESS:
-                         break;
+                        if (clause->tag == tag_virt_basename)
+                        {
+                            char *basename = strrchr(str, '/');
+                            if (basename)
+                                str = basename + 1;
+                        }
+                        break;
                     case e_ENTRY_SIZEMISMATCH:
                         logf("read error #15");
                         return false;
@@ -1331,13 +1356,6 @@ static bool check_clauses(struct tagcache_search *tcs,
                         break;;
                 }
             }
-        }
-
-        if (clause->tag == tag_virt_basename)
-        {
-            char *basename = strrchr(str, '/');
-            if (basename)
-                str = basename + 1;
         }
 
         if (!check_against_clause(seek, str, clause))
@@ -1709,7 +1727,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
     return true;
 }
 
-static bool get_next(struct tagcache_search *tcs)
+static bool get_next(struct tagcache_search *tcs, bool is_numeric)
 {
     /* WARNING pointers into buf are used in outside functions */
     static char buf[TAGCACHE_BUFSZ];
@@ -1718,11 +1736,6 @@ static bool get_next(struct tagcache_search *tcs)
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     long flag = 0;
 #endif
-
-    if (!tcs->valid || !tc_stat.ready)
-        return false;
-
-    bool is_numeric = TAGCACHE_IS_NUMERIC(tcs->type);
 
     if (tcs->idxfd[tcs->type] < 0 && !is_numeric
 #ifdef HAVE_TC_RAMCACHE
@@ -1849,9 +1862,6 @@ static bool get_next(struct tagcache_search *tcs)
             tcs->valid = false;
             logf("read error #4");
             return false;
-        default:
-            logf("unknown_error");
-            break;;
     }
 
     /**
@@ -1871,12 +1881,15 @@ static bool get_next(struct tagcache_search *tcs)
 
 bool tagcache_get_next(struct tagcache_search *tcs)
 {
-    while (get_next(tcs))
+    if (tcs->valid && tagcache_is_usable())
     {
-        if (tcs->result_len > 1)
-            return true;
+        bool is_numeric = TAGCACHE_IS_NUMERIC(tcs->type);
+        while (get_next(tcs, is_numeric))
+        {
+            if (tcs->result_len > 1)
+                return true;
+        }
     }
-
 #ifdef LOGF_ENABLE
     if (tcs->unique_list_count > 0)
         logf(" uniqbuf: %d used / %d avail", tcs->unique_list_count, tcs->unique_list_capacity);
@@ -2817,9 +2830,6 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                         logf("read error #8");
                         close(fd);
                         return -2;
-                    default:
-                        logf("unknown_error");
-                        break;;
                 }
 
                 /**
@@ -3994,9 +4004,6 @@ static bool delete_entry(long idx_id)
                 case e_TAG_SIZEMISMATCH:
                     logf("delete_entry(): read error #3");
                     goto cleanup;
-                default:
-                    logf("unknown_error");
-                    break;;
             }
 
             myidx.tag_seek[tag] = crc_32(buf, strlen(buf), 0xffffffff);
@@ -4519,10 +4526,6 @@ static bool check_file_refs(bool auto_update)
 
         switch (res)
         {
-            default:
-                logf("read error");
-                ret = false;
-                goto wend_finished;
             case e_ENTRY_SIZEMISMATCH:
                 logf("size mismatch entry EOF?"); /* likely EOF */
                 ret = false;
