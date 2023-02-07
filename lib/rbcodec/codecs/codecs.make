@@ -65,7 +65,9 @@ include $(RBCODECLIB_DIR)/codecs/libgme/libvgm.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libkss.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libemu2413.make
 include $(RBCODECLIB_DIR)/codecs/libopus/libopus.make
+ifneq ($(MEMORYSIZE),2)
 include $(RBCODECLIB_DIR)/codecs/cRSID/cRSID.make
+endif
 
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out

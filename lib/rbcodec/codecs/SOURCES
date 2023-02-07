@@ -17,7 +17,6 @@ atrac3_rm.c
 atrac3_oma.c
 mpc.c
 wma.c
-sid.c
 ape.c
 asap.c
 aac.c
@@ -43,6 +42,7 @@ nsf.c
 sgc.c
 vgm.c
 #if MEMORYSIZE > 2
+sid.c
 kss.c
 #endif
 aac_bsf.c
