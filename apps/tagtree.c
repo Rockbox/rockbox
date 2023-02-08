@@ -189,7 +189,8 @@ struct menu_root {
 struct match
 {
     const char* str;
-    int symbol;
+    uint16_t len;
+    uint16_t symbol;
 };
 
 /* Statusbar text of the current view. */
@@ -328,79 +329,93 @@ static int get_token_str(char *buf, int size)
 
 static int get_tag(int *tag)
 {
+    #define TAG_MATCH(str, tag) {str, sizeof(str) - 1, tag}
     static const struct match get_tag_match[] =
     {
-        {"album", tag_album},
-        {"artist", tag_artist},
-        {"bitrate", tag_bitrate},
-        {"composer", tag_composer},
-        {"comment", tag_comment},
-        {"albumartist", tag_albumartist},
-        {"ensemble", tag_albumartist},
-        {"grouping", tag_grouping},
-        {"genre", tag_genre},
-        {"length", tag_length},
-        {"Lm", tag_virt_length_min},
-        {"Ls", tag_virt_length_sec},
-        {"Pm", tag_virt_playtime_min},
-        {"Ps", tag_virt_playtime_sec},
-        {"title", tag_title},
-        {"filename", tag_filename},
-        {"basename", tag_virt_basename},
-        {"tracknum", tag_tracknumber},
-        {"canonicalartist", tag_virt_canonicalartist},
-        {"discnum", tag_discnumber},
-        {"year", tag_year},
-        {"playcount", tag_playcount},
-        {"rating", tag_rating},
-        {"lastplayed", tag_lastplayed},
-        {"lastelapsed", tag_lastelapsed},
-        {"lastoffset", tag_lastoffset},
-        {"commitid", tag_commitid},
-        {"entryage", tag_virt_entryage},
-        {"autoscore", tag_virt_autoscore},
-        {"%sort", var_sorttype},
-        {"%limit", var_limit},
-        {"%strip", var_strip},
-        {"%menu_start", var_menu_start},
-        {"%include", var_include},
-        {"%root_menu", var_rootmenu},
-        {"%format", var_format},
-        {"->", menu_next},
-        {"==>", menu_load},
-        {"%reload", menu_reload}
+        TAG_MATCH("Lm", tag_virt_length_min),
+        TAG_MATCH("Ls", tag_virt_length_sec),
+        TAG_MATCH("Pm", tag_virt_playtime_min),
+        TAG_MATCH("Ps", tag_virt_playtime_sec),
+        TAG_MATCH("->", menu_next),
+
+        TAG_MATCH("==>", menu_load),
+
+        TAG_MATCH("year", tag_year),
+
+        TAG_MATCH("album", tag_album),
+        TAG_MATCH("genre", tag_genre),
+        TAG_MATCH("title", tag_title),
+        TAG_MATCH("%sort", var_sorttype),
+
+        TAG_MATCH("artist", tag_artist),
+        TAG_MATCH("length", tag_length),
+        TAG_MATCH("rating", tag_rating),
+        TAG_MATCH("%limit", var_limit),
+        TAG_MATCH("%strip", var_strip),
+
+        TAG_MATCH("bitrate", tag_bitrate),
+        TAG_MATCH("comment", tag_comment),
+        TAG_MATCH("discnum", tag_discnumber),
+        TAG_MATCH("%format", var_format),
+        TAG_MATCH("%reload", menu_reload),
+
+        TAG_MATCH("filename", tag_filename),
+        TAG_MATCH("basename", tag_virt_basename),
+        TAG_MATCH("tracknum", tag_tracknumber),
+        TAG_MATCH("composer", tag_composer),
+        TAG_MATCH("ensemble", tag_albumartist),
+        TAG_MATCH("grouping", tag_grouping),
+        TAG_MATCH("entryage", tag_virt_entryage),
+        TAG_MATCH("commitid", tag_commitid),
+        TAG_MATCH("%include", var_include),
+
+        TAG_MATCH("playcount", tag_playcount),
+        TAG_MATCH("autoscore", tag_virt_autoscore),
+
+        TAG_MATCH("lastplayed", tag_lastplayed),
+        TAG_MATCH("lastoffset", tag_lastoffset),
+        TAG_MATCH("%root_menu", var_rootmenu),
+
+        TAG_MATCH("albumartist", tag_albumartist),
+        TAG_MATCH("lastelapsed", tag_lastelapsed),
+        TAG_MATCH("%menu_start", var_menu_start),
+
+        TAG_MATCH("canonicalartist", tag_virt_canonicalartist),
+        TAG_MATCH("", 0) /* sentinel */
     };
-    char buf[128];
-    unsigned int i;
+    #undef TAG_MATCH
+    const size_t max_cmd_sz = 32; /* needs to be >= to len of longest tagstr */
+    const char *tagstr;
+    unsigned int tagstr_len;
+    const struct match *match;
 
     /* Find the start. */
-    while ((*strp == ' ' || *strp == '>') && *strp != '\0')
+    while (*strp == ' ' || *strp == '>')
         strp++;
 
     if (*strp == '\0' || *strp == '?')
         return 0;
 
-    for (i = 0; i < sizeof(buf)-1; i++)
+    tagstr = strp;
+    for (tagstr_len = 0; tagstr_len < max_cmd_sz; tagstr_len++)
     {
         if (*strp == '\0' || *strp == ' ')
             break ;
-        buf[i] = *strp;
         strp++;
     }
-    buf[i] = '\0';
 
-    for (i = 0; i < ARRAYLEN(get_tag_match); i++)
+    for (match = get_tag_match; match->len != 0; match++)
     {
-        if (!strcasecmp(buf, get_tag_match[i].str))
+        if (tagstr_len != match->len)
+            continue;
+        else if (strncasecmp(tagstr, match->str, match->len) == 0)
         {
-            *tag = get_tag_match[i].symbol;
+            *tag = match->symbol;
             return 1;
         }
     }
 
-    logf("NO MATCH: %s\n", buf);
-    if (buf[0] == '?')
-        return 0;
+    logf("NO MATCH: %.*s\n", tagstr_len, tagstr);
 
     return -1;
 }
@@ -412,6 +427,7 @@ static int get_clause(int *condition)
     #define CLAUSE(op1, op2, symbol) {OPS2VAL(op1, op2), symbol }
 
     struct clause_symbol {int value;int symbol;};
+    const struct clause_symbol *match;
     static const struct clause_symbol get_clause_match[] =
     {
         CLAUSE('=', ' ', clause_is),
@@ -429,7 +445,8 @@ static int get_clause(int *condition)
         CLAUSE('!', '$', clause_not_ends_with),
         CLAUSE('@', '^', clause_begins_oneof),
         CLAUSE('@', '$', clause_ends_oneof),
-        CLAUSE('@', ' ', clause_oneof)
+        CLAUSE('@', ' ', clause_oneof),
+        CLAUSE(0, 0, 0) /* sentinel */
     };
 
     /* Find the start. */
@@ -446,11 +463,11 @@ static int get_clause(int *condition)
 
     int value = OPS2VAL(op1, op2);
 
-    for (unsigned int i = 0; i < ARRAYLEN(get_clause_match); i++)
+    for (match = get_clause_match; match->value != 0; match++)
     {
-        if (value == get_clause_match[i].value)
+        if (value == match->value)
         {
-            *condition = get_clause_match[i].symbol;
+            *condition = match->symbol;
             return 1;
         }
     }
@@ -1321,7 +1338,7 @@ static bool show_search_progress(bool init, int count)
 static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                       char *buf, int buf_size)
 {
-    char fmtbuf[20];
+    static char fmtbuf[20];
     bool read_format = false;
     unsigned fmtbuf_pos = 0;
     int parpos = 0;
@@ -1583,7 +1600,6 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         fmt = NULL;
         /* Check the format */
-        core_pin(tagtree_handle);
         for (i = 0; i < format_count; i++)
         {
             if (formats[i]->group_id != csi->format_id[level])
@@ -1596,7 +1612,6 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                 break;
             }
         }
-        core_unpin(tagtree_handle);
 
         if (strcmp(tcs.result, UNTAGGED) == 0)
         {
