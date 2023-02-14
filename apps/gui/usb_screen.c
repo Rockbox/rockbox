@@ -41,6 +41,7 @@
 #include "skin_engine/skin_engine.h"
 #include "playlist.h"
 #include "misc.h"
+#include "icons.h"
 
 #include "bitmaps/usblogo.h"
 
@@ -155,7 +156,24 @@ static void usb_screen_fix_viewports(struct screen *screen,
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
+#ifdef HAVE_LCD_SPLIT
+    switch (statusbar_position(screen))
+    {
+         /* start beyond split */
+         case STATUSBAR_OFF:
+             logo->y = parent->y + LCD_SPLIT_POS;
+             break;
+         case STATUSBAR_TOP:
+             logo->y = parent->y + LCD_SPLIT_POS - STATUSBAR_HEIGHT;
+             break;
+         /* start at the top for maximum space */
+         default:
+             logo->y = parent->y;
+             break;
+    }
+#else
     logo->y = parent->y + (parent->height - logo_height) / 2;
+#endif
     logo->width = logo_width;
     logo->height = logo_height;
 
