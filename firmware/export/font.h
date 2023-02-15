@@ -117,7 +117,7 @@ struct font {
 
 /* font routines*/
 void font_init(void) INIT_ATTR;
-const char* font_filename(int font_id);
+bool font_filename_matches_loaded_id(int font_id, char *filename);
 int font_load(const char *path);
 int font_load_ex(const char *path, size_t buffer_size, int glyphs);
 void font_unload(int font_id);

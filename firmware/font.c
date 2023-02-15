@@ -152,13 +152,6 @@ void font_lock(int font_id, bool lock)
 
 static struct buflib_callbacks buflibops = {buflibmove_callback, NULL, NULL };
 
-static inline struct font *pf_from_handle(int handle)
-{
-    struct buflib_alloc_data *alloc = core_get_data(handle);
-    struct font *pf = &alloc->font;
-    return pf;
-}
-
 static inline unsigned char *buffer_from_handle(int handle)
 {
     struct buflib_alloc_data *alloc = core_get_data(handle);
@@ -358,7 +351,7 @@ static int find_font_index(const char* path)
     return FONT_SYSFIXED;
 }
 
-const char* font_filename(int font_id)
+bool font_filename_matches_loaded_id(int font_id, char *filename)
 {
     if ( font_id < 0 || font_id >= MAXFONTS )
         return NULL;
@@ -367,10 +360,10 @@ const char* font_filename(int font_id)
     {
         struct buflib_alloc_data *data = core_get_data(handle);
         logf("%s id: [%d], %s", __func__, font_id, data->path);
-        return data->path;
+        return strcmp(data->path, filename) == 0;
     }
 
-    return NULL;
+    return false;
 }
 
 static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
@@ -688,15 +681,15 @@ static void font_enable(int font_id)
     int handle = buflib_allocations[font_id];
     if ( handle < 0 )
         return;
-    struct buflib_alloc_data *pdata = core_get_data(handle);
+    struct buflib_alloc_data *pdata = core_get_data_pinned(handle);
     struct font *pf = &pdata->font;
 
     if (pf->disabled && pf->fd < 0)
     {
-        const char *filename = font_filename(font_id);
-        pf->fd = open(filename, O_RDONLY);
+        pf->fd = open(pdata->path, O_RDONLY);
         pf->disabled = false;
     }
+    core_put_data_pinned(pdata);
 }
 
 void font_enable_all(void)
@@ -932,25 +925,28 @@ static void glyph_cache_save(int font_id)
     if ( handle < 0 )
         return;
 
-    struct font *pf = pf_from_handle(handle);
+    struct buflib_alloc_data *pdata = core_get_data_pinned(handle);
+    struct font *pf = &pdata->font;
+
     if(pf && pf->fd >= 0)
     {
         char filename[MAX_PATH];
-        font_path_to_glyph_path(font_filename(font_id), filename);
+        font_path_to_glyph_path(pdata->path, filename);
         fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
-        if (fd < 0)
-            return;
-
-        cache_pf = pf;
-        cache_fd = fd;
-        lru_traverse(&cache_pf->cache._lru, glyph_file_write);
-        glyph_file_write(NULL);
-        if (cache_fd >= 0) 
+        if (fd >= 0)
         {
-            close(cache_fd);
-            cache_fd = -1;
+            cache_pf = pf;
+            cache_fd = fd;
+            lru_traverse(&cache_pf->cache._lru, glyph_file_write);
+            glyph_file_write(NULL);
+            if (cache_fd >= 0) 
+            {
+                close(cache_fd);
+                cache_fd = -1;
+            }
         }
     }
+    core_put_data_pinned(pdata);
     return;
 }
 

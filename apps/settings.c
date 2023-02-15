@@ -929,11 +929,9 @@ void settings_apply(bool read_disk)
         if (global_settings.font_file[0]
             && global_settings.font_file[0] != '-') {
             int font_ui = screens[SCREEN_MAIN].getuifont();
-            const char* loaded_font = font_filename(font_ui);
-
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
-            if (!loaded_font || strcmp(loaded_font, buf))
+            if (!font_filename_matches_loaded_id(font_ui, buf))
             {
                 CHART2(">font_load ", global_settings.font_file);
                 if (font_ui >= 0)
@@ -948,10 +946,9 @@ void settings_apply(bool read_disk)
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
             int font_ui = screens[SCREEN_REMOTE].getuifont();
-            const char* loaded_font = font_filename(font_ui);
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.remote_font_file);
-            if (!loaded_font || strcmp(loaded_font, buf))
+            if (!font_filename_matches_loaded_id(font_ui, buf))
             {
                 CHART2(">font_load_remoteui ", global_settings.remote_font_file);
                 if (font_ui >= 0)
