@@ -326,32 +326,7 @@ static struct font* font_load_cached(struct font* pf,
     return pf;
 }
 
-
-static int find_font_index(const char* path)
-{
-    int index = 0, handle;
-
-    while (index < MAXFONTS)
-    {
-        handle = buflib_allocations[index];
-        if (handle > 0)
-        {
-            struct buflib_alloc_data *data = core_get_data(handle);
-            if(!strcmp(data->path, path))
-            {
-                logf("%s Found id: [%d], %s", __func__, index, path);
-                return index;
-            }
-        }
-
-        index++;
-    }
-    logf("%s %s Not found using id: [%d], FONT_SYSFIXED",
-         __func__, path, FONT_SYSFIXED);
-    return FONT_SYSFIXED;
-}
-
-bool font_filename_matches_loaded_id(int font_id, char *filename)
+bool font_filename_matches_loaded_id(int font_id, const char *filename)
 {
     if ( font_id >= 0 && font_id < MAXFONTS )
     {
@@ -364,6 +339,23 @@ bool font_filename_matches_loaded_id(int font_id, char *filename)
         }
     }
     return false;
+}
+
+static int find_font_index(const char* path)
+{
+    for(int index = 0; index < MAXFONTS; index++)
+    {
+        if(font_filename_matches_loaded_id(index, path))
+        {
+            logf("%s Found id: [%d], %s", __func__, index, path);
+            return index;
+        }
+
+        index++;
+    }
+    logf("%s %s Not found using id: [%d], FONT_SYSFIXED",
+         __func__, path, FONT_SYSFIXED);
+    return FONT_SYSFIXED;
 }
 
 static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
@@ -541,8 +533,8 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         return -1;
     }
     struct buflib_alloc_data *pdata;
-    core_pin(handle);
-    pdata = core_get_data(handle);
+
+    pdata = core_get_data_pinned(handle);
     pdata->refcount     = 1;
     pdata->path = pdata->buffer + bufsize;
     /* save load path so we can recognize this font later */
@@ -599,7 +591,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     }
     buflib_allocations[font_id] = handle;
     //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
-    lock_font_handle( handle, false );
+    core_put_data_pinned(pdata);
     logf("%s id: [%d], %s", __func__, font_id, path);
     return font_id; /* success!*/
 }
@@ -882,8 +874,9 @@ static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
 {
     /* take full file name, cut extension, and add .glyphcache */
     strmemccpy(glyph_path, font_path, MAX_PATH);
-    glyph_path[strlen(glyph_path)- sizeof(FONT_EXT)] = '\0';
-    strcat(glyph_path, "." GLYPH_CACHE_EXT);
+    int dotidx = strlen(glyph_path) - sizeof(FONT_EXT);
+    strmemccpy(glyph_path + dotidx, "." GLYPH_CACHE_EXT, MAX_PATH - dotidx);
+    logf("%s %s", __func__, glyph_path);
 }
 
 /* call with NULL to flush */
