@@ -353,16 +353,16 @@ static int find_font_index(const char* path)
 
 bool font_filename_matches_loaded_id(int font_id, char *filename)
 {
-    if ( font_id < 0 || font_id >= MAXFONTS )
-        return NULL;
-    int handle = buflib_allocations[font_id];
-    if (handle > 0)
+    if ( font_id >= 0 && font_id < MAXFONTS )
     {
-        struct buflib_alloc_data *data = core_get_data(handle);
-        logf("%s id: [%d], %s", __func__, font_id, data->path);
-        return strcmp(data->path, filename) == 0;
+        int handle = buflib_allocations[font_id];
+        if (handle > 0)
+        {
+            struct buflib_alloc_data *data = core_get_data(handle);
+            logf("%s id: [%d], %s", __func__, font_id, data->path);
+            return strcmp(data->path, filename) == 0;
+        }
     }
-
     return false;
 }
 
