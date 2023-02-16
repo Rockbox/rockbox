@@ -85,6 +85,7 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
         new_chunk = get_chunk_array(ctx, new_handle);
         /* ensure all chunks data is zeroed, we depend on it */
         memset(new_chunk, 0, CHUNK_ARRSZ(max_chunks));
+        put_chunk_array(ctx, new_chunk);
     }
     if (hdr->chunk_handle > 0) /* handle existing chunk */
     {
@@ -92,10 +93,11 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
 
         old_chunk = get_chunk_array(ctx, hdr->chunk_handle);
 
-        if (new_chunk != NULL) /* copy any valid old chunks to new */
+        if (new_handle > 0) /* copy any valid old chunks to new */
         {
             min_chunk = MIN(max_chunks, hdr->current + 1);
             logf("%s copying %ld chunks", __func__, min_chunk);
+            new_chunk = get_chunk_array(ctx, new_handle);
             memcpy(new_chunk, old_chunk, CHUNK_ARRSZ(min_chunk));
             put_chunk_array(ctx, new_chunk);
         }
