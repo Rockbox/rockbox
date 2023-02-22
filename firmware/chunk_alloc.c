@@ -114,7 +114,7 @@ bool chunk_realloc(struct chunk_alloc_header *hdr,
             logf("%s shrink existing chunk array", __func__);
             min_chunk = max_chunks;
             buflib_shrink(ctx, hdr->chunk_handle,
-                          old_chunk, CHUNK_ARRSZ(max_chunks));
+                          NULL, CHUNK_ARRSZ(max_chunks));
 
             new_handle = hdr->chunk_handle;
         }
