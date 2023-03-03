@@ -14897,16 +14897,16 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
   </source>
   <dest>
-    *: "Bezpośrednie"
+    *: "Bezpośrednio"
   </dest>
   <voice>
-    *: "Bezpośrednie"
+    *: "Bezpośrednio"
   </voice>
 </phrase>
 <phrase>
@@ -16393,79 +16393,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REWIND_ACROSS_TRACKS
-  desc: in playback settings menu
-  user: core
-  <source>
-    *: "Rewind Across Tracks"
-  </source>
-  <dest>
-    *: "Przewiń poprzez utwory"
-  </dest>
-  <voice>
-    *: "Przewiń poprzez utwory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS
-  desc: used in the onplay menu
-  user: core
-  <source>
-    *: "Set As..."
-  </source>
-  <dest>
-    *: "Ustaw jako..."
-  </dest>
-  <voice>
-    *: "Ustaw jako..."
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_DIR
-  desc: used in the onplay menu
-  user: core
-  <source>
-    *: "Playlist Directory"
-  </source>
-  <dest>
-    *: "Katalog list odtwarzania"
-  </dest>
-  <voice>
-    *: "Katalog list odtwarzania"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_START_DIR
-  desc: used in the onplay menu
-  user: core
-  <source>
-    *: "Start Directory"
-  </source>
-  <dest>
-    *: "Katalog startowy"
-  </dest>
-  <voice>
-    *: "Katalog startowy"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_DIR
-  desc: used in the onplay menu
-  user: core
-  <source>
-    *: none
-    recording: "Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Katalog nagrywania"
-  </dest>
-  <voice>
-    *: none
-    recording: "Katalog nagrywania"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ADD_TO_PL
   desc: used in the onplay menu
   user: core
@@ -16561,5 +16488,56 @@
   </dest>
   <voice>
     *: "Odtwórz ostatni losowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Tryb regulacji głośności"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Tryb regulacji głośności"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Liczba kroków głośności"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Liczba kroków głośności"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Percepcyjny"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Percepcyjny"
   </voice>
 </phrase>
