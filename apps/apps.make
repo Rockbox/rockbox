@@ -24,7 +24,7 @@ $(BUILDDIR)/apps/features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
                  -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
-		grep -v "^\#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
+		grep -v "^#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
 
 $(BUILDDIR)/apps/genlang-features:  $(BUILDDIR)/apps/features
 	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))tr \\n : < $< > $@

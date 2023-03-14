@@ -59,7 +59,7 @@ $(OBJDIR)/features.tex: $(ROOTDIR)/apps/features.txt
 	$(SILENT) for f in \
 	    $$(cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	       $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" \
-	       -imacros "button.h" - | grep -v "^\#" | grep -v "^$$"); \
+	       -imacros "button.h" - | grep -v "^#" | grep -v "^$$"); \
 	    do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}"; done ; \
 	printf "$$feat" > $@
 

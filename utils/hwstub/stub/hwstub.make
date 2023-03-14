@@ -8,7 +8,7 @@ LDFLAGS=-lgcc -Os -nostdlib -T$(TMP_LDS) -Wl,-Map,$(TMP_MAP) $(INCLUDES) -L$(BUI
 
 SRC:=$(shell cat $(ROOT_DIR)/SOURCES | $(CC) $(INCLUDES) \
     $(DEFINES) -E -P -include "config.h" - 2>/dev/null \
-    | grep -v "^\#")
+    | grep -v "^#")
 SRC:=$(foreach src,$(SRC),$(BUILD_DIR)/$(src))
 OBJ=$(SRC:.c=.o)
 OBJ:=$(OBJ:.S=.o)
