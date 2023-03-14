@@ -203,8 +203,9 @@ static int codec_load_ram(struct codec_api *api)
         return CODEC_ERROR;
     }
 
-    if (hdr->api_version > CODEC_API_VERSION
-        || hdr->api_version < CODEC_MIN_API_VERSION) {
+    if (hdr->api_version != CODEC_API_VERSION ||
+        c_hdr->api_size > sizeof(struct codec_api))
+    {
         logf("codec api version error");
         lc_close(curr_handle);
         curr_handle = NULL;

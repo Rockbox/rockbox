@@ -864,9 +864,7 @@ int plugin_load(const char* plugin, const void* parameter)
     }
 
     p_hdr = lc_get_header(current_plugin_handle);
-
     hdr = p_hdr ? &p_hdr->lc_hdr : NULL;
-
 
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
@@ -881,13 +879,15 @@ int plugin_load(const char* plugin, const void* parameter)
         splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
-    if (hdr->api_version > PLUGIN_API_VERSION
-        || hdr->api_version < PLUGIN_MIN_API_VERSION)
+
+    if (hdr->api_version != PLUGIN_API_VERSION ||
+        p_hdr->api_size > sizeof(struct plugin_api))
     {
         lc_close(current_plugin_handle);
         splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* tlsf crashes observed on arm with 0x4 aligned addresses */
     plugin_size = ALIGN_UP(hdr->end_addr - pluginbuf, 0x8);

@@ -157,13 +157,12 @@ int plugin_open(const char *plugin, const char *parameter);
 
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
-/* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 265
-
-/* update this to latest version if a change to the api struct breaks
-   backwards compatibility (and please take the opportunity to sort in any
-   new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 260
+/*
+ * Increment this whenever a change breaks the plugin ABI,
+ * when this happens please take the opportunity to sort in
+ * any new functions "waiting" at the end of the list.
+ */
+#define PLUGIN_API_VERSION 266
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -962,6 +961,7 @@ struct plugin_header {
     struct lc_header lc_hdr; /* must be the first */
     enum plugin_status(*entry_point)(const void*);
     const struct plugin_api **api;
+    size_t api_size;
 };
 
 #ifdef PLUGIN
@@ -973,14 +973,15 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
         { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, plugin__start, &rb };
+          plugin_start_addr, plugin_end_addr, }, \
+        plugin__start, &rb, sizeof(struct plugin_api) };
 #else /* PLATFORM_HOSTED */
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
-        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL }, \
-        plugin__start, &rb };
+            { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL }, \
+            plugin__start, &rb, sizeof(struct plugin_api) };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
 

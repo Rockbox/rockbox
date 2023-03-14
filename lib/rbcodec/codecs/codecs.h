@@ -71,13 +71,12 @@
 /* magic for encoder codecs */
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
-/* increase this every time the api struct changes */
-#define CODEC_API_VERSION 49
-
-/* update this to latest version if a change to the api struct breaks
-   backwards compatibility (and please take the opportunity to sort in any
-   new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 49
+/*
+ * Increment this whenever a change breaks the codec ABI,
+ * when this happens please take the opportunity to sort in
+ * any new functions "waiting" at the end of the list.
+ */
+#define CODEC_API_VERSION 50
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -228,6 +227,7 @@ struct codec_header {
     enum codec_status(*entry_point)(enum codec_entry_call_reason reason);
     enum codec_status(*run_proc)(void);
     struct codec_api **api;
+    size_t api_size;
     void * rec_extension[]; /* extension for encoders */
 };
 
@@ -241,15 +241,16 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
+          plugin_start_addr, plugin_end_addr }, \
+        codec_start, codec_run, &ci, sizeof(struct codec_api) };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci, { enc_callback } };
+          plugin_start_addr, plugin_end_addr }, \
+        codec_start, codec_run, &ci, sizeof(struct codec_api), \
+        { enc_callback } };
 
 #else /* def SIMULATOR */
 /* decoders */
@@ -257,13 +258,14 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci };
+        codec_start, codec_run, &ci, sizeof(struct codec_api) };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci, { enc_callback } };
+        codec_start, codec_run, &ci, sizeof(struct codec_api), \
+        { enc_callback } };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 

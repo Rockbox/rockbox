@@ -136,14 +136,17 @@ struct image_decoder {
                             int x, int y, int width, int height);
 };
 
-#define IMGDEC_API_VERSION  (PLUGIN_API_VERSION << 4 | 0)
+#define IMGDEC_API_VERSION 1
 
 /* image decoder header */
 struct imgdec_header {
     struct lc_header lc_hdr; /* must be the first */
     const struct image_decoder *decoder;
     const struct plugin_api **api;
+    unsigned short plugin_api_version;
+    size_t plugin_api_size;
     const struct imgdec_api **img_api;
+    size_t img_api_size;
 };
 
 #ifdef IMGDEC
@@ -157,15 +160,18 @@ extern const struct image_decoder image_decoder;
         const struct imgdec_header __header \
         __attribute__ ((section (".header")))= { \
         { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, &image_decoder, &rb, &iv };
+          plugin_start_addr, plugin_end_addr, }, &image_decoder, \
+          &rb, PLUGIN_API_VERSION, sizeof(struct plugin_api), \
+          &iv, sizeof(struct imgdec_api) };
 #else /* PLATFORM_HOSTED */
 #define IMGDEC_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
         const struct imgdec_api *iv DATA_ATTR; \
         const struct imgdec_header __header \
         __attribute__((visibility("default"))) = { \
-        { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
-        NULL, NULL }, &image_decoder, &rb, &iv };
+        { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, NULL, NULL }, \
+          &image_decoder, &rb, PLUGIN_API_VERSION, sizeof(struct plugin_api), \
+          &iv, sizeof(struct imgdec_api), };
 #endif /* CONFIG_PLATFORM */
 #endif
 
