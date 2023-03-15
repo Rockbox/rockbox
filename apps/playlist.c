@@ -1021,7 +1021,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
  * search through all the directories (starting with the current) to find
  * one that has tracks to play
  */
-static int get_next_dir(char *dir, bool is_forward)
+static int get_next_dir(char *dir, int direction)
 {
     struct playlist_info* playlist = &current_playlist;
     int result = -1;
@@ -1103,7 +1103,7 @@ static int get_next_dir(char *dir, bool is_forward)
 
     /* set up sorting/direction */
     tc->sort_dir = global_settings.sort_dir;
-    if (!is_forward)
+    if (direction < 0)
     {
         static const char sortpairs[] =
         {
@@ -1197,14 +1197,6 @@ static int get_next_dir(char *dir, bool is_forward)
     tc->sort_dir = global_settings.sort_dir;
 
     return result;
-}
-
-static int get_next_directory(char *dir){
-    return get_next_dir(dir, true);
-}
-
-static int get_previous_directory(char *dir){
-    return get_next_dir(dir, false);
 }
 
 /*
@@ -1314,13 +1306,8 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
 static int create_and_play_dir(int direction, bool play_last)
 {
     char dir[MAX_PATH + 1];
-    int res;
+    int res = get_next_dir(dir, direction);
     int index = -1;
-
-    if(direction > 0)
-      res = get_next_directory(dir);
-    else
-      res = get_previous_directory(dir);
 
     if (res < 0) /* return the error encountered */
         return res;
