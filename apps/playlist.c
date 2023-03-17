@@ -601,15 +601,13 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
 
     playlist->filename[0] = '\0';
 
-    chunk_alloc_free(&playlist->name_chunk_buffer);
-
     playlist->seed = 0;
     playlist->num_cached = 0;
 
     playlist->utf8 = true;
     playlist->control_created = false;
-    playlist->in_ram = false;
     playlist->modified = false;
+    playlist->dirplay = true;
 
     playlist->control_fd = -1;
 
@@ -704,9 +702,9 @@ static void new_playlist_unlocked(struct playlist_info* playlist,
     {
         fileused = "";
 
-        /* only the current playlist can be in RAM */
+        /* only the current playlist can use dirplay */
         if (dirused && playlist == &current_playlist)
-            playlist->in_ram = true;
+            playlist->dirplay = true;
         else
             dirused = ""; /* empty playlist */
     }
@@ -1252,14 +1250,7 @@ static int get_track_filename(struct playlist_info* playlist, int index, int see
     }
 #endif /* HAVE_DIRCACHE */
 
-    if (playlist->in_ram && !control_file && max < 0)
-    {
-        char *namebuf = chunk_get_data(&playlist->name_chunk_buffer, seek);
-        strmemccpy(tmp_buf, namebuf, sizeof(tmp_buf));
-        chunk_put_data(&playlist->name_chunk_buffer, namebuf, seek);
-        NOTEF("%s [in Ram]: 0x%x %s", __func__, seek, tmp_buf);
-    }
-    else if (max < 0)
+    if (max < 0)
     {
         playlist_write_lock(playlist);
 
@@ -2064,25 +2055,6 @@ static void dc_thread_playlist(void)
 #endif
 
 /*
- * Allocate name chunk buffer header for in-ram playlists
- */
-static void alloc_namebuffer(void)
-{
-#if MEMORYSIZE >= 16
-# define NAME_CHUNK_SZ (200 << 10) /*200K*/
-#elif MEMORYSIZE >= 8
-# define NAME_CHUNK_SZ (100 << 10) /*100K*/
-#else
-# define NAME_CHUNK_SZ (50 << 10) /*50K*/
-#endif
-    struct playlist_info* playlist = &current_playlist;
-    size_t namebufsz = (AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir);
-    size_t name_chunks = (namebufsz + NAME_CHUNK_SZ - 1) / NAME_CHUNK_SZ;
-    core_chunk_alloc_init(&playlist->name_chunk_buffer, NAME_CHUNK_SZ, name_chunks);
-#undef NAME_CHUNK_SZ
-}
-
-/*
  * Allocate a temporary buffer for loading playlists
  */
 static int alloc_tempbuf(size_t* buflen)
@@ -2181,47 +2153,18 @@ void playlist_shutdown(void)
 }
 
 /*
- * Add track to in_ram playlist.  Used when playing directories.
+ * Add track to end of the playlist. Prefer playlist_insert_track(),
+ * this is DEPRECATED and will be going away at some point.
  */
 int playlist_add(const char *filename)
 {
-    size_t indice = CHUNK_ALLOC_INVALID;
-    struct playlist_info* playlist = &current_playlist;
-    int len = strlen(filename);
+    int ret = playlist_insert_track(NULL, filename, PLAYLIST_INSERT_LAST,
+                                    false, true);
+    if (ret < 0)
+        return ret;
 
-    if (!chunk_alloc_is_initialized(&playlist->name_chunk_buffer))
-        alloc_namebuffer();
-
-    if (chunk_alloc_is_initialized(&playlist->name_chunk_buffer))
-        indice = chunk_alloc(&playlist->name_chunk_buffer, len + 1);
-
-    if(indice == CHUNK_ALLOC_INVALID)
-    {
-
-        notify_buffer_full();
-        return -2;
-    }
-
-    if(playlist->amount >= playlist->max_playlist_size)
-    {
-        notify_buffer_full();
-        return -1;
-    }
-
-    playlist_write_lock(playlist);
-
-    char *namebuf = (char*)chunk_get_data(&playlist->name_chunk_buffer, indice);
-    strcpy(namebuf, filename);
-    namebuf[len] = '\0';
-    chunk_put_data(&playlist->name_chunk_buffer, namebuf, indice);
-
-    playlist->indices[playlist->amount] = indice;
-    dc_init_filerefs(playlist, playlist->amount, 1);
-
-    playlist->amount++;
-
-    playlist_write_unlock(playlist);
-    return 0;
+    playlist_set_modified(NULL, false);
+    return ret;
 }
 
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
@@ -2286,8 +2229,6 @@ int playlist_create_ex(struct playlist_info* playlist,
 #endif
     }
 
-    chunk_alloc_free(&playlist->name_chunk_buffer);
-
     new_playlist_unlocked(playlist, dir, file);
 
     /* load the playlist file */
@@ -2344,7 +2285,7 @@ bool playlist_check(int steps)
     struct playlist_info* playlist = &current_playlist;
 
     /* always allow folder navigation */
-    if (global_settings.next_folder && playlist->in_ram)
+    if (global_settings.next_folder && playlist->dirplay)
         return true;
 
     int index = get_next_index(playlist, steps, -1);
@@ -3125,7 +3066,7 @@ int playlist_next(int steps)
             playlist->index = 0;
             index = 0;
         }
-        else if (playlist->in_ram && global_settings.next_folder)
+        else if (playlist->dirplay && global_settings.next_folder)
         {
             /* we switch playlists here */
             index = create_and_play_dir(steps, true);
@@ -3175,7 +3116,7 @@ out:
 bool playlist_next_dir(int direction)
 {
     /* not to mess up real playlists */
-    if(!current_playlist.in_ram)
+    if(!current_playlist.dirplay)
        return false;
 
     return create_and_play_dir(direction, false) >= 0;
@@ -3208,7 +3149,7 @@ const char* playlist_peek(int steps, char* buf, size_t buf_size)
 
     temp_ptr = buf;
 
-    if (!playlist->in_ram || control_file)
+    if (!playlist->dirplay || control_file)
     {
         /* remove bogus dirs from beginning of path
            (workaround for buggy playlist creation tools) */
@@ -3442,8 +3383,7 @@ int playlist_resume(void)
                         }
                         else if (str2[0] != '\0')
                         {
-                            playlist->in_ram = true;
-                            resume_directory(str2);
+                            playlist->dirplay = true;
                         }
 
                         /* load the rest of the data */

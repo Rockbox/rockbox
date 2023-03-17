@@ -74,16 +74,13 @@ struct playlist_info
 {
     bool utf8;           /* playlist is in .m3u8 format             */
     bool control_created; /* has control file been created?         */
-    bool in_ram;         /* playlist stored in ram (dirplay)        */
     bool modified;       /* has playlist been modified by the user? */
+    bool dirplay;        /* are we playing a directory directly? */
     int  fd;             /* descriptor of the open playlist file    */
     int  control_fd;     /* descriptor of the open control file     */
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     unsigned long *indices; /* array of indices            */
-
-    struct chunk_alloc_header name_chunk_buffer; /* chunk buffer for 
-                                                    in-ram playlist */
 
     int  index;          /* index of current playing track          */
     int  first_index;    /* index of first song in playlist         */
