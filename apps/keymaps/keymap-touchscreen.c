@@ -383,7 +383,7 @@ const struct button_mapping* get_context_mapping(int context)
         return target_get_context_mapping(context & ~CONTEXT_CUSTOM2);
     }
 
-    switch (context)
+    switch (context & ~CONTEXT_LOCKED)
     {
         case CONTEXT_STD:
             return button_context_standard;

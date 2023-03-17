@@ -324,18 +324,16 @@ static const struct button_mapping button_context_usb_hid_mode_browser[] = {
 
 const struct button_mapping* get_context_mapping(int context)
 {
-    switch (context)
+    switch (context & ~CONTEXT_LOCKED)
     {
         default:
-        case CONTEXT_STD | CONTEXT_LOCKED:
         case CONTEXT_STD:
             return button_context_standard;
-        case CONTEXT_WPS | CONTEXT_LOCKED:
-            return button_context_wps_locked;
         case CONTEXT_WPS:
+            if (context & CONTEXT_LOCKED)
+                return button_context_wps_locked;
             return button_context_wps;
         case CONTEXT_TREE:
-        case CONTEXT_MAINMENU | CONTEXT_LOCKED:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
