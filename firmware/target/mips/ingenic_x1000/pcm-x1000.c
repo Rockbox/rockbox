@@ -168,8 +168,23 @@ void pcm_play_dma_start(const void* addr, size_t size)
 
 void pcm_play_dma_stop(void)
 {
-    jz_writef(AIC_CCR, TDMS(0), ETUR(0), ERPL(0));
-    jz_writef(AIC_CCR, TFLUSH(1));
+    /* disable DMA and underrun interrupts */
+    jz_writef(AIC_CCR, TDMS(0), ETUR(0));
+
+    /*
+     * wait for FIFO to be empty - on targets
+     * with >16bit samples, flushing the fifo
+     * may result in swapping l and r channels!
+     * (ensure bit clock is running first)
+     */
+    if (jz_readf(AIC_I2SCR, STPBK) == 0) {
+        while(jz_readf(AIC_SR, TFL) != 0);
+    } else {
+        panicf("pcm_play_dma_stop: No bit clock running!");
+    }
+
+    /* disable playback */
+    jz_writef(AIC_CCR, ERPL(0));
 
     play_dma_pending_event = DMA_EVENT_NONE;
     aic_state &= ~AIC_STATE_PLAYING;
