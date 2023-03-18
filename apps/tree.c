@@ -652,7 +652,7 @@ static int dirbrowse(void)
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
 
-    while(1) {
+    while(tc.browse) {
         bool restore = false;
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
@@ -1018,7 +1018,7 @@ int rockbox_browse(struct browse_context *browse)
     }
     else
     {
-        if (dirfilter != SHOW_ID3DB)
+        if (dirfilter != SHOW_ID3DB && (browse->flags & BROWSE_DIRFILTER) == 0)
             tc.dirfilter = &global_settings.dirfilter;
         tc.browse = browse;
         strmemccpy(current, browse->root, MAX_PATH);

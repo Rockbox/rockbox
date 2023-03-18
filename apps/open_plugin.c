@@ -344,8 +344,25 @@ retnhash:
     return hash;
 }
 
+/* only displays directories and .rock files */
+static bool callback_show_item(char *name, int attr, struct tree_context *tc)
+{
+    (void)name;
+    if(attr & ATTR_DIRECTORY)
+    {
+        if (strstr(tc->currdir, PLUGIN_DIR) != NULL)
+            return true;
+        tc->browse = NULL; /* exit immediately */
+    }
+    else if(attr & FILE_ATTR_ROCK)
+    {
+        return true;
+    }
+    return false;
+}
+
 /* open_plugin_browse()
-* allows fthe user to browse for a plugin to set to a supplied key
+* allows the user to browse for a plugin to set to a supplied key
 * if key is a lang_id that is used otherwise a hash of the key is created
 * for later recall of the plugin path
 */
@@ -361,17 +378,18 @@ void open_plugin_browse(const char *key)
         (key ? P2STR((unsigned char *)key):"No Key"), open_plugin_entry.name);
     logf("OP browse %s %s", op_entry->path, op_entry->param);
 
-    if (op_entry->path[0] == '\0')
+    if (op_entry->path[0] == '\0' || !file_exists(op_entry->path))
         strcpy(op_entry->path, PLUGIN_DIR"/");
 
     struct browse_context browse = {
         .dirfilter = SHOW_ALL,
-        .flags = BROWSE_SELECTONLY,
+        .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU | BROWSE_DIRFILTER,
         .title = str(LANG_OPEN_PLUGIN),
         .icon = Icon_Plugin,
         .root = op_entry->path,
         .buf = tmp_buf,
         .bufsize = sizeof(tmp_buf),
+        .callback_show_item = callback_show_item,
     };
 
     if (rockbox_browse(&browse) == GO_TO_PREVIOUS)
