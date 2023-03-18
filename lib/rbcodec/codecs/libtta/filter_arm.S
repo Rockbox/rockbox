@@ -165,8 +165,8 @@ hybrid_filter:
     sub      r10, r11, r10
 
     @ set to the memory: *pA, *(pA-1), *(pA-2), *(pA-3), *pM, *(pM-1), *(pM-2), *(pM-3)
-    stmneda  r2,  {r10, r11, r12, lr}
-    stmneda  r3,  {r5,  r6,  r7,  r8}
+    stmdane  r2,  {r10, r11, r12, lr}
+    stmdane  r3,  {r5,  r6,  r7,  r8}
     ldmpc    cond=ne regs=r4-r12     @ hybrid_filter end (when fs->index != 0)
 
 .hf_memshl:

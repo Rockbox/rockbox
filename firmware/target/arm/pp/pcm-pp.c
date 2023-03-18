@@ -327,6 +327,7 @@ void fiq_playback(void)
      */
     asm volatile (
     /* No external calls */
+        ".syntax unified              \n"
         "sub     lr, lr, #4           \n" /* Prepare return address */
         "stmfd   sp!, { lr }          \n" /* stack lr so we can use it */
         "ldr     r12, =0xcf001040     \n" /* Some magic from iPodLinux ... */
@@ -349,8 +350,8 @@ void fiq_playback(void)
         "bhi     0b                   \n" /* ... yes, continue */
 
         "cmp     r9, #0               \n" /* either FIFO full or size empty? */
-        "stmneia r11, { r8-r9 }       \n" /* save p and size, if not empty */
-        "ldmnefd sp!, { pc }^         \n" /* RFE if not empty */
+        "stmiane r11, { r8-r9 }       \n" /* save p and size, if not empty */
+        "ldmfdne sp!, { pc }^         \n" /* RFE if not empty */
 
     /* Making external calls */
     "1:                               \n"
@@ -363,7 +364,7 @@ void fiq_playback(void)
         "mov     lr, pc               \n" /* long call (not in same section) */
         "bx      r3                   \n"
         "cmp     r0, #0               \n" /* more data? */
-        "ldmeqfd sp!, { r0-r3, pc }^  \n" /* no? -> exit */
+        "ldmfdeq sp!, { r0-r3, pc }^  \n" /* no? -> exit */
 
         "ldr     r14, [r10, #0x1c]    \n" /* read IISFIFO_CFG to check FIFO status */
         "ands    r14, r14, #(0xe<<23) \n" /* r14 = (IIS_TX_FREE_COUNT & ~1) << 23 */

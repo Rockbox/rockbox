@@ -73,15 +73,16 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile(
+        ".syntax unified                \n"
         "ldr     r0, [%0, #40]          \n" /* Load start pointer */
         "cmp     r0, #0                 \n" /* Check for NULL */
 
         /* If not already running, jump to start */
 #if ARM_ARCH == 4 && defined(USE_THUMB)
-        "ldmneia %0, { r0, r12 }        \n"
+        "ldmiane %0, { r0, r12 }        \n"
         "bxne    r12                    \n"
 #else
-        "ldmneia %0, { r0, pc }         \n"
+        "ldmiane %0, { r0, pc }         \n"
 #endif
 
         "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */

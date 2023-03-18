@@ -43,8 +43,8 @@
     ldrsh  r7, [r0, #12]          /* d2 */
     ldrsh  r8, [r0, #14]          /* d3 */
     orrs   r9, r2, r3
-    orreqs r9, r4, r5
-    orreqs r9, r6, r7
+    orrseq r9, r4, r5
+    orrseq r9, r6, r7
     cmpeq  r8, #0
     bne    2f
     mov    r1, r1, asl #15
@@ -320,7 +320,7 @@ mpeg2_idct_copy:
 mpeg2_idct_add:
     cmp    r0, #129
     mov    r0, r1
-    ldreqsh r1, [r0, #0]
+    ldrsheq r1, [r0, #0]
     bne    1f
     and    r1, r1, #0x70
     cmp    r1, #0x40

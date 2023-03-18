@@ -1006,13 +1006,14 @@ Lyre prototype 1 */
 #endif
 
 #if defined(CPU_ARM) && defined(__ASSEMBLER__)
+.syntax unified
 /* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */
 .macro ldmpc cond="", order="ia", regs
 #if ARM_ARCH == 4 && defined(USE_THUMB)
-    ldm\cond\order sp!, { \regs, lr }
+    ldm\order\cond sp!, { \regs, lr }
     bx\cond lr
 #else
-    ldm\cond\order sp!, { \regs, pc }
+    ldm\order\cond sp!, { \regs, pc }
 #endif
 .endm
 .macro ldrpc cond=""

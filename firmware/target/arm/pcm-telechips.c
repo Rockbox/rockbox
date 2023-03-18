@@ -218,6 +218,7 @@ void fiq_handler(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (
+        ".syntax unified             \n"
         "sub     lr, lr, #4          \n"
         "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
         "mov     r14, #0             \n" /* Was the callback called? */
@@ -251,7 +252,7 @@ void fiq_handler(void)
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
 
         "cmp     r14, #0             \n" /* Callback called? */
-        "ldmeqfd sp!, { r0-r3, pc }^ \n" /* no? -> exit */
+        "ldmfdeq sp!, { r0-r3, pc }^ \n" /* no? -> exit */
 
         "ldr     r1, =pcm_play_status_callback \n"
         "ldr     r1, [r1]            \n"
@@ -268,7 +269,7 @@ void fiq_handler(void)
         "mov     lr, pc              \n"
         "ldr     pc, =pcm_play_dma_complete_callback \n"
         "cmp     r0, #0              \n" /* any more to play? */
-        "ldmneia r11, { r8-r9 }      \n" /* load new p and size */
+        "ldmiane r11, { r8-r9 }      \n" /* load new p and size */
         "cmpne   r9, #0x0f           \n" /* did we actually get enough data? */
         "bhi     .fill_fifo          \n" /* not stop and enough? refill */
         "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */

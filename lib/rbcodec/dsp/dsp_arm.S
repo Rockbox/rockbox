@@ -323,7 +323,7 @@ resample_hermite:
     add     r6, r6, r0, lsl #2          @ r6 = &s[pos]
 
     cmp     r0, #3                      @ pos >= 3? history not needed
-    ldmgedb r6, { r1-r3 }               @ x3..x1 = s[pos-3]..s[pos-1]
+    ldmdbge r6, { r1-r3 }               @ x3..x1 = s[pos-3]..s[pos-1]
     bge     .hrs_loadhist_done          @
     add     r10, r0, r0, lsl #1         @ branch pc + pos*12
     add     pc, pc, r10, lsl #2         @
@@ -496,7 +496,7 @@ resample_hermite:
     ldmfd   sp!, { r10, r12 }           @ recover ch, h
     subs    r10, r10, #1                @ --ch
     stmia   r12!, { r1-r3 }             @ h[0..2] = x3..x1
-    ldmgtia sp, { r0-r2 }               @ load data, src, dst
+    ldmiagt sp, { r0-r2 }               @ load data, src, dst
     bgt     .hrs_channel_loop
 
     ldmfd   sp!, { r1-r3 }              @ pop data, src, dst
@@ -614,7 +614,7 @@ filter_process:
     ldr     r0, [sp]                @ r0 = history[channels-ch-1]
     subs    r3, r3, #1              @ all channels processed?
     stmia   r0!, { r9-r12 }         @ save back history, history++
-    ldmhsib sp, { r1-r2 }           @ r1 = buf, r2 = count
+    ldmibhs sp, { r1-r2 }           @ r1 = buf, r2 = count
     strhs   r3, [sp, #12]           @ store ch
     strhs   r0, [sp]                @ store history[channels-ch-1]
     bhs     .fp_channelloop

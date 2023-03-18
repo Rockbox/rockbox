@@ -35,7 +35,7 @@
 memset16:
         tst     r0, #2                  @ unaligned?
         cmpne   r2, #0
-        strneh  r1, [r0], #2            @ store one halfword to align
+        strhne  r1, [r0], #2            @ store one halfword to align
         subne   r2, r2, #1
 
 /*
@@ -54,29 +54,29 @@ memset16:
         mov     lr, r1
 
 2:      subs    r2, r2, #32
-        stmgeia r0!, {r1, r3, ip, lr}   @ 64 bytes at a time.
-        stmgeia r0!, {r1, r3, ip, lr}
-        stmgeia r0!, {r1, r3, ip, lr}
-        stmgeia r0!, {r1, r3, ip, lr}
+        stmiage r0!, {r1, r3, ip, lr}   @ 64 bytes at a time.
+        stmiage r0!, {r1, r3, ip, lr}
+        stmiage r0!, {r1, r3, ip, lr}
+        stmiage r0!, {r1, r3, ip, lr}
         bgt     2b
         ldrpc   cond=eq                 @ Now <64 bytes to go.
 /*
  * No need to correct the count; we're only testing bits from now on
  */
         tst     r2, #16
-        stmneia r0!, {r1, r3, ip, lr}
-        stmneia r0!, {r1, r3, ip, lr}
+        stmiane r0!, {r1, r3, ip, lr}
+        stmiane r0!, {r1, r3, ip, lr}
         tst     r2, #8
-        stmneia r0!, {r1, r3, ip, lr}
+        stmiane r0!, {r1, r3, ip, lr}
         ldr     lr, [sp], #4
 
 4:      tst     r2, #4
-        stmneia r0!, {r1, r3}
+        stmiane r0!, {r1, r3}
         tst     r2, #2
         strne   r1, [r0], #4
 
         tst     r2, #1
-        strneh  r1, [r0], #2
+        strhne  r1, [r0], #2
         bx      lr
 .end:
         .size   memset16,.end-memset16

@@ -225,7 +225,7 @@ udiv32_arm:
     mov     \inv, \divisor, lsl \bits
     add     \neg, pc, \inv, lsr #25
     cmp     \inv, #1<<31
-    ldrhib  \inv, [\neg, #.L_udiv_est_table-.-64]
+    ldrbhi  \inv, [\neg, #.L_udiv_est_table-.-64]
     bls     20f
     subs    \bits, \bits, #7
     rsb     \neg, \divisor, #0

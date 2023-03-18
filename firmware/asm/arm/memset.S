@@ -34,8 +34,8 @@
 1:      cmp     r2, #4                  @ 1 do we have enough
         blt     5f                      @ 1 bytes to align with?
         cmp     r3, #2                  @ 1
-        strgtb  r1, [r0, #-1]!          @ 1
-        strgeb  r1, [r0, #-1]!          @ 1
+        strbgt  r1, [r0, #-1]!          @ 1
+        strbge  r1, [r0, #-1]!          @ 1
         strb    r1, [r0, #-1]!          @ 1
         sub     r2, r2, r3              @ 1 r2 = r2 - r3
         b 2f
@@ -65,24 +65,24 @@ memset:
         mov     lr, r1
 
 3:      subs    r2, r2, #64
-        stmgedb r0!, {r1, r3, ip, lr}   @ 64 bytes at a time.
-        stmgedb r0!, {r1, r3, ip, lr}
-        stmgedb r0!, {r1, r3, ip, lr}
-        stmgedb r0!, {r1, r3, ip, lr}
+        stmdbge r0!, {r1, r3, ip, lr}   @ 64 bytes at a time.
+        stmdbge r0!, {r1, r3, ip, lr}
+        stmdbge r0!, {r1, r3, ip, lr}
+        stmdbge r0!, {r1, r3, ip, lr}
         bgt     3b
         ldrpc   cond=eq                 @ Now <64 bytes to go.
 /*
  * No need to correct the count; we're only testing bits from now on
  */
         tst     r2, #32
-        stmnedb r0!, {r1, r3, ip, lr}
-        stmnedb r0!, {r1, r3, ip, lr}
+        stmdbne r0!, {r1, r3, ip, lr}
+        stmdbne r0!, {r1, r3, ip, lr}
         tst     r2, #16
-        stmnedb r0!, {r1, r3, ip, lr}
+        stmdbne r0!, {r1, r3, ip, lr}
         ldr     lr, [sp], #4
 
 5:      tst     r2, #8
-        stmnedb r0!, {r1, r3}
+        stmdbne r0!, {r1, r3}
         tst     r2, #4
         strne   r1, [r0, #-4]!
 /*
@@ -90,10 +90,10 @@ memset:
  * may have an unaligned pointer as well.
  */
 6:      tst     r2, #2
-        strneb  r1, [r0, #-1]!
-        strneb  r1, [r0, #-1]!
+        strbne  r1, [r0, #-1]!
+        strbne  r1, [r0, #-1]!
         tst     r2, #1
-        strneb  r1, [r0, #-1]!
+        strbne  r1, [r0, #-1]!
         bx      lr
 .end:
         .size   memset,.end-memset

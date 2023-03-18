@@ -410,7 +410,7 @@ jpeg_idct8v:
 #if ARM_ARCH < 5
     mov    r8,  r4,  lsl #16
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4, lsr #16
+    orrseq r9,  r5,  r4, lsr #16
     bne    2f
     mov    r8,  r8,  asr #14
     strh   r8,  [r2]
@@ -505,7 +505,7 @@ jpeg_idct8v:
 #else /* ARMv5+ */
     mov    r12, r4,  lsl #16
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4,  lsr #16
+    orrseq r9,  r5,  r4,  lsr #16
     bne    2f
     mov    r12, r12, asr #14
     strh   r12, [r2]
@@ -615,7 +615,7 @@ jpeg_idct8h:
 #if ARM_ARCH < 5
     add    r8,  r14, r4,  lsl #16
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4, lsr #16
+    orrseq r9,  r5,  r4, lsr #16
     bne    2f
     mov    r8,  r8,  asr #21
     cmp    r8,  #255
@@ -727,7 +727,7 @@ jpeg_idct8h:
 #else /* ARMv5+ */
     add    r12, r14, r4,  lsl #16
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4,  lsr #16
+    orrseq r9,  r5,  r4,  lsr #16
     bne    2f
     mov    r12, r12, asr #21
     cmp    r12, #255
@@ -835,7 +835,7 @@ jpeg_idct8v:
 1:
     ldmia  r0!, { r4-r7 }
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4,  lsr #16
+    orrseq r9,  r5,  r4,  lsr #16
     bne    2f
     mov    r4,  r4,  lsl #2
     strh   r4,  [r2]
@@ -939,7 +939,7 @@ jpeg_idct8h:
     ldmia  r0!, { r4-r7 }
     sadd16 r4,  r4,  r14
     orrs   r9,  r6,  r7
-    orreqs r9,  r5,  r4,  lsr #16
+    orrseq r9,  r5,  r4,  lsr #16
     bne    2f
     sxth   r4,  r4
     usat   r4,  #8,  r4,  asr #5

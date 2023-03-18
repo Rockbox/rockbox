@@ -227,7 +227,7 @@
     /* Test whether divisor is 2^N */
     cmp     \inv, #1<<31
     /* Load approximate reciprocal */
-    ldrhib  \inv, [\neg, #.L_udiv_est_table-.-64]
+    ldrbhi  \inv, [\neg, #.L_udiv_est_table-.-64]
     bls     20f
     subs    \bits, \bits, #7
     rsb     \neg, \divisor, #0

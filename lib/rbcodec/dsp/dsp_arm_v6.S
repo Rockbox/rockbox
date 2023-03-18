@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+ #include "rbcodecconfig.h"
 
 /****************************************************************************
  *  void sample_output_mono(struct sample_io_data *this,
@@ -56,7 +57,7 @@ sample_output_mono:
     stmia   r3!, { r12, r14 }          @ store So0, So1
     bgt     1b                         @
                                        @
-    ldmltfd sp!, { r4, pc }            @ if count was even, we're done
+    ldmfdlt sp!, { r4, pc }            @ if count was even, we're done
                                        @
 2:                                     @
     ldr     r12, [r2]                  @ round, scale, saturate
@@ -113,7 +114,7 @@ sample_output_stereo:
     stmia   r3!, { r6, r7 }            @ store So0, So1
     bgt     1b                         @
                                        @
-    ldmltfd sp!, { r4-r7, pc }         @ if count was even, we're done
+    ldmfdlt sp!, { r4-r7, pc }         @ if count was even, we're done
                                        @
 2:                                     @
     ldr     r6, [r2]                   @ r6 = Li

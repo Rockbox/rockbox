@@ -45,6 +45,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     asm volatile (
+        ".syntax unified                 \n"
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -117,7 +118,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "smladx  %[res], r1, r2, %[res]  \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldmneia %[f2]!, {r2,r4}         \n"
+        "ldmiane %[f2]!, {r2,r4}         \n"
         "sadd16  r0, r0, r7              \n"
         "sadd16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
@@ -172,8 +173,8 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "smlad   %[res], r3, r5, %[res]  \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldrned  r4, [%[f2]], #8         \n"
-        "ldrned  r0, [%[v1], #8]         \n"
+        "ldrdne  r4, [%[f2]], #8         \n"
+        "ldrdne  r0, [%[v1], #8]         \n"
         "sadd16  r2, r2, r6              \n"
         "sadd16  r3, r3, r7              \n"
         "strd    r2, [%[v1]], #8         \n"
@@ -214,6 +215,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     asm volatile (
+        ".syntax unified                 \n"
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -286,7 +288,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "smladx  %[res], r1, r2, %[res]  \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldmneia %[f2]!, {r2,r4}         \n"
+        "ldmiane %[f2]!, {r2,r4}         \n"
         "ssub16  r0, r0, r7              \n"
         "ssub16  r1, r1, r5              \n"
         "strd    r0, [%[v1]], #8         \n"
@@ -341,8 +343,8 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "smlad   %[res], r3, r5, %[res]  \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldrned  r4, [%[f2]], #8         \n"
-        "ldrned  r0, [%[v1], #8]         \n"
+        "ldrdne  r4, [%[f2]], #8         \n"
+        "ldrdne  r0, [%[v1], #8]         \n"
         "ssub16  r2, r2, r6              \n"
         "ssub16  r3, r3, r7              \n"
         "strd    r2, [%[v1]], #8         \n"
@@ -381,6 +383,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #endif
 
     asm volatile (
+        ".syntax unified                 \n"
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -421,10 +424,10 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "pkhtb   r1, r7, r4              \n"
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldrned  r6, [%[v2]], #8         \n"
+        "ldrdne  r6, [%[v2]], #8         \n"
         "smladx  %[res], r2, r1, %[res]  \n"
         "pkhtb   r2, r4, r5              \n"
-        "ldrned  r0, [%[v1]], #8         \n"
+        "ldrdne  r0, [%[v1]], #8         \n"
         "smladx  %[res], r3, r2, %[res]  \n"
         "bne     1b                      \n"
 #else
@@ -461,9 +464,9 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "ldrd    r4, [%[v2]], #8         \n"
         "smlad   %[res], r1, r6, %[res]  \n"
         "subs    %[cnt], %[cnt], #1      \n"
-        "ldrned  r0, [%[v1]], #8         \n"
+        "ldrdne  r0, [%[v1]], #8         \n"
         "smlad   %[res], r2, r7, %[res]  \n"
-        "ldrned  r6, [%[v2]], #8         \n"
+        "ldrdne  r6, [%[v2]], #8         \n"
         "smlad   %[res], r3, r4, %[res]  \n"
         "bne     1b                      \n"
 #else

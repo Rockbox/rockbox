@@ -45,7 +45,7 @@ safe_read8_faulty_addr:
     @ if(value != NULL)
     cmp     r1, #0
     @   *value = r0
-    strneb  r0, [r1]
+    strbne  r0, [r1]
     @ return true;
     mov     r0, #1
     bx      lr
@@ -72,7 +72,7 @@ safe_read16_faulty_addr:
     @ if(value != NULL)
     cmp     r1, #0
     @   *value = r0
-    strneh  r0, [r1]
+    strhne  r0, [r1]
     @ return true;
     mov     r0, #1
     bx      lr
