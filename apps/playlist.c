@@ -273,30 +273,32 @@ static int pl_open_playlist(struct playlist_info *playlist)
     return fd;
 }
 
+static void pl_close_fd(int *fdptr)
+{
+    int fd = *fdptr;
+    if (fd >= 0)
+    {
+        close(fd);
+        *fdptr = -1;
+    }
+}
+
 /*
  * Close any open file descriptor for the playlist file.
  * Not thread-safe.
  */
 static void pl_close_playlist(struct playlist_info *playlist)
 {
-    if (playlist->fd >= 0)
-    {
-        close(playlist->fd);
-        playlist->fd = -1;
-    }
+    pl_close_fd(&playlist->fd);
 }
 
-static void close_playlist_control_file(struct playlist_info *playlist)
+/*
+ * Close any open playlist control file descriptor.
+ * Not thread-safe.
+ */
+static void pl_close_control(struct playlist_info *playlist)
 {
-    playlist_write_lock(playlist);
-
-    if (playlist->control_fd >= 0)
-    {
-        close(playlist->control_fd);
-        playlist->control_fd = -1;
-    }
-
-    playlist_write_unlock(playlist);
+    pl_close_fd(&playlist->control_fd);
 }
 
 /* Check if the filename suggests M3U or M3U8 format. */
@@ -802,7 +804,7 @@ static int recreate_control_unlocked(struct playlist_info* playlist)
         char* file = playlist->filename+playlist->dirlen;
         char c = playlist->filename[playlist->dirlen-1];
 
-        close_playlist_control_file(playlist);
+        pl_close_control(playlist);
 
         snprintf(temp_file, sizeof(temp_file), "%s%s",
             playlist->control_filename, file_suffix);
@@ -2172,7 +2174,7 @@ void playlist_shutdown(void)
     if (playlist->control_fd >= 0)
     {
         flush_cached_control_unlocked(playlist);
-        close_playlist_control_file(playlist);
+        pl_close_control(playlist);
     }
 
     playlist_write_unlock(playlist);
@@ -2361,14 +2363,18 @@ void playlist_close(struct playlist_info* playlist)
     if (!playlist)
         return;
 
+    playlist_write_lock(playlist);
+
     pl_close_playlist(playlist);
-    close_playlist_control_file(playlist);
+    pl_close_control(playlist);
 
     if (playlist->control_created)
     {
         remove(playlist->control_filename);
         playlist->control_created = false;
     }
+
+    playlist_write_unlock(playlist);
 }
 
 /*
@@ -3954,8 +3960,8 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.utf8 = playlist->utf8;
     current_playlist.fd = playlist->fd;
 
-    close_playlist_control_file(playlist);
-    close_playlist_control_file(&current_playlist);
+    pl_close_control(playlist);
+    pl_close_control(&current_playlist);
 
     remove(current_playlist.control_filename);
     current_playlist.control_created = false;
