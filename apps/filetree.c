@@ -94,23 +94,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
         }
     }
 
-    if (res == -2) /* name buffer is full store to disk? */
-    {
-        if (yesno_pop(ID2P(LANG_CATALOG_ADD_TO_NEW)))
-        {
-            char playlist_dir[MAX_PATH];
-            strmemccpy(playlist_dir, c->currdir, sizeof(playlist_dir));
-            tree_unlock_cache(c);
-            if (playlist_create(playlist_dir, "dynamic.m3u8") >= 0)
-            {
-                playlist_insert_directory(NULL, playlist_dir,
-                                          PLAYLIST_REPLACE, false, false);
-            }
-        }
-    }
-    else
-        tree_unlock_cache(c);
-
+    tree_unlock_cache(c);
     return start_index;
 }
 
