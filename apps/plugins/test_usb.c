@@ -85,7 +85,7 @@ static void kill_tsr(void)
     rb->queue_delete(&queue);
 }
 
-static bool exit_tsr(bool reenter)
+static int exit_tsr(bool reenter)
 {
     MENUITEM_STRINGLIST(menu, "USB test menu", NULL,
                         "Status", "Stop plugin", "Back");
@@ -100,9 +100,9 @@ static bool exit_tsr(bool reenter)
         case 1:
             rb->splashf(HZ, "Stopping USB test thread");
             kill_tsr();
-            return true;
+            return (reenter ? PLUGIN_TSR_TERMINATE : PLUGIN_TSR_SUSPEND);
         case 2:
-            return false;
+            return PLUGIN_TSR_CONTINUE;
         }
     }
 }
@@ -119,14 +119,15 @@ static void run_tsr(void)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    (void)parameter;
+    bool resume = (parameter == rb->plugin_tsr);
+
     MENUITEM_STRINGLIST(menu, "USB test menu", NULL,
                         "Start", "Quit");
 
-    switch(rb->do_menu(&menu, NULL, NULL, false)) {
+    switch(!resume ? rb->do_menu(&menu, NULL, NULL, false) : 0) {
     case 0:
         run_tsr();
-        rb->splashf(HZ, "Thread started");
+        rb->splashf(HZ, "USB test thread started");
         return PLUGIN_OK;
     case 1:
         return PLUGIN_OK;

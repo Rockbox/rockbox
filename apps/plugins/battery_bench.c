@@ -289,11 +289,11 @@ static struct event_queue thread_q SHAREDBSS_ATTR;
 static bool in_usb_mode;
 static unsigned int buf_idx;
 
-static bool exit_tsr(bool reenter)
+static int exit_tsr(bool reenter)
 {
-    bool is_exit;
+    int exit_status;
     long button;
-    (void)reenter;
+
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
     rb->lcd_puts_scroll(0, 1, "Press " BATTERY_OFF_TXT " to cancel the test");
@@ -313,16 +313,17 @@ static bool exit_tsr(bool reenter)
             rb->thread_wait(gThread.id);
             /* remove the thread's queue from the broadcast list */
             rb->queue_delete(&thread_q);
-            is_exit = true;
+            exit_status = (reenter ? PLUGIN_TSR_TERMINATE : PLUGIN_TSR_SUSPEND);
+            
         }
-        else is_exit = false;
+        else exit_status = PLUGIN_TSR_CONTINUE;
 
         break;
     }
     FOR_NB_SCREENS(idx)
         rb->screens[idx]->scroll_stop();
 
-    return is_exit;
+    return exit_status;
 }
 
 #define BIT_CHARGER     0x1
@@ -502,14 +503,19 @@ static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, in
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    (void)parameter;
     int button, fd;
+    bool resume = false;
     bool on = false;
     start_tick = *rb->current_tick;
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
                            "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT " - quit" };
-    rb->lcd_clear_display();
+
+    if (parameter == rb->plugin_tsr)
+    {
+        resume = true;
+        on = true;
+    }
 
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -529,36 +535,38 @@ enum plugin_status plugin_start(const void* parameter)
                     rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
     rb->lcd_remote_update();
 #endif
-
-    do
+    if (!resume)
     {
-        button = rb->button_get(true);
-        switch (button)
+        do
         {
-            case BATTERY_ON:
-#ifdef BATTERY_RC_ON
-            case BATTERY_RC_ON:
-#endif
-                on = true;
-                break;
-            case BATTERY_OFF:
-#ifdef BATTERY_RC_OFF
-            case BATTERY_RC_OFF:
-#endif
-                return PLUGIN_OK;
+            button = rb->button_get(true);
+            switch (button)
+            {
+                case BATTERY_ON:
+    #ifdef BATTERY_RC_ON
+                case BATTERY_RC_ON:
+    #endif
+                    on = true;
+                    break;
+                case BATTERY_OFF:
+    #ifdef BATTERY_RC_OFF
+                case BATTERY_RC_OFF:
+    #endif
+                    return PLUGIN_OK;
 
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
-        }
-    }while(!on);
-
+                default:
+                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                        return PLUGIN_USB_CONNECTED;
+            }
+        }while(!on);
+    }
     fd = rb->open(BATTERY_LOG, O_RDONLY);
     if (fd < 0)
     {
         fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT, 0666);
         if (fd >= 0)
         {
+
             rb->fdprintf(fd,
                 "# This plugin will log your battery performance in a\n"
                 "# file (%s) every minute.\n"

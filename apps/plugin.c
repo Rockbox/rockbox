@@ -74,7 +74,7 @@ extern unsigned char pluginbuf[];
 
 /* for actual plugins only, not for codecs */
 static int  plugin_size = 0;
-static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
+static int (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 /* NULL if no plugin is loaded, otherwise the handle that lc_open() returned */
 static void *current_plugin_handle;
@@ -83,7 +83,7 @@ char *plugin_get_current_filename(void);
 
 static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
-static void plugin_tsr(bool (*exit_callback)(bool));
+static void plugin_tsr(int (*exit_callback)(bool));
 
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 /* File handle leak prophylaxis */
@@ -183,6 +183,8 @@ static const struct plugin_api rockbox_api = {
     /* lcd */
     splash,
     splashf,
+    splash_progress,
+    splash_progress_set_delay,
 #ifdef HAVE_LCD_CONTRAST
     lcd_set_contrast,
 #endif
@@ -436,6 +438,7 @@ static const struct plugin_api rockbox_api = {
     set_current_file,
     set_dirfilter,
     onplay_show_playlist_menu,
+    onplay_show_playlist_cat_menu,
     browse_id3,
 
     /* talking */
@@ -587,6 +590,7 @@ static const struct plugin_api rockbox_api = {
     buflib_get_data,
 
     /* sound */
+    adjust_volume,
     sound_set,
     sound_current, /*stub*/
     sound_default,
@@ -674,6 +678,7 @@ static const struct plugin_api rockbox_api = {
     tagcache_fill_tags,
 #endif
 #endif
+    tagtree_subentries_do_action,
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -685,6 +690,7 @@ static const struct plugin_api rockbox_api = {
     playlist_amount,
     playlist_resume,
     playlist_resume_track,
+    playlist_set_modified,
     playlist_start,
     playlist_add,
     playlist_sync,
@@ -814,6 +820,7 @@ static const struct plugin_api rockbox_api = {
     sys_reboot,
 
     /* pathfuncs */
+    fix_path_part,
 #ifdef HAVE_MULTIVOLUME
     path_strip_volume,
 #endif
@@ -821,15 +828,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    splash_progress,
-    splash_progress_set_delay,
-    fix_path_part,
-    onplay_show_playlist_cat_menu,
-#if defined(HAVE_TAGCACHE)
-    tagtree_subentries_do_action,
-#endif
-    adjust_volume,
-    playlist_set_modified,
 };
 
 static int plugin_buffer_handle;
@@ -839,17 +837,31 @@ int plugin_load(const char* plugin, const void* parameter)
 {
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
+    const char * resume_plugin = NULL;
+
+    if (!plugin)
+        return PLUGIN_ERROR;
 
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
-        if (pfn_tsr_exit(!strcmp(current_plugin, plugin)) == false )
+        bool reenter = (strcmp(current_plugin, plugin) == 0);
+        int exit_status = pfn_tsr_exit(reenter);
+        if (exit_status == PLUGIN_TSR_CONTINUE)
         {
             /* not allowing another plugin to load */
             return PLUGIN_OK;
         }
-        lc_close(current_plugin_handle);
-        current_plugin_handle = pfn_tsr_exit = NULL;
-        plugin_buffer_handle = core_free(plugin_buffer_handle);
+        else
+        {
+            lc_close(current_plugin_handle);
+            current_plugin_handle = pfn_tsr_exit = NULL;
+            plugin_buffer_handle = core_free(plugin_buffer_handle);
+
+            if (!reenter)
+                resume_plugin = strdupa(current_plugin);
+            else if (exit_status == PLUGIN_TSR_TERMINATE)
+                return PLUGIN_OK; /* don't even load the new plugin either */
+        }
     }
 
 #ifdef HAVE_DISK_STORAGE
@@ -857,7 +869,6 @@ int plugin_load(const char* plugin, const void* parameter)
         splash(0, ID2P(LANG_WAIT));
 #endif
     strcpy(current_plugin, plugin);
-
     current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
     if (current_plugin_handle == NULL) {
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
@@ -990,6 +1001,12 @@ int plugin_load(const char* plugin, const void* parameter)
     if (rc == PLUGIN_ERROR)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
 
+    if (resume_plugin && rc != PLUGIN_GOTO_PLUGIN && !pfn_tsr_exit)
+    {
+            /*plugin = resume_plugin;*/
+            /*parameter = rockbox_api.plugin_tsr;*/
+            return plugin_load(resume_plugin, rockbox_api.plugin_tsr);
+    }
     return rc;
 }
 
@@ -1067,7 +1084,7 @@ static void plugin_release_audio_buffer(void)
 /* The plugin wants to stay resident after leaving its main function, e.g.
    runs from timer or own thread. The callback is registered to later
    instruct it to free its resources before a new plugin gets loaded. */
-static void plugin_tsr(bool (*exit_callback)(bool))
+static void plugin_tsr(int (*exit_callback)(bool))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
 }

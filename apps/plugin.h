@@ -162,7 +162,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 266
+#define PLUGIN_API_VERSION 267
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -177,6 +177,12 @@ enum plugin_status {
     PLUGIN_GOTO_WPS,
     PLUGIN_GOTO_PLUGIN,
     PLUGIN_ERROR = -1,
+};
+
+enum plugin_tsr_status {
+    PLUGIN_TSR_CONTINUE = 0, /* TSR continues running */
+    PLUGIN_TSR_SUSPEND,      /* TSR exits but will restart later */
+    PLUGIN_TSR_TERMINATE,    /* TSR exits and will not be restarted */
 };
 
 /* NOTE: To support backwards compatibility, only add new functions at
@@ -195,6 +201,8 @@ struct plugin_api {
     /* lcd */
     void (*splash)(int ticks, const char *str);
     void (*splashf)(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+    void (*splash_progress)(int current, int total, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4);
+    void (*splash_progress_set_delay)(long delay_ticks);
 #ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
 #endif
@@ -488,6 +496,8 @@ struct plugin_api {
     void (*set_dirfilter)(int l_dirfilter);
 
     void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
+    void (*onplay_show_playlist_cat_menu)(const char* track_name, int attr,
+                                          void (*add_to_pl_cb));
     bool (*browse_id3)(struct mp3entry *id3,
                        int playlist_display_index, int playlist_amount,
                        struct tm *modified);
@@ -660,6 +670,7 @@ struct plugin_api {
     void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
 
     /* sound */
+    void (*adjust_volume)(int steps);
     void (*sound_set)(int setting, int value);
     int (*sound_current)(int setting); /*stub*/
     int (*sound_default)(int setting);
@@ -769,6 +780,7 @@ struct plugin_api {
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
 #endif
+    bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -782,6 +794,7 @@ struct plugin_api {
     int (*playlist_resume)(void);
     void (*playlist_resume_track)(int start_index, unsigned int crc,
                                   unsigned long elapsed, unsigned long offset);
+    void (*playlist_set_modified)(struct playlist_info *playlist, bool modified);
     void (*playlist_start)(int start_index, unsigned long elapsed,
                            unsigned long offset);
     int (*playlist_add)(const char *filename);
@@ -932,29 +945,20 @@ struct plugin_api {
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_release_audio_buffer)(void);
-    void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
+    void (*plugin_tsr)(int (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
     size_t (*plugin_reserve_buffer)(size_t buffer_size);
     /* reboot and poweroff */
     void (*sys_poweroff)(void);
     void (*sys_reboot)(void);
     /* pathfuncs */
+    void (*fix_path_part)(char* path, int offset, int count);
 #ifdef HAVE_MULTIVOLUME
     int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
-    void (*splash_progress)(int current, int total, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4);
-    void (*splash_progress_set_delay)(long delay_ticks);
-    void (*fix_path_part)(char* path, int offset, int count);
-    void (*onplay_show_playlist_cat_menu)(const char* track_name, int attr,
-                                          void (*add_to_pl_cb));
-#ifdef HAVE_TAGCACHE
-    bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
-#endif
-    void (*adjust_volume)(int steps);
-    void (*playlist_set_modified)(struct playlist_info *playlist, bool modified);
+
 };
 
 /* plugin header */

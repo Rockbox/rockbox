@@ -97,6 +97,7 @@ enum plugin_status plugin_start(const void* parameter); /* entry */
 static struct
 {
     bool exiting; /* signal to the thread that we want to exit */
+    bool resume;
     unsigned int id; /* worker thread id */
     struct  event_queue queue; /* thread event queue */
     long stack[THREAD_STACK_SIZE / sizeof(long)];
@@ -393,7 +394,7 @@ static int settings_menu(void)
                 break;
             case 4: /*sep*/
                 continue;
-            case 5:
+            case 5: /* quit the plugin */
                 return -1;
                 break;
             case 6:
@@ -433,7 +434,8 @@ void thread(void)
                 in_usb = false;
                 /*fall through*/
             case EV_STARTUP:
-                rb->beep_play(1500, 100, 1000);
+                if (!gThread.resume)
+                    rb->beep_play(1500, 100, 1000);
                 break;
             case EV_EXIT:
                 return;
@@ -479,17 +481,45 @@ void thread_quit(void)
     }
 }
 
+static bool check_user_input(void)
+{
+    int i = 0;
+    rb->button_clear_queue();
+    if (rb->button_get_w_tmo(HZ) > BUTTON_NONE)
+    {
+        while ((rb->button_get(false) & BUTTON_REL) != BUTTON_REL)
+        {
+            if (i & 1)
+                rb->beep_play(800, 100, 1000 - i * (1000 / 15));
+
+            if (++i > 15)
+            {
+                return true;
+            }
+            rb->sleep(HZ / 5);
+        }
+    }
+    return false;
+}
+
 /* callback to end the TSR plugin, called before a new one gets loaded */
-static bool exit_tsr(bool reenter)
+static int exit_tsr(bool reenter)
 {
     if (reenter)
     {
         rb->queue_post(&gThread.queue, EV_OTHINSTANCE, 0);
-        return false; /* dont let it start again */
+
+        /* quit the plugin if user holds a button */
+        if (check_user_input() == true)
+        {
+            if (settings_menu() < 0)
+                return PLUGIN_TSR_TERMINATE; /*kill TSR dont let it start again */
+        }
+        return PLUGIN_TSR_CONTINUE; /* dont let new plugin start*/
     }
     thread_quit();
 
-    return true;
+    return PLUGIN_TSR_SUSPEND;
 }
 
 
@@ -497,58 +527,35 @@ static bool exit_tsr(bool reenter)
 
 int plugin_main(const void* parameter)
 {
-    (void)parameter;
-    bool settings = false;
-    int i = 0;
-
     rb->memset(&gThread, 0, sizeof(gThread));
 
     gAnnounce.index = 0;
     gAnnounce.timeout = 0;
-
-    rb->splash(HZ / 2, "Announce Status");
-
-    if (configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER) < 0)
+    /* Resume plugin ? */
+    if (parameter == rb->plugin_tsr)
     {
-        /* If the loading failed, save a new config file */
-        config_set_defaults();
-        configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);
-
-        rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
+        gThread.resume = true;
     }
-
-    if (gAnnounce.show_prompt)
+    else
     {
-        if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+        rb->splash(HZ / 2, "Announce Status");
+        if (gAnnounce.show_prompt)
         {
-            rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
-        }
-        rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
-    }
-
-    rb->button_clear_queue();
-    if (rb->button_get_w_tmo(HZ) > BUTTON_NONE)
-    {
-        while ((rb->button_get(false) & BUTTON_REL) != BUTTON_REL)
-        {
-            if (i & 1)
-                rb->beep_play(800, 100, 1000);
-
-            if (++i > 15)
+            if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
             {
-                settings = true;
-                break;
+                rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
             }
-            rb->sleep(HZ / 5);
+            rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
         }
-    }
 
-    if (settings)
-    {
-        rb->splash(100, ID2P(LANG_SETTINGS));
-        int ret = settings_menu();
-        if (ret < 0)
-            return 0;
+
+        if (check_user_input() == true)
+        {
+            rb->splash(100, ID2P(LANG_SETTINGS));
+            int ret = settings_menu();
+            if (ret < 0)
+                return 0;
+        }
     }
 
     gAnnounce.timeout = *rb->current_tick;
@@ -571,6 +578,16 @@ enum plugin_status plugin_start(const void* parameter)
     /* now go ahead and have fun! */
     if (rb->usb_inserted() == true)
         return PLUGIN_USB_CONNECTED;
+
+    config_set_defaults();
+    if (configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER) < 0)
+    {
+        /* If the loading failed, save a new config file */
+        config_set_defaults();
+        configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);
+        rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
+    }
+
     int ret = plugin_main(parameter);
     return (ret==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
