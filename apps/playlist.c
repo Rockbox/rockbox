@@ -3149,25 +3149,22 @@ const char* playlist_peek(int steps, char* buf, size_t buf_size)
 
     temp_ptr = buf;
 
-    if (!playlist->dirplay || control_file)
+    /* remove bogus dirs from beginning of path
+       (workaround for buggy playlist creation tools) */
+    while (temp_ptr)
     {
-        /* remove bogus dirs from beginning of path
-           (workaround for buggy playlist creation tools) */
-        while (temp_ptr)
-        {
-            if (file_exists(temp_ptr))
-                break;
+        if (file_exists(temp_ptr))
+            break;
 
-            temp_ptr = strchr(temp_ptr+1, '/');
-        }
+        temp_ptr = strchr(temp_ptr+1, '/');
+    }
 
-        if (!temp_ptr)
-        {
-            /* Even though this is an invalid file, we still need to pass a
-               file name to the caller because NULL is used to indicate end
-               of playlist */
-            return buf;
-        }
+    if (!temp_ptr)
+    {
+        /* Even though this is an invalid file, we still need to pass a
+           file name to the caller because NULL is used to indicate end
+           of playlist */
+        return buf;
     }
 
     return temp_ptr;
