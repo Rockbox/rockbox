@@ -327,7 +327,7 @@ void fiq_playback(void)
      */
     asm volatile (
     /* No external calls */
-        ".syntax unified              \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "sub     lr, lr, #4           \n" /* Prepare return address */
         "stmfd   sp!, { lr }          \n" /* stack lr so we can use it */
         "ldr     r12, =0xcf001040     \n" /* Some magic from iPodLinux ... */
@@ -395,6 +395,7 @@ void fiq_playback(void)
         "bne     3b                   \n" /* no? -> go return */
         "b       2b                   \n" /* yes -> get even more */
         ".ltorg                       \n"
+        END_ARM_ASM_SYNTAX_UNIFIED
         : /* These must only be integers! No regs */
         : "i"(PCM_DMAST_OK), "i"(PCM_DMAST_STARTED));
 }

@@ -45,7 +45,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     asm volatile (
-        ".syntax unified                 \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -186,6 +186,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     "99:                                 \n"
+        END_ARM_ASM_SYNTAX_UNIFIED
         : /* outputs */
 #if ORDER > 32
         [cnt]"+r"(cnt),
@@ -215,7 +216,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     asm volatile (
-        ".syntax unified                 \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -356,6 +357,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
 #endif
 
     "99:                                 \n"
+        END_ARM_ASM_SYNTAX_UNIFIED
         : /* outputs */
 #if ORDER > 32
         [cnt]"+r"(cnt),
@@ -383,7 +385,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #endif
 
     asm volatile (
-        ".syntax unified                 \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
 #if ORDER > 32
         "mov     %[res], #0              \n"
 #endif
@@ -477,6 +479,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #endif
 
     "99:                                 \n"
+        END_ARM_ASM_SYNTAX_UNIFIED
         : /* outputs */
 #if ORDER > 32
         [cnt]"+r"(cnt),

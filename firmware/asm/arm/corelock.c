@@ -61,7 +61,7 @@ int corelock_try_lock(struct corelock *cl)
 
     /* Relies on the fact that core IDs are complementary bitmasks (0x55,0xaa) */
     asm volatile (
-        ".syntax unified             \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "mov    r1, %[id]            \n" /* r1 = PROCESSOR_ID */
         "ldrb   r1, [r1]             \n"
         "strb   r1, [%[cl], r1, lsr #7] \n" /* cl->myl[core] = core */
@@ -74,6 +74,7 @@ int corelock_try_lock(struct corelock *cl)
         "ands   %[rv], %[rv], r1     \n"
         "strbeq %[rv], [%[cl], r1, lsr #7] \n" /* if not, cl->myl[core] = 0 */
     "1:                              \n" /* Done */
+        END_ARM_ASM_SYNTAX_UNIFIED
         : [rv] "=r"(rval)
         : [id] "i" (&PROCESSOR_ID), [cl] "r" (cl)
         : "r1","r2","cc"

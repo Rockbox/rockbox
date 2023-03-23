@@ -218,7 +218,7 @@ void fiq_handler(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (
-        ".syntax unified             \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "sub     lr, lr, #4          \n"
         "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
         "mov     r14, #0             \n" /* Was the callback called? */
@@ -274,6 +274,7 @@ void fiq_handler(void)
         "bhi     .fill_fifo          \n" /* not stop and enough? refill */
         "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
         ".ltorg                      \n"
+        END_ARM_ASM_SYNTAX_UNIFIED
         : : "i"(PCM_DMAST_OK), "i"(PCM_DMAST_STARTED)
     );
 }

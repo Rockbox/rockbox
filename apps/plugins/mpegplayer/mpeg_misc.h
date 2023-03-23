@@ -53,13 +53,14 @@ enum state_enum
 #define CMP_3_CONST(_a, _b) \
     ({  int _x;                             \
         asm volatile (                      \
-            ".syntax unified          \n"   \
+            BEGIN_ARM_ASM_SYNTAX_UNIFIED    \
             "ldrb   %[x], [%[a], #0]  \n"   \
             "eors   %[x], %[x], %[b0] \n"   \
             "ldrbeq %[x], [%[a], #1]  \n"   \
             "eorseq %[x], %[x], %[b1] \n"   \
             "ldrbeq %[x], [%[a], #2]  \n"   \
             "eorseq %[x], %[x], %[b2] \n"   \
+            END_ARM_ASM_SYNTAX_UNIFIED      \
             : [x]"=&r"(_x)                  \
             : [a]"r"(_a),                   \
               [b0]"i"(((_b) >> 24) & 0xff), \
@@ -71,7 +72,7 @@ enum state_enum
 #define CMP_4_CONST(_a, _b) \
     ({  int _x;                             \
         asm volatile (                      \
-            ".syntax unified          \n"   \
+            BEGIN_ARM_ASM_SYNTAX_UNIFIED    \
             "ldrb   %[x], [%[a], #0]  \n"   \
             "eors   %[x], %[x], %[b0] \n"   \
             "ldrbeq %[x], [%[a], #1]  \n"   \
@@ -80,6 +81,7 @@ enum state_enum
             "eorseq %[x], %[x], %[b2] \n"   \
             "ldrbeq %[x], [%[a], #3]  \n"   \
             "eorseq %[x], %[x], %[b3] \n"   \
+            END_ARM_ASM_SYNTAX_UNIFIED      \
             : [x]"=&r"(_x)                  \
             : [a]"r"(_a),                   \
               [b0]"i"(((_b) >> 24) & 0xff), \

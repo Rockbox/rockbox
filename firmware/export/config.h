@@ -1005,6 +1005,16 @@ Lyre prototype 1 */
 #define ROCKBOX_STRICT_ALIGN 1
 #endif
 
+/*
+ * These macros are for switching on unified syntax in inline assembly.
+ * Older versions of GCC emit assembly in divided syntax with no option
+ * to enable unified syntax.
+ *
+ * FIXME: This needs to be looked at after the toolchain bump
+ */
+#define BEGIN_ARM_ASM_SYNTAX_UNIFIED ".syntax unified\n"
+#define END_ARM_ASM_SYNTAX_UNIFIED   ".syntax divided\n"
+
 #if defined(CPU_ARM) && defined(__ASSEMBLER__)
 .syntax unified
 /* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */

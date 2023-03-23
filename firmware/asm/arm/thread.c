@@ -73,7 +73,7 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile(
-        ".syntax unified                \n"
+        BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "ldr     r0, [%0, #40]          \n" /* Load start pointer */
         "cmp     r0, #0                 \n" /* Check for NULL */
 
@@ -86,6 +86,7 @@ static inline void load_context(const void* addr)
 #endif
 
         "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
+        END_ARM_ASM_SYNTAX_UNIFIED
         : : "r" (addr) : "r0" /* only! */
     );
 }
