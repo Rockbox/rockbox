@@ -33,7 +33,6 @@
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02
 #define PLAYLIST_ATTR_SKIPPED   0x04
-#define PLAYLIST_MAX_CACHE      16
 
 #define PLAYLIST_DISPLAY_COUNT  10
 
@@ -61,15 +60,6 @@ enum {
     PLAYLIST_INSERT_LAST_SHUFFLED = -7
 };
 
-struct playlist_control_cache {
-    enum playlist_command command;
-    int i1;
-    int i2;
-    const char* s1;
-    const char* s2;
-    void* data;
-};
-
 struct playlist_info
 {
     bool utf8;           /* playlist is in .m3u8 format             */
@@ -87,14 +77,9 @@ struct playlist_info
     int  amount;         /* number of tracks in the index           */
     int  last_insert_pos; /* last position we inserted a track      */
     bool started;       /* has playlist been started?               */
-    bool pending_control_sync; /* control file needs to be synced   */
     int last_shuffled_start; /* number of tracks when insert last
                                     shuffled command start */
     int  seed;           /* shuffle seed                            */
-    /* cache of playlist control commands waiting to be flushed to
-       to disk                                                      */
-    struct playlist_control_cache control_cache[PLAYLIST_MAX_CACHE];
-    int num_cached;      /* number of cached entries                */
     struct mutex mutex; /* mutex for control file access    */
 #ifdef HAVE_DIRCACHE
     int dcfrefs_handle;
