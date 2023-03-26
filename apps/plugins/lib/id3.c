@@ -20,27 +20,20 @@
  ****************************************************************************/
 #include "plugin.h"
 
-bool retrieve_id3(struct mp3entry *id3, const char* file, bool try_tagcache)
+/* Fills mp3entry with metadata retrieved from  RAM, if possible, or by reading from
+ * the file directly.  Note that the tagcache only stores a subset of metadata and
+ * will thus not return certain properties of the file, such as frequency, size, or
+ * codec.
+ */
+bool retrieve_id3(struct mp3entry *id3, const char* file)
 {
-    bool ret = false;
-    int fd;
-
 #if defined (HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (try_tagcache && rb->tagcache_fill_tags(id3, file))
+    if (rb->tagcache_fill_tags(id3, file))
     {
         rb->strlcpy(id3->path, file, sizeof(id3->path));
         return true;
     }
-#else
-    (void) try_tagcache;
 #endif
 
-    fd = rb->open(file, O_RDONLY);
-    if (fd >= 0)
-    {
-        if (rb->get_metadata(id3, fd, file))
-            ret = true;
-        rb->close(fd);
-    }
-    return ret;
+    return !rb->mp3info(id3, file);
 }

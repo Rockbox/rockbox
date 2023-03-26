@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/id3.h"
 
 #ifdef HAVE_TAGCACHE
 #include "lib/mul_id3.h"
@@ -127,7 +126,7 @@ static bool file_properties(const char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
                     tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-                if (retrieve_id3(&id3, selected_file, false))
+                if (!rb->mp3info(&id3, selected_file))
                     props_type = PROPS_ID3;
                 found = true;
                 break;
@@ -375,7 +374,7 @@ static bool determine_file_or_dir(void)
 #ifdef HAVE_TAGCACHE
 bool mul_id3_add(const char *file_name)
 {
-    if (!retrieve_id3(&id3, file_name, false))
+    if (rb->mp3info(&id3, file_name))
         return false;
 
     collect_id3(&id3, mul_id3_count == 0);

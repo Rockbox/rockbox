@@ -2086,7 +2086,7 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                    pf_idx.album_index[slide_index].artist_seek);
 
     ret = rb->tagcache_get_next(&tcs) &&
-          retrieve_id3(&id3, tcs.result, true) &&
+          retrieve_id3(&id3, tcs.result) &&
           search_albumart_files(&id3, ":", buf, buflen);
 
     rb->tagcache_search_finish(&tcs);
@@ -3996,7 +3996,7 @@ static int show_id3_info(const char *selected_file)
     i = 0;
     do {
         file_name = i == 0 ? selected_file : get_track_filename(i);
-        if (!retrieve_id3(&id3, file_name, false))
+        if (rb->mp3info(&id3, file_name))
             return 0;
 
         if (is_multiple_tracks)
@@ -4347,7 +4347,7 @@ static void draw_album_text(void)
 static void set_initial_slide(const char* selected_file)
 {
     if (selected_file)
-        set_current_slide(retrieve_id3(&id3, selected_file, true) ?
+        set_current_slide(retrieve_id3(&id3, selected_file) ?
                             id3_get_index(&id3) :
                             pf_cfg.last_album);
     else

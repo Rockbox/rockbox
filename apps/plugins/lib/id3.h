@@ -21,6 +21,6 @@
 #ifndef ID3_H
 #define ID3_H
 
-bool retrieve_id3(struct mp3entry *id3, const char* file, bool try_tagcache);
+bool retrieve_id3(struct mp3entry *id3, const char* file);
 
 #endif /* ID3_H */
