@@ -3531,6 +3531,7 @@ int playlist_resume(void)
     }
 
 out:
+    playlist_set_modified(playlist, false);
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
