@@ -123,6 +123,9 @@ static enum audio_buffer_state
 /** Main state control **/
 static bool ff_rw_mode SHAREDBSS_ATTR = false; /* Pre-ff-rewind mode (A,O-) */
 
+static long seek_on_finish_load_time = 0;
+static int seek_on_finish_load_id3_hid = 0;
+
 static enum play_status
 {
     PLAY_STOPPED = 0,
@@ -1590,8 +1593,16 @@ static bool audio_start_codec(bool auto_skip)
         return false;
     }
 
+    bool delayed_seek = false;
+    if (info.id3_hid == seek_on_finish_load_id3_hid)
+    {
+        cur_id3->elapsed = seek_on_finish_load_time;
+        cur_id3->offset = 0;
+        delayed_seek = true;
+    }
+
 #ifdef HAVE_TAGCACHE
-    bool autoresume_enable = global_settings.autoresume_enable;
+    bool autoresume_enable = !delayed_seek && global_settings.autoresume_enable;
 
     if (autoresume_enable && !(cur_id3->elapsed || cur_id3->offset))
     {
@@ -1641,8 +1652,8 @@ static bool audio_start_codec(bool auto_skip)
        and back again will cause accumulation of silent rewinds - that's not
        our job to track directly nor could it be in any reasonable way
      */
-    resume_rewind_adjust_progress(cur_id3, &cur_id3->elapsed,
-                                  &cur_id3->offset);
+    if (!delayed_seek)
+        resume_rewind_adjust_progress(cur_id3, &cur_id3->elapsed, &cur_id3->offset);
 
     /* Update the codec API with the metadata and track info */
     id3_write(CODEC_ID3, cur_id3);
@@ -2429,6 +2440,9 @@ static void audio_on_finish_load_track(int id3_hid)
     {
         audio_handle_track_load_status(LOAD_TRACK_ERR_START_CODEC);
     }
+
+    seek_on_finish_load_time = 0;
+    seek_on_finish_load_id3_hid = 0;
 }
 
 /* Called when handles other than metadata handles have finished buffering
@@ -3161,6 +3175,12 @@ static void audio_on_ff_rewind(long time)
 
         track_event_flags = TEF_NONE;
 
+        if (time < 0)
+        {
+            time = id3->length + time;
+            if (time < 0)
+                time = 0;
+        }
         /* Send event before clobbering the time if rewinding. */
         if (time == 0)
         {
@@ -3201,18 +3221,15 @@ static void audio_on_ff_rewind(long time)
         /* Track must complete the loading _now_ since a codec and audio
            handle are needed in order to do the seek */
         bool finish_load = cur_info.audio_hid < 0;
-
-        if (finish_load &&
-            audio_finish_load_track(&cur_info) != LOAD_TRACK_READY)
+        if (finish_load)
         {
-            /* Call above should push any load sequence - no need for
-               halt_decoding_track here if no skip was pending here because
-               there would not be a codec started if no audio handle was yet
-               opened */
-            break;
+            seek_on_finish_load_time = time;
+            seek_on_finish_load_id3_hid = cur_info.id3_hid;
+            // Wait till playback thread receives finish load track event and seek then
+            return;
         }
 
-        if (pending == TRACK_SKIP_AUTO || finish_load)
+        if (pending == TRACK_SKIP_AUTO)
         {
             if (!bufreadid3(cur_info.id3_hid, ci_id3) ||
                 !audio_init_codec(&cur_info, ci_id3))

@@ -464,7 +464,21 @@ static void play_hop(int direction)
         if (direction > 0)
             next_track();
         else if (direction < 0)
+        {
+            if (step > 0 && global_settings.rewind_across_tracks && elapsed < DEFAULT_SKIP_THRESH && playlist_check(-1))
+            {
+                bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
+                if (!audio_paused)
+                    audio_pause();
+                audio_prev();
+                audio_ff_rewind(-step);
+                if (!audio_paused)
+                    audio_resume();
+                return;
+            }
+
             prev_track(DEFAULT_SKIP_THRESH);
+        }
         return;
     }
     else if (direction == 1 && step >= remaining)
