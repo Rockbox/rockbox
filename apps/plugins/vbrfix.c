@@ -150,7 +150,7 @@ static bool vbr_fix(const char *selected_file)
     xingupdate(0);
 
     rc = rb->mp3info(&entry, selected_file);
-    if(rc < 0) {
+    if(rc) {
         fileerror(rc);
         return true;
     }
@@ -258,6 +258,8 @@ static bool vbr_fix(const char *selected_file)
     }
     else
     {
+        rb->close(fd);
+
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
         rb->splash(HZ*2, ID2P(LANG_NOT_A_VBR_FILE));
