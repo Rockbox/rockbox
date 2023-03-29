@@ -28,7 +28,7 @@ rb.playlist_amount =            function()
                                     return rb.playlist("amount")
                                 end
 rb.playlist_add =               function (filename)
-                                    return rb.playlist("add", filename)
+                                    return rb.playlist("insert_track", filename, rb.PLAYLIST_INSERT_LAST, false, true)
                                 end
 rb.playlist_create =            function(dir, filename)
                                     return rb.playlist("create", dir, filename)

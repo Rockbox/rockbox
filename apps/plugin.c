@@ -692,7 +692,6 @@ static const struct plugin_api rockbox_api = {
     playlist_resume_track,
     playlist_set_modified,
     playlist_start,
-    playlist_add,
     playlist_sync,
     playlist_remove_all_tracks,
     playlist_create,

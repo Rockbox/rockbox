@@ -797,7 +797,6 @@ struct plugin_api {
     void (*playlist_set_modified)(struct playlist_info *playlist, bool modified);
     void (*playlist_start)(int start_index, unsigned long elapsed,
                            unsigned long offset);
-    int (*playlist_add)(const char *filename);
     void (*playlist_sync)(struct playlist_info* playlist);
     int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
     int (*playlist_create)(const char *dir, const char *file);

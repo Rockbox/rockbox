@@ -103,7 +103,6 @@ void playlist_init(void) INIT_ATTR;
 void playlist_shutdown(void);
 int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
-int playlist_add(const char *filename);
 int playlist_shuffle(int random_seed, int start_index);
 unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
                                          int index);

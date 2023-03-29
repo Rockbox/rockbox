@@ -317,13 +317,13 @@ RB_WRAP(splash_scroller)
 RB_WRAP(playlist)
 {
     /* just passes NULL to work with the current playlist */
-    enum e_playlist {PLAYL_AMOUNT = 0, PLAYL_ADD, PLAYL_CREATE,
+    enum e_playlist {PLAYL_AMOUNT = 0, PLAYL_CREATE,
                      PLAYL_START, PLAYL_RESUMETRACK, PLAYL_RESUME,
                      PLAYL_SHUFFLE, PLAYL_SYNC, PLAYL_REMOVEALLTRACKS,
                      PLAYL_INSERTTRACK, PLAYL_INSERTDIRECTORY, PLAYL_INSERTPLAYL,
                      PLAYL_ECOUNT};
 
-    const char *playlist_option[] = {"amount", "add", "create", "start", "resume_track",
+    const char *playlist_option[] = {"amount", "create", "start", "resume_track",
                                      "resume", "shuffle", "sync", "remove_all_tracks",
                                      "insert_track", "insert_directory", "insert_playlist", NULL};
 
@@ -338,10 +338,6 @@ RB_WRAP(playlist)
     {
         case PLAYL_AMOUNT:
             result = rb->playlist_amount();
-            break;
-        case PLAYL_ADD:
-            filename = luaL_checkstring(L, 2);
-            result = rb->playlist_add(filename);
             break;
         case PLAYL_CREATE:
             dir = luaL_checkstring(L, 2);

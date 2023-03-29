@@ -1207,6 +1207,8 @@ static int create_and_play_dir(int direction, bool play_last)
         if (global_settings.playlist_shuffle)
              playlist_shuffle(current_tick, -1);
 
+        playlist_set_modified(NULL, false);
+
         if (play_last && direction <= 0)
             index = current_playlist.amount - 1;
         else
@@ -2022,21 +2024,6 @@ void playlist_shutdown(void)
         pl_close_control(playlist);
 
     playlist_write_unlock(playlist);
-}
-
-/*
- * Add track to end of the playlist. Prefer playlist_insert_track(),
- * this is DEPRECATED and will be going away at some point.
- */
-int playlist_add(const char *filename)
-{
-    int ret = playlist_insert_track(NULL, filename, PLAYLIST_INSERT_LAST,
-                                    false, true);
-    if (ret < 0)
-        return ret;
-
-    playlist_set_modified(NULL, false);
-    return ret;
 }
 
 /* returns number of tracks in playlist (includes queued/inserted tracks) */
