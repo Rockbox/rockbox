@@ -4281,7 +4281,6 @@ static bool start_playback(bool return_to_WPS)
             start_index = rb->playlist_shuffle(*rb->current_tick, pf_tracks.sel);
     }
     rb->playlist_start(start_index, 0, 0);
-    rb->playlist_set_modified(NULL, false);
     old_shuffle = shuffle;
 #ifdef USEGSLIB
     if (!return_to_WPS)

@@ -31,10 +31,13 @@
                        started and contains all the commands done to it.
 
     The first non-comment line in a control file must begin with
-    "P:VERSION:DIR:FILE" where VERSION is the playlist control file version,
+    "P:VERSION:DIR:FILE" where VERSION is the playlist control file version
     DIR is the directory where the playlist is located and FILE is the
-    playlist filename.  For dirplay, FILE will be empty.  An empty playlist
-    will have both entries as null.
+    playlist filename (without the directory part).
+
+    When there is an on-disk playlist file, both DIR and FILE are nonempty.
+    Dynamically generated playlists (whether by the file browser, database,
+    or another means) have an empty FILE. For dirplay, DIR will be nonempty.
 
     Control file commands:
         a. Add track (A:<position>:<last position>:<path to track>)
@@ -130,9 +133,10 @@
  * v1 was the initial version when dynamic playlists were first implemented.
  * v2 was added shortly thereafter and has been used since 2003.
  * v3 added the (C)lear command and is otherwise identical to v2.
+ * v4 added the (F)lags command.
  */
 #define PLAYLIST_CONTROL_FILE_MIN_VERSION   2
-#define PLAYLIST_CONTROL_FILE_VERSION       3
+#define PLAYLIST_CONTROL_FILE_VERSION       4
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
 
@@ -431,6 +435,9 @@ static int update_control_unlocked(struct playlist_info* playlist,
     case PLAYLIST_COMMAND_CLEAR:
         result = write(fd, "C\n", 2);
         break;
+    case PLAYLIST_COMMAND_FLAGS:
+        result = fdprintf(fd, "F:%u:%u\n", i1, i2);
+        break;
     default:
         return -1;
     }
@@ -481,8 +488,7 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
 
     playlist->utf8 = true;
     playlist->control_created = false;
-    playlist->modified = false;
-    playlist->dirplay = true;
+    playlist->flags = 0;
 
     playlist->control_fd = -1;
 
@@ -499,6 +505,28 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
            playlist */
         create_control_unlocked(playlist);
     }
+}
+
+int update_playlist_flags_unlocked(struct playlist_info *playlist,
+                                   unsigned int setf, unsigned int clearf)
+{
+    unsigned int newflags = (playlist->flags & ~clearf) | setf;
+    if (newflags == playlist->flags)
+        return 0;
+
+    playlist->flags = newflags;
+
+    if (playlist->control_fd >= 0)
+    {
+        int res = update_control_unlocked(playlist, PLAYLIST_COMMAND_FLAGS,
+                                          setf, clearf, NULL, NULL, NULL);
+        if (res < 0)
+            return res;
+
+        sync_control_unlocked(playlist);
+    }
+
+    return 0;
 }
 
 /*
@@ -567,28 +595,21 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
 static void new_playlist_unlocked(struct playlist_info* playlist,
                                   const char *dir, const char *file)
 {
-    const char *fileused = file;
-    const char *dirused = dir;
-
     empty_playlist_unlocked(playlist, false);
 
-    if (!fileused)
-    {
-        fileused = "";
+    /* enable dirplay for the current playlist if there's a DIR but no FILE */
+    if (!file && dir && playlist == &current_playlist)
+        playlist->flags |= PLAYLIST_FLAG_DIRPLAY;
 
-        /* only the current playlist can use dirplay */
-        if (dirused && playlist == &current_playlist)
-            playlist->dirplay = true;
-        else
-            dirused = ""; /* empty playlist */
-    }
+    dir = dir ?: "";
+    file = file ?: "";
 
-    update_playlist_filename_unlocked(playlist, dirused, fileused);
+    update_playlist_filename_unlocked(playlist, dir, file);
 
     if (playlist->control_fd >= 0)
     {
         update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
-            PLAYLIST_CONTROL_FILE_VERSION, -1, dirused, fileused, NULL);
+                        PLAYLIST_CONTROL_FILE_VERSION, -1, dir, file, NULL);
         sync_control_unlocked(playlist);
     }
 }
@@ -711,7 +732,6 @@ static int recreate_control_unlocked(struct playlist_info* playlist)
     }
 
     playlist->seed = 0;
-    playlist->modified = true;
 
     for (i=0; i<playlist->amount; i++)
     {
@@ -1207,8 +1227,6 @@ static int create_and_play_dir(int direction, bool play_last)
         if (global_settings.playlist_shuffle)
              playlist_shuffle(current_tick, -1);
 
-        playlist_set_modified(NULL, false);
-
         if (play_last && direction <= 0)
             index = current_playlist.amount - 1;
         else
@@ -1248,7 +1266,6 @@ static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write
     playlist->first_index = 0;
     playlist->amount = 1;
     playlist->indices[0] |= PLAYLIST_QUEUED;
-    playlist->modified = true;
 
     if (playlist->last_insert_pos == 0)
         playlist->last_insert_pos = -1;
@@ -1423,7 +1440,6 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
     dc_init_filerefs(playlist, insert_position, 1);
 
     playlist->amount++;
-    playlist->modified = true;
 
     return insert_position;
 }
@@ -1466,7 +1482,6 @@ static int remove_track_unlocked(struct playlist_info* playlist,
     }
 
     playlist->amount--;
-    playlist->modified = true;
 
     /* update stored indices if needed */
     if (position < playlist->index)
@@ -1559,7 +1574,6 @@ static int randomise_playlist_unlocked(struct playlist_info* playlist,
     playlist->last_insert_pos = -1;
 
     playlist->seed = seed;
-    playlist->modified = true;
 
     if (write)
     {
@@ -1623,7 +1637,6 @@ static int sort_playlist_unlocked(struct playlist_info* playlist,
 
     /* indices have been moved so last insert position is no longer valid */
     playlist->last_insert_pos = -1;
-    playlist->modified = true;
 
     if (write && playlist->control_fd >= 0)
     {
@@ -2106,7 +2119,7 @@ bool playlist_check(int steps)
     struct playlist_info* playlist = &current_playlist;
 
     /* always allow folder navigation */
-    if (global_settings.next_folder && playlist->dirplay)
+    if (global_settings.next_folder && playlist_allow_dirplay(playlist))
         return true;
 
     int index = get_next_index(playlist, steps, -1);
@@ -2650,19 +2663,39 @@ bool playlist_modified(const struct playlist_info* playlist)
     if (!playlist)
         playlist = &current_playlist;
 
-    return playlist->modified;
+    return !!(playlist->flags & PLAYLIST_FLAG_MODIFIED);
 }
 
 /*
- * Set the playlist modified status. Useful for clearing the modified status
- * after dynamically building a playlist.
+ * Set the playlist modified status. Should be called to set the flag after
+ * an explicit user action that modifies the playlist. You should not clear
+ * the modified flag without properly warning the user.
  */
-void playlist_set_modified(struct playlist_info *playlist, bool modified)
+void playlist_set_modified(struct playlist_info* playlist, bool modified)
 {
     if (!playlist)
         playlist = &current_playlist;
 
-    playlist->modified = modified;
+    playlist_write_lock(playlist);
+
+    if (modified)
+        update_playlist_flags_unlocked(playlist, PLAYLIST_FLAG_MODIFIED, 0);
+    else
+        update_playlist_flags_unlocked(playlist, 0, PLAYLIST_FLAG_MODIFIED);
+
+    playlist_write_unlock(playlist);
+}
+
+/* returns true if directory playback features should be enabled */
+bool playlist_allow_dirplay(const struct playlist_info *playlist)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (playlist_modified(playlist))
+        return false;
+
+    return !!(playlist->flags & PLAYLIST_FLAG_DIRPLAY);
 }
 
 /*
@@ -2875,7 +2908,7 @@ int playlist_next(int steps)
             playlist->index = 0;
             index = 0;
         }
-        else if (playlist->dirplay && global_settings.next_folder)
+        else if (global_settings.next_folder && playlist_allow_dirplay(playlist))
         {
             /* we switch playlists here */
             index = create_and_play_dir(steps, true);
@@ -2926,8 +2959,8 @@ out:
 bool playlist_next_dir(int direction)
 {
     /* not to mess up real playlists */
-    if(!current_playlist.dirplay)
-       return false;
+    if (!playlist_allow_dirplay(&current_playlist))
+        return false;
 
     return create_and_play_dir(direction, false) >= 0;
 }
@@ -3184,7 +3217,7 @@ int playlist_resume(void)
                         }
                         else if (str2[0] != '\0')
                         {
-                            playlist->dirplay = true;
+                            playlist->flags |= PLAYLIST_FLAG_DIRPLAY;
                         }
 
                         /* load the rest of the data */
@@ -3314,6 +3347,14 @@ int playlist_resume(void)
                         }
                         break;
                     }
+                    case PLAYLIST_COMMAND_FLAGS:
+                    {
+                        unsigned int setf = atoi(str1);
+                        unsigned int clearf = atoi(str2);
+
+                        playlist->flags = (playlist->flags & ~clearf) | setf;
+                        break;
+                    }
                     case PLAYLIST_COMMAND_COMMENT:
                     default:
                         break;
@@ -3363,6 +3404,9 @@ int playlist_resume(void)
                         break;
                     case 'C':
                         current_command = PLAYLIST_COMMAND_CLEAR;
+                        break;
+                    case 'F':
+                        current_command = PLAYLIST_COMMAND_FLAGS;
                         break;
                     case '#':
                         current_command = PLAYLIST_COMMAND_COMMENT;
@@ -3462,7 +3506,6 @@ int playlist_resume(void)
     }
 
 out:
-    playlist_set_modified(playlist, false);
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
@@ -3663,7 +3706,6 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     if (fd >= 0)
         close(fd);
 
-    playlist->modified = false;
     cpu_boost(false);
 
     return result;
@@ -3722,7 +3764,6 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.amount = playlist->amount;
     current_playlist.last_insert_pos = playlist->last_insert_pos;
     current_playlist.seed = playlist->seed;
-    current_playlist.modified = playlist->modified;
 
     result = 0;
 

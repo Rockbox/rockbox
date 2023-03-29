@@ -1106,7 +1106,6 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
                 if (global_settings.playlist_shuffle)
                     playlist_shuffle(seed, -1);
 
-                playlist_set_modified(NULL, false);
                 playlist_start(index, elapsed, offset);
                 started = true;
             }
@@ -1159,7 +1158,6 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
                     return false;
             }
 
-            playlist_set_modified(NULL, false);
             playlist_start(index, elapsed, offset);
             started = true;
         }

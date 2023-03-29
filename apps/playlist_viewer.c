@@ -802,15 +802,23 @@ static bool update_viewer_with_changes(struct gui_synclist *playlist_lists, enum
     if (res == PV_ONPLAY_CHANGED ||
         res == PV_ONPLAY_ITEM_REMOVED)
     {
+        if (!viewer.playlist)
+            playlist_set_modified(NULL, true);
+
         if (res == PV_ONPLAY_ITEM_REMOVED)
             gui_synclist_del_item(playlist_lists);
+
         update_playlist(true);
+
         if (viewer.num_tracks <= 0)
             exit = true;
+
         if (viewer.selected_track >= viewer.num_tracks)
             viewer.selected_track = viewer.num_tracks-1;
+
         dirty = true;
     }
+
     /* the show_icons option in the playlist viewer settings
      * menu might have changed */
     update_lists(playlist_lists);
@@ -947,6 +955,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                          splashf(HZ, (unsigned char *)"%s %s", str(LANG_MOVE),
                                                                str(LANG_FAILED));
                     }
+
+                    if (!viewer.playlist)
+                        playlist_set_modified(NULL, true);
+
                     update_playlist(true);
                     viewer.moving_track = -1;
                     viewer.moving_playlist_index = -1;
@@ -976,7 +988,6 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                     if (global_settings.playlist_shuffle)
                         start_index = playlist_shuffle(current_tick, start_index);
                     playlist_start(start_index, 0, 0);
-                    playlist_set_modified(NULL, false);
 
                     if (viewer.initial_selection)
                         *(viewer.initial_selection) = viewer.selected_track;
