@@ -761,8 +761,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, size_t buflen)
 {
     ssize_t nread;
-    unsigned int i = 0;
-    unsigned int count = 0;
+    unsigned int i, count = 0;
     bool store_index;
     unsigned char *p;
     int result = 0;
@@ -772,18 +771,18 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
     playlist_write_lock(playlist);
 
-    /* Open playlist file for reading */
+    /* Close and re-open the playlist to ensure we are properly
+     * positioned at the start of the file after any UTF-8 BOM. */
+    pl_close_playlist(playlist);
     if (pl_open_playlist(playlist) < 0)
     {
         result = -1;
         goto exit;
     }
 
-    /* seek to the beginning of the file get_filename leaves it elsewhere */
-    i = lseek(playlist->fd, playlist->utf8 ? BOM_UTF_8_SIZE : 0, SEEK_SET);
+    i = lseek(playlist->fd, 0, SEEK_CUR);
 
     splash(0, ID2P(LANG_WAIT));
-
     store_index = true;
 
     while(1)
