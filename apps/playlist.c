@@ -111,6 +111,7 @@
 #include "dircache.h"
 #endif
 #include "logf.h"
+#include "panic.h"
 
 #if 0//def ROCKBOX_HAS_LOGDISKF
 #undef DEBUGF
@@ -676,101 +677,6 @@ static void display_playlist_count(int count, const unsigned char *fmt,
     }
 
     splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT));
-}
-
-/*
- * recreate the control file based on current playlist entries
- */
-static int recreate_control_unlocked(struct playlist_info* playlist)
-{
-    const char file_suffix[] = "_temp\0";
-    char temp_file[MAX_PATH + sizeof(file_suffix)];
-    int  temp_fd = -1;
-    int  i;
-    int  result = 0;
-
-    temp_file[0] = 0;
-
-    if(playlist->control_fd >= 0)
-    {
-        char* dir = playlist->filename;
-        char* file = playlist->filename+playlist->dirlen;
-        char c = playlist->filename[playlist->dirlen-1];
-
-        pl_close_control(playlist);
-
-        snprintf(temp_file, sizeof(temp_file), "%s%s",
-            playlist->control_filename, file_suffix);
-
-        if (rename(playlist->control_filename, temp_file) < 0)
-            return -1;
-
-        temp_fd = open(temp_file, O_RDONLY);
-        if (temp_fd < 0)
-            return -1;
-
-        playlist->control_fd = open(playlist->control_filename,
-            O_CREAT|O_RDWR|O_TRUNC, 0666);
-        if (playlist->control_fd < 0)
-        {
-            close(temp_fd);
-            return -1;
-        }
-
-        playlist->filename[playlist->dirlen-1] = '\0';
-
-        update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
-                        PLAYLIST_CONTROL_FILE_VERSION, -1, dir, file, NULL);
-
-        playlist->filename[playlist->dirlen-1] = c;
-
-        if (result < 0)
-        {
-            close(temp_fd);
-            return result;
-        }
-    }
-
-    playlist->seed = 0;
-
-    for (i=0; i<playlist->amount; i++)
-    {
-        if (playlist->indices[i] & PLAYLIST_INSERT_TYPE_MASK)
-        {
-            bool queue = playlist->indices[i] & PLAYLIST_QUEUED;
-            char inserted_file[MAX_PATH+1];
-
-            lseek(temp_fd, playlist->indices[i] & PLAYLIST_SEEK_MASK,
-                SEEK_SET);
-            read_line(temp_fd, inserted_file, sizeof(inserted_file));
-
-            result = fdprintf(playlist->control_fd, "%c:%d:%d:",
-                queue?'Q':'A', i, playlist->last_insert_pos);
-            if (result > 0)
-            {
-                /* save the position in file where name is written */
-                int seek_pos = lseek(playlist->control_fd, 0, SEEK_CUR);
-
-                result = fdprintf(playlist->control_fd, "%s\n",
-                    inserted_file);
-
-                playlist->indices[i] =
-                    (playlist->indices[i] & ~PLAYLIST_SEEK_MASK) | seek_pos;
-            }
-
-            if (result < 0)
-                break;
-        }
-    }
-
-    close(temp_fd);
-    remove(temp_file);
-    fsync(playlist->control_fd);
-
-    if (result < 0)
-        return result;
-
-    return 0;
 }
 
 /*
@@ -3560,173 +3466,6 @@ void playlist_resume_track(int start_index, unsigned int crc,
     playlist_start(0, 0, 0);
 }
 
-/* save the current dynamic playlist to specified file. The
- * temp_buffer (if not NULL) is used as a scratchpad when loading indices
- * (slow if not used). */
-int playlist_save(struct playlist_info* playlist, char *filename,
-                       void* temp_buffer, size_t temp_buffer_size)
-{
-    int fd;
-    int i, index;
-    int count = 0;
-    char path[MAX_PATH+1];
-    char tmp_buf[MAX_PATH+1];
-    int result = 0;
-    int *seek_buf;
-    bool reparse;
-    ssize_t pathlen;
-
-    ALIGN_BUFFER(temp_buffer, temp_buffer_size, sizeof(int));
-    seek_buf = temp_buffer;
-
-    /* without temp_buffer, or when it's depleted, and we overwrite the current
-     * playlist then the newly saved playlist has to be reparsed. With
-     * sufficient temp_buffer the indicies be remembered and added without
-     * reparsing */
-    reparse = temp_buffer_size == 0;
-
-    if (!playlist)
-        playlist = &current_playlist;
-
-    if (playlist->amount <= 0)
-        return -1;
-
-    /* use current working directory as base for pathname */
-    pathlen = format_track_path(path, filename, sizeof(path), PATH_ROOTSTR);
-    if (pathlen < 0)
-        return -1;
-
-    /* Use temporary pathname and overwrite/rename later */
-    if (strlcat(path, "_temp", sizeof(path)) >= sizeof (path))
-        return -1;
-
-    if (is_m3u8_name(path))
-    {
-        fd = open_utf8(path, O_CREAT|O_WRONLY|O_TRUNC);
-    }
-    else
-    {
-        /* some applications require a BOM to read the file properly */
-        fd = open(path, O_CREAT|O_WRONLY|O_TRUNC, 0666);
-    }
-
-    if (fd < 0)
-    {
-        notify_access_error();
-        return -1;
-    }
-
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
-
-    cpu_boost(true);
-
-    index = playlist->first_index;
-    for (i=0; i<playlist->amount; i++)
-    {
-        /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            result = -1;
-            break;
-        }
-
-        /* Don't save queued files */
-        if (!(playlist->indices[index] & PLAYLIST_QUEUED))
-        {
-            if (get_track_filename(playlist, index, tmp_buf, sizeof(tmp_buf)))
-            {
-                result = -1;
-                break;
-            }
-
-            if (!reparse)
-                seek_buf[count] = filesize(fd);
-
-            if (fdprintf(fd, "%s\n", tmp_buf) < 0)
-            {
-                notify_access_error();
-                result = -1;
-                break;
-            }
-
-            count++;
-            /* when our temp buffer is depleted we have to fall
-             * back to reparsing the playlist (slow) */
-            if (count*sizeof(int) >= temp_buffer_size)
-                reparse = true;
-
-            if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
-                display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT),
-                                       false);
-
-            yield();
-        }
-
-        index = (index+1)%playlist->amount;
-    }
-
-    close(fd);
-    fd = -1;
-
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
-
-    if (result >= 0)
-    {
-        strmemcpy(tmp_buf, path, pathlen); /* remove "_temp" */
-
-        dc_thread_stop(playlist);
-        playlist_write_lock(playlist);
-
-        if (!rename(path, tmp_buf))
-        {
-            fd = open_utf8(tmp_buf, O_RDONLY);
-            if (fd >= 0 && fsamefile(fd, playlist->fd) > 0)
-            {
-                /* Replace the current playlist with the new one and update
-                   indices */
-                close(playlist->fd);
-                playlist->fd = fd;
-                fd = -1;
-
-                if (!reparse)
-                {
-                    index = playlist->first_index;
-                    for (i=0, count=0; i<playlist->amount; i++)
-                    {
-                        if (!(playlist->indices[index] & PLAYLIST_QUEUED))
-                        {
-                            playlist->indices[index] = seek_buf[count];
-                            count++;
-                        }
-                        index = (index+1)%playlist->amount;
-                    }
-                }
-                else
-                {
-                    NOTEF("reparsing current playlist (slow)");
-                    playlist->amount = 0;
-                    add_indices_to_playlist(playlist, temp_buffer,
-                                            temp_buffer_size);
-                }
-
-                /* we need to recreate control because inserted tracks are
-                   now part of the playlist and shuffle has been invalidated */
-                result = recreate_control_unlocked(playlist);
-            }
-        }
-
-        playlist_write_unlock(playlist);
-        dc_thread_start(playlist, true);
-    }
-
-    if (fd >= 0)
-        close(fd);
-
-    cpu_boost(false);
-
-    return result;
-}
-
 /*
  * Set the specified playlist as the current.
  * NOTE: You will get undefined behaviour if something is already playing so
@@ -3937,4 +3676,292 @@ int playlist_update_resume_info(const struct mp3entry* id3)
     }
 
     return 0;
+}
+
+static int pl_get_tempname(const char *filename, char *buf, size_t bufsz)
+{
+    if (strlcpy(buf, filename, bufsz) >= bufsz)
+        return -1;
+
+    if (strlcat(buf, "_temp", bufsz) >= bufsz)
+        return -1;
+
+    return 0;
+}
+
+/*
+ * Save all non-queued tracks to an M3U playlist with the given filename.
+ * On success, the playlist is updated to point to the new playlist file.
+ * On failure, the playlist filename is unchanged, but playlist indices
+ * may be trashed; the current playlist should be reloaded.
+ *
+ * Returns 0 on success, < 0 on error, and > 0 if user canceled.
+ */
+static int pl_save_playlist(struct playlist_info* playlist,
+                            const char *filename,
+                            char *tmpbuf, size_t tmpsize)
+{
+    int fd, index, num_saved;
+    off_t offset;
+    int ret, err;
+
+    if (pl_get_tempname(filename, tmpbuf, tmpsize))
+        return -1;
+
+    /*
+     * We always save playlists as UTF-8. Add a BOM only when
+     * saving to the .m3u file extension.
+     */
+    if (is_m3u8_name(filename))
+        fd = open(tmpbuf, O_CREAT|O_WRONLY|O_TRUNC, 0666);
+    else
+        fd = open_utf8(tmpbuf, O_CREAT|O_WRONLY|O_TRUNC);
+
+    if (fd < 0)
+        return -1;
+
+    offset = lseek(fd, 0, SEEK_CUR);
+    index = playlist->first_index;
+    num_saved = 0;
+
+    display_playlist_count(num_saved, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
+
+    for (int i = 0; i < playlist->amount; ++i, ++index)
+    {
+        if (index == playlist->amount)
+            index = 0;
+
+        /* TODO: Disabled for now, as we can't restore the playlist state yet */
+        if (false && action_userabort(TIMEOUT_NOBLOCK))
+        {
+            err = 1;
+            goto error;
+        }
+
+        /* Do not save queued files to playlist. */
+        if (playlist->indices[index] & PLAYLIST_QUEUED)
+            continue;
+
+        if (get_track_filename(playlist, index, tmpbuf, tmpsize))
+        {
+            err = -2;
+            goto error;
+        }
+
+        /* Update seek offset so it points into the new file. */
+        playlist->indices[index] &= ~PLAYLIST_INSERT_TYPE_MASK;
+        playlist->indices[index] &= ~PLAYLIST_SEEK_MASK;
+        playlist->indices[index] |= offset;
+
+        ret = fdprintf(fd, "%s\n", tmpbuf);
+        if (ret < 0)
+        {
+            err = -3;
+            goto error;
+        }
+
+        offset += ret;
+        num_saved++;
+
+        if ((num_saved % PLAYLIST_DISPLAY_COUNT) == 0)
+            display_playlist_count(num_saved, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
+    }
+
+    display_playlist_count(num_saved, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
+    close(fd);
+    pl_close_playlist(playlist);
+
+    pl_get_tempname(filename, tmpbuf, tmpsize);
+    if (rename(tmpbuf, filename))
+        return -4;
+
+    strcpy(tmpbuf, filename);
+    char *dir = tmpbuf;
+    char *file = strrchr(tmpbuf, '/') + 1;
+    file[-1] = '\0';
+
+    update_playlist_filename_unlocked(playlist, dir, file);
+    return 0;
+
+error:
+    close(fd);
+    pl_get_tempname(filename, tmpbuf, tmpsize);
+    remove(tmpbuf);
+    return err;
+}
+
+/*
+ * Update the control file after saving the playlist under a new name.
+ * A new control file is generated, containing the new playlist filename.
+ * Queued tracks are copied to the new control file.
+ *
+ * On success, the new control file replaces the old control file.
+ * On failure, indices may be trashed and the playlist should be
+ * reloaded. This may not be possible if the playlist was overwritten.
+ */
+static int pl_save_update_control(struct playlist_info* playlist,
+                                  char *tmpbuf, size_t tmpsize)
+{
+    int old_fd, index;
+    int err;
+    char c;
+    bool any_queued = false;
+
+    /* Nothing to update if we don't have any control file */
+    if (!playlist->control_created)
+        return 0;
+
+    if (pl_get_tempname(playlist->control_filename, tmpbuf, tmpsize))
+        return -1;
+
+    /* Close the existing control file, reopen it as read-only */
+    pl_close_control(playlist);
+    old_fd = open(playlist->control_filename, O_RDONLY);
+    if (old_fd < 0)
+        return -2;
+
+    /* Create new control file, pointing it at a tempfile */
+    playlist->control_fd = open(tmpbuf, O_CREAT|O_RDWR|O_TRUNC, 0666);
+    if (playlist->control_fd < 0)
+    {
+        close(old_fd);
+        return -3;
+    }
+
+    /* Write out playlist filename */
+    c = playlist->filename[playlist->dirlen-1];
+    playlist->filename[playlist->dirlen-1] = '\0';
+
+    err = update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
+                                  PLAYLIST_CONTROL_FILE_VERSION, -1,
+                                  playlist->filename,
+                                  &playlist->filename[playlist->dirlen], NULL);
+
+    playlist->filename[playlist->dirlen-1] = c;
+
+    if (err <= 0)
+        return -4;
+
+    index = playlist->first_index;
+    for (int i = 0; i < playlist->amount; ++i, ++index)
+    {
+        if (index == playlist->amount)
+            index = 0;
+
+        /* We only need to update queued files */
+        if (!(playlist->indices[index] & PLAYLIST_QUEUED))
+            continue;
+
+        /* Read filename from old control file */
+        lseek(old_fd, playlist->indices[index] & PLAYLIST_SEEK_MASK, SEEK_SET);
+        read_line(old_fd, tmpbuf, tmpsize);
+
+        /* Write it out to the new control file */
+        int seekpos;
+        err = update_control_unlocked(playlist, PLAYLIST_COMMAND_QUEUE,
+                                      i, playlist->last_insert_pos,
+                                      tmpbuf, NULL, &seekpos);
+        if (err <= 0)
+            return -5;
+
+        /* Update seek offset for the new control file. */
+        playlist->indices[index] &= ~PLAYLIST_SEEK_MASK;
+        playlist->indices[index] |= seekpos;
+        any_queued = true;
+    }
+
+    /* Preserve modified state */
+    if (playlist_modified(playlist))
+    {
+        if (any_queued)
+        {
+            err = update_control_unlocked(playlist, PLAYLIST_COMMAND_FLAGS,
+                                          PLAYLIST_FLAG_MODIFIED, 0, NULL, NULL, NULL);
+            if (err <= 0)
+                return -6;
+        }
+        else
+        {
+            playlist->flags &= ~PLAYLIST_FLAG_MODIFIED;
+        }
+    }
+
+    /* Clear dirplay flag, since we now point at a playlist */
+    playlist->flags &= ~PLAYLIST_FLAG_DIRPLAY;
+
+    /* Reset shuffle seed */
+    playlist->seed = 0;
+
+    pl_close_control(playlist);
+    close(old_fd);
+    remove(playlist->control_filename);
+
+    /* TODO: Check for errors? The old control file is gone by this point... */
+    pl_get_tempname(playlist->control_filename, tmpbuf, tmpsize);
+    rename(tmpbuf, playlist->control_filename);
+
+    playlist->control_fd = open(playlist->control_filename, O_RDWR);
+    playlist->control_created = (playlist->control_fd >= 0);
+    return 0;
+}
+
+int playlist_save(struct playlist_info* playlist, char *filename)
+{
+    char save_path[MAX_PATH+1];
+    char tmpbuf[MAX_PATH+1];
+    ssize_t pathlen;
+    int rc = 0;
+
+    if (!playlist)
+        playlist = &current_playlist;
+
+    pathlen = format_track_path(save_path, filename, sizeof(save_path), PATH_ROOTSTR);
+    if (pathlen < 0)
+        return -1;
+
+    cpu_boost(true);
+    dc_thread_stop(playlist);
+    playlist_write_lock(playlist);
+
+    if (playlist->amount <= 0)
+    {
+        rc = -1;
+        goto error;
+    }
+
+    rc = pl_save_playlist(playlist, save_path, tmpbuf, sizeof(tmpbuf));
+    if (rc < 0)
+    {
+        // TODO: If we fail here, we just need to reparse the old playlist file
+        panicf("Failed to save playlist: %d", rc);
+        goto error;
+    }
+
+    /* User cancelled? */
+    if (rc > 0)
+        goto error;
+
+    rc = pl_save_update_control(playlist, tmpbuf, sizeof(tmpbuf));
+    if (rc)
+    {
+        // TODO: If we fail here, then there are two possibilities depending on
+        // whether we overwrote the old playlist file:
+        //
+        // - if it still exists, we could reparse it + old control file
+        // - otherwise, we need to selectively reload the old control file
+        //   and somehow make use of the new playlist file
+        //
+        // The latter case poses other issues though, like what happens after we
+        // resume, because replaying the old control file over the new playlist
+        // won't work properly. We could simply choose to reset the control file,
+        // seeing as by this point it only contains transient data (queued tracks).
+        panicf("Failed to update control file: %d", rc);
+        goto error;
+    }
+
+error:
+    playlist_write_unlock(playlist);
+    dc_thread_start(playlist, true);
+    cpu_boost(false);
+    return rc;
 }

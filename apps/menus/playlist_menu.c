@@ -83,7 +83,7 @@ int save_playlist_screen(struct playlist_info* playlist)
                                        playlist ? playlist->filename :
                                        playlist_get_current()->filename))
     {
-        playlist_save(playlist, temp, NULL, 0);
+        playlist_save(playlist, temp);
 
         /* reload in case playlist was saved to cwd */
         reload_directory();

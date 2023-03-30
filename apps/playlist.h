@@ -177,8 +177,7 @@ size_t playlist_get_required_bufsz(struct playlist_info* playlist,
                                    bool include_namebuf, int num_indices);
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
-int playlist_save(struct playlist_info* playlist, char *filename,
-                  void* temp_buffer, size_t temp_buffer_size);
+int playlist_save(struct playlist_info* playlist, char *filename);
 int playlist_directory_tracksearch(const char* dirname, bool recurse,
                                    int (*callback)(char*, void*),
                                    void* context);
