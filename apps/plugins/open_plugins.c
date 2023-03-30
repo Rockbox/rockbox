@@ -101,7 +101,7 @@ static bool op_entry_read(int fd, int selected_item, off_t data_sz)
 {
     rb->memset(&op_entry, 0, op_entry_sz);
     op_entry.lang_id = -1;
-    return ((selected_item >= 0) &&
+    return ((selected_item >= 0) && (fd >= 0) &&
         (rb->lseek(fd, selected_item  * op_entry_sz, SEEK_SET) >= 0) &&
         (rb->read(fd, &op_entry, data_sz) == data_sz) && op_entry_checksum() > 0);
 }
@@ -196,7 +196,7 @@ static int op_entry_set_path(void)
 
     struct browse_context browse = {
         .dirfilter = SHOW_ALL,
-        .flags = BROWSE_SELECTONLY,
+        .flags = BROWSE_SELECTONLY | BROWSE_DIRFILTER,
         .title = rb->str(LANG_ADD),
         .icon = Icon_Plugin,
         .root = op_entry.path,
@@ -225,7 +225,7 @@ static int op_entry_set_param_path(void)
 
     struct browse_context browse = {
         .dirfilter = SHOW_ALL,
-        .flags = BROWSE_SELECTONLY,
+        .flags = BROWSE_SELECTONLY | BROWSE_DIRFILTER,
         .title = rb->str(LANG_PARAMETER),
         .icon = Icon_Plugin,
         .root = tmp_buf,
@@ -412,6 +412,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
     {
         rb->close(fd_tmp);
         rb->close(fd_dat);
+        fd_dat = -1;
         rb->remove(OPEN_PLUGIN_DAT);
         rb->rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
     }
@@ -468,7 +469,7 @@ static void op_entry_remove(int selection)
 static void op_entry_remove_empty(void)
 {
     bool resave = false;
-    if (fd_dat && rb->lseek(fd_dat, 0, SEEK_SET) == 0)
+    if (fd_dat >= 0 && rb->lseek(fd_dat, 0, SEEK_SET) == 0)
     {
         while (resave == false &&
                rb->read(fd_dat, &op_entry, op_entry_sz) == op_entry_sz)
@@ -489,6 +490,7 @@ static void op_entry_remove_empty(void)
         {
             rb->close(fd_tmp);
             rb->close(fd_dat);
+            fd_dat = -1;
             rb->remove(OPEN_PLUGIN_DAT);
             rb->rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
         }

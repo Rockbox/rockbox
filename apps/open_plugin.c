@@ -304,12 +304,8 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
         op_update_dat(op_entry, true);
     }
 
-    if (plugin)
+    while (plugin)
     {
-        op_entry->hash     = hash;
-        op_entry->lang_id  = lang_id;
-        op_entry->checksum = open_plugin_csum +
-            (lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
         /* name */
         if (path_basename(plugin, (const char **)&pos) == 0)
             pos = "\0";
@@ -323,28 +319,33 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
             if(!parameter)
                 parameter = "";
             strmemccpy(op_entry->param, parameter, OPEN_PLUGIN_BUFSZ);
-            goto retnhash;
         }
         else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
         {
+            /* get the entry from the opx file */
             op_load_entry(0, OPEN_PLUGIN_LANG_IGNORE, op_entry, plugin);
-            goto retnhash;
         }
+        else
+        {
+            break;
+        }
+        op_entry->hash     = hash;
+        op_entry->lang_id  = lang_id;
+        op_entry->checksum = open_plugin_csum +
+            (lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
+        logf("OP add_path name: %s %s %s",
+             op_entry->name, op_entry->path, op_entry->param);
+        return hash;
     }
 
     logf("OP add_path Invalid, *Clearing entry*");
     if (lang_id != LANG_SHORTCUTS) /* from shortcuts menu */
         splashf(HZ * 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
     op_clear_entry(op_entry);
-    hash = 0;
-
-retnhash:
-    logf("OP add_path name: %s %s %s",
-         op_entry->name, op_entry->path, op_entry->param);
-    return hash;
+    return 0;
 }
 
-/* only displays directories and .rock files */
+/* only displays directories, .rock, and .opx files */
 static bool callback_show_item(char *name, int attr, struct tree_context *tc)
 {
     (void)name;
@@ -355,6 +356,10 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
         tc->browse = NULL; /* exit immediately */
     }
     else if(attr & FILE_ATTR_ROCK)
+    {
+        return true;
+    }
+    else if(attr & FILE_ATTR_OPX)
     {
         return true;
     }
@@ -375,7 +380,7 @@ void open_plugin_browse(const char *key)
     struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
 
     logf("OP browse key: %s name: %s",
-        (key ? P2STR((unsigned char *)key):"No Key"), open_plugin_entry.name);
+        (key ? P2STR((unsigned char *)key):"No Key"), op_entry->name);
     logf("OP browse %s %s", op_entry->path, op_entry->param);
 
     if (op_entry->path[0] == '\0' || !file_exists(op_entry->path))
@@ -399,7 +404,7 @@ void open_plugin_browse(const char *key)
 /* open_plugin_load_entry()
 * recall of the plugin path and parameters based on supplied key
 * returns the index in OPEN_PLUGIN_DAT where the entry was found (>= 0)
-* if the entry was found but has not been saved returns OPEN_PLUGIN_NEEDS_FLUSHED 
+* if the entry was found but has not been saved returns OPEN_PLUGIN_NEEDS_FLUSHED
 * otherwise returns OPEN_PLUGIN_NOT_FOUND (< 0) if key was not found
 */
 int open_plugin_load_entry(const char *key)
