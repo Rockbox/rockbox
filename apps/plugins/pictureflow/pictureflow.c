@@ -2072,8 +2072,6 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                     int buflen)
 {
     bool ret;
-    if (slide_index == -1)
-        rb->strlcpy(buf, EMPTY_SLIDE, buflen);
 
     if (tcs.valid || !rb->tagcache_search(&tcs, tag_filename))
         return false;
@@ -3162,7 +3160,7 @@ static inline void set_current_slide(const int slide_index)
 }
 
 
-static void interrupt_cover_out_animation(void);
+static void skip_animation_to_idle_state(void);
 static bool sort_albums(int new_sorting, bool from_settings)
 {
     int i, album_idx, artist_idx;
@@ -3196,7 +3194,7 @@ static bool sort_albums(int new_sorting, bool from_settings)
     if (pf_state == pf_show_tracks ||
         pf_state == pf_cover_in ||
         pf_state == pf_cover_out)
-        interrupt_cover_out_animation();
+        skip_animation_to_idle_state();
     else if (pf_state == pf_scrolling)
         set_current_slide(target);
     pf_state = pf_idle;
@@ -3256,6 +3254,8 @@ static void start_animation(void)
     pf_state = pf_scrolling;
 }
 
+static void update_scroll_animation(void);
+
 /**
   Go to the previous slide
  */
@@ -3269,6 +3269,8 @@ static void show_previous_slide(void)
     } else if ( step > 0 ) {
         target = center_index;
         step = (target <= center_slide.slide_index) ? -1 : 1;
+        if (step < 0)
+            update_scroll_animation();
     } else {
         target = fmax(0, center_index - 2);
     }
@@ -3288,6 +3290,8 @@ static void show_next_slide(void)
     } else if ( step < 0 ) {
         target = center_index;
         step = (target < center_slide.slide_index) ? -1 : 1;
+        if (step > 0)
+            update_scroll_animation();
     } else {
         target = fmin(center_index + 2, number_of_slides - 1);
     }
@@ -3473,7 +3477,7 @@ static void cleanup(void)
 #endif
 }
 
-static void interrupt_cover_in_animation(void);
+static void skip_animation_to_show_tracks(void);
 static void adjust_album_display_for_setting(int old_val, int new_val)
 {
     if (old_val == new_val)
@@ -3484,7 +3488,7 @@ static void adjust_album_display_for_setting(int old_val, int new_val)
     reset_slides();
 
     if (pf_state == pf_show_tracks)
-        interrupt_cover_in_animation();
+        skip_animation_to_show_tracks();
 }
 
 /**
@@ -3706,21 +3710,33 @@ static int main_menu(void)
     }
 }
 
+#define ZOOMIN_FRAME_COUNT  19
+#define ZOOMIN_FRAME_DIST   -5
+#define ZOOMIN_FRAME_ANGLE  1
+#define ZOOMIN_FRAME_FADE   13
+
+#define ROTATE_FRAME_COUNT  15
+#define ROTATE_FRAME_ANGLE  16
+
+#define KEYFRAME_COUNT ZOOMIN_FRAME_COUNT + ROTATE_FRAME_COUNT
+
 /**
    Animation step for zooming into the current cover
  */
 static void update_cover_in_animation(void)
 {
     cover_animation_keyframe++;
-    if( cover_animation_keyframe < 20 ) {
-        center_slide.distance-=5;
-        center_slide.angle+=1;
-        extra_fade += 13;
+
+    if(cover_animation_keyframe <= ZOOMIN_FRAME_COUNT)
+    {
+        center_slide.distance += ZOOMIN_FRAME_DIST;
+        center_slide.angle +=    ZOOMIN_FRAME_ANGLE;
+        extra_fade +=            ZOOMIN_FRAME_FADE;
     }
-    else if( cover_animation_keyframe < 35 ) {
-        center_slide.angle+=16;
-    }
-    else {
+    else if(cover_animation_keyframe <= KEYFRAME_COUNT)
+        center_slide.angle += ROTATE_FRAME_ANGLE;
+    else
+    {
         cover_animation_keyframe = 0;
         pf_state = pf_show_tracks;
     }
@@ -3732,36 +3748,40 @@ static void update_cover_in_animation(void)
 static void update_cover_out_animation(void)
 {
     cover_animation_keyframe++;
-    if( cover_animation_keyframe <= 15 ) {
-        center_slide.angle-=16;
+
+    if(cover_animation_keyframe <= ROTATE_FRAME_COUNT)
+        center_slide.angle -= ROTATE_FRAME_ANGLE;
+    else if(cover_animation_keyframe <= KEYFRAME_COUNT)
+    {
+        center_slide.distance -= ZOOMIN_FRAME_DIST;
+        center_slide.angle -=    ZOOMIN_FRAME_ANGLE;
+        extra_fade -=            ZOOMIN_FRAME_FADE;
     }
-    else if( cover_animation_keyframe < 35 ) {
-        center_slide.distance+=5;
-        center_slide.angle-=1;
-        extra_fade -= 13;
-    }
-    else {
+    else
+    {
         cover_animation_keyframe = 0;
         pf_state = pf_idle;
     }
 }
 
 /**
-   Skip steps for zooming into the current cover
+   Immediately show tracks and skip any animation frames
 */
-static void interrupt_cover_in_animation(void)
+static void skip_animation_to_show_tracks(void)
 {
     pf_state = pf_show_tracks;
     cover_animation_keyframe = 0;
-    extra_fade = 13 * 19;
-    center_slide.distance = -5 * 19;
-    center_slide.angle = 19 + (15 * 16);
+
+    extra_fade =            ZOOMIN_FRAME_COUNT * ZOOMIN_FRAME_FADE;
+    center_slide.distance = ZOOMIN_FRAME_COUNT * ZOOMIN_FRAME_DIST;
+    center_slide.angle   = (ZOOMIN_FRAME_COUNT * ZOOMIN_FRAME_ANGLE) +
+                           (ROTATE_FRAME_COUNT * ROTATE_FRAME_ANGLE);
 }
 
 /**
-   Skip steps for zooming out the current cover
+   Immediately transition to idle state and skip any animation frames
 */
-static void interrupt_cover_out_animation(void)
+static void skip_animation_to_idle_state(void)
 {
     pf_state = pf_idle;
     cover_animation_keyframe = 0;
@@ -3770,21 +3790,12 @@ static void interrupt_cover_out_animation(void)
 }
 
 /**
-  Stop zooming out the current cover and start zooming in
+  Change direction during cover in/out animation
 */
-static void revert_cover_out_animation(void)
+static void reverse_animation(void)
 {
-    pf_state = pf_cover_in;
-    cover_animation_keyframe = 34 - cover_animation_keyframe;
-}
-
-/**
-  Stop zooming into the current cover and start zooming out
-*/
-static void revert_cover_in_animation(void)
-{
-    pf_state = pf_cover_out;
-    cover_animation_keyframe = 34 - cover_animation_keyframe;
+    pf_state = pf_state == pf_cover_out ? pf_cover_in : pf_cover_out;
+    cover_animation_keyframe = KEYFRAME_COUNT - cover_animation_keyframe;
 }
 
 /**
@@ -3967,7 +3978,7 @@ static void select_next_album(void)
         free_borrowed_tracks();
         target = center_index + 1;
         set_current_slide(target);
-        interrupt_cover_in_animation();
+        skip_animation_to_show_tracks();
     }
 }
 
@@ -3977,7 +3988,7 @@ static void select_prev_album(void)
         free_borrowed_tracks();
         target = center_index - 1;
         set_current_slide(target);
-        interrupt_cover_in_animation();
+        skip_animation_to_show_tracks();
     }
 }
 
@@ -4605,9 +4616,9 @@ static int pictureflow_main(const char* selected_file)
                 free_borrowed_tracks();
             }
             else if (pf_state == pf_cover_in)
-                revert_cover_in_animation();
+                reverse_animation();
             else if (pf_state == pf_cover_out)
-                interrupt_cover_out_animation();
+                skip_animation_to_idle_state();
             else if (pf_state == pf_idle || pf_state == pf_scrolling)
                 return PLUGIN_OK;
             break;
@@ -4634,9 +4645,9 @@ static int pictureflow_main(const char* selected_file)
             if ( pf_state == pf_show_tracks )
                 select_next_track();
             else if (pf_state == pf_cover_in)
-                interrupt_cover_in_animation();
+                skip_animation_to_show_tracks();
             else if (pf_state == pf_cover_out)
-                interrupt_cover_out_animation();
+                skip_animation_to_idle_state();
 
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_next_slide();
@@ -4647,9 +4658,9 @@ static int pictureflow_main(const char* selected_file)
             if ( pf_state == pf_show_tracks )
                 select_prev_track();
             else if (pf_state == pf_cover_in)
-                interrupt_cover_in_animation();
+                skip_animation_to_show_tracks();
             else if (pf_state == pf_cover_out)
-                interrupt_cover_out_animation();
+                skip_animation_to_idle_state();
 
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
@@ -4685,6 +4696,10 @@ static int pictureflow_main(const char* selected_file)
             }
             else if ( pf_state == pf_show_tracks )
                 select_prev_album();
+            else if (pf_state == pf_cover_in)
+                reverse_animation();
+            else if (pf_state == pf_cover_out)
+                skip_animation_to_idle_state();
             break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
@@ -4697,7 +4712,7 @@ static int pictureflow_main(const char* selected_file)
                     pf_state = pf_idle;
                 }
                 else if (pf_state == pf_cover_out)
-                    interrupt_cover_out_animation();
+                    skip_animation_to_idle_state();
 
                 if (context_menu_ready())
                 {
@@ -4727,9 +4742,9 @@ static int pictureflow_main(const char* selected_file)
                     pf_state = pf_cover_in;
             }
             else if (pf_state == pf_cover_out)
-                revert_cover_out_animation();
+                reverse_animation();
             else if (pf_state == pf_cover_in)
-                interrupt_cover_in_animation();
+                skip_animation_to_show_tracks();
 #if PF_PLAYBACK_CAPABLE
             else if (pf_state == pf_show_tracks) {
                 if(pf_cfg.auto_wps != 0) {
