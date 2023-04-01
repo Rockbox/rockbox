@@ -1422,6 +1422,17 @@ static int list_voice_cb(int list_index, void* data)
             else
                 rb->talk_spell(name, true);
     }
+    else if(data == MENU_ID(M_SETKEYS))
+    {
+        char buf[MAX_MENU_NAME];
+        int selcol = printcell_get_column_selected();
+        const char* name = printcell_get_column_text(selcol, buf, sizeof(buf));
+        long id = P2ID((const unsigned char *)name);
+        if(id>=0)
+            rb->talk_id(id, true);
+        else
+            rb->talk_spell(name, true);
+    }
     else
     {
         char buf[MAX_MENU_NAME];
@@ -1606,14 +1617,14 @@ int menu_action_setkeys(int *action, int selected_item, bool* exit, struct gui_s
             }
             else
             {
-                keyset.view_lastcol = printcell_increment_column(lists, 1, true);
+                keyset.view_lastcol = printcell_increment_column(1, true);
                 *action = ACTION_NONE;
             }
         }
     }
     else if (*action == ACTION_STD_CANCEL)
     {
-        keyset.view_lastcol = printcell_increment_column(lists, -1, true);
+        keyset.view_lastcol = printcell_increment_column(-1, true);
         if (keyset.view_lastcol != keyset.view_columns - 1)
         {
             *action = ACTION_NONE;
@@ -2038,7 +2049,7 @@ static void synclist_set(int id, int selected_item, int items, int sel_size)
     rb->gui_synclist_set_voice_callback(&lists, list_voice_cb);
     rb->gui_synclist_set_nb_items(&lists,items);
     rb->gui_synclist_select_item(&lists, selected_item);
-    printcell_enable(&lists, false, false);
+    printcell_enable(false);
 
     if (menu_id == MENU_ID(M_ROOT))
     {
@@ -2047,15 +2058,16 @@ static void synclist_set(int id, int selected_item, int items, int sel_size)
     }
     else if (menu_id == MENU_ID(M_SETKEYS))
     {
-        printcell_enable(&lists, true, true);
-        keyset.view_columns = printcell_set_columns(&lists, ACTVIEW_HEADER, Icon_Rockbox);
-        int curcol = printcell_increment_column(&lists, 0, true);
+        keyset.view_columns = printcell_set_columns(&lists, NULL, 
+                                                  ACTVIEW_HEADER, Icon_Rockbox);
+        printcell_enable(true);
+        int curcol = printcell_get_column_selected();
         if (keyset.view_lastcol >= keyset.view_columns)
             keyset.view_lastcol = -1;
         /* restore column position */
         while (keyset.view_lastcol > -1 && curcol != keyset.view_lastcol)
         {
-            curcol = printcell_increment_column(&lists, 1, true);
+            curcol = printcell_increment_column(1, true);
         }
         keyset.view_lastcol = curcol;
     }
@@ -2065,9 +2077,8 @@ static void synclist_set(int id, int selected_item, int items, int sel_size)
         PEEK_MENU_ID(id);
         lang_strlcpy(menu_title, mainitem(id)->name, sizeof(menu_title));
         rb->gui_synclist_set_title(&lists, menu_title, Icon_Submenu_Entered);
-        /* if (menu_title[0] == '$'){ printcell_enable(&lists, true, true); } */
+        /* if (menu_title[0] == '$'){ printcell_enable(true); } */
     }
-
 }
 
 static void keyremap_set_buffer(void* buffer, size_t buf_size)

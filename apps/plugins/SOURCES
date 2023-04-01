@@ -13,6 +13,7 @@ jackpot.c
 keybox.c
 keyremap.c
 lastfm_scrobbler.c
+lastfm_scrobbler_viewer.c
 logo.c
 lrcplayer.c
 mosaique.c

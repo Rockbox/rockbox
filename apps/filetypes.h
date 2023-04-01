@@ -48,6 +48,7 @@
 #define FILE_ATTR_FMS   0x1200 /* FM screen skin file */
 #define FILE_ATTR_RFMS  0x1300 /* FM screen skin file */
 #define FILE_ATTR_OPX   0x1400 /* open plugins shortcut */
+#define FILE_ATTR_LOG   0x1500 /* log file */
 #define FILE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 struct filetype {

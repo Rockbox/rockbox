@@ -160,6 +160,8 @@ static int config_settings_menu(void)
             case 3:
                 rb->set_int("Beep Level", "", UNIT_INT,
                             &gConfig.beeplvl, NULL, 1, 0, 10, NULL);
+                if (gConfig.beeplvl > 0)
+                    rb->beep_play(1500, 100, 100 * gConfig.beeplvl);
             case 4: /*sep*/
                 continue;
             case 5:
