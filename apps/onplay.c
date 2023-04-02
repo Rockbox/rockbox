@@ -1890,6 +1890,13 @@ static bool hotkey_delete_item(void)
     if (selected_file_attr & ATTR_VOLUME)
         return false;
 #endif
+
+#ifdef HAVE_TAGCACHE
+    if (context == CONTEXT_ID3DB &&
+        (selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
+        return false;
+#endif
+
     return delete_file_dir();
 }
 
