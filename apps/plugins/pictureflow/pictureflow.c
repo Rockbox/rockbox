@@ -4000,8 +4000,6 @@ static int show_id3_info(const char *selected_file)
     const char *file_name;
     bool is_multiple_tracks = insert_whole_album && pf_tracks.count > 1;
 
-    init_mul_id3();
-
     last_tick = *(rb->current_tick) + HZ/2;
     rb->splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     i = 0;
@@ -4027,9 +4025,9 @@ static int show_id3_info(const char *selected_file)
     } while (++i < pf_tracks.count && is_multiple_tracks);
 
     if (is_multiple_tracks)
-        write_id3_mul_tracks(&id3);
+        finalize_id3(&id3);
 
-    return rb->browse_id3(&id3, 0, 0, NULL) ? PLUGIN_USB_CONNECTED : 0;
+    return rb->browse_id3(&id3, 0, 0, NULL, i > 1) ? PLUGIN_USB_CONNECTED : 0;
 }
 
 

@@ -22,8 +22,8 @@
 #include "mul_id3.h"
 
 struct multiple_tracks_id3 {
-    unsigned long length;
-    unsigned long filesize;
+    unsigned long long filesize;
+    unsigned long long length;
     unsigned long frequency;
     unsigned int artist_hash;
     unsigned int composer_hash;
@@ -35,8 +35,6 @@ struct multiple_tracks_id3 {
     unsigned int codectype;
     unsigned int bitrate;
     int year;
-    bool filesize_ovf;
-    bool length_ovf;
     bool vbr;
 };
 
@@ -64,7 +62,7 @@ static unsigned int mfnv(char *str)
     return hash;
 }
 
-void init_mul_id3(void)
+static void init_mul_id3(void)
 {
     mul_id3.artist_hash = 0;
     mul_id3.album_hash = 0;
@@ -80,14 +78,13 @@ void init_mul_id3(void)
     mul_id3.length = 0;
     mul_id3.filesize = 0;
     mul_id3.year = 0;
-    mul_id3.length_ovf = false;
-    mul_id3.filesize_ovf = false;
 }
 
 void collect_id3(struct mp3entry *id3, bool is_first_track)
 {
     if (is_first_track)
     {
+        init_mul_id3();
         mul_id3.artist_hash = mfnv(id3->artist);
         mul_id3.album_hash = mfnv(id3->album);
         mul_id3.genre_hash = mfnv(id3->genre_string);
@@ -129,25 +126,18 @@ void collect_id3(struct mp3entry *id3, bool is_first_track)
         if (mul_id3.year && (id3->year != mul_id3.year))
             mul_id3.year = 0;
     }
-
-    if (ULONG_MAX - mul_id3.length < id3->length)
-    {
-        mul_id3.length_ovf = true;
-        mul_id3.length = 0;
-    }
-    else if (!mul_id3.length_ovf)
-        mul_id3.length += id3->length;
-
-    if (INT_MAX - mul_id3.filesize < id3->filesize) /* output_dyn_value expects int */
-    {
-        mul_id3.filesize_ovf = true;
-        mul_id3.filesize = 0;
-    }
-    else if (!mul_id3.filesize_ovf)
-        mul_id3.filesize += id3->filesize;
+    mul_id3.length += id3->length;
+    mul_id3.filesize += id3->filesize;
 }
 
-void write_id3_mul_tracks(struct mp3entry *id3)
+/* (!) Note scale factor applied to returned metadata:
+ *     - Unit for filesize will be KiB instead of Bytes
+ *     - Unit for length will be s instead of ms
+ *
+ *     Use result only as input for browse_id3,
+ *     and set multiple_tracks parameter to true.
+ */
+void finalize_id3(struct mp3entry *id3)
 {
     id3->path[0] = '\0';
     id3->title = NULL;
@@ -169,8 +159,10 @@ void write_id3_mul_tracks(struct mp3entry *id3)
     id3->track_string = NULL;
     id3->year_string = NULL;
     id3->year = mul_id3.year;
-    id3->length = mul_id3.length;
-    id3->filesize = mul_id3.filesize;
+    mul_id3.length /= 1000;
+    mul_id3.filesize >>= 10;
+    id3->length = mul_id3.length > ULONG_MAX ? 0 : mul_id3.length;
+    id3->filesize = mul_id3.filesize > INT_MAX ? 0 : mul_id3.filesize;
     id3->frequency = mul_id3.frequency;
     id3->bitrate = mul_id3.bitrate;
     id3->codectype = mul_id3.codectype;

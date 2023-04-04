@@ -394,6 +394,7 @@ static const int id3_headers[]=
 struct id3view_info {
     struct mp3entry* id3;
     struct tm *modified;
+    bool multiple_tracks;
     int count;
     int playlist_display_index;
     int playlist_amount;
@@ -491,6 +492,9 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
 {
     struct id3view_info *info = (struct id3view_info*)data;
     struct mp3entry* id3 =info->id3;
+    const unsigned char * const *unit;
+    unsigned int unit_ct;
+    unsigned long length;
     struct tm *tm = info->modified;
     int info_no=selected_item/2;
     if(!(selected_item%2))
@@ -593,10 +597,13 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 break;
             case LANG_ID3_LENGTH:
-                format_time(buffer, buffer_len, id3->length);
+                length = info->multiple_tracks ? id3->length : id3->length / 1000;
+
+                format_time_auto(buffer, buffer_len,
+                                 length, UNIT_SEC | UNIT_TRIM_ZERO, true);
                 val=buffer;
                 if(say_it)
-                    talk_value(id3->length /1000, UNIT_TIME, true);
+                    talk_value(length, UNIT_TIME, true);
                 break;
             case LANG_ID3_PLAYLIST:
                 if (info->playlist_display_index == 0 || info->playlist_amount == 0 )
@@ -667,10 +674,20 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_FILESIZE: /* not LANG_ID3_FILESIZE because the string is shared */
                 if (!id3->filesize)
                     return NULL;
-                output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, 4, true);
+                if (info->multiple_tracks)
+                {
+                    unit = kibyte_units;
+                    unit_ct = 3;
+                }
+                else
+                {
+                    unit = byte_units;
+                    unit_ct = 4;
+                }
+                output_dyn_value(buffer, buffer_len, id3->filesize, unit, unit_ct, true);
                 val=buffer;
                 if(say_it && val)
-                    output_dyn_value(NULL, 0, id3->filesize, byte_units, 4, true);
+                    output_dyn_value(NULL, 0, id3->filesize, unit, unit_ct, true);
                 break;
             case LANG_DATE:
                 if (!tm)
@@ -720,8 +737,11 @@ static int id3_speak_item(int selected_item, void* data)
     return 0;
 }
 
+/* Note: Setting multiple_tracks parameter to true causes filesize value
+ * to be treated as KiB (instead of Bytes), and length as s instead of ms.
+ */
 bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
-                struct tm *modified)
+                struct tm *modified, bool multiple_tracks)
 {
     struct gui_synclist id3_lists;
     int key;
@@ -730,6 +750,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     info.count = 0;
     info.id3 = id3;
     info.modified = modified;
+    info.multiple_tracks = multiple_tracks;
     info.playlist_display_index = playlist_display_index;
     info.playlist_amount = playlist_amount;
     bool ret = false;

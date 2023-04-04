@@ -406,14 +406,12 @@ enum plugin_status plugin_start(const void* parameter)
     if (!rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))) /* db table selected */
     {
         props_type = PROPS_MUL_ID3;
-        init_mul_id3();
         mul_id3_count = 0;
 
         if (!rb->tagtree_subentries_do_action(&mul_id3_add) || mul_id3_count == 0)
             return PLUGIN_ERROR;
-
-        if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
-            write_id3_mul_tracks(&id3);
+        else if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
+            finalize_id3(&id3);
     }
     else
 #endif
@@ -448,8 +446,8 @@ enum plugin_status plugin_start(const void* parameter)
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
-    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm)  :
-               (props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL) :
+    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm, false)  :
+               (props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count > 1) :
                                               browse_file_or_dir(&stats));
 
     FOR_NB_SCREENS(i)

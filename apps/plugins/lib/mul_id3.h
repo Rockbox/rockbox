@@ -21,8 +21,7 @@
 #ifndef MUL_ID3_H
 #define MUL_ID3_H
 
-void init_mul_id3(void);
 void collect_id3(struct mp3entry *id3, bool is_first_track);
-void write_id3_mul_tracks(struct mp3entry *id3);
+void finalize_id3(struct mp3entry *id3);
 
 #endif /* MUL_ID3_H */
