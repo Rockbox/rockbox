@@ -306,6 +306,12 @@ static bool clean_shutdown(enum shutdown_type sd_type,
 {
     long msg_id = -1;
 
+    if (!global_settings.show_shutdown_message && get_sleep_timer_active())
+    {
+        talk_force_shutup();
+        talk_disable(true);
+    }
+
     status_save();
 
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)

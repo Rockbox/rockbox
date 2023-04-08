@@ -961,6 +961,11 @@ static void set_sleep_timer(int seconds)
     sleeptimer_duration = seconds;
 }
 
+bool get_sleep_timer_active(void)
+{
+    return sleeptimer_active;
+}
+
 int get_sleep_timer(void)
 {
     if (sleeptimer_active && (sleeptimer_endtick >= current_tick))
