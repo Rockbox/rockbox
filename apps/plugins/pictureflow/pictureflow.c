@@ -4027,7 +4027,7 @@ static int show_id3_info(const char *selected_file)
     if (is_multiple_tracks)
         finalize_id3(&id3);
 
-    return rb->browse_id3(&id3, 0, 0, NULL, i > 1) ? PLUGIN_USB_CONNECTED : 0;
+    return rb->browse_id3(&id3, 0, 0, NULL, i) ? PLUGIN_USB_CONNECTED : 0;
 }
 
 

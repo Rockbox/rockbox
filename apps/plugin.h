@@ -500,7 +500,7 @@ struct plugin_api {
                                           void (*add_to_pl_cb));
     bool (*browse_id3)(struct mp3entry *id3,
                        int playlist_display_index, int playlist_amount,
-                       struct tm *modified, bool multiple_tracks);
+                       struct tm *modified, int track_ct);
 
     /* talking */
     int (*talk_id)(int32_t id, bool enqueue);

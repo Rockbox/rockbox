@@ -446,9 +446,11 @@ enum plugin_status plugin_start(const void* parameter)
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
-    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm, false)  :
-               (props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count > 1) :
-                                              browse_file_or_dir(&stats));
+    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm, 1)  :
+#ifdef HAVE_TAGCACHE
+                props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
+#endif
+                                              browse_file_or_dir(&stats);
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);

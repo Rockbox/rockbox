@@ -135,7 +135,7 @@ void collect_id3(struct mp3entry *id3, bool is_first_track)
  *     - Unit for length will be s instead of ms
  *
  *     Use result only as input for browse_id3,
- *     and set multiple_tracks parameter to true.
+ *     with the track_ct parameter set to  > 1.
  */
 void finalize_id3(struct mp3entry *id3)
 {
