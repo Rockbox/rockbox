@@ -84,6 +84,7 @@ pitch_detector,apps
 pitch_screen,viewers
 pixel-painter,games
 plasma,demos
+playing_time,apps
 png,viewers
 gif,viewers
 pong,games

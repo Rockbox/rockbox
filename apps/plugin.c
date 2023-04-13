@@ -827,6 +827,13 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+    format_time_auto,
+    output_dyn_value,
+    playlist_get_resume_info,
+    playlist_get_track_info,
+    list_do_action,
+    talk_idarray,
+
 };
 
 static int plugin_buffer_handle;

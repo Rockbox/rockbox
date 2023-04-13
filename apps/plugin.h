@@ -958,6 +958,17 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+    const char* (*format_time_auto)(char *buffer, int buf_len, long value,
+                                    int unit_idx, bool supress_unit);
+    char* (*output_dyn_value)(char *buf, int buf_size, int value,
+                              const unsigned char * const *units,
+                              unsigned int unit_count, bool binary_scale);
+    int (*playlist_get_resume_info)(int *resume_index);
+    int (*playlist_get_track_info)(struct playlist_info* playlist, int index,
+                                   struct playlist_track_info* info);
+    bool (*list_do_action)(int context, int timeout,
+                           struct gui_synclist *lists, int *action);
+    int (*talk_idarray)(const long *idarray, bool enqueue);
 };
 
 /* plugin header */
