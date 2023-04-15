@@ -540,6 +540,7 @@ static PFreal offsetX;
 static PFreal offsetY;
 static int number_of_slides;
 static bool is_initial_slide = true;
+static bool show_tracks_while_browsing = false;
 
 static struct pf_slide_cache pf_sldcache;
 
@@ -3649,6 +3650,7 @@ static int settings_menu(void)
   Show the main menu
  */
 enum {
+    PF_SHOW_TRACKS_WHILE_BROWSING,
     PF_GOTO_WPS,
 #if PF_PLAYBACK_CAPABLE
     PF_MENU_CLEAR_PLAYLIST,
@@ -3669,6 +3671,7 @@ static int main_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(main_menu, "PictureFlow Main Menu", NULL,
+                        ID2P(LANG_SHOW_TRACKS_WHILE_BROWSING),
                         ID2P(LANG_GOTO_WPS),
 #if PF_PLAYBACK_CAPABLE
                         ID2P(LANG_CLEAR_PLAYLIST),
@@ -3679,6 +3682,16 @@ static int main_menu(void)
                         ID2P(LANG_MENU_QUIT));
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
+            case PF_SHOW_TRACKS_WHILE_BROWSING:
+                if (pf_state != pf_show_tracks)
+                {
+                    if (pf_state == pf_scrolling)
+                        set_current_slide(target);
+
+                    skip_animation_to_show_tracks();
+                }
+                show_tracks_while_browsing = true;
+                return 0;
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
@@ -3926,7 +3939,7 @@ static void show_track_list(void)
     for (; track_i < pf_tracks.list_visible + pf_tracks.list_start; track_i++)
     {
         char *trackname = get_track_name(track_i);
-        if ( track_i == pf_tracks.sel ) {
+        if (track_i == pf_tracks.sel && !show_tracks_while_browsing) {
             if (pf_tracks.sel != pf_tracks.last_sel) {
                 set_scroll_line(trackname, PF_SCROLL_TRACK);
                 pf_tracks.last_sel = pf_tracks.sel;
@@ -4140,7 +4153,7 @@ static bool context_menu_ready(void)
     rb->lcd_set_background(N_BRIGHT(255));
 #endif
 #endif
-    insert_whole_album = pf_state != pf_show_tracks;
+    insert_whole_album = (pf_state != pf_show_tracks) || show_tracks_while_browsing;
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
@@ -4151,7 +4164,7 @@ static void context_menu_cleanup(void)
 {
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
-    if (insert_whole_album)
+    if (pf_state != pf_show_tracks)
         free_borrowed_tracks();
 #ifdef USEGSLIB
     grey_show(true);
@@ -4163,7 +4176,7 @@ static void context_menu_cleanup(void)
 static int context_menu(void)
 {
     char album_name[MAX_PATH];
-    char *file_name = get_track_filename(pf_tracks.sel);
+    char *file_name = get_track_filename(show_tracks_while_browsing ? 0 : pf_tracks.sel);
     int attr;
 
     enum {
@@ -4538,6 +4551,7 @@ static int pictureflow_main(const char* selected_file)
                 instant_update = true;
                 break;
             case pf_cover_out:
+                show_tracks_while_browsing = false;
                 update_cover_out_animation();
                 render_all_slides();
                 instant_update = true;
@@ -4546,6 +4560,7 @@ static int pictureflow_main(const char* selected_file)
                 show_track_list();
                 break;
             case pf_idle:
+                show_tracks_while_browsing = false;
                 render_all_slides();
                 if (aa_cache.inspected < pf_idx.album_ct)
                 {
@@ -4608,7 +4623,9 @@ static int pictureflow_main(const char* selected_file)
         case PF_WPS:
             return PLUGIN_GOTO_WPS;
         case PF_BACK:
-            if ( pf_state == pf_show_tracks )
+            if (show_tracks_while_browsing)
+                show_tracks_while_browsing = false;
+            else if (pf_state == pf_show_tracks)
             {
                 pf_state = pf_cover_out;
                 free_borrowed_tracks();
@@ -4641,7 +4658,12 @@ static int pictureflow_main(const char* selected_file)
         case PF_NEXT:
         case PF_NEXT_REPEAT:
             if ( pf_state == pf_show_tracks )
-                select_next_track();
+            {
+                if (show_tracks_while_browsing)
+                    select_next_album();
+                else
+                    select_next_track();
+            }
             else if (pf_state == pf_cover_in)
                 skip_animation_to_show_tracks();
             else if (pf_state == pf_cover_out)
@@ -4654,7 +4676,12 @@ static int pictureflow_main(const char* selected_file)
         case PF_PREV:
         case PF_PREV_REPEAT:
             if ( pf_state == pf_show_tracks )
-                select_prev_track();
+            {
+                if (show_tracks_while_browsing)
+                    select_prev_album();
+                else
+                    select_prev_track();
+            }
             else if (pf_state == pf_cover_in)
                 skip_animation_to_show_tracks();
             else if (pf_state == pf_cover_out)
@@ -4743,16 +4770,19 @@ static int pictureflow_main(const char* selected_file)
                 reverse_animation();
             else if (pf_state == pf_cover_in)
                 skip_animation_to_show_tracks();
+            else if (pf_state == pf_show_tracks)
+            {
+                if (show_tracks_while_browsing)
+                    show_tracks_while_browsing = false;
 #if PF_PLAYBACK_CAPABLE
-            else if (pf_state == pf_show_tracks) {
-                if(pf_cfg.auto_wps != 0) {
+                else if(pf_cfg.auto_wps != 0) {
                     if (start_playback(true))
                         return PLUGIN_GOTO_WPS;
                 }
                 else
                     start_playback(false);
-            }
 #endif
+            }
             break;
         default:
             exit_on_usb(button);
