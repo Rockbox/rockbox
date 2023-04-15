@@ -15110,16 +15110,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Clear playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Clear playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>

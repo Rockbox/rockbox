@@ -3657,11 +3657,9 @@ enum {
     PF_GOTO_LAST_ALBUM,
     PF_GOTO_WPS,
 #if PF_PLAYBACK_CAPABLE
-    PF_MENU_CLEAR_PLAYLIST,
     PF_MENU_PLAYBACK_CONTROL,
 #endif
     PF_MENU_SETTINGS,
-    PF_MENU_RETURN,
     PF_MENU_QUIT,
 };
 
@@ -3679,11 +3677,9 @@ static int main_menu(void)
                         ID2P(LANG_GOTO_LAST_ALBUM),
                         ID2P(LANG_GOTO_WPS),
 #if PF_PLAYBACK_CAPABLE
-                        ID2P(LANG_CLEAR_PLAYLIST),
                         ID2P(LANG_PLAYBACK_CONTROL),
 #endif
                         ID2P(LANG_SETTINGS),
-                        ID2P(LANG_RETURN),
                         ID2P(LANG_MENU_QUIT));
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
@@ -3718,12 +3714,6 @@ static int main_menu(void)
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
-            case PF_MENU_CLEAR_PLAYLIST:
-                if(rb->warn_on_pl_erase() && rb->playlist_remove_all_tracks(NULL) == 0) {
-                    rb->playlist_create(NULL, NULL);
-                    rb->splash(HZ*2, ID2P(LANG_PLAYLIST_CLEARED));
-                }
-                break;
             case PF_MENU_PLAYBACK_CONTROL: /* Playback Control */
                 playback_control(NULL);
                 break;
@@ -3732,8 +3722,6 @@ static int main_menu(void)
                 result = settings_menu();
                 if ( result != 0 ) return result;
                 break;
-            case PF_MENU_RETURN:
-                return 0;
             case PF_MENU_QUIT:
                 return -1;
 
