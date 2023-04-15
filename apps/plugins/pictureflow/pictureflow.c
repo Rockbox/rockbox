@@ -3241,7 +3241,10 @@ static bool sort_albums(int new_sorting, bool from_settings)
 
         if(!rb->strcmp(pf_idx.album_names + album_idx, current_album_name) &&
             !rb->strcmp(pf_idx.artist_names + artist_idx, current_album_artist))
+        {
             set_current_slide(i);
+            pf_cfg.last_album = i;
+        }
     }
     return true;
 }
@@ -3651,6 +3654,7 @@ static int settings_menu(void)
  */
 enum {
     PF_SHOW_TRACKS_WHILE_BROWSING,
+    PF_GOTO_LAST_ALBUM,
     PF_GOTO_WPS,
 #if PF_PLAYBACK_CAPABLE
     PF_MENU_CLEAR_PLAYLIST,
@@ -3664,7 +3668,7 @@ enum {
 static int main_menu(void)
 {
     int selection = 0;
-    int result;
+    int result, curr_album;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(255));
@@ -3672,6 +3676,7 @@ static int main_menu(void)
 
     MENUITEM_STRINGLIST(main_menu, "PictureFlow Main Menu", NULL,
                         ID2P(LANG_SHOW_TRACKS_WHILE_BROWSING),
+                        ID2P(LANG_GOTO_LAST_ALBUM),
                         ID2P(LANG_GOTO_WPS),
 #if PF_PLAYBACK_CAPABLE
                         ID2P(LANG_CLEAR_PLAYLIST),
@@ -3691,6 +3696,24 @@ static int main_menu(void)
                     skip_animation_to_show_tracks();
                 }
                 show_tracks_while_browsing = true;
+                return 0;
+            case PF_GOTO_LAST_ALBUM:
+                if (pf_state == pf_scrolling)
+                    curr_album = target;
+                else
+                    curr_album = center_index;
+
+                if (pf_state == pf_show_tracks)
+                    free_borrowed_tracks();
+                if (pf_state == pf_show_tracks ||
+                    pf_state == pf_cover_in ||
+                    pf_state == pf_cover_out)
+                    skip_animation_to_idle_state();
+
+                set_current_slide(pf_cfg.last_album);
+                pf_cfg.last_album = curr_album;
+
+                pf_state = pf_idle;
                 return 0;
             case PF_GOTO_WPS: /* WPS */
                 return -2;
@@ -4848,7 +4871,10 @@ enum plugin_status plugin_start(const void *parameter)
 
     ret = file_id3 ? pictureflow_main(file) : pictureflow_main(NULL);
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
-        pf_cfg.last_album = center_index;
+        if (pf_state == pf_scrolling)
+            pf_cfg.last_album = target;
+        else
+            pf_cfg.last_album = center_index;
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {

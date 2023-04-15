@@ -16624,3 +16624,17 @@
     *: "Show Tracks While Browsing"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Go to Last Album"
+  </dest>
+  <voice>
+    *: "Go to Last Album"
+  </voice>
+</phrase>
