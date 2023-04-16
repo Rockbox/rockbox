@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <zlib.h>
 #include "misc.h"
 #include "fwu.h"
 #include "afi.h"
@@ -100,7 +101,26 @@ static int unpack_afi_fw_cb(const char *filename, uint8_t *buf, size_t size)
     FILE *f = fopen(name, "wb");
     if(f)
     {
-        fwrite(buf, size, 1, f);
+        if (0 != memcmp(buf, "\x1f\x8b\x8\0\0\0\0\0\0\xb", 10))
+            fwrite(buf, size, 1, f);
+        else
+        {
+            uint8_t buf_out[8192];
+            z_stream zs;
+            int err = Z_OK;
+            cprintf(GREEN, "inflating... ");
+            memset(&zs, 0, sizeof(zs));
+            zs.next_in = buf + 10;
+            zs.avail_in = size - 10;
+            inflateInit2(&zs, -MAX_WBITS); /* raw */
+            while (err == Z_OK)
+            {
+                zs.next_out = buf_out;
+                zs.avail_out = sizeof(buf_out);
+                err = inflate(&zs, Z_NO_FLUSH);
+                fwrite(buf_out, 1, sizeof(buf_out) - zs.avail_out, f);
+            }
+        }
         fclose(f);
         cprintf(RED, "Ok\n");
         return 0;
@@ -119,10 +139,10 @@ static int do_afi(uint8_t *buf, size_t size)
     return afi_unpack(buf, size, &unpack_afi_fw_cb);
 }
 
-static int do_fw(uint8_t *buf, size_t size)
+static int do_fw(uint8_t *buf, size_t size, bool big_endian)
 {
     build_out_prefix(".unpack", "", true);
-    return fw_unpack(buf, size, &unpack_afi_fw_cb);
+    return fw_unpack(buf, size, &unpack_afi_fw_cb, big_endian);
 }
 static void usage(void)
 {
@@ -135,6 +155,7 @@ static void usage(void)
     printf("  --fwu             Unpack a FWU firmware file\n");
     printf("  --afi             Unpack a AFI archive file\n");
     printf("  --fw              Unpack a FW archive file\n");
+    printf("  --fw251           Big-endian FW archive used on Flip80251\n");
     printf("  --atj2127         Force ATJ2127 decryption mode\n");
     printf("The default is to try to guess the format.\n");
     printf("If several formats are specified, all are tried.\n");
@@ -147,6 +168,7 @@ int main(int argc, char **argv)
     bool try_fwu = false;
     bool try_afi = false;
     bool try_fw = false;
+    bool big_endian = false;
     enum fwu_mode_t fwu_mode = FWU_AUTO;
 
     while(1)
@@ -159,11 +181,12 @@ int main(int argc, char **argv)
             {"fwu", no_argument, 0, 'u'},
             {"afi", no_argument, 0, 'a'},
             {"fw", no_argument, 0, 'w'},
+            {"fw251", no_argument, 0, 'b'},
             {"atj2127", no_argument, 0, '2'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hdco:a2", long_options, NULL);
+        int c = getopt_long(argc, argv, "hdco:a2b", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -191,6 +214,10 @@ int main(int argc, char **argv)
                 break;
             case 'w':
                 try_fw = true;
+                break;
+            case 'b':
+                try_fw = true;
+                big_endian = true;
                 break;
             case '2':
                 fwu_mode = FWU_ATJ2127;
@@ -238,7 +265,7 @@ int main(int argc, char **argv)
     else if(try_afi || afi_check(buf, size))
         ret = do_afi(buf, size);
     else if(try_fw || fw_check(buf, size))
-        ret = do_fw(buf, size);
+        ret = do_fw(buf, size, big_endian);
     else
     {
         cprintf(GREY, "No valid format found\n");

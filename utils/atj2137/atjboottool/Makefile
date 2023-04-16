@@ -2,7 +2,7 @@ DEFINES=
 CC=gcc
 LD=gcc
 CFLAGS=-g -std=c99 -W -Wall $(DEFINES)
-LDFLAGS=
+LDFLAGS=-lz
 BINS=atjboottool
 
 all: $(BINS)

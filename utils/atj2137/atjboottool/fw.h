@@ -27,7 +27,7 @@
  * its name and content. If the callback returns a nonzero value, the function will stop and return
  * that value. Returns 0 on success */
 typedef int (*fw_extract_callback_t)(const char *name, uint8_t *buf, size_t size);
-int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t cb);
+int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t cb, bool big_endian);
 /* Check if a file looks like an AFI file */
 bool fw_check(uint8_t *buf, size_t size);
 

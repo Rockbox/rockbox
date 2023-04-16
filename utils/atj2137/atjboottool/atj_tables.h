@@ -21,15 +21,15 @@
 #ifndef __ATJ_TABLES__
 #define __ATJ_TABLES__
 
-uint8_t g_check_block_A_table[1024];
-uint8_t g_decode_B_table[20];
-uint32_t g_crypto_table[8];
-uint32_t g_crypto_table2[8];
-uint32_t g_crypto_key6[8];
-uint32_t g_crypto_key3[6];
-uint32_t g_crypto_key4[6];
-uint32_t g_crypto_key5[6];
-uint32_t g_atj_ec233_a[8];
-uint32_t g_atj_ec163_a[6];
+extern uint8_t g_decode_A_table[1024];
+extern uint8_t g_decode_B_table[20];
+extern uint32_t g_sect233k1_G_x[8];
+extern uint32_t g_sect233k1_G_y[8];
+extern uint32_t g_sect233k1_b[8];
+extern uint32_t g_sect163r2_G_x[6];
+extern uint32_t g_sect163r2_G_y[6];
+extern uint32_t g_sect163r2_a[6];
+extern uint32_t g_sect163r2_b[6];
+extern uint32_t g_sect233k1_a[8];
 
 #endif // __ATJ_TABLES__
