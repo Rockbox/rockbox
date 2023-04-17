@@ -102,7 +102,7 @@ static struct plugin_config
     bool separator;
     bool talk;
     int  col_width;
-    uint32_t hidecol_flags;
+    int hidecol_flags;
 } gConfig;
 
 static struct configdata config[] =
@@ -468,7 +468,7 @@ static int filter_items(struct printcell_data_t *pc_data,
     char *find_exclude = printcell_get_column_text(selcol, find_exclude_buf,
                                                       sizeof(find_exclude_buf));
     const char colsep = '\t';
-    int find_len = strlen(find_exclude);
+    int find_len = rb->strlen(find_exclude);
 
     if (find_type == FIND_CUSTOM || find_len == 0)
     {
@@ -515,7 +515,7 @@ static int filter_items(struct printcell_data_t *pc_data,
         if (rb->kbd_input(find_exclude_buf, sizeof(find_exclude_buf), NULL) < 0)
             return -1;
         find_exclude = find_exclude_buf;
-        find_len = strlen(find_exclude);
+        find_len = rb->strlen(find_exclude);
     }
 
     char tmp_filename[MAX_PATH];
@@ -616,7 +616,7 @@ static int filter_items(struct printcell_data_t *pc_data,
                     }
                 }
             }
-            int len = strlen(data);
+            int len = rb->strlen(data);
             if (len > 0)
             {
                 logf("writing [%d bytes][%s]", len + 1, data);
