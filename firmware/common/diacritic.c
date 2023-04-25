@@ -232,7 +232,10 @@ bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 
     /* Add MRU entry */
     if (mru_len < MRU_MAX_LEN)
+    {
+        diacritic_mru[mru_len] = i;
         mru_len++;
+    }
 
 Found:
 
