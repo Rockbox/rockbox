@@ -1473,7 +1473,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Риплејгејн"
+    *: "Replaygain"
   </dest>
   <voice>
     *: "Риплејгејн"
@@ -3386,7 +3386,7 @@
   <voice>
     *: none
     battery_types: "Алкална"
-    xduoox3: "Новија (2000 милиампер часова)"
+    xduoox3: "Новија двехиљаде милиампер часова"
   </voice>
 </phrase>
 <phrase>
@@ -3400,13 +3400,13 @@
   </source>
   <dest>
     *: none
-    battery_types: "НиМХ"
+    battery_types: "NiMH"
     xduoox3: "Старија (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Никл метал хидридна"
-    xduoox3: "Старија 1500 милиампер часова"
+    xduoox3: "Старија хиљадупетсто милиампер часова"
   </voice>
 </phrase>
 <phrase>
@@ -4936,11 +4936,11 @@
   </source>
   <dest>
     *: none
-    recording: "МПЕГ Слој 3"
+    recording: "MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "МПЕГ Слој 3"
+    recording: "Епмег лејер три"
   </voice>
 </phrase>
 <phrase>
@@ -4953,11 +4953,11 @@
   </source>
   <dest>
     *: none
-    recording: "ПЦМ Талас"
+    recording: "PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "ПЦМ Талас"
+    recording: "пи си ем вејв"
   </voice>
 </phrase>
 <phrase>
@@ -4974,7 +4974,7 @@
   </dest>
   <voice>
     *: none
-    recording: "WavPack"
+    recording: "вавпак"
   </voice>
 </phrase>
 <phrase>
@@ -4991,7 +4991,7 @@
   </dest>
   <voice>
     *: none
-    recording: "AIFF"
+    recording: "еј ај еф еф"
   </voice>
 </phrase>
 <phrase>
@@ -5305,19 +5305,19 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
     *: none
-    recording: "Постави као директоријум за снимање"
+    recording: ""
   </dest>
   <voice>
     *: none
-    recording: "Постави као директоријум за снимање"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6004,13 +6004,13 @@
   </source>
   <dest>
     *: "Инт:"
-    hibylinux: "мСД:"
-    xduoox3: "мСД1:"
+    hibylinux: "mSD:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Интерни"
-    hibylinux: "микро Ес Де"
-    xduoox3: "микро Ес Де 1"
+    hibylinux: "мајкро Ес Де"
+    xduoox3: "мајкро Ес Де један"
   </voice>
 </phrase>
 <phrase>
@@ -6025,15 +6025,15 @@
   </source>
   <dest>
     *: none
-    multivolume: "ХД1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "мСД:"
-    xduoox3: "мСД2:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "Ха Де 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Ес Де"
-    xduoox3: "микро Ес Де 2"
+    multivolume: "Ха Де један"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "мајкро Ес Де"
+    xduoox3: "мајкро Ес Де два"
   </voice>
 </phrase>
 <phrase>
@@ -6122,58 +6122,58 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Уметни"
+    *: ""
   </dest>
   <voice>
-    *: "Уметни"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Уметни наредну"
+    *: ""
   </dest>
   <voice>
-    *: "Уметни наредну"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Уметни последњу"
+    *: ""
   </dest>
   <voice>
-    *: "Уметни последњу"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Уметни промешано"
+    *: ""
   </dest>
   <voice>
-    *: "Уметни промешано"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6346,16 +6346,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Додај у плејлисту"
+    *: ""
   </dest>
   <voice>
-    *: "Додај у плејлисту"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9581,7 +9581,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Величина"
   </voice>
 </phrase>
 <phrase>
@@ -9674,7 +9674,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Време дељења"
   </voice>
 </phrase>
 <phrase>
@@ -9705,7 +9705,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "КЛИП"
   </voice>
 </phrase>
 <phrase>
@@ -9735,11 +9735,11 @@
   </source>
   <dest>
     *: none
-    recording: "Датотека:"
+    recording: "Име фајла:"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Име фајла"
   </voice>
 </phrase>
 <phrase>
@@ -9814,11 +9814,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC време клиповања"
+    agc: "АРП време клиповања"
   </dest>
   <voice>
     *: none
-    agc: "AGC време клиповања"
+    agc: "AРП време клиповања"
   </voice>
 </phrase>
 <phrase>
@@ -10353,16 +10353,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Уметни на крај промешану"
+    *: ""
   </dest>
   <voice>
-    *: "Уметни на крај промешану"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10465,11 +10465,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Рата"
+    pitchscreen: "Стопа"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Рата"
+    pitchscreen: "Стопа"
   </voice>
 </phrase>
 <phrase>
@@ -10503,7 +10503,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Human Interface Device"
+    usb_hid: "У ес бе хјуман интерфејс дивајс"
   </voice>
 </phrase>
 <phrase>
@@ -11095,7 +11095,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "Дел"
   </voice>
 </phrase>
 <phrase>
@@ -11467,16 +11467,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Покрени прегледач фајлова у овом фолдеру"
+    *: ""
   </dest>
   <voice>
-    *: "Покрени прегледач фајлова у овом фолдеру"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11647,16 +11647,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Постави као директоријум каталога плејлисти"
+    *: ""
   </dest>
   <voice>
-    *: "Постави као директоријум каталога плејлисти"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11782,10 +11782,10 @@
     *: "Simple (Meier)"
   </source>
   <dest>
-    *: "Једноставан (Meier)"
+    *: "Једноставан (Мајер)"
   </dest>
   <voice>
-    *: "Једноставан Мејеров"
+    *: "Једноставан Мајеров"
   </voice>
 </phrase>
 <phrase>
@@ -12006,11 +12006,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Стрмина DAC филтра"
+    filter_roll_off: "Стрмина ДАК филтра"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Стрмина DAC филтра"
+    filter_roll_off: "Стрмина ДАК филтра"
   </voice>
 </phrase>
 <phrase>
@@ -12021,10 +12021,10 @@
     *: "Line Separator"
   </source>
   <dest>
-    *: "Сепаратор линија"
+    *: "Граничник линија"
   </dest>
   <voice>
-    *: "Сепаратор линија"
+    *: "Граничник линија"
   </voice>
 </phrase>
 <phrase>
@@ -12049,10 +12049,10 @@
     *: "Line Separator Colour"
   </source>
   <dest>
-    *: "Боја сепаратора линија"
+    *: "Боја граничника линија"
   </dest>
   <voice>
-    *: "Боја сепаратора линија"
+    *: "Боја граничника линија"
   </voice>
 </phrase>
 <phrase>
@@ -12192,10 +12192,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Андроид Прегледни Мост"
+    *: "Андроид дибаг мост"
   </dest>
   <voice>
-    *: "Андроид Прегледни Мост"
+    *: "Андроид дибаг мост"
   </voice>
 </phrase>
 <phrase>
@@ -12248,10 +12248,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Хаас Просторни Звук"
+    *: "Хас окружујући звук"
   </dest>
   <voice>
-    *: "Хаас Просторни Звук"
+    *: "Хас окружујући звук"
   </voice>
 </phrase>
 <phrase>
@@ -12899,7 +12899,7 @@
     *: "Особине директоријума"
   </dest>
   <voice>
-    *: ""
+    *: "Особине директоријума"
   </voice>
 </phrase>
 <phrase>
@@ -12929,7 +12929,7 @@
     lowmem: none
   </dest>
   <voice>
-    *: "Постави време настављања"
+    *: "Постави време настављања у минутама"
     lowmem: none
   </voice>
 </phrase>
@@ -13118,7 +13118,7 @@
     *: "Редослед Rockbox главног менија"
   </dest>
   <voice>
-    *: ""
+    *: "Редослед Рокбокс главног менија"
   </voice>
 </phrase>
 <phrase>
@@ -13132,7 +13132,7 @@
     *: "Особине фајла"
   </dest>
   <voice>
-    *: ""
+    *: "Особине фајла"
   </voice>
 </phrase>
 <phrase>
@@ -13185,10 +13185,10 @@
     *: "Cache will be rebuilt on next restart"
   </source>
   <dest>
-    *: "Кеш ће да се изради при наредном поновном покретању"
+    *: "Кеш ће да се изгради при наредном поновном покретању"
   </dest>
   <voice>
-    *: "Кеш ће да се изради при наредном поновном покретању"
+    *: "Кеш ће да се изгради при наредном поновном покретању"
   </voice>
 </phrase>
 <phrase>
@@ -14242,7 +14242,7 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
@@ -14855,7 +14855,7 @@
     *: "Играј Вормлет!"
   </dest>
   <voice>
-    *: "Играј Вормлет!!"
+    *: "Играј Вормлет!"
   </voice>
 </phrase>
 <phrase>
@@ -15193,11 +15193,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Учестаност узорковања"
+    *: "Учесталост узорковања"
     lowmem: none
   </dest>
   <voice>
-    *: "Учестаност узорковања"
+    *: "Учесталост узорковања"
     lowmem: none
   </voice>
 </phrase>
@@ -15598,11 +15598,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Аподизацијски тип 1"
+    es9218: "Аподизациони тип 1"
   </dest>
   <voice>
     *: none
-    es9218: "Аподизацијски тип 1"
+    es9218: "Аподизациони тип 1"
   </voice>
 </phrase>
 <phrase>
@@ -15615,11 +15615,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Аподизацијски тип 2"
+    es9218: "Аподизациони тип 2"
   </dest>
   <voice>
     *: none
-    es9218: "Аподизацијски тип 2"
+    es9218: "Аподизациони тип 2"
   </voice>
 </phrase>
 <phrase>
@@ -15693,7 +15693,7 @@
   <voice>
     *: none
     dac_power_mode: "Високе перформансе"
-    es9218: "Високо појачање (2 Vrms)"
+    es9218: "Високо појачање два волта ефективно"
   </voice>
 </phrase>
 <phrase>
@@ -15713,7 +15713,7 @@
   <voice>
     *: none
     dac_power_mode: "Штедња батерије"
-    es9218: "Ниско појачање (1 Vrms)"
+    es9218: "Ниско појачање један волт ефективно"
   </voice>
 </phrase>
 <phrase>
@@ -15727,7 +15727,7 @@
     *: "Да пређем у режим USB масовне меморије?"
   </dest>
   <voice>
-    *: "Да пређем у режим USB масовне меморије?"
+    *: "Да пређем у режим У Ес Бе масовне меморије?"
   </voice>
 </phrase>
 <phrase>
@@ -16018,7 +16018,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "dmY"
+    *: "dAY"
   </dest>
   <voice>
     *: ""
@@ -16150,7 +16150,7 @@
   </dest>
   <voice>
     *: none
-    rds: "Синхронизуј са RDS временом"
+    rds: "Синхронизуј са Ер де ес временом"
   </voice>
 </phrase>
 <phrase>
@@ -16245,10 +16245,10 @@
     *: "Track Info"
   </source>
   <dest>
-    *: "Подаци о Песми"
+    *: "Инфо о нумери"
   </dest>
   <voice>
-    *: "Подаци о Песми"
+    *: "Инфо о нумери"
   </voice>
 </phrase>
 <phrase>
@@ -16259,10 +16259,10 @@
     *: "Play"
   </source>
   <dest>
-    *: "Покрени"
+    *: "Пусти"
   </dest>
   <voice>
-    *: "Покрени"
+    *: "Пусти"
   </voice>
 </phrase>
 <phrase>
@@ -16273,10 +16273,10 @@
     *: "Play Shuffled"
   </source>
   <dest>
-    *: "Покрени Разбацано"
+    *: "Пусти измешано"
   </dest>
   <voice>
-    *: "Покрени Разбацано"
+    *: "Пусти измешано"
   </voice>
 </phrase>
 <phrase>
@@ -16287,10 +16287,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Задржите Тренутну Нумеру Када Замењујете Плејлисту"
+    *: "Задржи текућу нумеру када се замењује плејлиста"
   </dest>
   <voice>
-    *: "Задржите Тренутну Нумеру Када Замењујете Плејлисту"
+    *: "Задржи текућу нумеру када се замењује плејлиста"
   </voice>
 </phrase>
 <phrase>
@@ -16304,12 +16304,234 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10: "Обришите подешавања када се дугме за ресетовање држи током покретања"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обришите подешавања када је прекидач за чекање укључен током покретања"
+    clear_settings_on_hold,iriverh10: "Обриши подешавања када се током покретања држи ресет тастер"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обриши подешавања када је током покретања укључен тастер hold"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10: "Обришите подешавања када се дугме за ресетовање држи током покретања"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обришите подешавања када је прекидач за чекање укључен током покретања"
+    clear_settings_on_hold,iriverh10: "Обриши подешавања када се током покретања држи ресет тастер"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обриши подешавања када је током покретања укључен тастер hold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Премотавај преко нумера"
+  </dest>
+  <voice>
+    *: "Премотавај преко нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Постави као..."
+  </dest>
+  <voice>
+    *: "Постави као..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Директоријум са плејлистама"
+  </dest>
+  <voice>
+    *: "Директоријум са плејлистама"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Почетни директоријум"
+  </dest>
+  <voice>
+    *: "Почетни директоријум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Директоријум за снимање"
+  </dest>
+  <voice>
+    *: none
+    recording: "Директоријум за снимање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Додај у плејлисту..."
+  </dest>
+  <voice>
+    *: "Додај у плејлисту..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Додај у постојећу плејлисту"
+  </dest>
+  <voice>
+    *: "Додај у постојећу плејлисту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Пушта се следеће..."
+  </dest>
+  <voice>
+    *: "Пушта се следеће..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Пусти следећу"
+  </dest>
+  <voice>
+    *: "Пусти следећу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Додај промешано"
+  </dest>
+  <voice>
+    *: "Додај промешано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Пусти последње"
+  </dest>
+  <voice>
+    *: "Пусти последње"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Пусти последње промешано"
+  </dest>
+  <voice>
+    *: "Пусти последње промешано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Режим подешавања јачине"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Режим подешавања јачине"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Број корака јачине"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Број корака јачине"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Перцептуално"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Перцептуално"
   </voice>
 </phrase>
