@@ -43,10 +43,11 @@ static const char scroll_tick_table[18] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1
 };
 
+#include "drivers/lcd-scroll.c"
+
+#ifndef BOOTLOADER
 static void scroll_thread(void);
 static const char scroll_name[] = "scroll";
-
-#include "drivers/lcd-scroll.c"
 
 #ifdef HAVE_REMOTE_LCD
 static struct event_queue scroll_queue SHAREDBSS_ATTR;
@@ -58,7 +59,7 @@ static struct event_queue scroll_queue SHAREDBSS_ATTR;
 #undef LCDM
 #define LCDM(ma) LCD_REMOTE_ ## ma
 
-#include "drivers/lcd-scroll.c"
+#include "drivers/lcd-scroll.c"   // Yes, a second time.
 
 static void sync_display_ticks(void)
 {
@@ -105,7 +106,6 @@ static bool scroll_process_message(int delay)
 
 static void scroll_thread(void) NORETURN_ATTR;
 #ifdef HAVE_REMOTE_LCD
-
 static void scroll_thread(void)
 {
     enum
@@ -176,18 +176,14 @@ static void scroll_thread(void)
     while (1)
     {
         sleep(lcd_scroll_info.ticks);
-#if !defined(BOOTLOADER)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         if (lcd_active())
 #endif
             lcd_scroll_worker();
-#endif /* !BOOTLOADER */
     }
 }
 #endif /* HAVE_REMOTE_LCD */
 
-
-#ifndef BOOTLOADER
 void scroll_init(void)
 {
     static char scroll_stack[DEFAULT_STACK_SIZE*3];
