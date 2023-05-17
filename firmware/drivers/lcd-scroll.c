@@ -180,7 +180,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     return ended;
 }
 
-#if !defined(BOOTLOADER) || defined(HAVE_REMOTE_LCD)
+#if !defined(BOOTLOADER)
 static void LCDFN(scroll_worker)(void)
 {
     int index;

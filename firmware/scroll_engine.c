@@ -45,13 +45,7 @@ static const char scroll_tick_table[18] = {
 
 #include "drivers/lcd-scroll.c"
 
-#ifndef BOOTLOADER
-static void scroll_thread(void);
-static const char scroll_name[] = "scroll";
-
 #ifdef HAVE_REMOTE_LCD
-static struct event_queue scroll_queue SHAREDBSS_ATTR;
-
 /* copied from lcd-remote-1bit.c */
 /* Compile 1 bit vertical packing LCD driver for remote LCD */
 #undef LCDFN
@@ -59,7 +53,11 @@ static struct event_queue scroll_queue SHAREDBSS_ATTR;
 #undef LCDM
 #define LCDM(ma) LCD_REMOTE_ ## ma
 
-#include "drivers/lcd-scroll.c"   // Yes, a second time.
+#include "drivers/lcd-scroll.c"
+#endif /* HAVE_REMOTE_LCD */
+
+#if defined(HAVE_REMOTE_LCD) && !defined(BOOTLOADER)
+static struct event_queue scroll_queue SHAREDBSS_ATTR;
 
 static void sync_display_ticks(void)
 {
@@ -102,9 +100,13 @@ static bool scroll_process_message(int delay)
 
     return false;
 }
-#endif /* HAVE_REMOTE_LCD */
+#endif /* HAVE_REMOTE_LCD && !BOOTLOADER */
 
+#if !defined(BOOTLOADER)
+static void scroll_thread(void);
+static const char scroll_name[] = "scroll";
 static void scroll_thread(void) NORETURN_ATTR;
+
 #ifdef HAVE_REMOTE_LCD
 static void scroll_thread(void)
 {
@@ -170,7 +172,7 @@ static void scroll_thread(void)
         }
     }
 }
-#else
+#else /* !HAVE_REMOTE_LCD */
 static void scroll_thread(void)
 {
     while (1)
@@ -182,7 +184,7 @@ static void scroll_thread(void)
             lcd_scroll_worker();
     }
 }
-#endif /* HAVE_REMOTE_LCD */
+#endif /* !HAVE_REMOTE_LCD */
 
 void scroll_init(void)
 {
@@ -195,9 +197,9 @@ void scroll_init(void)
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 }
-#else
+#else /* BOOTLOADER */
 void scroll_init(void)
 {
     /* DUMMY */
 }
-#endif /* ndef BOOTLOADER*/
+#endif /* BOOTLOADER*/
