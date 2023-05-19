@@ -44,7 +44,7 @@
 #define disk_writer_lock()      file_internal_lock_WRITER()
 #define disk_writer_unlock()    file_internal_unlock_WRITER()
 
-/* Partition table entry layout:
+/* "MBR" Partition table entry layout:
    -----------------------
    0: 0x80 - active
    1: starting head
@@ -58,6 +58,16 @@
    12-15: nr of sectors in partition
 */
 
+#define BYTES2INT64(array, pos) \
+    (((uint64_t)array[pos+0] <<  0) | \
+     ((uint64_t)array[pos+1] <<  8) | \
+     ((uint64_t)array[pos+2] << 16) | \
+     ((uint64_t)array[pos+3] << 24) | \
+     ((uint64_t)array[pos+4] << 32) | \
+     ((uint64_t)array[pos+5] << 40) | \
+     ((uint64_t)array[pos+6] << 48) | \
+     ((uint64_t)array[pos+7] << 56) )
+
 #define BYTES2INT32(array, pos) \
     (((uint32_t)array[pos+0] <<  0) | \
      ((uint32_t)array[pos+1] <<  8) | \
@@ -65,11 +75,11 @@
      ((uint32_t)array[pos+3] << 24))
 
 #define BYTES2INT16(array, pos) \
-    (((uint32_t)array[pos+0] << 0) | \
-     ((uint32_t)array[pos+1] << 8))
+    (((uint16_t)array[pos+0] << 0) | \
+     ((uint16_t)array[pos+1] << 8))
 
 /* space for 4 partitions on 2 drives */
-static struct partinfo part[NUM_DRIVES*4];
+static struct partinfo part[NUM_DRIVES*MAX_PARTITIONS_PER_DRIVE];
 /* mounted to which drive (-1 if none) */
 static int vol_drive[NUM_VOLUMES];
 
@@ -120,12 +130,13 @@ bool disk_init(IF_MD_NONVOID(int drive))
         /* For each drive, start at a different position, in order not to
            destroy the first entry of drive 0. That one is needed to calculate
            config sector position. */
-        struct partinfo *pinfo = &part[IF_MD_DRV(drive)*4];
+        struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
+	uint8_t is_gpt = 0;
 
         disk_writer_lock();
 
         /* parse partitions */
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < MAX_PARTITIONS_PER_DRIVE && i < 4; i++)
         {
             unsigned char* ptr = sector + 0x1be + 16*i;
             pinfo[i].type  = ptr[4];
@@ -140,8 +151,115 @@ bool disk_init(IF_MD_NONVOID(int drive))
             {
                 /* not handled yet */
             }
-        }
 
+            if (pinfo[i].type == PARTITION_TYPE_GPT_GUARD) {
+		is_gpt = 1;
+	    }
+	}
+
+	while (is_gpt) {
+	    /* Re-start partition parsing using GPT */
+	    uint64_t part_lba;
+	    uint32_t part_entries;
+	    uint32_t part_entry_size;
+            unsigned char* ptr = sector;
+
+	    storage_read_sectors(IF_MD(drive,) 1, 1, sector);
+
+	    part_lba = BYTES2INT64(ptr, 0);
+            if (part_lba != 0x5452415020494645ULL) {
+                DEBUGF("GPT: Invalid signature\n");
+                break;
+            }
+            part_entry_size = BYTES2INT32(ptr, 8);
+            if (part_entry_size != 0x00010000) {
+                DEBUGF("GPT: Invalid version\n");
+                break;
+            }
+            part_entry_size = BYTES2INT32(ptr, 12);
+            if (part_entry_size != 0x5c) {
+                DEBUGF("GPT: Invalid header size\n");
+                break;
+            }
+            // XXX checksum header -- u32 @ offset 16
+            part_entry_size = BYTES2INT32(ptr, 24);
+            if (part_entry_size != 1) {
+                DEBUGF("GPT: Invalid header LBA\n");
+                break;
+            }
+
+	    part_lba = BYTES2INT64(ptr, 72);
+	    part_entries = BYTES2INT32(ptr, 80);
+	    part_entry_size = BYTES2INT32(ptr, 84);
+
+	    int part = 0;
+reload:
+	    storage_read_sectors(IF_MD(drive,) part_lba, 1, sector);
+            uint8_t *pptr = ptr;
+	    while (part < MAX_PARTITIONS_PER_DRIVE && part_entries) {
+		if (pptr - ptr >= SECTOR_SIZE) {
+		    part_lba++;
+		    goto reload;
+		}
+
+		/* Parse GPT entry.  We only care about the "General Data" type, ie:
+		     EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
+                     LE32     LE16 LE16 BE16 BE16
+                */
+                uint64_t tmp;
+                tmp = BYTES2INT32(pptr, 0);
+                if (tmp != 0xEBD0A0A2)
+                    goto skip;
+                tmp = BYTES2INT16(pptr, 4);
+                if (tmp != 0xB9E5)
+                    goto skip;
+                tmp = BYTES2INT16(pptr, 6);
+                if (tmp != 0x4433)
+                    goto skip;
+                if (pptr[8] != 0x87 || pptr[9] != 0xc0)
+                    goto skip;
+                if (pptr[10] != 0x68 || pptr[11] != 0xb6 || pptr[12] != 0xb7 ||
+                    pptr[13] != 0x26 || pptr[14] != 0x99 || pptr[15] != 0xc7)
+                    goto skip;
+
+                tmp = BYTES2INT64(pptr, 48); /* Flags */
+                if (tmp) {
+                    DEBUGF("GPT: Skip parition with flags\n");
+                    goto skip; /* Any flag makes us ignore this */
+                }
+                tmp = BYTES2INT64(pptr, 32); /* FIRST LBA */
+                if (tmp > UINT32_MAX) { // XXX revisit when we resize struct partinfo!
+                    DEBUGF("GPT: partition starts after 2GiB mark\n");
+                    goto skip;
+                }
+                if (tmp < 34) {
+                    DEBUGF("GPT: Invalid start LBA\n");
+                    goto skip;
+                }
+                pinfo[part].start = tmp;
+                tmp = BYTES2INT64(pptr, 40); /* LAST LBA */
+                if (tmp > UINT32_MAX) { // XXX revisit when we resize struct partinfo!
+                    DEBUGF("GPT: partition ends after 2GiB mark\n");
+                    goto skip;
+                }
+                if (tmp <= pinfo[part].start) {
+                    DEBUGF("GPT: Invalid end LBA\n");
+                    goto skip;
+                }
+                pinfo[part].size = tmp - pinfo[part].start + 1;
+                pinfo[part].type = PARTITION_TYPE_FAT32_LBA;
+
+                DEBUGF("GPart%d: start: %08lx size: %08lx\n",
+                       part,pinfo[part].start,pinfo[part].size);
+                part++;
+
+            skip:
+                pptr += part_entry_size;
+                part_entries--;
+            }
+
+            is_gpt = 0; /* To break out of the loop */
+	}
         disk_writer_unlock();
 
         init = true;
@@ -192,8 +310,7 @@ int disk_mount(int drive)
     disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
 #endif
 
-
-       /* try "superfloppy" mode */
+        /* try "superfloppy" mode */
         DEBUGF("Trying to mount sector 0.\n");
 
         if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
@@ -210,11 +327,13 @@ int disk_mount(int drive)
     if (mounted == 0 && volume != -1) /* not a "superfloppy"? */
     {
         for (int i = CONFIG_DEFAULT_PARTNUM;
-             volume != -1 && i < 4 && mounted < NUM_VOLUMES_PER_DRIVE;
+             volume != -1 && i < MAX_PARTITIONS_PER_DRIVE && mounted < NUM_VOLUMES_PER_DRIVE;
              i++)
         {
             if (pinfo[i].type == 0 || pinfo[i].type == 5)
                 continue;  /* skip free/extended partitions */
+
+        DEBUGF("Trying to mount partition %d.\n", i);
 
         #ifdef MAX_LOG_SECTOR_SIZE
             for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
