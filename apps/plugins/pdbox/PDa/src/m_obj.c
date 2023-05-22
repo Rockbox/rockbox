@@ -272,6 +272,7 @@ static int outlet_eventno;
     recursion */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wdangling-pointer"
 void outlet_setstacklim(void)
 {
     char c;
