@@ -4360,7 +4360,7 @@ gccver=`$CC -dumpversion`;
 if [ $uname = "Darwin" ]; then
  ldver=`$LD -v 2>&1 | sed -e 's/[^0-9.-]//g'`
 else
- ldver=`$LD --version | head -n 1 | sed -e 's/\ /\n/g' | tail -n 1`
+ ldver=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
 fi
 
 # Convert LD version to a number major*100 + minor
