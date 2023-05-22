@@ -16,6 +16,7 @@ my $LANGUAGE_COOKIE   = 0x1a;
 my $VOICE_COOKIE      = 0x9a;
 my $LANGUAGE_VERSION  = 0x06;
 my $LANGUAGE_FLAG_RTL = 0x01;
+my $LANGUAGE_FLAG_UNITS_FIRST = 0x02;
 
 my $HEADER_SIZE       = 4;
 my $SUBHEADER_SIZE    = 6;
@@ -371,6 +372,9 @@ while(<LANG>) {
         # comment or empty line - output it if it's part of the header
         if ($_ =~ /LANGUAGE_IS_RTL/) {
             $langoptions |= $LANGUAGE_FLAG_RTL;
+        }
+        if ($_ =~ /LANGUAGE_UNITS_FIRST/) {
+            $langoptions |= $LANGUAGE_FLAG_UNITS_FIRST;
         }
 
         if ($header and $sortfile) {

@@ -37,7 +37,9 @@
 /* See tools/genlang (TODO: Use common include for both) */
 #define LANGUAGE_COOKIE   0x1a
 #define LANGUAGE_VERSION  0x06
-#define LANGUAGE_FLAG_RTL 0x01
+
+#define LANGUAGE_FLAG_RTL         0x01
+#define LANGUAGE_FLAG_UNITS_FIRST 0x02
 
 #define HEADER_SIZE 4
 #define SUBHEADER_SIZE 6
@@ -54,8 +56,8 @@ void lang_init(const unsigned char *builtin, unsigned char **dest, int count)
     }
 }
 
-int lang_load(const char *filename, const unsigned char *builtin, 
-              unsigned char **dest, unsigned char *buffer, 
+int lang_load(const char *filename, const unsigned char *builtin,
+              unsigned char **dest, unsigned char *buffer,
               unsigned int user_num, int max_lang_size,
               unsigned int max_id)
 {
@@ -142,4 +144,9 @@ int lang_english_to_id(const char *english)
 int lang_is_rtl(void)
 {
     return (lang_options & LANGUAGE_FLAG_RTL) != 0;
+}
+
+int lang_units_first(void)
+{
+    return (lang_options & LANGUAGE_FLAG_UNITS_FIRST) != 0;
 }

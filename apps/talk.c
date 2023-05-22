@@ -35,6 +35,7 @@
 #include "voice_thread.h"
 #include "audio.h"
 #include "lang.h"
+#include "language.h"
 #include "talk.h"
 #include "metadata.h"
 /*#define LOGF_ENABLE*/
@@ -1419,8 +1420,11 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
         return 0;
     }
 
+    if (lang_units_first())
+        talk_id(unit_id, true); /* say the unit, if any */
     talk_number(n, enqueue); /* say the number */
-    talk_id(unit_id, true); /* say the unit, if any */
+    if (!lang_units_first())
+        talk_id(unit_id, true); /* say the unit, if any */
 
     return 0;
 }
