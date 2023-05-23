@@ -29,8 +29,12 @@ else
     make="make"
 fi
 
+# record version
+makever=`$make -v |sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
+
 # This is the absolute path to where the script resides.
 rockboxdevdir="$( readlink -f "$( dirname "${BASH_SOURCE[0]}" )" )"
+patch_dir="$rockboxdevdir/toolchain-patches"
 
 if [ `uname -s` = "Darwin" ]; then
     parallel=`sysctl -n hw.physicalcpu`
@@ -51,7 +55,7 @@ if [ -z $LINUX_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc g++ xz bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
+reqtools="gcc g++ xz bzip2 gzip $make patch makeinfo automake libtool autoconf flex bison"
 
 ##############################################################################
 # Functions:
@@ -427,8 +431,6 @@ build() {
         mkdir -p $builddir
     fi
 
-    patch_dir="$rockboxdevdir/toolchain-patches"
-
     # download source tarball
     gettool "$toolname" "$version"
     file="$toolname-$version"
@@ -530,6 +532,8 @@ build_linux_toolchain () {
     linux_ver="$6"
     glibc_ver="$7"
     glibc_opts="$8"
+    glibc_patches="$9"
+
     # where to put the sysroot
     sysroot="$prefix/$target/sysroot"
     # extract arch from target
@@ -553,6 +557,11 @@ build_linux_toolchain () {
         mkdir -p $builddir
     fi
 
+    if [ "$makever" -gt 43 ] ; then
+	glibc_make_opts="--jobserver-style=pipe --shuffle=none"
+#	MAKEFLAGS="--jobserver-style=pipe --shuffle=none"
+    fi
+
     # download all tools
     gettool "binutils" "$binutils_ver"
     gettool "gcc" "$gcc_ver"
@@ -565,6 +574,18 @@ build_linux_toolchain () {
     extract "gcc-$gcc_ver"
     extract "linux-$linux_ver"
     extract "glibc-$glibc_ver"
+
+    # do we have a patch?
+    for p in $glibc_patches; do
+        echo "ROCKBOXDEV: applying patch $p"
+	(cd $builddir/glibc-$glibc_ver ; patch -p1 < "$patch_dir/$p")
+
+	# check if the patch applied cleanly
+        if [ $? -gt 0 ]; then
+            echo "ROCKBOXDEV: failed to apply patch $p"
+            exit
+        fi
+    done
 
     # we make it possible to restart a build on error by using the RBDEV_RESTART
     # variable, the format is RBDEV_RESTART="tool" where tool is the toolname at which
@@ -600,7 +621,7 @@ build_linux_toolchain () {
     prefix="/usr" \
     buildtool "glibc" "$glibc_ver" "--target=$target --host=$target --build=$MACHTYPE \
         --with-__thread --with-headers=$sysroot/usr/include $glibc_opts" \
-        "" "install install_root=$sysroot"
+        "$glibc_make_opts" "install install_root=$sysroot"
     # build stage 2 compiler
     RESTART_STEP="gcc-stage2" \
     buildtool "gcc" "$gcc_ver" "$gcc_opts --enable-languages=c,c++ --target=$target \
@@ -671,6 +692,11 @@ for t in $reqtools; do
 done
 if [ -n "$missingtools" ]; then
     echo "ROCKBOXDEV: Please install the missing tools and re-run the script."
+    exit 1
+fi
+
+if ! $make -v | grep -q GNU ; then
+    echo "ROCKBOXDEV: Building the rockbox toolchains requires GNU Make."
     exit 1
 fi
 
@@ -789,7 +815,7 @@ do
             # avoid patches/bugs.
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
             build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "4.9.4" \
-                "$gccopts" "2.6.32.68" "2.19" "$glibcopts"
+                "$gccopts" "2.6.32.68" "2.19" "$glibcopts" "glibc-220-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
@@ -825,7 +851,7 @@ do
             glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16"
             # FIXME: maybe add -mhard-float
             build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
-                "$gccopts" "3.2.85" "2.25" "$glibcopts"
+                "$gccopts" "3.2.85" "2.25" "$glibcopts" "glibc-225-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
