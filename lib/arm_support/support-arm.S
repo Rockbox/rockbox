@@ -30,6 +30,8 @@
 
 #include <config.h>
 
+.syntax unified
+
 .macro ARM_SDIV32_PRE numerator, divisor, sign
     /* sign[31] = divisor sign */
     ands    \sign, \divisor, #1<<31

@@ -35,6 +35,8 @@
 #define push            lsr
 #endif
 
+	.syntax unified
+
         .text
 
 /*

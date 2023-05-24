@@ -22,6 +22,7 @@
  ****************************************************************************/
  #include "rbcodecconfig.h"
 
+    .syntax unified
 /****************************************************************************
  *  void channel_mode_proc_mono(struct dsp_proc_entry *this,
  *                              struct dsp_buffer **buf_p)

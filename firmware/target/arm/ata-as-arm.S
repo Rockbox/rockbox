@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+    .syntax unified
 
 #if CONFIG_CPU == PP5002
     /* Causes ATA retries on iPod G3 probably related to improper controller

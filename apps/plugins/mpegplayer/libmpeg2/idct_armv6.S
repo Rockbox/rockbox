@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+    .syntax unified
+
     .global     mpeg2_idct_copy
     .type       mpeg2_idct_copy, %function
     .global     mpeg2_idct_add

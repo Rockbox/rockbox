@@ -35,6 +35,8 @@
 #define push            lsr
 #endif
 
+    .syntax     unified
+
 /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
 /* Prototype: void *mempcpy(void *dest, const void *src, size_t n); */
 

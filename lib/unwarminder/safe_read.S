@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "config.h"
 
+.syntax unified
+
 .data
 was_aborted:
     .word   0

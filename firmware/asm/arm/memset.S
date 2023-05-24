@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "config.h"
 
+    .syntax unified
+
     .section    .icode,"ax",%progbits
 
     .align      2

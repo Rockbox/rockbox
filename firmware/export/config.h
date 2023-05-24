@@ -1018,14 +1018,19 @@ Lyre prototype 1 */
  * These macros are for switching on unified syntax in inline assembly.
  * Older versions of GCC emit assembly in divided syntax with no option
  * to enable unified syntax.
- *
- * FIXME: This needs to be looked at after the toolchain bump
  */
+#if (__GNUC__ < 8)
 #define BEGIN_ARM_ASM_SYNTAX_UNIFIED ".syntax unified\n"
 #define END_ARM_ASM_SYNTAX_UNIFIED   ".syntax divided\n"
+#else
+#define BEGIN_ARM_ASM_SYNTAX_UNIFIED
+#define END_ARM_ASM_SYNTAX_UNIFIED
+#endif
 
 #if defined(CPU_ARM) && defined(__ASSEMBLER__)
+#if (__GNUC__ < 8)
 .syntax unified
+#endif
 /* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */
 .macro ldmpc cond="", order="ia", regs
 #if ARM_ARCH == 4 && defined(USE_THUMB)
@@ -1043,6 +1048,9 @@ Lyre prototype 1 */
     ldr\cond pc, [sp], #4
 #endif
 .endm
+#if (__GNUC__ < 8)
+.syntax divided
+#endif
 #endif
 
 #if defined(CPU_COLDFIRE) && defined(__ASSEMBLER__)

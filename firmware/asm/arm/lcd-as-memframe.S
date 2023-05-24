@@ -24,6 +24,8 @@
 #include "config.h"
 #include "cpu.h"
 
+     .syntax     unified
+
 /****************************************************************************
  * void lcd_copy_buffer_rect(fb_data *dst, fb_data *src, int width,
  *                           int height);

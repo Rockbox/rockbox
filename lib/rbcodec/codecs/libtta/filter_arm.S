@@ -26,6 +26,8 @@
  * void hybrid_filter(fltst *fs, int *in)
  */
 
+    .syntax unified
+
 #ifdef USE_IRAM
     .section .icode, "ax", %progbits
 #else

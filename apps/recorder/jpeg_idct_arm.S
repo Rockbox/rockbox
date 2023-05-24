@@ -24,6 +24,8 @@
 #include "config.h"
 #include "apps/core_asmdefs.h"
 
+    .syntax unified
+
     .section .text
     .align   2
     .global jpeg_idct1h

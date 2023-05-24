@@ -20,6 +20,7 @@
  ****************************************************************************/
  #include "rbcodecconfig.h"
 
+ .syntax unified
 /****************************************************************************
  *  void sample_output_mono(struct sample_io_data *this,
  *                          struct dsp_buffer *src,
