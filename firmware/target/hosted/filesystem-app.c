@@ -584,6 +584,7 @@ int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize)
     char volname[VOL_MAX_LEN + 1];
     get_volume_name(volume, volname);
 #else
+    IF_MV((void)volume;)
     const char *volname = "/";
 #endif
 
