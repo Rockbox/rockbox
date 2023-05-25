@@ -4270,7 +4270,7 @@ fi
       simcc "database-sdl"
       toolset='';
       appsdir='$(ROOTDIR)/tools/database';
-      rbdir="./.rockbox"
+
       case $uname in
           CYGWIN*|MINGW*)
               output="database_${modelname}.exe"

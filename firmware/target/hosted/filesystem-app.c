@@ -43,6 +43,10 @@
 #undef PIVOT_ROOT
 #endif
 
+#if defined(DBTOOL)
+#define PIVOT_ROOT "."
+#endif
+
 #if defined(__PCTOOL__)
 /* We don't want this for tools */
 #undef HAVE_SPECIAL_DIRS
@@ -222,7 +226,7 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #define PIVOT_ROOT_LEN (sizeof(PIVOT_ROOT)-1)
     /* Prepend root prefix to find actual path */
     if (strncmp(PIVOT_ROOT, dir, PIVOT_ROOT_LEN)
-#ifdef MULTIDRIVE_DIR
+#if defined(MULTIDRIVE_DIR) && defined(MULTIDRIVE_DIR_LEN)
 	/* Unless it's a MULTIDRIVE dir, in which case use as-is */
 	&& strncmp(MULTIDRIVE_DIR, dir, MULTIDRIVE_DIR_LEN)
 #endif
