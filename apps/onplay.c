@@ -70,6 +70,7 @@ static const char *selected_file = NULL;
 static char selected_file_path[MAX_PATH];
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+static bool in_queue_submenu = false;
 static bool (*ctx_current_playlist_insert)(int position, bool queue, bool create_new);
 static int (*ctx_add_to_playlist)(const char* playlist, bool new_playlist);
 extern struct menu_item_ex file_menu; /* settings_menu.c  */
@@ -767,8 +768,6 @@ static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list)
 {
-    static bool in_queue_submenu = false;
-
     (void)this_list;
     switch (action)
     {
@@ -822,13 +821,7 @@ static int treeplaylist_callback(int action,
         break;
 
     case ACTION_ENTER_MENUITEM:
-        if (this_item == &queue_menu)
-            in_queue_submenu = true;
-        break;
-
-    case ACTION_EXIT_MENUITEM:
-        if (this_item == &queue_menu)
-            in_queue_submenu = false;
+        in_queue_submenu = this_item == &queue_menu;
         break;
     }
 
@@ -844,6 +837,7 @@ void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb))
         selected_file_attr = ATTR_DIRECTORY;
     else
         selected_file_attr = filetype_get_attr(path);
+    in_queue_submenu = false;
     do_menu(&tree_playlist_menu, NULL, NULL, false);
 }
 
