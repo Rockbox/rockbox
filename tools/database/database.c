@@ -30,3 +30,34 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+
+/* needed for io.c */
+const char *sim_root_dir = ".";
+
+/* stubs to avoid including thread-sdl.c */
+#include "kernel.h"
+void mutex_init(struct mutex *m)
+{
+    (void)m;
+}
+
+void mutex_lock(struct mutex *m)
+{
+    (void)m;
+}
+
+void mutex_unlock(struct mutex *m)
+{
+    (void)m;
+}
+
+void sim_thread_lock(void *me)
+{
+    (void)me;
+}
+
+void * sim_thread_unlock(void)
+{
+    return (void*)1;
+}
