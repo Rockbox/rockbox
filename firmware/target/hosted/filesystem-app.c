@@ -580,7 +580,7 @@ ssize_t app_readlink(const char *path, char *buf, size_t bufsiz)
 
 int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize)
 {
-#ifdef HAVE_MULTIVOLUME
+#if defined(HAVE_MULTIVOLUME) && !(CONFIG_PLATFORM & PLATFORM_HOSTED)
     char volname[VOL_MAX_LEN + 1];
     get_volume_name(volume, volname);
 #else
