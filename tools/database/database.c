@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
     /* / is actually ., will get translated in io.c
      * (with the help of sim_root_dir below */
-    const char *paths[] = { "/", NULL };
+    const char *paths[] = { "./", NULL };
     tagcache_init();
     do_tagcache_build(paths);
     tagcache_reverse_scan();
