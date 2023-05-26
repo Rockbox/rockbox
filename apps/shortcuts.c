@@ -640,7 +640,10 @@ int do_shortcut_menu(void *ignored)
                     }
                     else
                     {
-                        onplay_show_playlist_menu(sc->u.path, NULL);
+                        onplay_show_playlist_menu(sc->u.path,
+                                                  dir_exists(sc->u.path) ? ATTR_DIRECTORY :
+                                                  filetype_get_attr(sc->u.path),
+                                                  NULL);
                     }
                     break;
                 case SHORTCUT_FILE:

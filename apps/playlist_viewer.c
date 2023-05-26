@@ -634,7 +634,7 @@ static enum pv_onplay_result onplay_menu(int index)
         {
             case 0:
                 /* playlist */
-                onplay_show_playlist_menu(current_track->name, NULL);
+                onplay_show_playlist_menu(current_track->name, FILE_ATTR_AUDIO, NULL);
                 ret = PV_ONPLAY_UNCHANGED;
                 break;
             case 1:

@@ -78,6 +78,6 @@ const struct hotkey_assignment *get_hotkey(int action);
 /* needed for the playlist viewer.. eventually clean this up */
 void onplay_show_playlist_cat_menu(const char* track_name, int attr,
                                    void (*add_to_pl_cb));
-void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb));
+void onplay_show_playlist_menu(const char* path, int attr, void (*playlist_insert_cb));
 
 #endif

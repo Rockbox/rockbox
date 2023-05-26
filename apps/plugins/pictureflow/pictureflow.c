@@ -4188,7 +4188,7 @@ static int context_menu(void)
 {
     char album_name[MAX_PATH];
     char *file_name = get_track_filename(show_tracks_while_browsing ? 0 : pf_tracks.sel);
-    int attr;
+    int attr = FILE_ATTR_AUDIO;
 
     enum {
         PF_CURRENT_PLAYLIST = 0,
@@ -4205,13 +4205,15 @@ static int context_menu(void)
                             NULL, NULL, false)) {
 
             case PF_CURRENT_PLAYLIST:
-                rb->onplay_show_playlist_menu(file_name,
-                                              &pf_current_playlist_insert);
+                if (insert_whole_album && pf_tracks.count > 1)
+                {
+                    attr = ATTR_DIRECTORY;
+                    file_name = NULL;
+                }
+                rb->onplay_show_playlist_menu(file_name, attr, &pf_current_playlist_insert);
                 return 0;
             case PF_CATALOG:
-                if (!insert_whole_album)
-                    attr = FILE_ATTR_AUDIO;
-                else
+                if (insert_whole_album)
                 {
                     /* add a leading slash so that catalog_add_to_a_playlist
                        later prefills the name when creating a new playlist */

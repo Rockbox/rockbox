@@ -828,15 +828,12 @@ static int treeplaylist_callback(int action,
     return action;
 }
 
-void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb))
+void onplay_show_playlist_menu(const char* path, int attr, void (*playlist_insert_cb))
 {
     context = CONTEXT_STD;
     ctx_current_playlist_insert = playlist_insert_cb;
     selected_file = path;
-    if (dir_exists(path))
-        selected_file_attr = ATTR_DIRECTORY;
-    else
-        selected_file_attr = filetype_get_attr(path);
+    selected_file_attr = attr;
     in_queue_submenu = false;
     do_menu(&tree_playlist_menu, NULL, NULL, false);
 }

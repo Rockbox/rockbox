@@ -162,7 +162,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 268
+#define PLUGIN_API_VERSION 269
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -495,7 +495,7 @@ struct plugin_api {
     void (*set_current_file)(const char* path);
     void (*set_dirfilter)(int l_dirfilter);
 
-    void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
+    void (*onplay_show_playlist_menu)(const char* path, int attr, void (*playlist_insert_cb));
     void (*onplay_show_playlist_cat_menu)(const char* track_name, int attr,
                                           void (*add_to_pl_cb));
     bool (*browse_id3)(struct mp3entry *id3,
