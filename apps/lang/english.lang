@@ -6125,18 +6125,21 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "H D 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
