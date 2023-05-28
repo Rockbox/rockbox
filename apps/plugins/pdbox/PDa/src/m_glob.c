@@ -16,7 +16,7 @@ void glob_quit(void *dummy);
 void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv);
 void glob_meters(void *dummy, t_floatarg f);
 void glob_key(void *dummy, t_symbol *s, int ac, t_atom *av);
-void glob_audiostatus(void *dummy);
+void glob_audiostatus(void);
 void glob_finderror(t_pd *dummy);
 void glob_audio_properties(t_pd *dummy, t_floatarg flongform);
 void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv);
