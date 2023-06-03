@@ -411,6 +411,7 @@ static int remove_extension(char* path)
 bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
                                     const char* curr_pl_name)
 {
+    char bmark_file[MAX_PATH + 7];
     bool do_save = false;
     while (!do_save && !remove_extension(pl_name) &&
            !kbd_input(pl_name, buf_size - 7, NULL))
@@ -421,7 +422,16 @@ bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
         /* warn before overwriting existing (different) playlist */
         if ((!curr_pl_name || strcmp(curr_pl_name, pl_name)) &&
             file_exists(pl_name))
+        {
             do_save = confirm_overwrite_yesno() == YESNO_YES;
+
+            if (do_save) /* delete bookmark file unrelated to new playlist */
+            {
+                snprintf(bmark_file, sizeof(bmark_file), "%s.bmark", pl_name);
+                if (file_exists(bmark_file))
+                    remove(bmark_file);
+            }
+        }
     }
     return do_save;
 }
