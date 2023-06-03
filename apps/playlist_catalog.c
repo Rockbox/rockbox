@@ -389,6 +389,43 @@ bool catalog_view_playlists(void)
     return (display_playlists(NULL, CATBROWSE_CATVIEW) >= 0);
 }
 
+static void apply_playlist_extension(char* buf, size_t buf_size)
+{
+    size_t len = strlen(buf);
+    if(len > 4 && !strcasecmp(&buf[len-4], ".m3u"))
+        strlcat(buf, "8", buf_size);
+    else if(len <= 5 || strcasecmp(&buf[len-5], ".m3u8"))
+        strlcat(buf, ".m3u8", buf_size);
+}
+
+static int remove_extension(char* path)
+{
+    char *dot = strrchr(path, '.');
+    if (dot)
+       *dot = '\0';
+
+    return 0;
+}
+
+
+bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
+                                    const char* curr_pl_name)
+{
+    bool do_save = false;
+    while (!do_save && !remove_extension(pl_name) &&
+           !kbd_input(pl_name, buf_size - 7, NULL))
+    {
+        do_save = true;
+        apply_playlist_extension(pl_name, buf_size);
+
+        /* warn before overwriting existing (different) playlist */
+        if ((!curr_pl_name || strcmp(curr_pl_name, pl_name)) &&
+            file_exists(pl_name))
+            do_save = confirm_overwrite_yesno() == YESNO_YES;
+    }
+    return do_save;
+}
+
 static int (*ctx_add_to_playlist)(const char* playlist, bool new_playlist);
 bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name,
@@ -404,7 +441,6 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
 
     if (new_playlist)
     {
-        size_t len;
         if (m3u8name == NULL)
         {
             const char *name;
@@ -425,14 +461,10 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         else
             strmemccpy(playlist, m3u8name, MAX_PATH);
 
-        if (kbd_input(playlist, MAX_PATH, NULL))
+        apply_playlist_extension(playlist, sizeof(playlist));
+        
+        if (!catalog_pick_new_playlist_name(playlist, sizeof(playlist), NULL))
             return false;
-
-        len = strlen(playlist);
-        if(len > 4 && !strcasecmp(&playlist[len-4], ".m3u"))
-            strlcat(playlist, "8", sizeof(playlist));
-        else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
-            strlcat(playlist, ".m3u8", sizeof(playlist));
     }
     else
     {

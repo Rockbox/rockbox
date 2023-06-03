@@ -948,13 +948,6 @@ static bool poll_cancel_action(const char *path)
     return ACTION_STD_CANCEL == get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
 }
 
-static int confirm_overwrite(void)
-{
-    static const char *lines[] = { ID2P(LANG_REALLY_OVERWRITE) };
-    static const struct text_message message = { lines, 1 };
-    return gui_syncyesno_run(&message, NULL, NULL);
-}
-
 static bool check_new_name(const char *basename)
 {
     /* at least prevent escapes out of the base directory from keyboard-
@@ -1426,7 +1419,7 @@ static int clipboard_paste(void)
     case RELATE_DIFFERENT:
         if (file_exists(target.path)) {
             /* If user chooses not to overwrite, cancel */
-            if (confirm_overwrite() == YESNO_NO) {
+            if (confirm_overwrite_yesno() == YESNO_NO) {
                 rc = OPRC_NOOVERWRT;
                 break;
             }

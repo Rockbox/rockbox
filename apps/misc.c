@@ -1227,6 +1227,13 @@ int confirm_delete_yesno(const char *name)
     return gui_syncyesno_run(&message, &yes_message, NULL);
 }
 
+int confirm_overwrite_yesno(void)
+{
+    static const char *lines[] = { ID2P(LANG_REALLY_OVERWRITE) };
+    static const struct text_message message = { lines, 1 };
+    return gui_syncyesno_run(&message, NULL, NULL);
+}
+
 /*  time_split_units()
     split time values depending on base unit
     unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS

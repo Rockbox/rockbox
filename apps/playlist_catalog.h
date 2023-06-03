@@ -33,6 +33,9 @@ void catalog_set_directory(const char* directory);
  */
 bool catalog_view_playlists(void);
 
+bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
+                                    const char* curr_pl_name);
+
 /* 
  * Add something to a playlist (new or select from list of playlists in
  * catalog).
