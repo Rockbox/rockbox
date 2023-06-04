@@ -661,7 +661,8 @@ static enum pv_onplay_result onplay_menu(int index)
                 break;
             case 6:
                 /* save playlist */
-                save_playlist_screen(viewer.playlist);
+                if (!save_playlist_screen(viewer.playlist))
+                    dirty = false;
                 ret = PV_ONPLAY_UNCHANGED;
                 break;
             case 7:
