@@ -6042,18 +6042,21 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "ha de 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro es de"
     xduoox3: "mikro es de 2"
@@ -13297,16 +13300,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Wyczyść listę odtwarzania"
+    *: ""
   </dest>
   <voice>
-    *: "Wyczyść listę odtwarzania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16539,5 +16542,33 @@
   <voice>
     *: none
     perceptual_volume: "Percepcyjny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Pokazuj utwory podczas przeglądania"
+  </dest>
+  <voice>
+    *: "Pokazuj utwory podczas przeglądania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Przejdź do ostatniego albumu"
+  </dest>
+  <voice>
+    *: "Przejdź do ostatniego albumu"
   </voice>
 </phrase>
