@@ -5342,10 +5342,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -6041,24 +6043,33 @@
     xduoox3: "micro S D 1"
   </voice>
 </phrase>
+### The <source> section for 'LANG_DISK_NAME_MMC:hibylinux' is missing! Copying from english!
+### The <source> section for 'LANG_DISK_NAME_MMC:multivolume' differs from the english!
+### the previously used one is commented below:
+### HD1:
+### The <dest> section for 'LANG_DISK_NAME_MMC:hibylinux' is missing! Copying from english!
+### The <voice> section for 'LANG_DISK_NAME_MMC:hibylinux' is missing! Copying from english!
 <phrase>
   id: LANG_DISK_NAME_MMC
   desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "H D 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
@@ -14597,16 +14608,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Clear playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Clear playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16530,5 +16541,35 @@
   <voice>
     *: none
     perceptual_volume: "Perceptual"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Show Tracks While Browsing"
+  </dest>
+  <voice>
+    *: "Show Tracks While Browsing"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Go to Last Album"
+  </dest>
+  <voice>
+    *: "Go to Last Album"
   </voice>
 </phrase>
