@@ -426,9 +426,16 @@ static int parse_image_load(struct skin_element *element,
     img->buflib_handle = -1;
     img->is_9_segment = false;
     img->loaded = false;
+    img->dither = false;
 
     if (token->type == SKIN_TOKEN_IMAGE_DISPLAY)
+    {
         token->value.data = PTRTOSKINOFFSET(skin_buffer, img);
+#ifdef HAVE_BACKDROP_IMAGE
+        if (curr_vp)
+            img->dither = curr_vp->output_to_backdrop_buffer;
+#endif
+    }
 
     if (!strcmp(img->bm.data, "__list_icons__"))
     {
@@ -1910,11 +1917,12 @@ static int buflib_move_callback(int handle, void* current, void* new)
 }
 #endif
 
-static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
+static int load_skin_bmp(struct wps_data *wps_data, struct gui_img *img, char* bmpdir)
 {
 
     (void)wps_data; /* only needed for remote targets */
     char img_path[MAX_PATH];
+    struct bitmap *bitmap = &img->bm;
 
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
@@ -1938,7 +1946,8 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
         bmpformat = FORMAT_ANY|FORMAT_REMOTE;
     else
 #endif
-        bmpformat = FORMAT_ANY|FORMAT_TRANSPARENT;
+        bmpformat = img->dither ? FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT :
+                                  FORMAT_ANY|FORMAT_TRANSPARENT;
 
     handle = core_load_bmp(img_path, bitmap, bmpformat, &buf_reqd, &buflib_ops);
     if (handle != CLB_ALOC_ERR)
@@ -1990,7 +1999,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                 char path[MAX_PATH];
                 int handle;
                 strcpy(path, img->bm.data);
-                handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                handle = load_skin_bmp(wps_data, img, bmpdir);
                 img->buflib_handle = handle;
                 img->loaded = img->buflib_handle > 0;
 
