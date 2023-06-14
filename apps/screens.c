@@ -757,17 +757,19 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     int key;
     unsigned int i;
     struct id3view_info info;
-    info.count = 0;
     info.id3 = id3;
     info.modified = modified;
     info.track_ct = track_ct;
-    info.playlist_display_index = playlist_display_index;
     info.playlist_amount = playlist_amount;
     bool ret = false;
     int curr_activity = get_current_activity();
-    if (curr_activity != ACTIVITY_PLUGIN &&
-        curr_activity != ACTIVITY_PLAYLISTVIEWER)
+    bool is_curr_track_info = curr_activity != ACTIVITY_PLUGIN &&
+                              curr_activity != ACTIVITY_PLAYLISTVIEWER;
+    if (is_curr_track_info)
         push_current_activity(ACTIVITY_ID3SCREEN);
+refresh_info:
+    info.count = 0;
+    info.playlist_display_index = playlist_display_index;
     for (i = 0; i < ARRAYLEN(id3_headers); i++)
     {
         char temp[8];
@@ -798,10 +800,23 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
                 ret =  true;
                 break;
             }
+        } 
+        else if (is_curr_track_info)
+        {
+            if (!audio_status())
+            {
+                ret = false;
+                break;
+            }
+            else
+            {
+                playlist_display_index = playlist_get_display_index();
+                if (playlist_display_index != info.playlist_display_index)
+                    goto refresh_info;
+            }
         }
     }
-    if (curr_activity != ACTIVITY_PLUGIN &&
-        curr_activity != ACTIVITY_PLAYLISTVIEWER)
+    if (is_curr_track_info)
         pop_current_activity();
     return ret;
 }
