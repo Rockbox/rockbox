@@ -729,11 +729,11 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
 }
 
 /* gui_synclist callback */
-static const char* id3_get_info(int selected_item, void* data,
-                                char *buffer, size_t buffer_len)
+static const char* id3_get_name_cb(int selected_item, void* data,
+                                   char *buffer, size_t buffer_len)
 {
     return id3_get_or_speak_info(selected_item, data, buffer,
-                                 buffer_len, false);
+                                 buffer_len, false) ? : "";
 }
 
 static int id3_speak_item(int selected_item, void* data)
@@ -774,11 +774,11 @@ refresh_info:
     {
         char temp[8];
         info.info_id[i] = i;
-        if (id3_get_info((i*2)+1, &info, temp, 8) != NULL)
+        if (id3_get_or_speak_info((i*2)+1, &info, temp, 8, false) != NULL)
             info.info_id[info.count++] = i;
     }
 
-    gui_synclist_init(&id3_lists, &id3_get_info, &info, true, 2, NULL);
+    gui_synclist_init(&id3_lists, &id3_get_name_cb, &info, true, 2, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&id3_lists, id3_speak_item);
     gui_synclist_set_nb_items(&id3_lists, info.count*2);
