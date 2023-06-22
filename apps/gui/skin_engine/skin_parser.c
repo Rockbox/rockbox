@@ -1081,7 +1081,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     enum
     {
         eINVERT = 0, eNOFILL, eNOBORDER, eNOBAR, eSLIDER, eIMAGE,
-        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING, 
+        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING,
         e_PB_TAG_COUNT
     };
 
@@ -1962,7 +1962,7 @@ static int load_skin_bmp(struct wps_data *wps_data, struct gui_img *img, char* b
     if (buf_reqd == CLB_READ_ERR)
     {
         /* Abort if we can't load an image */
-        DEBUGF("Couldn't load '%s' (%ld)\n", img_path, buf_reqd);
+        DEBUGF("Couldn't load '%s' (%zu)\n", img_path, buf_reqd);
     }
     else
     {
