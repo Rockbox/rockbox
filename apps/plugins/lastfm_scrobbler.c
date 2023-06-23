@@ -343,7 +343,7 @@ int scrobbler_init_cache(void)
 static inline size_t cache_get_entry_size(int str_len)
 {
     /* entry_sz consists of the cache entry + str_len + \0NULL terminator */
-    return ALIGN_UP(str_len + 1 + sizeof(struct cache_entry), 0x4);
+    return ALIGN_UP(str_len + 1 + sizeof(struct cache_entry), alignof(struct cache_entry));
 }
 
 static inline const char* str_chk_valid(const char *s, const char *alt)
