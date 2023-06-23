@@ -626,7 +626,7 @@ static int add_to_playlist(void* arg)
     }
 
 #ifdef HAVE_TAGCACHE
-    if (context == CONTEXT_ID3DB)
+    if ((context == CONTEXT_ID3DB) && (selected_file_attr & ATTR_DIRECTORY))
     {
         tagtree_current_playlist_insert(position, queue);
     }
