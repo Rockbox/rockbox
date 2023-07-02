@@ -56,7 +56,7 @@ extern const mpc_can_data mpc_can_Bands;
 extern const mpc_can_data mpc_can_SCFI[2];
 extern const mpc_can_data mpc_can_DSCF[2];
 extern const mpc_can_data mpc_can_Res [2];
-extern const mpc_can_data mpc_can_Q [8][2];
+extern const mpc_can_data mpc_can_Q [6][2];
 extern const mpc_can_data mpc_can_Q1;
 extern const mpc_can_data mpc_can_Q9up;
 
