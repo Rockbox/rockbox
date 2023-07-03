@@ -33,6 +33,13 @@ else
 endif
 CODECLDFLAGS += $(GLOBAL_LDOPTS)
 
+ifdef USE_LTO
+ CODECLDFLAGS += -flto -fno-builtin -ffreestanding
+ CODECFLAGS += -flto -fno-builtin -ffreestanding
+ CODECLDFLAGS += -e __header
+endif
+
+
 # the codec libraries
 include $(RBCODECLIB_DIR)/codecs/demac/libdemac.make
 include $(RBCODECLIB_DIR)/codecs/liba52/liba52.make

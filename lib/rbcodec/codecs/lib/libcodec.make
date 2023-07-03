@@ -23,6 +23,11 @@ ifneq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)
     CODECLIBFLAGS += -ffunction-sections
 endif
 
+ifdef USE_LTO
+# We do NOT want LTO on the GCC support file
+$(CODECDIR)/lib/codeclib.o: CODECLIBFLAGS += -fno-lto
+endif
+
 $(CODECDIR)/lib/%.o: $(RBCODECLIB_DIR)/codecs/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \

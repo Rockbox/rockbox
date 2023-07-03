@@ -37,6 +37,12 @@ PLUGINLIB_OBJ := $(PLUGINLIB_SRC:.c=.o)
 PLUGINLIB_OBJ := $(PLUGINLIB_OBJ:.S=.o)
 PLUGINLIB_OBJ := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(PLUGINLIB_OBJ))
 
+ifdef USE_LTO
+# We do NOT want LTO on the GCC support file.
+$(BUILDDIR)/apps/plugins/lib/gcc-support.o: PLUGINFLAGS += -fno-lto
+$(BUILDDIR)/apps/plugins/plugin_crt0.o: PLUGINFLAGS += -fno-lto
+endif
+
 ### build data / rules
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
@@ -146,6 +152,12 @@ else
  OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
 endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
+
+ifdef USE_LTO
+ PLUGINFLAGS += -flto -fno-builtin -ffreestanding
+ PLUGINLDFLAGS += -flto -fno-builtin -ffreestanding
+ PLUGINLDFLAGS += -e plugin_start
+endif
 
 $(BUILDDIR)/%.rock:
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
