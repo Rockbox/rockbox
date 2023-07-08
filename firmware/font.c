@@ -350,8 +350,6 @@ static int find_font_index(const char* path)
             logf("%s Found id: [%d], %s", __func__, index, path);
             return index;
         }
-
-        index++;
     }
     logf("%s %s Not found using id: [%d], FONT_SYSFIXED",
          __func__, path, FONT_SYSFIXED);
