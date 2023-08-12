@@ -28,7 +28,11 @@
 #endif
 
 #ifndef __MINGW32__
+#ifdef __APPLE__
+#include <sys/types.h>
+#else
 #include <endian.h>
+#endif
 #endif
 
 /* clear these out since we redefine them to be truely constant compatible */

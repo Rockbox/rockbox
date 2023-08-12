@@ -25,7 +25,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#ifdef __APPLE__
+#include <libkern/OSByteOrder.h>
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#else
 #include <endian.h> /* TODO: find portable alternative */
+#endif
 
 #define SPL_HEADER_SIZE 512
 #define SPL_KEY_SIZE    1536

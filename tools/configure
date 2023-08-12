@@ -14,6 +14,7 @@ CCOPTS="-W -Wall -Wextra -Wundef -Os -nostdlib -ffreestanding -Wstrict-prototype
 LDOPTS=""
 # LD options for the core + plugins
 GLOBAL_LDOPTS=""
+LDMAP_OPT="-Map"
 
 extradefines=""
 use_logf="#undef ROCKBOX_HAS_LOGF"
@@ -260,6 +261,7 @@ simcc () {
 
  app_type=$1
  winbuild=""
+ macbuild=""
  GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib// -e s/\ -Wundef//`
 
  if [ "yes" = "$use_debug" ]; then
@@ -391,7 +393,9 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    LDOPTS="$LDOPTS -ldl"
-   SHARED_LDFLAGS="-dynamiclib -Wl\,-single_module"
+   SHARED_LDFLAGS="-dynamiclib -Wl,-no_warn_duplicate_libraries"
+   LDMAP_OPT="-map"
+   macbuild="yes"
    ;;
 
    SunOS)
@@ -409,7 +413,7 @@ simcc () {
  esac
  fi
 
- if [ "$winbuild" != "yes" ]; then
+ if [ "$winbuild" != "yes" ] && [ "$macbuild" != "yes" ]; then
    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
    if [ "`uname -m`" = "i686" ]; then
      echo "Enabling MMX support"
@@ -4875,6 +4879,7 @@ export SHARED_LDFLAGS=${SHARED_LDFLAGS}
 export SHARED_CFLAGS=${SHARED_CFLAGS}
 export LDOPTS=${LDOPTS}
 export GLOBAL_LDOPTS=${GLOBAL_LDOPTS}
+export LDMAP_OPT=${LDMAP_OPT}
 export GCCVER=${gccver}
 export GCCNUM=${gccnum}
 export UNAME=${uname}

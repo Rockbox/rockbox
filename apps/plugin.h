@@ -46,6 +46,17 @@
 #undef strncmp
 #undef strchr
 #undef strtok_r
+#ifdef __APPLE__
+#undef strncpy
+#undef snprintf
+#undef strcpy
+#undef strcat
+#undef memset
+#undef memcpy
+#undef memmove
+#undef vsnprintf
+#undef vsprintf
+#endif
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);

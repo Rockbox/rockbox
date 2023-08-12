@@ -19,7 +19,12 @@
  *
  ****************************************************************************/
 #define RB_FILESYSTEM_OS
+#ifdef __APPLE__
+#include <sys/param.h>
+#include <sys/mount.h>
+#else
 #include <sys/statfs.h> /* lowest common denominator */
+#endif
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
@@ -218,6 +223,15 @@ void volume_size(IF_MV(int volume,) sector_t *sizep, sector_t *freep)
     if (os_volume_path(IF_MV(volume,) volpath, sizeof (volpath)) >= 0
         && !statfs(volpath, &fs))
     {
+#ifdef __APPLE__
+        DEBUGF("statvfs: frsize=%d blocks=%ld bfree=%ld\n",
+               (int)fs.f_bsize, (long)fs.f_blocks, (long)fs.f_bfree);
+        if (sizep)
+            size = (fs.f_blocks / 2) * (fs.f_bsize / 512);
+
+        if (freep)
+            free = (fs.f_bfree / 2) * (fs.f_bsize / 512);
+#else
         DEBUGF("statvfs: frsize=%d blocks=%ld bfree=%ld\n",
                (int)fs.f_frsize, (long)fs.f_blocks, (long)fs.f_bfree);
         if (sizep)
@@ -225,6 +239,7 @@ void volume_size(IF_MV(int volume,) sector_t *sizep, sector_t *freep)
 
         if (freep)
             free = (fs.f_bfree / 2) * (fs.f_frsize / 512);
+#endif
     }
 
     if (sizep)

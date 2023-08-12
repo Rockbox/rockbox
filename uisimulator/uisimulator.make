@@ -21,7 +21,11 @@ SIMLIB = $(BUILDDIR)/uisimulator/libuisimulator.a
 ifeq (yes,$(APPLICATION))
 UIBMP=
 else
+ifeq ($(UNAME), Darwin)
+UIBMP=
+else
 UIBMP=$(BUILDDIR)/UI256.bmp
+endif
 endif
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
@@ -31,8 +35,12 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $(SIMLIB)
+ifeq ($(UNAME), Darwin)
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-map,$(BUILDDIR)/rockbox.map
+else
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
 	-Wl,-Map,$(BUILDDIR)/rockbox.map
+endif
 	$(SILENT)$(call objcopy,$@,$@)
 
 $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c

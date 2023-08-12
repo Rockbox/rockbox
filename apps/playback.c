@@ -3989,7 +3989,13 @@ size_t audio_get_filebuflen(void)
 
 /* How many tracks exist on the buffer - full or partial */
 unsigned int audio_track_count(void)
+#ifndef __APPLE__
     __attribute__((alias("track_list_count")));
+#else
+{
+   return track_list_count();
+}
+#endif
 
 /* Return total ringbuffer space occupied - ridx to widx */
 long audio_filebufused(void)

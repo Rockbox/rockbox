@@ -47,6 +47,13 @@ void* codec_calloc(size_t nmemb, size_t size);
 void* codec_realloc(void* ptr, size_t size);
 void codec_free(void* ptr);
 
+#ifdef __APPLE__
+#undef memcpy
+#undef strcat
+#undef memset
+#undef memmove
+#undef strcpy
+#endif
 void *memcpy(void *dest, const void *src, size_t n);
 void *memset(void *s, int c, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
