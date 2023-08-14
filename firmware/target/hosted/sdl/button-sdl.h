@@ -28,6 +28,10 @@
 
 extern int sdl_app_has_input_focus;
 
+#ifdef __APPLE__
+void handle_sdl_events(void);
+#endif
+
 bool button_hold(void);
 #undef button_init_device
 void button_init_device(void);

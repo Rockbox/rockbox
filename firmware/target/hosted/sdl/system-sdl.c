@@ -138,6 +138,7 @@ static void sdl_window_setup(void)
     }
 }
 
+#ifndef __APPLE__ /* MacOS requires events to be handled on main thread */
 /*
  * This thread will read the buttons in an interrupt like fashion, and
  * also initializes SDL_INIT_VIDEO and the surfaces
@@ -205,6 +206,7 @@ static int sdl_event_thread(void * param)
 #endif
     return 0;
 }
+#endif
 
 static bool quitting;
 
@@ -270,11 +272,13 @@ void system_init(void)
     sdl_window_setup();
 #endif
 
+#ifndef __APPLE__ /* MacOS requires events to be handled on main thread */
     s = SDL_CreateSemaphore(0); /* 0-count so it blocks */
     evt_thread = SDL_CreateThread(sdl_event_thread, NULL, s);
     SDL_SemWait(s);
     /* cleanup */
     SDL_DestroySemaphore(s);
+#endif
 }
 
 

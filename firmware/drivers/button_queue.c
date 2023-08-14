@@ -22,6 +22,9 @@
 #include "system.h"
 #include "kernel.h"
 #include "button.h"
+#ifdef HAVE_SDL
+#include "button-sdl.h"
+#endif
 
 static struct event_queue button_queue SHAREDBSS_ATTR;
 static intptr_t button_data; /* data value from last message dequeued */
@@ -92,7 +95,29 @@ static void button_queue_wait(struct queue_event *evp, int timeout)
 #else /* ndef HAVE_ADJUSTABLE_CPU_FREQ */
 static inline void button_queue_wait(struct queue_event *evp, int timeout)
 {
+#if defined(__APPLE__) && (CONFIG_PLATFORM & PLATFORM_SDL)
+    unsigned long initial_tick = current_tick;
+    unsigned long curr_tick, remaining;
+    while(true)
+    {
+        handle_sdl_events();
+        queue_wait_w_tmo(&button_queue, evp, TIMEOUT_NOBLOCK);
+        if (evp->id != SYS_TIMEOUT || timeout == TIMEOUT_NOBLOCK)
+            return;
+        else if (timeout == TIMEOUT_BLOCK)
+            sleep(HZ/60);
+        else
+        {
+            curr_tick = current_tick;
+            if (!TIME_AFTER(initial_tick + timeout, curr_tick))
+                return;
+            remaining = ((initial_tick + timeout) - curr_tick);
+            sleep(remaining < HZ/60 ? remaining : HZ/60);
+        }
+    }
+#else
     queue_wait_w_tmo(&button_queue, evp, timeout);
+#endif
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 

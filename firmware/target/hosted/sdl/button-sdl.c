@@ -307,6 +307,15 @@ static bool event_handler(SDL_Event *event)
     return false;
 }
 
+#ifdef __APPLE__
+void handle_sdl_events(void)
+{
+    SDL_Event event;
+    while(SDL_PollEvent(&event))
+        event_handler(&event);
+}
+#endif
+
 void gui_message_loop(void)
 {
     SDL_Event event;
