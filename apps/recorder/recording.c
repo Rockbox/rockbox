@@ -643,16 +643,11 @@ void rec_command(enum recording_command cmd)
             audio_stop_recording();
             break;
         case RECORDING_CMD_START:
-            /* steal mp3 buffer, create unique filename and start recording */
-            pm_reset_clipcount();
-            pm_activate_clipcount(true);
-            audio_record(rec_create_filename(path_buffer));
-            break;
         case RECORDING_CMD_START_NEWFILE:
             /* create unique filename and start recording*/
             pm_reset_clipcount();
-            pm_activate_clipcount(true); /* just to be sure */
-            audio_new_file(rec_create_filename(path_buffer));
+            pm_activate_clipcount(true);
+            audio_record(rec_create_filename(path_buffer));
             break;
         case RECORDING_CMD_PAUSE:
             pm_activate_clipcount(false);

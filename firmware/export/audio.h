@@ -154,7 +154,6 @@ void audio_record(const char *filename);
 void audio_stop_recording(void);
 void audio_pause_recording(void);
 void audio_resume_recording(void);
-void audio_new_file(const char *filename);
 void audio_set_recording_options(struct audio_recording_options *options);
 void audio_set_recording_gain(int left, int right, int type);
 unsigned long audio_recorded_time(void);

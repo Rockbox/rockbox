@@ -979,10 +979,6 @@ void audio_record(const char *filename)
     audio_queue_send(Q_AUDIO_RECORD, (intptr_t)filename);
 }
 
-/* audio_record alias for API compatibility with HW codec */
-void audio_new_file(const char *filename)
-    __attribute__((alias("audio_record")));
-
 /* Stop current recording if recording */
 void audio_stop_recording(void)
 {
