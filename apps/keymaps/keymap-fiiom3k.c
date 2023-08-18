@@ -215,10 +215,8 @@ static const struct button_mapping button_context_yesnoscreen[] = {
 }; /* button_context_yesnoscreen */
 
 static const struct button_mapping button_context_recscreen[] = {
-    {ACTION_REC_PAUSE,          BUTTON_SELECT,                      BUTTON_NONE},
     {ACTION_REC_PAUSE,          BUTTON_PLAY,                        BUTTON_NONE},
-    {ACTION_REC_NEWFILE,        BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT},
-    {ACTION_REC_NEWFILE,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY},
+    {ACTION_REC_NEWFILE,        BUTTON_SELECT,                      BUTTON_NONE},
     {ACTION_STD_MENU,           BUTTON_MENU,                        BUTTON_NONE},
     {ACTION_STD_CANCEL,         BUTTON_BACK,                        BUTTON_NONE},
     {ACTION_STD_CANCEL,         BUTTON_POWER,                       BUTTON_NONE},
