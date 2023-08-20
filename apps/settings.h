@@ -691,10 +691,8 @@ struct user_settings
 #ifdef HAVE_BACKLIGHT
     bool bl_selective_actions; /* backlight disable on some actions */
     int  bl_selective_actions_mask;/* mask of actions that will not enable backlight */
-#ifdef HAS_BUTTON_HOLD
     int backlight_on_button_hold; /* what to do with backlight when hold
                                      switch is on */
-#endif
 #ifdef HAVE_LCD_SLEEP_SETTING
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off:  -1=never, 0=always,

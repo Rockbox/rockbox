@@ -1846,12 +1846,16 @@ const struct settings_list settings[] = {
                       ID2P(LANG_IN_SUBMENU)),
 
 #ifdef HAVE_BACKLIGHT
-#ifdef HAS_BUTTON_HOLD
-    CHOICE_SETTING(0, backlight_on_button_hold, LANG_BACKLIGHT_ON_BUTTON_HOLD,
-                   1, "backlight on button hold", "normal,off,on",
+    CHOICE_SETTING(0, backlight_on_button_hold,
+                   LANG_BACKLIGHT_ON_BUTTON_HOLD,
+#ifdef HAS_HOLD_BUTTON                   
+                   1,
+#else
+                   0,
+#endif
+                   "backlight on button hold", "normal,off,on",
                    backlight_set_on_button_hold, 3,
                    ID2P(LANG_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
-#endif
 
 #ifdef HAVE_LCD_SLEEP_SETTING
     TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,

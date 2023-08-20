@@ -1051,9 +1051,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
 #endif
-#ifdef HAS_BUTTON_HOLD
     backlight_set_on_button_hold(global_settings.backlight_on_button_hold);
-#endif
 
 #ifdef HAVE_LCD_SLEEP_SETTING
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);

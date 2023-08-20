@@ -2347,15 +2347,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </dest>
   <voice>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on hold"
   </voice>
 </phrase>

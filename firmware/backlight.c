@@ -39,6 +39,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "screendump.h"
+#include "action.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -120,9 +121,7 @@ static int backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
 #endif
-#ifdef HAS_BUTTON_HOLD
 static int backlight_on_button_hold = 0;
-#endif
 static void backlight_handle_timeout(void);
 
 #ifdef HAVE_BUTTON_LIGHT
@@ -846,18 +845,18 @@ bool is_backlight_on(bool ignore_always_off)
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
 {
-#ifdef HAS_BUTTON_HOLD
     if ((backlight_on_button_hold != 0)
-#ifdef HAVE_REMOTE_LCD_AS_MAIN
+#if defined(HAVE_REMOTE_LCD_AS_MAIN) && defined(HAS_REMOTE_BUTTON_HOLD)  
         && remote_button_hold()
-#else
+#elifdef HAS_BUTTON_HOLD
         && button_hold()
+#else
+        && is_keys_locked()
 #endif
         )
         return (backlight_on_button_hold == 2) ? 0 : -1;
         /* always on or always off */
     else
-#endif
 #if CONFIG_CHARGING
         if (power_input_present())
             return backlight_timeout_plugged;
@@ -893,6 +892,7 @@ void backlight_hold_changed(bool hold_button)
         queue_post(&backlight_queue, BACKLIGHT_ON, 0);
     }
 }
+#endif /* HAS_BUTTON_HOLD */
 
 void backlight_set_on_button_hold(int index)
 {
@@ -903,7 +903,6 @@ void backlight_set_on_button_hold(int index)
     backlight_on_button_hold = index;
     queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
-#endif /* HAS_BUTTON_HOLD */
 
 #ifdef HAVE_LCD_SLEEP_SETTING
 void lcd_set_sleep_after_backlight_off(int timeout_seconds)
