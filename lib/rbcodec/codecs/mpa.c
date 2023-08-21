@@ -192,11 +192,19 @@ static int get_file_pos(int newtime)
             pos = cur_toc * toc_sizestep;
 
             /* Interpolate between this TOC mark and the next TOC mark */
-            newtime -= percent * pct_timestep;
-            pos += (uint64_t)plength * newtime / pct_timestep;
+            int newtime_toc = newtime - percent * pct_timestep;
+            pos += (uint64_t)plength * newtime_toc / pct_timestep;
         } else {
             /* No TOC exists, estimate the new position */
             pos = (uint64_t)newtime * id3->filesize / id3->length;
+        }
+        // VBR seek might be very inaccurate in long files 
+        // So make sure that seeking actually happened in the intended direction 
+        // Fix jumps in the wrong direction by seeking relative to the current position
+        long delta = id3->elapsed - newtime;
+        if ((delta >= 0 && pos > ci->curpos) || (delta < 0 && pos < ci->curpos))
+        {
+            pos = ci->curpos - delta * id3->filesize / id3->length;
         }
     } else if (id3->bitrate) {
         pos = newtime * (id3->bitrate / 8);
