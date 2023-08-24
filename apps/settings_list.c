@@ -63,6 +63,7 @@
 #include "onplay.h"
 #include "misc.h" /* current activity */
 #endif
+#include "playlist.h"
 
 #include "voice_thread.h"
 
@@ -618,6 +619,19 @@ static void eq_set_default(void* setting, void* defaultval)
     memcpy(setting, defaultval, sizeof(struct eq_band_setting));
 }
 
+/* perform shuffle/unshuffle of the current playlist based on the boolean provided */
+static void shuffle_playlist_callback(bool shuffle)
+{
+    if (shuffle)
+    {
+        playlist_randomise(NULL, current_tick, true);
+    }
+    else
+    {
+        playlist_sort(NULL, true);
+    }
+}
+
 #ifdef HAVE_QUICKSCREEN
 static void qs_load_from_cfg(void *var, char *value)
 {
@@ -898,7 +912,7 @@ const struct settings_list settings[] = {
 #endif
 
     /* playback */
-    OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
+    OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", shuffle_playlist_callback),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
     SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
