@@ -31,6 +31,7 @@
 #include "backlight.h"
 #include "system.h"
 #include "button-sdl.h"
+#include "lcd-sdl.h"
 #include "sim_tasks.h"
 #include "buttonmap.h"
 #include "debug.h"
@@ -240,6 +241,17 @@ static bool event_handler(SDL_Event *event)
             sdl_app_has_input_focus = 1;
         else if (event->window.event == SDL_WINDOWEVENT_FOCUS_LOST)
             sdl_app_has_input_focus = 0;
+        else if(event->window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            sdl_window_needs_update();
+#if !defined (__APPLE__) && !defined(__WIN32)
+            static unsigned long last_tick;
+            if (TIME_AFTER(current_tick, last_tick + HZ/20) && !button_queue_full())
+                  button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
+            else
+                  last_tick = current_tick;
+#endif
+        }
         break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:

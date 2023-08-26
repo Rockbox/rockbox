@@ -28,6 +28,11 @@
 /* Default display zoom level */
 extern SDL_Surface *gui_surface;
 extern SDL_Renderer *sdlRenderer;
+extern SDL_Window *window;
+
+void sdl_get_window_dimensions(int *w, int *h);
+int sdl_update_window(void);
+void sdl_window_needs_update(void);
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,

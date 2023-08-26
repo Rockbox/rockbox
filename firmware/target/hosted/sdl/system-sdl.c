@@ -91,28 +91,7 @@ static void sdl_window_setup(void)
         }
     }
 
-    /* Set things up */
-    if (background)
-    {
-        width = UI_WIDTH;
-        height = UI_HEIGHT;
-    }
-    else
-    {
-#ifdef HAVE_REMOTE_LCD
-        if (showremote)
-        {
-            width = SIM_LCD_WIDTH > SIM_REMOTE_WIDTH ? SIM_LCD_WIDTH : SIM_REMOTE_WIDTH;
-            height = SIM_LCD_HEIGHT + SIM_REMOTE_HEIGHT;
-        }
-        else
-#endif
-        {
-            width = SIM_LCD_WIDTH;
-            height = SIM_LCD_HEIGHT;
-        }
-    }
-
+    sdl_get_window_dimensions(&width, &height);
     depth = LCD_DEPTH;
     if (depth < 8)
         depth = 16;
@@ -122,11 +101,20 @@ static void sdl_window_setup(void)
     flags |= SDL_WINDOW_FULLSCREEN;
 #endif
 
+    if (display_zoom == 1)
+        flags |= SDL_WINDOW_RESIZABLE;
+
+    flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+
     if ((window = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                       width * display_zoom, height * display_zoom , flags)) == NULL)
         panicf("%s", SDL_GetError());
     if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
         panicf("%s", SDL_GetError());
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_RenderSetLogicalSize(sdlRenderer, width * display_zoom, height * display_zoom);
+
     if ((gui_surface = SDL_CreateRGBSurface(0, width * display_zoom, height * display_zoom, depth,
                                        0, 0, 0, 0)) == NULL)
         panicf("%s", SDL_GetError());
@@ -152,6 +140,7 @@ static void sdl_window_setup(void)
 static int sdl_event_thread(void * param)
 {
 #ifdef __WIN32 /* Fails on Linux and MacOS */
+    SDL_SetHint(SDL_HINT_WINDOWS_DPI_SCALING, "1");
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     sdl_window_setup();
 #endif

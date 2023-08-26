@@ -23,8 +23,98 @@
 #include "lcd-sdl.h"
 #include "sim-ui-defines.h"
 #include "system.h" /* for MIN() and MAX() */
+#include "misc.h"
 
 double display_zoom = 1;
+
+static bool window_needs_update;
+
+void sdl_get_window_dimensions(int *w, int *h)
+{
+    if (background)
+    {
+        *w = UI_WIDTH;
+        *h = UI_HEIGHT;
+    }
+    else
+    {
+#ifdef HAVE_REMOTE_LCD
+        if (showremote)
+        {
+            *w = SIM_LCD_WIDTH > SIM_REMOTE_WIDTH ? SIM_LCD_WIDTH : SIM_REMOTE_WIDTH;
+            *h = SIM_LCD_HEIGHT + SIM_REMOTE_HEIGHT;
+        }
+        else
+#endif
+        {
+            *w = SIM_LCD_WIDTH;
+            *h = SIM_LCD_HEIGHT;
+        }
+    }
+}
+
+static inline void sdl_render(void)
+{
+    SDL_Texture *sdlTexture = SDL_CreateTextureFromSurface(sdlRenderer, gui_surface);
+    SDL_RenderClear(sdlRenderer);
+    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+    SDL_RenderPresent(sdlRenderer);
+    SDL_DestroyTexture(sdlTexture);
+}
+
+
+#define SNAP_MARGIN 50
+int sdl_update_window(void)
+{
+    if (!window_needs_update)
+        return false;
+    window_needs_update = false;
+
+#if defined (__APPLE__) || defined(__WIN32) /* Constrain aspect ratio */
+    if (!(SDL_GetWindowFlags(window) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN)))
+    {
+        float aspect_ratio;
+        int w, h;
+
+        sdl_get_window_dimensions(&w, &h);
+        aspect_ratio = (float) h / w;
+
+        int original_height = h;
+        int original_width = w;
+
+        SDL_GetWindowSize(window, &w, &h);
+        if (w != original_width || h != original_height)
+        {
+            if (abs(original_width - w) < SNAP_MARGIN)
+            {
+                w = original_width;
+                h = original_height;
+            }
+            else
+                h = w * aspect_ratio;
+
+            SDL_SetWindowSize(window, w, h);
+        }
+    }
+#endif
+    sdl_render();
+    return true;
+}
+
+void sdl_window_needs_update(void)
+{
+    window_needs_update = true;
+
+    /* For MacOS and Windows, we're on a main or
+    display thread already, and can immediately
+    update the window.
+    On Linux, we have to defer the update, until
+    it is handled by the main thread later. */
+#if defined (__APPLE__) || defined(__WIN32)
+    sdl_update_window();
+#endif
+}
+
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,
@@ -117,15 +207,12 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
 
     uint8_t alpha;
     if (SDL_GetSurfaceAlphaMod(surface,&alpha) == 0 && alpha < 255)
-        SDL_FillRect(gui_surface, &dest, 0);
+        SDL_FillRect(gui_surface, &dest, 0); /* alpha needs a black background */
 
-    SDL_BlitSurface(surface, &src, gui_surface, &dest); /* alpha needs a black background */
+    SDL_BlitSurface(surface, &src, gui_surface, &dest);
 
-    SDL_Texture *sdlTexture = SDL_CreateTextureFromSurface(sdlRenderer, gui_surface);
-    SDL_RenderClear(sdlRenderer);
-    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
-    SDL_RenderPresent(sdlRenderer);
-    SDL_DestroyTexture(sdlTexture);
+    if (!sdl_update_window()) /* already calls sdl_render itself */
+        sdl_render();
 }
 
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */

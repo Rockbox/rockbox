@@ -24,6 +24,7 @@
 #include "button.h"
 #ifdef HAVE_SDL
 #include "button-sdl.h"
+#include "lcd-sdl.h"
 #endif
 
 static struct event_queue button_queue SHAREDBSS_ATTR;
@@ -100,7 +101,7 @@ static inline void button_queue_wait(struct queue_event *evp, int timeout)
     unsigned long curr_tick, remaining;
     while(true)
     {
-        handle_sdl_events();
+        handle_sdl_events(); /* Includes window updates after resize events */
         queue_wait_w_tmo(&button_queue, evp, TIMEOUT_NOBLOCK);
         if (evp->id != SYS_TIMEOUT || timeout == TIMEOUT_NOBLOCK)
             return;
@@ -117,6 +118,9 @@ static inline void button_queue_wait(struct queue_event *evp, int timeout)
     }
 #else
     queue_wait_w_tmo(&button_queue, evp, timeout);
+#ifdef HAVE_SDL
+    sdl_update_window(); /* Window may have been resized */
+#endif
 #endif
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
