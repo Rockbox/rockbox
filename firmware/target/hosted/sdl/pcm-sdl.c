@@ -104,7 +104,6 @@ void pcm_dma_apply_settings(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    pcm_dma_apply_settings_nolock();
 
     pcm_data = addr;
     pcm_data_size = size;
