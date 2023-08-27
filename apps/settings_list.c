@@ -622,14 +622,31 @@ static void eq_set_default(void* setting, void* defaultval)
 /* perform shuffle/unshuffle of the current playlist based on the boolean provided */
 static void shuffle_playlist_callback(bool shuffle)
 {
-    if (shuffle)
+    struct playlist_info *playlist = playlist_get_current();
+    if (playlist->started)
     {
-        playlist_randomise(NULL, current_tick, true);
+        if ((audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
+        {
+            replaygain_update();
+            if (shuffle)
+            {
+                playlist_randomise(playlist, current_tick, true);
+            }
+            else
+            {
+                playlist_sort(playlist, true);
+            }
+        }
     }
-    else
+}
+
+static void repeat_mode_callback(int repeat)
+{
+    if ((audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
     {
-        playlist_sort(NULL, true);
+        audio_flush_and_reload_tracks();
     }
+    (void)repeat;
 }
 
 #ifdef HAVE_QUICKSCREEN
@@ -912,17 +929,19 @@ const struct settings_list settings[] = {
 #endif
 
     /* playback */
-    OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", shuffle_playlist_callback),
+    OFFON_SETTING(F_CB_ON_SELECT_ONLY_IF_CHANGED, playlist_shuffle, LANG_SHUFFLE,
+                  false, "shuffle", shuffle_playlist_callback),
+
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
     SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
-    CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_OFF, "repeat",
-                   "off,all,one,shuffle"
+    CHOICE_SETTING(F_CB_ON_SELECT_ONLY_IF_CHANGED, repeat_mode, LANG_REPEAT,
+                   REPEAT_OFF, "repeat", "off,all,one,shuffle"
 #ifdef AB_REPEAT_ENABLE
                    ",ab"
 #endif
-                   , NULL,
+                   , repeat_mode_callback,
 #ifdef AB_REPEAT_ENABLE
                    5,
 #else

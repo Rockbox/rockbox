@@ -470,7 +470,10 @@ bool option_screen(const struct settings_list *setting,
     int *variable;
     bool allow_wrap = setting->flags & F_NO_WRAP ? false : true;
     bool cb_on_select_only =
-                ((setting->flags & F_CB_ON_SELECT_ONLY) == F_CB_ON_SELECT_ONLY);
+        ((setting->flags & F_CB_ON_SELECT_ONLY) == F_CB_ON_SELECT_ONLY);
+    bool cb_on_changed =
+        ((setting->flags & F_CB_ON_SELECT_ONLY_IF_CHANGED) == F_CB_ON_SELECT_ONLY_IF_CHANGED);
+
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
     char *title;
@@ -561,8 +564,12 @@ bool option_screen(const struct settings_list *setting,
             }
             settings_save();
             done = true;
+
             if (cb_on_select_only && function)
-                function(*variable);
+            {
+                if (!cb_on_changed || (*variable != oldvalue))
+                    function(*variable);
+            }
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
         {

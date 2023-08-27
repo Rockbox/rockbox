@@ -418,8 +418,6 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 int quick_screen_quick(int button_enter)
 {
     struct gui_quickscreen qs;
-    bool oldshuffle = global_settings.playlist_shuffle;
-    int oldrepeat = global_settings.repeat_mode;
 #ifdef HAVE_ALBUMART
     int old_album_art = global_settings.album_art;
 #endif
@@ -438,21 +436,6 @@ int quick_screen_quick(int button_enter)
     if (ret & QUICKSCREEN_CHANGED)
     {
         settings_save();
-        /* make sure repeat/shuffle/any other nasty ones get updated */
-        if ( oldrepeat != global_settings.repeat_mode &&
-             (audio_status() & AUDIO_STATUS_PLAY) )
-        {
-            audio_flush_and_reload_tracks();
-        }
-        if (oldshuffle != global_settings.playlist_shuffle
-            && audio_status() & AUDIO_STATUS_PLAY)
-        {
-            replaygain_update();
-            if (global_settings.playlist_shuffle)
-                playlist_randomise(NULL, current_tick, true);
-            else
-                playlist_sort(NULL, true);
-        }
 #ifdef HAVE_ALBUMART
         if (old_album_art != global_settings.album_art)
             set_albumart_mode(global_settings.album_art);

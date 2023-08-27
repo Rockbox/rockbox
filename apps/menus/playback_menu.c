@@ -244,19 +244,9 @@ static int playback_callback(int action,
                              struct gui_synclist *this_list)
 {
     (void)this_list;
-    static bool old_shuffle = false;
-    static int old_repeat = 0;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
-            if (this_item == &shuffle_item)
-            {
-                old_shuffle = global_settings.playlist_shuffle;
-            }
-            else if (this_item == &repeat_mode)
-            {
-                old_repeat = global_settings.repeat_mode;
-            }
             break;
 
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -268,35 +258,6 @@ static int playback_callback(int action,
                 break;
             }
 #endif /* HAVE_PLAY_FREQ */
-
-            if (!(audio_status() & AUDIO_STATUS_PLAY))
-                break;
-
-            /* Playing only */
-            if (this_item == &shuffle_item)
-            {
-                if (old_shuffle == global_settings.playlist_shuffle)
-                    break;
-
-                replaygain_update();
-
-                if (global_settings.playlist_shuffle)
-                {
-                    playlist_randomise(NULL, current_tick, true);
-                }
-                else
-                {
-                    playlist_sort(NULL, true);
-                }
-            }
-            else if (this_item == &repeat_mode)
-            {
-                if (old_repeat == global_settings.repeat_mode)
-                    break;
-
-                audio_flush_and_reload_tracks();
-            }
-
             break;
     }
     return action;
