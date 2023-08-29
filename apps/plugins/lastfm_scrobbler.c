@@ -575,6 +575,7 @@ static int create_log_entry(const struct mp3entry *id,
 
 static void scrobbler_add_to_cache(const struct mp3entry *id)
 {
+    logf("%s", __func__);
     int trk_info_len = 0;
 
     if (id->elapsed < (unsigned long) gConfig.minms)
@@ -663,6 +664,7 @@ static void scrobbler_flush_cache(void)
         /* Add any pending entries to the cache */
     if (gCache.pending)
     {
+        logf("SCROBBLER: pending entry");
         gCache.pending = false;
         if (rb->audio_status())
             scrobbler_add_to_cache(rb->audio_current_track());
@@ -762,20 +764,23 @@ void thread(void)
                 in_usb = false;
                 /*fall through*/
             case EV_STARTUP:
+                logf("SCROBBLER: Thread Started");
                 events_register();
                 play_tone(1500, 100);
                 break;
             case SYS_POWEROFF:
+                logf("SYS_POWEROFF");
+                /*fall through*/
             case SYS_REBOOT:
                 gCache.force_flush = true;
                 /*fall through*/
             case EV_EXIT:
 #if USING_STORAGE_CALLBACK
                 rb->unregister_storage_idle_func(scrobbler_flush_callback, false);
-#else
+#endif
                 if (!in_usb)
                     scrobbler_flush_cache();
-#endif
+
                 events_unregister();
                 return;
             case EV_FLUSHCACHE:

@@ -261,6 +261,7 @@ static int playback_callback(int action,
             break;
     }
     return action;
+    (void)this_item;
 }
 /*    PLAYBACK MENU                */
 /***********************************/
