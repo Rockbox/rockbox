@@ -472,7 +472,7 @@ bool option_screen(const struct settings_list *setting,
     bool cb_on_select_only =
         ((setting->flags & F_CB_ON_SELECT_ONLY) == F_CB_ON_SELECT_ONLY);
     bool cb_on_changed =
-        ((setting->flags & F_CB_ON_SELECT_ONLY_IF_CHANGED) == F_CB_ON_SELECT_ONLY_IF_CHANGED);
+        ((setting->flags & F_CB_ONLY_IF_CHANGED) == F_CB_ONLY_IF_CHANGED);
 
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
@@ -578,8 +578,10 @@ bool option_screen(const struct settings_list *setting,
         }
         /* callback */
         if (function && !cb_on_select_only)
-            function(*variable);
-
+        {
+            if (!cb_on_changed || (*variable != oldvalue))
+                function(*variable);
+        }
         /* if the volume is changing we need to let the skins know */
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;

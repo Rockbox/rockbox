@@ -929,15 +929,15 @@ const struct settings_list settings[] = {
 #endif
 
     /* playback */
-    OFFON_SETTING(F_CB_ON_SELECT_ONLY_IF_CHANGED, playlist_shuffle, LANG_SHUFFLE,
-                  false, "shuffle", shuffle_playlist_callback),
+    OFFON_SETTING(F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED, playlist_shuffle,
+                  LANG_SHUFFLE, false, "shuffle", shuffle_playlist_callback),
 
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
     SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
-    CHOICE_SETTING(F_CB_ON_SELECT_ONLY_IF_CHANGED, repeat_mode, LANG_REPEAT,
-                   REPEAT_OFF, "repeat", "off,all,one,shuffle"
+    CHOICE_SETTING(F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED, repeat_mode,
+                   LANG_REPEAT, REPEAT_OFF, "repeat", "off,all,one,shuffle"
 #ifdef AB_REPEAT_ENABLE
                    ",ab"
 #endif
