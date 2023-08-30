@@ -468,9 +468,25 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 
     numentries = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
-  
-    qtmovie->res->num_lookup_table = numentries;
-    qtmovie->res->lookup_table = malloc(numentries * sizeof(*qtmovie->res->lookup_table));
+
+    uint8_t accuracy_divider = 1;
+    uint32_t fit_numentries = numentries;
+    while (true)
+    {
+        qtmovie->res->lookup_table = malloc(fit_numentries * sizeof(*qtmovie->res->lookup_table));
+
+        if (qtmovie->res->lookup_table)
+        {
+            break;
+        }
+        else
+        {
+            // we failed to alloc memory for lookup table, so reduce seek accuracy and try again
+            fit_numentries = numentries / ++accuracy_divider;
+        }
+    }
+    DEBUGF("lookup_table numentries %d, fit_numentries %d\n", numentries, fit_numentries);
+    qtmovie->res->num_lookup_table = fit_numentries;
 
     if (!qtmovie->res->lookup_table)
     {
@@ -518,11 +534,14 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
             frame += (new_first - old_first) * old_frame;
         }
         frame += (k - old_first) * old_frame;
-        
-        qtmovie->res->lookup_table[idx].sample = frame;
-        qtmovie->res->lookup_table[idx].offset = offset;
-        idx++;
-        
+
+        if ((k-1) % accuracy_divider == 0)
+        {
+            qtmovie->res->lookup_table[idx].sample = frame;
+            qtmovie->res->lookup_table[idx].offset = offset;
+            idx++;
+        }
+
         frame -= (k - old_first) * old_frame;
         
         offset = stream_read_uint32(qtmovie->stream);
