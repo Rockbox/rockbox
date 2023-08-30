@@ -845,7 +845,8 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
             break;
         default:
             //DEBUGF("(top) unknown chunk id: %c%c%c%c\n",SPLITFOURCC(chunk_id));
-            return 0;
+            stream_skip(qtmovie.stream, chunk_len - 8);
+            break;
         }
 
     }
