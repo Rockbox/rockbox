@@ -56,22 +56,13 @@ typedef struct
 /* chunk handlers */
 static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    fourcc_t type;
     size_t size_remaining = chunk_len - 8;
 
-    type = stream_read_uint32(qtmovie->stream);
+    // filetype (supported ignore case values: m4a, m4b, mp42, 3gp6, qt, isom)  
+    char filetype[4];
+    stream_read(qtmovie->stream, 4, filetype);
     size_remaining-=4;
-    if ((type != MAKEFOURCC('M','4','A',' ')) &&
-        (type != MAKEFOURCC('m','4','a',' ')) &&
-        (type != MAKEFOURCC('M','4','B',' ')) &&
-        (type != MAKEFOURCC('m','p','4','2')) &&
-        (type != MAKEFOURCC('3','g','p','6')) &&
-        (type != MAKEFOURCC('q','t',' ',' ')) &&
-        (type != MAKEFOURCC('i','s','o','m')))
-    {
-        DEBUGF("not M4A file\n");
-        return;
-    }
+
     /* minor_ver = */ stream_read_uint32(qtmovie->stream);
     size_remaining-=4;
 

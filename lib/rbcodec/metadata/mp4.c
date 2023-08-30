@@ -57,10 +57,6 @@
 #define MP4_gnre FOURCC('g', 'n', 'r', 'e')
 #define MP4_hdlr FOURCC('h', 'd', 'l', 'r')
 #define MP4_ilst FOURCC('i', 'l', 's', 't')
-#define MP4_isom FOURCC('i', 's', 'o', 'm')
-#define MP4_M4A  FOURCC('M', '4', 'A', ' ')
-#define MP4_m4a  FOURCC('m', '4', 'a', ' ') /*technically its "M4A "*/
-#define MP4_M4B  FOURCC('M', '4', 'B', ' ') /*but files exist with lower case*/
 #define MP4_mdat FOURCC('m', 'd', 'a', 't')
 #define MP4_mdia FOURCC('m', 'd', 'i', 'a')
 #define MP4_mdir FOURCC('m', 'd', 'i', 'r')
@@ -68,8 +64,6 @@
 #define MP4_minf FOURCC('m', 'i', 'n', 'f')
 #define MP4_moov FOURCC('m', 'o', 'o', 'v')
 #define MP4_mp4a FOURCC('m', 'p', '4', 'a')
-#define MP4_mp42 FOURCC('m', 'p', '4', '2')
-#define MP4_qt   FOURCC('q', 't', ' ', ' ')
 #define MP4_soun FOURCC('s', 'o', 'u', 'n')
 #define MP4_stbl FOURCC('s', 't', 'b', 'l')
 #define MP4_stsd FOURCC('s', 't', 's', 'd')
@@ -618,20 +612,11 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         {
         case MP4_ftyp:
             {
-                uint32_t id;
-                
-                read_uint32be(fd, &id);
+                // filetype (supported ignore case values: m4a, m4b, mp42, 3gp6, qt, isom)
+                char filetype[4];
+                read(fd, &filetype, 4);
+                DEBUGF("MP4 file type:  '%.4s'\n", filetype);
                 size -= 4;
-                
-                if ((id != MP4_M4A) && (id != MP4_M4B) && (id != MP4_mp42) 
-                    && (id != MP4_qt) && (id != MP4_3gp6) && (id != MP4_m4a)
-                    && (id != MP4_isom))
-                {
-                    DEBUGF("Unknown MP4 file type: '%c%c%c%c'\n", 
-                        (int)(id >> 24 & 0xff), (int)(id >> 16 & 0xff),
-                        (int)(id >> 8 & 0xff), (int)(id & 0xff));
-                    return false;
-                }
             }
             break;
 
