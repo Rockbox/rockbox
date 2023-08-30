@@ -71,7 +71,7 @@ typedef struct
     fourcc_t format;
     void *buf;
 
-    sample_to_chunk_t *sample_to_chunk;
+    int32_t sample_to_chunk_offset;
     uint32_t num_sample_to_chunks;
     
     sample_offset_t *lookup_table;
