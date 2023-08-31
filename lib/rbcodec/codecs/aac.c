@@ -211,7 +211,11 @@ enum codec_status codec_run(void)
         /* NeAACDecDecode may sometimes return NULL without setting error. */
         if (ret == NULL || frame_info.error > 0) {
             LOGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
-            return CODEC_ERROR;
+
+            // In files with gaps between chunks and reduced lookup_table we can't properly detect all gaps
+            // in m4a_check_sample_offset.  So just ignore decode errors till next chunk present in lookup_table 
+            if (file_offset > 0)
+                return CODEC_ERROR;
         }
 
         /* Advance codec buffer (no need to call set_offset because of this) */
