@@ -60,12 +60,8 @@ static int setcrossfadeonexit_callback(int action,
 
 /***********************************/
 /*    PLAYBACK MENU                */
-static int playback_callback(int action,
-                             const struct menu_item_ex *this_item,
-                             struct gui_synclist *this_list);
-
-MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, playback_callback);
-MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, playback_callback);
+MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, NULL);
+MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, NULL);
 MENUITEM_SETTING(play_selected, &global_settings.play_selected, NULL);
 
 MENUITEM_SETTING(ff_rewind_accel, &global_settings.ff_rewind_accel, NULL);
@@ -178,8 +174,7 @@ MENUITEM_SETTING(rewind_across_tracks, &global_settings.rewind_across_tracks, NU
 MENUITEM_SETTING(resume_rewind, &global_settings.resume_rewind, NULL);
 MENUITEM_SETTING(pause_rewind, &global_settings.pause_rewind, NULL);
 #ifdef HAVE_PLAY_FREQ
-MENUITEM_SETTING(play_frequency, &global_settings.play_frequency,
-                 playback_callback);
+MENUITEM_SETTING(play_frequency, &global_settings.play_frequency, NULL);
 #endif
 #ifdef HAVE_ALBUMART
 static int albumart_callback(int action,
@@ -239,29 +234,5 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
          );
 
-static int playback_callback(int action,
-                             const struct menu_item_ex *this_item,
-                             struct gui_synclist *this_list)
-{
-    (void)this_list;
-    switch (action)
-    {
-        case ACTION_ENTER_MENUITEM:
-            break;
-
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            /* Playing or not */
-#ifdef HAVE_PLAY_FREQ
-            if (this_item == &play_frequency)
-            {
-                audio_set_playback_frequency(global_settings.play_frequency);
-                break;
-            }
-#endif /* HAVE_PLAY_FREQ */
-            break;
-    }
-    return action;
-    (void)this_item;
-}
 /*    PLAYBACK MENU                */
 /***********************************/

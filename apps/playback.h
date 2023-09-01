@@ -83,7 +83,7 @@ void audio_set_cuesheet(bool enable);
 void audio_set_crossfade(int enable);
 #endif
 #ifdef HAVE_PLAY_FREQ
-void audio_set_playback_frequency(int setting);
+void audio_set_playback_frequency(unsigned int sample_rate_hz);
 #endif
 #ifdef HAVE_ALBUMART
 void set_albumart_mode(int setting);

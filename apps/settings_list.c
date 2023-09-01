@@ -41,6 +41,7 @@
 #include "kernel.h"
 #include "open_plugin.h"
 #include "misc.h"
+#include "playback.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -387,7 +388,7 @@ static const char* list_pad_formatter(char *buffer, size_t buffer_size,
 {
     switch (val)
     {
-        case -1: return str(LANG_AUTOMATIC);
+        case -1: return str(LANG_AUTO);
         case  0: return str(LANG_OFF);
         default: break;
     }
@@ -399,7 +400,7 @@ static int32_t list_pad_getlang(int value, int unit)
 {
     switch (value)
     {
-        case -1: return LANG_AUTOMATIC;
+        case -1: return LANG_AUTO;
         case  0: return LANG_OFF;
         default: return TALK_ID(value, unit);
     }
@@ -618,6 +619,30 @@ static void eq_set_default(void* setting, void* defaultval)
 {
     memcpy(setting, defaultval, sizeof(struct eq_band_setting));
 }
+
+#ifdef HAVE_PLAY_FREQ
+static const char* formatter_freq_unit_0_is_auto(char *buffer, size_t buffer_size,
+                                    int value, const char *unit)
+{
+    if (value == 0)
+        return str(LANG_AUTO);
+    else
+        return db_format(buffer, buffer_size, value / 100, unit);
+}
+
+static int32_t getlang_freq_unit_0_is_auto(int value, int unit)
+{
+    if (value == 0)
+        return LANG_AUTO;
+    else
+        return talk_value_decimal(value, unit, 3, false);
+}
+
+static void playback_frequency_callback(int sample_rate_hz)
+{
+    audio_set_playback_frequency(sample_rate_hz);
+}
+#endif /* HAVE_PLAY_FREQ */
 
 /* perform shuffle/unshuffle of the current playlist based on the boolean provided */
 static void shuffle_playlist_callback(bool shuffle)
@@ -954,16 +979,17 @@ const struct settings_list settings[] = {
 #endif
                   ), /* CHOICE_SETTING( repeat_mode ) */
 #ifdef HAVE_PLAY_FREQ
-    STRINGCHOICE_SETTING(0, play_frequency, LANG_FREQUENCY, 0,
+     TABLE_SETTING(F_SOUNDSETTING|F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED,
+                  play_frequency, LANG_FREQUENCY, 0, "playback frequency", "auto",
+                  UNIT_KHZ, formatter_freq_unit_0_is_auto,
+                  getlang_freq_unit_0_is_auto,
+                  playback_frequency_callback, 
 #if HAVE_PLAY_FREQ >= 192
-        "playback frequency", "auto,44.1 kHz,48 kHz,88.2 kHz,96 kHz,176.4 kHz,192 kHz", NULL, 7,
-        LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ), TALK_ID_DECIMAL(882, 1, UNIT_KHZ), TALK_ID(96, UNIT_KHZ), TALK_ID_DECIMAL(1764, 1, UNIT_KHZ), TALK_ID(192, UNIT_KHZ)),
+                  7,0,SAMPR_44,SAMPR_48,SAMPR_88,SAMPR_96,SAMPR_176,SAMPR_192),
 #elif HAVE_PLAY_FREQ >= 96
-        "playback frequency", "auto,44.1 kHz,48 kHz,88.2 kHz,96 kHz", NULL, 5,
-        LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ), TALK_ID_DECIMAL(882, 1, UNIT_KHZ), TALK_ID(96, UNIT_KHZ)),
+                  5,0,SAMPR_44,SAMPR_48,SAMPR_88,SAMPR_96),
 #elif HAVE_PLAY_FREQ >= 48
-        "playback frequency", "auto,44.1 kHz,48 kHz", NULL, 3,
-        LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ)),
+                  3,0,SAMPR_44,SAMPR_48),
 #else
       #error "HAVE_PLAY_FREQ < 48???"
 #endif

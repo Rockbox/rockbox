@@ -3981,29 +3981,45 @@ static void audio_change_frequency_callback(unsigned short id, void *data)
     }
 }
 
-void audio_set_playback_frequency(int setting)
+void audio_set_playback_frequency(unsigned int sample_rate_hz)
 {
+    /* sample_rate_hz == 0 is "automatic", and also a sentinel */
 #if HAVE_PLAY_FREQ >= 192
-    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48, SAMPR_88, SAMPR_96, SAMPR_176, SAMPR_192 };
+    static const unsigned int play_sampr[] = {SAMPR_44, SAMPR_48, SAMPR_88, SAMPR_96, SAMPR_176, SAMPR_192, 0 };
 #elif HAVE_PLAY_FREQ >= 96
-    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48, SAMPR_88, SAMPR_96 };
+    static const unsigned int play_sampr[] = {SAMPR_44, SAMPR_48, SAMPR_88, SAMPR_96, 0 };
 #elif HAVE_PLAY_FREQ >= 48
-    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48 };
+    static const unsigned int play_sampr[] = {SAMPR_44, SAMPR_48, 0 };
 #else
     #error "HAVE_PLAY_FREQ < 48 ??"
 #endif
+    const unsigned int *p_sampr = play_sampr;
+    unsigned int sampr = 0;
 
-    if ((unsigned)setting > ARRAYLEN(play_sampr)) /* [0] is "automatic" */
-        setting = 0;
+    while (*p_sampr != 0)
+    {
+        if (*p_sampr == sample_rate_hz)
+        {
+            sampr = *p_sampr;
+            break;
+        }
+        p_sampr++;
+    }
 
-    unsigned long playback_sampr = mixer_get_frequency();
-    unsigned long sampr = setting ?
-      play_sampr[setting - 1] :
-      ((audio_status() == AUDIO_STATUS_PLAY) ?
-       audio_guess_frequency(audio_current_track()) :
-       playback_sampr);
+    if (sampr == 0)
+    {
+        if (audio_status() == AUDIO_STATUS_PLAY)
+        {
+            sampr = audio_guess_frequency(audio_current_track());
+        }
+        else
+        {
+            logf("could not set sample rate to %u hz", sample_rate_hz);
+            return; /* leave as is */
+        }
+    }
 
-    if (sampr != playback_sampr)
+    if (sampr != mixer_get_frequency())
     {
         mixer_set_frequency(sampr);
         LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
