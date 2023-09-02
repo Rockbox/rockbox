@@ -806,6 +806,7 @@ void check_bootfile(bool do_rolo)
                 }
             }
             mtime = info.mtime;
+            break;
         }
     }
     closedir(dir);
