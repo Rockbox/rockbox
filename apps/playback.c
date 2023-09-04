@@ -4008,7 +4008,7 @@ void audio_set_playback_frequency(unsigned int sample_rate_hz)
 
     if (sampr == 0)
     {
-        if (audio_status() == AUDIO_STATUS_PLAY)
+        if (audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
         {
             sampr = audio_guess_frequency(audio_current_track());
         }
