@@ -82,6 +82,7 @@ typedef struct
 
     uint32_t *sample_byte_sizes;
     uint32_t num_sample_byte_sizes;
+    int32_t sample_byte_sizes_offset;
 
     uint32_t codecdata_len;
     uint8_t codecdata[MAX_CODECDATA_SIZE];

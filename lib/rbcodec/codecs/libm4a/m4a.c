@@ -211,11 +211,13 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
         sound_sample_i += time_cnt * time_dur;
     }
 
-    DEBUGF("seek chunk=%lu, sample=%lu, soundsample=%lu, offset=%lu\n",
-           (unsigned long)chunk, (unsigned long)chunk_first_sample,
-           sound_sample_i, (unsigned long)offset);
+    if (demux_res->sample_byte_sizes_offset)
+    {
+        stream->ci->seek_buffer(demux_res->sample_byte_sizes_offset + chunk_first_sample * 4);
+    }
 
-    if (tsz_tab) {
+    if (tsz_tab || demux_res->sample_byte_sizes_offset)
+    {
         /* We have a sample-to-bytes table available so we can do accurate
          * seeking. Move one sample at a time and update the file offset and
          * PCM sample offset as we go. */
@@ -229,7 +231,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
                 time_dur = tts_tab[time].sample_duration;
             }
 
-            offset += tsz_tab[i];
+            offset += tsz_tab ? tsz_tab[i] : stream_read_uint32(stream);
             sound_sample_i += time_dur;
             time_cnt--;
         }
@@ -238,6 +240,13 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
          * start of a chunk, which is often much lower resolution. */
         sample_i = chunk_first_sample;
     }
+
+    DEBUGF("seek chunk=%lu, chunk_first_sample=%lu, sample_i=%u, soundsample=%lu, offset=%lu\n",
+           (unsigned long)chunk,
+           (unsigned long)chunk_first_sample,
+           sample_i,
+           (unsigned long)sound_sample_i,
+           (unsigned long)offset);
 
     if (stream->ci->seek_buffer(offset))
     {

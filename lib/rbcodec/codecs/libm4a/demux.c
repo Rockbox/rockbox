@@ -400,7 +400,8 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     }
     else
     {
-        DEBUGF("stsz too large, ignoring it\n");
+        qtmovie->res->sample_byte_sizes_offset = stream_tell(qtmovie->stream);
+        DEBUGF("stsz too large: %u, save sample_byte_sizes_offset\n", numsizes);
     }
 
     if (size_remaining)
@@ -479,6 +480,14 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
     {
         DEBUGF("stco too large to allocate lookup_table[]\n");
         return false;
+    }
+
+    // Reading sample_byte_sizes data on seek can lead to additional re-buffering.
+    // So skip it if we have good enough seek accuracy via lookup_table (3000 ms)
+    if (qtmovie->res->sample_byte_sizes_offset && ci->id3->length / fit_numentries <= 3000)
+    {
+        qtmovie->res->sample_byte_sizes_offset = 0;
+        DEBUGF("lookup_table seek accuracy %ld ms, ignoring sample_byte_sizes_offset \n", ci->id3->length / fit_numentries);
     }
 
     /* Build up lookup table. The lookup table contains the sample index and
