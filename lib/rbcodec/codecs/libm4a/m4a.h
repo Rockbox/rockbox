@@ -130,10 +130,10 @@ int stream_eof(stream_t *stream);
 void stream_create(stream_t *stream,struct codec_api* ci);
 unsigned int get_sample_offset(demux_res_t *demux_res, uint32_t sample);
 unsigned int m4a_seek (demux_res_t* demux_res, stream_t* stream,
-    uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
+    uint64_t sound_sample_loc, uint64_t* sound_samples_done, 
     int* current_sample);
 unsigned int m4a_seek_raw (demux_res_t* demux_res, stream_t* stream,
-    uint32_t file_loc, uint32_t* sound_samples_done, int* current_sample);
+    uint32_t file_loc, uint64_t* sound_samples_done, int* current_sample);
 int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *start);
 
 #endif /* STREAM_H */

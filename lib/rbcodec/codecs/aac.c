@@ -56,7 +56,7 @@ enum codec_status codec_run(void)
     size_t n;
     demux_res_t demux_res;
     stream_t input_stream;
-    uint32_t sound_samples_done;
+    uint64_t sound_samples_done;
     uint32_t elapsed_time;
     int file_offset;
     int framelength;
@@ -172,7 +172,7 @@ enum codec_status codec_run(void)
              * m4a_seek and the resulting sound_samples_done must be expanded 
              * by a factor 2. This is done via using sbr_fac. */
             if (m4a_seek(&demux_res, &input_stream,
-                          (param/10/sbr_fac)*(ci->id3->frequency/100),
+                         (uint64_t) param * ci->id3->frequency / sbr_fac / 1000ULL,
                           &sound_samples_done, (int*) &i)) {
                 sound_samples_done *= sbr_fac;
                 elapsed_time = sound_samples_done * 1000LL / ci->id3->frequency;

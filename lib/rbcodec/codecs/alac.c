@@ -55,7 +55,7 @@ enum codec_status codec_run(void)
     size_t n;
     demux_res_t demux_res;
     stream_t input_stream;
-    uint32_t samplesdone;
+    uint64_t samplesdone;
     int samplesdecoded;
     unsigned int i;
     unsigned char* buffer;

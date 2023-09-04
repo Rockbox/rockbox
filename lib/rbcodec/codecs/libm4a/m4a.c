@@ -137,13 +137,14 @@ int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *st
 /* Seek to desired sound sample location. Return 1 on success (and modify
  * sound_samples_done and current_sample), 0 if failed. */
 unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream, 
-    uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
+    uint64_t sound_sample_loc, uint64_t* sound_samples_done, 
     int* current_sample)
 {
-    uint32_t i, sample_i, sound_sample_i;
+    uint32_t i, sample_i;
     uint32_t time, time_cnt, time_dur;
     uint32_t chunk, chunk_first_sample;
     uint32_t offset;
+    uint64_t sound_sample_i;
     time_to_sample_t *tts_tab = demux_res->time_to_sample;
     sample_offset_t *tco_tab = demux_res->lookup_table;
     uint32_t *tsz_tab = demux_res->sample_byte_sizes;
@@ -208,7 +209,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
 
     DEBUGF("seek chunk=%lu, sample=%lu, soundsample=%lu, offset=%lu\n",
            (unsigned long)chunk, (unsigned long)chunk_first_sample,
-           (unsigned long)sound_sample_i, (unsigned long)offset);
+           sound_sample_i, (unsigned long)offset);
 
     if (tsz_tab) {
         /* We have a sample-to-bytes table available so we can do accurate
@@ -260,13 +261,13 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
  * calculate the sound_samples_done value.
  */
 unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
-    uint32_t file_loc, uint32_t* sound_samples_done, 
+    uint32_t file_loc, uint64_t* sound_samples_done, 
     int* current_sample)
 {
     uint32_t i;
     uint32_t chunk_sample     = 0;
     uint32_t total_samples    = 0;
-    uint32_t new_sound_sample = 0;
+    uint64_t new_sound_sample = 0;
     uint32_t tmp_dur;
     uint32_t tmp_cnt;
     uint32_t new_pos;
