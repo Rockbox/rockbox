@@ -259,7 +259,7 @@ struct mp3entry {
     int tail_trim;          /* Number of samples to remove from the end */
 
     /* Added for Vorbis, used by mp4 parser as well. */
-    unsigned long samples;  /* number of samples in track */
+    uint64_t samples;  /* number of samples in track */
 
     /* MP3 stream specific info */
     unsigned long frame_count; /* number of frames in the file (if VBR) */

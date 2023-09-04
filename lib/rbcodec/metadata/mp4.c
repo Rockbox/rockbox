@@ -707,13 +707,11 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                      * need any further special handling. */
                     if (id3->codectype==AFMT_MP4_AAC_HE && l<=1024)
                     {
-                        id3->samples += n * l * 2;
+                        l *= 2;
                         id3->needs_upsampling_correction = true;
                     }
-                    else
-                    {
-                        id3->samples += n * l;
-                    }
+
+                    id3->samples += (uint64_t) n * l;
                 }
                 
                 size = 0;
