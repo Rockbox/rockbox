@@ -475,14 +475,14 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
     {
         qtmovie->res->lookup_table = malloc(fit_numentries * sizeof(*qtmovie->res->lookup_table));
 
-        if (qtmovie->res->lookup_table)
+        if (qtmovie->res->lookup_table || (++accuracy_divider == 0))
         {
             break;
         }
         else
         {
             // we failed to alloc memory for lookup table, so reduce seek accuracy and try again
-            fit_numentries = numentries / ++accuracy_divider;
+            fit_numentries = numentries / accuracy_divider;
         }
     }
     DEBUGF("lookup_table numentries %d, fit_numentries %d\n", numentries, fit_numentries);
