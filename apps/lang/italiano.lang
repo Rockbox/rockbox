@@ -5324,19 +5324,17 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Imposta come cartella di registrazione"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: "Imposta come cartella di registrazione"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6038,18 +6036,21 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
     xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "HD 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "Micro S D"
     xduoox3: "Micro SD 2"
@@ -6141,58 +6142,58 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Inserisci"
+    *: ""
   </dest>
   <voice>
-    *: "Inserisci"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Inserisci come prossima"
+    *: ""
   </dest>
   <voice>
-    *: "Inserisci come prossima"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Inserisci Come Ultima"
+    *: ""
   </dest>
   <voice>
-    *: "Inserisci Come Ultima"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Mescola E Inserisci"
+    *: ""
   </dest>
   <voice>
-    *: "Mescola E Inserisci"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6365,16 +6366,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Aggiungi alla playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Aggiungi alla playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6763,7 +6764,7 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<No Info>"
+    *: "<Nessuna0 Info>"
   </dest>
   <voice>
     *: "Nessuna Informazione"
@@ -10848,16 +10849,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Mescola E Inserisci Come Ultima"
+    *: ""
   </dest>
   <voice>
-    *: "Mescola E Inserisci Come Ultima"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11455,16 +11456,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Avvia Sfoglia File Da Qui"
+    *: ""
   </dest>
   <voice>
-    *: "Avvia Sfoglia File Da Qui"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11570,16 +11571,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Imposta Come Cartella Catalogo Playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Imposta Come Cartella Catalogo Playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11660,16 +11661,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTOMATIC
-  desc: generic automatic
+  desc: deprecated
   user: core
   <source>
-    *: "Automatic"
+    *: ""
   </source>
   <dest>
-    *: "Automatico"
+    *: ""
   </dest>
   <voice>
-    *: "Automatico"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12510,7 +12511,7 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
@@ -14879,16 +14880,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Svuota playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Svuota playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16313,5 +16314,255 @@
     *: none
     clear_settings_on_hold,iriverh10: "Cancella le impostazioni quando si tiene premuto il pulsante reset durante l'avvio"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Cancella le impostazioni quando l'interruttore di blocco è attivo durante l'avvio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Riavvolgi tra le tracce"
+  </dest>
+  <voice>
+    *: "Riavvolgi tra le tracce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Imposta Come..."
+  </dest>
+  <voice>
+    *: "Imposta Come..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Cartella Playlist"
+  </dest>
+  <voice>
+    *: "Cartella Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Cartella Iniziale"
+  </dest>
+  <voice>
+    *: "Cartella Iniziale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Cartella Di Registrazione"
+  </dest>
+  <voice>
+    *: none
+    recording: "Cartella Di Registrazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Aggiungi alla  Playlist..."
+  </dest>
+  <voice>
+    *: "Aggiungi alla Playlist..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Aggiungi alla Playlist Esistente"
+  </dest>
+  <voice>
+    *: "Aggiungi alla Playlist Esistente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Riproduzione Brano Successivo..."
+  </dest>
+  <voice>
+    *: "Riproduzione Brano Successivo..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Riproduci Successivo"
+  </dest>
+  <voice>
+    *: "Riproduci Successivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Aggiungi Casualmente"
+  </dest>
+  <voice>
+    *: "Aggiungi Casualmente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Riproduci Ultimo"
+  </dest>
+  <voice>
+    *: "Riproduci Ultimo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Riproduci Ultimo Casualmente"
+  </dest>
+  <voice>
+    *: "Riproduci Ultimo Casualmente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Modalità Aggiustamento Volume"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Modalità Aggiustamento Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Numero di Passi per il Volume"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Numero di Passi per il Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Percettivo"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Percettivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Mostra tracce durante la navigazione"
+  </dest>
+  <voice>
+    *: "Mostra tracce durante la navigazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Vai all'Ultimo Album"
+  </dest>
+  <voice>
+    *: "Vai all'Ultimo Album"
   </voice>
 </phrase>
