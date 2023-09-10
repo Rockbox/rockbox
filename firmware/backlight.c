@@ -23,6 +23,7 @@
 #include "config.h"
 #if !defined(BOOTLOADER)
 #include "settings.h"
+#include "action.h"
 #endif
 #include <stdlib.h>
 #include "cpu.h"
@@ -39,7 +40,6 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "screendump.h"
-#include "action.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -846,9 +846,9 @@ bool is_backlight_on(bool ignore_always_off)
 int backlight_get_current_timeout(void)
 {
     if ((backlight_on_button_hold != 0)
-#if defined(HAVE_REMOTE_LCD_AS_MAIN) && defined(HAS_REMOTE_BUTTON_HOLD)  
+#if (defined(HAVE_REMOTE_LCD_AS_MAIN) && defined(HAS_REMOTE_BUTTON_HOLD))
         && remote_button_hold()
-#elifdef HAS_BUTTON_HOLD
+#elif defined(HAS_BUTTON_HOLD)
         && button_hold()
 #else
         && is_keys_locked()
