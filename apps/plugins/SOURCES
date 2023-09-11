@@ -9,6 +9,7 @@ tagcache/tagcache.c
 chessclock.c
 credits.c
 cube.c
+dart_scorer.c
 dict.c
 jackpot.c
 keybox.c

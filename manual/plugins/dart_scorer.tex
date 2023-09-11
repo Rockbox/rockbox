@@ -1,0 +1,17 @@
+\subsection{Dart Scorer}
+
+The dart scorer plugin allows scoring a game of darts (301/501) for two players. It supports modifiers for double/triple hits, bullseye, undo, and game saving and resuming.
+
+\begin{btnmap}
+  \PluginUp, \PluginDown, \PluginLeft, \PluginRight
+  \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp, \PluginRCDown, \PluginRCLeft, \PluginRCRight}
+  & Move cursor\\
+
+  \PluginSelect
+  & Select button under cursor\\
+
+  \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{\PluginCancel}
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonSelect}
+  \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
+  & Go to menu\\
+\end{btnmap}

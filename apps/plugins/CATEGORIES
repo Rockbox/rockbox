@@ -22,6 +22,7 @@ clock,apps
 codebuster,games
 credits,viewers
 cube,demos
+dart_scorer,apps
 db_commit,apps
 db_folder_select,viewers
 demystify,demos
