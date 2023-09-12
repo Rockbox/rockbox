@@ -72,29 +72,46 @@ static int strnatcasecmp_n(const char *a, const char *b, size_t n)
 int ft_build_playlist(struct tree_context* c, int start_index)
 {
     int i;
-    int res = 0;
     int start=start_index;
+    int res;
     struct playlist_info *playlist = playlist_get_current();
 
     tree_lock_cache(c);
     struct entry *entries = tree_get_entries(c);
 
-    for(i = 0;i < c->filesindir;i++)
+    struct playlist_insert_context pl_context;
+
+    res = playlist_insert_context_create(playlist, &pl_context,
+                                        PLAYLIST_REPLACE, false, false);
+    if (res >= 0)
     {
-        if((entries[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+        cpu_boost(true);
+        for(i = 0;i < c->filesindir;i++)
         {
-            res = playlist_insert_track(playlist, entries[i].name,
-                                        PLAYLIST_INSERT_LAST, false, false);
-            if (res < 0)
+#if 0 /*only needed if displaying progress */
+            /* user abort */
+            if (action_userabort(TIMEOUT_NOBLOCK))
+            {
                 break;
+            }
+#endif
+            if((entries[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+            {
+                res = playlist_insert_context_add(&pl_context, entries[i].name);
+                if (res < 0)
+                    break;
+            }
+            else
+            {
+                /* Adjust the start index when se skip non-MP3 entries */
+                if(i < start)
+                    start_index--;
+            }
         }
-        else
-        {
-            /* Adjust the start index when se skip non-MP3 entries */
-            if(i < start)
-                start_index--;
-        }
+        cpu_boost(false);
     }
+    
+    playlist_insert_context_release(&pl_context);
 
     tree_unlock_cache(c);
     return start_index;

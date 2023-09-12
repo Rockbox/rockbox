@@ -166,13 +166,6 @@
 #define PLAYLIST_QUEUED                 0x20000000
 #define PLAYLIST_SKIPPED                0x10000000
 
-struct directory_search_context {
-    struct playlist_info* playlist;
-    int position;
-    bool queue;
-    int count;
-};
-
 static struct playlist_info current_playlist;
 
 static void dc_init_filerefs(struct playlist_info *playlist,
@@ -1435,41 +1428,7 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
  */
 static int directory_search_callback(char* filename, void* context)
 {
-    struct directory_search_context* c =
-        (struct directory_search_context*) context;
-    int insert_pos;
-
-    insert_pos = add_track_to_playlist_unlocked(c->playlist, filename,
-                                                c->position, c->queue, -1);
-
-    if (insert_pos < 0)
-        return -1;
-
-    (c->count)++;
-
-    /* After first INSERT_FIRST switch to INSERT so that all the
-    rest of the tracks get inserted one after the other */
-    if (c->position == PLAYLIST_INSERT_FIRST)
-        c->position = PLAYLIST_INSERT;
-
-    if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
-    {
-        unsigned char* count_str;
-
-        if (c->queue)
-            count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-        else
-            count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-        display_playlist_count(c->count, count_str, false);
-
-        if ((c->count) == PLAYLIST_DISPLAY_COUNT &&
-            (audio_status() & AUDIO_STATUS_PLAY) &&
-            c->playlist->started)
-            audio_flush_and_reload_tracks();
-    }
-
-    return 0;
+    return playlist_insert_context_add(context, filename);
 }
 
 /*
@@ -2441,18 +2400,19 @@ int playlist_get_track_info(struct playlist_info* playlist, int index,
 }
 
 /*
- * Insert all tracks from specified directory into playlist.
+ * initialize an insert context to add tracks to a playlist
+ * don't forget to release it when finished adding files
  */
-int playlist_insert_directory(struct playlist_info* playlist,
-                              const char *dirname, int position, bool queue,
-                              bool recurse)
+int playlist_insert_context_create(struct playlist_info* playlist,
+                                   struct playlist_insert_context *context,
+                                   int position, bool queue, bool progress)
 {
-    int result;
-    unsigned char *count_str;
-    struct directory_search_context context;
 
     if (!playlist)
         playlist = &current_playlist;
+
+    context->playlist = playlist;
+    context->initialized = false;
 
     dc_thread_stop(playlist);
     playlist_write_lock(playlist);
@@ -2460,8 +2420,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     if (check_control(playlist) < 0)
     {
         notify_control_access_error();
-        result = -1;
-        goto out;
+        return -1;
     }
 
     if (position == PLAYLIST_REPLACE)
@@ -2470,41 +2429,101 @@ int playlist_insert_directory(struct playlist_info* playlist,
             position = PLAYLIST_INSERT_LAST;
         else
         {
-            result = -1;
-            goto out;
+            return -1;
         }
     }
 
+    context->playlist = playlist;
+    context->position = position;
+    context->queue = queue;
+    context->count = 0;
+    context->progress = progress;
+    context->initialized = true;
+
     if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
+        context->count_langid = LANG_PLAYLIST_QUEUE_COUNT;
     else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
+        context->count_langid = LANG_PLAYLIST_INSERT_COUNT;
 
-    display_playlist_count(0, count_str, false);
+    return 0;
+}
 
-    context.playlist = playlist;
-    context.position = position;
-    context.queue = queue;
-    context.count = 0;
+/*
+ * add tracks to playlist using opened insert context
+ */
+int playlist_insert_context_add(struct playlist_insert_context *context,
+                                const char *filename)
+{
+    struct playlist_insert_context* c = context;
+    int insert_pos;
 
-    cpu_boost(true);
+    insert_pos = add_track_to_playlist_unlocked(c->playlist, filename,
+                                                c->position, c->queue, -1);
 
-    result = playlist_directory_tracksearch(dirname, recurse,
-        directory_search_callback, &context);
+    if (insert_pos < 0)
+        return -1;
 
-    sync_control_unlocked(playlist);
+    (c->count)++;
 
-    cpu_boost(false);
+    /* After first INSERT_FIRST switch to INSERT so that all the
+    rest of the tracks get inserted one after the other */
+    if (c->position == PLAYLIST_INSERT_FIRST)
+        c->position = PLAYLIST_INSERT;
 
-    display_playlist_count(context.count, count_str, true);
+    if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
+    {
+        if (c->progress)
+            display_playlist_count(c->count, ID2P(c->count_langid), false);
 
-out:
+        if ((c->count) == PLAYLIST_DISPLAY_COUNT &&
+            (audio_status() & AUDIO_STATUS_PLAY) &&
+            c->playlist->started)
+            audio_flush_and_reload_tracks();
+    }
+
+    return 0;
+}
+
+/*
+ * release opened insert context, sync playlist
+ */
+void playlist_insert_context_release(struct playlist_insert_context *context)
+{
+
+    struct playlist_info* playlist = context->playlist;
+    if (context->initialized)
+        sync_control_unlocked(playlist);
+    if (context->progress)
+        display_playlist_count(context->count, ID2P(context->count_langid), true);
+
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
 
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
+}
 
+/*
+ * Insert all tracks from specified directory into playlist.
+ */
+int playlist_insert_directory(struct playlist_info* playlist,
+                              const char *dirname, int position, bool queue,
+                              bool recurse)
+{
+    int result = -1;
+    struct playlist_insert_context context;
+    result = playlist_insert_context_create(playlist, &context,
+                                            position, queue, true);
+    if (result >= 0)
+    {
+        cpu_boost(true);
+
+        result = playlist_directory_tracksearch(dirname, recurse,
+            directory_search_callback, &context);
+
+        cpu_boost(false);
+    }
+    playlist_insert_context_release(&context);
     return result;
 }
 
@@ -2514,133 +2533,70 @@ out:
 int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue)
 {
-    int fd;
+    int fd = -1;
     int max;
     char *dir;
-    unsigned char *count_str;
+
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
-    int count = 0;
+
     int result = -1;
     bool utf8 = is_m3u8_name(filename);
 
-    if (!playlist)
-        playlist = &current_playlist;
-
-    dc_thread_stop(playlist);
-    playlist_write_lock(playlist);
-
+    struct playlist_insert_context pl_context;
     cpu_boost(true);
 
-    if (check_control(playlist) < 0)
+    if (playlist_insert_context_create(playlist, &pl_context, position, queue, true) >= 0)
     {
-        notify_control_access_error();
-        goto out;
-    }
-
-    fd = open_utf8(filename, O_RDONLY);
-    if (fd < 0)
-    {
-        notify_access_error();
-        goto out;
-    }
-
-    /* we need the directory name for formatting purposes */
-    size_t dirlen = path_dirname(filename, (const char **)&dir);
-    dir = strmemdupa(dir, dirlen);
-
-    if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-    display_playlist_count(count, count_str, false);
-
-    if (position == PLAYLIST_REPLACE)
-    {
-        if (remove_all_tracks_unlocked(playlist, true) == 0)
-            position = PLAYLIST_INSERT_LAST;
-        else
+        fd = open_utf8(filename, O_RDONLY);
+        if (fd < 0)
         {
-            close(fd);
+            notify_access_error();
             goto out;
         }
-    }
 
-    while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
-    {
-        /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-            break;
+        /* we need the directory name for formatting purposes */
+        size_t dirlen = path_dirname(filename, (const char **)&dir);
+        dir = strmemdupa(dir, dirlen);
 
-        if (temp_buf[0] != '#' && temp_buf[0] != '\0')
+        while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
         {
-            int insert_pos;
+            /* user abort */
+            if (action_userabort(TIMEOUT_NOBLOCK))
+                break;
 
-            if (!utf8)
+            if (temp_buf[0] != '#' && temp_buf[0] != '\0')
             {
-                /* Use trackname as a temporay buffer. Note that trackname must
-                 * be as large as temp_buf.
-                 */
-                max = convert_m3u_name(temp_buf, max, sizeof(temp_buf), trackname);
-            }
-
-            /* we need to format so that relative paths are correctly
-               handled */
-            if (format_track_path(trackname, temp_buf, sizeof(trackname), dir) < 0)
-            {
-                goto out;
-            }
-
-            insert_pos = add_track_to_playlist_unlocked(playlist, trackname,
-                                                        position, queue, -1);
-
-            if (insert_pos < 0)
-            {
-                goto out;
-            }
-
-            /* After first INSERT_FIRST switch to INSERT so that all the
-            rest of the tracks get inserted one after the other */
-            if (position == PLAYLIST_INSERT_FIRST)
-                position = PLAYLIST_INSERT;
-
-            count++;
-
-            if ((count%PLAYLIST_DISPLAY_COUNT) == 0)
-            {
-                display_playlist_count(count, count_str, false);
-
-                if (count == PLAYLIST_DISPLAY_COUNT &&
-                    (audio_status() & AUDIO_STATUS_PLAY) &&
-                    playlist->started)
+                if (!utf8)
                 {
-                    audio_flush_and_reload_tracks();
+                    /* Use trackname as a temporay buffer. Note that trackname must
+                     * be as large as temp_buf.
+                     */
+                    max = convert_m3u_name(temp_buf, max, sizeof(temp_buf), trackname);
                 }
+
+                /* we need to format so that relative paths are correctly
+                   handled */
+                if (format_track_path(trackname, temp_buf, sizeof(trackname), dir) < 0)
+                {
+                    goto out;
+                }
+
+                if (playlist_insert_context_add(&pl_context, trackname) < 0)
+                    goto out;
             }
+
+            /* let the other threads work */
+            yield();
         }
-
-        /* let the other threads work */
-        yield();
     }
-
-    close(fd);
-
-    sync_control_unlocked(playlist);
-
-    display_playlist_count(count, count_str, true);
-
-    if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
-        audio_flush_and_reload_tracks();
 
     result = 0;
 
 out:
+    close(fd);
     cpu_boost(false);
-
-    playlist_write_unlock(playlist);
-    dc_thread_start(playlist, true);
-
+    playlist_insert_context_release(&pl_context);
     return result;
 }
 

@@ -98,6 +98,16 @@ struct playlist_track_info
     int  display_index;      /* index of track for display          */
 };
 
+struct playlist_insert_context {
+    struct playlist_info* playlist;
+    int position;
+    bool queue;
+    bool progress;
+    bool initialized;
+    int count;
+    int32_t count_langid;
+};
+
 /* Exported functions only for current playlist. */
 void playlist_init(void) INIT_ATTR;
 void playlist_shutdown(void);
@@ -132,6 +142,12 @@ void playlist_close(struct playlist_info* playlist);
 void playlist_sync(struct playlist_info* playlist);
 int playlist_insert_track(struct playlist_info* playlist, const char *filename,
                           int position, bool queue, bool sync);
+int playlist_insert_context_create(struct playlist_info* playlist,
+                                   struct playlist_insert_context *context,
+                                   int position, bool queue, bool progress);
+int playlist_insert_context_add(struct playlist_insert_context *context,
+                                const char *filename);
+void playlist_insert_context_release(struct playlist_insert_context *context);
 int playlist_insert_directory(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
                               bool recurse);
