@@ -533,14 +533,11 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
             
             frame += (new_first - old_first) * old_frame;
         }
-        frame += (k - old_first) * old_frame;
 
         if ((k-1) % accuracy_divider == 0)
         {
-            qtmovie->res->lookup_table[idx++].sample = frame;
+            qtmovie->res->lookup_table[idx++].sample = frame + (k - old_first) * old_frame;
         }
-
-        frame -= (k - old_first) * old_frame;
     }
     /* zero-terminate the lookup table */
     qtmovie->res->lookup_table[idx].sample = 0;
