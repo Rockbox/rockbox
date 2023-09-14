@@ -101,8 +101,7 @@ struct table_setting {
 };
 #define F_TABLE_SETTING 0x2000
 #define F_ALLOW_ARBITRARY_VALS 0x4000
-#define F_CB_ON_SELECT_ONLY 0x20000
-#define F_CB_ONLY_IF_CHANGED 0x40000
+
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
@@ -153,11 +152,16 @@ struct custom_setting {
 - a NVRAM setting is removed
 */
 #define F_TEMPVAR    0x0400 /* used if the setting should be set using a temp var */
-#define F_PADTITLE   0x800 /* pad the title with spaces to force it to scroll */
+#define F_PADTITLE   0x0800 /* pad the title with spaces to force it to scroll */
 #define F_NO_WRAP     0x1000 /* used if the list should not wrap */
 
-#define F_BANFROMQS     0x80000000 /* ban the setting from the quickscreen items */
+#define F_CB_ON_SELECT_ONLY 0x10000000 /* option_callback only called if selected */
+#define F_CB_ONLY_IF_CHANGED 0x20000000 /* option_callback only called if setting changed */
+
 #define F_DEPRECATED    0x40000000 /* DEPRECATED setting, don't write to .cfg */
+#define F_BANFROMQS     0x80000000 /* ban the setting from the quickscreen items */
+
+
 struct settings_list {
     uint32_t             flags;   /* BD__ _SER TFFF NNN_ _ATW PTVC IFRB STTT */
     void                *setting;
