@@ -167,7 +167,25 @@
 #define PLAYLIST_SKIPPED                0x10000000
 
 static struct playlist_info current_playlist;
+/* REPEAT_ONE support functions */
+static long last_manual_skip_tick = 0;
 
+static inline bool is_manual_skip(void)
+{
+    return (last_manual_skip_tick + HZ/2 > current_tick);
+}
+
+static void track_change_callback(unsigned short id, void *param)
+{
+    (void)id;
+    unsigned int flags = ((struct track_event *)param)->flags;
+    if ((flags & TEF_AUTO_SKIP) != TEF_AUTO_SKIP)
+    {
+        last_manual_skip_tick = current_tick;
+    }
+}
+
+/* Directory Cache*/
 static void dc_init_filerefs(struct playlist_info *playlist,
                              int start, int count)
 {
@@ -1691,8 +1709,11 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
     if (repeat_mode == -1)
         repeat_mode = global_settings.repeat_mode;
 
-    if (repeat_mode == REPEAT_SHUFFLE && playlist->amount <= 1)
+    if ((repeat_mode == REPEAT_SHUFFLE && playlist->amount <= 1) || 
+        (repeat_mode == REPEAT_ONE && is_manual_skip()))
+    {
         repeat_mode = REPEAT_ALL;
+    }
 
     steps = calculate_step_count(playlist, steps);
     switch (repeat_mode)
@@ -1964,6 +1985,7 @@ void playlist_init(void)
 
     dc_thread_start(&current_playlist, false);
 #endif /* HAVE_DIRCACHE */
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_change_callback);
 }
 
 /*
@@ -2823,35 +2845,40 @@ int playlist_next(int steps)
     playlist_write_lock(playlist);
 
     int index;
+    int repeat = global_settings.repeat_mode;
 
-    if ( (steps > 0)
-#ifdef AB_REPEAT_ENABLE
-    && (global_settings.repeat_mode != REPEAT_AB)
-#endif
-    && (global_settings.repeat_mode != REPEAT_ONE) )
+    if (steps > 0)
     {
-        int i, j;
-
-        /* We need to delete all the queued songs */
-        for (i=0, j=steps; i<j; i++)
+        if (repeat == REPEAT_ONE && is_manual_skip())
         {
-            index = get_next_index(playlist, i, -1);
-
-            if (index >= 0 && playlist->indices[index] & PLAYLIST_QUEUE_MASK)
+            repeat = REPEAT_ALL;
+        }
+#ifdef AB_REPEAT_ENABLE
+        else if (repeat != REPEAT_ONE && repeat != REPEAT_AB)
+#else
+        else if (repeat != REPEAT_ONE)
+#endif
+        {
+            int i, j;
+            /* We need to delete all the queued songs */
+            for (i=0, j=steps; i<j; i++)
             {
-                remove_track_unlocked(playlist, index, true);
-                steps--; /* one less track */
+                index = get_next_index(playlist, i, repeat);
+
+                if (index >= 0 && playlist->indices[index] & PLAYLIST_QUEUE_MASK)
+                {
+                    remove_track_unlocked(playlist, index, true);
+                    steps--; /* one less track */
+                }
             }
         }
-    }
-
-    index = get_next_index(playlist, steps, -1);
+    } /*steps > 0*/
+    index = get_next_index(playlist, steps, repeat);
 
     if (index < 0)
     {
         /* end of playlist... or is it */
-        if (global_settings.repeat_mode == REPEAT_SHUFFLE &&
-            playlist->amount > 1)
+        if (repeat == REPEAT_SHUFFLE && playlist->amount > 1)
         {
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
             playlist->first_index = 0;
