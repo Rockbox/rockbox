@@ -524,7 +524,7 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
     stream_seek(qtmovie->stream, qtmovie->res->sample_to_chunk_offset);
     stream_read_sample_to_chunk(qtmovie->stream, &old_first, &old_frame);
     stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
-    for (k = 1; k < numentries; ++k)
+    for (k = 1; k < numentries + 1; ++k)
     {
         for (; i < qtmovie->res->num_sample_to_chunks; ++i)
         {
@@ -548,9 +548,11 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
             qtmovie->res->lookup_table[idx++].sample = frame + (k - old_first) * old_frame;
         }
     }
-    /* zero-terminate the lookup table */
-    qtmovie->res->lookup_table[idx].sample = 0;
-    qtmovie->res->lookup_table[idx].offset = 0;
+    /* zero-terminate sample if it wasn't calculated */
+    if (idx < fit_numentries)
+    {
+        qtmovie->res->lookup_table[idx].sample = 0;
+    }
 
     stream_seek(qtmovie->stream, current_offset);
     if (size_remaining)

@@ -181,8 +181,6 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     /* Find the chunk after 'sample_i'. */
     for (chunk = 1; chunk < demux_res->num_lookup_table; ++chunk)
     {
-        if (tco_tab[chunk].offset == 0)
-            break;
         if (tco_tab[chunk].sample > sample_i)
             break;
     }
@@ -287,12 +285,12 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
 
     /* We know the desired byte offset, search for the chunk right before.
      * Return the associated sample to this chunk as chunk_sample. */
-    for (i=0; i < demux_res->num_lookup_table; ++i)
+    for (i = 1; i < demux_res->num_lookup_table; ++i)
     {
         if (demux_res->lookup_table[i].offset > file_loc)
             break;
     }
-    i = (i>0) ? i-1 : 0; /* We want the last chunk _before_ file_loc. */
+    --i; /* We want the last chunk _before_ file_loc. */
     *lookup_table_idx = i;
     chunk_sample = demux_res->lookup_table[i].sample;
     new_pos      = demux_res->lookup_table[i].offset;
