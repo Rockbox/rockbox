@@ -36,8 +36,8 @@
 #include "menu.h"
 #include "quickscreen.h"
 
-/* HASFLAG compares value to a (SINGLE) flag returns true if set, false otherwise */
-#define HASFLAG(settings_list, flag) ((settings_list->flags & flag) == flag)
+/* HASFLAG compares value to flags returns true if set, false otherwise */
+#define HASFLAG(settings_list, flag) ((settings_list->flags & (flag)) == (flag))
 
 static int selection_to_val(const struct settings_list *setting, int selection);
 int option_value_as_int(const struct settings_list *setting)
