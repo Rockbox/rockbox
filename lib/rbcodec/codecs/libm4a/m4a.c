@@ -122,16 +122,19 @@ void stream_create(stream_t *stream,struct codec_api* ci)
 int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *start)
 {
     uint32_t i = *start;
-    for (i=0; i<demux_res->num_lookup_table; ++i)
+    for (;i < demux_res->num_lookup_table; ++i)
     {
-        if (demux_res->lookup_table[i].sample > frame ||
-            demux_res->lookup_table[i].offset == 0)
-            return -1;
-        if (demux_res->lookup_table[i].sample == frame)
+        if (demux_res->lookup_table[i].sample > frame)
             break;
+
+        if (demux_res->lookup_table[i].sample == frame)
+        {
+            *start = i;
+            return demux_res->lookup_table[i].offset;
+        }
     }
     *start = i;
-    return demux_res->lookup_table[i].offset;
+    return -1;
 }
 
 /* Seek to desired sound sample location. Return 1 on success (and modify

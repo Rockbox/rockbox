@@ -202,12 +202,7 @@ enum codec_status codec_run(void)
         {
             ci->advance_buffer(file_offset - ci->curpos);
         }
-        else if (file_offset == 0)
-        {
-            LOGF("AAC: get_sample_offset error\n");
-            return CODEC_ERROR;
-        }
-        
+
         /* Request the required number of bytes from the input buffer */
         buffer=ci->request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
 
