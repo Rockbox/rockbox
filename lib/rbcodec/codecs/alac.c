@@ -64,6 +64,7 @@ enum codec_status codec_run(void)
     unsigned long resume_time;
     uint32_t resume_offset;
     unsigned int did_resume;
+    int lookup_table_idx = 0;
 
     /* Clean and initialize decoder structures */
     memset(&demux_res , 0, sizeof(demux_res));
@@ -96,10 +97,10 @@ enum codec_status codec_run(void)
     if (resume_time)
         did_resume = m4a_seek(&demux_res, &input_stream,
                               (uint64_t)resume_time * ci->id3->frequency / 1000ULL,
-                              &samplesdone, (int *) &i);
+                              &samplesdone, (int *) &i, &lookup_table_idx);
     else if (resume_offset)
         did_resume = m4a_seek_raw(&demux_res, &input_stream, resume_offset,
-                                  &samplesdone, (int *) &i);
+                                  &samplesdone, (int *) &i, &lookup_table_idx);
     else
         did_resume = 0;
 
@@ -122,7 +123,7 @@ enum codec_status codec_run(void)
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (m4a_seek(&demux_res, &input_stream,
                          (uint64_t)param * ci->id3->frequency / 1000ULL,
-                         &samplesdone, (int *) &i))
+                         &samplesdone, (int *) &i, &lookup_table_idx))
                 set_elapsed_samples(samplesdone);
 
             ci->seek_complete();

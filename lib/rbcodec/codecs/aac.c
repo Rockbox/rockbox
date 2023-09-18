@@ -138,7 +138,7 @@ enum codec_status codec_run(void)
          * upsampling files the resulting sound_samples_done must be expanded
          * by a factor of 2. This is done via using sbr_fac. */
         if (m4a_seek_raw(&demux_res, &input_stream, file_offset,
-                          &sound_samples_done, (int*) &i)) {
+                          &sound_samples_done, (int*) &i, &seek_idx)) {
             sound_samples_done *= sbr_fac;
         } else {
             sound_samples_done = 0;
@@ -173,11 +173,10 @@ enum codec_status codec_run(void)
              * by a factor 2. This is done via using sbr_fac. */
             if (m4a_seek(&demux_res, &input_stream,
                          (uint64_t) param * ci->id3->frequency / sbr_fac / 1000ULL,
-                          &sound_samples_done, (int*) &i)) {
+                          &sound_samples_done, (int*) &i, &seek_idx)) {
                 sound_samples_done *= sbr_fac;
                 elapsed_time = sound_samples_done * 1000LL / ci->id3->frequency;
                 ci->set_elapsed(elapsed_time);
-                seek_idx = 0;
 
                 if (i == 0) 
                 {

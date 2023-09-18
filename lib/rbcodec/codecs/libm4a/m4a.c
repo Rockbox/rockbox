@@ -141,7 +141,7 @@ int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *st
  * sound_samples_done and current_sample), 0 if failed. */
 unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream, 
     uint64_t sound_sample_loc, uint64_t* sound_samples_done, 
-    int* current_sample)
+    int* current_sample, int* lookup_table_idx)
 {
     uint32_t i, sample_i;
     uint32_t time, time_cnt, time_dur;
@@ -189,6 +189,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
 
     /* The preceding chunk is the one that contains 'sample_i'. */
     chunk--;
+    *lookup_table_idx = chunk;
     chunk_first_sample = tco_tab[chunk].sample;
     offset = tco_tab[chunk].offset;
 
@@ -265,7 +266,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
  */
 unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     uint32_t file_loc, uint64_t* sound_samples_done, 
-    int* current_sample)
+    int* current_sample, int* lookup_table_idx)
 {
     uint32_t i;
     uint32_t chunk_sample     = 0;
@@ -283,6 +284,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
             break;
     }
     i = (i>0) ? i-1 : 0; /* We want the last chunk _before_ file_loc. */
+    *lookup_table_idx = i;
     chunk_sample = demux_res->lookup_table[i].sample;
     new_pos      = demux_res->lookup_table[i].offset;
     
