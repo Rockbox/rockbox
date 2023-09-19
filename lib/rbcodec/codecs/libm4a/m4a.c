@@ -114,10 +114,10 @@ void stream_create(stream_t *stream,struct codec_api* ci)
 
 /* Check if there is a dedicated byte position contained for the given frame.
  * Return this byte position in case of success or return -1. This allows to
- * skip empty samples. 
- * During standard playback the search result (index i) will always increase. 
+ * skip empty samples.
+ * During standard playback the search result (index i) will always increase.
  * Therefor we save this index and let the caller set this value again as start
- * index when calling m4a_check_sample_offset() for the next frame. This 
+ * index when calling m4a_check_sample_offset() for the next frame. This
  * reduces the overall loop count significantly. */
 int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *start)
 {
@@ -139,9 +139,9 @@ int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *st
 
 /* Seek to desired sound sample location. Return 1 on success (and modify
  * sound_samples_done and current_sample), 0 if failed. */
-unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream, 
-    uint64_t sound_sample_loc, uint64_t* sound_samples_done, 
-    int* current_sample, int* lookup_table_idx)
+unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
+    uint64_t sound_sample_loc, uint64_t* sound_samples_done,
+    uint32_t* current_sample, uint32_t* lookup_table_idx)
 {
     uint32_t i, sample_i;
     uint32_t time, time_cnt, time_dur;
@@ -257,7 +257,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
  * 1) the lookup_table array contains the file offset for the first sample
  *    of each chunk.
  *
- * 2) the time_to_sample array contains the duration (in sound samples) 
+ * 2) the time_to_sample array contains the duration (in sound samples)
  *    of each sample of data.
  *
  * Locate the chunk containing location (using lookup_table), find the first
@@ -265,8 +265,8 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
  * calculate the sound_samples_done value.
  */
 unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
-    uint32_t file_loc, uint64_t* sound_samples_done, 
-    int* current_sample, int* lookup_table_idx)
+    uint32_t file_loc, uint64_t* sound_samples_done,
+    uint32_t* current_sample, uint32_t* lookup_table_idx)
 {
     uint32_t i;
     uint32_t chunk_sample     = 0;
@@ -276,7 +276,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     uint32_t tmp_cnt;
     uint32_t new_pos;
 
-    /* We know the desired byte offset, search for the chunk right before. 
+    /* We know the desired byte offset, search for the chunk right before.
      * Return the associated sample to this chunk as chunk_sample. */
     for (i=0; i < demux_res->num_lookup_table; ++i)
     {
@@ -287,7 +287,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     *lookup_table_idx = i;
     chunk_sample = demux_res->lookup_table[i].sample;
     new_pos      = demux_res->lookup_table[i].offset;
-    
+
     /* Get sound sample offset. */
     i = 0;
     time_to_sample_t *tab2 = demux_res->time_to_sample;
@@ -306,12 +306,12 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     }
 
     /* Go to the new file position. */
-    if (stream->ci->seek_buffer(new_pos)) 
+    if (stream->ci->seek_buffer(new_pos))
     {
         *sound_samples_done = new_sound_sample;
         *current_sample = chunk_sample;
         return 1;
-    } 
+    }
 
     return 0;
 }
