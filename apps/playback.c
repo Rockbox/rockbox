@@ -3687,6 +3687,12 @@ void audio_resume(void)
     audio_queue_send(Q_AUDIO_PAUSE, false);
 }
 
+/* Internal function used by REPEAT_ONE */
+bool audio_pending_track_skip_is_auto(void)
+{
+    return (skip_pending == TRACK_SKIP_AUTO);
+}
+
 /* Skip the specified number of tracks forward or backward from the current */
 void audio_skip(int offset)
 {

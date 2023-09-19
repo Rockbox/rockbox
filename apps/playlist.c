@@ -167,22 +167,11 @@
 #define PLAYLIST_SKIPPED                0x10000000
 
 static struct playlist_info current_playlist;
-/* REPEAT_ONE support functions */
-static long last_manual_skip_tick = 0;
-
+/* REPEAT_ONE support function from playback.c */
+extern bool audio_pending_track_skip_is_auto(void);
 static inline bool is_manual_skip(void)
 {
-    return (last_manual_skip_tick + HZ/2 > current_tick);
-}
-
-static void track_change_callback(unsigned short id, void *param)
-{
-    (void)id;
-    unsigned int flags = ((struct track_event *)param)->flags;
-    if ((flags & TEF_AUTO_SKIP) != TEF_AUTO_SKIP)
-    {
-        last_manual_skip_tick = current_tick;
-    }
+    return !audio_pending_track_skip_is_auto();
 }
 
 /* Directory Cache*/
@@ -1985,7 +1974,6 @@ void playlist_init(void)
 
     dc_thread_start(&current_playlist, false);
 #endif /* HAVE_DIRCACHE */
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_change_callback);
 }
 
 /*
