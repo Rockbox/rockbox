@@ -213,6 +213,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
 {
     unsigned char buf[8] = {0};
     bool sbr = false;
+    bool sbr_signaled = false;
 
     lseek(fd, 4, SEEK_CUR);     /* Version and flags. */
     read(fd, buf, 1);           /* Verify ES_DescrTag. */
@@ -282,6 +283,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
          * Object type           - 5 bits
          * Frequency index       - 4 bits
          * Channel configuration - 4 bits
+         * Also see libfaad/mp4.c AudioSpecificConfig2 (consider using it instead of manual parsing)
          */
         bits = get_long_be(buf);
         type = bits >> 27;              /* Object type - 5 bits */
@@ -326,6 +328,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
             if (type == 5)
             {
                 sbr = bits >> 31;
+                sbr_signaled = true;
 
                 if (sbr)
                 {
@@ -353,13 +356,11 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
             }
         }
         
-        if (!sbr && (id3->frequency <= 24000) && (length <= 2))
+        if (!sbr && !sbr_signaled && id3->frequency <= 24000)
         {
-            /* Double the frequency for low-frequency files without a "long" 
-             * DecSpecificConfig header. The file may or may not contain SBR,
-             * but here we guess it does if the header is short. This can
-             * fail on some files, but it's the best we can do, short of 
-             * decoding (parts of) the file.
+            /* As stated in libfaad/mp4.c AudioSpecificConfig2:
+             * no SBR signalled, this could mean either implicit signalling or no SBR in this file 
+             * MPEG specification states: assume SBR on files with samplerate <= 24000 Hz 
              */
             id3->frequency *= 2;
             sbr = true;
