@@ -168,10 +168,10 @@
 
 static struct playlist_info current_playlist;
 /* REPEAT_ONE support function from playback.c */
-extern bool audio_pending_track_skip_is_auto(void);
+extern bool audio_pending_track_skip_is_manual(void);
 static inline bool is_manual_skip(void)
 {
-    return !audio_pending_track_skip_is_auto();
+    return audio_pending_track_skip_is_manual();
 }
 
 /* Directory Cache*/
@@ -1698,8 +1698,7 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
     if (repeat_mode == -1)
         repeat_mode = global_settings.repeat_mode;
 
-    if ((repeat_mode == REPEAT_SHUFFLE && playlist->amount <= 1) || 
-        (repeat_mode == REPEAT_ONE && is_manual_skip()))
+    if (repeat_mode == REPEAT_SHUFFLE && playlist->amount <= 1)
     {
         repeat_mode = REPEAT_ALL;
     }
@@ -2833,25 +2832,25 @@ int playlist_next(int steps)
     playlist_write_lock(playlist);
 
     int index;
-    int repeat = global_settings.repeat_mode;
-
+    int repeat_mode = global_settings.repeat_mode;
+    if (repeat_mode == REPEAT_ONE)
+    {
+        if (is_manual_skip())
+            repeat_mode = REPEAT_ALL;
+    }
     if (steps > 0)
     {
-        if (repeat == REPEAT_ONE && is_manual_skip())
-        {
-            repeat = REPEAT_ALL;
-        }
 #ifdef AB_REPEAT_ENABLE
-        else if (repeat != REPEAT_ONE && repeat != REPEAT_AB)
+        if (repeat_mode != REPEAT_AB && repeat_mode != REPEAT_ONE)
 #else
-        else if (repeat != REPEAT_ONE)
+        if (repeat_mode != REPEAT_ONE)
 #endif
         {
             int i, j;
             /* We need to delete all the queued songs */
             for (i=0, j=steps; i<j; i++)
             {
-                index = get_next_index(playlist, i, repeat);
+                index = get_next_index(playlist, i, -1);
 
                 if (index >= 0 && playlist->indices[index] & PLAYLIST_QUEUE_MASK)
                 {
@@ -2861,12 +2860,12 @@ int playlist_next(int steps)
             }
         }
     } /*steps > 0*/
-    index = get_next_index(playlist, steps, repeat);
+    index = get_next_index(playlist, steps, repeat_mode);
 
     if (index < 0)
     {
         /* end of playlist... or is it */
-        if (repeat == REPEAT_SHUFFLE && playlist->amount > 1)
+        if (repeat_mode == REPEAT_SHUFFLE && playlist->amount > 1)
         {
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
             playlist->first_index = 0;

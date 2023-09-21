@@ -315,6 +315,8 @@ static unsigned int track_event_flags = TEF_NONE; /* (A, O-) */
 /* Pending manual track skip offset */
 static int skip_offset = 0; /* (A, O) */
 
+static bool track_skip_is_manual = false;
+
 /* Track change notification */
 static struct
 {
@@ -2574,9 +2576,9 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
     /* Even if the new track is bad, the old track must be finished off */
     pcmbuf_start_track_change(type);
 
-    bool auto_skip = type != TRACK_CHANGE_MANUAL;
+    track_skip_is_manual = (type == TRACK_CHANGE_MANUAL);
 
-    if (!auto_skip)
+    if (track_skip_is_manual)
     {
         /* Manual track change happens now */
         audio_finalise_track_change();
@@ -2595,9 +2597,9 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
                 return;
 
             /* Everything needed for the codec is ready - start it */
-            if (audio_start_codec(auto_skip))
+            if (audio_start_codec(!track_skip_is_manual))
             {
-                if (!auto_skip)
+                if (track_skip_is_manual)
                     playing_id3_sync(&info, -1, -1);
                 return;
             }
@@ -2924,6 +2926,7 @@ static void audio_stop_playback(void)
 
     skip_pending = TRACK_SKIP_NONE;
     track_event_flags = TEF_NONE;
+    track_skip_is_manual = false;
 
     /* Close all tracks and mark them NULL */
     remove_event(BUFFER_EVENT_REBUFFER, buffer_event_rebuffer_callback);
@@ -2999,6 +3002,11 @@ static void audio_on_skip(void)
     /* Manual skip */
     track_event_flags = TEF_NONE;
 
+    if (toskip == 1 && global_settings.repeat_mode == REPEAT_ONE)
+    {
+        audio_reset_and_rebuffer(TRACK_LIST_KEEP_CURRENT, 1);
+    }
+
     /* If there was an auto skip in progress, there will be residual
        advancement of the playlist and/or track list so compensation will be
        required in order to end up in the right spot */
@@ -3049,7 +3057,7 @@ static void audio_on_skip(void)
             track_list_delta += d;
         }
     }
-
+    track_skip_is_manual = false;
     /* Adjust things by how much the playlist was manually moved */
     playlist_peek_offset -= playlist_delta;
 
@@ -3750,10 +3758,11 @@ void audio_resume(void)
     audio_queue_send(Q_AUDIO_PAUSE, false);
 }
 
-/* Internal function used by REPEAT_ONE */
-bool audio_pending_track_skip_is_auto(void)
+/* Internal function used by REPEAT_ONE extern playlist.c */
+bool audio_pending_track_skip_is_manual(void)
 {
-    return (skip_pending == TRACK_SKIP_AUTO);
+    logf("Track change is: %s", track_skip_is_manual ? "Manual": "Auto");
+    return track_skip_is_manual;
 }
 
 /* Skip the specified number of tracks forward or backward from the current */
