@@ -1291,7 +1291,8 @@ bool bookmark_exists(void)
 
     char* name = playlist_get_name(NULL, global_temp_buffer,
                                    sizeof(global_temp_buffer));
-    if (generate_bookmark_file_name(bm_filename, sizeof(bm_filename), name, -1))
+    if (!playlist_dynamic_only() && 
+        generate_bookmark_file_name(bm_filename, sizeof(bm_filename), name, -1))
     {
         exist = file_exists(bm_filename);
     }
@@ -1311,8 +1312,10 @@ bool bookmark_is_bookmarkable_state(void)
         /* no track playing */
        (playlist_get_resume_info(&resume_index) == -1) ||
         /* invalid queue info */
-       (playlist_modified(NULL)))
-        /* can't bookmark while in the queue */
+       (playlist_modified(NULL)) ||
+        /* can't bookmark playlists modified by user */
+       (playlist_dynamic_only()))
+        /* can't bookmark playlists without associated folder or playlist file */
     {
         return false;
     }

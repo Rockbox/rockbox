@@ -2699,6 +2699,22 @@ bool playlist_allow_dirplay(const struct playlist_info *playlist)
 }
 
 /*
+ * Returns true if the current playlist is neither
+ * associated  with a folder nor with an on-disk playlist.
+ */
+bool playlist_dynamic_only(void)
+{
+    /* NOTE: New dynamic playlists currently use root dir ("/")
+     *       as their placeholder filename – this could change.
+     */
+    if (!strcmp(current_playlist.filename, "/") &&
+        !(current_playlist.flags & PLAYLIST_FLAG_DIRPLAY))
+        return true;
+
+    return false;
+}
+
+/*
  * Move track at index to new_index.  Tracks between the two are shifted
  * appropriately.  Returns 0 on success and -1 on failure.
  */
