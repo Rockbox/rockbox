@@ -252,7 +252,7 @@ static void play_tone(bool volume_set)
     else
 #endif /* HAVE_VOLUME_IN_LIST */
     {
-        rb->set_option("Sample Rate", &freq, INT, names,
+        rb->set_option("Sample Rate", &freq, RB_INT, names,
                        HW_NUM_FREQ, set_frequency);
         (void)volume_set;
     }

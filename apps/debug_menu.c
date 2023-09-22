@@ -2216,7 +2216,7 @@ static bool dbg_set_memory_guard(void)
     };
     int mode = system_memory_guard(MEMGUARD_KEEP);
 
-    set_option( "Catch mem accesses", &mode, INT, names, MAXMEMGUARD, NULL);
+    set_option( "Catch mem accesses", &mode, RB_INT, names, MAXMEMGUARD, NULL);
     system_memory_guard(mode);
 
     return false;

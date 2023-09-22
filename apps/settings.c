@@ -1201,7 +1201,7 @@ bool set_bool_options(const char* string, const bool* variable,
     };
     bool result;
 
-    result = set_option(string, variable, BOOL, names, 2,
+    result = set_option(string, variable, RB_BOOL, names, 2,
                         (void (*)(int))(void (*)(void))function);
     return result;
 }
@@ -1286,13 +1286,13 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     item.lang_id = -1;
     item.cfg_vals = (char*)string;
     item.setting = &temp;
-    if (type == BOOL)
+    if (type == RB_BOOL)
         temp = *(bool*)variable? 1: 0;
     else
         temp = *(int*)variable;
     if (!option_screen(&item, NULL, false, NULL))
     {
-        if (type == BOOL)
+        if (type == RB_BOOL)
 
             *(bool*)variable = (temp == 1);
         else

@@ -230,7 +230,7 @@ static bool set_option_dithering(void)
         [DITHER_DIFFUSION] = { STR(LANG_DIFFUSION) },
     };
 
-    rb->set_option(rb->str(LANG_DITHERING), &settings.jpeg_dither_mode, INT,
+    rb->set_option(rb->str(LANG_DITHERING), &settings.jpeg_dither_mode, RB_INT,
                    dithering, DITHER_NUM_MODES, NULL);
     return false;
 }
@@ -290,7 +290,7 @@ static int show_menu(void) /* return 1 to quit */
         case MIID_RETURN:
             break;
         case MIID_TOGGLE_SS_MODE:
-            rb->set_option(rb->str(LANG_SLIDESHOW_MODE), &iv_api.slideshow_enabled, BOOL,
+            rb->set_option(rb->str(LANG_SLIDESHOW_MODE), &iv_api.slideshow_enabled, RB_BOOL,
                            slideshow , 2, NULL);
             break;
         case MIID_CHANGE_SS_MODE:

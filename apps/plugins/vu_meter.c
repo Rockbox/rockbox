@@ -668,7 +668,7 @@ static bool vu_meter_menu(void)
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0:
-                rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,
+                rb->set_option("Meter Type", &vumeter_settings.meter_type, RB_INT,
                                meter_type_option, 2, NULL);
                 break;
 
@@ -701,12 +701,12 @@ static bool vu_meter_menu(void)
             case 3:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT,
+                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, RB_INT,
                                decay_speed_option, 7, NULL);
                 }
                 else
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT,
+                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, RB_INT,
                                decay_speed_option, 7, NULL);
                 }
                 break;

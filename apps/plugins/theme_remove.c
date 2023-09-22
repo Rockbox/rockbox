@@ -589,7 +589,7 @@ static bool option_menu(void)
         {
             struct remove_setting *setting = &remove_list[result];
             int prev_option = setting->option;
-            if (rb->set_option(option_menu_[result], &setting->option, INT,
+            if (rb->set_option(option_menu_[result], &setting->option, RB_INT,
                                remove_names, NUM_REMOVE_OPTION, NULL))
                 return true;
             if (prev_option != setting->option)

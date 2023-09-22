@@ -81,17 +81,17 @@ static void menu_analog_settings(void)
         switch(result){
             case 0:
                 rb->set_option("Show Date", &clock_settings.analog.show_date,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
             case 1:
                 rb->set_option("Show Second Hand",
                                &clock_settings.analog.show_seconds,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
             case 2:
                 rb->set_option("Show Border",
                                &clock_settings.analog.show_border,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
         }
     }
@@ -112,12 +112,12 @@ static void menu_digital_settings(void){
             case 0:
                 rb->set_option("Show Seconds",
                                &clock_settings.digital.show_seconds,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
             case 1:
                 rb->set_option("Blinking Colon",
                                &clock_settings.digital.blinkcolon,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
         }
     }
@@ -129,7 +129,7 @@ static void menu_digital_settings(void){
 static void confirm_reset(void){
     int result=0;
 
-    rb->set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
+    rb->set_option("Reset all settings?", &result, RB_INT, noyes_text, 2, NULL);
 
     if(result == 1){ /* reset! */
         clock_settings_reset(&clock_settings);
@@ -157,16 +157,16 @@ static void menu_general_settings(void){
             case 0:
                 rb->set_option("Hour format",
                                &clock_settings.general.hour_format,
-                               INT, hour_format_text, 2, NULL);
+                               RB_INT, hour_format_text, 2, NULL);
                 break;
             case 1:
                 rb->set_option("Date format",
                                &clock_settings.general.date_format,
-                               INT, date_format_text, 4, NULL);
+                               RB_INT, date_format_text, 4, NULL);
                 break;
             case 2:
                 rb->set_option("Show Counter", &clock_settings.general.show_counter,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
                 break;
             case 3:
                 confirm_reset();
@@ -180,7 +180,7 @@ static void menu_general_settings(void){
             case 5:
                 rb->set_option("Save On Exit",
                                &clock_settings.general.save_settings,
-                               BOOL, noyes_text, 2, NULL);
+                               RB_BOOL, noyes_text, 2, NULL);
 
                 /* if we no longer save on exit,
                    we better save now to remember that */
@@ -190,14 +190,14 @@ static void menu_general_settings(void){
             case 6:
                 rb->set_option("Backlight Settings",
                                &clock_settings.general.backlight,
-                               INT, backlight_settings_text, 3, NULL);
+                               RB_INT, backlight_settings_text, 3, NULL);
                 apply_backlight_setting(clock_settings.general.backlight);
                 break;
 
             case 7:
                 rb->set_option("Idle Poweroff (temporary)",
                                &clock_settings.general.idle_poweroff,
-                               BOOL, idle_poweroff_text, 2, NULL);
+                               RB_BOOL, idle_poweroff_text, 2, NULL);
                 break;
         }
     }

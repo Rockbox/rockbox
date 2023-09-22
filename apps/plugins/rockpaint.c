@@ -2869,7 +2869,7 @@ static void goto_menu(void)
             case MAIN_MENU_BRUSH_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(bsize == times_list[multi]) break;
-                rb->set_option( "Brush Size", &multi, INT, times_options, 4, NULL );
+                rb->set_option( "Brush Size", &multi, RB_INT, times_options, 4, NULL );
                 if( multi >= 0 )
                     bsize = times_list[multi];
                 break;
@@ -2877,7 +2877,7 @@ static void goto_menu(void)
             case MAIN_MENU_BRUSH_SPEED:
                 for(multi = 0; multi<3; multi++)
                     if(bspeed == times_list[multi]) break;
-                rb->set_option( "Brush Speed", &multi, INT, times_options, 3, NULL );
+                rb->set_option( "Brush Speed", &multi, RB_INT, times_options, 3, NULL );
                 if( multi >= 0 ) {
                     bspeed = times_list[multi];
                     incdec_x.step[0] = bspeed;
@@ -2894,7 +2894,7 @@ static void goto_menu(void)
             case MAIN_MENU_GRID_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(gridsize == gridsize_list[multi]) break;
-                rb->set_option( "Grid Size", &multi, INT, gridsize_options, 4, NULL );
+                rb->set_option( "Grid Size", &multi, RB_INT, gridsize_options, 4, NULL );
                 if( multi >= 0 )
                     gridsize = gridsize_list[multi];
                 break;

@@ -257,21 +257,21 @@ static void options_menu(void){
         {
             case 0:
                 new_setting=settings.kempston;
-                rb->set_option("Map Keys to kempston",&new_setting,INT, 
+                rb->set_option("Map Keys to kempston",&new_setting, RB_INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.kempston )
                     settings.kempston=new_setting;
                 break;
             case 1:
                 new_setting = settings.showfps;
-                rb->set_option("Display Speed",&new_setting,INT, 
+                rb->set_option("Display Speed",&new_setting, RB_INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.showfps )
                     settings.showfps=new_setting;
                 break;
             case 2:
                 new_setting = settings.invert_colors;
-                rb->set_option("Invert Colors",&new_setting,INT, 
+                rb->set_option("Invert Colors",&new_setting, RB_INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.invert_colors )
                     settings.invert_colors=new_setting;
@@ -279,14 +279,14 @@ static void options_menu(void){
                 break;
             case 3:
                 new_setting = settings.frameskip;
-                rb->set_option("Frameskip",&new_setting,INT, 
+                rb->set_option("Frameskip",&new_setting, RB_INT,
                                frameskip_items, 10, NULL);
                 if (new_setting != settings.frameskip )
                     settings.frameskip=new_setting;
                 break;
             case 4:
                 new_setting = settings.sound;
-                rb->set_option("Sound",&new_setting,INT, 
+                rb->set_option("Sound",&new_setting, RB_INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
@@ -296,7 +296,7 @@ static void options_menu(void){
                 break;
             case 5:
                 new_setting = 9 - settings.volume;
-                rb->set_option("Volume",&new_setting,INT, 
+                rb->set_option("Volume",&new_setting, RB_INT,
                                frameskip_items, 10, NULL);
                 new_setting = 9 - new_setting;
                 if (new_setting != settings.volume )

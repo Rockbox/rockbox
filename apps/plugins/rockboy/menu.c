@@ -437,39 +437,39 @@ static void do_opt_menu(void)
         switch (result)
         {
             case 0: /* Frameskip */
-                rb->set_option("Max Frameskip", &options.maxskip, INT, frameskip, 
+                rb->set_option("Max Frameskip", &options.maxskip, RB_INT, frameskip,
                     sizeof(frameskip)/sizeof(*frameskip), NULL );
                 break;
             case 1: /* Autosave */
-                rb->set_option("Autosave", &options.autosave, INT, onoff, 2, NULL );
+                rb->set_option("Autosave", &options.autosave, RB_INT, onoff, 2, NULL );
                 break;
             case 2: /* Sound */
                 if(options.sound>1) options.sound=1;
-                rb->set_option("Sound", &options.sound, INT, onoff, 2, NULL );
+                rb->set_option("Sound", &options.sound, RB_INT, onoff, 2, NULL );
                 if(options.sound) sound_dirty();
                 break;
             case 3: /* Volume */
                 rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
                 break;
             case 4: /* Stats */
-                rb->set_option("Stats", &options.showstats, INT, stats, 3, NULL );
+                rb->set_option("Stats", &options.showstats, RB_INT, stats, 3, NULL );
                 break;
             case 5: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR
             case 6: /* Screen Size */
-                rb->set_option("Screen Size", &options.scaling, INT, scaling,
+                rb->set_option("Screen Size", &options.scaling, RB_INT, scaling,
                     sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
             case 7: /* Screen rotate */
-                rb->set_option("Screen Rotate", &options.rotate, INT, rotate,
+                rb->set_option("Screen Rotate", &options.rotate, RB_INT, rotate,
                     sizeof(rotate)/sizeof(*rotate), NULL );
                 setvidmode();
                 break;
             case 8: /* Palette */
-                rb->set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
+                rb->set_option("Set Palette", &options.pal, RB_INT, palette, 17, NULL );
                 set_pal();
                 break;
 #endif

@@ -91,7 +91,7 @@ static int recsource_func(void)
 #endif
 
     return set_option(str(LANG_RECORDING_SOURCE),
-                      &global_settings.rec_source, INT, names,
+                      &global_settings.rec_source, RB_INT, names,
                       n_opts, NULL );
 }
 MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE),
@@ -171,7 +171,7 @@ static int recfrequency_func(void)
     }
 
     ret = set_option(str(LANG_FREQUENCY),
-                     &rec_frequency, INT, opts, n_opts, NULL );
+                     &rec_frequency, RB_INT, opts, n_opts, NULL );
 
     if (!ret
         HAVE_SPDIF_REC_( && global_settings.rec_source != REC_SRC_SPDIF)
@@ -221,7 +221,7 @@ static int recchannels_func(void)
     make_options_from_indexes(names, table, n_opts, opts);
 
     ret = set_option(str(LANG_CHANNELS), &rec_channels,
-                     INT, opts, n_opts, NULL );
+                     RB_INT, opts, n_opts, NULL );
 
     if (!ret)
         global_settings.rec_channels = table[rec_channels];
@@ -241,7 +241,7 @@ static int recmonomode_func(void)
 
     int rec_mono_mode = global_settings.rec_mono_mode;
     bool ret = set_option(str(LANG_RECORDING_MONO_MODE), &rec_mono_mode,
-                     INT, names, 3, NULL );
+                     RB_INT, names, 3, NULL );
 
     if (rec_mono_mode != global_settings.rec_mono_mode)
         global_settings.rec_mono_mode = rec_mono_mode;
@@ -261,7 +261,7 @@ static int recformat_func(void)
     };
 
     int rec_format = global_settings.rec_format;
-    bool res = set_option(str(LANG_FORMAT), &rec_format, INT,
+    bool res = set_option(str(LANG_FORMAT), &rec_format, RB_INT,
                           names, REC_NUM_FORMATS, NULL );
 
     if (rec_format != global_settings.rec_format)

@@ -46,7 +46,7 @@ static bool tv_horizontal_scroll_mode_setting(void)
         {"Scroll by Column", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.horizontal_scroll_mode, INT,
+    return rb->set_option("Scroll Mode", &new_prefs.horizontal_scroll_mode, RB_INT,
                           names, 2, NULL);
 }
 
@@ -75,7 +75,7 @@ static bool tv_vertical_scroll_mode_setting(void)
         {"Scroll by Line", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, INT,
+    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, RB_INT,
                           names, 2, NULL);
 }
 
@@ -97,7 +97,7 @@ static bool tv_narrow_mode_setting(void)
         {"Top/Bottom Page",    -1},
     };
 
-    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, INT,
+    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, RB_INT,
                           names, 2, NULL);
 }
 
@@ -138,7 +138,7 @@ static bool tv_encoding_setting(void)
         names[idx].voice_id = -1;
     }
 
-    return rb->set_option("Encoding", &new_prefs.encoding, INT, names,
+    return rb->set_option("Encoding", &new_prefs.encoding, RB_INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 
@@ -149,7 +149,7 @@ static bool tv_word_wrap_setting(void)
         {"Off (Chop Words)", -1},
     };
 
-    return rb->set_option("Word Wrap", &new_prefs.word_mode, INT,
+    return rb->set_option("Word Wrap", &new_prefs.word_mode, RB_INT,
                           names, 2, NULL);
 }
 
@@ -162,7 +162,7 @@ static bool tv_line_mode_setting(void)
         {"Reflow Lines", -1},
     };
 
-    return rb->set_option("Line Mode", &new_prefs.line_mode, INT, names,
+    return rb->set_option("Line Mode", &new_prefs.line_mode, RB_INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 
@@ -179,7 +179,7 @@ static bool tv_alignment_setting(void)
         {"Right", -1},
     };
 
-    return rb->set_option("Alignment", &new_prefs.alignment, INT,
+    return rb->set_option("Alignment", &new_prefs.alignment, RB_INT,
                            names , 2, NULL);
 }
 

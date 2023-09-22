@@ -312,32 +312,32 @@ static void fireworks_menu(void)
                 break;
 
             case 1:
-                rb->set_option("Auto-Fire", &autofire_delay, INT,
+                rb->set_option("Auto-Fire", &autofire_delay, RB_INT,
                                 autofire_delay_settings, 15, NULL);
                 break;
 
             case 2:
                 rb->set_option("Particles Per Firework", &particles_per_firework,
-                                INT, particle_settings, 8, NULL);
+                                RB_INT, particle_settings, 8, NULL);
                 break;
 
             case 3:
-                rb->set_option("Particle Life", &particle_life, INT,
+                rb->set_option("Particle Life", &particle_life, RB_INT,
                                 particle_life_settings, 9, NULL);
                 break;
 
             case 4:
-                rb->set_option("Gravity", &gravity, INT,
+                rb->set_option("Gravity", &gravity, RB_INT,
                                 gravity_settings, 4, NULL);
                 break;
 
             case 5:
-                rb->set_option("Show Rockets", &show_rockets, INT,
+                rb->set_option("Show Rockets", &show_rockets, RB_INT,
                                 rocket_settings, 3, NULL);
                 break;
 
             case 6:
-                rb->set_option("FPS (Speed)", &frames_per_second, INT,
+                rb->set_option("FPS (Speed)", &frames_per_second, RB_INT,
                                 fps_settings, 9, NULL);
                 break;
 

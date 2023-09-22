@@ -135,7 +135,7 @@ static int alarm_setting(void)
 #endif
     return set_option(str(LANG_ALARM_WAKEUP_SCREEN),
                       &global_settings.alarm_wake_up_screen, 
-                      INT, items, i, NULL);
+                      RB_INT, items, i, NULL);
 }
 
 MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),

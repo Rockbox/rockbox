@@ -867,7 +867,7 @@ static bool numdisplay_setting(void)
         {"Coloured",  -1},
     };
 
-    return rb->set_option("Number Display", &sudcfg.number_display, INT, names,
+    return rb->set_option("Number Display", &sudcfg.number_display, RB_INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 #endif
@@ -880,7 +880,7 @@ static bool showmarkings_setting(void)
         {"Show",  -1},
     };
 
-    return rb->set_option("Show Markings", &sudcfg.show_markings, INT, names,
+    return rb->set_option("Show Markings", &sudcfg.show_markings, RB_INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 #endif

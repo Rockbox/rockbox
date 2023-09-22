@@ -623,7 +623,7 @@ static int settings_menu(void)
             break;
 
         case 6:
-            rb->set_option(rb->str(LANG_MIKMOD_SAMPLERATE), &(settings.sample_rate), INT, sr_names,
+            rb->set_option(rb->str(LANG_MIKMOD_SAMPLERATE), &(settings.sample_rate), RB_INT, sr_names,
                            HW_NUM_FREQ, NULL);
             applysettings();
             break;

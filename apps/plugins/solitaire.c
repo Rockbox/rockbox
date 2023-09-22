@@ -1088,7 +1088,7 @@ static int solitaire_menu(bool in_game)
 
             case 2:
                 if (rb->set_option("Draw Cards Option", &sol.draw_type,
-                                   INT, drawcards, 2, NULL))
+                                   RB_INT, drawcards, 2, NULL))
                     result = MENU_USB;
                 break;
 

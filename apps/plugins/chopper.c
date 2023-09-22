@@ -784,7 +784,7 @@ static int chopMenu(int menunum)
                 res = -1;
                 break;
             case 2:
-                rb->set_option("Level", &iLevelMode, INT, levels, 2, NULL);
+                rb->set_option("Level", &iLevelMode, RB_INT, levels, 2, NULL);
                 break;
             case 3:
                 playback_control(NULL);

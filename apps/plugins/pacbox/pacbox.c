@@ -266,7 +266,7 @@ static bool pacbox_menu(void)
         {
             case PBMI_DIFFICULTY:
                 new_setting=settings.difficulty;
-                rb->set_option("Difficulty", &new_setting, INT,
+                rb->set_option("Difficulty", &new_setting, RB_INT,
                                difficulty_options , 2, NULL);
                 if (new_setting != settings.difficulty) {
                     settings.difficulty=new_setting;
@@ -275,7 +275,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_PACMEN_PER_GAME:
                 new_setting=settings.numlives;
-                rb->set_option("Pacmen Per Game", &new_setting, INT,
+                rb->set_option("Pacmen Per Game", &new_setting, RB_INT,
                                numlives_options , 4, NULL);
                 if (new_setting != settings.numlives) {
                     settings.numlives=new_setting;
@@ -284,7 +284,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_BONUS_LIFE:
                 new_setting=settings.bonus;
-                rb->set_option("Bonus Life", &new_setting, INT,
+                rb->set_option("Bonus Life", &new_setting, RB_INT,
                                bonus_options , 4, NULL);
                 if (new_setting != settings.bonus) {
                     settings.bonus=new_setting;
@@ -293,7 +293,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_GHOST_NAMES:
                 new_setting=settings.ghostnames;
-                rb->set_option("Ghost Names", &new_setting, INT,
+                rb->set_option("Ghost Names", &new_setting, RB_INT,
                                ghostname_options , 2, NULL);
                 if (new_setting != settings.ghostnames) {
                     settings.ghostnames=new_setting;
@@ -301,16 +301,16 @@ static bool pacbox_menu(void)
                 }
                 break;
             case PBMI_DISPLAY_FPS:
-                rb->set_option("Display FPS",&settings.showfps,INT,
+                rb->set_option("Display FPS",&settings.showfps, RB_INT,
                                noyes, 2, NULL);
                 break;
             case PBMI_SOUND:
-                rb->set_option("Sound",&settings.sound, INT,
+                rb->set_option("Sound",&settings.sound, RB_INT,
                                noyes, 2, NULL);
                 break;
 #ifdef AI
             case PBMI_AI:
-                rb->set_option("AI",&settings.ai, INT,
+                rb->set_option("AI",&settings.ai, RB_INT,
                                noyes, 2, NULL);
                 break;
 #endif

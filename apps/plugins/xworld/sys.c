@@ -206,7 +206,7 @@ static void do_video_settings(struct System* sys)
 #else
         case 2:
 #endif
-            rb->set_option("Scaling", &sys->settings.scaling_quality, INT, scaling_settings,
+            rb->set_option("Scaling", &sys->settings.scaling_quality, RB_INT, scaling_settings,
 #ifdef HAVE_LCD_COLOR
                            3
 #else
@@ -225,7 +225,7 @@ static void do_video_settings(struct System* sys)
 #else
         case 3:
 #endif
-            rb->set_option("Rotation", &sys->settings.rotation_option, INT, rotation_settings, 3, NULL);
+            rb->set_option("Rotation", &sys->settings.rotation_option, RB_INT, rotation_settings, 3, NULL);
             if(sys->settings.rotation_option &&
                sys->settings.zoom)
             {

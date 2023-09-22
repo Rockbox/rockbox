@@ -1599,7 +1599,7 @@ static void game_init(void)
                 speed = level*20;
                 return;
             case 1:
-                rb->set_option("Game Type", &game_type, INT,
+                rb->set_option("Game Type", &game_type, RB_INT,
                                type_options, 2, NULL);
                 break;
             case 2:

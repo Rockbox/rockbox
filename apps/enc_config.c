@@ -183,7 +183,7 @@ static bool mp3_enc_bitrate(struct menucallback_data *data)
 
     int index = round_value_to_list32(cfg->mp3_enc.bitrate, rate_list,
                                       n_rates, false);
-    bool res = set_option(str(LANG_BITRATE), &index, INT,
+    bool res = set_option(str(LANG_BITRATE), &index, RB_INT,
                           items, n_rates, NULL);
     index = round_value_to_list32(rate_list[index], mp3_enc_bitr,
                                   MP3_ENC_NUM_BITR, false);

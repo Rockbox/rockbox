@@ -2562,24 +2562,24 @@ enum plugin_status plugin_start(const void* parameter)
             case 3:
                 switch(players) {
                     case 0:
-                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote, RB_INT,
                                        nokey_option, 1, NULL);
                         break;
                     case 1:
-                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote, RB_INT,
                                        key24_option, 2, NULL);
                         break;
                     case 2:
 #ifdef REMOTE
-                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote, RB_INT,
                                        remote_option, 2, NULL);
 #else
-                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote, RB_INT,
                                        key2_option, 1, NULL);
 #endif
                         break;
                     case 3:
-                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote, RB_INT,
                                        remoteonly_option, 1, NULL);
                         break;
                 }
@@ -2608,7 +2608,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             case 9:
                 new_setting = 0;
-                rb->set_option(rb->str(LANG_RESET), &new_setting, INT, noyes , 2, NULL);
+                rb->set_option(rb->str(LANG_RESET), &new_setting, RB_INT, noyes , 2, NULL);
                 if (new_setting == 1)
                     default_settings();
                 break;

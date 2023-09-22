@@ -911,7 +911,7 @@ static bool edit_memo(int change, struct shown *shown)
 
             case 6: /* weekday */
                 rb->set_option("First Day of Week", &info.first_wday,
-                                INT, modes, 7, NULL);
+                                RB_INT, modes, 7, NULL);
                 break;
 
             case 7: /* playback control */

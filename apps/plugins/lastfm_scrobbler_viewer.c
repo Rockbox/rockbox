@@ -478,7 +478,7 @@ static int filter_items(struct printcell_data_t *pc_data,
             {"Exclude Any", -1}, {"Include", -1},
             {"Include Case Sensitive", -1}, {"Include Any", -1}
         };
-        if (rb->set_option("Find Type", &option, INT,
+        if (rb->set_option("Find Type", &option, RB_INT,
                            find_types, 6, NULL))
         {
             return 0;

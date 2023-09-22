@@ -583,7 +583,7 @@ static int settings_menu(void)
                                                          };
             static int sel=1;
             rb->set_option("Computer difficulty", &sel,
-                           INT, difficulty_options, 3, NULL);
+                           RB_INT, difficulty_options, 3, NULL);
             superdom_settings.compdiff=sel+1;
             break;
         }

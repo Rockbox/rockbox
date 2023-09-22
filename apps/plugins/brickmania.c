@@ -1565,7 +1565,7 @@ static int brickmania_menu(void)
                 brickmania_init_game(true);
                 return 0;
             case 2:
-                rb->set_option("Difficulty", &difficulty, INT,
+                rb->set_option("Difficulty", &difficulty, RB_INT,
                                     options, 2, NULL);
                 break;
             case 3:

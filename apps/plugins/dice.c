@@ -201,7 +201,7 @@ static bool dice_menu(struct dices * dice) {
                 break;
 
             case 2:
-                rb->set_option("Number of Sides", &sides_index, INT, 
+                rb->set_option("Number of Sides", &sides_index, RB_INT,
                                nb_sides_option,
                                sizeof(nb_sides_values)/sizeof(int), NULL);
                 dice->nb_sides=nb_sides_values[sides_index];

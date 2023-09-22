@@ -1199,7 +1199,7 @@ static void display_options(void)
 #if MPEG_OPTION_DITHERING_ENABLED
         case MPEG_OPTION_DITHERING:
             result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
-            mpeg_set_option(rb->str(LANG_DITHERING), &result, INT, noyes, 2, NULL);
+            mpeg_set_option(rb->str(LANG_DITHERING), &result, RB_INT, noyes, 2, NULL);
             settings.displayoptions =
                 (settings.displayoptions & ~LCD_YUV_DITHER)
                       | ((result != 0) ? LCD_YUV_DITHER : 0);
@@ -1208,17 +1208,17 @@ static void display_options(void)
 #endif /* MPEG_OPTION_DITHERING_ENABLED */
 
         case MPEG_OPTION_DISPLAY_FPS:
-            mpeg_set_option(rb->str(LANG_DISPLAY_FPS), &settings.showfps, INT,
+            mpeg_set_option(rb->str(LANG_DISPLAY_FPS), &settings.showfps, RB_INT,
                             noyes, 2, NULL);
             break;
 
         case MPEG_OPTION_LIMIT_FPS:
-            mpeg_set_option(rb->str(LANG_LIMIT_FPS), &settings.limitfps, INT,
+            mpeg_set_option(rb->str(LANG_LIMIT_FPS), &settings.limitfps, RB_INT,
                             noyes, 2, NULL);
             break;
 
         case MPEG_OPTION_SKIP_FRAMES:
-            mpeg_set_option(rb->str(LANG_SKIP_FRAMES), &settings.skipframes, INT,
+            mpeg_set_option(rb->str(LANG_SKIP_FRAMES), &settings.skipframes, RB_INT,
                             noyes, 2, NULL);
             break;
 
@@ -1269,31 +1269,31 @@ static void audio_options(void)
         switch (result)
         {
         case MPEG_AUDIO_TONE_CONTROLS:
-            mpeg_set_option(rb->str(LANG_TONE_CONTROLS), &settings.tone_controls, INT,
+            mpeg_set_option(rb->str(LANG_TONE_CONTROLS), &settings.tone_controls, RB_INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_CHANNEL_MODES:
             mpeg_set_option(rb->str(LANG_CHANNEL_CONFIGURATION), &settings.channel_modes,
-                            INT, globaloff, 2, NULL);
+                            RB_INT, globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_CROSSFEED:
-            mpeg_set_option(rb->str(LANG_CROSSFEED), &settings.crossfeed, INT,
+            mpeg_set_option(rb->str(LANG_CROSSFEED), &settings.crossfeed, RB_INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_EQUALIZER:
-            mpeg_set_option(rb->str(LANG_EQUALIZER), &settings.equalizer, INT,
+            mpeg_set_option(rb->str(LANG_EQUALIZER), &settings.equalizer, RB_INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_DITHERING:
-            mpeg_set_option(rb->str(LANG_DITHERING), &settings.dithering, INT,
+            mpeg_set_option(rb->str(LANG_DITHERING), &settings.dithering, RB_INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
@@ -1322,7 +1322,7 @@ static void resume_options(void)
     };
 
     mpeg_set_option(rb->str(LANG_MENU_RESUME_OPTIONS), &settings.resume_options,
-                    INT, items, MPEG_RESUME_NUM_OPTIONS, NULL);
+                    RB_INT, items, MPEG_RESUME_NUM_OPTIONS, NULL);
 }
 
 static void clear_resume_count(void)
@@ -1369,7 +1369,7 @@ static void mpeg_settings(void)
 
         case MPEG_SETTING_PLAY_MODE:
             mpeg_set_option(rb->str(LANG_MENU_PLAY_MODE), &settings.play_mode,
-                            INT, singleall, 2, NULL);
+                            RB_INT, singleall, 2, NULL);
             break;
 
         case MPEG_SETTING_CLEAR_RESUMES:

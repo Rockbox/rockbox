@@ -261,7 +261,7 @@ void settings_apply(bool read_disk);
 void settings_apply_pm_range(void);
 void settings_display(void);
 
-enum optiontype { INT, BOOL };
+enum optiontype { RB_INT, RB_BOOL };
 
 const struct settings_list* find_setting(const void* variable);
 const struct settings_list* find_setting_by_cfgname(const char* name);

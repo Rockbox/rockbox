@@ -3552,7 +3552,7 @@ static int settings_menu(void)
             case 0:
                 old_val = pf_cfg.show_album_name;
                 rb->set_option(rb->str(LANG_SHOW_ALBUM_TITLE),
-                      &pf_cfg.show_album_name, INT, album_name_options, 5, NULL);
+                      &pf_cfg.show_album_name, RB_INT, album_name_options, 5, NULL);
                 adjust_album_display_for_setting(old_val, pf_cfg.show_album_name);
                 break;
             case 1:
@@ -3561,7 +3561,7 @@ static int settings_menu(void)
             case 2:
                 old_val = pf_cfg.sort_albums_by;
                 rb->set_option(rb->str(LANG_SORT_ALBUMS_BY),
-                      &pf_cfg.sort_albums_by, INT, sort_options, 4, NULL);
+                      &pf_cfg.sort_albums_by, RB_INT, sort_options, 4, NULL);
                 if (old_val != pf_cfg.sort_albums_by &&
                     !sort_albums(pf_cfg.sort_albums_by, true))
                     pf_cfg.sort_albums_by = old_val;
@@ -3569,7 +3569,7 @@ static int settings_menu(void)
             case 3:
                 old_val = pf_cfg.year_sort_order;
                 rb->set_option(rb->str(LANG_YEAR_SORT_ORDER),
-                      &pf_cfg.year_sort_order, INT, year_sort_order_options, 2, NULL);
+                      &pf_cfg.year_sort_order, RB_INT, year_sort_order_options, 2, NULL);
                 if (old_val != pf_cfg.year_sort_order &&
                     !sort_albums(pf_cfg.sort_albums_by, true))
                     pf_cfg.year_sort_order = old_val;
@@ -3635,11 +3635,11 @@ static int settings_menu(void)
                 break;
             case 12:
                 rb->set_option(rb->str(LANG_WPS_INTEGRATION),
-                               &pf_cfg.auto_wps, INT, wps_options, 3, NULL);
+                               &pf_cfg.auto_wps, RB_INT, wps_options, 3, NULL);
                 break;
             case 13:
                 rb->set_option(rb->str(LANG_BACKLIGHT),
-                        &pf_cfg.backlight_mode, INT, backlight_options, 2, NULL);
+                        &pf_cfg.backlight_mode, RB_INT, backlight_options, 2, NULL);
                 break;
 
             case MENU_ATTACHED_USB:

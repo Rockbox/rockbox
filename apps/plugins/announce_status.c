@@ -383,7 +383,7 @@ static int settings_menu(void)
                 break;
             case 1:
                 rb->set_option(rb->str(LANG_ANNOUNCE_ON),
-                      &gAnnounce.announce_on, INT, announce_options, 2, NULL);
+                      &gAnnounce.announce_on, RB_INT, announce_options, 2, NULL);
                 break;
             case 2:
                 rb->set_int(rb->str(LANG_GROUPING), "", 1,

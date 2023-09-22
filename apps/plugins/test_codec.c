@@ -915,7 +915,7 @@ menu:
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (result == BOOST)
     {
-        rb->set_option("Boosting", &boost, INT,
+        rb->set_option("Boosting", &boost, RB_INT,
                         boost_settings, 2, NULL);
         goto menu;
     }

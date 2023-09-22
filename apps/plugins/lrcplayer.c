@@ -2288,7 +2288,7 @@ static bool lrc_display_menu(void)
                 usb = rb->set_bool("Wipe", &prefs.wipe);
                 break;
             case LRC_MENU_ALIGN:
-                usb = rb->set_option("Alignment", &prefs.align, INT,
+                usb = rb->set_option("Alignment", &prefs.align, RB_INT,
                                      align_names, 3, NULL);
                 break;
             case LRC_MENU_LINE_MODE:
@@ -2345,7 +2345,7 @@ static bool lrc_lyrics_menu(void)
             case LRC_MENU_ENCODING:
                 prefs.encoding++;
                 old_val = prefs.encoding;
-                usb = rb->set_option("Encoding", &prefs.encoding, INT,
+                usb = rb->set_option("Encoding", &prefs.encoding, RB_INT,
                                      cp_names, NUM_CODEPAGES+1, NULL);
                 if (prefs.encoding != old_val)
                 {

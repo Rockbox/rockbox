@@ -1481,7 +1481,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                 jewels_init(bj);
                 return 0;
             case 2:
-                rb->set_option("Mode", &bj->tmp_type, INT, mode, 2, NULL);
+                rb->set_option("Mode", &bj->tmp_type, RB_INT, mode, 2, NULL);
                 break;
             case 3:
                 if(jewels_help())

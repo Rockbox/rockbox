@@ -400,7 +400,7 @@ static bool reversi_gui_choose_strategy(
     }
     
     result = 
-        rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
+        rb->set_option(prompt, &index, RB_INT, strategy_settings, num_items, NULL);
         
     (*player) = strategy_values[index];
 
@@ -450,7 +450,7 @@ static bool reversi_gui_menu(void) {
                     break;
                 }
             }
-            rb->set_option(MENU_TEXT_WRAP_MODE, &index, INT,
+            rb->set_option(MENU_TEXT_WRAP_MODE, &index, RB_INT,
                     cursor_wrap_mode_settings, 3, NULL);
             cursor_wrap_mode = cursor_wrap_mode_values[index];
             break;

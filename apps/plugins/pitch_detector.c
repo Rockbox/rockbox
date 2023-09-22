@@ -503,19 +503,19 @@ static bool main_menu(void)
                 rb->set_option(
                     "Algorithm Pickiness (Lower -> more discriminating)",
                     &settings.yin_threshold,
-                    INT, yin_threshold_text,
+                    RB_INT, yin_threshold_text,
                     sizeof(yin_threshold_text) / sizeof(yin_threshold_text[0]),
                     NULL);
                 break;
             case 5:
                 rb->set_option("Display Accidentals As",
                                &settings.use_sharps,
-                               BOOL, accidental_text, 2, NULL);
+                               RB_BOOL, accidental_text, 2, NULL);
                 break;
             case 6:
                 rb->set_option("Key Transposition",
                               &settings.key_transposition,
-                              INT, transpose_text, 12, NULL);
+                              RB_INT, transpose_text, 12, NULL);
                 break;
             case 7:
                 rb->set_bool("Display Frequency (Hz)",
