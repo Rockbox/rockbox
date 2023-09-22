@@ -515,7 +515,7 @@ static bool history_interval(void)
 
     return set_option(str(LANG_HISTOGRAM_INTERVAL),
                           &global_settings.histogram_interval,
-                          INT, names, 4, NULL );
+                          RB_INT, names, 4, NULL );
 }
 
 MENUITEM_FUNCTION(histogram, 0, ID2P(LANG_HISTOGRAM_INTERVAL),

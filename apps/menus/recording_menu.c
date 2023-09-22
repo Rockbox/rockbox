@@ -329,11 +329,11 @@ static int agc_preset_func(void)
     if (global_settings.rec_source)
         return set_option(str(LANG_RECORDING_AGC_PRESET),
                           &global_settings.rec_agc_preset_line,
-                          INT, names, 6, NULL );
+                          RB_INT, names, 6, NULL );
     else
         return set_option(str(LANG_RECORDING_AGC_PRESET),
                           &global_settings.rec_agc_preset_mic,
-                          INT, names, 6, NULL );
+                          RB_INT, names, 6, NULL );
 }
 
 static int agc_cliptime_func(void)
@@ -347,7 +347,7 @@ static int agc_cliptime_func(void)
     };
     return set_option(str(LANG_RECORDING_AGC_CLIPTIME),
                       &global_settings.rec_agc_cliptime,
-                      INT, names, 5, NULL );
+                      RB_INT, names, 5, NULL );
 }
 MENUITEM_FUNCTION(agc_preset, 0, ID2P(LANG_RECORDING_AGC_PRESET),
                   agc_preset_func, NULL, Icon_Menu_setting);
@@ -380,7 +380,7 @@ static enum themable_icons trigger_get_icon(int selected_item, void * data)
 static const char * trigger_get_name(int selected_item, void * data,
                         char * buffer, size_t buffer_len)
 {
-    const struct settings_list **settings = 
+    const struct settings_list **settings =
             (const struct settings_list **)data;
     const struct settings_list *s = settings[selected_item / 2];
     if ((selected_item % 2) == 0) /* header */
@@ -493,7 +493,7 @@ int rectrigger(void)
     /* restart trigger with new values */
     settings_apply_trigger();
     peak_meter_trigger (global_settings.rec_trigger_mode != TRIG_MODE_OFF);
-    
+
     trigger_speak_item(settings, 0, true);
 
     while (!done)
@@ -505,7 +505,7 @@ int rectrigger(void)
             settings_apply_trigger();
             changed = false;
         }
-        
+
         FOR_NB_SCREENS(i)
             screens[i].set_viewport(&triggervp[i]);
         peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width, NB_SCREENS);
