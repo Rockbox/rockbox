@@ -732,12 +732,15 @@ static void oneOperand(void);
 static void drawLines(void);
 static void drawButtons(int group);
 
+#ifndef _WIN32
 double      strtod(const char *nptr, char **endptr);
+#endif
 long long atoll(const char *nptr);
 
 /* -----------------------------------------------------------------------
 Standard library function
 ----------------------------------------------------------------------- */
+#ifndef _WIN32
 double strtod(const char *nptr, char **endptr)
 {
     double out;
@@ -774,6 +777,7 @@ double strtod(const char *nptr, char **endptr)
         *endptr=(char *) nptr;
     return out;
 }
+#endif
 
 // WARNING Unsafe: Use strtoll instead
 long long atoll(const char *nptr)
