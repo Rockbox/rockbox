@@ -35,22 +35,6 @@ extern "C" {
 #include "faad_config.h"
 #include "codeclib.h"
 
-extern struct codec_api* ci;
-
-#if defined(DEBUG) || defined(SIMULATOR)
-#undef DEBUGF
-#define DEBUGF ci->debugf
-#else
-#define DEBUGF(...)
-#endif
-
-#ifdef ROCKBOX_HAS_LOGF
-#undef LOGF
-#define LOGF ci->logf
-#else
-#define LOGF(...)
-#endif
-
 #if   (CONFIG_CPU == MCF5250)
 /* Enough IRAM but performance suffers with ICODE_ATTR. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
