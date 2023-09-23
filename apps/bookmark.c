@@ -380,7 +380,7 @@ static bool generate_bookmark_file_name(char *filenamebuf,
 {
     /* if this is a root dir MP3, rename the bookmark file root_dir.bmark */
     /* otherwise, name it based on the bmarknamein variable */
-    if (!strcmp("/", bmarknamein))
+    if (!strncmp("/", bmarknamein, bmarknamelen))
         strmemccpy(filenamebuf, "/root_dir.bmark", filenamebufsz);
     else
     {
