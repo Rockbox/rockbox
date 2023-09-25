@@ -78,6 +78,7 @@ static int reset_settings(void)
             settings_apply(true);
             settings_apply_skins();
             break;
+        case YESNO_TMO:
         case YESNO_NO:
             break;
         case YESNO_USB:

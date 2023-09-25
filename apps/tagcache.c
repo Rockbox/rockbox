@@ -75,6 +75,7 @@
 #include "usb.h"
 #include "metadata.h"
 #include "tagcache.h"
+#include "yesno.h"
 #include "core_alloc.h"
 #include "crc32.h"
 #include "misc.h"
@@ -5064,17 +5065,39 @@ void tagcache_unload_ramcache(void)
 #endif /* HAVE_TC_RAMCACHE */
 
 #ifndef __PCTOOL__
+
+/*
+ * db_file_exists is noinline to minimize stack usage
+ */
+static bool NO_INLINE db_file_exists(const char* filename)
+{
+    char buf[MAX_PATH];
+
+    snprintf(buf, sizeof(buf), "%s/%s", tc_stat.db_path, filename);
+
+    return file_exists(buf);
+}
+
 static void tagcache_thread(void)
 {
     struct queue_event ev;
     bool check_done = false;
-
+    cpu_boost(true);
     /* If the previous cache build/update was interrupted, commit
      * the changes first in foreground. */
-    cpu_boost(true);
-    allocate_tempbuf();
-    commit();
-    free_tempbuf();
+    if (db_file_exists(TAGCACHE_FILE_TEMP))
+    {
+        static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
+                                      ID2P(LANG_TAGCACHE_UPDATE)};
+        static const struct text_message message = {lines, 2};
+
+        if (gui_syncyesno_run_w_tmo(HZ * 5, YESNO_YES, &message, NULL, NULL) == YESNO_YES)
+        {
+            allocate_tempbuf();
+            commit();
+            free_tempbuf();
+        }
+    }
 
 #ifdef HAVE_TC_RAMCACHE
 #ifdef HAVE_EEPROM_SETTINGS
