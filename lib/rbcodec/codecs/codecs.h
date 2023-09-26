@@ -60,7 +60,7 @@
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
 #define LOGF ci->logf
-#elifdef LOGF_ENABLE
+#elif defined(LOGF_ENABLE)
 #include "logf.h"
 #undef LOGF
 #define LOGF logf
