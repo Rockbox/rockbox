@@ -1,1102 +1,3713 @@
 <?xml version="1.0"?>
-<soc name="atj213x" desc="Actions atj213x">
-  <dev name="ADC" long_name="Analog to Digital Converter" desc="" version="1.0">
-    <addr name="ADC" addr="0xb0110000"/>
-  </dev>
-  <dev name="ATA" long_name="" desc="" version="1.0">
-    <addr name="ATA" addr="0xb0090000"/>
-    <reg name="CONFIG" desc="">
-      <addr name="CONFIG" addr="0x0"/>
-    </reg>
-    <reg name="UDMACTL" desc="">
-      <addr name="UDMACTL" addr="0x4"/>
-    </reg>
-    <reg name="DATA" desc="">
-      <addr name="DATA" addr="0x8"/>
-    </reg>
-    <reg name="FEATURE" desc="">
-      <addr name="FEATURE" addr="0xc"/>
-    </reg>
-    <reg name="SECCNT" desc="">
-      <addr name="SECCNT" addr="0x10"/>
-    </reg>
-    <reg name="SECNUM" desc="">
-      <addr name="SECNUM" addr="0x14"/>
-    </reg>
-    <reg name="CLDLOW" desc="">
-      <addr name="CLDL" addr="0x18"/>
-    </reg>
-    <reg name="CLDHI" desc="">
-      <addr name="CLDHIGH" addr="0x1c"/>
-    </reg>
-    <reg name="HEAD" desc="">
-      <addr name="HEAD" addr="0x20"/>
-    </reg>
-    <reg name="CMD" desc="">
-      <addr name="CMD" addr="0x24"/>
-    </reg>
-    <reg name="BYTECNT" desc="">
-      <addr name="BYTECNT" addr="0x28"/>
-    </reg>
-    <reg name="FIFOCTL" desc="">
-      <addr name="FIFOCTL" addr="0x2c"/>
-    </reg>
-    <reg name="FIFOCFG" desc="">
-      <addr name="FIFOCFG" addr="0x30"/>
-    </reg>
-    <reg name="ADDRDEC" desc="">
-      <addr name="ADDRDEC" addr="0x34"/>
-    </reg>
-    <reg name="IRQCTL" desc="">
-      <addr name="IRQCTL" addr="0x38"/>
-    </reg>
-  </dev>
-  <dev name="BOOT" long_name="" desc="" version="">
-    <addr name="BOOT" addr="0xb0038000"/>
-    <reg name="NORCTL" desc="">
-      <addr name="NORCTL" addr="0x0"/>
-    </reg>
-    <reg name="BROMCTL" desc="">
-      <addr name="BROMCTL" addr="0x4"/>
-    </reg>
-    <reg name="CHIPID" desc="">
-      <addr name="CHIPID" addr="0x8"/>
-    </reg>
-  </dev>
-  <dev name="BT" long_name="" desc="" version="">
-    <addr name="BT" addr="0xb00d0000"/>
-  </dev>
-  <dev name="CMU" long_name="Clock Management Unit" desc="" version="1.0">
-    <addr name="CMU" addr="0xb0010000"/>
-    <reg name="COREPLL" desc="">
-      <addr name="COREPLL" addr="0x0"/>
-      <field name="RESERVED31_11" desc="" bitrange="31:11"/>
-      <field name="CPBY" desc="Core PLL Bypass " bitrange="10:10"/>
-      <field name="CPBI" desc="Core PLL Bias " bitrange="9:8"/>
-      <field name="CPEN" desc="Core PLL Enable " bitrange="7:7"/>
-      <field name="HOEN" desc="High Oscillator Enable" bitrange="6:6"/>
-      <field name="CPCK" desc="COREPLLout = CPCK * 6 (MHz) (in range 12 - 378MHz)" bitrange="5:0"/>
-    </reg>
-    <reg name="DSPPLL" desc="">
-      <addr name="DSPPLL" addr="0x4"/>
-      <field name="RESERVED31_9" desc="" bitrange="31:9"/>
-      <field name="DPBI" desc="DSP PLL Bias" bitrange="8:7"/>
-      <field name="DPEN" desc="DSP PLL Enable" bitrange="6:6"/>
-      <field name="DPCK" desc="DSPPLLout = DPCK * 6 (MHz) (in range 12-378MHz)" bitrange="5:0"/>
-    </reg>
-    <reg name="AUDIOPLL" desc="">
-      <addr name="AUDIOPLL" addr="0x8"/>
-      <field name="RESERVED31_12" desc="" bitrange="31:12"/>
-      <field name="ADCPLL" desc="Audio PLL CLk Control" bitrange="11:11"/>
-      <field name="ADCCLK" desc="ADC Clock Divisor, output is FS*256" bitrange="10:8"/>
-      <field name="RESERVED7" desc="" bitrange="7:7"/>
-      <field name="APBI" desc="Audio PLL Bias" bitrange="6:5"/>
-      <field name="APEN" desc="Audio PLL Enable" bitrange="4:4"/>
-      <field name="DACPLL" desc="DAC PLL CLk Control" bitrange="3:3"/>
-      <field name="DACCLK" desc="DAC Clock Divisor, output is FS*256" bitrange="2:0"/>
-    </reg>
-    <reg name="BUSCLK" desc="Bus CLK Control Register">
-      <addr name="BUSCLK" addr="0xc"/>
-      <field name="KEYE" desc="Key Wakeup Enable" bitrange="31:31"/>
-      <field name="ALME" desc="Alarm Wakeup Enable" bitrange="30:30"/>
-      <field name="SIRE" desc="SIRQ Wakeup Enable" bitrange="29:29"/>
-      <field name="RESERVED28" desc="" bitrange="28:28"/>
-      <field name="USBE" desc="Usb Wakeup Enable" bitrange="27:27"/>
-      <field name="RESERVED26_12" desc="" bitrange="26:12"/>
-      <field name="PCLKDIV" desc="Peripheral CLK Divisor" bitrange="11:8"/>
-      <field name="CORECLKS" desc="CPU Clock Selection" bitrange="7:6"/>
-      <field name="SCLKDIV" desc="System Clock Divisor" bitrange="5:4"/>
-      <field name="CCLKDIV" desc="CPU Clock Divisor" bitrange="3:2"/>
-      <field name="DCEN" desc="Core CLK DC Enable" bitrange="1:1"/>
-    </reg>
-    <reg name="SDRCLK" desc="SDRAM Interface CLK Control Register">
-      <addr name="SDRCLK" addr="0x10"/>
-      <field name="RESERVED31_2" desc="" bitrange="31:2"/>
-      <field name="SDRDIV" desc="" bitrange="1:0"/>
-    </reg>
-    <reg name="NANDCLK" desc="NAND Interface CLK Control Register">
-      <addr name="NANDCLK" addr="0x18"/>
-      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
-      <field name="NANDDIV" desc="" bitrange="3:0"/>
-    </reg>
-    <reg name="SDCLK" desc="SD Interface CLK Control Register&#10;">
-      <addr name="SDCLK" addr="0x1c"/>
-      <field name="RESERVED31_6" desc="" bitrange="31:6"/>
-      <field name="CKEN" desc="SD Interface Clock Enable" bitrange="5:5"/>
-      <field name="D128" desc="Enable Divide 128 circuit" bitrange="4:4"/>
-      <field name="SDDIV" desc="" bitrange="3:0"/>
-    </reg>
-    <reg name="MHACLK" desc="MHA CLK Control Register">
-      <addr name="MHACLK" addr="0x20"/>
-      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
-      <field name="MHADIV" desc="" bitrange="3:0"/>
-    </reg>
-    <reg name="UART2CLK" desc="Uart2 CLK Control Register">
-      <addr name="UART2CLK" addr="0x2c"/>
-      <field name="RESERVED31_17" desc="" bitrange="31:17"/>
-      <field name="U2EN" desc="Uart2 Clock Enable &#10;" bitrange="16:16"/>
-      <field name="UART2DIV" desc="" bitrange="15:0"/>
-    </reg>
-    <reg name="DMACLK" desc="DMA CLK Control Register">
-      <addr name="DMACLK" addr="0x30"/>
-      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
-      <field name="D7EN" desc="DMA 7 (Special Channel) Clock Enable" bitrange="3:3"/>
-      <field name="D6EN" desc="DMA 6 (Special Channel) Clock Enable" bitrange="2:2"/>
-      <field name="D5EN" desc="DMA 5 (Special Channel) Clock Enable" bitrange="1:1"/>
-      <field name="D4EN" desc="DMA 4 (Special Channel) Clock Enable" bitrange="0:0"/>
-    </reg>
-    <reg name="FMCLK" desc="FM CLK Control Register">
-      <addr name="FMCLK" addr="0x34"/>
-      <field name="RESERVED31_6" desc="" bitrange="31:6"/>
-      <field name="BCKE" desc="PWM Back Light clock Enable" bitrange="5:5"/>
-      <field name="BCKS" desc="Back Light CLK source select" bitrange="4:4"/>
-      <field name="BCKCON" desc="Divided PWM Back Light Special Clock Control" bitrange="3:2"/>
-      <field name="CLKS" desc="FM Clock Output Selection" bitrange="1:1"/>
-      <field name="OUTE" desc="FM Clock Output Enable (From Test Pin)" bitrange="0:0"/>
-    </reg>
-    <reg name="MCACLK" desc="MCA CLK Control Register">
-      <addr name="MCACLK" addr="0x38"/>
-      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
-      <field name="MCADIV" desc="" bitrange="3:0"/>
-    </reg>
-    <reg name="DEVCLKEN" desc="Device CLK Control Register">
-      <addr name="DEVCLKEN" addr="0x80"/>
-      <field name="RESERVED31_27" desc="" bitrange="31:27"/>
-      <field name="GPIO" desc="" bitrange="26:26"/>
-      <field name="KEY" desc="" bitrange="25:25"/>
-      <field name="RESERVED24" desc="" bitrange="24:24"/>
-      <field name="I2C" desc="" bitrange="23:23"/>
-      <field name="UART" desc="" bitrange="22:22"/>
-      <field name="RESERVED21_19" desc="" bitrange="21:19"/>
-      <field name="ADC" desc="" bitrange="18:18"/>
-      <field name="DAC" desc="" bitrange="17:17"/>
-      <field name="DSPC" desc="" bitrange="16:16"/>
-      <field name="MCA" desc="" bitrange="15:15"/>
-      <field name="MHA" desc="" bitrange="14:14"/>
-      <field name="USBC" desc="" bitrange="13:13"/>
-      <field name="RESERVED12" desc="" bitrange="12:12"/>
-      <field name="SD" desc="" bitrange="11:11"/>
-      <field name="RESERVED10" desc="" bitrange="10:10"/>
-      <field name="NAND" desc="" bitrange="9:9"/>
-      <field name="DMAC" desc="" bitrange="8:8"/>
-      <field name="PCNT" desc="" bitrange="7:7"/>
-      <field name="SDRM" desc="" bitrange="6:6"/>
-      <field name="SDRC" desc="" bitrange="5:5"/>
-      <field name="DSPM" desc="" bitrange="4:4"/>
-      <field name="RESERVED3" desc="" bitrange="3:3"/>
-      <field name="RMOC" desc="" bitrange="2:2"/>
-      <field name="YUV" desc="" bitrange="1:1"/>
-      <field name="RESERVED0" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="DEVRST" desc="Device Reset Control Register">
-      <addr name="DEVRST" addr="0x84"/>
-      <field name="RESERVED31" desc="" bitrange="31:31"/>
-      <field name="GPIO" desc="" bitrange="30:30"/>
-      <field name="KEY" desc="" bitrange="29:29"/>
-      <field name="RESERVED28" desc="" bitrange="28:28"/>
-      <field name="I2C" desc="" bitrange="27:27"/>
-      <field name="UART" desc="" bitrange="26:26"/>
-      <field name="RESERVED25_23" desc="" bitrange="25:23"/>
-      <field name="ADC" desc="" bitrange="22:22"/>
-      <field name="DAC" desc="" bitrange="21:21"/>
-      <field name="DSPC" desc="DSP control block reset" bitrange="20:20"/>
-      <field name="INTC" desc="" bitrange="19:19"/>
-      <field name="RTC" desc="" bitrange="18:18"/>
-      <field name="PMU" desc="" bitrange="17:17"/>
-      <field name="RESERVED16_14" desc="" bitrange="16:14"/>
-      <field name="DSPM" desc="SRAM DSP MEM reset" bitrange="13:13"/>
-      <field name="TVENC" desc="" bitrange="12:12"/>
-      <field name="YUV" desc="" bitrange="11:11"/>
-      <field name="MCA" desc="" bitrange="10:10"/>
-      <field name="USB" desc="" bitrange="9:9"/>
-      <field name="RESERVED8" desc="" bitrange="8:8"/>
-      <field name="MHA" desc="" bitrange="7:7"/>
-      <field name="SD" desc="" bitrange="6:6"/>
-      <field name="NAND" desc="" bitrange="5:5"/>
-      <field name="RESERVED4" desc="" bitrange="4:4"/>
-      <field name="DMAC" desc="" bitrange="3:3"/>
-      <field name="PCNT" desc="" bitrange="2:2"/>
-      <field name="RESERVED1" desc="" bitrange="1:1"/>
-      <field name="SDR" desc="SDRAM Control register and SDRAM block Reset" bitrange="0:0"/>
-    </reg>
-  </dev>
-  <dev name="DAC" long_name="Digital Analog Converter" desc="" version="1.0">
-    <addr name="DAC" addr="0xb0100000"/>
-  </dev>
-  <dev name="DMAC" long_name="Direct Memory Access Controller" desc="Channels 0-3 work with retular AHB bus, channels 4-7 work with 'special' bus." version="">
-    <addr name="DMAC" addr="0xb0060000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="IRQEN" desc="">
-      <addr name="IRQEN" addr="0x4"/>
-    </reg>
-    <reg name="IRQPD" desc="">
-      <addr name="IRQPD" addr="0x8"/>
-    </reg>
-    <reg name="DMA_MODE" desc="">
-      <formula string="0x100+n*0x20"/>
-      <addr name="DMA_MODE0" addr="0x100"/>
-      <addr name="DMA_MODE1" addr="0x120"/>
-      <addr name="DMA_MODE2" addr="0x140"/>
-      <addr name="DMA_MODE3" addr="0x160"/>
-      <addr name="DMA_MODE4" addr="0x180"/>
-      <addr name="DMA_MODE5" addr="0x1a0"/>
-      <addr name="DMA_MODE6" addr="0x1c0"/>
-      <addr name="DMA_MODE7" addr="0x1e0"/>
-      <field name="DBURLEN" desc="Destination burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary." bitrange="31:29">
-        <value name="SINGLE" value="0x0" desc=""/>
-        <value name="INCR4" value="0x3" desc=""/>
-        <value name="INCR8" value="0x5" desc=""/>
-      </field>
-      <field name="RELO" desc="DMA Reload Bit." bitrange="28:28"/>
-      <field name="DDSP" desc="Destination DSP mode.&#10;" bitrange="27:27"/>
-      <field name="DCOL" desc="Destination Column Mode." bitrange="26:26"/>
-      <field name="DDIR" desc="Destination address direction. If DBURLEN is INCR4 or INCR8 only INCREASE is allowed." bitrange="25:25">
-        <value name="INCREASE" value="0x0" desc=""/>
-        <value name="DECREASE" value="0x1" desc=""/>
-      </field>
-      <field name="DFXA" desc="Destination Fixed Address bit." bitrange="24:24">
-        <value name="NOT_FIXED" value="0x0" desc=""/>
-        <value name="FIXED" value="0x1" desc=""/>
-      </field>
-      <field name="DTRG" desc="Destination DRQ Trig Source." bitrange="23:19">
-        <value name="DAC" value="0x6" desc=""/>
-        <value name="SDRAM" value="0x10" desc=""/>
-        <value name="IRAM" value="0x11" desc=""/>
-        <value name="SD" value="0x16" desc=""/>
-        <value name="OTG" value="0x17" desc=""/>
-        <value name="LCM" value="0x18" desc=""/>
-      </field>
-      <field name="DTRANWID" desc="" bitrange="18:17">
-        <value name="WIDTH8" value="0x0" desc=""/>
-        <value name="WIDTH16" value="0x1" desc=""/>
-        <value name="WIDTH32" value="0x2" desc=""/>
-      </field>
-      <field name="DFXS" desc="If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than DTRANWID. &#10;If DFXS=1, DMA will always transfer in DTRANWID. &#10;" bitrange="16:16"/>
-      <field name="SBURLEN" desc="Source burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary." bitrange="15:13">
-        <value name="SINGLE" value="0x0" desc=""/>
-        <value name="INCR4" value="0x3" desc=""/>
-        <value name="INCR8" value="0x5" desc=""/>
-      </field>
-      <field name="SDSP" desc="Source DSP mode. &#10;" bitrange="11:11"/>
-      <field name="SCOL" desc="Source Column Mode." bitrange="10:10"/>
-      <field name="SDIR" desc="Source address direction. If SBURLEN is INCR4 or INCR8 only INCREASE is allowed." bitrange="9:9">
-        <value name="INCREASE" value="0x0" desc=""/>
-        <value name="DECREASE" value="0x1" desc=""/>
-      </field>
-      <field name="SFXA" desc="Source Fixed Addres bit." bitrange="8:8">
-        <value name="NOT_FIXED" value="0x0" desc=""/>
-        <value name="FIXED" value="0x1" desc=""/>
-      </field>
-      <field name="STRG" desc="DRQ trig source." bitrange="7:3">
-        <value name="DAC" value="0x6" desc=""/>
-        <value name="SDRAM" value="0x10" desc=""/>
-        <value name="IRAM" value="0x11" desc=""/>
-        <value name="SD" value="0x16" desc=""/>
-        <value name="OTG" value="0x17" desc=""/>
-        <value name="LCM" value="0x18" desc=""/>
-      </field>
-      <field name="STRANWID" desc="" bitrange="2:1">
-        <value name="WIDTH8" value="0x0" desc=""/>
-        <value name="WIDTH16" value="0x1" desc=""/>
-        <value name="WIDTH32" value="0x2" desc=""/>
-      </field>
-      <field name="SFXS" desc="Source Fix Size. If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than STRANWID. If SFXS=1, DMA will always transfer in STRANWID." bitrange="0:0"/>
-    </reg>
-    <reg name="DMA_SRC" desc="">
-      <formula string="0x104+n*0x20"/>
-      <addr name="DMA_SRC0" addr="0x104"/>
-      <addr name="DMA_SRC1" addr="0x124"/>
-      <addr name="DMA_SRC2" addr="0x144"/>
-      <addr name="DMA_SRC3" addr="0x164"/>
-      <addr name="DMA_SRC4" addr="0x184"/>
-      <addr name="DMA_SRC5" addr="0x1a4"/>
-      <addr name="DMA_SRC6" addr="0x1c4"/>
-      <addr name="DMA_SRC7" addr="0x1e4"/>
-    </reg>
-    <reg name="DMA_DST" desc="">
-      <formula string="0x108+n*0x20"/>
-      <addr name="DMA_DST0" addr="0x108"/>
-      <addr name="DMA_DST1" addr="0x128"/>
-      <addr name="DMA_DST2" addr="0x148"/>
-      <addr name="DMA_DST3" addr="0x168"/>
-      <addr name="DMA_DST4" addr="0x188"/>
-      <addr name="DMA_DST5" addr="0x1a8"/>
-      <addr name="DMA_DST6" addr="0x1c8"/>
-      <addr name="DMA_DST7" addr="0x1e8"/>
-    </reg>
-    <reg name="DMA_CNT" desc="">
-      <formula string="0x10c+n*0x20"/>
-      <addr name="DMA_CNT0" addr="0x10c"/>
-      <addr name="DMA_CNT1" addr="0x12c"/>
-      <addr name="DMA_CNT2" addr="0x14c"/>
-      <addr name="DMA_CNT3" addr="0x16c"/>
-      <addr name="DMA_CNT4" addr="0x18c"/>
-      <addr name="DMA_CNT5" addr="0x1ac"/>
-      <addr name="DMA_CNT6" addr="0x1cc"/>
-      <addr name="DMA_CNT7" addr="0x1ec"/>
-    </reg>
-    <reg name="DMA_REM" desc="">
-      <formula string="0x110+n*0x20"/>
-      <addr name="DMA_REM0" addr="0x110"/>
-      <addr name="DMA_REM1" addr="0x130"/>
-      <addr name="DMA_REM2" addr="0x150"/>
-      <addr name="DMA_REM3" addr="0x170"/>
-      <addr name="DMA_REM4" addr="0x190"/>
-      <addr name="DMA_REM5" addr="0x1b0"/>
-      <addr name="DMA_REM6" addr="0x1d0"/>
-      <addr name="DMA_REM7" addr="0x1f0"/>
-    </reg>
-    <reg name="DMA_CMD" desc="">
-      <formula string="0x114+n*0x20"/>
-      <addr name="DMA_CMD0" addr="0x114"/>
-      <addr name="DMA_CMD1" addr="0x134"/>
-      <addr name="DMA_CMD2" addr="0x154"/>
-      <addr name="DMA_CMD3" addr="0x174"/>
-      <addr name="DMA_CMD4" addr="0x194"/>
-      <addr name="DMA_CMD5" addr="0x1b4"/>
-      <addr name="DMA_CMD6" addr="0x1d4"/>
-      <addr name="DMA_CMD7" addr="0x1f4"/>
-    </reg>
-  </dev>
-  <dev name="DSP" long_name="Digital Signal Processor" desc="" version="1.0">
-    <addr name="DSP" addr="0xb0050000"/>
-    <reg name="HDR" desc="HIP data registers">
-      <addr name="HDR0" addr="0x0"/>
-      <addr name="HDR1" addr="0x4"/>
-      <addr name="HDR2" addr="0x8"/>
-      <addr name="HDR3" addr="0xc"/>
-      <addr name="HDR4" addr="0x10"/>
-      <addr name="HDR5" addr="0x14"/>
-      <addr name="HSR6" addr="0x18"/>
-      <addr name="HSR7" addr="0x1c"/>
-    </reg>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x20"/>
-    </reg>
-  </dev>
-  <dev name="GPIO" long_name="" desc="" version="1.0">
-    <addr name="GPIO" addr="0xb01c0000"/>
-    <reg name="OUTEN" desc="">
-      <addr name="AOUTEN" addr="0x0"/>
-      <addr name="BOUTEN" addr="0xc"/>
-    </reg>
-    <reg name="INEN" desc="">
-      <addr name="AINEN" addr="0x4"/>
-      <addr name="BINEN" addr="0x10"/>
-    </reg>
-    <reg name="DAT" desc="">
-      <addr name="ADAT" addr="0x8"/>
-      <addr name="BDAT" addr="0x14"/>
-    </reg>
-    <reg name="MFCTL0" desc="">
-      <addr name="MFCTL0" addr="0x18"/>
-      <field name="RESERVED31_25" desc="" bitrange="31:25"/>
-      <field name="GPIOA2_0" desc="" bitrange="24:22">
-        <value name="NAND_CLE_RB_ALE" value="0x1" desc=""/>
-        <value name="LCD_RS_WD9_WD0" value="0x2" desc=""/>
-        <value name="SD_CMD" value="0x4" desc=""/>
-      </field>
-      <field name="CEB6" desc="" bitrange="21:20">
-        <value name="LCD_CE" value="0x2" desc=""/>
-        <value name="SD_CLK" value="0x3" desc=""/>
-      </field>
-      <field name="RESERVED19_16" desc="" bitrange="19:16"/>
-      <field name="CEB3" desc="" bitrange="15:14">
-        <value name="NAND_CEB3" value="0x1" desc=""/>
-        <value name="LCD_CE" value="0x2" desc=""/>
-      </field>
-      <field name="CEB2" desc="" bitrange="13:12">
-        <value name="NAND_CEB2" value="0x1" desc=""/>
-        <value name="LCD_CE" value="0x2" desc=""/>
-      </field>
-      <field name="CEB1" desc="" bitrange="11:10">
-        <value name="NAND_CEB1" value="0x1" desc=""/>
-        <value name="LCD_CE" value="0x2" desc=""/>
-      </field>
-      <field name="CEB0" desc="" bitrange="9:8">
-        <value name="NAND_CEB0" value="0x1" desc=""/>
-        <value name="LCD_CE" value="0x2" desc=""/>
-      </field>
-      <field name="WRRD" desc="" bitrange="7:6">
-        <value name="NAND_WR_RD" value="0x1" desc=""/>
-        <value name="LCD_WRB_RDB" value="0x2" desc=""/>
-      </field>
-      <field name="NAND_D7_0" desc="" bitrange="5:3">
-        <value name="NAND_D7_0" value="0x1" desc=""/>
-        <value name="LCD_WD17_10" value="0x2" desc=""/>
-      </field>
-      <field name="NAND_D15_8" desc="" bitrange="2:0">
-        <value name="NAND_D15_8" value="0x1" desc=""/>
-        <value name="LCD_WD8_1" value="0x2" desc=""/>
-        <value name="SDR_D7_0" value="0x4" desc=""/>
-      </field>
-    </reg>
-    <reg name="MFCTL1" desc="">
-      <addr name="MFCTL1" addr="0x1c"/>
-      <field name="MFEN" desc="" bitrange="31:31"/>
-      <field name="RESERVED30_18" desc="" bitrange="30:18"/>
-      <field name="SD2E" desc="" bitrange="17:17"/>
-      <field name="RBS" desc="" bitrange="16:16"/>
-      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
-      <field name="SIR0" desc="" bitrange="11:11"/>
-      <field name="SPTR" desc="" bitrange="10:9">
-        <value name="I2C1_SCL_ADA" value="0x1" desc=""/>
-        <value name="UART2_TX_RX" value="0x2" desc=""/>
-      </field>
-      <field name="U2TR" desc="" bitrange="8:8">
-        <value name="UART2_TX_RX" value="0x0" desc=""/>
-        <value name="I2C2_SCL_SDA" value="0x1" desc=""/>
-      </field>
-      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
-      <field name="I2C1SS" desc="" bitrange="5:4">
-        <value name="I2C1_SCL_SDA" value="0x0" desc=""/>
-        <value name="UART2_TX_RX" value="0x1" desc=""/>
-      </field>
-      <field name="RESERVED3_0" desc="" bitrange="3:0"/>
-    </reg>
-  </dev>
-  <dev name="I2C" long_name="" desc="" version="1.0">
-    <addr name="I2C1" addr="0xb0180000"/>
-    <addr name="I2C2" addr="0xb0180020"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-      <field name="RESERVED31_9" desc="" bitrange="31:9"/>
-      <field name="PUEN" desc="nternal Pull-up Resistor (4.7k) Enable" bitrange="8:8"/>
-      <field name="EN" desc="Block enable" bitrange="7:7"/>
-      <field name="SIE" desc="START Condition Generates IRQ Enable (only for slave mode)" bitrange="6:6"/>
-      <field name="IRQE" desc="IRQ Enable" bitrange="5:5"/>
-      <field name="MS" desc="Mode select" bitrange="4:4">
-        <value name="MASTER" value="0x0" desc=""/>
-        <value name="SLAVE" value="0x1" desc=""/>
-      </field>
-      <field name="GBCC" desc="Generating Bus Control Condition (only for master mode)" bitrange="3:2">
-        <value name="NOP" value="0x0" desc=""/>
-        <value name="START" value="0x1" desc=""/>
-        <value name="STOP" value="0x2" desc=""/>
-        <value name="REPEATED_START" value="0x3" desc=""/>
-      </field>
-      <field name="RB" desc="Release Bus. Writing 1 to this bit will release the clock and data line to idle. MCU should write 1 to this bit after transmitting or receiving the last bit of&#10;the whole transfer.&#10;" bitrange="1:1"/>
-      <field name="GRAS" desc="Generating/Receiving Acknowledge Signal" bitrange="0:0"/>
-    </reg>
-    <reg name="CLKDIV" desc="">
-      <addr name="CLKDIV" addr="0x4"/>
-      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
-      <field name="CLKDIV" desc="Clock Divider Factor (only for master mode). I2Cx clock (SCL) can select standard (100kbps) mode and fast (400kbps) mode. Calculating SCL is as follows: SCL=PCLK/(CLKDIV*16)&#10;" bitrange="7:0"/>
-    </reg>
-    <reg name="STAT" desc="">
-      <addr name="STAT" addr="0x8"/>
-      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
-      <field name="TRC" desc="Transmit/Receive Complete Bit" bitrange="7:7"/>
-      <field name="STPD" desc="STOP Detect Bit " bitrange="6:6"/>
-      <field name="STAD" desc="START Detect Bit" bitrange="5:5"/>
-      <field name="RWST" desc="Read/Write Status Bit (only for Slave mode)" bitrange="4:4"/>
-      <field name="LBST" desc="Last Byte Status Bit" bitrange="3:3"/>
-      <field name="IRQP" desc="IRQ Pending Bit" bitrange="2:2"/>
-      <field name="OVST" desc="Overflow Status Bit" bitrange="1:1"/>
-      <field name="WCO" desc="Writing Collision Bit" bitrange="0:0"/>
-    </reg>
-    <reg name="ADDR" desc="">
-      <addr name="ADDR" addr="0xc"/>
-      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
-      <field name="SDAD" desc="Slave Device Address" bitrange="7:1"/>
-      <field name="RWCM" desc="Read/Write Control or Match" bitrange="0:0"/>
-    </reg>
-    <reg name="DAT" desc="">
-      <addr name="DAT" addr="0x10"/>
-      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
-      <field name="TXRXDAT" desc="Transmit/Receive Data" bitrange="7:0"/>
-    </reg>
-  </dev>
-  <dev name="INTC" long_name="Interrupt Controller" desc="" version="1.0">
-    <addr name="INTC" addr="0xb0020000"/>
-    <reg name="PD" desc="">
-      <addr name="PD" addr="0x0"/>
-    </reg>
-    <reg name="MSK" desc="">
-      <addr name="MSK" addr="0x4"/>
-    </reg>
-    <reg name="CFG" desc="">
-      <addr name="CFG0" addr="0x8"/>
-      <addr name="CFG1" addr="0xc"/>
-      <addr name="CFG2" addr="0x10"/>
-    </reg>
-    <reg name="EXTCTL" desc="">
-      <addr name="EXTCTL" addr="0x14"/>
-    </reg>
-  </dev>
-  <dev name="IR" long_name="" desc="" version="1.0">
-    <addr name="IR" addr="0xb0160010"/>
-  </dev>
-  <dev name="KEY" long_name="" desc="" version="1.0">
-    <addr name="KEY" addr="0xb01a0000"/>
-  </dev>
-  <dev name="MCA" long_name="Motion Compensation Accelerator" desc="" version="1.0">
-    <addr name="MCA" addr="0xb0080000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-  </dev>
-  <dev name="MHA" long_name="Media Hardware Accelerator" desc="" version="1.0">
-    <addr name="MHA" addr="0xb00c0000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="CFG" desc="">
-      <addr name="CFG" addr="0x4"/>
-    </reg>
-    <reg name="DCSCLx" desc="">
-      <addr name="DCSCL0" addr="0x10"/>
-      <addr name="DCSCL1" addr="0x14"/>
-      <addr name="DCSCL2" addr="0x18"/>
-      <addr name="DCSCL3" addr="0x1c"/>
-    </reg>
-    <reg name="QSCL" desc="">
-      <addr name="QSCL" addr="0x20"/>
-    </reg>
-  </dev>
-  <dev name="NAND" long_name="NAND Flash Interface" desc="" version="1.0">
-    <addr name="NAND" addr="0xb00a0000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="STATUS" desc="">
-      <addr name="STATUS" addr="0x4"/>
-    </reg>
-    <reg name="FIFOTIM" desc="">
-      <addr name="FIFOTIM" addr="0x8"/>
-    </reg>
-    <reg name="CLKCTL" desc="">
-      <addr name="CLKCTL" addr="0xc"/>
-    </reg>
-    <reg name="BYTECNT" desc="">
-      <addr name="BYTECNT" addr="0x10"/>
-    </reg>
-    <reg name="ADDR01" desc="">
-      <addr name="ADDR01" addr="0x14"/>
-    </reg>
-    <reg name="ADDR23" desc="">
-      <addr name="ADDR23" addr="0x18"/>
-    </reg>
-    <reg name="ADDR45" desc="">
-      <addr name="ADDR45" addr="0x1c"/>
-    </reg>
-    <reg name="ADDR67" desc="">
-      <addr name="ADDR67" addr="0x20"/>
-    </reg>
-    <reg name="BUF" desc="">
-      <addr name="BUF0" addr="0x24"/>
-      <addr name="BUF1" addr="0x28"/>
-    </reg>
-    <reg name="CMD" desc="">
-      <addr name="CMD" addr="0x2c"/>
-    </reg>
-    <reg name="ECCCTL" desc="">
-      <addr name="ECCCTL" addr="0x30"/>
-    </reg>
-    <reg name="HAMECC" desc="">
-      <addr name="HAMECC0" addr="0x34"/>
-      <addr name="HAMECC1" addr="0x38"/>
-      <addr name="HAMECC2" addr="0x3c"/>
-    </reg>
-    <reg name="HAMCEC" desc="">
-      <addr name="HAMCEC" addr="0x40"/>
-    </reg>
-    <reg name="RSE" desc="">
-      <addr name="RSE0" addr="0x44"/>
-      <addr name="RSE1" addr="0x48"/>
-      <addr name="RSE2" addr="0x4c"/>
-      <addr name="RSE3" addr="0x50"/>
-    </reg>
-    <reg name="RSPS" desc="">
-      <addr name="RSPS0" addr="0x54"/>
-      <addr name="RSPS1" addr="0x58"/>
-      <addr name="RSPS2" addr="0x5c"/>
-    </reg>
-    <reg name="FIFODATA" desc="">
-      <addr name="FIFODATA" addr="0x60"/>
-    </reg>
-    <reg name="DEBUG" desc="">
-      <addr name="DEBUG" addr="0x70"/>
-    </reg>
-  </dev>
-  <dev name="PCM" long_name="" desc="" version="1.0">
-    <addr name="PCM" addr="0xb0150000"/>
-  </dev>
-  <dev name="PCNT" long_name="Performance Counters" desc="The base address is not clear!" version="1.0">
-    <addr name="PCNT" addr="0xb003c000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="PCx" desc="">
-      <addr name="PC0" addr="0x4"/>
-      <addr name="PC1" addr="0x8"/>
-    </reg>
-  </dev>
-  <dev name="PMU" long_name="Power Management Unit" desc="" version="1.0">
-    <addr name="PMU" addr="0xb0000000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-      <field name="LBRM" desc="" bitrange="31:31"/>
-      <field name="VCVS" desc="" bitrange="30:28"/>
-      <field name="LBNM" desc="" bitrange="27:27"/>
-      <field name="VDVS" desc="" bitrange="26:24"/>
-      <field name="VCDE" desc="" bitrange="23:23"/>
-      <field name="VCVD" desc="" bitrange="22:20"/>
-      <field name="VDDE" desc="" bitrange="19:19"/>
-      <field name="VDVD" desc="" bitrange="18:16"/>
-      <field name="BLEN" desc="" bitrange="15:15"/>
-      <field name="VCOE" desc="" bitrange="14:14"/>
-      <field name="LA6E" desc="" bitrange="13:13"/>
-      <field name="LA4E" desc="" bitrange="12:12"/>
-      <field name="IBIAS" desc="" bitrange="11:10"/>
-      <field name="OSCFREQ" desc="" bitrange="9:8"/>
-      <field name="DC1M" desc="" bitrange="7:7"/>
-      <field name="DC2M" desc="" bitrange="6:6"/>
-      <field name="BLVS" desc="" bitrange="5:3"/>
-      <field name="VDV0" desc="" bitrange="2:2"/>
-      <field name="PWRM" desc="" bitrange="1:0"/>
-    </reg>
-    <reg name="LRADC" desc="">
-      <addr name="LRADC" addr="0x4"/>
-      <field name="RESERVED31_28" desc="" bitrange="31:28"/>
-      <field name="REMOADC4" desc="" bitrange="27:24"/>
-      <field name="RESERVED23_20" desc="" bitrange="23:22"/>
-      <field name="BATADC6" desc="" bitrange="21:16"/>
-      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
-      <field name="TEMPADC6" desc="" bitrange="13:8"/>
-      <field name="RESERVED7_0" desc="" bitrange="7:0"/>
-    </reg>
-    <reg name="CHG" desc="">
-      <addr name="CHG" addr="0x8"/>
-      <field name="EN" desc="" bitrange="31:31"/>
-      <field name="CURRENT" desc="" bitrange="30:28">
-        <value name="CURRENT_50mA" value="0x0" desc=""/>
-        <value name="CURRENT_100mA" value="0x1" desc=""/>
-        <value name="CURRENT_150mA" value="0x2" desc=""/>
-        <value name="CURRENT_200mA" value="0x3" desc=""/>
-        <value name="CURRENT_250mA" value="0x4" desc=""/>
-        <value name="CURRENT_300mA" value="0x5" desc=""/>
-        <value name="CURRENT_400mA" value="0x6" desc=""/>
-        <value name="CURRENT_500mA" value="0x7" desc=""/>
-      </field>
-      <field name="STAT" desc="" bitrange="27:27">
-        <value name="DISCHARGING" value="0x0" desc=""/>
-        <value name="CHARGING" value="0x1" desc=""/>
-      </field>
-      <field name="CHGPHASE" desc="" bitrange="26:25">
-        <value name="RESERVED" value="0x0" desc=""/>
-        <value name="PRECHARGE" value="0x1" desc=""/>
-        <value name="CC" value="0x2" desc=""/>
-        <value name="CV" value="0x3" desc=""/>
-      </field>
-      <field name="RESERVED24_16" desc="" bitrange="24:16"/>
-      <field name="PBLS" desc="" bitrange="15:15"/>
-      <field name="PPHS" desc="" bitrange="14:14"/>
-      <field name="RESERVED13" desc="" bitrange="13:13"/>
-      <field name="PDUT" desc="" bitrange="12:8"/>
-      <field name="RESERVED7" desc="" bitrange="7:7"/>
-      <field name="BLV0" desc="" bitrange="6:6"/>
-      <field name="TMPSET" desc="" bitrange="5:4">
-        <value name="TEMP_40C" value="0x0" desc=""/>
-        <value name="TEMP_45C" value="0x1" desc=""/>
-        <value name="TEMP_50C" value="0x2" desc=""/>
-        <value name="TEMP_55C" value="0x3" desc=""/>
-      </field>
-      <field name="LBNMIVS" desc="" bitrange="3:2">
-        <value name="VOLTAGE_2_9" value="0x0" desc=""/>
-        <value name="VOLTAGE_3_1" value="0x1" desc=""/>
-        <value name="VOLTAGE_3_3" value="0x2" desc=""/>
-        <value name="VOLTAGE_3_5" value="0x3" desc=""/>
-      </field>
-      <field name="LBRVS" desc="" bitrange="1:0">
-        <value name="VOLTAGE_2_7" value="0x0" desc=""/>
-        <value name="VOLTAGE_2_9" value="0x1" desc=""/>
-        <value name="VOLTAGE_3_1" value="0x2" desc=""/>
-        <value name="VOLTAGE_3_3" value="0x3" desc=""/>
-      </field>
-    </reg>
-  </dev>
-  <dev name="RTCWDT" long_name="Real Time Clock, Timers and Watchdog" desc="" version="1.0">
-    <addr name="RTC" addr="0xb0018000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="DHMS" desc="">
-      <addr name="DHMS" addr="0x4"/>
-      <field name="RESERVED31_27" desc="" bitrange="31:27"/>
-      <field name="DAY" desc="" bitrange="26:24"/>
-      <field name="RESERVED23_21" desc="" bitrange="23:21"/>
-      <field name="HOUR" desc="" bitrange="20:16"/>
-      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
-      <field name="MIN" desc="" bitrange="13:8"/>
-      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
-      <field name="SEC" desc="" bitrange="5:0"/>
-    </reg>
-    <reg name="YMD" desc="">
-      <addr name="YMD" addr="0x8"/>
-      <field name="RESERVED31" desc="" bitrange="31:31"/>
-      <field name="CENT" desc="" bitrange="30:24"/>
-      <field name="RESERVED23" desc="" bitrange="23:23"/>
-      <field name="YEAR" desc="" bitrange="22:16"/>
-      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
-      <field name="MON" desc="" bitrange="11:8"/>
-      <field name="RESERVED7_5" desc="" bitrange="7:5"/>
-      <field name="DATE" desc="" bitrange="4:0"/>
-    </reg>
-    <reg name="DHMSALM" desc="">
-      <addr name="DHMSALM" addr="0xc"/>
-      <field name="RESERVED31_21" desc="" bitrange="31:21"/>
-      <field name="HOURAL" desc="" bitrange="20:16"/>
-      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
-      <field name="MINAL" desc="" bitrange="13:8"/>
-      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
-      <field name="SECAL" desc="" bitrange="5:0"/>
-    </reg>
-    <reg name="YMDALM" desc="">
-      <addr name="YMDALM" addr="0x10"/>
-      <field name="RESERVED31_23" desc="" bitrange="31:23"/>
-      <field name="YEARAL" desc="" bitrange="22:16"/>
-      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
-      <field name="MONAL" desc="" bitrange="11:8"/>
-      <field name="RESERVED7_5" desc="" bitrange="7:5"/>
-      <field name="DATEAL" desc="" bitrange="4:0"/>
-    </reg>
-    <reg name="WDCTL" desc="">
-      <addr name="WDCTL" addr="0x14"/>
-    </reg>
-    <reg name="TxCTL" desc="">
-      <addr name="T0CTL" addr="0x18"/>
-      <addr name="T1CTL" addr="0x20"/>
-    </reg>
-    <reg name="Tx" desc="">
-      <addr name="T0" addr="0x1c"/>
-      <addr name="T1" addr="0x24"/>
-    </reg>
-  </dev>
-  <dev name="SD" long_name="SD/MMC Interface" desc="" version="">
-    <addr name="SD" addr="0xb00b0000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="CMDRSP" desc="">
-      <addr name="CMDRSP" addr="0x4"/>
-    </reg>
-    <reg name="RW" desc="">
-      <addr name="RW" addr="0x8"/>
-    </reg>
-    <reg name="FIFOCTL" desc="">
-      <addr name="FIFOCTL" addr="0xc"/>
-    </reg>
-    <reg name="CMD" desc="">
-      <addr name="CMD" addr="0x10"/>
-    </reg>
-    <reg name="ARG" desc="">
-      <addr name="ARG" addr="0x14"/>
-    </reg>
-    <reg name="CRC7" desc="">
-      <addr name="CRC7" addr="0x18"/>
-    </reg>
-    <reg name="RSPBUFx" desc="">
-      <addr name="RSPBUF0" addr="0x1c"/>
-      <addr name="RSPBUF1" addr="0x20"/>
-      <addr name="RSPBUF2" addr="0x24"/>
-      <addr name="RSPBUF3" addr="0x28"/>
-      <addr name="RSPBUF4" addr="0x2c"/>
-    </reg>
-    <reg name="DAT" desc="">
-      <addr name="DAT" addr="0x30"/>
-    </reg>
-    <reg name="CLK" desc="">
-      <addr name="CLK" addr="0x34"/>
-    </reg>
-    <reg name="BYTECNT" desc="">
-      <addr name="BYTECNT" addr="0x38"/>
-    </reg>
-  </dev>
-  <dev name="SDR" long_name="SDRAM Interface" desc="" version="1.0">
-    <addr name="SDR" addr="0xb0070000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="ADDRCFG" desc="">
-      <addr name="ADDRCFG" addr="0x4"/>
-    </reg>
-    <reg name="EN" desc="">
-      <addr name="EN" addr="0x8"/>
-      <field name="RESERVED31_1" desc="" bitrange="31:1"/>
-      <field name="EN" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="CMD" desc="">
-      <addr name="CMD" addr="0xc"/>
-    </reg>
-    <reg name="STAT" desc="">
-      <addr name="STAT" addr="0x10"/>
-    </reg>
-    <reg name="RFSH" desc="">
-      <addr name="RFSH" addr="0x14"/>
-    </reg>
-    <reg name="MODE" desc="">
-      <addr name="MODE" addr="0x18"/>
-    </reg>
-    <reg name="MOBILE" desc="">
-      <addr name="MOBILE" addr="0x1c"/>
-    </reg>
-  </dev>
-  <dev name="SPDIF" long_name="Sony Philips Digital Interface" desc="" version="1.0">
-    <addr name="SPDIF" addr="0xb0140000"/>
-  </dev>
-  <dev name="SPI" long_name="" desc="" version="1.0">
-    <addr name="SPI" addr="0xb0190000"/>
-  </dev>
-  <dev name="SRAMOC" long_name="SRAM on Chip" desc="" version="1.0">
-    <addr name="SRAMOC" addr="0xb0030000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-    </reg>
-    <reg name="STAT" desc="">
-      <addr name="STAT" addr="0x4"/>
-    </reg>
-  </dev>
-  <dev name="TP" long_name="" desc="" version="1.0">
-    <addr name="TP" addr="0xb0120000"/>
-  </dev>
-  <dev name="UART" long_name="" desc="" version="1.0">
-    <addr name="UART0" addr="0xb0160000"/>
-    <addr name="UART1" addr="0xb0160020"/>
-  </dev>
-  <dev name="UDC" long_name="Usb Device Controller" desc="CAST cusb2-otg IP core" version="1.0">
-    <addr name="UDC" addr="0xb00e0000"/>
-    <reg name="EP0BC" desc="ep0 byte count register">
-      <addr name="OUT0BC" addr="0x0"/>
-      <addr name="IN0BC" addr="0x1"/>
-      <field name="RESERVED" desc="" bitrange="31:8"/>
-      <field name="BC" desc="" bitrange="7:0"/>
-    </reg>
-    <reg name="EP0CS" desc="">
-      <addr name="EP0CS" addr="0x2"/>
-      <field name="RESERVED" desc="" bitrange="31:8"/>
-      <field name="OUT_BUSY" desc="" bitrange="3:3"/>
-      <field name="IN_BUSY" desc="" bitrange="2:2"/>
-      <field name="NAK" desc="Writing 1 clears" bitrange="1:1"/>
-      <field name="STALL" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="BCL" desc="Endpoint byte count LSB register">
-      <addr name="OUT1BCL" addr="0x8"/>
-      <addr name="IN1BCL" addr="0xc"/>
-      <addr name="OUT2BCL" addr="0x10"/>
-      <addr name="IN2BCL" addr="0x14"/>
-    </reg>
-    <reg name="BCH" desc="Endpoint byte count MSB">
-      <addr name="OUT1BCH" addr="0x9"/>
-      <addr name="IN1BCH" addr="0xd"/>
-      <addr name="OUT2BCH" addr="0x11"/>
-      <addr name="IN2BCH" addr="0x15"/>
-    </reg>
-    <reg name="CON" desc="Endpoint configuration register">
-      <addr name="OUT1CON" addr="0xa"/>
-      <addr name="IN1CON" addr="0xe"/>
-      <addr name="OUT2CON" addr="0x12"/>
-      <addr name="IN2CON" addr="0x16"/>
-      <field name="EP_ENABLE" desc="" bitrange="7:7"/>
-      <field name="STALL" desc="" bitrange="6:6"/>
-      <field name="EP_TYPE" desc="" bitrange="3:2">
-        <value name="RESERVED" value="0x0" desc=""/>
-        <value name="ISOCHRONOUS" value="0x1" desc=""/>
-        <value name="BULK" value="0x2" desc=""/>
-        <value name="INTERRUPT" value="0x3" desc=""/>
-      </field>
-      <field name="SUBFIFOS" desc="" bitrange="1:0">
-        <value name="SINGLE" value="0x0" desc=""/>
-        <value name="DOUBLE" value="0x1" desc=""/>
-        <value name="TRIPLE" value="0x2" desc=""/>
-        <value name="QUAD" value="0x3" desc=""/>
-      </field>
-    </reg>
-    <reg name="CS" desc="Endpoint status register">
-      <addr name="OUT1CS" addr="0xb"/>
-      <addr name="IN1CS" addr="0xf"/>
-      <addr name="OUT2CS" addr="0x13"/>
-      <addr name="IN2CS" addr="0x17"/>
-      <field name="AUTO" desc="" bitrange="4:4"/>
-      <field name="NPACK1" desc="" bitrange="3:3"/>
-      <field name="NPACK0" desc="" bitrange="2:2"/>
-      <field name="BUSY" desc="" bitrange="1:1"/>
-      <field name="ERROR" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="FIFODAT" desc="Endpoint FIFO">
-      <addr name="FIFO1DAT" addr="0x84"/>
-      <addr name="FIFO2DAT" addr="0x88"/>
-    </reg>
-    <reg name="EP0DAT" desc="Endpoint 0 buffers each 64 bytes long.">
-      <addr name="EP0INDAT" addr="0x100"/>
-      <addr name="EP0OUTDAT" addr="0x140"/>
-    </reg>
-    <reg name="SETUPDAT" desc="SETUP packet buffer">
-      <addr name="SETUPDAT" addr="0x180"/>
-    </reg>
-    <reg name="EPIRQ" desc="Endpoint irq flag register">
-      <addr name="IN04IRQ" addr="0x188"/>
-      <addr name="OUT04IRQ" addr="0x18a"/>
-      <field name="EP_NUM" desc="" bitrange="2:0"/>
-    </reg>
-    <reg name="USBIRQ" desc="General usb core irq flags">
-      <addr name="USBIRQ" addr="0x18c"/>
-      <field name="HS" desc="Enter high speed operation. Set by core on connection." bitrange="5:5"/>
-      <field name="RESET" desc="Asserted on usb reset." bitrange="4:4"/>
-      <field name="SUSPEND" desc="" bitrange="3:3"/>
-      <field name="SETUP_TOKEN" desc="" bitrange="2:2"/>
-      <field name="SOF" desc="" bitrange="1:1"/>
-      <field name="SETUP_DATA" desc="Setup data are ready to be accessed in SETUPDAT buffer." bitrange="0:0"/>
-    </reg>
-    <reg name="EPIEN" desc="Endpoint interrupt enable register">
-      <addr name="IN04IEN" addr="0x194"/>
-      <addr name="OUT04IEN" addr="0x196"/>
-      <field name="EP_NUM" desc="" bitrange="2:0"/>
-    </reg>
-    <reg name="USBIEN" desc="General usb interrupts enable register">
-      <addr name="USBIEN" addr="0x198"/>
-      <field name="HS" desc="" bitrange="5:5"/>
-      <field name="RESET" desc="" bitrange="4:4"/>
-      <field name="SUSPEND" desc="" bitrange="3:3"/>
-      <field name="SETUP_TOKEN" desc="" bitrange="2:2"/>
-      <field name="SOF" desc="" bitrange="1:1"/>
-      <field name="SETUP_DATA" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="IVECT" desc="Interrupt vector register&#10;known (guessed) values:&#10;0x00 - SETUP&#10;0x10 - RESET&#10;0x14 - HS&#10;0x28 - EPs&#10;0xD8 - OTG">
-      <addr name="IVECT" addr="0x1a0"/>
-    </reg>
-    <reg name="ENDPRST" desc="Endpoint reset register">
-      <addr name="ENDPRST" addr="0x1a2"/>
-      <field name="FIFO_RESET" desc="" bitrange="6:6"/>
-      <field name="TOGGLE_RESET" desc="" bitrange="5:5"/>
-      <field name="DIR" desc="" bitrange="4:4">
-        <value name="OUT" value="0x0" desc=""/>
-        <value name="IN" value="0x1" desc=""/>
-      </field>
-      <field name="EP_NUM" desc="" bitrange="2:0"/>
-    </reg>
-    <reg name="USBCS" desc="">
-      <addr name="USBCS" addr="0x1a3"/>
-      <field name="SOFT_CONNECT" desc="" bitrange="6:6"/>
-      <field name="SIGRESUME" desc="" bitrange="5:5"/>
-      <field name="USBSPEED" desc="" bitrange="1:1"/>
-      <field name="HCLSMODE" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="FIFOCTRL" desc="">
-      <addr name="FIFOCTRL" addr="0x1a8"/>
-      <field name="CPU_ACCESS" desc="" bitrange="7:7"/>
-      <field name="DMA" desc="" bitrange="5:5"/>
-      <field name="DIR" desc="" bitrange="4:4">
-        <value name="OUT" value="0x0" desc=""/>
-        <value name="IN" value="0x1" desc=""/>
-      </field>
-      <field name="EP_NUM" desc="" bitrange="2:0"/>
-    </reg>
-    <reg name="OTGIRQ" desc="">
-      <addr name="OTGIRQ" addr="0x1bc"/>
-      <field name="PERIPH" desc="" bitrange="4:4"/>
-      <field name="VBUSERR" desc="" bitrange="3:3"/>
-      <field name="LOCSOFT" desc="" bitrange="2:2"/>
-      <field name="SPRDET" desc="" bitrange="1:1"/>
-      <field name="OTG_IDLE" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="OTGSTATUS" desc="">
-      <addr name="OTGSTATUS" addr="0x1bf"/>
-    </reg>
-    <reg name="OTGIEN" desc="OTG interrupt enable register">
-      <addr name="OTGIEN" addr="0x1c0"/>
-    </reg>
-    <reg name="HCMAXPCKL" desc="High speed max packed size LSB">
-      <addr name="HCIN1MAXPCKL" addr="0x1e2"/>
-      <addr name="HCOUT2MAXPCKL" addr="0x3e4"/>
-    </reg>
-    <reg name="STADDR" desc="Endpoint buffer start address">
-      <addr name="OUT1STADDR" addr="0x304"/>
-      <addr name="IN2STADDR" addr="0x348"/>
-    </reg>
-    <reg name="USBEIRQ" desc="USB extended irq register">
-      <addr name="USBEIRQ" addr="0x400"/>
-      <field name="USB" desc="" bitrange="7:7"/>
-      <field name="WAKEUP" desc="" bitrange="6:6"/>
-      <field name="RESUME" desc="" bitrange="5:5"/>
-      <field name="CONDISCON" desc="" bitrange="4:4"/>
-      <field name="USBIEN" desc="" bitrange="3:3"/>
-      <field name="WAKEUPIEN" desc="" bitrange="2:2"/>
-      <field name="RESUMEIEN" desc="" bitrange="1:1"/>
-      <field name="CONDISCONIEN" desc="" bitrange="0:0"/>
-    </reg>
-    <reg name="USBERST" desc="">
-      <addr name="USBERST" addr="0x404"/>
-    </reg>
-    <reg name="DMAEPSEL" desc="">
-      <addr name="DMAEPSEL" addr="0x40c"/>
-      <field name="EP_SEL" desc="" bitrange="31:0">
-        <value name="UNKNOWN" value="0x0" desc=""/>
-        <value name="EP1_IN" value="0x1" desc=""/>
-        <value name="EP1_OUT" value="0x3" desc=""/>
-        <value name="EP2_IN" value="0x4" desc=""/>
-        <value name="EP2_OUT" value="0xc" desc=""/>
-      </field>
-    </reg>
-  </dev>
-  <dev name="YUV2RGB" long_name="Color Space Conversion Accelerator" desc="" version="">
-    <addr name="YUV2RGB" addr="0xb00f0000"/>
-    <reg name="CTL" desc="">
-      <addr name="CTL" addr="0x0"/>
-      <field name="RESERVED" desc="" bitrange="31:22"/>
-      <field name="RFBM" desc="Read fifo block mode." bitrange="21:21"/>
-      <field name="WFBM" desc="Write fifo block mode" bitrange="20:20"/>
-      <field name="EN" desc="RGB Decoder enable." bitrange="19:19"/>
-      <field name="FES" desc="Fifo empty status." bitrange="18:18"/>
-      <field name="WDCS" desc="Write Data/Command Select" bitrange="17:16">
-        <value name="CMD" value="0x0" desc="Write LCD register address"/>
-        <value name="DATA" value="0x1" desc="Write LCD register data"/>
-        <value name="RGB" value="0x2" desc="RGB565 Data FrameBuffer Transfer"/>
-        <value name="YUV" value="0x3" desc="YCbCr/YUV Data FrameBuffer Transfer"/>
-      </field>
-      <field name="DEST" desc="RGB Decoder Destination." bitrange="15:15"/>
-      <field name="FORMATS" desc="RGB Format" bitrange="13:11">
-        <value name="RGB565_1" value="0x0" desc="16bit (RGB 565 1transfer)"/>
-        <value name="RGB666_1" value="0x1" desc="18bit (RGB 666 1transfer)"/>
-        <value name="RGB565_2" value="0x2" desc="8bit (RGB 565 2transfers)"/>
-        <value name="RGB666_2" value="0x3" desc="9bit (RGB 666 2transfers)"/>
-        <value name="RGB888_3" value="0x4" desc="8bit (RGB 888 3transfers)"/>
-        <value name="RGB666_3" value="0x5" desc="6bit (RGB 666 3transfers)"/>
-      </field>
-      <field name="SEQ" desc="RGB Sequence" bitrange="10:10">
-        <value name="RGB" value="0x0" desc=""/>
-        <value name="BGR" value="0x1" desc=""/>
-      </field>
-      <field name="FWCS" desc="FIFO write channel select." bitrange="9:9">
-        <value name="SPECIAL" value="0x0" desc=""/>
-        <value name="AHB" value="0x1" desc=""/>
-      </field>
-      <field name="FRCS" desc="FIFO read channel select" bitrange="8:8">
-        <value name="SPECIAL" value="0x0" desc=""/>
-        <value name="AHB" value="0x1" desc=""/>
-      </field>
-      <field name="EMDE" desc="FIFO Empty (Write) DRQ Enable." bitrange="7:7"/>
-      <field name="EMIE" desc="FIFO Empty (Write) IRQ Enable." bitrange="6:6"/>
-      <field name="FUDE" desc="FIFO Full (Read) DRQ Enable." bitrange="5:5"/>
-      <field name="FUIE" desc="FIFO Full (Read) IRQ Enable." bitrange="4:4"/>
-      <field name="EMCO" desc="FIFO Empty (Write) Condition." bitrange="3:3">
-        <value name="EMPTY_4_8" value="0x0" desc=""/>
-        <value name="EMPTY_0_8" value="0x1" desc=""/>
-      </field>
-      <field name="EMIP" desc="FIFO Empty (Write) IRQ Pending Bit." bitrange="2:2"/>
-      <field name="FUIP" desc="FIFO Full (Read) IRQ Pending Bit." bitrange="1:1"/>
-      <field name="ERP" desc="FIFO Error Pending Bit.  Write 1 to the bit to clear it and reset the FIFO." bitrange="0:0"/>
-    </reg>
-    <reg name="FIFODATA" desc="">
-      <addr name="FIFODATA" addr="0x4"/>
-    </reg>
-    <reg name="CLKCTL" desc="">
-      <addr name="CLKCTL" addr="0x8"/>
-    </reg>
-    <reg name="FRAMECOUNT" desc="">
-      <addr name="FRAMECOUNT" addr="0xc"/>
-    </reg>
-  </dev>
+<soc version="2">
+    <name>atj213x</name>
+    <title>Actions atj213x</title>
+    <author>Marcin Bukat</author>
+    <node>
+        <name>ADC</name>
+        <title>Analog to Digital Converter</title>
+        <instance>
+            <name>ADC</name>
+            <address>0xb0110000</address>
+        </instance>
+    </node>
+    <node>
+        <name>ATA</name>
+        <instance>
+            <name>ATA</name>
+            <address>0xb0090000</address>
+        </instance>
+        <node>
+            <name>CONFIG</name>
+            <instance>
+                <name>CONFIG</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>UDMACTL</name>
+            <instance>
+                <name>UDMACTL</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DATA</name>
+            <instance>
+                <name>DATA</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FEATURE</name>
+            <instance>
+                <name>FEATURE</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>SECCNT</name>
+            <instance>
+                <name>SECCNT</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>SECNUM</name>
+            <instance>
+                <name>SECNUM</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CLDLOW</name>
+            <instance>
+                <name>CLDL</name>
+                <address>0x18</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CLDHI</name>
+            <instance>
+                <name>CLDHIGH</name>
+                <address>0x1c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>HEAD</name>
+            <instance>
+                <name>HEAD</name>
+                <address>0x20</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMD</name>
+            <instance>
+                <name>CMD</name>
+                <address>0x24</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>BYTECNT</name>
+            <instance>
+                <name>BYTECNT</name>
+                <address>0x28</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FIFOCTL</name>
+            <instance>
+                <name>FIFOCTL</name>
+                <address>0x2c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FIFOCFG</name>
+            <instance>
+                <name>FIFOCFG</name>
+                <address>0x30</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDRDEC</name>
+            <instance>
+                <name>ADDRDEC</name>
+                <address>0x34</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>IRQCTL</name>
+            <instance>
+                <name>IRQCTL</name>
+                <address>0x38</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>BOOT</name>
+        <instance>
+            <name>BOOT</name>
+            <address>0xb0038000</address>
+        </instance>
+        <node>
+            <name>NORCTL</name>
+            <instance>
+                <name>NORCTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>BROMCTL</name>
+            <instance>
+                <name>BROMCTL</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CHIPID</name>
+            <instance>
+                <name>CHIPID</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>BT</name>
+        <instance>
+            <name>BT</name>
+            <address>0xb00d0000</address>
+        </instance>
+    </node>
+    <node>
+        <name>CMU</name>
+        <title>Clock Management Unit</title>
+        <instance>
+            <name>CMU</name>
+            <address>0xb0010000</address>
+        </instance>
+        <node>
+            <name>COREPLL</name>
+            <instance>
+                <name>COREPLL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_11</name>
+                    <position>11</position>
+                    <width>21</width>
+                </field>
+                <field>
+                    <name>CPBY</name>
+                    <desc>Core PLL Bypass </desc>
+                    <position>10</position>
+                </field>
+                <field>
+                    <name>CPBI</name>
+                    <desc>Core PLL Bias </desc>
+                    <position>8</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>CPEN</name>
+                    <desc>Core PLL Enable </desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>HOEN</name>
+                    <desc>High Oscillator Enable</desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>CPCK</name>
+                    <desc>COREPLLout = CPCK * 6 (MHz) (in range 12 - 378MHz)</desc>
+                    <position>0</position>
+                    <width>6</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DSPPLL</name>
+            <instance>
+                <name>DSPPLL</name>
+                <address>0x4</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_9</name>
+                    <position>9</position>
+                    <width>23</width>
+                </field>
+                <field>
+                    <name>DPBI</name>
+                    <desc>DSP PLL Bias</desc>
+                    <position>7</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>DPEN</name>
+                    <desc>DSP PLL Enable</desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>DPCK</name>
+                    <desc>DSPPLLout = DPCK * 6 (MHz) (in range 12-378MHz)</desc>
+                    <position>0</position>
+                    <width>6</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>AUDIOPLL</name>
+            <instance>
+                <name>AUDIOPLL</name>
+                <address>0x8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_12</name>
+                    <position>12</position>
+                    <width>20</width>
+                </field>
+                <field>
+                    <name>ADCPLL</name>
+                    <desc>Audio PLL CLk Control</desc>
+                    <position>11</position>
+                </field>
+                <field>
+                    <name>ADCCLK</name>
+                    <desc>ADC Clock Divisor, output is FS*256</desc>
+                    <position>8</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>RESERVED7</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>APBI</name>
+                    <desc>Audio PLL Bias</desc>
+                    <position>5</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>APEN</name>
+                    <desc>Audio PLL Enable</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>DACPLL</name>
+                    <desc>DAC PLL CLk Control</desc>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>DACCLK</name>
+                    <desc>DAC Clock Divisor, output is FS*256</desc>
+                    <position>0</position>
+                    <width>3</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>BUSCLK</name>
+            <instance>
+                <name>BUSCLK</name>
+                <address>0xc</address>
+            </instance>
+            <register>
+                <desc>Bus CLK Control Register</desc>
+                <field>
+                    <name>KEYE</name>
+                    <desc>Key Wakeup Enable</desc>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>ALME</name>
+                    <desc>Alarm Wakeup Enable</desc>
+                    <position>30</position>
+                </field>
+                <field>
+                    <name>SIRE</name>
+                    <desc>SIRQ Wakeup Enable</desc>
+                    <position>29</position>
+                </field>
+                <field>
+                    <name>RESERVED28</name>
+                    <position>28</position>
+                </field>
+                <field>
+                    <name>USBE</name>
+                    <desc>Usb Wakeup Enable</desc>
+                    <position>27</position>
+                </field>
+                <field>
+                    <name>RESERVED26_12</name>
+                    <position>12</position>
+                    <width>15</width>
+                </field>
+                <field>
+                    <name>PCLKDIV</name>
+                    <desc>Peripheral CLK Divisor</desc>
+                    <position>8</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>CORECLKS</name>
+                    <desc>CPU Clock Selection</desc>
+                    <position>6</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>SCLKDIV</name>
+                    <desc>System Clock Divisor</desc>
+                    <position>4</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>CCLKDIV</name>
+                    <desc>CPU Clock Divisor</desc>
+                    <position>2</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>DCEN</name>
+                    <desc>Core CLK DC Enable</desc>
+                    <position>1</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>SDRCLK</name>
+            <instance>
+                <name>SDRCLK</name>
+                <address>0x10</address>
+            </instance>
+            <register>
+                <desc>SDRAM Interface CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_2</name>
+                    <position>2</position>
+                    <width>30</width>
+                </field>
+                <field>
+                    <name>SDRDIV</name>
+                    <position>0</position>
+                    <width>2</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>NANDCLK</name>
+            <instance>
+                <name>NANDCLK</name>
+                <address>0x18</address>
+            </instance>
+            <register>
+                <desc>NAND Interface CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_4</name>
+                    <position>4</position>
+                    <width>28</width>
+                </field>
+                <field>
+                    <name>NANDDIV</name>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>SDCLK</name>
+            <instance>
+                <name>SDCLK</name>
+                <address>0x1c</address>
+            </instance>
+            <register>
+                <desc>SD Interface CLK Control Register
+</desc>
+                <field>
+                    <name>RESERVED31_6</name>
+                    <position>6</position>
+                    <width>26</width>
+                </field>
+                <field>
+                    <name>CKEN</name>
+                    <desc>SD Interface Clock Enable</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>D128</name>
+                    <desc>Enable Divide 128 circuit</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>SDDIV</name>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>MHACLK</name>
+            <instance>
+                <name>MHACLK</name>
+                <address>0x20</address>
+            </instance>
+            <register>
+                <desc>MHA CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_4</name>
+                    <position>4</position>
+                    <width>28</width>
+                </field>
+                <field>
+                    <name>MHADIV</name>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>UART2CLK</name>
+            <instance>
+                <name>UART2CLK</name>
+                <address>0x2c</address>
+            </instance>
+            <register>
+                <desc>Uart2 CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_17</name>
+                    <position>17</position>
+                    <width>15</width>
+                </field>
+                <field>
+                    <name>U2EN</name>
+                    <desc>Uart2 Clock Enable 
+</desc>
+                    <position>16</position>
+                </field>
+                <field>
+                    <name>UART2DIV</name>
+                    <position>0</position>
+                    <width>16</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DMACLK</name>
+            <instance>
+                <name>DMACLK</name>
+                <address>0x30</address>
+            </instance>
+            <register>
+                <desc>DMA CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_4</name>
+                    <position>4</position>
+                    <width>28</width>
+                </field>
+                <field>
+                    <name>D7EN</name>
+                    <desc>DMA 7 (Special Channel) Clock Enable</desc>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>D6EN</name>
+                    <desc>DMA 6 (Special Channel) Clock Enable</desc>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>D5EN</name>
+                    <desc>DMA 5 (Special Channel) Clock Enable</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>D4EN</name>
+                    <desc>DMA 4 (Special Channel) Clock Enable</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>FMCLK</name>
+            <instance>
+                <name>FMCLK</name>
+                <address>0x34</address>
+            </instance>
+            <register>
+                <desc>FM CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_6</name>
+                    <position>6</position>
+                    <width>26</width>
+                </field>
+                <field>
+                    <name>BCKE</name>
+                    <desc>PWM Back Light clock Enable</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>BCKS</name>
+                    <desc>Back Light CLK source select</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>BCKCON</name>
+                    <desc>Divided PWM Back Light Special Clock Control</desc>
+                    <position>2</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>CLKS</name>
+                    <desc>FM Clock Output Selection</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>OUTE</name>
+                    <desc>FM Clock Output Enable (From Test Pin)</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>MCACLK</name>
+            <instance>
+                <name>MCACLK</name>
+                <address>0x38</address>
+            </instance>
+            <register>
+                <desc>MCA CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_4</name>
+                    <position>4</position>
+                    <width>28</width>
+                </field>
+                <field>
+                    <name>MCADIV</name>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DEVCLKEN</name>
+            <instance>
+                <name>DEVCLKEN</name>
+                <address>0x80</address>
+            </instance>
+            <register>
+                <desc>Device CLK Control Register</desc>
+                <field>
+                    <name>RESERVED31_27</name>
+                    <position>27</position>
+                    <width>5</width>
+                </field>
+                <field>
+                    <name>GPIO</name>
+                    <position>26</position>
+                </field>
+                <field>
+                    <name>KEY</name>
+                    <position>25</position>
+                </field>
+                <field>
+                    <name>RESERVED24</name>
+                    <position>24</position>
+                </field>
+                <field>
+                    <name>I2C</name>
+                    <position>23</position>
+                </field>
+                <field>
+                    <name>UART</name>
+                    <position>22</position>
+                </field>
+                <field>
+                    <name>RESERVED21_19</name>
+                    <position>19</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>ADC</name>
+                    <position>18</position>
+                </field>
+                <field>
+                    <name>DAC</name>
+                    <position>17</position>
+                </field>
+                <field>
+                    <name>DSPC</name>
+                    <position>16</position>
+                </field>
+                <field>
+                    <name>MCA</name>
+                    <position>15</position>
+                </field>
+                <field>
+                    <name>MHA</name>
+                    <position>14</position>
+                </field>
+                <field>
+                    <name>USBC</name>
+                    <position>13</position>
+                </field>
+                <field>
+                    <name>RESERVED12</name>
+                    <position>12</position>
+                </field>
+                <field>
+                    <name>SD</name>
+                    <position>11</position>
+                </field>
+                <field>
+                    <name>RESERVED10</name>
+                    <position>10</position>
+                </field>
+                <field>
+                    <name>NAND</name>
+                    <position>9</position>
+                </field>
+                <field>
+                    <name>DMAC</name>
+                    <position>8</position>
+                </field>
+                <field>
+                    <name>PCNT</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>SDRM</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>SDRC</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>DSPM</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>RESERVED3</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>RMOC</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>YUV</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>RESERVED0</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DEVRST</name>
+            <instance>
+                <name>DEVRST</name>
+                <address>0x84</address>
+            </instance>
+            <register>
+                <desc>Device Reset Control Register</desc>
+                <field>
+                    <name>RESERVED31</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>GPIO</name>
+                    <position>30</position>
+                </field>
+                <field>
+                    <name>KEY</name>
+                    <position>29</position>
+                </field>
+                <field>
+                    <name>RESERVED28</name>
+                    <position>28</position>
+                </field>
+                <field>
+                    <name>I2C</name>
+                    <position>27</position>
+                </field>
+                <field>
+                    <name>UART</name>
+                    <position>26</position>
+                </field>
+                <field>
+                    <name>RESERVED25_23</name>
+                    <position>23</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>ADC</name>
+                    <position>22</position>
+                </field>
+                <field>
+                    <name>DAC</name>
+                    <position>21</position>
+                </field>
+                <field>
+                    <name>DSPC</name>
+                    <desc>DSP control block reset</desc>
+                    <position>20</position>
+                </field>
+                <field>
+                    <name>INTC</name>
+                    <position>19</position>
+                </field>
+                <field>
+                    <name>RTC</name>
+                    <position>18</position>
+                </field>
+                <field>
+                    <name>PMU</name>
+                    <position>17</position>
+                </field>
+                <field>
+                    <name>RESERVED16_14</name>
+                    <position>14</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>DSPM</name>
+                    <desc>SRAM DSP MEM reset</desc>
+                    <position>13</position>
+                </field>
+                <field>
+                    <name>TVENC</name>
+                    <position>12</position>
+                </field>
+                <field>
+                    <name>YUV</name>
+                    <position>11</position>
+                </field>
+                <field>
+                    <name>MCA</name>
+                    <position>10</position>
+                </field>
+                <field>
+                    <name>USB</name>
+                    <position>9</position>
+                </field>
+                <field>
+                    <name>RESERVED8</name>
+                    <position>8</position>
+                </field>
+                <field>
+                    <name>MHA</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>SD</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>NAND</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>RESERVED4</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>DMAC</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>PCNT</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>RESERVED1</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>SDR</name>
+                    <desc>SDRAM Control register and SDRAM block Reset</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>DAC</name>
+        <title>Digital Analog Converter</title>
+        <instance>
+            <name>DAC</name>
+            <address>0xb0100000</address>
+        </instance>
+    </node>
+    <node>
+        <name>DMAC</name>
+        <title>Direct Memory Access Controller</title>
+        <desc>Channels 0-3 work with retular AHB bus, channels 4-7 work with 'special' bus.</desc>
+        <instance>
+            <name>DMAC</name>
+            <address>0xb0060000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>IRQEN</name>
+            <instance>
+                <name>IRQEN</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>IRQPD</name>
+            <instance>
+                <name>IRQPD</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMA_MODE</name>
+            <instance>
+                <name>DMA_MODE</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x100</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register>
+                <field>
+                    <name>DBURLEN</name>
+                    <desc>Destination burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary.</desc>
+                    <position>29</position>
+                    <width>3</width>
+                    <enum>
+                        <name>SINGLE</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>INCR4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>INCR8</name>
+                        <value>0x5</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RELO</name>
+                    <desc>DMA Reload Bit.</desc>
+                    <position>28</position>
+                </field>
+                <field>
+                    <name>DDSP</name>
+                    <desc>Destination DSP mode.
+</desc>
+                    <position>27</position>
+                </field>
+                <field>
+                    <name>DCOL</name>
+                    <desc>Destination Column Mode.</desc>
+                    <position>26</position>
+                </field>
+                <field>
+                    <name>DDIR</name>
+                    <desc>Destination address direction. If DBURLEN is INCR4 or INCR8 only INCREASE is allowed.</desc>
+                    <position>25</position>
+                    <enum>
+                        <name>INCREASE</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>DECREASE</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>DFXA</name>
+                    <desc>Destination Fixed Address bit.</desc>
+                    <position>24</position>
+                    <enum>
+                        <name>NOT_FIXED</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIXED</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>DTRG</name>
+                    <desc>Destination DRQ Trig Source.</desc>
+                    <position>19</position>
+                    <width>5</width>
+                    <enum>
+                        <name>DAC</name>
+                        <value>0x6</value>
+                    </enum>
+                    <enum>
+                        <name>SDRAM</name>
+                        <value>0x10</value>
+                    </enum>
+                    <enum>
+                        <name>IRAM</name>
+                        <value>0x11</value>
+                    </enum>
+                    <enum>
+                        <name>SD</name>
+                        <value>0x16</value>
+                    </enum>
+                    <enum>
+                        <name>OTG</name>
+                        <value>0x17</value>
+                    </enum>
+                    <enum>
+                        <name>LCM</name>
+                        <value>0x18</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>DTRANWID</name>
+                    <position>17</position>
+                    <width>2</width>
+                    <enum>
+                        <name>WIDTH8</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>WIDTH16</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>WIDTH32</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>DFXS</name>
+                    <desc>If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than DTRANWID. 
+If DFXS=1, DMA will always transfer in DTRANWID. 
+</desc>
+                    <position>16</position>
+                </field>
+                <field>
+                    <name>SBURLEN</name>
+                    <desc>Source burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary.</desc>
+                    <position>13</position>
+                    <width>3</width>
+                    <enum>
+                        <name>SINGLE</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>INCR4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>INCR8</name>
+                        <value>0x5</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>SDSP</name>
+                    <desc>Source DSP mode. 
+</desc>
+                    <position>11</position>
+                </field>
+                <field>
+                    <name>SCOL</name>
+                    <desc>Source Column Mode.</desc>
+                    <position>10</position>
+                </field>
+                <field>
+                    <name>SDIR</name>
+                    <desc>Source address direction. If SBURLEN is INCR4 or INCR8 only INCREASE is allowed.</desc>
+                    <position>9</position>
+                    <enum>
+                        <name>INCREASE</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>DECREASE</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>SFXA</name>
+                    <desc>Source Fixed Addres bit.</desc>
+                    <position>8</position>
+                    <enum>
+                        <name>NOT_FIXED</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIXED</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>STRG</name>
+                    <desc>DRQ trig source.</desc>
+                    <position>3</position>
+                    <width>5</width>
+                    <enum>
+                        <name>DAC</name>
+                        <value>0x6</value>
+                    </enum>
+                    <enum>
+                        <name>SDRAM</name>
+                        <value>0x10</value>
+                    </enum>
+                    <enum>
+                        <name>IRAM</name>
+                        <value>0x11</value>
+                    </enum>
+                    <enum>
+                        <name>SD</name>
+                        <value>0x16</value>
+                    </enum>
+                    <enum>
+                        <name>OTG</name>
+                        <value>0x17</value>
+                    </enum>
+                    <enum>
+                        <name>LCM</name>
+                        <value>0x18</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>STRANWID</name>
+                    <position>1</position>
+                    <width>2</width>
+                    <enum>
+                        <name>WIDTH8</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>WIDTH16</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>WIDTH32</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>SFXS</name>
+                    <desc>Source Fix Size. If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than STRANWID. If SFXS=1, DMA will always transfer in STRANWID.</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DMA_SRC</name>
+            <instance>
+                <name>DMA_SRC</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x104</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMA_DST</name>
+            <instance>
+                <name>DMA_DST</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x108</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMA_CNT</name>
+            <instance>
+                <name>DMA_CNT</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x10c</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMA_REM</name>
+            <instance>
+                <name>DMA_REM</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x110</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMA_CMD</name>
+            <instance>
+                <name>DMA_CMD</name>
+                <range>
+                    <first>0</first>
+                    <count>8</count>
+                    <base>0x114</base>
+                    <stride>0x20</stride>
+                </range>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>DSP</name>
+        <title>Digital Signal Processor</title>
+        <instance>
+            <name>DSP</name>
+            <address>0xb0050000</address>
+        </instance>
+        <node>
+            <name>HDR</name>
+            <instance>
+                <name>HDR0</name>
+                <address>0x0</address>
+            </instance>
+            <instance>
+                <name>HDR1</name>
+                <address>0x4</address>
+            </instance>
+            <instance>
+                <name>HDR2</name>
+                <address>0x8</address>
+            </instance>
+            <instance>
+                <name>HDR3</name>
+                <address>0xc</address>
+            </instance>
+            <instance>
+                <name>HDR4</name>
+                <address>0x10</address>
+            </instance>
+            <instance>
+                <name>HDR5</name>
+                <address>0x14</address>
+            </instance>
+            <instance>
+                <name>HSR6</name>
+                <address>0x18</address>
+            </instance>
+            <instance>
+                <name>HSR7</name>
+                <address>0x1c</address>
+            </instance>
+            <register>
+                <desc>HIP data registers</desc>
+            </register>
+        </node>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x20</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>GPIO</name>
+        <instance>
+            <name>GPIO</name>
+            <address>0xb01c0000</address>
+        </instance>
+        <node>
+            <name>OUTEN</name>
+            <instance>
+                <name>AOUTEN</name>
+                <address>0x0</address>
+            </instance>
+            <instance>
+                <name>BOUTEN</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>INEN</name>
+            <instance>
+                <name>AINEN</name>
+                <address>0x4</address>
+            </instance>
+            <instance>
+                <name>BINEN</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DAT</name>
+            <instance>
+                <name>ADAT</name>
+                <address>0x8</address>
+            </instance>
+            <instance>
+                <name>BDAT</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>MFCTL0</name>
+            <instance>
+                <name>MFCTL0</name>
+                <address>0x18</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_25</name>
+                    <position>25</position>
+                    <width>7</width>
+                </field>
+                <field>
+                    <name>GPIOA2_0</name>
+                    <position>22</position>
+                    <width>3</width>
+                    <enum>
+                        <name>NAND_CLE_RB_ALE</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_RS_WD9_WD0</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>SD_CMD</name>
+                        <value>0x4</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CEB6</name>
+                    <position>20</position>
+                    <width>2</width>
+                    <enum>
+                        <name>LCD_CE</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>SD_CLK</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RESERVED19_16</name>
+                    <position>16</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>CEB3</name>
+                    <position>14</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NAND_CEB3</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_CE</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CEB2</name>
+                    <position>12</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NAND_CEB2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_CE</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CEB1</name>
+                    <position>10</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NAND_CEB1</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_CE</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CEB0</name>
+                    <position>8</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NAND_CEB0</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_CE</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>WRRD</name>
+                    <position>6</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NAND_WR_RD</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_WRB_RDB</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>NAND_D7_0</name>
+                    <position>3</position>
+                    <width>3</width>
+                    <enum>
+                        <name>NAND_D7_0</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_WD17_10</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>NAND_D15_8</name>
+                    <position>0</position>
+                    <width>3</width>
+                    <enum>
+                        <name>NAND_D15_8</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>LCD_WD8_1</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>SDR_D7_0</name>
+                        <value>0x4</value>
+                    </enum>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>MFCTL1</name>
+            <instance>
+                <name>MFCTL1</name>
+                <address>0x1c</address>
+            </instance>
+            <register>
+                <field>
+                    <name>MFEN</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>RESERVED30_18</name>
+                    <position>18</position>
+                    <width>13</width>
+                </field>
+                <field>
+                    <name>SD2E</name>
+                    <position>17</position>
+                </field>
+                <field>
+                    <name>RBS</name>
+                    <position>16</position>
+                </field>
+                <field>
+                    <name>RESERVED15_12</name>
+                    <position>12</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>SIR0</name>
+                    <position>11</position>
+                </field>
+                <field>
+                    <name>SPTR</name>
+                    <position>9</position>
+                    <width>2</width>
+                    <enum>
+                        <name>I2C1_SCL_ADA</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>UART2_TX_RX</name>
+                        <value>0x2</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>U2TR</name>
+                    <position>8</position>
+                    <enum>
+                        <name>UART2_TX_RX</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>I2C2_SCL_SDA</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RESERVED7_6</name>
+                    <position>6</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>I2C1SS</name>
+                    <position>4</position>
+                    <width>2</width>
+                    <enum>
+                        <name>I2C1_SCL_SDA</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>UART2_TX_RX</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RESERVED3_0</name>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>I2C</name>
+        <instance>
+            <name>I2C</name>
+            <range>
+                <first>1</first>
+                <address>0xb0180000</address>
+                <address>0xb0180020</address>
+            </range>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_9</name>
+                    <position>9</position>
+                    <width>23</width>
+                </field>
+                <field>
+                    <name>PUEN</name>
+                    <desc>nternal Pull-up Resistor (4.7k) Enable</desc>
+                    <position>8</position>
+                </field>
+                <field>
+                    <name>EN</name>
+                    <desc>Block enable</desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>SIE</name>
+                    <desc>START Condition Generates IRQ Enable (only for slave mode)</desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>IRQE</name>
+                    <desc>IRQ Enable</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>MS</name>
+                    <desc>Mode select</desc>
+                    <position>4</position>
+                    <enum>
+                        <name>MASTER</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>SLAVE</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>GBCC</name>
+                    <desc>Generating Bus Control Condition (only for master mode)</desc>
+                    <position>2</position>
+                    <width>2</width>
+                    <enum>
+                        <name>NOP</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>START</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>STOP</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>REPEATED_START</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RB</name>
+                    <desc>Release Bus. Writing 1 to this bit will release the clock and data line to idle. MCU should write 1 to this bit after transmitting or receiving the last bit of
+the whole transfer.
+</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>GRAS</name>
+                    <desc>Generating/Receiving Acknowledge Signal</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>CLKDIV</name>
+            <instance>
+                <name>CLKDIV</name>
+                <address>0x4</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_8</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>CLKDIV</name>
+                    <desc>Clock Divider Factor (only for master mode). I2Cx clock (SCL) can select standard (100kbps) mode and fast (400kbps) mode. Calculating SCL is as follows: SCL=PCLK/(CLKDIV*16)
+</desc>
+                    <position>0</position>
+                    <width>8</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>STAT</name>
+            <instance>
+                <name>STAT</name>
+                <address>0x8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_8</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>TRC</name>
+                    <desc>Transmit/Receive Complete Bit</desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>STPD</name>
+                    <desc>STOP Detect Bit </desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>STAD</name>
+                    <desc>START Detect Bit</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>RWST</name>
+                    <desc>Read/Write Status Bit (only for Slave mode)</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>LBST</name>
+                    <desc>Last Byte Status Bit</desc>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>IRQP</name>
+                    <desc>IRQ Pending Bit</desc>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>OVST</name>
+                    <desc>Overflow Status Bit</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>WCO</name>
+                    <desc>Writing Collision Bit</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>ADDR</name>
+            <instance>
+                <name>ADDR</name>
+                <address>0xc</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_8</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>SDAD</name>
+                    <desc>Slave Device Address</desc>
+                    <position>1</position>
+                    <width>7</width>
+                </field>
+                <field>
+                    <name>RWCM</name>
+                    <desc>Read/Write Control or Match</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DAT</name>
+            <instance>
+                <name>DAT</name>
+                <address>0x10</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_8</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>TXRXDAT</name>
+                    <desc>Transmit/Receive Data</desc>
+                    <position>0</position>
+                    <width>8</width>
+                </field>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>INTC</name>
+        <title>Interrupt Controller</title>
+        <instance>
+            <name>INTC</name>
+            <address>0xb0020000</address>
+        </instance>
+        <node>
+            <name>PD</name>
+            <instance>
+                <name>PD</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>MSK</name>
+            <instance>
+                <name>MSK</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CFG</name>
+            <instance>
+                <name>CFG0</name>
+                <address>0x8</address>
+            </instance>
+            <instance>
+                <name>CFG1</name>
+                <address>0xc</address>
+            </instance>
+            <instance>
+                <name>CFG2</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>EXTCTL</name>
+            <instance>
+                <name>EXTCTL</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>IR</name>
+        <instance>
+            <name>IR</name>
+            <address>0xb0160010</address>
+        </instance>
+    </node>
+    <node>
+        <name>KEY</name>
+        <instance>
+            <name>KEY</name>
+            <address>0xb01a0000</address>
+        </instance>
+    </node>
+    <node>
+        <name>MCA</name>
+        <title>Motion Compensation Accelerator</title>
+        <instance>
+            <name>MCA</name>
+            <address>0xb0080000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>MHA</name>
+        <title>Media Hardware Accelerator</title>
+        <instance>
+            <name>MHA</name>
+            <address>0xb00c0000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CFG</name>
+            <instance>
+                <name>CFG</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DCSCLx</name>
+            <instance>
+                <name>DCSCL0</name>
+                <address>0x10</address>
+            </instance>
+            <instance>
+                <name>DCSCL1</name>
+                <address>0x14</address>
+            </instance>
+            <instance>
+                <name>DCSCL2</name>
+                <address>0x18</address>
+            </instance>
+            <instance>
+                <name>DCSCL3</name>
+                <address>0x1c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>QSCL</name>
+            <instance>
+                <name>QSCL</name>
+                <address>0x20</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>NAND</name>
+        <title>NAND Flash Interface</title>
+        <instance>
+            <name>NAND</name>
+            <address>0xb00a0000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>STATUS</name>
+            <instance>
+                <name>STATUS</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FIFOTIM</name>
+            <instance>
+                <name>FIFOTIM</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CLKCTL</name>
+            <instance>
+                <name>CLKCTL</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>BYTECNT</name>
+            <instance>
+                <name>BYTECNT</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDR01</name>
+            <instance>
+                <name>ADDR01</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDR23</name>
+            <instance>
+                <name>ADDR23</name>
+                <address>0x18</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDR45</name>
+            <instance>
+                <name>ADDR45</name>
+                <address>0x1c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDR67</name>
+            <instance>
+                <name>ADDR67</name>
+                <address>0x20</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>BUF</name>
+            <instance>
+                <name>BUF0</name>
+                <address>0x24</address>
+            </instance>
+            <instance>
+                <name>BUF1</name>
+                <address>0x28</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMD</name>
+            <instance>
+                <name>CMD</name>
+                <address>0x2c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ECCCTL</name>
+            <instance>
+                <name>ECCCTL</name>
+                <address>0x30</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>HAMECC</name>
+            <instance>
+                <name>HAMECC0</name>
+                <address>0x34</address>
+            </instance>
+            <instance>
+                <name>HAMECC1</name>
+                <address>0x38</address>
+            </instance>
+            <instance>
+                <name>HAMECC2</name>
+                <address>0x3c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>HAMCEC</name>
+            <instance>
+                <name>HAMCEC</name>
+                <address>0x40</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>RSE</name>
+            <instance>
+                <name>RSE0</name>
+                <address>0x44</address>
+            </instance>
+            <instance>
+                <name>RSE1</name>
+                <address>0x48</address>
+            </instance>
+            <instance>
+                <name>RSE2</name>
+                <address>0x4c</address>
+            </instance>
+            <instance>
+                <name>RSE3</name>
+                <address>0x50</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>RSPS</name>
+            <instance>
+                <name>RSPS0</name>
+                <address>0x54</address>
+            </instance>
+            <instance>
+                <name>RSPS1</name>
+                <address>0x58</address>
+            </instance>
+            <instance>
+                <name>RSPS2</name>
+                <address>0x5c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FIFODATA</name>
+            <instance>
+                <name>FIFODATA</name>
+                <address>0x60</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DEBUG</name>
+            <instance>
+                <name>DEBUG</name>
+                <address>0x70</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>PCM</name>
+        <instance>
+            <name>PCM</name>
+            <address>0xb0150000</address>
+        </instance>
+    </node>
+    <node>
+        <name>PCNT</name>
+        <title>Performance Counters</title>
+        <desc>The base address is not clear!</desc>
+        <instance>
+            <name>PCNT</name>
+            <address>0xb003c000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>PCx</name>
+            <instance>
+                <name>PC0</name>
+                <address>0x4</address>
+            </instance>
+            <instance>
+                <name>PC1</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>PMU</name>
+        <title>Power Management Unit</title>
+        <instance>
+            <name>PMU</name>
+            <address>0xb0000000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <field>
+                    <name>LBRM</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>VCVS</name>
+                    <position>28</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>LBNM</name>
+                    <position>27</position>
+                </field>
+                <field>
+                    <name>VDVS</name>
+                    <position>24</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>VCDE</name>
+                    <position>23</position>
+                </field>
+                <field>
+                    <name>VCVD</name>
+                    <position>20</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>VDDE</name>
+                    <position>19</position>
+                </field>
+                <field>
+                    <name>VDVD</name>
+                    <position>16</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>BLEN</name>
+                    <position>15</position>
+                </field>
+                <field>
+                    <name>VCOE</name>
+                    <position>14</position>
+                </field>
+                <field>
+                    <name>LA6E</name>
+                    <position>13</position>
+                </field>
+                <field>
+                    <name>LA4E</name>
+                    <position>12</position>
+                </field>
+                <field>
+                    <name>IBIAS</name>
+                    <position>10</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>OSCFREQ</name>
+                    <position>8</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>DC1M</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>DC2M</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>BLVS</name>
+                    <position>3</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>VDV0</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>PWRM</name>
+                    <position>0</position>
+                    <width>2</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>LRADC</name>
+            <instance>
+                <name>LRADC</name>
+                <address>0x4</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_28</name>
+                    <position>28</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>REMOADC4</name>
+                    <position>24</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>RESERVED23_20</name>
+                    <position>22</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>BATADC6</name>
+                    <position>16</position>
+                    <width>6</width>
+                </field>
+                <field>
+                    <name>RESERVED15_14</name>
+                    <position>14</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>TEMPADC6</name>
+                    <position>8</position>
+                    <width>6</width>
+                </field>
+                <field>
+                    <name>RESERVED7_0</name>
+                    <position>0</position>
+                    <width>8</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>CHG</name>
+            <instance>
+                <name>CHG</name>
+                <address>0x8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>EN</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>CURRENT</name>
+                    <position>28</position>
+                    <width>3</width>
+                    <enum>
+                        <name>CURRENT_50mA</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_100mA</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_150mA</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_200mA</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_250mA</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_300mA</name>
+                        <value>0x5</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_400mA</name>
+                        <value>0x6</value>
+                    </enum>
+                    <enum>
+                        <name>CURRENT_500mA</name>
+                        <value>0x7</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>STAT</name>
+                    <position>27</position>
+                    <enum>
+                        <name>DISCHARGING</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>CHARGING</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CHGPHASE</name>
+                    <position>25</position>
+                    <width>2</width>
+                    <enum>
+                        <name>RESERVED</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PRECHARGE</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>CC</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>CV</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>RESERVED24_16</name>
+                    <position>16</position>
+                    <width>9</width>
+                </field>
+                <field>
+                    <name>PBLS</name>
+                    <position>15</position>
+                </field>
+                <field>
+                    <name>PPHS</name>
+                    <position>14</position>
+                </field>
+                <field>
+                    <name>RESERVED13</name>
+                    <position>13</position>
+                </field>
+                <field>
+                    <name>PDUT</name>
+                    <position>8</position>
+                    <width>5</width>
+                </field>
+                <field>
+                    <name>RESERVED7</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>BLV0</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>TMPSET</name>
+                    <position>4</position>
+                    <width>2</width>
+                    <enum>
+                        <name>TEMP_40C</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>TEMP_45C</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>TEMP_50C</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>TEMP_55C</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>LBNMIVS</name>
+                    <position>2</position>
+                    <width>2</width>
+                    <enum>
+                        <name>VOLTAGE_2_9</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_3_1</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_3_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_3_5</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>LBRVS</name>
+                    <position>0</position>
+                    <width>2</width>
+                    <enum>
+                        <name>VOLTAGE_2_7</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_2_9</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_3_1</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>VOLTAGE_3_3</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>RTCWDT</name>
+        <title>Real Time Clock, Timers and Watchdog</title>
+        <instance>
+            <name>RTC</name>
+            <address>0xb0018000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DHMS</name>
+            <instance>
+                <name>DHMS</name>
+                <address>0x4</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_27</name>
+                    <position>27</position>
+                    <width>5</width>
+                </field>
+                <field>
+                    <name>DAY</name>
+                    <position>24</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>RESERVED23_21</name>
+                    <position>21</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>HOUR</name>
+                    <position>16</position>
+                    <width>5</width>
+                </field>
+                <field>
+                    <name>RESERVED15_14</name>
+                    <position>14</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>MIN</name>
+                    <position>8</position>
+                    <width>6</width>
+                </field>
+                <field>
+                    <name>RESERVED7_6</name>
+                    <position>6</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>SEC</name>
+                    <position>0</position>
+                    <width>6</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>YMD</name>
+            <instance>
+                <name>YMD</name>
+                <address>0x8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>CENT</name>
+                    <position>24</position>
+                    <width>7</width>
+                </field>
+                <field>
+                    <name>RESERVED23</name>
+                    <position>23</position>
+                </field>
+                <field>
+                    <name>YEAR</name>
+                    <position>16</position>
+                    <width>7</width>
+                </field>
+                <field>
+                    <name>RESERVED15_12</name>
+                    <position>12</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>MON</name>
+                    <position>8</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>RESERVED7_5</name>
+                    <position>5</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>DATE</name>
+                    <position>0</position>
+                    <width>5</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>DHMSALM</name>
+            <instance>
+                <name>DHMSALM</name>
+                <address>0xc</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_21</name>
+                    <position>21</position>
+                    <width>11</width>
+                </field>
+                <field>
+                    <name>HOURAL</name>
+                    <position>16</position>
+                    <width>5</width>
+                </field>
+                <field>
+                    <name>RESERVED15_14</name>
+                    <position>14</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>MINAL</name>
+                    <position>8</position>
+                    <width>6</width>
+                </field>
+                <field>
+                    <name>RESERVED7_6</name>
+                    <position>6</position>
+                    <width>2</width>
+                </field>
+                <field>
+                    <name>SECAL</name>
+                    <position>0</position>
+                    <width>6</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>YMDALM</name>
+            <instance>
+                <name>YMDALM</name>
+                <address>0x10</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_23</name>
+                    <position>23</position>
+                    <width>9</width>
+                </field>
+                <field>
+                    <name>YEARAL</name>
+                    <position>16</position>
+                    <width>7</width>
+                </field>
+                <field>
+                    <name>RESERVED15_12</name>
+                    <position>12</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>MONAL</name>
+                    <position>8</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>RESERVED7_5</name>
+                    <position>5</position>
+                    <width>3</width>
+                </field>
+                <field>
+                    <name>DATEAL</name>
+                    <position>0</position>
+                    <width>5</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>WDCTL</name>
+            <instance>
+                <name>WDCTL</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>TxCTL</name>
+            <instance>
+                <name>T0CTL</name>
+                <address>0x18</address>
+            </instance>
+            <instance>
+                <name>T1CTL</name>
+                <address>0x20</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>Tx</name>
+            <instance>
+                <name>T0</name>
+                <address>0x1c</address>
+            </instance>
+            <instance>
+                <name>T1</name>
+                <address>0x24</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>SD</name>
+        <title>SD/MMC Interface</title>
+        <instance>
+            <name>SD</name>
+            <address>0xb00b0000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMDRSP</name>
+            <instance>
+                <name>CMDRSP</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>RW</name>
+            <instance>
+                <name>RW</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FIFOCTL</name>
+            <instance>
+                <name>FIFOCTL</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMD</name>
+            <instance>
+                <name>CMD</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ARG</name>
+            <instance>
+                <name>ARG</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CRC7</name>
+            <instance>
+                <name>CRC7</name>
+                <address>0x18</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>RSPBUFx</name>
+            <instance>
+                <name>RSPBUF0</name>
+                <address>0x1c</address>
+            </instance>
+            <instance>
+                <name>RSPBUF1</name>
+                <address>0x20</address>
+            </instance>
+            <instance>
+                <name>RSPBUF2</name>
+                <address>0x24</address>
+            </instance>
+            <instance>
+                <name>RSPBUF3</name>
+                <address>0x28</address>
+            </instance>
+            <instance>
+                <name>RSPBUF4</name>
+                <address>0x2c</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DAT</name>
+            <instance>
+                <name>DAT</name>
+                <address>0x30</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CLK</name>
+            <instance>
+                <name>CLK</name>
+                <address>0x34</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>BYTECNT</name>
+            <instance>
+                <name>BYTECNT</name>
+                <address>0x38</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>SDR</name>
+        <title>SDRAM Interface</title>
+        <instance>
+            <name>SDR</name>
+            <address>0xb0070000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>ADDRCFG</name>
+            <instance>
+                <name>ADDRCFG</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>EN</name>
+            <instance>
+                <name>EN</name>
+                <address>0x8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED31_1</name>
+                    <position>1</position>
+                    <width>31</width>
+                </field>
+                <field>
+                    <name>EN</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>CMD</name>
+            <instance>
+                <name>CMD</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>STAT</name>
+            <instance>
+                <name>STAT</name>
+                <address>0x10</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>RFSH</name>
+            <instance>
+                <name>RFSH</name>
+                <address>0x14</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>MODE</name>
+            <instance>
+                <name>MODE</name>
+                <address>0x18</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>MOBILE</name>
+            <instance>
+                <name>MOBILE</name>
+                <address>0x1c</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>SPDIF</name>
+        <title>Sony Philips Digital Interface</title>
+        <instance>
+            <name>SPDIF</name>
+            <address>0xb0140000</address>
+        </instance>
+    </node>
+    <node>
+        <name>SPI</name>
+        <instance>
+            <name>SPI</name>
+            <address>0xb0190000</address>
+        </instance>
+    </node>
+    <node>
+        <name>SRAMOC</name>
+        <title>SRAM on Chip</title>
+        <instance>
+            <name>SRAMOC</name>
+            <address>0xb0030000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>STAT</name>
+            <instance>
+                <name>STAT</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
+    <node>
+        <name>TP</name>
+        <instance>
+            <name>TP</name>
+            <address>0xb0120000</address>
+        </instance>
+    </node>
+    <node>
+        <name>UART</name>
+        <instance>
+            <name>UART</name>
+            <range>
+                <first>1</first>
+                <address>0xb0160000</address>
+                <address>0xb0160020</address>
+            </range>
+        </instance>
+    </node>
+    <node>
+        <name>UDC</name>
+        <title>Usb Device Controller</title>
+        <desc>CAST cusb2-otg IP core</desc>
+        <instance>
+            <name>UDC</name>
+            <address>0xb00e0000</address>
+        </instance>
+        <node>
+            <name>EP0BC</name>
+            <instance>
+                <name>OUT0BC</name>
+                <address>0x0</address>
+            </instance>
+            <instance>
+                <name>IN0BC</name>
+                <address>0x1</address>
+            </instance>
+            <register>
+                <desc>ep0 byte count register</desc>
+                <field>
+                    <name>RESERVED</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>BC</name>
+                    <position>0</position>
+                    <width>8</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>EP0CS</name>
+            <instance>
+                <name>EP0CS</name>
+                <address>0x2</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED</name>
+                    <position>8</position>
+                    <width>24</width>
+                </field>
+                <field>
+                    <name>OUT_BUSY</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>IN_BUSY</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>NAK</name>
+                    <desc>Writing 1 clears</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>STALL</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>BCL</name>
+            <instance>
+                <name>OUT1BCL</name>
+                <address>0x8</address>
+            </instance>
+            <instance>
+                <name>IN1BCL</name>
+                <address>0xc</address>
+            </instance>
+            <instance>
+                <name>OUT2BCL</name>
+                <address>0x10</address>
+            </instance>
+            <instance>
+                <name>IN2BCL</name>
+                <address>0x14</address>
+            </instance>
+            <register>
+                <desc>Endpoint byte count LSB register</desc>
+            </register>
+        </node>
+        <node>
+            <name>BCH</name>
+            <instance>
+                <name>OUT1BCH</name>
+                <address>0x9</address>
+            </instance>
+            <instance>
+                <name>IN1BCH</name>
+                <address>0xd</address>
+            </instance>
+            <instance>
+                <name>OUT2BCH</name>
+                <address>0x11</address>
+            </instance>
+            <instance>
+                <name>IN2BCH</name>
+                <address>0x15</address>
+            </instance>
+            <register>
+                <desc>Endpoint byte count MSB</desc>
+            </register>
+        </node>
+        <node>
+            <name>CON</name>
+            <instance>
+                <name>OUT1CON</name>
+                <address>0xa</address>
+            </instance>
+            <instance>
+                <name>IN1CON</name>
+                <address>0xe</address>
+            </instance>
+            <instance>
+                <name>OUT2CON</name>
+                <address>0x12</address>
+            </instance>
+            <instance>
+                <name>IN2CON</name>
+                <address>0x16</address>
+            </instance>
+            <register>
+                <desc>Endpoint configuration register</desc>
+                <field>
+                    <name>EP_ENABLE</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>STALL</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>EP_TYPE</name>
+                    <position>2</position>
+                    <width>2</width>
+                    <enum>
+                        <name>RESERVED</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>ISOCHRONOUS</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BULK</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>INTERRUPT</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>SUBFIFOS</name>
+                    <position>0</position>
+                    <width>2</width>
+                    <enum>
+                        <name>SINGLE</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>DOUBLE</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>TRIPLE</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>QUAD</name>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>CS</name>
+            <instance>
+                <name>OUT1CS</name>
+                <address>0xb</address>
+            </instance>
+            <instance>
+                <name>IN1CS</name>
+                <address>0xf</address>
+            </instance>
+            <instance>
+                <name>OUT2CS</name>
+                <address>0x13</address>
+            </instance>
+            <instance>
+                <name>IN2CS</name>
+                <address>0x17</address>
+            </instance>
+            <register>
+                <desc>Endpoint status register</desc>
+                <field>
+                    <name>AUTO</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>NPACK1</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>NPACK0</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>BUSY</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>ERROR</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>FIFODAT</name>
+            <instance>
+                <name>FIFO1DAT</name>
+                <address>0x84</address>
+            </instance>
+            <instance>
+                <name>FIFO2DAT</name>
+                <address>0x88</address>
+            </instance>
+            <register>
+                <desc>Endpoint FIFO</desc>
+            </register>
+        </node>
+        <node>
+            <name>EP0DAT</name>
+            <instance>
+                <name>EP0INDAT</name>
+                <address>0x100</address>
+            </instance>
+            <instance>
+                <name>EP0OUTDAT</name>
+                <address>0x140</address>
+            </instance>
+            <register>
+                <desc>Endpoint 0 buffers each 64 bytes long.</desc>
+            </register>
+        </node>
+        <node>
+            <name>SETUPDAT</name>
+            <instance>
+                <name>SETUPDAT</name>
+                <address>0x180</address>
+            </instance>
+            <register>
+                <desc>SETUP packet buffer</desc>
+            </register>
+        </node>
+        <node>
+            <name>EPIRQ</name>
+            <instance>
+                <name>IN04IRQ</name>
+                <address>0x188</address>
+            </instance>
+            <instance>
+                <name>OUT04IRQ</name>
+                <address>0x18a</address>
+            </instance>
+            <register>
+                <desc>Endpoint irq flag register</desc>
+                <field>
+                    <name>EP_NUM</name>
+                    <position>0</position>
+                    <width>3</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>USBIRQ</name>
+            <instance>
+                <name>USBIRQ</name>
+                <address>0x18c</address>
+            </instance>
+            <register>
+                <desc>General usb core irq flags</desc>
+                <field>
+                    <name>HS</name>
+                    <desc>Enter high speed operation. Set by core on connection.</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>RESET</name>
+                    <desc>Asserted on usb reset.</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>SUSPEND</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>SETUP_TOKEN</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>SOF</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>SETUP_DATA</name>
+                    <desc>Setup data are ready to be accessed in SETUPDAT buffer.</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>EPIEN</name>
+            <instance>
+                <name>IN04IEN</name>
+                <address>0x194</address>
+            </instance>
+            <instance>
+                <name>OUT04IEN</name>
+                <address>0x196</address>
+            </instance>
+            <register>
+                <desc>Endpoint interrupt enable register</desc>
+                <field>
+                    <name>EP_NUM</name>
+                    <position>0</position>
+                    <width>3</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>USBIEN</name>
+            <instance>
+                <name>USBIEN</name>
+                <address>0x198</address>
+            </instance>
+            <register>
+                <desc>General usb interrupts enable register</desc>
+                <field>
+                    <name>HS</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>RESET</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>SUSPEND</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>SETUP_TOKEN</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>SOF</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>SETUP_DATA</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>IVECT</name>
+            <instance>
+                <name>IVECT</name>
+                <address>0x1a0</address>
+            </instance>
+            <register>
+                <desc>Interrupt vector register
+known (guessed) values:
+0x00 - SETUP
+0x10 - RESET
+0x14 - HS
+0x28 - EPs
+0xD8 - OTG</desc>
+            </register>
+        </node>
+        <node>
+            <name>ENDPRST</name>
+            <instance>
+                <name>ENDPRST</name>
+                <address>0x1a2</address>
+            </instance>
+            <register>
+                <desc>Endpoint reset register</desc>
+                <field>
+                    <name>FIFO_RESET</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>TOGGLE_RESET</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>DIR</name>
+                    <position>4</position>
+                    <enum>
+                        <name>OUT</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>IN</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>EP_NUM</name>
+                    <position>0</position>
+                    <width>3</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>USBCS</name>
+            <instance>
+                <name>USBCS</name>
+                <address>0x1a3</address>
+            </instance>
+            <register>
+                <field>
+                    <name>SOFT_CONNECT</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>SIGRESUME</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>USBSPEED</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>HCLSMODE</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>FIFOCTRL</name>
+            <instance>
+                <name>FIFOCTRL</name>
+                <address>0x1a8</address>
+            </instance>
+            <register>
+                <field>
+                    <name>CPU_ACCESS</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>DMA</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>DIR</name>
+                    <position>4</position>
+                    <enum>
+                        <name>OUT</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>IN</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>EP_NUM</name>
+                    <position>0</position>
+                    <width>3</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>OTGIRQ</name>
+            <instance>
+                <name>OTGIRQ</name>
+                <address>0x1bc</address>
+            </instance>
+            <register>
+                <field>
+                    <name>PERIPH</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>VBUSERR</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>LOCSOFT</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>SPRDET</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>OTG_IDLE</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>OTGSTATUS</name>
+            <instance>
+                <name>OTGSTATUS</name>
+                <address>0x1bf</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>OTGIEN</name>
+            <instance>
+                <name>OTGIEN</name>
+                <address>0x1c0</address>
+            </instance>
+            <register>
+                <desc>OTG interrupt enable register</desc>
+            </register>
+        </node>
+        <node>
+            <name>HCMAXPCKL</name>
+            <instance>
+                <name>HCIN1MAXPCKL</name>
+                <address>0x1e2</address>
+            </instance>
+            <instance>
+                <name>HCOUT2MAXPCKL</name>
+                <address>0x3e4</address>
+            </instance>
+            <register>
+                <desc>High speed max packed size LSB</desc>
+            </register>
+        </node>
+        <node>
+            <name>STADDR</name>
+            <instance>
+                <name>OUT1STADDR</name>
+                <address>0x304</address>
+            </instance>
+            <instance>
+                <name>IN2STADDR</name>
+                <address>0x348</address>
+            </instance>
+            <register>
+                <desc>Endpoint buffer start address</desc>
+            </register>
+        </node>
+        <node>
+            <name>USBEIRQ</name>
+            <instance>
+                <name>USBEIRQ</name>
+                <address>0x400</address>
+            </instance>
+            <register>
+                <desc>USB extended irq register</desc>
+                <field>
+                    <name>USB</name>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>WAKEUP</name>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>RESUME</name>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>CONDISCON</name>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>USBIEN</name>
+                    <position>3</position>
+                </field>
+                <field>
+                    <name>WAKEUPIEN</name>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>RESUMEIEN</name>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>CONDISCONIEN</name>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>USBERST</name>
+            <instance>
+                <name>USBERST</name>
+                <address>0x404</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DMAEPSEL</name>
+            <instance>
+                <name>DMAEPSEL</name>
+                <address>0x40c</address>
+            </instance>
+            <register>
+                <field>
+                    <name>EP_SEL</name>
+                    <position>0</position>
+                    <width>32</width>
+                    <enum>
+                        <name>UNKNOWN</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>EP1_IN</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>EP1_OUT</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>EP2_IN</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>EP2_OUT</name>
+                        <value>0xc</value>
+                    </enum>
+                </field>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>YUV2RGB</name>
+        <title>Color Space Conversion Accelerator</title>
+        <instance>
+            <name>YUV2RGB</name>
+            <address>0xb00f0000</address>
+        </instance>
+        <node>
+            <name>CTL</name>
+            <instance>
+                <name>CTL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <field>
+                    <name>RESERVED</name>
+                    <position>22</position>
+                    <width>10</width>
+                </field>
+                <field>
+                    <name>RFBM</name>
+                    <desc>Read fifo block mode.</desc>
+                    <position>21</position>
+                </field>
+                <field>
+                    <name>WFBM</name>
+                    <desc>Write fifo block mode</desc>
+                    <position>20</position>
+                </field>
+                <field>
+                    <name>EN</name>
+                    <desc>RGB Decoder enable.</desc>
+                    <position>19</position>
+                </field>
+                <field>
+                    <name>FES</name>
+                    <desc>Fifo empty status.</desc>
+                    <position>18</position>
+                </field>
+                <field>
+                    <name>WDCS</name>
+                    <desc>Write Data/Command Select</desc>
+                    <position>16</position>
+                    <width>2</width>
+                    <enum>
+                        <name>CMD</name>
+                        <desc>Write LCD register address</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>DATA</name>
+                        <desc>Write LCD register data</desc>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>RGB</name>
+                        <desc>RGB565 Data FrameBuffer Transfer</desc>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>YUV</name>
+                        <desc>YCbCr/YUV Data FrameBuffer Transfer</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>DEST</name>
+                    <desc>RGB Decoder Destination.</desc>
+                    <position>15</position>
+                </field>
+                <field>
+                    <name>FORMATS</name>
+                    <desc>RGB Format</desc>
+                    <position>11</position>
+                    <width>3</width>
+                    <enum>
+                        <name>RGB565_1</name>
+                        <desc>16bit (RGB 565 1transfer)</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>RGB666_1</name>
+                        <desc>18bit (RGB 666 1transfer)</desc>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>RGB565_2</name>
+                        <desc>8bit (RGB 565 2transfers)</desc>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>RGB666_2</name>
+                        <desc>9bit (RGB 666 2transfers)</desc>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>RGB888_3</name>
+                        <desc>8bit (RGB 888 3transfers)</desc>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>RGB666_3</name>
+                        <desc>6bit (RGB 666 3transfers)</desc>
+                        <value>0x5</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>SEQ</name>
+                    <desc>RGB Sequence</desc>
+                    <position>10</position>
+                    <enum>
+                        <name>RGB</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BGR</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>FWCS</name>
+                    <desc>FIFO write channel select.</desc>
+                    <position>9</position>
+                    <enum>
+                        <name>SPECIAL</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>AHB</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>FRCS</name>
+                    <desc>FIFO read channel select</desc>
+                    <position>8</position>
+                    <enum>
+                        <name>SPECIAL</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>AHB</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>EMDE</name>
+                    <desc>FIFO Empty (Write) DRQ Enable.</desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>EMIE</name>
+                    <desc>FIFO Empty (Write) IRQ Enable.</desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>FUDE</name>
+                    <desc>FIFO Full (Read) DRQ Enable.</desc>
+                    <position>5</position>
+                </field>
+                <field>
+                    <name>FUIE</name>
+                    <desc>FIFO Full (Read) IRQ Enable.</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>EMCO</name>
+                    <desc>FIFO Empty (Write) Condition.</desc>
+                    <position>3</position>
+                    <enum>
+                        <name>EMPTY_4_8</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>EMPTY_0_8</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>EMIP</name>
+                    <desc>FIFO Empty (Write) IRQ Pending Bit.</desc>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>FUIP</name>
+                    <desc>FIFO Full (Read) IRQ Pending Bit.</desc>
+                    <position>1</position>
+                </field>
+                <field>
+                    <name>ERP</name>
+                    <desc>FIFO Error Pending Bit.  Write 1 to the bit to clear it and reset the FIFO.</desc>
+                    <position>0</position>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>FIFODATA</name>
+            <instance>
+                <name>FIFODATA</name>
+                <address>0x4</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CLKCTL</name>
+            <instance>
+                <name>CLKCTL</name>
+                <address>0x8</address>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FRAMECOUNT</name>
+            <instance>
+                <name>FRAMECOUNT</name>
+                <address>0xc</address>
+            </instance>
+            <register/>
+        </node>
+    </node>
 </soc>
