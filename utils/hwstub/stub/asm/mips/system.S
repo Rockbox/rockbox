@@ -25,6 +25,7 @@
  * the code can register a "longjmp" buffer to restore the context in case of
  * fault */
 .data
+.align 4
 .global exception_jmp_ctx_ptr
 exception_jmp_ctx_ptr:
 /* buffer contains in order: s0-s7, sp, s8, ra */
@@ -56,19 +57,19 @@ set_exception_jmp:
  * a0: exception type (EXCEPTION_*) */
 .global restore_exception_jmp
 restore_exception_jmp:
-    la k1, exception_jmp_ctx_ptr
-    lw s0,  0(k1)
-    lw s1,  4(k1)
-    lw s2,  8(k1)
-    lw s3, 12(k1)
-    lw s4, 16(k1)
-    lw s5, 20(k1)
-    lw s6, 24(k1)
-    lw s7, 28(k1)
-    lw sp, 32(k1)
-    lw s8, 36(k1)
-    lw k1, 40(k1)
-    mtc0 k1, C0_EPC
+    la v0, exception_jmp_ctx_ptr
+    lw s0,  0(v0)
+    lw s1,  4(v0)
+    lw s2,  8(v0)
+    lw s3, 12(v0)
+    lw s4, 16(v0)
+    lw s5, 20(v0)
+    lw s6, 24(v0)
+    lw s7, 28(v0)
+    lw sp, 32(v0)
+    lw s8, 36(v0)
+    lw v0, 40(v0)
+    mtc0 v0, C0_EPC
 #ifdef CONFIG_JZ4760B
     /* XBurst has a 3 interlock cycle delay, but we don't know if the interlock
      * works with eret */
