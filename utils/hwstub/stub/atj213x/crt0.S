@@ -140,66 +140,27 @@ stack_munge_loop:
     .section .exception.tlb_refill,"ax",%progbits
 
 tlb_refill_handler:
-    la k1, exception_jmp_ctx_ptr
-    lw s0,  0(k1)
-    lw s1,  4(k1)
-    lw s2,  8(k1)
-    lw s3, 12(k1)
-    lw s4, 16(k1)
-    lw s5, 20(k1)
-    lw s6, 24(k1)
-    lw s7, 28(k1)
-    lw sp, 32(k1)
-    lw s8, 36(k1)
-    lw k1, 40(k1)
-    mtc0 k1, C0_EPC
-    ehb
-    li v0, EXCEPTION_ADDR
-    eret
+    li a0, EXCEPTION_ADDR
+    la k0, restore_exception_jmp
+    jr k0
     nop
 
     .global cache_error_handler
     .section .exception.cache_error,"ax",%progbits
 
 cache_error_handler:
-    la k1, exception_jmp_ctx_ptr
-    lw s0,  0(k1)
-    lw s1,  4(k1)
-    lw s2,  8(k1)
-    lw s3, 12(k1)
-    lw s4, 16(k1)
-    lw s5, 20(k1)
-    lw s6, 24(k1)
-    lw s7, 28(k1)
-    lw sp, 32(k1)
-    lw s8, 36(k1)
-    lw k1, 40(k1)
-    mtc0 k1, C0_EPC
-    ehb
-    li v0, EXCEPTION_ADDR
-    eret
+    li a0, EXCEPTION_ADDR
+    la k0, restore_exception_jmp
+    jr k0
     nop
 
     .global general_exception_handler
     .section .exception.general_exception,"ax",%progbits
 
 general_exception_handler:
-    la k1, exception_jmp_ctx_ptr
-    lw s0,  0(k1)
-    lw s1,  4(k1)
-    lw s2,  8(k1)
-    lw s3, 12(k1)
-    lw s4, 16(k1)
-    lw s5, 20(k1)
-    lw s6, 24(k1)
-    lw s7, 28(k1)
-    lw sp, 32(k1)
-    lw s8, 36(k1)
-    lw k1, 40(k1)
-    mtc0 k1, C0_EPC
-    ehb
-    li v0, EXCEPTION_UNSP
-    eret
+    li a0, EXCEPTION_UNSP
+    la k0, restore_exception_jmp
+    jr k0
     nop
 
 /* s0-s7 not saved as this are callee saved registers
