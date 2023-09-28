@@ -130,38 +130,34 @@ stack_munge_loop:
     bne t0, sp, stack_munge_loop
     addiu t0, 4
 
+    # setup Global Pointer
+    la gp, _gp
+
     # jump to C code with enabled interrupts
     la t0, main
     jr.hb t0
     ei
 
-    .extern exception_jmp_ctx_ptr
     .global tlb_refill_handler
     .section .exception.tlb_refill,"ax",%progbits
 
 tlb_refill_handler:
+    j restore_exception_jmp
     li a0, EXCEPTION_ADDR
-    la k0, restore_exception_jmp
-    jr k0
-    nop
 
     .global cache_error_handler
     .section .exception.cache_error,"ax",%progbits
 
 cache_error_handler:
+    j restore_exception_jmp
     li a0, EXCEPTION_ADDR
-    la k0, restore_exception_jmp
-    jr k0
-    nop
 
     .global general_exception_handler
     .section .exception.general_exception,"ax",%progbits
 
 general_exception_handler:
+    j restore_exception_jmp
     li a0, EXCEPTION_UNSP
-    la k0, restore_exception_jmp
-    jr k0
-    nop
 
 /* s0-s7 not saved as this are callee saved registers
  * CO_STATUS is not saved as nested interrupts are not supported
@@ -249,8 +245,6 @@ restore:
     addiu sp, sp, 84
     move sp, k1
     eret
-    nop
 
     .set reorder
     .set at
-

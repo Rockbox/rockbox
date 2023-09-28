@@ -8,7 +8,7 @@ AS=$(PREFIX)gcc
 OC=$(PREFIX)objcopy
 DEFINES=
 INCLUDES=-I$(CURDIR)
-GCCOPTS=-march=mips32r2 -G0 -msoft-float
+GCCOPTS=-Os -march=mips32r2 -G128 -msoft-float
 BUILD_DIR=$(CURDIR)/build/
 ROOT_DIR=$(CURDIR)/..
 

@@ -28,6 +28,11 @@ SECTIONS
             *(.rodata*)
 	    *(.data*)
             *(.rel.dyn)
+
+            . = ALIGN(8);
+            _gp = ABSOLUTE(. + 0x7ff0);
+
+            *(.sdata*)
 	} > IRAM
 
   .bss (NOLOAD) :
