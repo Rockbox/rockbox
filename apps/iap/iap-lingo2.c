@@ -187,6 +187,17 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
                     REMOTE_BUTTON(BUTTON_RC_RIGHT);
                 if(buf[4] & 32) /* frwd */
                     REMOTE_BUTTON(BUTTON_RC_LEFT);
+                if(buf[4] & 64) /* menu */
+                    REMOTE_BUTTON(BUTTON_RC_MENU);
+                if(buf[4] & 128) /* select */
+                    REMOTE_BUTTON(BUTTON_RC_SELECT);
+            }
+            else if(len >= 6 && buf[5] != 0)
+            {
+                if(buf[5] & 1) /* up */
+                    REMOTE_BUTTON(BUTTON_RC_UP);
+                if (buf[5] & 2) /* down */
+                    REMOTE_BUTTON(BUTTON_RC_DOWN);
             }
 
             /* power on released */
