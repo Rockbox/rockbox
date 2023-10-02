@@ -23,7 +23,7 @@
 #include "kernel.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
+//#define LOGF_ENABLE
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
@@ -314,7 +314,7 @@ void pcm_play_stop(void)
  * what pcm_apply_settings will set */
 void pcm_set_frequency(unsigned int samplerate)
 {
-    logf("pcm_set_frequency");
+    logf("pcm_set_frequency %u", samplerate);
 
     int index;
 

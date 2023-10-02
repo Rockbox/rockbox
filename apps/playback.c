@@ -202,6 +202,7 @@ static enum filling_state
     STATE_FINISHED, /* all remaining tracks are fully buffered */
     STATE_ENDING,   /* audio playback is ending */
     STATE_ENDED,    /* audio playback is done */
+    STATE_STOPPED,  /* buffering is stopped explicitly */
 } filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
@@ -349,7 +350,6 @@ enum audio_start_playback_flags
 {
     AUDIO_START_RESTART = 0x1, /* "Restart" playback (flush _all_ tracks) */
     AUDIO_START_NEWBUF  = 0x2, /* Mark the audiobuffer as invalid */
-    AUDIO_START_REFRESH = 0x80
 };
 
 static void audio_start_playback(const struct audio_resume_info *resume_info,
@@ -2055,6 +2055,10 @@ static int audio_load_track(void)
     return LOAD_TRACK_OK;
 }
 
+#ifdef HAVE_PLAY_FREQ
+static bool audio_auto_change_frequency(struct mp3entry *id3, bool play);
+#endif
+
 /* Second part of the track loading: We now have the metadata available, so we
    can load the codec, the album art and finally the audio data.
    This is called on the audio thread after the buffering thread calls the
@@ -2087,6 +2091,24 @@ static int audio_finish_load_track(struct track_info *infop)
         goto audio_finish_load_track_exit;
     }
 
+    struct track_info user_cur;
+
+#ifdef HAVE_PLAY_FREQ
+    track_list_user_current(0, &user_cur);
+    bool is_current_user = infop->self_hid == user_cur.self_hid;
+    if (audio_auto_change_frequency(track_id3, is_current_user))
+    {
+        // frequency switch requires full re-buffering, so stop buffering
+        filling = STATE_STOPPED;
+        logf("buffering stopped (current_track: %b, current_user: %b)", infop->self_hid == cur_info.self_hid, is_current_user);
+        if (is_current_user)
+            // audio_finish_load_track_exit not needed as playback restart is already initiated
+            return trackstat;
+
+        goto audio_finish_load_track_exit;
+    }
+#endif
+
     /* Try to load a cuesheet for the track */
     if (!audio_load_cuesheet(infop, track_id3))
     {
@@ -2113,7 +2135,6 @@ static int audio_finish_load_track(struct track_info *infop)
     /* All handles available to external routines are ready - audio and codec
        information is private */
 
-    struct track_info user_cur;
     track_list_user_current(0, &user_cur);
     if (infop->self_hid == user_cur.self_hid)
     {
@@ -2241,7 +2262,7 @@ audio_finish_load_track_exit:
         playlist_peek_offset--;
     }
 
-    if (filling != STATE_FULL)
+    if (filling != STATE_FULL && filling != STATE_STOPPED)
     {
         /* Load next track - error or not */
         track_list.in_progress_hid = 0;
@@ -2566,6 +2587,11 @@ static void audio_finalise_track_change(void)
     id3_mutex_unlock();
 
     audio_playlist_track_change();
+
+#ifdef HAVE_PLAY_FREQ
+    if (filling == STATE_STOPPED)
+        audio_auto_change_frequency(track_id3, true);
+#endif
 }
 
 /* Actually begin a transition and take care of the codec change - may complete
@@ -2667,7 +2693,7 @@ static void audio_on_codec_complete(int status)
     struct track_info info;
     bool have_track = track_list_advance_current(1, &info);
 
-    if (!have_track || info.audio_hid < 0)
+    if (!have_track || (info.audio_hid < 0 && filling != STATE_STOPPED))
     {
         bool end_of_playlist = false;
 
@@ -2764,18 +2790,15 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     static struct audio_resume_info resume = { 0, 0 };
     enum play_status old_status = play_status;
 
-    if (!(flags & AUDIO_START_REFRESH))
+    if (resume_info)
     {
-        if (resume_info)
-        {
-            resume.elapsed = resume_info->elapsed;
-            resume.offset = resume_info->offset;
-        }
-        else
-        {
-            resume.elapsed = 0;
-            resume.offset = 0;
-        }
+        resume.elapsed = resume_info->elapsed;
+        resume.offset = resume_info->offset;
+    }
+    else
+    {
+        resume.elapsed = 0;
+        resume.offset = 0;
     }
 
     if (flags & AUDIO_START_NEWBUF)
@@ -2802,11 +2825,8 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
                left off */
             pcmbuf_play_stop();
 
-            if (!(flags & AUDIO_START_REFRESH))
-            {
-                resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
-                resume.offset = id3_get(PLAYING_ID3)->offset;
-            }
+            resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
+            resume.offset = id3_get(PLAYING_ID3)->offset;
 
             track_list_clear(TRACK_LIST_CLEAR_ALL);
             pcmbuf_update_frequency();
@@ -3425,7 +3445,7 @@ void audio_playback_handler(struct queue_event *ev)
         case Q_AUDIO_REMAKE_AUDIO_BUFFER:
             /* buffer needs to be reinitialized */
             LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
-            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF | (ev->data ? AUDIO_START_REFRESH : 0));
+            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
             if (play_status == PLAY_STOPPED)
                 return; /* just need to change buffer state */
             break;
@@ -3465,6 +3485,7 @@ void audio_playback_handler(struct queue_event *ev)
             }
             /* Fall-through */
         case STATE_FINISHED:
+        case STATE_STOPPED:
             /* All data was buffered */
             cancel_cpu_boost();
             /* Fall-through */
@@ -4029,37 +4050,22 @@ static unsigned long audio_guess_frequency(struct mp3entry *id3)
     }
 }
 
-static void audio_change_frequency_callback(unsigned short id, void *data)
+static bool audio_auto_change_frequency(struct mp3entry *id3, bool play)
 {
-    static bool starting_playback = false;
-    struct mp3entry *id3;
-
-    switch (id)
+    unsigned long guessed_frequency = global_settings.play_frequency == 0 ? audio_guess_frequency(id3) : 0;
+    if (guessed_frequency && mixer_get_frequency() != guessed_frequency)
     {
-    case PLAYBACK_EVENT_START_PLAYBACK:
-        starting_playback = true;
-        break;
+        if (!play)
+            return true;
 
-    case PLAYBACK_EVENT_TRACK_CHANGE:
-        id3 = ((struct track_event *)data)->id3;
-        if (id3 && !global_settings.play_frequency)
-        {
-            unsigned long guessed_frequency = audio_guess_frequency(id3);
-            if (mixer_get_frequency() != guessed_frequency)
-            {
 #ifdef PLAYBACK_VOICE
-                voice_stop();
+        voice_stop();
 #endif
-                mixer_set_frequency(guessed_frequency);
-                audio_queue_post(Q_AUDIO_REMAKE_AUDIO_BUFFER, starting_playback);
-            }
-        }
-        starting_playback = false;
-        break;
-
-    default:
-        break;
+        mixer_set_frequency(guessed_frequency);
+        audio_queue_post(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
+        return true;
     }
+    return false;
 }
 
 void audio_set_playback_frequency(unsigned int sample_rate_hz)
@@ -4124,10 +4130,6 @@ void INIT_ATTR playback_init(void)
     track_list_init();
     buffering_init();
     pcmbuf_update_frequency();
-#ifdef HAVE_PLAY_FREQ
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_change_frequency_callback);
-    add_event(PLAYBACK_EVENT_START_PLAYBACK, audio_change_frequency_callback);
-#endif
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
