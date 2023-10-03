@@ -127,6 +127,8 @@ enum codec_status codec_run(void)
                 set_elapsed_samples(samplesdone);
 
             ci->seek_complete();
+            if (i >= demux_res.num_sample_byte_sizes)
+                break;
         }
 
         /* Request the required number of bytes from the input buffer */

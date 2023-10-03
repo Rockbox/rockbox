@@ -185,6 +185,8 @@ enum codec_status codec_run(void)
             }
             NeAACDecPostSeekReset(decoder, i);
             ci->seek_complete();
+            if (i >= demux_res.num_sample_byte_sizes)
+                break;
         }
 
         action = CODEC_ACTION_NULL;
