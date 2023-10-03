@@ -55,6 +55,7 @@
  *
  */
 
+
 /*#define LOGF_ENABLE*/
 /*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */
 
@@ -174,7 +175,9 @@ static const char tagcache_thread_name[] = "tagcache";
 
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAGCACHE_BUFSZ];
-
+/* Shared buffer for several build_index fns to reduce stack usage */
+static char build_idx_buf[TAGCACHE_BUFSZ];
+static const long build_idx_bufsz = sizeof(build_idx_buf);
 /* Used when removing duplicates. */
 static char *tempbuf;     /* Allocated when needed. */
 static long tempbufidx;   /* Current location in buffer. */
@@ -355,11 +358,10 @@ static inline void tcrc_buffer_unlock(void)
  * Full tag entries stored in a temporary file waiting
  * for commit to the cache. */
 struct temp_file_entry {
-    long tag_offset[TAG_COUNT];
-    short tag_length[TAG_COUNT];
-    long flag;
-
-    long data_length;
+    int32_t tag_offset[TAG_COUNT];
+    int16_t tag_length[TAG_COUNT];
+    int32_t flag;
+    int32_t data_length;
 };
 
 struct tempbuf_id_list {
@@ -394,43 +396,6 @@ static bool delete_entry(long idx_id);
 static inline void str_setlen(char *buf, size_t len)
 {
     buf[len] = '\0';
-}
-
-static void allocate_tempbuf(void)
-{
-    /* Yeah, malloc would be really nice now :) */
-    size_t size;
-    tempbuf_size = 0;
-
-#ifdef __PCTOOL__
-    size = 32*1024*1024;
-    tempbuf = malloc(size);
-    if (tempbuf)
-        tempbuf_size = size;
-#else /* !__PCTOOL__ */
-    /* Need to pass dummy ops to prevent the buffer being moved
-     * out from under us, since we yield during the tagcache commit. */
-    tempbuf_handle = core_alloc_maximum(&size, &buflib_ops_locked);
-    if (tempbuf_handle > 0)
-    {
-        tempbuf = core_get_data(tempbuf_handle);
-        tempbuf_size = size;
-    }
-#endif /* __PCTOOL__ */
-}
-
-static void free_tempbuf(void)
-{
-    if (tempbuf_size == 0)
-        return ;
-
-#ifdef __PCTOOL__
-    free(tempbuf);
-#else
-    tempbuf_handle = core_free(tempbuf_handle);
-#endif
-    tempbuf = NULL;
-    tempbuf_size = 0;
 }
 
 const char* tagcache_tag_to_str(int tag)
@@ -631,8 +596,8 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
                       tc_stat.db_path, tag);
     if (fd < 0)
     {
-        logf("tag file open failed: tag=%d write=%d file= " TAGCACHE_FILE_INDEX,
-             tag, write, tag);
+        logf("%s failed: tag=%d write=%d file= " TAGCACHE_FILE_INDEX,
+             __func__, tag, write, tag);
         tc_stat.ready = false;
         return fd;
     }
@@ -693,6 +658,85 @@ static int open_master_fd(struct master_header *hdr, bool write)
     return fd;
 }
 
+static void remove_files(void)
+{
+    int i;
+    char buf[MAX_PATH];
+    const int bufsz = sizeof(buf);
+    logf("%s", __func__);
+
+    tc_stat.ready = false;
+    tc_stat.ramcache = false;
+    tc_stat.econ = false;
+    remove_db_file(TAGCACHE_FILE_MASTER);
+    for (i = 0; i < TAG_COUNT; i++)
+    {
+        if (TAGCACHE_IS_NUMERIC(i))
+            continue;
+
+        snprintf(buf, bufsz, "%s/" TAGCACHE_FILE_INDEX,
+                 tc_stat.db_path, i);
+        remove(buf);
+    }
+}
+
+static bool check_all_headers(void)
+{
+    struct master_header myhdr;
+    struct tagcache_header tch;
+    int tag;
+    int fd;
+
+    if ( (fd = open_master_fd(&myhdr, false)) < 0)
+        return false;
+
+    close(fd);
+    if (myhdr.dirty)
+    {
+        logf("tagcache is dirty!");
+        return false;
+    }
+
+    memcpy(&current_tcmh, &myhdr, sizeof(struct master_header));
+
+    for (tag = 0; tag < TAG_COUNT; tag++)
+    {
+        if (TAGCACHE_IS_NUMERIC(tag))
+            continue;
+
+        if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
+            return false;
+
+        close(fd);
+    }
+
+    return true;
+}
+
+static bool update_master_header(void)
+{
+    struct master_header myhdr;
+    int fd;
+
+    if (!tc_stat.ready)
+        return false;
+
+    if ( (fd = open_master_fd(&myhdr, true)) < 0)
+        return false;
+
+    myhdr.serial = current_tcmh.serial;
+    myhdr.commitid = current_tcmh.commitid;
+    myhdr.dirty = current_tcmh.dirty;
+
+    /* Write it back */
+    lseek(fd, 0, SEEK_SET);
+    write_master_header(fd, &myhdr);
+    close(fd);
+
+    return true;
+}
+
+
 #ifndef __PCTOOL__
 static bool do_timed_yield(void)
 {
@@ -707,6 +751,44 @@ static bool do_timed_yield(void)
     return false;
 }
 #endif /* __PCTOOL__ */
+
+static void allocate_tempbuf(void)
+{
+    /* Yeah, malloc would be really nice now :) */
+    size_t size;
+    tempbuf_size = 0;
+
+#ifdef __PCTOOL__
+    size = 32*1024*1024;
+    tempbuf = malloc(size);
+    if (tempbuf)
+        tempbuf_size = size;
+#else /* !__PCTOOL__ */
+    /* Need to pass dummy ops to prevent the buffer being moved
+     * out from under us, since we yield during the tagcache commit. */
+    tempbuf_handle = core_alloc_maximum(&size, &buflib_ops_locked);
+    if (tempbuf_handle > 0)
+    {
+        tempbuf = core_get_data(tempbuf_handle);
+        tempbuf_size = size;
+    }
+#endif /* __PCTOOL__ */
+
+}
+
+static void free_tempbuf(void)
+{
+    if (tempbuf_size == 0)
+        return ;
+
+#ifdef __PCTOOL__
+    free(tempbuf);
+#else
+    tempbuf_handle = core_free(tempbuf_handle);
+#endif
+    tempbuf = NULL;
+    tempbuf_size = 0;
+}
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 /* find the ramcache entry corresponding to the file indicated by
@@ -1636,61 +1718,6 @@ static bool build_lookup_list(struct tagcache_search *tcs)
 }
 
 
-static void remove_files(void)
-{
-    int i;
-    char buf[MAX_PATH];
-    const int bufsz = sizeof(buf);
-    
-    tc_stat.ready = false;
-    tc_stat.ramcache = false;
-    tc_stat.econ = false;
-    remove_db_file(TAGCACHE_FILE_MASTER);
-    for (i = 0; i < TAG_COUNT; i++)
-    {
-        if (TAGCACHE_IS_NUMERIC(i))
-            continue;
-
-        snprintf(buf, bufsz, "%s/" TAGCACHE_FILE_INDEX,
-                 tc_stat.db_path, i);
-        remove(buf);
-    }
-}
-
-
-static bool check_all_headers(void)
-{
-    struct master_header myhdr;
-    struct tagcache_header tch;
-    int tag;
-    int fd;
-
-    if ( (fd = open_master_fd(&myhdr, false)) < 0)
-        return false;
-
-    close(fd);
-    if (myhdr.dirty)
-    {
-        logf("tagcache is dirty!");
-        return false;
-    }
-
-    memcpy(&current_tcmh, &myhdr, sizeof(struct master_header));
-
-    for (tag = 0; tag < TAG_COUNT; tag++)
-    {
-        if (TAGCACHE_IS_NUMERIC(tag))
-            continue;
-
-        if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
-            return false;
-
-        close(fd);
-    }
-
-    return true;
-}
-
 bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header tag_hdr;
@@ -2003,29 +2030,6 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
         return false;
 
     return retrieve(tcs, IF_DIRCACHE(idxid,) &idx, tag, buf, size);
-}
-
-static bool update_master_header(void)
-{
-    struct master_header myhdr;
-    int fd;
-
-    if (!tc_stat.ready)
-        return false;
-
-    if ( (fd = open_master_fd(&myhdr, true)) < 0)
-        return false;
-
-    myhdr.serial = current_tcmh.serial;
-    myhdr.commitid = current_tcmh.commitid;
-    myhdr.dirty = current_tcmh.dirty;
-
-    /* Write it back */
-    lseek(fd, 0, SEEK_SET);
-    write_master_header(fd, &myhdr);
-    close(fd);
-
-    return true;
 }
 
 void tagcache_search_finish(struct tagcache_search *tcs)
@@ -2366,15 +2370,14 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     int len = strlen(str)+1;
     int i;
-    unsigned crc32;
     unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
-    char buf[TAGCACHE_BUFSZ];
-    const int bufsz = sizeof(buf);
-    
-    for (i = 0; str[i] != '\0' && i < bufsz-1; i++)
-        buf[i] = tolower(str[i]);
-
-    crc32 = crc_32(buf, i, 0xffffffff);
+    unsigned crc32 = 0xffffffff;
+    char chr_lower;
+    for (i = 0; str[i] != '\0' && i < len; i++)
+    {
+        chr_lower = tolower(str[i]);
+        crc32 = crc_32(&chr_lower, 1, crc32);
+    }
 
     if (unique)
     {
@@ -2568,9 +2571,6 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
     int entries_processed = 0;
     int i, j;
 
-    char buf[TAGCACHE_BUFSZ];
-    const int bufsz = sizeof(buf);
-
     max_entries = tempbuf_size / sizeof(struct temp_file_entry) - 1;
 
     logf("Building numeric indices...");
@@ -2621,23 +2621,23 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
              */
 #define tmpdb_read_string_tag(tag) \
     lseek(tmpfd, tfe->tag_offset[tag], SEEK_CUR); \
-    if ((unsigned long)tfe->tag_length[tag] > (unsigned long)bufsz) \
+    if ((unsigned long)tfe->tag_length[tag] > (unsigned long)build_idx_bufsz) \
     { \
         logf("read fail: buffer overflow"); \
         close(masterfd); \
         return false; \
     } \
     \
-    if (read(tmpfd, buf, tfe->tag_length[tag]) != \
+    if (read(tmpfd, build_idx_buf, tfe->tag_length[tag]) != \
         tfe->tag_length[tag]) \
     { \
         logf("read fail #2"); \
         close(masterfd); \
         return false; \
     } \
-    str_setlen(buf, tfe->tag_length[tag]); \
+    str_setlen(build_idx_buf, tfe->tag_length[tag]); \
     \
-    tfe->tag_offset[tag] = crc_32(buf, strlen(buf), 0xffffffff); \
+    tfe->tag_offset[tag] = crc_32(build_idx_buf, strlen(build_idx_buf), 0xffffffff); \
     lseek(tmpfd, datastart, SEEK_SET)
 
             tmpdb_read_string_tag(tag_filename);
@@ -2808,8 +2808,6 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     struct master_header   tcmh;
     struct index_entry idxbuf[IDX_BUF_DEPTH];
     int idxbuf_pos;
-    char buf[TAGCACHE_BUFSZ];
-    const long bufsz = sizeof(buf);
     int fd = -1, masterfd;
     bool error = false;
     int init;
@@ -2905,7 +2903,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 struct tagfile_entry entry;
                 int loc = lseek(fd, 0, SEEK_CUR);
                 bool ret;
-                switch (read_tagfile_entry_and_tag(fd, &entry, buf, bufsz))
+                switch (read_tagfile_entry_and_tag(fd, &entry, build_idx_buf, build_idx_bufsz))
                 {
                     case e_SUCCESS_LEN_ZERO: /* Skip deleted entries. */
                         continue;
@@ -2930,7 +2928,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * is saved so we can later reindex the master lookup
                  * table when the index gets resorted.
                  */
-                ret = tempbuf_insert(buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH
+                ret = tempbuf_insert(build_idx_buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH
                                      + commit_entry_count, entry.idx_id,
                                      TAGCACHE_IS_UNIQUE(index_type));
                 if (!ret)
@@ -2947,6 +2945,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     }
     else
     {
+        logf("Create New Index: %d", index_type);
         /**
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
@@ -2954,7 +2953,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * Note: although we are creating a file under the db path, it must
          * already exist by this point so no mkdir is required.
          */
-        fd = open_pathfmt(buf, bufsz, O_WRONLY | O_CREAT | O_TRUNC,
+        fd = open_pathfmt(build_idx_buf, build_idx_bufsz,
+                          O_WRONLY | O_CREAT | O_TRUNC,
                           "%s/" TAGCACHE_FILE_INDEX,
                           tc_stat.db_path, index_type);
         if (fd < 0)
@@ -3056,7 +3056,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
 
             /* Read data. */
-            if (entry.tag_length[index_type] >= (long)bufsz)
+            if (entry.tag_length[index_type] >= build_idx_bufsz)
             {
                 logf("too long entry!");
                 error = true;
@@ -3064,19 +3064,20 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
 
             lseek(tmpfd, entry.tag_offset[index_type], SEEK_CUR);
-            if (read(tmpfd, buf, entry.tag_length[index_type]) !=
+            if (read(tmpfd, build_idx_buf, entry.tag_length[index_type]) !=
                 entry.tag_length[index_type])
             {
                 logf("read fail #4");
                 error = true;
                 goto error_exit;
             }
-            str_setlen(buf, entry.tag_length[index_type]);
+            str_setlen(build_idx_buf, entry.tag_length[index_type]);
 
             if (TAGCACHE_IS_UNIQUE(index_type))
-                error = !tempbuf_insert(buf, i, -1, true);
+                error = !tempbuf_insert(build_idx_buf, i, -1, true);
             else
-                error = !tempbuf_insert(buf, i, tcmh.tch.entry_count + i, false);
+                error = !tempbuf_insert(build_idx_buf, i,
+                                        tcmh.tch.entry_count + i, false);
 
             if (error)
             {
@@ -3210,7 +3211,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 }
 
                 /* Read data. */
-                if (entry.tag_length[index_type] >= (int)sizeof(buf))
+                if (entry.tag_length[index_type] >= build_idx_bufsz)
                 {
                     logf("too long entry!");
                     logf("length=%d", entry.tag_length[index_type]);
@@ -3220,7 +3221,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 }
 
                 lseek(tmpfd, entry.tag_offset[index_type], SEEK_CUR);
-                if (read(tmpfd, buf, entry.tag_length[index_type]) !=
+                if (read(tmpfd, build_idx_buf, entry.tag_length[index_type]) !=
                     entry.tag_length[index_type])
                 {
                     logf("read fail #8");
@@ -3235,7 +3236,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 fe.tag_length = entry.tag_length[index_type];
                 fe.idx_id = tcmh.tch.entry_count + i + j;
                 write_tagfile_entry(fd, &fe);
-                write(fd, buf, fe.tag_length);
+                write(fd, build_idx_buf, fe.tag_length);
                 tempbufidx++;
 
                 /* Skip to next. */
@@ -3408,6 +3409,7 @@ static bool commit(void)
             tc_stat.commit_step = 0;
             goto commit_error;
         }
+        do_timed_yield();
     }
 
     if (!build_numeric_indices(&tch, tmpfd))
@@ -3443,7 +3445,7 @@ static bool commit(void)
     tc_stat.ready = check_all_headers();
     tc_stat.readyvalid = true;
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE)
     if (ramcache_buffer_stolen)
     {
         tempbuf = NULL;
@@ -3482,6 +3484,7 @@ commit_error:
 
     return rc;
 }
+
 
 #ifndef __PCTOOL__
 
