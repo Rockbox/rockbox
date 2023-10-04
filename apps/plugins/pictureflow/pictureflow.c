@@ -1141,6 +1141,8 @@ static void write_artist_entry(struct tagcache_search *tcs,
 static int get_tcs_search_res(int type, struct tagcache_search *tcs,
                               void **buf, size_t *bufsz)
 {
+    char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     int ret = SUCCESS;
     unsigned int l, name_idx = 0;
     void (*writefn)(struct tagcache_search *, int, unsigned int);
@@ -1156,7 +1158,7 @@ static int get_tcs_search_res(int type, struct tagcache_search *tcs,
         data_size = sizeof(struct album_data);
     }
 
-    while (rb->tagcache_get_next(tcs))
+    while (rb->tagcache_get_next(tcs, tcs_buf, tcs_bufsz))
     {
         if (rb->button_get(false) > BUTTON_NONE)
         {
@@ -1196,6 +1198,8 @@ static int get_tcs_search_res(int type, struct tagcache_search *tcs,
 static int create_album_untagged(struct tagcache_search *tcs,
                                  void **buf, size_t *bufsz)
 {
+    static char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     int ret = SUCCESS;
     int album_count = pf_idx.album_ct; /* store existing count */
     int total_count = pf_idx.album_ct + pf_idx.artist_ct * 2;
@@ -1210,7 +1214,7 @@ static int create_album_untagged(struct tagcache_search *tcs,
     {
         rb->tagcache_search_add_filter(tcs, tag_album, pf_idx.album_untagged_seek);
 
-        while (rb->tagcache_get_next(tcs))
+        while (rb->tagcache_get_next(tcs, tcs_buf, tcs_bufsz))
         {
             if (rb->button_get(false) > BUTTON_NONE) {
                 if (confirm_quit())
@@ -1339,6 +1343,8 @@ static int build_artist_index(struct tagcache_search *tcs,
 
 static int assign_album_year(void)
 {
+    char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     draw_progressbar(0, pf_idx.album_ct, "Assigning Album Year");
     for (int album_idx = 0; album_idx < pf_idx.album_ct; album_idx++)
     {
@@ -1367,7 +1373,7 @@ static int assign_album_year(void)
                 rb->tagcache_search_add_filter(&tcs, tag_albumartist,
                     pf_idx.album_index[album_idx].artist_seek);
 
-            while (rb->tagcache_get_next(&tcs)) {
+            while (rb->tagcache_get_next(&tcs, tcs_buf, tcs_bufsz)) {
                 int track_year = rb->tagcache_get_numeric(&tcs, tag_year);
                 if (track_year > album_year)
                     album_year = track_year;
@@ -1386,6 +1392,8 @@ static int assign_album_year(void)
  */
 static int create_album_index(void)
 {
+    static char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     void *buf = pf_idx.buf;
     size_t buf_size = pf_idx.buf_sz;
 
@@ -1463,7 +1471,7 @@ static int create_album_index(void)
         last = 0;
         final = pf_idx.artist_ct;
         retry = 0;
-        if (rb->tagcache_get_next(&tcs))
+        if (rb->tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
         {
 
 retry_artist_lookup:
@@ -1981,6 +1989,8 @@ static int pf_tcs_retrieve_file_name(int fn_idx)
  */
 static void create_track_index(const int slide_index)
 {
+    char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     buf_ctx_lock();
     if ( slide_index == pf_tracks.cur_idx )
         return;
@@ -1998,7 +2008,7 @@ static void create_track_index(const int slide_index)
     int string_index = 0;
     pf_tracks.count = 0;
 
-    while (rb->tagcache_get_next(&tcs))
+    while (rb->tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
     {
         int disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
         int track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
@@ -2073,7 +2083,8 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                     int buflen)
 {
     bool ret;
-
+    char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     if (tcs.valid || !rb->tagcache_search(&tcs, tag_filename))
         return false;
 
@@ -2084,7 +2095,7 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
     rb->tagcache_search_add_filter(&tcs, tag_albumartist,
                                    pf_idx.album_index[slide_index].artist_seek);
 
-    ret = rb->tagcache_get_next(&tcs) &&
+    ret = rb->tagcache_get_next(&tcs, tcs_buf, tcs_bufsz) &&
           retrieve_id3(&id3, tcs.result) &&
           search_albumart_files(&id3, ":", buf, buflen);
 

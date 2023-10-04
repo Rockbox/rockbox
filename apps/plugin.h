@@ -114,6 +114,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "screen_access.h"
 #include "onplay.h"
 #include "screens.h"
+#include "vuprintf.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -162,7 +163,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 269
+#define PLUGIN_API_VERSION 270
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -404,6 +405,8 @@ struct plugin_api {
     bool (*yesno_pop)(const char* text);
 
     /* action handling */
+    bool (*list_do_action)(int context, int timeout,
+                           struct gui_synclist *lists, int *action);
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
@@ -504,6 +507,7 @@ struct plugin_api {
 
     /* talking */
     int (*talk_id)(int32_t id, bool enqueue);
+    int (*talk_idarray)(const long *idarray, bool enqueue);
     int (*talk_file)(const char *root, const char *dir, const char *file,
                      const char *ext, const long *prefix_ids, bool enqueue);
     int (*talk_file_or_spell)(const char *dirname, const char* filename,
@@ -623,6 +627,7 @@ struct plugin_api {
     int (*snprintf)(char *buf, size_t size, const char *fmt, ...)
                     ATTRIBUTE_PRINTF(3, 4);
     int (*vsnprintf)(char *buf, size_t size, const char *fmt, va_list ap);
+    int (*vuprintf)(vuprintf_push_cb push, void *userp, const char *fmt, va_list ap);
     char* (*strcpy)(char *dst, const char *src);
     size_t (*strlcpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
@@ -645,6 +650,9 @@ struct plugin_api {
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
     char* (*strtok_r)(char *ptr, const char *sep, char **end);
+    char* (*output_dyn_value)(char *buf, int buf_size, int value,
+                              const unsigned char * const *units,
+                              unsigned int unit_count, bool binary_scale);
     /* unicode stuff */
     const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
     unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
@@ -768,7 +776,7 @@ struct plugin_api {
            void *buffer, long length);
     bool (*tagcache_search_add_filter)(struct tagcache_search *tcs,
                                     int tag, int seek);
-    bool (*tagcache_get_next)(struct tagcache_search *tcs);
+    bool (*tagcache_get_next)(struct tagcache_search *tcs, char *buf, long size);
     bool (*tagcache_retrieve)(struct tagcache_search *tcs, int idxid,
                            int tag, char *buf, long size);
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
@@ -790,6 +798,9 @@ struct plugin_api {
 
     /* playback control */
     struct playlist_info* (*playlist_get_current)(void);
+    int (*playlist_get_resume_info)(int *resume_index);
+    int (*playlist_get_track_info)(struct playlist_info* playlist, int index,
+                                   struct playlist_track_info* info);
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     void (*playlist_resume_track)(int start_index, unsigned int crc,
@@ -896,7 +907,8 @@ struct plugin_api {
 #if CONFIG_RTC
     time_t (*mktime)(struct tm *t);
 #endif
-
+    const char* (*format_time_auto)(char *buffer, int buf_len, long value,
+                                    int unit_idx, bool supress_unit);
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
@@ -958,17 +970,6 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    const char* (*format_time_auto)(char *buffer, int buf_len, long value,
-                                    int unit_idx, bool supress_unit);
-    char* (*output_dyn_value)(char *buf, int buf_size, int value,
-                              const unsigned char * const *units,
-                              unsigned int unit_count, bool binary_scale);
-    int (*playlist_get_resume_info)(int *resume_index);
-    int (*playlist_get_track_info)(struct playlist_info* playlist, int index,
-                                   struct playlist_track_info* info);
-    bool (*list_do_action)(int context, int timeout,
-                           struct gui_synclist *lists, int *action);
-    int (*talk_idarray)(const long *idarray, bool enqueue);
 };
 
 /* plugin header */

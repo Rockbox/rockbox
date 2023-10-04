@@ -102,9 +102,6 @@
  */
 #define TAGCACHE_SUPPORT_FOREIGN_ENDIAN
 
-/* Maximum length of a single tag. */
-#define TAG_MAXLEN (MAX_PATH*2)
-
 /* Allow a little drift to the filename ordering (should not be too high/low). */
 #define POS_HISTORY_COUNT 4
 
@@ -169,9 +166,6 @@ static struct event_queue tagcache_queue SHAREDBSS_ATTR;
 static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
-/* buffer size for all the (stack allocated & static) buffers handling tc data */
-#define TAGCACHE_BUFSZ (TAG_MAXLEN+32)
-
 
 /* Previous path when scanning directory tree recursively. */
 static char curpath[TAGCACHE_BUFSZ];
@@ -1849,11 +1843,8 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
     return true;
 }
 
-static bool get_next(struct tagcache_search *tcs, bool is_numeric)
+static bool get_next(struct tagcache_search *tcs, bool is_numeric, char *buf, long bufsz)
 {
-    /* WARNING pointers into buf are used in outside functions */
-    static char buf[TAGCACHE_BUFSZ];
-    const int bufsz = sizeof(buf);
     struct tagfile_entry entry;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     long flag = 0;
@@ -2001,12 +1992,12 @@ static bool get_next(struct tagcache_search *tcs, bool is_numeric)
     return true;
 }
 
-bool tagcache_get_next(struct tagcache_search *tcs)
+bool tagcache_get_next(struct tagcache_search *tcs, char *buf, long size)
 {
     if (tcs->valid && tagcache_is_usable())
     {
         bool is_numeric = TAGCACHE_IS_NUMERIC(tcs->type);
-        while (get_next(tcs, is_numeric))
+        while (get_next(tcs, is_numeric, buf, size))
         {
             if (tcs->result_len > 1)
                 return true;
@@ -3971,8 +3962,6 @@ static bool delete_entry(long idx_id)
     int tag, i;
     struct index_entry idx, myidx;
     struct master_header myhdr;
-    char buf[TAGCACHE_BUFSZ];
-    const int bufsz = sizeof(buf);
     int in_use[TAG_COUNT];
 
     logf("delete_entry(): %ld", idx_id);
@@ -4081,7 +4070,8 @@ static bool delete_entry(long idx_id)
             /* Skip the header block */
             lseek(fd, myidx.tag_seek[tag], SEEK_SET);
 
-            switch (read_tagfile_entry_and_tag(fd, &tfe, buf, bufsz))
+            switch (read_tagfile_entry_and_tag(fd, &tfe,
+                                               build_idx_buf, build_idx_bufsz))
             {
                 case e_SUCCESS_LEN_ZERO:
                     logf("deleted_entry(): SUCCESS");
@@ -4099,7 +4089,8 @@ static bool delete_entry(long idx_id)
                     goto cleanup;
             }
 
-            myidx.tag_seek[tag] = crc_32(buf, strlen(buf), 0xffffffff);
+            myidx.tag_seek[tag] = crc_32(build_idx_buf,
+                                         strlen(build_idx_buf), 0xffffffff);
         }
 
         if (in_use[tag])

@@ -351,6 +351,7 @@ static const struct plugin_api rockbox_api = {
     yesno_pop,
 
     /* action handling */
+    list_do_action,
     get_custom_action,
     get_action,
 #ifdef HAVE_TOUCHSCREEN
@@ -443,6 +444,7 @@ static const struct plugin_api rockbox_api = {
 
     /* talking */
     talk_id,
+    talk_idarray,
     talk_file,
     talk_file_or_spell,
     talk_dir_or_spell,
@@ -546,6 +548,7 @@ static const struct plugin_api rockbox_api = {
     /* strings and memory */
     snprintf,
     vsnprintf,
+    vuprintf,
     strcpy,
     strlcpy,
     strlen,
@@ -568,6 +571,7 @@ static const struct plugin_api rockbox_api = {
     memcmp,
     strcasestr,
     strtok_r,
+    output_dyn_value,
     /* unicode stuff */
     utf8decode,
     iso_decode,
@@ -687,6 +691,8 @@ static const struct plugin_api rockbox_api = {
 
     /* playback control */
     playlist_get_current,
+    playlist_get_resume_info,
+    playlist_get_track_info,
     playlist_amount,
     playlist_resume,
     playlist_resume_track,
@@ -769,7 +775,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_RTC
     mktime,
 #endif
-
+    format_time_auto,
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -826,13 +832,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    format_time_auto,
-    output_dyn_value,
-    playlist_get_resume_info,
-    playlist_get_track_info,
-    list_do_action,
-    talk_idarray,
 
 };
 

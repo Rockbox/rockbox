@@ -53,6 +53,10 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 /* Tag to be used on untagged files. */
 #define UNTAGGED "<Untagged>"
+/* Maximum length of a single tag. */
+#define TAG_MAXLEN (MAX_PATH*2)
+/* buffer size for all the (stack allocated & static) buffers handling tc data */
+#define TAGCACHE_BUFSZ (TAG_MAXLEN+32)
 
 /* Numeric tags (we can use these tags with conditional clauses). */
 #define TAGCACHE_NUMERIC_TAGS ((1LU << tag_year) | (1LU << tag_discnumber) | \
@@ -172,7 +176,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause);
-bool tagcache_get_next(struct tagcache_search *tcs);
+bool tagcache_get_next(struct tagcache_search *tcs, char *buf, long size);
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
                        int tag, char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);

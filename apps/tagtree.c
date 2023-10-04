@@ -1448,6 +1448,8 @@ static void tcs_get_basename(struct tagcache_search *tcs, bool is_basename)
 
 static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
+    char tcs_buf[TAGCACHE_BUFSZ];
+    const long tcs_bufsz = sizeof(tcs_buf);
     struct tagcache_search tcs;
     struct display_format *fmt;
     int i;
@@ -1584,7 +1586,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         total_count += 2;
     }
 
-    while (tagcache_get_next(&tcs))
+    while (tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
     {
         if (total_count++ < offset)
             continue;
@@ -1729,7 +1731,7 @@ entry_skip_formatter:
         return current_entry_count;
     }
 
-    while (tagcache_get_next(&tcs))
+    while (tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
     {
         if (!show_search_progress(false, total_count))
             break;
