@@ -4,6 +4,7 @@ battery_bench.c
 #endif
 #ifdef HAVE_TAGCACHE
 db_folder_select.c
+tagcache/tagcache.c
 #endif
 chessclock.c
 credits.c

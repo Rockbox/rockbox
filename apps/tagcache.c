@@ -55,6 +55,7 @@
  *
  */
 
+#if !defined(PLUGIN)
 
 /*#define LOGF_ENABLE*/
 /*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */
@@ -91,7 +92,7 @@
 #include "lang.h"
 #include "eeprom_settings.h"
 #endif
-
+#endif /*!defined(PLUGIN)*/
 /*
  * Define this to support non-native endian tagcache files.
  * Databases are always written in native endian so this is
@@ -131,6 +132,9 @@
 
 /* Idle time before committing events in the command queue. */
 #define TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY  HZ*2
+
+/* Dont commit database_tmp data. */
+#define TAGCACHE_FILE_NOCOMMIT  "database_commit.ignore"
 
 /* Temporary database containing new tags to be committed to the main db. */
 #define TAGCACHE_FILE_TEMP       "database_tmp.tcd"
@@ -730,7 +734,7 @@ static bool update_master_header(void)
     return true;
 }
 
-
+#if !defined(PLUGIN)
 #ifndef __PCTOOL__
 static bool do_timed_yield(void)
 {
@@ -2355,6 +2359,8 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
 
     #undef ADD_TAG
 }
+#endif /*!defined(PLUGIN)*/
+
 
 static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
 {
@@ -3064,18 +3070,22 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
             str_setlen(build_idx_buf, entry.tag_length[index_type]);
 
-            if (TAGCACHE_IS_UNIQUE(index_type))
-                error = !tempbuf_insert(build_idx_buf, i, -1, true);
-            else
-                error = !tempbuf_insert(build_idx_buf, i,
-                                        tcmh.tch.entry_count + i, false);
-
-            if (error)
+#if defined(PLUGIN)
+            if (user_check_tag(index_type, build_idx_buf))
+#endif /*defined(PLUGIN)*/
             {
-                logf("insert error");
-                goto error_exit;
-            }
+                if (TAGCACHE_IS_UNIQUE(index_type))
+                    error = !tempbuf_insert(build_idx_buf, i, -1, true);
+                else
+                    error = !tempbuf_insert(build_idx_buf, i,
+                                            tcmh.tch.entry_count + i, false);
 
+                if (error)
+                {
+                    logf("insert error");
+                    goto error_exit;
+                }
+            }
             /* Skip to next. */
             lseek(tmpfd, entry.data_length - entry.tag_offset[index_type] -
                     entry.tag_length[index_type], SEEK_CUR);
@@ -3299,7 +3309,20 @@ static bool commit(void)
     while (write_lock)
         sleep(1);
 
-    tmpfd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
+#if !defined(PLUGIN)
+    int fd = open_db_fd(TAGCACHE_FILE_NOCOMMIT, O_RDONLY);
+    if (fd >= 0)
+    {
+        logf("canceling commit");
+        tc_stat.commit_delayed = true;
+        close(fd);
+        tmpfd = -1;      
+    }
+    else
+#endif /*!defined(PLUGIN)*/
+    {
+        tmpfd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
+    }
     if (tmpfd < 0)
     {
         logf("nothing to commit");
@@ -3360,6 +3383,14 @@ static bool commit(void)
         ramcache_buffer_stolen = true;
     }
 #endif /* HAVE_TC_RAMCACHE */
+
+#if defined(PLUGIN)
+    if (tempbuf_size == 0)
+    {
+        tempbuf = rb->plugin_get_audio_buffer(&tempbuf_size);
+        tempbuf_size &= ~0x03;
+    }
+#endif /*defined(PLUGIN)*/
 
     /* And finally fail if there are no buffers available. */
     if (tempbuf_size == 0)
@@ -3433,8 +3464,7 @@ static bool commit(void)
     close(masterfd);
 
     logf("tagcache committed");
-    tc_stat.ready = check_all_headers();
-    tc_stat.readyvalid = true;
+    tagcache_commit_finalize();
 
 #if defined(HAVE_TC_RAMCACHE)
     if (ramcache_buffer_stolen)
@@ -3476,7 +3506,13 @@ commit_error:
     return rc;
 }
 
+void tagcache_commit_finalize(void)
+{
+    tc_stat.ready = check_all_headers();
+    tc_stat.readyvalid = true;
+}
 
+#if !defined(PLUGIN)
 #ifndef __PCTOOL__
 
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
@@ -5116,8 +5152,7 @@ static void tagcache_thread(void)
     if (!tc_stat.ready)
     {
         sleep(HZ);
-        tc_stat.ready = check_all_headers();
-        tc_stat.readyvalid = true;
+        tagcache_commit_finalize();
     }
 
     while (1)
@@ -5351,3 +5386,4 @@ int tagcache_get_max_commit_step(void)
 {
     return (int)(SORTED_TAGS_COUNT)+1;
 }
+#endif /*!defined(PLUGIN)*/

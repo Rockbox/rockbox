@@ -31,6 +31,15 @@ If a subdirectory of an `ignored' directory should still be scanned, place a
 file named \fname{database.unignore} in it. The files in that directory and
 its subdirectories will be scanned and added to the database.
 
+\subsubsection{Issues During Database Commit}
+
+You may have files on your \dap{} whose contents might not be displayed
+correctly or even crash the database.
+Placing a file named \fname{/.rockbox/database_commit.ignore}
+will prevent the device from committing the database automatically
+you can manually commit the database using the db_commit plugin in APPS
+with logging
+
 \subsection{\label{ref:databasemenu}The Database Menu}
 
 \begin{description}

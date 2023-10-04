@@ -969,7 +969,7 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+    void (*tagcache_commit_finalize)(void);
 };
 
 /* plugin header */
