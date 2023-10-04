@@ -48,8 +48,12 @@ void print_usage(FILE *f, bool client, bool server)
     fprintf(f, "  default   Default choice made by the library\n");
     if(client)
     {
-        fprintf(f, "When creating a USB context, the domain and port must be empty:\n");
-        fprintf(f, "  usb:\n");
+        fprintf(f, "When creating a USB context, the domain and port represent usb_port and device_address\n");
+        fprintf(f, "as reported by lsusb. You can leave empty usb_port:device_address to match any usb device\n");
+        fprintf(f, "which provide hwstub interface\n");
+        fprintf(f, "  usb://\n");
+        fprintf(f, "or\n");
+        fprintf(f, "  usb://usb_port:device_address\n");
     }
     fprintf(f, "When creating a TCP context, the domain and port are the usual TCP parameters:\n");
     fprintf(f, "  tcp://localhost\n");
@@ -220,17 +224,55 @@ std::shared_ptr<context> create_context(const uri& uri, std::string *error)
     /* handle different types of contexts */
     if(uri.scheme() == "usb")
     {
-        /* domain and port must be empty */
-        if(!uri.domain().empty() || !uri.port().empty())
+        if(!uri.domain().empty() && !uri.port().empty())
+        {
+            /** URI usb://usb_port:device_address
+             *  for example usb://6:31
+             *  usb_port and device_address match numbers
+             *  reported by lsusb
+             *
+             *  This filtering is additional to filtering
+             *  by hwstub interface so final outcome will be device
+             *  with usb_port:device_address which IS hwstub device
+             */
+            try
+            {
+                int bus = std::stoi(uri.domain());
+                int addr = std::stoi(uri.port());
+                libusb_context *ctx;
+                libusb_init(&ctx);
+
+                /** Build closure used to filter valid devices */
+                std::function<bool(void *)> f = [bus, addr](void *d){
+                    libusb_device *dev = (libusb_device *)d;
+                    return hwstub::usb::device::is_bus_addr_device(dev, bus, addr);
+                };
+
+                return hwstub::usb::context::create(ctx, true, nullptr, f);
+            }
+            catch(...)
+            {
+                if(error)
+                    *error = "USB URI bus_port:device_address format error";
+                return std::shared_ptr<context>();
+            }
+        }
+        else if(uri.domain().empty() && uri.port().empty())
+        {
+            /** URI usb://
+             *  No filtering, any usb device with hwstub
+             *  interface will match
+             */
+            libusb_context *ctx;
+            libusb_init(&ctx);
+            return hwstub::usb::context::create(ctx, true);
+        }
+        else
         {
             if(error)
-            *error = "USB URI cannot contain a domain or a port";
+                *error = "USB URI format error";
             return std::shared_ptr<context>();
         }
-        /* in doubt, create a new libusb context and let the context destroy it */
-        libusb_context *ctx;
-        libusb_init(&ctx);
-        return hwstub::usb::context::create(ctx, true);
     }
     else if(uri.scheme() == "virt")
     {

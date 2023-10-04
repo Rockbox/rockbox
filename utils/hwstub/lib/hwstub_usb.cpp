@@ -41,20 +41,28 @@ context::context(libusb_context *ctx, bool cleanup_ctx)
 {
 }
 
+context::context(libusb_context *ctx, bool cleanup_ctx, std::string *error, device_filter_t f)
+    :m_usb_ctx(ctx), m_cleanup_ctx(cleanup_ctx)
+{
+    (void)error;
+    // NOTE: can't use initializer list since this member is from parent class
+    // and parent's class constructor is NOT called when initializer list is built
+    device_filter = f;
+}
+
 context::~context()
 {
     if(m_cleanup_ctx)
         libusb_exit(m_usb_ctx);
 }
 
-std::shared_ptr<context> context::create(libusb_context *ctx, bool cleanup_ctx,
-    std::string *error)
+std::shared_ptr<context> context::create(libusb_context *ctx, bool cleanup_ctx, std::string *error, device_filter_t f)
 {
     (void) error;
     if(ctx == nullptr)
         libusb_init(nullptr);
     // NOTE: can't use make_shared() because of the protected ctor */
-    return std::shared_ptr<context>(new context(ctx, cleanup_ctx));
+    return std::shared_ptr<context>(new context(ctx, cleanup_ctx, nullptr, f));
 }
 
 libusb_context *context::native_context()
@@ -81,7 +89,11 @@ error context::fetch_device_list(std::vector<ctx_dev_t>& list, void*& ptr)
     ptr = (void *)usb_list;
     list.clear();
     for(int i = 0; i < ret; i++)
-        if(device::is_hwstub_dev(usb_list[i]))
+        /* filter devices by hwstub interface and by other filtering criteria
+         * if provided
+         */
+        if(device::is_hwstub_dev(usb_list[i]) &&
+           context::device_filter(usb_list[i]))
             list.push_back(to_ctx_dev(usb_list[i]));
     return error::SUCCESS;
 }
@@ -229,6 +241,12 @@ uint16_t device::get_pid()
     struct libusb_device_descriptor dev_desc;
     libusb_get_device_descriptor(native_device(), &dev_desc);
     return dev_desc.idProduct;
+}
+
+bool device::is_bus_addr_device(libusb_device *dev, uint8_t bus, uint8_t addr)
+{
+    return ((libusb_get_bus_number(dev) == bus) &&
+            (libusb_get_device_address(dev) == addr));
 }
 
 /**

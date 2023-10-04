@@ -96,6 +96,12 @@ public:
      * are still connected (or believe to be). This function will update the device
      * list. */
     error get_device_list(std::vector<std::shared_ptr<device>>& list);
+
+    /** Opaque device type */
+    typedef void* ctx_dev_t;
+    typedef std::function<bool(ctx_dev_t)> device_filter_t;
+    /** Default device filter function accept any device */
+    device_filter_t device_filter = [](ctx_dev_t d){(void)d; return true;};
     /** Force the context to update its internal list of devices. */
     error update_list();
     /** Ask the context to automatically poll for device changes.
@@ -130,8 +136,6 @@ protected:
     void change_device(bool arrived, std::shared_ptr<device> dev);
     /** Do device notification */
     void notify_device(bool arrived, std::shared_ptr<device> dev);
-    /** Opaque device type */
-    typedef void* ctx_dev_t;
     /** Fetch the device list. Each item in the list is an opaque pointer. The function
      * can also provide a pointer that will be used to free the list resources
      * if necessary. Return <0 on error. */
