@@ -545,7 +545,7 @@ static void thread(void)
                 short x, y;
                 static int prev_y;
 
-                action = action_get_touchscreen_press(&x, &y);
+                action = rb->action_get_touchscreen_press(&x, &y);
 
                 if(action & BUTTON_REL)
                     prev_y = 0;
