@@ -832,7 +832,9 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+#ifdef HAVE_TAGCACHE
     tagcache_commit_finalize,
+#endif
 };
 
 static int plugin_buffer_handle;
