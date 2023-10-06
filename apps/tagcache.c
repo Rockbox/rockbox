@@ -92,6 +92,9 @@
 #include "lang.h"
 #include "eeprom_settings.h"
 #endif
+#define USR_CANCEL false
+#else/*!defined(PLUGIN)*/
+#define USR_CANCEL (tc_stat.commit_delayed == true)
 #endif /*!defined(PLUGIN)*/
 /*
  * Define this to support non-native endian tagcache files.
@@ -2370,7 +2373,7 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
     unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
     unsigned crc32 = 0xffffffff;
     char chr_lower;
-    for (i = 0; str[i] != '\0' && i < len; i++)
+    for (i = 0; str[i] != '\0' && i < len -1; i++)
     {
         chr_lower = tolower(str[i]);
         crc32 = crc_32(&chr_lower, 1, crc32);
@@ -2404,9 +2407,12 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
 
     /* Insert it to the buffer. */
     tempbuf_left -= len;
-    if (tempbuf_left - 4 < 0 || tempbufidx >= commit_entry_count-1)
+    if (tempbuf_left - 4 < 0 || tempbufidx >= commit_entry_count)
+    {
+        logf("temp buf error rem: %ld idx: %d / %d",
+             tempbuf_left, tempbufidx, commit_entry_count-1);
         return false;
-
+    }
     if (id >= lookup_buffer_depth)
     {
         logf("lookup buf overf. #2: %d", id);
@@ -2585,7 +2591,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         return false;
     }
 
-    while (entries_processed < h->entry_count)
+    while (entries_processed < h->entry_count && !USR_CANCEL)
     {
         int count = MIN(h->entry_count - entries_processed, max_entries);
 
@@ -2651,7 +2657,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         lseek(masterfd, sizeof(struct master_header), SEEK_SET);
 
         /* Check if we can resurrect some deleted runtime statistics data. */
-        for (i = 0; i < tcmh.tch.entry_count; i++)
+        for (i = 0; i < tcmh.tch.entry_count && !USR_CANCEL; i++)
         {
             /* Read the index entry. */
             if (read_index_entries(masterfd, &idx, 1) != sizeof(struct index_entry))
@@ -2742,7 +2748,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         lseek(masterfd, masterfd_pos, SEEK_SET);
 
         /* Commit the data to the index. */
-        for (i = 0; i < count; i++)
+        for (i = 0; i < count && !USR_CANCEL; i++)
         {
             int loc = lseek(masterfd, 0, SEEK_CUR);
 
@@ -2895,7 +2901,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         if (TAGCACHE_IS_SORTED(index_type))
         {
             logf("loading tags...");
-            for (i = 0; i < tch.entry_count; i++)
+            for (i = 0; i < tch.entry_count && !USR_CANCEL; i++)
             {
                 struct tagfile_entry entry;
                 int loc = lseek(fd, 0, SEEK_CUR);
@@ -3040,7 +3046,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
         /* h is the header of the temporary file containing new tags. */
         logf("inserting new tags...");
-        for (i = 0; i < h->entry_count; i++)
+        for (i = 0; i < h->entry_count && !USR_CANCEL; i++)
         {
             struct temp_file_entry entry;
 
@@ -3112,7 +3118,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          */
         logf("updating indices...");
         lseek(masterfd, sizeof(struct master_header), SEEK_SET);
-        for (i = 0; i < tcmh.tch.entry_count; i += idxbuf_pos)
+        for (i = 0; i < tcmh.tch.entry_count && !USR_CANCEL; i += idxbuf_pos)
         {
             int j;
             int loc = lseek(masterfd, 0, SEEK_CUR);
@@ -3172,7 +3178,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     lseek(masterfd, masterfd_pos, SEEK_SET);
     lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
     lseek(fd, 0, SEEK_END);
-    for (i = 0; i < h->entry_count; i += idxbuf_pos)
+    for (i = 0; i < h->entry_count && !USR_CANCEL; i += idxbuf_pos)
     {
         int j;
 
@@ -3412,7 +3418,7 @@ static bool commit(void)
     tch.datasize = 0;
     tc_stat.commit_delayed = false;
 
-    for (i = 0; i < TAG_COUNT; i++)
+    for (i = 0; i < TAG_COUNT && !USR_CANCEL; i++)
     {
         int ret;
 
@@ -3446,41 +3452,44 @@ static bool commit(void)
 
     tc_stat.commit_step = 0;
 
-    /* Update the master index headers. */
-    if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
-        goto commit_error;
+    if (!USR_CANCEL)
+    {
+        /* Update the master index headers. */
+        if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
+            goto commit_error;
 
-    remove_db_file(TAGCACHE_FILE_TEMP);
+        remove_db_file(TAGCACHE_FILE_TEMP);
 
-    tcmh.tch.entry_count += tch.entry_count;
-    tcmh.tch.datasize = sizeof(struct master_header)
-        + sizeof(struct index_entry) * tcmh.tch.entry_count
-        + tch.datasize;
-    tcmh.dirty = false;
-    tcmh.commitid++;
+        tcmh.tch.entry_count += tch.entry_count;
+        tcmh.tch.datasize = sizeof(struct master_header)
+            + sizeof(struct index_entry) * tcmh.tch.entry_count
+            + tch.datasize;
+        tcmh.dirty = false;
+        tcmh.commitid++;
 
-    lseek(masterfd, 0, SEEK_SET);
-    write_master_header(masterfd, &tcmh);
-    close(masterfd);
+        lseek(masterfd, 0, SEEK_SET);
+        write_master_header(masterfd, &tcmh);
+        close(masterfd);
 
-    logf("tagcache committed");
-    tagcache_commit_finalize();
+        logf("tagcache committed");
+        tagcache_commit_finalize();
 
 #if defined(HAVE_TC_RAMCACHE)
-    if (ramcache_buffer_stolen)
-    {
-        tempbuf = NULL;
-        tempbuf_size = 0;
-        ramcache_buffer_stolen = false;
-        tcrc_buffer_unlock();
-    }
+        if (ramcache_buffer_stolen)
+        {
+            tempbuf = NULL;
+            tempbuf_size = 0;
+            ramcache_buffer_stolen = false;
+            tcrc_buffer_unlock();
+        }
 
-    /* Reload tagcache. */
-    if (tc_stat.ramcache_allocated > 0)
-        tagcache_start_scan();
+        /* Reload tagcache. */
+        if (tc_stat.ramcache_allocated > 0)
+            tagcache_start_scan();
 #endif /* HAVE_TC_RAMCACHE */
 
-    rc = true;
+        rc = true;
+    } /*!USR_CANCEL*/
 
 commit_error:
 #ifdef HAVE_TC_RAMCACHE
