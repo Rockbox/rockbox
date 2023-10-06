@@ -1921,7 +1921,7 @@ static bool get_next(struct tagcache_search *tcs, bool is_numeric, char *buf, lo
         if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE))
         {
             ssize_t len = dircache_get_fileref_path(&tcrc_dcfrefs[tcs->idx_id],
-                                                    buf, sizeof (buf));
+                                                    buf, bufsz);
             if (len >= 0)
             {
                 tcs->result_len = len + 1;
@@ -1939,7 +1939,7 @@ static bool get_next(struct tagcache_search *tcs, bool is_numeric, char *buf, lo
 
             ep = (struct tagfile_entry *)&tcramcache.hdr->tags[tcs->type][tcs->position];
             /* don't return ep->tag_data directly as it may move */
-            tcs->result_len = strlcpy(buf, ep->tag_data, sizeof(buf)) + 1;
+            tcs->result_len = strlcpy(buf, ep->tag_data, bufsz) + 1;
             tcs->result = buf;
             tcs->idx_id = ep->idx_id;
             tcs->ramresult = false; /* was true before we copied to buf too */
