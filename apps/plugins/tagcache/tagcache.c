@@ -62,7 +62,8 @@ static void _log(const char *fmt, ...);
 #define crc_32(x,y,z)   rb->crc_32(x,y,z)
 
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(APPLICATION)
+
 #define errno  (*rb->__errno())
 #endif
 #define ENOENT 2        /* No such file or directory */
@@ -160,6 +161,7 @@ bool user_check_tag(int index_type, char* build_idx_buf)
 
 static bool logdump(bool append);
 static unsigned char logbuffer[MAX_LOG_SIZE + 1];
+static int log_font_h = -1;
 static int logindex;
 static bool logwrap;
 static bool logenabled = true;
@@ -269,7 +271,6 @@ static bool logdisplay(void)
 
     int w, h, i, index;
     int fontnr;
-    static int delta_y = -1;
     int cur_x, cur_y, delta_x;
     struct font* font;
 
@@ -281,11 +282,11 @@ static bool logdisplay(void)
     w = LCD_WIDTH;
     h = LCD_HEIGHT;
 
-    if (delta_y < 0) /* init, get the horizontal size of each line */
+    if (log_font_h < 0) /* init, get the horizontal size of each line */
     {
-        rb->font_getstringsize("A", NULL, &delta_y, fontnr);
+        rb->font_getstringsize("A", NULL, &log_font_h, fontnr);
         /* start at the end of the log */
-        gThread.user_index = compute_nb_lines(w, font) - h/delta_y -1;
+        gThread.user_index = compute_nb_lines(w, font) - h/log_font_h -1;
         /* user_index will be number of the first line to display (warning: line!=log entry) */
         /* if negative, will be set 0 to zero later */
     }
@@ -315,7 +316,7 @@ static bool logdisplay(void)
         {
             /* should be display a newline ? */
             if(index >= gThread.user_index)
-                cur_y += delta_y;
+                cur_y += log_font_h;
             cur_x = 0;
             index++;
         }
@@ -328,7 +329,7 @@ static bool logdisplay(void)
             {
                 /* should be display a newline ? */
                 if(index >= gThread.user_index)
-                    cur_y += delta_y;
+                    cur_y += log_font_h;
                 cur_x = 0;
                 index++;
             }
@@ -345,7 +346,7 @@ static bool logdisplay(void)
         }
         i++;
         /* did we fill the screen ? */
-        if(cur_y > h - delta_y)
+        if(cur_y > h - log_font_h)
         {
             if (TIME_AFTER(current_tick, gThread.last_useraction_tick + HZ))
                 gThread.user_index++;
@@ -551,7 +552,7 @@ static void thread(void)
                 else
                 {
                     if(prev_y != 0)
-                        gThread.user_index += (prev_y - y) / delta_y;
+                        gThread.user_index += (prev_y - y) / log_font_h;
 
                     prev_y = y;
                 }
