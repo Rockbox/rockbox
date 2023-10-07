@@ -1261,34 +1261,20 @@ static void playing_id3_sync(struct track_info *user_infop,
     id3_mutex_lock();
 
     struct mp3entry *id3 = bufgetid3(user_infop->id3_hid);
-    struct mp3entry *playing_id3 = id3_get(PLAYING_ID3);
 
     pcm_play_lock();
 
-    unsigned long e = playing_id3->elapsed;
-    unsigned long o = playing_id3->offset;
-
-    id3_write(PLAYING_ID3, id3);
-
-    if (elapsed == (unsigned long)-1)
-    {
-        playing_id3->elapsed = e;
-        elapsed = 0;
-    }
-
-    if (offset == (unsigned long)-1)
-    {
-        playing_id3->offset = o;
-        offset = 0;
-    }
-
-    pcm_play_unlock();
-
     if (id3)
     {
-        id3->elapsed = elapsed;
-        id3->offset = offset;
+        if (elapsed != (unsigned long)-1)
+            id3->elapsed = elapsed;
+
+        if (offset != (unsigned long)-1)
+            id3->offset = offset;
     }
+    id3_write(PLAYING_ID3, id3);
+
+    pcm_play_unlock();
 
     id3_mutex_unlock();
 }
