@@ -52,10 +52,23 @@ with logging
     browsing but it does not use extra RAM and saves some battery on boot up. 
     
     \opt{HAVE_DISK_STORAGE}{
-    \note{If you browse your music frequently using the database, you should
+      If you browse your music frequently using the database, you should
       load to RAM, as this will reduce the overall battery consumption because
-      the disk will not need to spin on each search.}
+      the disk will not need to spin on each search.
     }
+
+    \note{When Load to RAM is turned on, and the directory cache is enabled as well,
+    it may take an unexpectedly long amount of time for disk activity to
+    wind down after booting, depending on your library size and player.
+
+    This can be mitigated by choosing the \setting{Quick} option instead, which causes
+    the database to ignore cached file references. In that case, you may notice brief
+    moments of disk activity once the path for a database entry has to be retrieved.
+
+    Set to \setting{On}, if you plan to take advantage the database's Update function,
+    or use a WPS that displays multiple upcoming tracks from the current playlist.
+    Otherwise, you may notice file names instead of metadata being displayed for those
+    tracks.}
   }
   
 \item[Auto Update]

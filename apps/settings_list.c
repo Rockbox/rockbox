@@ -1813,7 +1813,10 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
-    OFFON_SETTING(F_BANFROMQS,tagcache_ram,LANG_TAGCACHE_RAM,false,"tagcache_ram",NULL),
+    CHOICE_SETTING(F_BANFROMQS, tagcache_ram, LANG_TAGCACHE_RAM,
+                   0, "tagcache_ram", "off,on,quick",
+                   NULL, 3,
+                   ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_QUICK_IGNORE_DIRACHE)),
 #endif
     OFFON_SETTING(F_BANFROMQS, tagcache_autoupdate, LANG_TAGCACHE_AUTOUPDATE, false,
                   "tagcache_autoupdate", NULL),

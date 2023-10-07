@@ -16669,3 +16669,17 @@
     *: "Remove Queued Tracks?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Quick (Ignore Directory Cache)"
+  </dest>
+  <voice>
+    *: "Quick (Ignore Directory Cache)"
+  </voice>
+</phrase>

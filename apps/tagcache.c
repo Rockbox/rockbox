@@ -800,7 +800,8 @@ static long find_entry_ram(const char *filename)
     struct dircache_fileref dcfref;
 
     /* Check if tagcache is loaded into ram. */
-    if (!tc_stat.ramcache)
+    if (!tc_stat.ramcache
+        || global_settings.tagcache_ram != TAGCACHE_RAM_ON)
         return -1;
 
     if (dircache_search(DCS_CACHED_PATH | DCS_UPDATE_FILEREF, &dcfref,
@@ -5247,7 +5248,8 @@ static void tagcache_thread(void)
                 if (!tc_stat.ramcache && global_settings.tagcache_ram)
                 {
                     load_ramcache();
-                    check_file_refs(global_settings.tagcache_autoupdate);
+                    if (global_settings.tagcache_ram == TAGCACHE_RAM_ON)
+                        check_file_refs(global_settings.tagcache_autoupdate);
                     if (tc_stat.ramcache && global_settings.tagcache_autoupdate)
                         tagcache_build();
                 }

@@ -136,6 +136,13 @@ enum
 };
 #endif
 
+enum
+{
+    TAGCACHE_RAM_OFF = 0,
+    TAGCACHE_RAM_ON = 1,
+    TAGCACHE_RAM_QUICK = 2
+};
+
 /* dir filter options */
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
  *       Any new rockbox browse filter modes (accessible through the menu)
@@ -576,7 +583,7 @@ struct user_settings
 #endif
 #ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
-    bool tagcache_ram;        /* load tagcache to ram? */
+    int tagcache_ram;        /* load tagcache to ram: 1=on, 2=quick (ignore dircache) */
 #endif
     bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
     bool autoresume_enable;   /* enable auto-resume feature? */
