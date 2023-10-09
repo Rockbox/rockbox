@@ -332,7 +332,10 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         bool is_selected = false;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
-        entry_name = P2STR(s);
+        if (P2ID((unsigned char *)s) > VOICEONLY_DELIMITER)
+            entry_name = "";
+        else
+            entry_name = P2STR(s);
 
         while (*entry_name == '\t')
         {
