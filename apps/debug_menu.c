@@ -209,6 +209,10 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
         *x_offset += 1;
         action = ACTION_REDRAW;
     }
+    else if (IS_SYSEVENT(action))
+    {
+        return ACTION_REDRAW;
+    }
     else if (action != ACTION_UNKNOWN)
     {
         *x_offset = 0;

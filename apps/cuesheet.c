@@ -523,6 +523,8 @@ void browse_cuesheet(struct cuesheet *cue)
 
             case ACTION_STD_CANCEL:
                 done = true;
+            default:
+                break;
         }
     }
 }

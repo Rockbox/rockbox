@@ -577,7 +577,7 @@ bool gui_synclist_keyclick_callback(int action, void* data)
             return false;
     }
 
-    return action != ACTION_NONE;
+    return action != ACTION_NONE && !IS_SYSEVENT(action);
 }
 
 /*
@@ -610,6 +610,9 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
 #else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
+
+    if (IS_SYSEVENT(action))
+        return false;
 
     if (action != ACTION_TOUCHSCREEN)
     {
@@ -647,13 +650,8 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
     /* Disable the skin redraw callback */
     current_lists = NULL;
 
-    /* Prevent list wraparound by repeating actions */
+    /* repeat actions block list wraparound */
     bool allow_wrap = lists->wraparound;
-    if (action == ACTION_STD_PREVREPEAT ||
-        action == ACTION_STD_NEXTREPEAT ||
-        action == ACTION_LISTTREE_PGUP  ||
-        action == ACTION_LISTTREE_PGDOWN)
-        allow_wrap = false;
 
     switch (action)
     {
@@ -669,8 +667,11 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
             adjust_volume(-1);
             return true;
 #endif
-        case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
+            allow_wrap = false; /* Prevent list wraparound on repeating actions */
+            /*Fallthrough*/
+        case ACTION_STD_PREV:
+        
             gui_list_select_at_offset(lists, -next_item_modifier, allow_wrap);
 #ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
@@ -680,8 +681,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
             *actionptr = ACTION_STD_PREV;
             return true;
 
-        case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
+            allow_wrap = false; /* Prevent list wraparound on repeating actions */
+            /*Fallthrough*/
+        case ACTION_STD_NEXT:
             gui_list_select_at_offset(lists, next_item_modifier, allow_wrap);
 #ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
@@ -733,7 +736,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
                          SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
-            gui_synclist_select_previous_page(lists, screen, allow_wrap);
+            gui_synclist_select_previous_page(lists, screen, false);
             gui_synclist_draw(lists);
             yield();
             *actionptr = ACTION_STD_NEXT;
@@ -748,7 +751,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
                          SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
-            gui_synclist_select_next_page(lists, screen, allow_wrap);
+            gui_synclist_select_next_page(lists, screen, false);
             gui_synclist_draw(lists);
             yield();
             *actionptr = ACTION_STD_PREV;

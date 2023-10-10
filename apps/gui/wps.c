@@ -322,7 +322,7 @@ static bool ffwd_rew(int button, bool seek_from_end)
 #endif
             if (button != ACTION_WPS_SEEKFWD
                 && button != ACTION_WPS_SEEKBACK
-                && button != 0)
+                && button != 0 && !IS_SYSEVENT(button))
                 button = ACTION_WPS_STOPSEEK;
         }
     }
