@@ -305,7 +305,7 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
                 result=YESNO_YES;
                 break;
             case ACTION_NONE:
-                if(tmo_default_res != YESNO_TMO && end_tick <= current_tick)
+                if(tmo_default_res != YESNO_TMO && TIME_AFTER(current_tick, end_tick))
                 {
                     splash(HZ/2, ID2P(LANG_TIMEOUT));
                     result = tmo_default_res;
