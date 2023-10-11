@@ -136,6 +136,7 @@ void play_tone(unsigned int frequency, unsigned int duration);
 static struct
 {
     bool exiting; /* signal to the thread that we want to exit */
+    bool hide_reentry; /* we may return on WPS fail, hide next invocation */
     unsigned int id; /* worker thread id */
     struct event_queue queue; /* thread event queue */
     struct queue_sender_list queue_send;
@@ -841,6 +842,13 @@ static int plugin_exit_tsr(bool reenter)
                          "Quit scrobbler?" }, 3
     };
 
+    if (gThread.hide_reentry &&
+       (rb->audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE)) == 0)
+    {
+        gThread.hide_reentry = false;
+        return PLUGIN_TSR_CONTINUE;
+    }
+
     while(true)
     {
         int result = reenter ? rb->do_menu(&menu, NULL, NULL, false) : 2;
@@ -897,8 +905,10 @@ static int plugin_main(const void* parameter)
     rb->memcpy(&gConfig, &cfg, sizeof(struct scrobbler_cfg)); /*restore settings */
 
     if (gConfig.playback)
+    {
+        gThread.hide_reentry = true;
         return PLUGIN_GOTO_WPS;
-
+    }
     return PLUGIN_OK;
 }
 
