@@ -3780,6 +3780,7 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.amount = playlist->amount;
     current_playlist.last_insert_pos = playlist->last_insert_pos;
     current_playlist.seed = playlist->seed;
+    current_playlist.flags = playlist->flags;
 
     result = 0;
 
