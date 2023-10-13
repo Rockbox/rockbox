@@ -1848,7 +1848,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, backlight_on_button_hold,
                    LANG_BACKLIGHT_ON_BUTTON_HOLD,
-#ifdef HAS_HOLD_BUTTON                   
+#ifdef HAS_BUTTON_HOLD                   
                    1,
 #else
                    0,
