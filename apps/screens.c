@@ -397,6 +397,7 @@ struct id3view_info {
     struct tm *modified;
     int track_ct;
     int count;
+    struct playlist_info *playlist;
     int playlist_display_index;
     int playlist_amount;
     int info_id[ARRAYLEN(id3_headers)];
@@ -496,6 +497,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
     const unsigned char * const *unit;
     unsigned int unit_ct;
     unsigned long length;
+    bool pl_modified;
     struct tm *tm = info->modified;
     int info_no=selected_item/2;
     if(!(selected_item%2))
@@ -618,14 +620,39 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_ID3_PLAYLIST:
                 if (info->playlist_display_index == 0 || info->playlist_amount == 0 )
                     return NULL;
-                snprintf(buffer, buffer_len, "%d/%d",
-                         info->playlist_display_index, info->playlist_amount);
-                val=buffer;
+
+                pl_modified = playlist_modified(info->playlist);
+
+                snprintf(buffer, buffer_len, "%d/%d%s",
+                         info->playlist_display_index, info->playlist_amount,
+                         pl_modified ? "* " :"  ");
+                val = buffer;
+                size_t prefix_len = strlen(buffer);
+                buffer += prefix_len;
+                buffer_len -= prefix_len;
+
+                if (info->playlist)
+                     playlist_name(info->playlist, buffer, buffer_len);
+                else
+                {
+                    if (playlist_allow_dirplay(NULL))
+                        strmemccpy(buffer, "(Folder)", buffer_len);
+                    else if (playlist_dynamic_only())
+                        strmemccpy(buffer, "(Dynamic)", buffer_len);
+                    else
+                        playlist_name(NULL, buffer, buffer_len);
+                }
+
                 if(say_it)
                 {
                     talk_number(info->playlist_display_index, true);
                     talk_id(VOICE_OF, true);
                     talk_number(info->playlist_amount, true);
+
+                    if (pl_modified)
+                        talk_spell("Modified", true);
+                    if (buffer) /* playlist name */
+                        talk_spell(buffer, true);
                 }
                 break;
             case LANG_FORMAT:
@@ -750,7 +777,8 @@ static int id3_speak_item(int selected_item, void* data)
 /* Note: If track_ct > 1, filesize value will be treated as
  * KiB (instead of Bytes), and length as s instead of ms.
  */
-bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
+bool browse_id3_ex(struct mp3entry *id3, struct playlist_info *playlist,
+                int playlist_display_index, int playlist_amount,
                 struct tm *modified, int track_ct)
 {
     struct gui_synclist id3_lists;
@@ -760,6 +788,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     info.id3 = id3;
     info.modified = modified;
     info.track_ct = track_ct;
+    info.playlist = playlist;
     info.playlist_amount = playlist_amount;
     bool ret = false;
     int curr_activity = get_current_activity();
@@ -819,6 +848,13 @@ refresh_info:
     if (is_curr_track_info)
         pop_current_activity();
     return ret;
+}
+
+bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
+                struct tm *modified, int track_ct)
+{
+    return browse_id3_ex(id3, NULL, playlist_display_index, playlist_amount,
+                         modified, track_ct);
 }
 
 static const char* runtime_get_data(int selected_item, void* data,

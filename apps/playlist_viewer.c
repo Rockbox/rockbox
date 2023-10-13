@@ -523,7 +523,7 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
     }
 
     return id3_retrieval_successful &&
-            browse_id3(&id3, current_track->index + 1,
+            browse_id3_ex(&id3, viewer.playlist, current_track->index + 1,
             viewer.num_tracks, NULL, 1) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
 }
 
