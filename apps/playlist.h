@@ -36,7 +36,7 @@
 
 #define PLAYLIST_DISPLAY_COUNT  10
 
-#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u8"
+#define PLAYLIST_UNTITLED_PREFIX "Playlist "
 
 #define PLAYLIST_FLAG_MODIFIED (1u << 0) /* playlist was manually modified */
 #define PLAYLIST_FLAG_DIRPLAY  (1u << 1) /* enable directory skipping */

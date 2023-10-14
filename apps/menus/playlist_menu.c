@@ -39,6 +39,7 @@
 #include "playlist_catalog.h"
 #include "splash.h"
 #include "filetree.h"
+#include "general.h"
 
 /* load a screen to save the playlist passed in (or current playlist if NULL is passed) */
 int save_playlist_screen(struct playlist_info* playlist)
@@ -54,29 +55,27 @@ int save_playlist_screen(struct playlist_info* playlist)
     char temp[MAX_PATH+1], *p;
     int len;
 
+    catalog_get_directory(directoryonly, sizeof(directoryonly));
     playlist_get_name(playlist, temp, sizeof(temp)-1);
 
     len = strlen(temp);
 
     if (len <= 1) /* root or dynamic playlist */
-    {
-        catalog_get_directory(temp, sizeof(temp));
-        strlcat(temp, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(temp));
-    }
+        create_numbered_filename(temp, directoryonly, PLAYLIST_UNTITLED_PREFIX, ".m3u8",
+                                 1 IF_CNFN_NUM_(, NULL));
     else if (!strcmp((temp + len - 1), "/")) /* dir playlists other than root  */
     {
         temp[len - 1] = '\0';
-        catalog_get_directory(directoryonly, sizeof(directoryonly));
 
         if ((p = strrchr(temp, '/'))) /* use last path component as playlist name */
         {
             strlcat(directoryonly, p, sizeof(directoryonly));
             strlcat(directoryonly, ".m3u8", sizeof(directoryonly));
+            strmemccpy(temp, directoryonly, sizeof(temp));
         }
         else
-            strlcat(directoryonly, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(directoryonly));
-
-        strmemccpy(temp, directoryonly, sizeof(temp));
+            create_numbered_filename(temp, directoryonly, PLAYLIST_UNTITLED_PREFIX, ".m3u8",
+                                     1 IF_CNFN_NUM_(, NULL));
     }
 
     if (catalog_pick_new_playlist_name(temp, sizeof(temp),

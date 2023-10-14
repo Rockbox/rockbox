@@ -47,6 +47,7 @@
 #include "playlist_viewer.h"
 #include "bookmark.h"
 #include "root_menu.h"
+#include "general.h"
 
 /* Use for recursive directory search */
 struct add_track_context {
@@ -464,14 +465,16 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                 name = strrchr(sel, '/');
 
             if (name == NULL || ((sel_attr & ATTR_DIRECTORY) != ATTR_DIRECTORY))
-                name = "/";
-
-            strlcat(playlist, name, sizeof(playlist));
+                create_numbered_filename(playlist, playlist, PLAYLIST_UNTITLED_PREFIX,
+                                         ".m3u8", 1 IF_CNFN_NUM_(, NULL));
+            else
+            {
+                strlcat(playlist, name, sizeof(playlist));
+                apply_playlist_extension(playlist, sizeof(playlist));
+            }
         }
         else
-            strmemccpy(playlist, m3u8name, MAX_PATH);
-
-        apply_playlist_extension(playlist, sizeof(playlist));
+            strmemccpy(playlist, m3u8name, sizeof(playlist));
         
         if (!catalog_pick_new_playlist_name(playlist, sizeof(playlist), NULL))
             return false;

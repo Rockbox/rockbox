@@ -43,7 +43,7 @@ bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
  *  sel_attr     : the attributes that tell what type of file we're adding
  *  new_playlist : whether we want to create a new playlist or add to an
  *                 existing one.
- *  m3u8name     : filename to save the playlist to, NULL to show the keyboard
+ *  m3u8name     : NULL, or filename to show in keyboard picker (include the extension!)
  *  add_to_pl_cb : can be NULL, or a function responsible for handling the
  *                 insert operations itself, in case the caller wants full
  *                 control over how and what files are actually added.
