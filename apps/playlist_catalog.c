@@ -420,10 +420,10 @@ bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
         apply_playlist_extension(pl_name, buf_size);
 
         /* warn before overwriting existing (different) playlist */
-        if ((!curr_pl_name || strcmp(curr_pl_name, pl_name)) &&
-            file_exists(pl_name))
+        if (!curr_pl_name || strcmp(curr_pl_name, pl_name))
         {
-            do_save = confirm_overwrite_yesno() == YESNO_YES;
+            if (file_exists(pl_name))
+                do_save = confirm_overwrite_yesno() == YESNO_YES;
 
             if (do_save) /* delete bookmark file unrelated to new playlist */
             {
