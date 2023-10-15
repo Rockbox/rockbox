@@ -48,6 +48,7 @@ static int props_type = PROPS_FILE;
 static struct mp3entry id3;
 #ifdef HAVE_TAGCACHE
 static int mul_id3_count;
+static int skipped_count;
 #endif
 
 static char str_filename[MAX_PATH];
@@ -374,11 +375,15 @@ static bool determine_file_or_dir(void)
 #ifdef HAVE_TAGCACHE
 bool mul_id3_add(const char *file_name)
 {
-    if (rb->mp3info(&id3, file_name))
+    if (!file_name)
+        skipped_count++;
+    else if (rb->mp3info(&id3, file_name))
         return false;
-
-    collect_id3(&id3, mul_id3_count == 0);
-    mul_id3_count++;
+    else
+    {
+        collect_id3(&id3, mul_id3_count == 0);
+        mul_id3_count++;
+    }
 
     return true;
 }
@@ -406,12 +411,15 @@ enum plugin_status plugin_start(const void* parameter)
     if (!rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))) /* db table selected */
     {
         props_type = PROPS_MUL_ID3;
-        mul_id3_count = 0;
+        mul_id3_count = skipped_count = 0;
 
         if (!rb->tagtree_subentries_do_action(&mul_id3_add) || mul_id3_count == 0)
             return PLUGIN_ERROR;
         else if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
             finalize_id3(&id3);
+
+        if (skipped_count > 0)
+            rb->splashf(HZ*2, "Skipped %d", skipped_count);
     }
     else
 #endif

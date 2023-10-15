@@ -2258,7 +2258,8 @@ static bool tagtree_insert_selection(int position, bool queue,
 
 /* Execute action_cb for all subentries of the current table's
  * selected item, handing over each entry's filename in the
- * callback function parameter.
+ * callback function parameter. Parameter will be NULL for
+ * entries whose filename couldn't be retrieved.
  */
 bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
 {
@@ -2289,9 +2290,8 @@ bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
                 last_tick = current_tick;
             }
 
-            if (!tagcache_retrieve(&tcs, tagtree_get_entry(tc, i)->extraseek,
-                                   tcs.type, buf, sizeof buf)
-                || !action_cb(buf))
+            if (!action_cb(tagcache_retrieve(&tcs, tagtree_get_entry(tc, i)->extraseek,
+                                             tcs.type, buf, sizeof buf) ? buf : NULL))
             {
                 ret = false;
                 break;
