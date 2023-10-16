@@ -209,6 +209,7 @@ static bool shuffle_playlist(void)
         return false;
     playlist_sort(NULL, true);
     playlist_randomise(NULL, current_tick, true);
+    playlist_set_modified(NULL, true);
 
     return false;
 }
