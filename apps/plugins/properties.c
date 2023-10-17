@@ -375,10 +375,8 @@ static bool determine_file_or_dir(void)
 #ifdef HAVE_TAGCACHE
 bool mul_id3_add(const char *file_name)
 {
-    if (!file_name)
+    if (!file_name || rb->mp3info(&id3, file_name))
         skipped_count++;
-    else if (rb->mp3info(&id3, file_name))
-        return false;
     else
     {
         collect_id3(&id3, mul_id3_count == 0);
