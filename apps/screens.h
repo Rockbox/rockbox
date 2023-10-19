@@ -24,7 +24,9 @@
 #include "config.h"
 #include "timefuncs.h"
 #include "metadata.h"
+#ifndef WARBLE
 #include "playlist.h"
+#endif
 
 struct screen;
 
@@ -40,10 +42,12 @@ int mmc_remove_request(void);
 bool set_time_screen(const char* title, struct tm *tm, bool set_date);
 #endif
 
-bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
-                struct tm *modified, int track_ct);
+#ifndef WARBLE
 bool browse_id3_ex(struct mp3entry *id3, struct playlist_info *playlist,
                 int playlist_display_index, int playlist_amount,
+                struct tm *modified, int track_ct);
+#endif
+bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
                 struct tm *modified, int track_ct);
 int  view_runtime(void);
 
