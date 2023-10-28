@@ -658,15 +658,7 @@ static enum pv_onplay_result onplay_menu(int index)
                 ret = PV_ONPLAY_CHANGED;
                 break;
             case 6:
-                /* save playlist */
-                if (!save_playlist_screen(viewer.playlist) && viewer.playlist)
-                    /*
-                     * Set unmodified unless it's the current playlist, which may
-                     * contain queued songs that aren't saved to the playlist file
-                     * TODO: This can be removed once g5192 is merged,
-                     *       "playlist: Rewrite playlist_save(), optimization & fixes"
-                     */
-                    playlist_set_modified(viewer.playlist, false);
+                save_playlist_screen(viewer.playlist);
                 ret = PV_ONPLAY_UNCHANGED;
                 break;
             case 7:
