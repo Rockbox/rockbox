@@ -3509,11 +3509,9 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.dirlen = playlist->dirlen;
 
     if (playlist->indices && playlist->indices != current_playlist.indices)
-    {
         memcpy((void*)current_playlist.indices, (void*)playlist->indices,
                playlist->max_playlist_size*sizeof(*playlist->indices));
-        dc_init_filerefs(&current_playlist, 0, current_playlist.max_playlist_size);
-    }
+    dc_init_filerefs(&current_playlist, 0, current_playlist.max_playlist_size);
 
     current_playlist.first_index = playlist->first_index;
     current_playlist.amount = playlist->amount;
