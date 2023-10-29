@@ -500,6 +500,12 @@ static void power_thread_rtc_process(void)
 /* switch off unit if battery level is too low for reliable operation */
 bool query_force_shutdown(void)
 {
+#if CONFIG_CHARGING
+    /* It doesn't make sense to force shutdown when externally powered. */
+    if (power_input_present())
+        return false;
+#endif
+
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return false;
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
