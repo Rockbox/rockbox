@@ -520,7 +520,11 @@ static char* create_bookmark(char **name,
 /* ----------------------------------------------------------------------- */
 static void get_track_resume_info(struct resume_info *resume_info)
 {
-    playlist_get_resume_info(&(resume_info->resume_index));
+    if (global_settings.playlist_shuffle)
+        playlist_get_resume_info(&(resume_info->resume_index));
+    else
+        resume_info->resume_index = playlist_get_display_index() - 1;
+
     resume_info->resume_seed = playlist_get_seed(NULL);
     resume_info->id3 = audio_current_track();
     resume_info->repeat_mode = global_settings.repeat_mode;

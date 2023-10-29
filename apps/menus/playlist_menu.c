@@ -121,7 +121,7 @@ int save_playlist_screen(struct playlist_info* playlist)
             }
 
             /* can't trust index from id3 (don't know why), get it from playlist */
-            resume_index = playlist_get_current()->index;
+            resume_index = playlist_get_display_index() - 1;
 
             struct mp3entry* id3 = audio_current_track();
 
