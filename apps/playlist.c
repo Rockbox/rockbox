@@ -3023,7 +3023,6 @@ int playlist_resume(void)
     STORAGE_ALIGN_BUFFER(buffer, buflen);
     buflen = ALIGN_DOWN(buflen, 512); /* to avoid partial sector I/O */
 
-    playlist_shutdown(); /* flush any cached control commands to disk */
     empty_playlist_unlocked(playlist, true);
 
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
