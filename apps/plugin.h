@@ -972,6 +972,8 @@ struct plugin_api {
 #ifdef HAVE_TAGCACHE
     void (*tagcache_commit_finalize)(void);
 #endif
+    int (*playlist_get_first_index)(const struct playlist_info* playlist);
+    int (*playlist_get_display_index)(void);
 };
 
 /* plugin header */

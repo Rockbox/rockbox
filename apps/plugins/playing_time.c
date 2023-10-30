@@ -50,8 +50,10 @@ enum ePT_KBS {
 
 /* playing_time screen context */
 struct playing_time_info {
-    int curr_playing; /* index of currently playing track in playlist */
-    int nb_tracks; /* how many tracks in playlist */
+    int curr_index;         /* index of currently playing track in playlist */
+    int curr_display_index; /* display index of currently playing track in playlist */
+    int nb_tracks;          /* how many tracks in playlist */
+    
     /* seconds total, before, and after current position.  Datatype
        allows for values up to 68years.  If I had kept it in ms
        though, it would have overflowed at 24days, which takes
@@ -59,6 +61,7 @@ struct playing_time_info {
        have playlists lasting longer than that. */
     long secs[ePT_SECS_COUNT];
     long trk_secs[ePT_SECS_COUNT];
+
     /* kilobytes played total, before, and after current pos.
        Kilobytes because bytes would overflow. Data type range is up
        to 2TB. */
@@ -160,13 +163,14 @@ static const char * playing_time_get_or_speak_info(int selected_item, void * dat
         break;
     }
     case 4: { /* track index */
-        int track_pct = (pti->curr_playing + 1) * 100 / pti->nb_tracks;
+        int track_pct = pti->curr_display_index * 100 / pti->nb_tracks;
+
         rb->snprintf(buf, buffer_len, rb->str(LANG_PLAYTIME_TRACK),
-                 pti->curr_playing + 1, pti->nb_tracks, track_pct);
+                 pti->curr_display_index, pti->nb_tracks, track_pct);
 
         if (say_it)
           rb_talk_ids(false, LANG_PLAYTIME_TRACK,
-                     TALK_ID(pti->curr_playing + 1, UNIT_INT),
+                     TALK_ID(pti->curr_display_index, UNIT_INT),
                      VOICE_OF,
                      TALK_ID(pti->nb_tracks, UNIT_INT),
                      VOICE_PAUSE,
@@ -248,13 +252,15 @@ static bool playing_time(void)
     struct playing_time_info pti;
     struct playlist_track_info pltrack;
     struct mp3entry id3;
-    int i, fd;
+    int i, index, fd;
 
     pti.nb_tracks = rb->playlist_amount();
-    rb->playlist_get_resume_info(&pti.curr_playing);
+    rb->playlist_get_resume_info(&pti.curr_index);
     struct mp3entry *curr_id3 = rb->audio_current_track();
-    if (pti.curr_playing == -1 || !curr_id3)
+    if (pti.curr_index == -1 || !curr_id3)
         return false;
+    pti.curr_display_index = rb->playlist_get_display_index();
+
     pti.secs[ePT_SECS_BEF] = pti.trk_secs[ePT_SECS_BEF] = curr_id3->elapsed / 1000;
     pti.secs[ePT_SECS_AFT] = pti.trk_secs[ePT_SECS_AFT]
         = (curr_id3->length -curr_id3->elapsed) / 1000;
@@ -267,7 +273,12 @@ static bool playing_time(void)
        huge playlists this can take a while... The reference position
        is the position at the moment this function was invoked,
        although playback continues forward. */
-    for (i = 0; i < pti.nb_tracks; i++) {
+    index = rb->playlist_get_first_index(NULL);
+    for (i = 0; i < pti.nb_tracks; i++, index++) {
+
+        if (index == pti.nb_tracks)
+            index = 0;
+
         /* Show a splash while we are loading. */
         rb->splash_progress(i, pti.nb_tracks,
                          "%s (%s)", rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
@@ -281,10 +292,10 @@ static bool playing_time(void)
         if (rb->action_userabort(TIMEOUT_NOBLOCK))
             goto exit;
 
-        if (i == pti.curr_playing)
+        if (index == pti.curr_index)
             continue;
 
-        if (rb->playlist_get_track_info(NULL, i, &pltrack) >= 0)
+        if (rb->playlist_get_track_info(NULL, index, &pltrack) >= 0)
         {
             bool ret = false;
             if ((fd = rb->open(pltrack.filename, O_RDONLY)) >= 0)
@@ -293,7 +304,7 @@ static bool playing_time(void)
                 rb->close(fd);
                 if (ret)
                 {
-                    if (i < pti.curr_playing) {
+                    if (pltrack.display_index < pti.curr_display_index) {
                         pti.secs[ePT_SECS_BEF] += id3.length / 1000;
                         pti.kbs[ePT_KBS_BEF] += id3.filesize / 1024;
                     } else {

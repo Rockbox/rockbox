@@ -835,6 +835,8 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TAGCACHE
     tagcache_commit_finalize,
 #endif
+    playlist_get_first_index,
+    playlist_get_display_index,
 };
 
 static int plugin_buffer_handle;
