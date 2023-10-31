@@ -1255,8 +1255,7 @@ static void audio_update_and_announce_next_track(const struct mp3entry *id3_next
 
 /* Bring the user current mp3entry up to date and set a new offset for the
    buffered metadata */
-static void playing_id3_sync(struct track_info *user_infop,
-                             unsigned long elapsed, unsigned long offset)
+static void playing_id3_sync(struct track_info *user_infop, struct audio_resume_info *resume_info)
 {
     id3_mutex_lock();
 
@@ -1264,16 +1263,18 @@ static void playing_id3_sync(struct track_info *user_infop,
 
     pcm_play_lock();
 
-    if (id3)
+    if (resume_info && id3)
     {
-        if (elapsed != (unsigned long)-1)
-            id3->elapsed = elapsed;
-
-        if (offset != (unsigned long)-1)
-            id3->offset = offset;
+        id3->elapsed = resume_info->elapsed;
+        id3->offset = resume_info->offset;
     }
     id3_write(PLAYING_ID3, id3);
 
+    if (!resume_info && id3)
+    {
+        id3->offset = 0;
+        id3->elapsed = 0;
+    }
     pcm_play_unlock();
 
     id3_mutex_unlock();
@@ -2433,7 +2434,7 @@ static void audio_on_finish_load_track(int id3_hid)
                change otherwise */
             bool was_valid = valid_mp3entry(id3_get(PLAYING_ID3));
 
-            playing_id3_sync(&info, -1, -1);
+            playing_id3_sync(&info, NULL);
 
             if (!was_valid)
             {
@@ -2626,7 +2627,7 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
             if (audio_start_codec(!track_skip_is_manual))
             {
                 if (track_skip_is_manual)
-                    playing_id3_sync(&info, -1, -1);
+                    playing_id3_sync(&info, NULL);
                 return;
             }
         }
@@ -2903,7 +2904,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
         /* This is the currently playing track - get metadata, stat */
         struct track_info info;
         track_list_current(0, &info);
-        playing_id3_sync(&info, resume.elapsed, resume.offset);
+        playing_id3_sync(&info, &resume);
 
         if (valid_mp3entry(id3_get(PLAYING_ID3)))
         {
