@@ -123,9 +123,6 @@ static enum audio_buffer_state
 /** Main state control **/
 static bool ff_rw_mode SHAREDBSS_ATTR = false; /* Pre-ff-rewind mode (A,O-) */
 
-static long seek_on_finish_load_time = 0;
-static int seek_on_finish_load_id3_hid = 0;
-
 static enum play_status
 {
     PLAY_STOPPED = 0,
@@ -1255,7 +1252,7 @@ static void audio_update_and_announce_next_track(const struct mp3entry *id3_next
 
 /* Bring the user current mp3entry up to date and set a new offset for the
    buffered metadata */
-static void playing_id3_sync(struct track_info *user_infop, struct audio_resume_info *resume_info)
+static void playing_id3_sync(struct track_info *user_infop, struct audio_resume_info *resume_info, bool skip_resume_adjustments)
 {
     id3_mutex_lock();
 
@@ -1263,18 +1260,25 @@ static void playing_id3_sync(struct track_info *user_infop, struct audio_resume_
 
     pcm_play_lock();
 
-    if (resume_info && id3)
+    if (id3)
     {
-        id3->elapsed = resume_info->elapsed;
-        id3->offset = resume_info->offset;
+        if (resume_info)
+        {
+            id3->elapsed = resume_info->elapsed;
+            id3->offset = resume_info->offset;
+        }
+        id3->skip_resume_adjustments = skip_resume_adjustments;
     }
+    
     id3_write(PLAYING_ID3, id3);
 
     if (!resume_info && id3)
     {
         id3->offset = 0;
         id3->elapsed = 0;
+        id3->skip_resume_adjustments = false;
     }
+
     pcm_play_unlock();
 
     id3_mutex_unlock();
@@ -1580,16 +1584,8 @@ static bool audio_start_codec(bool auto_skip)
         return false;
     }
 
-    bool delayed_seek = false;
-    if (info.id3_hid == seek_on_finish_load_id3_hid)
-    {
-        cur_id3->elapsed = seek_on_finish_load_time;
-        cur_id3->offset = 0;
-        delayed_seek = true;
-    }
-
-#ifdef HAVE_TAGCACHE
-    bool autoresume_enable = !delayed_seek && global_settings.autoresume_enable;
+    #ifdef HAVE_TAGCACHE
+    bool autoresume_enable = !cur_id3->skip_resume_adjustments && global_settings.autoresume_enable;
 
     if (autoresume_enable && !(cur_id3->elapsed || cur_id3->offset))
     {
@@ -1639,8 +1635,11 @@ static bool audio_start_codec(bool auto_skip)
        and back again will cause accumulation of silent rewinds - that's not
        our job to track directly nor could it be in any reasonable way
      */
-    if (!delayed_seek)
+    if (!cur_id3->skip_resume_adjustments)
+    {
         resume_rewind_adjust_progress(cur_id3, &cur_id3->elapsed, &cur_id3->offset);
+        cur_id3->skip_resume_adjustments = true;
+    }
 
     /* Update the codec API with the metadata and track info */
     id3_write(CODEC_ID3, cur_id3);
@@ -2434,7 +2433,7 @@ static void audio_on_finish_load_track(int id3_hid)
                change otherwise */
             bool was_valid = valid_mp3entry(id3_get(PLAYING_ID3));
 
-            playing_id3_sync(&info, NULL);
+            playing_id3_sync(&info, NULL, true);
 
             if (!was_valid)
             {
@@ -2448,9 +2447,6 @@ static void audio_on_finish_load_track(int id3_hid)
     {
         audio_handle_track_load_status(LOAD_TRACK_ERR_START_CODEC);
     }
-
-    seek_on_finish_load_time = 0;
-    seek_on_finish_load_id3_hid = 0;
 }
 
 /* Called when handles other than metadata handles have finished buffering
@@ -2627,7 +2623,7 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
             if (audio_start_codec(!track_skip_is_manual))
             {
                 if (track_skip_is_manual)
-                    playing_id3_sync(&info, NULL);
+                    playing_id3_sync(&info, NULL, true);
                 return;
             }
         }
@@ -2791,6 +2787,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     static struct audio_resume_info resume = { 0, 0 };
     enum play_status old_status = play_status;
 
+    bool skip_resume_adjustments = false;
     if (resume_info)
     {
         resume.elapsed = resume_info->elapsed;
@@ -2828,6 +2825,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 
             resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
             resume.offset = id3_get(PLAYING_ID3)->offset;
+            skip_resume_adjustments = id3_get(PLAYING_ID3)->skip_resume_adjustments;
 
             track_list_clear(TRACK_LIST_CLEAR_ALL);
             pcmbuf_update_frequency();
@@ -2904,7 +2902,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
         /* This is the currently playing track - get metadata, stat */
         struct track_info info;
         track_list_current(0, &info);
-        playing_id3_sync(&info, &resume);
+        playing_id3_sync(&info, &resume, skip_resume_adjustments);
 
         if (valid_mp3entry(id3_get(PLAYING_ID3)))
         {
@@ -3225,14 +3223,11 @@ static void audio_on_ff_rewind(long time)
         struct track_info cur_info;
         track_list_current(0, &cur_info);
 
-        /* Track must complete the loading _now_ since a codec and audio
-           handle are needed in order to do the seek */
         bool finish_load = cur_info.audio_hid < 0;
         if (finish_load)
         {
-            seek_on_finish_load_time = time;
-            seek_on_finish_load_id3_hid = cur_info.id3_hid;
-            // Wait till playback thread receives finish load track event and seek then
+            // track is not yet loaded so simply update resume details for upcoming finish_load_track and quit 
+            playing_id3_sync(&cur_info, &(struct audio_resume_info){ time, 0 }, true);
             return;
         }
 
