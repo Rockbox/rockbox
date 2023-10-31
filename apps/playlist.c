@@ -2997,6 +2997,7 @@ int playlist_resume(void)
     int result = -1;
 
     splash(0, ID2P(LANG_WAIT));
+    cpu_boost(true);
 
     struct playlist_info* playlist = &current_playlist;
     dc_thread_stop(playlist);
@@ -3430,6 +3431,7 @@ out:
 
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
     core_free(handle);
+    cpu_boost(false);
     return result;
 }
 
