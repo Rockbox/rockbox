@@ -2874,6 +2874,7 @@ int playlist_next(int steps)
             playlist->first_index = 0;
             sort_playlist_unlocked(playlist, false, false);
             randomise_playlist_unlocked(playlist, current_tick, false, true);
+            global_settings.playlist_shuffle = true;
 
             playlist->started = true;
             playlist->index = 0;
