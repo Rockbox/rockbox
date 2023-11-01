@@ -654,7 +654,9 @@ static enum pv_onplay_result onplay_menu(int index)
                 break;
             case 5:
                 /* shuffle */
-                playlist_randomise(viewer.playlist, current_tick, false);
+                playlist_sort(viewer.playlist, !viewer.playlist);
+                playlist_randomise(viewer.playlist, current_tick, !viewer.playlist);
+                viewer.selected_track = 0;
                 ret = PV_ONPLAY_CHANGED;
                 break;
             case 6:
@@ -779,8 +781,14 @@ static int playlist_callback_voice(int selected_item, void *data)
     return 0;
 }
 
-static void update_lists(struct gui_synclist * playlist_lists)
+static void update_lists(struct gui_synclist * playlist_lists, bool init)
 {
+    if (init)
+    {
+        gui_synclist_init(playlist_lists, playlist_callback_name,
+                          &viewer, false, 1, NULL);
+        gui_synclist_set_nb_items(playlist_lists, viewer.num_tracks);
+    }
     gui_synclist_set_voice_callback(playlist_lists,
                                     global_settings.talk_file?
                                     &playlist_callback_voice:NULL);
@@ -788,6 +796,7 @@ static void update_lists(struct gui_synclist * playlist_lists)
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
     gui_synclist_set_title(playlist_lists, viewer.title, Icon_Playlist);
+    gui_synclist_select_item(playlist_lists, viewer.selected_track);
     gui_synclist_draw(playlist_lists);
     gui_synclist_speak_item(playlist_lists);
 }
@@ -814,25 +823,8 @@ static bool update_viewer_with_changes(struct gui_synclist *playlist_lists, enum
 
     /* the show_icons option in the playlist viewer settings
      * menu might have changed */
-    update_lists(playlist_lists);
+    update_lists(playlist_lists, false);
     return exit;
-}
-
-static void prepare_lists(struct gui_synclist * playlist_lists)
-{
-    gui_synclist_init(playlist_lists, playlist_callback_name,
-                      &viewer, false, 1, NULL);
-    gui_synclist_set_voice_callback(playlist_lists,
-                                    global_settings.talk_file ?
-                                     &playlist_callback_voice : NULL);
-    gui_synclist_set_icon_callback(playlist_lists,
-                                   global_settings.playlist_viewer_icons ?
-                                    &playlist_callback_icons : NULL);
-    gui_synclist_set_nb_items(playlist_lists, viewer.num_tracks);
-    gui_synclist_set_title(playlist_lists, viewer.title, Icon_Playlist);
-    gui_synclist_select_item(playlist_lists, viewer.selected_track);
-    gui_synclist_draw(playlist_lists);
-    gui_synclist_speak_item(playlist_lists);
 }
 
 static bool open_playlist_viewer(const char* filename,
@@ -844,7 +836,7 @@ static bool open_playlist_viewer(const char* filename,
     if (!playlist_viewer_init(&viewer, filename, reload, most_recent_selection))
         return false;
 
-    prepare_lists(playlist_lists);
+    update_lists(playlist_lists, true);
 
     return true;
 }
@@ -1038,7 +1030,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
                         }
                         update_playlist(true);
-                        prepare_lists(&playlist_lists);
+                        update_lists(&playlist_lists, true);
                     }
                     break;
 #endif
@@ -1077,7 +1069,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                         ret = PLAYLIST_VIEWER_USB;
                         goto exit;
                     }
-                    update_lists(&playlist_lists);
+                    update_lists(&playlist_lists, false);
                 }
                 else if (global_settings.hotkey_tree == HOTKEY_DELETE)
                 {
