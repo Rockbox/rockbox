@@ -1417,7 +1417,7 @@ static int remove_track_unlocked(struct playlist_info* playlist,
  * to make sure the current index is still pointing to correct track.
  */
 static void find_and_set_playlist_index_unlocked(struct playlist_info* playlist,
-                                                 unsigned int seek)
+                                                 unsigned long seek)
 {
     int i;
 
@@ -1443,7 +1443,7 @@ static int randomise_playlist_unlocked(struct playlist_info* playlist,
 {
     int count;
     int candidate;
-    unsigned int current = playlist->indices[playlist->index];
+    unsigned long current = playlist->indices[playlist->index];
 
     /* seed 0 is used to identify sorted playlist for resume purposes */
     if (seed == 0)
@@ -1459,7 +1459,7 @@ static int randomise_playlist_unlocked(struct playlist_info* playlist,
         candidate = rand() % (count + 1);
 
         /* now swap the values at the 'count' and 'candidate' positions */
-        int indextmp = playlist->indices[candidate];
+        unsigned long indextmp = playlist->indices[candidate];
         playlist->indices[candidate] = playlist->indices[count];
         playlist->indices[count] = indextmp;
 #ifdef HAVE_DIRCACHE
@@ -1525,7 +1525,7 @@ static int sort_compare_fn(const void* p1, const void* p2)
 static int sort_playlist_unlocked(struct playlist_info* playlist,
                                   bool start_current, bool write)
 {
-    unsigned int current = playlist->indices[playlist->index];
+    unsigned long current = playlist->indices[playlist->index];
 
     if (playlist->amount > 0)
         qsort((void*)playlist->indices, playlist->amount,
