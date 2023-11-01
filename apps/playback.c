@@ -2690,12 +2690,18 @@ static void audio_on_codec_complete(int status)
     struct track_info info;
     bool have_track = track_list_advance_current(1, &info);
 
-    if (!have_track || (info.audio_hid < 0 && filling != STATE_STOPPED))
+    if (!have_track || info.audio_hid < 0)
     {
         bool end_of_playlist = false;
 
         if (have_track)
         {
+            if (filling == STATE_STOPPED)
+            {
+                audio_begin_track_change(TRACK_CHANGE_END_OF_DATA, trackstat);
+                return;
+            }
+
             /* Track load is not complete - it might have stopped on a
                full buffer without reaching the audio handle or we just
                arrived at it early
