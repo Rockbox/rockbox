@@ -306,7 +306,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
         new_sound_sample += tmp_cnt * tmp_dur;
         if (chunk_sample <= total_samples)
         {
-            new_sound_sample += (chunk_sample - total_samples) * tmp_dur;
+            new_sound_sample -= (total_samples - chunk_sample) * tmp_dur;
             break;
         }
         ++i;
