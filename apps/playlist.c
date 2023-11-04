@@ -2749,6 +2749,11 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
     else /* Calculate index of desired position */
     {
         new_index = (r+playlist->first_index)%playlist->amount;
+
+        if ((new_index < playlist->first_index) && (new_index <= playlist->index))
+            displace_current = true;
+        else if ((new_index >= playlist->first_index) && (playlist->index < playlist->first_index))
+            displace_current = false;
     }
 
     result = add_track_to_playlist_unlocked(playlist, filename,
