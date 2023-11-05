@@ -1208,6 +1208,8 @@ static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write
  *  PLAYLIST_INSERT_FIRST         - Add track immediately after current song, no
  *                                  matter what other tracks have been inserted
  *  PLAYLIST_INSERT_LAST          - Add track to end of playlist
+ *  PLAYLIST_INSERT_LAST_ROTATED  - Add track to end of playlist, by inserting at
+ *                                  first_index, then increasing first_index by 1
  *  PLAYLIST_INSERT_SHUFFLED      - Add track at some random point between the
  *                                  current playing track and end of playlist
  *  PLAYLIST_INSERT_LAST_SHUFFLED - Add tracks in random order to the end of
@@ -1260,11 +1262,15 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
             playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_LAST:
-            if (playlist->first_index > 0)
-                position = insert_position = playlist->first_index;
-            else
+            if (playlist->first_index <= 0)
+            {
                 position = insert_position = playlist->amount;
-
+                playlist->last_insert_pos = position;
+                break;
+            }
+            /* fallthrough */
+        case PLAYLIST_INSERT_LAST_ROTATED:
+            position = insert_position = playlist->first_index;
             playlist->last_insert_pos = position;
             break;
         case PLAYLIST_INSERT_SHUFFLED:
@@ -1330,16 +1336,37 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
     if (orig_position < 0)
     {
         if (playlist->amount > 0 && insert_position <= playlist->index &&
-            playlist->started)
+            playlist->started && orig_position != PLAYLIST_INSERT_LAST_ROTATED)
             playlist->index++;
 
+        /*
+         * When inserting into a playlist at positions before or equal to first_index
+         * (unless PLAYLIST_PREPEND is specified explicitly), adjust first_index, so
+         * that track insertion near the end does not affect the start of the playlist
+         */
         if (playlist->amount > 0 && insert_position <= playlist->first_index &&
             orig_position != PLAYLIST_PREPEND && playlist->started)
+        {
+            /*
+             * To ensure proper resuming from control file for a track that is supposed
+             * to be appended, but is inserted at first_index, store position as special
+             * value.
+             * If we were to store the position unchanged, i.e. use first_index,
+             * track would be prepended, instead, after resuming.
+             */
+            if (insert_position == playlist->first_index)
+                position = PLAYLIST_INSERT_LAST_ROTATED;
+
             playlist->first_index++;
+        }
     }
+    else if (playlist->amount > 0 && insert_position < playlist->first_index &&
+             playlist->started)
+         playlist->first_index++;
 
     if (insert_position < playlist->last_insert_pos ||
-        (insert_position == playlist->last_insert_pos && position < 0))
+        (insert_position == playlist->last_insert_pos && position < 0 &&
+         position != PLAYLIST_INSERT_LAST_ROTATED))
         playlist->last_insert_pos++;
 
     if (seek_pos < 0 && playlist->control_fd >= 0)
