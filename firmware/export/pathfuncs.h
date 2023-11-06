@@ -94,6 +94,8 @@ void path_remove_dot_segments(char *dstpath, const char *path);
 /* constants useable in basepath and component */
 #define PA_SEP_HARD NULL /* separate even if base is empty */
 #define PA_SEP_SOFT ""   /* separate only if base is nonempty */
+size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
+                      const char *component, size_t bufsize);
 size_t path_append(char *buffer, const char *basepath, const char *component,
                    size_t bufsize);
 ssize_t parse_path_component(const char **pathp, const char **namep);

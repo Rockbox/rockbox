@@ -536,6 +536,7 @@ int update_playlist_flags_unlocked(struct playlist_info *playlist,
  * dest: output buffer
  * src: the file name from the playlist
  * dir: the absolute path to the directory where the playlist resides
+ * dlen used to truncate dir -- supply -1u to ignore
  *
  * The type of path in "src" determines what will be written to "dest":
  *
@@ -548,11 +549,10 @@ int update_playlist_flags_unlocked(struct playlist_info *playlist,
  *    the drive letter is accepted but ignored.
  */
 static ssize_t format_track_path(char *dest, char *src, int buf_length,
-                                 const char *dir)
+                                 const char *dir, size_t dlen)
 {
     /* Look for the end of the string (includes NULL) */
     size_t len = strcspn(src, "\r\n");;
-
     /* Now work back killing white space */
     while (len > 0)
     {
@@ -574,18 +574,25 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
     #ifdef HAVE_MULTIVOLUME
         const char *p;
         path_strip_last_volume(dir, &p, false);
-        dir = strmemdupa(dir, p - dir); /* empty if no volspec on dir */
+        //dir = strmemdupa(dir, p - dir);
+        dlen = (p-dir);  /* empty if no volspec on dir */
     #else
         dir = "";                       /* only volume is root */
     #endif
     }
 
-    len = path_append(dest, *dir ? dir : PATH_ROOTSTR, src, buf_length);
+    if (*dir == '\0')
+    {
+        dir = PATH_ROOTSTR;
+        dlen = -1u;
+    }
+
+    len = path_append_ex(dest, dir, dlen, src, buf_length);
     if (len >= (size_t)buf_length)
         return -1; /* buffer too small */
 
     path_remove_dot_segments (dest, dest);
-
+    logf("%s %s", __func__, dest);
     return strlen (dest);
 }
 
@@ -1033,6 +1040,9 @@ static int get_track_filename(struct playlist_info* playlist, int index,
     char dir_buf[MAX_PATH+1];
     bool utf8 = playlist->utf8;
 
+    if (index < 0 || index >= playlist->amount)
+        return -1;
+
     playlist_write_lock(playlist);
 
     bool control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
@@ -1102,10 +1112,10 @@ static int get_track_filename(struct playlist_info* playlist, int index,
         }
     }
 
-    strmemccpy(dir_buf, playlist->filename, playlist->dirlen);
     playlist_write_unlock(playlist);
 
-    if (format_track_path(buf, tmp_buf, buf_length, dir_buf) < 0)
+    if (format_track_path(buf, tmp_buf, buf_length,
+                          playlist->filename, playlist->dirlen) < 0)
         return -1;
 
     return 0;
@@ -1776,7 +1786,7 @@ static void dc_thread_playlist(void)
                     }
 
                     /* Load the filename from playlist file. */
-                    if (get_track_filename(playlist, index, tmp, sizeof(tmp)))
+                    if (get_track_filename(playlist, index, tmp, sizeof(tmp)) != 0)
                         break;
 
                     /* Obtain the dircache file entry cookie. */
@@ -2217,16 +2227,20 @@ int playlist_get_display_index(void)
 unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
                                          int index)
 {
-    struct playlist_track_info track_info;
-    if (playlist_get_track_info(playlist, index, &track_info) == -1)
-        return -1;
     const char *basename;
+    char filename[MAX_PATH]; /* path name of mp3 file */
+    if (!playlist)
+        playlist = &current_playlist;
+
+    if (get_track_filename(playlist, index, filename, sizeof(filename)) != 0)
+        return -1;
+
 #ifdef HAVE_MULTIVOLUME
     /* remove the volume identifier it might change just use the relative part*/
-    path_strip_volume(track_info.filename, &basename, false);
+    path_strip_volume(filename, &basename, false);
     if (basename == NULL)
 #endif
-        basename = track_info.filename;
+        basename = filename;
     NOTEF("%s: %s", __func__, basename);
     return crc_32(basename, strlen(basename), -1);
 }
@@ -2298,11 +2312,8 @@ int playlist_get_track_info(struct playlist_info* playlist, int index,
     if (!playlist)
         playlist = &current_playlist;
 
-    if (index < 0 || index >= playlist->amount)
-        return -1;
-
     if (get_track_filename(playlist, index,
-                           info->filename, sizeof(info->filename)))
+                           info->filename, sizeof(info->filename)) != 0)
         return -1;
 
     info->attr = 0;
@@ -2482,7 +2493,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
         /* we need the directory name for formatting purposes */
         size_t dirlen = path_dirname(filename, (const char **)&dir);
-        dir = strmemdupa(dir, dirlen);
+        //dir = strmemdupa(dir, dirlen);
 
         while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
         {
@@ -2502,7 +2513,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
                 /* we need to format so that relative paths are correctly
                    handled */
-                if (format_track_path(trackname, temp_buf, sizeof(trackname), dir) < 0)
+                if (format_track_path(trackname, temp_buf,
+                                      sizeof(trackname), dir, dirlen) < 0)
                 {
                     goto out;
                 }
@@ -2683,7 +2695,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 
     queue = playlist->indices[index] & PLAYLIST_QUEUED;
 
-    if (get_track_filename(playlist, index, filename, sizeof(filename)))
+    if (get_track_filename(playlist, index, filename, sizeof(filename)) != 0)
         goto out;
 
     /* We want to insert the track at the position that was specified by
@@ -2891,9 +2903,8 @@ const char* playlist_peek(int steps, char* buf, size_t buf_size)
 {
     struct playlist_info* playlist = &current_playlist;
     char *temp_ptr;
-    int index;
+    int index = get_next_index(playlist, steps, -1);
 
-    index = get_next_index(playlist, steps, -1);
     if (index < 0)
         return NULL;
 
@@ -2901,7 +2912,7 @@ const char* playlist_peek(int steps, char* buf, size_t buf_size)
     if (!buf || !buf_size)
         return "";
 
-    if (get_track_filename(playlist, index, buf, buf_size))
+    if (get_track_filename(playlist, index, buf, buf_size) != 0)
         return NULL;
 
     temp_ptr = buf;
@@ -2979,6 +2990,48 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
     return result;
 }
 
+/* playlist_resume helper function
+ * only allows comments (#) and PLAYLIST_COMMAND_PLAYLIST (P)
+ */
+static enum playlist_command pl_cmds_start(char cmd)
+{
+    if (cmd == 'P')
+        return PLAYLIST_COMMAND_PLAYLIST;
+    if (cmd == '#')
+        return PLAYLIST_COMMAND_COMMENT;
+
+    return PLAYLIST_COMMAND_ERROR;
+}
+
+/* playlist resume helper function excludes PLAYLIST_COMMAND_PLAYLIST (P) */
+static enum playlist_command pl_cmds_run(char cmd)
+{
+    switch (cmd)
+    {
+        case 'A':
+            return PLAYLIST_COMMAND_ADD;
+        case 'Q':
+            return PLAYLIST_COMMAND_QUEUE;
+        case 'D':
+            return PLAYLIST_COMMAND_DELETE;
+        case 'S':
+            return PLAYLIST_COMMAND_SHUFFLE;
+        case 'U':
+            return PLAYLIST_COMMAND_UNSHUFFLE;
+        case 'R':
+            return PLAYLIST_COMMAND_RESET;
+        case 'C':
+            return PLAYLIST_COMMAND_CLEAR;
+        case 'F':
+            return PLAYLIST_COMMAND_FLAGS;
+        case '#':
+            return PLAYLIST_COMMAND_COMMENT;
+        default: /* ERROR */
+            break;
+    }
+    return PLAYLIST_COMMAND_ERROR;
+}
+
 /*
  * Restore the playlist state based on control file commands.  Called to
  * resume playback after shutdown.
@@ -2992,9 +3045,9 @@ int playlist_resume(void)
     int nread;
     int total_read = 0;
     int control_file_size = 0;
-    bool first = true;
     bool sorted = true;
     int result = -1;
+    enum playlist_command (*pl_cmd)(char) = &pl_cmds_start;
 
     splash(0, ID2P(LANG_WAIT));
     cpu_boost(true);
@@ -3060,13 +3113,12 @@ int playlist_resume(void)
         bool newline = true;
         bool exit_loop = false;
         char *p = buffer;
-        char *str1 = NULL;
-        char *str2 = NULL;
-        char *str3 = NULL;
+        char *strp[3] = {NULL};
 
         unsigned long last_tick = current_tick;
         splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
         bool useraborted = false;
+        bool queue = false;
 
         for(count=0; count<nread && !exit_loop; count++,p++)
         {
@@ -3090,25 +3142,35 @@ int playlist_resume(void)
 
                 switch (current_command)
                 {
+                    case PLAYLIST_COMMAND_ERROR:
+                    {
+                        /* first non-comment line does not specify playlist */
+                        /* ( below handled by pl_cmds_run() ) */
+                        /* OR playlist is specified more than once */
+                        /* OR unknown command -- pl corrupted?? */
+                        result = -12;
+                        exit_loop = true;
+                        break;
+                    }
                     case PLAYLIST_COMMAND_PLAYLIST:
                     {
-                        /* str1=version str2=dir str3=file */
+                        /* strp[0]=version strp[1]=dir strp[2]=file */
                         int version;
 
-                        if (!str1)
+                        if (!strp[0])
                         {
                             result = -2;
                             exit_loop = true;
                             break;
                         }
 
-                        if (!str2)
-                            str2 = "";
+                        if (!strp[1])
+                            strp[1] = "";
 
-                        if (!str3)
-                            str3 = "";
+                        if (!strp[2])
+                            strp[2] = "";
 
-                        version = atoi(str1);
+                        version = atoi(strp[0]);
 
                         /*
                          * TODO: Playlist control file version upgrades
@@ -3126,72 +3188,68 @@ int playlist_resume(void)
                             goto out;
                         }
 
-                        update_playlist_filename_unlocked(playlist, str2, str3);
+                        update_playlist_filename_unlocked(playlist, strp[1], strp[2]);
 
-                        if (str3[0] != '\0')
+                        if (strp[2][0] != '\0')
                         {
                             /* NOTE: add_indices_to_playlist() overwrites the
                                audiobuf so we need to reload control file
                                data */
                             add_indices_to_playlist(playlist, buffer, buflen);
                         }
-                        else if (str2[0] != '\0')
+                        else if (strp[1][0] != '\0')
                         {
                             playlist->flags |= PLAYLIST_FLAG_DIRPLAY;
                         }
 
                         /* load the rest of the data */
-                        first = false;
                         exit_loop = true;
                         readsize = buflen;
+                        pl_cmd = &pl_cmds_run;
                         break;
                     }
-                    case PLAYLIST_COMMAND_ADD:
                     case PLAYLIST_COMMAND_QUEUE:
+                        queue = true;
+                        /*Fall-through*/
+                    case PLAYLIST_COMMAND_ADD:
                     {
-                        /* str1=position str2=last_position str3=file */
-                        int position, last_position;
-                        bool queue;
-
-                        if (!str1 || !str2 || !str3)
+                        /* strp[0]=position strp[1]=last_position strp[2]=file */
+                        if (!strp[0] || !strp[1] || !strp[2])
                         {
                             result = -4;
                             exit_loop = true;
                             break;
                         }
 
-                        position = atoi(str1);
-                        last_position = atoi(str2);
+                        int position = atoi(strp[0]);
+                        int last_position = atoi(strp[1]);
 
-                        queue = (current_command == PLAYLIST_COMMAND_ADD)?
-                            false:true;
-
-                        /* seek position is based on str3's position in
+                        /* seek position is based on strp[2]'s position in
                            buffer */
-                        if (add_track_to_playlist_unlocked(playlist, str3,
-                                position, queue, total_read+(str3-buffer)) < 0)
+                        if (add_track_to_playlist_unlocked(playlist, strp[2],
+                                position, queue, total_read+(strp[2]-buffer)) < 0)
                         {
                             result = -5;
                             goto out;
                         }
 
                         playlist->last_insert_pos = last_position;
-
+                        queue = false;
                         break;
                     }
                     case PLAYLIST_COMMAND_DELETE:
                     {
-                        /* str1=position */
+                        /* strp[0]=position */
                         int position;
 
-                        if (!str1)
+                        if (!strp[0])
                         {
                             result = -6;
                             exit_loop = true;
                             break;
                         }
 
-                        position = atoi(str1);
+                        position = atoi(strp[0]);
 
                         if (remove_track_unlocked(playlist, position, false) < 0)
                         {
@@ -3203,10 +3261,10 @@ int playlist_resume(void)
                     }
                     case PLAYLIST_COMMAND_SHUFFLE:
                     {
-                        /* str1=seed str2=first_index */
+                        /* strp[0]=seed strp[1]=first_index */
                         int seed;
 
-                        if (!str1 || !str2)
+                        if (!strp[0] || !strp[1])
                         {
                             result = -8;
                             exit_loop = true;
@@ -3219,8 +3277,8 @@ int playlist_resume(void)
                             sort_playlist_unlocked(playlist, false, false);
                         }
 
-                        seed = atoi(str1);
-                        playlist->first_index = atoi(str2);
+                        seed = atoi(strp[0]);
+                        playlist->first_index = atoi(strp[1]);
 
                         if (randomise_playlist_unlocked(playlist, seed, false,
                                 false) < 0)
@@ -3234,15 +3292,15 @@ int playlist_resume(void)
                     }
                     case PLAYLIST_COMMAND_UNSHUFFLE:
                     {
-                        /* str1=first_index */
-                        if (!str1)
+                        /* strp[0]=first_index */
+                        if (!strp[0])
                         {
                             result = -10;
                             exit_loop = true;
                             break;
                         }
 
-                        playlist->first_index = atoi(str1);
+                        playlist->first_index = atoi(strp[0]);
 
                         if (sort_playlist_unlocked(playlist, false, false) < 0)
                         {
@@ -3269,8 +3327,14 @@ int playlist_resume(void)
                     }
                     case PLAYLIST_COMMAND_FLAGS:
                     {
-                        unsigned int setf = atoi(str1);
-                        unsigned int clearf = atoi(str2);
+                        if (!strp[0] || !strp[1])
+                        {
+                            result = -18;
+                            exit_loop = true;
+                            break;
+                        }
+                        unsigned int setf = atoi(strp[0]);
+                        unsigned int clearf = atoi(strp[1]);
 
                         playlist->flags = (playlist->flags & ~clearf) | setf;
                         break;
@@ -3290,69 +3354,13 @@ int playlist_resume(void)
             else if(newline)
             {
                 newline = false;
-
-                switch (*p)
-                {
-                    case 'P':
-                        /* playlist can only be specified once */
-                        if (!first)
-                        {
-                            result = -13;
-                            exit_loop = true;
-                            break;
-                        }
-
-                        current_command = PLAYLIST_COMMAND_PLAYLIST;
-                        break;
-                    case 'A':
-                        current_command = PLAYLIST_COMMAND_ADD;
-                        break;
-                    case 'Q':
-                        current_command = PLAYLIST_COMMAND_QUEUE;
-                        break;
-                    case 'D':
-                        current_command = PLAYLIST_COMMAND_DELETE;
-                        break;
-                    case 'S':
-                        current_command = PLAYLIST_COMMAND_SHUFFLE;
-                        break;
-                    case 'U':
-                        current_command = PLAYLIST_COMMAND_UNSHUFFLE;
-                        break;
-                    case 'R':
-                        current_command = PLAYLIST_COMMAND_RESET;
-                        break;
-                    case 'C':
-                        current_command = PLAYLIST_COMMAND_CLEAR;
-                        break;
-                    case 'F':
-                        current_command = PLAYLIST_COMMAND_FLAGS;
-                        break;
-                    case '#':
-                        current_command = PLAYLIST_COMMAND_COMMENT;
-                        break;
-                    default:
-                        result = -14;
-                        exit_loop = true;
-                        break;
-                }
-
-                /* first non-comment line must always specify playlist */
-                if (first &&
-                    (current_command != PLAYLIST_COMMAND_PLAYLIST) &&
-                    (current_command != PLAYLIST_COMMAND_COMMENT))
-                {
-                    result = -12;
-                    exit_loop = true;
-                    break;
-                }
-
+                current_command = (*pl_cmd)(*p);
                 str_count = -1;
-                str1 = NULL;
-                str2 = NULL;
-                str3 = NULL;
+                strp[0] = NULL;
+                strp[1] = NULL;
+                strp[2] = NULL;
             }
-            else if(current_command != PLAYLIST_COMMAND_COMMENT)
+            else if(current_command < PLAYLIST_COMMAND_COMMENT)
             {
                 /* all control file strings are separated with a colon.
                    Replace the colon with 0 to get proper strings that can be
@@ -3367,13 +3375,9 @@ int playlist_resume(void)
                         switch (str_count)
                         {
                         case 0:
-                            str1 = p+1;
-                            break;
                         case 1:
-                            str2 = p+1;
-                            break;
                         case 2:
-                            str3 = p+1;
+                            strp[str_count] = p+1;
                             break;
                         default:
                             /* allow last string to contain colons */
@@ -3385,7 +3389,7 @@ int playlist_resume(void)
             }
         }
 
-        if (result < 0)
+        if (result < 0 || current_command == PLAYLIST_COMMAND_ERROR)
         {
             splashf(HZ*2, "Err: %d, %s", result, str(LANG_PLAYLIST_CONTROL_INVALID));
             goto out;
@@ -3443,20 +3447,14 @@ void playlist_resume_track(int start_index, unsigned int crc,
     unsigned int tmp_crc;
     struct playlist_info* playlist = &current_playlist;
 
-    tmp_crc = playlist_get_filename_crc32(playlist, start_index);
-
-    if (tmp_crc == crc)
-    {
-        playlist_start(start_index, elapsed, offset);
-        return;
-    }
-
     for (i = 0 ; i < playlist->amount; i++)
     {
-        tmp_crc = playlist_get_filename_crc32(playlist, i);
+        int index = (i + start_index) % playlist->amount;
+
+        tmp_crc = playlist_get_filename_crc32(playlist, index);
         if (tmp_crc == crc)
         {
-            playlist_start(i, elapsed, offset);
+            playlist_start(index, elapsed, offset);
             return;
         }
     }
@@ -3739,7 +3737,7 @@ static int pl_save_playlist(struct playlist_info* playlist,
         if (playlist->indices[index] & PLAYLIST_QUEUED)
             continue;
 
-        if (get_track_filename(playlist, index, tmpbuf, tmpsize))
+        if (get_track_filename(playlist, index, tmpbuf, tmpsize) != 0)
         {
             err = -2;
             goto error;
@@ -3914,7 +3912,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     if (!playlist)
         playlist = &current_playlist;
 
-    pathlen = format_track_path(save_path, filename, sizeof(save_path), PATH_ROOTSTR);
+    pathlen = format_track_path(save_path, filename,
+                                sizeof(save_path), PATH_ROOTSTR, -1u);
     if (pathlen < 0)
         return -1;
 
