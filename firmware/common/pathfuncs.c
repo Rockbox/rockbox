@@ -476,6 +476,7 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
         /* 'component' is absolute; replace all */
         basepath = component;
         component = "";
+        basepath_max = -1u;
     }
 
     /* if basepath is not null or empty, buffer contents are replaced,
@@ -486,7 +487,7 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
     else
     {
         len = strlcpy(buf, basepath, bufsize);
-        if (basepath_max < len && basepath != component)
+        if (basepath_max < len)
         {
             len = basepath_max;
             buf[basepath_max] = '\0';
