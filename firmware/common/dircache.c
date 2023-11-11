@@ -2488,44 +2488,81 @@ struct get_path_sub_data
 
 static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
 {
+
+#ifdef HAVE_MULTIVOLUME
+#define NAMEBUFLEN (MAX(VOL_MAX_LEN+1, MAX_TINYNAME+1))
+#else
+#define NAMEBUFLEN (MAX_TINYNAME+1)
+#endif
+    char namebuf[NAMEBUFLEN];
+#undef NAMEBUFLEN
+
     if (idx == 0)
         return -1; /* entry is an orphan split from any root */
 
-    ssize_t len;
-    char *cename;
+    char *cename = "";
+    size_t cename_len = (-1u);
+    ssize_t len = 0;
+    int next_idx = idx;
+    int count = 1; /* +1 for the idx incoming */
+    int remain;
 
-    if (idx > 0)
+    do /* go all the way up to the root */
     {
-        struct dircache_entry *ce = get_entry(idx);
+        count++;
+        if (next_idx > (int)dircache.numentries)
+            return -1; /* ERROR! */
+        next_idx = dircache_runinfo.pentry[next_idx].up;
+    } while (next_idx > 0);
 
-        data->serialhash = dc_hash_serialnum(ce->serialnum, data->serialhash);
-
-        /* go all the way up then move back down from the root */
-        len = get_path_sub(ce->up, data) - 1;
-        if (len < 0)
-            return -2;
-
-        cename = alloca(DC_MAX_NAME + 1);
-        entry_name_copy(cename, ce);
-    }
-    else /* idx < 0 */
+    if (next_idx < 0) /* root */
     {
-        len = 0;
-        cename = "";
-
-    #ifdef HAVE_MULTIVOLUME
-        /* prepend the volume specifier */
-        int volume = IF_MV_VOL(-idx - 1);
-        cename = alloca(VOL_MAX_LEN+1);
-        get_volume_name(volume, cename);
-    #endif /* HAVE_MULTIVOLUME */
-
-        data->serialhash = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum,
+        data->serialhash = dc_hash_serialnum(get_idx_dcvolp(next_idx)->serialnum,
                                              data->serialhash);
+#ifdef HAVE_MULTIVOLUME
+        /* prepend the volume specifier */
+        cename = namebuf;
+        get_volume_name(IF_MV_VOL(-next_idx - 1), cename);
+#endif /* HAVE_MULTIVOLUME */
     }
 
-    return len + path_append(data->buf + len, PA_SEP_HARD, cename,
+    /* we have the volume name write it to the buffer */
+    goto write_path_component;
+    /* if not MULTIVOLUME it will just be adding '/' */
+
+    while (next_idx > 0 && count > 0)
+    {
+        struct dircache_entry *ce = &dircache_runinfo.pentry[next_idx];
+        if (remain <= 0)
+        {
+            data->serialhash = dc_hash_serialnum(ce->serialnum, data->serialhash);
+            if (LIKELY(!ce->tinyname))
+            {
+                cename = get_name(ce->name);
+                cename_len = CE_NAMESIZE(ce->namelen);
+            }
+            else
+            {
+                cename = namebuf;
+                entry_name_copy(cename, ce);
+                cename_len = -1u;
+            }
+write_path_component:
+            len += path_append_ex(data->buf + len, PA_SEP_HARD, -1u, cename, cename_len,
                              data->size > (size_t)len ? data->size - len : 0);
+
+            count--;
+            remain = count - 1;
+            next_idx = idx;
+        }
+        else
+        {
+            remain--;
+            next_idx = ce->up;
+        }
+
+    }
+    return len;
 }
 
 /**

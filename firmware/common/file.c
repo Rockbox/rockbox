@@ -1056,7 +1056,7 @@ int rename(const char *old, const char *new)
         FILE_ERROR(EINVAL, -4);
     }
 
-    const char * const oldname = strmemdupa(oldinfo.name, oldinfo.length);
+    //const char * const oldname = strmemdupa(oldinfo.name, oldinfo.length);
     const char * const newname = strmemdupa(newinfo.name, newinfo.length);
     bool is_overwrite = false;
 
@@ -1076,7 +1076,8 @@ int rename(const char *old, const char *new)
                     FILE_ERROR(ERRNO, rc * 10 - 5);
             }
         }
-        else if (!strcmp(newname, oldname)) /* case-only is ok */
+        else if (!strncmp(newname, oldinfo.name, oldinfo.length) && /* case-only is ok */
+                 newname[oldinfo.length] == '\0') /* make sure of actual match */
         {
             DEBUGF("No name change (success)\n");
             rc = 0;

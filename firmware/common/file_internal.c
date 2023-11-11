@@ -433,7 +433,7 @@ static NO_INLINE int open_path_component(struct pathwalk *walkp,
     int rc;
 
     /* create a null-terminated copy of the component name */
-    char *compname = strmemdupa(compp->name, compp->length);
+    //char *compname = strmemdupa(compp->name, compp->length);
 
     unsigned int callflags = walkp->callflags;
     struct pathwalk_component *parentp = compp->nextp;
@@ -455,7 +455,8 @@ static NO_INLINE int open_path_component(struct pathwalk *walkp,
         if (rc > 1 && !(callflags & FF_NOISO))
             iso_decode_d_name(dir_fatent.name);
 
-        if (!strcasecmp(compname, dir_fatent.name))
+        if (!strncasecmp(compp->name, dir_fatent.name, compp->length) &&
+            dir_fatent.name[compp->length] == '\0') /* make sure of actual match */
             break;
     }
 
@@ -474,8 +475,8 @@ static NO_INLINE int open_path_component(struct pathwalk *walkp,
                   &compp->info.fatfile);
     if (rc < 0)
     {
-        DEBUGF("I/O error opening file/directory %s (%d)\n",
-               compname, rc);
+        DEBUGF("I/O error opening file/directory  %.*s (%d)\n",
+               compp->length, compp->name, rc);
         return -EIO;
     }
 
