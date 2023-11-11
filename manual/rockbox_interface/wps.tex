@@ -223,8 +223,13 @@ enabled. It allows the assignment of a personal rating value (0 -- 10)
 to a track which can be displayed in the WPS and used in the Database
 browser. The value wraps at 10.
 
-\subsubsection{Bookmarks}
-This allows you to create a bookmark in the currently-playing track.
+\subsubsection{\label{ref:createbookmark}Bookmarks}
+This allows you to create a bookmark in the currently-playing track. Note that bookmarks
+can only be created for directories, or for playlists stored on disk. Unsaved or modified
+lists must be saved first. Queued tracks, which are automatically removed after playback,
+do not get stored to the playlist file. When saving, Rockbox will offer to purge the
+current playlist of such tracks, so that you'll be able to create bookmarks afterwards.
+See \reference{ref:Bookmarkconfigactual} for more information on bookmarks.
 
 \subsubsection{\label{ref:trackinfoviewer}Show Track Info}
 \screenshot{rockbox_interface/images/ss-id3-viewer}{The track info viewer}{}

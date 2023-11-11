@@ -129,8 +129,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  * avoid allocating yet another path buffer on the stack (and save some
  * code; the caller typically needs to create the full pathname anyway)...
  */
-bool ft_play_playlist(char* pathname, char* dirname,
-                      char* filename, bool skip_warn_and_bookmarks)
+bool ft_play_playlist(char* pathname, char* dirname, char* filename)
 {
     if (global_settings.party_mode && audio_status())
     {
@@ -138,12 +137,9 @@ bool ft_play_playlist(char* pathname, char* dirname,
         return false;
     }
 
-    if (!skip_warn_and_bookmarks)
-    {
-        int res =  bookmark_autoload(pathname);
-        if (res == BOOKMARK_CANCEL || res == BOOKMARK_DO_RESUME || !warn_on_pl_erase())
-            return false;
-    }
+    int res =  bookmark_autoload(pathname);
+    if (res == BOOKMARK_CANCEL || res == BOOKMARK_DO_RESUME || !warn_on_pl_erase())
+        return false;
 
     splash(0, ID2P(LANG_WAIT));
 
@@ -547,7 +543,7 @@ int ft_enter(struct tree_context* c)
 
         switch ( file_attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
-                play = ft_play_playlist(buf, c->currdir, file->name, false);
+                play = ft_play_playlist(buf, c->currdir, file->name);
 
                 if (play)
                 {

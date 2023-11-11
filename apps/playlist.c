@@ -99,6 +99,7 @@
 #include "filetypes.h"
 #include "icons.h"
 #include "system.h"
+#include "misc.h"
 
 #include "lang.h"
 #include "talk.h"
@@ -3977,6 +3978,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     char tmpbuf[MAX_PATH+1];
     ssize_t pathlen;
     int rc = 0;
+    bool reload_tracks = false;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -3995,6 +3997,17 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         rc = -1;
         goto error;
     }
+
+    /* Ask if queued tracks should be removed, so that
+    playlist can be bookmarked after it's been saved */
+    for (int i = playlist->amount - 1; i >= 0; i--)
+        if (playlist->indices[i] & PLAYLIST_QUEUED)
+        {
+            if (reload_tracks || (reload_tracks = (confirm_remove_queued_yesno() == YESNO_YES)))
+                remove_track_unlocked(playlist, i, false);
+            else
+                break;
+        }
 
     rc = pl_save_playlist(playlist, save_path, tmpbuf, sizeof(tmpbuf));
     if (rc < 0)
@@ -4030,5 +4043,8 @@ error:
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
     cpu_boost(false);
+    if (reload_tracks && playlist->started &&
+        (audio_status() & AUDIO_STATUS_PLAY))
+        audio_flush_and_reload_tracks();
     return rc;
 }

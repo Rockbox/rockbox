@@ -1412,8 +1412,6 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, recursive_dir_insert, LANG_RECURSE_DIRECTORY , RECURSE_ON,
                    "recursive directory insert", off_on_ask, NULL , 3 ,
                    ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_ASK)),
-    OFFON_SETTING(0, playlist_reload_after_save, LANG_PLAYLIST_RELOAD_AFTER_SAVE,
-                  false, "reload after saving playlist", NULL),
     /* bookmarks */
     CHOICE_SETTING(0, autocreatebookmark, LANG_BOOKMARK_SETTINGS_AUTOCREATE,
                    BOOKMARK_NO, "autocreate bookmarks",

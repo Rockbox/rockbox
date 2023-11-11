@@ -38,7 +38,6 @@
 #include "talk.h"
 #include "playlist_catalog.h"
 #include "splash.h"
-#include "filetree.h"
 #include "general.h"
 
 /* load a screen to save the playlist passed in (or current playlist if NULL is passed) */
@@ -46,11 +45,6 @@ int save_playlist_screen(struct playlist_info* playlist)
 {
 
     char directoryonly[MAX_PATH+3];
-    char *filename;
-
-    int resume_index;
-    uint32_t resume_elapsed;
-    uint32_t resume_offset;
 
     char temp[MAX_PATH+1], *p;
     int len;
@@ -86,55 +80,8 @@ int save_playlist_screen(struct playlist_info* playlist)
 
         /* reload in case playlist was saved to cwd */
         reload_directory();
-
-        /* only reload newly saved playlist if:
-         * playlist is null AND setting is turned on
-         *
-         * if playlist is null, we should be dealing with the current playlist,
-         * and thus we got here from the wps screen. That means we want to reload
-         * the current playlist so the user can make bookmarks. */
-        if ((global_settings.playlist_reload_after_save == true) &&
-            (playlist == NULL))
-        {
-
-            /* at least one slash exists in temp */
-            if (strrchr(temp, '/') != NULL)
-            {
-                filename = strrchr(temp, '/') + 1;
-
-                if (temp[0] == '/') /* most common situation - first char is a slash */
-                {
-                    strcpy(directoryonly, temp);
-                    directoryonly[filename - temp] = '\0';
-                } else /* there is a slash, but not at the beginning of temp - prepend one */
-                {
-                    directoryonly[0] = '/';
-
-                    strcpy(directoryonly+1, temp);
-                    directoryonly[filename - temp + 1] = '\0';
-                }
-            } else /* temp doesn't contain any slashes, uncommon? */
-            {
-                directoryonly[0] = '/';
-                directoryonly[1] = '\0';
-                filename = temp;
-            }
-
-            /* can't trust index from id3 (don't know why), get it from playlist */
-            resume_index = playlist_get_display_index() - 1;
-
-            struct mp3entry* id3 = audio_current_track();
-
-            /* record elapsed and offset so they don't change when we load new playlist */
-            resume_elapsed = id3->elapsed;
-            resume_offset = id3->offset;
-
-            ft_play_playlist(temp, directoryonly, filename, true);
-            playlist_start(resume_index, resume_elapsed, resume_offset);
-        }
-    /* cancelled out of name selection */
     } else {
-        return 1;
+        return 1; /* cancelled out of name selection */
     }
 
     return 0;
@@ -179,14 +126,12 @@ MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL)
 MENUITEM_SETTING(keep_current_track_on_replace, &global_settings.keep_current_track_on_replace_playlist, NULL);
 MENUITEM_SETTING(show_shuffled_adding_options, &global_settings.show_shuffled_adding_options, NULL);
 MENUITEM_SETTING(show_queue_options, &global_settings.show_queue_options, NULL);
-MENUITEM_SETTING(playlist_reload_after_save, &global_settings.playlist_reload_after_save, NULL);
 MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
           NULL, Icon_Playlist,
           &warn_on_erase,
           &keep_current_track_on_replace,
           &show_shuffled_adding_options,
-          &show_queue_options,
-          &playlist_reload_after_save);
+          &show_queue_options);
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,

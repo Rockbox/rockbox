@@ -1235,6 +1235,13 @@ int confirm_overwrite_yesno(void)
     return gui_syncyesno_run(&message, NULL, NULL);
 }
 
+int confirm_remove_queued_yesno(void)
+{
+    static const char *lines[] = { ID2P(LANG_REMOVE_QUEUED_TRACKS) };
+    static const struct text_message message = { lines, 1 };
+    return gui_syncyesno_run(&message, NULL, NULL);
+}
+
 /*  time_split_units()
     split time values depending on base unit
     unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS

@@ -28,7 +28,6 @@ int ft_exit(struct tree_context* c);
 int ft_assemble_path(char *buf, size_t bufsz,
                       const char* currdir, const char* filename);
 int ft_build_playlist(struct tree_context* c, int start_index);
-bool ft_play_playlist(char* pathname, char* dirname,
-                      char* filename, bool skip_warn_and_bookmarks);
+bool ft_play_playlist(char* pathname, char* dirname, char* filename);
 
 #endif

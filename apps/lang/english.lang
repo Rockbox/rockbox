@@ -15936,16 +15936,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Reload After Saving"
+    *: ""
   </dest>
   <voice>
-    *: "Reload After Saving"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16653,5 +16653,19 @@
   </dest>
   <voice>
     *: "Database Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Remove Queued Tracks?"
+  </dest>
+  <voice>
+    *: "Remove Queued Tracks?"
   </voice>
 </phrase>
