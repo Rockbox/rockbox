@@ -613,6 +613,7 @@ int rename_file(const char *selected_file)
 {
     int rc;
     char newname[MAX_PATH];
+    char *newext = NULL;
     const char *oldbase, *selection = selected_file;
 
     path_basename(selection, &oldbase);
@@ -622,10 +623,19 @@ int rename_file(const char *selected_file)
     if (strmemccpy(newname, selection, sizeof (newname)) == NULL)
         return FORC_PATH_TOO_LONG;
 
+    if ((*tree_get_context()->dirfilter > NUM_FILTER_MODES) &&
+        (newext = strrchr(newbase, '.')))
+        /* hide extension when renaming in lists restricted to a
+        single file format, such as in the Playlists menu */
+        *newext = '\0';
+
     rc = prompt_name(newbase, sizeof (newname) - pathlen);
 
     if (rc != FORC_SUCCESS)
         return rc;
+
+    if (newext) /* re-add original extension */
+        strlcat(newbase, strrchr(selection, '.'), sizeof (newname) - pathlen);
 
     if (!strcmp(oldbase, newbase))
         return FORC_NOOP; /* No change at all */
