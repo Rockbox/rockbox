@@ -135,9 +135,11 @@
  * v2 was added shortly thereafter and has been used since 2003.
  * v3 added the (C)lear command and is otherwise identical to v2.
  * v4 added the (F)lags command.
+ * v5 added index to the (C)lear command. Added PLAYLIST_INSERT_LAST_ROTATED (-8) as
+ *    a supported position for (A)dd or (Q)eue commands.
  */
 #define PLAYLIST_CONTROL_FILE_MIN_VERSION   2
-#define PLAYLIST_CONTROL_FILE_VERSION       4
+#define PLAYLIST_CONTROL_FILE_VERSION       5
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
 
