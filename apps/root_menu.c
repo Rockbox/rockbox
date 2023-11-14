@@ -330,7 +330,7 @@ static int wpsscrn(void* param)
     }
     else if ( global_status.resume_index != -1 )
     {
-        DEBUGF("Resume index %X crc32 %lX offset %lX\n",
+        DEBUGF("Resume index %d crc32 %lX offset %lX\n",
                global_status.resume_index,
                (unsigned long)global_status.resume_crc32,
                (unsigned long)global_status.resume_offset);
