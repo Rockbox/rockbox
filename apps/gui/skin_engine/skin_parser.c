@@ -2007,6 +2007,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                 {
                     struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);
                     img->subimage_height = img->bm.height / img->num_subimages;
+                    struct bitmap* loaded_bm = &img->bm;
                     while (imglist)
                     {
                         token = SKINOFFSETTOPTR(skin_buffer, imglist->token);
@@ -2016,6 +2017,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                             {
                                 img->loaded = true;
                                 img->buflib_handle = handle;
+                                img->bm = *loaded_bm;
                                 img->subimage_height = img->bm.height / img->num_subimages;
                             }
                         }
