@@ -81,6 +81,7 @@ enum pv_onplay_result {
     PV_ONPLAY_ITEM_REMOVED,
     PV_ONPLAY_CHANGED,
     PV_ONPLAY_UNCHANGED,
+    PV_ONPLAY_SAVED,
 };
 
 struct playlist_buffer
@@ -661,7 +662,8 @@ static enum pv_onplay_result onplay_menu(int index)
                 break;
             case 6:
                 save_playlist_screen(viewer.playlist);
-                ret = PV_ONPLAY_UNCHANGED;
+                /* playlist indices of current playlist may have changed */
+                ret = viewer.playlist ? PV_ONPLAY_UNCHANGED : PV_ONPLAY_SAVED;
                 break;
             case 7:
                 /* playlist viewer settings */
@@ -784,11 +786,9 @@ static int playlist_callback_voice(int selected_item, void *data)
 static void update_lists(struct gui_synclist * playlist_lists, bool init)
 {
     if (init)
-    {
         gui_synclist_init(playlist_lists, playlist_callback_name,
                           &viewer, false, 1, NULL);
-        gui_synclist_set_nb_items(playlist_lists, viewer.num_tracks);
-    }
+    gui_synclist_set_nb_items(playlist_lists, viewer.num_tracks);
     gui_synclist_set_voice_callback(playlist_lists,
                                     global_settings.talk_file?
                                     &playlist_callback_voice:NULL);
@@ -805,9 +805,11 @@ static bool update_viewer_with_changes(struct gui_synclist *playlist_lists, enum
 {
     bool exit = false;
     if (res == PV_ONPLAY_CHANGED ||
+        res == PV_ONPLAY_SAVED ||
         res == PV_ONPLAY_ITEM_REMOVED)
     {
-        playlist_set_modified(viewer.playlist, true);
+        if (res != PV_ONPLAY_SAVED)
+            playlist_set_modified(viewer.playlist, true);
 
         if (res == PV_ONPLAY_ITEM_REMOVED)
             gui_synclist_del_item(playlist_lists);
