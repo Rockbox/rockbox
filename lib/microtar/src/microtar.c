@@ -25,6 +25,19 @@
 #include <limits.h>
 #include <string.h>
 
+#ifndef strcmp
+#define strcmp my_strcmp
+static int my strcmp(const char *s1, const char *s2)
+{
+    while (*s1 != '\0' && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+
+    return ((*(unsigned char *) s1) - (*(unsigned char *) s2));
+}
+#endif /*FIX ME*/
+
 #ifdef ROCKBOX
 /* Rockbox lacks strncpy in its libc */
 #define strncpy my_strncpy
