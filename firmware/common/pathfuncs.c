@@ -23,9 +23,9 @@
 #include "system.h"
 #include "pathfuncs.h"
 #include "string-extra.h"
+#include <stdio.h>
 
 #ifdef HAVE_MULTIVOLUME
-#include <stdio.h>
 #include "storage.h"
 
 enum storage_name_dec_indexes
