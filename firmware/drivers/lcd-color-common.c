@@ -239,10 +239,9 @@ __attribute__((weak))
 #endif
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
+                  int dst_x, int dst_y, int width, int height)
 {
     const unsigned char *ysrc, *usrc, *vsrc;
-    int cb, cr, rv, guv, bu, r, g, b;
 
     int linecounter;
     fb_data *dst, *row_end;
@@ -253,10 +252,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = FBADDR(x, y);
+    dst     = FBADDR(dst_x, dst_y);
     row_end = dst + width;
 #else
-    dst     = FBADDR(LCD_WIDTH - y - 1, x);
+    dst     = FBADDR(LCD_WIDTH - dst_y - 1, dst_x);
     row_end = dst + LCD_WIDTH * width;
 #endif
 
@@ -272,6 +271,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
     do
     {
+        int y, cb, cr, rv, guv, bu, r, g, b;
+
         do
         {
             y  = YFAC*(*ysrc++ - 16);
@@ -401,9 +402,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
     while (--linecounter > 0);
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    lcd_update_rect(x, y, width, height);
+    lcd_update_rect(dst_x, dst_y, width, height);
 #else
-    lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
+    lcd_update_rect(LCD_WIDTH - dst_y - height, dst_x, height, width);
 #endif
 }
 
