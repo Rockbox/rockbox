@@ -19,13 +19,19 @@
  *
  ****************************************************************************/
 
-#include "audiohw.h"
 #include "system.h"
+#include "audiohw.h"
+#include "pcm_sw_volume.h"
 #include "pcm_sampr.h"
+#include "i2c-target.h"
+#include "button.h"
+
+// #define LOGF_ENABLE
+#include "logf.h"
+
 #include "aic-x1000.h"
 #include "i2c-x1000.h"
 #include "gpio-x1000.h"
-#include "logf.h"
 
 /*
  * Earlier devices audio path appears to be:
@@ -42,7 +48,7 @@ void audiohw_init(void)
     /* explicitly mute everything */
     gpio_set_level(GPIO_HPAMP_SHDN, 0);
     gpio_set_level(GPIO_STEREOSW_MUTE, 1);
-    gpio_set_level(GPIO_DAC_XMIT, 0);
+    gpio_set_level(GPIO_DAC_PWR, 0);
 
     aic_set_play_last_sample(true);
     aic_set_external_codec(true);
@@ -81,18 +87,34 @@ void audiohw_postinit(void)
     gpio_set_level(GPIO_STEREOSW_SEL, 0);
     gpio_set_level(GPIO_HPAMP_SHDN, 1);
     mdelay(10);
-    gpio_set_level(GPIO_DAC_XMIT, 1);
+    gpio_set_level(GPIO_DAC_PWR, 1);
     mdelay(10);
     gpio_set_level(GPIO_STEREOSW_MUTE, 0);
+
+    i2c_x1000_set_freq(ES9018K2M_BUS, I2C_FREQ_400K);
+
+    int ret = es9018k2m_read_reg(ES9018K2M_REG0_SYSTEM_SETTINGS);
+    if (ret >= 0) /* Detected ES9018K2M DAC */
+    {
+        logf("ES9018K2M found: ret=%d", ret);
+        es9018k2m_present_flag = 1;
+
+       /* Default is 32-bit data, and it works ok. Enabling the following
+        * causes issue. Which is weird, I definitely thought AIC was configured
+        * for 24-bit data... */
+        // es9018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0b01001100); // 24-bit data
+
+    } else { /* Default to SWVOL for PCM5102A DAC */
+        logf("Default to SWVOL: ret=%d", ret);
+    }
 }
 
-/* TODO: get shutdown just right according to dac datasheet */
 void audiohw_close(void)
 {
     /* mute - attempt to make power-off pop-free */
     gpio_set_level(GPIO_STEREOSW_MUTE, 1);
     mdelay(10);
-    gpio_set_level(GPIO_DAC_XMIT, 0);
+    gpio_set_level(GPIO_DAC_PWR, 0);
     mdelay(10);
     gpio_set_level(GPIO_HPAMP_SHDN, 0);
 }
@@ -107,3 +129,46 @@ void audiohw_set_frequency(int fsel)
     aic_enable_i2s_bit_clock(true);
 }
 
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    int l, r;
+
+    eros_qn_set_last_vol(vol_l, vol_r);
+
+    l = vol_l;
+    r = vol_r;
+
+#if (defined(HAVE_HEADPHONE_DETECTION) && defined(HAVE_LINEOUT_DETECTION))
+    /* make sure headphones aren't present - don't want to
+     * blow out our eardrums cranking it to full */
+    if (lineout_inserted() && !headphones_inserted())
+    {
+        eros_qn_switch_output(1);
+
+        l = r = eros_qn_get_volume_limit();
+    }
+    else
+    {
+        eros_qn_switch_output(0);
+    }
+#endif
+
+    if (es9018k2m_present_flag) /* ES9018K2M */
+    {
+        /* Same volume range and mute point for both DACs, so use PCM5102A_VOLUME_MIN */
+        l = l <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : l;
+        r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : r;
+
+        /* set software volume just below unity due to
+         * DAC offset. We don't want to overflow the PCM system. */
+        pcm_set_master_volume(-1, -1);
+        es9018k2m_set_volume(l, r);
+    }
+    else /* PCM5102A */
+    {
+        l = l <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : (l / 20);
+        r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : (r / 20);
+
+        pcm_set_master_volume(l, r);
+    }
+}

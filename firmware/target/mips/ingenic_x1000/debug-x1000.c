@@ -121,6 +121,9 @@ extern volatile unsigned aic_tx_underruns;
 #ifdef HAVE_RECORDING
 extern volatile unsigned aic_rx_overruns;
 #endif
+#ifdef HAVE_EROS_QN_CODEC
+extern int es9018k2m_present_flag;
+#endif
 
 static bool dbg_audio(void)
 {
@@ -129,6 +132,16 @@ static bool dbg_audio(void)
         lcd_putsf(0, 0, "TX underruns: %u", aic_tx_underruns);
 #ifdef HAVE_RECORDING
         lcd_putsf(0, 1, "RX overruns:  %u", aic_rx_overruns);
+#endif
+#ifdef HAVE_EROS_QN_CODEC
+        if (es9018k2m_present_flag)
+        {
+            lcd_putsf(0, 2, "(%d) ES9018K2M HWVOL", es9018k2m_present_flag);
+        }
+        else
+        {
+            lcd_putsf(0, 2, "(%d) SWVOL", es9018k2m_present_flag);
+        }
 #endif
         lcd_update();
     } while(get_action(CONTEXT_STD, HZ) != ACTION_STD_CANCEL);

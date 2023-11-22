@@ -25,6 +25,9 @@
 #define I2C_ASYNC_BUS_COUNT  3
 #define I2C_ASYNC_QUEUE_SIZE 4
 
+#define ES9018K2M_BUS 1
+#define ES9018K2M_ADDR 0x48
+
 #define AXP_PMU_BUS  2
 #define AXP_PMU_ADDR 0x34
 

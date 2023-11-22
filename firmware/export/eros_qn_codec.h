@@ -32,13 +32,25 @@
 #define PCM5102A_VOLUME_MIN -740
 #define PCM5102A_VOLUME_MAX -20
 
-/* a small DC offset prevents play/pause clicking due to the DAC auto-muting */
+/* a small DC offset prevents play/pause clicking due to the PCM5102A DAC auto-muting */
 #define PCM_DC_OFFSET_VALUE -1
 
 AUDIOHW_SETTING(VOLUME, "dB", 0, 2, PCM5102A_VOLUME_MIN/10, PCM5102A_VOLUME_MAX/10, 0)
 
+/* flag indicating whether this is a new revision unit with the ES9018K2M DAC */
+extern int es9018k2m_present_flag;
+
+/* Switch the output sink. 0 - headphones, 1 - line out */
+void eros_qn_switch_output(int select);
+
+/* Record last volume setting for switching between headphones/line out */
+void eros_qn_set_last_vol(long int vol_l, long int vol_r);
+
 /* this just calls audiohw_set_volume() with the last (locally) known volume,
  * used for switching to/from fixed line out volume. */
-void dac_set_outputs(void);
+void eros_qn_set_outputs(void);
+
+/* returns (global_settings.volume_limit * 10) */
+int eros_qn_get_volume_limit(void);
 
 #endif

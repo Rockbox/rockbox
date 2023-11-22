@@ -25,8 +25,8 @@
 #include "audio.h"
 #include "audiohw.h"
 
-/* NOTE:  The register names are not known, as the register numbering
-   listed in the ES9018 datasheet does not match what is described below.. */
+/* NOTE: This implementation is specifically for the ES9018K2M, which has a different register
+ * structure from the ES9018. */
 
 static uint8_t reg0  = 0x00; /* System settings. Default value of register 0 */
 static uint8_t reg1  = 0x80; /* Input settings. Manual input, I2S, 32-bit (?) */

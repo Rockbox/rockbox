@@ -15,17 +15,21 @@
 
 /* ---------------------------------------------- */
 
+
 /*              Name            Port    Pins            Function */
 DEFINE_PINGROUP(LCD_DATA,       GPIO_A, 0xffff <<  0,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(LCD_CONTROL,    GPIO_B,   0x1a << 16,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(MSC0,           GPIO_A,   0x3f << 20,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(SFC,            GPIO_A,   0x3f << 26,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(I2S,            GPIO_B,   0x1f <<  0,   GPIOF_DEVICE(1))
+DEFINE_PINGROUP(I2C1,           GPIO_C,      3 << 26,   GPIOF_DEVICE(0))
 DEFINE_PINGROUP(I2C2,           GPIO_D,      3 <<  0,   GPIOF_DEVICE(1))
 
 /*          Name                Pin             Function */
 /* mute DAC: 0 - mute, 1 - play */
-DEFINE_GPIO(DAC_XMIT,           GPIO_PB(12),    GPIOF_OUTPUT(0))
+/* Note: This seems to actually be power to the DAC in general,
+ * at least on the ES9018K2M devices. Was "DAC_XMIT". */
+DEFINE_GPIO(DAC_PWR,           GPIO_PB(12),    GPIOF_OUTPUT(0))
 
 /* mute HP amp: 0 - mute, 1 - play */
 DEFINE_GPIO(HPAMP_SHDN,         GPIO_PB(8),     GPIOF_OUTPUT(0))

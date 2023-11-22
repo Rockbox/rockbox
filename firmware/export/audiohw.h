@@ -214,6 +214,7 @@ struct sound_settings_info
 #include "pcm1792.h"
 #elif defined(HAVE_EROS_QN_CODEC)
 #include "eros_qn_codec.h"
+#include "es9018k2m.h"
 #elif defined(HAVE_NWZ_LINUX_CODEC)
 #include "nwzlinux_codec.h"
 #elif defined(HAVE_CS4398)
