@@ -353,7 +353,7 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
     {
         if (strstr(tc->currdir, PLUGIN_DIR) != NULL)
             return true;
-        tc->browse = NULL; /* exit immediately */
+        tc->is_browsing = false; /* exit immediately */
     }
     else if(attr & FILE_ATTR_ROCK)
     {

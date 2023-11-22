@@ -608,6 +608,13 @@ void set_current_file(const char *path)
     {
         tc.selected_item = tree_get_file_position(lastfile);
     }
+
+    if (!tc.is_browsing && tc.out_of_tree == 0)
+    {
+        /* the browser is closed */
+        /* don't allow the previous items to overwrite what we just loaded */
+        tc.out_of_tree = tc.selected_item + 1;
+    }
 }
 
 
@@ -652,7 +659,7 @@ static int dirbrowse(void)
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
 
-    while(tc.browse) {
+    while(tc.browse && tc.is_browsing) {
         bool restore = false;
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
@@ -973,9 +980,17 @@ static struct tree_context backups[NUM_TC_BACKUP];
 static int backup_count = -1;
 int rockbox_browse(struct browse_context *browse)
 {
+    tc.is_browsing = (browse != NULL);
     static char current[MAX_PATH];
     int ret_val = 0;
     int dirfilter = browse->dirfilter;
+
+    if (tc.out_of_tree > 0)
+    {
+        tc.selected_item = tc.out_of_tree - 1;
+        tc.out_of_tree = 0;
+        return ft_enter(&tc);
+    }
 
     if (backup_count >= NUM_TC_BACKUP)
         return GO_TO_PREVIOUS;
@@ -1031,6 +1046,9 @@ int rockbox_browse(struct browse_context *browse)
     backup_count--;
     if (backup_count >= 0)
         tc = backups[backup_count];
+
+    tc.is_browsing = false;
+
     return ret_val;
 }
 
@@ -1198,7 +1216,7 @@ static int ft_play_filename(char *dir, char *file, int attr)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
-    tc.browse = NULL; /* clear browse to prevent reentry to a possibly missing file */
+     tc.is_browsing = false;/* clear browse to prevent reentry to a possibly missing file */
 #ifdef HAVE_TAGCACHE
     tagcache_shutdown();
 #endif

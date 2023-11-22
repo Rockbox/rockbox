@@ -32,7 +32,7 @@ enum sc_list_action_type
     SCLA_USB,
 };
 
-
+static size_t root_len;
 static char *link_filename;
 static bool user_file;
 
@@ -175,6 +175,42 @@ bool goto_entry(char *file_or_dir)
 }
 #endif
 
+static bool callback_show_item(char *name, int attr, struct tree_context *tc)
+{
+    (void)name;
+    if(attr & ATTR_DIRECTORY)
+    {
+        if ((tc->browse->flags & BROWSE_SELECTED) == 0 &&
+            rb->strlen(tc->currdir) < root_len)
+        {
+            tc->is_browsing = false; /* exit immediately */
+        }
+    }
+
+    return true;
+}
+
+bool open_browse(char *path, char *buf, size_t bufsz)
+{
+    struct browse_context browse = {
+        .dirfilter = rb->global_settings->dirfilter,
+        .flags = BROWSE_DIRFILTER| BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
+        .title = path,
+        .icon = Icon_Plugin,
+        .root = path,
+        .buf = buf,
+        .bufsize = bufsz,
+        .callback_show_item = callback_show_item,
+    };
+    root_len = 0;
+    char *name = rb->strrchr(path, '/');
+    if (name)
+        root_len = name - path;
+    rb->rockbox_browse(&browse);
+
+    return (browse.flags & BROWSE_SELECTED);
+}
+
 int goto_entry(char *file_or_dir)
 {
     DEBUGF("Trying to go to '%s'...\n", file_or_dir);
@@ -202,14 +238,18 @@ int goto_entry(char *file_or_dir)
     }
     else
     {
-        /* Set the browsers dirfilter to the global setting
-         * This is required in case the plugin was launched
-         * from the plugins browser, in which case the
-         * dirfilter is set to only display .rock files */
-        rb->set_dirfilter(rb->global_settings->dirfilter);
-
-        /* Change directory to the entry selected by the user */
-        rb->set_current_file(file_or_dir);
+        if (!is_dir)
+        {
+            rb->set_current_file(file_or_dir);
+            return LOOP_EXIT;
+        }
+        char tmp_buf[MAX_PATH];
+        if (open_browse(file_or_dir, tmp_buf, sizeof(tmp_buf)))
+        {
+            DEBUGF("Trying to load '%s'...\n", tmp_buf);
+            rb->set_current_file(tmp_buf);
+            return LOOP_EXIT;
+        }
     }
     return PLUGIN_OK;
 }

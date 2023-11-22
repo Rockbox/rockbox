@@ -90,9 +90,12 @@ struct tree_context {
     int currtable; /* db use */
     int currextra; /* db use */
 #endif
+    int sort_dir; /* directory sort order */
+    int out_of_tree; /* shortcut from elsewhere */
     struct tree_cache cache;
     bool dirfull;
-    int sort_dir; /* directory sort order */
+    bool is_browsing; /* valid browse context? */
+
     struct browse_context *browse;
 };
 

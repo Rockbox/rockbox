@@ -287,11 +287,17 @@ static int compare(const void* p1, const void* p2)
 /* load and sort directory into the tree's cache. returns NULL on failure. */
 int ft_load(struct tree_context* c, const char* tempdir)
 {
+    if (c->out_of_tree > 0) /* something else is loaded */
+        return 0;
+
     int files_in_dir = 0;
     int name_buffer_used = 0;
     struct dirent *entry;
     bool (*callback_show_item)(char *, int, struct tree_context *) = NULL;
     DIR *dir;
+
+    if (!c->is_browsing)
+        c->browse = NULL;
 
     if (tempdir)
         dir = opendir(tempdir);
@@ -760,6 +766,7 @@ int ft_enter(struct tree_context* c)
             }
         }
     }
+
     return rc;
 }
 
@@ -801,6 +808,8 @@ int ft_exit(struct tree_context* c)
 
     if (exit_func)
         rc = 3;
+
+    c->out_of_tree = 0;
 
     return rc;
 }
