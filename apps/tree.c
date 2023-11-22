@@ -352,9 +352,20 @@ static int tree_get_file_position(char * filename)
  */
 static int update_dir(void)
 {
+    struct gui_synclist * const list = &tree_lists;
+    int show_path_in_browser = global_settings.show_path_in_browser;
     bool changed = false;
+
+    const char* title = NULL;/* Must clear the title as the list is reused */
+    int icon = NOICON;
+
 #ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
+#else
+    const bool id3db = false;
+#endif
+
+#ifdef HAVE_TAGCACHE
     /* Checks for changes */
     if (id3db) {
         if (tc.currtable != lasttable ||
@@ -385,9 +396,7 @@ static int update_dir(void)
     /* if selected item is undefined */
     if (tc.selected_item == -1)
     {
-#ifdef HAVE_TAGCACHE
         if (!id3db)
-#endif
             /* use lastfile to determine the selected item */
             tc.selected_item = tree_get_file_position(lastfile);
 
@@ -398,31 +407,22 @@ static int update_dir(void)
     }
     if (changed)
     {
-        if(
-#ifdef HAVE_TAGCACHE
-        !id3db &&
-#endif
-        tc.dirfull )
+        if( !id3db && tc.dirfull )
         {
             splash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
 
-    gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
+    gui_synclist_init(list, &tree_get_filename, &tc, false, 1, NULL);
 
 #ifdef HAVE_TAGCACHE
     if (id3db)
     {
-        if (global_settings.show_path_in_browser == SHOW_PATH_FULL
-            || global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
+        if (show_path_in_browser == SHOW_PATH_FULL
+            || show_path_in_browser == SHOW_PATH_CURRENT)
         {
-            gui_synclist_set_title(&tree_lists, tagtree_get_title(&tc),
-                filetype_get_icon(ATTR_DIRECTORY));
-        }
-        else
-        {
-            /* Must clear the title as the list is reused */
-            gui_synclist_set_title(&tree_lists, NULL, NOICON);
+            title = tagtree_get_title(&tc);
+            icon = filetype_get_icon(ATTR_DIRECTORY);
         }
     }
     else
@@ -430,49 +430,52 @@ static int update_dir(void)
     {
         if (tc.browse && tc.browse->title)
         {
-            int icon = tc.browse->icon;
+            title = tc.browse->title;
+            icon = tc.browse->icon;
             if (icon == NOICON)
                 icon = filetype_get_icon(ATTR_DIRECTORY);
-            gui_synclist_set_title(&tree_lists, tc.browse->title, icon);
-        }
-        else if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
-        {
-            gui_synclist_set_title(&tree_lists, tc.currdir,
-                filetype_get_icon(ATTR_DIRECTORY));
-        }
-        else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
-        {
-            char *title = strrchr(tc.currdir, '/') + 1;
-            if (*title == '\0')
-            {
-                /* Display "Files" for the root dir */
-                gui_synclist_set_title(&tree_lists, str(LANG_DIR_BROWSER),
-                    filetype_get_icon(ATTR_DIRECTORY));
-            }
-            else
-                gui_synclist_set_title(&tree_lists, title,
-                    filetype_get_icon(ATTR_DIRECTORY));
         }
         else
         {
-            /* Must clear the title as the list is reused */
-            gui_synclist_set_title(&tree_lists, NULL, NOICON);
+            if (show_path_in_browser == SHOW_PATH_FULL)
+            {
+                title = tc.currdir;
+                icon = filetype_get_icon(ATTR_DIRECTORY);
+            }
+            else if (show_path_in_browser == SHOW_PATH_CURRENT)
+            {
+                title = strrchr(tc.currdir, '/');
+                if (title != NULL)
+                {
+                    title++; /* step past the separator */
+                    if (*title == '\0')
+                    {
+                        /* Display "Files" for the root dir */
+                        title = str(LANG_DIR_BROWSER);
+                    }
+                    icon = filetype_get_icon(ATTR_DIRECTORY);
+                }
+            }           
         }
     }
 
-    gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
-    gui_synclist_set_icon_callback(&tree_lists,
-                                   global_settings.show_icons?tree_get_fileicon:NULL);
-    gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
+    /* set title and icon, if nothing is set, clear the title 
+     * with NULL and icon as NOICON as the list is reused */
+    gui_synclist_set_title(list, title, icon);
+
+    gui_synclist_set_nb_items(list, tc.filesindir);
+    gui_synclist_set_icon_callback(list,
+                            global_settings.show_icons?tree_get_fileicon:NULL);
+    gui_synclist_set_voice_callback(list, &tree_voice_cb);
 #ifdef HAVE_LCD_COLOR
-    gui_synclist_set_color_callback(&tree_lists, &tree_get_filecolor);
+    gui_synclist_set_color_callback(list, &tree_get_filecolor);
 #endif
     if( tc.selected_item >= tc.filesindir)
         tc.selected_item=tc.filesindir-1;
 
-    gui_synclist_select_item(&tree_lists, tc.selected_item);
-    gui_synclist_draw(&tree_lists);
-    gui_synclist_speak_item(&tree_lists);
+    gui_synclist_select_item(list, tc.selected_item);
+    gui_synclist_draw(list);
+    gui_synclist_speak_item(list);
     return tc.filesindir;
 }
 
@@ -483,13 +486,13 @@ void resume_directory(const char *dir)
     int ret;
 #ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
+#else
+    const bool id3db = false;
 #endif
     /* make sure the dirfilter is sane. The only time it should be possible
      * thats its not is when resume playlist is called from a plugin
      */
-#ifdef HAVE_TAGCACHE
     if (!id3db)
-#endif
         *tc.dirfilter = global_settings.dirfilter;
     ret = ft_load(&tc, dir);
     *tc.dirfilter = dirfilter;
@@ -557,10 +560,9 @@ void set_dirfilter(int l_dirfilter)
     *tc.dirfilter = l_dirfilter;
 }
 
-/* Selects a file and update tree context properly */
-void set_current_file(const char *path)
+/* Selects a path + file and update tree context properly */
+static void set_current_file_ex(const char *path, const char *filename)
 {
-    const char *name;
     int i;
 
 #ifdef HAVE_TAGCACHE
@@ -570,21 +572,27 @@ void set_current_file(const char *path)
         return;
 #endif
 
-    /* separate directory from filename */
-    /* gets the directory's name and put it into tc.currdir */
-    name = strrchr(path+1,'/');
-    if (name)
+    if (!filename) /* path and filename supplied combined */
     {
-        strmemccpy(tc.currdir, path, name - path + 1);
-        name++;
+        /* separate directory from filename */
+        /* gets the directory's name and put it into tc.currdir */
+        filename = strrchr(path+1,'/');
+        if (filename)
+        {
+            strmemccpy(tc.currdir, path, filename - path + 1);
+            filename++;
+        }
+        else
+        {
+            strcpy(tc.currdir, "/");
+            filename = path+1;
+        }
     }
-    else
+    else /* path and filename came in separate */
     {
-        strcpy(tc.currdir, "/");
-        name = path+1;
+        strmemccpy(tc.currdir, path, MAX_PATH);
     }
-
-    strmemccpy(lastfile, name, MAX_PATH);
+    strmemccpy(lastfile, filename, MAX_PATH);
 
 
     /* If we changed dir we must recalculate the dirlevel
@@ -615,6 +623,12 @@ void set_current_file(const char *path)
         /* don't allow the previous items to overwrite what we just loaded */
         tc.out_of_tree = tc.selected_item + 1;
     }
+}
+
+/* Selects a file and update tree context properly */
+void set_current_file(const char *path)
+{
+    set_current_file_ex(path, NULL);
 }
 
 
@@ -981,7 +995,6 @@ static int backup_count = -1;
 int rockbox_browse(struct browse_context *browse)
 {
     tc.is_browsing = (browse != NULL);
-    static char current[MAX_PATH];
     int ret_val = 0;
     int dirfilter = browse->dirfilter;
 
@@ -1021,9 +1034,7 @@ int rockbox_browse(struct browse_context *browse)
 
         if (browse->selected)
         {
-            snprintf(current, sizeof(current), "%s/%s",
-                browse->root, browse->selected);
-            set_current_file(current);
+            set_current_file_ex(browse->root, browse->selected);
             /* set_current_file changes dirlevel, change it back */
             tc.dirlevel = 0;
         }
@@ -1036,8 +1047,7 @@ int rockbox_browse(struct browse_context *browse)
         if (dirfilter != SHOW_ID3DB && (browse->flags & BROWSE_DIRFILTER) == 0)
             tc.dirfilter = &global_settings.dirfilter;
         tc.browse = browse;
-        strmemccpy(current, browse->root, MAX_PATH);
-        set_current_file(current);
+        set_current_file(browse->root);
         if (browse->flags&BROWSE_RUNFILE)
             ret_val = ft_enter(&tc);
         else
