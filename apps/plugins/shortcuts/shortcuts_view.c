@@ -247,6 +247,7 @@ int goto_entry(char *file_or_dir)
         if (open_browse(file_or_dir, tmp_buf, sizeof(tmp_buf)))
         {
             DEBUGF("Trying to load '%s'...\n", tmp_buf);
+            rb->set_dirfilter(rb->global_settings->dirfilter);
             rb->set_current_file(tmp_buf);
             return LOOP_EXIT;
         }

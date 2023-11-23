@@ -577,9 +577,10 @@ static void set_current_file_ex(const char *path, const char *filename)
         /* separate directory from filename */
         /* gets the directory's name and put it into tc.currdir */
         filename = strrchr(path+1,'/');
-        if (filename)
+        size_t endpos = filename - path;
+        if (endpos < MAX_PATH - 1)
         {
-            strmemccpy(tc.currdir, path, filename - path + 1);
+            strmemccpy(tc.currdir, path, endpos + 1);
             filename++;
         }
         else
@@ -588,9 +589,18 @@ static void set_current_file_ex(const char *path, const char *filename)
             filename = path+1;
         }
     }
-    else /* path and filename came in separate */
+    else /* path and filename came in separate ensure an ending '/' */
     {
-        strmemccpy(tc.currdir, path, MAX_PATH);
+        char *end_p = strmemccpy(tc.currdir, path, MAX_PATH);
+        size_t endpos = end_p - tc.currdir;
+        if (endpos < MAX_PATH)
+        {
+            if (tc.currdir[endpos - 2] != '/')
+            {
+                tc.currdir[endpos - 1] = '/';
+                tc.currdir[endpos] = '\0';
+            }
+        }
     }
     strmemccpy(lastfile, filename, MAX_PATH);
 
@@ -615,13 +625,12 @@ static void set_current_file_ex(const char *path, const char *filename)
     if (ft_load(&tc, NULL) >= 0)
     {
         tc.selected_item = tree_get_file_position(lastfile);
-    }
-
-    if (!tc.is_browsing && tc.out_of_tree == 0)
-    {
-        /* the browser is closed */
-        /* don't allow the previous items to overwrite what we just loaded */
-        tc.out_of_tree = tc.selected_item + 1;
+        if (!tc.is_browsing && tc.out_of_tree == 0)
+        {
+            /* the browser is closed */
+            /* don't allow the previous items to overwrite what we just loaded */
+            tc.out_of_tree = tc.selected_item + 1;
+        }
     }
 }
 
@@ -998,13 +1007,6 @@ int rockbox_browse(struct browse_context *browse)
     int ret_val = 0;
     int dirfilter = browse->dirfilter;
 
-    if (tc.out_of_tree > 0)
-    {
-        tc.selected_item = tc.out_of_tree - 1;
-        tc.out_of_tree = 0;
-        return ft_enter(&tc);
-    }
-
     if (backup_count >= NUM_TC_BACKUP)
         return GO_TO_PREVIOUS;
     if (backup_count >= 0)
@@ -1015,43 +1017,55 @@ int rockbox_browse(struct browse_context *browse)
     tc.sort_dir = global_settings.sort_dir;
 
     reload_dir = true;
-    if (*tc.dirfilter >= NUM_FILTER_MODES)
+
+    if (tc.out_of_tree > 0)
     {
-        int last_context;
-        /* don't reset if its the same browse already loaded */
-        if (tc.browse != browse ||
-            !(tc.currdir[1] && strcmp(tc.currdir, browse->root) == 0))
-        {
-            tc.browse = browse;
-            tc.selected_item = 0;
-            tc.dirlevel = 0;
-
-            strmemccpy(tc.currdir, browse->root, sizeof(tc.currdir));
-        }
-
-        start_wps = false;
-        last_context = curr_context;
-
-        if (browse->selected)
-        {
-            set_current_file_ex(browse->root, browse->selected);
-            /* set_current_file changes dirlevel, change it back */
-            tc.dirlevel = 0;
-        }
-
-        ret_val = dirbrowse();
-        curr_context = last_context;
+        /* an item has already been loaded out_of_tree holds the selected index
+         * what happens with the item is dependent on the browse context */
+        tc.selected_item = tc.out_of_tree - 1;
+        tc.out_of_tree = 0;
+        ret_val = ft_enter(&tc);
     }
     else
     {
-        if (dirfilter != SHOW_ID3DB && (browse->flags & BROWSE_DIRFILTER) == 0)
-            tc.dirfilter = &global_settings.dirfilter;
-        tc.browse = browse;
-        set_current_file(browse->root);
-        if (browse->flags&BROWSE_RUNFILE)
-            ret_val = ft_enter(&tc);
-        else
+        if (*tc.dirfilter >= NUM_FILTER_MODES)
+        {
+            int last_context;
+            /* don't reset if its the same browse already loaded */
+            if (tc.browse != browse ||
+                !(tc.currdir[1] && strcmp(tc.currdir, browse->root) == 0))
+            {
+                tc.browse = browse;
+                tc.selected_item = 0;
+                tc.dirlevel = 0;
+
+                strmemccpy(tc.currdir, browse->root, sizeof(tc.currdir));
+            }
+
+            start_wps = false;
+            last_context = curr_context;
+
+            if (browse->selected)
+            {
+                set_current_file_ex(browse->root, browse->selected);
+                /* set_current_file changes dirlevel, change it back */
+                tc.dirlevel = 0;
+            }
+
             ret_val = dirbrowse();
+            curr_context = last_context;
+        }
+        else
+        {
+            if (dirfilter != SHOW_ID3DB && (browse->flags & BROWSE_DIRFILTER) == 0)
+                tc.dirfilter = &global_settings.dirfilter;
+            tc.browse = browse;
+            set_current_file(browse->root);
+            if (browse->flags&BROWSE_RUNFILE)
+                ret_val = ft_enter(&tc);
+            else
+                ret_val = dirbrowse();
+        }
     }
     backup_count--;
     if (backup_count >= 0)
