@@ -589,7 +589,7 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
         dlen = -1u;
     }
 
-    len = path_append_ex(dest, dir, dlen, src, -1u, buf_length);
+    len = path_append_ex(dest, dir, dlen, src, buf_length);
     if (len >= (size_t)buf_length)
         return -1; /* buffer too small */
 

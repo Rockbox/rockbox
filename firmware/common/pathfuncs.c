@@ -447,22 +447,10 @@ void path_remove_dot_segments (char *dstpath, const char *path)
     *dstp = 0;
 }
 
-/* helper function copy n chars of a string to a dst buffer of dst_sz
- * returns the length of the string it created or attempted to create
- */
-static inline size_t copynchars(char *dst, size_t dst_sz, const char *src, size_t src_max)
-{
-    int cpychrs = -1;
-    if (src_max < -1u) /* we could be dealing with unterminated strings */
-        cpychrs = src_max;
-    /* testing shows this to be on par with using discreet functions and safer ;) */
-    int ret = snprintf(dst, dst_sz, "%.*s", cpychrs, src);
-    if (ret >= 0)
-        return ret;
-
-    return 0; /* Error */
-}
 /* Appends one path to another, adding separators between components if needed.
+ * basepath_max can be used to truncate the basepath if desired
+ * NOTE: basepath is truncated after copying to the buffer so there must be enough
+ * free space for the entirety of the basepath even if the resulting string would fit
  *
  * Return value and behavior is otherwise as strlcpy so that truncation may be
  * detected.
@@ -470,52 +458,45 @@ static inline size_t copynchars(char *dst, size_t dst_sz, const char *src, size_
  * For basepath and component:
  * PA_SEP_HARD adds a separator even if the base path is empty
  * PA_SEP_SOFT adds a separator only if the base path is not empty
- *
- * basepath_max can be used to truncate the basepath if desired
- * component_max can be used to truncate the component if desired
- *
- * (Supply -1u to disable truncation)
  */
 size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
-                   const char *component, size_t component_max, size_t bufsize)
+                   const char *component, size_t bufsize)
 {
     size_t len;
-    bool check_base = (basepath_max == 0);
     bool separate = false;
-    const char *base = basepath && !check_base && basepath[0] ? basepath : buf;
-
+    const char *base = basepath && basepath[0] ? basepath : buf;
     if (!base)
         return bufsize; /* won't work to get lengths from buf */
 
     if (!buf)
-    {
-        static char fbuf; /* fake buffer to elide later null checks */
-        buf = &fbuf;
         bufsize = 0;
-    }
-    if (!component)
-    {
-        check_base = true;
-        component = "";
-    }
+
     if (path_is_absolute(component))
     {
         /* 'component' is absolute; replace all */
         basepath = component;
-        basepath_max = component_max;
         component = "";
+        basepath_max = -1u;
     }
 
     /* if basepath is not null or empty, buffer contents are replaced,
        otherwise buf contains the base path */
+
     if (base == buf)
         len = strlen(buf);
     else
-        len = copynchars(buf, bufsize, basepath, basepath_max);
+    {
+        len = strlcpy(buf, basepath, bufsize);
+        if (basepath_max < len)
+        {
+            len = basepath_max;
+            buf[basepath_max] = '\0';
+        }
+    }
 
-    if (!basepath || basepath_max == 0 || check_base)
+    if (!basepath || !component || basepath_max == 0)
         separate = !len || base[len-1] != PATH_SEPCH;
-    else if (component[0] && component_max > 0)
+    else if (component[0])
         separate = len && base[len-1] != PATH_SEPCH;
 
     /* caller might lie about size of buf yet use buf as the base */
@@ -528,22 +509,14 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
     if (separate && (len++, bufsize > 0) && --bufsize > 0)
         *buf++ = PATH_SEPCH;
 
-    return len + copynchars(buf, bufsize, component, component_max);
+    return len + strlcpy(buf, component ?: "", bufsize);
 }
 
-/* Appends one path to another, adding separators between components if needed.
- *
- * Return value and behavior is otherwise as strlcpy so that truncation may be
- * detected.
- *
- * For basepath and component:
- * PA_SEP_HARD adds a separator even if the base path is empty
- * PA_SEP_SOFT adds a separator only if the base path is not empty
- */
+
 size_t path_append(char *buf, const char *basepath,
                    const char *component, size_t bufsize)
 {
-    return path_append_ex(buf, basepath, -1u, component, -1u, bufsize);
+    return path_append_ex(buf, basepath, -1u, component, bufsize);
 }
 /* Returns the location and length of the next path component, consuming the
  * input in the process.
