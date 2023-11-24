@@ -699,7 +699,7 @@ struct font* font_get(int font)
     struct font* pf;
     if (font == FONT_UI)
         font = MAXFONTS-1;
-    if (font <= FONT_SYSFIXED)
+    if (font <= FONT_SYSFIXED || font >= MAXFONTS)
         return &sysfont;
 
     while (1) {

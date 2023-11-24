@@ -88,7 +88,7 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     enum yesno_res def_res = yn->tmo_default_res;
     long end_tick = yn->end_tick;
 
-    last_vp = display->set_viewport(vp);
+    last_vp = display->set_viewport_ex(vp, VP_FLAG_VP_SET_CLEAN);
     display->clear_viewport();
     nb_lines = yn->main_message->nb_lines;
     vp_lines = viewport_get_nb_lines(vp);
@@ -182,9 +182,10 @@ static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
     const struct text_message * message=yn->result_message[result];
     struct viewport *vp = yn->vp;
     struct screen * display=yn->display;
+    struct viewport *last_vp = display->set_viewport_ex(vp, VP_FLAG_VP_SET_CLEAN);
+
     if(message==NULL)
         return false;
-    struct viewport *last_vp = display->set_viewport(vp);
     display->clear_viewport();
     put_message(yn->display, message, 0, viewport_get_nb_lines(vp));
     display->update_viewport();
@@ -223,21 +224,16 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
 {
     int button;
     int result=-1;
-    bool result_displayed;
+    bool result_displayed = false;
     struct gui_yesno yn[NB_SCREENS];
     struct viewport vp[NB_SCREENS];
     long talked_tick = 0;
     long end_tick = current_tick + ticks;
-    long button_scan_tmo;
+    long button_scan_tmo = HZ/2;
 
-    if (ticks >= HZ) /* Display a prompt with timeout to the user */
-    {
-        button_scan_tmo = HZ/2;
-    }
-    else
+    if (ticks < HZ) /* Display a prompt with NO timeout to the user */
     {
         tmo_default_res = YESNO_TMO;
-        button_scan_tmo = HZ*5;
     }
 
     FOR_NB_SCREENS(i)
@@ -278,7 +274,8 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
             talked_tick = current_tick;
             talk_text_message(main_message, false);
         }
-        send_event(GUI_EVENT_NEED_UI_UPDATE, NULL);
+        FOR_NB_SCREENS(i)
+            gui_yesno_draw(&yn[i]);
 
         button = get_action(CONTEXT_YESNOSCREEN, button_scan_tmo);
 
@@ -340,11 +337,13 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
                           : no_message, false);
         talk_force_enqueue_next();
     }
-    if(result_displayed)
-        sleep(HZ);
+
 
   exit:
     remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);
+
+    if(result_displayed)
+        sleep(HZ);
 
     FOR_NB_SCREENS(i)
     {
