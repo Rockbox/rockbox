@@ -780,10 +780,9 @@ static int load_plugin_screen(char *key)
             ret_val = GO_TO_WPS;
         else if (ret == PLUGIN_GOTO_PLUGIN)
         {
-            if (key == ID2P(LANG_SHORTCUTS) &&
-                op_entry->lang_id == ID2P(LANG_OPEN_PLUGIN))
+            if (key == (char*)LANG_SHORTCUTS && op_entry->lang_id == LANG_OPEN_PLUGIN)
             {
-                op_entry->lang_id = ID2P(LANG_SHORTCUTS);
+                op_entry->lang_id = LANG_SHORTCUTS;
             }
             continue;
         }
