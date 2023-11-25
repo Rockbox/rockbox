@@ -764,7 +764,6 @@ static int load_plugin_screen(char *key)
 
     while(loops-- > 0) /* just to keep things from getting out of hand */
     {
-        
         int opret = open_plugin_load_entry(key);
         struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
         char *path = op_entry->path;
@@ -773,7 +772,6 @@ static int load_plugin_screen(char *key)
             param = NULL;
         if (path[0] == '\0' && key)
             path = P2STR((unsigned char *)key);
-
         int ret = plugin_load(path, param);
 
         if (ret == PLUGIN_USB_CONNECTED || ret == PLUGIN_ERROR)
@@ -781,7 +779,14 @@ static int load_plugin_screen(char *key)
         else if (ret == PLUGIN_GOTO_WPS)
             ret_val = GO_TO_WPS;
         else if (ret == PLUGIN_GOTO_PLUGIN)
+        {
+            if (key == ID2P(LANG_SHORTCUTS) &&
+                op_entry->lang_id == ID2P(LANG_OPEN_PLUGIN))
+            {
+                op_entry->lang_id = ID2P(LANG_SHORTCUTS);
+            }
             continue;
+        }
         else
         {
             ret_val = GO_TO_PREVIOUS;

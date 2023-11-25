@@ -620,13 +620,21 @@ int do_shortcut_menu(void *ignored)
     while (done == GO_TO_PREVIOUS)
     {
         list.count = shortcut_count;
+        if(tree_get_context()->out_of_tree > 0) /* a shortcut has been selected */
+        {
+            done = GO_TO_FILEBROWSER;
+            break;
+        }
+
         if (simplelist_show_list(&list))
             break; /* some error happened?! */
+
         if (list.selection == -1)
             break;
         else
         {
             sc = get_shortcut(list.selection);
+
             if (!sc)
                 continue;
 
@@ -668,6 +676,7 @@ int do_shortcut_menu(void *ignored)
                     if (sc->type == SHORTCUT_FILE)
                         browse.flags |= BROWSE_RUNFILE;
                     done = rockbox_browse(&browse);
+
                 }
                 break;
                 case SHORTCUT_SETTING:
