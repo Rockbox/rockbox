@@ -64,8 +64,8 @@ void LCDFN(scroll_stop_viewport_rect)(const struct viewport *vp, int x, int y, i
         struct scrollinfo *s = &LCDFN(scroll_info).scroll[i];
         /* check if the specified area crosses the viewport in some way */
         if (s->vp == vp
-            && (x < (s->x+s->width) && (x+width) >= s->x)
-            && (y < (s->y+s->height) && (y+height) >= s->y))
+            && (x < (s->x+s->width) && (x+width) > s->x)
+            && (y < (s->y+s->height) && (y+height) > s->y))
         {
             /* inform scroller about end of scrolling */
             s->line = NULL;
