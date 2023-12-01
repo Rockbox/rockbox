@@ -30,16 +30,16 @@
 #include "viewport.h"
 #include "appevents.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 #include "splash.h"
+#include "backlight.h"
 
 struct gui_yesno
 {
+    struct viewport vp;
     const struct text_message * main_message;
-    const struct text_message * result_message[2];
-
-    struct viewport *vp;
     struct screen * display;
+    int vp_lines;
     /* timeout data */
     long end_tick;
     enum yesno_res tmo_default_res;
@@ -48,16 +48,13 @@ struct gui_yesno
 static void talk_text_message(const struct text_message * message, bool enqueue)
 {
     int line;
-    if(message)
+    for(line=0; line < message->nb_lines; line++)
     {
-        for(line=0; line<message->nb_lines; line++)
+        long id = P2ID((unsigned char *)message->message_lines[line]);
+        if(id>=0)
         {
-            long id = P2ID((unsigned char *)message->message_lines[line]);
-            if(id>=0)
-            {
-                talk_id(id, enqueue);
-                enqueue = true;
-            }
+            talk_id(id, enqueue);
+            enqueue = true;
         }
     }
 }
@@ -67,7 +64,8 @@ static int put_message(struct screen *display,
                         int start, int max_y)
 {
     int i;
-    for(i=0; i<message->nb_lines && i+start<max_y; i++)
+    int ct = MIN(message->nb_lines, max_y - start);
+    for(i=0; i < ct; i++)
     {
         display->puts_scroll(0, i+start,
                              P2STR((unsigned char *)message->message_lines[i]));
@@ -82,22 +80,24 @@ static int put_message(struct screen *display,
 static void gui_yesno_draw(struct gui_yesno * yn)
 {
     struct screen * display=yn->display;
-    struct viewport *vp = yn->vp;
-    int nb_lines, vp_lines, line_shift=0;
-    struct viewport *last_vp;
+    struct viewport *vp = &yn->vp;
+    int vp_lines = yn->vp_lines;
     enum yesno_res def_res = yn->tmo_default_res;
-    long end_tick = yn->end_tick;
+    const struct text_message *main_message = yn->main_message;
+    int line_shift = 0;
+    struct viewport *last_vp = display->set_viewport_ex(vp, VP_FLAG_VP_SET_CLEAN);
 
-    last_vp = display->set_viewport_ex(vp, VP_FLAG_VP_SET_CLEAN);
-    display->clear_viewport();
-    nb_lines = yn->main_message->nb_lines;
-    vp_lines = viewport_get_nb_lines(vp);
+    /* do our own clear to avoid stopping scrolling */
+    int oldmode = vp->drawmode;
+    vp->drawmode ^= DRMODE_INVERSEVID;
+    vp->drawmode |= DRMODE_SOLID;
+    display->fillrect(0, 0, vp->width, vp->height);
+    vp->drawmode = oldmode;
 
-    if(nb_lines+3< vp_lines)
-        line_shift=1;
+    if(main_message->nb_lines + 3 < vp_lines)
+        line_shift = 1;
 
-    line_shift += put_message(display, yn->main_message,
-                              line_shift, vp_lines);
+    line_shift += put_message(display, main_message, line_shift, vp_lines);
 
 #ifdef HAVE_TOUCHSCREEN
     if (display->screen_type == SCREEN_MAIN)
@@ -113,9 +113,9 @@ static void gui_yesno_draw(struct gui_yesno * yn)
 
         if (def_res == YESNO_YES)
         {
-            display->getstringsize(" (0)", &tmo_w, NULL);
-            tm_rem = ((end_tick - current_tick) / 100);
-            btn_fmt = "%s (%d)";
+            display->getstringsize(" (00)", &tmo_w, NULL);
+            tm_rem = ((yn->end_tick - current_tick) / 100);
+            btn_fmt = "%s (%02d)";
         }
         else
         {
@@ -132,9 +132,9 @@ static void gui_yesno_draw(struct gui_yesno * yn)
 
         if (def_res == YESNO_NO)
         {
-            display->getstringsize(" (0)", &tmo_w, NULL);
-            tm_rem = ((end_tick - current_tick) / 100);
-            btn_fmt = "%s (%d)";
+            display->getstringsize(" (00)", &tmo_w, NULL);
+            tm_rem = ((yn->end_tick - current_tick) / 100);
+            btn_fmt = "%s (%02d)";
         }
         else
         {
@@ -149,20 +149,22 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     }
 #else
     /* Space remaining for yes / no text ? */
-    if(line_shift+2 <= vp_lines)
+    if(line_shift + 2 <= vp_lines)
     {
-        if(line_shift+3 <= vp_lines)
+        if(line_shift + 3 <= vp_lines)
             line_shift++;
         display->puts(0, line_shift, str(LANG_CONFIRM_WITH_BUTTON));
         display->puts(0, line_shift+1, str(LANG_CANCEL_WITH_ANY));
 
         if (def_res == YESNO_YES || def_res == YESNO_NO)
         {
-            int tm_rem = ((end_tick - current_tick) / 100);
+            int tm_rem = ((yn->end_tick - current_tick) / 100);
             if (def_res == YESNO_YES)
-                display->putsf(0, line_shift, "%s (%d)", str(LANG_CONFIRM_WITH_BUTTON), tm_rem);
+                display->putsf(0, line_shift, "%s (%02d)",
+                               str(LANG_CONFIRM_WITH_BUTTON), tm_rem);
             else
-                display->putsf(0, line_shift+1, "%s (%d)", str(LANG_CANCEL_WITH_ANY), tm_rem);
+                display->putsf(0, line_shift+1, "%s (%02d)",
+                               str(LANG_CANCEL_WITH_ANY), tm_rem);
         }
     }
 #endif
@@ -177,22 +179,18 @@ static void gui_yesno_draw(struct gui_yesno * yn)
  *    YESNO_NO if no
  *    YESNO_YES if yes
  */
-static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
+static void gui_yesno_draw_result(struct gui_yesno * yn, const struct text_message * message)
 {
-    const struct text_message * message=yn->result_message[result];
-    struct viewport *vp = yn->vp;
+    struct viewport *vp = &yn->vp;
     struct screen * display=yn->display;
     struct viewport *last_vp = display->set_viewport_ex(vp, VP_FLAG_VP_SET_CLEAN);
 
-    if(message==NULL)
-        return false;
     display->clear_viewport();
-    put_message(yn->display, message, 0, viewport_get_nb_lines(vp));
+    put_message(display, message, 0, yn->vp_lines);
     display->update_viewport();
     display->set_viewport(last_vp);
-    return(true);
 }
-
+#if 0
 static void gui_yesno_ui_update(unsigned short id, void *event_data, void *user_data)
 {
     (void)id;
@@ -200,11 +198,13 @@ static void gui_yesno_ui_update(unsigned short id, void *event_data, void *user_
 
     struct gui_yesno* yn = (struct gui_yesno*)user_data;
     FOR_NB_SCREENS(i)
+    {
         gui_yesno_draw(&yn[i]);
+    }
 }
-
+#endif
 /* Display a YES_NO prompt to the user
- * 
+ *
  * ticks < HZ will be ignored and the prompt will be blocking
  * tmo_default_res is the answer that is returned when the timeout expires
  * a default result of YESNO_TMO will also make the prompt blocking
@@ -222,14 +222,14 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
                                        const struct text_message * yes_message,
                                        const struct text_message * no_message)
 {
-    int button;
-    int result=-1;
-    bool result_displayed = false;
+    #define YESNO_NONE (-1)
+    int action;
+    bool backlight_on;
+    bool talk_menu = global_settings.talk_menu;
+    int result = YESNO_NONE;
     struct gui_yesno yn[NB_SCREENS];
-    struct viewport vp[NB_SCREENS];
-    long talked_tick = 0;
+    long talked_tick = current_tick - 1;
     long end_tick = current_tick + ticks;
-    long button_scan_tmo = HZ/2;
 
     if (ticks < HZ) /* Display a prompt with NO timeout to the user */
     {
@@ -240,15 +240,11 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
     {
         yn[i].end_tick = end_tick;
         yn[i].tmo_default_res = tmo_default_res;
-
         yn[i].main_message=main_message;
-        yn[i].result_message[YESNO_YES]=yes_message;
-        yn[i].result_message[YESNO_NO]=no_message;
         yn[i].display=&screens[i];
-        yn[i].vp = &vp[i];
-        viewportmanager_theme_enable(i, true, yn[i].vp);
         screens[i].scroll_stop();
-        gui_yesno_draw(&(yn[i]));
+        viewportmanager_theme_enable(i, true, &(yn[i].vp));
+        yn[i].vp_lines = viewport_get_nb_lines(&(yn[i].vp));
     }
 
 #ifdef HAVE_TOUCHSCREEN
@@ -263,33 +259,36 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
 
     /* hook into UI update events to avoid the dialog disappearing
      * in case the skin decides to do a full refresh */
-    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, gui_yesno_ui_update, &yn[0]);
+    /*add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, gui_yesno_ui_update, &yn[0]);*/
+    /* probably no longer needed --Bilgus 2023*/
 
-    while (result==-1)
+    while (result==YESNO_NONE)
     {
-        /* Repeat the question every 5secs (more or less) */
-        if (global_settings.talk_menu
-            && (talked_tick==0 || TIME_AFTER(current_tick, talked_tick+HZ*5)))
-        {
-            talked_tick = current_tick;
-            talk_text_message(main_message, false);
-        }
+
         FOR_NB_SCREENS(i)
             gui_yesno_draw(&yn[i]);
 
-        button = get_action(CONTEXT_YESNOSCREEN, button_scan_tmo);
-
-        switch (button)
+        /* Repeat the question every 5secs (more or less) */
+        if (talk_menu && TIME_AFTER(current_tick, talked_tick))
+        {
+            talked_tick = current_tick + (HZ*5);
+            talk_text_message(main_message, false);
+        }
+        backlight_on = is_backlight_on(false);
+        action = get_action(CONTEXT_YESNOSCREEN, HZ / 2); /* for statubar and tmo */
+        switch (action)
         {
 #ifdef HAVE_TOUCHSCREEN
             case ACTION_TOUCHSCREEN:
                 {
+                    int btn;
                     short int x, y;
-                    if (action_get_touchscreen_press_in_vp(&x, &y, yn[0].vp) == BUTTON_REL)
+                    btn = action_get_touchscreen_press_in_vp(&x, &y, &(yn[0].vp))
+                    if (btn == BUTTON_REL)
                     {
-                        if (y > yn[0].vp->height/2)
+                        if (y > yn[0].vp.height/2)
                         {
-                            if (x <= yn[0].vp->width/2)
+                            if (x <= yn[0].vp.width/2)
                                 result = YESNO_YES;
                             else
                                 result = YESNO_NO;
@@ -299,55 +298,62 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
                 break;
 #endif
             case ACTION_YESNO_ACCEPT:
-                result=YESNO_YES;
+                result = YESNO_YES;
                 break;
             case ACTION_NONE:
                 if(tmo_default_res != YESNO_TMO && TIME_AFTER(current_tick, end_tick))
                 {
                     splash(HZ/2, ID2P(LANG_TIMEOUT));
                     result = tmo_default_res;
-                    break;
+                    goto exit;
                 }
             /*fall-through*/
             case ACTION_UNKNOWN:
-            case SYS_CHARGER_DISCONNECTED:
-            case SYS_BATTERY_UPDATE:
-            case SYS_TIMEOUT:
-#if CONFIG_CHARGING
-            case SYS_CHARGER_CONNECTED:
-#endif
-                /* ignore some SYS events that can happen */
+            case ACTION_REDRAW:
                 continue;
             default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+                if(default_event_handler(action) == SYS_USB_CONNECTED) {
                     result = YESNO_USB;
                     goto exit;
                 }
+                if (!IS_SYSEVENT(action)) /* ignore SYS events that can happen */
+                    result = YESNO_NO;
+        }
 
-                result = YESNO_NO;
+        if (!backlight_on)
+            result = YESNO_NONE; /* don't allow results if the screen is off */
+    }
+
+exit:
+
+    /*remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);*/
+
+    if (result == YESNO_YES || result == YESNO_NO)
+    {
+        const struct text_message * resmsg;
+        if (result == YESNO_YES)
+            resmsg = yes_message;
+        else
+            resmsg = no_message;
+
+        if (resmsg != NULL)
+        {
+            FOR_NB_SCREENS(i)
+                gui_yesno_draw_result(&(yn[i]), resmsg);
+
+            if (talk_menu)
+            {
+                talk_text_message(resmsg, false);
+                talk_force_enqueue_next();
+            }
+
+            sleep(HZ);
         }
     }
 
     FOR_NB_SCREENS(i)
-        result_displayed=gui_yesno_draw_result(&(yn[i]), result);
-
-    if (global_settings.talk_menu)
     {
-        talk_text_message((result == YESNO_YES) ? yes_message
-                          : no_message, false);
-        talk_force_enqueue_next();
-    }
-
-
-  exit:
-    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);
-
-    if(result_displayed)
-        sleep(HZ);
-
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].scroll_stop_viewport(yn[i].vp);
+        screens[i].scroll_stop_viewport(&(yn[i].vp));
         viewportmanager_theme_undo(i, true);
     }
 
@@ -366,7 +372,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 }
 
 /* Function to manipulate all yesno dialogues.
-   This function needs the output text as an argument. */
+   This function needs the prompt text as an argument. */
 bool yesno_pop(const char* text)
 {
     const char *lines[]={text};
