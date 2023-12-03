@@ -1011,7 +1011,9 @@ void root_menu(void)
                        case make sure we preserve and restore the origin */
                     if (shortcut_origin != GO_TO_ROOT)
                     {
-                        if (shortcut_origin != GO_TO_WPS)
+                        if(tree_get_context()->out_of_tree > 0) /* a shortcut has been selected */
+                            next_screen = GO_TO_FILEBROWSER;
+                        else if (shortcut_origin != GO_TO_WPS)
                             next_screen = shortcut_origin;
                         shortcut_origin = GO_TO_ROOT;
                     }

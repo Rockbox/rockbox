@@ -620,11 +620,6 @@ int do_shortcut_menu(void *ignored)
     while (done == GO_TO_PREVIOUS)
     {
         list.count = shortcut_count;
-        if(tree_get_context()->out_of_tree > 0) /* a shortcut has been selected */
-        {
-            done = GO_TO_FILEBROWSER;
-            break;
-        }
 
         if (simplelist_show_list(&list))
             break; /* some error happened?! */
