@@ -55,15 +55,20 @@ static int vol_tenthdb2hw(const int tdb)
  * static uint8_t reg4_automute_time           = 0x00; // Automute time. Default = disabled
  * static uint8_t reg5_automute_level          = 0x68; // Automute level. Default is some level
  * static uint8_t reg6_deemphasis              = 0x4A; // Deemphasis. Default = disabled
- * static uint8_t reg7_general_settings        = 0x80; // General settings. Default sharp fir, pcm iir and unmuted
+ */
+static uint8_t reg7_general_settings        = 0x80; // General settings. Default sharp fir, pcm iir and unmuted
+/*
  * static uint8_t reg8_gpio_configuration      = 0x10; // GPIO configuration
  * static uint8_t reg10_master_mode_control    = 0x05; // Master Mode Control. Default value: master mode off
  * static uint8_t reg11_channel_mapping        = 0x02; // Channel Mapping. Default stereo is Ch1=left, Ch2=right
  * static uint8_t reg12_dpll_settings          = 0x5A; // DPLL Settings. Default = 5 for I2S, A for DSD
  * static uint8_t reg13_thd_comp               = 0x40; // THD Compensation
  * static uint8_t reg14_softstart_settings     = 0x8A; // Soft Start Settings
- * static uint8_t reg21_gpio_input_selection   = 0x00; // Oversampling filter. Default: oversampling ON
  */
+static uint8_t reg21_gpio_input_selection   = 0x00; // Oversampling filter. Default: oversampling ON
+
+#define bitSet(value, bit) ((value) |= (1UL << (bit)))
+#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 
 static uint8_t vol_reg_l = ES9018K2M_REG15_VOLUME_L;
 static uint8_t reg15_vol_l = 0;
@@ -95,7 +100,7 @@ i2c_descriptor vol_desc_r = {
     .next = NULL,
 };
 
-void es9018k2m_set_volume(int vol_l, int vol_r)
+void es9018k2m_set_volume_async(int vol_l, int vol_r)
 {
     /* Queue writes to the DAC's volume.
      * Note that this needs to be done asynchronously. From testing, calling
@@ -104,6 +109,43 @@ void es9018k2m_set_volume(int vol_l, int vol_r)
     reg16_vol_r = vol_tenthdb2hw(vol_r);
     i2c_async_queue(ES9018K2M_BUS, TIMEOUT_NOBLOCK, I2C_Q_ADD, 0, &vol_desc_l);
     i2c_async_queue(ES9018K2M_BUS, TIMEOUT_NOBLOCK, I2C_Q_ADD, 0, &vol_desc_r);
+}
+
+void es9018k2m_set_filter_roll_off(int value)
+{
+    /* Note: the ihifi800 implementation manipulates
+    * bit 0 of reg21, but I think that is incorrect?
+    * Bit 2 is the bypass for the IIR digital filters,
+    * Whereas Bit 0 is the oversampling filter, which
+    * the datasheet seems to say should be left on. */
+
+    /* 0 = "Sharp" / Fast Rolloff (Default)
+       1 = Slow Rolloff
+       2 = "Short" / Minimum Phase
+       3 = Bypass */
+    switch(value)
+    {
+        case 0:
+            bitClear(reg7_general_settings, 5);
+            bitClear(reg7_general_settings, 6);
+            bitClear(reg21_gpio_input_selection, 2);
+            break;
+        case 1:
+            bitSet(reg7_general_settings, 5);
+            bitClear(reg7_general_settings, 6);
+            bitClear(reg21_gpio_input_selection, 2);
+            break;
+        case 2:
+            bitClear(reg7_general_settings, 5);
+            bitSet(reg7_general_settings, 6);
+            bitClear(reg21_gpio_input_selection, 2);
+            break;
+        case 3:
+            bitSet(reg21_gpio_input_selection, 2);
+            break;
+    }
+    es9018k2m_write_reg(ES9018K2M_REG7_GENERAL_SETTINGS, reg7_general_settings);
+    es9018k2m_write_reg(ES9018K2M_REG21_GPIO_INPUT_SELECT, reg21_gpio_input_selection);
 }
 
 /* returns I2C_STATUS_OK upon success, I2C_STATUS_* errors upon error */

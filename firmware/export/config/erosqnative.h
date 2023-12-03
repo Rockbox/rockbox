@@ -63,6 +63,8 @@
 #define HAVE_EROS_QN_CODEC
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
+#define AUDIOHW_CAPS (FILTER_ROLL_OFF_CAP)
+#define AUDIOHW_HAVE_SHORT_ROLL_OFF
 
 /* use high-bitdepth volume scaling */
 #define PCM_NATIVE_BITDEPTH 24

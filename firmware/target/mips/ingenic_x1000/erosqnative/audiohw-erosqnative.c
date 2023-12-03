@@ -162,7 +162,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
         /* set software volume just below unity due to
          * DAC offset. We don't want to overflow the PCM system. */
         pcm_set_master_volume(-1, -1);
-        es9018k2m_set_volume(l, r);
+        es9018k2m_set_volume_async(l, r);
     }
     else /* PCM5102A */
     {
@@ -170,5 +170,13 @@ void audiohw_set_volume(int vol_l, int vol_r)
         r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : (r / 20);
 
         pcm_set_master_volume(l, r);
+    }
+}
+
+void audiohw_set_filter_roll_off(int value)
+{
+    if (es9018k2m_present_flag)
+    {
+        es9018k2m_set_filter_roll_off(value);
     }
 }

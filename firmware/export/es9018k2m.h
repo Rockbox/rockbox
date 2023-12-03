@@ -25,6 +25,13 @@
 
 //======================================================================================
 // ES9018K2M support stuff
+// Implement audiohw_* functions in audiohw-*.c. These functions are utilities which
+// may be used there.
+
+// AUDIOHW_SETTING(VOLUME, *) not set here, probably best to put it in device-specific *_codec.h
+#ifdef AUDIOHW_HAVE_SHORT_ROLL_OFF
+AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 3, 0)
+#endif
 
 #ifndef ES9018K2M_VOLUME_MIN
 # define ES9018K2M_VOLUME_MIN	-1270
@@ -50,8 +57,11 @@
 #define ES9018K2M_REG16_VOLUME_R            16
 #define ES9018K2M_REG21_GPIO_INPUT_SELECT   21
 
-/* writes volume levels to DAC over I2C */
-void es9018k2m_set_volume(int vol_l, int vol_r);
+/* writes volume levels to DAC over I2C, asynchronously */
+void es9018k2m_set_volume_async(int vol_l, int vol_r);
+
+/* write filter roll-off setting to DAC over I2C, synchronously */
+void es9018k2m_set_filter_roll_off(int value);
 
 /* writes a single register */
 /* returns I2C_STATUS_OK upon success, I2C_STATUS_* errors upon error */
