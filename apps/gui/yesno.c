@@ -29,8 +29,6 @@
 #include "settings.h"
 #include "viewport.h"
 #include "appevents.h"
-
-//#include <stdio.h>
 #include "splash.h"
 #include "backlight.h"
 
@@ -283,7 +281,7 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
                 {
                     int btn;
                     short int x, y;
-                    btn = action_get_touchscreen_press_in_vp(&x, &y, &(yn[0].vp))
+                    btn = action_get_touchscreen_press_in_vp(&x, &y, &(yn[0].vp));
                     if (btn == BUTTON_REL)
                     {
                         if (y > yn[0].vp.height/2)
