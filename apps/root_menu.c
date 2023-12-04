@@ -1009,11 +1009,17 @@ void root_menu(void)
                 {
                     /* shortcuts may take several trips through the GO_TO_PLUGIN
                        case make sure we preserve and restore the origin */
-                    if (shortcut_origin != GO_TO_ROOT)
+                    if(tree_get_context()->out_of_tree > 0) /* a shortcut has been selected */
                     {
-                        if(tree_get_context()->out_of_tree > 0) /* a shortcut has been selected */
-                            next_screen = GO_TO_FILEBROWSER;
-                        else if (shortcut_origin != GO_TO_WPS)
+                        next_screen = GO_TO_FILEBROWSER;
+                        shortcut_origin = GO_TO_ROOT;
+                        /* note in some cases there is a screen to return to
+                        but the history is rewritten as if you browsed here 
+                        from the root so return there when finished */
+                    }
+                    else if (shortcut_origin != GO_TO_ROOT)
+                    {
+                        if (shortcut_origin != GO_TO_WPS)
                             next_screen = shortcut_origin;
                         shortcut_origin = GO_TO_ROOT;
                     }
