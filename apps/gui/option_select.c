@@ -594,7 +594,7 @@ bool option_screen(const struct settings_list *setting,
     return false;
 }
 
-int get_setting_info_for_bar(const struct settings_list *setting, int *count, int *val)
+int get_setting_info_for_bar(const struct settings_list *setting, int offset, int *count, int *val)
 {
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
@@ -602,7 +602,9 @@ int get_setting_info_for_bar(const struct settings_list *setting, int *count, in
 
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
-        oldvalue = *(int*)setting->setting;
+        if (!(setting->flags&F_EQSETTING) || offset > 2)
+            offset = 0;
+        oldvalue = ((int*)setting->setting)[offset];
     }
     else if (var_type == F_T_BOOL)
     {
@@ -620,14 +622,16 @@ int get_setting_info_for_bar(const struct settings_list *setting, int *count, in
 }
 
 #ifdef HAVE_TOUCHSCREEN
-void update_setting_value_from_touch(const struct settings_list *setting, int selection)
+void update_setting_value_from_touch(const struct settings_list *setting, int offset, int selection)
 {
     int new_val = selection_to_val(setting, selection);
     int var_type = setting->flags&F_T_MASK;
 
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
-        *(int*)setting->setting = new_val;
+        if (!(setting->flags&F_EQSETTING) || offset > 2)
+            offset = 0;
+        ((int*)setting->setting)[offset] = new_val;
     }
     else if (var_type == F_T_BOOL)
     {

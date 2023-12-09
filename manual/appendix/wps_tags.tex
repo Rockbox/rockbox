@@ -85,7 +85,7 @@ show the information for the next song to be played.
 
     \config{\%Vi('label',\dots)} &
     Declare a Custom UI Viewport. The `\dots' parameters use the same logic as
-    the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
+    the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\
 
     \config{\%VI('label')} & Set the Info Viewport to use the viewport called
     label, as declared with the previous tag.\\
@@ -708,6 +708,7 @@ display cycling round the defined sublines. See
     \opt{touchscreen}{
         \item[notouch] -- don't create the touchregion for progress/volume bars.
     }
+  \item[soffset] -- For compound settings (such as the equalizer), this lets you pick which element in the set to use. The next param must be the number.  Must be specified prior to the setting name.
   \item[setting] -- Specify the setting name to draw the bar from (bar must be
     \%St type), the next param is the settings config name.
 \end{description}

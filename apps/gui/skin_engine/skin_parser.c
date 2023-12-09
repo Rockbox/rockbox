@@ -960,6 +960,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     struct viewport *vp = &curr_vp->vp;
     struct skin_tag_parameter *param = get_param(element, 0);
     int curr_param = 0;
+    int setting_offset = 0;
     char *image_filename = NULL;
 #ifdef HAVE_TOUCHSCREEN
     bool suppress_touchregion = false;
@@ -1082,7 +1083,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     enum
     {
         eINVERT = 0, eNOFILL, eNOBORDER, eNOBAR, eSLIDER, eIMAGE,
-        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING,
+        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING, eSETTING_OFFSET,
         e_PB_TAG_COUNT
     };
 
@@ -1090,7 +1091,7 @@ static int parse_progressbar_tag(struct skin_element* element,
                  [eNOFILL] = "nofill", [eNOBORDER] = "noborder", [eNOBAR] = "nobar",
                  [eSLIDER] = "slider", [eIMAGE] = "image", [eBACKDROP] = "backdrop",
                  [eVERTICAL] = "vertical", [eHORIZONTAL] = "horizontal",
-                 [eNOTOUCH] = "notouch", [eSETTING] = "setting", [e_PB_TAG_COUNT] = NULL};
+                 [eNOTOUCH] = "notouch", [eSETTING] = "setting", [eSETTING_OFFSET] = "soffset", [e_PB_TAG_COUNT] = NULL};
     int pb_op;
 
     while (curr_param < element->params_count)
@@ -1158,6 +1159,15 @@ static int parse_progressbar_tag(struct skin_element* element,
         else if (pb_op == eNOTOUCH)
             suppress_touchregion = true;
 #endif
+        else if (token->type == SKIN_TOKEN_SETTING && pb_op == eSETTING_OFFSET)
+        {
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                setting_offset = param->data.number;
+            }
+        }
         else if (token->type == SKIN_TOKEN_SETTING && pb_op == eSETTING)
         {
             if (curr_param+1 < element->params_count)
@@ -1169,6 +1179,7 @@ static int parse_progressbar_tag(struct skin_element* element,
                 pb->setting = find_setting_by_cfgname(text);
                 if (!pb->setting)
                     return WPS_ERROR_INVALID_PARAM;
+                pb->setting_offset = setting_offset;
 #endif
             }
         }
@@ -1223,7 +1234,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     else if (token->type == SKIN_TOKEN_SETTING)
-		token->type = SKIN_TOKEN_SETTINGBAR;
+	token->type = SKIN_TOKEN_SETTINGBAR;
     pb->type = token->type;
 
 #ifdef HAVE_TOUCHSCREEN

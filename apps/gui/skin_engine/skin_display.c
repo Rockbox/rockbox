@@ -217,7 +217,7 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
     else if (pb->type == SKIN_TOKEN_SETTINGBAR)
     {
         int val, count;
-        get_setting_info_for_bar(pb->setting, &count, &val);
+        get_setting_info_for_bar(pb->setting, pb->setting_offset, &count, &val);
         length = count - 1;
         end = val;
     }

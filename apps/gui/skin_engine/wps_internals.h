@@ -132,9 +132,9 @@ struct progressbar {
     bool nobar;
     OFFSETTYPE(struct gui_img *) slider;
     bool horizontal;
+    char setting_offset;
     OFFSETTYPE(struct gui_img *) backdrop;
     const struct settings_list *setting;
-
 };
 
 struct draw_rectangle {

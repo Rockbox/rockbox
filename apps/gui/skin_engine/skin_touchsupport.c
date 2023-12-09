@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include <stdio.h>
 #include "action.h"
@@ -80,7 +80,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
             continue;
         }
-        if (data->touchscreen_locked && 
+        if (data->touchscreen_locked &&
             (r->action != ACTION_TOUCH_SOFTLOCK && !r->allow_while_locked))
         {
             regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
@@ -143,7 +143,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
                         r->last_press = current_tick;
                         break;
                     default:
-                        if (r->armed && ((repeated && needs_repeat) || 
+                        if (r->armed && ((repeated && needs_repeat) ||
                             (released && !needs_repeat)))
                         {
                             returncode = r->action;
@@ -166,7 +166,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
         skin_disarm_touchregions(gwps);
     if (temp && temp->press_length == LONG_PRESS)
         temp->armed = false;
-    
+
     if (returncode != ACTION_NONE)
     {
         if (global_settings.party_mode)
@@ -227,9 +227,9 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_DEC:
             {
-                const struct settings_list *setting = 
+                const struct settings_list *setting =
                                             temp->setting_data.setting;
-                option_select_next_val(setting, 
+                option_select_next_val(setting,
                                        returncode == ACTION_SETTINGS_DEC,
                                        true);
                 returncode = ACTION_REDRAW;
@@ -245,7 +245,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
                     case F_T_CUSTOM:
                         s->custom_setting
                             ->load_from_cfg(s->setting, SKINOFFSETTOPTR(skin_buffer, data->value.text));
-                        break;                          
+                        break;
                     case F_T_INT:
                     case F_T_UINT:
                         *(int*)s->setting = data->value.number;
@@ -287,7 +287,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             break;
             case ACTION_TOUCH_SHUFFLE: /* toggle shuffle mode */
             {
-                global_settings.playlist_shuffle = 
+                global_settings.playlist_shuffle =
                                             !global_settings.playlist_shuffle;
                 replaygain_update();
                 if (global_settings.playlist_shuffle)
@@ -299,7 +299,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             break;
             case ACTION_TOUCH_REPMODE: /* cycle the repeat mode setting */
             {
-                const struct settings_list *rep_setting = 
+                const struct settings_list *rep_setting =
                                 find_setting(&global_settings.repeat_mode);
                 option_select_next_val(rep_setting, false, true);
                 audio_flush_and_reload_tracks();
@@ -307,15 +307,15 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             }
             break;
             case ACTION_TOUCH_SETTING:
-            {                
+            {
                 struct progressbar *bar =
                         SKINOFFSETTOPTR(skin_buffer, temp->bar);
                 if (bar && edge_offset)
-                {                    
+                {
                     int val, count;
-                    get_setting_info_for_bar(bar->setting, &count, &val);
+                    get_setting_info_for_bar(bar->setting, bar->setting_offset, &count, &val);
                     val = *edge_offset * count / 1000;
-                    update_setting_value_from_touch(bar->setting, val);
+                    update_setting_value_from_touch(bar->setting, bar->setting_offset, val);
                 }
             }
             break;
