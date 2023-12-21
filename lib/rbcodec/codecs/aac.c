@@ -92,8 +92,6 @@ enum codec_status codec_run(void)
 
     stream_create(&input_stream,ci);
 
-    ci->seek_buffer(ci->id3->first_frame_offset);
-
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -148,6 +146,7 @@ enum codec_status codec_run(void)
     } else {
         elapsed_time = 0;
         sound_samples_done = 0;
+        ci->seek_buffer(ci->id3->first_frame_offset);
     }
 
     ci->set_elapsed(elapsed_time);
