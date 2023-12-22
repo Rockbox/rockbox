@@ -93,11 +93,13 @@ bool get_aac_metadata(int fd, struct mp3entry *entry)
                 break;
         }
         entry->bitrate = (unsigned int)((total * entry->frequency / frames + 64000) / 128000);
+#ifdef CODEC_AAC_SBR_DEC
         if (entry->frequency <= 24000)
         {
             entry->frequency <<= 1;
             entry->needs_upsampling_correction = true;
         }
+#endif
     }
     else
     {

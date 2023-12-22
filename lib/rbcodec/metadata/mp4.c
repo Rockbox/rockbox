@@ -349,7 +349,10 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
                 }
             }
         }
-        
+#ifndef CODEC_AAC_SBR_DEC
+        //SBR_DEC is disabled so disable sbr implicit signalling
+        sbr_signaled = true;
+#endif
         if (!sbr && !sbr_signaled && id3->frequency <= 24000)
         {
             /* As stated in libfaad/mp4.c AudioSpecificConfig2:

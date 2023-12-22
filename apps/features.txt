@@ -300,3 +300,7 @@ clear_settings_on_hold
 #if defined(HAVE_PERCEPTUAL_VOLUME)
 perceptual_volume
 #endif
+
+#if defined(CODEC_AAC_SBR_DEC)
+codec_aac_he
+#endif

@@ -86,10 +86,10 @@
         & \fname{.adx}
         & Encrypted ADX is not supported.\\
     Advanced Audio Coding
-        & \fname{.m4a}, \fname{.m4b}, \fname{.mp4}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
-        \nopt{clipv1,c200v2}{
+        & \fname{.aac}, \fname{.m4a}, \fname{.m4b}, \fname{.mp4}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
+        \opt{codec_aac_he}{
             & Supports AAC-LC, -HEv1, and -HEv2 profiles\\}
-        \opt{clipv1,c200v2}{ % low memory targets (CODEC_SIZE <= 512 KB)
+        \nopt{codec_aac_he}{ % low memory (CODEC_SIZE <= 512 KB) or slow cpu targets 
             & Supports AAC-LC profile\\}
     MPEG audio
         & \fname{.mpa}, \fname{.mpga}, \fname{.mp1}, \fname{.mp2}, \fname{.mp3}
@@ -122,7 +122,7 @@
         & \\
   \end{rbtabular}
 
-  \note{AAC-HE profiles might not play in realtime on all devices due to CPU
+  \note{AAC-HE profiles \opt{codec_aac_he}{might not play in realtime on all devices}\nopt{codec_aac_he}{are disabled on this device} due to CPU
   performance requirements.}
 
   \subsection{Lossless Codecs}

@@ -135,9 +135,11 @@ extern "C" {
   #undef ERROR_RESILIENCE
 #endif
 
-#if CODEC_SIZE >= 0x80000
+#ifdef CODEC_AAC_SBR_DEC
 #define SBR_DEC
 //#define SBR_LOW_POWER /* Does not work yet in rockbox. */
+#endif
+#if CODEC_SIZE >= 0x80000
 #define PS_DEC
 #endif
 

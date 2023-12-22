@@ -601,6 +601,10 @@ Lyre prototype 1 */
 //#error "unknown hwardware platform!"
 #endif
 
+#if !(CONFIG_CPU >= PP5002 && CONFIG_CPU <= PP5022) && CODEC_SIZE >= 0x80000
+#define CODEC_AAC_SBR_DEC
+#endif
+
 #ifdef __PCTOOL__
 #undef CONFIG_CPU
 #define CONFIG_CPU 0

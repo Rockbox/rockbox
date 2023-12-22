@@ -850,9 +850,13 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
 #if (defined(PS_DEC) || defined(DRM_PS))
     if ((hDecoder->ps_used[hDecoder->fr_ch_ele] == 0))
     {
-        uint8_t ele = hDecoder->fr_ch_ele;
         uint8_t ch = sce->channel;
-        uint16_t frame_size = (hDecoder->sbr_alloced[ele]) ? 2 : 1;
+        uint16_t frame_size =
+#ifdef SBR_DEC
+                (hDecoder->sbr_alloced[hDecoder->fr_ch_ele]) ? 2 : 1;
+#else
+                1;
+#endif
         frame_size *= hDecoder->frameLength*sizeof(real_t);
 
         memcpy(hDecoder->time_out[ch+1], hDecoder->time_out[ch], frame_size);
