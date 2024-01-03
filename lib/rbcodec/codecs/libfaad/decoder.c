@@ -247,6 +247,7 @@ int32_t NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder, uint8_t *buffer,
     if ((hDecoder == NULL) || (samplerate == NULL) || (channels == NULL))
         return -1;
 
+    adts.old_format = hDecoder->config.useOldADTSFormat;
     hDecoder->sf_index = get_sr_index(hDecoder->config.defSampleRate);
     hDecoder->object_type = hDecoder->config.defObjectType;
     *samplerate = get_sample_rate(hDecoder->sf_index);
@@ -277,11 +278,8 @@ int32_t NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder, uint8_t *buffer,
             bits = bit2byte(faad_get_processed_bits(&ld));
 
         /* Check if an ADTS header is present */
-        } else if (faad_showbits(&ld, 12) == 0xfff) {
+        } else if (adts_frame(&adts, &ld) == 0) {
             hDecoder->adts_header_present = 1;
-
-            adts.old_format = hDecoder->config.useOldADTSFormat;
-            adts_frame(&adts, &ld);
 
             hDecoder->sf_index = adts.sf_index;
             hDecoder->object_type = adts.profile + 1;
