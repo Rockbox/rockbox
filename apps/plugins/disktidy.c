@@ -176,7 +176,7 @@ static void tidy_load_file(const char* file)
             str++;
         unsigned i = find_file_string(str, last_group);
 
-        tidy_types[i].remove = rb->strcmp(remove, "yes");
+        tidy_types[i].remove = !rb->strcmp(remove, "yes");
 
         if (i >= tidy_type_count)
         {
