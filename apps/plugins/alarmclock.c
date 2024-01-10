@@ -136,6 +136,9 @@ enum plugin_status plugin_start(const void* parameter)
     pause_audio();
 
     while(!quit) {
+        FOR_NB_SCREENS(i) {
+            draw(rb->screens[i]);
+        }
         button = get_button();
 
 #if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
@@ -147,9 +150,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
             quit = true;
 
-        FOR_NB_SCREENS(i) {
-            draw(rb->screens[i]);
-        }
         if (waiting) {
             if (rem_seconds() <= 0) {
                 quit = done = true;
