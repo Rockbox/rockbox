@@ -92,6 +92,8 @@ enum codec_status codec_run(void)
 
     stream_create(&input_stream,ci);
 
+    ci->seek_buffer(0);
+
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -146,7 +148,6 @@ enum codec_status codec_run(void)
     } else {
         elapsed_time = 0;
         sound_samples_done = 0;
-        ci->seek_buffer(ci->id3->first_frame_offset);
     }
 
     ci->set_elapsed(elapsed_time);
@@ -194,13 +195,14 @@ enum codec_status codec_run(void)
          * doesn't seem to happen much, but it probably means that a
          * "proper" file can have chunks out of order. Why one would want
          * that an good question (but files with gaps do exist, so who
-         * knows?), so we don't support that - for now, at least.
+         * knows?), and we might not properly support it.
+         * Metadata can also be placed after audio data so skip back if needed.
          */
         file_offset = m4a_check_sample_offset(&demux_res, i, &seek_idx);
 
-        if (file_offset > ci->curpos)
+        if (file_offset > 0 && file_offset != ci->curpos)
         {
-            ci->advance_buffer(file_offset - ci->curpos);
+            ci->seek_buffer(file_offset);
         }
 
         /* Request the required number of bytes from the input buffer */
