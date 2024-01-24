@@ -2494,6 +2494,23 @@ static inline char* single_mode_get_id3_tag(struct mp3entry *id3)
     return NULL;
 }
 
+static bool single_mode_do_pause(int id3_hid)
+{
+    if (global_settings.single_mode != SINGLE_MODE_OFF && global_settings.party_mode == 0 &&
+        ((skip_pending == TRACK_SKIP_AUTO) || (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST))) {
+
+        if (global_settings.single_mode == SINGLE_MODE_TRACK)
+            return true;
+
+        char *previous_tag = single_mode_get_id3_tag(id3_get(PLAYING_ID3));
+        char *new_tag = single_mode_get_id3_tag(bufgetid3(id3_hid));
+        return previous_tag == NULL ||
+               new_tag == NULL ||
+               strcmp(previous_tag, new_tag) != 0;
+    }
+    return false;
+}
+
 /* Called to make an outstanding track skip the current track and to send the
    transition events */
 static void audio_finalise_track_change(void)
@@ -2540,42 +2557,27 @@ static void audio_finalise_track_change(void)
     bool have_info = track_list_current(0, &info);
     struct mp3entry *track_id3 = NULL;
 
-    id3_mutex_lock();
-
     /* Update the current cuesheet if any and enabled */
     if (have_info)
     {
         buf_read_cuesheet(info.cuesheet_hid);
         track_id3 = bufgetid3(info.id3_hid);
-    }
 
-    if (SINGLE_MODE_OFF != global_settings.single_mode && global_settings.party_mode == 0 &&
-        ((skip_pending == TRACK_SKIP_AUTO) || (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST)))
-    {
-        bool single_mode_do_pause = true;
-        if (SINGLE_MODE_TRACK != global_settings.single_mode)
-        {
-            char *previous_tag = single_mode_get_id3_tag(id3_get(PLAYING_ID3));
-            char *new_tag = single_mode_get_id3_tag(track_id3);
-            single_mode_do_pause = previous_tag == NULL ||
-                                   new_tag == NULL ||
-                                   strcmp(previous_tag, new_tag) != 0;
-        }
-
-        if (single_mode_do_pause)
+        if (single_mode_do_pause(info.id3_hid))
         {
             play_status = PLAY_PAUSED;
             pcmbuf_pause(true);
         }
     }
+    /* Sync the next track information */
+    have_info = track_list_current(1, &info);
+
+    id3_mutex_lock();
 
     id3_write(PLAYING_ID3, track_id3);
 
     /* The skip is technically over */
     skip_pending = TRACK_SKIP_NONE;
-
-    /* Sync the next track information */
-    have_info = track_list_current(1, &info);
 
     id3_write(NEXTTRACK_ID3, have_info ? bufgetid3(info.id3_hid) :
                                          id3_get(UNBUFFERED_ID3));
@@ -2641,6 +2643,79 @@ static void audio_monitor_end_of_playlist(void)
     pcmbuf_start_track_change(TRACK_CHANGE_END_OF_DATA);
 }
 
+/* Does this track have an entry allocated? */
+static bool audio_can_change_track(int *trackstat, int *id3_hid)
+{
+    struct track_info info;
+    bool have_track = track_list_advance_current(1, &info);
+    *id3_hid = info.id3_hid;
+    if (!have_track || info.audio_hid < 0)
+    {
+        bool end_of_playlist = false;
+
+        if (have_track)
+        {
+            if (filling == STATE_STOPPED)
+            {
+                audio_begin_track_change(TRACK_CHANGE_END_OF_DATA, *trackstat);
+                return false;
+            }
+
+            /* Track load is not complete - it might have stopped on a
+               full buffer without reaching the audio handle or we just
+               arrived at it early
+
+               If this type is atomic and we couldn't get the audio,
+               perhaps it would need to wrap to make the allocation and
+               handles are in the way - to maximize the liklihood it can
+               be allocated, clear all handles to reset the buffer and
+               its indexes to 0 - for packet audio, this should not be an
+               issue and a pointless full reload of all the track's
+               metadata may be avoided */
+
+            struct mp3entry *track_id3 = bufgetid3(info.id3_hid);
+
+            if (track_id3 && !rbcodec_format_is_atomic(track_id3->codectype))
+            {
+                /* Continue filling after this track */
+                audio_reset_and_rebuffer(TRACK_LIST_KEEP_CURRENT, 1);
+                return true;
+            }
+            /* else rebuffer at this track; status applies to the track we
+               want */
+        }
+        else if (!playlist_peek(1, NULL, 0))
+        {
+            /* Play sequence is complete - directory change or other playlist
+               resequencing - the playlist must now be advanced in order to
+               continue since a peek ahead to the next track is not possible */
+            skip_pending = TRACK_SKIP_AUTO_NEW_PLAYLIST;
+            end_of_playlist = playlist_next(1) < 0;
+        }
+
+        if (!end_of_playlist)
+        {
+            *trackstat = audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL,
+                    skip_pending == TRACK_SKIP_AUTO ? 0 : -1);
+
+            if (*trackstat == LOAD_TRACK_ERR_NO_MORE)
+            {
+                /* Failed to find anything after all - do playlist switchover
+                   instead */
+                skip_pending = TRACK_SKIP_AUTO_NEW_PLAYLIST;
+                end_of_playlist = playlist_next(1) < 0;
+            }
+        }
+
+        if (end_of_playlist)
+        {
+            audio_monitor_end_of_playlist();
+            return false;
+        }
+    }
+    return true;
+}
+
 /* Codec has completed decoding the track
    (usually Q_AUDIO_CODEC_COMPLETE) */
 static void audio_on_codec_complete(int status)
@@ -2685,77 +2760,14 @@ static void audio_on_codec_complete(int status)
     track_event_flags = TEF_AUTO_SKIP;
     skip_pending = TRACK_SKIP_AUTO;
 
-    /* Does this track have an entry allocated? */
-    struct track_info info;
-    bool have_track = track_list_advance_current(1, &info);
-
-    if (!have_track || info.audio_hid < 0)
+    int id3_hid = 0;
+    if (audio_can_change_track(&trackstat, &id3_hid)) 
     {
-        bool end_of_playlist = false;
-
-        if (have_track)
-        {
-            if (filling == STATE_STOPPED)
-            {
-                audio_begin_track_change(TRACK_CHANGE_END_OF_DATA, trackstat);
-                return;
-            }
-
-            /* Track load is not complete - it might have stopped on a
-               full buffer without reaching the audio handle or we just
-               arrived at it early
-
-               If this type is atomic and we couldn't get the audio,
-               perhaps it would need to wrap to make the allocation and
-               handles are in the way - to maximize the liklihood it can
-               be allocated, clear all handles to reset the buffer and
-               its indexes to 0 - for packet audio, this should not be an
-               issue and a pointless full reload of all the track's
-               metadata may be avoided */
-
-            struct mp3entry *track_id3 = bufgetid3(info.id3_hid);
-
-            if (track_id3 && !rbcodec_format_is_atomic(track_id3->codectype))
-            {
-                /* Continue filling after this track */
-                audio_reset_and_rebuffer(TRACK_LIST_KEEP_CURRENT, 1);
-                audio_begin_track_change(TRACK_CHANGE_AUTO, trackstat);
-                return;
-            }
-            /* else rebuffer at this track; status applies to the track we
-               want */
-        }
-        else if (!playlist_peek(1, NULL, 0))
-        {
-            /* Play sequence is complete - directory change or other playlist
-               resequencing - the playlist must now be advanced in order to
-               continue since a peek ahead to the next track is not possible */
-            skip_pending = TRACK_SKIP_AUTO_NEW_PLAYLIST;
-            end_of_playlist = playlist_next(1) < 0;
-        }
-
-        if (!end_of_playlist)
-        {
-            trackstat = audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL,
-                            skip_pending == TRACK_SKIP_AUTO ? 0 : -1);
-
-            if (trackstat == LOAD_TRACK_ERR_NO_MORE)
-            {
-                /* Failed to find anything after all - do playlist switchover
-                   instead */
-                skip_pending = TRACK_SKIP_AUTO_NEW_PLAYLIST;
-                end_of_playlist = playlist_next(1) < 0;
-            }
-        }
-
-        if (end_of_playlist)
-        {
-            audio_monitor_end_of_playlist();
-            return;
-        }
+        audio_begin_track_change(
+                single_mode_do_pause(id3_hid)
+                ? TRACK_CHANGE_END_OF_DATA
+                : TRACK_CHANGE_AUTO, trackstat);
     }
-
-    audio_begin_track_change(TRACK_CHANGE_AUTO, trackstat);
 }
 
 /* Called when codec completes seek operation
