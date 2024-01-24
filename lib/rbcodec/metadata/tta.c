@@ -93,21 +93,21 @@ bool get_tta_metadata(int fd, struct mp3entry* id3)
 
     /* skip check CRC */
 
-    id3->channels  = (GET_HEADER(ttahdr, NUM_CHANNELS));
+    unsigned short channels  = (GET_HEADER(ttahdr, NUM_CHANNELS));
     id3->frequency = (GET_HEADER(ttahdr, SAMPLE_RATE));
     id3->length    = ((GET_HEADER(ttahdr, DATA_LENGTH)) / id3->frequency) * 1000LL;
     bps            = (GET_HEADER(ttahdr, BITS_PER_SAMPLE));
 
     datasize = id3->filesize - id3->first_frame_offset;
-    origsize = (GET_HEADER(ttahdr, DATA_LENGTH)) * ((bps + 7) / 8) * id3->channels;
+    origsize = (GET_HEADER(ttahdr, DATA_LENGTH)) * ((bps + 7) / 8) * channels;
 
-    id3->bitrate = (int) ((uint64_t) datasize * id3->frequency * id3->channels * bps
+    id3->bitrate = (int) ((uint64_t) datasize * id3->frequency * channels * bps
                                                / (origsize * 1000LL));
 
     /* output header info (for debug) */
     DEBUGF("TTA header info ----\n");
     DEBUGF("id:        %x\n",  (unsigned int)(GET_HEADER(ttahdr, ID)));
-    DEBUGF("channels:  %d\n",  id3->channels);
+    DEBUGF("channels:  %d\n",  channels);
     DEBUGF("frequency: %ld\n", id3->frequency);
     DEBUGF("length:    %ld\n", id3->length);
     DEBUGF("bitrate:   %d\n",  id3->bitrate);

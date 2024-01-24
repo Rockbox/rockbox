@@ -272,10 +272,6 @@ struct mp3entry {
     bool has_toc;           /* True if there is a VBR header in the file */
     unsigned char toc[100]; /* table of contents */
 
-    /* Added for ATRAC3 */
-    unsigned int channels;       /* Number of channels in the stream */
-    unsigned int extradata_size; /* Size (in bytes) of the codec's extradata from the container */
-
     /* Added for AAC HE SBR */
     bool needs_upsampling_correction; /* flag used by aac codec */
 

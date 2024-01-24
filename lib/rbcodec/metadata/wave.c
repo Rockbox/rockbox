@@ -160,7 +160,7 @@ static void set_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3)
             fmt->samplesperblock = 1;
             break;
         case WAVE_FORMAT_YAMAHA_ADPCM:
-            if (id3->channels != 0)
+            if (fmt->channels != 0)
             {
                 fmt->samplesperblock =
                     (fmt->blockalign == ((id3->frequency / 60) + 4) * fmt->channels)?
@@ -172,7 +172,7 @@ static void set_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3)
             fmt->samplesperblock = 2;
             break;
         case WAVE_FORMAT_SWF_ADPCM:
-            if (fmt->bitspersample != 0 && id3->channels != 0)
+            if (fmt->bitspersample != 0 && fmt->channels != 0)
             {
                 fmt->samplesperblock
                      = (((fmt->blockalign << 3) - 2) / fmt->channels - 22)
@@ -226,8 +226,6 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
         if(id3->bitrate == 66 || id3->bitrate == 94)
             jsflag = 1;
 
-        id3->extradata_size = 14;
-        id3->channels = 2;
         id3->codectype = AFMT_OMA_ATRAC3;
         id3->bytesperframe = fmt->blockalign;
         

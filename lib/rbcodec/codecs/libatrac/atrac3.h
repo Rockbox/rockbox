@@ -107,7 +107,7 @@ typedef struct {
     //@}
 } ATRAC3Context;
 
-int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3);
+int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3, uint16_t channels, uint32_t extradata_size);
 
 int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
                         int *data_size, const uint8_t *buf, int buf_size);

@@ -749,8 +749,6 @@ static void print_mp3entry(const struct mp3entry *id3, FILE *f)
     if (id3->bytesperframe) fprintf(f, "Bytes per frame: %lu\n", id3->bytesperframe);
     if (id3->vbr) fprintf(f, "VBR: true\n");
     if (id3->has_toc) fprintf(f, "Has TOC: true\n");
-    if (id3->channels) fprintf(f, "Number of channels: %u\n", id3->channels);
-    if (id3->extradata_size) fprintf(f, "Size of extra data: %u\n", id3->extradata_size);
     if (id3->needs_upsampling_correction) fprintf(f, "Needs upsampling correction: true\n");
     /* TODO: replaygain; albumart; cuesheet */
     if (id3->mb_track_id) fprintf(f, "Musicbrainz track ID: %s\n", id3->mb_track_id);

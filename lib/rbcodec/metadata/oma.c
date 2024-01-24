@@ -149,10 +149,6 @@ static int oma_read_header(int fd, struct mp3entry* id3)
 
             id3->bitrate = id3->frequency * id3->bytesperframe * 8 / (1024 * 1000);
 
-            /* fake the atrac3 extradata (wav format, makes stream copy to wav work) */
-            /* ATRAC3 expects and extra-data size of 14 bytes for wav format, and *
-             * looks for that in the id3v2buf.                                    */
-            id3->extradata_size = 14;
             AV_WL16(&id3->id3v2buf[0],  1);             // always 1
             AV_WL32(&id3->id3v2buf[2],  id3->frequency);    // samples rate
             AV_WL16(&id3->id3v2buf[6],  jsflag);        // coding mode
@@ -160,7 +156,6 @@ static int oma_read_header(int fd, struct mp3entry* id3)
             AV_WL16(&id3->id3v2buf[10], 1);             // always 1
             AV_WL16(&id3->id3v2buf[12], 0);             // always 0
 
-            id3->channels = 2;
             DEBUGF("sample_rate = %d\n", id3->frequency);
             DEBUGF("frame_size = %d\n", id3->bytesperframe);
             DEBUGF("stereo_coding_mode = %d\n", jsflag);

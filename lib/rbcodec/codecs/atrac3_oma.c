@@ -23,7 +23,6 @@
 
 #include "logf.h"
 #include "codeclib.h"
-#include "inttypes.h"
 #include "libatrac/atrac3.h"
 
 CODEC_HEADER
@@ -66,12 +65,16 @@ enum codec_status codec_run(void)
  
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
-    ci->configure(DSP_SET_STEREO_MODE, ci->id3->channels == 1 ?
+    const uint8_t channels = 2;
+    ci->configure(DSP_SET_STEREO_MODE, channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
 
     ci->seek_buffer(0);
 
-    res = atrac3_decode_init(&q, ci->id3);
+    /* fake the atrac3 extradata (wav format, makes stream copy to wav work) */
+    /* ATRAC3 expects and extra-data size of 14 bytes for wav format, and *
+     * looks for that in the id3v2buf.                                    */
+    res = atrac3_decode_init(&q, ci->id3, channels, 14);
     if(res < 0) {
         DEBUGF("failed to initialize OMA atrac decoder\n");
         return CODEC_ERROR;
@@ -143,7 +146,7 @@ enum codec_status codec_run(void)
 
         if(datasize)
             ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024,
-                              q.samples_per_frame / ci->id3->channels);
+                              q.samples_per_frame / channels);
 
         elapsed += (FRAMESIZE * 8) / BITRATE;
         ci->set_elapsed(elapsed);
