@@ -351,8 +351,13 @@ static bool playing_time(void)
         if (rb->list_do_action(CONTEXT_LIST, HZ/2, &pt_lists, &key) == 0
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
+            bool usb = rb->default_event_handler(key) == SYS_USB_CONNECTED;
+
+            if (!usb && IS_SYSEVENT(key))
+                continue;
+
             rb->talk_force_shutup();
-            return(rb->default_event_handler(key) == SYS_USB_CONNECTED);
+            return usb;
         }
 
     }
