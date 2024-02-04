@@ -13576,10 +13576,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </source>
   <dest>
-    *: "В списке осталось: %s"
+    *: "В списке осталось:"
   </dest>
   <voice>
     *: "В списке осталось"
@@ -13590,10 +13590,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "В списке проиграно: %s / %s %ld%%"
+    *: "В списке проиграно:"
   </dest>
   <voice>
     *: "В списке проиграно"
@@ -13924,10 +13924,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "В треке проиграно: %s / %s %ld%%"
+    *: "В треке проиграно:"
   </dest>
   <voice>
     *: "В трэке проиграно"
@@ -14118,10 +14118,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "В треке осталось: %s"
+    *: "В треке осталось:"
   </dest>
   <voice>
     *: "В трэке осталось"
@@ -14272,10 +14272,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Средний битрейт: %ld kbps"
+    *: "Средний битрейт:"
   </dest>
   <voice>
     *: "Средний битрейт"
@@ -14331,10 +14331,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Средний размер трека: %s"
+    *: "Средний размер трека:"
   </dest>
   <voice>
     *: "Средний размер трэка"
@@ -14452,10 +14452,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Объём памяти: %s (проиграно %s, осталось %s)"
+    *: "Объём памяти (Проиграно / Осталось):"
   </dest>
   <voice>
     *: "Объём памяти"
@@ -14607,10 +14607,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Трек %d / %d %d%%"
+    *: "Трек:"
   </dest>
   <voice>
     *: "Трэк"
