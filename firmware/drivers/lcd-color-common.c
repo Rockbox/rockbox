@@ -166,6 +166,7 @@ void lcd_bitmap_transparent(const fb_data *src, int x, int y,
                                 STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
 
+#ifndef DISABLE_ALPHA_BITMAP
 /* draw alpha bitmap for anti-alias font */
 void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
                                       int src_y, int stride, int x, int y,
@@ -173,6 +174,7 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
 {
     lcd_alpha_bitmap_part_mix(NULL, src, src_x, src_y, x, y, width, height, 0, stride);
 }
+#endif /* !DISABLE_ALPHA_BITMAP */
 
 /* Draw a partial bitmap (mono or native) including alpha channel */
 void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
@@ -181,10 +183,12 @@ void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
     int bitmap_stride = LCD_FBSTRIDE(bm->width, bm->height);
     if (bm->format == FORMAT_MONO)
         lcd_mono_bitmap_part(bm->data, src_x, src_y, bm->width, x, y, width, height);
+#ifndef DISABLE_ALPHA_BITMAP
     else if (bm->alpha_offset > 0)
         lcd_alpha_bitmap_part_mix((fb_data*)bm->data, bm->data+bm->alpha_offset,
             src_x, src_y, x, y, width, height,
             bitmap_stride, ALIGN_UP(bm->width, 2));
+#endif /* !DISABLE_ALPHA_BITMAP */
     else
         lcd_bitmap_transparent_part((fb_data*)bm->data,
             src_x, src_y, bitmap_stride, x, y, width, height);

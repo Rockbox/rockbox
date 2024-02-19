@@ -563,7 +563,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 
         bits = font_get_bits(pf, *ucs);
 
-#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
+#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR) && !defined(DISABLE_ALPHA_BITMAP)
         if (pf->depth)
             lcd_alpha_bitmap_part(bits, ofs, 0, width, x, y,
                                   width - ofs, pf->height);

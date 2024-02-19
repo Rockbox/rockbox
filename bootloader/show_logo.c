@@ -25,8 +25,9 @@
 #include <string.h>
 #include "version.h"
 
+#ifndef DISABLE_LOGO
 #include "bitmaps/rockboxlogo.h"
-
+#endif
 #if LCD_WIDTH <= 128
 #define BOOT_VERFMT "Boot %s"
 #else
@@ -54,7 +55,9 @@ void show_logo( void )
     lcd_putsxy(text_xpos, 0, verstr);
     lcd_bmp(&bm_rockboxlogo, LOGO_XPOS, 16);
 #else
+#ifndef DISABLE_LOGO
     lcd_bmp(&bm_rockboxlogo, LOGO_XPOS, 10);
+#endif
     lcd_putsxy(text_xpos, LCD_HEIGHT-SYSFONT_HEIGHT, verstr);
 #endif
 

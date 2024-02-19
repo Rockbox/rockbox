@@ -266,7 +266,9 @@ static inline void cpu_boost_unlock(void)
 /* Define this if target has support for generating backtraces */
 #if defined(CPU_ARM) || \
     (defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE))
+#ifndef DISABLE_BACKTRACE
     #define HAVE_RB_BACKTRACE
+#endif
 #endif
 
 #ifndef MIN_STACK_ALIGN

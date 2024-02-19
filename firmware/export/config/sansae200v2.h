@@ -65,14 +65,17 @@
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
  */
-#endif
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
-
+#else /* !BOOTLOADER */
+#define DISABLE_ALPHA_BITMAP
+#define DISABLE_LOGO
+#define DISABLE_BACKTRACE
+#endif /* !BOOTLOADER */
 /* put the lcd frame buffer in IRAM */
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR
 
