@@ -2266,16 +2266,16 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
-    hold_button: "Podświetlenie (podczas blokady)"
+    *: "Podświetlenie (podczas blokady)"
+    hold_button: "Podświetlenie (podczas przytrzymania)"
   </dest>
   <voice>
-    *: none
-    hold_button: "Podświetlenie podczas blokady przycisków"
+    *: "Podświetlenie podczas blokady"
+    hold_button: "Podświetlenie podczas przytrzymania"
   </voice>
 </phrase>
 <phrase>
@@ -6050,7 +6050,7 @@
   <dest>
     *: none
     hibylinux: "USB:"
-    multivolume: "HD1"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
@@ -11715,16 +11715,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTOMATIC
-  desc: generic automatic
+  desc: deprecated
   user: core
   <source>
-    *: "Automatic"
+    *: ""
   </source>
   <dest>
-    *: "Automatyczny"
+    *: ""
   </dest>
   <voice>
-    *: "Automatyczny"
+    *: ""
   </voice>
 </phrase>
 <phrase>
