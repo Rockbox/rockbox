@@ -219,10 +219,15 @@ static int option_talk(int selected_item, void * data)
 void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply)
 {
+    bool repeated = get_action_statuscode(NULL) & ACTION_REPEAT;
+
     int val = 0;
     int *value = setting->setting;
     if (HASFLAG(setting, F_BOOL_SETTING))
     {
+        if (repeated)
+            return;
+
         *(bool*)value = !*(bool*)value;
         if (apply && setting->bool_setting->option_callback)
             setting->bool_setting->option_callback(*(bool*)value);
@@ -236,13 +241,13 @@ void option_select_next_val(const struct settings_list *setting,
         {
             val = *value + info->step;
             if (neg_step ? (val < info->max) : (val > info->max))
-                val = info->min;
+                val = repeated ? *value : info->min;
         }
         else
         {
             val = *value - info->step;
             if (neg_step ? (val > info->min) : (val < info->min))
-                val = info->max;
+                val = repeated ? *value : info->max;
         }
         *value = val;
         if (apply && info->option_callback)
@@ -258,13 +263,13 @@ void option_select_next_val(const struct settings_list *setting,
         {
             val = *value + steps;
             if (val >= max)
-                val = min;
+                val = repeated ? *value :  min;
         }
         else
         {
             val = *value - steps;
             if (val < min)
-                val = max;
+                val = repeated ? *value : max;
         }
         *value = val;
         if (apply)
@@ -277,13 +282,13 @@ void option_select_next_val(const struct settings_list *setting,
         {
             val = *value + 1;
             if (val >= info->count)
-                val = 0;
+                val = repeated ? *value :  0;
         }
         else
         {
             val = *value - 1;
             if (val < 0)
-                val = info->count-1;
+                val = repeated ? *value : info->count-1;
         }
         *value = val;
         if (apply && info->option_callback)
@@ -300,7 +305,11 @@ void option_select_next_val(const struct settings_list *setting,
                   (settings->flags&F_ALLOW_ARBITRARY_VALS &&
                     *value < tbl_info->values[i]))
             {
-                val = tbl_info->values[(i+add)%tbl_info->count];
+                int index = (i+add)%tbl_info->count;
+                if (repeated && ((i == 0 && previous) || (!previous && i == tbl_info->count -1)))
+                    val = *value;
+                else
+                    val = tbl_info->values[index];
                 break;
             }
         }
