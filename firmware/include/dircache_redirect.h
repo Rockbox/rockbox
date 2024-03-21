@@ -139,8 +139,10 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
-#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if (defined(HAVE_MULTIVOLUME) || (defined(HAVE_MULTIBOOT) && !defined(BOOTLOADER)))
     char path[VOL_MAX_LEN+2];
+#endif
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
     char rtpath[MAX_PATH / 2];
     make_volume_root(volume, path);
 
@@ -183,7 +185,6 @@ standard_redirect:
             root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
     }
 #elif defined(HAVE_MULTIVOLUME)
-    char path[VOL_MAX_LEN+2];
     make_volume_root(volume, path);
     root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
     if (volume == path_strip_volume(RB_ROOT_CONTENTS_DIR, NULL, false))

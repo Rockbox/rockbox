@@ -23,6 +23,7 @@
 #include "fileobj_mgr.h"
 #include "rb_namespace.h"
 #include "file_internal.h"
+#include <stdio.h> /*snprintf*/
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 //#define LOGF_ENABLE
@@ -82,39 +83,48 @@ static void unmount_item(int item)
     set_root_item_state(item, 0);
 }
 
+static char *root_realpath_internal(void)
+{
+    static char root_realpath[ROOT_MAX_REALPATH];
+    return root_realpath;
+}
+const char* root_get_realpath(void)
+{
+    return root_realpath_internal();
+}
+
 /* mount the directory that enumerates into the root namespace */
 int root_mount_path(const char *path, unsigned int flags)
 {
+    const char *folder = NULL; /* is a folder enumerated in the root? */
 #ifdef HAVE_MULTIVOLUME
-    int volume = path_strip_volume(path, NULL, false);
+    int volume = path_strip_volume(path, &folder, false);
     if (volume == ROOT_VOLUME)
         return -EINVAL;
-
     if (!CHECK_VOL(volume))
         return -ENOENT;
+    char volname[VOL_MAX_LEN+2];
+    make_volume_root(volume, volname);
 #else
+    const char volname = PATH_ROOTSTR;
     if (!path_is_absolute(path))
     {
         logf("Path not absolute %s", path);
         return -ENOENT;
     }
+    path_dirname(path, &folder);
 #endif /* HAVE_MULTIVOLUME */
-
     bool contents = flags & NSITEM_CONTENTS;
-    int item = contents ? ROOT_CONTENTS_INDEX : IF_MV_VOL(volume);
+    int item = IF_MV_VOL(volume);
     unsigned int state = get_root_item_state(item);
-
     logf("%s: item:%d, st:%u, %s", __func__, item, state, path);
-
-    if (state)
-        return -EBUSY;
-
-    if (contents)
+    if (contents && state) /* volume must be mounted to enumerate into the root namespace */
     {
+        if (get_root_item_state(ROOT_CONTENTS_INDEX))
+            return -EBUSY; /* error something is already enumerated */
         /* cache information about the target */
         struct filestr_base stream;
         struct path_component_info compinfo;
-
         int e = errno;
         int rc = open_stream_internal(path, FF_DIR | FF_PROBE | FF_INFO |
                                       FF_DEVPATH, &stream, &compinfo);
@@ -124,15 +134,39 @@ int root_mount_path(const char *path, unsigned int flags)
             errno = e;
             return rc;
         }
-
         if (!fileobj_mount(&compinfo.info, FO_DIRECTORY, &root_bindp))
             return -EBUSY;
-    }
+        int root_state = NSITEM_MOUNTED | (flags & (NSITEM_HIDDEN|NSITEM_CONTENTS));
+        set_root_item_state(ROOT_CONTENTS_INDEX, root_state);
+        flags |= state; /* preserve the state of the mounted volume */
+        if (!folder)
+        {
+            folder = "";
+        }
+        else
+        {
+            /*if a folder has been enumerated don't mark the whole volume */
+            if (folder[0] != '\0' && folder[1] != '\0')
+                flags &= ~NSITEM_CONTENTS;
 
+        }
+        snprintf(root_realpath_internal(), ROOT_MAX_REALPATH,"%s%s", volname, folder);
+    }
+    else if (state) /* error volume already mounted */
+        return -EBUSY;
     state = NSITEM_MOUNTED | (flags & (NSITEM_HIDDEN|NSITEM_CONTENTS));
     set_root_item_state(item, state);
-
     return 0;
+}
+
+/* check if volume in path is mounted in the root namespace */
+bool ns_volume_is_visible(IF_MV_NONVOID(int volume))
+{
+    int item = IF_MV_VOL(volume);
+    if ((item == ROOT_VOLUME) || !CHECK_VOL(item))
+        return false;
+    unsigned int state = get_root_item_state(item);
+    return state && (((state & NSITEM_HIDDEN) == 0) || (state & NSITEM_CONTENTS));
 }
 
 /* inform root that an entire volume is being unmounted */
@@ -154,7 +188,10 @@ void root_unmount_volume(IF_MV_NONVOID(int volume))
     uint32_t state = get_root_item_state(ROOT_CONTENTS_INDEX);
     if (state && (volume < 0 || BASEINFO_VOL(&root_bindp->info) == volume))
 #endif
+    {
         unmount_item(ROOT_CONTENTS_INDEX);
+        root_realpath_internal()[0] = '\0';
+    }
 }
 
 /* parse the root part of a path */
@@ -268,8 +305,13 @@ int root_readdir_dirent(struct filestr_base *stream,
         state = get_root_item_state(item);
         if ((state & (NSITEM_MOUNTED|NSITEM_HIDDEN)) == NSITEM_MOUNTED)
         {
-            logf("Found mounted item: %d %s", item, entry->d_name);
-            break;
+#if 1 /* hide the volume enumerated into the root namespace */
+            if (item == ROOT_CONTENTS_INDEX || (state & NSITEM_CONTENTS) == 0)
+            {
+                logf("Found mounted item: %d %s", item, entry->d_name);
+                break;
+            }
+#endif
         }
 
         item++;

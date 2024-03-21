@@ -843,3 +843,8 @@ int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize)
 
     return sim_get_os_path(buffer, tmpbuf, bufsize);
 }
+
+const char* sim_root_realpath(void)
+{
+    return PATH_ROOTSTR;
+}

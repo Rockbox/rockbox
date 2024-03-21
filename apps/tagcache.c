@@ -4990,10 +4990,56 @@ void do_tagcache_build(const char *path[])
 
     roots_ll[0].path = path[0];
     roots_ll[0].next = NULL;
+
+#if defined HAVE_MULTIVOLUME && !defined(SIMULATOR) && !defined(__PCTOOL__)
+    extern bool ns_volume_is_visible(int volume); /*rb_namespace.c*/
+    /* i is for the path vector, j for the roots_ll array */
+    int i = 1, j = 1;
+    bool added = false;
+    char volnamebuf[NUM_VOLUMES][VOL_MAX_LEN + 1];
+    /* we can just parse the root directory ('/') and get to any mounted
+    * volume but we can also enumerate a volume in the root directory
+    * when this occurs it leads to multiple entries since the files can
+    * be reached through multiple paths ex, /Foo could also be /SD1/Foo
+    * we used to hide the volume that was mapped but then when you switch
+    * from the sd to the internal the paths don't map to the right volume
+    * instead we will attempt to rewrite the root with any non-hidden volumes
+    * failing that just leave the paths alone */
+    if (!strcmp(PATH_ROOTSTR, path[0]))
+    {
+        i = 0;
+        j = 0;
+    }
+    /* path can be skipped , but root_ll entries can't */
+    for(; path[i] && j < MAX_STATIC_ROOTS; i++)
+    {
+        /* check if the link target is inside of an existing search root
+         * don't add if target is inside, we'll scan it later */
+        if (!added && !strcmp(PATH_ROOTSTR, path[i]))
+        {
+            for (int v = 0; v < NUM_VOLUMES; v++)
+            {
+                if (ns_volume_is_visible(v))
+                {
+                    make_volume_root(v, volnamebuf[v]);
+                    roots_ll[j].path = volnamebuf[v];
+                    if (j > 0)
+                        roots_ll[j-1].next = &roots_ll[j];
+                    j++;
+                    added = true;
+                }
+            }
+            if(!added)
+                j = 1;
+            added = true;
+            continue;
+        }
+#else
     /* i is for the path vector, j for the roots_ll array
      * path can be skipped , but root_ll entries can't */
     for(int i = 1, j = 1; path[i] && j < MAX_STATIC_ROOTS; i++)
     {
+#endif /*def HAVE_MULTIVOLUME*/
         if (search_root_exists(path[i])) /* skip this path */
             continue;
 
@@ -5006,6 +5052,7 @@ void do_tagcache_build(const char *path[])
     /* check_dir might add new roots */
     for(this = &roots_ll[0]; this; this = this->next)
     {
+        logf("Search root %s", this->path);
         strmemccpy(curpath, this->path, sizeof(curpath));
         ret = ret && check_dir(this->path, true);
     }

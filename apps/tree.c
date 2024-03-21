@@ -646,7 +646,6 @@ static int dirbrowse(void)
 {
     int numentries=0;
     char buf[MAX_PATH];
-    int len;
     int button;
     int oldbutton;
     bool reload_root = false;
@@ -857,16 +856,8 @@ static int dirbrowse(void)
 
                         attr = entry->attr;
 
-                        if (currdir[1]) /* Not in / */
-                        {
-                            len = snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir, entry->name);
+                        ft_assemble_path(buf, sizeof(buf), currdir, entry->name);
 
-                            if ((unsigned) len > sizeof(buf))
-                                splash(HZ, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
-                        }
-                        else /* In / */
-                            snprintf(buf, sizeof buf, "/%s", entry->name);
                     }
                     onplay_result = onplay(buf, attr, curr_context, hotkey);
                 }

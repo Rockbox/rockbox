@@ -46,6 +46,10 @@
 #include "strnatcmp.h"
 #include "keyboard.h"
 
+#ifdef HAVE_MULTIVOLUME
+#include "mv.h"
+#endif
+
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -471,6 +475,45 @@ static void ft_apply_skin_file(char *buf, char *file, const int maxlen)
     settings_apply_skins();
 }
 
+int ft_assemble_path(char *buf, size_t bufsz, const char* currdir, const char* filename)
+{
+    int len;
+    if (!filename)
+        filename = "";
+#ifdef HAVE_MULTIVOLUME
+    if (currdir && currdir[0] && currdir[1]) /* Not in / */
+    {
+        if (currdir[1] != VOL_START_TOK)
+        {
+            len = snprintf(buf, bufsz, "%s%s/%s", root_realpath(), currdir, filename);
+        }
+        else
+            len = snprintf(buf, bufsz, "%s/%s", currdir, filename);
+    }
+    else /* In / */
+    {
+        if (filename[0] != VOL_START_TOK)
+        {
+            len = snprintf(buf, bufsz, "%s/%s",root_realpath(), filename);
+        }
+        else
+            len = snprintf(buf, bufsz, "/%s", filename);
+    }
+#else
+    if (currdir && currdir[0] && currdir[1]) /* Not in / */
+    {
+        len = snprintf(buf, bufsz, "%s%s/%s", root_realpath(), currdir, filename);
+    }
+    else /* In / */
+    {
+        len = snprintf(buf, bufsz, "%s/%s",root_realpath(), filename);
+    }
+#endif
+    if ((unsigned) len > bufsz)
+        splash(HZ, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+    return len;
+}
+
 int ft_enter(struct tree_context* c)
 {
     int rc = GO_TO_PREVIOUS;
@@ -484,16 +527,7 @@ int ft_enter(struct tree_context* c)
     }
 
     int file_attr = file->attr;
-    int len;
-
-    if (c->currdir[1])
-    {
-        len = snprintf(buf,sizeof(buf),"%s/%s",c->currdir, file->name);
-        if ((unsigned) len > sizeof(buf))
-            splash(HZ, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
-    }
-    else
-        snprintf(buf,sizeof(buf),"/%s",file->name);
+    ft_assemble_path(buf, sizeof(buf), c->currdir, file->name);
 
     if (file_attr & ATTR_DIRECTORY) {
         memcpy(c->currdir, buf, sizeof(c->currdir));
@@ -537,22 +571,27 @@ int ft_enter(struct tree_context* c)
                                           PLAYLIST_INSERT_LAST, true, true);
                     splash(HZ, ID2P(LANG_QUEUE_LAST));
                 }
-                else if (playlist_create(c->currdir, NULL) != -1)
+                else
                 {
-                    start_index = ft_build_playlist(c, c->selected_item);
-                    if (global_settings.playlist_shuffle)
+                    /* use the assembled path sans filename */
+                    char * fp = strrchr(buf, PATH_SEPCH);
+                    if (fp)
+                        *fp = '\0';
+                    if (playlist_create(buf, NULL) != -1)
                     {
-                        start_index = playlist_shuffle(seed, start_index);
-
-                        /* when shuffling dir.: play all files
-                           even if the file selected by user is
-                           not the first one */
-                        if (!global_settings.play_selected)
-                            start_index = 0;
+                        start_index = ft_build_playlist(c, c->selected_item);
+                        if (global_settings.playlist_shuffle)
+                        {
+                            start_index = playlist_shuffle(seed, start_index);
+                            /* when shuffling dir.: play all files
+                               even if the file selected by user is
+                               not the first one */
+                            if (!global_settings.play_selected)
+                                start_index = 0;
+                        }
+                        playlist_start(start_index, 0, 0);
+                        play = true;
                     }
-
-                    playlist_start(start_index, 0, 0);
-                    play = true;
                 }
                 break;
             }

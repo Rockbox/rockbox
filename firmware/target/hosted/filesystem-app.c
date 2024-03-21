@@ -600,3 +600,8 @@ int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize)
 
     return 0;
 }
+
+const char* app_root_realpath(void)
+{
+    return PATH_ROOTSTR;
+}

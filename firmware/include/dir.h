@@ -63,6 +63,9 @@
 #ifndef dir_exists
 #define dir_exists      FS_PREFIX(dir_exists)
 #endif
+#ifndef root_realpath
+#define root_realpath      FS_PREFIX(root_realpath)
+#endif
 #endif /* !DIRFUNCTIONS_DEFINED */
 
 #ifndef DIRENT_DEFINED
@@ -83,6 +86,9 @@ struct dirinfo
 #ifndef DIRFUNCTIONS_DECLARED
 /* TIP: set errno to zero before calling to see if anything failed */
 struct dirinfo dir_get_info(DIR *dirp, struct DIRENT *entry);
+const char* root_realpath(void);
 #endif /* !DIRFUNCTIONS_DECLARED */
+
+
 
 #endif /* _DIR_H_ */

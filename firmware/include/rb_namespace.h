@@ -37,6 +37,8 @@ struct ns_scan_info
 };
 
 /* root functions */
+#define ROOT_MAX_REALPATH 80
+const char* root_get_realpath(void);
 int root_mount_path(const char *path, unsigned int flags);
 void root_unmount_volume(IF_MV_NONVOID(int volume));
 int root_readdir_dirent(struct filestr_base *stream,
@@ -49,6 +51,7 @@ int ns_open_root(IF_MV(int volume,) unsigned int *callflagsp,
                  struct file_base_info *infop, uint16_t *attrp);
 int ns_open_stream(const char *path, unsigned int callflags,
                    struct filestr_base *stream, struct ns_scan_info *scanp);
+bool ns_volume_is_visible(IF_MV_NONVOID(int volume));
 
 /* closes the namespace stream */
 static inline int ns_close_stream(struct filestr_base *stream)

@@ -344,3 +344,9 @@ struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
 file_error:
     return (struct dirinfo){ .attribute = 0 };
 }
+
+const char* root_realpath(void)
+{
+    /* Native only, for APP and SIM see respective filesystem-.c files */
+    return root_get_realpath(); /* rb_namespace.c */
+}
