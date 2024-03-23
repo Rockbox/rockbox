@@ -106,7 +106,7 @@ int root_mount_path(const char *path, unsigned int flags)
     char volname[VOL_MAX_LEN+2];
     make_volume_root(volume, volname);
 #else
-    const char volname = PATH_ROOTSTR;
+    const char *volname = PATH_ROOTSTR;
     if (!path_is_absolute(path))
     {
         logf("Path not absolute %s", path);
