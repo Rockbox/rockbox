@@ -238,7 +238,9 @@ common/dircache.c
 common/pathfuncs.c
 common/fdprintf.c
 common/linked_list.c
+#ifndef PLATFORM_NATIVE
 common/rb_namespace.c
+#endif
 common/rectangle.c
 common/strcasecmp.c
 common/strcasestr.c
