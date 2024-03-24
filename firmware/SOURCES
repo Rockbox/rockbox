@@ -238,7 +238,7 @@ common/dircache.c
 common/pathfuncs.c
 common/fdprintf.c
 common/linked_list.c
-#ifndef PLATFORM_NATIVE
+#if (!(CONFIG_PLATFORM & PLATFORM_HOSTED))
 common/rb_namespace.c
 #endif
 common/rectangle.c
