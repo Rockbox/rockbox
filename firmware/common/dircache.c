@@ -1882,7 +1882,8 @@ static void build_volumes(void)
 
     logf("Done, %ld KiB used", dircache.size / 1024);
 
-    core_unpin(dircache_runinfo.handle);
+    if (dircache_runinfo.handle > 0) /* dircache may have been disabled */
+        core_unpin(dircache_runinfo.handle);
 }
 
 /**
