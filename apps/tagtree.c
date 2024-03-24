@@ -2420,7 +2420,8 @@ int tagtree_get_attr(struct tree_context* c)
     switch (c->currtable)
     {
         case NAVIBROWSE:
-            if (csi->tagorder[c->currextra] == tag_title)
+            if (csi->tagorder[c->currextra] == tag_title
+                || csi->tagorder[c->currextra] == tag_virt_basename)
                 attr = FILE_ATTR_AUDIO;
             else
                 attr = ATTR_DIRECTORY;
