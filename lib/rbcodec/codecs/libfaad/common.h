@@ -66,7 +66,7 @@ extern "C" {
 #endif
 
 /* Used to allocate several SBR + PS arrays and variables statically. */
-//#define FAAD_STATIC_ALLOC
+#define FAAD_STATIC_ALLOC
 
 #define INLINE __inline
 #if 0 //defined(_WIN32) && !defined(_WIN32_WCE)
