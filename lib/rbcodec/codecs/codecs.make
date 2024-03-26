@@ -76,6 +76,7 @@ ifneq ($(MEMORYSIZE),2)
 include $(RBCODECLIB_DIR)/codecs/cRSID/cRSID.make
 endif
 
+ifndef DEBUG
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
 $(CODECLIB) : CODECFLAGS += -O1
@@ -148,6 +149,7 @@ ifeq ($(MEMORYSIZE),2)
   $(ASFLIB) : CODECFLAGS += -Os
   $(WMALIB) : CODECFLAGS += -Os
 endif
+endif #ifndef DEBUG
 
 ifndef APP_TYPE
   CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
