@@ -74,7 +74,7 @@ static void unmount_item(int item)
     if (!state)
         return;
 
-    if (state & NSITEM_CONTENTS)
+    if (item == ROOT_CONTENTS_INDEX && state & NSITEM_CONTENTS)
     {
         fileobj_unmount(root_bindp);
         root_bindp = NULL;
@@ -139,18 +139,19 @@ int root_mount_path(const char *path, unsigned int flags)
         int root_state = NSITEM_MOUNTED | (flags & (NSITEM_HIDDEN|NSITEM_CONTENTS));
         set_root_item_state(ROOT_CONTENTS_INDEX, root_state);
         flags |= state; /* preserve the state of the mounted volume */
-        if (!folder)
-        {
-            folder = "";
-        }
-        else
-        {
-            /*if a folder has been enumerated don't mark the whole volume */
-            if (folder[0] != '\0' && folder[1] != '\0')
-                flags &= ~NSITEM_CONTENTS;
 
+        if (folder)
+        {
+            while (*folder == PATH_SEPCH)
+                folder++;
+            /*if a folder has been enumerated don't mark the whole volume */
+            if (folder[0] != '\0')
+                flags &= ~NSITEM_CONTENTS;
+            else
+                folder = NULL; /*Ensure separator is added by path_append */
         }
-        snprintf(root_realpath_internal(), ROOT_MAX_REALPATH,"%s%s", volname, folder);
+
+        path_append(root_realpath_internal(), volname, folder, ROOT_MAX_REALPATH);
     }
     else if (state) /* error volume already mounted */
         return -EBUSY;

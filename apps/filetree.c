@@ -477,41 +477,46 @@ static void ft_apply_skin_file(char *buf, char *file, const int maxlen)
 
 int ft_assemble_path(char *buf, size_t bufsz, const char* currdir, const char* filename)
 {
-    int len;
+    size_t len;
     if (!filename)
         filename = "";
+
 #ifdef HAVE_MULTIVOLUME
     if (currdir && currdir[0] && currdir[1]) /* Not in / */
     {
         if (currdir[1] != VOL_START_TOK)
         {
-            len = snprintf(buf, bufsz, "%s%s/%s", root_realpath(), currdir, filename);
+            len = path_append(buf, root_realpath(), currdir, bufsz);
+            if (len < bufsz)
+                len = path_append(buf, buf + len, filename, bufsz - len);
         }
-        else
-            len = snprintf(buf, bufsz, "%s/%s", currdir, filename);
+        len = path_append(buf, currdir, filename, bufsz);
     }
     else /* In / */
     {
         if (filename[0] != VOL_START_TOK)
         {
-            len = snprintf(buf, bufsz, "%s/%s",root_realpath(), filename);
+            len = path_append(buf, root_realpath(), filename, bufsz);
         }
         else
-            len = snprintf(buf, bufsz, "/%s", filename);
+            len = path_append(buf, PATH_SEPSTR, filename, bufsz);
     }
 #else
     if (currdir && currdir[0] && currdir[1]) /* Not in / */
     {
-        len = snprintf(buf, bufsz, "%s%s/%s", root_realpath(), currdir, filename);
+        len = path_append(buf, root_realpath(), currdir, bufsz);
+        if(len < bufsz)
+            len = path_append(buf, buf + len, filename, bufsz - len);
     }
     else /* In / */
     {
-        len = snprintf(buf, bufsz, "%s/%s",root_realpath(), filename);
+        len = path_append(buf, root_realpath(), filename, bufsz);
     }
 #endif
-    if ((unsigned) len > bufsz)
+
+    if (len > bufsz)
         splash(HZ, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
-    return len;
+    return (int)len;
 }
 
 int ft_enter(struct tree_context* c)
@@ -528,7 +533,6 @@ int ft_enter(struct tree_context* c)
 
     int file_attr = file->attr;
     ft_assemble_path(buf, sizeof(buf), c->currdir, file->name);
-
     if (file_attr & ATTR_DIRECTORY) {
         memcpy(c->currdir, buf, sizeof(c->currdir));
         if ( c->dirlevel < MAX_DIR_LEVELS )
@@ -814,17 +818,39 @@ int ft_exit(struct tree_context* c)
     extern char lastfile[]; /* from tree.c */
     char buf[MAX_PATH];
     int rc = 0;
-    bool exit_func = false;
-
+    bool exit_func = false; 
     int i = strlen(c->currdir);
     if (i>1) {
-        while (c->currdir[i-1]!='/')
+        while (c->currdir[i-1]!=PATH_SEPCH)
             i--;
         strcpy(buf,&c->currdir[i]);
         if (i==1)
-            c->currdir[i]=0;
+            c->currdir[i]='\0';
         else
-            c->currdir[i-1]=0;
+            c->currdir[i-1]='\0';
+
+#ifdef HAVE_MULTIVOLUME /* un-redirect the realpath */
+        if ((unsigned)c->dirlevel<=2) /* only expect redirect two levels max */
+        {
+            char *currdir = c->currdir;
+            const char *root = root_realpath();
+            int len = i-1;
+            /* compare to the root path bail if they don't match except single '/' */
+            for (; len > 0 && *root != '\0' && *root == *currdir; len--)
+            {
+                root++;
+                currdir++;
+            }
+            if (*root == PATH_SEPCH) /* root may have trailing slash */
+                root++;
+            if (*root == '\0' &&
+                (len == 0 || (len == 1 && *currdir == PATH_SEPCH)))
+            {
+                strcpy(c->currdir, PATH_ROOTSTR);
+                c->dirlevel=1;
+            }
+        }
+#endif
 
         if (*c->dirfilter > NUM_FILTER_MODES && c->dirlevel < 1)
             exit_func = true;
