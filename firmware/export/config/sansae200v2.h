@@ -6,6 +6,13 @@
 #define MODEL_NUMBER 41
 #define MODEL_NAME   "Sandisk Sansa e200v2 series"
 
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
+
+/* define boot redirect file name allows booting from external drives */
+#define BOOT_REDIR "rockbox_main.e200v2"
+#define MULTIBOOT_MIN_VOLUME 1
+
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
@@ -192,10 +199,8 @@
 
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
-
-#ifndef BOOTLOADER
 #define HAVE_HOTSWAP
-#endif
+
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_AS3525
