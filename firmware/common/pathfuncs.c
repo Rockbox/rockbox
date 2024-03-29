@@ -339,6 +339,23 @@ size_t path_dirname(const char *name, const char **nameptr)
     return q - name;
 }
 
+/* Removes leading separators from a path
+ * ""      *nameptr->NUL,   count=0: ""
+ * "/"     *nameptr->/,     count=1: "/"
+ * "//"    *nameptr->2nd /, count=2: "/"
+ * "a/"    *nameptr->a/,    count=0: "a/"
+ * "//b//" *nameptr->2nd /, count=2: "/b//"
+ * "/c/"   *nameptr->/,     count=1: "/c/"
+ */
+size_t path_strip_leading_separators(const char *name, const char **nameptr)
+{
+    const char *p = name;
+    *nameptr = p;
+    while (*(p) == PATH_SEPCH && *(++p) == PATH_SEPCH)
+            *nameptr = p;
+    return p - name;
+}
+
 /* Removes trailing separators from a path
  * ""     *nameptr->NUL,   len=0: ""
  * "/"    *nameptr->/,     len=1: "/"
@@ -462,7 +479,7 @@ void path_remove_dot_segments (char *dstpath, const char *path)
 size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
                    const char *component, size_t bufsize)
 {
-    size_t len;
+    size_t len = 0;
     bool separate = false;
     const char *base = basepath && basepath[0] ? basepath : buf;
     if (!base)
@@ -471,7 +488,7 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
     if (!buf)
         bufsize = 0;
 
-    if (path_is_absolute(component))
+    if (path_is_absolute(component)) /* starts with a '/' path separator */
     {
         /* 'component' is absolute; replace all */
         basepath = component;
@@ -484,8 +501,9 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
 
     if (base == buf)
         len = strlen(buf);
-    else
+    else if (basepath)
     {
+        path_strip_leading_separators(basepath, &basepath);
         len = strlcpy(buf, basepath, bufsize);
         if (basepath_max < len)
         {

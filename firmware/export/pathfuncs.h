@@ -87,6 +87,7 @@ int make_volume_root(int volume, char *dst);
 int path_strip_drive(const char *name, const char **nameptr, bool greedy);
 size_t path_basename(const char *name, const char **nameptr);
 size_t path_dirname(const char *name, const char **nameptr);
+size_t path_strip_leading_separators(const char *name, const char **nameptr);
 size_t path_strip_trailing_separators(const char *name, const char **nameptr);
 void path_correct_separators(char *dstpath, const char *path);
 void path_remove_dot_segments(char *dstpath, const char *path);

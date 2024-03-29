@@ -70,7 +70,7 @@ static int browser_status = CATBROWSE_NOTHING;
 
 static size_t get_directory(char* dirbuf, size_t dirbuf_sz)
 {
-    char *pl_dir = PLAYLIST_CATALOG_DEFAULT_DIR;
+    const char *pl_dir = PLAYLIST_CATALOG_DEFAULT_DIR;
 
     /* directory config is of the format: "dir: /path/to/dir" */
     if (global_settings.playlist_catalog_dir[0] != '\0')
@@ -79,10 +79,7 @@ static size_t get_directory(char* dirbuf, size_t dirbuf_sz)
     }
 
     /* remove duplicate leading '/' */
-    if (pl_dir[0] == '/' && pl_dir[1] == '/')
-    {
-        pl_dir++;
-    }
+    path_strip_leading_separators(pl_dir, &pl_dir);
 
     return strlcpy(dirbuf, pl_dir, dirbuf_sz);
 }
