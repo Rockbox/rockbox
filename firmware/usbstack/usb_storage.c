@@ -425,17 +425,20 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 
     return (dest - orig_dest);
 }
-
-static int usb_handle;
+#if (CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || \
+     CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2 || \
+     defined(BOOTLOADER) || CONFIG_CPU == DM320) && !defined(CPU_PP502x)
+#define USB_STATIC_ALLOC
+#else
+static int usb_handle = 0;
+#endif
 void usb_storage_init_connection(void)
 {
     logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if (CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || \
-     CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2 || \
-     defined(BOOTLOADER) || CONFIG_CPU == DM320) && !defined(CPU_PP502x)
+#ifdef USB_STATIC_ALLOC
     static unsigned char _cbw_buffer[MAX_CBW_SIZE]
         USB_DEVBSS_ATTR __attribute__((aligned(32)));
     cbw_buffer = (void *)_cbw_buffer;
@@ -480,7 +483,9 @@ void usb_storage_init_connection(void)
 
 void usb_storage_disconnect(void)
 {
+#ifndef USB_STATIC_ALLOC
     usb_handle = core_free(usb_handle);
+#endif
 }
 
 /* called by usb_core_transfer_complete() */
