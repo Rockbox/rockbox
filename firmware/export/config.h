@@ -1343,6 +1343,20 @@ Lyre prototype 1 */
 # define HAVE_PERCEPTUAL_VOLUME
 #endif
 
+/*
+ * Turn off legacy codepage handling in the filesystem code for bootloaders,
+ * and support ISO-8859-1 (Latin-1) only. This only affects DOS 8.3 filename
+ * parsing when FAT32 long names are unavailable; long names are Unicode and
+ * can always be decoded properly regardless of this setting.
+ *
+ * In reality, bootloaders never supported codepages other than Latin-1 in
+ * the first place. They did contain the code to load codepages from disk,
+ * but had no way to actually change the codepage away from Latin-1.
+ */
+#if !defined(BOOTLOADER)
+# define HAVE_FILESYSTEM_CODEPAGE
+#endif
+
 /* null audiohw setting macro for when codec header is included for reasons
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)

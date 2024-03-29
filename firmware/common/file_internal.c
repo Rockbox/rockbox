@@ -223,6 +223,7 @@ int test_dir_empty_internal(struct filestr_base *stream)
 /* iso decode the name to UTF-8 */
 void iso_decode_d_name(char *d_name)
 {
+#ifdef HAVE_FILESYSTEM_CODEPAGE
     if (is_dotdir_name(d_name))
         return;
 
@@ -232,6 +233,9 @@ void iso_decode_d_name(char *d_name)
     /* This MUST be the default codepage thus not something that could be
        loaded on call */
     iso_decode(shortname, d_name, -1, len + 1);
+#else
+    (void)d_name;
+#endif
 }
 
 #ifdef HAVE_DIRCACHE
