@@ -27,6 +27,7 @@ bindir=
 libdir=
 sharedir=
 
+arm_thumb_boot=
 thread_support="ASSEMBLER_THREADS"
 sysfont="08-Schumacher-Clean"
 app_lcd_width=
@@ -2511,6 +2512,7 @@ fi
     appextra="recorder:gui:radio"
     plugins="yes"
     toolset=$scramblebitmaptools
+    arm_thumb_boot=1
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-e200v2"
@@ -4232,6 +4234,9 @@ fi
       fi
       if test -n "$bootoutput"; then
           output=$bootoutput
+      fi
+      if test -n "$arm_thumb_boot" && test -z "$ARG_ARM_THUMB"; then
+          ARG_ARM_THUMB=1
       fi
       extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
       bootloader="1"
