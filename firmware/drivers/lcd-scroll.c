@@ -30,6 +30,7 @@
 #define MAIN_LCD
 #endif
 
+#if !defined(BOOTLOADER)
 static struct scrollinfo LCDFN(scroll)[LCDM(SCROLLABLE_LINES)];
 
 struct scroll_screen_info LCDFN(scroll_info) =
@@ -180,7 +181,6 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     return ended;
 }
 
-#if !defined(BOOTLOADER)
 static void LCDFN(scroll_worker)(void)
 {
     int index;
