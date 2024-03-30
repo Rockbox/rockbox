@@ -160,11 +160,6 @@
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF
 
-/* Offset ( in the firmware file's header ) to the file CRC and data. These are
-   only used when loading the old format rockbox.h10 file */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0
-#define FIRMWARE_OFFSET_FILE_DATA   0x8
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
 

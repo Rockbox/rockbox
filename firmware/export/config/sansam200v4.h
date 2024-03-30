@@ -131,12 +131,6 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 #define CONFIG_USBOTG USBOTG_AS3525
 
 /* enable these for the experimental usb stack */

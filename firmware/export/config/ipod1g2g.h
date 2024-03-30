@@ -160,15 +160,6 @@
 
 #define CONFIG_LCD LCD_IPOD2BPP
 
-/* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0
-
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 #define USB_HANDLED_BY_OF
 /* actually firewire only, but handled like USB */
 

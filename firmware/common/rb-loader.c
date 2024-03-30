@@ -58,16 +58,15 @@ static int load_firmware_filename(unsigned char* buf,
         goto end;
     }
 
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-
-    if (read(fd, &chksum, 4) < 4)
+    /* read 32-bit checksum followed by 4-byte model name,
+     * this is the "scramble -add" header written by tools/scramble */
+    if (read(fd, buf, 8) < 8)
     {
         ret = EREAD_CHKSUM_FAILED;
         goto end;
     }
-    chksum = betoh32(chksum); /* Rockbox checksums are big-endian */
 
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
+    chksum = load_be32(buf); /* Rockbox checksums are big-endian */
 
     if (read(fd, buf, len) < len)
     {

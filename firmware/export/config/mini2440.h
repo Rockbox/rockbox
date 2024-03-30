@@ -147,12 +147,6 @@
 #define CONFIG_CHARGING CHARGING_MONITOR
 /*#define POWER_INPUT_BATTERY 0*/
 
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 #define BOOTFILE_EXT "mini2440"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

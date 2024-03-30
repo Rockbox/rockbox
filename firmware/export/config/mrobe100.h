@@ -193,12 +193,6 @@
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR         "/.rockbox"
 
-/* Offset ( in the firmware file's header ) to the file CRC and data.
-   Not used for the mrobe 100, since it boots an mi4 file, but needed
-   for compatibility. */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0
-#define FIRMWARE_OFFSET_FILE_DATA   0x0
-
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
 

@@ -141,12 +141,6 @@
 /* Define this if you have ATA power-off control */
 //#define HAVE_ATA_POWER_OFF
 
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 /* USB */
 //#define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x04E8

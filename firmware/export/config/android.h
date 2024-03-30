@@ -86,12 +86,6 @@
 #define CPU_FREQ 48000000
 */
 
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 #define CONFIG_LCD LCD_COWOND2
 
 /* Define this if a programmable hotkey is mapped */

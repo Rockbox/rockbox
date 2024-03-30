@@ -5,8 +5,6 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 40
 #define MODEL_NAME   "Sandisk Sansa Clip"
-#define FIRMWARE_OFFSET_FILE_DATA 8
-#define FIRMWARE_OFFSET_FILE_CRC 0
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 

@@ -171,12 +171,6 @@
 
 #define CONFIG_LCD LCD_H300
 
-/* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 0
-
-/* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 8
-
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ISP1362
 

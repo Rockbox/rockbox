@@ -154,12 +154,6 @@
 /* Type of LCD */
 #define CONFIG_LCD LCD_VIEW
 
-/* Offset ( in the firmware file's header ) to the file CRC and data. These are
-   only used when loading the old format rockbox.e200 file
-   Required for bootloader/common.c to compile */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0
-#define FIRMWARE_OFFSET_FILE_DATA   0x8
-
 #ifndef BOOTLOADER
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2

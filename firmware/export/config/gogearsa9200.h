@@ -185,10 +185,6 @@
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-/* These values are unused, but need to be defined */
-#define FIRMWARE_OFFSET_FILE_CRC    0x0
-#define FIRMWARE_OFFSET_FILE_DATA   0x8
-
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
 #define INCLUDE_TIMEOUT_API

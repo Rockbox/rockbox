@@ -8,8 +8,6 @@
 #define BOOTFILE_EXT "erosq"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
-#define FIRMWARE_OFFSET_FILE_CRC  0
-#define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* CPU defines */
 #define CONFIG_CPU      X1000
