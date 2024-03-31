@@ -513,7 +513,7 @@ void volume_size(IF_MV(int volume,) unsigned long *sizep, unsigned long *freep)
 }
 
 #if defined (HAVE_HOTSWAP) || defined (HAVE_MULTIDRIVE) \
-    || defined (HAVE_DIRCACHE)
+    || defined (HAVE_DIRCACHE) || defined(HAVE_BOOTDATA)
 enum volume_info_type
 {
 #ifdef HAVE_HOTSWAP
@@ -592,4 +592,4 @@ bool volume_ismounted(IF_MV_NONVOID(int volume))
 #endif /* HAVE_DIRCACHE */
 
 
-#endif /* HAVE_HOTSWAP || HAVE_MULTIDRIVE || HAVE_DIRCACHE */
+#endif /* HAVE_HOTSWAP || HAVE_MULTIDRIVE || HAVE_DIRCACHE || HAVE_BOOTDATA */

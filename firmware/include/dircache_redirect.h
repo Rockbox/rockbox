@@ -152,8 +152,8 @@ static inline bool multiboot_is_boot_volume(int volume)
         return volume_drive(volume) == 0;
 #else
         /* FIXME: Anything else that can get here is a Sansa. */
-        return volume_drive(volume) == boot_data.boot_volume ||
-               volume == boot_data.boot_volume;
+        return volume_drive(volume) == boot_data._boot_volume ||
+               volume == boot_data._boot_volume;
 #endif
     }
 
