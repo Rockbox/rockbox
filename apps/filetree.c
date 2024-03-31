@@ -820,6 +820,11 @@ int ft_exit(struct tree_context* c)
     int rc = 0;
     bool exit_func = false; 
     int i = strlen(c->currdir);
+
+    /* strip trailing slashes */
+    while (c->currdir[i-1] == PATH_SEPCH)
+        i--;
+
     if (i>1) {
         while (c->currdir[i-1]!=PATH_SEPCH)
             i--;
