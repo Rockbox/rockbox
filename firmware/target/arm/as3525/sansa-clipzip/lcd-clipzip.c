@@ -116,6 +116,13 @@ static void lcd_write_dat(uint8_t data)
     SSP_DATA = data;
 }
 
+/* writes 2 data bytes to the LCD */
+static void lcd_write_dat_word(uint8_t data1, uint8_t data2)
+{
+    lcd_write_dat(data1);
+    lcd_write_dat(data2);
+}
+
 /* writes both a command and data value to the lcd */
 static void lcd_write(uint8_t cmd, uint8_t data)
 {
@@ -167,8 +174,7 @@ static void lcd_init_type0(void)
 /* writes a table entry (for type 1 LCDs) */
 static void lcd_write_nibbles(uint8_t val)
 {
-    lcd_write_dat((val >> 4) & 0x0F);
-    lcd_write_dat((val >> 0) & 0x0F);
+    lcd_write_dat_word((val >> 4) & 0x0F, (val >> 0) & 0x0F);
 }
 
 /* Initialises lcd type 1
@@ -191,38 +197,27 @@ static void lcd_init_type1(void)
     };
     int i;
 
-    lcd_write_cmd(0x02);
-    lcd_write_dat(0x00);
+    lcd_write(0x02, 0x00);
 
     lcd_write_cmd(0x01);
 
-    lcd_write_cmd(0x03);
-    lcd_write_dat(0x00);
+    lcd_write(0x03, 0x00);
 
-    lcd_write_cmd(0x04);
-    lcd_write_dat(0x03);
+    lcd_write(0x04, 0x03);
 
-    lcd_write_cmd(0x05);
-    lcd_write_dat(0x00);    /* 0x08 results in BGR colour */
+    lcd_write(0x05, 0x00);    /* 0x08 results in BGR colour */
 
-    lcd_write_cmd(0x06);
-    lcd_write_dat(0x00);
+    lcd_write(0x06, 0x00);
 
-    lcd_write_cmd(0x07);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x04);
-    lcd_write_dat(0x1F);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x05);
+    lcd_write(0x07, 0x00);
+    lcd_write_dat_word(0x00, 0x04);
+    lcd_write_dat_word(0x1F, 0x00);
+    lcd_write_dat_word(0x00, 0x05);
     lcd_write_dat(0x0F);
 
-    lcd_write_cmd(0x08);
-    lcd_write_dat(0x01);
+    lcd_write(0x08, 0x01);
 
-    lcd_write_cmd(0x09);
-    lcd_write_dat(0x07);
+    lcd_write(0x09, 0x07);
 
     lcd_write_cmd(0x0A);
     lcd_write_nibbles(0);
@@ -230,10 +225,8 @@ static void lcd_init_type1(void)
     lcd_write_nibbles(0);
     lcd_write_nibbles(LCD_HEIGHT - 1);
 
-    lcd_write_cmd(0x0B);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
+    lcd_write(0x0B, 0x00);
+    lcd_write_dat_word(0x00, 0x00);
     lcd_write_dat(0x00);
 
     lcd_write_cmd(0x0E);
@@ -241,38 +234,28 @@ static void lcd_init_type1(void)
     lcd_write_nibbles(0x25);
     lcd_write_nibbles(0x3F);
 
-    lcd_write_cmd(0x0F);
-    lcd_write_dat(0x0A);
-    lcd_write_dat(0x0A);
-    lcd_write_dat(0x0A);
+    lcd_write(0x0F, 0x0A);
+    lcd_write_dat_word(0x0A, 0x0A);
 
-    lcd_write_cmd(0x1C);
-    lcd_write_dat(0x08);
+    lcd_write(0x1C, 0x08);
 
-    lcd_write_cmd(0x1D);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
+    lcd_write(0x1D, 0x00);
+    lcd_write_dat_word(0x00, 0x00);
 
-    lcd_write_cmd(0x1E);
-    lcd_write_dat(0x05);
+    lcd_write(0x1E, 0x05);
 
-    lcd_write_cmd(0x1F);
-    lcd_write_dat(0x00);
+    lcd_write(0x1F, 0x00);
 
-    lcd_write_cmd(0x30);
-    lcd_write_dat(0x10);
+    lcd_write(0x30, 0x10);
 
     lcd_write_cmd(0x3A);
     for (i = 0; i < 128; i++) {
         lcd_write_nibbles(curve[i]);
     }
 
-    lcd_write_cmd(0x3C);
-    lcd_write_dat(0x00);
+    lcd_write(0x3C, 0x00);
 
-    lcd_write_cmd(0x3D);
-    lcd_write_dat(0x00);
+    lcd_write(0x3D, 0x00);
 }
 
 #ifdef HAVE_LCD_ENABLE
@@ -305,18 +288,14 @@ void lcd_enable(bool on)
     }
     else {
         if (on) {
-            lcd_write_cmd(0x03);
-            lcd_write_dat(0x00);
+            lcd_write(0x03, 0x00);
 
-            lcd_write_cmd(0x02);
-            lcd_write_dat(0x01);
+            lcd_write(0x02, 0x01);
         }
         else {
-            lcd_write_cmd(0x02);
-            lcd_write_dat(0x00);
+            lcd_write(0x02, 0x00);
 
-            lcd_write_cmd(0x03);
-            lcd_write_dat(0x01);
+            lcd_write(0x03, 0x01);
         }
     }
     
@@ -398,8 +377,7 @@ void lcd_write_data(const fb_data *data, int count)
 
     while (count--) {
         pixel = *data++;
-        lcd_write_dat((pixel >> 8) & 0xFF);
-        lcd_write_dat((pixel >> 0) & 0xFF);
+        lcd_write_dat_word((pixel >> 8) & 0xFF, (pixel >> 0) & 0xFF);
     }
 }
 
