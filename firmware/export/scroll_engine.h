@@ -38,6 +38,11 @@ extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_speed(int speed);
 extern void lcd_scroll_delay(int ms);
 
+#ifdef HAVE_REMOTE_LCD
+extern void lcd_remote_scroll_speed(int speed);
+extern void lcd_remote_scroll_delay(int ms);
+#endif
+
 #ifdef BOOTLOADER
 static inline void lcd_scroll_stop(void)
 {
@@ -62,22 +67,45 @@ static inline bool lcd_scroll_now(struct scrollinfo *scroll)
     (void)scroll;
     return false;
 }
+
+#ifdef HAVE_REMOTE_LCD
+static inline void lcd_remote_scroll_stop(void)
+{
+}
+
+static inline void lcd_remote_scroll_stop_viewport(const struct viewport *vp)
+{
+    (void)vp;
+}
+
+static inline void lcd_remote_scroll_stop_viewport_rect(const struct viewport *vp, int x, int y, int width, int height)
+{
+    (void)vp;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+}
+
+static inline bool lcd_remote_scroll_now(struct scrollinfo *scroll)
+{
+    (void)scroll;
+    return false;
+}
+#endif /* HAVE_REMOTE_LCD */
 #else
 extern void lcd_scroll_stop(void);
 extern void lcd_scroll_stop_viewport(const struct viewport *vp);
 extern void lcd_scroll_stop_viewport_rect(const struct viewport *vp, int x, int y, int width, int height);
 extern bool lcd_scroll_now(struct scrollinfo *scroll);
-#endif
-#ifdef HAVE_REMOTE_LCD
-extern void lcd_remote_scroll_speed(int speed);
-extern void lcd_remote_scroll_delay(int ms);
 
+#ifdef HAVE_REMOTE_LCD
 extern void lcd_remote_scroll_stop(void);
 extern void lcd_remote_scroll_stop_viewport(const struct viewport *vp);
 extern void lcd_remote_scroll_stop_viewport_rect(const struct viewport *vp, int x, int y, int width, int height);
 extern bool lcd_remote_scroll_now(struct scrollinfo *scroll);
-#endif
-
+#endif /* HAVE_REMOTE_LCD */
+#endif /* BOOTLOADER */
 
 
 /* internal usage, but in multiple drivers
