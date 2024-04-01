@@ -137,6 +137,7 @@ enum infoscreenorder
 #ifdef HAVE_RECORDING
     INFO_REC_DIR,
 #endif
+    INFO_ROOT_DIR,
     INFO_VERSION,
 #if CONFIG_RTC
     INFO_DATE,
@@ -241,7 +242,9 @@ static const char* info_getname(int selected_item, void *data,
             snprintf(buffer, buffer_len, "%s %s", str(LANG_REC_DIR), global_settings.rec_directory);
             break;
 #endif
-
+        case INFO_ROOT_DIR:
+            snprintf(buffer, buffer_len, "%s %s", str(LANG_DISPLAY_FULL_PATH), root_realpath());
+            break;
         case INFO_BUFFER: /* buffer */
         {
             long kib = audio_buffer_size() >> 10; /* to KiB */
@@ -336,27 +339,14 @@ static int info_speak_item(int selected_item, void * data)
             talk_id(LANG_REC_DIR, false);
             if (global_settings.rec_directory[0])
             {
-                long *pathsep = NULL;
-                char rec_directory[MAX_PATHNAME+1];
-                char *s;
-                strcpy(rec_directory, global_settings.rec_directory);
-                s = rec_directory;
-                if ((strlen(s) > 1) && (s[strlen(s) - 1] == '/'))
-                    s[strlen(s) - 1] = 0;
-                while (s)
-                {
-                    s = strchr(s + 1, '/');
-                    if (s)
-                        s[0] = 0;
-                    talk_dir_or_spell(rec_directory, pathsep, true);
-                    if (s)
-                        s[0] = '/';
-                    pathsep = TALK_IDARRAY(VOICE_CHAR_SLASH);
-                }
+                talk_fullpath(global_settings.rec_directory, true);
             }
             break;
 #endif
-
+        case INFO_ROOT_DIR:
+            talk_id(LANG_DISPLAY_FULL_PATH, false);
+            talk_fullpath(root_realpath(), true);
+            break;
         case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
