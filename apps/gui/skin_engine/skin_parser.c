@@ -62,6 +62,7 @@
 #include "settings.h"
 #include "settings_list.h"
 #include "rbpaths.h"
+#include "pathfuncs.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #include "tuner.h"
