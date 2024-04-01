@@ -264,7 +264,7 @@ struct stmp_logical_media_table_t
 {
     struct scsi_stmp_logical_table_header_t header;
     struct scsi_stmp_logical_table_entry_t entry[];
-}RB_PACKED table;
+}RB_PACKED;
 
 #ifdef RB_POP_PACK
 #pragma pack(pop)
