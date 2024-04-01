@@ -237,7 +237,7 @@ extern bool lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
 
 /* performance function */
 #if defined(HAVE_LCD_COLOR)
-#if MEMORYSIZE > 2 && !defined(BOOTLOADER)
+#if MEMORYSIZE > 2
 #define LCD_YUV_DITHER 0x1
     extern void lcd_yuv_set_options(unsigned options);
     extern void lcd_blit_yuv(unsigned char * const src[3],
