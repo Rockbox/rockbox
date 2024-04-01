@@ -33,6 +33,7 @@
 #include "storage.h"
 #include "rolo.h"
 #include "rbpaths.h"
+#include "pathfuncs.h"
 
 //#define LOGF_ENABLE
 #include "logf.h"
@@ -94,9 +95,9 @@ int rolo_load(const char* filename)
     logf("system: %s", buf);
     system(buf);
 
-    snprintf(buf, sizeof(buf), "%s/%s", EXECDIR, BOOTFILE);
+    path_append(buf, EXECDIR, BOOTFILE, sizeof(buf));
 #else
-    snprintf(buf, sizeof(buf), "%s/%s", EXECDIR, filename);
+    path_append(buf, EXECDIR, filename, sizeof(buf));
 #endif
 
     logf("execl: %s", buf);

@@ -63,6 +63,7 @@
 #include "list.h"
 #include "viewport.h"
 #include "exported_menus.h"
+#include "pathfuncs.h"
 
 static bool no_source_in_menu = false;
 static int recmenu_callback(int action,
@@ -305,7 +306,8 @@ MENUITEM_SETTING(rec_prerecord_time, &global_settings.rec_prerecord_time, NULL);
 
 static int clear_rec_directory(void)
 {
-    strcpy(global_settings.rec_directory, REC_BASE_DIR);
+    path_append(global_settings.rec_directory, REC_BASE_DIR,
+                PA_SEP_HARD, sizeof(global_settings.rec_directory));
     settings_save();
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;

@@ -193,7 +193,8 @@ MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
 static int clear_start_directory(void)
 {
-    strcpy(global_settings.start_directory, "/");
+    path_append(global_settings.start_directory, PATH_ROOTSTR,
+                PA_SEP_HARD, sizeof(global_settings.start_directory));
     settings_save();
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;

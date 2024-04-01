@@ -305,7 +305,7 @@ static int get_image_id(int c)
 void get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
-    snprintf(buf, buf_size, "%s/%s", bmpdir, start);
+    path_append(buf, bmpdir, start, buf_size);
 }
 
 static int parse_image_display(struct skin_element *element,

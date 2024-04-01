@@ -211,7 +211,7 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
     {
         const char *p = dir + HOME_DIR_LEN;
         while (*p == '/') p++;
-        snprintf(buf, bufsize, "%s/%s", rbhome, p);
+        path_append(buf, rbhome, p, bufsize);
         dir = buf;
     }
     else if (!strncmp(ROCKBOX_DIR, dir, ROCKBOX_DIR_LEN))
@@ -232,7 +232,7 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #endif
        )
     {
-        snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
+        path_append(buf, PIVOT_ROOT, dir, bufsize);
         dir = buf;
     }
 #endif

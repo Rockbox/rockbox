@@ -78,10 +78,7 @@ static size_t get_directory(char* dirbuf, size_t dirbuf_sz)
         pl_dir = global_settings.playlist_catalog_dir;
     }
 
-    /* remove duplicate leading '/' */
-    path_strip_leading_separators(pl_dir, &pl_dir);
-
-    return strlcpy(dirbuf, pl_dir, dirbuf_sz);
+    return path_append(dirbuf, pl_dir, PA_SEP_SOFT, dirbuf_sz);
 }
 
 /* Retrieve playlist directory from config file and verify it exists
@@ -127,8 +124,8 @@ void catalog_set_directory(const char* directory)
     }
     else
     {
-        strmemccpy(global_settings.playlist_catalog_dir,
-                   directory, sizeof(global_settings.playlist_catalog_dir));
+        path_append(global_settings.playlist_catalog_dir, directory,
+                    PA_SEP_SOFT, sizeof(global_settings.playlist_catalog_dir));
     }
     initialize_catalog();
 }
@@ -204,8 +201,8 @@ restart:
     {
         if (strcmp(most_recent_playlist, selected_playlist)) /* isn't most recent one */
         {
-            strmemccpy(most_recent_playlist, selected_playlist,
-                       sizeof(most_recent_playlist));
+            path_append(most_recent_playlist, selected_playlist,
+                        PA_SEP_SOFT, sizeof(most_recent_playlist));
             most_recent_selection = 0;
             reopen_last_playlist = false;
         }
