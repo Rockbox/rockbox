@@ -155,14 +155,17 @@ static int find_roots(void)
 
         struct dirent* ent;
         while((ent = rb->readdir(dir))) {
+            const char *dname = ent->d_name;
+            if (*dname == '.' && *(dname + 1) == '\0')
+                dname++; /* skip the dot so we can check root of volume */
             int r = rb->snprintf(tmpbuf, sizeof(tmpbuf), "/<%d>/%s/%s/%s",
-                                 vol, ent->d_name, bootdir, BOOTFILE);
+                                 vol, dname, bootdir, BOOTFILE);
             if(r < 0 || (size_t)r >= sizeof(tmpbuf))
                 continue;
 
             if(check_firmware(tmpbuf)) {
                 rb->snprintf(roots[nroots], MAX_PATH, "/<%d>/%s",
-                             vol, ent->d_name);
+                             vol, dname);
                 nroots += 1;
 
                 /* quit if we hit the maximum */
