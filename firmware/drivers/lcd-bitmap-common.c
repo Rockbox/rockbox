@@ -374,6 +374,13 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
     LCDFN(update_rect)(vp->x + x, vp->y + y, width, height);
 }
 
+/* helper to align function signatures between mono_bitmap & alpha_bitmap_part */
+static void LCDFN(mono_bmp_part_helper)(const unsigned char *src, int src_x,
+                    int src_y, int stride, int x, int y, int width, int height)
+{
+    LCDFN(mono_bitmap_part)(src, src_x, src_y, stride, x, y, width, height);
+}
+
 #ifndef BOOTLOADER
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
@@ -404,6 +411,15 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
     }
 
+    void (*bmp_part_fn)(const unsigned char *src, int src_x, int src_y,
+                        int stride, int x, int y, int width, int height);
+#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
+    if (pf->depth)
+        bmp_part_fn = lcd_alpha_bitmap_part;
+    else
+#endif
+        bmp_part_fn = LCDFN(mono_bmp_part_helper);
+
     rtl_next_non_diac_width = 0;
     last_non_diacritic_width = 0;
     /* Mark diacritic and rtl flags for each character */
@@ -411,7 +427,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     {
         bool is_rtl, is_diac;
         const unsigned char *bits;
-        int width, base_width, drawmode = 0, base_ofs = 0;
+        int width, base_width, base_ofs = 0;
         const unsigned short next_ch = ucs[1];
 
         if (x >= LCDFN(current_viewport)->width)
@@ -459,6 +475,8 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             continue;
         }
 
+        bits = font_get_bits(pf, *ucs);
+
         if (is_diac)
         {
             /* XXX: Suggested by amiconn:
@@ -475,25 +493,17 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
              * buffer using OR, and then draw the final bitmap instead of the
              * chars, without touching the drawmode
              **/
-            drawmode = LCDFN(current_viewport)->drawmode;
+            int drawmode = LCDFN(current_viewport)->drawmode;
             LCDFN(current_viewport)->drawmode = DRMODE_FG;
-
             base_ofs = (base_width - width) / 2;
-        }
 
-        bits = font_get_bits(pf, *ucs);
+            bmp_part_fn(bits, ofs, 0, width, x + base_ofs, y, width - ofs, pf->height);
 
-#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
-        if (pf->depth)
-            lcd_alpha_bitmap_part(bits, ofs, 0, width, x + base_ofs, y,
-                                  width - ofs, pf->height);
-        else
-#endif
-            LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x + base_ofs,
-                                    y, width - ofs, pf->height);
-        if (is_diac)
-        {
             LCDFN(current_viewport)->drawmode = drawmode;
+        }
+        else
+        {
+            bmp_part_fn(bits, ofs, 0, width, x + base_ofs, y, width - ofs, pf->height);
         }
 
         if (next_ch)
@@ -544,6 +554,15 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
     }
 
+    void (*bmp_part_fn)(const unsigned char *src, int src_x, int src_y,
+                        int stride, int x, int y, int width, int height);
+#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR) && !defined(DISABLE_ALPHA_BITMAP)
+    if (pf->depth)
+        bmp_part_fn = lcd_alpha_bitmap_part;
+    else
+#endif
+        bmp_part_fn = mono_bmp_part_helper;
+
     /* allow utf but no diacritics or rtl lang */
     for (ucs = bidi_l2v(str, 1); *ucs; ucs++)
     {
@@ -563,14 +582,8 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 
         bits = font_get_bits(pf, *ucs);
 
-#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR) && !defined(DISABLE_ALPHA_BITMAP)
-        if (pf->depth)
-            lcd_alpha_bitmap_part(bits, ofs, 0, width, x, y,
-                                  width - ofs, pf->height);
-        else
-#endif
-            LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x,
-                                    y, width - ofs, pf->height);
+        bmp_part_fn(bits, ofs, 0, width, x, y, width - ofs, pf->height);
+
         if (next_ch)
         {
             x += width - ofs;
