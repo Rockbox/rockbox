@@ -561,7 +561,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         bmp_part_fn = lcd_alpha_bitmap_part;
     else
 #endif
-        bmp_part_fn = mono_bmp_part_helper;
+        bmp_part_fn = LCDFN(mono_bmp_part_helper);
 
     /* allow utf but no diacritics or rtl lang */
     for (ucs = bidi_l2v(str, 1); *ucs; ucs++)
