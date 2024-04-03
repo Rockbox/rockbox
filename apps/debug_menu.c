@@ -2557,6 +2557,7 @@ static bool dbg_boot_data(void)
             simplelist_addline("Boot drive: %d", (int)boot_data.boot_drive);
             simplelist_addline("Boot partition: %d", (int)boot_data.boot_partition);
         }
+        simplelist_addline("Boot path: %s%s/%s", root_realpath(), BOOTDIR, BOOTFILE);
     }
 
     simplelist_addline("Bootdata RAW:");
