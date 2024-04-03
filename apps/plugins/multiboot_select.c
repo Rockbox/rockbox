@@ -155,11 +155,20 @@ static int find_roots(void)
 
         struct dirent* ent;
         while((ent = rb->readdir(dir))) {
+            /* skip non-directories */
+            if ((rb->dir_get_info(dir, ent).attribute & ATTR_DIRECTORY) == 0) {
+                continue;
+            }
+
             const char *dname = ent->d_name;
-            if (*dname == '.' && *(dname + 1) == '\0')
-                dname++; /* skip the dot so we can check root of volume */
+            /* check for bootdir in the root of the volume */
+            if (rb->strcmp(bootdir, dname) == 0) {
+                dname = "";
+            }
+
             int r = rb->snprintf(tmpbuf, sizeof(tmpbuf), "/<%d>/%s/%s/%s",
                                  vol, dname, bootdir, BOOTFILE);
+
             if(r < 0 || (size_t)r >= sizeof(tmpbuf))
                 continue;
 
