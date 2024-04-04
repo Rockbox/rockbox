@@ -87,6 +87,7 @@ static const char* get_codectype(const struct mp3entry* id3)
  * level    - what to extract. 0 is file name, 1 is parent of file, 2 is
  *            parent of parent, etc.
  *
+ * path does not need to be absolute, ignores multiple slashes
  * Returns buf if the desired level was found, NULL otherwise.
  */
 char* get_dir(char* buf, int buf_size, const char* path, int level)
@@ -94,7 +95,7 @@ char* get_dir(char* buf, int buf_size, const char* path, int level)
     const char* sep;
     const char* last_sep;
     int len;
-
+    buf[0] = '\0';
     sep = path + strlen(path);
     last_sep = sep;
 
@@ -105,15 +106,19 @@ char* get_dir(char* buf, int buf_size, const char* path, int level)
             if (!level)
                 break;
 
-            level--;
             last_sep = sep - 1;
+            if (*last_sep != '/') /* ignore multiple separators */
+                level--;
         }
     }
 
-    if (level || (last_sep <= sep))
+    if (level || (last_sep <= sep)) /* level was not found */
         return NULL;
 
-    len = MIN(last_sep - sep, buf_size - 1);
+    if (sep == path && *sep != '/') /* for paths without leading separator */
+        sep = path - 1;
+
+    len = MIN((last_sep - sep), buf_size - 1);
     strmemccpy(buf, sep + 1, len + 1);
     return buf;
 }
