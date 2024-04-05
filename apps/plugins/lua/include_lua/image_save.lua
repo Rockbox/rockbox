@@ -198,7 +198,7 @@ do
         end
 
         -- Bitmap lines start at bottom unless biHeight is negative
-        for point in _points(img, 1, h, w + bytesleft, 1) do
+        for point in _points(img, 1, h, w + bytesleft, 1, 1, 1, true) do
             imgdata[#imgdata + 1] = fs_bytes_E(bpp, point or 0)
 
             if #fbuffer >= 31 then -- buffered write, increase # for performance

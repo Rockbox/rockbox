@@ -76,7 +76,7 @@ local BLUE  = _clr.set(WHITE, 0, 0, 255)
 -------------------------------------------
 local clrs
 local CANCEL_BUTTON = rb.actions.PLA_CANCEL
-
+local LCD_DEPTH = rb.LCD_DEPTH
 -- EXAMPLES ---------------------------------------------------------------------- EXAMPLES---------------------------------------------------------------------
 function my_blit(dst_val, dx, dy, src_val, sx, sy)
     -- user defined blit operation
@@ -84,7 +84,7 @@ function my_blit(dst_val, dx, dy, src_val, sx, sy)
     --you may change pixels in both the source and dest image
     --return nil to stop early
 
-    if _lcd.DEPTH < 2 then
+    if LCD_DEPTH < 2 then
         return src_val
     end
 
@@ -518,7 +518,7 @@ function twist(img)
             for ix = 1, _lcd.W, w do
                 y_col = y_col + 1
                 y = ims.y_pos[(y_col % 2) + 1]
-                if _lcd.DEPTH > 1 then
+                if LCD_DEPTH > 1 then
                     _lcd:copy(ims.strip, ix, 1, 1, y, w, h, false, _blit.BDEQC, colors[1])
                 else
                     _lcd:copy(ims.strip, ix, 1, 1, y, w, h, false, _blit.BSAND)
@@ -767,10 +767,10 @@ function long_text()
     local wait = 0
     w = w + wp * 3
     h = h + 4
-    local img = _img.new(w + 1, h)
+    local img = _img.new(w + 1, h + 1)
     img:clear(BLACK)
     _draw.rounded_rect_filled(img, 1, 1, w, h, 15, WHITE)
-    _draw_text(img, 1, 2, nil, nil, nil, BLACK, txt)
+    _draw_text(img, 1, 1, nil, nil, nil, BLACK, txt)
 
     for p = -w + 1, w - 1 do
         wait = 0
@@ -858,7 +858,7 @@ function main_menu()
                 [14] = function(EXIT_) return true end
                 }
 
-    if _lcd.DEPTH < 2 then
+    if LCD_DEPTH < 2 then
         table.remove(mt, 10)
         table.remove(ft, 10)
     end
@@ -880,7 +880,7 @@ _timer("main") -- keep track of how long the program ran
 -- Clear the screen
 _lcd:clear(BLACK)
 
-if _lcd.DEPTH > 1 then
+if LCD_DEPTH > 1 then
 --draw a gradient using available colors
 if IS_COLOR_TARGET == true then
     clrs = {

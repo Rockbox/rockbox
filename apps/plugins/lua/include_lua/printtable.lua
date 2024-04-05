@@ -145,13 +145,14 @@ function print_table(t, t_count, settings)
 
     local wrap, justify, start, curpos, co_routine, hasheader, m_sel
     local header_fgc, header_bgc, item_fgc, item_bgc, item_selc
-    local table_linedesc, drawsep, overflow, dpad_fn
+    local table_linedesc, drawsep, overflow, dpad_fn, pagescroll
     do
         local s = settings or _print.get_settings()
         wrap, justify  = s.wrap, s.justify
         start, curpos  = s.start, s.curpos
         co_routine     = s.co_routine
         hasheader      = s.hasheader
+        pagescroll     = s.pagescroll
         drawsep        = s.drawsep
         sb_width       = s.sb_width or sb_width
         m_sel          = false
@@ -234,7 +235,12 @@ function print_table(t, t_count, settings)
                           dpad_fn(t_p.col, -1, -t_p.col_scrl, t_p.row, -1, -t_p.row_scrl,
                                   nil, overflow, (t_p.row + t_p.vcursor - 1))
 
+
+        if pagescroll == true then
+            t_p.row = t_p.row + y_chg * maxline - 1
+        end
         t_p.vcursor = t_p.vcursor + y_chg
+
 
         if t_p.vcursor > maxline or t_p.vcursor < t_p.vcursor_min then
             t_p.row = yi
@@ -268,6 +274,7 @@ function print_table(t, t_count, settings)
         elseif y_chg ~= 0 then
             --t_p.col = 0 -- reset column to the beginning
             _print.clear()
+
             _print.opt.sel_line(t_p.vcursor)
 
             t_p.row_scrl = set_accel(timeb, t_p.row_scrl, t_p)
