@@ -210,7 +210,7 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
     if (!strncmp(HOME_DIR, dir, HOME_DIR_LEN))
     {
         const char *p = dir + HOME_DIR_LEN;
-        while (*p == '/') p++;
+        while (*p == PATH_SEPCH) p++; /* strip leading slashes */
         path_append(buf, rbhome, p, bufsize);
         dir = buf;
     }
@@ -232,6 +232,7 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #endif
        )
     {
+        while (*dir == PATH_SEPCH) dir++; /* strip leading slashes */
         path_append(buf, PIVOT_ROOT, dir, bufsize);
         dir = buf;
     }
