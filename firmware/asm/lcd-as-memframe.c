@@ -177,5 +177,7 @@ void lcd_write_yuv420_lines_odither(fb_data *dst,
                                    int width, int stride,
                                    int x_screen, int y_screen)
 {
+    (void)x_screen;
+    (void)y_screen;
     return lcd_write_yuv420_lines(dst, src, width, stride);
 }
