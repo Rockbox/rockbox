@@ -25,10 +25,10 @@ static inline int clamp(int val, int min, int max)
     return val;
 }
 
-extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char const * const src[3],
-                                   int width,
-                                   int stride)
+void lcd_write_yuv420_lines(fb_data *dst,
+                            unsigned char const * const src[3],
+                            int width,
+                            int stride)
 {
     /* Draw a partial YUV colour bitmap - similiar behavior to lcd_blit_yuv
        in the core */
@@ -176,4 +176,6 @@ void lcd_write_yuv420_lines_odither(fb_data *dst,
                                    unsigned char const * const src[3],
                                    int width, int stride,
                                    int x_screen, int y_screen)
-__attribute__((alias("lcd_write_yuv420_lines")));
+{
+    return lcd_write_yuv420_lines(dst, src, width, stride);
+}
