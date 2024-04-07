@@ -168,7 +168,7 @@ static const char* _get_user_file_path(const char *path,
     const char *pos = path;
     /* replace ROCKBOX_DIR in path with $HOME/.config/rockbox.org */
     pos += ROCKBOX_DIR_LEN;
-    if (*pos == '/') pos += 1;
+    while (*pos == PATH_SEPCH) pos++;
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     if (path_append(buf, "/sdcard/rockbox", pos, bufsize) >= bufsize)
