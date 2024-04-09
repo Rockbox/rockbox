@@ -515,12 +515,21 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
     struct mp3entry id3;
     bool id3_retrieval_successful = false;
 
-    int fd = open(current_track->name, O_RDONLY);
-    if (fd >= 0)
+    if (!viewer.playlist &&
+        (playlist_get_resume_info(&viewer.current_playing_track) == current_track->index))
     {
-        if (get_metadata(&id3, fd, current_track->name))
-            id3_retrieval_successful = true;
-        close(fd);
+        copy_mp3entry(&id3, audio_current_track()); /* retrieve id3 from RAM */
+        id3_retrieval_successful = true;
+    }
+    else
+    {
+        int fd = open(current_track->name, O_RDONLY);
+        if (fd >= 0)
+        {
+            if (get_metadata(&id3, fd, current_track->name))
+                id3_retrieval_successful = true;
+            close(fd);
+        }
     }
 
     return id3_retrieval_successful &&
