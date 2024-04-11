@@ -166,10 +166,58 @@ long ata_last_disk_activity(void);
 int ata_spinup_time(void); /* ticks */
 
 /* Returns 1 if drive is solid-state */
-int ata_disk_isssd(void);
+static inline int ata_disk_isssd(void)
+{
+    unsigned short *identify_info = ata_get_identify();
+    /*
+       Offset 217 is "Nominal Rotation rate"
+        0x0000 == Not reported
+        0x0001 == Solid State
+        0x0401 -> 0xffe == RPM
+        All others reserved
+
+        Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either.
+        However, this is a relatively recent change, and we can't rely on it,
+        especially for the FC1307A CF->SD adapters!
+
+       Offset 168 is "Nominal Form Factor"
+         all values >= 0x06 are guaranteed to be Solid State (mSATA, m.2, etc)
+
+       Offset 169 b0 is set to show device implements TRIM.
+
+    Unreliable mechanisms:
+
+       Offset 83 b2 shows device implements CFA commands.
+        However microdrives pose a problem as they support CFA but are not
+        SSD.
+
+       Offset 160 b15 indicates support for CF+ power level 1, if not set
+        then device is standard flash CF.  However this is not foolproof
+        as newer CF cards may support it for extra performance.
+
+       Offset 163 shows CF Advanced timing modes; microdrive seems to
+        report 0, but all others (including iFlash) report higher!
+
+       So if device support CFA _AND_ reports higher speeds modes, it is SSD.
+
+     */
+    return ( (identify_info[217] == 0x0001 || identify_info[217] == 0x0100) /* "Solid state" rotational rate */
+             || ((identify_info[168] & 0x0f) >= 0x06)                       /* Explicit SSD form factors */
+             || (identify_info[169] & (1<<0))                               /* TRIM supported */
+             || ((identify_info[83] & (1<<2)) &&                            /* CFA compliant */
+                 (((identify_info[160] & (1<<15)) == 0) ||                     /* CF level 0 */
+                  (identify_info[163] > 0)))                                   /* Advanced timing modes */
+           );
+}
 
 /* Returns 1 if the drive can be powered off safely */
-int ata_disk_can_poweroff(void);
+static inline int ata_disk_can_poweroff(void)
+{
+    unsigned short *identify_info = ata_get_identify();
+    /* Only devices that claim to support PM can be safely powered off.
+       This notably excludes the various SD adapters! */
+    return (identify_info[82] & (1<<3) && identify_info[85] & (1<<3));
+}
 
 #ifdef HAVE_ATA_DMA
 /* Returns current DMA mode */

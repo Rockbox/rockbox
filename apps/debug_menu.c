@@ -1074,7 +1074,7 @@ static bool view_battery(void)
 
                 lcd_putsf(0, line++, "State: %s", chrgstate_strings[y]);
 
-                lcd_putsf(0, line++, "%s Switch: %s", "Battery", 
+                lcd_putsf(0, line++, "%s Switch: %s", "Battery",
                          (st & POWER_INPUT_BATTERY) ? "On" : "Off");
 
                 y = chrgraw_adc_voltage();
@@ -1405,6 +1405,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
+    simplelist_addline("SSD detected: %s", ata_disk_isssd() ? "yes" : "no");
     simplelist_addline(
              "Spinup time: %d ms", storage_spinup_time() * (1000/HZ));
     i = identify_info[82] & (1<<3);
@@ -1512,6 +1513,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     i = identify_info[0] & (1 << 7);
     simplelist_addline(
             "Removeable media: %s", i ? "yes" : "no");
+
     return btn;
 }
 

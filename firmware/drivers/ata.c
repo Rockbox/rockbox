@@ -58,6 +58,7 @@
 #define CMD_IDENTIFY               0xEC
 #define CMD_SLEEP                  0xE6
 #define CMD_FLUSH_CACHE            0xE7
+#define CMD_FLUSH_CACHE_EXT        0xEA
 #define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 #ifdef HAVE_ATA_DMA
@@ -105,7 +106,7 @@ static bool lba48 = false; /* set for 48 bit addressing */
 
 static long last_disk_activity = -1;
 #ifdef HAVE_ATA_POWER_OFF
-static long power_off_tick;
+static long power_off_tick = 0;
 #endif
 
 static unsigned long total_sectors;
@@ -152,18 +153,10 @@ static inline bool ata_sleep_timed_out(void)
            TIME_AFTER(current_tick, last_disk_activity + sleep_timeout);
 }
 
-static inline void schedule_ata_power_off(void)
-{
-#ifdef HAVE_ATA_POWER_OFF
-    if (!ata_disk_can_poweroff())
-        power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
-#endif
-}
-
 static inline bool ata_power_off_timed_out(void)
 {
 #ifdef HAVE_ATA_POWER_OFF
-    return TIME_AFTER(current_tick, power_off_tick);
+    return power_off_tick && TIME_AFTER(current_tick, power_off_tick);
 #else
     return false;
 #endif
@@ -230,6 +223,10 @@ static int ata_perform_wakeup(int state)
 
 static int ata_perform_sleep(void)
 {
+    /* If device doesn't support PM features, don't try to sleep. */
+    if (!ata_disk_can_poweroff())
+        return 0; // XXX or return a failure?
+
     logf("ata SLEEP %ld", current_tick);
 
     ATA_OUT8(ATA_SELECT, ata_device);
@@ -244,18 +241,10 @@ static int ata_perform_sleep(void)
         - transitions to PM2:Standby
         - enters Standby_z power condition
 
-      This places the device into a state where power-off is safe, but
-      it is not the lowest-theoretical power state -- that is SLEEP, but
-      that is bugged on some SSDs (FC1307A-based).
-
-      TODO: Is there a practical downside to using STANDBY_IMMEDIATE instead
-      of SLEEP, assuming the former spins down the drive?
+      This places the device into a state where power-off is safe.  We
+      will cut power at a later time.
     */
-    if (ata_disk_isssd()) {
-        ATA_OUT8(ATA_COMMAND, CMD_STANDBY_IMMEDIATE);
-    } else {
-        ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
-    }
+    ATA_OUT8(ATA_COMMAND, CMD_STANDBY_IMMEDIATE);
 
     if (!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
@@ -267,11 +256,17 @@ static int ata_perform_sleep(void)
 
 static int ata_perform_flush_cache(void)
 {
-    /* Don't issue the flush cache command if the device
-       doesn't support it, even though it's mandatory.
-    */
-    if (!(identify_info[83] & (1 << 12)))
+    uint8_t cmd;
+
+    if (identify_info[83] & (1 << 13)) {
+        cmd = CMD_FLUSH_CACHE_EXT;
+    } else if (identify_info[83] & (1 << 12)) {
+        cmd = CMD_FLUSH_CACHE;
+    } else {
+        /* If neither (mandatory!) command is supported
+           then don't issue it. */
        return 0;
+    }
 
     logf("ata FLUSH CACHE %ld", current_tick);
 
@@ -282,7 +277,7 @@ static int ata_perform_flush_cache(void)
         return -1;
     }
 
-    ATA_OUT8(ATA_COMMAND, CMD_FLUSH_CACHE);
+    ATA_OUT8(ATA_COMMAND, cmd);
 
     if (!wait_for_rdy()) {
         DEBUGF("ata_perform_flush_cache() - CMD failed\n");
@@ -386,47 +381,6 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
     }
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
-
-int ata_disk_isssd(void)
-{
-    /*
-       Offset 217 is "Nominal Rotation rate"
-        0x0000 == Not reported
-        0x0001 == Solid State
-        0x0401 -> 0xffe == RPM
-        All others reserved
-
-        Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either.
-        However, this is a relatively recent change, and we can't rely on it,
-        especially for the FC1307A CF->SD adapters!
-
-       Offset 168 is "Nominal Form Factor"
-        all values >= 0x06 are guaranteed to be Solid State (mSATA, m.2, etc)
-
-       Offset 83 b2 and/or 86 b2 is set to show device implementes CFA commands
-
-       Offset 169 b0 is set to show device implements TRIM.
-
-       Offset 0 is 0x848a for CF, but that's not guaranteed, because reasons.
-     */
-    return (identify_info[83] & (1<<2) || identify_info[86] & (1<<2) ||
-            (identify_info[168] & 0x0f) >= 0x06 ||
-            identify_info[169] & (1<<0) ||
-            identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
-}
-
-int ata_disk_can_poweroff(void)
-{
-    /* Some SSDs don't like getting powered off, presumably because
-       in the real world they're not in removable form factors and
-       don't expect to have power removed.
-
-       In particular, mSATA, m.2, and MicroSSD are suspect.
-    */
-
-    return ((identify_info[168] & 0x0f) < 0x06 ||
-            (identify_info[168] & 0x0f) > 0x08);
-}
 
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
@@ -903,7 +857,10 @@ void ata_sleepnow(void)
         if (ata_state == ATA_ON) {
             if (!ata_perform_flush_cache() && !ata_perform_sleep()) {
                 ata_state = ATA_SLEEPING;
-                schedule_ata_power_off();
+#ifdef HAVE_ATA_POWER_OFF
+                if (ata_disk_can_poweroff())
+                    power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
+#endif
             }
         }
         mutex_unlock(&ata_mtx);
@@ -1136,7 +1093,7 @@ static int set_features(void)
         unsigned char parameter;
     } features[] = {
         { 83, 14, 0x03, 0 },   /* force PIO mode */
-        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */  // TODO: What about FC1307A that doesn't advertise this properly?
+        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
 #ifdef HAVE_ATA_DMA
@@ -1455,17 +1412,17 @@ int ata_event(long id, intptr_t data)
        the first case is frequently hit anyway. */
     if (LIKELY(id == Q_STORAGE_TICK)) {
         /* won't see ATA_BOOT in here */
-        int state = ata_state;
-        if (state != ATA_ON || !ata_sleep_timed_out()) {
-            if (state == ATA_SLEEPING && ata_power_off_timed_out()) {
+        if (ata_state != ATA_ON || !ata_sleep_timed_out()) {
+#ifdef HAVE_ATA_POWER_OFF
+            if (ata_state == ATA_SLEEPING && ata_power_off_timed_out()) {
+                power_off_tick = 0;
                 mutex_lock(&ata_mtx);
-                if (ata_state == ATA_SLEEPING) {
-                    logf("ata OFF %ld", current_tick);
-                    ide_power_enable(false);
-                    ata_state = ATA_OFF;
-                }
+                logf("ata OFF %ld", current_tick);
+                ide_power_enable(false);
+                ata_state = ATA_OFF;
                 mutex_unlock(&ata_mtx);
             }
+#endif
             STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
         }
     }
