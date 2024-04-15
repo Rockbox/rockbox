@@ -984,7 +984,10 @@ void ata_spindown(int seconds)
 void ata_sleepnow(void)
 {
     mutex_lock(&ata_mutex);
-    ata_power_down();
+
+    if (ata_disk_can_poweroff())
+        ata_power_down();
+
     mutex_unlock(&ata_mutex);
 }
 
