@@ -536,7 +536,7 @@ sub allbuilds {
 	'engines' => {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-gb -k 5',
-	    'gtts' => '-l en-gb',
+	    'gtts' => '-l en -t co.uk',
 	},
         'enabled' => 1,
     },
@@ -571,7 +571,7 @@ sub allbuilds {
 	'engines' => {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-us -k 5',
-	    'gtts' => '-l en-us',
+	    'gtts' => '-l en -t us',
 	},
         'enabled' => 1,
     },

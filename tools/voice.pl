@@ -81,24 +81,24 @@ my %festival_lang_map = (
 );
 
 my %gtts_lang_map = (
-    'english' => 'en-gb',  # Always first, it's the golden master
-	'czech' => 'cs',   # not supported
-	'dansk' => 'da',
-	'deutsch' => 'de',
-        'english-us' => 'en-us',
-	'espanol' => 'es-es',
-	'francais' => 'fr-fr',
-        'greek' => 'el',
-        'magyar' => 'hu',
-        'italiano' => 'it',
-        'nederlands' => 'nl',
-        'norsk' => 'no',
-	'polski' => 'pl',
-	'russian' => 'ru',
-	'slovak' => 'sk',
-        'srpski' => 'sr',
-        'svenska' => 'sv',
-        'turkce' => 'tr',
+    'english' => '-l en -t co.uk',  # Always first, it's the golden master
+	'czech' => '-l cs',   # not supported
+	'dansk' => '-l da',
+	'deutsch' => '-l de',
+	'english-us' => '-l en -t us',
+	'espanol' => '-l es',
+	'francais' => '-l fr',
+	'greek' => '-l el',
+	'magyar' => '-l hu',
+	'italiano' => '-l it',
+	'nederlands' => '-l nl',
+	'norsk' => '-l no',
+	'polski' => '-l pl',
+	'russian' => '-l ru',
+	'slovak' => '-l sk',
+	'srpski' => '-l sr',
+	'svenska' => '-l sv',
+	'turkce' => '-l tr',
 );
 
 my %espeak_lang_map = (
@@ -167,7 +167,7 @@ sub init_tts {
     } elsif ($tts_engine eq 'gtts') {
         $ret{"format"} = 'mp3';
         if (defined($gtts_lang_map{$language}) && $tts_engine_opts !~ /-l/) {
-            $ret{"ttsoptions"} = "-l $gtts_lang_map{$language} ";
+            $ret{"ttsoptions"} = " $gtts_lang_map{$language} ";
         }
     } elsif ($tts_engine eq 'espeak' || $tts_engine eq 'espeak-ng') {
         if (defined($espeak_lang_map{$language}) && $tts_engine_opts !~ /-v/) {
@@ -403,7 +403,8 @@ sub generateclips {
             $voice = $1;
             if ($id !~ /^NOT_USED_.*$/ && $voice ne "") {
                 my $wav = $id . '.wav';
-                my $enc = $id . '.mp3';
+                my $enc = $id . '.enc';
+		my $format = $tts_object->{'format'};
 
                 # Print some progress information
                 if (++$i % 10 == 0 and !$verbose) {
@@ -415,7 +416,7 @@ sub generateclips {
 
                 # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
-                    $pool_file = sprintf("%s/%s-%s.mp3", $ENV{'POOL'},
+                    $pool_file = sprintf("%s/%s-%s.enc", $ENV{'POOL'},
                                          md5_hex(Encode::encode_utf8("$voice $tts_engine $tts_engine_opts $encoder_opts")),
                                          $language);
                     if (-f $pool_file) {
@@ -431,12 +432,18 @@ sub generateclips {
                         copy(dirname($0)."/VOICE_PAUSE.wav", $wav);
                     } else {
 			voicestring($voice, $wav, $tts_engine_opts, $tts_object);
-			if ($tts_object->{'format'} eq "wav") {
+			if ($format eq "wav") {
 			    wavtrim($wav, 500, $tts_object);
 			    # 500 seems to be a reasonable default for now
 			}
                     }
-		    if ($tts_object->{'format'} eq "wav" || $id eq "VOICE_PAUSE") {
+		    # Convert from mp3 to wav so we can use rbspeex
+		    if ($format eq "mp3") {
+			system("ffmpeg -loglevel 0 -i $wav $id$wav");
+			rename("$id$wav","$wav");
+			$format = "wav";
+		    }
+		    if ($format eq "wav" || $id eq "VOICE_PAUSE") {
 			encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
 		    } else {
 			copy($wav, $enc);
@@ -483,7 +490,7 @@ sub createvoice {
 }
 
 sub deleteencs() {
-    for (glob('*.mp3')) {
+    for (glob('*.enc')) {
         unlink($_);
     }
     for (glob('*.wav')) {
