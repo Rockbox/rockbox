@@ -516,6 +516,7 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
     bool id3_retrieval_successful = false;
 
     if (!viewer.playlist &&
+        (audio_status() & AUDIO_STATUS_PLAY) &&
         (playlist_get_resume_info(&viewer.current_playing_track) == current_track->index))
     {
         copy_mp3entry(&id3, audio_current_track()); /* retrieve id3 from RAM */
