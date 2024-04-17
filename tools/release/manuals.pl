@@ -1,8 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
+require "./tools/builds.pm";
 
-$version="3.15";
-
-require "tools/builds.pm";
+require "./tools/builds.pm";
 
 my $verbose;
 if($ARGV[0] eq "-v") {
@@ -10,20 +9,15 @@ if($ARGV[0] eq "-v") {
     shift @ARGV;
 }
 
-my $doonly;
-if($ARGV[0]) {
-    $doonly = $ARGV[0];
-    print "only build $doonly\n" if($verbose);
-}
+my $tag = $ARGV[0];
+my $version = $ARGV[1];
+
+my $outdir = "output/manuals";
 
 # made once for all targets
 sub runone {
     my ($dir)=@_;
     my $a;
-
-    if($doonly && ($doonly ne $dir)) {
-        return;
-    }
 
     mkdir "buildm-$dir";
     chdir "buildm-$dir";
@@ -34,16 +28,18 @@ sub runone {
 
     chdir "..";
 
-    my $o="buildm-$dir/manual/rockbox-build.pdf";
+    my $o="buildm-$dir/rockbox-$dir-$version.pdf";
     if (-f $o) {
-        my $newo="output/rockbox-$dir-$version.pdf";
+        my $newo="$outdir/rockbox-$dir-$version.pdf";
         system("mv $o $newo");
         print "moved $o to $newo\n" if($verbose);
+    } else {
+	print "buildm-$dir/rockbox-$dir-$version.pdf not found\n";
     }
 
     $o="buildm-$dir/rockbox-manual.zip";
     if (-f $o) {
-        my $newo="output/rockbox-$dir-$version-html.zip";
+        my $newo="$outdir/rockbox-$dir-$version-html.zip";
         system("mv $o $newo");
         print "moved $o to $newo\n" if($verbose);
     }
@@ -64,18 +60,20 @@ sub buildit {
     print "C: $c\n" if($verbose);
     `$c`;
 
-    print "Run 'make'\n" if($verbose);
+    print "Run 'make manual'\n" if($verbose);
     `make manual VERSION=$version 2>/dev/null`;
 
     print "Run 'make manual-zip'\n" if($verbose);
     `make manual-zip VERSION=$version 2>/dev/null`;
 }
 
+`git checkout $tag`;
+
 # run make in tools first to make sure they're up-to-date
 `(cd tools && make ) >/dev/null 2>&1`;
 
-for my $b (&stablebuilds) {
-    next if (length($builds{$b}{configname}) > 0); # no variants
+`mkdir -p $outdir`;
 
+for my $b (&usablebuilds) {
     runone($b);
 }

@@ -1,8 +1,5 @@
-#!/usr/bin/perl
-
-$version="3.15";
-
-require "tools/builds.pm";
+#!/usr/bin/perl -w
+require "./tools/builds.pm";
 
 my $verbose;
 if($ARGV[0] eq "-v") {
@@ -10,60 +7,63 @@ if($ARGV[0] eq "-v") {
     shift @ARGV;
 }
 
-my $doonly;
-if($ARGV[0]) {
-    $doonly = $ARGV[0];
-    print "only build $doonly\n" if($verbose);
-}
+my $tag = $ARGV[0];
+my $version = $ARGV[1];
+
+my $outdir = "output/voices";
 
 # made once for all targets
 sub runone {
-    my ($dir)=@_;
+    my ($target, $name, $lang, $engine, $voice, $engine_opts)=@_;
     my $a;
 
-    if($doonly && ($doonly ne $dir)) {
-        return;
-    }
+    print "*** LANGUAGE: $lang\n";
 
-    mkdir "buildv-$dir";
-    chdir "buildv-$dir";
-    print "Build in buildv-$dir\n" if($verbose);
+    print "Build in buildv-$target-$lang\n" if($verbose);
 
-    # build the manual(s)
-    $a = buildit($dir);
+    mkdir "buildv-$target-$lang";
+    chdir "buildv-$target-$lang";
 
-    chdir "..";
+    # build the voice(s)
+    $a = buildit($target, $lang, $engine, $voice, $engine_opts);
 
-    my $o="buildv-$dir/english.voice";
+    my $o="$lang.voice";
     if (-f $o) {
-        my $newo="output/$dir-$version-english.zip";
-        system("cp $o output/$dir-$version-english.voice");
+        my $newo="../$outdir/$target/voice-$target-$version-$name.zip";
+	system("mkdir -p ../$outdir/$target");
+        system("mkdir -p .rockbox/langs");
+        system("mkdir -p output/$target");
         system("mkdir -p .rockbox/langs");
         system("cp $o .rockbox/langs");
-        system("zip -r $newo .rockbox");
+        system("zip -q -r $newo .rockbox");
         system("rm -rf .rockbox");
+        `chmod a+r $newo`;
         print "moved $o to $newo\n" if($verbose);
     }
 
-    print "remove all contents in buildv-$dir\n" if($verbose);
-    system("rm -rf buildv-$dir");
+    chdir "..";
+
+    print "remove all contents in buildv-$target-$lang\n" if($verbose);
+    system("rm -rf buildv-$target-$lang");
 
     return $a;
 };
 
 sub buildit {
-    my ($model)=@_;
+    my ($target, $lang, $engine, $voice, $engine_opts)=@_;
 
     `rm -rf * >/dev/null 2>&1`;
 
-    my $c = "../tools/configure --type=av --target=$model --language=0 --tts=f --ram=0 --voice=0";
+    my $c = "../tools/configure --no-ccache --type=av --target=$target --ram=-1 --language=$lang --tts=$engine --voice=$voice --ttsopts='$engine_opts'";
 
     print "C: $c\n" if($verbose);
-    `$c`;
+    system($c);
 
     print "Run 'make voice'\n" if($verbose);
-    print `make voice VERSION=$version 2>/dev/null`;
+    `make voice`;
 }
+
+`git checkout $tag`;
 
 # run make in tools first to make sure they're up-to-date
 `(cd tools && make ) >/dev/null 2>&1`;
@@ -75,8 +75,16 @@ my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
 `rm -f $pool/*`;
 $ENV{'POOL'}="$pool";
 
-for my $b (&stablebuilds) {
-    next if (length($builds{$b}{configname}) > 0); # no variants
+`mkdir -p $outdir`;
 
-    runone($b);
-}
+for my $b (&usablebuilds) {
+    next if ($builds{$b}{voice}); # no variants
+
+    for my $v (&allvoices) {
+	my %voice = $voices{$v};
+
+#        print " runone $b $v ($voices{$v}->{lang} via $voices{$v}->{defengine})\n";
+	runone($b, $v, $voices{$v}->{lang}, $voices{$v}->{defengine},
+	       "-1", $voices{$v}->{engines}->{$voices{$v}->{defengine}});
+        }
+    }
