@@ -335,7 +335,7 @@ sub synchronize {
 # Run genlang and create voice clips for each string
 sub generateclips {
     our $verbose;
-    my ($language, $target, $encoder, $encoder_opts, $tts_engine, $tts_engine_opts, $existingids) = @_;
+    my ($language, $target, $encoder, $encoder_opts, $tts_object, $tts_engine_opts, $existingids) = @_;
     my $english = dirname($0) . '/../apps/lang/english.lang';
     my $langfile = dirname($0) . '/../apps/lang/' . $language . '.lang';
     my $correctionsfile = dirname($0) . '/voice-corrections.txt';
@@ -362,7 +362,6 @@ sub generateclips {
     }
     open(VOICEFONTIDS, " < $idfile");
 
-    my $tts_object = init_tts($tts_engine, $tts_engine_opts, $language);
     # add string corrections to tts_object.
     my @corrects = ();
     open(VOICEREGEXP, "<$correctionsfile") or die "Can't open corrections file!\n";
@@ -419,7 +418,7 @@ sub generateclips {
                 # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
                     $pool_file = sprintf("%s/%s-%s.enc", $ENV{'POOL'},
-                                         md5_hex(Encode::encode_utf8("$voice $tts_engine $tts_engine_opts $encoder_opts")),
+                                         md5_hex(Encode::encode_utf8("$voice ". $tts_object->{"name"}." $tts_engine_opts $encoder_opts")),
                                          $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;
@@ -589,6 +588,8 @@ if (defined($v) or defined($ENV{'V'})) {
 # add the tools dir to the path temporarily, for calling various tools
 $ENV{'PATH'} = dirname($0) . ':' . $ENV{'PATH'};
 
+my $tts_object = init_tts($s, $S, $l);
+
 # Do what we're told
 if ($V == 1) {
     # Only do the panic cleanup for voicefiles
@@ -598,17 +599,14 @@ if ($V == 1) {
     printf("Generating voice\n  Target: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n",
            defined($t) ? $t : "unknown",
            $l, $e, $E, $s, $S);
-    generateclips($l, $t, $e, $E, $s, $S, $f);
+    generateclips($l, $t, $e, $E, $tts_object, $S, $f);
     createvoice($l, $i, $f);
     deleteencs();
-}
-elsif ($C) {
+} elsif ($C) {
     printf("Generating .talk clips\n  Path: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n", $ARGV[0], $l, $e, $E, $s, $S);
-    my $tts_object = init_tts($s, $S, $l);
     gentalkclips($ARGV[0], $tts_object, $e, $E, $S, 0);
     shutdown_tts($tts_object);
-}
-else {
+} else {
     printusage();
     exit 1;
 }
