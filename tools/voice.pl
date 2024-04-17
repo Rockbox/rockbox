@@ -124,6 +124,8 @@ my %espeak_lang_map = (
         'turkce' => 'tr',
 );
 
+my $trim_thresh = 500;   # Trim silence if over this, in ms
+
 # Initialize TTS engine. May return an object or value which will be passed
 # to voicestring and shutdown_tts
 sub init_tts {
@@ -433,8 +435,7 @@ sub generateclips {
                     } else {
 			voicestring($voice, $wav, $tts_engine_opts, $tts_object);
 			if ($format eq "wav") {
-			    wavtrim($wav, 500, $tts_object);
-			    # 500 seems to be a reasonable default for now
+			    wavtrim($wav, $trim_thresh, $tts_object);
 			}
                     }
 		    # Convert from mp3 to wav so we can use rbspeex
@@ -510,6 +511,8 @@ sub gentalkclips {
     my $d = new DirHandle $dir;
     while (my $file = $d->read) {
         my ($voice, $wav, $enc);
+	my $format = $tts_object->{'format'};
+
         # Print some progress information
         if (++$i % 10 == 0 and !$verbose) {
             print(".");
@@ -527,8 +530,8 @@ sub gentalkclips {
         }
         # Element is a dir
         if ( -d $path) {
+	    $enc = sprintf("%s/_dirname.talk", $path);
             gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
-            $enc = sprintf("%s/_dirname.talk", $path);
         }
         # Element is a file
         else {
@@ -537,13 +540,24 @@ sub gentalkclips {
         }
 
         printf("Talkclip %s: %s", $enc, $voice) if $verbose;
+	# Don't generate encoded file if it already exists
+	next if (-f $enc);
 
-        voicestring($voice, $wav, $tts_engine_opts, $tts_object);
-        wavtrim($wav, 500, $tts_object);
-        # 500 seems to be a reasonable default for now
-        encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
-        synchronize($tts_object);
-        unlink($wav);
+	voicestring($voice, $wav, $tts_engine_opts, $tts_object);
+	wavtrim($wav, $trim_thresh, $tts_object);
+
+	if ($format eq "mp3") {
+	    system("ffmpeg -loglevel 0 -i $wav $voice$wav");
+	    rename("$voice$wav","$wav");
+	    $format = "wav";
+	}
+	if ($format eq "wav") {
+	    encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
+	} else {
+	    copy($wav, $enc);
+	}
+	synchronize($tts_object);
+	unlink($wav);
     }
 }
 
