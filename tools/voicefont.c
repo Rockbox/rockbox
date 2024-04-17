@@ -18,14 +18,14 @@
  * KIND, either express or implied.
  *
  * A tool to generate the Rockbox "voicefont", a collection of all the UI
- * strings. 
- * 
+ * strings.
+ *
  * Details at http://www.rockbox.org/wiki/VoiceBuilding
  *
  ****************************************************************************/
 
-#include "voicefont.h" 
- 
+#include "voicefont.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -59,10 +59,10 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     static unsigned char buffer[65535]; /* clip buffer, allow only 64K */
     int fields;
     char line[255]; /* one line from the .lang file */
-    char mp3filename1[1024];
-    char mp3filename2[1024];
-    char* mp3filename;
-    FILE* pMp3File;
+    char encfilename1[1024];
+    char encfilename2[1024];
+    char* encfilename;
+    FILE* pEncFile;
 
     memset(voiceonly, 0, sizeof(voiceonly));
     while (!feof(voicefontids))
@@ -97,25 +97,25 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     for (i=0; i<count; i++)
     {
         pos[i] = ftell(output);
-        sprintf(mp3filename1, "%s%s.mp3", filedir, names[i]);
-        sprintf(mp3filename2, "%s%s.wav.mp3", filedir, names[i]);
-        mp3filename = mp3filename1;
-        pMp3File = fopen(mp3filename, "rb");
-        if (pMp3File == NULL)
+        sprintf(encfilename1, "%s%s.enc", filedir, names[i]);
+        sprintf(encfilename2, "%s%s.wav.enc", filedir, names[i]);
+        encfilename = encfilename1;
+        pEncFile = fopen(encfilename, "rb");
+        if (pEncFile == NULL)
         {   /* alternatively, try the lame default filename */
-            mp3filename = mp3filename2;
-            pMp3File = fopen(mp3filename, "rb");
-            if (pMp3File == NULL)
+            encfilename = encfilename2;
+            pEncFile = fopen(encfilename, "rb");
+            if (pEncFile == NULL)
             {
-                printf("mp3 file %s not found!\n", mp3filename1);
+                printf("enc file %s not found!\n", encfilename1);
                 size[i] = 0;
                 continue;
             }
         }
-        printf("processing %s", mp3filename);
+        printf("processing %s", encfilename);
 
-        size[i] = fread(buffer, 1, sizeof(buffer), pMp3File);
-        fclose(pMp3File);
+        size[i] = fread(buffer, 1, sizeof(buffer), pEncFile);
+        fclose(pEncFile);
         fwrite(buffer, 1, size[i], output);
 
         printf(": %d %s %d\n", i, names[i], size[i]); /* debug */
@@ -177,7 +177,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
 
     return 0;
 
-    
+
 }
 #ifndef RBUTIL
 int main (int argc, char** argv)
@@ -186,14 +186,14 @@ int main (int argc, char** argv)
 
     if (argc < 2)
     {
-        printf("Makes a Rockbox voicefont from a collection of mp3 clips.\n");
-        printf("Usage: voicefont <string id list file> <target id> <mp3 path> <output file>\n");
+        printf("Makes a Rockbox voicefont from a collection of encoded clips.\n");
+        printf("Usage: voicefont <string id list file> <target id> <enc path> <output file>\n");
         printf("\n");
         printf("Example: \n");
-        printf("voicefont voicefontids.txt 2 voice\\ voicefont.bin\n");
+        printf("voicefont voicefontids.txt 2 voice/ voicefont.bin\n");
         return -1;
     }
-    
+
     ids = fopen(argv[1], "r");
     if (ids == NULL)
     {
@@ -207,7 +207,7 @@ int main (int argc, char** argv)
         printf("Error opening output file %s\n", argv[4]);
         return -2;
     }
-    
+
     if (voicefont(ids, atoi(argv[2]),argv[3],output, 400) < 0)
     {
         printf("Error too many voicefont entries!\n");
@@ -216,4 +216,3 @@ int main (int argc, char** argv)
     return 0;
 }
 #endif
-
