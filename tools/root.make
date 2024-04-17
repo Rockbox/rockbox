@@ -374,7 +374,17 @@ ifdef TTS_ENGINE
 
 voice: voicetools $(BUILDDIR)/apps/features
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
-	for lang in `echo $(VOICELANGUAGE) |sed "s/,/ /g"`; do $(TOOLSDIR)/voice.pl -V -l=$$lang -t=$(MODELNAME)$$feat -i=$(TARGET_ID) -e="$(ENCODER)" -E="$(ENC_OPTS)" -s=$(TTS_ENGINE) -S="$(TTS_OPTS)"; done \
+	for lang in `echo $(VOICELANGUAGE) |sed "s/,/ /g"`; do $(TOOLSDIR)/voice.pl -V -l=$$lang -t=$(MODELNAME)$$feat -i=$(TARGET_ID) -e="$(ENCODER)" -E="$(ENC_OPTS)" -s=$(TTS_ENGINE) -S="$(TTS_OPTS)"; done
+
+talkclips: voicetools
+	$(SILENT)if [ -z '$(TALKDIR)' ] ; then \
+		echo "Must specify TALKDIR"; \
+	else \
+		for lang in `echo $(VOICELANGUAGE) |sed "s/,/ /g"`; do $(TOOLSDIR)/voice.pl -C -l=$$lang -e="$(ENCODER)" -E="$(ENC_OPTS)" -s=$(TTS_ENGINE) -S="$(TTS_OPTS)" $(FORCE) "$(TALKDIR)" ; done \
+	fi
+
+talkclips-force: FORCE=-F
+talkclips-force: talkclips
 
 endif
 

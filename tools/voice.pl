@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use File::Basename;
 use File::Copy;
-use vars qw($V $C $t $l $e $E $s $S $i $v $f);
+use vars qw($V $C $t $l $e $E $s $S $i $v $f $F);
 use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
@@ -63,6 +63,8 @@ Usage: voice.pl [options] [path to dir]
  -S=<TTS engine options>
     Options to pass to the TTS engine. Enclose in double quotes if the
     options include spaces.
+
+ -F Force the file to be regenerated even if present
 
  -v
     Be verbose
@@ -125,6 +127,7 @@ my %espeak_lang_map = (
 );
 
 my $trim_thresh = 500;   # Trim silence if over this, in ms
+my $force = 0;           # Don't regenerate files already present
 
 # Initialize TTS engine. May return an object or value which will be passed
 # to voicestring and shutdown_tts
@@ -427,7 +430,7 @@ sub generateclips {
                 }
 
                 # Don't generate encoded file if it already exists (probably from the POOL)
-                if (! -f $enc) {
+                if (! -f $enc && !$force) {
                     if ($id eq "VOICE_PAUSE") {
                         print("Use distributed $wav\n") if $verbose;
                         copy(dirname($0)."/VOICE_PAUSE.wav", $wav);
@@ -540,7 +543,7 @@ sub gentalkclips {
 
         printf("Talkclip %s: %s", $enc, $voice) if $verbose;
 	# Don't generate encoded file if it already exists
-	next if (-f $enc);
+	next if (-f $enc && !$force);
 
 	voicestring($voice, $wav, $tts_engine_opts, $tts_object);
 	wavtrim($wav, $trim_thresh, $tts_object);
@@ -563,6 +566,7 @@ sub gentalkclips {
 
 # Check parameters
 my $printusage = 0;
+
 unless (defined($V) or defined($C)) { print("Missing either -V or -C\n"); $printusage = 1; }
 if (defined($V)) {
     unless (defined($l)) { print("Missing -l argument\n"); $printusage = 1; }
@@ -575,6 +579,9 @@ if (defined($V)) {
 elsif (defined($C)) {
     unless (defined($ARGV[0])) { print "Missing path argument\n"; $printusage = 1; }
 }
+
+$force = 1 if (defined($F));
+
 unless (defined($e)) { print("Missing -e argument\n"); $printusage = 1; }
 unless (defined($E)) { print("Missing -E argument\n"); $printusage = 1; }
 unless (defined($s)) { print("Missing -s argument\n"); $printusage = 1; }
