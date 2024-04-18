@@ -425,6 +425,7 @@ sub generateclips {
                                          $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;
+                        system("touch $pool_file"); # So we know it's still being used.
                         copy($pool_file, $enc);
                     }
                 }
