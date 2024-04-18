@@ -2266,11 +2266,6 @@
     charging: "Backlight (While Plugged In)"
   </voice>
 </phrase>
-### The <source> section for 'LANG_BACKLIGHT_ON_BUTTON_HOLD:*' differs from the english!
-### the previously used one is commented below:
-### Backlight on Lock
-### The <dest> section for 'LANG_BACKLIGHT_ON_BUTTON_HOLD:*' is missing! Copying from english!
-### The <voice> section for 'LANG_BACKLIGHT_ON_BUTTON_HOLD:*' is missing! Copying from english!
 <phrase>
   id: LANG_BACKLIGHT_ON_BUTTON_HOLD
   desc: in lcd settings
@@ -5347,12 +5342,10 @@
     recording: ""
   </source>
   <dest>
-    *: none
-    recording: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16568,5 +16561,19 @@
   </dest>
   <voice>
     *: "Go to Last Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Database Directory"
+  </dest>
+  <voice>
+    *: "Database Directory"
   </voice>
 </phrase>
