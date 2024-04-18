@@ -647,7 +647,7 @@ static void d_line(struct rocklua_image *img,
     img_vp.fg_pattern = 0x55 * (~(*clr) & 3);
     img_vp.drawmode = DRMODE_FG;
 #elif LCD_DEPTH > 1
-    img_vp.fg_pattern = *clr;
+    img_vp.fg_pattern = FB_UNPACK_SCALAR_LCD(*clr);
     img_vp.drawmode = DRMODE_FG;
 #else /* bit of a hack to make sure lines show properly from lua */
       /* use rb.lcd_drawline if you want full control */
