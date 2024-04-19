@@ -488,7 +488,7 @@ int ft_assemble_path(char *buf, size_t bufsz, const char* currdir, const char* f
         {
             len = path_append(buf, root_realpath(), currdir, bufsz);
             if (len < bufsz)
-                len = path_append(buf, buf + len, filename, bufsz - len);
+                len = path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
         }
         len = path_append(buf, currdir, filename, bufsz);
     }
@@ -506,7 +506,7 @@ int ft_assemble_path(char *buf, size_t bufsz, const char* currdir, const char* f
     {
         len = path_append(buf, root_realpath(), currdir, bufsz);
         if(len < bufsz)
-            len = path_append(buf, buf + len, filename, bufsz - len);
+            len = path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
     }
     else /* In / */
     {
