@@ -858,7 +858,7 @@
     *: "önceden kesilmiş"
   </dest>
   <voice>
-    *: "önceden kesilmiş	"
+    *: "önceden kesilmiş"
   </voice>
 </phrase>
 <phrase>
@@ -4447,10 +4447,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "Yüksek Band Filtresi	"
+    *: "Yüksek Band Filtresi"
   </dest>
   <voice>
-    *: "Yüksek Band Filtresi	"
+    *: "Yüksek Band Filtresi"
   </voice>
 </phrase>
 <phrase>
@@ -5119,10 +5119,10 @@
     *: "View Catalogue"
   </source>
   <dest>
-    *: "Kataloğu Görüntüle	"
+    *: "Kataloğu Görüntüle"
   </dest>
   <voice>
-    *: "Kataloğu Görüntüle	"
+    *: "Kataloğu Görüntüle"
   </voice>
 </phrase>
 <phrase>
@@ -6727,10 +6727,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Dosya Tarayıcı konumunda başlatın	"
+    *: "Dosya Tarayıcı konumunda başlatın"
   </dest>
   <voice>
-    *: "Dosya Tarayıcı konumunda başlatın	"
+    *: "Dosya Tarayıcı konumunda başlatın"
   </voice>
 </phrase>
 <phrase>
