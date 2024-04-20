@@ -1159,6 +1159,13 @@ voiceconfig () {
         DEFAULT_TTS_OPTS=$GTTS_OPTS
         DEFAULT_CHOICE="g"
     fi
+    if [ -n "`findtool piper`" ]; then
+        PIPER="(p)iper "
+        PIPER_OPTS=""
+        DEFAULT_TTS="piper"
+        DEFAULT_TTS_OPTS=$PIPER_OPTS
+        DEFAULT_CHOICE="p"
+    fi
     if [ -n "`findtool rbspeak`" ]; then
         RBSPEAK="(O)ther "
         RBSPEAK_OPTS=""
@@ -1167,15 +1174,15 @@ voiceconfig () {
         DEFAULT_CHOICE="O"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC" ] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$GTTS" ] && [ "$GTTS" = "$RBSPEAK" ] ; then
-        echo "You need Festival, eSpeak, Mimic, Flite, gtts, or rbspeak in your path, or SAPI available to build voice files"
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC" ] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$GTTS" ] && [ "$GTTS" = "$PIPER" ] && [ "$PIPER" = "$RBSPEAK" ] ; then
+        echo "You need Festival, eSpeak, Mimic, Flite, piper, gtts, or rbspeak in your path, or SAPI available to build voice files"
         exit 3
     fi
 
     if [ "$ARG_TTS" ]; then
         option=$ARG_TTS
     else
-        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${GTTS}${RBSPEAK}(${DEFAULT_CHOICE})?"
+        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${GTTS}${RBSPEAK}${PIPER}(${DEFAULT_CHOICE})?"
         option=`input`
         if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
         advopts="$advopts --tts=$option"
@@ -1208,6 +1215,10 @@ voiceconfig () {
 	[Gg]|gtts)
         TTS_ENGINE="gtts"
         TTS_OPTS=$GTTS_OPTS
+	;;
+	[Pp]|piper)
+        TTS_ENGINE="piper"
+        TTS_OPTS=$PIPER_OPTS
 	;;
 	[Oo]|rbspeak)
         TTS_ENGINE="rbspeak"
@@ -1247,6 +1258,39 @@ voiceconfig () {
         advopts="$advopts --voice=$CHOICE"
         echo "Festival voice set to $TTS_FESTIVAL_VOICE"
         echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
+    elif [ "$TTS_ENGINE" = "piper" ]; then
+	if [ -z "$PIPER_MODEL_DIR" ]; then
+	    echo "Please set PIPER_MODEL_DIR!";
+	    exit 1
+	fi
+	models=`(cd $PIPER_MODEL_DIR ; ls -1 *onnx)`
+	for model in $models; do
+	    PIPER_MODEL="$model"  # Default
+	    break;
+        done
+        if [ "$ARG_VOICE" ]; then
+            CHOICE=$ARG_VOICE
+        else
+	    i=1
+	    for model in $models; do
+		printf "%3d. %s\n" "$i" "$model"
+                i=`expr $i + 1`
+            done
+            printf "Please select which piper model to use (default is $PIPER_MODEL): "
+            CHOICE=`input`
+	fi
+        i=1
+        for model in $models; do
+            if [ "$i" = "$CHOICE" -o "$model" = "$CHOICE" ]; then
+                PIPER_MODEL="$model"
+		break;
+            fi
+            i=`expr $i + 1`
+        done
+
+	TTS_OPTS="$TTS_OPTS --model $PIPER_MODEL_DIR/$PIPER_MODEL"
+        advopts="$advopts --voice=$PIPER_MODEL"
+        echo "Piper model set to $PIPER_MODEL"
     elif [ "$TTS_ENGINE" = "mimic" ]; then
 	voicelist=`mimic -lv | cut -d':' -f2`
         for voice in $voicelist; do
@@ -1268,6 +1312,7 @@ voiceconfig () {
         for voice in $voicelist; do
             if [ "$i" = "$CHOICE" -o "$voice" = "$CHOICE" ]; then
                 TTS_MIMIC_VOICE="$voice"
+		break
             fi
             i=`expr $i + 1`
         done
@@ -4756,6 +4801,7 @@ export ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
 export ANDROID_SDK_PATH=${ANDROID_SDK_PATH}
 export ANDROID_PLATFORM_VERSION=${ANDROID_PLATFORM_VERSION}
 export TOOLSET=${toolset}
+export PIPER_MODEL_DIR=${PIPER_MODEL_DIR}
 $CCACHE_ARG
 
 CONFIGURE_OPTIONS=${cmdline}

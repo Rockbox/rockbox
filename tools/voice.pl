@@ -42,7 +42,8 @@ Usage: voice.pl [options] [path to dir]
     Specify which target you want to build voicefile for. Must include
     any features that target supports.
 
- -f=<file> Use existing voiceids file
+ -f=<file>
+    Use existing voiceids file
 
  -i=<target_id>
     Numeric target id. Needed for voice building.
@@ -64,7 +65,8 @@ Usage: voice.pl [options] [path to dir]
     Options to pass to the TTS engine. Enclose in double quotes if the
     options include spaces.
 
- -F Force the file to be regenerated even if present
+ -F
+    Force the file to be regenerated even if present
 
  -v
     Be verbose
@@ -73,57 +75,78 @@ USAGE
 }
 
 my %festival_lang_map = (
-                           'english' => 'english',
-			   'english-us' => 'english',
-			   'espanol' => 'spanish',
-			  #'finnish' => 'finnish'
-			  #'italiano' => 'italian',
-                          #'czech' => 'czech',
-			  #'welsh' => 'welsh'
+    'english' => 'english',
+    'english-us' => 'english',
+    'espanol' => 'spanish',
+    #'finnish' => 'finnish'
+    #'italiano' => 'italian',
+    #'czech' => 'czech',
+    #'welsh' => 'welsh'
 );
 
 my %gtts_lang_map = (
     'english' => '-l en -t co.uk',  # Always first, it's the golden master
-	'czech' => '-l cs',   # not supported
-	'dansk' => '-l da',
-	'deutsch' => '-l de',
-	'english-us' => '-l en -t us',
-	'espanol' => '-l es',
-	'francais' => '-l fr',
-	'greek' => '-l el',
-	'magyar' => '-l hu',
-	'italiano' => '-l it',
-	'nederlands' => '-l nl',
-	'norsk' => '-l no',
-	'polski' => '-l pl',
-	'russian' => '-l ru',
-	'slovak' => '-l sk',
-	'srpski' => '-l sr',
-	'svenska' => '-l sv',
-	'turkce' => '-l tr',
+    'czech' => '-l cs',
+    'dansk' => '-l da',
+    'deutsch' => '-l de',
+    'english-us' => '-l en -t us',
+    'espanol' => '-l es',
+    'francais' => '-l fr',
+    'greek' => '-l el',
+    'magyar' => '-l hu',
+    'italiano' => '-l it',
+    'nederlands' => '-l nl',
+    'norsk' => '-l no',
+    'polski' => '-l pl',
+    'russian' => '-l ru',
+    'slovak' => '-l sk',
+    'srpski' => '-l sr',
+    'svenska' => '-l sv',
+    'turkce' => '-l tr',
 );
 
 my %espeak_lang_map = (
-    'english' => 'en-gb',  # Always first, it's the golden master
-	'czech' => 'cs',
-	'dansk' => 'da',
-	'deutsch' => 'de',
-        'english-us' => 'en-us',
-	'espanol' => 'es',
-	'francais' => 'fr-fr',
-	'greek' => 'el',
-        'nederlands' => 'nl',
-        'magyar' => 'hu',
-        'italiano' => 'it',
-        'japanese' => 'ja',
-        'nederlands' => 'nl',
-        'norsk' => 'no',
-        'polski' => 'pl',
-        'russian' => 'ru',
-        'slovak' => 'sk',
-        'srpski' => 'sr',
-        'svenska' => 'sv',
-        'turkce' => 'tr',
+    'english' => '-ven-gb -k 5',  # Always first, it's the golden master
+    'czech' => '-vcs',
+    'dansk' => '-vda',
+    'deutsch' => '-vde',
+    'english-us' => '-ven-us -k 5',
+    'espanol' => '-ves',
+    'francais' => '-vfr-fr',
+    'greek' => '-vel',
+    'magyar' => '-vhu',
+    'italiano' => '-vit',
+    'japanese' => '-vja',
+    'nederlands' => '-vnl',
+    'norsk' => '-vno',
+    'polski' => '-vpl',
+    'russian' => '-vru',
+    'slovak' => '-vsk',
+    'srpski' => '-vsr',
+    'svenska' => '-vsv',
+    'turkce' => '-vtr',
+    );
+
+my %piper_lang_map = (
+    'english' => 'en_GB-cori-high.onnx',  # Always first, it's the golden master
+    'czech' => 'cs_CZ-jirka-medium.onnx',
+    'dansk' => 'da_DK-talesyntese-medium.onnx',
+    'deutsch' => 'de_DE-thorsten-high.onnx',
+    'english-us' => 'en_US-libritts-high.onnx',
+    'espanol' => 'es_ES-sharvard-medium.onnx',
+    'francais' => 'fr_FR-siwis-medium.onnx',
+    'greek' => 'el_GR-rapunzelina-low.onnx',
+#    'magyar' => '-vhu',
+    'italiano' => 'it_IT-riccardo-x_low.onnx',
+#    'japanese' => '-vja',
+    'nederlands' => 'nl_NL-mls-medium.onnx',
+    'norsk' => 'no_NO-talesyntese-medium.onnx',
+    'polski' => 'pl_PL-gosia-medium.onnx',
+    'russian' => 'ru_RU-irina-medium.onnx',
+    'slovak' => 'sk_SK-lili-medium.onnx',
+    'srpski' => 'sr_RS-serbski_institut-medium.onnx',
+    'svenska' => 'sv_SE-nst-medium.onnx',
+    'turkce' => 'tr_TR-fettah-medium.onnx',
 );
 
 my $trim_thresh = 500;   # Trim silence if over this, in ms
@@ -141,6 +164,7 @@ sub init_tts {
     # Don't use given/when here - it's not compatible with old perl versions
     if ($tts_engine eq 'festival') {
         print("> festival $tts_engine_opts --server\n") if $verbose;
+        # Open command, and filehandles for STDIN, STDOUT, STDERR
         my $pid = open(FESTIVAL_SERVER, "| festival $tts_engine_opts --server > /dev/null 2>&1");
         my $dummy = *FESTIVAL_SERVER; #suppress warning
         $SIG{INT} = sub { kill TERM => $pid; print("foo"); panic_cleanup(); };
@@ -148,6 +172,21 @@ sub init_tts {
         $ret{"pid"} = $pid;
         if (defined($festival_lang_map{$language}) && $tts_engine_opts !~ /--language/) {
             $ret{"ttsoptions"} = "--language $festival_lang_map{$language} ";
+        }
+    } elsif ($tts_engine eq 'piper') {
+	my $cmd = "piper $tts_engine_opts --json-input";
+        print("> $cmd\n") if $verbose;
+
+        my $pid = open3(*CMD_IN, *CMD_OUT, *CMD_ERR, $cmd);
+        $SIG{INT} = sub { kill TERM => $pid; print("foo"); panic_cleanup(); };
+        $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
+        $ret{"pid"} = $pid;
+        binmode(*CMD_IN, ':encoding(utf8)');
+        binmode(*CMD_OUT, ':encoding(utf8)');
+        binmode(*CMD_ERR, ':encoding(utf8)');
+	if (defined($piper_lang_map{$language}) && $tts_engine_opts !~ /--model/) {
+	    die("Need PIPER_MODEL_DIR\n") if (!defined($ENV{'PIPER_MODEL_DIR'}));
+            $ret{"ttsoptions"} = "--model $ENV{PIPER_MODEL_DIR}/$piper_lang_map{$language} ";
         }
     } elsif ($tts_engine eq 'sapi') {
         my $toolsdir = dirname($0);
@@ -176,7 +215,7 @@ sub init_tts {
         }
     } elsif ($tts_engine eq 'espeak' || $tts_engine eq 'espeak-ng') {
         if (defined($espeak_lang_map{$language}) && $tts_engine_opts !~ /-v/) {
-            $ret{"ttsoptions"} = "-v$espeak_lang_map{$language} ";
+            $ret{"ttsoptions"} = " $espeak_lang_map{$language} ";
         }
     }
 
@@ -188,6 +227,10 @@ sub shutdown_tts {
     my ($tts_object) = @_;
     if ($$tts_object{'name'} eq 'festival') {
         # Send SIGTERM to festival server
+        kill TERM => $$tts_object{"pid"};
+    }
+    elsif ($$tts_object{'name'} eq 'piper') {
+        # Send SIGTERM to piper
         kill TERM => $$tts_object{"pid"};
     }
     elsif ($$tts_object{'name'} eq 'sapi') {
@@ -243,6 +286,13 @@ sub voicestring {
         }
         close(CMD_OUT);
         close(CMD_ERR);
+    }
+    elsif ($name eq 'piper') {
+	$cmd = "{ \"text\": \"$string\", \"output_file\": \"$output\" }";
+        print(">> $cmd\n") if $verbose;
+	print(CMD_IN "$cmd\n");
+	my $res = <CMD_OUT>;
+	$res = <CMD_ERR>;
     }
     elsif ($name eq 'flite') {
         $cmd = "flite $tts_engine_opts -t \"$string\" \"$output\"";
@@ -469,7 +519,6 @@ sub generateclips {
     print("\n");
 
     unlink($updfile) if (-f $updfile);
-    shutdown_tts($tts_object);
 }
 
 # Assemble the voicefile
@@ -608,6 +657,7 @@ if ($V == 1) {
            defined($t) ? $t : "unknown",
            $l, $e, $E, $s, $S);
     generateclips($l, $t, $e, $E, $tts_object, $S, $f);
+    shutdown_tts($tts_object);
     createvoice($l, $i, $f);
     deleteencs();
 } elsif ($C) {
