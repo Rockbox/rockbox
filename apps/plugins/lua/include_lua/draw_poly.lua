@@ -46,7 +46,9 @@ local _poly = {} do
     local flood_fill
 
     -- draws a non-filled figure based on points in t-points
-    local function polyline(img, x, y, t_pts, color, bClosed, bClip, scale_x, scale_y)
+    local function polyline(img, x, y, t_pts, color, bClosed, bClip, scale_x, scale_y, b_size_only)
+        local draw_fn = _line
+        if b_size_only == true then draw_fn = function() end end
         scale_x = scale_x or 1
         scale_y = scale_y or 1
 
@@ -69,8 +71,7 @@ local _poly = {} do
             else
                 pt2 = {t_pts[i] * scale_x, t_pts[i + 1] * scale_y}
             end-- first and last point
-
-            _line(img, pt1[1] + x, pt1[2] + y, pt2[1] + x, pt2[2] + y, color, bClip)
+            draw_fn(img, pt1[1] + x, pt1[2] + y, pt2[1] + x, pt2[2] + y, color, bClip)
             if pt1[1] > max_x then max_x = pt1[1] end
             if pt1[2] > max_y then max_y = pt1[2] end
         end
@@ -80,12 +81,12 @@ local _poly = {} do
     end
 
     -- draws a closed figure based on points in t_pts
-    _poly.polygon = function(img, x, y, t_pts, color, fillcolor, bClip, scale_x, scale_y)
+    _poly.polygon = function(img, x, y, t_pts, color, fillcolor, bClip, scale_x, scale_y, b_size_only)
         scale_x = scale_x or 1
         scale_y = scale_y or 1
         if #t_pts < 2 then error("not enough points", 3) end
 
-        if fillcolor then
+        if fillcolor and b_size_only ~= true then
             flood_fill = flood_fill or require("draw_floodfill")
             local x_min, x_max = 0, 0
             local y_min, y_max = 0, 0
@@ -119,7 +120,7 @@ local _poly = {} do
                   _NIL, _NIL, _NIL, _NIL, bClip, BSAND, fillcolor)
         end
 
-        polyline(img, x, y, t_pts, color, true, bClip, scale_x, scale_y)
+        return polyline(img, x, y, t_pts, color, true, bClip, scale_x, scale_y, b_size_only)
     end
 
     -- expose internal functions to the outside through _poly table
