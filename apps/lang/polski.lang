@@ -15700,16 +15700,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Załaduj ponownie po zapisaniu"
+    *: ""
   </dest>
   <voice>
-    *: "Załaduj ponownie po zapisaniu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16570,5 +16570,33 @@
   </dest>
   <voice>
     *: "Przejdź do ostatniego albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Katalog bazy danych"
+  </dest>
+  <voice>
+    *: "Katalog bazy danych"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Usunąć zakolejkowane utwory?"
+  </dest>
+  <voice>
+    *: "Usunąć zakolejkowane utwory?"
   </voice>
 </phrase>
