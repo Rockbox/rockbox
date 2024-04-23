@@ -440,7 +440,11 @@ $releasenotes="/wiki/ReleaseNotes315";
         manualok => 1, # Remove once status moves to 3
     },
     'aigoerosq' => {
-        name => 'AIGO EROS Q / K',
+        name => 'AIGO EROS Q / K (Hosted)',
+        status => 2,
+    },
+    'erosqnative' => {
+        name => 'AIGO EROS Q / K (Native)',
         status => 2,
     },
     'ihifi770' => {
