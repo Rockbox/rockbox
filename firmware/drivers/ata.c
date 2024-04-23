@@ -287,7 +287,6 @@ static int ata_perform_flush_cache(void)
     return 0;
 }
 
-
 static ICODE_ATTR int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
@@ -1092,16 +1091,18 @@ static int set_features(void)
         unsigned char subcommand;
         unsigned char parameter;
     } features[] = {
-        { 83, 14, 0x03, 0 },   /* force PIO mode */
-        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
-        { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
-        { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
+        { 83, 14, 0x03, 0 },   /* force PIO mode by default */
 #ifdef HAVE_ATA_DMA
         { 0, 0, 0x03, 0 },     /* DMA mode */
 #endif
+        /* NOTE: Above two MUST come first! */
+        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
+        { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
+        { 82, 5, 0x02, 0 },    /* enable volatile write cache */
+        { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
     };
     int i;
-    int pio_mode = 2;
+    int pio_mode = 2; /* Lowest */
 
     /* Find out the highest supported PIO mode */
     if (identify_info[53] & (1<<1)) {  /* Is word 64 valid? */
@@ -1115,20 +1116,21 @@ static int set_features(void)
     features[0].parameter = 8 + pio_mode;
 
 #ifdef HAVE_ATA_DMA
-    if (identify_info[53] & (1<<2))
+    if (identify_info[53] & (1<<2)) {
         /* Ultra DMA mode info present, find a mode */
         dma_mode = get_best_mode(identify_info[88], ATA_MAX_UDMA, 0x40);
+    }
 
     if (!dma_mode) {
         /* No UDMA mode found, try to find a multi-word DMA mode */
         dma_mode = get_best_mode(identify_info[63], ATA_MAX_MWDMA, 0x20);
-        features[4].id_word = 63;
+        features[1].id_word = 63;
+    } else {
+        features[1].id_word = 88;
     }
-    else
-        features[4].id_word = 88;
 
-    features[4].id_bit = dma_mode & 7;
-    features[4].parameter = dma_mode;
+    features[1].id_bit = dma_mode & 7;
+    features[1].parameter = dma_mode;
 #endif /* HAVE_ATA_DMA */
 
     ATA_OUT8(ATA_SELECT, ata_device);
