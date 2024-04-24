@@ -16600,3 +16600,45 @@
     *: "Usunąć zakolejkowane utwory?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Szybko (ignoruj pamięć podręczną katalogu)"
+  </dest>
+  <voice>
+    *: "Szybko (ignoruj pamięć podręczną katalogu)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Ekran bieżącego odtwarzania"
+  </dest>
+  <voice>
+    *: "Ekran bieżącego odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Przeglądarka domyślna"
+  </dest>
+  <voice>
+    *: "Przeglądarka domyślna"
+  </voice>
+</phrase>
