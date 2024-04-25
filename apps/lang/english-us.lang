@@ -5342,10 +5342,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -15705,16 +15707,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Reload After Saving"
+    *: ""
   </dest>
   <voice>
-    *: "Reload After Saving"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16575,5 +16577,305 @@
   </dest>
   <voice>
     *: "Database Directory"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Remove Queued Tracks?"
+  </dest>
+  <voice>
+    *: "Remove Queued Tracks?"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Quick (Ignore Directory Cache)"
+  </dest>
+  <voice>
+    *: "Quick (Ignore Directory Cache)"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "What's Playing Screen"
+  </dest>
+  <voice>
+    *: "What's Playing Screen"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Default Browser"
+  </dest>
+  <voice>
+    *: "Default Browser"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze Main Menu"
+  </dest>
+  <voice>
+    *: "Amaze Main Menu"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Set Maze Size"
+  </dest>
+  <voice>
+    *: "Set Maze Size"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "View Map"
+  </dest>
+  <voice>
+    *: "View Map"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Show Compass"
+  </dest>
+  <voice>
+    *: "Show Compass"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Show Map"
+  </dest>
+  <voice>
+    *: "Show Map"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Remember Path"
+  </dest>
+  <voice>
+    *: "Remember Path"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Use Large Tiles"
+  </dest>
+  <voice>
+    *: "Use Large Tiles"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Show Solution"
+  </dest>
+  <voice>
+    *: "Show Solution"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Quit without saving"
+  </dest>
+  <voice>
+    *: "Quit without saving"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generating maze..."
+  </dest>
+  <voice>
+    *: "Generating maze..."
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "You win!"
+  </dest>
+  <voice>
+    *: "You win!"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "You cheated!"
+  </dest>
+  <voice>
+    *: "You cheated!"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Easy"
+  </dest>
+  <voice>
+    *: "Easy"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Hard"
+  </dest>
+  <voice>
+    *: "Hard"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Expert"
+  </dest>
+  <voice>
+    *: "Expert"
   </voice>
 </phrase>
