@@ -209,7 +209,10 @@ int make_table(int nchar, uchar * bitlen, int tablebits, ushort * table)
 }
 
 /* huf.c */
-
+#if (__GNUC__ == 14) // XXX nuke later?
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 void read_pt_len(int nn, int nbit, int i_special)
 {
   int i, n;
@@ -247,6 +250,9 @@ void read_pt_len(int nn, int nbit, int i_special)
     make_table(nn, pt_len, 8, pt_table);
   }
 }
+#if (__GNUC__ == 14)
+#pragma GCC diagnostic pop
+#endif
 
 void read_c_len(void)
 {

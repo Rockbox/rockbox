@@ -207,6 +207,10 @@ void celt_iir(const opus_val32 *_x,
 #endif
 }
 
+#if (__GNUC__ == 14) // XXX nuke later?
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 int _celt_autocorr(
                    const opus_val16 *x,   /*  in: [0...n-1] samples x   */
                    opus_val32       *ac,  /* out: [0...lag-1] ac values */
@@ -294,3 +298,6 @@ int _celt_autocorr(
    RESTORE_STACK;
    return shift;
 }
+#if (__GNUC__ == 14)
+#pragma GCC diagnostic pop
+#endif
