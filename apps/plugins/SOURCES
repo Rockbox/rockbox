@@ -112,7 +112,6 @@ pictureflow.c
 metronome.c
 
 2048.c
-amaze.c
 
 /* Lua needs at least 160 KB to work in */
 #if PLUGIN_BUFFER_SIZE >= 0x80000
@@ -122,6 +121,10 @@ lua_scripts.lua
 pixel-painter.lua
 #endif /* HAVE_LCD_COLOR */
 #endif /* PLUGIN_BUFFER_SIZE >= 0x80000 */
+
+#if PLUGIN_BUFFER_SIZE > 0x10000 /* Doesn't fit on most 2Mb targets */
+amaze.c
+#endif
 
 rockblox1d.c
 brickmania.c
