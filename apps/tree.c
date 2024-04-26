@@ -275,8 +275,40 @@ static int tree_voice_cb(int selected_item, void * data)
     }
 
     /* spell name AFTER voicing filetype */
-    if (spell_name)
+    if (spell_name) {
+        /* Don't spell the extension if it's not displayed */
+        if (!is_dir) {
+            bool stripit;
+            switch(global_settings.show_filename_ext) {
+            case 0:
+                /* show file extension: off */
+                stripit = true;
+                break;
+            case 1:
+                /* show file extension: on */
+                stripit = false;
+                break;
+            case 2:
+                /* show file extension: only unknown types */
+                stripit = filetype_supported(attr);
+                break;
+            case 3:
+            default:
+                /* show file extension: only when viewing all */
+                stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
+                          (*(local_tc->dirfilter) != SHOW_ALL);
+                break;
+            }
+
+            if (stripit) {
+                char *ext = strrchr(name, '.');
+                if (ext)
+                    *ext = 0;
+            }
+        }
+
         talk_spell(name, true);
+    }
 
     return 0;
 }
@@ -455,11 +487,11 @@ static int update_dir(void)
                     }
                     icon = filetype_get_icon(ATTR_DIRECTORY);
                 }
-            }           
+            }
         }
     }
 
-    /* set title and icon, if nothing is set, clear the title 
+    /* set title and icon, if nothing is set, clear the title
      * with NULL and icon as NOICON as the list is reused */
     gui_synclist_set_title(list, title, icon);
 
