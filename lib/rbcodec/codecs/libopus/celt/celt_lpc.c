@@ -209,7 +209,7 @@ void celt_iir(const opus_val32 *_x,
 
 #if (__GNUC__ == 14) // XXX nuke later?
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 int _celt_autocorr(
                    const opus_val16 *x,   /*  in: [0...n-1] samples x   */
