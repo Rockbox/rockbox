@@ -469,7 +469,7 @@ static __inline__ void corrupt(const char *msg) {
 void * __attribute__((weak)) get_new_area(size_t * size)
 {
     (void)size;
-    return ((void *) ~0);
+    return ((void *) ~0u);
 }
 #endif
 

@@ -95,5 +95,6 @@ void *get_new_area(size_t *size)
         return audiobuf_ptr;
     }
 
-    return ((void *) ~0);
+    *size = 0;
+    return ((void *) ~0u);
 }
