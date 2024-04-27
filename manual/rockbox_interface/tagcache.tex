@@ -47,30 +47,34 @@ with logging
   \item[Load To RAM]
     The database can either be kept on \disk{} (to save memory), or
     loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
-    the database to RAM, allowing faster browsing and searching. Setting this
-    option to \setting{No} keeps the database on the \disk{}, meaning slower 
-    browsing but it does not use extra RAM and saves some battery on boot up. 
-    
+    the database to RAM, beginning with the next reboot, allowing faster browsing and
+    searching. Setting this option to \setting{No} keeps the database on the \disk{},
+    meaning slower browsing but it does not use extra RAM and saves some battery on
+    boot up.
+
     \opt{HAVE_DISK_STORAGE}{
       If you browse your music frequently using the database, you should
       load to RAM, as this will reduce the overall battery consumption because
       the disk will not need to spin on each search.
     }
 
-    \note{When Load to RAM is turned on, and the directory cache is enabled as well,
-    it may take an unexpectedly long amount of time for disk activity to
-    wind down after booting, depending on your library size and player.
+    \note{When Load to RAM is turned on, and the directory cache (see
+    \reference{ref:dircache}) is enabled as well, it may take an unexpectedly long amount
+    of time for disk activity to wind down after booting, depending on your library size
+    and player.
 
     This can be mitigated by choosing the \setting{Quick} option instead, which causes
-    the database to ignore cached file references. In that case, you may notice brief
-    moments of disk activity once the path for a database entry has to be retrieved.
+    the database to ignore cached file references. In that case, you should expect brief
+    moments of disk activity whenever the path for a database entry has to be retrieved.
 
-    Set to \setting{On}, if you plan to take advantage the database's Update function,
-    or use a WPS that displays multiple upcoming tracks from the current playlist.
-    Otherwise, you may notice file names instead of metadata being displayed for those
-    tracks.}
+    Setting this to \setting{On} may be preferable for reducing disk accesses if you plan to
+    take advantage of \setting{Auto Update}, have enabled \setting{Gather Runtime Data}
+    (see below for both), enabled \setting{Automatic resume} (see
+    \reference{ref:Autoresumeconfigactual}), or use a WPS that displays multiple upcoming
+    tracks from the current playlist. In the latter case, metadata will not be displayed
+    for those tracks otherwise.}
   }
-  
+
 \item[Auto Update]
   If \setting{Auto update} is set to \setting{on}, each time the \dap{}
   boots, the database will automatically be updated.
