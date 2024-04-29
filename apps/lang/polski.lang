@@ -16642,3 +16642,227 @@
     *: "Przeglądarka domyślna"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Menu główne Amaze"
+  </dest>
+  <voice>
+    *: "Menu główne Amejz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Ustaw rozmiar labiryntu"
+  </dest>
+  <voice>
+    *: "Ustaw rozmiar labiryntu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Wyświetl mapę"
+  </dest>
+  <voice>
+    *: "Wyświetl mapę"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Pokaż kompas"
+  </dest>
+  <voice>
+    *: "Pokaż kompas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Pokaż mapę"
+  </dest>
+  <voice>
+    *: "Pokaż mapę"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Zapamiętuj ścieżkę"
+  </dest>
+  <voice>
+    *: "Zapamiętuj ścieżkę"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Używaj dużych płytek"
+  </dest>
+  <voice>
+    *: "Używaj dużych płytek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Pokaż rozwiązanie"
+  </dest>
+  <voice>
+    *: "Pokaż rozwiązanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Wyjdź bez zapisywania"
+  </dest>
+  <voice>
+    *: "Wyjdź bez zapisywania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generowanie labiryntu..."
+  </dest>
+  <voice>
+    *: "Generowanie labiryntu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Wygrana!"
+  </dest>
+  <voice>
+    *: "Wygrana!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Oszustwo!"
+  </dest>
+  <voice>
+    *: "Oszustwo!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Łatwa"
+  </dest>
+  <voice>
+    *: "Łatwa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Średnia"
+  </dest>
+  <voice>
+    *: "Średnia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Trudna"
+  </dest>
+  <voice>
+    *: "Trudna"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Ekspercka"
+  </dest>
+  <voice>
+    *: "Ekspercka"
+  </voice>
+</phrase>
