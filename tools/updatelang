@@ -371,7 +371,11 @@ foreach my $id (@langorder) {
 		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from translated <dest>!\n";
 		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
-
+		    if ($lang{$id}{'voice'}{$tgt} =~ /%/) {
+	                # If it has suspicious characters that are not normally voiced..
+		        $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+			#print "#!! '$id:$tgt' suspicious characters\n";
+		    }
 		} else {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
 
@@ -397,6 +401,11 @@ foreach my $id (@langorder) {
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
 	    }
 	}
+        if ($lp{$tgt} =~ /%/) {
+            # If it has suspicious characters that are not normally voiced..
+            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+#            print "#!! '$id:$tgt' suspicious characters\n";
+        }
     }
 }
 
