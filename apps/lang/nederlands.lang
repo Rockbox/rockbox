@@ -1171,10 +1171,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "Database"
+    *: "Databank"
   </dest>
   <voice>
-    *: "Database"
+    *: "Databank"
   </voice>
 </phrase>
 <phrase>
@@ -3182,7 +3182,7 @@
   <voice>
     *: none
     battery_types: "Nikkelmetaalhydride"
-    xduoox3: "Ouder 1500 milliampère per uur"
+    xduoox3: "Ouder 1500 milliampère uur"
   </voice>
 </phrase>
 <phrase>
@@ -3577,58 +3577,58 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Invoegen"
+    *: ""
   </dest>
   <voice>
-    *: "Invoegen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Invoegen als volgende"
+    *: ""
   </dest>
   <voice>
-    *: "Invoegen als volgende"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Invoegen als laatste"
+    *: ""
   </dest>
   <voice>
-    *: "Invoegen als laatste"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Geschud invoegen"
+    *: ""
   </dest>
   <voice>
-    *: "Geschud invoegen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3861,20 +3861,23 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
   </voice>
 </phrase>
@@ -7043,16 +7046,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Toevoegen aan afspeellijst"
+    *: ""
   </dest>
   <voice>
-    *: "Toevoegen aan afspeellijst"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7266,15 +7269,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Verlichting met vergrendeling"
     hold_button: "Verlichting met Hold-knop"
   </dest>
   <voice>
-    *: none
+    *: "Verlichting met vergrendeling"
     hold_button: "Verlichting met Hold-knop"
   </voice>
 </phrase>
@@ -8479,19 +8482,17 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Instellen Als Opnamemap"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: "Instellen Als Opnamemap"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10562,16 +10563,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Geschud onderaan wachtrij plaatsen"
+    *: ""
   </dest>
   <voice>
-    *: "Geschud onderaan wachtrij plaatsen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11476,16 +11477,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Bestandsbeheer hier starten"
+    *: ""
   </dest>
   <voice>
-    *: "Bestandsbeheer hier starten"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11608,16 +11609,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Instellen als afspeellijstcatalogusmap"
+    *: ""
   </dest>
   <voice>
-    *: "Instellen als afspeellijstcatalogusmap"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11667,16 +11668,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTOMATIC
-  desc: generic automatic
+  desc: deprecated
   user: core
   <source>
-    *: "Automatic"
+    *: ""
   </source>
   <dest>
-    *: "Automatisch"
+    *: ""
   </dest>
   <voice>
-    *: "Automatisch"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14800,16 +14801,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Afspeellijst wissen"
+    *: ""
   </dest>
   <voice>
-    *: "Afspeellijst wissen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14856,7 +14857,7 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
@@ -15855,16 +15856,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Herladen na Opslaan"
+    *: ""
   </dest>
   <voice>
-    *: "Herladen na Opslaan"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16322,5 +16323,549 @@
     *: none
     clear_settings_on_hold,iriverh10: "Instellingen wissen wanneer de resetknop wordt ingedrukt tijdens het opstarten"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Instellingen wissen wanneer de houd schakelaar aan staat tijdens het opstarten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Terugspoelen Over Tracks"
+  </dest>
+  <voice>
+    *: "Terugspoelen over tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Set As..."
+  </dest>
+  <voice>
+    *: "Set As..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Afspeellijstmap"
+  </dest>
+  <voice>
+    *: "Afspeellijst map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Startmap"
+  </dest>
+  <voice>
+    *: "Start map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Opnamemap"
+  </dest>
+  <voice>
+    *: none
+    recording: "Opname map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Voeg toe aan Afspeellijst..."
+  </dest>
+  <voice>
+    *: "Voeg toe aan Afspeellijst..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Voeg toe aan Bestaande Afspeellijst"
+  </dest>
+  <voice>
+    *: "Voeg toe aan Bestaande Afspeellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Hier Na..."
+  </dest>
+  <voice>
+    *: "Hier na..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Speel volgende"
+  </dest>
+  <voice>
+    *: "Speel volgende"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Voeg Shuffled toe"
+  </dest>
+  <voice>
+    *: "Voeg Shuffled toe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Laatste Afspelen"
+  </dest>
+  <voice>
+    *: "Laatste Afspelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Speel Laatst Geshuffled"
+  </dest>
+  <voice>
+    *: "Speel Laatst Geshuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Volume Aanpas Modus"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Volume Aanpas Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Aantal Volumestappen"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Aantal Volumestappen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Perceptueel"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Perceptueel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Toon Tracks Tijdens Browsen"
+  </dest>
+  <voice>
+    *: "Toon Tracks Tijdens Browsen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Ga naar Laatste Album"
+  </dest>
+  <voice>
+    *: "Ga naar Laatste Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Databankmap"
+  </dest>
+  <voice>
+    *: "Databank map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Verwijder Queued Tracks?"
+  </dest>
+  <voice>
+    *: "Verwijder Queued Tracks?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Snel (Negeer Mapcache)"
+  </dest>
+  <voice>
+    *: "Snel (Negeer Map cache)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Wat er nu Speelt Scherm"
+  </dest>
+  <voice>
+    *: "Wat er nu Speelt Scherm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Standaard Browser"
+  </dest>
+  <voice>
+    *: "Standaard Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze Hoofdmenu"
+  </dest>
+  <voice>
+    *: "Amaze Hoofdmenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Stel Doolhofgrootte in"
+  </dest>
+  <voice>
+    *: "Stel Doolhofgrootte in"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Bekijk Kaart"
+  </dest>
+  <voice>
+    *: "Bekijk Kaart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Toon Kompas"
+  </dest>
+  <voice>
+    *: "Toon Kompas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Toon Kaart"
+  </dest>
+  <voice>
+    *: "Toon Kaart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Onthoud Pad"
+  </dest>
+  <voice>
+    *: "Onthoud Pad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Gebruik Grote Tegels"
+  </dest>
+  <voice>
+    *: "Gebruik Grote Tegels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Toon Oplossing"
+  </dest>
+  <voice>
+    *: "Toon Oplossing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Stoppen zonder op te slaan"
+  </dest>
+  <voice>
+    *: "Stoppen zonder op te slaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Doolhof maken..."
+  </dest>
+  <voice>
+    *: "Doolhof maken..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Jij wint!"
+  </dest>
+  <voice>
+    *: "Jij wint!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Je hebt valsgespeeld!"
+  </dest>
+  <voice>
+    *: "Je hebt valsgespeeld!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Gemakkelijk"
+  </dest>
+  <voice>
+    *: "Gemakkelijk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Moeilijk"
+  </dest>
+  <voice>
+    *: "Moeilijk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Expert"
+  </dest>
+  <voice>
+    *: "Expert"
   </voice>
 </phrase>
