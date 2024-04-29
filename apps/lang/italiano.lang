@@ -2260,15 +2260,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Retroilluminazione Sul tasto di blocco"
   </dest>
   <voice>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "RetroIlluminazione sul tasto di blocco"
   </voice>
 </phrase>
@@ -15861,16 +15861,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Ricarica Dopo Il Salvataggio"
+    *: ""
   </dest>
   <voice>
-    *: "Ricarica Dopo Il Salvataggio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16105,10 +16105,10 @@
     *: "Album Art"
   </source>
   <dest>
-    *: "Album Art"
+    *: "Copertina Album"
   </dest>
   <voice>
-    *: "Album Art"
+    *: "Copertina Album"
   </voice>
 </phrase>
 <phrase>
@@ -16564,5 +16564,299 @@
   </dest>
   <voice>
     *: "Vai all'Ultimo Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Directory Del Database"
+  </dest>
+  <voice>
+    *: "Directory Del Database"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Rimuovere Le Tracce In Coda?"
+  </dest>
+  <voice>
+    *: "Rimuovere Le Tracce In Coda?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Veloce (Ignora Cache Della Directory)"
+  </dest>
+  <voice>
+    *: "Veloce (Ignora Cache Della Directory)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Schermata Di Riproduzione"
+  </dest>
+  <voice>
+    *: "Schermata Di Riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Browser Predefinito"
+  </dest>
+  <voice>
+    *: "Browser Predefinito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Menu Principale Labirinto"
+  </dest>
+  <voice>
+    *: "Menu Principale Labirinto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Imposta la dimensione del labirinto"
+  </dest>
+  <voice>
+    *: "Imposta la dimensione del labirinto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Visualizza Mappa"
+  </dest>
+  <voice>
+    *: "Visualizza Mappa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Mostra la bussola"
+  </dest>
+  <voice>
+    *: "Mostra la bussola"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Mostra la mappa"
+  </dest>
+  <voice>
+    *: "Mostra la mappa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Ricorda il percorso"
+  </dest>
+  <voice>
+    *: "Ricorda il percorso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Usa Piastrelle Grandi"
+  </dest>
+  <voice>
+    *: "Usa Piastrelle Grandi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Mostra la soluzione"
+  </dest>
+  <voice>
+    *: "Mostra la soluzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Esci senza salvare"
+  </dest>
+  <voice>
+    *: "Esci senza salvare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generating maze..."
+  </dest>
+  <voice>
+    *: "Generating maze..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Hai vinto!"
+  </dest>
+  <voice>
+    *: "Hai vinto!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Hai barato!"
+  </dest>
+  <voice>
+    *: "Hai barato!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Facile"
+  </dest>
+  <voice>
+    *: "Facile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medio"
+  </dest>
+  <voice>
+    *: "Medio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Impegnativo"
+  </dest>
+  <voice>
+    *: "Impegnativo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Esperto"
+  </dest>
+  <voice>
+    *: "Esperto"
   </voice>
 </phrase>
