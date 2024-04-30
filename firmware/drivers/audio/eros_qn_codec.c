@@ -51,10 +51,14 @@ int eros_qn_get_volume_limit(void)
 
 void eros_qn_switch_output(int select)
 {
-    if (select == 0)
+    /* normal operation 0, reverse operation 1, or always 0 */
+    if ((select == 0 && global_settings.stereosw_mode == 0) \
+        || (select == 1 && global_settings.stereosw_mode == 1) \
+        || global_settings.stereosw_mode == 2)
     {
         gpio_set_level(GPIO_STEREOSW_SEL, 0);
     }
+    /* normal operation 1, reverse operation 0, or always 1 */
     else
     {
         gpio_set_level(GPIO_STEREOSW_SEL, 1);

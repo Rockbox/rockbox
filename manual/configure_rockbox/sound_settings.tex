@@ -193,6 +193,24 @@ change to customise your listening experience.
   the effect of widening the stereo field. A value of 100\% will leave the
   stereo field unaltered.
 
+\opt{erosqnative}{
+  \section{Stereo Switch Mode}
+  The Eros Q and related devices contain a stereo switch in the audio path.
+  This may be connected differently depending on the hardware revision. This
+  setting allows the behavior of the stereo switch to be changed if one of
+  the two outputs (Headphones or Line Out) is not working. There are four modes:
+  \begin{description}
+    \item[Normal.]
+      Headphones output uses a value of 0, and Line Out uses a value of 1.
+    \item[Reverse.]
+      Headphones output uses a value of 1, and Line Out uses a value of 0.
+    \item[Always 0.]
+      Both outputs use a value of 0.
+    \item[Always 1.]
+      Both outputs use a value of 1.
+  \end{description}
+}
+
 \opt{dac_power_mode}{
   \opt{fiiom3k}{
   \section{DAC Power Mode}

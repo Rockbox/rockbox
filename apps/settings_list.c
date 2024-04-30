@@ -2295,6 +2295,11 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, clear_settings_on_hold, LANG_CLEAR_SETTINGS_ON_HOLD,
                   true, "clear settings on hold", NULL),
 #endif
+#if defined(HAVE_EROS_QN_CODEC)
+    CHOICE_SETTING(0, stereosw_mode, LANG_STEREOSW_MODE, 0, "stereo switch mode",
+    "normal,reverse,always0,always1", sound_settings_apply, 4,
+    ID2P(LANG_NORMAL), ID2P(LANG_REVERSE), ID2P(LANG_ALWAYS_ZERO), ID2P(LANG_ALWAYS_ONE)),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

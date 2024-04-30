@@ -899,6 +899,9 @@ struct user_settings
     (CONFIG_KEYPAD == IRIVER_H10_PAD)
     bool clear_settings_on_hold;
 #endif
+#if defined(HAVE_EROS_QN_CODEC)
+    int stereosw_mode; /* indicates normal, reverse, always 0, always 1 operation */
+#endif
 };
 
 /** global variables **/
