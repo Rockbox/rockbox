@@ -124,6 +124,37 @@ sub combinetgts {
     return %combined;
 }
 
+sub reduceformat($) {
+    my ($in) = @_;
+    my $out = "";
+    my $infmt = 0;
+
+    for (my $i = 0; $i < length($in) ; $i++) {
+	my $c = substr($in, $i, 1);
+	if (!$infmt && ($c eq '%')) {
+	    # First char in a format string!
+	    $infmt = 1;
+	    next;
+	}
+	next if (!$infmt);
+
+	if ($c ne '%') {
+	    # Ignore literal %, otherwise dump specifier over
+	    $out .= $c;
+	}
+
+	# Look for a terminating field:
+	my $count = $c =~ tr/sSdDuUxXzZ%//;
+	if ($count) {
+	    $infmt = 0;
+	    next;
+	}
+    }
+
+    return $out;
+}
+
+
 ##################
 
 if($#ARGV != 2) {
@@ -332,6 +363,17 @@ foreach my $id (@langorder) {
 	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is identical to english!\n";
 #	    print "#!! '$id:$tgt' dest identical ('$lp{$tgt}')\n";
 	}
+	my $count1 = $ep{$tgt} =~ tr/%//;
+	my $count2 = $lp{$tgt} =~ tr/%//;
+	if ($count1 || $count2) {
+	    my $fmt1 = reduceformat($ep{$tgt});
+	    my $fmt2 = reduceformat($lp{$tgt});
+	    if ($fmt1 ne $fmt2) {
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has incorrect format specifiers! Copying from English!\n";
+		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
+#	        print "#!! '$id:$tgt' dest does not match src format args: '$fmt1' vs '$fmt2'\n";
+	    }
+	}
     }
 }
 
@@ -365,7 +407,7 @@ foreach my $id (@langorder) {
 	    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
-		# If the lang voice string is blank, complain, and copy from English
+		# If the lang voice string is blank, complain and copy from translation
 #		print "#!! '$id:$tgt' voice is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		if ($lang{$id}{'dest'}{$tgt} ne '' &&
 		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
