@@ -139,10 +139,10 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Yükleniyor... %%%d bitti (%s)"
+    *: "Yükleniyor... %d%% bitti (%s)"
   </dest>
   <voice>
-    *: "Yükleniyor... %%%d tamamlandı (%s)"
+    *: "Yükleniyor"
   </voice>
 </phrase>
 <phrase>
@@ -1601,7 +1601,7 @@
     *: "Doğrusal (%)"
   </dest>
   <voice>
-    *: "Doğrusal (%)"
+    *: "Doğrusal yüzde"
   </voice>
 </phrase>
 <phrase>
@@ -1754,7 +1754,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -1779,7 +1779,6 @@
     *: none
     gigabeatfx,mrobe500: "POWER = Geri Döndür"
     gigabeats: "LEFT =  Revert"
-    sansafuzeplus: "BACK = Geri Döndür"
     gogearsa9200: "LEFT = Geri Döndür"
     iaudiom5,iaudiox5: "RECORD = Geri Döndür"
     ipod*,mpiohd300,sansac200*: "MENU = Geri Döndür"
@@ -1788,11 +1787,12 @@
     mrobe100: "DISPLAY = Geri Döndür"
     rtc: "OFF = Geri Döndür"
     samsungyh*: "REW = Geri Döndür"
+    sansafuzeplus: "BACK = Geri Döndür"
     vibe500: "C = Geri Döndür"
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -1978,7 +1978,7 @@
     *: "May"
   </source>
   <dest>
-    *: "May"
+    *: "Mayıs"
   </dest>
   <voice>
     *: "Mayıs"
@@ -2172,19 +2172,22 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro-SD:"
-    xduoox3: "mikro-SD2:"
+    hibylinux: "USB:"
+    multivolume: "HardDisk1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikroSD:"
+    xduoox3: "mikroSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
+    hibylinux: "U S B"
+    multivolume: "Hard Disk 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikroSD"
     xduoox3: "mikroSD2"
   </voice>
@@ -2652,7 +2655,7 @@
     *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: "Düzenleme Modu: %s"
+    *: "Düzenleme Modu: %s %s"
   </dest>
   <voice>
     *: ""
@@ -3887,16 +3890,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTOMATIC
-  desc: generic automatic
+  desc: deprecated
   user: core
   <source>
-    *: "Automatic"
+    *: ""
   </source>
   <dest>
-    *: "Otomatik"
+    *: ""
   </dest>
   <voice>
-    *: "Otomatik"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4112,10 +4115,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Kuyruğa Alınan %d Parça (%s)"
+    *: "Sırada %d Tane Parça (%s)"
   </dest>
   <voice>
-    *: "Kuyruğa Alınan %d Parça (%s)"
+    *: "tane parça sırada"
   </voice>
 </phrase>
 <phrase>
@@ -4691,16 +4694,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
+  desc: deprecated
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: ""
   </source>
   <dest>
-    *: "Oynatma Listesi Katalog Dizini Olarak Ayarla"
+    *: ""
   </dest>
   <voice>
-    *: "Oynatma Listesi Katalog Dizini Olarak Ayarla"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4812,16 +4815,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert"
+    *: ""
   </source>
   <dest>
-    *: "Tak"
+    *: ""
   </dest>
   <voice>
-    *: "Tak"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4871,16 +4874,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
+  desc: deprecated
   user: core
   <source>
-    *: "Start File Browser Here"
+    *: ""
   </source>
   <dest>
-    *: "Dosya Tarayıcısını Buradan Başlat	"
+    *: ""
   </dest>
   <voice>
-    *: "Dosya Tarayıcısını Buradan Başlat"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5656,10 +5659,10 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz Band Kazancı"
+    *: "%d Hz Bant Kazancı"
   </dest>
   <voice>
-    *: "%d Hz Band Kazancı"
+    *: "hertz bant kazancı"
   </voice>
 </phrase>
 <phrase>
@@ -7284,19 +7287,17 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
+  desc: deprecated
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: ""
   </source>
   <dest>
-    *: none
-    recording: "Kayıt Dizini Olarak Ayarla"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: "Kayıt Dizini Olarak Ayarla"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7335,16 +7336,16 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
-    hold_button: "Beklemede Arka Işık"
+    *: "Arka aydınlatma Kilitle"
+    hold_button: "Arka aydınlatma Beklemede tut"
   </dest>
   <voice>
-    *: none
-    hold_button: "Beklemede Arka Işık"
+    *: "Arka aydınlatma Kilitle"
+    hold_button: "Arka aydınlatma Beklemede tut"
   </voice>
 </phrase>
 <phrase>
@@ -7616,16 +7617,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Next"
+    *: ""
   </source>
   <dest>
-    *: "Sonrakini Ekle"
+    *: ""
   </dest>
   <voice>
-    *: "Sonrakini Ekle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7988,16 +7989,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
+  desc: deprecated
   user: core
   <source>
-    *: "Add to Playlist"
+    *: ""
   </source>
   <dest>
-    *: "Oynatma listesine ekle"
+    *: ""
   </dest>
   <voice>
-    *: "Oynatma listesine ekle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8322,11 +8323,11 @@
   </source>
   <dest>
     *: none
-    recording: "-inf"
+    recording: "-sonsuz"
   </dest>
   <voice>
     *: none
-    recording: "eksi sonsuzluk"
+    recording: "eksi sonsuz"
   </voice>
 </phrase>
 <phrase>
@@ -8575,16 +8576,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Karışık Ekle"
+    *: ""
   </dest>
   <voice>
-    *: "Karışık Ekle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8803,16 +8804,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Son Karıştırılanı Ekle"
+    *: ""
   </dest>
   <voice>
-    *: "Son Karıştırılanı Ekle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8910,31 +8911,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "OYNAT=KAPALI olarak ayarla=İptal"
-    gigabeats: "SELECT=GÜÇ Ayarla=İptal"
-    ipod*: "SELECT=Ayarla,MENÜ=İptal"
-    iriverh10,iriverh10_5gb: "SELECT=Ayarla PREV=İptal"
-    mpiohd300: "ENTER=Ayarla MENÜ=İptal"
-    sansafuzeplus: "SELECT=GERİ Ayarla=İptal"
-    vibe500: "Tamam=Ayarla, C=İptal"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9893,16 +9879,16 @@
 </phrase>
 <phrase>
   id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  desc: deprecated
   user: core
   <source>
-    *: "Insert Last"
+    *: ""
   </source>
   <dest>
-    *: "Sona Ekle"
+    *: ""
   </dest>
   <voice>
-    *: "Sona Ekle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10290,10 +10276,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Last.fm Günlüğü"
@@ -14666,58 +14652,58 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Sanatçı]"
+    *: ""
   </dest>
   <voice>
-    *: "Sanatçı"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Başlık]"
+    *: ""
   </dest>
   <voice>
-    *: "Başlık"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Albüm]"
+    *: ""
   </dest>
   <voice>
-    *: "Albüm"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Süre]"
+    *: ""
   </dest>
   <voice>
-    *: "Süre"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15051,16 +15037,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Oynatma listesini temizle"
+    *: ""
   </dest>
   <voice>
-    *: "Oynatma listesini temizle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15107,7 +15093,7 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
@@ -15750,16 +15736,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Listeyi Temizle ve Sonrakini Oynat"
+    *: ""
   </dest>
   <voice>
-    *: "Listeyi Temizle ve Sonrakini Oynat"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15820,16 +15806,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Listeyi Temizle ve Karışık Oynat"
+    *: ""
   </dest>
   <voice>
-    *: "Listeyi Temizle ve Karışık Oynat"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15876,142 +15862,142 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Kaydettikten Sonra Yeniden Yükle"
+    *: ""
   </dest>
   <voice>
-    *: "Kaydettikten Sonra Yeniden Yükle"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Albüm sanatçısı]"
+    *: ""
   </dest>
   <voice>
-    *: "Albüm sanatçısı"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Tür]"
+    *: ""
   </dest>
   <voice>
-    *: "Tür"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Yorum]"
+    *: ""
   </dest>
   <voice>
-    *: "Yorum Yap"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Besteci]"
+    *: ""
   </dest>
   <voice>
-    *: "Besteci"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Yıl]"
+    *: ""
   </dest>
   <voice>
-    *: "Yıl"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Parça numarası]"
+    *: ""
   </dest>
   <voice>
-    *: "Parça numarası"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Disknumarası]"
+    *: ""
   </dest>
   <voice>
-    *: "Disk numarası"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Frekans]"
+    *: ""
   </dest>
   <voice>
-    *: "Frekans"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Bithızı]"
+    *: ""
   </dest>
   <voice>
-    *: "bit hızı"
+    *: ""
   </voice>
 </phrase>
 <phrase>
