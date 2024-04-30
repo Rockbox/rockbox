@@ -370,6 +370,8 @@ foreach my $id (@langorder) {
 	    my $fmt2 = reduceformat($lp{$tgt});
 	    if ($fmt1 ne $fmt2) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has incorrect format specifiers! Copying from English!\n";
+		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "### $lang{$id}{dest}{$tgt}\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 #	        print "#!! '$id:$tgt' dest does not match src format args: '$fmt1' vs '$fmt2'\n";
 	    }
