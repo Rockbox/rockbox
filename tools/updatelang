@@ -363,6 +363,16 @@ foreach my $id (@langorder) {
 	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is identical to english!\n";
 #	    print "#!! '$id:$tgt' dest identical ('$lp{$tgt}')\n";
 	}
+	if ($id eq 'LANG_VOICED_DATE_FORMAT') {
+	    my $sane = $lp{$tgt};
+	    $sane =~ tr/YAmd//d;
+	    if (length($sane) != 0) {
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has illegal characters!  Restoring from English!\n";
+		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "### $lang{$id}{dest}{$tgt}\n";
+		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
+	    }
+	}
 	my $count1 = $ep{$tgt} =~ tr/%//;
 	my $count2 = $lp{$tgt} =~ tr/%//;
 	if ($count1 || $count2) {
