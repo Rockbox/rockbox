@@ -47,7 +47,7 @@ sub parselangfile {
 	    next;
         } elsif($line =~ /^ *#/) {
 	    push(@comments, "$line\n") if ($pos eq 'lang');
-            # comments are ignored!
+            # comments are ignored, but retained!
             next;
         } elsif ($pos eq 'phrase' && $line =~ /^([^:]+): ?(.*)$/) {
 	    $thisphrase{$pos}->{$1} = $2;
@@ -374,16 +374,30 @@ foreach my $id (@langorder) {
 	    }
 	}
 	my $count1 = $ep{$tgt} =~ tr/%//;
-	my $count2 = $lp{$tgt} =~ tr/%//;
+	my $count2 = 0;
+	if (defined($lp{$tgt})) {
+	    $count2 = $lp{$tgt} =~ tr/%//;
+	}
 	if ($count1 || $count2) {
 	    my $fmt1 = reduceformat($ep{$tgt});
-	    my $fmt2 = reduceformat($lp{$tgt});
+	    my $fmt2 = "";
+	    if ($count2) {
+		$fmt2 = reduceformat($lp{$tgt});
+	    }
 	    if ($fmt1 ne $fmt2) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has incorrect format specifiers! Copying from English!\n";
 		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
 		$lang{$id}{'notes'} .= "### $lang{$id}{dest}{$tgt}\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 #	        print "#!! '$id:$tgt' dest does not match src format args: '$fmt1' vs '$fmt2'\n";
+	    }
+	}
+	if (defined($lp{$tgt})) {
+	    $count2 = $lp{$tgt} =~ tr/"//;
+            if ($count2 > 0) {
+		# If it has suspicious characters that are not allowed
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+#               print "#!! '$id:$tgt' suspicious characters\n";
 	    }
 	}
     }
@@ -425,7 +439,7 @@ foreach my $id (@langorder) {
 		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from translated <dest>!\n";
 		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
-		    if ($lang{$id}{'voice'}{$tgt} =~ /%/) {
+		    if ($lang{$id}{'voice'}{$tgt} =~ /%"/) {
 	                # If it has suspicious characters that are not normally voiced..
 		        $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
 			#print "#!! '$id:$tgt' suspicious characters\n";
@@ -455,7 +469,7 @@ foreach my $id (@langorder) {
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
 	    }
 	}
-        if ($lp{$tgt} =~ /%/) {
+        if (defined($lp{$tgt}) && ($lp{$tgt} =~ /%"/)) {
             # If it has suspicious characters that are not normally voiced..
             $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
 #            print "#!! '$id:$tgt' suspicious characters\n";
