@@ -453,6 +453,56 @@ struct dirent * app_readdir(DIR *dirp)
     return (struct dirent *)osdirent;
 }
 
+/* read a directory (reentrant) */
+int app_readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
+{
+    struct __dir *this = (struct __dir *)dirp;
+    if (!this)
+        FILE_ERROR_RETURN(EBADF, -6);
+
+    if (!result)
+        FILE_ERROR_RETURN(EFAULT, -2);
+
+    *result = NULL;
+
+    if (!entry)
+        FILE_ERROR_RETURN(EFAULT, -3);
+
+#ifdef HAVE_MULTIDRIVE
+    if (this->volumes_returned < NUM_VOLUMES)
+    {
+        while (++this->volumes_returned < NUM_VOLUMES)
+        {
+            if (!volume_present(this->volumes_returned))
+                continue;
+
+            get_volume_name(this->volumes_returned, entry->d_name);
+            *result = entry;
+            return 0;
+        }
+    }
+    /* do normal directory reads */
+#endif /* HAVE_MULTIDRIVE */
+
+    OS_DIRENT_T *osdirent = os_readdir(this->osdirp);
+    if (!osdirent)
+        FILE_ERROR_RETURN(ERRNO, -4);
+#ifdef OS_DIRENT_CONVERT
+    size_t name_size = sizeof (entry->d_name);
+    if (strlcpy_from_os(entry->d_name, osdirent->d_name,
+                        name_size) >= name_size)
+    {
+        entry->d_name[0] = '\0';
+        errno = EOVERFLOW;
+        FILE_ERROR_RETURN(ENAMETOOLONG, -5);
+    }
+
+    *result = entry;
+#endif /* OS_DIRENT_CONVERT */
+
+    return 0;
+}
+
 int app_mkdir(const char *path)
 {
     char realpath[MAX_PATH];

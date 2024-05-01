@@ -704,6 +704,41 @@ struct sim_dirent * sim_readdir(DIR *dirp)
     return entry;
 }
 
+/* read a directory (reentrant) */
+int sim_readdir_r(DIR *dirp, struct sim_dirent *entry, struct sim_dirent **result)
+{
+    if (!result)
+        FILE_ERROR_RETURN(EFAULT, -2);
+
+    *result = NULL;
+
+    if (!entry)
+        FILE_ERROR_RETURN(EFAULT, -3);
+
+   struct dirstr_desc *dirstr = get_dirstr(dirp);
+    if (!dirstr)
+        FILE_ERROR_RETURN(ERRNO, -1);
+
+    entry->info.osdirent = NULL;
+
+    if (readdir_volume(dirstr, entry))
+    {
+        *result = entry;
+        return 0;
+    }
+    OS_DIRENT_T *osdirent = os_readdir(dirstr->osdirp);
+    if (!osdirent)
+        FILE_ERROR_RETURN(ERRNO, -4);
+
+    size_t size = sizeof (entry->d_name);
+    if (strlcpy_from_os(entry->d_name, osdirent->d_name, size) >= size)
+        FILE_ERROR_RETURN(ENAMETOOLONG, -5);
+
+    entry->info.osdirent = osdirent;
+    *result = entry;
+    return 0;
+}
+
 int sim_mkdir(const char *path)
 {
     char ospath[SIM_TMPBUF_MAX_PATH];

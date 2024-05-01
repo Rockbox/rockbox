@@ -4863,8 +4863,8 @@ static int free_search_roots(struct search_roots_ll * start)
 
 static bool check_dir(const char *dirname, int add_files)
 {
+    static struct dirent direntry; /* function is recursive, static uses less stack */
     int success = false;
-
     DIR *dir = opendir(dirname);
     if (!dir)
     {
@@ -4883,7 +4883,9 @@ static bool check_dir(const char *dirname, int add_files)
     /* Recursively scan the dir. */
     while (!check_event_queue())
     {
-        struct dirent *entry = readdir(dir);
+        struct dirent *entry;
+        readdir_r(dir, &direntry, &entry);
+
         if (entry == NULL)
         {
             success = true;
