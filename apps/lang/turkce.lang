@@ -11378,10 +11378,10 @@
     *: "Q"
   </source>
   <dest>
-    *: "Q"
+    *: "Kalite"
   </dest>
   <voice>
-    *: "Q"
+    *: "Kalite"
   </voice>
 </phrase>
 <phrase>
@@ -12519,11 +12519,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "Ellemeden Geçir"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "Ellemeden Geçir"
   </voice>
 </phrase>
 <phrase>
@@ -12655,11 +12655,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Tuğla Duvar (güçlü ses)"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Tuğla Duvar (güçlü ses)"
   </voice>
 </phrase>
 <phrase>
@@ -13935,7 +13935,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bishop"
+    *: "Fil"
   </voice>
 </phrase>
 <phrase>
@@ -15441,10 +15441,10 @@
     *: "Track"
   </source>
   <dest>
-    *: "Track"
+    *: "Parça"
   </dest>
   <voice>
-    *: "Track"
+    *: "Parça"
   </voice>
 </phrase>
 <phrase>
@@ -16022,7 +16022,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "Gün"
+    *: "dAY"
   </dest>
   <voice>
     *: ""
@@ -16096,5 +16096,768 @@
   </dest>
   <voice>
     *: "Azalan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Albüm Kapağı"
+  </dest>
+  <voice>
+    *: "Albüm Kapağı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Dahili olanı Tercih et"
+  </dest>
+  <voice>
+    *: "Dahili olanı Tercih et"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Görsel Dosyasını Tercih et"
+  </dest>
+  <voice>
+    *: "Görsel Dosyasını Tercih et"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "RDS (radyoVeriSistemi) Saatini Eşle"
+  </dest>
+  <voice>
+    *: none
+    rds: "RDS (radyoVeriSistemi) Saatini Eşle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Albümleri şuna göre sırala:"
+  </dest>
+  <voice>
+    *: "Albümleri şuna göre sırala:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Artist + İsim"
+  </dest>
+  <voice>
+    *: "Artist Ve İsim"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Artist + Yıl"
+  </dest>
+  <voice>
+    *: "Artist Ve Yıl"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Yıla göre sırala"
+  </dest>
+  <voice>
+    *: "Yıla göre sırala"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Albüm İsminde Yılı da Yaz"
+  </dest>
+  <voice>
+    *: "Albüm İsminde Yılı da Yaz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Önbelleğin güncellenmesini bitirmesi gerek önce!"
+  </dest>
+  <voice>
+    *: "Önbelleğin güncellenmesini bitirmesi gerek önce!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Parça Bilgisi"
+  </dest>
+  <voice>
+    *: "Parça Bilgisi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Oynat"
+  </dest>
+  <voice>
+    *: "Oynat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Karılmış Oynat"
+  </dest>
+  <voice>
+    *: "Karılmış Oynat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Oynatma Listesi Yenilendiğinde Şuanki Parçayı Tut"
+  </dest>
+  <voice>
+    *: "Oynatma Listesi Yenilendiğinde Şuanki Parçayı Tut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Başlangıç sırasında Reset tuşu basılı tutulduğunda ayarları sıfırla"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Başlangıç sırasında Hold tuşu basılı tutulduğunda ayarları sıfırla"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Başlangıç sırasında Reset tuşu basılı tutulduğunda ayarları sıfırla"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Başlangıç sırasında Hold tuşu basılı tutulduğunda ayarları sıfırla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Parçalar içerisinde Geriye Sar"
+  </dest>
+  <voice>
+    *: "Parçalar içerisinde Geriye Sar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Şöyle Ayarlansın..."
+  </dest>
+  <voice>
+    *: "Şöyle Ayarlansın..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Oynatma Listesi Dizini"
+  </dest>
+  <voice>
+    *: "Oynatma Listesi Dizini"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Başlangıç Dizini"
+  </dest>
+  <voice>
+    *: "Başlangıç Dizini"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Kayıt etme Dizini"
+  </dest>
+  <voice>
+    *: none
+    recording: "Kayıt etme Dizini"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Oynatma Listesine ekle..."
+  </dest>
+  <voice>
+    *: "Oynatma Listesine ekle..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Var olan bir Oynatma Listesine ekle"
+  </dest>
+  <voice>
+    *: "Var olan bir Oynatma Listesine ekle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Bir Sonraki Oynanıyor..."
+  </dest>
+  <voice>
+    *: "Bir Sonraki Oynanıyor..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Bir Sonrakini Oynat"
+  </dest>
+  <voice>
+    *: "Bir Sonrakini Oynat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Karılmışı Ekle"
+  </dest>
+  <voice>
+    *: "Karılmışı Ekle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Sonuncuyu Oynat"
+  </dest>
+  <voice>
+    *: "Sonuncuyu Oynat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Son Karılmış olanı Oynat"
+  </dest>
+  <voice>
+    *: "Son Karılmış olanı Oynat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Ses Seviyesi Ayarlaması Modu"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Ses Seviyesi Ayarlaması Modu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Ses Seviyesi Adımı Miktarı"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Ses Seviyesi Adımı Miktarı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Algısal"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Algısal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Tarar iken Parçaları Göster"
+  </dest>
+  <voice>
+    *: "Tarar iken Parçaları Göster"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Sondaki Albüme Git"
+  </dest>
+  <voice>
+    *: "Sondaki Albüme Git"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Veritabanı Dizini"
+  </dest>
+  <voice>
+    *: "Veritabanı Dizini"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Sıralanmış Parçaları Silmeyi lütfeder misin?"
+  </dest>
+  <voice>
+    *: "Sıralanmış Parçaları Silmeyi lütfeder misin?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Hızlı (Dizin Önbelleğini Görmezden gelerek)"
+  </dest>
+  <voice>
+    *: "Hızlı (Dizin Önbelleğini Görmezden gelerek)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: ""Ne oynuyor?" Ekranı"
+  </dest>
+  <voice>
+    *: ""Ne oynuyor?" Ekranı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Varsayılan Tarayıcı"
+  </dest>
+  <voice>
+    *: "Varsayılan Tarayıcı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze Ana Menü"
+  </dest>
+  <voice>
+    *: "Amaze Ana Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Labirent boyutunu Ayarla"
+  </dest>
+  <voice>
+    *: "Labirent boyutunu Ayarla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Haritaya Bak"
+  </dest>
+  <voice>
+    *: "Haritaya Bak"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Pusulayı Göster"
+  </dest>
+  <voice>
+    *: "Pusulayı Göster"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Haritayı Göster"
+  </dest>
+  <voice>
+    *: "Haritayı Göster"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Patikayı Hatırla"
+  </dest>
+  <voice>
+    *: "Patikayı Hatırla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Büyük Karolar Kullan"
+  </dest>
+  <voice>
+    *: "Büyük Karolar Kullan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Çözümü Göster"
+  </dest>
+  <voice>
+    *: "Çözümü Göster"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Kaydetmeden Çık"
+  </dest>
+  <voice>
+    *: "Kaydetmeden Çık"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Labirent Oluşturuluyor..."
+  </dest>
+  <voice>
+    *: "Labirent Oluşturuluyor..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Kazandın!"
+  </dest>
+  <voice>
+    *: "Kazandın!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Hile yaptın!"
+  </dest>
+  <voice>
+    *: "Hile yaptın!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Kolay"
+  </dest>
+  <voice>
+    *: "Kolay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Orta"
+  </dest>
+  <voice>
+    *: "Orta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Zor"
+  </dest>
+  <voice>
+    *: "Zor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Çok Zor"
+  </dest>
+  <voice>
+    *: "Çok Zor"
   </voice>
 </phrase>
