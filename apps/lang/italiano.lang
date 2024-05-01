@@ -6330,7 +6330,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Ricerca... %d trovato (%i)"
+    *: "Ricerca... %d trovato (%s)"
   </dest>
   <voice>
     *: "Trovato"
