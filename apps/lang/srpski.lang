@@ -2241,16 +2241,16 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Позадинско осветљење на Lock"
     hold_button: "Позадинско осветљење на Hold"
   </dest>
   <voice>
-    *: none
-    hold_button: "Позадинско осветљење на Hold"
+    *: "Позадинско осветљење на Лок"
+    hold_button: "Позадинско осветљење на Холд"
   </voice>
 </phrase>
 <phrase>
@@ -6019,18 +6019,21 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "У Ес Бе"
     multivolume: "Ха Де један"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "мајкро Ес Де"
     xduoox3: "мајкро Ес Де два"
@@ -11692,16 +11695,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTOMATIC
-  desc: generic automatic
+  desc: deprecated
   user: core
   <source>
-    *: "Automatic"
+    *: ""
   </source>
   <dest>
-    *: "Аутоматски"
+    *: ""
   </dest>
   <voice>
-    *: "Аутоматски"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13280,16 +13283,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
+  desc: deprecated
   user: core
   <source>
-    *: "Clear playlist"
+    *: ""
   </source>
   <dest>
-    *: "Очисти плејлисту"
+    *: ""
   </dest>
   <voice>
-    *: "Очисти плејлисту"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15858,16 +15861,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
+  desc: deprecated
   user: core
   <source>
-    *: "Reload After Saving"
+    *: ""
   </source>
   <dest>
-    *: "Поново учитај након чувања"
+    *: ""
   </dest>
   <voice>
-    *: "Поново учитај након чувања"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16533,5 +16536,327 @@
   <voice>
     *: none
     perceptual_volume: "Перцептуално"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Прикажи нумере током прегледа"
+  </dest>
+  <voice>
+    *: "Прикажи нумере током прегледа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Иди на последњи албум"
+  </dest>
+  <voice>
+    *: "Иди на последњи албум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Директоријум базе података"
+  </dest>
+  <voice>
+    *: "Директоријум базе података"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Да уклоним нумере из реда?"
+  </dest>
+  <voice>
+    *: "Да уклоним нумере из реда?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Брзо (игнориши кеш директоријума)"
+  </dest>
+  <voice>
+    *: "Брзо (игнориши кеш директоријума)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Екран шта се пушта"
+  </dest>
+  <voice>
+    *: "Екран шта се пушта"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Подраз. прегледач"
+  </dest>
+  <voice>
+    *: "Подраз. прегледач"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze главни мени"
+  </dest>
+  <voice>
+    *: "Амејз главни мени"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Постави величину лавиринта"
+  </dest>
+  <voice>
+    *: "Постави величину лавиринта"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Погледај мапу"
+  </dest>
+  <voice>
+    *: "Погледај мапу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Прикажи компас"
+  </dest>
+  <voice>
+    *: "Прикажи компас"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Прикажи мапу"
+  </dest>
+  <voice>
+    *: "Прикажи мапу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Запамти путању"
+  </dest>
+  <voice>
+    *: "Запамти путању"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Користи велике плочице"
+  </dest>
+  <voice>
+    *: "Користи велике плочице"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Прикажи решење"
+  </dest>
+  <voice>
+    *: "Прикажи решење"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Напусти без чувања"
+  </dest>
+  <voice>
+    *: "Напусти без чувања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Лавиринт се генерише..."
+  </dest>
+  <voice>
+    *: "Лавиринт се генерише..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Победили сте!"
+  </dest>
+  <voice>
+    *: "Победили сте!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Варали сте!"
+  </dest>
+  <voice>
+    *: "Варали сте!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Лако"
+  </dest>
+  <voice>
+    *: "Лако"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Средње"
+  </dest>
+  <voice>
+    *: "Средње"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Тешко"
+  </dest>
+  <voice>
+    *: "Тешко"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Стручњак"
+  </dest>
+  <voice>
+    *: "Стручњак"
   </voice>
 </phrase>
