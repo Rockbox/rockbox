@@ -5312,12 +5312,10 @@
     recording: ""
   </source>
   <dest>
-    *: none
-    recording: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9584,7 +9582,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Величина"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9677,7 +9675,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Време дељења"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9708,7 +9706,7 @@
   </dest>
   <voice>
     *: none
-    recording: "КЛИП"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9742,7 +9740,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Име фајла"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -12902,7 +12900,7 @@
     *: "Особине директоријума"
   </dest>
   <voice>
-    *: "Особине директоријума"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13121,7 +13119,7 @@
     *: "Редослед Rockbox главног менија"
   </dest>
   <voice>
-    *: "Редослед Рокбокс главног менија"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13135,7 +13133,7 @@
     *: "Особине фајла"
   </dest>
   <voice>
-    *: "Особине фајла"
+    *: ""
   </voice>
 </phrase>
 <phrase>
