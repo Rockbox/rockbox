@@ -292,7 +292,6 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     int files_in_dir = 0;
     int name_buffer_used = 0;
-    struct dirent direntry;
     struct dirent *entry;
     bool (*callback_show_item)(char *, int, struct tree_context *) = NULL;
     DIR *dir;
@@ -314,7 +313,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirfull = false;
 
     tree_lock_cache(c);
-    while (readdir_r(dir, &direntry, &entry) == 0 && entry) {
+    while ((entry = readdir(dir))) {
         int len;
         struct dirinfo info;
         struct entry* dptr = tree_get_entry_at(c, files_in_dir);
@@ -327,17 +326,17 @@ int ft_load(struct tree_context* c, const char* tempdir)
         info = dir_get_info(dir, entry);
         len = strlen((char *)entry->d_name);
 
+        /* skip directories . and .. */
+        if ((info.attribute & ATTR_DIRECTORY) &&
+            (((len == 1) && (!strncmp((char *)entry->d_name, ".", 1))) ||
+             ((len == 2) && (!strncmp((char *)entry->d_name, "..", 2))))) {
+            continue;
+        }
+
         /* Skip FAT volume ID */
         if (info.attribute & ATTR_VOLUME_ID) {
             continue;
         }
-
-        dptr->attr = info.attribute;
-        int dir_attr = (dptr->attr & ATTR_DIRECTORY);
-
-        /* skip directories . and .. */
-        if (dir_attr && is_dotdir_name(entry->d_name))
-            continue;
 
         /* filter out dotfiles and hidden files */
         if (*c->dirfilter != SHOW_ALL &&
@@ -345,6 +344,9 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (info.attribute & ATTR_HIDDEN))) {
             continue;
         }
+
+        dptr->attr = info.attribute;
+        int dir_attr = (dptr->attr & ATTR_DIRECTORY);
 
         /* check for known file types */
         if ( !(dir_attr) )

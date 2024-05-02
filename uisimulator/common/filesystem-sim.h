@@ -98,7 +98,6 @@ struct dirinfo_native
 #ifndef DIRFUNCTIONS_DECLARED
 DIR * sim_opendir(const char *dirname);
 struct sim_dirent * sim_readdir(DIR *dirp);
-int   sim_readdir_r(DIR *dirp, struct sim_dirent* entry, struct sim_dirent **result);
 int   sim_closedir(DIR *dirp);
 int   sim_mkdir(const char *path);
 int   sim_rmdir(const char *path);

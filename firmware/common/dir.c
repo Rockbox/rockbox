@@ -159,7 +159,6 @@ file_error:
     return rc;
 }
 
-#if 0
 /* read a directory */
 struct dirent * readdir(DIR *dirp)
 {
@@ -183,18 +182,22 @@ file_error:
 
     return res;
 }
-#endif
 
-/* readdir, readdir_r common fn */
-static int readdir_common(DIR *dirp, struct dirent *entry, struct dirent **result)
+#if 0 /* not included now but probably should be */
+/* read a directory (reentrant) */
+int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 {
-    *result = NULL; /* we checked for validity before calling, yes? */
+    if (!result)
+        FILE_ERROR_RETURN(EFAULT, -2);
+
+    *result = NULL;
+
+    if (!entry)
+        FILE_ERROR_RETURN(EFAULT, -3);
+
     struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
     if (!dir)
         FILE_ERROR_RETURN(ERRNO, -1);
-
-    if (!entry)
-        entry = &dir->entry;
 
     int rc = ns_readdir_dirent(&dir->stream, &dir->scan, entry);
     if (rc < 0)
@@ -215,27 +218,6 @@ file_error:
     return rc;
 }
 
-/* read a directory */
-struct dirent * readdir(DIR *dirp)
-{
-    struct dirent *entry;
-    readdir_common(dirp, NULL, &entry);
-    return entry;
-}
-
-/* read a directory (reentrant) */
-int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
-{
-    if (!result)
-        FILE_ERROR_RETURN(EFAULT, -2);
-    *result = NULL;
-    if (!entry)
-        FILE_ERROR_RETURN(EFAULT, -3);
-    return readdir_common(dirp, entry, result);
-}
-
-
-#if 0 /* not included now but probably should be */
 /* reset the position of a directory stream to the beginning of a directory */
 void rewinddir(DIR *dirp)
 {
