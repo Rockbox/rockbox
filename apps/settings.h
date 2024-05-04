@@ -163,7 +163,7 @@ enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
 
 /* file and dir sort options */
 enum { SORT_ALPHA, SORT_DATE, SORT_DATE_REVERSED, SORT_TYPE, /* available as settings */
-       SORT_ALPHA_REVERSED, SORT_TYPE_REVERSED };            /* internal use only */
+       SORT_ALPHA_REVERSED, SORT_TYPE_REVERSED, SORT_AS_FILE }; /* internal use only */
 enum { SORT_INTERPRET_AS_DIGIT, SORT_INTERPRET_AS_NUMBER };
 
 /* recursive dir insert options */

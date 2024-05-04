@@ -8,7 +8,7 @@
 #
 
 PICRSCR_SRCDIR := $(APPSDIR)/plugins/picross
-PICRSCR_BUILDDIR := $(BUILDDIR)/apps/plugins/picross
+PICRSCR_BUILDDIR := $(BUILDDIR)/apps/plugins/.picross
 PICRSCRS := $(wildcard $(PICRSCR_SRCDIR)/*.picross)
 
 #DUMMY := $(info [${PICRSCRS}])
@@ -18,7 +18,7 @@ DUMMY : all
 all: $(subst $(PICRSCR_SRCDIR)/,$(PICRSCR_BUILDDIR)/,$(PICRSCRS))
 
 $(PICRSCR_BUILDDIR)/%.picross: $(PICRSCR_SRCDIR)/%.picross | $(PICRSCR_BUILDDIR)
-	$(call PRINTS,CP $(subst $(PICRSCR_SRCDIR)/,,$<))cp $< $@
+	$(call PRINTS,CP $(subst $(APPSDIR)/,,$<))cp $< $@
 
 $(PICRSCR_BUILDDIR):
 	$(call PRINTS,MKDIR $@)mkdir -p $(PICRSCR_BUILDDIR)/

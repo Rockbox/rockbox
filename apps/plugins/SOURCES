@@ -117,7 +117,6 @@ metronome.c
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 boomshine.lua
 picross.lua
-lua_scripts.lua
 #ifdef HAVE_LCD_COLOR
 pixel-painter.lua
 #endif /* HAVE_LCD_COLOR */

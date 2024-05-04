@@ -167,6 +167,13 @@ sub make_install {
         glob_install("$src/rocks/$t/*", "$libdir/rocks/$t", "-m 0755");
     }
 
+    if(-e "$src/rocks/games/sgt_puzzles") {
+        unless (glob_mkdir("$libdir/rocks/games/sgt_puzzles")) {
+            return 0;
+        }
+        glob_install("$src/rocks/games/sgt_puzzles/*", "$libdir/rocks/games/sgt_puzzles", "-m 0755");
+    }
+
     # rocks/viewers/lua
     unless (glob_mkdir("$libdir/rocks/viewers/lua")) {
         return 0;
@@ -182,12 +189,13 @@ sub make_install {
         #glob_mkdir("$temp_dir/rocks/demos/lua_scripts");
         #glob_copy("$ROOT/apps/plugins/lua_scripts/*.lua", "$temp_dir/rocks/demos/lua_scripts/");
     }
-       #lua picross puzzles
+
+    #lua picross puzzles
     if(-e "$ROOT/apps/plugins/picross") {
-        unless (glob_mkdir("$libdir/rocks/games/picross")) {
+        unless (glob_mkdir("$libdir/rocks/games/.picross")) {
             return 0;
         }
-        glob_install("$ROOT/apps/plugins/picross/*.picross", "$libdir/rocks/games/picross");
+        glob_install("$ROOT/apps/plugins/picross/*.picross", "$libdir/rocks/games/.picross");
     }
 
     # all the rest directories
@@ -451,6 +459,12 @@ sub buildzip {
         glob_copy("$ROOT/apps/plugins/lua_scripts/*.lua", "$temp_dir/rocks/demos/lua_scripts/");
     }
 
+    #lua picross puzzles
+    if(-e "$ROOT/apps/plugins/picross") {
+        glob_mkdir("$temp_dir/rocks/games/.picross");
+        glob_copy("$ROOT/apps/plugins/picross/*.picross", "$temp_dir/rocks/games/.picross/");
+    }
+
     # exclude entries for the image file types not supported by the imageviewer for the target.
     my $viewers = "$ROOT/apps/plugins/viewers.config";
     my $c="cat $viewers | gcc $cppdef -I. -I$firmdir/export -E -P -include config.h -";
@@ -512,7 +526,13 @@ sub buildzip {
     foreach my $line (@rock_targetdirs) {
         if ($line =~ /([^,]*),(.*)/) {
             my ($plugin, $dir)=($1, $2);
-            move("$temp_dir/rocks/${plugin}.rock", "$temp_dir/rocks/$dir/${plugin}.rock");
+            if($dir  eq 'games' and substr(${plugin}, 0, 4) eq "sgt-") {
+                glob_mkdir("$temp_dir/rocks/$dir/sgt_puzzles");
+                move("$temp_dir/rocks/${plugin}.rock", "$temp_dir/rocks/$dir/sgt_puzzles/${plugin}.rock");
+            }
+            else {
+                move("$temp_dir/rocks/${plugin}.rock", "$temp_dir/rocks/$dir/${plugin}.rock");
+            }
             if(-e "$temp_dir/rocks/${plugin}.ovl") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well

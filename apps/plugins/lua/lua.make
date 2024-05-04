@@ -16,14 +16,7 @@ LUA_OBJ := $(call c2obj, $(LUA_SRC))
 OTHER_SRC += $(LUA_SRC)
 
 LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
-LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua \
-						draw.lua draw_floodfill.lua draw_poly.lua draw_num.lua \
-						draw_text.lua files.lua image.lua image_save.lua lcd.lua \
-						math_ex.lua print.lua timer.lua playlist.lua pcm.lua \
-						sound.lua rbcompat.lua rbsettings.lua poly_points.lua \
-						printtable.lua printmenus.lua printsubmenu.lua \
-						menubuttons.lua menucoresettings.lua create_kbd_layout.lua \
-                        temploader.lua)
+LUA_INCLUDELIST := $(wildcard $(LUA_INCLUDEDIR)/*.lua)
 
 ifndef APP_TYPE
     ROCKS += $(LUA_BUILDDIR)/lua.rock
@@ -31,6 +24,7 @@ else
     ### simulator
     ROCKS += $(LUA_BUILDDIR)/lua.rock
 endif
+all: $(subst $(LUA_INCLUDEDIR)/,$(LUA_BUILDDIR)/,$(LUA_INCLUDELIST))
 
 $(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua \
                                                 $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_BUILDDIR)/rb_defines.lua $(LUA_BUILDDIR)/sound_defines.lua \
@@ -66,7 +60,7 @@ $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
 
 $(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua | $(LUA_BUILDDIR)
-	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $@
+	$(call PRINTS,CP $(notdir $<))cp $< $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 

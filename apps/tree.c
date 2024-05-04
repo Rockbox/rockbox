@@ -466,6 +466,13 @@ static int update_dir(void)
             icon = tc.browse->icon;
             if (icon == NOICON)
                 icon = filetype_get_icon(ATTR_DIRECTORY);
+            /* display sub directories in the title of plugin browser */
+            if (tc.dirlevel > 0 && *tc.dirfilter == SHOW_PLUGINS)
+            {
+                char *subdir = strrchr(tc.currdir, '/');
+                if (subdir)
+                    title = subdir + 1; /* step past the separator */
+            }
         }
         else
         {
@@ -1056,7 +1063,7 @@ int rockbox_browse(struct browse_context *browse)
             int last_context;
             /* don't reset if its the same browse already loaded */
             if (tc.browse != browse ||
-                !(tc.currdir[1] && strcmp(tc.currdir, browse->root) == 0))
+                !(tc.currdir[1] && strstr(tc.currdir, browse->root) != NULL))
             {
                 tc.browse = browse;
                 tc.selected_item = 0;

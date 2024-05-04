@@ -224,7 +224,11 @@ static int compare(const void* p1, const void* p2)
     struct entry* e2 = (struct entry*)p2;
     int criteria;
 
-    if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
+    if (cmp_data.sort_dir == SORT_AS_FILE)
+    {   /* treat as two files */
+        criteria = global_settings.sort_file;
+    }
+    else if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
     {   /* two directories */
         criteria = cmp_data.sort_dir;
 
@@ -326,17 +330,16 @@ int ft_load(struct tree_context* c, const char* tempdir)
         info = dir_get_info(dir, entry);
         len = strlen((char *)entry->d_name);
 
-        /* skip directories . and .. */
-        if ((info.attribute & ATTR_DIRECTORY) &&
-            (((len == 1) && (!strncmp((char *)entry->d_name, ".", 1))) ||
-             ((len == 2) && (!strncmp((char *)entry->d_name, "..", 2))))) {
-            continue;
-        }
-
         /* Skip FAT volume ID */
         if (info.attribute & ATTR_VOLUME_ID) {
             continue;
         }
+
+        dptr->attr = info.attribute;
+        int dir_attr = (dptr->attr & ATTR_DIRECTORY);
+        /* skip directories . and .. */
+        if (dir_attr && is_dotdir_name(entry->d_name))
+            continue;
 
         /* filter out dotfiles and hidden files */
         if (*c->dirfilter != SHOW_ALL &&
@@ -345,48 +348,45 @@ int ft_load(struct tree_context* c, const char* tempdir)
             continue;
         }
 
-        dptr->attr = info.attribute;
-        int dir_attr = (dptr->attr & ATTR_DIRECTORY);
-
         /* check for known file types */
         if ( !(dir_attr) )
             dptr->attr |= filetype_get_attr((char *)entry->d_name);
 
         int file_attr = (dptr->attr & FILE_ATTR_MASK);
 
+#define CHK_FT(show,attr) (*c->dirfilter == (show) && file_attr != (attr))
         /* filter out non-visible files */
-        if ((!(dir_attr) && ((*c->dirfilter == SHOW_PLAYLIST &&
-             file_attr != FILE_ATTR_M3U) ||
-            ((*c->dirfilter == SHOW_MUSIC && file_attr != FILE_ATTR_AUDIO) &&
-             file_attr != FILE_ATTR_M3U) ||
+        if ((!(dir_attr) && (CHK_FT(SHOW_PLAYLIST, FILE_ATTR_M3U) ||
+            (CHK_FT(SHOW_MUSIC, FILE_ATTR_AUDIO) && file_attr != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
-            (*c->dirfilter == SHOW_WPS && file_attr != FILE_ATTR_WPS) ||
-            (*c->dirfilter == SHOW_FONT && file_attr != FILE_ATTR_FONT) ||
-            (*c->dirfilter == SHOW_SBS  && file_attr != FILE_ATTR_SBS) ||
+            CHK_FT(SHOW_WPS,  FILE_ATTR_WPS)  ||
+            CHK_FT(SHOW_FONT, FILE_ATTR_FONT) ||
+            CHK_FT(SHOW_SBS,  FILE_ATTR_SBS)  ||
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_FMS  && file_attr != FILE_ATTR_FMS) ||
+            CHK_FT(SHOW_FMS, FILE_ATTR_FMS) ||
+            CHK_FT(SHOW_FMR, FILE_ATTR_FMR) ||
 #endif
 #ifdef HAVE_REMOTE_LCD
-            (*c->dirfilter == SHOW_RWPS && file_attr != FILE_ATTR_RWPS) ||
-            (*c->dirfilter == SHOW_RSBS && file_attr != FILE_ATTR_RSBS) ||
+            CHK_FT(SHOW_RWPS, FILE_ATTR_RWPS) ||
+            CHK_FT(SHOW_RSBS, FILE_ATTR_RSBS) ||
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_RFMS  && file_attr != FILE_ATTR_RFMS) ||
+            CHK_FT(SHOW_RFMS, FILE_ATTR_RFMS) ||
 #endif
 #endif
-#if CONFIG_TUNER
-            (*c->dirfilter == SHOW_FMR && file_attr != FILE_ATTR_FMR) ||
-#endif
-            (*c->dirfilter == SHOW_M3U && file_attr != FILE_ATTR_M3U) ||
-            (*c->dirfilter == SHOW_CFG && file_attr != FILE_ATTR_CFG) ||
-            (*c->dirfilter == SHOW_LNG && file_attr != FILE_ATTR_LNG) ||
-            (*c->dirfilter == SHOW_MOD && file_attr != FILE_ATTR_MOD) ||
-            (*c->dirfilter == SHOW_PLUGINS && file_attr != FILE_ATTR_ROCK &&
-                                              file_attr != FILE_ATTR_LUA &&
-                                              file_attr != FILE_ATTR_OPX) ||
+            CHK_FT(SHOW_M3U, FILE_ATTR_M3U) ||
+            CHK_FT(SHOW_CFG, FILE_ATTR_CFG) ||
+            CHK_FT(SHOW_LNG, FILE_ATTR_LNG) ||
+            CHK_FT(SHOW_MOD, FILE_ATTR_MOD) ||
+           /* show first level directories */
+           ((!(dir_attr) || c->dirlevel > 0)       &&
+            CHK_FT(SHOW_PLUGINS, FILE_ATTR_ROCK)   &&
+                       file_attr != FILE_ATTR_LUA  &&
+                       file_attr != FILE_ATTR_OPX) ||
             (callback_show_item && !callback_show_item(entry->d_name, dptr->attr, c)))
         {
             continue;
         }
+#undef CHK_FT
 
         if (len > c->cache.name_buffer_size - name_buffer_used - 1) {
             /* Tell the world that we ran out of buffer space */
@@ -408,7 +408,9 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirlength = files_in_dir;
     closedir(dir);
 
-    cmp_data.sort_dir = c->sort_dir;
+    /* allow directories to be sorted into file list */
+    cmp_data.sort_dir = (*c->dirfilter == SHOW_PLUGINS) ? SORT_AS_FILE : c->sort_dir;
+
     if (global_settings.sort_case)
     {
         if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)

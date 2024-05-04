@@ -10,7 +10,6 @@
 LUASCR_SRCDIR := $(APPSDIR)/plugins/lua_scripts
 LUASCR_BUILDDIR := $(BUILDDIR)/apps/plugins/lua_scripts
 LUASCRS := $(wildcard $(LUASCR_SRCDIR)/*.lua)
-
 #DUMMY := $(info [${LUASCRS}])
 
 DUMMY : all
@@ -18,7 +17,6 @@ DUMMY : all
 all: $(subst $(LUASCR_SRCDIR)/,$(LUASCR_BUILDDIR)/,$(LUASCRS))
 
 $(LUASCR_BUILDDIR)/%.lua: $(LUASCR_SRCDIR)/%.lua | $(LUASCR_BUILDDIR)
-	$(call PRINTS,CP $(subst $(LUASCR_SRCDIR)/,,$<))cp $< $@
-
+	$(call PRINTS,CP $(subst $(APPSDIR)/,,$<))cp $< $@
 $(LUASCR_BUILDDIR):
 	$(call PRINTS,MKDIR $@)mkdir -p $(LUASCR_BUILDDIR)/

@@ -57,7 +57,6 @@ lastfm_scrobbler_viewer,viewers
 logo,demos
 lrcplayer,apps
 lua,viewers
-lua_scripts,demos
 fractals,demos
 main_menu_config,apps
 matrix,demos

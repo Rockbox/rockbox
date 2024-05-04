@@ -24,7 +24,7 @@ local _clr   = require("color") -- clrset, clrinc provides device independent co
 local _lcd   = require("lcd")   -- lcd helper functions
 
 local plugindir = rb.PLUGIN_GAMES_DATA_DIR
-local userdir = plugindir .. "/picross"
+local userdir = plugindir .. "/.picross"
 
 local wrap = rb.settings.read('global_settings', rb.system.global_settings.list_wraparound)
 wrap = (wrap or 1) == 1
@@ -371,7 +371,7 @@ function State:loadSave()
 end
 
 function State:loadDefault()
-    self:loadFile(userdir .. '/picross_default.picross')
+    return self:loadFile(userdir .. '/picross_default.picross')
 end
 
 function State:loadFile(path)
@@ -763,7 +763,9 @@ function viewPicture()
 end
 
 if not State:loadSave() then
-    State:loadDefault()
+    if not State:loadDefault() then
+    return;
+    end
 end
 
 local act = rb.actions
