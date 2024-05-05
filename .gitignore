@@ -110,6 +110,7 @@ __pycache__
 /tools/codepages
 /tools/rdf2binary
 /tools/mkboot
+/tools/mk500boot
 /tools/uclpack
 /tools/ipod_fw
 /tools/wavtrim
