@@ -116,7 +116,6 @@ static int op_entry_read_opx(const char *path)
     int ret = -1;
     off_t filesize;
     int fd_opx;
-    int len;
 
     if(rb->filetype_get_attr(path) == FILE_ATTR_OPX)
     {
@@ -317,7 +316,6 @@ static int op_entry_transfer(int fd, int fd_tmp,
 static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter, bool use_key)
 {
     char buf[MAX_PATH];
-    int len;
     uint32_t hash;
     uint32_t newhash;
     char *pos = "";;
