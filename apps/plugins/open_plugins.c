@@ -118,8 +118,7 @@ static int op_entry_read_opx(const char *path)
     int fd_opx;
     int len;
 
-    len = rb->strlen(path);
-    if(len > OP_LEN && rb->strcasecmp(&((path)[len-OP_LEN]), "." OP_EXT) == 0)
+    if(rb->filetype_get_attr(path) == FILE_ATTR_OPX)
     {
         fd_opx = rb->open(path, O_RDONLY);
         if (fd_opx >= 0)
@@ -317,6 +316,7 @@ static int op_entry_transfer(int fd, int fd_tmp,
 
 static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter, bool use_key)
 {
+    char buf[MAX_PATH];
     int len;
     uint32_t hash;
     uint32_t newhash;
@@ -339,8 +339,11 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
     else
         hash = op_entry.hash;
 
+
+
     if (plugin)
     {
+        int fattr = rb->filetype_get_attr(plugin);
         /* name */
         if (use_key)
         {
@@ -353,8 +356,21 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
         if (op_entry.name[0] == '\0' || op_entry.lang_id >= 0)
             rb->strlcpy(op_entry.name, pos, OPEN_PLUGIN_NAMESZ);
 
-        len = rb->strlen(pos);
-        if(len > ROCK_LEN && rb->strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
+
+
+        if ((!parameter || parameter[0] == '\0') && fattr != FILE_ATTR_ROCK && fattr != FILE_ATTR_OPX)
+        {
+            rb->strlcpy(op_entry.param, plugin, OPEN_PLUGIN_BUFSZ);
+            parameter = op_entry.param;
+            plugin = rb->filetype_get_plugin(fattr, buf, sizeof(buf));
+            if (!plugin)
+            {
+                rb->splashf(HZ * 2, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+                return 0;
+            }
+        }
+
+        if(fattr == FILE_ATTR_ROCK)
         {
             fd_tmp = rb->open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
             if (fd_tmp < 0)

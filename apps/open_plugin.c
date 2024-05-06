@@ -26,15 +26,11 @@
 #include "pathfuncs.h"
 #include "splash.h"
 #include "lang.h"
+#include "filetypes.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
-
-#define ROCK_EXT "rock"
-#define ROCK_LEN sizeof(ROCK_EXT)
-#define OP_EXT "opx"
-#define OP_LEN sizeof(OP_EXT)
 
 static const uint32_t open_plugin_csum = OPEN_PLUGIN_CHECKSUM;
 
@@ -279,7 +275,6 @@ struct open_plugin_entry_t * open_plugin_get_entry(void)
 */
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
-    size_t len;
     uint32_t hash;
     int32_t lang_id;
     char *pos = "\0";
@@ -306,12 +301,15 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 
     while (plugin)
     {
+        int fattr = filetype_get_attr(plugin);
+
         /* name */
         if (path_basename(plugin, (const char **)&pos) == 0)
             pos = "\0";
 
-        len = strlcpy(op_entry->name, pos, OPEN_PLUGIN_NAMESZ);
-        if (len > ROCK_LEN && strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
+        strlcpy(op_entry->name, pos, OPEN_PLUGIN_NAMESZ);
+
+        if (fattr == FILE_ATTR_ROCK)
         {
             /* path */
             strmemccpy(op_entry->path, plugin, OPEN_PLUGIN_BUFSZ);
@@ -320,10 +318,20 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
                 parameter = "";
             strmemccpy(op_entry->param, parameter, OPEN_PLUGIN_BUFSZ);
         }
-        else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
+        else if (fattr == FILE_ATTR_OPX)
         {
             /* get the entry from the opx file */
             op_load_entry(0, OPEN_PLUGIN_LANG_IGNORE, op_entry, plugin);
+        }
+        else if(!parameter)
+        {
+            strmemccpy(op_entry->param, plugin, OPEN_PLUGIN_BUFSZ);
+            plugin = filetype_get_plugin(fattr, op_entry->path, OPEN_PLUGIN_BUFSZ);
+            if (!plugin)
+            {
+                logf("OP no plugin found to run %s", op_entry->param);
+                break;
+            }
         }
         else
         {
@@ -349,6 +357,8 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 static bool callback_show_item(char *name, int attr, struct tree_context *tc)
 {
     (void)name;
+    (void)tc;
+#if 0
     if(attr & ATTR_DIRECTORY)
     {
         if (strstr(tc->currdir, PLUGIN_DIR) != NULL)
@@ -364,6 +374,9 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
         return true;
     }
     return false;
+#endif
+    return attr & ATTR_DIRECTORY ||
+                    (filetype_supported(attr) && (attr & FILE_ATTR_AUDIO) == 0);
 }
 
 /* open_plugin_browse()

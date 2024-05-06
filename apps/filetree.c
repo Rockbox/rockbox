@@ -755,7 +755,7 @@ int ft_enter(struct tree_context* c)
                     return rc;
                 }
 
-                plugin = filetype_get_plugin(file, plugin_path, sizeof(plugin_path));
+                plugin = filetype_get_plugin(file->attr, plugin_path, sizeof(plugin_path));
                 if (plugin)
                 {
 #ifdef PLUGINS_RUN_IN_BROWSER /* Stay in the filetree to run a plugin */

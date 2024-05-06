@@ -604,9 +604,9 @@ int filetype_get_icon(int attr)
     return filetypes[index].icon;
 }
 
-char* filetype_get_plugin(const struct entry* file, char *buffer, size_t buffer_len)
+char* filetype_get_plugin(int attr, char *buffer, size_t buffer_len)
 {
-    int index = find_attr(file->attr);
+    int index = find_attr(attr);
     if (index < 0 || !buffer)
         return NULL;
     struct file_type *ft_indexed = &filetypes[index];

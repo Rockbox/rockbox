@@ -1033,7 +1033,7 @@ enum plugin_status plugin_start(const void* parameter)
     long greysize; /* helper */
 #endif
 
-    if(!parameter) return PLUGIN_ERROR;
+    if(!parameter) {rb->splash(HZ*2, "No file"); return PLUGIN_ERROR; }
 
     rb->strcpy(np_file, parameter);
     if (get_image_type(np_file, false) == IMAGE_UNKNOWN)
@@ -1050,8 +1050,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     get_pic_list();
-
-    if(!entries) return PLUGIN_ERROR;
 
 #ifdef USEGSLIB
     if (!grey_init(buf, buf_size, GREY_ON_COP,

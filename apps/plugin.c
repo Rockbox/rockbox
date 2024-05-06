@@ -837,6 +837,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     playlist_get_first_index,
     playlist_get_display_index,
+    filetype_get_plugin,
 };
 
 static int plugin_buffer_handle;
