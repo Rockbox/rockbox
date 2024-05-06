@@ -167,6 +167,24 @@ bool in_radio_screen(void)
     return in_screen;
 }
 
+/* Keep freq on the grid for the current region */
+int snap_freq_to_grid(int freq)
+{
+    const struct fm_region_data * const fmr =
+        &fm_region_data[global_settings.fm_region];
+
+    /* Range clamp if out of range or just round to nearest */
+    if (freq < fmr->freq_min)
+        freq = fmr->freq_min;
+    else if (freq > fmr->freq_max)
+        freq = fmr->freq_max;
+    else
+        freq = (freq - fmr->freq_min + fmr->freq_step/2) /
+                fmr->freq_step * fmr->freq_step + fmr->freq_min;
+
+    return freq;
+}
+
 /* TODO: Move some more of the control functionality to firmware
          and clean up the mess */
 
@@ -186,7 +204,8 @@ void radio_start(void)
     /* clear flag before any yielding */
     radio_status &= ~FMRADIO_START_PAUSED;
 
-    curr_freq = global_status.last_frequency * fmr->freq_step + fmr->freq_min;
+    /* ensure the frequency is in range otherwise bad things happen --Bilgus */
+    curr_freq = snap_freq_to_grid(global_status.last_frequency * fmr->freq_step + fmr->freq_min);
 
     tuner_set(RADIO_SLEEP, 0); /* wake up the tuner */
 
@@ -259,24 +278,6 @@ void radio_stop(void)
 bool radio_hardware_present(void)
 {
     return tuner_get(RADIO_PRESENT);
-}
-
-/* Keep freq on the grid for the current region */
-int snap_freq_to_grid(int freq)
-{
-    const struct fm_region_data * const fmr =
-        &fm_region_data[global_settings.fm_region];
-
-    /* Range clamp if out of range or just round to nearest */
-    if (freq < fmr->freq_min)
-        freq = fmr->freq_min;
-    else if (freq > fmr->freq_max)
-        freq = fmr->freq_max;
-    else
-        freq = (freq - fmr->freq_min + fmr->freq_step/2) /
-                fmr->freq_step * fmr->freq_step + fmr->freq_min;
-
-    return freq;
 }
 
 void remember_frequency(void)
