@@ -582,13 +582,13 @@ sub gentalkclips {
         if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
             next;
         }
-        # Element is a dir
-        if ( -d $path) {
+
+        if ( -d $path) { # Element is a dir
 	    $enc = sprintf("%s/_dirname.talk", $path);
-            gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
-        }
-        # Element is a file
-        else {
+            if (! -e "$path/talkclips.ignore") { # Skip directories containing "talkclips.ignore"
+                gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
+            }
+        } else { # Element is a file
             $enc = sprintf("%s.talk", $path);
             $voice =~ s/\.[^\.]*$//; # Trim extension
         }

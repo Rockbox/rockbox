@@ -388,8 +388,11 @@ sub buildzip {
         }
     }
 
-    # create the file so the database does not try indexing a folder
+    # create the file so the database indexer skips this folder
     open(IGNORE, ">$temp_dir/database.ignore")  || die "can't open database.ignore";
+    close(IGNORE);
+    # create the file so the talkclip generation skips this folder
+    open(IGNORE, ">$temp_dir/talkclips.ignore")  || die "can't open talkclips.ignore";
     close(IGNORE);
 
     # the samsung ypr0 has a loader script that's needed in the zip
