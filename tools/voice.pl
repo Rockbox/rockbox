@@ -17,6 +17,7 @@
 
 use strict;
 use warnings;
+use utf8;
 use File::Basename;
 use File::Copy;
 use vars qw($V $C $t $l $e $E $s $S $i $v $f $F);
@@ -25,8 +26,8 @@ use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
 use DirHandle;
 use open ':encoding(utf8)';
-use open ':std';
-use utf8;
+use Encode::Locale;
+use Encode;
 
 sub printusage {
     print <<USAGE
@@ -562,6 +563,7 @@ sub gentalkclips {
     my ($dir, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i) = @_;
     my $d = new DirHandle $dir;
     while (my $file = $d->read) {
+	$file = Encode::decode( locale_fs => $file);
         my ($voice, $wav, $enc);
 	my $format = $tts_object->{'format'};
 
