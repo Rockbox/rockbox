@@ -1,23 +1,23 @@
-/* Copyright (C) 2005-2006 Jean-Marc Valin 
+/* Copyright (C) 2005-2006 Jean-Marc Valin
    File: fftwrap.c
 
-   Wrapper for various FFTs 
+   Wrapper for various FFTs
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -35,10 +35,6 @@
 #ifdef HAVE_CONFIG_H
 #include "config-speex.h"
 #endif
-
-/*#define USE_SMALLFT*/
-#define USE_KISS_FFT
-
 
 #include "arch.h"
 #include "os_support.h"
@@ -66,7 +62,7 @@ static int maximize_range(spx_word16_t *in, spx_word16_t *out, spx_word16_t boun
    for (i=0;i<len;i++)
    {
       out[i] = SHL16(in[i], shift);
-   }   
+   }
    return shift;
 }
 
@@ -128,6 +124,119 @@ void spx_ifft(void *table, float *in, float *out)
          out[i] = in[i];
    }
    spx_drft_backward((struct drft_lookup *)table, out);
+}
+
+#elif defined(USE_INTEL_MKL)
+#include <mkl.h>
+
+struct mkl_config {
+  DFTI_DESCRIPTOR_HANDLE desc;
+  int N;
+};
+
+void *spx_fft_init(int size)
+{
+  struct mkl_config *table = (struct mkl_config *) speex_alloc(sizeof(struct mkl_config));
+  table->N = size;
+  DftiCreateDescriptor(&table->desc, DFTI_SINGLE, DFTI_REAL, 1, size);
+  DftiSetValue(table->desc, DFTI_PACKED_FORMAT, DFTI_PACK_FORMAT);
+  DftiSetValue(table->desc, DFTI_PLACEMENT, DFTI_NOT_INPLACE);
+  DftiSetValue(table->desc, DFTI_FORWARD_SCALE, 1.0f / size);
+  DftiCommitDescriptor(table->desc);
+  return table;
+}
+
+void spx_fft_destroy(void *table)
+{
+  struct mkl_config *t = (struct mkl_config *) table;
+  DftiFreeDescriptor(t->desc);
+  speex_free(table);
+}
+
+void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
+{
+  struct mkl_config *t = (struct mkl_config *) table;
+  DftiComputeForward(t->desc, in, out);
+}
+
+void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
+{
+  struct mkl_config *t = (struct mkl_config *) table;
+  DftiComputeBackward(t->desc, in, out);
+}
+
+#elif defined(USE_GPL_FFTW3)
+
+#include <fftw3.h>
+
+struct fftw_config {
+  float *in;
+  float *out;
+  fftwf_plan fft;
+  fftwf_plan ifft;
+  int N;
+};
+
+void *spx_fft_init(int size)
+{
+  struct fftw_config *table = (struct fftw_config *) speex_alloc(sizeof(struct fftw_config));
+  table->in = fftwf_malloc(sizeof(float) * (size+2));
+  table->out = fftwf_malloc(sizeof(float) * (size+2));
+
+  table->fft = fftwf_plan_dft_r2c_1d(size, table->in, (fftwf_complex *) table->out, FFTW_PATIENT);
+  table->ifft = fftwf_plan_dft_c2r_1d(size, (fftwf_complex *) table->in, table->out, FFTW_PATIENT);
+
+  table->N = size;
+  return table;
+}
+
+void spx_fft_destroy(void *table)
+{
+  struct fftw_config *t = (struct fftw_config *) table;
+  fftwf_destroy_plan(t->fft);
+  fftwf_destroy_plan(t->ifft);
+  fftwf_free(t->in);
+  fftwf_free(t->out);
+  speex_free(table);
+}
+
+
+void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
+{
+  int i;
+  struct fftw_config *t = (struct fftw_config *) table;
+  const int N = t->N;
+  float *iptr = t->in;
+  float *optr = t->out;
+  const float m = 1.0 / N;
+  for(i=0;i<N;++i)
+    iptr[i]=in[i] * m;
+
+  fftwf_execute(t->fft);
+
+  out[0] = optr[0];
+  for(i=1;i<N;++i)
+    out[i] = optr[i+1];
+}
+
+void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
+{
+  int i;
+  struct fftw_config *t = (struct fftw_config *) table;
+  const int N = t->N;
+  float *iptr = t->in;
+  float *optr = t->out;
+
+  iptr[0] = in[0];
+  iptr[1] = 0.0f;
+  for(i=1;i<N;++i)
+    iptr[i+1] = in[i];
+  iptr[N+1] = 0.0f;
+
+  fftwf_execute(t->ifft);
+
+  for(i=0;i<N;++i)
+    out[i] = optr[i];
 }
 
 #elif defined(USE_KISS_FFT)

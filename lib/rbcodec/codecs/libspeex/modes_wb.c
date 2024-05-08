@@ -55,9 +55,9 @@
 #endif
 
 #ifndef ROCKBOX_VOICE_CODEC
-const SpeexMode * const speex_mode_list[SPEEX_NB_MODES] = {&speex_nb_mode, &speex_wb_mode, &speex_uwb_mode};
+EXPORT const SpeexMode * const speex_mode_list[SPEEX_NB_MODES] = {&speex_nb_mode, &speex_wb_mode, &speex_uwb_mode};
 #else
-const SpeexMode * const speex_mode_list[SPEEX_NB_MODES] = {&speex_nb_mode, &speex_wb_mode, NULL};
+EXPORT const SpeexMode * const speex_mode_list[SPEEX_NB_MODES] = {&speex_nb_mode, &speex_wb_mode, NULL};
 #endif
 
 extern const signed char hexc_table[];
@@ -250,7 +250,7 @@ static const SpeexSBMode sb_wb_mode = {
 };
 
 
-const SpeexMode speex_wb_mode = {
+EXPORT const SpeexMode speex_wb_mode = {
    &sb_wb_mode,
    wb_mode_query,
    "wideband (sub-band CELP)",
@@ -285,7 +285,7 @@ const SpeexMode speex_wb_mode = {
 
 #ifndef ROCKBOX_VOICE_CODEC
 /* Split-band "ultra-wideband" (32 kbps) CELP mode*/
-static const SpeexSBMode sb_uwb_mode = {
+EXPORT static const SpeexSBMode sb_uwb_mode = {
    &speex_wb_mode,
    320,    /*frameSize*/
    80,     /*subframeSize*/
@@ -365,7 +365,7 @@ const SpeexMode speex_uwb_mode = {
 /* We have defined speex_lib_get_mode() as a macro in speex.h */
 #undef speex_lib_get_mode
 
-const SpeexMode * speex_lib_get_mode (int mode)
+EXPORT const SpeexMode * speex_lib_get_mode (int mode)
 {
    if (mode < 0 || mode >= SPEEX_NB_MODES) return NULL;
 

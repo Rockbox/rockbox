@@ -1,5 +1,5 @@
 #ifndef ROCKBOX_VOICE_ENCODER
-#include "codeclib.h" 
+#include "codeclib.h"
 #include "autoconf.h"
 #else
 #define ICODE_ATTR
@@ -17,7 +17,11 @@
 
 /* Make use of ARM4E assembly optimizations */
 #if defined(CPU_ARM)
+#if (ARM_ARCH < 5)
 #define ARM4_ASM
+#else
+#define ARM5E_ASM
+#endif
 #endif
 
 /* Make use of Coldfire assembly optimizations */
@@ -40,10 +44,10 @@
 
 #ifndef ROCKBOX_VOICE_ENCODER
 /* Compile target codec as fixed point */
-#define FIXED_POINT 
+#define FIXED_POINT
 #else
 /* Compile voice clip encoder as floating point */
-#define FLOATING_POINT 
+#define FLOATING_POINT
 #endif
 
 #ifndef ROCKBOX_VOICE_CODEC
@@ -137,13 +141,13 @@
 #define SPEEX_MAJOR_VERSION 1
 
 /* Version micro */
-#define SPEEX_MICRO_VERSION 15
+#define SPEEX_MICRO_VERSION 16
 
 /* Version minor */
 #define SPEEX_MINOR_VERSION 1
 
 /* Complete version string */
-#define SPEEX_VERSION "1.2beta3"
+#define SPEEX_VERSION "1.2rc1"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -155,7 +159,7 @@
 /* #undef USE_ALLOCA */
 
 /* Use C99 variable-size arrays */
-#define VAR_ARRAYS 
+#define VAR_ARRAYS
 
 /* Enable Vorbis-style psychoacoustics (EXPERIMENTAL) */
 /* #undef VORBIS_PSYCHO */
@@ -184,3 +188,7 @@
 
 #define RELEASE 1
 
+/* We don't care */
+#define EXPORT
+
+#define USE_KISS_FFT

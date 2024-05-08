@@ -450,7 +450,7 @@ static const SpeexNBMode nb_mode = {
 
 
 /* Default mode for narrowband */
-const SpeexMode speex_nb_mode = {
+EXPORT const SpeexMode speex_nb_mode = {
    &nb_mode,
    nb_mode_query,
    "narrowband",
@@ -479,8 +479,12 @@ const SpeexMode speex_nb_mode = {
 
 
 
-int speex_mode_query(const SpeexMode *mode, int request, void *ptr)
+EXPORT int speex_mode_query(const SpeexMode *mode, int request, void *ptr)
 {
    return mode->query(mode->mode, request, ptr);
 }
+
+#ifdef FIXED_DEBUG
+long long spx_mips=0;
+#endif
 

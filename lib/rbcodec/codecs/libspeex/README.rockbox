@@ -1,6 +1,6 @@
-Library: libspeex-1.2beta3 (SVN version 14054)
-Imported: 2007-03-12 by Dan Everton
-
+Library: libspeex-1.2rc1
+Imported 1.2beta3: 2007-03-12 by Dan Everton
+Updated  1.2rc1: 2024-05-08 by Solomon Peachy
 
 This directory contains a local version of libspeex for decoding Ogg/Speex
 audio streams. 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Jean-Marc Valin 
+/* Copyright (C) 2002 Jean-Marc Valin
    File: speex_bits.c
 
    Handles bit packing/unpacking
@@ -6,18 +6,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -46,7 +46,7 @@
 #endif
 
 #ifdef ROCKBOX_VOICE_ENCODER
-void speex_bits_init(SpeexBits *bits)
+EXPORT void speex_bits_init(SpeexBits *bits)
 {
    bits->chars = (char*)speex_alloc(MAX_CHARS_PER_FRAME);
    if (!bits->chars)
@@ -62,7 +62,7 @@ void speex_bits_init(SpeexBits *bits)
 
 #if 0
 /* Rockbox: unused */
-void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
+EXPORT void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
 {
    bits->chars = (char*)buff;
    bits->buf_size = buf_size;
@@ -73,7 +73,7 @@ void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
 }
 #endif
 
-void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size)
+EXPORT void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size)
 {
    bits->chars = (char*)buff;
    bits->buf_size = buf_size;
@@ -84,11 +84,11 @@ void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size)
    bits->charPtr=0;
    bits->bitPtr=0;
    bits->overflow=0;
-   
+
 }
 
 #ifndef ROCKBOX_VOICE_CODEC
-void speex_bits_destroy(SpeexBits *bits)
+EXPORT void speex_bits_destroy(SpeexBits *bits)
 {
    if (bits->owner)
       speex_free(bits->chars);
@@ -97,7 +97,7 @@ void speex_bits_destroy(SpeexBits *bits)
 #endif
 
 #ifdef ROCKBOX_VOICE_ENCODER
-void speex_bits_reset(SpeexBits *bits)
+EXPORT void speex_bits_reset(SpeexBits *bits)
 {
    /* We only need to clear the first byte now */
    bits->chars[0]=0;
@@ -110,7 +110,7 @@ void speex_bits_reset(SpeexBits *bits)
 
 #if 0
 /* Rockbox: unused */
-void speex_bits_rewind(SpeexBits *bits)
+EXPORT void speex_bits_rewind(SpeexBits *bits)
 {
    bits->charPtr=0;
    bits->bitPtr=0;
@@ -119,7 +119,7 @@ void speex_bits_rewind(SpeexBits *bits)
 #endif
 
 #if !defined(SPEEX_VOICE_ENCODER) && !defined(ROCKBOX_VOICE_CODEC)
-void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
+EXPORT void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
 {
    int i;
    int nchars = len / BYTES_PER_CHAR;
@@ -166,9 +166,10 @@ static void speex_bits_flush(SpeexBits *bits)
    bits->charPtr=0;
 }
 
-void speex_bits_read_whole_bytes(SpeexBits *bits, char *chars, int nbytes)
+EXPORT void speex_bits_read_whole_bytes(SpeexBits *bits, char *chars, int nbytes)
 {
    int i,pos;
+
    int nchars = nbytes/BYTES_PER_CHAR;
 
    if (((bits->nbBits+BITS_PER_CHAR-1)>>LOG2_BITS_PER_CHAR)+nchars > bits->buf_size)
@@ -200,7 +201,7 @@ void speex_bits_read_whole_bytes(SpeexBits *bits, char *chars, int nbytes)
 #endif
 
 #ifndef SPEEX_DISABLE_ENCODER
-int speex_bits_write(SpeexBits *bits, char *chars, int max_nbytes)
+EXPORT int speex_bits_write(SpeexBits *bits, char *chars, int max_nbytes)
 {
    int i;
    int max_nchars = max_nbytes/BYTES_PER_CHAR;
@@ -223,7 +224,7 @@ int speex_bits_write(SpeexBits *bits, char *chars, int max_nbytes)
    return max_nchars*BYTES_PER_CHAR;
 }
 
-int speex_bits_write_whole_bytes(SpeexBits *bits, char *chars, int max_nbytes)
+EXPORT int speex_bits_write_whole_bytes(SpeexBits *bits, char *chars, int max_nbytes)
 {
    int max_nchars = max_nbytes/BYTES_PER_CHAR;
    int i;
@@ -241,7 +242,7 @@ int speex_bits_write_whole_bytes(SpeexBits *bits, char *chars, int max_nbytes)
    return max_nchars*BYTES_PER_CHAR;
 }
 
-void speex_bits_pack(SpeexBits *bits, int data, int nbBits)
+EXPORT void speex_bits_pack(SpeexBits *bits, int data, int nbBits)
 {
    unsigned int d=data;
 
@@ -287,7 +288,7 @@ void speex_bits_pack(SpeexBits *bits, int data, int nbBits)
 
 #if 0
 /* Rockbox: unused */
-int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
+EXPORT int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
 {
    unsigned int d=speex_bits_unpack_unsigned(bits,nbBits);
    /* If number is negative */
@@ -299,7 +300,7 @@ int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
 }
 #endif
 
-unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits)
+EXPORT unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits)
 {
    unsigned int d=0;
    if ((bits->charPtr<<LOG2_BITS_PER_CHAR)+bits->bitPtr+nbBits>bits->nbBits)
@@ -323,7 +324,7 @@ unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits)
 
 #if 0
 /* Rockbox: unused */
-unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits)
+EXPORT unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits)
 {
    unsigned int d=0;
    int bitPtr, charPtr;
@@ -353,7 +354,7 @@ unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits)
 }
 #endif
 
-int speex_bits_peek(SpeexBits *bits)
+EXPORT int speex_bits_peek(SpeexBits *bits)
 {
    if ((bits->charPtr<<LOG2_BITS_PER_CHAR)+bits->bitPtr+1>bits->nbBits)
       bits->overflow=1;
@@ -362,7 +363,7 @@ int speex_bits_peek(SpeexBits *bits)
    return (bits->chars[bits->charPtr]>>(BITS_PER_CHAR-1 - bits->bitPtr))&1;
 }
 
-void speex_bits_advance(SpeexBits *bits, int n)
+EXPORT void speex_bits_advance(SpeexBits *bits, int n)
 {
     if (((bits->charPtr<<LOG2_BITS_PER_CHAR)+bits->bitPtr+n>bits->nbBits) || bits->overflow){
       bits->overflow=1;
@@ -372,7 +373,7 @@ void speex_bits_advance(SpeexBits *bits, int n)
    bits->bitPtr = (bits->bitPtr+n) & (BITS_PER_CHAR-1);       /* modulo by BITS_PER_CHAR */
 }
 
-int speex_bits_remaining(SpeexBits *bits)
+EXPORT int speex_bits_remaining(SpeexBits *bits)
 {
    if (bits->overflow)
       return -1;
@@ -382,14 +383,14 @@ int speex_bits_remaining(SpeexBits *bits)
 
 #if 0
 /* Rockbox: unused */
-int speex_bits_nbytes(SpeexBits *bits)
+EXPORT int speex_bits_nbytes(SpeexBits *bits)
 {
    return ((bits->nbBits+BITS_PER_CHAR-1)>>LOG2_BITS_PER_CHAR);
 }
 #endif
 
 #ifndef SPEEX_DISABLE_ENCODER
-void speex_bits_insert_terminator(SpeexBits *bits)
+EXPORT void speex_bits_insert_terminator(SpeexBits *bits)
 {
    if (bits->bitPtr)
       speex_bits_pack(bits, 0, 1);
