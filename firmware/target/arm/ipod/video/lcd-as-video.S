@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+.syntax unified
+
     .section .icode, "ax", %progbits
 
 /****************************************************************************

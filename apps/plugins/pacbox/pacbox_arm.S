@@ -22,6 +22,8 @@
 #include "config.h"
 #include "pacbox.h"
 
+.syntax unified
+
     .section .icode,"ax",%progbits
     .global blit_display
 
