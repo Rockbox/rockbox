@@ -437,6 +437,8 @@ help:
 	@echo "tools          - builds the tools only"
 	@echo "voice          - creates the voice clips (voice builds only)"
 	@echo "voicetools     - builds the voice tools only"
+	@echo "talkclips      - builds talkclips for everything under TALKDIR, skipping existing clips"
+	@echo "talkclips-force - builds talkclips for everything under TALKDIR, overwriting all existing clips"
 	@echo "install        - installs your build (at PREFIX, defaults to simdisk/ for simulators (no fonts))"
 	@echo "fullinstall    - installs your build (like install, but with fonts)"
 	@echo "symlinkinstall - like fullinstall, but with links instead of copying files. (Good for developing on simulator)"
