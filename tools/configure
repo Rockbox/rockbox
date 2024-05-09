@@ -4409,14 +4409,13 @@ gccver=`$CC -dumpversion`;
 # system etc to be able to see it easier
 if [ $uname = "Darwin" ]; then
  ldver=`$LD -v 2>&1 | sed -e 's/[^0-9.-]//g'`
+ # Convert LD version to a number major*100 + minor
+ ldnum1=`echo $ldver | cut -d . -f1`
+ ldnum2=`echo $ldver | cut -d . -f2`
+ ldnum=`(expr $ldnum1 "*" 100 + $ldnum2) 2>/dev/null`
 else
- ldver=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
+ ldnum=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
 fi
-
-# Convert LD version to a number major*100 + minor
-ldnum1=`echo $ldver | cut -d . -f1`
-ldnum2=`echo $ldver | cut -d . -f2`
-ldnum=`(expr $ldnum1 "*" 100 + $ldnum2) 2>/dev/null`
 
 if test "$ldnum" -ge "227"; then
   have_nocrossrefs_to="#define HAVE_NOCROSSREFS_TO"
