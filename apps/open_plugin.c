@@ -323,10 +323,10 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
             /* get the entry from the opx file */
             op_load_entry(0, OPEN_PLUGIN_LANG_IGNORE, op_entry, plugin);
         }
-        else if(!parameter)
+        else if(!parameter && lang_id != LANG_SHORTCUTS)
         {
             strmemccpy(op_entry->param, plugin, OPEN_PLUGIN_BUFSZ);
-            plugin = filetype_get_plugin(fattr, op_entry->path, OPEN_PLUGIN_BUFSZ);
+            plugin = filetype_get_viewer(op_entry->path, OPEN_PLUGIN_BUFSZ, plugin);
             if (!plugin)
             {
                 logf("OP no plugin found to run %s", op_entry->param);
@@ -376,7 +376,7 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
     return false;
 #endif
     return attr & ATTR_DIRECTORY ||
-                    (filetype_supported(attr) && (attr & FILE_ATTR_AUDIO) == 0);
+                    (filetype_supported(attr) && (attr & FILE_ATTR_AUDIO) != FILE_ATTR_AUDIO);
 }
 
 /* open_plugin_browse()

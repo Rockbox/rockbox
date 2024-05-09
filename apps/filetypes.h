@@ -79,8 +79,11 @@ char* filetype_get_plugin(int attr, char *buffer, size_t buffer_len);
 /* returns true if the attr is supported */
 bool  filetype_supported(int attr);
 
-/* List avialable viewers */
+/* List avialable viewers and start selected plugin with current_file as argument */
 int filetype_list_viewers(const char* current_file);
+
+/* return the plugin filename the user selected for the file Returns NULL if canceled */
+char* filetype_get_viewer(char *buffer, size_t buffer_len, const char* current_file);
 
 /* start a plugin with file as the argument (called from onplay.c) */
 int filetype_load_plugin(const char* plugin, const char* file);

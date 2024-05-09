@@ -604,11 +604,11 @@ int filetype_get_icon(int attr)
     return filetypes[index].icon;
 }
 
-char* filetype_get_plugin(int attr, char *buffer, size_t buffer_len)
+static int filetype_get_plugin_index(int attr)
 {
     int index = find_attr(attr);
-    if (index < 0 || !buffer)
-        return NULL;
+    if (index < 0)
+        return -1;
     struct file_type *ft_indexed = &filetypes[index];
 
     /* attempt to find a suitable viewer by file extension */
@@ -621,16 +621,26 @@ char* filetype_get_plugin(int attr, char *buffer, size_t buffer_len)
             ft = &filetypes[i];
             if (ft->plugin == NULL || ft->extension == NULL)
                 continue;
-            else if (strcmp(ft->extension, ft_indexed->extension) == 0)
+            else if (ft->plugin != NULL &&
+                     strcmp(ft->extension, ft_indexed->extension) == 0)
             {
                 /*splashf(HZ*3, "Found %d %s %s", i, ft->extension, ft->plugin);*/
-                ft_indexed = ft;
-                break;
+                return i;
             }
         }
     }
     if (ft_indexed->plugin == NULL)
+        index = -1;
+    return index; /* Not Found */
+}
+
+char* filetype_get_plugin(int attr, char *buffer, size_t buffer_len)
+{
+    int index = filetype_get_plugin_index(attr);
+    if (index < 0 || !buffer)
         return NULL;
+
+    struct file_type *ft_indexed = &filetypes[index];
 
     snprintf(buffer, buffer_len, "%s/%s." ROCK_EXTENSION,
              PLUGIN_DIR, ft_indexed->plugin);
@@ -674,24 +684,48 @@ static int openwith_get_talk(int selected_item, void * data)
     return 0;
 }
 
-int filetype_list_viewers(const char* current_file)
+char* filetype_get_viewer(char *buffer, size_t buffer_len, const char* current_file)
 {
+    int attr = filetype_get_attr(current_file);
+
     struct simplelist_info info;
     simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), viewer_count, NULL);
+
+    int default_index = filetype_get_plugin_index(attr);
+
+    if (default_index >= 0)
+    {
+        for (int i = 0; i < viewer_count; i++)
+            if (viewers[i] == default_index)
+            {
+                info.selection = i;
+                break;
+            }
+    }
+
     info.get_name = openwith_get_name;
     info.get_icon = global_settings.show_icons?openwith_get_icon:NULL;
     info.get_talk = openwith_get_talk;
 
-    int ret = simplelist_show_list(&info);
+    simplelist_show_list(&info);
 
     if (info.selection >= 0) /* run user selected viewer */
     {
-        char plugin[MAX_PATH];
         int i = viewers[info.selection];
-        snprintf(plugin, MAX_PATH, "%s/%s." ROCK_EXTENSION,
+        snprintf(buffer, buffer_len, "%s/%s." ROCK_EXTENSION,
                     PLUGIN_DIR, filetypes[i].plugin);
-        ret = plugin_load(plugin, current_file);
+        return buffer;
     }
+    return NULL;
+
+}
+
+int filetype_list_viewers(const char* current_file)
+{
+    int ret = PLUGIN_ERROR;
+    char plugin[MAX_PATH];
+    if (filetype_get_viewer(plugin, sizeof(plugin), current_file) != NULL)
+        ret = plugin_load(plugin, current_file);
     return ret;
 }
 
