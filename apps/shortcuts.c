@@ -427,7 +427,7 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         /* No translation support as only soft_shutdown has LANG_SHUTDOWN defined */
         return type_strings[SHORTCUT_SHUTDOWN];
     }
-    else if (sc->type == SHORTCUT_BROWSER && (sc->u.path)[0] != '\0')
+    else if (sc->type == SHORTCUT_BROWSER && sc->name[0] == '\0' && (sc->u.path)[0] != '\0')
     {
         char* pos;
         if (path_basename(sc->u.path, (const char **)&pos) > 0)
