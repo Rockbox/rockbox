@@ -61,6 +61,7 @@ static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_PLAYLISTMENU] = "playlist menu",
     [SHORTCUT_SEPARATOR] = "separator",
     [SHORTCUT_SHUTDOWN] = "shutdown",
+    [SHORTCUT_REBOOT] = "reboot",
     [SHORTCUT_TIME] = "time",
 };
 
@@ -189,6 +190,7 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
         case SHORTCUT_SHUTDOWN:
+        case SHORTCUT_REBOOT:
         default:
             break;
     }
@@ -362,6 +364,7 @@ static int readline_cb(int n, char *buf, void *parameters)
                     break;
                 case SHORTCUT_SEPARATOR:
                 case SHORTCUT_SHUTDOWN:
+                case SHORTCUT_REBOOT:
                     break;
             }
         }
@@ -444,10 +447,11 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         }
         return sc->name;
     }
-    else if (sc->type == SHORTCUT_SHUTDOWN && sc->name[0] == '\0')
+    else if ((sc->type == SHORTCUT_SHUTDOWN || sc->type == SHORTCUT_REBOOT) &&
+             sc->name[0] == '\0')
     {
         /* No translation support as only soft_shutdown has LANG_SHUTDOWN defined */
-        return type_strings[SHORTCUT_SHUTDOWN];
+        return type_strings[sc->type];
     }
     else if (sc->type == SHORTCUT_BROWSER && sc->name[0] == '\0' && (sc->u.path)[0] != '\0')
     {
@@ -524,6 +528,7 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
             case SHORTCUT_PLAYLISTMENU:
                 return Icon_Playlist;
             case SHORTCUT_SHUTDOWN:
+            case SHORTCUT_REBOOT:
                 return Icon_System_menu;
             case SHORTCUT_TIME:
                 return Icon_Menu_functioncall;
@@ -605,11 +610,13 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                     talk_spell(sc->name, false);
                 break;
             case SHORTCUT_SHUTDOWN:
+            case SHORTCUT_REBOOT:
                 if (!sc->name[0])
                 {
-                    talk_spell(type_strings[SHORTCUT_SHUTDOWN], false);
+                    talk_spell(type_strings[sc->type], false);
                     break;
                 }
+                /* fall-through */
             default:
                 talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
                 break;
@@ -735,6 +742,14 @@ int do_shortcut_menu(void *ignored)
                     else
 #endif
                         sys_poweroff();
+                    break;
+                case SHORTCUT_REBOOT:
+#if CONFIG_CHARGING
+                    if (charger_inserted())
+                        charging_splash();
+                    else
+#endif
+                        sys_reboot();
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
