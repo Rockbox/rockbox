@@ -520,8 +520,8 @@ static int seconds_to_min(int secs)
 
 /* A string representation of either whether a sleep timer will be started or
    canceled, and how long it will be or how long is remaining in brackets */
-static char* sleep_timer_getname(int selected_item, void * data,
-                                 char *buffer, size_t buffer_len)
+char* sleep_timer_getname(int selected_item, void * data,
+                          char *buffer, size_t buffer_len)
 {
     (void)selected_item;
     (void)data;
@@ -537,7 +537,7 @@ static char* sleep_timer_getname(int selected_item, void * data,
     return buffer;
 }
 
-static int sleep_timer_voice(int selected_item, void*data)
+int sleep_timer_voice(int selected_item, void*data)
 {
     (void)selected_item;
     (void)data;
@@ -555,7 +555,7 @@ static int sleep_timer_voice(int selected_item, void*data)
 }
 
 /* If a sleep timer is running, cancel it, otherwise start one */
-static int toggle_sleeptimer(void)
+int toggle_sleeptimer(void)
 {
     set_sleeptimer_duration(get_sleep_timer() ? 0
                     : global_settings.sleeptimer_duration);

@@ -325,8 +325,10 @@ Available types are:
 \item[separator] \config{data} is ignored; \config{name} can be used to display text,
   or left blank to make the list more accessible with visual gaps
 \item[time] \config{data} needs to be \opt{rtc}{either ``talk'' to talk the time, or }``sleep X''
-  where X is the number of minutes to run the sleep timer for (0 to disable). \config{name}
-  is required for this shortcut type.
+  where X can, optionally, be the number of minutes to run the sleep timer for (0 to disable).
+  If ``sleep'' is not followed by a number, the sleep timer can be stopped, if running,
+  or started using the default duration; \config{name} will be ignored in that case. Otherwise
+  \config{name} is required for this shortcut type.
 \item[shutdown] \config{data} is ignored; \config{name} can be used to display text
 \end{description}
 

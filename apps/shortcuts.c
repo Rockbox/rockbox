@@ -244,8 +244,11 @@ static void shortcuts_ata_idle_callback(void)
 #endif
             {
                 write(fd, "sleep ", 6);
-                len = snprintf(buf, MAX_PATH, "%d", sc->u.timedata.sleep_timeout);
-                write(fd, buf, len);
+                if (sc->u.timedata.sleep_timeout >= 0)
+                {
+                    len = snprintf(buf, MAX_PATH, "%d", sc->u.timedata.sleep_timeout);
+                    write(fd, buf, len);
+                }
             }
         }
         else
@@ -348,8 +351,12 @@ static int readline_cb(int n, char *buf, void *parameters)
                         sc->u.timedata.talktime = true;
                     else
 #endif
-                    if (!strncasecmp(value, "sleep ", strlen("sleep ")))
-                        sc->u.timedata.sleep_timeout = atoi(&value[strlen("sleep ")]);
+                    if (!strncasecmp(value, "sleep", strlen("sleep")))
+                    {
+                        /* 'sleep' may appear alone or followed by number after a space */
+                        sc->u.timedata.sleep_timeout = strlen(&value[5]) > 1 ?
+                            atoi(&value[strlen("sleep ")]) : -1;
+                    }
                     else
                         sc->type = SHORTCUT_UNDEFINED; /* error */
                     break;
@@ -411,6 +418,8 @@ void shortcuts_init(void)
     --buflib_move_lock;
 }
 
+char* sleep_timer_getname(int selected_item, void * data,
+                          char *buffer, size_t buffer_len); /* settings_menu.c  */
 static const char * shortcut_menu_get_name(int selected_item, void * data,
                                            char * buffer, size_t buffer_len)
 {
@@ -420,8 +429,21 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         return "";
     if (sc->type == SHORTCUT_SETTING)
         return sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id));
-    else if (sc->type == SHORTCUT_SEPARATOR || sc->type == SHORTCUT_TIME)
+    else if (sc->type == SHORTCUT_SEPARATOR)
         return sc->name;
+    else if (sc->type == SHORTCUT_TIME)
+    {
+        if (sc->u.timedata.sleep_timeout < 0
+#if CONFIG_RTC
+            && !sc->u.timedata.talktime
+#endif
+        ) /* Toggle Sleep Timer */
+        {
+            sleep_timer_getname(selected_item, data, buffer, buffer_len);
+            return buffer;
+        }
+        return sc->name;
+    }
     else if (sc->type == SHORTCUT_SHUTDOWN && sc->name[0] == '\0')
     {
         /* No translation support as only soft_shutdown has LANG_SHUTDOWN defined */
@@ -513,6 +535,7 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
 }
 
 void talk_timedate(void);
+int sleep_timer_voice(int selected_item, void*data); /* settings_menu.c  */
 static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
@@ -576,7 +599,9 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                     talk_timedate();
                 else
 #endif
-                if (sc->name[0])
+                if (sc->u.timedata.sleep_timeout < 0)
+                    sleep_timer_voice(selected_item, data);
+                else if (sc->name[0])
                     talk_spell(sc->name, false);
                 break;
             case SHORTCUT_SHUTDOWN:
@@ -596,7 +621,7 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
 
 const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
                                   int value, const char* unit);
-
+int toggle_sleeptimer(void); /* settings_menu.c  */
 int do_shortcut_menu(void *ignored)
 {
     (void)ignored;
@@ -717,10 +742,16 @@ int do_shortcut_menu(void *ignored)
 #endif
                     {
                         char timer_buf[10];
-                        set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
-                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
-                                sleep_timer_formatter(timer_buf, sizeof(timer_buf),
-                                                      sc->u.timedata.sleep_timeout, NULL));
+                        if (sc->u.timedata.sleep_timeout >= 0)
+                        {
+                            set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
+                            splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
+                                    sleep_timer_formatter(timer_buf, sizeof(timer_buf),
+                                                          sc->u.timedata.sleep_timeout,
+                                                          NULL));
+                        }
+                        else
+                            toggle_sleeptimer();
                     }
                     break;
                 case SHORTCUT_UNDEFINED:
