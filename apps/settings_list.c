@@ -818,12 +818,14 @@ static void volume_limit_set_default(void* setting, void* defaultval)
     *(int*)setting = sound_max(SOUND_VOLUME);
 }
 
+#if defined(HAVE_EROS_QN_CODEC)
 static void stereosw_apply(int arg)
 {
     (void)arg;
 
     sound_settings_apply();
 }
+#endif
 
 const struct settings_list settings[] = {
     /* sound settings */
