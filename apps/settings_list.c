@@ -818,6 +818,13 @@ static void volume_limit_set_default(void* setting, void* defaultval)
     *(int*)setting = sound_max(SOUND_VOLUME);
 }
 
+static void stereosw_apply(int arg)
+{
+    (void)arg;
+
+    sound_settings_apply();
+}
+
 const struct settings_list settings[] = {
     /* sound settings */
     SOUND_SETTING(F_NO_WRAP, volume, LANG_VOLUME, "volume", SOUND_VOLUME),
@@ -2297,7 +2304,7 @@ const struct settings_list settings[] = {
 #endif
 #if defined(HAVE_EROS_QN_CODEC)
     CHOICE_SETTING(0, stereosw_mode, LANG_STEREOSW_MODE, 0, "stereo switch mode",
-    "normal,reverse,always0,always1", sound_settings_apply, 4,
+    "normal,reverse,always0,always1", stereosw_apply, 4,
     ID2P(LANG_NORMAL), ID2P(LANG_REVERSE), ID2P(LANG_ALWAYS_ZERO), ID2P(LANG_ALWAYS_ONE)),
 #endif
 };
