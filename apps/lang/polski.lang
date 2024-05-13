@@ -16866,3 +16866,59 @@
     *: "Ekspercka"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STEREOSW_MODE
+  desc: Stereo Switch Mode
+  user: core
+  <source>
+    *: "Stereo Switch Mode"
+  </source>
+  <dest>
+    *: "Tryb przełączania stereo"
+  </dest>
+  <voice>
+    *: "Tryb przełączania stereo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Reverse"
+  </source>
+  <dest>
+    *: "Odwrócony"
+  </dest>
+  <voice>
+    *: "Odwrócony"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ZERO
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 0"
+  </source>
+  <dest>
+    *: "Zawsze 0"
+  </dest>
+  <voice>
+    *: "Zawsze 0"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 1"
+  </source>
+  <dest>
+    *: "Zawsze 1"
+  </dest>
+  <voice>
+    *: "Zawsze 1"
+  </voice>
+</phrase>
