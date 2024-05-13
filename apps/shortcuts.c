@@ -186,7 +186,11 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_SETTING:
             return sc->u.setting != NULL;
         case SHORTCUT_TIME:
-            return sc->name[0] != '\0';
+#if CONFIG_RTC
+            if (sc->u.timedata.talktime)
+                return sc->name[0] != '\0';
+#endif
+            return sc->name[0] != '\0' || sc->u.timedata.sleep_timeout < 0;
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
         case SHORTCUT_SHUTDOWN:
