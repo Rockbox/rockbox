@@ -107,7 +107,7 @@ char* get_dir(char* buf, int buf_size, const char* path, int level)
                 break;
 
             last_sep = sep - 1;
-            if (*last_sep != '/') /* ignore multiple separators */
+            if (last_sep < path || *last_sep != '/') /* ignore multiple separators */
                 level--;
         }
     }
