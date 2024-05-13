@@ -739,7 +739,7 @@ static int delete_file_dir(void)
     }
 
     clear_display(true);
-    splash(HZ/2, str(LANG_DELETING));
+    splash(HZ/2, ID2P(LANG_DELETING));
 
     int rc = -1;
 
@@ -1826,4 +1826,3 @@ int get_onplay_context(void)
 {
     return context;
 }
-

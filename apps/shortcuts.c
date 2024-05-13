@@ -608,7 +608,7 @@ int do_shortcut_menu(void *ignored)
 
     if (shortcut_count == 0)
     {
-        splash(HZ, str(LANG_NO_FILES));
+        splash(HZ, ID2P(LANG_NO_FILES));
         return GO_TO_PREVIOUS;
     }
     push_current_activity(ACTIVITY_SHORTCUTSMENU);

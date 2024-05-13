@@ -1819,7 +1819,7 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
         case ACTION_STD_CANCEL:
             if (*(int *)lists->data > 0 && info.status == DIRCACHE_SCANNING)
             {
-                splash(HZ, str(LANG_SCANNING_DISK));
+                splash(HZ, ID2P(LANG_SCANNING_DISK));
                 btn = ACTION_NONE;
             }
             break;
