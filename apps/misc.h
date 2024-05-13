@@ -93,6 +93,19 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
  */
 void format_time(char* buf, int buf_size, long t);
 
+const char* format_sleeptimer(char* buffer, size_t buffer_size,
+                              int value, const char* unit);
+
+/* A string representation of either whether a sleep timer will be started or
+   canceled, and how long it will be or how long is remaining in brackets */
+char* string_sleeptimer(char *buffer, size_t buffer_len);
+int toggle_sleeptimer(void);
+void talk_sleeptimer(void);
+
+#if CONFIG_RTC
+void talk_timedate(void);
+#endif
+
 /* Ask the user if they really want to erase the current dynamic playlist
  * returns true if the playlist should be replaced */
 bool warn_on_pl_erase(void);

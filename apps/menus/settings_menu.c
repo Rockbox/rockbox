@@ -57,6 +57,7 @@
 #endif
 #include "plugin.h"
 #include "onplay.h"
+#include "misc.h"
 
 #ifndef HAS_BUTTON_HOLD
 static int selectivesoftlock_callback(int action,
@@ -496,69 +497,20 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 /***********************************/
 /*    STARTUP/SHUTDOWN MENU      */
 
-/* sleep timer option */
-const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
-                                         int value, const char* unit)
-{
-    (void) unit;
-    int minutes, hours;
 
-    if (value) {
-        hours = value / 60;
-        minutes = value - (hours * 60);
-        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
-        return buffer;
-    } else {
-        return str(LANG_OFF);
-    }
-}
-
-static int seconds_to_min(int secs)
-{
-    return (secs + 10) / 60;  /* round up for 50+ seconds */
-}
-
-/* A string representation of either whether a sleep timer will be started or
-   canceled, and how long it will be or how long is remaining in brackets */
-char* sleep_timer_getname(int selected_item, void * data,
-                          char *buffer, size_t buffer_len)
+char* sleeptimer_getname(int selected_item, void * data,
+                         char *buffer, size_t buffer_len)
 {
     (void)selected_item;
     (void)data;
-    int sec = get_sleep_timer();
-    char timer_buf[10];
-
-    snprintf(buffer, buffer_len, "%s (%s)",
-             str(sec ? LANG_SLEEP_TIMER_CANCEL_CURRENT
-                 : LANG_SLEEP_TIMER_START_CURRENT),
-             sleep_timer_formatter(timer_buf, sizeof(timer_buf),
-                sec ? seconds_to_min(sec)
-                    : global_settings.sleeptimer_duration, NULL));
-    return buffer;
+    return string_sleeptimer(buffer, buffer_len);
 }
 
-int sleep_timer_voice(int selected_item, void*data)
+int sleeptimer_voice(int selected_item, void*data)
 {
     (void)selected_item;
     (void)data;
-    int seconds = get_sleep_timer();
-    long talk_ids[] = {
-        seconds ? LANG_SLEEP_TIMER_CANCEL_CURRENT
-            : LANG_SLEEP_TIMER_START_CURRENT,
-        VOICE_PAUSE,
-        (seconds ? seconds_to_min(seconds)
-            : global_settings.sleeptimer_duration) | UNIT_MIN << UNIT_SHIFT,
-        TALK_FINAL_ID
-    };
-    talk_idarray(talk_ids, true);
-    return 0;
-}
-
-/* If a sleep timer is running, cancel it, otherwise start one */
-int toggle_sleeptimer(void)
-{
-    set_sleeptimer_duration(get_sleep_timer() ? 0
-                    : global_settings.sleeptimer_duration);
+    talk_sleeptimer();
     return 0;
 }
 
@@ -587,7 +539,7 @@ static int sleeptimer_duration_cb(int action,
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 MENUITEM_FUNCTION_DYNTEXT(sleeptimer_toggle, 0, toggle_sleeptimer,
-                          sleep_timer_getname, sleep_timer_voice, NULL,
+                          sleeptimer_getname, sleeptimer_voice, NULL,
                           NULL, Icon_NOICON);
 MENUITEM_SETTING(sleeptimer_duration,
                  &global_settings.sleeptimer_duration,

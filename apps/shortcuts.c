@@ -421,8 +421,6 @@ void shortcuts_init(void)
     --buflib_move_lock;
 }
 
-char* sleep_timer_getname(int selected_item, void * data,
-                          char *buffer, size_t buffer_len); /* settings_menu.c  */
 static const char * shortcut_menu_get_name(int selected_item, void * data,
                                            char * buffer, size_t buffer_len)
 {
@@ -440,11 +438,9 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
 #if CONFIG_RTC
             && !sc->u.timedata.talktime
 #endif
-        ) /* Toggle Sleep Timer */
-        {
-            sleep_timer_getname(selected_item, data, buffer, buffer_len);
-            return buffer;
-        }
+        ) /* String representation for toggling sleep timer */
+            return string_sleeptimer(buffer, buffer_len);
+
         return sc->name;
     }
     else if ((sc->type == SHORTCUT_SHUTDOWN || sc->type == SHORTCUT_REBOOT) &&
@@ -466,7 +462,91 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
     return sc->name[0] ? sc->name : sc->u.path;
 }
 
-static int shortcut_menu_speak_item(int selected_item, void * data);
+static int shortcut_menu_speak_item(int selected_item, void * data)
+{
+    (void)data;
+    struct shortcut *sc = get_shortcut(selected_item);
+    if (sc)
+    {
+        if (sc->talk_clip[0])
+        {
+            talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+        }
+        else
+        {
+            switch (sc->type)
+            {
+            case SHORTCUT_BROWSER:
+                {
+                    static char path[MAX_PATH];
+                    DIR* dir;
+                    struct dirent* entry;
+                    char* filename = strrchr(sc->u.path, PATH_SEPCH) + 1;
+                    if (*filename != '\0')
+                    {
+                        int dirlen = (filename - sc->u.path);
+                        strmemccpy(path, sc->u.path, dirlen + 1);
+                        dir = opendir(path);
+                        if (dir)
+                        {
+                            while (0 != (entry = readdir(dir)))
+                            {
+                                if (!strcmp(entry->d_name, filename))
+                                {
+                                    struct dirinfo info = dir_get_info(dir, entry);
+                                    if (info.attribute & ATTR_DIRECTORY)
+                                        talk_dir_or_spell(sc->u.path, NULL, false);
+                                    else talk_file_or_spell(path, filename, NULL, false);
+                                    closedir(dir);
+                                    return 0;
+                                }
+                            }
+                            closedir(dir);
+                        }
+                    }
+                    else
+                    {
+                        talk_dir_or_spell(sc->u.path, NULL, false);
+                        break;
+                    }
+                    talk_spell(sc->u.path, false);
+                }
+                break;
+            case SHORTCUT_FILE:
+            case SHORTCUT_PLAYLISTMENU:
+                talk_file_or_spell(NULL, sc->u.path, NULL, false);
+                break;
+            case SHORTCUT_SETTING:
+                talk_id(sc->u.setting->lang_id, false);
+                break;
+            case SHORTCUT_TIME:
+#if CONFIG_RTC
+                if (sc->u.timedata.talktime)
+                    talk_timedate();
+                else
+#endif
+                if (sc->u.timedata.sleep_timeout < 0)
+                    talk_sleeptimer();
+                else if (sc->name[0])
+                    talk_spell(sc->name, false);
+                break;
+            case SHORTCUT_SHUTDOWN:
+            case SHORTCUT_REBOOT:
+                if (!sc->name[0])
+                {
+                    talk_spell(type_strings[sc->type], false);
+                    break;
+                }
+                /* fall-through */
+            default:
+                talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
 static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 {
     (void)lists;
@@ -539,96 +619,6 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
     return sc->icon;
 }
 
-void talk_timedate(void);
-int sleep_timer_voice(int selected_item, void*data); /* settings_menu.c  */
-static int shortcut_menu_speak_item(int selected_item, void * data)
-{
-    (void)data;
-    struct shortcut *sc = get_shortcut(selected_item);
-    if (sc)
-    {
-        if (sc->talk_clip[0])
-        {
-            talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
-        }
-        else
-        {
-            switch (sc->type)
-            {
-            case SHORTCUT_BROWSER:
-                {
-                    static char path[MAX_PATH];
-                    DIR* dir;
-                    struct dirent* entry;
-                    char* filename = strrchr(sc->u.path, PATH_SEPCH) + 1;
-                    if (*filename != '\0')
-                    {
-                        int dirlen = (filename - sc->u.path);
-                        strmemccpy(path, sc->u.path, dirlen + 1);
-                        dir = opendir(path);
-                        if (dir)
-                        {
-                            while (0 != (entry = readdir(dir)))
-                            {
-                                if (!strcmp(entry->d_name, filename))
-                                {
-                                    struct dirinfo info = dir_get_info(dir, entry);
-                                    if (info.attribute & ATTR_DIRECTORY)
-                                        talk_dir_or_spell(sc->u.path, NULL, false);
-                                    else talk_file_or_spell(path, filename, NULL, false);
-                                    closedir(dir);
-                                    return 0;
-                                }
-                            }
-                            closedir(dir);
-                        }
-                    }
-                    else
-                    {
-                        talk_dir_or_spell(sc->u.path, NULL, false);
-                        break;
-                    }
-                    talk_spell(sc->u.path, false);
-                }
-                break;
-            case SHORTCUT_FILE:
-            case SHORTCUT_PLAYLISTMENU:
-                talk_file_or_spell(NULL, sc->u.path, NULL, false);
-                break;
-            case SHORTCUT_SETTING:
-                talk_id(sc->u.setting->lang_id, false);
-                break;
-            case SHORTCUT_TIME:
-#if CONFIG_RTC
-                if (sc->u.timedata.talktime)
-                    talk_timedate();
-                else
-#endif
-                if (sc->u.timedata.sleep_timeout < 0)
-                    sleep_timer_voice(selected_item, data);
-                else if (sc->name[0])
-                    talk_spell(sc->name, false);
-                break;
-            case SHORTCUT_SHUTDOWN:
-            case SHORTCUT_REBOOT:
-                if (!sc->name[0])
-                {
-                    talk_spell(type_strings[sc->type], false);
-                    break;
-                }
-                /* fall-through */
-            default:
-                talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
-                break;
-            }
-        }
-    }
-    return 0;
-}
-
-const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
-                                  int value, const char* unit);
-int toggle_sleeptimer(void); /* settings_menu.c  */
 int do_shortcut_menu(void *ignored)
 {
     (void)ignored;
@@ -761,7 +751,7 @@ int do_shortcut_menu(void *ignored)
                         {
                             set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
                             splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
-                                    sleep_timer_formatter(timer_buf, sizeof(timer_buf),
+                                    format_sleeptimer(timer_buf, sizeof(timer_buf),
                                                           sc->u.timedata.sleep_timeout,
                                                           NULL));
                         }

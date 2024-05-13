@@ -1467,6 +1467,82 @@ void format_time(char* buf, int buf_size, long t)
              t < 0, "-", units_in[UNIT_IDX_HR], hashours, ":",
              hashours+1, units_in[UNIT_IDX_MIN], units_in[UNIT_IDX_SEC]);
 }
+
+const char* format_sleeptimer(char* buffer, size_t buffer_size,
+                              int value, const char* unit)
+{
+    (void) unit;
+    int minutes, hours;
+
+    if (value) {
+        hours = value / 60;
+        minutes = value - (hours * 60);
+        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
+        return buffer;
+    } else {
+        return str(LANG_OFF);
+    }
+}
+
+static int seconds_to_min(int secs)
+{
+    return (secs + 10) / 60;  /* round up for 50+ seconds */
+}
+
+char* string_sleeptimer(char *buffer, size_t buffer_len)
+{
+    int sec = get_sleep_timer();
+    char timer_buf[10];
+
+    snprintf(buffer, buffer_len, "%s (%s)",
+             str(sec ? LANG_SLEEP_TIMER_CANCEL_CURRENT
+                 : LANG_SLEEP_TIMER_START_CURRENT),
+             format_sleeptimer(timer_buf, sizeof(timer_buf),
+                sec ? seconds_to_min(sec)
+                    : global_settings.sleeptimer_duration, NULL));
+    return buffer;
+}
+
+/* If a sleep timer is running, cancel it, otherwise start one */
+int toggle_sleeptimer(void)
+{
+    set_sleeptimer_duration(get_sleep_timer() ? 0
+                    : global_settings.sleeptimer_duration);
+    return 0;
+}
+
+void talk_sleeptimer(void)
+{
+    int seconds = get_sleep_timer();
+    long talk_ids[] = {
+        seconds ? LANG_SLEEP_TIMER_CANCEL_CURRENT
+            : LANG_SLEEP_TIMER_START_CURRENT,
+        VOICE_PAUSE,
+        (seconds ? seconds_to_min(seconds)
+            : global_settings.sleeptimer_duration) | UNIT_MIN << UNIT_SHIFT,
+        TALK_FINAL_ID
+    };
+    talk_idarray(talk_ids, true);
+}
+
+#if CONFIG_RTC
+void talk_timedate(void)
+{
+    struct tm *tm = get_time();
+    if (!global_settings.talk_menu)
+        return;
+    talk_id(VOICE_CURRENT_TIME, false);
+    if (valid_time(tm))
+    {
+        talk_time(tm, true);
+        talk_date(get_time(), true);
+    }
+    else
+    {
+        talk_id(LANG_UNKNOWN, true);
+    }
+}
+#endif /* CONFIG_RTC */
 #endif /* !defined(CHECKWPS) && !defined(DBTOOL)*/
 
 /**

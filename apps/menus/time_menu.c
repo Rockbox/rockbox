@@ -144,23 +144,6 @@ MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
 
 #endif /* HAVE_RTC_ALARM */
 
-void talk_timedate(void)
-{
-    struct tm *tm = get_time();
-    if (!global_settings.talk_menu)
-        return;
-    talk_id(VOICE_CURRENT_TIME, false);
-    if (valid_time(tm))
-    {
-        talk_time(tm, true);
-        talk_date(get_time(), true);
-    }
-    else
-    {
-        talk_id(LANG_UNKNOWN, true);
-    }
-}
-
 static void draw_timedate(struct viewport *vp, struct screen *display)
 {
     struct tm *tm = get_time();
