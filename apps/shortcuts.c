@@ -440,6 +440,7 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
     return sc->name[0] ? sc->name : sc->u.path;
 }
 
+static int shortcut_menu_speak_item(int selected_item, void * data);
 static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 {
     (void)lists;
@@ -454,6 +455,7 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
         if (confirm_delete_yesno("") != YESNO_YES)
         {
             gui_synclist_set_title(lists, lists->title, lists->title_icon);
+            shortcut_menu_speak_item(selection, NULL);
             return ACTION_REDRAW;
         }
 
@@ -467,6 +469,8 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
         shortcuts_ata_idle_callback();
         if (shortcut_count == 0)
             return ACTION_STD_CANCEL;
+
+        shortcut_menu_speak_item(gui_synclist_get_sel_pos(lists), NULL);
         return ACTION_REDRAW;
     }
     return action;
@@ -508,6 +512,7 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
     return sc->icon;
 }
 
+void talk_timedate(void);
 static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
@@ -565,11 +570,15 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
             case SHORTCUT_SETTING:
                 talk_id(sc->u.setting->lang_id, false);
                 break;
-#if CONFIG_RTC
             case SHORTCUT_TIME:
-                talk_id(LANG_TIME_MENU, false);
-                break;
+#if CONFIG_RTC
+                if (sc->u.timedata.talktime)
+                    talk_timedate();
+                else
 #endif
+                if (sc->name[0])
+                    talk_spell(sc->name, false);
+                break;
             case SHORTCUT_SHUTDOWN:
                 if (!sc->name[0])
                 {
@@ -585,7 +594,6 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
     return 0;
 }
 
-void talk_timedate(void);
 const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
                                   int value, const char* unit);
 
@@ -705,10 +713,7 @@ int do_shortcut_menu(void *ignored)
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
-                  if (sc->u.timedata.talktime) {
-                        talk_timedate();
-                        talk_force_enqueue_next();
-                  } else
+                  if (!sc->u.timedata.talktime)
 #endif
                     {
                         char timer_buf[10];
