@@ -16579,7 +16579,6 @@
     *: "Database Directory"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_REMOVE_QUEUED_TRACKS
   desc: Confirmation dialog
@@ -16594,7 +16593,6 @@
     *: "Remove Queued Tracks?"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_QUICK_IGNORE_DIRACHE
   desc: in Settings
@@ -16609,7 +16607,6 @@
     *: "Quick (Ignore Directory Cache)"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_WPS
   desc: in Settings
@@ -16624,7 +16621,6 @@
     *: "What's Playing Screen"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_DEFAULT_BROWSER
   desc: in Settings
@@ -16639,7 +16635,6 @@
     *: "Default Browser"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_AMAZE_MENU
   desc: Amaze game
@@ -16654,7 +16649,6 @@
     *: "Amaze Main Menu"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
@@ -16669,7 +16663,6 @@
     *: "Set Maze Size"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_VIEW_MAP
   desc: Map in Amaze game
@@ -16684,7 +16677,6 @@
     *: "View Map"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SHOW_COMPASS
   desc: Compass in Amaze game
@@ -16699,7 +16691,6 @@
     *: "Show Compass"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SHOW_MAP
   desc: Map in Amaze game
@@ -16714,7 +16705,6 @@
     *: "Show Map"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_REMEMBER_PATH
   desc: Map in Amaze game
@@ -16729,7 +16719,6 @@
     *: "Remember Path"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_USE_LARGE_TILES
   desc: Map in Amaze game
@@ -16744,7 +16733,6 @@
     *: "Use Large Tiles"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SHOW_SOLUTION
   desc: Map in Amaze game
@@ -16759,7 +16747,6 @@
     *: "Show Solution"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_QUIT_WITHOUT_SAVING
   desc:
@@ -16774,7 +16761,6 @@
     *: "Quit without saving"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_GENERATING_MAZE
   desc: Amaze game
@@ -16789,7 +16775,6 @@
     *: "Generating maze..."
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_YOU_WIN
   desc: Success in game
@@ -16804,7 +16789,6 @@
     *: "You win!"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_YOU_CHEATED
   desc: Cheated in game
@@ -16819,7 +16803,6 @@
     *: "You cheated!"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_DIFFICULTY_EASY
   desc: Game difficulty
@@ -16834,7 +16817,6 @@
     *: "Easy"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_DIFFICULTY_MEDIUM
   desc: Game difficulty
@@ -16849,7 +16831,6 @@
     *: "Medium"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_DIFFICULTY_HARD
   desc: Game difficulty
@@ -16864,7 +16845,6 @@
     *: "Hard"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_DIFFICULTY_EXPERT
   desc: Game difficulty
@@ -16877,5 +16857,65 @@
   </dest>
   <voice>
     *: "Expert"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_STEREOSW_MODE
+  desc: Stereo Switch Mode
+  user: core
+  <source>
+    *: "Stereo Switch Mode"
+  </source>
+  <dest>
+    *: "Stereo Switch Mode"
+  </dest>
+  <voice>
+    *: "Stereo Switch Mode"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_REVERSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Reverse"
+  </source>
+  <dest>
+    *: "Reverse"
+  </dest>
+  <voice>
+    *: "Reverse"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_ALWAYS_ZERO
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 0"
+  </source>
+  <dest>
+    *: "Always 0"
+  </dest>
+  <voice>
+    *: "Always 0"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_ALWAYS_ONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 1"
+  </source>
+  <dest>
+    *: "Always 1"
+  </dest>
+  <voice>
+    *: "Always 1"
   </voice>
 </phrase>
