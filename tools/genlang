@@ -469,6 +469,10 @@ while(<LANG>) {
                     else {
                         $idnum = $idcount[$user]++;
                     }
+
+		    # Strip out the magic "Same as english" flag
+		    $dest =~ s/^("?)~/$1/;
+		    $voice =~ s/^("?)~/$1/;
                     
                     $id{$idstr} = $idnum;
                     $idnum[$user][$idnum]=$idstr;
