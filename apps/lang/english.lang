@@ -3645,22 +3645,22 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
+    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
+    rtc: "ON = Set"
     vibe500: "OK = Set"
   </dest>
   <voice>
@@ -3674,7 +3674,6 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3683,12 +3682,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3697,6 +3696,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </dest>
@@ -4517,7 +4517,7 @@
     *: "Cleared"
   </dest>
   <voice>
-    *: "Cleared"
+    *: "Settings Cleared"
   </voice>
 </phrase>
 <phrase>
@@ -6105,18 +6105,18 @@
   user: core
   <source>
     *: "Int:"
-    xduoox3: "mSD1:"
     hibylinux: "mSD:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
-    xduoox3: "mSD1:"
     hibylinux: "mSD:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Internal"
-    xduoox3: "micro S D 1"
     hibylinux: "micro S D"
+    xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -6134,7 +6134,7 @@
     *: none
     hibylinux: "USB:"
     multivolume: "HD1:"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
@@ -6818,20 +6818,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Album Gain"
-  </dest>
-  <voice>
-    *: "Album gain"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_PATH
   desc: in tag viewer
   user: core
@@ -6856,7 +6842,7 @@
     *: "<No Info>"
   </dest>
   <voice>
-    *: "No info"
+    *: "No Info"
   </voice>
 </phrase>
 <phrase>
@@ -9696,15 +9682,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </voice>
 </phrase>
 <phrase>
@@ -16377,18 +16363,18 @@
   user: core
   <source>
     *: none
-    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Clear settings when hold switch is on during startup"
-    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
   </source>
   <dest>
     *: none
-    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Clear settings when hold switch is on during startup"
-    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
   </dest>
   <voice>
     *: none
-    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Clear settings when hold switch is on during startup"
-    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
   </voice>
 </phrase>
 <phrase>

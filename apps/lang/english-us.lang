@@ -6057,7 +6057,7 @@
   <dest>
     *: none
     hibylinux: "USB:"
-    multivolume: "HD1"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
@@ -6739,20 +6739,6 @@
   </dest>
   <voice>
     *: "Track Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Album Gain"
-  </dest>
-  <voice>
-    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -9421,6 +9407,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Voice prompt volume"
+  </dest>
+  <voice>
+    *: "Voice prompt volume"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOICE_FILETYPE
   desc: voice settings menu
   user: core
@@ -10788,6 +10788,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Attack Time"
+  </source>
+  <dest>
+    *: "Attack Time"
+  </dest>
+  <voice>
+    *: "Attack Time"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_COMPRESSOR_RELEASE
   desc: in sound settings
   user: core
@@ -11600,20 +11614,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CURRENT_PLAYLIST
-  desc: Used when you need to say playlist, also voiced
-  user: core
-  <source>
-    *: "Current Playlist"
-  </source>
-  <dest>
-    *: "Current Playlist"
-  </dest>
-  <voice>
-    *: "Current Playlist"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
   desc: deprecated
   user: core
@@ -11628,20 +11628,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SAVE_CHANGES
-  desc: When you try to exit screens to confirm save
-  user: core
-  <source>
-    *: "Save Changes?"
-  </source>
-  <dest>
-    *: "Save Changes?"
-  </dest>
-  <voice>
-    *: "Save Changes?"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_PLAYLISTCAT_DIR
   desc:
   user: core
@@ -11653,6 +11639,34 @@
   </dest>
   <voice>
     *: "Reset Playlist Catalog Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Current Playlist"
+  </dest>
+  <voice>
+    *: "Current Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Save Changes?"
+  </dest>
+  <voice>
+    *: "Save Changes?"
   </voice>
 </phrase>
 <phrase>
@@ -11704,20 +11718,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
-  desc: shown instead of sleep timer when it's running
-  user: core
-  <source>
-    *: "Cancel Sleep Timer"
-  </source>
-  <dest>
-    *: "Cancel Sleep Timer"
-  </dest>
-  <voice>
-    *: "Cancel Sleep Timer"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SLEEP_TIMER_DURATION
   desc: default sleep timer duration in minutes
   user: core
@@ -11746,34 +11746,59 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_GLYPHS
-  desc: in settings_menu
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
   user: core
   <source>
-    *: "Glyphs To Cache"
+    *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Glyphs To Cache"
+    *: "Cancel Sleep Timer"
   </dest>
   <voice>
-    *: "Glyphs To Cache"
+    *: "Cancel Sleep Timer"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYCLICK_HARDWARE
-  desc: in keyclick settings menu
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
   user: core
   <source>
-    *: none
-    hardware_click: "Speaker Keyclick"
+    *: "Line Separator"
   </source>
   <dest>
-    *: none
-    hardware_click: "Speaker Keyclick"
+    *: "Line Separator"
   </dest>
   <voice>
-    *: none
-    hardware_click: "Speaker Keyclick"
+    *: "Line Separator"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Line Separator Color"
+  </dest>
+  <voice>
+    *: "Line Separator Color"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Shortcuts"
+  </dest>
+  <voice>
+    *: "Shortcuts"
   </voice>
 </phrase>
 <phrase>
@@ -11794,17 +11819,34 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHORTCUTS
-  desc: Title in the shortcuts menu
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
   user: core
   <source>
-    *: "Shortcuts"
+    *: none
+    hardware_click: "Speaker Keyclick"
   </source>
   <dest>
-    *: "Shortcuts"
+    *: none
+    hardware_click: "Speaker Keyclick"
   </dest>
   <voice>
-    *: "Shortcuts"
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glyphs To Cache"
+  </dest>
+  <voice>
+    *: "Glyphs To Cache"
   </voice>
 </phrase>
 <phrase>
@@ -11836,17 +11878,34 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CROSSFEED_MEIER
-  desc: in sound settings
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
   user: core
   <source>
-    *: "Simple (Meier)"
+    *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Simple (Meier)"
+    *: "Constrain Auto-Change"
   </dest>
   <voice>
-    *: "Simple"
+    *: "Constrain Auto-Change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
   </voice>
 </phrase>
 <phrase>
@@ -11878,6 +11937,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Simple (Meier)"
+  </source>
+  <dest>
+    *: "Simple (Meier)"
+  </dest>
+  <voice>
+    *: "Simple"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CROSSFEED_CUSTOM
   desc: in sound settings
   user: core
@@ -11889,37 +11962,6 @@
   </dest>
   <voice>
     *: "Custom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
-  desc: in settings_menu.
-  user: core
-  <source>
-    *: none
-    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
-  </source>
-  <dest>
-    *: none
-    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
-  </dest>
-  <voice>
-    *: none
-    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONSTRAIN_NEXT_FOLDER
-  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
-  user: core
-  <source>
-    *: "Constrain Auto-Change"
-  </source>
-  <dest>
-    *: "Constrain Auto-Change"
-  </dest>
-  <voice>
-    *: "Constrain Auto-Change"
   </voice>
 </phrase>
 <phrase>
@@ -11951,48 +11993,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ACTION_DISABLE_TOUCH
-  desc: Softlock behaviour setting
-  user: core
-  <source>
-    *: "Disable Touch"
-  </source>
-  <dest>
-    *: "Disable Touch"
-  </dest>
-  <voice>
-    *: "Disable Touch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SLIDESHOW_TIME
-  desc: in the imageviewer settings menu
-  user: core
-  <source>
-    *: "Slideshow Time"
-  </source>
-  <dest>
-    *: "Slideshow Time"
-  </dest>
-  <voice>
-    *: "Slide show Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ORDERED
-  desc: in the imageviewer settings menu
-  user: core
-  <source>
-    *: "Ordered"
-  </source>
-  <dest>
-    *: "Ordered"
-  </dest>
-  <voice>
-    *: "Ordered"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_ROLL_OFF
   desc: in sound settings
   user: core
@@ -12007,6 +12007,261 @@
   <voice>
     *: none
     filter_roll_off: "DAC filter roll-off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Short"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Short"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Bypass"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Bypass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybrid Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybrid Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Brick Wall"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Brick Wall"
   </voice>
 </phrase>
 <phrase>
@@ -12070,59 +12325,45 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_BLACK
-  desc: spoken only, for announcing chess piece color
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
   user: core
   <source>
-    *: ""
+    *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: ""
+    *: "Maximum Volume Limit"
   </dest>
   <voice>
-    *: "Black"
+    *: "Maximum Volume Limit"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_GAME_BEGINNING
-  desc: in the chessbox game viewer
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
   user: core
   <source>
-    *: "At the beginning of the game"
+    *: "Q"
   </source>
   <dest>
-    *: "At the beginning of the game"
+    *: "Q"
   </dest>
   <voice>
-    *: "At the beginning of the game"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_4
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 4: 40 moves / 30 min"
-  </source>
-  <dest>
-    *: "Level 4: 40 moves / 30 min"
-  </dest>
-  <voice>
-    *: "Level 4: 40 moves per 30 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SURROUND_FX1
+  id: LANG_PBE
   desc: in sound settings
   user: core
   <source>
-    *: "f(x1)"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: "f(x1)"
+    *: "Perceptual Bass Enhancement"
   </dest>
   <voice>
-    *: "f(x1)"
+    *: "Perceptual Bass Enhancement"
   </voice>
 </phrase>
 <phrase>
@@ -12140,90 +12381,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_MOVING_TRACK
-  desc: playlist viewer
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Moving track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_STORAGE
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Storage: %s (done %s, remaining %s)"
-  </source>
-  <dest>
-    *: "Storage: %s (done %s, remaining %s)"
-  </dest>
-  <voice>
-    *: "Storage"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANGE_REPEAT_MODE
-  desc: in playback control menu
-  user: core
-  <source>
-    *: "Change Repeat Mode"
-  </source>
-  <dest>
-    *: "Change Repeat Mode"
-  </dest>
-  <voice>
-    *: "Change Repeat Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_AUTOLOCK_ON
-  desc: Softlock behaviour setting
-  user: core
-  <source>
-    *: "Autolock On"
-  </source>
-  <dest>
-    *: "Autolock On"
-  </dest>
-  <voice>
-    *: "Autolock On"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_CHESSBOX_KINGSIDE
-  desc: spoken only, for announcing chess moves
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "king side"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_AVG_BITRATE
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Average bitrate: %ld kbps"
-  </source>
-  <dest>
-    *: "Average bitrate: %ld kbps"
-  </dest>
-  <voice>
-    *: "Average bit rate"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SURROUND
   desc: in the sound settings menu
   user: core
@@ -12238,149 +12395,59 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Level 8: 1 move / 15 min"
-  </dest>
-  <voice>
-    *: "Level 8: 1 move per 15 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_ATTACK
+  id: LANG_SURROUND_FX1
   desc: in sound settings
   user: core
   <source>
-    *: "Attack Time"
+    *: "f(x1)"
   </source>
   <dest>
-    *: "Attack Time"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: "Attack Time"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_WHITE
-  desc: spoken only, for announcing chess piece color
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
   user: core
   <source>
-    *: ""
+    *: "f(x2)"
   </source>
   <dest>
-    *: ""
+    *: "f(x2)"
   </dest>
   <voice>
-    *: "White"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_CHESSBOX_CHECK
-  desc: spoken only, for announcing chess moves
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
   user: core
   <source>
-    *: ""
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: ""
+    *: "SIDE ONLY"
   </dest>
   <voice>
-    *: "Check!"
+    *: "SIDE ONLY"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MENU_RESUME_OPTIONS
-  desc: in mpegplayer menus
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
   user: core
   <source>
-    *: "Resume Options"
-    lowmem: none
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Resume Options"
-    lowmem: none
+    *: "Dry / Wet Mix"
   </dest>
   <voice>
-    *: "Resume Options"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_SAVING_POSITION
-  desc: in chessbox
-  user: core
-  <source>
-    *: "Saving position"
-  </source>
-  <dest>
-    *: "Saving position"
-  </dest>
-  <voice>
-    *: "Saving position"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU_RESTORE_GAME
-  desc: in the chessbox menu
-  user: core
-  <source>
-    *: "Restore Game"
-  </source>
-  <dest>
-    *: "Restore Game"
-  </dest>
-  <voice>
-    *: "Restore Game"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_DISABLE_UNMAPPED
-  desc: Backlight behaviour setting
-  user: core
-  <source>
-    *: "Disable Unmapped Keys"
-  </source>
-  <dest>
-    *: "Disable Unmapped Keys"
-  </dest>
-  <voice>
-    *: "Disable Unmapped Keys"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_PITCH_ABSOLUTE_MODE
-  desc: spoken only
-  user: core
-  <source>
-    *: none
-    pitchscreen: ""
-  </source>
-  <dest>
-    *: none
-    pitchscreen: ""
-  </dest>
-  <voice>
-    *: none
-    pitchscreen: "Absolute mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_2_KEY_CONTROL
-  desc: Item for menus
-  user: core
-  <source>
-    *: "2 Key Control"
-  </source>
-  <dest>
-    *: "2 Key Control"
-  </dest>
-  <voice>
-    *: "2 Key Control"
+    *: "Dry / Wet Mix"
   </voice>
 </phrase>
 <phrase>
@@ -12398,79 +12465,6 @@
   <voice>
     *: none
     ibassodx50,ibassodx90: "Freq Scaling Governor"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ARGH_SIZE
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Argh Size"
-  </source>
-  <dest>
-    *: "Argh Size"
-  </dest>
-  <voice>
-    *: "Argh Size"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
-  desc: Spoken if battery bench is already running
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Battery bench is already running"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_TRK_REMAINING
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Track remaining: %s"
-  </source>
-  <dest>
-    *: "Track remaining: %s"
-  </dest>
-  <voice>
-    *: "Track remaining"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SINGLE
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Single"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Single"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Single"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_ROOK
-  desc: spoken only, for announcing chess piece names
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Rook"
   </voice>
 </phrase>
 <phrase>
@@ -12530,90 +12524,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_QUEUED
-  desc: playlist viewer
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Queued"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_SEEK
+  id: LANG_ACTION_ENABLED
   desc: Selective Actions
   user: core
   <source>
-    *: "Exempt Seek"
+    *: "Enabled"
   </source>
   <dest>
-    *: "Exempt Seek"
+    *: "Enabled"
   </dest>
   <voice>
-    *: "Exempt Seek"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FORCE_START_MENU
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Start menu"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Start menu"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Start menu"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_GNUCHESS
-  desc: spoken only, for announcing player's id
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "GNU Chess"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_CHESSBOX_CASTLE
-  desc: spoken only, for announcing chess moves
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "castle"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_KNIGHT
-  desc: spoken only, for announcing chess piece names
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Knight"
+    *: "Enabled"
   </voice>
 </phrase>
 <phrase>
@@ -12631,17 +12552,213 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_PGN_PARSE_ERROR
-  desc: in the chessbox game viewer
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
   user: core
   <source>
-    *: "Error parsing game !"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Error parsing game !"
+    *: "Exempt Seek"
   </dest>
   <voice>
-    *: "Error parsing game !"
+    *: "Exempt Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Skip"
+  </source>
+  <dest>
+    *: "Exempt Skip"
+  </dest>
+  <voice>
+    *: "Exempt Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Backlight Exemptions"
+  </dest>
+  <voice>
+    *: "Backlight Exemptions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Disable on External Power"
+  </dest>
+  <voice>
+    *: "Disable on External Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Disable Unmapped Keys"
+  </dest>
+  <voice>
+    *: "Disable Unmapped Keys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Advanced Key Lock"
+  </dest>
+  <voice>
+    *: "Advanced Key Lock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Autolock On"
+  </dest>
+  <voice>
+    *: "Autolock On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Autolock Off"
+  </dest>
+  <voice>
+    *: "Autolock Off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Locked Reminders"
+  </source>
+  <dest>
+    *: "Disable Locked Reminders"
+  </dest>
+  <voice>
+    *: "Disable Locked Reminders"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Disable Touch"
+  </dest>
+  <voice>
+    *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "One per playlist"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "One per track"
+  </dest>
+  <voice>
+    *: "One per track"
   </voice>
 </phrase>
 <phrase>
@@ -12659,6 +12776,466 @@
   </voice>
 </phrase>
 <phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "No viewers found"
+  </dest>
+  <voice>
+    *: "No viewers found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Never"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Playlist elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Track elapsed: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Track elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Playlist remaining: %s"
+  </dest>
+  <voice>
+    *: "Playlist remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Track remaining: %s"
+  </dest>
+  <voice>
+    *: "Track remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Track %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Storage: %s (done %s, remaining %s)"
+  </dest>
+  <voice>
+    *: "Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Done"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Average track size: %s"
+  </dest>
+  <voice>
+    *: "Average track size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Average bitrate: %ld kbps"
+  </dest>
+  <voice>
+    *: "Average bit rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Error while gathering info"
+  </dest>
+  <voice>
+    *: "Error while gathering info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Playing time"
+  </dest>
+  <voice>
+    *: "Playing time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Delay Before Resume"
+  </dest>
+  <voice>
+    *: none
+    charging: "Delay Before Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Absolute mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Time stretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Remote Control"
+  </dest>
+  <voice>
+    *: "Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "No Rem. Control"
+  </dest>
+  <voice>
+    *: "No Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Out of Control"
+  </dest>
+  <voice>
+    *: "Out of Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Key Control"
+  </dest>
+  <voice>
+    *: "2 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Key Control"
+  </dest>
+  <voice>
+    *: "4 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Play Wormlet!"
+  </source>
+  <dest>
+    *: "Play Wormlet!"
+  </dest>
+  <voice>
+    *: "Play Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Number of Worms"
+  </source>
+  <dest>
+    *: "Number of Worms"
+  </dest>
+  <voice>
+    *: "Number of Worms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: "Worm Growth Per Food"
+  </dest>
+  <voice>
+    *: "Worm Growth Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Speed"
+  </source>
+  <dest>
+    *: "Worm Speed"
+  </dest>
+  <voice>
+    *: "Worm Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Arghs Per Food"
+  </source>
+  <dest>
+    *: "Arghs Per Food"
+  </dest>
+  <voice>
+    *: "Arghs Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Argh Size"
+  </source>
+  <dest>
+    *: "Argh Size"
+  </dest>
+  <voice>
+    *: "Argh Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Food Size"
+  </source>
+  <dest>
+    *: "Food Size"
+  </dest>
+  <voice>
+    *: "Food Size"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_NUMBER_OF_PLAYERS
   desc: For game menus
   user: core
@@ -12670,6 +13247,188 @@
   </dest>
   <voice>
     *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Control Style"
+  </dest>
+  <voice>
+    *: "Control Style"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Revert to Default Settings"
+  </dest>
+  <voice>
+    *: "Revert to Default Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Quit"
+  </dest>
+  <voice>
+    *: "Quit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Display Options"
+  </dest>
+  <voice>
+    *: "Display Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Previous Track"
+  </dest>
+  <voice>
+    *: "Previous Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pause / Play"
+  </dest>
+  <voice>
+    *: "Pause / Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Stop Playback"
+  </dest>
+  <voice>
+    *: "Stop Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Next Track"
+  </dest>
+  <voice>
+    *: "Next Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Change Volume"
+  </dest>
+  <voice>
+    *: "Change Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Shuffle Mode"
+  </dest>
+  <voice>
+    *: "Shuffle Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Change Repeat Mode"
+  </dest>
+  <voice>
+    *: "Change Repeat Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Playback Control"
+  </dest>
+  <voice>
+    *: "Playback Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Checkmate!"
+  </source>
+  <dest>
+    *: "Checkmate!"
+  </dest>
+  <voice>
+    *: "Checkmate!"
   </voice>
 </phrase>
 <phrase>
@@ -12701,222 +13460,45 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SLIDESHOW_MODE
-  desc: in the imageviewer settings menu
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
   user: core
   <source>
-    *: "Toggle Slideshow Mode"
+    *: "Resume Game"
   </source>
   <dest>
-    *: "Toggle Slideshow Mode"
+    *: "Resume Game"
   </dest>
   <voice>
-    *: "Toggle Slide show Mode"
+    *: "Resume Game"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHANGE_SHUFFLE_MODE
-  desc: in playback control menu
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
   user: core
   <source>
-    *: "Shuffle Mode"
+    *: "Save Game"
   </source>
   <dest>
-    *: "Shuffle Mode"
+    *: "Save Game"
   </dest>
   <voice>
-    *: "Shuffle Mode"
+    *: "Save Game"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_RESUME_TIME
-  desc: in the mpegplayer settings menu
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
   user: core
   <source>
-    *: "Set resume time (min)"
-    lowmem: none
+    *: "Restore Game"
   </source>
   <dest>
-    *: "Set resume time (min)"
-    lowmem: none
+    *: "Restore Game"
   </dest>
   <voice>
-    *: "Set resume time"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_6
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 6: 40 moves / 120 min"
-  </source>
-  <dest>
-    *: "Level 6: 40 moves / 120 min"
-  </dest>
-  <voice>
-    *: "Level 6: 40 moves per 120 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_UNMARKED
-  desc: spoken only, for announcing chess piece unmarking
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Unmarked"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_2
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 2: 60 moves / 15 min"
-  </source>
-  <dest>
-    *: "Level 2: 60 moves / 15 min"
-  </dest>
-  <voice>
-    *: "Level 2: 60 moves per 15 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PBE
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Perceptual Bass Enhancement"
-  </source>
-  <dest>
-    *: "Perceptual Bass Enhancement"
-  </dest>
-  <voice>
-    *: "Perceptual Bass Enhancement"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ARGHS_PER_FOOD
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Arghs Per Food"
-  </source>
-  <dest>
-    *: "Arghs Per Food"
-  </dest>
-  <voice>
-    *: "Arghs Per Food"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Level 10: 1 move / 600 min"
-  </dest>
-  <voice>
-    *: "Level 10: 1 move per 600 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_CHECKMATE
-  desc: in chessbox
-  user: core
-  <source>
-    *: "Checkmate!"
-  </source>
-  <dest>
-    *: "Checkmate!"
-  </dest>
-  <voice>
-    *: "Checkmate!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_7
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 7: 40 moves / 240 min"
-  </source>
-  <dest>
-    *: "Level 7: 40 moves / 240 min"
-  </dest>
-  <voice>
-    *: "Level 7: 40 moves per 240 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USE_COMMON_SETTING
-  desc: in the mpegplayer settings menu
-  user: core
-  <source>
-    *: "Use common setting"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Use common setting"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Use common setting"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAY_WORMLET
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Play Wormlet!"
-  </source>
-  <dest>
-    *: "Play Wormlet!"
-  </dest>
-  <voice>
-    *: "Play Wormlet!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIP_FRAMES
-  desc: in the mpegplayer settings menu
-  user: core
-  <source>
-    *: "Skip frames"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Skip frames"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Skip frames"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_SKIP
-  desc: Selective Actions
-  user: core
-  <source>
-    *: "Exempt Skip"
-  </source>
-  <dest>
-    *: "Exempt Skip"
-  </dest>
-  <voice>
-    *: "Exempt Skip"
+    *: "Restore Game"
   </voice>
 </phrase>
 <phrase>
@@ -12934,6 +13516,174 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Select Other Game"
+  </source>
+  <dest>
+    *: "Select Other Game"
+  </dest>
+  <voice>
+    *: "Select Other Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: "Level 1: 60 moves / 5 min"
+  </dest>
+  <voice>
+    *: "Level 1: 60 moves per 5 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: "Level 2: 60 moves / 15 min"
+  </dest>
+  <voice>
+    *: "Level 2: 60 moves per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 3: 60 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 3: 60 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 4: 40 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 4: 40 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: "Level 5: 40 moves / 60 min"
+  </dest>
+  <voice>
+    *: "Level 5: 40 moves per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: "Level 6: 40 moves / 120 min"
+  </dest>
+  <voice>
+    *: "Level 6: 40 moves per 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: "Level 7: 40 moves / 240 min"
+  </dest>
+  <voice>
+    *: "Level 7: 40 moves per 240 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: "Level 8: 1 move / 15 min"
+  </dest>
+  <voice>
+    *: "Level 8: 1 move per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: "Level 9: 1 move / 60 min"
+  </dest>
+  <voice>
+    *: "Level 9: 1 move per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: "Level 10: 1 move / 600 min"
+  </dest>
+  <voice>
+    *: "Level 10: 1 move per 600 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "Error parsing game !"
+  </source>
+  <dest>
+    *: "Error parsing game !"
+  </dest>
+  <voice>
+    *: "Error parsing game !"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CHESSBOX_NO_GAMES
   desc: in the chessbox game viewer
   user: core
@@ -12948,177 +13698,185 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PREVTRACK
-  desc: in playback control menu
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
   user: core
   <source>
-    *: "Previous Track"
+    *: "At the beginning of the game"
   </source>
   <dest>
-    *: "Previous Track"
+    *: "At the beginning of the game"
   </dest>
   <voice>
-    *: "Previous Track"
+    *: "At the beginning of the game"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LIST_SEPARATOR
-  desc: line between lines in lists
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
   user: core
   <source>
-    *: "Line Separator"
+    *: "At the end of the game"
   </source>
   <dest>
-    *: "Line Separator"
+    *: "At the end of the game"
   </dest>
   <voice>
-    *: "Line Separator"
+    *: "At the end of the game"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHANGE_VOLUME
-  desc: in playback control menu
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: "Change Volume"
-  </source>
-  <dest>
-    *: "Change Volume"
-  </dest>
-  <voice>
-    *: "Change Volume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LOADING_POSITION
-  desc: in chessbox
-  user: core
-  <source>
-    *: "Loading position"
-  </source>
-  <dest>
-    *: "Loading position"
-  </dest>
-  <voice>
-    *: "Loading position"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_THINKING
-  desc: in chessbox
-  user: core
-  <source>
-    *: "Thinking..."
-  </source>
-  <dest>
-    *: "Thinking..."
-  </dest>
-  <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
-  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
-  user: core
-  <source>
-    *: "One per track"
   </source>
   <dest>
-    *: "One per track"
-  </dest>
-  <voice>
-    *: "One per track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONDITIONAL_START_MENU
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Start menu if not completed"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Start menu if not completed"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Start menu if not completed"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RETURN
-  desc: in various plugin menus
-  user: core
-  <source>
-    *: "Return"
-  </source>
-  <dest>
-    *: "Return"
-  </dest>
-  <voice>
-    *: "Return"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LIMIT_FPS
-  desc: in the mpegplayer settings menu
-  user: core
-  <source>
-    *: "Limit FPS"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Limit FPS"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Limit FPS"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_GAMES
-  desc: in chessbox
-  user: core
-  <source>
-    *: "Games"
-  </source>
-  <dest>
-    *: "Games"
-  </dest>
-  <voice>
     *: ""
+  </dest>
+  <voice>
+    *: "Player"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MENU_DISPLAY_OPTIONS
-  desc: in various menus
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: "Display Options"
+    *: ""
   </source>
   <dest>
-    *: "Display Options"
+    *: ""
   </dest>
   <voice>
-    *: "Display Options"
+    *: "GNU Chess"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CONTROL_STYLE
-  desc: In various menus
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
   user: core
   <source>
-    *: "Control Style"
+    *: ""
   </source>
   <dest>
-    *: "Control Style"
+    *: ""
   </dest>
   <voice>
-    *: "Control Style"
+    *: "Marked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Unmarked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "White"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Black"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Check!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "captures"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "castle"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "king side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "queen side"
   </voice>
 </phrase>
 <phrase>
@@ -13136,20 +13894,45 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_PITCH_SEMITONE_MODE
-  desc: spoken only
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    pitchscreen: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    pitchscreen: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    pitchscreen: "Semitone mode"
+    *: "Knight"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bishop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Rook"
   </voice>
 </phrase>
 <phrase>
@@ -13181,6 +13964,90 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Games"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Saving position"
+  </source>
+  <dest>
+    *: "Saving position"
+  </dest>
+  <voice>
+    *: "Saving position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Loading position"
+  </source>
+  <dest>
+    *: "Loading position"
+  </dest>
+  <voice>
+    *: "Loading position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Thinking..."
+  </source>
+  <dest>
+    *: "Thinking..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Battery bench is already running"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Press play to run battery bench or stop to cancel"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CANNOT_RESTART_PLAYBACK
   desc: cannot restart playback splash in imageviewer
   user: core
@@ -13195,33 +14062,284 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WORM_SPEED
-  desc: For wormlet menu
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
   user: core
   <source>
-    *: "Worm Speed"
+    *: "Ordered"
   </source>
   <dest>
-    *: "Worm Speed"
+    *: "Ordered"
   </dest>
   <voice>
-    *: "Worm Speed"
+    *: "Ordered"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_UNAVAILABLE
-  desc: in mpegplayer settings
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
   user: core
   <source>
-    *: "Unavailable"
+    *: "Diffusion"
+  </source>
+  <dest>
+    *: "Diffusion"
+  </dest>
+  <voice>
+    *: "Diffusion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Grayscale"
+  </source>
+  <dest>
+    *: "Grayscale"
+  </dest>
+  <voice>
+    *: "Grayscale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: "Toggle Slideshow Mode"
+  </dest>
+  <voice>
+    *: "Toggle Slide show Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Slideshow Time"
+  </source>
+  <dest>
+    *: "Slideshow Time"
+  </dest>
+  <voice>
+    *: "Slide show Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Return"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "View Played Games"
+  </source>
+  <dest>
+    *: "View Played Games"
+  </dest>
+  <voice>
+    *: "View Played Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Audio Options"
     lowmem: none
   </source>
   <dest>
-    *: "Unavailable"
+    *: "Audio Options"
     lowmem: none
   </dest>
   <voice>
-    *: "Unavailable"
+    *: "Audio Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play Mode"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play Mode"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Single"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Single"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use sound setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use sound setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play from beginning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play from beginning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Set resume time (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Set resume time"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: "Display FPS"
+  </source>
+  <dest>
+    *: "Display FPS"
+  </dest>
+  <voice>
+    *: "Display FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Limit FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Skip frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Skip frames"
     lowmem: none
   </voice>
 </phrase>
@@ -13243,1019 +14361,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WORM_GROWTH_PER_FOOD
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Worm Growth Per Food"
-  </source>
-  <dest>
-    *: "Worm Growth Per Food"
-  </dest>
-  <voice>
-    *: "Worm Growth Per Food"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKLIGHT_SELECTIVE
-  desc: Backlight behaviour setting
-  user: core
-  <source>
-    *: "Backlight Exemptions"
-  </source>
-  <dest>
-    *: "Backlight Exemptions"
-  </dest>
-  <voice>
-    *: "Backlight Exemptions"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LIST_SEPARATOR_COLOR
-  desc: line between lines in lists
-  user: core
-  <source>
-    *: "Line Separator Colour"
-  </source>
-  <dest>
-    *: "Line Separator Color"
-  </dest>
-  <voice>
-    *: "Line Separator Color"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SOFTLOCK_SELECTIVE
-  desc: Softlock behaviour setting
-  user: core
-  <source>
-    *: "Advanced Key Lock"
-  </source>
-  <dest>
-    *: "Advanced Key Lock"
-  </dest>
-  <voice>
-    *: "Advanced Key Lock"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_AUDIO_OPTIONS
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Audio Options"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Audio Options"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Audio Options"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CAR_ADAPTER_MODE_DELAY
-  desc: Displayed for setting car adapter mode delay
-  user: core
-  <source>
-    *: none
-    charging: "Delay Before Resume"
-  </source>
-  <dest>
-    *: none
-    charging: "Delay Before Resume"
-  </dest>
-  <voice>
-    *: none
-    charging: "Delay Before Resume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU_VIEW_GAMES
-  desc: in the chessbox menu
-  user: core
-  <source>
-    *: "View Played Games"
-  </source>
-  <dest>
-    *: "View Played Games"
-  </dest>
-  <voice>
-    *: "View Played Games"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_VOLUME_LIMIT
-  desc: in sound_settings
-  user: core
-  <source>
-    *: "Maximum Volume Limit"
-  </source>
-  <dest>
-    *: "Maximum Volume Limit"
-  </dest>
-  <voice>
-    *: "Maximum Volume Limit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NUMBER_OF_WORMS
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Number of Worms"
-  </source>
-  <dest>
-    *: "Number of Worms"
-  </dest>
-  <voice>
-    *: "Number of Worms"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REC_DIR
-  desc: used in the info screen to show a recording dir
-  user: core
-  <source>
-    *: none
-    recording: "Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Recording Directory"
-  </dest>
-  <voice>
-    *: none
-    recording: "Recording Directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_PLAY_MODE
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Play Mode"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Play Mode"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Play Mode"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_PLAYTIME_DONE
-  desc: playing time screen
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Done"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
-  desc: Save only one bookmark for a playlist in recent bookmarks
-  user: core
-  <source>
-    *: "One per playlist"
-  </source>
-  <dest>
-    *: "One per playlist"
-  </dest>
-  <voice>
-    *: "One per playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_3
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 3: 60 moves / 30 min"
-  </source>
-  <dest>
-    *: "Level 3: 60 moves / 30 min"
-  </dest>
-  <voice>
-    *: "Level 3: 60 moves per 30 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIFFUSION
-  desc: in the imageviewer settings menu
-  user: core
-  <source>
-    *: "Diffusion"
-  </source>
-  <dest>
-    *: "Diffusion"
-  </dest>
-  <voice>
-    *: "Diffusion"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEVER
-  desc: in lcd settings
-  user: core
-  <source>
-    *: "Never"
-  </source>
-  <dest>
-    *: "Never"
-  </dest>
-  <voice>
-    *: "Never"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NO_REM_CONTROL
-  desc: Item for menus
-  user: core
-  <source>
-    *: "No Rem. Control"
-  </source>
-  <dest>
-    *: "No Rem. Control"
-  </dest>
-  <voice>
-    *: "No Remote Control"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SURROUND_FX2
-  desc: in sound settings
-  user: core
-  <source>
-    *: "f(x2)"
-  </source>
-  <dest>
-    *: "f(x2)"
-  </dest>
-  <voice>
-    *: "f(x2)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_DISABLE_EXT_POWER
-  desc: Backlight behaviour setting
-  user: core
-  <source>
-    *: "Disable on External Power"
-  </source>
-  <dest>
-    *: "Disable on External Power"
-  </dest>
-  <voice>
-    *: "Disable on External Power"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_ENABLED
-  desc: Selective Actions
-  user: core
-  <source>
-    *: "Enabled"
-  </source>
-  <dest>
-    *: "Enabled"
-  </dest>
-  <voice>
-    *: "Enabled"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYBACK_CONTROL
-  desc: in playback control menu
-  user: core
-  <source>
-    *: "Playback Control"
-  </source>
-  <dest>
-    *: "Playback Control"
-  </dest>
-  <voice>
-    *: "Playback Control"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_CONTROL
-  desc: Item for menus
-  user: core
-  <source>
-    *: "Remote Control"
-  </source>
-  <dest>
-    *: "Remote Control"
-  </dest>
-  <voice>
-    *: "Remote Control"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_CHESSBOX_QUEENSIDE
-  desc: spoken only, for announcing chess moves
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "queen side"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_PITCH_TIMESTRETCH_MODE
-  desc: spoken only
-  user: core
-  <source>
-    *: none
-    pitchscreen: ""
-  </source>
-  <dest>
-    *: none
-    pitchscreen: ""
-  </dest>
-  <voice>
-    *: none
-    pitchscreen: "Time stretch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESTART_PLAYBACK
+  id: LANG_USE_COMMON_SETTING
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: "Play from beginning"
+    *: "Use common setting"
     lowmem: none
   </source>
   <dest>
-    *: "Play from beginning"
+    *: "Use common setting"
     lowmem: none
   </dest>
   <voice>
-    *: "Play from beginning"
+    *: "Use common setting"
     lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SURROUND_MIX
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Dry / Wet Mix"
-  </source>
-  <dest>
-    *: "Dry / Wet Mix"
-  </dest>
-  <voice>
-    *: "Dry / Wet Mix"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_SHORT
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9018: "Short"
-  </source>
-  <dest>
-    *: none
-    es9018: "Short"
-  </dest>
-  <voice>
-    *: none
-    es9018: "Short"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_GAME_END
-  desc: in the chessbox game viewer
-  user: core
-  <source>
-    *: "At the end of the game"
-  </source>
-  <dest>
-    *: "At the end of the game"
-  </dest>
-  <voice>
-    *: "At the end of the game"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Error while gathering info"
-  </dest>
-  <voice>
-    *: "Error while gathering info"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_ELAPSED
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
-  </source>
-  <dest>
-    *: "Playlist elapsed: %s / %s %ld%%"
-  </dest>
-  <voice>
-    *: "Playlist elapsed"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Playlist remaining: %s"
-  </source>
-  <dest>
-    *: "Playlist remaining: %s"
-  </dest>
-  <voice>
-    *: "Playlist remaining"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_BAD_TRACK
-  desc: playlist viewer
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Bad track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FOOD_SIZE
-  desc: For wormlet menu
-  user: core
-  <source>
-    *: "Food Size"
-  </source>
-  <dest>
-    *: "Food Size"
-  </dest>
-  <voice>
-    *: "Food Size"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KIBIBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "KiB"
-  </source>
-  <dest>
-    *: "KiB"
-  </dest>
-  <voice>
-    *: "kibibyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_BYPASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9018: "Bypass"
-  </source>
-  <dest>
-    *: none
-    es9018: "Bypass"
-  </dest>
-  <voice>
-    *: none
-    es9018: "Bypass"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
-  desc: in the chessbox menu
-  user: core
-  <source>
-    *: "Select Other Game"
-  </source>
-  <dest>
-    *: "Select Other Game"
-  </dest>
-  <voice>
-    *: "Select Other Game"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_4_KEY_CONTROL
-  desc: Item for menus
-  user: core
-  <source>
-    *: "4 Key Control"
-  </source>
-  <dest>
-    *: "4 Key Control"
-  </dest>
-  <voice>
-    *: "4 Key Control"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_5
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 5: 40 moves / 60 min"
-  </source>
-  <dest>
-    *: "Level 5: 40 moves / 60 min"
-  </dest>
-  <voice>
-    *: "Level 5: 40 moves per 60 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_MARKED
-  desc: spoken only, for announcing chess piece marking
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Marked"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_AUTOLOCK_OFF
-  desc: Softlock behaviour setting
-  user: core
-  <source>
-    *: "Autolock Off"
-  </source>
-  <dest>
-    *: "Autolock Off"
-  </dest>
-  <voice>
-    *: "Autolock Off"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYPAUSE
-  desc: in playback control menu
-  user: core
-  <source>
-    *: "Pause / Play"
-  </source>
-  <dest>
-    *: "Pause / Play"
-  </dest>
-  <voice>
-    *: "Pause / Play"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_OUT_OF_CONTROL
-  desc: Item for menus
-  user: core
-  <source>
-    *: "Out of Control"
-  </source>
-  <dest>
-    *: "Out of Control"
-  </dest>
-  <voice>
-    *: "Out of Control"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_CHESSBOX_CAPTURES
-  desc: spoken only, for announcing chess moves
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "captures"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ACTION_DISABLE_NOTIFY
-  desc: Softlock behaviour setting
-  user: core
-  <source>
-    *: "Disable Locked Reminders"
-  </source>
-  <dest>
-    *: "Disable Locked Reminders"
-  </dest>
-  <voice>
-    *: "Disable Locked Reminders"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USE_SOUND_SETTING
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Use sound setting"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Use sound setting"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Use sound setting"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_SHARP
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    filter_roll_off: "Sharp"
-  </source>
-  <dest>
-    *: none
-    filter_roll_off: "Sharp"
-  </dest>
-  <voice>
-    *: none
-    filter_roll_off: "Sharp"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_SLOW
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    filter_roll_off: "Slow"
-  </source>
-  <dest>
-    *: none
-    filter_roll_off: "Slow"
-  </dest>
-  <voice>
-    *: none
-    filter_roll_off: "Slow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIBIBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "GiB"
-  </source>
-  <dest>
-    *: "GiB"
-  </dest>
-  <voice>
-    *: "gibibyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU_RESUME_GAME
-  desc: in the chessbox menu
-  user: core
-  <source>
-    *: "Resume Game"
-  </source>
-  <dest>
-    *: "Resume Game"
-  </dest>
-  <voice>
-    *: "Resume Game"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEXTTRACK
-  desc: in playback control menu
-  user: core
-  <source>
-    *: "Next Track"
-  </source>
-  <dest>
-    *: "Next Track"
-  </dest>
-  <voice>
-    *: "Next Track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STOP_PLAYBACK
-  desc: in playback control menu
-  user: core
-  <source>
-    *: "Stop Playback"
-  </source>
-  <dest>
-    *: "Stop Playback"
-  </dest>
-  <voice>
-    *: "Stop Playback"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_TRACK
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Track %d / %d %d%%"
-  </source>
-  <dest>
-    *: "Track %d / %d %d%%"
-  </dest>
-  <voice>
-    *: "Track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DISPLAY_FPS
-  desc: in the mpegplayer and pictureflow settings menus
-  user: core
-  <source>
-    *: "Display FPS"
-  </source>
-  <dest>
-    *: "Display FPS"
-  </dest>
-  <voice>
-    *: "Display FPS"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_BISHOP
-  desc: spoken only, for announcing chess piece names
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Bishop"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYING_TIME
-  desc: onplay menu
-  user: core
-  <source>
-    *: "Playing time"
-  </source>
-  <dest>
-    *: "Playing time"
-  </dest>
-  <voice>
-    *: "Playing time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEBIBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "MiB"
-  </source>
-  <dest>
-    *: "MiB"
-  </dest>
-  <voice>
-    *: "mebibyte"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_PLAYER
-  desc: spoken only, for announcing player's id
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Player"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_BAT_BENCH_KEYS
-  desc: Battery bench start up message
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Press play to run battery bench or stop to cancel"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SURROUND_METHOD2
-  desc: in sound settings
-  user: core
-  <source>
-    *: "SIDE ONLY"
-  </source>
-  <dest>
-    *: "SIDE ONLY"
-  </dest>
-  <voice>
-    *: "SIDE ONLY"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Level 9: 1 move / 60 min"
-  </dest>
-  <voice>
-    *: "Level 9: 1 move per 60 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "No viewers found"
-  </dest>
-  <voice>
-    *: "No viewers found"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GRAYSCALE
-  desc: in the imageviewer settings menu
-  user: core
-  <source>
-    *: "Grayscale"
-  </source>
-  <dest>
-    *: "Grayscale"
-  </dest>
-  <voice>
-    *: "Grayscale"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_1
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 1: 60 moves / 5 min"
-  </source>
-  <dest>
-    *: "Level 1: 60 moves / 5 min"
-  </dest>
-  <voice>
-    *: "Level 1: 60 moves per 5 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERT_TO_DEFAULT_SETTINGS
-  desc: In various menus
-  user: core
-  <source>
-    *: "Revert to Default Settings"
-  </source>
-  <dest>
-    *: "Revert to Default Settings"
-  </dest>
-  <voice>
-    *: "Revert to Default Settings"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU_SAVE_GAME
-  desc: in the chessbox menu
-  user: core
-  <source>
-    *: "Save Game"
-  </source>
-  <dest>
-    *: "Save Game"
-  </dest>
-  <voice>
-    *: "Save Game"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_AVG_TRACK_SIZE
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Average track size: %s"
-  </source>
-  <dest>
-    *: "Average track size: %s"
-  </dest>
-  <voice>
-    *: "Average track size"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_TRK_ELAPSED
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Track elapsed: %s / %s %ld%%"
-  </source>
-  <dest>
-    *: "Track elapsed: %s / %s %ld%%"
-  </dest>
-  <voice>
-    *: "Track elapsed"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTO_RESUME
-  desc: in mpegplayer menus
-  user: core
-  <source>
-    *: "Resume automatically"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Resume automatically"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Resume automatically"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_QUIT
-  desc: in various menus
-  user: core
-  <source>
-    *: "Quit"
-  </source>
-  <dest>
-    *: "Quit"
-  </dest>
-  <voice>
-    *: "Quit"
   </voice>
 </phrase>
 <phrase>
@@ -14272,6 +14391,57 @@
   </dest>
   <voice>
     *: "Tone controls"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu if not completed"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu if not completed"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume automatically"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume automatically"
     lowmem: none
   </voice>
 </phrase>
@@ -14293,101 +14463,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_TITLE
-  desc: deprecated
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
   user: core
   <source>
-    *: ""
+    *: "Unavailable"
+    lowmem: none
   </source>
   <dest>
-    *: ""
+    *: "Unavailable"
+    lowmem: none
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FILE_PROPERTIES
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "File properties"
-  </source>
-  <dest>
-    *: "File properties"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FILES
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "[Files]"
-  </source>
-  <dest>
-    *: "[Files]"
-  </dest>
-  <voice>
-    *: "Files"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_PATH
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "[Path]"
-  </source>
-  <dest>
-    *: "[Path]"
-  </dest>
-  <voice>
-    *: "Path"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_ITEM_UP
-  desc: in main_menu_config
-  user: core
-  <source>
-    *: "Move Item Up"
-  </source>
-  <dest>
-    *: "Move Item Up"
-  </dest>
-  <voice>
-    *: "Move Item Up"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FAIL
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "Failed to gather information"
-  </source>
-  <dest>
-    *: "Failed to gather information"
-  </dest>
-  <voice>
-    *: "Failed to gather information"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SAVE_EXIT
-  desc: in main_menu_config
-  user: core
-  <source>
-    *: "Save and Exit"
-  </source>
-  <dest>
-    *: "Save and Exit"
-  </dest>
-  <voice>
-    *: "Save and Exit"
+    *: "Unavailable"
+    lowmem: none
   </voice>
 </phrase>
 <phrase>
@@ -14405,6 +14494,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_LOAD_DEFAULT_CONFIGURATION
   desc: in main_menu_config
   user: core
@@ -14419,31 +14536,59 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_DURATION
-  desc: deprecated
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
   user: core
   <source>
-    *: ""
+    *: "Save and Exit"
   </source>
   <dest>
-    *: ""
+    *: "Save and Exit"
+  </dest>
+  <voice>
+    *: "Save and Exit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Rockbox Main Menu Order"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_SUBDIRS
+  id: LANG_PROPERTIES_PATH
   desc: in properties plugin
   user: core
   <source>
-    *: "[Subdirs]"
+    *: "[Path]"
   </source>
   <dest>
-    *: "[Subdirs]"
+    *: "[Path]"
   </dest>
   <voice>
-    *: "Subdirs"
+    *: "Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Filename]"
+  </dest>
+  <voice>
+    *: "Filename"
   </voice>
 </phrase>
 <phrase>
@@ -14458,6 +14603,20 @@
   </dest>
   <voice>
     *: "Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Date]"
+  </dest>
+  <voice>
+    *: "Date"
   </voice>
 </phrase>
 <phrase>
@@ -14489,42 +14648,14 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_FILENAME
-  desc: in properties plugin
+  id: LANG_PROPERTIES_TITLE
+  desc: deprecated
   user: core
   <source>
-    *: "[Filename]"
-  </source>
-  <dest>
-    *: "[Filename]"
-  </dest>
-  <voice>
-    *: "Filename"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "Directory properties"
-  </source>
-  <dest>
-    *: "Directory properties"
-  </dest>
-  <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
-  user: core
-  <source>
-    *: "Rockbox Main Menu Order"
   </source>
   <dest>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14545,63 +14676,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_DATE
-  desc: in properties plugin
-  user: core
-  <source>
-    *: "[Date]"
-  </source>
-  <dest>
-    *: "[Date]"
-  </dest>
-  <voice>
-    *: "Date"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_ITEM_DOWN
-  desc: in main_menu_config
-  user: core
-  <source>
-    *: "Move Item Down"
-  </source>
-  <dest>
-    *: "Move Item Down"
-  </dest>
-  <voice>
-    *: "Move Item Down"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHOW_AT_THE_BOTTOM
-  desc: in the pictureflow settings
-  user: core
-  <source>
-    *: "Show at the bottom"
-  </source>
-  <dest>
-    *: "Show at the bottom"
-  </dest>
-  <voice>
-    *: "Show at the bottom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Added to playlist"
-  </dest>
-  <voice>
-    *: "Added to playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_PLAYLIST
+  id: LANG_PROPERTIES_DURATION
   desc: deprecated
   user: core
   <source>
@@ -14615,48 +14690,87 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CPU_BOOST
-  desc: in mikmod settings menu
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
   user: core
   <source>
-    *: "CPU Boost"
-    lowmem: none
+    *: "[Subdirs]"
   </source>
   <dest>
-    *: "CPU Boost"
-    lowmem: none
+    *: "[Subdirs]"
   </dest>
   <voice>
-    *: "CPU Boost"
-    lowmem: none
+    *: "Subdirs"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESIZE_COVERS
-  desc: in the pictureflow settings menu
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
   user: core
   <source>
-    *: "Resize Covers"
+    *: "[Files]"
   </source>
   <dest>
-    *: "Resize Covers"
+    *: "[Files]"
   </dest>
   <voice>
-    *: "Resize Covers"
+    *: "Files"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NO_ALBUMART_FOUND
-  desc: in the pictureflow splash messages
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
   user: core
   <source>
-    *: "No album art found"
+    *: "Directory properties"
   </source>
   <dest>
-    *: "No album art found"
+    *: "Directory properties"
   </dest>
   <voice>
-    *: "No album art found"
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "File properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Failed to gather information"
+  </dest>
+  <voice>
+    *: "Failed to gather information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Swap Channels"
+  </dest>
+  <voice>
+    *: "Swap Channels"
   </voice>
 </phrase>
 <phrase>
@@ -14694,233 +14808,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MIKMOD_SURROUND
-  desc: in mikmod settings menu
-  user: core
-  <source>
-    *: "Surround"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Surround"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Surround"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HIDE_ALBUM_TITLE
-  desc: in the pictureflow settings
-  user: core
-  <source>
-    *: "Hide album title"
-  </source>
-  <dest>
-    *: "Hide album title"
-  </dest>
-  <voice>
-    *: "Hide album title"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHOW_AT_THE_TOP
-  desc: in the pictureflow settings
-  user: core
-  <source>
-    *: "Show at the top"
-  </source>
-  <dest>
-    *: "Show at the top"
-  </dest>
-  <voice>
-    *: "Show at the top"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NUMBER_OF_SLIDES
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Number of slides"
-  </source>
-  <dest>
-    *: "Number of slides"
-  </dest>
-  <voice>
-    *: "Number of slides"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ON
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Always On"
-  </source>
-  <dest>
-    *: "Always On"
-  </dest>
-  <voice>
-    *: "Always On"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ZOOM
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Zoom"
-  </source>
-  <dest>
-    *: "Zoom"
-  </dest>
-  <voice>
-    *: "Zoom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_VIA_TRACK_LIST
-  desc: in the pictureflow settings
-  user: core
-  <source>
-    *: "Via Track list"
-  </source>
-  <dest>
-    *: "Via Track list"
-  </dest>
-  <voice>
-    *: "Via Track list"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHOW_ALBUM_TITLE
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Show album title"
-  </source>
-  <dest>
-    *: "Show album title"
-  </dest>
-  <voice>
-    *: "Show album title"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GOTO_WPS
-  desc: in the pictureflow main menu
-  user: core
-  <source>
-    *: "Go to WPS"
-  </source>
-  <dest>
-    *: "Go to WPS"
-  </dest>
-  <voice>
-    *: "Go to WPS"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Cache will be rebuilt on next restart"
-  </source>
-  <dest>
-    *: "Cache will be rebuilt on next restart"
-  </dest>
-  <voice>
-    *: "Cache will be rebuilt on next restart"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REBUILD_CACHE
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Rebuild cache"
-  </source>
-  <dest>
-    *: "Rebuild cache"
-  </dest>
-  <voice>
-    *: "Rebuild cache"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ERROR_WRITING_CONFIG
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Error writing config"
-  </source>
-  <dest>
-    *: "Error writing config"
-  </dest>
-  <voice>
-    *: "Error writing config"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Playlist Cleared"
-  </dest>
-  <voice>
-    *: "Playlist Cleared"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CENTRE_MARGIN
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Centre margin"
-  </source>
-  <dest>
-    *: "Centre margin"
-  </dest>
-  <voice>
-    *: "Centre margin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SPACING
-  desc: in the pictureflow settings menu
-  user: core
-  <source>
-    *: "Spacing"
-  </source>
-  <dest>
-    *: "Spacing"
-  </dest>
-  <voice>
-    *: "Spacing"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRECT
-  desc: in the pictureflow settings, also a volume adjustment mode
-  user: core
-  <source>
-    *: "Direct"
-  </source>
-  <dest>
-    *: "Direct"
-  </dest>
-  <voice>
-    *: "Direct"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_INTERPOLATION
   desc: in mikmod settings menu
   user: core
@@ -14938,17 +14825,169 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SWAP_CHANNELS
-  desc: in sound_settings
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
   user: core
   <source>
-    *: "Swap Channels"
+    *: "Surround"
+    lowmem: none
   </source>
   <dest>
-    *: "Swap Channels"
+    *: "Surround"
+    lowmem: none
   </dest>
   <voice>
-    *: "Swap Channels"
+    *: "Surround"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "HQ Mixer"
+    lowmem: none
+  </source>
+  <dest>
+    *: "HQ Mixer"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "High Quality Mixer"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Sample Rate"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Sample Rate"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Sample Rate"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: "CPU Boost"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "CPU Boost"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Spacing"
+  </source>
+  <dest>
+    *: "Spacing"
+  </dest>
+  <voice>
+    *: "Spacing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Centre margin"
+  </source>
+  <dest>
+    *: "Centre margin"
+  </dest>
+  <voice>
+    *: "Centre margin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Number of slides"
+  </source>
+  <dest>
+    *: "Number of slides"
+  </dest>
+  <voice>
+    *: "Number of slides"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Zoom"
+  </source>
+  <dest>
+    *: "Zoom"
+  </dest>
+  <voice>
+    *: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Show album title"
+  </source>
+  <dest>
+    *: "Show album title"
+  </dest>
+  <voice>
+    *: "Show album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Resize Covers"
+  </source>
+  <dest>
+    *: "Resize Covers"
+  </dest>
+  <voice>
+    *: "Resize Covers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Rebuild cache"
+  </source>
+  <dest>
+    *: "Rebuild cache"
+  </dest>
+  <voice>
+    *: "Rebuild cache"
   </voice>
 </phrase>
 <phrase>
@@ -14966,17 +15005,185 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILE_ERROR
-  desc: in vbrfix plugin
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
   user: core
   <source>
-    *: "File error: %d"
+    *: "Go to WPS"
   </source>
   <dest>
-    *: "File error: %d"
+    *: "Go to WPS"
   </dest>
   <voice>
-    *: "File error"
+    *: "Go to WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide album title"
+  </source>
+  <dest>
+    *: "Hide album title"
+  </dest>
+  <voice>
+    *: "Hide album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the bottom"
+  </source>
+  <dest>
+    *: "Show at the bottom"
+  </dest>
+  <voice>
+    *: "Show at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the top"
+  </source>
+  <dest>
+    *: "Show at the top"
+  </dest>
+  <voice>
+    *: "Show at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings, also a volume adjustment mode
+  user: core
+  <source>
+    *: "Direct"
+  </source>
+  <dest>
+    *: "Direct"
+  </dest>
+  <voice>
+    *: "Direct"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Via Track list"
+  </source>
+  <dest>
+    *: "Via Track list"
+  </dest>
+  <voice>
+    *: "Via Track list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Always On"
+  </source>
+  <dest>
+    *: "Always On"
+  </dest>
+  <voice>
+    *: "Always On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "No album art found"
+  </source>
+  <dest>
+    *: "No album art found"
+  </dest>
+  <voice>
+    *: "No album art found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: "Cache will be rebuilt on next restart"
+  </dest>
+  <voice>
+    *: "Cache will be rebuilt on next restart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Playlist Cleared"
+  </source>
+  <dest>
+    *: "Playlist Cleared"
+  </dest>
+  <voice>
+    *: "Playlist Cleared"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Added to playlist"
+  </source>
+  <dest>
+    *: "Added to playlist"
+  </dest>
+  <voice>
+    *: "Added to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Error writing config"
+  </source>
+  <dest>
+    *: "Error writing config"
+  </dest>
+  <voice>
+    *: "Error writing config"
   </voice>
 </phrase>
 <phrase>
@@ -14994,6 +15201,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "File error: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_UPDATE_CACHE
   desc: in pictureflow
   user: core
@@ -15008,20 +15229,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHOW_AT_THE_BOTTOM_NEW
-  desc: in the pictureflow settings
-  user: core
-  <source>
-    *: "Show album at the bottom"
-  </source>
-  <dest>
-    *: "Show album at the bottom"
-  </dest>
-  <voice>
-    *: "Show album at the bottom"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HIDE_ALBUM_TITLE_NEW
   desc: in the pictureflow settings
   user: core
@@ -15033,6 +15240,20 @@
   </dest>
   <voice>
     *: "Hide information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the bottom"
+  </source>
+  <dest>
+    *: "Show album at the bottom"
+  </dest>
+  <voice>
+    *: "Show album at the bottom"
   </voice>
 </phrase>
 <phrase>
@@ -15330,40 +15551,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MIKMOD_HQMIXER
-  desc: in mikmod settings menu
-  user: core
-  <source>
-    *: "HQ Mixer"
-    lowmem: none
-  </source>
-  <dest>
-    *: "HQ Mixer"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "High Quality Mixer"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_SAMPLERATE
-  desc: in mikmod settings menu
-  user: core
-  <source>
-    *: "Sample Rate"
-    lowmem: none
-  </source>
-  <dest>
-    *: "Sample Rate"
-    lowmem: none
-  </dest>
-  <voice>
-    *: "Sample Rate"
-    lowmem: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_OPEN_PLUGIN
   desc: onplay open plugin
   user: core
@@ -15518,40 +15705,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_SHORT_SHARP
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    filter_roll_off: "Short Sharp"
-  </source>
-  <dest>
-    *: none
-    filter_roll_off: "Short Sharp"
-  </dest>
-  <voice>
-    *: none
-    filter_roll_off: "Short Sharp"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_SHORT_SLOW
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    filter_roll_off: "Short Slow"
-  </source>
-  <dest>
-    *: none
-    filter_roll_off: "Short Slow"
-  </dest>
-  <voice>
-    *: none
-    filter_roll_off: "Short Slow"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ENTER_USB_STORAGE_MODE_QUERY
   desc: upon plugging in USB
   user: core
@@ -15563,20 +15716,6 @@
   </dest>
   <voice>
     *: "Enter USB mass storage mode?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TALK_MIXER_LEVEL
-  desc: Relative volume of voice prompts
-  user: core
-  <source>
-    *: "Voice prompt volume"
-  </source>
-  <dest>
-    *: "Voice prompt volume"
-  </dest>
-  <voice>
-    *: "Voice prompt volume"
   </voice>
 </phrase>
 <phrase>
@@ -15717,159 +15856,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_SUPER_SLOW
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    filter_roll_off: "Super Slow"
-  </source>
-  <dest>
-    *: none
-    filter_roll_off: "Super Slow"
-  </dest>
-  <voice>
-    *: none
-    filter_roll_off: "Super Slow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_LINEAR_FAST
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Linear Fast"
-  </source>
-  <dest>
-    *: none
-    es9218: "Linear Fast"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Linear Fast"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_LINEAR_SLOW
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Linear Slow"
-  </source>
-  <dest>
-    *: none
-    es9218: "Linear Slow"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Linear Slow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_MINIMUM_FAST
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Minimum Fast"
-  </source>
-  <dest>
-    *: none
-    es9218: "Minimum Fast"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Minimum Fast"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_MINIMUM_SLOW
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Minimum Slow"
-  </source>
-  <dest>
-    *: none
-    es9218: "Minimum Slow"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Minimum Slow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_APODIZING_1
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Apodizing type 1"
-  </source>
-  <dest>
-    *: none
-    es9218: "Apodizing type 1"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Apodizing type 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_APODIZING_2
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Apodizing type 2"
-  </source>
-  <dest>
-    *: none
-    es9218: "Apodizing type 2"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Apodizing type 2"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_HYBRID_FAST
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Hybrid Fast"
-  </source>
-  <dest>
-    *: none
-    es9218: "Hybrid Fast"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Hybrid Fast"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_BRICK_WALL
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    es9218: "Brick Wall"
-  </source>
-  <dest>
-    *: none
-    es9218: "Brick Wall"
-  </dest>
-  <voice>
-    *: none
-    es9218: "Brick Wall"
   </voice>
 </phrase>
 <phrase>
@@ -16859,7 +16845,6 @@
     *: "Expert"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_STEREOSW_MODE
   desc: Stereo Switch Mode
@@ -16874,7 +16859,6 @@
     *: "Stereo Switch Mode"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_REVERSE
   desc: in settings_menu
@@ -16889,7 +16873,6 @@
     *: "Reverse"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_ALWAYS_ZERO
   desc: in settings_menu
@@ -16904,7 +16887,6 @@
     *: "Always 0"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_ALWAYS_ONE
   desc: in settings_menu

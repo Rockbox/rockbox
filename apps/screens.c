@@ -385,7 +385,7 @@ static const int id3_headers[]=
     LANG_ID3_BITRATE,
     LANG_ID3_FREQUENCY,
     LANG_ID3_TRACK_GAIN,
-    LANG_ID3_ALBUM_GAIN,
+    LANG_ALBUM_GAIN,
     LANG_FILESIZE,
     LANG_ID3_PATH,
     LANG_DATE,
@@ -692,7 +692,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if(say_it && val)
                     say_gain(val);
                 break;
-            case LANG_ID3_ALBUM_GAIN:
+            case LANG_ALBUM_GAIN:
                 replaygain_itoa(buffer, buffer_len, id3->album_level);
                 val=(id3->album_level) ? buffer : NULL; /* only show level!=0 */
                 if(say_it && val)
