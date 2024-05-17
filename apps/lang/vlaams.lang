@@ -12716,7 +12716,7 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: "DAC filter roll-off"
   </source>
   <dest>
     *: "DAC-filtersteilheid"

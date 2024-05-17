@@ -11983,7 +11983,7 @@
   user: core
   <source>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC filter roll-off"
   </source>
   <dest>
     *: none

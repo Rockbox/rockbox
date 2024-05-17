@@ -12074,15 +12074,15 @@
   user: core
   <source>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC filter roll-off"
   </source>
   <dest>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC filter roll-off"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC filter roll-off"
   </voice>
 </phrase>
 <phrase>
@@ -12346,18 +12346,18 @@
   user: core
   <source>
     *: none
-    dac_power_mode: "DAC's power mode"
-    es9218: "DAC's output level"
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
   </source>
   <dest>
     *: none
-    dac_power_mode: "DAC's power mode"
-    es9218: "DAC's output level"
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "DAC's power mode"
-    es9218: "DAC's output level"
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
   </voice>
 </phrase>
 <phrase>
