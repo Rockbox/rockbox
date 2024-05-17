@@ -4,9 +4,7 @@
     Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                       \/            \/     \/    \/            \/
-  $Id$
- 
- 
+
   Voice string corrections for voice.pl to support TTS engines.
   The list items are separated by the separator that is defined by the first
   character on the line. If the first character is a whitespace the line will
@@ -19,18 +17,9 @@
   Empty lines and lines starting with a whitespace are ignored, for all other
   lines the first character will become the separator.
 
-  General for all engines and languages
-
-/.*/.*/.*/USB/U S B/g
-/.*/.*/.*/LCD/L C D/g
-/.*/.*/.*/VBR/V B R/g
-/.*/.*/.*/FPS/F P S/g
-/.*/.*/.*/RWPS/R W P S/g
-/.*/.*/.*/WPS/W P S/g
-/.*/.*/.*/ID3/I D 3/g
-/.*/.*/.*/DAC/D A C/g
-/.*/.*/.*/ADC/A D C/g
-/.*/.*/.*/last\.fm/Last F M/ig
+  Note that the contents of this file are applied IN ORDER, so you must place
+  more generic rules at the end.  For example, the Russian-specific
+  correction for 'USB' conflicts with the generic correction.
 
   English
 
@@ -133,3 +122,16 @@
 /svenska/espeak/.*/procent/pro-cent/ig
 /svenska/espeak/.*/spellistor/spelistor/ig
 /svenska/espeak/.*/cuesheet/qjyschiit/ig
+
+  General for all engines and languages
+
+/.*/.*/.*/USB/U S B/g
+/.*/.*/.*/LCD/L C D/g
+/.*/.*/.*/VBR/V B R/g
+/.*/.*/.*/FPS/F P S/g
+/.*/.*/.*/RWPS/R W P S/g
+/.*/.*/.*/WPS/W P S/g
+/.*/.*/.*/ID3/I D 3/g
+/.*/.*/.*/DAC/D A C/g
+/.*/.*/.*/ADC/A D C/g
+/.*/.*/.*/last\.fm/Last F M/ig
