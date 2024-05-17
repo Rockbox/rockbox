@@ -392,13 +392,11 @@ foreach my $id (@langorder) {
 #	        print "#!! '$id:$tgt' dest does not match src format args: '$fmt1' vs '$fmt2'\n";
 	    }
 	}
-	if (defined($lp{$tgt})) {
-	    $count2 = $lp{$tgt} =~ tr/"//;
-            if ($count2 > 0) {
-		# If it has suspicious characters that are not allowed
-		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
-#               print "#!! '$id:$tgt' suspicious characters\n";
-	    }
+
+	if ($lang{$id}{'dest'}{$tgt} =~ tr/"//) {
+	    # If it has suspicious characters that are not allowed
+	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+#           print "#!! '$id:$tgt' suspicious characters\n";
 	}
     }
 }
@@ -439,11 +437,6 @@ foreach my $id (@langorder) {
 		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from translated <dest>!\n";
 		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
-		    if ($lang{$id}{'voice'}{$tgt} =~ /%"/) {
-	                # If it has suspicious characters that are not normally voiced..
-		        $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
-			#print "#!! '$id:$tgt' suspicious characters\n";
-		    }
 		} else {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
 
@@ -469,11 +462,16 @@ foreach my $id (@langorder) {
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english! (correct or prefix with ~)\n";
 	    }
 	}
-        if (defined($lp{$tgt}) && ($lp{$tgt} =~ /%"/)) {
+        if ($lang{$id}{'voice'}{$tgt} =~ tr/%"//) {
             # If it has suspicious characters that are not normally voiced..
-            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters (eg '%'), please double-check!\n";
 #            print "#!! '$id:$tgt' suspicious characters\n";
         }
+	if ($lang{$id}{'voice'}{$tgt} =~ /\.\.\./) {
+	    # Ellipses should not be in voice strings
+	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has ellipses (...), please remove!\n";
+#           print "#!! '$id:$tgt' ellipses\n";
+	}
     }
 }
 
