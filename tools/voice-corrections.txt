@@ -19,14 +19,6 @@
   Empty lines and lines starting with a whitespace are ignored, for all other
   lines the first character will become the separator.
 
-
-  Russian
-
-/russian/.*/.*/USB/Ю Эс Би/g
-/russian/.*/.*/VBR/Ви Би Ар/g
-/russian/.*/.*/ПДУ/П Д У/g
-/russian/.*/.*/ЖКД/Ж Ка Д/g
-
   General for all engines and languages
 
 /.*/.*/.*/USB/U S B/g
@@ -37,7 +29,7 @@
 /.*/.*/.*/WPS/W P S/g
 /.*/.*/.*/ID3/I D 3/g
 /.*/.*/.*/DAC/D A C/g
-/.*/.*/.*/ADC/A C C/g
+/.*/.*/.*/ADC/A D C/g
 /.*/.*/.*/last\.fm/Last F M/ig
 
   English
@@ -67,23 +59,6 @@
 /deutsch/sapi/AT&T Labs/energie\b/ener-gie/ig;
 /deutsch/sapi/AT&T Labs/\Blauf\b/-lauf/ig;
 /deutsch/sapi/AT&T Labs/\bnumerisch\b/numehrisch/ig;
-
-  Swedish (svenska)
-  for all swedish engines (e.g. for english words)
-
-/svenska/.*/.*/kilobyte/kilobajt/ig
-/svenska/.*/.*/megabyte/megabajt/ig
-/svenska/.*/.*/gigabyte/gigabajt/ig
-/svenska/.*/.*/\bloudness\b/laudness/ig
-/svenska/espeak/.*/ampere/ampär/ig
-/svenska/espeak/.*/bokmärken/bok-märken/ig
-/svenska/espeak/.*/generella/schenerella/ig
-/svenska/espeak/.*/dithering/diddering/ig
-/svenska/espeak/.*/\bunicode\b/jynikod/ig
-/svenska/espeak/.*/uttoning/utoning/ig
-/svenska/espeak/.*/procent/pro-cent/ig
-/svenska/espeak/.*/spellistor/spelistor/ig
-/svenska/espeak/.*/cuesheet/qjyschiit/ig
 
   Italian (italiano)
   for all italian engines (e.g. for english words)
@@ -134,3 +109,27 @@
 /japanese/sapi/Voiceware/一杯/いっぱい/ig
 /japanese/sapi/Voiceware/無い場合レジューム/無い場合、れじゅうむ/ig
 /japanese/sapi/Create System Development Co, Ltd./一杯/いっぱい/ig
+
+  Russian
+
+/russian/.*/.*/USB/Ю Эс Би/g
+/russian/.*/.*/VBR/Ви Би Ар/g
+/russian/.*/.*/ПДУ/П Д У/g
+/russian/.*/.*/ЖКД/Ж Ка Д/g
+
+  Swedish (svenska)
+  for all swedish engines (e.g. for english words)
+
+/svenska/.*/.*/kilobyte/kilobajt/ig
+/svenska/.*/.*/megabyte/megabajt/ig
+/svenska/.*/.*/gigabyte/gigabajt/ig
+/svenska/.*/.*/\bloudness\b/laudness/ig
+/svenska/espeak/.*/ampere/ampär/ig
+/svenska/espeak/.*/bokmärken/bok-märken/ig
+/svenska/espeak/.*/generella/schenerella/ig
+/svenska/espeak/.*/dithering/diddering/ig
+/svenska/espeak/.*/\bunicode\b/jynikod/ig
+/svenska/espeak/.*/uttoning/utoning/ig
+/svenska/espeak/.*/procent/pro-cent/ig
+/svenska/espeak/.*/spellistor/spelistor/ig
+/svenska/espeak/.*/cuesheet/qjyschiit/ig
