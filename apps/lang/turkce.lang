@@ -156,7 +156,7 @@
     *: "Disk Kontrolü yapıyor..."
   </dest>
   <voice>
-    *: "Disk Kontrolü yapıyor..."
+    *: "Disk Kontrolü yapıyor"
   </voice>
 </phrase>
 <phrase>
@@ -5392,7 +5392,7 @@
     *: "Bununla aç..."
   </dest>
   <voice>
-    *: "Bununla aç..."
+    *: "Bununla aç"
   </voice>
 </phrase>
 <phrase>
@@ -6106,7 +6106,7 @@
     *: "Kopyalanıyor..."
   </dest>
   <voice>
-    *: "Kopyalanıyor..."
+    *: "Kopyalanıyor"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7311,7 @@
     *: "Hareketli..."
   </dest>
   <voice>
-    *: "Hareketli..."
+    *: "Hareketli"
   </voice>
 </phrase>
 <phrase>
@@ -10897,7 +10897,7 @@
     *: "Siliniyor..."
   </dest>
   <voice>
-    *: "Siliniyor..."
+    *: "Siliniyor"
   </voice>
 </phrase>
 <phrase>
@@ -14030,10 +14030,10 @@
     *: "Thinking..."
   </source>
   <dest>
-    *: "düşün.."
+    *: "düşün..."
   </dest>
   <voice>
-    *: ""
+    *: "düşün"
   </voice>
 </phrase>
 <phrase>
@@ -16342,7 +16342,7 @@
     *: "Şöyle Ayarlansın..."
   </dest>
   <voice>
-    *: "Şöyle Ayarlansın..."
+    *: "Şöyle Ayarlansın"
   </voice>
 </phrase>
 <phrase>
@@ -16401,7 +16401,7 @@
     *: "Oynatma Listesine ekle..."
   </dest>
   <voice>
-    *: "Oynatma Listesine ekle..."
+    *: "Oynatma Listesine ekle"
   </voice>
 </phrase>
 <phrase>
@@ -16429,7 +16429,7 @@
     *: "Bir Sonraki Oynanıyor..."
   </dest>
   <voice>
-    *: "Bir Sonraki Oynanıyor..."
+    *: "Bir Sonraki Oynanıyor"
   </voice>
 </phrase>
 <phrase>
@@ -16774,7 +16774,7 @@
     *: "Labirent Oluşturuluyor..."
   </dest>
   <voice>
-    *: "Labirent Oluşturuluyor..."
+    *: "Labirent Oluşturuluyor"
   </voice>
 </phrase>
 <phrase>

@@ -14092,7 +14092,7 @@
     *: "Thinking..."
   </dest>
   <voice>
-    *: ""
+    *: "Thinking"
   </voice>
 </phrase>
 <phrase>
@@ -15819,7 +15819,7 @@
     *: "Queue..."
   </dest>
   <voice>
-    *: "Queue..."
+    *: "Queue"
   </voice>
 </phrase>
 <phrase>
@@ -16402,7 +16402,7 @@
     *: "Set As..."
   </dest>
   <voice>
-    *: "Set As..."
+    *: "Set As"
   </voice>
 </phrase>
 <phrase>
@@ -16461,7 +16461,7 @@
     *: "Add to Playlist..."
   </dest>
   <voice>
-    *: "Add to Playlist..."
+    *: "Add to Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -16489,7 +16489,7 @@
     *: "Playing Next..."
   </dest>
   <voice>
-    *: "Playing Next..."
+    *: "Playing Next"
   </voice>
 </phrase>
 <phrase>
@@ -16834,7 +16834,7 @@
     *: "Generating maze..."
   </dest>
   <voice>
-    *: "Generating maze..."
+    *: "Generating maze"
   </voice>
 </phrase>
 <phrase>
