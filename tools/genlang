@@ -27,7 +27,7 @@ my $SUBHEADER_SIZE    = 6;
 # the ability. But, starting now, this ability is no longer provided since I
 # figured it was boring and unnecessary to write support for now since we
 # don't use it anymore.
-   
+
 
 if(!$ARGV[0]) {
     print <<MOO
@@ -263,7 +263,7 @@ sub readenglish {
     my $withindest;
     my $numphrases = 0;
     my $numusers = 1; # core is already in the users map
-    
+
     while(<ENG>) {
 
         # get rid of DOS newlines
@@ -440,7 +440,7 @@ while(<LANG>) {
                     if($dest eq '""' && $phrase{'desc'} !~ /deprecated/i && $idstr !~ /^VOICE/) {
                         print STDERR "$input:$line:1: warning: empty dest before line in non-deprecated phrase!\n";
                     }
-                    
+
                     my $userstr = trim($phrase{'user'});
                     my $user = $users{$userstr};
                     if ($userstr eq "") {
@@ -471,12 +471,12 @@ while(<LANG>) {
                     }
 
 		    # Strip out the magic "Same as english" flag
-		    $dest =~ s/^("?)~/$1/;
-		    $voice =~ s/^("?)~/$1/;
-                    
+		    $dest =~ s/^("?)~+/$1/;
+		    $voice =~ s/^("?)~+/$1/;
+
                     $id{$idstr} = $idnum;
                     $idnum[$user][$idnum]=$idstr;
-                    
+
                     $source{$idstr}=$src;
                     $dest{$idstr}=$dest;
                     $voice{$idstr}=$voice;
@@ -529,7 +529,7 @@ if($prefix) {
     open(HFILE_CORE, ">$prefix/lang.h") ||
         die "Error: couldn't create file $prefix/lang.h\n";
     open(CFILE_CORE, ">$prefix/lang_core.c") ||
-        die "Error: couldn't create file $prefix/lang_core.c\n";        
+        die "Error: couldn't create file $prefix/lang_core.c\n";
 
    # get header file name
    $headername = "$prefix/lang.h";
@@ -572,7 +572,7 @@ MOO
     print CFILE_CORE <<MOO
 /* This file was automatically generated using genlang, the strings come
    from "$input" */
-   
+
 #include "$headername"
 
 unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
@@ -584,9 +584,9 @@ MOO
     my $i;
     for $i (0 .. $idcount[$users{"core"}]-1) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID name
-        
+
         $name =~ tr/\"//d; # cut off the quotes
-        
+
         printf HFILE_CORE ("    %s, /* %d */\n", $name, $i);
     }
 
@@ -602,9 +602,9 @@ MOO
 # Output the ID names for the enum in the header file
     for $i (0x8001 .. ($voiceid[$users{"core"}]-1)) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID name
-        
+
         $name =~ tr/\"//d; # cut off the quotes
-        
+
         printf HFILE_CORE ("    %s, /* 0x%x */\n", $name, $i);
     }
 
@@ -621,7 +621,7 @@ MOO
     for $i (0 .. $idcount[$users{"core"}]-1) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID
         my $dest = $dest{$name}; # get the destination phrase
-        
+
         $dest =~ s:\"$:\\0\":; # insert a \0 before the second quote
 
         if(!$dest) {
