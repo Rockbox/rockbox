@@ -48,7 +48,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
     int readlen;
     int rc;
     int orig_fd, fd;
-    
+
     rb->snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
 
     orig_fd = rb->open(fname, O_RDONLY);
@@ -70,7 +70,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
             rb->close(orig_fd);
             return 10*readlen - 3;
         }
-        
+
         rc = rb->write(fd, audiobuf, readlen);
         if(rc < 0) {
             rb->close(fd);
@@ -78,7 +78,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
             return 10*rc - 4;
         }
     }
-    
+
     /* Now insert the data into the file */
     rc = rb->write(fd, buf, num_bytes);
     if(rc < 0) {
@@ -103,7 +103,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
             return 10*rc - 8;
         }
     } while(readlen > 0);
-    
+
     rb->close(fd);
     rb->close(orig_fd);
 
@@ -118,13 +118,19 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
     if(rc < 0) {
         return 10*rc - 9;
     }
-    
+
     return 0;
 }
 
 static void fileerror(int rc)
 {
-    rb->splashf(HZ*2, ID2P(LANG_FILE_ERROR), rc);
+    if (rb->global_settings->talk_menu) {
+        rb->talk_id(LANG_FILE_ERROR, true);
+        rb->talk_value_decimal(rc, UNIT_INT, 0, true);
+        rb->talk_force_enqueue_next();
+    }
+
+    rb->splashf(HZ*2, rb->str(LANG_FILE_ERROR), rc);
 }
 
 static const unsigned char empty_id3_header[] =
@@ -154,7 +160,7 @@ static bool vbr_fix(const char *selected_file)
         fileerror(rc);
         return true;
     }
-    
+
     fd = rb->open(selected_file, O_RDWR);
     if(fd < 0) {
         fileerror(fd);
@@ -173,7 +179,7 @@ static bool vbr_fix(const char *selected_file)
                                           entry.filesize, xingbuf, num_frames, 0,
                                           0, xingupdate, true,
                                           audiobuf, audiobuflen);
-        
+
         /* Try to fit the Xing header first in the stream. Replace the existing
            VBR header if there is one, else see if there is room between the
            ID3 tag and the first MP3 frame. */
@@ -191,7 +197,7 @@ static bool vbr_fix(const char *selected_file)
 
             unused_space =
                 entry.first_frame_offset - entry.id3v2len - framelen;
-            
+
             /* Fill the unused space with 0's (using the MP3 buffer)
                and write it to the file */
             if(unused_space)
@@ -212,48 +218,48 @@ static bool vbr_fix(const char *selected_file)
                 fileerror(rc);
                 return true;
             }
-            
+
             rb->close(fd);
         } else {
             /* If not, insert some space. If there is an ID3 tag in the
                file we only insert just enough to squeeze the Xing header
                in. If not, we insert an additional empty ID3 tag of 4K. */
-            
+
             rb->close(fd);
-            
+
             /* Nasty trick alert! The insert_data_in_file() function
                uses the MP3 buffer when copying the data. We assume
                that the ID3 tag isn't longer than 1MB so the xing
                buffer won't be overwritten. */
-            
+
             if(entry.first_frame_offset) {
                 DEBUGF("Inserting %d bytes\n", framelen);
                 numbytes = framelen;
             } else {
                 DEBUGF("Inserting 4096+%d bytes\n", framelen);
                 numbytes = 4096 + framelen;
-                
+
                 rb->memset(audiobuf + 0x100000, 0, numbytes);
-                
+
                 /* Insert the ID3 header */
                 rb->memcpy(audiobuf + 0x100000, empty_id3_header,
                            sizeof(empty_id3_header));
             }
-            
+
             /* Copy the Xing header */
             rb->memcpy(audiobuf + 0x100000 + numbytes - framelen,
                        xingbuf, framelen);
-            
+
             rc = insert_data_in_file(selected_file,
                                      entry.first_frame_offset,
                                      audiobuf + 0x100000, numbytes);
-            
+
             if(rc < 0) {
                 fileerror(rc);
                 return true;
             }
         }
-        
+
         xingupdate(100);
     }
     else
@@ -276,7 +282,7 @@ enum plugin_status plugin_start(const void *parameter)
         return PLUGIN_ERROR;
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif

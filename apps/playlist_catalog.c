@@ -95,7 +95,12 @@ static int initialize_catalog_buf(char* dirbuf, size_t dirbuf_sz)
     if (!dir_exists(dirbuf))
     {
         if (mkdir(dirbuf) < 0) {
-            splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), dirbuf);
+            if (global_settings.talk_menu) {
+                talk_id(LANG_CATALOG_NO_DIRECTORY, true);
+                talk_dir_or_spell(dirbuf, NULL, true);
+                talk_force_enqueue_next();
+            }
+            splashf(HZ*2, str(LANG_CATALOG_NO_DIRECTORY), dirbuf);
             return -1;
         }
         else {
@@ -469,7 +474,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         }
         else
             strmemccpy(playlist, m3u8name, sizeof(playlist));
-        
+
         if (!catalog_pick_new_playlist_name(playlist, sizeof(playlist), NULL))
             return false;
     }

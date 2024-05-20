@@ -41,6 +41,7 @@
 #include "tagtree.h"
 #include "lang.h"
 #include "logf.h"
+#include "talk.h"
 #include "playlist.h"
 #include "keyboard.h"
 #include "gui/list.h"
@@ -1744,7 +1745,12 @@ entry_skip_formatter:
 
     if (!sort && (sort_inverse || sort_limit))
     {
-        splashf(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        if (global_settings.talk_menu) {
+            talk_id(LANG_SHOWDIR_BUFFER_FULL, true);
+            talk_value(total_count, UNIT_INT, true);
+        }
+
+        splashf(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
