@@ -975,7 +975,7 @@ static int select_bookmark(const char* bookmark_file_name,
         {
             MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
                 NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME),
-                ID2P(LANG_BOOKMARK_CONTEXT_DELETE));
+                ID2P(LANG_DELETE));
             static const int menu_actions[] =
             {
                 ACTION_STD_OK, ACTION_BMS_DELETE
@@ -1295,7 +1295,7 @@ bool bookmark_exists(void)
 
     char* name = playlist_get_name(NULL, global_temp_buffer,
                                    sizeof(global_temp_buffer));
-    if (!playlist_dynamic_only() && 
+    if (!playlist_dynamic_only() &&
         generate_bookmark_file_name(bm_filename, sizeof(bm_filename), name, -1))
     {
         exist = file_exists(bm_filename);

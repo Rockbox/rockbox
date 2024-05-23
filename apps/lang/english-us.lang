@@ -536,20 +536,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Delete"
-  </dest>
-  <voice>
-    *: "Delete"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -4058,23 +4044,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Alarm Set"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Alarm set"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -5289,23 +5258,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Directory"
-  </dest>
-  <voice>
-    *: none
-    recording: "Directory"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLEAR_REC_DIR
   desc:
   user: core
@@ -6249,20 +6201,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "View Catalog"
-  </dest>
-  <voice>
-    *: "View Catalog"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CATALOG_ADD_TO_NEW
   desc: in onplay playlist catalogue submenu
   user: core
@@ -7023,20 +6961,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Error updating playlist control file"
-  </dest>
-  <voice>
-    *: "Error updating playlist control file"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
   user: core
@@ -7219,23 +7143,6 @@
   <voice>
     *: none
     iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-inf"
-  </dest>
-  <voice>
-    *: none
-    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>
@@ -7461,23 +7368,6 @@
   <voice>
     *: none
     charging: "Battery: Charging"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </dest>
-  <voice>
-    *: none
-    charging: "Trickle charge"
   </voice>
 </phrase>
 <phrase>
@@ -10412,20 +10302,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Scrollbar Position"
-  </dest>
-  <voice>
-    *: "Scrollbar position"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR
   desc: in sound settings
   user: core
@@ -10698,20 +10574,6 @@
   </dest>
   <voice>
     *: "Skip to Outro"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Custom"
-  </dest>
-  <voice>
-    *: "Custom"
   </voice>
 </phrase>
 <phrase>
@@ -12630,20 +12492,6 @@
   </dest>
   <voice>
     *: "Moving track"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "No viewers found"
-  </dest>
-  <voice>
-    *: "No viewers found"
   </voice>
 </phrase>
 <phrase>
@@ -14887,34 +14735,6 @@
   </dest>
   <voice>
     *: "Cache will be rebuilt on next restart"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Playlist Cleared"
-  </dest>
-  <voice>
-    *: "Playlist Cleared"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Added to playlist"
-  </dest>
-  <voice>
-    *: "Added to playlist"
   </voice>
 </phrase>
 <phrase>
