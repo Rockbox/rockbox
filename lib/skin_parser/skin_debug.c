@@ -43,6 +43,9 @@ static char* error_message;
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
 {
+    if (children == NULL)
+        return NULL;
+
     struct skin_element **kids = SKINOFFSETTOPTR(skin_buffer, children);
     return kids[child];
 }
@@ -266,7 +269,7 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
         case INTEGER:
             printf("integer: %d", params[i].data.number);
             break;
-            
+
         case DECIMAL:
             printf("decimal: %d.%d", params[i].data.number/10,
                               params[i].data.number%10);
