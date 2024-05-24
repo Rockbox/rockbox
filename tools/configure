@@ -4307,7 +4307,6 @@ fi
       uname=`uname`
       simcc "checkwps"
       toolset='';
-      t_cpu='';
       GCCOPTS='';
       rbdir='.'
       extradefines="$extradefines  -DDEBUG"

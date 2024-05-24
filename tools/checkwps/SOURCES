@@ -2,6 +2,7 @@
 ../../apps/gui/skin_engine/skin_parser.c
 ../../apps/gui/skin_engine/skin_backdrops.c
 ../../apps/gui/viewport.c
+../../apps/language.c
 ../../apps/misc.c
 ../../firmware/common/strmemccpy.c
 ../../firmware/common/strlcpy.c

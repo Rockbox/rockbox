@@ -44,6 +44,8 @@
 #else
 #include "action.h"
 #include "checkwps.h"
+#include "language.h"
+#include "lang_enum.h"
 #include "audio.h"
 #define lang_is_rtl() (false)
 #define DEBUGF printf
@@ -804,22 +806,29 @@ static int parse_setting_and_lang(struct skin_element *element,
                                   struct wps_token *token,
                                   struct wps_data *wps_data)
 {
-    /* NOTE: both the string validations that happen in here will
-     * automatically PASS on checkwps because its too hard to get
-     * settings_list.c and english.lang built for it.
-     * If that ever changes remove the #ifndef __PCTOOL__'s here
-     */
     (void)wps_data;
     char *temp = get_param_text(element, 0);
 
     if (token->type == SKIN_TOKEN_TRANSLATEDSTRING)
     {
-#ifndef __PCTOOL__
         int i = lang_english_to_id(temp);
-        if (i < 0)
+        if (i < 0) {
+            DEBUGF("Translated String [%s] NOT FOUND\n", temp);
+            /* Due to conditionals in a theme, a missing string
+               might never be hit.  So currently we have to just treat
+               this as an advisory */
+#if 1
             i = LANG_LAST_INDEX_IN_ARRAY;
-        token->value.i = i;
+#else
+            return WPS_ERROR_INVALID_PARAM;
 #endif
+        }
+#ifdef DEBUG_SKIN_ENGINE
+        else if (debug_wps) {
+            DEBUGF("Translated String [%s] = %d\n", temp, i);
+        }
+#endif
+        token->value.i = i;
     }
     else if (element->params_count > 1)
     {
@@ -830,11 +839,17 @@ static int parse_setting_and_lang(struct skin_element *element,
     }
     else
     {
+    /* NOTE: The string validations that happen here will
+     * automatically PASS on checkwps because its too hard to get
+     * settings_list.c built for a specific target.
+     * If that ever changes remove the #ifndef __PCTOOL__ here
+     */
 #ifndef __PCTOOL__
         const struct settings_list *setting = find_setting_by_cfgname(temp);
-        if (!setting)
+        if (!setting) {
+            DEBUGF("Invalid setting [%s]\n", temp);
             return WPS_ERROR_INVALID_PARAM;
-
+        }
         token->value.xdata = (void *)setting;
 #endif
     }

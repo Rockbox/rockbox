@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
-#ifndef __PCTOOL__
+#if defined(CHECKWPS) || !defined(__PCTOOL__)
 #include "button-target.h"
 #endif
 

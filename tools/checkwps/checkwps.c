@@ -35,7 +35,7 @@
 #include "file.h"
 #include "font.h"
 
-bool debug_wps = true;
+bool debug_wps = false;
 int wps_verbose_level = 0;
 char *skin_buffer;
 
@@ -167,9 +167,9 @@ int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
 #endif
 
-static inline bool backdrop_load(const char *filename, char* backdrop_buffer) 	
-{ 	
- (void)filename; (void)backdrop_buffer; return true; 	
+static inline bool backdrop_load(const char *filename, char* backdrop_buffer)
+{
+ (void)filename; (void)backdrop_buffer; return true;
 }
 
 struct screen screens[NB_SCREENS] =
@@ -282,6 +282,7 @@ int main(int argc, char **argv)
         while (argv[1][i] && argv[1][i] == 'v') {
             i++;
             wps_verbose_level++;
+            debug_wps = true;
         }
     }
     skin_buffer = malloc(SKIN_BUFFER_SIZE);
