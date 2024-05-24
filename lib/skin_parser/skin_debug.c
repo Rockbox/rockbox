@@ -43,7 +43,7 @@ static char* error_message;
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
 {
-    if (children == NULL)
+    if ((void*)children == NULL) // Stupid type shenanigans
         return NULL;
 
     struct skin_element **kids = SKINOFFSETTOPTR(skin_buffer, children);
