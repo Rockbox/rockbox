@@ -177,21 +177,12 @@ static int bookmark_menu_callback(int action,
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
-            /* hide create bookmark option if bookmarking isn't currently possible (no track playing, queued tracks...) */
-            if (this_item == &bookmark_create_menu_item)
-            {
-                if (!bookmark_is_bookmarkable_state())
-                    return ACTION_EXIT_MENUITEM;
-            }
             /* hide loading bookmarks menu if no bookmarks exist */
-            else if (this_item == &bookmark_load_menu_item)
+            if (this_item == &bookmark_load_menu_item)
             {
                 if (!bookmark_exists())
                     return ACTION_EXIT_MENUITEM;
             }
-            /* hide the bookmark menu if bookmarks can't be loaded or created */
-            else if (!bookmark_is_bookmarkable_state() && !bookmark_exists())
-                return ACTION_EXIT_MENUITEM;
             break;
         case ACTION_EXIT_MENUITEM:
             settings_save();

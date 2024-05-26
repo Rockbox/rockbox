@@ -42,6 +42,7 @@
 #include "plugin.h"
 #include "file.h"
 #include "pathfuncs.h"
+#include "playlist_menu.h"
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
@@ -1096,6 +1097,9 @@ static bool play_bookmark(const char* bookmark)
 /* ----------------------------------------------------------------------- */
 bool bookmark_create_menu(void)
 {
+    if (!bookmark_is_bookmarkable_state())
+        save_playlist_screen(NULL);
+
     return write_bookmark(true);
 }
 /* ----------------------------------------------------------------------- */
