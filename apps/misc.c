@@ -200,6 +200,29 @@ bool warn_on_pl_erase(void)
         return true;
 }
 
+bool show_search_progress(bool init, int count)
+{
+    static int last_tick = 0;
+
+    /* Don't show splashes for 1/2 second after starting search */
+    if (init)
+    {
+        last_tick = current_tick + HZ/2;
+        return true;
+    }
+
+    /* Update progress every 1/10 of a second */
+    if (TIME_AFTER(current_tick, last_tick + HZ/10))
+    {
+        splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), count, str(LANG_OFF_ABORT));
+        if (action_userabort(TIMEOUT_NOBLOCK))
+            return false;
+        last_tick = current_tick;
+        yield();
+    }
+
+    return true;
+}
 
 /* Performance optimized version of the read_line() (see below) function. */
 int fast_readline(int fd, char *buf, int buf_size, void *parameters,

@@ -19,10 +19,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-
-#ifdef HAVE_TAGCACHE
 #include "lib/mul_id3.h"
-#endif
 
 #if !defined(ARRAY_SIZE)
     #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
@@ -38,6 +35,7 @@ struct dir_stats {
 
 enum props_types {
     PROPS_FILE = 0,
+    PROPS_PLAYLIST,
     PROPS_ID3,
     PROPS_MUL_ID3,
     PROPS_DIR
@@ -46,10 +44,8 @@ enum props_types {
 static int props_type = PROPS_FILE;
 
 static struct mp3entry id3;
-#ifdef HAVE_TAGCACHE
 static int mul_id3_count;
 static int skipped_count;
-#endif
 
 static char str_filename[MAX_PATH];
 static char str_dirname[MAX_PATH];
@@ -64,6 +60,7 @@ static int32_t size_unit;
 static struct tm tm;
 
 #define NUM_FILE_PROPERTIES 5
+#define NUM_PLAYLIST_PROPERTIES 1 + NUM_FILE_PROPERTIES
 static const unsigned char* const props_file[] =
 {
     ID2P(LANG_PROPERTIES_PATH),       str_dirname,
@@ -71,6 +68,7 @@ static const unsigned char* const props_file[] =
     ID2P(LANG_PROPERTIES_SIZE),       str_size,
     ID2P(LANG_PROPERTIES_DATE),       str_date,
     ID2P(LANG_PROPERTIES_TIME),       str_time,
+    ID2P(LANG_MENU_SHOW_ID3_INFO),    "...",
 };
 
 #define NUM_DIR_PROPERTIES 4
@@ -120,7 +118,8 @@ static bool file_properties(const char* selected_file)
                 log = human_size_log((unsigned long)info.size);
                 nsize = ((unsigned long)info.size) >> (log*10);
                 size_unit = units[log];
-                rb->snprintf(str_size, sizeof str_size, "%lu %s", nsize, rb->str(size_unit));
+                rb->snprintf(str_size, sizeof str_size, "%lu %s",
+                             nsize, rb->str(size_unit));
                 rb->gmtime_r(&info.mtime, &tm);
                 rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
                     tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
@@ -249,7 +248,7 @@ static const char * get_props(int selected_item, void* data,
     if (PROPS_DIR == props_type)
         rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_dir)) ? "ERROR" :
                                 (char *) p2str(props_dir[selected_item]), buffer_len);
-    else if (PROPS_FILE == props_type)
+    else
         rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_file)) ? "ERROR" :
                                 (char *) p2str(props_file[selected_item]), buffer_len);
 
@@ -259,7 +258,8 @@ static const char * get_props(int selected_item, void* data,
 static int speak_property_selection(int selected_item, void *data)
 {
     struct dir_stats *stats = data;
-    int32_t id = P2ID((props_type == PROPS_DIR  ? props_dir : props_file)[selected_item]);
+    int32_t id = P2ID((props_type == PROPS_DIR ?
+                       props_dir : props_file)[selected_item]);
     rb->talk_id(id, false);
     switch (id)
     {
@@ -326,7 +326,8 @@ static int browse_file_or_dir(struct dir_stats *stats)
         rb->gui_synclist_set_voice_callback(&properties_lists, speak_property_selection);
     rb->gui_synclist_set_nb_items(&properties_lists,
                                   2 * (props_type == PROPS_FILE ? NUM_FILE_PROPERTIES :
-                                                                  NUM_DIR_PROPERTIES));
+                                       props_type == PROPS_PLAYLIST ? 
+                                       NUM_PLAYLIST_PROPERTIES : NUM_DIR_PROPERTIES));
     rb->gui_synclist_select_item(&properties_lists, 0);
     rb->gui_synclist_draw(&properties_lists);
     rb->gui_synclist_speak_item(&properties_lists);
@@ -339,11 +340,17 @@ static int browse_file_or_dir(struct dir_stats *stats)
             continue;
         switch(button)
         {
+            case ACTION_STD_OK:
+                if (props_type == PROPS_PLAYLIST &&
+                      rb->gui_synclist_get_sel_pos(&properties_lists)
+                        == ARRAY_SIZE(props_file) - 2)
+                    return -1;
+                break;
             case ACTION_STD_CANCEL:
-                return false;
+                return 0;
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
+                    return 1;
                 break;
         }
     }
@@ -372,7 +379,6 @@ static bool determine_file_or_dir(void)
     return false;
 }
 
-#ifdef HAVE_TAGCACHE
 bool mul_id3_add(const char *file_name)
 {
     if (!file_name || rb->mp3info(&id3, file_name))
@@ -385,10 +391,37 @@ bool mul_id3_add(const char *file_name)
 
     return true;
 }
+
+static bool has_pl_extension(const char* filename)
+{
+    char *dot = rb->strrchr(filename, '.');
+    return (dot && (!rb->strcasecmp(dot, ".m3u") || !rb->strcasecmp(dot, ".m3u8")));
+}
+
+/* Assemble track info from a database table or the contents of a playlist file */
+static bool assemble_track_info(const char *filename)
+{
+    props_type = PROPS_MUL_ID3;
+    mul_id3_count = skipped_count = 0;
+
+    if (     (filename && !rb->playlist_entries_iterate(filename, NULL, &mul_id3_add))
+#ifdef HAVE_TAGCACHE
+         || (!filename && !rb->tagtree_subentries_do_action(&mul_id3_add))
 #endif
+         || mul_id3_count == 0)
+        return false;
+    else if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
+        finalize_id3(&id3);
+
+    if (skipped_count > 0)
+        rb->splashf(HZ*2, "Skipped %d", skipped_count);
+
+    return true;
+}
 
 enum plugin_status plugin_start(const void* parameter)
 {
+    int ret;
     static struct dir_stats stats =
     {
         .len = MAX_PATH,
@@ -405,23 +438,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
 
-#ifdef HAVE_TAGCACHE
-    if (!rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))) /* db table selected */
-    {
-        props_type = PROPS_MUL_ID3;
-        mul_id3_count = skipped_count = 0;
-
-        if (!rb->tagtree_subentries_do_action(&mul_id3_add) || mul_id3_count == 0)
-            return PLUGIN_ERROR;
-        else if (mul_id3_count > 1) /* otherwise, the retrieved id3 can be used as-is */
-            finalize_id3(&id3);
-
-        if (skipped_count > 0)
-            rb->splashf(HZ*2, "Skipped %d", skipped_count);
-    }
-    else
-#endif
-    if (file[0] == '/') /* single track selected */
+    if (file[0] == '/') /* single file selected */
     {
         const char* file_name = rb->strrchr(file, '/') + 1;
         int dirlen = (file_name - file);
@@ -437,8 +454,12 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_OK;
         }
 
+        if (props_type == PROPS_FILE && has_pl_extension(file))
+            props_type = PROPS_PLAYLIST;
+
         /* get the info depending on its_a_dir */
-        if(!(props_type == PROPS_DIR ? dir_properties(file, &stats) : file_properties(file)))
+        if(!(props_type == PROPS_DIR ?
+             dir_properties(file, &stats) : file_properties(file)))
         {
             /* something went wrong (to do: tell user what it was (nesting,...) */
             rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
@@ -446,20 +467,32 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_OK;
         }
     }
-    else
+             /* database table selected */
+    else if (rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))
+             || !assemble_track_info(NULL))
         return PLUGIN_ERROR;
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
-    bool usb =  props_type == PROPS_ID3 ?     rb->browse_id3(&id3, 0, 0, &tm, 1)  :
-#ifdef HAVE_TAGCACHE
-                props_type == PROPS_MUL_ID3 ? rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
-#endif
-                                              browse_file_or_dir(&stats);
+    if (props_type == PROPS_ID3)
+        ret = rb->browse_id3(&id3, 0, 0, &tm, 1);   /* Track Info for single file */
+    else if (props_type == PROPS_MUL_ID3)
+        ret = rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count); /* database tracks */
+    else if ((ret = browse_file_or_dir(&stats)) < 0)
+        ret = assemble_track_info(file) ?                      /* playlist tracks */
+                rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) : -1;
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
 
-    return usb ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
+    switch (ret)
+    {
+        case 1:
+            return PLUGIN_USB_CONNECTED;
+        case -1:
+            return PLUGIN_ERROR;
+        default:
+            return PLUGIN_OK;
+    }
 }

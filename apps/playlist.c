@@ -2498,74 +2498,105 @@ int playlist_insert_directory(struct playlist_info* playlist,
 }
 
 /*
- * Insert all tracks from specified playlist into dynamic playlist.
+ * If action_cb is *not* NULL, it will be called for every track contained
+ * in the playlist specified by filename. If action_cb is NULL, you must
+ * instead provide a playlist insert context to use for adding each track
+ * into a dynamic playlist.
  */
-int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
-                             int position, bool queue)
+bool playlist_entries_iterate(const char *filename,
+                              struct playlist_insert_context *pl_context,
+                              bool (*action_cb)(const char *file_name))
 {
-    int fd = -1;
+    int fd = -1, i = 0;
+    bool ret = false;
     int max;
     char *dir;
 
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
 
-    int result = -1;
     bool utf8 = is_m3u8_name(filename);
+
+    cpu_boost(true);
+
+    fd = open_utf8(filename, O_RDONLY);
+    if (fd < 0)
+    {
+        notify_access_error();
+        goto out;
+    }
+
+    /* we need the directory name for formatting purposes */
+    size_t dirlen = path_dirname(filename, (const char **)&dir);
+    //dir = strmemdupa(dir, dirlen);
+
+
+    if (action_cb)
+        show_search_progress(true, 0);
+
+    while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
+    {
+        /* user abort */
+        if (!action_cb && action_userabort(TIMEOUT_NOBLOCK))
+            break;
+
+        if (temp_buf[0] != '#' && temp_buf[0] != '\0')
+        {
+            i++;
+            if (!utf8)
+            {
+                /* Use trackname as a temporay buffer. Note that trackname must
+                 * be as large as temp_buf.
+                 */
+                max = convert_m3u_name(temp_buf, max, sizeof(temp_buf), trackname);
+            }
+
+            /* we need to format so that relative paths are correctly
+               handled */
+            if (format_track_path(trackname, temp_buf,
+                                  sizeof(trackname), dir, dirlen) < 0)
+            {
+                goto out;
+            }
+
+            if (action_cb)
+            {
+                if (!action_cb(trackname))
+                    goto out;
+                else if (!show_search_progress(false, i))
+                    break;
+            }
+            else if (playlist_insert_context_add(pl_context, trackname) < 0)
+                goto out;
+        }
+
+        /* let the other threads work */
+        yield();
+    }
+    ret = true;
+
+out:
+    close(fd);
+    cpu_boost(false);
+    return ret;
+}
+
+/*
+ * Insert all tracks from specified playlist into dynamic playlist.
+ */
+int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
+                             int position, bool queue)
+{
+
+    int result = -1;
 
     struct playlist_insert_context pl_context;
     cpu_boost(true);
 
-    if (playlist_insert_context_create(playlist, &pl_context, position, queue, true) >= 0)
-    {
-        fd = open_utf8(filename, O_RDONLY);
-        if (fd < 0)
-        {
-            notify_access_error();
-            goto out;
-        }
+    if (playlist_insert_context_create(playlist, &pl_context, position, queue, true) >= 0
+         && playlist_entries_iterate(filename, &pl_context, NULL))
+        result = 0;
 
-        /* we need the directory name for formatting purposes */
-        size_t dirlen = path_dirname(filename, (const char **)&dir);
-        //dir = strmemdupa(dir, dirlen);
-
-        while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
-        {
-            /* user abort */
-            if (action_userabort(TIMEOUT_NOBLOCK))
-                break;
-
-            if (temp_buf[0] != '#' && temp_buf[0] != '\0')
-            {
-                if (!utf8)
-                {
-                    /* Use trackname as a temporay buffer. Note that trackname must
-                     * be as large as temp_buf.
-                     */
-                    max = convert_m3u_name(temp_buf, max, sizeof(temp_buf), trackname);
-                }
-
-                /* we need to format so that relative paths are correctly
-                   handled */
-                if (format_track_path(trackname, temp_buf,
-                                      sizeof(trackname), dir, dirlen) < 0)
-                {
-                    goto out;
-                }
-
-                if (playlist_insert_context_add(&pl_context, trackname) < 0)
-                    goto out;
-            }
-
-            /* let the other threads work */
-            yield();
-        }
-    }
-
-    result = 0;
-
-out:
-    close(fd);
     cpu_boost(false);
     playlist_insert_context_release(&pl_context);
     return result;

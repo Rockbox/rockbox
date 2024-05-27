@@ -159,6 +159,9 @@ int playlist_insert_directory(struct playlist_info* playlist,
                               bool recurse);
 int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue);
+bool playlist_entries_iterate(const char *filename,
+                              struct playlist_insert_context *pl_context,
+                              bool (*action_cb)(const char *file_name));
 void playlist_skip_entry(struct playlist_info *playlist, int steps);
 int playlist_delete(struct playlist_info* playlist, int index);
 int playlist_move(struct playlist_info* playlist, int index, int new_index);
