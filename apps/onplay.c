@@ -1442,9 +1442,9 @@ static int clipboard_callback(int action,
                 return (clipboard.path[0] != 0) ?
                                     action : ACTION_EXIT_MENUITEM;
             }
-            else if (this_item == &create_dir_item)
+            else if (this_item == &create_dir_item &&
+                     *tree_get_context()->dirfilter <= NUM_FILTER_MODES)
             {
-                /* always visible */
                 return action;
             }
             else if (selected_file)
