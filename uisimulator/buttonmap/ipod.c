@@ -54,6 +54,7 @@ int key_to_button(int keyboard_button)
         case SDLK_SPACE:
             new_btn = BUTTON_SELECT;
             break;
+        case SDLK_ESCAPE:
         case SDLK_KP_PERIOD:
         case SDLK_INSERT:
             new_btn = BUTTON_MENU;
@@ -101,6 +102,14 @@ struct button_map bm[] = {
     { SDLK_KP_PLUS,    95, 326, 27, "Play" },
     { SDLK_KP8,        57, 233, 29, "Scroll Back" },
     { SDLK_KP2,       132, 226, 29, "Scroll Fwd" },
+#elif defined (IPOD_6G)
+    { SDLK_KP5,        175, 432, 45, "Select" },
+    { SDLK_KP4,         75, 432, 38, "Left" },
+    { SDLK_KP6,        275, 432, 39, "Right" },
+    { SDLK_KP_PERIOD,  175, 350, 34, "Menu" },
+    { SDLK_KP_PLUS,    175, 539, 41, "Play" },
+    { SDLK_KP8,        100, 375, 35, "Scroll Back" },
+    { SDLK_KP2,        245, 375, 35, "Scroll Fwd" },
 #elif defined (IPOD_COLOR) 
     { SDLK_KP5,        128, 362, 35, "Select" },
     { SDLK_KP4,         55, 358, 38, "Left" },
