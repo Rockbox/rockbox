@@ -324,7 +324,7 @@ static void button_event(int key, bool pressed)
     case SDLK_p:
         if (!pressed)
         {
-            static bool hp_connected = false;
+            static bool hp_connected = true;
             hp_connected = !hp_connected;
             sim_trigger_hp(hp_connected);
         }
