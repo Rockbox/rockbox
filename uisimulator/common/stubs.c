@@ -172,20 +172,6 @@ bool rtc_check_alarm_flag(void)
 }
 #endif
 
-#ifdef HAVE_HEADPHONE_DETECTION
-bool headphones_inserted(void)
-{
-    return true;
-}
-#endif
-
-#ifdef HAVE_LINEOUT_DETECTION
-bool lineout_inserted(void)
-{
-    return false;
-}
-#endif
-
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {

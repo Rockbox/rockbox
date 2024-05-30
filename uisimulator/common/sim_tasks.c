@@ -144,6 +144,32 @@ void sim_trigger_screendump(void)
     queue_post(&sim_queue, SIM_SCREENDUMP, 0);
 }
 
+#ifdef HAVE_HEADPHONE_DETECTION
+static bool is_hp_inserted = true;
+bool headphones_inserted(void)
+{
+    return is_hp_inserted;
+}
+void sim_trigger_hp(bool inserted)
+{
+    is_hp_inserted = inserted;
+    DEBUGF("Headphone %s.\n", inserted ? "inserted":"removed");
+}
+#endif
+
+#ifdef HAVE_LINEOUT_DETECTION
+static bool is_lo_inserted = false;
+bool lineout_inserted(void)
+{
+    return is_lo_inserted;
+}
+void sim_trigger_lo(bool inserted)
+{
+    is_lo_inserted = inserted;
+    DEBUGF("Lineout %s.\n", inserted ? "inserted":"removed");
+}
+#endif
+
 static bool is_usb_inserted;
 void sim_trigger_usb(bool inserted)
 {
@@ -157,8 +183,10 @@ void sim_trigger_usb(bool inserted)
     {
         send_event(SYS_EVENT_USB_EXTRACTED, NULL);
         queue_post(&sim_queue, SIM_USB_EXTRACTED, 0);
+        DEBUGF("USB %s.\n", inserted ? "inserted":"removed");
     }
     is_usb_inserted = inserted;
+
 }
 
 int usb_detect(void)
@@ -204,6 +232,8 @@ void sim_trigger_external(bool inserted)
         queue_post(&sim_queue, SIM_EXT_INSERTED, drive);
     else
         queue_post(&sim_queue, SIM_EXT_EXTRACTED, drive);
+
+    DEBUGF("Ext %s\n", inserted ? "inserted":"removed");
 }
 
 bool hostfs_present(int drive)

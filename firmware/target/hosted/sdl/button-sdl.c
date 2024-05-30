@@ -320,6 +320,26 @@ static void button_event(int key, bool pressed)
             sim_trigger_usb(usb_connected);
         }
         return;
+#ifdef HAVE_HEADPHONE_DETECTION
+    case SDLK_p:
+        if (!pressed)
+        {
+            static bool hp_connected = false;
+            hp_connected = !hp_connected;
+            sim_trigger_hp(hp_connected);
+        }
+        return;
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+    case SDLK_l:
+        if (!pressed)
+        {
+            static bool lo_connected = false;
+            lo_connected = !lo_connected;
+            sim_trigger_lo(lo_connected);
+        }
+        return;
+#endif
 #ifdef HAVE_MULTIDRIVE
     case EXT_KEY:
         if (!pressed)
