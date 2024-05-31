@@ -121,6 +121,15 @@ static int show_credits(void)
     return 0;
 }
 
+static int show_legal(void)
+{
+    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", "/.rockbox/docs/COPYING.txt") != PLUGIN_OK)
+        show_info();
+    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", "/.rockbox/docs/LICENSES.txt") != PLUGIN_OK)
+        show_info();
+    return 0;
+}
+
 #define SIZE_FMT "%s %s"
 struct info_data
 
@@ -469,9 +478,12 @@ MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                   debug_menu, NULL, Icon_NOICON);
 
+MENUITEM_FUNCTION(show_legal_item, 0, ID2P(LANG_LEGAL_NOTICES),
+                  show_legal, NULL, Icon_NOICON);
+
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
           &show_info_item, &show_credits_item,
-          &show_runtime_item, &debug_menu_item);
+          &show_runtime_item, &show_legal_item, &debug_menu_item);
 /*      INFO MENU                  */
 /***********************************/
 

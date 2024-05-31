@@ -16298,3 +16298,17 @@
     *: "Always 1"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Legal Notices"
+  </dest>
+  <voice>
+    *: "Legal Notices"
+  </voice>
+</phrase>
