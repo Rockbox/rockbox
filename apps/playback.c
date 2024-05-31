@@ -4054,6 +4054,8 @@ static unsigned long audio_guess_frequency(struct mp3entry *id3)
 
 static bool audio_auto_change_frequency(struct mp3entry *id3, bool play)
 {
+    if (!valid_mp3entry(id3))
+        return false;
     unsigned long guessed_frequency = global_settings.play_frequency == 0 ? audio_guess_frequency(id3) : 0;
     if (guessed_frequency && mixer_get_frequency() != guessed_frequency)
     {
