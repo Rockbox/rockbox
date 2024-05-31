@@ -365,7 +365,8 @@ foreach my $id (@langorder) {
 	}
 	if ($id eq 'LANG_VOICED_DATE_FORMAT') {
 	    my $sane = $lp{$tgt};
-	    $sane =~ tr/YAmd//d;
+	    $sane =~ s/^~?(.*)/$1/;  # Strip off leading ~ if it's there as it's not a legal character for the format.
+	    $sane =~ tr/YAmd~//d;
 	    if (length($sane) != 0) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has illegal characters!  Restoring from English!\n";
 		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
@@ -393,9 +394,11 @@ foreach my $id (@langorder) {
 	    }
 	}
 
-	if ($lang{$id}{'dest'}{$tgt} =~ tr/"//) {
+	my $sane = $lang{$id}{'dest'}{$tgt};
+	$sane =~ s/^~?(.*)/$1/;  # Strip off leading ~ if it's there as it's not a legal character otherwise
+	if ($sane =~ tr/"~//) {
 	    # If it has suspicious characters that are not allowed
-	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has some suspicious characters, please double-check!\n";
+	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has some suspicious characters (eg '~'), please double-check!\n";
 #           print "#!! '$id:$tgt' suspicious characters\n";
 	}
     }
@@ -462,9 +465,11 @@ foreach my $id (@langorder) {
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english! (correct or prefix with ~)\n";
 	    }
 	}
-        if ($lang{$id}{'voice'}{$tgt} =~ tr/%"//) {
+	my $sane = $lang{$id}{'voice'}{$tgt};
+	$sane =~ s/^~?(.*)/$1/;  # Strip off leading ~ if it's there as it's not a legal character otherwise
+        if ($sane =~ tr/%"~//) {
             # If it has suspicious characters that are not normally voiced..
-            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters (eg '%'), please double-check!\n";
+            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters (eg '%' or '~'), please double-check!\n";
 #            print "#!! '$id:$tgt' suspicious characters\n";
         }
 	if ($lang{$id}{'voice'}{$tgt} =~ /\.\.\./) {
