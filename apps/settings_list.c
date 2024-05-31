@@ -998,7 +998,7 @@ const struct settings_list settings[] = {
                   play_frequency, LANG_FREQUENCY, 0, "playback frequency", "auto",
                   UNIT_KHZ, formatter_freq_unit_0_is_auto,
                   getlang_freq_unit_0_is_auto,
-                  playback_frequency_callback, 
+                  playback_frequency_callback,
 #if HAVE_PLAY_FREQ >= 192
                   7,0,SAMPR_44,SAMPR_48,SAMPR_88,SAMPR_96,SAMPR_176,SAMPR_192),
 #elif HAVE_PLAY_FREQ >= 96
@@ -1883,7 +1883,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, backlight_on_button_hold,
                    LANG_BACKLIGHT_ON_BUTTON_HOLD,
-#ifdef HAS_BUTTON_HOLD                   
+#ifdef HAS_BUTTON_HOLD
                    1,
 #else
                    0,
@@ -2216,6 +2216,8 @@ const struct settings_list settings[] = {
 #ifdef HAVE_REMOTE_LCD
     VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
 #endif
+
+    TEXT_SETTING(F_THEMESETTING, player_name, "player name", "", NULL, NULL),
 
 #ifdef HAVE_MORSE_INPUT
     OFFON_SETTING(0, morse_input, LANG_MORSE_INPUT, false, "morse input", NULL),

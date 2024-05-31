@@ -803,6 +803,7 @@ struct user_settings
 #ifdef HAVE_REMOTE_LCD
     unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
 #endif
+    char player_name[64];  /* Name of the local player */
 
     struct compressor_settings compressor_settings;
 
