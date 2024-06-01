@@ -169,10 +169,10 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "~Lade... %d%% fertig (%s)"
+    *: "Lade... %d%% fertig (%s)"
   </dest>
   <voice>
-    *: "~Lade... %d%% fertig (%s)"
+    *: "Lade"
   </voice>
 </phrase>
 <phrase>
@@ -6173,7 +6173,7 @@
     *: "Suche... %d gefunden (%s)"
   </dest>
   <voice>
-    *: "~Suche... %d gefunden (%s)"
+    *: "Gefunden"
   </voice>
 </phrase>
 <phrase>
@@ -6719,7 +6719,7 @@
     *: "Verschiebe..."
   </dest>
   <voice>
-    *: "Verschiebe..."
+    *: "Verschiebe"
   </voice>
 </phrase>
 <phrase>
@@ -13750,7 +13750,7 @@
     *: "Denke..."
   </dest>
   <voice>
-    *: "~Denke..."
+    *: "Denke"
   </voice>
 </phrase>
 <phrase>
@@ -14775,11 +14775,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "Mischer Hohe Qualität"
     lowmem: none
   </dest>
   <voice>
-    *: "Mischer Hohe Qualität"
+    *: "Mischer hohe Qualität"
     lowmem: none
   </voice>
 </phrase>
@@ -14905,7 +14905,7 @@
   </source>
   <dest>
     *: "Zum Abbrechen LINKS drücken."
-    android,hifietma*,zenvision,vibe500: "Zum Abbrechen ZURÜCK drücken."
+    android,hifietma*,vibe500,zenvision: "Zum Abbrechen ZURÜCK drücken."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Zum Abbrechen POWER drücken."
     ihifi760,ihifi960: "Zum Abbrechen ZURÜCK doppeldrücken."
     ihifi770,ihifi770c,ihifi800: "Zum Abbrechen STARTMENÜ drücken."
@@ -14919,7 +14919,7 @@
   </dest>
   <voice>
     *: "Zum Abbrechen LINKS drücken."
-    android,hifietma*,zenvision,vibe500: "Zum Abbrechen ZURÜCK drücken."
+    android,hifietma*,vibe500,zenvision: "Zum Abbrechen ZURÜCK drücken."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Zum Abbrechen POWER drücken."
     ihifi760,ihifi960: "Zum Abbrechen ZURÜCK doppeldrücken."
     ihifi770,ihifi770c,ihifi800: "Zum Abbrechen STARTMENÜ drücken."
@@ -15159,7 +15159,7 @@
     *: "Kein Zusatzprogramm: %s"
   </dest>
   <voice>
-    *: "Kein Zusatzprogramm: %s"
+    *: "Kein Zusatzprogramm"
   </voice>
 </phrase>
 <phrase>
@@ -15422,7 +15422,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "dAY"
+    *: "~dAY"
   </dest>
   <voice>
     *: ""
@@ -15742,7 +15742,7 @@
     *: "Setze als..."
   </dest>
   <voice>
-    *: "Setze als..."
+    *: "Setze als"
   </voice>
 </phrase>
 <phrase>
@@ -15801,7 +15801,7 @@
     *: "Zu Wiedergabeliste hinzufügen..."
   </dest>
   <voice>
-    *: "Zu Wiedergabeliste hinzufügen..."
+    *: "Zu Wiedergabeliste hinzufügen"
   </voice>
 </phrase>
 <phrase>
@@ -15829,7 +15829,7 @@
     *: "Nächster Titel..."
   </dest>
   <voice>
-    *: "Nächster Titel..."
+    *: "Nächster Titel"
   </voice>
 </phrase>
 <phrase>
@@ -16174,7 +16174,7 @@
     *: "Generiere maze..."
   </dest>
   <voice>
-    *: "Generiere maze..."
+    *: "Generiere maze"
   </voice>
 </phrase>
 <phrase>
@@ -16315,5 +16315,19 @@
   </dest>
   <voice>
     *: "Immer 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Rechtliche Hinweise"
+  </dest>
+  <voice>
+    *: "Rechtliche Hinweise"
   </voice>
 </phrase>
