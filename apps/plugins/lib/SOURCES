@@ -72,6 +72,4 @@ pluginlib_touchscreen.c
 
 id3.c
 
-#ifdef HAVE_TAGCACHE
 mul_id3.c
-#endif
