@@ -276,9 +276,11 @@ static int tree_voice_cb(int selected_item, void * data)
 
     /* spell name AFTER voicing filetype */
     if (spell_name) {
+        bool stripit = false;
+        char *ext = NULL;
+
         /* Don't spell the extension if it's not displayed */
         if (!is_dir) {
-            bool stripit;
             switch(global_settings.show_filename_ext) {
             case 0:
                 /* show file extension: off */
@@ -301,13 +303,15 @@ static int tree_voice_cb(int selected_item, void * data)
             }
 
             if (stripit) {
-                char *ext = strrchr(name, '.');
+                ext = strrchr(name, '.');
                 if (ext)
                     *ext = 0;
             }
         }
-
         talk_spell(name, true);
+
+        if (stripit && ext)
+            *ext = '.';
     }
 
     return 0;
