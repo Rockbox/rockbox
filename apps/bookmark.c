@@ -290,14 +290,17 @@ static bool add_bookmark(const char* bookmark_file_name,
     uint32_t pl_hash, pl_track_hash;
     uint32_t bm_pl_hash, bm_pl_track_hash;
 
+    if (!bookmark)
+        return false; /* no bookmark */
+
     /* Opening up a temp bookmark file */
     temp_bookmark_file = open_temp_bookmark(fnamebuf,
                                             sizeof(fnamebuf),
                                             O_WRONLY | O_CREAT | O_TRUNC,
                                             bookmark_file_name);
 
-    if (temp_bookmark_file < 0 || !bookmark)
-        return false; /* can't open the temp file or no bookmark */
+    if (temp_bookmark_file < 0)
+        return false; /* can't open the temp file */
 
     if (most_recent && ((global_settings.usemrb == BOOKMARK_ONE_PER_PLAYLIST)
                       || (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)))
@@ -876,10 +879,10 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
     close(temp_bookmark_file);
 
     /* only retrieve the path*/
-    open_temp_bookmark(global_temp_buffer,
+    close(open_temp_bookmark(global_temp_buffer,
                        sizeof(global_temp_buffer),
                        O_PATH,
-                       bookmark_file_name);
+                       bookmark_file_name));
 
     remove(bookmark_file_name);
     rename(global_temp_buffer, bookmark_file_name);
