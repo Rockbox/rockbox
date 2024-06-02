@@ -695,7 +695,7 @@ void destroy_memory_pool(void *mem_pool)
 void *tlsf_malloc(size_t size)
 {
 /******************************************************************/
-    void *ret;
+    void *ret = NULL;
 
 #if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!mp) {
@@ -710,12 +710,14 @@ void *tlsf_malloc(size_t size)
         init_memory_pool(area_size, area);
     }
 #endif
+    if (mp)
+    {
+        TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
 
-    TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
+        ret = malloc_ex(size, mp);
 
-    ret = malloc_ex(size, mp);
-
-    TLSF_RELEASE_LOCK(&((tlsf_t *)mp)->lock);
+        TLSF_RELEASE_LOCK(&((tlsf_t *)mp)->lock);
+    }
 
     return ret;
 }
