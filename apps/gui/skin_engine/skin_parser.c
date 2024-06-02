@@ -2026,7 +2026,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             {
                 char path[MAX_PATH];
                 int handle;
-                strcpy(path, img->bm.data);
+                strmemccpy(path, img->bm.data, sizeof(path));
                 handle = load_skin_bmp(wps_data, img, bmpdir);
                 img->buflib_handle = handle;
                 img->loaded = img->buflib_handle > 0;
