@@ -724,7 +724,6 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
     struct font* pf = callback_data;
 
     unsigned short char_code = p->_char_code;
-    unsigned char tmp[2];
     int fd;
 
     lock_font_handle(pf->handle, true);
@@ -755,11 +754,14 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
         else
             fd = pf->fd;
         lseek(fd, offset, SEEK_SET);
-        read (fd, tmp, 2);
-        bitmap_offset = tmp[0] | (tmp[1] << 8);
-        if (pf->long_offset) {
-            read (fd, tmp, 2);
-            bitmap_offset |= (tmp[0] << 16) | (tmp[1] << 24);
+        unsigned char tmp[2];
+        if (read (fd, tmp, 2) == 2)
+        {
+            bitmap_offset = tmp[0] | (tmp[1] << 8);
+            if (pf->long_offset) {
+                if (read (fd, tmp, 2) == 2)
+                    bitmap_offset |= (tmp[0] << 16) | (tmp[1] << 24);
+            }
         }
     }
     else
