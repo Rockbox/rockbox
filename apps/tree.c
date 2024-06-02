@@ -621,7 +621,7 @@ static void set_current_file_ex(const char *path, const char *filename)
         /* gets the directory's name and put it into tc.currdir */
         filename = strrchr(path+1,'/');
         size_t endpos = filename - path;
-        if (endpos < MAX_PATH - 1)
+        if (filename && endpos < MAX_PATH - 1)
         {
             strmemccpy(tc.currdir, path, endpos + 1);
             filename++;
@@ -1039,7 +1039,7 @@ int rockbox_browse(struct browse_context *browse)
 {
     tc.is_browsing = (browse != NULL);
     int ret_val = 0;
-    int dirfilter = browse->dirfilter;
+    int dirfilter = tc.is_browsing ? browse->dirfilter : SHOW_ALL;
 
     if (backup_count >= NUM_TC_BACKUP)
         return GO_TO_PREVIOUS;
