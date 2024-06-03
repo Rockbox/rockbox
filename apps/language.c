@@ -70,13 +70,18 @@ int lang_load(const char *filename, const unsigned char *builtin,
 
     if(fd < 0)
         return 1;
-    read(fd, lang_header, HEADER_SIZE);
-    if((lang_header[0] == LANGUAGE_COOKIE) &&
+
+    if(read(fd, lang_header, HEADER_SIZE) == HEADER_SIZE &&
+       ((lang_header[0] == LANGUAGE_COOKIE) &&
        (lang_header[1] == LANGUAGE_VERSION) &&
-       (lang_header[2] == TARGET_ID)) {
+       (lang_header[2] == TARGET_ID))) {
         /* jump to the proper entry in the table of subheaders */
         lseek(fd, user_num * SUBHEADER_SIZE, SEEK_CUR);
-        read(fd, sub_header, SUBHEADER_SIZE);
+        if (read(fd, sub_header, SUBHEADER_SIZE) != SUBHEADER_SIZE)
+        {
+            DEBUGF("Language %s bad subheader %u\n", filename, user_num);
+            retcode = 4;
+        }
         /* read in information about the requested lang */
 #if 0   /* unused */
         unsigned int num_strings = (sub_header[0]<<8) | sub_header[1];
