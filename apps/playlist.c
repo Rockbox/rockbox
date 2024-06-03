@@ -1042,6 +1042,8 @@ static int get_track_filename(struct playlist_info* playlist, int index,
     char tmp_buf[MAX_PATH+1];
     char dir_buf[MAX_PATH+1];
     bool utf8 = playlist->utf8;
+    if (buf_length > 0)
+        buf[0] = '\0';
 
     if (index < 0 || index >= playlist->amount)
         return -1;
