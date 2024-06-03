@@ -3931,7 +3931,10 @@ static int pl_save_update_control(struct playlist_info* playlist,
     playlist->filename[playlist->dirlen-1] = c;
 
     if (err <= 0)
+    {
+        close(old_fd);
         return -4;
+    }
 
     if (playlist->first_index > 0)
     {
