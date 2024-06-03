@@ -417,13 +417,13 @@ void ata_dma_set_mode(unsigned char mode)
     else if (dmamode == 0x40 && modeidx <= ATA_MAX_UDMA)
     {
         /* Using Ultra DMA */
-        ata_set_udma_timings(dmamode);
+        ata_set_udma_timings(modeidx);
         ata_dma_selected = ATA_DMA_UDMA;
     }
     else if (dmamode == 0x20 && modeidx <= ATA_MAX_MWDMA)
     {
         /* Using Multiword DMA */
-        ata_set_mdma_timings(dmamode);
+        ata_set_mdma_timings(modeidx);
         ata_dma_selected = ATA_DMA_MWDMA;
     }
     else
