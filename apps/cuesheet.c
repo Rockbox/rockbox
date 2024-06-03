@@ -66,7 +66,8 @@ static bool search_for_cuesheet(const char *path, struct cuesheet_file *cue_file
         if (strlcat(cuepath, slash, MAX_PATH) >= MAX_PATH)
             goto skip; /* overflow */
         dot = strrchr(cuepath, '.');
-        strcpy(dot, ".cue");
+        if (dot)
+            strcpy(dot, ".cue");
         if (!file_exists(cuepath))
         {
 skip:
