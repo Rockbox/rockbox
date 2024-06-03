@@ -139,11 +139,9 @@ static int mount_sd(void)
     /* kludge to make sure we get our wanted mount flags. This is needed
      * when the sd was already mounted before we booted */
     unmount_sd();
-    char iocharset[64] = "iocharset=";
-    strlcat(iocharset, get_current_codepage_name_linux(), sizeof(iocharset));
     ret = mount("/dev/mmcblk0p1", "/mnt/mmc", "vfat",
                 MS_MGC_VAL | MS_SYNCHRONOUS | MS_RELATIME,
-                iocharset);
+                "iocharset=utf8");
     /* failure probably means the kernel does not support the iocharset.
      * retry without to load the default */
     if (ret == -1)
