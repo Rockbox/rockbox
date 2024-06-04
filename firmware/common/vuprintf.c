@@ -730,7 +730,8 @@ static int format_double_radix(double f,
                                vuprintf_push_cb push,
                                void *userp)
 {
-    struct ap_int ia, fa;
+    struct ap_int ia ={0};
+    struct ap_int fa ={0};
     long rc = parse_double(f, &ia, &fa, fmt_buf);
 
     if (UNLIKELY(rc < 0)) {
