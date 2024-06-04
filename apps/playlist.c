@@ -3894,7 +3894,7 @@ static int pl_save_update_control(struct playlist_info* playlist,
                                   char *tmpbuf, size_t tmpsize)
 {
     int old_fd;
-    int err;
+    int err = 0;
     char c;
     bool any_queued = false;
 
@@ -3915,8 +3915,8 @@ static int pl_save_update_control(struct playlist_info* playlist,
     playlist->control_fd = open(tmpbuf, O_CREAT|O_RDWR|O_TRUNC, 0666);
     if (playlist->control_fd < 0)
     {
-        close(old_fd);
-        return -3;
+        err = -3;
+        goto error;
     }
 
     /* Write out playlist filename */
@@ -3932,8 +3932,8 @@ static int pl_save_update_control(struct playlist_info* playlist,
 
     if (err <= 0)
     {
-        close(old_fd);
-        return -4;
+        err = -4;
+        goto error;
     }
 
     if (playlist->first_index > 0)
@@ -3964,8 +3964,10 @@ static int pl_save_update_control(struct playlist_info* playlist,
                                       index, playlist->last_insert_pos,
                                       tmpbuf, NULL, &seekpos);
         if (err <= 0)
-            return -5;
-
+        {
+            err = -5;
+            goto error;
+        }
         /* Update seek offset for the new control file. */
         playlist->indices[index] &= ~PLAYLIST_SEEK_MASK;
         playlist->indices[index] |= seekpos;
@@ -3980,7 +3982,10 @@ static int pl_save_update_control(struct playlist_info* playlist,
             err = update_control_unlocked(playlist, PLAYLIST_COMMAND_FLAGS,
                                           PLAYLIST_FLAG_MODIFIED, 0, NULL, NULL, NULL);
             if (err <= 0)
-                return -6;
+            {
+                err = -6;
+                goto error;
+            }
         }
         else
         {
@@ -4006,7 +4011,12 @@ static int pl_save_update_control(struct playlist_info* playlist,
 
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     playlist->control_created = (playlist->control_fd >= 0);
+
     return 0;
+
+error:
+    close(old_fd);
+    return err;
 }
 
 int playlist_save(struct playlist_info* playlist, char *filename)
