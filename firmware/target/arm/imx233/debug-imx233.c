@@ -963,6 +963,7 @@ bool dbg_hw_info_audio(void)
         struct imx233_audioout_info_t out = imx233_audioout_get_info();
         struct imx233_audioin_info_t in = imx233_audioin_get_info();
         int line = 0;
+        size_t len;
 #define display_sys(st, sys, name) \
         if(st.sys) \
         { \
@@ -971,15 +972,17 @@ bool dbg_hw_info_audio(void)
             for(int i = 0; i < 2; i++) \
             { \
                 if(st.sys##mute[i]) \
-                    strcat(buffer, "mute"); \
-                else \
-                    snprintf(buffer + strlen(buffer), 64,  "%d.%d", \
+                    strlcat(buffer, "mute", 64); \
+                else { \
+                    len = strlen(buffer); \
+                    snprintf(buffer + len, 64 - len,  "%d.%d", \
                         /* properly handle negative values ! */ \
                         st.sys##vol[i] / 10, (10 + (st.sys##vol[i]) % 10) % 10); \
+                } \
                 if(i == 0) \
-                    strcat(buffer, " / "); \
+                    strlcat(buffer, " / ", 64); \
                 else \
-                    strcat(buffer, " dB"); \
+                    strlcat(buffer, " dB", 64); \
             } \
             lcd_putsf(0, line++, "%s", buffer); \
         } \
