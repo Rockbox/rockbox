@@ -29,7 +29,7 @@
 
 static void write_bootdata_v0(struct boot_data_t *data, unsigned int boot_volume)
 {
-    memset(data->payload, data->length, 0);
+    memset(data->payload, 0, data->length);
 
     data->_boot_volume = boot_volume;
     data->version = 0;
@@ -37,7 +37,7 @@ static void write_bootdata_v0(struct boot_data_t *data, unsigned int boot_volume
 
 static void write_bootdata_v1(struct boot_data_t *data, unsigned int boot_volume)
 {
-    memset(data->payload, data->length, 0);
+    memset(data->payload, 0, data->length);
 
     data->_boot_volume = 0xff;
     data->version = 1;
