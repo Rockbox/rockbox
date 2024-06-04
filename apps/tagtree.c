@@ -1897,7 +1897,8 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
             || is_random_item)
         {
             max_history_level = c->dirlevel + 1;
-            selected_item_history[c->dirlevel + 1] = 0;
+            if (max_history_level < MAX_DIR_LEVELS)
+                selected_item_history[max_history_level] = 0;
         }
 
         selected_item_history[c->dirlevel]=c->selected_item;
