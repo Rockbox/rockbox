@@ -225,7 +225,7 @@ static const char * playing_time_get_or_speak_info(int selected_item, void * dat
     }
     case 5: { /* storage size */
         int i;
-        char kbstr[ePT_KBS_COUNT][10];
+        char kbstr[ePT_KBS_COUNT][20];
 
         for (i = 0; i < ePT_KBS_COUNT; i++) {
             rb->output_dyn_value(kbstr[i], sizeof(kbstr[i]),
@@ -248,7 +248,7 @@ static const char * playing_time_get_or_speak_info(int selected_item, void * dat
         break;
     }
     case 6: { /* Average track file size */
-        char str[10];
+        char str[20];
         long avg_track_size = pti->kbs[ePT_KBS_TTL] / pti->nb_tracks;
         rb->output_dyn_value(str, sizeof(str), avg_track_size, kibyte_units, 3, true);
         rb->snprintf(buf, buffer_len, "%s", str);
