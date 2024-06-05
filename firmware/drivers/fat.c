@@ -659,11 +659,14 @@ static inline unsigned int longent_char_next(unsigned int i)
 {
     switch (i += 2)
     {
+    /* flip endian for elements 14 - 27 */
     case 26: i -= 1; /* return 28 */
+    /* Fall-Through */
     case 11: i += 3; /* return 14 */
     }
-
-    return i < 32 ? i : 0;
+    /* BYTES2INT16() uses [i + 0] and [i + 1] therefore
+     * 30 is the max element available in the raw byte array of size 32 */
+    return i < 31 ? i : 0;
 }
 
 /* initialize the parse state; call before parsing first long entry */
@@ -1708,6 +1711,7 @@ static int add_dir_entry(struct bpb *fat_bpb, struct fat_filestr *parentstr,
         int dots = strlcpy(shortname, name, 11);
         memset(&shortname[dots], ' ', 11 - dots);
         entries_needed = 1;
+        basisname[0] = '\0';
     }
     else
     {
