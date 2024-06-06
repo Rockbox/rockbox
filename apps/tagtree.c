@@ -1905,7 +1905,16 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
     }
     table_history[c->dirlevel] = c->currtable;
     extra_history[c->dirlevel] = c->currextra;
-    c->dirlevel++;
+
+    if (c->dirlevel + 1 < MAX_DIR_LEVELS)
+    {
+        c->dirlevel++;
+        /*DEBUGF("Tagtree depth %d\n", c->dirlevel);*/
+    }
+    else
+    {
+        DEBUGF("Tagtree depth exceeded\n");
+    }
 
     /* lock buflib for possible I/O to protect dptr */
     tree_lock_cache(c);
@@ -2058,7 +2067,15 @@ void tagtree_exit(struct tree_context* c, bool is_visible)
     }
     c->dirfull = false;
     if (c->dirlevel > 0)
+    {
         c->dirlevel--;
+        /*DEBUGF("Tagtree depth %d\n", c->dirlevel);*/
+    }
+    else
+    {
+        DEBUGF("Tagtree nothing to exit\n");
+    }
+
     if (is_visible)
         c->selected_item = selected_item_history[c->dirlevel];
     c->currtable = table_history[c->dirlevel];
