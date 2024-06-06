@@ -482,7 +482,7 @@ static struct child* find_from_filename(const char* filename, struct folder *roo
 cascade:
     /* filename == XXX/YYY. cascade down */
     child_set_state_expand(this, root);
-    while (slash[0] == '/') slash++; /* eat slashes */
+    while (slash && slash[0] == '/') slash++; /* eat slashes */
     return find_from_filename(slash, this->folder);
 }
 
