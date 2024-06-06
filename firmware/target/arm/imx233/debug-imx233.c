@@ -42,6 +42,7 @@
 #include "timrot-imx233.h"
 #include "string.h"
 #include "stdio.h"
+#include "strlcat.h"
 #include "button.h"
 #include "button-imx233.h"
 #include "sdmmc-imx233.h"
@@ -1202,9 +1203,9 @@ bool dbg_hw_info_button(void)
             }
             flags[0] = 0;
             if(MAP[i].flags & IMX233_BUTTON_INVERTED)
-                strcat(flags, " inv");
+                strlcat(flags, " inv", sizeof(flags));
             if(MAP[i].flags & IMX233_BUTTON_PULLUP)
-                strcat(flags, " pull");
+                strlcat(flags, " pull", sizeof(flags));
 #if LCD_WIDTH <= LCD_HEIGHT
             lcd_putsf(0, line++, "%s %d %d/%d %d %s", MAP[i].name, val,
                 MAP[i].rounds, MAP[i].threshold, raw, type);
