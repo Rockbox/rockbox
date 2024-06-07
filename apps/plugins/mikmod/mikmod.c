@@ -491,6 +491,20 @@ static struct mikmod_settings settings =
 
 static struct mikmod_settings old_settings;
 
+static const struct configdata config[] =
+{
+    { TYPE_INT, 0, 128, { .int_p = &settings.pansep }, "Panning Separation", NULL},
+    { TYPE_INT, 0, 15, { .int_p = &settings.reverb }, "Reverberation", NULL},
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.interp }, "Interpolation", NULL},
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.reverse }, "Reverse Channels", NULL},
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.surround }, "Surround", NULL},
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.hqmixer }, "HQ Mixer", NULL},
+    { TYPE_INT, 0, HW_NUM_FREQ-1, { .int_p = &settings.sample_rate }, "Sample Rate", NULL},
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.boost }, "CPU Boost", NULL},
+#endif
+};
+
 static void applysettings(void)
 {
     md_pansep = settings.pansep;
@@ -919,20 +933,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     enum plugin_status retval;
     int orig_samplerate = rb->mixer_get_frequency();
-
-    const struct configdata config[] =
-    {
-        { TYPE_INT, 0, 128, { .int_p = &settings.pansep }, rb->str(LANG_PANNING_SEPARATION), NULL},
-        { TYPE_INT, 0, 15, { .int_p = &settings.reverb }, rb->str(LANG_REVERBERATION), NULL},
-        { TYPE_BOOL, 0, 1, { .bool_p = &settings.interp }, rb->str(LANG_INTERPOLATION), NULL},
-        { TYPE_BOOL, 0, 1, { .bool_p = &settings.reverse }, rb->str(LANG_SWAP_CHANNELS), NULL},
-        { TYPE_BOOL, 0, 1, { .bool_p = &settings.surround }, rb->str(LANG_MIKMOD_SURROUND), NULL},
-        { TYPE_BOOL, 0, 1, { .bool_p = &settings.hqmixer }, rb->str(LANG_MIKMOD_HQMIXER), NULL},
-        { TYPE_INT, 0, HW_NUM_FREQ-1, { .int_p = &settings.sample_rate }, rb->str(LANG_MIKMOD_SAMPLERATE), NULL},
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        { TYPE_BOOL, 0, 1, { .bool_p = &settings.boost }, rb->str(LANG_CPU_BOOST), NULL},
-#endif
-    };
 
     if (parameter == NULL)
     {
