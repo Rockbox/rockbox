@@ -555,7 +555,7 @@ static int cb_menu_viewer(void)
 {
     int selection;
 
-    MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,
+    MENUITEM_STRINGLIST(menu, ID2P(LANG_CHESSBOX_MENU), NULL,
                         ID2P(LANG_CHESSBOX_MENU_RESTART_GAME),
                         ID2P(LANG_CHESSBOX_MENU_SELECT_OTHER_GAME),
                         ID2P(LANG_CHESSBOX_MENU_RESUME_GAME),
@@ -800,7 +800,7 @@ static int cb_menu(void)
 {
     int selection;
 
-    MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,
+    MENUITEM_STRINGLIST(menu,ID2P(LANG_CHESSBOX_MENU), NULL,
                         ID2P(LANG_CHESSBOX_MENU_NEW_GAME),
                         ID2P(LANG_CHESSBOX_MENU_RESUME_GAME),
                         ID2P(LANG_CHESSBOX_MENU_SAVE_GAME),
