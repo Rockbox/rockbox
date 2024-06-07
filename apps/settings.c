@@ -259,7 +259,7 @@ bool cfg_string_to_int(const struct settings_list *setting, int* out, const char
     size_t len = strlen(str);
     int index = 0;
 
-    while (true)
+    while (ptr)
     {
         if (!strncmp(ptr, str, len))
         {
@@ -283,6 +283,8 @@ bool cfg_string_to_int(const struct settings_list *setting, int* out, const char
         ptr++;
         index++;
     }
+    logf("%s() bad setting\n", __func__);
+    return false;
 }
 
 /**
@@ -471,7 +473,7 @@ bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, 
     if (setting->flags & F_TABLE_SETTING)
         values = setting->table_setting->values;
 
-    while (true)
+    while (ptr)
     {
         if ((values && values[index] == val) ||
             (!values && index == val))
@@ -494,6 +496,8 @@ bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, 
         ptr++;
         index++;
     }
+    logf("%s() bad setting\n", __func__);
+    return false;
 }
 
 void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len)
