@@ -555,6 +555,12 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
                                  const char *dir, size_t dlen)
 {
     /* Look for the end of the string (includes NULL) */
+
+    if (!src || !dest || !dir)
+    {
+        DEBUGF("%s() bad pointer", __func__);
+        return -2; /* bad pointers */
+    }
     size_t len = strcspn(src, "\r\n");;
     /* Now work back killing white space */
     while (len > 0)
