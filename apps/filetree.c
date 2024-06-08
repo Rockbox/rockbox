@@ -473,43 +473,64 @@ static void ft_apply_skin_file(char *buf, char *file, const int maxlen)
     settings_apply_skins();
 }
 
+static const char *strip_slash(const char *path, const char *def)
+{
+    if (path)
+    {
+        while (*path == PATH_SEPCH)
+            path++; /* we don't want this treated as an absolute path */
+        return path;
+    }
+    return def;
+}
+
 int ft_assemble_path(char *buf, size_t bufsz, const char* currdir, const char* filename)
 {
     size_t len;
-    if (!filename)
-        filename = "";
+    const char *cd = strip_slash(currdir, "");
+    filename = strip_slash(filename, "");
+    /* remove slashes and NULL strings to make logic below simpler */
 
 #ifdef HAVE_MULTIVOLUME
-    if (currdir && currdir[0] && currdir[1]) /* Not in / */
+    /* Multi-volume device drives might be enumerated in root so everything
+       should be an absolute qualified path with <drive>/ prepended */
+    if (*cd != '\0') /* Not in / */
     {
-        if (currdir[1] != VOL_START_TOK)
+        if (*cd == VOL_START_TOK)
         {
-            len = path_append(buf, root_realpath(), currdir, bufsz);
-            if (len < bufsz)
-                len = path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
-        }
-        len = path_append(buf, currdir, filename, bufsz);
+          /* use currdir, here we want the slash as it already contains the <drive> */
+            len = path_append(buf, currdir, filename, bufsz);
+        } /* buf => /currdir/filename */
+        else
+        {
+            len = path_append(buf, root_realpath(), cd, bufsz); /* /<drive>/currdir */
+            if(len < bufsz)
+                len += path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
+        } /* buf => /<drive>/currdir/filename */
     }
     else /* In / */
     {
-        if (filename[0] != VOL_START_TOK)
+        if (*filename == VOL_START_TOK)
+        {
+            len = path_append(buf, PATH_SEPSTR, filename, bufsz);
+        } /* buf => /filename */
+        else
         {
             len = path_append(buf, root_realpath(), filename, bufsz);
-        }
-        else
-            len = path_append(buf, PATH_SEPSTR, filename, bufsz);
+        } /* buf => /<drive>/filename */
     }
 #else
-    if (currdir && currdir[0] && currdir[1]) /* Not in / */
+    /* Other devices might need a specific drive/dir prepended but its usually '/' */
+    if (*cd != '\0') /* Not in / */
     {
-        len = path_append(buf, root_realpath(), currdir, bufsz);
+        len = path_append(buf, root_realpath(), cd, bufsz);/* /currdir */
         if(len < bufsz)
-            len = path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
-    }
+            len += path_append(buf + len, PA_SEP_HARD, filename, bufsz - len);
+    } /* buf => /currdir/filename */
     else /* In / */
     {
         len = path_append(buf, root_realpath(), filename, bufsz);
-    }
+    }  /* buf => /filename */
 #endif
 
     if (len > bufsz)
