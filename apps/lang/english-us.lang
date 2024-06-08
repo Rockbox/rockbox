@@ -16312,3 +16312,59 @@
     *: "Legal Notices"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Error: %s"
+  </dest>
+  <voice>
+    *: "Error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Mikmod Settings"
+  </dest>
+  <voice>
+    *: "Mik mod Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Mikmod Menu"
+  </dest>
+  <voice>
+    *: "Mik mod Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Chessbox Menu"
+  </dest>
+  <voice>
+    *: "Chess box Menu"
+  </voice>
+</phrase>
