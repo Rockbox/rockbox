@@ -545,20 +545,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Usuń"
-  </dest>
-  <voice>
-    *: "Usuń"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -700,7 +686,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
@@ -714,7 +700,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
@@ -993,20 +979,6 @@
   </dest>
   <voice>
     *: "Przeglądaj ustawienia korektora"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Parametr: %s"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4067,23 +4039,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Budzik ustawiony"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Budzik ustawiony"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -4098,20 +4053,6 @@
   <voice>
     *: none
     alarm: "Godzina budzenia jest zbyt wczesna!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5312,38 +5253,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Katalog"
-  </dest>
-  <voice>
-    *: none
-    recording: "Katalog"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    recording: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLEAR_REC_DIR
   desc:
   user: core
@@ -6147,62 +6056,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
   user: core
@@ -6256,20 +6109,6 @@
   </dest>
   <voice>
     *: "Losowo do kolejki"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6354,34 +6193,6 @@
   </dest>
   <voice>
     *: "Przetasuj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Zobacz katalog"
-  </dest>
-  <voice>
-    *: "Zobacz katalog"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6732,20 +6543,6 @@
   </dest>
   <voice>
     *: "Wzm. utworu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Wzm. albumu"
-  </dest>
-  <voice>
-    *: "Wzm. albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7159,20 +6956,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Błąd odświeżania pliku kontroli listy odtwarzania"
-  </dest>
-  <voice>
-    *: "Błąd odświeżania pliku kontroli listy odtwarzania"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
   user: core
@@ -7355,23 +7138,6 @@
   <voice>
     *: none
     iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-inf"
-  </dest>
-  <voice>
-    *: none
-    recording: "Minus nieskończoność"
   </voice>
 </phrase>
 <phrase>
@@ -7597,23 +7363,6 @@
   <voice>
     *: none
     charging: "Ładowanie baterii"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Bateria: wolne ładowanie"
-  </dest>
-  <voice>
-    *: none
-    charging: "Wolne ładowanie baterii"
   </voice>
 </phrase>
 <phrase>
@@ -10432,20 +10181,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Pozycja paska przewijania"
-  </dest>
-  <voice>
-    *: "Pozycja paska przewijania"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR
   desc: in sound settings
   user: core
@@ -10688,20 +10423,6 @@
   </dest>
   <voice>
     *: "Automatycznie"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11117,20 +10838,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Własny"
-  </dest>
-  <voice>
-    *: "Własny"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -11475,20 +11182,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_RSSI
   desc: Signal strength of a received FM station
   user: core
@@ -11587,20 +11280,6 @@
   </dest>
   <voice>
     *: "Obecna lista odtwarzania"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11711,20 +11390,6 @@
   <voice>
     *: none
     touchscreen: "Odstępy międzyliniowe w listach"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOMATIC
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12446,20 +12111,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "Nie znaleziono przeglądarek"
-  </dest>
-  <voice>
-    *: "Nie znaleziono przeglądarek"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_QUEUED
   desc: playlist viewer
   user: core
@@ -13167,20 +12818,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_ALBUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYBACK_CONTROL
   desc: in playback control menu
   user: core
@@ -13296,20 +12933,6 @@
   </dest>
   <voice>
     *: "Nie udało się zebrać informacji"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_PLAYLIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13473,20 +13096,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Wyczyszczono listę odtwarzania"
-  </dest>
-  <voice>
-    *: "Wyczyszczono listę odtwarzania"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PREVTRACK
   desc: in playback control menu
   user: core
@@ -13636,20 +13245,6 @@
   </dest>
   <voice>
     *: "Pokaż tytuł albumu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DURATION
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14000,7 +13595,7 @@
     *: "Myślę..."
   </dest>
   <voice>
-    *: ""
+    *: "Myślę"
   </voice>
 </phrase>
 <phrase>
@@ -14206,20 +13801,6 @@
   </dest>
   <voice>
     *: "Ładowanie pozycji"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14843,20 +14424,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Dodano do listy odtwarzania"
-  </dest>
-  <voice>
-    *: "Dodano do listy odtwarzania"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_4_KEY_CONTROL
   desc: Item for menus
   user: core
@@ -14882,20 +14449,6 @@
   </dest>
   <voice>
     *: "Zmień tryb powtarzania"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TITLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15513,20 +15066,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE_MENU
   desc: in onplay menu
   user: core
@@ -15580,20 +15119,6 @@
   </dest>
   <voice>
     *: "W podmenu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15696,20 +15221,6 @@
   </dest>
   <voice>
     *: "Zawsze automatycznie blokuj"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15863,132 +15374,6 @@
   <voice>
     *: none
     es9218: "Ściana"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUMARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_GENRE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMMENT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMPOSER
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_YEAR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TRACKNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DISCNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FREQUENCY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_BITRATE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16347,7 +15732,7 @@
     *: "Ustaw jako..."
   </dest>
   <voice>
-    *: "Ustaw jako..."
+    *: "Ustaw jako"
   </voice>
 </phrase>
 <phrase>
@@ -16406,7 +15791,7 @@
     *: "Dodaj do listy odtwarzania..."
   </dest>
   <voice>
-    *: "Dodaj do listy odtwarzania..."
+    *: "Dodaj do listy odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -16434,7 +15819,7 @@
     *: "Odtwarzanie następnego..."
   </dest>
   <voice>
-    *: "Odtwarzanie następnego..."
+    *: "Odtwarzanie następnego"
   </voice>
 </phrase>
 <phrase>
@@ -16920,5 +16305,75 @@
   </dest>
   <voice>
     *: "Zawsze 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Informacje prawne"
+  </dest>
+  <voice>
+    *: "Informacje prawne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Błąd: %s"
+  </dest>
+  <voice>
+    *: "Błąd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Ustawienia Mikmod"
+  </dest>
+  <voice>
+    *: "Ustawienia Mykmod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Menu Mikmod"
+  </dest>
+  <voice>
+    *: "Menu Mykmod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Menu Chessbox"
+  </dest>
+  <voice>
+    *: "Menu Czesboks"
   </voice>
 </phrase>
