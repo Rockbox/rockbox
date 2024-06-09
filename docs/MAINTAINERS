@@ -1,4 +1,3 @@
-$Id$
                __________               __   ___.
      Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
      Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -6,17 +5,20 @@ $Id$
      Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                        \/            \/     \/    \/            \/
 
-
 Rockbox Maintainers
 ===================
 
 This file lists the people maintaining the different parts of the
 Rockbox project.
 
+Note that there as of 2024-06, this file is pretty out of date.  There
+are only a handful of active contributors that try to maintain
+everything, and the best way to reach them is via the #rockbox IRC
+channel on libera.chat.
+
 Syntax used:
 
   :area name: maintainer 1,maintainer 2
-
 
 Port maintainers
 ----------------
@@ -284,11 +286,10 @@ Bootloaders
 Build Tools
 -----------
 
-:configure script and build system: Solomon Peachy
-:genlang: Solomon Peachy
+:configure script and general build system: Solomon Peachy
 :bdf2bmp:
 :bmp2rb: Daniel Stenberg
-:checkwps: Nicolas Pennequin
+:checkwps: Solomon Peachy
 :mkboot: Linus Nielsen Feltzing
 :database:
 :rdf2binary:
@@ -300,7 +301,8 @@ Build Tools
 :scramble: Linus Nielsen Feltzing
 :descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
-:voice perl script: Solomon Peachy
+:voice.pl: Solomon Peachy
+:genlang/updatelang: Solomon Peachy
 
 Install Tools
 -------------
@@ -326,4 +328,4 @@ Utilities
 Web site stuff
 --------------
 
-:web site scripts and server-side admin:Solomon Peachy
+:web site, buildserver, general scripts, and server-side admin:Solomon Peachy
