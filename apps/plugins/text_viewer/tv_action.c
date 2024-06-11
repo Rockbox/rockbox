@@ -58,7 +58,7 @@ void tv_exit(void)
     {
         DEBUGF("Saving settings\n");
         if (!tv_save_settings())
-            rb->splash(HZ, "Can't save preferences and bookmarks");
+            rb->splash(HZ, "Can't save preferences and bookmarks"); // XXX i18n
     }
     else
         DEBUGF("Skip saving settings\n");

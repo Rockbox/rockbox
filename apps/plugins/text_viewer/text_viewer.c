@@ -31,7 +31,7 @@
 enum plugin_status plugin_start(const void* file)
 {
     int button;
-#if defined(TV_AUTOSCROLL_PRE) 
+#if defined(TV_AUTOSCROLL_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
     bool autoscroll = false;
@@ -50,12 +50,20 @@ enum plugin_status plugin_start(const void* file)
     plugin_buf = rb->plugin_get_buffer(&size);
 
     if (!tv_init_action(&plugin_buf, &size)) {
-        rb->splash(HZ, "Error initialize");
+        rb->splashf(HZ, ID2P(LANG_ERROR_FORMATSTR), "initialize");
         return PLUGIN_ERROR;
     }
 
+    /* Voice that we're loading the file... */
+    if (rb->global_settings->talk_menu) {
+        rb->talk_id(LANG_WAIT, true);
+        rb->talk_file_or_spell(NULL, file, NULL, true);
+        rb->talk_force_enqueue_next();
+    }
+//    rb->splashf(HZ/2, "%s %s", rb->str(LANG_WAIT), file);
+
     if (!tv_load_file(file)) {
-        rb->splash(HZ, "Error opening file");
+        rb->splashf(HZ, ID2P(LANG_ERROR_FORMATSTR), "reading file");
         return PLUGIN_ERROR;
     }
 
@@ -215,7 +223,7 @@ enum plugin_status plugin_start(const void* file)
         }
         if (button != BUTTON_NONE)
         {
-#if defined(TV_AUTOSCROLL_PRE) 
+#if defined(TV_AUTOSCROLL_PRE)
             lastbutton = button;
 #endif
             rb->yield();

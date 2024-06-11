@@ -281,7 +281,7 @@ static bool tv_set_font(const unsigned char *font)
         tv_change_fontid(rb->font_load(path));
         if (preferences->font_id < 0)
         {
-            rb->splash(HZ/2, "font load failed");
+            rb->splash(HZ/2, "font load failed"); // XXX i18n
             return false;
         }
     }
@@ -304,7 +304,7 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
         {
             /*
              * tv_set_font(rb->global_settings->font_file) doesn't fail usually.
-             * if it fails, a fatal problem occurs in Rockbox. 
+             * if it fails, a fatal problem occurs in Rockbox.
              */
             if (!rb->strcmp(preferences->font_name, rb->global_settings->font_file))
                 return TV_CALLBACK_ERROR;

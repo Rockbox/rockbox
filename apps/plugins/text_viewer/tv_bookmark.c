@@ -149,13 +149,13 @@ void tv_toggle_bookmark(void)
     if (idx < 0)
     {
         if (tv_add_bookmark(pos) >= 0)
-            rb->splash(HZ/2, "Bookmark add");
+            rb->splash(HZ/2, ID2P(LANG_BOOKMARK_CREATE_SUCCESS));
         else
-            rb->splash(HZ/2, "No more add bookmark");
+            rb->splash(HZ/2, "No more add bookmark"); // XXX i18n
         return;
     }
     tv_remove_bookmark(idx);
-    rb->splash(HZ/2, "Bookmark remove");
+    rb->splash(HZ/2, "Bookmark remove"); // XXX i18n
 }
 
 void tv_create_system_bookmark(void)
@@ -233,9 +233,9 @@ void tv_select_bookmark(void)
             tv_copy_screen_pos(&select_pos);
 
             if (select_pos.file_pos == 0)
-                rb->splash(HZ, "Start the first page");
+                rb->splash(HZ, "Start the first page"); // XXX i18n
             else
-                rb->splash(HZ, "Return to the current page");
+                rb->splash(HZ, "Return to the current page"); // XXX i18n
         }
     }
 

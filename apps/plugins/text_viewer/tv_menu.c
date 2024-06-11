@@ -42,7 +42,7 @@ static bool tv_horizontal_scrollbar_setting(void)
 static bool tv_horizontal_scroll_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Scroll by Screen", -1},
+        {"Scroll by Screen", -1}, // XXX i18n
         {"Scroll by Column", -1},
     };
 
@@ -50,12 +50,12 @@ static bool tv_horizontal_scroll_mode_setting(void)
                           names, 2, NULL);
 }
 
-MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Scrollbar",
+MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, ID2P(LANG_SCROLL_BAR),
                   tv_horizontal_scrollbar_setting, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(horizontal_scroll_mode_item, 0, "Scroll Mode",
+MENUITEM_FUNCTION(horizontal_scroll_mode_item, 0, "Scroll Mode", // XXX i18n
                   tv_horizontal_scroll_mode_setting, NULL, Icon_NOICON);
 
-MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
+MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON, // XXX i18n
           &horizontal_scrollbar_item,
           &horizontal_scroll_mode_item);
 
@@ -65,43 +65,43 @@ MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
 
 static bool tv_vertical_scrollbar_setting(void)
 {
-    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
+    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar); // XXX i18n
 }
 
 static bool tv_vertical_scroll_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Scroll by Page", -1},
+        {"Scroll by Page", -1}, // XXX i18n
         {"Scroll by Line", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, RB_INT,
+    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, RB_INT, // XXX i18n
                           names, 2, NULL);
 }
 
 static bool tv_overlap_page_mode_setting(void)
 {
-    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode);
+    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode); // XXX i18n
 }
 
 static bool tv_autoscroll_speed_setting(void)
 {
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, // XXX i18n
                        &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
 static bool tv_narrow_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Previous/Next Page", -1},
+        {"Previous/Next Page", -1}, // XXX i18n
         {"Top/Bottom Page",    -1},
     };
 
-    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, RB_INT,
+    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, RB_INT, // XXX i18n
                           names, 2, NULL);
 }
 
-MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
+MENUITEM_FUNCTION(vertical_scrollbar_item, 0, ID2P(LANG_SCROLL_BAR),
                   tv_vertical_scrollbar_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(vertical_scroll_mode_item, 0, "Scroll Mode",
                   tv_vertical_scroll_mode_setting, NULL, Icon_NOICON);
@@ -116,11 +116,13 @@ MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
           &vertical_scroll_mode_item, &overlap_page_mode_item, &autoscroll_speed_item,
           &narrow_mode_item);
 
+// XXX i18n ^^^
+
 /*                      */
 /* scroll settings menu */
 /*                      */
 
-MAKE_MENU(scroll_menu, "Scroll Settings", NULL, Icon_NOICON,
+MAKE_MENU(scroll_menu, "Scroll Settings", NULL, Icon_NOICON, // XXX i18n
           &horizontal_scroll_menu, &vertical_scroll_menu);
 
 /*           */
@@ -145,8 +147,8 @@ static bool tv_encoding_setting(void)
 static bool tv_word_wrap_setting(void)
 {
     static const struct opt_items names[] = {
-        {"On",               -1},
-        {"Off (Chop Words)", -1},
+        {STR(LANG_ON)},
+        {"Off (Chop Words)", -1}, // XXX i18n
     };
 
     return rb->set_option("Word Wrap", &new_prefs.word_mode, RB_INT,
@@ -156,31 +158,31 @@ static bool tv_word_wrap_setting(void)
 static bool tv_line_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Normal",       -1},
-        {"Join Lines",   -1},
+        {STR(LANG_NORMAL)},
+        {"Join Lines",   -1}, // XXX i18n
         {"Expand Lines", -1},
         {"Reflow Lines", -1},
     };
 
     return rb->set_option("Line Mode", &new_prefs.line_mode, RB_INT, names,
-                          sizeof(names) / sizeof(names[0]), NULL);
+                          sizeof(names) / sizeof(names[0]), NULL); // XXX i18n
 }
 
 static bool tv_windows_setting(void)
 {
-    return rb->set_int("Screens Per Page", "", UNIT_INT, 
+    return rb->set_int("Screens Per Page", "", UNIT_INT, // XXX i18n
                        &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
 static bool tv_alignment_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Left", -1},
-        {"Right", -1},
+        {STR(LANG_LEFT)},
+        {STR(LANG_RIGHT)},
     };
 
     return rb->set_option("Alignment", &new_prefs.alignment, RB_INT,
-                           names , 2, NULL);
+                          names , 2, NULL); // XXX i18n
 }
 
 static bool tv_header_setting(void)
@@ -206,7 +208,7 @@ static bool tv_font_setting(void)
     struct browse_context browse = {
         .dirfilter = SHOW_FONT,
         .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
-        .title = "Font", /* XXX: Translate? */
+        .title = ID2P(LANG_CUSTOM_FONT),
         .icon = Icon_Menu_setting,
         .root = FONT_DIR,
         .selected = name,
@@ -229,7 +231,7 @@ static bool tv_font_setting(void)
 
 static bool tv_indent_spaces_setting(void)
 {
-    return rb->set_int("Indent Spaces", "", UNIT_INT, 
+    return rb->set_int("Indent Spaces", "", UNIT_INT,
                        &new_prefs.indent_spaces, NULL, 1, 0, 5, NULL);
 }
 
@@ -256,7 +258,7 @@ MENUITEM_FUNCTION(footer_item, 0, "Show Footer",
                   tv_footer_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(statusbar_item, 0, "Show Statusbar",
                   tv_statusbar_setting, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(font_item, 0, "Font",
+MENUITEM_FUNCTION(font_item, 0, ID2P(LANG_CUSTOM_FONT),
                   tv_font_setting, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces",
                   tv_indent_spaces_setting, NULL, Icon_NOICON);
@@ -274,6 +276,7 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             , &night_mode_item
 #endif
             );
+// XXX finish i18n ^^^
 
 static unsigned tv_options_menu(void)
 {
@@ -290,9 +293,13 @@ unsigned tv_display_menu(void)
     unsigned result = TV_MENU_RESULT_EXIT_MENU;
 
     MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
-                        "Return", "Viewer Options",
-                        "Show Playback Menu", "Select Bookmark",
-                        "Global Settings", "Quit");
+                        ID2P(LANG_RETURN),
+                        "Viewer Options",
+                        ID2P(LANG_PLAYBACK_CONTROL),
+                        ID2P(LANG_BOOKMARK_SELECT_BOOKMARK),
+                        "Global Settings",
+                        ID2P(LANG_MENU_QUIT));
+    // XXX finish i18n ^^^
 
     switch (rb->do_menu(&menu, NULL, NULL, false))
     {
