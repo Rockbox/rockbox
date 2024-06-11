@@ -588,48 +588,48 @@ static int settings_menu(void)
         switch(selection)
         {
         case 0:
-            rb->set_int(rb->str(LANG_PANNING_SEPARATION), "", 1,
+            rb->set_int("Panning Separation", "", 1,
                         &(settings.pansep),
                         NULL, 8, 0, 128, NULL );
             applysettings();
             break;
 
         case 1:
-            rb->set_int(rb->str(LANG_REVERBERATION), "", 1,
+            rb->set_int("Reverberation", "", 1,
                         &(settings.reverb),
                         NULL, 1, 0, 15, NULL );
             applysettings();
             break;
 
         case 2:
-            rb->set_bool(rb->str(LANG_INTERPOLATION), &(settings.interp));
+            rb->set_bool("Interpolation", &(settings.interp));
             applysettings();
             break;
 
         case 3:
-            rb->set_bool(rb->str(LANG_SWAP_CHANNELS), &(settings.reverse));
+            rb->set_bool("Reverse Channels", &(settings.reverse));
             applysettings();
             break;
 
         case 4:
-            rb->set_bool(rb->str(LANG_MIKMOD_SURROUND), &(settings.surround));
+            rb->set_bool("Surround", &(settings.surround));
             applysettings();
             break;
 
         case 5:
-            rb->set_bool(rb->str(LANG_MIKMOD_HQMIXER), &(settings.hqmixer));
+            rb->set_bool("HQ Mixer", &(settings.hqmixer));
             applysettings();
             break;
 
         case 6:
-            rb->set_option(rb->str(LANG_MIKMOD_SAMPLERATE), &(settings.sample_rate), RB_INT, sr_names,
+            rb->set_option("Sample Rate", &(settings.sample_rate), RB_INT, sr_names,
                            HW_NUM_FREQ, NULL);
             applysettings();
             break;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         case 7:
-            rb->set_bool(rb->str(LANG_CPU_BOOST), &(settings.boost));
+            rb->set_bool("CPU Boost", &(settings.boost));
             applysettings();
             break;
 #endif

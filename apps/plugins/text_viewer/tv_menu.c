@@ -65,7 +65,7 @@ MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON, // XXX i18n
 
 static bool tv_vertical_scrollbar_setting(void)
 {
-    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar); // XXX i18n
+    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
 }
 
 static bool tv_vertical_scroll_mode_setting(void)
@@ -75,18 +75,18 @@ static bool tv_vertical_scroll_mode_setting(void)
         {"Scroll by Line", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, RB_INT, // XXX i18n
+    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, RB_INT,
                           names, 2, NULL);
 }
 
 static bool tv_overlap_page_mode_setting(void)
 {
-    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode); // XXX i18n
+    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode);
 }
 
 static bool tv_autoscroll_speed_setting(void)
 {
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, // XXX i18n
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT,
                        &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
@@ -97,7 +97,7 @@ static bool tv_narrow_mode_setting(void)
         {"Top/Bottom Page",    -1},
     };
 
-    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, RB_INT, // XXX i18n
+    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, RB_INT,
                           names, 2, NULL);
 }
 
@@ -165,12 +165,12 @@ static bool tv_line_mode_setting(void)
     };
 
     return rb->set_option("Line Mode", &new_prefs.line_mode, RB_INT, names,
-                          sizeof(names) / sizeof(names[0]), NULL); // XXX i18n
+                          sizeof(names) / sizeof(names[0]), NULL);
 }
 
 static bool tv_windows_setting(void)
 {
-    return rb->set_int("Screens Per Page", "", UNIT_INT, // XXX i18n
+    return rb->set_int("Screens Per Page", "", UNIT_INT,
                        &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
@@ -182,7 +182,7 @@ static bool tv_alignment_setting(void)
     };
 
     return rb->set_option("Alignment", &new_prefs.alignment, RB_INT,
-                          names , 2, NULL); // XXX i18n
+                          names , 2, NULL);
 }
 
 static bool tv_header_setting(void)
