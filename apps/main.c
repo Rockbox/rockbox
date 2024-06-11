@@ -141,7 +141,7 @@
 #if defined(WIN32)
 #undef main
 #endif
-#endif
+#endif /* SDL|MAEMO|PAMDORA */
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
@@ -432,7 +432,7 @@ static void init(void)
 #endif
 }
 
-#else /* CONFIG_PLATFORM & PLATFORM_HOSTED */
+#else /* ! (CONFIG_PLATFORM & PLATFORM_HOSTED) */
 
 #include "errno.h"
 
@@ -551,7 +551,7 @@ static void init(void)
     {
         lcd_clear_display();
         lcd_putsf(0, 1, "ATA error: %d", rc);
-        lcd_puts(0, 3, "Press ON to debug");
+        lcd_puts(0, 3, "Press button to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL)); /* DO NOT CHANGE TO ACTION SYSTEM */
         dbg_ports();
@@ -605,13 +605,24 @@ static void init(void)
             lcd_clear_display();
             lcd_puts(0, 0, "No partition");
             lcd_puts(0, 1, "found.");
+#ifndef USB_NONE
             lcd_puts(0, 2, "Insert USB cable");
             lcd_puts(0, 3, "and fix it.");
+#elif !defined(DEBUG)
+            lcd_puts(0, 2, "Rebooting in 5s");
+#endif
             lcd_update();
 
+#ifndef USB_NONE
+            usb_start_monitoring();
             while(button_get(true) != SYS_USB_CONNECTED) {};
             gui_usb_screen_run(true);
+#else
+            sleep(HZ*5);
+#endif
+#if !defined(DEBUG)
             system_reboot();
+#endif
         }
     }
 
