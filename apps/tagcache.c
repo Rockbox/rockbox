@@ -4991,7 +4991,7 @@ void do_tagcache_build(const char *path[])
     roots_ll[0].path = path[0];
     roots_ll[0].next = NULL;
 
-#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR) && !defined(__PCTOOL__) && defined(PLATFORM_NATIVE)
+#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR) && !defined(__PCTOOL__) && !defined(APPLICATION)
     extern bool ns_volume_is_visible(int volume); /*rb_namespace.c*/
     /* i is for the path vector, j for the roots_ll array */
     int i = 1, j = 1;
