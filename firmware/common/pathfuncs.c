@@ -339,23 +339,6 @@ size_t path_dirname(const char *name, const char **nameptr)
     return q - name;
 }
 
-/* Removes leading separators from a path
- * ""      *nameptr->NUL,   count=0: ""
- * "/"     *nameptr->/,     count=1: "/"
- * "//"    *nameptr->2nd /, count=2: "/"
- * "a/"    *nameptr->a/,    count=0: "a/"
- * "//b//" *nameptr->2nd /, count=2: "/b//"
- * "/c/"   *nameptr->/,     count=1: "/c/"
- */
-size_t path_strip_leading_separators(const char *name, const char **nameptr)
-{
-    const char *p = name;
-    *nameptr = p;
-    while (*(p) == PATH_SEPCH && *(++p) == PATH_SEPCH)
-            *nameptr = p;
-    return p - name;
-}
-
 /* Removes trailing separators from a path
  * ""     *nameptr->NUL,   len=0: ""
  * "/"    *nameptr->/,     len=1: "/"
@@ -503,9 +486,11 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
         len = strlen(buf);
     else if (basepath)
     {
-        path_strip_leading_separators(basepath, &basepath);
+        /* strip extra leading separators */
+        while (*basepath == PATH_SEPCH && *(basepath + 1) == PATH_SEPCH)
+            basepath++;
         len = strlcpy(buf, basepath, bufsize);
-        if (basepath_max < len)
+        if (basepath_max < len) /*if needed truncate basepath to basepath_max */
         {
             len = basepath_max;
             buf[basepath_max] = '\0';
