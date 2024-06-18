@@ -23,6 +23,7 @@
 #define __SANSAIO_H
 
 #include <stdint.h>
+#include <sys/types.h>
 #if !defined(_MSC_VER)
 #include <unistd.h> /* not available on MSVC */
 #endif
