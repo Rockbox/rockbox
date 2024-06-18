@@ -608,7 +608,7 @@ static void init(void)
 #ifndef USB_NONE
             lcd_puts(0, 2, "Insert USB cable");
             lcd_puts(0, 3, "and fix it.");
-#elif !defined(DEBUG)
+#elif !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
             lcd_puts(0, 2, "Rebooting in 5s");
 #endif
             lcd_update();
@@ -617,11 +617,19 @@ static void init(void)
             usb_start_monitoring();
             while(button_get(true) != SYS_USB_CONNECTED) {};
             gui_usb_screen_run(true);
-#else
+#elif !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
             sleep(HZ*5);
 #endif
-#if !defined(DEBUG)
+
+#if !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
             system_reboot();
+#else
+            rc = disk_mount_all();
+            if (rc <= 0) {
+                lcd_putsf(0, 4, "Error mounting: %08x", rc);
+                lcd_update();
+                sleep(HZ*5);
+            }
 #endif
         }
     }
