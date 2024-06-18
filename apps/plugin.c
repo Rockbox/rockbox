@@ -47,6 +47,7 @@
 #include "load_code.h"
 #include "file.h"
 #include "core_keymap.h"
+#include "language.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -839,6 +840,7 @@ static const struct plugin_api rockbox_api = {
     playlist_get_display_index,
     filetype_get_plugin,
     playlist_entries_iterate,
+    lang_is_rtl,
 };
 
 static int plugin_buffer_handle;

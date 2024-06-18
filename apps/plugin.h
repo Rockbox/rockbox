@@ -978,6 +978,7 @@ struct plugin_api {
     bool (*playlist_entries_iterate)(const char *filename,
                                      struct playlist_insert_context *pl_context,
                                      bool (*action_cb)(const char *file_name));
+    int  (*lang_is_rtl)(void);
 };
 
 /* plugin header */
