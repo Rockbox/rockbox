@@ -262,8 +262,8 @@ simcc () {
  winbuild=""
  GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib// -e s/\ -Wundef//`
 
- if [ "$debug" ]; then
-    GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os//`
+ if [ "yes" = "$use_debug" ]; then
+    GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/-Og/`
  fi
 
  GCCOPTS="$GCCOPTS -fno-builtin -g"
