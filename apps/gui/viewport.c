@@ -72,29 +72,34 @@ static int theme_stack_top[NB_SCREENS]; /* the last item added */
 static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
 static bool is_theme_enabled(enum screen_type screen);
 
+static void evt_toggle(bool enable, unsigned short id,
+                         void (*handler)(unsigned short id, void *data))
+{
+    if (enable)
+        add_event(id, handler);
+    else
+        remove_event(id, handler);
+}
 
 static void toggle_events(bool enable)
 {
-    if (enable)
-    {
-        add_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+    evt_toggle(enable, GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+    evt_toggle(enable, PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
+    evt_toggle(enable, PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        add_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
+    evt_toggle(enable, LCD_EVENT_ACTIVATION, do_sbs_update_callback);
 #endif
-        add_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
-        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
-    }
-    else
-    {
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        remove_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
-#endif
-        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
-        remove_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
-        remove_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
-    }
 }
 
+static void set_clear_update_valid_vp(enum screen_type screen, struct viewport *vp)
+{
+    if (vp->width && vp->height)
+    {
+        screens[screen].set_viewport(vp);
+        screens[screen].clear_viewport();
+        screens[screen].update_viewport();
+    }
+}
 
 static void toggle_theme(enum screen_type screen, bool force)
 {
@@ -129,41 +134,22 @@ static void toggle_theme(enum screen_type screen, bool force)
             deadspace.y = 0;
             deadspace.width = screens[screen].lcdwidth;
             deadspace.height = user.y;
-            if (deadspace.width && deadspace.height)
-            {
-                screens[screen].set_viewport(&deadspace);
-                screens[screen].clear_viewport();
-                screens[screen].update_viewport();
-            }
+            set_clear_update_valid_vp(screen, &deadspace);
             /* below */
             deadspace.y = user.y + user.height;
             deadspace.height = screens[screen].lcdheight - deadspace.y;
-            if (deadspace.width && deadspace.height)
-            {
-                screens[screen].set_viewport(&deadspace);
-                screens[screen].clear_viewport();
-                screens[screen].update_viewport();
-            }
+            set_clear_update_valid_vp(screen, &deadspace);
             /* left */
             deadspace.x = 0;
             deadspace.y = 0;
             deadspace.width = user.x;
             deadspace.height = screens[screen].lcdheight;
-            if (deadspace.width && deadspace.height)
-            {
-                screens[screen].set_viewport(&deadspace);
-                screens[screen].clear_viewport();
-                screens[screen].update_viewport();
-            }
+            set_clear_update_valid_vp(screen, &deadspace);
             /* below */
             deadspace.x = user.x + user.width;
             deadspace.width = screens[screen].lcdwidth - deadspace.x;
-            if (deadspace.width && deadspace.height)
-            {
-                screens[screen].set_viewport(&deadspace);
-                screens[screen].clear_viewport();
-                screens[screen].update_viewport();
-            }
+            set_clear_update_valid_vp(screen, &deadspace);
+
             screens[screen].set_viewport(last_vp);
         }
         intptr_t force = first_boot?0:1;
