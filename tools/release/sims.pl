@@ -189,7 +189,7 @@ sub buildit {
 }
 
 for my $b (sort byname keys %builds) {
-    if ($builds{$b}{status} >= 2)
+    if ($builds{$b}{status} > 0 && $builds{$b}{status} >= 2)
     {
         if ($builds{$b}{ram} ne '')
 	{
