@@ -144,7 +144,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     uint32_t* current_sample, uint32_t* lookup_table_idx)
 {
     uint32_t i, sample_i;
-    uint32_t time, time_cnt, time_dur;
+    uint32_t time, time_cnt = 0, time_dur = 0;
     uint32_t chunk, chunk_first_sample;
     uint32_t offset;
     uint64_t sound_sample_i;
