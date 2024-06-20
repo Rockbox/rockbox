@@ -511,7 +511,7 @@ static inline const char * format_s(const void *str,
         return NULL; /* wchar_t support for now */
     }
 
-    const char *s = str;
+    const char *s = str ? str : "(null)";
     size_t len;
     /* string length may be specified by precision instead of \0-
        terminated; however, don't go past a \0 if one is there */
