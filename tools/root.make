@@ -228,7 +228,7 @@ clean::
 		manual *.pdf *.a credits.raw rockbox.ipod bitmaps \
 		pluginbitmaps UI256.bmp rockbox-full.zip html txt \
 		rockbox-manual*.zip sysfont.h rockbox-info.txt voicefontids \
-		*.wav *.mp3 *.voice $(CLEANOBJS) \
+		*.wav *.mp3 *.voice *.talk $(CLEANOBJS) \
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
 		make.dep rombox.elf rombox.map rombox.bin romstart.txt \
 		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK) \
