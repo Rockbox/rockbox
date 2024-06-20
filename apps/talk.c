@@ -1587,7 +1587,21 @@ void talk_announce_voice_invalid(void)
     int buf_handle;
     struct queue_entry qe;
 
-    const char talkfile[] = LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
+    char talkfile[MAX_PATH];
+    const char* const p_lang_def = DEFAULT_VOICE_LANG; /* default */
+    const char* p_lang = p_lang_def;
+
+    /* attempt to load Invalid voice clip in proper lang otherwise use default */
+    if (global_settings.lang_file[0] && global_settings.lang_file[0] != 0xff)
+        p_lang = global_settings.lang_file;
+
+    while(1)
+    {
+        snprintf(talkfile, sizeof(talkfile), LANG_DIR "/InvalidVoice_%s.talk", p_lang);
+        if (file_exists(talkfile) || p_lang == p_lang_def)
+            break; /* if it exists or default talk file doesn't exist give up */
+        p_lang = p_lang_def;
+    }
 
     if (global_settings.talk_menu && talk_status != TALK_STATUS_OK)
     {
