@@ -38,7 +38,6 @@ static inline void ab_void_dummy_marker(unsigned int song_position)
 }
 static inline void ab_dummy_voidfn(void){}
 
-#define ab_repeat_init         ab_dummy_voidfn
 #define ab_before_A_marker     ab_bool_dummy_marker
 #define ab_after_A_marker      ab_bool_dummy_marker
 #define ab_jump_to_A_marker    ab_dummy_voidfn
@@ -59,7 +58,6 @@ static inline void ab_dummy_voidfn(void){}
 
 #include "settings.h"
 
-void ab_repeat_init(void);
 bool ab_before_A_marker(unsigned int song_position);
 bool ab_after_A_marker(unsigned int song_position);
 void ab_jump_to_A_marker(void);

@@ -47,6 +47,7 @@ void ab_end_of_track_report(void)
     }
 }
 
+#if 0
 void ab_repeat_init(void)
 {
     static bool ab_initialized = false;
@@ -55,13 +56,13 @@ void ab_repeat_init(void)
         ab_initialized = true;
     }
 }
+#endif
 
 /* determines if the given song position is earlier than the A mark;
 intended for use in handling the jump NEXT and PREV commands */
 bool ab_before_A_marker(unsigned int song_position)
 {
-    return (ab_A_marker != AB_MARKER_NONE)
-        && (song_position < ab_A_marker);
+    return (song_position < ab_A_marker);
 }
 
 /* determines if the given song position is later than the A mark;
@@ -97,20 +98,20 @@ by this fudge factor when setting a mark */
 void ab_set_A_marker(unsigned int song_position)
 {
     ab_A_marker = song_position;
-    ab_A_marker = (ab_A_marker >= EAR_TO_HAND_LATENCY_FUDGE) 
-        ? (ab_A_marker - EAR_TO_HAND_LATENCY_FUDGE) : 0;
+    ab_A_marker = (ab_A_marker >= EAR_TO_HAND_LATENCY_FUDGE)
+        ? (ab_A_marker - EAR_TO_HAND_LATENCY_FUDGE) : AB_MARKER_NONE;
     /* check if markers are out of order */
-    if ( (ab_B_marker != AB_MARKER_NONE) && (ab_A_marker > ab_B_marker) )
+    if (ab_A_marker > ab_B_marker)
         ab_B_marker = AB_MARKER_NONE;
 }
 
 void ab_set_B_marker(unsigned int song_position)
 {
     ab_B_marker = song_position;
-    ab_B_marker = (ab_B_marker >= EAR_TO_HAND_LATENCY_FUDGE) 
-        ? (ab_B_marker - EAR_TO_HAND_LATENCY_FUDGE) : 0;
+    ab_B_marker = (ab_B_marker >= EAR_TO_HAND_LATENCY_FUDGE)
+        ? (ab_B_marker - EAR_TO_HAND_LATENCY_FUDGE) : AB_MARKER_NONE;
     /* check if markers are out of order */
-    if ( (ab_A_marker != AB_MARKER_NONE) && (ab_B_marker < ab_A_marker) )
+    if (ab_B_marker < ab_A_marker)
         ab_A_marker = AB_MARKER_NONE;
 }
 

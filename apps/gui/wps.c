@@ -692,7 +692,6 @@ long gui_wps_show(void)
     long last_left = 0, last_right = 0;
     struct wps_state *state = get_wps_state();
 
-    ab_repeat_init();
     ab_reset_markers();
 
     wps_state_init();
