@@ -237,8 +237,14 @@ foreach (@englishorder) {
 foreach (@missingorder) {
 #    print "#!! '$_' missing\n";
     push(@langorder, $_);
-    $lang{$_} = $english{$_};
-    $lang{$_}{'notes'} .= "### This phrase is missing entirely, copying from english!\n";
+    if ($_ eq 'VOICE_LANG_NAME') {
+        $lang{$_} = $english{$_};
+	$lang{$_}{'voice'}{'*'} = "";
+        $lang{$_}{'notes'} .= "### This phrase is missing entirely, please fill out\n";
+    } else {
+        $lang{$_} = $english{$_};
+        $lang{$_}{'notes'} .= "### This phrase is missing entirely, copying from english!\n";
+    }
     $lang{$_}{'new'} = 1;
 }
 undef @missingorder;

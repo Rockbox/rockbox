@@ -16861,3 +16861,17 @@
     *: "Çok Zor"
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_LANG_NAME
+  desc: Spoken name of the language
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Türkçe"
+  </voice>
+</phrase>

@@ -16368,3 +16368,31 @@
     *: "Chess box Menu"
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Invalid Voice File"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_LANG_NAME
+  desc: Spoken name of the language
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "American English"
+  </voice>
+</phrase>

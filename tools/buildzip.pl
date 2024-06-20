@@ -658,6 +658,11 @@ sub buildzip {
     # Copy over the Invalid Language fallback stuff
     glob_copy("$ROOT/apps/lang/Invalid*.talk", "$temp_dir/langs/");
 
+    # Copy over any generated voice/talk clips
+    glob_copy('Invalid*.talk', "$temp_dir/langs/");
+    glob_copy('*.lng.talk', "$temp_dir/langs/");
+    glob_copy('*.voice', "$temp_dir/langs/");
+
     # copy the .lua files
     glob_mkdir("$temp_dir/rocks/viewers/lua/");
     glob_copy('apps/plugins/lua/*.lua', "$temp_dir/rocks/viewers/lua/");
