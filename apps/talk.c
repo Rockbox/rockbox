@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2004 Jörg Hohensohn
  *
@@ -1080,6 +1079,7 @@ static int _talk_file(const char* filename,
     /* reload needed? */
     if (talk_is_disabled())
         return -1;
+
     if (talk_handle <= 0 || index_handle <= 0)
     {
         fd = open_voicefile();
@@ -1605,8 +1605,6 @@ void talk_announce_voice_invalid(void)
 
     if (global_settings.talk_menu && talk_status != TALK_STATUS_OK)
     {
-        talk_temp_disable_count = 0xFF; /* don't let anyone else use voice sys */
-
         voice_fd = open(talkfile, O_RDONLY);
         if (voice_fd < 0)
             goto out; /* can't open */
@@ -1632,13 +1630,12 @@ void talk_announce_voice_invalid(void)
             qe.length = qe.remaining = voice_sz;
             queue_clip(&qe, false);
             voice_wait();
-            voice_thread_kill();
         }
 
         mutex_unlock(&read_buffer_mutex);
 
         buf_handle = buflib_free(&clip_ctx, buf_handle);
-        talk_handle = core_free(talk_handle);
+
     out:
         close(voice_fd);
         return;
