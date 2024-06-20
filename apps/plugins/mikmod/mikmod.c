@@ -378,7 +378,7 @@ static void showinstruments(void)
     rb->lcd_clear_display();
     for( i=0; i<MAX_LINES && i+vscroll<module->numins; i++ )
     {
-        sprintf(statustext, "%02d %s", i+vscroll+1, module->instruments[i+vscroll].insname);
+        sprintf(statustext, "%02d %s", i+vscroll+1, module->instruments[i+vscroll].insname ? module->instruments[i+vscroll].insname : "[n/a]");
         rb->lcd_putsxy(1, 1+(8*i), statustext);
     }
     rb->lcd_update();
