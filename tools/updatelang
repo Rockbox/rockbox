@@ -446,6 +446,8 @@ foreach my $id (@langorder) {
 		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from translated <dest>!\n";
 		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
+		} elsif ($id eq 'VOICE_LANG_NAME') {
+		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Please fill out!\n";
 		} else {
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
 
