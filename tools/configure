@@ -1078,6 +1078,9 @@ Win(6)4 crosscompile, (T)est plugins, (O)mit plugins, S(m)all C lib, Logf to Ser
     for thislang in `echo $voicelanguage | sed 's/,/ /g'`; do
       voiceconfig "$thislang"
     done
+    if [ -z "$POOL" ] ; then
+	echo " \$POOL is not set, will use <builddir>/voice-pool by default"
+    fi
   fi
   if [ "yes" = "$use_debug" ]; then
     debug="-DDEBUG"
