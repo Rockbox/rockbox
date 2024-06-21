@@ -10,6 +10,7 @@ bookmark.c
 core_keymap.c
 debug_menu.c
 filetypes.c
+fileop.c
 language.c
 main.c
 menu.c

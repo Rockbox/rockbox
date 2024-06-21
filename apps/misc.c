@@ -1999,4 +1999,22 @@ long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm
 
     return vol >> NVOL_FRACBITS;
 }
+
+void clear_screen_buffer(bool update)
+{
+    struct viewport vp;
+    struct viewport *last_vp;
+    FOR_NB_SCREENS(i)
+    {
+        struct screen * screen = &screens[i];
+        viewport_set_defaults(&vp, screen->screen_type);
+        last_vp = screen->set_viewport(&vp);
+        screen->clear_viewport();
+        if (update) {
+            screen->update_viewport();
+        }
+        screen->set_viewport(last_vp);
+    }
+}
+
 #endif /* ndef __PCTOOL__ */

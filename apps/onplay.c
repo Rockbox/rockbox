@@ -26,7 +26,6 @@
 
 #include "debug.h"
 #include "lcd.h"
-#include "file.h"
 #include "audio.h"
 #include "menu.h"
 #include "lang.h"
@@ -43,6 +42,7 @@
 #include "talk.h"
 #include "onplay.h"
 #include "filetypes.h"
+#include "fileop.h"
 #include "open_plugin.h"
 #include "plugin.h"
 #include "bookmark.h"
@@ -83,31 +83,6 @@ extern struct menu_item_ex file_menu; /* settings_menu.c  */
         {MT_MENU|MENU_HAS_DESC|MENU_EXITAFTERTHISMENU|                  \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
-
-/* Used for directory move, copy and delete */
-struct dirrecurse_params
-{
-    char path[MAX_PATH];    /* Buffer for full path */
-    size_t append;          /* Append position in 'path' for stack push */
-};
-
-enum clipboard_op_flags
-{
-    PASTE_CUT       = 0x00, /* Is a move (cut) operation (default) */
-    PASTE_COPY      = 0x01, /* Is a copy operation */
-    PASTE_OVERWRITE = 0x02, /* Overwrite destination */
-    PASTE_EXDEV     = 0x04, /* Actually copy/move across volumes */
-};
-
-/* result codec of various onplay operations */
-enum onplay_result_code
-{
-    /* Anything < 0 is failure */
-    OPRC_SUCCESS   = 0,     /* All operations completed successfully */
-    OPRC_NOOP      = 1,     /* Operation didn't need to do anything */
-    OPRC_CANCELLED = 2,     /* Operation was cancelled by user */
-    OPRC_NOOVERWRT = 3,
-};
 
 static struct clipboard
 {
@@ -191,8 +166,6 @@ static int bookmark_menu_callback(int action,
     return action;
 }
 
-
-
 /* CONTEXT_WPS playlist options */
 static bool shuffle_playlist(void)
 {
@@ -244,45 +217,81 @@ MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                );
 
 /* argument for add_to_playlist (for use by menu callbacks) */
+#define PL_NONE    0x00
+#define PL_QUEUE   0x01
+#define PL_REPLACE 0x02
 struct add_to_pl_param
 {
     int8_t position;
-    unsigned int queue: 1;
-    unsigned int replace: 1;
+    uint8_t flags;
 };
 
-static struct add_to_pl_param addtopl_insert           = {PLAYLIST_INSERT, 0, 0};
-static struct add_to_pl_param addtopl_insert_first     = {PLAYLIST_INSERT_FIRST, 0, 0};
-static struct add_to_pl_param addtopl_insert_last      = {PLAYLIST_INSERT_LAST, 0, 0};
-static struct add_to_pl_param addtopl_insert_shuf      = {PLAYLIST_INSERT_SHUFFLED, 0, 0};
-static struct add_to_pl_param addtopl_insert_last_shuf = {PLAYLIST_INSERT_LAST_SHUFFLED, 0, 0};
+static struct add_to_pl_param addtopl_insert           = {PLAYLIST_INSERT, PL_NONE};
+static struct add_to_pl_param addtopl_insert_first     = {PLAYLIST_INSERT_FIRST, PL_NONE};
+static struct add_to_pl_param addtopl_insert_last      = {PLAYLIST_INSERT_LAST, PL_NONE};
+static struct add_to_pl_param addtopl_insert_shuf      = {PLAYLIST_INSERT_SHUFFLED, PL_NONE};
+static struct add_to_pl_param addtopl_insert_last_shuf = {PLAYLIST_INSERT_LAST_SHUFFLED, PL_NONE};
 
-static struct add_to_pl_param addtopl_queue            = {PLAYLIST_INSERT, 1, 0};
-static struct add_to_pl_param addtopl_queue_first      = {PLAYLIST_INSERT_FIRST, 1, 0};
-static struct add_to_pl_param addtopl_queue_last       = {PLAYLIST_INSERT_LAST, 1, 0};
-static struct add_to_pl_param addtopl_queue_shuf       = {PLAYLIST_INSERT_SHUFFLED, 1, 0};
-static struct add_to_pl_param addtopl_queue_last_shuf  = {PLAYLIST_INSERT_LAST_SHUFFLED, 1, 0};
+static struct add_to_pl_param addtopl_queue            = {PLAYLIST_INSERT, PL_QUEUE};
+static struct add_to_pl_param addtopl_queue_first      = {PLAYLIST_INSERT_FIRST, PL_QUEUE};
+static struct add_to_pl_param addtopl_queue_last       = {PLAYLIST_INSERT_LAST, PL_QUEUE};
+static struct add_to_pl_param addtopl_queue_shuf       = {PLAYLIST_INSERT_SHUFFLED, PL_QUEUE};
+static struct add_to_pl_param addtopl_queue_last_shuf  = {PLAYLIST_INSERT_LAST_SHUFFLED, PL_QUEUE};
 
-static struct add_to_pl_param addtopl_replace          = {PLAYLIST_INSERT, 0, 1};
-static struct add_to_pl_param addtopl_replace_shuffled = {PLAYLIST_INSERT_LAST_SHUFFLED, 0, 1};
+static struct add_to_pl_param addtopl_replace          = {PLAYLIST_INSERT, PL_REPLACE};
+static struct add_to_pl_param addtopl_replace_shuffled = {PLAYLIST_INSERT_LAST_SHUFFLED, PL_REPLACE};
+
+static void op_playlist_insert_selected(int position, bool queue)
+{
+#ifdef HAVE_TAGCACHE
+    if (context == CONTEXT_STD && ctx_current_playlist_insert != NULL)
+    {
+        ctx_current_playlist_insert(position, queue, false);
+        return;
+    }
+#endif
+    if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+        playlist_insert_track(NULL, selected_file, position, queue, true);
+    else if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)
+        playlist_insert_playlist(NULL, selected_file, position, queue);
+    else if (selected_file_attr & ATTR_DIRECTORY)
+    {
+#ifdef HAVE_TAGCACHE
+        if (context == CONTEXT_ID3DB)
+        {
+            tagtree_current_playlist_insert(position, queue);
+            return;
+        }
+#endif
+        bool recurse = (global_settings.recursive_dir_insert == RECURSE_ON);
+        if (global_settings.recursive_dir_insert == RECURSE_ASK)
+        {
+
+            const char *lines[] = {
+                ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
+                selected_file
+            };
+            const struct text_message message={lines, 2};
+            /* Ask if user wants to recurse directory */
+            recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
+        }
+
+        playlist_insert_directory(NULL, selected_file, position, queue,
+                                  recurse == RECURSE_ON);
+    }
+}
 
 /* CONTEXT_[TREE|ID3DB|STD] playlist options */
 static int add_to_playlist(void* arg)
 {
     struct add_to_pl_param* param = arg;
     int position = param->position;
-    bool new_playlist = !!param->replace;
-    bool queue = !!param->queue;
+    bool new_playlist = (param->flags & PL_REPLACE) == PL_REPLACE;
+    bool queue = (param->flags & PL_QUEUE) == PL_QUEUE;
 
     /* warn if replacing the playlist */
     if (new_playlist && !warn_on_pl_erase())
         return 0;
-
-    const char *lines[] = {
-        ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
-        selected_file
-    };
-    const struct text_message message={lines, 2};
 
     splash(0, ID2P(LANG_WAIT));
 
@@ -307,38 +316,7 @@ static int add_to_playlist(void* arg)
             playlist_set_last_shuffled_start();
     }
 
-#ifdef HAVE_TAGCACHE
-    if ((context == CONTEXT_ID3DB) && (selected_file_attr & ATTR_DIRECTORY))
-    {
-        tagtree_current_playlist_insert(position, queue);
-    }
-    else if (context == CONTEXT_STD && ctx_current_playlist_insert != NULL)
-    {
-        ctx_current_playlist_insert(position, queue, false);
-    }
-    else
-#endif
-    {
-        if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
-            playlist_insert_track(NULL, selected_file, position, queue, true);
-        else if (selected_file_attr & ATTR_DIRECTORY)
-        {
-            bool recurse = false;
-
-            if (global_settings.recursive_dir_insert != RECURSE_ASK)
-                recurse = (bool)global_settings.recursive_dir_insert;
-            else
-            {
-                /* Ask if user wants to recurse directory */
-                recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
-            }
-
-            playlist_insert_directory(NULL, selected_file, position, queue,
-                                      recurse);
-        }
-        else if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)
-            playlist_insert_playlist(NULL, selected_file, position, queue);
-    }
+    op_playlist_insert_selected(position, queue);
 
     if (new_playlist && (playlist_amount() > 0))
     {
@@ -447,18 +425,21 @@ MAKE_ONPLAYMENU(tree_playlist_menu, ID2P(LANG_PLAYING_NEXT),
                 &replace_pl_item,
                 &replace_shuf_pl_item
                );
+
 static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list)
 {
     (void)this_list;
+    int sel_file_attr = (selected_file_attr & FILE_ATTR_MASK);
+
     switch (action)
     {
     case ACTION_REQUEST_MENUITEM:
         if (this_item == &tree_playlist_menu)
         {
-            if ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO &&
-                (selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U &&
+            if (sel_file_attr != FILE_ATTR_AUDIO &&
+                sel_file_attr != FILE_ATTR_M3U &&
                 (selected_file_attr & ATTR_DIRECTORY) == 0)
                 return ACTION_EXIT_MENUITEM;
         }
@@ -476,7 +457,7 @@ static int treeplaylist_callback(int action,
         {
             struct add_to_pl_param *param = this_item->function_param->param;
 
-            if (param->queue)
+            if ((param->flags & PL_QUEUE) == PL_QUEUE)
             {
                 if (global_settings.show_queue_options != QUEUE_SHOW_AT_TOPLEVEL &&
                     !in_queue_submenu)
@@ -489,12 +470,12 @@ static int treeplaylist_callback(int action,
                 if (!global_settings.show_shuffled_adding_options)
                     return ACTION_EXIT_MENUITEM;
 
-                if ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U &&
+                if (sel_file_attr != FILE_ATTR_M3U &&
                     (selected_file_attr & ATTR_DIRECTORY) == 0)
                     return ACTION_EXIT_MENUITEM;
             }
 
-            if (!param->replace)
+            if ((param->flags & PL_REPLACE) != PL_REPLACE)
             {
                 if (!(audio_status() & AUDIO_STATUS_PLAY))
                     return ACTION_EXIT_MENUITEM;
@@ -583,482 +564,17 @@ static int cat_playlist_callback(int action,
     return action;
 }
 
-static void draw_slider(void)
-{
-    struct viewport *last_vp;
-    FOR_NB_SCREENS(i)
-    {
-        struct viewport vp;
-        int slider_height = 2*screens[i].getcharheight();
-        viewport_set_defaults(&vp, i);
-        last_vp = screens[i].set_viewport(&vp);
-        show_busy_slider(&screens[i], 1, vp.height - slider_height,
-                         vp.width-2, slider_height-1);
-        screens[i].update_viewport();
-        screens[i].set_viewport(last_vp);
-    }
-}
-
-static void clear_display(bool update)
-{
-    struct viewport vp;
-    struct viewport *last_vp;
-    FOR_NB_SCREENS(i)
-    {
-        struct screen * screen = &screens[i];
-        viewport_set_defaults(&vp, screen->screen_type);
-        last_vp = screen->set_viewport(&vp);
-        screen->clear_viewport();
-        if (update) {
-            screen->update_viewport();
-        }
-        screen->set_viewport(last_vp);
-    }
-}
-
-static void splash_path(const char *path)
-{
-    clear_display(false);
-    path_basename(path, &path);
-    splash(0, path);
-    draw_slider();
-}
-
-/* Splashes the path and checks the keys */
-static bool poll_cancel_action(const char *path)
-{
-    splash_path(path);
-    return ACTION_STD_CANCEL == get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
-}
-
-static bool check_new_name(const char *basename)
-{
-    /* at least prevent escapes out of the base directory from keyboard-
-       entered filenames; the file code should reject other invalidities */
-    return *basename != '\0' && !strchr(basename, PATH_SEPCH) &&
-           !is_dotdir_name(basename);
-}
-
 static void splash_cancelled(void)
 {
-    clear_display(true);
+    clear_screen_buffer(true);
     splash(HZ, ID2P(LANG_CANCEL));
 }
 
-static void splash_failed(int lang_what)
+static void splash_failed(int lang_what, int err)
 {
     cond_talk_ids_fq(lang_what, LANG_FAILED);
-    clear_display(true);
-    splashf(HZ*2, "%s %s", str(lang_what), str(LANG_FAILED));
-}
-
-/* helper function to remove a non-empty directory */
-static int remove_dir(struct dirrecurse_params *parm)
-{
-    DIR *dir = opendir(parm->path);
-    if (!dir) {
-        return -1; /* open error */
-    }
-
-    size_t append = parm->append;
-    int rc = OPRC_SUCCESS;
-
-    /* walk through the directory content */
-    while (rc == OPRC_SUCCESS) {
-        errno = 0; /* distinguish failure from eod */
-        struct dirent *entry = readdir(dir);
-        if (!entry) {
-            if (errno) {
-                rc = -1;
-            }
-            break;
-        }
-
-        struct dirinfo info = dir_get_info(dir, entry);
-        if ((info.attribute & ATTR_DIRECTORY) &&
-            is_dotdir_name(entry->d_name)) {
-            continue; /* skip these */
-        }
-
-        /* append name to current directory */
-        parm->append = append + path_append(&parm->path[append],
-                                            PA_SEP_HARD, entry->d_name,
-                                            sizeof (parm->path) - append);
-        if (parm->append >= sizeof (parm->path)) {
-            rc = -1;
-            break; /* no space left in buffer */
-        }
-
-        if (info.attribute & ATTR_DIRECTORY) {
-            /* remove a subdirectory */
-            rc = remove_dir(parm);
-        } else {
-            /* remove a file */
-            if (poll_cancel_action(parm->path)) {
-                rc = OPRC_CANCELLED;
-                break;
-            }
-
-            rc = remove(parm->path);
-        }
-
-        /* Remove basename we added above */
-        parm->path[append] = '\0';
-    }
-
-    closedir(dir);
-
-    if (rc == 0) {
-        /* remove the now empty directory */
-        if (poll_cancel_action(parm->path)) {
-            rc = OPRC_CANCELLED;
-        } else {
-            rc = rmdir(parm->path);
-        }
-    }
-
-    return rc;
-}
-
-/* share code for file and directory deletion, saves space */
-static int delete_file_dir(void)
-{
-    const char *to_delete=selected_file;
-    const int   to_delete_attr=selected_file_attr;
-    if (confirm_delete_yesno(to_delete) != YESNO_YES) {
-        return 1;
-    }
-
-    clear_display(true);
-    splash(HZ/2, ID2P(LANG_DELETING));
-
-    int rc = -1;
-
-    if (to_delete_attr & ATTR_DIRECTORY) { /* true if directory */
-        struct dirrecurse_params parm;
-        parm.append = strlcpy(parm.path, to_delete, sizeof (parm.path));
-
-        if (parm.append < sizeof (parm.path)) {
-            cpu_boost(true);
-            rc = remove_dir(&parm);
-            cpu_boost(false);
-        }
-    } else {
-        rc = remove(to_delete);
-    }
-
-    if (rc < OPRC_SUCCESS) {
-        splash_failed(LANG_DELETE);
-    } else if (rc == OPRC_CANCELLED) {
-        splash_cancelled();
-    }
-
-    if (rc != OPRC_NOOP) {
-        /* Could have failed after some but not all needed changes; reload */
-        onplay_result = ONPLAY_RELOAD_DIR;
-    }
-
-    return 1;
-}
-
-static int rename_file(void)
-{
-    int rc = -1;
-    char newname[MAX_PATH];
-    const char *oldbase, *selection = selected_file;
-
-    path_basename(selection, &oldbase);
-    size_t pathlen = oldbase - selection;
-    char *newbase = newname + pathlen;
-
-    if (strmemccpy(newname, selection, sizeof (newname)) == NULL) {
-        /* Too long */
-    } else if (kbd_input(newbase, sizeof (newname) - pathlen, NULL) < 0) {
-        rc = OPRC_CANCELLED;
-    } else if (!strcmp(oldbase, newbase)) {
-        rc = OPRC_NOOP; /* No change at all */
-    } else if (check_new_name(newbase)) {
-        switch (relate(selection, newname))
-        {
-        case RELATE_DIFFERENT:
-            if (file_exists(newname)) {
-                break; /* don't overwrite */
-            }
-            /* Fall-through */
-        case RELATE_SAME:
-            rc = rename(selection, newname);
-            break;
-        case RELATE_PREFIX:
-        default:
-            break;
-        }
-    }
-
-    if (rc < OPRC_SUCCESS) {
-        splash_failed(LANG_RENAME);
-    } else if (rc == OPRC_CANCELLED) {
-        /* splash_cancelled(); kbd_input() splashes it */
-    } else if (rc == OPRC_SUCCESS) {
-        onplay_result = ONPLAY_RELOAD_DIR;
-    }
-
-    return 1;
-}
-
-static int create_dir(void)
-{
-    int rc = -1;
-    char dirname[MAX_PATH];
-    size_t pathlen = path_append(dirname, getcwd(NULL, 0), PA_SEP_HARD,
-                                 sizeof (dirname));
-    char *basename = dirname + pathlen;
-
-    if (pathlen >= sizeof (dirname)) {
-        /* Too long */
-    } else if (kbd_input(basename, sizeof (dirname) - pathlen, NULL) < 0) {
-        rc = OPRC_CANCELLED;
-    } else if (check_new_name(basename)) {
-        rc = mkdir(dirname);
-    }
-
-    if (rc < OPRC_SUCCESS) {
-        splash_failed(LANG_CREATE_DIR);
-    } else if (rc == OPRC_CANCELLED) {
-        /* splash_cancelled(); kbd_input() splashes it */
-    } else if (rc == OPRC_SUCCESS) {
-        onplay_result = ONPLAY_RELOAD_DIR;
-    }
-
-    return 1;
-}
-
-/* Paste a file */
-static int clipboard_pastefile(const char *src, const char *target,
-                               unsigned int flags)
-{
-    int rc = -1;
-
-    while (!(flags & (PASTE_COPY | PASTE_EXDEV))) {
-        if ((flags & PASTE_OVERWRITE) || !file_exists(target)) {
-            /* Rename and possibly overwrite the file */
-            if (poll_cancel_action(src)) {
-                rc = OPRC_CANCELLED;
-            } else {
-                rc = rename(src, target);
-            }
-
-        #ifdef HAVE_MULTIVOLUME
-            if (rc < 0 && errno == EXDEV) {
-                /* Failed because cross volume rename doesn't work; force
-                   a move instead */
-                flags |= PASTE_EXDEV;
-                break;
-            }
-        #endif /* HAVE_MULTIVOLUME */
-        }
-
-        return rc;
-    }
-
-    /* See if we can get the plugin buffer for the file copy buffer */
-    size_t buffersize;
-    char *buffer = (char *) plugin_get_buffer(&buffersize);
-    if (buffer == NULL || buffersize < 512) {
-        /* Not large enough, try for a disk sector worth of stack
-           instead */
-        buffersize = 512;
-        buffer = (char *)alloca(buffersize);
-    }
-
-    if (buffer == NULL) {
-        return -1;
-    }
-
-    buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector
-                              size */
-
-    int src_fd = open(src, O_RDONLY);
-    if (src_fd >= 0) {
-        int oflag = O_WRONLY|O_CREAT;
-
-        if (!(flags & PASTE_OVERWRITE)) {
-            oflag |= O_EXCL;
-        }
-
-        int target_fd = open(target, oflag, 0666);
-        if (target_fd >= 0) {
-            off_t total_size = 0;
-            off_t next_cancel_test = 0; /* No excessive button polling */
-
-            rc = OPRC_SUCCESS;
-
-            while (rc == OPRC_SUCCESS) {
-                if (total_size >= next_cancel_test) {
-                    next_cancel_test = total_size + 0x10000;
-                    if (poll_cancel_action(src)) {
-                       rc = OPRC_CANCELLED;
-                       break;
-                    }
-                }
-
-                ssize_t bytesread = read(src_fd, buffer, buffersize);
-                if (bytesread <= 0) {
-                    if (bytesread < 0) {
-                        rc = -1;
-                    }
-                    /* else eof on buffer boundary; nothing to write */
-                    break;
-                }
-
-                ssize_t byteswritten = write(target_fd, buffer, bytesread);
-                if (byteswritten < bytesread) {
-                    /* Some I/O error */
-                    rc = -1;
-                    break;
-                }
-
-                total_size += byteswritten;
-
-                if (bytesread < (ssize_t)buffersize) {
-                    /* EOF with trailing bytes */
-                    break;
-                }
-            }
-
-            if (rc == OPRC_SUCCESS) {
-                /* If overwriting, set the correct length if original was
-                   longer */
-                rc = ftruncate(target_fd, total_size);
-            }
-
-            close(target_fd);
-
-            if (rc != OPRC_SUCCESS) {
-                /* Copy failed. Cleanup. */
-                remove(target);
-            }
-        }
-
-        close(src_fd);
-    }
-
-    if (rc == OPRC_SUCCESS && !(flags & PASTE_COPY)) {
-        /* Remove the source file */
-        rc = remove(src);
-    }
-
-    return rc;
-}
-
-/* Paste a directory */
-static int clipboard_pastedirectory(struct dirrecurse_params *src,
-                                    struct dirrecurse_params *target,
-                                    unsigned int flags)
-{
-    int rc = -1;
-
-    while (!(flags & (PASTE_COPY | PASTE_EXDEV))) {
-        if ((flags & PASTE_OVERWRITE) || !file_exists(target->path)) {
-            /* Just try to move the directory */
-            if (poll_cancel_action(src->path)) {
-                rc = OPRC_CANCELLED;
-            } else {
-                rc = rename(src->path, target->path);
-            }
-
-            if (rc < 0) {
-                int errnum = errno;
-                if (errnum == ENOTEMPTY && (flags & PASTE_OVERWRITE)) {
-                    /* Directory is not empty thus rename() will not do a quick
-                       overwrite */
-                    break;
-                }
-            #ifdef HAVE_MULTIVOLUME
-                else if (errnum == EXDEV) {
-                    /* Failed because cross volume rename doesn't work; force
-                       a move instead */
-                    flags |= PASTE_EXDEV;
-                    break;
-                }
-            #endif /* HAVE_MULTIVOLUME */
-            }
-        }
-
-        return rc;
-    }
-
-    DIR *srcdir = opendir(src->path);
-
-    if (srcdir) {
-        /* Make a directory to copy things to */
-        rc = mkdir(target->path);
-        if (rc < 0 && errno == EEXIST && (flags & PASTE_OVERWRITE)) {
-            /* Exists and overwrite was approved */
-            rc = OPRC_SUCCESS;
-        }
-    }
-
-    size_t srcap = src->append, targetap = target->append;
-
-    /* Walk through the directory content; this loop will exit as soon as
-       there's a problem */
-    while (rc == OPRC_SUCCESS) {
-        errno = 0; /* Distinguish failure from eod */
-        struct dirent *entry = readdir(srcdir);
-        if (!entry) {
-            if (errno) {
-                rc = -1;
-            }
-            break;
-        }
-
-        struct dirinfo info = dir_get_info(srcdir, entry);
-        if ((info.attribute & ATTR_DIRECTORY) &&
-            is_dotdir_name(entry->d_name)) {
-            continue; /* Skip these */
-        }
-
-        /* Append names to current directories */
-        src->append = srcap +
-            path_append(&src->path[srcap], PA_SEP_HARD, entry->d_name,
-                        sizeof(src->path) - srcap);
-
-        target->append = targetap +
-            path_append(&target->path[targetap], PA_SEP_HARD, entry->d_name,
-                        sizeof (target->path) - targetap);
-
-        if (src->append >= sizeof (src->path) ||
-            target->append >= sizeof (target->path)) {
-            rc = -1; /* No space left in buffer */
-            break;
-        }
-
-        if (poll_cancel_action(src->path)) {
-            rc = OPRC_CANCELLED;
-            break;
-        }
-
-        DEBUGF("Copy %s to %s\n", src->path, target->path);
-
-        if (info.attribute & ATTR_DIRECTORY) {
-            /* Copy/move a subdirectory */
-            rc = clipboard_pastedirectory(src, target, flags); /* recursion */
-        } else {
-            /* Copy/move a file */
-            rc = clipboard_pastefile(src->path, target->path, flags);
-        }
-
-        /* Remove basenames we added above */
-        src->path[srcap] = target->path[targetap] = '\0';
-    }
-
-    if (rc == OPRC_SUCCESS && !(flags & PASTE_COPY)) {
-        /* Remove the now empty directory */
-        rc = rmdir(src->path);
-    }
-
-    closedir(srcdir);
-    return rc;
+    clear_screen_buffer(true);
+    splashf(HZ*2, "%s %s (%d)", str(lang_what), str(LANG_FAILED), err);
 }
 
 static bool clipboard_cut(void)
@@ -1079,82 +595,27 @@ static int clipboard_paste(void)
     if (!clipboard.path[0])
         return 1;
 
-    int rc = -1;
+    int rc = copy_move_fileobject(clipboard.path, getcwd(NULL, 0), clipboard.flags);
 
-    struct dirrecurse_params src, target;
-    unsigned int flags = clipboard.flags;
 
-    /* Figure out the name of the selection */
-    const char *nameptr;
-    path_basename(clipboard.path, &nameptr);
-
-    /* Final target is current directory plus name of selection  */
-    target.append = path_append(target.path, getcwd(NULL, 0),
-                                nameptr, sizeof (target.path));
-
-    switch (target.append < sizeof (target.path) ?
-                relate(clipboard.path, target.path) : -1)
-    {
-    case RELATE_SAME:
-        rc = OPRC_NOOP;
-        break;
-
-    case RELATE_DIFFERENT:
-        if (file_exists(target.path)) {
-            /* If user chooses not to overwrite, cancel */
-            if (confirm_overwrite_yesno() == YESNO_NO) {
-                rc = OPRC_NOOVERWRT;
-                break;
-            }
-
-            flags |= PASTE_OVERWRITE;
-        }
-
-        clear_display(true);
-        splash(HZ/2, (flags & PASTE_COPY) ? ID2P(LANG_COPYING) :
-                                            ID2P(LANG_MOVING));
-
-        /* Now figure out what we're doing */
-        cpu_boost(true);
-
-        if (clipboard.attr & ATTR_DIRECTORY) {
-            /* Copy or move a subdirectory */
-            src.append = strlcpy(src.path, clipboard.path,
-                                 sizeof (src.path));
-            if (src.append < sizeof (src.path)) {
-                rc = clipboard_pastedirectory(&src, &target, flags);
-            }
-        } else {
-            /* Copy or move a file */
-            rc = clipboard_pastefile(clipboard.path, target.path, flags);
-        }
-
-        cpu_boost(false);
-        break;
-
-    case RELATE_PREFIX:
-    default: /* Some other relation / failure */
-        break;
-    }
-
-    clear_display(true);
+    clear_screen_buffer(true);
 
     switch (rc)
     {
-    case OPRC_CANCELLED:
+    case FORC_CANCELLED:
         splash_cancelled();
         /* Fallthrough */
-    case OPRC_SUCCESS:
+    case FORC_SUCCESS:
         onplay_result = ONPLAY_RELOAD_DIR;
         /* Fallthrough */
-    case OPRC_NOOP:
+    case FORC_NOOP:
         clipboard_clear_selection(&clipboard);
         /* Fallthrough */
-    case OPRC_NOOVERWRT:
+    case FORC_NOOVERWRT:
         break;
     default:
-        if (rc < OPRC_SUCCESS) {
-            splash_failed(LANG_PASTE);
+        if (rc < FORC_SUCCESS) {
+            splash_failed(LANG_PASTE, rc);
             onplay_result = ONPLAY_RELOAD_DIR;
         }
     }
@@ -1249,13 +710,57 @@ MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, Icon_Audio);
 #endif
 
+static int clipboard_delete_selected_fileobject(void)
+{
+    int rc = delete_fileobject(selected_file);
+    if (rc < FORC_SUCCESS) {
+        splash_failed(LANG_DELETE, rc);
+    } else if (rc == FORC_CANCELLED) {
+        splash_cancelled();
+    }
+    if (rc != FORC_NOOP) {
+        /* Could have failed after some but not all needed changes; reload */
+        onplay_result = ONPLAY_RELOAD_DIR;
+    }
+    return 1;
+}
+
+static void show_result(int rc, int lang_what)
+{
+    if (rc < FORC_SUCCESS) {
+        splash_failed(lang_what, rc);
+    } else if (rc == FORC_CANCELLED) {
+        /* splash_cancelled(); kbd_input() splashes it */
+    } else if (rc == FORC_SUCCESS) {
+        onplay_result = ONPLAY_RELOAD_DIR;
+    }
+}
+
+static int clipboard_create_dir(void)
+{
+    int rc = create_dir();
+
+    show_result(rc, LANG_CREATE_DIR);
+
+    return 1;
+}
+
+static int clipboard_rename_selected_file(void)
+{
+    int rc = rename_file(selected_file);
+
+    show_result(rc, LANG_RENAME);
+
+    return 1;
+}
+
 /* CONTEXT_[TREE|ID3DB] items */
 static int clipboard_callback(int action,
                               const struct menu_item_ex *this_item,
                               struct gui_synclist *this_list);
 
 MENUITEM_FUNCTION(rename_file_item, 0, ID2P(LANG_RENAME),
-                  rename_file, clipboard_callback, Icon_NOICON);
+                  clipboard_rename_selected_file, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_cut_item, 0, ID2P(LANG_CUT),
                   clipboard_cut, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_copy_item, 0, ID2P(LANG_COPY),
@@ -1263,11 +768,11 @@ MENUITEM_FUNCTION(clipboard_copy_item, 0, ID2P(LANG_COPY),
 MENUITEM_FUNCTION(clipboard_paste_item, 0, ID2P(LANG_PASTE),
                   clipboard_paste, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(delete_file_item, 0, ID2P(LANG_DELETE),
-                  delete_file_dir, clipboard_callback, Icon_NOICON);
+                  clipboard_delete_selected_fileobject, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(delete_dir_item, 0, ID2P(LANG_DELETE_DIR),
-                  delete_file_dir, clipboard_callback, Icon_NOICON);
+                 clipboard_delete_selected_fileobject, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(create_dir_item, 0, ID2P(LANG_CREATE_DIR),
-                  create_dir, clipboard_callback, Icon_NOICON);
+                  clipboard_create_dir, clipboard_callback, Icon_NOICON);
 
 /* other items */
 static bool list_viewers(void)
@@ -1337,12 +842,18 @@ MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
                   onplay_add_to_shortcuts,
                   clipboard_callback, Icon_NOICON);
 
+static void set_dir_helper(char* dirnamebuf, size_t bufsz)
+{
+    path_append(dirnamebuf, selected_file, PA_SEP_HARD, bufsz);
+    settings_save();
+}
+
 #if LCD_DEPTH > 1
 static bool set_backdrop(void)
 {
-    path_append(global_settings.backdrop_file, selected_file,
-                PA_SEP_HARD, sizeof(global_settings.backdrop_file));
-    settings_save();
+    set_dir_helper(global_settings.backdrop_file,
+                   sizeof(global_settings.backdrop_file));
+
     skin_backdrop_load_setting();
     skin_backdrop_show(sb_get_backdrop(SCREEN_MAIN));
     return true;
@@ -1353,9 +864,8 @@ MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
 {
-    path_append(global_settings.rec_directory, selected_file,
-                PA_SEP_HARD, sizeof(global_settings.rec_directory));
-    settings_save();
+    set_dir_helper(global_settings.rec_directory,
+                   sizeof(global_settings.rec_directory));
     return false;
 }
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_RECORDING_DIR),
@@ -1363,10 +873,8 @@ MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_RECORDING_DIR),
 #endif
 static bool set_startdir(void)
 {
-    path_append(global_settings.start_directory, selected_file,
-                PA_SEP_HARD, sizeof(global_settings.start_directory));
-
-    settings_save();
+    set_dir_helper(global_settings.start_directory,
+                   sizeof(global_settings.start_directory));
     return false;
 }
 MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_START_DIR),
@@ -1384,16 +892,14 @@ MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_PLAYLIST_DIR),
 #ifdef HAVE_TAGCACHE
 static bool set_databasedir(void)
 {
-    path_append(global_settings.tagcache_db_path, selected_file,
-                PA_SEP_SOFT, sizeof(global_settings.tagcache_db_path));
-
     struct tagcache_stat *tc_stat = tagcache_get_stat();
-    if (strcasecmp(global_settings.tagcache_db_path, tc_stat->db_path))
+    if (strcasecmp(selected_file, tc_stat->db_path))
     {
         splash(HZ, ID2P(LANG_PLEASE_REBOOT));
     }
 
-    settings_save();
+    set_dir_helper(global_settings.tagcache_db_path,
+                   sizeof(global_settings.tagcache_db_path));
     return false;
 }
 MENUITEM_FUNCTION(set_databasedir_item, 0, ID2P(LANG_DATABASE_DIR),
@@ -1589,7 +1095,7 @@ static bool hotkey_delete_item(void)
         return false;
 #endif
 
-    return delete_file_dir();
+    return clipboard_delete_selected_fileobject();
 }
 
 static bool hotkey_open_with(void)

@@ -277,4 +277,8 @@ long to_normalized_volume(long vol, long min_vol, long max_vol, long max_norm);
  * for the given normalized volume. */
 long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm);
 
+/* clear the lcd output buffer, if update is true the cleared buffer
+ * will be written to the lcd */
+void clear_screen_buffer(bool update);
+
 #endif /* MISC_H */
