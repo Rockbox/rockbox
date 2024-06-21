@@ -511,16 +511,17 @@ sub generateclips {
                     if (defined($ENV{'POOL'})) {
 			copy($enc, $pool_file);
                     }
-		    # Special cases
-		    if ($id eq "VOICE_INVALID_VOICE_FILE") {
-			copy ($enc, "InvalidVoice_$language.talk");
-		    }
-		    if ($id eq "VOICE_LANG_NAME") {
-			copy ($enc, "$language.lng.talk");
-		    }
-
                     unlink($wav);
                 }
+
+		# Special cases
+		if ($id eq "VOICE_INVALID_VOICE_FILE") {
+		    copy ($enc, "InvalidVoice_$language.talk");
+		}
+		if ($id eq "VOICE_LANG_NAME") {
+		    copy ($enc, "$language.lng.talk");
+	        }
+
                 $voice = "";
                 $id = "";
             }
