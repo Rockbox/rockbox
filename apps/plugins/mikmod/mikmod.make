@@ -18,7 +18,7 @@ MIKMOD_OBJ := $(call c2obj, $(MIKMOD_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(MIKMOD_SRC)
 
-MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR) -O2
+MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR) -O2 -DMIKMOD_STATIC
 
 # Disable stringop-truncation warnings on GCC 8 or greater
 ifeq ($(shell expr $(GCCNUM) \> 800),1)
