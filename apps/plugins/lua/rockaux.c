@@ -202,11 +202,13 @@ int strcoll(const char * str1, const char * str2)
     return rb->strcmp(str1, str2);
 }
 
+#ifndef _WIN32
 struct tm * gmtime(const time_t *timep)
 {
     static struct tm time;
     return rb->gmtime_r(timep, &time);
 }
+#endif
 
 int get_current_path(lua_State *L, int level)
 {
