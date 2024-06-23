@@ -178,6 +178,10 @@ sub init_tts {
             $ret{"ttsoptions"} = "--language $festival_lang_map{$language} ";
         }
     } elsif ($tts_engine eq 'piper') {
+	if (defined($piper_lang_map{$language}) && $tts_engine_opts !~ /--model/) {
+	    die("Need PIPER_MODEL_DIR\n") if (!defined($ENV{'PIPER_MODEL_DIR'}));
+       	    $tts_engine_opts = "--model $ENV{PIPER_MODEL_DIR}/$piper_lang_map{$language} ";
+	}
 	my $cmd = "piper $tts_engine_opts --json-input";
         print("> $cmd\n") if $verbose;
 
@@ -188,10 +192,7 @@ sub init_tts {
         binmode(*CMD_IN, ':encoding(utf8)');
         binmode(*CMD_OUT, ':encoding(utf8)');
         binmode(*CMD_ERR, ':encoding(utf8)');
-	if (defined($piper_lang_map{$language}) && $tts_engine_opts !~ /--model/) {
-	    die("Need PIPER_MODEL_DIR\n") if (!defined($ENV{'PIPER_MODEL_DIR'}));
-            $ret{"ttsoptions"} = "--model $ENV{PIPER_MODEL_DIR}/$piper_lang_map{$language} ";
-        }
+
     } elsif ($tts_engine eq 'sapi') {
         my $toolsdir = dirname($0);
         my $path = `cygpath $toolsdir -a -w`;
