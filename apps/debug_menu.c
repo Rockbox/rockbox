@@ -1391,6 +1391,13 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     for (i=39; i && buf[i]==' '; i--)
         buf[i] = 0;
     simplelist_addline("Model: %s", buf);
+    for (i=0; i < 10; i++)
+        ((unsigned short*)buf)[i]=htobe16(identify_info[i+10]);
+    buf[20]=0;
+    /* kill trailing space */
+    for (i=19; i && buf[i]==' '; i--)
+        buf[i] = 0;
+    simplelist_addline("Serial number: %s", buf);
     for (i=0; i < 4; i++)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
     buf[8]=0;
