@@ -132,6 +132,10 @@
 #include "rb-loader.h"
 #endif
 
+#if defined(IPOD_6G)
+#include "nor-target.h"
+#endif
+
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
 
 static const char* threads_getname(int selected_item, void *data,
@@ -2581,6 +2585,95 @@ static bool dbg_boot_data(void)
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
+#if defined(IPOD_6G)
+#define SYSCFG_MAX_ENTRIES 10 // 9 on iPod Classic/6G
+
+static bool dbg_syscfg(void) {
+    struct simplelist_info info;
+    struct SysCfgHeader syscfg_hdr;
+    size_t syscfg_hdr_size = sizeof(struct SysCfgHeader);
+    size_t syscfg_entry_size = sizeof(struct SysCfgEntry);
+    struct SysCfgEntry syscfg_entries[SYSCFG_MAX_ENTRIES];
+
+    simplelist_info_init(&info, "SysCfg NOR contents", 1, NULL);
+    simplelist_set_line_count(0);
+
+    bootflash_init(SPI_PORT);
+    bootflash_read(SPI_PORT, 0, syscfg_hdr_size, &syscfg_hdr);
+
+    if (syscfg_hdr.magic != SYSCFG_MAGIC) {
+        simplelist_addline("SCfg magic not found");
+        bootflash_close(SPI_PORT);
+        return simplelist_show_list(&info);
+    }
+
+    simplelist_addline("Total size: %u bytes", syscfg_hdr.size);
+    simplelist_addline("Entries: %u", syscfg_hdr.num_entries);
+
+    size_t calculated_syscfg_size = syscfg_hdr_size + syscfg_entry_size * syscfg_hdr.num_entries;
+
+    if (syscfg_hdr.size != calculated_syscfg_size) {
+        simplelist_addline("Wrong size: expected %u, got %u", calculated_syscfg_size, syscfg_hdr.size);
+        bootflash_close(SPI_PORT);
+        return simplelist_show_list(&info);
+    }
+
+    if (syscfg_hdr.num_entries > SYSCFG_MAX_ENTRIES) {
+        simplelist_addline("Too many entries, showing first %u", syscfg_hdr.num_entries);
+    }
+
+    size_t syscfg_num_entries = MIN(syscfg_hdr.num_entries, SYSCFG_MAX_ENTRIES);
+    size_t syscfg_entries_size = syscfg_entry_size * syscfg_num_entries;
+
+    bootflash_read(SPI_PORT, syscfg_hdr_size, syscfg_entries_size, &syscfg_entries);
+    bootflash_close(SPI_PORT);
+
+    for (size_t i = 0; i < syscfg_num_entries; i++) {
+        struct SysCfgEntry* entry = &syscfg_entries[i];
+        char* tag = (char *)&entry->tag;
+        uint32_t* data32 = (uint32_t *)entry->data;
+
+        switch (entry->tag) {
+            case SYSCFG_TAG_SRNM:
+                simplelist_addline("Serial number (SrNm): %s", entry->data);
+                break;
+            case SYSCFG_TAG_FWID:
+                simplelist_addline("Firmware ID (FwId): %07X", data32[1] & 0x0FFFFFFF);
+                break;
+            case SYSCFG_TAG_HWID:
+                simplelist_addline("Hardware ID (HwId): %08X", data32[0]);
+                break;
+            case SYSCFG_TAG_HWVR:
+                simplelist_addline("Hardware version (HwVr): %06X", data32[1]);
+                break;
+            case SYSCFG_TAG_CODC:
+                simplelist_addline("Codec (Codc): %s", entry->data);
+                break;
+            case SYSCFG_TAG_SWVR:
+                simplelist_addline("Software version (SwVr): %s", entry->data);
+                break;
+            case SYSCFG_TAG_MLBN:
+                simplelist_addline("Logic board serial number (MLBN): %s", entry->data);
+                break;
+            case SYSCFG_TAG_MODN:
+                simplelist_addline("Model number (Mod#): %s", entry->data);
+                break;
+            case SYSCFG_TAG_REGN:
+                simplelist_addline("Sales region (Regn): %08X %08X", data32[0], data32[1]);
+                break;
+            default:
+                simplelist_addline("%c%c%c%c: %08X %08X %08X %08X",
+                    tag[3], tag[2], tag[1], tag[0],
+                    data32[0], data32[1], data32[2], data32[3]
+                );
+                break;
+        }
+    }
+
+    return simplelist_show_list(&info);
+}
+#endif
+
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2690,6 +2783,9 @@ static const struct {
         {"Talk engine stats", dbg_talk },
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
+#endif
+#if defined(IPOD_6G)
+        {"View SysCfg", dbg_syscfg },
 #endif
 };
 

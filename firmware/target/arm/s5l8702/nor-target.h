@@ -87,6 +87,34 @@ int bootflash_compare(int port, int offset, void* addr, int size);
 void bootflash_erase_blocks(int port, int first, int n);
 void bootflash_close(int port);
 
+/*
+ * SysCfg
+ */
+struct SysCfgHeader {
+    uint32_t magic; // always 'SCfg'
+    uint32_t size;
+    uint32_t unknown1; // 0x00000200 on iPod classic
+    uint32_t version; // maybe? 0x00010001 on iPod classic
+    uint32_t unknown2; // 0x00000000 on iPod classic
+    uint32_t num_entries;
+}; // 0x18
+
+struct SysCfgEntry {
+    uint32_t tag;
+    uint8_t data[0x10];
+};
+
+#define SYSCFG_MAGIC 0x53436667 // SCfg
+
+#define SYSCFG_TAG_SRNM 0x53724e6d // SrNm
+#define SYSCFG_TAG_FWID 0x46774964 // FwId
+#define SYSCFG_TAG_HWID 0x48774964 // HwId
+#define SYSCFG_TAG_HWVR 0x48775672 // HwVr
+#define SYSCFG_TAG_CODC 0x436f6463 // Codc
+#define SYSCFG_TAG_SWVR 0x53775672 // SwVr
+#define SYSCFG_TAG_MLBN 0x4d4c424e // MLBN
+#define SYSCFG_TAG_MODN 0x4d6f6423 // Mod#
+#define SYSCFG_TAG_REGN 0x5265676e // Regn
 
 /*
  * IM3

@@ -1568,6 +1568,9 @@ target/arm/s5l8702/clocking-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-6g.c
 target/arm/s5l8702/ipod6g/lcd-asm-6g.S
 target/arm/s5l8702/ipod6g/piezo-6g.c
+target/arm/s5l8702/spi-s5l8702.c
+target/arm/s5l8702/crypto-s5l8702.c
+target/arm/s5l8702/nor-s5l8702.c
 #if 0 //TODO
 target/arm/s5l8702/postmortemstub.S
 #endif
@@ -1587,10 +1590,6 @@ target/arm/s5l8702/debug-s5l8702.c
 target/arm/s5l8702/pcm-s5l8702.c
 target/arm/s5l8702/ipod6g/audio-6g.c
 target/arm/s5l8702/ipod6g/cscodec-6g.c
-#else
-target/arm/s5l8702/spi-s5l8702.c
-target/arm/s5l8702/crypto-s5l8702.c
-target/arm/s5l8702/nor-s5l8702.c
 #endif /* BOOTLOADER */
 #endif /* IPOD_6G */
 
