@@ -556,7 +556,7 @@ sub allbuilds {
 	    'gtts' => '-l cs',
 	    'piper' => 'cs_CZ-jirka-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'dansk' => {
 	'lang' => 'dansk',
