@@ -359,17 +359,43 @@ static void set_serial_descriptor(void)
 {
     short* p = &usb_string_iSerial.wString[1];
     unsigned short* identify = ata_get_identify();
-    unsigned short x;
+    char sn[20];
+    char length = 20;
     int i;
 
-    for(i = 10; i < 20; i++) {
-       x = identify[i];
-       *p++ = hex[(x >> 12) & 0xF];
-       *p++ = hex[(x >> 8) & 0xF];
-       *p++ = hex[(x >> 4) & 0xF];
-       *p++ = hex[(x >> 0) & 0xF];
+    for (i = 0; i < length / 2; i++) {
+        ((unsigned short*)sn)[i] = htobe16(identify[i + 10]);
     }
-    usb_string_iSerial.bLength = 84;
+
+    char is_printable = 1;
+    for (i = 0; i < length; i++) {
+        if (sn[i] < 32 || sn[i] > 126) {
+            is_printable = 0;
+            break;
+        }
+    }
+
+    if (is_printable) {
+        /* trim trailing spaces */
+        while (length > 0 && sn[length - 1] == ' ') {
+            length--;
+        }
+
+        for (i = 0; i < length; i++) {
+            *p++ = sn[i];
+        }
+
+        usb_string_iSerial.bLength = 2 + 2 * (1 + length);
+    }
+    else {
+        for (i = 0; i < length; i++) {
+            char x = sn[i];
+            *p++ = hex[(x >> 4) & 0xF];
+            *p++ = hex[x & 0xF];
+        }
+
+        usb_string_iSerial.bLength = 2 + 2 * (1 + length * 2);
+    }
 }
 #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
 /* This "serial number" isn't unique, but it should never actually
