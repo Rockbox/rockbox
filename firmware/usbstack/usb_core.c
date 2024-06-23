@@ -50,21 +50,17 @@
 
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
-#ifdef HAVE_AS3514
+#if defined(IPOD_ARCH) && defined(CPU_PP)
+// no need to include anything
+#elif defined(HAVE_AS3514)
 #include "ascodec.h"
 #include "as3514.h"
-#endif
-
-#if !defined(HAVE_AS3514) && !defined(IPOD_ARCH) && (CONFIG_STORAGE & STORAGE_ATA)
-#include "ata.h"
-#endif
-
-#if (CONFIG_CPU == IMX233)
+#elif (CONFIG_CPU == IMX233) && IMX233_SUBTARGET >= 3700
 #include "ocotp-imx233.h"
-#endif
-
-#ifdef SANSA_CONNECT
+#elif defined(SANSA_CONNECT)
 #include "cryptomem-sansaconnect.h"
+#elif (CONFIG_STORAGE & STORAGE_ATA)
+#include "ata.h"
 #endif
 
 #ifndef USB_MAX_CURRENT
@@ -287,7 +283,7 @@ static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
 static const short hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-#ifdef IPOD_ARCH
+#if defined(IPOD_ARCH) && defined(CPU_PP)
 static void set_serial_descriptor(void)
 {
 #ifdef IPOD_VIDEO
