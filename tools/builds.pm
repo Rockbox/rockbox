@@ -541,6 +541,7 @@ sub allbuilds {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-gb -k 5',
 	    'gtts' => '-l en -t co.uk',
+	    'piper' => 'en_GB-cori-high.onnx',
 	},
         'enabled' => 1,
     },
@@ -553,6 +554,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vcs',
 	    'gtts' => '-l cs',
+	    'piper' => 'cs_CZ-jirka-medium.onnx',
 	},
         'enabled' => 0,
     },
@@ -564,6 +566,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vda',
 	    'gtts' => '-l da',
+            'piper' => 'da_DK-talesyntese-medium.onnx',
 	},
         'enabled' => 0,
     },
@@ -575,6 +578,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vde',
 	    'gtts' => '-l de',
+            'piper' => 'de_DE-thorsten-high.onnx',
 	},
         'enabled' => 1,
     },
@@ -586,6 +590,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vet',
 	    'gtts' => '-l et',
+            # No piper voice yet.
 	},
         'enabled' => 0,
     },
@@ -598,6 +603,7 @@ sub allbuilds {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-us -k 5',
 	    'gtts' => '-l en -t us',
+            'piper' => 'en_US-lessac-high.onnx',
 	},
         'enabled' => 1,
     },
@@ -610,6 +616,7 @@ sub allbuilds {
 	    'festival' => '--language spanish',
 	    'espeak' => '-ves -k 5',
 	    'gtts' => '-l es',
+            'piper' => 'es_ES-sharvard-medium.onnx',
 	},
         'enabled' => 0,
     },
@@ -619,9 +626,9 @@ sub allbuilds {
         'short' => 'es-mx',
         'defengine' => 'espeak',
 	'engines' => {
-	    'festival' => '--language spanish',
 	    'espeak' => '-ves -k 6',
-	    'gtts' => '-l es -t mx',
+            'gtts' => '-l es -t mx',
+            # No piper voice yet.
 	},
         'enabled' => 0,
     },
@@ -633,6 +640,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vfr-fr',
 	    'gtts' => '-l fr',
+            'piper' => 'fr_FR-siwis-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -644,6 +652,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vel',
 	    'gtts' => '-l el',
+            'piper' => 'el_GR-rapunzelina-low.onnx',
 	},
         'enabled' => 1,
     },
@@ -655,6 +664,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vit',
 	    'gtts' => '-l it',
+            'piper' => 'it_IT-paola-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -666,6 +676,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vnl',
 	    'gtts' => '-l nl',
+            'piper' => 'nl_NL-mls-medium.onnx',
 	},
 	'enabled' => 1,
     },
@@ -677,6 +688,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vno',
 	    'gtts' => '-l no',
+            'piper' => 'no_NO-talesyntese-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -688,6 +700,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vpl',
 	    'gtts' => '-l pl',
+            'piper' => 'pl_PL-gosia-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -699,6 +712,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vru',
 	    'gtts' => '-l ru',
+            'piper' => 'ru_RU-irina-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -710,6 +724,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vsk',
 	    'gtts' => '-l sk',
+            'piper' => 'sk_SK-lili-medium.onnx',
 	},
         'enabled' => 1,
     },
@@ -721,8 +736,21 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vsr',
 	    'gtts' => '-l sr',
+            'piper' => 'sr_RS-serbski_institut-medium.onnx',
 	},
         'enabled' => 1,
+    },
+    'svenska' => {
+	'lang' => 'svenska',
+	'name' => 'Svenska (Swedish)',
+        'short' => 'sr',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vsv',
+	    'gtts' => '-l sv',
+            'piper' => 'sv_SE-nst-medium.onnx',
+	},
+        'enabled' => 0,
     },
     'turkce' => {
 	'lang' => 'turkce',
@@ -732,6 +760,7 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vtr',
 	    'gtts' => '-l tr',
+            'piper' => 'tr_TR-fettah-medium.onnx',
 	},
         'enabled' => 1,
     },
