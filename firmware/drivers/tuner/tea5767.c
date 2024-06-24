@@ -64,7 +64,7 @@ int tea5767_set(int setting, int value)
             write_bytes[3] |= (1<<4) | (1<<3) | (1<<1);
 #else
             /* soft mute, stereo noise cancelling */
-            write_bytes[3] |= (1<<3) | (1<<1); 
+            write_bytes[3] |= (1<<3) | (1<<1);
 #endif
             /* sleep / standby mode */
             tea5767_set_clear(3, (1<<6), value);
@@ -184,7 +184,7 @@ void tea5767_init(void)
     tea5767_set(RADIO_MUTE, 1);
     int res = fmradio_3wire_read(buf);
     res = ((buf[0] == 0) && (buf[1] == 0) && (buf[2] == 0) && (buf[3] == 0)
-          && (buf[4] == 0) && (buf[5] == 0)) ? -1 : 1;
+          && (buf[4] == 0)) ? -1 : 1;
     /* clear chipid byte - we don't use it here for detection, so it should be */
     /* set to zero, to fulfill the condition in "else" block */
     buf[3] = 0;
