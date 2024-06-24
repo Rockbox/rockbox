@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -12513,10 +12512,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </dest>
   <voice>
     *: "Playlist elapsed"
@@ -12527,10 +12526,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </dest>
   <voice>
     *: "Track elapsed"
@@ -12541,10 +12540,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </source>
   <dest>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </dest>
   <voice>
     *: "Playlist remaining"
@@ -12555,10 +12554,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </dest>
   <voice>
     *: "Track remaining"
@@ -12569,10 +12568,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </dest>
   <voice>
     *: "Track"
@@ -12583,10 +12582,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </dest>
   <voice>
     *: "Storage"
@@ -12611,10 +12610,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </dest>
   <voice>
     *: "Average track size"
@@ -12625,10 +12624,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </dest>
   <voice>
     *: "Average bit rate"
@@ -16394,5 +16393,19 @@
   </dest>
   <voice>
     *: "American English"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
