@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,6 +23,7 @@
 # - Maciej Adamczak
 # - Marcin Łukasik
 # - Tomasz Kowalczyk
+# - Adam Rak
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3397,7 +3397,7 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
+    battery_types: "~NiMH"
     xduoox3: "Starsza (1500 mAh)"
   </dest>
   <voice>
@@ -3751,7 +3751,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Marzec"
@@ -5936,8 +5936,8 @@
   </source>
   <dest>
     *: "Wew.:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Wewnętrzny"
@@ -5958,10 +5958,10 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1:"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
@@ -12286,10 +12286,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </source>
   <dest>
-    *: "Pozostały czas listy odtwarzania: %s"
+    *: "Pozostały czas listy odtwarzania:"
   </dest>
   <voice>
     *: "Pozostały czas listy odtwarzania"
@@ -12578,10 +12578,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Utwór %d / %d %d%%"
+    *: "Utwór:"
   </dest>
   <voice>
     *: "Utwór"
@@ -12707,10 +12707,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Czas utworu: %s / %s %ld%%"
+    *: "Czas utworu:"
   </dest>
   <voice>
     *: "Czas utworu"
@@ -12867,10 +12867,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Pozostały czas utworu: %s"
+    *: "Pozostały czas utworu:"
   </dest>
   <voice>
     *: "Pozostały czas utworu"
@@ -13252,10 +13252,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Czas listy odtwarzania: %s / %s %ld%%"
+    *: "Czas listy odtwarzania:"
   </dest>
   <voice>
     *: "Czas listy odtwarzania"
@@ -13766,10 +13766,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Średni rozmiar utworu: %s"
+    *: "Średni rozmiar utworu:"
   </dest>
   <voice>
     *: "Średni rozmiar utworu"
@@ -14086,10 +14086,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Magazyn: %s (skończono %s, pozostało %s)"
+    *: "Magazyn (ukończono / pozostało):"
   </dest>
   <voice>
     *: "Magazyn"
@@ -14117,10 +14117,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Średnia szybkość transmisji: %ld kbps"
+    *: "Średnia szybkość transmisji:"
   </dest>
   <voice>
     *: "Średnia szybkość transmisji"
@@ -16389,5 +16389,33 @@
   </dest>
   <voice>
     *: "Polski"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Nieprawidłowy plik głosowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "~%ld%%"
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
