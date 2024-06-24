@@ -64,7 +64,7 @@ struct playing_time_info {
     int curr_index;         /* index of currently playing track in playlist */
     int curr_display_index; /* display index of currently playing track in playlist */
     int nb_tracks;          /* how many tracks in playlist */
-    
+
     /* seconds total, before, and after current position.  Datatype
        allows for values up to 68years.  If I had kept it in ms
        though, it would have overflowed at 24days, which takes
@@ -86,7 +86,7 @@ static char* get_percent_str(long percents)
     return val;
 }
 
-static inline void prepare_time_string(const char *buf, size_t buffer_len, long elapsed_pct, const char *timestr1, const char *timestr2)
+static inline void prepare_time_string(char *buf, size_t buffer_len, long elapsed_pct, const char *timestr1, const char *timestr2)
 {
     if (rb->lang_is_rtl())
     {
