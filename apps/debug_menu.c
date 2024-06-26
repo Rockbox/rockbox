@@ -2585,7 +2585,7 @@ static bool dbg_boot_data(void)
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
-#if defined(IPOD_6G)
+#if defined(IPOD_6G) && !defined(SIMULATOR)
 #define SYSCFG_MAX_ENTRIES 10 // 9 on iPod Classic/6G
 
 static bool dbg_syscfg(void) {
@@ -2784,7 +2784,7 @@ static const struct {
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
 #endif
-#if defined(IPOD_6G)
+#if defined(IPOD_6G) && !defined(SIMULATOR)
         {"View SysCfg", dbg_syscfg },
 #endif
 };
