@@ -311,6 +311,8 @@ simcc () {
    # add cross-compiler option(s)
    GCCOPTS="$GCCOPTS -Wno-format"
    LDOPTS="$LDOPTS -mconsole -static"
+   GLOBAL_LDOPTS=`echo $GLOBAL_LDOPTS | sed -e s/\-Wl,-z,defs//`
+   LDOPTS=`echo $LDOPTS | sed -e s/-ldl// -e s/-lrt// -e s/-lasound//`
    output="$output.exe"
    winbuild="yes"
 
