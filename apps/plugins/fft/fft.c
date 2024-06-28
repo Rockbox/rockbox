@@ -33,7 +33,12 @@
 #include "lib/osd.h"
 
 #ifndef HAVE_LCD_COLOR
+#if defined(SIMULATOR)
+// Use the one in pluginlib/osd
+extern GREY_INFO_STRUCT
+#else
 GREY_INFO_STRUCT
+#endif
 #endif
 
 #include "lib/pluginlib_actions.h"
