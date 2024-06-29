@@ -962,8 +962,8 @@ static int perform_soft_reset(void)
     if (identify())
         return -5;
 
-    if (set_features())
-        return -2;
+    if ((ret = set_features()))
+        return -60 + ret;
 
     if (set_multiple_mode(multisectors))
         return -3;
@@ -1013,7 +1013,7 @@ static int ata_power_on(void)
 
     rc = set_features();
     if (rc)
-        return rc * 10 - 2;
+        return -60 + rc;
 
     if (set_multiple_mode(multisectors))
         return -3;
@@ -1284,7 +1284,7 @@ int STORAGE_INIT_ATTR ata_init(void)
             goto error;
         }
 
-        rc = set_features();
+        rc = set_features(); // rror codes are between -1 and -49
         if (rc) {
             rc = -60 + rc;
             goto error;
@@ -1321,7 +1321,7 @@ int STORAGE_INIT_ATTR ata_init(void)
     }
     rc = set_multiple_mode(multisectors);
     if (rc)
-        rc = -70 + rc;
+        rc = -100 + rc;
 
 error:
     mutex_unlock(&ata_mtx);
