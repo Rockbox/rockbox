@@ -9,6 +9,7 @@
  *
  * Copyright (C) 2005, 2006 Ben Basha (Paprica)
  * Copyright (C) 2009 Karl Kurbjun
+ * Copyright (C) 2010 Matteo Italia (MItaly)
  *  check_lines is based off an explanation and expanded math presented by Paul
  *   Bourke: http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
  *
@@ -391,6 +392,21 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define DOWN      BUTTON_BOTTOMMIDDLE
 #endif
 #endif
+
+/* MI: fallback for the suicide combination */
+#ifndef SUICIDE
+/* Some targets do not define DOWN (which isn't actually used in the game) */
+#ifndef DOWN
+#define TWO_KEYS_SUICIDE
+/* No third key to add safety to the suicide button -> press it longer */
+#define SUICIDE (SELECT|QUIT|BUTTON_REPEAT)
+#else
+#define THREE_KEYS_SUICIDE
+/* Three keys provide enough safety to avoid the long press, which may lead to
+ more suicides than necessary :) */
+#define SUICIDE (DOWN|SELECT|QUIT)
+#endif /* #ifndef DOWN */
+#endif /* #ifndef SUICIDE */
 
 /* Continue text is used as a string later when the game is paused.  This allows
  *  targets to specify their own text if needed.
@@ -1441,16 +1457,16 @@ static void brickmania_sleep(int secs)
 static int brickmania_help(void)
 {
     static char *help_text[] = {
-        "Brickmania", "", "Aim", "",
-        "Destroy", "all", "the", "bricks", "by", "bouncing",
-        "the", "ball", "of", "them", "using", "the", "paddle.", "", "",
-        "Controls", "",
+        "Brickmania", "", "Aim", "",                                    /*  3 */
+        "Destroy", "all", "the", "bricks", "by", "bouncing",            /*  9 */
+        "the", "ball", "of", "them", "using", "the", "paddle.", "", "", /* 18 */
+        "Controls", "",                                                 /* 20 */
 #if CONFIG_KEYPAD == COWON_D2_PAD
         "- & +:",
 #else
         "< & >:",
 #endif
-        "Moves", "the", "paddle", "",
+        "Moves", "the", "paddle", "",                                   /* 25 */
 #if (CONFIG_KEYPAD == IAUDIO_M3_PAD)
         "PLAY:",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -1460,7 +1476,7 @@ static int brickmania_help(void)
 #else
         "SELECT:",
 #endif
-        "Releases", "the", "ball/Fire!", "",
+        "Releases", "the", "ball/Fire!", "",                            /* 30 */
 #if CONFIG_KEYPAD == IAUDIO_M3_PAD
         "REC:",
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
@@ -1477,30 +1493,52 @@ static int brickmania_help(void)
 #else
         "POWER:",
 #endif
-        "Returns", "to", "menu", "", "",
-        "Specials", "",
-        "N", "Normal:", "returns", "paddle", "to", "normal", "",
-        "D", "DIE!:", "loses", "a", "life", "",
-        "L", "Life:", "gains", "a", "life/power", "up", "",
-        "F", "Fire:", "allows", "you", "to", "shoot", "bricks", "",
-        "G", "Glue:", "ball", "sticks", "to", "paddle", "",
-        "B", "Ball:", "generates", "another", "ball", "",
-        "FL", "Flip:", "flips", "left / right", "movement", "",
-        "<->", "or", "<E>:", "enlarges", "the", "paddle", "",
-        ">-<", "or", ">S<:", "shrinks", "the", "paddle", "",
+        "Returns", "to", "menu", "",                                    /* 35 */
+#if defined(THREE_KEYS_SUICIDE)
+        "Press", "Fire,", "Down,", "Quit", "together:",
+#elif defined(TWO_KEYS_SUICIDE)
+        "Hold", "Fire", "and", "Quit", "together:",
+#else
+#error No info about the suicide button, cannot complete help screen.
+#endif
+        "Kills", "all","the", "balls","(suicide)","",                   /* 46 */
+        "",                                                             /* 47 */
+        "Specials", "",                                                 /* 49 */
+        "N", "Normal:", "returns", "paddle", "to", "normal", "",        /* 56 */
+        "D", "DIE!:", "loses", "a", "life", "",                         /* 62 */
+        "L", "Life:", "gains", "a", "life/power", "up", "",             /* 69 */
+        "F", "Fire:", "allows", "you", "to", "shoot", "bricks", "",     /* 77 */
+        "G", "Glue:", "ball", "sticks", "to", "paddle", "",             /* 84 */
+        "B", "Ball:", "generates", "another", "ball", "",               /* 90 */
+        "FL", "Flip:", "flips", "left / right", "movement", "",         /* 96 */
+        "<->", "or", "<E>:", "enlarges", "the", "paddle", "",          /* 103 */
+        ">-<", "or", ">S<:", "shrinks", "the", "paddle", "",           /* 110 */
     };
     static struct style_text formation[]={
         { 0, TEXT_CENTER|TEXT_UNDERLINE },
         { 2, C_RED },
         { 19, C_RED },
-        { 37, C_RED },
-        { 39, C_BLUE },
-        { 46, C_RED },
-        { 52, C_GREEN },
-        { 59, C_ORANGE },
-        { 67, C_GREEN },
-        { 74, C_YELLOW },
-        { 80, C_RED },
+        { 21, TEXT_UNDERLINE},
+        { 26, TEXT_UNDERLINE},
+        { 31, TEXT_UNDERLINE},
+#if defined(THREE_KEYS_SUICIDE)
+        { 37, TEXT_UNDERLINE},
+        { 38, TEXT_UNDERLINE},
+        { 39, TEXT_UNDERLINE},
+#elif defined(TWO_KEYS_SUICIDE)
+        { 37, TEXT_UNDERLINE},
+        { 39, TEXT_UNDERLINE},
+#else
+#error No info about the suicide button, cannot complete help screen.
+#endif
+        { 48, C_RED },
+        { 50, C_BLUE },
+        { 57, C_RED },
+        { 63, C_GREEN },
+        { 70, C_ORANGE },
+        { 78, C_GREEN },
+        { 85, C_YELLOW },
+        { 91, C_RED },
         LAST_STYLE_ITEM
     };
 
@@ -1522,9 +1560,13 @@ static int brickmania_menu_cb(int action,
 {
     (void)this_list;
     int i = ((intptr_t)this_item);
-    if(action == ACTION_REQUEST_MENUITEM
-       && !resume && (i==0 || i==6))
-        return ACTION_EXIT_MENUITEM;
+    if(action == ACTION_REQUEST_MENUITEM)
+    {
+        if(!resume && (i==0 || i==7))
+            return ACTION_EXIT_MENUITEM;
+        if(i==6 && !rb->file_exists(SAVE_FILE))
+            return ACTION_EXIT_MENUITEM;
+    }
     return action;
 }
 
@@ -1546,16 +1588,14 @@ static int brickmania_menu(void)
                         "Resume Game", "Start New Game",
                         "Difficulty", "Help", "High Scores",
                         "Playback Control",
+                        "Remove savefile",
                         "Quit without Saving", "Quit");
-
     rb->button_clear_queue();
     while (true) {
         switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 if(game_state!=ST_READY)
                     game_state = ST_PAUSE;
-                if(resume_file)
-                    rb->remove(SAVE_FILE);
                 return 0;
             case 1:
                 score=0;
@@ -1580,8 +1620,11 @@ static int brickmania_menu(void)
                     return 1;
                 break;
             case 6:
-                return 1;
+                rb->remove(SAVE_FILE);
+                break;
             case 7:
+                return 1;
+            case 8:
                 if (resume) {
                     rb->splash(HZ*1, "Saving game ...");
                     brickmania_savegame();
@@ -1629,6 +1672,20 @@ static void brick_hit(int i, int j)
         brick_on_board--;
         score+=SCORE_BALL_DEMOLISHED_BRICK;
     }
+}
+
+static void newround(void)
+{
+    brickmania_init_game(false);
+    brickmania_sleep(2);
+}
+
+static void error_newround(const char * message)
+{
+    rb->splash(HZ*3,"Some error happened, so the current balls will be killed.");
+    rb->splashf(HZ*3,"The reason is: %s",message);
+    rb->splash(HZ*3,"Don't worry, it's my fault, you won't lose any life for this. :)");
+    newround(); 
 }
 
 static int brickmania_game_loop(void)
@@ -1723,10 +1780,17 @@ static int brickmania_game_loop(void)
 
             /* draw the ball */
             for(i=0;i<used_balls;i++)
+            {
+                /* MI: workaround for balls exiting from the screen */
+                const int H_OFFSCREEN_LIMIT=GAMESCREEN_WIDTH*3/2;
+                const int V_OFFSCREEN_LIMIT=GAMESCREEN_HEIGHT*3/2;
+                if(abs(ball[i].pos_x)>H_OFFSCREEN_LIMIT || abs(ball[i].pos_y)>V_OFFSCREEN_LIMIT)
+                    error_newround("Ball went offscreen");
                 rb->lcd_bitmap(brickmania_ball,
                     INT3(ball[i].pos_x - HALFBALL),
                     INT3(ball[i].pos_y - HALFBALL),
                     INT3(BALL), INT3(BALL));
+            }
 
             if (brick_on_board==0)
                 brick_on_board--;
@@ -2474,7 +2538,16 @@ static int brickmania_game_loop(void)
                     resume = true;
                     return 0;
                     break;
-
+                
+                /* MI: added suicide button in case the ball gets stuck or
+                 whatever */
+                case SUICIDE:
+                    life--;
+                    rb->splash(HZ,"Balls killed!");
+                    if(life>=0)
+                        newround();
+                    rb->button_clear_queue();
+                    break;
                 default:
                     if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                         return 1;
