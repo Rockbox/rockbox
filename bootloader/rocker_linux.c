@@ -145,6 +145,7 @@ enum boot_mode
     BOOT_OF,
     BOOT_COUNT,
     BOOT_STOP, /* power down/suspend */
+    BOOT_CANARY,
 };
 
 static void display_text_center(int y, const char *text)
@@ -165,16 +166,17 @@ static void display_text_centerf(int y, const char *format, ...)
 }
 
 /* get timeout before taking action if the user doesn't touch the device */
-static int get_inactivity_tmo(void)
+static int get_inactivity_tmo(int same_as_last)
 {
 #if defined(HAS_BUTTON_HOLD)
     if(button_hold())
         return 5 * HZ; /* Inactivity timeout when on hold */
     else
 #endif
-        return 10 * HZ; /* Inactivity timeout when not on hold */
-
-    // XXX if booting the last selection, use a short timeout?
+        if (same_as_last)
+            return 1 * HZ; /* Timeout when mode is the same as the previous mode */
+        else
+            return 10 * HZ; /* Default timeout */
 }
 
 /* return action on idle timeout */
@@ -188,10 +190,26 @@ static enum boot_mode inactivity_action(enum boot_mode cur_selection)
         return cur_selection; /* return last choice */
 }
 
-/* we store the boot mode in a file in /tmp so we can reload it between 'boots'
- * (since the mostly suspends instead of powering down) */
+static int mounted = 0;
+
+static void mount_storage(int enable)
+{
+    if (enable && !mounted) {
+        system("/bin/mkdir -p " BASE_DIR);
+        if (system("/bin/mount /dev/mmcblk0 " BASE_DIR))
+            system("/bin/mount /dev/mmcblk0p1 " BASE_DIR);
+        // XXX possibly invoke sys_serv -> "MOUNT:MOUNT:%s %s", blkdev, mntpoint
+    } else if (!enable && mounted) {
+        system("/bin/unmount " BASE_DIR);
+        // XXX possibly invoke sys_serv -> "MOUNT:UNMOUNT:%s %s", mntpoint
+    }
+    mounted = enable;
+}
+
+/* we store the boot mode in a file so we can reload it between 'boots' */
 static enum boot_mode load_boot_mode(enum boot_mode mode)
 {
+    mount_storage(true);
     int fd = open(BASE_DIR "/.rockbox/rb_bl_mode.txt", O_RDONLY);
     if(fd >= 0)
     {
@@ -201,21 +219,9 @@ static enum boot_mode load_boot_mode(enum boot_mode mode)
     return mode;
 }
 
-static void mount_storage(int enable)
-{
-    if (enable) {
-        system("/bin/mkdir -p " BASE_DIR);
-        if (system("/bin/mount /dev/mmcblk0 " BASE_DIR))
-            system("/bin/mount /dev/mmcblk0p1 " BASE_DIR);
-        // XXX possibly invoke sys_serv -> "MOUNT:MOUNT:%s %s", blkdev, mntpoint
-    } else {
-        system("/bin/unmount " BASE_DIR);
-        // XXX possibly invoke sys_serv -> "MOUNT:UNMOUNT:%s %s", mntpoint
-    }
-}
-
 static void save_boot_mode(enum boot_mode mode)
 {
+    mount_storage(true);
     int fd = open(BASE_DIR "/.rockbox/rb_bl_mode.txt", O_RDWR | O_CREAT | O_TRUNC);
     if(fd >= 0)
     {
@@ -227,9 +233,9 @@ static void save_boot_mode(enum boot_mode mode)
 static enum boot_mode get_boot_mode(void)
 {
     /* load previous mode, or start with rockbox if none */
-    enum boot_mode init_mode = load_boot_mode(BOOT_ROCKBOX);
+    enum boot_mode init_mode = load_boot_mode(BOOT_CANARY);
     /* wait for user action */
-    enum boot_mode mode = init_mode;
+    enum boot_mode mode = (init_mode == BOOT_CANARY) ? BOOT_ROCKBOX : init_mode;
     int last_activity = current_tick;
 #if defined(HAS_BUTTON_HOLD)
     bool hold_status = button_hold();
@@ -244,7 +250,7 @@ static enum boot_mode get_boot_mode(void)
             return mode;
         }
         /* inactivity detection */
-        int timeout = last_activity + get_inactivity_tmo();
+        int timeout = last_activity + get_inactivity_tmo(init_mode == mode);
         if(TIME_AFTER(current_tick, timeout))
         {
             /* save last choice */
@@ -314,10 +320,14 @@ static enum boot_mode get_boot_mode(void)
         if(btn == BUTTON_SELECT)
             break;
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN)
+        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN) {
             mode = (mode + BOOT_COUNT - 1) % BOOT_COUNT;
-        if(btn == BUTTON_RIGHT || btn == BUTTON_UP)
+            init_mode = BOOT_CANARY;
+        }
+        if(btn == BUTTON_RIGHT || btn == BUTTON_UP) {
             mode = (mode + 1) % BOOT_COUNT;
+            init_mode = BOOT_CANARY;
+        }
     }
 
     /* save mode */
@@ -642,8 +652,8 @@ int main(int argc, char **argv)
             system("/bin/chmod +x /tmp/" BOOTFILE);
             execl("/tmp/" BOOTFILE, BOOTFILE, NULL);
             printf("execvp failed: %s\n", strerror(errno));
-            /* fallback to OF in case of failure */
-            error_screen("Cannot boot Rockbox");
+            error_screen("Cannot boot Rockbox!");
+            mode = BOOT_TOOLS;
             sleep(2 * HZ);
         }
         else
