@@ -12130,10 +12130,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Titel verbleibend: %s"
+    *: "Titel verbleibend:"
   </dest>
   <voice>
     *: "Titel verbleibend"
@@ -12256,10 +12256,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Wiedergabeliste vergangen: %s / %s %ld%%"
+    *: "Wiedergabeliste vergangen:"
   </dest>
   <voice>
     *: "Wiedergabeliste vergangen"
@@ -12430,10 +12430,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Titel %d / %d %d%%"
+    *: "Titel:"
   </dest>
   <voice>
     *: "Titel"
@@ -13118,10 +13118,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Speicher: %s (done %s, remaining %s)"
+    *: "Speicher (fertig/ verbleibend):"
   </dest>
   <voice>
     *: "Speicher"
@@ -13581,10 +13581,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </source>
   <dest>
-    *: "Wiedrgabeliste verbleibend: %s"
+    *: "Wiedrgabeliste verbleibend:"
   </dest>
   <voice>
     *: "Wiedrgabeliste verbleibend"
@@ -13873,10 +13873,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Titel vergangen: %s / %s %ld%%"
+    *: "Titel vergangen:"
   </dest>
   <voice>
     *: "Titel vergangen"
@@ -13929,10 +13929,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Durchschnittliche Bitrate: %ld kbps"
+    *: "Durchschnittliche Bitrate:"
   </dest>
   <voice>
     *: "Durchschnittliche Bitrate"
@@ -14050,10 +14050,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Durchschnittliche Titelgröße: %s"
+    *: "Durchschnittliche Titelgröße:"
   </dest>
   <voice>
     *: "Durchschnittliche Titelgröße"
@@ -16343,5 +16343,89 @@
   </dest>
   <voice>
     *: "Deustch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Fehler: %s"
+  </dest>
+  <voice>
+    *: "Fehler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Mikmod Einstellungen"
+  </dest>
+  <voice>
+    *: "Mik mod Einstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Mikmod Menü"
+  </dest>
+  <voice>
+    *: "Mik mod Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Schachbox Menü"
+  </dest>
+  <voice>
+    *: "Schach box Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Ungültige Sprach Datei"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
