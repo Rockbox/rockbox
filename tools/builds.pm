@@ -10,6 +10,7 @@ $releasenotes="/wiki/ReleaseNotes315";
 # 'modelname' => {
 #    name => 'Full Name',
 #    status => 1,                        # 0=retired, 1=unusable, 2=unstable, 3=stable
+#    sim = 1,                            # optional (defaults 1 for status 2/3 and 0 for status 1)
 #    ram => 2,                           # optional (used?)
 #    manual => 'modelname2',             # optional (uses modelname2's manual)
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
@@ -82,26 +83,32 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'hifietma9' => {
         name => 'HiFi E.T MA9',
+	sim => 0,
         status => 2,
     },
     'hifietma9c' => {
         name => 'HiFi E.T MA9C',
+	sim => 0,
         status => 2,
     },
     'hifietma8' => {
         name => 'HiFi E.T MA8',
         status => 2,
+	sim => 0,
     },
     'hifietma8c' => {
         name => 'HiFi E.T MA8C',
         status => 2,
+	sim => 0,
     },
     'hifimanhm60x' => {
         name => 'HiFiMAN HM-60x',
+	sim => 0,
         status => 2,
     },
     'hifimanhm801' => {
         name => 'HiFiMAN HM-801',
+	sim => 0,
         status => 2,
     },
     'iaudiom3' => {
@@ -118,10 +125,12 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'ibassodx50' => {
         name => 'iBasso DX50',
+	sim => 0,
         status => 2,
     },
     'ibassodx90' => {
         name => 'iBasso DX90',
+	sim => 0,
         status => 2,
     },
     'ipod1g2g' => {
@@ -219,10 +228,12 @@ $releasenotes="/wiki/ReleaseNotes315";
     'ondavx747' => {
         name => 'Onda VX747',
         status => 1,
+	sim => 1,
     },
     'ondavx747p' => {
         name => 'Onda VX747+',
         status => 1,
+	sim => 1,
     },
     'ondavx767' => {
         name => 'Onda VX767',
@@ -231,6 +242,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'ondavx777' => {
         name => 'Onda VX777',
         status => 1,
+	sim => 1,
     },
     'rk27generic' => {
         name => 'Rockchip rk27xx',
@@ -254,6 +266,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'samsungypr1' => {
         name => 'Samsung YP-R1',
+	sim => 0,
         status => 2,
     },
     'samsungyps3' => {
@@ -316,6 +329,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'sansam200v4' => {
         name => 'SanDisk Sansa m200 v4',
         status => 1,
+	sim => 1,
     },
     'sansaview' => {
         name => 'SanDisk Sansa View',
@@ -328,14 +342,17 @@ $releasenotes="/wiki/ReleaseNotes315";
     'zenvision' => {
         name => 'Creative Zen Vision',
         status => 1,
+	sim => 1,
     },
     'zenvisionm30gb' => {
         name => 'Creative Zen Vision:M 30GB',
         status => 1,
+	sim => 1,
     },
     'zenvisionm60gb' => {
         name => 'Creative Zen Vision:M 60GB',
         status => 1,
+	sim => 1,
     },
     'mpiohd200' => {
         name => 'MPIO HD200',
@@ -355,6 +372,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'sonynwze350' => {
         name => 'Sony NWZ-E350',
+	sim => 0,
         status => 2,
     },
     'sonynwze360' => {
@@ -367,26 +385,32 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'sonynwze450' => {
         name => 'Sony NWZ-E450',
+	sim => 0,
         status => 2,
     },
     'sonynwze460' => {
         name => 'Sony NWZ-E460',
+	sim => 0,
         status => 2,
     },
     'sonynwze470' => {
         name => 'Sony NWZ-E470',
+	sim => 0,
         status => 2,
     },
     'sonynwze580' => {
         name => 'Sony NWZ-E580',
+	sim => 0,
         status => 2,
     },
     'sonynwza10' => {
         name => 'Sony NWZ-A10',
+	sim => 0,
         status => 2,
     },
     'sonynwa20' => {
         name => 'Sony NW-A20',
+	sim => 0,
         status => 2,
     },
     'sonynwza860' => {
@@ -396,6 +420,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'sonynwzs750' => {
         name => 'Sony NWZ-S750',
         status => 2,
+	sim => 0,
     },
     'creativezenxfi' => {
         name => 'Creative Zen X-Fi',
@@ -507,6 +532,17 @@ sub allbuilds {
 
     for my $b (sort byname keys %builds) {
         push @list, $b;
+    }
+
+    return @list;
+}
+
+sub simbuilds {
+    my @list;
+
+    for my $b (&allbuilds) {
+        push @list, $b if (defined($builds{$b}{sim}) and $builds{$b}{sim});
+        push @list, $b if (!defined($builds{$b}{sim}) and $builds{$b}{status} > 1);
     }
 
     return @list;

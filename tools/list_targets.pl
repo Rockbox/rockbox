@@ -10,18 +10,29 @@
 
 require "./builds.pm";
 
+print "Retired:\n";
+
+for my $b (&stablebuilds) {
+    print "   " , $builds{$b}{name} , "\n" if($builds{$b}{status} == 0);
+}
+
 print "Stable:\n";
 
 for my $b (&stablebuilds) {
-    print $builds{$b}{name} , "\n";
+    print "   " , $builds{$b}{name} , "\n" if($builds{$b}{status} != 0);
 }
 
 print "Unstable:\n";
 for my $b (&usablebuilds) {
-    print $builds{$b}{name} , "\n";
+    print "   " , $builds{$b}{name} , "\n";
 }
 
 print "Unusable:\n";
 for my $b (&allbuilds) {
-        print $builds{$b}{name} , "\n" if($builds{$b}{status} == 1);
+    print "   " , $builds{$b}{name} , "\n" if($builds{$b}{status} == 1);
+}
+
+print "Simulators:\n";
+for my $b (&simbuilds) {
+    print "   " , $builds{$b}{name} , "\n";
 }

@@ -188,26 +188,14 @@ sub buildit {
     `make install 2>/dev/null`;
 }
 
-for my $b (sort byname keys %builds) {
-    if ($builds{$b}{status} > 0 && $builds{$b}{status} >= 2)
+for my $b (sort &simbuilds) {
+    if ($builds{$b}{ram} ne '')
     {
-        if ($builds{$b}{ram} ne '')
-	{
-	    # These builds need the ram size sent to configure
-	    runone($b, $builds{$b}{ram} . '\n');
-	}
-	else
-	{
-	    runone($b);
-	}
+	# These builds need the ram size sent to configure
+	runone($b, $builds{$b}{ram} . '\n');
+    }
+    else
+    {
+	runone($b);
     }
 }
-
-#The following ports are in the unusable category, but the simulator does build
-runone("ondavx747");
-runone("ondavx747p");
-runone("ondavx777");
-runone("sansam200v4");
-runone("zenvision");
-runone("zenvisionm30gb");
-runone("zenvisionm60gb");
