@@ -342,7 +342,7 @@ e_them_t2_action2(U8 e)
   static U8 *cl = (U8 *)&cx;
   static U8 *ch = (U8 *)&cx + 1;
   static U16 *sl = (U16 *)&e_them_rndseed;
-  static U16 *sh = (U16 *)&e_them_rndseed + 2;
+  static U16 *sh = ((U16 *)&e_them_rndseed) + 1;
 
   /*sys_printf("e_them_t2 ------------------------------\n");*/
 

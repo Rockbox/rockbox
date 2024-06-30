@@ -64,7 +64,7 @@ void sysfile_clearRootPath()
  */
 file_t sysfile_open(const char *name)
 {
-    int fd;
+    long fd;
 
     size_t fullPathLength = rb->strlen(rootPath) + rb->strlen(name) + 2;
     char *fullPath = sysmem_push(fullPathLength);
@@ -97,7 +97,7 @@ file_t sysfile_open(const char *name)
  */
 int sysfile_read(file_t file, void *buf, size_t size, size_t count)
 {
-    int fd = (int)file;
+    long fd = (long)file;
     return (rb->read(fd, buf, size * count) / size);
 }
 
@@ -106,7 +106,7 @@ int sysfile_read(file_t file, void *buf, size_t size, size_t count)
  */
 int sysfile_seek(file_t file, long offset, int origin)
 {
-    int fd = (int)file;
+    long fd = (long)file;
     return rb->lseek(fd, offset, origin);
 }
 
@@ -115,7 +115,7 @@ int sysfile_seek(file_t file, long offset, int origin)
  */
 void sysfile_close(file_t file)
 {
-    int fd = (int)file;
+    long fd = (long)file;
     rb->close(fd);
 }
 

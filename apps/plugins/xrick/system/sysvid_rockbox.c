@@ -55,7 +55,9 @@ enum { GREYBUFSIZE = (LCD_WIDTH*((LCD_HEIGHT+7)/8)*16+200) };
 #  endif
 #endif /* ndef HAVE_LCD_COLOR */
 
+#ifdef HAVE_LCD_COLOR
 static fb_data *lcd_fb = NULL;
+#endif
 
 #if (LCD_HEIGHT < SYSVID_HEIGHT)
 enum { ROW_RESIZE_STEP = (LCD_HEIGHT << 16) / SYSVID_HEIGHT };

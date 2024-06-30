@@ -219,6 +219,11 @@
 #define MINIZ_HAS_64BIT_REGISTERS 1
 #endif
 
+#if (__GNUC__ >= 7)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
