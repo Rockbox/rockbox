@@ -66,6 +66,7 @@
 #include "fixedpoint.h"
 #endif
 #include "list.h"
+#include "option_select.h"
 #include "wps.h"
 
 #define NOINLINE __attribute__ ((noinline))
@@ -657,6 +658,23 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
     }
     return NULL;
 }
+
+#ifdef HAVE_QUICKSCREEN
+static const char* get_qs_token_value(enum quickscreen_item item, bool data_token,
+                                       char *buf, int buf_size)
+{
+    const struct settings_list *qs_setting = global_settings.qs_items[item];
+
+    if (qs_setting == NULL)
+        return "ERR";
+
+    if (data_token)
+        return option_get_valuestring(qs_setting, buf, buf_size,
+                                      option_value_as_int(qs_setting));
+
+    return P2STR(ID2P(qs_setting->lang_id));
+}
+#endif
 
 /* Return the tags value as text. buf should be used as temp storage if needed.
 
@@ -1372,6 +1390,25 @@ const char *get_token_value(struct gui_wps *gwps,
             return "t";
 #else
             return NULL;
+#endif
+
+#ifdef HAVE_QUICKSCREEN
+        case SKIN_TOKEN_TOP_QUICKSETTING_NAME:
+            return get_qs_token_value(QUICKSCREEN_TOP, false, buf, buf_size);
+        case SKIN_TOKEN_TOP_QUICKSETTING_VALUE:
+            return get_qs_token_value(QUICKSCREEN_TOP, true, buf, buf_size);
+        case SKIN_TOKEN_RIGHT_QUICKSETTING_NAME:
+            return get_qs_token_value(QUICKSCREEN_RIGHT, false, buf, buf_size);
+        case SKIN_TOKEN_RIGHT_QUICKSETTING_VALUE:
+            return get_qs_token_value(QUICKSCREEN_RIGHT, true, buf, buf_size);
+        case SKIN_TOKEN_BOTTOM_QUICKSETTING_NAME:
+            return get_qs_token_value(QUICKSCREEN_BOTTOM, false, buf, buf_size);
+        case SKIN_TOKEN_BOTTOM_QUICKSETTING_VALUE:
+            return get_qs_token_value(QUICKSCREEN_BOTTOM, true, buf, buf_size);
+        case SKIN_TOKEN_LEFT_QUICKSETTING_NAME:
+            return get_qs_token_value(QUICKSCREEN_LEFT, false, buf, buf_size);
+        case SKIN_TOKEN_LEFT_QUICKSETTING_VALUE:
+            return get_qs_token_value(QUICKSCREEN_LEFT, true, buf, buf_size);
 #endif
 
         case SKIN_TOKEN_SETTING:

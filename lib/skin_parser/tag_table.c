@@ -210,6 +210,15 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "S[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "s[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "[IP][IP][ip][ip]i", 0 },
+
+    { SKIN_TOKEN_TOP_QUICKSETTING_NAME,      "QT" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_TOP_QUICKSETTING_VALUE,      "Qt" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_RIGHT_QUICKSETTING_NAME,      "QR" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_RIGHT_QUICKSETTING_VALUE,      "Qr" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_BOTTOM_QUICKSETTING_NAME,      "QB" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_BOTTOM_QUICKSETTING_VALUE,      "Qb" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_LEFT_QUICKSETTING_NAME,      "QL" , "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_LEFT_QUICKSETTING_VALUE,      "Ql" , "", SKIN_REFRESH_DYNAMIC },
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
     /* This uses the bar tag params also but the first item can be a string

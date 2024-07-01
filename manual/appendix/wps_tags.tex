@@ -354,6 +354,24 @@ Examples:
 \item As a conditional: \config{\%?St(eq enabled)<Eq is enabled|Eq is disabled>}
 \end{enumerate}
 
+\opt{quickscreen}{
+\subsection{Displaying Quickscreen settings}
+
+If your player has a quickscreen, the preset settings can be displayed using the following.
+
+\begin{tagmap}
+    \config{\%QT} & Display the name of the top quickscreen setting.\\
+    \config{\%Qt} & Display the value of the top quickscreen setting.\\
+    \config{\%QR} & Display the name of the right quickscreen setting.\\
+    \config{\%Qr} & Display the value of the right quickscreen setting.\\
+    \config{\%QB} & Display the name of the bottom quickscreen setting.\\
+    \config{\%Qb} & Display the value of the bottom quickscreen setting.\\
+    \config{\%QL} & Display the name of the left quickscreen setting.\\
+    \config{\%Ql} & Display the value of the left quickscreen setting.\\
+  \end{tagmap}
+
+  \note{If a preset does not match a legal setting, or has no setting applied, all tags will display "ERR".}
+}
 
 \section{\label{ref:wps_images}Images}
   \begin{tagmap}
