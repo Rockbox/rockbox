@@ -123,8 +123,8 @@ void sysvid_setPalette(img_color_t *pal, U16 n)
     for (i = 0; i < n; i++)
     {
 #ifdef HAVE_LCD_COLOR
-#if LCD_PIXELFORMAT == XRGB8888
-        int x =  LCD_RGBPACK(pal[i].r, pal[i].g, pal[i].b);
+#if (LCD_PIXELFORMAT == RGB888) || (LCD_PIXELFORMAT == XRGB8888)
+        unsigned long x =  LCD_RGBPACK(pal[i].r, pal[i].g, pal[i].b);
         palette[i] = FB_SCALARPACK(x);
 #else
         palette[i] = LCD_RGBPACK(pal[i].r, pal[i].g, pal[i].b);
