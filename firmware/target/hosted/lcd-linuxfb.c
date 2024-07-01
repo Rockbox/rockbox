@@ -59,14 +59,21 @@ void lcd_init_device(void)
         panicf("Cannot read framebuffer fixed information");
     }
 
-#if 0
-    /* check resolution and framebuffer size */
-    if(vinfo.xres != LCD_WIDTH || vinfo.yres != LCD_HEIGHT || vinfo.bits_per_pixel != LCD_DEPTH)
+    if(ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
     {
-        panicf("Unexpected framebuffer resolution: %dx%dx%d\n", vinfo.xres,
-            vinfo.yres, vinfo.bits_per_pixel);
+        panicf("Cannot read framebuffer variable information");
     }
-#endif
+
+    /* Make sure we match our desired bitdepth */
+    if (vinfo.bits_per_pixel != LCD_DEPTH || vinfo.xres != LCD_WIDTH || vinfo.yres != LCD_HEIGHT) {
+        vinfo.bits_per_pixel = LCD_DEPTH;
+        vinfo.xres = LCD_WIDTH;
+        vinfo.yres = LCD_HEIGHT;
+        if (ioctl(fd, FBIOPUT_VSCREENINFO, &vinfo)) {
+            panicf("Cannot set framebuffer to %dx%dx%d",
+               vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+        }
+    }
     /* Note: we use a framebuffer size of width*height*bbp. We cannot trust the
      * values returned by the driver for line_length */
 
@@ -75,11 +82,6 @@ void lcd_init_device(void)
     if((void *)framebuffer == MAP_FAILED)
     {
         panicf("Cannot map framebuffer");
-    }
-
-    if(ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
-    {
-        panicf("Cannot read framebuffer variable information");
     }
 
     memset(framebuffer, 0, finfo.smem_len);
