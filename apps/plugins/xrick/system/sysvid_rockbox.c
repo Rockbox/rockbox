@@ -123,7 +123,12 @@ void sysvid_setPalette(img_color_t *pal, U16 n)
     for (i = 0; i < n; i++)
     {
 #ifdef HAVE_LCD_COLOR
+#if LCD_PIXELFORMAT == XRGB8888
+        int x =  LCD_RGBPACK(pal[i].r, pal[i].g, pal[i].b);
+        palette[i] = FB_SCALARPACK(x);
+#else
         palette[i] = LCD_RGBPACK(pal[i].r, pal[i].g, pal[i].b);
+#endif
 #else
         palette[i] = ((3 * pal[i].r) + (6 * pal[i].g) + pal[i].b) / 10;
 #endif
@@ -212,7 +217,7 @@ void sysvid_update(const rect_t *rects)
         }
         destBuf = lcd_fb;
 #else
-        destBuf = greybuffer;
+        destBuf = (fb_data*) greybuffer;
 #endif /* HAVE_LCD_COLOR */
         destBuf += resizedColumn + resizedRow * LCD_WIDTH;
 
