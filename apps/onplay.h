@@ -25,7 +25,7 @@
 #include "menu.h"
 #endif
 
-int onplay(char* file, int attr, int from_screen, bool hotkey);
+int onplay(char* file, int attr, int from_context, bool hotkey);
 int get_onplay_context(void);
 
 enum {

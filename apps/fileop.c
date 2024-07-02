@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2002 Björn Stenberg
@@ -50,6 +50,17 @@ struct file_op_params
     size_t append;         /* Append position in 'path' for stack push */
 };
 
+static int prompt_name(char* buf, size_t bufsz)
+{
+    if (kbd_input(buf, bufsz, NULL) < 0)
+        return FORC_CANCELLED;
+    /* at least prevent escapes out of the base directory from keyboard-
+       entered filenames; the file code should reject other invalidities */
+    if (*buf != '\0' && !strchr(buf, PATH_SEPCH) && !is_dotdir_name(buf))
+        return FORC_SUCCESS;
+    return FORC_UNKNOWN_FAILURE;
+}
+
 static bool poll_cancel_action(const char *path, int operation, int current, int total)
 {
     const char *op_str = "";
@@ -75,7 +86,7 @@ static bool poll_cancel_action(const char *path, int operation, int current, int
     return ACTION_STD_CANCEL == get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
 }
 
-static struct file_op_params* init_file_op(struct file_op_params *param,
+static void init_file_op(struct file_op_params *param,
                                     const char *basename,
                                     const char *selected_file)
 {
@@ -90,8 +101,6 @@ static struct file_op_params* init_file_op(struct file_op_params *param,
     param->is_dir = dir_exists(param->path);
     param->objects = 0; /* how many files and subdirectories*/
     param->processed = 0;
-
-    return param;
 }
 
 /* counts file objects, deletes file objects */
@@ -144,7 +153,7 @@ static int directory_fileop(struct file_op_params *param, enum file_op_current f
 
             if (info.attribute & ATTR_DIRECTORY) {
                 /* remove a subdirectory */
-                rc = directory_fileop(param, fileop);
+                rc = directory_fileop(param, fileop); /* recursion */
             } else {
                 /* remove a file */
                 if (poll_cancel_action(param->path, FOC_DELETE, param->processed, param->objects))
@@ -165,8 +174,8 @@ static int directory_fileop(struct file_op_params *param, enum file_op_current f
             }
 
             if (info.attribute & ATTR_DIRECTORY) {
-                /* remove a subdirectory */
-                rc = directory_fileop(param, FOC_COUNT);
+                /* enter subdirectory */
+                rc = directory_fileop(param, FOC_COUNT); /* recursion */
             } else {
                 if (poll_cancel_action(param->path, FOC_COUNT, param->objects, 0))
                 {
@@ -195,150 +204,42 @@ static int directory_fileop(struct file_op_params *param, enum file_op_current f
     return rc;
 }
 
+/* Walk a directory tree and count the number of objects (dirs & files)
+ * also check that enough resources exist to do an operation */
 static int check_count_fileobjects(struct file_op_params *param)
 {
+    cpu_boost(true);
     int rc = directory_fileop(param, FOC_COUNT);
+    cpu_boost(false);
     DEBUGF("%s res:(%d) objects %d \n", __func__, rc, param->objects);
     return rc;
 }
 
-static bool check_new_name(const char *basename)
-{
-    /* at least prevent escapes out of the base directory from keyboard-
-       entered filenames; the file code should reject other invalidities */
-    return *basename != '\0' && !strchr(basename, PATH_SEPCH) &&
-           !is_dotdir_name(basename);
-}
-
-int create_dir(void)
-{
-    int rc = FORC_UNKNOWN_FAILURE;
-    char dirname[MAX_PATH];
-    size_t pathlen = path_append(dirname, getcwd(NULL, 0), PA_SEP_HARD,
-                                 sizeof (dirname));
-    char *basename = dirname + pathlen;
-
-    if (pathlen >= sizeof (dirname)) {
-        /* Too long */
-    } else if (kbd_input(basename, sizeof (dirname) - pathlen, NULL) < 0) {
-        rc = FORC_CANCELLED;
-    } else if (check_new_name(basename)) {
-        rc = mkdir(dirname);
-    }
-
-    return rc;
-}
-
-/************************************************************************************/
-/* share code for file and directory deletion, saves space */
-static int delete_file_dir(struct file_op_params *param)
-{
-    /* Note: delete_file_dir() will happily delete whatever
-     * path is passed (after confirmation) */
-    if (confirm_delete_yesno(param->path) != YESNO_YES) {
-        return FORC_CANCELLED;
-    }
-
-    clear_screen_buffer(true);
-    poll_cancel_action(param->path, FOC_DELETE, param->processed, param->objects);
-
-    int rc = FORC_UNKNOWN_FAILURE;
-
-    if (param->is_dir) { /* if directory */
-        cpu_boost(true);
-        rc = directory_fileop(param, FOC_DELETE);
-        cpu_boost(false);
-    } else {
-        rc = remove(param->path);
-    }
-
-    return rc;
-}
-
-int delete_fileobject(const char *selected_file)
-{
-    struct file_op_params param;
-    if (init_file_op(&param, selected_file, NULL)->is_dir == true)
-    {
-        int rc = check_count_fileobjects(&param);
-        DEBUGF("%s res: %d, ct: %d, %s", __func__, rc, param.objects, param.path);
-        if (rc != FORC_SUCCESS)
-            return rc;
-    }
-
-    return delete_file_dir(&param);
-}
-
-int rename_file(const char *selected_file)
-{
-    int rc = FORC_UNKNOWN_FAILURE;
-    char newname[MAX_PATH];
-    const char *oldbase, *selection = selected_file;
-
-    path_basename(selection, &oldbase);
-    size_t pathlen = oldbase - selection;
-    char *newbase = newname + pathlen;
-
-    if (strmemccpy(newname, selection, sizeof (newname)) == NULL) {
-        /* Too long */
-    } else if (kbd_input(newbase, sizeof (newname) - pathlen, NULL) < 0) {
-        rc = FORC_CANCELLED;
-    } else if (!strcmp(oldbase, newbase)) {
-        rc = FORC_NOOP; /* No change at all */
-    } else if (check_new_name(newbase)) {
-        switch (relate(selection, newname))
-        {
-        case RELATE_DIFFERENT:
-            if (file_exists(newname)) {
-                break; /* don't overwrite */
-            }
-            /* Fall-through */
-        case RELATE_SAME:
-            rc = rename(selection, newname);
-            break;
-        case RELATE_PREFIX:
-        default:
-            break;
-        }
-    }
-
-    return rc;
-}
-
+/* Attempt to just rename a file or directory */
 static int move_by_rename(const char *src_path,
                           const char *dst_path,
                           unsigned int *pflags)
 {
     unsigned int flags = *pflags;
     int rc = FORC_UNKNOWN_FAILURE;
-    while (!(flags & (PASTE_COPY | PASTE_EXDEV))) {
+    if (!(flags & (PASTE_COPY | PASTE_EXDEV))) {
         if ((flags & PASTE_OVERWRITE) || !file_exists(dst_path)) {
             /* Just try to move the directory / file */
             if (poll_cancel_action(src_path, FOC_MOVE, 0 , 0)) {
                 rc = FORC_CANCELLED;
             } else {
                 rc = rename(src_path, dst_path);
-            }
-
-            if (rc < 0) {
-                int errnum = errno;
-                if (errnum == ENOTEMPTY && (flags & PASTE_OVERWRITE)) {
-                    /* Directory is not empty thus rename() will not do a quick
-                       overwrite */
-                    break;
+#ifdef HAVE_MULTIVOLUME
+                if (rc < FORC_SUCCESS && errno == EXDEV) {
+                    /* Failed because cross volume rename doesn't work */
+                    *pflags |= PASTE_EXDEV; /* force a move instead */
                 }
-            #ifdef HAVE_MULTIVOLUME
-                else if (errnum == EXDEV) {
-                    /* Failed because cross volume rename doesn't work; force
-                       a move instead */
-                    *pflags |= PASTE_EXDEV;
-                    break;
-                }
-            #endif /* HAVE_MULTIVOLUME */
+#endif /* HAVE_MULTIVOLUME */
+             /* if (errno == ENOTEMPTY && (flags & PASTE_OVERWRITE)) {
+              * Directory is not empty thus rename() will not do a quick overwrite */
             }
         }
 
-        break;
     }
     return rc;
 }
@@ -365,8 +266,7 @@ static int copy_move_file(const char *src_path, const char *dst_path, unsigned i
         return FORC_NO_BUFFER_AVAIL;
     }
 
-    buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector
-                              size */
+    buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector size */
 
     int src_fd = open(src_path, O_RDONLY);
     if (src_fd >= 0) {
@@ -423,9 +323,12 @@ static int copy_move_file(const char *src_path, const char *dst_path, unsigned i
             }
 
             if (rc == FORC_SUCCESS) {
-                /* If overwriting, set the correct length if original was
-                   longer */
-                rc = ftruncate(dst_fd, total_size) * 10;
+                if (total_size != src_sz)
+                    rc = FORC_UNKNOWN_FAILURE;
+                else {
+                /* If overwriting, set the correct length if original was longer */
+                    rc = ftruncate(dst_fd, total_size) * 10;
+                }
             }
 
             close(dst_fd);
@@ -449,20 +352,19 @@ static int copy_move_file(const char *src_path, const char *dst_path, unsigned i
 
 /* Paste a directory */
 static int copy_move_directory(struct file_op_params *src,
-                                    struct file_op_params *dst,
-                                    unsigned int flags)
+                               struct file_op_params *dst,
+                                        unsigned int flags)
 {
-    int rc = FORC_UNKNOWN_FAILURE;
-
     DIR *srcdir = opendir(src->path);
 
-    if (srcdir) {
-        /* Make a directory to copy things to */
-        rc = mkdir(dst->path) * 10;
-        if (rc < 0 && errno == EEXIST && (flags & PASTE_OVERWRITE)) {
-            /* Exists and overwrite was approved */
-            rc = FORC_SUCCESS;
-        }
+    if (!srcdir)
+        return FORC_PATH_NOT_EXIST;
+
+    /* Make a directory to copy things to */
+    int rc = mkdir(dst->path) * 10;
+    if (rc < 0 && errno == EEXIST && (flags & PASTE_OVERWRITE)) {
+        /* Exists and overwrite was approved */
+        rc = FORC_SUCCESS;
     }
 
     size_t srcap = src->append, dstap = dst->append;
@@ -488,7 +390,7 @@ static int copy_move_directory(struct file_op_params *src,
         /* Append names to current directories */
         src->append = srcap +
             path_append(&src->path[srcap], PA_SEP_HARD, entry->d_name,
-                        sizeof(src->path) - srcap);
+                        sizeof (src->path) - srcap);
 
         dst->append = dstap +
             path_append(&dst->path[dstap], PA_SEP_HARD, entry->d_name,
@@ -538,12 +440,15 @@ static int copy_move_directory(struct file_op_params *src,
     return rc;
 }
 
+/************************************************************************************/
+/* PUBLIC FUNCTIONS                                                                 */
+/************************************************************************************/
+
+/* Copy or move a file or directory see: file_op_flags */
 int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned int flags)
 {
     if (!src_path[0])
         return FORC_NOOP;
-
-    int rc = FORC_UNKNOWN_FAILURE;
 
     struct file_op_params src, dst;
 
@@ -553,40 +458,37 @@ int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned in
 
     /* Final target is current directory plus name of selection  */
     init_file_op(&dst, dst_path, nameptr);
+    if (dst.append >= sizeof (dst.path))
+        return FORC_PATH_TOO_LONG;
 
-    switch (dst.append < sizeof (dst.path) ?
-                relate(src_path, dst.path) : FORC_PATH_TOO_LONG)
-    {
-    case RELATE_SAME:
-        rc = FORC_NOOP;
-        break;
+    int rel = relate(src_path, dst.path);
+    if (rel == RELATE_SAME)
+        return FORC_NOOP;
 
-    case RELATE_DIFFERENT:
+    if (rel == RELATE_DIFFERENT) {
+        int rc;
         if (file_exists(dst.path)) {
             /* If user chooses not to overwrite, cancel */
             if (confirm_overwrite_yesno() == YESNO_NO) {
-                rc = FORC_NOOVERWRT;
-                break;
+                return FORC_NOOVERWRT;
             }
 
             flags |= PASTE_OVERWRITE;
         }
 
+        init_file_op(&src, src_path, NULL);
+        if (src.append >= sizeof (src.path))
+            return FORC_PATH_TOO_LONG;
         /* Now figure out what we're doing */
         cpu_boost(true);
-
-        init_file_op(&src, src_path, NULL);
-
         if (src.is_dir) {
             /* Copy or move a subdirectory */
-
-            if (src.append < sizeof (src.path)) {
-                /* Try renaming first */
-                rc = move_by_rename(src.path, dst.path, &flags);
-                if (rc != FORC_SUCCESS && rc != FORC_CANCELLED) {
-                     if (check_count_fileobjects(&src) == FORC_SUCCESS) {
-                        rc = copy_move_directory(&src, &dst, flags);
-                    }
+            /* Try renaming first */
+            rc = move_by_rename(src.path, dst.path, &flags);
+            if (rc < FORC_SUCCESS) {
+                rc = check_count_fileobjects(&src);
+                if (rc == FORC_SUCCESS) {
+                    rc = copy_move_directory(&src, &dst, flags);
                 }
             }
         } else {
@@ -595,12 +497,102 @@ int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned in
         }
 
         cpu_boost(false);
-        break;
+        DEBUGF("%s res: %d, ct: %d/%d %s\n",
+               __func__, rc, src.objects, src.processed, src.path);
+        return rc;
+    }
 
-    case RELATE_PREFIX:
-    default: /* Some other relation / failure */
-        break;
+    /* Else Some other relation / failure */
+    DEBUGF("%s res: %d, rel: %d\n", __func__, rc, rel);
+    return FORC_UNKNOWN_FAILURE;
+}
+
+int create_dir(void)
+{
+    int rc;
+    char dirname[MAX_PATH];
+    size_t pathlen = path_append(dirname, getcwd(NULL, 0), PA_SEP_HARD,
+                                 sizeof (dirname));
+    char *basename = dirname + pathlen;
+
+    if (pathlen >= sizeof (dirname))
+        return FORC_PATH_TOO_LONG;
+
+    rc = prompt_name(basename, sizeof (dirname) - pathlen);
+    if (rc == FORC_SUCCESS)
+        rc = mkdir(dirname) * 10;
+    return rc;
+}
+
+/* share code for file and directory deletion, saves space */
+int delete_fileobject(const char *selected_file)
+{
+    int rc;
+    struct file_op_params param;
+    init_file_op(&param, selected_file, NULL);
+    if (param.append >= sizeof (param.path))
+        return FORC_PATH_TOO_LONG;
+
+    if (param.is_dir) {
+        int rc = check_count_fileobjects(&param);
+        DEBUGF("%s res: %d, ct: %d, %s", __func__, rc, param.objects, param.path);
+        if (rc != FORC_SUCCESS)
+            return rc;
+    }
+
+    /* Note: delete_fileobject() will happily delete whatever
+     * path is passed (after confirmation) */
+    if (confirm_delete_yesno(param.path) != YESNO_YES) {
+        return FORC_CANCELLED;
+    }
+
+    clear_screen_buffer(true);
+    if (poll_cancel_action(param.path, FOC_DELETE, param.processed, param.objects))
+        return FORC_CANCELLED;
+
+    if (param.is_dir) { /* if directory */
+        cpu_boost(true);
+        rc = directory_fileop(&param, FOC_DELETE);
+        cpu_boost(false);
+    } else {
+        rc = remove(param.path) * 10;
     }
 
     return rc;
+}
+
+int rename_file(const char *selected_file)
+{
+    int rc;
+    char newname[MAX_PATH];
+    const char *oldbase, *selection = selected_file;
+
+    path_basename(selection, &oldbase);
+    size_t pathlen = oldbase - selection;
+    char *newbase = newname + pathlen;
+
+    if (strmemccpy(newname, selection, sizeof (newname)) == NULL)
+        return FORC_PATH_TOO_LONG;
+
+    rc = prompt_name(newbase, sizeof (newname) - pathlen);
+
+    if (rc != FORC_SUCCESS)
+        return rc;
+
+    if (!strcmp(oldbase, newbase))
+        return FORC_NOOP; /* No change at all */
+
+    int rel = relate(selection, newname);
+    if (rel == RELATE_DIFFERENT)
+    {
+        if (file_exists(newname)) { /* don't overwrite */
+            return FORC_PATH_EXISTS;
+        }
+        return rename(selection, newname) * 10;
+    }
+    if (rel == RELATE_SAME)
+        return rename(selection, newname) * 10;
+
+    /* Else Some other relation / failure */
+    return FORC_UNKNOWN_FAILURE;
 }

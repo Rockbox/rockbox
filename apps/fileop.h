@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2002 Björn Stenberg
@@ -26,6 +26,7 @@
 /* result codes of various file operations */
 enum fileop_result_code
 {
+    FORC_PATH_EXISTS      = -8,
     FORC_READ_FAILURE     = -7,
     FORC_WRITE_FAILURE    = -6,
     FORC_NO_BUFFER_AVAIL  = -5,
@@ -55,7 +56,6 @@ enum file_op_current
     FOC_MOVE,
     FOC_COPY,
     FOC_DELETE,
-    FOC_CREATE,
 };
 
 int create_dir(void);
@@ -64,7 +64,8 @@ int rename_file(const char *selected_file);
 
 int delete_fileobject(const char *selected_file);
 
-int copy_move_fileobject(const char *src_path, const char *dst_path,
-                            unsigned int flags);
+int copy_move_fileobject(const char *src_path,
+                         const char *dst_path,
+                           unsigned int flags);
 
 #endif /* FILEOP_H */
