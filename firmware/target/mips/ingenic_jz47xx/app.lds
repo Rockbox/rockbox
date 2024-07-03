@@ -37,15 +37,11 @@ SECTIONS
 {
     . = DRAMORIG;
 
-    .startup :
+    .text :
     {
         loadaddress = .;
         _loadaddress = .;
-        *(.startup.text);
-    } > DRAM
-
-    .text :
-    {
+        *(.init.text);
         *(.text*);
 #ifndef HAVE_INIT_ATTR
         *(.init*);

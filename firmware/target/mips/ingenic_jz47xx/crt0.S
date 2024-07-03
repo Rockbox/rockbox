@@ -44,7 +44,7 @@
     .extern main
     .global _start
 
-    .section .startup.text,"ax",%progbits
+    .section .init.text
     .set    push
     .set    mips32
     .set    noreorder
