@@ -1646,9 +1646,9 @@ target/mips/ingenic_jz47xx/kernel-jz4760.c
 target/mips/ingenic_jz47xx/i2c-jz4760.c
 target/mips/ingenic_jz47xx/lcd-jz4760.c
 target/mips/ingenic_jz47xx/system-jz4760.c
-target/mips/ingenic_jz47xx/usb-jz4760.c
 target/mips/ingenic_jz47xx/timer-jz4760.c
 #ifndef BOOTLOADER
+target/mips/ingenic_jz47xx/usb-jz4760.c
 target/mips/ingenic_jz47xx/codec-jz4760.c
 target/mips/ingenic_jz47xx/pcm-jz4760.c
 #endif /* BOOTLOADER */

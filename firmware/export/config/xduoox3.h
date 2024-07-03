@@ -174,6 +174,7 @@
 /* Type of LCD */
 #define CONFIG_LCD LCD_XDUOOX3
 
+#ifndef BOOTLOADER
 /* USB On-the-go */
 #define CONFIG_USBOTG     USBOTG_JZ4760
 
@@ -189,6 +190,7 @@
 
 #define USB_NUM_ENDPOINTS  3
 #define USB_DEVBSS_ATTR    IBSS_ATTR
+#endif /* !BOOTLOADER */
 
 #define BOOTFILE_EXT "x3"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
@@ -198,7 +200,7 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#endif /* SIMULATOR */
+#endif /* !SIMULATOR */
 
 /** Port-specific settings **/
 

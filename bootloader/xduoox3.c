@@ -160,25 +160,6 @@ static int boot_rockbox(void)
     }
 }
 
-#if 0
-static void reset_configuration(void)
-{
-    int rc;
-
-    rc = disk_mount_all();
-    if (rc <= 0)
-    {
-        verbose = true;
-        error(EDISK,rc, true);
-    }
-
-    if(rename(ROCKBOX_DIR "/config.cfg", ROCKBOX_DIR "/config.old") == 0)
-        show_splash(HZ/2, "Configuration reset successfully!");
-    else
-        show_splash(HZ/2, "Couldn't reset configuration!");
-}
-#endif
-
 int main(void)
 {
     int rc;
