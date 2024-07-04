@@ -435,7 +435,9 @@ simcc () {
         else
           echo "Your sdl-config does not know about static libs, falling back to shared library"
           sdlldopts=$($sdl --libs)
-          LDOPTS=`echo $LDOPTS | sed -e s/ -static//`
+#          if [ "$win32crosscompile" = "yes" ] ; then
+              LDOPTS=`echo $LDOPTS | sed -e s/-static//`
+#          fi
         fi
         GCCOPTS="$GCCOPTS ${sdlccopts}"
         LDOPTS="$LDOPTS ${sdlldopts}"
