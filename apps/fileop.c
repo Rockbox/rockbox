@@ -503,7 +503,7 @@ int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned in
     }
 
     /* Else Some other relation / failure */
-    DEBUGF("%s res: %d, rel: %d\n", __func__, rc, rel);
+    DEBUGF("%s res: %d, rel: %d\n", __func__, FORC_UNKNOWN_FAILURE, rel);
     return FORC_UNKNOWN_FAILURE;
 }
 
