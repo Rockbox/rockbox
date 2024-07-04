@@ -40,10 +40,10 @@
     *: "No"
   </source>
   <dest>
-    *: "No"
+    *: "~No"
   </dest>
   <voice>
-    *: "No"
+    *: "~No"
   </voice>
 </phrase>
 <phrase>
@@ -330,10 +330,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "Database"
+    *: "~Database"
   </dest>
   <voice>
-    *: "Database"
+    *: "~Database"
   </voice>
 </phrase>
 <phrase>
@@ -539,20 +539,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Cancella"
-  </dest>
-  <voice>
-    *: "Cancella"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -630,10 +616,10 @@
     *: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: "~Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: "~Volume"
   </voice>
 </phrase>
 <phrase>
@@ -694,30 +680,30 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "~Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "~Stereo"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -787,10 +773,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -815,7 +801,7 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </dest>
   <voice>
     *: "Crossfid"
@@ -990,20 +976,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Modo editing: %s"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_EQUALIZER_GAIN_ITEM
   desc: in the equalizer settings menu
   user: core
@@ -1109,10 +1081,10 @@
     *: "Dithering"
   </source>
   <dest>
-    *: "Dithering"
+    *: "~Dithering"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "~Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1324,11 +1296,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "~Crossfade"
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "~Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1477,11 +1449,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "~Mix"
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "~Mix"
   </voice>
 </phrase>
 <phrase>
@@ -1492,10 +1464,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "~Replaygain"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "~Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2159,10 +2131,10 @@
     *: "Display"
   </source>
   <dest>
-    *: "Display"
+    *: "~Display"
   </dest>
   <voice>
-    *: "Display"
+    *: "~Display"
   </voice>
 </phrase>
 <phrase>
@@ -2264,11 +2236,11 @@
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: "Backlight on Lock"
+    *: "Retroilluminazione su Blocco"
     hold_button: "Retroilluminazione Sul tasto di blocco"
   </dest>
   <voice>
-    *: "Backlight on Lock"
+    *: "Retroilluminazione su Blocco"
     hold_button: "RetroIlluminazione sul tasto di blocco"
   </voice>
 </phrase>
@@ -3090,10 +3062,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin1"
+    *: "~Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -3146,10 +3118,10 @@
     *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "Thai (ISO-8859-11)"
+    *: "~Thai (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Thai"
+    *: "~Thai"
   </voice>
 </phrase>
 <phrase>
@@ -3258,10 +3230,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -3759,7 +3731,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "Febbraio"
@@ -3773,7 +3745,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Marzo"
@@ -3787,7 +3759,7 @@
     *: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: "~Apr"
   </dest>
   <voice>
     *: "Aprile"
@@ -3885,7 +3857,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "Novembre"
@@ -4061,23 +4033,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Imposta Allarme"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Imposta Allarme"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -4092,20 +4047,6 @@
   <voice>
     *: none
     alarm: "L'orario impostato è troppo vicino!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5040,11 +4981,11 @@
   </source>
   <dest>
     *: none
-    recording: "Bitrate"
+    recording: "~Bitrate"
   </dest>
   <voice>
     *: none
-    recording: "Bitrate"
+    recording: "~Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -5306,38 +5247,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Cartella"
-  </dest>
-  <voice>
-    *: none
-    recording: "Cartella"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    recording: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLEAR_REC_DIR
   desc:
   user: core
@@ -5517,11 +5426,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "~Stop"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "~Stop"
   </voice>
 </phrase>
 <phrase>
@@ -5946,10 +5855,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox Info"
+    *: "~Rockbox Info"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "~Rockbox Info"
   </voice>
 </phrase>
 <phrase>
@@ -5960,7 +5869,7 @@
     *: "Buffer:"
   </source>
   <dest>
-    *: "Buffer:"
+    *: "~Buffer:"
   </dest>
   <voice>
     *: "Dimensione buffer"
@@ -5976,7 +5885,7 @@
   </source>
   <dest>
     *: "Batteria: %d%% %dh %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "~Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Livello Batteria"
@@ -6020,14 +5929,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "MSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Interno"
-    hibylinux: "micro S D"
-    xduoox3: "Micro SD 1"
+    hibylinux: "~micro S D"
+    xduoox3: "~Micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -6043,17 +5952,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "HD 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "Micro S D"
-    xduoox3: "Micro SD 2"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro SD 2"
   </voice>
 </phrase>
 <phrase>
@@ -6134,66 +6043,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "~Playlist"
   </dest>
   <voice>
-    *: "Playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
+    *: "~Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6250,20 +6103,6 @@
   </dest>
   <voice>
     *: "Mescola E Accoda"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6348,34 +6187,6 @@
   </dest>
   <voice>
     *: "Mescola"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Visualizza catalogo"
-  </dest>
-  <voice>
-    *: "Visualizza catalogo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6554,10 +6365,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -6624,10 +6435,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "~Playlist"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "~Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6638,10 +6449,10 @@
     *: "Bitrate"
   </source>
   <dest>
-    *: "Bitrate"
+    *: "~Bitrate"
   </dest>
   <voice>
-    *: "Bitrate"
+    *: "~Bit rate"
   </voice>
 </phrase>
 <phrase>
@@ -6666,7 +6477,7 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "Discnum"
+    *: "Numdisco"
   </dest>
   <voice>
     *: "Numero disco"
@@ -6726,20 +6537,6 @@
   </dest>
   <voice>
     *: "Guadagno Traccia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Guadagno Album"
-  </dest>
-  <voice>
-    *: "Guadagno Album"
   </voice>
 </phrase>
 <phrase>
@@ -7153,20 +6950,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Errore di aggiornamento file controllo playlist"
-  </dest>
-  <voice>
-    *: "Errore di aggiornamento file controllo playlist"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
   user: core
@@ -7349,23 +7132,6 @@
   <voice>
     *: none
     iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-inf"
-  </dest>
-  <voice>
-    *: none
-    recording: "meno infinito"
   </voice>
 </phrase>
 <phrase>
@@ -7591,23 +7357,6 @@
   <voice>
     *: none
     charging: "Batteria In carica"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Batteria: Mantenimento carica"
-  </dest>
-  <voice>
-    *: none
-    charging: "Mantenimento carica"
   </voice>
 </phrase>
 <phrase>
@@ -8265,7 +8014,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -8307,7 +8056,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -8335,7 +8084,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8559,7 +8308,7 @@
     *: ""
   </dest>
   <voice>
-    *: ".....Oh"
+    *: "~O"
   </voice>
 </phrase>
 <phrase>
@@ -8573,7 +8322,7 @@
     *: ""
   </dest>
   <voice>
-    *: ".....PI"
+    *: "~P"
   </voice>
 </phrase>
 <phrase>
@@ -8587,7 +8336,7 @@
     *: ""
   </dest>
   <voice>
-    *: ".....KU"
+    *: "~Q"
   </voice>
 </phrase>
 <phrase>
@@ -8629,7 +8378,7 @@
     *: ""
   </dest>
   <voice>
-    *: ".....TI"
+    *: "~T"
   </voice>
 </phrase>
 <phrase>
@@ -8755,7 +8504,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "fail"
   </voice>
 </phrase>
 <phrase>
@@ -8783,7 +8532,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -8825,7 +8574,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "~plugin"
   </voice>
 </phrase>
 <phrase>
@@ -8867,7 +8616,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -8912,7 +8661,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "~cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -9139,7 +8888,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -9153,7 +8902,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -9567,7 +9316,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -9648,7 +9397,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "~Auto"
   </dest>
   <voice>
     *: none
@@ -9865,7 +9614,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "~AGC"
   </dest>
   <voice>
     *: none
@@ -9933,7 +9682,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -10244,10 +9993,10 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Timestretch"
+    *: "~Timestretch"
   </dest>
   <voice>
-    *: "Timestretch"
+    *: "~Time stretch"
   </voice>
 </phrase>
 <phrase>
@@ -10404,11 +10153,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "~Rate"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "~Rate"
   </voice>
 </phrase>
 <phrase>
@@ -10438,11 +10187,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -10489,11 +10238,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "~Mouse"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "~Mouse"
   </voice>
 </phrase>
 <phrase>
@@ -10508,20 +10257,6 @@
   </dest>
   <voice>
     *: "Larghezza Barra di Scorrimento"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Posizione Barra di Scorrimento"
-  </dest>
-  <voice>
-    *: "Posizione Barra di Scorrimento"
   </voice>
 </phrase>
 <phrase>
@@ -10709,10 +10444,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "~Auto"
   </dest>
   <voice>
-    *: "Auto"
+    *: "~Auto"
   </voice>
 </phrase>
 <phrase>
@@ -10723,10 +10458,10 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Knee"
+    *: "~Knee"
   </dest>
   <voice>
-    *: "Knee"
+    *: "~Knee"
   </voice>
 </phrase>
 <phrase>
@@ -10737,10 +10472,10 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Hard Knee"
+    *: "Knee Hard"
   </dest>
   <voice>
-    *: "Hard Knee"
+    *: "Knee Hard"
   </voice>
 </phrase>
 <phrase>
@@ -10751,10 +10486,10 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Soft Knee"
+    *: "Knee Soft"
   </dest>
   <voice>
-    *: "Soft Knee"
+    *: "Knee Soft"
   </voice>
 </phrase>
 <phrase>
@@ -10783,20 +10518,6 @@
   </dest>
   <voice>
     *: "Salta a Fine Traccia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Personalizzata"
-  </dest>
-  <voice>
-    *: "Personalizzata"
   </voice>
 </phrase>
 <phrase>
@@ -10845,20 +10566,6 @@
   <voice>
     *: none
     usb_hid: "Periferica USB Human Interface"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11383,7 +11090,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "Apri Picture Flow"
@@ -11399,11 +11106,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11452,20 +11159,6 @@
   </dest>
   <voice>
     *: "Aggiorna allo Stop"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11570,20 +11263,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_PLAYLISTCAT_DIR
   desc:
   user: core
@@ -11657,20 +11336,6 @@
   <voice>
     *: none
     touchscreen: "Padding Linea in Elenchi"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOMATIC
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12248,10 +11913,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </dest>
   <voice>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -12363,10 +12028,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </dest>
   <voice>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </voice>
 </phrase>
 <phrase>
@@ -12391,10 +12056,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Dry / Wet Mix"
+    *: "Mix Dry / Wet"
   </dest>
   <voice>
-    *: "Dry / Wet Mix"
+    *: "Mix Dry / Wet"
   </voice>
 </phrase>
 <phrase>
@@ -12542,10 +12207,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Bitrate medio: %ld kbps"
+    *: "Bitrate medio:"
   </dest>
   <voice>
     *: "Bitrate medio"
@@ -12702,10 +12367,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "~Zoom"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "~Zoom"
   </voice>
 </phrase>
 <phrase>
@@ -12864,20 +12529,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "Nessun visualizzatore trovato"
-  </dest>
-  <voice>
-    *: "Nessun visualizzatore trovato"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NO_REM_CONTROL
   desc: Item for menus
   user: core
@@ -12909,20 +12560,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Aggiunto alla playlist"
-  </dest>
-  <voice>
-    *: "Aggiunto alla playlist"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SWAP_CHANNELS
   desc: in sound_settings
   user: core
@@ -12946,11 +12583,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </voice>
 </phrase>
 <phrase>
@@ -13069,20 +12706,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_ALBUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PROPERTIES_TIME
   desc: in properties plugin
   user: core
@@ -13198,20 +12821,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_ARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REVERBERATION
   desc: in mikmod settings menu
   user: core
@@ -13233,10 +12842,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Traccia %d / %d %d%%"
+    *: "Traccia:"
   </dest>
   <voice>
     *: "Traccia"
@@ -13254,20 +12863,6 @@
   </dest>
   <voice>
     *: "Traccia in movimento"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TITLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13425,11 +13020,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </voice>
 </phrase>
@@ -13529,20 +13124,6 @@
   </dest>
   <voice>
     *: "Salva posizione"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DURATION
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13901,10 +13482,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Dimensione media delle traccie: %s"
+    *: "Dimensione media delle tracce:"
   </dest>
   <voice>
     *: "Dimensione media delle traccie"
@@ -13999,10 +13580,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: "Playlist remaining:"
   </source>
   <dest>
-    *: "Playlist rimanente: %s"
+    *: "Playlist rimanente:"
   </dest>
   <voice>
     *: "Playlist rimanente"
@@ -14111,10 +13692,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Traccia rimanente: %s"
+    *: "Traccia rimanente:"
   </dest>
   <voice>
     *: "Traccia rimanente"
@@ -14326,20 +13907,6 @@
   </dest>
   <voice>
     *: "Commuta l'elemento"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Playlist Svuotata"
-  </dest>
-  <voice>
-    *: "Playlist Svuotata"
   </voice>
 </phrase>
 <phrase>
@@ -14589,10 +14156,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Traccia trascorsa: %s / %s %ld%%"
+    *: "Traccia trascorsa:"
   </dest>
   <voice>
     *: "Traccia trascorsa"
@@ -14603,10 +14170,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Memoria: %s (fatto %s, restante %s)"
+    *: "Memoria (Usata / Rimanente):"
   </dest>
   <voice>
     *: "Memoria"
@@ -14701,10 +14268,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist trascorsa: %s / %s %ld%%"
+    *: "Playlist trascorsa:"
   </dest>
   <voice>
     *: "Playlist trascorsa"
@@ -14735,7 +14302,7 @@
     *: "Rifletto..."
   </dest>
   <voice>
-    *: ""
+    *: "Rifletto"
   </voice>
 </phrase>
 <phrase>
@@ -14876,20 +14443,6 @@
   </dest>
   <voice>
     *: "Sottocartelle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_PLAYLIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15117,10 +14670,10 @@
     *: "Timeout"
   </source>
   <dest>
-    *: "Timeout"
+    *: "~Timeout"
   </dest>
   <voice>
-    *: "Timeout"
+    *: "~Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -15282,11 +14835,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Sample Rate"
+    *: "~Sample Rate"
     lowmem: none
   </dest>
   <voice>
-    *: "Sample Rate"
+    *: "~Sample Rate"
     lowmem: none
   </voice>
 </phrase>
@@ -15507,20 +15060,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DAC_POWER_MODE
   desc: in sound settings
   user: core
@@ -15591,7 +15130,7 @@
     *: "Coda..."
   </dest>
   <voice>
-    *: "Coda..."
+    *: "Coda"
   </voice>
 </phrase>
 <phrase>
@@ -15634,20 +15173,6 @@
   </dest>
   <voice>
     *: "Nel sottomenu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15716,11 +15241,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super Lento"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super Lento"
   </voice>
 </phrase>
 <phrase>
@@ -15733,11 +15258,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Lineare Veloce"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Lineare Veloce"
   </voice>
 </phrase>
 <phrase>
@@ -15750,11 +15275,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Lineare Lento"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Lineare Lento"
   </voice>
 </phrase>
 <phrase>
@@ -15767,11 +15292,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minimo Veloce"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minimo Veloce"
   </voice>
 </phrase>
 <phrase>
@@ -15784,11 +15309,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minimo Lento"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minimo Lento"
   </voice>
 </phrase>
 <phrase>
@@ -15801,11 +15326,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodizing tipo 1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodizing tipo 1"
   </voice>
 </phrase>
 <phrase>
@@ -15818,11 +15343,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodizing tipo 2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodizing tipo 2"
   </voice>
 </phrase>
 <phrase>
@@ -15835,11 +15360,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Ibrido Veloce"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Ibrido Veloce"
   </voice>
 </phrase>
 <phrase>
@@ -15852,151 +15377,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "~Brick Wall"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUMARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_GENRE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMMENT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMPOSER
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_YEAR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TRACKNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DISCNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FREQUENCY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_BITRATE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
+    es9218: "~Brick Wall"
   </voice>
 </phrase>
 <phrase>
@@ -16341,7 +15726,7 @@
     *: "Imposta Come..."
   </dest>
   <voice>
-    *: "Imposta Come..."
+    *: "Imposta Come"
   </voice>
 </phrase>
 <phrase>
@@ -16400,7 +15785,7 @@
     *: "Aggiungi alla  Playlist..."
   </dest>
   <voice>
-    *: "Aggiungi alla Playlist..."
+    *: "Aggiungi alla Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -16428,7 +15813,7 @@
     *: "Riproduzione Brano Successivo..."
   </dest>
   <voice>
-    *: "Riproduzione Brano Successivo..."
+    *: "Riproduzione Brano Successivo"
   </voice>
 </phrase>
 <phrase>
@@ -16770,10 +16155,10 @@
     *: "Generating maze..."
   </source>
   <dest>
-    *: "Generating maze..."
+    *: "Generazione del labirinto..."
   </dest>
   <voice>
-    *: "Generating maze..."
+    *: "Generazione del labirinto"
   </voice>
 </phrase>
 <phrase>
@@ -16872,5 +16257,159 @@
   </dest>
   <voice>
     *: "Italiano"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STEREOSW_MODE
+  desc: Stereo Switch Mode
+  user: core
+  <source>
+    *: "Stereo Switch Mode"
+  </source>
+  <dest>
+    *: "Modalità di Commutazione Stereo"
+  </dest>
+  <voice>
+    *: "Modalità di Commutazione Stereo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Reverse"
+  </source>
+  <dest>
+    *: "Inversione"
+  </dest>
+  <voice>
+    *: "Inversione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ZERO
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 0"
+  </source>
+  <dest>
+    *: "Sempre 0"
+  </dest>
+  <voice>
+    *: "Sempre 0"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Always 1"
+  </source>
+  <dest>
+    *: "Sempre 1"
+  </dest>
+  <voice>
+    *: "Sempre 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Note Legali"
+  </dest>
+  <voice>
+    *: "Note Legali"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Errore: %s"
+  </dest>
+  <voice>
+    *: "Errore"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Impostazioni Mikmod"
+  </dest>
+  <voice>
+    *: "Impostazioni Mik mod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Menu Mikmod"
+  </dest>
+  <voice>
+    *: "Menu Mik mod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Menu Chessbox"
+  </dest>
+  <voice>
+    *: "Menu Chess box"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Fail della voce non valido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "~%ld%%"
+  </dest>
+  <voice>
+    *: none
   </voice>
 </phrase>
