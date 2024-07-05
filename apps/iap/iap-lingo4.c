@@ -1787,7 +1787,6 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             unsigned char data[70] = {0x04, 0x00, 0xFF};
             struct mp3entry id3;
-            int fd;
             size_t len;
             long tracknum = get_u32(&buf[3]);
 
@@ -1802,10 +1801,8 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             {
                 struct playlist_track_info info;
                 playlist_get_track_info(NULL, tracknum, &info);
-                fd = open(info.filename, O_RDONLY);
-                memset(&id3, 0, sizeof(struct mp3entry));
-                get_metadata(&id3, fd, info.filename);
-                close(fd);
+                /* memset(&id3, 0, sizeof(struct mp3entry)); --get_metadata does this for us */
+                get_metadata(&id3, -1, info.filename);
             }
             /* Return the requested track data */
             switch(cmd)

@@ -2193,7 +2193,6 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     struct mp3entry id3;
     struct temp_file_entry entry;
     bool ret;
-    int fd;
     int idx_id = -1;
     char tracknumfix[3];
     int offset = 0;
@@ -2266,21 +2265,16 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
         }
     }
 
-    fd = open(path, O_RDONLY);
-    if (fd < 0)
-    {
-        logf("open fail: %s", path);
-        return ;
-    }
-
-    memset(&id3, 0, sizeof(struct mp3entry));
+    /*memset(&id3, 0, sizeof(struct mp3entry)); -- get_metadata does this for us */
     memset(&entry, 0, sizeof(struct temp_file_entry));
     memset(&tracknumfix, 0, sizeof(tracknumfix));
-    ret = get_metadata(&id3, fd, path);
-    close(fd);
+    ret = get_metadata_ex(&id3, -1, path, METADATA_EXCLUDE_ID3_PATH);
 
     if (!ret)
+    {
+        logf("get_metadata fail: %s", path);
         return ;
+    }
 
     logf("-> %s", path);
 

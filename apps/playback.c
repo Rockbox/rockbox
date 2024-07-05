@@ -2022,8 +2022,7 @@ static int audio_load_track(void)
         if (fd >= 0)
         {
             id3_mutex_lock();
-            if(!get_metadata(ub_id3, fd, path))
-                wipe_mp3entry(ub_id3);
+            get_metadata(ub_id3, fd, path);
             id3_mutex_unlock();
         }
 

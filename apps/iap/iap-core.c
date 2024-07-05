@@ -685,7 +685,6 @@ bool iap_getc(const unsigned char x)
 void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
 {
     int tracknum;
-    int fd;
     struct playlist_track_info info;
 
     tracknum = track;
@@ -699,10 +698,8 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     if(playlist_next(0) != tracknum)
     {
         playlist_get_track_info(NULL, tracknum, &info);
-        fd = open(info.filename, O_RDONLY);
-        memset(id3, 0, sizeof(*id3));
-        get_metadata(id3, fd, info.filename);
-        close(fd);
+        /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
+        get_metadata(id3, -1, info.filename);
     } else {
         memcpy(id3, audio_current_track(), sizeof(*id3));
     }

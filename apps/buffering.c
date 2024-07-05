@@ -652,11 +652,9 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
     trigger_cpu_boost();
 
     if (h->type == TYPE_ID3) {
-        if (!get_metadata(ringbuf_ptr(h->data), h->fd, h->path)) {
-            /* metadata parsing failed: clear the buffer. */
-            wipe_mp3entry(ringbuf_ptr(h->data));
-        }
-        close_fd(&h->fd);
+        get_metadata_ex(ringbuf_ptr(h->data),
+                        h->fd, h->path, METADATA_CLOSE_FD_ON_EXIT);
+        h->fd = -1; /* with above, behavior same as close_fd */
         h->widx = ringbuf_add(h->data, h->filesize);
         h->end  = h->filesize;
         send_event(BUFFER_EVENT_FINISHED, &handle_id);

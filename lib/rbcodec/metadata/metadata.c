@@ -394,25 +394,19 @@ unsigned int probe_file_format(const char *filename)
 /* Note, that this returns false for successful, true for error! */
 bool mp3info(struct mp3entry *entry, const char *filename)
 {
-    int fd;
-    bool result;
-
-    fd = open(filename, O_RDONLY);
-    if (fd < 0)
-        return true;
-
-    result = !get_metadata(entry, fd, filename);
-
-    close(fd);
-
-    return result;
+    return !get_metadata(entry, -1, filename);
 }
 
 /* Get metadata for track - return false if parsing showed problems with the
- * file that would prevent playback.
+ * file that would prevent playback. supply a filedescriptor <0 and the file will be opened
+ * and closed automatically within the get_metadata call
+ * get_metadata_ex allows flags to change the way get_metadata behaves
+ * METADATA_EXCLUDE_ID3_PATH  won't copy filename path to the id3 path buffer 
+ * METADATA_CLOSE_FD_ON_EXIT closes the open filedescriptor on exit
  */
-bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
+bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int flags)
 {
+    bool success = true;
     const struct afmt_entry *entry;
     int logfd = 0;
     DEBUGF("Read metadata for %s\n", trackname);
@@ -426,9 +420,19 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
             close(logfd);
         }
     }
-
     /* Clear the mp3entry to avoid having bogus pointers appear */
     wipe_mp3entry(id3);
+
+    if (fd < 0)
+    {
+        fd = open(trackname, O_RDONLY);
+        flags |= METADATA_CLOSE_FD_ON_EXIT;
+        if (fd < 0)
+        {
+            DEBUGF("Error opening %s\n", trackname);
+            return false; /*Failure*/
+        }
+    }
 
     /* Take our best guess at the codec type based on file extension */
     id3->codectype = probe_file_format(trackname);
@@ -443,19 +447,31 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     if (!entry->parse_func)
     {
         DEBUGF("nothing to parse for %s (format %s)\n", trackname, entry->label);
-        return false;
+        success = false;
     }
-
-    if (!entry->parse_func(fd, id3))
+    else if (!entry->parse_func(fd, id3))
     {
         DEBUGF("parsing %s failed (format: %s)\n", trackname, entry->label);
-        return false;
+        success = false;
+        wipe_mp3entry(id3); /* ensure the mp3entry is clear */
     }
 
-    lseek(fd, 0, SEEK_SET);
-    strlcpy(id3->path, trackname, sizeof(id3->path));
-    /* We have successfully read the metadata from the file */
-    return true;
+    if ((flags & METADATA_CLOSE_FD_ON_EXIT))
+        close(fd);
+    else
+        lseek(fd, 0, SEEK_SET);
+
+    if (success && (flags & METADATA_EXCLUDE_ID3_PATH) == 0)
+    {
+        strlcpy(id3->path, trackname, sizeof(id3->path));
+    }
+    /* have we successfully read the metadata from the file? */
+    return success;
+}
+
+bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
+{
+    return get_metadata_ex(id3, fd, trackname, 0);
 }
 
 #define MOVE_ENTRY(x) if (x) x += offset;
