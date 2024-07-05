@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 //#define SD_DEBUG
 
 #include "system.h"
@@ -33,7 +33,7 @@
 #include "sdmmc.h"
 #endif
 #include "storage.h"
-#include "dma-target.h"     
+#include "dma-target.h"
 #include "system-target.h"
 #include "led-mini2440.h"
 
@@ -83,7 +83,7 @@ struct sd_card_status
     int retry_max;
 };
 
-/** static, private data **/ 
+/** static, private data **/
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -117,13 +117,13 @@ static struct mutex             sd_mtx SHAREDBSS_ATTR;
 static struct semaphore         transfer_completion_signal;
 static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
-static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
+static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE]
                         __attribute__((aligned(32)));
 static unsigned char *  uncached_buffer;
 
-static inline void mci_delay(void) 
-{ 
-    int i = 0xffff; 
+static inline void mci_delay(void)
+{
+    int i = 0xffff;
     while (i--)
         asm volatile ("nop\n");
 }
@@ -146,7 +146,7 @@ static void get_regs (unsigned *regs)
 {
     unsigned j;
     volatile unsigned long *sdi_reg = &SDICON;
-    
+
     for (j=0; j < 16;j++)
     {
         *regs++ = *sdi_reg++;
@@ -158,7 +158,7 @@ static void dump_regs (unsigned *regs1, unsigned *regs2)
     unsigned j;
     volatile unsigned long*sdi_reg = &SDICON;
     unsigned long diff;
-    
+
     for (j=0; j < 16;j++)
     {
         diff = *regs1 ^ *regs2;
@@ -174,23 +174,23 @@ static void dump_regs (unsigned *regs1, unsigned *regs2)
 static void debug_r1(int cmd)
 {
 #if defined(SD_DEBUG)
-    dbgprintf("CMD%2.2d:SDICSTA=%04x [%c%c%c%c%c-%c%c%c%c%c%c%c]  SDIRSP0=%08x [%d %s] \n", 
-        cmd, 
-        SDICSTA, 
-        (SDICSTA & S3C2410_SDICMDSTAT_CRCFAIL)    ? 'C' : ' ', 
-        (SDICSTA & S3C2410_SDICMDSTAT_CMDSENT)    ? 'S' : ' ', 
-        (SDICSTA & S3C2410_SDICMDSTAT_CMDTIMEOUT) ? 'T' : ' ', 
-        (SDICSTA & S3C2410_SDICMDSTAT_RSPFIN)     ? 'R' : ' ', 
-        (SDICSTA & S3C2410_SDICMDSTAT_XFERING)    ? 'X' : ' ', 
-        
-        (SDICSTA & 0x40)    ? 'P' : ' ', 
-        (SDICSTA & 0x20)    ? 'A' : ' ', 
-        (SDICSTA & 0x10)    ? 'E' : ' ', 
-        (SDICSTA & 0x08)    ? 'C' : ' ', 
-        (SDICSTA & 0x04)    ? 'I' : ' ', 
-        (SDICSTA & 0x02)    ? 'R' : ' ', 
-        (SDICSTA & 0x01)    ? 'Z' : ' ', 
-        
+    dbgprintf("CMD%2.2d:SDICSTA=%04x [%c%c%c%c%c-%c%c%c%c%c%c%c]  SDIRSP0=%08x [%d %s] \n",
+        cmd,
+        SDICSTA,
+        (SDICSTA & S3C2410_SDICMDSTAT_CRCFAIL)    ? 'C' : ' ',
+        (SDICSTA & S3C2410_SDICMDSTAT_CMDSENT)    ? 'S' : ' ',
+        (SDICSTA & S3C2410_SDICMDSTAT_CMDTIMEOUT) ? 'T' : ' ',
+        (SDICSTA & S3C2410_SDICMDSTAT_RSPFIN)     ? 'R' : ' ',
+        (SDICSTA & S3C2410_SDICMDSTAT_XFERING)    ? 'X' : ' ',
+
+        (SDICSTA & 0x40)    ? 'P' : ' ',
+        (SDICSTA & 0x20)    ? 'A' : ' ',
+        (SDICSTA & 0x10)    ? 'E' : ' ',
+        (SDICSTA & 0x08)    ? 'C' : ' ',
+        (SDICSTA & 0x04)    ? 'I' : ' ',
+        (SDICSTA & 0x02)    ? 'R' : ' ',
+        (SDICSTA & 0x01)    ? 'Z' : ' ',
+
         SDIRSP0,
         SD_R1_CURRENT_STATE(SDIRSP0),
         (SDIRSP0 & SD_R1_READY_FOR_DATA) ? "RDY " : "    "
@@ -205,8 +205,8 @@ void SDI (void)
     int status = SDIDSTA;
 #ifndef HAVE_MULTIDRIVE
     const int curr_card = 0;
-#endif     
-    
+#endif
+
     transfer_error[curr_card] = status
 #if 0
         & ( S3C2410_SDIDSTA_CRCFAIL | S3C2410_SDIDSTA_RXCRCFAIL |
@@ -217,7 +217,7 @@ void SDI (void)
     SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;  /* needed to clear int  */
 
     dbgprintf ("SDI %x\n", transfer_error[curr_card]);
-    
+
     semaphore_release(&transfer_completion_signal);
 
     /* Ack the interrupt */
@@ -229,13 +229,13 @@ void SDI (void)
 void dma_callback (void)
 {
     const int status = SDIDSTA;
-    
+
     transfer_error[0] = status & (S3C2410_SDIDSTA_CRCFAIL |
         S3C2410_SDIDSTA_RXCRCFAIL   |
         S3C2410_SDIDSTA_DATATIMEOUT );
 
     SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;  /* needed to clear int  */
-    
+
     dbgprintf ("dma_cb\n");
     semaphore_release(&transfer_completion_signal);
 }
@@ -248,14 +248,14 @@ static void init_sdi_controller(const int card_no)
 /*****************************************************************************/
 #ifdef MINI2440
     /* Specific to Mini2440 */
-    
+
     /* Enable pullups on SDCMD and SDDAT pins */
     S3C2440_GPIO_PULLUP (GPEUP, 6, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPEUP, 7, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPEUP, 8, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPEUP, 9, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPEUP, 10, GPIO_PULLUP_ENABLE);
-    
+
     /* Enable special function for SDCMD, SDCLK and SDDAT pins */
     S3C2440_GPIO_CONFIG (GPECON, 5, GPIO_FUNCTION);
     S3C2440_GPIO_CONFIG (GPECON, 6, GPIO_FUNCTION);
@@ -263,15 +263,15 @@ static void init_sdi_controller(const int card_no)
     S3C2440_GPIO_CONFIG (GPECON, 8, GPIO_FUNCTION);
     S3C2440_GPIO_CONFIG (GPECON, 9, GPIO_FUNCTION);
     S3C2440_GPIO_CONFIG (GPECON, 10, GPIO_FUNCTION);
-    
+
     /* Card Detect input */
     S3C2440_GPIO_CONFIG (GPGCON, 8, GPIO_INPUT);
     /* enable external irq 8-23 on the internal interrupt controller */
     INTMSK &= ~1<<5;
     /* enable GPG8 IRQ on the external interrupt controller */
     EINTMASK &= ~(1<<16);
-    
-    
+
+
     /* Write Protect input */
     S3C2440_GPIO_CONFIG (GPHCON, 8, GPIO_INPUT);
 /*****************************************************************************/
@@ -279,11 +279,11 @@ static void init_sdi_controller(const int card_no)
 #error Unsupported target
 #endif
 /*****************************************************************************/
-    
+
     /* About 400KHz for initial comms with card */
     SDIPRE   = PCLK / INITIAL_CLK - 1;
     /* Byte order=Type A (Little Endian), clock enable */
-    SDICON   = S3C2410_SDICON_CLOCKTYPE;       
+    SDICON   = S3C2410_SDICON_CLOCKTYPE;
     SDIFSTA  |= S3C2440_SDIFSTA_FIFORESET;
     SDIBSIZE = SD_BLOCK_SIZE;
     SDIDTIMER= 0x7fffff;      /* Set timeout count - max value */
@@ -297,11 +297,11 @@ static void init_sdi_controller(const int card_no)
     /* Enable interrupt in controller */
     bitclr32(&INTMOD, SDI_MASK);
     bitclr32(&INTMSK, SDI_MASK);
-    
-    SDIIMSK |= S3C2410_SDIIMSK_DATAFINISH 
+
+    SDIIMSK |= S3C2410_SDIIMSK_DATAFINISH
                | S3C2410_SDIIMSK_DATATIMEOUT
-               | S3C2410_SDIIMSK_DATACRC     
-               | S3C2410_SDIIMSK_CRCSTATUS   
+               | S3C2410_SDIIMSK_DATACRC
+               | S3C2410_SDIIMSK_CRCSTATUS
                | S3C2410_SDIIMSK_FIFOFAIL
                ;
 #endif
@@ -325,18 +325,18 @@ static bool send_cmd(const int card_no, const int cmd, const int arg,
     get_regs (reg_copy2);
     dump_regs (reg_copy, reg_copy2);
 #endif
-    
+
 #if 0
     while (SDICSTA & S3C2410_SDICMDSTAT_XFERING)
         ; /* wait ?? */
-#endif    
+#endif
     /* set up new command */
-    
+
     if (flags & MCI_ARG)
         SDICARG = arg;
     else
         SDICARG = 0;
-    
+
     val = cmd | S3C2410_SDICMDCON_CMDSTART | S3C2410_SDICMDCON_SENDERHOST;
     if(flags & MCI_RESP)
     {
@@ -344,27 +344,27 @@ static bool send_cmd(const int card_no, const int cmd, const int arg,
         if(flags & MCI_LONG_RESP)
             val |= S3C2410_SDICMDCON_LONGRSP;
     }
-    
+
     /* Clear command/data status flags */
     SDICSTA |= 0x0f << 9;
     SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;
-        
+
     /* Initiate the command */
     SDICCON = val;
-             
+
     if (flags & MCI_RESP)
     {
         /* wait for response or timeout */
-        do 
+        do
         {
             status = SDICSTA;
-        } while ( (status & (S3C2410_SDICMDSTAT_RSPFIN | 
+        } while ( (status & (S3C2410_SDICMDSTAT_RSPFIN |
                              S3C2410_SDICMDSTAT_CMDTIMEOUT) ) == 0);
         debug_r1(cmd);
         if (status & S3C2410_SDICMDSTAT_CMDTIMEOUT)
             ret = false;
         else if (status & (S3C2410_SDICMDSTAT_RSPFIN))
-        {   
+        {
             /* resp received */
             if(flags & MCI_LONG_RESP)
             {
@@ -381,10 +381,10 @@ static bool send_cmd(const int card_no, const int cmd, const int arg,
         else
             ret = true;
     }
-    else 
+    else
     {
         /* wait for command completion or timeout */
-        do 
+        do
         {
             status = SDICSTA;
         } while ( (status & (S3C2410_SDICMDSTAT_CMDSENT |
@@ -395,12 +395,12 @@ static bool send_cmd(const int card_no, const int cmd, const int arg,
         else
             ret = true;
     }
-    
+
     /* Clear Command status flags */
     SDICSTA |= 0x0f << 9;
-    
+
     mci_delay();
-    
+
     return ret;
 }
 
@@ -558,7 +558,7 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
     const int card_no = 0;
 #endif
     (void)card_no;
-    
+
     /* not applicable */
     dbgprintf ("sd_remov");
     return false;
@@ -596,7 +596,7 @@ static int sd_wait_for_state(const int card_no, unsigned int state)
     }
 }
 
-static int sd_transfer_sectors(int card_no, unsigned long start,
+static int sd_transfer_sectors(int card_no, sector_t start,
                                int count, void* buf, const bool write)
 {
     int ret = EC_OK;
@@ -636,7 +636,7 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
         void *dma_buf;
         const int cmd =
             write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
-        unsigned long start_addr = start;
+        sector_t start_addr = start;
 
         dma_buf = aligned_buffer;
         if(transfer > UNALIGNED_NUM_SECTORS)
@@ -650,10 +650,10 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
 
         /* TODO? */
         SDIFSTA = SDIFSTA | S3C2440_SDIFSTA_FIFORESET;
-        SDIDCON = S3C2440_SDIDCON_DS_WORD   | 
+        SDIDCON = S3C2440_SDIDCON_DS_WORD   |
                   S3C2410_SDIDCON_BLOCKMODE | S3C2410_SDIDCON_WIDEBUS |
                   S3C2410_SDIDCON_DMAEN     |
-                  S3C2440_SDIDCON_DATSTART  |  
+                  S3C2440_SDIDCON_DATSTART  |
                   ( transfer << 0);
         if (write)
             SDIDCON |= S3C2410_SDIDCON_TXAFTERRESP | S3C2410_SDIDCON_XFER_TXSTART;
@@ -665,6 +665,7 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
         INTPND = SDI_MASK;
 
         /* Initiate read/write command */
+        // XXX 64-bit
         if(!send_cmd(card_no, cmd, start_addr, MCI_ARG | MCI_RESP, NULL))
         {
             ret -= 3*20;
@@ -674,32 +675,32 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
         if(write)
         {
             request.source_addr    = dma_buf;
-            request.source_control = DISRCC_LOC_AHB | DISRCC_INC_AUTO;            
+            request.source_control = DISRCC_LOC_AHB | DISRCC_INC_AUTO;
             request.dest_addr      = &SDIDAT_LLE;
-            request.dest_control   = DISRCC_LOC_APB | DISRCC_INC_FIXED;            
+            request.dest_control   = DISRCC_LOC_APB | DISRCC_INC_FIXED;
             request.count          = transfer * SD_BLOCK_SIZE / sizeof(long);
             request.source_map     = DMA_SRC_MAP_SDI;
-            request.control        = DCON_DMD_HS | DCON_SYNC_APB |  
+            request.control        = DCON_DMD_HS | DCON_SYNC_APB |
                                      DCON_HW_SEL |
                                      DCON_NO_RELOAD | DCON_DSZ_WORD;
-            request.callback       = NULL;        
-            
+            request.callback       = NULL;
+
             dma_enable_channel(0, &request);
         }
         else
         {
             request.source_addr    = &SDIDAT_LLE;
-            request.source_control = DISRCC_LOC_APB | DISRCC_INC_FIXED;            
+            request.source_control = DISRCC_LOC_APB | DISRCC_INC_FIXED;
             request.dest_addr      = dma_buf;
-            request.dest_control   = DISRCC_LOC_AHB | DISRCC_INC_AUTO;            
+            request.dest_control   = DISRCC_LOC_AHB | DISRCC_INC_AUTO;
             request.count          = transfer * SD_BLOCK_SIZE / sizeof(long);
             request.source_map     = DMA_SRC_MAP_SDI;
-            request.control        = DCON_DMD_HS | DCON_SYNC_APB |  
+            request.control        = DCON_DMD_HS | DCON_SYNC_APB |
                                      DCON_HW_SEL |
                                      DCON_NO_RELOAD | DCON_DSZ_WORD;
-            request.callback       = NULL;        
-            
-            dma_enable_channel(0, &request); 
+            request.callback       = NULL;
+
+            dma_enable_channel(0, &request);
         }
 
 #if 0
@@ -716,12 +717,12 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
 #endif
 
         semaphore_wait(&transfer_completion_signal, 100 /*TIMEOUT_BLOCK*/);
-        
+
         /* wait for DMA to finish */
         while (DSTAT0 & DSTAT_STAT_BUSY)
             ;
-            
-#if 0        
+
+#if 0
         status = SDIDSTA;
         while ((status & (S3C2410_SDIDSTA_DATATIMEOUT|S3C2410_SDIDSTA_XFERFINISH)) == 0)
         {
@@ -738,10 +739,10 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
             count -= transfer;
             loops = 0;  /* reset errors counter */
         }
-        else 
+        else
         {
             dbgprintf ("SD transfer error : 0x%x\n", transfer_error[card_no]);
-                
+
             if(loops++ > MAX_TRANSFER_ERRORS)
             {
                 led_flash(LED1|LED2, LED3|LED4);
@@ -783,11 +784,11 @@ sd_transfer_error:
     return ret;
 }
 
-int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD(int card_no,) sector_t start, int incount,
                      void* inbuf)
 {
     int ret;
-  
+
 #ifdef HAVE_MULTIDRIVE
     dbgprintf ("sd_read %d %x %d\n", card_no, start, incount);
 #else
@@ -804,7 +805,7 @@ int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
 }
 
 /*****************************************************************************/
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
 #ifdef BOOTLOADER /* we don't need write support in bootloader */
@@ -835,7 +836,7 @@ void sd_enable(bool on)
 {
     dbgprintf ("sd_enable %d\n", on);
     /* TODO: enable/disable SDI clock */
-    
+
     if (sd_enabled == on)
         return; /* nothing to do */
     if (on)
@@ -847,14 +848,14 @@ void sd_enable(bool on)
         sd_enabled = false;
     }
 }
-    
+
 int sd_init(void)
 {
     int ret = EC_OK;
     dbgprintf ("\n==============================\n");
     dbgprintf ("             sd_init\n");
     dbgprintf ("==============================\n");
-    
+
     init_sdi_controller (0);
 #ifndef BOOTLOADER
     sd_enabled = true;
@@ -893,7 +894,7 @@ long sd_last_disk_activity(void)
 }
 
 tCardInfo *card_get_info_target(int card_no)
-{    
+{
     return &card_info[card_no];
 }
 

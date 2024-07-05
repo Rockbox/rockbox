@@ -126,8 +126,10 @@ void GIO2(void)
 
 #define VFAT_SECTOR_SIZE(x) ( (x)/0x8000 ) /* 1GB array requires 80kB of RAM */
 
-extern int ata_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
-extern int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
+extern int ata_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf);
+extern int ata_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf);
+
+// XXX 64-bit:   Due to this it's not likely that this target will ever handle 64-bit storage.
 
 struct main_header
 {
@@ -253,9 +255,9 @@ static void cfs_init(void)
     /* Read root inode */
     _ata_read_sectors(CFS_CLUSTER2CLUSTER(cfs->first_inode), 64, &sector2);
     root_inode = (struct cfs_inode*)&sector2;
-    
+
     logf("Root inode = 0x%x", root_inode);
-    
+
     logf("0x%x 0x%x", CFS_CLUSTER2CLUSTER(root_inode->first_class_chain[0]), root_inode->first_class_chain[0]);
 
     /* Read root inode's first sector */
@@ -277,9 +279,9 @@ static void cfs_init(void)
                 vfat_inode_nr = root_direntry_items[i].inode_number;
         }
     }
-    
+
     logf("VFAT inode = 0x%x", vfat_inode_nr);
-    
+
     if(vfat_inode_nr != 0)
     {
         /* Read VFAT inode */
@@ -384,19 +386,19 @@ static void cfs_init(void)
     cfs_inited = true;
 }
 
-static inline unsigned long map_sector(unsigned long sector)
+static inline sector_t map_sector(sector_t sector)
 {
     /*
      *  Sector mapping: start of CFS + FAT_SECTOR2CFS_SECTOR(sector) + missing part
      *  FAT works with sectors of 0x200 bytes, CFS with sectors of 0x8000 bytes.
      */
 #ifndef BOOTLOADER
-    unsigned long *sectors = core_get_data(sectors_handle);
+    sector_t *sectors = core_get_data(sectors_handle);
 #endif
     return cfs_start+sectors[sector/64]*64+sector%64;
 }
 
-int ata_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
+int ata_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
 {
     if(!cfs_inited)
         cfs_init();
@@ -423,7 +425,7 @@ int ata_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf
     }
 }
 
-int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
+int ata_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf)
 {
     if(!cfs_inited)
         cfs_init();

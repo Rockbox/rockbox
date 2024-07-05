@@ -23,6 +23,7 @@
 #define __MV_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "config.h"
 
 /* FixMe: These macros are a bit nasty and perhaps misplaced here.
@@ -39,6 +40,19 @@
 #define IF_MD_NONVOID(x...) void
 #define IF_MD_DRV(d)  0
 #endif /* HAVE_MULTIDRIVE */
+
+/* Storage size */
+#if (CONFIG_STORAGE & STORAGE_ATA) && defined(HAVE_LBA48)
+typedef uint64_t sector_t;
+#define STORAGE_64BIT_SECTOR
+#elif (CONFIG_STORAGE & STORAGE_SD) && defined(HAVE_SDUC)
+typedef uint64_t sector_t;
+#define STORAGE_64BIT_SECTOR
+#else
+typedef unsigned long sector_t;
+#undef STORAGE_64BIT_SECTOR
+#endif
+
 
 /* Volumes mean things that have filesystems on them, like partitions */
 #ifdef HAVE_MULTIVOLUME
@@ -113,7 +127,7 @@ struct volumeinfo
 /* Volume-centric functions (in disk.c) */
 void volume_recalc_free(IF_MV_NONVOID(int volume));
 unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume));
-void volume_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
+void volume_size(IF_MV(int volume,) sector_t *size, sector_t *free);
 #ifdef HAVE_DIRCACHE
 bool volume_ismounted(IF_MV_NONVOID(int volume));
 #endif

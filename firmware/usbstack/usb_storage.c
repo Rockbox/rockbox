@@ -114,6 +114,9 @@
 #define SCSI_REPORT_LUNS          0xa0
 #define SCSI_WRITE_BUFFER         0x3b
 
+#define SCSI_READ_16              0x88
+#define SCSI_WRITE_16             0x8a
+
 #define UMS_STATUS_GOOD            0x00
 #define UMS_STATUS_FAIL            0x01
 
@@ -273,7 +276,7 @@ static union {
 static char *cbw_buffer;
 
 static struct {
-    unsigned int sector;
+    sector_t sector;
     unsigned int count;
     unsigned int orig_count;
     unsigned int cur_cmd;
@@ -503,7 +506,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             if(dir==USB_DIR_IN) {
                 logf("IN received in RECEIVING");
             }
-            logf("scsi write %d %d", cur_cmd.sector, cur_cmd.count);
+            logf("scsi write %llu %d", cur_cmd.sector, cur_cmd.count);
             if(status==0) {
                 if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
                   && (unsigned int)length!=WRITE_BUFFER_SIZE) {
@@ -511,7 +514,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                     break;
                 }
 
-                unsigned int next_sector = cur_cmd.sector +
+                sector_t next_sector = cur_cmd.sector +
                              (WRITE_BUFFER_SIZE/SECTOR_SIZE);
                 unsigned int next_count = cur_cmd.count -
                              MIN(cur_cmd.count,WRITE_BUFFER_SIZE/SECTOR_SIZE);
@@ -739,12 +742,10 @@ static void send_and_read_next(void)
 
 static void handle_scsi(struct command_block_wrapper* cbw)
 {
-    /* USB Mass Storage assumes LBA capability.
-       TODO: support 48-bit LBA */
-
     struct storage_info info;
     unsigned int length = cbw->data_transfer_length;
-    unsigned int block_size, block_count;
+    sector_t block_count;
+    unsigned int block_size;
     bool lun_present=true;
     unsigned char lun = cbw->lun;
     unsigned int block_size_mult = 1;
@@ -888,6 +889,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     memset(tb.ms_data_10->block_descriptor.reserved,0,4);
                     memset(tb.ms_data_10->block_descriptor.num_blocks,0,8);
 
+#ifdef STORAGE_64BIT_SECTOR
+                    tb.ms_data_10->block_descriptor.num_blocks[2] =
+                        ((block_count/block_size_mult) & 0xff00000000ULL)>>40;
+                    tb.ms_data_10->block_descriptor.num_blocks[3] =
+                        ((block_count/block_size_mult) & 0x00ff000000ULL)>>32;
+#endif
                     tb.ms_data_10->block_descriptor.num_blocks[4] =
                         ((block_count/block_size_mult) & 0xff000000)>>24;
                     tb.ms_data_10->block_descriptor.num_blocks[5] =
@@ -1070,7 +1077,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                  cbw->command_block[8]);
             cur_cmd.orig_count = cur_cmd.count;
 
-            //logf("scsi read %d %d", cur_cmd.sector, cur_cmd.count);
+            logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
 
             if((cur_cmd.sector + cur_cmd.count) > block_count) {
                 send_csw(UMS_STATUS_FAIL);
@@ -1092,7 +1099,58 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_and_read_next();
             }
             break;
+#ifdef STORAGE_64BIT_SECTOR
+        case SCSI_READ_16:
+            logf("scsi read16 %d",lun);
+            if(!lun_present) {
+                send_command_failed_result();
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
+                break;
+            }
+            cur_cmd.data[0] = tb.transfer_buffer;
+            cur_cmd.data[1] = &tb.transfer_buffer[READ_BUFFER_SIZE];
+            cur_cmd.data_select=0;
+            cur_cmd.sector = block_size_mult *
+                 ((uint64_t)cbw->command_block[2] << 56 |
+                 (uint64_t)cbw->command_block[3] << 48 |
+                 (uint64_t)cbw->command_block[4] << 40 |
+                 (uint64_t)cbw->command_block[5] << 32 |
+                 cbw->command_block[6] << 24 |
+                 cbw->command_block[7] << 16 |
+                 cbw->command_block[8] << 8  |
+                 cbw->command_block[9]);
+            cur_cmd.count = block_size_mult *
+                (cbw->command_block[10] << 24 |
+                 cbw->command_block[11] << 16 |
+                 cbw->command_block[12] << 8 |
+                 cbw->command_block[13]);
+            cur_cmd.orig_count = cur_cmd.count;
 
+            logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
+
+            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+                cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
+                cur_sense_data.ascq=0;
+            }
+            else {
+#ifdef USB_USE_RAMDISK
+                memcpy(cur_cmd.data[cur_cmd.data_select],
+                        ramdisk_buffer + cur_cmd.sector*SECTOR_SIZE,
+                        MIN(READ_BUFFER_SIZE/SECTOR_SIZE,cur_cmd.count)*SECTOR_SIZE);
+#else
+                cur_cmd.last_result = storage_read_sectors(IF_MD(cur_cmd.lun,)
+                        cur_cmd.sector,
+                        MIN(READ_BUFFER_SIZE/SECTOR_SIZE, cur_cmd.count),
+                        cur_cmd.data[cur_cmd.data_select]);
+#endif
+                send_and_read_next();
+            }
+            break;
+#endif
         case SCSI_WRITE_10:
             logf("scsi write10 %d",lun);
             if(!lun_present) {
@@ -1127,6 +1185,48 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                         MIN(WRITE_BUFFER_SIZE, cur_cmd.count*SECTOR_SIZE));
             }
             break;
+#ifdef STORAGE_64BIT_SECTOR
+        case SCSI_WRITE_16:
+            logf("scsi write16 %d",lun);
+            if(!lun_present) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
+                break;
+            }
+            cur_cmd.data[0] = tb.transfer_buffer;
+            cur_cmd.data[1] = &tb.transfer_buffer[WRITE_BUFFER_SIZE];
+            cur_cmd.data_select=0;
+            cur_cmd.sector = block_size_mult *
+                ((uint64_t)cbw->command_block[2] << 56 |
+                 (uint64_t)cbw->command_block[3] << 48 |
+                 (uint64_t)cbw->command_block[4] << 40 |
+                 (uint64_t)cbw->command_block[5] << 32 |
+                 cbw->command_block[6] << 24 |
+                 cbw->command_block[7] << 16 |
+                 cbw->command_block[8] << 8  |
+                 cbw->command_block[9]);
+            cur_cmd.count = block_size_mult *
+                (cbw->command_block[10] << 24 |
+                 cbw->command_block[11] << 16 |
+                 cbw->command_block[12] << 8 |
+                 cbw->command_block[13]);
+            cur_cmd.orig_count = cur_cmd.count;
+
+            /* expect data */
+            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+                cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
+                cur_sense_data.ascq=0;
+            }
+            else {
+                receive_block_data(cur_cmd.data[0],
+                        MIN(WRITE_BUFFER_SIZE, cur_cmd.count*SECTOR_SIZE));
+            }
+            break;
+#endif
 
 #if CONFIG_RTC
         case SCSI_WRITE_BUFFER:

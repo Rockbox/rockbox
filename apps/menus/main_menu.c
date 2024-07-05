@@ -134,8 +134,8 @@ static int show_legal(void)
 struct info_data
 
 {
-    unsigned long size[NUM_VOLUMES];
-    unsigned long free[NUM_VOLUMES];
+    sector_t size[NUM_VOLUMES];
+    sector_t free[NUM_VOLUMES];
     unsigned long name[NUM_VOLUMES];
     bool new_data;
 };
@@ -162,16 +162,19 @@ enum infoscreenorder
 */
 static int refresh_data(struct info_data *info)
 {
-    int i = 0;
+#ifdef HAVE_MULTIVOLUME
 #ifdef HAVE_MULTIDRIVE
-    int drive;
     int max = -1;
-
+#endif
+    int drive = 0;
+    int i = 0;
     for (i = 0 ; CHECK_VOL(i) ; i++) {
 #endif
 	volume_size(IF_MV(i,) &info->size[i], &info->free[i]);
+#ifdef HAVE_MULTIVOLUME
 #ifdef HAVE_MULTIDRIVE
 	drive = volume_drive(i);
+#endif
 	if (drive > 0 || info->size[i] == 0)
 	    info->name[i] = LANG_DISK_NAME_MMC;
 	else
@@ -182,9 +185,12 @@ static int refresh_data(struct info_data *info)
 	    max = drive;
 	else if (drive < max)
 	    break;
+#elif defined(HAVE_MULTIVOLUME)
+        if (volume_partition(i) == -1)
+            break;
+#endif
+#ifdef HAVE_MULTIVOLUME
     }
-#else
-    i++;
 #endif
 
     info->new_data = false;

@@ -45,7 +45,7 @@ enum imx233_part_t
 /** The computation function can be called very early in the boot, at which point
  * usual storage read/write function may not be available. To workaround this
  * issue, one must provide a read function. */
-typedef int (*part_read_fn_t)(intptr_t user, unsigned long start, int count, void* buf);
+typedef int (*part_read_fn_t)(intptr_t user, sector_t start, int count, void* buf);
 /* Enable/Disable window computations for internal storage following the
  * Freescale/Creative convention */
 void imx233_partitions_enable_window(bool enable);
@@ -55,6 +55,6 @@ bool imx233_partitions_is_window_enabled(void);
  * for a whole disk, *end should be the size of the disk when the function is
  * called */
 int imx233_partitions_compute_window(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, unsigned *start, unsigned *end);
+    enum imx233_part_t part, sector_t *start, unsigned *end);
 
 #endif /* __PARTITIONS_IMX233__ */

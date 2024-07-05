@@ -139,7 +139,7 @@ const unsigned char * const unit_strings_core[] =
  * voiced.*/
 char *output_dyn_value(char *buf,
                        int buf_size,
-                       int value,
+                       int64_t value,
                        const unsigned char * const *units,
                        unsigned int unit_count,
                        bool binary_scale)
@@ -147,8 +147,9 @@ char *output_dyn_value(char *buf,
     unsigned int scale = binary_scale ? 1024 : 1000;
     unsigned int fraction = 0;
     unsigned int unit_no = 0;
-    unsigned int value_abs = (value < 0) ? -value : value;
+    uint64_t value_abs = (value < 0) ? -value : value;
     char tbuf[5];
+    int value2;
 
     while (value_abs >= scale && unit_no < (unit_count - 1))
     {
@@ -157,7 +158,7 @@ char *output_dyn_value(char *buf,
         unit_no++;
     }
 
-    value = (value < 0) ? -value_abs : value_abs; /* preserve sign */
+    value2 = (value < 0) ? -value_abs : value_abs; /* preserve sign */
     fraction = (fraction * 1000 / scale) / 10;
 
     if (value_abs >= 100 || fraction >= 100 || !unit_no)
@@ -170,10 +171,10 @@ char *output_dyn_value(char *buf,
     if (buf)
     {
         if (*tbuf)
-            snprintf(buf, buf_size, "%d%s%s%s", value, str(LANG_POINT),
+            snprintf(buf, buf_size, "%d%s%s%s", value2, str(LANG_POINT),
                      tbuf, P2STR(units[unit_no]));
         else
-            snprintf(buf, buf_size, "%d%s", value, P2STR(units[unit_no]));
+            snprintf(buf, buf_size, "%d%s", value2, P2STR(units[unit_no]));
     }
     else
     {
@@ -1851,7 +1852,7 @@ enum current_activity get_current_activity(void)
 * ** Extended error info truth table **
 *  [ Handle ][buf_reqd]
 *  [  > 0   ][  > 0   ] buf_reqd indicates how many bytes were used
-*  [ALOC_ERR][  > 0   ] buf_reqd indicates how many bytes are needed 
+*  [ALOC_ERR][  > 0   ] buf_reqd indicates how many bytes are needed
 *  [ALOC_ERR][READ_ERR] there was an error reading the file or it is empty
 */
 int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,

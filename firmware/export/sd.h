@@ -42,8 +42,8 @@ bool sd_disk_is_active(void);
 int  sd_soft_reset(void);
 int  sd_init(void) STORAGE_INIT_ATTR;
 void sd_close(void);
-int  sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
-int  sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
+int  sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf);
+int  sd_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf);
 void sd_spin(void);
 int  sd_spinup_time(void); /* ticks */
 
@@ -93,6 +93,7 @@ int sd_num_drives(int first_drive);
 #define SD_READ_SINGLE_BLOCK      17
 #define SD_READ_MULTIPLE_BLOCK    18
 #define SD_SEND_NUM_WR_BLOCKS     22  /* acmd22 */
+#define SD_UC_ADDRESS_EXTENSION   22
 #define SD_SET_WR_BLK_ERASE_COUNT 23  /* acmd23 */
 #define SD_WRITE_BLOCK            24
 #define SD_WRITE_MULTIPLE_BLOCK   25

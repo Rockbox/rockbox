@@ -648,7 +648,7 @@ int mmc_event(long id, intptr_t data)
 #endif /* CONFIG_STORAGE & STORAGE_MMC */
 
 /* low-level function, don't call directly! */
-static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
+static int __xfer_sectors(int drive, sector_t start, int count, void *buf, bool read)
 {
     uint32_t resp;
     int ret = 0;
@@ -660,7 +660,7 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
             need_stop = false;
         /* Set bank_start to the correct unit (blocks or bytes).
          * MMC drives use block addressing, SD cards bytes or blocks */
-        int bank_start = start;
+        sector_t bank_start = start;
         if(SDMMC_MODE(drive) == SD_MODE && !(SDMMC_INFO(drive).ocr & (1<<30)))   /* not SDHC */
             bank_start *= SD_BLOCK_SIZE;
         /* issue read/write
@@ -686,7 +686,7 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
     return ret;
 }
 
-static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
+static int transfer_sectors(int drive, sector_t start, int count, void *buf, bool read)
 {
     int ret = 0;
     /* the function doesn't work when count is 0 */
@@ -806,7 +806,7 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
 }
 
 /* user specifies the sdmmc drive */
-static int part_read_fn(intptr_t user, unsigned long start, int count, void* buf)
+static int part_read_fn(intptr_t user, sector_t start, int count, void* buf)
 {
     return transfer_sectors(user, start, count, buf, true);
 }
@@ -917,7 +917,7 @@ void sd_enable(bool on)
     (void) on;
 }
 
-int sd_read_sectors(IF_MD(int sd_drive,) unsigned long start, int count, void *buf)
+int sd_read_sectors(IF_MD(int sd_drive,) sector_t start, int count, void *buf)
 {
 #ifndef HAVE_MULTIDRIVE
     int sd_drive = 0;
@@ -925,7 +925,7 @@ int sd_read_sectors(IF_MD(int sd_drive,) unsigned long start, int count, void *b
     return transfer_sectors(sd_map[sd_drive], start, count, buf, true);
 }
 
-int sd_write_sectors(IF_MD(int sd_drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MD(int sd_drive,) sector_t start, int count, const void* buf)
 {
 #ifndef HAVE_MULTIDRIVE
     int sd_drive = 0;
@@ -1039,7 +1039,7 @@ int mmc_spinup_time(void)
     return 0;
 }
 
-int mmc_read_sectors(IF_MD(int mmc_drive,) unsigned long start, int count, void *buf)
+int mmc_read_sectors(IF_MD(int mmc_drive,) sector_t start, int count, void *buf)
 {
 #ifndef HAVE_MULTIDRIVE
     int mmc_drive = 0;
@@ -1047,7 +1047,7 @@ int mmc_read_sectors(IF_MD(int mmc_drive,) unsigned long start, int count, void 
     return transfer_sectors(mmc_map[mmc_drive], start, count, buf, true);
 }
 
-int mmc_write_sectors(IF_MD(int mmc_drive,) unsigned long start, int count, const void* buf)
+int mmc_write_sectors(IF_MD(int mmc_drive,) sector_t start, int count, const void* buf)
 {
 #ifndef HAVE_MULTIDRIVE
     int mmc_drive = 0;

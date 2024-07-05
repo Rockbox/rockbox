@@ -472,7 +472,7 @@ int os_modtime(const char *path, time_t modtime)
 
 int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize);
 
-void volume_size(IF_MV(int volume,) unsigned long *sizep, unsigned long *freep)
+void volume_size(IF_MV(int volume,) sector_t *sizep, sector_t *freep)
 {
     ULARGE_INTEGER free = { .QuadPart = 0 },
                    size = { .QuadPart = 0 };

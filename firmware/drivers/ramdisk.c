@@ -32,7 +32,7 @@ static unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
 static long last_disk_activity = -1;
 
 int ramdisk_read_sectors(IF_MD(int drive,)
-                     unsigned long start,
+                     sector_t start,
                      int count,
                      void* buf)
 {
@@ -48,7 +48,7 @@ int ramdisk_read_sectors(IF_MD(int drive,)
 }
 
 int ramdisk_write_sectors(IF_MD(int drive,)
-                      unsigned long start,
+                      sector_t start,
                       int count,
                       const void* buf)
 {
@@ -134,7 +134,7 @@ int ramdisk_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

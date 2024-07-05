@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "system.h"
 #include <string.h>
 #include "gcc_extensions.h"
@@ -97,7 +97,7 @@ struct sd_card_status
     int retry_max;
 };
 
-/** static, private data **/ 
+/** static, private data **/
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -123,7 +123,7 @@ static struct mutex             sd_mtx SHAREDBSS_ATTR;
 static struct semaphore         data_done SHAREDBSS_ATTR;
 static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
-static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
+static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE]
                         __attribute__((aligned(32)));
 
 static void sd_card_mux(int card_no)
@@ -397,7 +397,7 @@ static int sd_init_card(const int card_no)
                      SDHC_RESP_FMT_1, &currcard->rca);
     if (ret < 0)
     {
-        dbgprintf("SD_SEND_RELATIVE_ADDR failed"); 
+        dbgprintf("SD_SEND_RELATIVE_ADDR failed");
         return -1;
     }
 
@@ -559,7 +559,7 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 #ifdef HAVE_MULTIDRIVE
     (void)card_no;
 #endif
-    
+
     /* not applicable */
     return false;
 }
@@ -597,17 +597,17 @@ static int sd_wait_for_state(unsigned int state)
     }
 }
 
-static int sd_transfer_sectors(int card_no, unsigned long start,
+static int sd_transfer_sectors(int card_no, sector_t start,
                                int count, void *buffer, bool write)
 {
     int ret;
-    unsigned long start_addr;
+    sector_t start_addr;
     int dma_channel = -1;
     bool use_direct_dma;
     int count_per_dma;
     unsigned long rel_addr;
 
-    dbgprintf("transfer %d %d %d", card_no, start, count);
+    dbgprintf("transfer %d %lu %d", card_no, start, count);
     mutex_lock(&sd_mtx);
     enable_controller(true);
 
@@ -673,6 +673,7 @@ sd_transfer_retry:
         if (!(card_info[card_no].ocr & SD_OCR_CARD_CAPACITY_STATUS))
             start_addr *= SD_BLOCK_SIZE; /* not SDHC */
 
+        // XXX 64-bit
         ret = sd_command(write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK,
                          start_addr, MMC_CMD_DCLR | MMC_CMD_DATA |
                          SDHC_RESP_FMT_1 | (write ? MMC_CMD_WRITE : 0),
@@ -765,7 +766,7 @@ sd_transfer_error:
     }
 }
 
-int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD(int card_no,) sector_t start, int incount,
                      void* inbuf)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -774,7 +775,7 @@ int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
     return sd_transfer_sectors(card_no, start, incount, inbuf, false);
 }
 
-int sd_write_sectors(IF_MD(int card_no,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int card_no,) sector_t start, int count,
                       const void* outbuf)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -862,7 +863,7 @@ long sd_last_disk_activity(void)
 }
 
 tCardInfo *card_get_info_target(int card_no)
-{    
+{
     return &card_info[card_no];
 }
 

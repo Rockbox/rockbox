@@ -71,7 +71,7 @@ static const char *creative_part_name(enum imx233_part_t part)
 }
 
 static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, unsigned *start, unsigned *end)
+    enum imx233_part_t part, sector_t *start, unsigned *end)
 {
     uint8_t mblk[512];
     int ret = read_fn(user, MBLK_ADDR / 512, 1, mblk);

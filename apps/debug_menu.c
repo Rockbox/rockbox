@@ -557,14 +557,16 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
     if (!disk_partinfo(partition, &p))
         return buffer;
 
+    // XXX fix this up to use logical sector size
+    // XXX and if mounted, show free info...
     if (selected_item%2)
     {
-        snprintf(buffer, buffer_len, "   T:%x %ld MB", p.type,
-                 p.size / ( 2048 / ( SECTOR_SIZE / 512 )));
+        snprintf(buffer, buffer_len, "   T:%x %llu MB", p.type,
+                 (uint64_t)(p.size / ( 2048 / ( SECTOR_SIZE / 512 ))));
     }
     else
     {
-        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p.start);
+        snprintf(buffer, buffer_len, "P%d: S:%llx", partition, (uint64_t)p.start);
     }
     return buffer;
 }
@@ -572,7 +574,7 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
 static bool dbg_partitions(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Partition Info", NUM_DRIVES * 4, NULL);
+    simplelist_info_init(&info, "Partition Info", NUM_DRIVES * MAX_PARTITIONS_PER_DRIVE, NULL);
     info.selection_size = 2;
     info.scroll_all = true;
     info.get_name = dbg_partitions_getname;
@@ -1343,6 +1345,22 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     "R2W: *%d", card->r2w_factor);
 #if (CONFIG_STORAGE & STORAGE_SD)
             int csd_structure = card_extract_bits(card->csd, 127, 2);
+            const char *ver;
+            switch(csd_structure) {
+            case 0:
+                    ver = "1 (SD)";
+                    break;
+            case 1:
+                    ver = "2 (SDHC/SDXC)";
+                    break;
+            case 2:
+                    ver = "3 (SDUC)";
+                    break;
+            default:
+                    ver = "Unknown";
+                    break;
+            }
+            simplelist_addline("SDVer: %s\n", ver);
             if (csd_structure == 0) /* CSD version 1.0 */
 #endif
             {
@@ -1407,15 +1425,41 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     buf[8]=0;
     simplelist_addline(
              "Firmware: %s", buf);
-    snprintf(buf, sizeof buf, "%ld MB",
-             ((unsigned long)identify_info[61] << 16 |
-              (unsigned long)identify_info[60]) / 2048 );
+
+    uint64_t total_sectors = identify_info[60] | (identify_info[61] << 16);
+#ifdef HAVE_LBA48
+    if (identify_info[83] & 0x0400
+        && total_sectors == 0x0FFFFFFF)
+        total_sectors = identify_info[100] | (identify_info[101] << 16) | ((uint64_t)identify_info[102] << 32) | ((uint64_t)identify_info[103] << 48);
+#endif
+
+    uint32_t sector_size;
+
+    /* Logical sector size > 512B ? */
+    if ((identify_info[106] & 0xd000) == 0x5000)
+        sector_size = identify_info[117] | (identify_info[118] << 16);
+    else
+        sector_size = SECTOR_SIZE;
+
+    total_sectors *= sector_size;   /* Convert to bytes */
+    total_sectors /= (1024 * 1024); /* Convert to MB */
+
+    simplelist_addline("Size: %llu MB", total_sectors);
+    simplelist_addline("Logical sector size: %u B", sector_size);
+
+    if((identify_info[106] & 0xe000) == 0x6000)
+        sector_size *= BIT_N(identify_info[106] & 0x000f);
     simplelist_addline(
-             "Size: %s", buf);
-    unsigned long free;
+            "Physical sector size: %d B", sector_size);
+
+#ifndef HAVE_MULTIVOLUME
+    // XXX this needs to be fixed for multi-volume setups
+    sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
-             "Free: %ld MB", free / 1024);
+             "Free: %llu MB", free / 1024);
+#endif
+
     simplelist_addline("SSD detected: %s", ata_disk_isssd() ? "yes" : "no");
     simplelist_addline(
              "Spinup time: %d ms", storage_spinup_time() * (1000/HZ));
@@ -1452,11 +1496,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         simplelist_addline(
                  "No timing info");
     }
-    int sector_size = 512;
-    if((identify_info[106] & 0xe000) == 0x6000)
-        sector_size *= BIT_N(identify_info[106] & 0x000f);
-    simplelist_addline(
-            "Physical sector size: %d", sector_size);
+
 #ifdef HAVE_ATA_DMA
     if (identify_info[63] & (1<<0)) {
         simplelist_addline(
@@ -1751,8 +1791,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Model: %s", info.product);
     simplelist_addline("Firmware: %s", info.revision);
     simplelist_addline(
-             "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
-    unsigned long free;
+            "Size: %lld MB", (uint64_t)(info.num_sectors*(info.sector_size/512)/2048));
+    storage_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
@@ -1771,13 +1811,13 @@ static bool dbg_identify_info(void)
         const unsigned short *identify_info = ata_get_identify();
 #ifdef ROCKBOX_LITTLE_ENDIAN
         /* this is a pointer to a driver buffer so we can't modify it */
-        for (int i = 0; i < SECTOR_SIZE/2; ++i)
+        for (int i = 0; i < ATA_IDENTIFY_WORDS; ++i)
         {
             unsigned short word = swap16(identify_info[i]);
             write(fd, &word, 2);
         }
 #else
-        write(fd, identify_info, SECTOR_SIZE);
+        write(fd, identify_info, ATA_IDENTIFY_WORDS*2);
 #endif
         close(fd);
     }

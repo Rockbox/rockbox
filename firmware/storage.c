@@ -343,7 +343,7 @@ int storage_init(void)
     return rc;
 }
 
-int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count,
+int storage_read_sectors(IF_MD(int drive,) sector_t start, int count,
                          void* buf)
 {
 #ifdef CONFIG_STORAGE_MULTI
@@ -385,7 +385,7 @@ int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count,
 
 }
 
-int storage_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int storage_write_sectors(IF_MD(int drive,) sector_t start, int count,
                           const void* buf)
 {
 #ifdef CONFIG_STORAGE_MULTI

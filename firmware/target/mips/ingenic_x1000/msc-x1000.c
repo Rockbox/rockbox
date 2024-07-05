@@ -844,7 +844,7 @@ int msc_cmd_send_csd(msc_drv* d)
         d->cardinfo.csd[i] = req.response[i];
     sd_parse_csd(&d->cardinfo);
 
-    if((req.response[0] >> 30) == 1)
+    if(d->cardinfo.sd2plus)
         d->driver_flags |= MSC_DF_V2_CARD;
 
     return 0;

@@ -140,8 +140,8 @@ bool ata_disk_is_active(void);
 int ata_soft_reset(void);
 int ata_init(void) STORAGE_INIT_ATTR;
 void ata_close(void);
-int ata_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
-int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
+int ata_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf);
+int ata_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf);
 void ata_spin(void);
 #if (CONFIG_LED == LED_REAL)
 void ata_set_led_enabled(bool enabled);
@@ -232,5 +232,7 @@ int ata_read_smart(struct ata_smart_values*);
 #ifdef BOOTLOADER
 #define STORAGE_CLOSE
 #endif
+
+#define ATA_IDENTIFY_WORDS 256
 
 #endif /* __ATA_H__ */

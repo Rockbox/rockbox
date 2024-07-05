@@ -31,18 +31,18 @@
 
 /* This file provides only STUBS for now */
 
-/** static, private data **/ 
+/** static, private data **/
 static bool initialized = false;
 
 /* API Functions */
-int nand_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MD(int drive,) sector_t start, int incount,
                      void* inbuf)
 {
     (void)drive;
     return ftl_read(start, incount, inbuf);
 }
 
-int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
     (void)drive;
@@ -112,7 +112,7 @@ int nand_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

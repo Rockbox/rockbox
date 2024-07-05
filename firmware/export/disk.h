@@ -26,8 +26,8 @@
 
 struct partinfo
 {
-    unsigned long start; /* first sector (LBA) */
-    unsigned long size;  /* number of sectors */
+    sector_t start; /* first sector (LBA) */
+    sector_t size;  /* number of sectors */
     unsigned char type;
 };
 

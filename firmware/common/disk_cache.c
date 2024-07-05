@@ -71,12 +71,12 @@ struct disk_cache_entry
 #ifdef HAVE_MULTIVOLUME
     unsigned char volume;   /* volume of sector */
 #endif
-    unsigned long sector;   /* cached disk sector number */
+    sector_t sector;   /* cached disk sector number */
 };
 
 BITARRAY_TYPE_DECLARE(cache_map_entry_t, cache_map, DC_NUM_ENTRIES)
 
-static inline unsigned int map_sector(unsigned long sector)
+static inline unsigned int map_sector(sector_t sector)
 {
     /* keep sector hash simple for now */
     return sector % DC_MAP_NUM_ENTRIES;
@@ -172,7 +172,7 @@ static inline void cache_discard_entry(struct disk_cache_entry *dce,
 /* search the cache for the specified sector, returning a buffer, either
    to the specified sector, if it exists, or a new/evicted entry that must
    be filled */
-void * dc_cache_probe(IF_MV(int volume,) unsigned long sector,
+void * dc_cache_probe(IF_MV(int volume,) sector_t sector,
                       unsigned int *flagsp)
 {
     unsigned int mapnum = map_sector(sector);
@@ -200,7 +200,7 @@ void * dc_cache_probe(IF_MV(int volume,) unsigned long sector,
     if (old_flags)
     {
         int old_volume = IF_MV_VOL(dce->volume);
-        unsigned long sector = dce->sector;
+        sector_t sector = dce->sector;
         unsigned int old_mapnum = map_sector(sector);
 
         if (old_flags & DCE_DIRTY)

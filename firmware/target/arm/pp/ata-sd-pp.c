@@ -82,7 +82,7 @@
 #define STAT_TIME_OUT_RES     (1 << 1)
 #define STAT_TIME_OUT_READ    (1)
 #define STAT_ERROR_BITS       (0x3f)
- 
+
 /* MMC_CMDAT bits */
 /* Some of the bits used by the OF don't make much sense with these */
 /* definitions. So they're probably different between PXA and PP502x */
@@ -101,7 +101,7 @@
 #define CMDAT_RES_TYPE3    (3)
 #define CMDAT_RES_TYPE2    (2)
 #define CMDAT_RES_TYPE1    (1)
- 
+
 /* MMC_I_MASK bits */
 /* PP502x apparently only has bits 0-3 */
 #define I_MASK_SDIO_SUSPEND_ACK  (1 << 12)
@@ -499,18 +499,18 @@ static inline void copy_write_sectors(const unsigned char** buf)
     {
         asm volatile (
             "ldmia  %[buf]!, { r3, r5, r7, r9 } \r\n"
-            "mov    r4, r3, lsr #16             \r\n" 
-            "mov    r6, r5, lsr #16             \r\n" 
-            "mov    r8, r7, lsr #16             \r\n" 
-            "mov    r10, r9, lsr #16            \r\n" 
+            "mov    r4, r3, lsr #16             \r\n"
+            "mov    r6, r5, lsr #16             \r\n"
+            "mov    r8, r7, lsr #16             \r\n"
+            "mov    r10, r9, lsr #16            \r\n"
             "stmia  %[data], { r3-r10 }         \r\n"
             "ldmia  %[buf]!, { r3, r5, r7, r9 } \r\n"
-            "mov    r4, r3, lsr #16             \r\n" 
-            "mov    r6, r5, lsr #16             \r\n" 
-            "mov    r8, r7, lsr #16             \r\n" 
-            "mov    %[t], r9, lsr #16           \r\n" 
+            "mov    r4, r3, lsr #16             \r\n"
+            "mov    r6, r5, lsr #16             \r\n"
+            "mov    r8, r7, lsr #16             \r\n"
+            "mov    %[t], r9, lsr #16           \r\n"
             "stmia  %[data], { r3-r9 }          \r\n"
-            : [buf]"+&r"(*buf), [t]"=&r"(t) 
+            : [buf]"+&r"(*buf), [t]"=&r"(t)
             : [data]"r"(&MMC_DATA_FIFO)
             : "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"
         );
@@ -760,7 +760,7 @@ static void sd_init_device(int card_no)
         currcard->csd[i] = temp_reg[3-i];
 
     sd_parse_csd(currcard);
-    
+
     MMC_CLKRT = 0;  /* switch to highest clock rate */
 
     ret = sd_command(SD_SELECT_CARD, currcard->rca, NULL,
@@ -849,7 +849,7 @@ static void sd_select_device(int card_no)
 
 /* API Functions */
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int incount,
                      void* inbuf)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -857,8 +857,8 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
 #endif
     int ret;
     unsigned char *buf, *buf_end;
-    unsigned int bank;
-    
+    sector_t bank;
+
     /* TODO: Add DMA support. */
 
     mutex_lock(&sd_mtx);
@@ -894,7 +894,7 @@ sd_read_retry:
             if (ret < 0)
                 goto sd_read_error;
         }
-    
+
         start -= bank * BLOCKS_PER_BANK;
     }
 
@@ -903,6 +903,8 @@ sd_read_retry:
         goto sd_read_error;
 
     MMC_NUMBLK = incount;
+
+    // XXX 64-bit addresses..
 
 #ifdef HAVE_HOTSWAP
     if(currcard->ocr & (1<<30) )
@@ -966,7 +968,7 @@ sd_read_error:
     }
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */
@@ -1010,7 +1012,7 @@ sd_write_retry:
             if (ret < 0)
                 goto sd_write_error;
         }
-    
+
         start -= bank * BLOCKS_PER_BANK;
     }
 
@@ -1250,7 +1252,7 @@ int sd_num_drives(int first_drive)
 #else
     (void)first_drive;
 #endif
-    
+
 #ifdef HAVE_MULTIDRIVE
     return 2;
 #else

@@ -36,7 +36,7 @@ static inline void dc_unlock_cache(void)
     mutex_unlock(&disk_cache_mutex);
 }
 
-void * dc_cache_probe(IF_MV(int volume,) unsigned long secnum,
+void * dc_cache_probe(IF_MV(int volume,) sector_t secnum,
                       unsigned int *flags);
 void dc_dirty_buf(void *buf);
 void dc_discard_buf(void *buf);
@@ -46,7 +46,7 @@ void dc_discard_all(IF_MV_NONVOID(int volume));
 void dc_init(void) INIT_ATTR;
 
 /* in addition to filling, writeback is implemented by the client */
-extern void dc_writeback_callback(IF_MV(int volume, ) unsigned long sector,
+extern void dc_writeback_callback(IF_MV(int volume, ) sector_t sector,
                                   void *buf);
 
 

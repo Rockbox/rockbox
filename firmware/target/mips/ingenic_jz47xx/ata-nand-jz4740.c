@@ -84,7 +84,7 @@ struct nand_param
  *
  */
 
-static volatile unsigned long nand_address;
+static volatile sector_t nand_address;
 #define NAND_DATAPORT      (nand_address)
 #define NAND_ADDRPORT      (nand_address+0x10000)
 #define NAND_COMMPORT      (nand_address+0x08000)
@@ -111,7 +111,7 @@ static volatile unsigned long nand_address;
 static struct nand_info* chip_info = NULL;
 static struct nand_info* banks[4];
 static unsigned int nr_banks = 1;
-static unsigned long bank_size;
+static sector_t bank_size;
 static struct nand_param internal_param;
 static struct mutex nand_mtx;
 #ifdef USE_DMA
@@ -282,7 +282,7 @@ static void jz_rs_correct(unsigned char *dat, int idx, int mask)
 /*
  * Read oob
  */
-static int jz_nand_read_oob(unsigned long page_addr, unsigned char *buf, int size)
+static int jz_nand_read_oob(sector_t page_addr, unsigned char *buf, int size)
 {
     struct nand_param *nandp = &internal_param;
     int page_size, row_cycle, bus_width;
@@ -338,7 +338,7 @@ static int jz_nand_read_oob(unsigned long page_addr, unsigned char *buf, int siz
  *    page - page number within a block: 0, 1, 2, ...
  *    dst - pointer to target buffer
  */
-static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
+static int jz_nand_read_page(sector_t page_addr, unsigned char *dst)
 {
     struct nand_param *nandp = &internal_param;
     int page_size, oob_size;
@@ -611,7 +611,7 @@ int nand_init(void)
     return res;
 }
 
-static inline int read_sector(unsigned long start, unsigned int count,
+static inline int read_sector(sector_t start, unsigned int count,
                                void* buf, unsigned int chip_size)
 {
     register int ret;
@@ -627,14 +627,14 @@ static inline int read_sector(unsigned long start, unsigned int count,
     return ret;
 }
 
-int nand_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
+int nand_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive;
 #endif
     int ret = 0;
     unsigned int i, _count, chip_size = chip_info->page_size;
-    unsigned long _start;
+    sector_t _start;
 
     logf("start");
     mutex_lock(&nand_mtx);
@@ -670,7 +670,7 @@ int nand_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* bu
 }
 
 /* TODO */
-int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
+int nand_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf)
 {
     (void)start;
     (void)count;

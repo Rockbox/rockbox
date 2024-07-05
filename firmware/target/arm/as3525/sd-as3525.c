@@ -446,7 +446,7 @@ static int sd_init_card(const int drive)
     sd_parse_csd(&card_info[drive]);
 
 #if defined(HAVE_MULTIDRIVE)
-    hs_card = (card_info[drive].speed == 50000000);
+    hs_card = (card_info[drive].speed >= 50000000);
 #endif
 
     /* Boost MCICLK to operating speed */
@@ -455,7 +455,7 @@ static int sd_init_card(const int drive)
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
-        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED) | 
+        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED) |
                            MCI_CLOCK_POWERSAVE; /* SD supports powersave */
 #endif
 
@@ -680,7 +680,7 @@ static int sd_select_bank(signed char bank)
     return 0;
 }
 
-static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
+static int sd_transfer_sectors(IF_MD(int drive,) sector_t start,
                                int count, void* buf, const bool write)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -735,7 +735,8 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
         unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
         void *dma_buf;
 
-        unsigned long bank_start = start;
+        sector_t bank_start = start;
+        // XXX 64-bit sectors?
 
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
@@ -869,7 +870,7 @@ sd_transfer_error_nodma:
     return ret;
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count,
                      void* buf)
 {
     int ret;
@@ -881,11 +882,11 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
     return ret;
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
                      const void* buf)
 {
 #ifdef VERIFY_WRITE
-    unsigned long saved_start = start;
+    sector_t saved_start = start;
     int saved_count = count;
     void *saved_buf = (void*)buf;
 #endif

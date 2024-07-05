@@ -115,7 +115,7 @@ struct fat_filestr
 {
     struct fat_file *fatfilep;  /* common file information */
     long          lastcluster;  /* cluster of last access */
-    unsigned long lastsector;   /* sector of last access */
+    sector_t lastsector;   /* sector of last access */
     long          clusternum;   /* cluster number of last access */
     unsigned long sectornum;    /* sector number within current cluster */
     bool          eof;          /* end-of-file reached */
@@ -173,7 +173,7 @@ int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
 #endif /* MAX_LOG_SECTOR_SIZE */
 unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
 void fat_recalc_free(IF_MV_NONVOID(int volume));
-bool fat_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
+bool fat_size(IF_MV(int volume,) sector_t *size, sector_t *free);
 
 /** Misc. **/
 void fat_empty_fat_direntry(struct fat_direntry *entry);

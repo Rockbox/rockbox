@@ -173,9 +173,9 @@ union raw_dirent
 
 struct fsinfo
 {
-    unsigned long freecount; /* last known free cluster count */
-    unsigned long nextfree;  /* first cluster to start looking for free
-                                clusters, or 0xffffffff for no hint */
+    sector_t freecount; /* last known free cluster count */
+    sector_t nextfree;  /* first cluster to start looking for free
+                           clusters, or 0xffffffff for no hint */
 };
 /* fsinfo offsets */
 #define FSINFO_SIGNATURE 0
@@ -233,7 +233,7 @@ static struct bpb
     unsigned long totalsectors;
     unsigned long rootdirsector;
     unsigned long firstdatasector;
-    unsigned long startsector;
+    sector_t startsector;
     unsigned long dataclusters;
     unsigned long fatrgnstart;
     unsigned long fatrgnend;
@@ -241,8 +241,8 @@ static struct bpb
 #ifdef HAVE_FAT16SUPPORT
     unsigned int bpb_rootentcnt;    /* Number of dir entries in the root */
     /* internals for FAT16 support */
-    unsigned long rootdirsectornum; /* sector offset of root dir relative to start
-                                     * of first pseudo cluster */
+    sector_t rootdirsectornum; /* sector offset of root dir relative to start
+                                * of first pseudo cluster */
 #endif /* HAVE_FAT16SUPPORT */
 
     /** Additional information kept for each volume **/
@@ -329,7 +329,7 @@ static void cache_discard(IF_MV_NONVOID(struct bpb *fat_bpb))
 }
 
 /* caches a FAT or data area sector */
-static void * cache_sector(struct bpb *fat_bpb, unsigned long secnum)
+static void * cache_sector(struct bpb *fat_bpb, sector_t secnum)
 {
     unsigned int flags;
     void *buf = dc_cache_probe(IF_MV(fat_bpb->volume,) secnum, &flags);
@@ -340,8 +340,8 @@ static void * cache_sector(struct bpb *fat_bpb, unsigned long secnum)
                                       secnum + fat_bpb->startsector, 1, buf);
         if (UNLIKELY(rc < 0))
         {
-            DEBUGF("%s() - Could not read sector %ld"
-                   " (error %d)\n", __func__, secnum, rc);
+            DEBUGF("%s() - Could not read sector %llu"
+                   " (error %d)\n", __func__, (uint64_t)secnum, rc);
             dc_discard_buf(buf);
             return NULL;
         }
@@ -354,14 +354,14 @@ static void * cache_sector(struct bpb *fat_bpb, unsigned long secnum)
  * contents are NOT loaded before returning - use when completely overwriting
  * a sector's contents in order to avoid a fill */
 static void * cache_sector_buffer(IF_MV(struct bpb *fat_bpb,)
-                                  unsigned long secnum)
+                                  sector_t secnum)
 {
     unsigned int flags;
     return dc_cache_probe(IF_MV(fat_bpb->volume,) secnum, &flags);
 }
 
 /* flush a cache buffer to storage */
-void dc_writeback_callback(IF_MV(int volume,) unsigned long sector, void *buf)
+void dc_writeback_callback(IF_MV(int volume,) sector_t sector, void *buf)
 {
     struct bpb * const fat_bpb = &fat_bpbs[IF_MV_VOL(volume)];
     unsigned int copies = !IS_FAT_SECTOR(fat_bpb, sector) ?
@@ -374,8 +374,8 @@ void dc_writeback_callback(IF_MV(int volume,) unsigned long sector, void *buf)
         int rc = storage_write_sectors(IF_MD(fat_bpb->drive,) sector, 1, buf);
         if (rc < 0)
         {
-            panicf("%s() - Could not write sector %ld"
-                   " (error %d)\n", __func__, sector, rc);
+            panicf("%s() - Could not write sector %llu"
+                   " (error %d)\n", __func__, (uint64_t)sector, rc);
         }
 
         if (--copies == 0)
@@ -2397,12 +2397,12 @@ unsigned long fat_query_sectornum(const struct fat_filestr *filestr)
 }
 
 /* helper for fat_readwrite */
-static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
+static long transfer(struct bpb *fat_bpb, sector_t start, long count,
                      char *buf, bool write)
 {
     long rc = 0;
 
-    DEBUGF("%s(s=%lx, c=%lx, wr=%u)\n", __func__,
+    DEBUGF("%s(s=%llx, c=%lx, wr=%u)\n", __func__,
            start + fat_bpb->startsector, count, write ? 1 : 0);
 
     if (write)
@@ -2416,12 +2416,12 @@ static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
             firstallowed = fat_bpb->firstdatasector;
 
         if (start < firstallowed)
-            panicf("Write %ld before data\n", firstallowed - start);
+            panicf("Write %llu before data\n", (uint64_t)(firstallowed - start));
 
         if (start + count > fat_bpb->totalsectors)
         {
-            panicf("Write %ld after data\n",
-                   start + count - fat_bpb->totalsectors);
+            panicf("Write %llu after data\n",
+                   (uint64_t)(start + count - fat_bpb->totalsectors));
         }
     }
 
@@ -2487,14 +2487,14 @@ long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
     long rc;
 
     long          cluster    = filestr->lastcluster;
-    unsigned long sector     = filestr->lastsector;
+    sector_t sector     = filestr->lastsector;
     long          clusternum = filestr->clusternum;
     unsigned long sectornum  = filestr->sectornum;
 
     DEBUGF("%s(file:%lx,count:0x%lx,buf:%lx,%s)\n", __func__,
            file->firstcluster, sectorcount, (long)buf,
            write ? "write":"read");
-    DEBUGF("%s: sec:%lx numsec:%ld eof:%d\n", __func__,
+    DEBUGF("%s: sec:%llx numsec:%ld eof:%d\n", __func__,
            sector, (long)sectornum, eof ? 1 : 0);
 
     eof = false;
@@ -2534,7 +2534,7 @@ long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
 
     unsigned long transferred = 0;
     unsigned long count = 0;
-    unsigned long last = sector;
+    sector_t last = sector;
 
     while (transferred + count < sectorcount)
     {
@@ -2961,7 +2961,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     dc_unlock_cache();
 }
 
-bool fat_size(IF_MV(int volume,) unsigned long *size, unsigned long *free)
+bool fat_size(IF_MV(int volume,) sector_t *size, sector_t *free)
 {
     struct bpb * const fat_bpb = FAT_BPB(volume);
     if (!fat_bpb)

@@ -677,7 +677,7 @@ int sd_init(void)
     return 0;
 }
 
-static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
+static int sd_transfer_sectors(IF_MD(int drive,) sector_t start,
                                 int count, void* buf, bool write)
 {
     unsigned long response;
@@ -776,7 +776,7 @@ retry_with_reinit:
 
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
-        int arg = start;
+        sector_t arg = start;  // XXX 64-bit
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
             arg *= SD_BLOCK_SIZE;
 
@@ -858,13 +858,13 @@ exit:
     return ret;
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count,
                     void* buf)
 {
     return sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
                      const void* buf)
 {
     return sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);

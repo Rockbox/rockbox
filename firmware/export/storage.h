@@ -107,7 +107,7 @@ int ramdisk_event(long id, intptr_t data);
 struct storage_info
 {
     unsigned int sector_size;
-    unsigned int num_sectors;
+    sector_t num_sectors;
     char *vendor;
     char *product;
     char *revision;
@@ -318,6 +318,6 @@ int storage_driver_type(int drive);
 
 #endif /* NOT CONFIG_STORAGE_MULTI and NOT SIMULATOR*/
 
-int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
-int storage_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
+int storage_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf);
+int storage_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf);
 #endif

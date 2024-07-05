@@ -58,10 +58,9 @@
 #define CEATA_DAT_NONBUSY_TIMEOUT 5000000
 #define CEATA_MMC_RCA 1
 
-
 /** static, private data **/
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
-static uint16_t ata_identify_data[0x100] STORAGE_ALIGN_ATTR;
+static uint16_t ata_identify_data[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
 static bool ceata;
 static bool ata_lba48;
 static bool ata_dma;
@@ -510,7 +509,7 @@ static int ata_identify(uint16_t* buf)
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_CSD, CMD_IDENTIFY);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 1, 1);
-        for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
+        for (i = 0; i < ATA_IDENTIFY_WORDS; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
     }
     return 0;
 }
@@ -701,7 +700,7 @@ static int ata_power_up(void)
                             | (((uint64_t)ata_identify_data[103]) << 48);
     else
         ata_total_sectors = ata_identify_data[60] | (((uint32_t)ata_identify_data[61]) << 16);
-    ata_total_sectors >>= 3;
+    ata_total_sectors >>= 3; /* ie SECTOR_SIZE/512. */
     ata_powered = true;
     ata_set_active();
     return 0;
@@ -966,7 +965,7 @@ static int ata_reset(void)
     return rc;
 }
 
-int ata_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
+int ata_read_sectors(IF_MD(int drive,) sector_t start, int incount,
                      void* inbuf)
 {
     mutex_lock(&ata_mutex);
@@ -975,7 +974,7 @@ int ata_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
     return rc;
 }
 
-int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int ata_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
     mutex_lock(&ata_mutex);

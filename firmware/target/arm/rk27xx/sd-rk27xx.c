@@ -453,7 +453,7 @@ static inline void write_sd_data(unsigned char **src)
     *src += 512;
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count,
                     void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
@@ -497,6 +497,8 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                        DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                        DATA_XFER_MULTI;
         }
+
+        // XXX 64-bit
 
         /* issue read command to the card */
         if (!send_cmd(SD_READ_MULTIPLE_BLOCK, start, RES_R1, &response))
@@ -576,7 +578,7 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
 }
 
 /* Not tested */
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
                      const void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
@@ -620,6 +622,7 @@ int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
 
         write_sd_data(&src); /* put data into transfer buffer */
 
+        // XXX 64-bit
         if (!send_cmd(SD_WRITE_MULTIPLE_BLOCK, start, RES_R1, &response))
         {
             ret = -3;

@@ -51,7 +51,7 @@ static int sd_init_card(msc_drv* d)
 }
 
 static int sd_transfer(msc_drv* d, bool write,
-                       unsigned long start, int count, void* buf)
+                       sector_t start, int count, void* buf)
 {
     int status = -1;
 
@@ -114,6 +114,7 @@ static int sd_transfer(msc_drv* d, bool write,
                                           : SD_READ_MULTIPLE_BLOCK;
         }
 
+        // XXX 64-bit
         if(d->driver_flags & MSC_DF_V2_CARD)
             req.argument = start;
         else
@@ -142,14 +143,14 @@ static int sd_transfer(msc_drv* d, bool write,
     return status;
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start,
+int sd_read_sectors(IF_MD(int drive,) sector_t start,
                     int count, void* buf)
 {
     return sd_transfer(sd_to_msc[IF_MD_DRV(drive)], false,
                        start, count, buf);
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start,
+int sd_write_sectors(IF_MD(int drive,) sector_t start,
                      int count, const void* buf)
 {
     return sd_transfer(sd_to_msc[IF_MD_DRV(drive)], true,

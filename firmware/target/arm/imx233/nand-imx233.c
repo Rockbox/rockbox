@@ -36,13 +36,13 @@ int nand_init(void)
 {
     return -1;
 }
-int nand_read_sectors(IF_MD(int drive,) unsigned long start, int count,
+int nand_read_sectors(IF_MD(int drive,) sector_t start, int count,
                      void* buf)
 {
     return -1;
 }
 
-int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD(int drive,) sector_t start, int count,
                      const void* buf)
 {
     return -1;

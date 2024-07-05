@@ -172,6 +172,8 @@ bool disk_init(IF_MD_NONVOID(int drive))
 	    }
 	}
 
+        // XXX backup GPT header at final LBA of drive...
+
 	while (is_gpt) {
 	    /* Re-start partition parsing using GPT */
 	    uint64_t part_lba;
@@ -243,20 +245,24 @@ reload:
                     goto skip; /* Any flag makes us ignore this */
                 }
                 tmp = BYTES2INT64(pptr, 32); /* FIRST LBA */
-                if (tmp > UINT32_MAX) { // XXX revisit when we resize struct partinfo!
-                    DEBUGF("GPT: partition starts after 2GiB mark\n");
+#ifndef STORAGE_64BIT_SECTOR
+                if (tmp > UINT32_MAX) {
+                    DEBUGF("GPT: partition starts after 2TiB mark\n");
                     goto skip;
                 }
+#endif
                 if (tmp < 34) {
                     DEBUGF("GPT: Invalid start LBA\n");
                     goto skip;
                 }
                 pinfo[part].start = tmp;
                 tmp = BYTES2INT64(pptr, 40); /* LAST LBA */
-                if (tmp > UINT32_MAX) { // XXX revisit when we resize struct partinfo!
-                    DEBUGF("GPT: partition ends after 2GiB mark\n");
+#ifndef STORAGE_64BIT_SECTOR
+                if (tmp > UINT32_MAX) {
+                    DEBUGF("GPT: partition ends after 2TiB mark\n");
                     goto skip;
                 }
+#endif
                 if (tmp <= pinfo[part].start) {
                     DEBUGF("GPT: Invalid end LBA\n");
                     goto skip;
@@ -264,7 +270,7 @@ reload:
                 pinfo[part].size = tmp - pinfo[part].start + 1;
                 pinfo[part].type = PARTITION_TYPE_FAT32_LBA;
 
-                DEBUGF("GPart%d: start: %08lx size: %08lx\n",
+                DEBUGF("GPart%d: start: %016lx size: %016lx\n",
                        part,pinfo[part].start,pinfo[part].size);
                 part++;
 
@@ -499,13 +505,13 @@ unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume))
     return clustersize;
 }
 
-void volume_size(IF_MV(int volume,) unsigned long *sizep, unsigned long *freep)
+void volume_size(IF_MV(int volume,) sector_t *sizep, sector_t *freep)
 {
     disk_reader_lock();
 
     if (!CHECK_VOL(volume) || !fat_size(IF_MV(volume,) sizep, freep))
     {
-        if (freep) *sizep = 0;
+        if (sizep) *sizep = 0;
         if (freep) *freep = 0;
     }
 

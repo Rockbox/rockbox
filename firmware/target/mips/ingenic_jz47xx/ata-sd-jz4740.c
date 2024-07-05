@@ -42,7 +42,6 @@ static struct mutex       sd_mtx;
 
 static int                use_4bit;
 static int                num_6;
-static int                sd2_0;
 
 //#define SD_DMA_ENABLE
 #define SD_DMA_INTERRUPT 0
@@ -598,7 +597,7 @@ static int jz_sd_transmit_data(struct sd_request *req)
 static inline unsigned int jz_sd_calc_clkrt(unsigned int rate)
 {
     unsigned int clkrt;
-    unsigned int clk_src = sd2_0 ? SD_CLOCK_HIGH : SD_CLOCK_FAST;
+    unsigned int clk_src = card.sd2plus ? SD_CLOCK_HIGH : SD_CLOCK_FAST;
 
     clkrt = 0;
     while (rate < clk_src)
@@ -716,7 +715,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
             events = SD_EVENT_RX_DATA_DONE;
             break;
 
-        case 6:
+        case SD_SWITCH_FUNC:
             if (num_6 < 2)
             {
 #if defined(SD_DMA_ENABLE)
@@ -1086,7 +1085,6 @@ static int sd_init_card_state(struct sd_request *request)
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             sd_parse_csd(&card);
-            sd2_0 = (card_extract_bits(card.csd, 127, 2) == 1);
 
             logf("CSD: %08lx%08lx%08lx%08lx", card.csd[0], card.csd[1], card.csd[2], card.csd[3]);
             DEBUG("SD card is ready");
@@ -1155,7 +1153,7 @@ static int sd_select_card(void)
     if (retval)
         return retval;
 
-    if (sd2_0)
+    if (card.sd2plus)
     {
         retval = sd_read_switch(&request);
         if (!retval)
@@ -1188,7 +1186,6 @@ static int __sd_init_device(void)
     /* Initialise card data as blank */
     memset(&card, 0, sizeof(tCardInfo));
 
-    sd2_0 = 0;
     num_6 = 0;
     use_4bit = 0;
 
@@ -1250,7 +1247,7 @@ static inline void sd_stop_transfer(void)
     mutex_unlock(&sd_mtx);
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive;
@@ -1276,7 +1273,8 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
-    if (sd2_0)
+    // XXX 64-bit
+    if (card.sd2plus)
     {
         sd_send_cmd(&request, SD_READ_MULTIPLE_BLOCK, start,
                      count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
@@ -1292,19 +1290,18 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
             goto err;
     }
 
-    last_disk_activity = current_tick;
-
     sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
 err:
+    last_disk_activity = current_tick;
     sd_stop_transfer();
 
     return retval;
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive;
@@ -1330,7 +1327,8 @@ int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const voi
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
-    if (sd2_0)
+    // XXX 64-bit
+    if (card.sd2plus)
     {
         sd_send_cmd(&request, SD_WRITE_MULTIPLE_BLOCK, start,
                  count, SD_BLOCK_SIZE, RESPONSE_R1,

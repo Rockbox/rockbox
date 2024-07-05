@@ -49,6 +49,13 @@ void sd_parse_csd(tCardInfo *card)
         c_size = card_extract_bits(card->csd, 69, 22) + 1;
         card->numblocks = c_size << 10;
     }
+    else if(csd_version == 2)
+    {
+        /* CSD version 3.0 */
+        c_size = card_extract_bits(card->csd, 75, 28) + 1;
+        card->numblocks = c_size << 10;
+    }
+    card->sd2plus = csd_version >= 1;
 
     card->blocksize = 512;  /* Always use 512 byte blocks */
 
@@ -62,7 +69,9 @@ void sd_parse_csd(tCardInfo *card)
 
     card->r2w_factor = card_extract_bits(card->csd, 28, 3);
 
-    logf("CSD%d.0 numblocks:%ld speed:%ld", csd_version+1, card->numblocks, card->speed);
+
+
+    logf("CSD%d.0 numblocks:%lld speed:%ld", csd_version+1, card->numblocks, card->speed);
     logf("nsac: %d taac: %ld r2w: %d", card->nsac, card->taac, card->r2w_factor);
 }
 
@@ -99,4 +108,3 @@ void sd_get_info(IF_MD(int drive,) struct storage_info *info)
     info->revision="0.00";
 }
 #endif
-

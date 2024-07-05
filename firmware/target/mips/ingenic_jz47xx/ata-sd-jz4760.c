@@ -57,8 +57,6 @@ static struct semaphore   sd_wakeup[NUM_DRIVES];
 
 static int                use_4bit[NUM_DRIVES];
 static int                num_6[NUM_DRIVES];
-static int                sd2_0[NUM_DRIVES];
-
 
 //#define DEBUG(x...)         logf(x)
 #define DEBUG(x, ...)
@@ -698,7 +696,7 @@ static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
     unsigned int clkrt = 0;
     unsigned int clk_src = cpu_frequency / __cpm_get_mscdiv(); /* MSC_CLK */
 
-    if (!sd2_0[drive] && rate > SD_CLOCK_FAST)
+    if (!card[drive].sd2plus && rate > SD_CLOCK_FAST)
         rate = SD_CLOCK_FAST;
 
     while (rate < clk_src)
@@ -1192,7 +1190,6 @@ static int sd_init_card_state(const int drive, struct sd_request *request)
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             sd_parse_csd(&card[drive]);
-            sd2_0[drive] = (card_extract_bits(card[drive].csd, 127, 2) == 1);
 
             logf("CSD: %08lx%08lx%08lx%08lx", card[drive].csd[0], card[drive].csd[1], card[drive].csd[2], card[drive].csd[3]);
             DEBUG("SD card is ready");
@@ -1261,7 +1258,7 @@ static int sd_select_card(const int drive)
     if (retval)
         return retval;
 
-    if (sd2_0[drive])
+    if (card[drive].sd2plus)
     {
         retval = sd_read_switch(drive, &request);
         if (!retval)
@@ -1292,7 +1289,6 @@ static int __sd_init_device(const int drive)
     /* Initialise card data as blank */
     memset(&card[drive], 0, sizeof(tCardInfo));
 
-    sd2_0[drive] = 0;
     num_6[drive] = 0;
     use_4bit[drive] = 0;
     active[drive] = 0;
@@ -1402,7 +1398,7 @@ static inline void sd_stop_transfer(const int drive)
     mutex_unlock(&sd_mtx[drive]);
 }
 
-int sd_transfer_sectors(IF_MD(const int drive,) unsigned long start, int count, void* buf, bool write)
+int sd_transfer_sectors(IF_MD(const int drive,) sector_t start, int count, void* buf, bool write)
 {
     struct sd_request request;
     struct sd_response_r1 r1;
@@ -1427,11 +1423,12 @@ int sd_transfer_sectors(IF_MD(const int drive,) unsigned long start, int count, 
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
+    // XXX 64-bit
     sd_send_cmd(drive, &request,
                 (count > 1) ?
                 (write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK) :
                 (write ? SD_WRITE_BLOCK : SD_READ_SINGLE_BLOCK),
-                sd2_0[drive] ? start : (start * SD_BLOCK_SIZE),
+                card[drive].sd2plus ? start : (start * SD_BLOCK_SIZE),
                 count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
@@ -1451,12 +1448,12 @@ err:
     return retval;
 }
 
-int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
 {
   return sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
 }
 
-int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf)
 {
   return sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);
 }

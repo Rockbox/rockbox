@@ -649,7 +649,7 @@ struct plugin_api {
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
     char* (*strtok_r)(char *ptr, const char *sep, char **end);
-    char* (*output_dyn_value)(char *buf, int buf_size, int value,
+    char* (*output_dyn_value)(char *buf, int buf_size, int64_t value,
                               const unsigned char * const *units,
                               unsigned int unit_count, bool binary_scale);
     /* unicode stuff */
