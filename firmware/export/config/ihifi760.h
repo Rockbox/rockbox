@@ -57,8 +57,6 @@
 
 /* commented for now */
 /* #define HAVE_HOTSWAP */
-
-#define NUM_DRIVES 1
 #define SECTOR_SIZE 512
 
 /* for small(ish) SD cards */

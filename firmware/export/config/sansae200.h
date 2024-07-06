@@ -181,7 +181,6 @@
 #define CONFIG_LCD LCD_X5
 
 #define HAVE_MULTIDRIVE
-//#define HAVE_MULTIVOLUME
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP /* required to access sd from bootloader */
 

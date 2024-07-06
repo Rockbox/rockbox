@@ -38,8 +38,7 @@
 /* define the storage type */
 #define CONFIG_STORAGE STORAGE_SD
 
-#define HAVE_MULTIDRIVE
-#define NUM_DRIVES 1 // no access to NAND yet
+#define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP
 #define HAVE_HOTSWAP_STORAGE_AS_MAIN
 #define INCLUDE_TIMEOUT_API

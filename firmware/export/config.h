@@ -868,6 +868,18 @@ Lyre prototype 1 */
 #define CONFIG_STORAGE_MULTI
 #endif
 
+#if !defined(HAVE_MULTIVOLUME)
+#if defined(HAVE_MULTIDRIVE)
+/* Multidrive strongly implies multivolume */
+#define HAVE_MULTIVOLUME
+#elif (CONFIG_STORAGE & STORAGE_SD)
+/* SD routinely have multiple partitions */
+#elif (CONFIG_STORAGE & STORAGE_ATA) && defined(HAVE_LBA48)
+/* ATA routinely haves multiple partitions, but don't bother if we can't do LBA48 */
+#define HAVE_MULTIVOLUME
+#endif
+#endif
+
 /* Explicit HAVE_MULTIVOLUME in the config file. Allow the maximum number */
 #ifdef HAVE_MULTIVOLUME
 #define NUM_VOLUMES_PER_DRIVE 4
@@ -876,10 +888,6 @@ Lyre prototype 1 */
 #endif
 #if defined(CONFIG_STORAGE_MULTI) && !defined(HAVE_MULTIDRIVE)
 #define HAVE_MULTIDRIVE
-#endif
-
-#if defined(HAVE_MULTIDRIVE) && !defined(HAVE_MULTIVOLUME)
-#define HAVE_MULTIVOLUME
 #endif
 
 #if defined(HAVE_MULTIDRIVE) && !defined(NUM_DRIVES)
