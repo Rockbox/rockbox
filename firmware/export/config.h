@@ -892,6 +892,11 @@ Lyre prototype 1 */
 #endif
 #endif
 
+/* Bootloaders don't need multivolume awareness */
+#if defined(BOOTLOADER) && defined(HAVE_MULTIVOLUME)
+#undef HAVE_MULTIVOLUME
+#endif
+
 /* Explicit HAVE_MULTIVOLUME in the config file. Allow the maximum number */
 #ifdef HAVE_MULTIVOLUME
 #define NUM_VOLUMES_PER_DRIVE 4
