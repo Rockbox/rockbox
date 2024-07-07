@@ -187,6 +187,9 @@ long sd_last_disk_activity(void)
 
 bool sd_present(IF_MD_NONVOID(int drive))
 {
+#ifndef HAVE_MULTIDRIVE
+    int drive = 0;
+#endif
     /* Seems that volume_properties() in firmware/common/disk.c may pass
      * drive = -1 when the SD card is not inserted, so just return false.
      */
@@ -198,6 +201,10 @@ bool sd_present(IF_MD_NONVOID(int drive))
 
 bool sd_removable(IF_MD_NONVOID(int drive))
 {
+#ifndef HAVE_MULTIDRIVE
+    int drive = 0;
+#endif
+
     /* Same reason as sd_present() */
     if(drive < 0)
         return false;

@@ -868,6 +868,18 @@ Lyre prototype 1 */
 #define CONFIG_STORAGE_MULTI
 #endif
 
+#if defined(CONFIG_STORAGE_MULTI) && !defined(HAVE_MULTIDRIVE)
+#define HAVE_MULTIDRIVE
+#endif
+
+#if defined(HAVE_MULTIDRIVE) && !defined(NUM_DRIVES)
+#error HAVE_MULTIDRIVE needs to have an explicit NUM_DRIVES
+#endif
+
+#ifndef NUM_DRIVES
+#define NUM_DRIVES 1
+#endif
+
 #if !defined(HAVE_MULTIVOLUME)
 #if defined(HAVE_MULTIDRIVE)
 /* Multidrive strongly implies multivolume */
@@ -886,13 +898,6 @@ Lyre prototype 1 */
 #else
 #define NUM_VOLUMES_PER_DRIVE 1
 #endif
-#if defined(CONFIG_STORAGE_MULTI) && !defined(HAVE_MULTIDRIVE)
-#define HAVE_MULTIDRIVE
-#endif
-
-#if defined(HAVE_MULTIDRIVE) && !defined(NUM_DRIVES)
-#error HAVE_MULTIDRIVE needs to have an explicit NUM_DRIVES
-#endif
 
 /* note to remove multi-partition booting this could be changed to MULTIDRIVE */
 #if defined(HAVE_BOOTDATA) && defined(BOOT_REDIR) && defined(HAVE_MULTIVOLUME)
@@ -903,10 +908,6 @@ Lyre prototype 1 */
  * allow any volume but some targets may wish to exclude the internal drive. */
 #if defined(HAVE_MULTIBOOT) && !defined(MULTIBOOT_MIN_VOLUME)
 # define MULTIBOOT_MIN_VOLUME 0
-#endif
-
-#ifndef NUM_DRIVES
-#define NUM_DRIVES 1
 #endif
 
 #define NUM_VOLUMES (NUM_DRIVES * NUM_VOLUMES_PER_DRIVE)
@@ -942,30 +943,34 @@ Lyre prototype 1 */
 #ifdef HAVE_BOOTLOADER_USB_MODE
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
+
 #if (CONFIG_CPU == S5L8702)
 #define USB_DRIVER_CLOSE
 #else
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_REQUEST
 #endif
+
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
+
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_TNETV105
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
+
 #if CONFIG_CPU == X1000
 #define USB_DRIVER_CLOSE
 #endif
-#endif
+
+#endif /* BOOTLOADER_USB_MODE */
 
 #else /* !BOOTLOADER */
 
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 #define HAVE_WAKEUP_EXT_CB
-
 
 #if defined(ASSEMBLER_THREADS) \
     || defined(HAVE_WIN32_FIBER_THREADS) \
@@ -1001,7 +1006,7 @@ Lyre prototype 1 */
 #endif /* CONFIG_USB == */
 #endif /* HAVE_USBSTACK */
 
-#endif /* BOOTLOADER */
+#endif /* !BOOTLOADER */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \

@@ -50,11 +50,12 @@
 #define HAVE_FLASH_STORAGE
 
 #define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
+#define NUM_DRIVES 1  /* NAND doesn't work yet */
 
 #define CONFIG_NAND NAND_RK27XX
 #define HAVE_SW_TONE_CONTROLS
 
-#define HAVE_HOTSWAP
+//#define HAVE_HOTSWAP
 
 #define SECTOR_SIZE 512
 
@@ -182,8 +183,5 @@
 #define BOOTFILE_EXT "rkw"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
-
-/* disabled for now */
-#undef HAVE_HOTSWAP
 
 #endif /* SIMULATOR */
