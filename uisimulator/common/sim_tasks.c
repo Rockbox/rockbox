@@ -51,7 +51,7 @@ enum {
 #endif
 };
 
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
 extern void sim_ext_extracted(int drive);
 #endif
 
