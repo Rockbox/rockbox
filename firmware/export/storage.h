@@ -227,7 +227,7 @@ static inline void storage_sleep(void) {};
         #define storage_last_disk_activity() mmc_last_disk_activity()
         #define storage_spinup_time() 0
         #define storage_get_identify() mmc_get_identify()
-       
+
         #ifdef STORAGE_GET_INFO
             #define storage_get_info(drive, info) mmc_get_info(IF_MD(drive,) info)
         #endif
@@ -251,7 +251,7 @@ static inline void storage_sleep(void) {};
         #define storage_last_disk_activity() nand_last_disk_activity()
         #define storage_spinup_time() 0
         #define storage_get_identify() nand_get_identify()
-       
+
         #ifdef STORAGE_GET_INFO
             #define storage_get_info(drive, info) nand_get_info(IF_MD(drive,) info)
         #endif
@@ -275,7 +275,7 @@ static inline void storage_sleep(void) {};
         #define storage_last_disk_activity() ramdisk_last_disk_activity()
         #define storage_spinup_time() 0
         #define storage_get_identify() ramdisk_get_identify()
-       
+
         #ifdef STORAGE_GET_INFO
             #define storage_get_info(drive, info) ramdisk_get_info(IF_MD(drive,) info)
         #endif

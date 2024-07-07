@@ -37,8 +37,8 @@ extern int  hostfs_init(void);
 extern int  hostfs_flush(void);
 
 #ifdef HAVE_HOTSWAP
-extern bool hostfs_removable(int drive);
-extern bool hostfs_present(int drive);
+extern bool hostfs_removable(IF_MD_NONVOID(int drive));
+extern bool hostfs_present(IF_MD_NONVOID(int drive));
 #endif
 
 /* This has to be repeated here for now for sim's sake since HAVE_HOSTFS
