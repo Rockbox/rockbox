@@ -60,7 +60,7 @@ void sim_thread(void)
     struct queue_event ev;
     long last_broadcast_tick = current_tick;
     int num_acks_to_expect = 0;
-    
+
     while (1)
     {
         queue_wait_w_tmo(&sim_queue, &ev, 5*HZ);
@@ -69,7 +69,7 @@ void sim_thread(void)
             case SYS_TIMEOUT:
                 call_storage_idle_notifys(false);
                 break;
-    
+
             case SIM_SCREENDUMP:
                 screen_dump();
 #ifdef HAVE_REMOTE_LCD
@@ -134,7 +134,7 @@ void sim_thread(void)
 void sim_tasks_init(void)
 {
     queue_init(&sim_queue, false);
-    
+
     create_thread(sim_thread, sim_thread_stack, sizeof(sim_thread_stack), 0,
                   sim_thread_name IF_PRIO(,PRIORITY_BACKGROUND) IF_COP(,CPU));
 }
@@ -220,9 +220,9 @@ void usb_wait_for_disconnect(struct event_queue *q)
     }
 }
 
-#ifdef HAVE_MULTIDRIVE
 static bool is_ext_inserted;
 
+#ifdef HAVE_MULTIDRIVE
 void sim_trigger_external(bool inserted)
 {
     is_ext_inserted = inserted;
@@ -235,6 +235,7 @@ void sim_trigger_external(bool inserted)
 
     DEBUGF("Ext %s\n", inserted ? "inserted":"removed");
 }
+#endif
 
 bool hostfs_present(int drive)
 {
@@ -246,7 +247,7 @@ bool hostfs_removable(int drive)
     return drive > 0;
 }
 
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_HOTSWAP
 bool volume_removable(int volume)
 {
     /* volume == drive for now */
@@ -258,13 +259,15 @@ bool volume_present(int volume)
     /* volume == drive for now */
     return hostfs_present(volume);
 }
+#endif /* HAVE_HOTSWAP */
 
+#ifdef HAVE_MULTIDRIVE
 int volume_drive(int volume)
 {
     /* volume == drive for now */
     return volume;
 }
-#endif /* HAVE_MULTIVOLUME */
+#endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
 bool mmc_touched(void)
@@ -296,5 +299,3 @@ int hostfs_driver_type(int drive)
     return drive > 0 ? SIMEXT1_TYPE_NUM : STORAGE_HOSTFS_NUM;
 }
 #endif /* CONFIG_STORAGE_MULTI */
-
-#endif /* CONFIG_STORAGE & STORAGE_MMC */
