@@ -11,7 +11,7 @@ Rockbox Maintainers
 This file lists the people maintaining the different parts of the
 Rockbox project.
 
-Note that there as of 2024-06, this file is pretty out of date.  There
+Note that there as of 2024-07, this file is pretty out of date.  There
 are only a handful of active contributors that try to maintain
 everything, and the best way to reach them is via the #rockbox IRC
 channel on libera.chat.
@@ -27,11 +27,13 @@ NOTE: Port maintainers are simply developers who use a particular
 target on a daily basis and are therefore able to report issues
 specific to that target.
 
-:AGPTek Rocker:Solomon Peachy
+:AGPTek Rocker: Solomon Peachy
 :Creative Zen Vision:
 :Creative Zen Vision:M: Maurus Cuelenaere
 :Creative Zen Vision:M 60GB:
-:Eros Q / K:Solomon Peachy
+:Eros Q / K (hosted): Solomon Peachy
+:Eros Q / K (native): Dana Conrad
+:FiiO M3K: Aidan MacDonald
 :Iriver H100/H115: Linus Nielsen Feltzing
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iriver H320/H340: Peter D'Hoye
@@ -41,6 +43,7 @@ specific to that target.
 :Ipod 4th Gen Grayscale:
 :Ipod Color/Photo: Dave Chapman
 :Ipod Video:
+:Ipod Classic:
 :Ipod Mini 1st Gen:
 :Ipod Mini 2nd Gen: Jens Arnold
 :Ipod Nano 1st Gen: Thom Johansen
@@ -51,6 +54,7 @@ specific to that target.
 :Iaudio M5: Marianne Arnold
 :Iaudio M3: Jens Arnold
 :Onda VX747: Maurus Cuelenaere
+:Shanling Q1: Aidan MacDonald
 :Sansa E200: Michael Sevakis, Barry Wardell
 :Sansa E200R:
 :Sansa C200:
@@ -67,7 +71,7 @@ Core code (low-level)
 :LCD drivers: Michael Sevakis, Jens Arnold
 :Button drivers: Michael Sevakis
 :Rolo:
-:ATA driver: Michael Sevakis
+:ATA driver: Solomon Peachy
 :MMC driver: Jens Arnold
 :SD driver: Barry Wardell
 :FAT driver: Linus Nielsen Feltzing
@@ -90,7 +94,7 @@ Core code (Mid-level)
 :Profiling:
 :Screens API and GUI widgets: Kévin Ferrare
 :Settings API: Jonathan Gordon
-:Language API:
+:Language API: Solomon Peachy
 :Menu API: Jonathan Gordon
 :Button actions: Jonathan Gordon
 
@@ -104,7 +108,7 @@ Core code (high-level)
 :Playlists:
 :Radio UI:
 :Recording UI: Peter D'Hoye
-:Voice UI: Stéphane Doyon
+:Voice UI: Solomon Peachy
 :WPS: Nicolas Pennequin
 :User interface: Jonathan Gordon
 
@@ -128,6 +132,7 @@ the person(s) named next to "General".
 
 :General: Solomon Peachy
 :German: Wilfried Winkler
+:Italian: Alessio Lenzi
 :Polish: Adam Rak
 
 Plugins
@@ -139,6 +144,7 @@ Plugins
 :XLCD library:
 
 :alpine_cdc:
+:amaze: Solomon Peachy
 :battery_bench:
 :blackjack:
 :bounce: Daniel Stenberg
@@ -179,6 +185,7 @@ Plugins
 :metronome:
 :midi2wav: Stepan Moskovchenko (though it's deprecated in favor of midiplay)
 :midiplay: Stepan Moskovchenko
+:mikmod: Solomon Peachy
 :minesweeper: Antoine Cellerier
 :mosaique:
 :mp3_encoder:
@@ -196,6 +203,7 @@ Plugins
 :rockboy:
 :rocklife: Antoine Cellerier
 :rockpaint: Antoine Cellerier
+:sdl: Franklin Wei
 :search: Linus Nielsen Feltzing
 :sliding_puzzle:
 :snake:
@@ -227,6 +235,7 @@ Plugins
 :wavview: Peter D'Hoye
 :wormlet:
 :xobox: Antoine Cellerier
+:xrick: Solomon Peachy
 :zxbox:
 
 
@@ -245,6 +254,7 @@ Codecs (Playback)
 :Musepack: Thom Johansen
 :NSF:
 :Ogg Vorbis:
+:Opus:
 :Shorten:
 :SID:
 :SPC: Michael Sevakis
@@ -267,12 +277,14 @@ Codecs (Recording)
 Bootloaders
 -----------
 
+:HibyOS: Solomon Peachy
 :Iriver H1xx/H3xx: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iaudio X5/M5: Linus Nielsen Feltzing
 :PortalPlayer (not ipod): Barry Wardell
 :Ipod: Dave Chapman
 :Gigabeat F/X: Barry Wardell
-
+:xDuoo X3: Solomon Peachy
+:x1000: Aidan MacDonald
 
 Build Tools
 -----------
@@ -288,12 +300,13 @@ Build Tools
 :codepages:
 :uclpack:
 :wavtrim: Linus Nielsen Feltzing
-:voicefont:
+:voicefont: Solomon Peachy
 :scramble: Linus Nielsen Feltzing
 :descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
 :voice.pl: Solomon Peachy
-:genlang/updatelang: Solomon Peachy
+:genlang: Solomon Peachy
+:updatelang: Solomon Peachy
 
 Install Tools
 -------------
@@ -303,11 +316,10 @@ Install Tools
 :sansapatcher: Dave Chapman, Barry Wardell
 :e200rpatcher: Dave Chapman
 
-
 Manual
 ------
 
-:Manual build system:
+:Manual build system: Solomon Peachy
 [What to put here - maintainers for chapters?]
 
 Utilities
