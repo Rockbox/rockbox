@@ -1252,7 +1252,7 @@ static inline void sd_stop_transfer(void)
 
 int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive;
 #endif
     sd_start_transfer();
@@ -1304,9 +1304,9 @@ err:
     return retval;
 }
 
-int sd_write_sectors(IF_MV(int drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive;
 #endif
     sd_start_transfer();
@@ -1387,7 +1387,7 @@ int sd_soft_reset(void)
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MD_NONVOID(int drive))
 {
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIDRIVE
     (void)drive;
 #endif
     return true;
@@ -1415,7 +1415,7 @@ void MMC_CD_IRQ(void)
 }
 #endif
 
-bool sd_present(IF_MV_NONVOID(int drive))
+bool sd_present(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive;
