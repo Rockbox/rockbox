@@ -691,7 +691,7 @@ struct sim_dirent * sim_readdir(DIR *dirp)
 
     if (readdir_volume(dirstr, entry))
         return entry;
-  
+
     OS_DIRENT_T *osdirent = os_readdir(dirstr->osdirp);
     if (!osdirent)
         return NULL;

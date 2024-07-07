@@ -120,6 +120,9 @@ bool volume_ismounted(IF_MV_NONVOID(int volume));
 #ifdef HAVE_HOTSWAP
 bool volume_removable(int volume);
 bool volume_present(int volume);
+#else
+#define volume_present(x) 1
+#define volueme_removeable(x) 0
 #endif /* HAVE_HOTSWAP */
 
 #ifdef HAVE_MULTIDRIVE

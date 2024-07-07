@@ -25,11 +25,6 @@
 
 #undef AMS_OF_SIZE
 
-/* Simulator core requires hotswap */
-#ifndef HAVE_HOTSWAP
-#define HAVE_HOTSWAP
-#endif
-
 #undef HAVE_HOTSWAP_STORAGE_AS_MAIN
 #undef HAVE_STORAGE_FLUSH
 
