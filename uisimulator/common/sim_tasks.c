@@ -114,7 +114,7 @@ void sim_thread(void)
                  * do it here anyway but don't depend on the acks */
                 queue_broadcast(SYS_USB_DISCONNECTED, 0);
                 break;
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
             case SIM_EXT_INSERTED:
             case SIM_EXT_EXTRACTED:
                 sim_ext_extracted(ev.data);

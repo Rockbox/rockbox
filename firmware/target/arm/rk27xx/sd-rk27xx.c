@@ -35,7 +35,7 @@
 #include "panic.h"
 #include "stdbool.h"
 #include "storage.h"
-
+#include "timeout.h"
 #include "lcd.h"
 #include <stdarg.h>
 #include "sysfont.h"
