@@ -68,12 +68,13 @@ sub buildit {
 # run make in tools first to make sure they're up-to-date
 `(cd tools && make ) >/dev/null 2>&1`;
 
-my $home=$ENV{'HOME'};
-
-my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
-`mkdir -p $pool`;
-`rm -f $pool/*`;
-$ENV{'POOL'}="$pool";
+if (!defined($ENV{'POOL'}) {
+    my $home=$ENV{'HOME'};
+    my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
+    `mkdir -p $pool`;
+    $ENV{'POOL'}="$pool";
+}
+# `rm -f $pool/*`;
 
 `mkdir -p $outdir`;
 
