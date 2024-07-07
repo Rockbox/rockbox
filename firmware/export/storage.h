@@ -310,6 +310,9 @@ void storage_get_info(int drive, struct storage_info *info);
 #ifdef HAVE_HOTSWAP
 bool storage_removable(int drive);
 bool storage_present(int drive);
+#else
+#define storage_removable(x) 0
+#define storage_present(x) 1
 #endif
 int storage_driver_type(int drive);
 

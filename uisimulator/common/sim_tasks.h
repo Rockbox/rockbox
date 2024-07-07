@@ -28,7 +28,9 @@
 void sim_tasks_init(void);
 void sim_trigger_screendump(void);
 void sim_trigger_usb(bool inserted);
+#ifdef HAVE_HOTSWAP
 void sim_trigger_external(bool inserted);
+#endif
 void sim_trigger_hp(bool inserted);
 void sim_trigger_lo(bool inserted);
 #endif

@@ -222,7 +222,7 @@ void usb_wait_for_disconnect(struct event_queue *q)
 
 static bool is_ext_inserted;
 
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
 void sim_trigger_external(bool inserted)
 {
     is_ext_inserted = inserted;

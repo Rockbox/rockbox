@@ -340,7 +340,7 @@ static void button_event(int key, bool pressed)
         }
         return;
 #endif
-#ifdef HAVE_MULTIDRIVE
+#ifdef HAVE_HOTSWAP
     case EXT_KEY:
         if (!pressed)
             sim_trigger_external(!storage_present(1));
