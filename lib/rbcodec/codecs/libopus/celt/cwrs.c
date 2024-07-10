@@ -210,7 +210,7 @@ int log2_frac(opus_uint32 val, int frac)
 #if defined(CUSTOM_MODES)
 static const opus_uint32 CELT_PVQ_U_DATA[1488]={
 #else
-static const opus_uint32 CELT_PVQ_U_DATA[1272]={
+static const opus_uint32 CELT_PVQ_U_DATA[1272] ICONST_ATTR ={
 #endif
   /*N=0, K=0...176:*/
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -410,7 +410,7 @@ static const opus_uint32 CELT_PVQ_U_DATA[1272]={
 };
 
 #if defined(CUSTOM_MODES)
-static const opus_uint32 *const CELT_PVQ_U_ROW[15]={
+static const opus_uint32 *const CELT_PVQ_U_ROW[15] ICONST_ATTR ={
   CELT_PVQ_U_DATA+   0,CELT_PVQ_U_DATA+ 208,CELT_PVQ_U_DATA+ 415,
   CELT_PVQ_U_DATA+ 621,CELT_PVQ_U_DATA+ 826,CELT_PVQ_U_DATA+1030,
   CELT_PVQ_U_DATA+1233,CELT_PVQ_U_DATA+1336,CELT_PVQ_U_DATA+1389,
