@@ -231,7 +231,7 @@ static bool retrieve_track_metadata(struct mp3entry *id3, const char *filename, 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     /* try to get the id3 data from the database */
     /* the database, doesn't store frequency, file size or codec (g4470) ChrisS*/
-    if ((flags & METADATA_EXCLUDE_ID3_PATH) || !tagcache_fill_tags(id3, filename))
+    if (!(flags & METADATA_EXCLUDE_ID3_PATH) || !tagcache_fill_tags(id3, filename))
 #endif
     /* fall back to reading the file from disk */
     {
@@ -718,10 +718,23 @@ static enum pv_onplay_result onplay_menu(int index)
                 ret = viewer.playlist ? PV_ONPLAY_UNCHANGED : PV_ONPLAY_SAVED;
                 break;
             case 7:
+            {
+                int last_display = global_settings.playlist_viewer_track_display;
                 /* playlist viewer settings */
                 result = do_menu(&viewer_settings_menu, NULL, NULL, false);
-                ret = (result == MENU_ATTACHED_USB) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
+
+
+                if (result == MENU_ATTACHED_USB)
+                    ret = PV_ONPLAY_USB;
+                else
+                {
+                    if (last_display != global_settings.playlist_viewer_track_display)
+                        update_playlist(true);/* reload buffer */
+
+                    ret = PV_ONPLAY_UNCHANGED;
+                }
                 break;
+            }
 #ifdef HAVE_TAGCACHE
             case 8:
                 ret = open_pictureflow(current_track);
