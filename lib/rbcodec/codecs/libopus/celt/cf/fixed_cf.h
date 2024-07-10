@@ -55,8 +55,9 @@ static inline int32_t MULT32_32_Q31_cf(int32_t a, int32_t b)
 
 #define OVERRIDE_COMB_FILTER_CONST
 static inline void comb_filter_const(opus_val32 *y, opus_val32 *x, int T, int N,
-    opus_val16 g10, opus_val16 g11, opus_val16 g12)
+    opus_val16 g10, opus_val16 g11, opus_val16 g12, int arch)
 {
+  (void)arch;
   opus_val32 x0, x1, x2, x3, x4;
   int i;
   x4 = x[-T-2];
