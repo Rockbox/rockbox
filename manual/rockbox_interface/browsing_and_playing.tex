@@ -2,12 +2,12 @@
 \chapter{Browsing and playing}
 \section{\label{ref:file_browser}File Browser}
 \screenshot{rockbox_interface/images/ss-file-browser}{The file browser}{}
-Rockbox lets you browse your music in either of two ways. The 
-\setting{File Browser} lets you navigate through the files and directories on 
+Rockbox lets you browse your music in either of two ways. The
+\setting{File Browser} lets you navigate through the files and directories on
 your \dap, entering directories and executing the default action on each file.
-To help differentiate files, each file format is displayed with an icon. 
+To help differentiate files, each file format is displayed with an icon.
 
-The \setting{Database Browser}, on the other hand, allows you to navigate 
+The \setting{Database Browser}, on the other hand, allows you to navigate
 through the music on your player using categories like album, artist, genre,
 etc.
 
@@ -35,7 +35,7 @@ the \setting{Show Files} setting to all.
 \begin{btnmap}
       \ActionStdPrev{}/\ActionStdNext{}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdPrev{}/\ActionRCStdNext{}}
-         & Go to previous/next item in list. If you are on the first/last 
+         & Go to previous/next item in list. If you are on the first/last
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}
@@ -61,14 +61,14 @@ the \setting{Show Files} setting to all.
       & Execute the default action on the selected file or enter a
         directory.\\
       %
-      \ActionTreeWps 
+      \ActionTreeWps
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeWps}
          & If there is an audio file playing, return to the
          \setting{While Playing Screen} (WPS) without stopping playback.\\
       %
       \nopt{player,SANSA_C200_PAD,erosqnative}%
         {%
-          \ActionTreeStop 
+          \ActionTreeStop
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeStop}
           & Stop audio playback.\\%
         }%
@@ -108,16 +108,16 @@ the \setting{Show Files} setting to all.
 \subsection{\label{ref:Contextmenu}\label{ref:PartIISectionFM}Context Menu}
 \screenshot{rockbox_interface/images/ss-context-menu}{The Context Menu}{}
 
-The \setting{Context Menu} allows you to perform certain operations on files or 
-directories.  To access the \setting{Context Menu}, position the selector over a file 
+The \setting{Context Menu} allows you to perform certain operations on files or
+directories.  To access the \setting{Context Menu}, position the selector over a file
 or directory and access the context menu with \ActionStdContext{}.\\
 
-\note{The \setting{Context Menu} is a context sensitive menu.  If the 
-\setting{Context Menu} is invoked on a file, it will display options available 
-for files.  If the \setting{Context Menu} is invoked on a directory, 
+\note{The \setting{Context Menu} is a context sensitive menu.  If the
+\setting{Context Menu} is invoked on a file, it will display options available
+for files.  If the \setting{Context Menu} is invoked on a directory,
 it will display options for directories.\\}
 
-The \setting{Context Menu} contains the following options (unless otherwise noted, 
+The \setting{Context Menu} contains the following options (unless otherwise noted,
 each option pertains both to files and directories):
 
 \begin{description}
@@ -126,7 +126,7 @@ each option pertains both to files and directories):
 \item [Playing Next...]
   Enters the \setting{Playing Next Submenu} (see \reference{ref:playingnext_submenu}).
 \item [Add to Playlist...]
-  Enters the \setting{Add to Playlist Submenu} (see 
+  Enters the \setting{Add to Playlist Submenu} (see
   \reference{ref:addtoplaylist_submenu}).
 \item [Rename.]
   This function lets the user modify the name of a file or directory.
@@ -202,7 +202,7 @@ each option pertains both to files and directories):
 
 \subsection{\label{sec:virtual_keyboard}Virtual Keyboard}
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
-This is the virtual keyboard that is used when entering text in Rockbox, for 
+This is the virtual keyboard that is used when entering text in Rockbox, for
 example when renaming a file or creating a new directory.
 The virtual keyboard can be easily changed by making a text file
 with the required layout. More information on how to achieve this can be found
@@ -298,7 +298,7 @@ on the Rockbox website at \wikilink{LoadableKeyboardLayouts}.
         \ActionKbdMorseSelect
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCKbdMorseSelect}
         & Tap to select a character in Morse code input mode. \\
-      } 
+      }
 \end{btnmap}
 
 \input{rockbox_interface/tagcache.tex}
