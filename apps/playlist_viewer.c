@@ -65,10 +65,10 @@
 /* Information about a specific track */
 struct playlist_entry {
     char *name;                 /* track path                               */
-    char *title;                /* Formatted track name                     */
-    int index;                  /* Playlist index                           */
-    int display_index;          /* Display index                            */
-    int attr;                  /* Is track queued?; Is track marked as bad?*/
+    int  index;                 /* Playlist index                           */
+    int  display_index;         /* Display index                            */
+    uint16_t title_offset;      /* where in the buffer the title is located  */
+    uint16_t attr;              /* Is track queued?; Is track marked as bad?*/
 };
 
 enum direction
@@ -124,8 +124,6 @@ struct playlist_viewer {
                            int flags); /* Title display metadata lookup fn */
     struct playlist_buffer buffer;
 };
-
-
 
 static struct playlist_viewer  viewer;
 
@@ -280,7 +278,7 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
     if (len <= remaining_size)
     {
         entry->name = name_buffer;
-        entry->title = name_buffer;
+        entry->title_offset = 0; /* offset 0 is the first char of name */
         entry->index = info.index;
         entry->display_index = info.display_index;
         entry->attr = info.attr & (PLAYLIST_ATTR_SKIPPED | PLAYLIST_ATTR_QUEUED);
@@ -295,7 +293,8 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
                 return -1; /*Failure */
             if (tlen > 0)
             {
-                entry->title = name_buffer;
+                entry->title_offset = len;
+                /* offset is the first char after terminating zero of name */
                 len += tlen;
             }
         }
@@ -528,7 +527,7 @@ static void format_line(const struct playlist_entry* track, char* str,
 {
     char name[MAX_PATH];
     char *skipped = "";
-    format_name(name, track->title, sizeof(name));
+    format_name(name, track->name + track->title_offset, sizeof(name));
 
     if (track->attr & PLAYLIST_ATTR_SKIPPED)
         skipped = "(ERR) ";
@@ -859,7 +858,7 @@ static int playlist_callback_voice(int selected_item, void *data)
             talk_fullpath(track->name, true);
             break;
         case 2: /*title*/
-            talk_spell(track->title, true);
+            talk_spell(track->name + track->title_offset, true);
             break;
         default:
         case 0: /*filename only*/
@@ -1209,25 +1208,28 @@ static void close_playlist_viewer(void)
     }
 }
 
+static struct playlist_track_info* get_static_track_info(int *found_indicies, int selected_item)
+{
+    /* playlist_track_info is a large struct keep a static copy to hand out */
+    static struct playlist_track_info track;
+    playlist_get_track_info(viewer.playlist, found_indicies[selected_item], &track);
+    return &track;
+}
+
 static const char* playlist_search_callback_name(int selected_item, void * data,
                                                  char *buffer, size_t buffer_len)
 {
-    int *found_indicies = (int*)data;
-    static struct playlist_track_info track;
-    playlist_get_track_info(viewer.playlist, found_indicies[selected_item], &track);
-
-    format_name(buffer, track.filename, buffer_len);
+    struct playlist_track_info *track = get_static_track_info(data, selected_item);
+    format_name(buffer, track->filename, buffer_len);
     return buffer;
 }
 
 static int say_search_item(int selected_item, void *data)
 {
-    int *found_indicies = (int*)data;
-    static struct playlist_track_info track;
-    playlist_get_track_info(viewer.playlist,found_indicies[selected_item],&track);
+    struct playlist_track_info *track = get_static_track_info(data, selected_item);
     if(global_settings.playlist_viewer_track_display == 1)
-        talk_fullpath(track.filename, false);
-    else talk_file_or_spell(NULL, track.filename, NULL, false);
+        talk_fullpath(track->filename, false);
+    else talk_file_or_spell(NULL, track->filename, NULL, false);
     return 0;
 }
 
