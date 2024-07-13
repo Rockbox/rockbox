@@ -51,10 +51,6 @@
 #include "menus/exported_menus.h"
 #include "yesno.h"
 
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-#include "tagcache.h"
-#endif
-
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
 
@@ -67,8 +63,7 @@ struct playlist_entry {
     char *name;                 /* track path                               */
     int  index;                 /* Playlist index                           */
     int  display_index;         /* Display index                            */
-    uint16_t title_offset;      /* where in the buffer the title is located  */
-    uint16_t attr;              /* Is track queued?; Is track marked as bad?*/
+    int  attr;                  /* Is track queued?; Is track marked as bad?*/
 };
 
 enum direction
@@ -118,11 +113,13 @@ struct playlist_viewer {
                                    or -1 if nothing is currently being moved */
     int moving_playlist_index;  /* Playlist-relative index (as opposed to
                                    viewer-relative index) of moving track    */
-    bool (*track_metadata)(struct mp3entry* id3,
-                           int fd,
-                           const char* trackname,
-                           int flags); /* Title display metadata lookup fn */
     struct playlist_buffer buffer;
+};
+
+struct playlist_search_data
+{
+    struct playlist_track_info *track;
+    int *found_indicies;
 };
 
 static struct playlist_viewer  viewer;
@@ -230,36 +227,6 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     playlist_buffer_load_entries(pb, start, direction);
 }
 
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static bool try_track_ram_metadata(struct mp3entry* id3, int fd, const char* trackname, int flags)
-{
-    /* used for title display mode */
-    /* try to get the id3 data from the database */
-    if (tagcache_fill_tags(id3, trackname))
-        return true;
-    /* fall back to reading the file from disk */
-    return get_metadata_ex(id3, fd, trackname, flags);
-}
-#endif
-
-static int load_track_title(char* buffer, size_t bufsz, char *filename)
-{
-    size_t len = 0;
-    struct mp3entry id3;
-    if (viewer.track_metadata(&id3, -1, filename, METADATA_EXCLUDE_ID3_PATH)
-       && id3.title && id3.title[0] != '\0')
-    {
-        const char *artist = id3.artist;
-        if (!artist)
-            artist = id3.albumartist;
-        if(!artist)
-            artist = str(LANG_TAGNAVI_UNTAGGED);
-
-        len = snprintf(buffer, bufsz, "%s - %s", artist, id3.title) + 1;
-    }
-    return len;
-}
-
 static int playlist_entry_load(struct playlist_entry *entry, int index,
                                char* name_buffer, int remaining_size)
 {
@@ -278,27 +245,9 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
     if (len <= remaining_size)
     {
         entry->name = name_buffer;
-        entry->title_offset = 0; /* offset 0 is the first char of name */
         entry->index = info.index;
         entry->display_index = info.display_index;
         entry->attr = info.attr & (PLAYLIST_ATTR_SKIPPED | PLAYLIST_ATTR_QUEUED);
-
-        if (global_settings.playlist_viewer_track_display == 2) /* title */
-        {
-            /* advance buffer position past filename, adjust length remaining */
-            name_buffer += len;
-            remaining_size -= len;
-            int tlen = load_track_title(name_buffer, remaining_size, info.filename);
-            if (tlen > remaining_size)
-                return -1; /*Failure */
-            if (tlen > 0)
-            {
-                entry->title_offset = len;
-                /* offset is the first char after terminating zero of name */
-                len += tlen;
-            }
-        }
-
         return len;
     }
     return -1;
@@ -443,17 +392,6 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
             file = filename+1;
         }
         viewer->title = file;
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-        if (global_settings.tagcache_ram == TAGCACHE_RAM_ON &&
-            tagcache_is_usable() && tagcache_is_in_ram())
-        {
-            viewer->track_metadata = try_track_ram_metadata;
-        }
-        else
-#endif
-        {
-            viewer->track_metadata = get_metadata_ex;
-        }
 
         if (is_playing)
         {
@@ -512,8 +450,6 @@ static void format_name(char* dest, const char* src, size_t bufsz)
             strrsplt(dest, '.');
             break;
         }
-        case 2: /* Artist - Title */
-            /*fall-through*/
         case 1:
             /* Full path */
             strlcpy(dest, src, bufsz);
@@ -527,7 +463,7 @@ static void format_line(const struct playlist_entry* track, char* str,
 {
     char name[MAX_PATH];
     char *skipped = "";
-    format_name(name, track->name + track->title_offset, sizeof(name));
+    format_name(name, track->name, sizeof(name));
 
     if (track->attr & PLAYLIST_ATTR_SKIPPED)
         skipped = "(ERR) ";
@@ -856,9 +792,6 @@ static int playlist_callback_voice(int selected_item, void *data)
     {
         case 1: /*full path*/
             talk_fullpath(track->name, true);
-            break;
-        case 2: /*title*/
-            talk_spell(track->name + track->title_offset, true);
             break;
         default:
         case 0: /*filename only*/
@@ -1208,28 +1141,22 @@ static void close_playlist_viewer(void)
     }
 }
 
-static struct playlist_track_info* get_static_track_info(int *found_indicies, int selected_item)
-{
-    /* playlist_track_info is a large struct keep a static copy to hand out */
-    static struct playlist_track_info track;
-    playlist_get_track_info(viewer.playlist, found_indicies[selected_item], &track);
-    return &track;
-}
-
 static const char* playlist_search_callback_name(int selected_item, void * data,
                                                  char *buffer, size_t buffer_len)
 {
-    struct playlist_track_info *track = get_static_track_info(data, selected_item);
-    format_name(buffer, track->filename, buffer_len);
+    struct playlist_search_data *s_data = data;
+    playlist_get_track_info(viewer.playlist, s_data->found_indicies[selected_item], s_data->track);
+    format_name(buffer, s_data->track->filename, buffer_len);
     return buffer;
 }
 
 static int say_search_item(int selected_item, void *data)
 {
-    struct playlist_track_info *track = get_static_track_info(data, selected_item);
-    if(global_settings.playlist_viewer_track_display == 1)
-        talk_fullpath(track->filename, false);
-    else talk_file_or_spell(NULL, track->filename, NULL, false);
+    struct playlist_search_data *s_data = data;
+    playlist_get_track_info(viewer.playlist, s_data->found_indicies[selected_item], s_data->track);
+    if(global_settings.playlist_viewer_track_display == 1) /* full path*/
+        talk_fullpath(s_data->track->filename, false);
+    else talk_file_or_spell(NULL, s_data->track->filename, NULL, false);
     return 0;
 }
 
@@ -1241,6 +1168,7 @@ bool search_playlist(void)
     int found_indicies[MAX_PLAYLIST_ENTRIES];
     int found_indicies_count = 0, last_found_count = -1;
     int button;
+    int track_display = global_settings.playlist_viewer_track_display;
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
@@ -1268,8 +1196,11 @@ bool search_playlist(void)
             break;
 
         playlist_get_track_info(viewer.playlist, i, &track);
+        const char *trackname = track.filename;
+        if (track_display == 0) /* if we only display filename only search filename */
+            trackname = strrchr(track.filename, '/');
 
-        if (strcasestr(track.filename,search_str))
+        if (trackname && strcasestr(trackname, search_str))
             found_indicies[found_indicies_count++] = track.index;
 
         yield();
@@ -1284,9 +1215,9 @@ bool search_playlist(void)
         return ret;
     }
     backlight_on();
-
+    struct playlist_search_data s_data = {.track = &track, .found_indicies = found_indicies}; 
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
-                      found_indicies, false, 1, NULL);
+                      &s_data, false, 1, NULL);
     gui_synclist_set_title(&playlist_lists, str(LANG_SEARCH_RESULTS), NOICON);
     gui_synclist_set_icon_callback(&playlist_lists, NULL);
     if(global_settings.talk_file)
