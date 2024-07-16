@@ -191,22 +191,22 @@ static inline int ata_disk_isssd(void)
         However microdrives pose a problem as they support CFA but are not
         SSD.
 
+       Offset 163 shows CF Advanced timing modes; microdrives all seems to
+        report 0, but all others (including iFlash) report higher!  This
+        is often present even when the "CFA supported" bit is 0.
+
        Offset 160 b15 indicates support for CF+ power level 1, if not set
         then device is standard flash CF.  However this is not foolproof
-        as newer CF cards may support it for extra performance.
+        as newer CF cards (and those CF->SD adapters) may report this.
 
-       Offset 163 shows CF Advanced timing modes; microdrive seems to
-        report 0, but all others (including iFlash) report higher!
-
-       So if device support CFA _AND_ reports higher speeds modes, it is SSD.
 
      */
     return ( (identify_info[217] == 0x0001 || identify_info[217] == 0x0100) /* "Solid state" rotational rate */
              || ((identify_info[168] & 0x0f) >= 0x06)                       /* Explicit SSD form factors */
              || (identify_info[169] & (1<<0))                               /* TRIM supported */
+             || (identify_info[163] > 0)                                    /* CF Advanced timing modes */
              || ((identify_info[83] & (1<<2)) &&                            /* CFA compliant */
-                 (((identify_info[160] & (1<<15)) == 0) ||                     /* CF level 0 */
-                  (identify_info[163] > 0)))                                   /* Advanced timing modes */
+                 ((identify_info[160] & (1<<15)) == 0))                       /* CF power level 0 */
            );
 }
 
