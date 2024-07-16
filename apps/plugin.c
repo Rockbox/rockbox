@@ -841,6 +841,7 @@ static const struct plugin_api rockbox_api = {
     filetype_get_plugin,
     playlist_entries_iterate,
     lang_is_rtl,
+    get_codec_string,
 };
 
 static int plugin_buffer_handle;

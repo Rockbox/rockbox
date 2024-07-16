@@ -74,7 +74,7 @@
 static const char* get_codectype(const struct mp3entry* id3)
 {
     if (id3 && id3->codectype < AFMT_NUM_CODECS) {
-        return audio_formats[id3->codectype].label;
+        return get_codec_string(id3->codectype);
     } else {
         return NULL;
     }

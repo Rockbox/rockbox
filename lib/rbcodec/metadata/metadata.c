@@ -304,6 +304,14 @@ int get_audio_base_codec_type(int type)
     return base_type;
 }
 
+const char * get_codec_string(int type)
+{
+    if (type < 0 || type >= AFMT_NUM_CODECS)
+        type = AFMT_UNKNOWN;
+
+    return audio_formats[type].label;
+}
+
 /* Get the basic audio type */
 bool rbcodec_format_is_atomic(int afmt)
 {

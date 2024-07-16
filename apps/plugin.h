@@ -979,6 +979,7 @@ struct plugin_api {
                                      struct playlist_insert_context *pl_context,
                                      bool (*action_cb)(const char *file_name));
     int  (*lang_is_rtl)(void);
+    const char* (*get_codec_string)(int codectype);
 };
 
 /* plugin header */
