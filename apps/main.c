@@ -604,7 +604,7 @@ static void init(void)
         {
             lcd_clear_display();
             lcd_puts(0, 0, "No partition");
-            lcd_puts(0, 1, "found.");
+            lcd_putsf(0, 1, "found (%d).", rc);
 #ifndef USB_NONE
             lcd_puts(0, 2, "Insert USB cable");
             lcd_puts(0, 3, "and fix it.");
