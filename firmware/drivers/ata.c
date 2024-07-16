@@ -1102,10 +1102,8 @@ static int set_features(void)
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
     };
     int i;
-    int pio_mode = 0;
+    int pio_mode = 2; /* Lowest */
 
-#ifdef ATA_SET_PIO_TIMING
-    pio_mode = 2;
     /* Find out the highest supported PIO mode */
     if (identify_info[53] & (1<<1)) {  /* Is word 64 valid? */
       if (identify_info[64] & 2)
@@ -1113,7 +1111,6 @@ static int set_features(void)
       else if(identify_info[64] & 1)
         pio_mode = 3;
     }
-#endif
 
     /* Update the table: set highest supported pio mode that we also support */
     features[0].parameter = 8 + pio_mode;
