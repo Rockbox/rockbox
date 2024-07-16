@@ -175,11 +175,12 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write) {
     /* Writes only need to be word-aligned, but by default DMA
      * is not used for writing on non-SSDs as it appears to be slower.
      */
-    if (!ata_disk_isssd())
-        return false;
-
-    if (write && ((unsigned long)addr & 3))
-        return false;
+    if (write) {
+        if ((unsigned long)addr & 3)
+            return false;
+        if (!ata_disk_isssd())
+            return false;
+    }
 
 #if ATA_MAX_UDMA > 2
     if (dma_needs_boost && !dma_boosted) {
