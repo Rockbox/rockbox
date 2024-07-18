@@ -604,6 +604,18 @@ sub simbuilds {
         'enabled' => 1,
     },
     # Everything else in alphabetical order
+    'chinese-simp' => {  # Mandarin?
+	'lang' => 'chinese-simp',
+	'name' => '(Chinese Simplified)',
+        'short' => 'zh_CN',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vzh',
+	    'gtts' => '-l zh-CN',
+	    'piper' => 'zh_CN-huayan-medium.onnx',
+	},
+        'enabled' => 0,
+    },
     'czech' => {
 	'lang' => 'czech',
 	'name' => 'Čeština (Czech)',
