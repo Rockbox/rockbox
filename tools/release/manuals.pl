@@ -74,6 +74,6 @@ sub buildit {
 
 `mkdir -p $outdir`;
 
-for my $b (&usablebuilds) {
+for my $b (&manualbuilds) {
     runone($b);
 }

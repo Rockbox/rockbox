@@ -16,7 +16,7 @@ $releasenotes="/wiki/ReleaseNotes315";
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
 #    voice => 'modelname4'               # optional (uses modelname4's voice)
 #    release => '3.14',                  # optional (final release version, if different from above)
-#    manualok => 1,                      # optional (builds manual even if target is not stable)
+#    manualok => 1,                      # optional (defaults 1 for status 3 and 0 for rest)
 # }
 
 %builds = (
@@ -512,7 +512,18 @@ sub usablebuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if ($builds{$b}{status} >= 2 || defined($builds{$b}{manualok}));
+        push @list, $b if ($builds{$b}{status} >= 2);
+    }
+
+    return @list;
+}
+
+sub manualbuilds {
+    my @list;
+
+    for my $b (sort byname keys %builds) {
+        push @list, $b if (($builds{$b}{status} >= 2 && !defined($builds{$builds{$b}{manualok}})) ||
+			   (defined($builds{$builds{$b}{manualok}}) && ($builds{$builds{$b}{manualok}} > 0)));
     }
 
     return @list;
