@@ -440,12 +440,13 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'agptekrocker' => {
         name => 'Agptek Rocker',
-        status => 2,
-        manualok => 1, # Remove once status moves to 3
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox3' => {
         name => 'xDuoo X3',
         status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox3ii' => {
         name => 'xDuoo X3ii',

@@ -27,8 +27,9 @@ foreach my $b (&stablebuilds) {
     else {
 	$ver = $publicrelease;
     }
-#    print "$b=$ver,$baseurl/release/$ver/rockbox-$b-$ver.zip\n";
-    print "$b=$ver\n";
+    if ($ver <= $publicrelease) {
+        print "$b=$ver\n";
+    }
 }
 
 print "[status]\n";
