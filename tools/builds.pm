@@ -450,11 +450,15 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'xduoox3ii' => {
         name => 'xDuoo X3ii',
-        status => 2,
+        manualok => 0,     # Remove when manual is written
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox20' => {
         name => 'xDuoo X20',
-        status => 2,
+        manualok => 0,     # Remove when manual is written
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'fiiom3klinux' => {
         name => 'FiiO M3K (Linux)',
