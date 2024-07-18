@@ -23,8 +23,7 @@ foreach my $b (&stablebuilds) {
     my $ver;
     if(exists($builds{$b}{release})) {
 	$ver = $builds{$b}{release};
-    }
-    else {
+    } else {
 	$ver = $publicrelease;
     }
     if ($ver <= $publicrelease) {
@@ -35,5 +34,16 @@ foreach my $b (&stablebuilds) {
 print "[status]\n";
 
 foreach my $b (&allbuilds) {
-    print "$b=$builds{$b}{status}\n";
+    my $ver;
+    my $status = $builds{$b}{status};
+
+    if(exists($builds{$b}{release})) {
+	$ver = $builds{$b}{release};
+    } else {
+	$ver = $publicrelease;
+    }
+    if ($ver > $publicrelease) {
+        $status=2;
+    }
+    print "$b=$status\n";
 }
