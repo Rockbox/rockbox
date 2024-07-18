@@ -369,6 +369,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'creativezenxfi3' => {
         name => 'Creative Zen X-Fi3',
         status => 3,
+        manualok => 0,
     },
     'sonynwze350' => {
         name => 'Sony NWZ-E350',
@@ -378,10 +379,12 @@ $releasenotes="/wiki/ReleaseNotes315";
     'sonynwze360' => {
         name => 'Sony NWZ-E360',
         status => 3,
+        manualok => 0,
     },
     'sonynwze370' => {
         name => 'Sony NWZ-E370/E380',
         status => 3,
+        manualok => 0,
     },
     'sonynwze450' => {
         name => 'Sony NWZ-E450',
@@ -424,11 +427,13 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'creativezenxfi' => {
         name => 'Creative Zen X-Fi',
-        status => 3
+        status => 3,
+        manualok => 0,
     },
     'creativezenxfistyle' => {
         name => 'Creative Zen X-Fi Style',
-        status => 3
+        status => 3,
+        manualok => 0,
     },
     'creativezen' => {
         name => 'Creative Zen',
@@ -436,7 +441,8 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'creativezenmozaic' => {
         name => 'Creative Zen Mozaic',
-        status => 3
+        status => 3,
+        manualok => 0,
     },
     'agptekrocker' => {
         name => 'Agptek Rocker',
