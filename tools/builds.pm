@@ -532,7 +532,7 @@ sub manualbuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if (($builds{$b}{status} >= 2 && !defined($builds{$builds{$b}{manualok}})) ||
+        push @list, $b if (($builds{$b}{status} > 2 && !defined($builds{$builds{$b}{manualok}})) ||
 			   (defined($builds{$builds{$b}{manualok}}) && ($builds{$builds{$b}{manualok}} > 0)));
     }
 
