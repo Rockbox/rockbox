@@ -479,7 +479,7 @@ sub generateclips {
                 # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
                     $pool_file = sprintf("%s/%s-%s.enc", $ENV{'POOL'},
-                                         md5_hex(Encode::encode_utf8("$voice ". $tts_object->{"name"}." $tts_engine_opts $encoder_opts")),
+                                         md5_hex(Encode::encode_utf8("$voice ". $tts_object->{"name"}." $tts_engine_opts ".$tts_object->{"ttsoptions"}." $encoder_opts")),
                                          $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;
@@ -673,7 +673,7 @@ if ($V == 1) {
 
     printf("Generating voice\n  Target: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n  Pool directory: %s\n",
            defined($t) ? $t : "unknown",
-           $l, $e, $E, $s, $S, defined($ENV{'POOL'}) ? $ENV{'POOL'} : "<none>");
+           $l, $e, $E, $s, "$S $tts_object->{ttsoptions}", defined($ENV{'POOL'}) ? $ENV{'POOL'} : "<none>");
     generateclips($l, $t, $e, $E, $tts_object, $S, $f);
     shutdown_tts($tts_object);
     createvoice($l, $i, $f);
