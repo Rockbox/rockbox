@@ -606,12 +606,12 @@ sub simbuilds {
     # Everything else in alphabetical order
     'chinese-simp' => {  # Mandarin?
 	'lang' => 'chinese-simp',
-	'name' => '(Chinese Simplified)',
+	'name' => '简体中文 (Chinese Simplified)',
         'short' => 'zh_CN',
         'defengine' => 'espeak',
 	'engines' => {
 	    'espeak' => '-vzh',
-	    'gtts' => '-l zh-CN',
+	    'gtts' => '-l zh',
 	    'piper' => 'zh_CN-huayan-medium.onnx',
 	},
         'enabled' => 0,

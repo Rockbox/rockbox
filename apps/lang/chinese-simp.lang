@@ -771,7 +771,7 @@
     *: "带通滤波器%d"
   </dest>
   <voice>
-    *: "带通滤波器%d"
+    *: "带通滤波器"
   </voice>
 </phrase>
 <phrase>
