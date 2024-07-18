@@ -71,10 +71,12 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'gogearhdd1630' => {
         name => 'Philips GoGear HDD1630',
+        manualok => 0,
         status => 3,
     },
     'gogearhdd6330' => {
         name => 'Philips GoGear HDD6330',
+        manualok => 0,
         status => 3,
     },
     'gogearsa9200' => {
@@ -532,8 +534,8 @@ sub manualbuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if (($builds{$b}{status} > 2 && !defined($builds{$builds{$b}{manualok}})) ||
-			   (defined($builds{$builds{$b}{manualok}}) && ($builds{$builds{$b}{manualok}} > 0)));
+        push @list, $b if (($builds{$b}{status} > 2 && !defined($builds{$b}{manualok})) ||
+                          (defined($builds{$b}{manualok}) && ($builds{$b}{manualok} > 0)));
     }
 
     return @list;
