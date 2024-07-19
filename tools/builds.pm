@@ -609,7 +609,7 @@ sub simbuilds {
     'chinese-simp' => {  # Mandarin?
 	'lang' => 'chinese-simp',
 	'name' => '简体中文 (Chinese Simplified)',
-        'short' => 'zh_CN',
+        'short' => 'zh_cn',
         'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vzh',
@@ -838,14 +838,14 @@ sub simbuilds {
     },
 );
 
-sub bylang {
-    return uc $voices{$a}{lang} cmp uc $voices{$b}{lang};
+sub byshortname {
+    return uc $voices{$a}{short} cmp uc $voices{$b}{short};
 }
 
 sub allvoices {
     my @list;
 
-    for my $b (sort bylang keys %voices) {
+    for my $b (sort byshortname keys %voices) {
         push @list, $b if (defined($voices{$b}->{enabled}) && $voices{$b}->{enabled});
     }
 
@@ -856,7 +856,7 @@ sub voicesforlang($) {
     my $l = shift @_;
     my @list;
 
-    for my $b (sort bylang keys %voices) {
+    for my $b (sort byshortname keys %voices) {
         push @list, $b if ($voices{$b}{lang} eq $b && defined($voices{$b}->{enabled}) && $voices{$b}->{enabled});
     }
 
