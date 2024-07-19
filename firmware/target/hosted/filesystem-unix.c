@@ -33,6 +33,8 @@
 #include "pathfuncs.h"
 #include "string-extra.h"
 
+int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize);
+
 #define SAME_FILE_INFO(sb1p, sb2p) \
     ((sb1p)->st_dev == (sb2p)->st_dev && (sb1p)->st_ino == (sb2p)->st_ino)
 

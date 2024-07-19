@@ -21,9 +21,6 @@
 #ifndef _FILESYSTEM_HOSTED_H_
 #define _FILESYSTEM_HOSTED_H_
 
-#include "mv.h"
-
-int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize);
 void * os_lc_open(const char *ospath);
 
 #endif /* _FILESYSTEM_HOSTED_H_ */
