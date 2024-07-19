@@ -202,7 +202,7 @@
     *: "常规设置"
   </dest>
   <voice>
-    *: "一般设置"
+    *: "常规设置"
   </voice>
 </phrase>
 <phrase>
@@ -3945,7 +3945,6 @@
   <dest>
     *: none
     gigabeatfx: "POWER:取消"
-    mrobe500: "电源:取消"
     gigabeats,sansafuzeplus: "BACK:取消"
     gogearsa9200: "LEFT:取消"
     iaudiom5,iaudiox5: "RECORD:取消"
@@ -3953,13 +3952,14 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
     iriverh100,iriverh120,iriverh300: "STOP:取消"
     mrobe100: "DISPLAY:取消"
+    mrobe500: "电源:取消"
     rtc: "OFF:取消"
     samsungyh*: "REW:取消"
     vibe500: "CANCEL:取消"
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -13450,7 +13450,7 @@
     *: ""
   </dest>
   <voice>
-    *: "未标记"
+    *: "取消标记"
   </voice>
 </phrase>
 <phrase>
@@ -13464,7 +13464,7 @@
     *: ""
   </dest>
   <voice>
-    *: "白子"
+    *: "白"
   </voice>
 </phrase>
 <phrase>
@@ -13478,7 +13478,7 @@
     *: ""
   </dest>
   <voice>
-    *: "黑子"
+    *: "黑"
   </voice>
 </phrase>
 <phrase>
@@ -13492,7 +13492,7 @@
     *: ""
   </dest>
   <voice>
-    *: "检查！"
+    *: "将军！"
   </voice>
 </phrase>
 <phrase>
@@ -13534,7 +13534,7 @@
     *: ""
   </dest>
   <voice>
-    *: "特大号床侧"
+    *: "王翼"
   </voice>
 </phrase>
 <phrase>
@@ -13548,7 +13548,7 @@
     *: ""
   </dest>
   <voice>
-    *: "皇后区"
+    *: "后翼"
   </voice>
 </phrase>
 <phrase>
@@ -13562,7 +13562,7 @@
     *: ""
   </dest>
   <voice>
-    *: "马前卒"
+    *: "兵"
   </voice>
 </phrase>
 <phrase>
@@ -13576,7 +13576,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Knight"
+    *: "马"
   </voice>
 </phrase>
 <phrase>
@@ -13590,7 +13590,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bishop"
+    *: "象"
   </voice>
 </phrase>
 <phrase>
@@ -13604,7 +13604,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Rook"
+    *: "居"
   </voice>
 </phrase>
 <phrase>
@@ -13618,7 +13618,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queen"
+    *: "后"
   </voice>
 </phrase>
 <phrase>
@@ -13632,7 +13632,7 @@
     *: ""
   </dest>
   <voice>
-    *: "King"
+    *: "王"
   </voice>
 </phrase>
 <phrase>
@@ -13741,10 +13741,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "已排序"
   </dest>
   <voice>
-    *: "Ordered"
+    *: "已排序"
   </voice>
 </phrase>
 <phrase>
@@ -13755,10 +13755,10 @@
     *: "Diffusion"
   </source>
   <dest>
-    *: "Diffusion"
+    *: "弥散"
   </dest>
   <voice>
-    *: "Diffusion"
+    *: "弥散"
   </voice>
 </phrase>
 <phrase>
@@ -14398,11 +14398,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Panning Separation"
+    *: "平移分离"
     lowmem: none
   </dest>
   <voice>
-    *: "Panning Separation"
+    *: "平移分离"
     lowmem: none
   </voice>
 </phrase>
@@ -14415,11 +14415,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Reverberation"
+    *: "混响"
     lowmem: none
   </dest>
   <voice>
-    *: "Reverberation"
+    *: "混响"
     lowmem: none
   </voice>
 </phrase>
@@ -14432,11 +14432,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Interpolation"
+    *: "插值"
     lowmem: none
   </dest>
   <voice>
-    *: "Interpolation"
+    *: "插值"
     lowmem: none
   </voice>
 </phrase>
@@ -14449,11 +14449,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "环绕"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "环绕"
     lowmem: none
   </voice>
 </phrase>
@@ -14466,11 +14466,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "HQ混合器"
     lowmem: none
   </dest>
   <voice>
-    *: "High Quality Mixer"
+    *: "高品混合器"
     lowmem: none
   </voice>
 </phrase>
@@ -14483,11 +14483,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Sample Rate"
+    *: "采样率"
     lowmem: none
   </dest>
   <voice>
-    *: "Sample Rate"
+    *: "采样率"
     lowmem: none
   </voice>
 </phrase>
@@ -14500,11 +14500,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "CPU Boost"
+    *: "CPU加速"
     lowmem: none
   </dest>
   <voice>
-    *: "CPU Boost"
+    *: "C P U加速"
     lowmem: none
   </voice>
 </phrase>
@@ -14516,10 +14516,10 @@
     *: "Spacing"
   </source>
   <dest>
-    *: "Spacing"
+    *: "间距"
   </dest>
   <voice>
-    *: "Spacing"
+    *: "间距"
   </voice>
 </phrase>
 <phrase>
@@ -14530,10 +14530,10 @@
     *: "Centre margin"
   </source>
   <dest>
-    *: "Centre margin"
+    *: "中心边距"
   </dest>
   <voice>
-    *: "Centre margin"
+    *: "中心边距"
   </voice>
 </phrase>
 <phrase>
@@ -14544,10 +14544,10 @@
     *: "Number of slides"
   </source>
   <dest>
-    *: "Number of slides"
+    *: "幻灯片数量"
   </dest>
   <voice>
-    *: "Number of slides"
+    *: "幻灯片数量"
   </voice>
 </phrase>
 <phrase>
@@ -14558,10 +14558,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "缩放"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "缩放"
   </voice>
 </phrase>
 <phrase>
@@ -14684,10 +14684,10 @@
     *: "Direct"
   </source>
   <dest>
-    *: "Direct"
+    *: "直接"
   </dest>
   <voice>
-    *: "Direct"
+    *: "直接"
   </voice>
 </phrase>
 <phrase>
@@ -15118,11 +15118,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Hold for settings"
+    hotkey: "按HOLD键设置"
   </dest>
   <voice>
     *: none
-    hotkey: "Hold for settings"
+    hotkey: "按HOLD键设置"
   </voice>
 </phrase>
 <phrase>
@@ -15371,10 +15371,10 @@
     *: "Exempt Volume"
   </source>
   <dest>
-    *: "豁免音量"
+    *: "调节音量时豁免"
   </dest>
   <voice>
-    *: "豁免音量"
+    *: "调节音量时豁免"
   </voice>
 </phrase>
 <phrase>
@@ -15469,10 +15469,10 @@
     *: "Ascending"
   </source>
   <dest>
-    *: "Ascending"
+    *: "上升"
   </dest>
   <voice>
-    *: "Ascending"
+    *: "上升"
   </voice>
 </phrase>
 <phrase>
@@ -15483,10 +15483,10 @@
     *: "Descending"
   </source>
   <dest>
-    *: "Descending"
+    *: "下降"
   </dest>
   <voice>
-    *: "Descending"
+    *: "下降"
   </voice>
 </phrase>
 <phrase>
@@ -15873,10 +15873,10 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Play Last Shuffled"
+    *: "播放列表随机"
   </dest>
   <voice>
-    *: "Play Last Shuffled"
+    *: "播放列表随机"
   </voice>
 </phrase>
 <phrase>
@@ -15923,11 +15923,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "感性"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "感性"
   </voice>
 </phrase>
 <phrase>
@@ -16050,10 +16050,10 @@
     *: "Set Maze Size"
   </source>
   <dest>
-    *: "Set Maze Size"
+    *: "设置迷宫大小"
   </dest>
   <voice>
-    *: "Set Maze Size"
+    *: "设置迷宫大小"
   </voice>
 </phrase>
 <phrase>
@@ -16316,10 +16316,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "非法通知"
+    *: "法律声明"
   </dest>
   <voice>
-    *: "非法通知"
+    *: "法律声明"
   </voice>
 </phrase>
 <phrase>
@@ -16414,7 +16414,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
