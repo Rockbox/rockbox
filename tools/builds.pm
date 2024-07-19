@@ -596,7 +596,7 @@ sub simbuilds {
 	'lang' => 'english',
 	'name' => 'UK English',
 	'short' => 'en-gb',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-gb -k 5',
@@ -610,19 +610,19 @@ sub simbuilds {
 	'lang' => 'chinese-simp',
 	'name' => '简体中文 (Chinese Simplified)',
         'short' => 'zh_CN',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vzh',
 	    'gtts' => '-l zh',
 	    'piper' => 'zh_CN-huayan-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'czech' => {
 	'lang' => 'czech',
 	'name' => 'Čeština (Czech)',
         'short' => 'cs',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vcs',
 	    'gtts' => '-l cs',
@@ -634,7 +634,7 @@ sub simbuilds {
 	'lang' => 'dansk',
 	'name' => 'Dansk (Danish)',
         'short' => 'da',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vda',
 	    'gtts' => '-l da',
@@ -646,7 +646,7 @@ sub simbuilds {
 	'lang' => 'deutsch',
 	'name' => 'Deutsch (German)',
         'short' => 'de',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vde',
 	    'gtts' => '-l de',
@@ -670,7 +670,7 @@ sub simbuilds {
 	'lang' => 'english-us',
 	'name' => 'American English',
         'short' => 'en-us',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-us -k 5',
@@ -683,7 +683,7 @@ sub simbuilds {
 	'lang' => 'espanol',
 	'name' => 'Spanish (Peninsular)',
         'short' => 'es-es',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'festival' => '--language spanish',
 	    'espeak' => '-ves -k 5',
@@ -708,7 +708,7 @@ sub simbuilds {
 	'lang' => 'francais',
 	'name' => 'Français (French)',
         'short' => 'fr',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vfr-fr',
 	    'gtts' => '-l fr',
@@ -720,7 +720,7 @@ sub simbuilds {
 	'lang' => 'greek',
 	'name' => 'Ελληνικά (Greek)',
         'short' => 'el',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vel',
 	    'gtts' => '-l el',
@@ -732,7 +732,7 @@ sub simbuilds {
 	'lang' => 'italiano',
 	'name' => 'Italiano (Italian)',
         'short' => 'it',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vit',
 	    'gtts' => '-l it',
@@ -744,7 +744,7 @@ sub simbuilds {
 	'lang' => 'nederlands',
 	'name' => 'Nederlands (Dutch)',
         'short' => 'nl',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vnl',
 	    'gtts' => '-l nl',
@@ -756,7 +756,7 @@ sub simbuilds {
 	'lang' => 'norsk',
 	'name' => 'Norsk (Norwegian)',
         'short' => 'no',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vno',
 	    'gtts' => '-l no',
@@ -768,7 +768,7 @@ sub simbuilds {
 	'lang' => 'polski',
 	'name' => 'Polski (Polish)',
         'short' => 'pl',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vpl',
 	    'gtts' => '-l pl',
@@ -780,7 +780,7 @@ sub simbuilds {
 	'lang' => 'russian',
 	'name' => 'Русский (Russian)',
         'short' => 'ru',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vru',
 	    'gtts' => '-l ru',
@@ -792,7 +792,7 @@ sub simbuilds {
 	'lang' => 'slovak',
 	'name' => 'Slovenský (Slovak)',
         'short' => 'sk',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vsk',
 	    'gtts' => '-l sk',
@@ -804,7 +804,7 @@ sub simbuilds {
 	'lang' => 'srpski',
 	'name' => 'српски (Serbian)',
         'short' => 'sr',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vsr',
 	    'gtts' => '-l sr',
@@ -816,7 +816,7 @@ sub simbuilds {
 	'lang' => 'svenska',
 	'name' => 'Svenska (Swedish)',
         'short' => 'sr',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vsv',
 	    'gtts' => '-l sv',
@@ -828,7 +828,7 @@ sub simbuilds {
 	'lang' => 'turkce',
 	'name' => 'Türkçe (Turkish)',
         'short' => 'tr',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vtr',
 	    'gtts' => '-l tr',
