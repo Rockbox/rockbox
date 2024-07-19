@@ -385,9 +385,13 @@ static int calc_strength(int colour, int x, int y)
                 if(a && b) /* diagonally adjacent, give less influence */
                 {
                     score += 5;
-                    if(board[x + a][y + b].tank || board[x + a][y + b].farm)
+                    if(board[x + a][y + b].tank)
                         score += 15;
-                    if(board[x + a][y + b].plane || board[x + a][y + b].ind)
+                    if(board[x + a][y + b].farm)
+                        score += 15;
+                    if(board[x + a][y + b].plane)
+                        score += 20;
+                    if (board[x + a][y + b].ind)
                         score += 20;
                     if(board[x + a][y + b].nuke)
                         score += 10;
@@ -397,10 +401,14 @@ static int calc_strength(int colour, int x, int y)
                 else
                 {
                     score += 10;
-                    if(board[x + a][y + b].tank || board[x + a][y + b].farm)
+                    if(board[x + a][y + b].tank)
                         score += 30;
-                    if(board[x + a][y + b].plane || board[x + a][y + b].ind)
-                        score += 40;
+                    if(board[x + a][y + b].farm)
+                        score += 30;
+                    if(board[x + a][y + b].plane)
+                        score += 20;
+                    if(board[x + a][y + b].ind)
+                        score += 20;
                     if(board[x + a][y + b].nuke)
                         score += 20;
                     if(board[x + a][y + b].men)
