@@ -247,8 +247,7 @@ void VoiceFileCreator::create(void)
             TalkGenerator::TalkEntry entry;
             entry.toSpeak = voice;
             entry.wavfilename = m_path + "/" + id + ".wav";
-            //voicefont wants them with .mp3 extension
-            entry.talkfilename = m_path + "/" + id + ".mp3";
+            entry.talkfilename = m_path + "/" + id + ".enc";
             entry.voiced = false;
             entry.encoded = false;
             if(id == "VOICE_PAUSE")
@@ -324,6 +323,10 @@ void VoiceFileCreator::create(void)
     voicefont(ids2,m_targetid,m_path.toLocal8Bit().data(), output, m_voiceformat);
     // ids2 and output are closed by voicefont().
 
+    // Copy these two over to the device
+    QFile::copy(m_path + "/VOICE_INVALID_VOICE_FILE.enc",  m_mountpoint + "/.rockbox/langs/InvalidVoice_" + m_lang + ".talk");
+    QFile::copy(m_path + "/VOICE_LANG_NAME.enc", m_mountpoint + "/.rockbox/langs/" + m_lang + ".lng.talk");
+
     //cleanup
     cleanup();
 
@@ -359,4 +362,3 @@ void VoiceFileCreator::cleanup()
 
     return;
 }
-
