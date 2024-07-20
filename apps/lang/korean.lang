@@ -19,6 +19,7 @@
 # - Kong Hui Sug
 # - Jeong Taek In
 # - Sanggon Lee
+# - Hoseok Seo
 #
 # 이 파일은 한국어 언어 파일입니다.
 #
@@ -108,27 +109,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "불러오고 있습니다..."
+    *: "로딩 중..."
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "OFF버튼으로 전원끄기"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
+    *: "로딩 중..."
   </voice>
 </phrase>
 <phrase>
@@ -139,27 +123,10 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "시스템이 종료됩니다."
+    *: "종료 중..."
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "삽입된 MMC를 제거해주세요"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "삽입된 MMC를 제거해주세요"
+    *: "종료 중..."
   </voice>
 </phrase>
 <phrase>
@@ -173,7 +140,7 @@
     *: "실패하였습니다."
   </dest>
   <voice>
-    *: ""
+    *: "실패하였습니다."
   </voice>
 </phrase>
 <phrase>
@@ -237,7 +204,7 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "테마 선택"
@@ -292,23 +259,6 @@
   </dest>
   <voice>
     *: "플러그인 보기"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "끄기"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "끄기"
   </voice>
 </phrase>
 <phrase>
@@ -369,7 +319,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
@@ -383,7 +333,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
@@ -463,159 +413,6 @@
   </dest>
   <voice>
     *: "스테레오 너비"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "소리크기"
-  </dest>
-  <voice>
-    *: none
-    masf: "소리크기"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "자동 볼륨설정"
-  </dest>
-  <voice>
-    *: none
-    masf: "자동 볼륨설정"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "AV 감속 시간"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "저음역 강화"
-  </dest>
-  <voice>
-    *: none
-    masf: "저음역 강화"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 켬"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB 켬"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 세기"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB 세기"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 하모닉스"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB 하모닉스"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 센터 주파수"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB 센터 주파수"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 모양"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB 모양"
   </voice>
 </phrase>
 <phrase>
@@ -783,7 +580,7 @@
     *: "초기화 되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "초기화 되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -913,20 +710,6 @@
   </dest>
   <voice>
     *: "EQ 프리셋 탐색"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "편집 모드: %s"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1099,7 +882,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1290,7 +1073,7 @@
   desc: in playback settings
   user: core
   <source>
-    *: "Beep Volume"
+    *: "Track Skip Beep"
   </source>
   <dest>
     *: "삐 소리크기"
@@ -1338,7 +1121,7 @@
     *: "큼"
   </dest>
   <voice>
-    *: ""
+    *: "큼"
   </voice>
 </phrase>
 <phrase>
@@ -1428,7 +1211,7 @@
     *: "업데이트 중입니다..."
   </dest>
   <voice>
-    *: ""
+    *: "업데이트 중입니다..."
   </voice>
 </phrase>
 <phrase>
@@ -1442,7 +1225,7 @@
     *: "음악 DB 업데이트 중..."
   </dest>
   <voice>
-    *: ""
+    *: "음악 DB 업데이트 중..."
   </voice>
 </phrase>
 <phrase>
@@ -1632,7 +1415,7 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: "Browse Fonts"
+    *: "Font"
   </source>
   <dest>
     *: "폰트 찾기"
@@ -1646,7 +1429,7 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "WPS 선택"
@@ -1661,7 +1444,7 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
@@ -1737,15 +1520,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "피크 미터 설정"
-    masd: none
   </dest>
   <voice>
     *: "피크 미터 설정"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2153,20 +1933,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
-  user: core
-  <source>
-    *: "Unique only"
-  </source>
-  <dest>
-    *: "특별한 것만"
-  </dest>
-  <voice>
-    *: "특별한 것만"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOICE_MENU
   desc: item of voice menu, enable/disable the voice UI
   user: core
@@ -2241,30 +2007,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
     *: "MP3 파일 사용"
   </dest>
   <voice>
     *: "MP3 파일 사용"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "음질"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "음질"
   </voice>
 </phrase>
 <phrase>
@@ -2339,23 +2088,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "독립된 프레임"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "독립된 프레임"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORD_TIMESPLIT
   desc: Record split menu
   user: core
@@ -2387,23 +2119,6 @@
   <voice>
     *: none
     recording: "프리 레코딩 타임"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "디렉토리"
-  </dest>
-  <voice>
-    *: none
-    recording: "디렉토리"
   </voice>
 </phrase>
 <phrase>
@@ -3193,23 +2908,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "버튼 바"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "버튼 바"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
   user: core
@@ -3271,15 +2969,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "피크 미터 속도"
-    masd: none
   </dest>
   <voice>
     *: "피크 미터 속도"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3288,15 +2983,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "피크 미터 시간"
-    masd: none
   </dest>
   <voice>
     *: "피크 미터 시간"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3305,15 +2997,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "고음 표시 시간"
-    masd: none
   </dest>
   <voice>
     *: "고음 표시 시간"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3322,15 +3011,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "내려오지 않게 하기"
-    masd: none
   </dest>
   <voice>
     *: "내려오지 않게 하기"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3339,15 +3025,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "표시 단위"
-    masd: none
   </dest>
   <voice>
     *: "표시 단위"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3356,15 +3039,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "데시벨 (dB)"
-    masd: none
   </dest>
   <voice>
     *: "데시벨"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3373,15 +3053,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "퍼센트 (%)"
-    masd: none
   </dest>
   <voice>
     *: "퍼센트"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3390,15 +3067,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "최소 범위"
-    masd: none
   </dest>
   <voice>
     *: "최소 범위"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3407,15 +3081,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "최대 범위"
-    masd: none
   </dest>
   <voice>
     *: "최대 범위"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3456,14 +3127,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "알카라인"
+    xduoox3: "Newer (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "알카라인"
+    xduoox3: "Newer 2000 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -3473,14 +3147,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "니켈 수소"
+    xduoox3: "Older (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "니켈 수소"
+    xduoox3: "Older 1500 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -3724,7 +3401,7 @@
     *: "같은 이름이 존재합니다. 덮어 쓰시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "같은 이름이 존재합니다. 덮어 쓰시겠습니까?"
   </voice>
 </phrase>
 <phrase>
@@ -3783,7 +3460,7 @@
     *: "삭제하시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "삭제하시겠습니까?"
   </voice>
 </phrase>
 <phrase>
@@ -3797,7 +3474,7 @@
     *: "삭제되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "삭제되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -3871,62 +3548,6 @@
   </dest>
   <voice>
     *: "재생순서 다시섞기"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert"
-  </source>
-  <dest>
-    *: "재생목록에 삽입"
-  </dest>
-  <voice>
-    *: "재생목록에 삽입"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Next"
-  </source>
-  <dest>
-    *: "다음곡으로 삽입"
-  </dest>
-  <voice>
-    *: "다음곡으로 삽입"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Last"
-  </source>
-  <dest>
-    *: "마지막곡에 삽입"
-  </dest>
-  <voice>
-    *: "마지막곡에 삽입"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user: core
-  <source>
-    *: "Insert Shuffled"
-  </source>
-  <dest>
-    *: "임의순서로 삽입"
-  </dest>
-  <voice>
-    *: "임의순서로 삽입"
   </voice>
 </phrase>
 <phrase>
@@ -4010,7 +3631,7 @@
     *: "찾는 중... %d개 검색됨 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "찾는 중... %d개 검색됨 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -4073,52 +3694,16 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "배터리: Top-Off Chg"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "배터리: Top-Off Chg"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "배터리: Trickle Chg"
-  </dest>
-  <voice>
-    *: none
-    charging: "배터리: Trickle Chg"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_TIME
   desc: battery level in % and estimated time remaining
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "배터리: %d%% (%d시간 %d분)"
     ipodmini1g,ipodmini2g,iriverh10: "배터리: %d%% %d시간 %d분"
-    iriverifp7xx: "%d%% %d시간 %d분"
   </dest>
   <voice>
     *: "배터리 레벨"
@@ -4135,7 +3720,7 @@
     *: "전체 용량:"
   </dest>
   <voice>
-    *: ""
+    *: "전체 용량:"
   </voice>
 </phrase>
 <phrase>
@@ -4158,38 +3743,41 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "내부:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "내부"
+    hibylinux: "micro S D"
     xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    archosondio*: "MMC:"
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    archosondio*: "MMC:"
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    archosondio*: "M M C"
+    hibylinux: "U S B"
     multivolume: "H D 1 "
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
@@ -4271,7 +3859,7 @@
     *: "북마크를 만드시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "북마크를 만드시겠습니까?"
   </voice>
 </phrase>
 <phrase>
@@ -4285,7 +3873,7 @@
     *: "북마크가 생성되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "북마크가 생성되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -4299,7 +3887,7 @@
     *: "북마크 생성에 실패하였습니다."
   </dest>
   <voice>
-    *: ""
+    *: "북마크 생성에 실패하였습니다."
   </voice>
 </phrase>
 <phrase>
@@ -4313,7 +3901,7 @@
     *: "북마크가 없습니다."
   </dest>
   <voice>
-    *: ""
+    *: "북마크가 없습니다."
   </voice>
 </phrase>
 <phrase>
@@ -4322,10 +3910,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "A = Revert"
-    gigabeats: "BACK = Revert"
-    gogearsa9200,ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
@@ -4336,7 +3925,9 @@
   <dest>
     *: none
     gigabeatfx: "[전원]: 원상태 복구"
+    mrobe500: "POWER = Revert"
     gigabeats: "[뒤]: 원상태 복구"
+    sansafuzeplus: "BACK = Revert"
     gogearsa9200,ipod*,mpiohd300,sansac200*: "[메뉴]: 원상태 복구"
     iaudiom5,iaudiox5: "[녹음]: 원상태 복구"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "[이전]: 원상태 복구"
@@ -4348,6 +3939,7 @@
   </dest>
   <voice>
     *: none
+    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4411,7 +4003,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
-    sansac200*,sansae200*,vibe500: "The disk is full. Press UP to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
@@ -4423,6 +4015,7 @@
   </dest>
   <voice>
     *: none
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -4494,23 +4087,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "마이너스 무한대"
-  </dest>
-  <voice>
-    *: none
-    recording: "마이너스 무한대"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_TIME
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
   user: core
@@ -4545,23 +4121,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "알람 설정"
-  </dest>
-  <voice>
-    *: none
-    alarm: "알람 설정"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -4576,33 +4135,6 @@
   <voice>
     *: none
     alarm: "알람 시간이 너무 짧습니다"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
-  </source>
-  <dest>
-    *: none
-    alarm: "[재생]: 설정   [꺼짐]: 취소"
-    gigabeats: "[선택]: 설정   [꺼짐]: 취소"
-    ipod*: "[선택]: 설정   [메뉴]: 취소"
-    iriverh10,iriverh10_5gb: "[선택]: 설정   [이전]: 취소"
-    mpiohd300: "ENTER: 설정   MENU: 취소"
-    vibe500: "OK: 설정   C: 취소"
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
@@ -4636,7 +4168,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "RGB"
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -4839,20 +4371,6 @@
   </dest>
   <voice>
     *: "트랙 게인"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "앨범 게인"
-  </dest>
-  <voice>
-    *: "앨범 게인"
   </voice>
 </phrase>
 <phrase>
@@ -5843,48 +5361,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "KB"
-  </source>
-  <dest>
-    *: "KB"
-  </dest>
-  <voice>
-    *: "킬로바이트"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "MB"
-  </source>
-  <dest>
-    *: "MB"
-  </dest>
-  <voice>
-    *: "메가바이트"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "GB"
-  </source>
-  <dest>
-    *: "GB"
-  </dest>
-  <voice>
-    *: "기가바이트"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
   user: core
@@ -6458,7 +5934,7 @@
     *: "재생목록 버퍼의 공간이 부족합니다."
   </dest>
   <voice>
-    *: ""
+    *: "재생목록 버퍼의 공간이 부족합니다."
   </voice>
 </phrase>
 <phrase>
@@ -6486,7 +5962,7 @@
     *: "%d개의 음악 추가 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d개의 음악 추가 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6500,7 +5976,7 @@
     *: "%d개의 음악 예약 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d개의 음악 예약 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6514,7 +5990,7 @@
     *: "%d개의 음악 저장 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d개의 음악 저장 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6528,7 +6004,7 @@
     *: "하위 폴더도 추가하시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "하위 폴더도 추가하시겠습니까?"
   </voice>
 </phrase>
 <phrase>
@@ -6542,7 +6018,7 @@
     *: "현재 재생목록을 삭제하시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "현재 재생목록을 삭제하시겠습니까?"
   </voice>
 </phrase>
 <phrase>
@@ -6556,21 +6032,7 @@
     *: "재생할 파일이 없습니다."
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "재생목록 제어 파일 업데이트 에러"
-  </dest>
-  <voice>
-    *: ""
+    *: "재생할 파일이 없습니다."
   </voice>
 </phrase>
 <phrase>
@@ -6584,7 +6046,7 @@
     *: "재생목록 파일 접근 에러"
   </dest>
   <voice>
-    *: ""
+    *: "재생목록 파일 접근 에러"
   </voice>
 </phrase>
 <phrase>
@@ -6598,7 +6060,7 @@
     *: "재생목록 제어 파일 접근 에러"
   </dest>
   <voice>
-    *: ""
+    *: "재생목록 제어 파일 접근 에러"
   </voice>
 </phrase>
 <phrase>
@@ -6612,7 +6074,7 @@
     *: "폴더 접근 에러"
   </dest>
   <voice>
-    *: ""
+    *: "폴더 접근 에러"
   </voice>
 </phrase>
 <phrase>
@@ -6626,7 +6088,7 @@
     *: "재생목록 제어 파일이 유효하지 않습니다."
   </dest>
   <voice>
-    *: ""
+    *: "재생목록 제어 파일이 유효하지 않습니다."
   </voice>
 </phrase>
 <phrase>
@@ -6729,91 +6191,6 @@
   <voice>
     *: none
     radio: "프리셋 리스트가 꽉 찼습니다"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "메뉴"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "나가기"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "하기"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "추가"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "녹음"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6946,7 +6323,7 @@
     *: "폴더 버퍼의 공간이 부족합니다."
   </dest>
   <voice>
-    *: ""
+    *: "폴더 버퍼의 공간이 부족합니다."
   </voice>
 </phrase>
 <phrase>
@@ -6960,7 +6337,7 @@
     *: "새 언어가 적용되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "새 언어가 적용되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -6974,7 +6351,7 @@
     *: "설정이 적용되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "설정이 적용되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -6988,7 +6365,7 @@
     *: "설정이 저장되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "설정이 저장되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7002,7 +6379,7 @@
     *: "부트 파일이 변경되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "부트 파일이 변경되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7016,12 +6393,12 @@
     *: "지금 재부팅 하시겠습니까?"
   </dest>
   <voice>
-    *: ""
+    *: "지금 재부팅 하시겠습니까?"
   </voice>
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
@@ -7036,6 +6413,7 @@
     *: "[꺼짐]: 중지"
     gigabeatfx: "[전원]: 중지"
     gigabeats: "[뒤]: 중지"
+    sansafuzeplus: "BACK to abort"
     iaudiom5,iaudiox5: "[재생 길게누름]: 중지"
     ipod*: "[재생/일시정지]: 중지"
     iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "[이전]: 중지"
@@ -7056,7 +6434,7 @@
     *: "파일이 없습니다."
   </dest>
   <voice>
-    *: ""
+    *: "파일이 없습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7070,7 +6448,7 @@
     *: "새 키보드가 적용되었습니다."
   </dest>
   <voice>
-    *: ""
+    *: "새 키보드가 적용되었습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7187,7 +6565,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -7196,7 +6574,7 @@
     *: "이 모델은 지원하지 않습니다."
   </dest>
   <voice>
-    *: ""
+    *: "이 모델은 지원하지 않습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7210,7 +6588,7 @@
     *: "이 버전은 지원하지 않습니다."
   </dest>
   <voice>
-    *: ""
+    *: "이 버전은 지원하지 않습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7224,7 +6602,7 @@
     *: "플러그인에서 오류가 발생하였습니다."
   </dest>
   <voice>
-    *: ""
+    *: "플러그인에서 오류가 발생하였습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7238,7 +6616,7 @@
     *: "확장자의 길이가 너무 깁니다."
   </dest>
   <voice>
-    *: ""
+    *: "확장자의 길이가 너무 깁니다."
   </voice>
 </phrase>
 <phrase>
@@ -7485,7 +6863,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -7495,20 +6873,6 @@
   </dest>
   <voice>
     *: "재생목록 모음"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "Add to Playlist"
-  </source>
-  <dest>
-    *: "재생목록에 추가"
-  </dest>
-  <voice>
-    *: "재생목록에 추가"
   </voice>
 </phrase>
 <phrase>
@@ -7526,20 +6890,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "재생목록들 보기"
-  </dest>
-  <voice>
-    *: "재생목록들 보기"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CATALOG_NO_DIRECTORY
   desc: error message when playlist catalogue directory doesn't exist
   user: core
@@ -7550,7 +6900,7 @@
     *: "%s가 존재하지 않습니다."
   </dest>
   <voice>
-    *: ""
+    *: "%s가 존재하지 않습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7564,7 +6914,7 @@
     *: "재생목록이 없습니다."
   </dest>
   <voice>
-    *: ""
+    *: "재생목록이 없습니다."
   </voice>
 </phrase>
 <phrase>
@@ -7722,15 +7072,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "홀드 버튼이 켜졌을때 백라이트 설정"
   </dest>
   <voice>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "홀드 버튼이 켜졌을때 백라이트 설정"
   </voice>
 </phrase>
@@ -7739,16 +7089,13 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </source>
   <dest>
-    *: none
-    lcd_sleep: "켜지 않음"
+    *: "Never"
   </dest>
   <voice>
-    *: none
-    lcd_sleep: "켜지 않음"
+    *: "Never"
   </voice>
 </phrase>
 <phrase>
@@ -7766,40 +7113,6 @@
   <voice>
     *: none
     lcd_sleep: "백라이트 꺼진 후 슬립모드 진입시간"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "스테레오"
-  </dest>
-  <voice>
-    *: none
-    recording: "스테레오"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "모노"
-  </dest>
-  <voice>
-    *: none
-    recording: "모노"
   </voice>
 </phrase>
 <phrase>
@@ -7831,159 +7144,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "음질"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "음질"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "주파수"
-  </dest>
-  <voice>
-    *: none
-    recording: "주파수"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "소스"
-  </dest>
-  <voice>
-    *: none
-    recording: "소스"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "내부 마이크"
-  </dest>
-  <voice>
-    *: none
-    recording: "내부 마이크"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "디지털"
-  </dest>
-  <voice>
-    *: none
-    recording: "디지털"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "트리거"
-  </dest>
-  <voice>
-    *: none
-    recording: "트리거"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "메뉴"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "옵션"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "액정"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LOADING_PERCENT
   desc: splash number of percents loaded
   user: core
@@ -7994,7 +7154,7 @@
     *: "불러오는 중... %d%% 완료 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "불러오는 중... %d%% 완료 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -8242,10 +7402,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Last.fm 로그 기록"
@@ -8265,12 +7425,12 @@
     *: "사용하려면 다시 시작해주세요."
   </dest>
   <voice>
-    *: ""
+    *: "사용하려면 다시 시작해주세요."
   </voice>
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: "Dithering"
@@ -8477,7 +7637,7 @@
     *: "주의! 배터리가 부족합니다!"
   </dest>
   <voice>
-    *: ""
+    *: "주의! 배터리가 부족합니다!"
   </voice>
 </phrase>
 <phrase>
@@ -8491,7 +7651,7 @@
     *: "배터리가 없습니다! 충전해주세요!"
   </dest>
   <voice>
-    *: ""
+    *: "배터리가 없습니다! 충전해주세요!"
   </voice>
 </phrase>
 <phrase>
@@ -8582,20 +7742,6 @@
   </dest>
   <voice>
     *: "초기화 하시겠습니까?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
-  user: core
-  <source>
-    *: "Play Next"
-  </source>
-  <dest>
-    *: "다음곡으로 재생"
-  </dest>
-  <voice>
-    *: "다음곡으로 재생"
   </voice>
 </phrase>
 <phrase>
@@ -8810,13 +7956,15 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    gogearsa9200,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 돌아가기)"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
     gogearsa9200,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
+    sansafuze*: "Building database... %d found (PREV to return)"
     iriverh100,iriverh120,iriverh300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
   </dest>
   <voice>
@@ -8969,7 +8117,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "units per tick"
   </voice>
 </phrase>
 <phrase>
@@ -9021,23 +8169,6 @@
   <voice>
     *: none
     lcd_color: "주 색깔"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "라인 인"
-  </dest>
-  <voice>
-    *: none
-    recording: "라인 인"
   </voice>
 </phrase>
 <phrase>
@@ -9319,11 +8450,9 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "버퍼:"
-    archosplayer: "버퍼:"
   </dest>
   <voice>
     *: "버퍼 크기"
@@ -9428,16 +8557,19 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    archosplayer: "(PLAY/STOP)"
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = Yes"
+    cowond2*: "MENU, or top-right = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "[재생] = 예"
-    archosplayer: "(재생/정지)"
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "[선택] = 예"
+    cowond2*: "MENU, or top-right = Yes"
+    creativezen*,sansaclip*,sansaconnect,sansafuze*: "SELECT = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "[선택] = 예"
     iriverh100,iriverh120,iriverh300: "[네비] = 예"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = 예"
   </dest>
   <voice>
@@ -9450,24 +8582,28 @@
   user: core
   <source>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
     rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "[선택] = 설정"
+    sansaclip*,sansaconnect,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = 설정"
     iriverh100,iriverh120,iriverh300: "[네비] = 설정"
     mpiohd300: "ENTER = 설정"
+    mrobe500: "HEART = Set"
     rtc: "[켬] = 설정"
     vibe500: "OK = 설정"
   </dest>
   <voice>
     *: none
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9476,15 +8612,12 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "다른 버튼 = 아니오"
-    archosplayer: none
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -9619,7 +8752,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "oh"
   </voice>
 </phrase>
 <phrase>
@@ -9673,15 +8806,12 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
     *: "노래 목록의 마지막"
-    archosplayer: "목록의 마지막"
   </dest>
   <voice>
     *: "노래 목록의 마지막"
-    archosplayer: "목록의 마지막"
   </voice>
 </phrase>
 <phrase>
@@ -9758,20 +8888,6 @@
   <voice>
     *: none
     recording: "녹음 멈추고 끄기"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "모드:"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10023,23 +9139,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
-  user: core
-  <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
-  </source>
-  <dest>
-    *: none
-    headphone_detection: "되감기 시간"
-  </dest>
-  <voice>
-    *: none
-    headphone_detection: "되감기 시간"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PITCH_UP_SEMITONE
   desc: in wps
   user: core
@@ -10206,20 +9305,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "지우기"
-  </dest>
-  <voice>
-    *: "지우기"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OCLOCK
   desc: spoken only, for wall clock announce
   user: core
@@ -10230,7 +9315,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "o'clock"
   </voice>
 </phrase>
 <phrase>
@@ -10303,7 +9388,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -10434,25 +9519,8 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "채널"
-  </dest>
-  <voice>
-    *: none
-    recording: "채널"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -10562,7 +9630,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "OK"
   </voice>
 </phrase>
 <phrase>
@@ -10650,23 +9718,6 @@
   <voice>
     *: none
     gigabeatfx: "높음"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
-  user: core
-  <source>
-    *: none
-    recording: "Set As Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "녹음 디렉토리로 설정"
-  </dest>
-  <voice>
-    *: none
-    recording: "녹음 디렉토리로 설정"
   </voice>
 </phrase>
 <phrase>
