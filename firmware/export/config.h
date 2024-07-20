@@ -897,8 +897,8 @@ Lyre prototype 1 */
 #undef HAVE_MULTIVOLUME
 #endif
 
-/* Explicit HAVE_MULTIVOLUME in the config file. Allow the maximum number */
-#ifdef HAVE_MULTIVOLUME
+/* Number of volumes per drive */
+#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR)
 #define NUM_VOLUMES_PER_DRIVE 4
 #else
 #define NUM_VOLUMES_PER_DRIVE 1
