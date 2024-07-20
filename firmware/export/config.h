@@ -898,7 +898,7 @@ Lyre prototype 1 */
 #endif
 
 /* Number of volumes per drive */
-#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR)
+#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR) && !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define NUM_VOLUMES_PER_DRIVE 4
 #else
 #define NUM_VOLUMES_PER_DRIVE 1
