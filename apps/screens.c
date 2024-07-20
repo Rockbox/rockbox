@@ -656,10 +656,10 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 break;
             case LANG_FORMAT:
-                if (id3->codectype >= AFMT_NUM_CODECS)
+                if (id3->codectype == AFMT_UNKNOWN && info->track_ct > 1)
                     return NULL;
 
-                strmemccpy(buffer, audio_formats[id3->codectype].label, buffer_len);
+                strmemccpy(buffer, get_codec_string(id3->codectype), buffer_len);
 
                 val=buffer;
                 if(say_it)
