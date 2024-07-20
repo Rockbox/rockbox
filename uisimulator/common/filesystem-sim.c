@@ -34,6 +34,7 @@
 #include "pathfuncs.h"
 #include "string-extra.h"
 #include "debug.h"
+#include "mv.h"
 
 #ifndef os_fstatat
 #define USE_OSDIRNAME /* we need to remember the open directory path */
@@ -204,20 +205,20 @@ void sim_ext_extracted(int drive)
     for (unsigned int i = 0; i < MAX_OPEN_FILES; i++)
     {
         struct filestr_desc *filestr = &openfiles[i];
-        if (filestr->osfd >= 0 && volume_drive(filestr->volume) == drive)
+        if (filestr->osfd >= 0 && IF_MV(volume_drive(filestr->volume) == drive))
             filestr->mounted = false;
     }
 
     for (unsigned int i = 0; i < MAX_OPEN_DIRS; i++)
     {
         struct dirstr_desc *dirstr = &opendirs[i];
-        if (dirstr->osdirp && volume_drive(dirstr->volume) == drive)
+        if (dirstr->osdirp && IF_MV(volume_drive(dirstr->volume) == drive))
             dirstr->mounted = false;
     }
 
     (void)drive;
 }
-#endif /* HAVE_MULTIDRIVE */
+#endif /* HAVE_HOTSWAP */
 
 /**
  * Provides target-like path parsing behavior with single and multiple volumes
@@ -314,14 +315,12 @@ int sim_get_os_path(char *buffer, const char *path, size_t bufsize)
 
             if (next > p)
             {
-            #ifdef HAVE_MULTIDRIVE
                 /* Feign failure if the volume isn't "mounted" */
                 if (!volume_present(volume))
                 {
                     errno = ENXIO;
                     return -1;
                 }
-            #endif /* HAVE_MULTIDRIVE */
 
                 sysroot = false;
 
