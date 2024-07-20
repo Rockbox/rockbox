@@ -348,6 +348,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
             continue;
         }
 
+        if (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & ATTR_DIRECTORY) &&
+            (dptr->attr &
+            (ATTR_HIDDEN | ATTR_SYSTEM | ATTR_VOLUME_ID | ATTR_VOLUME)) != 0) {
+            continue; /* skip non plugin folders */
+        }
+
         /* check for known file types */
         if ( !(dir_attr) )
             dptr->attr |= filetype_get_attr((char *)entry->d_name);
