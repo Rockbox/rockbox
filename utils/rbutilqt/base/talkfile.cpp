@@ -143,6 +143,12 @@ bool TalkFileCreator::createTalkList(QDir startDir)
             if(!dir.dirName().isEmpty() && m_talkFolders)
             {
                 // check if we should ignore it
+                if(QFileInfo::exists(dir.path() + "/talkclips.ignore"))
+                {
+                    continue;
+                }
+
+                // check to see if it's already covered
                 if(m_generateOnlyNew && QFileInfo::exists(dir.path() + "/_dirname.talk"))
                 {
                     continue;
@@ -302,4 +308,3 @@ void TalkFileCreator::abort()
     m_abort = true;
     emit aborted();
 }
-
