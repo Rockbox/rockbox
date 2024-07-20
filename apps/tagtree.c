@@ -1452,7 +1452,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 #else
         true
 #endif
-        , 0);
+        , 0, 0, 0);
 
     if (c->currtable == ALLSUBENTRIES)
     {
@@ -1676,7 +1676,7 @@ entry_skip_formatter:
 
         if (init)
         {
-            if (!show_search_progress(false, total_count))
+            if (!show_search_progress(false, total_count, 0, 0))
             {   /* user aborted */
                 tagcache_search_finish(&tcs);
                 tree_unlock_cache(c);
@@ -1710,7 +1710,7 @@ entry_skip_formatter:
 
     while (tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
     {
-        if (!show_search_progress(false, total_count))
+        if (!show_search_progress(false, total_count, 0, 0))
             break;
         total_count++;
     }
@@ -2229,7 +2229,7 @@ static bool tagtree_insert_selection(int position, bool queue,
 #else
         true
 #endif
-        , 0);
+        , 0, 0, 0);
 
     newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
 

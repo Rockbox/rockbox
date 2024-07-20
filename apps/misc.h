@@ -110,7 +110,7 @@ void talk_timedate(void);
  * returns true if the playlist should be replaced */
 bool warn_on_pl_erase(void);
 
-bool show_search_progress(bool init, int count);
+bool show_search_progress(bool init, int count, int current, int total);
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If 

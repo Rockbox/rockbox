@@ -2519,6 +2519,7 @@ bool playlist_entries_iterate(const char *filename,
     bool ret = false;
     int max;
     char *dir;
+    off_t filesize;
 
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
@@ -2533,14 +2534,16 @@ bool playlist_entries_iterate(const char *filename,
         notify_access_error();
         goto out;
     }
-
+    off_t start = lseek(fd, 0, SEEK_CUR);
+    filesize = lseek(fd, 0, SEEK_END);
+    lseek(fd, start, SEEK_SET);
     /* we need the directory name for formatting purposes */
     size_t dirlen = path_dirname(filename, (const char **)&dir);
     //dir = strmemdupa(dir, dirlen);
 
 
     if (action_cb)
-        show_search_progress(true, 0);
+        show_search_progress(true, 0, 0, 0);
 
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
@@ -2561,17 +2564,17 @@ bool playlist_entries_iterate(const char *filename,
 
             /* we need to format so that relative paths are correctly
                handled */
-            if (format_track_path(trackname, temp_buf,
-                                  sizeof(trackname), dir, dirlen) < 0)
+            if ((max = format_track_path(trackname, temp_buf,
+                                  sizeof(trackname), dir, dirlen)) < 0)
             {
                 goto out;
             }
-
+            start += max;
             if (action_cb)
             {
                 if (!action_cb(trackname))
                     goto out;
-                else if (!show_search_progress(false, i))
+                else if (!show_search_progress(false, i, start, filesize))
                     break;
             }
             else if (playlist_insert_context_add(pl_context, trackname) < 0)
