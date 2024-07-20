@@ -11938,11 +11938,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "短锐(Short Sharp)"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "短锐"
   </voice>
 </phrase>
 <phrase>
@@ -11955,11 +11955,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "短慢"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "短慢"
   </voice>
 </phrase>
 <phrase>
@@ -11972,11 +11972,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "特别慢"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "特别慢"
   </voice>
 </phrase>
 <phrase>
@@ -11989,11 +11989,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Short"
+    es9018: "短"
   </dest>
   <voice>
     *: none
-    es9018: "Short"
+    es9018: "短"
   </voice>
 </phrase>
 <phrase>
@@ -12006,11 +12006,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "跳过(Bypass)"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "跳过"
   </voice>
 </phrase>
 <phrase>
@@ -12023,11 +12023,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "线性快速"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "线性快速"
   </voice>
 </phrase>
 <phrase>
@@ -12040,11 +12040,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "线性慢速"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "线性慢速"
   </voice>
 </phrase>
 <phrase>
@@ -12057,11 +12057,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "最小化快速"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "最小化快速"
   </voice>
 </phrase>
 <phrase>
@@ -12074,11 +12074,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "最小化慢速"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "最小化慢速"
   </voice>
 </phrase>
 <phrase>
@@ -12091,11 +12091,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "切趾类型1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "切趾类型一"
   </voice>
 </phrase>
 <phrase>
@@ -12108,11 +12108,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "切趾类型2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "切趾类型二"
   </voice>
 </phrase>
 <phrase>
@@ -12125,11 +12125,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "混合快速"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "混合快速"
   </voice>
 </phrase>
 <phrase>
@@ -12142,11 +12142,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "砖墙"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "砖墙"
   </voice>
 </phrase>
 <phrase>
