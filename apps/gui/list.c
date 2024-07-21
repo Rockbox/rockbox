@@ -51,6 +51,7 @@ void list_draw(struct screen *display, struct gui_synclist *list);
 
 static long last_dirty_tick;
 static struct viewport parent[NB_SCREENS];
+static struct gui_synclist *current_lists;
 
 static bool list_is_dirty(struct gui_synclist *list)
 {
@@ -59,8 +60,12 @@ static bool list_is_dirty(struct gui_synclist *list)
 
 static void list_force_reinit(unsigned short id, void *param, void *last_dirty_tick)
 {
-    (void)id;
     (void)param;
+    if (id == SYS_EVENT_USB_INSERTED) /* Disable the skin redraw callback -- Data may not be valid after USB unplug*/
+    {
+        current_lists = NULL;
+        return;
+    }
     *(int *)last_dirty_tick = current_tick;
 }
 
@@ -68,6 +73,7 @@ void list_init(void)
 {
     last_dirty_tick = current_tick;
     add_event_ex(GUI_EVENT_THEME_CHANGED, false, list_force_reinit, &last_dirty_tick);
+    add_event_ex(SYS_EVENT_USB_INSERTED, false, list_force_reinit, NULL);
 }
 
 static void list_init_viewports(struct gui_synclist *list)
@@ -590,7 +596,6 @@ bool gui_synclist_keyclick_callback(int action, void* data)
  * if something is using the list UI they *must* be calling those
  * two functions in the correct order or the list wont work.
  */
-static struct gui_synclist *current_lists;
 static bool ui_update_event_registered = false;
 static void _lists_uiviewport_update_callback(unsigned short id, void *data)
 {

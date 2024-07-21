@@ -1005,7 +1005,7 @@ static int dirbrowse(void)
             }
         }
     }
-    return true;
+    return GO_TO_ROOT;
 }
 
 int create_playlist(void)
