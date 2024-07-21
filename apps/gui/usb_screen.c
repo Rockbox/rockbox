@@ -243,7 +243,13 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 
 void gui_usb_screen_run(bool early_usb)
 {
-    (void) early_usb;
+#ifdef SIMULATOR /* the sim allows toggling USB fast enough to overflow viewportmanagers stack */
+    static bool in_usb_screen = false;
+    if (in_usb_screen)
+        return;
+    in_usb_screen = true;
+#endif
+
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
@@ -334,4 +340,7 @@ void gui_usb_screen_run(bool early_usb)
     }
 
     pop_current_activity();
+#ifdef SIMULATOR
+    in_usb_screen = false;
+#endif
 }

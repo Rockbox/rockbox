@@ -60,12 +60,8 @@ static bool list_is_dirty(struct gui_synclist *list)
 
 static void list_force_reinit(unsigned short id, void *param, void *last_dirty_tick)
 {
+    (void)id;
     (void)param;
-    if (id == SYS_EVENT_USB_INSERTED) /* Disable the skin redraw callback -- Data may not be valid after USB unplug*/
-    {
-        current_lists = NULL;
-        return;
-    }
     *(int *)last_dirty_tick = current_tick;
 }
 
@@ -73,7 +69,6 @@ void list_init(void)
 {
     last_dirty_tick = current_tick;
     add_event_ex(GUI_EVENT_THEME_CHANGED, false, list_force_reinit, &last_dirty_tick);
-    add_event_ex(SYS_EVENT_USB_INSERTED, false, list_force_reinit, NULL);
 }
 
 static void list_init_viewports(struct gui_synclist *list)
@@ -166,7 +161,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->nb_items = 0;
     gui_list->selected_item = 0;
     gui_synclist_init_display_settings(gui_list);
-
 #ifdef HAVE_TOUCHSCREEN
     gui_list->y_pos = 0;
 #endif
@@ -592,15 +586,19 @@ bool gui_synclist_keyclick_callback(int action, void* data)
  * loop.
  *
  * The GUI_EVENT_NEED_UI_UPDATE event is registered for in list_do_action_timeout()
- * and unregistered in gui_synclict_do_button(). This is done because
- * if something is using the list UI they *must* be calling those
+ * as a oneshot and current_lists updated. later current_lists is set to NULL
+ * in gui_synclist_do_button() effectively disabling the callback. 
+*  This is done because if something is using the list UI they *must* be calling those
  * two functions in the correct order or the list wont work.
  */
-static bool ui_update_event_registered = false;
-static void _lists_uiviewport_update_callback(unsigned short id, void *data)
+
+static void _lists_uiviewport_update_callback(unsigned short id,
+                                              void *data, void *userdata)
 {
     (void)id;
     (void)data;
+    (void)userdata;
+
     if (current_lists)
         gui_synclist_draw(current_lists);
 }
@@ -774,13 +772,8 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
 /* Returns the lowest of timeout or the delay until a postponed
    scheduled announcement is due (if any). */
 {
-    if (lists != current_lists)
-    {
-        if (!ui_update_event_registered)
-            ui_update_event_registered =
-                    add_event(GUI_EVENT_NEED_UI_UPDATE, _lists_uiviewport_update_callback);
-        current_lists = lists;
-    }
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, true, _lists_uiviewport_update_callback, NULL);
+    current_lists = lists;
     if(lists->scheduled_talk_tick)
     {
         long delay = lists->scheduled_talk_tick -current_tick +1;
@@ -949,7 +942,9 @@ bool simplelist_show_list(struct simplelist_info *info)
             old_line_count = simplelist_line_count;
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
+        {
             return true;
+        }
     }
     talk_shutup();
 
