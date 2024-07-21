@@ -2586,7 +2586,7 @@ static bool dbg_boot_data(void)
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
 #if defined(IPOD_6G) && !defined(SIMULATOR)
-#define SYSCFG_MAX_ENTRIES 10 // 9 on iPod Classic/6G
+#define SYSCFG_MAX_ENTRIES 9 // 9 on iPod Classic/6G
 
 static bool dbg_syscfg(void) {
     struct simplelist_info info;
@@ -2607,8 +2607,7 @@ static bool dbg_syscfg(void) {
         return simplelist_show_list(&info);
     }
 
-    simplelist_addline("Total size: %u bytes", syscfg_hdr.size);
-    simplelist_addline("Entries: %u", syscfg_hdr.num_entries);
+    simplelist_addline("Total size: %u bytes, %u entries", syscfg_hdr.size, syscfg_hdr.num_entries);
 
     size_t calculated_syscfg_size = syscfg_hdr_size + syscfg_entry_size * syscfg_hdr.num_entries;
 
@@ -2619,7 +2618,7 @@ static bool dbg_syscfg(void) {
     }
 
     if (syscfg_hdr.num_entries > SYSCFG_MAX_ENTRIES) {
-        simplelist_addline("Too many entries, showing first %u", syscfg_hdr.num_entries);
+        simplelist_addline("Too many entries, showing only first %u", SYSCFG_MAX_ENTRIES);
     }
 
     size_t syscfg_num_entries = MIN(syscfg_hdr.num_entries, SYSCFG_MAX_ENTRIES);
