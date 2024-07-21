@@ -792,7 +792,7 @@ sub simbuilds {
 	'lang' => 'slovak',
 	'name' => 'Slovenský (Slovak)',
         'short' => 'sk',
-        'defengine' => 'piper',
+        'defengine' => 'espeak',
 	'engines' => {
 	    'espeak' => '-vsk',
 	    'gtts' => '-l sk',
