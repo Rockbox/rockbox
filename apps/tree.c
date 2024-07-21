@@ -1101,11 +1101,12 @@ int rockbox_browse(struct browse_context *browse)
                 ret_val = dirbrowse();
         }
     }
+
+    tc.is_browsing = false;
+
     backup_count--;
     if (backup_count >= 0)
         tc = backups[backup_count];
-
-    tc.is_browsing = false;
 
     return ret_val;
 }
