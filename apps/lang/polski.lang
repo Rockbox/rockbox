@@ -454,10 +454,10 @@
     *: "System"
   </source>
   <dest>
-    *: "System"
+    *: "~System"
   </dest>
   <voice>
-    *: "System"
+    *: "~System"
   </voice>
 </phrase>
 <phrase>
@@ -692,10 +692,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "~Stereo"
   </dest>
   <voice>
-    *: "Stereofoniczny"
+    *: "~Stereofoniczny"
   </voice>
 </phrase>
 <phrase>
@@ -706,10 +706,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Monofoniczny"
+    *: "~Monofoniczny"
   </voice>
 </phrase>
 <phrase>
@@ -779,10 +779,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -807,7 +807,7 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </dest>
   <voice>
     *: "krosfid"
@@ -1470,7 +1470,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "~Replaygain"
   </dest>
   <voice>
     *: "riplejgejn"
@@ -4871,11 +4871,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </voice>
 </phrase>
 <phrase>
@@ -4886,10 +4886,10 @@
     *: "Format"
   </source>
   <dest>
-    *: "Format"
+    *: "~Format"
   </dest>
   <voice>
-    *: "Format"
+    *: "~Format"
   </voice>
 </phrase>
 <phrase>
@@ -4902,11 +4902,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -4919,11 +4919,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -5636,11 +5636,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Przywróć)"
+    remote: "(Głośność- : Przywróć)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Przywróć)"
+    remote: "Głośność minus przywróć"
   </voice>
 </phrase>
 <phrase>
@@ -5922,7 +5922,7 @@
     *: "Wolne miejsce:"
   </dest>
   <voice>
-    *: "Wolne miejsce na dysku:"
+    *: "Wolne miejsce na dysku"
   </voice>
 </phrase>
 <phrase>
@@ -5965,7 +5965,7 @@
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
+    hibylinux: "u es be"
     multivolume: "ha de 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro es de"
     xduoox3: "mikro es de 2"
@@ -6371,10 +6371,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -7036,7 +7036,7 @@
     *: "Tryb:"
   </dest>
   <voice>
-    *: "Tryb:"
+    *: "Tryb"
   </voice>
 </phrase>
 <phrase>
@@ -7880,7 +7880,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "~minus"
   </voice>
 </phrase>
 <phrase>
@@ -7894,7 +7894,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "~plus"
   </voice>
 </phrase>
 <phrase>
@@ -8922,7 +8922,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "~oh"
   </voice>
 </phrase>
 <phrase>
@@ -10142,11 +10142,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "~Limit"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "~Limit"
   </voice>
 </phrase>
 <phrase>
@@ -10450,7 +10450,7 @@
     *: "Następny:"
   </dest>
   <voice>
-    *: "Następny:"
+    *: "Następny"
   </voice>
 </phrase>
 <phrase>
@@ -10814,10 +10814,10 @@
     *: "Limit"
   </source>
   <dest>
-    *: "Limit"
+    *: "~Limit"
   </dest>
   <voice>
-    *: "Limit"
+    *: "~Limit"
   </voice>
 </phrase>
 <phrase>
@@ -10830,11 +10830,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -10961,7 +10961,7 @@
     *: "Następny:"
   </dest>
   <voice>
-    *: "Następny:"
+    *: "Następny"
   </voice>
 </phrase>
 <phrase>
@@ -11070,11 +11070,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11195,7 +11195,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Poziom sygnału:"
+    radio: "Poziom sygnału"
   </voice>
 </phrase>
 <phrase>
@@ -12334,7 +12334,7 @@
     *: "Poziom 3: 60 ruchów / 30 min"
   </dest>
   <voice>
-    *: "Poziom 3: 60 ruchów na 30 minut"
+    *: "Poziom 3 60 ruchów na 30 minut"
   </voice>
 </phrase>
 <phrase>
@@ -12612,7 +12612,7 @@
     *: "Poziom 1: 60 ruchów / 5 min"
   </dest>
   <voice>
-    *: "Poziom 1: 60 ruchów na 5 minut"
+    *: "Poziom 1 60 ruchów na 5 minut"
   </voice>
 </phrase>
 <phrase>
@@ -12643,7 +12643,7 @@
     *: "Poziom 8: 1 ruch / 15 min"
   </dest>
   <voice>
-    *: "Poziom 8: 1 ruch na 15 minut"
+    *: "Poziom 8 1 ruch na 15 minut"
   </voice>
 </phrase>
 <phrase>
@@ -12671,7 +12671,7 @@
     *: "Poziom 4: 40 ruchów / 30 min"
   </dest>
   <voice>
-    *: "Poziom 4: 40 ruchów na 30 minut"
+    *: "Poziom 4 40 ruchów na 30 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13199,7 +13199,7 @@
     *: "Poziom 7: 40 ruchów / 240 min"
   </dest>
   <voice>
-    *: "Poziom 7: 40 ruchów na 240 minut"
+    *: "Poziom 7 40 ruchów na 240 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13230,7 +13230,7 @@
     *: "Poziom 2: 60 ruchów / 15 min"
   </dest>
   <voice>
-    *: "Poziom 2: 60 ruchów na 15 minut"
+    *: "Poziom 2 60 ruchów na 15 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13401,7 +13401,7 @@
     *: "Poziom 6: 40 ruchów / 120 min"
   </dest>
   <voice>
-    *: "Poziom 6: 40 ruchów na 120 minut"
+    *: "Poziom 6 40 ruchów na 120 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13567,7 +13567,7 @@
     *: "Poziom 5: 40 ruchów / 60 min"
   </dest>
   <voice>
-    *: "Poziom 5: 40 ruchów na 60 minut"
+    *: "Poziom 5 40 ruchów na 60 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13814,7 +13814,7 @@
     *: "Poziom 10: 1 ruch / 600 min"
   </dest>
   <voice>
-    *: "Poziom 10: 1 ruch na 600 minut"
+    *: "Poziom 10 1 ruch na 600 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14322,7 +14322,7 @@
     *: "Poziom 9: 1 ruch / 60 min"
   </dest>
   <voice>
-    *: "Poziom 9: 1 ruch na 60 minut"
+    *: "Poziom 9 1 ruch na 60 minut"
   </voice>
 </phrase>
 <phrase>
