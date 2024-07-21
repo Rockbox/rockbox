@@ -5721,7 +5721,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Volume minus to Re-enable)"
   </voice>
 </phrase>
 <phrase>
@@ -6003,7 +6003,7 @@
     *: "Free:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Free disk space"
   </voice>
 </phrase>
 <phrase>
@@ -7117,7 +7117,7 @@
     *: "Mode:"
   </dest>
   <voice>
-    *: "Mode:"
+    *: "Mode"
   </voice>
 </phrase>
 <phrase>
@@ -7443,7 +7443,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Battery: Charging"
+    charging: "Battery is Charging"
   </voice>
 </phrase>
 <phrase>
@@ -8779,7 +8779,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "Current time"
   </voice>
 </phrase>
 <phrase>
@@ -10759,7 +10759,7 @@
     *: "Next Track:"
   </dest>
   <voice>
-    *: "Next Track:"
+    *: "Next Track"
   </voice>
 </phrase>
 <phrase>
@@ -10773,7 +10773,7 @@
     *: "Next:"
   </dest>
   <voice>
-    *: "Next:"
+    *: "Next"
   </voice>
 </phrase>
 <phrase>
@@ -11321,7 +11321,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Signal strength:"
+    radio: "Signal strength"
   </voice>
 </phrase>
 <phrase>
@@ -13279,7 +13279,7 @@
     *: "Level 1: 60 moves / 5 min"
   </dest>
   <voice>
-    *: "Level 1: 60 moves per 5 minutes"
+    *: "Level 1, 60 moves per 5 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13293,7 +13293,7 @@
     *: "Level 2: 60 moves / 15 min"
   </dest>
   <voice>
-    *: "Level 2: 60 moves per 15 minutes"
+    *: "Level 2, 60 moves per 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13307,7 +13307,7 @@
     *: "Level 3: 60 moves / 30 min"
   </dest>
   <voice>
-    *: "Level 3: 60 moves per 30 minutes"
+    *: "Level 3, 60 moves per 30 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13321,7 +13321,7 @@
     *: "Level 4: 40 moves / 30 min"
   </dest>
   <voice>
-    *: "Level 4: 40 moves per 30 minutes"
+    *: "Level 4, 40 moves per 30 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13335,7 +13335,7 @@
     *: "Level 5: 40 moves / 60 min"
   </dest>
   <voice>
-    *: "Level 5: 40 moves per 60 minutes"
+    *: "Level 5, 40 moves per 60 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13349,7 +13349,7 @@
     *: "Level 6: 40 moves / 120 min"
   </dest>
   <voice>
-    *: "Level 6: 40 moves per 120 minutes"
+    *: "Level 6, 40 moves per 120 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13363,7 +13363,7 @@
     *: "Level 7: 40 moves / 240 min"
   </dest>
   <voice>
-    *: "Level 7: 40 moves per 240 minutes"
+    *: "Level 7, 40 moves per 240 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13377,7 +13377,7 @@
     *: "Level 8: 1 move / 15 min"
   </dest>
   <voice>
-    *: "Level 8: 1 move per 15 minutes"
+    *: "Level 8, 1 move per 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13391,7 +13391,7 @@
     *: "Level 9: 1 move / 60 min"
   </dest>
   <voice>
-    *: "Level 9: 1 move per 60 minutes"
+    *: "Level 9, 1 move per 60 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13405,7 +13405,7 @@
     *: "Level 10: 1 move / 600 min"
   </dest>
   <voice>
-    *: "Level 10: 1 move per 600 minutes"
+    *: "Level 10, 1 move per 600 minutes"
   </voice>
 </phrase>
 <phrase>

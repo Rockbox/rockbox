@@ -7901,7 +7901,7 @@
     *: "模式:"
   </dest>
   <voice>
-    *: "模式:"
+    *: "模式"
   </voice>
 </phrase>
 <phrase>
@@ -10148,7 +10148,7 @@
     *: "下一曲:"
   </dest>
   <voice>
-    *: "下一曲:"
+    *: "下一曲"
   </voice>
 </phrase>
 <phrase>
@@ -11203,7 +11203,7 @@
   </dest>
   <voice>
     *: none
-    radio: "信号强度:"
+    radio: "信号强度"
   </voice>
 </phrase>
 <phrase>
@@ -13212,7 +13212,7 @@
     *: "Level 1: 60 步 / 5 分钟"
   </dest>
   <voice>
-    *: "Level 1: 60 步 每5 分钟"
+    *: "Level 1, 60 步 每5 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13226,7 +13226,7 @@
     *: "Level 2: 60 步 / 15 分钟"
   </dest>
   <voice>
-    *: "Level 2: 60 步 每15 分钟"
+    *: "Level 2, 60 步 每15 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13240,7 +13240,7 @@
     *: "Level 3: 60 步 / 30 分钟"
   </dest>
   <voice>
-    *: "Level 3: 60 步 每30 分钟"
+    *: "Level 3, 60 步 每30 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13254,7 +13254,7 @@
     *: "Level 4: 40 步 / 30 分钟"
   </dest>
   <voice>
-    *: "Level 4: 40 步 每30 分钟"
+    *: "Level 4, 40 步 每30 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13268,7 +13268,7 @@
     *: "Level 5: 40 步 / 60 分钟"
   </dest>
   <voice>
-    *: "Level 5: 40 步 每60 分钟"
+    *: "Level 5, 40 步 每60 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13282,7 +13282,7 @@
     *: "Level 6: 40 步 / 120 分钟"
   </dest>
   <voice>
-    *: "Level 6: 40 步 每120 分钟"
+    *: "Level 6, 40 步 每120 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13296,7 +13296,7 @@
     *: "Level 7: 40 步 / 240 分钟"
   </dest>
   <voice>
-    *: "Level 7: 40 步 每240 分钟"
+    *: "Level 7, 40 步 每240 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13310,7 +13310,7 @@
     *: "Level 8: 1 步 / 15 分钟"
   </dest>
   <voice>
-    *: "Level 8: 1 步 每15 分钟"
+    *: "Level 8, 1 步 每15 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13324,7 +13324,7 @@
     *: "Level 9: 1 步 / 60 分钟"
   </dest>
   <voice>
-    *: "Level 9: 1 步 每60 分钟"
+    *: "Level 9, 1 步 每60 分钟"
   </voice>
 </phrase>
 <phrase>
@@ -13338,7 +13338,7 @@
     *: "Level 10: 1 步 / 600 分钟"
   </dest>
   <voice>
-    *: "Level 10: 1 步 每 600 分钟"
+    *: "Level 10, 1 步 每 600 分钟"
   </voice>
 </phrase>
 <phrase>

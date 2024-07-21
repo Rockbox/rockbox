@@ -3271,7 +3271,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Tastenbeleuchtung: Helligkeit"
+    buttonlight_brightness: "Tastenbeleuchtung Helligkeit"
   </voice>
 </phrase>
 <phrase>
@@ -5917,7 +5917,7 @@
     *: "Frei:"
   </dest>
   <voice>
-    *: "Freier Plattenplatz:"
+    *: "Freier Plattenplatz"
   </voice>
 </phrase>
 <phrase>
@@ -7031,7 +7031,7 @@
     *: "Modus:"
   </dest>
   <voice>
-    *: "Modus:"
+    *: "Modus"
   </voice>
 </phrase>
 <phrase>
@@ -8693,7 +8693,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Uhrzeit:"
+    rtc: "Uhrzeit"
   </voice>
 </phrase>
 <phrase>
@@ -10363,7 +10363,7 @@
     *: "Danach:"
   </dest>
   <voice>
-    *: "Danach:"
+    *: "Danach"
   </voice>
 </phrase>
 <phrase>
@@ -10628,7 +10628,7 @@
     *: "Nächster Titel:"
   </dest>
   <voice>
-    *: "Nächster Titel:"
+    *: "Nächster Titel"
   </voice>
 </phrase>
 <phrase>
@@ -11221,7 +11221,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Signalstärke:"
+    radio: "Signalstärke"
   </voice>
 </phrase>
 <phrase>
@@ -12091,7 +12091,7 @@
     *: "Level 5: 40 Züge/ 60 min"
   </dest>
   <voice>
-    *: "Level 5: 40 Züge pro 60 Minuten"
+    *: "Level 5, 40 Züge pro 60 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -12391,7 +12391,7 @@
     *: "Level 1: 60 Züge/ 5 min"
   </dest>
   <voice>
-    *: "Level 1: 60 Züge pro 5 Minuten"
+    *: "Level 1, 60 Züge pro 5 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -12565,7 +12565,7 @@
     *: "Level 2: 60 Züge / 15 min"
   </dest>
   <voice>
-    *: "Level 2: 60 Züge pro 15 Minuten"
+    *: "Level 2, 60 Züge pro 15 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -12773,7 +12773,7 @@
     *: "Level 7: 40 Züge / 240 min"
   </dest>
   <voice>
-    *: "Level 7: 40 Züge pro 240 Minuten"
+    *: "Level 7, 40 Züge pro 240 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13068,7 +13068,7 @@
     *: "Level 9: 1 Züge / 60 min"
   </dest>
   <voice>
-    *: "Level 9: 1 Züge pro 60 Minuten"
+    *: "Level 9, 1 Züge pro 60 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13183,7 +13183,7 @@
     *: "Level 3: 60 Züge / 30 min"
   </dest>
   <voice>
-    *: "Level 3: 60 Züge pro 30 Minuten"
+    *: "Level 3, 60 Züge pro 30 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13708,7 +13708,7 @@
     *: "Level 4: 40 Züge / 30 min"
   </dest>
   <voice>
-    *: "Level 4: 40 Züge pro 30 Minuten"
+    *: "Level 4, 40 Züge pro 30 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -14084,7 +14084,7 @@
     *: "Level 6: 40 Züge / 120 min"
   </dest>
   <voice>
-    *: "Level 6: 40 Züge pro 120 Minuten"
+    *: "Level 6, 40 Züge pro 120 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -14334,7 +14334,7 @@
     *: "Level 10: 1 Zug / 600 min"
   </dest>
   <voice>
-    *: "Level 10: 1 Zug pro 600 Minuten"
+    *: "Level 10, 1 Zug pro 600 Minuten"
   </voice>
 </phrase>
 <phrase>
@@ -14404,7 +14404,7 @@
     *: "Level 8: 1 Zug / 15 min"
   </dest>
   <voice>
-    *: "Level 8: 1 Zug pro 15 Minuten"
+    *: "Level 8, 1 Zug pro 15 Minuten"
   </voice>
 </phrase>
 <phrase>

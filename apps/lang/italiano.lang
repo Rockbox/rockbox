@@ -5141,7 +5141,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Suddivisione per: "
+    recording: "Suddivisione per "
   </voice>
 </phrase>
 <phrase>
@@ -5209,7 +5209,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Tempo: "
+    recording: "Tempo "
   </voice>
 </phrase>
 <phrase>
@@ -5916,7 +5916,7 @@
     *: "Liberi:"
   </dest>
   <voice>
-    *: "Spazio Libero su Disco:"
+    *: "Spazio Libero su Disco"
   </voice>
 </phrase>
 <phrase>
@@ -7030,7 +7030,7 @@
     *: "Modo:"
   </dest>
   <voice>
-    *: "Modo:"
+    *: "Modo"
   </voice>
 </phrase>
 <phrase>
@@ -8692,7 +8692,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "ora attuale:"
+    rtc: "ora attuale"
   </voice>
 </phrase>
 <phrase>
@@ -10627,7 +10627,7 @@
     *: "Prossima Traccia:"
   </dest>
   <voice>
-    *: "Prossima Traccia:"
+    *: "Prossima Traccia"
   </voice>
 </phrase>
 <phrase>
@@ -10641,7 +10641,7 @@
     *: "Prossima:"
   </dest>
   <voice>
-    *: "Prossima:"
+    *: "Prossima"
   </voice>
 </phrase>
 <phrase>
@@ -11189,7 +11189,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Potenza segnale:"
+    radio: "Potenza segnale"
   </voice>
 </phrase>
 <phrase>
@@ -12463,7 +12463,7 @@
     *: "Livello 9: 1 mossa / 60 min"
   </dest>
   <voice>
-    *: "Livello 9: 1 mossa ogni 60 minuti"
+    *: "Livello 9, 1 mossa ogni 60 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -12477,7 +12477,7 @@
     *: "Livello 8: 1 mossa / 15 min"
   </dest>
   <voice>
-    *: "Livello 8: 1 mossa ogni 15 minuti"
+    *: "Livello 8, 1 mossa ogni 15 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -12991,7 +12991,7 @@
     *: "Livello 2: 60 mosse / 15 min"
   </dest>
   <voice>
-    *: "Livello 2: 60 mosse ogni 15 minuti"
+    *: "Livello 2, 60 mosse ogni 15 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -13095,7 +13095,7 @@
     *: "Livello 5: 40 mosse / 60 min"
   </dest>
   <voice>
-    *: "Livello 5: 40 mosse ogni 60 minuti"
+    *: "Livello 5, 40 mosse ogni 60 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -13272,7 +13272,7 @@
     *: "Livello 10: 1 mossa / 600 min"
   </dest>
   <voice>
-    *: "Livello 10: 1 mossa ogni 600 minuti"
+    *: "Livello 10, 1 mossa ogni 600 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -13572,7 +13572,7 @@
     *: "Livello 7: 40 mosse / 240 min"
   </dest>
   <voice>
-    *: "Livello 7: 40 mosse ogni 240 minuti"
+    *: "Livello 7, 40 mosse ogni 240 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -13875,7 +13875,7 @@
     *: "Livello 3: 60 mosse / 30 min"
   </dest>
   <voice>
-    *: "Livello 3: 60 mosse ogni 30 minuti"
+    *: "Livello 3, 60 mosse ogni 30 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -14027,7 +14027,7 @@
     *: "Livello 6: 40 mosse / 120 min"
   </dest>
   <voice>
-    *: "Livello 6: 40 mosse ogni 120 minuti"
+    *: "Livello 6, 40 mosse ogni 120 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -14134,7 +14134,7 @@
     *: "Livello 1: 60 mosse / 5 min"
   </dest>
   <voice>
-    *: "Livello 1: 60 mosse ogni 5 minuti"
+    *: "Livello 1, 60 mosse ogni 5 minuti"
   </voice>
 </phrase>
 <phrase>
@@ -14260,7 +14260,7 @@
     *: "Livello 4: 40 mosse / 30 min"
   </dest>
   <voice>
-    *: "Livello 4: 40 mosse ogni 30 minuti"
+    *: "Livello 4, 40 mosse ogni 30 minuti"
   </voice>
 </phrase>
 <phrase>
