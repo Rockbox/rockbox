@@ -16417,7 +16417,7 @@
   desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
   user: core
   <source>
-    *: "~%ld%%"
+    *: "%ld%%"
   </source>
   <dest>
     *: "~%ld%%"
