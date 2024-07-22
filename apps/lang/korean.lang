@@ -3418,7 +3418,7 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
+    battery_types: "~NiMH"
     xduoox3: "오래됨 (1500 mAh)"
   </dest>
   <voice>
@@ -4743,7 +4743,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "사전설정 목록 로드"
   </voice>
 </phrase>
 <phrase>
@@ -4940,11 +4940,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "PCM 웨이브"
   </voice>
 </phrase>
 <phrase>
@@ -5661,7 +5661,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(볼륨- : 다시 켜기)"
+    remote: "(재활성화하려면 볼륨 마이너스)"
   </voice>
 </phrase>
 <phrase>
@@ -5943,7 +5943,7 @@
     *: "여유:"
   </dest>
   <voice>
-    *: "여유 디스크공간:"
+    *: "여유 디스크공간"
   </voice>
 </phrase>
 <phrase>
@@ -5957,8 +5957,8 @@
   </source>
   <dest>
     *: "내부:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux: "마이크로SD:"
+    xduoox3: "마이크로SD1:"
   </dest>
   <voice>
     *: "내부"
@@ -5981,8 +5981,8 @@
     *: none
     hibylinux: "USB:"
     multivolume: "HD1:"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "마이크로SD:"
+    xduoox3: "마이크로SD2:"
   </dest>
   <voice>
     *: none
@@ -7057,7 +7057,7 @@
     *: "모드:"
   </dest>
   <voice>
-    *: "Mode:"
+    *: "모드"
   </voice>
 </phrase>
 <phrase>
@@ -7383,7 +7383,7 @@
   </dest>
   <voice>
     *: none
-    charging: "배터리: 충전중"
+    charging: "배터리 충전 중"
   </voice>
 </phrase>
 <phrase>
@@ -7436,7 +7436,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "~."
   </dest>
   <voice>
     *: "포인트"
@@ -8719,7 +8719,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "현재 시간:"
+    rtc: "현재 시간"
   </voice>
 </phrase>
 <phrase>
@@ -8786,7 +8786,7 @@
     *: "Games"
   </source>
   <dest>
-    *: "Games"
+    *: "게임"
   </dest>
   <voice>
     *: "게임"
@@ -10699,7 +10699,7 @@
     *: "다음 트랙:"
   </dest>
   <voice>
-    *: "다음 트랙:"
+    *: "다음 트랙"
   </voice>
 </phrase>
 <phrase>
@@ -10713,7 +10713,7 @@
     *: "다음:"
   </dest>
   <voice>
-    *: "다음:"
+    *: "다음"
   </voice>
 </phrase>
 <phrase>
@@ -11261,7 +11261,7 @@
   </dest>
   <voice>
     *: none
-    radio: "신호 강도:"
+    radio: "신호 강도"
   </voice>
 </phrase>
 <phrase>
@@ -13219,7 +13219,7 @@
     *: "레벨 1: 60 이동 / 5 분"
   </dest>
   <voice>
-    *: "레벨 1: 5 분당 60 이동"
+    *: "레벨 1, 5 분당 60 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13233,7 +13233,7 @@
     *: "레벨 2: 60 이동 / 15 분"
   </dest>
   <voice>
-    *: "레벨 2: 15 분당 60 이동"
+    *: "레벨 2, 15 분당 60 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13247,7 +13247,7 @@
     *: "레벨 3: 60 이동 / 30 분"
   </dest>
   <voice>
-    *: "레벨 3: 30 분당 60 이동"
+    *: "레벨 3, 30 분당 60 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13258,10 +13258,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "레벨 4: 40 이동 / 30 분
+    *: "레벨 4: 40 이동 / 30 분"
   </dest>
   <voice>
-    *: "레벨 4: 30 분당 40 이동"
+    *: "레벨 4, 30 분당 40 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13275,7 +13275,7 @@
     *: "레벨 5: 40 이동 / 60 분"
   </dest>
   <voice>
-    *: "레벨 5: 60 분당 40 이동"
+    *: "레벨 5, 60 분당 40 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13289,7 +13289,7 @@
     *: "레벨 6: 40 이동 / 120 분"
   </dest>
   <voice>
-    *: "레벨 6: 120 분당 40 이동"
+    *: "레벨 6, 120 분당 40 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13303,7 +13303,7 @@
     *: "레벨 7: 40 이동 / 240 분"
   </dest>
   <voice>
-    *: "레벨 7: 240 분당 40 이동"
+    *: "레벨 7, 240 분당 40 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13317,7 +13317,7 @@
     *: "레벨 8: 1 이동 / 15 분"
   </dest>
   <voice>
-    *: "레벨 8: 15 분당 1 이동"
+    *: "레벨 8, 15 분당 1 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13331,7 +13331,7 @@
     *: "레벨 9: 1 이동 / 60 분"
   </dest>
   <voice>
-    *: "레벨 9: 60 분당 1 이동"
+    *: "레벨 9, 60 분당 1 이동"
   </voice>
 </phrase>
 <phrase>
@@ -13345,7 +13345,7 @@
     *: "레벨 10: 1 이동 / 600 분"
   </dest>
   <voice>
-    *: "레벨 10: 600 분당 1 이동"
+    *: "레벨 10, 600 분당 1 이동"
   </voice>
 </phrase>
 <phrase>
