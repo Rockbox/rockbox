@@ -740,6 +740,17 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'korean' => {  #
+	'lang' => 'korean',
+	'name' => '한국어 (Korean)',
+        'short' => 'ko_KR',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vko',
+	    'gtts' => '-l ko',
+	},
+        'enabled' => 1,
+    },
     'nederlands' => {
 	'lang' => 'nederlands',
 	'name' => 'Nederlands (Dutch)',

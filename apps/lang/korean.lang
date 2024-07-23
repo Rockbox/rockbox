@@ -5979,15 +5979,15 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "마이크로SD:"
     xduoox3: "마이크로SD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "H D 1"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "마이크로 S D"
     xduoox3: "마이크로 S D 2"
   </voice>
