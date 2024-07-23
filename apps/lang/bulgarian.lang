@@ -5975,8 +5975,8 @@
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "H D 1"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро S D"
     xduoox3: "микро S D 2"
   </voice>
