@@ -298,7 +298,7 @@ static bool playing_time(void)
     struct playing_time_info pti;
     struct playlist_track_info pltrack;
     struct mp3entry id3;
-    int i, index, fd;
+    int i, index;
 
     pti.nb_tracks = rb->playlist_amount();
     rb->playlist_get_resume_info(&pti.curr_index);
@@ -313,8 +313,11 @@ static bool playing_time(void)
     pti.kbs[ePT_KBS_BEF] = curr_id3->offset / 1024;
     pti.kbs[ePT_KBS_AFT] = (curr_id3->filesize -curr_id3->offset) / 1024;
 
-    rb->splash(0, ID2P(LANG_WAIT));
-    rb->splash_progress_set_delay(5 * HZ);
+    rb->splash_progress_set_delay(HZ/2);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(true);
+#endif
     /* Go through each file in the playlist and get its stats. For
        huge playlists this can take a while... The reference position
        is the position at the moment this function was invoked,
@@ -326,8 +329,8 @@ static bool playing_time(void)
             index = 0;
 
         /* Show a splash while we are loading. */
-        rb->splash_progress(i, pti.nb_tracks,
-                         "%s (%s)", rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
+        rb->splash_progress(i, pti.nb_tracks, "%s (%s)",
+                            rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
 
         /* Voice equivalent */
         if (TIME_AFTER(*rb->current_tick, talked_tick + 5 * HZ)) {
@@ -336,42 +339,37 @@ static bool playing_time(void)
                      TALK_ID(i * 100 / pti.nb_tracks, UNIT_PERCENT));
         }
         if (rb->action_userabort(TIMEOUT_NOBLOCK))
+        {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
             goto exit;
+        }
 
         if (index == pti.curr_index)
             continue;
 
-        if (rb->playlist_get_track_info(NULL, index, &pltrack) >= 0)
+        if (rb->playlist_get_track_info(NULL, index, &pltrack) < 0
+            || rb->mp3info(&id3, pltrack.filename))
         {
-            bool ret = false;
-            if ((fd = rb->open(pltrack.filename, O_RDONLY)) >= 0)
-            {
-                ret = rb->get_metadata(&id3, fd, pltrack.filename);
-                rb->close(fd);
-                if (ret)
-                {
-                    if (pltrack.display_index < pti.curr_display_index) {
-                        pti.secs[ePT_SECS_BEF] += id3.length / 1000;
-                        pti.kbs[ePT_KBS_BEF] += id3.filesize / 1024;
-                    } else {
-                        pti.secs[ePT_SECS_AFT] += id3.length / 1000;
-                        pti.kbs[ePT_KBS_AFT] += id3.filesize / 1024;
-                    }
-                }
-            }
+            error_count++;
+            continue;
+        }
 
-            if (!ret)
-            {
-                error_count++;
-                continue;
-            }
+        if (pltrack.display_index < pti.curr_display_index) /* preceding tracks */
+        {
+            pti.secs[ePT_SECS_BEF] += id3.length / 1000;
+            pti.kbs[ePT_KBS_BEF] += id3.filesize / 1024;
         }
         else
         {
-            error_count++;
-            break;
+            pti.secs[ePT_SECS_AFT] += id3.length / 1000;
+            pti.kbs[ePT_KBS_AFT] += id3.filesize / 1024;
         }
     }
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(false);
+#endif
 
     if (error_count > 0)
     {
