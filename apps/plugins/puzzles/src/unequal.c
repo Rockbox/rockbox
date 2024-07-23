@@ -1844,18 +1844,18 @@ static void draw_gt(drawing *dr, int ox, int oy,
 {
     int coords[12];
     int xdx = (dx1+dx2 ? 0 : 1), xdy = (dx1+dx2 ? 1 : 0);
-    coords[0] = ox + xdx;
-    coords[1] = oy + xdy;
-    coords[2] = ox + xdx + dx1;
-    coords[3] = oy + xdy + dy1;
-    coords[4] = ox + xdx + dx1 + dx2;
-    coords[5] = oy + xdy + dy1 + dy2;
-    coords[6] = ox - xdx + dx1 + dx2;
-    coords[7] = oy - xdy + dy1 + dy2;
-    coords[8] = ox - xdx + dx1;
-    coords[9] = oy - xdy + dy1;
-    coords[10] = ox - xdx;
-    coords[11] = oy - xdy;
+    coords[0] = ox + xdx + dx1;
+    coords[1] = oy + xdy + dy1;
+    coords[2] = ox + xdx + dx1 + dx2;
+    coords[3] = oy + xdy + dy1 + dy2;
+    coords[4] = ox - xdx + dx1 + dx2;
+    coords[5] = oy - xdy + dy1 + dy2;
+    coords[6] = ox - xdx + dx1;
+    coords[7] = oy - xdy + dy1;
+    coords[8] = ox - xdx;
+    coords[9] = oy - xdy;
+    coords[10] = ox + xdx;
+    coords[11] = oy + xdy;
     draw_polygon(dr, coords, 6, col, col);
 }
 

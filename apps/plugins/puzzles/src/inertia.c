@@ -1886,6 +1886,11 @@ static void draw_player(drawing *dr, game_drawstate *ds, int x, int y,
 	    coords[d*4+2] = x + TILESIZE/2 + (int)((TILESIZE*3/7) * x2);
 	    coords[d*4+3] = y + TILESIZE/2 + (int)((TILESIZE*3/7) * y2);
 	}
+        /* rockbox hack */
+        int tmp[2] = { coords[0], coords[1] };
+        memmove(coords, coords + 2, sizeof(int) * DIRECTIONS * 4 - 2);
+        memcpy(coords + DIRECTIONS * 4 - 2, tmp, 2 * sizeof(int));
+        
 	draw_polygon(dr, coords, DIRECTIONS*2, COL_DEAD_PLAYER, COL_OUTLINE);
     } else {
 	draw_circle(dr, x + TILESIZE/2, y + TILESIZE/2,
@@ -1901,8 +1906,6 @@ static void draw_player(drawing *dr, game_drawstate *ds, int x, int y,
 	int coords[14], *c;
 
 	c = coords;
-	*c++ = ox + px/9;
-	*c++ = oy + py/9;
 	*c++ = ox + px/9 + ax*2/3;
 	*c++ = oy + py/9 + ay*2/3;
 	*c++ = ox + px/3 + ax*2/3;
@@ -1915,6 +1918,8 @@ static void draw_player(drawing *dr, game_drawstate *ds, int x, int y,
 	*c++ = oy - py/9 + ay*2/3;
 	*c++ = ox - px/9;
 	*c++ = oy - py/9;
+	*c++ = ox + px/9;
+	*c++ = oy + py/9;
 	draw_polygon(dr, coords, 7, COL_HINT, COL_OUTLINE);
     }
 

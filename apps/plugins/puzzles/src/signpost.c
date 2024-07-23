@@ -1895,8 +1895,9 @@ static void draw_star(drawing *dr, int cx, int cy, int rad, int npoints,
     coords = snewn(npoints * 2 * 2, int);
 
     for (n = 0; n < npoints * 2; n++) {
-        a = 2.0 * PI * ((double)n / ((double)npoints * 2.0)) + angle_offset;
-        r = (n % 2) ? (double)rad/2.0 : (double)rad;
+        /* hack to accomodate rockbox's concave polygon drawing */
+        a = 2.0 * PI * ((double)n / ((double)npoints * 2.0)) + angle_offset - PI / npoints;
+        r = (n % 2 == 0) ? (double)rad/2.0 : (double)rad;
 
         /* We're rotating the point at (0, -r) by a degrees */
         coords[2*n+0] = cx + (int)( r * sin(a));

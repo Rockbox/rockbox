@@ -2867,12 +2867,12 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
     coords[(n)*2+0] = x + (int)(TILE_SIZE * (dx)); \
     coords[(n)*2+1] = y + (int)(TILE_SIZE * (dy)); \
 } while (0)
-	    SETCOORD(0, 0.6F,  0.35F);
-	    SETCOORD(1, 0.6F,  0.7F);
-	    SETCOORD(2, 0.8F,  0.8F);
-	    SETCOORD(3, 0.25F, 0.8F);
-	    SETCOORD(4, 0.55F, 0.7F);
-	    SETCOORD(5, 0.55F, 0.35F);
+	    SETCOORD(0, 0.6F,  0.7F);
+	    SETCOORD(1, 0.8F,  0.8F);
+	    SETCOORD(2, 0.25F, 0.8F);
+	    SETCOORD(3, 0.55F, 0.7F);
+	    SETCOORD(4, 0.55F, 0.35F);
+	    SETCOORD(5, 0.6F,  0.35F);
 	    draw_polygon(dr, coords, 6, COL_FLAGBASE, COL_FLAGBASE);
 
 	    SETCOORD(0, 0.6F, 0.2F);
