@@ -87,7 +87,7 @@ my %festival_lang_map = (
 
 my %gtts_lang_map = (
     'english' => '-l en -t co.uk',  # Always first, it's the golden master
-    'bulgarian' => 'l bg',
+    'bulgarian' => '-l bg',
     'chinese-simp' => '-l zh',
     'czech' => '-l cs',
     'dansk' => '-l da',
