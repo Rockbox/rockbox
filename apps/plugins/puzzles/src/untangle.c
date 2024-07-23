@@ -20,10 +20,6 @@
  *    requirements are adequately expressed by a single scalar tile
  *    size), and probably complicate the rest of the puzzles' API as a
  *    result. So I'm not sure I really want to do it.
- *
- *  - It would be nice if we could somehow auto-detect a real `long
- *    long' type on the host platform and use it in place of my
- *    hand-hacked int64s. It'd be faster and more reliable.
  */
 
 #include <stdio.h>
@@ -31,7 +27,15 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
+#if HAVE_STDINT_H
+#  include <stdint.h>
+#endif
 
 #include "puzzles.h"
 #include "tree234.h"
@@ -39,7 +43,6 @@
 #define CIRCLE_RADIUS 6
 #define DRAG_THRESHOLD (CIRCLE_RADIUS * 2)
 #define PREFERRED_TILESIZE 64
-#define CURSOR_GRANULARITY 5
 
 #define FLASH_TIME 0.30F
 #define ANIM_TIME 0.13F
@@ -49,9 +52,7 @@ enum {
     COL_SYSBACKGROUND,
     COL_BACKGROUND,
     COL_LINE,
-#ifdef SHOW_CROSSINGS
     COL_CROSSEDLINE,
-#endif
     COL_OUTLINE,
     COL_POINT,
     COL_DRAGPOINT,
@@ -93,9 +94,7 @@ struct game_state {
     game_params params;
     int w, h;			       /* extent of coordinate system only */
     point *pts;
-#ifdef SHOW_CROSSINGS
     int *crosses;		       /* mark edges which are crossed */
-#endif
     struct graph *graph;
     bool completed, cheated, just_solved;
 };
@@ -208,6 +207,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->n < 4)
         return "Number of points must be at least four";
+    if (params->n > INT_MAX / 3)
+        return "Number of points must not be unreasonably large";
     return NULL;
 }
 
@@ -215,6 +216,9 @@ static const char *validate_params(const game_params *params, bool full)
  * Small number of 64-bit integer arithmetic operations, to prevent
  * integer overflow at the very core of cross().
  */
+
+#if !HAVE_STDINT_H
+/* For prehistoric C implementations, do this the hard way */
 
 typedef struct {
     long hi;
@@ -294,6 +298,21 @@ static int64 dotprod64(long a, long b, long p, long q)
 	ab.hi++;
     return ab;
 }
+
+#else /* HAVE_STDINT_H */
+
+typedef int64_t int64;
+#define greater64(i,j) ((i) > (j))
+#define sign64(i) ((i) < 0 ? -1 : (i)==0 ? 0 : +1)
+#define mulu32to64(x,y) ((int64_t)(unsigned long)(x) * (unsigned long)(y))
+#define mul32to64(x,y) ((int64_t)(long)(x) * (long)(y))
+
+static int64 dotprod64(long a, long b, long p, long q)
+{
+    return (int64)a * b + (int64)p * q;
+}
+
+#endif /* HAVE_STDINT_H */
 
 /*
  * Determine whether the line segments between a1 and a2, and
@@ -419,7 +438,9 @@ static void addedge(tree234 *edges, int a, int b)
     e->a = min(a, b);
     e->b = max(a, b);
 
-    add234(edges, e);
+    if (add234(edges, e) != e)
+        /* Duplicate edge. */
+        sfree(e);
 }
 
 static bool isedge(tree234 *edges, int a, int b)
@@ -441,8 +462,8 @@ typedef struct vertex {
 
 static int vertcmpC(const void *av, const void *bv)
 {
-    const vertex *a = (vertex *)av;
-    const vertex *b = (vertex *)bv;
+    const vertex *a = (const vertex *)av;
+    const vertex *b = (const vertex *)bv;
 
     if (a->param < b->param)
 	return -1;
@@ -754,6 +775,8 @@ static const char *validate_desc(const game_params *params, const char *desc)
 		return "Expected ',' after number in game description";
 	    desc++;		       /* eat comma */
 	}
+        if (a == b)
+            return "Node linked to itself in game description";
     }
 
     return NULL;
@@ -765,10 +788,8 @@ static void mark_crossings(game_state *state)
     int i, j;
     edge *e, *e2;
 
-#ifdef SHOW_CROSSINGS
     for (i = 0; (e = index234(state->graph->edges, i)) != NULL; i++)
 	state->crosses[i] = false;
-#endif
 
     /*
      * Check correctness: for every pair of edges, see whether they
@@ -782,11 +803,7 @@ static void mark_crossings(game_state *state)
 	    if (cross(state->pts[e2->a], state->pts[e2->b],
 		      state->pts[e->a], state->pts[e->b])) {
 		ok = false;
-#ifdef SHOW_CROSSINGS
 		state->crosses[i] = state->crosses[j] = true;
-#else
-		goto done;	       /* multi-level break - sorry */
-#endif
 	    }
 	}
     }
@@ -795,9 +812,6 @@ static void mark_crossings(game_state *state)
      * e == NULL if we've gone through all the edge pairs
      * without finding a crossing.
      */
-#ifndef SHOW_CROSSINGS
-    done:
-#endif
     if (ok)
 	state->completed = true;
 }
@@ -834,10 +848,8 @@ static game_state *new_game(midend *me, const game_params *params,
 	addedge(state->graph->edges, a, b);
     }
 
-#ifdef SHOW_CROSSINGS
     state->crosses = snewn(count234(state->graph->edges), int);
     mark_crossings(state);	       /* sets up `crosses' and `completed' */
-#endif
 
     return state;
 }
@@ -857,11 +869,9 @@ static game_state *dup_game(const game_state *state)
     ret->completed = state->completed;
     ret->cheated = state->cheated;
     ret->just_solved = state->just_solved;
-#ifdef SHOW_CROSSINGS
     ret->crosses = snewn(count234(ret->graph->edges), int);
     memcpy(ret->crosses, state->crosses,
 	   count234(ret->graph->edges) * sizeof(int));
-#endif
 
     return ret;
 }
@@ -1025,19 +1035,10 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return ret;
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 struct game_ui {
+    /* Invariant: at most one of {dragpoint, cursorpoint} may be valid
+     * at any time. */
     int dragpoint;		       /* point being dragged; -1 if none */
-
     int cursorpoint;                   /* point being highlighted, but
                                         * not dragged by the cursor,
                                         * again -1 if none */
@@ -1046,6 +1047,26 @@ struct game_ui {
     bool just_dragged;                 /* reset in game_changed_state */
     bool just_moved;                   /* _set_ in game_changed_state */
     float anim_length;
+
+    /*
+     * User preference option to snap dragged points to a coarse-ish
+     * grid. Requested by a user who otherwise found themself spending
+     * too much time struggling to get lines nicely horizontal or
+     * vertical.
+     */
+    bool snap_to_grid;
+
+    /*
+     * User preference option to highlight graph edges involved in a
+     * crossing.
+     */
+    bool show_crossed_edges;
+
+    /*
+     * User preference option to show vertices as numbers instead of
+     * circular blobs, so you can easily tell them apart.
+     */
+    bool vertex_numbers;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -1054,21 +1075,51 @@ static game_ui *new_ui(const game_state *state)
     ui->dragpoint = -1;
     ui->cursorpoint = -1;
     ui->just_moved = ui->just_dragged = false;
+    ui->snap_to_grid = false;
+    ui->show_crossed_edges = false;
+    ui->vertex_numbers = false;
     return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *cfg;
+
+    cfg = snewn(4, config_item);
+
+    cfg[0].name = "Snap points to a grid";
+    cfg[0].kw = "snap-to-grid";
+    cfg[0].type = C_BOOLEAN;
+    cfg[0].u.boolean.bval = ui->snap_to_grid;
+
+    cfg[1].name = "Show edges that cross another edge";
+    cfg[1].kw = "show-crossed-edges";
+    cfg[1].type = C_BOOLEAN;
+    cfg[1].u.boolean.bval = ui->show_crossed_edges;
+
+    cfg[2].name = "Display style for vertices";
+    cfg[2].kw = "vertex-style";
+    cfg[2].type = C_CHOICES;
+    cfg[2].u.choices.choicenames = ":Circles:Numbers";
+    cfg[2].u.choices.choicekws = ":circle:number";
+    cfg[2].u.choices.selected = ui->vertex_numbers;
+
+    cfg[3].name = NULL;
+    cfg[3].type = C_END;
+
+    return cfg;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->snap_to_grid = cfg[0].u.boolean.bval;
+    ui->show_crossed_edges = cfg[1].u.boolean.bval;
+    ui->vertex_numbers = cfg[2].u.choices.selected;
 }
 
 static void free_ui(game_ui *ui)
 {
     sfree(ui);
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
 }
 
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
@@ -1084,6 +1135,66 @@ struct game_drawstate {
     int bg, dragpoint, cursorpoint;
     long *x, *y;
 };
+
+static void place_dragged_point(const game_state *state, game_ui *ui,
+                                const game_drawstate *ds, int x, int y)
+{
+    if (ui->snap_to_grid) {
+        /*
+         * We snap points to a grid that has n-1 vertices on each
+         * side. This should be large enough to permit a straight-
+         * line drawing of any n-vertex planar graph, and moreover,
+         * any specific planar embedding of that graph.
+         *
+         * Source: David Eppstein's book 'Forbidden Configurations in
+         * Discrete Geometry' mentions (section 16.3, page 182) that
+         * the point configuration he describes as GRID(n-1,n-1) -
+         * that is, the vertices of a square grid with n-1 vertices on
+         * each side - is universal for n-vertex planar graphs. In
+         * other words (from definitions earlier in the chapter), if a
+         * graph G admits any drawing in the plane at all, then it can
+         * be drawn with straight lines, and with all vertices being
+         * vertices of that grid.
+         *
+         * That fact by itself only says that _some_ planar embedding
+         * of G can be drawn in this grid. We'd prefer that _all_
+         * embeddings of G can be so drawn, because 'snap to grid' is
+         * supposed to be a UI affordance, not an extra puzzle
+         * challenge, so we don't want to constrain the player's
+         * choice of planar embedding.
+         *
+         * But it doesn't make a difference. Proof: given a specific
+         * planar embedding of G, triangulate it, by adding extra
+         * edges to every face of degree > 3. When this process
+         * terminates with every face a triangle, we have a new graph
+         * G' such that no edge can be added without it ceasing to be
+         * planar. Standard theorems say that a maximal planar graph
+         * is 3-connected, and that a 3-connected planar graph has a
+         * _unique_ embedding. So any drawing of G' in the plane can
+         * be converted into a drawing of G in the desired embedding,
+         * by simply removing all the extra edges that we added to
+         * turn G into G'. And G' is still an n-vertex planar graph,
+         * hence it can be drawn in GRID(n-1,n-1). []
+         */
+        int d = state->params.n - 1;
+
+        /* Calculate position in terms of the snapping grid. */
+        x = d * x / (state->w * ds->tilesize);
+        y = d * y / (state->h * ds->tilesize);
+        /* Convert to standard co-ordinates, applying a half-square offset. */
+        ui->newpoint.x = (x * 2 + 1) * state->w;
+        ui->newpoint.y = (y * 2 + 1) * state->h;
+        ui->newpoint.d = d * 2;
+    } else {
+        ui->newpoint.x = x;
+        ui->newpoint.y = y;
+        ui->newpoint.d = ds->tilesize;
+    }
+}
+
+static float normsq(point pt) {
+    return (pt.x * pt.x + pt.y * pt.y) / (pt.d * pt.d);
+}
 
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
@@ -1119,23 +1230,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
 	if (bestd <= DRAG_THRESHOLD * DRAG_THRESHOLD) {
 	    ui->dragpoint = best;
-	    ui->cursorpoint = -1;
-	    ui->newpoint.x = x;
-	    ui->newpoint.y = y;
-	    ui->newpoint.d = ds->tilesize;
-	    return UI_UPDATE;
+	    ui->cursorpoint = -1; /* eliminate the cursor point, if any */
+            place_dragged_point(state, ui, ds, x, y);
+	    return MOVE_UI_UPDATE;
 	}
-
+        return MOVE_NO_EFFECT;
     } else if (IS_MOUSE_DRAG(button) && ui->dragpoint >= 0) {
-	ui->newpoint.x = x;
-	ui->newpoint.y = y;
-	ui->newpoint.d = ds->tilesize;
-	return UI_UPDATE;
+        place_dragged_point(state, ui, ds, x, y);
+	return MOVE_UI_UPDATE;
     } else if (IS_MOUSE_RELEASE(button) && ui->dragpoint >= 0) {
 	int p = ui->dragpoint;
 	char buf[80];
 
 	ui->dragpoint = -1;	       /* terminate drag, no matter what */
+        ui->cursorpoint = -1;          /* also eliminate the cursor point */
 
 	/*
 	 * First, see if we're within range. The user can cancel a
@@ -1145,7 +1253,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->newpoint.x >= (long)state->w*ui->newpoint.d ||
 	    ui->newpoint.y < 0 ||
             ui->newpoint.y >= (long)state->h*ui->newpoint.d)
-	    return UI_UPDATE;
+	    return MOVE_UI_UPDATE;
 
 	/*
 	 * We aren't cancelling the drag. Construct a move string
@@ -1155,109 +1263,140 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		ui->newpoint.x, ui->newpoint.y, ui->newpoint.d);
 	ui->just_dragged = true;
 	return dupstr(buf);
+    } else if (IS_MOUSE_DRAG(button) || IS_MOUSE_RELEASE(button)) {
+        return MOVE_NO_EFFECT;
     }
-    else if(IS_CURSOR_MOVE(button))
-    {
-        if(ui->dragpoint < 0)
-        {
-            /* We're selecting a point here. */
-            /* Search all the points and find the closest one (2-D) in
-             * the given direction. */
-            int i, best;
-            long bestd;
+    else if(IS_CURSOR_MOVE(button)) {
+        if(ui->dragpoint < 0) {
+            /*
+	     * We're selecting a point with the cursor keys.
+	     *
+	     * If no point is currently highlighted, we assume the "0"
+	     * point is highlighted to begin. Then, we search all the
+	     * points and find the nearest one (by Euclidean distance)
+	     * in the quadrant corresponding to the cursor key
+	     * direction. A point is in the right quadrant if and only
+	     * if the azimuth angle to that point from the cursor
+	     * point is within a [-45 deg, +45 deg] interval from the
+	     * direction vector of the cursor key.
+	     *
+	     * An important corner case here is if another point is in
+	     * the exact same location as the currently highlighted
+	     * point (which is a possibility with the "snap to grid"
+	     * preference). In this case, we do not consider the other
+	     * point as a candidate point, so as to prevent the cursor
+	     * from being "stuck" on any point. The player can still
+	     * select the overlapped point by dragging the highlighted
+	     * point away and then navigating back.
+	     */
+            int i, best = -1;
+            float bestd = 0;
 
-            if(ui->cursorpoint < 0)
-            {
+            if(ui->cursorpoint < 0) {
                 ui->cursorpoint = 0;
             }
 
-            /*
-             * Begin drag. We drag the vertex _nearest_ to the pointer,
-             * just in case one is nearly on top of another and we want
-             * to drag the latter. However, we drag nothing at all if
-             * the nearest vertex is outside DRAG_THRESHOLD.
-             */
-            best = -1;
-            bestd = 0;
+	    point cur = state->pts[ui->cursorpoint];
 
             for (i = 0; i < n; i++) {
-                long px, py, dx, dy, d;
-                float angle;
-                int right_direction;
+		point delta;
+		float distsq;
+		point p = state->pts[i];
+                int right_direction = false;
+
                 if(i == ui->cursorpoint)
                     continue;
 
-                px = state->pts[i].x * ds->tilesize / state->pts[i].d;
-                py = state->pts[i].y * ds->tilesize / state->pts[i].d;
-                dx = px - state->pts[ui->cursorpoint].x * ds->tilesize / state->pts[ui->cursorpoint].d;
-                dy = py - state->pts[ui->cursorpoint].y * ds->tilesize / state->pts[ui->cursorpoint].d;
-                d = dx*dx + dy*dy;
+		/* Compute the vector p - cur. Check that it lies in
+		 * the correct quadrant. */
+		delta.x = p.x * cur.d - cur.x * p.d;
+		delta.y = p.y * cur.d - cur.y * p.d;
+		delta.d = cur.d * p.d;
 
-                /* Figure out if this point falls into a 90 degree
-                 * range extending from the current point */
+		if(delta.x == 0 && delta.y == 0)
+		    continue; /* overlaps cursor point - skip */
 
-                angle = atan2(-dy, dx); /* negate y to adjust for raster coordinates */
+		switch(button) {
+		case CURSOR_UP:
+		    right_direction = (delta.y <= -delta.x) && (delta.y <= delta.x);
+		    break;
+		case CURSOR_DOWN:
+		    right_direction = (delta.y >= -delta.x) && (delta.y >= delta.x);
+		    break;
+		case CURSOR_LEFT:
+		    right_direction = (delta.y >= delta.x) && (delta.y <= -delta.x);
+		    break;
+		case CURSOR_RIGHT:
+		    right_direction = (delta.y <= delta.x) && (delta.y >= -delta.x);
+		    break;
+		}
 
-                /* offset to [0..2*PI] */
-                if(angle < 0)
-                    angle += 2*PI;
+		if(!right_direction)
+		    continue;
 
-                right_direction = false;
+		/* Compute squared Euclidean distance */
+		distsq = normsq(delta);
 
-                if((button == CURSOR_UP && (1*PI/4 <= angle && angle <= 3*PI/4))   ||
-                   (button == CURSOR_LEFT && (3*PI/4 <= angle && angle <= 5*PI/4)) ||
-                   (button == CURSOR_DOWN && (5*PI/4 <= angle && angle <= 7*PI/4)) ||
-                   (button == CURSOR_RIGHT && (angle >= 7*PI/4 || angle <= 1*PI/4)))
-                    right_direction = true;
-
-                if ((best == -1 || bestd > d) && right_direction) {
+                if (best == -1 || distsq < bestd) {
                     best = i;
-                    bestd = d;
+                    bestd = distsq;
                 }
             }
 
-            if(best >= 0)
-            {
+            if(best >= 0) {
                 ui->cursorpoint = best;
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
             }
         }
-        else if(ui->dragpoint >= 0)
-        {
-            /* dragging */
-            switch(button)
-            {
+	else if(ui->dragpoint >= 0) {
+            /* Dragging a point with the cursor keys. */
+	    int movement_increment = ds->tilesize / 2;
+	    int dx = 0, dy = 0;
+
+            switch(button) {
             case CURSOR_UP:
-                ui->newpoint.y -= ds->tilesize / CURSOR_GRANULARITY;
-                return UI_UPDATE;
+		dy = -movement_increment;
+		break;
             case CURSOR_DOWN:
-                ui->newpoint.y += ds->tilesize / CURSOR_GRANULARITY;
-                return UI_UPDATE;
+		dy = movement_increment;
+		break;
             case CURSOR_LEFT:
-                ui->newpoint.x -= ds->tilesize / CURSOR_GRANULARITY;
-                return UI_UPDATE;
+		dx = -movement_increment;
+		break;
             case CURSOR_RIGHT:
-                ui->newpoint.x += ds->tilesize / CURSOR_GRANULARITY;
-                return UI_UPDATE;
+		dx = movement_increment;
+                break;
             default:
                 break;
             }
+
+	    /* This code has a slightly inconvenient interaction with
+	     * the snap to grid feature: if the point being dragged
+	     * originates on a non-grid point which is in the bottom
+	     * half or right half (or both) of a grid cell (a 75%
+	     * probability), then dragging point right (if it
+	     * originates from the right half) or down (if it
+	     * originates from the bottom half) will cause the point
+	     * to move one more grid cell than intended in that
+	     * direction. I (F. Wei) it wasn't worth handling this
+	     * corner case - if anyone feels inclined, please feel
+	     * free to do so. */
+	    place_dragged_point(state, ui, ds,
+				ui->newpoint.x * ds->tilesize / ui->newpoint.d + dx,
+				ui->newpoint.y * ds->tilesize / ui->newpoint.d + dy);
+	    return MOVE_UI_UPDATE;
         }
-    }
-    else if(IS_CURSOR_SELECT(button))
-    {
-        if(ui->dragpoint < 0 && ui->cursorpoint >= 0)
-        {
+    } else if(button == CURSOR_SELECT) {
+        if(ui->dragpoint < 0 && ui->cursorpoint >= 0) {
             /* begin drag */
             ui->dragpoint = ui->cursorpoint;
             ui->cursorpoint = -1;
             ui->newpoint.x = state->pts[ui->dragpoint].x * ds->tilesize / state->pts[ui->dragpoint].d;
             ui->newpoint.y = state->pts[ui->dragpoint].y * ds->tilesize / state->pts[ui->dragpoint].d;
             ui->newpoint.d = ds->tilesize;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
-        else if(ui->dragpoint >= 0)
-        {
+        else if(ui->dragpoint >= 0) {
             /* end drag */
             int p = ui->dragpoint;
             char buf[80];
@@ -1273,7 +1412,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->newpoint.x >= (long)state->w*ui->newpoint.d ||
                 ui->newpoint.y < 0 ||
                 ui->newpoint.y >= (long)state->h*ui->newpoint.d)
-                return UI_UPDATE;
+                return MOVE_UI_UPDATE;
 
             /*
              * We aren't cancelling the drag. Construct a move string
@@ -1284,14 +1423,29 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->just_dragged = true;
             return dupstr(buf);
         }
-        else if(ui->cursorpoint < 0)
-        {
+        else if(ui->cursorpoint < 0) {
             ui->cursorpoint = 0;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
+    } else if(STRIP_BUTTON_MODIFIERS(button) == CURSOR_SELECT2 ||
+	      STRIP_BUTTON_MODIFIERS(button) == '\t') {
+	/* Use spacebar or tab to cycle through the points. Shift
+	 * reverses cycle direction. */
+	if(ui->dragpoint >= 0)
+	    return MOVE_NO_EFFECT;
+	if(ui->cursorpoint < 0) {
+	    ui->cursorpoint = 0;
+	    return MOVE_UI_UPDATE;
+	}
+	assert(ui->cursorpoint >= 0);
+
+        /* cursorpoint is valid - increment it */
+	int direction = (button & MOD_SHFT) ? -1 : 1;
+	ui->cursorpoint = (ui->cursorpoint + direction + state->params.n) % state->params.n;
+	return MOVE_UI_UPDATE;
     }
 
-    return NULL;
+    return MOVE_UNUSED;
 }
 
 static game_state *execute_move(const game_state *state, const char *move)
@@ -1334,7 +1488,7 @@ static game_state *execute_move(const game_state *state, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     *x = *y = COORDLIMIT(params->n) * tilesize;
 }
@@ -1363,11 +1517,9 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_LINE * 3 + 1] = 0.0F;
     ret[COL_LINE * 3 + 2] = 0.0F;
 
-#ifdef SHOW_CROSSINGS
     ret[COL_CROSSEDLINE * 3 + 0] = 1.0F;
     ret[COL_CROSSEDLINE * 3 + 1] = 0.0F;
     ret[COL_CROSSEDLINE * 3 + 2] = 0.0F;
-#endif
 
     ret[COL_OUTLINE * 3 + 0] = 0.0F;
     ret[COL_OUTLINE * 3 + 1] = 0.0F;
@@ -1491,15 +1643,16 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         ds->y[i] = y;
     }
 
-    if (ds->bg == bg && ds->dragpoint == ui->dragpoint && ds->cursorpoint == ui->cursorpoint && !points_moved)
+    if (ds->bg == bg &&
+	ds->dragpoint == ui->dragpoint &&
+	ds->cursorpoint == ui->cursorpoint && !points_moved)
         return;                        /* nothing to do */
 
     ds->dragpoint = ui->dragpoint;
+    ds->cursorpoint = ui->cursorpoint;
     ds->bg = bg;
 
-    game_compute_size(&state->params, ds->tilesize, &w, &h);
-
-    clip(dr, 0, 0, w, h);
+    game_compute_size(&state->params, ds->tilesize, ui, &w, &h);
     draw_rect(dr, 0, 0, w, h, bg);
 
     /*
@@ -1508,23 +1661,28 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 
     for (i = 0; (e = index234(state->graph->edges, i)) != NULL; i++) {
 	draw_line(dr, ds->x[e->a], ds->y[e->a], ds->x[e->b], ds->y[e->b],
-#ifdef SHOW_CROSSINGS
-		  (oldstate?oldstate:state)->crosses[i] ?
-		  COL_CROSSEDLINE :
-#endif
-		  COL_LINE);
+		  ui->show_crossed_edges &&
+                  (oldstate?oldstate:state)->crosses[i] ?
+		  COL_CROSSEDLINE : COL_LINE);
     }
 
     /*
      * Draw the points.
-     * 
-     * When dragging, we should not only vary the colours, but
-     * leave the point being dragged until last.
+     *
+     * When dragging, we vary the point colours to highlight the drag
+     * point and neighbour points. The draw order is defined so that
+     * the most relevant points (i.e., the dragged point and cursor
+     * point) are drawn last, so they appear on top of other points.
      */
+    static const int draw_order[] = {
+	COL_POINT,
+	COL_NEIGHBOUR,
+	COL_CURSORPOINT,
+	COL_DRAGPOINT
+    };
+
     for (j = 0; j < 4; j++) {
-	int thisc = (j == 0 ? COL_POINT :
-		     (j == 1 ? COL_NEIGHBOUR :
-                      j == 2 ? COL_CURSORPOINT : COL_DRAGPOINT));
+	int thisc = draw_order[j];
 	for (i = 0; i < state->params.n; i++) {
             int c;
 
@@ -1540,19 +1698,17 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	    }
 
 	    if (c == thisc) {
-#ifdef VERTEX_NUMBERS
-		draw_circle(dr, ds->x[i], ds->y[i], DRAG_THRESHOLD, bg, bg);
-		{
-		    char buf[80];
-		    sprintf(buf, "%d", i);
-		    draw_text(dr, ds->x[i], ds->y[i], FONT_VARIABLE,
+                if (ui->vertex_numbers) {
+                    char buf[80];
+                    draw_circle(dr, ds->x[i], ds->y[i], DRAG_THRESHOLD, bg, bg);
+                    sprintf(buf, "%d", i);
+                    draw_text(dr, ds->x[i], ds->y[i], FONT_VARIABLE,
                               DRAG_THRESHOLD*3/2,
-			      ALIGN_VCENTRE|ALIGN_HCENTRE, c, buf);
-		}
-#else
-		draw_circle(dr, ds->x[i], ds->y[i], CIRCLE_RADIUS,
-                            c, COL_OUTLINE);
-#endif
+                              ALIGN_VCENTRE|ALIGN_HCENTRE, c, buf);
+                } else {
+                    draw_circle(dr, ds->x[i], ds->y[i], CIRCLE_RADIUS,
+                                c, COL_OUTLINE);
+                }
 	    }
 	}
     }
@@ -1587,35 +1743,25 @@ static void game_get_cursor_location(const game_ui *ui,
                                      const game_params *params,
                                      int *x, int *y, int *w, int *h)
 {
-    if(ui->dragpoint >= 0 || ui->cursorpoint >= 0) {
-        int idx = (ui->dragpoint >= 0) ? ui->dragpoint : ui->cursorpoint;
+    point pt;
+    if(ui->dragpoint >= 0)
+	pt = ui->newpoint;
+    else if(ui->cursorpoint >= 0)
+	pt = state->pts[ui->cursorpoint];
+    else
+	return;
 
-        int cx, cy;
-        cx = ds->x[idx];
-        cy = ds->y[idx];
+    int cx = ds->tilesize * pt.x / pt.d;
+    int cy = ds->tilesize * pt.y / pt.d;
 
-        *x = cx - CIRCLE_RADIUS;
-        *y = cy - CIRCLE_RADIUS;
-        *w = *h = 2 * CIRCLE_RADIUS + 1;
-    }
+    *x = cx - CIRCLE_RADIUS;
+    *y = cy - CIRCLE_RADIUS;
+    *w = *h = 2 * CIRCLE_RADIUS + 1;
 }
 
 static int game_status(const game_state *state)
 {
     return state->completed ? +1 : 0;
-}
-
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
 }
 
 #ifdef COMBINED
@@ -1638,13 +1784,15 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     PREFERRED_TILESIZE, game_compute_size, game_set_size,
@@ -1656,8 +1804,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     SOLVE_ANIMATES,		       /* flags */
 };

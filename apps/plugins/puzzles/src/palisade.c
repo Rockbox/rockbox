@@ -17,6 +17,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,7 +47,7 @@ struct game_params {
     int w, h, k;
 };
 
-typedef char clue;
+typedef signed char clue;
 typedef unsigned char borderflag;
 
 typedef struct shared_state {
@@ -156,13 +157,15 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
-    int w = params->w, h = params->h, k = params->k, wh = w * h;
+    int w = params->w, h = params->h, k = params->k, wh;
 
     if (k < 1) return "Region size must be at least one";
     if (w < 1) return "Width must be at least one";
     if (h < 1) return "Height must be at least one";
+    if (w > INT_MAX / h)
+        return "Width times height must not be unreasonably large";
+    wh = w * h;
     if (wh % k) return "Region size must divide grid area";
-
     if (!full) return NULL; /* succeed partial validation */
 
     /* MAYBE FIXME: we (just?) don't have the UI for winning these. */
@@ -183,7 +186,7 @@ typedef struct solver_ctx {
     const game_params *params;  /* also in shared_state */
     clue *clues;                /* also in shared_state */
     borderflag *borders;        /* also in game_state */
-    int *dsf;                   /* particular to the solver */
+    DSF *dsf;                   /* particular to the solver */
 } solver_ctx;
 
 /* Deductions:
@@ -270,7 +273,7 @@ static void connect(solver_ctx *ctx, int i, int j)
 static bool connected(solver_ctx *ctx, int i, int j, int dir)
 {
     if (j == COMPUTE_J) j = i + dx[dir] + ctx->params->w*dy[dir];
-    return dsf_canonify(ctx->dsf, i) == dsf_canonify(ctx->dsf, j);
+    return dsf_equivalent(ctx->dsf, i, j);
 }
 
 static void disconnect(solver_ctx *ctx, int i, int j, int dir)
@@ -502,19 +505,20 @@ static bool solver_equivalent_edges(solver_ctx *ctx)
     return changed;
 }
 
-#define UNVISITED 6
-
 /* build connected components in `dsf', along the lines of `borders'. */
-static void dfs_dsf(int i, int w, borderflag *border, int *dsf, bool black)
+static void build_dsf(int w, int h, borderflag *border, DSF *dsf, bool black)
 {
-    int dir;
-    for (dir = 0; dir < 4; ++dir) {
-        int ii = i + dx[dir] + w*dy[dir], bdir = BORDER(dir);
-        if (black ? (border[i] & bdir) : !(border[i] & DISABLED(bdir)))
-            continue;
-        if (dsf[ii] != UNVISITED) continue;
-        dsf_merge(dsf, i, ii);
-        dfs_dsf(ii, w, border, dsf, black);
+    int x, y;
+
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+            if (x+1 < w && (black ? !(border[y*w+x] & BORDER_R) :
+                            (border[y*w+x] & DISABLED(BORDER_R))))
+                dsf_merge(dsf, y*w+x, y*w+(x+1));
+            if (y+1 < h && (black ? !(border[y*w+x] & BORDER_D) :
+                            (border[y*w+x] & DISABLED(BORDER_D))))
+                dsf_merge(dsf, y*w+x, (y+1)*w+x);
+        }
     }
 }
 
@@ -523,9 +527,9 @@ static bool is_solved(const game_params *params, clue *clues,
 {
     int w = params->w, h = params->h, wh = w*h, k = params->k;
     int i, x, y;
-    int *dsf = snew_dsf(wh);
+    DSF *dsf = dsf_new(wh);
 
-    assert (dsf[0] == UNVISITED); /* check: UNVISITED and dsf.c match up */
+    build_dsf(w, h, border, dsf, true);
 
     /*
      * A game is solved if:
@@ -536,7 +540,6 @@ static bool is_solved(const game_params *params, clue *clues,
      *  - the borders also satisfy the clue set
      */
     for (i = 0; i < wh; ++i) {
-        if (dsf[i] == UNVISITED) dfs_dsf(i, params->w, border, dsf, true);
         if (dsf_size(dsf, i) != k) goto error;
         if (clues[i] == EMPTY) continue;
         if (clues[i] != bitcount[border[i] & BORDER_MASK]) goto error;
@@ -554,19 +557,19 @@ static bool is_solved(const game_params *params, clue *clues,
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {
             if (x+1 < w && (border[y*w+x] & BORDER_R) &&
-                dsf_canonify(dsf, y*w+x) == dsf_canonify(dsf, y*w+(x+1)))
+                dsf_equivalent(dsf, y*w+x, y*w+(x+1)))
                 goto error;
             if (y+1 < h && (border[y*w+x] & BORDER_D) &&
-                dsf_canonify(dsf, y*w+x) == dsf_canonify(dsf, (y+1)*w+x))
+                dsf_equivalent(dsf, y*w+x, (y+1)*w+x))
                 goto error;
         }
     }
 
-    sfree(dsf);
+    dsf_free(dsf);
     return true;
 
 error:
-    sfree(dsf);
+    dsf_free(dsf);
     return false;
 }
 
@@ -579,7 +582,7 @@ static bool solver(const game_params *params, clue *clues, borderflag *borders)
     ctx.params = params;
     ctx.clues = clues;
     ctx.borders = borders;
-    ctx.dsf = snew_dsf(wh);
+    ctx.dsf = dsf_new(wh);
 
     solver_connected_clues_versus_region_size(&ctx); /* idempotent */
     do {
@@ -591,7 +594,7 @@ static bool solver(const game_params *params, clue *clues, borderflag *borders)
         changed |= solver_equivalent_edges(&ctx);
     } while (changed);
 
-    sfree(ctx.dsf);
+    dsf_free(ctx.dsf);
 
     return is_solved(params, clues, borders);
 }
@@ -622,15 +625,14 @@ static char *new_game_desc(const game_params *params, random_state *rs,
 {
     int w = params->w, h = params->h, wh = w*h, k = params->k;
 
-    clue *numbers = snewn(wh + 1, clue), *p;
+    clue *numbers = snewn(wh + 1, clue);
     borderflag *rim = snewn(wh, borderflag);
     borderflag *scratch_borders = snewn(wh, borderflag);
 
     char *soln = snewa(*aux, wh + 2);
     int *shuf = snewn(wh, int);
-    int *dsf = NULL, i, r, c;
-
-    int attempts = 0;
+    DSF *dsf = NULL;
+    int i, r, c;
 
     for (i = 0; i < wh; ++i) shuf[i] = i;
     xshuffle(shuf, wh, rs);
@@ -642,10 +644,9 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     soln[wh] = '\0';
 
     do {
-        ++attempts;
         setmem(soln, '@', wh);
 
-        sfree(dsf);
+        dsf_free(dsf);
         dsf = divvy_rectangle(w, h, k, rs);
 
         for (r = 0; r < h; ++r)
@@ -655,7 +656,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
                 for (dir = 0; dir < 4; ++dir) {
                     int rr = r + dy[dir], cc = c + dx[dir], ii = rr * w + cc;
                     if (OUT_OF_BOUNDS(cc, rr, w, h) ||
-                        dsf_canonify(dsf, i) != dsf_canonify(dsf, ii)) {
+                        !dsf_equivalent(dsf, i, ii)) {
                         ++numbers[i];
                         soln[i] |= BORDER(dir);
                     }
@@ -680,9 +681,10 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     sfree(scratch_borders);
     sfree(rim);
     sfree(shuf);
-    sfree(dsf);
+    dsf_free(dsf);
 
-    p = numbers;
+    char *output = snewn(wh + 1, char), *p = output;
+
     r = 0;
     for (i = 0; i < wh; ++i) {
         if (numbers[i] != EMPTY) {
@@ -699,7 +701,8 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     }
     *p++ = '\0';
 
-    return sresize(numbers, p - numbers, clue);
+    sfree(numbers);
+    return sresize(output, p - output, char);
 }
 
 static const char *validate_desc(const game_params *params, const char *desc)
@@ -867,30 +870,19 @@ static char *game_text_format(const game_state *state)
 struct game_ui {
     int x, y;
     bool show;
-    bool fake_ctrl, fake_shift;
 };
 
 static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->x = ui->y = 0;
-    ui->show = ui->fake_ctrl = ui->fake_shift = false;
+    ui->show = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
 static void free_ui(game_ui *ui)
 {
     sfree(ui);
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
-    assert (encoding == NULL);
 }
 
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
@@ -907,7 +899,7 @@ struct game_drawstate {
 
 #define TILESIZE (ds->tilesize)
 #define MARGIN (ds->tilesize / 2)
-#define WIDTH (1 + (TILESIZE >= 16) + (TILESIZE >= 32) + (TILESIZE >= 64))
+#define WIDTH (3*TILESIZE/32 > 1 ? 3*TILESIZE/32 : 1)
 #define CENTER ((ds->tilesize / 2) + WIDTH/2)
 
 #define FROMCOORD(x) (((x) - MARGIN) / TILESIZE)
@@ -918,12 +910,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds, int x, int y, int button)
 {
     int w = state->shared->params.w, h = state->shared->params.h;
-    bool control = (button & MOD_CTRL) | ui->fake_ctrl, shift = (button & MOD_SHFT) | ui->fake_shift;
+    bool control = button & MOD_CTRL, shift = button & MOD_SHFT;
 
-    /* reset */
-    ui->fake_ctrl = ui->fake_shift = false;
-
-    button &= ~MOD_MASK;
+    button = STRIP_BUTTON_MODIFIERS(button);
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
         int gx = FROMCOORD(x), gy = FROMCOORD(y), possible = BORDER_MASK;
@@ -974,13 +963,13 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     }
 
     if (IS_CURSOR_MOVE(button)) {
-        ui->show = true;
         if (control || shift) {
             borderflag flag = 0, newflag;
             int dir, i =  ui->y * w + ui->x;
+            ui->show = true;
             x = ui->x;
             y = ui->y;
-            move_cursor(button, &x, &y, w, h, false);
+            move_cursor(button, &x, &y, w, h, false, NULL);
             if (OUT_OF_BOUNDS(x, y, w, h)) return NULL;
 
             for (dir = 0; dir < 4; ++dir)
@@ -999,20 +988,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             if (shift) newflag |= DISABLED(BORDER(FLIP(dir)));
             return string(80, "F%d,%d,%dF%d,%d,%d",
                           ui->x, ui->y, flag, x, y, newflag);
-        } else {
-            move_cursor(button, &ui->x, &ui->y, w, h, false);
-            return UI_UPDATE;
-        }
-    }
-    else if(IS_CURSOR_SELECT(button)) {
-        /* CURSOR_SELECT or CURSOR_SELECT2 tells us to toggle whether
-         * the button press should be interpreted as having CTRL or
-         * shift pressed along with it, respectively. */
-        ui->show = true;
-        if(button == CURSOR_SELECT2)
-            ui->fake_shift = !ui->fake_shift;
-        else
-            ui->fake_ctrl = !ui->fake_ctrl;
+        } else
+            return move_cursor(button, &ui->x, &ui->y, w, h, false, &ui->show);
     }
 
     return NULL;
@@ -1022,15 +999,14 @@ static game_state *execute_move(const game_state *state, const char *move)
 {
     int w = state->shared->params.w, h = state->shared->params.h, wh = w * h;
     game_state *ret = dup_game(state);
-    int nchars, x, y, flag;
+    int nchars, x, y, flag, i;
 
     if (*move == 'S') {
-        int i;
         ++move;
         for (i = 0; i < wh && move[i]; ++i)
             ret->borders[i] =
                 (move[i] & BORDER_MASK) | DISABLED(~move[i] & BORDER_MASK);
-        if (i < wh || move[i]) return NULL; /* leaks `ret', then we die */
+        if (i < wh || move[i]) goto badmove;
         ret->cheated = ret->completed = true;
         return ret;
     }
@@ -1038,22 +1014,31 @@ static game_state *execute_move(const game_state *state, const char *move)
     while (sscanf(move, "F%d,%d,%d%n", &x, &y, &flag, &nchars) == 3 &&
            !OUT_OF_BOUNDS(x, y, w, h)) {
         move += nchars;
+        for (i = 0; i < 4; i++)
+            if ((flag & BORDER(i)) &&
+                OUT_OF_BOUNDS(x+dx[i], y+dy[i], w, h))
+                /* No toggling the borders of the grid! */
+                goto badmove;
         ret->borders[y*w + x] ^= flag;
     }
 
-    if (*move) return NULL; /* leaks `ret', then we die */
+    if (*move) goto badmove;
 
     if (!ret->completed)
         ret->completed = is_solved(&ret->shared->params, ret->shared->clues,
                                    ret->borders);
 
     return ret;
+
+  badmove:
+    free_game(ret);
+    return NULL;
 }
 
 /* --- Drawing routines --------------------------------------------- */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     *x = (params->w + 1) * tilesize;
     *y = (params->h + 1) * tilesize;
@@ -1181,14 +1166,13 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                         float animtime, float flashtime)
 {
     int w = state->shared->params.w, h = state->shared->params.h, wh = w*h;
-    int r, c, i, flash = ((int) (flashtime * 5 / FLASH_TIME)) % 2;
-    int *black_border_dsf = snew_dsf(wh), *yellow_border_dsf = snew_dsf(wh);
+    int r, c, flash = ((int) (flashtime * 5 / FLASH_TIME)) % 2;
+    DSF *black_border_dsf = dsf_new(wh), *yellow_border_dsf = dsf_new(wh);
     int k = state->shared->params.k;
 
     if (!ds->grid) {
         char buf[40];
         int bgw = (w+1) * ds->tilesize, bgh = (h+1) * ds->tilesize;
-        draw_rect(dr, 0, 0, bgw, bgh, COL_BACKGROUND);
 
         for (r = 0; r <= h; ++r)
             for (c = 0; c <= w; ++c)
@@ -1203,12 +1187,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         status_bar(dr, buf);
     }
 
-    for (i = 0; i < wh; ++i) {
-        if (black_border_dsf[i] == UNVISITED)
-            dfs_dsf(i, w, state->borders, black_border_dsf, true);
-        if (yellow_border_dsf[i] == UNVISITED)
-            dfs_dsf(i, w, state->borders, yellow_border_dsf, false);
-    }
+    build_dsf(w, h, state->borders, black_border_dsf, true);
+    build_dsf(w, h, state->borders, yellow_border_dsf, false);
 
     for (r = 0; r < h; ++r)
         for (c = 0; c < w; ++c) {
@@ -1268,8 +1248,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
             draw_tile(dr, ds, r, c, ds->grid[i], clue);
         }
 
-    sfree(black_border_dsf);
-    sfree(yellow_border_dsf);
+    dsf_free(black_border_dsf);
+    dsf_free(yellow_border_dsf);
 }
 
 static float game_anim_length(const game_state *oldstate,
@@ -1306,17 +1286,12 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    assert (!"this shouldn't get called");
-    return false;                      /* placate optimiser */
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int pw, ph;
 
-    game_compute_size(params, 700, &pw, &ph); /* 7mm, like loopy */
+    game_compute_size(params, 700, ui, &pw, &ph); /* 7mm, like loopy */
 
     *x = pw / 100.0F;
     *y = ph / 100.0F;
@@ -1335,7 +1310,8 @@ static void print_line(drawing *dr, int x1, int y1, int x2, int y2,
     } else draw_line(dr, x1, y1, x2, y2, colour);
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int w = state->shared->params.w, h = state->shared->params.h;
     int ink = print_mono_colour(dr, 0);
@@ -1399,12 +1375,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     48, game_compute_size, game_set_size,
@@ -1418,6 +1396,6 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     true,                                     /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,                                         /* flags */
 };

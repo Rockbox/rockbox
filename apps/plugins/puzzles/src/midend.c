@@ -30,6 +30,11 @@ struct midend_serialise_buf {
     int len, size;
 };
 
+struct midend_serialise_buf_read_ctx {
+    struct midend_serialise_buf *ser;
+    int len, pos;
+};
+
 struct midend {
     frontend *frontend;
     random_state *random;
@@ -73,6 +78,7 @@ struct midend {
 
     game_params *params, *curparams;
     game_drawstate *drawstate;
+    bool first_draw;
     game_ui *ui;
 
     game_state *oldstate;
@@ -88,10 +94,15 @@ struct midend {
 
     int pressed_mouse_button;
 
-    int preferred_tilesize, tilesize, winwidth, winheight;
+    struct midend_serialise_buf be_prefs;
+
+    int preferred_tilesize, preferred_tilesize_dpr, tilesize;
+    int winwidth, winheight;
 
     void (*game_id_change_notify_function)(void *);
     void *game_id_change_notify_ctx;
+
+    bool one_key_shortcuts;
 };
 
 #define ensure(me) do { \
@@ -119,21 +130,33 @@ struct deserialise_data {
 };
 
 /*
- * Forward reference.
+ * Forward references.
  */
 static const char *midend_deserialise_internal(
     midend *me, bool (*read)(void *ctx, void *buf, int len), void *rctx,
     const char *(*check)(void *ctx, midend *, const struct deserialise_data *),
     void *cctx);
+static void midend_serialise_prefs(
+    midend *me, game_ui *ui,
+    void (*write)(void *ctx, const void *buf, int len), void *wctx);
+static const char *midend_deserialise_prefs(
+    midend *me, game_ui *ui,
+    bool (*read)(void *ctx, void *buf, int len), void *rctx);
+static config_item *midend_get_prefs(midend *me, game_ui *ui);
+static void midend_set_prefs(midend *me, game_ui *ui, config_item *all_prefs);
+static void midend_apply_prefs(midend *me, game_ui *ui);
 
 void midend_reset_tilesize(midend *me)
 {
     me->preferred_tilesize = me->ourgame->preferred_tilesize;
+    me->preferred_tilesize_dpr = 1.0;
     {
         /*
          * Allow an environment-based override for the default tile
          * size by defining a variable along the lines of
          * `NET_TILESIZE=15'.
+         *
+         * XXX How should this interact with DPR?
          */
 
 	char buf[80], *e;
@@ -196,6 +219,7 @@ midend *midend_new(frontend *fe, const game *ourgame,
     me->aux_info = NULL;
     me->genmode = GOT_NOTHING;
     me->drawstate = NULL;
+    me->first_draw = true;
     me->oldstate = NULL;
     me->preset_menu = NULL;
     me->anim_time = me->anim_pos = 0.0F;
@@ -211,6 +235,11 @@ midend *midend_new(frontend *fe, const game *ourgame,
 	me->drawing = drawing_new(drapi, me, drhandle);
     else
 	me->drawing = NULL;
+
+    me->be_prefs.buf = NULL;
+    me->be_prefs.size = me->be_prefs.len = 0;
+
+    me->one_key_shortcuts = true;
 
     midend_reset_tilesize(me);
 
@@ -280,6 +309,7 @@ void midend_free(midend *me)
     sfree(me->privdesc);
     sfree(me->seedstr);
     sfree(me->aux_info);
+    sfree(me->be_prefs.buf);
     me->ourgame->free_params(me->params);
     midend_free_preset_menu(me, me->preset_menu);
     if (me->ui)
@@ -297,14 +327,56 @@ static void midend_size_new_drawstate(midend *me)
      * anyway yet.
      */
     if (me->tilesize > 0) {
-	me->ourgame->compute_size(me->params, me->tilesize,
+	me->ourgame->compute_size(me->params, me->tilesize, me->ui,
 				  &me->winwidth, &me->winheight);
 	me->ourgame->set_size(me->drawing, me->drawstate,
 			      me->params, me->tilesize);
     }
 }
 
-void midend_size(midend *me, int *x, int *y, bool user_size)
+/*
+ * There is no one correct way to convert tilesizes between device
+ * pixel ratios, because there's only a loosely-defined relationship
+ * between tilesize and the actual size of a puzzle.  We define this
+ * function as the canonical conversion function so everything in the
+ * midend will be consistent.
+ */
+static int convert_tilesize(midend *me, int old_tilesize,
+                            double old_dpr, double new_dpr)
+{
+    int x, y, rx, ry, min, max;
+    game_params *defaults;
+
+    if (new_dpr == old_dpr)
+        return old_tilesize;
+
+    defaults = me->ourgame->default_params();
+
+    me->ourgame->compute_size(defaults, old_tilesize, me->ui, &x, &y);
+    x *= new_dpr / old_dpr;
+    y *= new_dpr / old_dpr;
+
+    min = max = 1;
+    do {
+        max *= 2;
+        me->ourgame->compute_size(defaults, max, me->ui, &rx, &ry);
+    } while (rx <= x && ry <= y);
+
+    while (max - min > 1) {
+	int mid = (max + min) / 2;
+	me->ourgame->compute_size(defaults, mid, me->ui, &rx, &ry);
+	if (rx <= x && ry <= y)
+	    min = mid;
+	else
+	    max = mid;
+    }
+
+    me->ourgame->free_params(defaults);
+    return min;
+}
+
+void midend_size(midend *me, int *x, int *y, bool user_size,
+                 double device_pixel_ratio)
 {
     int min, max;
     int rx, ry;
@@ -318,6 +390,7 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
         me->ourgame->free_drawstate(me->drawing, me->drawstate);
         me->drawstate = me->ourgame->new_drawstate(me->drawing,
                                                    me->states[0].state);
+        me->first_draw = true;
     }
 
     /*
@@ -333,10 +406,12 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
 	max = 1;
 	do {
 	    max *= 2;
-	    me->ourgame->compute_size(me->params, max, &rx, &ry);
+	    me->ourgame->compute_size(me->params, max, me->ui, &rx, &ry);
 	} while (rx <= *x && ry <= *y);
     } else
-	max = me->preferred_tilesize + 1;
+	max = convert_tilesize(me, me->preferred_tilesize,
+                               me->preferred_tilesize_dpr,
+                               device_pixel_ratio) + 1;
     min = 1;
 
     /*
@@ -347,7 +422,7 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
      */
     while (max - min > 1) {
 	int mid = (max + min) / 2;
-	me->ourgame->compute_size(me->params, mid, &rx, &ry);
+	me->ourgame->compute_size(me->params, mid, me->ui, &rx, &ry);
 	if (rx <= *x && ry <= *y)
 	    min = mid;
 	else
@@ -359,9 +434,11 @@ void midend_size(midend *me, int *x, int *y, bool user_size)
      */
 
     me->tilesize = min;
-    if (user_size)
+    if (user_size) {
         /* If the user requested a change in size, make it permanent. */
         me->preferred_tilesize = me->tilesize;
+        me->preferred_tilesize_dpr = device_pixel_ratio;
+    }
     midend_size_new_drawstate(me);
     *x = me->winwidth;
     *y = me->winheight;
@@ -378,6 +455,28 @@ void midend_set_params(midend *me, game_params *params)
 game_params *midend_get_params(midend *me)
 {
     return me->ourgame->dup_params(me->params);
+}
+
+static char *encode_params(midend *me, const game_params *params, bool full)
+{
+    char *encoded = me->ourgame->encode_params(params, full);
+    int i;
+
+    /* Assert that the params consist of printable ASCII containing
+     * neither '#' nor ':'. */
+    for (i = 0; encoded[i]; i++)
+        assert(encoded[i] >= 32 && encoded[i] < 127 &&
+	       encoded[i] != '#' && encoded[i] != ':');
+    return encoded;
+}
+
+static void assert_printable_ascii(char const *s)
+{
+    /* Assert that s is entirely printable ASCII, and hence safe for
+     * writing in a save file. */
+    int i;
+    for (i = 0; s[i]; i++)
+        assert(s[i] >= 32 && s[i] < 127);
 }
 
 static void midend_set_timer(midend *me)
@@ -397,11 +496,12 @@ void midend_force_redraw(midend *me)
         me->ourgame->free_drawstate(me->drawing, me->drawstate);
     me->drawstate = me->ourgame->new_drawstate(me->drawing,
 					       me->states[0].state);
+    me->first_draw = true;
     midend_size_new_drawstate(me);
     midend_redraw(me);
 }
 
-static void newgame_serialise_write(void *ctx, const void *buf, int len)
+static void midend_serialise_buf_write(void *ctx, const void *buf, int len)
 {
     struct midend_serialise_buf *ser = (struct midend_serialise_buf *)ctx;
     int new_len;
@@ -414,6 +514,18 @@ static void newgame_serialise_write(void *ctx, const void *buf, int len)
     }
     memcpy(ser->buf + ser->len, buf, len);
     ser->len = new_len;
+}
+
+static bool midend_serialise_buf_read(void *ctx, void *buf, int len)
+{
+    struct midend_serialise_buf_read_ctx *const rctx = ctx;
+
+    if (len > rctx->len - rctx->pos)
+        return false;
+
+    memcpy(buf, rctx->ser->buf + rctx->pos, len);
+    rctx->pos += len;
+    return true;
 }
 
 void midend_new_game(midend *me)
@@ -435,7 +547,7 @@ void midend_new_game(midend *me)
          * worse, valid but wrong.
          */
         midend_purge_states(me);
-        midend_serialise(me, newgame_serialise_write, &me->newgame_undo);
+        midend_serialise(me, midend_serialise_buf_write, &me->newgame_undo);
     }
 
     midend_stop_anim(me);
@@ -487,6 +599,7 @@ void midend_new_game(midend *me)
 	 */
         me->desc = me->ourgame->new_desc(me->curparams, rs,
 					 &me->aux_info, (me->drawing != NULL));
+	assert_printable_ascii(me->desc);
 	me->privdesc = NULL;
         random_free(rs);
     }
@@ -536,6 +649,7 @@ void midend_new_game(midend *me)
     me->statepos = 1;
     me->drawstate = me->ourgame->new_drawstate(me->drawing,
 					       me->states[0].state);
+    me->first_draw = true;
     midend_size_new_drawstate(me);
     me->elapsed = 0.0F;
     me->flash_pos = me->flash_time = 0.0F;
@@ -543,6 +657,7 @@ void midend_new_game(midend *me)
     if (me->ui)
         me->ourgame->free_ui(me->ui);
     me->ui = me->ourgame->new_ui(me->states[0].state);
+    midend_apply_prefs(me, me->ui);
     midend_set_timer(me);
     me->pressed_mouse_button = 0;
 
@@ -550,6 +665,20 @@ void midend_new_game(midend *me)
         me->game_id_change_notify_function(me->game_id_change_notify_ctx);
 
     me->newgame_can_store_undo = true;
+}
+
+const char *midend_load_prefs(
+    midend *me, bool (*read)(void *ctx, void *buf, int len), void *rctx)
+{
+    const char *err = midend_deserialise_prefs(me, NULL, read, rctx);
+    return err;
+}
+
+void midend_save_prefs(midend *me,
+                       void (*write)(void *ctx, const void *buf, int len),
+                       void *wctx)
+{
+    midend_serialise_prefs(me, NULL, write, wctx);
 }
 
 bool midend_can_undo(midend *me)
@@ -560,23 +689,6 @@ bool midend_can_undo(midend *me)
 bool midend_can_redo(midend *me)
 {
     return (me->statepos < me->nstates || me->newgame_redo.len);
-}
-
-struct newgame_undo_deserialise_read_ctx {
-    struct midend_serialise_buf *ser;
-    int len, pos;
-};
-
-static bool newgame_undo_deserialise_read(void *ctx, void *buf, int len)
-{
-    struct newgame_undo_deserialise_read_ctx *const rctx = ctx;
-
-    if (len > rctx->len - rctx->pos)
-        return false;
-
-    memcpy(buf, rctx->ser->buf + rctx->pos, len);
-    rctx->pos += len;
-    return true;
 }
 
 struct newgame_undo_deserialise_check_ctx {
@@ -613,8 +725,8 @@ static const char *newgame_undo_deserialise_check(
      * We check both params and cparams, to be as safe as possible.
      */
 
-    old = me->ourgame->encode_params(me->params, true);
-    new = me->ourgame->encode_params(data->params, true);
+    old = encode_params(me, me->params, true);
+    new = encode_params(me, data->params, true);
     if (strcmp(old, new)) {
         /* Set a flag to distinguish this deserialise failure
          * from one due to faulty decoding */
@@ -622,8 +734,8 @@ static const char *newgame_undo_deserialise_check(
         return "Undoing this new-game operation would change params";
     }
 
-    old = me->ourgame->encode_params(me->curparams, true);
-    new = me->ourgame->encode_params(data->cparams, true);
+    old = encode_params(me, me->curparams, true);
+    new = encode_params(me, data->cparams, true);
     if (strcmp(old, new)) {
         ctx->refused = true;
         return "Undoing this new-game operation would change params";
@@ -648,7 +760,7 @@ static bool midend_undo(midend *me)
         me->dir = -1;
         return true;
     } else if (me->newgame_undo.len) {
-	struct newgame_undo_deserialise_read_ctx rctx;
+	struct midend_serialise_buf_read_ctx rctx;
 	struct newgame_undo_deserialise_check_ctx cctx;
         struct midend_serialise_buf serbuf;
 
@@ -659,14 +771,14 @@ static bool midend_undo(midend *me)
          */
         serbuf.buf = NULL;
         serbuf.len = serbuf.size = 0;
-        midend_serialise(me, newgame_serialise_write, &serbuf);
+        midend_serialise(me, midend_serialise_buf_write, &serbuf);
 
 	rctx.ser = &me->newgame_undo;
 	rctx.len = me->newgame_undo.len; /* copy for reentrancy safety */
 	rctx.pos = 0;
         cctx.refused = false;
         deserialise_error = midend_deserialise_internal(
-            me, newgame_undo_deserialise_read, &rctx,
+            me, midend_serialise_buf_read, &rctx,
             newgame_undo_deserialise_check, &cctx);
         if (cctx.refused) {
             /*
@@ -699,7 +811,8 @@ static bool midend_undo(midend *me)
              * the midend so that we can redo back into it later.
              */
             me->newgame_redo.len = 0;
-            newgame_serialise_write(&me->newgame_redo, serbuf.buf, serbuf.len);
+            midend_serialise_buf_write(&me->newgame_redo,
+                                       serbuf.buf, serbuf.len);
 
             sfree(serbuf.buf);
             return true;
@@ -721,7 +834,7 @@ static bool midend_redo(midend *me)
         me->dir = +1;
         return true;
     } else if (me->newgame_redo.len) {
-	struct newgame_undo_deserialise_read_ctx rctx;
+	struct midend_serialise_buf_read_ctx rctx;
 	struct newgame_undo_deserialise_check_ctx cctx;
         struct midend_serialise_buf serbuf;
 
@@ -732,14 +845,14 @@ static bool midend_redo(midend *me)
          */
         serbuf.buf = NULL;
         serbuf.len = serbuf.size = 0;
-        midend_serialise(me, newgame_serialise_write, &serbuf);
+        midend_serialise(me, midend_serialise_buf_write, &serbuf);
 
 	rctx.ser = &me->newgame_redo;
 	rctx.len = me->newgame_redo.len; /* copy for reentrancy safety */
 	rctx.pos = 0;
         cctx.refused = false;
         deserialise_error = midend_deserialise_internal(
-            me, newgame_undo_deserialise_read, &rctx,
+            me, midend_serialise_buf_read, &rctx,
             newgame_undo_deserialise_check, &cctx);
         if (cctx.refused) {
             /*
@@ -772,7 +885,8 @@ static bool midend_redo(midend *me)
              * the midend so that we can undo back into it later.
              */
             me->newgame_undo.len = 0;
-            newgame_serialise_write(&me->newgame_undo, serbuf.buf, serbuf.len);
+            midend_serialise_buf_write(&me->newgame_undo,
+                                       serbuf.buf, serbuf.len);
 
             sfree(serbuf.buf);
             return true;
@@ -859,12 +973,13 @@ void midend_restart_game(midend *me)
     midend_set_timer(me);
 }
 
-static bool midend_really_process_key(midend *me, int x, int y, int button)
+static int midend_really_process_key(midend *me, int x, int y, int button)
 {
     game_state *oldstate =
         me->ourgame->dup_game(me->states[me->statepos - 1].state);
     int type = MOVE;
-    bool gottype = false, ret = true;
+    bool gottype = false;
+    int ret = PKR_NO_EFFECT;
     float anim_time;
     game_state *s;
     char *movestr = NULL;
@@ -875,40 +990,51 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
             me->ui, me->drawstate, x, y, button);
     }
 
-    if (!movestr) {
-	if (button == 'n' || button == 'N' || button == '\x0E' ||
-            button == UI_NEWGAME) {
+    if (movestr == NULL || movestr == MOVE_UNUSED) {
+	if ((me->one_key_shortcuts && (button == 'n' || button == 'N')) ||
+             button == '\x0E' || button == UI_NEWGAME) {
 	    midend_new_game(me);
 	    midend_redraw(me);
+            ret = PKR_SOME_EFFECT;
 	    goto done;		       /* never animate */
-	} else if (button == 'u' || button == 'U' ||
-		   button == '\x1A' || button == '\x1F' ||
+	} else if ((me->one_key_shortcuts && (button=='u' || button=='U')) ||
+                   button == '*' || button == '\x1A' || button == '\x1F' ||
                    button == UI_UNDO) {
 	    midend_stop_anim(me);
 	    type = me->states[me->statepos-1].movetype;
 	    gottype = true;
 	    if (!midend_undo(me))
 		goto done;
-	} else if (button == 'r' || button == 'R' ||
-		   button == '\x12' || button == '\x19' ||
+            ret = PKR_SOME_EFFECT;
+	} else if ((me->one_key_shortcuts && (button=='r' || button=='R')) ||
+                   button == '#' || button == '\x12' || button == '\x19' ||
                    button == UI_REDO) {
 	    midend_stop_anim(me);
 	    if (!midend_redo(me))
 		goto done;
+            ret = PKR_SOME_EFFECT;
 	} else if ((button == '\x13' || button == UI_SOLVE) &&
                    me->ourgame->can_solve) {
+            ret = PKR_SOME_EFFECT;
 	    if (midend_solve(me))
 		goto done;
-	} else if (button == 'q' || button == 'Q' || button == '\x11' ||
-                   button == UI_QUIT) {
-	    ret = false;
+	} else if ((me->one_key_shortcuts && (button=='q' || button=='Q')) ||
+                   button == '\x11' || button == UI_QUIT) {
+            ret = PKR_QUIT;
 	    goto done;
-	} else
+	} else {
+            ret = PKR_UNUSED;
 	    goto done;
+        }
+    } else if (movestr == MOVE_NO_EFFECT) {
+        ret = PKR_NO_EFFECT;
+        goto done;
     } else {
-	if (movestr == UI_UPDATE)
+        ret = PKR_SOME_EFFECT;
+	if (movestr == MOVE_UI_UPDATE)
 	    s = me->states[me->statepos-1].state;
 	else {
+	    assert_printable_ascii(movestr);
 	    s = me->ourgame->execute_move(me->states[me->statepos-1].state,
 					  movestr);
 	    assert(s != NULL);
@@ -975,9 +1101,9 @@ static bool midend_really_process_key(midend *me, int x, int y, int button)
     return ret;
 }
 
-bool midend_process_key(midend *me, int x, int y, int button)
+int midend_process_key(midend *me, int x, int y, int button)
 {
-    bool ret = true;
+    int ret = PKR_UNUSED, ret2;
 
     /*
      * Harmonise mouse drag and release messages.
@@ -1052,6 +1178,10 @@ bool midend_process_key(midend *me, int x, int y, int button)
      * of '\n' etc for keyboard-based cursors. The choice of buttons
      * here could eventually be controlled by a runtime configuration
      * option.
+     *
+     * We also handle converting MOD_CTRL|'a' etc into '\x01' etc,
+     * specially recognising Ctrl+Shift+Z, and stripping modifier
+     * flags off keys that aren't meant to have them.
      */
     if (IS_MOUSE_DRAG(button) || IS_MOUSE_RELEASE(button)) {
         if (me->pressed_mouse_button) {
@@ -1076,11 +1206,34 @@ bool midend_process_key(midend *me, int x, int y, int button)
         /*
          * Fabricate a button-up for the previously pressed button.
          */
-        ret = ret && midend_really_process_key
+        ret2 = midend_really_process_key
             (me, x, y, (me->pressed_mouse_button +
                         (LEFT_RELEASE - LEFT_BUTTON)));
+        ret = min(ret, ret2);
     }
 
+    /* Canonicalise CTRL+ASCII. */
+    if ((button & MOD_CTRL) &&
+        STRIP_BUTTON_MODIFIERS(button) >= 0x40 &&
+        STRIP_BUTTON_MODIFIERS(button) < 0x80)
+        button = button & (0x1f | (MOD_MASK & ~MOD_CTRL));
+    /* Special handling to make CTRL+SHFT+Z into REDO. */
+    if ((button & (~MOD_MASK | MOD_SHFT)) == (MOD_SHFT | '\x1A'))
+        button = UI_REDO;
+    /* interpret_move() expects CTRL and SHFT only on cursor keys, and
+     * TAB (added as of 7/2024 to support Untangle). */
+    if (!IS_CURSOR_MOVE(STRIP_BUTTON_MODIFIERS(button))) {
+        /* reject CTRL+anything odd */
+        if ((button & MOD_CTRL) && STRIP_BUTTON_MODIFIERS(button) >= 0x20)
+            return PKR_UNUSED;
+        /* otherwise strip them, except for tab */
+	if (STRIP_BUTTON_MODIFIERS(button) != '\t')
+	    button &= ~(MOD_CTRL | MOD_SHFT);
+    }
+    /* interpret_move() expects NUM_KEYPAD only on numbers. */
+    if (STRIP_BUTTON_MODIFIERS(button) < '0' ||
+	STRIP_BUTTON_MODIFIERS(button) > '9')
+        button &= ~MOD_NUM_KEYPAD;
     /*
      * Translate keyboard presses to cursor selection.
      */
@@ -1101,7 +1254,8 @@ bool midend_process_key(midend *me, int x, int y, int button)
     /*
      * Now send on the event we originally received.
      */
-    ret = ret && midend_really_process_key(me, x, y, button);
+    ret2 = midend_really_process_key(me, x, y, button);
+    ret = min(ret, ret2);
 
     /*
      * And update the currently pressed button.
@@ -1121,7 +1275,7 @@ key_label *midend_request_keys(midend *me, int *n)
 
     if(me->ourgame->request_keys)
     {
-        keys = me->ourgame->request_keys(midend_get_params(me), &nkeys);
+        keys = me->ourgame->request_keys(me->params, &nkeys);
         for(i = 0; i < nkeys; ++i)
         {
             if(!keys[i].label)
@@ -1135,12 +1289,38 @@ key_label *midend_request_keys(midend *me, int *n)
     return keys;
 }
 
+/* Return a good label to show next to a key right now. */
+const char *midend_current_key_label(midend *me, int button)
+{
+    assert(IS_CURSOR_SELECT(button));
+    if (!me->ourgame->current_key_label) return "";
+    return me->ourgame->current_key_label(
+        me->ui, me->states[me->statepos-1].state, button);
+}
+
 void midend_redraw(midend *me)
 {
     assert(me->drawing);
 
     if (me->statepos > 0 && me->drawstate) {
+        bool first_draw = me->first_draw;
+        me->first_draw = false;
+
         start_draw(me->drawing);
+
+        if (first_draw) {
+            /*
+             * The initial contents of the window are not guaranteed
+             * by the front end. But we also don't want to require
+             * every single game to go to the effort of clearing the
+             * window on setup. So we centralise here the operation of
+             * covering the whole window with colour 0 (assumed to be
+             * the puzzle's background colour) the first time we do a
+             * redraw operation with a new drawstate.
+             */
+            draw_rect(me->drawing, 0, 0, me->winwidth, me->winheight, 0);
+        }
+
         if (me->oldstate && me->anim_time > 0 &&
             me->anim_pos < me->anim_time) {
             assert(me->dir != 0);
@@ -1152,6 +1332,15 @@ void midend_redraw(midend *me)
 				me->states[me->statepos-1].state, +1 /*shrug*/,
 				me->ui, 0.0, me->flash_pos);
         }
+
+        if (first_draw) {
+            /*
+             * Call a big draw_update on the whole window, in case the
+             * game backend didn't.
+             */
+            draw_update(me->drawing, 0, 0, me->winwidth, me->winheight);
+        }
+
         end_draw(me->drawing);
     }
 }
@@ -1201,6 +1390,7 @@ float *midend_colours(midend *me, int *ncolours)
     float *ret;
 
     ret = me->ourgame->colours(me->frontend, ncolours);
+    assert(*ncolours >= 1);
 
     {
         int i;
@@ -1227,6 +1417,9 @@ float *midend_colours(midend *me, int *ncolours)
                 ret[i*3 + 1] = g / 255.0F;
                 ret[i*3 + 2] = b / 255.0F;
             }
+            assert(0.0F <= ret[i*3 + 0] && ret[i*3 + 0] <= 1.0F);
+            assert(0.0F <= ret[i*3 + 1] && ret[i*3 + 1] <= 1.0F);
+            assert(0.0F <= ret[i*3 + 2] && ret[i*3 + 2] <= 1.0F);
         }
     }
 
@@ -1359,7 +1552,7 @@ static void preset_menu_encode_params(midend *me, struct preset_menu *menu)
     for (i = 0; i < menu->n_entries; i++) {
         if (menu->entries[i].params) {
             me->encoded_presets[menu->entries[i].id] =
-                me->ourgame->encode_params(menu->entries[i].params, true);
+	        encode_params(me, menu->entries[i].params, true);
         } else {
             preset_menu_encode_params(me, menu->entries[i].submenu);
         }
@@ -1438,7 +1631,7 @@ struct preset_menu *midend_get_presets(midend *me, int *id_limit)
 
 int midend_which_preset(midend *me)
 {
-    char *encoding = me->ourgame->encode_params(me->params, true);
+    char *encoding = encode_params(me, me->params, true);
     int i, ret;
 
     ret = -1;
@@ -1496,6 +1689,10 @@ bool midend_get_cursor_location(midend *me,
 void midend_supersede_game_desc(midend *me, const char *desc,
                                 const char *privdesc)
 {
+    /* Assert that the descriptions consists only of printable ASCII. */
+    assert_printable_ascii(desc);
+    if (privdesc)
+	assert_printable_ascii(privdesc);
     sfree(me->desc);
     sfree(me->privdesc);
     me->desc = dupstr(desc);
@@ -1545,7 +1742,7 @@ config_item *midend_get_config(midend *me, int which, char **wintitle)
          * the former is likely to persist across many code
          * changes).
          */
-        parstr = me->ourgame->encode_params(me->curparams, which == CFG_SEED);
+        parstr = encode_params(me, me->curparams, which == CFG_SEED);
         assert(parstr);
         if (which == CFG_DESC) {
             rest = me->desc ? me->desc : "";
@@ -1562,6 +1759,10 @@ config_item *midend_get_config(midend *me, int which, char **wintitle)
 	ret[1].name = NULL;
 
 	return ret;
+      case CFG_PREFS:
+	sprintf(titlebuf, "%s preferences", me->ourgame->name);
+	*wintitle = titlebuf;
+	return midend_get_prefs(me, NULL);
     }
 
     assert(!"We shouldn't be here");
@@ -1670,6 +1871,7 @@ static const char *midend_game_id_int(midend *me, const char *id, int defmode)
             newcurparams = me->ourgame->default_params();
         }
         me->ourgame->decode_params(newcurparams, par);
+        sfree(par);
         error = me->ourgame->validate_params(newcurparams, desc == NULL);
         if (error) {
             me->ourgame->free_params(newcurparams);
@@ -1689,7 +1891,7 @@ static const char *midend_game_id_int(midend *me, const char *id, int defmode)
 
             newparams = me->ourgame->dup_params(me->params);
 
-            tmpstr = me->ourgame->encode_params(newcurparams, false);
+            tmpstr = encode_params(me, newcurparams, false);
             me->ourgame->decode_params(newparams, tmpstr);
 
             sfree(tmpstr);
@@ -1745,8 +1947,6 @@ static const char *midend_game_id_int(midend *me, const char *id, int defmode)
         me->genmode = GOT_SEED;
     }
 
-    sfree(par);
-
     me->newgame_can_store_undo = false;
 
     return NULL;
@@ -1761,7 +1961,7 @@ char *midend_get_game_id(midend *me)
 {
     char *parstr, *ret;
 
-    parstr = me->ourgame->encode_params(me->curparams, false);
+    parstr = encode_params(me, me->curparams, false);
     assert(parstr);
     assert(me->desc);
     ret = snewn(strlen(parstr) + strlen(me->desc) + 2, char);
@@ -1777,7 +1977,7 @@ char *midend_get_random_seed(midend *me)
     if (!me->seedstr)
         return NULL;
 
-    parstr = me->ourgame->encode_params(me->curparams, true);
+    parstr = encode_params(me, me->curparams, true);
     assert(parstr);
     ret = snewn(strlen(parstr) + strlen(me->seedstr) + 2, char);
     sprintf(ret, "%s#%s", parstr, me->seedstr);
@@ -1811,6 +2011,10 @@ const char *midend_set_config(midend *me, int which, config_item *cfg)
 	if (error)
 	    return error;
 	break;
+
+      case CFG_PREFS:
+        midend_set_prefs(me, me->ui, cfg);
+        break;
     }
 
     return NULL;
@@ -1849,12 +2053,13 @@ const char *midend_solve(midend *me)
     movestr = me->ourgame->solve(me->states[0].state,
 				 me->states[me->statepos-1].state,
 				 me->aux_info, &msg);
-    assert(movestr != UI_UPDATE);
+    assert(movestr != MOVE_UI_UPDATE);
     if (!movestr) {
 	if (!msg)
 	    msg = "Solve operation failed";   /* _shouldn't_ happen, but can */
 	return msg;
     }
+    assert_printable_ascii(movestr);
     s = me->ourgame->execute_move(me->states[me->statepos-1].state, movestr);
     assert(s);
 
@@ -1961,7 +2166,9 @@ void midend_serialise(midend *me,
     char lbuf[9];                               \
     copy_left_justified(lbuf, sizeof(lbuf), h); \
     sprintf(hbuf, "%s:%d:", lbuf, (int)strlen(str)); \
+    assert_printable_ascii(hbuf); \
     write(wctx, hbuf, strlen(hbuf)); \
+    assert_printable_ascii(str); \
     write(wctx, str, strlen(str)); \
     write(wctx, "\n", 1); \
 } while (0)
@@ -1986,7 +2193,7 @@ void midend_serialise(midend *me,
      * The current long-term parameters structure, in full.
      */
     if (me->params) {
-        char *s = me->ourgame->encode_params(me->params, true);
+        char *s = encode_params(me, me->params, true);
         wr("PARAMS", s);
         sfree(s);
     }
@@ -1995,7 +2202,7 @@ void midend_serialise(midend *me,
      * The current short-term parameters structure, in full.
      */
     if (me->curparams) {
-        char *s = me->ourgame->encode_params(me->curparams, true);
+        char *s = encode_params(me, me->curparams, true);
         wr("CPARAMS", s);
         sfree(s);
     }
@@ -2003,8 +2210,27 @@ void midend_serialise(midend *me,
     /*
      * The current game description, the privdesc, and the random seed.
      */
-    if (me->seedstr)
-        wr("SEED", me->seedstr);
+    if (me->seedstr) {
+        /*
+         * Random seeds are not necessarily printable ASCII.
+         * Hex-encode the seed if necessary.  Printable ASCII seeds
+         * are emitted unencoded for compatibility with older
+         * versions.
+         */
+        int i;
+
+        for (i = 0; me->seedstr[i]; i++)
+            if (me->seedstr[i] < 32 || me->seedstr[i] >= 127)
+                break;
+        if (me->seedstr[i]) {
+            char *hexseed = bin2hex((unsigned char *)me->seedstr,
+                                    strlen(me->seedstr));
+
+            wr("HEXSEED", hexseed);
+            sfree(hexseed);
+        } else
+            wr("SEED", me->seedstr);
+    }
     if (me->desc)
         wr("DESC", me->desc);
     if (me->privdesc)
@@ -2036,7 +2262,7 @@ void midend_serialise(midend *me,
     /*
      * Any required serialisation of the game_ui.
      */
-    if (me->ui) {
+    if (me->ui && me->ourgame->encode_ui) {
         char *s = me->ourgame->encode_ui(me->ui);
         if (s) {
             wr("UI", s);
@@ -2049,7 +2275,7 @@ void midend_serialise(midend *me,
      */
     if (me->ourgame->is_timed) {
         char buf[80];
-        ftoa(buf, me->elapsed);
+        sprintf(buf, "%g", me->elapsed);
         wr("TIME", buf);
     }
 
@@ -2060,6 +2286,7 @@ void midend_serialise(midend *me,
         char buf[80];
         sprintf(buf, "%d", me->nstates);
         wr("NSTATES", buf);
+        assert(me->statepos >= 1 && me->statepos <= me->nstates);
         sprintf(buf, "%d", me->statepos);
         wr("STATEPOS", buf);
     }
@@ -2159,7 +2386,7 @@ static const char *midend_deserialise_internal(
 
             if (c == ':') {
                 break;
-            } else if (c >= '0' && c <= '9') {
+            } else if (c >= '0' && c <= '9' && len < (INT_MAX - 10) / 10) {
                 len = (len * 10) + (c - '0');
             } else {
                 if (started)
@@ -2171,10 +2398,17 @@ static const char *midend_deserialise_internal(
 
         val = snewn(len+1, char);
         if (!read(rctx, val, len)) {
-            if (started)
+            /* unexpected EOF */
             goto cleanup;
         }
         val[len] = '\0';
+        /* Validate that all values (apart from SEED) are printable ASCII. */
+        if (strcmp(key, "SEED"))
+            for (i = 0; val[i]; i++)
+                if (val[i] < 32 || val[i] >= 127) {
+                    ret = "Forbidden characters in saved game file";
+                    goto cleanup;
+                }
 
         if (!started) {
             if (strcmp(key, "SAVEFILE") || strcmp(val, SERIALISE_MAGIC)) {
@@ -2204,6 +2438,15 @@ static const char *midend_deserialise_internal(
                 sfree(data.cparstr);
                 data.cparstr = val;
                 val = NULL;
+            } else if (!strcmp(key, "HEXSEED")) {
+                unsigned char *tmp;
+                int len = strlen(val) / 2;   /* length in bytes */
+                tmp = hex2bin(val, len);
+                sfree(data.seed);
+                data.seed = snewn(len + 1, char);
+                memcpy(data.seed, tmp, len);
+                data.seed[len] = '\0';
+                sfree(tmp);
             } else if (!strcmp(key, "SEED")) {
                 sfree(data.seed);
                 data.seed = val;
@@ -2234,13 +2477,13 @@ static const char *midend_deserialise_internal(
             } else if (!strcmp(key, "TIME")) {
                 data.elapsed = (float)atof(val);
             } else if (!strcmp(key, "NSTATES")) {
+                if (data.states) {
+                    ret = "Two state counts provided in save file";
+                    goto cleanup;
+                }
                 data.nstates = atoi(val);
                 if (data.nstates <= 0) {
                     ret = "Number of states in save file was negative";
-                    goto cleanup;
-                }
-                if (data.states) {
-                    ret = "Two state counts provided in save file";
                     goto cleanup;
                 }
                 data.states = snewn(data.nstates, struct midend_state_entry);
@@ -2251,19 +2494,25 @@ static const char *midend_deserialise_internal(
                 }
             } else if (!strcmp(key, "STATEPOS")) {
                 data.statepos = atoi(val);
-            } else if (!strcmp(key, "MOVE")) {
+            } else if (!strcmp(key, "MOVE") ||
+                       !strcmp(key, "SOLVE") ||
+                       !strcmp(key, "RESTART")) {
+                if (!data.states) {
+                    ret = "No state count provided in save file";
+                    goto cleanup;
+                }
+                if (data.statepos < 0) {
+                    ret = "No game position provided in save file";
+                    goto cleanup;
+                }
                 gotstates++;
-                data.states[gotstates].movetype = MOVE;
-                data.states[gotstates].movestr = val;
-                val = NULL;
-            } else if (!strcmp(key, "SOLVE")) {
-                gotstates++;
-                data.states[gotstates].movetype = SOLVE;
-                data.states[gotstates].movestr = val;
-                val = NULL;
-            } else if (!strcmp(key, "RESTART")) {
-                gotstates++;
-                data.states[gotstates].movetype = RESTART;
+                assert(gotstates < data.nstates);
+                if (!strcmp(key, "MOVE"))
+                    data.states[gotstates].movetype = MOVE;
+                else if (!strcmp(key, "SOLVE"))
+                    data.states[gotstates].movetype = SOLVE;
+                else
+                    data.states[gotstates].movetype = RESTART;
                 data.states[gotstates].movestr = val;
                 val = NULL;
             }
@@ -2274,12 +2523,20 @@ static const char *midend_deserialise_internal(
     }
 
     data.params = me->ourgame->default_params();
+    if (!data.parstr) {
+        ret = "Long-term parameters in save file are missing";
+        goto cleanup;
+    }
     me->ourgame->decode_params(data.params, data.parstr);
     if (me->ourgame->validate_params(data.params, true)) {
         ret = "Long-term parameters in save file are invalid";
         goto cleanup;
     }
     data.cparams = me->ourgame->default_params();
+    if (!data.cparstr) {
+        ret = "Short-term parameters in save file are missing";
+        goto cleanup;
+    }
     me->ourgame->decode_params(data.cparams, data.cparstr);
     if (me->ourgame->validate_params(data.cparams, false)) {
         ret = "Short-term parameters in save file are invalid";
@@ -2305,12 +2562,18 @@ static const char *midend_deserialise_internal(
         ret = "Game private description in save file is invalid";
         goto cleanup;
     }
-    if (data.statepos < 0 || data.statepos >= data.nstates) {
+    if (data.statepos < 1 || data.statepos > data.nstates) {
         ret = "Game position in save file is out of range";
+        goto cleanup;
     }
 
+    if (!data.states) {
+        ret = "No state count provided in save file";
+        goto cleanup;
+    }
     data.states[0].state = me->ourgame->new_game(
         me, data.cparams, data.privdesc ? data.privdesc : data.desc);
+
     for (i = 1; i < data.nstates; i++) {
         assert(data.states[i].movetype != NEWGAME);
         switch (data.states[i].movetype) {
@@ -2336,7 +2599,10 @@ static const char *midend_deserialise_internal(
     }
 
     data.ui = me->ourgame->new_ui(data.states[0].state);
-    me->ourgame->decode_ui(data.ui, data.uistr);
+    midend_apply_prefs(me, data.ui);
+    if (data.uistr && me->ourgame->decode_ui)
+        me->ourgame->decode_ui(data.ui, data.uistr,
+                               data.states[data.statepos-1].state);
 
     /*
      * Run the externally provided check function, and abort if it
@@ -2429,6 +2695,7 @@ static const char *midend_deserialise_internal(
     me->drawstate =
         me->ourgame->new_drawstate(me->drawing,
 				   me->states[me->statepos-1].state);
+    me->first_draw = true;
     midend_size_new_drawstate(me);
     if (me->game_id_change_notify_function)
         me->game_id_change_notify_function(me->game_id_change_notify_ctx);
@@ -2528,7 +2795,7 @@ const char *identify_game(char **name,
 
             if (c == ':') {
                 break;
-            } else if (c >= '0' && c <= '9') {
+            } else if (c >= '0' && c <= '9' && len < (INT_MAX - 10) / 10) {
                 len = (len * 10) + (c - '0');
             } else {
                 if (started)
@@ -2540,7 +2807,7 @@ const char *identify_game(char **name,
 
         val = snewn(len+1, char);
         if (!read(rctx, val, len)) {
-            if (started)
+            /* unexpected EOF */
             goto cleanup;
         }
         val[len] = '\0';
@@ -2605,14 +2872,340 @@ const char *midend_print_puzzle(midend *me, document *doc, bool with_soln)
 	soln = NULL;
 
     /*
-     * This call passes over ownership of the two game_states and
-     * the game_params. Hence we duplicate the ones we want to
-     * keep, and we don't have to bother freeing soln if it was
-     * non-NULL.
+     * This call passes over ownership of the two game_states, the
+     * game_params and the game_ui. Hence we duplicate the ones we
+     * want to keep, and we don't have to bother freeing soln if it
+     * was non-NULL.
      */
+    game_ui *ui = me->ourgame->new_ui(me->states[0].state);
+    midend_apply_prefs(me, ui);
     document_add_puzzle(doc, me->ourgame,
-			me->ourgame->dup_params(me->curparams),
+			me->ourgame->dup_params(me->curparams), ui,
 			me->ourgame->dup_game(me->states[0].state), soln);
 
     return NULL;
+}
+
+static void midend_apply_prefs(midend *me, game_ui *ui)
+{
+    struct midend_serialise_buf_read_ctx rctx[1];
+    rctx->ser = &me->be_prefs;
+    rctx->len = me->be_prefs.len;
+    rctx->pos = 0;
+    const char *err = midend_deserialise_prefs(
+        me, ui, midend_serialise_buf_read, rctx);
+    /* This should have come from our own serialise function, so
+     * it should never be invalid. */
+    assert(!err && "Bad internal serialisation of preferences");
+}
+
+static config_item *midend_get_prefs(midend *me, game_ui *ui)
+{
+    int n_be_prefs, n_me_prefs, pos, i;
+    config_item *all_prefs, *be_prefs;
+
+    be_prefs = NULL;
+    n_be_prefs = 0;
+    if (me->ourgame->get_prefs) {
+        if (ui) {
+            be_prefs = me->ourgame->get_prefs(ui);
+        } else if (me->ui) {
+            be_prefs = me->ourgame->get_prefs(me->ui);
+        } else {
+            game_ui *tmp_ui = me->ourgame->new_ui(NULL);
+            be_prefs = me->ourgame->get_prefs(tmp_ui);
+            me->ourgame->free_ui(tmp_ui);
+        }
+        while (be_prefs[n_be_prefs].type != C_END)
+            n_be_prefs++;
+    }
+
+    n_me_prefs = 1;
+    all_prefs = snewn(n_me_prefs + n_be_prefs + 1, config_item);
+
+    pos = 0;
+
+    assert(pos < n_me_prefs);
+    all_prefs[pos].name = "Keyboard shortcuts without Ctrl";
+    all_prefs[pos].kw = "one-key-shortcuts";
+    all_prefs[pos].type = C_BOOLEAN;
+    all_prefs[pos].u.boolean.bval = me->one_key_shortcuts;
+    pos++;
+
+    for (i = 0; i < n_be_prefs; i++) {
+        all_prefs[pos] = be_prefs[i];  /* structure copy */
+        pos++;
+    }
+
+    all_prefs[pos].name = NULL;
+    all_prefs[pos].type = C_END;
+
+    if (be_prefs)
+        /* We already copied each element, so don't free those with
+           free_cfg(). */
+        sfree(be_prefs);
+
+    return all_prefs;
+}
+
+static void midend_set_prefs(midend *me, game_ui *ui, config_item *all_prefs)
+{
+    int pos = 0;
+    game_ui *tmpui = NULL;
+
+    me->one_key_shortcuts = all_prefs[pos].u.boolean.bval;
+    pos++;
+
+    if (me->ourgame->get_prefs) {
+        if (!ui)
+            ui = tmpui = me->ourgame->new_ui(NULL);
+        me->ourgame->set_prefs(ui, all_prefs + pos);
+    }
+
+    me->be_prefs.len = 0;
+    midend_serialise_prefs(me, ui, midend_serialise_buf_write, &me->be_prefs);
+
+    if (tmpui)
+        me->ourgame->free_ui(tmpui);
+}
+
+static void midend_serialise_prefs(
+    midend *me, game_ui *ui,
+    void (*write)(void *ctx, const void *buf, int len), void *wctx)
+{
+    config_item *cfg;
+    int i;
+
+    cfg = midend_get_prefs(me, ui);
+
+    assert(cfg);
+
+    for (i = 0; cfg[i].type != C_END; i++) {
+        config_item *it = &cfg[i];
+
+        /* Expect keywords to be made up only of simple characters */
+        assert(it->kw[strspn(it->kw, "abcdefghijklmnopqrstuvwxyz-")] == '\0');
+
+        write(wctx, it->kw, strlen(it->kw));
+        write(wctx, "=", 1);
+
+        switch (it->type) {
+          case C_BOOLEAN:
+            if (it->u.boolean.bval)
+                write(wctx, "true", 4);
+            else
+                write(wctx, "false", 5);
+            break;
+          case C_STRING: {
+            const char *p = it->u.string.sval;
+            while (*p) {
+                char c = *p++;
+                write(wctx, &c, 1);
+                if (c == '\n')
+                write(wctx, " ", 1);
+            }
+            break;
+          }
+          case C_CHOICES: {
+            int n = it->u.choices.selected;
+            const char *p = it->u.choices.choicekws;
+            char sepstr[2];
+
+            sepstr[0] = *p++;
+            sepstr[1] = '\0';
+
+            while (n > 0) {
+                const char *q = strchr(p, sepstr[0]);
+                assert(q != NULL && "Value out of range in C_CHOICES");
+                p = q+1;
+                n--;
+            }
+
+            write(wctx, p, strcspn(p, sepstr));
+            break;
+          }
+        }
+
+        write(wctx, "\n", 1);
+    }
+
+    free_cfg(cfg);
+}
+
+struct buffer {
+    char *data;
+    size_t len, size;
+};
+
+static void buffer_append(struct buffer *buf, char c)
+{
+    if (buf->len + 2 > buf->size) {
+        size_t new_size = buf->size + buf->size / 4 + 128;
+        assert(new_size > buf->size);
+        buf->data = sresize(buf->data, new_size, char);
+        buf->size = new_size;
+        assert(buf->len < buf->size);
+    }
+    buf->data[buf->len++] = c;
+    assert(buf->len < buf->size);
+    buf->data[buf->len] = '\0';
+}
+
+static const char *midend_deserialise_prefs(
+    midend *me, game_ui *ui,
+    bool (*read)(void *ctx, void *buf, int len), void *rctx)
+{
+    config_item *cfg, *it;
+    int i;
+    struct buffer buf[1] = {{ NULL, 0, 0 }};
+    const char *errmsg = NULL;
+    char read_char;
+    char ungot_char = '\0';
+    bool have_ungot_a_char = false, eof = false;
+
+    cfg = midend_get_prefs(me, ui);
+
+    while (!eof) {
+        if (have_ungot_a_char) {
+            read_char = ungot_char;
+            have_ungot_a_char = false;
+        } else {
+            if (!read(rctx, &read_char, 1))
+                goto out;           /* EOF at line start == success */
+        }
+
+        if (read_char == '#' || read_char == '\n') {
+            /* Skip comment or blank line */
+            while (read_char != '\n') {
+                if (!read(rctx, &read_char, 1))
+                    goto out;  /* EOF during boring line == success */
+            }
+            continue;
+        }
+
+        buf->len = 0;
+        while (true) {
+            buffer_append(buf, read_char);
+            if (!read(rctx, &read_char, 1)) {
+                errmsg = "Partial line at end of preferences file";
+                goto out;
+            }
+            if (read_char == '\n') {
+                errmsg = "Expected '=' after keyword";
+                goto out;
+            }
+            if (read_char == '=')
+                break;
+        }
+
+        it = NULL;
+        for (i = 0; cfg[i].type != C_END; i++)
+            if (!strcmp(buf->data, cfg[i].kw))
+                it = &cfg[i];
+
+        buf->len = 0;
+        while (true) {
+            if (!read(rctx, &read_char, 1)) {
+                /* We tolerate missing \n at the end of the file, so
+                 * this is taken to mean we've got a complete config
+                 * directive. But set the eof flag so that we stop
+                 * after processing it. */
+                eof = true;
+                break;
+            } else if (read_char == '\n') {
+                /* Newline _might_ be the end of this config
+                 * directive, unless it's followed by a space, in
+                 * which case it's a space-stuffed line
+                 * continuation. */
+                if (read(rctx, &read_char, 1)) {
+                    if (read_char == ' ') {
+                        buffer_append(buf, '\n');
+                        continue;
+                    } else {
+                        /* But if the next character wasn't a space,
+                         * then we must unget it so that it'll be
+                         * available to the next iteration of our
+                         * outer loop as the first character of the
+                         * next keyword. */
+                        ungot_char = read_char;
+                        have_ungot_a_char = true;
+                        break;
+                    }
+                } else {
+                    /* And if the newline was followed by EOF, then we
+                     * should finish this iteration of the outer
+                     * loop normally, and then not go round again. */
+                    eof = true;
+                    break;
+                }
+            } else {
+                /* Any other character is just added to the buffer. */
+                buffer_append(buf, read_char);
+            }
+        }
+
+        if (!it) {
+            /*
+             * Tolerate unknown keywords in a preferences file, on the
+             * assumption that they're from a different (probably
+             * later) version of the game.
+             */
+            continue;
+        }
+
+        switch (it->type) {
+          case C_BOOLEAN:
+            if (!strcmp(buf->data, "true"))
+                it->u.boolean.bval = true;
+            else if (!strcmp(buf->data, "false"))
+                it->u.boolean.bval = false;
+            else {
+                errmsg = "Value for boolean was not 'true' or 'false'";
+                goto out;
+            }
+            break;
+          case C_STRING:
+            sfree(it->u.string.sval);
+            it->u.string.sval = buf->data;
+            buf->data = NULL;
+            buf->len = buf->size = 0;
+            break;
+          case C_CHOICES: {
+            int n = 0;
+            bool found = false;
+            const char *p = it->u.choices.choicekws;
+            char sepstr[2];
+
+            sepstr[0] = *p;
+            sepstr[1] = '\0';
+
+            while (*p++) {
+                int len = strcspn(p, sepstr);
+                if (buf->len == len && !memcmp(p, buf->data, len)) {
+                    it->u.choices.selected = n;
+                    found = true;
+                    break;
+                }
+                p += len;
+                n++;
+            }
+
+            if (!found) {
+                errmsg = "Invalid value for enumeration";
+                goto out;
+            }
+
+            break;
+          }
+        }
+    }
+
+  out:
+
+    if (!errmsg)
+        midend_set_prefs(me, ui, cfg);
+
+    free_cfg(cfg);
+    sfree(buf->data);
+    return errmsg;
 }

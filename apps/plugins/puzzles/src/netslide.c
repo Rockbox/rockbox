@@ -8,7 +8,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 #include "tree234.h"
@@ -242,10 +247,7 @@ static char *encode_params(const game_params *params, bool full)
     if (params->wrapping)
         ret[len++] = 'w';
     if (full && params->barrier_probability)
-    {
-        len += sprintf(ret+len, "b");
-        len += ftoa(ret + len, params->barrier_probability);
-    }
+        len += sprintf(ret+len, "b%g", params->barrier_probability);
     /* Shuffle limit is part of the limited parameters, because we have to
      * provide the target move count. */
     if (params->movetarget)
@@ -279,7 +281,7 @@ static config_item *game_configure(const game_params *params)
 
     ret[3].name = "Barrier probability";
     ret[3].type = C_STRING;
-    ftoa(buf, params->barrier_probability);
+    sprintf(buf, "%g", params->barrier_probability);
     ret[3].u.string.sval = dupstr(buf);
 
     ret[4].name = "Number of shuffling moves";
@@ -310,6 +312,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->width <= 1 || params->height <= 1)
 	return "Width and height must both be greater than one";
+    if (params->width > INT_MAX / params->height)
+        return "Width times height must not be unreasonably large";
     if (params->barrier_probability < 0)
 	return "Barrier probability may not be negative";
     if (params->barrier_probability > 1)
@@ -895,16 +899,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr(aux);
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 /* ----------------------------------------------------------------------
  * Utility routine.
  */
@@ -981,7 +975,7 @@ static game_ui *new_ui(const game_state *state)
     game_ui *ui = snew(game_ui);
     ui->cur_x = 0;
     ui->cur_y = -1;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -989,15 +983,6 @@ static game_ui *new_ui(const game_state *state)
 static void free_ui(game_ui *ui)
 {
     sfree(ui);
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
 }
 
 /* ----------------------------------------------------------------------
@@ -1009,7 +994,9 @@ static void slide_row_int(int w, int h, unsigned char *tiles, int dir, int row)
     int x = dir > 0 ? -1 : w;
     int tx = x + dir;
     int n = w - 1;
-    unsigned char endtile = tiles[row * w + tx];
+    unsigned char endtile;
+    assert(0 <= tx && tx < w);
+    endtile = tiles[row * w + tx];
     do {
         x = tx;
         tx = (x + dir + w) % w;
@@ -1023,7 +1010,9 @@ static void slide_col_int(int w, int h, unsigned char *tiles, int dir, int col)
     int y = dir > 0 ? -1 : h;
     int ty = y + dir;
     int n = h - 1;
-    unsigned char endtile = tiles[ty * w + col];
+    unsigned char endtile;
+    assert(0 <= ty && ty < h);
+    endtile = tiles[ty * w + col];
     do {
         y = ty;
         ty = (y + dir + h) % h;
@@ -1055,6 +1044,14 @@ struct game_drawstate {
     int cur_x, cur_y;
 };
 
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (IS_CURSOR_SELECT(button) && ui->cur_visible)
+        return "Slide";
+    return "";
+}
+
 static char *interpret_move(const game_state *state, game_ui *ui,
                             const game_drawstate *ds,
                             int x, int y, int button)
@@ -1063,7 +1060,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int dx, dy;
     char buf[80];
 
-    button &= ~MOD_MASK;
+    button = STRIP_BUTTON_MODIFIERS(button);
 
     if (IS_CURSOR_MOVE(button)) {
         int cpos, diff = 0;
@@ -1078,7 +1075,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
 
         ui->cur_visible = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
@@ -1092,7 +1089,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         } else {
             /* 'click' when cursor is invisible just makes cursor visible. */
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     } else
         return NULL;
@@ -1136,7 +1133,9 @@ static game_state *execute_move(const game_state *from, const char *move)
 
     if ((move[0] == 'C' || move[0] == 'R') &&
 	sscanf(move+1, "%d,%d", &c, &d) == 2 &&
-	c >= 0 && c < (move[0] == 'C' ? from->width : from->height)) {
+	c >= 0 && c < (move[0] == 'C' ? from->width : from->height) &&
+        d <= (move[0] == 'C' ? from->height : from->width) &&
+        d >= -(move[0] == 'C' ? from->height : from->width) && d != 0) {
 	col = (move[0] == 'C');
     } else if (move[0] == 'S' &&
 	       strlen(move) == from->width * from->height + 1) {
@@ -1226,7 +1225,7 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
 }
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -1490,7 +1489,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
         vx = (dy ? 1 : 0);
         vy = (dx ? 1 : 0);
 
-        if (xshift == 0.0 && yshift == 0.0 && (tile & dir)) {
+        if (xshift == 0.0F && yshift == 0.0F && (tile & dir)) {
             /*
              * If we are fully connected to the other tile, we must
              * draw right across the tile border. (We can use our
@@ -1594,21 +1593,12 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     int cur_x = -1, cur_y = -1;
 
     /*
-     * Clear the screen and draw the exterior barrier lines if this
-     * is our first call.
+     * Draw the exterior barrier lines if this is our first call.
      */
     if (!ds->started) {
         int phase;
 
         ds->started = true;
-
-        draw_rect(dr, 0, 0, 
-                  BORDER * 2 + WINDOW_OFFSET * 2 + TILE_SIZE * state->width + TILE_BORDER,
-                  BORDER * 2 + WINDOW_OFFSET * 2 + TILE_SIZE * state->height + TILE_BORDER,
-                  COL_BACKGROUND);
-        draw_update(dr, 0, 0, 
-                    BORDER * 2 + WINDOW_OFFSET*2 + TILE_SIZE*state->width + TILE_BORDER,
-                    BORDER * 2 + WINDOW_OFFSET*2 + TILE_SIZE*state->height + TILE_BORDER);
 
         for (phase = 0; phase < 2; phase++) {
 
@@ -1703,7 +1693,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     /*
      * Draw any tile which differs from the way it was last drawn.
      */
-    if (xshift != 0.0 || yshift != 0.0) {
+    if (xshift != 0.0F || yshift != 0.0F) {
         active = compute_active(state,
                                 state->last_move_row, state->last_move_col);
     } else {
@@ -1849,19 +1839,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return false;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame netslide
 #endif
@@ -1882,13 +1859,15 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1900,9 +1879,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

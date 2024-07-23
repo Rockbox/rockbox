@@ -23,7 +23,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 #include "latin.h"
@@ -385,12 +389,12 @@ static int solver_easy(struct latin_solver *solver, void *vctx)
 	    return ret;
 
 #ifdef STANDALONE_SOLVER
-	    if (solver_show_working)
-		sprintf(prefix, "%*slower bounds for clue %s %d:\n",
-			solver_recurse_depth*4, "",
-			cluepos[c/w], c%w+1);
-	    else
-		prefix[0] = '\0';	       /* placate optimiser */
+	if (solver_show_working)
+	    sprintf(prefix, "%*slower bounds for clue %s %d:\n",
+		    solver_recurse_depth*4, "",
+		    cluepos[c/w], c%w+1);
+	else
+	    prefix[0] = '\0';	       /* placate optimiser */
 #endif
 
 	i = 0;
@@ -893,6 +897,7 @@ static const char *validate_desc(const game_params *params, const char *desc)
 	    return "Too much data to fit in grid";
     }
 
+    if (*p) return "Rubbish at end of game description";
     return NULL;
 }
 
@@ -1154,7 +1159,47 @@ struct game_ui {
      * allowed on immutable squares.
      */
     bool hcursor;
+
+    /*
+     * User preference option which can be set to FALSE to disable the
+     * 3D graphical style, and instead just display the puzzle as if
+     * it was a Sudoku variant, i.e. each square just has a digit in
+     * it.
+     *
+     * I was initially a bit uncertain about whether the 3D style
+     * would be the right thing, on the basis that it uses up space in
+     * the cells and makes it hard to use many pencil marks. Actually
+     * nobody seems to have complained, but having put in the option
+     * while I was still being uncertain, it seems silly not to leave
+     * it in just in case.
+     */
+    int three_d;
+
+    /*
+     * User preference option: if the user right-clicks in a square
+     * and presses a number key to add/remove a pencil mark, do we
+     * hide the mouse highlight again afterwards?
+     *
+     * Historically our answer was yes. The Android port prefers no.
+     * There are advantages both ways, depending how much you dislike
+     * the highlight cluttering your view. So it's a preference.
+     */
+    bool pencil_keep_highlight;
 };
+
+static void legacy_prefs_override(struct game_ui *ui_out)
+{
+    static bool initialised = false;
+    static int three_d = -1;
+
+    if (!initialised) {
+        initialised = true;
+        three_d = getenv_bool("TOWERS_2D", -1);
+    }
+
+    if (three_d != -1)
+        ui_out->three_d = three_d;
+}
 
 static game_ui *new_ui(const game_state *state)
 {
@@ -1162,8 +1207,11 @@ static game_ui *new_ui(const game_state *state)
 
     ui->hx = ui->hy = 0;
     ui->hpencil = false;
-    ui->hshow = false;
-    ui->hcursor = false;
+    ui->hshow = ui->hcursor = getenv_bool("PUZZLES_SHOW_CURSOR", false);
+
+    ui->three_d = true;
+    ui->pencil_keep_highlight = false;
+    legacy_prefs_override(ui);
 
     return ui;
 }
@@ -1173,13 +1221,34 @@ static void free_ui(game_ui *ui)
     sfree(ui);
 }
 
-static char *encode_ui(const game_ui *ui)
+static config_item *get_prefs(game_ui *ui)
 {
-    return NULL;
+    config_item *ret;
+
+    ret = snewn(3, config_item);
+
+    ret[0].name = "Keep mouse highlight after changing a pencil mark";
+    ret[0].kw = "pencil-keep-highlight";
+    ret[0].type = C_BOOLEAN;
+    ret[0].u.boolean.bval = ui->pencil_keep_highlight;
+
+    ret[1].name = "Puzzle appearance";
+    ret[1].kw = "appearance";
+    ret[1].type = C_CHOICES;
+    ret[1].u.choices.choicenames = ":2D:3D";
+    ret[1].u.choices.choicekws = ":2d:3d";
+    ret[1].u.choices.selected = ui->three_d;
+
+    ret[2].name = NULL;
+    ret[2].type = C_END;
+
+    return ret;
 }
 
-static void decode_ui(game_ui *ui, const char *encoding)
+static void set_prefs(game_ui *ui, const config_item *cfg)
 {
+    ui->pencil_keep_highlight = cfg[0].u.boolean.bval;
+    ui->three_d = cfg[1].u.choices.selected;
 }
 
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
@@ -1196,6 +1265,14 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
         newstate->grid[ui->hy * w + ui->hx] != 0) {
         ui->hshow = false;
     }
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (ui->hshow && (button == CURSOR_SELECT))
+        return ui->hpencil ? "Ink" : "Pencil";
+    return "";
 }
 
 #define PREFERRED_TILESIZE 48
@@ -1221,8 +1298,6 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 
 struct game_drawstate {
     int tilesize;
-    bool three_d;       /* default 3D graphics are user-disableable */
-    bool started;
     long *tiles;		       /* (w+2)*(w+2) temp space */
     long *drawn;		       /* (w+2)*(w+2)*4: current drawn data */
     bool *errtmp;
@@ -1349,12 +1424,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int tx, ty;
     char buf[80];
 
-    button &= ~MOD_MASK;
+    button = STRIP_BUTTON_MODIFIERS(button);
 
     tx = FROMCOORD(x);
     ty = FROMCOORD(y);
 
-    if (ds->three_d) {
+    if (ui->three_d) {
 	/*
 	 * In 3D mode, just locating the mouse click in the natural
 	 * square grid may not be sufficient to tell which tower the
@@ -1401,7 +1476,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hpencil = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (button == RIGHT_BUTTON) {
             /*
@@ -1421,7 +1496,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = false;
             }
             ui->hcursor = false;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     } else if (button == LEFT_BUTTON) {
         if (is_clue(state, tx, ty)) {
@@ -1444,16 +1519,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             }
             return NULL;
         }
-        move_cursor(button, &ui->hx, &ui->hy, w, w, false);
-        ui->hshow = true;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return move_cursor(button, &ui->hx, &ui->hy, w, w, false, &ui->hshow);
     }
     if (ui->hshow &&
         (button == CURSOR_SELECT)) {
         ui->hpencil = !ui->hpencil;
         ui->hcursor = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (ui->hshow &&
@@ -1476,10 +1549,31 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (state->clues->immutable[ui->hy*w+ui->hx])
             return NULL;
 
+        /*
+         * If you ask to fill a square with what it already contains,
+         * or blank it when it's already empty, that has no effect...
+         */
+        if ((!ui->hpencil || n == 0) && state->grid[ui->hy*w+ui->hx] == n &&
+            state->pencil[ui->hy*w+ui->hx] == 0) {
+            /* ... expect to remove the cursor in mouse mode. */
+            if (!ui->hcursor) {
+                ui->hshow = false;
+                return MOVE_UI_UPDATE;
+            }
+            return NULL;
+        }
+
 	sprintf(buf, "%c%d,%d,%d",
 		(char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
 
-        if (!ui->hcursor) ui->hshow = false;
+        /*
+         * Hide the highlight after a keypress, if it was mouse-
+         * generated. Also, don't hide it if this move has changed
+         * pencil marks and the user preference says not to hide the
+         * highlight in that situation.
+         */
+        if (!ui->hcursor && !(ui->hpencil && ui->pencil_keep_highlight))
+            ui->hshow = false;
 
 	return dupstr(buf);
     }
@@ -1558,7 +1652,7 @@ static game_state *execute_move(const game_state *from, const char *move)
 #define SIZE(w) ((w) * TILESIZE + 2*BORDER)
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -1614,8 +1708,6 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     int i;
 
     ds->tilesize = 0;
-    ds->three_d = !getenv("TOWERS_2D");
-    ds->started = false;
     ds->tiles = snewn((w+2)*(w+2), long);
     ds->drawn = snewn((w+2)*(w+2)*4, long);
     for (i = 0; i < (w+2)*(w+2)*4; i++)
@@ -1633,8 +1725,8 @@ static void game_free_drawstate(drawing *dr, game_drawstate *ds)
     sfree(ds);
 }
 
-static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
-		      int x, int y, long tile)
+static void draw_tile(drawing *dr, game_drawstate *ds, const game_ui *ui,
+                      struct clues *clues, int x, int y, long tile)
 {
     int w = clues->w /* , a = w*w */;
     int tx, ty, bg;
@@ -1646,7 +1738,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
     bg = (tile & DF_HIGHLIGHT) ? COL_HIGHLIGHT : COL_BACKGROUND;
 
     /* draw tower */
-    if (ds->three_d && (tile & DF_PLAYAREA) && (tile & DF_DIGIT_MASK)) {
+    if (ui->three_d && (tile & DF_PLAYAREA) && (tile & DF_DIGIT_MASK)) {
 	int coords[8];
 	int xoff = X_3D_DISP(tile & DF_DIGIT_MASK, w);
 	int yoff = Y_3D_DISP(tile & DF_DIGIT_MASK, w);
@@ -1747,10 +1839,10 @@ static void draw_tile(drawing *dr, game_drawstate *ds, struct clues *clues,
 	     * to put the pencil marks.
 	     */
 	    /* Start with the whole square, minus space for impinging towers */
-	    pl = tx + (ds->three_d ? X_3D_DISP(w,w) : 0);
+	    pl = tx + (ui->three_d ? X_3D_DISP(w,w) : 0);
 	    pr = tx + TILESIZE;
 	    pt = ty;
-	    pb = ty + TILESIZE - (ds->three_d ? Y_3D_DISP(w,w) : 0);
+	    pb = ty + TILESIZE - (ui->three_d ? Y_3D_DISP(w,w) : 0);
 
 	    /*
 	     * We arrange our pencil marks in a grid layout, with
@@ -1821,20 +1913,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     int w = state->par.w /*, a = w*w */;
     int i, x, y;
 
-    if (!ds->started) {
-	/*
-	 * The initial contents of the window are not guaranteed and
-	 * can vary with front ends. To be on the safe side, all
-	 * games should start by drawing a big background-colour
-	 * rectangle covering the whole window.
-	 */
-	draw_rect(dr, 0, 0, SIZE(w), SIZE(w), COL_BACKGROUND);
-
-	draw_update(dr, 0, 0, SIZE(w), SIZE(w));
-
-	ds->started = true;
-    }
-
     check_errors(state, ds->errtmp);
 
     /*
@@ -1900,13 +1978,13 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 		ds->drawn[i*4+2] != bl || ds->drawn[i*4+3] != br) {
 		clip(dr, COORD(x-1), COORD(y-1), TILESIZE, TILESIZE);
 
-		draw_tile(dr, ds, state->clues, x-1, y-1, tr);
+		draw_tile(dr, ds, ui, state->clues, x-1, y-1, tr);
 		if (x > 0)
-		    draw_tile(dr, ds, state->clues, x-2, y-1, tl);
+		    draw_tile(dr, ds, ui, state->clues, x-2, y-1, tl);
 		if (y <= w)
-		    draw_tile(dr, ds, state->clues, x-1, y, br);
+		    draw_tile(dr, ds, ui, state->clues, x-1, y, br);
 		if (x > 0 && y <= w)
-		    draw_tile(dr, ds, state->clues, x-2, y, bl);
+		    draw_tile(dr, ds, ui, state->clues, x-2, y, bl);
 
 		unclip(dr);
 		draw_update(dr, COORD(x-1), COORD(y-1), TILESIZE, TILESIZE);
@@ -1953,26 +2031,21 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    if (state->completed)
-	return false;
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int pw, ph;
 
     /*
      * We use 9mm squares by default, like Solo.
      */
-    game_compute_size(params, 900, &pw, &ph);
+    game_compute_size(params, 900, ui, &pw, &ph);
     *x = pw / 100.0F;
     *y = ph / 100.0F;
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int w = state->par.w;
     int ink = print_mono_colour(dr, 0);
@@ -2058,12 +2131,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     game_request_keys,
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILESIZE, game_compute_size, game_set_size,
@@ -2077,7 +2152,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON | REQUIRE_NUMPAD,  /* flags */
 };
 

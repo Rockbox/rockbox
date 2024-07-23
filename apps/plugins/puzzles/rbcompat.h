@@ -34,6 +34,8 @@ int sscanf_wrapper(const char *ibuf, const char *fmt, ...);
 double atof_wrapper(const char *s);
 double acos_wrapper(double x);
 
+#define NO_TGMATH_H
+
 #define acos acos_wrapper
 #define atan atan_wrapper
 #define atan2 atan2_wrapper

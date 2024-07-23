@@ -58,7 +58,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -911,8 +915,8 @@ static const char *validate_params(const game_params *params, bool full)
     int const w = params->w, h = params->h;
     if (w < 1) return "Error: width is less than 1";
     if (h < 1) return "Error: height is less than 1";
+    if (w > SCHAR_MAX - (h - 1)) return "Error: w + h is too big";
     if (w * h < 1) return "Error: size is less than 1";
-    if (w + h - 1 > SCHAR_MAX) return "Error: w + h is too big";
     /* I might be unable to store clues in my puzzle_size *grid; */
     if (full) {
         if (w == 2 && h == 2) return "Error: can't create 2x2 puzzles";
@@ -1221,14 +1225,75 @@ static char *game_text_format(const game_state *state)
 struct game_ui {
     puzzle_size r, c; /* cursor position */
     bool cursor_show;
+
+    /*
+     * User preference option to swap the left and right mouse
+     * buttons.
+     *
+     * The original puzzle submitter thought it would be more useful
+     * to have the left button turn an empty square into a dotted one,
+     * on the grounds that that was what you did most often; I (SGT)
+     * felt instinctively that the left button ought to place black
+     * squares and the right button place dots, on the grounds that
+     * that was consistent with many other puzzles in which the left
+     * button fills in the data used by the solution checker while the
+     * right button places pencil marks for the user's convenience.
+     *
+     * My first beta-player wasn't sure either, so I thought I'd
+     * pre-emptively put in a 'configuration' mechanism just in case.
+     */
+    bool swap_buttons;
 };
+
+static void legacy_prefs_override(struct game_ui *ui_out)
+{
+    static int initialised = false;
+    static int swap_buttons = -1;
+
+    if (!initialised) {
+        initialised = true;
+        swap_buttons = getenv_bool("RANGE_SWAP_BUTTONS", -1);
+    }
+
+    if (swap_buttons != -1)
+        ui_out->swap_buttons = swap_buttons;
+}
 
 static game_ui *new_ui(const game_state *state)
 {
     struct game_ui *ui = snew(game_ui);
     ui->r = ui->c = 0;
-    ui->cursor_show = false;
+    ui->cursor_show = getenv_bool("PUZZLES_SHOW_CURSOR", false);
+
+    ui->swap_buttons = false;
+    legacy_prefs_override(ui);
+
     return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *ret;
+
+    ret = snewn(2, config_item);
+
+    ret[0].name = "Mouse button order";
+    ret[0].kw = "left-mouse-button";
+    ret[0].type = C_CHOICES;
+    ret[0].u.choices.choicenames =
+        ":Left to fill, right to dot:Left to dot, right to fill";
+    ret[0].u.choices.choicekws = ":fill:dot";
+    ret[0].u.choices.selected = ui->swap_buttons;
+
+    ret[1].name = NULL;
+    ret[1].type = C_END;
+
+    return ret;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->swap_buttons = cfg[0].u.choices.selected;
 }
 
 static void free_ui(game_ui *ui)
@@ -1236,13 +1301,25 @@ static void free_ui(game_ui *ui)
     sfree(ui);
 }
 
-static char *encode_ui(const game_ui *ui)
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
 {
-    return NULL;
-}
+    int cell;
 
-static void decode_ui(game_ui *ui, const char *encoding)
-{
+    if (IS_CURSOR_SELECT(button)) {
+        cell = state->grid[idx(ui->r, ui->c, state->params.w)];
+        if (!ui->cursor_show || cell > 0) return "";
+        switch (cell) {
+          case EMPTY:
+            return button == CURSOR_SELECT ? "Fill" : "Dot";
+          case WHITE:
+            return button == CURSOR_SELECT ? "Empty" : "Fill";
+          case BLACK:
+            return button == CURSOR_SELECT ? "Dot" : "Empty";
+        }
+    }
+    return "";
+
 }
 
 typedef struct drawcell {
@@ -1253,7 +1330,6 @@ typedef struct drawcell {
 struct game_drawstate {
     int tilesize;
     drawcell *grid;
-    bool started;
 };
 
 #define TILESIZE (ds->tilesize)
@@ -1283,38 +1359,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
-	/*
-	 * Utterly awful hack, exactly analogous to the one in Slant,
-	 * to configure the left and right mouse buttons the opposite
-	 * way round.
-	 *
-	 * The original puzzle submitter thought it would be more
-	 * useful to have the left button turn an empty square into a
-	 * dotted one, on the grounds that that was what you did most
-	 * often; I (SGT) felt instinctively that the left button
-	 * ought to place black squares and the right button place
-	 * dots, on the grounds that that was consistent with many
-	 * other puzzles in which the left button fills in the data
-	 * used by the solution checker while the right button places
-	 * pencil marks for the user's convenience.
-	 *
-	 * My first beta-player wasn't sure either, so I thought I'd
-	 * pre-emptively put in a 'configuration' mechanism just in
-	 * case.
-	 */
-	{
-	    static int swap_buttons = -1;
-	    if (swap_buttons < 0) {
-		char *env = getenv("RANGE_SWAP_BUTTONS");
-		swap_buttons = (env && (env[0] == 'y' || env[0] == 'Y'));
-	    }
-	    if (swap_buttons) {
-		if (button == LEFT_BUTTON)
-		    button = RIGHT_BUTTON;
-		else
-		    button = LEFT_BUTTON;
-	    }
-	}
+        if (ui->swap_buttons) {
+            if (button == LEFT_BUTTON)
+                button = RIGHT_BUTTON;
+            else
+                button = LEFT_BUTTON;
+        }
     }
 
     switch (button) {
@@ -1355,14 +1405,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 else if (do_post)
                     return nfmtstr(40, "W,%d,%d", ui->r, ui->c);
                 else
-                    return UI_UPDATE;
+                    return MOVE_UI_UPDATE;
 
             } else if (!out_of_bounds(ui->r + dr[i], ui->c + dc[i], w, h)) {
                 ui->r += dr[i];
                 ui->c += dc[i];
             }
         } else ui->cursor_show = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (action == hint) {
@@ -1408,7 +1458,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 static bool find_errors(const game_state *state, bool *report)
 {
     int const w = state->params.w, h = state->params.h, n = w * h;
-    int *dsf;
+    DSF *dsf;
 
     int r, c, i;
 
@@ -1463,7 +1513,7 @@ static bool find_errors(const game_state *state, bool *report)
     /*
      * Check that all the white cells form a single connected component.
      */
-    dsf = snew_dsf(n);
+    dsf = dsf_new(n);
     for (r = 0; r < h-1; ++r)
         for (c = 0; c < w; ++c)
             if (state->grid[r*w+c] != BLACK &&
@@ -1474,11 +1524,12 @@ static bool find_errors(const game_state *state, bool *report)
             if (state->grid[r*w+c] != BLACK &&
                 state->grid[r*w+(c+1)] != BLACK)
                 dsf_merge(dsf, r*w+c, r*w+(c+1));
-    if (nblack + dsf_size(dsf, any_white_cell) < n) {
+    if (any_white_cell != -1 &&
+        nblack + dsf_size(dsf, any_white_cell) < n) {
         int biggest, canonical;
 
         if (!report) {
-            sfree(dsf);
+            dsf_free(dsf);
             goto found_error;
         }
 
@@ -1503,7 +1554,7 @@ static bool find_errors(const game_state *state, bool *report)
             if (state->grid[i] != BLACK && dsf_canonify(dsf, i) != canonical)
                 report[i] = true;
     }
-    sfree(dsf);
+    dsf_free(dsf);
 
     free_game(dup);
     return false; /* if report != NULL, this is ignored */
@@ -1604,13 +1655,12 @@ enum {
     COL_USER = COL_GRID,
     COL_ERROR,
     COL_LOWLIGHT,
-    COL_HIGHLIGHT = COL_ERROR, /* mkhighlight needs it, I don't */
     COL_CURSOR = COL_LOWLIGHT,
     NCOLOURS
 };
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     *x = (1 + params->w) * tilesize;
     *y = (1 + params->h) * tilesize;
@@ -1629,7 +1679,7 @@ static float *game_colours(frontend *fe, int *ncolours)
 {
     float *ret = snewn(3 * NCOLOURS, float);
 
-    game_mkhighlight(fe, ret, COL_BACKGROUND, COL_HIGHLIGHT, COL_LOWLIGHT);
+    game_mkhighlight(fe, ret, COL_BACKGROUND, -1, COL_LOWLIGHT);
     COLOUR(ret, COL_GRID,  0.0F, 0.0F, 0.0F);
     COLOUR(ret, COL_ERROR, 1.0F, 0.0F, 0.0F);
 
@@ -1655,7 +1705,6 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
     int i;
 
     ds->tilesize = 0;
-    ds->started = false;
 
     ds->grid = snewn(n, drawcell);
     for (i = 0; i < n; ++i)
@@ -1690,7 +1739,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                         float animtime, float flashtime)
 {
     int const w = state->params.w, h = state->params.h, n = w * h;
-    int const wpx = (w+1) * ds->tilesize, hpx = (h+1) * ds->tilesize;
     int const flash = ((int) (flashtime * 5 / FLASH_TIME)) % 2;
 
     int r, c, i;
@@ -1700,12 +1748,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     find_errors(state, errors);
 
     assert (oldstate == NULL); /* only happens if animating moves */
-
-    if (!ds->started) {
-        ds->started = true;
-        draw_rect(dr, 0, 0, wpx, hpx, COL_BACKGROUND);
-        draw_update(dr, 0, 0, wpx, hpx);
-    }
 
     for (i = r = 0; r < h; ++r) {
         for (c = 0; c < w; ++c, ++i) {
@@ -1757,25 +1799,21 @@ static void draw_cell(drawing *draw, game_drawstate *ds, int r, int c,
     draw_update(draw, x, y, ts + 1, ts + 1);
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    puts("warning: game_timing_state was called (this shouldn't happen)");
-    return false; /* the (non-existing) timer should not be running */
-}
-
 /* ----------------------------------------------------------------------
  * User interface: print
  */
 
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int print_width, print_height;
-    game_compute_size(params, 800, &print_width, &print_height);
+    game_compute_size(params, 800, ui, &print_width, &print_height);
     *x = print_width  / 100.0F;
     *y = print_height / 100.0F;
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int const w = state->params.w, h = state->params.h;
     game_drawstate ds_obj, *ds = &ds_obj;
@@ -1821,12 +1859,14 @@ struct game const thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1840,6 +1880,6 @@ struct game const thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false, /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0, /* flags */
 };

@@ -7,7 +7,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -171,7 +175,7 @@ enum { LEFT, RIGHT, UP, DOWN, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
     (ra)[0] = rx; (ra)[1] = ry; (ra)[2] = rz; \
 } while (0)
 
-#define APPROXEQ(x,y) ( SQ(x-y) < 0.1 )
+#define APPROXEQ(x,y) ( SQ(x-y) < 0.1F )
 
 struct grid_square {
     float x, y;
@@ -202,8 +206,8 @@ struct game_grid {
 };
 
 #define SET_SQUARE(state, i, val) \
-    ((state)->bluemask[(i)/32] &= ~(1 << ((i)%32)), \
-     (state)->bluemask[(i)/32] |= ((!!val) << ((i)%32)))
+    ((state)->bluemask[(i)/32] &= ~(1UL << ((i)%32)), \
+     (state)->bluemask[(i)/32] |= ((unsigned long)(!!val) << ((i)%32)))
 #define GET_SQUARE(state, i) \
     (((state)->bluemask[(i)/32] >> ((i)%32)) & 1)
 
@@ -542,12 +546,38 @@ static const char *validate_params(const game_params *params, bool full)
     if (params->solid < 0 || params->solid >= lenof(solids))
 	return "Unrecognised solid type";
 
+    if (params->d1 < 0 || params->d2 < 0)
+        return "Grid dimensions may not be negative";
+
     if (solids[params->solid]->order == 4) {
 	if (params->d1 <= 1 || params->d2 <= 1)
 	    return "Both grid dimensions must be greater than one";
+        if (params->d2 > INT_MAX / params->d1)
+	    return "Grid area must not be unreasonably large";
     } else {
 	if (params->d1 <= 0 && params->d2 <= 0)
 	    return "At least one grid dimension must be greater than zero";
+
+        /*
+         * Check whether d1^2 + d2^2 + 4 d1 d2 > INT_MAX, without overflow:
+         *
+         * First check d1^2 doesn't overflow by itself.
+         *
+         * Then check d2^2 doesn't exceed the remaining space between
+         * d1^2 and INT_MAX.
+         *
+         * If that's all OK then we know both d1 and d2 are
+         * individually less than the square root of INT_MAX, so we
+         * can safely multiply them and compare against the
+         * _remaining_ space.
+         */
+        if ((params->d1 > 0 && params->d1 > INT_MAX / params->d1) ||
+            (params->d2 > 0 &&
+             params->d2 > (INT_MAX - params->d1*params->d1) / params->d2) ||
+            (params->d2 > 0 &&
+             params->d1*params->d2 > (INT_MAX - params->d1*params->d1 -
+                                      params->d2*params->d2) / params->d2))
+	    return "Grid area must not be unreasonably large";
     }
 
     for (i = 0; i < 4; i++)
@@ -761,7 +791,7 @@ static bool align_poly(const struct solid *solid, struct grid_square *sq,
             dist += SQ(solid->vertices[i*3+1] * flip - sq->points[j*2+1] + sq->y);
             dist += SQ(solid->vertices[i*3+2] - zmin);
 
-            if (dist < 0.1) {
+            if (dist < 0.1F) {
                 matches++;
                 index = i;
             }
@@ -811,7 +841,7 @@ static struct solid *transform_poly(const struct solid *solid, bool flip,
      */
     vx = ret->vertices[key1*3+0] - ret->vertices[key0*3+0];
     vy = ret->vertices[key1*3+1] - ret->vertices[key0*3+1];
-    assert(APPROXEQ(vx*vx + vy*vy, 1.0));
+    assert(APPROXEQ(vx*vx + vy*vy, 1.0F));
 
     vmatrix[0] =  vx; vmatrix[3] = vy; vmatrix[6] = 0;
     vmatrix[1] = -vy; vmatrix[4] = vx; vmatrix[7] = 0;
@@ -999,37 +1029,12 @@ static void free_game(game_state *state)
     sfree(state);
 }
 
-static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, const char **error)
-{
-    return NULL;
-}
-
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 static game_ui *new_ui(const game_state *state)
 {
     return NULL;
 }
 
 static void free_ui(game_ui *ui)
-{
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
 {
 }
 
@@ -1081,11 +1086,11 @@ static int find_move_dest(const game_state *from, int direction,
             for (j = 0; j < from->grid->squares[i].npoints; j++) {
                 dist = (SQ(from->grid->squares[i].points[j*2] - points[0]) +
                         SQ(from->grid->squares[i].points[j*2+1] - points[1]));
-                if (dist < 0.1)
+                if (dist < 0.1F)
                     dkey[match++] = j;
                 dist = (SQ(from->grid->squares[i].points[j*2] - points[2]) +
                         SQ(from->grid->squares[i].points[j*2+1] - points[3]));
-                if (dist < 0.1)
+                if (dist < 0.1F)
                     dkey[match++] = j;
             }
 
@@ -1140,7 +1145,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         cy = (int)(state->grid->squares[state->current].y * GRID_SCALE) + ds->oy;
 
         if (x == cx && y == cy)
-            return NULL;               /* clicked in exact centre!  */
+            return MOVE_NO_EFFECT;     /* clicked in exact centre!  */
         angle = atan2(y - cy, x - cx);
 
         /*
@@ -1191,11 +1196,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 direction = RIGHT;
         }
     } else
-        return NULL;
+        return MOVE_UNUSED;
 
     mask = state->grid->squares[state->current].directions[direction];
     if (mask == 0)
-        return NULL;
+        return MOVE_NO_EFFECT;
 
     /*
      * Translate diagonal directions into orthogonal ones.
@@ -1210,14 +1215,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     }
 
     if (find_move_dest(state, direction, skey, dkey) < 0)
-	return NULL;
+        return MOVE_NO_EFFECT;
 
     if (direction == LEFT)  return dupstr("L");
     if (direction == RIGHT) return dupstr("R");
     if (direction == UP)    return dupstr("U");
     if (direction == DOWN)  return dupstr("D");
 
-    return NULL;		       /* should never happen */
+    return MOVE_NO_EFFECT;             /* should never happen */
 }
 
 static game_state *execute_move(const game_state *from, const char *move)
@@ -1484,7 +1489,7 @@ static struct bbox find_bbox(const game_params *params)
     ((int)(((bb).d - (bb).u + 2*(solid)->border) * gs))
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     struct bbox bb = find_bbox(params);
 
@@ -1734,19 +1739,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame cube
 #endif
@@ -1766,14 +1758,16 @@ const struct game thegame = {
     new_game,
     dup_game,
     free_game,
-    false, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, /* solve */
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     PREFERRED_GRID_SCALE, game_compute_size, game_set_size,
@@ -1785,8 +1779,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };

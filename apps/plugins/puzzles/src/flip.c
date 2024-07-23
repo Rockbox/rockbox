@@ -8,7 +8,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 #include "tree234.h"
@@ -181,9 +186,16 @@ static game_params *custom_params(const config_item *cfg)
 
 static const char *validate_params(const game_params *params, bool full)
 {
+    int wh;
+
     if (params->w <= 0 || params->h <= 0)
         return "Width and height must both be greater than zero";
-    return NULL;
+    if (params->w > (INT_MAX - 3) / params->h)
+        return "Width times height must not be unreasonably large";
+    wh = params->w * params->h;
+    if (wh > (INT_MAX - 3) / wh)
+        return "Width times height is too large";    
+   return NULL;
 }
 
 static char *encode_bitmap(unsigned char *bmp, int len)
@@ -905,7 +917,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->cx = ui->cy = 0;
-    ui->cdraw = false;
+    ui->cdraw = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -914,18 +926,16 @@ static void free_ui(game_ui *ui)
     sfree(ui);
 }
 
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
-}
-
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
                                const game_state *newstate)
 {
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (IS_CURSOR_SELECT(button)) return "Flip";
+    return "";
 }
 
 struct game_drawstate {
@@ -940,7 +950,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             int x, int y, int button)
 {
     int w = state->w, h = state->h, wh = w * h;
-    char buf[80], *nullret = NULL;
+    char buf[80], *nullret = MOVE_UNUSED;
 
     if (button == LEFT_BUTTON || IS_CURSOR_SELECT(button)) {
         int tx, ty;
@@ -951,7 +961,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             tx = ui->cx; ty = ui->cy;
             ui->cdraw = true;
         }
-        nullret = UI_UPDATE;
+        nullret = MOVE_UI_UPDATE;
 
         if (tx >= 0 && tx < w && ty >= 0 && ty < h) {
             /*
@@ -969,25 +979,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 sprintf(buf, "M%d,%d", tx, ty);
                 return dupstr(buf);
             } else {
-                return NULL;
+                return MOVE_NO_EFFECT;
             }
         }
-    }
-    else if (IS_CURSOR_MOVE(button)) {
-        int dx = 0, dy = 0;
-        switch (button) {
-        case CURSOR_UP:         dy = -1; break;
-        case CURSOR_DOWN:       dy = 1; break;
-        case CURSOR_RIGHT:      dx = 1; break;
-        case CURSOR_LEFT:       dx = -1; break;
-        default: assert(!"shouldn't get here");
-        }
-        ui->cx += dx; ui->cy += dy;
-        ui->cx = min(max(ui->cx, 0), state->w - 1);
-        ui->cy = min(max(ui->cy, 0), state->h - 1);
-        ui->cdraw = true;
-        nullret = UI_UPDATE;
-    }
+    } else if (IS_CURSOR_MOVE(button))
+        nullret = move_cursor(button, &ui->cx, &ui->cy, state->w, state->h,
+                              false, &ui->cdraw);
 
     return nullret;
 }
@@ -1045,7 +1042,7 @@ static game_state *execute_move(const game_state *from, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -1145,7 +1142,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
 	coords[7] = by + TILE_SIZE - (int)((float)TILE_SIZE * animtime);
 
 	colour = (tile & 1 ? COL_WRONG : COL_RIGHT);
-	if (animtime < 0.5)
+	if (animtime < 0.5F)
 	    colour = COL_WRONG + COL_RIGHT - colour;
 
 	draw_polygon(dr, coords, 4, colour, COL_GRID);
@@ -1159,7 +1156,7 @@ static void draw_tile(drawing *dr, game_drawstate *ds, const game_state *state,
 	for (j = 0; j < w; j++)
 	    if (state->matrix->matrix[(y*w+x)*wh + i*w+j]) {
 		int ox = j - x, oy = i - y;
-		int td = TILE_SIZE / 16;
+		int td = TILE_SIZE / 16 ? TILE_SIZE / 16 : 1;
 		int cx = (bx + TILE_SIZE/2) + (2 * ox - 1) * td;
 		int cy = (by + TILE_SIZE/2) + (2 * oy - 1) * td;
 		if (ox == 0 && oy == 0)
@@ -1202,9 +1199,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     int i, flashframe;
 
     if (!ds->started) {
-        draw_rect(dr, 0, 0, TILE_SIZE * w + 2 * BORDER,
-                  TILE_SIZE * h + 2 * BORDER, COL_BACKGROUND);
-
         /*
          * Draw the grid lines.
          */
@@ -1309,19 +1303,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame flip
 #endif
@@ -1343,12 +1324,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1360,8 +1343,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };

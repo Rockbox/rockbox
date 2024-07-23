@@ -163,6 +163,11 @@
  *        cases by waiting until a key has been released before we
  *        send the input keystroke(s) to the game.
  *
+ *     e) Key repeat
+ *
+ *        In some games, we would like to send repeated key events to
+ *        allow long drags. Currently, this is only used in Untangle.
+ *
  *  5) Game configuration and preset management
  *
  *     The backend games specify a hierarchy of user-adjustable game
@@ -1211,7 +1216,7 @@ static void zoom_filltriangle(int x1, int y1,
 }
 
 /* Should probably refactor this */
-static void rb_draw_poly(void *handle, int *coords, int npoints,
+static void rb_draw_poly(void *handle, const int *coords, int npoints,
                          int fillcolor, int outlinecolor)
 {
     if(!zoom_enabled)
@@ -2268,7 +2273,7 @@ static void zoom(void)
     zoom_clipl = 0;
     zoom_clipr = zoom_w;
 
-    midend_size(me, &zoom_w, &zoom_h, true);
+    midend_size(me, &zoom_w, &zoom_h, true, 1.0);
 
     /* Allocating the framebuffer will mostly likely grab the
      * audiobuffer, which will make impossible to load new fonts, and
@@ -2634,10 +2639,10 @@ const char *config_formatter(int sel, void *data, char *buf, size_t len)
     return buf;
 }
 
-static bool config_menu(void)
+static bool config_menu_core(int which)
 {
     char *title;
-    config_item *config = midend_get_config(me, CFG_SETTINGS, &title);
+    config_item *config = midend_get_config(me, which, &title);
 
     rb->lcd_setfont(cur_font = FONT_UI);
 
@@ -2689,7 +2694,7 @@ static bool config_menu(void)
                 old_str = dupstr(old.u.string.sval);
 
             bool freed_str = do_configure_item(config, pos);
-            const char *err = midend_set_config(me, CFG_SETTINGS, config);
+            const char *err = midend_set_config(me, which, config);
 
             if(err)
             {
@@ -2726,6 +2731,16 @@ done:
     sfree(title);
     free_cfg(config);
     return success;
+}
+
+static bool config_menu(void)
+{
+    return config_menu_core(CFG_SETTINGS);
+}
+
+static bool preferences_menu(void)
+{
+    return config_menu_core(CFG_PREFS);
 }
 
 static const char *preset_formatter(int sel, void *data, char *buf, size_t len)
@@ -3108,8 +3123,9 @@ static int pause_menu(void)
                         "Game Type",           // 10
                         "Debug Menu",          // 11
                         "Configure Game",      // 12
-                        "Quit without Saving", // 13
-                        "Quit");               // 14
+			"Preferences",         // 13
+                        "Quit without Saving", // 14
+                        "Quit");               // 15
 
 #if defined(FOR_REAL) && defined(DEBUG_MENU)
     help_times = 0;
@@ -3190,9 +3206,13 @@ static int pause_menu(void)
                 quit = true;
             }
             break;
-        case 13:
-            return -2;
+	case 13:
+	    preferences_menu();
+	    // do not go straight into game.
+	    break;
         case 14:
+            return -2;
+        case 15:
             return -3;
         default:
             break;
@@ -3217,7 +3237,7 @@ static void fix_size(void)
     rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize("X", NULL, &h_x);
     h -= h_x;
-    midend_size(me, &w, &h, true);
+    midend_size(me, &w, &h, true, 1.0);
 }
 
 static void init_tlsf(void)
@@ -3277,32 +3297,39 @@ static bool string_in_list(const char *target, const char **list)
 static void tune_input(const char *name)
 {
     static const char *want_spacebar[] = {
+	"Black Box",
+	"Bridges",
+	"Galaxies",
+	"Keen",
         "Magnets",
         "Map",
         "Mines",
         "Palisade",
+	"Pattern",
         "Rectangles",
+	"Signpost",
+	"Singles",
+	"Solo",
+	"Tents",
+	"Towers",
+	"Unequal",
+	"Group",
         NULL
     };
 
-    /* these get a spacebar on long click - you must also add to the
-     * falling_edge list below! */
+    /* these get a spacebar on long click - this implicitly enables
+     * falling-edge button events (see below)! */
     input_settings.want_spacebar = string_in_list(name, want_spacebar);
 
     static const char *falling_edge[] = {
         "Inertia",
-        "Magnets",
-        "Map",
-        "Mines",
-        "Palisade",
-        "Rectangles",
         NULL
     };
 
     /* wait until a key is released to send an action (useful for
      * chording in Inertia; must be enabled if the game needs a
      * spacebar) */
-    input_settings.falling_edge = string_in_list(name, falling_edge);
+    input_settings.falling_edge = string_in_list(name, falling_edge) || input_settings.want_spacebar;
 
     /* For want_spacebar to work, events must be sent on the falling
      * edge */
@@ -3691,8 +3718,9 @@ static void puzzles_main(void)
                         "Playback Control",    // 4
                         "Game Type",           // 5
                         "Configure Game",      // 6
-                        "Quit without Saving", // 7
-                        "Quit");               // 8
+			"Preferences",         // 7
+                        "Quit without Saving", // 8
+                        "Quit");               // 9
 
     bool quit = false;
     int sel = 0;
@@ -3738,11 +3766,14 @@ static void puzzles_main(void)
                 goto game_loop;
             }
             break;
-        case 8:
+	case 7:
+	    preferences_menu();
+	    break;
+        case 9:
             if(load_success)
                 save_game();
             /* fall through */
-        case 7:
+        case 8:
             /* we don't care about freeing anything because tlsf will
              * be wiped out the next time around */
             return;

@@ -2,6 +2,10 @@
  * gtk.c: GTK front end for my puzzle collection.
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1 /* for strcasestr */
+#endif
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -9,8 +13,16 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
+#include <unistd.h>
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 
@@ -25,6 +37,7 @@
 #include <X11/Xatom.h>
 
 #include "puzzles.h"
+#include "gtk.h"
 
 #if GTK_CHECK_VERSION(2,0,0)
 # define USE_PANGO
@@ -82,7 +95,7 @@
 #ifdef DEBUGGING
 static FILE *debug_fp = NULL;
 
-void dputs(const char *buf)
+static void dputs(const char *buf)
 {
     if (!debug_fp) {
         debug_fp = fopen("debug.log", "w");
@@ -131,6 +144,8 @@ void fatal(const char *fmt, ...)
  */
 
 static void changed_preset(frontend *fe);
+static void load_prefs(frontend *fe);
+static char *save_prefs(frontend *fe);
 
 struct font {
 #ifdef USE_PANGO
@@ -314,7 +329,7 @@ void frontend_default_colour(frontend *fe, float *output)
     output[0] = output[1] = output[2] = 0.9F;
 }
 
-void gtk_status_bar(void *handle, const char *text)
+static void gtk_status_bar(void *handle, const char *text)
 {
     frontend *fe = (frontend *)handle;
 
@@ -389,6 +404,21 @@ static void print_set_colour(frontend *fe, int colour)
 
 static void set_window_background(frontend *fe, int colour)
 {
+#if GTK_CHECK_VERSION(3,0,0)
+    /* In case the user's chosen theme is dark, we should not override
+     * the background colour for the whole window as this makes the
+     * menu and status bars unreadable. This might be visible through
+     * the gtk-application-prefer-dark-theme flag or else we have to
+     * work it out from the name. */
+    gboolean dark_theme = false;
+    char *theme_name = NULL;
+    g_object_get(gtk_settings_get_default(),
+		 "gtk-application-prefer-dark-theme", &dark_theme,
+		 "gtk-theme-name", &theme_name,
+		 NULL);
+    if (theme_name && strcasestr(theme_name, "-dark"))
+	dark_theme = true;
+    g_free(theme_name);
 #if GTK_CHECK_VERSION(3,20,0)
     char css_buf[512];
     sprintf(css_buf, ".background { "
@@ -401,23 +431,28 @@ static void set_window_background(frontend *fe, int colour)
     if (!gtk_css_provider_load_from_data(
             GTK_CSS_PROVIDER(fe->css_provider), css_buf, -1, NULL))
         assert(0 && "Couldn't load CSS");
-    gtk_style_context_add_provider(
-        gtk_widget_get_style_context(fe->window),
-        GTK_STYLE_PROVIDER(fe->css_provider),
-        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    if (!dark_theme) {
+	gtk_style_context_add_provider(
+	    gtk_widget_get_style_context(fe->window),
+	    GTK_STYLE_PROVIDER(fe->css_provider),
+	    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
     gtk_style_context_add_provider(
         gtk_widget_get_style_context(fe->area),
         GTK_STYLE_PROVIDER(fe->css_provider),
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-#elif GTK_CHECK_VERSION(3,0,0)
+#else // still at least GTK 3.0 but less than 3.20
     GdkRGBA rgba;
     rgba.red = fe->colours[3*colour + 0];
     rgba.green = fe->colours[3*colour + 1];
     rgba.blue = fe->colours[3*colour + 2];
     rgba.alpha = 1.0;
     gdk_window_set_background_rgba(gtk_widget_get_window(fe->area), &rgba);
-    gdk_window_set_background_rgba(gtk_widget_get_window(fe->window), &rgba);
-#else
+    if (!dark_theme)
+	gdk_window_set_background_rgba(gtk_widget_get_window(fe->window),
+				       &rgba);
+#endif // GTK_CHECK_VERSION(3,20,0)
+#else // GTK 2 version comes next
     GdkColormap *colmap;
 
     colmap = gdk_colormap_get_system();
@@ -571,7 +606,7 @@ static void do_draw_thick_line(frontend *fe, float thickness,
     cairo_restore(fe->cr);
 }
 
-static void do_draw_poly(frontend *fe, int *coords, int npoints,
+static void do_draw_poly(frontend *fe, const int *coords, int npoints,
 			 int fillcolour, int outlinecolour)
 {
     int i;
@@ -832,7 +867,7 @@ static void do_draw_thick_line(frontend *fe, float thickness,
 			       save.join_style);
 }
 
-static void do_draw_poly(frontend *fe, int *coords, int npoints,
+static void do_draw_poly(frontend *fe, const int *coords, int npoints,
 			 int fillcolour, int outlinecolour)
 {
     GdkPoint *points = snewn(npoints, GdkPoint);
@@ -1129,7 +1164,7 @@ static void align_and_draw_text(int index, int align, int x, int y,
  * The exported drawing functions.
  */
 
-void gtk_start_draw(void *handle)
+static void gtk_start_draw(void *handle)
 {
     frontend *fe = (frontend *)handle;
     fe->bbox_l = fe->w;
@@ -1139,20 +1174,21 @@ void gtk_start_draw(void *handle)
     setup_drawing(fe);
 }
 
-void gtk_clip(void *handle, int x, int y, int w, int h)
+static void gtk_clip(void *handle, int x, int y, int w, int h)
 {
     frontend *fe = (frontend *)handle;
     do_clip(fe, x, y, w, h);
 }
 
-void gtk_unclip(void *handle)
+static void gtk_unclip(void *handle)
 {
     frontend *fe = (frontend *)handle;
     do_unclip(fe);
 }
 
-void gtk_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
-		   int align, int colour, const char *text)
+static void gtk_draw_text(void *handle, int x, int y, int fonttype,
+                          int fontsize, int align, int colour,
+                          const char *text)
 {
     frontend *fe = (frontend *)handle;
     int i;
@@ -1184,43 +1220,45 @@ void gtk_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
     align_and_draw_text(fe, i, align, x, y, text);
 }
 
-void gtk_draw_rect(void *handle, int x, int y, int w, int h, int colour)
+static void gtk_draw_rect(void *handle, int x, int y, int w, int h, int colour)
 {
     frontend *fe = (frontend *)handle;
     fe->dr_api->set_colour(fe, colour);
     do_draw_rect(fe, x, y, w, h);
 }
 
-void gtk_draw_line(void *handle, int x1, int y1, int x2, int y2, int colour)
+static void gtk_draw_line(void *handle, int x1, int y1, int x2, int y2,
+                          int colour)
 {
     frontend *fe = (frontend *)handle;
     fe->dr_api->set_colour(fe, colour);
     do_draw_line(fe, x1, y1, x2, y2);
 }
 
-void gtk_draw_thick_line(void *handle, float thickness,
-			 float x1, float y1, float x2, float y2, int colour)
+static void gtk_draw_thick_line(void *handle, float thickness,
+                                float x1, float y1, float x2, float y2,
+                                int colour)
 {
     frontend *fe = (frontend *)handle;
     fe->dr_api->set_colour(fe, colour);
     do_draw_thick_line(fe, thickness, x1, y1, x2, y2);
 }
 
-void gtk_draw_poly(void *handle, int *coords, int npoints,
-		   int fillcolour, int outlinecolour)
+static void gtk_draw_poly(void *handle, const int *coords, int npoints,
+                          int fillcolour, int outlinecolour)
 {
     frontend *fe = (frontend *)handle;
     do_draw_poly(fe, coords, npoints, fillcolour, outlinecolour);
 }
 
-void gtk_draw_circle(void *handle, int cx, int cy, int radius,
-		     int fillcolour, int outlinecolour)
+static void gtk_draw_circle(void *handle, int cx, int cy, int radius,
+                            int fillcolour, int outlinecolour)
 {
     frontend *fe = (frontend *)handle;
     do_draw_circle(fe, cx, cy, radius, fillcolour, outlinecolour);
 }
 
-blitter *gtk_blitter_new(void *handle, int w, int h)
+static blitter *gtk_blitter_new(void *handle, int w, int h)
 {
     blitter *bl = snew(blitter);
     setup_blitter(bl, w, h);
@@ -1229,13 +1267,13 @@ blitter *gtk_blitter_new(void *handle, int w, int h)
     return bl;
 }
 
-void gtk_blitter_free(void *handle, blitter *bl)
+static void gtk_blitter_free(void *handle, blitter *bl)
 {
     teardown_blitter(bl);
     sfree(bl);
 }
 
-void gtk_blitter_save(void *handle, blitter *bl, int x, int y)
+static void gtk_blitter_save(void *handle, blitter *bl, int x, int y)
 {
     frontend *fe = (frontend *)handle;
     do_blitter_save(fe, bl, x, y);
@@ -1243,7 +1281,7 @@ void gtk_blitter_save(void *handle, blitter *bl, int x, int y)
     bl->y = y;
 }
 
-void gtk_blitter_load(void *handle, blitter *bl, int x, int y)
+static void gtk_blitter_load(void *handle, blitter *bl, int x, int y)
 {
     frontend *fe = (frontend *)handle;
     if (x == BLITTER_FROMSAVED && y == BLITTER_FROMSAVED) {
@@ -1253,7 +1291,7 @@ void gtk_blitter_load(void *handle, blitter *bl, int x, int y)
     do_blitter_load(fe, bl, x, y);
 }
 
-void gtk_draw_update(void *handle, int x, int y, int w, int h)
+static void gtk_draw_update(void *handle, int x, int y, int w, int h)
 {
     frontend *fe = (frontend *)handle;
     if (fe->bbox_l > x  ) fe->bbox_l = x  ;
@@ -1262,7 +1300,7 @@ void gtk_draw_update(void *handle, int x, int y, int w, int h)
     if (fe->bbox_d < y+h) fe->bbox_d = y+h;
 }
 
-void gtk_end_draw(void *handle)
+static void gtk_end_draw(void *handle)
 {
     frontend *fe = (frontend *)handle;
 
@@ -1286,7 +1324,8 @@ void gtk_end_draw(void *handle)
 }
 
 #ifdef USE_PANGO
-char *gtk_text_fallback(void *handle, const char *const *strings, int nstrings)
+static char *gtk_text_fallback(void *handle, const char *const *strings,
+                               int nstrings)
 {
     /*
      * We assume Pango can cope with any UTF-8 likely to be emitted
@@ -1297,18 +1336,18 @@ char *gtk_text_fallback(void *handle, const char *const *strings, int nstrings)
 #endif
 
 #ifdef USE_PRINTING
-void gtk_begin_doc(void *handle, int pages)
+static void gtk_begin_doc(void *handle, int pages)
 {
     frontend *fe = (frontend *)handle;
     gtk_print_operation_set_n_pages(fe->printop, pages);
 }
 
-void gtk_begin_page(void *handle, int number)
+static void gtk_begin_page(void *handle, int number)
 {
 }
 
-void gtk_begin_puzzle(void *handle, float xm, float xc,
-                      float ym, float yc, int pw, int ph, float wmm)
+static void gtk_begin_puzzle(void *handle, float xm, float xc,
+                             float ym, float yc, int pw, int ph, float wmm)
 {
     frontend *fe = (frontend *)handle;
     double ppw, pph, pox, poy, dpmmx, dpmmy;
@@ -1346,27 +1385,27 @@ void gtk_begin_puzzle(void *handle, float xm, float xc,
     fe->hatchspace = 1.0 * pw / wmm;
 }
 
-void gtk_end_puzzle(void *handle)
+static void gtk_end_puzzle(void *handle)
 {
     frontend *fe = (frontend *)handle;
     cairo_restore(fe->cr);
 }
 
-void gtk_end_page(void *handle, int number)
+static void gtk_end_page(void *handle, int number)
 {
 }
 
-void gtk_end_doc(void *handle)
+static void gtk_end_doc(void *handle)
 {
 }
 
-void gtk_line_width(void *handle, float width)
+static void gtk_line_width(void *handle, float width)
 {
     frontend *fe = (frontend *)handle;
     cairo_set_line_width(fe->cr, width);
 }
 
-void gtk_line_dotted(void *handle, bool dotted)
+static void gtk_line_dotted(void *handle, bool dotted)
 {
     frontend *fe = (frontend *)handle;
 
@@ -1379,7 +1418,7 @@ void gtk_line_dotted(void *handle, bool dotted)
 }
 #endif /* USE_PRINTING */
 
-const struct internal_drawing_api internal_drawing = {
+static const struct internal_drawing_api internal_drawing = {
     draw_set_colour,
 #ifdef USE_CAIRO
     do_draw_fill,
@@ -1388,14 +1427,14 @@ const struct internal_drawing_api internal_drawing = {
 };
 
 #ifdef USE_CAIRO
-const struct internal_drawing_api internal_printing = {
+static const struct internal_drawing_api internal_printing = {
     print_set_colour,
     do_print_fill,
     do_print_fill_preserve,
 };
 #endif
 
-const struct drawing_api gtk_drawing = {
+static const struct drawing_api gtk_drawing = {
     gtk_draw_text,
     gtk_draw_rect,
     gtk_draw_line,
@@ -1502,13 +1541,18 @@ static gint key_event(GtkWidget *widget, GdkEventKey *event, gpointer data)
         keyval = '\177';
     else if ((event->keyval == 'z' || event->keyval == 'Z') && shift && ctrl)
         keyval = UI_REDO;
+    else if (event->keyval == GDK_KEY_ISO_Left_Tab) {
+	/* SHIFT+TAB gets special handling. Ref:
+	 * https://mail.gnome.org/archives/gtk-list/1999-August/msg00145.html */
+	keyval = '\t' | MOD_SHFT;
+    }
     else if (event->string[0] && !event->string[1])
         keyval = (unsigned char)event->string[0];
     else
         keyval = -1;
 
     if (keyval >= 0 &&
-        !midend_process_key(fe->me, 0, 0, keyval))
+        midend_process_key(fe->me, 0, 0, keyval) == PKR_QUIT)
 	gtk_widget_destroy(fe->window);
 
     return true;
@@ -1542,8 +1586,8 @@ static gint button_event(GtkWidget *widget, GdkEventButton *event,
     if (event->type == GDK_BUTTON_RELEASE && button >= LEFT_BUTTON)
         button += LEFT_RELEASE - LEFT_BUTTON;
 
-    if (!midend_process_key(fe->me, event->x - fe->ox,
-                            event->y - fe->oy, button))
+    if (midend_process_key(fe->me, event->x - fe->ox,
+                           event->y - fe->oy, button) == PKR_QUIT)
 	gtk_widget_destroy(fe->window);
 
     return true;
@@ -1567,8 +1611,8 @@ static gint motion_event(GtkWidget *widget, GdkEventMotion *event,
     else
 	return false;		       /* don't even know what button! */
 
-    if (!midend_process_key(fe->me, event->x - fe->ox,
-                            event->y - fe->oy, button))
+    if (midend_process_key(fe->me, event->x - fe->ox,
+                           event->y - fe->oy, button) == PKR_QUIT)
 	gtk_widget_destroy(fe->window);
 #if GTK_CHECK_VERSION(2,12,0)
     gdk_event_request_motions(event);
@@ -1649,7 +1693,7 @@ static void resize_puzzle_to_area(frontend *fe, int x, int y)
 
     fe->w = x;
     fe->h = y;
-    midend_size(fe->me, &x, &y, true);
+    midend_size(fe->me, &x, &y, true, 1.0);
     fe->pw = x;
     fe->ph = y;
 #if GTK_CHECK_VERSION(3,10,0)
@@ -1773,8 +1817,8 @@ static void align_label(GtkLabel *label, double x, double y)
 }
 
 #if GTK_CHECK_VERSION(3,0,0)
-bool message_box(GtkWidget *parent, const char *title, const char *msg,
-                 bool centre, int type)
+static bool message_box(GtkWidget *parent, const char *title, const char *msg,
+                        bool centre, int type)
 {
     GtkWidget *window;
     gint ret;
@@ -1807,7 +1851,7 @@ bool message_box(GtkWidget *parent, const char *title, const char *msg,
                  bool centre, int type)
 {
     GtkWidget *window, *hbox, *text, *button;
-    char *titles;
+    const char *titles;
     int i, def, cancel;
 
     window = gtk_dialog_new();
@@ -1868,7 +1912,7 @@ bool message_box(GtkWidget *parent, const char *title, const char *msg,
 }
 #endif /* GTK_CHECK_VERSION(3,0,0) */
 
-void error_box(GtkWidget *parent, const char *msg)
+static void error_box(GtkWidget *parent, const char *msg)
 {
     message_box(parent, "Error", msg, false, MB_OK);
 }
@@ -1883,9 +1927,17 @@ static void config_ok_button_clicked(GtkButton *button, gpointer data)
     if (err)
 	error_box(fe->cfgbox, err);
     else {
+        if (fe->cfg_which == CFG_PREFS) {
+            char *prefs_err = save_prefs(fe);
+            if (prefs_err) {
+                error_box(fe->cfgbox, prefs_err);
+                sfree(prefs_err);
+            }
+        }
 	fe->cfgret = true;
 	gtk_widget_destroy(fe->cfgbox);
-	changed_preset(fe);
+        if (fe->cfg_which != CFG_PREFS)
+            changed_preset(fe);
     }
 }
 
@@ -2163,7 +2215,7 @@ static void menu_key_event(GtkMenuItem *menuitem, gpointer data)
     frontend *fe = (frontend *)data;
     int key = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(menuitem),
                                                 "user-data"));
-    if (!midend_process_key(fe->me, 0, 0, key))
+    if (midend_process_key(fe->me, 0, 0, key) == PKR_QUIT)
 	gtk_widget_destroy(fe->window);
 }
 
@@ -2185,7 +2237,7 @@ static void get_size(frontend *fe, int *px, int *py)
      */
     x = INT_MAX;
     y = INT_MAX;
-    midend_size(fe->me, &x, &y, false);
+    midend_size(fe->me, &x, &y, false, 1.0);
     *px = x;
     *py = y;
 }
@@ -2362,8 +2414,8 @@ static void menu_preset_event(GtkMenuItem *menuitem, gpointer data)
     midend_redraw(fe->me);
 }
 
-GdkAtom compound_text_atom, utf8_string_atom;
-bool paste_initialised = false;
+static GdkAtom compound_text_atom, utf8_string_atom;
+static bool paste_initialised = false;
 
 static void set_selection(frontend *fe, GdkAtom selection)
 {
@@ -2380,16 +2432,16 @@ static void set_selection(frontend *fe, GdkAtom selection)
      * COMPOUND_TEXT or UTF8_STRING.
      */
 
-    if (gtk_selection_owner_set(fe->area, selection, CurrentTime)) {
-	gtk_selection_clear_targets(fe->area, selection);
-	gtk_selection_add_target(fe->area, selection,
+    if (gtk_selection_owner_set(fe->window, selection, CurrentTime)) {
+	gtk_selection_clear_targets(fe->window, selection);
+	gtk_selection_add_target(fe->window, selection,
 				 GDK_SELECTION_TYPE_STRING, 1);
-	gtk_selection_add_target(fe->area, selection, compound_text_atom, 1);
-	gtk_selection_add_target(fe->area, selection, utf8_string_atom, 1);
+	gtk_selection_add_target(fe->window, selection, compound_text_atom, 1);
+	gtk_selection_add_target(fe->window, selection, utf8_string_atom, 1);
     }
 }
 
-void write_clip(frontend *fe, char *data)
+static void write_clip(frontend *fe, char *data)
 {
     if (fe->paste_data)
 	sfree(fe->paste_data);
@@ -2401,16 +2453,16 @@ void write_clip(frontend *fe, char *data)
     set_selection(fe, GDK_SELECTION_CLIPBOARD);
 }
 
-void selection_get(GtkWidget *widget, GtkSelectionData *seldata,
-		   guint info, guint time_stamp, gpointer data)
+static void selection_get(GtkWidget *widget, GtkSelectionData *seldata,
+                          guint info, guint time_stamp, gpointer data)
 {
     frontend *fe = (frontend *)data;
     gtk_selection_data_set(seldata, gtk_selection_data_get_target(seldata), 8,
 			   fe->paste_data, fe->paste_data_len);
 }
 
-gint selection_clear(GtkWidget *widget, GdkEventSelection *seldata,
-		     gpointer data)
+static gint selection_clear(GtkWidget *widget, GdkEventSelection *seldata,
+                            gpointer data)
 {
     frontend *fe = (frontend *)data;
 
@@ -2508,7 +2560,7 @@ static char *file_selector(frontend *fe, const char *title, bool save)
 #endif
 
 #ifdef USE_PRINTING
-GObject *create_print_widget(GtkPrintOperation *print, gpointer data)
+static GObject *create_print_widget(GtkPrintOperation *print, gpointer data)
 {
     GtkLabel *count_label, *width_label, *height_label,
         *scale_llabel, *scale_rlabel;
@@ -2649,8 +2701,8 @@ GObject *create_print_widget(GtkPrintOperation *print, gpointer data)
     return G_OBJECT(grid);
 }
 
-void apply_print_widget(GtkPrintOperation *print,
-                        GtkWidget *widget, gpointer data)
+static void apply_print_widget(GtkPrintOperation *print,
+                               GtkWidget *widget, gpointer data)
 {
     frontend *fe = (frontend *)data;
 
@@ -2673,8 +2725,8 @@ void apply_print_widget(GtkPrintOperation *print,
     }
 }
 
-void print_begin(GtkPrintOperation *printop,
-                 GtkPrintContext *context, gpointer data)
+static void print_begin(GtkPrintOperation *printop,
+                        GtkPrintContext *context, gpointer data)
 {
     frontend *fe = (frontend *)data;
     midend *nme = NULL;  /* non-interactive midend for bulk puzzle generation */
@@ -2708,6 +2760,8 @@ void print_begin(GtkPrintOperation *printop,
 		thegame.free_params(params);
 	    }
 
+            load_prefs(fe);
+
             midend_new_game(nme);
             err = midend_print_puzzle(nme, fe->doc, fe->printsolns);
         }
@@ -2725,16 +2779,16 @@ void print_begin(GtkPrintOperation *printop,
     document_begin(fe->doc, fe->print_dr);
 }
 
-void draw_page(GtkPrintOperation *printop,
-               GtkPrintContext *context,
-               gint page_nr, gpointer data)
+static void draw_page(GtkPrintOperation *printop,
+                      GtkPrintContext *context,
+                      gint page_nr, gpointer data)
 {
     frontend *fe = (frontend *)data;
     document_print_page(fe->doc, fe->print_dr, page_nr);
 }
 
-void print_end(GtkPrintOperation *printop,
-               GtkPrintContext *context, gpointer data)
+static void print_end(GtkPrintOperation *printop,
+                      GtkPrintContext *context, gpointer data)
 {
     frontend *fe = (frontend *)data;
 
@@ -2919,6 +2973,206 @@ static void menu_load_event(GtkMenuItem *menuitem, gpointer data)
     }
 }
 
+static char *prefs_dir(void)
+{
+    const char *var;
+    if ((var = getenv("SGT_PUZZLES_DIR")) != NULL)
+        return dupstr(var);
+    if ((var = getenv("XDG_CONFIG_HOME")) != NULL) {
+        size_t size = strlen(var) + 20;
+        char *dir = snewn(size, char);
+        sprintf(dir, "%s/sgt-puzzles", var);
+        return dir;
+    }
+    if ((var = getenv("HOME")) != NULL) {
+        size_t size = strlen(var) + 32;
+        char *dir = snewn(size, char);
+        sprintf(dir, "%s/.config/sgt-puzzles", var);
+        return dir;
+    }
+    return NULL;
+}
+
+static char *prefs_path_general(const game *game, const char *suffix)
+{
+    char *dir, *path;
+
+    dir = prefs_dir();
+    if (!dir)
+        return NULL;
+
+    path = make_prefs_path(dir, "/", game, suffix);
+
+    sfree(dir);
+    return path;
+}
+
+static char *prefs_path(const game *game)
+{
+    return prefs_path_general(game, ".conf");
+}
+
+static char *prefs_tmp_path(const game *game)
+{
+    return prefs_path_general(game, ".conf.tmp");
+}
+
+static void load_prefs(frontend *fe)
+{
+    const game *game = midend_which_game(fe->me);
+    char *path = prefs_path(game);
+    if (!path)
+        return;
+    FILE *fp = fopen(path, "r");
+    if (!fp)
+        return;
+    const char *err = midend_load_prefs(fe->me, savefile_read, fp);
+    fclose(fp);
+    if (err)
+        fprintf(stderr, "Unable to load preferences file %s:\n%s\n",
+                path, err);
+    sfree(path);
+}
+
+static char *save_prefs(frontend *fe)
+{
+    const game *game = midend_which_game(fe->me);
+    char *dir_path = prefs_dir();
+    char *file_path = prefs_path(game);
+    char *tmp_path = prefs_tmp_path(game);
+    struct savefile_write_ctx wctx[1];
+    int fd;
+    bool cleanup_dir = false, cleanup_tmpfile = false;
+    char *err = NULL;
+
+    if (!dir_path || !file_path || !tmp_path) {
+        sprintf(err = snewn(256, char),
+                "Unable to save preferences:\n"
+                "Could not determine pathname for configuration files");
+        goto out;
+    }
+
+    if (mkdir(dir_path, 0777) < 0) {
+        /* Ignore errors while trying to make the directory. It may
+         * well already exist, and even if we got some error code
+         * other than EEXIST, it's still worth at least _trying_ to
+         * make the file inside it, and see if that goes wrong. */
+    } else {
+        cleanup_dir = true;
+    }
+
+    fd = open(tmp_path, O_CREAT | O_WRONLY | O_TRUNC | O_EXCL, 0666);
+    if (fd < 0) {
+        const char *os_err = strerror(errno);
+        sprintf(err = snewn(256 + strlen(tmp_path) + strlen(os_err), char),
+                "Unable to save preferences:\n"
+                "Unable to create file '%s': %s", tmp_path, os_err);
+        goto out;
+    } else {
+        cleanup_tmpfile = true;
+    }
+
+    wctx->error = 0;
+    wctx->fp = fdopen(fd, "w");
+    midend_save_prefs(fe->me, savefile_write, wctx);
+    fclose(wctx->fp);
+    if (wctx->error) {
+        const char *os_err = strerror(wctx->error);
+        sprintf(err = snewn(80 + strlen(tmp_path) + strlen(os_err), char),
+                "Unable to write file '%s': %s", tmp_path, os_err);
+        goto out;
+    }
+
+    if (rename(tmp_path, file_path) < 0) {
+        const char *os_err = strerror(errno);
+        sprintf(err = snewn(256 + strlen(tmp_path) + strlen(file_path) +
+                            strlen(os_err), char),
+                "Unable to save preferences:\n"
+                "Unable to rename '%s' to '%s': %s", tmp_path, file_path,
+                os_err);
+        goto out;
+    } else {
+        cleanup_dir = false;
+        cleanup_tmpfile = false;
+    }
+
+  out:
+    if (cleanup_tmpfile) {
+        if (unlink(tmp_path) < 0) { /* can't do anything about this */ }
+    }
+    if (cleanup_dir) {
+        if (rmdir(dir_path) < 0) { /* can't do anything about this */ }
+    }
+    sfree(dir_path);
+    sfree(file_path);
+    sfree(tmp_path);
+    return err;
+}
+
+static bool delete_prefs(const game *game, char **msg)
+{
+    char *dir_path = prefs_dir();
+    char *file_path = prefs_path(game);
+    char *tmp_path = prefs_tmp_path(game);
+    char *msgs[3];
+    int i, len, nmsgs = 0;
+    char *p;
+    bool ok = true;
+
+    if (unlink(file_path) == 0) {
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(file_path), char),
+                "Removed preferences file %s\n", file_path);
+    } else if (errno != ENOENT) {
+        const char *os_err = strerror(errno);
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(file_path) + strlen(os_err),
+                                      char),
+                "Failed to remove preferences file %s: %s\n",
+                file_path, os_err);
+        ok = false;
+    }
+
+    if (unlink(tmp_path) == 0) {
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(tmp_path), char),
+                "Removed temporary file %s\n", tmp_path);
+    } else if (errno != ENOENT) {
+        const char *os_err = strerror(errno);
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(tmp_path) + strlen(os_err),
+                                      char),
+                "Failed to remove temporary file %s: %s\n", tmp_path, os_err);
+        ok = false;
+    }
+
+    if (rmdir(dir_path) == 0) {
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(dir_path), char),
+                "Removed empty preferences directory %s\n", dir_path);
+    } else if (errno != ENOENT && errno != ENOTEMPTY) {
+        const char *os_err = strerror(errno);
+        sprintf(msgs[nmsgs++] = snewn(256 + strlen(dir_path) + strlen(os_err),
+                                      char),
+                "Failed to remove preferences directory %s: %s\n",
+                dir_path, os_err);
+        ok = false;
+    }
+
+    for (i = len = 0; i < nmsgs; i++)
+        len += strlen(msgs[i]);
+    *msg = snewn(len + 1, char);
+    p = *msg;
+    for (i = len = 0; i < nmsgs; i++) {
+        size_t len = strlen(msgs[i]);
+        memcpy(p, msgs[i], len);
+        p += len;
+        sfree(msgs[i]);
+    }
+    *p = '\0';
+
+    sfree(dir_path);
+    sfree(file_path);
+    sfree(tmp_path);
+
+    return ok;
+}
+
 #ifdef USE_PRINTING
 static void menu_print_event(GtkMenuItem *menuitem, gpointer data)
 {
@@ -2960,9 +3214,83 @@ static void menu_config_event(GtkMenuItem *menuitem, gpointer data)
     if (!get_config(fe, which))
 	return;
 
-    midend_new_game(fe->me);
+    if (which != CFG_PREFS)
+        midend_new_game(fe->me);
+
     resize_fe(fe);
     midend_redraw(fe->me);
+}
+
+#ifndef HELP_BROWSER_PATH
+#define HELP_BROWSER_PATH "xdg-open:sensible-browser:$BROWSER"
+#endif
+
+static bool try_show_help(const char *browser, const char *help_name)
+{
+    const char *argv[3] = { browser, help_name, NULL };
+
+    return g_spawn_async(NULL, (char **)argv, NULL,
+			 G_SPAWN_SEARCH_PATH,
+			 NULL, NULL, NULL, NULL);
+}
+
+static void show_help(frontend *fe, const char *topic)
+{
+    char *path = dupstr(HELP_BROWSER_PATH);
+    char *path_entry;
+    char *help_name;
+    size_t help_name_size;
+    bool succeeded = true;
+
+    help_name_size = strlen(HELP_DIR) + 4 + strlen(topic) + 6;
+    help_name = snewn(help_name_size, char);
+    sprintf(help_name, "%s/en/%s.html",
+	    HELP_DIR, topic);
+
+    if (access(help_name, R_OK)) {
+	error_box(fe->window, "Help file is not installed");
+	sfree(path);
+	sfree(help_name);
+	return;
+    }
+
+    path_entry = path;
+    for (;;) {
+	size_t len;
+	bool last;
+
+	len = strcspn(path_entry, ":");
+	last = path_entry[len] == 0;
+	path_entry[len] = 0;
+
+	if (path_entry[0] == '$') {
+	    const char *command = getenv(path_entry + 1);
+
+	    if (command)
+		succeeded = try_show_help(command, help_name);
+	} else {
+	    succeeded = try_show_help(path_entry, help_name);
+	}
+
+	if (last || succeeded)
+	    break;
+	path_entry += len + 1;
+    }
+
+    if (!succeeded)
+	error_box(fe->window, "Failed to start a help browser");
+    sfree(path);
+    sfree(help_name);
+}
+
+static void menu_help_contents_event(GtkMenuItem *menuitem, gpointer data)
+{
+    show_help((frontend *)data, "index");
+}
+
+static void menu_help_specific_event(GtkMenuItem *menuitem, gpointer data)
+{
+    show_help((frontend *)data, thegame.htmlhelp_topic);
 }
 
 static void menu_about_event(GtkMenuItem *menuitem, gpointer data)
@@ -2975,12 +3303,9 @@ static void menu_about_event(GtkMenuItem *menuitem, gpointer data)
     "version", ver,                                                 \
     "comments", "Part of Simon Tatham's Portable Puzzle Collection"
 
-    extern char *const *const xpm_icons[];
-    extern const int n_xpm_icons;
-
     if (n_xpm_icons) {
         GdkPixbuf *icon = gdk_pixbuf_new_from_xpm_data
-            ((const gchar **)xpm_icons[n_xpm_icons-1]);
+            ((const gchar **)xpm_icons[0]);
 
         gtk_show_about_dialog
             (GTK_WINDOW(fe->window),
@@ -3092,8 +3417,6 @@ static frontend *new_window(
     GList *iconlist;
     int x, y, n;
     char errbuf[1024];
-    extern char *const *const xpm_icons[];
-    extern const int n_xpm_icons;
     struct preset_menu *preset_menu;
 
     fe = snew(frontend);
@@ -3113,6 +3436,7 @@ static frontend *new_window(
     fe->timer_id = -1;
 
     fe->me = midend_new(fe, &thegame, &gtk_drawing, fe);
+    load_prefs(fe);
 
     fe->dr_api = &internal_drawing;
 
@@ -3376,6 +3700,16 @@ static frontend *new_window(
                          G_CALLBACK(menu_solve_event), fe);
 	gtk_widget_show(menuitem);
     }
+
+    add_menu_separator(GTK_CONTAINER(menu));
+    menuitem = gtk_menu_item_new_with_label("Preferences...");
+    gtk_container_add(GTK_CONTAINER(menu), menuitem);
+    g_object_set_data(G_OBJECT(menuitem), "user-data",
+                      GINT_TO_POINTER(CFG_PREFS));
+    g_signal_connect(G_OBJECT(menuitem), "activate",
+                     G_CALLBACK(menu_config_event), fe);
+    gtk_widget_show(menuitem);
+
     add_menu_separator(GTK_CONTAINER(menu));
     add_menu_ui_item(fe, GTK_CONTAINER(menu), "Exit", UI_QUIT, 'q', 0);
 
@@ -3385,6 +3719,25 @@ static frontend *new_window(
 
     menu = gtk_menu_new();
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
+
+    menuitem = gtk_menu_item_new_with_label("Contents");
+    gtk_container_add(GTK_CONTAINER(menu), menuitem);
+    g_signal_connect(G_OBJECT(menuitem), "activate",
+		     G_CALLBACK(menu_help_contents_event), fe);
+    gtk_widget_show(menuitem);
+
+    if (thegame.htmlhelp_topic) {
+	char *item;
+	assert(thegame.name);
+	item = snewn(9 + strlen(thegame.name), char);
+	sprintf(item, "Help on %s", thegame.name);
+	menuitem = gtk_menu_item_new_with_label(item);
+	sfree(item);
+	gtk_container_add(GTK_CONTAINER(menu), menuitem);
+	g_signal_connect(G_OBJECT(menuitem), "activate",
+			 G_CALLBACK(menu_help_specific_event), fe);
+	gtk_widget_show(menuitem);
+    }
 
     menuitem = gtk_menu_item_new_with_label("About");
     gtk_container_add(GTK_CONTAINER(menu), menuitem);
@@ -3503,9 +3856,9 @@ static frontend *new_window(
                      G_CALLBACK(button_event), fe);
     g_signal_connect(G_OBJECT(fe->area), "motion_notify_event",
                      G_CALLBACK(motion_event), fe);
-    g_signal_connect(G_OBJECT(fe->area), "selection_get",
+    g_signal_connect(G_OBJECT(fe->window), "selection_get",
                      G_CALLBACK(selection_get), fe);
-    g_signal_connect(G_OBJECT(fe->area), "selection_clear_event",
+    g_signal_connect(G_OBJECT(fe->window), "selection_clear_event",
                      G_CALLBACK(selection_clear), fe);
 #if GTK_CHECK_VERSION(3,0,0)
     g_signal_connect(G_OBJECT(fe->area), "draw",
@@ -3534,7 +3887,7 @@ static frontend *new_window(
     if (n_xpm_icons) {
         gtk_window_set_icon(GTK_WINDOW(fe->window),
                             gdk_pixbuf_new_from_xpm_data
-                            ((const gchar **)xpm_icons[0]));
+                            ((const gchar **)xpm_icons[n_xpm_icons-1]));
 
 	iconlist = NULL;
 	for (n = 0; n < n_xpm_icons; n++) {
@@ -3578,10 +3931,10 @@ static void list_presets_from_menu(struct preset_menu *menu)
 int main(int argc, char **argv)
 {
     char *pname = argv[0];
-    char *error;
     int ngenerate = 0, px = 1, py = 1;
     bool print = false;
     bool time_generation = false, test_solve = false, list_presets = false;
+    bool delete_prefs_action = false;
     bool soln = false, colour = false;
     float scale = 1.0F;
     float redo_proportion = 0.0F;
@@ -3640,6 +3993,9 @@ int main(int argc, char **argv)
             test_solve = true;
 	} else if (doing_opts && !strcmp(p, "--list-presets")) {
             list_presets = true;
+	} else if (doing_opts && (!strcmp(p, "--delete-prefs") ||
+                                  !strcmp(p, "--delete-preferences"))) {
+            delete_prefs_action = true;
 	} else if (doing_opts && !strcmp(p, "--save")) {
 	    if (--ac > 0) {
 		savefile = *++av;
@@ -3988,9 +4344,20 @@ int main(int argc, char **argv)
         list_presets_from_menu(menu);
 	midend_free(me);
         return 0;
+    } else if (delete_prefs_action) {
+        char *msg = NULL;
+        bool ok = delete_prefs(&thegame, &msg);
+        if (!ok) {
+            fputs(msg, stderr);
+            return 1;
+        } else {
+            fputs(msg, stdout);
+            return 0;
+        }
     } else {
 	frontend *fe;
         bool headless = screenshot_file != NULL;
+        char *error = NULL;
 
         if (!headless)
             gtk_init(&argc, &argv);
@@ -3999,6 +4366,7 @@ int main(int argc, char **argv)
 
 	if (!fe) {
 	    fprintf(stderr, "%s: %s\n", pname, error);
+            sfree(error);
 	    return 1;
 	}
 
@@ -4014,7 +4382,7 @@ int main(int argc, char **argv)
 
 	if (redo_proportion) {
 	    /* Start a redo. */
-	    midend_process_key(fe->me, 0, 0, 'r');
+            midend_process_key(fe->me, 0, 0, 'r');
 	    /* And freeze the timer at the specified position. */
 	    midend_freeze_timer(fe->me, redo_proportion);
 	}

@@ -36,7 +36,7 @@
 
 This is a collection of small one-player puzzle games.
 
-\copyright This manual is copyright 2004-2014 Simon Tatham. All rights
+\copyright This manual is copyright 2004-2024 Simon Tatham. All rights
 reserved. You may distribute this documentation under the MIT licence.
 See \k{licence} for the licence text in full.
 
@@ -130,12 +130,12 @@ current puzzle. (Only for puzzles which make sense to print, of
 course \dash it's hard to think of a sensible printable representation
 of Fifteen!)
 
-\dt \ii\e{Undo} (\q{U}, Ctrl+\q{Z}, Ctrl+\q{_})
+\dt \ii\e{Undo} (\q{U}, Ctrl+\q{Z}, Ctrl+\q{_}, \q{*})
 
 \dd Undoes a single move. (You can undo moves back to the start of the
 session.)
 
-\dt \ii\e{Redo} (\q{R}, Ctrl+\q{R})
+\dt \ii\e{Redo} (\q{R}, Ctrl+\q{R}, \q{#})
 
 \dd Redoes a previously undone move.
 
@@ -176,6 +176,22 @@ solving it yourself after seeing the answer, you can just press Undo.
 \dt \I{exit}\ii\e{Quit} (\q{Q}, Ctrl+\q{Q})
 
 \dd Closes the application entirely.
+
+\dt \i\e{Preferences}
+
+\dd Where supported, brings up a dialog allowing you to configure
+personal preferences about a particular game. Some of these
+preferences will be specific to a particular game; others will be
+common to all games.
+
+\lcont{
+
+One option common to all games allows you to turn off the one-key
+shortcuts like \q{N} for new game or \q{Q} for quit, so that there's
+less chance of hitting them by accident. You can still access the same
+shortcuts with the Ctrl key.
+
+}
 
 \H{common-id} Specifying games with the \ii{game ID}
 
@@ -347,6 +363,11 @@ The most common use of this option is in conjunction with \c{--print},
 in which case its behaviour is slightly different; see below.
 
 }
+
+\dt \cw{--delete-prefs}
+
+\dd This option causes the puzzle to delete the configuration file in
+which its user preferences were stored, if there is one.
 
 \dt \I{printing, on Unix}\cw{--print }\e{w}\cw{x}\e{h}
 
@@ -535,6 +556,16 @@ feature and risk having ambiguous puzzles. (Also, finding \e{all}
 the possible solutions can be an additional challenge for an
 advanced player.)
 
+\H{net-prefs} \I{preferences, for Net}Net user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure when loops are highlighted
+as errors. By default, they're always highlighted; by changing this
+option, you can ask for a loop to be highlighted only if every tile
+forming part of the loop is locked. This avoids the loop highlighting
+acting as a spoiler for available deductions about squares you haven't
+even looked at yet.
+
 
 \C{cube} \i{Cube}
 
@@ -601,7 +632,8 @@ respectively.
 \cfg{winhelp-topic}{games.fifteen}
 
 The old ones are the best: this is the good old \q{\i{15-puzzle}}
-with sliding tiles. You have a 4\by\.4 square grid; 15 squares
+with sliding tiles, which dates from the 1870s.
+You have a 4\by\.4 square grid; 15 squares
 contain numbered tiles, and the sixteenth is empty. Your move is to
 choose a tile next to the empty space, and slide it into the space.
 The aim is to end up with the tiles in numerical order, with the
@@ -620,8 +652,9 @@ A left-click with the mouse in the row or column containing the empty
 space will move as many tiles as necessary to move the space to the
 mouse pointer.
 
-The arrow keys will move a tile adjacent to the space in the direction
-indicated (moving the space in the \e{opposite} direction).
+By default, the arrow keys will move a tile adjacent to the space in
+the direction indicated (moving the space in the \e{opposite}
+direction).
 
 Pressing \q{h} will make a suggested move.  Pressing \q{h} enough
 times will solve the game, but it may scramble your progress while
@@ -634,6 +667,18 @@ doing so.
 The only options available from the \q{Custom...} option on the \q{Type}
 menu are \e{Width} and \e{Height}, which are self-explanatory. (Once
 you've changed these, it's not a \q{15-puzzle} any more, of course!)
+
+\H{fifteen-prefs} \I{preferences, for Fifteen}Fifteen user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the sense of the arrow
+keys. With the default setting, \q{Move the tile}, the arrow key you
+press indicates the direction that you want a tile to move, so that
+(for example) if you want to move the tile left of the gap rightwards
+into the gap, you'd press Right. With the opposite setting, \q{Move
+the gap}, the behaviour of the arrow keys is reversed, and you would
+press Left to move the tile left of the gap into the gap, so that the
+\e{gap} ends up one square left of where it was.
 
 
 \C{sixteen} \i{Sixteen}
@@ -785,8 +830,7 @@ quite as good as hand-crafted puzzles would be, but on the plus side
 you get an inexhaustible supply of puzzles tailored to your own
 specification.
 
-\B{nikoli-rect} \W{http://www.nikoli.co.jp/en/puzzles/shikaku.html}\cw{http://www.nikoli.co.jp/en/puzzles/shikaku.html}
-(beware of Flash)
+\B{nikoli-rect} \W{https://www.nikoli.co.jp/en/puzzles/shikaku/}\cw{https://www.nikoli.co.jp/en/puzzles/shikaku/}
 
 \B{puzzle-palace-rect} \W{https://web.archive.org/web/20041024001459/http://www.puzzle.gr.jp/puzzle/sikaku/palm/index.html.en}\cw{https://web.archive.org/web/20041024001459/http://www.puzzle.gr.jp/puzzle/sikaku/palm/index.html.en}
 
@@ -880,10 +924,10 @@ Netslide was contributed to this collection by Richard Boulton.
 \cfg{winhelp-topic}{games.pattern}
 
 You have a grid of squares, which must all be filled in either black
-or white. Beside each row of the grid are listed the lengths of the
-runs of black squares on that row; above each column are listed the
-lengths of the runs of black squares in that column. Your aim is to
-fill in the entire grid black or white.
+or white. Beside each row of the grid are listed, in order, the
+lengths of the runs of black squares on that row; above each column
+are listed, in order, the lengths of the runs of black squares in that
+column. Your aim is to fill in the entire grid black or white.
 
 I first saw this puzzle form around 1995, under the name
 \q{\i{nonograms}}. I've seen it in various places since then, under
@@ -977,8 +1021,7 @@ of the modern form of the puzzle, and it was first published in
 of the history of the puzzle can be found on Wikipedia
 \k{wikipedia-solo}.
 
-\B{nikoli-solo} \W{http://www.nikoli.co.jp/en/puzzles/sudoku.html}\cw{http://www.nikoli.co.jp/en/puzzles/sudoku.html}
-(beware of Flash)
+\B{nikoli-solo} \W{https://www.nikoli.co.jp/en/puzzles/sudoku/}\cw{https://www.nikoli.co.jp/en/puzzles/sudoku/}
 
 \B{wikipedia-solo} \W{http://en.wikipedia.org/wiki/Sudoku}\cw{http://en.wikipedia.org/wiki/Sudoku}
 
@@ -1337,9 +1380,14 @@ after marking.
 
 Alternatively, with the keyboard, the up and down cursor keys can be
 used to select a peg colour, the left and right keys to select a
-peg position, and the space bar or Enter key to place a peg of the
+peg position, and the Enter key to place a peg of the
 selected colour in the chosen position. \q{D} or Backspace removes a
 peg, and Space adds a hold marker.
+
+The number keys can also be used to insert pegs: \q{1} inserts the
+top-most colour, \q{2} the second one, and so forth.  These also
+move the peg cursor to the right.  Pressing \q{L} will label the
+pegs with their numbers.
 
 Pressing \q{h} or \q{?} will fill the current guess with a suggested
 guess.  Using this is not recommended for 10 or more pegs as it is
@@ -1395,6 +1443,13 @@ that, use one extra colour.
 this increases the search space (making things harder), and is turned on by
 default.
 
+\H{guess-prefs} \I{preferences, for Guess}Guess user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure whether pegs are labelled
+with their numbers.  Unlike the \q{L} key, this will persist between
+games.
+
 
 \C{pegs} \i{Pegs}
 
@@ -1442,8 +1497,9 @@ These parameters are available from the \q{Custom...} option on the
 
 \dd Controls whether you are given a board of a standard shape or a
 randomly generated shape. The two standard shapes currently
-supported are \q{Cross} and \q{Octagon} (also commonly known as the
-English and European traditional board layouts respectively).
+supported are \q{Cross} (in various sizes) and \q{Octagon}.
+The 7\by\.7 Cross is the traditional English board layout.
+The Octagon is the traditional French one.
 Selecting \q{Random} will give you a different board shape every
 time (but always one that is known to have a solution).
 
@@ -1529,6 +1585,11 @@ I originally saw this in the form of a Flash game called \i{Planarity}
 
 To move a point, click on it with the left mouse button and drag it
 into a new position.
+
+The cursor keys may also be used to navigate amongst the
+points. Pressing the Enter key will toggle dragging the
+currently-highlighted point. Pressing Tab or Space will cycle through
+all the points.
 
 (All the actions described in \k{common-actions} are also available.)
 
@@ -1714,7 +1775,7 @@ grid because that would immediately cause a loop.)
 Credit for this puzzle goes to \i{Nikoli} \k{nikoli-slant}.
 
 \B{nikoli-slant}
-\W{http://www.nikoli.co.jp/ja/puzzles/gokigen_naname}\cw{http://www.nikoli.co.jp/ja/puzzles/gokigen_naname}
+\W{https://www.nikoli.co.jp/ja/puzzles/gokigen_naname/}\cw{https://www.nikoli.co.jp/ja/puzzles/gokigen_naname/}
 (in Japanese)
 
 \H{slant-controls} \i{Slant controls}
@@ -1763,6 +1824,12 @@ don't yet know what that direction is, and this might enable you to
 deduce something about still other squares.) Even at Hard level,
 guesswork and backtracking should never be necessary.
 
+\H{slant-prefs} \I{preferences, for Slant}Slant user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure which way round the mouse
+buttons work.
+
 
 \C{lightup} \i{Light Up}
 
@@ -1792,8 +1859,7 @@ Credit for this puzzle goes to \i{Nikoli} \k{nikoli-lightup}.
 Light Up was contributed to this collection by James Harvey.
 
 \B{nikoli-lightup}
-\W{http://www.nikoli.co.jp/en/puzzles/akari.html}\cw{http://www.nikoli.co.jp/en/puzzles/akari.html}
-(beware of Flash)
+\W{https://www.nikoli.co.jp/en/puzzles/akari/}\cw{https://www.nikoli.co.jp/en/puzzles/akari/}
 
 \H{lightup-controls} \i{Light Up controls}
 
@@ -1847,6 +1913,12 @@ noticeably.)
 backtracking or guessing, \q{Hard} means that some guesses will
 probably be necessary.
 
+\H{lightup-prefs} \I{preferences, for Light Up}Light Up user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure whether \q{this is not a
+light} marks are shown when the square is also lit.
+
 
 \C{map} \i{Map}
 
@@ -1856,7 +1928,7 @@ You are given a map consisting of a number of regions. Your task is
 to colour each region with one of four colours, in such a way that
 no two regions sharing a boundary have the same colour. You are
 provided with some regions already coloured, sufficient to make the
-remainder of the solution unique.
+remainder of the solution unique, and these cannot be changed.
 
 Only regions which share a length of border are required to be
 different colours. Two regions which meet at only one \e{point}
@@ -1864,9 +1936,9 @@ different colours. Two regions which meet at only one \e{point}
 
 I believe this puzzle is original; I've never seen an implementation
 of it anywhere else. The concept of a \i{four-colouring} puzzle was
-suggested by Owen Dunn; credit must also go to Nikoli and to Verity
+suggested by Alexandra Lanes; credit must also go to Nikoli and to Verity
 Allan for inspiring the train of thought that led to me realising
-Owen's suggestion was a viable puzzle. Thanks also to Gareth Taylor
+Alex's suggestion was a viable puzzle. Thanks also to Gareth Taylor
 for many detailed suggestions.
 
 \H{map-controls} \i{Map controls}
@@ -1940,6 +2012,12 @@ Unreasonable puzzles may require guessing and backtracking.
 
 }
 
+\H{map-prefs} \I{preferences, for Map}Map user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the style of the victory
+flash and also whether the regions start out labelled with numbers.
+
 
 \C{loopy} \i{Loopy}
 
@@ -1967,8 +2045,7 @@ and subsequently enhanced to handle various types of non-square grid
 by Lambros Lambrou.
 
 \B{nikoli-loopy}
-\W{http://www.nikoli.co.jp/en/puzzles/slitherlink.html}\cw{http://www.nikoli.co.jp/en/puzzles/slitherlink.html}
-(beware of Flash)
+\W{https://www.nikoli.co.jp/en/puzzles/slitherlink/}\cw{https://www.nikoli.co.jp/en/puzzles/slitherlink/}
 
 \H{loopy-controls} \i{Loopy controls}
 
@@ -2013,6 +2090,34 @@ same; this makes them the least confusing to play.
 \#{FIXME: what distinguishes Easy, Medium, and Hard? In particular,
 when are backtracking/guesswork required, if ever?}
 
+\H{loopy-prefs} \I{preferences, for Loopy}Loopy user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the following things:
+
+\q{Draw excluded grid lines faintly}. This is on by default: when a
+line of the grid has been explicitly excluded from the solution by
+right-clicking it, the line is still drawn, just in a faint grey
+colour. If you turn this option off, excluded lines are not drawn at
+all.
+
+\q{Auto-follow unique paths of edges}. This is off by default. When
+it's on, clicking to change the status of a single grid line will
+potentially propagate the change along multiple lines, if one or both
+ends of the line you clicked connect to only one other line. (The idea
+is that if two lines meet at a vertex and no other lines do at all,
+then those lines are either both part of the loop or neither, so
+there's no reason you should have to click separately to toggle each
+one.)
+
+In the mode \q{Based on grid only}, the effects of a click will only
+propagate across vertices that have degree 2 in the underlying grid.
+For example, in the square grid, the effect will \e{only} occur at the
+four grid corners.
+
+In the mode \q{Based on grid and game state}, the propagation will
+also take account of edges you've already excluded from the solution,
+so that it will do even more work for you.
 
 \C{inertia} \i{Inertia}
 
@@ -2171,8 +2276,7 @@ Credit for this puzzle goes to \i{Nikoli} \k{nikoli-bridges}.
 Bridges was contributed to this collection by James Harvey.
 
 \B{nikoli-bridges}
-\W{http://www.nikoli.co.jp/en/puzzles/hashiwokakero.html}\cw{http://www.nikoli.co.jp/en/puzzles/hashiwokakero.html}
-(beware of Flash)
+\W{https://www.nikoli.co.jp/en/puzzles/Hashiwokakero/}\cw{https://www.nikoli.co.jp/en/puzzles/Hashiwokakero/}
 
 \H{bridges-controls} \i{Bridges controls}
 
@@ -2216,6 +2320,9 @@ pressing the return key twice.
 By pressing a number key, you can jump to the nearest island with that
 number.  Letters \q{a}, ..., \q{f} count as 10, ..., 15 and \q{0} as
 16.
+
+The \q{G} key will draw a grey line between each pair of islands that
+could be connected with a bridge or non-bridge but are currently not.
 
 Violations of the puzzle rules will be marked in red:
 
@@ -2287,6 +2394,13 @@ possible islands; low expansion factors can create lots of
 tightly-packed islands.
 
 }
+
+\H{bridges-prefs} \I{preferences, for Bridges}Bridges user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure whether possible bridge
+locations are shown.  Unlike the \q{G} key, this will persist between
+games.
 
 
 \C{unequal} \i{Unequal}
@@ -2416,7 +2530,7 @@ English as \q{Spiral Galaxies}.
 
 Galaxies was contributed to this collection by James Harvey.
 
-\B{nikoli-galaxies} \W{http://www.nikoli.co.jp/en/puzzles/astronomical_show.html}\cw{http://www.nikoli.co.jp/en/puzzles/astronomical_show.html}
+\B{nikoli-galaxies} \W{https://www.nikoli.co.jp/en/puzzles/tentai_show/}\cw{https://www.nikoli.co.jp/en/puzzles/tentai_show/}
 
 \H{galaxies-controls} \i{Galaxies controls}
 
@@ -2489,7 +2603,7 @@ Credit for this puzzle goes to \i{Nikoli} \k{nikoli-fillomino}.
 Filling was contributed to this collection by Jonas K\u00F6{oe}lker.
 
 \B{nikoli-fillomino}
-\W{http://www.nikoli.co.jp/en/puzzles/fillomino.html}\cw{http://www.nikoli.co.jp/en/puzzles/fillomino.html}
+\W{https://www.nikoli.co.jp/en/puzzles/fillomino/}\cw{https://www.nikoli.co.jp/en/puzzles/fillomino/}
 
 \H{filling-controls} \I{controls, for Filling}Filling controls
 
@@ -2718,6 +2832,14 @@ level, some backtracking will be required, but the solution should
 still be unique. The remaining levels require increasingly complex
 reasoning to avoid having to backtrack.
 
+\H{towers-prefs} \I{preferences, for Towers}Towers user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the style of the game
+display. If you don't like the three-dimensional mode, selecting
+\q{2D} will switch to a simpler display style in which towers are
+shown by just writing their height in the square.
+
 
 \C{singles} \i{Singles}
 
@@ -2741,8 +2863,7 @@ Credit for this puzzle goes to \i{Nikoli} \k{nikoli-hitori} who call it
 Singles was contributed to this collection by James Harvey.
 
 \B{nikoli-hitori}
-\W{http://www.nikoli.com/en/puzzles/hitori.html}\cw{http://www.nikoli.com/en/puzzles/hitori.html}
-(beware of Flash)
+\W{https://www.nikoli.co.jp/en/puzzles/hitori/}\cw{https://www.nikoli.co.jp/en/puzzles/hitori/}
 
 \H{singles-controls} \i{Singles controls}
 
@@ -2750,7 +2871,9 @@ Singles was contributed to this collection by James Harvey.
 
 Left-clicking on an empty square will colour it black; left-clicking again 
 will restore the number. Right-clicking will add a circle (useful for 
-indicating that a cell is definitely not black). 
+indicating that a cell is definitely not black). Clicking outside the
+grid will toggle whether black squares completely hide the numbers on
+them, or display them in dark grey.
 
 You can also use the cursor keys to move around the grid. Pressing the
 return or space keys will turn a square black or add a circle respectively,
@@ -2771,6 +2894,12 @@ These parameters are available from the \q{Custom...} option on the
 
 \dd Controls the difficulty of the generated puzzle.
 
+\H{Singles-prefs} \I{preferences, for Singles}Singles user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure whether numbers on black
+squares are visible.  Unlike clicking outside the grid, this will
+persist between games.
 
 \C{magnets} \i{Magnets}
 
@@ -2925,6 +3054,13 @@ These parameters are available from the \q{Custom...} option on the
 (the start at the top left, and the end at the bottom right). If false the start
 and end squares are placed randomly (although always both shown). 
 
+\H{signpost-prefs} \I{preferences, for Signpost}Signpost user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the style of the victory
+effect.
+
+
 \C{range} \i{Range}
 
 \cfg{winhelp-topic}{games.range}
@@ -2959,7 +3095,7 @@ it \q{Kurodoko}, \q{Kuromasu} or \q{Where is Black Cells}.
 Range was contributed to this collection by Jonas K\u00F6{oe}lker.
 
 \B{nikoli-range}
-\W{http://www.nikoli.co.jp/en/puzzles/where_is_black_cells.html}\cw{http://www.nikoli.co.jp/en/puzzles/where_is_black_cells.html}
+\W{https://www.nikoli.co.jp/en/puzzles/kurodoko/}\cw{https://www.nikoli.co.jp/en/puzzles/kurodoko/}
 
 \H{range-controls} \I{controls, for Range}Range controls
 
@@ -2986,6 +3122,13 @@ These parameters are available from the \q{Custom...} option on the
 \dt \e{Width}, \e{Height}
 
 \dd Size of grid in squares.
+
+\H{range-prefs} \I{preferences, for Range}Range user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure which way round the mouse
+buttons work.
+
 
 \C{pearl} \i{Pearl}
 
@@ -3019,8 +3162,7 @@ Credit for this puzzle goes to \i{Nikoli}, who call it \q{Masyu}.
 Thanks to James Harvey for assistance with the implementation.
 
 \B{nikoli-pearl}
-\W{http://www.nikoli.co.jp/en/puzzles/masyu.html}\cw{http://www.nikoli.co.jp/en/puzzles/masyu.html}
-(beware of Flash)
+\W{https://www.nikoli.co.jp/en/puzzles/masyu/}\cw{https://www.nikoli.co.jp/en/puzzles/masyu/}
 
 \H{pearl-controls} \I{controls, for Pearl}Pearl controls
 
@@ -3053,6 +3195,41 @@ right click, respectively, on the edge in the direction of the key.
 
 These parameters are available from the \q{Custom...} option on the
 \q{Type} menu.
+
+\dt \e{Width}, \e{Height}
+
+\dd Size of grid in squares.
+
+\dt \e{Difficulty}
+
+\dd Controls the difficulty of the generated puzzle.
+
+\dt \e{Allow unsoluble}
+
+\dd If this is set, then the game will be generated in the simplest
+way: every clue square that can possibly be provided will be shown,
+and the generator will not check whether the puzzle can be uniquely
+solved.
+
+\lcont{
+
+This speeds up game generation, and allows much larger grids to be
+played. At least one possible solution will still always exist, but
+there's no guarantee that it will be unique, or that it will be
+possible to deduce it step by step.
+
+}
+
+\H{pearl-prefs} \I{preferences, for Pearl}Pearl user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure the style of the game
+display. \q{Traditional} is the default mode, in which the loop runs
+between centres of grid squares, and each clue occupies a square.
+\q{Loopy-style} is an alternative mode that looks more like Loopy
+(\k{loopy}), in which the loop runs between grid \e{vertices}, and the
+clues also occupy vertices.
+
 
 \C{undead} \i{Undead}
 
@@ -3088,12 +3265,13 @@ Undead was contributed to this collection by Steffen Bauer.
 Undead has a similar control system to Solo, Unequal and Keen.
 
 To play Undead, click the mouse in any empty square and then type a
-letter on the keyboard indicating the type of monster: \q{G} for a
-ghost, \q{V} for a vampire, or \q{Z} for a zombie. If you make a
+letter or number on the keyboard indicating the type of monster:
+\q{G} or \q{1} for a ghost, \q{V} or \q{2} for a vampire,
+or \q{Z} or \q{3} for a zombie. If you make a
 mistake, click the mouse in the incorrect square and press Space to
 clear it again (or use the Undo feature).
 
-If you \e{right}-click in a square and then type a letter, the
+If you \e{right}-click in a square and then type a letter or number, the
 corresponding monster will be shown in reduced size in that square, as
 a \q{pencil mark}. You can have pencil marks for multiple monsters in
 the same square. A square containing a full-size monster cannot also
@@ -3106,7 +3284,7 @@ monster, or you can use them as lists of the possible monster in a
 given square, or anything else you feel like.
 
 To erase a single pencil mark, right-click in the square and type
-the same letter again.
+the same letter or number again.
 
 All pencil marks in a square are erased when you left-click and type a
 monster letter, or when you left-click and press Space. Right-clicking
@@ -3114,7 +3292,7 @@ and pressing space will also erase pencil marks.
 
 As for Solo, the cursor keys can be used in conjunction with the letter
 keys to place monsters or pencil marks. Use the cursor keys to move a
-highlight around the grid, and type a monster letter to enter it in
+highlight around the grid, and type a monster letter or number to enter it in
 the highlighted square. Pressing return toggles the highlight into a
 mode in which you can enter or remove pencil marks.
 
@@ -3139,6 +3317,13 @@ These parameters are available from the \q{Custom...} option on the
 \dt \e{Difficulty}
 
 \dd Controls the difficulty of the generated puzzle.
+
+\H{undead-prefs} \I{preferences, for Undead}Undead user preferences
+
+On platforms that support user preferences, the \q{Preferences} option
+on the \q{Game} menu will let you configure whether Undead uses letters
+or pictures to represent monsters.
+
 
 \C{unruly} \i{Unruly}
 
@@ -3257,7 +3442,7 @@ real challenge, set this value to 0 and then try to solve a grid in
 
 }
 
-\C{tracks} \i{Tracks}
+\C{tracks} \i{Train Tracks}
 
 \cfg{winhelp-topic}{games.tracks}
 
@@ -3269,9 +3454,9 @@ clues to the top and right of the grid.
 There are only straight and 90 degree curved rails, and the track may not
 cross itself.
 
-Tracks was contributed to this collection by James Harvey.
+Train Tracks was contributed to this collection by James Harvey.
 
-\H{tracks-controls} \I{controls, for Tracks}Tracks controls
+\H{tracks-controls} \I{controls, for Tracks}Train Tracks controls
 
 Left-clicking on an edge between two squares adds a track segment between
 the two squares. Right-clicking on an edge adds a cross on the edge,
@@ -3288,7 +3473,7 @@ columns to match the clue.
 
 (All the actions described in \k{common-actions} are also available.)
 
-\H{tracks-parameters} \I{parameters, for Tracks}Tracks parameters
+\H{tracks-parameters} \I{parameters, for Tracks}Train Tracks parameters
 
 These parameters are available from the \q{Custom...} option on the
 \q{Type} menu.
@@ -3305,12 +3490,12 @@ that would lead to impossible crossings later.
 
 \dt \e{Disallow consecutive 1 clues}
 
-\dd Controls whether the Tracks game generation permits two adjacent
-rows or columns to have a 1 clue, or permits the row or column of the
-track's endpoint to have a 1 clue. By default this is not permitted,
-to avoid long straight boring segments of track and make the games
-more twiddly and interesting. If you want to restore the possibility,
-turn this option off.
+\dd Controls whether the Train Tracks game generation permits two
+adjacent rows or columns to have a 1 clue, or permits the row or
+column of the track's endpoint to have a 1 clue. By default this is
+not permitted, to avoid long straight boring segments of track and
+make the games more twiddly and interesting. If you want to restore
+the possibility, turn this option off.
 
 
 \C{palisade} \i{Palisade}
@@ -3329,7 +3514,7 @@ Credit for this puzzle goes to \i{Nikoli}, who call it \q{Five Cells}.
 Palisade was contributed to this collection by Jonas K\u00F6{oe}lker.
 
 \B{nikoli-palisade}
-\W{http://nikoli.co.jp/en/puzzles/five_cells.html}\cw{http://nikoli.co.jp/en/puzzles/five_cells.html}
+\W{https://www.nikoli.co.jp/en/puzzles/five_cells/}\cw{https://www.nikoli.co.jp/en/puzzles/five_cells/}
 
 \H{palisade-controls} \I{controls, for Palisade}Palisade controls
 
@@ -3354,14 +3539,64 @@ These parameters are available from the \q{Custom...} option on the
 
 \dd The size of the regions into which the grid must be subdivided.
 
+\C{mosaic} \i{Mosaic}
+
+\cfg{winhelp-topic}{games.mosaic}
+
+You are given a grid of squares, which you must colour either black or
+white.
+
+Some squares contain clue numbers. Each clue tells you the number of
+black squares in the 3\times\.3 region surrounding the clue \dash
+\e{including} the clue square itself.
+
+This game is variously known in other locations as: ArtMosaico, Count
+and Darken, Cuenta Y Sombrea, Fill-a-Pix, Fill-In, Komsu Karala,
+Magipic, Majipiku, Mosaico, Mosaik, Mozaiek, Nampre Puzzle,
+Nurie-Puzzle, Oekaki-Pix, Voisimage.
+
+Mosaic was contributed to this collection by Didi Kohen. Colour design
+by Michal Shomer. The implementation is loosely based on
+\W{https://github.com/mordechaim/Mosaic}\cw{github.com/mordechaim/Mosaic}.
+
+\H{mosaic-controls} \I{controls, for Mosaic}Mosaic controls
+
+To play Mosaic, click the mouse in a square to change its colour.
+Left-clicking an empty square will turn it black, and right-clicking
+will turn it white. Keep clicking the same button to cycle through the
+three possible states for the square.
+
+If you hold down the mouse button and drag, you can colour multiple
+cells in a single action.
+
+You can also use the cursor keys to move around the grid. Pressing the
+return or space keys will turn an empty square black or white
+respectively (and then cycle the colours in the same way as the mouse
+buttons), and pressing Backspace will reset a square to empty.
+
+\H{Mosaic-parameters} \I{parameters, for Mosaic}Mosaic parameters
+
+These parameters are available from the \q{Custom...} option on the
+\q{Type} menu.
+
+\dt \e{Width}, \e{Height}
+
+\dd Size of grid in squares.
+
+\dt \e{Aggressive generation}
+
+\dd With this option set, the game generator will try harder to
+eliminate unnecessary clues on the board. This slows down generation,
+so it's not recommended for boards larger than, say, 30\times\.30.
+
 \A{licence} \I{MIT licence}\ii{Licence}
 
-This software is \i{copyright} 2004-2014 Simon Tatham.
+This software is \i{copyright} 2004-2024 Simon Tatham.
 
 Portions copyright Richard Boulton, James Harvey, Mike Pinna, Jonas
 K\u00F6{oe}lker, Dariusz Olszewski, Michael Schierl, Lambros Lambrou,
 Bernd Schmidt, Steffen Bauer, Lennard Sprong, Rogier Goossens, Michael
-Quevillon and Asher Gordon.
+Quevillon, Asher Gordon, Didi Kohen, and Ben Harris.
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files

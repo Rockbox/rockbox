@@ -32,7 +32,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 #include "matching.h"
@@ -229,7 +234,7 @@
  */
 #if defined STANDALONE_SOLVER
 #define SOLVER_DIAGNOSTICS
-bool verbose = false;
+static bool verbose = false;
 #elif defined SOLVER_DIAGNOSTICS
 #define verbose true
 #endif
@@ -408,6 +413,8 @@ static const char *validate_params(const game_params *params, bool full)
      */
     if (params->w < 4 || params->h < 4)
 	return "Width and height must both be at least four";
+    if (params->w > (INT_MAX - 1) / params->h)
+        return "Width times height must not be unreasonably large";
     return NULL;
 }
 
@@ -998,7 +1005,7 @@ static char *new_game_desc(const game_params *params_in, random_state *rs,
 	    int dy, dx;
             bool ok = true;
 
-            which = i + random_upto(rs, j);
+            which = i + random_upto(rs, w*h - i);
             tmp = order[which];
             order[which] = order[i];
             order[i] = tmp;
@@ -1188,6 +1195,21 @@ static char *new_game_desc(const game_params *params_in, random_state *rs,
     return ret;
 }
 
+/*
+ * Grid description format:
+ * 
+ * _ = tree
+ * a = 1 BLANK then TREE
+ * ...
+ * y = 25 BLANKs then TREE
+ * z = 25 BLANKs
+ * ! = set previous square to TENT
+ * - = set previous square to NONTENT
+ *
+ * Last character must be one that would insert a tree as the first
+ * square after the grid.
+ */
+
 static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h;
@@ -1201,9 +1223,10 @@ static const char *validate_desc(const game_params *params, const char *desc)
             area += *desc - 'a' + 2;
 	else if (*desc == 'z')
             area += 25;
-        else if (*desc == '!' || *desc == '-')
-            /* do nothing */;
-        else
+        else if (*desc == '!' || *desc == '-') {
+            if (area == 0 || area > w * h)
+                return "Tent or non-tent placed off the grid";
+        } else
             return "Invalid character in grid specification";
 
 	desc++;
@@ -1436,7 +1459,7 @@ static game_ui *new_ui(const game_state *state)
     ui->drag_button = -1;
     ui->drag_ok = false;
     ui->cx = ui->cy = 0;
-    ui->cdisp = false;
+    ui->cdisp = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -1445,18 +1468,25 @@ static void free_ui(game_ui *ui)
     sfree(ui);
 }
 
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
-}
-
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
                                const game_state *newstate)
 {
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    int w = state->p.w;
+    int v = state->grid[ui->cy*w+ui->cx];
+
+    if (IS_CURSOR_SELECT(button) && ui->cdisp) {
+        switch (v) {
+          case BLANK:
+            return button == CURSOR_SELECT ? "Tent" : "Green";
+          case TENT: case NONTENT: return "Clear";
+        }
+    }
+    return "";
 }
 
 struct game_drawstate {
@@ -1546,7 +1576,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     char tmpbuf[80];
     bool shift = button & MOD_SHFT, control = button & MOD_CTRL;
 
-    button &= ~MOD_MASK;
+    button = STRIP_BUTTON_MODIFIERS(button);
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
         x = FROMCOORD(x);
@@ -1559,7 +1589,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dsy = ui->dey = y;
         ui->drag_ok = true;
         ui->cdisp = false;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if ((IS_MOUSE_DRAG(button) || IS_MOUSE_RELEASE(button)) &&
@@ -1591,14 +1621,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
 
         if (IS_MOUSE_DRAG(button))
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
 
         /*
          * The drag has been released. Enact it.
          */
         if (!ui->drag_ok) {
             ui->drag_button = -1;
-            return UI_UPDATE;          /* drag was just cancelled */
+            return MOVE_UI_UPDATE;          /* drag was just cancelled */
         }
 
         xmin = min(ui->dsx, ui->dex);
@@ -1636,7 +1666,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (buflen == 0) {
             sfree(buf);
-            return UI_UPDATE;          /* drag was terminated */
+            return MOVE_UI_UPDATE;          /* drag was terminated */
         } else {
             buf[buflen] = '\0';
             return buf;
@@ -1644,11 +1674,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     }
 
     if (IS_CURSOR_MOVE(button)) {
-        ui->cdisp = true;
+        char *ret;
         if (shift || control) {
             int len = 0, i, indices[2];
             indices[0] = ui->cx + w * ui->cy;
-            move_cursor(button, &ui->cx, &ui->cy, w, h, false);
+            ret = move_cursor(button, &ui->cx, &ui->cy, w, h, false,
+                              &ui->cdisp);
             indices[1] = ui->cx + w * ui->cy;
 
             /* NONTENTify all unique traversed eligible squares */
@@ -1663,8 +1694,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             tmpbuf[len] = '\0';
             if (len) return dupstr(tmpbuf);
         } else
-            move_cursor(button, &ui->cx, &ui->cy, w, h, false);
-        return UI_UPDATE;
+            ret = move_cursor(button, &ui->cx, &ui->cy, w, h, false,
+                              &ui->cdisp);
+        return ret;
     }
     if (ui->cdisp) {
         char rep = 0;
@@ -1691,7 +1723,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
     } else if (IS_CURSOR_SELECT(button)) {
         ui->cdisp = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     return NULL;
@@ -1875,7 +1907,7 @@ static game_state *execute_move(const game_state *state, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* fool the macros */
     struct dummy { int tilesize; } dummy, *ds = &dummy;
@@ -1976,7 +2008,8 @@ static int *find_errors(const game_state *state, char *grid)
 {
     int w = state->p.w, h = state->p.h;
     int *ret = snewn(w*h + w + h, int);
-    int *tmp = snewn(w*h*2, int), *dsf = tmp + w*h;
+    int *tmp = snewn(w*h, int);
+    DSF *dsf;
     int x, y;
 
     /*
@@ -2193,7 +2226,7 @@ static int *find_errors(const game_state *state, char *grid)
      * all the tents in any component which has a smaller tree
      * count.
      */
-    dsf_init(dsf, w*h);
+    dsf = dsf_new(w*h);
     /* Construct the equivalence classes. */
     for (y = 0; y < h; y++) {
 	for (x = 0; x < w-1; x++) {
@@ -2236,7 +2269,7 @@ static int *find_errors(const game_state *state, char *grid)
      * start of the game, before the user had done anything wrong!)
      */
 #define TENT(x) ((x)==TENT || (x)==BLANK)
-    dsf_init(dsf, w*h);
+    dsf_reinit(dsf);
     /* Construct the equivalence classes. */
     for (y = 0; y < h; y++) {
 	for (x = 0; x < w-1; x++) {
@@ -2272,6 +2305,7 @@ static int *find_errors(const game_state *state, char *grid)
 #undef TENT
 
     sfree(tmp);
+    dsf_free(dsf);
     return ret;
 }
 
@@ -2411,14 +2445,6 @@ static void int_redraw(drawing *dr, game_drawstate *ds,
     }
 
     if (printing || !ds->started) {
-	if (!printing) {
-	    int ww, wh;
-	    game_compute_size(&state->p, TILESIZE, &ww, &wh);
-	    draw_rect(dr, 0, 0, ww, wh, COL_BACKGROUND);
-	    draw_update(dr, 0, 0, ww, wh);
-	    ds->started = true;
-	}
-
 	if (printing)
 	    print_line_width(dr, TILESIZE/64);
 
@@ -2572,24 +2598,21 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
+static void game_print_size(const game_params *params, const game_ui *ui,
+                            float *x, float *y)
 {
     int pw, ph;
 
     /*
      * I'll use 6mm squares by default.
      */
-    game_compute_size(params, 600, &pw, &ph);
+    game_compute_size(params, 600, ui, &pw, &ph);
     *x = pw / 100.0F;
     *y = ph / 100.0F;
 }
 
-static void game_print(drawing *dr, const game_state *state, int tilesize)
+static void game_print(drawing *dr, const game_state *state, const game_ui *ui,
+                       int tilesize)
 {
     int c;
 
@@ -2628,12 +2651,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILESIZE, game_compute_size, game_set_size,
@@ -2647,7 +2672,7 @@ const struct game thegame = {
     game_status,
     true, false, game_print_size, game_print,
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 

@@ -3,8 +3,7 @@
  * 
  * Still TODO:
  *
- *  - think about configurably supporting question marks. Once,
- *    that is, we've thought about configurability in general!
+ *  - think about configurably supporting question marks.
  */
 
 #include <stdio.h>
@@ -12,7 +11,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "tree234.h"
 #include "puzzles.h"
@@ -34,8 +38,8 @@ enum {
 #else
 #define BORDER (TILE_SIZE * 3 / 2)
 #endif
-#define HIGHLIGHT_WIDTH (TILE_SIZE / 10)
-#define OUTER_HIGHLIGHT_WIDTH (BORDER / 10)
+#define HIGHLIGHT_WIDTH (TILE_SIZE / 10 ? TILE_SIZE / 10 : 1)
+#define OUTER_HIGHLIGHT_WIDTH (BORDER / 10 ? BORDER / 10 : 1)
 #define COORD(x)  ( (x) * TILE_SIZE + BORDER )
 #define FROMCOORD(x)  ( ((x) - BORDER + TILE_SIZE) / TILE_SIZE - 1 )
 
@@ -162,7 +166,9 @@ static void decode_params(game_params *params, char const *string)
 	params->n = atoi(p);
 	while (*p && (*p == '.' || isdigit((unsigned char)*p))) p++;
     } else {
-	params->n = params->w * params->h / 10;
+        if (params->h > 0 && params->w > 0 &&
+            params->w <= INT_MAX / params->h)
+            params->n = params->w * params->h / 10;
     }
 
     while (*p) {
@@ -250,7 +256,7 @@ static const char *validate_params(const game_params *params, bool full)
      * blocking the way and no idea what's behind them, or one mine
      * and no way to know which of the two rows it's in. If the
      * mine count is even you can create a soluble grid by packing
-     * all the mines at one end (so what when you hit a two-mine
+     * all the mines at one end (so that when you hit a two-mine
      * wall there are only as many covered squares left as there
      * are mines); but if it's odd, you are doomed, because you
      * _have_ to have a gap somewhere which you can't determine the
@@ -258,12 +264,25 @@ static const char *validate_params(const game_params *params, bool full)
      */
     if (full && params->unique && (params->w <= 2 || params->h <= 2))
 	return "Width and height must both be greater than two";
+    if (params->w < 1 || params->h < 1)
+	return "Width and height must both be at least one";
+    if (params->w > SHRT_MAX || params->h > SHRT_MAX)
+        return "Neither width nor height may be unreasonably large";
+    /*
+     * We use random_upto() to place mines, and its maximum limit is 2^28-1.
+     */
+#if (1<<28)-1 < INT_MAX
+    if (params->w > ((1<<28)-1) / params->h)
+#else
+    if (params->w > INT_MAX / params->h)
+#endif
+        return "Width times height must not be unreasonably large";
     if (params->n < 0)
 	return "Mine count may not be negative";
-    if (params->n > params->w * params->h - 9)
-	return "Too many mines for grid size";
     if (params->n < 1)
         return "Number of mines must be greater than zero";
+    if (params->n > params->w * params->h - 9)
+	return "Too many mines for grid size";
 
     /*
      * FIXME: Need more constraints here. Not sure what the
@@ -428,7 +447,9 @@ static void ss_add(struct setstore *ss, int x, int y, int mask, int mines)
      * Create a set structure and add it to the tree.
      */
     s = snew(struct set);
+    assert(SHRT_MIN <= x && x <= SHRT_MAX);
     s->x = x;
+    assert(SHRT_MIN <= y && y <= SHRT_MAX);
     s->y = y;
     s->mask = mask;
     s->mines = mines;
@@ -499,7 +520,9 @@ static struct set **ss_overlap(struct setstore *ss, int x, int y, int mask)
 	    /*
 	     * Find the first set with these top left coordinates.
 	     */
+            assert(SHRT_MIN <= xx && xx <= SHRT_MAX);
 	    stmp.x = xx;
+            assert(SHRT_MIN <= yy && yy <= SHRT_MAX);
 	    stmp.y = yy;
 	    stmp.mask = 0;
 
@@ -1880,72 +1903,7 @@ static char *describe_layout(bool *grid, int area, int x, int y,
 static bool *new_mine_layout(int w, int h, int n, int x, int y, bool unique,
 			     random_state *rs, char **game_desc)
 {
-    bool *grid;
-
-#ifdef TEST_OBFUSCATION
-    static int tested_obfuscation = false;
-    if (!tested_obfuscation) {
-	/*
-	 * A few simple test vectors for the obfuscator.
-	 * 
-	 * First test: the 28-bit stream 1234567. This divides up
-	 * into 1234 and 567[0]. The SHA of 56 70 30 (appending
-	 * "0") is 15ce8ab946640340bbb99f3f48fd2c45d1a31d30. Thus,
-	 * we XOR the 16-bit string 15CE into the input 1234 to get
-	 * 07FA. Next, we SHA that with "0": the SHA of 07 FA 30 is
-	 * 3370135c5e3da4fed937adc004a79533962b6391. So we XOR the
-	 * 12-bit string 337 into the input 567 to get 650. Thus
-	 * our output is 07FA650.
-	 */
-	{
-	    unsigned char bmp1[] = "\x12\x34\x56\x70";
-	    obfuscate_bitmap(bmp1, 28, false);
-	    printf("test 1 encode: %s\n",
-		   memcmp(bmp1, "\x07\xfa\x65\x00", 4) ? "failed" : "passed");
-	    obfuscate_bitmap(bmp1, 28, true);
-	    printf("test 1 decode: %s\n",
-		   memcmp(bmp1, "\x12\x34\x56\x70", 4) ? "failed" : "passed");
-	}
-	/*
-	 * Second test: a long string to make sure we switch from
-	 * one SHA to the next correctly. My input string this time
-	 * is simply fifty bytes of zeroes.
-	 */
-	{
-	    unsigned char bmp2[50];
-	    unsigned char bmp2a[50];
-	    memset(bmp2, 0, 50);
-	    memset(bmp2a, 0, 50);
-	    obfuscate_bitmap(bmp2, 50 * 8, false);
-	    /*
-	     * SHA of twenty-five zero bytes plus "0" is
-	     * b202c07b990c01f6ff2d544707f60e506019b671. SHA of
-	     * twenty-five zero bytes plus "1" is
-	     * fcb1d8b5a2f6b592fe6780b36aa9d65dd7aa6db9. Thus our
-	     * first half becomes
-	     * b202c07b990c01f6ff2d544707f60e506019b671fcb1d8b5a2.
-	     * 
-	     * SHA of that lot plus "0" is
-	     * 10b0af913db85d37ca27f52a9f78bba3a80030db. SHA of the
-	     * same string plus "1" is
-	     * 3d01d8df78e76d382b8106f480135a1bc751d725. So the
-	     * second half becomes
-	     * 10b0af913db85d37ca27f52a9f78bba3a80030db3d01d8df78.
-	     */
-	    printf("test 2 encode: %s\n",
-		   memcmp(bmp2, "\xb2\x02\xc0\x7b\x99\x0c\x01\xf6\xff\x2d\x54"
-			  "\x47\x07\xf6\x0e\x50\x60\x19\xb6\x71\xfc\xb1\xd8"
-			  "\xb5\xa2\x10\xb0\xaf\x91\x3d\xb8\x5d\x37\xca\x27"
-			  "\xf5\x2a\x9f\x78\xbb\xa3\xa8\x00\x30\xdb\x3d\x01"
-			  "\xd8\xdf\x78", 50) ? "failed" : "passed");
-	    obfuscate_bitmap(bmp2, 50 * 8, true);
-	    printf("test 2 decode: %s\n",
-		   memcmp(bmp2, bmp2a, 50) ? "failed" : "passed");
-	}
-    }
-#endif
-
-    grid = minegen(w, h, n, x, y, unique, rs);
+    bool *grid = minegen(w, h, n, x, y, unique, rs);
 
     if (game_desc)
         *game_desc = describe_layout(grid, w * h, x, y, true);
@@ -2001,6 +1959,8 @@ static const char *validate_desc(const game_params *params, const char *desc)
         desc++;
 	if (!*desc || !isdigit((unsigned char)*desc))
 	    return "No initial mine count in game description";
+	if (atoi(desc) > wh - 9)
+            return "Too many mines for grid size";
 	while (*desc && isdigit((unsigned char)*desc))
 	    desc++;		       /* skip over mine count */
 	if (*desc != ',')
@@ -2139,6 +2099,8 @@ static int open_square(game_state *state, int x, int y)
 	    break;
     }
 
+    /* If the player has already lost, don't let them win as well. */
+    if (state->dead) return 0;
     /*
      * Finally, scan the grid and see if exactly as many squares
      * are still covered as there are mines. If so, set the `won'
@@ -2365,7 +2327,7 @@ static game_ui *new_ui(const game_state *state)
     ui->completed = false;
     ui->flash_is_death = false;	       /* *shrug* */
     ui->cur_x = ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     return ui;
 }
 
@@ -2387,7 +2349,8 @@ static char *encode_ui(const game_ui *ui)
     return dupstr(buf);
 }
 
-static void decode_ui(game_ui *ui, const char *encoding)
+static void decode_ui(game_ui *ui, const char *encoding,
+                      const game_state *state)
 {
     int p= 0;
     sscanf(encoding, "D%d%n", &ui->deaths, &p);
@@ -2400,6 +2363,35 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 {
     if (newstate->won)
 	ui->completed = true;
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    int cx = ui->cur_x, cy = ui->cur_y;
+    int v = state->grid[cy * state->w + cx];
+
+    if (state->dead || state->won || !ui->cur_visible) return "";
+    if (button == CURSOR_SELECT2) {
+        if (v == -2) return "Mark";
+        if (v == -1) return "Unmark";
+        return "";
+    }
+    if (button == CURSOR_SELECT) {
+        int dy, dx, n = 0;
+        if (v == -2 || v == -3) return "Uncover";
+        if (v == 0) return "";
+        /* Count mine markers. */
+        for (dy = -1; dy <= +1; dy++)
+            for (dx = -1; dx <= +1; dx++)
+                if (cx+dx >= 0 && cx+dx < state->w &&
+			cy+dy >= 0 && cy+dy < state->h) {
+			if (state->grid[(cy+dy)*state->w+(cx+dx)] == -1)
+			    n++;
+		    }
+        if (n == v) return "Clear";
+    }
+    return "";
 }
 
 struct game_drawstate {
@@ -2432,22 +2424,20 @@ static char *interpret_move(const game_state *from, game_ui *ui,
     cx = FROMCOORD(x);
     cy = FROMCOORD(y);
 
-    if (IS_CURSOR_MOVE(button)) {
-        move_cursor(button, &ui->cur_x, &ui->cur_y, from->w, from->h, false);
-        ui->cur_visible = true;
-        return UI_UPDATE;
-    }
+    if (IS_CURSOR_MOVE(button))
+        return move_cursor(button, &ui->cur_x, &ui->cur_y, from->w, from->h,
+                           false, &ui->cur_visible);
     if (IS_CURSOR_SELECT(button)) {
         int v = from->grid[ui->cur_y * from->w + ui->cur_x];
 
         if (!ui->cur_visible) {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         if (button == CURSOR_SELECT2) {
             /* As for RIGHT_BUTTON; only works on covered square. */
             if (v != -2 && v != -1)
-                return NULL;
+                return MOVE_NO_EFFECT;
             sprintf(buf, "F%d,%d", ui->cur_x, ui->cur_y);
             return dupstr(buf);
         }
@@ -2468,7 +2458,7 @@ static char *interpret_move(const game_state *from, game_ui *ui,
     if (button == LEFT_BUTTON || button == LEFT_DRAG ||
 	button == MIDDLE_BUTTON || button == MIDDLE_DRAG) {
 	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
-	    return NULL;
+	    return MOVE_UNUSED;
 
 	/*
 	 * Mouse-downs and mouse-drags just cause highlighting
@@ -2482,12 +2472,12 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	else if (button == MIDDLE_BUTTON)
 	    ui->validradius = 1;
         ui->cur_visible = false;
-	return UI_UPDATE;
+	return MOVE_UI_UPDATE;
     }
 
     if (button == RIGHT_BUTTON) {
 	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
-	    return NULL;
+	    return MOVE_UNUSED;
 
 	/*
 	 * Right-clicking only works on a covered square, and it
@@ -2498,7 +2488,7 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	 */
 	if (from->grid[cy * from->w + cx] != -2 &&
 	    from->grid[cy * from->w + cx] != -1)
-	    return NULL;
+	    return MOVE_NO_EFFECT;
 
 	sprintf(buf, "F%d,%d", cx, cy);
 	return dupstr(buf);
@@ -2509,11 +2499,12 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	ui->hradius = 0;
 
 	/*
-	 * At this stage we must never return NULL: we have adjusted
-	 * the ui, so at worst we return UI_UPDATE.
+	 * At this stage we must never return MOVE_UNUSED or
+	 * MOVE_NO_EFFECT: we have adjusted the ui, so at worst we
+	 * return MOVE_UI_UPDATE.
 	 */
 	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
-	    return UI_UPDATE;
+	    return MOVE_UI_UPDATE;
 
 	/*
 	 * Left-clicking on a covered square opens a tile. Not
@@ -2533,7 +2524,7 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	}
         goto uncover;
     }
-    return NULL;
+    return MOVE_UNUSED;
 
 uncover:
     {
@@ -2591,7 +2582,7 @@ uncover:
 	    }
 	}
 
-	return UI_UPDATE;
+	return MOVE_UI_UPDATE;
     }
 }
 
@@ -2603,6 +2594,7 @@ static game_state *execute_move(const game_state *from, const char *move)
     if (!strcmp(move, "S")) {
 	int yy, xx;
 
+        if (!from->layout->mines) return NULL; /* Game not started. */
 	ret = dup_game(from);
         if (!ret->dead) {
             /*
@@ -2656,12 +2648,17 @@ static game_state *execute_move(const game_state *from, const char *move)
 
 	return ret;
     } else {
+        /* Dead players should stop trying to move. */
+        if (from->dead)
+            return NULL;
 	ret = dup_game(from);
 
 	while (*move) {
 	    if (move[0] == 'F' &&
 		sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
-		cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+		cx >= 0 && cx < from->w && cy >= 0 && cy < from->h &&
+                (ret->grid[cy * from->w + cx] == -1 ||
+                 ret->grid[cy * from->w + cx] == -2)) {
 		ret->grid[cy * from->w + cx] ^= (-2 ^ -1);
 	    } else if (move[0] == 'O' &&
 		       sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
@@ -2697,7 +2694,7 @@ static game_state *execute_move(const game_state *from, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -2870,12 +2867,12 @@ static void draw_tile(drawing *dr, game_drawstate *ds,
     coords[(n)*2+0] = x + (int)(TILE_SIZE * (dx)); \
     coords[(n)*2+1] = y + (int)(TILE_SIZE * (dy)); \
 } while (0)
-	    SETCOORD(0, 0.6F,  0.7F);
-	    SETCOORD(1, 0.8F,  0.8F);
-	    SETCOORD(2, 0.25F, 0.8F);
-	    SETCOORD(3, 0.55F, 0.7F);
-	    SETCOORD(4, 0.55F, 0.35F);
-	    SETCOORD(5, 0.6F,  0.35F);
+	    SETCOORD(0, 0.6F,  0.35F);
+	    SETCOORD(1, 0.6F,  0.7F);
+	    SETCOORD(2, 0.8F,  0.8F);
+	    SETCOORD(3, 0.25F, 0.8F);
+	    SETCOORD(4, 0.55F, 0.7F);
+	    SETCOORD(5, 0.55F, 0.35F);
 	    draw_polygon(dr, coords, 6, COL_FLAGBASE, COL_FLAGBASE);
 
 	    SETCOORD(0, 0.6F, 0.2F);
@@ -2979,13 +2976,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 
     if (!ds->started) {
         int coords[10];
-
-	draw_rect(dr, 0, 0,
-		  TILE_SIZE * state->w + 2 * BORDER,
-		  TILE_SIZE * state->h + 2 * BORDER, COL_BACKGROUND);
-	draw_update(dr, 0, 0,
-		    TILE_SIZE * state->w + 2 * BORDER,
-		    TILE_SIZE * state->h + 2 * BORDER);
 
         /*
          * Recessed area containing the whole puzzle.
@@ -3182,14 +3172,6 @@ static bool game_timing_state(const game_state *state, game_ui *ui)
     return true;
 }
 
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame mines
 #endif
@@ -3211,12 +3193,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
     encode_ui,
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -3228,7 +3212,7 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
     true, game_timing_state,
     BUTTON_BEATS(LEFT_BUTTON, RIGHT_BUTTON) | REQUIRE_RBUTTON,

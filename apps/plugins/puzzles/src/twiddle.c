@@ -10,7 +10,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -123,14 +128,16 @@ static void decode_params(game_params *ret, char const *string)
     while (*string) {
 	if (*string == 'r') {
 	    ret->rowsonly = true;
+            string++;
 	} else if (*string == 'o') {
 	    ret->orientable = true;
+            string++;
 	} else if (*string == 'm') {
             string++;
 	    ret->movetarget = atoi(string);
-            while (string[1] && isdigit((unsigned char)string[1])) string++;
-	}
-	string++;
+            while (*string && isdigit((unsigned char)*string)) string++;
+	} else
+            string++;
     }
 }
 
@@ -210,6 +217,8 @@ static const char *validate_params(const game_params *params, bool full)
 	return "Width must be at least the rotating block size";
     if (params->h < params->n)
 	return "Height must be at least the rotating block size";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
     if (params->movetarget < 0)
         return "Number of shuffling moves may not be negative";
     return NULL;
@@ -615,7 +624,7 @@ static game_ui *new_ui(const game_state *state)
 
     ui->cur_x = 0;
     ui->cur_y = 0;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     return ui;
 }
@@ -625,18 +634,20 @@ static void free_ui(game_ui *ui)
     sfree(ui);
 }
 
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
-}
-
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
                                const game_state *newstate)
 {
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (!ui->cur_visible) return "";
+    switch (button) {
+      case CURSOR_SELECT: return "Turn left";
+      case CURSOR_SELECT2: return "Turn right";
+    }
+    return "";
 }
 
 struct game_drawstate {
@@ -657,18 +668,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
     button = button & (~MOD_MASK | MOD_NUM_KEYPAD);
 
-    if (IS_CURSOR_MOVE(button)) {
-        if (button == CURSOR_LEFT && ui->cur_x > 0)
-            ui->cur_x--;
-        if (button == CURSOR_RIGHT && (ui->cur_x+n) < (w))
-            ui->cur_x++;
-        if (button == CURSOR_UP && ui->cur_y > 0)
-            ui->cur_y--;
-        if (button == CURSOR_DOWN && (ui->cur_y+n) < (h))
-            ui->cur_y++;
-        ui->cur_visible = true;
-        return UI_UPDATE;
-    }
+    if (IS_CURSOR_MOVE(button))
+        return move_cursor(button, &ui->cur_x, &ui->cur_y, w-n+1, h-n+1,
+                           false, &ui->cur_visible);
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
 	/*
@@ -691,7 +693,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             dir = (button == CURSOR_SELECT2) ? -1 : +1;
         } else {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
     } else if (button == 'a' || button == 'A' || button==MOD_NUM_KEYPAD+'7') {
         x = y = 0;
@@ -791,7 +793,7 @@ static game_state *execute_move(const game_state *from, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -870,8 +872,8 @@ static void rotate(int *xy, struct rotation *rot)
 	xf2 = rot->c * xf + rot->s * yf;
 	yf2 = - rot->s * xf + rot->c * yf;
 
-	xy[0] = (int)(xf2 + rot->ox + 0.5);   /* round to nearest */
-	xy[1] = (int)(yf2 + rot->oy + 0.5);   /* round to nearest */
+	xy[0] = (int)(xf2 + rot->ox + 0.5F);   /* round to nearest */
+	xy[1] = (int)(yf2 + rot->oy + 0.5F);   /* round to nearest */
     }
 }
 
@@ -1058,7 +1060,7 @@ static int highlight_colour(float angle)
 	COL_LOWLIGHT,
     };
 
-    return colours[(int)((angle + 2*PI) / (PI/16)) & 31];
+    return colours[(int)((angle + 2*(float)PI) / ((float)PI/16)) & 31];
 }
 
 static float game_anim_length_real(const game_state *oldstate,
@@ -1135,13 +1137,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     if (!ds->started) {
         int coords[10];
 
-	draw_rect(dr, 0, 0,
-		  TILE_SIZE * state->w + 2 * BORDER,
-		  TILE_SIZE * state->h + 2 * BORDER, COL_BACKGROUND);
-	draw_update(dr, 0, 0,
-		    TILE_SIZE * state->w + 2 * BORDER,
-		    TILE_SIZE * state->h + 2 * BORDER);
-
         /*
          * Recessed area containing the whole puzzle.
          */
@@ -1189,7 +1184,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 	rot->cw = rot->ch = TILE_SIZE * state->n;
 	rot->ox = rot->cx + rot->cw/2;
 	rot->oy = rot->cy + rot->ch/2;
-	angle = (float)((-PI/2 * lastr) * (1.0 - animtime / anim_max));
+	angle = ((-(float)PI/2 * lastr) * (1.0F - animtime / anim_max));
 	rot->c = (float)cos(angle);
 	rot->s = (float)sin(angle);
 
@@ -1282,19 +1277,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     }
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame twiddle
 #endif
@@ -1316,12 +1298,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1333,9 +1317,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

@@ -260,9 +260,10 @@ static bool addremcommon(int w, int h, int x, int y, int *own, int val)
  * In both of the above suggested use cases, the user would
  * probably want w==h==k, but that isn't a requirement.
  */
-static int *divvy_internal(int w, int h, int k, random_state *rs)
+DSF *divvy_rectangle_attempt(int w, int h, int k, random_state *rs)
 {
-    int *order, *queue, *tmp, *own, *sizes, *addable, *retdsf;
+    int *order, *queue, *tmp, *own, *sizes, *addable;
+    DSF *retdsf, *tmpdsf;
     bool *removable;
     int wh = w*h;
     int i, j, n, x, y, qhead, qtail;
@@ -277,6 +278,7 @@ static int *divvy_internal(int w, int h, int k, random_state *rs)
     queue = snewn(n, int);
     addable = snewn(wh*4, int);
     removable = snewn(wh, bool);
+    retdsf = tmpdsf = NULL;
 
     /*
      * Permute the grid squares into a random order, which will be
@@ -609,7 +611,7 @@ static int *divvy_internal(int w, int h, int k, random_state *rs)
 	assert(own[i] >= 0 && own[i] < n);
 	tmp[own[i]] = i;
     }
-    retdsf = snew_dsf(wh);
+    retdsf = dsf_new(wh);
     for (i = 0; i < wh; i++) {
 	dsf_merge(retdsf, i, tmp[own[i]]);
     }
@@ -619,18 +621,18 @@ static int *divvy_internal(int w, int h, int k, random_state *rs)
      * the ominoes really are k-ominoes and we haven't
      * accidentally split one into two disconnected pieces.
      */
-    dsf_init(tmp, wh);
+    tmpdsf = dsf_new(wh);
     for (y = 0; y < h; y++)
 	for (x = 0; x+1 < w; x++)
 	    if (own[y*w+x] == own[y*w+(x+1)])
-		dsf_merge(tmp, y*w+x, y*w+(x+1));
+		dsf_merge(tmpdsf, y*w+x, y*w+(x+1));
     for (x = 0; x < w; x++)
 	for (y = 0; y+1 < h; y++)
 	    if (own[y*w+x] == own[(y+1)*w+x])
-		dsf_merge(tmp, y*w+x, (y+1)*w+x);
+		dsf_merge(tmpdsf, y*w+x, (y+1)*w+x);
     for (i = 0; i < wh; i++) {
 	j = dsf_canonify(retdsf, i);
-	assert(dsf_canonify(tmp, j) == dsf_canonify(tmp, i));
+	assert(dsf_equivalent(tmpdsf, j, i));
     }
 
     cleanup:
@@ -640,6 +642,7 @@ static int *divvy_internal(int w, int h, int k, random_state *rs)
      */
     sfree(order);
     sfree(tmp);
+    dsf_free(tmpdsf);
     sfree(own);
     sfree(sizes);
     sfree(queue);
@@ -652,131 +655,13 @@ static int *divvy_internal(int w, int h, int k, random_state *rs)
     return retdsf;
 }
 
-#ifdef TESTMODE
-static int fail_counter = 0;
-#endif
-
-int *divvy_rectangle(int w, int h, int k, random_state *rs)
+DSF *divvy_rectangle(int w, int h, int k, random_state *rs)
 {
-    int *ret;
+    DSF *ret;
 
     do {
-	ret = divvy_internal(w, h, k, rs);
-
-#ifdef TESTMODE
-	if (!ret)
-	    fail_counter++;
-#endif
-
+	ret = divvy_rectangle_attempt(w, h, k, rs);
     } while (!ret);
 
     return ret;
 }
-
-#ifdef TESTMODE
-
-/*
- * gcc -g -O0 -DTESTMODE -I.. -o divvy divvy.c ../random.c ../malloc.c ../dsf.c ../misc.c ../nullfe.c
- * 
- * or to debug
- * 
- * gcc -g -O0 -DDIVVY_DIAGNOSTICS -DTESTMODE -I.. -o divvy divvy.c ../random.c ../malloc.c ../dsf.c ../misc.c ../nullfe.c
- */
-
-int main(int argc, char **argv)
-{
-    int *dsf;
-    int i;
-    int w = 9, h = 4, k = 6, tries = 100;
-    random_state *rs;
-
-    rs = random_new("123456", 6);
-
-    if (argc > 1)
-	w = atoi(argv[1]);
-    if (argc > 2)
-	h = atoi(argv[2]);
-    if (argc > 3)
-	k = atoi(argv[3]);
-    if (argc > 4)
-	tries = atoi(argv[4]);
-
-    for (i = 0; i < tries; i++) {
-	int x, y;
-
-	dsf = divvy_rectangle(w, h, k, rs);
-	assert(dsf);
-
-	for (y = 0; y <= 2*h; y++) {
-	    for (x = 0; x <= 2*w; x++) {
-		int miny = y/2 - 1, maxy = y/2;
-		int minx = x/2 - 1, maxx = x/2;
-		int classes[4], tx, ty;
-		for (ty = 0; ty < 2; ty++)
-		    for (tx = 0; tx < 2; tx++) {
-			int cx = minx+tx, cy = miny+ty;
-			if (cx < 0 || cx >= w || cy < 0 || cy >= h)
-			    classes[ty*2+tx] = -1;
-			else
-			    classes[ty*2+tx] = dsf_canonify(dsf, cy*w+cx);
-		    }
-		switch (y%2 * 2 + x%2) {
-		  case 0:	       /* corner */
-		    /*
-		     * Cases for the corner:
-		     *
-		     * 	- if all four surrounding squares belong
-		     * 	  to the same omino, we print a space.
-		     *
-		     * 	- if the top two are the same and the
-		     * 	  bottom two are the same, we print a
-		     * 	  horizontal line.
-		     *
-		     * 	- if the left two are the same and the
-		     * 	  right two are the same, we print a
-		     * 	  vertical line.
-		     *
-		     *  - otherwise, we print a cross.
-		     */
-		    if (classes[0] == classes[1] &&
-			classes[1] == classes[2] &&
-			classes[2] == classes[3])
-			printf(" ");
-		    else if (classes[0] == classes[1] &&
-			     classes[2] == classes[3])
-			printf("-");
-		    else if (classes[0] == classes[2] &&
-			     classes[1] == classes[3])
-			printf("|");
-		    else
-			printf("+");
-		    break;
-		  case 1:	       /* horiz edge */
-		    if (classes[1] == classes[3])
-			printf("  ");
-		    else
-			printf("--");
-		    break;
-		  case 2:	       /* vert edge */
-		    if (classes[2] == classes[3])
-			printf(" ");
-		    else
-			printf("|");
-		    break;
-		  case 3:	       /* square centre */
-		    printf("  ");
-		    break;
-		}
-	    }
-	    printf("\n");
-	}
-	printf("\n");
-	sfree(dsf);
-    }
-
-    printf("%d retries needed for %d successes\n", fail_counter, tries);
-
-    return 0;
-}
-
-#endif

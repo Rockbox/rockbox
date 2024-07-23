@@ -19,7 +19,7 @@ then
 fi
 
 echo "=== POTENTIALLY DANGEROUS OPERATION ==="
-echo "Are you sure you want to remove all files in src/?"
+echo "Are you sure you want to remove all files in src/ and help/?"
 echo -n "If so, type \"yes\" in all caps: "
 read ans
 if [ "YES" == $ans ]
@@ -30,8 +30,9 @@ then
     rm -rf src
     echo "[2/5] Copying new sources"
     mkdir src
-    cp -r "$1"/{*.c,*.h,*.R,*.but,LICENCE,README} src
+    cp -r "$1"/{*.c,*.h,*.but,LICENCE,README,CMakeLists.txt} src
     echo "[3/5] Regenerating help"
+    rm -rf help
     ./genhelp.sh
 
     echo "[4/5] Staging for commit"

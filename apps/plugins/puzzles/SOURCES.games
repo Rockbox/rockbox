@@ -16,6 +16,7 @@ src/lightup.c
 src/magnets.c
 src/map.c
 src/mines.c
+src/mosaic.c
 src/net.c
 src/netslide.c
 src/palisade.c
@@ -37,7 +38,8 @@ src/unequal.c
 src/unruly.c
 src/untangle.c
 
-/* disabled for now (fix puzzles.make and CATEGORIES to accomodate these) */
+/* Disabled for now. Fix puzzles.make and CATEGORIES to accomodate these. */
+/* The help system would also need to be patched to compile these. */
 /*src/unfinished/group.c*/
 /*src/unfinished/separate.c*/
 /*src/unfinished/slide.c*/

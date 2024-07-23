@@ -16,7 +16,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -68,16 +72,6 @@ static char *encode_params(const game_params *params, bool full)
     return dupstr("FIXME");
 }
 
-static config_item *game_configure(const game_params *params)
-{
-    return NULL;
-}
-
-static game_params *custom_params(const config_item *cfg)
-{
-    return NULL;
-}
-
 static const char *validate_params(const game_params *params, bool full)
 {
     return NULL;
@@ -118,37 +112,12 @@ static void free_game(game_state *state)
     sfree(state);
 }
 
-static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, const char **error)
-{
-    return NULL;
-}
-
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 static game_ui *new_ui(const game_state *state)
 {
     return NULL;
 }
 
 static void free_ui(game_ui *ui)
-{
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
 {
 }
 
@@ -179,7 +148,7 @@ static game_state *execute_move(const game_state *state, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     *x = *y = 10 * tilesize;	       /* FIXME */
 }
@@ -220,14 +189,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                         int dir, const game_ui *ui,
                         float animtime, float flashtime)
 {
-    /*
-     * The initial contents of the window are not guaranteed and
-     * can vary with front ends. To be on the safe side, all games
-     * should start by drawing a big background-colour rectangle
-     * covering the whole window.
-     */
-    draw_rect(dr, 0, 0, 10*ds->tilesize, 10*ds->tilesize, COL_BACKGROUND);
-    draw_update(dr, 0, 0, 10*ds->tilesize, 10*ds->tilesize);
 }
 
 static float game_anim_length(const game_state *oldstate,
@@ -255,19 +216,6 @@ static int game_status(const game_state *state)
     return 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame nullgame
 #endif
@@ -280,21 +228,23 @@ const struct game thegame = {
     encode_params,
     free_params,
     dup_params,
-    false, game_configure, custom_params,
+    false, NULL, NULL, /* configure, custom_params */
     validate_params,
     new_game_desc,
     validate_desc,
     new_game,
     dup_game,
     free_game,
-    false, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, /* solve */
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     20 /* FIXME */, game_compute_size, game_set_size,
@@ -306,8 +256,8 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     false,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };

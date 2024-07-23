@@ -563,7 +563,7 @@ void latin_solver_free_scratch(struct latin_solver_scratch *scratch)
     sfree(scratch);
 }
 
-void latin_solver_alloc(struct latin_solver *solver, digit *grid, int o)
+bool latin_solver_alloc(struct latin_solver *solver, digit *grid, int o)
 {
     int x, y;
 
@@ -577,14 +577,23 @@ void latin_solver_alloc(struct latin_solver *solver, digit *grid, int o)
     memset(solver->row, 0, o*o);
     memset(solver->col, 0, o*o);
 
-    for (x = 0; x < o; x++)
-	for (y = 0; y < o; y++)
-	    if (grid[y*o+x])
-		latin_solver_place(solver, x, y, grid[y*o+x]);
-
 #ifdef STANDALONE_SOLVER
     solver->names = NULL;
 #endif
+
+    for (x = 0; x < o; x++) {
+	for (y = 0; y < o; y++) {
+            int n = grid[y*o+x];
+            if (n) {
+                if (cube(x, y, n))
+                    latin_solver_place(solver, x, y, n);
+                else
+                    return false;      /* puzzle is already inconsistent */
+            }
+        }
+    }
+
+    return true;
 }
 
 void latin_solver_free(struct latin_solver *solver)
@@ -810,15 +819,17 @@ static int latin_solver_recurse
 	    } else {
 		newctx = ctx;
 	    }
-	    latin_solver_alloc(&subsolver, outgrid, o);
 #ifdef STANDALONE_SOLVER
 	    subsolver.names = solver->names;
 #endif
-            ret = latin_solver_top(&subsolver, diff_recursive,
-				   diff_simple, diff_set_0, diff_set_1,
-				   diff_forcing, diff_recursive,
-				   usersolvers, valid, newctx,
-                                   ctxnew, ctxfree);
+	    if (latin_solver_alloc(&subsolver, outgrid, o))
+                ret = latin_solver_top(&subsolver, diff_recursive,
+                                       diff_simple, diff_set_0, diff_set_1,
+                                       diff_forcing, diff_recursive,
+                                       usersolvers, valid, newctx,
+                                       ctxnew, ctxfree);
+            else
+                ret = diff_impossible;
 	    latin_solver_free(&subsolver);
 	    if (ctxnew)
 		ctxfree(newctx);
@@ -1059,11 +1070,13 @@ int latin_solver(digit *grid, int o, int maxdiff,
     struct latin_solver solver;
     int diff;
 
-    latin_solver_alloc(&solver, grid, o);
-    diff = latin_solver_main(&solver, maxdiff,
-			     diff_simple, diff_set_0, diff_set_1,
-			     diff_forcing, diff_recursive,
-			     usersolvers, valid, ctx, ctxnew, ctxfree);
+    if (latin_solver_alloc(&solver, grid, o))
+        diff = latin_solver_main(&solver, maxdiff,
+                                 diff_simple, diff_set_0, diff_set_1,
+                                 diff_forcing, diff_recursive,
+                                 usersolvers, valid, ctx, ctxnew, ctxfree);
+    else
+        diff = diff_impossible;
     latin_solver_free(&solver);
     return diff;
 }
@@ -1297,122 +1310,5 @@ bool latin_check(digit *sq, int order)
 
     return ret;
 }
-
-
-/* --------------------------------------------------------
- * Testing (and printing).
- */
-
-#ifdef STANDALONE_LATIN_TEST
-
-#include <stdio.h>
-#include <time.h>
-
-const char *quis;
-
-static void latin_print(digit *sq, int order)
-{
-    int x, y;
-
-    for (y = 0; y < order; y++) {
-	for (x = 0; x < order; x++) {
-	    printf("%2u ", ELT(sq, x, y));
-	}
-	printf("\n");
-    }
-    printf("\n");
-}
-
-static void gen(int order, random_state *rs, int debug)
-{
-    digit *sq;
-
-    solver_show_working = debug;
-
-    sq = latin_generate(order, rs);
-    latin_print(sq, order);
-    if (latin_check(sq, order)) {
-	fprintf(stderr, "Square is not a latin square!");
-	exit(1);
-    }
-
-    sfree(sq);
-}
-
-void test_soak(int order, random_state *rs)
-{
-    digit *sq;
-    int n = 0;
-    time_t tt_start, tt_now, tt_last;
-
-    solver_show_working = 0;
-    tt_now = tt_start = time(NULL);
-
-    while(1) {
-        sq = latin_generate(order, rs);
-        sfree(sq);
-        n++;
-
-        tt_last = time(NULL);
-        if (tt_last > tt_now) {
-            tt_now = tt_last;
-            printf("%d total, %3.1f/s\n", n,
-                   (double)n / (double)(tt_now - tt_start));
-        }
-    }
-}
-
-void usage_exit(const char *msg)
-{
-    if (msg)
-        fprintf(stderr, "%s: %s\n", quis, msg);
-    fprintf(stderr, "Usage: %s [--seed SEED] --soak <params> | [game_id [game_id ...]]\n", quis);
-    exit(1);
-}
-
-int main(int argc, char *argv[])
-{
-    int i, soak = 0;
-    random_state *rs;
-    time_t seed = time(NULL);
-
-    quis = argv[0];
-    while (--argc > 0) {
-	const char *p = *++argv;
-	if (!strcmp(p, "--soak"))
-	    soak = 1;
-	else if (!strcmp(p, "--seed")) {
-	    if (argc == 0)
-		usage_exit("--seed needs an argument");
-	    seed = (time_t)atoi(*++argv);
-	    argc--;
-	} else if (*p == '-')
-		usage_exit("unrecognised option");
-	else
-	    break; /* finished options */
-    }
-
-    rs = random_new((void*)&seed, sizeof(time_t));
-
-    if (soak == 1) {
-	if (argc != 1) usage_exit("only one argument for --soak");
-	test_soak(atoi(*argv), rs);
-    } else {
-	if (argc > 0) {
-	    for (i = 0; i < argc; i++) {
-		gen(atoi(*argv++), rs, 1);
-	    }
-	} else {
-	    while (1) {
-		i = random_upto(rs, 20) + 1;
-		gen(i, rs, 0);
-	    }
-	}
-    }
-    random_free(rs);
-    return 0;
-}
-
-#endif
 
 /* vim: set shiftwidth=4 tabstop=8: */

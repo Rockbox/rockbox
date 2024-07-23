@@ -7,7 +7,12 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#include <limits.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -138,6 +143,8 @@ static const char *validate_params(const game_params *params, bool full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and height must both be at least two";
+    if (params->w > INT_MAX / params->h)
+        return "Width times height must not be unreasonably large";
 
     return NULL;
 }
@@ -156,6 +163,14 @@ static int perm_parity(int *perm, int n)
     return ret;
 }
 
+static int is_completed(int *tiles, int n) {
+    int p;
+    for (p = 0; p < n; p++)
+        if (tiles[p] != (p < n-1 ? p+1 : 0))
+            return 0;
+    return 1;
+}
+
 static char *new_game_desc(const game_params *params, random_state *rs,
 			   char **aux, bool interactive)
 {
@@ -171,81 +186,83 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     tiles = snewn(n, int);
     used = snewn(n, bool);
 
-    for (i = 0; i < n; i++) {
-        tiles[i] = -1;
-        used[i] = false;
-    }
+    do {
+        for (i = 0; i < n; i++) {
+            tiles[i] = -1;
+            used[i] = false;
+        }
 
-    gap = random_upto(rs, n);
-    tiles[gap] = 0;
-    used[0] = true;
+        gap = random_upto(rs, n);
+        tiles[gap] = 0;
+        used[0] = true;
 
-    /*
-     * Place everything else except the last two tiles.
-     */
-    for (x = 0, i = n-1; i > 2; i--) {
-        int k = random_upto(rs, i);
-        int j;
+        /*
+         * Place everything else except the last two tiles.
+         */
+        for (x = 0, i = n - 1; i > 2; i--) {
+            int k = random_upto(rs, i);
+            int j;
 
-        for (j = 0; j < n; j++)
-            if (!used[j] && (k-- == 0))
-                break;
+            for (j = 0; j < n; j++)
+                if (!used[j] && (k-- == 0))
+                    break;
 
-        assert(j < n && !used[j]);
-        used[j] = true;
+            assert(j < n && !used[j]);
+            used[j] = true;
 
+            while (tiles[x] >= 0)
+                x++;
+            assert(x < n);
+            tiles[x] = j;
+        }
+
+        /*
+         * Find the last two locations, and the last two pieces.
+         */
         while (tiles[x] >= 0)
             x++;
         assert(x < n);
-        tiles[x] = j;
-    }
-
-    /*
-     * Find the last two locations, and the last two pieces.
-     */
-    while (tiles[x] >= 0)
+        x1 = x;
         x++;
-    assert(x < n);
-    x1 = x;
-    x++;
-    while (tiles[x] >= 0)
-        x++;
-    assert(x < n);
-    x2 = x;
+        while (tiles[x] >= 0)
+            x++;
+        assert(x < n);
+        x2 = x;
 
-    for (i = 0; i < n; i++)
-        if (!used[i])
-            break;
-    p1 = i;
-    for (i = p1+1; i < n; i++)
-        if (!used[i])
-            break;
-    p2 = i;
+        for (i = 0; i < n; i++)
+            if (!used[i])
+                break;
+        p1 = i;
+        for (i = p1 + 1; i < n; i++)
+            if (!used[i])
+                break;
+        p2 = i;
 
-    /*
-     * Determine the required parity of the overall permutation.
-     * This is the XOR of:
-     * 
-     * 	- The chessboard parity ((x^y)&1) of the gap square. The
-     * 	  bottom right counts as even.
-     * 
-     *  - The parity of n. (The target permutation is 1,...,n-1,0
-     *    rather than 0,...,n-1; this is a cyclic permutation of
-     *    the starting point and hence is odd iff n is even.)
-     */
-    parity = PARITY_P(params, gap);
+        /*
+         * Determine the required parity of the overall permutation.
+         * This is the XOR of:
+         *
+         * 	- The chessboard parity ((x^y)&1) of the gap square. The
+         * 	  bottom right counts as even.
+         *
+         *  - The parity of n. (The target permutation is 1,...,n-1,0
+         *    rather than 0,...,n-1; this is a cyclic permutation of
+         *    the starting point and hence is odd iff n is even.)
+         */
+        parity = PARITY_P(params, gap);
 
-    /*
-     * Try the last two tiles one way round. If that fails, swap
-     * them.
-     */
-    tiles[x1] = p1;
-    tiles[x2] = p2;
-    if (perm_parity(tiles, n) != parity) {
-        tiles[x1] = p2;
-        tiles[x2] = p1;
-        assert(perm_parity(tiles, n) == parity);
-    }
+        /*
+         * Try the last two tiles one way round. If that fails, swap
+         * them.
+         */
+        tiles[x1] = p1;
+        tiles[x2] = p2;
+        if (perm_parity(tiles, n) != parity) {
+            tiles[x1] = p2;
+            tiles[x2] = p1;
+            assert(perm_parity(tiles, n) == parity);
+        }
+    } while (is_completed(tiles, n));
 
     /*
      * Now construct the game description, by describing the tile
@@ -432,22 +449,68 @@ static char *game_text_format(const game_state *state)
     return ret;
 }
 
+struct game_ui {
+    /*
+     * User-preference option: invert the direction of arrow-key
+     * control, so that the arrow on the key you press indicates in
+     * which direction you want the _space_ to move, rather than in
+     * which direction you want a tile to move to fill the space.
+     */
+    bool invert_cursor;
+};
+
+static void legacy_prefs_override(struct game_ui *ui_out)
+{
+    static bool initialised = false;
+    static int invert_cursor = -1;
+
+    if (!initialised) {
+        initialised = true;
+        invert_cursor = getenv_bool("FIFTEEN_INVERT_CURSOR", -1);
+    }
+
+    if (invert_cursor != -1)
+        ui_out->invert_cursor = invert_cursor;
+}
+
 static game_ui *new_ui(const game_state *state)
 {
-    return NULL;
+    struct game_ui *ui = snew(struct game_ui);
+
+    ui->invert_cursor = false;
+
+    legacy_prefs_override(ui);
+
+    return ui;
+}
+
+static config_item *get_prefs(game_ui *ui)
+{
+    config_item *ret;
+
+    ret = snewn(2, config_item);
+
+    ret[0].name = "Sense of arrow keys";
+    ret[0].kw = "arrow-semantics";
+    ret[0].type = C_CHOICES;
+    ret[0].u.choices.choicenames = ":Move the tile:Move the gap";
+    ret[0].u.choices.choicekws = ":tile:gap";
+    ret[0].u.choices.selected = ui->invert_cursor;
+
+    ret[1].name = NULL;
+    ret[1].type = C_END;
+
+    return ret;
+}
+
+static void set_prefs(game_ui *ui, const config_item *cfg)
+{
+    ui->invert_cursor = cfg[0].u.choices.selected;
 }
 
 static void free_ui(game_ui *ui)
 {
-}
-
-static char *encode_ui(const game_ui *ui)
-{
-    return NULL;
-}
-
-static void decode_ui(game_ui *ui, const char *encoding)
-{
+    sfree(ui);
 }
 
 static void game_changed_state(game_ui *ui, const game_state *oldstate,
@@ -692,28 +755,23 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     int cy = Y(state, state->gap_pos), ny = cy;
     char buf[80];
 
-    button &= ~MOD_MASK;
+    button = STRIP_BUTTON_MODIFIERS(button);
 
     if (button == LEFT_BUTTON) {
         nx = FROMCOORD(x);
         ny = FROMCOORD(y);
         if (nx < 0 || nx >= state->w || ny < 0 || ny >= state->h)
-            return NULL;               /* out of bounds */
+            return MOVE_UNUSED;               /* out of bounds */
     } else if (IS_CURSOR_MOVE(button)) {
-        static int invert_cursor = -1;
-        if (invert_cursor == -1) {
-            char *env = getenv("FIFTEEN_INVERT_CURSOR");
-            invert_cursor = (env && (env[0] == 'y' || env[0] == 'Y'));
-        }
         button = flip_cursor(button); /* the default */
-        if (invert_cursor)
+        if (ui->invert_cursor)
             button = flip_cursor(button); /* undoes the first flip */
-	move_cursor(button, &nx, &ny, state->w, state->h, false);
+        move_cursor(button, &nx, &ny, state->w, state->h, false, NULL);
     } else if ((button == 'h' || button == 'H') && !state->completed) {
         if (!compute_hint(state, &nx, &ny))
-            return NULL; /* shouldn't happen, since ^^we^^checked^^ */
+            return MOVE_NO_EFFECT;/* shouldn't happen, since ^^we^^checked^^ */
     } else
-        return NULL;                   /* no move */
+        return MOVE_UNUSED;                   /* no move */
 
     /*
      * Any click location should be equal to the gap location
@@ -724,7 +782,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	return dupstr(buf);
     }
 
-    return NULL;
+    return MOVE_NO_EFFECT;
 }
 
 static game_state *execute_move(const game_state *from, const char *move)
@@ -786,11 +844,8 @@ static game_state *execute_move(const game_state *from, const char *move)
     /*
      * See if the game has been completed.
      */
-    if (!ret->completed) {
+    if (!ret->completed && is_completed(ret->tiles, ret->n)) {
         ret->completed = ret->movecount;
-        for (p = 0; p < ret->n; p++)
-            if (ret->tiles[p] != (p < ret->n-1 ? p+1 : 0))
-                ret->completed = 0;
     }
 
     return ret;
@@ -801,7 +856,7 @@ static game_state *execute_move(const game_state *from, const char *move)
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Ick: fake up `ds->tilesize' for macro expansion purposes */
     struct { int tilesize; } ads, *ds = &ads;
@@ -903,13 +958,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 
     if (!ds->started) {
         int coords[10];
-
-	draw_rect(dr, 0, 0,
-		  TILE_SIZE * state->w + 2 * BORDER,
-		  TILE_SIZE * state->h + 2 * BORDER, COL_BACKGROUND);
-	draw_update(dr, 0, 0,
-		    TILE_SIZE * state->w + 2 * BORDER,
-		    TILE_SIZE * state->h + 2 * BORDER);
 
         /*
          * Recessed area containing the whole puzzle.
@@ -1077,19 +1125,6 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame fifteen
 #endif
@@ -1111,12 +1146,14 @@ const struct game thegame = {
     free_game,
     true, solve_game,
     true, game_can_format_as_text_now, game_text_format,
+    get_prefs, set_prefs,
     new_ui,
     free_ui,
-    encode_ui,
-    decode_ui,
+    NULL, /* encode_ui */
+    NULL, /* decode_ui */
     NULL, /* game_request_keys */
     game_changed_state,
+    NULL, /* current_key_label */
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1128,9 +1165,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     0,				       /* flags */
 };
 

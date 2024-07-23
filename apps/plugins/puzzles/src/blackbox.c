@@ -7,7 +7,11 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <math.h>
+#ifdef NO_TGMATH_H
+#  include <math.h>
+#else
+#  include <tgmath.h>
+#endif
 
 #include "puzzles.h"
 
@@ -192,12 +196,14 @@ static const char *validate_params(const game_params *params, bool full)
      * types, and could be worked around if required. */
     if (params->w > 255 || params->h > 255)
         return "Widths and heights greater than 255 are not supported";
+    if (params->minballs < 0)
+        return "Negative number of balls";
+    if (params->minballs < 1)
+        return "Number of balls must be at least one";
     if (params->minballs > params->maxballs)
         return "Minimum number of balls may not be greater than maximum";
     if (params->minballs >= params->w * params->h)
         return "Too many balls to fit in grid";
-    if (params->minballs < 1)
-        return "Number of balls must be at least one";
     return NULL;
 }
 
@@ -307,7 +313,7 @@ struct game_state {
 
 #define GRID(s,x,y) ((s)->grid[(y)*((s)->w+2) + (x)])
 
-#define RANGECHECK(s,x) ((x) >= 0 && (x) <= (s)->nlasers)
+#define RANGECHECK(s,x) ((x) >= 0 && (x) < (s)->nlasers)
 
 /* specify numbers because they must match array indexes. */
 enum { DIR_UP = 0, DIR_RIGHT = 1, DIR_DOWN = 2, DIR_LEFT = 3 };
@@ -468,16 +474,6 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr("S");
 }
 
-static bool game_can_format_as_text_now(const game_params *params)
-{
-    return true;
-}
-
-static char *game_text_format(const game_state *state)
-{
-    return NULL;
-}
-
 struct game_ui {
     int flash_laserno;
     int errors;
@@ -495,7 +491,7 @@ static game_ui *new_ui(const game_state *state)
     ui->newmove = false;
 
     ui->cur_x = ui->cur_y = 1;
-    ui->cur_visible = false;
+    ui->cur_visible = getenv_bool("PUZZLES_SHOW_CURSOR", false);
 
     ui->flash_laser = 0;
 
@@ -517,7 +513,8 @@ static char *encode_ui(const game_ui *ui)
     return dupstr(buf);
 }
 
-static void decode_ui(game_ui *ui, const char *encoding)
+static void decode_ui(game_ui *ui, const char *encoding,
+                      const game_state *state)
 {
     sscanf(encoding, "E%d", &ui->errors);
 }
@@ -532,6 +529,41 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
     if (newstate->justwrong && ui->newmove)
 	ui->errors++;
     ui->newmove = false;
+}
+
+static const char *current_key_label(const game_ui *ui,
+                                     const game_state *state, int button)
+{
+    if (IS_CURSOR_SELECT(button) && ui->cur_visible && !state->reveal) {
+        int gx = ui->cur_x, gy = ui->cur_y, rangeno = -1;
+        if (gx == 0 && gy == 0 && button == CURSOR_SELECT) return "Check";
+        if (gx >= 1 && gx <= state->w && gy >= 1 && gy <= state->h) {
+            /* Cursor somewhere in the arena. */
+            if (button == CURSOR_SELECT && !(GRID(state, gx,gy) & BALL_LOCK))
+                return (GRID(state, gx, gy) & BALL_GUESS) ? "Clear" : "Ball";
+            if (button == CURSOR_SELECT2)
+                return (GRID(state, gx, gy) & BALL_LOCK) ? "Unlock" : "Lock";
+        }
+        if (grid2range(state, gx, gy, &rangeno)) {
+            if (button == CURSOR_SELECT &&
+                state->exits[rangeno] == LASER_EMPTY)
+                return "Fire";
+            if (button == CURSOR_SELECT2) {
+                int n = 0;
+                /* Row or column lock or unlock. */
+                if (gy == 0 || gy > state->h) { /* Column lock */
+                    for (gy = 1; gy <= state->h; gy++)
+                        n += !!(GRID(state, gx, gy) & BALL_LOCK);
+                    return n > state->h/2 ? "Unlock" : "Lock";
+                } else { /* Row lock */
+                    for (gx = 1; gx <= state->w; gx++)
+                        n += !!(GRID(state, gx, gy) & BALL_LOCK);
+                    return n > state->w/2 ? "Unlock" : "Lock";
+                }
+            }
+        }
+    }
+    return "";
 }
 
 #define OFFSET(gx,gy,o) do {                                    \
@@ -875,7 +907,7 @@ done:
 #define TILE_SIZE (ds->tilesize)
 
 #define TODRAW(x) ((TILE_SIZE * (x)) + (TILE_SIZE / 2))
-#define FROMDRAW(x) (((x) - (TILE_SIZE / 2)) / TILE_SIZE)
+#define FROMDRAW(x) (((x) + (TILE_SIZE / 2)) / TILE_SIZE - 1)
 
 #define CAN_REVEAL(state) ((state)->nguesses >= (state)->minballs && \
 			   (state)->nguesses <= (state)->maxballs && \
@@ -900,7 +932,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (IS_CURSOR_MOVE(button)) {
         int cx = ui->cur_x, cy = ui->cur_y;
 
-        move_cursor(button, &cx, &cy, state->w+2, state->h+2, false);
+        move_cursor(button, &cx, &cy, state->w+2, state->h+2, false, NULL);
         if ((cx == 0 && cy == 0 && !CAN_REVEAL(state)) ||
             (cx == 0 && cy == state->h+1) ||
             (cx == state->w+1 && cy == 0) ||
@@ -909,7 +941,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cur_x = cx;
         ui->cur_y = cy;
         ui->cur_visible = true;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
@@ -919,7 +951,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         wouldflash = 1;
     } else if (button == LEFT_RELEASE) {
         ui->flash_laser = 0;
-        return UI_UPDATE;
+        return MOVE_UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         if (ui->cur_visible) {
             gx = ui->cur_x;
@@ -928,7 +960,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             wouldflash = 2;
         } else {
             ui->cur_visible = true;
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         }
         /* Fix up 'button' for the below logic. */
         if (button == CURSOR_SELECT2) button = RIGHT_BUTTON;
@@ -977,9 +1009,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    return nullret;
         ui->flash_laserno = rangeno;
         ui->flash_laser = wouldflash;
-        nullret = UI_UPDATE;
+        nullret = MOVE_UI_UPDATE;
         if (state->exits[rangeno] != LASER_EMPTY)
-            return UI_UPDATE;
+            return MOVE_UI_UPDATE;
         sprintf(buf, "F%d", rangeno);
         break;
 
@@ -1034,9 +1066,9 @@ static game_state *execute_move(const game_state *from, const char *move)
 
     case 'F':
         sscanf(move+1, "%d", &rangeno);
-        if (ret->exits[rangeno] != LASER_EMPTY)
-            goto badmove;
         if (!RANGECHECK(ret, rangeno))
+            goto badmove;
+        if (ret->exits[rangeno] != LASER_EMPTY)
             goto badmove;
         fire_laser(ret, rangeno);
         break;
@@ -1119,7 +1151,7 @@ static void game_get_cursor_location(const game_ui *ui,
  */
 
 static void game_compute_size(const game_params *params, int tilesize,
-                              int *x, int *y)
+                              const game_ui *ui, int *x, int *y)
 {
     /* Border is ts/2, to make things easier.
      * Thus we have (width) + 2 (firing range*2) + 1 (border*2) tiles
@@ -1379,10 +1411,6 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         int x0 = TODRAW(0)-1, y0 = TODRAW(0)-1;
         int x1 = TODRAW(state->w+2), y1 = TODRAW(state->h+2);
 
-        draw_rect(dr, 0, 0,
-                  TILE_SIZE * (state->w+3), TILE_SIZE * (state->h+3),
-                  COL_BACKGROUND);
-
         /* clockwise around the outline starting at pt behind (1,1). */
         draw_line(dr, x0+ts, y0+ts, x0+ts, y0,    COL_HIGHLIGHT);
         draw_line(dr, x0+ts, y0,    x1-ts, y0,    COL_HIGHLIGHT);
@@ -1429,14 +1457,14 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         int outline = (ui->cur_visible && ui->cur_x == 0 && ui->cur_y == 0)
             ? COL_CURSOR : COL_BALL;
         clip(dr, TODRAW(0)-1, TODRAW(0)-1, TILE_SIZE+1, TILE_SIZE+1);
-        draw_circle(dr, TODRAW(0) + ds->crad, TODRAW(0) + ds->crad, ds->crad,
+        draw_circle(dr, TODRAW(0) + ds->crad-1, TODRAW(0) + ds->crad-1, ds->crad-1,
                     outline, outline);
-        draw_circle(dr, TODRAW(0) + ds->crad, TODRAW(0) + ds->crad, ds->crad-2,
+        draw_circle(dr, TODRAW(0) + ds->crad-1, TODRAW(0) + ds->crad-1, ds->crad-3,
                     COL_BUTTON, COL_BUTTON);
 	unclip(dr);
     } else {
         draw_rect(dr, TODRAW(0)-1, TODRAW(0)-1,
-		  TILE_SIZE+1, TILE_SIZE+1, COL_BACKGROUND);
+		  TILE_SIZE, TILE_SIZE, COL_BACKGROUND);
     }
     draw_update(dr, TODRAW(0), TODRAW(0), TILE_SIZE, TILE_SIZE);
     ds->reveal = state->reveal;
@@ -1509,19 +1537,6 @@ static int game_status(const game_state *state)
     return 0;
 }
 
-static bool game_timing_state(const game_state *state, game_ui *ui)
-{
-    return true;
-}
-
-static void game_print_size(const game_params *params, float *x, float *y)
-{
-}
-
-static void game_print(drawing *dr, const game_state *state, int tilesize)
-{
-}
-
 #ifdef COMBINED
 #define thegame blackbox
 #endif
@@ -1542,13 +1557,15 @@ const struct game thegame = {
     dup_game,
     free_game,
     true, solve_game,
-    false, game_can_format_as_text_now, game_text_format,
+    false, NULL, NULL, /* can_format_as_text_now, text_format */
+    NULL, NULL, /* get_prefs, set_prefs */
     new_ui,
     free_ui,
     encode_ui,
     decode_ui,
     NULL, /* game_request_keys */
     game_changed_state,
+    current_key_label,
     interpret_move,
     execute_move,
     PREFERRED_TILE_SIZE, game_compute_size, game_set_size,
@@ -1560,9 +1577,9 @@ const struct game thegame = {
     game_flash_length,
     game_get_cursor_location,
     game_status,
-    false, false, game_print_size, game_print,
+    false, false, NULL, NULL,          /* print_size, print */
     true,			       /* wants_statusbar */
-    false, game_timing_state,
+    false, NULL,                       /* timing_state */
     REQUIRE_RBUTTON,		       /* flags */
 };
 
