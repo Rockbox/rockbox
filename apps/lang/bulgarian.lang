@@ -4929,7 +4929,7 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
@@ -5946,8 +5946,8 @@
   </source>
   <dest>
     *: "вгр:"
-    hibylinux: "mSD:"
-    xduoox3: "MSD1:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Вградена памет"
@@ -5968,10 +5968,10 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
@@ -12510,7 +12510,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Moving track"
+    *: "Преместване на запис"
   </voice>
 </phrase>
 <phrase>
@@ -16213,10 +16213,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Средно"
   </dest>
   <voice>
-    *: "Medium"
+    *: "Средно"
   </voice>
 </phrase>
 <phrase>
@@ -16227,10 +16227,10 @@
     *: "Hard"
   </source>
   <dest>
-    *: "Hard"
+    *: "Трудно"
   </dest>
   <voice>
-    *: "Hard"
+    *: "Трудно"
   </voice>
 </phrase>
 <phrase>
@@ -16241,10 +16241,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "Експертно"
   </dest>
   <voice>
-    *: "Expert"
+    *: "Експертно"
   </voice>
 </phrase>
 <phrase>
@@ -16255,10 +16255,10 @@
     *: "Stereo Switch Mode"
   </source>
   <dest>
-    *: "Stereo Switch Mode"
+    *: "Разменяне на стерео"
   </dest>
   <voice>
-    *: "Stereo Switch Mode"
+    *: "Разменяне на стерео"
   </voice>
 </phrase>
 <phrase>
@@ -16269,10 +16269,10 @@
     *: "Reverse"
   </source>
   <dest>
-    *: "Reverse"
+    *: "Обърнато"
   </dest>
   <voice>
-    *: "Reverse"
+    *: "Обърнато"
   </voice>
 </phrase>
 <phrase>
@@ -16283,10 +16283,10 @@
     *: "Always 0"
   </source>
   <dest>
-    *: "Always 0"
+    *: "Винаги 0"
   </dest>
   <voice>
-    *: "Always 0"
+    *: "Винаги 0"
   </voice>
 </phrase>
 <phrase>
@@ -16297,10 +16297,10 @@
     *: "Always 1"
   </source>
   <dest>
-    *: "Always 1"
+    *: "Винаги 1"
   </dest>
   <voice>
-    *: "Always 1"
+    *: "Винаги 1"
   </voice>
 </phrase>
 <phrase>
@@ -16311,10 +16311,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "Legal Notices"
+    *: "Правни бележки"
   </dest>
   <voice>
-    *: "Legal Notices"
+    *: "Правни бележки"
   </voice>
 </phrase>
 <phrase>
@@ -16325,10 +16325,10 @@
     *: "Error: %s"
   </source>
   <dest>
-    *: "Error: %s"
+    *: "Грешка: %s"
   </dest>
   <voice>
-    *: "Error"
+    *: "Грешка"
   </voice>
 </phrase>
 <phrase>
@@ -16339,10 +16339,10 @@
     *: "Mikmod Settings"
   </source>
   <dest>
-    *: "Mikmod Settings"
+    *: "Настройки на Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Settings"
+    *: "Настройки на Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16353,10 +16353,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Mikmod Menu"
+    *: "Меню на Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Menu"
+    *: "Меню на Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16367,10 +16367,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Меню на Chessbox"
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Меню на Chess box"
   </voice>
 </phrase>
 <phrase>
@@ -16384,7 +16384,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Invalid Voice File"
+    *: "Невалиден гласов файл"
   </voice>
 </phrase>
 <phrase>
