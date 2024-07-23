@@ -843,7 +843,7 @@ androidcc () {
             endian="little"
             gcctarget="i686-linux-android-"
             echo "${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
-            ${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
+            ${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
             if [ ${?} != 0 ]; then
                 exit
             fi
