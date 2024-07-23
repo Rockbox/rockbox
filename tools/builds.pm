@@ -606,6 +606,17 @@ sub simbuilds {
         'enabled' => 1,
     },
     # Everything else in alphabetical order
+    'bulgarian' => {
+	'lang' => 'bulgarian',
+	'name' => 'Български (Bulgarian)',
+        'short' => 'bg',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vbg',
+	    'gtts' => '-l bg',
+	},
+        'enabled' => 1,
+    },
     'chinese-simp' => {  # Mandarin?
 	'lang' => 'chinese-simp',
 	'name' => '简体中文 (Chinese Simplified)',
@@ -743,7 +754,7 @@ sub simbuilds {
     'korean' => {  #
 	'lang' => 'korean',
 	'name' => '한국어 (Korean)',
-        'short' => 'ko_KR',
+        'short' => 'ko',
         'defengine' => 'espeak',
 	'engines' => {
 	    'espeak' => '-vko',

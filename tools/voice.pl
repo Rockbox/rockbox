@@ -87,6 +87,7 @@ my %festival_lang_map = (
 
 my %gtts_lang_map = (
     'english' => '-l en -t co.uk',  # Always first, it's the golden master
+    'bulgarian' => 'l bg',
     'chinese-simp' => '-l zh',
     'czech' => '-l cs',
     'dansk' => '-l da',
@@ -111,6 +112,7 @@ my %gtts_lang_map = (
 
 my %espeak_lang_map = (
     'english' => '-ven-gb -k 5',  # Always first, it's the golden master
+    'bulgarian' => '-vbg',
     'chinese-simp' => '-vzh',
     'czech' => '-vcs',
     'dansk' => '-vda',
@@ -136,6 +138,7 @@ my %espeak_lang_map = (
 
 my %piper_lang_map = (
     'english' => 'en_GB-cori-high.onnx',  # Always first, it's the golden master
+#    'bulgarian' => '-vbg',
     'chinese-simp' => 'zh_CN-huayan-medium.onnx',
     'czech' => 'cs_CZ-jirka-medium.onnx',
     'dansk' => 'da_DK-talesyntese-medium.onnx',

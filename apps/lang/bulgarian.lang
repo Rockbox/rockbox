@@ -3246,7 +3246,7 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "Уникод (UTF-8)"
   </dest>
   <voice>
     *: "Уникод (UTF-8)"
@@ -16202,7 +16202,7 @@
     *: "Лесно"
   </dest>
   <voice>
-    *: ""
+    *: "Лесно"
   </voice>
 </phrase>
 <phrase>
@@ -16398,7 +16398,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Български"
   </voice>
 </phrase>
 <phrase>
@@ -16409,7 +16409,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
