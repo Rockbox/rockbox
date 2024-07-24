@@ -54,6 +54,8 @@
 
 #define RB_ROOT_VOL_HIDDEN(v)   (IF_MV_VOL(v) == 0)
 #define RB_ROOT_CONTENTS_DIR    "/" IF_MV("<0>")
+#define REC_BASE_DIR        HOME_DIR "Recordings"
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "Playlists"
 
 #else /* APPLICATION */
 
@@ -67,13 +69,11 @@
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 #endif
 
+#define REC_BASE_DIR        HOME_DIR "/Recordings"]
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
 #endif /* !APPLICATION || SAMSUNG_YPR0 */
 
-#define REC_BASE_DIR        HOME_DIR "/Recordings"
-#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
-
 #define LANG_DIR            ROCKBOX_DIR "/langs"
-
 #define PLUGIN_GAMES_DIR    PLUGIN_DIR "/games"
 #define PLUGIN_APPS_DIR     PLUGIN_DIR "/apps"
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
