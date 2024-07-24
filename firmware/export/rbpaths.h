@@ -69,7 +69,7 @@
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 #endif
 
-#define REC_BASE_DIR        HOME_DIR "/Recordings"]
+#define REC_BASE_DIR        HOME_DIR "/Recordings"
 #define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
 #endif /* !APPLICATION || SAMSUNG_YPR0 */
 
