@@ -44,212 +44,190 @@ const int menu_items[] = {
 
 const unsigned char * const * const kibyte_units = &byte_units[1];
 
-enum ePT_SECS {
-    ePT_SECS_TTL = 0,
-    ePT_SECS_BEF,
-    ePT_SECS_AFT,
-    ePT_SECS_COUNT
-};
-
-enum ePT_KBS {
+enum ePT_SUM {
     /* Note: Order matters (voicing order of LANG_PLAYTIME_STORAGE) */
-    ePT_KBS_TTL = 0,
-    ePT_KBS_BEF,
-    ePT_KBS_AFT,
-    ePT_KBS_COUNT
+    ePT_TOTAL = 0,
+    ePT_ELAPSED,
+    ePT_REMAINING,
+
+    ePT_COUNT
 };
 
-/* playing_time screen context */
 struct playing_time_info {
-    int curr_index;         /* index of currently playing track in playlist */
-    int curr_display_index; /* display index of currently playing track in playlist */
-    int nb_tracks;          /* how many tracks in playlist */
-
-    /* seconds total, before, and after current position.  Datatype
-       allows for values up to 68years.  If I had kept it in ms
-       though, it would have overflowed at 24days, which takes
-       something like 8.5GB at 32kbps, and so we could conceivably
-       have playlists lasting longer than that. */
-    long secs[ePT_SECS_COUNT];
-    long trk_secs[ePT_SECS_COUNT];
-
-    /* kilobytes played total, before, and after current pos.
-       Kilobytes because bytes would overflow. Data type range is up
-       to 2TB. */
-    long kbs[ePT_KBS_COUNT];
+    int nb_tracks;          /*                  number of tracks in playlist */
+    int curr_track_index;   /*  index of currently playing track in playlist */
+    int curr_display_index; /*      display index of currently playing track */
+    unsigned long curr_track_length[ePT_COUNT]; /*      current track length */
+    unsigned long long length[ePT_COUNT];       /*      length of all tracks */
+    unsigned long long size[ePT_COUNT];         /*   file size of all tracks */
 };
 
 static char* get_percent_str(long percents)
 {
     static char val[10];
-    rb->snprintf(val, 10, rb->str(LANG_PERCENT_FORMAT), percents);
+    rb->snprintf(val, sizeof(val), rb->str(LANG_PERCENT_FORMAT), percents);
     return val;
 }
 
-static inline void prepare_time_string(char *buf, size_t buffer_len, long elapsed_pct, const char *timestr1, const char *timestr2)
+static inline void prepare_time_string(char *buf, size_t buffer_len,
+                                       long elapsed_pct, const char *timestr1,
+                                       const char *timestr2)
 {
     if (rb->lang_is_rtl())
-    {
         rb->snprintf(buf, buffer_len, "%s %s / %s",
-                get_percent_str(elapsed_pct), timestr2, timestr1);
-    }
+                     get_percent_str(elapsed_pct), timestr2, timestr1);
     else
-    {
         rb->snprintf(buf, buffer_len, "%s / %s %s",
-                timestr1, timestr2, get_percent_str(elapsed_pct));
-    }
+                     timestr1, timestr2, get_percent_str(elapsed_pct));
 }
 
 /* list callback for playing_time screen */
-static const char * playing_time_get_or_speak_info(int selected_item, void * data,
-                                                   char *buf, size_t buffer_len,
-                                                   bool say_it)
+static const char * pt_get_or_speak_info(int selected_item, void * data,
+                                         char *buf, size_t buffer_len,
+                                         bool say_it)
 {
     long elapsed_pct; /* percentage of duration elapsed */
     struct playing_time_info *pti = (struct playing_time_info *)data;
     int info_no = selected_item/2;
     const int menu_name_id = menu_items[info_no];
 
-    if (!(selected_item%2))
-    {/* header */
+    /* header */
+    if (!(selected_item % 2))
         return rb->str(menu_name_id);
-    }
 
+    /* data */
     switch(info_no) {
     case 0: { /* elapsed and total time */
         char timestr1[25], timestr2[25];
         rb->format_time_auto(timestr1, sizeof(timestr1),
-                         pti->secs[ePT_SECS_BEF], UNIT_SEC, true);
+                             pti->length[ePT_ELAPSED], UNIT_SEC, true);
 
         rb->format_time_auto(timestr2, sizeof(timestr2),
-                         pti->secs[ePT_SECS_TTL], UNIT_SEC, true);
+                             pti->length[ePT_TOTAL], UNIT_SEC, true);
 
-        if (pti->secs[ePT_SECS_TTL] == 0)
+        if (pti->length[ePT_TOTAL] == 0)
             elapsed_pct = 0;
-        else if (pti->secs[ePT_SECS_TTL] <= 0xFFFFFF)
+        else if (pti->length[ePT_TOTAL] <= 0xFFFFFF)
         {
-            elapsed_pct = (pti->secs[ePT_SECS_BEF] * 100
-                            / pti->secs[ePT_SECS_TTL]);
+            elapsed_pct = (pti->length[ePT_ELAPSED] * 100
+                           / pti->length[ePT_TOTAL]);
         }
         else /* sacrifice some precision to avoid overflow */
         {
-            elapsed_pct = (pti->secs[ePT_SECS_BEF] >> 7) * 100
-                           / (pti->secs[ePT_SECS_TTL] >> 7);
+            elapsed_pct = (pti->length[ePT_ELAPSED] >> 7) * 100
+                          / (pti->length[ePT_TOTAL] >> 7);
         }
         prepare_time_string(buf, buffer_len, elapsed_pct, timestr1, timestr2);
 
         if (say_it)
             rb_talk_ids(false, menu_name_id,
-                     TALK_ID(pti->secs[ePT_SECS_BEF], UNIT_TIME),
-                     VOICE_OF,
-                     TALK_ID(pti->secs[ePT_SECS_TTL], UNIT_TIME),
-                     VOICE_PAUSE,
-                     TALK_ID(elapsed_pct, UNIT_PERCENT));
+                        TALK_ID(pti->length[ePT_ELAPSED], UNIT_TIME),
+                        VOICE_OF,
+                        TALK_ID(pti->length[ePT_TOTAL], UNIT_TIME),
+                        VOICE_PAUSE,
+                        TALK_ID(elapsed_pct, UNIT_PERCENT));
         break;
     }
     case 1: { /* playlist remaining time */
         char timestr[25];
-        rb->format_time_auto(timestr, sizeof(timestr), pti->secs[ePT_SECS_AFT],
-            UNIT_SEC, false);
+        rb->format_time_auto(timestr, sizeof(timestr),
+                             pti->length[ePT_REMAINING], UNIT_SEC, false);
         rb->snprintf(buf, buffer_len, "%s", timestr);
 
         if (say_it)
-          rb_talk_ids(false, menu_name_id,
-                     TALK_ID(pti->secs[ePT_SECS_AFT], UNIT_TIME));
+            rb_talk_ids(false, menu_name_id,
+                        TALK_ID(pti->length[ePT_REMAINING], UNIT_TIME));
         break;
     }
     case 2: { /* track elapsed and duration */
         char timestr1[25], timestr2[25];
 
-        rb->format_time_auto(timestr1, sizeof(timestr1), pti->trk_secs[ePT_SECS_BEF],
-            UNIT_SEC, true);
-        rb->format_time_auto(timestr2, sizeof(timestr2), pti->trk_secs[ePT_SECS_TTL],
-            UNIT_SEC, true);
+        rb->format_time_auto(timestr1, sizeof(timestr1),
+                             pti->curr_track_length[ePT_ELAPSED], UNIT_SEC, true);
+        rb->format_time_auto(timestr2, sizeof(timestr2),
+                             pti->curr_track_length[ePT_TOTAL], UNIT_SEC, true);
 
-        if (pti->trk_secs[ePT_SECS_TTL] == 0)
+        if (pti->curr_track_length[ePT_TOTAL] == 0)
             elapsed_pct = 0;
-        else if (pti->trk_secs[ePT_SECS_TTL] <= 0xFFFFFF)
+        else if (pti->curr_track_length[ePT_TOTAL] <= 0xFFFFFF)
         {
-            elapsed_pct = (pti->trk_secs[ePT_SECS_BEF] * 100
-                           / pti->trk_secs[ePT_SECS_TTL]);
+            elapsed_pct = (pti->curr_track_length[ePT_ELAPSED] * 100
+                           / pti->curr_track_length[ePT_TOTAL]);
         }
         else /* sacrifice some precision to avoid overflow */
         {
-            elapsed_pct = (pti->trk_secs[ePT_SECS_BEF] >> 7) * 100
-                            / (pti->trk_secs[ePT_SECS_TTL] >> 7);
+            elapsed_pct = (pti->curr_track_length[ePT_ELAPSED] >> 7) * 100
+                          / (pti->curr_track_length[ePT_TOTAL] >> 7);
         }
         prepare_time_string(buf, buffer_len, elapsed_pct, timestr1, timestr2);
 
         if (say_it)
             rb_talk_ids(false, menu_name_id,
-                     TALK_ID(pti->trk_secs[ePT_SECS_BEF], UNIT_TIME),
-                     VOICE_OF,
-                     TALK_ID(pti->trk_secs[ePT_SECS_TTL], UNIT_TIME),
-                     VOICE_PAUSE,
-                     TALK_ID(elapsed_pct, UNIT_PERCENT));
+                        TALK_ID(pti->curr_track_length[ePT_ELAPSED], UNIT_TIME),
+                        VOICE_OF,
+                        TALK_ID(pti->curr_track_length[ePT_TOTAL], UNIT_TIME),
+                        VOICE_PAUSE,
+                        TALK_ID(elapsed_pct, UNIT_PERCENT));
         break;
     }
     case 3: { /* track remaining time */
         char timestr[25];
-        rb->format_time_auto(timestr, sizeof(timestr), pti->trk_secs[ePT_SECS_AFT],
-            UNIT_SEC, false);
+        rb->format_time_auto(timestr, sizeof(timestr),
+                             pti->curr_track_length[ePT_REMAINING], UNIT_SEC, false);
         rb->snprintf(buf, buffer_len, "%s", timestr);
 
         if (say_it)
-          rb_talk_ids(false, menu_name_id,
-                     TALK_ID(pti->trk_secs[ePT_SECS_AFT], UNIT_TIME));
+            rb_talk_ids(false, menu_name_id,
+                        TALK_ID(pti->curr_track_length[ePT_REMAINING], UNIT_TIME));
         break;
     }
     case 4: { /* track index */
         int track_pct = pti->curr_display_index * 100 / pti->nb_tracks;
 
         if (rb->lang_is_rtl())
-        {
-            rb->snprintf(buf, buffer_len, "%s %d / %d",
-                    get_percent_str(track_pct), pti->nb_tracks, pti->curr_display_index);
-        }
+            rb->snprintf(buf, buffer_len, "%s %d / %d", get_percent_str(track_pct),
+                         pti->nb_tracks, pti->curr_display_index);
         else
-        {
-            rb->snprintf(buf, buffer_len, "%d / %d %s",
-                    pti->curr_display_index, pti->nb_tracks, get_percent_str(track_pct));
-        }
+            rb->snprintf(buf, buffer_len, "%d / %d %s", pti->curr_display_index,
+                         pti->nb_tracks, get_percent_str(track_pct));
 
         if (say_it)
-          rb_talk_ids(false, menu_name_id,
-                     TALK_ID(pti->curr_display_index, UNIT_INT),
-                     VOICE_OF,
-                     TALK_ID(pti->nb_tracks, UNIT_INT),
-                     VOICE_PAUSE,
-                     TALK_ID(track_pct, UNIT_PERCENT));
+            rb_talk_ids(false, menu_name_id,
+                        TALK_ID(pti->curr_display_index, UNIT_INT),
+                        VOICE_OF,
+                        TALK_ID(pti->nb_tracks, UNIT_INT),
+                        VOICE_PAUSE,
+                        TALK_ID(track_pct, UNIT_PERCENT));
         break;
     }
     case 5: { /* storage size */
         int i;
-        char kbstr[ePT_KBS_COUNT][20];
+        char kbstr[ePT_COUNT][20];
 
-        for (i = 0; i < ePT_KBS_COUNT; i++) {
+        for (i = 0; i < ePT_COUNT; i++) {
             rb->output_dyn_value(kbstr[i], sizeof(kbstr[i]),
-                             pti->kbs[i], kibyte_units, 3, true);
+                                 pti->size[i], kibyte_units, 3, true);
         }
-        rb->snprintf(buf, buffer_len, "%s (%s / %s)",
-                 kbstr[ePT_KBS_TTL], kbstr[ePT_KBS_BEF],kbstr[ePT_KBS_AFT]);
+        rb->snprintf(buf, buffer_len, "%s (%s / %s)", kbstr[ePT_TOTAL],
+                     kbstr[ePT_ELAPSED], kbstr[ePT_REMAINING]);
 
         if (say_it) {
-            int32_t voice_ids[ePT_KBS_COUNT];
-            voice_ids[ePT_KBS_TTL] = menu_name_id;
-            voice_ids[ePT_KBS_BEF] = VOICE_PLAYTIME_DONE;
-            voice_ids[ePT_KBS_AFT] = LANG_PLAYTIME_REMAINING;
+            int32_t voice_ids[ePT_COUNT];
+            voice_ids[ePT_TOTAL] = menu_name_id;
+            voice_ids[ePT_ELAPSED] = VOICE_PLAYTIME_DONE;
+            voice_ids[ePT_REMAINING] = LANG_PLAYTIME_REMAINING;
 
-            for (i = 0; i < ePT_KBS_COUNT; i++) {
+            for (i = 0; i < ePT_COUNT; i++)
+            {
                 rb_talk_ids(i > 0, VOICE_PAUSE, voice_ids[i]);
-                rb->output_dyn_value(NULL, 0, pti->kbs[i], kibyte_units, 3, true);
+                rb->output_dyn_value(NULL, 0, pti->size[i], kibyte_units, 3, true);
             }
         }
         break;
     }
     case 6: { /* Average track file size */
         char str[20];
-        long avg_track_size = pti->kbs[ePT_KBS_TTL] / pti->nb_tracks;
+        long avg_track_size = pti->size[ePT_TOTAL] / pti->nb_tracks;
         rb->output_dyn_value(str, sizeof(str), avg_track_size, kibyte_units, 3, true);
         rb->snprintf(buf, buffer_len, "%s", str);
 
@@ -261,31 +239,30 @@ static const char * playing_time_get_or_speak_info(int selected_item, void * dat
     }
     case 7: { /* Average bitrate */
         /* Convert power of 2 kilobytes to power of 10 kilobits */
-        long avg_bitrate = (pti->kbs[ePT_KBS_TTL] / pti->secs[ePT_SECS_TTL]
+        long avg_bitrate = (pti->size[ePT_TOTAL] / pti->length[ePT_TOTAL]
                             * 1024 * 8 / 1000);
         rb->snprintf(buf, buffer_len, "%ld  kbps", avg_bitrate);
 
         if (say_it)
-          rb_talk_ids(false, menu_name_id,
-                   TALK_ID(avg_bitrate, UNIT_KBIT));
+            rb_talk_ids(false, menu_name_id,
+                        TALK_ID(avg_bitrate, UNIT_KBIT));
         break;
     }
     }
     return buf;
 }
 
-static const char * playing_time_get_info(int selected_item, void * data,
-                                          char *buffer, size_t buffer_len)
+static const char * pt_get_info(int selected_item, void * data,
+                                char *buffer, size_t buffer_len)
 {
-    return playing_time_get_or_speak_info(selected_item, data,
-                                          buffer, buffer_len, false);
+    return pt_get_or_speak_info(selected_item, data,
+                                buffer, buffer_len, false);
 }
 
-static int playing_time_speak_info(int selected_item, void * data)
+static int pt_speak_info(int selected_item, void * data)
 {
     static char buffer[MAX_PATH];
-    playing_time_get_or_speak_info(selected_item, data,
-                                   buffer, MAX_PATH, true);
+    pt_get_or_speak_info(selected_item, data, buffer, sizeof(buffer), true);
     return 0;
 }
 
@@ -293,25 +270,30 @@ static int playing_time_speak_info(int selected_item, void * data)
    other stats */
 static bool playing_time(void)
 {
-    int error_count = 0;
-    unsigned long talked_tick = *rb->current_tick;
     struct playing_time_info pti;
-    struct playlist_track_info pltrack;
+    struct playlist_track_info pl_track;
     struct mp3entry id3;
-    int i, index;
+    struct mp3entry *curr_id3;
+    struct gui_synclist pt_lists;
+    unsigned long talked_tick = *rb->current_tick;
+    int action, i, index, section, error_count = 0;
 
     pti.nb_tracks = rb->playlist_amount();
-    rb->playlist_get_resume_info(&pti.curr_index);
-    struct mp3entry *curr_id3 = rb->audio_current_track();
-    if (pti.curr_index == -1 || !curr_id3)
+    rb->playlist_get_resume_info(&pti.curr_track_index);
+    curr_id3 = rb->audio_current_track();
+
+    if (pti.curr_track_index == -1 || !curr_id3)
         return false;
+
     pti.curr_display_index = rb->playlist_get_display_index();
 
-    pti.secs[ePT_SECS_BEF] = pti.trk_secs[ePT_SECS_BEF] = curr_id3->elapsed / 1000;
-    pti.secs[ePT_SECS_AFT] = pti.trk_secs[ePT_SECS_AFT]
-        = (curr_id3->length -curr_id3->elapsed) / 1000;
-    pti.kbs[ePT_KBS_BEF] = curr_id3->offset / 1024;
-    pti.kbs[ePT_KBS_AFT] = (curr_id3->filesize -curr_id3->offset) / 1024;
+    pti.length[ePT_ELAPSED] = pti.curr_track_length[ePT_ELAPSED]
+                            = curr_id3->elapsed;
+    pti.length[ePT_REMAINING] = pti.curr_track_length[ePT_REMAINING]
+                              = curr_id3->length - curr_id3->elapsed;
+
+    pti.size[ePT_ELAPSED] = curr_id3->offset;
+    pti.size[ePT_REMAINING] = curr_id3->filesize - curr_id3->offset;
 
     rb->splash_progress_set_delay(HZ/2);
 
@@ -328,15 +310,14 @@ static bool playing_time(void)
         if (index == pti.nb_tracks)
             index = 0;
 
-        /* Show a splash while we are loading. */
         rb->splash_progress(i, pti.nb_tracks, "%s (%s)",
                             rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
 
-        /* Voice equivalent */
-        if (TIME_AFTER(*rb->current_tick, talked_tick + 5 * HZ)) {
+        if (TIME_AFTER(*rb->current_tick, talked_tick + HZ*5))
+        {
             talked_tick = *rb->current_tick;
             rb_talk_ids(false, LANG_LOADING_PERCENT,
-                     TALK_ID(i * 100 / pti.nb_tracks, UNIT_PERCENT));
+                        TALK_ID(i * 100 / pti.nb_tracks, UNIT_PERCENT));
         }
         if (rb->action_userabort(TIMEOUT_NOBLOCK))
         {
@@ -346,67 +327,67 @@ static bool playing_time(void)
             goto exit;
         }
 
-        if (index == pti.curr_index)
+        if (index == pti.curr_track_index)
             continue;
 
-        if (rb->playlist_get_track_info(NULL, index, &pltrack) < 0
-            || !rb->get_metadata(&id3, -1, pltrack.filename))
+        if (rb->playlist_get_track_info(NULL, index, &pl_track) < 0
+            || !rb->get_metadata(&id3, -1, pl_track.filename))
         {
             error_count++;
             continue;
         }
 
-        if (pltrack.display_index < pti.curr_display_index) /* preceding tracks */
-        {
-            pti.secs[ePT_SECS_BEF] += id3.length / 1000;
-            pti.kbs[ePT_KBS_BEF] += id3.filesize / 1024;
-        }
-        else
-        {
-            pti.secs[ePT_SECS_AFT] += id3.length / 1000;
-            pti.kbs[ePT_KBS_AFT] += id3.filesize / 1024;
-        }
+        section = pl_track.display_index < pti.curr_display_index ?
+                  ePT_ELAPSED : ePT_REMAINING;
+        pti.length[section] += id3.length;
+        pti.size[section] += id3.filesize;
     }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(false);
 #endif
 
     if (error_count > 0)
-    {
         rb->splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
-    }
 
     pti.nb_tracks -= error_count;
-    pti.secs[ePT_SECS_TTL] = pti.secs[ePT_SECS_BEF] + pti.secs[ePT_SECS_AFT];
-    pti.trk_secs[ePT_SECS_TTL] = pti.trk_secs[ePT_SECS_BEF] + pti.trk_secs[ePT_SECS_AFT];
-    pti.kbs[ePT_KBS_TTL] = pti.kbs[ePT_KBS_BEF] + pti.kbs[ePT_KBS_AFT];
 
-    struct gui_synclist pt_lists;
-    int key;
+    /* convert units from ms to s */
+    pti.length[ePT_ELAPSED] /= 1000;
+    pti.length[ePT_REMAINING] /= 1000;
+    pti.curr_track_length[ePT_ELAPSED] /= 1000;
+    pti.curr_track_length[ePT_REMAINING] /= 1000;
+    /* convert units from Bytes to KiB  */
+    pti.size[ePT_ELAPSED] >>= 10;
+    pti.size[ePT_REMAINING] >>= 10;
 
-    rb->gui_synclist_init(&pt_lists, &playing_time_get_info, &pti, true, 2, NULL);
+    /* calculate totals */
+    pti.length[ePT_TOTAL] = pti.length[ePT_ELAPSED] + pti.length[ePT_REMAINING];
+    pti.curr_track_length[ePT_TOTAL] = pti.curr_track_length[ePT_ELAPSED]
+                                       + pti.curr_track_length[ePT_REMAINING];
+    pti.size[ePT_TOTAL] = pti.size[ePT_ELAPSED] + pti.size[ePT_REMAINING];
+
+    rb->gui_synclist_init(&pt_lists, &pt_get_info, &pti, true, 2, NULL);
     if (rb->global_settings->talk_menu)
-        rb->gui_synclist_set_voice_callback(&pt_lists, playing_time_speak_info);
+        rb->gui_synclist_set_voice_callback(&pt_lists, pt_speak_info);
     rb->gui_synclist_set_nb_items(&pt_lists, 16);
     rb->gui_synclist_set_title(&pt_lists, rb->str(LANG_PLAYING_TIME), NOICON);
     rb->gui_synclist_draw(&pt_lists);
     rb->gui_synclist_speak_item(&pt_lists);
-    while (true) {
-        key = rb->get_action(CONTEXT_LIST, HZ/2);
-        if (rb->gui_synclist_do_button(&pt_lists, &key) == 0
-           && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
+    while (true)
+    {
+        action = rb->get_action(CONTEXT_LIST, HZ/2);
+        if (rb->gui_synclist_do_button(&pt_lists, &action) == 0
+            && action != ACTION_NONE && action != ACTION_UNKNOWN)
         {
-            bool usb = rb->default_event_handler(key) == SYS_USB_CONNECTED;
+            bool usb = rb->default_event_handler(action) == SYS_USB_CONNECTED;
 
-            if (!usb && IS_SYSEVENT(key))
+            if (!usb && IS_SYSEVENT(action))
                 continue;
 
             rb->talk_force_shutup();
             return usb;
         }
-
     }
-
  exit:
     return false;
 }
