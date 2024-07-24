@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016-2020 Franklin Wei
+ * Copyright (C) 2016-2024 Franklin Wei
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,10 +24,9 @@
  * ================================
  *
  * This file contains the majority of the rockbox-specific code for
- * the sgt-puzzles port. It implements a set of functions for the
- * backend to call to actually run the games, as well as rockbox UI
- * code (menus, input, etc). For a good overview of the rest of the
- * puzzles code, see:
+ * the sgt-puzzles port. It implements an API for the backend to call
+ * to run the games, as well as the rockbox UI code (menus, input,
+ * etc). For a good overview of the rest of the puzzles code, see:
  *
  * <https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/>.
  *
@@ -37,7 +36,7 @@
  * Contents of this file
  * ---------------------
  *
- * By rough order of appearnce in this file:
+ * By rough order of appearance in this file:
  *
  *  1) "Zoom" feature
  *
@@ -62,8 +61,7 @@
  *     mode switching. In commit 5094aaa, this behavior was changed so
  *     that the frontend can now query the backend for the on-screen
  *     cursor location and move the viewport accordingly through the
- *     new midend_get_cursor_location() API (which is not yet merged
- *     into Simon's tree as of October 2020).
+ *     new midend_get_cursor_location() API.
  *
  *  2) Font management
  *
@@ -82,8 +80,8 @@
  *
  *  3) Drawing API
  *
- *     The sgt-puzzles backend wants a set of function pointers to the
- *     usual drawing primitives. [1] If the `zoom_enabled' switch is
+ *     The sgt-puzzles backend wants a set of function pointers to
+ *     typical drawing primitives. [1] If the `zoom_enabled' switch is
  *     on, these call upon the "zoomed" drawing routines in (1).
  *
  *     In the normal un-zoomed case, these functions generally rely on
@@ -108,7 +106,7 @@
  *     a) Mouse mode
  *
  *        This mode is designed to accommodate puzzles without a
- *        keyboard or cursor interface (currently only "Loopy"). We
+ *        keyboard or cursor interface (currently only Loopyx). We
  *        remap the cursor keys to move an on-screen cursor rather
  *        than sending arrow keys to the game.
  *
@@ -174,6 +172,10 @@
  *     configuration parameters that control aspects of puzzle
  *     generation, etc. Also supplied are a set of "presets" that
  *     specify a predetermined set of configuration parameters.
+ *
+ *     In 2023, Simon introduced a User Preferences system that allows
+ *     further customization of the game UI (e.g., "snap to grid" in
+ *     Untangle). Rockbox support for this was added in July 2024.
  *
  *  6) In-game help
  *

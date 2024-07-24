@@ -64,3 +64,6 @@ May 2019: Resync to e2135d5.
 
 June 2020: Resync to 9aa7b7c. Fixed really embarrassing bug in loading
 saved games.
+
+July 2024: Resync to 1c62dac (branched from Simon's fd304c5).
+Implement user preferences menu. Introduced "Mosaic".
