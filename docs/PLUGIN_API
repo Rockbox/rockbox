@@ -1324,13 +1324,6 @@ time_t mktime(struct tm *t)
     \return
     \description
 
-bool mp3info(struct mp3entry *entry, const char *filename)
-    \group misc
-    \param entry
-    \param filename
-    \return FALSE if successfull
-    \description The given =entry= is filled in with whatever id3 info it could find about the given =filename=
-
 void mutex_init(struct mutex *m)
     \group kernel/ system
     \param m

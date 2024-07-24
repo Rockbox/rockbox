@@ -130,7 +130,7 @@ static bool file_properties(const char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
                     tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-                if (props_type != PROPS_PLAYLIST && !rb->mp3info(&id3, selected_file))
+                if (props_type != PROPS_PLAYLIST && rb->get_metadata(&id3, -1, selected_file))
                     props_type = PROPS_ID3;
                 found = true;
                 break;
@@ -416,7 +416,7 @@ static bool determine_file_or_dir(void)
 
 bool mul_id3_add(const char *file_name)
 {
-    if (!file_name || rb->mp3info(&id3, file_name))
+    if (!file_name || !rb->get_metadata(&id3, -1, file_name))
         skipped_count++;
     else
     {

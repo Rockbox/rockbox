@@ -163,7 +163,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 270
+#define PLUGIN_API_VERSION 271
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -405,8 +405,6 @@ struct plugin_api {
     bool (*yesno_pop)(const char* text);
 
     /* action handling */
-    bool (*list_do_action)(int context, int timeout,
-                           struct gui_synclist *lists, int *action);
     int (*get_custom_action)(int context,int timeout,
                           const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
@@ -479,6 +477,7 @@ struct plugin_api {
     uint32_t (*crc_32r)(const void *src, uint32_t len, uint32_t crc32);
 
     int (*filetype_get_attr)(const char* file);
+    char* (*filetype_get_plugin)(int attr, char *buffer, size_t buffer_len);
 
     /* dir */
     DIR * (*opendir)(const char *dirname);
@@ -662,6 +661,9 @@ struct plugin_api {
     unsigned long (*utf8length)(const unsigned char *utf8);
     int (*utf8seek)(const unsigned char* utf8, int offset);
 
+    /* language */
+    int  (*lang_is_rtl)(void);
+
     /* the buflib memory management library */
     void   (*buflib_init)(struct buflib_context* ctx, void* buf, size_t size);
     size_t (*buflib_available)(struct buflib_context* ctx);
@@ -761,7 +763,7 @@ struct plugin_api {
 
     /* metadata */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
-    bool (*mp3info)(struct mp3entry *entry, const char *filename);
+    const char* (*get_codec_string)(int codectype);
     int (*count_mp3_frames)(int fd,  int startpos,  int filesize,
                      void (*progressfunc)(int),
                      unsigned char* buf, size_t buflen);
@@ -782,6 +784,7 @@ struct plugin_api {
     void (*tagcache_search_finish)(struct tagcache_search *tcs);
     long (*tagcache_get_numeric)(const struct tagcache_search *tcs, int tag);
     struct tagcache_stat* (*tagcache_get_stat)(void);
+    void (*tagcache_commit_finalize)(void);
 #if defined(HAVE_TC_RAMCACHE)
     bool (*tagcache_is_in_ram)(void);
 #if defined(HAVE_DIRCACHE)
@@ -801,6 +804,11 @@ struct plugin_api {
     int (*playlist_get_resume_info)(int *resume_index);
     int (*playlist_get_track_info)(struct playlist_info* playlist, int index,
                                    struct playlist_track_info* info);
+    int (*playlist_get_first_index)(const struct playlist_info* playlist);
+    int (*playlist_get_display_index)(void);
+    bool (*playlist_entries_iterate)(const char *filename,
+                                     struct playlist_insert_context *pl_context,
+                                     bool (*action_cb)(const char *file_name));
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     void (*playlist_resume_track)(int start_index, unsigned int crc,
@@ -969,17 +977,6 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-    void (*tagcache_commit_finalize)(void);
-#endif
-    int (*playlist_get_first_index)(const struct playlist_info* playlist);
-    int (*playlist_get_display_index)(void);
-    char* (*filetype_get_plugin)(int attr, char *buffer, size_t buffer_len);
-    bool (*playlist_entries_iterate)(const char *filename,
-                                     struct playlist_insert_context *pl_context,
-                                     bool (*action_cb)(const char *file_name));
-    int  (*lang_is_rtl)(void);
-    const char* (*get_codec_string)(int codectype);
 };
 
 /* plugin header */

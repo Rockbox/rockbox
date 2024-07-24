@@ -35,5 +35,5 @@ bool retrieve_id3(struct mp3entry *id3, const char* file)
     }
 #endif
 
-    return !rb->mp3info(id3, file);
+    return rb->get_metadata(id3, -1, file);
 }

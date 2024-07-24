@@ -399,12 +399,6 @@ unsigned int probe_file_format(const char *filename)
     return AFMT_UNKNOWN;
 }
 
-/* Note, that this returns false for successful, true for error! */
-bool mp3info(struct mp3entry *entry, const char *filename)
-{
-    return !get_metadata(entry, -1, filename);
-}
-
 /* Get metadata for track - return false if parsing showed problems with the
  * file that would prevent playback. supply a filedescriptor <0 and the file will be opened
  * and closed automatically within the get_metadata call

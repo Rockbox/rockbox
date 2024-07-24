@@ -350,7 +350,7 @@ static bool playing_time(void)
             continue;
 
         if (rb->playlist_get_track_info(NULL, index, &pltrack) < 0
-            || rb->mp3info(&id3, pltrack.filename))
+            || !rb->get_metadata(&id3, -1, pltrack.filename))
         {
             error_count++;
             continue;
@@ -392,7 +392,8 @@ static bool playing_time(void)
     rb->gui_synclist_draw(&pt_lists);
     rb->gui_synclist_speak_item(&pt_lists);
     while (true) {
-        if (rb->list_do_action(CONTEXT_LIST, HZ/2, &pt_lists, &key) == 0
+        key = rb->get_action(CONTEXT_LIST, HZ/2);
+        if (rb->gui_synclist_do_button(&pt_lists, &key) == 0
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
             bool usb = rb->default_event_handler(key) == SYS_USB_CONNECTED;

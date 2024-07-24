@@ -352,7 +352,6 @@ static const struct plugin_api rockbox_api = {
     yesno_pop,
 
     /* action handling */
-    list_do_action,
     get_custom_action,
     get_action,
 #ifdef HAVE_TOUCHSCREEN
@@ -422,6 +421,7 @@ static const struct plugin_api rockbox_api = {
     crc_32,
     crc_32r,
     filetype_get_attr,
+    filetype_get_plugin,
 
     /* dir */
     FS_PREFIX(opendir),
@@ -582,6 +582,9 @@ static const struct plugin_api rockbox_api = {
     utf8length,
     utf8seek,
 
+    /* language */
+    lang_is_rtl,
+
     /* the buflib memory management library */
     buflib_init,
     buflib_available,
@@ -665,7 +668,7 @@ static const struct plugin_api rockbox_api = {
 
     /* metadata */
     get_metadata,
-    mp3info,
+    get_codec_string,
     count_mp3_frames,
     create_xing_header,
 #ifdef HAVE_TAGCACHE
@@ -677,6 +680,7 @@ static const struct plugin_api rockbox_api = {
     tagcache_search_finish,
     tagcache_get_numeric,
     tagcache_get_stat,
+    tagcache_commit_finalize,
 #if defined(HAVE_TC_RAMCACHE)
     tagcache_is_in_ram,
 #if defined(HAVE_DIRCACHE)
@@ -694,6 +698,9 @@ static const struct plugin_api rockbox_api = {
     playlist_get_current,
     playlist_get_resume_info,
     playlist_get_track_info,
+    playlist_get_first_index,
+    playlist_get_display_index,
+    playlist_entries_iterate,
     playlist_amount,
     playlist_resume,
     playlist_resume_track,
@@ -833,15 +840,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef HAVE_TAGCACHE
-    tagcache_commit_finalize,
-#endif
-    playlist_get_first_index,
-    playlist_get_display_index,
-    filetype_get_plugin,
-    playlist_entries_iterate,
-    lang_is_rtl,
-    get_codec_string,
 };
 
 static int plugin_buffer_handle;

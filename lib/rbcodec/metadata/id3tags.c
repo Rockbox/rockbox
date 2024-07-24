@@ -1200,7 +1200,7 @@ int main(int argc, char **argv)
     for(i=1; i<argc; i++) {
         struct mp3entry mp3;
         mp3.album = "Bogus";
-        if(mp3info(&mp3, argv[i], false)) {
+        if(!get_metadata(&mp3, -1, argv[i])) {
             printf("Failed to get %s\n", argv[i]);
             return 0;
         }

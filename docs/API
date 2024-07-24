@@ -197,14 +197,6 @@ Memory allocation
      each and returns a pointer to the allocated memory. The memory is set to
      zero.
 
-ID3
-
-  #include <id3.h>
-  bool mp3info(mp3entry *entry, char *filename);
-
-     Return FALSE if successful. The given mp3entry is then filled in with
-     whatever id3 info it could find about the given file.
-
 Various
 
   #include <kernel.h>
