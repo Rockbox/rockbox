@@ -27,11 +27,11 @@
 
 struct dir_stats {
     char dirname[MAX_PATH];
-    int len;
     unsigned int dir_count;
     unsigned int file_count;
     unsigned int audio_file_count;
     unsigned long long byte_count;
+    bool canceled;
 };
 
 enum props_types {
@@ -147,7 +147,7 @@ static bool file_properties(const char* selected_file)
 static bool _dir_properties(struct dir_stats *stats, bool (*id3_cb)(const char*))
 {
     bool result = true;
-    static long last_tick = 0;
+    static unsigned long last_lcd_update, last_get_action;
     struct dirent* entry;
     int dirlen = rb->strlen(stats->dirname);
     DIR* dir =  rb->opendir(stats->dirname);
@@ -161,31 +161,28 @@ static bool _dir_properties(struct dir_stats *stats, bool (*id3_cb)(const char*)
     while(result && (0 != (entry = rb->readdir(dir))))
     {
         struct dirinfo info = rb->dir_get_info(dir, entry);
-
-        rb->snprintf(stats->dirname + dirlen, stats->len - dirlen, "/%s",
-                     entry->d_name); /* append name to current directory */
-
         if (info.attribute & ATTR_DIRECTORY)
         {
             if (!rb->strcmp((char *)entry->d_name, ".") ||
                 !rb->strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
+            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
+                         "/%s", entry->d_name); /* append name to current directory */
+
             if (!id3_cb)
             {
                 stats->dir_count++; /* new directory */
-                if (*rb->current_tick - last_tick > (HZ/8))
+                if (*rb->current_tick - last_lcd_update > (HZ/2))
                 {
                     unsigned int log;
-                    last_tick = *(rb->current_tick);
+                    last_lcd_update = *(rb->current_tick);
                     rb->lcd_clear_display();
-                    rb->lcd_puts(0, 0, "SCANNING...");
-                    rb->lcd_puts(0, 1, stats->dirname);
-                    rb->lcd_putsf(0, 2, "Directories: %d", stats->dir_count);
-                    rb->lcd_putsf(0, 3, "Files: %d (Audio: %d)",
+                    rb->lcd_putsf(0, 0, "Directories: %d", stats->dir_count);
+                    rb->lcd_putsf(0, 1, "Files: %d (Audio: %d)",
                                   stats->file_count, stats->audio_file_count);
                     log = human_size_log(stats->byte_count);
-                    rb->lcd_putsf(0, 4, "Size: %lu %s",
+                    rb->lcd_putsf(0, 2, "Size: %lu %s",
                                   (unsigned long)(stats->byte_count >> (10*log)),
                                   rb->str(units[log]));
                     rb->lcd_update();
@@ -205,11 +202,20 @@ static bool _dir_properties(struct dir_stats *stats, bool (*id3_cb)(const char*)
         {
             rb->splash_progress(mul_id3_count, stats->audio_file_count, "%s (%s)",
                                 rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
+            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
+                         "/%s", entry->d_name); /* append name to current directory */
             id3_cb(stats->dirname); /* allow metadata to be collected */
         }
 
-        if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
-            result = false;
+        if (TIME_AFTER(*(rb->current_tick), last_get_action + HZ/8))
+        {
+            if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
+            {
+                stats->canceled = true;
+                result = false;
+            }
+            last_get_action = *(rb->current_tick);
+        }
         rb->yield();
     }
     rb->closedir(dir);
@@ -230,7 +236,7 @@ static bool dir_properties(const char* selected_file, struct dir_stats *stats,
     unsigned int log;
     bool success;
 
-    rb->strlcpy(stats->dirname, selected_file, MAX_PATH);
+    rb->strlcpy(stats->dirname, selected_file, sizeof(stats->dirname));
     if (id3_cb)
         rb->splash_progress_set_delay(HZ / 2); /* hide progress bar for 0.5s */
 
@@ -248,7 +254,7 @@ static bool dir_properties(const char* selected_file, struct dir_stats *stats,
 
     if (!id3_cb)
     {
-        rb->strlcpy(str_dirname, selected_file, MAX_PATH);
+        rb->strlcpy(str_dirname, selected_file, sizeof(str_dirname));
         rb->snprintf(str_dircount, sizeof str_dircount, "%d", stats->dir_count);
         rb->snprintf(str_filecount, sizeof str_filecount, "%d", stats->file_count);
         rb->snprintf(str_audio_filecount, sizeof str_filecount, "%d",
@@ -475,14 +481,7 @@ static bool assemble_track_info(const char *filename, struct dir_stats *stats)
 enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
-    static struct dir_stats stats =
-    {
-        .len = MAX_PATH,
-        .dir_count  = 0,
-        .file_count  = 0,
-        .audio_file_count = 0,
-        .byte_count  = 0,
-    };
+    static struct dir_stats stats;
 
     const char *file = parameter;
     if(!parameter)
@@ -498,7 +497,7 @@ enum plugin_status plugin_start(const void* parameter)
         int dirlen = (file_name - file);
 
         rb->strlcpy(str_dirname, file, dirlen + 1);
-        rb->snprintf(str_filename, sizeof str_filename, "%s", file+dirlen);
+        rb->snprintf(str_filename, sizeof str_filename, "%s", file + dirlen);
 
         if(!determine_file_or_dir())
         {
@@ -514,9 +513,12 @@ enum plugin_status plugin_start(const void* parameter)
         if(!(props_type == PROPS_DIR ?
              dir_properties(file, &stats, NULL) : file_properties(file)))
         {
-            /* something went wrong (to do: tell user what it was (nesting,...) */
-            rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
-            rb->action_userabort(TIMEOUT_BLOCK);
+            if (!stats.canceled)
+            {
+                /* something went wrong (to do: tell user what it was (nesting,...) */
+                rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
+                rb->action_userabort(TIMEOUT_BLOCK);
+            }
             return PLUGIN_OK;
         }
     }
@@ -534,7 +536,8 @@ enum plugin_status plugin_start(const void* parameter)
         ret = rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count); /* database tracks */
     else if ((ret = browse_file_or_dir(&stats)) < 0)
         ret = assemble_track_info(file, &stats) ?    /* playlist or folder tracks */
-                rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) : -1;
+                rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
+                (stats.canceled ? 0 : -1);
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
