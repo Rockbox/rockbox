@@ -25,15 +25,6 @@
     #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
 #endif
 
-struct dir_stats {
-    char dirname[MAX_PATH];
-    unsigned int dir_count;
-    unsigned int file_count;
-    unsigned int audio_file_count;
-    unsigned long long byte_count;
-    bool canceled;
-};
-
 enum props_types {
     PROPS_FILE = 0,
     PROPS_PLAYLIST,
@@ -42,7 +33,7 @@ enum props_types {
     PROPS_DIR
 };
 
-static int props_type = PROPS_FILE;
+static int props_type;
 
 static struct mp3entry id3;
 static int mul_id3_count;
@@ -57,8 +48,8 @@ static char str_audio_filecount[64];
 static char str_date[64];
 static char str_time[64];
 
-static unsigned long nsize;
-static int32_t size_unit;
+static unsigned long display_size;
+static int32_t lang_size_unit;
 static struct tm tm;
 
 #define NUM_FILE_PROPERTIES 5
@@ -86,26 +77,6 @@ static const unsigned char* const props_dir[] =
     ID2P(LANG_MENU_SHOW_ID3_INFO),    str_audio_filecount,
 };
 
-static const int32_t units[] =
-{
-    LANG_BYTE,
-    LANG_KIBIBYTE,
-    LANG_MEBIBYTE,
-    LANG_GIBIBYTE
-};
-
-static unsigned int human_size_log(unsigned long long size)
-{
-    const size_t n = sizeof(units)/sizeof(units[0]);
-
-    unsigned int i;
-    /* margin set at 10K boundary: 10239 B +1 => 10 KB */
-    for(i=0; i < n-1 && size >= 10*1024; i++)
-        size >>= 10; /* div by 1024 */
-
-    return i;
-}
-
 static bool file_properties(const char* selected_file)
 {
     bool found = false;
@@ -118,12 +89,9 @@ static bool file_properties(const char* selected_file)
             struct dirinfo info = rb->dir_get_info(dir, entry);
             if(!rb->strcmp(entry->d_name, str_filename))
             {
-                unsigned int log;
-                log = human_size_log((unsigned long)info.size);
-                nsize = ((unsigned long)info.size) >> (log*10);
-                size_unit = units[log];
+                display_size = human_size(info.size, &lang_size_unit);
                 rb->snprintf(str_size, sizeof str_size, "%lu %s",
-                             nsize, rb->str(size_unit));
+                             display_size, rb->str(lang_size_unit));
                 rb->gmtime_r(&info.mtime, &tm);
                 rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
                     tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
@@ -141,99 +109,10 @@ static bool file_properties(const char* selected_file)
     return found;
 }
 
-/* Recursively scans directories in search of files
- * and informs the user of the progress.
- */
-static bool _dir_properties(struct dir_stats *stats, bool (*id3_cb)(const char*))
-{
-    bool result = true;
-    static unsigned long last_lcd_update, last_get_action;
-    struct dirent* entry;
-    int dirlen = rb->strlen(stats->dirname);
-    DIR* dir =  rb->opendir(stats->dirname);
-    if (!dir)
-    {
-        rb->splashf(HZ*2, "open error: %s", stats->dirname);
-        return false;
-    }
 
-    /* walk through the directory content */
-    while(result && (0 != (entry = rb->readdir(dir))))
-    {
-        struct dirinfo info = rb->dir_get_info(dir, entry);
-        if (info.attribute & ATTR_DIRECTORY)
-        {
-            if (!rb->strcmp((char *)entry->d_name, ".") ||
-                !rb->strcmp((char *)entry->d_name, ".."))
-                continue; /* skip these */
-
-            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
-                         "/%s", entry->d_name); /* append name to current directory */
-
-            if (!id3_cb)
-            {
-                stats->dir_count++; /* new directory */
-                if (*rb->current_tick - last_lcd_update > (HZ/2))
-                {
-                    unsigned int log;
-                    last_lcd_update = *(rb->current_tick);
-                    rb->lcd_clear_display();
-                    rb->lcd_putsf(0, 0, "Directories: %d", stats->dir_count);
-                    rb->lcd_putsf(0, 1, "Files: %d (Audio: %d)",
-                                  stats->file_count, stats->audio_file_count);
-                    log = human_size_log(stats->byte_count);
-                    rb->lcd_putsf(0, 2, "Size: %lu %s",
-                                  (unsigned long)(stats->byte_count >> (10*log)),
-                                  rb->str(units[log]));
-                    rb->lcd_update();
-                }
-            }
-
-            result = _dir_properties(stats, id3_cb); /* recursion */
-        }
-        else if (!id3_cb)
-        {
-            stats->file_count++; /* new file */
-            stats->byte_count += info.size;
-            if (rb->filetype_get_attr(entry->d_name) == FILE_ATTR_AUDIO)
-                stats->audio_file_count++;
-        }
-        else if (rb->filetype_get_attr(entry->d_name) == FILE_ATTR_AUDIO)
-        {
-            rb->splash_progress(mul_id3_count, stats->audio_file_count, "%s (%s)",
-                                rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
-            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
-                         "/%s", entry->d_name); /* append name to current directory */
-            id3_cb(stats->dirname); /* allow metadata to be collected */
-        }
-
-        if (TIME_AFTER(*(rb->current_tick), last_get_action + HZ/8))
-        {
-            if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
-            {
-                stats->canceled = true;
-                result = false;
-            }
-            last_get_action = *(rb->current_tick);
-        }
-        rb->yield();
-    }
-    rb->closedir(dir);
-    return result;
-}
-
-/* 1) If id3_cb is null, dir_properties calculates all dir stats, including the
- * audio file count.
- *
- * 2) If id3_cb points to a function, dir_properties will call it for every audio
- * file encountered, to allow the file's metadata to be collected. The displayed
- * progress bar's maximum value is set to the audio file count.
- * Stats are assumed to have already been generated by a preceding run.
- */
 static bool dir_properties(const char* selected_file, struct dir_stats *stats,
                            bool (*id3_cb)(const char*))
 {
-    unsigned int log;
     bool success;
 
     rb->strlcpy(stats->dirname, selected_file, sizeof(stats->dirname));
@@ -243,8 +122,8 @@ static bool dir_properties(const char* selected_file, struct dir_stats *stats,
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-    success = _dir_properties(stats, id3_cb);
-    
+    success = collect_dir_stats(stats, id3_cb);
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -259,10 +138,9 @@ static bool dir_properties(const char* selected_file, struct dir_stats *stats,
         rb->snprintf(str_filecount, sizeof str_filecount, "%d", stats->file_count);
         rb->snprintf(str_audio_filecount, sizeof str_filecount, "%d",
                      stats->audio_file_count);
-        log = human_size_log(stats->byte_count);
-        nsize = (long) (stats->byte_count >> (log*10));
-        size_unit = units[log];
-        rb->snprintf(str_size, sizeof str_size, "%ld %s", nsize, rb->str(size_unit));
+        display_size = human_size(stats->byte_count, &lang_size_unit);
+        rb->snprintf(str_size, sizeof str_size, "%lu %s", display_size,
+                     rb->str(lang_size_unit));
     }
     return true;
 }
@@ -320,8 +198,8 @@ static int speak_property_selection(int selected_item, void *data)
         rb->talk_file_or_spell(str_dirname, str_filename, NULL, true);
         break;
     case LANG_PROPERTIES_SIZE:
-        rb->talk_number(nsize, true);
-        rb->talk_id(size_unit, true);
+        rb->talk_number(display_size, true);
+        rb->talk_id(lang_size_unit, true);
         break;
     case LANG_PROPERTIES_DATE:
         rb->talk_date(&tm, true);
@@ -399,10 +277,8 @@ static int browse_file_or_dir(struct dir_stats *stats)
 
 static bool determine_file_or_dir(void)
 {
-    DIR* dir;
     struct dirent* entry;
-
-    dir = rb->opendir(str_dirname);
+    DIR* dir = rb->opendir(str_dirname);
     if (dir)
     {
         while(0 != (entry = rb->readdir(dir)))
@@ -482,7 +358,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int ret;
     static struct dir_stats stats;
-
     const char *file = parameter;
     if(!parameter)
         return PLUGIN_ERROR;
@@ -490,12 +365,10 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
-
     if (file[0] == '/') /* single file or folder selected */
     {
         const char* file_name = rb->strrchr(file, '/') + 1;
-        int dirlen = (file_name - file);
-
+        const int dirlen = (file_name - file);
         rb->strlcpy(str_dirname, file, dirlen + 1);
         rb->snprintf(str_filename, sizeof str_filename, "%s", file + dirlen);
 

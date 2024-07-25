@@ -40,6 +40,13 @@ struct multiple_tracks_id3 {
 
 static struct multiple_tracks_id3 mul_id3;
 
+static const int32_t units[] =
+{
+    LANG_BYTE,
+    LANG_KIBIBYTE,
+    LANG_MEBIBYTE,
+    LANG_GIBIBYTE
+};
 
 /* Calculate modified FNV hash of string
  * has good avalanche behaviour and uniform distribution
@@ -130,9 +137,7 @@ void collect_id3(struct mp3entry *id3, bool is_first_track)
     mul_id3.filesize += id3->filesize;
 }
 
-/* (!) Note scale factor applied to returned metadata:
- *     - Unit for filesize will be KiB instead of Bytes
- *     - Unit for length will be s instead of ms
+/* (!) Note unit conversion below
  *
  *     Use result only as input for browse_id3,
  *     with the track_ct parameter set to  > 1.
@@ -159,8 +164,8 @@ void finalize_id3(struct mp3entry *id3)
     id3->track_string = NULL;
     id3->year_string = NULL;
     id3->year = mul_id3.year;
-    mul_id3.length /= 1000;
-    mul_id3.filesize >>= 10;
+    mul_id3.length /= 1000;  /* convert from ms to s */
+    mul_id3.filesize >>= 10; /* convert from B to KiB */
     id3->length = mul_id3.length > ULONG_MAX ? 0 : mul_id3.length;
     id3->filesize = mul_id3.filesize > INT_MAX ? 0 : mul_id3.filesize;
     id3->frequency = mul_id3.frequency;
@@ -171,4 +176,177 @@ void finalize_id3(struct mp3entry *id3)
     id3->tracknum = 0;
     id3->track_level = 0;
     id3->album_level = 0;
+}
+
+unsigned long human_size(unsigned long long byte_count, int32_t *unit_lang_id)
+{
+    const size_t n = sizeof(units)/sizeof(units[0]);
+    unsigned int i;
+
+    /* margin set at 10K boundary: 10239 B +1 => 10 KB */
+    for(i = 0; i < n-1 && byte_count >= 10*1024; i++)
+        byte_count >>= 10; /* div by 1024 */
+
+    *unit_lang_id = units[i];
+    return (unsigned long)byte_count;
+}
+
+/* missing filetype attribute for images */
+static const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
+/* and videos */
+static const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
+
+static void prn(const char *str, int y)
+{
+    rb->lcd_puts(0, y, str);
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_puts(0, y, str);
+#endif
+}
+
+void display_dir_stats(struct dir_stats *stats)
+{
+    char buf[32];
+    int32_t lang_size_unit;
+    unsigned long display_size = human_size(stats->byte_count, &lang_size_unit);
+    rb->lcd_clear_display();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_clear_display();
+#endif
+    rb->snprintf(buf, sizeof(buf), "Files: %d (%lu %s)", stats->file_count,
+                 display_size, rb->str(lang_size_unit));
+    prn(buf, 0);
+    rb->snprintf(buf, sizeof(buf), "Audio: %d", stats->audio_file_count);
+    prn(buf, 1);
+    if (stats->count_all)
+    {
+        rb->snprintf(buf, sizeof(buf), "Playlists: %d", stats->m3u_file_count);
+        prn(buf, 2);
+        rb->snprintf(buf, sizeof(buf), "Images: %d", stats->img_file_count);
+        prn(buf, 3);
+        rb->snprintf(buf, sizeof(buf), "Videos: %d", stats->vid_file_count);
+        prn(buf, 4);
+        rb->snprintf(buf, sizeof(buf), "Directories: %d", stats->dir_count);
+        prn(buf, 5);
+        rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d",
+                     stats->max_files_in_dir);
+        prn(buf, 6);
+    }
+    else
+    {
+        rb->snprintf(buf, sizeof(buf), "Directories: %d", stats->dir_count);
+        prn(buf, 2);
+    }
+    rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_update();
+#endif
+
+}
+
+/* Recursively scans directories in search of files
+ * and informs the user of the progress.
+ */
+bool collect_dir_stats(struct dir_stats *stats, bool (*id3_cb)(const char*))
+{
+    bool result = true;
+    unsigned int files_in_dir = 0;
+    static unsigned int id3_count;
+    static unsigned long last_displayed, last_get_action;
+    struct dirent* entry;
+    int dirlen = rb->strlen(stats->dirname);
+    DIR* dir =  rb->opendir(stats->dirname);
+    if (!dir)
+    {
+        rb->splashf(HZ*2, "open error: %s", stats->dirname);
+        return false;
+    }
+    else if (!stats->dirname[1]) /* root dir */
+        stats->dirname[0] = dirlen = 0;
+
+    /* walk through the directory content */
+    while(result && (0 != (entry = rb->readdir(dir))))
+    {
+        struct dirinfo info = rb->dir_get_info(dir, entry);
+        if (info.attribute & ATTR_DIRECTORY)
+        {
+            if (!rb->strcmp((char *)entry->d_name, ".") ||
+                !rb->strcmp((char *)entry->d_name, ".."))
+                continue; /* skip these */
+
+            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
+                         "/%s", entry->d_name); /* append name to current directory */
+            if (!id3_cb)
+            {
+                stats->dir_count++; /* new directory */
+                if (*rb->current_tick - last_displayed > (HZ/2))
+                {
+                    if (last_displayed)
+                        display_dir_stats(stats);
+                    last_displayed = *(rb->current_tick);
+                }
+            }
+            result = collect_dir_stats(stats, id3_cb); /* recursion */
+        }
+        else if (!id3_cb)
+        {
+            char *ptr;
+            stats->file_count++; /* new file */
+            files_in_dir++;
+            stats->byte_count += info.size;
+
+            int attr = rb->filetype_get_attr(entry->d_name);
+            if (attr == FILE_ATTR_AUDIO)
+                stats->audio_file_count++;
+            else if (attr == FILE_ATTR_M3U)
+                stats->m3u_file_count++;
+            /* image or video file attributes have to be compared manually */
+            else if (stats->count_all &&
+                     (ptr = rb->strrchr(entry->d_name,'.')))
+            {
+                unsigned int i;
+                ptr++;
+                for(i = 0; i < ARRAYLEN(image_exts); i++)
+                {
+                    if(!rb->strcasecmp(ptr, image_exts[i]))
+                    {
+                        stats->img_file_count++;
+                        break;
+                    }
+                }
+                if (i >= ARRAYLEN(image_exts)) {
+                    for(i = 0; i < ARRAYLEN(video_exts); i++) {
+                        if(!rb->strcasecmp(ptr, video_exts[i])) {
+                            stats->vid_file_count++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else if (rb->filetype_get_attr(entry->d_name) == FILE_ATTR_AUDIO)
+        {
+            rb->splash_progress(id3_count++, stats->audio_file_count,
+                                "%s (%s)",
+                                rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
+            rb->snprintf(stats->dirname + dirlen, sizeof(stats->dirname) - dirlen,
+                         "/%s", entry->d_name); /* append name to current directory */
+            id3_cb(stats->dirname); /* allow metadata to be collected */
+        }
+
+        if (TIME_AFTER(*(rb->current_tick), last_get_action + HZ/8))
+        {
+            if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
+            {
+                stats->canceled = true;
+                result = false;
+            }
+            last_get_action = *(rb->current_tick);
+        }
+        rb->yield();
+    }
+    rb->closedir(dir);
+    if (stats->max_files_in_dir < files_in_dir)
+        stats->max_files_in_dir = files_in_dir;
+    return result;
 }
