@@ -30,6 +30,7 @@
 #include "usb.h"
 #include "mv.h"
 #include "ata_idle_notify.h"
+#include "pathfuncs.h"
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -133,6 +134,7 @@ void sim_thread(void)
 
 void sim_tasks_init(void)
 {
+    init_volume_names();
     queue_init(&sim_queue, false);
 
     create_thread(sim_thread, sim_thread_stack, sizeof(sim_thread_stack), 0,

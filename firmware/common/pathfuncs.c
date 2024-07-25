@@ -113,6 +113,7 @@ static const unsigned char storage_dec_indexes[STORAGE_NUM_TYPES+1] =
 /* builds a list of drive/volume specifiers <volstr#> */
 void init_volume_names(void)
 {
+    DEBUGF("%s: ", __func__);
     FOR_EACH_VOLUME(-1, volume)
     {
         const char *voldec = "";
@@ -124,8 +125,9 @@ void init_volume_names(void)
         voldec = storage_dec_names[storage_dec_indexes[type]];
         snprintf(buffer, VOL_MAX_LEN + 1, "%c%s%d%c",
                 VOL_START_TOK, voldec, volume, VOL_END_TOK);
-        DEBUGF("%s: vol: %d %s", __func__, volume, buffer);
+        DEBUGF("vol<%d> = %s ", volume, buffer);
     }
+    DEBUGF("\n"); 
 }
 
 /* Returns on which volume this is and sets *nameptr to the portion of the
