@@ -47,3 +47,5 @@ foreach my $b (&allbuilds) {
     }
     print "$b=$status\n";
 }
+
+print "\n";
