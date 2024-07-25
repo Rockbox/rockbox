@@ -5634,7 +5634,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-Attivato)"
+    remote: "(Volume, meno per riattivare)"
   </voice>
 </phrase>
 <phrase>
