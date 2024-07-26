@@ -131,6 +131,12 @@
 #define MAIN_NORETURN_ATTR
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#ifdef HAVE_MULTIVOLUME
+#include "pathfuncs.h" /* for init_volume_names */
+#endif
+#endif
+
 #if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #ifdef SIMULATOR
 #include "sim_tasks.h"
@@ -381,6 +387,9 @@ static void init(void)
     powermgmt_init();
     backlight_init();
     unicode_init();
+#ifdef HAVE_MULTIVOLUME
+    init_volume_names();
+#endif
 #ifdef SIMULATOR
     sim_tasks_init();
 #endif

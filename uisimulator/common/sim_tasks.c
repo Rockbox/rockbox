@@ -30,9 +30,6 @@
 #include "usb.h"
 #include "mv.h"
 #include "ata_idle_notify.h"
-#ifdef HAVE_MULTIVOLUME
-#include "pathfuncs.h" /* for init_volume_names */
-#endif
 
 #ifdef WIN32
 #include <windows.h>
@@ -137,9 +134,6 @@ void sim_thread(void)
 
 void sim_tasks_init(void)
 {
-#ifdef HAVE_MULTIVOLUME
-    init_volume_names();
-#endif
     queue_init(&sim_queue, false);
 
     create_thread(sim_thread, sim_thread_stack, sizeof(sim_thread_stack), 0,
