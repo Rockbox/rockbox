@@ -321,8 +321,6 @@ enum plugin_status plugin_start(const void* parameter)
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_enable(i, true, NULL);
 
     if (props_type == PROPS_MUL_ID3)
         ret = assemble_track_info(NULL, NULL);
@@ -348,9 +346,6 @@ enum plugin_status plugin_start(const void* parameter)
         ret = assemble_track_info(file, &stats) ?    /* playlist or folder tracks */
               rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
               (stats.canceled ? 0 : -1);
-
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_undo(i, false);
 
     return ret == -1 ? PLUGIN_ERROR : ret == 1 ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }

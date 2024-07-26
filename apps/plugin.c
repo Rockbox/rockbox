@@ -856,6 +856,10 @@ int plugin_load(const char* plugin, const void* parameter)
     if (!plugin)
         return PLUGIN_ERROR;
 
+    /* for some plugins, the SBS can be left enabled */
+    const char *sepch = strrchr(plugin, PATH_SEPCH);
+    bool theme_enabled = sepch && !strcmp("properties.rock", sepch + 1);
+
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
         bool reenter = (strcmp(current_plugin, plugin) == 0);
@@ -923,7 +927,8 @@ int plugin_load(const char* plugin, const void* parameter)
 
     *(p_hdr->api) = &rockbox_api;
     lcd_set_viewport(NULL);
-    lcd_clear_display();
+    if (!theme_enabled)
+        lcd_clear_display();
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_viewport(NULL);
@@ -938,8 +943,9 @@ int plugin_load(const char* plugin, const void* parameter)
      * they should be fixed properly instead of this lock */
     tree_lock_cache(tree_get_context());
 
-    FOR_NB_SCREENS(i)
-       viewportmanager_theme_enable(i, false, NULL);
+    if (!theme_enabled)
+        FOR_NB_SCREENS(i)
+            viewportmanager_theme_enable(i, false, NULL);
 
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
@@ -1000,13 +1006,16 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 #endif
 
-    lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
 #endif
 
-    FOR_NB_SCREENS(i)
-        viewportmanager_theme_undo(i, true);
+    if (!theme_enabled)
+    {
+        lcd_clear_display();
+        FOR_NB_SCREENS(i)
+            viewportmanager_theme_undo(i, true);
+    }
 
     plugin_check_open_close__exit();
 
