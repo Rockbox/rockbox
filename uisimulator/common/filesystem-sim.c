@@ -307,9 +307,12 @@ int sim_get_os_path(char *buffer, const char *path, size_t bufsize)
         #ifdef HAVE_MULTIVOLUME
             if (level != 1)
                 break; /* Volume spec only valid @ root level */
+            if (p[-1] != PATH_SEPCH)
+                break;
 
             const char *next;
-            volume = path_strip_volume(p, &next, true);
+            volume = path_strip_volume(p-1, &next, true);
+
             if (volume == ROOT_VOLUME)
                 volume = 0; /* FIXME: root no longer implies volume 0 */
 
@@ -831,7 +834,7 @@ int os_volume_path(IF_MV(int volume, ) char *buffer, size_t bufsize)
     char volname[VOL_MAX_LEN + 1];
     get_volume_name(volume, volname);
 
-    if (path_append(tmpbuf, PA_SEP_HARD, volname, sizeof (volname))
+    if (path_append(tmpbuf, PA_SEP_HARD, volname, sizeof (tmpbuf))
             >= sizeof (volname))
         return -1;
 #endif /* HAVE_MULTIVOLUME */
