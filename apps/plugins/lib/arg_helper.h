@@ -54,7 +54,7 @@ int num_parse(const char **parameter, int *number, int *decimal);
 * Note: WS at beginning is stripped, **parameter starts at the first NON WS char
 * return 0 for arg_callback to quit parsing immediately
 */
-void argparse(const char *parameter, int parameter_len,
-              int (*arg_callback)(char argchar, const char **parameter));
+void argparse(const char *parameter, int parameter_len, void *userdata,
+         int (*arg_callback)(char argchar, const char **parameter, void *userdata));
 
 #endif /* _LIB_ARG_HELPER_H_ */

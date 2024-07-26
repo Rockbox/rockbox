@@ -31,7 +31,7 @@
 #ifdef PLUGIN
     #define strchr rb->strchr
 #endif
-int string_parse(const char **parameter, char* buf, size_t buf_sz)
+int string_parse(const char **parameter, char *buf, size_t buf_sz)
 {
 /* fills buf with a string upto buf_sz, null terminates the buffer
  * strings break on WS by default but can be enclosed in single or double quotes
@@ -44,6 +44,11 @@ int string_parse(const char **parameter, char* buf, size_t buf_sz)
     char stopchars[] = "\'\"";
     int skipped = 0;
     int found = 0;
+    if (!parameter || !*parameter)
+    {
+        *buf = '\0';
+        return 0;
+    }
     const char* start = *parameter;
 
     if (strchr(stopchars, *start))
@@ -79,7 +84,7 @@ int string_parse(const char **parameter, char* buf, size_t buf_sz)
     return found + skipped;
 }
 
-int char_parse(const char **parameter, char* character)
+int char_parse(const char **parameter, char *character)
 {
 /* passes *character a single character eats remaining non-WS characters */
     char buf[2];
@@ -95,6 +100,8 @@ int bool_parse(const char **parameter, bool *choice)
 /* determine true false using the first character the rest are skipped/ignored */
     int found = 0;
     const char tf_val[]="fn0ty1";/* false chars on left f/t should be balanced fffttt */
+    if (!parameter || !*parameter)
+        return 0;
     const char* start = *parameter;
 
 
@@ -133,7 +140,9 @@ int longnum_parse(const char **parameter, long *number, long *decimal)
     int neg = 0;
     int digits = 0;
     //logf ("n: %s\n", *parameter);
-    const char *start = *parameter;
+    if (!parameter || !*parameter)
+        return 0;
+    const char* start = *parameter;
 
     if (*start == '-')
     {
@@ -209,7 +218,8 @@ int num_parse(const char **parameter, int *number, int *decimal)
 * Note: WS at beginning is stripped, **parameter starts at the first NON WS char
 * return 0 for arg_callback to quit parsing immediately
 */
-void argparse(const char *parameter, int parameter_len, int (*arg_callback)(char argchar, const char **parameter))
+void argparse(const char *parameter, int parameter_len, void *userdata,
+        int (*arg_callback)(char argchar, const char **parameter, void *userdata))
 {
     bool lastchr;
     char argchar;
@@ -222,7 +232,10 @@ void argparse(const char *parameter, int parameter_len, int (*arg_callback)(char
             {
                 if ((*parameter) == '\0')
                     return;
-                logf ("%s\n",parameter);
+
+                if (parameter_len < 0) { logf ("%s\n", parameter); }
+                else { logf ("%.*s\n", plen, parameter); }
+
                 argchar = *parameter;
                 lastchr = (*(parameter + 1) == '\0');
                 while (*++parameter || lastchr)
@@ -230,7 +243,7 @@ void argparse(const char *parameter, int parameter_len, int (*arg_callback)(char
                     lastchr = false;
                     if (isspace(*parameter))
                         continue; /* eat spaces at beginning */
-                    if (!arg_callback(argchar, &parameter))
+                    if (!arg_callback(argchar, &parameter, userdata))
                         return;
                     break;
                 }

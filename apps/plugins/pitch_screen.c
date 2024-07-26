@@ -1120,8 +1120,9 @@ int gui_syncpitchscreen_run(void)
     return 0;
 }
 
-static int arg_callback(char argchar, const char **parameter)
+static int arg_callback(char argchar, const char **parameter, void *userdata)
 {
+    (void)userdata;
     int ret;
     long num, dec;
     bool bret;
@@ -1232,7 +1233,7 @@ enum plugin_status plugin_start(const void* parameter)
         struct pvars cur;
         fill_pitchvars(&cur);
         fill_pitchvars(&pitch_vars);
-        argparse((const char*) parameter, -1, &arg_callback);
+        argparse((const char*) parameter, -1, NULL, &arg_callback);
         if (pitch_vars.pitch != cur.pitch)
         {
             rb->sound_set_pitch(pitch_vars.pitch);
