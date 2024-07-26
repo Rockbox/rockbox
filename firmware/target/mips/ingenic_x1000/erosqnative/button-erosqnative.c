@@ -75,12 +75,26 @@ volatile signed int enc_position = 0;
 /* Value of headphone detect register */
 static uint8_t hp_detect_reg = 0x00;
 static uint8_t hp_detect_reg_old = 0x00;
+static uint8_t hp_detect_debounce1 = 0x00;
+static uint8_t hp_detect_debounce2 = 0x00;
+static uint8_t debounce_count = 0;
 
 /* Interval to poll the register */
-#define HPD_POLL_TIME (HZ/2)
+#define HPD_POLL_TIME (HZ/4)
 
 static int hp_detect_tmo_cb(struct timeout* tmo)
 {
+    if (hp_detect_debounce1 == hp_detect_debounce2){
+        if (debounce_count >= 2){
+            debounce_count = 2;
+        } else {
+            debounce_count = debounce_count + 1;
+        }
+    } else {
+        debounce_count = 0;
+        hp_detect_debounce2 = hp_detect_debounce1;
+    }
+
     i2c_descriptor* d = (i2c_descriptor*)tmo->data;
     i2c_async_queue(AXP_PMU_BUS, TIMEOUT_NOBLOCK, I2C_Q_ADD, 0, d);
     return HPD_POLL_TIME;
@@ -96,7 +110,7 @@ static void hp_detect_init(void)
         .tran_mode = I2C_READ,
         .buffer[0] = (void*)&gpio_reg,
         .count[0] = 1,
-        .buffer[1] = &hp_detect_reg,
+        .buffer[1] = &hp_detect_debounce1,
         .count[1] = 1,
         .callback = NULL,
         .arg = 0,
@@ -113,6 +127,8 @@ static void hp_detect_init(void)
     if(r >= 0)
     {
         hp_detect_reg = r;
+        hp_detect_debounce1 = r;
+        hp_detect_debounce2 = r;
         hp_detect_reg_old = hp_detect_reg;
     }
 
@@ -122,6 +138,9 @@ static void hp_detect_init(void)
 
 bool headphones_inserted(void)
 {
+    if (debounce_count > 1){
+        hp_detect_reg = hp_detect_debounce2;
+    }
     /* if the status has changed, set the output volume accordingly */
     if ((hp_detect_reg & 0x30) != (hp_detect_reg_old & 0x30))
     {
@@ -135,6 +154,9 @@ bool headphones_inserted(void)
 
 bool lineout_inserted(void)
 {
+    if (debounce_count > 1){
+        hp_detect_reg = hp_detect_debounce2;
+    }
     /* if the status has changed, set the output volume accordingly */
     if ((hp_detect_reg & 0x30) != (hp_detect_reg_old & 0x30))
     {

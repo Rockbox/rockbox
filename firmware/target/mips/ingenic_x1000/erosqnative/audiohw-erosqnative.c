@@ -139,17 +139,19 @@ void audiohw_set_volume(int vol_l, int vol_r)
     r = vol_r;
 
 #if (defined(HAVE_HEADPHONE_DETECTION) && defined(HAVE_LINEOUT_DETECTION))
-    /* make sure headphones aren't present - don't want to
-     * blow out our eardrums cranking it to full */
-    if (lineout_inserted() && !headphones_inserted())
+    /* Due to the hardware's detection method, make the Line-Out
+     * the default. The LO can only be detected if it is active
+     * (assuming a high-impedance device is attached). HP takes priority
+     * if both are present. */
+    if (headphones_inserted())
+    {
+        eros_qn_switch_output(0);
+    }
+    else
     {
         eros_qn_switch_output(1);
 
         l = r = eros_qn_get_volume_limit();
-    }
-    else
-    {
-        eros_qn_switch_output(0);
     }
 #endif
 
