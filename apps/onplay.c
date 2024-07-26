@@ -138,7 +138,7 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
 static int bookmark_load_menu_wrapper(void)
 {
     if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh(); /* when called from ctxt menu */
+        pop_current_activity_without_refresh();          /* when called from ctxt menu */
 
     return bookmark_load_menu();
 }
@@ -689,7 +689,7 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 static int browse_id3_wrapper(void)
 {
     if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh(); /* when called from ctxt menu */
+        pop_current_activity_without_refresh();          /* when called from ctxt menu */
 
     if (browse_id3(audio_current_track(),
             playlist_get_display_index(),
@@ -806,6 +806,10 @@ static bool onplay_load_plugin(void *param)
     if (!prepare_database_sel(param))
         return false;
 #endif
+
+    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
+        pop_current_activity_without_refresh();          /* when called from ctxt menu */
+
     int ret = filetype_load_plugin((const char*)param, selected_file.path);
     if (ret == PLUGIN_USB_CONNECTED)
         onplay_result = ONPLAY_RELOAD_DIR;
@@ -1299,7 +1303,7 @@ int onplay(char* file, int attr, int from_context, bool hotkey)
     menu_selection = do_menu(menu, NULL, NULL, false);
 
     if (get_current_activity() == ACTIVITY_CONTEXTMENU) /* Activity may have been      */
-        pop_current_activity();     /* popped already by menu item */
+        pop_current_activity();                         /* popped already by menu item */
 
 
     if (menu_selection == GO_TO_WPS)

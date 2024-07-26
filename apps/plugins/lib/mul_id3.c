@@ -196,52 +196,45 @@ static const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
 /* and videos */
 static const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
 
-static void prn(const char *str, int y)
+static void display_dir_stats_vp(struct dir_stats *stats, struct viewport *vp,
+                                 struct screen *display)
 {
-    rb->lcd_puts(0, y, str);
-#ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_puts(0, y, str);
-#endif
+    static bool initialized;
+    int32_t lang_size_unit;
+    unsigned long display_size = human_size(stats->byte_count, &lang_size_unit);
+    struct viewport *last_vp = display->set_viewport(vp);
+    display->clear_viewport();
+    if (initialized)
+    {
+        display->putsf(0, 0, "Files: %d (%lu %s)", stats->file_count,
+                       display_size, rb->str(lang_size_unit));
+        display->putsf(0, 1, "Audio: %d", stats->audio_file_count);
+        if (stats->count_all)
+        {
+            display->putsf(0, 2, "Playlists: %d", stats->m3u_file_count);
+            display->putsf(0, 3, "Images: %d", stats->img_file_count);
+            display->putsf(0, 4, "Videos: %d", stats->vid_file_count);
+            display->putsf(0, 5, "Directories: %d", stats->dir_count);
+            display->putsf(0, 6, "Max files in Dir: %d", stats->max_files_in_dir);
+        }
+        else
+            display->putsf(0, 2, "Directories: %d", stats->dir_count);
+    }
+    else
+        initialized = true;
+
+    display->update_viewport();
+    display->set_viewport(last_vp);
 }
 
 void display_dir_stats(struct dir_stats *stats)
 {
-    char buf[32];
-    int32_t lang_size_unit;
-    unsigned long display_size = human_size(stats->byte_count, &lang_size_unit);
-    rb->lcd_clear_display();
-#ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_clear_display();
-#endif
-    rb->snprintf(buf, sizeof(buf), "Files: %d (%lu %s)", stats->file_count,
-                 display_size, rb->str(lang_size_unit));
-    prn(buf, 0);
-    rb->snprintf(buf, sizeof(buf), "Audio: %d", stats->audio_file_count);
-    prn(buf, 1);
-    if (stats->count_all)
+    struct viewport vps[NB_SCREENS];
+    FOR_NB_SCREENS(i)
     {
-        rb->snprintf(buf, sizeof(buf), "Playlists: %d", stats->m3u_file_count);
-        prn(buf, 2);
-        rb->snprintf(buf, sizeof(buf), "Images: %d", stats->img_file_count);
-        prn(buf, 3);
-        rb->snprintf(buf, sizeof(buf), "Videos: %d", stats->vid_file_count);
-        prn(buf, 4);
-        rb->snprintf(buf, sizeof(buf), "Directories: %d", stats->dir_count);
-        prn(buf, 5);
-        rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d",
-                     stats->max_files_in_dir);
-        prn(buf, 6);
+        rb->viewport_set_defaults(&vps[i], i);
+        display_dir_stats_vp(stats, &vps[i], rb->screens[i]);
     }
-    else
-    {
-        rb->snprintf(buf, sizeof(buf), "Directories: %d", stats->dir_count);
-        prn(buf, 2);
-    }
-    rb->lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_update();
-#endif
-
 }
 
 /* Recursively scans directories in search of files
@@ -281,8 +274,7 @@ bool collect_dir_stats(struct dir_stats *stats, bool (*id3_cb)(const char*))
                 stats->dir_count++; /* new directory */
                 if (*rb->current_tick - last_displayed > (HZ/2))
                 {
-                    if (last_displayed)
-                        display_dir_stats(stats);
+                    display_dir_stats(stats);
                     last_displayed = *(rb->current_tick);
                 }
             }

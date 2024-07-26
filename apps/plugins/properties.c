@@ -35,6 +35,7 @@ enum props_types {
 
 static int props_type;
 
+static struct gui_synclist properties_lists;
 static struct mp3entry id3;
 static int mul_id3_count;
 static int skipped_count;
@@ -53,7 +54,7 @@ static int32_t lang_size_unit;
 static struct tm tm;
 
 #define NUM_FILE_PROPERTIES 5
-#define NUM_PLAYLIST_PROPERTIES 1 + NUM_FILE_PROPERTIES
+#define NUM_PLAYLIST_PROPERTIES (1 + NUM_FILE_PROPERTIES)
 static const unsigned char* const props_file[] =
 {
     ID2P(LANG_PROPERTIES_PATH),       str_dirname,
@@ -66,7 +67,7 @@ static const unsigned char* const props_file[] =
 };
 
 #define NUM_DIR_PROPERTIES 4
-#define NUM_AUDIODIR_PROPERTIES 1 + NUM_DIR_PROPERTIES
+#define NUM_AUDIODIR_PROPERTIES (1 + NUM_DIR_PROPERTIES)
 static const unsigned char* const props_dir[] =
 {
     ID2P(LANG_PROPERTIES_PATH),       str_dirname,
@@ -220,41 +221,40 @@ static int speak_property_selection(int selected_item, void *data)
     return 0;
 }
 
-static int browse_file_or_dir(struct dir_stats *stats)
+static void setup_properties_list(struct dir_stats *stats)
 {
-    struct gui_synclist properties_lists;
-    int button, nb_items;
-
+    int nb_props;
     if (props_type == PROPS_FILE)
-        nb_items = NUM_FILE_PROPERTIES;
+        nb_props = NUM_FILE_PROPERTIES;
     else if (props_type == PROPS_PLAYLIST)
-        nb_items = NUM_PLAYLIST_PROPERTIES;
-    else if (stats->audio_file_count)
-        nb_items = NUM_AUDIODIR_PROPERTIES;
+        nb_props = NUM_PLAYLIST_PROPERTIES;
     else
-        nb_items = NUM_DIR_PROPERTIES;
-
-    nb_items *= 2;
-
+        nb_props = NUM_DIR_PROPERTIES;
+    
     rb->gui_synclist_init(&properties_lists, &get_props, stats, false, 2, NULL);
     rb->gui_synclist_set_title(&properties_lists,
                                rb->str(props_type == PROPS_DIR ?
-                                                LANG_PROPERTIES_DIRECTORY_PROPERTIES :
-                                                LANG_PROPERTIES_FILE_PROPERTIES),
+                                       LANG_PROPERTIES_DIRECTORY_PROPERTIES :
+                                       LANG_PROPERTIES_FILE_PROPERTIES),
                                NOICON);
-    rb->gui_synclist_set_icon_callback(&properties_lists, NULL);
     if (rb->global_settings->talk_menu)
         rb->gui_synclist_set_voice_callback(&properties_lists, speak_property_selection);
-    rb->gui_synclist_set_nb_items(&properties_lists, nb_items);
-    rb->gui_synclist_select_item(&properties_lists, 0);
+    rb->gui_synclist_set_nb_items(&properties_lists, nb_props*2);
+}
+
+static int browse_file_or_dir(struct dir_stats *stats)
+{
+    int button;
+
+    if (props_type == PROPS_DIR && stats->audio_file_count)
+        rb->gui_synclist_set_nb_items(&properties_lists, NUM_AUDIODIR_PROPERTIES*2);
     rb->gui_synclist_draw(&properties_lists);
     rb->gui_synclist_speak_item(&properties_lists);
-
     while(true)
     {
         button = rb->get_action(CONTEXT_LIST, HZ);
         /* HZ so the status bar redraws corectly */
-        if (rb->gui_synclist_do_button(&properties_lists,&button))
+        if (rb->gui_synclist_do_button(&properties_lists, &button))
             continue;
         switch(button)
         {
@@ -356,12 +356,14 @@ static bool assemble_track_info(const char *filename, struct dir_stats *stats)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    int ret;
+    int ret = 0;
     static struct dir_stats stats;
     const char *file = parameter;
     if(!parameter)
         return PLUGIN_ERROR;
 
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
@@ -374,34 +376,44 @@ enum plugin_status plugin_start(const void* parameter)
 
         if(!determine_file_or_dir())
         {
-            /* weird: we couldn't find the entry. This Should Never Happen (TM) */
             rb->splashf(0, "File/Dir not found: %s", file);
             rb->action_userabort(TIMEOUT_BLOCK);
-            return PLUGIN_OK;
+            goto exit;
         }
 
-        if (props_type == PROPS_FILE && has_pl_extension(file))
-            props_type = PROPS_PLAYLIST;
-
-        if(!(props_type == PROPS_DIR ?
-             dir_properties(file, &stats, NULL) : file_properties(file)))
+        if (props_type == PROPS_FILE)
         {
+            if (has_pl_extension(file))
+                props_type = PROPS_PLAYLIST;
+
+            ret = !file_properties(file);
+        }
+
+        if (props_type != PROPS_ID3) /* i.e. not handled by browse_id3 */
+        {
+            setup_properties_list(&stats); /* Show title during dir scan */
+            if (props_type == PROPS_DIR)
+                ret = !dir_properties(file, &stats, NULL);
+        }
+        if (ret)
+        {
+            ret = 0;
             if (!stats.canceled)
             {
-                /* something went wrong (to do: tell user what it was (nesting,...) */
+                /* TODO: describe error */
                 rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
                 rb->action_userabort(TIMEOUT_BLOCK);
             }
-            return PLUGIN_OK;
+            goto exit;
         }
     }
              /* database table selected */
     else if (rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))
              || !assemble_track_info(NULL, NULL))
-        return PLUGIN_ERROR;
-
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_enable(i, true, NULL);
+    {
+        ret = -1;
+        goto exit;
+    }
 
     if (props_type == PROPS_ID3)
         ret = rb->browse_id3(&id3, 0, 0, &tm, 1);   /* Track Info for single file */
@@ -411,7 +423,7 @@ enum plugin_status plugin_start(const void* parameter)
         ret = assemble_track_info(file, &stats) ?    /* playlist or folder tracks */
                 rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
                 (stats.canceled ? 0 : -1);
-
+exit:
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
 
