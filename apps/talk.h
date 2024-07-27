@@ -145,6 +145,10 @@ void talk_fractional(char *tbuf, int value, int unit);
 void talk_time(const struct tm *tm, bool enqueue);
 void talk_date(const struct tm *tm, bool enqueue);
 
+#ifdef HAVE_MULTIVOLUME
+int talk_volume_id(int volume);
+#endif
+
 /* speaks hr, min, sec, ms; unit_idx is lowest or base unit of the time value */
 int talk_time_intervals(long time, int unit_idx, bool enqueue);
 

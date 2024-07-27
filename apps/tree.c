@@ -1252,6 +1252,12 @@ static void say_filetype(int attr)
 
 static int ft_play_dirname(char* name)
 {
+#ifdef HAVE_MULTIVOLUME
+    int vol = path_get_volume_id(name);
+    if (talk_volume_id(vol))
+        return 1;
+#endif
+
     return talk_file(tc.currdir, name, dir_thumbnail_name, NULL,
                      global_settings.talk_filetype ?
                      TALK_IDARRAY(VOICE_DIR) : NULL,

@@ -127,7 +127,35 @@ void init_volume_names(void)
                 VOL_START_TOK, voldec, volume, VOL_END_TOK);
         DEBUGF("vol<%d> = %s ", volume, buffer);
     }
-    DEBUGF("\n"); 
+    DEBUGF("\n");
+}
+
+#include <stdio.h>
+
+int path_get_volume_id(const char *name)
+{
+    int v = -1;
+
+    if (!name || *name != VOL_START_TOK)
+        goto bail;
+
+    do {
+        switch (*name)
+        {
+        case '0' ... '9':       /* digit; parse volume number */
+            v = (v * 10 + *name - '0') % VOL_NUM_MAX;
+            break;
+        case '\0':
+        case PATH_SEPCH:        /* no closing bracket; no volume */
+            v = -1;
+            goto bail;
+        default:                /* something else; reset volume */
+            v = 0;
+        }
+    } while (*++name != VOL_END_TOK);  /* found end token? */
+
+bail:
+    return v;
 }
 
 /* Returns on which volume this is and sets *nameptr to the portion of the

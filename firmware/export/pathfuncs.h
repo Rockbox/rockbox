@@ -83,6 +83,7 @@ int path_strip_last_volume(const char *name, const char **nameptr, bool greedy);
 int get_volume_name(int volume, char *name);
 int make_volume_root(int volume, char *dst);
 void init_volume_names(void);
+int path_get_volume_id(const char *name);
 #endif
 
 int path_strip_drive(const char *name, const char **nameptr, bool greedy);
