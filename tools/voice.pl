@@ -138,7 +138,7 @@ my %espeak_lang_map = (
     );
 
 my %piper_lang_map = (
-    'english' => 'en_GB-cori-high.onnx',  # Always first, it's the golden master
+    'english' => 'en_GB-semaine-medium.onnx',  # Always first, it's the golden master
 #    'bulgarian' => '-vbg',
     'chinese-simp' => 'zh_CN-huayan-medium.onnx',
     'czech' => 'cs_CZ-jirka-medium.onnx',
@@ -595,16 +595,20 @@ sub gentalkclips {
             print(".");
         }
 
-        # Convert to a complete path
-        my $path = sprintf("%s/%s", $dir, $file);
-
-        $voice = $file;
-        $wav = sprintf("%s.talk.wav", $path);
-
         # Ignore dot-dirs and talk files
         if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
             next;
         }
+
+        $voice = $file;
+
+        # Convert some symbols to spaces
+        $voice =~ tr/_-/  /;
+
+        # Convert to a complete path
+        my $path = sprintf("%s/%s", $dir, $file);
+
+        $wav = sprintf("%s.talk.wav", $path);
 
         if ( -d $path) { # Element is a dir
 	    $enc = sprintf("%s/_dirname.talk", $path);

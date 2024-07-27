@@ -601,7 +601,7 @@ sub simbuilds {
 	    'festival' => '--language english',
 	    'espeak' => '-ven-gb -k 5',
 	    'gtts' => '-l en -t co.uk',
-	    'piper' => 'en_GB-cori-high.onnx',
+	    'piper' => 'en_GB-semaine-medium.onnx',
 	},
         'enabled' => 1,
     },
