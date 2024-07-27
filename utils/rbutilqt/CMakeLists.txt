@@ -22,6 +22,7 @@ set(RBUTIL_TS_FILES
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_he.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_it.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_ja.ts
+    ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_ko.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_nl.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_pl.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_pt_BR.ts
