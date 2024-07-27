@@ -610,7 +610,7 @@ sub simbuilds {
 	'lang' => 'bulgarian',
 	'name' => 'Български (Bulgarian)',
         'short' => 'bg',
-        'defengine' => 'espeak',
+        'defengine' => 'gtts',
 	'engines' => {
 	    'espeak' => '-vbg',
 	    'gtts' => '-l bg',
