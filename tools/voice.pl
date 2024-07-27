@@ -8,6 +8,7 @@
 # $Id$
 #
 # Copyright (C) 2007 Jonas Häggqvist
+# Copyright (C) 2020 Solomon Peachy
 #
 # All files in this archive are subject to the GNU General Public License.
 # See the file COPYING in the source tree root for full license agreement.
@@ -162,7 +163,7 @@ my %piper_lang_map = (
     'turkce' => 'tr_TR-fettah-medium.onnx',
 );
 
-my $trim_thresh = 500;   # Trim silence if over this, in ms
+my $trim_thresh = 250;   # Trim silence if over this, in ms
 my $force = 0;           # Don't regenerate files already present
 
 # Initialize TTS engine. May return an object or value which will be passed
