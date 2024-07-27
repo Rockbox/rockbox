@@ -92,7 +92,7 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
     const int menu_name_id = menu_items[info_no];
 
     /* header */
-    if (!(selected_item % 2))
+    if (!say_it && !(selected_item % 2))
         return rb->str(menu_name_id);
 
     /* data */
