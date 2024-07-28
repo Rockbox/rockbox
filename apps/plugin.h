@@ -977,6 +977,8 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    int (*talk_fullpath)(const char* path, bool enqueue);
 };
 
 /* plugin header */

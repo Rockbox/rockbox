@@ -175,25 +175,7 @@ static int speak_property_selection(int selected_item, void *data)
     switch (id)
     {
     case LANG_PROPERTIES_PATH:
-        if (str_dirname[0] == '/')
-        {
-            char *start = str_dirname;
-            char *ptr;
-            while (0 != (ptr = rb->strchr(start, '/')))
-            {
-                *ptr = '\0';
-                rb->talk_dir_or_spell(str_dirname, NULL, true);
-                *ptr = '/';
-                rb->talk_id(VOICE_CHAR_SLASH, true);
-                start = ptr + 1;
-            }
-            if (*start)
-                rb->talk_dir_or_spell(str_dirname, NULL, true);
-        }
-        else
-        {
-            rb->talk_spell(str_dirname, true);
-        }
+        rb->talk_fullpath(str_dirname, true);
         break;
     case LANG_PROPERTIES_FILENAME:
         rb->talk_file_or_spell(str_dirname, str_filename, NULL, true);
@@ -230,7 +212,7 @@ static void setup_properties_list(struct dir_stats *stats)
         nb_props = NUM_PLAYLIST_PROPERTIES;
     else
         nb_props = NUM_DIR_PROPERTIES;
-    
+
     rb->gui_synclist_init(&properties_lists, &get_props, stats, false, 2, NULL);
     rb->gui_synclist_set_title(&properties_lists,
                                rb->str(props_type == PROPS_DIR ?
