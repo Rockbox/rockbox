@@ -1232,8 +1232,18 @@ int talk_fullpath(const char* path, bool enqueue)
         ptr = strchr(start, PATH_SEPCH);
     }
 
-    /* no more slashes, final component is a filename */
-    return talk_file_or_spell(NULL, buf, NULL, true);
+    /* no more slashes, figure out final component */
+    if (!*start) {
+        return 1;
+    }
+
+    DIR* dir = opendir(buf);
+    if (dir) {
+        closedir(dir);
+        return talk_dir_or_spell(buf, NULL, true);
+    } else {
+        return talk_file_or_spell(NULL, buf, NULL, true);
+    }
 }
 
 /* say a numeric value, this word ordering works for english,
