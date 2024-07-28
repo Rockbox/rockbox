@@ -1219,7 +1219,6 @@ bool search_playlist(void)
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
                       &s_data, false, 1, NULL);
     gui_synclist_set_title(&playlist_lists, str(LANG_SEARCH_RESULTS), NOICON);
-    gui_synclist_set_icon_callback(&playlist_lists, NULL);
     if(global_settings.talk_file)
         gui_synclist_set_voice_callback(&playlist_lists,
                                         global_settings.talk_file?

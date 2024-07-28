@@ -900,7 +900,6 @@ int view_runtime(void)
     gui_synclist_set_title(&lists, str(LANG_RUNNING_TIME), NOICON);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, runtime_speak_data);
-    gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, 4);
 
     while(1)

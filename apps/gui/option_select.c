@@ -504,7 +504,6 @@ bool option_screen(const struct settings_list *setting,
         title = P2STR(option_title);
 
     gui_synclist_set_title(&lists, title, Icon_Questionmark);
-    gui_synclist_set_icon_callback(&lists, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, option_talk);
 

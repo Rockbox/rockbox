@@ -485,7 +485,6 @@ int handle_radio_presets(void)
 
     gui_synclist_init(&lists, presets_get_name, NULL, false, 1, NULL);
     gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
-    gui_synclist_set_icon_callback(&lists, NULL);
     if(global_settings.talk_file)
         gui_synclist_set_voice_callback(&lists, presets_speak_name);
     gui_synclist_set_nb_items(&lists, num_presets);
