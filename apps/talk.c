@@ -777,7 +777,7 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
             talk_id(VOICE_DOT, true);
         else if (c == ' ')
             talk_id(VOICE_PAUSE, true);
-        else if (c == '/')
+        else if (c == PATH_SEPCH)
             talk_id(VOICE_CHAR_SLASH, true);
 
         while (QUEUE_LEVEL == QUEUE_SIZE - 1) /* queue full - busy loop */
@@ -1140,12 +1140,12 @@ int talk_file(const char *root, const char *dir, const char *file,
 {
     char buf[MAX_PATH];
     const char *fmt = "%s%s%s%s%s";
-    /* Does root end with a slash */
-    if(root && root[0] && root[strlen(root)-1] != '/')
-        fmt = "%s/%s%s%s%s";
+    /* Does root end with a slash? */
+    if(root && root[0] && root[strlen(root)-1] != PATH_SEPCH)
+        fmt = "%s" PATH_SEPSTR "%s%s%s%s";
     snprintf(buf, MAX_PATH, fmt,
              root ? root : "",
-             dir ? dir : "", dir ? "/" : "",
+             dir ? dir : "", dir ? PATH_SEPSTR : "",
              file ? file : "",
              ext ? ext : "");
     return _talk_file(buf, prefix_ids, enqueue);
@@ -1207,14 +1207,14 @@ int talk_fullpath(const char* path, bool enqueue)
 {
     do_enqueue(enqueue);  /* cut off all the pending stuff */
 
-    if(path[0] != '/')
+    if(path[0] != PATH_SEPCH)
         /* path ought to start with /... */
         return talk_spell(path, true);
     talk_id(VOICE_CHAR_SLASH, true);
     char buf[MAX_PATH];
     strmemccpy(buf, path, MAX_PATH);
     char *start = buf+1; /* start of current component */
-    char *ptr = strchr(start, '/'); /* end of current component */
+    char *ptr = strchr(start, PATH_SEPCH); /* end of current component */
     while(ptr) { /* There are more slashes ahead */
         /* temporarily poke a NULL at end of component to truncate string */
         *ptr = '\0';
@@ -1226,10 +1226,10 @@ int talk_fullpath(const char* path, bool enqueue)
         } else
 #endif
             talk_dir_or_spell(buf, NULL, true);
-        *ptr = '/'; /* restore string */
+        *ptr = PATH_SEPCH; /* restore string */
         talk_id(VOICE_CHAR_SLASH, true);
         start = ptr+1; /* setup for next component */
-        ptr = strchr(start, '/');
+        ptr = strchr(start, PATH_SEPCH);
     }
 
     /* no more slashes, final component is a filename */
