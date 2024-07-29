@@ -610,10 +610,11 @@ sub simbuilds {
 	'lang' => 'bulgarian',
 	'name' => 'Български (Bulgarian)',
         'short' => 'bg',
-        'defengine' => 'gtts',
+        'defengine' => 'espeak',  # XXX Switch to gtts when buildserver is updated
 	'engines' => {
 	    'espeak' => '-vbg',
 	    'gtts' => '-l bg',
+            # No piper voice yet.
 	},
         'enabled' => 1,
     },
