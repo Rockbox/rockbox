@@ -761,7 +761,4 @@ void filesystem_init(void)
     mrsw_init(&file_internal_mrsw);
     dc_init();
     fileobj_mgr_init();
-#ifdef HAVE_MULTIVOLUME
-    init_volume_names();
-#endif
 }

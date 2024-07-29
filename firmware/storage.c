@@ -23,6 +23,7 @@
 #include "ata_idle_notify.h"
 #include "usb.h"
 #include "disk.h"
+#include "pathfuncs.h"
 
 #ifdef CONFIG_STORAGE_MULTI
 
@@ -275,21 +276,21 @@ int storage_init(void)
 #ifdef CONFIG_STORAGE_MULTI
     int i;
     num_drives=0;
-    
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     if ((rc=ata_init())) return rc;
-    
+
     int ata_drives = ata_num_drives(num_drives);
     for (i=0; i<ata_drives; i++)
     {
-        storage_drivers[num_drives++] = 
+        storage_drivers[num_drives++] =
             (STORAGE_ATA<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
     }
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
     if ((rc=mmc_init())) return rc;
-    
+
     int mmc_drives = mmc_num_drives(num_drives);
     for (i=0; i<mmc_drives ;i++)
     {
@@ -300,7 +301,7 @@ int storage_init(void)
 
 #if (CONFIG_STORAGE & STORAGE_SD)
     if ((rc=sd_init())) return rc;
-    
+
     int sd_drives = sd_num_drives(num_drives);
     for (i=0; i<sd_drives; i++)
     {
@@ -311,7 +312,7 @@ int storage_init(void)
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
     if ((rc=nand_init())) return rc;
-    
+
     int nand_drives = nand_num_drives(num_drives);
     for (i=0; i<nand_drives; i++)
     {
@@ -322,7 +323,7 @@ int storage_init(void)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     if ((rc=ramdisk_init())) return rc;
-    
+
     int ramdisk_drives = ramdisk_num_drives(num_drives);
     for (i=0; i<ramdisk_drives; i++)
     {
@@ -333,6 +334,10 @@ int storage_init(void)
 #else /* ndef CONFIG_STORAGE_MULTI */
     rc = STORAGE_FUNCTION(init)();
 #endif /* CONFIG_STORAGE_MULTI */
+
+#ifdef HAVE_MULTIVOLUME
+    init_volume_names();
+#endif
 
     storage_thread_init();
     return rc;
@@ -520,7 +525,7 @@ bool storage_disk_is_active(void)
 int storage_soft_reset(void)
 {
     int rc=0;
-    
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     if ((rc=ata_soft_reset())) return rc;
 #endif
@@ -548,7 +553,7 @@ int storage_soft_reset(void)
 int storage_flush(void)
 {
     int rc=0;
-    
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     //if ((rc=ata_flush())) return rc;
 #endif
@@ -648,7 +653,7 @@ long storage_last_disk_activity(void)
 {
     long max=0;
     long t;
-    
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     t=ata_last_disk_activity();
     if (t>max) max=t;
@@ -681,7 +686,7 @@ int storage_spinup_time(void)
 {
     int max=0;
     int t;
-    
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     t=ata_spinup_time();
     if (t>max) max=t;
@@ -716,7 +721,7 @@ void storage_get_info(int drive, struct storage_info *info)
 {
     int driver=(storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;
     int ldrive=(storage_drivers[drive] & DRIVE_MASK)>>DRIVE_OFFSET;
-    
+
     switch(driver)
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -752,7 +757,7 @@ bool storage_removable(int drive)
 {
     int driver=(storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;
     int ldrive=(storage_drivers[drive] & DRIVE_MASK)>>DRIVE_OFFSET;
-    
+
     switch(driver)
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -789,7 +794,7 @@ bool storage_present(int drive)
 {
     int driver=(storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;
     int ldrive=(storage_drivers[drive] & DRIVE_MASK)>>DRIVE_OFFSET;
-    
+
     switch(driver)
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
