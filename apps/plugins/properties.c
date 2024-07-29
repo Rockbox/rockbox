@@ -33,25 +33,17 @@ enum props_types {
     PROPS_DIR
 };
 
-static int props_type;
-
 static struct gui_synclist properties_lists;
 static struct mp3entry id3;
-static int mul_id3_count;
-static int skipped_count;
-
-static char str_filename[MAX_PATH];
-static char str_dirname[MAX_PATH];
-static char str_size[64];
-static char str_dircount[64];
-static char str_filecount[64];
-static char str_audio_filecount[64];
-static char str_date[64];
-static char str_time[64];
-
+static struct tm tm;
 static unsigned long display_size;
 static int32_t lang_size_unit;
-static struct tm tm;
+static int props_type, mul_id3_count, skipped_count;
+
+static char str_filename[MAX_PATH], str_dirname[MAX_PATH],
+            str_size[64], str_dircount[64], str_filecount[64],
+            str_audio_filecount[64], str_date[64], str_time[64];
+
 
 #define NUM_FILE_PROPERTIES 5
 #define NUM_PLAYLIST_PROPERTIES (1 + NUM_FILE_PROPERTIES)
@@ -78,71 +70,28 @@ static const unsigned char* const props_dir[] =
     ID2P(LANG_MENU_SHOW_ID3_INFO),    str_audio_filecount,
 };
 
-static bool file_properties(const char* selected_file)
+static bool dir_properties(const char* selected_file, struct dir_stats *stats)
 {
-    bool found = false;
-    struct dirent* entry;
-    DIR* dir = rb->opendir(str_dirname);
-    if (dir)
-    {
-        while(0 != (entry = rb->readdir(dir)))
-        {
-            struct dirinfo info = rb->dir_get_info(dir, entry);
-            if(!rb->strcmp(entry->d_name, str_filename))
-            {
-                display_size = human_size(info.size, &lang_size_unit);
-                rb->snprintf(str_size, sizeof str_size, "%lu %s",
-                             display_size, rb->str(lang_size_unit));
-                rb->gmtime_r(&info.mtime, &tm);
-                rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
-                    tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-                rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
-                    tm.tm_hour, tm.tm_min, tm.tm_sec);
-
-                if (props_type != PROPS_PLAYLIST && rb->get_metadata(&id3, -1, selected_file))
-                    props_type = PROPS_ID3;
-                found = true;
-                break;
-            }
-        }
-        rb->closedir(dir);
-    }
-    return found;
-}
-
-
-static bool dir_properties(const char* selected_file, struct dir_stats *stats,
-                           bool (*id3_cb)(const char*))
-{
-    bool success;
-
     rb->strlcpy(stats->dirname, selected_file, sizeof(stats->dirname));
-    if (id3_cb)
-        rb->splash_progress_set_delay(HZ / 2); /* hide progress bar for 0.5s */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+        rb->cpu_boost(true);
 #endif
-    success = collect_dir_stats(stats, id3_cb);
-
+    bool success = collect_dir_stats(stats, NULL);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+        rb->cpu_boost(false);
 #endif
-
     if (!success)
         return false;
 
-    if (!id3_cb)
-    {
-        rb->strlcpy(str_dirname, selected_file, sizeof(str_dirname));
-        rb->snprintf(str_dircount, sizeof str_dircount, "%d", stats->dir_count);
-        rb->snprintf(str_filecount, sizeof str_filecount, "%d", stats->file_count);
-        rb->snprintf(str_audio_filecount, sizeof str_filecount, "%d",
-                     stats->audio_file_count);
-        display_size = human_size(stats->byte_count, &lang_size_unit);
-        rb->snprintf(str_size, sizeof str_size, "%lu %s", display_size,
-                     rb->str(lang_size_unit));
-    }
+    rb->strlcpy(str_dirname, selected_file, sizeof(str_dirname));
+    rb->snprintf(str_dircount, sizeof str_dircount, "%d", stats->dir_count);
+    rb->snprintf(str_filecount, sizeof str_filecount, "%d", stats->file_count);
+    rb->snprintf(str_audio_filecount, sizeof str_filecount, "%d",
+                 stats->audio_file_count);
+    display_size = human_size(stats->byte_count, &lang_size_unit);
+    rb->snprintf(str_size, sizeof str_size, "%lu %s", display_size,
+                 rb->str(lang_size_unit));
     return true;
 }
 
@@ -157,12 +106,11 @@ static const char * get_props(int selected_item, void* data,
 {
     (void)data;
     if (PROPS_DIR == props_type)
-        rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_dir)) ? "ERROR" :
-                                (char *) p2str(props_dir[selected_item]), buffer_len);
+        rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_dir)) ?
+                    "ERROR" : (char *) p2str(props_dir[selected_item]), buffer_len);
     else
-        rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_file)) ? "ERROR" :
-                                (char *) p2str(props_file[selected_item]), buffer_len);
-
+        rb->strlcpy(buffer, selected_item >= (int)(ARRAY_SIZE(props_file)) ?
+                    "ERROR" : (char *) p2str(props_file[selected_item]), buffer_len);
     return buffer;
 }
 
@@ -226,15 +174,13 @@ static void setup_properties_list(struct dir_stats *stats)
 
 static int browse_file_or_dir(struct dir_stats *stats)
 {
-    int button;
-
     if (props_type == PROPS_DIR && stats->audio_file_count)
         rb->gui_synclist_set_nb_items(&properties_lists, NUM_AUDIODIR_PROPERTIES*2);
     rb->gui_synclist_draw(&properties_lists);
     rb->gui_synclist_speak_item(&properties_lists);
     while(true)
     {
-        button = rb->get_action(CONTEXT_LIST, HZ);
+        int button = rb->get_action(CONTEXT_LIST, HZ);
         /* HZ so the status bar redraws corectly */
         if (rb->gui_synclist_do_button(&properties_lists, &button))
             continue;
@@ -257,23 +203,54 @@ static int browse_file_or_dir(struct dir_stats *stats)
     }
 }
 
-static bool determine_file_or_dir(void)
+static bool determine_props_type(const char *file)
 {
-    struct dirent* entry;
-    DIR* dir = rb->opendir(str_dirname);
-    if (dir)
+    if (file[0] == PATH_SEPCH)
     {
+        const char* basename = rb->strrchr(file, PATH_SEPCH) + 1;
+        const int dir_len = (basename - file);
+        if ((int) sizeof(str_dirname) <= dir_len)
+            return false;
+        rb->strlcpy(str_dirname, file, dir_len + 1);
+        rb->strlcpy(str_filename, basename, sizeof str_filename);
+        struct dirent* entry;
+        DIR* dir = rb->opendir(str_dirname);
+        if (!dir)
+            return false;
         while(0 != (entry = rb->readdir(dir)))
         {
-            if(!rb->strcmp(entry->d_name, str_filename))
+            if(rb->strcmp(entry->d_name, str_filename))
+                continue;
+
+            struct dirinfo info = rb->dir_get_info(dir, entry);
+            if (info.attribute & ATTR_DIRECTORY)
+                props_type = PROPS_DIR;
+            else
             {
-                struct dirinfo info = rb->dir_get_info(dir, entry);
-                props_type = info.attribute & ATTR_DIRECTORY ? PROPS_DIR : PROPS_FILE;
-                rb->closedir(dir);
-                return true;
+                display_size = human_size(info.size, &lang_size_unit);
+                rb->snprintf(str_size, sizeof str_size, "%lu %s",
+                             display_size, rb->str(lang_size_unit));
+                rb->gmtime_r(&info.mtime, &tm);
+                rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
+                             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+                rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
+                             tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+                if (rb->filetype_get_attr(entry->d_name) == FILE_ATTR_M3U)
+                    props_type = PROPS_PLAYLIST;
+                else
+                    props_type = rb->get_metadata(&id3, -1, file) ?
+                                 PROPS_ID3 : PROPS_FILE;
             }
+            rb->closedir(dir);
+            return true;
         }
         rb->closedir(dir);
+    }
+    else if (!rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER)))
+    {
+        props_type = PROPS_MUL_ID3;
+        return true;
     }
     return false;
 }
@@ -287,40 +264,34 @@ bool mul_id3_add(const char *file_name)
         collect_id3(&id3, mul_id3_count == 0);
         mul_id3_count++;
     }
-
     return true;
 }
 
-static bool has_pl_extension(const char* filename)
-{
-    char *dot = rb->strrchr(filename, '.');
-    return (dot && (!rb->strcasecmp(dot, ".m3u") || !rb->strcasecmp(dot, ".m3u8")));
-}
-
-/* Assemble track info from a database table, the contents of a playlist file, or a dir */
+/* Assemble track info from a dir, a playlist, or a database table */
 static bool assemble_track_info(const char *filename, struct dir_stats *stats)
 {
-    if (!filename)
-        props_type = PROPS_MUL_ID3;
-    mul_id3_count = skipped_count = 0;
-
-#ifdef HAVE_TAGCACHE
-    if (props_type == PROPS_MUL_ID3 && !rb->tagtree_subentries_do_action(&mul_id3_add))
-        return false;
-    else
-#endif
+    if (props_type == PROPS_DIR)
     {
-        if (props_type == PROPS_DIR)
-        {
-            if (!dir_properties(filename, stats, &mul_id3_add))
-                return false;
-        }
-        else if(props_type == PROPS_PLAYLIST)
-        {
-            if (!rb->playlist_entries_iterate(filename, NULL, &mul_id3_add))
-                return false;
-        }
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(true);
+#endif
+        rb->strlcpy(stats->dirname, filename, sizeof(stats->dirname));
+        rb->splash_progress_set_delay(HZ/2); /* hide progress bar for 0.5s */
+        bool success = collect_dir_stats(stats, &mul_id3_add);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(false);
+#endif
+        if (!success)
+            return false;
     }
+    else if(props_type == PROPS_PLAYLIST &&
+            !rb->playlist_entries_iterate(filename, NULL, &mul_id3_add))
+        return false;
+#ifdef HAVE_TAGCACHE
+    else if (props_type == PROPS_MUL_ID3 &&
+             !rb->tagtree_subentries_do_action(&mul_id3_add))
+        return false;
+#endif
 
     if (mul_id3_count == 0)
     {
@@ -338,84 +309,48 @@ static bool assemble_track_info(const char *filename, struct dir_stats *stats)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    int ret = 0;
     static struct dir_stats stats;
     const char *file = parameter;
-    if(!parameter)
-        return PLUGIN_ERROR;
-
-    FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_enable(i, true, NULL);
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
-    if (file[0] == '/') /* single file or folder selected */
+    int ret = file && determine_props_type(file);
+    if (!ret)
     {
-        const char* file_name = rb->strrchr(file, '/') + 1;
-        const int dirlen = (file_name - file);
-        rb->strlcpy(str_dirname, file, dirlen + 1);
-        rb->snprintf(str_filename, sizeof str_filename, "%s", file + dirlen);
+        rb->splashf(0, "Could not find: %s", file ?: "(NULL)");
+        rb->action_userabort(TIMEOUT_BLOCK);
+        return PLUGIN_OK;
+    }
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
 
-        if(!determine_file_or_dir())
+    if (props_type == PROPS_MUL_ID3)
+        ret = assemble_track_info(NULL, NULL);
+    else if (props_type != PROPS_ID3)
+    {
+        setup_properties_list(&stats);               /* Show title during dir scan */
+        if (props_type == PROPS_DIR)
+            ret = dir_properties(file, &stats);
+    }
+    if (!ret)
+    {
+        if (!stats.canceled)
         {
-            rb->splashf(0, "File/Dir not found: %s", file);
+            rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));    /* TODO: describe error */
             rb->action_userabort(TIMEOUT_BLOCK);
-            goto exit;
-        }
-
-        if (props_type == PROPS_FILE)
-        {
-            if (has_pl_extension(file))
-                props_type = PROPS_PLAYLIST;
-
-            ret = !file_properties(file);
-        }
-
-        if (props_type != PROPS_ID3) /* i.e. not handled by browse_id3 */
-        {
-            setup_properties_list(&stats); /* Show title during dir scan */
-            if (props_type == PROPS_DIR)
-                ret = !dir_properties(file, &stats, NULL);
-        }
-        if (ret)
-        {
-            ret = 0;
-            if (!stats.canceled)
-            {
-                /* TODO: describe error */
-                rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
-                rb->action_userabort(TIMEOUT_BLOCK);
-            }
-            goto exit;
         }
     }
-             /* database table selected */
-    else if (rb->strcmp(file, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER))
-             || !assemble_track_info(NULL, NULL))
-    {
-        ret = -1;
-        goto exit;
-    }
-
-    if (props_type == PROPS_ID3)
+    else if (props_type == PROPS_ID3)
         ret = rb->browse_id3(&id3, 0, 0, &tm, 1);   /* Track Info for single file */
     else if (props_type == PROPS_MUL_ID3)
         ret = rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count); /* database tracks */
     else if ((ret = browse_file_or_dir(&stats)) < 0)
         ret = assemble_track_info(file, &stats) ?    /* playlist or folder tracks */
-                rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
-                (stats.canceled ? 0 : -1);
-exit:
+              rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
+              (stats.canceled ? 0 : -1);
+
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
 
-    switch (ret)
-    {
-        case 1:
-            return PLUGIN_USB_CONNECTED;
-        case -1:
-            return PLUGIN_ERROR;
-        default:
-            return PLUGIN_OK;
-    }
+    return ret == -1 ? PLUGIN_ERROR : ret == 1 ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
