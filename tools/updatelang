@@ -158,7 +158,7 @@ sub reduceformat($) {
 ##################
 
 if($#ARGV != 2) {
-    print "Usage: updatelang <english.lang> <otherlang> <outfile|->\n";
+    print "Usage: [ENGLISHORDER=1] updatelang <english.lang> <otherlang> <outfile|->\n";
     exit;
 }
 
@@ -502,7 +502,14 @@ foreach (@langheader) {
     print $fh $_;
 }
 
-my @finalorder = @langorder;  # TODO make configurable vs @englishorder
+my @finalorder;
+
+if ($ENV{'ENGLISHORDER'}) {
+    @finalorder = @englishorder;
+} else {
+    @finalorder = @langorder;
+}
+
 foreach my $id (@finalorder) {
     if (!defined($english{$id})) {
 	next;
