@@ -21,14 +21,6 @@ my $LANGUAGE_FLAG_UNITS_FIRST = 0x02;
 my $HEADER_SIZE       = 4;
 my $SUBHEADER_SIZE    = 6;
 
-# A note for future users and readers: The original v1 language system allowed
-# the build to create and use a different language than english built-in. We
-# removed that feature from our build-system, but the build scripts still had
-# the ability. But, starting now, this ability is no longer provided since I
-# figured it was boring and unnecessary to write support for now since we
-# don't use it anymore.
-
-
 if(!$ARGV[0]) {
     print <<MOO
 Usage: genlang [options] <langv2 file>
@@ -46,11 +38,7 @@ Usage: genlang [options] <langv2 file>
 
  -e=<english lang file>
     Point out the english (original source) file, to use that as master
-    language template. Used in combination with -b, -u or -s.
-
- -s
-    Sort the Update language file in the same order as the strings in the
-    English file.
+    language template. Used in combination with -b.
 
  -t=<target>
     Specify which target you want the translations/phrases for. Required when
@@ -73,41 +61,26 @@ MOO
     exit;
 }
 
-# How update works:
-#
-# 1) scan the english file, keep the whole <phrase> for each phrase.
-# 2) read the translated file, for each end of phrase, compare:
-#  A) all source strings, if there's any change there should be a comment about
-#     it output
-#  B) the desc fields
-#
-# 3) output the phrase with the comments from above
-# 4) check which phrases that the translated version didn't have, and spit out
-#    the english version of those
-#
-
 my $prefix = $p;
 my $binary = $b;
-my $sortfile = $s;
 my $binvoice = $c;
 
 my $english = $e;
 my $voiceout = $o;
 
-my $check = ($binary?.5:0) + ($prefix?1:0) + ($voiceout?1:0) + ($sortfile?1:0) + ($binvoice?.5:0);
+my $check = ($binary?.5:0) + ($prefix?1:0) + ($voiceout?1:0) + ($binvoice?.5:0);
 
 if($check > 1) {
-    print STDERR "Please use only one of -p, -o, -b, -c and -s\n";
+    print STDERR "Please use only one of -p, -o, -b, and -c\n";
     exit;
 }
 if(!$check) {
-    print STDERR "Please use at least one of -p, -o, -c, -e and -s\n";
+    print STDERR "Please use at least one of -p, -o, -c, and -e\n";
     exit;
 }
 
-
-if(($binary || $voiceout || $sortfile) && !$english) {
-    print STDERR "Please use -e too when you use -b, -o, -u or -s\n";
+if(($binary || $voiceout) && !$english) {
+    print STDERR "Please use -e too when you use -b, or -o\n";
     exit;
 }
 
@@ -118,7 +91,7 @@ if($binary && !$target_id) {
 }
 
 my $target = $t;
-if(!$target && !$sortfile) {
+if(!$target) {
     print STDERR "Please specify a target (with -t)!\n";
     exit;
 }
@@ -234,9 +207,8 @@ if($english) {
 }
 
 sub readenglish {
-    # For the cases where the english file needs to be scanned/read, we do
-    # it before we read the translated file. For -b it isn't necessary, but for
-    # -u it is convenient.
+    # For the cases where the english file needs to be scanned/read, we must
+    # do it before we read the translated file.
 
     my @idnum = ((0));       # start with a true number
     my @vidnum = ((0x8000)); # first voice id
@@ -318,7 +290,7 @@ sub readenglish {
             elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
                 my ($name, $val)=($1, $2);
                 $dest=""; # in case it is left untouched for when the
-                # model name isn't "our"
+                # model name isn't "ours"
                 dest($_, $name, $val);
 
                 if($dest) {
@@ -358,7 +330,6 @@ for (keys %users) {
 
 open(LANG, "<$input") || die "Error: couldn't read language file named $input\n";
 my @phrase;
-my $header = 1;
 my $langoptions = 0;
 
 while(<LANG>) {
@@ -376,13 +347,8 @@ while(<LANG>) {
         if ($_ =~ /LANGUAGE_UNITS_FIRST/) {
             $langoptions |= $LANGUAGE_FLAG_UNITS_FIRST;
         }
-
-        if ($header and $sortfile) {
-            print($_);
-        }
         next;
     }
-    $header = 0;
 
     my $ll = $_;
 
