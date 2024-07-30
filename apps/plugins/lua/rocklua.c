@@ -241,6 +241,20 @@ static void display_traceback(const char *errstr)
   rb->splash(10 * HZ, errstr);
 #endif
 }
+
+int browse_scripts(void)
+{
+    static char buf[MAX_PATH];
+    const char *fname = rb->plugin_get_current_filename();
+    /* strip plugin dir to save space in the param buffer */
+    if (rb->strncmp(fname, PLUGIN_DIR, sizeof(PLUGIN_DIR) - 1) == 0)
+        fname += sizeof(PLUGIN_DIR) - 1; /* leave slash */
+    /* -r return to this plugin, -f looking for lua files,
+       -s start in lua_scripts, -d lock to that directory */
+    snprintf(buf, sizeof(buf), "-r'%s'-f'.lua'-s'%s'-d",
+             fname, PLUGIN_DEMOS_DIR"/lua_scripts/");
+    return rb->plugin_open(VIEWERS_DIR "/file_picker.rock", buf);
+}
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -249,7 +263,10 @@ enum plugin_status plugin_start(const void* parameter)
     if (parameter == NULL)
     {
       if (!Ls)
+      {
         rb->splash(HZ, "Play a .lua file!");
+        return browse_scripts();
+      }
     }
     else
     {
