@@ -199,29 +199,23 @@ static const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
 static void display_dir_stats_vp(struct dir_stats *stats, struct viewport *vp,
                                  struct screen *display)
 {
-    static bool initialized;
     int32_t lang_size_unit;
     unsigned long display_size = human_size(stats->byte_count, &lang_size_unit);
     struct viewport *last_vp = display->set_viewport(vp);
     display->clear_viewport();
-    if (initialized)
+    display->putsf(0, 0, "Files: %d (%lu %s)", stats->file_count,
+                   display_size, rb->str(lang_size_unit));
+    display->putsf(0, 1, "Audio: %d", stats->audio_file_count);
+    if (stats->count_all)
     {
-        display->putsf(0, 0, "Files: %d (%lu %s)", stats->file_count,
-                       display_size, rb->str(lang_size_unit));
-        display->putsf(0, 1, "Audio: %d", stats->audio_file_count);
-        if (stats->count_all)
-        {
-            display->putsf(0, 2, "Playlists: %d", stats->m3u_file_count);
-            display->putsf(0, 3, "Images: %d", stats->img_file_count);
-            display->putsf(0, 4, "Videos: %d", stats->vid_file_count);
-            display->putsf(0, 5, "Directories: %d", stats->dir_count);
-            display->putsf(0, 6, "Max files in Dir: %d", stats->max_files_in_dir);
-        }
-        else
-            display->putsf(0, 2, "Directories: %d", stats->dir_count);
+        display->putsf(0, 2, "Playlists: %d", stats->m3u_file_count);
+        display->putsf(0, 3, "Images: %d", stats->img_file_count);
+        display->putsf(0, 4, "Videos: %d", stats->vid_file_count);
+        display->putsf(0, 5, "Directories: %d", stats->dir_count);
+        display->putsf(0, 6, "Max files in Dir: %d", stats->max_files_in_dir);
     }
     else
-        initialized = true;
+        display->putsf(0, 2, "Directories: %d", stats->dir_count);
 
     display->update_viewport();
     display->set_viewport(last_vp);
@@ -274,7 +268,8 @@ bool collect_dir_stats(struct dir_stats *stats, bool (*id3_cb)(const char*))
                 stats->dir_count++; /* new directory */
                 if (*rb->current_tick - last_displayed > (HZ/2))
                 {
-                    display_dir_stats(stats);
+                    if (last_displayed)
+                        display_dir_stats(stats);
                     last_displayed = *(rb->current_tick);
                 }
             }
