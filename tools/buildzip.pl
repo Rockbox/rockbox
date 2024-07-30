@@ -380,6 +380,7 @@ sub buildzip {
         my $cmd = "$ROOT/tools/convbdf -f $ROOT/fonts/*bdf >/dev/null 2>&1";
         print($cmd."\n") if $verbose;
         system($cmd);
+        copy("$ROOT/fonts/COPYING", ".");
         chdir("../../");
 
         if($fonts < 2) {
