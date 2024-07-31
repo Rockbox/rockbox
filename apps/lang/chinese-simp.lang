@@ -16420,3 +16420,17 @@
     *: none
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "请选择文件"
+  </dest>
+  <voice>
+    *: "请选择文件"
+  </voice>
+</phrase>
