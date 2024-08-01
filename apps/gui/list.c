@@ -700,6 +700,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
         case ACTION_TREE_PGRIGHT:
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
+            yield();
             return true;
         case ACTION_TREE_ROOT_INIT:
          /* After this button press ACTION_TREE_PGLEFT is allowed
@@ -727,6 +728,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
             gui_synclist_draw(lists);
             pgleft_allow_cancel = false; /* stop ACTION_TREE_PAGE_LEFT
                                             skipping to root */
+            yield();
             return true;
 /* for pgup / pgdown, we are obliged to have a different behaviour depending
  * on the screen for which the user pressed the key since for example, remote
