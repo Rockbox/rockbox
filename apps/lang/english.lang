@@ -12614,16 +12614,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "Playlist remaining:"
+    *: ""
   </dest>
   <voice>
-    *: "Playlist remaining"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16498,5 +16498,19 @@
   </dest>
   <voice>
     *: "Choose File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Remaining"
+  </dest>
+  <voice>
+    *: "Remaining"
   </voice>
 </phrase>

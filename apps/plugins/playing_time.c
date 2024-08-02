@@ -32,10 +32,10 @@ const unsigned char * const byte_units[] =
 };
 
 const int menu_items[] = {
-        LANG_PLAYTIME_ELAPSED,
-        LANG_PLAYTIME_REMAINING,
-        LANG_PLAYTIME_TRK_ELAPSED,
+        LANG_REMAINING,
+        LANG_ELAPSED,
         LANG_PLAYTIME_TRK_REMAINING,
+        LANG_PLAYTIME_TRK_ELAPSED,
         LANG_PLAYTIME_TRACK,
         LANG_PLAYTIME_STORAGE,
         LANG_PLAYTIME_AVG_TRACK_SIZE,
@@ -54,13 +54,60 @@ enum ePT_SUM {
 };
 
 struct playing_time_info {
-    int nb_tracks;          /*                  number of tracks in playlist */
-    int curr_track_index;   /*  index of currently playing track in playlist */
-    int curr_display_index; /*      display index of currently playing track */
-    unsigned long curr_track_length[ePT_COUNT]; /*      current track length */
-    unsigned long long length[ePT_COUNT];       /*      length of all tracks */
-    unsigned long long size[ePT_COUNT];         /*   file size of all tracks */
+    char single_mode_tag[MAX_PATH]; /* Relevant tag when single mode enabled */
+    unsigned long long size[ePT_COUNT]; /*               File size of tracks */
+    unsigned long long length[ePT_COUNT]; /*                Length of tracks */
+    unsigned long curr_track_length[ePT_COUNT]; /*      Current track length */
+    int curr_track_index;   /*  Index of currently playing track in playlist */
+    int curr_display_index; /*      Display index of currently playing track */
+    int actual_index; /*            Display index in actually counted tracks */
+    int counted; /*                        Number of tracks already added up */
+    int nb_tracks; /*                           Number of tracks in playlist */
+    int error_count; /*    Number of tracks whose data couldn't be retrieved */
+    bool remaining_only; /*                 Whether to ignore elapsed tracks */
 };
+
+static int32_t single_mode_lang(void)
+{
+    switch (rb->global_settings->single_mode)
+    {
+        case SINGLE_MODE_ALBUM:
+            return LANG_ID3_ALBUM;
+        case SINGLE_MODE_ALBUM_ARTIST:
+            return LANG_ID3_ALBUMARTIST;
+        case SINGLE_MODE_ARTIST:
+            return LANG_ID3_ARTIST;
+        case SINGLE_MODE_COMPOSER:
+            return LANG_ID3_COMPOSER;
+        case SINGLE_MODE_GROUPING:
+            return LANG_ID3_GROUPING;
+        case SINGLE_MODE_GENRE:
+            return LANG_ID3_GENRE;
+        case SINGLE_MODE_TRACK:
+            return LANG_TRACK;
+    }
+    return LANG_OFF;
+}
+
+static char* single_mode_id3_tag(struct mp3entry *id3)
+{
+    switch (rb->global_settings->single_mode)
+    {
+        case SINGLE_MODE_ALBUM:
+            return id3->album;
+        case SINGLE_MODE_ALBUM_ARTIST:
+            return id3->albumartist;
+        case SINGLE_MODE_ARTIST:
+            return id3->artist;
+        case SINGLE_MODE_COMPOSER:
+            return id3->composer;
+        case SINGLE_MODE_GROUPING:
+            return id3->grouping;
+        case SINGLE_MODE_GENRE:
+            return id3->genre_string;
+    }
+    return NULL;
+}
 
 static char* get_percent_str(long percents)
 {
@@ -97,7 +144,18 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
 
     /* data */
     switch(info_no) {
-    case 0: { /* elapsed and total time */
+    case 0: { /* playlist remaining time */
+        char timestr[25];
+        rb->format_time_auto(timestr, sizeof(timestr),
+                             pti->length[ePT_REMAINING], UNIT_SEC, false);
+        rb->snprintf(buf, buffer_len, "%s", timestr);
+
+        if (say_it)
+            rb_talk_ids(false, menu_name_id,
+                        TALK_ID(pti->length[ePT_REMAINING], UNIT_TIME));
+        break;
+    }
+    case 1: { /* elapsed and total time */
         char timestr1[25], timestr2[25];
         rb->format_time_auto(timestr1, sizeof(timestr1),
                              pti->length[ePT_ELAPSED], UNIT_SEC, true);
@@ -128,18 +186,18 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
                         TALK_ID(elapsed_pct, UNIT_PERCENT));
         break;
     }
-    case 1: { /* playlist remaining time */
+    case 2: { /* track remaining time */
         char timestr[25];
         rb->format_time_auto(timestr, sizeof(timestr),
-                             pti->length[ePT_REMAINING], UNIT_SEC, false);
+                             pti->curr_track_length[ePT_REMAINING], UNIT_SEC, false);
         rb->snprintf(buf, buffer_len, "%s", timestr);
 
         if (say_it)
             rb_talk_ids(false, menu_name_id,
-                        TALK_ID(pti->length[ePT_REMAINING], UNIT_TIME));
+                        TALK_ID(pti->curr_track_length[ePT_REMAINING], UNIT_TIME));
         break;
     }
-    case 2: { /* track elapsed and duration */
+    case 3: { /* track elapsed and duration */
         char timestr1[25], timestr2[25];
 
         rb->format_time_auto(timestr1, sizeof(timestr1),
@@ -170,32 +228,21 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
                         TALK_ID(elapsed_pct, UNIT_PERCENT));
         break;
     }
-    case 3: { /* track remaining time */
-        char timestr[25];
-        rb->format_time_auto(timestr, sizeof(timestr),
-                             pti->curr_track_length[ePT_REMAINING], UNIT_SEC, false);
-        rb->snprintf(buf, buffer_len, "%s", timestr);
-
-        if (say_it)
-            rb_talk_ids(false, menu_name_id,
-                        TALK_ID(pti->curr_track_length[ePT_REMAINING], UNIT_TIME));
-        break;
-    }
     case 4: { /* track index */
-        int track_pct = pti->curr_display_index * 100 / pti->nb_tracks;
+        int track_pct = pti->actual_index * 100 / pti->counted;
 
         if (rb->lang_is_rtl())
             rb->snprintf(buf, buffer_len, "%s %d / %d", get_percent_str(track_pct),
-                         pti->nb_tracks, pti->curr_display_index);
+                         pti->counted, pti->actual_index);
         else
-            rb->snprintf(buf, buffer_len, "%d / %d %s", pti->curr_display_index,
-                         pti->nb_tracks, get_percent_str(track_pct));
+            rb->snprintf(buf, buffer_len, "%d / %d %s", pti->actual_index,
+                         pti->counted, get_percent_str(track_pct));
 
         if (say_it)
             rb_talk_ids(false, menu_name_id,
-                        TALK_ID(pti->curr_display_index, UNIT_INT),
+                        TALK_ID(pti->actual_index, UNIT_INT),
                         VOICE_OF,
-                        TALK_ID(pti->nb_tracks, UNIT_INT),
+                        TALK_ID(pti->counted, UNIT_INT),
                         VOICE_PAUSE,
                         TALK_ID(track_pct, UNIT_PERCENT));
         break;
@@ -215,7 +262,7 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
             int32_t voice_ids[ePT_COUNT];
             voice_ids[ePT_TOTAL] = menu_name_id;
             voice_ids[ePT_ELAPSED] = VOICE_PLAYTIME_DONE;
-            voice_ids[ePT_REMAINING] = LANG_PLAYTIME_REMAINING;
+            voice_ids[ePT_REMAINING] = LANG_REMAINING;
 
             for (i = 0; i < ePT_COUNT; i++)
             {
@@ -227,7 +274,7 @@ static const char * pt_get_or_speak_info(int selected_item, void * data,
     }
     case 6: { /* Average track file size */
         char str[20];
-        long avg_track_size = pti->size[ePT_TOTAL] / pti->nb_tracks;
+        long avg_track_size = pti->size[ePT_TOTAL] / pti->counted;
         rb->output_dyn_value(str, sizeof(str), avg_track_size, kibyte_units, 3, true);
         rb->snprintf(buf, buffer_len, "%s", str);
 
@@ -266,116 +313,21 @@ static int pt_speak_info(int selected_item, void * data)
     return 0;
 }
 
-/* playing time screen: shows total and elapsed playlist duration and
-   other stats */
-static bool playing_time(void)
+static bool pt_display_stats(struct playing_time_info *pti)
 {
-    struct playing_time_info pti;
-    struct playlist_track_info pl_track;
-    struct mp3entry id3;
-    struct mp3entry *curr_id3;
     struct gui_synclist pt_lists;
-    unsigned long talked_tick = *rb->current_tick;
-    int action, i, index, section, error_count = 0;
-
-    pti.nb_tracks = rb->playlist_amount();
-    rb->playlist_get_resume_info(&pti.curr_track_index);
-    curr_id3 = rb->audio_current_track();
-
-    if (pti.curr_track_index == -1 || !curr_id3)
-        return false;
-
-    pti.curr_display_index = rb->playlist_get_display_index();
-
-    pti.length[ePT_ELAPSED] = pti.curr_track_length[ePT_ELAPSED]
-                            = curr_id3->elapsed;
-    pti.length[ePT_REMAINING] = pti.curr_track_length[ePT_REMAINING]
-                              = curr_id3->length - curr_id3->elapsed;
-
-    pti.size[ePT_ELAPSED] = curr_id3->offset;
-    pti.size[ePT_REMAINING] = curr_id3->filesize - curr_id3->offset;
-
-    rb->splash_progress_set_delay(HZ/2);
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(true);
-#endif
-    /* Go through each file in the playlist and get its stats. For
-       huge playlists this can take a while... The reference position
-       is the position at the moment this function was invoked,
-       although playback continues forward. */
-    index = rb->playlist_get_first_index(NULL);
-    for (i = 0; i < pti.nb_tracks; i++, index++) {
-
-        if (index == pti.nb_tracks)
-            index = 0;
-
-        rb->splash_progress(i, pti.nb_tracks, "%s (%s)",
-                            rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
-
-        if (TIME_AFTER(*rb->current_tick, talked_tick + HZ*5))
-        {
-            talked_tick = *rb->current_tick;
-            rb_talk_ids(false, LANG_LOADING_PERCENT,
-                        TALK_ID(i * 100 / pti.nb_tracks, UNIT_PERCENT));
-        }
-        if (rb->action_userabort(TIMEOUT_NOBLOCK))
-        {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
-#endif
-            goto exit;
-        }
-
-        if (index == pti.curr_track_index)
-            continue;
-
-        if (rb->playlist_get_track_info(NULL, index, &pl_track) < 0
-            || !rb->get_metadata(&id3, -1, pl_track.filename))
-        {
-            error_count++;
-            continue;
-        }
-
-        section = pl_track.display_index < pti.curr_display_index ?
-                  ePT_ELAPSED : ePT_REMAINING;
-        pti.length[section] += id3.length;
-        pti.size[section] += id3.filesize;
-    }
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(false);
-#endif
-
-    if (error_count > 0)
-        rb->splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
-
-    pti.nb_tracks -= error_count;
-
-    /* convert units from ms to s */
-    pti.length[ePT_ELAPSED] /= 1000;
-    pti.length[ePT_REMAINING] /= 1000;
-    pti.curr_track_length[ePT_ELAPSED] /= 1000;
-    pti.curr_track_length[ePT_REMAINING] /= 1000;
-    /* convert units from Bytes to KiB  */
-    pti.size[ePT_ELAPSED] >>= 10;
-    pti.size[ePT_REMAINING] >>= 10;
-
-    /* calculate totals */
-    pti.length[ePT_TOTAL] = pti.length[ePT_ELAPSED] + pti.length[ePT_REMAINING];
-    pti.curr_track_length[ePT_TOTAL] = pti.curr_track_length[ePT_ELAPSED]
-                                       + pti.curr_track_length[ePT_REMAINING];
-    pti.size[ePT_TOTAL] = pti.size[ePT_ELAPSED] + pti.size[ePT_REMAINING];
-
-    rb->gui_synclist_init(&pt_lists, &pt_get_info, &pti, true, 2, NULL);
+    rb->gui_synclist_init(&pt_lists, &pt_get_info, pti, true, 2, NULL);
     if (rb->global_settings->talk_menu)
         rb->gui_synclist_set_voice_callback(&pt_lists, pt_speak_info);
-    rb->gui_synclist_set_nb_items(&pt_lists, 16);
-    rb->gui_synclist_set_title(&pt_lists, rb->str(LANG_PLAYING_TIME), NOICON);
+    rb->gui_synclist_set_nb_items(&pt_lists, pti->remaining_only ? 2 : 8*2);
+    rb->gui_synclist_set_title(&pt_lists, *pti->single_mode_tag ?
+                                          rb->str(single_mode_lang()) :
+                                          rb->str(LANG_PLAYLIST), NOICON);
     rb->gui_synclist_draw(&pt_lists);
     rb->gui_synclist_speak_item(&pt_lists);
     while (true)
     {
-        action = rb->get_action(CONTEXT_LIST, HZ/2);
+        int action = rb->get_action(CONTEXT_LIST, HZ/2);
         if (rb->gui_synclist_do_button(&pt_lists, &action) == 0
             && action != ACTION_NONE && action != ACTION_UNKNOWN)
         {
@@ -388,16 +340,213 @@ static bool playing_time(void)
             return usb;
         }
     }
- exit:
     return false;
+}
+
+static const char *pt_options_name(int selected_item, void * data,
+                                   char *buf, size_t buf_size)
+{
+    (void) data;
+    (void) buf;
+    (void) buf_size;
+    return selected_item == 0 ? rb->str(LANG_ALL) :
+           selected_item == 1 ? rb->str(LANG_REMAINING) :
+           rb->str(single_mode_lang());
+}
+
+static int pt_options_speak(int selected_item, void * data)
+{
+    (void) data;
+    rb->talk_id(selected_item == 0 ? LANG_ALL :
+                selected_item == 1 ? LANG_REMAINING :
+                single_mode_lang(), false);
+    return 0;
+}
+
+static int pt_options(struct playing_time_info *pti)
+{
+    struct gui_synclist pt_options;
+    rb->gui_synclist_init(&pt_options, &pt_options_name, NULL, true, 1, NULL);
+    if (rb->global_settings->talk_menu)
+        rb->gui_synclist_set_voice_callback(&pt_options, pt_options_speak);
+    rb->gui_synclist_set_nb_items(&pt_options, *pti->single_mode_tag ? 3 : 2);
+    rb->gui_synclist_set_title(&pt_options, rb->str(LANG_PLAYING_TIME), NOICON);
+    rb->gui_synclist_draw(&pt_options);
+    rb->gui_synclist_speak_item(&pt_options);
+
+    while(true)
+    {
+        int button = rb->get_action(CONTEXT_LIST, HZ);
+        if (rb->gui_synclist_do_button(&pt_options, &button))
+            continue;
+        switch(button)
+        {
+            case ACTION_STD_OK:
+            {
+                int sel = rb->gui_synclist_get_sel_pos(&pt_options);
+                if (sel < 2)
+                    *pti->single_mode_tag = 0;
+                if (sel == 1)
+                    pti->remaining_only = true;
+                return -1;
+            }
+            case ACTION_STD_CANCEL:
+                return 0;
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return 1;
+        }
+    }
+}
+
+static void pt_store_converted_totals(struct playing_time_info *pti)
+{
+    /* convert units from ms to s */
+    pti->length[ePT_ELAPSED] /= 1000;
+    pti->length[ePT_REMAINING] /= 1000;
+    pti->curr_track_length[ePT_ELAPSED] /= 1000;
+    pti->curr_track_length[ePT_REMAINING] /= 1000;
+    /* convert units from Bytes to KiB  */
+    pti->size[ePT_ELAPSED] >>= 10;
+    pti->size[ePT_REMAINING] >>= 10;
+
+    pti->length[ePT_TOTAL] = pti->length[ePT_ELAPSED] + pti->length[ePT_REMAINING];
+    pti->curr_track_length[ePT_TOTAL] = pti->curr_track_length[ePT_ELAPSED]
+                                       + pti->curr_track_length[ePT_REMAINING];
+    pti->size[ePT_TOTAL] = pti->size[ePT_ELAPSED] + pti->size[ePT_REMAINING];
+}
+
+static int pt_add_track(int i, enum ePT_SUM section, struct playing_time_info *pti)
+{
+    struct mp3entry id3;
+    struct playlist_track_info pl_track;
+    static unsigned long talked_tick;
+    int progress_total = pti->remaining_only ?
+                         pti->nb_tracks - pti->curr_display_index :
+                         pti->nb_tracks;
+
+    rb->splash_progress(pti->counted, progress_total, "%s (%s)",
+                        rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
+
+    if (TIME_AFTER(*rb->current_tick, talked_tick + HZ*5))
+    {
+        talked_tick = *rb->current_tick;
+        rb_talk_ids(false, LANG_LOADING_PERCENT,
+                    TALK_ID(pti->counted * 100 / progress_total,
+                    UNIT_PERCENT));
+    }
+
+    if (rb->action_userabort(TIMEOUT_NOBLOCK))
+        return -1;
+    else if (rb->playlist_get_track_info(NULL, i, &pl_track) < 0
+             || !rb->get_metadata(&id3, -1, pl_track.filename))
+    {
+        pti->error_count++;
+        return -2;
+    }
+    else if(*pti->single_mode_tag &&    /* single mode tag doesn't match */
+            rb->strcmp(pti->single_mode_tag, single_mode_id3_tag(&id3) ?: ""))
+        return 1;
+
+    pti->length[section] += id3.length;
+    pti->size[section] += id3.filesize;
+    pti->counted++;
+    return 0;
+}
+
+static bool pt_add_remaining(struct playing_time_info *pti)
+{
+    int display_index = pti->curr_display_index + 1;
+    for (int i = pti->curr_track_index + 1; display_index <= pti->nb_tracks; i++, display_index++)
+    {
+        if (i == pti->nb_tracks)
+            i = 0;
+
+        int ret = pt_add_track(i, ePT_REMAINING, pti);
+        if (ret == 1)
+            break;
+        else if (ret == -1)
+            return false;
+    }
+    return true;
+}
+
+static bool pt_add_elapsed(struct playing_time_info *pti)
+{
+    int display_index = pti->curr_display_index - 1;
+    for (int i = pti->curr_track_index - 1; display_index > 0; i--, display_index--)
+    {
+        if (i < 0)
+            i = pti->nb_tracks - 1;
+
+        int ret = pt_add_track(i, ePT_ELAPSED, pti);
+        if (ret == 1)
+            break;
+        else if (ret == -1)
+            return false;
+        else if (ret == 0)
+            pti->actual_index++;
+    }
+    return true;
+}
+
+static bool pt_add_curr_track(struct playing_time_info *pti)
+{
+    struct mp3entry *curr_id3 = rb->audio_current_track();
+    rb->playlist_get_resume_info(&pti->curr_track_index);
+
+    if (pti->curr_track_index == -1 || !curr_id3)
+        return false;
+
+    pti->curr_display_index = rb->playlist_get_display_index();
+    pti->length[ePT_ELAPSED] = pti->curr_track_length[ePT_ELAPSED]
+                             = curr_id3->elapsed;
+    pti->length[ePT_REMAINING] = pti->curr_track_length[ePT_REMAINING]
+                               = curr_id3->length - curr_id3->elapsed;
+    pti->size[ePT_ELAPSED] = curr_id3->offset;
+    pti->size[ePT_REMAINING] = curr_id3->filesize - curr_id3->offset;
+    pti->actual_index = pti->counted = 1;
+    rb->strlcpy(pti->single_mode_tag, single_mode_id3_tag(curr_id3) ?: "",
+                sizeof(pti->single_mode_tag));
+    return true;
+}
+
+/* playing time screen: shows total and elapsed playlist duration and
+   other stats */
+static bool playing_time(void)
+{
+    struct playing_time_info pti = {0};
+
+    if (!pt_add_curr_track(&pti))
+        return false;
+
+   int opt = pt_options(&pti);
+   if (opt > -1)
+    return opt;
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+    rb->splash_progress_set_delay(HZ/2);
+    pti.nb_tracks = rb->playlist_amount();
+    int success = (pti.remaining_only || pt_add_elapsed(&pti)) && pt_add_remaining(&pti);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+    if (!success)
+        return false;
+    if (pti.error_count > 0)
+        rb->splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
+
+    pt_store_converted_totals(&pti);
+    return pt_display_stats(&pti);
 }
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    enum plugin_status status = PLUGIN_OK;
-
     (void)parameter;
+    enum plugin_status status = PLUGIN_OK;
 
     if (!rb->audio_status())
     {
