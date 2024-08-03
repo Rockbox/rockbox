@@ -96,21 +96,21 @@ Core code (Mid-level)
 :Settings API: Jonathan Gordon
 :Language API: Solomon Peachy
 :Menu API: Jonathan Gordon
-:Button actions: Jonathan Gordon
+:Button actions: William Wilgus, Jonathan Gordon
 
 
 Core code (high-level)
 ----------------------
 
 :Bookmarks: Magnus Holmgren
-:Cuesheet support: Nicolas Pennequin
+:Cuesheet support: William Wilgus, Nicolas Pennequin
 :Database: Miika Pekkarinen
 :Playlists:
 :Radio UI:
 :Recording UI: Peter D'Hoye
 :Voice UI: Solomon Peachy
 :WPS: Nicolas Pennequin
-:User interface: Jonathan Gordon
+:User interface: William Wilgus, Jonathan Gordon
 
 
 Metadata parsing
@@ -120,7 +120,7 @@ NOTE: Format-specific container format parsing is maintained by the
 relevant codec maintainer.
 
 :General:
-:ID3v1/v2: Linus Nielsen Feltzing
+:ID3v1/v2: William Wilgus, Linus Nielsen Feltzing
 :Vorbis Comments:
 :APEv2:
 
@@ -144,9 +144,11 @@ Plugins
 :XLCD library:
 
 :alpine_cdc:
+:announce_status: William Wilgus
 :amaze: Solomon Peachy
 :battery_bench:
 :blackjack:
+:boomshine: William Wilgus
 :bounce: Daniel Stenberg
 :brickmania:
 :bubbles:
@@ -160,6 +162,7 @@ Plugins
 :credits:
 :cube:
 :demystify: Kévin Ferrare
+:db_commit: William Wilgus
 :dice:
 :dict:
 :disktidy:
@@ -178,7 +181,10 @@ Plugins
 :jewels: Antoine Cellerier
 :jpeg:
 :keybox: Nils Wallménius
+:keyremap: William Wilgus
+:lastfm_scrobbler: William Wilgus
 :logo:
+:lua: William Wilgus
 :mandelbrot: Jens Arnold
 :maze:
 :mazezam:
@@ -190,7 +196,9 @@ Plugins
 :mosaique:
 :mp3_encoder:
 :mpegplayer: Michael Sevakis
+:multiboot_select:
 :nim:
+:open_plugins: William Wilgus
 :oscilloscope: Jens Arnold
 :pacbox: Dave Chapman
 :plasma:
