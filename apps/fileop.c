@@ -26,6 +26,7 @@
 #include <string.h>
 #include "string-extra.h"
 #include "debug.h"
+#include "powermgmt.h"
 
 #include "misc.h"
 #include "plugin.h"
@@ -259,6 +260,7 @@ static int move_by_rename(struct file_op_params *src,
 {
     unsigned int flags = *pflags;
     int rc = FORC_UNKNOWN_FAILURE;
+    reset_poweroff_timer();
     if (!(flags & (PASTE_COPY | PASTE_EXDEV))) {
         if ((flags & PASTE_OVERWRITE) || !file_exists(dst_path)) {
             /* Just try to move the directory / file */
