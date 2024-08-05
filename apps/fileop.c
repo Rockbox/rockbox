@@ -51,6 +51,7 @@ struct file_op_params
     unsigned long long total_size;
     unsigned long long processed_size;
     size_t append;         /* Append position in 'path' for stack push */
+    size_t extra_len;      /* Length added by dst path compared to src */
 };
 
 static int prompt_name(char* buf, size_t bufsz)
@@ -131,6 +132,7 @@ static void init_file_op(struct file_op_params *param,
         param->toplevel_name = selected_file;
     }
     param->is_dir = dir_exists(param->path);
+    param->extra_len = 0;
     param->objects = 0; /* how many files and subdirectories*/
     param->processed = 0;
     param->total_size = 0;
@@ -209,7 +211,7 @@ static int directory_fileop(struct file_op_params *param, enum file_op_current f
                 break;
             }
 
-            if (param->append >= sizeof (param->path)) {
+            if (param->append + param->extra_len >= sizeof (param->path)) {
                 rc = FORC_PATH_TOO_LONG;
                 break; /* no space left in buffer */
             }
@@ -523,6 +525,10 @@ int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned in
             /* Try renaming first */
             rc = move_by_rename(&src, dst.path, &flags);
             if (rc < FORC_SUCCESS) {
+                int extra_len = dst.append - src.append;
+                if (extra_len > 0)
+                    src.extra_len = extra_len;
+
                 rc = check_count_fileobjects(&src);
                 if (rc == FORC_SUCCESS) {
                     rc = copy_move_directory(&src, &dst, flags);
