@@ -77,6 +77,10 @@ struct lcd_tgt_config {
     size_t dma_wr_cmd_size;
 };
 
+#define LCD_WAIT_MAX_US 65500  /* µS max. Waittime */
+#define LCD_WAIT_US     1      /* µS per Step */
+#define LCD_WAIT_STEPS  (LCD_WAIT_MAX_US / LCD_WAIT_US)
+
 /* Static configuration for the target's LCD, must be defined by target. */
 extern const struct lcd_tgt_config lcd_tgt_config;
 

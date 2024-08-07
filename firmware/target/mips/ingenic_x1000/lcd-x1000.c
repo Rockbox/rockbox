@@ -69,10 +69,41 @@ static volatile int fbcopy_done;
 /* True if we're in sleep mode */
 static bool lcd_sleeping = false;
 #endif
+static bool lcd_on = false;
 
 /* Check if running with interrupts disabled (eg: panic screen) */
 #define lcd_panic_mode \
     UNLIKELY((read_c0_status() & 1) == 0)
+
+typedef enum {
+    LCD_SEND0,  LCD_SEND1,
+    WAIT_FRAME, SLEEP_FRAME,
+    WAIT_EOF,   SLEEP_EOF,
+    WAIT_QD,
+    WAIT_FBCPF, WAIT_FBCPP
+} Lcd_ID;
+
+
+// TODO: This may need a yield?
+static void __attribute__ ((noinline)) lcd_wait(Lcd_ID id)
+{
+    uint32_t i, done = 0;
+
+    for(i=0; i<LCD_WAIT_STEPS; i++) {
+        if (done) break;
+        switch (id) {
+          case LCD_SEND0:
+          case LCD_SEND1:
+          case WAIT_FRAME:
+          case SLEEP_FRAME: done = !jz_readf(LCD_MSTATE, BUSY);   break;
+          case WAIT_EOF:
+          case SLEEP_EOF:   done = jz_readf(LCD_STATE, EOF) != 0; break;
+          case WAIT_QD:     done = jz_readf(LCD_STATE, QD) != 0;  break;
+          case WAIT_FBCPF:
+          case WAIT_FBCPP:  done = fbcopy_done != 0; break;
+        }
+    }
+}
 
 static void lcd_init_controller(const struct lcd_tgt_config* cfg)
 {
@@ -125,7 +156,7 @@ static void lcd_init_controller(const struct lcd_tgt_config* cfg)
 
     /* DMA settings */
     jz_writef(LCD_CTRL, ENABLE(0), BURST_V(64WORD),
-              EOFM(1), SOFM(0), IFUM(0), QDM(0),
+              EOFM(0), SOFM(0), IFUM(0), QDM(0),
               BEDN(cfg->big_endian), PEDN(0));
     jz_write(LCD_DAH, LCD_WIDTH);
     jz_write(LCD_DAV, LCD_HEIGHT);
@@ -185,7 +216,7 @@ static void lcd_fbcopy_dma_cb(int evt)
     fbcopy_done = 1;
 }
 
-static void lcd_fbcopy_dma_run(dma_desc* d)
+static void lcd_fbcopy_dma_run(dma_desc* d, Lcd_ID id)
 {
     if(lcd_panic_mode) {
         /* Can't use DMA if interrupts are off, so just do a memcpy().
@@ -205,7 +236,7 @@ static void lcd_fbcopy_dma_run(dma_desc* d)
     jz_set(DMA_DB, 1 << DMA_CHANNEL_FBCOPY);
     jz_writef(DMA_CHN_CS(DMA_CHANNEL_FBCOPY), CTE(1));
 
-    while(!fbcopy_done);
+    lcd_wait(id);
 }
 
 static void lcd_fbcopy_dma_full(void)
@@ -221,7 +252,7 @@ static void lcd_fbcopy_dma_full(void)
     d.rt = jz_orf(DMA_CHN_RT, TYPE_V(AUTO));
     d.pad0 = 0;
     d.pad1 = 0;
-    lcd_fbcopy_dma_run(&d);
+    lcd_fbcopy_dma_run(&d, WAIT_FBCPF);
 }
 
 /* NOTE: DMA stride mode can only transfer up to 255 blocks at once.
@@ -254,7 +285,7 @@ static void lcd_fbcopy_dma_partial1(int x, int y, int width, int height)
         d.tc = width * height * sizeof(fb_data);
     }
 
-    lcd_fbcopy_dma_run(&d);
+    lcd_fbcopy_dma_run(&d, WAIT_FBCPP);
 }
 
 #if STRIDE_MAIN(LCD_HEIGHT, LCD_WIDTH) > 255
@@ -274,7 +305,12 @@ static void lcd_fbcopy_dma_partial(int x, int y, int width, int height)
 # define lcd_fbcopy_dma_partial lcd_fbcopy_dma_partial1
 #endif
 
-static void lcd_dma_start(void)
+typedef enum {
+    MODE_INIT,
+    MODE_SLEEP
+} DMA_Mode;
+
+static void lcd_dma_start(DMA_Mode mode)
 {
     /* Set format conversion bit, seems necessary for DMA mode.
      * Must set DTIMES here if we use an 8-bit bus type. */
@@ -286,44 +322,72 @@ static void lcd_dma_start(void)
               TE_INV(lcd_tgt_config.te_polarity ? 0 : 1),
               NOT_USE_TE(lcd_tgt_config.te_enable ? 0 : 1));
 
+    /* ref PM sec. 4.9.1 DMA operation,
+     * as well as sec. 4.5.2 Enabling the Controller.
+     * I think we're effectively doing the last bit
+     * of enabling the controller here, and then
+     * doing dma start.
+     */
+    jz_writef(LCD_MCTRL, DMA_MODE(1), DMA_START(1));
+
+    while(jz_readf(LCD_MSTATE, BUSY));
+
+    jz_writef(LCD_MCTRL, DMA_TX_EN(1));
+
+    /* clear any old flags */
+    jz_write(LCD_STATE, 0);
+
     /* Begin DMA transfer. Need to start a dummy frame or else we will
      * not be able to pass lcd_wait_frame() at the first lcd_update(). */
-    jz_write(LCD_STATE, 0);
+    // if (mode == MODE_INIT) { // Run this only once on Startup
     jz_write(LCD_DA, PHYSADDR(&lcd_dma_desc[0]));
-    jz_writef(LCD_MCTRL, DMA_MODE(1), DMA_START(1), DMA_TX_EN(1));
     jz_writef(LCD_CTRL, ENABLE(1));
+    // }
+
+    lcd_on = true;
 }
 
 static bool lcd_wait_frame(void)
 {
     /* Bail out if DMA is not enabled */
-    int irq = disable_irq_save();
-    int bit = jz_readf(LCD_CTRL, ENABLE);
-    restore_irq(irq);
-    if(!bit)
+    if(!lcd_active())
         return false;
 
     /* Usual case -- wait for EOF, wait for FIFO to drain, clear EOF */
-    while(jz_readf(LCD_STATE, EOF) == 0);
-    while(jz_readf(LCD_MSTATE, BUSY));
+    lcd_wait(WAIT_EOF);
+    lcd_wait(WAIT_FRAME);
     jz_writef(LCD_STATE, EOF(0));
     return true;
 }
 
-static void lcd_dma_stop(void)
+static void lcd_dma_stop(DMA_Mode mode)
 {
+    int irq = disable_irq_save();
+        lcd_on = false;
+    restore_irq(irq);
+
+    if (mode == MODE_INIT) { // Run this only once when endinng
 #ifdef LCD_X1000_DMA_WAIT_FOR_FRAME
-    /* Wait for frame to finish to avoid misaligning the write pointer */
-    lcd_wait_frame();
+        /* Wait for frame to finish to avoid misaligning the write pointer */
+        lcd_wait_frame();
 #endif
+        /* Stop the DMA transfer */
+        jz_writef(LCD_CTRL, ENABLE(0));
+        jz_writef(LCD_MCTRL, DMA_TX_EN(0));
 
-    /* Stop the DMA transfer */
-    jz_writef(LCD_CTRL, ENABLE(0));
-    jz_writef(LCD_MCTRL, DMA_TX_EN(0));
+        /* Wait for disable to take effect */
+        lcd_wait(WAIT_QD);
+    } else { // MODE_SLEEP
+        jz_writef(LCD_CTRL, ENABLE(0));
+        
+        /* Usual case -- wait for EOF, wait for FIFO to drain */
+        lcd_wait(SLEEP_EOF);
+        lcd_wait(SLEEP_FRAME);
 
-    /* Wait for disable to take effect */
-    while(jz_readf(LCD_STATE, QD) == 0);
-    jz_writef(LCD_STATE, QD(0));
+        /* Stop the DMA transfer */
+        jz_writef(LCD_MCTRL, DMA_TX_EN(0));
+    }
+    jz_write(LCD_STATE, 0); // clear State
 
     /* Clear format conversion bit, disable vsync */
     jz_writef(LCD_MCFG_NEW, FMT_CONV(0), DTIMES(0));
@@ -332,7 +396,7 @@ static void lcd_dma_stop(void)
 
 static void lcd_send(uint32_t d)
 {
-    while(jz_readf(LCD_MSTATE, BUSY));
+    lcd_wait(LCD_SEND0);
     REG_LCD_MDATA = d;
 }
 
@@ -370,6 +434,7 @@ void lcd_exec_commands(const uint32_t* cmdseq)
             break;
         }
     }
+    lcd_wait(LCD_SEND1);
 }
 
 void lcd_init_device(void)
@@ -381,7 +446,7 @@ void lcd_init_device(void)
 
     lcd_tgt_enable(true);
 
-    lcd_dma_start();
+    lcd_dma_start(MODE_INIT);
 }
 
 #ifdef HAVE_LCD_SHUTDOWN
@@ -389,8 +454,8 @@ void lcd_shutdown(void)
 {
     if(lcd_sleeping)
         lcd_tgt_sleep(false);
-    else if(jz_readf(LCD_CTRL, ENABLE))
-        lcd_dma_stop();
+    else if(lcd_active())
+        lcd_dma_stop(MODE_INIT);
 
     lcd_tgt_enable(false);
     jz_writef(CPM_CLKGR, LCD(1));
@@ -400,37 +465,42 @@ void lcd_shutdown(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
-    return jz_readf(LCD_CTRL, ENABLE);
+    return lcd_on;
 }
 
 void lcd_enable(bool en)
 {
-    /* Must disable IRQs to turn off the running LCD */
-    int irq = disable_irq_save();
-    int bit = jz_readf(LCD_CTRL, ENABLE);
-    if(bit && !en)
-        lcd_dma_stop();
-    restore_irq(irq);
+    bool state = lcd_active();
+    if(state && !en)
+#if defined(BOOTLOADER)
+        lcd_dma_stop(MODE_INIT);
+#else
+        lcd_dma_stop(MODE_SLEEP);
+#endif
 
     /* Deal with sleep mode */
 #if defined(HAVE_LCD_SLEEP) || defined(LCD_X1000_FASTSLEEP)
 #if defined(LCD_X1000_FASTSLEEP)
-    if(bit && !en) {
+    if(state && !en) {
         lcd_tgt_sleep(true);
         lcd_sleeping = true;
     } else
 #endif
-    if(!bit && en && lcd_sleeping) {
+    if(!state && en && lcd_sleeping) {
         lcd_tgt_sleep(false);
         lcd_sleeping = false;
     }
 #endif
 
     /* Handle turning the LCD back on */
-    if(!bit && en)
+    if(!state && en)
     {
         send_event(LCD_EVENT_ACTIVATION, NULL);
-        lcd_dma_start();
+#if defined(BOOTLOADER)
+        lcd_dma_start(MODE_INIT);
+#else
+        lcd_dma_start(MODE_SLEEP);
+#endif
     }
 }
 #endif
@@ -466,6 +536,9 @@ void lcd_update(void)
  * its entirety to the LCD through a different DMA process.                      */
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    if(!lcd_wait_frame())
+        return;
+
     /* Clamp the coordinates */
     if(x < 0) {
         width += x;
@@ -484,9 +557,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         height = LCD_HEIGHT - y;
 
     if(width < 0 || height < 0)
-        return;
-
-    if(!lcd_wait_frame())
         return;
 
     commit_dcache();
