@@ -56,6 +56,10 @@
 #include "crc32.h"
 #endif
 
+#if defined(HAVE_DEVICEDATA) && !defined(SIMULATOR)
+#include "devicedata.h"
+#endif
+
 #if CONFIG_CPU == AS3525v2
 #include "ascodec.h"
 #endif

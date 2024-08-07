@@ -9,6 +9,17 @@
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
 
+/* Define EROSQN_VER as a GCC option if desired - 
+ * v1, v2 players: "1"
+ * v3 players: "3"
+ * Only bootloader will be affected
+ */
+#ifdef BOOTLOADER
+# ifndef EROSQN_VER /* this should probably go in config/erosqnative.h*/
+#  define EROSQN_VER 1
+# endif
+#endif
+
 /* CPU defines */
 #define CONFIG_CPU      X1000
 #define X1000_EXCLK_FREQ   24000000

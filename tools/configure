@@ -1676,6 +1676,8 @@ cat <<EOF
  ==AIGO==                 244) M3K Linux
  245) Eros Q / K          246) M3K baremetal     ==Shanling==
  247) Eros Q / K native                          260) Q1
+ 248) Eros Q / K native v3 
+      (GC9A01 LCD Controller)
 EOF
 
   buildfor=`input`;
@@ -4190,7 +4192,38 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
     t_model="erosqnative"
+    # player version, for bootloader usage
+    # versions 1 and 2 both use 1
+    GCCOPTS="$GCCOPTS -DEROSQN_VER=1"
     ;;
+
+    248|erosqnative_v3)
+    target_id=116
+    modelname="erosqnative"
+    target="EROS_QN"
+    memory=32
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=erosqnative "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.erosq"
+    bootoutput="bootloader.erosq"
+    sysfontbl="16-Terminus"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="erosqnative"
+    # player version, for bootloader usage
+    # version 3
+    GCCOPTS="$GCCOPTS -DEROSQN_VER=3"
+    ;;
+
 
    *)
     echo "Please select a supported target platform!"

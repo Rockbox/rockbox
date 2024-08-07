@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "system.h"
+#include <string.h>
 #include "mips.h"
 #include "panic.h"
 #include "button.h"
@@ -35,6 +36,10 @@
 #include "x1000/intc.h"
 #include "x1000/msc.h"
 #include "x1000/aic.h"
+
+#if defined(HAVE_DEVICEDATA)
+#include "devicedata.h"
+#endif
 
 #ifdef X1000_CPUIDLE_STATS
 int __cpu_idle_avg = 0;
@@ -88,7 +93,7 @@ void fill_devicedata(struct device_data_t *data)
     memset(data->payload, 0xff, data->length);
     data->lcd_version = EROSQN_VER;
 #else
-    uint8_t lcd_version = data->lcd_version;
+    uint8_t lcd_version = device_data.lcd_version;
     memset(data->payload, 0xff, data->length);
     data->lcd_version = lcd_version;
 #endif
