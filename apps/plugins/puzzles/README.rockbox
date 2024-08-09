@@ -31,6 +31,56 @@ distribution. The compression is LZ4, implemented in lz4tiny.c (for
 decompression on target), and compress.c (for generation). genhelp.sh
 should be run whenever the documentation is changed.
 
+Upstreams
+=========
+
+As of 2024, Simon's tree is located at:
+
+https://git.tartarus.org/?p=simon/puzzles.git
+
+For a long time (i.e. 2017-2024), our version of the puzzles tree
+contained several modifications by myself (notably cursor interfaces
+to Untangle and Palisade). These divergent changes complicated
+maintenance of this port, as merge conflicts often arose when upstream
+changes to these games conflicted with our changes. To remedy this, I
+sent most of these patches back upstream in summer 2024, and since
+then, Simon has merged the majority of them into his tree.
+
+This leaves us with a very small set of places where our branch of the
+puzzles source diverges from Simon's. That branch lives here:
+
+https://github.com/built1n/puzzles/tree/rockbox-devel
+
+Notably, there are several hacks which work around Rockbox's lack of a
+proper polygon filling algorithm. Eliminating this deficiency would
+enable us to use a totally unmodified upstream source tree.
+
+Maintenance
+===========
+
+Simon's upstream tree sees continued development. The port is
+structured so that integrating new upstream versions is
+straightforward: all the upstream sources live in the src/
+subdirectory; all of the Rockbox frontend lives in the root
+apps/pluginspuzzles/ directory.
+
+The `resync.sh' shell script automates the resyncing process. It
+copies the upstream sources (point it to a local copy of the
+rockbox-devel branch above) into src/ and performs auto-generation of
+the help content. Note that a modified version of "halibut" (Simon's
+homegrown documentation processor) must be compiled from this source:
+
+https://github.com/built1n/halibut
+
+The LZ4 library and GCC are necessary as well.
+
+Wishlist
+========
+
+- Proper polygon filling algorithm. The current algorithm is a hack
+  that uses overdrawn triangles. This will enable us to eliminate the
+  last of the Rockbox-specific modifications.
+
 Kudos to Simon (duh), and Frank, for telling me about it.
 
 Franklin Wei (__builtin)
@@ -67,3 +117,6 @@ saved games.
 
 July 2024: Resync to 1c62dac (branched from Simon's fd304c5).
 Implement user preferences menu. Introduced "Mosaic".
+
+August 2024: Resync to ee5e327 (branched from Simon's
+1c1899e). Changes default Map stipple size to "Small".

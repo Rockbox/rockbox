@@ -1,8 +1,8 @@
 #!/bin/bash
 # usage: ./genhelp.sh
 #
-# Expects halibut to be installed in $PATH:
-# https://www.fwei.tk/git/halibut
+# Expects a modified version of `halibut' to be installed in $PATH:
+# https://github.com/built1n/halibut
 #
 # Also requires host CC and lz4 library to be available
 

@@ -2330,6 +2330,7 @@ static game_ui *new_ui(const game_state *state)
     ui->cur_moved = false;
     ui->cur_lastmove = 0;
     ui->flash_type = FLASH_CYCLIC;
+    ui->large_stipples = false;
     legacy_prefs_override(ui);
     return ui;
 }
