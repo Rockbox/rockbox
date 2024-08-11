@@ -515,14 +515,15 @@ static bool pt_add_curr_track(struct playing_time_info *pti)
    other stats */
 static bool playing_time(void)
 {
-    struct playing_time_info pti = {{0}};
+    struct playing_time_info pti;
+    rb->memset(&pti, 0, sizeof(struct playing_time_info));
 
     if (!pt_add_curr_track(&pti))
         return false;
 
-   int opt = pt_options(&pti);
-   if (opt > -1)
-    return opt;
+    int opt = pt_options(&pti);
+    if (opt > -1)
+        return opt;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
