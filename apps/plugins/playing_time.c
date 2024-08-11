@@ -515,7 +515,7 @@ static bool pt_add_curr_track(struct playing_time_info *pti)
    other stats */
 static bool playing_time(void)
 {
-    struct playing_time_info pti = {0};
+    struct playing_time_info pti = {{0}};
 
     if (!pt_add_curr_track(&pti))
         return false;

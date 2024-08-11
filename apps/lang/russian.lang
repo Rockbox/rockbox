@@ -15292,16 +15292,13 @@
   desc: prefix for elapsed playtime announcement
   user: core
   <source>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </source>
   <dest>
-    *: none
-    hotkey: "Проиграно"
+    *: "Проиграно"
   </dest>
   <voice>
-    *: none
-    hotkey: "Проиграно"
+    *: "Проиграно"
   </voice>
 </phrase>
 <phrase>

@@ -14701,16 +14701,13 @@
   desc: prefix for elapsed playtime announcement
   user: core
   <source>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </source>
   <dest>
-    *: none
-    hotkey: "Upłynęło"
+    *: "Upłynęło"
   </dest>
   <voice>
-    *: none
-    hotkey: "Upłynęło"
+    *: "Upłynęło"
   </voice>
 </phrase>
 <phrase>

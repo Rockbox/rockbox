@@ -15020,16 +15020,13 @@
   desc: prefix for elapsed playtime announcement
   user: core
   <source>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </source>
   <dest>
-    *: none
-    hotkey: "Vergangen"
+    *: "Vergangen"
   </dest>
   <voice>
-    *: none
-    hotkey: "Vergangen"
+    *: "Vergangen"
   </voice>
 </phrase>
 <phrase>

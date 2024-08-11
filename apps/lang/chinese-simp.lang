@@ -15011,16 +15011,13 @@
   desc: prefix for elapsed playtime announcement
   user: core
   <source>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </source>
   <dest>
-    *: none
-    hotkey: "过去了"
+    *: "过去了"
   </dest>
   <voice>
-    *: none
-    hotkey: "过去了"
+    *: "过去了"
   </voice>
 </phrase>
 <phrase>

@@ -15000,16 +15000,13 @@
   desc: prefix for elapsed playtime announcement
   user: core
   <source>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </source>
   <dest>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </dest>
   <voice>
-    *: none
-    hotkey: "Elapsed"
+    *: "Elapsed"
   </voice>
 </phrase>
 <phrase>
