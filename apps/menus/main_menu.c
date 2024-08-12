@@ -185,7 +185,7 @@ static int refresh_data(struct info_data *info)
 	    max = drive;
 	else if (drive < max)
 	    break;
-#elif defined(HAVE_HOTSWAP) || defined(HAVE_DIRCACHE) || defined(HAVE_BOOTDATA)
+#elif defined(HAVE_MULTIVOLUME) && (defined(HAVE_HOTSWAP) || defined(HAVE_HOTSWAP) || defined(HAVE_DIRCACHE) || defined(HAVE_BOOTDATA))
         if (volume_partition(i) == -1)
             break;
 #endif
