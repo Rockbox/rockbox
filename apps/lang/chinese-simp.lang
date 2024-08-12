@@ -12547,16 +12547,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "播放列表剩余："
+    *: ""
   </dest>
   <voice>
-    *: "播放列表剩余"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16429,5 +16429,19 @@
   </dest>
   <voice>
     *: "请选择文件"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "剩余"
+  </dest>
+  <voice>
+    *: "剩余"
   </voice>
 </phrase>

@@ -12554,16 +12554,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "남은 재생목록:"
+    *: ""
   </dest>
   <voice>
-    *: "남은 재생목록"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16435,5 +16435,19 @@
   </dest>
   <voice>
     *: "파일 선택"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "남은"
+  </dest>
+  <voice>
+    *: "남은"
   </voice>
 </phrase>
