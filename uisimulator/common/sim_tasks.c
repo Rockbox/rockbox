@@ -270,6 +270,13 @@ int volume_drive(int volume)
 }
 #endif
 
+int volume_partition(int volume)
+{
+    (void)volume;
+    /* Sims only implement a single parition per drive */
+    return 0;
+}
+
 #if (CONFIG_STORAGE & STORAGE_MMC)
 bool mmc_touched(void)
 {
