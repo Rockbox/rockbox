@@ -55,6 +55,6 @@ bool imx233_partitions_is_window_enabled(void);
  * for a whole disk, *end should be the size of the disk when the function is
  * called */
 int imx233_partitions_compute_window(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, sector_t *start, unsigned *end);
+    enum imx233_part_t part, sector_t *start, sector_t *end);
 
 #endif /* __PARTITIONS_IMX233__ */

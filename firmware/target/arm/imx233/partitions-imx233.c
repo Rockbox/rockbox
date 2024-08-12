@@ -71,7 +71,7 @@ static const char *creative_part_name(enum imx233_part_t part)
 }
 
 static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, sector_t *start, unsigned *end)
+    enum imx233_part_t part, sector_t *start, sector_t *end)
 {
     uint8_t mblk[512];
     int ret = read_fn(user, MBLK_ADDR / 512, 1, mblk);
@@ -99,7 +99,7 @@ static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
             }
             else
                 *end = *start + ent[i].size * hdr->block_size / 512;
-            
+
             return 0;
         }
     }
@@ -109,7 +109,7 @@ static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
 
 #if (IMX233_PARTITIONS & IMX233_FREESCALE)
 static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, unsigned *start, unsigned *end)
+    enum imx233_part_t part, sector_t *start, sector_t *end)
 {
     uint8_t mbr[512];
     int ret = read_fn(user, 0, 1, mbr);
@@ -179,7 +179,7 @@ static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
 #endif /* (IMX233_PARTITIONS & IMX233_FREESCALE) */
 
 int imx233_partitions_compute_window(intptr_t user, part_read_fn_t read_fn,
-    enum imx233_part_t part, unsigned *start, unsigned *end)
+    enum imx233_part_t part, sector_t *start, sector_t *end)
 {
     int ret = -1;
 #if (IMX233_PARTITIONS & IMX233_CREATIVE)

@@ -1792,7 +1792,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Firmware: %s", info.revision);
     simplelist_addline(
             "Size: %lld MB", (uint64_t)(info.num_sectors*(info.sector_size/512)/2048));
-    storage_t free;
+    sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);

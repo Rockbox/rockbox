@@ -203,8 +203,8 @@ struct sdmmc_status_t
  * the RCA is the 16-bit msb. Be careful that this is not the actuall RCA ! */
 
 /* common */
-static unsigned window_start[SDMMC_NUM_DRIVES];
-static unsigned window_end[SDMMC_NUM_DRIVES];
+static sector_t window_start[SDMMC_NUM_DRIVES];
+static sector_t window_end[SDMMC_NUM_DRIVES];
 static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 static struct mutex mutex[SDMMC_NUM_DRIVES];
