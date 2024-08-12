@@ -753,7 +753,7 @@ static void rb_color(int n)
 
 /* clipping is implemented through viewports and offsetting
  * coordinates */
-static void rb_clip(void *handle, int x, int y, int w, int h)
+static void rb_clip(drawing *dr, int x, int y, int w, int h)
 {
     if(!zoom_enabled)
     {
@@ -783,7 +783,7 @@ static void rb_clip(void *handle, int x, int y, int w, int h)
     }
 }
 
-static void rb_unclip(void *handle)
+static void rb_unclip(drawing *dr)
 {
     if(!zoom_enabled)
     {
@@ -800,7 +800,7 @@ static void rb_unclip(void *handle)
     }
 }
 
-static void rb_draw_text(void *handle, int x, int y, int fonttype,
+static void rb_draw_text(drawing *dr, int x, int y, int fonttype,
                          int fontsize, int align, int color, const char *text)
 {
     (void) fontsize;
@@ -865,7 +865,7 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
     }
 }
 
-static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
+static void rb_draw_rect(drawing *dr, int x, int y, int w, int h, int color)
 {
     rb_color(color);
     if(!zoom_enabled)
@@ -1007,7 +1007,7 @@ static void draw_antialiased_line(fb_data *fb, int w, int h, int x0, int y0, int
     }
 }
 
-static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
+static void rb_draw_line(drawing *dr, int x1, int y1, int x2, int y2,
                          int color)
 {
     rb_color(color);
@@ -1035,349 +1035,7 @@ static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
     }
 }
 
-#if 0
-/*
- * draw filled polygon
- * originally by Sebastian Leonhardt (ulmutul)
- * 'count' : number of coordinate pairs
- * 'pxy': array of coordinates. pxy[0]=x0,pxy[1]=y0,...
- * note: provide space for one extra coordinate, because the starting point
- * will automatically be inserted as end point.
- */
-
-/*
- * helper function:
- * find points of intersection between polygon and scanline
- */
-
-#define MAX_INTERSECTION 32
-
-static void fill_poly_line(int scanline, int count, int *pxy)
-{
-    int i;
-    int j;
-    int num_of_intersects;
-    int direct, old_direct;
-    //intersections of every line with scanline (y-coord)
-    int intersection[MAX_INTERSECTION];
-    /* add starting point as ending point */
-    pxy[count*2] = pxy[0];
-    pxy[count*2+1] = pxy[1];
-
-    old_direct=0;
-    num_of_intersects=0;
-    for (i=0; i<count*2; i+=2) {
-        int x1=pxy[i];
-        int y1=pxy[i+1];
-        int x2=pxy[i+2];
-        int y2=pxy[i+3];
-        // skip if line is outside of scanline
-        if (y1 < y2) {
-            if (scanline < y1 || scanline > y2)
-                continue;
-        }
-        else {
-            if (scanline < y2 || scanline > y1)
-                continue;
-        }
-        // calculate x-coord of intersection
-        if (y1==y2) {
-            direct=0;
-        }
-        else {
-            direct = y1>y2 ? 1 : -1;
-            // omit double intersections, if both lines lead in the same direction
-            intersection[num_of_intersects] =
-                x1+((scanline-y1)*(x2-x1))/(y2-y1);
-            if ( (direct!=old_direct)
-                 || (intersection[num_of_intersects] != intersection[num_of_intersects-1])
-                )
-                ++num_of_intersects;
-        }
-        old_direct = direct;
-    }
-
-    // sort points of intersection
-    for (i=0; i<num_of_intersects-1; ++i) {
-        for (j=i+1; j<num_of_intersects; ++j) {
-            if (intersection[j]<intersection[i]) {
-                int temp=intersection[i];
-                intersection[i]=intersection[j];
-                intersection[j]=temp;
-            }
-        }
-    }
-    // draw
-    for (i=0; i<num_of_intersects; i+=2) {
-        rb->lcd_hline(intersection[i], intersection[i+1], scanline);
-    }
-}
-
-/* two extra elements at end of pxy needed */
-static void v_fillarea(int count, int *pxy)
-{
-    int i;
-    int y1, y2;
-
-    // find min and max y coords
-    y1=y2=pxy[1];
-    for (i=3; i<count*2; i+=2) {
-        if (pxy[i] < y1) y1 = pxy[i];
-        else if (pxy[i] > y2) y2 = pxy[i];
-    }
-
-    for (i=y1; i<=y2; ++i) {
-        fill_poly_line(i, count, pxy);
-    }
-}
-#endif
-
-/* I'm a horrible person: this was copy-pasta'd straight from
- * xlcd_draw.c */
-
-/* sort the given coordinates by increasing x value */
-static void sort_points_by_increasing_x(int* x1, int* y1,
-                                        int* x2, int* y2,
-                                        int* x3, int* y3)
-{
-    int x, y;
-    if (*x1 > *x3)
-    {
-        if (*x2 < *x3)       /* x2 < x3 < x1 */
-        {
-            x = *x1; *x1 = *x2; *x2 = *x3; *x3 = x;
-            y = *y1; *y1 = *y2; *y2 = *y3; *y3 = y;
-        }
-        else if (*x2 > *x1)  /* x3 < x1 < x2 */
-        {
-            x = *x1; *x1 = *x3; *x3 = *x2; *x2 = x;
-            y = *y1; *y1 = *y3; *y3 = *y2; *y2 = y;
-        }
-        else               /* x3 <= x2 <= x1 */
-        {
-            x = *x1; *x1 = *x3; *x3 = x;
-            y = *y1; *y1 = *y3; *y3 = y;
-        }
-    }
-    else
-    {
-        if (*x2 < *x1)       /* x2 < x1 <= x3 */
-        {
-            x = *x1; *x1 = *x2; *x2 = x;
-            y = *y1; *y1 = *y2; *y2 = y;
-        }
-        else if (*x2 > *x3)  /* x1 <= x3 < x2 */
-        {
-            x = *x2; *x2 = *x3; *x3 = x;
-            y = *y2; *y2 = *y3; *y3 = y;
-        }
-        /* else already sorted */
-    }
-}
-
-#define sort_points_by_increasing_y(x1, y1, x2, y2, x3, y3)     \
-    sort_points_by_increasing_x(y1, x1, y2, x2, y3, x3)
-
-/* draw a filled triangle, using horizontal lines for speed */
-static void zoom_filltriangle(int x1, int y1,
-                              int x2, int y2,
-                              int x3, int y3)
-{
-    long fp_x1, fp_x2, fp_dx1, fp_dx2;
-    int y;
-    sort_points_by_increasing_y(&x1, &y1, &x2, &y2, &x3, &y3);
-
-    if (y1 < y3)  /* draw */
-    {
-        fp_dx1 = ((x3 - x1) << 16) / (y3 - y1);
-        fp_x1  = (x1 << 16) + (1<<15) + (fp_dx1 >> 1);
-
-        if (y1 < y2)  /* first part */
-        {
-            fp_dx2 = ((x2 - x1) << 16) / (y2 - y1);
-            fp_x2  = (x1 << 16) + (1<<15) + (fp_dx2 >> 1);
-            for (y = y1; y < y2; y++)
-            {
-                zoom_hline(fp_x1 >> 16, fp_x2 >> 16, y);
-                fp_x1 += fp_dx1;
-                fp_x2 += fp_dx2;
-            }
-        }
-        if (y2 < y3)  /* second part */
-        {
-            fp_dx2 = ((x3 - x2) << 16) / (y3 - y2);
-            fp_x2 = (x2 << 16) + (1<<15) + (fp_dx2 >> 1);
-            for (y = y2; y < y3; y++)
-            {
-                zoom_hline(fp_x1 >> 16, fp_x2 >> 16, y);
-                fp_x1 += fp_dx1;
-                fp_x2 += fp_dx2;
-            }
-        }
-    }
-}
-
-/* Should probably refactor this */
-static void rb_draw_poly(void *handle, const int *coords, int npoints,
-                         int fillcolor, int outlinecolor)
-{
-    if(!zoom_enabled)
-    {
-        LOGF("rb_draw_poly");
-
-        if(fillcolor >= 0)
-        {
-            rb_color(fillcolor);
-#if 1
-            /* serious hack: draw a bunch of triangles between adjacent points */
-            /* this generally works, even with some concave polygons */
-            for(int i = 2; i < npoints; ++i)
-            {
-                int x1, y1, x2, y2, x3, y3;
-                x1 = coords[0];
-                y1 = coords[1];
-                x2 = coords[(i - 1) * 2];
-                y2 = coords[(i - 1) * 2 + 1];
-                x3 = coords[i * 2];
-                y3 = coords[i * 2 + 1];
-                offset_coords(&x1, &y1);
-                offset_coords(&x2, &y2);
-                offset_coords(&x3, &y3);
-                xlcd_filltriangle(x1, y1,
-                                  x2, y2,
-                                  x3, y3);
-
-#ifdef DEBUG_MENU
-                if(debug_settings.polyanim)
-                {
-                    rb->lcd_update();
-                    rb->sleep(HZ/4);
-                }
-#endif
-#if 0
-                /* debug code */
-                rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
-                rb->lcd_drawpixel(x1, y1);
-                rb->lcd_drawpixel(x2, y2);
-                rb->lcd_drawpixel(x3, y3);
-                rb->lcd_update();
-                rb->sleep(HZ);
-                rb_color(fillcolor);
-                rb->lcd_drawpixel(x1, y1);
-                rb->lcd_drawpixel(x2, y2);
-                rb->lcd_drawpixel(x3, y3);
-                rb->lcd_update();
-#endif
-            }
-#else
-            int *pxy = smalloc(sizeof(int) * 2 * npoints + 2);
-            /* copy points, offsetted */
-            for(int i = 0; i < npoints; ++i)
-            {
-                pxy[2 * i + 0] = coords[2 * i + 0];
-                pxy[2 * i + 1] = coords[2 * i + 1];
-                offset_coords(&pxy[2*i+0], &pxy[2*i+1]);
-            }
-            v_fillarea(npoints, pxy);
-            sfree(pxy);
-#endif
-        }
-
-        /* draw outlines last so they're not covered by the fill */
-        assert(outlinecolor >= 0);
-        rb_color(outlinecolor);
-
-        for(int i = 1; i < npoints; ++i)
-        {
-            int x1, y1, x2, y2;
-            x1 = coords[2 * (i - 1)];
-            y1 = coords[2 * (i - 1) + 1];
-            x2 = coords[2 * i];
-            y2 = coords[2 * i + 1];
-            if(debug_settings.no_aa)
-            {
-                offset_coords(&x1, &y1);
-                offset_coords(&x2, &y2);
-                rb->lcd_drawline(x1, y1,
-                                 x2, y2);
-            }
-            else
-                draw_antialiased_line(lcd_fb, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
-
-#ifdef DEBUG_MENU
-            if(debug_settings.polyanim)
-            {
-                rb->lcd_update();
-                rb->sleep(HZ/4);
-            }
-#endif
-        }
-
-        int x1, y1, x2, y2;
-        x1 = coords[0];
-        y1 = coords[1];
-        x2 = coords[2 * (npoints - 1)];
-        y2 = coords[2 * (npoints - 1) + 1];
-        if(debug_settings.no_aa)
-        {
-            offset_coords(&x1, &y1);
-            offset_coords(&x2, &y2);
-
-            rb->lcd_drawline(x1, y1,
-                             x2, y2);
-        }
-        else
-            draw_antialiased_line(lcd_fb, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
-    }
-    else
-    {
-        LOGF("rb_draw_poly");
-
-        if(fillcolor >= 0)
-        {
-            rb_color(fillcolor);
-
-            /* serious hack: draw a bunch of triangles between adjacent points */
-            /* this generally works, even with some concave polygons */
-            for(int i = 2; i < npoints; ++i)
-            {
-                int x1, y1, x2, y2, x3, y3;
-                x1 = coords[0];
-                y1 = coords[1];
-                x2 = coords[(i - 1) * 2];
-                y2 = coords[(i - 1) * 2 + 1];
-                x3 = coords[i * 2];
-                y3 = coords[i * 2 + 1];
-                zoom_filltriangle(x1, y1,
-                                  x2, y2,
-                                  x3, y3);
-            }
-        }
-
-        /* draw outlines last so they're not covered by the fill */
-        assert(outlinecolor >= 0);
-        rb_color(outlinecolor);
-
-        for(int i = 1; i < npoints; ++i)
-        {
-            int x1, y1, x2, y2;
-            x1 = coords[2 * (i - 1)];
-            y1 = coords[2 * (i - 1) + 1];
-            x2 = coords[2 * i];
-            y2 = coords[2 * i + 1];
-            draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
-        }
-
-        int x1, y1, x2, y2;
-        x1 = coords[0];
-        y1 = coords[1];
-        x2 = coords[2 * (npoints - 1)];
-        y2 = coords[2 * (npoints - 1) + 1];
-        draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
-    }
-}
-
-static void rb_draw_circle(void *handle, int cx, int cy, int radius,
+static void rb_draw_circle(drawing *dr, int cx, int cy, int radius,
                            int fillcolor, int outlinecolor)
 {
     if(!zoom_enabled)
@@ -1449,7 +1107,7 @@ static void trim_rect(int *x, int *y, int *w, int *h)
     *h = y1 - y0;
 }
 
-static blitter *rb_blitter_new(void *handle, int w, int h)
+static blitter *rb_blitter_new(drawing *dr, int w, int h)
 {
     LOGF("rb_blitter_new");
     blitter *b = snew(blitter);
@@ -1460,7 +1118,7 @@ static blitter *rb_blitter_new(void *handle, int w, int h)
     return b;
 }
 
-static void rb_blitter_free(void *handle, blitter *bl)
+static void rb_blitter_free(drawing *dr, blitter *bl)
 {
     LOGF("rb_blitter_free");
     sfree(bl->bmp.data);
@@ -1469,7 +1127,7 @@ static void rb_blitter_free(void *handle, blitter *bl)
 }
 
 /* copy a section of the framebuffer */
-static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
+static void rb_blitter_save(drawing *dr, blitter *bl, int x, int y)
 {
     /* no viewport offset */
 #if LCD_STRIDEFORMAT == VERTICAL_STRIDE
@@ -1498,7 +1156,7 @@ static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
 #endif
 }
 
-static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
+static void rb_blitter_load(drawing *dr, blitter *bl, int x, int y)
 {
     LOGF("rb_blitter_load");
     if(!bl->have_data)
@@ -1528,7 +1186,7 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
     }
 }
 
-static void rb_draw_update(void *handle, int x, int y, int w, int h)
+static void rb_draw_update(drawing *dr, int x, int y, int w, int h)
 {
     LOGF("rb_draw_update(%d, %d, %d, %d)", x, y, w, h);
 
@@ -1552,9 +1210,9 @@ static void rb_draw_update(void *handle, int x, int y, int w, int h)
     need_draw_update = true;
 }
 
-static void rb_start_draw(void *handle)
+static void rb_start_draw(drawing *dr)
 {
-    (void) handle;
+    (void) dr;
 
     /* ... mumble mumble ... not ... reentrant ... mumble mumble ... */
 
@@ -1565,9 +1223,9 @@ static void rb_start_draw(void *handle)
     ud_d = LCD_HEIGHT;
 }
 
-static void rb_end_draw(void *handle)
+static void rb_end_draw(drawing *dr)
 {
-    (void) handle;
+    (void) dr;
 
     if(debug_settings.highlight_cursor)
     {
@@ -1594,7 +1252,7 @@ static void rb_end_draw(void *handle)
 #endif
 }
 
-static void rb_status_bar(void *handle, const char *text)
+static void rb_status_bar(drawing *dr, const char *text)
 {
     if(titlebar)
         sfree(titlebar);
@@ -1692,7 +1350,7 @@ static void draw_mouse(void)
  * glyph exists in a font) */
 #if 0
 /* See: https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/drawing.html#drawing-text-fallback */
-static char *rb_text_fallback(void *handle, const char *const *strings,
+static char *rb_text_fallback(drawing *dr, const char *const *strings,
                               int nstrings)
 {
     struct font *pf = rb->font_get(cur_font);
@@ -1725,10 +1383,11 @@ static char *rb_text_fallback(void *handle, const char *const *strings,
 #endif
 
 const drawing_api rb_drawing = {
+    1,
     rb_draw_text,
     rb_draw_rect,
     rb_draw_line,
-    rb_draw_poly,
+    draw_polygon_fallback,
     rb_draw_circle,
     rb_draw_update,
     rb_clip,

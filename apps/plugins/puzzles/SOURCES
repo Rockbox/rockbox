@@ -7,6 +7,7 @@ lz4tiny.c
 /* puzzles core sources */
 src/combi.c
 src/divvy.c
+src/draw-poly.c
 src/drawing.c
 src/dsf.c
 src/findloop.c

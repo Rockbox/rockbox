@@ -4,11 +4,6 @@ Introduction
 This is the readme for the Rockbox port of Simon Tatham's Portable
 Puzzle Collection.
 
-The upstream version used is subject to change, as it should be
-relatively trivial to update it to a newer version. Simply copying the
-upstream repo's contents into src/ and running genhelp.sh ought to do
-it (watch out for API changes, though!).
-
 Source structure
 ================
 
@@ -44,16 +39,8 @@ to Untangle and Palisade). These divergent changes complicated
 maintenance of this port, as merge conflicts often arose when upstream
 changes to these games conflicted with our changes. To remedy this, I
 sent most of these patches back upstream in summer 2024, and since
-then, Simon has merged the majority of them into his tree.
-
-This leaves us with a very small set of places where our branch of the
-puzzles source diverges from Simon's. That branch lives here:
-
-https://github.com/built1n/puzzles/tree/rockbox-devel
-
-Notably, there are several hacks which work around Rockbox's lack of a
-proper polygon filling algorithm. Eliminating this deficiency would
-enable us to use a totally unmodified upstream source tree.
+then, Simon has merged them into his repo. We are now able to run with
+a fully unmodified puzzles source tree.
 
 Maintenance
 ===========
@@ -62,7 +49,7 @@ Simon's upstream tree sees continued development. The port is
 structured so that integrating new upstream versions is
 straightforward: all the upstream sources live in the src/
 subdirectory; all of the Rockbox frontend lives in the root
-apps/pluginspuzzles/ directory.
+apps/plugins/puzzles/ directory.
 
 The `resync.sh' shell script automates the resyncing process. It
 copies the upstream sources (point it to a local copy of the
@@ -77,9 +64,7 @@ The LZ4 library and GCC are necessary as well.
 Wishlist
 ========
 
-- Proper polygon filling algorithm. The current algorithm is a hack
-  that uses overdrawn triangles. This will enable us to eliminate the
-  last of the Rockbox-specific modifications.
+- Nothing!
 
 Kudos to Simon (duh), and Frank, for telling me about it.
 
@@ -120,3 +105,6 @@ Implement user preferences menu. Introduced "Mosaic".
 
 August 2024: Resync to ee5e327 (branched from Simon's
 1c1899e). Changes default Map stipple size to "Small".
+
+August 2024: Resync to Simon's 262f709 (unmodified). Uses new scanline
+polygon filling algorithm. Updates drawing API.
