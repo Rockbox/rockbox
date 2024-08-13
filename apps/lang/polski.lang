@@ -6892,7 +6892,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Obniżenie Półtonu"
+    pitchscreen: "Obniżenie półtonu"
   </dest>
   <voice>
     *: none
@@ -11632,11 +11632,11 @@
   </source>
   <dest>
     *: none
-    sansafuzeplus: "Martwa strefa touchpada"
+    sansafuzeplus: "Martwa strefa panelu dotykowego"
   </dest>
   <voice>
     *: none
-    sansafuzeplus: "Martwa strefa touchpada"
+    sansafuzeplus: "Martwa strefa panelu dotykowego"
   </voice>
 </phrase>
 <phrase>
@@ -12283,16 +12283,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "Pozostały czas listy odtwarzania:"
+    *: ""
   </dest>
   <voice>
-    *: "Pozostały czas listy odtwarzania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16428,5 +16428,19 @@
   </dest>
   <voice>
     *: "Wybierz plik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Pozostały"
+  </dest>
+  <voice>
+    *: "Pozostały"
   </voice>
 </phrase>
