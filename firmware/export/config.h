@@ -893,7 +893,8 @@ Lyre prototype 1 */
 #endif
 
 /* Bootloaders don't need multivolume awareness */
-#if defined(BOOTLOADER) && defined(HAVE_MULTIVOLUME) && !(CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if defined(BOOTLOADER) && defined(HAVE_MULTIVOLUME) \
+    && !(CONFIG_PLATFORM & PLATFORM_HOSTED) && !defined(BOOT_REDIR)
 #undef HAVE_MULTIVOLUME
 #endif
 
