@@ -24,6 +24,7 @@
 #include "pathfuncs.h"
 #include "dir.h"
 #include "dircache.h"
+#include "file.h"
 
 #if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #include "rb-loader.h"
@@ -185,22 +186,33 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 
         if (multiboot_is_boot_volume(IF_MV_VOL(volume)))
         {
-            int rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
-            while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
-                rtpath[rtlen] = '\0'; /* remove extra separators */
+            /* get the full path to the BOOTFILE
+               ie. /<0>/redirectdir/.rockbox/rockbox.ext */
+            int rtlen = get_redirect_dir(rtpath, sizeof(rtpath),
+                                         volume, BOOTDIR, BOOTFILE);
+
+            if (rtlen <= 0 || rtlen >= (int) sizeof(rtpath))
+                rtlen = 0; /* path too long or sprintf error */
+            else if (file_exists(rtpath))
+            {
+                rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
+                while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
+                    rtpath[rtlen] = '\0'; /* remove separators */
+            }
+            else
+                rtlen = 0; /* No BOOTFILE found */
 
 #if 0 /*removed, causes issues with playback for now?*/
             if (rtlen <= 0 || rtpath[rtlen] == VOL_END_TOK)
                 root_unmount_volume(volume); /* unmount so root can be hidden*/
 #endif
-            if (rtlen <= 0) /* Error occurred, card removed? Set root to default */
-            {
+            if (rtlen <= 0 || root_mount_path(rtpath, NSITEM_CONTENTS) != 0)
+            {   /* Error occurred, card removed? Set root to default */
+                boot_data_valid = false;
                 root_unmount_volume(volume); /* unmount so root can be hidden*/
                 goto standard_redirect;
             }
-            root_mount_path(rtpath, NSITEM_CONTENTS);
         }
-
     }
     else
     {
