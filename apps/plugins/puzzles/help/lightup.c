@@ -191,4 +191,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2549;
 const unsigned short help_text_words = 468;
+const bool help_valid = true;
 const char quick_help_text[] = "Place bulbs to light up all the squares.";

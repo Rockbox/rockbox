@@ -131,4 +131,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1539;
 const unsigned short help_text_words = 299;
+const bool help_valid = true;
 const char quick_help_text[] = "Flip groups of squares to light them all up at once.";

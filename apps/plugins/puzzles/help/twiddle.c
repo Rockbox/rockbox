@@ -205,4 +205,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2945;
 const unsigned short help_text_words = 549;
+const bool help_valid = true;
 const char quick_help_text[] = "Rotate the tiles around themselves to arrange them into order.";

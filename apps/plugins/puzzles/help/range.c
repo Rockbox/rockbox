@@ -170,4 +170,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2223;
 const unsigned short help_text_words = 395;
+const bool help_valid = true;
 const char quick_help_text[] = "Place black squares to limit the visible distance from each numbered cell.";

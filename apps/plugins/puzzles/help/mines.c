@@ -260,4 +260,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3814;
 const unsigned short help_text_words = 732;
+const bool help_valid = true;
 const char quick_help_text[] = "Find all the mines without treading on any of them.";

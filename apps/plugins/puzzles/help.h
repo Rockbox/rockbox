@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #ifdef ROCKBOX
 #include "lib/display_text.h"
 #endif
@@ -12,3 +14,5 @@ extern const unsigned short help_text_len, quick_help_text_len, help_text_words;
 #if defined(ROCKBOX)
 extern struct style_text help_text_style[];
 #endif
+
+extern const bool help_valid;

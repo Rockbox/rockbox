@@ -271,4 +271,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3752;
 const unsigned short help_text_words = 686;
+const bool help_valid = true;
 const char quick_help_text[] = "Colour the map so that adjacent regions are never the same colour.";

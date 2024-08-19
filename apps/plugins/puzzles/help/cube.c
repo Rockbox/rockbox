@@ -166,4 +166,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2071;
 const unsigned short help_text_words = 386;
+const bool help_valid = true;
 const char quick_help_text[] = "Pick up all the blue squares by rolling the cube over them.";

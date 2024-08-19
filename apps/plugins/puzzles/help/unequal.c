@@ -257,4 +257,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3954;
 const unsigned short help_text_words = 731;
+const bool help_valid = true;
 const char quick_help_text[] = "Complete the latin square in accordance with the > signs.";

@@ -142,4 +142,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1821;
 const unsigned short help_text_words = 328;
+const bool help_valid = true;
 const char quick_help_text[] = "Mark every square with the area of its containing region.";

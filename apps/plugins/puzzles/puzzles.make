@@ -25,6 +25,8 @@ PUZZLES_OBJ = $(call c2obj, $(PUZZLES_SRC))
 PUZZLES_ROCKS = $(addprefix $(PUZZLES_OBJDIR)/sgt-, $(notdir $(PUZZLES_GAMES_SRC:.c=.rock)))
 
 OTHER_SRC += $(PUZZLES_SRC)
+OTHER_INC += -I$(PUZZLES_SRCDIR)/src -I $(PUZZLES_SRCDIR)
+
 ROCKS += $(PUZZLES_ROCKS)
 
 PUZZLES_OPTIMIZE = -O2
@@ -43,6 +45,13 @@ PUZZLESFLAGS = -I$(PUZZLES_SRCDIR)/dummy $(filter-out			\
 		-fdata-sections -w -Wl,--gc-sections
 
 $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_OBJDIR)/help/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
+		$(filter %.o, $^) \
+		$(filter %.a, $+) \
+		-lgcc $(filter-out -Wl%.map, $(PLUGINLDFLAGS)) -Wl,-Map,$(PUZZLES_OBJDIR)/src/$*.map
+	$(SILENT)$(call objcopy,$(PUZZLES_OBJDIR)/$*.elf,$@)
+
+$(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/unfinished/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

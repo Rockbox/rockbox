@@ -182,4 +182,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2395;
 const unsigned short help_text_words = 452;
+const bool help_valid = true;
 const char quick_help_text[] = "Turn the grid the same colour in as few flood fills as possible.";

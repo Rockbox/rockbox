@@ -248,4 +248,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3574;
 const unsigned short help_text_words = 660;
+const bool help_valid = true;
 const char quick_help_text[] = "Place ghosts, vampires and zombies so that the right numbers of them can be seen in mirrors.";

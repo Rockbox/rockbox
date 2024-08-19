@@ -168,4 +168,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2167;
 const unsigned short help_text_words = 389;
+const bool help_valid = true;
 const char quick_help_text[] = "Fill in the pattern in the grid, given only the lengths of runs of black squares.";

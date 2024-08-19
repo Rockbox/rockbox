@@ -222,4 +222,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3255;
 const unsigned short help_text_words = 595;
+const bool help_valid = true;
 const char quick_help_text[] = "Connect the squares into a path following the arrows.";

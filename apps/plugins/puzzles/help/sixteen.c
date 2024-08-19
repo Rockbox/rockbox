@@ -197,4 +197,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2553;
 const unsigned short help_text_words = 454;
+const bool help_valid = true;
 const char quick_help_text[] = "Slide a row at a time to arrange the tiles into order.";

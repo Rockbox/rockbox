@@ -190,4 +190,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2522;
 const unsigned short help_text_words = 439;
+const bool help_valid = true;
 const char quick_help_text[] = "Place magnets to satisfy the clues and avoid like poles touching.";

@@ -147,4 +147,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1673;
 const unsigned short help_text_words = 285;
+const bool help_valid = true;
 const char quick_help_text[] = "Fill in the grid given clues about number of nearby black squares.";

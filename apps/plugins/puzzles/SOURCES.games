@@ -35,13 +35,8 @@ src/undead.c
 src/unequal.c
 src/unruly.c
 src/untangle.c
-
-/* Disabled for now. Fix puzzles.make and CATEGORIES to accomodate these. */
-/* The help system would also need to be patched to compile these. */
-/*src/unfinished/group.c*/
-/*src/unfinished/separate.c*/
-/*src/unfinished/slide.c*/
-/*src/unfinished/sokoban.c*/
+src/unfinished/slide.c
+src/unfinished/sokoban.c
 
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000

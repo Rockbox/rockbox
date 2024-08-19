@@ -145,4 +145,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1707;
 const unsigned short help_text_words = 306;
+const bool help_valid = true;
 const char quick_help_text[] = "Fill in the black and white grid to avoid runs of three.";

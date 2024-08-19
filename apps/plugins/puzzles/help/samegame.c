@@ -188,4 +188,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2492;
 const unsigned short help_text_words = 445;
+const bool help_valid = true;
 const char quick_help_text[] = "Clear the grid by removing touching groups of the same colour squares.";

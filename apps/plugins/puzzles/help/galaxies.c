@@ -208,4 +208,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2766;
 const unsigned short help_text_words = 498;
+const bool help_valid = true;
 const char quick_help_text[] = "Divide the grid into rotationally symmetric regions each centred on a dot.";

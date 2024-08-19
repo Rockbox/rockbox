@@ -179,4 +179,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 2286;
 const unsigned short help_text_words = 431;
+const bool help_valid = true;
 const char quick_help_text[] = "Collect all the gems without running into any of the mines.";

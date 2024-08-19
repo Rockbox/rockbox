@@ -140,4 +140,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1672;
 const unsigned short help_text_words = 285;
+const bool help_valid = true;
 const char quick_help_text[] = "Divide the grid into equal-sized areas in accordance with the clues.";

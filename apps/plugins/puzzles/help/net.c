@@ -297,4 +297,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3919;
 const unsigned short help_text_words = 689;
+const bool help_valid = true;
 const char quick_help_text[] = "Rotate each tile to reassemble the network.";

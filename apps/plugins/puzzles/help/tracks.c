@@ -150,4 +150,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 1881;
 const unsigned short help_text_words = 337;
+const bool help_valid = true;
 const char quick_help_text[] = "Fill in the railway track according to the clues.";

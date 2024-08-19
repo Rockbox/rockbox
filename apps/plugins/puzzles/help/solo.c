@@ -383,4 +383,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 6259;
 const unsigned short help_text_words = 1153;
+const bool help_valid = true;
 const char quick_help_text[] = "Fill in the grid so that each row, column and square block contains one of every digit.";

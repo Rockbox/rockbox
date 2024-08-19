@@ -3,6 +3,7 @@ rockbox.c
 rbwrappers.c
 rbmalloc.c
 lz4tiny.c
+dummy/nullhelp.c
 
 /* puzzles core sources */
 src/combi.c

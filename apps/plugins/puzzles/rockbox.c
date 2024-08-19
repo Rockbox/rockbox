@@ -322,6 +322,7 @@ static struct viewport clip_rect;
 static bool clipped = false, zoom_enabled = false, view_mode = true, mouse_mode = false;
 
 static int mouse_x, mouse_y;
+static bool mouse_dragging = false; /* for sticky mode only */
 
 extern bool audiobuf_available; /* defined in rbmalloc.c */
 
@@ -346,6 +347,7 @@ static struct {
     bool ignore_repeats; /* ignore repeated button events (currently in all games but Untangle) */
     bool rclick_on_hold; /* if in mouse mode, send right-click on long-press of select */
     bool numerical_chooser; /* repurpose select to activate a numerical chooser */
+    bool sticky_mouse; /* if mouse left button should be persistent and toggled on/off */
 } input_settings;
 
 static bool accept_input = true;
@@ -748,7 +750,8 @@ static void rb_color(int n)
         fatal("bad color %d", n);
         return;
     }
-    rb->lcd_set_foreground(colors[n]);
+    if(colors)
+	rb->lcd_set_foreground(colors[n]);
 }
 
 /* clipping is implemented through viewports and offsetting
@@ -1284,7 +1287,8 @@ static void draw_title(bool clear_first)
     rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize(str, &w, &h);
 
-    rb->lcd_set_foreground(BG_COLOR);
+
+    rb->lcd_set_foreground(colors ? colors[0] : BG_COLOR);
     rb->lcd_fillrect(0, LCD_HEIGHT - h, clear_first ? LCD_WIDTH : w, h);
 
     rb->lcd_set_drawmode(DRMODE_FG);
@@ -1682,9 +1686,17 @@ static int process_input(int tmo, bool do_pausemenu)
                 LOGF("sending left click");
                 send_click(LEFT_BUTTON, true); /* right-click is handled earlier */
             }
-        }
-        else
-        {
+        } else if(input_settings.sticky_mouse) {
+	    if(pressed & BTN_FIRE) {
+		send_click(LEFT_BUTTON, false);
+		accept_input = false;
+		mouse_dragging = !mouse_dragging;
+	    } else if(mouse_dragging) {
+		send_click(LEFT_DRAG, false);
+	    } else {
+		send_click(LEFT_RELEASE, false);
+	    }
+	} else {
             if(pressed & BTN_FIRE) {
                 send_click(LEFT_BUTTON, false);
                 accept_input = false;
@@ -2482,6 +2494,7 @@ static bool presets_menu(void)
 
 static void quick_help(void)
 {
+#ifndef NO_HELP_TEXT
 #if defined(FOR_REAL) && defined(DEBUG_MENU)
     if(++help_times >= 5)
     {
@@ -2492,11 +2505,12 @@ static void quick_help(void)
 
     rb->splash(0, quick_help_text);
     rb->button_get(true);
-    return;
+#endif
 }
 
 static void full_help(const char *name)
 {
+#ifndef NO_HELP_TEXT
     unsigned old_bg = rb->lcd_get_background();
 
     bool orig_clipped = clipped;
@@ -2551,6 +2565,7 @@ static void full_help(const char *name)
 
     if(orig_clipped)
         rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+#endif
 }
 
 static void init_default_settings(void)
@@ -2701,6 +2716,11 @@ static int pausemenu_cb(int action,
             if(!midend_which_game(me)->can_solve)
                 return ACTION_EXIT_MENUITEM;
             break;
+	case 7:
+	case 8:
+	    if(!help_valid)
+		return ACTION_EXIT_MENUITEM;
+	    break;
         case 9:
             if(audiobuf_available)
                 break;
@@ -2751,7 +2771,7 @@ static void reset_drawing(void)
     rb->lcd_set_viewport(NULL);
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(BG_COLOR);
+    rb->lcd_set_background(colors ? colors[0] : BG_COLOR);
 }
 
 /* Make a new game, but tell the user through a splash so they don't
@@ -2876,7 +2896,7 @@ static int pause_menu(void)
             break;
         }
     }
-    rb->lcd_set_background(BG_COLOR);
+    rb->lcd_set_background(colors ? colors[0] : BG_COLOR);
     rb->lcd_clear_display();
     midend_force_redraw(me);
     rb->lcd_update();
@@ -2923,6 +2943,7 @@ static void init_colors(void)
     float *floatcolors = midend_colors(me, &ncolors);
 
     /* convert them to packed RGB */
+    sfree(colors);
     colors = smalloc(ncolors * sizeof(unsigned));
     unsigned *ptr = colors;
     float *floatptr = floatcolors;
@@ -3007,6 +3028,7 @@ static void tune_input(const char *name)
     static const char *no_rclick_on_hold[] = {
         "Map",
         "Signpost",
+	"Slide",
         "Untangle",
         NULL
     };
@@ -3015,10 +3037,20 @@ static void tune_input(const char *name)
 
     static const char *mouse_games[] = {
         "Loopy",
+	"Slide",
         NULL
     };
 
     mouse_mode = string_in_list(name, mouse_games);
+
+    static const char *sticky_mouse_games[] = {
+	"Map",
+	"Signpost",
+	"Slide",
+	"Untangle",
+    };
+
+    input_settings.sticky_mouse = string_in_list(name, sticky_mouse_games);
 
     static const char *number_chooser_games[] = {
         "Filling",
@@ -3312,8 +3344,11 @@ static int mainmenu_cb(int action,
             if(!load_success)
                 return ACTION_EXIT_MENUITEM;
             break;
+	case 2:
         case 3:
-            break;
+	    if(!help_valid)
+		return ACTION_EXIT_MENUITEM;
+	    break;
         case 4:
             if(audiobuf_available)
                 break;
@@ -3476,12 +3511,14 @@ static void puzzles_main(void)
                     /* quit without saving */
                     midend_free(me);
                     sfree(colors);
+		    colors = NULL;
                     return;
                 case -3:
                     /* save and quit */
                     save_game();
                     midend_free(me);
                     sfree(colors);
+		    colors = NULL;
                     return;
                 default:
                     break;
@@ -3511,6 +3548,7 @@ static void puzzles_main(void)
             rb->yield();
         }
         sfree(colors);
+	colors = NULL;
     }
 }
 

@@ -258,4 +258,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3536;
 const unsigned short help_text_words = 603;
+const bool help_valid = true;
 const char quick_help_text[] = "Divide the grid into rectangles with areas equal to the numbers.";

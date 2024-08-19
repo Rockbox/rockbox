@@ -340,4 +340,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 5480;
 const unsigned short help_text_words = 1016;
+const bool help_valid = true;
 const char quick_help_text[] = "Find the hidden balls in the box by bouncing laser beams off them.";

@@ -358,4 +358,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 5613;
 const unsigned short help_text_words = 1026;
+const bool help_valid = true;
 const char quick_help_text[] = "Connect all the islands with a network of bridges.";

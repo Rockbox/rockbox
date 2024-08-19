@@ -30,8 +30,8 @@ then
     echo "[1/5] Removing current src/ directory"
     rm -rf src
     echo "[2/5] Copying new sources"
-    mkdir src
-    cp -r "$1"/{*.h,puzzles.but,LICENCE,README,CMakeLists.txt} src
+    mkdir -p src/unfinished
+    cp -r "$1"/{*.h,puzzles.but,LICENCE,README,CMakeLists.txt,unfinished} src
 
     # Parse out definitions of core, core_obj, and common from
     # CMakeLists. Extract the .c filenames, except malloc.c, and store
@@ -46,17 +46,12 @@ then
     SRC="$(cat SOURCES.games SOURCES.core | sed 's/src\///' | tr '\n' ' ' | head -c-1) loopy.c pearl.c solo.c"
     echo "Detected sources:" $SRC
     pushd "$1" > /dev/null
-    cp $SRC "$ROOT"/src
+    cp -r $SRC "$ROOT"/src
     popd > /dev/null
 
-    cat <<EOF >> SOURCES.games
+    cat src/unfinished/CMakeLists.txt | awk '/puzzle\(/{p=1} p{print} /\)/{p=0}' | grep -Eo "\(.*$" | tr -dc "a-z\n" | awk '{print "src/unfinished/"$0".c"}' | grep -v "group" | grep -v "separate" >> SOURCES.games
 
-/* Disabled for now. Fix puzzles.make and CATEGORIES to accomodate these. */
-/* The help system would also need to be patched to compile these. */
-/*src/unfinished/group.c*/
-/*src/unfinished/separate.c*/
-/*src/unfinished/slide.c*/
-/*src/unfinished/sokoban.c*/
+    cat <<EOF >> SOURCES.games
 
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000

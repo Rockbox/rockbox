@@ -260,4 +260,5 @@ const char help_text[] = {
 
 const unsigned short help_text_len = 3969;
 const unsigned short help_text_words = 762;
+const bool help_valid = true;
 const char quick_help_text[] = "Complete the latin square in accordance with the arithmetic clues.";

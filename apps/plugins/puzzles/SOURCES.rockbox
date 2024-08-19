@@ -2,3 +2,4 @@ rockbox.c
 rbwrappers.c
 rbmalloc.c
 lz4tiny.c
+dummy/nullhelp.c
