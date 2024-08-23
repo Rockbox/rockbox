@@ -12287,10 +12287,10 @@
     *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "背光豁免（省电用）"
+    *: "背光开启例外规则"
   </dest>
   <voice>
-    *: "背光豁免"
+    *: "背光开启例外规则"
   </voice>
 </phrase>
 <phrase>
@@ -15494,10 +15494,10 @@
     *: "Album Art"
   </source>
   <dest>
-    *: "曲绘"
+    *: "专辑封面来源"
   </dest>
   <voice>
-    *: "曲绘"
+    *: "专辑封面来源"
   </voice>
 </phrase>
 <phrase>
