@@ -250,9 +250,8 @@ int rolo_load(const char* filename)
 
     err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
-    /* write the bootdata as if rolo were the bootloader
-     * FIXME: this won't work for root redirect... */
-    if (!strcmp(filename, BOOTDIR "/" BOOTFILE) && boot_data_valid)
+    // Write bootdata as long as the existing bootdata is valid
+    if (boot_data_valid)
     {
         int volume = 0;
 
