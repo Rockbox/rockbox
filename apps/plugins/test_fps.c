@@ -34,46 +34,132 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 #define DURATION (2*HZ) /* longer duration gives more precise results */
 
-
-
 /* Screen logging */
+#define MIN_LINE_LEN 32
 static int line;
+static char *lines = NULL;
+
 static int max_line;
+static int max_line_len;
+
 #ifdef HAVE_REMOTE_LCD
+static char *remote_lines = NULL; /* Not implemented */
 static int remote_line;
 static int remote_max_line;
+static int remote_max_line_len;
 #endif
+
+size_t plugin_buf_len;
+void* plugin_buf;
+
+#define PREP_LOG_BUF(BUF, BUF_SZ) {    \
+    if ((int)plugin_buf_len > BUF_SZ){ \
+        BUF = plugin_buf;              \
+        rb->memset(BUF, 0, BUF_SZ);    \
+        plugin_buf += BUF_SZ;          \
+        plugin_buf_len -= BUF_SZ;       \
+    }                                  \
+}                                      \
 
 static void log_init(void)
 {
     int h;
 
-    rb->lcd_getstringsize("A", NULL, &h);
+    int w = rb->lcd_getstringsize("A", NULL, &h);
+
+    max_line_len = MAX(MIN_LINE_LEN, (LCD_WIDTH / w) * 2);
     max_line = LCD_HEIGHT / h;
+
+    int linebuf_sz = ((max_line_len + 1) * max_line + 1) + 1;
+
+    PREP_LOG_BUF(lines, linebuf_sz);
+
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
+
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_getstringsize("A", NULL, &h);
+    w = rb->lcd_remote_getstringsize("A", NULL, &h);
+    remote_max_line_len = MAX(MIN_LINE_LEN, (LCD_REMOTE_WIDTH / w) * 2);
     remote_max_line = LCD_REMOTE_HEIGHT / h;
+
+    linebuf_sz = ((remote_max_line_len + 1) * remote_max_line + 1) + 1;
+    /* PREP_LOG_BUF(remote_lines, linebuf_sz); needs testing on real hardware */
+
     remote_line = 0;
     rb->lcd_remote_clear_display();
     rb->lcd_remote_update();
 #endif
 }
 
+static void show_log(void)
+{
+    if (lines)
+    {
+        for (int ln = 0; ln <= line; ln++)
+        {
+            char *this_line = lines + (ln * max_line_len);
+            rb->lcd_puts(0, ln, this_line);
+        }
+        rb->lcd_update();
+    }
+#ifdef HAVE_REMOTE_LCD
+    if (remote_lines)
+    {
+        for (int ln = 0; ln <= remote_line; ln++)
+        {
+            char *this_line = remote_lines + (ln * remote_max_line_len);
+            rb->lcd_remote_puts(0, ln, this_line);
+        }
+        rb->lcd_remote_update();
+    }
+#endif
+}
+
 static void log_text(char *text)
 {
-    rb->lcd_puts(0, line, text);
-    if (++line >= max_line)
-        line = 0;
-    rb->lcd_update();
+    if (lines)
+    {
+        char *this_line = lines + (line * max_line_len);
+        rb->strlcpy(this_line, text, max_line_len);
+        this_line[max_line_len] = '\0';
+    }
+    else
+    {
+        rb->lcd_puts(0, line, text);
+        rb->lcd_update();
+    }
+
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_puts(0, remote_line, text);
-    if (++remote_line >= remote_max_line)
-        remote_line = 0;
-    rb->lcd_remote_update();
+
+    if (remote_lines)
+    {
+        char *this_line = remote_lines + (remote_line * remote_max_line_len);
+        rb->strlcpy(this_line, text, remote_max_line_len);
+        this_line[remote_max_line_len] = '\0';
+    }
+    else
+    {
+        rb->lcd_remote_puts(0, remote_line, text);
+        rb->lcd_remote_update();
+    }
+
 #endif
+
+    show_log();
+
+    if (++line >= max_line)
+    {
+        line = 0;
+    }
+
+#ifdef HAVE_REMOTE_LCD
+    if (++remote_line >= remote_max_line)
+    {
+        remote_line = 0;
+    }
+#endif
+
 }
 
 static int calc_tenth_fps(int framecount, long ticks)
@@ -95,6 +181,7 @@ static void time_main_update(void)
     const int part14_h = LCD_HEIGHT/2;  /* y-size for 1/4 update test */
 
     log_text("Main LCD Update");
+    rb->sleep(HZ / 2);
 
     /* Test 1: full LCD update */
     frame_count = 0;
@@ -172,8 +259,9 @@ static void time_main_yuv(void)
     const int part14_w = YUV_WIDTH/2;   /* x-size for 1/4 update test */
     const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
-    
+
     log_text("Main LCD YUV");
+    rb->sleep(HZ / 2);
 
     rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
 
@@ -226,6 +314,7 @@ static void time_remote_update(void)
     const int part14_h = LCD_REMOTE_HEIGHT/2;  /* y-size for 1/4 update test */
 
     log_text("Remote LCD Update");
+    rb->sleep(HZ / 2);
 
     /* Test 1: full LCD update */
     frame_count = 0;
@@ -279,8 +368,8 @@ static void time_greyscale(void)
     long time_1, time_2;
     int frames_1, frames_2;
     int fps, load;
-    size_t gbuf_size;
-    unsigned char *gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    size_t gbuf_size = plugin_buf_len;
+    unsigned char *gbuf = (unsigned char *) plugin_buf;
 
 #if NUM_CORES > 1
     int i;
@@ -292,6 +381,8 @@ static void time_greyscale(void)
 #else
     const int i = 0;
     log_text("Greyscale library");
+    rb->sleep(HZ / 2);
+
     {
 #endif
 
@@ -392,10 +483,13 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* standard stuff */
     (void)parameter;
-    
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
+
+    /* Get the plugin buffer for the log and greylib */
+    plugin_buf = (unsigned char *)rb->plugin_get_buffer(&plugin_buf_len);
 
     log_init();
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -405,7 +499,8 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     time_main_update();
-    rb->sleep(HZ);
+    rb->sleep(HZ* 5);
+
 #if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
     time_main_yuv();
 #endif
@@ -424,6 +519,8 @@ enum plugin_status plugin_start(const void* parameter)
                      (cpu_freq + 500000) / 1000000);
     log_text(str);
 #endif
+
+    show_log();
 
     backlight_use_settings();
 
