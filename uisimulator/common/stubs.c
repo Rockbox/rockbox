@@ -35,6 +35,12 @@
 
 static bool storage_spinning = false;
 
+#if defined(HAVE_DEVICEDATA)
+#include "devicedata.h"
+struct device_data_t device_data =
+    {.length = DEVICE_DATA_PAYLOAD_SIZE};
+#endif /* def HAVE_DEVICEDATA */
+
 int fat_startsector(void)
 {
     return 63;

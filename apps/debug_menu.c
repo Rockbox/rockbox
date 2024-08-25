@@ -124,6 +124,10 @@
 
 #include "talk.h"
 
+#if defined(HAVE_DEVICEDATA)// && !defined(SIMULATOR)
+#include "devicedata.h"
+#endif
+
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"
 #include "multiboot.h"
@@ -2625,6 +2629,33 @@ static bool dbg_boot_data(void)
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
+#if defined(HAVE_DEVICEDATA)// && !defined(SIMULATOR)
+static bool dbg_device_data(void)
+{
+    struct simplelist_info info;
+    info.scroll_all = true;
+    simplelist_info_init(&info, "Device data", 1, NULL);
+    simplelist_set_line_count(0);
+
+    simplelist_addline("Device data");
+
+#if defined(EROS_QN)
+    simplelist_addline("Lcd Version: %d", (int)device_data.lcd_version);
+#endif
+
+    simplelist_addline("Device data RAW:");
+    for (size_t i = 0; i < device_data.length; i += 4)
+    {
+        simplelist_addline("%02x: %02x %02x %02x %02x", i,
+                           device_data.payload[i + 0], device_data.payload[i + 1],
+                           device_data.payload[i + 2], device_data.payload[i + 3]);
+    }
+
+    return simplelist_show_list(&info);
+}
+#endif /* defined(HAVE_DEVICEDATA)*/
+
+
 #if defined(IPOD_6G) && !defined(SIMULATOR)
 #define SYSCFG_MAX_ENTRIES 9 // 9 on iPod Classic/6G
 
@@ -2823,6 +2854,11 @@ static const struct {
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
 #endif
+
+#if defined(HAVE_DEVICEDATA)// && !defined(SIMULATOR)
+        {"Device data", dbg_device_data },
+#endif
+
 #if defined(IPOD_6G) && !defined(SIMULATOR)
         {"View SysCfg", dbg_syscfg },
 #endif

@@ -78,6 +78,10 @@
 #include "bootchart.h"
 #include "logdiskf.h"
 #include "bootdata.h"
+#if defined(HAVE_DEVICEDATA)
+#include "devicedata.h"
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
@@ -176,6 +180,9 @@ int main(void)
     }
     list_init();
     tree_init();
+#if defined(HAVE_DEVICEDATA) && !defined(BOOTLOADER) /* SIMULATOR */
+    verify_device_data();
+#endif
     /* Keep the order of this 3
      * Must be done before any code uses the multi-screen API */
 #ifdef HAVE_USBSTACK
@@ -457,6 +464,10 @@ static void init(void)
 
 #if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
     verify_boot_data();
+#endif
+
+#if defined(HAVE_DEVICEDATA) && !defined(BOOTLOADER)
+    verify_device_data();
 #endif
 
     /* early early early! */

@@ -274,6 +274,10 @@ int rolo_load(const char* filename)
     }
 #endif
 
+#if defined(HAVE_DEVICEDATA)
+    write_devicedata(filebuf, filebuf_size);
+#endif
+
     if (err <= 0)
     {
         rolo_error(loader_strerror(err));

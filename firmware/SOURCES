@@ -62,6 +62,10 @@ common/bootdata.c
 #endif
 #endif
 
+#if defined(HAVE_DEVICEDATA)
+common/devicedata.c
+#endif
+
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c

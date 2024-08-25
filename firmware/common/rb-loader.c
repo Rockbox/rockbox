@@ -30,6 +30,9 @@
 #include "multiboot.h"
 #endif
 
+#ifdef HAVE_DEVICEDATA
+#include "devicedata.h"
+#endif
 /* loads a firmware file from supplied filename
  * file opened, checks firmware size and checksum
  * if no error, firmware loaded to supplied buffer
@@ -118,7 +121,6 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
             /* if ret is valid breaks from loop to continue loading */
         }
 #endif
-
         if (ret < 0) /* Check default volume, no valid firmware file loaded yet */
         {
             /* First check in BOOTDIR */
@@ -140,6 +142,10 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
     }
     else /* full path passed ROLO etc.*/
         ret = load_firmware_filename(buf, firmware, buffer_size);
+
+#ifdef HAVE_DEVICEDATA
+        write_devicedata(buf, ret);
+#endif
 
     return ret;
 }

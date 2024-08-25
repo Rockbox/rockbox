@@ -81,6 +81,20 @@ void system_early_init(void)
     clk_init();
 }
 
+#if defined (HAVE_DEVICEDATA) && defined(EROS_QN)
+void fill_devicedata(struct device_data_t *data)
+{
+#ifdef BOOTLOADER
+    memset(data->payload, 0xff, data->length);
+    data->lcd_version = EROSQN_VER;
+#else
+    uint8_t lcd_version = data->lcd_version;
+    memset(data->payload, 0xff, data->length);
+    data->lcd_version = lcd_version;
+#endif
+}
+#endif
+
 /* First thing called from Rockbox main() */
 void system_init(void)
 {

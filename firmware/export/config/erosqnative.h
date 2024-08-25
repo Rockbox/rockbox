@@ -106,6 +106,9 @@
 #define HAVE_BOOTDATA
 #define BOOT_REDIR "rockbox_main.aigo_erosqn"
 
+/* DeviceData */
+#define HAVE_DEVICEDATA
+
 /* USB support */
 #ifndef SIMULATOR
 #define CONFIG_USBOTG USBOTG_DESIGNWARE
