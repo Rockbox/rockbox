@@ -378,8 +378,14 @@ buildtool() {
             $config_opt
     elif [ "$config_opt" != "NO_CONFIGURE" ]; then
         echo "ROCKBOXDEV: $toolname/configure"
+        cflags='-U_FORTIFY_SOURCE -fgnu89-inline -O2'
+        if [ "$tool" == "glib" ]; then
+            run_cmd "$logfile" sed -i -e 's/m4_copy/m4_copy_force/g' "$cfg_dir/m4macros/glib-gettext.m4"
+            run_cmd "$logfile" autoreconf -fiv "$cfg_dir"
+            cflags="$cflags -Wno-format-nonliteral -Wno-format-overflow"
+        fi
         # NOTE glibc requires to be compiled with optimization
-        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' CXXFLAGS="$CXXFLAGS" run_cmd "$logfile" \
+        CFLAGS="$cflags" CXXFLAGS="$CXXFLAGS" run_cmd "$logfile" \
             "$cfg_dir/configure" "--prefix=$prefix" \
             --disable-docs $config_opt
     fi
