@@ -1120,7 +1120,11 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4), topruntime, 0),
     INT_SETTING(F_BANFROMQS, max_files_in_playlist,
                 LANG_MAX_FILES_IN_PLAYLIST,
-#if MEMORYSIZE > 1
+#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022
+                  /** Slow CPU benefits greatly from building smaller playlists 
+                  On the iPod Mini 2nd gen, creating a playlist of 2000 entries takes around 10 seconds */
+                  2000,
+#elif MEMORYSIZE > 1
                   10000,
 #else
                   400,
@@ -1854,7 +1858,7 @@ const struct settings_list settings[] = {
                   true, "warn when erasing dynamic playlist",NULL),
     OFFON_SETTING(0, keep_current_track_on_replace_playlist, LANG_KEEP_CURRENT_TRACK_ON_REPLACE,
                   true, "keep current track when replacing playlist",NULL),
-    OFFON_SETTING(0, show_shuffled_adding_options, LANG_SHOW_SHUFFLED_ADDING_OPTIONS, false,
+    OFFON_SETTING(0, show_shuffled_adding_options, LANG_SHOW_SHUFFLED_ADDING_OPTIONS, true,
                       "show shuffled adding options", NULL),
     CHOICE_SETTING(0, show_queue_options, LANG_SHOW_QUEUE_OPTIONS, 0,
                       "show queue options", "off,on,in submenu",

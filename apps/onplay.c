@@ -302,7 +302,7 @@ static int add_to_playlist(void* arg)
 
     /* warn if replacing the playlist */
     if (new_playlist && !warn_on_pl_erase())
-        return 0;
+        return 1;
 
     splash(0, ID2P(LANG_WAIT));
 
@@ -340,7 +340,7 @@ static int add_to_playlist(void* arg)
     }
 
     playlist_set_modified(NULL, true);
-    return false;
+    return 0;
 }
 
 static bool view_playlist(void)
@@ -1255,7 +1255,7 @@ static int execute_hotkey(bool is_wps)
 }
 #endif /* HOTKEY */
 
-int onplay(char* file, int attr, int from_context, bool hotkey)
+int onplay(char* file, int attr, int from_context, bool hotkey, int customaction)
 {
     const struct menu_item_ex *menu;
     onplay_result = ONPLAY_OK;
@@ -1294,6 +1294,13 @@ int onplay(char* file, int attr, int from_context, bool hotkey)
 #else
     (void)hotkey;
 #endif
+    if (customaction == ONPLAY_CUSTOMACTION_SHUFFLE_SONGS) {
+        int returnCode = add_to_playlist(&addtopl_replace_shuffled);
+        if (returnCode == 1)
+            // User did not want to erase his current playlist, so let's show again the database main menu
+            return ONPLAY_RELOAD_DIR;
+        return ONPLAY_START_PLAY;
+    }
 
     push_current_activity(ACTIVITY_CONTEXTMENU);
     if (from_context == CONTEXT_WPS)

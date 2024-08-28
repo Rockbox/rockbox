@@ -56,6 +56,7 @@
 #include "playback.h"
 #include "strnatcmp.h"
 #include "panic.h"
+#include "onplay.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
@@ -71,6 +72,7 @@ struct tagentry {
     char* name;
     int newtable;
     int extraseek;
+    int customaction;
 };
 
 static struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
@@ -78,10 +80,10 @@ static struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
 #define SEARCHSTR_SIZE 256
 
 enum table {
-    ROOT = 1,
-    NAVIBROWSE,
-    ALLSUBENTRIES,
-    PLAYTRACK,
+    TABLE_ROOT = 1,
+    TABLE_NAVIBROWSE,
+    TABLE_ALLSUBENTRIES,
+    TABLE_PLAYTRACK,
 };
 
 static const struct id3_to_search_mapping {
@@ -108,11 +110,20 @@ enum variables {
     menu_next,
     menu_load,
     menu_reload,
+    menu_shuffle_songs,
 };
 
 /* Capacity 10 000 entries (for example 10k different artists) */
 #define UNIQBUF_SIZE (64*1024)
 static uint32_t uniqbuf[UNIQBUF_SIZE / sizeof(uint32_t)];
+
+#if MEMORYSIZE > 2
+    #define INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE (1024)
+#else
+    /* Lower quality randomness for low-ram devices using smaller segments */
+    #define INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE (128)
+#endif
+static bool selective_random_playlist_indexes[INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE];
 
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32
@@ -338,6 +349,7 @@ static int get_tag(int *tag)
         TAG_MATCH("Pm", tag_virt_playtime_min),
         TAG_MATCH("Ps", tag_virt_playtime_sec),
         TAG_MATCH("->", menu_next),
+        TAG_MATCH("~>", menu_shuffle_songs),
 
         TAG_MATCH("==>", menu_load),
 
@@ -820,7 +832,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
         return true;
     }
 
-    if (entry->type != menu_next)
+    if (entry->type != menu_next && entry->type != menu_shuffle_songs)
         return false;
 
     while (inst->tagorder_count < MAX_TAGS)
@@ -847,7 +859,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
 
         inst->tagorder_count++;
 
-        if (get_tag(&type) <= 0 || type != menu_next)
+        if (get_tag(&type) <= 0 || (type != menu_next && type != menu_shuffle_songs))
             break;
     }
 
@@ -1245,6 +1257,7 @@ static void tagtree_unload(struct tree_context *c)
             dptr->name = NULL;
             dptr->newtable = 0;
             dptr->extraseek = 0;
+            dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
         }
     }
@@ -1454,7 +1467,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 #endif
         , 0, 0, 0);
 
-    if (c->currtable == ALLSUBENTRIES)
+    if (c->currtable == TABLE_ALLSUBENTRIES)
     {
         tag = tag_title;
         level--;
@@ -1544,17 +1557,19 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     {
         if (offset == 0)
         {
-            dptr->newtable = ALLSUBENTRIES;
+            dptr->newtable = TABLE_ALLSUBENTRIES;
             dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
+            dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
             special_entry_count++;
         }
         if (offset <= 1)
         {
-            dptr->newtable = NAVIBROWSE;
+            dptr->newtable = TABLE_NAVIBROWSE;
             dptr->name = str(LANG_TAGNAVI_RANDOM);
             dptr->extraseek = -1;
+            dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
             special_entry_count++;
@@ -1568,14 +1583,15 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         if (total_count++ < offset)
             continue;
 
-        dptr->newtable = NAVIBROWSE;
+        dptr->newtable = TABLE_NAVIBROWSE;
         if (tag == tag_title || tag == tag_filename)
         {
-            dptr->newtable = PLAYTRACK;
+            dptr->newtable = TABLE_PLAYTRACK;
             dptr->extraseek = tcs.idx_id;
         }
         else
             dptr->extraseek = tcs.result_seek;
+        dptr->customaction = ONPLAY_NO_CUSTOMACTION;
 
         fmt = NULL;
         /* Check the format */
@@ -1758,7 +1774,7 @@ static int load_root(struct tree_context *c)
     int i;
 
     tc = c;
-    c->currtable = ROOT;
+    c->currtable = TABLE_ROOT;
     if (c->dirlevel == 0)
         c->currextra = rootmenu;
 
@@ -1775,13 +1791,21 @@ static int load_root(struct tree_context *c)
         switch (menu->items[i]->type)
         {
             case menu_next:
-                dptr->newtable = NAVIBROWSE;
+                dptr->newtable = TABLE_NAVIBROWSE;
                 dptr->extraseek = i;
+                dptr->customaction = ONPLAY_NO_CUSTOMACTION;
                 break;
 
             case menu_load:
-                dptr->newtable = ROOT;
+                dptr->newtable = TABLE_ROOT;
                 dptr->extraseek = menu->items[i]->link;
+                dptr->customaction = ONPLAY_NO_CUSTOMACTION;
+                break;
+
+            case menu_shuffle_songs:
+                dptr->newtable = TABLE_NAVIBROWSE;
+                dptr->extraseek = i;
+                dptr->customaction = ONPLAY_CUSTOMACTION_SHUFFLE_SONGS;
                 break;
         }
 
@@ -1804,19 +1828,19 @@ int tagtree_load(struct tree_context* c)
     if (!table)
     {
         c->dirfull = false;
-        table = ROOT;
+        table = TABLE_ROOT;
         c->currtable = table;
         c->currextra = rootmenu;
     }
 
     switch (table)
     {
-        case ROOT:
+        case TABLE_ROOT:
             count = load_root(c);
             break;
 
-        case ALLSUBENTRIES:
-        case NAVIBROWSE:
+        case TABLE_ALLSUBENTRIES:
+        case TABLE_NAVIBROWSE:
             logf("navibrowse...");
             cpu_boost(true);
             count = retrieve_entries(c, 0, true);
@@ -1921,16 +1945,16 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
     core_pin(tagtree_handle);
 
     switch (c->currtable) {
-        case ROOT:
+        case TABLE_ROOT:
             c->currextra = newextra;
 
-            if (newextra == ROOT)
+            if (newextra == TABLE_ROOT)
             {
                 menu = menus[seek];
                 c->currextra = seek;
             }
 
-            else if (newextra == NAVIBROWSE)
+            else if (newextra == TABLE_NAVIBROWSE)
             {
                 int i, j;
 
@@ -2005,9 +2029,9 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
 
             break;
 
-        case NAVIBROWSE:
-        case ALLSUBENTRIES:
-            if (newextra == PLAYTRACK)
+        case TABLE_NAVIBROWSE:
+        case TABLE_ALLSUBENTRIES:
+            if (newextra == TABLE_PLAYTRACK)
             {
                 adjust_selection = false;
 
@@ -2102,13 +2126,46 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     return 0;
 }
 
+int tagtree_get_custom_action(struct tree_context* c)
+{
+    return tagtree_get_entry(c, c->selected_item)->customaction;
+}
+
+static void swap_array_bool(bool *a, bool *b) {
+    bool temp = *a;
+    *a = *b;
+    *b = temp;
+}
+ 
+/**
+ * Randomly shuffle an array using the Fisher-Yates algorithm : https://en.wikipedia.org/wiki/Random_permutation
+ * This algorithm has a linear complexity. Don't forget to srand before call to use it with a relevant seed.
+ */
+static void shuffle_bool_array(bool array[], int size) {
+    for (int i = size - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        swap_array_bool(&array[i], &array[j]);
+    }
+}
+
+static bool fill_selective_random_playlist_indexes(int current_segment_n, int current_segment_max_available_space) {
+    if (current_segment_n == 0 || current_segment_max_available_space == 0)
+        return false;
+    if (current_segment_max_available_space > current_segment_n)
+        current_segment_max_available_space = current_segment_n;
+    for (int i = 0; i < current_segment_n; i++)
+        selective_random_playlist_indexes[i] = i < current_segment_max_available_space;
+    srand(current_tick);
+    shuffle_bool_array(selective_random_playlist_indexes, current_segment_n);
+    return true;
+}
 
 static bool insert_all_playlist(struct tree_context *c,
                                 const char* playlist, bool new_playlist,
                                 int position, bool queue)
 {
     struct tagcache_search tcs;
-    int i, n;
+    int n;
     int fd = -1;
     unsigned long last_tick;
     char buf[MAX_PATH];
@@ -2144,44 +2201,77 @@ static bool insert_all_playlist(struct tree_context *c,
             return false;
         }
     }
-
     last_tick = current_tick + HZ/2; /* Show splash after 0.5 seconds have passed */
     splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     n = c->filesindir;
-    for (i = 0; i < n; i++)
-    {
-
-        splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
-        if (TIME_AFTER(current_tick, last_tick + HZ/4))
-        {
-            if (action_userabort(TIMEOUT_NOBLOCK))
-                break;
-            last_tick = current_tick;
+    int segment_size = INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE;
+    int segments_count = n / segment_size;
+    int leftovers_segment_size = n % segment_size;
+    bool fill_randomly = false;
+    if (playlist == NULL) {
+        bool will_exceed = n > playlist_get_current()->max_playlist_size;
+        fill_randomly = will_exceed;
+    }
+    if (leftovers_segment_size > 0 && fill_randomly) {
+        // We need to re-balance the segments so the randomness will be coherent and balanced the same through all segments
+        while (leftovers_segment_size + segments_count < segment_size) {
+            segment_size--; // -1 to all other segments
+            leftovers_segment_size += segments_count;
         }
-
-        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek,
-                               tcs.type, buf, sizeof buf))
-        {
-            continue;
+    }
+    if (leftovers_segment_size > 0)
+        segments_count += 1;
+    int max_available_space = playlist_get_current()->max_playlist_size - playlist_get_current()->amount;
+    int max_available_space_per_segment = max_available_space / segments_count;
+    if (fill_randomly) {
+        talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
+        splashf(HZ * 3, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY), max_available_space_per_segment * segments_count);
+        //splashf(HZ * 5, "sz=%d lsz=%d sc=%d rcps=%d", segment_size, leftovers_segment_size, segments_count, max_available_space_per_segment);
+    }
+    for (int i = 0; i < segments_count; i++) {
+        bool is_leftovers_segment = leftovers_segment_size > 0 && i + 1 >= segments_count;
+        if (fill_randomly) {
+            if (is_leftovers_segment)
+                fill_randomly = fill_selective_random_playlist_indexes(leftovers_segment_size, max_available_space_per_segment);
+            else
+                fill_randomly = fill_selective_random_playlist_indexes(segment_size, max_available_space_per_segment);
         }
-
-        if (playlist == NULL)
-        {
-            if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
-            {
-                logf("playlist_insert_track failed");
+        bool exit_loop_now = false;
+        int cur_segment_start = i * segment_size;
+        int cur_segment_end;
+        if (is_leftovers_segment)
+            cur_segment_end = cur_segment_start + leftovers_segment_size;
+        else
+            cur_segment_end = cur_segment_start + segment_size;
+        for (int j = cur_segment_start; j < cur_segment_end && !exit_loop_now; j++) {
+            if (fill_randomly && !selective_random_playlist_indexes[j % segment_size])
+                continue;
+            splash_progress(j, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            if (TIME_AFTER(current_tick, last_tick + HZ/4)) {
+                if (action_userabort(TIMEOUT_NOBLOCK)) {
+                    exit_loop_now = true;
+                    break;
+                }
+                last_tick = current_tick;
+            }
+            if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, j)->extraseek, tcs.type, buf, sizeof buf))
+                continue;
+            if (playlist == NULL) {
+                if (playlist_insert_track(NULL, buf, position, queue, false) < 0) {
+                    logf("playlist_insert_track failed");
+                    exit_loop_now = true;
+                    break;
+                }
+            } else if (fdprintf(fd, "%s\n", buf) <= 0) {
+                exit_loop_now = true;
                 break;
             }
+            yield();
+            if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
+                position = PLAYLIST_INSERT;
         }
-        else if (fdprintf(fd, "%s\n", buf) <= 0)
-                break;
-
-        yield();
-
-        if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
-        {
-            position = PLAYLIST_INSERT;
-        }
+        if (exit_loop_now)
+            break;
     }
     if (playlist == NULL)
         playlist_sync(NULL);
@@ -2196,14 +2286,14 @@ static bool insert_all_playlist(struct tree_context *c,
 static bool goto_allsubentries(int newtable)
 {
     int i = 0;
-    while (i < 2 && (newtable == NAVIBROWSE || newtable == ALLSUBENTRIES))
+    while (i < 2 && (newtable == TABLE_NAVIBROWSE || newtable == TABLE_ALLSUBENTRIES))
     {
         tagtree_enter(tc, false);
         tagtree_load(tc);
         newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
         i++;
     }
-    return (newtable == PLAYTRACK);
+    return (newtable == TABLE_PLAYTRACK);
 }
 
 static void reset_tc_to_prev(int dirlevel, int selected_item)
@@ -2233,7 +2323,7 @@ static bool tagtree_insert_selection(int position, bool queue,
 
     newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
 
-    if (newtable == PLAYTRACK) /* Insert a single track? */
+    if (newtable == TABLE_PLAYTRACK) /* Insert a single track? */
     {
         if (tagtree_get_filename(tc, buf, sizeof buf) < 0)
             return false;
@@ -2353,9 +2443,19 @@ static int tagtree_play_folder(struct tree_context* c)
     if (!insert_all_playlist(c, NULL, false, PLAYLIST_INSERT_LAST, false))
         return -2;
 
+    int n = c->filesindir;
+    bool has_playlist_been_randomized = n > playlist_get_current()->max_playlist_size;
+    if (has_playlist_been_randomized) {
+        /* We need to recalculate the start index based on a percentage to put the user
+        around its desired start position and avoid out of bounds */
+    
+        int percentage_start_index = 100 * start_index / n;
+        start_index = percentage_start_index * playlist_get_current()->amount / 100;
+    }
+
     if (global_settings.playlist_shuffle)
     {
-        start_index = playlist_shuffle(current_tick, c->selected_item);
+        start_index = playlist_shuffle(current_tick, start_index);
         if (!global_settings.play_selected)
             start_index = 0;
     }
@@ -2403,11 +2503,11 @@ char *tagtree_get_title(struct tree_context* c)
 {
     switch (c->currtable)
     {
-        case ROOT:
+        case TABLE_ROOT:
             return menu->title;
 
-        case NAVIBROWSE:
-        case ALLSUBENTRIES:
+        case TABLE_NAVIBROWSE:
+        case TABLE_ALLSUBENTRIES:
             return current_title[c->currextra];
     }
 
@@ -2419,7 +2519,7 @@ int tagtree_get_attr(struct tree_context* c)
     int attr = -1;
     switch (c->currtable)
     {
-        case NAVIBROWSE:
+        case TABLE_NAVIBROWSE:
             if (csi->tagorder[c->currextra] == tag_title
                 || csi->tagorder[c->currextra] == tag_virt_basename)
                 attr = FILE_ATTR_AUDIO;
@@ -2427,7 +2527,7 @@ int tagtree_get_attr(struct tree_context* c)
                 attr = ATTR_DIRECTORY;
             break;
 
-        case ALLSUBENTRIES:
+        case TABLE_ALLSUBENTRIES:
             attr = FILE_ATTR_AUDIO;
             break;
 

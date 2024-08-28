@@ -25,7 +25,12 @@
 #include "menu.h"
 #endif
 
-int onplay(char* file, int attr, int from_context, bool hotkey);
+enum {
+    ONPLAY_NO_CUSTOMACTION,
+    ONPLAY_CUSTOMACTION_SHUFFLE_SONGS,
+};
+
+int onplay(char* file, int attr, int from_context, bool hotkey, int customaction);
 int get_onplay_context(void);
 
 enum {

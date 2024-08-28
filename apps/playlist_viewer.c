@@ -1107,7 +1107,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                     }
                 }
                 else
-                    onplay(current_track->name, FILE_ATTR_AUDIO, CONTEXT_STD, true);
+                    onplay(current_track->name, FILE_ATTR_AUDIO, CONTEXT_STD, true, ONPLAY_NO_CUSTOMACTION);
                 break;
             }
 #endif /* HAVE_HOTKEY */
