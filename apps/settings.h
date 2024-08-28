@@ -686,6 +686,7 @@ struct user_settings
     int  screen_scroll_step;
     int  show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
     bool offset_out_of_view;
+    bool disable_mainmenu_scrolling;
     unsigned char icon_file[MAX_FILENAME+1];
     unsigned char viewers_icon_file[MAX_FILENAME+1];
     unsigned char font_file[MAX_FILENAME+1]; /* last font */

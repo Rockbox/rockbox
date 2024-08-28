@@ -24,6 +24,8 @@
 /* This file is meant to be #included by scroll_engine.c (twice if a remote
  * is present) */
 
+#include "misc.h"
+#include "settings.h"
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
 #define LCDM(ma) LCD_ ## ma
@@ -195,8 +197,14 @@ static void LCDFN(scroll_worker)(void)
         s = &si->scroll[index];
 
         /* check pause */
-        if (TIME_BEFORE(current_tick, s->start_tick))
+        if (TIME_BEFORE(current_tick, s->start_tick)) {
             continue;
+        }
+
+        if (global_settings.disable_mainmenu_scrolling && get_current_activity() == ACTIVITY_MAINMENU) {
+            // No scrolling on the main menu if disabled (to not break themes with lockscreens)
+            continue;
+        }
 
         s->start_tick = current_tick;
 
