@@ -951,8 +951,8 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
 #ifdef HAVE_MORSE_INPUT
     if (state->morse_mode)
     {
-        const int w = 6, h = 8; /* sysfixed font width, height */
-        int i, j, x, y;
+        const int w = 6, h = 9; /* sysfixed font width, height */
+        int i, iNext, j, x, y;
         int sc_w = vp->width, sc_h = vp->height;//pm->main_y - pm->keyboard_margin - 1;
 
         /* Draw morse code screen with sysfont */
@@ -960,37 +960,47 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
         x = 0;
         y = 0;
         outline[1] = '\0';
-
+        
         /* Draw morse code table with code descriptions. */
-        for (i = 0; morse_alphabets[i] != '\0'; i++)
-        {
+        for (i = 0; morse_alphabets[i] != '\0'; i++) {
             int morse_code;
-
             outline[0] = morse_alphabets[i];
             sc->putsxy(x, y, outline);
-
             morse_code = morse_codes[i];
-            for (j = 0; morse_code > 0x01; morse_code >>= 1)
+            for (j = 0; morse_code > 0x01; morse_code >>= 1) {
                 j++;
-
-            x += w + 3 + j*4;
-            morse_code = morse_codes[i];
-            for (; morse_code > 0x01; morse_code >>= 1)
-            {
-                x -= 4;
-                if (morse_code & 0x01)
-                    sc->fillrect(x, y + 2, 3, 4);
-                else
-                    sc->fillrect(x, y + 3, 1, 2);
             }
-
-            x += w*5 - 3;
-            if (x + w*6 >= sc_w)
-            {
+            x += w + 3 + j * 4;
+            morse_code = morse_codes[i];
+            for (; morse_code > 0x01; morse_code >>= 1) {
+                x -= 4;
+                if (morse_code & 0x01) {
+                    sc->fillrect(x, y + 2, 3, 4);
+                } else {
+                    sc->fillrect(x, y + 3, 1, 2);
+                }
+            }
+            x += j * 4;
+            iNext = i + 1;
+            if (morse_alphabets[iNext] == '\0') {
+                break;
+            }
+            morse_code = morse_codes[iNext];
+            for (j = 0; morse_code > 0x01; morse_code >>= 1) {
+                j++;
+            }
+            // If the next one will go out of line
+            bool needNewLine = x + w + 3 + j * 4 + w >= sc_w;
+            if (needNewLine) {
+                if (y + h >= sc_h) {
+                    // No more height space
+                    break;
+                }
                 x = 0;
                 y += h;
-                if (y + h >= sc_h)
-                    break;
+            } else {
+                // Some pixels for spacing in the same line
+                x += w;
             }
         }
     }
