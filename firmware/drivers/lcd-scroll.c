@@ -24,8 +24,6 @@
 /* This file is meant to be #included by scroll_engine.c (twice if a remote
  * is present) */
 
-#include "misc.h"
-#include "settings.h"
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
 #define LCDM(ma) LCD_ ## ma

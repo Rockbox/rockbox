@@ -32,6 +32,10 @@
 #include "usb.h"
 #include "lcd.h"
 #include "font.h"
+#if !defined(BOOTLOADER)
+#include "misc.h"
+#include "settings.h"
+#endif
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
