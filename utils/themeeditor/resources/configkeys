@@ -40,6 +40,7 @@ scroll delay
 scroll step
 screen scroll step
 Screen Scrolls Out Of View
+Disable main menu scrolling
 bidir limit
 scroll paginated
 hold_lr_for_scroll_in_list
