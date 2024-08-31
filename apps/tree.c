@@ -738,10 +738,13 @@ static int dirbrowse(void)
         int customaction = ONPLAY_NO_CUSTOMACTION;
         bool do_restore_display = true;
         #ifdef HAVE_TAGCACHE
-            if (id3db && (button == ACTION_STD_OK || button == ACTION_STD_CONTEXT)) {
+            if (id3db && (button == ACTION_STD_OK || button == ACTION_STD_CONTEXT))
+            {
                 customaction = tagtree_get_custom_action(&tc);
-                if (customaction == ONPLAY_CUSTOMACTION_SHUFFLE_SONGS) {
-                    button = ACTION_STD_CONTEXT; /** The code to insert shuffled is on the context branch of the switch so we always go here */
+                if (customaction == ONPLAY_CUSTOMACTION_SHUFFLE_SONGS)
+                {
+                    /* The code to insert shuffled is on the context branch of the switch so we always go here */
+                    button = ACTION_STD_CONTEXT;
                     do_restore_display = false;
                 }
             }

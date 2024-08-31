@@ -1294,7 +1294,8 @@ int onplay(char* file, int attr, int from_context, bool hotkey, int customaction
 #else
     (void)hotkey;
 #endif
-    if (customaction == ONPLAY_CUSTOMACTION_SHUFFLE_SONGS) {
+    if (customaction == ONPLAY_CUSTOMACTION_SHUFFLE_SONGS)
+    {
         int returnCode = add_to_playlist(&addtopl_replace_shuffled);
         if (returnCode == 1)
             // User did not want to erase his current playlist, so let's show again the database main menu

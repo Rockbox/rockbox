@@ -2131,24 +2131,28 @@ int tagtree_get_custom_action(struct tree_context* c)
     return tagtree_get_entry(c, c->selected_item)->customaction;
 }
 
-static void swap_array_bool(bool *a, bool *b) {
+static void swap_array_bool(bool *a, bool *b)
+{
     bool temp = *a;
     *a = *b;
     *b = temp;
 }
- 
+
 /**
  * Randomly shuffle an array using the Fisher-Yates algorithm : https://en.wikipedia.org/wiki/Random_permutation
  * This algorithm has a linear complexity. Don't forget to srand before call to use it with a relevant seed.
  */
-static void shuffle_bool_array(bool array[], int size) {
-    for (int i = size - 1; i > 0; i--) {
+static void shuffle_bool_array(bool array[], int size)
+{
+    for (int i = size - 1; i > 0; i--)
+    {
         int j = rand() % (i + 1);
         swap_array_bool(&array[i], &array[j]);
     }
 }
 
-static bool fill_selective_random_playlist_indexes(int current_segment_n, int current_segment_max_available_space) {
+static bool fill_selective_random_playlist_indexes(int current_segment_n, int current_segment_max_available_space)
+{
     if (current_segment_n == 0 || current_segment_max_available_space == 0)
         return false;
     if (current_segment_max_available_space > current_segment_n)
@@ -2212,9 +2216,11 @@ static bool insert_all_playlist(struct tree_context *c,
         bool will_exceed = n > playlist_get_current()->max_playlist_size;
         fill_randomly = will_exceed;
     }
-    if (leftovers_segment_size > 0 && fill_randomly) {
-        // We need to re-balance the segments so the randomness will be coherent and balanced the same through all segments
-        while (leftovers_segment_size + segments_count < segment_size) {
+    if (leftovers_segment_size > 0 && fill_randomly)
+    {
+        /* We need to re-balance the segments so the randomness will be coherent and balanced the same through all segments */
+        while (leftovers_segment_size + segments_count < segment_size)
+        {
             segment_size--; // -1 to all other segments
             leftovers_segment_size += segments_count;
         }
@@ -2223,14 +2229,19 @@ static bool insert_all_playlist(struct tree_context *c,
         segments_count += 1;
     int max_available_space = playlist_get_current()->max_playlist_size - playlist_get_current()->amount;
     int max_available_space_per_segment = max_available_space / segments_count;
-    if (fill_randomly) {
+    if (fill_randomly)
+    {
         talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
-        splashf(HZ * 3, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY), max_available_space_per_segment * segments_count);
-        //splashf(HZ * 5, "sz=%d lsz=%d sc=%d rcps=%d", segment_size, leftovers_segment_size, segments_count, max_available_space_per_segment);
+        splashf(HZ * 3, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
+                max_available_space_per_segment * segments_count);
+        /* logf("sz=%d lsz=%d sc=%d rcps=%d", segment_size, leftovers_segment_size,
+                segments_count, max_available_space_per_segment); */
     }
-    for (int i = 0; i < segments_count; i++) {
+    for (int i = 0; i < segments_count; i++)
+    {
         bool is_leftovers_segment = leftovers_segment_size > 0 && i + 1 >= segments_count;
-        if (fill_randomly) {
+        if (fill_randomly)
+        {
             if (is_leftovers_segment)
                 fill_randomly = fill_selective_random_playlist_indexes(leftovers_segment_size, max_available_space_per_segment);
             else
@@ -2243,12 +2254,15 @@ static bool insert_all_playlist(struct tree_context *c,
             cur_segment_end = cur_segment_start + leftovers_segment_size;
         else
             cur_segment_end = cur_segment_start + segment_size;
-        for (int j = cur_segment_start; j < cur_segment_end && !exit_loop_now; j++) {
+        for (int j = cur_segment_start; j < cur_segment_end && !exit_loop_now; j++)
+        {
             if (fill_randomly && !selective_random_playlist_indexes[j % segment_size])
                 continue;
             splash_progress(j, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
-            if (TIME_AFTER(current_tick, last_tick + HZ/4)) {
-                if (action_userabort(TIMEOUT_NOBLOCK)) {
+            if (TIME_AFTER(current_tick, last_tick + HZ/4))
+            {
+                if (action_userabort(TIMEOUT_NOBLOCK))
+                {
                     exit_loop_now = true;
                     break;
                 }
@@ -2256,13 +2270,16 @@ static bool insert_all_playlist(struct tree_context *c,
             }
             if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, j)->extraseek, tcs.type, buf, sizeof buf))
                 continue;
-            if (playlist == NULL) {
+            if (playlist == NULL)
+            {
                 if (playlist_insert_track(NULL, buf, position, queue, false) < 0) {
                     logf("playlist_insert_track failed");
                     exit_loop_now = true;
                     break;
                 }
-            } else if (fdprintf(fd, "%s\n", buf) <= 0) {
+            }
+            else if (fdprintf(fd, "%s\n", buf) <= 0)
+            {
                 exit_loop_now = true;
                 break;
             }
@@ -2445,10 +2462,11 @@ static int tagtree_play_folder(struct tree_context* c)
 
     int n = c->filesindir;
     bool has_playlist_been_randomized = n > playlist_get_current()->max_playlist_size;
-    if (has_playlist_been_randomized) {
+    if (has_playlist_been_randomized)
+    {
         /* We need to recalculate the start index based on a percentage to put the user
         around its desired start position and avoid out of bounds */
-    
+
         int percentage_start_index = 100 * start_index / n;
         start_index = percentage_start_index * playlist_get_current()->amount / 100;
     }
