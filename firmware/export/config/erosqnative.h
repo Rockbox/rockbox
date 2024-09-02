@@ -9,15 +9,15 @@
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
 
-/* Define EROSQN_VER as a GCC option if desired - 
+/* Define EROSQN_VER as an "extradefine" in the configure script -
  * v1, v2 players: "1"
  * v3 players: "3"
- * Only bootloader will be affected
+ * Only bootloader will be affected.
+ *
+ * This allows us to fix the LCD init issues with v3 players.
  */
-#ifdef BOOTLOADER
-# ifndef EROSQN_VER /* this should probably go in config/erosqnative.h*/
-#  define EROSQN_VER 1
-# endif
+#ifndef EROSQN_VER
+#error "Must define EROSQN_VER"
 #endif
 
 /* CPU defines */

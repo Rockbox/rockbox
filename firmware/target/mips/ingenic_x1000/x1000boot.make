@@ -12,7 +12,7 @@ include $(ROOTDIR)/lib/microtar/microtar.make
 INCLUDES += -I$(APPSDIR)
 SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 
-LDSDEP := $(FIRMDIR)/export/cpu.h $(FIRMDIR)/export/config/$(MODELNAME).h
+LDSDEP := $(FIRMDIR)/export/cpu.h $(FIRMDIR)/export/config.h
 
 BOOTLDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/boot.lds
 BOOTLINK := $(BUILDDIR)/boot.link

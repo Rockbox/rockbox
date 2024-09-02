@@ -4194,12 +4194,12 @@ fi
     t_model="erosqnative"
     # player version, for bootloader usage
     # versions 1 and 2 both use 1
-    GCCOPTS="$GCCOPTS -DEROSQN_VER=1"
+    extradefines="$extradefines -DEROSQN_VER=1"
     ;;
 
     248|erosqnative_v3)
-    target_id=116
-    modelname="erosqnative"
+    target_id=117
+    modelname="erosqnative_v3"
     target="EROS_QN"
     memory=32
     mipsr2elcc
@@ -4221,7 +4221,7 @@ fi
     t_model="erosqnative"
     # player version, for bootloader usage
     # version 3
-    GCCOPTS="$GCCOPTS -DEROSQN_VER=3"
+    extradefines="$extradefines -DEROSQN_VER=3"
     ;;
 
 
