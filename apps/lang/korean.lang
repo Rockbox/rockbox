@@ -16465,3 +16465,17 @@
     *: "메인 메뉴 스크롤 비활성화"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be picked from it"
+  </source>
+  <dest>
+    *: "선택 항목이 너무 커서, %d개의 무작위 트랙 선택"
+  </dest>
+  <voice>
+    *: "선택 항목이 너무 커서, %d개의 무작위 트랙 선택"
+  </voice>
+</phrase>
