@@ -2058,13 +2058,13 @@
   desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
   user: core
   <source>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </dest>
   <voice>
-    *: "Selection too big, fewer random tracks will be picked from it"
+    *: "Selection too big, fewer random tracks will be selected"
   </voice>
 </phrase>
 <phrase>

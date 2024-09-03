@@ -2139,8 +2139,10 @@ static void swap_array_bool(bool *a, bool *b)
 }
 
 /**
- * Randomly shuffle an array using the Fisher-Yates algorithm : https://en.wikipedia.org/wiki/Random_permutation
- * This algorithm has a linear complexity. Don't forget to srand before call to use it with a relevant seed.
+ * Randomly shuffle an array using the Fisher-Yates algorithm :
+ *  https://en.wikipedia.org/wiki/Random_permutation
+ * This algorithm has a linear complexity. Don't forget to srand
+ * before call to use it with a relevant seed.
  */
 static void shuffle_bool_array(bool array[], int size)
 {
@@ -2151,14 +2153,15 @@ static void shuffle_bool_array(bool array[], int size)
     }
 }
 
-static bool fill_selective_random_playlist_indexes(int current_segment_n, int current_segment_max_available_space)
+static bool fill_random_playlist_indexes(int current_segment_n,
+                                         int current_segment_max_space)
 {
-    if (current_segment_n == 0 || current_segment_max_available_space == 0)
+    if (current_segment_n == 0 || current_segment_max_space == 0)
         return false;
-    if (current_segment_max_available_space > current_segment_n)
-        current_segment_max_available_space = current_segment_n;
+    if (current_segment_max_space > current_segment_n)
+        current_segment_max_space = current_segment_n;
     for (int i = 0; i < current_segment_n; i++)
-        selective_random_playlist_indexes[i] = i < current_segment_max_available_space;
+        selective_random_playlist_indexes[i] = i < current_segment_max_space;
     srand(current_tick);
     shuffle_bool_array(selective_random_playlist_indexes, current_segment_n);
     return true;
@@ -2205,20 +2208,27 @@ static bool insert_all_playlist(struct tree_context *c,
             return false;
         }
     }
+
     last_tick = current_tick + HZ/2; /* Show splash after 0.5 seconds have passed */
     splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     n = c->filesindir;
+
+    int max_playlist_size = playlist_get_current()->max_playlist_size;
+    int playlist_amount = playlist_get_current()->amount;
     int segment_size = INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE;
     int segments_count = n / segment_size;
-    int leftovers_segment_size = n % segment_size;
+    int leftovers_segment_size = n - (segments_count * segment_size);
     bool fill_randomly = false;
-    if (playlist == NULL) {
-        bool will_exceed = n > playlist_get_current()->max_playlist_size;
+
+    if (playlist == NULL)
+    {
+        bool will_exceed = n > max_playlist_size;
         fill_randomly = will_exceed;
     }
     if (leftovers_segment_size > 0 && fill_randomly)
     {
-        /* We need to re-balance the segments so the randomness will be coherent and balanced the same through all segments */
+        /* We need to re-balance the segments so the randomness will be
+         *   coherent and balanced the same through all segments */
         while (leftovers_segment_size + segments_count < segment_size)
         {
             segment_size--; // -1 to all other segments
@@ -2227,40 +2237,58 @@ static bool insert_all_playlist(struct tree_context *c,
     }
     if (leftovers_segment_size > 0)
         segments_count += 1;
-    int max_available_space = playlist_get_current()->max_playlist_size - playlist_get_current()->amount;
-    int max_available_space_per_segment = max_available_space / segments_count;
+
+    int max_available_space = max_playlist_size - playlist_amount;
+    int max_space_per_segment = max_available_space / segments_count;
+
+    int remaining_space =
+       max_available_space - (max_space_per_segment * segments_count);
+
     if (fill_randomly)
     {
         talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
         splashf(HZ * 3, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
-                max_available_space_per_segment * segments_count);
+                max_space_per_segment * segments_count + remaining_space);
         /* logf("sz=%d lsz=%d sc=%d rcps=%d", segment_size, leftovers_segment_size,
                 segments_count, max_available_space_per_segment); */
     }
+
+    bool exit_loop_now = false;
     for (int i = 0; i < segments_count; i++)
     {
-        bool is_leftovers_segment = leftovers_segment_size > 0 && i + 1 >= segments_count;
-        if (fill_randomly)
-        {
-            if (is_leftovers_segment)
-                fill_randomly = fill_selective_random_playlist_indexes(leftovers_segment_size, max_available_space_per_segment);
-            else
-                fill_randomly = fill_selective_random_playlist_indexes(segment_size, max_available_space_per_segment);
-        }
-        bool exit_loop_now = false;
+        int cur_segment_size = segment_size;
         int cur_segment_start = i * segment_size;
         int cur_segment_end;
-        if (is_leftovers_segment)
-            cur_segment_end = cur_segment_start + leftovers_segment_size;
-        else
-            cur_segment_end = cur_segment_start + segment_size;
+        int space_per_segment = max_space_per_segment;
+
+        if (i + 1 >= segments_count && leftovers_segment_size > 0)
+        {
+            /* add any remaining tracks to the last segment */
+            space_per_segment += remaining_space;
+            cur_segment_size = leftovers_segment_size;
+        }
+        else if (fill_randomly)
+        {
+            /* add an extra track to some of the segments */
+            if (remaining_space > 0 && (i & 7) != 7)
+            {
+                space_per_segment++;
+                remaining_space--;
+            }
+        }
+        if (fill_randomly)
+        {
+            fill_randomly = fill_random_playlist_indexes(cur_segment_size,
+                                                         space_per_segment);
+        }
+
+        cur_segment_end = cur_segment_start + cur_segment_size;
+
         for (int j = cur_segment_start; j < cur_segment_end && !exit_loop_now; j++)
         {
-            if (fill_randomly && !selective_random_playlist_indexes[j % segment_size])
-                continue;
-            splash_progress(j, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
             if (TIME_AFTER(current_tick, last_tick + HZ/4))
             {
+                splash_progress(j, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
                 if (action_userabort(TIMEOUT_NOBLOCK))
                 {
                     exit_loop_now = true;
@@ -2268,8 +2296,13 @@ static bool insert_all_playlist(struct tree_context *c,
                 }
                 last_tick = current_tick;
             }
+
+            if (fill_randomly && !selective_random_playlist_indexes[j % segment_size])
+                continue;
+
             if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, j)->extraseek, tcs.type, buf, sizeof buf))
                 continue;
+
             if (playlist == NULL)
             {
                 if (playlist_insert_track(NULL, buf, position, queue, false) < 0) {
