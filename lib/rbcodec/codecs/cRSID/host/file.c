@@ -39,7 +39,7 @@ cRSID_SIDheader* cRSID_processSIDfile(cRSID_C64instance* C64, unsigned char* fil
  for (i=1; i < (int)(sizeof(MagicStringPSID)-1); ++i) { if (SIDheader->MagicString[i] != MagicStringPSID[i]) return NULL; }
  C64->RealSIDmode = ( SIDheader->MagicString[0] == 'R' );
 
- if (SIDheader->LoadAddressH==0 && SIDheader->LoadAddressH==0) { //load-address taken from first 2 bytes of the C64 PRG
+ if (SIDheader->LoadAddressH==0 && SIDheader->LoadAddressL==0) { //load-address taken from first 2 bytes of the C64 PRG
   C64->LoadAddress = (filedata[SIDheader->HeaderSize+1]<<8) + (filedata[SIDheader->HeaderSize+0]);
   SIDdataOffset = SIDheader->HeaderSize+2;
  }
