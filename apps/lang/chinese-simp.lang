@@ -16459,3 +16459,17 @@
     *: "禁用主菜单滚动"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be picked from it"
+  </source>
+  <dest>
+    *: "选择了太多，将从中随机选取%d首"
+  </dest>
+  <voice>
+    *: "选择了太多，将从中选择更少曲目"
+  </voice>
+</phrase>
