@@ -57,6 +57,7 @@
 #include "strnatcmp.h"
 #include "panic.h"
 #include "onplay.h"
+#include "plugin.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
@@ -116,14 +117,6 @@ enum variables {
 /* Capacity 10 000 entries (for example 10k different artists) */
 #define UNIQBUF_SIZE (64*1024)
 static uint32_t uniqbuf[UNIQBUF_SIZE / sizeof(uint32_t)];
-
-#if MEMORYSIZE > 2
-    #define INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE (1024)
-#else
-    /* Lower quality randomness for low-ram devices using smaller segments */
-    #define INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE (128)
-#endif
-static bool selective_random_playlist_indexes[INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE];
 
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32
@@ -2141,30 +2134,26 @@ static void swap_array_bool(bool *a, bool *b)
 /**
  * Randomly shuffle an array using the Fisher-Yates algorithm :
  *  https://en.wikipedia.org/wiki/Random_permutation
- * This algorithm has a linear complexity. Don't forget to srand
- * before call to use it with a relevant seed.
+ *  This algorithm has a linear complexity.
+ *  Don't forget to srand before call to use it with a relevant seed.
  */
-static void shuffle_bool_array(bool array[], int size)
+static bool* fill_random_playlist_indexes(bool *bool_array, size_t arr_sz,
+                                         size_t track_count, size_t max_slots)
 {
-    for (int i = size - 1; i > 0; i--)
+    size_t i;
+    if (track_count * sizeof(bool) > arr_sz || max_slots > track_count)
+        return NULL;
+
+    for (i = 0; i < arr_sz; i++) /* fill max_slots with TRUE */
+        bool_array[i] = i < max_slots;
+
+    /* shuffle bool array */
+    for (i = track_count - 1; i > 0; i--)
     {
         int j = rand() % (i + 1);
-        swap_array_bool(&array[i], &array[j]);
+        swap_array_bool(&bool_array[i], &bool_array[j]);
     }
-}
-
-static bool fill_random_playlist_indexes(int current_segment_n,
-                                         int current_segment_max_space)
-{
-    if (current_segment_n == 0 || current_segment_max_space == 0)
-        return false;
-    if (current_segment_max_space > current_segment_n)
-        current_segment_max_space = current_segment_n;
-    for (int i = 0; i < current_segment_n; i++)
-        selective_random_playlist_indexes[i] = i < current_segment_max_space;
-    srand(current_tick);
-    shuffle_bool_array(selective_random_playlist_indexes, current_segment_n);
-    return true;
+    return bool_array;
 }
 
 static bool insert_all_playlist(struct tree_context *c,
@@ -2175,6 +2164,9 @@ static bool insert_all_playlist(struct tree_context *c,
     int n;
     int fd = -1;
     unsigned long last_tick;
+    int slots_remaining = 0;
+    bool fill_randomly = false;
+    bool *rand_bool_array = NULL;
     char buf[MAX_PATH];
 
     cpu_boost(true);
@@ -2213,113 +2205,111 @@ static bool insert_all_playlist(struct tree_context *c,
     splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     n = c->filesindir;
 
-    int max_playlist_size = playlist_get_current()->max_playlist_size;
-    int playlist_amount = playlist_get_current()->amount;
-    int segment_size = INSERT_ALL_PLAYLIST_MAX_SEGMENT_SIZE;
-    int segments_count = n / segment_size;
-    int leftovers_segment_size = n - (segments_count * segment_size);
-    bool fill_randomly = false;
-
     if (playlist == NULL)
     {
-        bool will_exceed = n > max_playlist_size;
-        fill_randomly = will_exceed;
-    }
-    if (leftovers_segment_size > 0 && fill_randomly)
-    {
-        /* We need to re-balance the segments so the randomness will be
-         *   coherent and balanced the same through all segments */
-        while (leftovers_segment_size + segments_count < segment_size)
+        int max_playlist_size = playlist_get_current()->max_playlist_size;
+        slots_remaining = max_playlist_size - playlist_get_current()->amount;
+        if (slots_remaining <= 0)
         {
-            segment_size--; // -1 to all other segments
-            leftovers_segment_size += segments_count;
+            logf("Playlist has no space remaining");
+            cpu_boost(false);
+            return false;
         }
-    }
-    if (leftovers_segment_size > 0)
-        segments_count += 1;
 
-    int max_available_space = max_playlist_size - playlist_amount;
-    int max_space_per_segment = max_available_space / segments_count;
+        fill_randomly = n > slots_remaining;
+    
+        if (fill_randomly)
+        {
+            srand(current_tick);
+            size_t bufsize = 0;
+            bool *buffer = (bool *) plugin_get_buffer(&bufsize);
+            rand_bool_array = fill_random_playlist_indexes(buffer, bufsize,
+                                                           n, slots_remaining);
 
-    int remaining_space =
-       max_available_space - (max_space_per_segment * segments_count);
-
-    if (fill_randomly)
-    {
-        talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
-        splashf(HZ * 3, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
-                max_space_per_segment * segments_count + remaining_space);
-        /* logf("sz=%d lsz=%d sc=%d rcps=%d", segment_size, leftovers_segment_size,
-                segments_count, max_available_space_per_segment); */
+            talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
+            splashf(HZ * 2, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
+                    slots_remaining);
+        }
     }
 
     bool exit_loop_now = false;
-    for (int i = 0; i < segments_count; i++)
+    for (int i = 0; i < n; i++)
     {
-        int cur_segment_size = segment_size;
-        int cur_segment_start = i * segment_size;
-        int cur_segment_end;
-        int space_per_segment = max_space_per_segment;
-
-        if (i + 1 >= segments_count && leftovers_segment_size > 0)
+        if (TIME_AFTER(current_tick, last_tick + HZ/4))
         {
-            /* add any remaining tracks to the last segment */
-            space_per_segment += remaining_space;
-            cur_segment_size = leftovers_segment_size;
-        }
-        else if (fill_randomly)
-        {
-            /* add an extra track to some of the segments */
-            if (remaining_space > 0 && (i & 7) != 7)
-            {
-                space_per_segment++;
-                remaining_space--;
-            }
-        }
-        if (fill_randomly)
-        {
-            fill_randomly = fill_random_playlist_indexes(cur_segment_size,
-                                                         space_per_segment);
-        }
-
-        cur_segment_end = cur_segment_start + cur_segment_size;
-
-        for (int j = cur_segment_start; j < cur_segment_end && !exit_loop_now; j++)
-        {
-            if (TIME_AFTER(current_tick, last_tick + HZ/4))
-            {
-                splash_progress(j, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
-                if (action_userabort(TIMEOUT_NOBLOCK))
-                {
-                    exit_loop_now = true;
-                    break;
-                }
-                last_tick = current_tick;
-            }
-
-            if (fill_randomly && !selective_random_playlist_indexes[j % segment_size])
-                continue;
-
-            if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, j)->extraseek, tcs.type, buf, sizeof buf))
-                continue;
-
-            if (playlist == NULL)
-            {
-                if (playlist_insert_track(NULL, buf, position, queue, false) < 0) {
-                    logf("playlist_insert_track failed");
-                    exit_loop_now = true;
-                    break;
-                }
-            }
-            else if (fdprintf(fd, "%s\n", buf) <= 0)
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            if (action_userabort(TIMEOUT_NOBLOCK))
             {
                 exit_loop_now = true;
                 break;
             }
-            yield();
-            if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
-                position = PLAYLIST_INSERT;
+            last_tick = current_tick;
         }
+
+        if (playlist == NULL)
+        {
+            if (fill_randomly)
+            {
+                int remaining_tracks = n - i;
+                if (remaining_tracks > slots_remaining)
+                {
+                    if (rand_bool_array)
+                    {
+                        /* Skip the track if rand_bool_array[i] is FALSE */
+                        if (!rand_bool_array[i])
+                            continue;
+                    }
+                    else
+                    {
+                        /* Generate random value between 0 and remaining_tracks - 1 */
+                        int selrange = RAND_MAX / remaining_tracks; /* Improve distribution */
+                        int random;
+
+                        for (int r = 0; r < 0x0FFF; r++) /* limit loops */
+                        {
+                            random = rand() / selrange;
+                            if (random < remaining_tracks)
+                                break;
+                            else
+                                random = 0;
+                        }
+                        /* Skip the track if random >= slots_remaining */
+                        if (random >= slots_remaining)
+                            continue;
+                    }
+                }
+            }
+        }
+
+        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek, tcs.type, buf, sizeof buf))
+            continue;
+
+        if (playlist == NULL)
+        {
+            if (fill_randomly)
+            {
+                if (--slots_remaining <= 0)
+                {
+                    exit_loop_now = true;
+                    break;
+                }
+            }
+
+            if (playlist_insert_track(NULL, buf, position, queue, false) < 0) {
+                logf("playlist_insert_track failed");
+                exit_loop_now = true;
+                break;
+            }
+        }
+        else if (fdprintf(fd, "%s\n", buf) <= 0)
+        {
+            exit_loop_now = true;
+            break;
+        }
+        yield();
+        if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
+            position = PLAYLIST_INSERT;
+
         if (exit_loop_now)
             break;
     }
