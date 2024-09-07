@@ -2032,6 +2032,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Title & Album from ID3 tags"
+  </dest>
+  <voice>
+    *: "Title and Album from tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Title from ID3 tags"
+  </dest>
+  <voice>
+    *: "Title from tags"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BUILDING_DATABASE
   desc: splash database building progress
   user: core

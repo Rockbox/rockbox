@@ -50,6 +50,7 @@
 #include "playlist_menu.h"
 #include "menus/exported_menus.h"
 #include "yesno.h"
+#include "playback.h"
 
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
@@ -142,7 +143,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  const char* filename, bool reload,
                                  int *most_recent_selection);
 
-static void format_line(const struct playlist_entry* track, char* str,
+static void format_line(struct playlist_entry* track, char* str,
                         int len);
 
 static bool update_playlist(bool force);
@@ -157,6 +158,27 @@ static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
     pb->buffer_size = names_buffer_size;
     pb->first_index = 0;
     pb->num_loaded = 0;
+}
+
+static int playlist_buffer_get_index(struct playlist_buffer *pb, int index)
+{
+    int buffer_index;
+    if (pb->direction == FORWARD)
+    {
+        if (index >= pb->first_index)
+            buffer_index = index-pb->first_index;
+        else /* rotation : track0 in buffer + requested track */
+            buffer_index = viewer.num_tracks-pb->first_index+index;
+    }
+    else
+    {
+        if (index <= pb->first_index)
+            buffer_index = pb->first_index-index;
+        else /* rotation : track0 in buffer + dist from the last track
+                to the requested track (num_tracks-requested track) */
+            buffer_index = pb->first_index+viewer.num_tracks-index;
+    }
+    return buffer_index;
 }
 
 /*
@@ -227,6 +249,25 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     playlist_buffer_load_entries(pb, start, direction);
 }
 
+static bool retrieve_id3_tags(const int index, const char* name, struct mp3entry *id3, int flags)
+{
+    bool id3_retrieval_successful = false;
+
+    if (!viewer.playlist &&
+        (audio_status() & AUDIO_STATUS_PLAY) &&
+        (playlist_get_resume_info(&viewer.current_playing_track) == index))
+    {
+        copy_mp3entry(id3, audio_current_track()); /* retrieve id3 from RAM */
+        id3_retrieval_successful = true;
+    }
+    else
+    {
+    /* Read from disk, the database, doesn't store frequency, file size or codec (g4470) ChrisS*/
+        id3_retrieval_successful = get_metadata_ex(id3, -1, name, flags);
+    }
+    return id3_retrieval_successful;
+}
+
 static int playlist_entry_load(struct playlist_entry *entry, int index,
                                char* name_buffer, int remaining_size)
 {
@@ -242,6 +283,13 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
 
     len = strlcpy(name_buffer, info.filename, remaining_size) + 1;
 
+    if (global_settings.playlist_viewer_track_display >
+        PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH && len <= remaining_size)
+    {
+        /* Allocate space for the id3viewc if the option is enabled */
+        len += MAX_PATH + 1;
+    }
+
     if (len <= remaining_size)
     {
         entry->name = name_buffer;
@@ -251,27 +299,6 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
         return len;
     }
     return -1;
-}
-
-static int playlist_buffer_get_index(struct playlist_buffer *pb, int index)
-{
-    int buffer_index;
-    if (pb->direction == FORWARD)
-    {
-        if (index >= pb->first_index)
-            buffer_index = index-pb->first_index;
-        else /* rotation : track0 in buffer + requested track */
-            buffer_index = viewer.num_tracks-pb->first_index+index;
-    }
-    else
-    {
-        if (index <= pb->first_index)
-            buffer_index = pb->first_index-index;
-        else /* rotation : track0 in buffer + dist from the last track
-                to the requested track (num_tracks-requested track) */
-            buffer_index = pb->first_index+viewer.num_tracks-index;
-    }
-    return buffer_index;
 }
 
 #define distance(a, b) \
@@ -440,7 +467,9 @@ static void format_name(char* dest, const char* src, size_t bufsz)
 {
     switch (global_settings.playlist_viewer_track_display)
     {
-        case 0:
+        case PLAYLIST_VIEWER_ENTRY_SHOW_FILE_NAME:
+        case PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE_AND_ALBUM: /* If loading from tags failed, only display the file name */
+        case PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE: /* If loading from tags failed, only display the file name */
         default:
         {
             /* Only display the filename */
@@ -450,7 +479,7 @@ static void format_name(char* dest, const char* src, size_t bufsz)
             strrsplt(dest, '.');
             break;
         }
-        case 1:
+        case PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH:
             /* Full path */
             strlcpy(dest, src, bufsz);
             break;
@@ -458,22 +487,99 @@ static void format_name(char* dest, const char* src, size_t bufsz)
 }
 
 /* Format display line */
-static void format_line(const struct playlist_entry* track, char* str,
+static void format_line(struct playlist_entry* track, char* str,
                         int len)
 {
-    char name[MAX_PATH];
+    char *id3viewc = NULL;
     char *skipped = "";
-    format_name(name, track->name, sizeof(name));
-
     if (track->attr & PLAYLIST_ATTR_SKIPPED)
         skipped = "(ERR) ";
-
-    if (global_settings.playlist_viewer_indices)
-        /* Display playlist index */
-        snprintf(str, len, "%d. %s%s", track->display_index, skipped, name);
+    if (!(track->attr & PLAYLIST_ATTR_RETRIEVE_ID3_ATTEMPTED) &&
+        (global_settings.playlist_viewer_track_display ==
+            PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE_AND_ALBUM ||
+        global_settings.playlist_viewer_track_display ==
+            PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE
+    ))
+    {
+        track->attr |= PLAYLIST_ATTR_RETRIEVE_ID3_ATTEMPTED;
+        struct mp3entry id3;
+        bool retrieve_success = retrieve_id3_tags(track->index, track->name,
+                                            &id3, METADATA_EXCLUDE_ID3_PATH);
+        if (retrieve_success)
+        {
+            if (!id3viewc)
+            {
+                id3viewc = track->name + strlen(track->name) + 1;
+            }
+            struct mp3entry * pid3 = &id3;
+            id3viewc[0] = '\0';
+            if (global_settings.playlist_viewer_track_display ==
+                PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE_AND_ALBUM)
+            {
+                /* Title & Album */
+                if (pid3->title && pid3->title[0] != '\0')
+                {
+                    char* cur_str = id3viewc;
+                    int title_len = strlen(pid3->title);
+                    int rem_space = MAX_PATH;
+                    for (int i = 0; i < title_len && rem_space > 0; i++)
+                    {
+                        cur_str[0] = pid3->title[i];
+                        cur_str++;
+                        rem_space--;
+                    }
+                    if (rem_space > 10)
+                    {
+                        cur_str[0] = (char) ' ';
+                        cur_str[1] = (char) '-';
+                        cur_str[2] = (char) ' ';
+                        cur_str += 3;
+                        rem_space -= 3;
+                        cur_str = strmemccpy(cur_str, pid3->album && pid3->album[0] != '\0' ?
+                            pid3->album : (char*) str(LANG_TAGNAVI_UNTAGGED), rem_space);
+                        if (cur_str)
+                            track->attr |= PLAYLIST_ATTR_RETRIEVE_ID3_SUCCEEDED;
+                    }
+                }
+            }
+            else if (global_settings.playlist_viewer_track_display ==
+                PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE)
+            {
+                /* Just the title */
+                if (pid3->title && pid3->title[0] != '\0' &&
+                    strmemccpy(id3viewc, pid3->title, MAX_PATH)
+                )
+                    track->attr |= PLAYLIST_ATTR_RETRIEVE_ID3_SUCCEEDED;
+            }
+            /* Yield to reduce as much as possible the perceived UI lag, 
+            because retrieving id3 tags is an expensive operation */
+            yield();
+        }
+    }
+    
+    if (!(track->attr & PLAYLIST_ATTR_RETRIEVE_ID3_SUCCEEDED))
+    {
+        /* Simply use a formatted file name */
+        char name[MAX_PATH];
+        format_name(name, track->name, sizeof(name));
+        if (global_settings.playlist_viewer_indices)
+            /* Display playlist index */
+            snprintf(str, len, "%d. %s%s", track->display_index, skipped, name);
+        else
+            snprintf(str, len, "%s%s", skipped, name);
+    }
     else
-        snprintf(str, len, "%s%s", skipped, name);
-
+    {
+        if (!id3viewc)
+        {
+            id3viewc = track->name + strlen(track->name) + 1;
+        }
+        if (global_settings.playlist_viewer_indices)
+            /* Display playlist index */
+            snprintf(str, len, "%d. %s%s", track->display_index, skipped, id3viewc);
+        else
+            snprintf(str, len, "%s%s", skipped, id3viewc);
+    }
 }
 
 /* Update playlist in case something has changed or forced */
@@ -512,20 +618,7 @@ static bool update_playlist(bool force)
 static enum pv_onplay_result show_track_info(const struct playlist_entry *current_track)
 {
     struct mp3entry id3;
-    bool id3_retrieval_successful = false;
-
-    if (!viewer.playlist &&
-        (audio_status() & AUDIO_STATUS_PLAY) &&
-        (playlist_get_resume_info(&viewer.current_playing_track) == current_track->index))
-    {
-        copy_mp3entry(&id3, audio_current_track()); /* retrieve id3 from RAM */
-        id3_retrieval_successful = true;
-    }
-    else
-    {
-    /* Read from disk, the database, doesn't store frequency, file size or codec (g4470) ChrisS*/
-        id3_retrieval_successful = get_metadata(&id3, -1, current_track->name);
-    }
+    bool id3_retrieval_successful = retrieve_id3_tags(current_track->index, current_track->name, &id3, 0);
 
     return id3_retrieval_successful &&
             browse_id3_ex(&id3, viewer.playlist, current_track->display_index,
@@ -790,11 +883,17 @@ static int playlist_callback_voice(int selected_item, void *data)
 
     switch(global_settings.playlist_viewer_track_display)
     {
-        case 1: /*full path*/
+        case PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH:
+            /*full path*/
             talk_fullpath(track->name, true);
             break;
         default:
-        case 0: /*filename only*/
+        case PLAYLIST_VIEWER_ENTRY_SHOW_FILE_NAME:
+            /*filename only*/
+        case PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE_AND_ALBUM:
+            /* If loading from tags failed, only talk the file name */
+        case PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE:
+            /* If loading from tags failed, only talk the file name */
             talk_file_or_spell(NULL, track->name, NULL, true);
             break;
     }
@@ -1154,7 +1253,8 @@ static int say_search_item(int selected_item, void *data)
 {
     struct playlist_search_data *s_data = data;
     playlist_get_track_info(viewer.playlist, s_data->found_indicies[selected_item], s_data->track);
-    if(global_settings.playlist_viewer_track_display == 1) /* full path*/
+    if(global_settings.playlist_viewer_track_display == PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH)
+        /* full path*/
         talk_fullpath(s_data->track->filename, false);
     else talk_file_or_spell(NULL, s_data->track->filename, NULL, false);
     return 0;
@@ -1197,7 +1297,8 @@ bool search_playlist(void)
 
         playlist_get_track_info(viewer.playlist, i, &track);
         const char *trackname = track.filename;
-        if (track_display == 0) /* if we only display filename only search filename */
+        if (track_display != PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH)
+            /* if we only display filename only search filename */
             trackname = strrchr(track.filename, '/');
 
         if (trackname && strcasestr(trackname, search_str))
