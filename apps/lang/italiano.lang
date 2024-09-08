@@ -16443,13 +16443,13 @@
   desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
   user: core
   <source>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
     *: "Selezione troppo grande, verranno prese solamente %d tracce casuali dalla selezione"
   </dest>
   <voice>
-    *: "Selezione troppo grande, verranno prese solamente %d tracce casuali dalla selezione"
+    *: "Selezione troppo grande, verranno prese solamente alcune tracce casuali dalla selezione"
   </voice>
 </phrase>
 <phrase>
