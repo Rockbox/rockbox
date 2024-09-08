@@ -16,8 +16,10 @@
  *
  * This allows us to fix the LCD init issues with v3 players.
  */
+#ifdef BOOTLOADER
 #ifndef EROSQN_VER
 #error "Must define EROSQN_VER"
+#endif
 #endif
 
 /* CPU defines */
