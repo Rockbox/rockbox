@@ -66,6 +66,10 @@
 
 static int tagtree_play_folder(struct tree_context* c);
 
+/* reuse of tagtree data after tagtree_play_folder() */
+static uint32_t loaded_entries_crc = 0;
+
+
 /* this needs to be same size as struct entry (tree.h) and name needs to be
  * the first; so that they're compatible enough to walk arrays of both
  * derefencing the name member*/
@@ -279,6 +283,20 @@ static struct buflib_callbacks ops = {
     .move_callback = move_callback,
     .shrink_callback = NULL,
 };
+
+static uint32_t tagtree_data_crc(struct tree_context* c)
+{
+    char* buf;
+    uint32_t crc;
+    buf = core_get_data(tagtree_handle); /* data for the search clauses etc */
+    crc = crc_32(buf, tagtree_buf_used, c->dirlength);
+    buf = core_get_data(c->cache.name_buffer_handle); /* names */
+    crc = crc_32(buf, c->cache.name_buffer_size, crc);
+    buf = core_get_data(c->cache.entries_handle); /* tagentries */
+    crc = crc_32(buf, c->cache.max_entries * sizeof(struct tagentry), crc);
+    logf("%s 0x%x", __func__, crc);
+    return crc;
+}
 
 static void* tagtree_alloc(size_t size)
 {
@@ -1813,6 +1831,8 @@ static int load_root(struct tree_context *c)
 
 int tagtree_load(struct tree_context* c)
 {
+    logf( "%s", __func__);
+
     int count;
     int table = c->currtable;
 
@@ -1829,12 +1849,24 @@ int tagtree_load(struct tree_context* c)
     switch (table)
     {
         case TABLE_ROOT:
+            logf( "root...");
             count = load_root(c);
             break;
 
         case TABLE_ALLSUBENTRIES:
         case TABLE_NAVIBROWSE:
             logf("navibrowse...");
+
+            if (loaded_entries_crc != 0)
+            {
+                if (loaded_entries_crc == tagtree_data_crc(c))
+                {
+                    count = c->dirlength;
+                    logf("Reusing %d entries", count);
+                    break;
+                }
+            }
+
             cpu_boost(true);
             count = retrieve_entries(c, 0, true);
             cpu_boost(false);
@@ -1844,6 +1876,8 @@ int tagtree_load(struct tree_context* c)
             logf("Unsupported table %d\n", table);
             return -1;
     }
+
+    loaded_entries_crc = 0;
 
     if (count < 0)
     {
@@ -1877,6 +1911,8 @@ int tagtree_load(struct tree_context* c)
  */
 int tagtree_enter(struct tree_context* c, bool is_visible)
 {
+    logf( "%s", __func__);
+
     int rc = 0;
     struct tagentry *dptr;
     struct mp3entry *id3;
@@ -2076,6 +2112,7 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
 /* Exits current database menu or table */
 void tagtree_exit(struct tree_context* c, bool is_visible)
 {
+    logf( "%s", __func__);
     if (is_visible) /* update selection history only for user-selected items */
     {
         if (c->selected_item != selected_item_history[c->dirlevel])
@@ -2472,6 +2509,7 @@ int tagtree_add_to_playlist(const char* playlist, bool new_playlist)
 
 static int tagtree_play_folder(struct tree_context* c)
 {
+    logf( "%s", __func__);
     int start_index = c->selected_item;
 
     if (playlist_create(NULL, NULL) < 0)
@@ -2502,6 +2540,7 @@ static int tagtree_play_folder(struct tree_context* c)
     }
 
     playlist_start(start_index, 0, 0);
+    loaded_entries_crc = tagtree_data_crc(c); /* save crc in case we return */
     return 0;
 }
 
