@@ -16463,12 +16463,40 @@
   desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
   user: core
   <source>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
     *: "Wybór jest zbyt duży, zostanie z niego wybranych %d losowych utworów"
   </dest>
   <voice>
     *: "Wybór jest zbyt duży, zostanie z niego wybrana mniejsza liczba losowych utworów"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Tytuł i album ze znaczników ID3"
+  </dest>
+  <voice>
+    *: "Tytuł i album ze znaczników i de trzy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Tytuł ze znaczników ID3"
+  </dest>
+  <voice>
+    *: "Tytuł ze znaczników i de trzy"
   </voice>
 </phrase>

@@ -16464,12 +16464,40 @@
   desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
   user: core
   <source>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
     *: "选择了太多，将从中随机选取%d首"
   </dest>
   <voice>
     *: "选择了太多，将从中选择更少曲目"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "ID3 标题&专辑信息"
+  </dest>
+  <voice>
+    *: "I D 3 标题与专辑信息"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "ID3标题信息"
+  </dest>
+  <voice>
+    *: "I D 3 标题信息"
   </voice>
 </phrase>
