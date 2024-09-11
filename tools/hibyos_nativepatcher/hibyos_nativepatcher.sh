@@ -1,7 +1,25 @@
 #!/bin/bash
-# USAGE: ./hibyos_nativepatcher.sh <path/to/updatefile.upt> <path/to/bootloader.erosq>
+# hibyos_nativepatcher.sh
+#
 # NOTE: THIS SCRIPT IS NOT TOLERANT OF WHITESPACE IN FILENAMES OR PATHS
 
+usage="hibyos_nativepatcher.sh
+    
+    USAGE: 
+    
+    hibyos_nativepatcher.sh <mkrbinstall/mkstockuboot> [arguments depend on mode, see below]
+
+    hibyos_nativepatcher.sh mkrbinstall <OFVERNAME (erosq or eros_h2)>
+        <path/to/output> <path/to/bootloader.erosq> <HWVER (hw1hw2 or hw3)> 
+        Output file will be path/to/output/erosqnative_RBVER-HWVER-OFVERNAME.upt.
+        Only the Hifiwalker H2 v1.3 uses "eros_h2", everything else uses "erosq".
+
+    hibyos_nativepatcher.sh mkstockuboot <path/to/OFupdatefile.upt>
+        Output file will be path/to/OFupdatefile-rbuninstall.upt.
+    
+    NOTE: THIS SCRIPT IS NOT TOLERANT OF WHITESPACE IN FILENAMES OR PATHS!"
+
+# check OS type and for any needed tools
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "$OSTYPE DETECTED"
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -19,99 +37,185 @@ else
     exit 1
 fi
 
+# make sure we can find patch_manifest
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if !(which $SCRIPT_DIR/patch_manifest.pl > /dev/null); then
     echo "couldn't find patch_manifest.pl!"
     exit 1
 fi
 
-updatefile=$(realpath --relative-base=$(pwd) $1)
-updatefile_path=$(echo "$updatefile" | perl -ne "s/\/[\w\.\_\-]*$// && print")
-updatefile_name=$(basename $updatefile)
-updatefile_name_noext=$(echo "$updatefile_name" | perl -ne "s/\.\w*$// && print")
-bootfile=$(realpath --relative-base=$(pwd) $2)
-echo "This will patch $updatefile with $bootfile..."
+###########################################################################
+# MKRBINSTALL
+###########################################################################
+if [[ "$1" == "mkrbinstall" ]]; then
+    echo "Creating installation image from bootloader file..."
 
-echo "MAKE WORKING DIR..."
-mkdir $updatefile_path/working_dir
-working_dir=$(realpath $updatefile_path/working_dir)
+    # make sure all arguments are accounted for...
+    if [[ -z "$5" ]]; then
+        echo "not all parameters included, please see usage:"
+        echo "$usage"
+        exit 1
+    fi
 
-# copy update.upt to update.iso
-cp $updatefile $working_dir/$updatefile_name_noext\_cpy.iso
+    # validate arguments
+    outputdir=$(realpath --relative-base=$(pwd) $3)
+    if !(ls $outputdir >& /dev/null); then
+        echo "directory $outputdir doesn't seem to exist. Please make sure it exists, then re-run hibyos_nativepatcher.sh."
+        exit 1
+    fi
 
-mkdir $working_dir/image_contents
+    # note, bootloaderfile might still be a valid path, but not a valid bootloader file... check to make sure tar can extract it okay.
+    bootloaderfile=$(realpath --relative-base=$(pwd) $4)
+    if !(ls $bootloaderfile >& /dev/null); then
+        echo "bootloader file $bootloaderfile doesn't seem to exist. Please make sure it exists, then re-run hibyos_nativepatcher.sh."
+        exit 1
+    fi
 
-# attach/mount iso
-echo "mount/extract/unmount original iso..."
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macos
-    hdiutil attach $working_dir/$updatefile_name_noext\_cpy.iso -mountpoint $working_dir/contentsiso
+    # make working directory...
+    mkdir $outputdir/working_dir
+    workingdir=$(realpath $outputdir/working_dir)
+    mkdir $workingdir/bootloader
 
-    # copy out iso contents
-    cp $working_dir/contentsiso/* $working_dir/image_contents
+    # extract bootloader file
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macos
+        tar -xvf $bootloaderfile --cd $workingdir/bootloader
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # linux-gnu
+        tar -xvf $bootloaderfile -C $workingdir/bootloader
+    fi
 
-    # unmount iso
-    hdiutil detach $working_dir/contentsiso
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # linux-gnu
-    7z -o$working_dir/image_contents x $working_dir/$updatefile_name_noext\_cpy.iso
-fi
+    # make sure we got what we wanted
+    if !(ls $workingdir/bootloader/bootloader.ucl >& /dev/null); then
+        echo "can't find bootloader.ucl! help!"
+        rm -rf $workingdir
+        exit 1
+    elif !(ls $workingdir/bootloader/spl.erosq >& /dev/null); then
+        echo "can't find spl.erosq! help!"
+        rm -rf $workingdir
+        exit 1
+    fi
 
-chmod 777 $working_dir/image_contents/*
+    bootver=$(cat $workingdir/bootloader/bootloader-info.txt)
+    if [ -z "$bootver" ]; then
+        echo "COULDN'T FIND BOOTLOADER-INFO!"
+        rm -rf $workingdir
+        exit 1
+    fi
 
-# extract spl, bootloader
-echo "extract bootloader..."
-mkdir $working_dir/bootloader
+    # if uboot.bin already exists, something is weird.
+    if (ls $workingdir/image_contents/uboot.bin >& /dev/null); then
+        echo "$workingdir/image_contents/uboot.bin already exists, something went weird."
+        rm -rf $workingdir
+        exit 1
+    fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macos
-    tar -xvf $bootfile --cd $working_dir/bootloader
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # linux-gnu
-    tar -xvf $bootfile -C $working_dir/bootloader
-fi
+    # everything exists, make the bin
+    mkdir $workingdir/image_contents/
+    touch $workingdir/image_contents/uboot.bin
+    echo "PATCHING!"
+    dd if=$workingdir/bootloader/spl.erosq of=$workingdir/image_contents/uboot.bin obs=1 seek=0 conv=notrunc
+    dd if=$workingdir/bootloader/bootloader.ucl of=$workingdir/image_contents/uboot.bin obs=1 seek=26624 conv=notrunc
 
-bootver=$(cat $working_dir/bootloader/bootloader-info.txt)
-if [ -z "$bootver" ]; then
-    echo "COULDN'T FIND BOOTLOADER-INFO!"
-    echo "cleaning up..."
-    rm -rf $working_dir
+    # create update.txt
+    md5=($(md5sum $workingdir/image_contents/uboot.bin))
+    if [ -z "$md5" ]; then
+        echo "COULDN'T MD5SUM UBOOT.BIN!"
+        rm -rf $workingdir
+        exit 1
+    fi
+    echo "Create update manifest with md5sum $md5"
+    echo "" > $workingdir/image_contents/update.txt
+    $SCRIPT_DIR/patch_manifest.pl $md5 $workingdir/image_contents/update.txt
+
+    # create version.txt
+    echo "version={
+        name=$2
+        ver=2024-09-10T14:42:18+08:00
+}" > $workingdir/image_contents/version.txt
+
+    outputfilename="erosqnative_$bootver-$5-$2"
+
+
+###########################################################################
+# MKSTOCKUBOOT
+###########################################################################
+elif [[ "$1" == "mkstockuboot" ]]; then
+    echo "Creating uninstallation image from stock update image..."
+
+    # make sure all arguments are accounted for...
+    if [[ -z "$2" ]]; then
+        echo "not all parameters included, please see usage:"
+        echo "$usage"
+        exit 1
+    fi
+
+    updatefile=$(realpath --relative-base=$(pwd) $2)
+    updatefile_path=$(echo "$updatefile" | perl -ne "s/\/[\w\.\_\-]*$// && print")
+    updatefile_name=$(basename $updatefile)
+    updatefile_name_noext=$(echo "$updatefile_name" | perl -ne "s/\.\w*$// && print")
+    outputdir=$updatefile_path
+    outputfilename="$updatefile_name_noext-rbuninstall"
+
+    mkdir $updatefile_path/working_dir
+    workingdir=$(realpath $updatefile_path/working_dir)
+
+    # copy update.upt to update.iso
+    cp $updatefile $workingdir/$updatefile_name_noext-cpy.iso
+
+    mkdir $workingdir/image_contents
+
+    # extract iso
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macos
+        hdiutil attach $workingdir/$updatefile_name_noext-cpy.iso -mountpoint $workingdir/contentsiso
+
+        # copy out iso contents
+        cp $workingdir/contentsiso/* $workingdir/image_contents
+
+        # unmount iso
+        hdiutil detach $workingdir/contentsiso
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # linux-gnu
+        7z -o$workingdir/image_contents x $workingdir/$updatefile_name_noext-cpy.iso
+    fi
+
+    chmod 777 $workingdir/image_contents/*
+
+    # modify update.txt
+    md5=($(md5sum $workingdir/image_contents/uboot.bin))
+    if [ -z "$md5" ]; then
+        echo "COULDN'T MD5SUM UBOOT.BIN!"
+        rm -rf $working_dir
+        exit 1
+    fi
+    echo "add to update manifest with md5sum $md5"
+    $SCRIPT_DIR/patch_manifest.pl $md5 $workingdir/image_contents/update.txt
+
+######################################################################
+# PRINT USAGE
+######################################################################
+else
+    echo "$usage"
     exit 1
 fi
-echo "FOUND VERSION $bootver"
 
-# patch uboot.bin
-echo "PATCH!"
-dd if=$working_dir/bootloader/spl.erosq of=$working_dir/image_contents/uboot.bin obs=1 seek=0 conv=notrunc
-dd if=$working_dir/bootloader/bootloader.ucl of=$working_dir/image_contents/uboot.bin obs=1 seek=26624 conv=notrunc
-
-# modify update.txt
-md5=($(md5sum $working_dir/image_contents/uboot.bin))
-if [ -z "$md5" ]; then
-    echo "COULDN'T MD5SUM UBOOT.BIN!"
-    echo "cleaning up..."
-    rm -rf $working_dir
-    exit 1
-fi
-echo "add to update manifest with md5sum $md5"
-$SCRIPT_DIR/patch_manifest.pl $md5 $working_dir/image_contents/update.txt
-
-# modify version.txt?
-
-# create iso
-echo "make new iso..."
+######################################################################
+# Common: make the image
+######################################################################
+# make the image
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macos
-    hdiutil makehybrid -iso -joliet -o $working_dir/$updatefile_name_noext\_patched_$bootver.iso $working_dir/image_contents/
+    hdiutil makehybrid -iso -joliet -o $outputdir/output.iso $workingdir/image_contents/
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # linux-gnu
-    genisoimage -o $working_dir/$updatefile_name_noext\_patched_$bootver.iso $working_dir/image_contents/
+    genisoimage -o $outputdir/output.iso $workingdir/image_contents/
 fi
 
-# rename to something.upt and put in original directory
-echo "final output file $updatefile_name_noext\_patched_$bootver.upt"
-mv $working_dir/$updatefile_name_noext\_patched_$bootver.iso $updatefile_path/$updatefile_name_noext\_patched_$bootver.upt
+# rename
+mv $outputdir/output.iso $outputdir/$outputfilename.upt
 
-# clean up
-echo "cleaning up..."
-rm -rf $working_dir
+# cleaning up
+rm -rf $workingdir
+
+exit 0
