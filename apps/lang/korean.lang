@@ -16473,10 +16473,10 @@
     *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: "선택 항목이 너무 커서, %d 개의 무작위 트랙 선택됨"
+    *: "선택이 너무 커서, %d 개의 무작위 트랙이 선택됨"
   </dest>
   <voice>
-    *: "선택 항목이 너무 커서, %d 개의 무작위 트랙 선택됨"
+    *: "선택이 너무 커서 무작위로 선택되는 트랙이 줄어듬"
   </voice>
 </phrase>
 <phrase>
