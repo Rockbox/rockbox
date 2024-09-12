@@ -2085,13 +2085,18 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
         return false;
 
     /* Find the corresponding entry in tagcache. */
+
+    if (filename != NULL)
+        memset(id3, 0, sizeof(struct mp3entry));
+    else /* Note: caller clears id3 prior to call */
+        filename = id3->path;
+
     idx_id = find_entry_ram(filename);
     if (idx_id < 0)
         return false;
 
     entry = &tcramcache.hdr->indices[idx_id];
-
-    memset(id3, 0, sizeof(struct mp3entry));
+   
     char* buf = id3->id3v2buf;
     ssize_t remaining = sizeof(id3->id3v2buf);
 

@@ -556,20 +556,29 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
         pid3 = state->nid3;
     else
     {
-        static char filename_buf[MAX_PATH + 1];
-        fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
+        static struct mp3entry tempid3; /* Note: path gets passed to outside fns */
+        memset(&tempid3, 0, sizeof(struct mp3entry));
+        /*static char filename_buf[MAX_PATH + 1];removed g#5926 */
+        fname = playlist_peek(offset, tempid3.path, sizeof(tempid3.path));
         *filename = (char*)fname;
-        static struct mp3entry tempid3;
+
         if (
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-            tagcache_fill_tags(&tempid3, fname) ||
+            tagcache_fill_tags(&tempid3, NULL) ||
 #endif
             audio_peek_track(&tempid3, offset)
         )
         {
             pid3 = &tempid3;
         }
+        else /* failed */
+        {
+            /* ensure *filename gets the path, audio_peek_track() cleared it */
+            fname = playlist_peek(offset, tempid3.path, sizeof(tempid3.path));
+            *filename = (char*)fname;
+        }
     }
+
     return pid3;
 }
 
@@ -710,8 +719,6 @@ const char *get_token_value(struct gui_wps *gwps,
         return NULL;
 
     id3 = get_mp3entry_from_offset(token->next? 1: offset, &filename);
-    if (id3)
-        filename = id3->path;
 
 #if CONFIG_RTC
     struct tm* tm = NULL;
