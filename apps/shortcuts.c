@@ -482,15 +482,15 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
             {
             case SHORTCUT_BROWSER:
                 {
-                    static char path[MAX_PATH];
                     DIR* dir;
                     struct dirent* entry;
-                    char* filename = strrchr(sc->u.path, PATH_SEPCH) + 1;
-                    if (*filename != '\0')
+                    char* slash = strrchr(sc->u.path, PATH_SEPCH);
+                    char* filename = slash + 1;
+                    if (slash && *filename != '\0')
                     {
-                        int dirlen = (filename - sc->u.path);
-                        strmemccpy(path, sc->u.path, dirlen + 1);
-                        dir = opendir(path);
+                        *slash = '\0'; /* terminate the path to open the directory */
+                        dir = opendir(sc->u.path);
+                        *slash = PATH_SEPCH; /* restore fullpath */
                         if (dir)
                         {
                             while (0 != (entry = readdir(dir)))
@@ -498,9 +498,12 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                                 if (!strcmp(entry->d_name, filename))
                                 {
                                     struct dirinfo info = dir_get_info(dir, entry);
+
                                     if (info.attribute & ATTR_DIRECTORY)
                                         talk_dir_or_spell(sc->u.path, NULL, false);
-                                    else talk_file_or_spell(path, filename, NULL, false);
+                                    else
+                                        talk_file_or_spell(NULL, sc->u.path, NULL, false);
+
                                     closedir(dir);
                                     return 0;
                                 }
