@@ -484,6 +484,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'erosqnative' => {
         name => 'AIGO EROS Q / K (Native)',
         status => 2,
+        manualok => 1, # Remove once status moves to 3
     },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
