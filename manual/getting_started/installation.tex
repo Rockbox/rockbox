@@ -118,6 +118,15 @@ of before installing.
 \begin{description}
   \item[Filesystem support.] Rockbox only supports the FAT32 filesystem. Other
     filesystems such as exFAT or NTFS are not supported.
+
+    \opt{erosqnative}{\note{Many SD cards come with exFAT on them from the
+    factory. The original firmware can be used to reformat them to FAT
+    by going to \code{System Settings --> Reset --> Format TF Card}.}
+    
+    \note{The SD card that sometimes come bundled with these players are usually
+    of substandard quality and are not to be trusted. It is recommended to source
+    a card of a reputable brand, from a reputable source, such as direct from
+    the manufacturer.}}
   \item[USB DAC.] This feature is not supported by Rockbox, but you can
     dual-boot the original firmware if you want to use it.
   \opt{shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq,erosqnative}{\item[Wireless.] There is no support for Bluetooth\opt{shanlingq1}{ or WiFi}.
@@ -545,7 +554,8 @@ by Rockbox, in the main directory of your \daps{} drive.
         \opt{samsungyh}{\input{getting_started/samsungyh_install.tex}}
         \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
         \opt{xduoox3ii,xduoox20,agptekrocker,aigoerosq}{\input{getting_started/hibyos_install.tex}}
-        \opt{fiiom3k,shanlingq1,erosqnative}{\input{getting_started/jztool_install.tex}}
+        \opt{fiiom3k,shanlingq1}{\input{getting_started/jztool_install.tex}}
+        \opt{erosqnative}{\input{getting_started/hibyos_nativeinstall.tex}}
     }
 }
 
@@ -807,7 +817,7 @@ completely follow the manual uninstallation instructions below.}}
     \playerman{} firmware.
 }
 
-\opt{fiiom3k,shanlingq1,erosqnative}{
+\opt{fiiom3k,shanlingq1}{
     If you want to remove the Rockbox bootloader, copy an original firmware
     update to your microSD card and run the \playerman{} update by 
     \opt{erosqnative}{running it from the Original Firmware's System Settings menu.}
@@ -819,6 +829,21 @@ completely follow the manual uninstallation instructions below.}}
     can be accessed by holding \ActionBootRecoveryMenu{} when powering on. If
     your \dap{} won't boot, use \fname{jztool} to load the bootloader over USB
     and enter the recovery menu -- see \reference{ref:jztool_load_bootloader}.
+}
+
+\opt{erosqnative}{
+    If you want to remove the Rockbox bootloader, you will need to acquire the correct
+    update file for your brand player and original firmware version number. The
+    uninstallation procedure can then be done as follows:
+
+    \begin{itemize}
+      \item If the update file is unmodified, use \fname{tools/hibyos_nativepatcher/hibyos_nativepatcher.sh}
+      to mark the original bootloader for updating
+      \item Place the update file on the SD card and ensure it is named \emph{exactly}
+      \fname{update.upt}
+      \item Boot into the Rockbox bootloader menu: With the player off, hold \ButtonVolUp + \ButtonPower
+      \item Select "Aigo Recovery"
+    \end{itemize}
 }
 
 \nopt{gigabeats}{

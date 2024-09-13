@@ -1,0 +1,66 @@
+We will install the bootloader with the original firmware's recovery
+mode. The process is summed up as the following:
+
+\begin{itemize}
+  \item Determine what hardware version your player is and download
+    the correct bootloader update file
+  \item Place the bootloader \fname{update.upt} file on the SD card
+  \item In the original firmware, run the Firmware Update
+    \code{System Settings --> Firmware Update}
+\end{itemize}
+
+\subsubsection{Determine hardware version}\label{ref:determine_hardware_version}
+Determine what hardware version your player is. Go to
+\code{System Settings --> About The Player --> Version} and reference
+the list below. hw1, hw1.5, and hw2 players all use the same update
+file (with one exception), while hw3 players use a different one.
+
+\note{Important: If your player's version is not contained in this list,
+for example if the firmware version is newer than what is listed here,
+we cannot be sure that the hardware is the same. The best thing to do is
+contact the manufacturer and ask them two things: (1) for an update file
+of your version, and (2) if a player with the most recent version listed
+here can be upgraded to the firmware version on your player. If they say
+yes, we can be more certain that the hardware has not changed. These lists
+may not be the most up to date, please see the wiki page at
+\url{https://www.rockbox.org/wiki/AIGOErosQK} for the most up-to-date list.}
+
+\begin{description}
+\item[hw1/hw1.5/hw2 players]
+  \begin{itemize}
+    \item Aigo Eros Q V1.8 - V2.0
+    \item Hifiwalker H2 V1.1 - V1.6
+    \item Surfans F20 V2.2 - V2.7
+  \end{itemize}
+
+  These players use \fname{erosqnative-hw1hw2-erosq.upt} as the update file.
+  The lone exception is the Hifiwalker H2 V1.3, which uses the update file
+  \fname{erosqnative-hw1hw2-eros_h2.upt}.
+\item[hw3 players]
+  \begin{itemize}
+    \item Aigo Eros Q V2.1
+    \item Hifiwalker H2 V1.7 - V1.8
+    \item Surfans F20 V3.0 - V3.3
+  \end{itemize}
+
+  These players use \fname{erosqnative-hw3-erosq.upt} as the update file.
+\end{description}
+
+Download the \fname{.upt} file for these players from \download{bootloader/aigo/native/}.
+
+\note{All players use the same Rockbox build, only the bootloader is different.}
+
+\subsubsection{Place update file on SD card}\label{ref:place_on_sd_card}
+Place the appropriate bootloader file on the root of the SD card and name it
+\emph{exactly} \fname{update.upt}.
+
+\note{This is a good time to ensure that your Rockbox installation \fname{.rockbox}
+is present on your SD card.}
+
+Don't forget to safely eject/unmount your player.
+
+\subsubsection{Run Firmware Update}\label{ref:run_firmware_update}
+In the original firmware, run the firmware updater by going to
+\code{System Settings --> Firmware Update}. At this point, you can delete
+\fname{update.upt} from the SD card if you wish. \emph{Do not delete .rockbox,
+this is your Rockbox installation and needs to stay there!}

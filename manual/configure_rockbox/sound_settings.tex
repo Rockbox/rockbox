@@ -44,10 +44,6 @@ change to customise your listening experience.
   limit, select a volume from the list and the maximum volume will be limited to
   the selected value all over the system.
   \opt{xduoox3}{This setting also applies to the Line Out of the \dap{}, as at full scale the \dap{} overdrives the signal.}
-  \opt{erosqnative}{On the \playertype{}, when using the Line Out without anything connected to the Headphone port,
-      the volume is fixed to the \setting{Volume Limit} value.
-      \note{On the \playertype{}, the Line Out level at -2~dB is approximately +7~dBV, -4~dB is approximately +4~dBu,
-      and -18~dB is approximately -10~dBV.}}
 
 \section{Bass}
   This setting emphasises
@@ -196,8 +192,7 @@ change to customise your listening experience.
 \opt{erosqnative}{
   \section{Stereo Switch Mode}
   The Eros Q and related devices contain a stereo switch in the audio path.
-  This may be connected differently depending on the hardware revision. This
-  setting allows the behavior of the stereo switch to be changed if one of
+  This setting allows the behavior of the stereo switch to be changed if one of
   the two outputs (Headphones or Line Out) is not working. There are four modes:
   \begin{description}
     \item[Normal.]
@@ -209,6 +204,16 @@ change to customise your listening experience.
     \item[Always 1.]
       Both outputs use a value of 1.
   \end{description}
+
+  \section{DAC filter roll-off}
+  Later versions of the Eros Q and related devices contain a DAC with user-selectable
+  filter roll-off modes. This allows switching between the following modes:
+  \begin{itemize}
+    \item "Sharp"
+    \item "Slow"
+    \item "Short"
+    \item "Bypass"
+  \end{itemize}
 }
 
 \opt{dac_power_mode}{
