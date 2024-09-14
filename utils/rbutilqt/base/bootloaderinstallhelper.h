@@ -30,6 +30,7 @@ class BootloaderInstallHelper : public QObject
     public:
         static BootloaderInstallBase* createBootloaderInstaller(QObject* parent, QString type);
         static BootloaderInstallBase::Capabilities bootloaderInstallerCapabilities(QObject *parent, QString type);
+        static QString preinstallHints(QString model);
         static QString postinstallHints(QString model);
 };
 

@@ -409,6 +409,17 @@ void SelectiveInstallWidget::installBootloader(void)
     }
 }
 
+void SelectiveInstallWidget::installBootloaderHints()
+{
+    if(ui.bootloaderCheckbox->isChecked()) {
+        QString msg = BootloaderInstallHelper::preinstallHints(
+                RbSettings::value(RbSettings::Platform).toString());
+        if(!msg.isEmpty()) {
+            QMessageBox::information(this, tr("Manual steps required"), msg);
+        }
+    }
+}
+
 void SelectiveInstallWidget::installBootloaderPost()
 {
     // don't do anything if no bootloader install has been done.

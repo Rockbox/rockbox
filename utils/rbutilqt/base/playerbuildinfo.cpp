@@ -67,6 +67,7 @@ const static struct {
     { PlayerBuildInfo::Encoder,            ":target:/encoder"          },
     { PlayerBuildInfo::Brand,              ":target:/brand"            },
     { PlayerBuildInfo::PlayerPicture,      ":target:/playerpic"        },
+    { PlayerBuildInfo::ThemeName,          ":target:/themename"        },
     { PlayerBuildInfo::TargetNamesAll,     "_targets/all"              },
     { PlayerBuildInfo::TargetNamesEnabled, "_targets/enabled"          },
     { PlayerBuildInfo::LanguageInfo,       "languages/:target:"        },
@@ -332,7 +333,7 @@ QVariant PlayerBuildInfo::value(SystemUrl item)
 QString PlayerBuildInfo::statusAsString(QString platform)
 {
     QString result;
-    switch(value(BuildStatus, platform).toInt())
+    switch(value(BuildStatus, platform.split('.').at(0)).toInt())
     {
     case STATUS_RETIRED:
         result = tr("Stable (Retired)");

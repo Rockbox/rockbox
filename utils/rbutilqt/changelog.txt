@@ -48,3 +48,6 @@ Version 1.5.1
 * Improve responsiveness on install / uninstall.
 * Enable Themes installation if themes are selected.
 
+Version 1.5.2
+* Add support for Native Port to AIGO Eros Q and various clones
+* Make Hosted Port to AIGO Eros Q and various clones "disabled" (can be reenabled by checking the "show disabled targets" checkbox)

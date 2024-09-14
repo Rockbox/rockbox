@@ -85,8 +85,13 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QString infoUrl = PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemesInfoUrl).toString();
-    infoUrl.replace("%TARGET%",
-            RbSettings::value(RbSettings::CurrentPlatform).toString().split(".").at(0));
+    if (PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemeName).toString() != "") {
+            infoUrl.replace("%TARGET%",
+            PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemeName).toString());
+    } else {
+        infoUrl.replace("%TARGET%",
+        RbSettings::value(RbSettings::CurrentPlatform).toString().split(".").at(0));
+    }
     infoUrl.replace("%REVISION%", installInfo.revision());
     infoUrl.replace("%RELEASE%", installInfo.release());
     infoUrl.replace("%RBUTILVER%", VERSION);

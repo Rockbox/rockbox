@@ -31,6 +31,7 @@ class SelectiveInstallWidget : public QWidget
     Q_OBJECT
     public:
         SelectiveInstallWidget(QWidget* parent = nullptr);
+        void installBootloaderHints(void);
 
     public slots:
         void updateVersion(void);

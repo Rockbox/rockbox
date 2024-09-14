@@ -97,6 +97,34 @@ BootloaderInstallBase::Capabilities
     return caps;
 }
 
+//! @brief Return pre install hints string.
+//! @param model model string
+//! @return hints.
+QString BootloaderInstallHelper::preinstallHints(QString model)
+{
+    bool hint = false;
+    QString msg = QObject::tr("Before Bootloader installation begins, "
+            "Please check the following:");
+
+    msg += "<ol>";
+    if(model.contains("erosqnative")) {
+        hint = true;
+        msg += QObject::tr("<li>Ensure your SD card is formatted as FAT. "
+                "exFAT is <i>not</i> supported. You can reformat using the "
+                "Original Firmware on your player if need be. It is located "
+                "under (System Settings --> Reset --> Format TF Card).</li>"
+                "<li>Please use a quality SD card from a reputable source. "
+                "The SD cards that come bundled with players are often of "
+                "substandard quality and may cause issues.</li>");
+    }
+    msg += "</ol>";
+
+    if(hint)
+        return msg;
+    else
+        return QString();
+}
+
 
 //! @brief Return post install hints string.
 //! @param model model string
@@ -114,7 +142,8 @@ QString BootloaderInstallHelper::postinstallHints(QString model)
     }
     if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300"
        || model == "ondavx747" || model == "agptekrocker"
-       || model == "xduoox3" || model == "xduoox3ii" || model == "xduoox20") {
+       || model == "xduoox3" || model == "xduoox3ii" || model == "xduoox20"
+       || model.contains("erosqnative")) {
         hint = true;
         msg += QObject::tr("<li>Reboot your player into the original firmware.</li>"
                 "<li>Perform a firmware upgrade using the update functionality "
