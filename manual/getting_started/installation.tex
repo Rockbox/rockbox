@@ -118,15 +118,15 @@ of before installing.
 \begin{description}
   \item[Filesystem support.] Rockbox only supports the FAT32 filesystem. Other
     filesystems such as exFAT or NTFS are not supported.
-
-    \opt{erosqnative}{\note{Many SD cards come with exFAT on them from the
-    factory. The original firmware can be used to reformat them to FAT
-    by going to \code{System Settings --> Reset --> Format TF Card}.}}
-
-    \note{The SD card that sometimes come bundled with these players are usually
-    of substandard quality and are not to be trusted. It is recommended to source
-    a card of a reputable brand, from a reputable source, such as direct from
-    the manufacturer.}}
+    \opt{erosqnative}{
+      \note{Many SD cards come with exFAT on them from the
+            factory. The original firmware can be used to reformat them to FAT
+            by going to: \fname{System Settings --> Reset --> Format TF Card}.}
+      \note{The SD card that sometimes come bundled with these players are usually
+      of substandard quality and are not to be trusted. It is recommended to source
+      a card of a reputable brand, from a reputable source, such as direct from
+      the manufacturer.}
+    }
   \item[USB DAC.] This feature is not supported by Rockbox, but you can
     dual-boot the original firmware if you want to use it.
   \opt{shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq,erosqnative}{\item[Wireless.] There is no support for Bluetooth\opt{shanlingq1}{ or WiFi}.
@@ -837,11 +837,9 @@ completely follow the manual uninstallation instructions below.}}
     uninstallation procedure can then be done as follows:
 
     \begin{itemize}
-      \item If the update file is unmodified, use \fname{tools/hibyos_nativepatcher/hibyos_nativepatcher.sh}
-      to mark the original bootloader for updating
-      \item Place the update file on the SD card and ensure it is named \emph{exactly}
-      \fname{update.upt}
-      \item Boot into the Rockbox bootloader menu: With the player off, hold \ButtonVolUp + \ButtonPower
+      \item If the update file is unmodified, use \fname{tools/hibyos\_nativepatcher/hibyos\_nativepatcher.sh} to mark the original bootloader for updating
+      \item Place the update file on the SD card and ensure it is named \emph{exactly} \fname{update.upt}
+      \item Boot into the Rockbox bootloader menu: With the player off, hold \ButtonVolUp{} + \ButtonPower{}
       \item Select "Aigo Recovery"
     \end{itemize}
 }
