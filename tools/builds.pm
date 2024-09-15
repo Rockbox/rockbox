@@ -474,17 +474,17 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'fiiom3k' => {
         name => 'FiiO M3K',
-        status => 2,
-        manualok => 1, # Remove once status moves to 3
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'aigoerosq' => {
         name => 'AIGO EROS Q / K (Hosted)',
-        status => 2,
+        status => 2,  # Do we promote this to stable?
     },
     'erosqnative' => {
         name => 'AIGO EROS Q / K (Native)',
-        status => 2,
-        manualok => 1, # Remove once status moves to 3
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
@@ -500,8 +500,8 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'shanlingq1' => {
         name => 'Shanling Q1',
-        status => 2,
-        manualok => 1, # Remove once status moves to 3
+        status => 3,
+        release => '4.0',  # Remove once 4.0 lands
     },
 );
 
