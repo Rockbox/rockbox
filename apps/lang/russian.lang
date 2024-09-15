@@ -29,6 +29,7 @@
 # - James Hunt
 # - Dmitriy Gamza
 # - Roman Levkin-Taymenev
+# - Dmitry Prozorov
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3462,8 +3463,7 @@
   </source>
   <dest>
     *: "Внутр:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux,xduoox3: "микро Эс Ди:"
   </dest>
   <voice>
     *: "Внутр"
@@ -3484,15 +3484,15 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "ЮСБ:"
+    multivolume: "ХД1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Эс Ди:"
+    xduoox3: "микро Эс Ди2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "Эйч Ди 1"
+    hibylinux: "Ю С Б"
+    multivolume: "Х Д 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Эс Ди"
     xduoox3: "микро Эс Ди 2"
   </voice>
@@ -3639,8 +3639,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500,rtc: "ВЫКЛ. = Отмена"
-    gigabeats: "НАЗАД = Отмена"
-    sansafuzeplus: "BACK = Revert"
+    gigabeats,sansafuzeplus: "НАЗАД = Отмена"
     gogearsa9200: "ЛЕВО = Отмена"
     iaudiom5,iaudiox5: "ЗАПИСЬ = Отмена"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Отмена"
@@ -5617,10 +5616,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "Saved %d tracks (%s)"
+    *: "Сохранено %d треков (%s)"
   </dest>
   <voice>
-    *: "Трэков сохранено"
+    *: "Треков сохранено"
   </voice>
 </phrase>
 <phrase>
@@ -6042,8 +6041,7 @@
   <dest>
     *: "ВЫКЛ. для отмены"
     gigabeatfx: "ВЫКЛ. для отмены"
-    gigabeats: "НАЗАД для отмены"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "НАЗАД для отмены"
     iaudiom5,iaudiox5: "ВОСПР. для отмены"
     ipod*: "ПАУЗА для отмены"
     iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "ПРЕД. для отмены"
@@ -6420,7 +6418,7 @@
     *: "Сканирование диска..."
   </dest>
   <voice>
-    *: "Сканирование диска..."
+    *: "Сканирование диска"
   </voice>
 </phrase>
 <phrase>
@@ -6586,7 +6584,7 @@
     *: "Удаление..."
   </dest>
   <voice>
-    *: "Удаление..."
+    *: "Удаление"
   </voice>
 </phrase>
 <phrase>
@@ -7017,7 +7015,7 @@
     *: "Буфер:"
   </dest>
   <voice>
-    *: "Буфер:"
+    *: "Размер буфера"
   </voice>
 </phrase>
 <phrase>
@@ -7133,7 +7131,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8735,7 +8733,7 @@
     *: "Перемещение..."
   </dest>
   <voice>
-    *: "Перемещение..."
+    *: "Перемещение"
   </voice>
 </phrase>
 <phrase>
@@ -9162,7 +9160,7 @@
     *: "%s не существует"
   </dest>
   <voice>
-    *: "%s не существует"
+    *: "Каталог плейлистов не существует"
   </voice>
 </phrase>
 <phrase>
@@ -12865,7 +12863,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "GNU Шахматы"
   </voice>
 </phrase>
 <phrase>
@@ -13255,7 +13253,7 @@
     *: "Думаю..."
   </dest>
   <voice>
-    *: "Думаю..."
+    *: "Думаю"
   </voice>
 </phrase>
 <phrase>
@@ -15071,7 +15069,7 @@
     *: "Очередь..."
   </dest>
   <voice>
-    *: "Очередь..."
+    *: "Очередь"
   </voice>
 </phrase>
 <phrase>
@@ -15639,7 +15637,7 @@
     *: "Установить как..."
   </dest>
   <voice>
-    *: "Установить как..."
+    *: "Установить как"
   </voice>
 </phrase>
 <phrase>
@@ -15695,10 +15693,10 @@
     *: "Add to Playlist..."
   </source>
   <dest>
-    *: "Добавить к списку проигрывания..."
+    *: "Добавить к списку воспроизведения.."
   </dest>
   <voice>
-    *: "Добавить к списку проигрывания..."
+    *: "Добавить к списку воспроизведения"
   </voice>
 </phrase>
 <phrase>
@@ -15723,10 +15721,10 @@
     *: "Playing Next..."
   </source>
   <dest>
-    *: "Дальнейшее проигрывание..."
+    *: "Воспроизвести далее..."
   </dest>
   <voice>
-    *: "Дальнейшее проигрывание..."
+    *: "Воспроизвести далее..."
   </voice>
 </phrase>
 <phrase>
@@ -15883,7 +15881,7 @@
   desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
   user: core
   <source>
-    *: "Selection too big, %d random tracks will be picked from it"
+    *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
     *: "Выбор слишком велик, из него будут выбраны %d случайных треков"
@@ -16476,5 +16474,33 @@
   </dest>
   <voice>
     *: "Оставшийся"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Название и альбом по тегам ID3"
+  </dest>
+  <voice>
+    *: "Название и альбом по тегам"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Название из ID3-тегов"
+  </dest>
+  <voice>
+    *: "Название из тегов"
   </voice>
 </phrase>
