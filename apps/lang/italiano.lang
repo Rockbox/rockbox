@@ -16466,3 +16466,31 @@
     *: "Disabilita lo scorrimento del menu principale"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Titolo e Album da ID3 tag"
+  </dest>
+  <voice>
+    *: "Titolo e Album da tag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Titolo da ID3 tag"
+  </dest>
+  <voice>
+    *: "Titolo da tag"
+  </voice>
+</phrase>
