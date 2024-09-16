@@ -3405,7 +3405,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Аккумулятор: Заряжается"
+    charging: "Аккумулятор заряжен"
   </voice>
 </phrase>
 <phrase>
@@ -3435,7 +3435,7 @@
     *: "Диск:"
   </dest>
   <voice>
-    *: "Диск:"
+    *: "Размер диска"
   </voice>
 </phrase>
 <phrase>
@@ -3651,7 +3651,7 @@
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7721,11 +7721,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Реактивировать)"
+    remote: "(Громкость - : чтобы снова включить)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Реактивировать)"
+    remote: "(Уменьшите громкость, чтобы снова включить)"
   </voice>
 </phrase>
 <phrase>
@@ -7753,7 +7753,7 @@
     *: "Режим:"
   </dest>
   <voice>
-    *: "Режим:"
+    *: "Режим"
   </voice>
 </phrase>
 <phrase>
@@ -8895,11 +8895,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MPEG Слой 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MPEG Слой 3"
   </voice>
 </phrase>
 <phrase>
@@ -9441,7 +9441,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "Oк"
   </voice>
 </phrase>
 <phrase>
@@ -9978,7 +9978,7 @@
     *: "Следующий трек:"
   </dest>
   <voice>
-    *: "Следующий трэк:"
+    *: "Следующий трэк"
   </voice>
 </phrase>
 <phrase>
@@ -9992,7 +9992,7 @@
     *: "Следующий:"
   </dest>
   <voice>
-    *: "Следующий:"
+    *: "Следующий"
   </voice>
 </phrase>
 <phrase>
@@ -11282,11 +11282,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "USB: Скрыть внутренний диск"
+    multidrive_usb: "Скрыть внутренний диск USB"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "USB: Скрыть внутренний диск"
+    multidrive_usb: "Скрыть внутренний диск USB"
   </voice>
 </phrase>
 <phrase>
@@ -15724,7 +15724,7 @@
     *: "Воспроизвести далее..."
   </dest>
   <voice>
-    *: "Воспроизвести далее..."
+    *: "Воспроизвести далее"
   </voice>
 </phrase>
 <phrase>
@@ -15980,7 +15980,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "День"
+    *: "~dAY"
   </dest>
   <voice>
     *: ""
