@@ -4,12 +4,11 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
 #
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
@@ -29,6 +28,7 @@
 # - James Hunt
 # - Dmitriy Gamza
 # - Roman Levkin-Taymenev
+# - Igor Poretsky
 # - Dmitry Prozorov
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -3511,7 +3511,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Текущее время:"
+    rtc: "Текущее время"
   </voice>
 </phrase>
 <phrase>
@@ -5011,7 +5011,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "~."
   </dest>
   <voice>
     *: "точка"
@@ -10047,11 +10047,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -12695,7 +12695,7 @@
     *: "Уровень 8: 1 ход / 15 мин."
   </dest>
   <voice>
-    *: "Уровень 8: 1 ход за 15 минут"
+    *: "Уровень 8, 1 ход за 15 минут"
   </voice>
 </phrase>
 <phrase>
@@ -12807,7 +12807,7 @@
     *: "Уровень 3: 60 ходов / 30 min."
   </dest>
   <voice>
-    *: "Уровень 3: 60 ходов за 30 минут"
+    *: "Уровень 3, 60 ходов за 30 минут"
   </voice>
 </phrase>
 <phrase>
@@ -12849,7 +12849,7 @@
     *: "Уровень 5: 40 ходов / 60 мин."
   </dest>
   <voice>
-    *: "Уровень 5: 40 ходов за 60 минут"
+    *: "Уровень 5, 40 ходов за 60 минут"
   </voice>
 </phrase>
 <phrase>
@@ -12877,7 +12877,7 @@
     *: "Уровень 9: 1 ход / 60 мин."
   </dest>
   <voice>
-    *: "Уровень 9: 1 ход за 60 минут"
+    *: "Уровень 9, 1 ход за 60 минут"
   </voice>
 </phrase>
 <phrase>
@@ -13079,7 +13079,7 @@
     *: "Уровень 4: 40 ходов / 30 мин."
   </dest>
   <voice>
-    *: "Уровень 4: 40 ходов за 30 минут"
+    *: "Уровень 4, 40 ходов за 30 минут"
   </voice>
 </phrase>
 <phrase>
@@ -13385,7 +13385,7 @@
     *: "Уровень 2: 60 ходов / 15 мин."
   </dest>
   <voice>
-    *: "Уровень 2: 60 ходов за 15 минут"
+    *: "Уровень 2, 60 ходов за 15 минут"
   </voice>
 </phrase>
 <phrase>
@@ -13441,7 +13441,7 @@
     *: "Уровень 1: 60 ходов / 5 мин."
   </dest>
   <voice>
-    *: "Уровень 1: 60 ходов за 5 минут"
+    *: "Уровень 1, 60 ходов за 5 минут"
   </voice>
 </phrase>
 <phrase>
@@ -13834,7 +13834,7 @@
     *: "Уровень 7: 40 ходов / 240 мин."
   </dest>
   <voice>
-    *: "Уровень 7: 40 ходов за 240 минут"
+    *: "Уровень 7, 40 ходов за 240 минут"
   </voice>
 </phrase>
 <phrase>
@@ -14110,7 +14110,7 @@
     *: "Уровень 10: 1 ход / 600 min."
   </dest>
   <voice>
-    *: "Уровень 10: 1 ход за 600 минут"
+    *: "Уровень 10, 1 ход за 600 минут"
   </voice>
 </phrase>
 <phrase>
@@ -14267,7 +14267,7 @@
     *: "Уровень 6: 40 ходов / 120 мин."
   </dest>
   <voice>
-    *: "Уровень 6: 40 ходов за 120 минут"
+    *: "Уровень 6, 40 ходов за 120 минут"
   </voice>
 </phrase>
 <phrase>
@@ -15058,7 +15058,7 @@
     es9218: "Низкая громкость"
   </voice>
 </phrase>
- <phrase>
+<phrase>
   id: LANG_QUEUE_MENU
   desc: in onplay menu
   user: core
@@ -15598,17 +15598,17 @@
   user: core
   <source>
     *: none
-    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
   </source>
   <dest>
     *: none
-    clear_settings_on_hold, iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
+    clear_settings_on_hold,iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Сбросить настройки при включенной блокировке во время загрузки"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold, iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
+    clear_settings_on_hold,iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
     ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Сбросить настройки при включенной блокировке во время загрузки"
   </voice>
 </phrase>
@@ -16428,7 +16428,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
