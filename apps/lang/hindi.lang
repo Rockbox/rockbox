@@ -444,10 +444,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<शुरू मत कर>"
+    *: "[शुरू मत कर]"
   </dest>
   <voice>
     *: "शुरू मत कर"
@@ -472,10 +472,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<गलत बूकमारक>"
+    *: "[गलत बूकमारक]"
   </dest>
   <voice>
     *: "गलत बूकमारक"
@@ -1252,13 +1252,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<सब tracks>"
+    *: "[सब tracks]"
   </dest>
   <voice>
     *: "सब tracks"
@@ -3266,10 +3266,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<कोई इनफो नही है>"
+    *: "[कोई इनफो नही है]"
   </dest>
   <voice>
     *: "कोई इनफो नही है"

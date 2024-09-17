@@ -484,10 +484,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Återuppta inte>"
+    *: "[Återuppta inte]"
   </dest>
   <voice>
     *: "Återuppta inte"
@@ -512,10 +512,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Felaktigt bokmärke>"
+    *: "[Felaktigt bokmärke]"
   </dest>
   <voice>
     *: "Felaktigt bokmärke"
@@ -2305,13 +2305,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Alla spår>"
+    *: "[Alla spår]"
   </dest>
   <voice>
     *: "Alla spår"
@@ -7153,10 +7153,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Saknas>"
+    *: "[Saknas]"
   </dest>
   <voice>
     *: "Saknas"
@@ -10179,13 +10179,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Slumpvald>"
+    *: "[Slumpvald]"
   </dest>
   <voice>
     *: "Slumpvald"
@@ -12040,13 +12040,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Ej taggad>"
+    *: "[Ej taggad]"
   </dest>
   <voice>
     *: "Ej taggad"

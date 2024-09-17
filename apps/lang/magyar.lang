@@ -470,10 +470,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Nincs folytatás>"
+    *: "[Nincs folytatás]"
   </dest>
   <voice>
     *: "Do not resume"
@@ -498,10 +498,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Érvénytelen könyvjelző>"
+    *: "[Érvénytelen könyvjelző]"
   </dest>
   <voice>
     *: "Invalid Bookmark"
@@ -2118,13 +2118,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Minden szám>"
+    *: "[Minden szám]"
   </dest>
   <voice>
     *: "All tracks"
@@ -6751,10 +6751,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Nincs adat>"
+    *: "[Nincs adat]"
   </dest>
   <voice>
     *: "Nincs adat"
@@ -9513,13 +9513,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Véletlenszerűen>"
+    *: "[Véletlenszerűen]"
   </dest>
   <voice>
     *: "Random"
@@ -10868,13 +10868,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Ismeretlen>"
+    *: "[Ismeretlen]"
   </dest>
   <voice>
     *: "Ismeretlen"

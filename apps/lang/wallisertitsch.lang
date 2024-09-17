@@ -2849,10 +2849,10 @@
   desc: ID3 info is missing
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<kei Info>"
+    *: "[kei Info]"
   </dest>
   <voice>
     *: "kei Info"

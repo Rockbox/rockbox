@@ -484,10 +484,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<レジュームしない>"
+    *: "[レジュームしない]"
   </dest>
   <voice>
     *: "レジュームしない"
@@ -512,10 +512,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<無効なブックマーク>"
+    *: "[無効なブックマーク]"
   </dest>
   <voice>
     *: "無効なブックマーク"
@@ -2306,13 +2306,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<すべてのトラック>"
+    *: "[すべてのトラック]"
   </dest>
   <voice>
     *: "すべてのトラック"
@@ -7154,10 +7154,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<情報無し>"
+    *: "[情報無し]"
   </dest>
   <voice>
     *: "情報無し"
@@ -10180,13 +10180,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<ランダム>"
+    *: "[ランダム]"
   </dest>
   <voice>
     *: "ランダム"
@@ -12041,13 +12041,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<タグ無し>"
+    *: "[タグ無し]"
   </dest>
   <voice>
     *: "タグ無し"

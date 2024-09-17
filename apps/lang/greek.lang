@@ -482,10 +482,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Χωρίς συνέχιση>"
+    *: "[Χωρίς συνέχιση]"
   </dest>
   <voice>
     *: "Χωρίς συνέχιση"
@@ -510,10 +510,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Μη έγκυρος σελιδοδείκτης>"
+    *: "[Μη έγκυρος σελιδοδείκτης]"
   </dest>
   <voice>
     *: "Μη έγκυρος σελιδοδείκτης"
@@ -2286,13 +2286,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Όλα τα κομμάτια>"
+    *: "[Όλα τα κομμάτια]"
   </dest>
   <voice>
     *: "Όλα τα κομμάτια"
@@ -7100,10 +7100,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Χωρίς πληροφορίες>"
+    *: "[Χωρίς πληροφορίες]"
   </dest>
   <voice>
     *: "Χωρίς πληροφορίες"
@@ -10177,13 +10177,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Τυχαία>"
+    *: "[Τυχαία]"
   </dest>
   <voice>
     *: "Τυχαία"
@@ -11478,13 +11478,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Χωρίς ετικέτα>"
+    *: "[Χωρίς ετικέτα]"
   </dest>
   <voice>
     *: "Χωρίς ετικέτα"

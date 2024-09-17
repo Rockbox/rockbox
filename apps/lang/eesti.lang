@@ -4620,10 +4620,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<No Info>"
+    *: "[No Info]"
   </dest>
   <voice>
     *: "No Info"
@@ -7131,13 +7131,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Kõik lood>"
+    *: "[Kõik lood]"
   </dest>
   <voice>
     *: "All tracks"

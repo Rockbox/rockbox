@@ -4851,10 +4851,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Ei tietoja>"
+    *: "[Ei tietoja]"
   </dest>
   <voice>
     *: "Ei tietoja"
@@ -7390,13 +7390,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Kaikki kappaleet>"
+    *: "[Kaikki kappaleet]"
   </dest>
   <voice>
     *: ""
@@ -8942,10 +8942,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Älä jatka>"
+    *: "[Älä jatka]"
   </dest>
   <voice>
     *: "Älä jatka"
@@ -8970,10 +8970,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Kirjanmerkki ei kelpaa>"
+    *: "[Kirjanmerkki ei kelpaa]"
   </dest>
   <voice>
     *: "Kirjanmerkki ei kelpaa"
@@ -10157,13 +10157,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Satunnainen>"
+    *: "[Satunnainen]"
   </dest>
   <voice>
     *: "Satunnainen"
@@ -11910,13 +11910,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Tunnisteeton>"
+    *: "[Tunnisteeton]"
   </dest>
   <voice>
     *: "Tunnisteeton"

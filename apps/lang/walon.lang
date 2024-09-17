@@ -480,10 +480,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Nén rataker>"
+    *: "[Nén rataker]"
   </dest>
   <voice>
     *: "Nén rataker"
@@ -508,10 +508,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Rimåke nén valåbe>"
+    *: "[Rimåke nén valåbe]"
   </dest>
   <voice>
     *: "Rimåke nén valåbe"
@@ -2316,13 +2316,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Tos les bokets>"
+    *: "[Tos les bokets]"
   </dest>
   <voice>
     *: "Tos les bokets"
@@ -7162,10 +7162,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Nole infô.>"
+    *: "[Nole infô.]"
   </dest>
   <voice>
     *: "Nole infô."
@@ -10188,13 +10188,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<D'astcheyance>"
+    *: "[D'astcheyance]"
   </dest>
   <voice>
     *: "astcheyance"

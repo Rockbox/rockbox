@@ -482,10 +482,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<אל תמשיך>"
+    *: "[אל תמשיך]"
   </dest>
   <voice>
     *: "אל תמשיך"
@@ -510,10 +510,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<סימניה פגומה>"
+    *: "[סימניה פגומה]"
   </dest>
   <voice>
     *: "סימניה פגומה"
@@ -2332,13 +2332,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<כל השירים>"
+    *: "[כל השירים]"
   </dest>
   <voice>
     *: "כל השירים"
@@ -7179,10 +7179,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<אין מידע>"
+    *: "[אין מידע]"
   </dest>
   <voice>
     *: "אין מידע"
@@ -10205,13 +10205,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<אקראי>"
+    *: "[אקראי]"
   </dest>
   <voice>
     *: "אקראי"
@@ -11961,13 +11961,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </dest>
   <voice>
     *: "Untagged"

@@ -476,10 +476,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Neatsākt>"
+    *: "[Neatsākt]"
   </dest>
   <voice>
     *: "neatsaakt"
@@ -504,10 +504,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Nederīga Grāmatzīme>"
+    *: "[Nederīga Grāmatzīme]"
   </dest>
   <voice>
     *: "nederiiga graamatziime"
@@ -2297,13 +2297,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Visas dziesmas>"
+    *: "[Visas dziesmas]"
   </dest>
   <voice>
     *: "visas dziesmas"
@@ -7145,10 +7145,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Nav Informācijas>"
+    *: "[Nav Informācijas]"
   </dest>
   <voice>
     *: "Nav Informācijas"
@@ -10171,13 +10171,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Dažādi>"
+    *: "[Dažādi]"
   </dest>
   <voice>
     *: "dazhaadi"
@@ -12015,13 +12015,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Neatzīmēts>"
+    *: "[Neatzīmēts]"
   </dest>
   <voice>
     *: "neatziimeets"

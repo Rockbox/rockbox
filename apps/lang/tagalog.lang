@@ -476,10 +476,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Hindi Tuloy>"
+    *: "[Hindi Tuloy]"
   </dest>
   <voice>
     *: "Hindi Tuloy"
@@ -504,10 +504,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Walang-saysay Bookmark>"
+    *: "[Walang-saysay Bookmark]"
   </dest>
   <voice>
     *: "Walang-saysay Bookmark"
@@ -2296,13 +2296,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Lahat ng landas>"
+    *: "[Lahat ng landas]"
   </dest>
   <voice>
     *: "All tracks"
@@ -6490,10 +6490,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Wala Inpormasyon>"
+    *: "[Wala Inpormasyon]"
   </dest>
   <voice>
     *: "Wala Inpormasyon"
@@ -7194,13 +7194,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Pagkakataon>"
+    *: "[Pagkakataon]"
   </dest>
   <voice>
     *: "Random"
@@ -11701,13 +11701,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </dest>
   <voice>
     *: "Untagged"

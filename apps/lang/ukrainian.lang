@@ -476,10 +476,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Не Продовжувати>"
+    *: "[Не Продовжувати]"
   </dest>
   <voice>
     *: "Не Продовжувати"
@@ -504,10 +504,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Помилкова Закладка>"
+    *: "[Помилкова Закладка]"
   </dest>
   <voice>
     *: "Помилкова Закладка"
@@ -2297,13 +2297,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Всi треки>"
+    *: "[Всi треки]"
   </dest>
   <voice>
     *: "Всi треки"
@@ -7143,10 +7143,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Iнформацiя вiдсутня>"
+    *: "[Iнформацiя вiдсутня]"
   </dest>
   <voice>
     *: "Iнформацiя вiдсутня"
@@ -10169,13 +10169,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Випадково>"
+    *: "[Випадково]"
   </dest>
   <voice>
     *: "Випадково"
@@ -11835,13 +11835,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Не тегований>"
+    *: "[Не тегований]"
   </dest>
   <voice>
     *: "Не тегований"

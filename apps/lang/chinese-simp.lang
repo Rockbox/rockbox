@@ -4395,13 +4395,13 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<无信息>"
+    *: "[无信息]"
   </dest>
   <voice>
-    *: "<无信息>"
+    *: "[无信息]"
   </voice>
 </phrase>
 <phrase>
@@ -6792,13 +6792,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<所有曲目>"
+    *: "[所有曲目]"
   </dest>
   <voice>
     *: "所有曲目"
@@ -8371,10 +8371,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<不从书签处恢复播放>"
+    *: "[不从书签处恢复播放]"
   </dest>
   <voice>
     *: "不从书签处恢复播放"
@@ -8545,10 +8545,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<无效书签>"
+    *: "[无效书签]"
   </dest>
   <voice>
     *: "这个书签无效"
@@ -9195,13 +9195,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<随机>"
+    *: "[随机]"
   </dest>
   <voice>
     *: "随机"
@@ -10923,13 +10923,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<无标签/元数据>"
+    *: "[无标签/元数据]"
   </dest>
   <voice>
     *: "没有标签或者元数据"

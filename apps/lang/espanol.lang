@@ -3188,10 +3188,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Sin información>"
+    *: "[Sin información]"
   </dest>
   <voice>
     *: "Sin información"
@@ -5681,13 +5681,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Todas las pistas>"
+    *: "[Todas las pistas]"
   </dest>
   <voice>
     *: "Todas las Pistas"
@@ -8935,13 +8935,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Aleatorio>"
+    *: "[Aleatorio]"
   </dest>
   <voice>
     *: "Aleatorio"
@@ -9647,10 +9647,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<No continuar>"
+    *: "[No continuar]"
   </dest>
   <voice>
     *: "No continuar"
@@ -9852,10 +9852,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Marcador incorrecto>"
+    *: "[Marcador incorrecto]"
   </dest>
   <voice>
     *: "Marcador incorrecto"
@@ -11864,13 +11864,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Sin etiqueta>"
+    *: "[Sin etiqueta]"
   </dest>
   <voice>
     *: "Sin etiqueta"

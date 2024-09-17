@@ -4729,10 +4729,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Sen Informoj>"
+    *: "[Sen Informoj]"
   </dest>
   <voice>
     *: "Sen Informoj"
@@ -7234,13 +7234,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Ĉiuj kantoj>"
+    *: "[Ĉiuj kantoj]"
   </dest>
   <voice>
     *: "Ĉiuj kantoj"

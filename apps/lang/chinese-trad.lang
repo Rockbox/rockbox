@@ -4502,13 +4502,13 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<無資訊>"
+    *: "[無資訊]"
   </dest>
   <voice>
-    *: "<無資訊>"
+    *: "[無資訊]"
   </voice>
 </phrase>
 <phrase>
@@ -6913,16 +6913,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<所有曲目>"
+    *: "[所有曲目]"
   </dest>
   <voice>
-    *: "<所有曲目>"
+    *: "[所有曲目]"
   </voice>
 </phrase>
 <phrase>
@@ -8524,13 +8524,13 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<不要恢復書簽>"
+    *: "[不要恢復書簽]"
   </dest>
   <voice>
-    *: "<不要恢復書簽>"
+    *: "[不要恢復書簽]"
   </voice>
 </phrase>
 <phrase>
@@ -8726,13 +8726,13 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<無效書簽>"
+    *: "[無效書簽]"
   </dest>
   <voice>
-    *: "<無效書簽>"
+    *: "[無效書簽]"
   </voice>
 </phrase>
 <phrase>
@@ -9393,13 +9393,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<隨機>"
+    *: "[隨機]"
   </dest>
   <voice>
     *: "隨機"

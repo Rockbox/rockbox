@@ -543,10 +543,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Nesugrįžti>"
+    *: "[Nesugrįžti]"
   </dest>
   <voice>
     *: "Nesugrįžti"
@@ -571,10 +571,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Klaidinga žymelė>"
+    *: "[Klaidinga žymelė]"
   </dest>
   <voice>
     *: "Klaidinga žymelė"
@@ -2378,13 +2378,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Visi įrašai>"
+    *: "[Visi įrašai]"
   </dest>
   <voice>
     *: "Visi įrašai"
@@ -7221,10 +7221,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Nėra informacijos>"
+    *: "[Nėra informacijos]"
   </dest>
   <voice>
     *: "Nėra informacijos"
@@ -10247,13 +10247,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Atsitiktinis>"
+    *: "[Atsitiktinis]"
   </dest>
   <voice>
     *: "Atsitiktinis"

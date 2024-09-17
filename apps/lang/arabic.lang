@@ -3613,13 +3613,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<كل الملفات>"
+    *: "[كل الملفات]"
   </dest>
   <voice>
     *: "All tracks"
@@ -3999,10 +3999,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<المعلومات غير متوفرة>"
+    *: "[المعلومات غير متوفرة]"
   </dest>
   <voice>
     *: "المعلومات غير متوفرة"
@@ -4863,13 +4863,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<عشوائي>"
+    *: "[عشوائي]"
   </dest>
   <voice>
     *: "Random"

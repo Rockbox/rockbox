@@ -3713,10 +3713,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Engar uppl.>"
+    *: "[Engar uppl.]"
   </dest>
   <voice>
     *: "Engar uppl."

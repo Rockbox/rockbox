@@ -482,10 +482,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Nepokračovat>"
+    *: "[Nepokračovat]"
   </dest>
   <voice>
     *: "Nepokračovat"
@@ -510,10 +510,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Neplatná záložka>"
+    *: "[Neplatná záložka]"
   </dest>
   <voice>
     *: "Neplatná záložka"
@@ -2303,13 +2303,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Vsechny skladby>"
+    *: "[Vsechny skladby]"
   </dest>
   <voice>
     *: "Všechny skladby"
@@ -7154,10 +7154,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Bez informace>"
+    *: "[Bez informace]"
   </dest>
   <voice>
     *: "Bez informace"
@@ -10189,13 +10189,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Nahodne>"
+    *: "[Nahodne]"
   </dest>
   <voice>
     *: "Náhodně"
@@ -12050,13 +12050,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Bez popisu>"
+    *: "[Bez popisu]"
   </dest>
   <voice>
     *: "Bez popisu"

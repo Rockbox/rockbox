@@ -490,10 +490,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Nicht fortsetzen>"
+    *: "[Nicht fortsetzen]"
   </dest>
   <voice>
     *: "Nicht fortsetzen"
@@ -518,10 +518,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Ungültiges Lesezeichen>"
+    *: "[Ungültiges Lesezeichen]"
   </dest>
   <voice>
     *: "Ungültiges Lesezeichen"
@@ -2112,13 +2112,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Alle Titel>"
+    *: "[Alle Titel]"
   </dest>
   <voice>
     *: "Alle Titel"
@@ -6559,10 +6559,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<keine Info>"
+    *: "[keine Info]"
   </dest>
   <voice>
     *: "keine Info"
@@ -9207,13 +9207,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Zufällig>"
+    *: "[Zufällig]"
   </dest>
   <voice>
     *: "Zufällig"
@@ -10907,13 +10907,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Unbekannt>"
+    *: "[Unbekannt]"
   </dest>
   <voice>
     *: "Unbekannt"

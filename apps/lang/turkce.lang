@@ -446,10 +446,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<Devam etme>"
+    *: "[Devam etme]"
   </dest>
   <voice>
     *: "Devam etme"
@@ -474,10 +474,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Geçersiz Yer imi>"
+    *: "[Geçersiz Yer imi]"
   </dest>
   <voice>
     *: "Geçersiz Yer imi"
@@ -2980,13 +2980,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Rastgele>"
+    *: "[Rastgele]"
   </dest>
   <voice>
     *: "Rastgele"
@@ -8017,16 +8017,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Etiketlenmemiş>"
+    *: "[Etiketlenmemiş]"
   </dest>
   <voice>
-    *: "<Etiketlenmemiş>"
+    *: "[Etiketlenmemiş]"
   </voice>
 </phrase>
 <phrase>
@@ -8304,10 +8304,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<Bilgi Yok>"
+    *: "[Bilgi Yok]"
   </dest>
   <voice>
     *: "Bilgi yok"
@@ -10335,13 +10335,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Tüm parçalar>"
+    *: "[Tüm parçalar]"
   </dest>
   <voice>
     *: "Tüm parçalar"

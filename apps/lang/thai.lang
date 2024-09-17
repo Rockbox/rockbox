@@ -477,10 +477,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<ไม่ต้องเปิดเพลงที่เล่นค้างไว้>"
+    *: "[ไม่ต้องเปิดเพลงที่เล่นค้างไว้]"
   </dest>
   <voice>
     *: "Do not resume"
@@ -505,10 +505,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<บุ๊คมาร์กไม่ถูกต้อง>"
+    *: "[บุ๊คมาร์กไม่ถูกต้อง]"
   </dest>
   <voice>
     *: "Invalid Bookmark"
@@ -2296,13 +2296,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<เพลงทั้งหมด>"
+    *: "[เพลงทั้งหมด]"
   </dest>
   <voice>
     *: "All tracks"
@@ -7124,10 +7124,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<ไม่มีข้อมูล>"
+    *: "[ไม่มีข้อมูล]"
   </dest>
   <voice>
     *: "ไม่มีข้อมูล"
@@ -10007,13 +10007,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<ทำการสุ่ม>"
+    *: "[ทำการสุ่ม]"
   </dest>
   <voice>
     *: "Random"
@@ -11941,13 +11941,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<ลบป้าย>"
+    *: "[ลบป้าย]"
   </dest>
   <voice>
     *: "Untagged"

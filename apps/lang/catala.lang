@@ -478,10 +478,10 @@
   desc: top item in the list when asking user about bookmark auto load
   user: core
   <source>
-    *: "<Don't Resume>"
+    *: "[Don't Resume]"
   </source>
   <dest>
-    *: "<No reprendre>"
+    *: "[No reprendre]"
   </dest>
   <voice>
     *: "No reprendre"
@@ -506,10 +506,10 @@
   desc: bookmark selection list, bookmark couldn't be parsed
   user: core
   <source>
-    *: "<Invalid Bookmark>"
+    *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "<Punt de pàgina invàlid>"
+    *: "[Punt de pàgina invàlid]"
   </dest>
   <voice>
     *: "Punt de Pàgina invàlid"
@@ -2298,13 +2298,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  desc: "[All tracks]" entry in tag browser
   user: core
   <source>
-    *: "<All tracks>"
+    *: "[All tracks]"
   </source>
   <dest>
-    *: "<Totes les pistes>"
+    *: "[Totes les pistes]"
   </dest>
   <voice>
     *: "Totes les pistes"
@@ -7141,10 +7141,10 @@
   desc: in tag viewer
   user: core
   <source>
-    *: "<No Info>"
+    *: "[No Info]"
   </source>
   <dest>
-    *: "<sense info>"
+    *: "[sense info]"
   </dest>
   <voice>
     *: "sense info"
@@ -10166,13 +10166,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_RANDOM
-  desc: "<Random>" entry in tag browser
+  desc: "[Random]" entry in tag browser
   user: core
   <source>
-    *: "<Random>"
+    *: "[Random]"
   </source>
   <dest>
-    *: "<Aleatori>"
+    *: "[Aleatori]"
   </dest>
   <voice>
     *: "Aleatori"
@@ -12027,13 +12027,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
+  desc: "[untagged]" entry in tag browser
   user: core
   <source>
-    *: "<Untagged>"
+    *: "[Untagged]"
   </source>
   <dest>
-    *: "<Sense etiquetar>"
+    *: "[Sense etiquetar]"
   </dest>
   <voice>
     *: "Sense etiquetar"
