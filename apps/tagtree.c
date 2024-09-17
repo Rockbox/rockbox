@@ -24,7 +24,7 @@
  * support the tag cache interface.
  */
 
-/*#define LOGF_ENABLE*/
+//#define LOGF_ENABLE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +58,7 @@
 #include "panic.h"
 #include "onplay.h"
 #include "plugin.h"
+#include "language.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
@@ -176,7 +177,8 @@ static int format_count;
 
 #define MENUENTRY_MAX_NAME 64
 struct menu_entry {
-    char name[MENUENTRY_MAX_NAME];
+    char _name[MENUENTRY_MAX_NAME];
+    const unsigned char *name;
     int type;
     struct search_instruction {
         char name[MENUENTRY_MAX_NAME];
@@ -191,7 +193,8 @@ struct menu_entry {
 };
 
 struct menu_root {
-    char title[MENUENTRY_MAX_NAME];
+    char _title[MENUENTRY_MAX_NAME];
+    const unsigned char *title;
     char id[MAX_MENU_ID_SIZE];
     int itemcount;
     struct menu_entry *items[TAGMENU_MAX_ITEMS];
@@ -228,7 +231,11 @@ static int move_callback(int handle, void* current, void* new)
     ptrdiff_t diff = new - current;
 
     if (menu)
+    {
+        if ((char *) menu->title == (char *) menu->_title)
+            UPDATE(menu->title, diff);
         UPDATE(menu, diff);
+    }
 
     if (csi)
         UPDATE(csi, diff);
@@ -251,8 +258,12 @@ static int move_callback(int handle, void* current, void* new)
                     UPDATE(mentry->si.clause[k][l], diff);
                 }
             }
+            if ((char *) menuroot->items[j]->name == (char *) menuroot->items[j]->_name)
+                UPDATE(menuroot->items[j]->name, diff);
             UPDATE(menuroot->items[j], diff);
         }
+        if ((char *) menus[i]->title == (char *) menus[i]->_title)
+            UPDATE(menus[i]->title, diff);
         UPDATE(menus[i], diff);
     }
 
@@ -796,11 +807,25 @@ static bool parse_search(struct menu_entry *entry, const char *str)
     strp = str;
 
     /* Parse entry name */
-    if (get_token_str(entry->name, sizeof entry->name) < 0)
+    if (get_token_str(entry->_name, sizeof entry->_name) < 0)
     {
         logf("No name found.");
         return false;
     }
+
+    /* Attempt to entry name to lang_id for voicing/translation
+    (excepted for single character entries like those in the 'First Letter' menus)
+    */
+    if (entry->_name[0] != '\0' && entry->_name[1] != '\0')
+    {
+        int lang_id = lang_english_to_id(entry->_name);
+        if (lang_id >= 0)
+            entry->name = ID2P(lang_id);
+        else
+            entry->name = entry->_name;
+    }
+    else
+        entry->name = entry->_name;
 
     /* Parse entry type */
     if (get_tag(&entry->type) <= 0)
@@ -1223,12 +1248,20 @@ static int parse_line(int n, char *buf, void *parameters)
                     strmemccpy(menu->id, data, MAX_MENU_ID_SIZE);
                 }
 
-                if (get_token_str(menu->title, sizeof(menu->title)) < 0)
+                if (get_token_str(menu->_title, sizeof(menu->_title)) < 0)
                 {
                     logf("%%menu_start title empty");
                     return 0;
                 }
-                logf("menu: %s", menu->title);
+
+                /* Attempt to match title to lang_id for voicing/translation */
+                int lang_id = lang_english_to_id(menu->_title);
+                if (lang_id >= 0)
+                    menu->title = ID2P(lang_id);
+                else
+                    menu->title = menu->_title;
+
+                logf("menu: %s id: %ld", P2STR(menu->title), P2ID(menu->title));
 
                 if (variable == menu_byfirstletter)
                 {
@@ -1355,7 +1388,7 @@ static void tagtree_unload(struct tree_context *c)
         tree_unlock_cache(c);
 }
 
-static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 'custom view'*/
+static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 'custom menu'*/
 {
     max_history_level = 0;
     format_count = 0;
@@ -1635,7 +1668,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         if (offset == 0)
         {
             dptr->newtable = TABLE_ALLSUBENTRIES;
-            dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
+            dptr->name = ID2P(LANG_TAGNAVI_ALL_TRACKS);
             dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
@@ -1644,7 +1677,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         if (offset <= 1)
         {
             dptr->newtable = TABLE_NAVIBROWSE;
-            dptr->name = str(LANG_TAGNAVI_RANDOM);
+            dptr->name = ID2P(LANG_TAGNAVI_RANDOM);
             dptr->extraseek = -1;
             dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
@@ -1864,7 +1897,12 @@ static int load_root(struct tree_context *c)
 
     for (i = 0; i < menu->itemcount; i++)
     {
-        dptr->name = menu->items[i]->name;
+
+        dptr->name = (char*)menu->items[i]->name;
+
+        logf( "%s loading menu %d name: %s, lang_id %ld", __func__, i,
+             P2STR((unsigned char*)dptr->name),P2ID((unsigned char*)dptr->name));
+
         switch (menu->items[i]->type)
         {
             case menu_next:
@@ -2062,8 +2100,12 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
                 csi = &menu->items[seek]->si;
                 c->currextra = 0;
 
-                strmemccpy(current_title[c->currextra], dptr->name,
+                unsigned char *name = dptr->name;
+
+                strmemccpy(current_title[c->currextra], P2STR(name),
                            sizeof(current_title[0]));
+
+                logf("%s (ROOT) current title %s", __func__, P2STR(name));
 
                 /* Read input as necessary. */
                 for (i = 0; i < csi->tagorder_count; i++)
@@ -2157,9 +2199,11 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
             else
                 c->dirlevel--;
 
+            unsigned char *name = dptr->name;
+            name = P2STR(name);
+            logf("%s (NAVI/ALLSUB) current title %s", __func__, name);
             /* Update the statusbar title */
-            strmemccpy(current_title[c->currextra], dptr->name,
-                       sizeof(current_title[0]));
+            strmemccpy(current_title[c->currextra], name, sizeof(current_title[0]));
             break;
 
         default:
@@ -2328,7 +2372,7 @@ static bool insert_all_playlist(struct tree_context *c,
         }
 
         fill_randomly = n > slots_remaining;
-    
+
         if (fill_randomly)
         {
             srand(current_tick);
@@ -2648,6 +2692,18 @@ char* tagtree_get_entry_name(struct tree_context *c, int id,
     struct tagentry *entry = tagtree_get_entry(c, id);
     if (!entry)
         return NULL;
+
+    unsigned char *name = entry->name;
+
+    int lang_id = P2ID(name);
+    logf("%s: '%s' id: %d\n", __func__,
+         P2STR(name), lang_id);
+    if (lang_id >= 0)
+    {
+        strmemccpy(buf,P2STR(name), bufsize);
+        return entry->name;
+    }
+
     strmemccpy(buf, entry->name, bufsize);
     return buf;
 }
@@ -2658,10 +2714,13 @@ char *tagtree_get_title(struct tree_context* c)
     switch (c->currtable)
     {
         case TABLE_ROOT:
-            return menu->title;
+            logf("%s (ROOT) %s", __func__,  P2STR(menu->title));
+            return P2STR(menu->title);
 
         case TABLE_NAVIBROWSE:
         case TABLE_ALLSUBENTRIES:
+            logf("%s (NAVI/ALLSUB) idx: %d %s", __func__,
+                 c->currextra, current_title[c->currextra]);
             return current_title[c->currextra];
     }
 

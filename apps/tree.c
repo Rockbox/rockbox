@@ -210,7 +210,7 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
 static int tree_voice_cb(int selected_item, void * data)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
-    char *name;
+    unsigned char *name;
     int attr=0;
     int customaction = ONPLAY_NO_CUSTOMACTION;
 #ifdef HAVE_TAGCACHE
@@ -222,6 +222,31 @@ static int tree_voice_cb(int selected_item, void * data)
         attr = tagtree_get_attr(local_tc);
         name = tagtree_get_entry_name(local_tc, selected_item, buf, sizeof(buf));
         customaction = tagtree_get_custom_action(local_tc);
+
+        /* See if name is an encoded ID, if it is, then speak it normally */
+        int lang_id = P2ID(name);
+        /*debugf("%s Found name %s id %d\n", __func__, P2STR(name), lang_id);*/
+        if (lang_id >= 0)
+        {
+            talk_id(lang_id, true);
+            return 0;
+        }
+
+        /* Otherwise, it is either a custom "header" or a database entry,
+           so try to look up a talk clip for it. */
+
+        // XXX this needs further work, so disable it for now
+        // -- need to distinguish between "headers" and entries
+        // each entry type ("artist", "album", etc) should be delineated
+        // so we can split the clips into subdirs.
+#if 0
+        if (talk_file(LANG_DIR"/database/", NULL,
+                      P2STR(name), file_thumbnail_ext, NULL, true) > 0)
+        {
+            return 0;
+        }
+        // XXX fall back to spelling it out?
+#endif
     }
     else
 #endif
@@ -479,7 +504,7 @@ static int update_dir(void)
                     if (*title == '\0')
                     {
                         /* Display "Files" for the root dir */
-                        title = str(LANG_DIR_BROWSER);
+                        title = ID2P(LANG_DIR_BROWSER);
                     }
                     icon = filetype_get_icon(ATTR_DIRECTORY);
                 }
@@ -489,7 +514,7 @@ static int update_dir(void)
 
     /* set title and icon, if nothing is set, clear the title
      * with NULL and icon as NOICON as the list is reused */
-    gui_synclist_set_title(list, title, icon);
+    gui_synclist_set_title(list, P2STR((unsigned char*)title), icon);
 
     gui_synclist_set_nb_items(list, tc.filesindir);
     gui_synclist_set_icon_callback(list,
