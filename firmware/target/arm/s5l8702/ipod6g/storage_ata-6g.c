@@ -521,7 +521,7 @@ static void ata_set_active(void)
 
 bool ata_disk_is_active(void)
 {
-    return ata_powered;
+    return ata_disk_can_poweroff() ? ata_powered : 0;
 }
 
 static int ata_set_feature(uint32_t feature, uint32_t param)

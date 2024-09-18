@@ -845,7 +845,7 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    return ata_state >= ATA_SPINUP;
+    return ata_disk_can_poweroff() ? (ata_state >= ATA_SPINUP) : 0;
 }
 
 void ata_sleepnow(void)
