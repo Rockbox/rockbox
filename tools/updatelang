@@ -476,9 +476,9 @@ foreach my $id (@langorder) {
 	}
 	my $sane = $lang{$id}{'voice'}{$tgt};
 	$sane =~ s/^~?(.*)/$1/;  # Strip off leading ~ if it's there as it's not a legal character otherwise
-        if ($sane =~ tr/%"~:\[\]<>{}//) {
+        if ($sane =~ tr/%"~:\[\]<>{}\|//) {
             # Suspicious characters that are not typically voiced..
-            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters (eg %,\",~,:,<,>,[,],{,}), please correct!\n";
+            $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' has some suspicious characters (eg %,\",~,:,<,>,[,],{,},|), please correct!\n";
 #            print "#!! '$id:$tgt' suspicious characters\n";
         }
 	if ($lang{$id}{'voice'}{$tgt} =~ /\.\.\./) {
