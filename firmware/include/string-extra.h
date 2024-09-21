@@ -30,7 +30,7 @@
 #include "memset16.h"
 
 #if defined(WIN32) || defined(APPLICATION) \
-        || defined(__PCTOOL__)
+        || defined(__PCTOOL__) || defined(SIMULATOR)
 #ifndef mempcpy
 #define mempcpy __builtin_mempcpy
 #endif

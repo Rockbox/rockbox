@@ -46,7 +46,9 @@ struct regs
      * give a decent amount of space and hope for the best...
      * FIXME: this isn't a great solution. */
     #undef MINSIGSTKSZ
-    #define MINSIGSTKSZ 16384
+    #endif
+    #ifndef MINSIGSTKSZ
+      #define MINSIGSTKSZ 16384
     #endif
     /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
     #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */

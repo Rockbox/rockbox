@@ -58,6 +58,10 @@
 #include "pcm_mixer.h"
 #endif
 
+#ifdef SIMULATOR
+#include <strings.h>
+#endif
+
 /* TODO: The audio thread really is doing multitasking of acting like a
          consumer and producer of tracks. It may be advantageous to better
          logically separate the two functions. I won't go that far just yet. */
@@ -1269,7 +1273,7 @@ static void playing_id3_sync(struct track_info *user_infop, struct audio_resume_
         }
         id3->skip_resume_adjustments = skip_resume_adjustments;
     }
-    
+
     id3_write(PLAYING_ID3, id3);
 
     if (!resume_info && id3)
@@ -2761,7 +2765,7 @@ static void audio_on_codec_complete(int status)
     skip_pending = TRACK_SKIP_AUTO;
 
     int id3_hid = 0;
-    if (audio_can_change_track(&trackstat, &id3_hid)) 
+    if (audio_can_change_track(&trackstat, &id3_hid))
     {
         audio_begin_track_change(
                 single_mode_do_pause(id3_hid)
@@ -3243,7 +3247,7 @@ static void audio_on_ff_rewind(long time)
         bool finish_load = cur_info.audio_hid < 0;
         if (finish_load)
         {
-            // track is not yet loaded so simply update resume details for upcoming finish_load_track and quit 
+            // track is not yet loaded so simply update resume details for upcoming finish_load_track and quit
             playing_id3_sync(&cur_info, &(struct audio_resume_info){ time, 0 }, true);
             return;
         }
