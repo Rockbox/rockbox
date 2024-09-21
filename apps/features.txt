@@ -229,6 +229,10 @@ backlight_fade_bool
 disk_storage
 #endif
 
+#if (CONFIG_STORAGE & STORAGE_SD)
+sd_storage
+#endif
+
 #if defined(HAS_REMOTE_BUTTON_HOLD)
 remote_button_hold
 #endif
