@@ -132,6 +132,11 @@ bool get_aac_metadata(int fd, struct mp3entry *entry)
         }
 #endif
     }
+    else
+    {
+        return false;
+    }
+
     entry->length = (unsigned long)((entry->filesize * 8LL + (entry->bitrate >> 1)) / entry->bitrate);
 
     return true;
