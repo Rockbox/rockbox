@@ -29,34 +29,32 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
-        case SDL_BUTTON_WHEELUP:
             new_btn = BUTTON_SCROLL_BACK;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
-        case SDL_BUTTON_WHEELDOWN:
             new_btn = BUTTON_SCROLL_FWD;
             break;
         case SDLK_PAGEUP:
-        case SDLK_KP9:
+        case SDLK_KP_9:
             new_btn = BUTTON_UP;
             break;
         case SDLK_PAGEDOWN:
-        case SDLK_KP3:
+        case SDLK_KP_3:
             new_btn = BUTTON_DOWN;
             break;
         case SDLK_KP_MINUS:
-        case SDLK_KP1:
+        case SDLK_KP_1:
             new_btn = BUTTON_POWER;
             break;
         case SDLK_h:
@@ -65,7 +63,7 @@ int key_to_button(int keyboard_button)
         case SDLK_KP_MULTIPLY:
             new_btn = BUTTON_HOME;
             break;
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_SPACE:
         case SDLK_KP_ENTER:
         case SDLK_RETURN:
@@ -76,14 +74,14 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
-    { SDLK_KP7,  70, 400, 15, "Back" },
-    { SDLK_KP9, 142, 272, 15, "Play/Pause" },
-    { SDLK_KP5, 142, 330, 26, "Select" },
-    { SDLK_KP8,  70, 261, 26, "Up" },
-    { SDLK_KP2, 219, 386, 26, "Down" },
-    { SDLK_KP6, 199, 332, 26, "Right" },
-    { SDLK_KP4,  77, 334, 26, "Left" },
-    { SDLK_KP3, 140, 392, 26, "Menu" },
+    { SDLK_KP_7,  70, 400, 15, "Back" },
+    { SDLK_KP_9, 142, 272, 15, "Play/Pause" },
+    { SDLK_KP_5, 142, 330, 26, "Select" },
+    { SDLK_KP_8,  70, 261, 26, "Up" },
+    { SDLK_KP_2, 219, 386, 26, "Down" },
+    { SDLK_KP_6, 199, 332, 26, "Right" },
+    { SDLK_KP_4,  77, 334, 26, "Left" },
+    { SDLK_KP_3, 140, 392, 26, "Menu" },
     { SDLK_KP_MINUS, 265, 299, 17, "Power" },
     { SDLK_h,   270, 354, 19, "Hold" },
     { SDLK_KP_MULTIPLY, 231, 269, 16, "Home" },

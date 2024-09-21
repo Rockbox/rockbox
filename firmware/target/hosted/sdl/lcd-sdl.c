@@ -115,12 +115,17 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
                     (ui_y + y_start) * display_zoom,
                     width * display_zoom, height * display_zoom};
 
-    if (surface->flags & SDL_SRCALPHA) /* alpha needs a black background */
+    uint8_t alpha;
+    if (SDL_GetSurfaceAlphaMod(surface,&alpha) == 0 && alpha < 255)
         SDL_FillRect(gui_surface, &dest, 0);
 
-    SDL_BlitSurface(surface, &src, gui_surface, &dest);
+    SDL_BlitSurface(surface, &src, gui_surface, &dest); /* alpha needs a black background */
 
-    SDL_Flip(gui_surface);
+    SDL_Texture *sdlTexture = SDL_CreateTextureFromSurface(sdlRenderer, gui_surface);
+    SDL_RenderClear(sdlRenderer);
+    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+    SDL_RenderPresent(sdlRenderer);
+    SDL_DestroyTexture(sdlTexture);
 }
 
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */
@@ -136,7 +141,7 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
         palette[i].b = start->b + (end->b - start->b) * i / (steps - 1);
     }
 
-    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, first, steps);
+    SDL_SetPaletteColors(surface->format->palette, palette, first , steps);
 }
 
 int lcd_get_dpi(void)

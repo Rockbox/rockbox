@@ -41,7 +41,7 @@ int key_to_button(int keyboard_button)
         case SDLK_KP_MINUS:
             new_btn = BUTTON_VOL_DOWN;
             break;
-        case SDLK_KP1:
+        case SDLK_KP_1:
         case SDLK_HOME:
         case SDLK_BACKSPACE:
             new_btn = BUTTON_BACK;

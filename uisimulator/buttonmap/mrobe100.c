@@ -53,28 +53,28 @@ int key_to_button(int keyboard_button)
         case SDLK_DOWN:
             new_btn = BUTTON_RC_DOWN;
             break;
-        case SDLK_KP1:
+        case SDLK_KP_1:
             new_btn = BUTTON_DISPLAY;
             break;
-        case SDLK_KP7:
+        case SDLK_KP_7:
             new_btn = BUTTON_MENU;
             break;
-        case SDLK_KP9:
+        case SDLK_KP_9:
             new_btn = BUTTON_PLAY;
             break;
-        case SDLK_KP4:
+        case SDLK_KP_4:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
             new_btn = BUTTON_UP;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
             new_btn = BUTTON_DOWN;
             break;
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_SPACE:
             new_btn = BUTTON_SELECT;
             break;
@@ -88,18 +88,18 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
-    { SDLK_KP7,      80, 233, 30, "Menu" },
-    { SDLK_KP8,     138, 250, 19, "Up" },
-    { SDLK_KP9,     201, 230, 27, "Play" },
-    { SDLK_KP4,      63, 305, 25, "Left" },
-    { SDLK_KP5,     125, 309, 28, "Select" },
-    { SDLK_KP6,     200, 307, 35, "Right" },
-    { SDLK_KP1,      52, 380, 32, "Display" },
-    { SDLK_KP2,     125, 363, 30, "Down" },
-    { SDLK_KP9,     168, 425, 10, "Play" },
-    { SDLK_KP4,     156, 440, 11, "Left" },
-    { SDLK_KP6,     180, 440, 13, "Right" },
-    { SDLK_KP7,     169, 452, 10, "Menu" },
+    { SDLK_KP_7,      80, 233, 30, "Menu" },
+    { SDLK_KP_8,     138, 250, 19, "Up" },
+    { SDLK_KP_9,     201, 230, 27, "Play" },
+    { SDLK_KP_4,      63, 305, 25, "Left" },
+    { SDLK_KP_5,     125, 309, 28, "Select" },
+    { SDLK_KP_6,     200, 307, 35, "Right" },
+    { SDLK_KP_1,      52, 380, 32, "Display" },
+    { SDLK_KP_2,     125, 363, 30, "Down" },
+    { SDLK_KP_9,     168, 425, 10, "Play" },
+    { SDLK_KP_4,     156, 440, 11, "Left" },
+    { SDLK_KP_6,     180, 440, 13, "Right" },
+    { SDLK_KP_7,     169, 452, 10, "Menu" },
     { SDLK_KP_MULTIPLY, 222, 15, 16, "Power" },
     { 0, 0, 0, 0, "None" }
 };

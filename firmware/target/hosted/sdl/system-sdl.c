@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2006 by Daniel Everton <dan@iocaine.org>
@@ -50,6 +50,8 @@
 #define SIMULATOR_DEFAULT_ROOT "simdisk"
 
 SDL_Surface    *gui_surface;
+SDL_Window     *window;
+SDL_Renderer   *sdlRenderer;
 
 bool            background = true;          /* use backgrounds by default */
 #ifdef HAVE_REMOTE_LCD
@@ -72,26 +74,12 @@ bool debug_audio = false;
 bool debug_wps = false;
 int wps_verbose_level = 3;
 
-/*
- * This thread will read the buttons in an interrupt like fashion, and
- * also initializes SDL_INIT_VIDEO and the surfaces
- *
- * it must be done in the same thread (at least on windows) because events only
- * work in the thread which called SDL_Init(SubSystem) with SDL_INIT_VIDEO
- *
- * This is an SDL thread and relies on preemptive behavoir of the host
- **/
-static int sdl_event_thread(void * param)
+static void sdl_window_setup(void)
 {
-    SDL_InitSubSystem(SDL_INIT_VIDEO);
-
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    SDL_sem *wait_for_maemo_startup;
-#endif
     SDL_Surface *picture_surface = NULL;
     int width, height;
     int depth;
-    Uint32 flags;
+    Uint32 flags = 0;
 
     /* Try and load the background image. If it fails go without */
     if (background) {
@@ -101,14 +89,14 @@ static int sdl_event_thread(void * param)
             DEBUGF("warn: %s\n", SDL_GetError());
         }
     }
-    
+
     /* Set things up */
     if (background)
     {
         width = UI_WIDTH;
         height = UI_HEIGHT;
-    } 
-    else 
+    }
+    else
     {
 #ifdef HAVE_REMOTE_LCD
         if (showremote)
@@ -128,17 +116,47 @@ static int sdl_event_thread(void * param)
     if (depth < 8)
         depth = 16;
 
-    flags = SDL_HWSURFACE|SDL_DOUBLEBUF;
 #if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
     /* Fullscreen mode for maemo app */
-    flags |= SDL_FULLSCREEN;
+    flags |= SDL_WINDOW_FULLSCREEN;
 #endif
 
-    SDL_WM_SetCaption(UI_TITLE, NULL);
-
-    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, flags)) == NULL) {
+    if ((window = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                      width * display_zoom, height * display_zoom , flags)) == NULL)
         panicf("%s", SDL_GetError());
+    if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) == NULL)
+        panicf("%s", SDL_GetError());
+    if ((gui_surface = SDL_CreateRGBSurface(0, width * display_zoom, height * display_zoom, depth,
+                                       0, 0, 0, 0)) == NULL)
+        panicf("%s", SDL_GetError());
+
+    /* If we have a background, blit it over to the display surface */
+    if (background && picture_surface)
+    {
+        SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
+        SDL_FreeSurface(picture_surface);
     }
+}
+
+/*
+ * This thread will read the buttons in an interrupt like fashion, and
+ * also initializes SDL_INIT_VIDEO and the surfaces
+ *
+ * it must be done in the same thread (at least on windows) because events only
+ * work in the thread that called SDL_InitSubSystem(SDL_INIT_VIDEO)
+ *
+ * This is an SDL thread and relies on preemptive behavoir of the host
+ **/
+static int sdl_event_thread(void * param)
+{
+#ifdef __WIN32 /* Fails on Linux and MacOS */
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    sdl_window_setup();
+#endif
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    SDL_sem *wait_for_maemo_startup;
+#endif
 
 #if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
     /* SDL touch screen fix: Work around a SDL assumption that returns
@@ -152,14 +170,10 @@ static int sdl_event_thread(void * param)
     SDL_SetCursor(hiddenCursor);
 #endif
 
-    if (background && picture_surface != NULL)
-        SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
-
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
     /* start maemo thread: Listen to display on/off events and battery monitoring */
     wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
-    SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, wait_for_maemo_startup);
-
+    SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, NULL, wait_for_maemo_startup);
     SDL_SemWait(wait_for_maemo_startup);
     SDL_DestroySemaphore(wait_for_maemo_startup);
 #endif
@@ -183,9 +197,6 @@ static int sdl_event_thread(void * param)
 #if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
     SDL_FreeCursor(hiddenCursor);
 #endif
-
-    if(picture_surface)
-        SDL_FreeSurface(picture_surface);
 
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
@@ -251,15 +262,16 @@ void system_init(void)
     g_type_init();
 #endif
 
-    if (SDL_Init(SDL_INIT_TIMER))
+    if (SDL_InitSubSystem(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
 
+#ifndef __WIN32  /* Fails on Windows */
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    sdl_window_setup();
+#endif
+
     s = SDL_CreateSemaphore(0); /* 0-count so it blocks */
-
-    evt_thread = SDL_CreateThread(sdl_event_thread, s);
-
-    /* wait for sdl_event_thread to run so that it can initialize the surfaces
-     * and video subsystem needed for SDL events */
+    evt_thread = SDL_CreateThread(sdl_event_thread, NULL, s);
     SDL_SemWait(s);
     /* cleanup */
     SDL_DestroySemaphore(s);
@@ -303,29 +315,29 @@ int hostfs_flush(void)
 
 void sys_handle_argv(int argc, char *argv[])
 {
-    if (argc >= 1) 
+    if (argc >= 1)
     {
         int x;
-        for (x = 1; x < argc; x++) 
+        for (x = 1; x < argc; x++)
         {
 #ifdef DEBUG
-            if (!strcmp("--debugaudio", argv[x])) 
+            if (!strcmp("--debugaudio", argv[x]))
             {
                 debug_audio = true;
                 printf("Writing debug audio file.\n");
             }
-            else 
+            else
 #endif
                 if (!strcmp("--debugwps", argv[x]))
             {
                 debug_wps = true;
                 printf("WPS debug mode enabled.\n");
-            } 
+            }
             else if (!strcmp("--nobackground", argv[x]))
             {
                 background = false;
                 printf("Disabling background image.\n");
-            } 
+            }
 #ifdef HAVE_REMOTE_LCD
             else if (!strcmp("--noremote", argv[x]))
             {
@@ -346,7 +358,7 @@ void sys_handle_argv(int argc, char *argv[])
                     display_zoom=atof(argv[x]);
                 else
                     display_zoom = 2;
-                printf("Window zoom is %d\n", display_zoom);
+                printf("Window zoom is %f\n", display_zoom);
             }
             else if (!strcmp("--alarm", argv[x]))
             {
@@ -372,7 +384,7 @@ void sys_handle_argv(int argc, char *argv[])
                     debug_buttons = true;
                     printf("Printing background button clicks.\n");
             }
-            else 
+            else
             {
                 printf("rockboxui\n");
                 printf("Arguments:\n");

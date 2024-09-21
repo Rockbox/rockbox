@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2005 by Nick Lanham
@@ -85,8 +85,43 @@ void pcm_play_unlock(void)
         SDL_UnlockMutex(audio_lock);
 }
 
+static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len);
 static void pcm_dma_apply_settings_nolock(void)
 {
+    SDL_AudioSpec wanted_spec;
+    wanted_spec.freq = pcm_sampr;
+    wanted_spec.format = AUDIO_S16SYS;
+    wanted_spec.channels = 2;
+    wanted_spec.samples = 2048;
+    wanted_spec.callback =
+        (void (SDLCALL *)(void *userdata,
+            Uint8 *stream, int len))sdl_audio_callback;
+    wanted_spec.userdata = &udata;
+    SDL_CloseAudio();
+    /* Open the audio device and start playing sound! */
+    if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
+        DEBUGF("Unable to open audio: %s\n", SDL_GetError());
+        return;
+    }
+    switch (obtained.format)
+    {
+    case AUDIO_U8:
+    case AUDIO_S8:
+        pcm_channel_bytes = 1;
+        break;
+    case AUDIO_U16LSB:
+    case AUDIO_S16LSB:
+    case AUDIO_U16MSB:
+    case AUDIO_S16MSB:
+        pcm_channel_bytes = 2;
+        break;
+    default:
+        DEBUGF("Unknown sample format obtained: %u\n",
+                (unsigned)obtained.format);
+        return;
+    }
+    pcm_sample_bytes = obtained.channels * pcm_channel_bytes;
+
     cvt_status = SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, pcm_sampr,
                     obtained.format, obtained.channels, obtained.freq);
 
@@ -256,9 +291,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
                 if (delay > 0)
                 {
-                    SDL_UnlockMutex(audio_lock);
                     SDL_Delay(delay);
-                    SDL_LockMutex(audio_lock);
 
                     if (!pcm_is_playing())
                         break;
@@ -339,7 +372,6 @@ void pcm_play_dma_init(void)
         return;
     }
 
-    SDL_AudioSpec wanted_spec;
 #ifdef DEBUG
     udata.debug = NULL;
     if (debug_audio) {
@@ -347,43 +379,6 @@ void pcm_play_dma_init(void)
         DEBUGF("Audio debug file open\n");
     }
 #endif
-    /* Set 16-bit stereo audio at 44Khz */
-    wanted_spec.freq = 44100;
-    wanted_spec.format = AUDIO_S16SYS;
-    wanted_spec.channels = 2;
-    wanted_spec.samples = 2048;
-    wanted_spec.callback =
-        (void (SDLCALL *)(void *userdata,
-            Uint8 *stream, int len))sdl_audio_callback;
-    wanted_spec.userdata = &udata;
-
-    /* Open the audio device and start playing sound! */
-    if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
-        DEBUGF("Unable to open audio: %s\n", SDL_GetError());
-        return;
-    }
-
-    switch (obtained.format)
-    {
-    case AUDIO_U8:
-    case AUDIO_S8:
-        pcm_channel_bytes = 1;
-        break;
-    case AUDIO_U16LSB:
-    case AUDIO_S16LSB:
-    case AUDIO_U16MSB:
-    case AUDIO_S16MSB:
-        pcm_channel_bytes = 2;
-        break;
-    default:
-        DEBUGF("Unknown sample format obtained: %u\n",
-                (unsigned)obtained.format);
-        return;
-    }
-
-    pcm_sample_bytes = obtained.channels * pcm_channel_bytes;
-
-    pcm_dma_apply_settings_nolock();
 }
 
 void pcm_play_dma_postinit(void)

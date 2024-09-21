@@ -29,17 +29,17 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_PREV;
             break;
 
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_NEXT;
             break;
 
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_RETURN:
         case SDLK_SPACE:
             new_btn = BUTTON_PLAY;

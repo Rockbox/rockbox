@@ -28,19 +28,19 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_PREV;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_NEXT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_SCROLL_BACK;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_SCROLL_FWD;
             break;
@@ -58,12 +58,6 @@ int key_to_button(int keyboard_button)
         case SDLK_INSERT:
             new_btn = BUTTON_MENU;
             break;
-        case SDL_BUTTON_WHEELUP:
-            new_btn = BUTTON_SCROLL_BACK;
-            break;
-        case SDL_BUTTON_WHEELDOWN:
-            new_btn = BUTTON_SCROLL_FWD;
-            break;
         case SDLK_KP_MINUS:
         case SDLK_PAGEUP:
             new_btn = BUTTON_VOL_UP;
@@ -78,10 +72,10 @@ int key_to_button(int keyboard_button)
 
 struct button_map bm[] = {
     { SDLK_KP_PERIOD,   60, 599, 25, "Menu" },
-    { SDLK_KP8,        213, 473, 20, "Scroll Back" },
-    { SDLK_KP2,         50, 473, 20, "Scroll Fwd" },
-    { SDLK_KP4,        323, 384, 30, "Prev" },
-    { SDLK_KP6,        323, 465, 30, "Next" },
+    { SDLK_KP_8,        213, 473, 20, "Scroll Back" },
+    { SDLK_KP_2,         50, 473, 20, "Scroll Fwd" },
+    { SDLK_KP_4,        323, 384, 30, "Prev" },
+    { SDLK_KP_6,        323, 465, 30, "Next" },
     { SDLK_BACKSPACE,  323, 578, 25, "Back" },
     { SDLK_KP_PLUS,    397,  91, 30, "Vol Up" },
     { SDLK_KP_MINUS,   397, 185, 43, "Vol Dn" },

@@ -30,31 +30,31 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_UP;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_KP_ENTER:
             new_btn = BUTTON_PLAY;
             break;
-        case SDLK_KP9:
+        case SDLK_KP_9:
         case SDLK_PAGEUP:
             new_btn = BUTTON_FFWD;
             break;
-        case SDLK_KP3:
+        case SDLK_KP_3:
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_REW;
             break;
@@ -69,15 +69,15 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {  
-    { SDLK_KP9,     370,  32, 15, "FF" },
-    { SDLK_KP5,     369,  84, 25, "Play" },
-    { SDLK_KP5,     367, 125, 27, "Play" },
-    { SDLK_KP3,     369, 188, 17, "Rew" },
+    { SDLK_KP_9,     370,  32, 15, "FF" },
+    { SDLK_KP_5,     369,  84, 25, "Play" },
+    { SDLK_KP_5,     367, 125, 27, "Play" },
+    { SDLK_KP_3,     369, 188, 17, "Rew" },
     { SDLK_KP_MINUS,370, 315, 15, "Rec On" },
     { SDLK_KP_PLUS, 370, 347, 15, "Rec Off" },
-    { SDLK_KP4,     146, 252, 32, "Menu" },
-    { SDLK_KP8,     204, 226, 27, "Up" },
-    { SDLK_KP6,     257, 250, 34, "Select" },
-    { SDLK_KP2,     205, 294, 35, "Down" },
+    { SDLK_KP_4,     146, 252, 32, "Menu" },
+    { SDLK_KP_8,     204, 226, 27, "Up" },
+    { SDLK_KP_6,     257, 250, 34, "Select" },
+    { SDLK_KP_2,     205, 294, 35, "Down" },
     { 0, 0, 0, 0, "None" }
 };

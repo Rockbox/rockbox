@@ -29,19 +29,19 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_UP;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
@@ -60,11 +60,9 @@ int key_to_button(int keyboard_button)
         case SDLK_INSERT:
             new_btn = BUTTON_MENU;
             break;
-        case SDL_BUTTON_WHEELUP:
         case SDLK_PAGEUP:
             new_btn = BUTTON_SCROLL_BACK;
             break;
-        case SDL_BUTTON_WHEELDOWN:
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_SCROLL_FWD;
             break;
@@ -76,7 +74,7 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_SELECT;
             break;
         case SDLK_SPACE:
-        case SDLK_KP5:
+        case SDLK_KP_5:
             new_btn = BUTTON_PLAY;
             break;
     }

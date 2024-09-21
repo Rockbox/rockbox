@@ -50,8 +50,8 @@ struct regs
     #ifndef MINSIGSTKSZ
       #define MINSIGSTKSZ 16384
     #endif
-    /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
-    #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
+    /* MINSIGSTKSZ for the OS to deliver the signal + 0x6000 for us */
+    #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x6000) /* Bytes */
   #elif defined(HAVE_WIN32_FIBER_THREADS)
     #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
   #endif

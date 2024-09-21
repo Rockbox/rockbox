@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
@@ -27,6 +27,7 @@
 
 /* Default display zoom level */
 extern SDL_Surface *gui_surface;
+extern SDL_Renderer *sdlRenderer;
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,
@@ -39,4 +40,3 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
                       int first, int steps);
 
 #endif /* #ifndef __LCDSDL_H__ */
-

@@ -68,9 +68,9 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
-    { SDLK_KP9,     171, 609, 9, "Play" },
-    { SDLK_KP4,     158, 623, 9, "Left" },
-    { SDLK_KP6,     184, 622, 9, "Right" },
-    { SDLK_KP7,     171, 638, 11, "Menu" },
+    { SDLK_KP_9,     171, 609, 9, "Play" },
+    { SDLK_KP_4,     158, 623, 9, "Left" },
+    { SDLK_KP_6,     184, 622, 9, "Right" },
+    { SDLK_KP_7,     171, 638, 11, "Menu" },
     { 0, 0, 0, 0, "None" }
 };

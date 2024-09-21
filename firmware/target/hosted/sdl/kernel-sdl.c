@@ -153,7 +153,7 @@ void sim_kernel_shutdown(void)
         SDL_Delay(10);
 
     SDL_DestroyMutex(sim_irq_mtx);
-    SDL_DestroyCond(sim_thread_cond); 
+    SDL_DestroyCond(sim_thread_cond);
 }
 
 Uint32 tick_timer(Uint32 interval, void *param)
@@ -162,9 +162,9 @@ Uint32 tick_timer(Uint32 interval, void *param)
 
     (void) interval;
     (void) param;
-    
+
     new_tick = (SDL_GetTicks() - start_tick) / (1000/HZ);
-        
+
     while(new_tick != current_tick)
     {
         sim_enter_irq_handler();
@@ -175,7 +175,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
 
         sim_exit_irq_handler();
     }
-    
+
     return interval;
 }
 
@@ -187,10 +187,10 @@ void tick_start(unsigned int interval_in_ms)
         exit(-1);
     }
 
-    if (tick_timer_id != NULL)
+    if (tick_timer_id != 0)
     {
         SDL_RemoveTimer(tick_timer_id);
-        tick_timer_id = NULL;
+        tick_timer_id = 0;
     }
     else
     {

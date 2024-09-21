@@ -29,33 +29,33 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_UP;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
-        case SDLK_KP1:
+        case SDLK_KP_1:
             new_btn = BUTTON_MENU;
             break;
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_SPACE:
             new_btn = BUTTON_PLAY;
             break;
-        case SDLK_KP7:
+        case SDLK_KP_7:
             new_btn = BUTTON_PREV;
             break;
-        case SDLK_KP9:
+        case SDLK_KP_9:
             new_btn = BUTTON_NEXT;
             break;
         case SDLK_KP_ENTER:
@@ -76,13 +76,13 @@ struct button_map bm[] = {
     { SDLK_KP_ENTER,  25, 155, 33, "Power" },
     { SDLK_PAGEUP,   210,  98, 31, "Vol Up" },
     { SDLK_PAGEDOWN, 210, 168, 34, "Vol Down" },
-    { SDLK_KP7,       40, 249, 26, "Prev" },
-    { SDLK_KP8,      110, 247, 22, "Up" },
-    { SDLK_KP9,      183, 249, 31, "Next" },
-    { SDLK_KP4,       45, 305, 25, "Left" },
-    { SDLK_KP5,      111, 304, 24, "Play" },
-    { SDLK_KP6,      183, 304, 21, "Right" },
-    { SDLK_KP1,       43, 377, 21, "Menu" },
-    { SDLK_KP2,      112, 371, 24, "Down" },
+    { SDLK_KP_7,       40, 249, 26, "Prev" },
+    { SDLK_KP_8,      110, 247, 22, "Up" },
+    { SDLK_KP_9,      183, 249, 31, "Next" },
+    { SDLK_KP_4,       45, 305, 25, "Left" },
+    { SDLK_KP_5,      111, 304, 24, "Play" },
+    { SDLK_KP_6,      183, 304, 21, "Right" },
+    { SDLK_KP_1,       43, 377, 21, "Menu" },
+    { SDLK_KP_2,      112, 371, 24, "Down" },
     { 0, 0, 0, 0, "None" }
 };

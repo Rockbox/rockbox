@@ -107,6 +107,30 @@ static void touchscreen_event(int x, int y)
 }
 #endif
 
+#if defined(HAVE_SCROLLWHEEL) || ((defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)))
+static void scrollwheel_event(int x, int y)
+{
+    int new_btn = 0;
+    if (y > 0)
+        new_btn = BUTTON_SCROLL_BACK;
+    else if (y < 0)
+        new_btn = BUTTON_SCROLL_FWD;
+    else
+        return;
+
+#ifdef HAVE_BACKLIGHT
+    backlight_on();
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_on();
+#endif
+    reset_poweroff_timer();
+    if (new_btn && !queue_full(&button_queue))
+        queue_post(&button_queue, new_btn, 1<<24);
+
+    (void)x;
+}
+#endif
 static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 {
 #define SQUARE(x) ((x)*(x))
@@ -118,10 +142,6 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
     if(button_up) {
         switch ( event->button )
         {
-#ifdef HAVE_SCROLLWHEEL
-        case SDL_BUTTON_WHEELUP:
-        case SDL_BUTTON_WHEELDOWN:
-#endif
         case SDL_BUTTON_MIDDLE:
         case SDL_BUTTON_RIGHT:
             button_event( event->button, false );
@@ -145,13 +165,9 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 #endif
             break;
         }
-    } else {    /* button down */
+    } else {   /* button down */
         switch ( event->button )
         {
-#ifdef HAVE_SCROLLWHEEL
-        case SDL_BUTTON_WHEELUP:
-        case SDL_BUTTON_WHEELDOWN:
-#endif
         case SDL_BUTTON_MIDDLE:
         case SDL_BUTTON_RIGHT:
             button_event( event->button, true );
@@ -215,18 +231,15 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 
 static bool event_handler(SDL_Event *event)
 {
-    SDLKey ev_key;
+    SDL_Keycode ev_key;
 
     switch(event->type)
     {
-    case SDL_ACTIVEEVENT:
-        if (event->active.state & SDL_APPINPUTFOCUS)
-        {
-            if (event->active.gain == 1)
-                sdl_app_has_input_focus = 1;
-            else
-                sdl_app_has_input_focus = 0;
-        }
+    case SDL_WINDOWEVENT:
+        if (event->window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+            sdl_app_has_input_focus = 1;
+        else if (event->window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+            sdl_app_has_input_focus = 0;
         break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
@@ -275,6 +288,13 @@ static bool event_handler(SDL_Event *event)
         mouse_event(mev, event->type == SDL_MOUSEBUTTONUP);
         break;
     }
+#ifdef HAVE_SCROLLWHEEL
+    case SDL_MOUSEWHEEL:
+    {
+        scrollwheel_event(event->wheel.x, event->wheel.y);
+        break;
+    }
+#endif
     case SDL_QUIT:
         /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
         sdl_sys_quit();
@@ -362,7 +382,7 @@ static void button_event(int key, bool pressed)
         }
         return;
 #endif
-        
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
     case SDLK_j:
         if(pressed)
@@ -379,7 +399,7 @@ static void button_event(int key, bool pressed)
         if(pressed)
             switch(_remote_type)
             {
-                case REMOTETYPE_UNPLUGGED: 
+                case REMOTETYPE_UNPLUGGED:
                     _remote_type=REMOTETYPE_H100_LCD;
                     DEBUGF("Changed remote type to H100\n");
                     break;
@@ -399,7 +419,7 @@ static void button_event(int key, bool pressed)
         break;
 #endif
 #ifndef APPLICATION
-    case SDLK_KP0:
+    case SDLK_KP_0:
     case SDLK_F5:
         if(pressed)
         {
@@ -430,32 +450,17 @@ static void button_event(int key, bool pressed)
 #endif
         break;
     }
-    /* Call to make up for scrollwheel target implementation.  This is
-     * not handled in the main button.c driver, but on the target
-     * implementation (look at button-e200.c for example if you are trying to 
-     * figure out why using button_get_data needed a hack before).
-     */
+
 #if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
-    if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) && 
+    if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) &&
         pressed)
     {
-        /* Clear these buttons from the data - adding them to the queue is
-         *  handled in the scrollwheel drivers for the targets.  They do not
-         *  store the scroll forward/back buttons in their button data for
-         *  the button_read call.
-         */
-#ifdef HAVE_BACKLIGHT
-        backlight_on();
-#endif
-#ifdef HAVE_BUTTON_LIGHT
-        buttonlight_on();
-#endif
-        reset_poweroff_timer();
-        queue_post(&button_queue, new_btn, 1<<24);
+        scrollwheel_event(0, new_btn == BUTTON_SCROLL_FWD ? -1 : 1);
         new_btn &= ~(BUTTON_SCROLL_FWD | BUTTON_SCROLL_BACK);
     }
 #endif
 
+    /* Update global button press state */
     if (pressed)
         btn |= new_btn;
     else
@@ -496,5 +501,4 @@ int button_read_device(void)
 
 void button_init_device(void)
 {
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 }

@@ -162,7 +162,7 @@ findtool(){
 # scan the $PATH for sdl-config - check whether for a (cross-)win32
 # sdl as requested
 findsdl(){
-  files=sdl-config
+  files=sdl2-config
   if [ -n "$CROSS_COMPILE" ]; then
     # sdl-config might (not) be prefixed for cross compiles so try both.
     files="${CROSS_COMPILE}sdl-config:${files}"
@@ -1676,7 +1676,7 @@ cat <<EOF
  ==AIGO==                 244) M3K Linux
  245) Eros Q / K          246) M3K baremetal     ==Shanling==
  247) Eros Q / K native                          260) Q1
- 248) Eros Q / K native v3 
+ 248) Eros Q / K native v3
       (GC9A01 LCD Controller)
 EOF
 

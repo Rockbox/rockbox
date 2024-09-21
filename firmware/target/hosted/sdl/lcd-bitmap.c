@@ -164,12 +164,12 @@ void sim_backlight(int value)
 #else /* LCD_DEPTH > 8 */
 #if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
     if (!lcd_active())
-        SDL_SetAlpha(lcd_surface, SDL_SRCALPHA, 0);
+        SDL_SetSurfaceAlphaMod(lcd_surface, 0);
     else
-        SDL_SetAlpha(lcd_surface, SDL_SRCALPHA,
+        SDL_SetSurfaceAlphaMod(lcd_surface,
                         MAX(BACKLIGHT_OFF_ALPHA, (value * 255) / 100));
 #else
-    SDL_SetAlpha(lcd_surface, SDL_SRCALPHA, (value * 255) / 100);
+    SDL_SetSurfaceAlphaMod(lcd_surface, (value * 255) / 100);
 #endif
 #endif /* LCD_DEPTH */
 
@@ -187,6 +187,7 @@ void lcd_init_device(void)
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,
                                        LCD_DEPTH, 0, 0, 0, 0);
+    SDL_SetSurfaceBlendMode(lcd_surface, SDL_BLENDMODE_BLEND);
 #elif LCD_DEPTH <= 8
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                        SIM_LCD_WIDTH * display_zoom,
@@ -222,7 +223,7 @@ void sim_lcd_ex_update_rect(int x_start, int y_start, int width, int height)
     if (lcd_ex_getpixel) {
         sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                         LCD_WIDTH, LCD_HEIGHT, lcd_ex_getpixel);
-        sdl_gui_update(lcd_surface, x_start, y_start, width, 
+        sdl_gui_update(lcd_surface, x_start, y_start, width,
                        height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                        background ? UI_LCD_POSX : 0,
                        background ? UI_LCD_POSY : 0);

@@ -28,19 +28,19 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_KP4:
+        case SDLK_KP_4:
         case SDLK_LEFT:
             new_btn = BUTTON_LEFT;
             break;
-        case SDLK_KP6:
+        case SDLK_KP_6:
         case SDLK_RIGHT:
             new_btn = BUTTON_RIGHT;
             break;
-        case SDLK_KP8:
+        case SDLK_KP_8:
         case SDLK_UP:
             new_btn = BUTTON_UP;
             break;
-        case SDLK_KP2:
+        case SDLK_KP_2:
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
@@ -54,7 +54,7 @@ int key_to_button(int keyboard_button)
         case SDLK_a:
             new_btn = BUTTON_A;
             break;
-        case SDLK_KP5:
+        case SDLK_KP_5:
         case SDLK_SPACE:
             new_btn = BUTTON_SELECT;
             break;
@@ -62,11 +62,11 @@ int key_to_button(int keyboard_button)
         case SDLK_INSERT:
             new_btn = BUTTON_MENU;
             break;
-        case SDLK_KP9:
+        case SDLK_KP_9:
         case SDLK_PAGEUP:
             new_btn = BUTTON_VOL_UP;
             break;
-        case SDLK_KP3:
+        case SDLK_KP_3:
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_VOL_DOWN;
             break;
@@ -77,13 +77,13 @@ int key_to_button(int keyboard_button)
 struct button_map bm[] = {
     { SDLK_KP_PLUS,    361, 187, 22, "Power" },
     { SDLK_KP_PERIOD,  361, 270, 17, "Menu" },
-    { SDLK_KP9,        365, 345, 26, "Vol Up" },
-    { SDLK_KP3,        363, 433, 25, "Vol Down" },
+    { SDLK_KP_9,        365, 345, 26, "Vol Up" },
+    { SDLK_KP_3,        363, 433, 25, "Vol Down" },
     { SDLK_KP_ENTER,   365, 520, 19, "A" },
-    { SDLK_KP8,        167, 458, 35, "Up" },
-    { SDLK_KP4,         86, 537, 29, "Left" },
-    { SDLK_KP5,        166, 536, 30, "Select" },
-    { SDLK_KP6,        248, 536, 30, "Right" },
-    { SDLK_KP2,        169, 617, 28, "Down" },
+    { SDLK_KP_8,        167, 458, 35, "Up" },
+    { SDLK_KP_4,         86, 537, 29, "Left" },
+    { SDLK_KP_5,        166, 536, 30, "Select" },
+    { SDLK_KP_6,        248, 536, 30, "Right" },
+    { SDLK_KP_2,        169, 617, 28, "Down" },
     { 0, 0, 0, 0, "None" }
 };

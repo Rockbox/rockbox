@@ -340,7 +340,7 @@ unsigned int create_thread(void (*function)(void),
         return 0;
     }
 
-    SDL_Thread *t = SDL_CreateThread(runthread, thread);
+    SDL_Thread *t = SDL_CreateThread(runthread, NULL, thread);
     if (t == NULL)
     {
         DEBUGF("Failed to create SDL thread\n");
@@ -447,7 +447,7 @@ void init_threads(void)
     thread->context.s = SDL_CreateSemaphore(0);
     thread->context.t = NULL; /* NULL for the implicit main thread */
     __running_self_entry() = thread;
- 
+
     if (thread->context.s == NULL)
     {
         fprintf(stderr, "Failed to create main semaphore\n");
