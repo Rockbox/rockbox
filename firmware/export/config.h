@@ -1265,6 +1265,12 @@ Lyre prototype 1 */
 #endif
 #endif
 
+#if defined(HAVE_SIGALTSTACK_THREADS)
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600   /* For sigaltstack */
+#endif
+#endif
+
 #ifdef CPU_MIPS
 #include <stdbool.h> /* MIPS GCC fix? */
 #endif
