@@ -268,6 +268,63 @@ of before installing.
 \end{description}
 }
 
+\subsection{Storage/Capacity Limits}
+
+\note{As of this writing, no Rockbox-capable device can handle
+  total drive capacities exceeding than 2TiB.}
+
+\opt{disk_storage}{
+Rockbox supports larger drive capacities when used on devices
+that use ATA storage and GPT partitioning, but due to the limitations
+of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally,
+there are typically underlying platform limitations that
+make it difficult, if not impossible, to boot from a GPT-partitioned
+drive.
+}
+
+\opt{sd_storage}{
+  \note{SD cards exceeding 32GiB are pre-formated using the exFAT filesystem with GPT paritioning.
+    Before they can be used with Rockbox, they must be reformatted with FAT32.}
+
+  Rockbox does not currently support SDUC cards with capacities exceeding 2TiB.  However, this is purely
+  a software limitation with Rockbox's SD card drivers, and will be addressed in a future release.
+}
+
+\opt{disk_storage}{
+\subsection{Flash/SSD mods}
+  It is common to replace the device's original mechanical hard drive with
+  some sort of solid-state storage. Older versions of Rockbox (3.15 or prior) do not work properly with many
+  of these so-called ``flash mods'', the most common symptom being data corruption on write operations.  All
+  known data integrity issues have been resolved, but each type of adapter has its own quirks:
+\begin{description}
+\item[Compact Flash.]  True Compact Flash cards \emph{natively} implement the ATA command set, including
+  advanced power management and the \emph{removeable} attribute. They are performant, reliable, and physically
+  robust, but tend to be expensive and not available in larger sizes.
+\item[SATA.] These are fast, reliable, and available in high capacities, but are typically optimized for high performance
+  at the expense of power consumption.. However, as they implement the full ATA command set, we are able
+  to aggressively power them down when not being actively used.
+\item[Single Secure Digital (SD).] While these adapters come in different form factors from multiple vendors,
+  they are all based on the same basic design. The ATA command set is \emph{incompletely emulated}, notably lacking
+  support for the \emph{mandatory} ATA power management commands that Rockbox uses to flush caches and safely
+  transition the device in and out of low power states.  Additionally, SD cards themselves vary widely in quality
+  and power consumption, leading to widely varying battery life.  Finally, they do not support SDUC cards at all so are
+  limited to individual cards of 2TiB or less.
+\item[Dual/Quad SD.]  These are similar to the above, only allowing use of mulitiple SD cards to
+  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each
+  card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive
+  that is the combined capacity of the individual cards in a RAID0-like manner. This also means that if any
+  one card fails, you lose everything.  Combined with the poor quality of most SD cards and the lack of support
+  for proper power management, this means use of multiple SD cards in one of these adapters is the reliable and most
+  power hungry solution of all.  Finally, in another violation of the ATA specification, these ATA<->SD adapters fail
+  to support addresses exceeding 32 bits, meaning that no matter which combination of cards is used, they simply will
+  not work if their combined capacity exceeds 2TiB.
+\item
+  All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care
+  must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur
+  in portable devices.  Ribbon cables are particularly vulnerable.
+\end{description}
+}
+
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
 There are two ways to install Rockbox: automated and manual. The automated
 way is the preferred method of installing Rockbox for the majority of
