@@ -270,9 +270,6 @@ of before installing.
 
 \subsection{Storage/Capacity Limits}
 
-\note{As of this writing, no Rockbox-capable device can handle
-  total drive capacities exceeding than 2TiB.}
-
 \opt{disk_storage}{
 Rockbox supports larger drive capacities when used on devices
 that use ATA storage and GPT partitioning, but due to the limitations
@@ -280,14 +277,22 @@ of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally,
 there are typically underlying platform limitations that
 make it difficult, if not impossible, to boot from a GPT-partitioned
 drive.
+
+\note{In practice, no Rockbox-capable device can handle total drive capacities exceeding 2TiB.}
 }
 
 \opt{sd_storage}{
+\item
+  Rockbox does not currently support SDUC cards, ie those with capacities
+  exceeding 2TiB.  However, this is purely a software limitation with
+  Rockbox's SD card drivers, and will be addressed in a future release.
+
   \note{SD cards exceeding 32GiB are pre-formated using the exFAT filesystem with GPT paritioning.
     Before they can be used with Rockbox, they must be reformatted with FAT32.}
+}
 
-  Rockbox does not currently support SDUC cards with capacities exceeding 2TiB.  However, this is purely
-  a software limitation with Rockbox's SD card drivers, and will be addressed in a future release.
+\opt{disk_storage,sd_storage}{
+\note{The disk format utility included with all versions Microsoft Windows released to date will refuse to create/format FAT32 partitons exceeding 32GiB, so users of larger storage devices will need an alternative tool. Options include GParted Live\footnote{\url{https://gparted.org/}}\opt{ipod}{ or performing a restore using iTunes on Windows}. \opt{sd_storage}{Addtionally, devices that support removable storage typically have a built-in format tool that can be used.}}
 }
 
 \opt{disk_storage}{
@@ -313,10 +318,9 @@ drive.
   increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each
   card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive
   that is the combined capacity of the individual cards in a RAID0-like manner. This also means that if any
-  one card fails, you lose everything.  Combined with the poor quality of most SD cards and the lack of support
-  for proper power management, this means use of multiple SD cards in one of these adapters is the reliable and most
-  power hungry solution of all.  Finally, in another violation of the ATA specification, these ATA<->SD adapters fail
-  to support addresses exceeding 32 bits, meaning that no matter which combination of cards is used, they simply will
+  one card fails, data on all other cards is most likely permenantly lost.  Combined with the poor quality of most SD cards and the lack of support
+  for proper power management, this means use of multiple SD cards in one of these adapters is the least reliable/robust and most power hungry solution of all.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail
+  to properly support addresses exceeding 32 bits, meaning that no matter which combination of cards is used, they simply will
   not work if their combined capacity exceeds 2TiB.
 \item
   All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care
