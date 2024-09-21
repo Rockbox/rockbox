@@ -635,6 +635,12 @@ Lyre prototype 1 */
 #endif
 #endif
 
+#if defined(__PCTOOL__) || defined(SIMULATOR)
+#ifndef CONFIG_PLATFORM
+#define CONFIG_PLATFORM PLATFORM_HOSTED
+#endif
+#endif
+
 #ifndef CONFIG_PLATFORM
 #define CONFIG_PLATFORM PLATFORM_NATIVE
 #endif
