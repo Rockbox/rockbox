@@ -296,9 +296,9 @@ For example, the stock Apple firmware on earlier 6th generation iPod Classic mod
 \opt{disk_storage}{
 \subsection{Flash/SSD mods}
   It is common to replace the device's original mechanical hard drive with
-  some sort of solid-state storage. Older versions of Rockbox (3.15 or prior) do not work properly with many
-  of these so-called ``flash mods'', the most common symptom being data corruption on write operations.  All
-  known data integrity issues have been resolved, but each type of adapter has its own quirks:
+  some sort of solid-state storage. Older versions of Rockbox (3.15 or prior) do \emph{not} work properly with many
+  of these so-called ``flash mods'', the most common symptom being data corruption on write-heavy operations.  All
+  known data integrity issues have been resolved, but each type of adapter still has its own quirks:
 \begin{description}
 \item[Compact Flash.]  True Compact Flash cards \emph{natively} implement the ATA command set, including
   advanced power management and the \emph{removeable} attribute. They are performant, reliable, and physically
@@ -307,22 +307,17 @@ For example, the stock Apple firmware on earlier 6th generation iPod Classic mod
   at the expense of power consumption.. However, as they implement the full ATA command set, we are able
   to aggressively power them down when not being actively used.
 \item[Single Secure Digital (SD).] While these adapters come in different form factors from multiple vendors,
-  they are all based on the same basic design. The ATA command set is \emph{incompletely emulated}, notably lacking
+  they are all based on the same basic design. The ATA command set is incompletely emulated, notably lacking
   support for the \emph{mandatory} ATA power management commands that Rockbox uses to flush caches and safely
-  transition the device in and out of low power states.  Additionally, SD cards themselves vary widely in quality
-  and power consumption, leading to widely varying battery life.  Finally, they do not support SDUC cards at all so are
-  limited to individual cards of 2TiB or less.
+  transition the device in and out of low power states.  Additionally, SD cards vary widely in quality
+  and power consumption with the resultant effects on data longevity and battery life. Finally, these SD adapters do not support 2TiB or larger SDUC cards.
 \item[Dual/Quad SD.]  These are similar to the above, only allowing use of mulitiple SD cards to
-  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each
-  card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive
-  that is the combined capacity of the individual cards in a RAID0-like manner. This also means that if any
-  one card fails, data on all other cards is most likely permenantly lost.  Combined with the poor quality of most SD cards and the lack of support
-  for proper power management, this means use of multiple SD cards in one of these adapters is the least reliable/robust and most power hungry solution of all.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail
-  to properly support addresses exceeding 32 bits, meaning that no matter which combination of cards is used, they simply will
-  not work if their combined capacity exceeds 2TiB.
+  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards is most likely permenantly lost.  Given the quality and power management concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust and the most power hungry of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter which combination of cards is used, they simply will not work if their combined capacity exceeds 2TiB.
 \end{description}
 
-All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.
+\note{All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.}
+
+It is also worth noting that you will not likely see improved data transfer rates when using solid-state storage; the underlying \dap{} hardware is simply too slow to materially benefit. However, the improved access times should help the \dap{} to feel much more responsive.
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
