@@ -271,14 +271,13 @@ of before installing.
 \subsection{Storage/Capacity Limits}
 
 \opt{disk_storage}{
-Rockbox supports larger drive capacities when used on devices
-that use ATA storage and GPT partitioning, but due to the limitations
-of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally,
-there are typically underlying platform limitations that
-make it difficult, if not impossible, to boot from a GPT-partitioned
-drive.
+Rockbox supports very large drive capacities when used with GPT partitioning on devices that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
 
-\note{In practice, no Rockbox-capable device can handle total drive capacities exceeding 2TiB.}
+\opt{ipod6g}{
+For example, the stock Apple firmware on earlier 6th generation iPod Classic models\footnote{MB029, MB145, MB147, MB150} is limited to drives no larger than 128GiB, and booting into the Apple firmware firmware with larger drive sizes will result in massive data corruption.  Later 6th generation iPod Classic models\footnote{MB562, MB565, MC293, MC297} (sometimes referred to as ``7th gen'') do not have this issue.  Rockbox itself will function correctly on all 6th/7th generation iPod Classi models.
+}
+
+\note{In practice, no Rockbox-capable device can currently handle total drive capacities exceeding 2TiB.}
 }
 
 \opt{sd_storage}{
@@ -321,11 +320,9 @@ drive.
   for proper power management, this means use of multiple SD cards in one of these adapters is the least reliable/robust and most power hungry solution of all.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail
   to properly support addresses exceeding 32 bits, meaning that no matter which combination of cards is used, they simply will
   not work if their combined capacity exceeds 2TiB.
-\item
-  All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care
-  must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur
-  in portable devices.  Ribbon cables are particularly vulnerable.
 \end{description}
+
+All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
