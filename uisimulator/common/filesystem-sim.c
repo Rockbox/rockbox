@@ -205,14 +205,14 @@ void sim_ext_extracted(int drive)
     for (unsigned int i = 0; i < MAX_OPEN_FILES; i++)
     {
         struct filestr_desc *filestr = &openfiles[i];
-        if (filestr->osfd >= 0 && IF_MV(volume_drive(filestr->volume) == drive))
+        if (filestr->osfd >= 0 IF_MV(&& volume_drive(filestr->volume) == drive))
             filestr->mounted = false;
     }
 
     for (unsigned int i = 0; i < MAX_OPEN_DIRS; i++)
     {
         struct dirstr_desc *dirstr = &opendirs[i];
-        if (dirstr->osdirp && IF_MV(volume_drive(dirstr->volume) == drive))
+        if (dirstr->osdirp IF_MV(&& volume_drive(dirstr->volume) == drive))
             dirstr->mounted = false;
     }
 
