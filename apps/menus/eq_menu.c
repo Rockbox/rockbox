@@ -638,7 +638,7 @@ int eq_menu_graphical(void)
                 max = EQ_GAIN_MAX;
 
                 screens[i].putsxyf(0, 0, str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                         str(LANG_SYSFONT_GAIN), "(dB)");
+                         str(LANG_GAIN), "(dB)");
             } else if (mode == CUTOFF) {
                 /* cutoff */
                 setting = &global_settings.eq_band_settings[current_band].cutoff;
@@ -660,7 +660,7 @@ int eq_menu_graphical(void)
                 max = EQ_Q_MAX;
 
                 screens[i].putsxyf(0, 0, str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                         str(LANG_SYSFONT_EQUALIZER_BAND_Q), "");
+                         str(LANG_EQUALIZER_BAND_Q), "");
             }
 
             /* Draw scrollbar if needed */
@@ -793,4 +793,3 @@ MENUITEM_FUNCTION_W_PARAM(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu,
         &advanced_menu, &eq_save, &eq_browse);
-
