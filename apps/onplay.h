@@ -28,6 +28,7 @@
 enum {
     ONPLAY_NO_CUSTOMACTION,
     ONPLAY_CUSTOMACTION_SHUFFLE_SONGS,
+    ONPLAY_CUSTOMACTION_FIRSTLETTER,
 };
 
 int onplay(char* file, int attr, int from_context, bool hotkey, int customaction);

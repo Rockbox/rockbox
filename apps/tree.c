@@ -205,6 +205,7 @@ static int tree_voice_cb(int selected_item, void * data)
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
+    int customaction = ONPLAY_NO_CUSTOMACTION;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     char buf[AVERAGE_FILENAME_LENGTH*2];
@@ -213,6 +214,7 @@ static int tree_voice_cb(int selected_item, void * data)
     {
         attr = tagtree_get_attr(local_tc);
         name = tagtree_get_entry_name(local_tc, selected_item, buf, sizeof(buf));
+        customaction = tagtree_get_custom_action(local_tc);
     }
     else
 #endif
@@ -245,7 +247,7 @@ static int tree_voice_cb(int selected_item, void * data)
                 did_clip = false;
         }
     }
-    bool spell_name = false;
+    bool spell_name = (customaction == ONPLAY_CUSTOMACTION_FIRSTLETTER);
     if(!did_clip)
     {
         /* say the number or spell if required or as a fallback */
