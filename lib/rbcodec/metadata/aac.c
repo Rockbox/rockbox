@@ -134,7 +134,8 @@ bool get_aac_metadata(int fd, struct mp3entry *entry)
     }
     else
     {
-        return false;
+        lseek(fd, 0, SEEK_SET);
+        return get_mp4_metadata(fd, entry);
     }
 
     entry->length = (unsigned long)((entry->filesize * 8LL + (entry->bitrate >> 1)) / entry->bitrate);
