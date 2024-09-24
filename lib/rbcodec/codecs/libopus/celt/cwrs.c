@@ -208,7 +208,7 @@ int log2_frac(opus_uint32 val, int frac)
    splitting a band from a standard Opus mode: 176, 144, 96, 88, 72, 64, 48,
    44, 36, 32, 24, 22, 18, 16, 8, 4, 2).*/
 #if defined(CUSTOM_MODES)
-static const opus_uint32 CELT_PVQ_U_DATA[1488]={
+static const opus_uint32 CELT_PVQ_U_DATA[1488] ICONST_ATTR ={
 #else
 static const opus_uint32 CELT_PVQ_U_DATA[1272] ICONST_ATTR ={
 #endif
@@ -418,7 +418,7 @@ static const opus_uint32 *const CELT_PVQ_U_ROW[15] ICONST_ATTR ={
   CELT_PVQ_U_DATA+1464,CELT_PVQ_U_DATA+1470,CELT_PVQ_U_DATA+1473
 };
 #else
-static const opus_uint32 *const CELT_PVQ_U_ROW[15]={
+static const opus_uint32 *const CELT_PVQ_U_ROW[15] ICONST_ATTR ={
   CELT_PVQ_U_DATA+   0,CELT_PVQ_U_DATA+ 176,CELT_PVQ_U_DATA+ 351,
   CELT_PVQ_U_DATA+ 525,CELT_PVQ_U_DATA+ 698,CELT_PVQ_U_DATA+ 870,
   CELT_PVQ_U_DATA+1041,CELT_PVQ_U_DATA+1131,CELT_PVQ_U_DATA+1178,
