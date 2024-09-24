@@ -84,7 +84,7 @@ struct voicefile_header /* file format of our voice file */
 
 /***************** Globals *****************/
 
-#if MEMORYSIZE <= 2
+#if MEMORYSIZE <= 8
 /* On low memory swcodec targets the entire voice file wouldn't fit in memory
  * together with codecs, so we load clips each time they are accessed. */
 #define TALK_PROGRESSIVE_LOAD
