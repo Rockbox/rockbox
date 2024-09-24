@@ -580,6 +580,12 @@ static void init_buffer_state(void)
     chunk_transidx = INVALID_BUF_INDEX;
 }
 
+/* call prior to init to get bytes required */
+size_t pcmbuf_size_reqd(void)
+{
+    return get_next_required_pcmbuf_chunks() * PCMBUF_CHUNK_SIZE;
+}
+
 /* Initialize the PCM buffer. The structure looks like this:
  * ...|---------PCMBUF---------|GUARDBUF|DESCS| */
 size_t pcmbuf_init(void *bufend)
