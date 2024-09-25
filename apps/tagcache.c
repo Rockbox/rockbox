@@ -970,6 +970,7 @@ static int find_index(const char *filename)
 
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
 {
+    /* NOTE: on ret==true you need to call tagcache_search_finish(tcs) yourself */
     int idx_id;
 
     if (!tc_stat.ready)
@@ -1721,6 +1722,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
 
 bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
+    /* NOTE: call tagcache_search_finish(&tcs) when finished or BAD things may happen (TM) */
     struct tagcache_header tag_hdr;
     struct master_header   master_hdr;
     int i;
@@ -3936,6 +3938,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
     if (clfd < 0)
     {
         logf("failure to open changelog");
+        tagcache_search_finish(tcs);
         return false;
     }
 
@@ -3944,6 +3947,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         if ( (tcs->masterfd = open_master_fd(&myhdr, false)) < 0)
         {
             close(clfd);
+            tagcache_search_finish(tcs);
             return false;
         }
     }

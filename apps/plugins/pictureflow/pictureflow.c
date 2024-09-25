@@ -1218,7 +1218,10 @@ static int create_album_untagged(struct tagcache_search *tcs,
         {
             if (rb->button_get(false) > BUTTON_NONE) {
                 if (confirm_quit())
+                {
+                    rb->tagcache_search_finish(tcs);
                     return ERROR_USER_ABORT;
+                }
                 else
                 {
                     rb->lcd_clear_display();
