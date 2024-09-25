@@ -8725,20 +8725,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Verstärkg."
-  </dest>
-  <voice>
-    *: "Verstärkung"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user: core
@@ -11784,20 +11770,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "~Q"
-  </dest>
-  <voice>
-    *: "~Q"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_SHARP
   desc: in sound settings
   user: core
@@ -13578,16 +13550,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "Wiedrgabeliste verbleibend:"
+    *: ""
   </dest>
   <voice>
-    *: "Wiedrgabeliste verbleibend"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16424,5 +16396,89 @@
   </dest>
   <voice>
     *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Titel & Album von ID3 Tags"
+  </dest>
+  <voice>
+    *: "Titel und Album von Tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Titel von ID3 Tags"
+  </dest>
+  <voice>
+    *: "Titel von Tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Auswahl zu groß, %d zufällige Titel werden ausgewählt"
+  </dest>
+  <voice>
+    *: "Auswahl zu groß, weniger zufällige Titel werden ausgewählt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Datei wählen"
+  </dest>
+  <voice>
+    *: "Datei wählen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Hauptmenü scrollen deaaktivieren"
+  </dest>
+  <voice>
+    *: "Hauptmenü scrollen deaktivieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Verbleibend"
+  </dest>
+  <voice>
+    *: "Verbleibend"
   </voice>
 </phrase>
