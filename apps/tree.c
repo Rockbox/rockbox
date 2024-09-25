@@ -421,7 +421,7 @@ static int update_dir(void)
     {
         tc.sort_dir = global_settings.sort_dir;
         /* if the tc.currdir has been changed, reload it ...*/
-        if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir)
+        if (reload_dir || strncmp(tc.currdir, lastdir, sizeof(lastdir)))
         {
             if (ft_load(&tc, NULL) < 0)
                 return -1;
@@ -584,14 +584,23 @@ char* get_current_file(char* buffer, size_t buffer_len)
     struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
     if (entry && getcwd(buffer, buffer_len))
     {
-        if (tc.dirlength)
+        if (!tc.dirlength)
+            return buffer;
+
+        size_t usedlen = strlen(buffer);
+
+        if (usedlen + 2 < buffer_len) /* ensure enough room for '/' + '\0' */
         {
-            if (buffer[strlen(buffer)-1] != '/')
-                strlcat(buffer, "/", buffer_len);
-            if (strlcat(buffer, entry->name, buffer_len) >= buffer_len)
-                return NULL;
+            if (buffer[usedlen-1] != '/')
+            {
+                buffer[usedlen] = '/';
+                /* strmemccpy will zero terminate if we run out of space after */
+                usedlen++;
+            }
+            buffer_len -= usedlen;
+            if (strmemccpy(buffer + usedlen, entry->name, buffer_len) != NULL)
+                return buffer;
         }
-        return buffer;
     }
     return NULL;
 }
