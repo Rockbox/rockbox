@@ -82,7 +82,12 @@ int ft_build_playlist(struct tree_context* c, int start_index)
 
     tree_lock_cache(c);
     struct entry *entries = tree_get_entries(c);
-
+    bool exceeds_pl = false;
+    if (c->filesindir > playlist->max_playlist_size)
+    {
+        exceeds_pl = true;
+        start_index = 0;
+    }
     struct playlist_insert_context pl_context;
 
     res = playlist_insert_context_create(playlist, &pl_context,
@@ -92,6 +97,9 @@ int ft_build_playlist(struct tree_context* c, int start_index)
         cpu_boost(true);
         for(i = 0;i < c->filesindir;i++)
         {
+            int item = i;
+            if (exceeds_pl)
+                item = (i + start) % c->filesindir;
 #if 0 /*only needed if displaying progress */
             /* user abort */
             if (action_userabort(TIMEOUT_NOBLOCK))
@@ -99,13 +107,13 @@ int ft_build_playlist(struct tree_context* c, int start_index)
                 break;
             }
 #endif
-            if((entries[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
+            if((entries[item].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
             {
-                res = playlist_insert_context_add(&pl_context, entries[i].name);
+                res = playlist_insert_context_add(&pl_context, entries[item].name);
                 if (res < 0)
                     break;
             }
-            else
+            else if (!exceeds_pl)
             {
                 /* Adjust the start index when se skip non-MP3 entries */
                 if(i < start)
