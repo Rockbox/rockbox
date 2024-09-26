@@ -1949,10 +1949,14 @@ void playlist_init(void)
  * Clean playlist at shutdown
  */
 void playlist_shutdown(void)
+
 {
+    /*BugFix we need to save resume info first */
+    /*if (usb_detect() == USB_INSERTED)*/
+    audio_stop();
     struct playlist_info* playlist = &current_playlist;
     playlist_write_lock(playlist);
-
+    logf("Closing Control %s", __func__);
     if (playlist->control_fd >= 0)
         pl_close_control(playlist);
 
