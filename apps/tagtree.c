@@ -2346,8 +2346,6 @@ static bool insert_all_playlist(struct tree_context *c,
             break;
         }
         yield();
-        if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
-            position = PLAYLIST_INSERT;
 
         if (exit_loop_now)
             break;
