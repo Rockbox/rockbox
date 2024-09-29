@@ -138,9 +138,10 @@
  * v4 added the (F)lags command.
  * v5 added index to the (C)lear command. Added PLAYLIST_INSERT_LAST_ROTATED (-8) as
  *    a supported position for (A)dd or (Q)eue commands.
+ * v6 removed the (C)lear command.
  */
 #define PLAYLIST_CONTROL_FILE_MIN_VERSION   2
-#define PLAYLIST_CONTROL_FILE_VERSION       5
+#define PLAYLIST_CONTROL_FILE_VERSION       6
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
 
@@ -435,9 +436,6 @@ static int update_control_unlocked(struct playlist_info* playlist,
         break;
     case PLAYLIST_COMMAND_RESET:
         result = write(fd, "R\n", 2);
-        break;
-    case PLAYLIST_COMMAND_CLEAR:
-        result = fdprintf(fd, "C:%d\n", i1);
         break;
     case PLAYLIST_COMMAND_FLAGS:
         result = fdprintf(fd, "F:%u:%u\n", i1, i2);
@@ -1174,8 +1172,31 @@ static int create_and_play_dir(int direction, bool play_last)
  */
 static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write)
 {
+    char filename[MAX_PATH];
+    int seek_pos = -1;
+
     if (playlist->amount <= 0)
         return 0;
+
+    if (write) /* Write control file commands to disk */
+    {
+        if (playlist->control_fd < 0)
+            return -1;
+
+        if (get_track_filename(playlist, playlist->index,
+                               filename, sizeof(filename)) != 0)
+            return -1;
+
+        /* Start over with fresh control file for emptied dynamic playlist */
+        pl_close_control(playlist);
+        create_control_unlocked(playlist);
+        update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
+                                PLAYLIST_CONTROL_FILE_VERSION, -1,
+                                "", "", NULL);
+        update_control_unlocked(playlist, PLAYLIST_COMMAND_QUEUE,
+                                0, 0, filename, NULL, &seek_pos);
+        sync_control_unlocked(playlist);
+    }
 
     /* Move current track down to position 0 */
     playlist->indices[0] = playlist->indices[playlist->index];
@@ -1190,22 +1211,25 @@ static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write
 
     /* Update playlist state as if by remove_track_unlocked() */
     playlist->first_index = 0;
+    playlist->index = 0;
     playlist->amount = 1;
     playlist->indices[0] |= PLAYLIST_QUEUED;
+    playlist->flags = 0; /* Reset dirplay and modified flags */
 
     if (playlist->last_insert_pos == 0)
         playlist->last_insert_pos = -1;
     else
         playlist->last_insert_pos = 0;
 
-    if (write && playlist->control_fd >= 0)
-    {
-        update_control_unlocked(playlist, PLAYLIST_COMMAND_CLEAR,
-                                playlist->index, -1, NULL, NULL, NULL);
-        sync_control_unlocked(playlist);
-    }
+    if (seek_pos == -1)
+        return 0;
 
-    playlist->index = 0;
+    /* Update seek offset so it points into the new control file. */
+    playlist->indices[0] &= ~PLAYLIST_INSERT_TYPE_MASK & ~PLAYLIST_SEEK_MASK;
+    playlist->indices[0] |= PLAYLIST_INSERT_TYPE_INSERT | seek_pos;
+
+    /* Cut connection to playlist file */
+    update_playlist_filename_unlocked(playlist, "", "");
 
     return 0;
 }
@@ -3402,6 +3426,8 @@ int playlist_resume(void)
                         playlist->last_insert_pos = -1;
                         break;
                     }
+                    /* FIXME: Deprecated.
+                     * Adjust PLAYLIST_CONTROL_FILE_MIN_VERSION after removal */
                     case PLAYLIST_COMMAND_CLEAR:
                     {
                         if (strp[0])
@@ -3960,11 +3986,12 @@ static int pl_save_update_control(struct playlist_info* playlist,
         playlist->last_insert_pos = rotate_index(playlist, playlist->last_insert_pos);
         playlist->first_index = 0;
     }
-    
+
     for (int index = 0; index < playlist->amount; ++index)
     {
         /* We only need to update queued files */
-        if (!(playlist->indices[index] & PLAYLIST_QUEUED))
+        if (!(playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK &&
+              playlist->indices[index] & PLAYLIST_QUEUED))
             continue;
 
         /* Read filename from old control file */
