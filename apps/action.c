@@ -1217,7 +1217,8 @@ bool action_userabort(int timeout)
 
 void action_wait_for_release(void)
 {
-    action_last.wait_for_release = true;
+    if (!(action_last.button & BUTTON_REL))
+        action_last.wait_for_release = true;
 }
 
 int get_action(int context, int timeout)
