@@ -717,6 +717,7 @@ static int scroll_bmp(struct image_info *info, bool initial_frame)
 #ifdef IMGVIEW_ZOOM_PRE
             if (lastbutton != IMGVIEW_ZOOM_PRE)
                 break;
+            lastbutton = button;
 #endif
             return ZOOM_IN;
             break;
@@ -725,6 +726,7 @@ static int scroll_bmp(struct image_info *info, bool initial_frame)
 #ifdef IMGVIEW_ZOOM_PRE
             if (lastbutton != IMGVIEW_ZOOM_PRE)
                 break;
+            lastbutton = button;
 #endif
             return ZOOM_OUT;
             break;
