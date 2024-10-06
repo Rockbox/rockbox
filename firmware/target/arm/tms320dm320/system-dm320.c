@@ -100,7 +100,7 @@ default_interrupt(RESERVED);
  * change the offset for the interrupt in the entry table.
  */
 
-static const unsigned short const irqpriority[] =
+static const unsigned short irqpriority[] =
 {
     IRQ_TIMER0,IRQ_TIMER1,IRQ_TIMER2,IRQ_TIMER3,IRQ_CCD_VD0,IRQ_CCD_VD1,
     IRQ_CCD_WEN,IRQ_VENC,IRQ_SERIAL0,IRQ_SERIAL1,IRQ_EXT_HOST,IRQ_DSPHINT,
