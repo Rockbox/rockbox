@@ -701,6 +701,12 @@ bool queue_empty(const struct event_queue* q)
     return ( q->read == q->write );
 }
 
+/* Poll queue to see if it is full */
+bool queue_full(const struct event_queue* q)
+{
+    return ((q->write - q->read) >= QUEUE_LENGTH);
+}
+
 void queue_clear(struct event_queue* q)
 {
     int oldlevel;

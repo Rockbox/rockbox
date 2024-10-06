@@ -141,6 +141,7 @@ extern void queue_reply(struct event_queue *q, intptr_t retval);
 extern bool queue_in_queue_send(struct event_queue *q);
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 extern bool queue_empty(const struct event_queue* q);
+extern bool queue_full(const struct event_queue* q);
 extern bool queue_peek(struct event_queue *q, struct queue_event *ev);
 
 #define QPEEK_FILTER_COUNT_MASK (0xffu) /* 0x00=1 filter, 0xff=256 filters */
