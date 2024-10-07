@@ -58,8 +58,8 @@
 #include "pcm_mixer.h"
 #endif
 
-#ifdef SIMULATOR
-#include <strings.h>
+#if defined(SIMULATOR) || defined(SDLAPP)
+#include <strings.h>  /* For strncasecmp() */
 #endif
 
 /* TODO: The audio thread really is doing multitasking of acting like a
