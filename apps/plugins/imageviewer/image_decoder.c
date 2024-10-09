@@ -25,12 +25,13 @@
 
 static const char *decoder_names[MAX_IMAGE_TYPES] = {
     "bmp",
-    "jpeg",
+    "jpeg", // Default decoder for jpeg: Use jpeg for old decoder, jpegp for new
     "png",
 #ifdef HAVE_LCD_COLOR
     "ppm",
 #endif
-    "gif"
+    "gif",
+    "jpegp",
 };
 
 /* Check file type by magic number or file extension

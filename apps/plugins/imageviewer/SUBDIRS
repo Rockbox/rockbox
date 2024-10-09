@@ -3,5 +3,6 @@ jpeg
 png
 #ifdef HAVE_LCD_COLOR
 ppm
+jpegp
 #endif
 gif

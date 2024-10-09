@@ -144,4 +144,4 @@ struct JPEGD {		// The JPEG DECODER OBJECT
 
 };
 
-extern int JPEGDecode(struct JPEGD *j);
+extern enum JPEGENUM JPEGDecode(struct JPEGD *j);

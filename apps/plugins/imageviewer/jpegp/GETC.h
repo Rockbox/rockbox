@@ -37,20 +37,20 @@
 
 // For decoders
 
-extern int GETC();
+extern int GETC(void);
 
 // Multibyte helpers
-extern int GETWbi();	// read word (16-bit) big-endian
-extern int GETWli();	// little-endian
-extern int GETDbi();	// read double word (32-bit) big-endian
-extern int GETDli();	// little-endian
+extern int GETWbi(void);	// read word (16-bit) big-endian
+extern int GETWli(void);	// little-endian
+extern int GETDbi(void);	// read double word (32-bit) big-endian
+extern int GETDli(void);	// little-endian
 
 // positioning
 extern void SEEK(int);	// move relative to current
 extern void POS(int);	// move absolute position (TIFF)
-extern int TELL();		// read actual position 
+extern int TELL(void);		// read actual position 
 
 
 // For RAINBOW clients to implement outside of Rainbow Library
 extern void *OPEN(char*);
-extern void CLOSE();
+extern void CLOSE(void);

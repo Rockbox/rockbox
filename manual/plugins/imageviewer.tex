@@ -161,7 +161,8 @@ for JPEG images.
 \end{description}
 
 \note{
-Progressive scan and other unusual JPEG files are not supported, and will
+\opt{lcd_color}{Progressive scan is supported. Unsupported JPEG files}
+\nopt{lcd_color}{Progressive scan and other unusual JPEG files are not supported, and} will
 result in various ``unsupported xx'' messages. Processing could also fail if the
 image is too big to decode which will be explained by a respective message.
 

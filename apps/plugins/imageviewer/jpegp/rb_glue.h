@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * load image decoder.
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,37 +18,18 @@
  *
  ****************************************************************************/
 
-#ifndef _IMAGE_DECODER_H
-#define _IMAGE_DECODER_H
+#include "plugin.h"
+#include "mempool.h"
 
-#include "imageviewer.h"
+//define from rbunicode.h clashes with jpeg81.h struct
+#undef COMP
 
-enum image_type {
-    IMAGE_UNKNOWN = -1,
-    IMAGE_BMP = 0,
-    IMAGE_JPEG,
-    IMAGE_PNG,
-#ifdef HAVE_LCD_COLOR
-    IMAGE_PPM,
+#undef  memset
+#define memset(a,b,c)      rb->memset((a),(b),(c))
+
+#if defined(DEBUG) || defined(SIMULATOR)
+#define printf rb->debugf
+#else
+#undef printf
+#define printf(...)
 #endif
-    IMAGE_GIF,
-    IMAGE_JPEG_PROGRESSIVE,
-
-    MAX_IMAGE_TYPES
-};
-
-struct loader_info {
-    enum image_type type;
-    const struct imgdec_api *iv;
-    unsigned char* buffer;
-    size_t size;
-};
-
-/* Check file type by magic number or file extension */
-enum image_type get_image_type(const char *name, bool quiet);
-/* Load image decoder */
-const struct image_decoder *load_decoder(struct loader_info *loader_info);
-/* Release the loaded decoder */
-void release_decoder(void);
-
-#endif /* _IMAGE_DECODER_H */

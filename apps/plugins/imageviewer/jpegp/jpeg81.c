@@ -40,12 +40,12 @@ jpeg81.c
 *   SOFTWARE.
 */
 
-#include "GETC.h" 
+#include "GETC.h"
+#include "rb_glue.h"
 #include "jpeg81.h"
-#include <malloc.h>		// calloc() called once
-#include <stdio.h>		// debug only
 
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 ///////////////////////////////////////// LOSSLESS /////////////////////////////////////////
 
 static int P1(struct COMP *C, TSAMP *samp)	// Px = Ra
@@ -63,17 +63,17 @@ static int P3(struct COMP *C, TSAMP *samp)	// Px = Rc
 	return samp[-C->du_width-1];
 }
 
-static int P4(struct COMP *C, TSAMP *samp)	// Px = Ra + Rb – Rc
+static int P4(struct COMP *C, TSAMP *samp)	// Px = Ra + Rb - Rc
 {
 	return samp[-1] + samp[-C->du_width] - samp[-C->du_width-1];
 }
 
-static int P5(struct COMP *C, TSAMP *samp)	// Px = Ra + ((Rb – Rc)/2)
+static int P5(struct COMP *C, TSAMP *samp)	// Px = Ra + ((Rb - Rc)/2)
 {
 	return samp[-1] + ( (samp[-C->du_width] - samp[-C->du_width-1]) >> 1 );
 }
 
-static int P6(struct COMP *C, TSAMP *samp)	// Px = Rb + ((Ra – Rc)/2)
+static int P6(struct COMP *C, TSAMP *samp)	// Px = Rb + ((Ra - Rc)/2)
 {
 	return samp[-C->du_width] + ( (samp[-1] - samp[-C->du_width-1]) >> 1 );
 }
@@ -215,7 +215,7 @@ static void du_sequential_huff(struct JPEGD *j, struct COMP *sc, TCOEF *coef)
 {
 	int s, k;
 	dc_decode_huff(j, sc, coef);
-	for (k=1; s=sc->ACS[ReadHuffmanCode(j, sc->ACB)]; k++) { // EOB?
+	for (k=1; (s=sc->ACS[ReadHuffmanCode(j, sc->ACB)]); k++) { // EOB?
 		k+= s>>4;
 		if (s==0xf0) continue; // ZRL
 		coef[k]= ReadDiff(j, s&15);
@@ -496,7 +496,7 @@ static void Ri(struct JPEGD *j, int n)
 				printf("RST%d\n", Marker&7);
 				printf("%08X: ECS\n", TELL());
 			}
-			else printf("STREAM ERROR: expected RSTn missing from ECS\n");
+			else { printf("STREAM ERROR: expected RSTn missing from ECS\n"); }
 			j->Reset_decoder(j);
 		}
 	}			
@@ -832,7 +832,7 @@ extern enum JPEGENUM JPEGDecode(struct JPEGD *j)
 					}
 				}
 
-				printf("  Malloc for %d Data Units (%d bytes)\n\n", TotalDU, sizeof(DU)*TotalDU);				
+				printf("  Malloc for %d Data Units (%lu bytes)\n\n", TotalDU, sizeof(DU)*TotalDU);
 
 				if (j->SOF > 0xC8) {	// DCT Arithmetic
 					j->Reset_decoder= Reset_decoder_arith;
@@ -953,7 +953,7 @@ extern enum JPEGENUM JPEGDecode(struct JPEGD *j)
 
 			for (Lq-=2; Lq; Lq -= 65 + 64*Pq) 
 			{
-				int (*get)();
+				int (*get)(void);
 				int T= GETC(); 
 				int Tq= T&3;
 				int *qt= j->QT[Tq];
@@ -993,3 +993,5 @@ extern enum JPEGENUM JPEGDecode(struct JPEGD *j)
 		}
 	}
 }
+
+#pragma GCC diagnostic pop

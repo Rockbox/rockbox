@@ -170,8 +170,12 @@ static int load_image(char *filename, struct image_info *info,
 
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
+#ifndef HAVE_LCD_COLOR
         rb->splashf(HZ, "unsupported %d", status);
         return PLUGIN_ERROR;
+#else
+        return PLUGIN_JPEG_PROGRESSIVE;
+#endif
     }
 
     if (!(status & DHT)) /* if no Huffman table present: */
