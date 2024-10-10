@@ -53,11 +53,29 @@
    BUFFER_BYTES: [4096 524288]
    TICK_TIME: ALL
 
- Mixer controls:
+ Mixer controls (v1):
 
      numid=1,iface=MIXER,name='Output Port Switch'
       ; type=INTEGER,access=rw------,values=1,min=0,max=5,step=0
       : values=4
+
+  Mixer controls (v2+):
+
+     numid=3,iface=MIXER,name='ES9018_K2M Digital Filter'
+       ; type=INTEGER,access=rw------,values=1,min=0,max=4,step=0
+       : values=0
+     numid=1,iface=MIXER,name='Left Playback Volume'
+       ; type=INTEGER,access=rw------,values=1,min=0,max=255,step=0
+       : values=0
+     numid=4,iface=MIXER,name='Output Port Switch'
+       ; type=INTEGER,access=rw------,values=1,min=0,max=5,step=0
+       : values=0
+     numid=2,iface=MIXER,name='Right Playback Volume'
+       ; type=INTEGER,access=rw------,values=1,min=0,max=255,step=0
+       : values=0
+     numid=5,iface=MIXER,name='isDSD'
+       ; type=BOOLEAN,access=rw------,values=1
+       : values=off
 */
 
 static int hw_init = 0;
@@ -67,6 +85,8 @@ static long int vol_r_hw = 255;
 static long int last_ps = -1;
 
 static int muted = -1;
+
+extern int hwver;
 
 void audiohw_mute(int mute)
 {
@@ -129,6 +149,13 @@ void audiohw_preinit(void)
     logf("hw preinit");
     alsa_controls_init("default");
     hw_init = 1;
+
+    /* See if we have hw2 or later */
+    if (alsa_controls_find("Left Playback Volume") == -1)
+        hwver = 1;
+    else if (hwver == 1)
+        hwver = 23;
+
     audiohw_mute(false);  /* No need to stay muted */
 }
 
@@ -154,10 +181,8 @@ void audiohw_set_frequency(int fsel)
 const int min_pcm = -740;
 const int max_pcm = 0;
 
-void audiohw_set_volume(int vol_l, int vol_r)
+static void audiohw_set_volume_v1(int vol_l, int vol_r)
 {
-    logf("hw vol %d %d", vol_l, vol_r);
-
     long l,r;
 
     vol_l_hw = vol_l;
@@ -180,6 +205,39 @@ void audiohw_set_volume(int vol_l, int vol_r)
     pcm_set_mixer_volume(sw_volume_l / 20, sw_volume_r / 20);
 }
 
+static void audiohw_set_volume_v2(int vol_l, int vol_r)
+{
+    long l,r;
+
+    if (lineout_inserted()) {
+        vol_l_hw = vol_r_hw = global_settings.volume_limit * 10;
+    } else {
+        vol_l_hw = -vol_l;
+        vol_r_hw = -vol_r;
+    }
+
+    if (!hw_init)
+       return;
+
+    l = vol_l_hw / 5;
+    r = vol_l_hw / 5;
+
+    alsa_controls_set_ints("Left Playback Volume", 1, &l);
+    alsa_controls_set_ints("Right Playback Volume", 1, &r);
+
+    /* Dial back PCM mixer to avoid compression */
+    pcm_set_mixer_volume(global_settings.volume_limit / 2, global_settings.volume_limit / 2);
+}
+
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    if (hwver >= 2) {
+        audiohw_set_volume_v2(vol_l, vol_r);
+    } else {
+        audiohw_set_volume_v1(vol_l, vol_r);
+    }
+}
+
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
     long l,r;
@@ -196,7 +254,16 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
         r = vol_r_hw;
     }
 
-    int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
-    int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
-    pcm_set_mixer_volume(sw_volume_l / 20, sw_volume_r / 20);
+    if (hwver >= 2) {
+         if (hw_init) {
+             l /= 5;
+             r /= 5;
+             alsa_controls_set_ints("Left Playback Volume", 1, &l);
+             alsa_controls_set_ints("Right Playback Volume", 1, &r);
+         }
+    } else {
+        int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
+        int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
+        pcm_set_mixer_volume(sw_volume_l / 20, sw_volume_r / 20);
+    }
 }

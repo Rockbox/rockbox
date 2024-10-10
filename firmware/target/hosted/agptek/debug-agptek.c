@@ -37,6 +37,8 @@
 
 static int line = 0;
 
+extern int hwver;
+
 bool dbg_hw_info(void)
 {
     int btn = 0;
@@ -60,6 +62,10 @@ bool dbg_hw_info(void)
         if (verstr[0]) {
             lcd_putsf(0, line++, "Boot ver: %s", verstr);
         }
+
+#ifdef EROS_Q
+        lcd_putsf(0, line++, "hwver: %d", hwver);
+#endif
 
         lcd_putsf(0, line++, "pcm srate: %d", pcm_alsa_get_rate());
         lcd_putsf(0, line++, "pcm xruns: %d", pcm_alsa_get_xruns());

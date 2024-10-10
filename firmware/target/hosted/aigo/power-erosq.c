@@ -45,16 +45,16 @@ const char * const sysfs_bat_status[2] = {
     "/sys/class/power_supply/axp_battery/status",
 };
 
-static int hwver = 0;
+int hwver = 1;  /* Exported */
 
 unsigned int erosq_power_get_battery_voltage(void)
 {
     int battery_voltage;
-    int x = sysfs_get_int(sysfs_bat_voltage[hwver], &battery_voltage);
+    int x = sysfs_get_int(sysfs_bat_voltage[hwver == 4], &battery_voltage);
 
-    if (!x) {
-        hwver ^= 1;
-        sysfs_get_int(sysfs_bat_voltage[hwver], &battery_voltage);
+    if (!x && hwver != 4) {
+        hwver = 4;
+        sysfs_get_int(sysfs_bat_voltage[hwver == 4], &battery_voltage);
     }
 
     return battery_voltage/1000;
@@ -63,11 +63,11 @@ unsigned int erosq_power_get_battery_voltage(void)
 unsigned int erosq_power_get_battery_capacity(void)
 {
     int battery_capacity;
-    int x = sysfs_get_int(sysfs_bat_capacity[hwver], &battery_capacity);
+    int x = sysfs_get_int(sysfs_bat_capacity[hwver == 4], &battery_capacity);
 
-    if (!x) {
-        hwver ^= 1;
-        sysfs_get_int(sysfs_bat_capacity[hwver], &battery_capacity);
+    if (!x && hwver != 4) {
+        hwver = 4;
+        sysfs_get_int(sysfs_bat_capacity[hwver == 4], &battery_capacity);
     }
 
     return battery_capacity;
@@ -81,11 +81,11 @@ bool charging_state(void)
 {
     if ((current_tick - last_tick) > HZ/2 ) {
         char buf[12] = {0};
-        int x = sysfs_get_string(sysfs_bat_status[hwver], buf, sizeof(buf));
+        int x = sysfs_get_string(sysfs_bat_status[hwver == 4], buf, sizeof(buf));
 
-        if (!x) {
-            hwver ^= 1;
-            sysfs_get_string(sysfs_bat_status[hwver], buf, sizeof(buf));
+        if (!x && hwver != 4) {
+            hwver = 4;
+            sysfs_get_string(sysfs_bat_status[hwver == 4], buf, sizeof(buf));
         }
 
         last_tick = current_tick;
