@@ -86,5 +86,7 @@
 #define ROOTDRIVE_DEV "/sys/block/mmcblk0"
 
 /* More common stuff */
+#ifndef EROS_Q
 #define BATTERY_DEV_NAME "battery"
+#endif
 #define POWER_DEV_NAME "usb"

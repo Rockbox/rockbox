@@ -33,9 +33,13 @@
 #include "usb.h"
 #endif
 
+#ifdef BATTERY_DEV_NAME
 #define BATTERY_STATUS_PATH "/sys/class/power_supply/" BATTERY_DEV_NAME "/status"
+#endif
+
 #define POWER_STATUS_PATH "/sys/class/power_supply/" POWER_DEV_NAME "/online"
 
+#ifdef BATTERY_DEV_NAME
 /* We get called multiple times per tick, let's cut that back! */
 static long last_tick = 0;
 static bool last_power = false;
@@ -51,6 +55,7 @@ bool charging_state(void)
     }
     return last_power;
 }
+#endif
 
 unsigned int power_input_status(void)
 {
