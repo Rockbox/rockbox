@@ -57,7 +57,7 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_mday = buf[4];
     tm->tm_mon = buf[5] - 1;
 
-#ifdef IRIVER_H300_SERIES 
+#ifdef IRIVER_H300_SERIES
     /* Special kludge to coexist with the iriver firmware. The iriver firmware
        stores the date as 1965+nn, and allows a range of 1980..2064. We use
        1964+nn here to make leap years work correctly, so the date will be one
@@ -158,7 +158,7 @@ bool rtc_check_alarm_started(bool release_alarm)
 
     if (run_before) {
         rc = alarm_state;
-        alarm_state &= ~release_alarm;
+        alarm_state &= !release_alarm;
     } else {
         char rt[3], at[3];
         /* The Ipod bootloader seems to read (and thus clear) the PCF interrupt
