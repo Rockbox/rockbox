@@ -464,16 +464,16 @@ build() {
         cd "$toolname-$version"
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
-            getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gmp"
-            tar xjf $dlwhere/gmp-4.3.2.tar.bz2
-            ln -s gmp-4.3.2 gmp
+            getfile "gmp-6.1.2.tar.xz" "$GNU_MIRROR/gmp"
+            tar xJf $dlwhere/gmp-6.1.2.tar.xz
+            ln -s gmp-6.1.2 gmp
         fi
 
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-3.1.0.tar.bz2" "$GNU_MIRROR/mpfr"
-            tar xjf $dlwhere/mpfr-3.1.0.tar.bz2
-            ln -s mpfr-3.1.0 mpfr
+            getfile "mpfr-3.1.6.tar.xz" "$GNU_MIRROR/mpfr"
+            tar xJf $dlwhere/mpfr-3.1.6.tar.xz
+            ln -s mpfr-3.1.6 mpfr
         fi
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
