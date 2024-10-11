@@ -124,7 +124,7 @@ static void sdl_window_setup(void)
     if ((window = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                       width * display_zoom, height * display_zoom , flags)) == NULL)
         panicf("%s", SDL_GetError());
-    if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) == NULL)
+    if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
         panicf("%s", SDL_GetError());
     if ((gui_surface = SDL_CreateRGBSurface(0, width * display_zoom, height * display_zoom, depth,
                                        0, 0, 0, 0)) == NULL)
