@@ -26,6 +26,7 @@
 /english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
 /english/festival/.*/\ba\b/ay/ig
 /english/festival/.*//$/./
+/english/.*/.*/ no./number /ig
 
   German (deutsch)
 
