@@ -92,7 +92,7 @@ void INT_GPIOA(void);
 default_interrupt(INT_GPIOB);
 default_interrupt(INT_GPIOC);
 
-static const char const irqname[][9] =
+static const char irqname[][9] =
 {
     "WATCHDOG", "TIMER1", "TIMER2", "USB", "DMAC", "NAND",
     "IDE", "MCI0", "MCI1", "AUDIO", "SSP", "I2C_MS",
