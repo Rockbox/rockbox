@@ -50,7 +50,8 @@ int rand(void);
 #endif
 
 #define abs(x) ((int)ABS(x))
-#define labs(x) ((long)abs(x))
+#define labs(x) ((long)ABS(x))
+#define llabs(x) ((long long)ABS(x))
 
 #ifdef SIMULATOR
 void exit(int status);
