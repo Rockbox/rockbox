@@ -466,17 +466,17 @@ static void impl_set_rate( struct Ym2612_Impl* impl, int sample_rate, int clock_
 {
 	assert( sample_rate );
 	assert( !clock_rate || clock_rate > sample_rate );
-	
+
 	int i;
 
 	// 144 = 12 * (prescale * 2) = 12 * 6 * 2
 	// prescale set to 6 by default
-	
+
 	int Frequency = (clock_rate ? (int)((FP_ONE_CLOCK * clock_rate) / sample_rate / 144) : (int)FP_ONE_CLOCK);
-	if ( abs( Frequency - FP_ONE_CLOCK ) < 1 )
+	if ( llabs( Frequency - FP_ONE_CLOCK ) < 1 )
 		Frequency = FP_ONE_CLOCK;
 	impl->YM2612.TimerBase = Frequency;
-    
+
     /* double Frequence = (double)Frequency / FP_ONE_CLOCK; */
 
 	// Tableau TL :

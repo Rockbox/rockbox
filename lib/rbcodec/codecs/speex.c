@@ -201,11 +201,11 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
     spx_int64_t avgpagelen = -1;
     spx_int64_t lastgranule = -1;
 
-    if(abs(pos-curpos)>10000 && headerssize>0 && curoffset-headerssize>10000) {
+    if(llabs(pos-curpos)>10000 && headerssize>0 && curoffset-headerssize>10000) {
         /* if seeking for more that 10sec,
            headersize is known & more than 10kb is played,
            try to guess a place to seek from the number of
-           bytes playe for this position, this works best when 
+           bytes playe for this position, this works best when
            the bitrate is relativly constant.
          */
 
