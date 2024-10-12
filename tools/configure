@@ -953,8 +953,9 @@ whichadvanced () {
     interact=1
     echo ""
     printf "Enter your developer options (press only enter when done)\n\
-(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (U)SB Serial, (W)in32 crosscompile,\n\
-Win(6)4 crosscompile, (T)est plugins, (O)mit plugins, S(m)all C lib, Logf to Ser(i)al port, LTO (B)uild "
+(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (U)SB Serial,\n\
+(W)in32 crosscompile, Win(6)4 crosscompile, (T)est plugins, (O)mit plugins, \n\
+S(m)all C lib, Logf to Ser(i)al port, LTO (B)uild, (E)rror on warnings"
     if [ "$modelname" = "iaudiom5" ]; then
       printf ", (F)M radio MOD"
     fi
@@ -1056,6 +1057,10 @@ Win(6)4 crosscompile, (T)est plugins, (O)mit plugins, S(m)all C lib, Logf to Ser
        [Bb])
         echo "LTO build enabled"
         LTO_ARG="export USE_LTO=y"
+        ;;
+       [Ee])
+        echo "Treating all warnings as errors"
+        GCCOPTS="$GCCOPTS -Werror"
         ;;
       "") # Match enter press when finished with advanced options
         cont=0
