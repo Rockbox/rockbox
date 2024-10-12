@@ -101,7 +101,7 @@ struct ata_smart_values
     unsigned char reserved_375_385[11];
     unsigned char vendor_specific_386_510[125];
     unsigned char chksum;
-} __attribute__((packed));
+} __attribute__((packed)) __attribute__((aligned(2)));
 
 /* Raw attribute value print formats */
 enum ata_attr_raw_format

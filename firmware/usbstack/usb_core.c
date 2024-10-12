@@ -119,16 +119,13 @@ static const struct usb_qualifier_descriptor __attribute__((aligned(2)))
     .bNumConfigurations = 1
 };
 
-static const struct usb_string_descriptor __attribute__((aligned(2)))
-                                    usb_string_iManufacturer =
+static const struct usb_string_descriptor usb_string_iManufacturer =
 USB_STRING_INITIALIZER(u"Rockbox.org");
 
-static const struct usb_string_descriptor __attribute__((aligned(2)))
-                                    usb_string_iProduct =
+static const struct usb_string_descriptor usb_string_iProduct =
 USB_STRING_INITIALIZER(u"Rockbox media player");
 
-static struct usb_string_descriptor __attribute__((aligned(2)))
-                                    usb_string_iSerial =
+static struct usb_string_descriptor usb_string_iSerial =
 USB_STRING_INITIALIZER(u"00000000000000000000000000000000000000000");
 
 /* Generic for all targets */
@@ -523,11 +520,11 @@ void usb_core_hotswap_event(int volume, bool inserted)
 static void usb_core_set_serial_function_id(void)
 {
     int i, id = 0;
-    
+
     for(i = 0; i < USB_NUM_DRIVERS; i++)
         if(drivers[i].enabled)
             id |= 1 << i;
-    
+
     usb_string_iSerial.wString[0] = hex[id];
 }
 
@@ -856,10 +853,10 @@ static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, void* 
     if(EP_NUM(req->wIndex) < USB_NUM_ENDPOINTS)
         control_handler =
             ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
-    
+
     if(control_handler)
         handled = control_handler(req, reqdata, response_data);
-    
+
     if(!handled) {
         /* nope. flag error */
         logf("usb bad req %d", req->bRequest);
