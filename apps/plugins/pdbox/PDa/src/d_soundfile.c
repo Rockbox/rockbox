@@ -701,7 +701,15 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
         memcpy(aiffhdr->a_samprate, AIFF_splrate, sizeof(AIFF_splrate));
         memcpy(aiffdc->dc_id, datachunk_ID, sizeof(datachunk_ID));
         longtmp = swap4(datasize, swap);
+#if __GNUC__ == 9  // False positive with GCC9.5.0
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         memcpy(&aiffdc->dc_size, &longtmp, 4);
+#if __GNUC__ == 9
+#pragma GCC diagnostic pop
+#endif
         headersize = AIFFPLUS;
     }
     else    /* WAVE format */
