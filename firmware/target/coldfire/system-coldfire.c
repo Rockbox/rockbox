@@ -26,6 +26,11 @@
 #include "lcd.h"
 #include "font.h"
 
+#if __GNUC__ >= 9
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIE"))) void name (void)
 
