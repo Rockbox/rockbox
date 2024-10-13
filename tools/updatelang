@@ -6,11 +6,15 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-# Copyright (C) 2020 Solomon Peachy
+# Copyright (C) 2020-2024 Solomon Peachy
 #
 
 use utf8;
 use File::Basename;
+use Unicode::Normalize;
+
+use open qw( :std :encoding(UTF-8) );
+binmode(STDOUT, ":encoding(UTF-8)");
 
 sub trim {
     my ($string) = @_;
@@ -72,6 +76,7 @@ sub parselangfile {
 #		    $l = "*";
 		}
 
+		$w = NFD($w); # Unicode decompose
 		$thisphrase{$pos}->{$l} = $w;
 	    }
 	}
@@ -538,10 +543,11 @@ foreach my $id (@finalorder) {
     %lp = combinetgts(%{$lang{$id}{'source'}});
     print $fh "  <source>\n";
     foreach my $tgt (sort(keys(%lp))) {
-	if ($lp{$tgt} eq 'none') {
-	    print $fh "    $tgt: $lp{$tgt}\n";
+	my $w = NFC($lp{$tgt});
+	if ($w eq 'none') {
+	    print $fh "    $tgt: $w\n";
 	} else {
-	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	    print $fh "    $tgt: \"$w\"\n";
 	}
     }
     print $fh "  </source>\n";
@@ -550,10 +556,11 @@ foreach my $id (@finalorder) {
     %lp = combinetgts(%{$lang{$id}{'dest'}});
     print $fh "  <dest>\n";
     foreach my $tgt (sort(keys(%lp))) {
-	if ($lp{$tgt} eq 'none') {
-	    print $fh "    $tgt: $lp{$tgt}\n";
+	my $w = NFC($lp{$tgt});
+	if ($w eq 'none') {
+	    print $fh "    $tgt: $w\n";
 	} else {
-	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	    print $fh "    $tgt: \"$w\"\n";
 	}
     }
     print $fh "  </dest>\n";
@@ -562,10 +569,11 @@ foreach my $id (@finalorder) {
     %lp = combinetgts(%{$lang{$id}{'voice'}});
     print $fh "  <voice>\n";
     foreach my $tgt (sort(keys(%lp))) {
-	if ($lp{$tgt} eq 'none') {
-	    print $fh "    $tgt: $lp{$tgt}\n";
+	my $w = NFC($lp{$tgt});
+	if ($w eq 'none') {
+	    print $fh "    $tgt: $w\n";
 	} else {
-	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	    print $fh "    $tgt: \"$w\"\n";
 	}
     }
     print $fh "  </voice>\n";
