@@ -1976,6 +1976,9 @@ drivers/i2c-async.c
 #ifdef HAVE_AXP_PMU
 drivers/axp-pmu.c
 #endif
+#ifdef HAVE_AXP2101_ADDON
+drivers/axp-2101.c
+#endif
 #ifdef HAVE_FT6x06
 drivers/ft6x06.c
 #endif

@@ -29,7 +29,9 @@
 # include "usb_core.h"
 #endif
 #include "axp-pmu.h"
+#include "axp-2101.h"
 #include "i2c-x1000.h"
+#include "devicedata.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -58,30 +60,94 @@ void power_init(void)
 {
     /* Initialize driver */
     i2c_x1000_set_freq(2, I2C_FREQ_400K);
-    axp_init();
 
-    /* Set lowest sample rate */
-    axp_adc_set_rate(AXP_ADC_RATE_25HZ);
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever >= 4){
+        uint8_t regread;
+        axp2101_init();
+        /* Enable required ADCs */
+        axp2101_adc_set_enabled(
+            (1 << AXP2101_ADC_VBAT_VOLTAGE) |
+            (1 << AXP2101_ADC_VBUS_VOLTAGE) |
+            (1 << AXP2101_ADC_VSYS_VOLTAGE) |
+            (1 << AXP2101_ADC_VBUS_VOLTAGE) |
+            (1 << AXP2101_ADC_TS_VOLTAGE) |
+            (1 << AXP2101_ADC_DIE_TEMPERATURE));
 
-    /* Enable required ADCs */
-    axp_adc_set_enabled(
-        (1 << ADC_BATTERY_VOLTAGE) |
-        (1 << ADC_CHARGE_CURRENT) |
-        (1 << ADC_DISCHARGE_CURRENT) |
-        (1 << ADC_VBUS_VOLTAGE) |
-        (1 << ADC_VBUS_CURRENT) |
-        (1 << ADC_INTERNAL_TEMP) |
-        (1 << ADC_APS_VOLTAGE));
+        i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP2101_REG_DCDC_ONOFF, 0, 0x1f, NULL);
+        i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP2101_REG_LDO_ONOFF0, 0, 0xff, NULL);
+        i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP2101_REG_LDO_ONOFF1, 0, 0x01, NULL);
 
-    /* Turn on all power outputs */
-    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
-    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+        // set power button delay to 1s to match earlier devices
+        regread = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP2101_REG_LOGICTHRESH);
+        if ((regread&0x03) != 0x02){
+            i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                            AXP2101_REG_LOGICTHRESH, 0x03, 0, NULL);
+            i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                            AXP2101_REG_LOGICTHRESH, 0, 0x02, NULL);
+        }
+        
+        // These match the OF as far as I can discern
+        // TODO: These values are set in EFUSE apparently, could
+        // do a "check then set if necessary"...
+        // Also if we had a fresh device we could verify what
+        // the OF sets.
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC1, 3300);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC2, 1200);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC3, 2800);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC4, 1800);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC5, 1400);
 
-    /* Set the default charging current. This is the same as the
-     * OF's setting, although it's not strictly within the USB spec. */
-    axp_set_charge_current(780);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_ALDO1, 2500);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_ALDO2, 3300);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_ALDO3, 3300);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_ALDO4, 3300);
+
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_BLDO1, 3300);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_BLDO2, 3300);
+
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DLDO1, 2500);
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_DLDO2, 1250);
+
+        axp2101_supply_set_voltage(AXP2101_SUPPLY_VCPUS, 500);
+
+        /* Set the default charging current. This is the same as the
+        * OF's setting, although it's not strictly within the USB spec. */
+        axp2101_set_charge_current(780);
+    } else {
+        axp_init();
+        /* Set lowest sample rate */
+        axp_adc_set_rate(AXP_ADC_RATE_25HZ);
+
+        /* Enable required ADCs */
+        axp_adc_set_enabled(
+            (1 << ADC_BATTERY_VOLTAGE) |
+            (1 << ADC_CHARGE_CURRENT) |
+            (1 << ADC_DISCHARGE_CURRENT) |
+            (1 << ADC_VBUS_VOLTAGE) |
+            (1 << ADC_VBUS_CURRENT) |
+            (1 << ADC_INTERNAL_TEMP) |
+            (1 << ADC_APS_VOLTAGE));
+        
+        /* TODO: Set Output Voltages! */
+        i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
+        i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                        AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+
+        /* Set the default charging current. This is the same as the
+        * OF's setting, although it's not strictly within the USB spec. */
+        axp_set_charge_current(780);
+    }
 
 #ifdef BOOTLOADER
     /* Delay to give power outputs time to stabilize.
@@ -95,7 +161,18 @@ void power_init(void)
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    axp_set_charge_current(maxcurrent);
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever >= 4){
+        axp2101_set_charge_current(maxcurrent);
+    } else {
+        axp_set_charge_current(maxcurrent);
+    }
+    
 }
 #endif
 
@@ -105,26 +182,64 @@ void adc_init(void)
 
 void power_off(void)
 {
-    axp_power_off();
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever >= 4){
+        axp2101_power_off();
+    } else {
+        axp_power_off();
+    }
     while(1);
 }
 
 bool charging_state(void)
 {
-    return axp_battery_status() == AXP_BATT_CHARGING;
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever >= 4){
+        return axp2101_battery_status() == AXP2101_BATT_CHARGING;
+    } else {
+        return axp_battery_status() == AXP_BATT_CHARGING;
+    }
 }
 
 int _battery_voltage(void)
 {
-    return axp_adc_read(ADC_BATTERY_VOLTAGE);
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever >= 4){
+        return axp2101_adc_read(AXP2101_ADC_VBAT_VOLTAGE);
+    } else {
+        return axp_adc_read(ADC_BATTERY_VOLTAGE);
+    }
 }
 
 #if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
 int _battery_current(void)
 {
-    if(charging_state())
-        return axp_adc_read(ADC_CHARGE_CURRENT);
-    else
-        return axp_adc_read(ADC_DISCHARGE_CURRENT);
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.lcd_version;
+#endif
+    if (devicever <= 3){
+        if(charging_state())
+            return axp_adc_read(ADC_CHARGE_CURRENT);
+        else
+            return axp_adc_read(ADC_DISCHARGE_CURRENT);
+    }
 }
 #endif

@@ -1678,9 +1678,11 @@ cat <<EOF
  ==FiiO==                  ==xDuoo==             ==AIGO==
  244) M3K Linux            241) X3               245) Eros Q / K
  246) M3K baremetal        242) X3II             247) Eros Q / K native
-                           243) X20              248) Eros Q / K native v3
- ==Shanling==                                         (GC9A01 LCD Controller)
- 260) Q1
+                           243) X20                     (hw1/hw2 bl, all hw rb)
+ ==Shanling==                                    248) Eros Q / K native
+ 260) Q1                                                (hw3 bl only)
+                                                 249) Eros Q / K native
+                                                        (hw4 bl only)
 EOF
 
   buildfor=`input`;
@@ -4134,6 +4136,33 @@ fi
     # player version, for bootloader usage
     # version 3
     extradefines="$extradefines -DEROSQN_VER=3"
+    ;;
+
+    249|erosqnative_v4)
+    target_id=118
+    modelname="erosqnative_v4"
+    target="EROS_QN"
+    memory=32
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=erosqnative "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.erosq"
+    bootoutput="bootloader.erosq"
+    sysfontbl="16-Terminus"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="erosqnative"
+    # player version, for bootloader usage
+    # version 4
+    extradefines="$extradefines -DEROSQN_VER=4"
     ;;
 
    250|ihifi770c)

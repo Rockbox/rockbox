@@ -25,6 +25,11 @@
 #include "i2c-async.h"
 #include <string.h>
 
+#if defined(HAVE_AXP2101_ADDON)
+# include "axp-2101.h"
+# include "devicedata.h"
+#endif
+
 /* Headers for the debug menu */
 #ifndef BOOTLOADER
 # include "action.h"
@@ -521,11 +526,24 @@ static const char* axp_debug_menu_get_name(int item, void* data,
 
 bool axp_debug_menu(void)
 {
-    struct simplelist_info info;
-    simplelist_info_init(&info, "AXP debug", AXP_DEBUG_NUM_ENTRIES, NULL);
-    info.action_callback = axp_debug_menu_cb;
-    info.get_name = axp_debug_menu_get_name;
-    return simplelist_show_list(&info);
+#if defined(EROS_QN)
+    int devicever;
+# if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+# else
+    devicever = device_data.lcd_version;
+# endif
+    if (devicever >= 4) {
+        return axp2101_debug_menu();
+    } else
+#endif
+    {
+        struct simplelist_info info;
+        simplelist_info_init(&info, "AXP debug", AXP_DEBUG_NUM_ENTRIES, NULL);
+        info.action_callback = axp_debug_menu_cb;
+        info.get_name = axp_debug_menu_get_name;
+        return simplelist_show_list(&info);
+    }
 }
 #endif /* !BOOTLOADER */
 
@@ -533,18 +551,31 @@ bool axp_debug_menu(void)
 unsigned int power_input_status(void)
 {
     unsigned int state = 0;
-    int input_status = axp_input_status();
+#if defined(EROS_QN)
+    int devicever;
+# if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+# else
+    devicever = device_data.lcd_version;
+# endif
+    if (devicever >= 4) {
+        return axp2101_power_input_status();
+    } else
+#endif
+    {
+        int input_status = axp_input_status();
 
-    if(input_status & AXP_INPUT_AC)
-        state |= POWER_INPUT_MAIN_CHARGER;
+        if(input_status & AXP_INPUT_AC)
+            state |= POWER_INPUT_MAIN_CHARGER;
 
-    if(input_status & AXP_INPUT_USB)
-        state |= POWER_INPUT_USB_CHARGER;
+        if(input_status & AXP_INPUT_USB)
+            state |= POWER_INPUT_USB_CHARGER;
 
 #ifdef HAVE_BATTERY_SWITCH
-    if(input_status & AXP_INPUT_BATTERY)
-        state |= POWER_INPUT_BATTERY;
+        if(input_status & AXP_INPUT_BATTERY)
+            state |= POWER_INPUT_BATTERY;
 #endif
+    }
 
     return state;
 }

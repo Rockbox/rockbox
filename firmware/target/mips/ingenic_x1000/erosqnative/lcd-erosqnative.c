@@ -292,7 +292,16 @@ void lcd_tgt_enable(bool enable)
 {
     if(enable) {
         /* power up the panel */
-        gpio_set_level(GPIO_LCD_PWR, 1);
+#ifdef BOOTLOADER
+# if EROSQN_VER <= 3
+        gpio_set_level(GPIO_LCD_PWR_HW1, 1);
+# endif
+#else
+        if (device_data.lcd_version <= 3)
+        {
+            gpio_set_level(GPIO_LCD_PWR_HW1, 1);
+        }
+#endif
         mdelay(20);
         gpio_set_level(GPIO_LCD_RESET, 1);
         mdelay(12);
@@ -307,13 +316,13 @@ void lcd_tgt_enable(bool enable)
         gpio_set_level(GPIO_LCD_CE, 0);
 
 #ifdef BOOTLOADER
-# if EROSQN_VER == 3
+# if EROSQN_VER >= 3
         lcd_exec_commands(&erosqnative_lcd_cmd_enable_v3[0]);
 # else
         lcd_exec_commands(&erosqnative_lcd_cmd_enable_v1[0]);
 # endif
 #else
-        if (device_data.lcd_version == 3)
+        if (device_data.lcd_version >= 3)
         {
             lcd_exec_commands(&erosqnative_lcd_cmd_enable_v3[0]);
         }
