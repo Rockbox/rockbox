@@ -4059,6 +4059,7 @@ fi
     t_manufacturer="aigo"
     t_model="erosq"
     sysfontbl="16-Terminus"
+    sysfont="14-Rockfont-Mix"
     ;;
 
    250|ihifi770c)
