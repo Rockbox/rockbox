@@ -29,6 +29,7 @@ use DirHandle;
 use open ':encoding(utf8)';
 use Encode::Locale;
 use Encode;
+use Unicode::Normalize;
 
 sub printusage {
     print <<USAGE
@@ -280,6 +281,9 @@ sub voicestring {
     my $name = $$tts_object{'name'};
 
     $tts_engine_opts .= $$tts_object{"ttsoptions"};
+
+    # Normalize Unicode
+    $string = NFC($string);
 
     printf("Generate \"%s\" with %s in file %s\n", $string, $name, $output) if $verbose;
     if ($name eq 'festival') {
