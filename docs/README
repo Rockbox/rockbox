@@ -13,7 +13,7 @@ Build Your Own Rockbox
 
      or
 
-   $ tar xjf rockbox.tar.bz2
+   $ tar xJf rockbox.tar.xz
 
 2. Create a build directory, preferably in the same directory as the firmware/
    and apps/ directories. This is where all generated files will be written.
