@@ -327,7 +327,13 @@ void ipod_4g_button_int(void)
 void button_init_device(void)
 {
     opto_i2c_init();
-    
+
+    /* fixes first button press being ignored */
+#if defined(IPOD_4G) || defined(IPOD_COLOR)
+    outl(inl(0x7000c100) & ~0x60000000, 0x7000c100);
+    outl(inl(0x7000c104) | 0x04000000, 0x7000c104);
+    outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
+#endif
     /* hold button - enable as input */
     GPIOA_ENABLE |= 0x20;
     GPIOA_OUTPUT_EN &= ~0x20; 
