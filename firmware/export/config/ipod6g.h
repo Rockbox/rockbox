@@ -12,7 +12,7 @@
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 
-#define HAVE_ATA_DMA 
+#define HAVE_ATA_DMA
 #define ATA_MAX_UDMA 4
 #define ATA_MAX_MWDMA 2
 
@@ -139,7 +139,7 @@
 
 /* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb)
  * which has a standard battery of 850mAh.
- * 
+ *
  * It's possible to buy 3rd party batteries up to 3000mAh.
  */
 #define BATTERY_CAPACITY_DEFAULT 550 /* default battery capacity */
@@ -189,17 +189,12 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
-#define SECTOR_SIZE 4096
-
 #define HAVE_ATA_SMART
 
+#define SECTOR_SIZE 512
 /* define this if the device has larger sectors when accessed via USB */
-/* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
-//#define MAX_LOG_SECTOR_SIZE 4096
-
-/* define this if the hard drive uses large physical sectors (ATA-7 feature) */
-/* and doesn't handle them in the drive firmware */
-//#define MAX_PHYS_SECTOR_SIZE 4096
+#define MAX_LOG_SECTOR_SIZE 4096
+//#define MAX_PHYS_SECTOR_SIZE 4096  // Only if we have various physical sector sizes
 
 #define HAVE_HARDWARE_CLICK
 

@@ -1430,11 +1430,13 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Firmware: %s", buf);
 
-    uint64_t total_sectors = identify_info[60] | ((uint32_t)identify_info[61] << 16);
+    uint64_t total_sectors = (identify_info[61] << 16) | identify_info[60];
 #ifdef HAVE_LBA48
-    if (identify_info[83] & 0x0400
-        && total_sectors == 0x0FFFFFFF)
-            total_sectors = identify_info[100] | ((uint64_t)identify_info[101] << 16) | ((uint64_t)identify_info[102] << 32) | ((uint64_t)identify_info[103] << 48);
+    if (identify_info[83] & 0x0400 && total_sectors == 0x0FFFFFFF)
+        total_sectors = ((uint64_t)identify_info[103] << 48) |
+                ((uint64_t)identify_info[102] << 32) |
+                ((uint64_t)identify_info[101] << 16) |
+                identify_info[100];
 #endif
 
     uint32_t sector_size;
@@ -1555,6 +1557,9 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     if (i == 0) {
         simplelist_addline(
                  "DMA not enabled");
+    } else if (i == 0xff) {
+        simplelist_addline(
+                 "CE-ATA mode");
     } else {
         simplelist_addline(
                  "DMA mode: %s %c",

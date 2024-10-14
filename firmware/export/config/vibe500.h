@@ -170,14 +170,6 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
-/* define this if the device has larger sectors when accessed via USB */
-/* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
-/* #define MAX_LOG_SECTOR_SIZE 2048 */
-
-/* define this if the hard drive uses large physical sectors (ATA-7 feature) */
-/* and doesn't handle them in the drive firmware */
-/* #define MAX_PHYS_SECTOR_SIZE 1024 */
-
 #define MI4_FORMAT
 #define BOOTFILE_EXT "mi4"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
@@ -185,9 +177,6 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-/* DMA is used only for reading on PP502x because although reads are ~8x faster
- * writes appear to be ~25% slower.
- */
 #ifndef BOOTLOADER
 #define HAVE_ATA_DMA
 #endif

@@ -114,7 +114,6 @@ static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[ATA_IDENTIFY_WORDS];
 
 #ifdef MAX_PHYS_SECTOR_SIZE
-
 struct sector_cache_entry {
     bool inuse;
     sector_t sectornum;  /* logical sector */
@@ -1068,7 +1067,7 @@ static int set_multiple_mode(int sectors)
 }
 
 #ifdef HAVE_ATA_DMA
-static int get_best_mode(unsigned short identword, int max, int modetype)
+static int ata_get_best_mode(unsigned short identword, int max, int modetype)
 {
     unsigned short testbit = BIT_N(max);
 
@@ -1118,12 +1117,12 @@ static int set_features(void)
 #ifdef HAVE_ATA_DMA
     if (identify_info[53] & (1<<2)) {
         /* Ultra DMA mode info present, find a mode */
-        dma_mode = get_best_mode(identify_info[88], ATA_MAX_UDMA, 0x40);
+        dma_mode = ata_get_best_mode(identify_info[88], ATA_MAX_UDMA, 0x40);
     }
 
     if (!dma_mode) {
         /* No UDMA mode found, try to find a multi-word DMA mode */
-        dma_mode = get_best_mode(identify_info[63], ATA_MAX_MWDMA, 0x20);
+        dma_mode = ata_get_best_mode(identify_info[63], ATA_MAX_MWDMA, 0x20);
         features[1].id_word = 63;
     } else {
         features[1].id_word = 88;
@@ -1263,14 +1262,14 @@ int STORAGE_INIT_ATTR ata_init(void)
 
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
 
-        total_sectors = identify_info[60] | (identify_info[61] << 16);
+        total_sectors = (identify_info[61] << 16) | identify_info[60];
 
 #ifdef HAVE_LBA48
-        if (identify_info[83] & 0x0400       /* 48 bit address support */
-            && total_sectors == 0x0FFFFFFF)  /* and disk size >= 128 GiB */
-        {                                    /* (needs BigLBA addressing) */
-            total_sectors = identify_info[100] | (identify_info[101] << 16) | ((uint64_t)identify_info[102] << 32) | ((uint64_t)identify_info[103] << 48);
-
+        if (identify_info[83] & 0x0400 && total_sectors == 0x0FFFFFFF) {
+            total_sectors = ((uint64_t)identify_info[103] << 48) |
+                    ((uint64_t)identify_info[102] << 32) |
+                    ((uint64_t)identify_info[101] << 16) |
+                    identify_info[100];
             lba48 = true; /* use BigLBA */
         }
 #endif /* HAVE_LBA48 */
