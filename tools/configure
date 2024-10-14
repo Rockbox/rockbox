@@ -1480,7 +1480,8 @@ help() {
                       behavior of falling back to them if no native thread
                       support was found.
     --with-address-sanitizer
-                      Enasbles the AddressSanitizer feature. Forces SDL threads.
+                      Enables the AddressSanitizer feature. Forces SDL threads.
+    --with-ubsan      Enables the UB Sanitizer feature.  Forces SDL threads.
     --32-bit          Force a 32-bit simulator (use with --sdl-threads for duke3d)
     --prefix          Target installation directory
     --compiler-prefix Override compiler prefix (inherently dangerous)
