@@ -25,6 +25,7 @@
 /* Enough IRAM to move additional data to it. */
 #define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
 #define IBSS_ATTR_FLAC_XLARGE_IRAM
+#define IBSS_ATTR_FLAC_XXLARGE_IRAM
 
 #elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
 #define ICODE_ATTR_FLAC ICODE_ATTR
@@ -32,6 +33,7 @@
 /* Enough IRAM to move even more additional data to it. */
 #define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
 #define IBSS_ATTR_FLAC_XLARGE_IRAM  IBSS_ATTR
+#define IBSS_ATTR_FLAC_XXLARGE_IRAM
 
 #else
 #define ICODE_ATTR_FLAC ICODE_ATTR
@@ -39,6 +41,7 @@
 /* Not enough IRAM available. */
 #define IBSS_ATTR_FLAC_LARGE_IRAM
 #define IBSS_ATTR_FLAC_XLARGE_IRAM
+#define IBSS_ATTR_FLAC_XXLARGE_IRAM
 #endif
 
 /* Endian conversion routines for standalone compilation */
