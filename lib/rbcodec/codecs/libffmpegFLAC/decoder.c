@@ -531,7 +531,7 @@ static int decode_frame(FLACContext *s,
 static int flac_downmix(FLACContext *s) ICODE_ATTR_FLAC;
 static int flac_downmix(FLACContext *s)
 {
-    int32_t *FL, *FR, *FC, *SB, *RL, *RR;
+    int32_t *FL, *FR, *FC, *SB, *RL, *RR, *RC;
     int32_t *outL = s->decoded[0];
     int32_t *outR = s->decoded[1];
     int i, scale=FLAC_OUTPUT_DEPTH-s->bps;
@@ -598,6 +598,24 @@ static int flac_downmix(FLACContext *s)
                 *outL++ = ((a + (a<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
                 *outR++ = ((b + (b<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
                 FL++; FR++; SB++; FC++; RL++; RR++;
+            }
+            break;
+        case 7: /* 6.1 channel order: FL FR FC SUB RL RR RC */
+            FL = s->decoded[0];
+            FR = s->decoded[1];
+            FC = s->decoded[2];
+            SB = s->decoded[3];
+            RL = s->decoded[4];
+            RR = s->decoded[5];
+            RC = s->decoded[6];
+            /* LF = 0.28 LF + 0.14 SUB + 0.14 FC + 0.28 RL + 0.00 RR + 0.14 CR
+               LR = 0.28 LR + 0.14 SUB + 0.14 FC + 0.00 RL + 0.28 RR + 0.14 CR */
+            for (i=0; i<s->blocksize; ++i) {
+                int32_t a = *(FL)*2 + *(SB) + *(FC) + *(RL)*2 + *(RC);
+                int32_t b = *(FR)*2 + *(SB) + *(FC) + *(RR)*2 + *(RC);
+                *outL++ = ((a + (a<<4))>>6) << scale; /* 9>>6 ~= 1/7 */
+                *outR++ = ((b + (b<<4))>>6) << scale; /* 9>>6 ~= 1/7 */
+                FL++; FR++; SB++; FC++; RL++; RR++; RC++;
             }
             break;
         default: /* 1.0 and 2.0 do not need downmix, other formats unknown. */
