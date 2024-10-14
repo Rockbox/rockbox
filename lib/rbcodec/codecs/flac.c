@@ -119,7 +119,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
         return false;
     }
 
-    if (ci->memcmp(buf,"fLaC",4) != 0) 
+    if (ci->memcmp(buf,"fLaC",4) != 0)
     {
         return false;
     }
@@ -138,7 +138,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
         if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
         {
             if (ci->read_filebuf(buf, blocklength) < blocklength) return false;
-          
+
             fc->filesize = ci->filesize;
             fc->min_blocksize = (buf[0] << 8) | buf[1];
             int max_blocksize = (buf[2] << 8) | buf[3];
@@ -151,34 +151,40 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
             fc->max_blocksize = max_blocksize;
             fc->min_framesize = (buf[4] << 16) | (buf[5] << 8) | buf[6];
             fc->max_framesize = (buf[7] << 16) | (buf[8] << 8) | buf[9];
-            fc->samplerate = (buf[10] << 12) | (buf[11] << 4) 
+            fc->samplerate = (buf[10] << 12) | (buf[11] << 4)
                              | ((buf[12] & 0xf0) >> 4);
             fc->channels = ((buf[12]&0x0e)>>1) + 1;
             fc->bps = (((buf[12]&0x01) << 4) | ((buf[13]&0xf0)>>4) ) + 1;
 
-            /* totalsamples is a 36-bit field, but we assume <= 32 bits are 
+            if (fc->channels > MAX_CHANNELS) {
+                    LOGF("FLAC: Too many channels (%d > %d)\n",
+                         fc->channels, MAX_CHANNELS);
+                    return false;
+            }
+
+            /* totalsamples is a 36-bit field, but we assume <= 32 bits are
                used */
-            fc->totalsamples = (buf[14] << 24) | (buf[15] << 16) 
+            fc->totalsamples = (buf[14] << 24) | (buf[15] << 16)
                                | (buf[16] << 8) | buf[17];
 
-            /* Calculate track length (in ms) and estimate the bitrate 
+            /* Calculate track length (in ms) and estimate the bitrate
                (in kbit/s) */
             fc->length = ((int64_t) fc->totalsamples * 1000) / fc->samplerate;
 
             found_streaminfo=true;
         } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
-            while ((nseekpoints < MAX_SUPPORTED_SEEKTABLE_SIZE) && 
+            while ((nseekpoints < MAX_SUPPORTED_SEEKTABLE_SIZE) &&
                    (blocklength >= 18)) {
                 if (ci->read_filebuf(buf,18) < 18) return false;
                 blocklength-=18;
 
-                seekpoint_hi=(buf[0] << 24) | (buf[1] << 16) | 
+                seekpoint_hi=(buf[0] << 24) | (buf[1] << 16) |
                              (buf[2] << 8) | buf[3];
-                seekpoint_lo=(buf[4] << 24) | (buf[5] << 16) | 
+                seekpoint_lo=(buf[4] << 24) | (buf[5] << 16) |
                              (buf[6] << 8) | buf[7];
-                offset_hi=(buf[8] << 24) | (buf[9] << 16) | 
+                offset_hi=(buf[8] << 24) | (buf[9] << 16) |
                              (buf[10] << 8) | buf[11];
-                offset_lo=(buf[12] << 24) | (buf[13] << 16) | 
+                offset_lo=(buf[12] << 24) | (buf[13] << 16) |
                              (buf[14] << 8) | buf[15];
 
                 blocksize=(buf[16] << 8) | buf[17];
@@ -202,7 +208,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     }
 
    if (found_streaminfo) {
-       fc->bitrate = ((int64_t) (fc->filesize-fc->metadatalength) * 8) 
+       fc->bitrate = ((int64_t) (fc->filesize-fc->metadatalength) * 8)
                      / fc->length;
        return true;
    } else {
@@ -254,7 +260,7 @@ static bool frame_sync(FLACContext* fc) {
     /* Decode the frame to verify the frame crc and
      * fill fc with its metadata.
      */
-    if(flac_decode_frame(fc, 
+    if(flac_decode_frame(fc,
        bit_buffer, buff_size, ci->yield) < 0) {
         return false;
     }
@@ -326,7 +332,7 @@ static bool flac_seek(FLACContext* fc, uint32_t target_sample) {
               (int64_t)(upper_bound - lower_bound)) /
               (upper_bound_sample - lower_bound_sample)) -
               approx_bytes_per_frame);
-            
+
             if(pos >= (off_t)upper_bound)
                 pos = (off_t)upper_bound-1;
             if(pos < (off_t)lower_bound)
@@ -431,7 +437,7 @@ static bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
         if(frame_sync(fc))
             got_a_frame = true;
     }
-    
+
     if(!got_a_frame) {
         ci->seek_buffer(fc->metadatalength);
         return false;
@@ -471,7 +477,7 @@ enum codec_status codec_run(void)
     /* Need to save resume for later use (cleared indirectly by flac_init) */
     elapsedtime = ci->id3->elapsed;
     samplesdone = ci->id3->offset;
-    
+
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
         return CODEC_ERROR;
@@ -526,7 +532,7 @@ enum codec_status codec_run(void)
         ci->yield();
         ci->pcmbuf_insert(&fc.decoded[0][fc.sample_skip], &fc.decoded[1][fc.sample_skip],
                           fc.blocksize - fc.sample_skip);
-        
+
         fc.sample_skip = 0;
 
         /* Update the elapsed-time indicator */
