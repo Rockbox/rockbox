@@ -186,7 +186,6 @@ struct ftl_cxt_type
    There is one of these per bank. */
 struct ftl_vfl_cxt_type
 {
-
     /* Cross-bank update sequence number, incremented on every VFL
        context commit on any bank. */
     uint32_t usn;
@@ -525,18 +524,24 @@ static uint32_t ftl_vfl_verify_checksum(uint32_t bank)
     return 1;
 }
 
-
 #ifndef FTL_READONLY
+
+#if __GNUC__ >= 9
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif
+
 /* Updates the checksums of the VFL context of the specified bank */
 static void ftl_vfl_update_checksum(uint32_t bank)
 {
     ftl_vfl_calculate_checksum(bank, &ftl_vfl_cxt[bank].checksum1,
                                &ftl_vfl_cxt[bank].checksum2);
 }
+
+#if __GNUC__ >= 9
+#pragma GCC diagnostic pop
 #endif
 
-
-#ifndef FTL_READONLY
 /* Writes 8 copies of the VFL context of the specified bank to flash,
    and succeeds if at least 4 can be read back properly. */
 static uint32_t ftl_vfl_store_cxt(uint32_t bank)
@@ -2107,7 +2112,7 @@ uint32_t ftl_sync(void)
     if (ftl_cxt.clean_flag == 1) return 0;
 
     mutex_lock(&ftl_mtx);
-    
+
 #ifdef FTL_TRACE
     DEBUGF("FTL: Syncing\n");
 #endif
