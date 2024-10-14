@@ -1,9 +1,9 @@
 #ifndef _FLAC_DECODER_H
 #define _FLAC_DECODER_H
- 
+
 #include "bitstream.h"
 
-#define MAX_CHANNELS   6      /* Maximum supported channels, only left/right will be played back */
+#define MAX_CHANNELS   7      /* Maximum supported channels, only left/right will be played back */
 #define MAX_BLOCKSIZE  4608   /* Maxsize in samples of one uncompressed frame */
 #define MAX_FRAMESIZE  65536  /* Maxsize in bytes of one compressed frame */
 #define MIN_FRAME_SIZE 11     /* smallest valid FLAC frame possible */
@@ -33,13 +33,13 @@ typedef struct FLACContext {
     int length;
     int bitrate;
     int metadatalength;
-    
+
     int bitstream_size;
     int bitstream_index;
 
     int sample_skip;
     int framesize;
-    
+
     int32_t *decoded[MAX_CHANNELS];
 } FLACContext;
 
