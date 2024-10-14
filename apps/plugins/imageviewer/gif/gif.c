@@ -76,8 +76,11 @@ static int img_mem(int ds)
 }
 
 static int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size)
+                      unsigned char *buf, ssize_t *buf_size,
+                      int offset, int filesize)
 {
+    (void)offset;(void)filesize;
+
     int w, h;
     long time = 0; /* measured ticks */
     struct gif_decoder *p_decoder = &decoder;

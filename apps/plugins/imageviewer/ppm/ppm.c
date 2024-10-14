@@ -75,7 +75,8 @@ static int img_mem(int ds)
 }
 
 static int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size)
+                      unsigned char *buf, ssize_t *buf_size,
+                      int offset, int filesize)
 {
     int fd;
     int rc = PLUGIN_OK;
@@ -83,7 +84,7 @@ static int load_image(char *filename, struct image_info *info,
     int w, h; /* used to center output */
 
     unsigned char *memory, *memory_max;
-    size_t memory_size, file_size;
+    size_t memory_size;
 
     /* cleanup */
     memset(&disp, 0, sizeof(disp));
@@ -100,13 +101,20 @@ static int load_image(char *filename, struct image_info *info,
         return PLUGIN_ERROR;
     }
 
-    file_size = rb->filesize(fd);
+    if (offset)
+    {
+        rb->lseek(fd, offset, SEEK_SET);
+    }
+    else
+    {
+        filesize = rb->filesize(fd);
+    }
     DEBUGF("reading file '%s'\n", filename);
 
     if (!iv->running_slideshow)
     {
         rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_putsf(0, 1, "loading %zu bytes", file_size);
+        rb->lcd_putsf(0, 1, "loading %zu bytes", filesize);
         rb->lcd_update();
     }
 

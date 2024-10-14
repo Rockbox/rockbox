@@ -96,8 +96,10 @@ static void scaled_dequantization_and_idct(void)
 }
 
 static int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size)
+                      unsigned char *buf, ssize_t *buf_size,
+                      int offset, int filesize)
 {
+    (void)filesize;
     int status;
     struct JPEGD *p_jpg = &jpg;
 
@@ -109,6 +111,10 @@ static int load_image(char *filename, struct image_info *info,
     if (!OPEN(filename))
     {
         return PLUGIN_ERROR;
+    }
+    if (offset)
+    {
+        POS(offset);
     }
 
     if (!iv->running_slideshow)

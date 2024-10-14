@@ -211,6 +211,13 @@ static void playing_time(void)
     plugin_load(PLUGIN_APPS_DIR"/playing_time.rock", NULL);
 }
 
+#ifdef HAVE_ALBUMART
+static void view_album_art(void)
+{
+    plugin_load(VIEWERS_DIR"/imageviewer.rock", NULL);
+}
+#endif
+
 MENUITEM_FUNCTION(wps_view_cur_playlist_item, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
                   wps_view_cur_playlist, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(search_playlist_item, 0, ID2P(LANG_SEARCH_IN_PLAYLIST),
@@ -705,6 +712,10 @@ MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_MENU_SHOW_I
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, Icon_Audio);
 #endif
+#ifdef HAVE_ALBUMART
+MENUITEM_FUNCTION(view_album_art_item, 0, ID2P(LANG_VIEW_ALBUMART),
+                  view_album_art, NULL, Icon_NOICON);
+#endif
 
 static int clipboard_delete_selected_fileobject(void)
 {
@@ -1027,6 +1038,9 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHCONTROL
            &pitch_screen_item,
+#endif
+#ifdef HAVE_ALBUMART
+           &view_album_art_item,
 #endif
          );
 

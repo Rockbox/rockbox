@@ -89,7 +89,8 @@ static int img_mem(int ds)
 }
 
 static int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size)
+                      unsigned char *buf, ssize_t *buf_size,
+                      int offset, int file_size)
 {
     int fd;
     long time = 0; /* measured ticks */
@@ -97,7 +98,7 @@ static int load_image(char *filename, struct image_info *info,
     LodePNG_Decoder *p_decoder = &decoder;
 
     unsigned char *memory, *memory_max, *image;
-    size_t memory_size, file_size;
+    size_t memory_size;
 
     /* cleanup */
     memset(&disp, 0, sizeof(disp));
@@ -113,7 +114,15 @@ static int load_image(char *filename, struct image_info *info,
         rb->splashf(HZ, "err opening %s: %d", filename, fd);
         return PLUGIN_ERROR;
     }
-    file_size = rb->filesize(fd);
+
+    if (offset)
+    {
+        rb->lseek(fd, offset, SEEK_SET);
+    }
+    else
+    {
+        file_size = rb->filesize(fd);
+    }
 
     DEBUGF("reading file '%s'\n", filename);
 
@@ -122,7 +131,7 @@ static int load_image(char *filename, struct image_info *info,
         rb->lcd_update();
     }
 
-    if (file_size > memory_size) {
+    if ((size_t)file_size > memory_size) {
         p_decoder->error = FILE_TOO_LARGE;
         rb->close(fd);
 

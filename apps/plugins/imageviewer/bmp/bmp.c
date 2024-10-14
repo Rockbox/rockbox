@@ -100,8 +100,10 @@ static int img_mem(int ds)
 }
 
 static int load_image(char *filename, struct image_info *info,
-                      unsigned char *buf, ssize_t *buf_size)
+                      unsigned char *buf, ssize_t *buf_size,
+                      int offset, int filesize)
 {
+    (void)filesize;
     int w, h; /* used to center output */
     long time; /* measured ticks */
     int fd;
@@ -127,6 +129,11 @@ static int load_image(char *filename, struct image_info *info,
         rb->splashf(HZ, "err opening %s: %d", filename, fd);
         return PLUGIN_ERROR;
     }
+    if (offset)
+    {
+        rb->lseek(fd, offset, SEEK_SET);
+    }
+
     int ds = 1;
     /* check size of image needed to load image. */
     size = scaled_read_bmp_fd(fd, &bmp, 0, format | FORMAT_RETURN_SIZE, cformat);
