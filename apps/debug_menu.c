@@ -1448,7 +1448,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     total_sectors *= sector_size;   /* Convert to bytes */
     total_sectors /= (1024 * 1024); /* Convert to MB */
 
-    simplelist_addline("Size: %llu MB", total_sectors);
+    simplelist_addline("Size: %llu MB", (uint64_t)total_sectors);
     simplelist_addline("Logical sector size: %u B", sector_size);
 #ifdef MAX_LOG_SECTOR_SIZE
     simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
@@ -1464,7 +1464,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
-             "Free: %llu MB", free / 1024);
+            "Free: %llu MB", (uint64_t)(free / 1024));
 #endif
 
     simplelist_addline("SSD detected: %s", ata_disk_isssd() ? "yes" : "no");
@@ -1798,7 +1798,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Model: %s", info.product);
     simplelist_addline("Firmware: %s", info.revision);
     simplelist_addline(
-            "Size: %lld MB", (uint64_t)(info.num_sectors*(info.sector_size/512)/2048));
+            "Size: %llu MB", (uint64_t)(info.num_sectors*(info.sector_size/512)/2048));
     sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(

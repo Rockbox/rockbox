@@ -1359,7 +1359,7 @@ void ata_get_info(IF_MD(int drive,)struct storage_info *info)
 #endif
     int i;
 
-    /* Logical sector size */
+    /* Logical sector size > 512B ? */
     if ((identify_info[106] & 0xd000) == 0x5000)
         info->sector_size = identify_info[117] | (identify_info[118] << 16);
     else
