@@ -1430,11 +1430,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Firmware: %s", buf);
 
-    uint64_t total_sectors = identify_info[60] | (identify_info[61] << 16);
+    uint64_t total_sectors = identify_info[60] | ((uint32_t)identify_info[61] << 16);
 #ifdef HAVE_LBA48
     if (identify_info[83] & 0x0400
         && total_sectors == 0x0FFFFFFF)
-        total_sectors = identify_info[100] | (identify_info[101] << 16) | ((uint64_t)identify_info[102] << 32) | ((uint64_t)identify_info[103] << 48);
+            total_sectors = identify_info[100] | ((uint64_t)identify_info[101] << 16) | ((uint64_t)identify_info[102] << 32) | ((uint64_t)identify_info[103] << 48);
 #endif
 
     uint32_t sector_size;
@@ -1450,6 +1450,9 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
     simplelist_addline("Size: %llu MB", total_sectors);
     simplelist_addline("Logical sector size: %u B", sector_size);
+#ifdef MAX_LOG_SECTOR_SIZE
+    simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
+#endif
 
     if((identify_info[106] & 0xe000) == 0x6000)
         sector_size *= BIT_N(identify_info[106] & 0x000f);
