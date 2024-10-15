@@ -1318,8 +1318,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #if (CONFIG_STORAGE & STORAGE_SD)
                     "O=%c%c",
                     (int) card_extract_bits(card->cid, 127, 8),
-                    card_extract_bits(card->cid, 119, 8),
-                    card_extract_bits(card->cid, 111, 8)
+                    (int) card_extract_bits(card->cid, 119, 8),
+                    (int) card_extract_bits(card->cid, 111, 8)
 #elif (CONFIG_STORAGE & STORAGE_MMC)
                     "O=%04x",
                     (int) card_extract_bits(card->cid, 127, 8),
@@ -1449,7 +1449,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     total_sectors /= (1024 * 1024); /* Convert to MB */
 
     simplelist_addline("Size: %llu MB", (uint64_t)total_sectors);
-    simplelist_addline("Logical sector size: %u B", sector_size);
+    simplelist_addline("Logical sector size: %lu B", sector_size);
 #ifdef MAX_LOG_SECTOR_SIZE
     simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
 #endif
@@ -1457,7 +1457,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     if((identify_info[106] & 0xe000) == 0x6000)
         sector_size *= BIT_N(identify_info[106] & 0x000f);
     simplelist_addline(
-            "Physical sector size: %d B", sector_size);
+            "Physical sector size: %lu B", sector_size);
 
 #ifndef HAVE_MULTIVOLUME
     // XXX this needs to be fixed for multi-volume setups
@@ -1887,13 +1887,13 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
     simplelist_set_line_count(0);
 
     simplelist_addline("Cache status: %s", info.statusdesc);
-    simplelist_addline("Last size: %lu B", info.last_size);
-    simplelist_addline("Size: %lu B", info.size);
+    simplelist_addline("Last size: %zu B", info.last_size);
+    simplelist_addline("Size: %zu B", info.size);
     unsigned int utilized = info.size ? 1000ull*info.sizeused / info.size : 0;
-    simplelist_addline("Used: %lu B (%u.%u%%)", info.sizeused,
+    simplelist_addline("Used: %zu B (%u.%u%%)", info.sizeused,
                        utilized / 10, utilized % 10);
-    simplelist_addline("Limit: %lu B", info.size_limit);
-    simplelist_addline("Reserve: %lu/%lu B", info.reserve_used, info.reserve);
+    simplelist_addline("Limit: %zu B", info.size_limit);
+    simplelist_addline("Reserve: %zu/%zu B", info.reserve_used, info.reserve);
     long ticks = ALIGN_UP(info.build_ticks, HZ / 10);
     simplelist_addline("Scanning took: %ld.%ld s",
                        ticks / HZ, (ticks*10 / HZ) % 10);
@@ -2681,12 +2681,12 @@ static bool dbg_syscfg(void) {
         return simplelist_show_list(&info);
     }
 
-    simplelist_addline("Total size: %u bytes, %u entries", syscfg_hdr.size, syscfg_hdr.num_entries);
+    simplelist_addline("Total size: %lu bytes, %lu entries", syscfg_hdr.size, syscfg_hdr.num_entries);
 
     size_t calculated_syscfg_size = syscfg_hdr_size + syscfg_entry_size * syscfg_hdr.num_entries;
 
     if (syscfg_hdr.size != calculated_syscfg_size) {
-        simplelist_addline("Wrong size: expected %u, got %u", calculated_syscfg_size, syscfg_hdr.size);
+        simplelist_addline("Wrong size: expected %zu, got %lu", calculated_syscfg_size, syscfg_hdr.size);
         bootflash_close(SPI_PORT);
         return simplelist_show_list(&info);
     }
@@ -2711,13 +2711,13 @@ static bool dbg_syscfg(void) {
                 simplelist_addline("Serial number (SrNm): %s", entry->data);
                 break;
             case SYSCFG_TAG_FWID:
-                simplelist_addline("Firmware ID (FwId): %07X", data32[1] & 0x0FFFFFFF);
+                simplelist_addline("Firmware ID (FwId): %07lX", data32[1] & 0x0FFFFFFF);
                 break;
             case SYSCFG_TAG_HWID:
-                simplelist_addline("Hardware ID (HwId): %08X", data32[0]);
+                simplelist_addline("Hardware ID (HwId): %08lX", data32[0]);
                 break;
             case SYSCFG_TAG_HWVR:
-                simplelist_addline("Hardware version (HwVr): %06X", data32[1]);
+                simplelist_addline("Hardware version (HwVr): %06lX", data32[1]);
                 break;
             case SYSCFG_TAG_CODC:
                 simplelist_addline("Codec (Codc): %s", entry->data);
@@ -2732,10 +2732,10 @@ static bool dbg_syscfg(void) {
                 simplelist_addline("Model number (Mod#): %s", entry->data);
                 break;
             case SYSCFG_TAG_REGN:
-                simplelist_addline("Sales region (Regn): %08X %08X", data32[0], data32[1]);
+                simplelist_addline("Sales region (Regn): %08lX %08lX", data32[0], data32[1]);
                 break;
             default:
-                simplelist_addline("%c%c%c%c: %08X %08X %08X %08X",
+                simplelist_addline("%c%c%c%c: %08lX %08lX %08lX %08lX",
                     tag[3], tag[2], tag[1], tag[0],
                     data32[0], data32[1], data32[2], data32[3]
                 );
