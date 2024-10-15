@@ -2200,7 +2200,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
         struct stfm1000_dbg_info nfo;
         stfm1000_dbg_info(&nfo);
         simplelist_addline("STFM1000 regs:");
-        simplelist_addline("chipid: 0x%x", nfo.chipid);
+        simplelist_addline("chipid: 0x%lx", nfo.chipid);
     }
 #endif /* STFM1000 */
 #if (CONFIG_TUNER & TEA5760)

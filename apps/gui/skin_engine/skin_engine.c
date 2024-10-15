@@ -352,13 +352,13 @@ bool dbg_skin_engine(void)
             struct skin_stats *stats = skin_get_stats(i, j);
             if (stats->buflib_handles)
             {
-                simplelist_addline("Skin ID: %d, %d allocations",
+                simplelist_addline("Skin ID: %d, %zd allocations",
                         i, stats->buflib_handles);
-                simplelist_addline("\tskin: %d bytes",
+                simplelist_addline("\tskin: %zd bytes",
                         stats->tree_size);
-                simplelist_addline("\tImages: %d bytes",
+                simplelist_addline("\tImages: %zd bytes",
                         stats->images_size);
-                simplelist_addline("\tTotal: %d bytes",
+                simplelist_addline("\tTotal: %zd bytes",
                         stats->tree_size + stats->images_size);
                 total += stats->tree_size + stats->images_size;
             }
@@ -375,7 +375,7 @@ bool dbg_skin_engine(void)
                 path += path_prefix_len;
             simplelist_addline("%s", path);
             simplelist_addline("\tref_count: %d", ref_count);
-            simplelist_addline("\tsize: %d", bytes);
+            simplelist_addline("\tsize: %zd", bytes);
             total += bytes;
         }
     }
