@@ -114,10 +114,16 @@ static fb_data pixel_to_lcd_gray(void)
 {
     int r, g, b;
 
-    g = clamp_component(pixel->g);
+    g = pixel->g;
+
     r = component_to_lcd(g, LCD_RED_BITS, NODITHER_DELTA);
+    r = clamp_component_bits(r, LCD_RED_BITS);
+
     b = component_to_lcd(g, LCD_BLUE_BITS, NODITHER_DELTA);
+    b  = clamp_component_bits(b, LCD_BLUE_BITS);
+
     g = component_to_lcd(g, LCD_GREEN_BITS, NODITHER_DELTA);
+    g = clamp_component_bits(g, LCD_GREEN_BITS);
 
     return FB_RGBPACK_LCD(r, g, b);
 }
