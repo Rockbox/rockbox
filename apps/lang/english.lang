@@ -951,6 +951,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Reset EQ"
+  </dest>
+  <voice>
+    *: "Reset EQ"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_EQUALIZER_ENABLED
   desc: in the equalizer settings menu
   user: core

@@ -782,14 +782,26 @@ static int eq_save_preset(void)
 /* Allows browsing of preset files */
 static struct browse_folder_info eqs = { EQS_DIR, SHOW_CFG };
 
+static void eq_reset_defaults(void)
+{
+    for (int i = 0; i < EQ_NUM_BANDS; i++) {
+        global_settings.eq_band_settings[i].cutoff = eq_defaults[i].cutoff;
+        global_settings.eq_band_settings[i].q = eq_defaults[i].q;
+        global_settings.eq_band_settings[i].gain = eq_defaults[i].gain;
+    }
+    eq_apply();
+}
+
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
                   eq_menu_graphical, lowlatency_callback, Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
                   eq_save_preset, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(eq_reset, 0, ID2P(LANG_RESET_EQUALIZER),
+                  eq_reset_defaults, NULL, Icon_NOICON);
 MENUITEM_FUNCTION_W_PARAM(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
                           browse_folder, (void*)&eqs,
                           lowlatency_callback, Icon_NOICON);
 
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu,
-        &advanced_menu, &eq_save, &eq_browse);
+        &advanced_menu, &eq_save, &eq_browse, &eq_reset);
