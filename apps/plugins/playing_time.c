@@ -422,7 +422,7 @@ static int pt_add_track(int i, enum ePT_SUM section, struct playing_time_info *p
     struct playlist_track_info pl_track;
     static unsigned long talked_tick;
     int progress_total = pti->remaining_only ?
-                         pti->nb_tracks - pti->curr_display_index :
+                         (pti->nb_tracks - pti->curr_display_index) + 1 :
                          pti->nb_tracks;
 
     rb->splash_progress(pti->counted, progress_total, "%s (%s)",
