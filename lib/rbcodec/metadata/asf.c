@@ -510,8 +510,6 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
 #ifdef HAVE_ALBUMART
                         } else if (itag == eWM_Picture) {
-                            uint32_t datalength = 0;
-                            uint32_t strlength;
                             /* Expected is either "01 00 xx xx 03 yy yy yy yy" or
                              * "03 yy yy yy yy". xx is the size of the WM/Picture
                              * container in bytes. yy equals the raw data length of
@@ -528,8 +526,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 read(fd, &type, 1);
                             }
                             if (type == 3) {
+                                uint32_t pic_size = 0;
                                 /* Read the raw data length of the embedded image. */
-                                read_uint32le(fd, &datalength);
+                                read_uint32le(fd, &pic_size);
 
                                 /* Reset utf8 buffer */
                                 utf8 = utf8buf;
@@ -538,8 +537,6 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 /* Gather the album art format, this string has a
                                  * double zero-termination. */
                                 asf_utf16LEdecode(fd, 32, &utf8, &utf8length);
-                                strlength = (strlen(utf8buf) + 2) * 2;
-                                lseek(fd, strlength-32, SEEK_CUR);
 
                                 static const char *aa_options[] = {"image/jpeg",
                                                    "image/jpg","image/png", NULL};
@@ -564,8 +561,8 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
 
                                 /* Set the album art size and position. */
                                 if (id3->albumart.type != AA_TYPE_UNKNOWN) {
-                                    id3->albumart.pos  = lseek(fd, 0, SEEK_CUR);
-                                    id3->albumart.size = datalength;
+                                    id3->albumart.pos  = after_pic_pos - pic_size;
+                                    id3->albumart.size = pic_size;
                                     id3->has_embedded_albumart = true;
                                 }
                             }
