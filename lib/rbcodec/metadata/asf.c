@@ -515,17 +515,17 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             /* Expected is either "01 00 xx xx 03 yy yy yy yy" or
                              * "03 yy yy yy yy". xx is the size of the WM/Picture
                              * container in bytes. yy equals the raw data length of
-                             * the embedded image. */
-                            lseek(fd, -4, SEEK_CUR);
+                             * the embedded image.
+                             * 
+                             *  Also save position after this tag in file in case any parsing errors */
+                            uint32_t after_pic_pos = lseek(fd, -4, SEEK_CUR) + 4 + length;
+
                             if (read(fd, &type, 1) != 1)
                                 type = 0;
 
                             if (type == 1) {
                                 lseek(fd, 3, SEEK_CUR);
                                 read(fd, &type, 1);
-                                /* In case the parsing will fail in the next step we
-                                 * might at least be able to skip the whole section. */
-                                datalength = length - 1;
                             }
                             if (type == 3) {
                                 /* Read the raw data length of the embedded image. */
@@ -570,7 +570,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 }
                             }
 
-                            lseek(fd, datalength, SEEK_CUR);
+                            lseek(fd, after_pic_pos, SEEK_SET);
 #endif
                         } else if (!strncmp("replaygain_", utf8buf, 11)) {
                             char *value = id3buf;
