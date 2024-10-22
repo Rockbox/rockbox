@@ -8734,20 +8734,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: "Gain"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user: core
@@ -12012,20 +11998,6 @@
   </dest>
   <voice>
     *: "Maximum Volume Limit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -16488,5 +16460,33 @@
   </dest>
   <voice>
     *: "Title from tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Reset EQ"
+  </dest>
+  <voice>
+    *: "Reset EQ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disc"
+  </dest>
+  <voice>
+    *: "Disc"
   </voice>
 </phrase>

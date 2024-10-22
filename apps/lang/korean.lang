@@ -8751,20 +8751,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "게인"
-  </dest>
-  <voice>
-    *: "게인"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user: core
@@ -12029,20 +12015,6 @@
   </dest>
   <voice>
     *: "최대 볼륨 제한"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -16505,5 +16477,33 @@
   </dest>
   <voice>
     *: "태그 제목"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "EQ 재설정"
+  </dest>
+  <voice>
+    *: "EQ 재설정"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "디스크"
+  </dest>
+  <voice>
+    *: "디스크"
   </voice>
 </phrase>

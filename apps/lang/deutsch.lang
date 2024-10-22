@@ -16482,3 +16482,31 @@
     *: "Verbleibend"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Equalizer zurücksetzen"
+  </dest>
+  <voice>
+    *: "Equalizer zurücksetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "CD"
+  </dest>
+  <voice>
+    *: "C D"
+  </voice>
+</phrase>

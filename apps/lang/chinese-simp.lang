@@ -11884,20 +11884,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "~Gain"
-  </dest>
-  <voice>
-    *: "~Gain"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TALK_MIXER_LEVEL
   desc: Relative volume of voice prompts
   user: core
@@ -12207,20 +12193,6 @@
     *: none
     dac_power_mode: "省电"
     es9218: "低增益 (1 Vrms)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "~Q"
-  </dest>
-  <voice>
-    *: "~Q"
   </voice>
 </phrase>
 <phrase>
@@ -16499,5 +16471,33 @@
   </dest>
   <voice>
     *: "I D 3 标题信息"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "重设均衡器"
+  </dest>
+  <voice>
+    *: "重设均衡器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "唱片"
+  </dest>
+  <voice>
+    *: "唱片"
   </voice>
 </phrase>
