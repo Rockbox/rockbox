@@ -323,22 +323,7 @@ static inline bool action_poll_button(action_last_t *last, action_cur_t *cur)
     int *button = &cur->button;
 
     *button = button_get_w_tmo(cur->timeout);
-   /* **************************************************************************
-    * if action_wait_for_release() was called without a button being pressed
-    * then actually waiting for release would do the wrong thing, i.e.
-    * the next key press is entirely ignored. So, if here comes a normal
-    * button press (neither release nor repeat) the press is a fresh one and
-    * no point in waiting for release
-    *
-    * This logic doesn't work for touchscreen which can send normal
-    * button events repeatedly before the first repeat (as in BUTTON_REPEAT).
-    * These cannot be distinguished from the very first touch
-    * but there's nothing we can do about it here
-    */
-    if (*button == BUTTON_NONE || (*button & (BUTTON_REPEAT|BUTTON_REL)) == 0)
-    {
-        last->wait_for_release = false;
-    }
+
    /* ********************************************************
     * Can return button immediately, sys_event & multimedia
     * button presses don't use the action system, Data from
