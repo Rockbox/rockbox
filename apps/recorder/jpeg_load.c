@@ -944,8 +944,9 @@ static int process_markers(struct jpeg* p_jpeg)
     int ret = 0; /* returned flags */
     bool done = false;
 
-    while (!done && (c = e_getc(p_jpeg, -1)))
+    while (!done)
     {
+        c = e_getc(p_jpeg, -1);
         if (c != 0xFF) /* no marker? */
         {
             JDEBUGF("Non-marker data\n");
