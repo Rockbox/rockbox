@@ -555,7 +555,7 @@ int storage_flush(void)
     int rc=0;
 
 #if (CONFIG_STORAGE & STORAGE_ATA)
-    //if ((rc=ata_flush())) return rc;
+    if ((rc=ata_flush())) return rc;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)

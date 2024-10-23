@@ -208,14 +208,16 @@ static inline int ata_disk_isssd(void)
            );
 }
 
-/* Returns 1 if the drive can be powered off safely */
-static inline int ata_disk_can_poweroff(void)
+/* Returns 1 if the drive supports power management commands */
+static inline int ata_disk_can_sleep(void)
 {
     unsigned short *identify_info = ata_get_identify();
     /* Only devices that claim to support PM can be safely powered off.
        This notably excludes the various SD adapters! */
     return (identify_info[82] & (1<<3) && identify_info[85] & (1<<3));
 }
+
+int ata_flush(void);
 
 #ifdef HAVE_ATA_DMA
 /* Returns current DMA mode */

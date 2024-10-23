@@ -174,7 +174,7 @@ static inline void storage_sleep(void) {};
         #define storage_disk_is_active() ata_disk_is_active()
         #define storage_soft_reset() ata_soft_reset()
         #ifdef HAVE_STORAGE_FLUSH
-            #define storage_flush() (void)0
+            #define storage_flush() ata_flush()
         #endif
         #define storage_last_disk_activity() ata_last_disk_activity()
         #define storage_spinup_time() ata_spinup_time()

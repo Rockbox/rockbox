@@ -83,6 +83,7 @@ static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 7 * HZ;
 static bool ata_powered;
+static bool canflush = true;
 static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
@@ -578,7 +579,7 @@ static void ata_set_active(void)
 
 bool ata_disk_is_active(void)
 {
-    return ata_disk_can_poweroff() ? ata_powered : 0;
+    return ata_powered;
 }
 
 static int ata_set_feature(uint32_t feature, uint32_t param)
@@ -745,6 +746,8 @@ static int ata_power_up(void)
         ata_dma = param ? true : false;
         dma_mode = param;
         PASS_RC(ata_set_feature(0x03, param), 3, 4); /* Transfer mode */
+
+        /* SET_FEATURE only supported on PATA, not CE-ATA */
         if (ata_identify_data[82] & BIT(5))
             PASS_RC(ata_set_feature(0x02, 0), 3, 5); /* Enable volatile write cache */
         if (ata_identify_data[82] & BIT(6))
@@ -753,7 +756,10 @@ static int ata_power_up(void)
             PASS_RC(ata_set_feature(0x05, 0x80), 3, 7); /* Enable lowest power mode w/o standby */
         if (ata_identify_data[83] & BIT(9))
             PASS_RC(ata_set_feature(0x42, 0x80), 3, 8); /* Enable lowest noise mode */
+
+        PASS_RC(ata_identify(ata_identify_data), 3, 9); /* Finally, re-read identify info */
     }
+
     spinup_time = current_tick - spinup_start;
 
     ata_total_sectors = (ata_identify_data[61] << 16) | ata_identify_data[60];
@@ -778,28 +784,6 @@ static void ata_power_down(void)
 {
     if (!ata_powered)
         return;
-    if (ceata)
-    {
-        memset(ceata_taskfile, 0, 16);
-        ceata_taskfile[0xf] = CMD_STANDBY_IMMEDIATE;
-        ceata_wait_idle();
-        ceata_write_multiple_register(0, ceata_taskfile, 16);
-        ceata_wait_idle();
-        sleep(HZ);
-        PWRCON(0) |= (1 << 9);
-    }
-    else
-    {
-        ata_wait_for_rdy(1000000);
-        ata_write_cbr(&ATA_PIO_DVR, 0);
-        ata_write_cbr(&ATA_PIO_CSD, CMD_STANDBY_IMMEDIATE);
-        ata_wait_for_rdy(1000000);
-        sleep(HZ / 30);
-        ATA_CONTROL = 0;
-        while (!(ATA_CONTROL & BIT(1)))
-            yield();
-        PWRCON(0) |= (1 << 5);
-    }
     PCON(7) = 0;
     PCON(8) = 0;
     PCON(9) = 0;
@@ -1080,26 +1064,27 @@ static void ata_flush_cache(void)
 {
     uint8_t cmd;
 
-    if (ata_identify_data[83] & BIT(13)) {
-        cmd = CMD_FLUSH_CACHE_EXT;
-    } else if (ata_identify_data[83] & BIT(12)) {
-        cmd = CMD_FLUSH_CACHE;
-    } else {
-        /* If neither (mandatory!) command is supported
-           then don't issue it. */
-       return;
-    }
-
-    if (ceata)
-    {
+    if (ceata) {
         memset(ceata_taskfile, 0, 16);
-        ceata_taskfile[0xf] = cmd;
+        ceata_taskfile[0xf] = CMD_FLUSH_CACHE_EXT;  /* CE-ATA only supports EXT */
         ceata_wait_idle();
         ceata_write_multiple_register(0, ceata_taskfile, 16);
         ceata_wait_idle();
-    }
-    else
-    {
+    } else {
+        if (!canflush) {
+            return;
+        } else if (ata_lba48 && ata_identify_data[83] & BIT(13)) {
+            cmd = CMD_FLUSH_CACHE_EXT; /* Flag, optional, ATA-6 and up, for use with LBA48 devices. Mandatory for CE-ATA */
+        } else if (ata_identify_data[83] & BIT(12)) {
+            cmd = CMD_FLUSH_CACHE; /* Flag, mandatory, ATA-6 and up */
+        } else if (ata_identify_data[80] >= BIT(5)) {  /* Use >= instead of '&' because bits lower than the latest standard we support don't have to be set */
+            cmd = CMD_FLUSH_CACHE; /* No flag, mandatory, ATA-5  (Optional for ATA-4) */
+        } else {
+            /* If neither command is supported then don't issue it. */
+            canflush = 0;
+            return;
+        }
+
         ata_wait_for_rdy(1000000);
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_CSD, cmd);
@@ -1107,14 +1092,46 @@ static void ata_flush_cache(void)
     }
 }
 
+int ata_flush(void)
+{
+    if (ata_powered) {
+        mutex_lock(&ata_mutex);
+        ata_flush_cache();
+        mutex_unlock(&ata_mutex);
+    }
+    return 0;
+}
+
 void ata_sleepnow(void)
 {
     mutex_lock(&ata_mutex);
 
-    if (ata_disk_can_poweroff())
-        ata_power_down();
-    else
-        ata_flush_cache();
+    ata_flush_cache();
+
+    if (ata_disk_can_sleep()) {
+        if (ceata) {
+            memset(ceata_taskfile, 0, 16);
+            ceata_taskfile[0xf] = CMD_STANDBY_IMMEDIATE;
+            ceata_wait_idle();
+            ceata_write_multiple_register(0, ceata_taskfile, 16);
+            ceata_wait_idle();
+            sleep(HZ);
+            PWRCON(0) |= (1 << 9);
+        } else {
+            ata_wait_for_rdy(1000000);
+            ata_write_cbr(&ATA_PIO_DVR, 0);
+            ata_write_cbr(&ATA_PIO_CSD, CMD_STANDBY_IMMEDIATE);
+            ata_wait_for_rdy(1000000);
+            sleep(HZ / 30);
+            ATA_CONTROL = 0;
+            while (!(ATA_CONTROL & BIT(1)))
+                yield();
+            PWRCON(0) |= (1 << 5);
+        }
+    }
+
+    if (ata_disk_can_sleep() || canflush)
+        ata_power_down(); // XXX add a powerdown delay similar to main ATA driver?
 
     mutex_unlock(&ata_mutex);
 }

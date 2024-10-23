@@ -103,6 +103,7 @@ static long sleep_timeout = 5*HZ;
 #ifdef HAVE_LBA48
 static bool lba48 = false; /* set for 48 bit addressing */
 #endif
+static bool canflush = true;
 
 static long last_disk_activity = -1;
 #ifdef HAVE_ATA_POWER_OFF
@@ -139,11 +140,6 @@ static int set_features(void);
 static inline void keep_ata_active(void)
 {
     last_disk_activity = current_tick;
-}
-
-static inline void schedule_ata_sleep(long from_now)
-{
-    last_disk_activity = current_tick - sleep_timeout + from_now;
 }
 
 static inline bool ata_sleep_timed_out(void)
@@ -223,7 +219,7 @@ static int ata_perform_wakeup(int state)
 static int ata_perform_sleep(void)
 {
     /* If device doesn't support PM features, don't try to sleep. */
-    if (!ata_disk_can_poweroff())
+    if (!ata_disk_can_sleep())
         return 0; // XXX or return a failure?
 
     logf("ata SLEEP %ld", current_tick);
@@ -257,13 +253,18 @@ static int ata_perform_flush_cache(void)
 {
     uint8_t cmd;
 
-    if (identify_info[83] & (1 << 13)) {
-        cmd = CMD_FLUSH_CACHE_EXT;
+    if (!canflush) {
+        return 0;
+    } else if (lba48 && identify_info[83] & (1 << 13)) {
+        cmd = CMD_FLUSH_CACHE_EXT;  /* Flag, optional, ATA-6 and up, for use with LBA48 devices */
     } else if (identify_info[83] & (1 << 12)) {
-        cmd = CMD_FLUSH_CACHE;
+        cmd = CMD_FLUSH_CACHE; /* Flag, mandatory, ATA-6 and up */
+    } else if (identify_info[80] >= (1 << 5)) { /* Use >= instead of '&' because bits lower than the latest standard we support don't have to be set */
+        cmd = CMD_FLUSH_CACHE; /* No flag, mandatory, ATA-5  (Optional for ATA-4) */
     } else {
         /* If neither (mandatory!) command is supported
            then don't issue it. */
+       canflush = 0;
        return 0;
     }
 
@@ -283,6 +284,16 @@ static int ata_perform_flush_cache(void)
         return -2;
     }
 
+    return 0;
+}
+
+int ata_flush(void)
+{
+    if (ata_state >= ATA_SPINUP) {
+        mutex_lock(&ata_mtx);
+        ata_perform_flush_cache();
+        mutex_unlock(&ata_mtx);
+    }
     return 0;
 }
 
@@ -844,7 +855,7 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    return ata_disk_can_poweroff() ? (ata_state >= ATA_SPINUP) : 0;
+    return (ata_state >= ATA_SPINUP);
 }
 
 void ata_sleepnow(void)
@@ -856,8 +867,9 @@ void ata_sleepnow(void)
             if (!ata_perform_flush_cache() && !ata_perform_sleep()) {
                 ata_state = ATA_SLEEPING;
 #ifdef HAVE_ATA_POWER_OFF
-                if (ata_disk_can_poweroff())
+                if (ata_disk_can_sleep() || canflush) {
                     power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
+                }
 #endif
             }
         }
@@ -967,6 +979,9 @@ static int perform_soft_reset(void)
     if (set_multiple_mode(multisectors))
         return -3;
 
+    if (identify())
+        return -2;
+
     if (freeze_lock())
         return -4;
 
@@ -1016,6 +1031,9 @@ static int ata_power_on(void)
 
     if (set_multiple_mode(multisectors))
         return -3;
+
+    if (identify())
+        return -2;
 
     if (freeze_lock())
         return -4;
@@ -1255,7 +1273,6 @@ int STORAGE_INIT_ATTR ata_init(void)
         }
 
         rc = identify();
-
         if (rc) {
             rc = -40 + rc;
             goto error;
@@ -1280,13 +1297,12 @@ int STORAGE_INIT_ATTR ata_init(void)
 #endif /* HAVE_LBA48 */
 
         rc = freeze_lock();
-
         if (rc) {
             rc = -50 + rc;
             goto error;
         }
 
-        rc = set_features(); // rror codes are between -1 and -49
+        rc = set_features(); // error codes are between -1 and -49
         if (rc) {
             rc = -60 + rc;
             goto error;
@@ -1324,6 +1340,12 @@ int STORAGE_INIT_ATTR ata_init(void)
     rc = set_multiple_mode(multisectors);
     if (rc)
         rc = -100 + rc;
+
+    rc = identify();
+    if (rc) {
+        rc = -40 + rc;
+        goto error;
+    }
 
 error:
     mutex_unlock(&ata_mtx);
@@ -1440,7 +1462,7 @@ int ata_event(long id, intptr_t data)
         ata_sleepnow();
     }
     else if (id == Q_STORAGE_SLEEP) {
-        schedule_ata_sleep(HZ/5);
+        last_disk_activity = current_tick - sleep_timeout + HZ / 5;
     }
 #ifndef USB_NONE
     else if (id == SYS_USB_CONNECTED) {

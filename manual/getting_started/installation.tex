@@ -305,14 +305,15 @@ For example, the stock Apple firmware on earlier 6th generation iPod Classic mod
   robust, but tend to be expensive and not available in larger sizes.
 \item[SATA.] These are fast, reliable, and available in high capacities, but are typically optimized for high performance
   at the expense of power consumption.. However, as they implement the full ATA command set, we are able
-  to aggressively power them down when not being actively used.
+  to minimize their power consumption and power them down when not being actively used.
 \item[Single Secure Digital (SD).] While these adapters come in different form factors from multiple vendors,
   they are all based on the same basic design. The ATA command set is incompletely emulated, notably lacking
-  support for the \emph{mandatory} ATA power management commands that Rockbox uses to flush caches and safely
+  support for \emph{mandatory} ATA power management commands that Rockbox uses to safely
   transition the device in and out of low power states.  Additionally, SD cards vary widely in quality
-  and power consumption with the resultant effects on data longevity and battery life. Finally, these SD adapters do not support 2TiB or larger SDUC cards.
+  and power consumption with the resultant effects on data longevity and battery life. Finally, these SD adapters
+  do not support 2TiB or larger SDUC cards.
 \item[Dual/Quad SD.]  These are similar to the above, only allowing use of mulitiple SD cards to
-  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards is most likely permenantly lost.  Given the quality and power management concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust and the most power hungry of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter which combination of cards is used, they simply will not work if their combined capacity exceeds 2TiB.
+  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards may be rendered inacessible.  Given the quality concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter what combination of cards is used, if their combined capacity exceeds 2TiB, the extra capacity will not be usable, and the device may even present as having (considerably) less space.
 \end{description}
 
 \note{All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.}
