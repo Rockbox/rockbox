@@ -1465,8 +1465,18 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     int sort_limit;
     int strip;
 
-    /* Show search progress after 0.5s delay */
-    show_search_progress(true, 0, 0, 0);
+    /* Show search progress straight away if the disk needs to spin up,
+       otherwise show it after the normal 1/2 second delay */
+    show_search_progress(
+#ifdef HAVE_DISK_STORAGE
+#ifdef HAVE_TC_RAMCACHE
+        tagcache_is_in_ram() ? true :
+#endif
+        storage_disk_is_active()
+#else
+        true
+#endif
+        , 0, 0, 0);
 
     if (c->currtable == TABLE_ALLSUBENTRIES)
     {
