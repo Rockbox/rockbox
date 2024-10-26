@@ -140,7 +140,8 @@
  *    a supported position for (A)dd or (Q)eue commands.
  * v6 removed the (C)lear command.
  */
-#define PLAYLIST_CONTROL_FILE_MIN_VERSION   2
+#define PLAYLIST_CONTROL_FILE_LTS_VERSION   2 /*  v2 still supported  */
+#define PLAYLIST_CONTROL_FILE_MIN_VERSION   6
 #define PLAYLIST_CONTROL_FILE_VERSION       6
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
@@ -1174,7 +1175,7 @@ static int create_and_play_dir(int direction, bool play_last)
 /*
  * remove all tracks, leaving the current track queued
  */
-static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write)
+static int remove_all_tracks_unlocked(struct playlist_info *playlist)
 {
     char filename[MAX_PATH];
     int seek_pos = -1;
@@ -1182,25 +1183,22 @@ static int remove_all_tracks_unlocked(struct playlist_info *playlist, bool write
     if (playlist->amount <= 0)
         return 0;
 
-    if (write) /* Write control file commands to disk */
-    {
-        if (playlist->control_fd < 0)
-            return -1;
+    if (playlist->control_fd < 0)
+        return -1;
 
-        if (get_track_filename(playlist, playlist->index,
-                               filename, sizeof(filename)) != 0)
-            return -1;
+    if (get_track_filename(playlist, playlist->index,
+                           filename, sizeof(filename)) != 0)
+        return -1;
 
-        /* Start over with fresh control file for emptied dynamic playlist */
-        pl_close_control(playlist);
-        create_control_unlocked(playlist);
-        update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
-                                PLAYLIST_CONTROL_FILE_VERSION, -1,
-                                "", "", NULL);
-        update_control_unlocked(playlist, PLAYLIST_COMMAND_QUEUE,
-                                0, 0, filename, NULL, &seek_pos);
-        sync_control_unlocked(playlist);
-    }
+    /* Start over with fresh control file for emptied dynamic playlist */
+    pl_close_control(playlist);
+    create_control_unlocked(playlist);
+    update_control_unlocked(playlist, PLAYLIST_COMMAND_PLAYLIST,
+                            PLAYLIST_CONTROL_FILE_VERSION, -1,
+                            "", "", NULL);
+    update_control_unlocked(playlist, PLAYLIST_COMMAND_QUEUE,
+                            0, 0, filename, NULL, &seek_pos);
+    sync_control_unlocked(playlist);
 
     /* Move current track down to position 0 */
     playlist->indices[0] = playlist->indices[playlist->index];
@@ -1348,7 +1346,7 @@ static int add_track_to_playlist_unlocked(struct playlist_info* playlist,
             break;
         }
         case PLAYLIST_REPLACE:
-            if (remove_all_tracks_unlocked(playlist, true) < 0)
+            if (remove_all_tracks_unlocked(playlist) < 0)
                 return -1;
             int newpos = playlist->index + 1;
             playlist->last_insert_pos = position = insert_position = newpos;
@@ -2426,7 +2424,7 @@ int playlist_insert_context_create(struct playlist_info* playlist,
 
     if (position == PLAYLIST_REPLACE)
     {
-        if (remove_all_tracks_unlocked(playlist, true) == 0)
+        if (remove_all_tracks_unlocked(playlist) == 0)
             position = PLAYLIST_INSERT_LAST;
         else
         {
@@ -3092,7 +3090,7 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
     dc_thread_stop(playlist);
     playlist_write_lock(playlist);
 
-    result = remove_all_tracks_unlocked(playlist, true);
+    result = remove_all_tracks_unlocked(playlist);
 
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, false);
@@ -3129,8 +3127,6 @@ static enum playlist_command pl_cmds_run(char cmd)
             return PLAYLIST_COMMAND_UNSHUFFLE;
         case 'R':
             return PLAYLIST_COMMAND_RESET;
-        case 'C':
-            return PLAYLIST_COMMAND_CLEAR;
         case 'F':
             return PLAYLIST_COMMAND_FLAGS;
         case '#':
@@ -3293,8 +3289,9 @@ int playlist_resume(void)
                          * (It's not a big deal since the error message will
                          * be practically the same either way...)
                          */
-                        if (version < PLAYLIST_CONTROL_FILE_MIN_VERSION ||
-                            version > PLAYLIST_CONTROL_FILE_VERSION)
+                        if ((version < PLAYLIST_CONTROL_FILE_MIN_VERSION ||
+                             version > PLAYLIST_CONTROL_FILE_VERSION)
+                            && version != PLAYLIST_CONTROL_FILE_LTS_VERSION)
                         {
                             result = -3;
                             goto out;
@@ -3426,19 +3423,6 @@ int playlist_resume(void)
                     case PLAYLIST_COMMAND_RESET:
                     {
                         playlist->last_insert_pos = -1;
-                        break;
-                    }
-                    /* FIXME: Deprecated.
-                     * Adjust PLAYLIST_CONTROL_FILE_MIN_VERSION after removal */
-                    case PLAYLIST_COMMAND_CLEAR:
-                    {
-                        if (strp[0])
-                            playlist->index = atoi(strp[0]);
-                        if (remove_all_tracks_unlocked(playlist, false) < 0)
-                        {
-                            result = -16;
-                            goto out;
-                        }
                         break;
                     }
                     case PLAYLIST_COMMAND_FLAGS:
