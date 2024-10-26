@@ -1116,8 +1116,13 @@ static int set_features(void)
 
 #ifdef HAVE_ATA_DMA
     if (identify_info[53] & (1<<2)) {
+        int max_udma = ATA_MAX_UDMA;
+#if ATA_MAX_UDMA > 2
+        if (!(ata_identify_data[93] & BIT(13)))
+            max_udma = 2;
+#endif
         /* Ultra DMA mode info present, find a mode */
-        dma_mode = ata_get_best_mode(identify_info[88], ATA_MAX_UDMA, 0x40);
+        dma_mode = ata_get_best_mode(identify_info[88], max_udma, 0x40);
     }
 
     if (!dma_mode) {

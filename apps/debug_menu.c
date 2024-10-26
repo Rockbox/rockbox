@@ -1567,9 +1567,9 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 '0' + (i & 7));
     }
 #endif /* HAVE_ATA_DMA */
-    i = identify_info[0] & (1 << 15);
+    i = identify_info[83] & (1 << 2);
     simplelist_addline(
-            "CF compatible: %s", i ? "yes" : "no");
+            "CFA compatible: %s", i ? "yes" : "no");
     i = identify_info[0] & (1 << 6);
     simplelist_addline(
             "Fixed device: %s", i ? "yes" : "no");

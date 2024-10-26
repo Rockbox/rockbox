@@ -609,15 +609,22 @@ static int ata_set_feature(uint32_t feature, uint32_t param)
 static int udmatimes[ATA_MAX_UDMA + 1] = {
         0x4071152,
         0x2050d52,
+#if ATA_MAX_UDMA >= 2
         0x2030a52,
+#endif
+#if ATA_MAX_UDMA >= 3
         0x1020a52,
-        0x1010a52
+#endif
+#if ATA_MAX_UDMA >= 4
+        0x1010a52,
+#endif
 };
 static int mwdmatimes[ATA_MAX_MWDMA + 1] = {
         0x1c175,
         0x7083,
-        0x5072
+        0x5072,
 };
+
 static int ata_get_best_mode(unsigned short identword, int max, int modetype)
 {
     unsigned short testbit = BIT_N(max);
@@ -719,7 +726,12 @@ static int ata_power_up(void)
 #ifdef HAVE_ATA_DMA
         if ((ata_identify_data[53] & BIT(2)) && (ata_identify_data[88] & BITRANGE(0, 4))) /* Any UDMA */
         {
-            param = ata_get_best_mode(ata_identify_data[88], ATA_MAX_UDMA, 0x40);
+            int max_udma = ATA_MAX_UDMA;
+#if ATA_MAX_UDMA > 2
+            if (!(ata_identify_data[93] & BIT(13)))
+                max_udma = 2;
+#endif
+            param = ata_get_best_mode(ata_identify_data[88], max_udma, 0x40);
             ATA_UDMA_TIME = udmatimes[param & 0xf];
             ata_dma_flags = BIT(2) | BIT(3) | BIT(9) | BIT(10);
         }
