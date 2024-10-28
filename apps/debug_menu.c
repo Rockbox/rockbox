@@ -1364,7 +1364,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     ver = "Unknown";
                     break;
             }
-            simplelist_addline("SDVer: %s\n", ver);
+            simplelist_addline("SDVer: %s", ver);
             if (csd_structure == 0) /* CSD version 1.0 */
 #endif
             {
