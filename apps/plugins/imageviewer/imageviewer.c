@@ -136,14 +136,23 @@ static enum image_type image_type = IMAGE_UNKNOWN;
 /************************* Implementation ***************************/
 
 /* Read directory contents for scrolling. */
-static void get_pic_list(void)
+static void get_pic_list(bool single_file)
 {
+    file_pt = (char **) buf;
+
+    if (single_file)
+    {
+        file_pt[0] = np_file;
+        buf_size -= sizeof(file_pt);
+        entries = 1;
+        curfile = 0;
+        return;
+    }
+
     struct tree_context *tree = rb->tree_get_context();
     struct entry *dircache = rb->tree_get_entries(tree);
     int i;
     char *pname;
-
-    file_pt = (char **) buf;
 
     /* Remove path and leave only the name.*/
     pname = rb->strrchr(np_file,'/');
@@ -1093,7 +1102,6 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_ERROR;
         }
 
-        entries = 1;
         is_album_art = true;
     }
     else
@@ -1112,11 +1120,7 @@ enum plugin_status plugin_start(const void* parameter)
     decoder_buf = rb->plugin_get_buffer(&decoder_buf_size);
     buf = rb->plugin_get_audio_buffer(&buf_size);
 #endif
-
-    if(!is_album_art)
-    {
-        get_pic_list();
-    }
+    get_pic_list(is_album_art);
 
 #ifdef USEGSLIB
     if (!grey_init(buf, buf_size, GREY_ON_COP,
