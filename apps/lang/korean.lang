@@ -16507,3 +16507,17 @@
     *: "디스크"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "앨범 아트 보기"
+  </dest>
+  <voice>
+    *: "앨범 아트 보기"
+  </voice>
+</phrase>

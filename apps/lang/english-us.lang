@@ -16490,3 +16490,17 @@
     *: "Disc"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "View Album Art"
+  </dest>
+  <voice>
+    *: "View Album Art"
+  </voice>
+</phrase>

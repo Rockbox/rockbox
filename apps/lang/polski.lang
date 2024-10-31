@@ -16500,3 +16500,17 @@
     *: "Płyta"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Pokaż okładkę albumu"
+  </dest>
+  <voice>
+    *: "Pokaż okładkę albumu"
+  </voice>
+</phrase>
