@@ -26,7 +26,7 @@ rbdir="/.rockbox"
 bindir=
 libdir=
 sharedir=
-
+sdl_config=sdl2-config
 arm_thumb_boot=
 thread_support="ASSEMBLER_THREADS"
 sysfont="08-Schumacher-Clean"
@@ -159,13 +159,13 @@ findtool(){
   fi
 }
 
-# scan the $PATH for sdl-config - check whether for a (cross-)win32
+# scan the $PATH for ${sdl_config} - check whether for a (cross-)win32
 # sdl as requested
 findsdl(){
-  files=sdl2-config
+  files=${sdl_config}
   if [ -n "$CROSS_COMPILE" ]; then
-    # sdl-config might (not) be prefixed for cross compiles so try both.
-    files="${CROSS_COMPILE}sdl-config:${files}"
+    # ${sdl_config} might (not) be prefixed for cross compiles so try both.
+    files="${CROSS_COMPILE}${sdl_config}:${files}"
   fi
   winbuild="$1"
 
@@ -191,7 +191,7 @@ findsdl(){
     fi
   fi
 
-  # search for the correct sdl-config
+  # search for the correct ${sdl_config}
   IFS=":"
   for path in $paths2check
   do
@@ -421,19 +421,19 @@ simcc () {
 
  if [ -n `echo $app_type | grep "sdl"` ]; then
     if [ -z "$sdl" ]; then
-        echo "configure didn't find sdl-config, which indicates that you"
+        echo "configure didn't find ${sdl_config}, which indicates that you"
         echo "don't have SDL (properly) installed. Please correct and"
         echo "re-run configure!"
         exit 2
     else
         echo Using $sdl
 
-        # generic sdl-config checker
+        # generic ${sdl_config} checker
         sdlccopts=$($sdl --cflags)
         if $sdl --static-libs > /dev/null 2>&1 ; then
           sdlldopts=$($sdl --static-libs)
         else
-          echo "Your sdl-config does not know about static libs, falling back to shared library"
+          echo "Your ${sdl_config} does not know about static libs, falling back to shared library"
           sdlldopts=$($sdl --libs)
 #          if [ "$win32crosscompile" = "yes" ] ; then
               LDOPTS=`echo $LDOPTS | sed -e s/-static//`
@@ -661,8 +661,8 @@ maemocc () {
     GCCOPTS="$GCCOPTS `pkg-config --cflags sdl`"
     LDOPTS="$LDOPTS `pkg-config --libs sdl`"
  else
-    GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-    LDOPTS="$LDOPTS `sdl-config --libs`"
+    GCCOPTS="$GCCOPTS `${sdl_config} --cflags`"
+    LDOPTS="$LDOPTS `${sdl_config} --libs`"
  fi
 
  # glib and libosso support
@@ -737,8 +737,8 @@ pandoracc () {
  prefixtools "$PNDSDK/bin/arm-angstrom-linux-gnueabi-"
 
  # Detect SDL
- GCCOPTS="$GCCOPTS `$PNDSDK/bin/sdl-config --cflags`"
- LDOPTS="$LDOPTS `$PNDSDK/bin/sdl-config --libs`"
+ GCCOPTS="$GCCOPTS `$PNDSDK/bin/${sdl_config} --cflags`"
+ LDOPTS="$LDOPTS `$PNDSDK/bin/${sdl_config} --libs`"
 
  # Compiler options
  GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
