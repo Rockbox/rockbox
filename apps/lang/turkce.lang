@@ -3692,7 +3692,7 @@
     *: "Sonraki:"
   </dest>
   <voice>
-    *: "Sonraki:"
+    *: "Sonraki"
   </voice>
 </phrase>
 <phrase>
@@ -4662,7 +4662,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Geçerli Zaman:"
+    rtc: "Geçerli Zaman"
   </voice>
 </phrase>
 <phrase>
@@ -5638,7 +5638,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Sinyal gücü:"
+    radio: "Sinyal gücü"
   </voice>
 </phrase>
 <phrase>
@@ -7438,7 +7438,7 @@
     *: "Mod:"
   </dest>
   <voice>
-    *: "Mod:"
+    *: "Mod"
   </voice>
 </phrase>
 <phrase>
@@ -7838,7 +7838,7 @@
     *: "[Etiketlenmemiş]"
   </dest>
   <voice>
-    *: "[Etiketlenmemiş]"
+    *: "Etiketlenmemiş"
   </voice>
 </phrase>
 <phrase>
@@ -8108,7 +8108,7 @@
     *: "Boş Alan:"
   </dest>
   <voice>
-    *: "Boş Alan:"
+    *: "Boş Alan"
   </voice>
 </phrase>
 <phrase>
@@ -9613,7 +9613,7 @@
     *: "Sonraki parça:"
   </dest>
   <voice>
-    *: "Sonraki parça:"
+    *: "Sonraki parça"
   </voice>
 </phrase>
 <phrase>
@@ -12494,7 +12494,7 @@
     *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist elapsed:"
+    *: "Geçen oynatma listesi:"
   </dest>
   <voice>
     *: "Geçen oynatma listesi"
@@ -12508,7 +12508,7 @@
     *: "Track elapsed:"
   </source>
   <dest>
-    *: "Track elapsed:"
+    *: "Geçen parça:"
   </dest>
   <voice>
     *: "Geçen parça"
@@ -12536,7 +12536,7 @@
     *: "Track remaining:"
   </source>
   <dest>
-    *: "Track remaining:"
+    *: "Kalan parça:"
   </dest>
   <voice>
     *: "Kalan parça"
@@ -12550,7 +12550,7 @@
     *: "Track:"
   </source>
   <dest>
-    *: "Track:"
+    *: "Parça:"
   </dest>
   <voice>
     *: "Parça"
@@ -12592,7 +12592,7 @@
     *: "Average track size:"
   </source>
   <dest>
-    *: "Average track size:"
+    *: "Ortalama parça boyutu:"
   </dest>
   <voice>
     *: "Ortalama parça boyutu"
@@ -12606,7 +12606,7 @@
     *: "Average bitrate:"
   </source>
   <dest>
-    *: "Average bitrate:"
+    *: "Ortalama bit hızı:"
   </dest>
   <voice>
     *: "Ortalama bit hızı"
@@ -15523,7 +15523,7 @@
     *: "Albümleri şuna göre sırala:"
   </dest>
   <voice>
-    *: "Albümleri şuna göre sırala:"
+    *: "Albümleri şuna göre sırala"
   </voice>
 </phrase>
 <phrase>
