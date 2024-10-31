@@ -631,6 +631,7 @@ static void init(void)
 #elif !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
             lcd_puts(0, 2, "Rebooting in 5s");
 #endif
+            lcd_puts(0, 4, rbversion);
             lcd_update();
 
 #ifndef USB_NONE
