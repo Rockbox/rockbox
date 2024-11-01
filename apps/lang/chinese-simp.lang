@@ -129,10 +129,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "读取中,请稍候..."
+    *: "读取..."
   </dest>
   <voice>
-    *: "读取中 请稍候"
+    *: "正在读取"
   </voice>
 </phrase>
 <phrase>
@@ -143,10 +143,10 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "关闭中..."
+    *: "下次见！"
   </dest>
   <voice>
-    *: "关闭中"
+    *: "正在关机"
   </voice>
 </phrase>
 <phrase>
@@ -3222,10 +3222,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "按照时长"
+    *: "时间"
   </dest>
   <voice>
-    *: "按照时长"
+    *: "时间"
   </voice>
 </phrase>
 <phrase>
@@ -15087,11 +15087,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "按HOLD键设置"
+    hotkey: "按住进行设置"
   </dest>
   <voice>
     *: none
-    hotkey: "按HOLD键设置"
+    hotkey: "按住进行设置"
   </voice>
 </phrase>
 <phrase>
@@ -16499,5 +16499,19 @@
   </dest>
   <voice>
     *: "唱片"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "查看专辑封面"
+  </dest>
+  <voice>
+    *: "查看专辑封面"
   </voice>
 </phrase>

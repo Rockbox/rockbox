@@ -5320,10 +5320,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Normal"
+    *: "~Normal"
   </dest>
   <voice>
-    *: "Normal"
+    *: "~Normal"
   </voice>
 </phrase>
 <phrase>
@@ -12564,7 +12564,7 @@
     *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Storage (Done / Remaining):"
+    *: "Depolama (Biten / Kalan):"
   </dest>
   <voice>
     *: "Depolama"
@@ -16252,10 +16252,10 @@
     *: "Title & Album from ID3 tags"
   </source>
   <dest>
-    *: "Title & Album from ID3 tags"
+    *: "ID3 etiketlerinden başlık & albüm"
   </dest>
   <voice>
-    *: "Title and Album from tags"
+    *: "Etiketlerden başlık"
   </voice>
 </phrase>
 <phrase>
@@ -16266,10 +16266,10 @@
     *: "Title from ID3 tags"
   </source>
   <dest>
-    *: "Title from ID3 tags"
+    *: "ID3 etiketlerinden başlık"
   </dest>
   <voice>
-    *: "Title from tags"
+    *: "Etiketlerden başlık"
   </voice>
 </phrase>
 <phrase>
@@ -16280,10 +16280,10 @@
     *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: "Selection too big, %d random tracks will be selected"
+    *: "Seçilenler çok fazla, %d rastgele parça seçilecek"
   </dest>
   <voice>
-    *: "Selection too big, fewer random tracks will be selected"
+    *: "Seçilenler çok fazla, daha az rastgele parça seçilecek"
   </voice>
 </phrase>
 <phrase>
@@ -16308,10 +16308,10 @@
     *: "Stereo Switch Mode"
   </source>
   <dest>
-    *: "Stereo Switch Mode"
+    *: "Çift Kanal Değişim Modu"
   </dest>
   <voice>
-    *: "Stereo Switch Mode"
+    *: "Çift Kanal Değişim Modu"
   </voice>
 </phrase>
 <phrase>
