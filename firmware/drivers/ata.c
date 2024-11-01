@@ -1310,7 +1310,7 @@ int STORAGE_INIT_ATTR ata_init(void)
 
 #ifdef MAX_PHYS_SECTOR_SIZE
         /* Find out the physical sector size */
-        if((identify_info[106] & 0xe000) == 0x6000)
+        if((identify_info[106] & 0xe000) == 0x6000) /* B14, B13 */
             phys_sector_mult = BIT_N(identify_info[106] & 0x000f);
         else
             phys_sector_mult = 1;
@@ -1386,8 +1386,8 @@ void ata_get_info(IF_MD(int drive,)struct storage_info *info)
     int i;
 
     /* Logical sector size > 512B ? */
-    if ((identify_info[106] & 0xd000) == 0x5000)
-        info->sector_size = identify_info[117] | (identify_info[118] << 16);
+    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+        info->sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
         info->sector_size = SECTOR_SIZE;
 

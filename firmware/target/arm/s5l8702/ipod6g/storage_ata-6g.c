@@ -1145,8 +1145,8 @@ void ata_spin(void)
 void ata_get_info(IF_MD(int drive,) struct storage_info *info)
 {
     /* Logical sector size */
-    if ((ata_identify_data[106] & 0xd000) == 0x5000)
-        info->sector_size = ata_identify_data[117] | (ata_identify_data[118] << 16);
+    if ((ata_identify_data[106] & 0xd000) == 0x5000) /* B14, B12 */
+        info->sector_size = (ata_identify_data[117] | (ata_identify_data[118] << 16)) * 2;
     else
         info->sector_size = SECTOR_SIZE;
 

@@ -1442,8 +1442,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     uint32_t sector_size;
 
     /* Logical sector size > 512B ? */
-    if ((identify_info[106] & 0xd000) == 0x5000)
-        sector_size = identify_info[117] | (identify_info[118] << 16);
+    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+        sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
         sector_size = SECTOR_SIZE;
 
@@ -1456,7 +1456,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
 #endif
 
-    if((identify_info[106] & 0xe000) == 0x6000)
+    if((identify_info[106] & 0xe000) == 0x6000) /* B14, B13 */
         sector_size *= BIT_N(identify_info[106] & 0x000f);
     simplelist_addline(
             "Physical sector size: %lu B", sector_size);
