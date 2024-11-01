@@ -29,6 +29,9 @@
 #include "mmcdefs-target.h"
 #include "s5l8702.h"
 #include "led.h"
+#include "debug.h"
+#include "panic.h"
+#include "fs_defines.h"
 
 #ifndef ATA_RETRIES
 #define ATA_RETRIES 3
@@ -58,21 +61,9 @@
 #define CEATA_DAT_NONBUSY_TIMEOUT 5000000
 #define CEATA_MMC_RCA 1
 
-#if SECTOR_SIZE == 4096
-#define SIZE_SHIFT 3 /* ie 4096 >> 3 == 512 */
-#elif SECTOR_SIZE == 512
-#define SIZE_SHIFT 0
-#else
-#error "Need to define SIZE_SHIFT for SECTOR_SIZE"
-#endif
-
-#ifdef MAX_PHYS_SECTOR_SIZE
-#error "Driver does not work with MAX_PHYS_SECTOR_SIZE"
-#endif
-
 /** static, private data **/
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
-static uint16_t ata_identify_data[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
+static uint16_t identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
 static bool ceata;
 static bool ata_lba48;
 static bool ata_dma;
@@ -88,10 +79,6 @@ static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
 static int dma_mode = 0;
-
-#if SECTOR_SIZE > 512
-static char aligned_buffer[SECTOR_SIZE] STORAGE_ALIGN_ATTR;
-#endif
 
 static const int ata_retries = ATA_RETRIES;
 static const bool ata_error_srst = true;
@@ -688,7 +675,7 @@ static int ata_power_up(void)
         SDCI_CDIV = SDCI_CDIV_CLKDIV(4);
         sleep(HZ / 100);
         PASS_RC(ceata_init(8), 3, 1);
-        PASS_RC(ata_identify(ata_identify_data), 3, 2);
+        PASS_RC(ata_identify(identify_info), 3, 2);
     } else {
         PCON(7) = 0x44444444;
         PCON(8) = 0x44444444;
@@ -710,14 +697,14 @@ static int ata_power_up(void)
         ATA_CFG = BIT(6);
         while (!(ATA_PIO_READY & BIT(1))) yield();
 
-        PASS_RC(ata_identify(ata_identify_data), 3, 3);
+        PASS_RC(ata_identify(identify_info), 3, 3);
 
         uint32_t piotime = 0x11f3; /* PIO0-2? */
-        if (ata_identify_data[53] & BIT(1)) /* Word 64..70 valid */
+        if (identify_info[53] & BIT(1)) /* Word 64..70 valid */
         {
-            if (ata_identify_data[64] & BIT(1))
+            if (identify_info[64] & BIT(1))
                 piotime = 0x2072; /* PIO mode 4 */
-            else if (ata_identify_data[64] & BIT(0))
+            else if (identify_info[64] & BIT(0))
                 piotime = 0x7083; /* PIO mode 3 */
         }
         ATA_PIO_TIME = piotime;
@@ -725,20 +712,20 @@ static int ata_power_up(void)
         uint32_t param = 0;
         ata_dma_flags = 0;
 #ifdef HAVE_ATA_DMA
-        if ((ata_identify_data[53] & BIT(2)) && (ata_identify_data[88] & BITRANGE(0, 4))) /* Any UDMA */
+        if ((identify_info[53] & BIT(2)) && (identify_info[88] & BITRANGE(0, 4))) /* Any UDMA */
         {
             int max_udma = ATA_MAX_UDMA;
 #if ATA_MAX_UDMA > 2
-            if (!(ata_identify_data[93] & BIT(13)))
+            if (!(identify_info[93] & BIT(13)))
                 max_udma = 2;
 #endif
-            param = ata_get_best_mode(ata_identify_data[88], max_udma, 0x40);
+            param = ata_get_best_mode(identify_info[88], max_udma, 0x40);
             ATA_UDMA_TIME = udmatimes[param & 0xf];
             ata_dma_flags = BIT(2) | BIT(3) | BIT(9) | BIT(10);
         }
-        if (!param && ata_identify_data[63] & BITRANGE(0, 2)) /* Fall back to any MWDMA */
+        if (!param && identify_info[63] & BITRANGE(0, 2)) /* Fall back to any MWDMA */
         {
-            param = ata_get_best_mode(ata_identify_data[63], ATA_MAX_MWDMA, 0x20);
+            param = ata_get_best_mode(identify_info[63], ATA_MAX_MWDMA, 0x20);
             ATA_MDMA_TIME = mwdmatimes[param & 0xf];
             ata_dma_flags = BIT(3) | BIT(10);
         }
@@ -748,33 +735,32 @@ static int ata_power_up(void)
         PASS_RC(ata_set_feature(0x03, param), 3, 4); /* Transfer mode */
 
         /* SET_FEATURE only supported on PATA, not CE-ATA */
-        if (ata_identify_data[82] & BIT(5))
+        if (identify_info[82] & BIT(5))
             PASS_RC(ata_set_feature(0x02, 0), 3, 5); /* Enable volatile write cache */
-        if (ata_identify_data[82] & BIT(6))
+        if (identify_info[82] & BIT(6))
             PASS_RC(ata_set_feature(0xaa, 0), 3, 6); /* Enable read lookahead */
-        if (ata_identify_data[83] & BIT(3))
+        if (identify_info[83] & BIT(3))
             PASS_RC(ata_set_feature(0x05, 0x80), 3, 7); /* Enable lowest power mode w/o standby */
-        if (ata_identify_data[83] & BIT(9))
+        if (identify_info[83] & BIT(9))
             PASS_RC(ata_set_feature(0x42, 0x80), 3, 8); /* Enable lowest noise mode */
 
-        PASS_RC(ata_identify(ata_identify_data), 3, 9); /* Finally, re-read identify info */
+        PASS_RC(ata_identify(identify_info), 3, 9); /* Finally, re-read identify info */
     }
 
     spinup_time = current_tick - spinup_start;
 
-    ata_total_sectors = (ata_identify_data[61] << 16) | ata_identify_data[60];
-    if ( ata_identify_data[83] & BIT(10) && ata_total_sectors == 0x0FFFFFFF)
+    ata_total_sectors = (identify_info[61] << 16) | identify_info[60];
+    if ( identify_info[83] & BIT(10) && ata_total_sectors == 0x0FFFFFFF)
     {
-        ata_total_sectors = ((uint64_t)ata_identify_data[103] << 48) |
-                ((uint64_t)ata_identify_data[102] << 32) |
-                ((uint64_t)ata_identify_data[101] << 16) |
-                ata_identify_data[100];
+        ata_total_sectors = ((uint64_t)identify_info[103] << 48) |
+                ((uint64_t)identify_info[102] << 32) |
+                ((uint64_t)identify_info[101] << 16) |
+                identify_info[100];
         ata_lba48 = true;
     } else {
         ata_lba48 = false;
     }
 
-    ata_total_sectors >>= SIZE_SHIFT;
     ata_powered = true;
     ata_set_active();
     return 0;
@@ -798,18 +784,18 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
     if (ceata)
     {
         memset(ceata_taskfile, 0, 16);
-        ceata_taskfile[0x2] = cnt >> (8-SIZE_SHIFT);
-        ceata_taskfile[0x3] = sector >> (24-SIZE_SHIFT);
-        ceata_taskfile[0x4] = sector >> (32-SIZE_SHIFT);
-        ceata_taskfile[0x5] = sector >> (40-SIZE_SHIFT);
-        ceata_taskfile[0xa] = cnt << SIZE_SHIFT;
-        ceata_taskfile[0xb] = sector << SIZE_SHIFT;
-        ceata_taskfile[0xc] = sector >> (8-SIZE_SHIFT);
-        ceata_taskfile[0xd] = sector >> (16-SIZE_SHIFT);
+        ceata_taskfile[0x2] = cnt >> 8;
+        ceata_taskfile[0x3] = sector >> 24;
+        ceata_taskfile[0x4] = sector >> 32;
+        ceata_taskfile[0x5] = sector >> 40;
+        ceata_taskfile[0xa] = cnt;
+        ceata_taskfile[0xb] = sector;
+        ceata_taskfile[0xc] = sector >> 8;
+        ceata_taskfile[0xd] = sector >> 16;
         ceata_taskfile[0xf] = write ? CMD_WRITE_DMA_EXT : CMD_READ_DMA_EXT;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt << SIZE_SHIFT, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
     }
     else
     {
@@ -817,14 +803,14 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         ata_write_cbr(&ATA_PIO_DVR, 0);
         if (ata_lba48)
         {
-            ata_write_cbr(&ATA_PIO_SCR, (cnt >> (8-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_SCR, (cnt << SIZE_SHIFT) & 0xff);
-            ata_write_cbr(&ATA_PIO_LHR, (sector >> (40-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LMR, (sector >> (32-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LLR, (sector >> (24-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LHR, (sector >> (16-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LMR, (sector >> (8-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LLR, (sector << SIZE_SHIFT) & 0xff);
+            ata_write_cbr(&ATA_PIO_SCR, (cnt >> 8) & 0xff);
+            ata_write_cbr(&ATA_PIO_SCR, (cnt) & 0xff);
+            ata_write_cbr(&ATA_PIO_LHR, (sector >> 40) & 0xff);
+            ata_write_cbr(&ATA_PIO_LMR, (sector >> 32) & 0xff);
+            ata_write_cbr(&ATA_PIO_LLR, (sector >> 24) & 0xff);
+            ata_write_cbr(&ATA_PIO_LHR, (sector >> 16) & 0xff);
+            ata_write_cbr(&ATA_PIO_LMR, (sector >> 8) & 0xff);
+            ata_write_cbr(&ATA_PIO_LLR, (sector) & 0xff);
             ata_write_cbr(&ATA_PIO_DVR, BIT(6));
             if (write)
                 ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_WRITE_DMA_EXT : CMD_WRITE_MULTIPLE_EXT);
@@ -833,11 +819,11 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         }
         else
         {
-            ata_write_cbr(&ATA_PIO_SCR, (cnt << SIZE_SHIFT) & 0xff);
-            ata_write_cbr(&ATA_PIO_LHR, (sector >> (16-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LMR, (sector >> (8-SIZE_SHIFT)) & 0xff);
-            ata_write_cbr(&ATA_PIO_LLR, (sector << SIZE_SHIFT) & 0xff);
-            ata_write_cbr(&ATA_PIO_DVR, BIT(6) | ((sector >> (24-SIZE_SHIFT)) & 0xf));
+            ata_write_cbr(&ATA_PIO_SCR, (cnt) & 0xff);
+            ata_write_cbr(&ATA_PIO_LHR, (sector >> 16) & 0xff);
+            ata_write_cbr(&ATA_PIO_LMR, (sector >> 8) & 0xff);
+            ata_write_cbr(&ATA_PIO_LLR, (sector) & 0xff);
+            ata_write_cbr(&ATA_PIO_DVR, BIT(6) | ((sector >> 24) & 0xf)); /* LBA28, mask off upper 4 bits of 32-bit sector address */
             if (write)
                 ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_WRITE_DMA : CMD_WRITE_SECTORS);
             else
@@ -878,18 +864,17 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         else
 #endif // HAVE_ATA_DMA
         {
-            cnt <<= SIZE_SHIFT;
             while (cnt--)
             {
                 int i;
                 PASS_RC(ata_wait_for_start_of_transfer(500000), 2, 1);
                 if (write)
-                    for (i = 0; i < 256; i++)
+                    for (i = 0; i < SECTOR_SIZE/2; i++)
                         ata_write_cbr(&ATA_PIO_DTR, ((uint16_t*)buffer)[i]);
                 else
-                    for (i = 0; i < 256; i++)
+                    for (i = 0; i < SECTOR_SIZE/2; i++)
                         ((uint16_t*)buffer)[i] = ata_read_cbr(&ATA_PIO_DTR);
-                buffer += (SECTOR_SIZE >> SIZE_SHIFT);
+                buffer += SECTOR_SIZE;
             }
         }
         PASS_RC(ata_wait_for_end_of_transfer(100000), 2, 3);
@@ -905,30 +890,8 @@ static int ata_rw_chunk(uint64_t sector, uint32_t cnt, void* buffer, bool write)
     return rc;
 }
 
-static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
+static int ata_transfer_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
 {
-#if SECTOR_SIZE > 512
-    if (STORAGE_OVERLAP((uint32_t)buffer))
-    {
-        while (count)
-        {
-            if (write)
-                memcpy(aligned_buffer, buffer, SECTOR_SIZE);
-
-            PASS_RC(ata_rw_sectors(sector, 1, aligned_buffer, write), 0, 0);
-
-            if (!write)
-                memcpy(buffer, aligned_buffer, SECTOR_SIZE);
-
-            buffer += SECTOR_SIZE;
-            sector++;
-            count--;
-        }
-
-        return 0;
-    }
-#endif
-
     if (!ata_powered)
         ata_power_up();
     if (sector + count > ata_total_sectors)
@@ -943,7 +906,7 @@ static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool wr
 
     while (count)
     {
-        uint32_t cnt = MIN(ata_lba48 ? (65536 >> SIZE_SHIFT) : (256 >> SIZE_SHIFT), count);
+        uint32_t cnt = MIN(ata_lba48 ? 65536 : 256, count);
         int rc = -1;
         rc = ata_rw_chunk(sector, cnt, buffer, write);
         if (rc && ata_error_srst)
@@ -1037,11 +1000,18 @@ static int ata_reset(void)
     return rc;
 }
 
+#include "ata-common.c"
+
+#ifndef MAX_PHYS_SECTOR_SIZE
 int ata_read_sectors(IF_MD(int drive,) sector_t start, int incount,
                      void* inbuf)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
+
     mutex_lock(&ata_mutex);
-    int rc = ata_rw_sectors(start, incount, inbuf, false);
+    int rc = ata_transfer_sectors(start, incount, inbuf, false);
     mutex_unlock(&ata_mutex);
     return rc;
 }
@@ -1049,11 +1019,16 @@ int ata_read_sectors(IF_MD(int drive,) sector_t start, int incount,
 int ata_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
+
     mutex_lock(&ata_mutex);
-    int rc = ata_rw_sectors(start, count, (void*)((uint32_t)outbuf), true);
+    int rc = ata_transfer_sectors(start, count, (void*)((uint32_t)outbuf), true);
     mutex_unlock(&ata_mutex);
     return rc;
 }
+#endif /* ndef MAX_PHYS_SECTOR_SIZE */
 
 void ata_spindown(int seconds)
 {
@@ -1073,11 +1048,11 @@ static void ata_flush_cache(void)
     } else {
         if (!canflush) {
             return;
-        } else if (ata_lba48 && ata_identify_data[83] & BIT(13)) {
+        } else if (ata_lba48 && identify_info[83] & BIT(13)) {
             cmd = CMD_FLUSH_CACHE_EXT; /* Flag, optional, ATA-6 and up, for use with LBA48 devices. Mandatory for CE-ATA */
-        } else if (ata_identify_data[83] & BIT(12)) {
+        } else if (identify_info[83] & BIT(12)) {
             cmd = CMD_FLUSH_CACHE; /* Flag, mandatory, ATA-6 and up */
-        } else if (ata_identify_data[80] >= BIT(5)) {  /* Use >= instead of '&' because bits lower than the latest standard we support don't have to be set */
+        } else if (identify_info[80] >= BIT(5)) {  /* Use >= instead of '&' because bits lower than the latest standard we support don't have to be set */
             cmd = CMD_FLUSH_CACHE; /* No flag, mandatory, ATA-5  (Optional for ATA-4) */
         } else {
             /* If neither command is supported then don't issue it. */
@@ -1145,8 +1120,8 @@ void ata_spin(void)
 void ata_get_info(IF_MD(int drive,) struct storage_info *info)
 {
     /* Logical sector size */
-    if ((ata_identify_data[106] & 0xd000) == 0x5000) /* B14, B12 */
-        info->sector_size = (ata_identify_data[117] | (ata_identify_data[118] << 16)) * 2;
+    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+        info->sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
         info->sector_size = SECTOR_SIZE;
 
@@ -1172,12 +1147,18 @@ int ata_init(void)
     ata_powered = false;
     ata_total_sectors = 0;
 
-    /* get ata_identify_data */
+    /* get identify_info */
     mutex_lock(&ata_mutex);
     int rc = ata_power_up();
     mutex_unlock(&ata_mutex);
     if (IS_ERR(rc))
         return rc;
+
+#ifdef MAX_PHYS_SECTOR_SIZE
+    rc = ata_get_phys_sector_mult();
+    if (IS_ERR(rc))
+        return rc;
+#endif
 
     return 0;
 }
@@ -1194,7 +1175,7 @@ static int ata_smart(uint16_t* buf)
         ceata_taskfile[0xe] = BIT(6);
         ceata_taskfile[0xf] = CMD_SMART;
         PASS_RC(ceata_wait_idle(), 3, 1);
-        if (((uint8_t*)ata_identify_data)[54] != 'A')  /* Model != aAmsung */
+        if (((uint8_t*)identify_info)[54] != 'A')  /* Model != aAmsung */
         {
             ceata_taskfile[0x9] = 0xd8; /* SMART enable operations */
             PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 2);
@@ -1242,7 +1223,7 @@ static int ata_num_drives(int first_drive)
 
 unsigned short* ata_get_identify(void)
 {
-    return ata_identify_data;
+    return identify_info;
 }
 
 int ata_spinup_time(void)
