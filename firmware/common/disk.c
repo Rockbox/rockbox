@@ -331,19 +331,18 @@ int disk_mount(int drive)
     disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
 #endif
 
-        /* try "superfloppy" mode */
-        DEBUGF("Trying to mount sector 0.\n");
+    /* try "superfloppy" mode */
+    DEBUGF("Trying to mount sector 0.\n");
 
-        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
-        {
-        #ifdef MAX_LOG_SECTOR_SIZE
-            disk_sector_multiplier[drive] =
-                fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
-        #endif
-            mounted = 1;
-            init_volume(&volumes[volume], drive, 0);
-            volume_onmount_internal(IF_MV(volume));
-        }
+    if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
+    {
+#ifdef MAX_LOG_SECTOR_SIZE
+        disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
+#endif
+        mounted = 1;
+        init_volume(&volumes[volume], drive, 0);
+        volume_onmount_internal(IF_MV(volume));
+    }
 
     if (mounted == 0 && volume != -1) /* not a "superfloppy"? */
     {
@@ -356,7 +355,7 @@ int disk_mount(int drive)
 
         DEBUGF("Trying to mount partition %d.\n", i);
 
-        #ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_LOG_SECTOR_SIZE
             for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
             {
                 if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
@@ -371,7 +370,7 @@ int disk_mount(int drive)
                     break;
                 }
             }
-        #else /* ndef MAX_LOG_SECTOR_SIZE */
+#else /* ndef MAX_LOG_SECTOR_SIZE */
             if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
             {
                 mounted++;
@@ -379,7 +378,7 @@ int disk_mount(int drive)
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
             }
-        #endif /* MAX_LOG_SECTOR_SIZE */
+#endif /* MAX_LOG_SECTOR_SIZE */
         }
     }
 
