@@ -90,7 +90,7 @@ enum {
 
 static int ata_state = ATA_BOOT;
 
-static struct mutex ata_mtx SHAREDBSS_ATTR;
+static struct mutex ata_mutex SHAREDBSS_ATTR;
 static int ata_device; /* device 0 (master) or 1 (slave) */
 
 static int spinup_time = 0;
@@ -101,7 +101,7 @@ static bool ata_led_on = false;
 
 static long sleep_timeout = 5*HZ;
 #ifdef HAVE_LBA48
-static bool lba48 = false; /* set for 48 bit addressing */
+static bool ata_lba48 = false; /* set for 48 bit addressing */
 #endif
 static bool canflush = true;
 
@@ -112,17 +112,17 @@ static long power_off_tick = 0;
 
 static sector_t total_sectors;
 static int multisectors; /* number of supported multisectors */
-static unsigned short identify_info[ATA_IDENTIFY_WORDS];
+
+static unsigned short identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 struct sector_cache_entry {
-    bool inuse;
-    sector_t sectornum;  /* logical sector */
     unsigned char data[MAX_PHYS_SECTOR_SIZE];
+    sector_t sectornum;  /* logical sector */
+    bool inuse;
 };
 /* buffer for reading and writing large physical sectors */
-#define NUMCACHES 2
-static struct sector_cache_entry sector_cache;
+static struct sector_cache_entry sector_cache STORAGE_ALIGN_ATTR;
 static int phys_sector_mult = 1;
 #endif
 
@@ -255,7 +255,7 @@ static int ata_perform_flush_cache(void)
 
     if (!canflush) {
         return 0;
-    } else if (lba48 && identify_info[83] & (1 << 13)) {
+    } else if (ata_lba48 && identify_info[83] & (1 << 13)) {
         cmd = CMD_FLUSH_CACHE_EXT;  /* Flag, optional, ATA-6 and up, for use with LBA48 devices */
     } else if (identify_info[83] & (1 << 12)) {
         cmd = CMD_FLUSH_CACHE; /* Flag, mandatory, ATA-6 and up */
@@ -290,9 +290,9 @@ static int ata_perform_flush_cache(void)
 int ata_flush(void)
 {
     if (ata_state >= ATA_SPINUP) {
-        mutex_lock(&ata_mtx);
+        mutex_lock(&ata_mutex);
         ata_perform_flush_cache();
-        mutex_unlock(&ata_mtx);
+        mutex_unlock(&ata_mutex);
     }
     return 0;
 }
@@ -447,7 +447,7 @@ static int ata_transfer_sectors(uint64_t start,
 #endif
 
 #ifdef HAVE_LBA48
-        if (lba48)
+        if (ata_lba48)
         {
             ATA_OUT8(ATA_NSECTOR, count >> 8);
             ATA_OUT8(ATA_NSECTOR, count & 0xff);
@@ -474,7 +474,7 @@ static int ata_transfer_sectors(uint64_t start,
             ATA_OUT8(ATA_SECTOR, start & 0xff);
             ATA_OUT8(ATA_LCYL, (start >> 8) & 0xff);
             ATA_OUT8(ATA_HCYL, (start >> 16) & 0xff);
-            ATA_OUT8(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+            ATA_OUT8(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);  /* LBA28, mask off upper 4 bits of 32-bit sector address */
 #ifdef HAVE_ATA_DMA
             if (write)
                 ATA_OUT8(ATA_COMMAND, usedma ? CMD_WRITE_DMA : CMD_WRITE_MULTIPLE);
@@ -610,9 +610,9 @@ int ata_read_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
     int rc = ata_transfer_sectors(start, incount, inbuf, false);
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
     return rc;
 }
 
@@ -625,9 +625,9 @@ int ata_write_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
     int rc = ata_transfer_sectors(start, count, (void*)buf, true);
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
     return rc;
 }
 #endif /* ndef MAX_PHYS_SECTOR_SIZE */
@@ -637,8 +637,8 @@ static int cache_sector(sector_t sector)
 {
     int rc;
 
+    /* round down to physical sector boundary */
     sector &= ~(phys_sector_mult - 1);
-              /* round down to physical sector boundary */
 
     /* check whether the sector is already cached */
     if (sector_cache.inuse && (sector_cache.sectornum == sector))
@@ -672,7 +672,7 @@ int ata_read_sectors(IF_MD(int drive,)
 #ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
 
     offset = start & (phys_sector_mult - 1);
 
@@ -722,7 +722,7 @@ int ata_read_sectors(IF_MD(int drive,)
     }
 
   error:
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
 
     return rc;
 }
@@ -738,7 +738,7 @@ int ata_write_sectors(IF_MD(int drive,)
 #ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
 
     offset = start & (phys_sector_mult - 1);
 
@@ -799,7 +799,7 @@ int ata_write_sectors(IF_MD(int drive,)
     }
 
   error:
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
 
     return rc;
 }
@@ -862,7 +862,7 @@ void ata_sleepnow(void)
 {
     if (ata_state >= ATA_SPINUP) {
         logf("ata SLEEPNOW %ld", current_tick);
-        mutex_lock(&ata_mtx);
+        mutex_lock(&ata_mutex);
         if (ata_state == ATA_ON) {
             if (!ata_perform_flush_cache() && !ata_perform_sleep()) {
                 ata_state = ATA_SLEEPING;
@@ -873,7 +873,7 @@ void ata_sleepnow(void)
 #endif
             }
         }
-        mutex_unlock(&ata_mtx);
+        mutex_unlock(&ata_mutex);
     }
 }
 
@@ -891,7 +891,7 @@ static int STORAGE_INIT_ATTR ata_hard_reset(void)
 {
     int ret;
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
 
     ata_reset();
 
@@ -902,7 +902,7 @@ static int STORAGE_INIT_ATTR ata_hard_reset(void)
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
 
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
 
     return ret;
 }
@@ -992,13 +992,13 @@ int ata_soft_reset(void)
 {
     int ret = -6;
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
 
     if (ata_state > ATA_OFF) {
         ret = perform_soft_reset();
     }
 
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
     return ret;
 }
 
@@ -1232,10 +1232,10 @@ int STORAGE_INIT_ATTR ata_init(void)
     bool coldstart;
 
     if (ata_state == ATA_BOOT) {
-        mutex_init(&ata_mtx);
+        mutex_init(&ata_mutex);
     }
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&ata_mutex);
 
     /* must be called before ata_device_init() */
     coldstart = ata_is_coldstart();
@@ -1292,7 +1292,7 @@ int STORAGE_INIT_ATTR ata_init(void)
                     ((uint64_t)identify_info[102] << 32) |
                     ((uint64_t)identify_info[101] << 16) |
                     identify_info[100];
-            lba48 = true; /* use BigLBA */
+            ata_lba48 = true; /* use BigLBA */
         }
 #endif /* HAVE_LBA48 */
 
@@ -1320,8 +1320,8 @@ int STORAGE_INIT_ATTR ata_init(void)
         if (phys_sector_mult > 1)
         {
             /* Check if drive really needs emulation  - if we can access
-             * sector 1 then assume the drive will handle it better than
-             * us, and ignore the large physical sectors.
+               sector 1 then assume the drive supports "512e" and will handle
+               it better than us, so ignore the large physical sectors.
              */
             char throwaway[SECTOR_SIZE];
             rc = ata_transfer_sectors(1, 1, &throwaway, false);
@@ -1348,7 +1348,7 @@ int STORAGE_INIT_ATTR ata_init(void)
     }
 
 error:
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&ata_mutex);
     return rc;
 }
 
@@ -1448,11 +1448,11 @@ int ata_event(long id, intptr_t data)
 #ifdef HAVE_ATA_POWER_OFF
             if (ata_state == ATA_SLEEPING && ata_power_off_timed_out()) {
                 power_off_tick = 0;
-                mutex_lock(&ata_mtx);
+                mutex_lock(&ata_mutex);
                 logf("ata OFF %ld", current_tick);
                 ide_power_enable(false);
                 ata_state = ATA_OFF;
-                mutex_unlock(&ata_mtx);
+                mutex_unlock(&ata_mutex);
             }
 #endif
             STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
@@ -1472,7 +1472,7 @@ int ata_event(long id, intptr_t data)
             STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
         }
         else {
-            mutex_lock(&ata_mtx);
+            mutex_lock(&ata_mutex);
             if (ata_state < ATA_ON) {
                 ata_led(true);
                 if (!(rc = ata_perform_wakeup(ata_state))) {
@@ -1480,7 +1480,7 @@ int ata_event(long id, intptr_t data)
                 }
                 ata_led(false);
             }
-            mutex_unlock(&ata_mtx);
+            mutex_unlock(&ata_mutex);
         }
     }
 #endif /* ndef USB_NONE */
