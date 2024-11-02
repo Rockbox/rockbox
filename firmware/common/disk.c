@@ -111,10 +111,6 @@ static void init_volume(struct volumeinfo *vi, int drive, int part)
 }
 
 #ifdef MAX_LOG_SECTOR_SIZE
-#if !(CONFIG_STORAGE & STORAGE_ATA)
-#error "MAX_LOG_SECTOR_SIZE only supported for STORAGE_ATA"
-#endif
-
 static uint16_t disk_sector_multiplier[NUM_DRIVES] =
     { [0 ... NUM_DRIVES-1] = 1 };
 
