@@ -29,6 +29,7 @@
 #include "dir.h"
 #include "rb_namespace.h"
 #include "disk.h"
+#include "panic.h"
 
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #include "bootdata.h"
@@ -110,7 +111,11 @@ static void init_volume(struct volumeinfo *vi, int drive, int part)
 }
 
 #ifdef MAX_LOG_SECTOR_SIZE
-static int disk_sector_multiplier[NUM_DRIVES] =
+#if !(CONFIG_STORAGE & STORAGE_ATA)
+#error "MAX_LOG_SECTOR_SIZE only supported for STORAGE_ATA"
+#endif
+
+static uint16_t disk_sector_multiplier[NUM_DRIVES] =
     { [0 ... NUM_DRIVES-1] = 1 };
 
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
@@ -125,6 +130,33 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 }
 #endif /* MAX_LOG_SECTOR_SIZE */
 
+#if (CONFIG_STORAGE & STORAGE_ATA)  // XXX make this more generic?
+static uint16_t disk_log_sector_size[NUM_DRIVES] =
+    { [0 ... NUM_DRIVES-1] = SECTOR_SIZE }; /* Updated from STORAGE_INFO */
+int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
+{
+    if (!CHECK_DRV(drive))
+        return 0;
+
+    disk_reader_lock();
+    int size = disk_log_sector_size[IF_MD_DRV(drive)];
+    disk_reader_unlock();
+    return size;
+}
+#ifdef HAVE_MULTIDRIVE
+#define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[__drive]
+#else
+#define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[0]
+#endif /* HAVE_MULTIDRIVE */
+#else /* !STORAGE_ATA */
+#define LOG_SECTOR_SIZE(__drive) SECTOR_SIZE
+int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
+{
+    IF_MD((void)drive);
+    return SECTOR_SIZE;
+}
+#endif /* !CONFIG_STORAGE & STORAGE_ATA */
+
 bool disk_init(IF_MD_NONVOID(int drive))
 {
     if (!CHECK_DRV(drive))
@@ -134,7 +166,30 @@ bool disk_init(IF_MD_NONVOID(int drive))
     if (!sector)
         return false;
 
-    memset(sector, 0, SECTOR_SIZE);
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    /* Query logical sector size */
+    struct storage_info *info = (struct storage_info*) sector;
+    storage_get_info(IF_MD_DRV(drive), info);
+    disk_writer_lock();
+#ifdef MAX_LOG_SECTOR_SIZE
+    disk_log_sector_size[IF_MD_DRV(drive)] = info->sector_size;
+#endif
+    disk_writer_unlock();
+
+#ifdef MAX_LOG_SECTOR_SIZE
+    if (info->sector_size > MAX_LOG_SECTOR_SIZE) {
+        panicf("Unsupported logical sector size: %d",
+               info->sector_size);
+    }
+#else
+    if (info->sector_size != SECTOR_SIZE) {
+        panicf("Unsupported logical sector size: %d",
+               info->sector_size);
+    }
+#endif
+#endif /* CONFIG_STORAGE & STORAGE_ATA */
+
+    memset(sector, 0, LOG_SECTOR_SIZE(drive));
     storage_read_sectors(IF_MD(drive,) 0, 1, sector);
 
     bool init = false;
@@ -213,11 +268,11 @@ bool disk_init(IF_MD_NONVOID(int drive))
 reload:
 	    storage_read_sectors(IF_MD(drive,) part_lba, 1, sector);
             uint8_t *pptr = ptr;
-	    while (part < MAX_PARTITIONS_PER_DRIVE && part_entries) {
-		if (pptr - ptr >= SECTOR_SIZE) {
-		    part_lba++;
-		    goto reload;
-		}
+            while (part < MAX_PARTITIONS_PER_DRIVE && part_entries) {
+                if (pptr - ptr >= LOG_SECTOR_SIZE(drive)) {
+                    part_lba++;
+                    goto reload;
+                }
 
 		/* Parse GPT entry.  We only care about the "General Data" type, ie:
 		     EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
@@ -337,7 +392,7 @@ int disk_mount(int drive)
     if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
     {
 #ifdef MAX_LOG_SECTOR_SIZE
-        disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
+        disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume)) / LOG_SECTOR_SIZE(drive);
 #endif
         mounted = 1;
         init_volume(&volumes[volume], drive, 0);
@@ -353,10 +408,10 @@ int disk_mount(int drive)
             if (pinfo[i].type == 0 || pinfo[i].type == 5)
                 continue;  /* skip free/extended partitions */
 
-        DEBUGF("Trying to mount partition %d.\n", i);
+            DEBUGF("Trying to mount partition %d.\n", i);
 
 #ifdef MAX_LOG_SECTOR_SIZE
-            for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
+            for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/LOG_SECTOR_SIZE(drive)); j <<= 1)
             {
                 if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
                 {

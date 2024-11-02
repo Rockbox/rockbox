@@ -47,10 +47,12 @@ int disk_mount(int drive);
 int disk_unmount_all(void);
 int disk_unmount(int drive);
 
-/* The number of 512-byte sectors in a "logical" sector. Needed for ipod 5.5G */
+/* Used when the drive's logical sector size is smaller than the sector size used by the partition table and filesystem.  Notably needed for ipod 5.5G/6G. */
 #ifdef MAX_LOG_SECTOR_SIZE
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 #endif
+/* The size of the drive's smallest addressible unit */
+int disk_get_log_sector_size(IF_MD_NONVOID(int drive));
 
 bool disk_present(IF_MD_NONVOID(int drive));
 
