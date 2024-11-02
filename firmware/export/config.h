@@ -1259,7 +1259,7 @@ Lyre prototype 1 */
 # define INCLUDE_TIMEOUT_API
 #endif
 
-#if (!defined(SIMULATOR) && !defined(HAVE_HOSTFS))
+#if (!defined(SIMULATOR) && !defined(HAVE_HOSTFS) && !(CONFIG_STORAGE & STORAGE_HOSTFS))
 #define STORAGE_GET_INFO
 #endif
 
