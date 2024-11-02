@@ -22,6 +22,12 @@
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 
+#ifdef MAX_LOG_SECTOR_SIZE
+#define __MAX_LOG_SECTOR_SIZE MAX_LOG_SECTOR_SIZE
+#else
+#define __MAX_LOG_SECTOR_SIZE SECTOR_SIZE
+#endif
+
 struct sector_cache_entry {
     unsigned char data[MAX_PHYS_SECTOR_SIZE];
     sector_t sectornum;  /* logical sector */
@@ -29,7 +35,7 @@ struct sector_cache_entry {
 };
 /* buffer for reading and writing large physical sectors */
 static struct sector_cache_entry sector_cache STORAGE_ALIGN_ATTR;
-static int phys_sector_mult = 1;
+static uint16_t phys_sector_mult = 1;
 
 static int cache_sector(sector_t sector)
 {
@@ -84,11 +90,11 @@ int ata_read_sectors(IF_MD(int drive,)
             rc = rc * 10 - 1;
             goto error;
         }
-        memcpy(inbuf, sector_cache.data + offset * SECTOR_SIZE,
-               partcount * SECTOR_SIZE);
+        memcpy(inbuf, sector_cache.data + offset * log_sector_size,
+               partcount * log_sector_size);
 
         start += partcount;
-        inbuf += partcount * SECTOR_SIZE;
+        inbuf += partcount * log_sector_size;
         incount -= partcount;
     }
     if (incount)
@@ -105,7 +111,7 @@ int ata_read_sectors(IF_MD(int drive,)
                 goto error;
             }
             start += incount;
-            inbuf += incount * SECTOR_SIZE;
+            inbuf += incount * log_sector_size;
         }
         if (offset)
         {
@@ -115,7 +121,7 @@ int ata_read_sectors(IF_MD(int drive,)
                 rc = rc * 10 - 3;
                 goto error;
             }
-            memcpy(inbuf, sector_cache.data, offset * SECTOR_SIZE);
+            memcpy(inbuf, sector_cache.data, offset * log_sector_size);
         }
     }
 
@@ -150,8 +156,8 @@ int ata_write_sectors(IF_MD(int drive,)
             rc = rc * 10 - 1;
             goto error;
         }
-        memcpy(sector_cache.data + offset * SECTOR_SIZE, buf,
-               partcount * SECTOR_SIZE);
+        memcpy(sector_cache.data + offset * log_sector_size, buf,
+               partcount * log_sector_size);
         rc = flush_current_sector();
         if (rc)
         {
@@ -159,7 +165,7 @@ int ata_write_sectors(IF_MD(int drive,)
             goto error;
         }
         start += partcount;
-        buf += partcount * SECTOR_SIZE;
+        buf += partcount * log_sector_size;
         count -= partcount;
     }
     if (count)
@@ -176,7 +182,7 @@ int ata_write_sectors(IF_MD(int drive,)
                 goto error;
             }
             start += count;
-            buf += count * SECTOR_SIZE;
+            buf += count * log_sector_size;
         }
         if (offset)
         {
@@ -186,7 +192,7 @@ int ata_write_sectors(IF_MD(int drive,)
                 rc = rc * 10 - 4;
                 goto error;
             }
-            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE);
+            memcpy(sector_cache.data, buf, offset * log_sector_size);
             rc = flush_current_sector();
             if (rc)
             {
@@ -220,15 +226,15 @@ static int ata_get_phys_sector_mult(void)
            sector 1 then assume the drive supports "512e" and will handle
            it better than us, so ignore the large physical sectors.
         */
-        char throwaway[SECTOR_SIZE];
+        char throwaway[__MAX_LOG_SECTOR_SIZE];
         rc = ata_transfer_sectors(1, 1, &throwaway, false);
         if (rc == 0)
             phys_sector_mult = 1;
     }
 
-    if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/SECTOR_SIZE))
-        panicf("Unsupported physical sector size: %d",
-               phys_sector_mult * SECTOR_SIZE);
+    if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/log_sector_size))
+        panicf("Unsupported physical sector size: %ld",
+               phys_sector_mult * log_sector_size);
 
     memset(&sector_cache, 0, sizeof(sector_cache));
 

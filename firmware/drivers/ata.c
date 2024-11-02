@@ -111,6 +111,7 @@ static long power_off_tick = 0;
 #endif
 
 static sector_t total_sectors;
+static uint32_t log_sector_size;
 static int multisectors; /* number of supported multisectors */
 
 static unsigned short identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
@@ -431,7 +432,7 @@ static int ata_transfer_sectors(uint64_t start,
 
 #ifdef HAVE_ATA_DMA
         /* If DMA is supported and parameters are ok for DMA, use it */
-        if (dma_mode && ata_dma_setup(inbuf, incount * SECTOR_SIZE, write))
+        if (dma_mode && ata_dma_setup(inbuf, incount * log_sector_size, write))
             usedma = true;
 #endif
 
@@ -533,7 +534,7 @@ static int ata_transfer_sectors(uint64_t start,
                 else
                     sectors = count;
 
-                wordcount = sectors * SECTOR_SIZE / 2;
+                wordcount = sectors * log_sector_size / 2;
 
                 if (write)
                     copy_write_sectors(buf, wordcount);
@@ -557,7 +558,7 @@ static int ata_transfer_sectors(uint64_t start,
                     goto retry;
                 }
 
-                buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
+                buf += sectors * log_sector_size; /* Advance one chunk of sectors */
                 count -= sectors;
 
                 keep_ata_active();
@@ -1097,7 +1098,7 @@ int STORAGE_INIT_ATTR ata_init(void)
         if (multisectors == 0) /* Invalid multisector info, try with 16 */
             multisectors = 16;
 
-        DEBUGF("ata: %d sectors per ata request\n",multisectors);
+        DEBUGF("ata: %d sectors per ata request\n", multisectors);
 
         total_sectors = (identify_info[61] << 16) | identify_info[60];
 
@@ -1110,6 +1111,12 @@ int STORAGE_INIT_ATTR ata_init(void)
             ata_lba48 = true; /* use BigLBA */
         }
 #endif /* HAVE_LBA48 */
+
+        /* Logical sector size > 512B ? */
+        if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+            log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
+        else
+            log_sector_size = SECTOR_SIZE;
 
         rc = freeze_lock();
         if (rc) {
@@ -1181,12 +1188,7 @@ void ata_get_info(IF_MD(int drive,)struct storage_info *info)
 #endif
     int i;
 
-    /* Logical sector size > 512B ? */
-    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
-        info->sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
-    else
-        info->sector_size = SECTOR_SIZE;
-
+    info->sector_size = log_sector_size;
     info->num_sectors = total_sectors;
 
     src = (unsigned short*)&identify_info[27];

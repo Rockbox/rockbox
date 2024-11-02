@@ -68,6 +68,7 @@ static bool ceata;
 static bool ata_lba48;
 static bool ata_dma;
 static uint64_t ata_total_sectors;
+static uint32_t log_sector_size;
 static struct mutex ata_mutex;
 static struct semaphore ata_wakeup;
 static uint32_t ata_dma_flags;
@@ -836,16 +837,16 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             if (write)
             {
                 ATA_SBUF_START = buffer;
-                ATA_SBUF_SIZE = SECTOR_SIZE * cnt;
+                ATA_SBUF_SIZE = log_sector_size * cnt;
                 ATA_CFG |= BIT(4);
             }
             else
             {
                 ATA_TBUF_START = buffer;
-                ATA_TBUF_SIZE = SECTOR_SIZE * cnt;
+                ATA_TBUF_SIZE = log_sector_size * cnt;
                 ATA_CFG &= ~BIT(4);
             }
-            ATA_XFR_NUM = SECTOR_SIZE * cnt - 1;
+            ATA_XFR_NUM = log_sector_size * cnt - 1;
             ATA_CFG |= ata_dma_flags;
             ATA_CFG &= ~(BIT(7) | BIT(8));
             semaphore_wait(&ata_wakeup, 0);
@@ -866,15 +867,15 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         {
             while (cnt--)
             {
-                int i;
+                uint16_t i;
                 PASS_RC(ata_wait_for_start_of_transfer(500000), 2, 1);
                 if (write)
-                    for (i = 0; i < SECTOR_SIZE/2; i++)
+                    for (i = 0; i < log_sector_size/2; i++)
                         ata_write_cbr(&ATA_PIO_DTR, ((uint16_t*)buffer)[i]);
                 else
-                    for (i = 0; i < SECTOR_SIZE/2; i++)
+                    for (i = 0; i < log_sector_size/2; i++)
                         ((uint16_t*)buffer)[i] = ata_read_cbr(&ATA_PIO_DTR);
-                buffer += SECTOR_SIZE;
+                buffer += log_sector_size;
             }
         }
         PASS_RC(ata_wait_for_end_of_transfer(100000), 2, 3);
@@ -927,11 +928,11 @@ static int ata_transfer_sectors(uint64_t sector, uint32_t count, void* buffer, b
                 }
                 if (rc)
                     break;
-                buf += SECTOR_SIZE;
+                buf += log_sector_size;
             }
         }
         PASS_RC(rc, 1, 1);
-        buffer += SECTOR_SIZE * cnt;
+        buffer += log_sector_size * cnt;
         sector += cnt;
         count -= cnt;
     }
@@ -1119,16 +1120,11 @@ void ata_spin(void)
 #ifdef STORAGE_GET_INFO
 void ata_get_info(IF_MD(int drive,) struct storage_info *info)
 {
-    /* Logical sector size */
-    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
-        info->sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
-    else
-        info->sector_size = SECTOR_SIZE;
-
-    (*info).num_sectors = ata_total_sectors;
-    (*info).vendor = "Apple";
-    (*info).product = "iPod Classic";
-    (*info).revision = "1.0";
+    info->sector_size = log_sector_size;
+    info->num_sectors = ata_total_sectors;
+    info->vendor = "Apple";
+    info->product = "iPod Classic";
+    info->revision = "1.0";
 }
 #endif
 
@@ -1149,10 +1145,16 @@ int ata_init(void)
 
     /* get identify_info */
     mutex_lock(&ata_mutex);
-    int rc = ata_power_up();
+    int rc = ata_power_up(); /* Include identify() call */
     mutex_unlock(&ata_mutex);
     if (IS_ERR(rc))
         return rc;
+
+    /* Logical sector size */
+    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+        log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
+    else
+        log_sector_size = SECTOR_SIZE;
 
 #ifdef MAX_PHYS_SECTOR_SIZE
     rc = ata_get_phys_sector_mult();
