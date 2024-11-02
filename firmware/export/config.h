@@ -1259,10 +1259,8 @@ Lyre prototype 1 */
 # define INCLUDE_TIMEOUT_API
 #endif
 
-#ifndef SIMULATOR
-#if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND) || (CONFIG_STORAGE & STORAGE_RAMDISK)
+#if (!defined(SIMULATOR) && !defined(HAVE_HOSTFS))
 #define STORAGE_GET_INFO
-#endif
 #endif
 
 #if defined(HAVE_SIGALTSTACK_THREADS)
