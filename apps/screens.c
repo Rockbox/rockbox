@@ -55,6 +55,7 @@
 #include "replaygain.h"
 
 #include "ctype.h"
+#include "plugin.h"
 
 #if CONFIG_CHARGING
 void charging_splash(void)
@@ -815,7 +816,19 @@ refresh_info:
         if(!list_do_action(CONTEXT_LIST,HZ/2, &id3_lists, &key)
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
-            if (key == ACTION_STD_OK || key == ACTION_STD_CANCEL)
+            if (key == ACTION_STD_OK)
+            {
+                int header_id = id3_headers[info.info_id[id3_lists.selected_item/2]];
+                char* title_and_text[2];
+                title_and_text[0] = str(header_id);
+
+                char buffer[MAX_PATH];
+                title_and_text[1] = (char*)id3_get_or_speak_info(id3_lists.selected_item+1,&info, buffer, sizeof(buffer), false);
+                plugin_load(VIEWERS_DIR"/view_text.rock", title_and_text);
+                gui_synclist_draw(&id3_lists);
+                continue;
+            }
+            if (key == ACTION_STD_CANCEL)
             {
                 ret = false;
                 break;

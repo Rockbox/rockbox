@@ -32,6 +32,7 @@ settings_dumper.c
 snow.c
 sort.c
 stats.c
+view_text.c
 #ifdef HAVE_TOUCHSCREEN
 stopwatch.lua
 #else
