@@ -860,8 +860,16 @@ int plugin_load(const char* plugin, const void* parameter)
     const char *sepch = strrchr(plugin, PATH_SEPCH);
     bool theme_enabled = sepch && !strcmp("properties.rock", sepch + 1);
 
-    if (current_plugin_handle && pfn_tsr_exit)
-    {    /* if we have a resident old plugin and a callback */
+    if (current_plugin_handle)
+    {
+        if (!pfn_tsr_exit)
+        {
+            /* not allowing another plugin to load */
+            logf("Attempt to load plugin `%s` while another non-TSR plugin `%s` is running.", plugin, current_plugin);
+            return PLUGIN_OK;
+        }
+
+        /* if we have a resident old plugin and a callback */
         bool reenter = (strcmp(current_plugin, plugin) == 0);
         int exit_status = pfn_tsr_exit(reenter);
         if (exit_status == PLUGIN_TSR_CONTINUE)
