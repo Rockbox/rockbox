@@ -35,14 +35,6 @@
 
 #define MAX_COMPNAME    260
 
-/* still experimental? */
-/* increasing this will increase the total memory used by the cache; the
-   cache, as noted in disk_cache.h, has other minimum requirements that may
-   prevent reducing its number of entries in order to compensate */
-#ifndef SECTOR_SIZE
-#define SECTOR_SIZE     512
-#endif
-
 /* limits for number of open descriptors - if you increase these values, make
    certain that the disk cache has enough available buffers */
 
@@ -108,7 +100,18 @@
 #define DC_MAP_NUM_ENTRIES  256
 #endif /* MEMORYSIZE */
 
+/* increasing this will increase the total memory used by the cache; the
+   cache, as noted in disk_cache.h, has other minimum requirements that may
+   prevent reducing its number of entries in order to compensate */
+#ifndef SECTOR_SIZE
+#define SECTOR_SIZE     512
+#endif
+
 /* this _could_ be larger than a sector if that would ever be useful */
+#ifdef MAX_LOG_SECTOR_SIZE
+#define DC_CACHE_BUFSIZE   MAX_LOG_SECTOR_SIZE
+#else
 #define DC_CACHE_BUFSIZE    SECTOR_SIZE
+#endif
 
 #endif /* FS_DEFINES_H */

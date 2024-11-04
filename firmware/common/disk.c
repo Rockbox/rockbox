@@ -173,7 +173,7 @@ bool disk_init(IF_MD_NONVOID(int drive))
     disk_writer_unlock();
 
 #ifdef MAX_LOG_SECTOR_SIZE
-    if (info->sector_size > MAX_LOG_SECTOR_SIZE) {
+    if (info->sector_size > MAX_LOG_SECTOR_SIZE || info->sector_size > DC_CACHE_BUFSIZE) {
         panicf("Unsupported logical sector size: %d",
                info->sector_size);
     }
@@ -185,7 +185,7 @@ bool disk_init(IF_MD_NONVOID(int drive))
 #endif
 #endif /* CONFIG_STORAGE & STORAGE_ATA */
 
-    memset(sector, 0, LOG_SECTOR_SIZE(drive));
+    memset(sector, 0, DC_CACHE_BUFSIZE);
     storage_read_sectors(IF_MD(drive,) 0, 1, sector);
 
     bool init = false;
