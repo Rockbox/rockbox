@@ -582,9 +582,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if (!id3->comment)
                     return NULL;
 
-                strmemccpy(buffer, id3->comment, buffer_len);
 
-                val=buffer;
+                val = id3->comment;
                 if(say_it && val)
                     talk_spell(val, true);
                 break;
@@ -659,9 +658,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if (id3->codectype == AFMT_UNKNOWN && info->track_ct > 1)
                     return NULL;
 
-                strmemccpy(buffer, get_codec_string(id3->codectype), buffer_len);
-
-                val=buffer;
+                val = (char*) get_codec_string(id3->codectype);
                 if(say_it)
                     talk_spell(val, true);
                 break;
