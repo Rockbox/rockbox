@@ -103,12 +103,12 @@ static int alloc_filestr(struct filestr_desc **filep)
 }
 
 /* return the file size in sectors */
-static inline unsigned long filesize_sectors(file_size_t size)
+static inline unsigned long filesize_sectors(uint16_t sector_size, file_size_t size)
 {
     /* overflow proof whereas "(x + y - 1) / y" is not */
-    unsigned long numsectors = size / SECTOR_SIZE;
+    unsigned long numsectors = size / sector_size;
 
-    if (size % SECTOR_SIZE)
+    if (size % sector_size)
         numsectors++;
 
     return numsectors;
@@ -196,10 +196,11 @@ file_error:
     return rc;
 }
 
-/* Handle syncing all file's streams to the truncation */ 
+/* Handle syncing all file's streams to the truncation */
 static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
-    unsigned long filesectors = filesize_sectors(size);
+    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+    unsigned long filesectors = filesize_sectors(sector_size, size);
 
     struct filestr_base *s = NULL;
     while ((s = fileobj_get_next_stream(&file->stream, s)))
@@ -229,9 +230,11 @@ static int ftruncate_internal(struct filestr_desc *file, file_size_t size,
     file_size_t cursize = *file->sizep;
     file_size_t truncsize = MIN(size, cursize);
 
+    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+
     if (write_now)
     {
-        unsigned long sector = filesize_sectors(truncsize);
+        unsigned long sector = filesize_sectors(sector_size, truncsize);
         struct filestr_cache *const cachep = file->stream.cachep;
 
         if (cachep->flags == (FSC_NEW|FSC_DIRTY) &&
@@ -244,7 +247,7 @@ static int ftruncate_internal(struct filestr_desc *file, file_size_t size,
             {
                 /* no space left on device; further truncation needed */
                 discard_cache(file);
-                truncsize = ALIGN_DOWN(truncsize - 1, SECTOR_SIZE);
+                truncsize = ALIGN_DOWN(truncsize - 1, sector_size);
                 sector--;
                 rc = rc2;
             }
@@ -292,6 +295,7 @@ static int fsync_internal(struct filestr_desc *file)
 
     file_size_t size = *file->sizep;
     unsigned int foflags = fileobj_get_flags(&file->stream);
+    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
 
     /* flush sector cache? */
     struct filestr_cache *const cachep = file->stream.cachep;
@@ -302,7 +306,7 @@ static int fsync_internal(struct filestr_desc *file)
         {
             /* no space left on device so this must be dropped */
             discard_cache(file);
-            size = ALIGN_DOWN(size - 1, SECTOR_SIZE);
+            size = ALIGN_DOWN(size - 1, sector_size);
             foflags |= FO_TRUNC;
             rc = rc2;
         }
@@ -407,7 +411,7 @@ static int open_internal_inner2(const char *path,
         /* not found; try to create it */
 
         callflags &= ~FO_TRUNC;
-        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name, 
+        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name,
                                     compinfo.length, ATTR_NEW_FILE, callflags,
                                     &file->stream);
         if (rc < 0)
@@ -649,15 +653,16 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
 
     struct filestr_cache * const cachep = file->stream.cachep;
     void * const bufstart = buf;
+    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
 
-    const unsigned long filesectors = filesize_sectors(size);
-    unsigned long sector = file->offset / SECTOR_SIZE;
-    unsigned long sectoroffs = file->offset % SECTOR_SIZE;
+    const unsigned long filesectors = filesize_sectors(sector_size, size);
+    unsigned long sector = file->offset / sector_size;
+    unsigned long sectoroffs = file->offset % sector_size;
 
     /* any head bytes? */
     if (sectoroffs)
     {
-        size_t headbytes = MIN(nbyte, SECTOR_SIZE - sectoroffs);
+        size_t headbytes = MIN(nbyte, sector_size - sectoroffs);
         rc = readwrite_partial(file, cachep, sector, sectoroffs, buf, headbytes,
                                filesectors, write);
         if (rc <= 0)
@@ -676,7 +681,7 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
     }
 
     /* read/write whole sectors right into/from the supplied buffer */
-    unsigned long sectorcount = nbyte / SECTOR_SIZE;
+    unsigned long sectorcount = nbyte / sector_size;
 
     while (sectorcount)
     {
@@ -728,8 +733,8 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
             }
             else
             {
-                buf += rc * SECTOR_SIZE;
-                nbyte -= rc * SECTOR_SIZE;
+                buf += rc * sector_size;
+                nbyte -= rc * sector_size;
                 sector += rc;
                 sectorcount -= rc;
 
@@ -745,9 +750,9 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
         if (UNLIKELY(sectorcount && sector == cachep->sector))
         {
             /* do this one sector with the cache */
-            readwrite_cache(cachep, buf, 0, SECTOR_SIZE, write);
-            buf += SECTOR_SIZE;
-            nbyte -= SECTOR_SIZE;
+            readwrite_cache(cachep, buf, 0, sector_size, write);
+            buf += sector_size;
+            nbyte -= sector_size;
             sector++;
             sectorcount--;
         }

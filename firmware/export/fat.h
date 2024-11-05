@@ -143,6 +143,8 @@ int fat_rename(struct fat_file *parent, struct fat_file *file,
 int fat_modtime(struct fat_file *parent, struct fat_file *file,
                 time_t modtime);
 
+int fat_file_sector_size(const struct fat_file *file);
+
 /** File stream functions **/
 int fat_closewrite(struct fat_filestr *filestr, uint32_t size,
                    struct fat_direntry *fatentp);
