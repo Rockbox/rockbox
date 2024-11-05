@@ -22,9 +22,10 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "config.h"
+#include "fs_defines.h"
 #include "storage.h"
 
-#define SECTOR_SIZE 512
 #define NUM_SECTORS 16384
 
 static unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
