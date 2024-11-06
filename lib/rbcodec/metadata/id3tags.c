@@ -725,7 +725,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
     unsigned char version;
     char *buffer = entry->id3v2buf;
     int bytesread = 0;
-    int buffersize = sizeof(entry->id3v2buf);
+    int buffersize;
     unsigned char global_flags;
     int flags;
     bool global_unsynch = false;
@@ -812,11 +812,26 @@ void setid3v2title(int fd, struct mp3entry *entry)
         global_unsynch = true;
     }
 
+    bool limit_tag_size = false;
+    uint32_t initial_pos = lseek(fd, 0, SEEK_CUR);
+    int  initial_size = size;
+
+retry_with_limit:
+    buffersize = sizeof(entry->id3v2buf) + sizeof(entry->id3v1buf);
+
+    if (limit_tag_size)
+    {
+        bufferpos = 0;
+        size = initial_size;
+        lseek(fd, initial_pos, SEEK_SET);
+        memset(buffer, 0, buffersize);
+    }
+
     /*
      * We must have at least minframesize bytes left for the
      * remaining frames to be interesting
      */
-    while (size >= minframesize && bufferpos < buffersize - 1) {
+    while (size >= minframesize) {
         flags = 0;
 
         /* Read frame header and check length */
@@ -913,7 +928,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
         /* Limit the maximum length of an id3 data item to ID3V2_MAX_ITEM_SIZE
            bytes. This reduces the chance that the available buffer is filled
            by single metadata items like large comments. */
-        if (ID3V2_MAX_ITEM_SIZE < framelen)
+        if (limit_tag_size && ID3V2_MAX_ITEM_SIZE < framelen)
             framelen = ID3V2_MAX_ITEM_SIZE;
 
         logf("id3v2 frame: %.4s", header);
@@ -950,6 +965,15 @@ void setid3v2title(int fd, struct mp3entry *entry)
             }
 
             if( !memcmp( header, tr->tag, tr->tag_length ) ) {
+
+                if (bufferpos >= buffersize - 1)
+                {
+                    if (limit_tag_size)
+                        return;
+
+                    limit_tag_size = true;
+                    goto retry_with_limit;
+                }
 
                 /* found a tag matching one in tagList, and not yet filled */
                 tag = buffer + bufferpos;
