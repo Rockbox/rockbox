@@ -1347,7 +1347,7 @@ int gen_c_source(struct font* pf, char *path)
     if (pf->offset) {
         /* output offset table */
         fprintf(ofp, "/* Character->glyph mapping. */\n"
-                "static const unsigned short _sysfont_offset[] = {\n");
+                "static const unsigned %s _sysfont_offset[] = {\n", pf->bits_size > 0xffdb ? "long" : "short");
 
         for (i=0; i<pf->size; ++i) {
             int offset = pf->offset[i];
