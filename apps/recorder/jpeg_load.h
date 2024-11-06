@@ -67,7 +67,7 @@ int clip_jpeg_file(const char* filename,
  * read embedded jpeg files as above. Needs an open file descripter, and
  * assumes the caller has lseek()'d to the start of the jpeg blob
  **/
-int clip_jpeg_fd(int fd,
+int clip_jpeg_fd(int fd, int flags,
                  unsigned long jpeg_size,
                  struct bitmap *bm,
                  int maxsize,

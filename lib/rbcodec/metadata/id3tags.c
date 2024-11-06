@@ -45,6 +45,7 @@
 #include "mp3data.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
+#include "embedded_metadata.h"
 #include "misc.h"
 
 static unsigned long unsync(unsigned long b0,
@@ -161,7 +162,8 @@ struct tag_resolver {
 
 static bool global_ff_found;
 
-static int unsynchronize(char* tag, int len, bool *ff_found)
+#define unsynchronize id3_unsynchronize
+int id3_unsynchronize(char* tag, int len, bool *ff_found)
 {
     int i;
     unsigned char c;
@@ -299,9 +301,7 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
     if(entry->has_embedded_albumart)
         return bufferpos;
 
-    /* we currently don't support unsynchronizing albumart */
-    if (entry->albumart.type == AA_TYPE_UNSYNC)
-        return bufferpos;
+    bool unsync = entry->albumart.type == AA_FLAG_ID3_UNSYNC;
 
     entry->albumart.type = AA_TYPE_UNKNOWN;
 
@@ -353,6 +353,10 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
         /* fixup offset&size for image data */
         entry->albumart.pos  += tag - start;
         entry->albumart.size -= tag - start;
+        if (unsync)
+        {
+            entry->albumart.type |= AA_FLAG_ID3_UNSYNC;
+        }
         /* check for malformed tag with no picture data */
         entry->has_embedded_albumart = (entry->albumart.size != 0);
     }
@@ -1142,14 +1146,11 @@ retry_with_limit:
                     ((tr->tag_length == 4 && !memcmp( header, "APIC", 4)) ||
                      (tr->tag_length == 3 && !memcmp( header, "PIC" , 3))))
                 {
-                    if (unsynch || (global_unsynch && version <= ID3_VER_2_3))
-                        entry->albumart.type = AA_TYPE_UNSYNC;
-                    else
-                    {
-                        entry->albumart.pos = lseek(fd, 0, SEEK_CUR) - framelen;
-                        entry->albumart.size = totframelen;
-                        entry->albumart.type = AA_TYPE_UNKNOWN;
-                    }
+                    entry->albumart.pos = lseek(fd, 0, SEEK_CUR) - framelen;
+                    entry->albumart.size = totframelen;
+                    entry->albumart.type = (unsynch || (global_unsynch && version <= ID3_VER_2_3))
+                                           ? AA_FLAG_ID3_UNSYNC
+                                           : AA_TYPE_UNKNOWN;
                 }
 #endif
                 if( tr->ppFunc )

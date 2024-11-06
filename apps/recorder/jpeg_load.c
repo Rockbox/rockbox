@@ -26,7 +26,7 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-
+#include "embedded_metadata.h"
 #include "plugin.h"
 #include "debug.h"
 #include "jpeg_load.h"
@@ -79,6 +79,9 @@ struct jpeg
     int fd;
     int buf_left;
     int buf_index;
+
+    int (*read_buf)(struct jpeg* p_jpeg, size_t count);
+    void* custom_param;
 #endif
     unsigned long len;
     unsigned long int bitbuf;
@@ -872,11 +875,21 @@ INLINE void jpeg_putc(struct jpeg* p_jpeg)
     p_jpeg->data--;
 }
 #else
+
+static int read_buf(struct jpeg* p_jpeg, size_t count)
+{
+    return read(p_jpeg->fd, p_jpeg->buf, count);
+}
+
+static int read_buf_id3_unsync(struct jpeg* p_jpeg, size_t count)
+{
+    count = read(p_jpeg->fd, p_jpeg->buf, count);
+    return id3_unsynchronize(p_jpeg->buf, count, (bool*) &p_jpeg->custom_param);
+}
+
 INLINE void fill_buf(struct jpeg* p_jpeg)
 {
-        p_jpeg->buf_left = read(p_jpeg->fd, p_jpeg->buf,
-                                (p_jpeg->len >= JPEG_READ_BUF_SIZE)?
-                                     JPEG_READ_BUF_SIZE : p_jpeg->len);
+        p_jpeg->buf_left = p_jpeg->read_buf(p_jpeg, MIN(JPEG_READ_BUF_SIZE, p_jpeg->len));
         p_jpeg->buf_index = 0;
         if (p_jpeg->buf_left > 0)
             p_jpeg->len -= p_jpeg->buf_left;
@@ -1958,7 +1971,7 @@ int clip_jpeg_file(const char* filename,
         return fd * 10 - 1;
     }
     lseek(fd, offset, SEEK_SET);
-    ret = clip_jpeg_fd(fd, jpeg_size, bm, maxsize, format, cformat);
+    ret = clip_jpeg_fd(fd, 0, jpeg_size, bm, maxsize, format, cformat);
     close(fd);
     return ret;
 }
@@ -2007,7 +2020,7 @@ int get_jpeg_dim_mem(unsigned char *data, unsigned long len,
 
 int decode_jpeg_mem(unsigned char *data,
 #else
-int clip_jpeg_fd(int fd,
+int clip_jpeg_fd(int fd, int flags,
 #endif
                  unsigned long len,
                  struct bitmap *bm,
@@ -2038,6 +2051,14 @@ int clip_jpeg_fd(int fd,
     p_jpeg->fd = fd;
     if (p_jpeg->len == 0)
         p_jpeg->len = filesize(p_jpeg->fd);
+
+    p_jpeg->read_buf = read_buf;
+
+    if (flags & AA_FLAG_ID3_UNSYNC)
+    {
+        p_jpeg->read_buf = read_buf_id3_unsync;
+        p_jpeg->custom_param = false;
+    }
 #endif
     status = process_markers(p_jpeg);
 #ifndef JPEG_FROM_MEM
@@ -2225,7 +2246,7 @@ int read_jpeg_fd(int fd,
                  int format,
                  const struct custom_format *cformat)
 {
-    return clip_jpeg_fd(fd, 0, bm, maxsize, format, cformat);
+    return clip_jpeg_fd(fd, 0, 0, bm, maxsize, format, cformat);
 }
 #endif
 

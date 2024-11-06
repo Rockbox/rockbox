@@ -196,13 +196,17 @@ enum {
     ID3_VER_2_4
 };
 
+#define AA_FLAGS_SHIFT 4
+#define AA_CLEAR_FLAGS_MASK ~(-1 << AA_FLAGS_SHIFT)
+
 #ifdef HAVE_ALBUMART
 enum mp3_aa_type {
-    AA_TYPE_UNSYNC = -1,
     AA_TYPE_UNKNOWN,
     AA_TYPE_BMP,
     AA_TYPE_PNG,
     AA_TYPE_JPG,
+
+    AA_FLAG_ID3_UNSYNC = 1 << (AA_FLAGS_SHIFT + 0),
 };
 
 struct mp3_albumart {
