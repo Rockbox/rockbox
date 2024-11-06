@@ -886,7 +886,7 @@ static int playfile(char* filename)
                     retval = menureturn;
                 }
             }
-            rb->lcd_setfont(FONT_SYSFIXED);
+            rb->lcd_setfont(FONT_UI);
             screenupdated = false;
             break;
 
@@ -939,8 +939,6 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(HZ*2, ID2P(LANG_NO_FILES));
         return PLUGIN_OK;
     }
-
-    rb->lcd_setfont(FONT_SYSFIXED);
 
     rb->talk_force_shutup();
     rb->pcm_play_stop();
