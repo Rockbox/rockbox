@@ -163,7 +163,7 @@ union raw_dirent
 #define FAT_NTRES_LC_NAME           0x08
 #define FAT_NTRES_LC_EXT            0x10
 
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
 #define LOG_SECTOR_SIZE(bpb) fat_bpb->sector_size
 #else
 #define LOG_SECTOR_SIZE(bpb) SECTOR_SIZE
@@ -272,14 +272,14 @@ static struct bpb
     int  BPB_FN_DECL(update_fat_entry, unsigned long, unsigned long);
     void BPB_FN_DECL(fat_recalc_free_internal);
 #endif /* HAVE_FAT16SUPPORT */
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
     uint16_t sector_size;
 #endif
 } fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 #ifdef STORAGE_NEEDS_BOUNCE_BUFFER
-#ifdef MAX_VIRT_SECTOR_SIZE
-#define BOUNCE_SECTOR_SIZE MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VARIABLE_LOG_SECTOR)
+#define BOUNCE_SECTOR_SIZE MAX_VARIABLE_LOG_SECTOR
 #else
 #define BOUNCE_SECTOR_SIZE SECTOR_SIZE
 #endif
@@ -1997,14 +1997,14 @@ static int free_cluster_chain(struct bpb *fat_bpb, long startcluster)
 
 /** File entity functions **/
 
+#if defined(MAX_VARIABLE_LOG_SECTOR)
 int fat_file_sector_size(const struct fat_file *file)
 {
-#ifdef MAX_VIRT_SECTOR_SIZE
     const struct bpb *fat_bpb = FAT_BPB(file->volume);
-#endif
 
     return LOG_SECTOR_SIZE(fat_bpb);
 }
+#endif
 
 int fat_create_file(struct fat_file *parent, const char *name,
                     uint8_t attr, struct fat_file *file,
@@ -2769,7 +2769,7 @@ int fat_readdir(struct fat_filestr *dirstr, struct fat_dirscan_info *scan,
 
     scan->entries = 0;
 
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
     struct fat_file *file = dirstr->fatfilep;
     const struct bpb *fat_bpb = FAT_BPB(file->volume);
 #endif
@@ -2916,8 +2916,7 @@ int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector)
 #ifdef HAVE_MULTIDRIVE
     fat_bpb->drive       = drive;
 #endif
-
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
     fat_bpb->sector_size = disk_get_log_sector_size(IF_MD(drive));
 #endif
 
@@ -2959,7 +2958,7 @@ int fat_unmount(IF_MV_NONVOID(int volume))
 
 /** Debug screen stuff **/
 
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
 /* This isn't necessarily the same as storage's logical sector size;
    we can have situations where the filesystem (and partition table)
    uses a larger "virtual sector" than the underlying storage device */
@@ -2973,7 +2972,7 @@ int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume))
 
     return bytes;
 }
-#endif /* MAX_VIRT_SECTOR_SIZE */
+#endif /* MAX_VIRT_SECTOR_SIZE || MAX_VARIAGLE_LOG_SECTOR */
 
 unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume))
 {

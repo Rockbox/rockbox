@@ -221,6 +221,9 @@
 /* and doesn't handle them in the drive firmware */
 #define MAX_PHYS_SECTOR_SIZE 1024
 
+/* define this if we want to support 512n and 4Kn drives */
+//#define MAX_VARIABLE_LOG_SECTOR 4096
+
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

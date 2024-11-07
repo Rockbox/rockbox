@@ -51,8 +51,13 @@ int disk_unmount(int drive);
 #ifdef MAX_VIRT_SECTOR_SIZE
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 #endif
+
+#ifdef MAX_VARIABLE_LOG_SECTOR
 /* The size of the drive's smallest addressible unit */
 int disk_get_log_sector_size(IF_MD_NONVOID(int drive));
+#else
+#define disk_get_log_sector_size(...) SECTOR_SIZE
+#endif
 
 bool disk_present(IF_MD_NONVOID(int drive));
 

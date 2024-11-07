@@ -126,7 +126,7 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 }
 #endif /* MAX_VIRT_SECTOR_SIZE */
 
-#if (CONFIG_STORAGE & STORAGE_ATA)  // XXX make this more generic?
+#ifdef MAX_VARIABLE_LOG_SECTOR
 static uint16_t disk_log_sector_size[NUM_DRIVES] =
     { [0 ... NUM_DRIVES-1] = SECTOR_SIZE }; /* Updated from STORAGE_INFO */
 int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
@@ -140,14 +140,9 @@ int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
     return size;
 }
 #define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[IF_MD_DRV(__drive)]
-#else /* !STORAGE_ATA */
+#else /* !MAX_VARIABLE_LOG_SECTOR */
 #define LOG_SECTOR_SIZE(__drive) SECTOR_SIZE
-int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
-{
-    IF_MD((void)drive);
-    return SECTOR_SIZE;
-}
-#endif /* !CONFIG_STORAGE & STORAGE_ATA */
+#endif /* !MAX_VARIABLE_LOG_SECTOR */
 
 bool disk_init(IF_MD_NONVOID(int drive))
 {
@@ -163,23 +158,23 @@ bool disk_init(IF_MD_NONVOID(int drive))
     struct storage_info *info = (struct storage_info*) sector;
     storage_get_info(IF_MD_DRV(drive), info);
     disk_writer_lock();
-#ifdef MAX_VIRT_SECTOR_SIZE
+#ifdef MAX_VARIABLE_LOG_SECTOR
     disk_log_sector_size[IF_MD_DRV(drive)] = info->sector_size;
 #endif
     disk_writer_unlock();
 
-#ifdef MAX_VIRT_SECTOR_SIZE
-    if (info->sector_size > MAX_VIRT_SECTOR_SIZE || info->sector_size > DC_CACHE_BUFSIZE) {
+#ifdef MAX_VARIABLE_LOG_SECTOR
+    if (info->sector_size > MAX_VARIABLE_LOG_SECTOR || info->sector_size > DC_CACHE_BUFSIZE) {
         panicf("Unsupported logical sector size: %d",
                info->sector_size);
     }
-#else
+#else  /* !MAX_VARIABLE_LOG_SECTOR */
     if (info->sector_size != SECTOR_SIZE) {
         panicf("Unsupported logical sector size: %d",
                info->sector_size);
     }
-#endif
-#endif /* CONFIG_STORAGE & STORAGE_ATA */
+#endif  /* !MAX_VARIABLE_LOG_SECTOR */
+#endif  /* STORAGE_ATA */
 
     memset(sector, 0, DC_CACHE_BUFSIZE);
     storage_read_sectors(IF_MD(drive,) 0, 1, sector);

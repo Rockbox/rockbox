@@ -143,7 +143,11 @@ int fat_rename(struct fat_file *parent, struct fat_file *file,
 int fat_modtime(struct fat_file *parent, struct fat_file *file,
                 time_t modtime);
 
+#if defined(MAX_VARIABLE_LOG_SECTOR)
 int fat_file_sector_size(const struct fat_file *file);
+#else
+#define fat_file_sector_size(__file) SECTOR_SIZE
+#endif
 
 /** File stream functions **/
 int fat_closewrite(struct fat_filestr *filestr, uint32_t size,
@@ -170,9 +174,9 @@ int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector);
 int fat_unmount(IF_MV_NONVOID(int volume));
 
 /** Debug screen stuff **/
-#ifdef MAX_VIRT_SECTOR_SIZE
+#if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
 int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
-#endif /* MAX_VIRT_SECTOR_SIZE */
+#endif /* MAX_VIRT_SECTOR_SIZE || MAX_VARIABLE_LOG_SECTOR */
 unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
 void fat_recalc_free(IF_MV_NONVOID(int volume));
 bool fat_size(IF_MV(int volume,) sector_t *size, sector_t *free);

@@ -924,6 +924,13 @@ Lyre prototype 1 */
 
 #define NUM_VOLUMES (NUM_DRIVES * NUM_VOLUMES_PER_DRIVE)
 
+/* Sanity check sector size options */
+#if defined(MAX_VARIABLE_LOG_SECTOR) && defined(MAX_VIRT_SECTOR_SIZE)
+#if (MAX_VIRT_SECTOR_SIZE < MAX_VARIABLE_LOG_SECTOR)
+#error "optional MAX_VIRT_SECTOR_SIZE must be at least as large as MAX_VARIABLE_LOG_SECTOR"
+#endif
+#endif
+
 #if defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 /* Bootloaders don't use CPU frequency adjustment */
 #undef HAVE_ADJUSTABLE_CPU_FREQ
