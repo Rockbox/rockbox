@@ -996,8 +996,7 @@ retry_with_limit:
                  * remove them so unicode_munge can work correctly
                  */
 
-                if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
-                   (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
+                if (tr->offset == offsetof(struct mp3entry, comment)) {
                     int offset;
                     if (buffersize - bufferpos <= 4)
                         return; /* Error ?? */
