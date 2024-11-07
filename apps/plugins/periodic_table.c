@@ -605,7 +605,7 @@ enum plugin_status plugin_start(const void* parameter)
     theme_bg=rb->lcd_get_background();
 #endif
 
-    struct font *pf = rb->font_get(FONT_UI);
+    struct font *pf = rb->font_get(rb->screens[SCREEN_MAIN]->getuifont());
     font_height = pf->height;
 
     while (1) {

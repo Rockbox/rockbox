@@ -138,7 +138,7 @@ static int init_view(struct view_info *info,
                      const char *title, const char *text)
 {
     rb->viewport_set_defaults(&info->vp, SCREEN_MAIN);
-    info->pf = rb->font_get(FONT_UI);
+    info->pf = rb->font_get(rb->screens[SCREEN_MAIN]->getuifont());
     info->display_lines = info->vp.height / info->pf->height;
 
     info->title = title;

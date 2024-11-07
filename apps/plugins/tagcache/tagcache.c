@@ -157,7 +157,7 @@ bool user_check_tag(int index_type, char* build_idx_buf)
 {
     static struct font *pf = NULL;
     if (!pf)
-        pf = rb->font_get(FONT_UI);
+        pf = rb->font_get(rb->screens[SCREEN_MAIN]->getuifont());
 
     if (index_type == tag_artist || index_type == tag_album ||
         index_type == tag_genre || index_type == tag_title ||
