@@ -139,11 +139,7 @@ int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
     disk_reader_unlock();
     return size;
 }
-#ifdef HAVE_MULTIDRIVE
-#define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[__drive]
-#else
-#define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[0]
-#endif /* HAVE_MULTIDRIVE */
+#define LOG_SECTOR_SIZE(__drive) disk_log_sector_size[IF_MD_DRV(__drive)]
 #else /* !STORAGE_ATA */
 #define LOG_SECTOR_SIZE(__drive) SECTOR_SIZE
 int disk_get_log_sector_size(IF_MD_NONVOID(int drive))
