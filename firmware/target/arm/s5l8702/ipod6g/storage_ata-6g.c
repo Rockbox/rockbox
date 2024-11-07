@@ -1154,7 +1154,7 @@ int ata_init(void)
     if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
         log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
-        log_sector_size = SECTOR_SIZE;
+        log_sector_size = 512;
 
 #ifdef MAX_PHYS_SECTOR_SIZE
     rc = ata_get_phys_sector_mult();

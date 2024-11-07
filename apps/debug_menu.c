@@ -1445,7 +1445,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
         sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
-        sector_size = SECTOR_SIZE;
+        sector_size = 512;
 
     total_sectors *= sector_size;   /* Convert to bytes */
     total_sectors /= (1024 * 1024); /* Convert to MB */
