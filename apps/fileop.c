@@ -85,7 +85,7 @@ static bool poll_cancel_action(int operation, struct file_op_params *param)
     {
         const char *op_str = (operation == FOC_DELETE) ? str(LANG_DELETING) :
                              (operation == FOC_COPY) ? str(LANG_COPYING) :
-                             str(LANG_MOVING); 
+                             str(LANG_MOVING);
 
         if ((operation == FOC_DELETE || !param->total_size) &&
             param->objects > 0)
@@ -598,6 +598,9 @@ int delete_fileobject(const char *selected_file)
         rc = directory_fileop(&param, FOC_DELETE);
         cpu_boost(false);
     } else {
+        param.objects = param.processed = 1;
+        if (poll_cancel_action(FOC_DELETE, &param))
+            return FORC_CANCELLED;
         rc = remove(param.path) * 10;
     }
 
