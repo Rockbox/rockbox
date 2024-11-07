@@ -170,9 +170,9 @@ int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector);
 int fat_unmount(IF_MV_NONVOID(int volume));
 
 /** Debug screen stuff **/
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
 int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
-#endif /* MAX_LOG_SECTOR_SIZE */
+#endif /* MAX_VIRT_SECTOR_SIZE */
 unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
 void fat_recalc_free(IF_MV_NONVOID(int volume));
 bool fat_size(IF_MV(int volume,) sector_t *size, sector_t *free);

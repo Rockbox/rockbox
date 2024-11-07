@@ -215,7 +215,7 @@
 
 /* define this if the device has larger sectors when accessed via USB */
 /* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
-#define MAX_LOG_SECTOR_SIZE 2048
+#define MAX_VIRT_SECTOR_SIZE 2048
 
 /* define this if the hard drive uses large physical sectors (ATA-7 feature) */
 /* and doesn't handle them in the drive firmware */

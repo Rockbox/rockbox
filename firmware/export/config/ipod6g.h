@@ -192,7 +192,7 @@
 #define HAVE_ATA_SMART
 
 /* define this if the device has larger sectors when accessed via USB */
-#define MAX_LOG_SECTOR_SIZE 4096
+#define MAX_VIRT_SECTOR_SIZE 4096
 
 /* This is the minimum access size for the device, even if it's larger than the logical sector size */
 #define MAX_PHYS_SECTOR_SIZE 4096

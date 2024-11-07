@@ -108,8 +108,8 @@
 #endif
 
 /* this _could_ be larger than a sector if that would ever be useful */
-#ifdef MAX_LOG_SECTOR_SIZE
-#define DC_CACHE_BUFSIZE   MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
+#define DC_CACHE_BUFSIZE   MAX_VIRT_SECTOR_SIZE
 #else
 #define DC_CACHE_BUFSIZE    SECTOR_SIZE
 #endif

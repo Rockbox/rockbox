@@ -793,7 +793,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         lun_present = false;
 
     unsigned int block_size_mult = 1; /* Number of LOGICAL storage device blocks in each USB block */
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
     block_size_mult = disk_get_sector_multiplier(IF_MD(lun));
 #endif
 

@@ -198,7 +198,7 @@
 
 /* The fuze+ actually interesting partition table does not use 512-byte sector
  * (usually 2048 logical sector size) */
-#define MAX_LOG_SECTOR_SIZE 2048
+#define MAX_VIRT_SECTOR_SIZE 2048
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

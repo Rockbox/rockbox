@@ -22,10 +22,10 @@
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 
-#ifdef MAX_LOG_SECTOR_SIZE
-#define __MAX_LOG_SECTOR_SIZE MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
+#define __MAX_VIRT_SECTOR_SIZE MAX_VIRT_SECTOR_SIZE
 #else
-#define __MAX_LOG_SECTOR_SIZE SECTOR_SIZE
+#define __MAX_VIRT_SECTOR_SIZE SECTOR_SIZE
 #endif
 
 struct sector_cache_entry {
@@ -226,7 +226,7 @@ static int ata_get_phys_sector_mult(void)
            sector 1 then assume the drive supports "512e" and will handle
            it better than us, so ignore the large physical sectors.
         */
-        char throwaway[__MAX_LOG_SECTOR_SIZE];
+        char throwaway[__MAX_VIRT_SECTOR_SIZE];
         rc = ata_transfer_sectors(1, 1, &throwaway, false);
         if (rc == 0)
             phys_sector_mult = 1;

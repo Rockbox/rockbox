@@ -1452,7 +1452,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
     simplelist_addline("Size: %llu MB", (uint64_t)total_sectors);
     simplelist_addline("Logical sector size: %lu B", sector_size);
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
     simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
 #endif
 

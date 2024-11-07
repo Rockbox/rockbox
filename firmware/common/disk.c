@@ -110,7 +110,7 @@ static void init_volume(struct volumeinfo *vi, int drive, int part)
     vi->partition = part;
 }
 
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
 static uint16_t disk_sector_multiplier[NUM_DRIVES] =
     { [0 ... NUM_DRIVES-1] = 1 };
 
@@ -124,7 +124,7 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
     disk_reader_unlock();
     return multiplier;
 }
-#endif /* MAX_LOG_SECTOR_SIZE */
+#endif /* MAX_VIRT_SECTOR_SIZE */
 
 #if (CONFIG_STORAGE & STORAGE_ATA)  // XXX make this more generic?
 static uint16_t disk_log_sector_size[NUM_DRIVES] =
@@ -163,13 +163,13 @@ bool disk_init(IF_MD_NONVOID(int drive))
     struct storage_info *info = (struct storage_info*) sector;
     storage_get_info(IF_MD_DRV(drive), info);
     disk_writer_lock();
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
     disk_log_sector_size[IF_MD_DRV(drive)] = info->sector_size;
 #endif
     disk_writer_unlock();
 
-#ifdef MAX_LOG_SECTOR_SIZE
-    if (info->sector_size > MAX_LOG_SECTOR_SIZE || info->sector_size > DC_CACHE_BUFSIZE) {
+#ifdef MAX_VIRT_SECTOR_SIZE
+    if (info->sector_size > MAX_VIRT_SECTOR_SIZE || info->sector_size > DC_CACHE_BUFSIZE) {
         panicf("Unsupported logical sector size: %d",
                info->sector_size);
     }
@@ -374,7 +374,7 @@ int disk_mount(int drive)
     }
 
     struct partinfo *pinfo = &part[IF_MD_DRV(drive)*4];
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
     disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
 #endif
 
@@ -383,7 +383,7 @@ int disk_mount(int drive)
 
     if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
     {
-#ifdef MAX_LOG_SECTOR_SIZE
+#ifdef MAX_VIRT_SECTOR_SIZE
         disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume)) / LOG_SECTOR_SIZE(drive);
 #endif
         mounted = 1;
@@ -402,8 +402,8 @@ int disk_mount(int drive)
 
             DEBUGF("Trying to mount partition %d.\n", i);
 
-#ifdef MAX_LOG_SECTOR_SIZE
-            for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/LOG_SECTOR_SIZE(drive)); j <<= 1)
+#ifdef MAX_VIRT_SECTOR_SIZE
+            for (int j = 1; j <= (MAX_VIRT_SECTOR_SIZE/LOG_SECTOR_SIZE(drive)); j <<= 1)
             {
                 if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
                 {
@@ -417,7 +417,7 @@ int disk_mount(int drive)
                     break;
                 }
             }
-#else /* ndef MAX_LOG_SECTOR_SIZE */
+#else /* ndef MAX_VIRT_SECTOR_SIZE */
             if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
             {
                 mounted++;
@@ -425,7 +425,7 @@ int disk_mount(int drive)
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
             }
-#endif /* MAX_LOG_SECTOR_SIZE */
+#endif /* MAX_VIRT_SECTOR_SIZE */
         }
     }
 
