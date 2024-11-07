@@ -197,7 +197,8 @@
 /* This is the minimum access size for the device, even if it's larger than the logical sector size */
 #define MAX_PHYS_SECTOR_SIZE 4096
 
-#define STORAGE_NEEDS_BOUNCE_BUFFER
+//#define STORAGE_NEEDS_BOUNCE_BUFFER
+#define STORAGE_WANTS_ALIGN
 
 #define HAVE_HARDWARE_CLICK
 
