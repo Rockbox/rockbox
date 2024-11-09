@@ -2770,8 +2770,7 @@ int fat_readdir(struct fat_filestr *dirstr, struct fat_dirscan_info *scan,
     scan->entries = 0;
 
 #if defined(MAX_VIRT_SECTOR_SIZE) || defined(MAX_VARIABLE_LOG_SECTOR)
-    struct fat_file *file = dirstr->fatfilep;
-    const struct bpb *fat_bpb = FAT_BPB(file->volume);
+    struct bpb *fat_bpb = FAT_BPB(dirstr->fatfilep->volume);
 #endif
 
     while (1)
