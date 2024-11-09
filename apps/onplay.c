@@ -700,7 +700,7 @@ static int browse_id3_wrapper(void)
 
     if (browse_id3(audio_current_track(),
             playlist_get_display_index(),
-            playlist_amount(), NULL, 1))
+            playlist_amount(), NULL, 1, NULL))
         return GO_TO_ROOT;
     return GO_TO_PREVIOUS;
 }

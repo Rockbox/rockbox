@@ -777,7 +777,8 @@ static int id3_speak_item(int selected_item, void* data)
  */
 bool browse_id3_ex(struct mp3entry *id3, struct playlist_info *playlist,
                 int playlist_display_index, int playlist_amount,
-                struct tm *modified, int track_ct)
+                struct tm *modified, int track_ct,
+                int (*view_text)(const char *title, const char *text))
 {
     struct gui_synclist id3_lists;
     int key;
@@ -824,7 +825,18 @@ refresh_info:
 
                 char buffer[MAX_PATH];
                 title_and_text[1] = (char*)id3_get_or_speak_info(id3_lists.selected_item+1,&info, buffer, sizeof(buffer), false);
-                plugin_load(VIEWERS_DIR"/view_text.rock", title_and_text);
+
+                if (view_text)
+                {
+                    FOR_NB_SCREENS(i)
+                        viewportmanager_theme_enable(i, false, NULL);
+                    view_text(title_and_text[0], title_and_text[1]);
+                    FOR_NB_SCREENS(i)
+                        viewportmanager_theme_undo(i, false);
+                }
+                else
+                    plugin_load(VIEWERS_DIR"/view_text.rock", title_and_text);
+                gui_synclist_set_title(&id3_lists, str(LANG_TRACK_INFO), NOICON);
                 gui_synclist_draw(&id3_lists);
                 continue;
             }
@@ -839,7 +851,7 @@ refresh_info:
                 ret =  true;
                 break;
             }
-        } 
+        }
         else if (is_curr_track_info)
         {
             if (!audio_status())
@@ -861,10 +873,11 @@ refresh_info:
 }
 
 bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount,
-                struct tm *modified, int track_ct)
+                struct tm *modified, int track_ct,
+                int (*view_text)(const char *title, const char *text))
 {
     return browse_id3_ex(id3, NULL, playlist_display_index, playlist_amount,
-                         modified, track_ct);
+                         modified, track_ct, view_text);
 }
 
 static const char* runtime_get_data(int selected_item, void* data,

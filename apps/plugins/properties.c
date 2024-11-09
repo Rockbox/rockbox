@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/mul_id3.h"
+#include "lib/simple_viewer.h"
 
 #if !defined(ARRAY_SIZE)
     #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
@@ -339,12 +340,15 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
     else if (props_type == PROPS_ID3)
-        ret = rb->browse_id3(&id3, 0, 0, &tm, 1);   /* Track Info for single file */
+        /* Track Info for single file */
+        ret = rb->browse_id3(&id3, 0, 0, &tm, 1, &view_text);
     else if (props_type == PROPS_MUL_ID3)
-        ret = rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count); /* database tracks */
+        /* database tracks */
+        ret = rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count, &view_text);
     else if ((ret = browse_file_or_dir(&stats)) < 0)
-        ret = assemble_track_info(file, &stats) ?    /* playlist or folder tracks */
-              rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count) :
+        ret = assemble_track_info(file, &stats) ?
+              /* playlist or folder tracks */
+              rb->browse_id3(&id3, 0, 0, NULL, mul_id3_count, &view_text) :
               (stats.canceled ? 0 : -1);
 
     return ret == -1 ? PLUGIN_ERROR : ret == 1 ? PLUGIN_USB_CONNECTED : PLUGIN_OK;

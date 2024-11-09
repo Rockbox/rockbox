@@ -174,7 +174,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 272
+#define PLUGIN_API_VERSION 273
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -513,7 +513,8 @@ struct plugin_api {
                                           void (*add_to_pl_cb));
     bool (*browse_id3)(struct mp3entry *id3,
                        int playlist_display_index, int playlist_amount,
-                       struct tm *modified, int track_ct);
+                       struct tm *modified, int track_ct,
+                       int (*view_text)(const char *title, const char *text));
 
     /* talking */
     int (*talk_id)(int32_t id, bool enqueue);

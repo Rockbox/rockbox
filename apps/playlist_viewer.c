@@ -55,6 +55,13 @@
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
 
+/* Maximum amount of space required for the name buffer. For each
+   entry, we store the file name as well as, possibly, metadata */
+#define MAX_NAME_BUFFER_SZ (MAX_PLAYLIST_ENTRIES * 2 * MAX_PATH)
+
+/* Over-approximation of view_text plugin size */
+#define VIEW_TEXT_PLUGIN_SZ 5000
+
 /* The number of items between the selected one and the end/start of
  * the buffer under which the buffer must reload */
 #define MIN_BUFFER_MARGIN (screens[0].getnblines()+1)
@@ -116,6 +123,7 @@ struct playlist_viewer {
                                    viewer-relative index) of moving track    */
     struct playlist_buffer buffer;
     struct mp3entry *id3;
+    bool allow_view_text_plugin;
 };
 
 struct playlist_search_data
@@ -392,6 +400,28 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     if (!buffer || buffer_size <= MAX_PATH + id3_size)
         return false;
 
+    /* Index buffer is required, unless playback is stopped or we're
+       showing the current playlist (i.e. filename == NULL) */
+    if (filename && is_playing)
+        index_buffer_size = playlist_get_index_bufsz(buffer_size - id3_size - (MAX_PATH + 1));
+
+    /* Check for unused space in the plugin buffer to run
+       the view_text plugin used by the Track Info screen:
+    ┌───────┬───────────────────────────────────────────────────────┐
+    │       │<----------------- plugin_get_buffer ----------------->│
+    │ (TSR  ├───────────────┬─────┬──────────────┬───────────────┐  │
+    │plugin)│██ view_text ██│ id3 │ index buffer │  name buffer  │  │
+    └───────┴───────────────┴─────┴──────────────┴───────────────┴──┘
+    */
+    if (buffer_size >= VIEW_TEXT_PLUGIN_SZ + id3_size + index_buffer_size + MAX_NAME_BUFFER_SZ)
+    {
+        buffer += VIEW_TEXT_PLUGIN_SZ;
+        buffer_size -= VIEW_TEXT_PLUGIN_SZ;
+        viewer->allow_view_text_plugin = true;
+    }
+    else
+        viewer->allow_view_text_plugin = false;
+
     viewer->id3 = (void *) buffer;
     buffer += id3_size;
     buffer_size -= id3_size;
@@ -425,8 +455,6 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         if (is_playing)
         {
             index_buffer = buffer;
-            index_buffer_size = playlist_get_index_bufsz(buffer_size - (MAX_PATH + 1));
-
             buffer += index_buffer_size;
             buffer_size -= index_buffer_size;
         }
@@ -577,15 +605,28 @@ static void format_line(struct playlist_entry* track, char* str,
     }
 }
 
+/* Fallback for displaying fullscreen tags, in case there is not
+ * enough plugin buffer space left to call the view_text plugin
+ * from the Track Info screen
+ */
+static int view_text(const char *title, const char *text)
+{
+    splashf(0, "[%s]\n%s", title, text);
+    action_userabort(TIMEOUT_BLOCK);
+    return 0;
+}
+
 static enum pv_onplay_result show_track_info(const struct playlist_entry *current_track)
 {
     bool id3_retrieval_successful = retrieve_id3_tags(current_track->index,
                                                       current_track->name,
                                                       viewer.id3, 0);
 
-    return id3_retrieval_successful &&
+    return (id3_retrieval_successful &&
             browse_id3_ex(viewer.id3, viewer.playlist, current_track->display_index,
-            viewer.num_tracks, NULL, 1) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
+                          viewer.num_tracks, NULL, 1,
+                          viewer.allow_view_text_plugin ? NULL : &view_text)) ?
+           PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
 }
 
 static void close_playlist_viewer(void)

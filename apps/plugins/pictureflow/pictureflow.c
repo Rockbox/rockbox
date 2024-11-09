@@ -33,6 +33,7 @@
 #include "lib/grey.h"
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
+#include "lib/simple_viewer.h"
 
 /******************************* Globals ***********************************/
 static fb_data *lcd_fb;
@@ -4082,7 +4083,7 @@ static int show_id3_info(const char *selected_file)
     if (is_multiple_tracks)
         finalize_id3(&id3);
 
-    return rb->browse_id3(&id3, 0, 0, NULL, i) ? PLUGIN_USB_CONNECTED : 0;
+    return rb->browse_id3(&id3, 0, 0, NULL, i, &view_text) ? PLUGIN_USB_CONNECTED : 0;
 }
 
 
