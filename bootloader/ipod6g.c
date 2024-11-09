@@ -424,8 +424,15 @@ void main(void)
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
     /* Enter USB mode if SELECT+RIGHT are pressed */
-    if (button_read_device() == (BUTTON_SELECT|BUTTON_RIGHT))
+    if (button_read_device() == (BUTTON_SELECT|BUTTON_RIGHT)) {
+#if defined(MAX_VIRT_SECTOR_SIZE) && defined(DEFAULT_VIRT_SECTOR_SIZE)
+#ifdef HAVE_MULTIDRIVE
+            for (int i = 0 ; i < NUM_DRIVES ; i++)
+#endif
+                disk_set_sector_multiplier(IF_MD(i,) DEFAULT_VIRT_SECTOR_SIZE);
+#endif
         usb_mode();
+    }
 #endif
 
     rc = disk_mount_all();

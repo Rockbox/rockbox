@@ -11,7 +11,7 @@
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -50,7 +50,7 @@
 #define XSC(X) #X
 #define SC(X) XSC(X)
 
-/* Maximum allowed firmware image size. The largest known current 
+/* Maximum allowed firmware image size. The largest known current
    (December 2006) firmware is about 7.5MB (Apple's firmware for the ipod video)
    so we set this to 8MB. */
 #define MAX_LOADSIZE (8*1024*1024)
@@ -202,6 +202,13 @@ void fatal_error(void)
 #endif
     lcd_update();
 
+#if defined(MAX_VIRT_SECTOR_SIZE) && defined(DEFAULT_VIRT_SECTOR_SIZE)
+#ifdef HAVE_MULTIDRIVE
+            for (int i = 0 ; i < NUM_DRIVES ; i++)
+#endif
+                disk_set_sector_multiplier(IF_MD(i,) DEFAULT_VIRT_SECTOR_SIZE);
+#endif
+
     usb_init();
     while (1) {
         if (button_hold() != holdstatus) {
@@ -298,7 +305,7 @@ void* main(void)
     struct partinfo pinfo;
     unsigned short* identify_info;
 
-    /* Check the button hold status as soon as possible - to 
+    /* Check the button hold status as soon as possible - to
        give the user maximum chance to turn it off in order to
        reset the settings in rockbox. */
     button_was_held = button_hold();
@@ -362,26 +369,26 @@ void* main(void)
     }
 
     disk_partinfo(1, &pinfo);
-    printf("Partition 1: 0x%02x %ld sectors", 
+    printf("Partition 1: 0x%02x %ld sectors",
            pinfo.type, pinfo.size);
 
     if (button_was_held || (btn==BUTTON_MENU)) {
-        /* If either the hold switch was on, or the Menu button was held, then 
+        /* If either the hold switch was on, or the Menu button was held, then
            try the Apple firmware */
 
         printf("Loading original firmware...");
-    
+
         /* First try an apple_os.ipod file on the FAT32 partition
-           (either in .rockbox or the root) 
+           (either in .rockbox or the root)
          */
-    
+
         rc=load_firmware(loadbuffer, "apple_os.ipod", MAX_LOADSIZE);
-    
+
         if (rc > 0) {
             printf("apple_os.ipod loaded.");
             return (void*)DRAM_START;
         } else if (rc == EFILE_NOT_FOUND) {
-            /* If apple_os.ipod doesn't exist, then check if there is an Apple 
+            /* If apple_os.ipod doesn't exist, then check if there is an Apple
                firmware image in RAM  */
             haveramos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
             if (haveramos) {
@@ -393,10 +400,10 @@ void* main(void)
             printf("Can't load apple_os.ipod:");
             printf(loader_strerror(rc));
         }
-        
+
         /* Everything failed - just loop forever */
         printf("No RetailOS detected");
-        
+
     } else if (btn==BUTTON_PLAY) {
         printf("Loading Linux...");
         rc=load_raw_firmware(loadbuffer, "/linux.bin", MAX_LOADSIZE);
@@ -427,10 +434,10 @@ void* main(void)
         printf("Can't load " BOOTFILE ": ");
         printf(loader_strerror(rc));
     }
-    
+
     /* If we get to here, then we haven't been able to load any firmware */
     fatal_error();
-    
+
     /* We never get here, but keep gcc happy */
     return (void*)0;
 }
