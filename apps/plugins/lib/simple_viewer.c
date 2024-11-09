@@ -265,6 +265,11 @@ int view_text(const char *title, const char *text)
         switch (button)
         {
         case PLA_UP:
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+            return PLUGIN_OK;
+#endif
         case PLA_UP_REPEAT:
 #ifdef HAVE_SCROLLWHEEL
         case PLA_SCROLL_BACK:
@@ -281,6 +286,11 @@ int view_text(const char *title, const char *text)
             scroll_down(&info, 1);
             break;
         case PLA_LEFT:
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+            return PLUGIN_OK;
+#endif
             scroll_up(&info, info.display_lines);
             break;
         case PLA_RIGHT:
@@ -292,6 +302,7 @@ int view_text(const char *title, const char *text)
         case PLA_RIGHT_REPEAT:
             scroll_to_bottom(&info);
             break;
+        case PLA_SELECT:
         case PLA_EXIT:
         case PLA_CANCEL:
             return PLUGIN_OK;
