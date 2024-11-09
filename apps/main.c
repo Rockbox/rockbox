@@ -634,6 +634,13 @@ static void init(void)
             lcd_puts(0, 4, rbversion);
             lcd_update();
 
+#if defined(MAX_VIRT_SECTOR_SIZE) && defined(DEFAULT_VIRT_SECTOR_SIZE)
+#ifdef HAVE_MULTIDRIVE
+            for (int i = 0 ; i < NUM_DRIVES ; i++)
+#endif
+                disk_set_sector_multiplier(IF_MD(i,) DEFAULT_VIRT_SECTOR_SIZE);
+#endif
+
 #ifndef USB_NONE
             usb_start_monitoring();
             while(button_get(true) != SYS_USB_CONNECTED) {};
@@ -650,6 +657,7 @@ static void init(void)
                 lcd_putsf(0, 4, "Error mounting: %08x", rc);
                 lcd_update();
                 sleep(HZ*5);
+                system_reboot();
             }
 #endif
         }

@@ -124,6 +124,18 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
     disk_reader_unlock();
     return multiplier;
 }
+
+#ifdef DEFAULT_VIRT_SECTOR_SIZE
+void disk_set_sector_multiplier(IF_MD(int drive,) uint16_t mult)
+{
+    if (!CHECK_DRV(drive))
+        return;
+
+    disk_writer_lock();
+    disk_sector_multiplier[IF_MD_DRV(drive)] = mult;
+    disk_writer_unlock();
+}
+#endif /* DEFAULT_VIRT_SECTOR_SIZE */
 #endif /* MAX_VIRT_SECTOR_SIZE */
 
 #ifdef MAX_VARIABLE_LOG_SECTOR
