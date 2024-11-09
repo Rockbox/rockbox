@@ -203,9 +203,6 @@
 /* define this if we want to support 512n and 4Kn drives */
 //#define MAX_VARIABLE_LOG_SECTOR 4096
 
-//#define STORAGE_NEEDS_BOUNCE_BUFFER
-#define STORAGE_WANTS_ALIGN
-
 #define HAVE_HARDWARE_CLICK
 
 /* Define this if you have adjustable CPU frequency */

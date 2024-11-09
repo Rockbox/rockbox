@@ -335,6 +335,11 @@ static inline void cpu_boost_unlock(void)
 #define MEM_ALIGN_DOWN(x) \
     ((typeof (x))ALIGN_DOWN((uintptr_t)(x), MEM_ALIGN_SIZE))
 
+/* Bounce buffers may have alignment requirments */
+#if defined(MAX_PHYS_SECTOR_SIZE) && !defined(STORAGE_WANTS_ALIGN)
+#define STORAGE_WANTS_ALIGN
+#endif
+
 #ifdef STORAGE_WANTS_ALIGN
     #define STORAGE_ALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))
     #define STORAGE_ALIGN_DOWN(x) \

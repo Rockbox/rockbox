@@ -28,6 +28,10 @@
 #define __MAX_VARIABLE_LOG_SECTOR SECTOR_SIZE
 #endif
 
+#ifndef STORAGE_ALIGN_ATTR
+#define STORAGE_ALIGN_ATTR __attribute__((aligned(sizeof(uint32_t))))
+#endif
+
 struct sector_cache_entry {
     unsigned char data[MAX_PHYS_SECTOR_SIZE];
     sector_t sectornum;  /* logical sector */
