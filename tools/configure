@@ -1645,40 +1645,40 @@ cat <<EOF
  100) GoGear SA9200        92) Zen Vision        61) Sansa View
  101) GoGear HDD1630/      93) Zen X-Fi2         62) Sansa Clip+
       HDD1830              94) Zen X-Fi3         63) Sansa Fuze v2
- 102) GoGear HDD6330       96) Zen X-Fi          64) Sansa Fuze+
-                           97) Zen Mozaic        65) Sansa Clip Zip
- ==Meizu==                 98) Zen               66) Sansa Connect
- 110) M6SL
- 111) M6SP                 ==Onda==              ==Lyre project==
- 112) M3                   120) VX747            130) Lyre proto 1
-                           121) VX767            131) Mini2440
- ==Samsung==               122) VX747+
- 140) YH-820               123) VX777            ==Packard Bell==
- 141) YH-920                                     160) Vibe 500
- 142) YH-925               ==MPIO==
- 143) YP-S3                170) HD200            ==ROCKCHIP==
-                           171) HD300            180) rk27xx generic
- ==HiFiMAN==
- 190) HM-60x               ==Application==       ==HiFi E.T.==
- 191) HM-801               200) SDL              210) MA9
-                           201) Android          211) MA9C
- ==Sony==                  202) Nokia N8xx       212) MA8
- 219) NWZ-E350 series      203) Nokia N900       213) MA8C
- 220) NWZ-E370/E380 series 204) Pandora
- 221) NWZ-E360 series      205) Samsung YP-R0    ==IHIFI==
- 222) NWZ-E450 series      206) Android MIPS     230) 760
- 223) NWZ-E460 series      207) Android x86      231) 960
- 224) NWZ-E470 series      208) Samsung YP-R1    250) 770C
- 225) NWZ-E580 series                            251) 770
- 226) NWZ-A10 series       ==iBasso==            252) 800
- 227) NW-A20 series        232) DX50
- 228) NWZ-A860 series      233) DX90             ==AgpTek==
- 229) NWZ-S750 series                            240) Rocker
-                           ==xDuoo==
- ==FiiO==                  241) X3               ==AIGO==
- 244) M3K Linux            242) X3II             245) Eros Q / K
- 246) M3K baremetal        243) X20              247) Eros Q / K native
-                                                 248) Eros Q / K native v3
+ 102) GoGear HDD6330       95) Zen V             64) Sansa Fuze+
+                           96) Zen X-Fi          65) Sansa Clip Zip
+ ==Meizu==                 97) Zen Mozaic        66) Sansa Connect
+ 110) M6SL                 98) Zen
+ 111) M6SP                                       ==Lyre project==
+ 112) M3                   ==Onda==              130) Lyre proto 1
+                           120) VX747            131) Mini2440
+ ==Samsung==               121) VX767
+ 140) YH-820               122) VX747+           ==Packard Bell==
+ 141) YH-920               123) VX777            160) Vibe 500
+ 142) YH-925
+ 143) YP-S3                ==MPIO==              ==ROCKCHIP==
+                           170) HD200            180) rk27xx generic
+ ==HiFiMAN==               171) HD300                                      
+ 190) HM-60x                                     ==HiFi E.T.==
+ 191) HM-801               ==Application==       210) MA9
+                           200) SDL              211) MA9C
+ ==Sony==                  201) Android          212) MA8
+ 219) NWZ-E350 series      202) Nokia N8xx       213) MA8C
+ 220) NWZ-E370/E380 series 203) Nokia N900                                 
+ 221) NWZ-E360 series      204) Pandora          ==IHIFI==
+ 222) NWZ-E450 series      205) Samsung YP-R0    230) 760
+ 223) NWZ-E460 series      206) Android MIPS     231) 960
+ 224) NWZ-E470 series      207) Android x86      250) 770C
+ 225) NWZ-E580 series      208) Samsung YP-R1    251) 770
+ 226) NWZ-A10 series                             252) 800
+ 227) NW-A20 series        ==iBasso==                                      
+ 228) NWZ-A860 series      232) DX50             ==AgpTek==
+ 229) NWZ-S750 series      233) DX90             240) Rocker
+                                                                           
+ ==FiiO==                  ==xDuoo==             ==AIGO==
+ 244) M3K Linux            241) X3               245) Eros Q / K
+ 246) M3K baremetal        242) X3II             247) Eros Q / K native
+                           243) X20              248) Eros Q / K native v3
  ==Shanling==                                         (GC9A01 LCD Controller)
  260) Q1
 EOF
@@ -2135,7 +2135,7 @@ fi
     t_model="m5"
     ;;
 
-    33|cowond2)
+   33|cowond2)
     target_id=34
     modelname="cowond2"
     target="COWON_D2"
@@ -2200,7 +2200,7 @@ fi
     t_model="gigabeat-fx"
     ;;
 
-    41|gigabeats)
+   41|gigabeats)
     target_id=26
     modelname="gigabeats"
     target="GIGABEAT_S"
@@ -2220,255 +2220,6 @@ fi
     t_manufacturer="imx31"
     t_model="gigabeat-s"
     ;;
-
-    70|mrobe500)
-    target_id=36
-    modelname="mrobe500"
-    target="MROBE_500"
-    memory=64 # always
-    arm926ejscc
-    tool="$rootdir/tools/scramble -add=m500"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 8"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.mrobe500"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    toolset=$gigabeatbitmaptools
-    boottool="cp "
-    bootoutput="rockbox.mrboot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="mrobe-500"
-    ;;
-
-   71|mrobe100)
-    target_id=33
-    modelname="mrobe100"
-    target="MROBE_100"
-    memory=32 # always
-    arm7tdmicc
-    tool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBOS"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.mi4"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
-    bootoutput="pp5020.mi4"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$scramblebitmaptools
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_soc="pp"
-    t_manufacturer="olympus"
-    t_model="mrobe-100"
-    ;;
-
-    89|creativezenxfistyle)
-    target_id=94
-    modelname="creativezenxfistyle"
-    target="CREATIVE_ZENXFISTYLE"
-    memory=64
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=zxfs"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenxfistyle.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zen"
-    arm926ejscc
-    ;;
-
-    90|zenvisionm30gb)
-    target_id=35
-    modelname="zenvisionm30gb"
-    target="CREATIVE_ZVM"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zvm"
-    USE_ELF="yes"
-    output="rockbox.zvm"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
-    bootoutput="rockbox.zvmboot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
-    ;;
-
-    91|zenvisionm60gb)
-    target_id=40
-    modelname="zenvisionm60gb"
-    target="CREATIVE_ZVM60GB"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zvm60 -no-ciff"
-    USE_ELF="yes"
-    output="rockbox.zvm60"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zvm60"
-    bootoutput="rockbox.zvm60boot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
-    ;;
-
-    92|zenvision)
-    target_id=39
-    modelname="zenvision"
-    target="CREATIVE_ZV"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zenvision -no-ciff"
-    USE_ELF="yes"
-    output="rockbox.zv"
-    appextra="recorder:gui:radio"
-    plugins=""
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zenvision"
-    bootoutput="rockbox.zvboot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
-    ;;
-
-   93|creativezenxfi2)
-    target_id=80
-    modelname="creativezenxfi2"
-    target="CREATIVE_ZENXFI2"
-    memory=64
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=zxf2"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenxfi2.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zenxfi2"
-    arm926ejscc
-    ;;
-
-   94|creativezenxfi3)
-    target_id=81
-    modelname="creativezenxfi3"
-    target="CREATIVE_ZENXFI3"
-    memory=64
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=zxf3"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenxfi3.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zenxfi3"
-    arm926ejscc
-    ;;
-
-    95|creativezenv)
-    target_id=92
-    modelname="creativezenv"
-    target="CREATIVE_ZENV"
-    memory=32
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=zenv"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenv.creative"
-    appextra="radio:gui:recorder"
-    plugins=""
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zen"
-    arm926ejscc
-    ;;
-
-   96|creativezenxfi)
-    target_id=86
-    modelname="creativezenxfi"
-    target="CREATIVE_ZENXFI"
-    memory=64
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
-    tool="$rootdir/tools/scramble -add=zxfi"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenxfi.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zen"
-    arm926ejscc
-    ;;
-
-   97|creativezenmozaic)
-    target_id=87
-    modelname="creativezenmozaic"
-    target="CREATIVE_ZENMOZAIC"
-    memory=32
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=zmoz"
-    output="rockbox.creative"
-    bootoutput="bootloader-zenmozaic.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zen"
-    arm926ejscc
-    ;;
-
-  98|creativezen)
-    target_id=90
-    modelname="creativezen"
-    target="CREATIVE_ZEN"
-    memory=32
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
-    tool="$rootdir/tools/scramble -add=zen"
-    output="rockbox.creative"
-    bootoutput="bootloader-zen.creative"
-    appextra="gui:recorder:radio"
-    plugins="yes"
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="creative-zen"
-    arm926ejscc
-    ;;
-
 
    50|sansae200)
     target_id=23
@@ -2586,7 +2337,6 @@ fi
     arm9tdmicc
     ;;
 
-
    57|sansam200v4)
     target_id=52
     modelname="sansam200v4"
@@ -2608,7 +2358,6 @@ fi
     arm9tdmicc
     ;;
 
-
    58|sansafuze)
     target_id=53
     modelname="sansafuze"
@@ -2627,7 +2376,6 @@ fi
     t_model="sansa-fuze"
     arm9tdmicc
     ;;
-
 
    59|sansac200v2)
     target_id=55
@@ -2790,6 +2538,254 @@ fi
     arm926ejscc
     ;;
 
+   70|mrobe500)
+    target_id=36
+    modelname="mrobe500"
+    target="MROBE_500"
+    memory=64 # always
+    arm926ejscc
+    tool="$rootdir/tools/scramble -add=m500"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 8"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.mrobe500"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    toolset=$gigabeatbitmaptools
+    boottool="cp "
+    bootoutput="rockbox.mrboot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="mrobe-500"
+    ;;
+
+   71|mrobe100)
+    target_id=33
+    modelname="mrobe100"
+    target="MROBE_100"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.mi4"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
+    bootoutput="pp5020.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$scramblebitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_soc="pp"
+    t_manufacturer="olympus"
+    t_model="mrobe-100"
+    ;;
+
+   89|creativezenxfistyle)
+    target_id=94
+    modelname="creativezenxfistyle"
+    target="CREATIVE_ZENXFISTYLE"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxfs"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfistyle.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
+   90|zenvisionm30gb)
+    target_id=35
+    modelname="zenvisionm30gb"
+    target="CREATIVE_ZVM"
+    memory=64
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -creative=zvm"
+    USE_ELF="yes"
+    output="rockbox.zvm"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    toolset=$ipodbitmaptools
+    boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
+    bootoutput="rockbox.zvmboot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="creative-zvm"
+    ;;
+
+   91|zenvisionm60gb)
+    target_id=40
+    modelname="zenvisionm60gb"
+    target="CREATIVE_ZVM60GB"
+    memory=64
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -creative=zvm60 -no-ciff"
+    USE_ELF="yes"
+    output="rockbox.zvm60"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    toolset=$ipodbitmaptools
+    boottool="$rootdir/tools/scramble -creative=zvm60"
+    bootoutput="rockbox.zvm60boot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="creative-zvm"
+    ;;
+
+   92|zenvision)
+    target_id=39
+    modelname="zenvision"
+    target="CREATIVE_ZV"
+    memory=64
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -creative=zenvision -no-ciff"
+    USE_ELF="yes"
+    output="rockbox.zv"
+    appextra="recorder:gui:radio"
+    plugins=""
+    toolset=$ipodbitmaptools
+    boottool="$rootdir/tools/scramble -creative=zenvision"
+    bootoutput="rockbox.zvboot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="creative-zvm"
+    ;;
+
+   93|creativezenxfi2)
+    target_id=80
+    modelname="creativezenxfi2"
+    target="CREATIVE_ZENXFI2"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxf2"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi2.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zenxfi2"
+    arm926ejscc
+    ;;
+
+   94|creativezenxfi3)
+    target_id=81
+    modelname="creativezenxfi3"
+    target="CREATIVE_ZENXFI3"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxf3"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi3.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zenxfi3"
+    arm926ejscc
+    ;;
+
+   95|creativezenv)
+    target_id=92
+    modelname="creativezenv"
+    target="CREATIVE_ZENV"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zenv"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenv.creative"
+    appextra="radio:gui:recorder"
+    plugins=""
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
+   96|creativezenxfi)
+    target_id=86
+    modelname="creativezenxfi"
+    target="CREATIVE_ZENXFI"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
+    tool="$rootdir/tools/scramble -add=zxfi"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
+   97|creativezenmozaic)
+    target_id=87
+    modelname="creativezenmozaic"
+    target="CREATIVE_ZENMOZAIC"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zmoz"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenmozaic.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
+  98|creativezen)
+    target_id=90
+    modelname="creativezen"
+    target="CREATIVE_ZEN"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
+    tool="$rootdir/tools/scramble -add=zen"
+    output="rockbox.creative"
+    bootoutput="bootloader-zen.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
    100|gogearsa9200)
     target_id=41
     modelname="gogearsa9200"
@@ -2925,7 +2921,7 @@ fi
     t_model="meizu-m3"
     ;;
 
-    120|ondavx747)
+   120|ondavx747)
     target_id=45
     modelname="ondavx747"
     target="ONDA_VX747"
@@ -2946,7 +2942,7 @@ fi
     t_model="onda_vx747"
     ;;
 
-    121|ondavx767)
+   121|ondavx767)
     target_id=64
     modelname="ondavx767"
     target="ONDA_VX767"
@@ -2967,7 +2963,7 @@ fi
     t_model="onda_vx767"
     ;;
 
-    122|ondavx747p)
+   122|ondavx747p)
     target_id=54
     modelname="ondavx747p"
     target="ONDA_VX747P"
@@ -2988,7 +2984,7 @@ fi
     t_model="onda_vx747"
     ;;
 
-    123|ondavx777)
+   123|ondavx777)
     target_id=61
     modelname="ondavx777"
     target="ONDA_VX777"
@@ -3009,7 +3005,7 @@ fi
     t_model="onda_vx747"
     ;;
 
-    130|lyreproto1)
+   130|lyreproto1)
     target_id=56
     modelname="lyreproto1"
     target="LYRE_PROTO1"
@@ -3899,7 +3895,7 @@ fi
     t_model="dx50"
     ;;
 
-    233|ibassodx90)
+   233|ibassodx90)
     application="yes"
     target_id=95
     modelname="ibassodx90"
@@ -3923,7 +3919,7 @@ fi
     t_model="dx90"
     ;;
 
-    240|agptekrocker)
+   240|agptekrocker)
     application="yes"
     app_type="rocker"
     target_id=97
@@ -3945,7 +3941,7 @@ fi
     mipsellinuxcc
     ;;
 
-    241|xduoox3)
+   241|xduoox3)
     target_id=106
     modelname="xduoox3"
     target="XDUOO_X3"
@@ -3967,7 +3963,7 @@ fi
     sysfont="08-Rockfont"
     ;;
 
-    242|xduoox3ii)
+   242|xduoox3ii)
     target_id=110
     application=yes
     app_type="xduoo"
@@ -3990,7 +3986,7 @@ fi
     sysfontbl="16-Terminus"
     ;;
 
-    243|xduoox20)
+   243|xduoox20)
     target_id=111
     application=yes
     app_type="xduoo"
@@ -4013,7 +4009,7 @@ fi
     sysfontbl="16-Terminus"
     ;;
 
-    244|fiiom3klinux)
+   244|fiiom3klinux)
     application="yes"
     app_type="fiio"
     target_id=112
@@ -4036,7 +4032,7 @@ fi
     sysfontbl="16-Terminus"
     ;;
 
-    245|aigoerosq|erosq)
+   245|aigoerosq|erosq)
     target_id=113
     application=yes
     app_type="erosq"
@@ -4058,6 +4054,86 @@ fi
     t_model="erosq"
     sysfontbl="16-Terminus"
     sysfont="14-Rockbox-Mix"
+    ;;
+
+   246|fiiom3k)
+    target_id=114
+    modelname="fiiom3k"
+    target="FIIO_M3K"
+    memory=64
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=fiiom3k "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.m3k"
+    bootoutput="bootloader.m3k"
+    sysfontbl="16-Terminus"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="fiiom3k"
+    ;;
+
+   247|erosqnative)
+    target_id=116
+    modelname="erosqnative"
+    target="EROS_QN"
+    memory=32
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=erosqnative "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.erosq"
+    bootoutput="bootloader.erosq"
+    sysfontbl="16-Terminus"
+    sysfont="14-Rockbox-Mix"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="erosqnative"
+    # player version, for bootloader usage
+    # versions 1 and 2 both use 1
+    extradefines="$extradefines -DEROSQN_VER=1"
+    ;;
+
+   248|erosqnative_v3)
+    target_id=117
+    modelname="erosqnative_v3"
+    target="EROS_QN"
+    memory=32
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=erosqnative "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.erosq"
+    bootoutput="bootloader.erosq"
+    sysfontbl="16-Terminus"
+    sysfont="14-Rockbox-Mix"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="erosqnative"
+    # player version, for bootloader usage
+    # version 3
+    extradefines="$extradefines -DEROSQN_VER=3"
     ;;
 
    250|ihifi770c)
@@ -4126,31 +4202,7 @@ fi
     t_model="ihifi2"
     ;;
 
-  246|fiiom3k)
-    target_id=114
-    modelname="fiiom3k"
-    target="FIIO_M3K"
-    memory=64
-    mipsr2elcc
-    appextra="recorder:gui"
-    plugins="yes"
-    tool="$rootdir/tools/scramble -add=fiiom3k "
-    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
-    output="rockbox.m3k"
-    bootoutput="bootloader.m3k"
-    sysfontbl="16-Terminus"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$x1000tools"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="mips"
-    t_manufacturer="ingenic_x1000"
-    t_model="fiiom3k"
-    ;;
-
-  260|shanlingq1)
+   260|shanlingq1)
     target_id=115
     modelname="shanlingq1"
     target="SHANLING_Q1"
@@ -4173,63 +4225,6 @@ fi
     t_manufacturer="ingenic_x1000"
     t_model="shanlingq1"
     ;;
-
-    247|erosqnative)
-    target_id=116
-    modelname="erosqnative"
-    target="EROS_QN"
-    memory=32
-    mipsr2elcc
-    appextra="recorder:gui"
-    plugins="yes"
-    tool="$rootdir/tools/scramble -add=erosqnative "
-    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
-    output="rockbox.erosq"
-    bootoutput="bootloader.erosq"
-    sysfontbl="16-Terminus"
-    sysfont="14-Rockbox-Mix"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$x1000tools"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="mips"
-    t_manufacturer="ingenic_x1000"
-    t_model="erosqnative"
-    # player version, for bootloader usage
-    # versions 1 and 2 both use 1
-    extradefines="$extradefines -DEROSQN_VER=1"
-    ;;
-
-    248|erosqnative_v3)
-    target_id=117
-    modelname="erosqnative_v3"
-    target="EROS_QN"
-    memory=32
-    mipsr2elcc
-    appextra="recorder:gui"
-    plugins="yes"
-    tool="$rootdir/tools/scramble -add=erosqnative "
-    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
-    output="rockbox.erosq"
-    bootoutput="bootloader.erosq"
-    sysfontbl="16-Terminus"
-    sysfont="14-Rockbox-Mix"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$x1000tools"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="mips"
-    t_manufacturer="ingenic_x1000"
-    t_model="erosqnative"
-    # player version, for bootloader usage
-    # version 3
-    extradefines="$extradefines -DEROSQN_VER=3"
-    ;;
-
 
    *)
     echo "Please select a supported target platform!"
