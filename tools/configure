@@ -1626,64 +1626,61 @@ if [ "$ARG_TARGET" ]; then
 else
   echo "Enter target platform:"
 cat <<EOF
- ==Cowon/iAudio==         ==iriver==             ==Apple iPod==
- 30) X5/X5V/X5L           10) H120/H140          20) Color/Photo
- 31) M5/M5L               11) H320/H340          21) Nano 1G
-                          12) iHP-100/110/115    22) Video
- 33) D2                                          23) 3G
- 34) M3/M3L               14) H10 20Gb           24) 4G Grayscale
-                          15) H10 5/6Gb          25) Mini 1G
- ==Creative==                                    26) Mini 2G
- 89) Zen X-Fi Style       ==Toshiba==            27) 1G, 2G
- 90) Zen Vision:M 30GB    40) Gigabeat F/X       28) Nano 2G
- 91) Zen Vision:M 60GB    41) Gigabeat S         29) Classic/6G
- 92) Zen Vision
- 93) Zen X-Fi2            ==Olympus=             ==SanDisk==
- 94) Zen X-Fi3            70) M:Robe 500         50) Sansa e200
- 96) Zen X-Fi             71) M:Robe 100         51) Sansa e200R
- 97) Zen Mozaic                                  52) Sansa c200
- 98) Zen                  ==Philips==
-                          100) GoGear SA9200
- ==Onda==                 101) GoGear HDD1630/   55) Sansa Clip
- 120) VX747                    HDD1830           56) Sansa e200v2
- 121) VX767               102) GoGear HDD6330    57) Sansa m200v4
- 122) VX747+                                     58) Sansa Fuze
- 123) VX777               ==Meizu==              59) Sansa c200v2
-                          110) M6SL              60) Sansa Clipv2
- ==Samsung==              111) M6SP              61) Sansa View
- 140) YH-820              112) M3                62) Sansa Clip+
- 141) YH-920                                     63) Sansa Fuze v2
- 142) YH-925                                     64) Sansa Fuze+
- 143) YP-S3                                      65) Sansa Clip Zip
-                          ==Packard Bell==       66) Sansa Connect
- ==Application==          160) Vibe 500
- 200) SDL
- 201) Android             ==MPIO==
- 202) Nokia N8xx          170) HD200             ==Lyre project==
- 203) Nokia N900          171) HD300             130) Lyre proto 1
- 204) Pandora                                    131) Mini2440
- 205) Samsung YP-R0       ==ROCKCHIP==
- 206) Android MIPS        180) rk27xx generic    ==HiFiMAN==
- 207) Android x86                                190) HM-60x
- 208) Samsung YP-R1       ==HiFi E.T.==          191) HM-801
-                          210) MA9
- ==iBasso==               211) MA9C              ==Sony==
- 232) DX50                212) MA8               219) NWZ-E350 series
- 233) DX90                213) MA8C              220) NWZ-E370/E380 series
-                                                 221) NWZ-E360 series
- ==xDuoo==                ==IHIFI==              222) NWZ-E450 series
- 241) X3                  230) 760               223) NWZ-E460 series
- 242) X3II                231) 960               224) NWZ-E470 series
- 243) X20                 250) 770C              225) NWZ-E580 series
-                          251) 770               226) NWZ-A10 series
- ==AgpTek==               252) 800               227) NW-A20 series
- 240) Rocker                                     228) NWZ-A860 series
-                          ==FiiO==               229) NWZ-S750 series
- ==AIGO==                 244) M3K Linux
- 245) Eros Q / K          246) M3K baremetal     ==Shanling==
- 247) Eros Q / K native                          260) Q1
- 248) Eros Q / K native v3
-      (GC9A01 LCD Controller)
+ ==iriver==                ==Apple iPod==        ==Cowon/iAudio==
+ 10) H120/H140             20) Color/Photo       30) X5/X5V/X5L
+ 11) H320/H340             21) Nano 1G           31) M5/M5L
+ 12) iHP-100/110/115       22) Video             33) D2
+ 14) H10 20Gb              23) 3G                34) M3/M3L
+ 15) H10 5/6Gb             24) 4G Grayscale
+                           25) Mini 1G           ==SanDisk==
+ ==Toshiba==               26) Mini 2G           50) Sansa e200
+ 40) Gigabeat F/X          27) 1G, 2G            51) Sansa e200R
+ 41) Gigabeat S            28) Nano 2G           52) Sansa c200
+                           29) Classic/6G        55) Sansa Clip
+ ==Olympus=                                      56) Sansa e200v2
+ 70) M:Robe 50             ==Creative==          57) Sansa m200v4
+ 71) M:Robe 100            89) Zen X-Fi Style    58) Sansa Fuze
+                           90) Zen Vision:M 30GB 59) Sansa c200v2
+ ==Philips==               91) Zen Vision:M 60GB 60) Sansa Clipv2
+ 100) GoGear SA9200        92) Zen Vision        61) Sansa View
+ 101) GoGear HDD1630/      93) Zen X-Fi2         62) Sansa Clip+
+      HDD1830              94) Zen X-Fi3         63) Sansa Fuze v2
+ 102) GoGear HDD6330       96) Zen X-Fi          64) Sansa Fuze+
+                           97) Zen Mozaic        65) Sansa Clip Zip
+ ==Meizu==                 98) Zen               66) Sansa Connect
+ 110) M6SL
+ 111) M6SP                 ==Onda==              ==Lyre project==
+ 112) M3                   120) VX747            130) Lyre proto 1
+                           121) VX767            131) Mini2440
+ ==Samsung==               122) VX747+
+ 140) YH-820               123) VX777            ==Packard Bell==
+ 141) YH-920                                     160) Vibe 500
+ 142) YH-925               ==MPIO==
+ 143) YP-S3                170) HD200            ==ROCKCHIP==
+                           171) HD300            180) rk27xx generic
+ ==HiFiMAN==
+ 190) HM-60x               ==Application==       ==HiFi E.T.==
+ 191) HM-801               200) SDL              210) MA9
+                           201) Android          211) MA9C
+ ==Sony==                  202) Nokia N8xx       212) MA8
+ 219) NWZ-E350 series      203) Nokia N900       213) MA8C
+ 220) NWZ-E370/E380 series 204) Pandora
+ 221) NWZ-E360 series      205) Samsung YP-R0    ==IHIFI==
+ 222) NWZ-E450 series      206) Android MIPS     230) 760
+ 223) NWZ-E460 series      207) Android x86      231) 960
+ 224) NWZ-E470 series      208) Samsung YP-R1    250) 770C
+ 225) NWZ-E580 series                            251) 770
+ 226) NWZ-A10 series       ==iBasso==            252) 800
+ 227) NW-A20 series        232) DX50
+ 228) NWZ-A860 series      233) DX90             ==AgpTek==
+ 229) NWZ-S750 series                            240) Rocker
+                           ==xDuoo==
+ ==FiiO==                  241) X3               ==AIGO==
+ 244) M3K Linux            242) X3II             245) Eros Q / K
+ 246) M3K baremetal        243) X20              247) Eros Q / K native
+                                                 248) Eros Q / K native v3
+ ==Shanling==                                         (GC9A01 LCD Controller)
+ 260) Q1
 EOF
 
   buildfor=`input`;
