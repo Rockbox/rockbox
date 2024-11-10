@@ -42,6 +42,8 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
     setting_count++;
     if (setting_count%10 == 0)
         rb->fdprintf(fd, "\r\n");
+    text[0] = '\0';
+
     switch (setting->flags&F_T_MASK)
     {
         case F_T_CUSTOM:
@@ -77,7 +79,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                          min, max, step);
             }
             else if (setting->flags&F_CHOICE_SETTING &&
-                     (setting->cfg_vals == NULL))
+                     (setting->choice_setting->cfg_vals == NULL))
             {
                 char temp[64];
                 int i;
@@ -89,9 +91,29 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                     rb->strcat(text, temp);
                 }
             }
-            else if (setting->cfg_vals != NULL)
+
+            const char *cfgvals = NULL;
+            if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
             {
-                rb->snprintf(text, sizeof(text), "%s", setting->cfg_vals);
+                cfgvals = setting->choice_setting->cfg_vals;
+            }
+            else if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
+            {
+                cfgvals = setting->bool_setting->cfg_vals;
+            }            
+            else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
+            {
+                cfgvals = setting->table_setting->cfg_vals;
+            }
+            else if ((setting->flags & F_HAS_CFGVALS) == F_HAS_CFGVALS)
+            {
+                cfgvals = setting->cfg_vals;
+            }
+
+            if (cfgvals != NULL)
+            {
+                size_t len = rb->strlen(text);
+                rb->snprintf(text + len, sizeof(text) - len, "[%s]", cfgvals);
             }
             break; /* F_T_*INT */
         case F_T_BOOL:

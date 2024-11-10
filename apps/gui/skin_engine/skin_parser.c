@@ -1606,7 +1606,7 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
             break;
         case F_T_INT:
         case F_T_UINT:
-            if (setting->cfg_vals == NULL)
+            if (setting_get_cfgvals(s->setting) == NULL)
             {
                 touchsetting->value.number = atoi(text);
             }

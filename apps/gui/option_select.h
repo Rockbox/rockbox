@@ -32,7 +32,7 @@ enum {
 
 bool option_screen(const struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
-                   bool use_temp_var, unsigned char* option_title);
+                   bool use_temp_var, const unsigned char* option_title);
 
 #if defined(HAVE_QUICKSCREEN) || defined(HAVE_RECORDING) || defined(HAVE_TOUCHSCREEN)
 void option_select_next_val(const struct settings_list *setting,

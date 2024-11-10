@@ -234,6 +234,22 @@ static void write_nvram_data(void)
     close(fd);
 }
 
+const char* setting_get_cfgvals(const struct settings_list *setting)
+{
+    if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
+        return setting->table_setting->cfg_vals;
+    else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
+        return setting->choice_setting->cfg_vals;
+    else if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
+    {
+        DEBUGF("Setting: %s \n", setting->cfg_name);
+        return setting->bool_setting->cfg_vals;
+    }
+    else if ((setting->flags & F_HAS_CFGVALS) == F_HAS_CFGVALS)
+        return setting->cfg_vals;
+    return NULL;
+}
+
 /** Reading from a config file **/
 /*
  * load settings from disk or RTC RAM
@@ -255,7 +271,7 @@ void settings_load(int which)
 
 bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str)
 {
-    const char* ptr = setting->cfg_vals;
+    const char* ptr = setting_get_cfgvals(setting);
     size_t len = strlen(str);
     int index = 0;
 
@@ -375,7 +391,7 @@ bool settings_load_config(const char* file, bool apply)
             }
             else
 #endif
-                if (setting->cfg_vals == NULL)
+                if (setting_get_cfgvals(setting) == NULL)
                 {
                     *(int*)setting->setting = atoi(value);
                     logf("Val: %s\r\n",value);
@@ -466,7 +482,7 @@ bool settings_load_config(const char* file, bool apply)
 
 bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, int buf_len)
 {
-    const char* ptr = setting->cfg_vals;
+    const char* ptr = setting_get_cfgvals(setting);
     const int *values = NULL;
     int index = 0;
 
@@ -520,7 +536,7 @@ void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len)
             }
             else
 #endif
-            if (setting->cfg_vals == NULL)
+            if (setting_get_cfgvals(setting) == NULL)
             {
                 snprintf(buf, buf_len, "%d", *(int*)setting->setting);
             }
@@ -1249,9 +1265,8 @@ bool set_int_ex(const unsigned char* string,
     item.int_setting = &data;
     item.flags = F_INT_SETTING|F_T_INT;
     item.lang_id = -1;
-    item.cfg_vals = (char*)string;
     item.setting = (void *)variable;
-    return option_screen(&item, NULL, false, NULL);
+    return option_screen(&item, NULL, false, string);
 }
 
 
@@ -1288,13 +1303,12 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     item.int_setting = &data;
     item.flags = F_INT_SETTING|F_T_INT;
     item.lang_id = -1;
-    item.cfg_vals = (char*)string;
     item.setting = &temp;
     if (type == RB_BOOL)
         temp = *(bool*)variable? 1: 0;
     else
         temp = *(int*)variable;
-    if (!option_screen(&item, NULL, false, NULL))
+    if (!option_screen(&item, NULL, false, string))
     {
         if (type == RB_BOOL)
 

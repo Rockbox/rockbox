@@ -477,7 +477,7 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
 
 bool option_screen(const struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
-                   bool use_temp_var, unsigned char* option_title)
+                   bool use_temp_var, const unsigned char* option_title)
 {
     int action;
     bool done = false;
@@ -490,7 +490,7 @@ bool option_screen(const struct settings_list *setting,
 
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
-    char *title;
+    const char *title = NULL;
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
         variable = use_temp_var ? &temp_var: (int*)setting->setting;
@@ -508,8 +508,11 @@ bool option_screen(const struct settings_list *setting,
     gui_synclist_init(&lists, value_setting_get_name_cb,
                       (void*)setting, false, 1, parent);
     if (setting->lang_id == -1)
-        title = (char*)setting->cfg_vals;
-    else
+    {
+        title = setting_get_cfgvals(setting);
+    }
+
+    if (!title)
         title = P2STR(option_title);
 
     gui_synclist_set_title(&lists, title, Icon_Questionmark);

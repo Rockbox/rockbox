@@ -316,7 +316,7 @@ void set_file(const char* filename, char* setting, const int maxlen);
 bool set_option(const char* string, const void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
 
-
+const char* setting_get_cfgvals(const struct settings_list *setting);
 
 /** global_settings and global_status struct definitions **/
 
