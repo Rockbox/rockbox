@@ -1924,7 +1924,7 @@ const struct settings_list settings[] = {
     {F_T_INT,&global_settings.rec_agc_maxgain_line,-1,INT(96),
         "agc maximum line gain",UNUSED},
     {F_T_INT|F_HAS_CFGVALS,&global_settings.rec_agc_cliptime,LANG_RECORDING_AGC_CLIPTIME,
-        INT(1),"agc cliptime", {.cfg_vals = "0.2 s,0.4 s,0.6 s,0.8 s,1 s"},
+        INT(1),"agc cliptime", {.cfg_vals = "0.2 s,0.4 s,0.6 s,0.8 s,1 s"}},
 #endif
 
 #ifdef HAVE_REMOTE_LCD
