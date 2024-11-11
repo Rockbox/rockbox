@@ -37,7 +37,7 @@ static long progress_next_tick = 0;
 
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
-#define RECT_SPACING 2
+#define RECT_SPACING 3
 #define SPLASH_MEMORY_INTERVAL (HZ)
 
 static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
@@ -128,7 +128,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     }
 
     /* prepare viewport
-     * First boundaries, then the grey filling, then the black border and finally
+     * First boundaries, then the background filling, then the border and finally
      * the text*/
 
     screen->scroll_stop();
@@ -148,12 +148,19 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
 
     vp->flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
+    unsigned fg = screen->get_foreground();
+    unsigned bg = screen->get_background();
+
+    bool broken = (fg == bg) ||
+                  (bg == 63422 && fg == 65535); /* -> iPod reFresh themes from '22 */
+
     if (screen->depth > 1)
     {
         vp->drawmode = DRMODE_FG;
         /* can't do vp->fg_pattern here, since set_foreground does a bit more on
          * greyscale */
-        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
+        screen->set_foreground(broken ? SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY) :
+                               bg);     /* gray as fallback for broken themes */
     }
     else
 #endif
@@ -165,7 +172,8 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     if (screen->depth > 1)
         /* can't do vp->fg_pattern here, since set_foreground does a bit more on
          * greyscale */
-        screen->set_foreground(SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
+        screen->set_foreground(broken ? SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK) :
+                               fg);     /* black as fallback for broken themes */
     else
 #endif
         vp->drawmode = DRMODE_SOLID;
