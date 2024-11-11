@@ -1023,7 +1023,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_CONTRAST
     /* its easier to leave this one un-macro()ed for the time being */
     { F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.contrast,
-        LANG_CONTRAST, FUNCTYPE(lcd_default_contrast), "contrast", NULL , {
+        LANG_CONTRAST, FUNCTYPE(lcd_default_contrast), "contrast", {
             .int_setting = (struct int_setting[]) {
                 { .option_callback = lcd_set_contrast,
                   .unit = UNIT_INT, .step = 1,
@@ -1153,7 +1153,7 @@ const struct settings_list settings[] = {
     /* its easier to leave this one un-macro()ed for the time being */
     { F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.battery_capacity,
         LANG_BATTERY_CAPACITY, FUNCTYPE(battery_default_capacity),
-        "battery capacity", NULL , {
+        "battery capacity" , {
             .int_setting = (struct int_setting[]) {
                 { .option_callback = set_battery_capacity,
                   .unit = UNIT_MAH, .step = BATTERY_CAPACITY_INC,
