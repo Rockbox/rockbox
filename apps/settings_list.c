@@ -1916,15 +1916,15 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_AGC
     {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORDING_AGC_PRESET,
-        INT(1),"agc mic preset",NULL,UNUSED},
+        INT(1),"agc mic preset",UNUSED},
     {F_T_INT,&global_settings.rec_agc_preset_line,LANG_RECORDING_AGC_PRESET,
-        INT(1),"agc line preset",NULL,UNUSED},
+        INT(1),"agc line preset",UNUSED},
     {F_T_INT,&global_settings.rec_agc_maxgain_mic,-1,INT(104),
-        "agc maximum mic gain",NULL,UNUSED},
+        "agc maximum mic gain",UNUSED},
     {F_T_INT,&global_settings.rec_agc_maxgain_line,-1,INT(96),
-        "agc maximum line gain",NULL,UNUSED},
-    {F_T_INT,&global_settings.rec_agc_cliptime,LANG_RECORDING_AGC_CLIPTIME,
-        INT(1),"agc cliptime","0.2 s,0.4 s,0.6 s,0.8 s,1 s",UNUSED},
+        "agc maximum line gain",UNUSED},
+    {F_T_INT|F_HAS_CFGVALS,&global_settings.rec_agc_cliptime,LANG_RECORDING_AGC_CLIPTIME,
+        INT(1),"agc cliptime", {.cfg_vals = "0.2 s,0.4 s,0.6 s,0.8 s,1 s"},
 #endif
 
 #ifdef HAVE_REMOTE_LCD
