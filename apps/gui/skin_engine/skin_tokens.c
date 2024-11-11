@@ -1447,7 +1447,7 @@ const char *get_token_value(struct gui_wps *gwps,
                              * on 16 bits ...
                              * but this is pretty useless anyway */
                             numeric_ret = *(int*)s->setting + 1;
-                        else if (setting_get_cfgvals(s->setting) == NULL)
+                        else if (setting_get_cfgvals(s) == NULL)
                             /* %?St|name|<1st choice|2nd choice|...> */
                             numeric_ret = (*(int*)s->setting-s->int_setting->min)
                                       /s->int_setting->step + 1;
