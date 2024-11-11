@@ -200,10 +200,6 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-
-/* DMA is used only for reading on PP502x because although reads are ~8x faster
- * writes appear to be ~25% slower.
- */
 #ifndef BOOTLOADER
 #define HAVE_ATA_DMA
 #endif
