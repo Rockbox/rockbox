@@ -206,7 +206,7 @@ static void handle_truncate(struct filestr_desc * const file, file_size_t size)
     while ((s = fileobj_get_next_stream(&file->stream, s)))
     {
         /* caches with data beyond new extents are invalid */
-        unsigned long sector = s->cachep->sector;
+        sector_t sector = s->cachep->sector;
         if (sector != INVALID_SECNUM && sector >= filesectors)
             filestr_discard_cache(s);
 

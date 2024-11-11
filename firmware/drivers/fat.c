@@ -2411,7 +2411,7 @@ void fat_filestr_init(struct fat_filestr *fatstr, struct fat_file *file)
     fat_rewind(fatstr);
 }
 
-unsigned long fat_query_sectornum(const struct fat_filestr *filestr)
+sector_t fat_query_sectornum(const struct fat_filestr *filestr)
 {
     /* return next sector number to be transferred */
     struct bpb * const fat_bpb = FAT_BPB(filestr->fatfilep->volume);

@@ -51,7 +51,11 @@
 /**
  ****************************************************************************/
 
+#ifdef STORAGE_64BIT_SECTOR
+#define INVALID_SECNUM     (0xfffffffffffffffeull) /* sequential, not FAT */
+#else
 #define INVALID_SECNUM     (0xfffffffeul) /* sequential, not FAT */
+#endif
 #define FAT_MAX_FILE_SIZE  (0xfffffffful) /* 2^32-1 bytes */
 #define MAX_DIRENTRIES     65536
 #define MAX_DIRECTORY_SIZE (MAX_DIRENTRIES*32) /* 2MB max size */
@@ -153,7 +157,7 @@ int fat_file_sector_size(const struct fat_file *file);
 int fat_closewrite(struct fat_filestr *filestr, uint32_t size,
                    struct fat_direntry *fatentp);
 void fat_filestr_init(struct fat_filestr *filestr, struct fat_file *file);
-unsigned long fat_query_sectornum(const struct fat_filestr *filestr);
+sector_t fat_query_sectornum(const struct fat_filestr *filestr);
 long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
                    void *buf, bool write);
 void fat_rewind(struct fat_filestr *filestr);

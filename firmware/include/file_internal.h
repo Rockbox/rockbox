@@ -54,8 +54,8 @@ enum filestr_cache_flags
 
 struct filestr_cache
 {
+    sector_t      sector;   /* file sector that is in buffer */
     uint8_t       *buffer;  /* buffer to hold sector */
-    unsigned long sector;   /* file sector that is in buffer */
     unsigned int  flags;    /* FSC_* bits */
 };
 
