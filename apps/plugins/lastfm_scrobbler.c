@@ -38,7 +38,7 @@ Where 1.1 is the version for this file format
     If the device knows the time, but not the timezone
         eg: #TZ/UNKNOWN
 
-<IDENTIFICATION STRING> should be replaced by the name/model of the hardware device 
+<IDENTIFICATION STRING> should be replaced by the name/model of the hardware device
  and the revision of the software producing the log file.
 
 After the header lines, simply append one line of text for every song
@@ -60,7 +60,7 @@ Example
 (listened to enter sandman, skipped cowboys, listened to the pusher) :
  #AUDIOSCROBBLER/1.0
  #TZ/UTC
- #CLIENT/Rockbox h3xx 1.1 
+ #CLIENT/Rockbox h3xx 1.1
  Metallica        Metallica        Enter Sandman        1        365        L        1143374412        62c2e20a?-559e-422f-a44c-9afa7882f0c4?
  Portishead        Roseland NYC Live        Cowboys        2        312        S        1143374777        db45ed76-f5bf-430f-a19f-fbe3cd1c77d3
  Steppenwolf        Live        The Pusher        12        350        L        1143374779        58ddd581-0fcc-45ed-9352-25255bf80bfb?
@@ -332,7 +332,7 @@ int scrobbler_init_cache(void)
 
     if (gCache.size < reqsz)
     {
-        logf("SCROBBLER: OOM , %ld < req:%ld", gCache.size, reqsz);
+        logf("SCROBBLER: OOM , %ld < req:%zu", gCache.size, reqsz);
         return -1;
     }
     gCache.force_flush = true;
@@ -381,7 +381,7 @@ static bool track_is_unique(uint32_t hash1, uint32_t hash2)
         /* Found in MRU */
         if ((i.hash1 == hash1) && (i.hash2 == hash2))
         {
-            logf("SCROBBLER: hash [%x, %x] found in MRU @ %d", i.hash1, i.hash2, mru);
+            logf("SCROBBLER: hash [%lx, %lx] found in MRU @ %d", i.hash1, i.hash2, mru);
             goto Found;
         }
     }
@@ -395,11 +395,11 @@ static bool track_is_unique(uint32_t hash1, uint32_t hash2)
     }
     else
     {
-        logf("SCROBBLER: hash [%x, %x] evicted from MRU", i.hash1, i.hash2);
+        logf("SCROBBLER: hash [%lx, %lx] evicted from MRU", i.hash1, i.hash2);
     }
 
     i = (struct hash64){.hash1 = hash1, .hash2 = hash2};
-    logf("SCROBBLER: hash [%x, %x] added to  MRU[%d]", i.hash1, i.hash2, mru_len);
+    logf("SCROBBLER: hash [%lx, %lx] added to  MRU[%d]", i.hash1, i.hash2, mru_len);
 
 Found:
 
@@ -475,7 +475,7 @@ static void scrobbler_write_cache(void)
 
         for (i = 0; i < entries && pos < used; i++)
         {
-            logf("SCROBBLER: write %d read pos [%ld]", i, pos);
+            logf("SCROBBLER: write %d read pos [%zu]", i, pos);
 
             struct cache_entry *entry = (struct cache_entry*)&gCache.buf[pos];
 
@@ -484,7 +484,7 @@ static void scrobbler_write_cache(void)
             prev_crc = crc;
 
             len = rb->strlen(entry->buf);
-            logf("SCROBBLER: write entry %d sz [%ld] len [%ld]", i, entry_sz, len);
+            logf("SCROBBLER: write entry %d sz [%zu] len [%zu]", i, entry_sz, len);
 
             if (len != entry->len || crc != entry->crc) /* the entry is corrupted */
             {
@@ -591,7 +591,7 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
     if ( gCache.pos > SCROBBLER_MAX_CACHE - SCROBBLER_CACHE_LEN )
         scrobbler_write_cache();
 
-    logf("SCROBBLER: add_to_cache[%d] write pos[%ld]", gCache.entries, gCache.pos);
+    logf("SCROBBLER: add_to_cache[%d] write pos[%zu]", gCache.entries, gCache.pos);
     /* use prev_crc to allow whole buffer to be checked for consistency */
     static uint32_t prev_crc = 0x0;
     if (gCache.pos == 0)
@@ -641,7 +641,7 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
 
                 size_t entry_sz = cache_get_entry_size(ret);
 
-                logf("SCROBBLER: Added (#%d) sz[%ld] len[%d], %s",
+                logf("SCROBBLER: Added (#%d) sz[%zu] len[%d], %s",
                      gCache.entries, entry_sz, ret, entry->buf);
 
                 gCache.entries++;
