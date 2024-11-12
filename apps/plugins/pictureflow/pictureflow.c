@@ -1878,7 +1878,7 @@ static int id3_get_index(struct mp3entry *id3)
             artist_idx = pf_idx.album_index[i].artist_idx;
 
             if(!rb->strcmp(pf_idx.album_names + album_idx, current_album) &&
-                !rb->strcmp(pf_idx.artist_names + artist_idx, current_artist))
+                !rb->strcasecmp(pf_idx.artist_names + artist_idx, current_artist))
                 return i;
         }
 
