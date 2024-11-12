@@ -2041,7 +2041,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                         token = SKINOFFSETTOPTR(skin_buffer, imglist->token);
                         if (token) {
                             img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-                            if (img && !strcmp(path, img->bm.data))
+                            if (img && img->bm.data && !strcmp(path, img->bm.data))
                             {
                                 img->loaded = true;
                                 img->buflib_handle = handle;
