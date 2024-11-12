@@ -71,7 +71,6 @@ static uint64_t ata_total_sectors;
 static uint32_t log_sector_size;
 static struct mutex ata_mutex;
 static struct semaphore ata_wakeup;
-static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 7 * HZ;
 static bool ata_powered;
@@ -79,7 +78,10 @@ static bool canflush = true;
 static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
+#ifdef HAVE_ATA_DMA
 static int dma_mode = 0;
+static uint32_t ata_dma_flags;
+#endif
 
 static const int ata_retries = ATA_RETRIES;
 static const bool ata_error_srst = true;
@@ -656,7 +658,9 @@ static int ata_power_up(void)
     if (ceata) {
         ata_lba48 = true;
         ata_dma = true;
+#ifdef HAVE_ATA_DMA
         dma_mode = 0xff; /* Canary */
+#endif
         PCON(8) = 0x33333333;
         PCON(9) = 0x00000033;
         PCON(11) |= 0xf;
@@ -711,8 +715,8 @@ static int ata_power_up(void)
         ATA_PIO_TIME = piotime;
 
         uint32_t param = 0;
-        ata_dma_flags = 0;
 #ifdef HAVE_ATA_DMA
+        ata_dma_flags = 0;
         if ((identify_info[53] & BIT(2)) && (identify_info[88] & BITRANGE(0, 4))) /* Any UDMA */
         {
             int max_udma = ATA_MAX_UDMA;
@@ -730,9 +734,9 @@ static int ata_power_up(void)
             ATA_MDMA_TIME = mwdmatimes[param & 0xf];
             ata_dma_flags = BIT(3) | BIT(10);
         }
+        dma_mode = param;
 #endif /* HAVE_ATA_DMA */
         ata_dma = param ? true : false;
-        dma_mode = param;
         PASS_RC(ata_set_feature(0x03, param), 3, 4); /* Transfer mode */
 
         /* SET_FEATURE only supported on PATA, not CE-ATA */
@@ -1145,7 +1149,7 @@ int ata_init(void)
 
     /* get identify_info */
     mutex_lock(&ata_mutex);
-    int rc = ata_power_up(); /* Include identify() call */
+    int rc = ata_power_up(); /* Includes identify() call */
     mutex_unlock(&ata_mutex);
     if (IS_ERR(rc))
         return rc;
