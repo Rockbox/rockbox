@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+//#define LOGF_ENABLE
+
 #include "config.h"
 #include "storage.h"
 #include "timer.h"
@@ -32,6 +34,7 @@
 #include "debug.h"
 #include "panic.h"
 #include "fs_defines.h"
+#include "logf.h"
 
 #ifndef ATA_RETRIES
 #define ATA_RETRIES 3
@@ -652,6 +655,8 @@ static int ata_get_best_mode(unsigned short identword, int max, int modetype)
  */
 static int ata_power_up(void)
 {
+    logf("ata POWERUP %ld", current_tick);
+
     ata_set_active();
     ide_power_enable(true);
     long spinup_start = current_tick;
@@ -775,6 +780,9 @@ static void ata_power_down(void)
 {
     if (!ata_powered)
         return;
+
+    logf("ata POWERDOWN %ld", current_tick);
+
     PCON(7) = 0;
     PCON(8) = 0;
     PCON(9) = 0;
@@ -908,6 +916,8 @@ static int ata_transfer_sectors(uint64_t sector, uint32_t count, void* buffer, b
         commit_discard_dcache();
     if (!ceata)
         ATA_COMMAND = BIT(1);
+
+    logf("ata XFER (%d) %d @ %llu", write, count, sector);
 
     while (count)
     {
@@ -1044,6 +1054,8 @@ static void ata_flush_cache(void)
 {
     uint8_t cmd;
 
+    logf("ata FLUSH CACHE %ld", current_tick);
+
     if (ceata) {
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0xf] = CMD_FLUSH_CACHE_EXT;  /* CE-ATA only supports EXT */
@@ -1089,6 +1101,8 @@ void ata_sleepnow(void)
     ata_flush_cache();
 
     if (ata_disk_can_sleep()) {
+        logf("ata SLEEP %ld", current_tick);
+
         if (ceata) {
             memset(ceata_taskfile, 0, 16);
             ceata_taskfile[0xf] = CMD_STANDBY_IMMEDIATE;

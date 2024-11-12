@@ -414,6 +414,8 @@ static int ata_transfer_sectors(uint64_t start,
         }
     }
 
+    logf("ata XFER (%d) %d @ %llu", write, incount, start);
+
     timeout = current_tick + READWRITE_TIMEOUT;
 
     ATA_OUT8(ATA_SELECT, ata_device);
