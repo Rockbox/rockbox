@@ -220,6 +220,15 @@ static int ata_get_phys_sector_mult(void)
 
     DEBUGF("ata: %d logical sectors per phys sector", phys_sector_mult);
 
+    if((identify_info[209] & 0xc000) == 0x4000) { /* B14 */
+        if (identify_info[209] & 0x3fff) {
+            panicf("ata: Unaligned logical/physical sector mapping");
+            // XXX we can probably handle this by adding a fixed offset
+            // to all operations and subtracting this from the reported
+            // size.  But we don't do tihs until we find a real-world need.
+        }
+    }
+
     if (phys_sector_mult > 1)
     {
         /* Check if drive really needs emulation  - if we can access
