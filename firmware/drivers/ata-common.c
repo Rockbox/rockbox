@@ -238,6 +238,10 @@ static int ata_get_phys_sector_mult(void)
         /* Check if drive really needs emulation  - if we can access
            sector 1 then assume the drive supports "512e" and will handle
            it better than us, so ignore the large physical sectors.
+
+           The exception here is if the device is partitioned to use
+           larger-than-logical "virtual" sectors; in that case we will
+           use whichever one (ie physical/"virtual") is larger.
         */
         char throwaway[__MAX_VARIABLE_LOG_SECTOR];
         rc = ata_transfer_sectors(1, 1, &throwaway, false);
@@ -252,6 +256,17 @@ static int ata_get_phys_sector_mult(void)
     memset(&sector_cache, 0, sizeof(sector_cache));
 
     return 0;
+}
+
+void ata_set_phys_sector_mult(unsigned int mult)
+{
+    unsigned int max = MAX_PHYS_SECTOR_SIZE/log_sector_size;
+    /* virtual sector could be larger than pyhsical sector */
+    if (!mult || mult > max)
+        mult = max;
+    /* It needs to be at _least_ the size of the real multiplier */
+    if (mult > phys_sector_mult)
+        phys_sector_mult = mult;
 }
 
 #endif  /* MAX_PHYS_SECTOR_SIZE */

@@ -434,6 +434,11 @@ int disk_mount(int drive)
             }
 #endif /* MAX_VIRT_SECTOR_SIZE */
         }
+
+#if defined(MAX_VIRT_SECTOR_SIZE) && defined(MAX_PHYS_SECTOR_SIZE)
+        if (mounted)
+            ata_set_phys_sector_mult(disk_sector_multiplier[drive]);
+#endif
     }
 
     disk_writer_unlock();

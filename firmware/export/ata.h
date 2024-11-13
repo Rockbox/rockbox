@@ -235,4 +235,8 @@ int ata_read_smart(struct ata_smart_values*);
 
 #define ATA_IDENTIFY_WORDS 256
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+void ata_set_phys_sector_mult(unsigned int mult);
+#endif
+
 #endif /* __ATA_H__ */
