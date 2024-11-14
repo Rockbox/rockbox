@@ -151,7 +151,18 @@ SYM (\name):
     /* Restore the registers, retrieving the state when setjmp() was called.  */
 #ifdef __thumb2__
     ldmfd       a1!, { v1-v7, fp, ip, lr }
-    ldr     sp, [a1],#+4
+#if __ARM_ARCH_PROFILE == 'M'
+    /*
+     * Errata 752419: Interrupted loads to SP can cause erroneous behaviour
+     * Apply the suggested workaround of loading to an intermediate register
+     * and then moving into sp. This only affects Cortex-M3 but a warning is
+     * issued by the assembler for all armv7-m targets with binutils 2.38.
+     */
+    ldr         a3, [a1], #4
+    mov         sp, a3
+#else
+    ldr         sp, [a1], #4
+#endif
 #else
     ldmfd       a1!, { v1-v7, fp, ip, sp, lr }
 #endif
