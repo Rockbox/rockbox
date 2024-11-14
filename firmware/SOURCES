@@ -609,7 +609,13 @@ target/arm/mmu-arm.S
 target/arm/bits-armv6.S
 target/arm/mmu-armv6.S
 # endif
-target/arm/system-arm.c
+
+#if defined(CPU_ARM_CLASSIC)
+target/arm/system-arm-classic.c
+#elif defined(CPU_ARM_MICRO)
+target/arm/system-arm-micro.c
+target/arm/vectors-arm-micro.S
+#endif
 
 #if CONFIG_STORAGE & STORAGE_ATA
 # ifdef CPU_PP502x
@@ -828,7 +834,7 @@ target/arm/s5l8702/crt0.S
 target/arm/imx233/crt0.S
 #elif CONFIG_CPU==RK27XX
 target/arm/rk27xx/crt0.S
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM_CLASSIC)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
 

@@ -86,7 +86,7 @@ void panicf( const char *fmt, ...)
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* Disable interrupts */
-#ifdef CPU_ARM
+#if defined(CPU_ARM_CLASSIC)
     disable_interrupt(IRQ_FIQ_STATUS);
 #else
     set_irq_level(DISABLE_INTERRUPTS);

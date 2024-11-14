@@ -500,7 +500,7 @@ static void init(void)
     power_init();
 
     enable_irq();
-#ifdef CPU_ARM
+#if defined(CPU_ARM_CLASSIC)
     enable_fiq();
 #endif
     /* current_tick should be ticking by now */

@@ -332,7 +332,7 @@ int rolo_load(const char* filename)
 #endif
 
 #if CONFIG_CPU != IMX31L /* We're not finished yet */
-#ifdef CPU_ARM
+#if defined(CPU_ARM_CLASSIC)
     /* Should do these together since some ARM version should never have
      * FIQ disabled and not IRQ (imx31 errata). */
     disable_interrupt(IRQ_FIQ_STATUS);
