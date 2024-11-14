@@ -61,7 +61,12 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
 static inline void store_context(void* addr)
 {
     asm volatile(
+#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+        "stmia  %0, { r4-r11, lr }     \n"
+        "str    sp, [%0, #36]          \n"
+#else
         "stmia  %0, { r4-r11, sp, lr } \n"
+#endif
         : : "r" (addr)
     );
 }
@@ -85,7 +90,13 @@ static inline void load_context(const void* addr)
         "ldmiane %0, { r0, pc }         \n"
 #endif
 
+#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+        "mov     r0, %0                 \n"
+        "ldmia   r0, { r4-r11, lr }     \n"
+        "ldr     sp, [r0, #36]          \n"
+#else
         "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
+#endif
         END_ARM_ASM_SYNTAX_UNIFIED
         : : "r" (addr) : "r0" /* only! */
     );

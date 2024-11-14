@@ -21,6 +21,20 @@
 
 #include "config.h"
 
+#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+/*
+ * Cortex-M cannot load/store SP with ldm/stm so we need to store it
+ * separately. This makes it slightly more efficient to store SP last
+ * so as not to split the register list.
+ */
+struct regs
+{
+    uint32_t r[8];  /*  0-28 - Registers r4-r11 */
+    uint32_t lr;    /*    32 - r14 (lr) */
+    uint32_t sp;    /*    36 - Stack pointer (r13) */
+    uint32_t start; /*    40 - Thread start address, or NULL when started */
+};
+#else
 struct regs
 {
     uint32_t r[8];  /*  0-28 - Registers r4-r11 */
@@ -28,6 +42,7 @@ struct regs
     uint32_t lr;    /*    36 - r14 (lr) */
     uint32_t start; /*    40 - Thread start address, or NULL when started */
 };
+#endif
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
   #include <errno.h>
