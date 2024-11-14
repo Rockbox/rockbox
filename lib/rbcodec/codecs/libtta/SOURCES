@@ -1,7 +1,6 @@
 ttadec.c
-#ifdef CPU_ARM
+#if defined(CPU_ARM_CLASSIC)
 filter_arm.S
-#endif
-#ifdef CPU_COLDFIRE
+#elif defined(CPU_COLDFIRE)
 filter_coldfire.S
 #endif

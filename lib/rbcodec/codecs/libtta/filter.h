@@ -42,7 +42,7 @@
 ///////// Filter Settings //////////
 static int flt_set[3] = {10, 9, 10};
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE)
+#if defined(CPU_ARM_CLASSIC) || defined(CPU_COLDFIRE)
 int hybrid_filter(fltst *fs, int *in); /* implements in filter_arm.S */
 
 #else

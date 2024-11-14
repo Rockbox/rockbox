@@ -97,7 +97,7 @@ static bool resample_new_delta(struct resample_data *data,
     return true;
 }
 
-#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(CPU_ARM_MICRO)
 int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
                      struct dsp_buffer *dst)
 {

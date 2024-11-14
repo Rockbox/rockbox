@@ -39,7 +39,7 @@ resample.c
 #ifdef CPU_COLDFIRE
 filters_cf.S
 ltp_cf.S
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM_CLASSIC)
 filters_arm4.S
 #endif
 #endif

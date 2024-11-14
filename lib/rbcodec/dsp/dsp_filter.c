@@ -277,7 +277,7 @@ void filter_flush(struct dsp_filter *f)
  * form 1 was chosen because of better numerical properties for fixed point
  * implementations.
  */
-#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(CPU_ARM_MICRO)
 void filter_process(struct dsp_filter *f, int32_t * const buf[], int count,
                     unsigned int channels)
 {

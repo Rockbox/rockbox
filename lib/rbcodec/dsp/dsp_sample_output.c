@@ -63,7 +63,9 @@ void sample_output_mono(struct sample_io_data *this,
     }
     while (--count > 0);
 }
+#endif /* CPU */
 
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(CPU_ARM_MICRO)
 /* write stereo internal format to output format */
 void sample_output_stereo(struct sample_io_data *this,
                           struct dsp_buffer *src, struct dsp_buffer *dst)

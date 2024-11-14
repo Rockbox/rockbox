@@ -304,7 +304,7 @@ int read_sample_rate (WavpackContext *wpc, WavpackMetadata *wpmd)
 
 #if defined(CPU_COLDFIRE)
 extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM_CLASSIC)
 extern void decorr_stereo_pass_cont_arm (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
 extern void decorr_stereo_pass_cont_arml (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
 #else
@@ -369,7 +369,7 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
                 decorr_stereo_pass (dpp, buffer, 8);
 #if defined(CPU_COLDFIRE)
                 decorr_stereo_pass_cont_mcf5249 (dpp, buffer + 16, sample_count - 8);
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM_CLASSIC)
                 if (((flags & MAG_MASK) >> MAG_LSB) > 15)
                     decorr_stereo_pass_cont_arml (dpp, buffer + 16, sample_count - 8);
                 else
@@ -541,7 +541,7 @@ static void decorr_stereo_pass (struct decorr_pass *dpp, int32_t *buffer, int32_
     dpp->weight_B = weight_B;
 }
 
-#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM_CLASSIC))
 
 static void decorr_stereo_pass_cont (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count)
 {

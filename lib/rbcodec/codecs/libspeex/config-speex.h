@@ -16,7 +16,7 @@
 #define DISABLE_VBR
 
 /* Make use of ARM4E assembly optimizations */
-#if defined(CPU_ARM)
+#if defined(CPU_ARM_CLASSIC)
 #if (ARM_ARCH < 5)
 #define ARM4_ASM
 #else

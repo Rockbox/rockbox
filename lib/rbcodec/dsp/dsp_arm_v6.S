@@ -71,6 +71,7 @@ sample_output_mono:
     ldmfd   sp!, { r4, pc }            @
     .size   sample_output_mono, .-sample_output_mono
 
+#ifndef CPU_ARM_MICRO
 /****************************************************************************
  * void sample_output_stereo(struct sample_io_data *this,
  *                           struct dsp_buffer *src,
@@ -131,3 +132,4 @@ sample_output_stereo:
                                        @
     ldmfd   sp!, { r4-r7, pc }         @
     .size   sample_output_stereo, .-sample_output_stereo
+#endif /* CPU_ARM_MICRO */

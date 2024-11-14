@@ -28,7 +28,7 @@
 
 #if defined(CPU_COLDFIRE)
 #define FPM_COLDFIRE_EMAC
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM_CLASSIC)
 #define FPM_ARM
 #elif defined(CPU_MIPS)
 #define FPM_MIPS

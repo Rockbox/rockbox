@@ -922,7 +922,7 @@ mad_fixed_t III_requantize(unsigned int value, signed int exp)
 }
 
 /* we must take care that sz >= bits and sz < sizeof(long) lest bits == 0 */
-# if defined(CPU_ARM)
+# if defined(CPU_ARM_CLASSIC)
 # define MASK(cache, sz, bits) \
     ({ unsigned long res; \
        asm ("mov  %0, #1\n\t" \
@@ -1557,7 +1557,7 @@ enum mad_error III_stereo(mad_fixed_t xr[2][576],
   return MAD_ERROR_NONE;
 }
 
-#if defined(CPU_ARM)
+#if defined(CPU_ARM_CLASSIC)
 void III_aliasreduce(mad_fixed_t xr[576], int lines);
 #else
 /*
@@ -2683,7 +2683,7 @@ void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
 
 #endif
 
-#ifdef CPU_ARM
+#if defined(CPU_ARM_CLASSIC)
 void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],
                  mad_fixed_t sample[18][32], unsigned int sb);
 #else

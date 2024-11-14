@@ -185,6 +185,7 @@ channel_mode_proc_karaoke:
     ldmpc   regs=r4                    @
     .size   channel_mode_proc_karaoke, .-channel_mode_proc_karaoke
 
+#ifndef CPU_ARM_MICRO
 /****************************************************************************
  * void crossfeed_process(struct dsp_proc_entry *this,
  *                        struct dsp_buffer **buf_p)
@@ -508,6 +509,7 @@ resample_hermite:
     str     r2, [r3]                    @ dst->remcount = r2
     ldmpc   regs=r4-r11                 @ ... and we're out
     .size   resample_hermite, .-resample_hermite
+#endif /* CPU_ARM_MICRO */
 
 /****************************************************************************
  *  void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
@@ -558,6 +560,7 @@ pga_process:
     ldmpc   regs=r4-r8
     .size   pga_process, .-pga_process
 
+#ifndef CPU_ARM_MICRO
 /****************************************************************************
  * void filter_process(struct dsp_filter *f, int32_t *buf[], int count,
  *                     unsigned int channels)
@@ -623,6 +626,7 @@ filter_process:
     add     sp, sp, #16             @ compensate for temp storage
     ldmpc   regs=r4-r11
     .size   filter_process, .-filter_process
+#endif /* CPU_ARM_MICRO */
 
 #if ARM_ARCH < 6
 /****************************************************************************

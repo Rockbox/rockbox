@@ -320,7 +320,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         (void)sum;
         lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order,
                         decoded + pred_order, coeffs);
-        #elif defined(CPU_ARM)
+        #elif defined(CPU_ARM_CLASSIC)
         (void)sum;
         lpc_decode_arm(s->blocksize - pred_order, qlevel, pred_order,
                        decoded + pred_order, coeffs);
