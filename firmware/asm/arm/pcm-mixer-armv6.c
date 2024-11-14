@@ -78,6 +78,27 @@ static FORCE_INLINE void write_samples(void *out,
     if (LIKELY(amp == MIX_AMP_UNITY))
     {
         /* Channel is unity amplitude */
+#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+        asm volatile (
+            "ands       r4, %2, #0x1f   \n"
+            "beq        2f              \n"
+        "1:                             \n"
+            "ldr        r3, [%1], #4    \n"
+            "subs       r4, r4, #4      \n"
+            "str        r3, [%0], #4    \n"
+            "bne        1b              \n"
+            "bics       %2, %2, #0x1f   \n"
+            "beq        3f              \n"
+        "2:                             \n"
+            "ldmia      %1!, { r3-r10 } \n"
+            "subs       %2, %2, #32     \n"
+            "stmia      %0!, { r3-r10 } \n"
+            "bhi        2b              \n"
+        "3:                             \n"
+            : "+lr"(out), "+lr"(src), "+r"(size)
+            :
+            : "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10");
+#else
         asm volatile (
             "ands       r1, %2, #0x1f  \n"
             "beq        2f             \n"
@@ -97,6 +118,7 @@ static FORCE_INLINE void write_samples(void *out,
             : "+r"(out), "+r"(src), "+r"(size)
             :
             : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7");
+#endif
     }
     else
     {
