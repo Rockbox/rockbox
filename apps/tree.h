@@ -35,6 +35,7 @@ struct entry {
     unsigned time_write; /* Last write time */
     #ifdef HAVE_TAGCACHE
     int customaction; /* db use */
+    char* album_name; /* db use */
     #endif
 };
 

@@ -2195,6 +2195,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Par album]"
+  </dest>
+  <voice>
+    *: "Toutes les pistes triées par album"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_DISPLAY
   desc: in settings_menu()
   user: core

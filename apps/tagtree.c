@@ -80,6 +80,7 @@ struct tagentry {
     int newtable;
     int extraseek;
     int customaction;
+    char* album_name;
 };
 
 static struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
@@ -90,6 +91,7 @@ enum table {
     TABLE_ROOT = 1,
     TABLE_NAVIBROWSE,
     TABLE_ALLSUBENTRIES,
+    TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS,
     TABLE_PLAYTRACK,
 };
 
@@ -913,6 +915,21 @@ static int compare(const void *p1, const void *p2)
     return qsort_fn(e1->name, e2->name, MAX_PATH);
 }
 
+static int compare_with_albums(const void *p1, const void *p2)
+{
+    struct tagentry *e1 = (struct tagentry *)p1;
+    struct tagentry *e2 = (struct tagentry *)p2;
+    int sort_album_res = qsort_fn(
+        e1->album_name == NULL ? "" : e1->album_name,
+        e2->album_name == NULL ? "" : e2->album_name, MAX_PATH);
+    if (sort_album_res != 0)
+    {
+        /* If album name is different */
+        return sort_album_res;
+    }
+    return qsort_fn(e1->name, e2->name, MAX_PATH);
+}
+
 static void tagtree_buffer_event(unsigned short id, void *ev_data)
 {
     (void)id;
@@ -1597,7 +1614,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 #endif
         , 0, 0, 0);
 
-    if (c->currtable == TABLE_ALLSUBENTRIES)
+    if (c->currtable == TABLE_ALLSUBENTRIES || c->currtable == TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS)
     {
         tag = tag_title;
         level--;
@@ -1661,8 +1678,17 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     fmt = NULL;
     for (i = 0; i < format_count; i++)
     {
-        if (formats[i]->group_id == csi->format_id[level])
-            fmt = formats[i];
+        if (c->currtable == TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS)
+        {
+            /* If it is sorted by albums, we need to use the proper view
+            that includes the disc number etc so sorting will be correct for each albums.
+            Otherwise, tracks will be sorted by title names */
+            if (formats[i]->group_id != csi->format_id[level + 1])
+                continue;
+        }
+        else if (formats[i]->group_id != csi->format_id[level])
+            continue;
+        fmt = formats[i];
     }
 
     if (fmt)
@@ -1685,16 +1711,29 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
     if (tag != tag_title && tag != tag_filename)
     {
-        if (offset == 0)
+        bool show_album_sorted = (tag == tag_album);
+        int show_album_sorted_offset = (show_album_sorted ? 1 : 0);
+        if (offset == 0 && show_album_sorted)
         {
-            dptr->newtable = TABLE_ALLSUBENTRIES;
-            dptr->name = ID2P(LANG_TAGNAVI_ALL_TRACKS);
+            dptr->newtable = TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS;
+            dptr->name = ID2P(LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM);
+            dptr->extraseek = 0;
             dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
             c->special_entry_count++;
         }
-        if (offset <= 1)
+        if (offset <= (show_album_sorted_offset))
+        {
+            dptr->newtable = TABLE_ALLSUBENTRIES;
+            dptr->name = ID2P(LANG_TAGNAVI_ALL_TRACKS);
+            dptr->extraseek = 0;
+            dptr->customaction = ONPLAY_NO_CUSTOMACTION;
+            dptr++;
+            current_entry_count++;
+            c->special_entry_count++;
+        }
+        if (offset <= (1 + show_album_sorted_offset))
         {
             dptr->newtable = TABLE_NAVIBROWSE;
             dptr->name = ID2P(LANG_TAGNAVI_RANDOM);
@@ -1706,6 +1745,8 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
 
         total_count += 2;
+        if (show_album_sorted)
+            total_count++;
     }
 
     while (tagcache_get_next(&tcs, tcs_buf, tcs_bufsz))
@@ -1727,7 +1768,15 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         /* Check the format */
         for (i = 0; i < format_count; i++)
         {
-            if (formats[i]->group_id != csi->format_id[level])
+            if (c->currtable == TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS)
+            {
+                /* If it is sorted by albums, we need to use the proper view
+                that includes the disc number etc so sorting will be correct for each albums.
+                Otherwise, tracks will be sorted by title names */
+                if (formats[i]->group_id != csi->format_id[level + 1])
+                    continue;
+            }
+            else if (formats[i]->group_id != csi->format_id[level])
                 continue;
 
             if (tagcache_check_clauses(&tcs, formats[i]->clause,
@@ -1744,13 +1793,22 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             { /* Fallback to basename */
                 char *lastname = dptr->name;
                 dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
-                if (tagcache_retrieve(&tcs, tcs.idx_id, tag_virt_basename, dptr->name,
+                if ((c->cache.name_buffer_size - namebufused) > 0 && 
+                    tagcache_retrieve(&tcs, tcs.idx_id, tag_virt_basename, dptr->name,
                                       c->cache.name_buffer_size - namebufused))
                 {
                     namebufused += strlen(dptr->name)+1;
+                    dptr->album_name = core_get_data(c->cache.name_buffer_handle)+namebufused;
+                    if ((c->cache.name_buffer_size - namebufused) > 0 &&
+                        tagcache_retrieve(&tcs, tcs.idx_id, tag_album, dptr->album_name,
+                                    c->cache.name_buffer_size - namebufused))
+                        namebufused += strlen(dptr->album_name)+1;
+                    else
+                        dptr->album_name = NULL;
                     goto entry_skip_formatter;
                 }
                 dptr->name = lastname; /* restore last entry if filename failed */
+                dptr->album_name = NULL;
             }
 
             tcs.result = str(LANG_TAGNAVI_UNTAGGED);
@@ -1760,25 +1818,33 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         if (!tcs.ramresult || fmt)
         {
+
             dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
 
             if (fmt)
             {
                 int ret = format_str(&tcs, fmt, dptr->name,
                                      c->cache.name_buffer_size - namebufused);
-                if (ret >= 0)
+                bool error_on_str_format = ret < 0;
+                if (!error_on_str_format)
                 {
                     namebufused += strlen(dptr->name)+1; /* include NULL */
+                    dptr->album_name = core_get_data(c->cache.name_buffer_handle)+namebufused;
+                    if ((c->cache.name_buffer_size - namebufused) > 0 &&
+                            tagcache_retrieve(&tcs, tcs.idx_id, tag_album, dptr->album_name,
+                                      c->cache.name_buffer_size - namebufused))
+                        namebufused += strlen(dptr->album_name)+1;
+                    else
+                        dptr->album_name = NULL;
                 }
                 else
                 {
-                    dptr->name[0] = '\0';
                     if (ret == -4)          /* buffer full */
                     {
                         logf("chunk mode #2: %d", current_entry_count);
                         c->dirfull = true;
                         sort = false;
-                        break ;
+                        break;
                     }
 
                     logf("format_str() failed");
@@ -1792,8 +1858,17 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             {
                 tcs_get_basename(&tcs, is_basename);
                 namebufused += tcs.result_len;
-                if (namebufused < c->cache.name_buffer_size)
+                bool buffer_full = (namebufused >= c->cache.name_buffer_size);
+                if (!buffer_full)
+                {
+                    dptr->album_name = core_get_data(c->cache.name_buffer_handle)+namebufused;
+                    if (tagcache_retrieve(&tcs, tcs.idx_id, tag_album, dptr->album_name,
+                                      c->cache.name_buffer_size - namebufused))
+                        namebufused += strlen(dptr->album_name)+1;
+                    else
+                        dptr->album_name = NULL;
                     strcpy(dptr->name, tcs.result);
+                }
                 else
                 {
                     logf("chunk mode #2a: %d", current_entry_count);
@@ -1807,6 +1882,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         {
             tcs_get_basename(&tcs, is_basename);
             dptr->name = tcs.result;
+            dptr->album_name = NULL;
         }
 entry_skip_formatter:
         dptr++;
@@ -1843,7 +1919,8 @@ entry_skip_formatter:
         qsort(&entries[c->special_entry_count],
               current_entry_count - c->special_entry_count,
               sizeof(struct tagentry),
-              compare);
+              c->currtable == TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS ? compare_with_albums : compare
+        );
     }
 
     if (!init)
@@ -1985,6 +2062,7 @@ int tagtree_load(struct tree_context* c)
             break;
 
         case TABLE_ALLSUBENTRIES:
+        case TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS:
         case TABLE_NAVIBROWSE:
             logf("navibrowse...");
 
@@ -2060,10 +2138,10 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
     if (seek == -1) /* <Random> menu item was selected */
     {
         is_random_item = true;
-        if(c->filesindir<=2) /* Menu contains only <All> and <Random> menu items */
+        if(c->filesindir<=c->special_entry_count) /* Menu contains only special entries */
             return 0;
         srand(current_tick);
-        dptr = (tagtree_get_entry(c, 2+(rand() % (c->filesindir-2))));
+        dptr = (tagtree_get_entry(c, c->special_entry_count+(rand() % (c->filesindir-c->special_entry_count))));
         seek = dptr->extraseek;
     }
     newextra = dptr->newtable;
@@ -2195,6 +2273,7 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
 
         case TABLE_NAVIBROWSE:
         case TABLE_ALLSUBENTRIES:
+        case TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS:
             if (newextra == TABLE_PLAYTRACK)
             {
                 adjust_selection = false;
@@ -2504,7 +2583,8 @@ static bool insert_all_playlist(struct tree_context *c,
 static bool goto_allsubentries(int newtable)
 {
     int i = 0;
-    while (i < 2 && (newtable == TABLE_NAVIBROWSE || newtable == TABLE_ALLSUBENTRIES))
+    while (i < 2 && (newtable == TABLE_NAVIBROWSE || newtable == TABLE_ALLSUBENTRIES
+        || newtable == TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS))
     {
         tagtree_enter(tc, false);
         tagtree_load(tc);
@@ -2746,6 +2826,7 @@ char *tagtree_get_title(struct tree_context* c)
 
         case TABLE_NAVIBROWSE:
         case TABLE_ALLSUBENTRIES:
+        case TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS:
             logf("%s (NAVI/ALLSUB) idx: %d %s", __func__,
                  c->currextra, current_title[c->currextra]);
             return current_title[c->currextra];
@@ -2768,6 +2849,7 @@ int tagtree_get_attr(struct tree_context* c)
             break;
 
         case TABLE_ALLSUBENTRIES:
+        case TABLE_ALLSUBENTRIES_SORTED_BY_ALBUMS:
             attr = FILE_ATTR_AUDIO;
             break;
 
