@@ -344,6 +344,8 @@ static void lcd_dma_start(DMA_Mode mode)
     jz_writef(LCD_CTRL, ENABLE(1));
     // }
 
+    (void)mode;
+
     lcd_on = true;
 }
 
@@ -379,7 +381,7 @@ static void lcd_dma_stop(DMA_Mode mode)
         lcd_wait(WAIT_QD);
     } else { // MODE_SLEEP
         jz_writef(LCD_CTRL, ENABLE(0));
-        
+
         /* Usual case -- wait for EOF, wait for FIFO to drain */
         lcd_wait(SLEEP_EOF);
         lcd_wait(SLEEP_FRAME);
