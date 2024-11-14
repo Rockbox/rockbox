@@ -1,8 +1,10 @@
 backtrace-unwarminder.c
-get_sp.S
 unwarm_arm.c
 unwarm.c
 unwarminder.c
 unwarmmem.c
 unwarm_thumb.c
 safe_read.S
+#if defined(CPU_ARM_CLASSIC)
+get_sp.S
+#endif

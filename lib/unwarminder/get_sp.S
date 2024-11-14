@@ -6,14 +6,18 @@
  *
  * On RaaA we are called in USER mode most probably and
  * cpsr mangling is restricted. We simply copy SP value
- * in this situation
+ * in this situation.
+ *
+ * For Cortex-M, SP is banked to MSP/PSP based on the current
+ * processor mode. Exception stack frames can be detected and
+ * backtraced across, so we can just return SP like RaaA does.
  */
 .section .text
 .type __get_sp,%function
 .global __get_sp
 
 __get_sp:
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM_CLASSIC)
     mrs r1, cpsr         /* save current state */
     orr r0, r1, #0xc0
     msr cpsr_c, r0       /* disable IRQ and FIQ */
@@ -28,7 +32,7 @@ call_from_exception:
 get_sp:
 #endif
     mov r0, sp           /* get SP */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM_CLASSIC)
     msr cpsr_c, r1       /* restore mode */
 #endif
     bx  lr
