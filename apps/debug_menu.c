@@ -565,12 +565,12 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
     // XXX and if mounted, show free info...
     if (selected_item%2)
     {
-        snprintf(buffer, buffer_len, "   T:%x %llu MB", p.type,
-                 (uint64_t)(p.size / ( 2048 / ( SECTOR_SIZE / 512 ))));
+        snprintf(buffer, buffer_len, "   T:%x %lu MB", p.type,
+                 (unsigned long)(p.size / ( 2048 / ( SECTOR_SIZE / 512 ))));
     }
     else
     {
-        snprintf(buffer, buffer_len, "P%d: S:%llx", partition, (uint64_t)p.start);
+        snprintf(buffer, buffer_len, "P%d: S:%llx", partition, (unsigned long long)p.start);
     }
     return buffer;
 }
@@ -1450,7 +1450,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     total_sectors *= sector_size;   /* Convert to bytes */
     total_sectors /= (1024 * 1024); /* Convert to MB */
 
-    simplelist_addline("Size: %llu MB", (uint64_t)total_sectors);
+    simplelist_addline("Size: %lu MB", (unsigned long)total_sectors);
     simplelist_addline("Logical sector size: %lu B", sector_size);
 #ifdef MAX_VIRT_SECTOR_SIZE
     simplelist_addline("Sector multiplier: %u", disk_get_sector_multiplier());
@@ -1466,7 +1466,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
-            "Free: %llu MB", (uint64_t)(free / 1024));
+            "Free: %lu MB", (unsigned long)(free / 1024));
 #endif
 
     simplelist_addline("SSD detected: %s", ata_disk_isssd() ? "yes" : "no");
@@ -1805,7 +1805,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Model: %s", info.product);
     simplelist_addline("Firmware: %s", info.revision);
     simplelist_addline(
-            "Size: %llu MB", (uint64_t)(info.num_sectors*(info.sector_size/512)/2048));
+            "Size: %lu MB", (unsigned long)(info.num_sectors*(info.sector_size/512)/2048));
     sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
