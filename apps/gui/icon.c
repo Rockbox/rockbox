@@ -39,10 +39,6 @@
 #include "bitmaps/remote_default_icons.h"
 #endif
 
-/* These are just the file names, the full path is snprint'ed when used */
-#define DEFAULT_VIEWER_BMP          "viewers"
-#define DEFAULT_REMOTE_VIEWER_BMP   "remote_viewers"
-
 /* We dont actually do anything with these pointers,
    but they need to be grouped like this to save code
    so storing them as void* is ok. (stops compile warning) */
@@ -211,12 +207,8 @@ void icons_init(void)
     {
         load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
 
-        if (global_settings.viewers_icon_file[0] == '-' ||
-            global_settings.viewers_icon_file[0] == '\0')
-        {
-            load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
-        }
-        else
+        if (global_settings.viewers_icon_file[0] != '-' &&
+            global_settings.viewers_icon_file[0] != '\0')
         {
             load_icons(global_settings.viewers_icon_file,
                     Iconset_viewers, SCREEN_MAIN);
@@ -226,13 +218,8 @@ void icons_init(void)
         load_icons(global_settings.remote_icon_file,
                 Iconset_user, SCREEN_REMOTE);
 
-        if (global_settings.remote_viewers_icon_file[0] == '-' ||
-            global_settings.remote_viewers_icon_file[0] == '\0')
-        {
-            load_icons(DEFAULT_REMOTE_VIEWER_BMP,
-                    Iconset_viewers, SCREEN_REMOTE);
-        }
-        else
+        if (global_settings.remote_viewers_icon_file[0] != '-' &&
+            global_settings.remote_viewers_icon_file[0] != '\0')
         {
             load_icons(global_settings.remote_viewers_icon_file,
                     Iconset_viewers, SCREEN_REMOTE);
