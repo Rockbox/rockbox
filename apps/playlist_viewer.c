@@ -424,8 +424,8 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         {
             /* Something is playing, try to accommodate
             *  global_settings.max_files_in_playlist entries */
-            index_buffer_size = playlist_get_required_bufsz(viewer->playlist,
-                                   false, global_settings.max_files_in_playlist);
+            index_buffer_size = (global_settings.max_files_in_playlist *
+                                 sizeof(*viewer->playlist->indices));
 
             if ((unsigned)index_buffer_size >= buffer_size - MAX_PATH)
                 index_buffer_size = buffer_size - (MAX_PATH + 1);
@@ -551,12 +551,12 @@ static void format_line(struct playlist_entry* track, char* str,
                 )
                     track->attr |= PLAYLIST_ATTR_RETRIEVE_ID3_SUCCEEDED;
             }
-            /* Yield to reduce as much as possible the perceived UI lag, 
+            /* Yield to reduce as much as possible the perceived UI lag,
             because retrieving id3 tags is an expensive operation */
             yield();
         }
     }
-    
+
     if (!(track->attr & PLAYLIST_ATTR_RETRIEVE_ID3_SUCCEEDED))
     {
         /* Simply use a formatted file name */
@@ -1316,7 +1316,7 @@ bool search_playlist(void)
         return ret;
     }
     backlight_on();
-    struct playlist_search_data s_data = {.track = &track, .found_indicies = found_indicies}; 
+    struct playlist_search_data s_data = {.track = &track, .found_indicies = found_indicies};
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
                       &s_data, false, 1, NULL);
     gui_synclist_set_title(&playlist_lists, str(LANG_SEARCH_RESULTS), NOICON);

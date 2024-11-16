@@ -180,8 +180,6 @@ char *playlist_name(const struct playlist_info* playlist, char *buf,
                     int buf_size);
 char *playlist_get_name(const struct playlist_info* playlist, char *buf,
                         int buf_size);
-size_t playlist_get_required_bufsz(struct playlist_info* playlist,
-                                   bool include_namebuf, int num_indices);
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
 int playlist_save(struct playlist_info* playlist, char *filename);
