@@ -375,23 +375,26 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     char *buffer, *index_buffer = NULL;
     size_t buffer_size, index_buffer_size = 0;
     bool is_playing = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
-    bool have_list = filename || is_playing;
-    if (!have_list && (global_status.resume_index != -1))
+
+    /* FIXME: On devices with a plugin buffer smaller than 512 KiB, the index buffer
+              is shared with the current playlist when playback is stopped, to enable
+              displaying larger playlists. This is generally unsafe, since it is possible
+              to start playback of a new playlist while another list is still open in the
+              viewer. Devices affected by this, as of the time of writing, appear to be:
+              - 80 KiB plugin buffer: Sansa c200v2
+              - 64 KiB plugin buffer: Sansa m200v4, Sansa Clip
+    */
+    bool require_index_buffer = filename && (is_playing || PLUGIN_BUFFER_SIZE >= 0x80000);
+
+    if (!filename && !is_playing)
     {
         /* Try to restore the list from control file */
-        have_list = (playlist_resume() != -1);
-    }
-    if (!have_list && (playlist_amount() > 0))
-    {
-         /*If dynamic playlist still exists, view it anyway even
-        if playback has reached the end of the playlist */
-        have_list = true;
-    }
-    if (!have_list)
-    {
-        /* Nothing to view, exit */
-        splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));
-        return false;
+        if (playlist_resume() == -1)
+        {
+            /* Nothing to view, exit */
+            splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));
+            return false;
+        }
     }
 
     size_t id3_size = ALIGN_UP(sizeof(*viewer->id3), 4);
@@ -402,7 +405,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 
     /* Index buffer is required, unless playback is stopped or we're
        showing the current playlist (i.e. filename == NULL) */
-    if (filename && is_playing)
+    if (require_index_buffer)
         index_buffer_size = playlist_get_index_bufsz(buffer_size - id3_size - (MAX_PATH + 1));
 
     /* Check for unused space in the plugin buffer to run
@@ -452,7 +455,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         }
         viewer->title = file;
 
-        if (is_playing)
+        if (require_index_buffer)
         {
             index_buffer = buffer;
             buffer += index_buffer_size;

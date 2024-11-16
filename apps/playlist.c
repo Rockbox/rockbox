@@ -2024,7 +2024,7 @@ size_t playlist_get_index_bufsz(size_t max_sz)
  * provided, the current playlist's index buffer is shared.
  * FIXME: When using the shared buffer, you must ensure that playback is
  *        stopped and that no other playlist will be started while this
- *        one is loaded.
+ *        one is loaded. The current playlist's indices will be trashed!
  *
  * The temp_buffer (if not NULL) is used as a scratchpad when loading indices.
  */
@@ -2052,18 +2052,11 @@ struct playlist_info* playlist_load(const char* dir, const char* file,
 
         playlist->max_playlist_size = num_indices;
         playlist->indices = index_buffer;
-#ifdef HAVE_DIRCACHE
-        playlist->dcfrefs_handle = 0;
-#endif
     }
     else
     {
-        /* FIXME not sure if it's safe to share index buffers */
         playlist->max_playlist_size = current_playlist.max_playlist_size;
         playlist->indices = current_playlist.indices;
-#ifdef HAVE_DIRCACHE
-        playlist->dcfrefs_handle = 0;
-#endif
     }
 
     new_playlist_unlocked(playlist, dir, file);
