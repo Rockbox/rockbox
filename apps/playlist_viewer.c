@@ -130,28 +130,6 @@ static struct playlist_info temp_playlist;
 static bool temp_playlist_init = false;
 
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
-                                 int names_buffer_size);
-static void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
-                                         enum direction direction);
-static int playlist_entry_load(struct playlist_entry *entry, int index,
-                               char* name_buffer, int remaining_size);
-
-static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer *pb,
-                                                         int index);
-
-static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 const char* filename, bool reload,
-                                 int *most_recent_selection);
-
-static void format_line(struct playlist_entry* track, char* str,
-                        int len);
-
-static bool update_playlist(bool force);
-static enum pv_onplay_result onplay_menu(int index);
-
-static void close_playlist_viewer(void);
-
-static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
                                  int names_buffer_size)
 {
     pb->name_buffer = names_buffer;
@@ -179,6 +157,39 @@ static int playlist_buffer_get_index(struct playlist_buffer *pb, int index)
             buffer_index = pb->first_index+viewer.num_tracks-index;
     }
     return buffer_index;
+}
+
+static int playlist_entry_load(struct playlist_entry *entry, int index,
+                               char* name_buffer, int remaining_size)
+{
+    struct playlist_track_info info;
+    int len;
+
+    /* Playlist viewer orders songs based on display index.  We need to
+       convert to real playlist index to access track */
+    index = (index + playlist_get_first_index(viewer.playlist)) %
+        viewer.num_tracks;
+    if (playlist_get_track_info(viewer.playlist, index, &info) < 0)
+        return -1;
+
+    len = strlcpy(name_buffer, info.filename, remaining_size) + 1;
+
+    if (global_settings.playlist_viewer_track_display >
+        PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH && len <= remaining_size)
+    {
+        /* Allocate space for the id3viewc if the option is enabled */
+        len += MAX_PATH + 1;
+    }
+
+    if (len <= remaining_size)
+    {
+        entry->name = name_buffer;
+        entry->index = info.index;
+        entry->display_index = info.display_index;
+        entry->attr = info.attr & (PLAYLIST_ATTR_SKIPPED | PLAYLIST_ATTR_QUEUED);
+        return len;
+    }
+    return -1;
 }
 
 /*
@@ -268,39 +279,6 @@ static bool retrieve_id3_tags(const int index, const char* name, struct mp3entry
     return id3_retrieval_successful;
 }
 
-static int playlist_entry_load(struct playlist_entry *entry, int index,
-                               char* name_buffer, int remaining_size)
-{
-    struct playlist_track_info info;
-    int len;
-
-    /* Playlist viewer orders songs based on display index.  We need to
-       convert to real playlist index to access track */
-    index = (index + playlist_get_first_index(viewer.playlist)) %
-        viewer.num_tracks;
-    if (playlist_get_track_info(viewer.playlist, index, &info) < 0)
-        return -1;
-
-    len = strlcpy(name_buffer, info.filename, remaining_size) + 1;
-
-    if (global_settings.playlist_viewer_track_display >
-        PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH && len <= remaining_size)
-    {
-        /* Allocate space for the id3viewc if the option is enabled */
-        len += MAX_PATH + 1;
-    }
-
-    if (len <= remaining_size)
-    {
-        entry->name = name_buffer;
-        entry->index = info.index;
-        entry->display_index = info.display_index;
-        entry->attr = info.attr & (PLAYLIST_ATTR_SKIPPED | PLAYLIST_ATTR_QUEUED);
-        return len;
-    }
-    return -1;
-}
-
 #define distance(a, b) \
     a>b? (a) - (b) : (b) - (a)
 static bool playlist_buffer_needs_reload(struct playlist_buffer* pb,
@@ -349,6 +327,39 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
         buffer_index = playlist_buffer_get_index(pb, index);
     }
     return &(pb->tracks[buffer_index]);
+}
+
+/* Update playlist in case something has changed or forced */
+static bool update_playlist(bool force)
+{
+    if (!viewer.playlist)
+        playlist_get_resume_info(&viewer.current_playing_track);
+    else
+        viewer.current_playing_track = -1;
+    int nb_tracks = playlist_amount_ex(viewer.playlist);
+
+    if (force || nb_tracks != viewer.num_tracks)
+    {
+        /* Reload tracks */
+        viewer.num_tracks = nb_tracks;
+        if (viewer.num_tracks <= 0)
+        {
+            global_status.resume_index = -1;
+            global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
+            return false;
+        }
+        playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
+                          viewer.selected_track);
+        if (viewer.buffer.num_loaded <= 0)
+        {
+            global_status.resume_index = -1;
+            global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
+            return false;
+        }
+    }
+    return true;
 }
 
 /* Initialize the playlist viewer. */
@@ -582,39 +593,6 @@ static void format_line(struct playlist_entry* track, char* str,
     }
 }
 
-/* Update playlist in case something has changed or forced */
-static bool update_playlist(bool force)
-{
-    if (!viewer.playlist)
-        playlist_get_resume_info(&viewer.current_playing_track);
-    else
-        viewer.current_playing_track = -1;
-    int nb_tracks = playlist_amount_ex(viewer.playlist);
-
-    if (force || nb_tracks != viewer.num_tracks)
-    {
-        /* Reload tracks */
-        viewer.num_tracks = nb_tracks;
-        if (viewer.num_tracks <= 0)
-        {
-            global_status.resume_index = -1;
-            global_status.resume_offset = -1;
-            global_status.resume_elapsed = -1;
-            return false;
-        }
-        playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
-                          viewer.selected_track);
-        if (viewer.buffer.num_loaded <= 0)
-        {
-            global_status.resume_index = -1;
-            global_status.resume_offset = -1;
-            global_status.resume_elapsed = -1;
-            return false;
-        }
-    }
-    return true;
-}
-
 static enum pv_onplay_result show_track_info(const struct playlist_entry *current_track)
 {
     struct mp3entry id3;
@@ -623,6 +601,20 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
     return id3_retrieval_successful &&
             browse_id3_ex(&id3, viewer.playlist, current_track->display_index,
             viewer.num_tracks, NULL, 1) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
+}
+
+static void close_playlist_viewer(void)
+{
+    talk_shutup();
+    if (viewer.playlist)
+    {
+        if (viewer.initial_selection)
+            *(viewer.initial_selection) = viewer.selected_track;
+
+        if(playlist_modified(viewer.playlist) && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
+            save_playlist_screen(viewer.playlist);
+        playlist_close(viewer.playlist);
+    }
 }
 
 #if defined(HAVE_HOTKEY) || defined(HAVE_TAGCACHE)
@@ -1224,20 +1216,6 @@ exit:
     pop_current_activity_without_refresh();
     close_playlist_viewer();
     return ret;
-}
-
-static void close_playlist_viewer(void)
-{
-    talk_shutup();
-    if (viewer.playlist)
-    {
-        if (viewer.initial_selection)
-            *(viewer.initial_selection) = viewer.selected_track;
-
-        if(playlist_modified(viewer.playlist) && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
-            save_playlist_screen(viewer.playlist);
-        playlist_close(viewer.playlist);
-    }
 }
 
 static const char* playlist_search_callback_name(int selected_item, void * data,
