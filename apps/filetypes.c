@@ -50,74 +50,24 @@ static void read_builtin_types_init(void) INIT_ATTR;
 static void read_viewers_config_init(void) INIT_ATTR;
 static void read_config_init(int fd) INIT_ATTR;
 
-/* a table for the known file types */
-static const struct filetype inbuilt_filetypes[] = {
-    { "mp3",  FILE_ATTR_AUDIO },
-    { "mp2",  FILE_ATTR_AUDIO },
-    { "mpa",  FILE_ATTR_AUDIO },
-    { "mp1",  FILE_ATTR_AUDIO },
-    { "ogg",  FILE_ATTR_AUDIO },
-    { "oga",  FILE_ATTR_AUDIO },
-    { "wma",  FILE_ATTR_AUDIO },
-    { "wmv",  FILE_ATTR_AUDIO },
-    { "asf",  FILE_ATTR_AUDIO },
-    { "wav",  FILE_ATTR_AUDIO },
-    { "flac", FILE_ATTR_AUDIO },
-    { "ac3",  FILE_ATTR_AUDIO },
-    { "a52",  FILE_ATTR_AUDIO },
-    { "mpc",  FILE_ATTR_AUDIO },
-    { "wv",   FILE_ATTR_AUDIO },
-    { "m4a",  FILE_ATTR_AUDIO },
-    { "m4b",  FILE_ATTR_AUDIO },
-    { "mp4",  FILE_ATTR_AUDIO },
-    { "mod",  FILE_ATTR_AUDIO },
-    { "mpga", FILE_ATTR_AUDIO },
-    { "shn",  FILE_ATTR_AUDIO },
-    { "aif",  FILE_ATTR_AUDIO },
-    { "aiff", FILE_ATTR_AUDIO },
-    { "spx" , FILE_ATTR_AUDIO },
-    { "opus", FILE_ATTR_AUDIO },
-    { "sid",  FILE_ATTR_AUDIO },
-    { "adx",  FILE_ATTR_AUDIO },
-    { "nsf",  FILE_ATTR_AUDIO },
-    { "nsfe", FILE_ATTR_AUDIO },
-    { "spc",  FILE_ATTR_AUDIO },
-    { "ape",  FILE_ATTR_AUDIO },
-    { "mac",  FILE_ATTR_AUDIO },
-    { "sap" , FILE_ATTR_AUDIO },
-    { "rm",   FILE_ATTR_AUDIO },
-    { "ra",   FILE_ATTR_AUDIO },
-    { "rmvb", FILE_ATTR_AUDIO },
-    { "cmc",  FILE_ATTR_AUDIO },
-    { "cm3",  FILE_ATTR_AUDIO },
-    { "cmr",  FILE_ATTR_AUDIO },
-    { "cms",  FILE_ATTR_AUDIO },
-    { "dmc",  FILE_ATTR_AUDIO },
-    { "dlt",  FILE_ATTR_AUDIO },
-    { "mpt",  FILE_ATTR_AUDIO },
-    { "mpd",  FILE_ATTR_AUDIO },
-    { "rmt",  FILE_ATTR_AUDIO },
-    { "tmc",  FILE_ATTR_AUDIO },
-    { "tm8",  FILE_ATTR_AUDIO },
-    { "tm2",  FILE_ATTR_AUDIO },
-    { "oma",  FILE_ATTR_AUDIO },
-    { "aa3",  FILE_ATTR_AUDIO },
-    { "at3",  FILE_ATTR_AUDIO },
-    { "mmf",  FILE_ATTR_AUDIO },
-    { "au",   FILE_ATTR_AUDIO },
-    { "snd",  FILE_ATTR_AUDIO },
-    { "vox",  FILE_ATTR_AUDIO },
-    { "w64",  FILE_ATTR_AUDIO },
-    { "tta",  FILE_ATTR_AUDIO },
-    { "ay",   FILE_ATTR_AUDIO },
-    { "vtx",  FILE_ATTR_AUDIO },
-    { "gbs",  FILE_ATTR_AUDIO },
-    { "hes",  FILE_ATTR_AUDIO },
-    { "sgc",  FILE_ATTR_AUDIO },
-    { "vgm",  FILE_ATTR_AUDIO },
-    { "vgz",  FILE_ATTR_AUDIO },
-    { "kss",  FILE_ATTR_AUDIO },
-    { "aac",  FILE_ATTR_AUDIO },
+/* string array for known audio file types (tree_attr == FILE_ATTR_AUDIO) */
+static const char* inbuilt_audio_filetypes[] = {
+    "mp3", "mp2", "mpa", "mp1", "ogg", "oga", "wma", "wmv", "asf", "wav",
+    "flac", "ac3", "a52", "mpc", "wv", "m4a", "m4b", "mp4", "mod", "mpga",
+    "shn", "aif", "aiff", "spx", "opus", "sid", "adx", "nsf", "nsfe", "spc",
+    "ape", "mac", "sap", "rm", "ra", "rmvb", "cmc", "cm3", "cmr", "cms", "dmc",
+    "dlt", "mpt", "mpd", "rmt", "tmc", "tm8", "tm2", "oma", "aa3", "at3", "mmf",
+    "au", "snd", "vox", "w64", "tta", "ay", "vtx", "gbs", "hes", "sgc", "vgm",
+    "vgz", "kss", "aac",
+};
+
+struct filetype_inbuilt {
+    const char* extension;
+    int tree_attr;
+};
+
+/* a table for the known file types, besides audio */
+static const struct filetype_inbuilt inbuilt_filetypes[] = {
     { "m3u",  FILE_ATTR_M3U },
     { "m3u8", FILE_ATTR_M3U },
     { "cfg",  FILE_ATTR_CFG },
@@ -219,17 +169,20 @@ long tree_get_filetype_voiceclip(int attr)
 struct file_type {
     enum themable_icons icon; /* the icon which shall be used for it, NOICON if unknown */
     unsigned char  attr; /* FILE_ATTR_MASK >> 8 */
-    char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
-    char* extension; /* NULL for none */
+    const char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
+    const char* extension; /* NULL for none */
 };
+
 static struct file_type filetypes[MAX_FILETYPES];
-static int custom_filetype_icons[MAX_FILETYPES];
+
+static enum themable_icons custom_filetype_icons[MAX_FILETYPES];
+
 static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
 static int custom_colors[MAX_FILETYPES];
 #endif
 struct filetype_unknown {
-    int icon;
+    enum themable_icons icon;
 #ifdef HAVE_LCD_COLOR
     int color;
 #endif
@@ -269,14 +222,14 @@ static struct buflib_callbacks ops = {
     .shrink_callback = NULL,
 };
 
-static char *filetypes_strdup(char* string)
+static const char *filetypes_strdup(char* string)
 {
     char *buffer = core_get_data(strdup_handle) + strdup_cur_idx;
     strdup_cur_idx += strlcpy(buffer, string, strdup_bufsize-strdup_cur_idx)+1;
     return buffer;
 }
 
-static char *filetypes_store_plugin(char *plugin, int n)
+static const char *filetypes_store_plugin(char *plugin, int n)
 {
     int i;
     /* if the plugin is in the list already, use it. */
@@ -353,7 +306,7 @@ void read_viewer_theme_file(void)
     int fd;
     char *ext, *icon;
     int i;
-    int *icon_dest;
+    enum themable_icons *icon_dest;
     global_status.viewer_icon_count = 0;
     custom_icons_loaded = false;
     custom_filetype_icons[0] = Icon_Folder;
@@ -456,31 +409,43 @@ static void rm_whitespaces(char* str)
     *s = '\0';
 }
 
+static void fill_from_builtin(const char *ext, int tree_attr)
+{
+    size_t icon_count = ARRAY_SIZE(inbuilt_attr_icons_voices);
+    if (filetype_count >= MAX_FILETYPES)
+        return;
+
+    struct file_type *filetype = &filetypes[filetype_count];
+    filetype->icon = unknown_file.icon;
+    filetype->attr   = tree_attr>>8;
+    filetype->plugin = NULL;
+    filetype->extension = ext;
+
+    if (filetype->attr > highest_attr)
+        highest_attr = filetype->attr;
+
+    for (size_t j = icon_count - 1; j < icon_count; j--)
+    {
+        if (tree_attr == inbuilt_attr_icons_voices[j].tree_attr)
+        {
+            filetype->icon = inbuilt_attr_icons_voices[j].icon;
+            break;
+        }
+    }
+    filetype_count++;
+}
+
 static void read_builtin_types_init(void)
 {
-    int tree_attr; 
-    size_t count = ARRAY_SIZE(inbuilt_filetypes);
-    size_t icon_count = ARRAY_SIZE(inbuilt_attr_icons_voices);
-    for(size_t i = 0; (i < count) && (filetype_count < MAX_FILETYPES); i++)
+    for(size_t i = 0; (i < ARRAY_SIZE(inbuilt_audio_filetypes)); i++)
     {
-        filetypes[filetype_count].extension = inbuilt_filetypes[i].extension;
-        filetypes[filetype_count].plugin = NULL;
+        fill_from_builtin(inbuilt_audio_filetypes[i], FILE_ATTR_AUDIO);
+    }
 
-        tree_attr = inbuilt_filetypes[i].tree_attr;
-        filetypes[filetype_count].attr   = tree_attr>>8;
-        if (filetypes[filetype_count].attr > highest_attr)
-            highest_attr = filetypes[filetype_count].attr;
-
-        filetypes[filetype_count].icon = unknown_file.icon;
-        for (size_t j = icon_count - 1; j < icon_count; j--)
-        {
-            if (tree_attr == inbuilt_attr_icons_voices[j].tree_attr)
-            {
-                filetypes[filetype_count].icon = inbuilt_attr_icons_voices[j].icon;
-                break;
-            }
-        }
-        filetype_count++;
+    for(size_t i = 0; (i < ARRAY_SIZE(inbuilt_filetypes)); i++)
+    {
+        fill_from_builtin(inbuilt_filetypes[i].extension,
+                          inbuilt_filetypes[i].tree_attr);
     }
 }
 

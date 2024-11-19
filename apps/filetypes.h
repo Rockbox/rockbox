@@ -51,11 +51,6 @@
 #define FILE_ATTR_LOG   0x1500 /* log file */
 #define FILE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
-struct filetype {
-    char* extension;
-    int tree_attr;
-};
-
 long tree_get_filetype_voiceclip(int attr);
 
 /* init the filetypes structs.
