@@ -125,10 +125,6 @@ struct playlist_search_data
 
 static struct playlist_viewer  viewer;
 
-/* Used when viewing playlists on disk */
-static struct playlist_info temp_playlist;
-static bool temp_playlist_init = false;
-
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
                                  int names_buffer_size)
 {
@@ -367,8 +363,8 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  const char* filename, bool reload,
                                  int *most_recent_selection)
 {
-    char* buffer;
-    size_t buffer_size;
+    char *buffer, *index_buffer = NULL;
+    size_t buffer_size, index_buffer_size = 0;
     bool is_playing = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
     bool have_list = filename || is_playing;
     if (!have_list && (global_status.resume_index != -1))
@@ -390,7 +386,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     }
 
     buffer = plugin_get_buffer(&buffer_size);
-    if (!buffer)
+    if (!buffer || buffer_size <= MAX_PATH)
         return false;
 
     if (!filename)
@@ -403,18 +399,6 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         /* Viewing playlist on disk */
         const char *dir, *file;
         char *temp_ptr;
-        char *index_buffer = NULL;
-        ssize_t index_buffer_size = 0;
-
-        /* Initialize temp playlist
-         * TODO - move this to playlist.c */
-        if (!temp_playlist_init)
-        {
-            mutex_init(&temp_playlist.mutex);
-            temp_playlist_init = true;
-        }
-
-        viewer->playlist = &temp_playlist;
 
         /* Separate directory from filename */
         temp_ptr = strrchr(filename+1,'/');
@@ -433,26 +417,20 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 
         if (is_playing)
         {
-            /* Something is playing, try to accommodate
-            *  global_settings.max_files_in_playlist entries */
-            index_buffer_size = (global_settings.max_files_in_playlist *
-                                 sizeof(*viewer->playlist->indices));
-
-            if ((unsigned)index_buffer_size >= buffer_size - MAX_PATH)
-                index_buffer_size = buffer_size - (MAX_PATH + 1);
-
             index_buffer = buffer;
+            index_buffer_size = playlist_get_index_bufsz(buffer_size - (MAX_PATH + 1));
+
+            buffer += index_buffer_size;
+            buffer_size -= index_buffer_size;
         }
 
-        playlist_create_ex(viewer->playlist, dir, file, index_buffer,
-            index_buffer_size, buffer+index_buffer_size,
-            buffer_size-index_buffer_size);
+        viewer->playlist = playlist_load(dir, file,
+                                         index_buffer, index_buffer_size,
+                                         buffer, buffer_size);
 
+        /* Merge separated dir and filename again */
         if (temp_ptr)
             *temp_ptr = '/';
-
-        buffer += index_buffer_size;
-        buffer_size -= index_buffer_size;
     }
     playlist_buffer_init(&viewer->buffer, buffer, buffer_size);
 

@@ -141,10 +141,10 @@ bool playlist_dynamic_only(void);
 
 /* Exported functions for all playlists.  Pass NULL for playlist_info
    structure to work with current playlist. */
-int playlist_create_ex(struct playlist_info* playlist,
-                       const char* dir, const char* file,
-                       void* index_buffer, int index_buffer_size,
-                       void* temp_buffer, int temp_buffer_size);
+size_t playlist_get_index_bufsz(size_t max_sz);
+struct playlist_info* playlist_load(const char* dir, const char* file,
+                                    void* index_buffer, int index_buffer_size,
+                                    void* temp_buffer, int temp_buffer_size);
 int playlist_set_current(struct playlist_info* playlist);
 void playlist_close(struct playlist_info* playlist);
 void playlist_sync(struct playlist_info* playlist);

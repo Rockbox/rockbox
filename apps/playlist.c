@@ -175,6 +175,8 @@
 #define PLAYLIST_SKIPPED                0x10000000
 
 static struct playlist_info current_playlist;
+static struct playlist_info on_disk_playlist;
+
 /* REPEAT_ONE support function from playback.c */
 extern bool audio_pending_track_skip_is_manual(void);
 static inline bool is_manual_skip(void)
@@ -1941,7 +1943,8 @@ void playlist_init(void)
 {
     int handle;
     struct playlist_info* playlist = &current_playlist;
-    mutex_init(&playlist->mutex);
+    mutex_init(&current_playlist.mutex);
+    mutex_init(&on_disk_playlist.mutex);
 
     strmemccpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
@@ -2005,20 +2008,37 @@ int playlist_amount(void)
     return playlist_amount_ex(NULL);
 }
 
-/*
- * Create a new playlist  If playlist is not NULL then we're loading a
- * playlist off disk for viewing/editing.  The index_buffer is used to store
- * playlist indices (required for and only used if !current playlist).  The
- * temp_buffer (if not NULL) is used as a scratchpad when loading indices.
+/* Return desired index buffer size for loading a playlist from disk,
+ * as determined by the user's 'max files in playlist' setting.
  *
- * XXX: This is really only usable by the playlist viewer. Never pass
- *      playlist == NULL, that cannot and will not work.
+ * Buffer size is constrained by given max_sz.
  */
-int playlist_create_ex(struct playlist_info* playlist,
-                       const char* dir, const char* file,
-                       void* index_buffer, int index_buffer_size,
-                       void* temp_buffer, int temp_buffer_size)
+size_t playlist_get_index_bufsz(size_t max_sz)
 {
+    size_t index_buffer_size = (global_settings.max_files_in_playlist *
+                                sizeof(*on_disk_playlist.indices));
+
+    return index_buffer_size > max_sz ? max_sz : index_buffer_size;
+}
+
+/*
+ * Load a playlist off disk for viewing/editing.
+ * Make sure to close a previously loaded playlist before calling this again!
+ *
+ * The index_buffer is used to store playlist indices. If no index buffer is
+ * provided, the current playlist's index buffer is shared.
+ * FIXME: When using the shared buffer, you must ensure that playback is
+ *        stopped and that no other playlist will be started while this
+ *        one is loaded.
+ *
+ * The temp_buffer (if not NULL) is used as a scratchpad when loading indices.
+ */
+struct playlist_info* playlist_load(const char* dir, const char* file,
+                                    void* index_buffer, int index_buffer_size,
+                                    void* temp_buffer, int temp_buffer_size)
+{
+    struct playlist_info* playlist = &on_disk_playlist;
+
     /* Initialize playlist structure */
     int r = rand() % 10;
 
@@ -2057,11 +2077,11 @@ int playlist_create_ex(struct playlist_info* playlist,
     if (file)
         add_indices_to_playlist(playlist, temp_buffer, temp_buffer_size);
 
-    return 0;
+    return playlist;
 }
 
 /*
- * Create new playlist
+ * Create new (current) playlist
  */
 int playlist_create(const char *dir, const char *file)
 {
