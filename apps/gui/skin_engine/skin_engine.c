@@ -354,19 +354,19 @@ bool dbg_skin_engine(void)
             {
                 simplelist_addline("Skin ID: %d, %zd allocations",
                         i, stats->buflib_handles);
-                simplelist_addline("\tskin: %zd bytes",
-                        stats->tree_size);
-                simplelist_addline("\tImages: %zd bytes",
-                        stats->images_size);
-                simplelist_addline("\tTotal: %zd bytes",
-                        stats->tree_size + stats->images_size);
+                simplelist_addline("\t%s: %zd bytes",
+                        "Skin", stats->tree_size);
+                simplelist_addline("\t%s: %zd bytes",
+                        "Images", stats->images_size);
+                simplelist_addline("\t%s: %zd bytes",
+                        "Total", stats->tree_size + stats->images_size);
                 total += stats->tree_size + stats->images_size;
             }
         }
     }
-    simplelist_addline("Skin total usage: %d bytes", total);
+    simplelist_addline("%s usage: %d bytes", "Skin total", total);
 #if defined(HAVE_BACKDROP_IMAGE)
-    simplelist_addline("Backdrop Images:");
+    simplelist_setline("Backdrop Images:");
     i = 0;
     while (skin_backdrop_get_debug(i++, &path, &ref_count, &bytes)) {
         if (ref_count > 0) {
@@ -379,7 +379,7 @@ bool dbg_skin_engine(void)
             total += bytes;
         }
     }
-    simplelist_addline("Total usage: %d bytes", total);
+    simplelist_addline("%s usage: %d bytes", "Total", total);
 #endif
     return simplelist_show_list(&info);
 }

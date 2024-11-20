@@ -113,14 +113,15 @@ int list_get_nb_lines(struct gui_synclist *list, enum screen_type screen)
 void list_init_item_height(struct gui_synclist *list, enum screen_type screen)
 {
     struct viewport *vp = list->parent[screen];
+    int line_height = font_get(vp->font)->height;
 #ifdef HAVE_TOUCHSCREEN
     /* the 4/12 factor is designed for reasonable item size on a 160dpi screen */
     if (global_settings.list_line_padding == -1)
-        list->line_height[screen] = MAX(lcd_get_dpi()*4/12, (int)font_get(vp->font)->height);
+        list->line_height[screen] = MAX(lcd_get_dpi()*4/12, line_height);
     else
-        list->line_height[screen] = font_get(vp->font)->height + global_settings.list_line_padding;
+        list->line_height[screen] = line_height + global_settings.list_line_padding;
 #else
-    list->line_height[screen] = font_get(vp->font)->height;
+    list->line_height[screen] = line_height;
 #endif
 }
 
@@ -198,27 +199,21 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
                             struct screen * display,
                             struct viewport *vp)
 {
-    int item_offset;
+    int item_offset = gui_list->offset_position[display->screen_type];
 
-    if (global_settings.offset_out_of_view)
+    if (!global_settings.offset_out_of_view)
     {
-        item_offset = gui_list->offset_position[display->screen_type];
-    }
-    else
-    {
+        int view_width = (vp->width - text_pos);
         /* if text is smaller than view */
-        if (item_width <= vp->width - text_pos)
+        if (item_width <= view_width)
         {
             item_offset = 0;
         }
         /* if text got out of view  */
-        else if (gui_list->offset_position[display->screen_type] >
-                    item_width - (vp->width - text_pos))
+        else if (item_offset > item_width - view_width)
         {
-            item_offset = item_width - (vp->width - text_pos);
+            item_offset = item_width - view_width;
         }
-        else
-            item_offset = gui_list->offset_position[display->screen_type];
     }
 
     return item_offset;
@@ -290,24 +285,24 @@ static void edge_beep(struct gui_synclist * gui_list, bool wrap)
 {
     if (gui_list->keyclick)
     {
-        list_speak_item *cb = gui_list->callback_speak_item;
+        enum system_sound sound = SOUND_LIST_EDGE_BEEP_WRAP;
         if (!wrap) /* a bounce */
         {
             static long last_bounce_tick = 0;
             if(TIME_BEFORE(current_tick, last_bounce_tick+HZ/4))
                 return;
             last_bounce_tick = current_tick;
+            sound = SOUND_LIST_EDGE_BEEP_NOWRAP;
         }
         /* Next thing the list code will do is go speak the item, doing
            a talk_shutup() first. Shutup now so the beep is clearer, and
            make sure the subsequent shutup is skipped because otherwise
            it'd kill the pcm buffer. */
-        if (cb) {
+        if (gui_list->callback_speak_item) {
             talk_shutup();
             talk_force_enqueue_next();
-        }
-        system_sound_play(wrap ? SOUND_LIST_EDGE_BEEP_WRAP : SOUND_LIST_EDGE_BEEP_NOWRAP);
-        if (cb) {
+            system_sound_play(sound);
+
             /* On at least x5: if, instead of the above shutup, I insert a
                sleep just after the beep_play() call, to delay the subsequent
                shutup and talk, then in some cases the beep is not played: if
@@ -320,6 +315,8 @@ static void edge_beep(struct gui_synclist * gui_list, bool wrap)
             sleep((40*HZ +999)/1000); // FIXME:  Is this really needed?
             talk_force_shutup();
         }
+        else
+            system_sound_play(sound);
     }
 }
 
@@ -381,22 +378,22 @@ void gui_synclist_select_item(struct gui_synclist * gui_list, int item_number)
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset, bool allow_wrap)
 {
-    int new_selection;
     if (gui_list->selected_size > 1)
     {
         offset *= gui_list->selected_size;
     }
 
-    new_selection = gui_list->selected_item + offset;
+    int new_selection = gui_list->selected_item + offset;
+    int remain = (gui_list->nb_items - gui_list->selected_size);
 
     if (new_selection >= gui_list->nb_items)
     {
-        new_selection = allow_wrap ? 0 : gui_list->nb_items - gui_list->selected_size;
+        new_selection = allow_wrap ? 0 : remain;
         edge_beep(gui_list, allow_wrap);
     }
     else if (new_selection < 0)
     {
-        new_selection = allow_wrap ? gui_list->nb_items - gui_list->selected_size : 0;
+        new_selection = allow_wrap ? remain : 0;
         edge_beep(gui_list, allow_wrap);
     }
 
@@ -804,8 +801,9 @@ bool list_do_action(int context, int timeout,
 /* Simple use list implementation */
 static int simplelist_line_count = 0, simplelist_line_remaining;
 static int simplelist_line_pos;
-static char simplelist_buffer[SIMPLELIST_MAX_LINES * SIMPLELIST_MAX_LINELENGTH];
-static char *simplelist_text[SIMPLELIST_MAX_LINES];
+/* buffer shared with bitmap/list code */
+char simplelist_buffer[SIMPLELIST_MAX_LINES * SIMPLELIST_MAX_LINELENGTH];
+static const char *simplelist_text[SIMPLELIST_MAX_LINES];
 /* set the amount of lines shown in the list */
 void simplelist_set_line_count(int lines)
 {
@@ -815,7 +813,7 @@ void simplelist_set_line_count(int lines)
         simplelist_line_count = 0;
     }
     else if (lines < simplelist_line_count) {
-        char *end = simplelist_text[lines];
+        const char *end = simplelist_text[lines];
         simplelist_line_pos = end - simplelist_buffer;
         simplelist_line_remaining = sizeof(simplelist_buffer) - simplelist_line_pos;
         simplelist_line_count = lines;
@@ -826,6 +824,16 @@ int simplelist_get_line_count(void)
 {
     return simplelist_line_count;
 }
+
+/* set/edit a line pointer in the list. */
+void simplelist_setline(const char *text)
+{
+    int line_number = simplelist_line_count++;
+    if (simplelist_line_count >= SIMPLELIST_MAX_LINES)
+        simplelist_line_count = 0;
+    simplelist_text[line_number] = text;
+}
+
 /* add/edit a line in the list.
    if line_number > number of lines shown it adds the line,
    else it edits the line */
@@ -833,11 +841,12 @@ void simplelist_addline(const char *fmt, ...)
 {
     va_list ap;
     size_t len = simplelist_line_remaining;
-    int line_number = simplelist_line_count++;
 
-    simplelist_text[line_number] = &simplelist_buffer[simplelist_line_pos];
+    char *bufpos = &simplelist_buffer[simplelist_line_pos];
+    simplelist_setline(bufpos);
+
     va_start(ap, fmt);
-    len = vsnprintf(simplelist_text[line_number], simplelist_line_remaining, fmt, ap);
+    len = vsnprintf(bufpos, simplelist_line_remaining, fmt, ap);
     va_end(ap);
     len++;
     simplelist_line_remaining -= len;
@@ -850,6 +859,8 @@ static const char* simplelist_static_getname(int item,
                                              size_t buffer_len)
 {
     (void)data; (void)buffer; (void)buffer_len;
+    /* Note: buffer shouldn't be used..
+     *  simplelist_buffer[] is already referenced by simplelist_text[] */
     return simplelist_text[item];
 }
 
@@ -858,10 +869,18 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
     list_get_name *getname;
+    int line_count;
+
     if (info->get_name)
+    {
         getname = info->get_name;
+        line_count = info->count;
+    }
     else
+    {
         getname = simplelist_static_getname;
+        line_count = simplelist_line_count;
+    }
 
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, !info->hide_theme, NULL);
@@ -871,13 +890,11 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     if (info->title)
         gui_synclist_set_title(&lists, info->title, info->title_icon);
-    if (info->get_icon)
-        gui_synclist_set_icon_callback(&lists, info->get_icon);
-    if (info->get_talk)
-        gui_synclist_set_voice_callback(&lists, info->get_talk);
+
+    gui_synclist_set_icon_callback(&lists, info->get_icon);
+    gui_synclist_set_voice_callback(&lists, info->get_talk);
 #ifdef HAVE_LCD_COLOR
-    if (info->get_color)
-        gui_synclist_set_color_callback(&lists, info->get_color);
+    gui_synclist_set_color_callback(&lists, info->get_color);
     if (info->selection_color)
         gui_synclist_set_sel_color(&lists, info->selection_color);
 #endif
@@ -885,11 +902,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     if (info->action_callback)
         info->action_callback(ACTION_REDRAW, &lists);
 
-    if (info->get_name == NULL)
-        gui_synclist_set_nb_items(&lists,
-                simplelist_line_count*info->selection_size);
-    else
-        gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
+    gui_synclist_set_nb_items(&lists, line_count*info->selection_size);
 
     gui_synclist_select_item(&lists, info->selection);
 

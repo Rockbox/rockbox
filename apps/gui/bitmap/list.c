@@ -324,14 +324,15 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         /* do the text */
         enum themable_icons icon;
         unsigned const char *s;
-        char entry_buffer[MAX_PATH];
+        extern char simplelist_buffer[SIMPLELIST_MAX_LINES * SIMPLELIST_MAX_LINELENGTH];
+        /*char entry_buffer[MAX_PATH]; use the buffer from gui/list.c instead */
         unsigned char *entry_name;
         int line = i - start;
         int line_indent = 0;
         int style = STYLE_DEFAULT;
         bool is_selected = false;
-        s = list->callback_get_item_name(i, list->data, entry_buffer,
-                                         sizeof(entry_buffer));
+        s = list->callback_get_item_name(i, list->data, simplelist_buffer,
+                                         sizeof(simplelist_buffer));
         if (P2ID((unsigned char *)s) > VOICEONLY_DELIMITER)
             entry_name = "";
         else

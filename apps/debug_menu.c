@@ -1380,7 +1380,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         }
         else if (card->initialized == 0)
         {
-            simplelist_addline("Not Found!");
+            simplelist_setline("Not Found!");
         }
 #if (CONFIG_STORAGE & STORAGE_SD)
         else /* card->initialized < 0 */
@@ -1494,7 +1494,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                  (identify_info[64] & (1<<1))     , &atanums[4*2]);
     }
     else {
-        simplelist_addline(
+        simplelist_setline(
                  "No PIO mode info");
     }
     timing_info_present = identify_info[53] & (1<<1);
@@ -1504,7 +1504,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                  identify_info[67],
                  identify_info[68] );
     } else {
-        simplelist_addline(
+        simplelist_setline(
                  "No timing info");
     }
 
@@ -1521,7 +1521,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                  identify_info[66] );
     }
     else {
-        simplelist_addline(
+        simplelist_setline(
                 "No MDMA mode info");
     }
     if (identify_info[53] & (1<<2)) {
@@ -1536,8 +1536,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                  (identify_info[88] & (1<<6)) >> 5, &atanums[6*2]);
     }
     else {
-        simplelist_addline(
-                "No UDMA mode info");
+        simplelist_setline("No UDMA mode info");
     }
 #endif /* HAVE_ATA_DMA */
     timing_info_present = identify_info[53] & (1<<1);
@@ -1549,19 +1548,16 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         simplelist_addline(
                 "IORDY disable: %s", i ? "yes" : "no");
     } else {
-        simplelist_addline(
-                "No timing info");
+        simplelist_setline("No timing info");
     }
     simplelist_addline(
              "Cluster size: %d bytes", volume_get_cluster_size(IF_MV(0)));
 #ifdef HAVE_ATA_DMA
     i = ata_get_dma_mode();
     if (i == 0) {
-        simplelist_addline(
-                 "DMA not enabled");
+        simplelist_setline("DMA not enabled");
     } else if (i == 0xff) {
-        simplelist_addline(
-                 "CE-ATA mode");
+        simplelist_setline("CE-ATA mode");
     } else {
         simplelist_addline(
                  "DMA mode: %s %c",
@@ -1759,7 +1755,7 @@ static int ata_smart_callback(int btn, struct gui_synclist *lists)
         {
             int i;
             char buf[SIMPLELIST_MAX_LINELENGTH];
-            simplelist_addline("Id  Name:  Current,Worst  Raw");
+            simplelist_setline("Id  Name:  Current,Worst  Raw");
             for (i = 0; i < NUMBER_ATA_SMART_ATTRIBUTES; i++)
             {
                 if (ata_smart_attr_to_string(
@@ -1936,7 +1932,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
 
     simplelist_addline("Initialized: %s",
              stat->initialized ? "Yes" : "No");
-    simplelist_addline("DB Ready: %s",
+    simplelist_addline("DB %s: %s", "Ready",
              stat->ready ? "Yes" : "No");
     simplelist_addline("DB Path: %s", stat->db_path);
     simplelist_addline("RAM Cache: %s",
@@ -1945,10 +1941,11 @@ static int database_callback(int btn, struct gui_synclist *lists)
              stat->ramcache_used, stat->ramcache_allocated);
     simplelist_addline("Total entries: %d",
                        stat->total_entries);
-    simplelist_addline("Progress: %d%% (%d entries)",
-             stat->progress, stat->processed_entries);
-    simplelist_addline("Curfile: %s",
-                       stat->curentry ? stat->curentry : "---");
+    simplelist_setline("Progress:");
+    simplelist_addline(" %d%% (%d entries)",
+                       stat->progress, stat->processed_entries);
+    simplelist_setline("Curfile:");
+    simplelist_addline(" %s", stat->curentry ? stat->curentry : "---");
     simplelist_addline("Commit step: %d",
              stat->commit_step);
     simplelist_addline("Commit delayed: %s",
@@ -2165,7 +2162,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 #if (CONFIG_TUNER & TEA5767)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
-    simplelist_addline("Philips regs:");
+    simplelist_setline("Philips regs:");
     simplelist_addline(
              "   %s: %02X %02X %02X %02X %02X", "Read",
              (unsigned)nfo.read_regs[0], (unsigned)nfo.read_regs[1],
@@ -2182,7 +2179,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct si4700_dbg_info nfo;
         si4700_dbg_info(&nfo);
-        simplelist_addline("SI4700 regs:");
+        simplelist_setline("SI4700 regs:");
         for (int i = 0; i < 16; i += 4) {
             simplelist_addline("%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
@@ -2194,7 +2191,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct rda5802_dbg_info nfo;
         rda5802_dbg_info(&nfo);
-        simplelist_addline("RDA5802 regs:");
+        simplelist_setline("RDA5802 regs:");
         for (int i = 0; i < 16; i += 4) {
             simplelist_addline("%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
@@ -2206,7 +2203,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct stfm1000_dbg_info nfo;
         stfm1000_dbg_info(&nfo);
-        simplelist_addline("STFM1000 regs:");
+        simplelist_setline("STFM1000 regs:");
         simplelist_addline("chipid: 0x%lx", nfo.chipid);
     }
 #endif /* STFM1000 */
@@ -2215,7 +2212,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct tea5760_dbg_info nfo;
         tea5760_dbg_info(&nfo);
-        simplelist_addline("TEA5760 regs:");
+        simplelist_setline("TEA5760 regs:");
         for (int i = 0; i < 16; i += 4) {
             simplelist_addline("%02X: %02X %02X %02X %02X",
                 i, nfo.read_regs[i], nfo.read_regs[i+1], nfo.read_regs[i+2], nfo.read_regs[i+3]);
@@ -2464,69 +2461,49 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-static const char* dbg_talk_get_name(int selected_item, void *data,
-                                     char *buffer, size_t buffer_len)
-{
-    struct talk_debug_data *talk_data = data;
-    switch(selected_item)
-    {
-        case 0:
-            if (talk_data->status != TALK_STATUS_ERR_NOFILE)
-                snprintf(buffer, buffer_len, "Current voice file: %s",
-                            talk_data->voicefile);
-            else
-                buffer = "No voice information available";
-            break;
-        case 1:
-            if (talk_data->status != TALK_STATUS_OK)
-                snprintf(buffer, buffer_len, "Talk Status: ERR (%i)",
-                            talk_data->status);
-            else
-                buffer = "Talk Status: OK";
-            break;
-        case 2:
-            snprintf(buffer, buffer_len, "Number of (empty) clips in voice file: (%d) %d",
-                    talk_data->num_empty_clips, talk_data->num_clips);
-            break;
-        case 3:
-            snprintf(buffer, buffer_len, "Min/Avg/Max size of clips: %d / %d / %d",
-                    talk_data->min_clipsize, talk_data->avg_clipsize, talk_data->max_clipsize);
-            break;
-        case 4:
-            snprintf(buffer, buffer_len, "Memory allocated: %ld.%02ld KB",
-                    talk_data->memory_allocated / 1024, talk_data->memory_allocated % 1024);
-            break;
-        case 5:
-            snprintf(buffer, buffer_len, "Memory used: %ld.%02ld KB",
-                    talk_data->memory_used / 1024, talk_data->memory_used % 1024);
-            break;
-        case 6:
-            snprintf(buffer, buffer_len, "Number of clips in cache: %d",
-                    talk_data->cached_clips);
-            break;
-        case 7:
-            snprintf(buffer, buffer_len, "Cache hits / misses: %d / %d",
-                    talk_data->cache_hits, talk_data->cache_misses);
-            break;
-        default:
-            buffer = "TODO";
-            break;
-    }
-
-    return buffer;
-}
-
 static bool dbg_talk(void)
 {
     struct simplelist_info list;
     struct talk_debug_data data;
-    if (talk_get_debug_data(&data))
-        simplelist_info_init(&list, "Voice Information:", 8, &data);
-    else
-        simplelist_info_init(&list, "Voice Information:", 2, &data);
+    talk_get_debug_data(&data);
+
+    simplelist_info_init(&list, "Voice Information:", 1, NULL);
+
     list.scroll_all = true;
     list.timeout = HZ;
-    list.get_name = dbg_talk_get_name;
+    //list.get_name = dbg_talk_get_name;
+
+    simplelist_set_line_count(0);
+
+    simplelist_setline("Current voice file:"); 
+    if (data.status != TALK_STATUS_ERR_NOFILE)
+        simplelist_addline(" %s", data.voicefile);
+    else
+        simplelist_setline(" No voice information available");
+
+    if (data.status != TALK_STATUS_OK)
+    {
+        simplelist_addline("Talk Status: ERR (%i)",
+                    data.status);
+        return simplelist_show_list(&list);
+    }
+    else
+        simplelist_setline("Talk Status: OK");
+    simplelist_setline("Number of (empty) clips in voice file:");
+    simplelist_addline(" (%d) %d", data.num_empty_clips, data.num_clips);
+    simplelist_setline("Min/Avg/Max size of clips:");
+    simplelist_addline(" %d / %d / %d",
+                    data.min_clipsize, data.avg_clipsize, data.max_clipsize);
+    simplelist_setline("Memory allocated:");
+    simplelist_addline(" %ld.%02ld KB",
+                    data.memory_allocated / 1024, data.memory_allocated % 1024);
+    simplelist_addline("Memory used:");
+    simplelist_addline(" %ld.%02ld KB",
+                       data.memory_used / 1024, data.memory_used % 1024);
+    simplelist_setline("Number of clips in cache:");
+    simplelist_addline(" %d", data.cached_clips);
+    simplelist_setline("Cache hits / misses:");
+    simplelist_addline("%d / %d", data.cache_hits, data.cache_misses);
 
     return simplelist_show_list(&list);
 }
@@ -2605,14 +2582,14 @@ static bool dbg_boot_data(void)
 
     if (!boot_data_valid)
     {
-        simplelist_addline("Boot data invalid");
+        simplelist_setline("Boot data invalid");
         simplelist_addline("Magic[0]: %08lx", boot_data.magic[0]);
         simplelist_addline("Magic[1]: %08lx", boot_data.magic[1]);
         simplelist_addline("Length: %lu", boot_data.length);
     }
     else
     {
-        simplelist_addline("Boot data valid");
+        simplelist_setline("Boot data valid");
         simplelist_addline("Version: %d", (int)boot_data.version);
 
         if (boot_data.version == 0)
@@ -2624,10 +2601,11 @@ static bool dbg_boot_data(void)
             simplelist_addline("Boot drive: %d", (int)boot_data.boot_drive);
             simplelist_addline("Boot partition: %d", (int)boot_data.boot_partition);
         }
-        simplelist_addline("Boot path: %s%s/%s", root_realpath(), BOOTDIR, BOOTFILE);
+        simplelist_setline("Boot path:");
+        simplelist_addline(" %s%s/%s", root_realpath(), BOOTDIR, BOOTFILE);
     }
 
-    simplelist_addline("Bootdata RAW:");
+    simplelist_setline("Bootdata RAW:");
     for (size_t i = 0; i < boot_data.length; i += 4)
     {
         simplelist_addline("%02x: %02x %02x %02x %02x", i,
@@ -2647,13 +2625,13 @@ static bool dbg_device_data(void)
     simplelist_info_init(&info, "Device data", 1, NULL);
     simplelist_set_line_count(0);
 
-    simplelist_addline("Device data");
+    simplelist_setline("Device data");
 
 #if defined(EROS_QN)
     simplelist_addline("Lcd Version: %d", (int)device_data.lcd_version);
 #endif
 
-    simplelist_addline("Device data RAW:");
+    simplelist_setline("Device data RAW:");
     for (size_t i = 0; i < device_data.length; i += 4)
     {
         simplelist_addline("%02x: %02x %02x %02x %02x", i,
@@ -2683,7 +2661,7 @@ static bool dbg_syscfg(void) {
     bootflash_read(SPI_PORT, 0, syscfg_hdr_size, &syscfg_hdr);
 
     if (syscfg_hdr.magic != SYSCFG_MAGIC) {
-        simplelist_addline("SCfg magic not found");
+        simplelist_setline("SCfg magic not found");
         bootflash_close(SPI_PORT);
         return simplelist_show_list(&info);
     }

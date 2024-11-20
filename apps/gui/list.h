@@ -313,7 +313,7 @@ void simplelist_set_line_count(int lines);
 int simplelist_get_line_count(void);
 /* add a line in the list. */
 void simplelist_addline(const char *fmt, ...) ATTRIBUTE_PRINTF(1,2);
-
+void simplelist_setline(const char *text);
 /* setup the info struct. members not setup in this function need to be assigned manually
    members set in this function:
     info.selection_size = 1;
