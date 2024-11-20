@@ -25,11 +25,11 @@
 #include "system.h"
 
 #include "uart-target.h"
-#include "uc870x.h"
+#include "uc87xx.h"
 
 
 /*
- * UC870x: UART controller for s5l870x
+ * UC87xx: UART controller for s5l87xx
  */
 
 /* Rx related INTs */
@@ -242,7 +242,7 @@ bool uartc_port_tx_ready(struct uartc_port *port)
 void uartc_port_tx_byte(struct uartc_port *port, uint8_t ch)
 {
     UTXH(port->baddr) = ch;
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
     port->n_tx_bytes++;
 #endif
 }
@@ -327,7 +327,7 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
         if (ints & UTRSTAT_AUTOBR_INT_BIT)
         {
             if (uartc_port_abr_status(port) == UABRSTAT_STATUS_COUNTING) {
-                #ifdef UC870X_DEBUG
+                #ifdef UC87XX_DEBUG
                 if (_UCON_RD(baddr) & UCON_AUTOBR_START_BIT) port->n_abnormal0++;
                 else port->n_abnormal1++;
                 #endif
@@ -365,7 +365,7 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
         port->rx_cb(len, port->rx_data, port->rx_err);
 #endif
 
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
         if (len) {
             port->n_rx_bytes += len;
             if (port->rx_err[0] & UERSTAT_OVERRUN_BIT)
@@ -393,7 +393,7 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
 }
 
 
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
@@ -506,4 +506,4 @@ int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt)
     return status;
 }
 #endif /* UART_CAP_AUTOBAUD */
-#endif /* UC870X_DEBUG */
+#endif /* UC87XX_DEBUG */

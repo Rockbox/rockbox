@@ -741,7 +741,7 @@
 
 
 /////UART/////
-/* s5l8702 UC870X HW: 1 UARTC, 4 ports */
+/* s5l8702 UC87XX HW: 1 UARTC, 4 ports */
 #define UARTC_BASE_ADDR     0x3CC00000
 #define UARTC_N_PORTS       4
 #define UARTC_PORT_OFFSET   0x4000

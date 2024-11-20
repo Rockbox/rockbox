@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __UC870X_H__
-#define __UC870X_H__
+#ifndef __UC87XX_H__
+#define __UC87XX_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -30,10 +30,10 @@
 
 
 /*
- * UC870x: UART controller for s5l870x
+ * UC87xx: UART controller for s5l87xx
  *
  * This UART is similar to the UART described in s5l8700 datasheet,
- * (see also s3c2416 and s3c6400 datasheets). On s5l8701+ the UC870x
+ * (see also s3c2416 and s3c6400 datasheets). On s5l8701+ the UC87xx
  * includes autobauding, and fine tuning for Tx/Rx speed on s5l8702+.
  */
 #if (CONFIG_CPU == S5L8701)
@@ -310,7 +310,7 @@ struct uartc_port
     bool abr_aborted;
 #endif
 
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
     uint32_t n_tx_bytes;
     uint32_t n_rx_bytes;
     uint32_t n_ovr_err;
@@ -321,12 +321,12 @@ struct uartc_port
     uint32_t n_abnormal0;
     uint32_t n_abnormal1;
 #endif /* UART_CAP_AUTOBAUD */
-#endif /* UC870X_DEBUG */
+#endif /* UC87XX_DEBUG */
 };
 
 
 /*
- * uc870x low level API
+ * uc87xx low level API
  */
 
 /* Initialization */
@@ -365,7 +365,7 @@ void uartc_port_abr_stop(struct uartc_port *port);
 void uartc_callback(const struct uartc *uartc, int port_id);
 
 /* Debug */
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
 void uartc_port_get_line_info(struct uartc_port *port,
                 int *tx_status, int *rx_status,
                 int *tx_speed, int *rx_speed, char *line_cfg);
@@ -380,6 +380,6 @@ enum {
 
 int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt);
 #endif /* UART_CAP_AUTOBAUD */
-#endif /* UC870X_DEBUG */
+#endif /* UC87XX_DEBUG */
 
-#endif /* __UC870X_H__ */
+#endif /* __UC87XX_H__ */

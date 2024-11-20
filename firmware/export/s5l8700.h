@@ -620,7 +620,7 @@
 
 /* 25. UART */
 #if CONFIG_CPU==S5L8701
-/* s5l8701 UC870X HW: 3 UARTC, 1 port per UARTC */
+/* s5l8701 UC87XX HW: 3 UARTC, 1 port per UARTC */
 #define S5L8701_N_UARTC         3
 #define S5L8701_N_PORTS         3
 
@@ -635,7 +635,7 @@
 #define UARTC2_PORT_OFFSET      0x0
 
 #else
-/* s5l8700 UC870X HW: 1 UARTC, 2 ports */
+/* s5l8700 UC87XX HW: 1 UARTC, 2 ports */
 #define S5L8700_N_UARTC         1
 #define S5L8700_N_PORTS         2
 

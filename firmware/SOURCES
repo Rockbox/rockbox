@@ -1544,7 +1544,7 @@ target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
 target/arm/s5l8700/usb-s5l8701.c
 #ifdef HAVE_SERIAL
-target/arm/uc870x.c
+target/arm/uc87xx.c
 target/arm/s5l8700/uart-s5l8701.c
 target/arm/s5l8700/ipodnano2g/serial-nano2g.c
 #endif
@@ -1583,7 +1583,7 @@ target/arm/s5l8702/ipod6g/adc-6g.c
 target/arm/s5l8702/usb-s5l8702.c
 #endif
 #ifdef HAVE_SERIAL
-target/arm/uc870x.c
+target/arm/uc87xx.c
 target/arm/s5l8702/uart-s5l8702.c
 target/arm/s5l8702/ipod6g/serial-6g.c
 #endif

@@ -34,7 +34,7 @@
 #endif
 #ifdef HAVE_SERIAL
 #include "uart-target.h"
-#include "uc870x.h"
+#include "uc87xx.h"
 #endif
 
 #define DEBUG_CANCEL BUTTON_MENU
@@ -53,7 +53,7 @@ bool dbg_hw_info(void)
     int i;
 #ifdef IPOD_NANO2G
     unsigned int state = 0;
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
     const unsigned int max_states=3;
 #else
     const unsigned int max_states=2;
@@ -131,7 +131,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("backlight: %s", pmu_read(0x29) ? "on" : "off");
             _DEBUG_PRINTF("brightness value: %d", pmu_read(0x28));
         }
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
         else if(state==2)
         {
             extern struct uartc_port ser_port;

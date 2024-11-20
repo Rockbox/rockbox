@@ -25,11 +25,11 @@
 #include "system.h"
 
 #include "s5l8700.h"
-#include "uc870x.h"
+#include "uc87xx.h"
 
 
 /*
- * s5l8701 UC870X HW: 3 UARTC, 1 port per UARTC
+ * s5l8701 UC87XX HW: 3 UARTC, 1 port per UARTC
  */
 static struct uartc_port *uartc0_port_l[UARTC0_N_PORTS];
 const struct uartc s5l8701_uartc0 =

@@ -34,7 +34,7 @@
 #include "pcm-target.h"
 #ifdef HAVE_SERIAL
 #include "uart-target.h"
-#include "uc870x.h"
+#include "uc87xx.h"
 #endif
 #include "clocking-s5l8702.h"
 
@@ -53,7 +53,7 @@ bool dbg_hw_info(void)
     int line;
     int i;
     unsigned int state = 0;
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
     const unsigned int max_states=3;
 #else
     const unsigned int max_states=2;
@@ -145,7 +145,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("USB D-: %d mV", adc_read_usbdata_voltage(false));
             line++;
         }
-#ifdef UC870X_DEBUG
+#ifdef UC87XX_DEBUG
         else if(state==(max_states-1))
         {
             extern struct uartc_port ser_port;

@@ -22,7 +22,7 @@
 #define __UART_TARGET_H__
 
 /* Define this to show debug data on "View HW Info" */
-/* #define UC870X_DEBUG */
+/* #define UC87XX_DEBUG */
 
 void uart_init(void);
 
