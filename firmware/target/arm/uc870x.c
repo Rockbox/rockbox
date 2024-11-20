@@ -32,25 +32,28 @@
  * UC870x: UART controller for s5l870x
  */
 
-/* Rx related masks */
-#if CONFIG_CPU == S5L8700
-#define UTRSTAT_RX_RELATED_INTS (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT)
-#define UCON_RX_RELATED_INTS    (UCON_RX_INT_BIT | UCON_ERR_INT_BIT)
-
-#elif CONFIG_CPU == S5L8701
-#define UTRSTAT_RX_RELATED_INTS \
-        (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT | UTRSTAT_AUTOBR_INT_BIT)
-#define UCON_RX_RELATED_INTS \
-        (UCON_RX_INT_BIT | UCON_ERR_INT_BIT | UCON_AUTOBR_INT_BIT)
-
-#else /* CONFIG_CPU == S5L8702 */
-#define UTRSTAT_RX_RELATED_INTS \
-        (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT | \
-        UTRSTAT_AUTOBR_INT_BIT | UTRSTAT_RX_TOUT_INT_BIT)
-#define UCON_RX_RELATED_INTS \
-        (UCON_RX_INT_BIT | UCON_ERR_INT_BIT | \
-        UCON_AUTOBR_INT_BIT | UCON_RX_TOUT_INT_BIT)
+/* Rx related INTs */
+#ifdef UART_CAP_AUTOBAUD
+#define AUTOBAUD_UTRSTAT_INT    UTRSTAT_AUTOBR_INT_BIT
+#define AUTOBAUD_UCON_INT       UCON_AUTOBR_INT_BIT
+#else
+#define AUTOBAUD_UTRSTAT_INT    0
+#define AUTOBAUD_UCON_INT       0
 #endif
+
+#ifdef UART_CAP_FINETUNE
+#define FINETUNE_UTRSTAT_INT    UTRSTAT_RX_TOUT_INT_BIT
+#define FINETUNE_UCON_INT       UCON_RX_TOUT_INT_BIT
+#else
+#define FINETUNE_UTRSTAT_INT    0
+#define FINETUNE_UCON_INT       0
+#endif
+
+#define UTRSTAT_RX_INTS   (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT | \
+                          AUTOBAUD_UTRSTAT_INT | FINETUNE_UTRSTAT_INT)
+                                
+#define UCON_RX_INTS      (UCON_RX_INT_BIT | UCON_ERR_INT_BIT | \
+                          AUTOBAUD_UCON_INT | FINETUNE_UCON_INT)
 
 #define UART_PORT_BASE(u,i)     (((u)->baddr) + (u)->port_off * (i))
 
@@ -68,7 +71,7 @@ static void uartc_reset_port_id(const struct uartc* uartc, int port_id)
     UFCON(baddr) = UFCON_RX_FIFO_RST_BIT | UFCON_TX_FIFO_RST_BIT;
     UTRSTAT(baddr) = ~0; /* clear all interrupts */
     UBRDIV(baddr) = 0;
-#if CONFIG_CPU == S5L8702
+#ifdef UART_CAP_FINETUNE
     UBRCONTX(baddr) = 0;
     UBRCONRX(baddr) = 0;
 #endif
@@ -119,14 +122,14 @@ void uartc_port_open(struct uartc_port *port)
     UCON(baddr) = (UCON_MODE_DISABLED << UCON_RX_MODE_POS)
                 | (UCON_MODE_DISABLED << UCON_TX_MODE_POS)
                 | ((port->clksel & UCON_CLKSEL_MASK) << UCON_CLKSEL_POS)
-                | (port->rx_cb ? UCON_RX_RELATED_INTS|UCON_RX_TOUT_EN_BIT : 0)
+                | (port->rx_cb ? UCON_RX_INTS|UCON_RX_TOUT_EN_BIT : 0)
                 | (port->tx_cb ? UCON_TX_INT_BIT : 0);
 
     /* init and register port struct */
     port->baddr = baddr;
-    port->utrstat_int_mask = (port->rx_cb ? UTRSTAT_RX_RELATED_INTS : 0)
+    port->utrstat_int_mask = (port->rx_cb ? UTRSTAT_RX_INTS : 0)
                            | (port->tx_cb ? UTRSTAT_TX_INT_BIT : 0);
-#if CONFIG_CPU != S5L8700
+#ifdef UART_CAP_AUTOBAUD
     port->abr_aborted = 0;
 #endif
     uartc->port_l[port->id] = port;
@@ -156,7 +159,7 @@ void uartc_port_set_bitrate_raw(struct uartc_port *port, uint32_t brdata)
 {
     uint32_t baddr = port->baddr;
     UBRDIV(baddr) = brdata & 0xff;
-#if CONFIG_CPU == S5L8702
+#ifdef UART_CAP_FINETUNE
     UBRCONRX(baddr) = brdata >> 8;
     UBRCONTX(baddr) = brdata >> 8;
 #endif
@@ -174,7 +177,7 @@ void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
 
     uint32_t brdata = brdiv - 1;
 
-#if CONFIG_CPU == S5L8702
+#ifdef UART_CAP_FINETUNE
     /* Fine adjust:
      *
      * Along the whole frame, insert/remove "jittered" bauds when needed
@@ -210,7 +213,7 @@ void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
     }
 
     brdata |= (brcon << 8);
-#endif /* CONFIG_CPU == S5L8702 */
+#endif /* UART_CAP_FINETUNE */
 
     uartc_port_set_rawbr(port, brdata);
 }
@@ -269,7 +272,7 @@ uint8_t uartc_port_read_byte(struct uartc_port *port)
     return uartc_port_rx_byte(port);
 }
 
-#if CONFIG_CPU != S5L8700
+#ifdef UART_CAP_AUTOBAUD
 /* Autobauding */
 static inline int uartc_port_abr_status(struct uartc_port *port)
 {
@@ -300,7 +303,7 @@ void uartc_port_abr_stop(struct uartc_port *port)
     else
         UCON(port->baddr) = _UCON_RD(port->baddr) & ~UCON_AUTOBR_START_BIT;
 }
-#endif /* CONFIG_CPU != S5L8700 */
+#endif /* UART_CAP_AUTOBAUD */
 
 /* ISR */
 void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
@@ -315,10 +318,10 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
        this ISR will be processed in the next call */
     UTRSTAT(baddr) = ints;
 
-    if (ints & UTRSTAT_RX_RELATED_INTS)
+    if (ints & UTRSTAT_RX_INTS)
     {
         int len = 0;
-#if CONFIG_CPU != S5L8700
+#ifdef UART_CAP_AUTOBAUD
         uint32_t abr_cnt = 0;
 
         if (ints & UTRSTAT_AUTOBR_INT_BIT)
@@ -335,8 +338,8 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
                 abr_cnt = UABRCNT(baddr);
         }
 
-        if (ints & (UTRSTAT_RX_RELATED_INTS ^ UTRSTAT_AUTOBR_INT_BIT))
-#endif /* CONFIG_CPU != S5L8700 */
+        if (ints & (UTRSTAT_RX_INTS ^ UTRSTAT_AUTOBR_INT_BIT))
+#endif /* UART_CAP_AUTOBAUD */
         {
             /* get FIFO count */
             uint32_t ufstat = UFSTAT(baddr);
@@ -355,11 +358,11 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
          * When overrun, it is marked on the first error:
          * overrun = len ? (rx_err[0] & UERSTAT_OVERRUN_BIT) : 0
          */
-#if CONFIG_CPU == S5L8700
-        port->rx_cb(len, port->rx_data, port->rx_err);
-#else
+#ifdef UART_CAP_AUTOBAUD
         /* 'abr_cnt' is zero when no ABR interrupt exists */
         port->rx_cb(len, port->rx_data, port->rx_err, abr_cnt);
+#else
+        port->rx_cb(len, port->rx_data, port->rx_err);
 #endif
 
 #ifdef UC870X_DEBUG
@@ -394,7 +397,7 @@ void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-#if CONFIG_CPU == S5L8702
+#ifdef UART_CAP_FINETUNE
 static int get_bitrate(int uclk, int brdiv, int brcon, int frame_len)
 {
     logf("get_bitrate(%d, %d, 0x%08x, %d)", uclk, brdiv, brcon, frame_len);
@@ -426,7 +429,7 @@ static int get_bitrate(int uclk, int brdiv, int brcon, int frame_len)
 
     return avg_speed;
 }
-#endif /* CONFIG_CPU == S5L8702 */
+#endif /* UART_CAP_FINETUNE */
 
 void uartc_port_get_line_info(struct uartc_port *port,
                 int *tx_status, int *rx_status,
@@ -446,7 +449,7 @@ void uartc_port_get_line_info(struct uartc_port *port,
     int parity = (ulcon >> ULCON_PARITY_POS) & ULCON_PARITY_MASK;
 
     uint32_t brdiv = UBRDIV(baddr) + 1;
-#if CONFIG_CPU == S5L8702
+#ifdef UART_CAP_FINETUNE
     int frame_len = 1 + n_data + (parity ? 1 : 0) + n_stop;
     if (tx_speed)
         *tx_speed = get_bitrate(port->clkhz, brdiv, UBRCONTX(baddr), frame_len);
@@ -471,7 +474,7 @@ void uartc_port_get_line_info(struct uartc_port *port,
     }
 }
 
-#if CONFIG_CPU != S5L8700
+#ifdef UART_CAP_AUTOBAUD
 /* Autobauding */
 int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt)
 {
@@ -502,5 +505,5 @@ int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt)
 
     return status;
 }
-#endif /* CONFIG_CPU != S5L8700 */
+#endif /* UART_CAP_AUTOBAUD */
 #endif /* UC870X_DEBUG */
