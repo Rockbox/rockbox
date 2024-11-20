@@ -59,8 +59,8 @@
 #define IBSS_ATTR_WMA_XL_IRAM
 #define ICONST_ATTR_WMA_XL_IRAM
 
-#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
-/* S5L870x has even more IRAM. Use it. */
+#elif defined(CPU_S5L87XX)
+/* S5L87xx has even more IRAM. Use it. */
 #define IBSS_ATTR_WMA_LARGE_IRAM IBSS_ATTR
 #define IBSS_ATTR_WMA_XL_IRAM    IBSS_ATTR
 #define ICONST_ATTR_WMA_XL_IRAM  ICONST_ATTR

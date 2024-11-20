@@ -24,8 +24,8 @@
 #include "codeclib.h"
 
 #if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || \
-    (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
-/* PP5022/24, MCF5250 and S5L870x have larger IRAM */
+    (CONFIG_CPU == MCF5250) || defined(CPU_S5L87XX)
+/* PP5022/24, MCF5250 and S5L87xx have larger IRAM */
 #define IBSS_ATTR_LARGE_IRAM    IBSS_ATTR
 #define ICODE_ATTR_LARGE_IRAM   ICODE_ATTR
 #define ICONST_ATTR_LARGE_IRAM  ICONST_ATTR

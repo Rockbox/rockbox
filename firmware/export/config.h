@@ -666,9 +666,9 @@ Lyre prototype 1 */
 #define CPU_PP502x
 #endif
 
-/* define for all cpus from S5L870X family */
+/* define for all cpus from S5L87XX family */
 #if (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701) || (CONFIG_CPU == S5L8702)
-#define CPU_S5L870X
+#define CPU_S5L87XX
 #endif
 
 /* define for all cpus from TCC780 family */
@@ -1029,7 +1029,7 @@ Lyre prototype 1 */
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
-    || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
+    || defined(CPU_S5L87XX) || (CONFIG_CPU == S3C2440) \
     || defined(APPLICATION) || (CONFIG_CPU == PP5002) \
     || (CONFIG_CPU == RK27XX) || (CONFIG_CPU == IMX233) ||              \
     (defined(HAVE_LCD_COLOR) && (LCD_STRIDEFORMAT == HORIZONTAL_STRIDE))
@@ -1118,7 +1118,7 @@ Lyre prototype 1 */
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == TCC7801) || \
     (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
-    defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
+    defined(CPU_S5L87XX)) || /* Samsung S5L87XX: core, plugins, codecs */ \
     ((CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B) && !defined(PLUGIN) && !defined(CODEC)) /* Jz47XX: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

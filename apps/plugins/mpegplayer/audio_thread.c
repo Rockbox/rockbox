@@ -59,7 +59,7 @@ static unsigned char mad_main_data[MAD_BUFFER_MDLEN];
    is for Coldfire. */
 
 /* 4608 bytes */
-#if defined(CPU_COLDFIRE) || defined(CPU_S5L870X)
+#if defined(CPU_COLDFIRE) || defined(CPU_S5L87XX)
 static mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
 #else
 static mad_fixed_t mad_frame_overlap[2][32][18];

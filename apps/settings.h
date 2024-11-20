@@ -218,8 +218,8 @@ enum {  ALARM_START_WPS = 0,
    This helps to save space for menus and options. */
 
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
-#if defined(CPU_S5L870X)
-/* the S5L870X has IRAM at 0, so we use 0xffff bytes right after that */
+#if defined(CPU_S5L87XX)
+/* the S5L87XX has IRAM at 0, so we use 0xffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x40000)
 #elif CONFIG_CPU==DM320
 /* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */

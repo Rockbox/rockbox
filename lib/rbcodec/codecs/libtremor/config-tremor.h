@@ -31,8 +31,8 @@
 #ifdef USE_IRAM
 #define TREMOR_USE_IRAM
 
-/* Define CPU of large IRAM (PP5022/5024, MCF5250)     */
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X) || (CONFIG_CPU == MCF5250)
+/* Define CPU of large IRAM (PP5022/5024, S5L87XX, MCF5250)     */
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L87XX) || (CONFIG_CPU == MCF5250)
 /* PCM_BUFFER    : 32768 byte (4096*2*4 or 2048*4*4)   *
  * WINDOW_LOOKUP : 9216 Byte (256*4 + 2048*4)          *
  * TOTAL         : 41984                               */

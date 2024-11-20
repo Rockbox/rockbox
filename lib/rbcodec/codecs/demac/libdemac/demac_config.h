@@ -44,11 +44,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define FILTER_BITS 32
 #endif
 
-#if !defined(CPU_PP) && !defined(CPU_S5L870X)
+#if !defined(CPU_PP) && !defined(CPU_S5L87XX)
 #define FILTER256_IRAM
 #endif
 
-#if CONFIG_CPU == PP5002 || defined(CPU_S5L870X)
+#if CONFIG_CPU == PP5002 || defined(CPU_S5L87XX)
 /* Code and data IRAM for speed (PP5002 has a broken cache), not enough IRAM
  * for the insane filter buffer. Reciprocal table for division in IRAM. */
 #define ICODE_SECTION_DEMAC_ARM   .icode
