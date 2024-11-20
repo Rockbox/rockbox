@@ -8395,7 +8395,7 @@
     *: "Modo:"
   </dest>
   <voice>
-    *: "Modo:"
+    *: "Modo"
   </voice>
 </phrase>
 <phrase>
@@ -10133,7 +10133,7 @@
     *: "Siguiente:"
   </dest>
   <voice>
-    *: "Siguiente:"
+    *: "Siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -10643,7 +10643,7 @@
     *: "Siguiente:"
   </dest>
   <voice>
-    *: "Siguiente:"
+    *: "Siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -11208,7 +11208,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Intesidad de la señal:"
+    radio: "Intesidad de la señal"
   </voice>
 </phrase>
 <phrase>
