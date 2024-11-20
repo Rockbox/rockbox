@@ -119,7 +119,7 @@
 /* Define if the device can wake from an RTC alarm */
 //#define HAVE_RTC_ALARM
 
-#define CONFIG_LCD LCD_IPOD6G
+#define CONFIG_LCD LCD_IPOD6GNANO3G4G
 
 /* Define the type of audio codec */
 #define HAVE_CS42L55

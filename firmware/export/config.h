@@ -72,6 +72,10 @@
 #define S5L8700      8700
 #define S5L8701      8701
 #define S5L8702      8702
+#define S5L8720      8720
+#define S5L8723      8723
+#define S5L8730      8730
+#define S5L8740      8740
 #define JZ4732       4732
 #define JZ4760B     47602
 #define AS3525       3525
@@ -246,7 +250,7 @@
 #define LCD_MINI2440  37 /* as used by the Mini2440 */
 #define LCD_HDD6330   38 /* as used by the Philips HDD6330 */
 #define LCD_VIBE500   39 /* as used by the Packard Bell Vibe 500 */
-#define LCD_IPOD6G    40 /* as used by the iPod Nano 2nd Generation */
+#define LCD_IPOD6GNANO3G4G   40 /* as used by the iPod Classic, Nano 3G and Nano 4G */
 #define LCD_FUZEPLUS  41
 #define LCD_SPFD5420A 42 /* rk27xx */
 #define LCD_CLIPZIP   43 /* as used by the Sandisk Sansa Clip Zip */
@@ -350,6 +354,8 @@ Lyre prototype 1 */
 #define RTC_JZ4760   22 /* Ingenic Jz4760 */
 #define RTC_X1000    23 /* Ingenic X1000 */
 #define RTC_CONNECT  24 /* Sansa Connect AVR */
+#define RTC_NANO3G   25 /* Dialog Semiconductor D1671 ??? */
+#define RTC_NANO4G   26 /* Dialog Semiconductor D1759 ??? */
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
@@ -667,7 +673,10 @@ Lyre prototype 1 */
 #endif
 
 /* define for all cpus from S5L87XX family */
-#if (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701) || (CONFIG_CPU == S5L8702)
+#if (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701) \
+    || (CONFIG_CPU == S5L8702) || (CONFIG_CPU == S5L8720) \
+    || (CONFIG_CPU == S5L8723) || (CONFIG_CPU == S5L8730) \
+    || (CONFIG_CPU == S5L8740)
 #define CPU_S5L87XX
 #endif
 
@@ -963,7 +972,7 @@ Lyre prototype 1 */
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
 
-#if (CONFIG_CPU == S5L8702)
+#if (CONFIG_CPU == S5L8702) || (CONFIG_CPU == S5L8720)
 #define USB_DRIVER_CLOSE
 #else
 #define USB_STATUS_BY_EVENT
