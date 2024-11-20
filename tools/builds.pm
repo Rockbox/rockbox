@@ -703,13 +703,13 @@ sub simbuilds {
 	    'gtts' => '-l es',
             'piper' => 'es_ES-sharvard-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'espanol-mx' => {
 	'lang' => 'espanol',
 	'name' => 'Spanish (Mexican)',
         'short' => 'es-mx',
-        'defengine' => 'espeak',
+        'defengine' => 'espeak', ### Use gtts instead?
 	'engines' => {
 	    'espeak' => '-ves -k 6',
             'gtts' => '-l es -t mx',
