@@ -73,6 +73,13 @@ struct menu_data_t
     int selected;
 };
 
+static int empty_menu_callback(int action, const struct menu_item_ex *this_item, struct gui_synclist *this_list)
+{
+    return action;
+    (void)this_item;
+    (void)this_list;
+}
+
 static void get_menu_callback(const struct menu_item_ex *m,
                         menu_callback_type *menu_callback)
 {
@@ -80,6 +87,9 @@ static void get_menu_callback(const struct menu_item_ex *m,
         *menu_callback= m->callback_and_desc->menu_callback;
     else
         *menu_callback = m->menu_callback;
+
+    if (!*menu_callback)
+        *menu_callback = &empty_menu_callback;
 }
 
 static bool query_audio_status(int *old_audio_status)
@@ -201,7 +211,7 @@ static int init_menu_lists(const struct menu_item_ex *menu,
     int start_action = ACTION_ENTER_MENUITEM;
     int count = MIN(MENU_GET_COUNT(menu->flags), MAX_MENU_SUBITEMS);
     int type = (menu->flags&MENU_TYPE_MASK);
-    menu_callback_type menu_callback = NULL;
+    menu_callback_type menu_callback = &empty_menu_callback;
     int icon;
     char * title;
     current_subitems_count = 0;
@@ -213,17 +223,10 @@ static int init_menu_lists(const struct menu_item_ex *menu,
     {
         if (type != MT_RETURN_ID)
             get_menu_callback(menu->submenus[i],&menu_callback);
-        if (menu_callback)
-        {
-            if (menu_callback(ACTION_REQUEST_MENUITEM,
-                type==MT_RETURN_ID ? (void*)(intptr_t)i: menu->submenus[i], lists)
-                    != ACTION_EXIT_MENUITEM)
-            {
-                current_subitems[current_subitems_count] = i;
-                current_subitems_count++;
-            }
-        }
-        else
+
+        if (menu_callback(ACTION_REQUEST_MENUITEM,
+            type==MT_RETURN_ID ? (void*)(intptr_t)i: menu->submenus[i], lists)
+                != ACTION_EXIT_MENUITEM)
         {
             current_subitems[current_subitems_count] = i;
             current_subitems_count++;
@@ -263,7 +266,7 @@ static int init_menu_lists(const struct menu_item_ex *menu,
     gui_synclist_select_item(lists, find_menu_selection(selected));
 
     get_menu_callback(menu,&menu_callback);
-    if (callback && menu_callback)
+    if (callback)
         start_action = menu_callback(start_action, menu, lists);
 
     return start_action;
@@ -402,7 +405,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int stack_top = 0;
 
     struct viewport *vps = NULL;
-    menu_callback_type menu_callback = NULL;
+    menu_callback_type menu_callback = &empty_menu_callback;
 
     /* if hide_theme is true, assume parent has been fixed before passed into
      * this function, e.g. with viewport_set_defaults(parent, screen) 
@@ -441,16 +444,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             action = gui_synclist_do_touchscreen(&lists);
 #endif
 
-        if (menu_callback)
-        {
-            int new_action = menu_callback(action, menu, &lists);
-            if (new_action == ACTION_EXIT_AFTER_THIS_MENUITEM)
-                ret = MENU_SELECTED_EXIT; /* exit after return from selection */
-            else if (new_action == ACTION_REDRAW)
-                redraw_lists = true;
-            else
-                action = new_action;
-        }
+        int new_action = menu_callback(action, menu, &lists);
+        if (new_action == ACTION_EXIT_AFTER_THIS_MENUITEM)
+            ret = MENU_SELECTED_EXIT; /* exit after return from selection */
+        else if (new_action == ACTION_REDRAW)
+            redraw_lists = true;
+        else
+            action = new_action;
 
         if (LIKELY(gui_synclist_do_button(&lists, &action)))
             continue;
@@ -586,8 +586,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             bool exiting_menu = false;
             in_stringlist = false;
 
-            if (menu_callback)
-                menu_callback(ACTION_EXIT_MENUITEM, menu, &lists);
+            menu_callback(ACTION_EXIT_MENUITEM, menu, &lists);
 
             if (menu->flags&MENU_EXITAFTERTHISMENU)
                 done = true;
@@ -630,12 +629,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             {
                 type = (temp->flags&MENU_TYPE_MASK);
                 get_menu_callback(temp, &menu_callback);
-                if (menu_callback)
-                {
-                    action = menu_callback(ACTION_ENTER_MENUITEM, temp, &lists);
-                    if (action == ACTION_EXIT_MENUITEM)
-                        break;
-                }
+                action = menu_callback(ACTION_ENTER_MENUITEM, temp, &lists);
+                if (action == ACTION_EXIT_MENUITEM)
+                    break;
             }
             switch (type)
             {
@@ -715,8 +711,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             }
             if (type != MT_MENU)
             {
-                if (menu_callback)
-                    menu_callback(ACTION_EXIT_MENUITEM, temp, &lists);
+                menu_callback(ACTION_EXIT_MENUITEM, temp, &lists);
             }
             if (current_submenus_menu != menu)
                 init_menu_lists(menu,&lists,selected,true,vps);
@@ -750,9 +745,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
         if (redraw_lists && !done)
         {
-            if (menu_callback)
-                if (menu_callback(ACTION_REDRAW, menu, &lists) != ACTION_REDRAW)
-                    continue;
+            if (menu_callback(ACTION_REDRAW, menu, &lists) != ACTION_REDRAW)
+                continue;
 
 
             gui_synclist_set_title(&lists, lists.title, lists.title_icon);
