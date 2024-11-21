@@ -56,7 +56,7 @@
 #if CONFIG_CPU == S5L8700 || CONFIG_CPU == S5L8701
 #include "s5l8700.h"
 #endif
-#if CONFIG_CPU == S5L8702
+#if CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8720
 #include "s5l8702.h"
 #endif
 #if CONFIG_CPU == JZ4732
