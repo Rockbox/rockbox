@@ -813,7 +813,24 @@ void simplelist_set_line_count(int lines)
         simplelist_line_count = 0;
     }
     else if (lines < simplelist_line_count) {
-        const char *end = simplelist_text[lines];
+        const char *end = simplelist_buffer;
+        int last_line = 0;
+        const char * const bufend = simplelist_buffer + sizeof(simplelist_buffer);
+        /* find the last item in the buffer we are still showing */
+        for (int line = 0; line <= lines; line++)
+        {
+            const char *first = simplelist_text[line];
+            if (first >= simplelist_buffer && first < bufend)
+            {
+                last_line = line;
+                end = first;
+            }
+            line++;
+        }
+
+        if (last_line < lines)
+            end += strlen(end) + 1; /* prior to the current line, save contents */
+
         simplelist_line_pos = end - simplelist_buffer;
         simplelist_line_remaining = sizeof(simplelist_buffer) - simplelist_line_pos;
         simplelist_line_count = lines;
