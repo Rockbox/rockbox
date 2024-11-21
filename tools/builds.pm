@@ -713,7 +713,7 @@ sub simbuilds {
 	'engines' => {
 	    'espeak' => '-ves -k 6',
             'gtts' => '-l es -t mx',
-            'piper' => 'es_ES-claude-high.onnx',
+            'piper' => 'es_MX-claude-high.onnx',
 	},
         'enabled' => 1,
     },
