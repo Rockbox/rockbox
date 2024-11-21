@@ -306,9 +306,9 @@ struct simplelist_info {
 /** The next three functions are used if the text is mostly static.
     These should be called in the action callback for the list.
  **/
-/* set the amount of lines shown in the list
+/* reset the amount of lines shown in the list to 0
    Only needed if simplelist_info.get_name == NULL */
-void simplelist_set_line_count(int lines);
+void simplelist_reset_lines(void);
 /* get the current amount of lines shown */
 int simplelist_get_line_count(void);
 /* add a line in the list. */

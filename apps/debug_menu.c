@@ -1278,7 +1278,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         }
 #endif
 
-        simplelist_set_line_count(0);
+        simplelist_reset_lines();
 
         card = card_get_info(*cardnum);
 
@@ -1408,7 +1408,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     bool timing_info_present = false;
     (void)btn;
 
-    simplelist_set_line_count(0);
+    simplelist_reset_lines();
 
     for (i=0; i < 20; i++)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
@@ -1750,7 +1750,7 @@ static int ata_smart_callback(int btn, struct gui_synclist *lists)
         int rc;
         memset(&smart_data, 0, sizeof(struct ata_smart_values));
         rc = ata_read_smart(&smart_data);
-        simplelist_set_line_count(0);
+        simplelist_reset_lines();
         if (rc == 0)
         {
             int i;
@@ -1887,7 +1887,7 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
         }
     }
 
-    simplelist_set_line_count(0);
+    simplelist_reset_lines();
 
     simplelist_addline("Cache status: %s", info.statusdesc);
     simplelist_addline("Last size: %zu B", info.last_size);
@@ -1902,9 +1902,6 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
                        ticks / HZ, (ticks*10 / HZ) % 10);
     simplelist_addline("Entry count: %u", info.entry_count);
 
-    if (btn == ACTION_NONE)
-        btn = ACTION_REDRAW;
-
     return btn;
 }
 
@@ -1912,7 +1909,7 @@ static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
     int syncbuild = 0;
-    simplelist_info_init(&info, "Dircache Info", 8, &syncbuild);
+    simplelist_info_init(&info, "Dircache Info", 0, &syncbuild);
     info.action_callback = dircache_callback;
     info.scroll_all = true;
     return simplelist_show_list(&info);
@@ -1928,7 +1925,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
     static bool synced = false;
     static int update_entries = 0;
 
-    simplelist_set_line_count(0);
+    simplelist_reset_lines();
 
     simplelist_addline("Initialized: %s",
              stat->initialized ? "Yes" : "No");
@@ -1981,7 +1978,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
 static bool dbg_tagcache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Database Info", 8, NULL);
+    simplelist_info_init(&info, "Database Info", 0, NULL);
     info.action_callback = database_callback;
     info.scroll_all = true;
 
@@ -2141,7 +2138,8 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     (void)lists;
     if (btn == ACTION_STD_CANCEL)
         return btn;
-    simplelist_set_line_count(1);
+    simplelist_reset_lines();
+    simplelist_setline("HW detected: yes");
 
 #if (CONFIG_TUNER & LV24020LP)
     simplelist_addline(
@@ -2249,10 +2247,9 @@ static bool dbg_fm_radio(void)
     tuner_type = tuner_detect_type();
 #endif
     info.scroll_all = true;
-    simplelist_info_init(&info, "FM Radio", 1, NULL);
-    simplelist_set_line_count(0);
-    simplelist_addline("HW detected: %s",
-                       radio_hardware_present() ? "yes" : "no");
+    simplelist_info_init(&info, "FM Radio", 0, NULL);
+    simplelist_reset_lines();
+    simplelist_setline("HW detected: no");
 
     info.action_callback = radio_hardware_present()?radio_callback : NULL;
     return simplelist_show_list(&info);
@@ -2467,13 +2464,12 @@ static bool dbg_talk(void)
     struct talk_debug_data data;
     talk_get_debug_data(&data);
 
-    simplelist_info_init(&list, "Voice Information:", 1, NULL);
+    simplelist_info_init(&list, "Voice Information:", 0, NULL);
 
     list.scroll_all = true;
     list.timeout = HZ;
-    //list.get_name = dbg_talk_get_name;
 
-    simplelist_set_line_count(0);
+    simplelist_reset_lines();
 
     simplelist_setline("Current voice file:"); 
     if (data.status != TALK_STATUS_ERR_NOFILE)
@@ -2577,8 +2573,8 @@ static bool dbg_boot_data(void)
 {
     struct simplelist_info info;
     info.scroll_all = true;
-    simplelist_info_init(&info, "Boot data", 1, NULL);
-    simplelist_set_line_count(0);
+    simplelist_info_init(&info, "Boot data", 0, NULL);
+    simplelist_reset_lines();
 
     if (!boot_data_valid)
     {
@@ -2622,8 +2618,8 @@ static bool dbg_device_data(void)
 {
     struct simplelist_info info;
     info.scroll_all = true;
-    simplelist_info_init(&info, "Device data", 1, NULL);
-    simplelist_set_line_count(0);
+    simplelist_info_init(&info, "Device data", 0, NULL);
+    simplelist_reset_lines();
 
     simplelist_setline("Device data");
 
@@ -2654,8 +2650,8 @@ static bool dbg_syscfg(void) {
     size_t syscfg_entry_size = sizeof(struct SysCfgEntry);
     struct SysCfgEntry syscfg_entries[SYSCFG_MAX_ENTRIES];
 
-    simplelist_info_init(&info, "SysCfg NOR contents", 1, NULL);
-    simplelist_set_line_count(0);
+    simplelist_info_init(&info, "SysCfg NOR contents", 0, NULL);
+    simplelist_reset_lines();
 
     bootflash_init(SPI_PORT);
     bootflash_read(SPI_PORT, 0, syscfg_hdr_size, &syscfg_hdr);

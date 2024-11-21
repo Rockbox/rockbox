@@ -342,7 +342,7 @@ bool dbg_skin_engine(void)
     int path_prefix_len = strlen(ROCKBOX_DIR "/wps/");
 #endif
     simplelist_info_init(&info, "Skin engine usage", 0, NULL);
-    simplelist_set_line_count(0);
+    simplelist_reset_lines();
     FOR_NB_SCREENS(j) {
 #if NB_SCREENS > 1
         simplelist_addline("%s display:",
