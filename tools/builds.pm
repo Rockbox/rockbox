@@ -709,13 +709,13 @@ sub simbuilds {
 	'lang' => 'espanol',
 	'name' => 'Spanish (Mexican)',
         'short' => 'es-mx',
-        'defengine' => 'espeak', ### Use gtts instead?
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-ves -k 6',
             'gtts' => '-l es -t mx',
-            # No piper voice yet.
+            'piper' => 'es_ES-claude-high.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'francais' => {
 	'lang' => 'francais',
