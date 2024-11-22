@@ -214,14 +214,10 @@ static int info_speak_item(int selected_item, void * data)
 
     switch (selected_item)
     {
-        case INFO_VERSION_TITLE:  /*fallthrough*/
-        case INFO_REC_DIR_TITLE:  /*fallthrough*/
-        case INFO_ROOT_DIR_TITLE: /*fallthrough*/
-            break;
-
         case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
             talk_spell(rbversion, true);
+        case INFO_VERSION_TITLE:  /*fallthrough*/
             break;
 
 #if CONFIG_RTC
@@ -251,11 +247,13 @@ static int info_speak_item(int selected_item, void * data)
             {
                 talk_fullpath(global_settings.rec_directory, true);
             }
+        case INFO_REC_DIR_TITLE:  /*fallthrough*/
             break;
 #endif
         case INFO_ROOT_DIR:
             talk_id(LANG_DISPLAY_FULL_PATH, false);
             talk_fullpath(root_realpath(), true);
+        case INFO_ROOT_DIR_TITLE: /*fallthrough*/
             break;
         case INFO_BUFFER: /* buffer */
         {
