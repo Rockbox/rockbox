@@ -302,10 +302,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -358,10 +358,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -1342,11 +1342,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </voice>
 </phrase>
 <phrase>
@@ -1916,12 +1916,12 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
+    battery_types: "~NiMH"
     xduoox3: "Vieja (1500 mAh)"
   </dest>
   <voice>
     *: none
-    battery_types: "N i m h"
+    battery_types: "Hidruro metálico de níquel"
     xduoox3: "Vieja 1500 miliamperios hora"
   </voice>
 </phrase>
@@ -2468,7 +2468,6 @@
     *: none
     gigabeatfx,mrobe500: "POWER = Cancelar"
     gigabeats: "ATRÁS = Cancelar"
-    sansafuzeplus: "BACK = Cancelar"
     gogearsa9200: "IZQUIERDA = Cancelar"
     iaudiom5,iaudiox5: "RECORD = Cancelar"
     ipod*,mpiohd300,sansac200*: "MENÚ = Cancelar"
@@ -2477,11 +2476,12 @@
     mrobe100: "DISPLAY = Cancelar"
     rtc: "OFF = Cancelar"
     samsungyh*: "REW = Cancelar"
+    sansafuzeplus: "BACK = Cancelar"
     vibe500: "C = Cancelar"
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -2906,7 +2906,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "Febrero"
@@ -2920,7 +2920,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Marzo"
@@ -2948,7 +2948,7 @@
     *: "May"
   </source>
   <dest>
-    *: "May"
+    *: "~May"
   </dest>
   <voice>
     *: "Mayo"
@@ -2962,7 +2962,7 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Jun"
+    *: "~Jun"
   </dest>
   <voice>
     *: "Junio"
@@ -2976,7 +2976,7 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Jul"
+    *: "~Jul"
   </dest>
   <voice>
     *: "Julio"
@@ -3004,7 +3004,7 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
     *: "Septiembre"
@@ -3018,7 +3018,7 @@
     *: "Oct"
   </source>
   <dest>
-    *: "Oct"
+    *: "~Oct"
   </dest>
   <voice>
     *: "Octubre"
@@ -3032,7 +3032,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "Noviembre"
@@ -3746,7 +3746,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "~."
   </dest>
   <voice>
     *: "punto"
@@ -4183,7 +4183,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -4267,7 +4267,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -5641,14 +5641,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Interno"
-    hibylinux: "micro S D"
-    xduoox3: "micro S D 1"
+    hibylinux: "~micro S D"
+    xduoox3: "~micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -5966,10 +5966,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode, u t f 8"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -6324,7 +6324,7 @@
     *: "Buscando... %d encontrados (%s)"
   </dest>
   <voice>
-    *: "Buscando... %d encontrados (%s)"
+    *: "Encontrado"
   </voice>
 </phrase>
 <phrase>
@@ -6430,17 +6430,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "m S D"
-    xduoox3: "m S D 2"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -6572,10 +6572,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1, iso 8859 1"
+    *: "~Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -7392,7 +7392,7 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
@@ -7483,10 +7483,10 @@
     *: "Never"
   </source>
   <dest>
-    *: "Never"
+    *: "Nunca"
   </dest>
   <voice>
-    *: "Never"
+    *: "Nunca"
   </voice>
 </phrase>
 <phrase>
@@ -7855,10 +7855,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Normal"
+    *: "~Normal"
   </dest>
   <voice>
-    *: "Normal"
+    *: "~Normal"
   </voice>
 </phrase>
 <phrase>
@@ -7872,7 +7872,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -7987,7 +7987,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8026,10 +8026,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "~Demos"
   </dest>
   <voice>
-    *: "Demos"
+    *: "~Demos"
   </voice>
 </phrase>
 <phrase>
@@ -8164,7 +8164,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "~oh"
   </voice>
 </phrase>
 <phrase>
@@ -8285,7 +8285,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -8705,10 +8705,10 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Cargando... %d%% hecho (%s)"
+    *: "Cargando... %d%% completado (%s)"
   </dest>
   <voice>
-    *: "Cargando... %d%% hecho (%s)"
+    *: "Cargando"
   </voice>
 </phrase>
 <phrase>
@@ -9517,7 +9517,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -10718,13 +10718,12 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Ganancia de la banda %d"
-    samsungypr1: "Band %d Gain"
+    gigabeats,samsungypr1: "Ganancia de Banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ganancia de la banda"
-    samsungypr1: "Band Gain"
+    gigabeats: "Ganancia de banda"
+    samsungypr1: "Ganancia de Banda"
   </voice>
 </phrase>
 <phrase>
@@ -10771,13 +10770,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Ancha"
-    samsungypr1: "Wide"
+    gigabeats,samsungypr1: "Ancha"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ancha"
-    samsungypr1: "Wide"
+    gigabeats,samsungypr1: "Ancha"
   </voice>
 </phrase>
 <phrase>
@@ -10824,13 +10821,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Estrecha"
-    samsungypr1: "Narrow"
+    gigabeats,samsungypr1: "Estrecha"
   </dest>
   <voice>
     *: none
-    gigabeats: "Estrecha"
-    samsungypr1: "Narrow"
+    gigabeats,samsungypr1: "Estrecha"
   </voice>
 </phrase>
 <phrase>
@@ -10888,13 +10883,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Ajustes avanzados de control de tono"
-    samsungypr1: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Configuración avanzada de control de tono"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ajustes avanzados de control de tono"
-    samsungypr1: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Configuración avanzada de control de tono"
   </voice>
 </phrase>
 <phrase>
@@ -10907,11 +10900,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: " Mejora 3-D"
   </dest>
   <voice>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: " Mejora 3-D"
   </voice>
 </phrase>
 <phrase>
@@ -10924,13 +10917,12 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Frecuencia de la banda %d"
-    samsungypr1: "Band %d Frequency"
+    gigabeats,samsungypr1: "Frecuencia de banda %d"
   </dest>
   <voice>
     *: none
     gigabeats: "Frecuencia de la banda"
-    samsungypr1: "Band Frequency"
+    samsungypr1: "Frecuencia de banda"
   </voice>
 </phrase>
 <phrase>
@@ -10943,13 +10935,12 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Ancho de la banda %d"
-    samsungypr1: "Band %d Width"
+    gigabeats,samsungypr1: "Ancho de banda %d"
   </dest>
   <voice>
     *: none
     gigabeats: "Ancho de la banda"
-    samsungypr1: "Band Width"
+    samsungypr1: "Ancho de banda"
   </voice>
 </phrase>
 <phrase>
@@ -10996,13 +10987,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Controles de tono"
-    samsungypr1: "Tone Controls"
+    gigabeats,samsungypr1: "Controles de tono"
   </dest>
   <voice>
     *: none
-    gigabeats: "Controles de tono"
-    samsungypr1: "Tone Controls"
+    gigabeats,samsungypr1: "Controles de tono"
   </voice>
 </phrase>
 <phrase>
@@ -11095,10 +11084,10 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
-    *: "Abrir pase de carátulas"
+    *: "abrir open flow"
   </voice>
 </phrase>
 <phrase>
@@ -11421,10 +11410,10 @@
     *: "Simple (Meier)"
   </source>
   <dest>
-    *: "Simple (Meier)"
+    *: "~Simple (Meier)"
   </dest>
   <voice>
-    *: "Simple (Meier)"
+    *: "~Simple"
   </voice>
 </phrase>
 <phrase>
@@ -11483,10 +11472,10 @@
     *: "Western European (CP1252)"
   </source>
   <dest>
-    *: "Western European (CP1252)"
+    *: "Europa Occidental (CP1252)"
   </dest>
   <voice>
-    *: "Europa Oeste (CP1252)"
+    *: "Europa Occidental"
   </voice>
 </phrase>
 <phrase>
@@ -11497,7 +11486,7 @@
     *: "Custom"
   </source>
   <dest>
-    *: "Custom"
+    *: "Personalizado"
   </dest>
   <voice>
     *: "Personalizado"
@@ -11511,7 +11500,7 @@
     *: "Shortcuts"
   </source>
   <dest>
-    *: "Shortcuts"
+    *: "Accesos directos"
   </dest>
   <voice>
     *: "Accesos directos"
@@ -11696,10 +11685,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "~Zoom"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "~Zoom"
   </voice>
 </phrase>
 <phrase>
@@ -13056,10 +13045,10 @@
     *: "Track remaining:"
   </source>
   <dest>
-    *: "Track remaining:"
+    *: "Pista restante:"
   </dest>
   <voice>
-    *: "Track remaining"
+    *: "Pista restante"
   </voice>
 </phrase>
 <phrase>
@@ -15621,10 +15610,10 @@
     *: "Artist + Name"
   </source>
   <dest>
-    *: "Artist + Name"
+    *: "Artista + Nombre"
   </dest>
   <voice>
-    *: "Artist And Name"
+    *: "Artista y Nombre"
   </voice>
 </phrase>
 <phrase>
@@ -15635,10 +15624,10 @@
     *: "Artist + Year"
   </source>
   <dest>
-    *: "Artist + Year"
+    *: "Artista + Año"
   </dest>
   <voice>
-    *: "Artist And Year"
+    *: "Artista y Año"
   </voice>
 </phrase>
 <phrase>
@@ -15649,10 +15638,10 @@
     *: "Year sort order"
   </source>
   <dest>
-    *: "Year sort order"
+    *: "Orden de clasificación por año"
   </dest>
   <voice>
-    *: "Year sort order"
+    *: "Orden de clasificación por año"
   </voice>
 </phrase>
 <phrase>
@@ -15663,10 +15652,10 @@
     *: "Show year in album title"
   </source>
   <dest>
-    *: "Show year in album title"
+    *: "Mostrar el año en el título del álbum"
   </dest>
   <voice>
-    *: "Show year in album title"
+    *: "Mostrar el año en el título del álbum"
   </voice>
 </phrase>
 <phrase>
@@ -15677,10 +15666,10 @@
     *: "Cache needs to finish updating first!"
   </source>
   <dest>
-    *: "Cache needs to finish updating first!"
+    *: "¡La caché tiene que terminar de actualizarse primero!"
   </dest>
   <voice>
-    *: "Cache needs to finish updating first!"
+    *: "¡La caché tiene que terminar de actualizarse primero!"
   </voice>
 </phrase>
 <phrase>
@@ -15691,10 +15680,10 @@
     *: "Track Info"
   </source>
   <dest>
-    *: "Track Info"
+    *: "Info de la Pista"
   </dest>
   <voice>
-    *: "Track Info"
+    *: "Info de la Pista"
   </voice>
 </phrase>
 <phrase>
@@ -15705,10 +15694,10 @@
     *: "Play"
   </source>
   <dest>
-    *: "Play"
+    *: "Reproducir"
   </dest>
   <voice>
-    *: "Play"
+    *: "Reproducir"
   </voice>
 </phrase>
 <phrase>
@@ -15719,10 +15708,10 @@
     *: "Play Shuffled"
   </source>
   <dest>
-    *: "Play Shuffled"
+    *: "Reproducir en orden aleatorio"
   </dest>
   <voice>
-    *: "Play Shuffled"
+    *: "Reproducir en orden aleatorio"
   </voice>
 </phrase>
 <phrase>
@@ -15733,10 +15722,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Mantener la pista actual al sustituir la lista de reproducción"
   </dest>
   <voice>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Mantener la pista actual al sustituir la lista de reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -15750,13 +15739,13 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Borrar ajustes al mantener pulsado el botón de reinicio durante el arranque"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Borrar ajustes cuando el interruptor de bloqueo está activado durante el arranque"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Borrar ajustes al mantener pulsado el botón de reinicio durante el arranque"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Borrar ajustes cuando el interruptor de bloqueo está activado durante el arranque"
   </voice>
 </phrase>
 <phrase>
@@ -15767,10 +15756,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rewind Across Tracks"
+    *: "Rebobinar a través de las pistas"
   </dest>
   <voice>
-    *: "Rewind across tracks"
+    *: "Rebobinar a través de las pistas"
   </voice>
 </phrase>
 <phrase>
@@ -15781,10 +15770,10 @@
     *: "Set As..."
   </source>
   <dest>
-    *: "Set As..."
+    *: "Establecer como..."
   </dest>
   <voice>
-    *: "Set As"
+    *: "Establecer como"
   </voice>
 </phrase>
 <phrase>
@@ -15795,10 +15784,10 @@
     *: "Playlist Directory"
   </source>
   <dest>
-    *: "Playlist Directory"
+    *: "Directorio de la lista de reproducción"
   </dest>
   <voice>
-    *: "Playlist Directory"
+    *: "Directorio de la lista de reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -15809,10 +15798,10 @@
     *: "Start Directory"
   </source>
   <dest>
-    *: "Start Directory"
+    *: "Iniciar Directorio"
   </dest>
   <voice>
-    *: "Start Directory"
+    *: "Iniciar Directorio"
   </voice>
 </phrase>
 <phrase>
@@ -15825,11 +15814,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Directorio de Grabaciones"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Directorio de Grabaciones"
   </voice>
 </phrase>
 <phrase>
@@ -15840,10 +15829,10 @@
     *: "Add to Playlist..."
   </source>
   <dest>
-    *: "Add to Playlist..."
+    *: "Añadir a Lista de Reproducción"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Añadir a Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -15854,10 +15843,10 @@
     *: "Add to Existing Playlist"
   </source>
   <dest>
-    *: "Add to Existing Playlist"
+    *: "Añadir a Lista de Reproducción Existente"
   </dest>
   <voice>
-    *: "Add to Existing Playlist"
+    *: "Añadir a Lista de Reproducción Existente"
   </voice>
 </phrase>
 <phrase>
@@ -15868,10 +15857,10 @@
     *: "Playing Next..."
   </source>
   <dest>
-    *: "Playing Next..."
+    *: "Reproduciendo Siguiente..."
   </dest>
   <voice>
-    *: "Playing Next"
+    *: "Reproduciendo Siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -15882,10 +15871,10 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "Play Next"
+    *: "Reproducir Siguiente"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Reproducir Siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -15896,10 +15885,10 @@
     *: "Add Shuffled"
   </source>
   <dest>
-    *: "Add Shuffled"
+    *: "Agregar Aleatoriamente"
   </dest>
   <voice>
-    *: "Add Shuffled"
+    *: "Agregar Aleatoriamente"
   </voice>
 </phrase>
 <phrase>
@@ -15910,10 +15899,10 @@
     *: "Play Last"
   </source>
   <dest>
-    *: "Play Last"
+    *: "Reproducir Última"
   </dest>
   <voice>
-    *: "Play Last"
+    *: "Reproducir Última"
   </voice>
 </phrase>
 <phrase>
@@ -15924,10 +15913,10 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Play Last Shuffled"
+    *: "Reproducir lo Último en Aleatorio"
   </dest>
   <voice>
-    *: "Play Last Shuffled"
+    *: "Reproducir lo Último en Aleatorio"
   </voice>
 </phrase>
 <phrase>
@@ -15940,11 +15929,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Volume Adjustment Mode"
+    perceptual_volume: "Modo de Ajuste de Volumen"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Volume Adjustment Mode"
+    perceptual_volume: "Modo de Ajuste de Volumen"
   </voice>
 </phrase>
 <phrase>
@@ -15957,11 +15946,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Number of Volume Steps"
+    perceptual_volume: "Número de Pasos de Volumen"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Number of Volume Steps"
+    perceptual_volume: "Número de Pasos de Volumen"
   </voice>
 </phrase>
 <phrase>
@@ -15974,11 +15963,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptiva"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptiva"
   </voice>
 </phrase>
 <phrase>
@@ -15989,10 +15978,10 @@
     *: "Show Tracks While Browsing"
   </source>
   <dest>
-    *: "Show Tracks While Browsing"
+    *: "Mostrar Pistas Mientras Navega"
   </dest>
   <voice>
-    *: "Show Tracks While Browsing"
+    *: "Mostrar Pistas Mientras Navega"
   </voice>
 </phrase>
 <phrase>
@@ -16003,10 +15992,10 @@
     *: "Go to Last Album"
   </source>
   <dest>
-    *: "Go to Last Album"
+    *: "Ir al Último Álbum"
   </dest>
   <voice>
-    *: "Go to Last Album"
+    *: "Ir al Último Álbum"
   </voice>
 </phrase>
 <phrase>
@@ -16017,10 +16006,10 @@
     *: "Database Directory"
   </source>
   <dest>
-    *: "Database Directory"
+    *: "Directorio de la Base de Datos"
   </dest>
   <voice>
-    *: "Database Directory"
+    *: "Directorio de la Base de Datos"
   </voice>
 </phrase>
 <phrase>
@@ -16031,10 +16020,10 @@
     *: "Remove Queued Tracks?"
   </source>
   <dest>
-    *: "Remove Queued Tracks?"
+    *: "¿Eliminar pistas en cola?"
   </dest>
   <voice>
-    *: "Remove Queued Tracks?"
+    *: "¿Eliminar pistas en cola?"
   </voice>
 </phrase>
 <phrase>
@@ -16045,10 +16034,10 @@
     *: "Quick (Ignore Directory Cache)"
   </source>
   <dest>
-    *: "Quick (Ignore Directory Cache)"
+    *: "Rápida (Ignorar caché de directorio)"
   </dest>
   <voice>
-    *: "Quick (Ignore Directory Cache)"
+    *: "Rápida (Ignorar caché de directorio)"
   </voice>
 </phrase>
 <phrase>
@@ -16059,10 +16048,10 @@
     *: "What's Playing Screen"
   </source>
   <dest>
-    *: "What's Playing Screen"
+    *: "Pantalla Qué Está Sonando"
   </dest>
   <voice>
-    *: "What's Playing Screen"
+    *: "Pantalla Qué Está Sonando"
   </voice>
 </phrase>
 <phrase>
@@ -16073,10 +16062,10 @@
     *: "Default Browser"
   </source>
   <dest>
-    *: "Default Browser"
+    *: "Navegador Predeterminado"
   </dest>
   <voice>
-    *: "Default Browser"
+    *: "Navegador Predeterminado"
   </voice>
 </phrase>
 <phrase>
@@ -16087,10 +16076,10 @@
     *: "Amaze Main Menu"
   </source>
   <dest>
-    *: "Amaze Main Menu"
+    *: "Menú Principal Amaze"
   </dest>
   <voice>
-    *: "Amaze Main Menu"
+    *: "Menú Principal Amaze"
   </voice>
 </phrase>
 <phrase>
@@ -16101,10 +16090,10 @@
     *: "Set Maze Size"
   </source>
   <dest>
-    *: "Set Maze Size"
+    *: "Establecer Tamaño del Laberinto"
   </dest>
   <voice>
-    *: "Set Maze Size"
+    *: "Establecer Tamaño del Laberinto"
   </voice>
 </phrase>
 <phrase>
@@ -16115,10 +16104,10 @@
     *: "View Map"
   </source>
   <dest>
-    *: "View Map"
+    *: "Ver Mapa"
   </dest>
   <voice>
-    *: "View Map"
+    *: "Ver Mapa"
   </voice>
 </phrase>
 <phrase>
@@ -16129,10 +16118,10 @@
     *: "Show Compass"
   </source>
   <dest>
-    *: "Show Compass"
+    *: "Mostrar Brújula"
   </dest>
   <voice>
-    *: "Show Compass"
+    *: "Mostrar Brújula"
   </voice>
 </phrase>
 <phrase>
@@ -16143,10 +16132,10 @@
     *: "Show Map"
   </source>
   <dest>
-    *: "Show Map"
+    *: "Ver Mapa"
   </dest>
   <voice>
-    *: "Show Map"
+    *: "Ver Mapa"
   </voice>
 </phrase>
 <phrase>
@@ -16157,10 +16146,10 @@
     *: "Remember Path"
   </source>
   <dest>
-    *: "Remember Path"
+    *: "Recordar Camino"
   </dest>
   <voice>
-    *: "Remember Path"
+    *: "Recordar Camino"
   </voice>
 </phrase>
 <phrase>
@@ -16171,10 +16160,10 @@
     *: "Use Large Tiles"
   </source>
   <dest>
-    *: "Use Large Tiles"
+    *: "Usar Mosaicos Grandes"
   </dest>
   <voice>
-    *: "Use Large Tiles"
+    *: "Usar Mosaicos Grandes"
   </voice>
 </phrase>
 <phrase>
@@ -16185,10 +16174,10 @@
     *: "Show Solution"
   </source>
   <dest>
-    *: "Show Solution"
+    *: "Mostrar Solución"
   </dest>
   <voice>
-    *: "Show Solution"
+    *: "Mostrar Solución"
   </voice>
 </phrase>
 <phrase>
@@ -16199,7 +16188,7 @@
     *: "Quit without saving"
   </source>
   <dest>
-    *: "Quit without saving"
+    *: "Salir sin guardar"
   </dest>
   <voice>
     *: "Quit without saving"
@@ -16213,10 +16202,10 @@
     *: "Generating maze..."
   </source>
   <dest>
-    *: "Generating maze..."
+    *: "Generando laberinto..."
   </dest>
   <voice>
-    *: "Generating maze"
+    *: "Generando laberinto"
   </voice>
 </phrase>
 <phrase>
@@ -16227,10 +16216,10 @@
     *: "You win!"
   </source>
   <dest>
-    *: "You win!"
+    *: "¡Has ganado!"
   </dest>
   <voice>
-    *: "You win!"
+    *: "¡Has ganado!"
   </voice>
 </phrase>
 <phrase>
@@ -16241,10 +16230,10 @@
     *: "You cheated!"
   </source>
   <dest>
-    *: "You cheated!"
+    *: "¡Has hecho trampa!"
   </dest>
   <voice>
-    *: "You cheated!"
+    *: "¡Has hecho trampa!"
   </voice>
 </phrase>
 <phrase>
@@ -16255,10 +16244,10 @@
     *: "Easy"
   </source>
   <dest>
-    *: "Easy"
+    *: "Fácil"
   </dest>
   <voice>
-    *: "Easy"
+    *: "Fácil"
   </voice>
 </phrase>
 <phrase>
@@ -16269,10 +16258,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Medio"
   </dest>
   <voice>
-    *: "Medium"
+    *: "Medio"
   </voice>
 </phrase>
 <phrase>
@@ -16283,10 +16272,10 @@
     *: "Hard"
   </source>
   <dest>
-    *: "Hard"
+    *: "Difícil"
   </dest>
   <voice>
-    *: "Hard"
+    *: "Difícil"
   </voice>
 </phrase>
 <phrase>
@@ -16297,10 +16286,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "Experto"
   </dest>
   <voice>
-    *: "Expert"
+    *: "Experto"
   </voice>
 </phrase>
 <phrase>
@@ -16311,10 +16300,10 @@
     *: "Stereo Switch Mode"
   </source>
   <dest>
-    *: "Stereo Switch Mode"
+    *: "Cambiar Modo Estéreo"
   </dest>
   <voice>
-    *: "Stereo Switch Mode"
+    *: "Cambiar Modo Estéreo"
   </voice>
 </phrase>
 <phrase>
@@ -16325,10 +16314,10 @@
     *: "Reverse"
   </source>
   <dest>
-    *: "Reverse"
+    *: "Reversa"
   </dest>
   <voice>
-    *: "Reverse"
+    *: "Reversa"
   </voice>
 </phrase>
 <phrase>
@@ -16339,10 +16328,10 @@
     *: "Always 0"
   </source>
   <dest>
-    *: "Always 0"
+    *: "Siempre 0"
   </dest>
   <voice>
-    *: "Always 0"
+    *: "Siempre 0"
   </voice>
 </phrase>
 <phrase>
@@ -16353,10 +16342,10 @@
     *: "Always 1"
   </source>
   <dest>
-    *: "Always 1"
+    *: "Siempre 1"
   </dest>
   <voice>
-    *: "Always 1"
+    *: "Siempre 1"
   </voice>
 </phrase>
 <phrase>
@@ -16367,10 +16356,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "Legal Notices"
+    *: "Noticias Legales"
   </dest>
   <voice>
-    *: "Legal Notices"
+    *: "Noticias Legales"
   </voice>
 </phrase>
 <phrase>
@@ -16381,10 +16370,10 @@
     *: "Error: %s"
   </source>
   <dest>
-    *: "Error: %s"
+    *: "~Error: %s"
   </dest>
   <voice>
-    *: "Error"
+    *: "~Error"
   </voice>
 </phrase>
 <phrase>
@@ -16395,10 +16384,10 @@
     *: "Mikmod Settings"
   </source>
   <dest>
-    *: "Mikmod Settings"
+    *: "Ajustes Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Settings"
+    *: "Ajustes Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16409,10 +16398,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Mikmod Menu"
+    *: "Menú Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Menu"
+    *: "Menú Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16423,10 +16412,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Menú Chessbox"
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Menú Chessbox"
   </voice>
 </phrase>
 <phrase>
@@ -16440,7 +16429,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Invalid Voice File"
+    *: "Archivo de Voz Inválido"
   </voice>
 </phrase>
 <phrase>
@@ -16465,7 +16454,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
@@ -16479,10 +16468,10 @@
     *: "Choose File"
   </source>
   <dest>
-    *: "Choose File"
+    *: "Elegir Archivo"
   </dest>
   <voice>
-    *: "Choose File"
+    *: "Elegir Archivo"
   </voice>
 </phrase>
 <phrase>
@@ -16493,10 +16482,10 @@
     *: "Disable main menu scrolling"
   </source>
   <dest>
-    *: "Disable main menu scrolling"
+    *: "Desactivar el desplazamiento del menú principal"
   </dest>
   <voice>
-    *: "Disable main menu scrolling"
+    *: "Desactivar el desplazamiento del menú principal"
   </voice>
 </phrase>
 <phrase>
@@ -16507,10 +16496,10 @@
     *: "Remaining"
   </source>
   <dest>
-    *: "Remaining"
+    *: "Restante"
   </dest>
   <voice>
-    *: "Remaining"
+    *: "Restante"
   </voice>
 </phrase>
 <phrase>
@@ -16521,9 +16510,9 @@
     *: "View Album Art"
   </source>
   <dest>
-    *: "View Album Art"
+    *: "Ver la Carátula del Álbum"
   </dest>
   <voice>
-    *: "View Album Art"
+    *: "Ver la Carátula del Álbum"
   </voice>
 </phrase>
