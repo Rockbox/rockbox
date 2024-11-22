@@ -46,9 +46,13 @@
 /* max viewer plugins */
 #define MAX_VIEWERS 56
 
+static void fill_from_builtin(const char*,int) INIT_ATTR;
 static void read_builtin_types_init(void) INIT_ATTR;
 static void read_viewers_config_init(void) INIT_ATTR;
 static void read_config_init(int fd) INIT_ATTR;
+#ifdef HAVE_LCD_COLOR
+void read_color_theme_file(void) INIT_ATTR;
+#endif
 
 /* string array for known audio file types (tree_attr == FILE_ATTR_AUDIO) */
 static const char* inbuilt_audio_filetypes[] = {
@@ -142,22 +146,34 @@ static const struct fileattr_icon_voice inbuilt_attr_icons_voices[] = {
 #endif
 };
 
+static int filetype_inbuilt_index(int tree_attr)
+{
+    size_t count = ARRAY_SIZE(inbuilt_attr_icons_voices);
+    /* try to find a inbuilt index for the extension, if known */
+    tree_attr &= FILE_ATTR_MASK; /* file type */
+
+    for (size_t i = count - 1; i < count; i--)
+    {
+        if (tree_attr == inbuilt_attr_icons_voices[i].tree_attr)
+        {
+            logf("%s found attr %d id", __func__, tree_attr);
+            return i;
+        }
+    }
+    logf("%s not found attr %d", __func__, tree_attr);
+    return -1;
+}
+
 long tree_get_filetype_voiceclip(int attr)
 {
     if (global_settings.talk_filetype)
     {
-        size_t count = ARRAY_SIZE(inbuilt_attr_icons_voices);
-        /* try to find a voice ID for the extension, if known */
-        attr &= FILE_ATTR_MASK; /* file type */
-
-        for (size_t i = count - 1; i < count; i--)
+        int index = filetype_inbuilt_index(attr);
+        if (index >= 0)
         {
-            if (attr == inbuilt_attr_icons_voices[i].tree_attr)
-            {
-                logf("%s found attr %d id %d", __func__, attr,
-                     inbuilt_attr_icons_voices[i].voiceclip);
-                return inbuilt_attr_icons_voices[i].voiceclip;
-            }
+            logf("%s found attr %d id %d", __func__, attr,
+                 inbuilt_attr_icons_voices[index].voiceclip);
+            return inbuilt_attr_icons_voices[index].voiceclip;
         }
     }
     logf("%s not found attr %d", __func__, attr);
@@ -176,23 +192,22 @@ struct file_type {
 static struct file_type filetypes[MAX_FILETYPES];
 
 static enum themable_icons custom_filetype_icons[MAX_FILETYPES];
-
 static bool custom_icons_loaded = false;
+
 #ifdef HAVE_LCD_COLOR
 static int custom_colors[MAX_FILETYPES];
-#endif
 struct filetype_unknown {
     enum themable_icons icon;
-#ifdef HAVE_LCD_COLOR
     int color;
-#endif
 };
 static struct filetype_unknown unknown_file = {
     .icon = Icon_NOICON,
-#ifdef HAVE_LCD_COLOR
     .color = -1,
-#endif
 };
+#else
+struct filetype_unknown { enum themable_icons icon; };
+static struct filetype_unknown unknown_file = { .icon = Icon_NOICON };
+#endif
 
 /* index array to filetypes used in open with list. */
 static int viewers[MAX_VIEWERS];
@@ -222,14 +237,14 @@ static struct buflib_callbacks ops = {
     .shrink_callback = NULL,
 };
 
-static const char *filetypes_strdup(char* string)
+static const char *filetypes_strdup(const char* string)
 {
     char *buffer = core_get_data(strdup_handle) + strdup_cur_idx;
     strdup_cur_idx += strlcpy(buffer, string, strdup_bufsize-strdup_cur_idx)+1;
     return buffer;
 }
 
-static const char *filetypes_store_plugin(char *plugin, int n)
+static const char *filetypes_store_plugin(const char *plugin, int n)
 {
     int i;
     /* if the plugin is in the list already, use it. */
@@ -246,14 +261,14 @@ static const char *filetypes_store_plugin(char *plugin, int n)
 
 static int find_extension(const char* extension)
 {
-    int i;
-    if (!extension)
-        return -1;
-    for (i=1; i<filetype_count; i++)
+    if (extension)
     {
-        if (filetypes[i].extension &&
-            !strcasecmp(extension, filetypes[i].extension))
-            return i;
+        for (int i=1; i<filetype_count; i++)
+        {
+            if (filetypes[i].extension &&
+                !strcasecmp(extension, filetypes[i].extension))
+                return i;
+        }
     }
     return -1;
 }
@@ -288,7 +303,7 @@ void read_color_theme_file(void) {
             hex_to_rgb(color, &custom_colors[0]);
             continue;
         }
-        if (!strcasecmp(ext, "???"))
+        if (!strcmp(ext, "???"))
         {
             hex_to_rgb(color, &unknown_file.color);
             continue;
@@ -300,6 +315,27 @@ void read_color_theme_file(void) {
     close(fd);
 }
 #endif
+
+static int parse_icon(const char *line, enum themable_icons *icon)
+{
+    int num = -1;
+    if (*line == '*')
+    {
+        num = atoi(line+1);
+        *icon = num;
+    }
+    else if (*line == '-')
+    {
+        *icon = Icon_NOICON;
+    }
+    else if (*line >= '0' && *line <= '9')
+    {
+        num = atoi(line);
+        *icon = Icon_Last_Themeable + num;
+    }
+    return num;
+}
+
 void read_viewer_theme_file(void)
 {
     char buffer[MAX_PATH];
@@ -309,8 +345,8 @@ void read_viewer_theme_file(void)
     enum themable_icons *icon_dest;
     global_status.viewer_icon_count = 0;
     custom_icons_loaded = false;
-    custom_filetype_icons[0] = Icon_Folder;
-    for (i=1; i<filetype_count; i++)
+    /*custom_filetype_icons[0] = Icon_Folder; filetypes[0] is folder icon.. */
+    for (i=0; i<filetype_count; i++)
     {
         custom_filetype_icons[i] = filetypes[i].icon;
     }
@@ -334,17 +370,8 @@ void read_viewer_theme_file(void)
 
         if (icon_dest)
         {
-            if (*icon == '*')
-                *icon_dest = atoi(icon+1);
-            else if (*icon == '-')
-                *icon_dest = Icon_NOICON;
-            else if (*icon >= '0' && *icon <= '9')
-            {
-                int number = atoi(icon);
-                if (number > global_status.viewer_icon_count)
-                    global_status.viewer_icon_count++;
-                *icon_dest = Icon_Last_Themeable + number;
-            }
+            if (parse_icon(icon, icon_dest) > global_status.viewer_icon_count)
+                global_status.viewer_icon_count++;
         }
     }
     close(fd);
@@ -411,7 +438,6 @@ static void rm_whitespaces(char* str)
 
 static void fill_from_builtin(const char *ext, int tree_attr)
 {
-    size_t icon_count = ARRAY_SIZE(inbuilt_attr_icons_voices);
     if (filetype_count >= MAX_FILETYPES)
         return;
 
@@ -424,14 +450,12 @@ static void fill_from_builtin(const char *ext, int tree_attr)
     if (filetype->attr > highest_attr)
         highest_attr = filetype->attr;
 
-    for (size_t j = icon_count - 1; j < icon_count; j--)
+    int index = filetype_inbuilt_index(tree_attr);
+    if (index >= 0)
     {
-        if (tree_attr == inbuilt_attr_icons_voices[j].tree_attr)
-        {
-            filetype->icon = inbuilt_attr_icons_voices[j].icon;
-            break;
-        }
+        filetype->icon = inbuilt_attr_icons_voices[index].icon;
     }
+
     filetype_count++;
 }
 
@@ -452,7 +476,7 @@ static void read_builtin_types_init(void)
 static void read_config_init(int fd)
 {
     char line[64], *s, *e;
-    char *extension, *plugin;
+    const char *extension, *plugin;
     /* config file is in the format
        <extension>,<plugin>,<icon code>
        ignore line if either of the first two are missing */
@@ -484,12 +508,7 @@ static void read_config_init(int fd)
         {
             /* get the icon */
             s = e+1;
-            if (*s == '*')
-                unknown_file.icon = atoi(s+1);
-            else if (*s == '-')
-                unknown_file.icon = Icon_NOICON;
-            else if (*s >= '0' && *s <= '9')
-                unknown_file.icon = Icon_Last_Themeable + atoi(s);
+            parse_icon(s, &unknown_file.icon);
             continue;
         }
 
@@ -502,25 +521,22 @@ static void read_config_init(int fd)
         highest_attr++;
         /* get the icon */
         s = e+1;
-        if (*s == '*')
-            file_type->icon = atoi(s+1);
-        else if (*s == '-')
-            file_type->icon = Icon_NOICON;
-        else if (*s >= '0' && *s <= '9')
-            file_type->icon = Icon_Last_Themeable + atoi(s);
+        parse_icon(s, &file_type->icon);
         filetype_count++;
     }
 }
 
-int filetype_get_attr(const char* file)
+static int file_find_extension(const char* file)
 {
     char *extension = strrchr(file, '.');
-    int i;
-    if (!extension)
-        return 0;
-    extension++;
+    if (extension)
+        extension++;
+    return find_extension(extension);
+}
 
-    i = find_extension(extension);
+int filetype_get_attr(const char* file)
+{
+    int i = file_find_extension(file);
     if (i >= 0)
         return (filetypes[i].attr<<8)&FILE_ATTR_MASK;
     return 0;
@@ -543,19 +559,12 @@ static int find_attr(int attr)
 #ifdef HAVE_LCD_COLOR
 int filetype_get_color(const char * name, int attr)
 {
-    char *extension;
-    int i;
     if ((attr & ATTR_DIRECTORY)==ATTR_DIRECTORY)
         return custom_colors[0];
-    extension = strrchr(name, '.');
-    if (!extension)
+    int i = file_find_extension(name);
+    if (i <= 0)
         return unknown_file.color;
-    extension++;
-
-    i = find_extension(extension);
-    if (i >= 0)
-        return custom_colors[i];
-    return unknown_file.color;
+    return custom_colors[i];
 }
 #endif
 
@@ -700,7 +709,7 @@ int filetype_load_plugin(const char* plugin, const char* file)
     char plugin_name[MAX_PATH];
     char *s;
 
-    for (i=0;i<filetype_count;i++)
+    for (i=1;i<filetype_count;i++)
     {
         if (filetypes[i].plugin)
         {
