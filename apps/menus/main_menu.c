@@ -358,7 +358,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #if CONFIG_CHARGING == CHARGING_SIMPLE
     /* Only know if plugged */
     if (charger_inserted())
-        simplelist_setline(str(LANG_BATTERY_CHARGE);
+        simplelist_setline(str(LANG_BATTERY_CHARGE));
     else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
     /* Go by what power management reports */
