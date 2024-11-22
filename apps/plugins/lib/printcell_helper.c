@@ -201,6 +201,9 @@ static inline int printcells(struct screen *display, char* buffer,
             buftext = &buffer[sidx[i]];
             display->put_line(x + offw + offx, ny, linedes, "$t", buftext);
             vp->width += COLUMN_ENDLEN + 1;
+            if (vp->width > vp_w)
+                vp->width = vp_w;
+
             draw_selector(display, linedes, selected_flag, i, separator, x, ny, nw, height);
         }
         x = nx;
