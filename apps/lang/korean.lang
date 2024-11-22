@@ -1984,7 +1984,7 @@
   </source>
   <dest>
     *: "데이터베이스 구축하는 중... %d 찾았음 (돌아오려면 OFF)"
-    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "데이터베이스 구축하는 중... %d found (돌아오려면 LEFT)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "데이터베이스 구축하는 중... %d 찾았음 (돌아오려면 LEFT)"
     gogearsa9200: "데이터베이스 구축하는 중... %d 찾았음 (돌아오려면 REW)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "데이터베이스 구축하는 중... %d 찾았음 (돌아오려면 PREV)"
     iriverh100,iriverh120,iriverh300: "데이터베이스 구축하는 중... %d 찾았음 (돌아오려면 STOP)"
@@ -4213,7 +4213,7 @@
     *: "Voice"
   </source>
   <dest>
-    *: "음섬"
+    *: "음성"
   </dest>
   <voice>
     *: "음성"
