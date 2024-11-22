@@ -144,9 +144,12 @@ enum infoscreenorder
     INFO_BATTERY = 0,
     INFO_BUFFER,
 #ifdef HAVE_RECORDING
+    INFO_REC_DIR_TITLE,
     INFO_REC_DIR,
 #endif
+    INFO_ROOT_DIR_TITLE,
     INFO_ROOT_DIR,
+    INFO_VERSION_TITLE,
     INFO_VERSION,
 #if CONFIG_RTC
     INFO_DATE,
@@ -197,113 +200,6 @@ static int refresh_data(struct info_data *info)
     return i;
 }
 
-static const char* info_getname(int selected_item, void *data,
-                                char *buffer, size_t buffer_len)
-{
-    struct info_data *info = (struct info_data*)data;
-#if CONFIG_RTC
-    struct tm *tm;
-#endif
-    char s1[32];
-    char s2[32];
-    int i;
-
-    if (info->new_data)
-	refresh_data(info);
-
-    switch (selected_item)
-    {
-        case INFO_VERSION:
-            snprintf(buffer, buffer_len, "%s: %s",
-                     str(LANG_VERSION), rbversion);
-            break;
-
-#if CONFIG_RTC
-        case INFO_TIME:
-            tm = get_time();
-            if (valid_time(tm))
-            {
-                snprintf(buffer, buffer_len, "%02d:%02d:%02d %s",
-                    global_settings.timeformat == 0 ? tm->tm_hour :
-                         ((tm->tm_hour + 11) % 12) + 1,
-                         tm->tm_min,
-                         tm->tm_sec,
-                         global_settings.timeformat == 0 ? "" :
-                         tm->tm_hour>11 ? "P" : "A");
-            }
-            else
-            {
-                snprintf(buffer, buffer_len, "%s", "--:--:--");
-            }
-            break;
-        case INFO_DATE:
-            tm = get_time();
-            if (valid_time(tm))
-            {
-                snprintf(buffer, buffer_len, "%s %d %d",
-                    str(LANG_MONTH_JANUARY + tm->tm_mon),
-                    tm->tm_mday,
-                    tm->tm_year+1900);
-            }
-            else
-            {
-                snprintf(buffer, buffer_len, "%s", str(LANG_UNKNOWN));
-            }
-            break;
-#endif
-
-#ifdef HAVE_RECORDING
-        case INFO_REC_DIR:
-            snprintf(buffer, buffer_len, "%s %s", str(LANG_REC_DIR), global_settings.rec_directory);
-            break;
-#endif
-        case INFO_ROOT_DIR:
-            snprintf(buffer, buffer_len, "%s %s", str(LANG_DISPLAY_FULL_PATH), root_realpath());
-            break;
-        case INFO_BUFFER: /* buffer */
-        {
-            long kib = audio_buffer_size() >> 10; /* to KiB */
-            output_dyn_value(s1, sizeof(s1), kib, kibyte_units, 3, true);
-            snprintf(buffer, buffer_len, "%s %s", str(LANG_BUFFER_STAT), s1);
-        }
-        break;
-        case INFO_BATTERY: /* battery */
-#if CONFIG_CHARGING == CHARGING_SIMPLE
-            /* Only know if plugged */
-            if (charger_inserted())
-                return str(LANG_BATTERY_CHARGE);
-            else
-#elif CONFIG_CHARGING >= CHARGING_MONITOR
-            /* Go by what power management reports */
-            if (charging_state())
-                return str(LANG_BATTERY_CHARGE);
-            else
-#endif /* CONFIG_CHARGING = */
-            if (battery_level() >= 0)
-                snprintf(buffer, buffer_len, str(LANG_BATTERY_TIME),
-                         battery_level(), battery_time() / 60, battery_time() % 60);
-            else
-                return "Battery n/a"; /* translating worth it? */
-            break;
-        case INFO_DISK1: /* disk usage for internal */
-        default:
-	    i = selected_item - INFO_DISK1;
-	    if (info->size[i]) {
-		output_dyn_value(s1, sizeof s1, info->free[i], kibyte_units, 3, true);
-		output_dyn_value(s2, sizeof s2, info->size[i], kibyte_units, 3, true);
-		snprintf(buffer, buffer_len, "%s %s/%s", str(info->name[i]),
-			 s1, s2);
-#ifdef HAVE_MULTIVOLUME
-	    } else {
-		snprintf(buffer, buffer_len, "%s %s", str(info->name[i]),
-			 str(LANG_NOT_PRESENT));
-#endif
-	    }
-            break;
-    }
-    return buffer;
-}
-
 static int info_speak_item(int selected_item, void * data)
 {
     struct info_data *info = (struct info_data*)data;
@@ -314,10 +210,15 @@ static int info_speak_item(int selected_item, void * data)
     int i;
 
     if (info->new_data)
-	refresh_data(info);
+        refresh_data(info);
 
     switch (selected_item)
     {
+        case INFO_VERSION_TITLE:  /*fallthrough*/
+        case INFO_REC_DIR_TITLE:  /*fallthrough*/
+        case INFO_ROOT_DIR_TITLE: /*fallthrough*/
+            break;
+
         case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
             talk_spell(rbversion, true);
@@ -325,27 +226,21 @@ static int info_speak_item(int selected_item, void * data)
 
 #if CONFIG_RTC
         case INFO_TIME:
-            tm = get_time();
             talk_id(VOICE_CURRENT_TIME, false);
-            if (valid_time(tm))
-            {
-                talk_time(tm, true);
-            }
-            else
-            {
-                talk_id(LANG_UNKNOWN, true);
-            }
-            break;
+            /* fallthrough */
         case INFO_DATE:
             tm = get_time();
-            if (valid_time(tm))
-            {
-                talk_date(get_time(), true);
-            }
-            else
+
+            if (!valid_time(tm))
             {
                 talk_id(LANG_UNKNOWN, true);
+                break;
             }
+            if (selected_item == INFO_DATE)
+                talk_date(tm, true);
+            else
+                talk_time(tm, true);
+
             break;
 #endif
 
@@ -401,42 +296,51 @@ static int info_speak_item(int selected_item, void * data)
             break;
         case INFO_DISK1: /* disk 1 */
         default:
-	    i = selected_item - INFO_DISK1;
-	    if (info->size[i]) {
-		talk_ids(false, info->name[i], LANG_DISK_FREE_INFO);
-		output_dyn_value(NULL, 0, info->free[i], kibyte_units, 3, true);
-		talk_id(LANG_DISK_SIZE_INFO, true);
-		output_dyn_value(NULL, 0, info->size[i], kibyte_units, 3, true);
+            i = selected_item - INFO_DISK1;
+            if (info->size[i]) {
+                talk_ids(false, info->name[i], LANG_DISK_FREE_INFO);
+                output_dyn_value(NULL, 0, info->free[i], kibyte_units, 3, true);
+                talk_id(LANG_DISK_SIZE_INFO, true);
+                output_dyn_value(NULL, 0, info->size[i], kibyte_units, 3, true);
 #ifdef HAVE_MULTIVOLUME
-	    } else {
-		talk_id(LANG_NOT_PRESENT, true);
+            } else {
+                talk_ids(true, info->name[i], LANG_NOT_PRESENT);
 #endif
-	    }
-	    break;
+            }
+            break;
     }
     return 0;
 }
 
 static int info_action_callback(int action, struct gui_synclist *lists)
 {
+    struct info_data *info = (struct info_data *)lists->data;
+    if (info->new_data)
+        refresh_data(info);
+
+    char s1[32];
+    char s2[32];
+#if CONFIG_RTC
+    struct tm *tm;
+#endif
     if (action == ACTION_STD_CANCEL)
+    {
         return action;
+    }
     else if (action == ACTION_STD_OK
 #ifdef HAVE_HOTSWAP
         || action == SYS_FS_CHANGED
 #endif
         )
     {
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        struct info_data *info = (struct info_data *)lists->data;
-        int i;
+        action = ACTION_REDRAW;
         info->new_data = true;
         splash(0, ID2P(LANG_SCANNING_DISK));
-        for (i = 0; i < NUM_VOLUMES; i++)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+        for (int i = 0; i < NUM_VOLUMES; i++)
             volume_recalc_free(IF_MV(i));
 #endif
         gui_synclist_speak_item(lists);
-        return ACTION_REDRAW;
     }
 #if CONFIG_RTC
     else if (action == ACTION_NONE)
@@ -445,10 +349,92 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         if (TIME_AFTER(current_tick, last_redraw + HZ*5))
         {
             last_redraw = current_tick;
-            return ACTION_REDRAW;
         }
+        else
+            return action;
     }
 #endif
+/* Note: these need to be in the same order as enum infoscreenorder */
+    simplelist_reset_lines();
+/* INFO_BATTERY */
+#if CONFIG_CHARGING == CHARGING_SIMPLE
+    /* Only know if plugged */
+    if (charger_inserted())
+        simplelist_setline(str(LANG_BATTERY_CHARGE);
+    else
+#elif CONFIG_CHARGING >= CHARGING_MONITOR
+    /* Go by what power management reports */
+    if (charging_state())
+        simplelist_setline(str(LANG_BATTERY_CHARGE));
+    else
+#endif /* CONFIG_CHARGING = */
+    if (battery_level() >= 0)
+        simplelist_addline(str(LANG_BATTERY_TIME),
+        battery_level(), battery_time() / 60, battery_time() % 60);
+    else
+        simplelist_setline("Battery n/a"); /* translating worth it? */
+
+/* INFO_BUFFER */
+    long kib = audio_buffer_size() >> 10; /* to KiB */
+    output_dyn_value(s1, sizeof(s1), kib, kibyte_units, 3, true);
+    simplelist_addline("%s %s", str(LANG_BUFFER_STAT), s1);
+
+#ifdef HAVE_RECORDING
+/* INFO_REC_DIR_TITLE*/
+    simplelist_setline(str(LANG_REC_DIR));
+/* INFO_REC_DIR */
+    simplelist_setline(global_settings.rec_directory);
+#endif
+
+/* INFO_ROOT_DIR_TITLE */
+    simplelist_setline(str(LANG_DISPLAY_FULL_PATH));
+/* INFO_ROOT_DIR */
+    simplelist_setline(root_realpath());
+/* INFO_VERSION_TITLE */
+    simplelist_setline(str(LANG_VERSION));
+/* INFO_VERSION */
+    simplelist_setline(rbversion);
+#if CONFIG_RTC
+
+    tm = get_time();
+    if (valid_time(tm))
+    {
+/* INFO_DATE */
+        simplelist_addline("%s %d %d",
+            str(LANG_MONTH_JANUARY + tm->tm_mon),
+            tm->tm_mday,
+            tm->tm_year+1900);
+/* INFO_TIME */
+        simplelist_addline("%02d:%02d:%02d %s",
+            global_settings.timeformat == 0 ? tm->tm_hour :
+                 ((tm->tm_hour + 11) % 12) + 1,
+                 tm->tm_min,
+                 tm->tm_sec,
+                 global_settings.timeformat == 0 ? "" :
+                 tm->tm_hour>11 ? "P" : "A");
+    }
+    else
+    {
+/* INFO_DATE */
+        simplelist_setline(str(LANG_UNKNOWN));
+/* INFO_TIME */
+        simplelist_setline("--:--:--");
+    }
+#endif
+/* INFO_DISK, capacity/free on internal */
+    for (int i = 0; i < NUM_VOLUMES; i++) {
+        if (info->size[i]) {
+            output_dyn_value(s1, sizeof s1, info->free[i], kibyte_units, 3, true);
+            output_dyn_value(s2, sizeof s2, info->size[i], kibyte_units, 3, true);
+            simplelist_addline("%s %s/%s", str(info->name[i]), s1, s2);
+#ifdef HAVE_MULTIVOLUME
+        } else {
+            simplelist_addline("%s %s", str(info->name[i]),
+                str(LANG_NOT_PRESENT));
+#endif
+        }
+    }
+
     return action;
 }
 
@@ -456,9 +442,9 @@ static int show_info(void)
 {
     struct info_data data = {.new_data = true };
     struct simplelist_info info;
-    int count = INFO_COUNT + refresh_data(&data) - 1;
-    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), count, (void*)&data);
-    info.get_name = info_getname;
+    refresh_data(&data);
+    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), 0, (void*)&data);
+    simplelist_setline(str(LANG_WAIT)); /* set a line so list is not empty on load */
     if(global_settings.talk_menu)
          info.get_talk = info_speak_item;
     info.action_callback = info_action_callback;
