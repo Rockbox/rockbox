@@ -25,7 +25,7 @@
 #include "system.h"
 #include "button.h"
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "clocking-s5l8702.h"
 #include "spi-s5l8702.h"
 #include "nor-target.h"

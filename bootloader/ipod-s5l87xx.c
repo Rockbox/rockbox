@@ -50,7 +50,7 @@
 #include "serial.h"
 #endif
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "clocking-s5l8702.h"
 #include "spi-s5l8702.h"
 #include "i2c-s5l8702.h"

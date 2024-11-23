@@ -23,7 +23,7 @@
 #include "config.h"
 #include "system.h"
 #include "audio.h"
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "panic.h"
 #include "audiohw.h"
 #include "pcm.h"

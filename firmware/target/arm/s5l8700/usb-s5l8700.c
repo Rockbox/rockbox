@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "usb.h"
 
 void usb_init_device(void)

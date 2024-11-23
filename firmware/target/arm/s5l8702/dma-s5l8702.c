@@ -21,7 +21,7 @@
 
 #include <config.h>
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "pl080.h"
 #include "dma-s5l8702.h"
 

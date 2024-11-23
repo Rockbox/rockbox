@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "inttypes.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "power.h"
 #include "panic.h"
 #include "pmu-target.h"

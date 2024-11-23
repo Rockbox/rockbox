@@ -24,7 +24,7 @@
 #include "config.h"
 #include "system.h"
 
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "uc87xx.h"
 
 

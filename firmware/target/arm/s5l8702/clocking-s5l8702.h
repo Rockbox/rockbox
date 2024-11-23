@@ -180,7 +180,7 @@
 
 /* TODO: join all these definitions in an unique place */
 #if 1
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #else
 #define CLKCON0     (*((volatile uint32_t*)(0x3C500000)))
 #define CLKCON1     (*((volatile uint32_t*)(0x3C500004)))

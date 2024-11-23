@@ -24,7 +24,7 @@
 #include "system.h"
 #include "audiohw.h"
 #include "i2c-s5l8702.h"
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "cscodec.h"
 
 void audiohw_init(void)

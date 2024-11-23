@@ -415,7 +415,7 @@ void lcd_init_device(void)
     lcd_type = (PDAT6 & 0x30) >> 4;
 
     while (!(LCD_STATUS & 0x2));
-    LCD_CONFIG = 0x80100db0;
+    LCD_CON = 0x80100db0;
     LCD_PHTIME = 0x33;
 
     /* Configure DMA channel */

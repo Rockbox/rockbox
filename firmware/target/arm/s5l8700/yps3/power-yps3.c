@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "config.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "power.h"
 
 /*  Power handling for the S5L8700 based Samsung YP-S3

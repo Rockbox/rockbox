@@ -86,7 +86,7 @@ bool dbg_hw_info(void)
 
             f_clk = get_system_freqs(&c_clk, &h_clk, &p_clk);
             s_clk = h_clk / soc_get_hsdiv();
-            l_clk = h_clk >> ((LCD_CONFIG & 7) + 1); /* div = 2^(val+1) */
+            l_clk = h_clk >> ((LCD_CON & 7) + 1); /* div = 2^(val+1) */
 
             #define MHZ 1000000
             #define TMHZ 100000

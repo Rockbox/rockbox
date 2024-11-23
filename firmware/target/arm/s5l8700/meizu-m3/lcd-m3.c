@@ -26,7 +26,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "inttypes.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 
 /*** definitions ***/
 #define STAT_BUS_IDLE   (1<<8)  /* Data bus idle */

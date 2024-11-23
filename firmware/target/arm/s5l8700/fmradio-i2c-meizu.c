@@ -29,7 +29,7 @@
 #include "config.h"
 
 #include "inttypes.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
 

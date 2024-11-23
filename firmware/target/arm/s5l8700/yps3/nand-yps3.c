@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "nand-target.h"
 
 /*  Driver for the S5L8700 flash memory controller for low-level access to the

@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "kernel.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "i2c-s5l8700.h"
 #include "uda1380.h"
 #include "udacodec.h"

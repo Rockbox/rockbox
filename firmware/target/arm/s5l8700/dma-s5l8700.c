@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "dma-target.h"
 #include "panic.h"
 #include "system.h"

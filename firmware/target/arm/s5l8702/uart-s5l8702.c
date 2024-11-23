@@ -25,7 +25,7 @@
 #include "cpu.h"
 #include "system.h"
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "uc87xx.h"
 
 

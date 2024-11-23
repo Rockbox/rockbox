@@ -25,7 +25,7 @@
 #include "config.h"
 #include "system.h"
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "clocking-s5l8702.h"
 #include "crypto-s5l8702.h"
 

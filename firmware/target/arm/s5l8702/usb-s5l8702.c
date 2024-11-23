@@ -27,7 +27,7 @@
 #include "usb_core.h"
 #endif
 
-#include "s5l8702.h"
+#include "s5l87xx.h"
 #include "clocking-s5l8702.h"
 #include "usb-designware.h"
 

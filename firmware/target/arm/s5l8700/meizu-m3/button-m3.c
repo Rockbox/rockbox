@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include "inttypes.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "button-target.h"
 
 /*  Button driver for the meizu M3

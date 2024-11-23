@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "inttypes.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "adc.h"
 #include "adc-target.h"
 #include "kernel.h"

@@ -22,7 +22,7 @@
 #include <inttypes.h>
 
 #include "config.h"
-#include "s5l8700.h"
+#include "s5l87xx.h"
 #include "lcd.h"
 
 /*  LCD driver for the Meizu M6 SP using the CLCD controller in the S5L8700
