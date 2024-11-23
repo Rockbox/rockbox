@@ -115,6 +115,7 @@ struct playlist_viewer {
     int moving_playlist_index;  /* Playlist-relative index (as opposed to
                                    viewer-relative index) of moving track    */
     struct playlist_buffer buffer;
+    struct mp3entry *id3;
 };
 
 struct playlist_search_data
@@ -385,9 +386,15 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         return false;
     }
 
+    size_t id3_size = sizeof(*viewer->id3);
+
     buffer = plugin_get_buffer(&buffer_size);
-    if (!buffer || buffer_size <= MAX_PATH)
+    if (!buffer || buffer_size <= MAX_PATH + id3_size)
         return false;
+
+    viewer->id3 = (void *) buffer;
+    buffer += id3_size;
+    buffer_size -= id3_size;
 
     if (!filename)
     {
@@ -491,16 +498,15 @@ static void format_line(struct playlist_entry* track, char* str,
     ))
     {
         track->attr |= PLAYLIST_ATTR_RETRIEVE_ID3_ATTEMPTED;
-        struct mp3entry id3;
         bool retrieve_success = retrieve_id3_tags(track->index, track->name,
-                                            &id3, METADATA_EXCLUDE_ID3_PATH);
+                                            viewer.id3, METADATA_EXCLUDE_ID3_PATH);
         if (retrieve_success)
         {
             if (!id3viewc)
             {
                 id3viewc = track->name + strlen(track->name) + 1;
             }
-            struct mp3entry * pid3 = &id3;
+            struct mp3entry * pid3 = viewer.id3;
             id3viewc[0] = '\0';
             if (global_settings.playlist_viewer_track_display ==
                 PLAYLIST_VIEWER_ENTRY_SHOW_ID3_TITLE_AND_ALBUM)
@@ -573,11 +579,12 @@ static void format_line(struct playlist_entry* track, char* str,
 
 static enum pv_onplay_result show_track_info(const struct playlist_entry *current_track)
 {
-    struct mp3entry id3;
-    bool id3_retrieval_successful = retrieve_id3_tags(current_track->index, current_track->name, &id3, 0);
+    bool id3_retrieval_successful = retrieve_id3_tags(current_track->index,
+                                                      current_track->name,
+                                                      viewer.id3, 0);
 
     return id3_retrieval_successful &&
-            browse_id3_ex(&id3, viewer.playlist, current_track->display_index,
+            browse_id3_ex(viewer.id3, viewer.playlist, current_track->display_index,
             viewer.num_tracks, NULL, 1) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
 }
 
