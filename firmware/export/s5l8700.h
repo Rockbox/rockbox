@@ -26,7 +26,6 @@
 #include <stdint.h>
 #endif
 
-#define REG8_PTR_T  volatile uint8_t *
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
@@ -781,26 +780,26 @@
 #define HASHDATAIN               ((REG32_PTR_T)(0x3C600040))
 
 /* Clickwheel controller - S5L8701 only */
-#define WHEEL00      (*((uint32_t volatile*)(0x3C200000)))
-#define WHEEL04      (*((uint32_t volatile*)(0x3C200004)))
-#define WHEEL08      (*((uint32_t volatile*)(0x3C200008)))
-#define WHEEL0C      (*((uint32_t volatile*)(0x3C20000C)))
-#define WHEEL10      (*((uint32_t volatile*)(0x3C200010)))
-#define WHEELINT     (*((uint32_t volatile*)(0x3C200014)))
-#define WHEELRX      (*((uint32_t volatile*)(0x3C200018)))
-#define WHEELTX      (*((uint32_t volatile*)(0x3C20001C)))
+#define WHEEL00      (*((REG32_PTR_T)(0x3C200000)))
+#define WHEEL04      (*((REG32_PTR_T)(0x3C200004)))
+#define WHEEL08      (*((REG32_PTR_T)(0x3C200008)))
+#define WHEEL0C      (*((REG32_PTR_T)(0x3C20000C)))
+#define WHEEL10      (*((REG32_PTR_T)(0x3C200010)))
+#define WHEELINT     (*((REG32_PTR_T)(0x3C200014)))
+#define WHEELRX      (*((REG32_PTR_T)(0x3C200018)))
+#define WHEELTX      (*((REG32_PTR_T)(0x3C20001C)))
 
 /* Synopsys OTG - S5L8701 only */
 #define OTGBASE 0x38800000
 #define PHYBASE 0x3C400000
 
 /* OTG PHY control registers */
-#define OPHYPWR     (*((uint32_t volatile*)(PHYBASE + 0x000)))
-#define OPHYCLK     (*((uint32_t volatile*)(PHYBASE + 0x004)))
-#define ORSTCON     (*((uint32_t volatile*)(PHYBASE + 0x008)))
-#define OPHYUNK3    (*((uint32_t volatile*)(PHYBASE + 0x018)))
-#define OPHYUNK1    (*((uint32_t volatile*)(PHYBASE + 0x01c)))
-#define OPHYUNK2    (*((uint32_t volatile*)(PHYBASE + 0x044)))
+#define OPHYPWR     (*((REG32_PTR_T)(PHYBASE + 0x000)))
+#define OPHYCLK     (*((REG32_PTR_T)(PHYBASE + 0x004)))
+#define ORSTCON     (*((REG32_PTR_T)(PHYBASE + 0x008)))
+#define OPHYUNK3    (*((REG32_PTR_T)(PHYBASE + 0x018)))
+#define OPHYUNK1    (*((REG32_PTR_T)(PHYBASE + 0x01c)))
+#define OPHYUNK2    (*((REG32_PTR_T)(PHYBASE + 0x044)))
 
 /* 7 available EPs (0b00000000011101010000000001101011), 6 used */
 #define USB_NUM_ENDPOINTS 6
