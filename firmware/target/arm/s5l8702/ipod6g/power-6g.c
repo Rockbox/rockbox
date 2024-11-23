@@ -72,7 +72,7 @@ void power_init(void)
      * is not present or it is insufficient or limited,
      * additional required power is drained from battery.
      */
-    PCONB = (PCONB & 0x000000ff)
+    PCON11 = (PCON11 & 0x000000ff)
           | (0xe << 8)      /* route D+ to ADC2: off */
           | (0xe << 12)     /* route D- to ADC2: off */
           | (0x0 << 16)     /* USB related input, POL pin ??? */
@@ -80,7 +80,7 @@ void power_init(void)
           | (0xe << 24)     /* HPWR: 100mA */
           | (0xe << 28);    /* USB suspend: off */
 
-    PCONC = (PCONC & 0xffff0000)
+    PCON12 = (PCON12 & 0xffff0000)
           | (0xe << 0)      /* double HPWR limit: off */
           | (0xe << 4)      /* disable battery charge: off */
           | (0xe << 8)      /* disable battery charge: off */

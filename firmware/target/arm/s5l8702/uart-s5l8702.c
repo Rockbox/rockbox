@@ -55,7 +55,7 @@ void uart_target_enable_gpio(int uart_id, int port_id)
             break;
         case 1:
             /* configure UART1 GPIO ports, including RTS/CTS signals */
-            PCOND = (PCOND & 0xff0000ff) | 0x00222200;
+            PCON13 = (PCON13 & 0xff0000ff) | 0x00222200;
             break;
         case 2:
         case 3:
@@ -74,7 +74,7 @@ void uart_target_disable_gpio(int uart_id, int port_id)
             PCON0 = (PCON0 & 0xff00ffff) | 0x00ee0000;
             break;
         case 1:
-            PCOND = (PCOND & 0xff0000ff) | 0x00eeee00;
+            PCON13 = (PCON13 & 0xff0000ff) | 0x00eeee00;
             break;
         case 2:
         case 3:

@@ -381,7 +381,7 @@ static void s5l_clickwheel_init(void)
     PDAT10 &= ~2;
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
     clockgate_enable(CLOCKGATE_CWHEEL, true);
-    PCONE = (PCONE & ~0x00ffff00) | 0x00222200;
+    PCON14 = (PCON14 & ~0x00ffff00) | 0x00222200;
     WHEEL00 = 0; /* stop s5l8702 controller */
     WHEELINT = 7;
     WHEEL10 = 1;
@@ -420,7 +420,7 @@ bool headphones_inserted(void)
 #if CONFIG_CPU==S5L8701
     return ((PDAT14 & (1 << 5)) != 0);
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
-    return ((PDATA & (1 << 6)) != 0);
+    return ((PDAT10 & (1 << 6)) != 0);
 #endif
 }
 #endif
@@ -455,7 +455,7 @@ int button_read_device(void)
             PWRCONEXT |= 1;
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
             WHEEL00 = 0;
-            PCONE = (PCONE & ~0x00ffff00) | 0x000e0e00;
+            PCON14 = (PCON14 & ~0x00ffff00) | 0x000e0e00;
             clockgate_enable(CLOCKGATE_CWHEEL, false);
 #endif
         }

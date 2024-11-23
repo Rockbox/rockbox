@@ -51,8 +51,8 @@ void spi_init(int port, bool state)
             PCON6 = (PCON6 & ~0xffff0000) | (val << 16);
             break;
         case 2:
-            PCONE = (PCONE & ~0xff000000) | (val << 24);
-            PCONF = (PCONF & ~0xff) | (val >> 8);
+            PCON14 = (PCON14 & ~0xff000000) | (val << 24);
+            PCON15 = (PCON15 & ~0xff) | (val >> 8);
             break;
     }
 }

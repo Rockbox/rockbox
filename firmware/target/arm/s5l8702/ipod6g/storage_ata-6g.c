@@ -678,11 +678,11 @@ static int ata_power_up(void)
         *((uint32_t volatile*)0x3cf0010c) = 0xff;
         SDCI_CTRL = SDCI_CTRL_SDCIEN | SDCI_CTRL_CLK_SEL_SDCLK
                   | SDCI_CTRL_BIT_8 | SDCI_CTRL_BIT_14;
-        SDCI_CDIV = SDCI_CDIV_CLKDIV(260);
+        SDCI_CLKDIV = SDCI_CDIV_CLKDIV(260);
         *((uint32_t volatile*)0x3cf00200) = 0xb000f;
         SDCI_IRQ_MASK = SDCI_IRQ_MASK_MASK_DAT_DONE_INT | SDCI_IRQ_MASK_MASK_IOCARD_IRQ_INT;
         PASS_RC(mmc_init(), 3, 0);
-        SDCI_CDIV = SDCI_CDIV_CLKDIV(4);
+        SDCI_CLKDIV = SDCI_CDIV_CLKDIV(4);
         sleep(HZ / 100);
         PASS_RC(ceata_init(8), 3, 1);
         PASS_RC(ata_identify(identify_info), 3, 2);

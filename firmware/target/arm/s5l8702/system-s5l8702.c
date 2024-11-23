@@ -157,9 +157,10 @@ void irq_handler(void)
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
-    void* dummy = VIC0ADDRESS;
-    dummy = VIC1ADDRESS;
-    (void)dummy;
+    const void* dummy0 = VIC0ADDRESS;
+    (void)dummy0;
+    const void* dummy1 = VIC1ADDRESS;
+    (void)dummy1;
     uint32_t irqs0 = VIC0IRQSTATUS;
     uint32_t irqs1 = VIC1IRQSTATUS;
     for (current_irq = 0; irqs0; current_irq++, irqs0 >>= 1)
