@@ -50,9 +50,6 @@ static void fill_from_builtin(const char*,int) INIT_ATTR;
 static void read_builtin_types_init(void) INIT_ATTR;
 static void read_viewers_config_init(void) INIT_ATTR;
 static void read_config_init(int fd) INIT_ATTR;
-#ifdef HAVE_LCD_COLOR
-void read_color_theme_file(void) INIT_ATTR;
-#endif
 
 /* string array for known audio file types (tree_attr == FILE_ATTR_AUDIO) */
 static const char* inbuilt_audio_filetypes[] = {
