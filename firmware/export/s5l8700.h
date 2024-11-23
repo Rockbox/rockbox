@@ -19,6 +19,9 @@
  *
  ****************************************************************************/
 
+#ifndef __S5L8700_H__
+#define __S5L8700_H__
+
 #ifndef ASM
 #include <stdint.h>
 #endif
@@ -811,3 +814,5 @@
 // #define USB_DW_ARCH_SLAVE
 
 #endif /* CONFIG_CPU==S5L8701 */
+
+#endif /* __S5L8700_H__ */
