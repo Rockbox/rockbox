@@ -178,7 +178,7 @@
 #define HAVE_USB_CHARGING_ENABLE
 
 /* The size of the flash ROM */
-#define FLASH_SIZE 0x1000000
+#define FLASH_SIZE 0x100000
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ        216000000
@@ -211,9 +211,6 @@
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
-
-/* Alternative bootfile extension - this is for encrypted images */
-#define BOOTFILE_EXT2 "ipodx"
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
