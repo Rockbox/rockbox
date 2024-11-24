@@ -49,7 +49,7 @@ $(BUILDDIR)/sysfont.o: $(SYSFONTX) $(BUILDDIR)/sysfont.h
 
 ifdef USE_LTO
 $(BUILDDIR)/firmware/asm/%.o: CFLAGS += -fno-lto
-$(BUILDDIR)/firmware/kernel/%.o: CFLAGS += -fno-lto
+$(BUILDDIR)/firmware/kernel/thread.o: CFLAGS += -fno-lto
 endif
 
 # GNU make (at least) has a bug/feature that exported variable are not available

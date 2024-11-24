@@ -47,7 +47,7 @@ static char panic_buf[128];
 #define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH) - 2
 
 #if defined(CPU_ARM) && defined(HAVE_RB_BACKTRACE)
-void panicf_f( const char *fmt, ...);
+void panicf_f( const char *fmt, ...) USED_ATTR;
 
 /* we wrap panicf() here with naked function to catch SP value */
 void __attribute__((naked)) panicf( const char *fmt, ...)
@@ -60,7 +60,7 @@ void __attribute__((naked)) panicf( const char *fmt, ...)
 }
 
 /*
- * "Dude. This is pretty fucked-up, right here." 
+ * "Dude. This is pretty fucked-up, right here."
  */
 void panicf_f( const char *fmt, ...)
 {

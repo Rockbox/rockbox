@@ -26,7 +26,7 @@
  *---------------------------------------------------------------------------
  */
 
-void start_thread(void); /* Provide C access to ASM label */
+void start_thread(void) USED_ATTR; /* Provide C access to ASM label */
 static void USED_ATTR _start_thread(void)
 {
     /* t1 = context */
