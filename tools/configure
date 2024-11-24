@@ -942,6 +942,24 @@ mipsellinuxcc () {
  prefixtools "mipsel-rockbox-linux-gnu-"
 }
 
+do_bootloader() {
+      appsdir='$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      flash=""
+      if test -n "$boottool"; then
+          tool="$boottool"
+      fi
+      if test -n "$bootoutput"; then
+          output=$bootoutput
+      fi
+      if test -n "$arm_thumb_boot" && test -z "$ARG_ARM_THUMB"; then
+          ARG_ARM_THUMB=1
+      fi
+      extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
+      bootloader="1"
+      if [ -n "${sysfontbl}" ] ; then sysfont=$sysfontbl ; fi
+}
+
 whichadvanced () {
   atype=`echo "$1" | cut -c 2-`
   ##################################################################
@@ -953,9 +971,9 @@ whichadvanced () {
     interact=1
     echo ""
     printf "Enter your developer options (press only enter when done)\n\
-(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (U)SB Serial,\n\
+(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (B)ootloader, (P)rofiling, (V)oice, (U)SB Serial,\n\
 (W)in32 crosscompile, Win(6)4 crosscompile, (T)est plugins, (O)mit plugins, \n\
-S(m)all C lib, Logf to Ser(i)al port, LTO (B)uild, (E)rror on warnings"
+S(m)all C lib, Logf to Ser(i)al port, LTO Build(X), (E)rror on warnings"
     if [ "$modelname" = "iaudiom5" ]; then
       printf ", (F)M radio MOD"
     fi
@@ -1014,6 +1032,10 @@ S(m)all C lib, Logf to Ser(i)al port, LTO (B)uild, (E)rror on warnings"
         echo "Simulator build enabled"
         simulator="yes"
         ;;
+      [Bb])
+        echo "Bootloader build selected"
+        do_bootloader
+        ;;
       [Pp])
         if [ "yes" = "$use_debug" ]; then
           echo "Profiling is incompatible with debug"
@@ -1054,11 +1076,12 @@ S(m)all C lib, Logf to Ser(i)al port, LTO (B)uild, (E)rror on warnings"
         win32crosscompile="yes"
         win64="yes"
         ;;
-       [Bb])
+      [Xx])
         echo "LTO build enabled"
         LTO_ARG="export USE_LTO=y"
+#        GCCOPTS="$GCCOPTS -flto"
         ;;
-       [Ee])
+      [Ee])
         echo "Treating all warnings as errors"
         GCCOPTS="$GCCOPTS -Werror"
         ;;
@@ -1658,23 +1681,23 @@ cat <<EOF
  142) YH-925
  143) YP-S3                ==MPIO==              ==ROCKCHIP==
                            170) HD200            180) rk27xx generic
- ==HiFiMAN==               171) HD300                                      
+ ==HiFiMAN==               171) HD300
  190) HM-60x                                     ==HiFi E.T.==
  191) HM-801               ==Application==       210) MA9
                            200) SDL              211) MA9C
  ==Sony==                  201) Android          212) MA8
  219) NWZ-E350 series      202) Nokia N8xx       213) MA8C
- 220) NWZ-E370/E380 series 203) Nokia N900                                 
+ 220) NWZ-E370/E380 series 203) Nokia N900
  221) NWZ-E360 series      204) Pandora          ==IHIFI==
  222) NWZ-E450 series      205) Samsung YP-R0    230) 760
  223) NWZ-E460 series      206) Android MIPS     231) 960
  224) NWZ-E470 series      207) Android x86      250) 770C
  225) NWZ-E580 series      208) Samsung YP-R1    251) 770
  226) NWZ-A10 series                             252) 800
- 227) NW-A20 series        ==iBasso==                                      
+ 227) NW-A20 series        ==iBasso==
  228) NWZ-A860 series      232) DX50             ==AgpTek==
  229) NWZ-S750 series      233) DX90             240) Rocker
-                                                                           
+
  ==FiiO==                  ==xDuoo==             ==AIGO==
  244) M3K Linux            241) X3               245) Eros Q / K
  246) M3K baremetal        242) X3II             247) Eros Q / K native
@@ -4351,21 +4374,7 @@ fi
       echo "sansa eraser build selected"
       ;;
     [Bb])
-      appsdir='$(ROOTDIR)/bootloader'
-      apps="bootloader"
-      flash=""
-      if test -n "$boottool"; then
-          tool="$boottool"
-      fi
-      if test -n "$bootoutput"; then
-          output=$bootoutput
-      fi
-      if test -n "$arm_thumb_boot" && test -z "$ARG_ARM_THUMB"; then
-          ARG_ARM_THUMB=1
-      fi
-      extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
-      bootloader="1"
-      if [ -n "${sysfontbl}" ] ; then sysfont=$sysfontbl ; fi
+      do_bootloader
       echo "Bootloader build selected"
       ;;
     [Ss])
