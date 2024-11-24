@@ -217,6 +217,7 @@ static void scroll_up(struct view_info *info, int n)
 
     calc_first_line(info, info->line-n);
     draw_text(info);
+    rb->yield();
 }
 
 static void scroll_down(struct view_info *info, int n)
@@ -226,6 +227,7 @@ static void scroll_down(struct view_info *info, int n)
 
     calc_first_line(info, info->line+n);
     draw_text(info);
+    rb->yield();
 }
 
 static void scroll_to_top(struct view_info *info)
