@@ -107,31 +107,11 @@
 #define SECTOR_SIZE     512
 #endif
 
-/* The file I/O code operates in terms of the FILESYSTEM sector size,
-   which may be much larger than the underlying device's logical sector size.
-   So we have to use the larger of the filesystem's max, the max logical, or
-   the the fixed logical size.
-*/
-
-#if defined(MAX_VIRT_SECTOR_SIZE) && defined(MAX_VARIABLE_LOG_SECTOR)
-#if (MAX_VIRT_SECTOR_SIZE < MAX_VARIABLE_LOG_SECTOR)
-#error "MAX_VIRT_SECTOR_SIZE < MAX_VARIABLE_LOG_SECTOR"
-#endif
-#if (MAX_VIRT_SECTOR_SIZE % MAX_VARIABLE_LOG_SECTOR)
-#error "MAX_VIRT_SECTOR_SIZE is not a multiple of MAX_VARIABLE_LOG_SECTOR"
-#endif
-#endif
-
-#if !defined(DC_CACHE_BUFSIZE) && defined(MAX_VIRT_SECTOR_SIZE)
-#define DC_CACHE_BUFSIZE MAX_VIRT_SECTOR_SIZE
-#endif
-
-#if !defined(DC_CACHE_BUFSIZE) && defined(MAX_VARIABLE_LOG_SECTOR)
-#define DC_CACHE_BUFSIZE MAX_VARIABLE_LOG_SECTOR
-#endif
-
-#if !defined(DC_CACHE_BUFSIZE)
-#define DC_CACHE_BUFSIZE SECTOR_SIZE
+/* this _could_ be larger than a sector if that would ever be useful */
+#ifdef MAX_VARIABLE_LOG_SECTOR
+#define DC_CACHE_BUFSIZE   MAX_VARIABLE_LOG_SECTOR
+#else
+#define DC_CACHE_BUFSIZE    SECTOR_SIZE
 #endif
 
 #endif /* FS_DEFINES_H */
