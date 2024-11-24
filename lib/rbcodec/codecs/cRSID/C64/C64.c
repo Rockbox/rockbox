@@ -31,7 +31,9 @@ cRSID_C64instance* cRSID_createC64 (cRSID_C64instance* C64, unsigned short sampl
 
 
 void cRSID_setC64 (cRSID_C64instance* C64) {   //set hardware-parameters (Models, SIDs) for playback of loaded SID-tune
- enum C64clocks { C64_PAL_CPUCLK=985248, C64_NTSC_CPUCLK=1022727 };
+#define C64_PAL_CPUCLK (985248)
+#define C64_NTSC_CPUCLK (1022727)
+
  enum C64scanlines { C64_PAL_SCANLINES = 312, C64_NTSC_SCANLINES = 263 };
  enum C64scanlineCycles { C64_PAL_SCANLINE_CYCLES = 63, C64_NTSC_SCANLINE_CYCLES = 65 };
  //enum C64framerates { PAL_FRAMERATE = 50, NTSC_FRAMERATE = 60 }; //Hz

@@ -743,12 +743,12 @@ av_cold int avcodec_close(AVCodecContext *avctx)
     return 0;
 }
 
-AVCodec *avcodec_find_encoder(enum CodecID id)
+AVCodec *avcodec_find_encoder(int codec_id)
 {
     AVCodec *p, *experimental=NULL;
     p = first_avcodec;
     while (p) {
-        if (p->encode != NULL && p->id == id) {
+        if (p->encode != NULL && p->id == codec_id) {
             if (p->capabilities & CODEC_CAP_EXPERIMENTAL && !experimental) {
                 experimental = p;
             } else
@@ -773,12 +773,12 @@ AVCodec *avcodec_find_encoder_by_name(const char *name)
     return NULL;
 }
 
-AVCodec *avcodec_find_decoder(enum CodecID id)
+AVCodec *avcodec_find_decoder(int codec_id)
 {
     AVCodec *p;
     p = first_avcodec;
     while (p) {
-        if (p->decode != NULL && p->id == id)
+        if (p->decode != NULL && p->id == codec_id)
             return p;
         p = p->next;
     }
@@ -1010,7 +1010,7 @@ char av_get_pict_type_char(int pict_type){
     }
 }
 
-int av_get_bits_per_sample(enum CodecID codec_id){
+int av_get_bits_per_sample(int codec_id){
     switch(codec_id){
     case CODEC_ID_ADPCM_SBPRO_2:
         return 2;
@@ -1150,7 +1150,7 @@ AVHWAccel *av_hwaccel_next(AVHWAccel *hwaccel)
     return hwaccel ? hwaccel->next : first_hwaccel;
 }
 
-AVHWAccel *ff_find_hwaccel(enum CodecID codec_id, enum PixelFormat pix_fmt)
+AVHWAccel *ff_find_hwaccel(int codec_id, enum PixelFormat pix_fmt)
 {
     AVHWAccel *hwaccel=NULL;
 

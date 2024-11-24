@@ -278,7 +278,7 @@ struct cache_entry_t
     uint8_t  block_header; /* final wave block header */
 };
 
-enum { BRR_CACHE_SIZE = 0x20000 + 32};
+#define BRR_CACHE_SIZE (0x20000 + 32)
 
 struct voice_wave_t
 {
@@ -424,7 +424,7 @@ struct Spc_Emu
     uint8_t boot_rom  [ROM_SIZE];
 };
 
-enum { SPC_FILE_SIZE = 0x10180 };
+#define SPC_FILE_SIZE (0x10180)
 
 struct spc_file_t
 {

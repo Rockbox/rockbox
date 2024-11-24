@@ -213,149 +213,150 @@ enum CodecID {
     CODEC_ID_VP8,
     CODEC_ID_PICTOR,
     CODEC_ID_ANSI,
-
+};
+/* enums are 2 bits on some devices */
     /* various PCM "codecs" */
-    CODEC_ID_PCM_S16LE= 0x10000,
-    CODEC_ID_PCM_S16BE,
-    CODEC_ID_PCM_U16LE,
-    CODEC_ID_PCM_U16BE,
-    CODEC_ID_PCM_S8,
-    CODEC_ID_PCM_U8,
-    CODEC_ID_PCM_MULAW,
-    CODEC_ID_PCM_ALAW,
-    CODEC_ID_PCM_S32LE,
-    CODEC_ID_PCM_S32BE,
-    CODEC_ID_PCM_U32LE,
-    CODEC_ID_PCM_U32BE,
-    CODEC_ID_PCM_S24LE,
-    CODEC_ID_PCM_S24BE,
-    CODEC_ID_PCM_U24LE,
-    CODEC_ID_PCM_U24BE,
-    CODEC_ID_PCM_S24DAUD,
-    CODEC_ID_PCM_ZORK,
-    CODEC_ID_PCM_S16LE_PLANAR,
-    CODEC_ID_PCM_DVD,
-    CODEC_ID_PCM_F32BE,
-    CODEC_ID_PCM_F32LE,
-    CODEC_ID_PCM_F64BE,
-    CODEC_ID_PCM_F64LE,
-    CODEC_ID_PCM_BLURAY,
+#define CODEC_ID_PCM_S16LE   (0x10000)
+#define CODEC_ID_PCM_S16BE   (0x10001)
+#define CODEC_ID_PCM_U16LE   (0x10002)
+#define CODEC_ID_PCM_U16BE   (0x10003)
+#define CODEC_ID_PCM_S8      (0x10004)
+#define CODEC_ID_PCM_U8      (0x10005)
+#define CODEC_ID_PCM_MULAW   (0x10006)
+#define CODEC_ID_PCM_ALAW    (0x10007)
+#define CODEC_ID_PCM_S32LE   (0x10008)
+#define CODEC_ID_PCM_S32BE   (0x10009)
+#define CODEC_ID_PCM_U32LE   (0x1000A)
+#define CODEC_ID_PCM_U32BE   (0x1000B)
+#define CODEC_ID_PCM_S24LE   (0x1000C)
+#define CODEC_ID_PCM_S24BE   (0x1000D)
+#define CODEC_ID_PCM_U24LE   (0x1000E)
+#define CODEC_ID_PCM_U24BE   (0x1000F)
+#define CODEC_ID_PCM_S24DAUD (0x10010)
+#define CODEC_ID_PCM_ZORK    (0x10011)
+#define CODEC_ID_PCM_S16LE_PLANAR (0x10012)
+#define CODEC_ID_PCM_DVD     (0x10013)
+#define CODEC_ID_PCM_F32BE   (0x10014)
+#define CODEC_ID_PCM_F32LE   (0x10015)
+#define CODEC_ID_PCM_F64BE   (0x10016)
+#define CODEC_ID_PCM_F64LE   (0x10017)
+#define CODEC_ID_PCM_BLURAY  (0x10018)
 
     /* various ADPCM codecs */
-    CODEC_ID_ADPCM_IMA_QT= 0x11000,
-    CODEC_ID_ADPCM_IMA_WAV,
-    CODEC_ID_ADPCM_IMA_DK3,
-    CODEC_ID_ADPCM_IMA_DK4,
-    CODEC_ID_ADPCM_IMA_WS,
-    CODEC_ID_ADPCM_IMA_SMJPEG,
-    CODEC_ID_ADPCM_MS,
-    CODEC_ID_ADPCM_4XM,
-    CODEC_ID_ADPCM_XA,
-    CODEC_ID_ADPCM_ADX,
-    CODEC_ID_ADPCM_EA,
-    CODEC_ID_ADPCM_G726,
-    CODEC_ID_ADPCM_CT,
-    CODEC_ID_ADPCM_SWF,
-    CODEC_ID_ADPCM_YAMAHA,
-    CODEC_ID_ADPCM_SBPRO_4,
-    CODEC_ID_ADPCM_SBPRO_3,
-    CODEC_ID_ADPCM_SBPRO_2,
-    CODEC_ID_ADPCM_THP,
-    CODEC_ID_ADPCM_IMA_AMV,
-    CODEC_ID_ADPCM_EA_R1,
-    CODEC_ID_ADPCM_EA_R3,
-    CODEC_ID_ADPCM_EA_R2,
-    CODEC_ID_ADPCM_IMA_EA_SEAD,
-    CODEC_ID_ADPCM_IMA_EA_EACS,
-    CODEC_ID_ADPCM_EA_XAS,
-    CODEC_ID_ADPCM_EA_MAXIS_XA,
-    CODEC_ID_ADPCM_IMA_ISS,
+#define CODEC_ID_ADPCM_IMA_QT     (0x11000)
+#define CODEC_ID_ADPCM_IMA_WAV    (0x11001)
+#define CODEC_ID_ADPCM_IMA_DK3    (0x11002)
+#define CODEC_ID_ADPCM_IMA_DK4    (0x11003)
+#define CODEC_ID_ADPCM_IMA_WS     (0x11004)
+#define CODEC_ID_ADPCM_IMA_SMJPEG (0x11005)
+#define CODEC_ID_ADPCM_MS         (0x11006)
+#define CODEC_ID_ADPCM_4XM        (0x11007)
+#define CODEC_ID_ADPCM_XA         (0x11008)
+#define CODEC_ID_ADPCM_ADX        (0x11009)
+#define CODEC_ID_ADPCM_EA         (0x1100A)
+#define CODEC_ID_ADPCM_G726       (0x1100B)
+#define CODEC_ID_ADPCM_CT         (0x1100C)
+#define CODEC_ID_ADPCM_SWF        (0x1100D)
+#define CODEC_ID_ADPCM_YAMAHA     (0x1100E)
+#define CODEC_ID_ADPCM_SBPRO_4    (0x1100F)
+#define CODEC_ID_ADPCM_SBPRO_3    (0x11010)
+#define CODEC_ID_ADPCM_SBPRO_2    (0x11011)
+#define CODEC_ID_ADPCM_THP        (0x11012)
+#define CODEC_ID_ADPCM_IMA_AMV    (0x11013)
+#define CODEC_ID_ADPCM_EA_R1      (0x11014)
+#define CODEC_ID_ADPCM_EA_R3      (0x11015)
+#define CODEC_ID_ADPCM_EA_R2      (0x11016)
+#define CODEC_ID_ADPCM_IMA_EA_SEAD (0x11017)
+#define CODEC_ID_ADPCM_IMA_EA_EACS (0x11018)
+#define CODEC_ID_ADPCM_EA_XAS      (0x11019)
+#define CODEC_ID_ADPCM_EA_MAXIS_XA (0x1101A)
+#define CODEC_ID_ADPCM_IMA_ISS     (0x1101B)
 
     /* AMR */
-    CODEC_ID_AMR_NB= 0x12000,
-    CODEC_ID_AMR_WB,
+#define CODEC_ID_AMR_NB (0x12000)
+#define CODEC_ID_AMR_WB (0x12001)
 
     /* RealAudio codecs*/
-    CODEC_ID_RA_144= 0x13000,
-    CODEC_ID_RA_288,
+#define CODEC_ID_RA_144 (0x13000)
+#define CODEC_ID_RA_288 (0x13001)
 
     /* various DPCM codecs */
-    CODEC_ID_ROQ_DPCM= 0x14000,
-    CODEC_ID_INTERPLAY_DPCM,
-    CODEC_ID_XAN_DPCM,
-    CODEC_ID_SOL_DPCM,
+#define CODEC_ID_ROQ_DPCM        (0x14000)
+#define CODEC_ID_INTERPLAY_DPCM  (0x14001)
+#define CODEC_ID_XAN_DPCM        (0x14002)
+#define CODEC_ID_SOL_DPCM        (0x14003)
 
     /* audio codecs */
-    CODEC_ID_MP2= 0x15000,
-    CODEC_ID_MP3, ///< preferred ID for decoding MPEG audio layer 1, 2 or 3
-    CODEC_ID_AAC,
-    CODEC_ID_AC3,
-    CODEC_ID_DTS,
-    CODEC_ID_VORBIS,
-    CODEC_ID_DVAUDIO,
-    CODEC_ID_WMAV1,
-    CODEC_ID_WMAV2,
-    CODEC_ID_MACE3,
-    CODEC_ID_MACE6,
-    CODEC_ID_VMDAUDIO,
-    CODEC_ID_SONIC,
-    CODEC_ID_SONIC_LS,
-    CODEC_ID_FLAC,
-    CODEC_ID_MP3ADU,
-    CODEC_ID_MP3ON4,
-    CODEC_ID_SHORTEN,
-    CODEC_ID_ALAC,
-    CODEC_ID_WESTWOOD_SND1,
-    CODEC_ID_GSM, ///< as in Berlin toast format
-    CODEC_ID_QDM2,
-    CODEC_ID_COOK,
-    CODEC_ID_TRUESPEECH,
-    CODEC_ID_TTA,
-    CODEC_ID_SMACKAUDIO,
-    CODEC_ID_QCELP,
-    CODEC_ID_WAVPACK,
-    CODEC_ID_DSICINAUDIO,
-    CODEC_ID_IMC,
-    CODEC_ID_MUSEPACK7,
-    CODEC_ID_MLP,
-    CODEC_ID_GSM_MS, /* as found in WAV */
-    CODEC_ID_ATRAC3,
-    CODEC_ID_VOXWARE,
-    CODEC_ID_APE,
-    CODEC_ID_NELLYMOSER,
-    CODEC_ID_MUSEPACK8,
-    CODEC_ID_SPEEX,
-    CODEC_ID_WMAVOICE,
-    CODEC_ID_WMAPRO,
-    CODEC_ID_WMALOSSLESS,
-    CODEC_ID_ATRAC3P,
-    CODEC_ID_EAC3,
-    CODEC_ID_SIPR,
-    CODEC_ID_MP1,
-    CODEC_ID_TWINVQ,
-    CODEC_ID_TRUEHD,
-    CODEC_ID_MP4ALS,
-    CODEC_ID_ATRAC1,
-    CODEC_ID_BINKAUDIO_RDFT,
-    CODEC_ID_BINKAUDIO_DCT,
+#define CODEC_ID_MP2            (0x15000)
+#define CODEC_ID_MP3            (0x15001) ///< preferred ID for decoding MPEG audio layer 1, 2 or 3
+#define CODEC_ID_AAC            (0x15002)
+#define CODEC_ID_AC3            (0x15003)
+#define CODEC_ID_DTS            (0x15004)
+#define CODEC_ID_VORBIS         (0x15005)
+#define CODEC_ID_DVAUDIO        (0x15006)
+#define CODEC_ID_WMAV1          (0x15007)
+#define CODEC_ID_WMAV2          (0x15008)
+#define CODEC_ID_MACE3          (0x15009)
+#define CODEC_ID_MACE6          (0x1500A)
+#define CODEC_ID_VMDAUDIO       (0x1500B)
+#define CODEC_ID_SONIC          (0x1500C)
+#define CODEC_ID_SONIC_LS       (0x1500D)
+#define CODEC_ID_FLAC           (0x1500E)
+#define CODEC_ID_MP3ADU         (0x1500F)
+#define CODEC_ID_MP3ON4         (0x15010)
+#define CODEC_ID_SHORTEN        (0x15011)
+#define CODEC_ID_ALAC           (0x15012)
+#define CODEC_ID_WESTWOOD_SND1  (0x15013)
+#define CODEC_ID_GSM            (0x15014) ///< as in Berlin toast format
+#define CODEC_ID_QDM2           (0x15015)
+#define CODEC_ID_COOK           (0x15016)
+#define CODEC_ID_TRUESPEECH     (0x15017)
+#define CODEC_ID_TTA            (0x15018
+#define CODEC_ID_SMACKAUDIO     (0x15019)
+#define CODEC_ID_QCELP          (0x1501A)
+#define CODEC_ID_WAVPACK        (0x1501B)
+#define CODEC_ID_DSICINAUDIO    (0x1501C)
+#define CODEC_ID_IMC            (0x1501D)
+#define CODEC_ID_MUSEPACK7      (0x1501E)
+#define CODEC_ID_MLP            (0x1501F)
+#define CODEC_ID_GSM_MS         (0x15020) /* as found in WAV */
+#define CODEC_ID_ATRAC3         (0x15021)
+#define CODEC_ID_VOXWARE        (0x15022)
+#define CODEC_ID_APE            (0x15023)
+#define CODEC_ID_NELLYMOSER     (0x15024)
+#define CODEC_ID_MUSEPACK8      (0x15025)
+#define CODEC_ID_SPEEX          (0x15026)
+#define CODEC_ID_WMAVOICE       (0x15027)
+#define CODEC_ID_WMAPRO         (0x15028)
+#define CODEC_ID_WMALOSSLESS    (0x15029)
+#define CODEC_ID_ATRAC3P        (0x1502A)
+#define CODEC_ID_EAC3           (0x1502B)
+#define CODEC_ID_SIPR           (0x1502C)
+#define CODEC_ID_MP1            (0x1502D)
+#define CODEC_ID_TWINVQ         (0x1502E)
+#define CODEC_ID_TRUEHD         (0x1502F)
+#define CODEC_ID_MP4ALS         (0x15030)
+#define CODEC_ID_ATRAC1         (0x15031)
+#define CODEC_ID_BINKAUDIO_RDFT (0x15032)
+#define CODEC_ID_BINKAUDIO_DCT  (0x15033)
 
     /* subtitle codecs */
-    CODEC_ID_DVD_SUBTITLE= 0x17000,
-    CODEC_ID_DVB_SUBTITLE,
-    CODEC_ID_TEXT,  ///< raw UTF-8 text
-    CODEC_ID_XSUB,
-    CODEC_ID_SSA,
-    CODEC_ID_MOV_TEXT,
-    CODEC_ID_HDMV_PGS_SUBTITLE,
-    CODEC_ID_DVB_TELETEXT,
-    CODEC_ID_SRT,
+#define CODEC_ID_DVD_SUBTITLE (0x17000)
+#define CODEC_ID_DVB_SUBTITLE (0x17001)
+#define CODEC_ID_TEXT         (0x17002)  ///< raw UTF-8 text
+#define CODEC_ID_XSUB         (0x17003)
+#define CODEC_ID_SSA          (0x17004)
+#define CODEC_ID_MOV_TEXT     (0x17005)
+#define CODEC_ID_HDMV_PGS_SUBTITLE (0x17006)
+#define CODEC_ID_DVB_TELETEXT (0x17007)
+#define CODEC_ID_SRT          (0x17008)
 
     /* other specific kind of codecs (generally used for attachments) */
-    CODEC_ID_TTF= 0x18000,
+#define CODEC_ID_TTF (0x18000)
 
-    CODEC_ID_PROBE= 0x19000, ///< codec_id is not known (like CODEC_ID_NONE) but lavf should attempt to identify it
+#define CODEC_ID_PROBE (0x19000) ///< codec_id is not known (like CODEC_ID_NONE) but lavf should attempt to identify it
 
-    CODEC_ID_MPEG2TS= 0x20000, /**< _FAKE_ codec to indicate a raw MPEG-2 TS
+#define CODEC_ID_MPEG2TS (0x20000) /**< _FAKE_ codec to indicate a raw MPEG-2 TS
                                 * stream (only used by libavformat) */
 };
 
@@ -1306,7 +1307,7 @@ typedef struct AVCodecContext {
 
     char codec_name[32];
     enum AVMediaType codec_type; /* see AVMEDIA_TYPE_xxx */
-    enum CodecID codec_id; /* see CODEC_ID_xxx */
+    int  codec_id; /* see CODEC_ID_xxx */
 
     /**
      * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
@@ -2721,7 +2722,7 @@ typedef struct AVCodec {
      */
     const char *name;
     enum AVMediaType type;
-    enum CodecID id;
+    int id; /*enum CodecId*/
     int priv_data_size;
     int (*init)(AVCodecContext *);
     int (*encode)(AVCodecContext *, uint8_t *buf, int buf_size, void *data);
@@ -2774,7 +2775,7 @@ typedef struct AVHWAccel {
      *
      * See CODEC_ID_xxx
      */
-    enum CodecID id;
+    int id; /*enum CodecID*/
 
     /**
      * Supported pixel format.
@@ -3278,7 +3279,7 @@ void avcodec_register(AVCodec *codec);
  * @param id CodecID of the requested encoder
  * @return An encoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_encoder(enum CodecID id);
+AVCodec *avcodec_find_encoder(int codec_id);
 
 /**
  * Find a registered encoder with the specified name.
@@ -3294,7 +3295,7 @@ AVCodec *avcodec_find_encoder_by_name(const char *name);
  * @param id CodecID of the requested decoder
  * @return A decoder if one was found, NULL otherwise.
  */
-AVCodec *avcodec_find_decoder(enum CodecID id);
+AVCodec *avcodec_find_decoder(int codec_id);
 
 /**
  * Find a registered decoder with the specified name.
@@ -3678,7 +3679,7 @@ char av_get_pict_type_char(int pict_type);
  * @param[in] codec_id the codec
  * @return Number of bits per sample or zero if unknown for the given codec.
  */
-int av_get_bits_per_sample(enum CodecID codec_id);
+int av_get_bits_per_sample(int codec_id);
 
 /**
  * Return sample format bits per sample.

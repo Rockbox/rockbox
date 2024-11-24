@@ -38,8 +38,8 @@ enum { bank_count   = fds_banks + 8 };
 
 enum { rom_begin = 0x8000 };
 enum { bank_select_addr = 0x5FF8 };
-enum { mem_size  = 0x10000 };	
-	
+#define mem_size  (0x10000)
+
 // cpu sits here when waiting for next call to play routine
 enum { idle_addr = 0x5FF6 };
 enum { banks_addr = idle_addr };

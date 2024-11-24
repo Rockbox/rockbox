@@ -104,7 +104,7 @@ char cRSID_playSIDfile(cRSID_C64instance* C64, char* filename, char subtune) {
 
 
 cRSID_SIDheader* cRSID_loadSIDtune(cRSID_C64instance* C64, char* filename) {
- enum SIDspecs { CRSID_FILESIZE_MAX = 100000 };
+#define CRSID_FILESIZE_MAX (100000)
  int FileSize;
  static unsigned char SIDfileData [CRSID_FILESIZE_MAX]; //use memset?
 

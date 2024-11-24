@@ -9,7 +9,7 @@
 
 enum { apu_status_addr = 0x4015 };
 enum { apu_osc_count = 5 };
-enum { apu_no_irq = INT_MAX/2 + 1 };
+#define apu_no_irq (INT_MAX/2 + 1)
 enum { apu_irq_waiting = 0 };
 
 enum { apu_io_addr = 0x4000 };

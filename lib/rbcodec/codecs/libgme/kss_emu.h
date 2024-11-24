@@ -34,7 +34,7 @@ enum {
 
 enum { idle_addr = 0xFFFF };
 enum { scc_enabled_true = 0xC000 };
-enum { mem_size = 0x10000 };
+#define mem_size (0x10000)
 
 // KSS file header
 enum { header_size = 0x20 };
