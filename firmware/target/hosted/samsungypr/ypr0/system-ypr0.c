@@ -281,3 +281,10 @@ void set_cpu_frequency(long frequency)
     }
 }
 #endif
+
+int volume_partition(int volume)
+{
+    (void)volume;
+    /* Hosted only implement a single parition per "drive" */
+    return 0;
+}

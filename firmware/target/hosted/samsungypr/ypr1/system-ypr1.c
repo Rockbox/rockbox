@@ -80,3 +80,10 @@ int hostfs_flush(void)
 
     return 0;
 }
+
+int volume_partition(int volume)
+{
+    (void)volume;
+    /* Hosted only implement a single parition per "drive" */
+    return 0;
+}

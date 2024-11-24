@@ -296,3 +296,10 @@ bool volume_present(int volume)
     return hostfs_present(volume);
 }
 #endif /* HAVE_HOTSWAP */
+
+int volume_partition(int volume)
+{
+    (void)volume;
+    /* Hosted only implement a single parition per "drive" */
+    return 0;
+}
