@@ -539,10 +539,37 @@ static int unicode_len(char encoding, const void* string)
     return len;
 }
 
-/* Checks to see if the passed in string is a 16-bit wide Unicode v2
+/* Checks if passed string can be treated as utf-8 string and process it accordingly */
+static bool parse_as_utf8(char* string, int *len)
+{
+    switch (string[0])
+    {
+        case 0x01: /* Unicode with or without BOM */
+        case 0x02:
+            return false;
+
+        case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
+            if (get_codepage() != UTF_8)
+                return false;
+        // fallthrough
+        case 0x03: /* UTF-8 encoded string */
+            (*len)--;
+            memmove(string, string + 1, *len);
+            return true;
+
+        default: /* Plain old string */
+            if (get_codepage() == UTF_8)
+            {
+                return true;
+            }
+            return false;
+    }
+}
+
+/* Must be called after parse_as_utf8. Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
    we convert from the default codepage */
-static int unicode_munge(char* string, char* utf8buf, int *len) {
+static void unicode_munge(char* string, char* utf8buf, int *len) {
     long tmp;
     bool le = false;
     int i = 0;
@@ -603,20 +630,13 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             } while(i < *len);
             *len = templen - 1;
             break;
-
-        case 0x03: /* UTF-8 encoded string */
-            for(i=0; i < *len; i++)
-                utf8[i] = str[i+1];
-            (*len)--;
-            break;
-
+        /* case 0x03:  UTF-8 encoded string handled by parse_as_utf8 */
         default: /* Plain old string */
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
             *len = (intptr_t)utf8 - (intptr_t)utf8buf;
             break;
     }
-    return 0;
 }
 
 /*
@@ -783,7 +803,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
     int flags;
     bool global_unsynch = false;
     bool unsynch = false;
-    int i, j;
+    int i;
     int rc;
     bool itunes_gapless = false;
 
@@ -1092,17 +1112,17 @@ retry_with_limit:
                         }
                     }
 
-                    /* UTF-8 could potentially be 3 times larger */
-                    /* so we need to create a new buffer         */
-                    char utf8buf[(3 * bytesread) + 1];
+                    if (!parse_as_utf8(tag, &bytesread))
+                    {
+                        /* UTF-8 could potentially be 3 times larger */
+                        /* so we need to create a new buffer         */
+                        char utf8buf[(3 * bytesread) + 1];
+                        unicode_munge( tag, utf8buf, &bytesread);
+                        if(bytesread >= buffersize - bufferpos)
+                            bytesread = buffersize - bufferpos - 1;
 
-                    unicode_munge( tag, utf8buf, &bytesread );
-
-                    if(bytesread >= buffersize - bufferpos)
-                        bytesread = buffersize - bufferpos - 1;
-
-                    for (j = 0; j < bytesread; j++)
-                        tag[j] = utf8buf[j];
+                        memcpy(tag, utf8buf, bytesread);
+                    }
 
                     /* remove trailing spaces */
                     while ( bytesread > 0 && isspace(tag[bytesread-1]))
