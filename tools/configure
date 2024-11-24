@@ -1079,7 +1079,7 @@ S(m)all C lib, Logf to Ser(i)al port, LTO Build(X), (E)rror on warnings"
       [Xx])
         echo "LTO build enabled"
         LTO_ARG="export USE_LTO=y"
-#        GCCOPTS="$GCCOPTS -flto"
+        GCCOPTS="$GCCOPTS -flto"
         ;;
       [Ee])
         echo "Treating all warnings as errors"

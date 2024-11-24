@@ -154,8 +154,8 @@ endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 ifdef USE_LTO
- PLUGINFLAGS += -flto -fno-builtin -ffreestanding
- PLUGINLDFLAGS += -flto -fno-builtin -ffreestanding
+ PLUGINFLAGS += -fno-builtin -ffreestanding
+ PLUGINLDFLAGS += -fno-builtin -ffreestanding
  PLUGINLDFLAGS += -e plugin_start
 endif
 

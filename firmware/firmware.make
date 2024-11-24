@@ -47,6 +47,11 @@ $(BUILDDIR)/sysfont.o: $(SYSFONTX) $(BUILDDIR)/sysfont.h
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(BUILDDIR)/sysfont.c $<
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$(BUILDDIR)/sysfont.c))$(CC) $(CFLAGS) -c $(BUILDDIR)/sysfont.c -o $@
 
+ifdef USE_LTO
+$(BUILDDIR)/firmware/asm/%.o: CFLAGS += -fno-lto
+$(BUILDDIR)/firmware/kernel/%.o: CFLAGS += -fno-lto
+endif
+
 # GNU make (at least) has a bug/feature that exported variable are not available
 # in the shell function (but are in recipe). Thus we need to explicitely pass
 # the VERSION environement variable

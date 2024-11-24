@@ -34,8 +34,8 @@ endif
 CODECLDFLAGS += $(GLOBAL_LDOPTS)
 
 ifdef USE_LTO
- CODECLDFLAGS += -flto -fno-builtin -ffreestanding
- CODECFLAGS += -flto -fno-builtin -ffreestanding
+ CODECLDFLAGS += -fno-builtin -ffreestanding
+ CODECFLAGS += -fno-builtin -ffreestanding
  CODECLDFLAGS += -e __header
 endif
 
