@@ -348,7 +348,7 @@ enum skin_token_type {
  */
 struct tag_info
 {
-    enum skin_token_type type;
+    unsigned short type;
     unsigned short param_pos;
     const char* name;
     int flags;
