@@ -132,13 +132,13 @@ static int show_legal(void)
 
 #define SIZE_FMT "%s %s"
 struct info_data
-
 {
     sector_t size[NUM_VOLUMES];
     sector_t free[NUM_VOLUMES];
     unsigned long name[NUM_VOLUMES];
     bool new_data;
 };
+
 enum infoscreenorder
 {
     INFO_BATTERY = 0,
@@ -171,6 +171,7 @@ static int refresh_data(struct info_data *info)
     int max = -1;
 #endif
     int drive = 0;
+    int special = 0;
     for (i = 0 ; CHECK_VOL(i) ; i++) {
 #endif
 	volume_size(IF_MV(i,) &info->size[i], &info->free[i]);
@@ -178,19 +179,32 @@ static int refresh_data(struct info_data *info)
 #ifdef HAVE_MULTIDRIVE
 	drive = volume_drive(i);
 #endif
-	if (drive > 0 || info->size[i] == 0)
+	if (drive > 0)
 	    info->name[i] = LANG_DISK_NAME_MMC;
 	else
 #endif
 	    info->name[i] = LANG_DISK_NAME_INTERNAL;
 #ifdef HAVE_MULTIDRIVE
-	if (drive > max)
+	if (drive > max) {
 	    max = drive;
-	else if (drive < max)
-	    break;
-#elif defined(HAVE_MULTIVOLUME) && (defined(HAVE_HOTSWAP) || defined(HAVE_HOTSWAP) || defined(HAVE_DIRCACHE) || defined(HAVE_BOOTDATA))
-        if (volume_partition(i) == -1)
-            break;
+        } else if (drive < max) {
+            if (max == 0) {
+                /* Special case, make sure we display a single entry for
+                   secondary drive too */
+                special = 1;
+            }
+#endif
+#if defined(HAVE_MULTIVOLUME) && (defined(HAVE_HOTSWAP) || defined(HAVE_HOTSWAP) || defined(HAVE_DIRCACHE) || defined(HAVE_BOOTDATA))
+            if (volume_partition(i) == -1) {
+                if (special)
+                    info->name[i] = LANG_DISK_NAME_MMC;
+                else
+                    info->name[i] = 0;
+                break; /* ie stop when we run out of valid partitions */
+            }
+#endif
+#ifdef HAVE_MULTIDRIVE
+        }
 #endif
 #ifdef HAVE_MULTIVOLUME
     }
@@ -301,7 +315,7 @@ static int info_speak_item(int selected_item, void * data)
                 talk_id(LANG_DISK_SIZE_INFO, true);
                 output_dyn_value(NULL, 0, info->size[i], kibyte_units, 3, true);
 #ifdef HAVE_MULTIVOLUME
-            } else {
+            } else if (info->name[i]) {
                 talk_ids(true, info->name[i], LANG_NOT_PRESENT);
 #endif
             }
@@ -335,7 +349,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         info->new_data = true;
         splash(0, ID2P(LANG_SCANNING_DISK));
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        for (int i = 0; i < NUM_VOLUMES; i++)
+        for (int i = 0; CHECK_VOL(i); i++)
             volume_recalc_free(IF_MV(i));
 #endif
         gui_synclist_speak_item(lists);
@@ -420,13 +434,13 @@ static int info_action_callback(int action, struct gui_synclist *lists)
     }
 #endif
 /* INFO_DISK, capacity/free on internal */
-    for (int i = 0; i < NUM_VOLUMES; i++) {
+    for (int i = 0; CHECK_VOL(i) ; i++) {
         if (info->size[i]) {
             output_dyn_value(s1, sizeof s1, info->free[i], kibyte_units, 3, true);
             output_dyn_value(s2, sizeof s2, info->size[i], kibyte_units, 3, true);
             simplelist_addline("%s %s/%s", str(info->name[i]), s1, s2);
 #ifdef HAVE_MULTIVOLUME
-        } else {
+        } else if (info->name[i]) {
             simplelist_addline("%s %s", str(info->name[i]),
                 str(LANG_NOT_PRESENT));
 #endif
