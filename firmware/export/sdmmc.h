@@ -27,7 +27,7 @@
 
 typedef struct
 {
-    bool initialized;
+    int initialized; /* 0, 1, or negative for errors */
 
     unsigned long read_timeout;     /* n * 8 clock cycles */
     unsigned long write_timeout;    /* n * 8 clock cycles */
