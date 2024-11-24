@@ -169,9 +169,9 @@ static int refresh_data(struct info_data *info)
 #ifdef HAVE_MULTIVOLUME
 #ifdef HAVE_MULTIDRIVE
     int max = -1;
+    int special = 0;
 #endif
     int drive = 0;
-    int special = 0;
     for (i = 0 ; CHECK_VOL(i) ; i++) {
 #endif
 	volume_size(IF_MV(i,) &info->size[i], &info->free[i]);
@@ -196,9 +196,11 @@ static int refresh_data(struct info_data *info)
 #endif
 #if defined(HAVE_MULTIVOLUME) && (defined(HAVE_HOTSWAP) || defined(HAVE_HOTSWAP) || defined(HAVE_DIRCACHE) || defined(HAVE_BOOTDATA))
             if (volume_partition(i) == -1) {
+#ifdef HAVE_MULTIDRIVE
                 if (special)
                     info->name[i] = LANG_DISK_NAME_MMC;
                 else
+#endif
                     info->name[i] = 0;
                 break; /* ie stop when we run out of valid partitions */
             }
