@@ -29,12 +29,14 @@ CODEC_HEADER
 ((((uint32_t)c1)<<24)|(((uint32_t)c2)<<16)|(((uint32_t)c3)<<8)|((uint32_t)c4))
 
 /* This codec supports the following AIFC compressionType formats */
-#define AIFC_FORMAT_PCM          FOURCC('N', 'O', 'N', 'E') /* AIFC PCM Format (big endian) */
-#define AIFC_FORMAT_ALAW         FOURCC('a', 'l', 'a', 'w') /* AIFC ALaw compressed */
-#define AIFC_FORMAT_MULAW        FOURCC('u', 'l', 'a', 'w') /* AIFC uLaw compressed */
-#define AIFC_FORMAT_IEEE_FLOAT32 FOURCC('f', 'l', '3', '2') /* AIFC IEEE float 32 bit */
-#define AIFC_FORMAT_IEEE_FLOAT64 FOURCC('f', 'l', '6', '4') /* AIFC IEEE float 64 bit */
-#define AIFC_FORMAT_QT_IMA_ADPCM FOURCC('i', 'm', 'a', '4') /* AIFC QuickTime IMA ADPCM */
+enum {
+    AIFC_FORMAT_PCM          = FOURCC('N', 'O', 'N', 'E'), /* AIFC PCM Format (big endian) */
+    AIFC_FORMAT_ALAW         = FOURCC('a', 'l', 'a', 'w'), /* AIFC ALaw compressed */
+    AIFC_FORMAT_MULAW        = FOURCC('u', 'l', 'a', 'w'), /* AIFC uLaw compressed */
+    AIFC_FORMAT_IEEE_FLOAT32 = FOURCC('f', 'l', '3', '2'), /* AIFC IEEE float 32 bit */
+    AIFC_FORMAT_IEEE_FLOAT64 = FOURCC('f', 'l', '6', '4'), /* AIFC IEEE float 64 bit */
+    AIFC_FORMAT_QT_IMA_ADPCM = FOURCC('i', 'm', 'a', '4'), /* AIFC QuickTime IMA ADPCM */
+};
 
 static const struct pcm_entry pcm_codecs[] = {
     { AIFC_FORMAT_PCM,          get_linear_pcm_codec      },

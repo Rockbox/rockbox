@@ -102,11 +102,9 @@ enum codec_command_action {
 #ifdef HAVE_RECORDING
     CODEC_ACTION_STREAM_FINISH = 2,
 #endif
-
+    CODEC_ACTION_MIN = LONG_MIN,
+    CODEC_ACTION_MAX = LONG_MAX,
 };
-
-#define     CODEC_ACTION_MIN (LONG_MIN)
-#define     CODEC_ACTION_MAX = (LONG_MAX)
 
 /* NOTE: To support backwards compatibility, only add new functions at
          the end of the structure.  Every time you add a new function,

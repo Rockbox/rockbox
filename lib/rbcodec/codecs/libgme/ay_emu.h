@@ -14,7 +14,7 @@
 
 // 64K memory to load code and data into before starting track. Caller
 // must parse the AY file.
-#define mem_size  (0x10000)
+enum { mem_size = 0x10000 };
 enum { ram_addr = 0x4000 }; // where official RAM starts
 
 // AY file header

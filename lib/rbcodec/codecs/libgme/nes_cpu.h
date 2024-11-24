@@ -11,13 +11,13 @@ typedef int nes_time_t;
 typedef int addr_t;
 
 enum { page_bits = 11 };
-#define page_size (1 << page_bits)
+enum { page_size = 1 << page_bits };
 enum { page_count = 0x10000 >> page_bits };
 
 // Unmapped page should be filled with this
 enum { halt_opcode = 0x22 };
 
-#define future_time (INT_MAX/2 + 1)
+enum { future_time = INT_MAX/2 + 1 };
 enum { irq_inhibit_mask = 0x04 };
 	
 // Can read this many bytes past end of a page

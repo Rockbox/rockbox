@@ -11,7 +11,7 @@ typedef int addr_t;
 
 // Emulator reads this many bytes past end of a page
 enum { cpu_padding = 8 };
-#define mem_size (0x10000)
+enum { mem_size = 0x10000 };
 enum { page_bits = 13 };
 enum { page_size = 1 << page_bits };
 enum { page_count = mem_size >> page_bits };

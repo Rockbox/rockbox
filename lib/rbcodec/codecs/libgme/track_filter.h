@@ -10,7 +10,7 @@
 typedef short sample_t;
 typedef int sample_count_t;
 
-#define indefinite_count (INT_MAX/2 + 1)
+enum { indefinite_count = INT_MAX/2 + 1 };
 enum { buf_size = 2048 };
 
 struct setup_t {

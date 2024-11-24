@@ -98,7 +98,7 @@ static inline void Sweep_reset( struct Gb_Square* this )
 
 // Noise 
 
-#define period2_mask (0x1FFFF)
+enum { period2_mask = 0x1FFFF };
 	
 struct Gb_Noise {
 	struct Gb_Osc osc;

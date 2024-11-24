@@ -34,7 +34,7 @@ static int const blip_buffer_extra_ = BLIP_MAX_QUALITY + 2;
 // Properties of fixed-point sample position
 typedef unsigned ufixed_t; // unsigned for more range, optimized shifts
 enum { fixed_bits = BLIP_BUFFER_ACCURACY };             // bits in fraction
-#define fixed_unit  (1 << fixed_bits)  // 1.0 samples
+enum { fixed_unit = 1 << fixed_bits };  // 1.0 samples
 
 // Deltas in buffer are fixed-point with this many fraction bits.
 // Less than 16 for extra range.

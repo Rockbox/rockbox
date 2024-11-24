@@ -7,7 +7,7 @@
 #include "gb_oscs.h"
 
 // Clock rate sound hardware runs at
-#define clock_rate (4194304 * GB_APU_OVERCLOCK)
+enum { clock_rate = 4194304 * GB_APU_OVERCLOCK };
 	
 // Registers are at io_addr to io_addr+io_size-1
 enum { io_addr = 0xFF10 };
