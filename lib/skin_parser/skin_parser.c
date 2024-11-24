@@ -501,7 +501,6 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     const char* bookmark;
     const char *open_square_bracket = NULL;
 
-    char tag_name[MAX_TAG_LENGTH];
     const char* tag_args;
     const struct tag_info *tag;
     struct skin_tag_parameter* params = NULL;
@@ -513,25 +512,14 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     int optional = 0;
 
     /* Checking the tag name */
-    for (i=0; cursor[i] && i<MAX_TAG_LENGTH; i++)
-        tag_name[i] = cursor[i];
-
-    /* First we check the two characters after the '%', then a single char */
-    tag = NULL;
-    i = MAX_TAG_LENGTH;
-    while (!tag && i > 1)
-    {
-        tag_name[i-1] = '\0';
-        tag = find_tag(tag_name);
-        i--;
-    }
+    tag = find_tag(cursor);
 
     if(!tag)
     {
         skin_error(ILLEGAL_TAG, cursor);
         return 0;
     }
-    cursor += i;
+    cursor += tag->param_pos - 1; /*strlen(tag->name)*/;
 
     /* Copying basic tag info */
     if(element->type != CONDITIONAL && element->type != VIEWPORT)

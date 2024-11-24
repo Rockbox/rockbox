@@ -78,11 +78,8 @@ static void skip_enumlist(const char** document)
 
 void skip_tag(const char** document)
 {
-    char tag_name[MAX_TAG_LENGTH];
-    int i;
     bool qmark;
     const struct tag_info *tag;
-    const char *cursor;
 
     if(**document == TAGSYM)
         (*document)++;
@@ -96,22 +93,8 @@ void skip_tag(const char** document)
     }
     else
     {
-        cursor = *document;
-
         /* Checking the tag name */
-        for (i=0; cursor[i] && i<MAX_TAG_LENGTH; i++)
-            tag_name[i] = cursor[i];
-
-        /* First we check the two characters after the '%', then a single char */
-        tag = NULL;
-        i = MAX_TAG_LENGTH;
-        while (!tag && i > 1)
-        {
-            tag_name[i-1] = '\0';
-            tag = find_tag(tag_name);
-            i--;
-        }
-
+        tag = find_tag(*document);
         if (tag)
         {
             *document += tag->param_pos - 1; /*strlen(tag->name)*/

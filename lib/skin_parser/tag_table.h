@@ -354,14 +354,14 @@ struct tag_info
     int flags;
 };
 
-/* 
+/*
  * Finds a tag by name and returns its parameter list, or an empty
  * string if the tag is not found in the table
  */
-const struct tag_info* find_tag(const char* name);
+const struct tag_info* find_tag(const char *name);
 
 /*
- * Determines whether a character is legal to escape or not.  If 
+ * Determines whether a character is legal to escape or not.  If
  * lookup is not found in the legal escape characters string, returns
  * false, otherwise returns true
  */

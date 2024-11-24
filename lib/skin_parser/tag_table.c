@@ -19,15 +19,17 @@
  *
  ****************************************************************************/
 
-#include "tag_table.h"
-
 #include <string.h>
+#include "tag_table.h"
+#include "debug.h"
+
 #define BAR_PARAMS "?[iP][iP][iP][iP]|s*"
 /* The tag definition table */
-static const struct tag_info legal_tags[] = 
+static const struct tag_info legal_tags[] =
 {
     /*{type,namelen+1,name\0param,flags}*/
 #define TAG(type,name,param,flag) {(type),sizeof(name),(name "\0" param),(flag)}
+
     TAG(SKIN_TOKEN_ALIGN_CENTER,          "ac", "", 0),
     TAG(SKIN_TOKEN_ALIGN_LEFT,            "al", "", 0),
     TAG(SKIN_TOKEN_ALIGN_LEFT_RTL,        "aL", "", 0),
@@ -38,6 +40,48 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_LOGICAL_IF,            "if", "TS[ITS]|D", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LOGICAL_AND,           "and", "T*", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LOGICAL_OR,            "or", "T*", SKIN_REFRESH_DYNAMIC),
+
+    TAG(SKIN_TOKEN_FILE_BITRATE,          "fb", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_CODEC,            "fc", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_FREQUENCY,        "ff", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_FREQUENCY_KHZ,    "fk", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_NAME_WITH_EXTENSION,  "fm", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_NAME,             "fn", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_PATH,             "fp", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_SIZE,             "fs", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_VBR,              "fv", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_DIRECTORY,        "d"  , "I", SKIN_REFRESH_STATIC),
+
+    TAG(SKIN_TOKEN_FILE_BITRATE,          "Fb", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_CODEC,            "Fc", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_FREQUENCY,        "Ff", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_FREQUENCY_KHZ,    "Fk", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_NAME_WITH_EXTENSION,  "Fm", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_NAME,             "Fn", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_PATH,             "Fp", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_SIZE,             "Fs", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_VBR,              "Fv", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_DIRECTORY,        "D"  , "I", SKIN_REFRESH_STATIC),
+
+    TAG(SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|[IP][IP]I", 0|NOBREAK),
+    TAG(SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S|[IT]I", 0),
+    TAG(SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK),
+    TAG(SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SF|II", SKIN_REFRESH_STATIC|NOBREAK),
+    TAG(SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT,"x9", "S", 0),
+
+    TAG(SKIN_TOKEN_VIEWPORT_ENABLE,        "Vd" , "S", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_UIVIEWPORT_ENABLE,      "VI" , "S", SKIN_REFRESH_STATIC),
+
+    TAG(SKIN_TOKEN_VIEWPORT_CUSTOMLIST,    "Vp" , "IC", SKIN_REFRESH_DYNAMIC|NOBREAK),
+    TAG(SKIN_TOKEN_VIEWPORT_FGCOLOUR,      "Vf" , "s", SKIN_REFRESH_STATIC|NOBREAK),
+    TAG(SKIN_TOKEN_VIEWPORT_BGCOLOUR,      "Vb" , "s", SKIN_REFRESH_STATIC|NOBREAK),
+    TAG(SKIN_TOKEN_VIEWPORT_TEXTSTYLE,     "Vs" , "S|s", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP,"Vg" , "SS|s", SKIN_REFRESH_STATIC|NOBREAK),
+    TAG(SKIN_TOKEN_VIEWPORT_DRAWONBG,      "VB" , "", SKIN_REFRESH_STATIC|NOBREAK),
+
+    TAG(SKIN_TOKEN_VIEWPORT_CONDITIONAL,   "Vl" , "S[IP][IP][ip][ip]i", 0),
+    TAG(SKIN_TOKEN_UIVIEWPORT_LOAD,        "Vi" , "s[IP][IP][ip][ip]i", 0),
+    TAG(SKIN_TOKEN_VIEWPORT_LOAD,          "V"  , "[IP][IP][ip][ip]i", 0),
 
     TAG(SKIN_TOKEN_BATTERY_PERCENT,       "bl" , BAR_PARAMS, SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_BATTERY_VOLTS,         "bv", "", SKIN_REFRESH_DYNAMIC),
@@ -66,28 +110,6 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_RTC_MONTH_NAME,        "cb", "", SKIN_RTC_REFRESH),
     TAG(SKIN_TOKEN_RTC_DAY_OF_WEEK_START_MON, "cu", "", SKIN_RTC_REFRESH),
     TAG(SKIN_TOKEN_RTC_DAY_OF_WEEK_START_SUN, "cw", "", SKIN_RTC_REFRESH),
-
-    TAG(SKIN_TOKEN_FILE_BITRATE,          "fb", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_CODEC,            "fc", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_FREQUENCY,        "ff", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_FREQUENCY_KHZ,    "fk", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_NAME_WITH_EXTENSION,  "fm", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_NAME,             "fn", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_PATH,             "fp", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_SIZE,             "fs", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_VBR,              "fv", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_DIRECTORY,        "d"  , "I", SKIN_REFRESH_STATIC),
-
-    TAG(SKIN_TOKEN_FILE_BITRATE,          "Fb", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_CODEC,            "Fc", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_FREQUENCY,        "Ff", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_FREQUENCY_KHZ,    "Fk", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_NAME_WITH_EXTENSION,  "Fm", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_NAME,             "Fn", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_PATH,             "Fp", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_SIZE,             "Fs", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_VBR,              "Fv", "", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_FILE_DIRECTORY,        "D"  , "I", SKIN_REFRESH_STATIC),
 
     TAG(SKIN_TOKEN_METADATA_ARTIST,       "ia", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_METADATA_COMPOSER,     "ic", "", SKIN_REFRESH_STATIC),
@@ -176,20 +198,12 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_DISABLE_THEME,         "wd", "", 0|NOBREAK),
     TAG(SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "", SKIN_REFRESH_STATIC|NOBREAK),
 
-    TAG(SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|[IP][IP]I", 0|NOBREAK),
-    TAG(SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S|[IT]I", 0),
-    TAG(SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SF|II", SKIN_REFRESH_STATIC|NOBREAK),
-    TAG(SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT,"x9", "S", 0),
-
     TAG(SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF|I", 0|NOBREAK),
     TAG(SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "[iP][iP][iP][iP]|ss", 0|NOBREAK),
     TAG(SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_ALBUMART_FOUND,        "C" , "", SKIN_REFRESH_STATIC),
 
-    TAG(SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_UIVIEWPORT_ENABLE,     "VI" , "S", SKIN_REFRESH_STATIC),
 
-    TAG(SKIN_TOKEN_VIEWPORT_CUSTOMLIST,   "Vp" , "IC", SKIN_REFRESH_DYNAMIC|NOBREAK),
     TAG(SKIN_TOKEN_LIST_TITLE_TEXT,       "Lt" , "", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LIST_ITEM_TEXT,        "LT", "|IS",  SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LIST_ITEM_ROW,         "LR", "",  SKIN_REFRESH_DYNAMIC),
@@ -201,16 +215,6 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_LIST_ITEM_IS_SELECTED, "Lc" , "", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LIST_NEEDS_SCROLLBAR,  "LB", BAR_PARAMS, SKIN_REFRESH_DYNAMIC),
 
-    TAG(SKIN_TOKEN_VIEWPORT_FGCOLOUR,      "Vf" , "s", SKIN_REFRESH_STATIC|NOBREAK),
-    TAG(SKIN_TOKEN_VIEWPORT_BGCOLOUR,      "Vb" , "s", SKIN_REFRESH_STATIC|NOBREAK),
-    TAG(SKIN_TOKEN_VIEWPORT_TEXTSTYLE,     "Vs" , "S|s", SKIN_REFRESH_STATIC),
-    TAG(SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP,"Vg" , "SS|s", SKIN_REFRESH_STATIC|NOBREAK),
-    TAG(SKIN_TOKEN_VIEWPORT_DRAWONBG,      "VB" , "", SKIN_REFRESH_STATIC|NOBREAK),
-
-    TAG(SKIN_TOKEN_VIEWPORT_CONDITIONAL,   "Vl" , "S[IP][IP][ip][ip]i", 0),
-    TAG(SKIN_TOKEN_UIVIEWPORT_LOAD,        "Vi" , "s[IP][IP][ip][ip]i", 0),
-    TAG(SKIN_TOKEN_VIEWPORT_LOAD,          "V"  , "[IP][IP][ip][ip]i", 0),
-
     TAG(SKIN_TOKEN_TOP_QUICKSETTING_NAME,    "QT" , "", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_TOP_QUICKSETTING_VALUE,   "Qt" , "", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_RIGHT_QUICKSETTING_NAME,  "QR" , "", SKIN_REFRESH_DYNAMIC),
@@ -220,7 +224,6 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_LEFT_QUICKSETTING_NAME,   "QL" , "", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_LEFT_QUICKSETTING_VALUE,  "Ql" , "", SKIN_REFRESH_DYNAMIC),
 
-    TAG(SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK),
     /* This uses the bar tag params also but the first item can be a string
      * and we don't allow no params. */
     TAG(SKIN_TOKEN_SETTING,               "St" , "[Sip]|[ip][ip][ip]s*", SKIN_REFRESH_DYNAMIC),
@@ -230,7 +233,7 @@ static const struct tag_info legal_tags[] =
     /* HACK Alert (jdgordon): The next two tags have hacks so we could
      * add a S param at the front without breaking old skins.
      * [SD]D <- handled by the callback, allows SD or S or D params
-     * [SI]III[SI]|SN <- SIIIIS|S or IIIIS|S 
+     * [SI]III[SI]|SN <- SIIIIS|S or IIIIS|S
      *  keep in sync with parse_touchregion() and parse_lasttouch() */
     TAG(SKIN_TOKEN_LASTTOUCH,     "Tl" , "|[SD]D", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_TOUCHREGION,   "T"  , "[Sip][ip][ip][ip][Sip]|S*", 0|NOBREAK),
@@ -264,26 +267,35 @@ static const char legal_escape_characters[] = "%(,);#<|>";
 
 /*
  * Just does a straight search through the tag table to find one by
- * the given name
+ * the given name, n denotes command length and length name will be truncated to
  */
-const struct tag_info* find_tag(const char* name)
+static const struct tag_info* search_tag(const char* name, int n)
 {
-    
     const struct tag_info* current = legal_tags;
-    
-    /* 
+
+    /*
      * Continue searching so long as we have a non-empty name string
      * and the name of the current element doesn't match the name
-     * we're searching for
+     * we're searching for, param_pos contains the length of name
+     * including the Null \0 character
      */
-    
-    while(strcmp(current->name, name) && current->name[0] != '\0')
-        current++;
 
-    if(current->name[0] == '\0')
+    while(current->param_pos > 1
+      && (current->param_pos != n || strncmp(current->name, name, n - 1) != 0))
+    {
+        current++;
+    }
+
+    if(current->param_pos <= 1) /*param_pos of 1 is an empty string '\0'*/
+    {
+        //DEBUGF("!NOT FOUND! %s %d %.*s\n", __func__, -1, n-1, name);
         return NULL;
+    }
     else
+    {
+        //DEBUGF("%s %d %s\n", __func__, current->type, current->name);
         return current;
+    }
 
 }
 
@@ -298,4 +310,21 @@ int find_escape_character(char lookup)
         return 1;
     else
         return 0;
+}
+
+/*
+ * Finds a tag by name and returns its parameter list, or an empty
+ * string if the tag is not found in the table
+ */
+const struct tag_info* find_tag(const char *name)
+{
+    /* First we check three then two characters after the '%', then a single char */
+    const struct tag_info *tag = NULL;
+    int i = MAX_TAG_LENGTH;
+    while (!tag && i > 1)
+    {
+        tag = search_tag(name, i);
+        i--;
+    }
+    return tag;
 }
