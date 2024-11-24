@@ -499,10 +499,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 {
     const char* cursor = *document + 1;
     const char* bookmark;
-    char *open_square_bracket = NULL;
+    const char *open_square_bracket = NULL;
 
     char tag_name[MAX_TAG_LENGTH];
-    char* tag_args;
+    const char* tag_args;
     const struct tag_info *tag;
     struct skin_tag_parameter* params = NULL;
 
