@@ -703,6 +703,59 @@ bool setid3v1title(int fd, struct mp3entry *entry)
     return true;
 }
 
+static bool is_cuesheet(char *tag, unsigned char *char_enc, unsigned char *cuesheet_offset)
+{
+    *char_enc = 0;
+    /* [enc type]+"CUESHEET\0" = 10 */
+    *cuesheet_offset = 10;
+    unsigned char utf16 = 0;
+
+    switch (tag[0])
+    {
+        case 0x00:
+            *char_enc = CHAR_ENC_ISO_8859_1;
+            break;
+        case 0x01:
+            if (!memcmp(tag + 1, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
+                utf16 = CHAR_ENC_UTF_16_BE;
+            else if (!memcmp(tag + 1, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
+                utf16 = CHAR_ENC_UTF_16_LE;
+            else
+                return false;
+
+            tag+= BOM_UTF_16_SIZE;
+            *char_enc = utf16;
+            /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
+            *cuesheet_offset = 21;
+            break;
+        case 0x02:
+            utf16 = *char_enc = CHAR_ENC_UTF_16_BE;
+            /* \2 + 0C0U0E0S0H0E0E0T00 = 19 */
+            *cuesheet_offset = 19;
+            break;
+        case 0x03:
+            *char_enc = CHAR_ENC_UTF_8;
+            break;
+        default:
+            return false;
+    }
+    ++tag; //skip encoding type
+    const char* key = "CUESHEET";
+
+    if (!utf16)
+        return !strncmp(tag, key, 8);
+
+    int tag_index;
+    for (int i =0; i < 8; ++i)
+    {
+        tag_index = i<<1;
+        if ( (utf16 == CHAR_ENC_UTF_16_BE && tag[tag_index] == 0 && tag[tag_index + 1] == key[i] )
+            || (tag[tag_index] == key[i] && tag[tag_index + 1] == 0 ))
+            continue;
+        return false;
+    }
+    return true;
+}
 
 /*
  * Sets the title of an MP3 entry based on its ID3v2 tag.
@@ -1019,6 +1072,26 @@ retry_with_limit:
                 /* Attempt to parse Unicode string only if the tag contents
                    aren't binary */
                 if(!tr->binary) {
+                    if ( /* Is it an embedded cuesheet? */
+                       (tr->offset == 0 && tr->tag_length == 4 && !memcmp(header, "TXXX", 4)) &&
+                       (bytesread >= 14)
+                    ) {
+                        unsigned char char_enc;
+                        unsigned char cuesheet_offset;
+                        if (is_cuesheet(tag, &char_enc, &cuesheet_offset))
+                        {
+                            if (char_enc > 0) {
+                                entry->has_embedded_cuesheet = true;
+                                entry->embedded_cuesheet.pos = lseek(fd, 0, SEEK_CUR)
+                                    - framelen + cuesheet_offset;
+                                entry->embedded_cuesheet.size = totframelen
+                                    - cuesheet_offset;
+                                entry->embedded_cuesheet.encoding = char_enc;
+                            }
+                            break;
+                        }
+                    }
+
                     /* UTF-8 could potentially be 3 times larger */
                     /* so we need to create a new buffer         */
                     char utf8buf[(3 * bytesread) + 1];
@@ -1027,49 +1100,6 @@ retry_with_limit:
 
                     if(bytesread >= buffersize - bufferpos)
                         bytesread = buffersize - bufferpos - 1;
-
-                    if ( /* Is it an embedded cuesheet? */
-                       (tr->tag_length == 4 && !memcmp(header, "TXXX", 4)) &&
-                       (bytesread >= 14 && !strncmp(utf8buf, "CUESHEET", 8))
-                    ) {
-                        unsigned char char_enc = 0;
-                        /* [enc type]+"CUESHEET\0" = 10 */
-                        unsigned char cuesheet_offset = 10;
-                        switch (tag[0]) {
-                            case 0x00:
-                                char_enc = CHAR_ENC_ISO_8859_1;
-                                break;
-                            case 0x01:
-                                tag++;
-                                if (!memcmp(tag,
-                                   BOM_UTF_16_BE, BOM_UTF_16_SIZE)) {
-                                    char_enc = CHAR_ENC_UTF_16_BE;
-                                } else if (!memcmp(tag,
-                                          BOM_UTF_16_LE, BOM_UTF_16_SIZE)) {
-                                    char_enc = CHAR_ENC_UTF_16_LE;
-                                }
-                                /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
-                                cuesheet_offset = 21;
-                                break;
-                            case 0x02:
-                                char_enc = CHAR_ENC_UTF_16_BE;
-                                /* \2 + 0C0U0E0S0H0E0E0T00 = 19 */
-                                cuesheet_offset = 19;
-                                break;
-                            case 0x03:
-                                char_enc = CHAR_ENC_UTF_8;
-                                break;
-                        }
-                        if (char_enc > 0) {
-                            entry->has_embedded_cuesheet = true;
-                            entry->embedded_cuesheet.pos = lseek(fd, 0, SEEK_CUR)
-                                - framelen + cuesheet_offset;
-                            entry->embedded_cuesheet.size = totframelen
-                                - cuesheet_offset;
-                            entry->embedded_cuesheet.encoding = char_enc;
-                        }
-                        break;
-                    }
 
                     for (j = 0; j < bytesread; j++)
                         tag[j] = utf8buf[j];
