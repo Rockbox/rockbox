@@ -205,7 +205,9 @@ static int refresh_data(struct info_data *info)
                 else
 #endif
                     info->name[i] = 0;
+#ifdef HAVE_MULTIVOLUME
                 break; /* ie stop when we run out of valid partitions */
+#endif
             }
 #ifdef HAVE_MULTIDRIVE
         }
