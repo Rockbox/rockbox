@@ -114,7 +114,7 @@ void skip_tag(const char** document)
 
         if (tag)
         {
-            *document += strlen(tag->name);
+            *document += tag->param_pos - 1; /*strlen(tag->name)*/
         }
     }
     if (**document == ARGLISTOPENSYM)

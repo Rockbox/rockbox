@@ -537,7 +537,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     if(element->type != CONDITIONAL && element->type != VIEWPORT)
         element->type = TAG;
     element->tag = tag;
-    tag_args = tag->params;
+    tag_args = tag->name + tag->param_pos;
     element->line = skin_line;
 
     /* Checking for the * flag */
