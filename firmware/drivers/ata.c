@@ -112,7 +112,7 @@ static long power_off_tick = 0;
 
 static sector_t total_sectors;
 static uint32_t log_sector_size;
-static int multisectors; /* number of supported multisectors */
+static uint8_t  multisectors; /* number of supported multisectors */
 
 static unsigned short identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
 
@@ -1097,10 +1097,12 @@ int STORAGE_INIT_ATTR ata_init(void)
         }
 
         multisectors = identify_info[47] & 0xff;
-        if (multisectors == 0) /* Invalid multisector info, try with 16 */
-            multisectors = 16;
+        if (!multisectors && (identify_info[59] & 0x100) == 0x100)
+            multisectors = identify_info[59] & 0xff;
+        if (!multisectors)
+            multisectors = 1; /* One transfer per REQ */
 
-        DEBUGF("ata: %d sectors per ata request\n", multisectors);
+        DEBUGF("ata: max %d sectors per DRQ\n", multisectors);
 
         total_sectors = (identify_info[61] << 16) | identify_info[60];
 
@@ -1142,6 +1144,7 @@ int STORAGE_INIT_ATTR ata_init(void)
         ata_state = ATA_ON;
         keep_ata_active();
     }
+
     rc = set_multiple_mode(multisectors);
     if (rc)
         rc = -100 + rc;
