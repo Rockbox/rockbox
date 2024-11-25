@@ -169,7 +169,7 @@ static int arg_callback(char argchar, const char **parameter, void *userdata)
             {
                 pfp->tree_attr = (num)&FILE_ATTR_MASK;
                 pfp->flags |= FIND_ATTRIB;
-                logf("Attrib: Val: 0x%lx\n", (uint32_t)num);
+                logf("Attrib: Val: 0x%lx\n", (unsigned long)num);
                 logf("ate %d chars\n", ret);
             }
             break;
