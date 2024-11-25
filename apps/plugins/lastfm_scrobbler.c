@@ -332,7 +332,7 @@ int scrobbler_init_cache(void)
 
     if (gCache.size < reqsz)
     {
-        logf("SCROBBLER: OOM , %ld < req:%zu", gCache.size, reqsz);
+        logf("SCROBBLER: OOM , %zu < req:%zu", gCache.size, reqsz);
         return -1;
     }
     gCache.force_flush = true;
