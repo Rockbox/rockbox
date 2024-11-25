@@ -1116,7 +1116,14 @@ retry_with_limit:
                     {
                         /* UTF-8 could potentially be 3 times larger */
                         /* so we need to create a new buffer         */
-                        char utf8buf[(3 * bytesread) + 1];
+                        int utf8_size = (3 * bytesread);
+                        if (utf8_size > ID3V2_BUF_SIZE)
+                        {
+                            //limit stack allocation to avoid stack overflow
+                            utf8_size = ID3V2_BUF_SIZE;
+                            bytesread = ID3V2_BUF_SIZE/3;
+                        }
+                        char utf8buf[utf8_size + 1];
                         unicode_munge( tag, utf8buf, &bytesread);
                         if(bytesread >= buffersize - bufferpos)
                             bytesread = buffersize - bufferpos - 1;
