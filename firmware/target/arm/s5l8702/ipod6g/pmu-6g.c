@@ -102,6 +102,15 @@ void pmu_enter_standby(void)
     pmu_write(0xc, 1);
 }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void pmu_set_cpu_voltage(bool high)
+{
+    pmu_write(PCF5063X_REG_DOWN1OUT,
+            high ? 0x13 /*1100mV*/ : 0xf /*1000mV*/);
+}
+#endif
+
+#if (CONFIG_RTC == RTC_NANO2G)
 void pmu_read_rtc(unsigned char* buffer)
 {
     pmu_read_multiple(0x59, 7, buffer);
@@ -111,6 +120,7 @@ void pmu_write_rtc(unsigned char* buffer)
 {
     pmu_write_multiple(0x59, 7, buffer);
 }
+#endif
 
 /*
  * ADC
@@ -467,3 +477,16 @@ void pmu_preinit(void)
     pmu_rd_multiple(PCF5063X_REG_INT1, 5, rd_buf);
     pmu_rd(PCF50635_REG_INT6);
 }
+
+#ifdef BOOTLOADER
+bool pmu_is_hibernated(void)
+{
+    /* OF sets GPIO3 to low when SDRAM is hibernated */
+    bool gpio3out, coldboot;
+    /* get (previously) configured output selection for GPIO3 */
+    gpio3out = (pmu_rd(PCF5063X_REG_GPIO3CFG) & 7);
+    /* coldboot: when set, device has been in NoPower state */
+    coldboot = (pmu_rd(PCF5063X_REG_OOCSHDWN) & PCF5063X_OOCSHDWN_COLDBOOT);
+    return !coldboot && !gpio3out;
+}
+#endif

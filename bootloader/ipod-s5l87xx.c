@@ -279,13 +279,6 @@ static int kernel_launch_onb(void)
     return rc;
 }
 
-static bool pmu_is_hibernated(void)
-{
-    /* OF sets GPIO3 to low when SDRAM is hibernated */
-    return !(pmu_rd(PCF5063X_REG_GPIO3CFG) & 7) &&
-        !(pmu_rd(PCF5063X_REG_OOCSHDWN) & PCF5063X_OOCSHDWN_COLDBOOT);
-}
-
 /*  The boot sequence is executed on power-on or reset. After power-up
  *  the device could come from a state of hibernation, OF hibernates
  *  the iPod after an inactive period of ~30 minutes (FW 1.1.2), on
