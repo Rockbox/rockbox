@@ -84,7 +84,7 @@ int ata_read_sectors(IF_MD(int drive,)
 
     offset = start & (phys_sector_mult - 1);
 
-    if (offset) /* first partial sector */
+    if (offset) /* first partial physical sector */
     {
         int partcount = MIN(incount, phys_sector_mult - offset);
 
@@ -101,32 +101,30 @@ int ata_read_sectors(IF_MD(int drive,)
         inbuf += partcount * log_sector_size;
         incount -= partcount;
     }
-    if (incount)
-    {
-        offset = incount & (phys_sector_mult - 1);
-        incount -= offset;
+    offset = incount & (phys_sector_mult - 1);
+    incount -= offset;
 
-        if (incount)
+    if (incount) /* all complete physical sectors */
+    {
+        rc = ata_transfer_sectors(start, incount, inbuf, false);
+        if (rc)
         {
-            rc = ata_transfer_sectors(start, incount, inbuf, false);
-            if (rc)
-            {
-                rc = rc * 10 - 2;
-                goto error;
-            }
-            start += incount;
-            inbuf += incount * log_sector_size;
+            rc = rc * 10 - 2;
+            goto error;
         }
-        if (offset)
+        start += incount;
+        inbuf += incount * log_sector_size;
+    }
+
+    if (offset) /* Trailing partial logical sector */
+    {
+        rc = cache_sector(start);
+        if (rc)
         {
-            rc = cache_sector(start);
-            if (rc)
-            {
-                rc = rc * 10 - 3;
-                goto error;
-            }
-            memcpy(inbuf, sector_cache.data, offset * log_sector_size);
+            rc = rc * 10 - 3;
+            goto error;
         }
+        memcpy(inbuf, sector_cache.data, offset * log_sector_size);
     }
 
   error:
@@ -150,7 +148,7 @@ int ata_write_sectors(IF_MD(int drive,)
 
     offset = start & (phys_sector_mult - 1);
 
-    if (offset) /* first partial sector */
+    if (offset) /* first partial physical sector */
     {
         int partcount = MIN(count, phys_sector_mult - offset);
 
@@ -172,37 +170,36 @@ int ata_write_sectors(IF_MD(int drive,)
         buf += partcount * log_sector_size;
         count -= partcount;
     }
-    if (count)
-    {
-        offset = count & (phys_sector_mult - 1);
-        count -= offset;
 
-        if (count)
+    offset = count & (phys_sector_mult - 1);
+    count -= offset;
+
+    if (count) /* all complete physical sectors */
+    {
+        rc = ata_transfer_sectors(start, count, (void*)buf, true);
+        if (rc)
         {
-            rc = ata_transfer_sectors(start, count, (void*)buf, true);
-            if (rc)
-            {
-                rc = rc * 10 - 3;
-                goto error;
-            }
-            start += count;
-            buf += count * log_sector_size;
+            rc = rc * 10 - 3;
+            goto error;
         }
-        if (offset)
+        start += count;
+        buf += count * log_sector_size;
+    }
+
+    if (offset) /* Trailing partial logical sector */
+    {
+        rc = cache_sector(start);
+        if (rc)
         {
-            rc = cache_sector(start);
-            if (rc)
-            {
-                rc = rc * 10 - 4;
-                goto error;
-            }
-            memcpy(sector_cache.data, buf, offset * log_sector_size);
-            rc = flush_current_sector();
-            if (rc)
-            {
-                rc = rc * 10 - 5;
-                goto error;
-            }
+            rc = rc * 10 - 4;
+            goto error;
+        }
+        memcpy(sector_cache.data, buf, offset * log_sector_size);
+        rc = flush_current_sector();
+        if (rc)
+        {
+            rc = rc * 10 - 5;
+            goto error;
         }
     }
 

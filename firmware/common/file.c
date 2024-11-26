@@ -120,7 +120,7 @@ static int flush_cache(struct filestr_desc *file)
     int rc;
     struct filestr_cache *cachep = file->stream.cachep;
 
-    DEBUGF("Flushing dirty sector cache (%lu)\n", cachep->sector);
+    DEBUGF("Flushing dirty sector cache (%llu)\n", (uint64_t)cachep->sector);
 
     if (fat_query_sectornum(&file->stream.fatstr) != cachep->sector)
     {

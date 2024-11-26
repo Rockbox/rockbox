@@ -278,7 +278,9 @@ static struct bpb
 } fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 #ifdef STORAGE_NEEDS_BOUNCE_BUFFER
-#if defined(MAX_VARIABLE_LOG_SECTOR)
+#if defined(MAX_VIRT_SETOR_SIZE)
+#define BOUNCE_SECTOR_SIZE MAX_VIRT_SECTOR_SIZE
+#elif defined(MAX_VARIABLE_LOG_SECTOR)
 #define BOUNCE_SECTOR_SIZE MAX_VARIABLE_LOG_SECTOR
 #elif defined(MAX_PHYS_SECTOR_SIZE)
 #define BOUNCE_SECTOR_SIZE MAX_PHYS_SECTOR_SIZE
@@ -1586,7 +1588,7 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
                           union raw_dirent *srcent, uint8_t attr,
                           unsigned int flags)
 {
-    DEBUGF("%s(file:%lx, first:%d, num:%d, name:%s)\n", __func__,
+    DEBUGF("%s(file:0x%lx, first:%d, num:%d, name:%s)\n", __func__,
            file->firstcluster, file->e.entry - file->e.entries + 1,
            file->e.entries, name);
 
@@ -2490,8 +2492,8 @@ static long transfer(struct bpb *fat_bpb, sector_t start, long count,
 
     if (rc < 0)
     {
-        DEBUGF("Couldn't %s sector %lx (err %ld)\n",
-               write ? "write":"read", start, rc);
+        DEBUGF("Couldn't %s sector %llx (err %ld)\n",
+               write ? "write":"read", (uint64_t)start, rc);
         return rc;
     }
 
@@ -2518,7 +2520,7 @@ long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
     long          clusternum = filestr->clusternum;
     unsigned long sectornum  = filestr->sectornum;
 
-    DEBUGF("%s(file:%lx,count:0x%lx,buf:%lx,%s)\n", __func__,
+    DEBUGF("%s(file:0x%lx,count:0x%lx,buf:%lx,%s)\n", __func__,
            file->firstcluster, sectorcount, (long)buf,
            write ? "write":"read");
     DEBUGF("%s: sec:%llx numsec:%ld eof:%d\n", __func__,
