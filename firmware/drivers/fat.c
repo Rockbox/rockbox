@@ -278,7 +278,7 @@ static struct bpb
 } fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 #ifdef STORAGE_NEEDS_BOUNCE_BUFFER
-#if defined(MAX_VIRT_SETOR_SIZE)
+#if defined(MAX_VIRT_SECTOR_SIZE)
 #define BOUNCE_SECTOR_SIZE MAX_VIRT_SECTOR_SIZE
 #elif defined(MAX_VARIABLE_LOG_SECTOR)
 #define BOUNCE_SECTOR_SIZE MAX_VARIABLE_LOG_SECTOR
@@ -287,7 +287,9 @@ static struct bpb
 #else
 #define BOUNCE_SECTOR_SIZE SECTOR_SIZE
 #endif
+#ifndef FAT_BOUNCE_SECTORS
 #define FAT_BOUNCE_SECTORS 10
+#endif
 static uint8_t fat_bounce_buffers[NUM_VOLUMES][BOUNCE_SECTOR_SIZE*FAT_BOUNCE_SECTORS] STORAGE_ALIGN_ATTR;
 #define FAT_BOUNCE_BUFFER(bpb) \
     (fat_bounce_buffers[IF_MV_VOL((bpb)->volume)])
