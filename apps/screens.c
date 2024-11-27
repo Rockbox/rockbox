@@ -861,8 +861,13 @@ static const char* runtime_get_data(int selected_item, void* data,
     long t;
     switch (selected_item)
     {
-        case 0: return str(LANG_RUNNING_TIME);
-        case 1: t = global_status.runtime;      break;
+        case 0:return str(LANG_RUNNING_TIME);
+        case 1: {
+            global_status.runtime += ((current_tick - lasttime) / HZ);
+            lasttime = current_tick;
+             t = global_status.runtime;
+            break;
+        }
         case 2: return str(LANG_TOP_TIME);
         case 3: t = global_status.topruntime;   break;
         default:
@@ -876,57 +881,52 @@ static const char* runtime_get_data(int selected_item, void* data,
 
 static int runtime_speak_data(int selected_item, void* data)
 {
-    (void) data;
-    talk_ids(false,
-             (selected_item < 2) ? LANG_RUNNING_TIME : LANG_TOP_TIME,
+    (void)data;
+    talk_ids(false,(selected_item < 2) ? LANG_RUNNING_TIME : LANG_TOP_TIME,
              TALK_ID((selected_item < 2) ? global_status.runtime
-                     : global_status.topruntime, UNIT_TIME));
+                                         : global_status.topruntime, UNIT_TIME));
     return 0;
 }
 
+static int runtime_info_cb(int action, struct gui_synclist *lists)
+{
+    static const char *lines[]={ ID2P(LANG_RUNNING_TIME), ID2P(LANG_CLEAR_TIME),
+                                 ID2P(LANG_TOP_TIME),     ID2P(LANG_CLEAR_TIME)};
+
+    if (action == ACTION_NONE)
+        return ACTION_REDRAW;
+
+    if(action == ACTION_STD_OK) {
+        int selected = (gui_synclist_get_sel_pos(lists));
+
+        const struct text_message message={lines + selected, 2};
+
+        if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
+        {
+            if (selected == 0)
+                global_status.runtime = 0;
+            else /*selected == 2*/
+                global_status.topruntime = 0;
+            gui_synclist_speak_item(lists);
+        }
+        action = ACTION_REDRAW;
+    }
+    return action;
+}
 
 int view_runtime(void)
 {
-    static const char *lines[]={ID2P(LANG_CLEAR_TIME)};
-    static const struct text_message message={lines, 1};
-    bool say_runtime = true;
+    struct simplelist_info info;
 
-    struct gui_synclist lists;
-    int action;
-    gui_synclist_init(&lists, runtime_get_data, NULL, false, 2, NULL);
-    gui_synclist_set_title(&lists, str(LANG_RUNNING_TIME), NOICON);
+    simplelist_info_init(&info, NULL, 2, NULL);
+    info.get_name = runtime_get_data;
+    info.action_callback = runtime_info_cb;
+    info.timeout = HZ;
+    info.selection_size = 2;
     if(global_settings.talk_menu)
-        gui_synclist_set_voice_callback(&lists, runtime_speak_data);
-    gui_synclist_set_nb_items(&lists, 4);
-
-    while(1)
-    {
-        global_status.runtime += ((current_tick - lasttime) / HZ);
-
-        lasttime = current_tick;
-        if (say_runtime)
-        {
-            gui_synclist_speak_item(&lists);
-            say_runtime = false;
-        }
-        gui_synclist_draw(&lists);
-        list_do_action(CONTEXT_STD, HZ, &lists, &action);
-        if(action == ACTION_STD_CANCEL)
-            break;
-        if(action == ACTION_STD_OK) {
-            if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
-            {
-                if (!(gui_synclist_get_sel_pos(&lists)/2))
-                    global_status.runtime = 0;
-                else
-                    global_status.topruntime = 0;
-                say_runtime = true;
-            }
-        }
-        if(default_event_handler(action) == SYS_USB_CONNECTED)
-            return 1;
-    }
-    return 0;
+        info.get_talk = runtime_speak_data;
+    info.scroll_all = true;
+    return simplelist_show_list(&info);
 }
 
 #ifdef HAVE_TOUCHSCREEN
