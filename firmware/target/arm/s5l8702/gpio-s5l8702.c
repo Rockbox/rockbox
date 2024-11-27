@@ -32,23 +32,41 @@ int rec_hw_ver;
 
 static uint32_t gpio_data[] =
 {
+#if defined(IPOD_6G)
     0x5322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
     0x33333333, 0x33333333, 0x3F000E33, 0xEEEEEEEE,
     0xEEEEEEEE, 0xEEEEEEEE, 0xE0EEEEEE, 0xEE00EE0E,
-    0xEEEE0EEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE
+    0xEEEE0EEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE,
+#elif defined(IPOD_NANO3G)
+    0xE322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
+    0xEEE33333, 0x3EE0EEEE, 0x0F00EE33, 0xEEEEEEE0,
+    0x22222222, 0x22222222, 0x33322222, 0xEEEEEEEE,
+    0xEEEEEEEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE,
+#elif defined(IPOD_NANO4G)
+    0x3202EEEE, 0xE0EE2253, 0x2223EEEE, 0x33333332,
+    0xFF333E33, 0xE0FEE200, 0x2222222E, 0x22222222,
+    0xEEEEEEE2, 0xEEE0EEEE, 0x2EEEEEEE, 0xEEEE0222,
+    0xEEEEE00E, 0xEEEEEEEE, 0xEEEEEEEE,
+#endif
 };
 
 void INIT_ATTR gpio_preinit(void)
 {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < GPIO_N_GROUPS; i++) {
         PCON(i) = gpio_data[i];
         PUNB(i) = 0;
         PUNC(i) = 0;
     }
+#if defined(IPOD_NANO4G)
+    PUNB(0) = 0x20;
+    PUNC(1) = 0x40;
+    GPIOUNK388 = (GPIOUNK388 & ~3) | 1;
+#endif
 }
 
 void INIT_ATTR gpio_init(void)
 {
+#ifdef IPOD_6G    
     /* Capture hardware versions:
      *
      * HW version 1 includes an amplifier for the jack plug
@@ -75,6 +93,9 @@ void INIT_ATTR gpio_init(void)
         GPIOCMD = 0xe0600;
         PUNB(14) |= (1 << 6);
     }
+#elif defined(IPOD_NANO3G)
+    rec_hw_ver = 0;
+#endif
 }
 
 #if 0
@@ -109,16 +130,20 @@ void gpio_group_set(int group, uint32_t mask, uint32_t cfg)
 #ifndef EINT_MAX_HANDLERS
 #define EINT_MAX_HANDLERS 1
 #endif
-static struct eint_handler* l_handlers[EINT_MAX_HANDLERS] IDATA_ATTR;
+static struct eic_handler* l_handlers[EINT_MAX_HANDLERS] IDATA_ATTR;
 
 void INIT_ATTR eint_init(void)
 {
-    /* disable external interrupts */
-    for (int i = 0; i < EIC_N_GROUPS; i++)
+    /* disable and clear external interrupts */
+    for (int i = 0; i < EIC_N_GROUPS; i++) {
         EIC_INTEN(i) = 0;
+        EIC_INTLEVEL(i) = 0;
+        EIC_INTTYPE(i) = 0;
+        EIC_INTSTAT(i) = ~0;
+    }        
 }
 
-void eint_register(struct eint_handler *h)
+void eint_register(struct eic_handler *h)
 {
     int i;
     int flags = disable_irq_save();
@@ -147,7 +172,7 @@ void eint_register(struct eint_handler *h)
         panicf("%s(): too many handlers!", __func__);
 }
 
-void eint_unregister(struct eint_handler *h)
+void eint_unregister(struct eic_handler *h)
 {
     int flags = disable_irq_save();
 
@@ -179,7 +204,7 @@ static void ICODE_ATTR eint_handler(int group)
     ints = EIC_INTSTAT(group) & EIC_INTEN(group);
 
     for (i = 0; i < EINT_MAX_HANDLERS; i++) {
-        struct eint_handler *h = l_handlers[i];
+        struct eic_handler *h = l_handlers[i];
 
         if (!h || (EIC_GROUP(h->gpio_n) != group))
             continue;

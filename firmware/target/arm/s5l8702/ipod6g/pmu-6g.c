@@ -199,9 +199,9 @@ static char pmu_thread_stack[DEFAULT_STACK_SIZE/2];
 static struct event_queue pmu_queue;
 static unsigned char ints_msk[6];
 
-static void pmu_eint_isr(struct eint_handler*);
+static void pmu_eint_isr(struct eic_handler*);
 
-static struct eint_handler pmu_eint =
+static struct eic_handler pmu_eint =
 {
     .gpio_n = GPIO_EINT_PMU,
     .type   = EIC_INTTYPE_LEVEL,
@@ -258,7 +258,7 @@ static void pmu_read_inputs_ooc(void)
 #endif
 }
 
-static void pmu_eint_isr(struct eint_handler *h)
+static void pmu_eint_isr(struct eic_handler *h)
 {
      eint_unregister(h);
      queue_post(&pmu_queue, Q_EINT, 0);

@@ -52,7 +52,11 @@
 #define GPIO_EINT_ALIVE     0xda
 
 /* probably a part of the system controller */
+#if CONFIG_CPU == S5L8702
 #define EIC_BASE 0x39a00000
+#elif CONFIG_CPU == S5L8720
+#define EIC_BASE 0x39700000
+#endif
 
 #define EIC_INTLEVEL(g) (*((REG32_PTR_T)(EIC_BASE + 0x80 + 4*(g))))
 #define EIC_INTSTAT(g)  (*((REG32_PTR_T)(EIC_BASE + 0xA0 + 4*(g))))
@@ -66,17 +70,17 @@
 #define EIC_INTTYPE_LEVEL   1
 
 
-struct eint_handler {
+struct eic_handler {
     uint8_t gpio_n;
     uint8_t type;       /* EIC_INTTYPE_ */
     uint8_t level;      /* EIC_INTLEVEL_ */
     uint8_t autoflip;
-    void (*isr)(struct eint_handler*);
+    void (*isr)(struct eic_handler*);
 };
 
 void eint_init(void);
-void eint_register(struct eint_handler *h);
-void eint_unregister(struct eint_handler *h);
+void eint_register(struct eic_handler *h);
+void eint_unregister(struct eic_handler *h);
 
 void gpio_preinit(void);
 void gpio_init(void);
@@ -85,6 +89,7 @@ uint32_t gpio_group_get(int group);
 void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
 
 
+#if CONFIG_CPU == S5L8702
 /*
  * This is very preliminary work in progress, ATM this region is called
  * system 'alive' because it seems there are similiarities when mixing
@@ -157,5 +162,7 @@ void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
 
 #define ALVTCNT         (*((REG32_PTR_T)(SYSALV_BASE + 0x78)))
 #define ALVTSTAT        (*((REG32_PTR_T)(SYSALV_BASE + 0x7c)))
+
+#endif /* CONFIG_CPU == S5L8702 */
 
 #endif /* __GPIO_S5L8702_H__ */
