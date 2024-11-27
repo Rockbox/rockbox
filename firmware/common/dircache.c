@@ -3024,7 +3024,7 @@ static bool dircache_is_clean(bool saving)
  * function to load the internal cache structure from disk to initialize
  * the dircache really fast with little disk access.
  */
-int dircache_load(void)
+int INIT_ATTR dircache_load(void)
 {
     logf("Loading directory cache");
     int fd = open_dircache_file(O_RDONLY);

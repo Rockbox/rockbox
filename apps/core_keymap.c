@@ -69,7 +69,7 @@ static int open_key_remap(const char *filename, int *countp)
     return -1;
 }
 
-int core_load_key_remap(const char *filename)
+int INIT_ATTR core_load_key_remap(const char *filename)
 {
     int count = 0; /* gcc falsely believes this may be used uninitialized */
     int fd = open_key_remap(filename, &count);
