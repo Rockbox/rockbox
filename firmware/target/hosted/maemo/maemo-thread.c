@@ -103,17 +103,17 @@ static void on_bt_button_pressed(LibHalContext *ctx,
     sim_enter_irq_handler();
 
     if (g_str_equal(condition_detail, "play-cd") || g_str_equal(condition_detail, "pause-cd"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_PLAYPAUSE, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_PLAYPAUSE, 0);
     else if (g_str_equal(condition_detail, "stop-cd"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_STOP, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_STOP, 0);
     else if (g_str_equal(condition_detail, "next-song"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_NEXT, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_NEXT, 0);
     else if (g_str_equal(condition_detail, "previous-song"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_PREV, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_PREV, 0);
     else if (g_str_equal(condition_detail, "fast-forward"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_FFWD, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_FFWD, 0);
     else if (g_str_equal(condition_detail, "rewind"))
-        queue_post(&button_queue, BUTTON_MULTIMEDIA_REW, 0);
+        button_queue_post(BUTTON_MULTIMEDIA_REW, 0);
 
     sim_exit_irq_handler();
 }

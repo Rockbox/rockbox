@@ -296,9 +296,9 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
              * should not be necessary but better to be safe. */
             if(fsm.active) {
                 if(dy < 0) {
-                    queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
+                    button_queue_post(BUTTON_SCROLL_BACK, 0);
                 } else {
-                    queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
+                    button_queue_post(BUTTON_SCROLL_FWD, 0);
                 }
 
                 /* Poke the backlight */

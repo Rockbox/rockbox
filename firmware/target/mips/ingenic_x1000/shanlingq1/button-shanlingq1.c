@@ -136,8 +136,8 @@ int button_read_device(int* data)
         wheel_pos = 0;
 
         /* Post the event (rapid motion is more reliable this way) */
-        queue_post(&button_queue, wheel_btn, 0);
-        queue_post(&button_queue, wheel_btn|BUTTON_REL, 0);
+        button_queue_post(wheel_btn, 0);
+        button_queue_post(wheel_btn|BUTTON_REL, 0);
 
         /* Poke the backlight */
         backlight_on();

@@ -694,7 +694,7 @@ static int kinetic_callback(struct timeout *tmo)
 
     /* let get_action() timeout, which loads to a
      * gui_synclist_draw() call from the main thread */
-    queue_post(&button_queue, BUTTON_REDRAW, 0);
+    button_queue_post(BUTTON_REDRAW, 0);
     /* stop if the velocity hit or crossed zero */
     if (!data->velocity)
     {

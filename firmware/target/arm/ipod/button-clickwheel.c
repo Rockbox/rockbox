@@ -223,7 +223,7 @@ static inline int ipod_4g_button_read(void)
                         if (send_events) 
 #endif
                         /* The queue should have no other events when scrolling */
-                        if (queue_empty(&button_queue))
+                        if (button_queue_empty())
                         {
                             /* each WHEEL_SENSITIVITY clicks = scrolling 1 item */
                             accumulated_wheel_delta /= WHEEL_SENSITIVITY;
@@ -232,11 +232,11 @@ static inline int ipod_4g_button_read(void)
                             /* always use acceleration mode (1<<31) */
                             /* always set message post count to (1<<24) for iPod */
                             /* this way the scrolling is always calculated from wheel_velocity */
-                            queue_post(&button_queue, wheel_keycode | repeat, 
+                            button_queue_post(wheel_keycode | repeat, 
                                        (1<<31) | (1 << 24) | wheel_velocity);
                                        
 #else
-                            queue_post(&button_queue, wheel_keycode | repeat, 
+                            button_queue_post(wheel_keycode | repeat, 
                                        (accumulated_wheel_delta << 16) | new_wheel_value);
 #endif
                             accumulated_wheel_delta = 0;

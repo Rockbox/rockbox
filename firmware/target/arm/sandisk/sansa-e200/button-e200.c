@@ -246,7 +246,7 @@ void clickwheel_int(void)
 
     count = 0;
 
-    if (queue_empty(&button_queue))
+    if (button_queue_empty())
     {
         /* Post wheel keycode with wheel data */
         int key = keycode;
@@ -260,7 +260,7 @@ void clickwheel_int(void)
 
         prev_keypost = keycode;
 
-        queue_post(&button_queue, key, (fast_mode << 31) | delta | velocity);
+        button_queue_post(key, (fast_mode << 31) | delta | velocity);
         /* Message posted - reset delta */
         delta = 1ul << 24;
     }

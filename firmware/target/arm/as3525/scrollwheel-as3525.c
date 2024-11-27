@@ -105,12 +105,12 @@ void scrollwheel(unsigned int wheel_value)
         /* the wheel is more reliable if we don't send every change,
          * every WHEEL_COUNTER_DIVth is basically one "physical click" 
          * which should make up 1 item in lists */
-        if (++counter >= WHEEL_COUNTER_DIV && queue_empty(&button_queue))
+        if (++counter >= WHEEL_COUNTER_DIV && button_queue_empty())
         {
             buttonlight_on();
             backlight_on();
             reset_poweroff_timer();
-            queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
+            button_queue_post(btn, ((wheel_delta+1)<<24));
             /* message posted - reset count and remember post */
             counter = 0;
             last_wheel_post = current_tick;

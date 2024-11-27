@@ -163,7 +163,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 271
+#define PLUGIN_API_VERSION 272
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -282,7 +282,7 @@ struct plugin_api {
 #endif
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    struct event_queue *button_queue;
+    void (*button_queue_post)(long id, intptr_t data);
 #endif
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
@@ -511,6 +511,7 @@ struct plugin_api {
                      const char *ext, const long *prefix_ids, bool enqueue);
     int (*talk_file_or_spell)(const char *dirname, const char* filename,
                               const long *prefix_ids, bool enqueue);
+    int (*talk_fullpath)(const char* path, bool enqueue);
     int (*talk_dir_or_spell)(const char* filename,
                              const long *prefix_ids, bool enqueue);
     int (*talk_number)(long n, bool enqueue);
@@ -977,8 +978,6 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    int (*talk_fullpath)(const char* path, bool enqueue);
 };
 
 /* plugin header */

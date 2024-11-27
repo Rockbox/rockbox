@@ -32,8 +32,6 @@
 # define BUTTON_REMOTE 0
 #endif
 
-extern struct event_queue button_queue;
-
 void button_init_device(void);
 #ifdef HAVE_BUTTON_DATA
 int button_read_device(int *);
@@ -50,15 +48,12 @@ bool remote_button_hold(void);
 
 void button_init (void) INIT_ATTR;
 void button_close(void);
-int button_queue_count(void);
-long button_get (bool block);
-long button_get_w_tmo(int ticks);
-intptr_t button_get_data(void);
+
 int button_status(void);
 #ifdef HAVE_BUTTON_DATA
 int button_status_wdata(int *pdata);
 #endif
-void button_clear_queue(void);
+
 void button_set_flip(bool flip); /* turn 180 degrees */
 #ifdef HAVE_BACKLIGHT
 void set_backlight_filter_keypress(bool value);
@@ -66,6 +61,19 @@ void set_backlight_filter_keypress(bool value);
 void set_remote_backlight_filter_keypress(bool value);
 #endif
 #endif
+
+/* button queue functions (in button_queue.c) */
+void button_queue_init(void);
+void button_queue_post(long id, intptr_t data);
+void button_queue_post_remove_head(long id, intptr_t data);
+bool button_queue_try_post(long button, int data);
+int button_queue_count(void);
+bool button_queue_empty(void);
+bool button_queue_full(void);
+void button_clear_queue(void);
+long button_get(bool block);
+long button_get_w_tmo(int ticks);
+intptr_t button_get_data(void);
 
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);

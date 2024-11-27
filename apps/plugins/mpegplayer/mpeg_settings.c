@@ -772,7 +772,7 @@ static void get_start_time_lcd_enable_hook(unsigned short id, void *param)
 {
     (void)id;
     (void)param;
-    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
+    rb->button_queue_post(LCD_ENABLE_EVENT_0, 0);
 }
 #endif /* HAVE_LCD_ENABLE */
 

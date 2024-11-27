@@ -125,8 +125,8 @@ static void scrollwheel_event(int x, int y)
     buttonlight_on();
 #endif
     reset_poweroff_timer();
-    if (new_btn && !queue_full(&button_queue))
-        queue_post(&button_queue, new_btn, 1<<24);
+    if (new_btn && !button_queue_full())
+        button_queue_post(new_btn, 1<<24);
 
     (void)x;
 }

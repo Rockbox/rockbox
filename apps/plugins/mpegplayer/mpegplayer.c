@@ -1208,7 +1208,7 @@ static void osd_lcd_enable_hook(unsigned short id, void* param)
 {
     (void)id;
     (void)param;
-    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_1, 0);
+    rb->button_queue_post(LCD_ENABLE_EVENT_1, 0);
 }
 #endif
 

@@ -305,7 +305,7 @@ int button_read_device(void)
     {
         /* need to use queue_post() in order to do BUTTON_SCROLL_*,
          * Rockbox treats these buttons differently. */
-        queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
+        button_queue_post(BUTTON_SCROLL_FWD, 0);
         enc_position = 0;
         reset_poweroff_timer();
         backlight_on();
@@ -314,7 +314,7 @@ int button_read_device(void)
     {
         /* need to use queue_post() in order to do BUTTON_SCROLL_*,
          * Rockbox treats these buttons differently. */
-        queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
+        button_queue_post(BUTTON_SCROLL_BACK, 0);
         enc_position = 0;
         reset_poweroff_timer();
         backlight_on();

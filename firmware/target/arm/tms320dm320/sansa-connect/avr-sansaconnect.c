@@ -195,7 +195,7 @@ static void handle_wheel(uint8_t wheel)
     }
 
     /* TODO: take velocity into account */
-    if (queue_empty(&button_queue))
+    if (button_queue_empty())
     {
         if (prev_key_post == key)
         {
@@ -204,7 +204,7 @@ static void handle_wheel(uint8_t wheel)
 
         /* Post directly, don't update btn as avr doesn't give
            interrupt on scroll stop */
-        queue_post(&button_queue, key, wheel_delta);
+        button_queue_post(key, wheel_delta);
 
         wheel_delta = 1ul << 24;
 

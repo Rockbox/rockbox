@@ -198,7 +198,7 @@ void do_sbs_update_callback(unsigned short id, void *param)
     skin_request_full_update(CUSTOM_STATUSBAR);
     force_waiting = true;
     /* force timeout in wps main loop, so that the update is instantly */
-    queue_post(&button_queue, BUTTON_NONE, 0);
+    button_queue_post(BUTTON_NONE, 0);
 }
 
 void sb_skin_set_update_delay(int delay)

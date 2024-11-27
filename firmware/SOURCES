@@ -338,6 +338,7 @@ backlight-sw-fading.c
 /* Misc. */
 drivers/led.c
 drivers/button.c
+drivers/button_queue.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_DAC3550A
 drivers/audio/dac3550a.c

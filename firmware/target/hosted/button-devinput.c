@@ -181,14 +181,14 @@ int button_read_device(void)
     {
         while (wheel_ticks-- > 0)
         {
-            queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
+            button_queue_post(BUTTON_SCROLL_FWD, 0);
         }
     }
     else if (wheel_ticks < 0)
     {
         while (wheel_ticks++ < 0)
         {
-            queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
+            button_queue_post(BUTTON_SCROLL_BACK, 0);
         }
     }
 #endif /* HAVE_SCROLLWHEEL */

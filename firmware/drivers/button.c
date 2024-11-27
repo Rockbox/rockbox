@@ -45,11 +45,8 @@
 #include "lcd.h"       /* lcd_active() prototype */
 #endif
 
-struct event_queue button_queue SHAREDBSS_ATTR;
-
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
-static intptr_t button_data; /* data value from last message dequeued */
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 
 #ifdef HAVE_BACKLIGHT /* Filter first keypress function pointer */
@@ -95,7 +92,7 @@ static void button_remote_post(void)
     /* Post events for the remote control */
     int btn = remote_control_rx();
     if(btn)
-        button_try_post(btn, 0);
+        button_queue_try_post(btn, 0);
 #endif
 }
 
@@ -104,8 +101,7 @@ static int hp_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_PHONE_PLUGGED : SYS_PHONE_UNPLUGGED;
-    queue_remove_from_head(&button_queue, id);
-    queue_post(&button_queue, id, 0);
+    button_queue_post_remove_head(id, 0);
     return 0;
     /*misc.c:hp_unplug_change*/
 }
@@ -116,8 +112,7 @@ static int lo_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_LINEOUT_PLUGGED : SYS_LINEOUT_UNPLUGGED;
-    queue_remove_from_head(&button_queue, id);
-    queue_post(&button_queue, id, 0);
+    button_queue_post_remove_head(id, 0);
     return 0;
     /*misc.c:lo_unplug_change*/
 }
@@ -151,40 +146,11 @@ static void check_audio_peripheral_state(void)
 #endif
 }
 
-static bool button_try_post(int button, int data)
-{
-#ifdef HAVE_TOUCHSCREEN
-    /* one can swipe over the scren very quickly,
-     * for this to work we want to forget about old presses and
-     * only respect the very latest ones */
-    const bool force_post = true;
-#else
-    /* Only post events if the queue is empty,
-     * to avoid afterscroll effects.
-     * i.e. don't post new buttons if previous ones haven't been
-     * processed yet - but always post releases */
-    const bool force_post = button & BUTTON_REL;
-#endif
-
-    bool ret = queue_empty(&button_queue);
-    if (!ret && force_post)
-    {
-        queue_remove_from_head(&button_queue, button);
-        ret = true;
-    }
-
-    if (ret)
-        queue_post(&button_queue, button, data);
-
-    /* on touchscreen we posted unconditionally */
-    return ret;
-}
-
 #ifdef HAVE_BACKLIGHT
 /* disabled function is shared between Main & Remote LCDs */
 static bool filter_first_keypress_disabled(int button, int data)
 {
-    button_try_post(button, data);
+    button_queue_try_post(button, data);
     return false;
 }
 
@@ -248,17 +214,17 @@ static void button_tick(void)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                button_try_post(BUTTON_REL | diff, data);
+                button_queue_try_post(BUTTON_REL | diff, data);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                button_try_post(BUTTON_REL | diff, data);
+                button_queue_try_post(BUTTON_REL | diff, data);
             else
                 skip_release = false;
 #else
-        button_try_post(BUTTON_REL | diff, data);
+        button_queue_try_post(BUTTON_REL | diff, data);
 #endif
     }
     else
@@ -367,7 +333,7 @@ static void button_tick(void)
                 {
                     /* Only post repeat events if the queue is empty,
                      * to avoid afterscroll effects. */
-                    if (button_try_post(BUTTON_REPEAT | btn, data))
+                    if (button_queue_try_post(BUTTON_REPEAT | btn, data))
                     {
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
@@ -394,7 +360,7 @@ static void button_tick(void)
                         buttonlight_on();
                     }
 #else /* no backlight, nothing to skip */
-                    button_try_post(btn, data);
+                    button_queue_try_post(btn, data);
 #endif
                     post = false;
                 }
@@ -412,119 +378,11 @@ static void button_tick(void)
     lastdata = data;
 }
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static bool button_boosted = false;
-static long button_unboost_tick;
-#define BUTTON_UNBOOST_TMO HZ
-
-static void button_boost(bool state)
-{
-    if (state)
-    {
-        button_unboost_tick = current_tick + BUTTON_UNBOOST_TMO;
-
-        if (!button_boosted)
-        {
-            button_boosted = true;
-            cpu_boost(true);
-        }
-    }
-    else if (!state && button_boosted)
-    {
-        button_boosted = false;
-        cpu_boost(false);
-    }
-}
-
-static void button_queue_wait(struct queue_event *evp, int timeout)
-{
-    /* Loop once after wait time if boosted in order to unboost and wait the
-       full remaining time */
-    do
-    {
-        int ticks = timeout;
-
-        if (ticks == 0) /* TIMEOUT_NOBLOCK */
-            ;
-        else if (ticks > 0)
-        {
-            if (button_boosted && ticks > BUTTON_UNBOOST_TMO)
-                ticks = BUTTON_UNBOOST_TMO;
-
-            timeout -= ticks;
-        }
-        else            /* TIMEOUT_BLOCK (ticks < 0) */
-        {
-            if (button_boosted)
-                ticks = BUTTON_UNBOOST_TMO;
-        }
-
-        queue_wait_w_tmo(&button_queue, evp, ticks);
-        if (evp->id != SYS_TIMEOUT)
-        {
-            /* GUI boost build gets immediate kick, otherwise at least 3
-               messages had to be there */
-        #ifndef HAVE_GUI_BOOST
-            if (queue_count(&button_queue) >= 2)
-        #endif
-                button_boost(true);
-
-            break;
-        }
-
-        if (button_boosted && TIME_AFTER(current_tick, button_unboost_tick))
-            button_boost(false);
-    }
-    while (timeout);
-}
-#else /* ndef HAVE_ADJUSTABLE_CPU_FREQ */
-static inline void button_queue_wait(struct queue_event *evp, int timeout)
-{
-    queue_wait_w_tmo(&button_queue, evp, timeout);
-}
-#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
-
-int button_queue_count( void )
-{
-    return queue_count(&button_queue);
-}
-
-long button_get(bool block)
-{
-    struct queue_event ev;
-    button_queue_wait(&ev, block ? TIMEOUT_BLOCK : TIMEOUT_NOBLOCK);
-
-    if (ev.id == SYS_TIMEOUT)
-        ev.id = BUTTON_NONE;
-    else
-        button_data = ev.data;
-
-    return ev.id;
-}
-
-long button_get_w_tmo(int ticks)
-{
-    struct queue_event ev;
-    button_queue_wait(&ev, ticks);
-
-    if (ev.id == SYS_TIMEOUT)
-        ev.id = BUTTON_NONE;
-    else
-        button_data = ev.data;
-
-    return ev.id;
-}
-
-intptr_t button_get_data(void)
-{
-    return button_data;
-}
-
 void button_init(void)
 {
     int temp;
     /* Init used objects first */
-    queue_init(&button_queue, true);
+    button_queue_init();
 
     /* hardware inits */
     button_init_device();
@@ -713,11 +571,6 @@ int button_status_wdata(int *pdata)
     return lastbtn;
 }
 #endif
-
-void button_clear_queue(void)
-{
-    queue_clear(&button_queue);
-}
 
 #ifdef HAVE_TOUCHSCREEN
 long touchscreen_last_touch(void)

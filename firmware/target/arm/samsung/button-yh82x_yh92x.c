@@ -133,12 +133,12 @@ int button_read_device(void)
         if ((~GPIOA_INPUT_VAL & 0x40) != rec_switch)
         {
             if (rec_switch) {
-                queue_post(&button_queue,BUTTON_REC_SW_OFF,0);
-                queue_post(&button_queue,BUTTON_REC_SW_OFF|BUTTON_REL,0);
+                button_queue_post(BUTTON_REC_SW_OFF,0);
+                button_queue_post(BUTTON_REC_SW_OFF|BUTTON_REL,0);
             }
             else {
-                queue_post(&button_queue,BUTTON_REC_SW_ON,0);
-                queue_post(&button_queue,BUTTON_REC_SW_ON|BUTTON_REL,0);
+                button_queue_post(BUTTON_REC_SW_ON,0);
+                button_queue_post(BUTTON_REC_SW_ON|BUTTON_REL,0);
             }
             rec_switch = ~GPIOA_INPUT_VAL & 0x40;
             backlight_on();

@@ -159,7 +159,7 @@ static void handle_scroll_wheel(int new_scroll)
         wheel_velocity = (7*wheel_velocity + v) / 8;
     }
 
-    if (queue_empty(&button_queue)) {
+    if (button_queue_empty()) {
         int key = wheel_keycode;
 
         if (v >= WHEEL_REPEAT_VELOCITY && prev_keypost == key) {
@@ -171,7 +171,7 @@ static void handle_scroll_wheel(int new_scroll)
         prev_keypost = wheel_keycode;
 
         /* post wheel keycode with wheel data */
-        queue_post(&button_queue, key,
+        button_queue_post(key,
                    (wheel_velocity >= WHEEL_ACCEL_START ? (1ul << 31) : 0)
                     | wheel_delta | wheel_velocity);
         /* message posted - reset delta */

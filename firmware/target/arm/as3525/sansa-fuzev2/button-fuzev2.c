@@ -163,9 +163,9 @@ static void scrollwheel(unsigned int wheel_value)
             
         last_wheel_post = time;
 
-        if (queue_empty(&button_queue))
+        if (button_queue_empty())
         {
-            queue_post(&button_queue, btn, wheel_fast_mode |
+            button_queue_post(btn, wheel_fast_mode |
                    (wheel_delta << 24) | wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
             /* message posted - reset delta and poke backlight on*/
             wheel_delta = 1;

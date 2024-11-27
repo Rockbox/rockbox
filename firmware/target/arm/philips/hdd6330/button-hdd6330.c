@@ -144,7 +144,7 @@ int button_read_device(void)
     /* Scrollstrip direct button post - much better response */
     if ((btn == BUTTON_UP) || (btn == BUTTON_DOWN))
     {
-        queue_post(&button_queue,btn|repeat,0);
+        button_queue_post(btn|repeat,0);
         backlight_on();
         buttonlight_on();
         reset_poweroff_timer();

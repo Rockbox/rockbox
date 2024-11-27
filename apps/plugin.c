@@ -249,7 +249,7 @@ static const struct plugin_api rockbox_api = {
     lcd_set_mode,
 #endif
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    &button_queue,
+    button_queue_post,
 #endif
     bidi_l2v,
     is_diacritic,
@@ -448,6 +448,7 @@ static const struct plugin_api rockbox_api = {
     talk_idarray,
     talk_file,
     talk_file_or_spell,
+    talk_fullpath,
     talk_dir_or_spell,
     talk_number,
     talk_value_decimal,
@@ -840,8 +841,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    talk_fullpath,
 };
 
 static int plugin_buffer_handle;
