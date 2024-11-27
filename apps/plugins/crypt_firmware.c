@@ -110,7 +110,7 @@ static void calc_hash(uint32_t* data, uint32_t size, uint32_t* result)
     for (ptr = 0; ptr < (size >> 2); ptr += 0x10)
     {
       for (i = 0; i < 0x10; i++) SHA1DATAIN[i] = data[ptr + i];
-      SHA1CONFIG = ctrl;
+      SHA1CONFIG = config;
       config = 0xA;
       while ((SHA1CONFIG & 1) != 0);
     }
