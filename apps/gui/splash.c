@@ -148,14 +148,17 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
 
     vp->flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
-    unsigned fg = screen->get_foreground();
-    unsigned bg = screen->get_background();
-
-    bool broken = (fg == bg) ||
-                  (bg == 63422 && fg == 65535); /* -> iPod reFresh themes from '22 */
+    unsigned fg = 0, bg = 0;
+    bool broken = false;
 
     if (screen->depth > 1)
     {
+        fg = screen->get_foreground();
+        bg = screen->get_background();
+
+        broken = (fg == bg) ||
+                 (bg == 63422 && fg == 65535); /* -> iPod reFresh themes from '22 */
+
         vp->drawmode = DRMODE_FG;
         /* can't do vp->fg_pattern here, since set_foreground does a bit more on
          * greyscale */
