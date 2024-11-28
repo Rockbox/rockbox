@@ -33,7 +33,48 @@
 #include <ctype.h>
 
 typedef unsigned chartype;
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+char* strcasestr (const char* haystack, const char* needle)
+{
+    chartype needle_ch = tolower(*needle++);
+    chartype needle_upch = toupper(needle_ch);
+    chartype ch_h;
+    char* match = (char*)haystack; /* if needle empty return haystack */
 
+    if (needle_ch != 0) {
+        /* find the first matching character */
+        do {
+            ch_h = *haystack++;
+            if (ch_h == 0) /* end of haystack no match.. */
+                return NULL;
+        } while (ch_h != needle_ch && ch_h != needle_upch);
+
+        match = (char*) haystack - 1;
+        /* find the first non-matching character */
+lcase_match:
+        while (ch_h == needle_ch) {
+            ch_h = *haystack++;
+            needle_ch = tolower(*needle++);
+            if (needle_ch == 0) /* end of needle, found match.. */
+                return match;
+        }
+/* lcase or ucase match */
+        needle_upch = toupper(needle_ch);
+        while (ch_h == needle_upch || ch_h == needle_ch) {
+            ch_h = *haystack++;
+            needle_ch = tolower(*needle++);
+            if (needle_ch == 0) /* end of needle, found match.. */
+                return match;
+
+            if (ch_h == needle_ch)
+                goto lcase_match;
+            needle_upch = toupper(needle_ch);
+        }
+        match = NULL;
+    }
+    return match;
+}
+#else
 char* strcasestr (const char* phaystack, const char* pneedle)
 {
     const unsigned char *haystack, *needle;
@@ -120,3 +161,4 @@ char* strcasestr (const char* phaystack, const char* pneedle)
   ret0:
     return 0;
 }
+#endif
