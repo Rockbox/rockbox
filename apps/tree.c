@@ -1064,8 +1064,14 @@ int rockbox_browse(struct browse_context *browse)
 {
     tc.is_browsing = (browse != NULL);
     int ret_val = 0;
-    int dirfilter = tc.is_browsing ? browse->dirfilter : SHOW_ALL;
-
+    int dirfilter = SHOW_ALL;
+    if (tc.is_browsing)
+        dirfilter = browse->dirfilter;
+    else
+    {
+        debugf("%s browse is [NULL] \n", __func__);
+        browse = tc.browse;
+    }
     if (backup_count >= NUM_TC_BACKUP)
         return GO_TO_PREVIOUS;
     if (backup_count >= 0)
