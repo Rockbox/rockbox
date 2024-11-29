@@ -406,6 +406,8 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
     if (colxw > 0) /* draw selector for first column (title or items) */
     {
         vp->width += COLUMN_ENDLEN + 1;
+        if (vp->width > vp_w)
+            vp->width = vp_w;
         draw_selector(display, linedes, selected_flag, 0,
                       separator, nx, y, nw, linedes->height);
     }
