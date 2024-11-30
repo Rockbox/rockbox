@@ -308,3 +308,7 @@ perceptual_volume
 #if defined(CODEC_AAC_SBR_DEC)
 codec_aac_he
 #endif
+
+#if defined(USE_LTO)
+lto
+#endif

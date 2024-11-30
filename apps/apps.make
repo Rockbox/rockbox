@@ -18,6 +18,11 @@ SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 # Kludge: depends on config.o which only depends on config-*.h to have config.h
 # changes trigger a genlang re-run
 #
+
+ifneq (,$(USE_LTO))
+$(BUILDDIR)/apps/features: PPCFLAGS += -DUSE_LTO
+endif
+
 $(BUILDDIR)/apps/features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/config.o
 	$(SILENT)mkdir -p $(BUILDDIR)/apps
 	$(SILENT)mkdir -p $(BUILDDIR)/lang
