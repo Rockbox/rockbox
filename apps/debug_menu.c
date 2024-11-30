@@ -2624,8 +2624,9 @@ static bool dbg_device_data(void)
     simplelist_setline("Device data");
 
 #if defined(EROS_QN)
-    simplelist_addline("Lcd Version: %d", (int)device_data.lcd_version);
+    simplelist_addline("Hardware Revision: %d", (int)device_data.hw_rev);
 #endif
+    simplelist_addline("Struct Ver: %d", (int)device_data.version);
 
     simplelist_setline("Device data RAW:");
     for (size_t i = 0; i < device_data.length; i += 4)

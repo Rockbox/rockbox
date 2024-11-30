@@ -67,7 +67,7 @@ void gpio_init(void)
 # if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 # else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 # endif
 #endif
     /* Apply all initial GPIO settings */

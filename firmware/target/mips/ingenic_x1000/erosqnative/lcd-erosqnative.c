@@ -297,7 +297,7 @@ void lcd_tgt_enable(bool enable)
         gpio_set_level(GPIO_LCD_PWR_HW1, 1);
 # endif
 #else
-        if (device_data.lcd_version <= 3)
+        if (device_data.hw_rev <= 3)
         {
             gpio_set_level(GPIO_LCD_PWR_HW1, 1);
         }
@@ -322,7 +322,7 @@ void lcd_tgt_enable(bool enable)
         lcd_exec_commands(&erosqnative_lcd_cmd_enable_v1[0]);
 # endif
 #else
-        if (device_data.lcd_version >= 3)
+        if (device_data.hw_rev >= 3)
         {
             lcd_exec_commands(&erosqnative_lcd_cmd_enable_v3[0]);
         }

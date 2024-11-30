@@ -41,6 +41,10 @@
 #include "devicedata.h"
 #endif
 
+#if defined(EROS_QN)
+#include "eros_qn_codec.h"
+#endif
+
 #ifdef X1000_CPUIDLE_STATS
 int __cpu_idle_avg = 0;
 int __cpu_idle_cur = 0;
@@ -89,14 +93,23 @@ void system_early_init(void)
 #if defined (HAVE_DEVICEDATA) && defined(EROS_QN)
 void fill_devicedata(struct device_data_t *data)
 {
-#ifdef BOOTLOADER
+# ifdef BOOTLOADER
     memset(data->payload, 0xff, data->length);
-    data->lcd_version = EROSQN_VER;
-#else
-    uint8_t lcd_version = device_data.lcd_version;
+#  if EROSQN_VER == 1
+    // version 2 has newer dac, 1 has old dac.
+    data->hw_rev = eros_qn_discover_dac(false) ? 2 : 1;
+#  else
+    // versions 3 and 4 both have new dac
+    data->hw_rev = EROSQN_VER;
+#  endif
+    data->version = DEIVCE_DATA_VERSION;
+# else
+    uint8_t hw_rev = device_data.hw_rev;
+    uint8_t version = device_data.version;
     memset(data->payload, 0xff, data->length);
-    data->lcd_version = lcd_version;
-#endif
+    data->hw_rev = hw_rev;
+    data->version = version;
+# endif
 }
 #endif
 

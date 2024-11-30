@@ -65,7 +65,7 @@ void power_init(void)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever >= 4){
         uint8_t regread;
@@ -165,7 +165,7 @@ void usb_charging_maxcurrent_change(int maxcurrent)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever >= 4){
         axp2101_set_charge_current(maxcurrent);
@@ -186,7 +186,7 @@ void power_off(void)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever >= 4){
         axp2101_power_off();
@@ -202,7 +202,7 @@ bool charging_state(void)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever >= 4){
         return axp2101_battery_status() == AXP2101_BATT_CHARGING;
@@ -217,7 +217,7 @@ int _battery_voltage(void)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever >= 4){
         return axp2101_adc_read(AXP2101_ADC_VBAT_VOLTAGE);
@@ -233,7 +233,7 @@ int _battery_current(void)
 #if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 #else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 #endif
     if (devicever <= 3){
         if(charging_state())

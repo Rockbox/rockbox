@@ -37,6 +37,7 @@
 
 #define DEVICE_DATA_MAGIC0    ('r' | 'b' << 8 | 'd' << 16 | 'e' << 24)
 #define DEVICE_DATA_MAGIC1    ('v' | 'i' << 8 | 'c' << 16 | 'e' << 24)
+#define DEIVCE_DATA_VERSION 0
 
 /* maximum size of payload */
 #define DEVICE_DATA_PAYLOAD_SIZE  4
@@ -59,8 +60,9 @@ struct device_data_t
         struct
         {
 #if defined(EROS_QN)
-            uint8_t lcd_version;
+            uint8_t hw_rev;
 #endif
+            uint8_t version;
         };
         uint8_t payload[DEVICE_DATA_PAYLOAD_SIZE];
     };

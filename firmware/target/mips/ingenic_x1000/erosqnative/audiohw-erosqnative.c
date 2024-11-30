@@ -32,6 +32,7 @@
 #include "aic-x1000.h"
 #include "i2c-x1000.h"
 #include "gpio-x1000.h"
+#include "devicedata.h"
 
 /*
  * Earlier devices audio path appears to be:
@@ -42,7 +43,7 @@
  * DAC --> HP Amp --> Stereo Switch \--> HP OUT
  *                                   \-> LO OUT
  */
-
+#if !defined(BOOTLOADER)
 void audiohw_init(void)
 {
     /* explicitly mute everything */
@@ -93,11 +94,18 @@ void audiohw_postinit(void)
 
     i2c_x1000_set_freq(ES9018K2M_BUS, I2C_FREQ_400K);
 
-    int ret = es9018k2m_read_reg(ES9018K2M_REG0_SYSTEM_SETTINGS);
-    if (ret >= 0) /* Detected ES9018K2M DAC */
+    // devices hw2 and newer use es9018k2m i2c dac
+    // hw1 devices use swvol
+    // special case hw2 devices with bootloaders identifying as hw1 (pre-version field)
+    if (device_data.hw_rev >= 2 || \
+        (device_data.version == 0xff && eros_qn_discover_dac(true)))
     {
-        logf("ES9018K2M found: ret=%d", ret);
-        es9018k2m_present_flag = 1;
+#if defined(LOGF_ENABLE)
+        if (device_data.version == 0xff) {
+            logf("OLD BOOTLOADER FOUND, UPDATE IT!");
+        }
+#endif
+        es9018k2m_present_flag = true;
 
        /* Default is 32-bit data, and it works ok. Enabling the following
         * causes issue. Which is weird, I definitely thought AIC was configured
@@ -128,8 +136,6 @@ void audiohw_postinit(void)
         * ! will hear random dropouts. (Fixed my SurfansF20 v3.2 dropouts)   */
         es9018k2m_write_reg(ES9018K2M_REG12_DPLL_SETTINGS, 0xda);
 
-    } else { /* Default to SWVOL for PCM5102A DAC */
-        logf("Default to SWVOL: ret=%d", ret);
     }
 }
 
@@ -206,3 +212,4 @@ void audiohw_set_filter_roll_off(int value)
         es9018k2m_set_filter_roll_off(value);
     }
 }
+#endif /* !defined(BOOTLOADER) */

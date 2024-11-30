@@ -24,15 +24,22 @@
 #include "config.h"
 #include "audio.h"
 #include "audiohw.h"
+#ifndef BOOTLOADER
 #include "settings.h"
+#endif
 #include "pcm_sw_volume.h"
 
-#include "gpio-x1000.h"
+// #define LOGF_ENABLE
+#include "logf.h"
 
-static long int vol_l_hw = PCM5102A_VOLUME_MIN;
-static long int vol_r_hw = PCM5102A_VOLUME_MIN;
+#include "gpio-x1000.h"
+#include "i2c-x1000.h"
+
 int es9018k2m_present_flag = 0;
 
+#ifndef BOOTLOADER
+static long int vol_l_hw = PCM5102A_VOLUME_MIN;
+static long int vol_r_hw = PCM5102A_VOLUME_MIN;
 void eros_qn_set_outputs(void)
 {
     audiohw_set_volume(vol_l_hw, vol_r_hw);
@@ -63,4 +70,33 @@ void eros_qn_switch_output(int select)
     {
         gpio_set_level(GPIO_STEREOSW_SEL, 1);
     }
+}
+#endif /* !defined(BOOTLOADER) */
+
+bool eros_qn_discover_dac(bool pwr_after_discovery)
+{
+    i2c_x1000_set_freq(ES9018K2M_BUS, I2C_FREQ_400K);
+    gpio_set_level(GPIO_DAC_PWR, 1);
+    gpio_set_level(GPIO_DAC_ANALOG_PWR, 1);
+    mdelay(10);
+    int ret = es9018k2m_read_reg(ES9018K2M_REG0_SYSTEM_SETTINGS);
+    if (ret == 0)
+    {
+        es9018k2m_present_flag = 1;
+        logf("ES9018K2M found! ret=%d", ret);
+    }
+    /* other options will go here if need be */
+    else
+    {
+        es9018k2m_present_flag = 0;
+        logf("Default to SWVOL: ret=%d", ret);
+    }
+
+    if (!pwr_after_discovery)
+    {
+        gpio_set_level(GPIO_DAC_PWR, 0);
+        gpio_set_level(GPIO_DAC_ANALOG_PWR, 0);
+    }
+
+    return es9018k2m_present_flag;
 }

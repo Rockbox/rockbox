@@ -531,7 +531,7 @@ bool axp_debug_menu(void)
 # if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 # else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 # endif
     if (devicever >= 4) {
         return axp2101_debug_menu();
@@ -556,7 +556,7 @@ unsigned int power_input_status(void)
 # if defined(BOOTLOADER)
     devicever = EROSQN_VER;
 # else
-    devicever = device_data.lcd_version;
+    devicever = device_data.hw_rev;
 # endif
     if (devicever >= 4) {
         return axp2101_power_input_status();

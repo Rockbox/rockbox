@@ -205,7 +205,7 @@ void button_init_device(void)
 
     /* Set up headphone and line out detect polling */
 #ifndef BOOTLOADER
-    hp_detect_init(device_data.lcd_version);
+    hp_detect_init(device_data.hw_rev);
 #endif
 }
 
@@ -266,7 +266,7 @@ int button_read_device(void)
     if((d & (1 << 5)) == 0) r  |= BUTTON_BACK;
 # endif
 #else
-    if (device_data.lcd_version >= 4){
+    if (device_data.hw_rev >= 4){
         if((b & (1 << 31)) == 0) r |= BUTTON_POWER;
         if((a & (1 << 18)) == 0) r |= BUTTON_BACK;
     } else {
@@ -280,7 +280,7 @@ int button_read_device(void)
     if((c & (1 << 24)) == 0) r  |= BUTTON_NEXT;
 
 #ifndef BOOTLOADER
-    if (device_data.lcd_version >= 4){
+    if (device_data.hw_rev >= 4){
         // get new HP/LO detect states
         // HP_detect PB14 --> hp_detect bit 4
         // LO_detect PB22 --> hp_detect bit 5

@@ -23,7 +23,9 @@
 #include "system.h"
 #include "es9018k2m.h"
 #include "i2c-async.h"
-#include "action.h"
+#ifndef BOOTLOADER
+# include "action.h"
+#endif
 
 //======================================================================================
 // ES9018K2M support stuff
@@ -36,6 +38,7 @@
 # error "No definition for ES9018K2M I2C address!"
 #endif
 
+#ifndef BOOTLOADER
 static int vol_tenthdb2hw(const int tdb)
 {
     if (tdb < ES9018K2M_VOLUME_MIN) {
@@ -147,6 +150,7 @@ void es9018k2m_set_filter_roll_off(int value)
     es9018k2m_write_reg(ES9018K2M_REG7_GENERAL_SETTINGS, reg7_general_settings);
     es9018k2m_write_reg(ES9018K2M_REG21_GPIO_INPUT_SELECT, reg21_gpio_input_selection);
 }
+#endif /* !defined(BOOTLOADER) */
 
 /* returns I2C_STATUS_OK upon success, I2C_STATUS_* errors upon error */
 int es9018k2m_write_reg(uint8_t reg, uint8_t val)

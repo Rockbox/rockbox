@@ -525,9 +525,6 @@ drivers/audio/cs4398.c
 drivers/audio/es9018.c
 #elif defined (HAVE_ES9218)
 drivers/audio/es9218.c
-#elif defined (HAVE_EROS_QN_CODEC)
-drivers/audio/eros_qn_codec.c
-drivers/audio/es9018k2m.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -561,6 +558,12 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 
 #endif /* !defined(BOOTLOADER) */
+
+/* build erosqn codec in bootloader for detection */
+#if defined(HAVE_EROS_QN_CODEC)
+drivers/audio/eros_qn_codec.c
+drivers/audio/es9018k2m.c
+#endif /* defined(HAVE_EROSQN_CODEC) */
 
 /* WiFi */
 #if !defined(BOOTLOADER)

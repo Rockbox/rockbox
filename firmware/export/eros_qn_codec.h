@@ -53,4 +53,10 @@ void eros_qn_set_outputs(void);
 /* returns (global_settings.volume_limit * 10) */
 int eros_qn_get_volume_limit(void);
 
+/* powers on the dac and tries to speak over i2c.
+ * will return 1 if es9018k2m, 0 if non-i2c dac.
+ * if pwr_after_discovery = 1, leave dac powered up.
+ * if 0, power down dac. */
+bool eros_qn_discover_dac(bool pwr_after_discovery);
+
 #endif
