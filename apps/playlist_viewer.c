@@ -386,7 +386,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         return false;
     }
 
-    size_t id3_size = sizeof(*viewer->id3);
+    size_t id3_size = ALIGN_UP(sizeof(*viewer->id3), 4);
 
     buffer = plugin_get_buffer(&buffer_size);
     if (!buffer || buffer_size <= MAX_PATH + id3_size)
