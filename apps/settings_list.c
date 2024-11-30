@@ -819,7 +819,7 @@ static void volume_limit_set_default(void* setting, void* defaultval)
 }
 
 #if defined(HAVE_EROS_QN_CODEC)
-static void stereosw_apply(int arg)
+static void hp_lo_select_apply(int arg)
 {
     (void)arg;
 
@@ -2312,9 +2312,9 @@ const struct settings_list settings[] = {
                   true, "clear settings on hold", NULL),
 #endif
 #if defined(HAVE_EROS_QN_CODEC)
-    CHOICE_SETTING(0, stereosw_mode, LANG_STEREOSW_MODE, 0, "stereo switch mode",
-    "normal,reverse,always0,always1", stereosw_apply, 4,
-    ID2P(LANG_NORMAL), ID2P(LANG_REVERSE), ID2P(LANG_ALWAYS_ZERO), ID2P(LANG_ALWAYS_ONE)),
+    CHOICE_SETTING(0, hp_lo_select, LANG_HP_LO_SELECT, 0, "headphone lineout select",
+    "auto,headphone,lineout", hp_lo_select_apply, 3,
+    ID2P(LANG_AUTO), ID2P(LANG_HEADPHONE), ID2P(LANG_LINEOUT)),
 #endif
 };
 

@@ -909,7 +909,7 @@ struct user_settings
     bool clear_settings_on_hold;
 #endif
 #if defined(HAVE_EROS_QN_CODEC)
-    int stereosw_mode; /* indicates normal, reverse, always 0, always 1 operation */
+    int hp_lo_select; /* indicates automatic, headphone-only, or lineout-only operation */
 #endif
 };
 

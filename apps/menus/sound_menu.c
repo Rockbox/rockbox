@@ -136,7 +136,7 @@ MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
 #endif
 
 #ifdef HAVE_EROS_QN_CODEC
-MENUITEM_SETTING(stereosw_mode, &global_settings.stereosw_mode,NULL);
+MENUITEM_SETTING(hp_lo_select, &global_settings.hp_lo_select,NULL);
 #endif
 
 #ifdef AUDIOHW_HAVE_POWER_MODE
@@ -258,7 +258,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           ,&roll_off
 #endif
 #ifdef HAVE_EROS_QN_CODEC
-          ,&stereosw_mode
+          ,&hp_lo_select
 #endif
 #ifdef AUDIOHW_HAVE_POWER_MODE
           ,&power_mode

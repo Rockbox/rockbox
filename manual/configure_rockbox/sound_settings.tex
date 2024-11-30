@@ -190,19 +190,24 @@ change to customise your listening experience.
   stereo field unaltered.
 
 \opt{erosqnative}{
-  \section{Stereo Switch Mode}
-  The Eros Q and related devices contain a stereo switch in the audio path.
-  This setting allows the behavior of the stereo switch to be changed if one of
-  the two outputs (Headphones or Line Out) is not working. There are four modes:
+  \section{Output Select}
+  The \dap{} has two output ports: Headphones and Line Out. This setting selects
+  either automatic detection, or forces the player to use Headphone output or
+  Line output.
+  \note{The headphone jack will only detect a pair of headphones or similar devices with low impedance.
+  An amplifier or other high-impedance device will not be detected. The lineout jack
+  will detect a high-impedance device.}
+  \note{Line output volume is fixed to Volume Limit value. Please see \setting{Volume} section.}
   \begin{description}
-    \item[Normal.]
-      Headphones output uses a value of 0, and Line Out uses a value of 1.
-    \item[Reverse.]
-      Headphones output uses a value of 1, and Line Out uses a value of 0.
-    \item[Always 0.]
-      Both outputs use a value of 0.
-    \item[Always 1.]
-      Both outputs use a value of 1.
+    \item[Automatic.]
+      Automatically detect which output to use. If both outputs are plugged in,
+      headphones will take precedence. Jack detection is enabled.
+    \item[Headphone.]
+      Force the headphone output to be active. Jack detection is disabled. Automatic
+      play/pause jack detection will not work.
+    \item[Lineout.]
+      Force the line output to be active. Jack detection is disabled. Automatic
+      play/pause jack detection will not work.
   \end{description}
 
   \section{DAC filter roll-off}

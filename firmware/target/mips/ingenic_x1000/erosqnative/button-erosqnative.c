@@ -34,6 +34,7 @@
 #include "devicedata.h"
 
 #ifndef BOOTLOADER
+# include "settings.h"
 # include "lcd.h"
 # include "font.h"
 #endif
@@ -166,7 +167,20 @@ bool headphones_inserted(void)
         eros_qn_set_outputs();
 #endif
     }
-    return hp_detect_reg & 0x10 ? false : true;
+#if !defined(BOOTLOADER)
+    if (global_settings.hp_lo_select == 1) // force headphones
+    {
+        return true;
+    }
+    else if (global_settings.hp_lo_select == 2) // force lineout
+    {
+        return false;
+    }
+    else // automatic
+#endif
+    {
+        return hp_detect_reg & 0x10 ? false : true;
+    }
 }
 
 bool lineout_inserted(void)
@@ -182,7 +196,20 @@ bool lineout_inserted(void)
         eros_qn_set_outputs();
 #endif
     }
-    return hp_detect_reg & 0x20 ? false : true;
+#if !defined(BOOTLOADER)
+    if (global_settings.hp_lo_select == 1) // force headphones
+    {
+        return false;
+    }
+    else if (global_settings.hp_lo_select == 2) // force lineout
+    {
+        return true;
+    }
+    else // automatic
+#endif
+    {
+        return hp_detect_reg & 0x20 ? false : true;
+    }
 }
 
 /* Rockbox interface */

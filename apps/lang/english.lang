@@ -16358,62 +16358,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Stereo Switch Mode"
-  </dest>
-  <voice>
-    *: "Stereo Switch Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Reverse"
-  </dest>
-  <voice>
-    *: "Reverse"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Always 0"
-  </dest>
-  <voice>
-    *: "Always 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Always 1"
-  </dest>
-  <voice>
-    *: "Always 1"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LEGAL_NOTICES
   desc: in system menu
   user: core
@@ -16579,5 +16523,47 @@
   </dest>
   <voice>
     *: "View Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: "Output Select"
+  </source>
+  <dest>
+    *: "Output Select"
+  </dest>
+  <voice>
+    *: "Output Select"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Headphone"
+  </source>
+  <dest>
+    *: "Headphone"
+  </dest>
+  <voice>
+    *: "Headphone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Lineout"
+  </source>
+  <dest>
+    *: "Lineout"
+  </dest>
+  <voice>
+    *: "Lineout"
   </voice>
 </phrase>
