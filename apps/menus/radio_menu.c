@@ -92,10 +92,11 @@ MENUITEM_SETTING(sync_rds_time, &global_settings.sync_rds_time, NULL);
 #endif
 
 #ifndef FM_MODE
-extern int radio_mode;
+
 static char* get_mode_text(int selected_item, void * data,
                            char *buffer, size_t buffer_len)
 {
+    int radio_mode = radio_get_mode();
     (void)selected_item;
     (void)data;
     snprintf(buffer, buffer_len, "%s %s", str(LANG_MODE),
@@ -105,19 +106,21 @@ static char* get_mode_text(int selected_item, void * data,
 }
 static int mode_speak_item(int selected_item, void * data)
 {
+    int radio_mode = radio_get_mode();
     (void)selected_item;
     (void)data;
     long talk_ids[4];
     talk_ids[0] = LANG_MODE;
-    talk_ids[1] = radio_mode ? LANG_PRESET : LANG_RADIO_SCAN_MODE;
+    talk_ids[1] = radio_mode != RADIO_SCAN_MODE? LANG_PRESET : LANG_RADIO_SCAN_MODE;
     talk_ids[2] = TALK_FINAL_ID;
     talk_idarray(talk_ids, true);
     return 0;
 }
 static int toggle_radio_mode(void)
 {
-    radio_mode = (radio_mode == RADIO_SCAN_MODE) ?
-                 RADIO_PRESET_MODE : RADIO_SCAN_MODE;
+    int radio_mode = radio_get_mode();
+    radio_set_mode((radio_mode == RADIO_SCAN_MODE) ?
+                 RADIO_PRESET_MODE : RADIO_SCAN_MODE);
     return 0;
 }
 MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0, toggle_radio_mode,

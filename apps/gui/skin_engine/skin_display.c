@@ -237,7 +237,7 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
 #endif
         {
             int min = fm_region_data[global_settings.fm_region].freq_min;
-            end = radio_current_frequency() - min;
+            end = radio_get_current_frequency() - min;
             length = fm_region_data[global_settings.fm_region].freq_max - min;
         }
     }

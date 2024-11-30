@@ -109,7 +109,7 @@ int radio_get_art_hid(struct dim *requested_dim)
     int free_idx = -1;
     const char* preset_name;
 
-    if (!buf || radio_scan_mode() || preset < 0)
+    if (!buf || (radio_get_mode() == RADIO_SCAN_MODE) || preset < 0)
         return -1;
 
     preset_name = radio_get_preset_name(preset);

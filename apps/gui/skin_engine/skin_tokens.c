@@ -455,7 +455,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 return "t";
             return NULL;
         case SKIN_TOKEN_TUNER_SCANMODE:
-            if (radio_scan_mode())
+            if (radio_get_mode() == RADIO_SCAN_MODE)
                 return "s";
             return NULL;
         case SKIN_TOKEN_TUNER_STEREO:
@@ -469,7 +469,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             return format_freq_MHz(region_data->freq_max,
                             region_data->freq_step, buf, buf_size);
         case SKIN_TOKEN_TUNER_CURFREQ:
-            return format_freq_MHz(radio_current_frequency(),
+            return format_freq_MHz(radio_get_current_frequency(),
                             region_data->freq_step, buf, buf_size);
 #ifdef HAVE_RADIO_RSSI
         case SKIN_TOKEN_TUNER_RSSI:
@@ -510,9 +510,9 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             if (preset < 0)
                 preset += preset_count;
             if (token->type == SKIN_TOKEN_PRESET_NAME)
-                snprintf(buf, buf_size, "%s", radio_get_preset(preset)->name);
+                snprintf(buf, buf_size, "%s", radio_get_preset_name(preset));
             else if (token->type == SKIN_TOKEN_PRESET_FREQ)
-                format_freq_MHz(radio_get_preset(preset)->frequency,
+                format_freq_MHz(radio_get_preset_freq(preset),
                                 region_data->freq_step, buf, buf_size);
             else
                 snprintf(buf, buf_size, "%d", preset + 1);

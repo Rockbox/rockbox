@@ -28,7 +28,7 @@
 #include "screen_access.h"
 #include "bmp.h"
 
-enum {
+enum radio_scan_mode {
     RADIO_SCAN_MODE = 0,
     RADIO_PRESET_MODE,
 };
@@ -43,13 +43,16 @@ void radio_pause(void);
 void radio_stop(void);
 bool radio_hardware_present(void);
 bool in_radio_screen(void);
-
-bool radio_scan_mode(void); /* true for scan mode, false for preset mode */
 bool radio_is_stereo(void);
-int radio_current_frequency(void);
+
+enum radio_scan_mode radio_get_mode(void); /* RADIO_SCAN_MODE, RADIO_PRESET_MODE */
+void radio_set_mode(enum radio_scan_mode);
+
+int radio_get_current_frequency(void);
+void radio_set_current_frequency(int freq);
+
 int radio_current_preset(void);
 int radio_preset_count(void);
-const struct fmstation *radio_get_preset(int preset);
 
 /* callbacks for the radio settings */
 void set_radio_region(int region);
@@ -57,11 +60,7 @@ void toggle_mono_mode(bool mono);
 
 #define MAX_FMPRESET_LEN 27
 
-struct fmstation
-{
-    int frequency; /* In Hz */
-    char name[MAX_FMPRESET_LEN+1];
-};
+int radio_get_preset_freq(int preset);
 const char* radio_get_preset_name(int preset);
 #if 0 /* disabled in draw_progressbar() */
 void presets_draw_markers(struct screen *screen, int x, int y, int w, int h);
