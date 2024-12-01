@@ -6,19 +6,34 @@
 # it stopped
 set -e
 
+system=`uname -s`
+
+# MacOS is perpetually special
+if [ "$system" == "Darwin" ]; then
+    parallel=`sysctl -n hw.physicalcpu`
+    READLINK=greadlink
+    TMP="$TMPDIR"
+    SED=gsed
+else
+    READLINK=readlink
+    parallel=`nproc`
+    TMP=/tmp
+    SED=sed
+fi
+
 # this is where this script will store downloaded files and check for already
 # downloaded files
-dlwhere="${RBDEV_DOWNLOAD:-/tmp/rbdev-dl}"
+dlwhere="${RBDEV_DOWNLOAD:-$TMP/rbdev-dl}"
 
 # will append the target string to the prefix dir mentioned here
 # Note that the user running this script must be able to do make install in
 # this given prefix directory. Also make sure that this given root dir
 # exists.
-prefix="${RBDEV_PREFIX:-/usr/local}"
+prefix="${RBDEV_PREFIX:-$TMP/local}"
 
 # This directory is used to extract all files and to build everything in. It
 # must not exist before this script is invoked (as a security measure).
-builddir="${RBDEV_BUILD:-/tmp/rbdev-build}"
+builddir="${RBDEV_BUILD:-$TMP/rbdev-build}"
 
 # This script needs to use GNU Make. On Linux systems, GNU Make is invoked
 # by running the "make" command, on most BSD systems, GNU Make is invoked
@@ -30,17 +45,11 @@ else
 fi
 
 # record version
-makever=`$make -v |sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
+makever=`$make -v |$SED -n '1p' | $SED -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
 
 # This is the absolute path to where the script resides.
-rockboxdevdir="$( readlink -f "$( dirname "${BASH_SOURCE[0]}" )" )"
+rockboxdevdir="$( $READLINK -f "$( dirname "${BASH_SOURCE[0]}" )" )"
 patch_dir="$rockboxdevdir/toolchain-patches"
-
-if [ `uname -s` = "Darwin" ]; then
-    parallel=`sysctl -n hw.physicalcpu`
-else
-    parallel=`nproc`
-fi
 
 if [ $parallel -gt 1 ] ; then
   make_parallel=-j$parallel
@@ -380,7 +389,7 @@ buildtool() {
         echo "ROCKBOXDEV: $toolname/configure"
         cflags='-U_FORTIFY_SOURCE -fgnu89-inline -O2'
         if [ "$tool" == "glib" ]; then
-            run_cmd "$logfile" sed -i -e 's/m4_copy/m4_copy_force/g' "$cfg_dir/m4macros/glib-gettext.m4"
+            run_cmd "$logfile" $SED -i -e 's/m4_copy/m4_copy_force/g' "$cfg_dir/m4macros/glib-gettext.m4"
             run_cmd "$logfile" autoreconf -fiv "$cfg_dir"
             cflags="$cflags -Wno-format-nonliteral -Wno-format-overflow"
         fi
@@ -426,6 +435,17 @@ build() {
         return
     fi
     echo "ROCKBOXDEV: Starting step '$stepname'"
+
+    # GCC is special..
+    if [ "$toolname" == "gcc" ]; then
+	configure_params="--enable-languages=c --disable-libssp $configure_params"
+
+        # For Apple targets only
+        if [ "$system" == "Darwin" ] ; then
+            patch="$patch apple_silicon.patch"
+            EXTRA_CXXFLAGS="-fbracket-depth=512"
+        fi
+    fi
 
     # create build directory
     if test -d $builddir; then
@@ -492,11 +512,6 @@ build() {
         cd $builddir
     fi
 
-    # GCC is special
-    if [ "$toolname" == "gcc" ] ; then
-	configure_params="--enable-languages=c --disable-libssp $configure_params"
-    fi
-
     echo "ROCKBOXDEV: logging to $logfile"
     rm -f "$logfile"
 
@@ -506,7 +521,7 @@ build() {
     cd build-$toolname
 
     echo "ROCKBOXDEV: $toolname/configure"
-    CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon -O2' CXXFLAGS='-std=gnu++03' run_cmd "$logfile" ../$toolname-$version/configure --target=$target --prefix=$prefix --disable-docs $configure_params
+    CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon -O2' CXXFLAGS="-std=gnu++03 $EXTRA_CXXFLAGS" run_cmd "$logfile" ../$toolname-$version/configure --target=$target --prefix=$prefix --disable-docs $configure_params
 
     echo "ROCKBOXDEV: $toolname/make"
     run_cmd "$logfile" $make $make_parallel
@@ -706,9 +721,9 @@ if ! $make -v | grep -q GNU ; then
     exit 1
 fi
 
-dlwhere=$(readlink -f "$dlwhere")
-prefix=$(readlink -f "$prefix")
-builddir=$(readlink -f "$builddir")
+dlwhere=$($READLINK -f "$dlwhere")
+prefix=$($READLINK -f "$prefix")
+builddir=$($READLINK -f "$builddir")
 
 echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD or use --dlwhere= to change)"
 echo "Install prefix     : $prefix  (set RBDEV_PREFIX or use --prefix= to change)"
@@ -749,7 +764,7 @@ if [ -z "$RBDEV_TARGET" ]; then
     echo "Select target arch:"
     echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
     echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, older Sony NWZ, etc)"
-    echo "i   - mips     (Jz47xx and ATJ-based players)"
+    echo "i   - mips     (Jz47xx/x1000 based players)"
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
     echo "y   - mips-linux  (Generic Linux MIPS: eg the many HiBy-OS targets)"
     echo "separate multiple targets with spaces"
@@ -759,23 +774,22 @@ if [ -z "$RBDEV_TARGET" ]; then
 else
     selarch=$RBDEV_TARGET
 fi
-system=`uname -s`
 
 # add target dir to path to ensure the new binutils are used in gcc build
 PATH="$prefix/bin:${PATH}"
 
 for arch in $selarch
 do
-    export MAKEFLAGS=`echo $MAKEFLAGS| sed 's/ -r / /'`  # We don't want -r
+    export MAKEFLAGS=`echo $MAKEFLAGS| $SED 's/ -r / /'`  # We don't want -r
     echo ""
     case $arch in
         [Ii])
-            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror" "isl"
+            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror" "gmp isl"
             build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc isl"
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror" "isl"
+            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror" "gmp isl"
             build "gcc" "m68k-elf" "4.9.4" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
 
@@ -788,7 +802,7 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.26.1" "" "$binopts --disable-werror" "isl"
+            build "binutils" "arm-elf-eabi" "2.26.1" "" "$binopts --disable-werror" "gmp isl"
             build "gcc" "arm-elf-eabi" "4.9.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.9.4.diff" "$gccopts MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
         [Xx])
