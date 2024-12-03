@@ -59,4 +59,4 @@
 #
 # Next Track Info
 %V(0,42,128,8,1)
-%ac%s%Sx(Next:) %?It<%It|%Fn>
+%ac%t(300)%s%Sx(Next:) %?It<%It|%Fn>;%s%ac%t(1)%ft(.rockbox/playername.txt)

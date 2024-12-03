@@ -50,6 +50,7 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_FILE_SIZE,             "fs", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_VBR,              "fv", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_DIRECTORY,        "d"  , "I", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_TEXT,             "ft" , "F|i", SKIN_REFRESH_STATIC),
 
     TAG(SKIN_TOKEN_FILE_BITRATE,          "Fb", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_CODEC,            "Fc", "", SKIN_REFRESH_STATIC),

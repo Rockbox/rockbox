@@ -199,6 +199,20 @@ int main(void)
     }
 #endif
 
+#if !defined(BOOTLOADER)
+    char buf[MAX_PATH / 2];
+    path_append(buf, root_realpath(),ROCKBOX_DIR"/playername.txt", sizeof(buf));
+    if (!file_exists(buf))
+    {
+        int fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0666);
+        if(fd >= 0)
+        {
+            fdprintf(fd, "RockBox!");
+            close(fd);
+        }
+    }
+#endif
+
 #ifdef AUTOROCK
     {
         char filename[MAX_PATH];

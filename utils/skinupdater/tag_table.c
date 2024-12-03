@@ -70,6 +70,7 @@ struct tag_info legal_tags[] =
     { "fn", "" },
     { "fp", "" },
     { "fs", "" },
+    { "ft", "" },
     { "fv", "" },
     { "d"  , "I" },
     

@@ -633,19 +633,22 @@ static int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
         {
             token = SKINOFFSETTOPTR(skin_buffer, element->data);
             if (token)
-                return token->value.i;
+                retval = token->value.i;
         }
         else if (element->type == CONDITIONAL)
         {
             struct conditional *conditional = SKINOFFSETTOPTR(skin_buffer, element->data);
-            int val = evaluate_conditional(gwps, 0, conditional,
-                                           element->children_count);
-            if (val >= 0)
+            int val = evaluate_conditional(gwps, 0, conditional, element->children_count);
+
+            int tmoval = get_subline_timeout(gwps, get_child(element->children, val));
+            if (tmoval >= 0)
             {
-                retval = get_subline_timeout(gwps, get_child(element->children, val));
-                if (retval >= 0)
-                    return retval;
+                return MAX(retval, tmoval); /* Bugfix %t()%?CONDITIONAL tmo ignored */
             }
+        }
+        else if (element->type == COMMENT)
+        {
+            retval = 0; /* don't display this item */
         }
         element = SKINOFFSETTOPTR(skin_buffer, element->next);
     }
@@ -657,6 +660,7 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
     bool changed_lines = false;
     struct line_alternator *alternator = SKINOFFSETTOPTR(skin_buffer, element->data);
     unsigned old_refresh = info->refresh_type;
+
     if (info->refresh_type == SKIN_REFRESH_ALL)
     {
         alternator->current_line = element->children_count-1;
@@ -697,7 +701,10 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
         if (suitable)
         {
             alternator->current_line = try_line;
-            alternator->next_change_tick = current_tick + rettimeout;
+            if (TIME_AFTER(current_tick, alternator->next_change_tick))
+            {
+                alternator->next_change_tick = current_tick + rettimeout;
+            }
         }
 
         info->refresh_type = SKIN_REFRESH_ALL;
