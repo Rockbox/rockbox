@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef _SKIN_ENGINE_H
 #define _SKIN_ENGINE_H
 
@@ -68,7 +68,7 @@ void skin_backdrop_unload(int backdrop_id);
 void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp);
 
 /* do the button loop as often as required for the peak meters to update
- * with a good refresh rate. 
+ * with a good refresh rate.
  * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);

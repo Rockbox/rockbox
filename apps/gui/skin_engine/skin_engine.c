@@ -63,7 +63,7 @@ void dummy_process(enum screen_type screen, struct wps_data *data, bool preproce
 { (void)screen, (void)data, (void)preprocess; } /* dummy replaces conditionals */
 
 static const struct gui_skin_helper empty_skin_helper = {&dummy_process,NULL,false};
-static const struct gui_skin_helper const * skin_helpers[SKINNABLE_SCREENS_COUNT] =
+static const struct gui_skin_helper * const skin_helpers[SKINNABLE_SCREENS_COUNT] =
 {
 #define SKH(proc, def, lob) &((struct gui_skin_helper){proc, def, lob})
     &empty_skin_helper,

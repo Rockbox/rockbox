@@ -2162,10 +2162,6 @@ static bool skin_load_fonts(struct wps_data *data)
 
 static int convert_viewport(struct wps_data *data, struct skin_element* element)
 {
-    if (element->tag)
-        DEBUGF("%s %s\n", __func__, element->tag->name);
-    else
-        DEBUGF("%s %s\n", __func__, "?");
     struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(*skin_vp));
     struct screen *display = &screens[curr_screen];
 

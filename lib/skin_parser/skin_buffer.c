@@ -28,7 +28,7 @@
 #include "skin_parser.h"
 
 /****************************************************************************
- * 
+ *
  *  This code handles buffer allocation for the entire skin system.
  *  This needs to work in 3 different situations:
  *    1) as a stand alone library. ROCKBOX isnt defined, alloc using malloc()
@@ -39,8 +39,8 @@
  *       the start of our buffer
  *    3) ROCKBOX "application/hosted" builds, alloc using the hosts malloc().
  *       We need to keep track of all allocations so they can be free()'d easily
- * 
- * 
+ *
+ *
  ****************************************************************************/
 
 
