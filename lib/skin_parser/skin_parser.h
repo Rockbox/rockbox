@@ -107,15 +107,14 @@ struct skin_tag_parameter
         DEFAULT
     } type;
 
+    char type_code;
+
     union
     {
         int number;
         OFFSETTYPE(char*) text;
         OFFSETTYPE(struct skin_element*) code;
-    } data;
-
-    char type_code;
-            
+    } data;          
 };
 
 /* Defines an element of a SKIN file,
@@ -151,7 +150,7 @@ struct skin_element
 
 enum skin_cb_returnvalue
 {
-    CALLBACK_ERROR = -666,
+    CALLBACK_ERROR = -128,
     FEATURE_NOT_AVAILABLE,
     CALLBACK_OK = 0,
     /* > 0 reserved for future use */

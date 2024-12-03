@@ -76,16 +76,15 @@ enum themable_icons sb_get_icon(enum screen_type screen)
     return sbs_has_title[screen] ? sbs_icon[screen] : Icon_NOICON + 2;
 }
     
-int sb_preproccess(enum screen_type screen, struct wps_data *data)
+void sb_process(enum screen_type screen, struct wps_data *data, bool preprocess)
 {
-    (void)data;
-    sbs_loaded[screen] = false;
-    sbs_has_title[screen] = false;
-    viewportmanager_theme_enable(screen, false, NULL);
-    return 1;
-}
-int sb_postproccess(enum screen_type screen, struct wps_data *data)
-{
+    if (preprocess)
+    {
+        sbs_loaded[screen] = false;
+        sbs_has_title[screen] = false;
+        viewportmanager_theme_enable(screen, false, NULL);
+        return;
+    }
     if (data->wps_loaded)
     {
         /* hide the sb's default viewport because it has nasty effect with stuff
@@ -100,7 +99,7 @@ int sb_postproccess(enum screen_type screen, struct wps_data *data)
         {
             if (!next_vp)
             {    /* no second viewport, let parsing fail */
-                return 0;
+                return;
             }
             /* hide this viewport, forever */
             vp->hidden_flags = VP_NEVER_VISIBLE;
@@ -109,7 +108,6 @@ int sb_postproccess(enum screen_type screen, struct wps_data *data)
         sbs_loaded[screen] = true;
     }
     viewportmanager_theme_undo(screen, false);
-    return 1;
 }
 
 static OFFSETTYPE(char*) infovp_label[NB_SCREENS];

@@ -98,8 +98,8 @@ struct gui_img {
     struct bitmap bm;
     int buflib_handle;
     OFFSETTYPE(char*) label;
-    bool loaded;            /* load state */
     int display;
+    bool loaded;            /* load state */
     bool using_preloaded_icons; /* using the icon system instead of a bmp */
     bool is_9_segment;
     bool dither;
@@ -114,6 +114,9 @@ struct image_display {
 
 struct progressbar {
     enum skin_token_type type;
+    bool  follow_lang_direction;
+    bool horizontal;
+    char setting_offset;
     /* regular pb */
     short x;
     /* >=0: explicitly set in the tag -> y-coord within the viewport
@@ -122,17 +125,14 @@ struct progressbar {
     short y;
     short width;
     short height;
-    bool  follow_lang_direction;
 
     OFFSETTYPE(struct gui_img *) image;
-
     bool invert_fill_direction;
     bool nofill;
     bool noborder;
     bool nobar;
     OFFSETTYPE(struct gui_img *) slider;
-    bool horizontal;
-    char setting_offset;
+
     OFFSETTYPE(struct gui_img *) backdrop;
     const struct settings_list *setting;
 };
@@ -185,10 +185,10 @@ struct gradient_config {
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
     struct frame_buffer_t framebuf; /* holds reference to current framebuffer */
-    char hidden_flags;
-    bool is_infovp;
     OFFSETTYPE(char*) label;
     int   parsed_fontid;
+    char hidden_flags;
+    bool is_infovp;
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     bool output_to_backdrop_buffer;
     bool fgbg_changed;
@@ -213,14 +213,15 @@ struct touchregion {
     short int hpad;          /* padding to height */
     bool reverse_bar;        /* if true 0% is the left or top */
     bool allow_while_locked;
+    bool armed;              /* A region is armed on press. Only armed regions are triggered
+                                on repeat or release. */
     enum {
         PRESS,               /* quick press only */
         LONG_PRESS,          /* Long press without repeat */
         REPEAT,              /* long press allowing repeats */
     } press_length;
     int action;              /* action this button will return */
-    bool armed;              /* A region is armed on press. Only armed regions are triggered
-                                on repeat or release. */
+
     union {                  /* Extra data, action dependant */
         struct touchsetting {
             const struct settings_list *setting; /* setting being controlled */
@@ -365,8 +366,8 @@ struct wps_data
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    OFFSETTYPE(struct skin_token_list *) touchregions;
     bool touchscreen_locked;
+    OFFSETTYPE(struct skin_token_list *) touchregions;
 #endif
 #ifdef HAVE_ALBUMART
     OFFSETTYPE(struct skin_albumart *) albumart;

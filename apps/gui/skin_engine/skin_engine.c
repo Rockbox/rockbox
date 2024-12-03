@@ -53,16 +53,24 @@ static bool skins_initialised = false;
 static char* get_skin_filename(char *buf, size_t buf_size,
                                enum skinnable_screens skin, enum screen_type screen);
 
-static struct gui_skin_helper {
-    int (*preproccess)(enum screen_type screen, struct wps_data *data);
-    int (*postproccess)(enum screen_type screen, struct wps_data *data);
+struct gui_skin_helper {
+    void (*process)(enum screen_type screen, struct wps_data *data, bool preprocess);
     char* (*default_skin)(enum screen_type screen);
     bool load_on_boot;
-} skin_helpers[SKINNABLE_SCREENS_COUNT] = {
-    [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings, true },
-    [WPS] = { NULL, NULL, wps_default_skin, true },
+};
+
+void dummy_process(enum screen_type screen, struct wps_data *data, bool preprocess)
+{ (void)screen, (void)data, (void)preprocess; } /* dummy replaces conditionals */
+
+static const struct gui_skin_helper empty_skin_helper = {&dummy_process,NULL,false};
+static const struct gui_skin_helper const * skin_helpers[SKINNABLE_SCREENS_COUNT] =
+{
+#define SKH(proc, def, lob) &((struct gui_skin_helper){proc, def, lob})
+    &empty_skin_helper,
+    [CUSTOM_STATUSBAR] = SKH(sb_process, sb_create_from_settings, true),
+    [WPS] =  SKH(dummy_process, wps_default_skin, true),
 #if CONFIG_TUNER
-    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false }
+    [FM_SCREEN] = SKH(dummy_process, default_radio_skin, false),
 #endif
 };
 
@@ -71,7 +79,6 @@ static struct gui_skin {
     struct wps_data     data;
     struct skin_stats   stats;
     bool                failsafe_loaded;
-
     bool                needs_full_update;
 } skins[SKINNABLE_SCREENS_COUNT][NB_SCREENS];
 
@@ -187,7 +194,7 @@ void settings_apply_skins(void)
             }
             gui_skin_reset(&skins[i][j]);
             skins[i][j].gui_wps.display = &screens[j];
-            if (skin_helpers[i].load_on_boot)
+            if (skin_helpers[i]->load_on_boot)
                 skin_get_gwps(i, j);
         }
     }
@@ -206,24 +213,22 @@ void skin_load(enum skinnable_screens skin, enum screen_type screen,
 {
     bool loaded = false;
 
-    if (skin_helpers[skin].preproccess)
-        skin_helpers[skin].preproccess(screen, &skins[skin][screen].data);
+    skin_helpers[skin]->process(screen, &skins[skin][screen].data, true);
 
     if (buf && *buf)
         loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile,
                                 &skins[skin][screen].stats);
 
-    if (!loaded && skin_helpers[skin].default_skin)
+    if (!loaded && skin_helpers[skin]->default_skin)
     {
         loaded = skin_data_load(screen, &skins[skin][screen].data,
-                                skin_helpers[skin].default_skin(screen), false,
+                                skin_helpers[skin]->default_skin(screen), false,
                                 &skins[skin][screen].stats);
         skins[skin][screen].failsafe_loaded = loaded;
     }
 
     skins[skin][screen].needs_full_update = true;
-    if (skin_helpers[skin].postproccess)
-        skin_helpers[skin].postproccess(screen, &skins[skin][screen].data);
+    skin_helpers[skin]->process(screen, &skins[skin][screen].data, false);
 #ifdef HAVE_BACKDROP_IMAGE
     if (loaded)
         skin_backdrops_preload();

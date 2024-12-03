@@ -49,8 +49,7 @@ int sb_touch_to_button(int context);
 #endif
 
 int sb_get_backdrop(enum screen_type screen);
-int sb_preproccess(enum screen_type screen, struct wps_data *data);
-int sb_postproccess(enum screen_type screen, struct wps_data *data);
+void sb_process(enum screen_type screen, struct wps_data *data, bool preprocess);
 
 void do_sbs_update_callback(unsigned short id, void *param);
 #endif /* __STATUSBAR_SKINNED_H__ */
