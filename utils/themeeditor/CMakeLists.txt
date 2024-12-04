@@ -13,6 +13,13 @@
 # KIND, either express or implied.
 #
 
+find_package(QuaZip-Qt${QT_VERSION_MAJOR} QUIET)
+if(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
+  set(QUAZIP_LIBRARY QuaZip::QuaZip)
+else()
+  set(QUAZIP_LIBRARY quazip)
+endif()
+
 add_executable(RockboxThemeEditor WIN32 MACOSX_BUNDLE
     graphics/rbalbumart.cpp
     graphics/rbalbumart.h
@@ -103,23 +110,6 @@ add_executable(RockboxThemeEditor WIN32 MACOSX_BUNDLE
     qtfindreplacedialog/findreplaceform.ui
     qtfindreplacedialog/varianteditor.cpp
     qtfindreplacedialog/varianteditor.h
-    quazip/ioapi.h
-    quazip/qioapi.cpp
-    quazip/minizip_crypt.h
-    quazip/quazip.cpp
-    quazip/quazip.h
-    quazip/quazipfile.cpp
-    quazip/quazipfile.h
-    quazip/quazipfileinfo.h
-    quazip/quazipfileinfo.cpp
-    quazip/quazipnewinfo.cpp
-    quazip/quazipnewinfo.h
-    quazip/unzip.c
-    quazip/unzip.h
-    quazip/zip.c
-    quazip/zip.h
-    zlib/zconf.h
-    zlib/zlib.h
     resources.qrc
     themeeditor.rc
     )
@@ -129,7 +119,7 @@ set_target_properties(RockboxThemeEditor PROPERTIES AUTOUIC ON)
 
 target_link_libraries(RockboxThemeEditor
     Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core
-    skin_parser z)
+    skin_parser z ${QUAZIP_LIBRARY})
 target_include_directories(RockboxThemeEditor PRIVATE models graphics gui qtfindreplacedialog quazip)
 target_compile_definitions(RockboxThemeEditor PRIVATE FINDREPLACE_NOLIB)
 
