@@ -143,6 +143,10 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
     int a;
 #endif
 
+    numchan = 0;
+    bps = 0;
+    sr = 0;
+
     if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
         snprintf(errstr, errlen, "invalid WAV file");
         return false;
@@ -181,7 +185,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
         ret = false;
         goto finish;
     }
-    if (fread(in, 2, numsamples, fin) != numsamples) {
+    if (fread(in, 2, numsamples, fin) != (size_t)numsamples) {
         snprintf(errstr, errlen, "could not read input file data");
         ret = false;
         goto finish;
@@ -209,7 +213,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
      * make sure the Speex encoder is allowed to spit out all its data at clip
      * end */
     numsamples += lookahead;
-   
+
     inpos = in;
     while (numsamples > 0) {
         int samples = frame_size;
@@ -250,7 +254,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
         nbytes = speex_bits_write_whole_bytes(&bits, cbits, 200);
 
         /* Write the compressed data */
-        if (fwrite(cbits, 1, nbytes, fout) != nbytes) {
+        if (fwrite(cbits, 1, nbytes, fout) != (size_t)nbytes) {
             snprintf(errstr, errlen, "could not write output data");
             ret = false;
             goto finish;
@@ -258,7 +262,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
     }
     /* Squeeze out the last bits */
     nbytes = speex_bits_write(&bits, cbits, 200);
-    if (fwrite(cbits, 1, nbytes, fout) != nbytes) {
+    if (fwrite(cbits, 1, nbytes, fout) != (size_t)nbytes) {
         snprintf(errstr, errlen, "could not write output data");
         ret = false;
     }
@@ -273,5 +277,3 @@ finish:
         free(in);
     return ret;
 }
-
-

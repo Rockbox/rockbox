@@ -55,13 +55,13 @@ int main(int argc, char *argv[])
 
     if ( ! strcmp(argv[1], "-h100"))
         return mkboot_iriver(argv[2], argv[3], argv[4], 0x1f0000);
-    
+
     if ( ! strcmp(argv[1], "-h300"))
         return mkboot_iriver(argv[2], argv[3], argv[4], 0x3f0000);
-    
+
     if ( ! strcmp(argv[1], "-iax5"))
         return mkboot_iaudio(argv[2], argv[3], argv[4], 0);
-        
+
     if ( ! strcmp(argv[1], "-iam5"))
         return mkboot_iaudio(argv[2], argv[3], argv[4], 1);
 
@@ -113,14 +113,13 @@ int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile,
         fclose(f);
         return -3;
     }
-    
+
     fclose(f);
 
     /* Now, read the boot loader into the image */
     f = fopen(bootfile, "rb");
     if(!f) {
         perror(bootfile);
-        fclose(f);
         return -4;
     }
 
@@ -158,7 +157,7 @@ int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile,
     image[0x20d] = (actual_length >> 16) & 0xff;
     image[0x20e] = (actual_length >> 8) & 0xff;
     image[0x20f] = actual_length & 0xff;
-    
+
     image[0x21c] = (actual_length >> 24) & 0xff;
     image[0x21d] = (actual_length >> 16) & 0xff;
     image[0x21e] = (actual_length >> 8) & 0xff;
@@ -179,17 +178,17 @@ int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile,
     image[1] = (total_length >> 8) & 0xff;
     image[2] = (total_length >> 16) & 0xff;
     image[3] = (total_length >> 24) & 0xff;
-    
+
     image[4] = binary_length & 0xff;
     image[5] = (binary_length >> 8) & 0xff;
     image[6] = (binary_length >> 16) & 0xff;
     image[7] = (binary_length >> 24) & 0xff;
-    
+
     image[8] = num_chksums & 0xff;
     image[9] = (num_chksums >> 8) & 0xff;
     image[10] = (num_chksums >> 16) & 0xff;
     image[11] = (num_chksums >> 24) & 0xff;
-    
+
     i = fwrite(image, 1, total_length, f);
     if(i < total_length) {
         perror(outfile);
@@ -198,9 +197,9 @@ int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile,
     }
 
     printf("Wrote 0x%x bytes in %s\n", total_length, outfile);
-    
+
     fclose(f);
-    
+
     return 0;
 }
 
@@ -217,7 +216,7 @@ int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile,
  * offset!) where we patch in the Rockbox loader */
 #define ROCKBOX_BOOTLOADER 0x00150000
 /* End of unused space in original firmware */
-#define BOOTLOADER_LIMIT   0x00170000 
+#define BOOTLOADER_LIMIT   0x00170000
 
 /* Patch the Rockbox bootloader into free space in the original firmware
  * (starting at 0x150000). The preloader starts execution of the OF at
@@ -254,12 +253,12 @@ int mkboot_iaudio(const char* infile, const char* bootfile, const char* outfile,
         fprintf(stderr, "Rockbox bootloader is too big.\n");
         return 1;
     }
- 
+
     if ((ffile = fopen(infile, "rb")) == NULL) {
         perror("Cannot open original firmware file.");
         return 1;
     }
-  
+
     fseek(ffile, 0, SEEK_END);
     flength = ftell(ffile);
     fseek(ffile, 0, SEEK_SET);

@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 #ifdef __WIN32__
         snprintf(sansa.diskname,sizeof(sansa.diskname),"\\\\.\\PhysicalDrive%s",argv[1]);
 #else
-        strncpy(sansa.diskname,argv[1],sizeof(sansa.diskname));
+        strncpy(sansa.diskname,argv[1],sizeof(sansa.diskname)-1);
 #endif
         i = 2;
     } else {
@@ -218,32 +218,32 @@ int main(int argc, char* argv[])
         } else if (strcmp(argv[i],"--install")==0) {
             action = INSTALL;
             i++;
-        } else if ((strcmp(argv[i],"-d")==0) || 
+        } else if ((strcmp(argv[i],"-d")==0) ||
                    (strcmp(argv[i],"--delete-bootloader")==0)) {
             action = DELETE_BOOTLOADER;
             i++;
-        } else if ((strcmp(argv[i],"-a")==0) || 
+        } else if ((strcmp(argv[i],"-a")==0) ||
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
             i++;
             if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-of")==0) || 
+        } else if ((strcmp(argv[i],"-of")==0) ||
                    (strcmp(argv[i],"--update-original-firmware")==0)) {
             action = UPDATE_OF;
             i++;
             if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-bl")==0) || 
+        } else if ((strcmp(argv[i],"-bl")==0) ||
                    (strcmp(argv[i],"--update-ppbl")==0)) {
             action = UPDATE_PPBL;
             i++;
             if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-rf")==0) || 
+        } else if ((strcmp(argv[i],"-rf")==0) ||
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
             i++;
