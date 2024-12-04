@@ -81,12 +81,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
     DEBUGF("ADX: after init\n");
-    
+
     /* init history */
     ch1_1=ch1_2=ch2_1=ch2_2=0;
 
     codec_set_replaygain(ci->id3);
-        
+
     /* Get header */
     DEBUGF("ADX: request initial buffer\n");
     ci->seek_buffer(0);
@@ -98,10 +98,10 @@ enum codec_status codec_run(void)
     DEBUGF("ADX: read size = %lx\n",(unsigned long)n);
 
     /* Get file header for starting offset, channel count */
-    
+
     chanstart = ((buf[2] << 8) | buf[3]) + 4;
     channels = buf[7];
-    
+
     /* useful for seeking and reporting current playback position */
     avgbytespersec = ci->id3->frequency * 18 * channels / 32;
     DEBUGF("avgbytespersec=%ld\n",(unsigned long)avgbytespersec);
@@ -126,7 +126,7 @@ enum codec_status codec_run(void)
         const int64_t b = (M_SQRT2*big28)-big28;
         int64_t c;
         int64_t d;
-        
+
         fp_sincos((unsigned long)phasemultiple,&z);
 
         a = (M_SQRT2*big28) - (z >> 3);
@@ -147,7 +147,7 @@ enum codec_status codec_run(void)
     }
 
     /* Get loop data */
-    
+
     looping = 0; start_adr = 0; end_adr = 0;
     if (!memcmp(buf+0x10,"\x01\xF4\x03",3)) {
         /* Soul Calibur 2 style (type 03) */
@@ -196,7 +196,7 @@ enum codec_status codec_run(void)
         DEBUGF("ADX: error, couldn't determine ADX type\n");
         return CODEC_ERROR;
     }
-    
+
     /* is file using encryption */
     if (buf[0x13]==0x08) {
         DEBUGF("ADX: error, encrypted ADX not supported\n");
@@ -204,13 +204,14 @@ enum codec_status codec_run(void)
     }
 
     if (looping) {
-        DEBUGF("ADX: looped, start: %lx end: %lx\n",start_adr,end_adr);
+        DEBUGF("ADX: looped, start: %jx end: %jx\n",
+               (intmax_t) start_adr, (intmax_t) end_adr);
     } else {
         DEBUGF("ADX: not looped\n");
     }
-    
+
     /* advance to first frame */
-    DEBUGF("ADX: first frame at %lx\n",chanstart);
+    DEBUGF("ADX: first frame at %jx\n", (intmax_t) chanstart);
     bufoff = chanstart;
 
     /* get in position */
@@ -226,7 +227,7 @@ enum codec_status codec_run(void)
     } else {
         DEBUGF("ADX CODEC_ERROR: more than 2 channels\n");
         return CODEC_ERROR;
-    }    
+    }
 
     endofstream = 0;
     loop_count = 0;
@@ -234,13 +235,13 @@ enum codec_status codec_run(void)
     fade_frames = 1;
 
     /* The main decoder loop */
-        
+
     while (!endofstream) {
         long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
-        
+
         /* do we need to loop? */
         if (bufoff > end_adr-18*channels && looping) {
             DEBUGF("ADX: loop!\n");
@@ -266,7 +267,7 @@ enum codec_status codec_run(void)
         /* do we need to seek? */
         if (action == CODEC_ACTION_SEEK_TIME) {
             uint32_t newpos;
-            
+
             DEBUGF("ADX: seek to %ldms\n", (long)param);
 
             endofstream = 0;
@@ -291,9 +292,9 @@ enum codec_status codec_run(void)
         }
 
         if (bufoff>ci->filesize-channels*18) break; /* End of stream */
-        
+
         sampleswritten=0;
-          
+
         while (
                 /* Is there data left in the file? */
                 (bufoff <= ci->filesize-(18*channels)) &&
@@ -310,13 +311,13 @@ enum codec_status codec_run(void)
             buf = ci->request_buffer(&n, 18);
 
             if (!buf || n!=18) {
-                DEBUGF("ADX: couldn't get buffer at %lx\n",
-                        bufoff);
+                DEBUGF("ADX: couldn't get buffer at %jx\n",
+                       (intmax_t) bufoff);
                 return CODEC_ERROR;
             }
 
             scale = ((buf[0] << 8) | (buf[1])) +1;
-  
+
             for (i = 2; i < 18; i++)
             {
                 d = (buf[i] >> 4) & 15;
@@ -332,14 +333,14 @@ enum codec_status codec_run(void)
                 if (d & 8) d -= 16;
                 ch1_0 = d*scale + ((coef1*ch1_1 + coef2*ch1_2) >> 12);
                 if (ch1_0 > 32767) ch1_0 = 32767;
-                else if (ch1_0 < -32768) ch1_0 = -32768; 
+                else if (ch1_0 < -32768) ch1_0 = -32768;
                 samples[sampleswritten] = ch1_0;
                 sampleswritten+=channels;
                 ch1_2 = ch1_1; ch1_1 = ch1_0;
             }
             bufoff+=18;
             ci->advance_buffer(18);
-            
+
             if (channels == 2) {
                 /* decode second channel */
                 int32_t scale;
@@ -348,13 +349,13 @@ enum codec_status codec_run(void)
                 buf = ci->request_buffer(&n, 18);
 
                 if (!buf || n!=18) {
-                    DEBUGF("ADX: couldn't get buffer at %lx\n",
-                            bufoff);
+                    DEBUGF("ADX: couldn't get buffer at %jx\n",
+                           (intmax_t) bufoff);
                     return CODEC_ERROR;
                 }
 
                 scale = ((buf[0] << 8)|(buf[1]))+1;
-  
+
                 sampleswritten-=63;
 
                 for (i = 2; i < 18; i++)
@@ -372,7 +373,7 @@ enum codec_status codec_run(void)
                     if (d & 8) d -= 16;
                     ch2_0 = d*scale + ((coef1*ch2_1 + coef2*ch2_2) >> 12);
                     if (ch2_0 > 32767) ch2_0 = 32767;
-                    else if (ch2_0 < -32768) ch2_0 = -32768; 
+                    else if (ch2_0 < -32768) ch2_0 = -32768;
                     samples[sampleswritten] = ch2_0;
                     sampleswritten+=2;
                     ch2_2 = ch2_1; ch2_1 = ch2_0;
@@ -394,7 +395,7 @@ enum codec_status codec_run(void)
             sampleswritten >>= 1; /* make samples/channel */
 
         ci->pcmbuf_insert(samples, NULL, sampleswritten);
-            
+
         ci->set_elapsed(
            ((end_adr-start_adr)*loop_count + bufoff-chanstart)*
            1000LL/avgbytespersec);

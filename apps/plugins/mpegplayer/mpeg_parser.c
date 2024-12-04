@@ -434,7 +434,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 state = STATE2; /* Last scan was early */
                 sk.dir = SSCAN_REVERSE;
-   
+
                 DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, (long)pos_left, (long)pos_new,
@@ -495,7 +495,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
             case STATE0:
                 /* Hardly likely except at very beginning - just do L->R scan
                  * to find something */
-                DEBUGF("!! no timestamp on first probe: %ld\n", sk.pos);
+                DEBUGF("!! no timestamp on first probe: %jd\n", (intmax_t) sk.pos);
             case STATE2:
             case STATE3:
                 /* Could just be missing timestamps because the interval is
@@ -733,10 +733,10 @@ static int parse_demux(struct stream *str, enum stream_parse_mode type)
             /* Problem? Meh...probably not but just a corrupted section.
              * Try to resync the parser which will probably succeed. */
             DEBUGF("packet start code prefix not found: 0x%02x\n"
-                   "  wl:%lu wr:%lu\n"
+                   "  wl:%jd wr:%jd\n"
                    "  p:%p cp:%p cpe:%p\n"
                    "  dbs:%p dbe:%p dbt:%p\n",
-                   str->id, str->hdr.win_left, str->hdr.win_right,
+                   str->id, (intmax_t) str->hdr.win_left, (intmax_t) str->hdr.win_right,
                    p, str->curr_packet, str->curr_packet_end,
                    disk_buf.start, disk_buf.end, disk_buf.tail);
             str->state = SSTATE_SYNC;
@@ -993,7 +993,7 @@ try_again:
 
     if (mpeg_parser_scan_start_code(&sk, MPEG_START_GOP))
     {
-        DEBUGF("GOP found at: %ld\n", sk.pos);
+        DEBUGF("GOP found at: %jd\n", (intmax_t) sk.pos);
 
         unsigned id = mpeg_parser_scan_pes(&sk);
 
@@ -1019,7 +1019,7 @@ try_again:
     str_parser.parms.sd.sk.len = 1024*1024;
     str_parser.parms.sd.sk.dir = SSCAN_FORWARD;
 
-    DEBUGF("thumb pos:%ld len:%ld\n", str_parser.parms.sd.sk.pos,
+    DEBUGF("thumb pos:%jd len:%ld\n", (intmax_t) str_parser.parms.sd.sk.pos,
            (long)str_parser.parms.sd.sk.len);
 
     result = str_send_msg(&video_str, STREAM_SYNC,
@@ -1072,7 +1072,8 @@ void parser_prepare_streaming(void)
     if (!stream_get_window(&sw))
         sw.left = sw.right = disk_buf.filesize;
 
-    DEBUGF("  swl:%ld swr:%ld\n", sw.left, sw.right);
+    DEBUGF("  swl:%jd swr:%jd\n",
+           (intmax_t) sw.left, (intmax_t) sw.right);
 
     if (sw.right > disk_buf.filesize - 4*MIN_BUFAHEAD)
         sw.right = disk_buf.filesize - 4*MIN_BUFAHEAD;
@@ -1094,7 +1095,7 @@ int parser_init_stream(void)
      * should succeed if it really is a video-only stream */
     video_str.hdr.pos = 0;
     video_str.hdr.limit = 256*1024;
-    
+
     if (parse_demux(&video_str, STREAM_PM_RANDOM_ACCESS) == STREAM_OK)
     {
         /* Found a video packet - assume program stream */

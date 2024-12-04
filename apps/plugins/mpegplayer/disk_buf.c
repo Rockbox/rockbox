@@ -79,10 +79,10 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
         {
             /* It was - don't register */
             DEBUGF("(was ready)\n"
-                   "  swl:%lu swr:%lu\n"
-                   "  dwl:%lu dwr:%lu\n",
-                   sh->win_left, sh->win_right,
-                   disk_buf.win_left, disk_buf.win_right);
+                   "  swl:%jd swr:%jd\n"
+                   "  dwl:%jd dwr:%jd\n",
+                   (intmax_t) sh->win_left, (intmax_t) sh->win_right,
+                   (intmax_t) disk_buf.win_left, (intmax_t) disk_buf.win_right);
             /* Be sure it's not listed though if multiple requests were made */
             list_remove_item(nf_list, sh);
             return DISK_BUF_NOTIFY_OK;
@@ -96,10 +96,10 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
             disk_buf.state = TSTATE_BUFFERING;
             list_add_item(nf_list, sh);
             DEBUGF("(registered)\n"
-                   "  swl:%lu swr:%lu\n"
-                   "  dwl:%lu dwr:%lu\n",
-                   sh->win_left, sh->win_right,
-                   disk_buf.win_left, disk_buf.win_right);
+                   "  swl:%jd swr:%jd\n"
+                   "  dwl:%jd dwr:%jd\n",
+                   (intmax_t) sh->win_left, (intmax_t) sh->win_right,
+                   (intmax_t) disk_buf.win_left, (intmax_t) disk_buf.win_right);
             return DISK_BUF_NOTIFY_REGISTERED;
         }
     }
@@ -307,7 +307,7 @@ static void disk_buf_on_reset(ssize_t pos)
         {
             if (--tag, --page < 0)
                 page = disk_buf.pgcount - 1;
-    
+
             if (disk_buf.cache[page] != tag)
                 break;
 
@@ -347,8 +347,8 @@ static void disk_buf_on_reset(ssize_t pos)
     disk_buf.tail = disk_buf.start + MAP_OFFSET_TO_BUFFER(anchor);
 
     DEBUGF("disk buf reset\n"
-           "  dwl:%ld dwr:%ld\n",
-           disk_buf.win_left, disk_buf.win_right);
+           "  dwl:%jd dwr:%jd\n",
+           (intmax_t) disk_buf.win_left, (intmax_t) disk_buf.win_right);
 
     /* Next read position is at right edge */
     rb->lseek(disk_buf.in_file, disk_buf.win_right, SEEK_SET);
@@ -466,7 +466,7 @@ static void disk_buf_thread(void)
     disk_buf.state = TSTATE_EOS;
     disk_buf.status = STREAM_STOPPED;
 
-    while (1)    
+    while (1)
     {
         if (disk_buf.state != TSTATE_EOS)
         {
@@ -591,7 +591,7 @@ static ssize_t disk_buf_probe(off_t start, size_t length, void **p)
             rng.tag_start = tag;
             rng.tag_end = tag_end;
             rng.pg_start = page;
-            
+
             result = rb->queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
                                     (intptr_t)&rng);
 
@@ -786,12 +786,14 @@ ssize_t disk_buf_prepare_streaming(off_t pos, size_t len)
     else if (pos > disk_buf.filesize)
         pos = disk_buf.filesize;
 
-    DEBUGF("prepare streaming:\n  pos:%ld len:%lu\n", pos, (unsigned long)len);
+    DEBUGF("prepare streaming:\n  pos:%jd len:%lu\n",
+           (intmax_t) pos, (unsigned long)len);
 
     pos = disk_buf_lseek(pos, SEEK_SET);
     len = disk_buf_probe(pos, len, NULL);
 
-    DEBUGF("  probe done: pos:%ld len:%lu\n", pos, (unsigned long)len);
+    DEBUGF("  probe done: pos:%jd len:%lu\n",
+           (intmax_t) pos, (unsigned long)len);
 
     len = disk_buf_send_msg(STREAM_RESET, pos);
 

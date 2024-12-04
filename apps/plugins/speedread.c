@@ -393,7 +393,8 @@ static void save_bookmark(const char *fname, int wpm)
         }
         rb->close(bookmark_fd);
     }
-    rb->fdprintf(tmp_fd, "%ld %d %d %s\n", line_offs, word_num, wpm, fname);
+    rb->fdprintf(tmp_fd, "%jd %d %d %s\n",
+                 (intmax_t) line_offs, word_num, wpm, fname);
     rb->close(tmp_fd);
     rb->rename(BOOKMARK_FILE ".tmp", BOOKMARK_FILE);
 }
@@ -585,7 +586,8 @@ static int poll_input(int *wpm, long *clear, const char *fname, off_t file_size)
                     offs += 99 * SEEK_INTERVAL;
                 else if(offs >= 10 * SEEK_INTERVAL)
                     offs += 9 * SEEK_INTERVAL;
-                rb->splashf(0, "%ld/%ld bytes", offs + base_offs, file_size);
+                rb->splashf(0, "%jd/%jd bytes",
+                            (intmax_t) (offs + base_offs), (intmax_t) file_size);
                 rb->sleep(HZ/20);
             } while(get_useraction() == FFWD && offs + base_offs < file_size && offs + base_offs >= 0);
 
@@ -614,7 +616,8 @@ static int poll_input(int *wpm, long *clear, const char *fname, off_t file_size)
                     offs -= 99 * SEEK_INTERVAL;
                 else if(offs <= -10 * SEEK_INTERVAL)
                     offs -= 9 * SEEK_INTERVAL;
-                rb->splashf(0, "%ld/%ld bytes", offs + base_offs, file_size);
+                rb->splashf(0, "%jd/%jd bytes",
+                            (intmax_t) (offs + base_offs), (intmax_t) file_size);
                 rb->sleep(HZ/20);
             } while(get_useraction() == FFWD && offs + base_offs < file_size && offs + base_offs >= 0);
 

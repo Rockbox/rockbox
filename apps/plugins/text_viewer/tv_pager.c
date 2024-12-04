@@ -218,7 +218,8 @@ void tv_convert_fpos(off_t fpos, struct tv_screen_pos *pos)
 
     tv_seek_page(i, SEEK_SET);
     while (tv_create_line_positions() && cur_pos.file_pos < fpos)
-        rb->splashf(0, "converting %ld%%...", 100 * cur_pos.file_pos / fpos); // XXX i18n
+        rb->splashf(0, "converting %jd%%...",
+                    (intmax_t) (100 * cur_pos.file_pos / fpos)); // XXX i18n
 
     if (i < max_page)
         cur_pos.page--;
@@ -239,7 +240,8 @@ static void tv_seek_to_bottom_line(void)
 
     tv_seek_page(0, SEEK_END);
     while (tv_create_line_positions())
-        rb->splashf(0, "loading %ld%%...", 100 * cur_pos.file_pos / total_size); // XXX i18n
+        rb->splashf(0, "loading %jd%%...",
+                    (intmax_t) (100 * cur_pos.file_pos / total_size)); // XXX i18n
 
     cur_pos.line = lines_per_page - 1;
 }
