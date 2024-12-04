@@ -275,6 +275,11 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
                               params[i].data.number%10);
             break;
 
+        case PERCENT:
+            printf("percent: %d.%d", params[i].data.number/10,
+                              params[i].data.number%10);
+            break;
+
         case CODE:
             printf("Skin Code: \n");
             debug_indent_level++;
