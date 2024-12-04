@@ -103,14 +103,15 @@ add_executable(RockboxThemeEditor WIN32 MACOSX_BUNDLE
     qtfindreplacedialog/findreplaceform.ui
     qtfindreplacedialog/varianteditor.cpp
     qtfindreplacedialog/varianteditor.h
-    quazip/crypt.h
-    quazip/ioapi.c
     quazip/ioapi.h
+    quazip/qioapi.cpp
+    quazip/minizip_crypt.h
     quazip/quazip.cpp
     quazip/quazip.h
     quazip/quazipfile.cpp
     quazip/quazipfile.h
     quazip/quazipfileinfo.h
+    quazip/quazipfileinfo.cpp
     quazip/quazipnewinfo.cpp
     quazip/quazipnewinfo.h
     quazip/unzip.c
@@ -147,4 +148,3 @@ deploy_qt(TARGET RockboxThemeEditor
     ICONFILE ${CMAKE_CURRENT_LIST_DIR}/resources/rbthemeeditor.svg
     DESKTOPFILE ${CMAKE_CURRENT_LIST_DIR}/RockboxThemeEditor.desktop
     DMGBUILDCFG ${CMAKE_CURRENT_LIST_DIR}/dmgbuild.cfg)
-
