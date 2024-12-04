@@ -21,7 +21,6 @@
 
 #include <string.h>
 #include "tag_table.h"
-#include "debug.h"
 
 #define BAR_PARAMS "?[iP][iP][iP][iP]|s*"
 /* The tag definition table */

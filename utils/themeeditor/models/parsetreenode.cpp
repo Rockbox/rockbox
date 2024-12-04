@@ -87,8 +87,7 @@ ParseTreeNode::ParseTreeNode(struct skin_element* data, ParseTreeNode* parent,
 case VIEWPORT:
         for(int i = 0; i < element->params_count; i++)
             children.append(new ParseTreeNode(&data->params[i], this, model));
-        /* Deliberate fall-through here */
-
+        /* Intentional fallthrough  */
     case LINE:
         for(int i = 0; i < data->children_count; i++)
         {
@@ -224,8 +223,12 @@ QString ParseTreeNode::genCode() const
                 }
                 buffer.append(ARGLISTCLOSESYM);
             }
-            if(element->tag->params[strlen(element->tag->params) - 1] == '\n')
-                buffer.append('\n');
+            if (element->tag->param_pos > 1)
+            {
+                const char *param = element->tag->name + element->tag->param_pos;
+                if(param[strlen(param) - 1] == '\n')
+                    buffer.append('\n');
+            }
             break;
 
         case TEXT:
@@ -262,6 +265,7 @@ QString ParseTreeNode::genCode() const
             break;
 
         case skin_tag_parameter::DECIMAL:
+        case skin_tag_parameter::PERCENT:
             buffer.append(QString::number(param->data.number / 10., 'f', 1));
             break;
 
@@ -348,6 +352,7 @@ int ParseTreeNode::genHash() const
             break;
 
         case skin_tag_parameter::DECIMAL:
+        case skin_tag_parameter::PERCENT:
             hash += param->data.number;
             break;
         }
@@ -421,6 +426,9 @@ QVariant ParseTreeNode::data(int column) const
             case skin_tag_parameter::DECIMAL:
                 return QObject::tr("Decimal");
 
+            case skin_tag_parameter::PERCENT:
+                return QObject::tr("Percent");
+
             case skin_tag_parameter::DEFAULT:
                 return QObject::tr("Default Argument");
 
@@ -471,6 +479,7 @@ QVariant ParseTreeNode::data(int column) const
                 return QString::number(param->data.number, 10);
 
             case skin_tag_parameter::DECIMAL:
+            case skin_tag_parameter::PERCENT:
                 return QString::number(param->data.number / 10., 'f', 1);
 
             case skin_tag_parameter::CODE:
@@ -825,6 +834,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
         case 'l':
             /* %xl */
             id = element->params[0].data.text;
+            tiles = 0;
             if(element->params[1].data.text == QString("__list_icons__"))
             {
                 filename = info.settings()->value("iconset", "");
@@ -862,7 +872,7 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             info.screen()->loadImage(id, image);
             image->show();
             image->enableMovement();
-            
+
             return true;
 
         }
