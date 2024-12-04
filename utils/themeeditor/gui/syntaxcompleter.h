@@ -38,7 +38,7 @@ signals:
 public slots:
 
 private:
-    QMap<QString, QStringList> tags;
+    QMultiMap<QString, QStringList> tags;
     QStringList keys;
 
 };

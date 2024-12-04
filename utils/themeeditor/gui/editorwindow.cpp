@@ -27,7 +27,6 @@
 #include "newprojectdialog.h"
 #include "projectexporter.h"
 
-#include <QDesktopWidget>
 #include <QFileSystemModel>
 #include <QSettings>
 #include <QFileDialog>

@@ -46,7 +46,7 @@ TargetData::TargetData()
 
     int cursor = 0;
     int index = 0;
-    while(cursor < data.count())
+    while(cursor < data.length())
     {
         QString id = scanString(data, cursor);
         QString name = "";
@@ -64,7 +64,7 @@ TargetData::TargetData()
             break;
 
         /* Now we have to parse each of the arguments */
-        while(cursor < data.count())
+        while(cursor < data.length())
         {
             QString key = scanString(data, cursor);
             if(key == "")
@@ -159,7 +159,7 @@ QString TargetData::scanString(QString data, int &index)
     QString retval;
 
     /* Skipping whitespace and comments */
-    while(index < data.count() && (data[index].isSpace() || data[index] == '#'))
+    while(index < data.length() && (data[index].isSpace() || data[index] == '#'))
     {
         if(data[index] == '#')
             skipComment(data, index);
@@ -167,7 +167,7 @@ QString TargetData::scanString(QString data, int &index)
             index++;
     }
 
-    while(index < data.count() && !reserved.contains(data[index]))
+    while(index < data.length() && !reserved.contains(data[index]))
     {
         if(data[index] == '%')
         {
@@ -187,7 +187,7 @@ QString TargetData::scanString(QString data, int &index)
 int TargetData::scanInt(QString data, int &index)
 {
     /* Skipping whitespace and comments */
-    while(index < data.count() && (data[index].isSpace() || data[index] == '#'))
+    while(index < data.length() && (data[index].isSpace() || data[index] == '#'))
     {
         if(data[index] == '#')
             skipComment(data, index);
@@ -196,7 +196,7 @@ int TargetData::scanInt(QString data, int &index)
     }
 
     QString number;
-    while(index < data.count() && data[index].isDigit())
+    while(index < data.length() && data[index].isDigit())
         number.append(data[index++]);
 
     return number.toInt();
@@ -221,17 +221,17 @@ void TargetData::skipComment(QString data, int &index)
     if(data[index] != '#')
         return;
 
-    while(index < data.count() && data[index] != '\n')
+    while(index < data.length() && data[index] != '\n')
         index++;
 
-    if(index < data.count())
+    if(index < data.length())
         index++;
 }
 
 bool TargetData::require(QChar required, QString data, int &index)
 {
     /* Skipping whitespace and comments */
-    while(index < data.count() && (data[index].isSpace() || data[index] == '#'))
+    while(index < data.length() && (data[index].isSpace() || data[index] == '#'))
     {
         if(data[index] == '#')
             skipComment(data, index);
@@ -239,7 +239,7 @@ bool TargetData::require(QChar required, QString data, int &index)
             index++;
     }
 
-    if(index == data.count())
+    if(index == data.length())
     {
         return false;
     }

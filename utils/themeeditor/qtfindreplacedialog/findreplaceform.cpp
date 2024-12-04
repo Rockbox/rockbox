@@ -5,7 +5,7 @@
 
 #include <QtGui>
 #include <QTextEdit>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSettings>
 
 #include "varianteditor.h"
@@ -96,8 +96,8 @@ void FindReplaceForm::validateRegExp(const QString &text) {
         return; // nothing to validate
     }
 
-    QRegExp reg(text,
-                (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
+    QRegularExpression reg(text,
+                (ui->caseCheckBox->isChecked() ? QRegularExpression::NoPatternOption : QRegularExpression::CaseInsensitiveOption));
 
     if (reg.isValid()) {
         showError("");
@@ -151,8 +151,8 @@ void FindReplaceForm::find(bool next) {
         flags |= QTextDocument::FindWholeWords;
 
     if (ui->regexCheckBox->isChecked()) {
-        QRegExp reg(toSearch,
-                    (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
+        QRegularExpression reg(toSearch,
+                (ui->caseCheckBox->isChecked() ? QRegularExpression::NoPatternOption : QRegularExpression::CaseInsensitiveOption));
 
         qDebug() << "searching for regexp: " << reg.pattern();
 
