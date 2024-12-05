@@ -61,7 +61,7 @@ void SyntaxCompleter::filter(QString text)
 {
     clear();
 
-    for(QMap<QString, QStringList>::iterator i = tags.begin()
+    for(QMultiMap<QString, QStringList>::iterator i = tags.begin()
         ; i != tags.end(); i++)
     {
         if(text.length() == 1)

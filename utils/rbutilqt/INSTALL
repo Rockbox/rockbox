@@ -20,7 +20,13 @@ for Rockbox.
 Requirements:
 =============
 - gcc
-- Qt 5
+- Qt 5 or
+- Qt 6
+- qt6-tools-dev
+- qt6-5compat-dev
+- qt6-svg-dev
+- qt6-multimedia-dev
+
 - at least the following folders from Rockbox tree:
   o lib/rbcodec/codecs/libspeex
   o utils/
@@ -31,12 +37,16 @@ Building:
 =========
 - run cmake in the utils/ folder
 - run make
+eg. mkdir utils/build-rbutil ; cd build-rbutil ; cmake ../utils ; make
+
 
 Build Options:
 ==============
 There are no build options to set by the user. If your Qt installation is not
 in the PATH or a standard search location you might need to set
 CMAKE_PREFIX_PATH to point to it.
+(*Note this probably has to be done on the command line defining
+ doesn't appear to work..*)
 
 Installation / Deployment:
 ==========================
