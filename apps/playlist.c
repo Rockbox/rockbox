@@ -70,7 +70,7 @@
       flushed to disk when required.
  */
 
-//#define LOGF_ENABLE
+// #define LOGF_ENABLE
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -591,6 +591,8 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
         dir = PATH_ROOTSTR;
         dlen = -1u;
     }
+
+    logf("dir: %s", dir);
 
     len = path_append_ex(dest, dir, dlen, src, buf_length);
     if (len >= (size_t)buf_length)

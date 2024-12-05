@@ -27,6 +27,9 @@
 #include "file_internal.h"
 #include "debug.h"
 
+// #define LOGF_ENABLE
+#include "logf.h"
+
 #ifdef HAVE_MULTIVOLUME
 #include "storage.h"
 
@@ -521,10 +524,36 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
 
     if (path_is_absolute(component)) /* starts with a '/' path separator */
     {
-        /* 'component' is absolute; replace all */
-        basepath = component;
-        component = "";
-        basepath_max = -1u;
+        #if defined(HAVE_MULTIVOLUME)
+            const char *baseend;
+            /* our component doesn't appear to have a drive/volume */
+            if (path_strip_volume(component, &baseend, false) == ROOT_VOLUME)
+            {
+                /* find the basepath's drive/volume name, if it has one.
+                 * ensure basepath is not NULL, that causes a crash on sim */
+                if (basepath != NULL && path_strip_volume(basepath, &baseend, false) != ROOT_VOLUME)
+                {
+                    basepath_max = baseend - basepath;
+                    /* strip leading separators from component */
+                    while (*component == PATH_SEPCH)
+                        component++;
+                } else {
+                    /* component is absolute with no drive/volume, but basepath doesn't 
+                     * have a volume either... we must be on root volume */
+                    basepath = component;
+                    component = "";
+                    basepath_max = -1u;
+                }
+            }
+            /* else component likely already has drive/volume name */
+            else
+        #endif
+            {
+                /* 'component' is absolute; replace all */
+                basepath = component;
+                component = "";
+                basepath_max = -1u;
+            }
     }
 
     /* if basepath is not null or empty, buffer contents are replaced,
