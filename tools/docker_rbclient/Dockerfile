@@ -1,12 +1,12 @@
-FROM debian:9
+FROM debian:12
 
 WORKDIR /home/rb
 
 ENV HOME /home/rb
-ENV MAKEFLAGS -j12
+ENV MAKEFLAGS -j$(nproc)
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y \
     build-essential \
     git \
     perl \
@@ -15,6 +15,8 @@ RUN apt-get update && \
     flex \
     bison \
     bzip2 \
+    gettext \
+    gtk-doc-tools \
     gzip \
     zip \
     patch \
@@ -24,9 +26,9 @@ RUN apt-get update && \
     autoconf \
     libmpc-dev \
     gawk \
-    python \
-    python-lzo \
-    python-setuptools \
+    python3 \
+    python3-lzo \
+    python3-setuptools \
     mtd-utils \
     xorriso \
     wget \
@@ -38,29 +40,23 @@ RUN apt-get update && \
     tex4ht \
     texlive-fonts-recommended \
     lmodern \
-    latex-xcolor \
     texlive-base \
     libsdl1.2-dev \
-    libsdl1.2debian
+    libsdl1.2debian \
+    libsdl2-dev
 
 RUN cd /home/rb && git clone git://git.rockbox.org/rockbox
 
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="s"
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="m"
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="a"
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="i"
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="x"
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="y"
+RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="m a i x y"
 
-# compile sometimes fails; place this last to avoid duplicate work
-RUN cd /home/rb/rockbox && ./tools/rockboxdev.sh --target="r"
+ENV PATH="/tmp/local/bin:$PATH"
 
 RUN cd /home/rb/rockbox && \
-    wget "http://git.rockbox.org/?p=www.git;a=blob_plain;f=buildserver/rbclient.pl;hb=HEAD" -O rbclient.pl && \
+    wget "https://git.rockbox.org/cgit/www.git/plain/buildserver/rbclient.pl" -O rbclient.pl && \
     chmod +x rbclient.pl
 
-COPY runclient_modified.sh /home/rb/rockbox/runclient.sh
-
-RUN cd /home/rb/rockbox && chmod +x runclient.sh
+RUN cd /home/rb/rockbox && \
+    wget "https://git.rockbox.org/cgit/www.git/plain/buildserver/runclient.sh" -O runclient.sh && \
+    chmod +x runclient.sh
 
 CMD cd /home/rb/rockbox && ./runclient.sh $USER $PASS $NAME

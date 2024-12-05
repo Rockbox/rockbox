@@ -435,7 +435,7 @@ simcc () {
         # generic ${sdl_config} checker
         sdlccopts=$($sdl --cflags)
         if $sdl --static-libs > /dev/null 2>&1 ; then
-          sdlldopts=$($sdl --static-libs)
+          sdlldopts=$(CC="$CC" $sdl --static-libs)
         else
           echo "Your ${sdl_config} does not know about static libs, falling back to shared library"
           sdlldopts=$($sdl --libs)
