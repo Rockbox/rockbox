@@ -21,7 +21,105 @@
 #include "config.h"
 #include "cpu.h"
 
-/* TTB routines not used */
+#if CONFIG_CPU == S5L8720
+#define USE_MMU
+#endif
+
+
+#ifdef USE_MMU
+
+/** MMU setup **/
+
+/*
+ * void ttb_init(void);
+ */
+    .section    .text.ttb_init, "ax", %progbits
+    .align      2
+    .global     ttb_init
+    .type       ttb_init, %function
+ttb_init:
+    ldr     r0, =TTB_BASE_ADDR      @
+    mvn     r1, #0                  @
+    // TODO: only set the first 3 bits to 0
+    // mcr     p15, 0, r1, c2, c0, 2   @ Set TTB backwards compatiblity
+    mcr     p15, 0, r0, c2, c0, 0   @ Set the TTB base address
+    mcr     p15, 0, r1, c3, c0, 0   @ Set all domains to manager status
+    bx      lr                      @
+    .size   ttb_init, .-ttb_init
+
+/*
+ * void map_section(unsigned int pa, unsigned int va, int mb, int flags);
+ */
+    .section    .text.map_section, "ax", %progbits
+    .align      2
+    .global     map_section
+    .type       map_section, %function
+map_section:
+    @ align to 1MB
+    @ pa &= (-1 << 20);
+    mov     r0, r0, lsr #20
+    mov     r0, r0, lsl #20
+
+    @ pa |= (flags | 0x412);
+    @ bit breakdown:
+    @  10:  superuser - r/w, user - no access
+    @  4:   should be "1"
+    @  3,2: Cache flags (flags (r3))
+    @  1:   Section signature
+    orr     r0, r0, r3
+    orr     r0, r0, #0x410
+    orr     r0, r0, #0x2
+
+    @ unsigned int* ttbPtr = TTB_BASE + (va >> 20);
+    @ sections are 1MB size
+    mov     r1, r1, lsr #20
+    ldr     r3, =TTB_BASE_ADDR
+    add     r1, r3, r1, lsl #0x2
+
+    @ Add MB to pa, flags are already present in pa, but addition
+    @ should not effect them
+    @
+    @ for( ; mb>0; mb--, pa += (1 << 20))
+    @ {
+    @     *(ttbPtr++) = pa;
+    @ }
+    cmp    r2, #0
+    bxle   lr
+    mov    r3, #0x0
+1:  @ loop
+    str    r0, [r1], #4
+    add    r0, r0, #0x100000
+    add    r3, r3, #0x1
+    cmp    r2, r3
+    bne    1b @ loop
+    bx     lr
+    .size   map_section, .-map_section
+
+/*
+ * void enable_mmu(void);
+ */
+    .section    .text.enable_mmu, "ax", %progbits
+    .align      2
+    .global     enable_mmu
+    .type       enable_mmu, %function
+enable_mmu:
+    mov     r0, #0                  @
+    mcr     p15, 0, r0, c8, c7, 0   @ invalidate TLB
+    mcr     p15, 0, r0, c7, c7,0    @ invalidate both i and dcache
+    mrc     p15, 0, r0, c1, c0, 0   @
+    orr     r0, r0, #1              @ enable mmu bit, i and dcache
+    orr     r0, r0, #1<<2           @ enable dcache
+    orr     r0, r0, #1<<12          @ enable icache
+    mcr     p15, 0, r0, c1, c0, 0   @
+    nop                             @
+    nop                             @
+    nop                             @
+    nop                             @
+    bx      lr                      @
+    .size   enable_mmu, .-enable_mmu
+    .ltorg
+
+#endif  /* USE_MMU */
 
 /** Cache coherency **/
 

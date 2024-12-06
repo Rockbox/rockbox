@@ -603,6 +603,9 @@ target/arm/bits-armv4.S
    || defined(CPU_S5L87XX)
 target/arm/mmu-arm.S
 #  endif
+# elif ARM_ARCH == 6
+target/arm/bits-armv6.S
+target/arm/mmu-armv6.S
 # endif
 target/arm/system-arm.c
 
@@ -1155,8 +1158,6 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 
 #ifdef GIGABEAT_S
 drivers/lcd-memframe.c
-target/arm/bits-armv6.S
-target/arm/mmu-armv6.S
 target/arm/imx31/ata-imx31.c
 target/arm/imx31/avic-imx31.c
 target/arm/imx31/ccm-imx31.c
