@@ -47,6 +47,7 @@ void spi_init(int port, bool state)
         case 0:
             PCON0 = (PCON0 & ~0xffff) | val;
             break;
+#if CONFIG_CPU == S5L8702
         case 1:
             PCON6 = (PCON6 & ~0xffff0000) | (val << 16);
             break;
@@ -54,6 +55,15 @@ void spi_init(int port, bool state)
             PCON14 = (PCON14 & ~0xff000000) | (val << 24);
             PCON15 = (PCON15 & ~0xff) | (val >> 8);
             break;
+#elif CONFIG_CPU == S5L8720
+        case 1:
+            PCON4 = (PCON4 & ~0xff000000) | (val << 24);
+            PCON5 = (PCON5 & ~0xff) | (val >> 8);
+            break;
+        case 2:
+            /* unknown */
+            break;
+#endif
     }
 }
 
@@ -67,19 +77,33 @@ void spi_ce(int port, bool state)
     switch (port)
     {
         case 0: GPIOCMD = 0x0000e | level; break;
+#if CONFIG_CPU == S5L8702
         case 1: GPIOCMD = 0x6040e | level; break;
         case 2: GPIOCMD = 0xe060e | level; break;
+#elif CONFIG_CPU == S5L8720
+        case 1: GPIOCMD = 0x4060e | level; break;
+        case 2: /* unknown */ break;
+#endif
     }
 }
 
 void spi_prepare(int port)
 {
     clockgate_enable(SPICLKGATE(port), true);
+#if CONFIG_CPU == S5L8720
+    clockgate_enable(SPICLKGATE_2(port), true);
+#endif
     SPISTATUS(port) = 0xf;
     SPICTRL(port) |= 0xc;
     SPICLKDIV(port) = clkdiv[port];
     SPIPIN(port) = 6;
+#if CONFIG_CPU == S5L8702
     SPISETUP(port) = 0x10618;
+#elif CONFIG_CPU == S5L8720
+    SPIUNK40(port) = 0xffffffff;
+    SPIUNK3C(port) = 0xffffffff;
+    SPISETUP(port) = 0x40618;
+#endif
     SPICTRL(port) |= 0xc;
     SPICTRL(port) = 1;
 }
@@ -87,25 +111,47 @@ void spi_prepare(int port)
 void spi_release(int port)
 {
     clockgate_enable(SPICLKGATE(port), false);
+#if CONFIG_CPU == S5L8720
+    clockgate_enable(SPICLKGATE_2(port), false);
+#endif
+}
+
+static inline void spi_wait_ready(int port)
+{
+#if CONFIG_CPU == S5L8702
+    while (!(SPISTATUS(port) & 0x3e00));
+#elif CONFIG_CPU == S5L8720
+    while (!(SPISTATUS(port) & 0xf800));
+#endif
 }
 
 uint32_t spi_write(int port, uint32_t data)
 {
+#if CONFIG_CPU == S5L8702
     SPIRXLIMIT(port) = 1;
     while ((SPISTATUS(port) & 0x1f0) == 0x100);
+#elif CONFIG_CPU == S5L8720
+    SPIUNK4C(port) = 1;
+    SPIRXLIMIT(port) = 1;
+    // TODO: Wouldn't this be 0x7c0? so that the rule of <<2 is fulfilled in this register?
+    while ((SPISTATUS(port) & 0x7f0) == 0x400);
+#endif
     SPITXDATA(port) = data;
-    while (!(SPISTATUS(port) & 0x3e00));
+    spi_wait_ready(port);
     return SPIRXDATA(port);
 }
 
 void spi_read(int port, uint32_t size, void* buf)
 {
     uint8_t* buffer = (uint8_t*)buf;
+#if CONFIG_CPU == S5L8720
+    SPIUNK4C(port) = size;
+#endif
     SPIRXLIMIT(port) = size;
     SPISETUP(port) |= 1;
     while (size--)
     {
-        while (!(SPISTATUS(port) & 0x3e00));
+        spi_wait_ready(port);
         *buffer++ = SPIRXDATA(port);
     }
     SPISETUP(port) &= ~1;
