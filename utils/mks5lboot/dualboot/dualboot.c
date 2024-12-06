@@ -28,7 +28,7 @@
 #include "s5l87xx.h"
 #include "clocking-s5l8702.h"
 #include "spi-s5l8702.h"
-#include "nor-target.h"
+#include "norboot-target.h"
 #include "piezo.h"
 
 /* How it works:

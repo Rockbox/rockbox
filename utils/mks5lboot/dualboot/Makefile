@@ -45,7 +45,7 @@ SOURCES  = init.S dualboot.c
 SOURCES += $(ROOTDIR)/lib/arm_support/support-arm.S
 SOURCES += $(wildcard $(FIRMDIR)/asm/mem*.c $(FIRMDIR)/libc/mem*.c)
 SOURCES += $(addprefix $(FWARM)/, mmu-arm.S)
-SOURCES += $(addprefix $(FW8702)/, clocking-s5l8702.c spi-s5l8702.c nor-s5l8702.c crypto-s5l8702.c)
+SOURCES += $(addprefix $(FW8702)/, clocking-s5l8702.c spi-s5l8702.c norboot-s5l8702.c crypto-s5l8702.c)
 # target/loader specific sources
 SRCTARGET = piezo-.c
 $(foreach l, $(LOADERS), $(foreach t, $(TARGETS),\

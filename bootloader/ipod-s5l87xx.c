@@ -56,7 +56,7 @@
 #include "i2c-s5l8702.h"
 #include "gpio-s5l8702.h"
 #include "pmu-target.h"
-#include "nor-target.h"
+#include "norboot-target.h"
 
 
 #define FW_ROCKBOX  0

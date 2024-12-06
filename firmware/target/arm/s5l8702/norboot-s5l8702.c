@@ -27,7 +27,7 @@
 #include "s5l87xx.h"
 #include "spi-s5l8702.h"
 #include "crypto-s5l8702.h"
-#include "nor-target.h"
+#include "norboot-target.h"
 
 static void bootflash_ce(int port, bool state)
 {

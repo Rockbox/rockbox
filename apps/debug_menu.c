@@ -137,7 +137,7 @@
 #endif
 
 #if defined(IPOD_6G)
-#include "nor-target.h"
+#include "norboot-target.h"
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
