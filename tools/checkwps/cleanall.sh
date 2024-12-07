@@ -2,7 +2,9 @@
 rootdir=`dirname $0`
 outdir=$rootdir/output
 
-make clean # make clean the build dir first
+if [ -f Makefile ] ; then
+  make clean # make clean the build dir first
+fi
 rm -f autoconf.h
 rm -f Makefile
 awk -f $rootdir/parse_configure.awk $rootdir/../configure | (

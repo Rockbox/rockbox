@@ -10,14 +10,12 @@ To compile
 
 Just run the ./buildall.sh script
 
-
 To remove all compiled files
 ----------------------------
 
 ./cleanall.sh
 
-
 To add a new target
 -------------------
 
-Add $target and $modelname from tools/configure to targets.txt
+No action necessary, list of targets is parsed out of the configure script
