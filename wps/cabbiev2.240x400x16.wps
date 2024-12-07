@@ -23,9 +23,9 @@
 %?C<|>
 %?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|%ac%s%?It<%It|%Fn>>
 %?C<%s%ac%?it<%it|%fn>|>
-%t(300)%?C<%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>|%ac%Sx(Next Track:)>;%s%ac%t(1)%ft(.rockbox/playername.txt)
+%?C<%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>|%ac%Sx(Next Track:)>
 %?C<|%s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>>
-%t(300)%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>;%s%ac%t(1)%ft(.rockbox/playername.txt)
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
 
 
      %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr     

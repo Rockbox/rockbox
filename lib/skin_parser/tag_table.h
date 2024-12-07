@@ -155,7 +155,6 @@ enum skin_token_type {
     SKIN_TOKEN_FILE_SIZE,
     SKIN_TOKEN_FILE_VBR,
     SKIN_TOKEN_FILE_DIRECTORY,
-    SKIN_TOKEN_FILE_TEXT,
 
     /* Image */
     SKIN_TOKEN_IMAGE_BACKDROP,
