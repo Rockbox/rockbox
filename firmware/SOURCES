@@ -560,7 +560,7 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* !defined(BOOTLOADER) */
 
 /* build erosqn codec in bootloader for detection */
-#if defined(HAVE_EROS_QN_CODEC)
+#if defined(HAVE_EROS_QN_CODEC) && !defined(SIMULATOR)
 drivers/audio/eros_qn_codec.c
 drivers/audio/es9018k2m.c
 #endif /* defined(HAVE_EROSQN_CODEC) */
