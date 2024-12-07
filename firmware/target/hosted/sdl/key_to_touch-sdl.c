@@ -60,9 +60,6 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
         case SDLK_KP_8:
         case SDLK_8:
         case SDLK_UP:
-#ifdef HAVE_SCROLLWHEEL
-        case SDL_BUTTON_WHEELUP:
-#endif
             new_btn = BUTTON_TOPMIDDLE;
             break;
         case SDLK_KP_9:
@@ -92,9 +89,6 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
             break;
         case SDLK_KP_2:
         case SDLK_k:
-#ifdef HAVE_SCROLLWHEEL
-        case SDL_BUTTON_WHEELDOWN:
-#endif
         case SDLK_DOWN:
             new_btn = BUTTON_BOTTOMMIDDLE;
             break;
