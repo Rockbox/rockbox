@@ -628,25 +628,39 @@ static int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
     }
     while (element)
     {
-        if (element->type == TAG &&
-            element->tag->type == SKIN_TOKEN_SUBLINE_TIMEOUT )
+        int type = element->type;
+        if (type == TAG && element->tag->type == SKIN_TOKEN_SUBLINE_TIMEOUT)
         {
             token = SKINOFFSETTOPTR(skin_buffer, element->data);
             if (token)
-                retval = token->value.i;
+            {
+                if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT_HIDE)
+                {
+                    struct wps_subline_timeout *st;
+                    st = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                    retval = st->show * TIMEOUT_UNIT;
+                    if (st->hide != 0)
+                    {
+                        if(TIME_BEFORE(current_tick, st->next_tick))
+                            retval = 0; /* don't display yet.. */
+                        else
+                            st->next_tick = current_tick + st->hide * TIMEOUT_UNIT;
+                    }
+                }
+                else
+                    retval = token->value.i;
+            }
         }
-        else if (element->type == CONDITIONAL)
+        else if (type == CONDITIONAL)
         {
             struct conditional *conditional = SKINOFFSETTOPTR(skin_buffer, element->data);
             int val = evaluate_conditional(gwps, 0, conditional, element->children_count);
 
             int tmoval = get_subline_timeout(gwps, get_child(element->children, val));
             if (tmoval >= 0)
-            {
                 return MAX(retval, tmoval); /* Bugfix %t()%?CONDITIONAL tmo ignored */
-            }
         }
-        else if (element->type == COMMENT)
+        else if (type == COMMENT)
         {
             retval = 0; /* don't display this item */
         }

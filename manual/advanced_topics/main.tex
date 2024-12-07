@@ -449,8 +449,12 @@ Subline related special characters and tags:
 \begin{description}
 \item[;] Split items on a line into separate sublines
 \item[\%t] Set the subline display time. The
-`\config{\%t}' is followed by either integer seconds (\config{\%t5}), or seconds
-and tenths of a second within () e.g. (\config{\%t(3.5)}).
+`\config{\%t}' is followed by either integer seconds (\config{\%t5[,timehide]}), or seconds
+and tenths of a second within () e.g. (\config{\%t(3.5)[,timehide]}).
+specify timehide to set number of seconds before tag will be displayed again.
+when using timehide the message is displayed for timeshow and not displayed again for timehide seconds.
+``Note:'' the max timeout allowed in themes is about 655 seconds (~10 minutes) going over will result in a timeout less than 10 minutes.
+        \%t(ts,th) supports longer timeouts (~100 minutes)
 \end{description}
 
 Each alternating subline can still be optionally scrolled while it is
@@ -463,6 +467,12 @@ Example subline definition:
                                  Display id3 title for 2 seconds,
                                  Display current and remaining track time
                                  for 3 seconds,
+                                 repeat...
+
+     %s%t(4, 30)%Ia;%s%It;%t(3)%sId; : Display next id3 artist for 4 seconds,
+                                 Display next id3 title for 2 seconds,
+                                 Display next id3 album for 3 seconds
+                                 For the next 30 seconds - display title for 2 seconds and album for 3 seconds
                                  repeat...
 \end{example}
 

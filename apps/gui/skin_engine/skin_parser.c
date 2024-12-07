@@ -927,7 +927,8 @@ static int parse_timeout_tag(struct skin_element *element,
 {
     (void)wps_data;
     int val = 0;
-    if (element->params_count == 0)
+    int params_count = element->params_count;
+    if (params_count == 0)
     {
         switch (token->type)
         {
@@ -943,8 +944,23 @@ static int parse_timeout_tag(struct skin_element *element,
         }
     }
     else
+    {
         val = get_param(element, 0)->data.number;
-    token->value.i = val * TIMEOUT_UNIT;
+        if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT && params_count == 2)
+        {
+            struct wps_subline_timeout *st = skin_buffer_alloc(sizeof(*st));
+            if (st)
+            {
+                st->show = val;
+                st->hide = get_param(element, 1)->data.number;
+                st->next_tick = current_tick; /* show immediately the first time */
+                token->type = SKIN_TOKEN_SUBLINE_TIMEOUT_HIDE;
+                token->value.data = PTRTOSKINOFFSET(skin_buffer, st);
+                return 0;
+            }
+        }
+        token->value.i = val * TIMEOUT_UNIT;
+    }
     return 0;
 }
 
@@ -1378,6 +1394,7 @@ failure:
     element->type = COMMENT;
     element->data = INVALID_OFFSET;
     token->type = SKIN_TOKEN_NO_TOKEN;
+    token->value.data = INVALID_OFFSET;
     return 0;
 }
 

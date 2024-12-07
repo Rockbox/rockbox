@@ -82,15 +82,13 @@ struct wps_token {
     bool next;
 };
 
-
 struct wps_subline_timeout {
-    long next_tick;
+    unsigned long next_tick;
     unsigned short hide;
     unsigned short show;
 };
 
 char* get_dir(char* buf, int buf_size, const char* path, int level);
-
 
 struct skin_token_list {
     OFFSETTYPE(struct wps_token *) token;

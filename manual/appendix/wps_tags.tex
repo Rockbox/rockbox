@@ -559,11 +559,13 @@ Examples of the \%if tag:\\
 \section{Subline Tags}
 
 \begin{tagmap}
-\config{\%t(time)}
-    & Set the subline display cycle time (\%t(5) or \%t(3.4) formats) \\
-\config{;}
-    & Split items on a line into separate sublines \\
+  \config{\%t(timeshow [,timehide])} & Set the subline display cycle time.\\
 \end{tagmap}
+    Use this tag to set the time a subline is displayed and optionally the amount of time to hide the line before line will be displayed again
+\begin{description}
+    \item[timeshow] -- how many seconds to display the line (\%t(5) or \%t(3.4) formats).
+    \item[timehide] -- OPTIONAL, how many seconds to wait before displaying the line again.
+\end{description}
 
 Allows grouping of several items (sublines) onto one line, with the
 display cycling round the defined sublines. See

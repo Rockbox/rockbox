@@ -50,6 +50,7 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_FILE_SIZE,             "fs", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_VBR,              "fv", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_DIRECTORY,        "d"  , "I", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_FILE_TEXT,             "ft" , "F|i", SKIN_REFRESH_STATIC),
 
     TAG(SKIN_TOKEN_FILE_BITRATE,          "Fb", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_FILE_CODEC,            "Fc", "", SKIN_REFRESH_STATIC),
@@ -191,7 +192,7 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_RDS_TEXT,              "tz", "", SKIN_REFRESH_DYNAMIC),
 
     TAG(SKIN_TOKEN_SUBLINE_SCROLL,        "s", "", SKIN_REFRESH_SCROLL),
-    TAG(SKIN_TOKEN_SUBLINE_TIMEOUT,       "t"  , "D", 0),
+    TAG(SKIN_TOKEN_SUBLINE_TIMEOUT,       "t"  , "D|d", 0),
 
     TAG(SKIN_TOKEN_ENABLE_THEME,          "we", "", 0|NOBREAK),
     TAG(SKIN_TOKEN_DISABLE_THEME,         "wd", "", 0|NOBREAK),

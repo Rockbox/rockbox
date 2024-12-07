@@ -30,7 +30,7 @@
 %?C<%s%ac%?it<%it|%fn>|>
 %?C<%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>|%ac%Sx(Next Track:)>>
 %?C<|%s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>>
-%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
+%?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>;%s%ac%t(1, 300)%ft(playername.txt)
 
 
      %pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr     
