@@ -16,6 +16,9 @@ LDOPTS=""
 GLOBAL_LDOPTS=""
 LDMAP_OPT="-Map"
 
+HOSTCC=gcc
+HOSTAR=ar
+
 extradefines=""
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
@@ -392,6 +395,14 @@ simcc () {
    Darwin)
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
+   if $CC --version | grep -q "clang"; then
+    echo "[Warning] Clang compiler ($CC) in your path is unsupported. Trying gcc-14."
+    CC=gcc-14
+    HOSTCC=gcc-14
+    AR=gcc-ar-14
+    HOSTAR=gcc-ar-14
+    CPP=cpp-14
+   fi
    LDOPTS="$LDOPTS -ldl"
    SHARED_LDFLAGS="-dynamiclib -Wl,-no_warn_duplicate_libraries"
    LDMAP_OPT="-map"
@@ -4499,14 +4510,9 @@ fi
 # Now, figure out version number of the (gcc) compiler we are about to use
 gccver=`$CC -dumpversion`;
 
-# figure out the binutil version too and display it, mostly for the build
-# system etc to be able to see it easier
-if [ $uname = "Darwin" ]; then
- ldver=`$LD -v 2>&1 | sed -e 's/[^0-9.-]//g'`
- # Convert LD version to a number major*100 + minor
- ldnum1=`echo $ldver | cut -d . -f1`
- ldnum2=`echo $ldver | cut -d . -f2`
- ldnum=`(expr $ldnum1 "*" 100 + $ldnum2) 2>/dev/null`
+# figure out the binutil version too
+if [ "yes" = "$simulator" ] || [ "yes" = "$application" ] && [ $uname = "Darwin" ]; then
+ ldnum=0
 else
  ldnum=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
 fi
@@ -4584,7 +4590,7 @@ else
 fi
 
 
-echo "Using $LD $ldver"
+echo "Using $LD"
 
 makever=`make --version | head -1`
 echo "Detected make $makever"
@@ -4602,8 +4608,8 @@ else
 fi
 
 # figure out the full path to the various commands if possible
-HOSTCC=`findtool gcc --lit`
-HOSTAR=`findtool ar --lit`
+HOSTCC=`findtool ${HOSTCC} --lit`
+HOSTAR=`findtool ${HOSTAR} --lit`
 CC=`findtool ${CC} --lit`
 CPP=`findtool ${CPP} --lit`
 LD=`findtool ${LD} --lit`
