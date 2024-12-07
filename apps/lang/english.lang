@@ -50,7 +50,7 @@
 # target name, for example: swcodec: "swcodec-specific string".
 #
 # The target names used are picked from the configure script and are set in the
-# MODELNAME variable in the root makefile. Currently, they are:
+# MODELNAME variable in the root makefile. This is an incomplete list:
 # Target        Target string
 # iriver
 # H100/H110/H115    iriverh100
@@ -10926,23 +10926,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Line Out"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Line Out"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
   user: core
@@ -16530,13 +16513,16 @@
   desc: Output Select
   user: core
   <source>
-    *: "Output Select"
+    *: none
+    erosqnative: "Output Select"
   </source>
   <dest>
-    *: "Output Select"
+    *: none
+    erosqnative: "Output Select"
   </dest>
   <voice>
-    *: "Output Select"
+    *: none
+    erosqnative: "Output Select"
   </voice>
 </phrase>
 <phrase>
@@ -16544,13 +16530,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Headphone"
+    *: none
+    erosqnative: "Headphone"
   </source>
   <dest>
-    *: "Headphone"
+    *: none
+    erosqnative: "Headphone"
   </dest>
   <voice>
-    *: "Headphone"
+    *: none
+    erosqnative: "Headphone"
   </voice>
 </phrase>
 <phrase>
@@ -16558,13 +16547,16 @@
   desc: in settings_menu
   user: core
   <source>
-    *: "Lineout"
+    *: none
+    lineout_poweroff,erosqnative: "Line Out"
   </source>
   <dest>
-    *: "Lineout"
+    *: none
+    lineout_poweroff,erosqnative: "Line Out"
   </dest>
   <voice>
-    *: "Lineout"
+    *: none
+    lineout_poweroff,erosqnative: "Line Out"
   </voice>
 </phrase>
 <phrase>

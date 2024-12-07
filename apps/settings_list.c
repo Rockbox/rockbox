@@ -1184,7 +1184,7 @@ const struct settings_list settings[] = {
                   true, "accessory power supply", accessory_supply_set),
 #endif
 #ifdef HAVE_LINEOUT_POWEROFF
-    OFFON_SETTING(0, lineout_active, LANG_LINEOUT_ONOFF,
+    OFFON_SETTING(0, lineout_active, LANG_LINEOUT,
                   true, "lineout", lineout_set),
 #endif
     /* tuner */
