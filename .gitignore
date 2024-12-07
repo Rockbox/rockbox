@@ -62,7 +62,9 @@ __pycache__
 
 # /utils/
 /utils/Makefile
-/utils/rbutil
+
+# skin updater
+/utils/skinupdater/skinupdater
 
 # /utils/ipodpatcher/
 /utils/ipodpatcher/ipodpatcher
@@ -72,6 +74,9 @@ __pycache__
 
 # /utils/bspatch/
 /utils/bspatch/bspatch
+
+# imxtools
+/utils/imxtools/scsitools/scsitool
 
 # /utils/rbutilqt/
 /utils/rbutilqt/build
@@ -106,6 +111,7 @@ __pycache__
 /tools/generate_rocklatin
 /tools/descramble
 /tools/convbdf
+/tools/convttf
 /tools/bmp2rb
 /tools/codepages
 /tools/rdf2binary
