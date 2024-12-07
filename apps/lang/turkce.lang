@@ -3295,23 +3295,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Çıkış"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Çıkış"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -13307,7 +13290,7 @@
     *: "Seviye 10: 1 hamle / 600 dk."
   </dest>
   <voice>
-    *: "Seviye 10: 600 dakikada 1 hamle"
+    *: "Seviye 10, 600 dakikada 1 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -16301,62 +16284,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Çift Kanal Değişim Modu"
-  </dest>
-  <voice>
-    *: "Çift Kanal Değişim Modu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Geri al"
-  </dest>
-  <voice>
-    *: "Geri al"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Her zaman 0"
-  </dest>
-  <voice>
-    *: "Her zaman 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Her zaman 1"
-  </dest>
-  <voice>
-    *: "Her zaman 1"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LEGAL_NOTICES
   desc: in system menu
   user: core
@@ -16508,5 +16435,70 @@
   </dest>
   <voice>
     *: "Albüm Sanatını İncele"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Çıkış Seç"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Çıkış Seç"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Kulaklık"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Kulaklık"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff,erosqnative: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff,erosqnative: "Ses çıkışı"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff,erosqnative: "Ses çıkışı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Font yüklenemedi: (%s)"
+  </dest>
+  <voice>
+    *: "parçalar kaydedildi"
   </voice>
 </phrase>
