@@ -1316,6 +1316,71 @@ static int parse_progressbar_tag(struct skin_element* element,
     return 0;
 }
 
+static int parse_filetext(struct skin_element *element,
+                            struct wps_token *token,
+                            struct wps_data *wps_data)
+{
+    (void)wps_data;
+    const char* filename;
+    char buf[MAX_PATH];
+    int fd;
+    int line = 0;
+
+    /* format: %ft(filename[,line]) */
+    filename = get_param_text(element, 0);
+
+    if (element->params_count == 2)
+        line = get_param(element, 1)->data.number;
+    else if (element->params_count != 1)
+    {
+        DEBUGF("%s(file, line): %s Error: param count %d\n",
+                  __func__, filename, element->params_count);
+        return WPS_ERROR_INVALID_PARAM;
+    }
+    path_append(buf, ROCKBOX_DIR, filename, sizeof(buf));
+    DEBUGF("%s %s[%d]\n", __func__, buf, line);
+
+    if ((fd = open_utf8(buf, O_RDONLY)) < 0)
+    {
+        DEBUGF("%s: Error Opening %s\n", __func__, buf);
+        goto failure;
+    }
+
+    int rd = 0;
+    while (line >= 0)
+    {
+        if ((rd = read_line(fd, buf, sizeof(buf))) < 0)
+            break;
+        line--;
+    }
+
+    if (rd <= 0) /* empty line? */
+    {
+        DEBUGF("%s: Error(%d) Reading %s\n", __func__, rd, filename);
+        goto failure;
+    }
+
+    buf[rd] = '\0';
+    char * skinbuf = skin_buffer_alloc(rd+1);
+
+    if (!skinbuf)
+    {
+        DEBUGF("%s: Error No Buffer %s\n", __func__, filename);
+        close(fd);
+        return WPS_ERROR_INVALID_PARAM;
+    }
+    strcpy(skinbuf, buf);
+    close(fd);
+    token->value.data = PTRTOSKINOFFSET(skin_buffer, skinbuf);
+    token->type = SKIN_TOKEN_STRING;
+    return 0;
+failure:
+    element->type = COMMENT;
+    element->data = INVALID_OFFSET;
+    token->type = SKIN_TOKEN_NO_TOKEN;
+    return 0;
+}
+
 #ifdef HAVE_ALBUMART
 static int parse_albumart_load(struct skin_element* element,
                                struct wps_token *token,
@@ -2377,6 +2442,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
 #endif
                 case SKIN_TOKEN_FILE_DIRECTORY:
                     token->value.i = get_param(element, 0)->data.number;
+                    break;
+                case SKIN_TOKEN_FILE_TEXT:
+                    function = parse_filetext;
                     break;
 #ifdef HAVE_BACKDROP_IMAGE
                 case SKIN_TOKEN_VIEWPORT_FGCOLOUR:

@@ -199,6 +199,18 @@ int main(void)
     }
 #endif
 
+#if !defined(BOOTLOADER)
+    if (!file_exists(ROCKBOX_DIR"/playername.txt"))
+    {
+        int fd = open(ROCKBOX_DIR"/playername.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
+        if(fd >= 0)
+        {
+            fdprintf(fd, "%s!", str(LANG_ROCKBOX_TITLE));
+            close(fd);
+        }
+    }
+#endif
+
 #ifdef AUTOROCK
     {
         char filename[MAX_PATH];
