@@ -16567,3 +16567,17 @@
     *: "Lineout"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Unable to load font: (%s)"
+  </dest>
+  <voice>
+    *: "tracks saved"
+  </voice>
+</phrase>
