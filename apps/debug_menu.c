@@ -2471,7 +2471,7 @@ static bool dbg_talk(void)
 
     simplelist_reset_lines();
 
-    simplelist_setline("Current voice file:"); 
+    simplelist_setline("Current voice file:");
     if (data.status != TALK_STATUS_ERR_NOFILE)
         simplelist_addline(" %s", data.voicefile);
     else
@@ -2631,7 +2631,7 @@ static bool dbg_device_data(void)
     simplelist_setline("Device data RAW:");
     for (size_t i = 0; i < device_data.length; i += 4)
     {
-        simplelist_addline("%02x: %02x %02x %02x %02x", i,
+        simplelist_addline("%02zx: %02x %02x %02x %02x", i,
                            device_data.payload[i + 0], device_data.payload[i + 1],
                            device_data.payload[i + 2], device_data.payload[i + 3]);
     }

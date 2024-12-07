@@ -77,8 +77,10 @@
 #define AUDIOHW_CAPS (FILTER_ROLL_OFF_CAP)
 #define AUDIOHW_HAVE_SHORT_ROLL_OFF
 
+#ifndef SIMULATOR
 /* use high-bitdepth volume scaling */
 #define PCM_NATIVE_BITDEPTH 24
+#endif
 
 /* Button defines */
 #define CONFIG_KEYPAD   EROSQ_PAD
