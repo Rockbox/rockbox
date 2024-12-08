@@ -2546,6 +2546,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
             if ( *(element->tag->name) == 'I' || *(element->tag->name) == 'F' ||
                  *(element->tag->name) == 'D')
                 token->next = true;
+            else if ( token->type == SKIN_TOKEN_TRACK_LENGTH && *(element->tag->name) == 'P')
+                token->next = true;
+
             if (follow_lang_direction > 0 )
                 follow_lang_direction--;
             break;

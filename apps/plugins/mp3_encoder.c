@@ -1107,7 +1107,7 @@ int HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int tbl
       case 14: l=3; s = (sgnv << 2) + (sgnw << 1) +  sgnx;              break;
       case 15: l=4; s = (sgnv << 3) + (sgnw << 2) + (sgnx << 1) + sgny; break;
       default: /* bug fix */
-        rb->splashf(HZ * 2, "bad input %d < or > array bounds", p);
+        rb->splashf(HZ * 2, "bad input %lu < or > array bounds", (unsigned long)p);
         return 0;
     }
 

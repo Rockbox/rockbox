@@ -132,6 +132,7 @@ struct tag_info legal_tags[] =
     { "pc", "" },
     { "pr", "" },
     { "pt", "" },
+    { "Pt", "" },
     { "pS" , "|I"},
     { "pE" , "|I"},
     { "pp", "" },
