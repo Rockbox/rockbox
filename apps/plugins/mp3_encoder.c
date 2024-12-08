@@ -1106,6 +1106,9 @@ int HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int tbl
       case 13: l=3; s = (sgnv << 2) + (sgnw << 1)               + sgny; break;
       case 14: l=3; s = (sgnv << 2) + (sgnw << 1) +  sgnx;              break;
       case 15: l=4; s = (sgnv << 3) + (sgnw << 2) + (sgnx << 1) + sgny; break;
+      default: /* bug fix */
+        rb->splashf(HZ * 2, "bad input %d < or > array bounds", p);
+        return 0;
     }
 
     d = (ht_count[tbl][0][p] << l) + s;
@@ -2687,9 +2690,17 @@ enum plugin_status plugin_start(const void* parameter)
         }
 
         rb->lcd_clear_display();
+#if LCD_WIDTH <= 128
+        rb->lcd_putsxy(0, 30, "Conversion:"); 
+        rb->lcd_putsxyf(0, 40,"%ld.%02lds    ", tim/100, tim%100);
+        tim = frames * cfg.smpl_per_frm * 100 / (cfg.samplerate != 0 ? cfg.samplerate : 1); /* unit=.01s */
+        rb->lcd_putsxy(0, 10, "WAV-Length:");
+        rb->lcd_putsxyf(0, 20, "%ld.%02lds    ", tim/100, tim%100);
+#else
         rb->lcd_putsxyf(0, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
-        tim = frames * cfg.smpl_per_frm * 100 / cfg.samplerate; /* unit=.01s */
+        tim = frames * cfg.smpl_per_frm * 100 / (cfg.samplerate != 0 ? cfg.samplerate : 1); /* unit=.01s */
         rb->lcd_putsxyf(0, 20, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
+#endif
         rb->lcd_update();
         rb->sleep(5*HZ);
     }

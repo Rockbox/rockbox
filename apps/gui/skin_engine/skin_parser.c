@@ -953,7 +953,11 @@ static int parse_timeout_tag(struct skin_element *element,
             {
                 st->show = val;
                 st->hide = get_param(element, 1)->data.number;
+#ifndef __PCTOOL__
                 st->next_tick = current_tick; /* show immediately the first time */
+#else
+                st->next_tick = 0; /* checkwps doesn't have current_tick */
+#endif
                 token->type = SKIN_TOKEN_SUBLINE_TIMEOUT_HIDE;
                 token->value.data = PTRTOSKINOFFSET(skin_buffer, st);
                 return 0;
