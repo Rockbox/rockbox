@@ -932,6 +932,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
      * value */
     element->type = TAG;
     element->line = skin_line;
+    element->is_conditional = true;
 
     /* Parsing the tag first */
     if(!skin_parse_tag(element, &cursor))
@@ -1152,6 +1153,7 @@ static struct skin_element* skin_alloc_element()
     retval->params_count = 0;
     retval->children_count = 0;
     retval->data = INVALID_OFFSET;
+    retval->is_conditional = false;
 
     return retval;
 

@@ -146,6 +146,7 @@ struct skin_element
     enum skin_element_type type;
     /* Number of elements in the params array */
     char params_count;
+    bool is_conditional;
 };
 
 enum skin_cb_returnvalue

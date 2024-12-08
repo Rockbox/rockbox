@@ -1380,7 +1380,13 @@ static int parse_filetext(struct skin_element *element,
         goto failure;
     }
 
+    if (element->is_conditional)
+    {
+        rd = 1; /* just alloc enough for the conditional to work*/
+    }
+
     buf[rd] = '\0';
+
     char * skinbuf = skin_buffer_alloc(rd+1);
 
     if (!skinbuf)
