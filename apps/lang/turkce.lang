@@ -7376,7 +7376,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Yeniden etkinleştir)"
+    remote: "(Ses eksi ile yeniden etkinleştir)"
   </voice>
 </phrase>
 <phrase>
@@ -16477,15 +16477,15 @@
   user: core
   <source>
     *: none
-    lineout_poweroff,erosqnative: "Line Out"
+    erosqnative,lineout_poweroff: "Line Out"
   </source>
   <dest>
     *: none
-    lineout_poweroff,erosqnative: "Ses çıkışı"
+    erosqnative,lineout_poweroff: "Ses çıkışı"
   </dest>
   <voice>
     *: none
-    lineout_poweroff,erosqnative: "Ses çıkışı"
+    erosqnative,lineout_poweroff: "Ses çıkışı"
   </voice>
 </phrase>
 <phrase>
