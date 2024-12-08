@@ -913,6 +913,7 @@ int plugin_load(const char* plugin, const void* parameter)
         )
     {
         lc_close(current_plugin_handle);
+        current_plugin_handle = NULL;
         splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
@@ -921,6 +922,7 @@ int plugin_load(const char* plugin, const void* parameter)
         p_hdr->api_size > sizeof(struct plugin_api))
     {
         lc_close(current_plugin_handle);
+        current_plugin_handle = NULL;
         splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
