@@ -38,8 +38,9 @@ char* skin_start = 0;
 static int viewport_line = 0;
 
 #ifdef ROCKBOX
-static skin_callback callback = NULL;
-static void* callback_data;
+static int empty_callback(struct skin_element* element, void* data);
+static skin_callback callback = &empty_callback;
+static void* callback_data = NULL;
 #endif
 
 /* Auxiliary parsing functions (not visible at global scope) */
@@ -71,6 +72,13 @@ static void skip_whitespace(const char** document)
 }
 
 #ifdef ROCKBOX
+static int empty_callback(struct skin_element* element, void* data)
+{
+    (void)element;
+    (void)data;
+    return CALLBACK_OK;
+}
+
 struct skin_element* skin_parse(const char* document,
                                 skin_callback cb, void* cb_data)
 {
@@ -153,7 +161,7 @@ static struct skin_element* skin_parse_viewport(const char** document)
         }
     }
 #ifdef ROCKBOX
-    else if (callback)
+    else
     {
         if (callback(retval, callback_data) == CALLBACK_ERROR)
         {
@@ -331,16 +339,10 @@ static struct skin_element* skin_parse_line_optional(const char** document,
     }
 
 #ifdef ROCKBOX
-    if (callback)
+    if (callback(retval, callback_data) == CALLBACK_ERROR)
     {
-        switch (callback(retval, callback_data))
-        {
-            case CALLBACK_ERROR:
-                skin_error(GOT_CALLBACK_ERROR, cursor);
-                return NULL;
-            default:
-                break;
-        }
+        skin_error(GOT_CALLBACK_ERROR, cursor);
+        return NULL;
     }
 #endif
 
@@ -480,13 +482,10 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
     }
 
 #ifdef ROCKBOX
-    if (callback)
+    if (callback(retval, callback_data) == CALLBACK_ERROR)
     {
-        if (callback(retval, callback_data) == CALLBACK_ERROR)
-        {
-            skin_error(GOT_CALLBACK_ERROR, *document);
-            return NULL;
-        }
+        skin_error(GOT_CALLBACK_ERROR, *document);
+        return NULL;
     }
 #endif
     *document = cursor;
@@ -542,13 +541,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     {
 
 #ifdef ROCKBOX
-        if (callback)
+        if (callback(element, callback_data) == CALLBACK_ERROR)
         {
-            if (callback(element, callback_data) == CALLBACK_ERROR)
-            {
-                skin_error(GOT_CALLBACK_ERROR, cursor);
-                return 0;
-            }
+            skin_error(GOT_CALLBACK_ERROR, cursor);
+            return 0;
         }
 #endif
         *document = cursor;
@@ -826,13 +822,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         return 0;
     }
 #ifdef ROCKBOX
-    if (callback)
+    if (callback(element, callback_data) == CALLBACK_ERROR)
     {
-        if (callback(element, callback_data) == CALLBACK_ERROR)
-        {
-            skin_error(GOT_CALLBACK_ERROR, *document);
-            return 0;
-        }
+        skin_error(GOT_CALLBACK_ERROR, *document);
+        return 0;
     }
 #endif
     *document = cursor;
@@ -897,13 +890,10 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     text[length] = '\0';
 
 #ifdef ROCKBOX
-    if (callback)
+    if (callback(element, callback_data) == CALLBACK_ERROR)
     {
-        if (callback(element, callback_data) == CALLBACK_ERROR)
-        {
-            skin_error(GOT_CALLBACK_ERROR, *document);
-            return 0;
-        }
+        skin_error(GOT_CALLBACK_ERROR, *document);
+        return 0;
     }
 #endif
 
@@ -940,18 +930,15 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
 
     element->type = CONDITIONAL;
 #ifdef ROCKBOX
-    if (callback)
+    switch (callback(element, callback_data))
     {
-        switch (callback(element, callback_data))
-        {
-            case FEATURE_NOT_AVAILABLE:
-                feature_available = false;
-                break;
-            case CALLBACK_ERROR:
-                return 0;
-            default:
-                break;
-        }
+        case FEATURE_NOT_AVAILABLE:
+            feature_available = false;
+            break;
+        case CALLBACK_ERROR:
+            return 0;
+        default:
+            break;
     }
 #endif
 
