@@ -863,7 +863,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fo = &(*filter)[1][~phase & 1][0];
 
       D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D1ptr = (void*)D-p;
 
       if(s & 1)
       {
