@@ -689,8 +689,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int sb;
   unsigned int phase, ch, s, p;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t (*sbsample)[36][32];
-  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t const (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32];
   mad_fixed_t const (*D1ptr)[32];
   mad_fixed64hi_t hi0, hi1;
@@ -712,8 +712,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
@@ -838,8 +838,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int          p;
   unsigned int phase, ch, s;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t  (*sbsample)[36][32];
-  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t const (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32], *ptr;
   mad_fixed_t const (*D1ptr)[32];
   mad_fixed64hi_t hi;
@@ -862,8 +862,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
@@ -957,8 +957,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int          p, sb;
   unsigned int phase, ch, s;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t (*sbsample)[36][32];
-  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t const (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32], *ptr;
   mad_fixed_t const (*D1ptr)[32];
   mad_fixed64hi_t hi;
@@ -981,8 +981,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
