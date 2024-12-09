@@ -317,26 +317,66 @@ void memory_init(void)
 #ifdef BOOTLOADER
 #include <stdbool.h>
 
-#if defined(IPOD_6G) || defined(IPOD_NANO3G)
 static void syscon_preinit(void)
 {
     /* after ROM boot, CG16_SYS is using PLL0 @108 MHz
        CClk = 108 MHz, HClk = 54 MHz, PClk = 27 MHz */
 
+#if CONFIG_CPU == S5L8702
     CLKCON0 &= ~CLKCON0_SDR_DISABLE_BIT;
+#elif CONFIG_CPU == S5L8720
+    int sec_epoch = soc_get_sec_epoch();
+
+    PWRCON(0) = 0x327e5;
+    PWRCON(1) = 0xfe2bed6d;
+    PWRCON(2) = 0x73;
+    PWRCON(3) = 0xff;
+    PWRCON(4) = 0xdcf779;
+
+    if (sec_epoch)
+        CLKCON0 &= ~CLKCON0_SDR_DISABLE_BIT;
+    else
+        CLKCON0 |= CLKCON0_SDR_DISABLE_BIT;
+#endif
 
     PLLMODE &= ~PLLMODE_OSCSEL_BIT; /* CG16_SEL_OSC = OSC0 */
+
+#if CONFIG_CPU == S5L8702
     cg16_config(&CG16_SYS, true, CG16_SEL_OSC, 1, 1);
     soc_set_system_divs(1, 1, 1);
+#elif CONFIG_CPU == S5L8720
+    cg16_config(&CG16_SYS, true, CG16_SEL_OSC, 1, 1, 0x0);
+    // soc_set_system_divs(1, 1, 1);
+
+    CLKCON1 = 0;
+    while (CLKCON1);
+#endif
 
     /* stop all PLLs */
     for (int pll = 0; pll < 3; pll++)
         pll_onoff(pll, false);
 
+#if CONFIG_CPU == S5L8702
     pll_config(2, PLLOP_DM, 1, 36, 1, 32400);
     pll_onoff(2, true);
     soc_set_system_divs(1, 2, 2 /*hprat*/);
+#elif CONFIG_CPU == S5L8720
+    PLLUNK3C = 0;
 
+    pll_config(0, PLLOP_DM, sec_epoch ? 6 : 3, 133, 1, 39900);
+    pll_onoff(0, true);
+
+    // soc_set_system_divs(1, 2, 1 /*hprat*/);
+
+    // XXX: Without this, SDRAM does not work!
+    uint32_t val = 0x404040;
+    CLKCON1 = val;
+    while (CLKCON1 != val);
+
+    CLKCON0 |= CLKCON0_UNK30_BIT;
+#endif
+
+#if CONFIG_CPU == S5L8702
     cg16_config(&CG16_SYS,   true,  CG16_SEL_PLL2, 1, 1);
     cg16_config(&CG16_2L,    false, CG16_SEL_OSC,  1, 1);
     cg16_config(&CG16_SVID,  false, CG16_SEL_OSC,  1, 1);
@@ -345,17 +385,33 @@ static void syscon_preinit(void)
     cg16_config(&CG16_AUD2,  false, CG16_SEL_OSC,  1, 1);
     cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  1, 1);
     cg16_config(&CG16_5L,    false, CG16_SEL_OSC,  1, 1);
+#elif CONFIG_CPU == S5L8720
+    cg16_config(&CG16_SYS,   true,  CG16_SEL_PLL0, 1, 1, 0x0);
+    cg16_config(&CG16_LCD,   false, CG16_SEL_OSC,  1, 1, 0x0);
+    cg16_config(&CG16_SVID,  false, CG16_SEL_OSC,  1, 1, 0x0);
+    cg16_config(&CG16_AUD0,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
+    cg16_config(&CG16_AUD1,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
+    cg16_config(&CG16_AUD2,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
+    // TODO: configure a 12 MHz ECLK for all targets, so the timer settings will be the same.
+    // cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  (S5L8720_OSC0_HZ / ECLK), 1, 0);
+    cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  1, 1, 0x0);
+    cg16_config(&CG16_5L,    false, CG16_SEL_OSC,  1, 1, 0x0);
+    cg16_config(&CG16_6L,    false, CG16_SEL_OSC,  1, 1, 0x0);
+#endif
 
     soc_set_hsdiv(1);
 
+#if CONFIG_CPU == S5L8702
     PWRCON_AHB = ~((1 << CLOCKGATE_SMx) |
                    (1 << CLOCKGATE_SM1));
     PWRCON_APB = ~((1 << (CLOCKGATE_TIMER - 32)) |
                    (1 << (CLOCKGATE_GPIO - 32)));
+#endif
 }
 
 static void miu_preinit(bool selfrefreshing)
 {
+#if CONFIG_CPU == S5L8702
     if (selfrefreshing)
         MIUCON = 0x11;      /* TBC: self-refresh -> IDLE */
 
@@ -428,74 +484,8 @@ static void miu_preinit(bool selfrefreshing)
     }
 
     MIUAREF |= 0x61000;   /* Auto-refresh enabled */
-}
-
-#elif defined(IPOD_NANO4G)
-static void syscon_preinit(void)
-{
-    int sec_epoch = soc_get_sec_epoch();
-
-    PWRCON(0) = 0x327e5;
-    PWRCON(1) = 0xfe2bed6d;
-    PWRCON(2) = 0x73;
-    PWRCON(3) = 0xff;
-    PWRCON(4) = 0xdcf779;
-
-    if (sec_epoch)
-        CLKCON0 &= ~CLKCON0_SDR_DISABLE_BIT;                // XXX: call this UNK31_BIT?
-    else
-        CLKCON0 |= CLKCON0_SDR_DISABLE_BIT;
-
-    PLLMODE &= ~PLLMODE_OSCSEL_BIT; /* CG16_SEL_OSC = OSC0 */
-    cg16_config(&CG16_SYS, true, CG16_SEL_OSC, 1, 1, 0x0);
-
-    //soc_set_system_divs(1, 1, 1);
-
-    CLKCON1 = 0;
-    while (CLKCON1);
-
-    /* stop all PLLs */
-    for (int pll = 0; pll < 3; pll++)
-        pll_onoff(pll, false);
-
-    PLLUNK3C = 0;
-
-    pll_config(0, PLLOP_DM, sec_epoch ? 6 : 3, 133, 1, 39900);
-    pll_onoff(0, true);
-
-    // soc_set_system_divs(1, 2, 1 /*hprat*/);
-
-    // XXX: Without this, SDRAM does not work!
-    uint32_t val = 0x404040;
-    CLKCON1 = val;
-    while (CLKCON1 != val);
-
-    CLKCON0 |= CLKCON0_UNK30_BIT;
-
-    cg16_config(&CG16_SYS,   true,  CG16_SEL_PLL0, 1, 1, 0x0);
-    cg16_config(&CG16_LCD,   false, CG16_SEL_OSC,  1, 1, 0x0);
-    cg16_config(&CG16_SVID,  false, CG16_SEL_OSC,  1, 1, 0x0);
-    cg16_config(&CG16_AUD0,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
-    cg16_config(&CG16_AUD1,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
-    cg16_config(&CG16_AUD2,  false, CG16_SEL_OSC,  1, 1, CG16_UNK14_BIT);
-    // TODO: configure a 12 MHz ECLK for all targets, so the timer settings will be the same.
-    // cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  (S5L8720_OSC0_HZ / ECLK), 1, 0);
-    cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  1, 1, 0x0);
-    cg16_config(&CG16_5L,    false, CG16_SEL_OSC,  1, 1, 0x0);
-    cg16_config(&CG16_6L,    false, CG16_SEL_OSC,  1, 1, 0x0);
-
-    soc_set_hsdiv(1);
-
-//     PWRCON(0) = 0x327e5;
-//     PWRCON(1) = 0xfe2bed6d;
-//     PWRCON(2) = 0x73;
-//     PWRCON(3) = 0xff;
-//     PWRCON(4) = 0xdcf779;
-}
-
-// TODO: There are things wrong, copying from spireader
-static void miu_preinit(bool selfrefreshing)
-{
+#elif CONFIG_CPU == S5L8720
+    // TODO: There are things wrong, copying from spireader
     GPIOUNK384 = 0;
 
     MIU_REG(0) = 1;
@@ -563,14 +553,14 @@ static void miu_preinit(bool selfrefreshing)
     MIU_REG(0x8) = 0x1;
 
     UNK3E000008 = 0x1f;
+#endif
 }
-#endif /* IPOD_NANO4G */
 
 /* Preliminary HW initialization */
 void system_preinit(void)
 {
     bool hibernated;        // TODO: hibernated -> resuming, or perhaps better warmboot
-#ifdef IPOD_NANO4G
+#if CONFIG_CPU == S5L8720
     uint32_t boot_config;
 
     /* Read boot configuration on PDAT3:
@@ -587,7 +577,7 @@ void system_preinit(void)
     gpio_preinit();
     i2c_preinit(0);
 
-#ifdef IPOD_NANO4G
+#if CONFIG_CPU == S5L8720
     /* TBC: store boot config into a PMU memory register */
     pmu_wr(0x7f, boot_config);
 #endif
