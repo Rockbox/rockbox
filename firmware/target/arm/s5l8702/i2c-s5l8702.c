@@ -55,6 +55,11 @@ static void i2c_on(int bus)
 {
     /* enable I2C clock */
     clockgate_enable(I2CCLKGATE(bus), true);
+#if CONFIG_CPU == S5L8720
+    /* this clockgate is needed when ECLK is used as source clock */
+    clockgate_enable(I2CCLKGATE_2(bus), true);
+    udelay(5);
+#endif
 }
 
 static void i2c_off(int bus)
@@ -65,6 +70,9 @@ static void i2c_off(int bus)
     /* disable I2C clock */
     wait_rdy(bus);
     clockgate_enable(I2CCLKGATE(bus), false);
+#if CONFIG_CPU == S5L8720
+    clockgate_enable(I2CCLKGATE_2(bus), false);
+#endif
 }
 
 /* wait for bus not busy, or tx/rx byte (should return once
@@ -84,15 +92,29 @@ static int i2c_start(int bus, unsigned char slave, bool rd)
     wait_rdy(bus);
     IICCON(bus) = (0 << 8) | /* INT_EN = disabled */
                   (1 << 7) | /* ACK_GEN */
-                  (0 << 6) | /* CLKSEL = PCLK/32 (TBC) */
-                  (4 << 0);  /* CK_REG */
+                  (0 << 6) | /* CLKSEL = SRCCLK/32 (TBC) */
+#if CONFIG_CPU == S5L8702
+                  (0 << 0);  /* CK_REG */
+#elif CONFIG_CPU == S5L8720
+                  (1 << 0);  /* CK_REG */
+#endif
 
     /* START */
+    int mode = rd ? 0x80 : 0xC0;
+    wait_rdy(bus);
+    IICSTAT(bus) = mode;
     wait_rdy(bus);
     IICDS(bus) = slave | rd;
     wait_rdy(bus);
-    IICSTAT(bus) = rd ? 0xB0 : 0xF0;
+    IICSTAT(bus) = mode | 0x30;
 
+#if CONFIG_CPU == S5L8702
+    // XXX this seems needed when ECLK is used
+    wait_rdy(bus);      // XXX: To solve the nano3g problem with ECLK,
+                        // or you can put it in either of the two i2c_wait_io(),
+                        // both work if you put this
+                        // TODO: Try on classic, maybe it's not necessary
+#endif
     i2c_wait_io(bus);
 
     /* check ACK */
@@ -207,13 +229,24 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
 
 void i2c_preinit(int bus)
 {
-    if (bus == 0) PCON3 = (PCON3 & ~0x00000ff0) | 0x00000220;
-    /* TBC: else if(bus == 1) PCON6 = (PCON6 & ~0x0ff00000) | 0x02200000; */
+#if CONFIG_CPU == S5L8702
+    if (bus == 0)
+        PCON3 = (PCON3 & ~0x00000ff0) | 0x00000220;
+#if 0 /* TBC */
+    else if (bus == 1)
+        PCON6 = (PCON6 & ~0x0ff00000) | 0x02200000;
+#endif
+#elif CONFIG_CPU == S5L8720
+    if (bus == 0) {
+        PCON2 = (PCON2 & ~0xf0000000) | 0x20000000;
+        PCON3 = (PCON3 & ~0x0000000f) | 0x00000002;
+    }
+#endif
     i2c_on(bus);
     wait_rdy(bus);
     IICADD(bus) = 0x40;   /* own slave address */
     wait_rdy(bus);
-    IICUNK14(bus) = 0;
+    IICUNK14(bus) = 1;    /* SRCCLK = ECLK */
     wait_rdy(bus);
     IICUNK18(bus) = 0;
     wait_rdy(bus);
