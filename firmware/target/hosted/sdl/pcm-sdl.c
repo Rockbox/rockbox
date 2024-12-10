@@ -57,6 +57,7 @@ static const void *pcm_data;
 static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
+static SDL_AudioDeviceID pcm_devid = 0;
 
 static struct pcm_udata
 {
@@ -97,9 +98,10 @@ static void pcm_dma_apply_settings_nolock(void)
         (void (SDLCALL *)(void *userdata,
             Uint8 *stream, int len))sdl_audio_callback;
     wanted_spec.userdata = &udata;
-    SDL_CloseAudio();
+    if (pcm_devid)
+        SDL_CloseAudioDevice(pcm_devid);
     /* Open the audio device and start playing sound! */
-    if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
+    if((pcm_devid = SDL_OpenAudioDevice(NULL, 0, &wanted_spec, &obtained, 0)) == 0) {
         DEBUGF("Unable to open audio: %s\n", SDL_GetError());
         return;
     }
@@ -114,6 +116,10 @@ static void pcm_dma_apply_settings_nolock(void)
     case AUDIO_U16MSB:
     case AUDIO_S16MSB:
         pcm_channel_bytes = 2;
+        break;
+    case AUDIO_F32MSB:
+    case AUDIO_F32LSB:
+        pcm_channel_bytes = 4;
         break;
     default:
         DEBUGF("Unknown sample format obtained: %u\n",
@@ -143,12 +149,12 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_data = addr;
     pcm_data_size = size;
 
-    SDL_PauseAudio(0);
+    SDL_PauseAudioDevice(pcm_devid, 0);
 }
 
 void pcm_play_dma_stop(void)
 {
-    SDL_PauseAudio(1);
+    SDL_PauseAudioDevice(pcm_devid, 1);
 #ifdef DEBUG
     if (udata.debug != NULL) {
         fclose(udata.debug);
@@ -205,8 +211,7 @@ static void write_to_soundcard(struct pcm_udata *udata)
             }
 #endif
             free(cvt.buf);
-        }
-        else {
+        } else {
             /* Convert is bad, so do silence */
             Uint32 num = wr*obtained.channels;
             udata->num_in = rd;
