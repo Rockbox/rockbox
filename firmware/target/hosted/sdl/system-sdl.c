@@ -268,6 +268,19 @@ void system_init(void)
     if (SDL_InitSubSystem(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
 
+#ifdef SIMULATOR
+    {
+        SDL_version compiled;
+        SDL_version linked;
+
+        SDL_VERSION(&compiled);
+        SDL_GetVersion(&linked);
+        printf("Rockbox compiled with SDL %u.%u.%u but running on SDL %u.%u.%u\n",
+               compiled.major, compiled.minor, compiled.patch,
+               linked.major, linked.minor, linked.patch);
+    }
+#endif
+
 #ifndef __WIN32  /* Fails on Windows */
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     sdl_window_setup();

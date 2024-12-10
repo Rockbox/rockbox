@@ -441,7 +441,7 @@ simcc () {
         echo "re-run configure!"
         exit 2
     else
-        echo Using $sdl
+        echo Using $sdl - version `$sdl --version`
 
         # generic ${sdl_config} checker
         sdlccopts=$($sdl --cflags)
