@@ -3,7 +3,9 @@ rockbox.c
 rbwrappers.c
 rbmalloc.c
 lz4tiny.c
+#ifndef WIN32
 dummy/nullhelp.c
+#endif
 
 /* puzzles core sources */
 src/combi.c

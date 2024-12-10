@@ -35,8 +35,10 @@ src/undead.c
 src/unequal.c
 src/unruly.c
 src/untangle.c
+#ifndef WIN32
 src/unfinished/slide.c
 src/unfinished/sokoban.c
+#endif
 
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000
