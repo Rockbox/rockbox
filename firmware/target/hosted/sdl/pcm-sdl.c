@@ -89,6 +89,10 @@ void pcm_play_unlock(void)
         SDL_UnlockMutex(audio_lock);
 }
 
+#ifndef SDL_AUDIO_ALLOW_SAMPLES_CHANGE
+#define SDL_AUDIO_ALLOW_SAMPLES_CHANGE 0
+#endif
+
 static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len);
 static void pcm_dma_apply_settings_nolock(void)
 {
@@ -120,6 +124,8 @@ static void pcm_dma_apply_settings_nolock(void)
     case AUDIO_S16MSB:
         pcm_channel_bytes = 2;
         break;
+    case AUDIO_S32MSB:
+    case AUDIO_S32LSB:
     case AUDIO_F32MSB:
     case AUDIO_F32LSB:
         pcm_channel_bytes = 4;
