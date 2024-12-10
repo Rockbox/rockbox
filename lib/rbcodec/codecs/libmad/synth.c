@@ -712,8 +712,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
@@ -862,8 +862,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
@@ -981,8 +981,8 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      D0ptr = (void*)&D[0][ p];
-      D1ptr = (void*)&D[0][-p];
+      D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
+      D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
 
       if(s & 1)
       {
