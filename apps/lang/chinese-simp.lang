@@ -10809,23 +10809,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "线路输出"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "线路输出"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -16222,62 +16205,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "立体声切换模式"
-  </dest>
-  <voice>
-    *: "立体声切换模式"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "反转"
-  </dest>
-  <voice>
-    *: "反转"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "总是0"
-  </dest>
-  <voice>
-    *: "总是0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "总是1"
-  </dest>
-  <voice>
-    *: "总是1"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LEGAL_NOTICES
   desc: in system menu
   user: core
@@ -16513,5 +16440,70 @@
   </dest>
   <voice>
     *: "查看专辑封面"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "输出选择"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "输出选择"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "耳机"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "耳机"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "线路输出"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "线路输出"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "~Unable to load font: (%s)"
+  </dest>
+  <voice>
+    *: "字体加载失败"
   </voice>
 </phrase>
