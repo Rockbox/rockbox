@@ -73,9 +73,9 @@ if($update) {
     system("git pull");
 }
 
-$test = `sdl-config --libs`;
+$test = `sdl2-config --libs`;
 if ($test eq "") {
-    printf("You don't appear to have sdl-config\n");
+    printf("You don't appear to have sdl2-config\n");
     die();
 }
 
