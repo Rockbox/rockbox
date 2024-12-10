@@ -58,6 +58,7 @@ bool            background = true;          /* use backgrounds by default */
 bool            showremote = true;          /* include remote by default */
 #endif
 bool            mapping = false;
+const char      *audiodev = NULL;
 bool            debug_buttons = false;
 
 bool            lcd_display_redraw = true;  /* Used for player simulator */
@@ -388,6 +389,15 @@ void sys_handle_argv(int argc, char *argv[])
                     debug_buttons = true;
                     printf("Printing background button clicks.\n");
             }
+            else if (!strcmp("--audiodev", argv[x]))
+            {
+                x++;
+                if (x < argc)
+                {
+                    audiodev = argv[x];
+                    printf("Audio device: '%s'\n", audiodev);
+                }
+            }
             else
             {
                 printf("rockboxui\n");
@@ -405,6 +415,7 @@ void sys_handle_argv(int argc, char *argv[])
                 printf("  --alarm \t Simulate a wake-up on alarm\n");
                 printf("  --root [DIR]\t Set root directory\n");
                 printf("  --mapping \t Output coordinates and radius for mapping backgrounds\n");
+                printf("  --audiodev [NAME] \t Audio device name to use\n");
                 exit(0);
             }
         }

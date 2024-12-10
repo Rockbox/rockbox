@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <SDL.h>
 #include "config.h"
 #include "debug.h"
@@ -47,9 +48,11 @@
 #include "logf.h"
 
 #ifdef DEBUG
-#include <stdio.h>
 extern bool debug_audio;
 #endif
+
+extern const char      *audiodev;
+
 
 static int cvt_status = -1;
 
@@ -101,8 +104,8 @@ static void pcm_dma_apply_settings_nolock(void)
     if (pcm_devid)
         SDL_CloseAudioDevice(pcm_devid);
     /* Open the audio device and start playing sound! */
-    if((pcm_devid = SDL_OpenAudioDevice(NULL, 0, &wanted_spec, &obtained, 0)) == 0) {
-        DEBUGF("Unable to open audio: %s\n", SDL_GetError());
+    if((pcm_devid = SDL_OpenAudioDevice(audiodev, 0, &wanted_spec, &obtained, 0)) == 0) {
+        panicf("Unable to open audio: %s\n", SDL_GetError());
         return;
     }
     switch (obtained.format)
@@ -122,7 +125,7 @@ static void pcm_dma_apply_settings_nolock(void)
         pcm_channel_bytes = 4;
         break;
     default:
-        DEBUGF("Unknown sample format obtained: %u\n",
+        panicf("Unknown sample format obtained: %u\n",
                 (unsigned)obtained.format);
         return;
     }
@@ -365,9 +368,22 @@ void pcm_play_dma_init(void)
 {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO))
     {
-        DEBUGF("Could not initialize SDL audio subsystem!\n");
+        panicf("Could not initialize SDL audio subsystem!\n");
         return;
     }
+
+#ifdef SIMULATOR
+    int cnt = SDL_GetNumAudioDrivers();
+    printf("SDL Audio Drivers supported:\n");
+    for (int i = 0 ; i < cnt ; i++) {
+        printf("   %s %s\n", SDL_GetAudioDriver(i), SDL_GetAudioDriver(i) == SDL_GetCurrentAudioDriver() ? "(active)" : "");
+    }
+    cnt = SDL_GetNumAudioDevices(0);
+    printf("SDL Audio Devices present:\n");
+    for (int i = 0 ; i < cnt ; i++) {
+            printf("  '%s'\n", SDL_GetAudioDeviceName(i, 0));
+    }
+#endif
 
     audio_lock = SDL_CreateMutex();
 
