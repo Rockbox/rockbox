@@ -104,7 +104,7 @@ static void pcm_dma_apply_settings_nolock(void)
     if (pcm_devid)
         SDL_CloseAudioDevice(pcm_devid);
     /* Open the audio device and start playing sound! */
-    if((pcm_devid = SDL_OpenAudioDevice(audiodev, 0, &wanted_spec, &obtained, 0)) == 0) {
+    if((pcm_devid = SDL_OpenAudioDevice(audiodev, 0, &wanted_spec, &obtained, SDL_AUDIO_ALLOW_SAMPLES_CHANGE)) == 0) {
         panicf("Unable to open audio: %s\n", SDL_GetError());
         return;
     }
