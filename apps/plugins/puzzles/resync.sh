@@ -49,7 +49,9 @@ then
     cp -r $SRC "$ROOT"/src
     popd > /dev/null
 
+echo "#ifndef WIN32" >> SOURCES.games
     cat src/unfinished/CMakeLists.txt | awk '/puzzle\(/{p=1} p{print} /\)/{p=0}' | grep -Eo "\(.*$" | tr -dc "a-z\n" | awk '{print "src/unfinished/"$0".c"}' | grep -v "group" | grep -v "separate" >> SOURCES.games
+echo "#endif" >> SOURCES.games
 
     cat <<EOF >> SOURCES.games
 
