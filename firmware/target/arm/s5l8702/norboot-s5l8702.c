@@ -206,36 +206,19 @@ void bootflash_write(int port, int offset, void* addr, int size)
 /*
  * IM3
  */
-static uint32_t get_uint32le(unsigned char *p)
+static inline uint32_t get_uint32le(unsigned char *p)
 {
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
+// TODO: rename to bootflash_im3_sz(), norboot_im3_sz() or nb_im3_sz()
 /* return full IM3 size aligned to NOR sector size */
 unsigned im3_nor_sz(struct Im3Info* hinfo)
 {
     return ALIGN_UP(IM3HDR_SZ + get_uint32le(hinfo->data_sz), 0x1000);
 }
 
-/* calculates SHA1, truncate the result to 128 bits, and encrypt it */
-void im3_sign(uint32_t keyidx, void* data, uint32_t size, void* sign)
-{
-    unsigned char hash[SHA1_SZ];
-    sha1(data, size, hash);
-    memcpy(sign, hash, SIGN_SZ);
-    hwkeyaes(HWKEYAES_ENCRYPT, keyidx, sign, SIGN_SZ);
-}
-
-/* only supports enc_type 1 and 2 (UKEY) */
-void im3_crypt(enum hwkeyaes_direction direction,
-                            struct Im3Info *hinfo, void *fw_addr)
-{
-    uint32_t fw_size = get_uint32le(hinfo->data_sz);
-    hinfo->enc_type = (direction == HWKEYAES_ENCRYPT) ? 1 : 2;
-    im3_sign(HWKEYAES_UKEY, hinfo, IM3INFOSIGN_SZ, hinfo->info_sign);
-    hwkeyaes(direction, HWKEYAES_UKEY, fw_addr, fw_size);
-}
-
+// TODO: norboot_im3_read(), on s5l8720 we could set nandboot_im3_read(), then norboot_ and nandboot_ could go to boot-s5l8702.c
 int im3_read(uint32_t offset, struct Im3Info *hinfo, void *fw_addr)
 {
     unsigned char hash[SIGN_SZ];

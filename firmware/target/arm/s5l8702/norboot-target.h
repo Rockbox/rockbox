@@ -119,46 +119,7 @@ struct SysCfgEntry {
 /*
  * IM3
  */
-#define IM3_IDENT       "8702"
-#define IM3_VERSION     "1.0"
-#define IM3HDR_SZ       0x800
-#define IM3INFO_SZ      (sizeof(struct Im3Info))
-#define IM3INFOSIGN_SZ  (offsetof(struct Im3Info, info_sign))
-
-#define SIGN_SZ     16
-
-struct Im3Info
-{
-    uint8_t ident[4];
-    uint8_t version[3];
-    uint8_t enc_type;
-    uint8_t entry[4];   /* LE */
-    uint8_t data_sz[4]; /* LE */
-    union {
-        struct {
-            uint8_t data_sign[SIGN_SZ];
-            uint8_t _reserved[32];
-        } enc12;
-        struct {
-            uint8_t sign_off[4]; /* LE */
-            uint8_t cert_off[4]; /* LE */
-            uint8_t cert_sz[4];  /* LE */
-            uint8_t _reserved[36];
-        } enc34;
-    } u;
-    uint8_t info_sign[SIGN_SZ];
-} __attribute__ ((packed));
-
-struct Im3Hdr
-{
-    struct Im3Info info;
-    uint8_t _zero[IM3HDR_SZ - sizeof(struct Im3Info)];
-} __attribute__ ((packed));
-
 unsigned im3_nor_sz(struct Im3Info* hinfo);
-void im3_sign(uint32_t keyidx, void* data, uint32_t size, void* sign);
-void im3_crypt(enum hwkeyaes_direction direction,
-                            struct Im3Info *hinfo, void *fw_addr);
 int im3_read(uint32_t offset, struct Im3Info *hinfo, void *fw_addr);
 bool im3_write(int offset, void *im3_addr);
 

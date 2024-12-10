@@ -68,6 +68,10 @@ void sha1(void* data, uint32_t size, void* hash)
     while (SHA1CONFIG & 1);
     SHA1RESET = 0;
     SHA1CONFIG = 0;
+#if CONFIG_CPU == S5L8720
+    SHA1UNK10 = 0;
+    SHA1UNK80 = 0;
+#endif    
     while (!done)
     {
         space = ((uint32_t)databuf) - ((uint32_t)data) - size + 64;
@@ -99,4 +103,32 @@ void sha1(void* data, uint32_t size, void* hash)
     }
     for (i = 0; i < 5; i++) *hashbuf++ = SHA1RESULT[i];
     clockgate_enable(CLOCKGATE_SHA, false);
+}
+
+
+/*
+ * IM3
+ */
+static inline uint32_t get_uint32le(unsigned char *p)
+{
+    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+/* calculates SHA1, truncate the result to 128 bits, and encrypt it */
+void im3_sign(uint32_t keyidx, void* data, uint32_t size, void* sign)
+{
+    unsigned char hash[SHA1_SZ];
+    sha1(data, size, hash);
+    memcpy(sign, hash, SIGN_SZ);
+    hwkeyaes(HWKEYAES_ENCRYPT, keyidx, sign, SIGN_SZ);
+}
+
+/* only supports enc_type 1 and 2 (UKEY) */
+void im3_crypt(enum hwkeyaes_direction direction,
+                            struct Im3Info *hinfo, void *fw_addr)
+{
+    uint32_t fw_size = get_uint32le(hinfo->data_sz);
+    hinfo->enc_type = (direction == HWKEYAES_ENCRYPT) ? 1 : 2;
+    im3_sign(HWKEYAES_UKEY, hinfo, IM3INFOSIGN_SZ, hinfo->info_sign);
+    hwkeyaes(direction, HWKEYAES_UKEY, fw_addr, fw_size);
 }
