@@ -1012,7 +1012,7 @@ static void show_help(void)
                                  "Introduction", "",
                                  "This", "plugin", "allows", "you", "to", "generate", "one-time", "passwords", "to", "provide", "a", "second", "factor", "of", "authentication", "for", "services", "that", "support", "it.",
                                  "It", "suppports", "both", "event-based", "(HOTP),", "and", "time-based", "(TOTP)", "password", "schemes.",
-                                 "In", "order", "to", "ensure", "proper", "functioning", "of", "time-based", "passwords", "ensure", "that", "the", "clock", "is", "accurate", "to", "within", "30", "seconds", "of", "actual", "time."
+                                 "In", "order", "to", "ensure", "proper", "functioning", "of", "time-based", "passwords", "ensure", "that", "the", "clock", "is", "accurate", "to", "within", "30", "seconds", "of", "actual", "time.",
                                  "Note", "that", "some", "devices", "lack", "a", "real-time", "clock,", "so", "time-based", "passwords", "are", "not", "supported", "on", "those", "targets." };
 
     struct style_text style[] = {
