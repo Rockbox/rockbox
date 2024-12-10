@@ -1107,7 +1107,8 @@ static void track_info_callback(unsigned short id, void *param)
         state->id3 = audio_current_track();
     }
 #endif
-    state->nid3 = audio_next_track();
+    if (id == PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE)
+        state->nid3 = audio_next_track();
     skin_request_full_update(WPS);
 }
 
