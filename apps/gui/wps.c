@@ -116,31 +116,40 @@ static void update_non_static(void)
         skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
 }
 
-void pause_action(bool updatewps)
+void wps_do_action(enum wps_do_action_type action, bool updatewps)
 {
-    /* Do audio first, then update, unless skin were to use its local
-       status in which case, reverse it */
-    audio_pause();
+    if (action == WPS_PLAYPAUSE) /* toggle the status */
+    {
+        struct wps_state *state = get_wps_state();
+        if (state->paused)
+            action = WPS_PLAY;
 
-    if (updatewps)
-        update_non_static();
-
-    if (global_settings.pause_rewind) {
-        long newpos;
-
-        audio_pre_ff_rewind();
-        newpos = audio_current_track()->elapsed
-            - global_settings.pause_rewind * 1000;
-        audio_ff_rewind(newpos > 0 ? newpos : 0);
+        state->paused = !state->paused;
     }
-}
 
-void unpause_action(bool updatewps)
-{
-    /* Do audio first, then update, unless skin were to use its local
-       status in which case, reverse it */
-    audio_resume();
+    if (action == WPS_PLAY) /* unpause_action */
+    {
+        audio_resume();
+    }
+    else /* WPS_PAUSE pause_action */
+    {
+        audio_pause();
 
+        if (global_settings.pause_rewind) {
+            unsigned long elapsed = audio_current_track()->elapsed;
+            long newpos = elapsed - (global_settings.pause_rewind * 1000);
+
+            audio_pre_ff_rewind();
+            audio_ff_rewind(newpos > 0 ? newpos : 0);
+        }
+        if (action == WPS_PLAYPAUSE)
+        {
+            settings_save();
+    #if !defined(HAVE_SW_POWEROFF)
+            call_storage_idle_notifys(true);   /* make sure resume info is saved */
+    #endif
+        }
+    }
     if (updatewps)
         update_non_static();
 }
@@ -601,25 +610,6 @@ static void gwps_enter_wps(bool theme_enabled)
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
-void wps_do_playpause(bool updatewps)
-{
-    struct wps_state *state = get_wps_state();
-    if ( state->paused )
-    {
-        state->paused = false;
-        unpause_action(updatewps);
-    }
-    else
-    {
-        state->paused = true;
-        pause_action(updatewps);
-        settings_save();
-#if !defined(HAVE_SW_POWEROFF)
-        call_storage_idle_notifys(true);   /* make sure resume info is saved */
-#endif
-    }
-}
-
 static long do_wps_exit(long action, bool bookmark)
 {
     audio_pause();
@@ -670,6 +660,32 @@ static long do_party_mode(long action)
         }
     }
     return action;
+}
+
+static inline int action_wpsab_single(long button)
+{
+/* The iPods/X5/M5 use a single button for the A-B mode markers,
+   defined as ACTION_WPSAB_SINGLE in their config files. */
+#ifdef ACTION_WPSAB_SINGLE
+        static int wps_ab_state = 0;
+        if (button == ACTION_WPSAB_SINGLE && ab_repeat_mode_enabled())
+        {
+            switch (wps_ab_state)
+            {
+                case 0: /* set the A spot */
+                    button = ACTION_WPS_ABSETA_PREVDIR;
+                    break;
+                case 1: /* set the B spot */
+                    button = ACTION_WPS_ABSETB_NEXTDIR;
+                    break;
+                case 2:
+                    button = ACTION_WPS_ABRESET;
+                    break;
+            }
+            wps_ab_state = (wps_ab_state+1) % 3;
+        }
+#endif /* def ACTION_WPSAB_SINGLE */
+    return button;
 }
 
 /* The WPS can be left in two ways:
@@ -770,27 +786,7 @@ long gui_wps_show(void)
 #endif
         button = do_party_mode(button); /* block select actions in party mode */
 
-/* The iPods/X5/M5 use a single button for the A-B mode markers,
-   defined as ACTION_WPSAB_SINGLE in their config files. */
-#ifdef ACTION_WPSAB_SINGLE
-        static int wps_ab_state = 0;
-        if (button == ACTION_WPSAB_SINGLE && ab_repeat_mode_enabled())
-        {
-            switch (wps_ab_state)
-            {
-                case 0: /* set the A spot */
-                    button = ACTION_WPS_ABSETA_PREVDIR;
-                    break;
-                case 1: /* set the B spot */
-                    button = ACTION_WPS_ABSETB_NEXTDIR;
-                    break;
-                case 2:
-                    button = ACTION_WPS_ABRESET;
-                    break;
-            }
-            wps_ab_state = (wps_ab_state+1) % 3;
-        }
-#endif /* def ACTION_WPSAB_SINGLE */
+        button = action_wpsab_single(button); /* iPods/X5/M5 */
 
         switch(button)
         {
@@ -848,7 +844,7 @@ long gui_wps_show(void)
 
                 /* play/pause */
             case ACTION_WPS_PLAY:
-                wps_do_playpause(true);
+                wps_do_action(WPS_PLAYPAUSE, true);
                 break;
 
             case ACTION_WPS_VOLUP: /* fall through */

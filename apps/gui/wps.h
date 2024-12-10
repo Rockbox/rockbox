@@ -36,10 +36,18 @@ struct wps_state
 
 long gui_wps_show(void);
 
+enum wps_do_action_type
+{
+    WPS_PLAY = AUDIO_STATUS_PLAY,
+    WPS_PAUSE = AUDIO_STATUS_PAUSE,
+    WPS_PLAYPAUSE, /* toggle */
+};
+
+void wps_do_action(enum wps_do_action_type, bool updatewps);
 /* fade (if enabled) and pause the audio, optionally rewind a little */
-void pause_action(bool updatewps);
-void unpause_action(bool updatewps);
-void wps_do_playpause(bool updatewps);
+#define pause_action(update) wps_do_action(WPS_PAUSE, update)
+#define unpause_action(update) wps_do_action(WPS_PLAY, update)
+#define wps_do_playpause(update) wps_do_action(WPS_PLAYPAUSE, update)
 
 struct wps_state *get_wps_state(void);
 
