@@ -38,8 +38,8 @@ long gui_wps_show(void);
 
 enum wps_do_action_type
 {
-    WPS_PLAY = AUDIO_STATUS_PLAY,
-    WPS_PAUSE = AUDIO_STATUS_PAUSE,
+    WPS_PLAY,
+    WPS_PAUSE,
     WPS_PLAYPAUSE, /* toggle */
 };
 
