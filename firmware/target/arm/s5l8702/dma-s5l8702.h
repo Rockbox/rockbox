@@ -32,13 +32,15 @@ extern struct dmac s5l8702_dmac0;
 extern struct dmac s5l8702_dmac1;
 
 #define S5L8702_DMAC_COUNT          2   /* N PL080 controllers */
-#define S5L8702_DMAC0_BASE          0x38200000
-#define S5L8702_DMAC1_BASE          0x39900000
+#define S5L8702_DMAC0_BASE          DMA0_BASE
+#define S5L8702_DMAC1_BASE          DMA1_BASE
 
 /* S5L7802 DMAC0 peripherals */
 #define S5L8702_DMAC0_PERI_IIS2_TX          0x0
 #define S5L8702_DMAC0_PERI_IIS2_RX          0x1
-#define S5L8702_DMAC0_PERI_UNKNOWN          0x2
+#if CONFIG_CPU == S5L8702
+#define S5L8702_DMAC0_PERI_SPDIF_TX         0x2
+#endif
 #define S5L8702_DMAC0_PERI_LCD_WR           0x3
 #define S5L8702_DMAC0_PERI_SPI0_TX          0x4
 #define S5L8702_DMAC0_PERI_SPI0_RX          0x5
@@ -55,21 +57,27 @@ extern struct dmac s5l8702_dmac1;
 
 /* S5L7802 DMAC1 peripherals */
 #define S5L8702_DMAC1_PERI_CEATA_WR         0x0
+#if CONFIG_CPU == S5L8702
 #define S5L8702_DMAC1_PERI_CEATA_RD         0x1
+#endif
 #define S5L8702_DMAC1_PERI_IIS1_TX          0x2
 #define S5L8702_DMAC1_PERI_IIS1_RX          0x3
 #define S5L8702_DMAC1_PERI_IIS2_TX          0x4
 #define S5L8702_DMAC1_PERI_IIS2_RX          0x5
+#if CONFIG_CPU == S5L8702
 #define S5L8702_DMAC1_PERI_SPI1_TX          0x6
 #define S5L8702_DMAC1_PERI_SPI1_RX          0x7
+#endif
 #define S5L8702_DMAC1_PERI_UART2_TX         0x8
 #define S5L8702_DMAC1_PERI_UART2_RX         0x9
 #define S5L8702_DMAC1_PERI_SPI0_TX          0xA
 #define S5L8702_DMAC1_PERI_SPI0_RX          0xB
 #define S5L8702_DMAC1_PERI_UART3_TX         0xC
 #define S5L8702_DMAC1_PERI_UART3_RX         0xD
+#if CONFIG_CPU == S5L8702
 #define S5L8702_DMAC1_PERI_SPI2_TX          0xE
 #define S5L8702_DMAC1_PERI_SPI2_RX          0xF
+#endif
 
 /* used when src and/or dst peripheral is memory */
 #define S5L8702_DMAC0_PERI_MEM              DMAC_PERI_NONE
@@ -77,15 +85,26 @@ extern struct dmac s5l8702_dmac1;
 
 /* s5l8702 peripheral DMA R/W addesses */
 #define S5L8702_DADDR_PERI_LCD_WR           0x38300040
-#define S5L8702_DADDR_PERI_UNKNOWN          0x3CB00010  /* SPDIF ??? */
+#if CONFIG_CPU == S5L8702
+#define S5L8702_DADDR_PERI_SPDIF_TX         0x3CB00010  /* TBC */
+#endif
 #define S5L8702_DADDR_PERI_UART0_TX         0x3CC00020
 #define S5L8702_DADDR_PERI_UART0_RX         0x3CC00024
+#if CONFIG_CPU == S5L8702
 #define S5L8702_DADDR_PERI_UART1_TX         0x3CC04020
 #define S5L8702_DADDR_PERI_UART1_RX         0x3CC04024
 #define S5L8702_DADDR_PERI_UART2_TX         0x3CC08020
 #define S5L8702_DADDR_PERI_UART2_RX         0x3CC08024
 #define S5L8702_DADDR_PERI_UART3_TX         0x3CC0C020
 #define S5L8702_DADDR_PERI_UART3_RX         0x3CC0C024
+#elif CONFIG_CPU == S5L8720
+#define S5L8702_DADDR_PERI_UART1_TX         0x3DB00020
+#define S5L8702_DADDR_PERI_UART1_RX         0x3DB00024
+#define S5L8702_DADDR_PERI_UART2_TX         0x3DC00020
+#define S5L8702_DADDR_PERI_UART2_RX         0x3DC00024
+#define S5L8702_DADDR_PERI_UART3_TX         0x3DD00020
+#define S5L8702_DADDR_PERI_UART3_RX         0x3DD00024
+#endif
 #define S5L8702_DADDR_PERI_IIS0_TX          0x3CA00010
 #define S5L8702_DADDR_PERI_IIS0_RX          0x3CA00038
 #define S5L8702_DADDR_PERI_IIS1_TX          0x3CD00010
@@ -93,7 +112,9 @@ extern struct dmac s5l8702_dmac1;
 #define S5L8702_DADDR_PERI_IIS2_TX          0x3D400010
 #define S5L8702_DADDR_PERI_IIS2_RX          0x3D400038
 #define S5L8702_DADDR_PERI_CEATA_WR         0x38A00080
+#if CONFIG_CPU == S5L8702
 #define S5L8702_DADDR_PERI_CEATA_RD         0x38A04080
+#endif
 #define S5L8702_DADDR_PERI_SPI0_TX          0x3C300010
 #define S5L8702_DADDR_PERI_SPI0_RX          0x3C300020
 #define S5L8702_DADDR_PERI_SPI1_TX          0x3CE00010
