@@ -136,7 +136,7 @@
 #include "rb-loader.h"
 #endif
 
-#if defined(IPOD_6G)
+#if defined(IPOD_6G) && !defined(SIMULATOR)
 #include "norboot-target.h"
 #endif
 
