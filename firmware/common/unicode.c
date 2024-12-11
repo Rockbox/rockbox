@@ -245,8 +245,8 @@ static int alloc_and_load_cp_table(int cp, void *buf)
     return -1;
 }
 
-/* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
-unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
+/* returns number of additional bytes required in encoded string (bytes_count - 1) */
+static int utf8_ucs_get_extra_bytes_count(unsigned long ucs)
 {
     int tail = 0;
 
@@ -254,17 +254,41 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
         while (ucs >> (5*tail + 6))
             tail++;
 
+    return tail;
+}
+
+static unsigned char * utf8encode_internal(unsigned long ucs, unsigned char *utf8, int tail)
+{
     *utf8++ = (ucs >> (6*tail)) | utf8comp[tail];
     while (tail--)
         *utf8++ = ((ucs >> (6*tail)) & (MASK ^ 0xFF)) | COMP;
-
     return utf8;
 }
 
-/* Recode an iso encoded string to UTF-8 */
-unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
-                          int cp, int count)
+static unsigned char* utf8encode_ex(unsigned long ucs, unsigned char *utf8, int* utf8_size)
 {
+    const int tail = utf8_ucs_get_extra_bytes_count(ucs);
+    *utf8_size -= tail + 1;
+    return  *utf8_size < 0 ? utf8 : utf8encode_internal(ucs, utf8, tail);
+}
+
+/* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
+unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
+{
+    return utf8encode_internal(ucs, utf8, utf8_ucs_get_extra_bytes_count(ucs));
+}
+
+unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8, int cp, int count)
+{
+    return iso_decode_ex(iso, utf8, cp, count, -1);
+}
+
+/* Recode an iso encoded string to UTF-8 */
+unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int cp, int count, int utf8_size)
+{
+    if (utf8_size == -1)
+        utf8_size = INT_MAX;
+
     uint16_t *table = NULL;
 
     cp_lock_enter();
@@ -322,11 +346,14 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
 
     cp_lock_leave();
 
-    while (count--) {
+    while (count-- && utf8_size > 0) {
         unsigned short ucs, tmp;
 
         if (*iso < 128 || cp == UTF_8) /* Already UTF-8 */
+        {
             *utf8++ = *iso++;
+            --utf8_size;
+        }
 
         else {
             /* tid tells us which table to use and how */
@@ -375,7 +402,8 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
 
             if (ucs == 0) /* unknown char, use replacement char */
                 ucs = 0xfffd;
-            utf8 = utf8encode(ucs, utf8);
+
+            utf8 = utf8encode_ex(ucs, utf8, &utf8_size);
         }
     }
 

@@ -314,7 +314,6 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                 break;
 
             size_t count = MAX_NAME*3 + 1;
-            size_t count8859 = MAX_NAME;
 
             switch (option)
             {
@@ -339,7 +338,6 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 
                     dest = cue->file;
                     count = MAX_PATH;
-                    count8859 = MAX_PATH/3;
                     break;
                 case eCS_TRACK:
                     /*Fall-Through*/
@@ -357,8 +355,8 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
             {
                 if (char_enc == CHAR_ENC_ISO_8859_1)
                 {
-                    dest = iso_decode(string, dest, -1,
-                        MIN(strlen(string), count8859));
+                    dest = iso_decode_ex(string, dest, -1,
+                        strlen(string), count - 1);
                     *dest = '\0';
                 }
                 else

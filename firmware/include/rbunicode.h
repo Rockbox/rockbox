@@ -57,6 +57,8 @@ enum codepages {
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
 unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);
 unsigned char* iso_decode(const unsigned char *latin1, unsigned char *utf8, int cp, int count);
+unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int cp, int count, int utf8_size);
+
 unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
 bool utf16_has_bom(const unsigned char *utf16, bool *le);

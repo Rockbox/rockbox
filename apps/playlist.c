@@ -350,14 +350,7 @@ static int convert_m3u_name(char* buf, int buf_len, int buf_max, char* temp)
     buf_len = i;
     dest = temp;
 
-    /* Convert char by char, so as to not overflow temp (iso_decode should
-     * preferably handle this). No more than 4 bytes should be generated for
-     * each input char.
-     */
-    for (i = 0; i < buf_len && dest < (temp + buf_max - 4); i++)
-    {
-        dest = iso_decode(&buf[i], dest, -1, 1);
-    }
+    dest = iso_decode_ex(buf, dest, -1, buf_len, buf_max - 1);
 
     *dest = 0;
     strcpy(buf, temp);

@@ -568,22 +568,16 @@ static bool parse_as_utf8(char* string, int *len)
 
 /* Must be called after parse_as_utf8. Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
-   we convert from the default codepage */
-static void unicode_munge(char* string, char* utf8buf, int *len) {
+   we convert from the default codepage
+   NOTE: real UTF-8 buffer size is expected to be utf8buf_size + 1 (additional byte for string terminator) */
+static void unicode_munge(unsigned char* string, unsigned char* utf8buf, int *len, int utf8buf_size) {
+    unsigned char *str = string;
+    unsigned char* utf8 = utf8buf;
+
     int i = 0;
-    unsigned char *str = (unsigned char *)string;
     int templen = 0;
-    unsigned char* utf8 = (unsigned char *)utf8buf;
 
     switch (str[0]) {
-        case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
-            str++;
-            (*len)--;
-            utf8 = iso_decode(str, utf8, -1, *len);
-            *utf8 = 0;
-            *len = (intptr_t)utf8 - (intptr_t)utf8buf;
-            break;
-
         case 0x01: /* Unicode with or without BOM */
         case 0x02:
             (*len)--;
@@ -618,10 +612,15 @@ static void unicode_munge(char* string, char* utf8buf, int *len) {
             *len = templen - 1;
             break;
         /* case 0x03:  UTF-8 encoded string handled by parse_as_utf8 */
+
+        case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
+            str++;
+            (*len)--;
+        //fallthrough
         default: /* Plain old string */
-            utf8 = iso_decode(str, utf8, -1, *len);
+            utf8 = iso_decode_ex(str, utf8, -1, *len, utf8buf_size);
             *utf8 = 0;
-            *len = (intptr_t)utf8 - (intptr_t)utf8buf;
+            *len = utf8 - utf8buf;
             break;
     }
 }
@@ -1103,10 +1102,9 @@ retry_with_limit:
                         {
                             //limit stack allocation to avoid stack overflow
                             utf8_size = ID3V2_BUF_SIZE;
-                            bytesread = ID3V2_BUF_SIZE/3;
                         }
-                        char utf8buf[utf8_size + 1];
-                        unicode_munge( tag, utf8buf, &bytesread);
+                        unsigned char utf8buf[utf8_size + 1];
+                        unicode_munge( (unsigned char *)tag, utf8buf, &bytesread, utf8_size);
                         if(bytesread >= buffersize - bufferpos)
                             bytesread = buffersize - bufferpos - 1;
 
