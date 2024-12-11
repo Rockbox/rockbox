@@ -570,8 +570,6 @@ static bool parse_as_utf8(char* string, int *len)
    string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
    we convert from the default codepage */
 static void unicode_munge(char* string, char* utf8buf, int *len) {
-    long tmp;
-    bool le = false;
     int i = 0;
     unsigned char *str = (unsigned char *)string;
     int templen = 0;
@@ -590,28 +588,17 @@ static void unicode_munge(char* string, char* utf8buf, int *len) {
         case 0x02:
             (*len)--;
             str++;
+            bool le;
+
 
             /* Handle frames with more than one string
                (needed for TXXX frames).*/
             do {
-                tmp = bytes2int(0, 0, str[0], str[1]);
-
-                /* Now check if there is a BOM
-                   (zero-width non-breaking space, 0xfeff)
-                   and if it is in little or big endian format */
-                if(tmp == 0xfffe) { /* Little endian? */
-                    le = true;
-                    str += 2;
-                    (*len)-=2;
-                } else if(tmp == 0xfeff) { /* Big endian? */
-                    str += 2;
-                    (*len)-=2;
-                } else
-                /* If there is no BOM (which is a specification violation),
-                   let's try to guess it. If one of the bytes is 0x00, it is
-                   probably the most significant one. */
-                    if(str[1] == 0)
-                        le = true;
+                if (utf16_has_bom(str, &le))
+                {
+                    str += BOM_UTF_16_SIZE;
+                    *len -= BOM_UTF_16_SIZE;
+                }
 
                 while ((i < *len) && (str[0] || str[1])) {
                     if(le)
@@ -734,17 +721,17 @@ static bool is_cuesheet(char *tag, unsigned char *char_enc, unsigned char *cuesh
     switch (*(tag++))
     {
         case 0x01:
-            if (!memcmp(tag, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
-                *char_enc = CHAR_ENC_UTF_16_BE;
-            else if (!memcmp(tag, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
-                *char_enc = CHAR_ENC_UTF_16_LE;
-            else
+        {
+            bool le;
+            if (!utf16_has_bom(tag, &le))
                 return false;
 
+            *char_enc = le ? CHAR_ENC_UTF_16_LE: CHAR_ENC_UTF_16_BE;
             tag+= BOM_UTF_16_SIZE;
             /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
             *cuesheet_offset = 21;
             break;
+        }
 
         case 0x02:
             *char_enc = CHAR_ENC_UTF_16_BE;

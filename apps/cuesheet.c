@@ -231,15 +231,14 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
             char_enc = CHAR_ENC_UTF_8;
             bom_read = BOM_UTF_8_SIZE;
         }
-        else if(!memcmp(line, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
+        else
         {
-            char_enc = CHAR_ENC_UTF_16_LE;
-            bom_read = BOM_UTF_16_SIZE;
-        }
-        else if(!memcmp(line, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
-        {
-            char_enc = CHAR_ENC_UTF_16_BE;
-            bom_read = BOM_UTF_16_SIZE;
+            bool le;
+            if (utf16_has_bom(line, &le))
+            {
+                char_enc = le ? CHAR_ENC_UTF_16_LE : CHAR_ENC_UTF_16_BE;
+                bom_read = BOM_UTF_16_SIZE;
+            }
         }
     }
 

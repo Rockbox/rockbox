@@ -29,6 +29,7 @@
 #define _RBUNICODE_H_
  
 #include "config.h"
+#include <stdbool.h>
 
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */
@@ -58,6 +59,7 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);
 unsigned char* iso_decode(const unsigned char *latin1, unsigned char *utf8, int cp, int count);
 unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
+bool utf16_has_bom(const unsigned char *utf16, bool *le);
 unsigned long utf8length(const unsigned char *utf8);
 const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
 void set_codepage(int cp);

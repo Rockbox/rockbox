@@ -437,6 +437,28 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
     return utf8;
 }
 
+bool utf16_has_bom(const unsigned char *utf16, bool *le)
+{
+    unsigned long ucs = utf16[0] << 8 | utf16[1];
+
+    if (ucs == 0xFEFF) /* Check for BOM */
+    {
+        *le  = false;
+        return true;
+    }
+
+    if (ucs == 0xFFFE)
+    {
+        *le = true;
+        return true;
+    }
+
+    /* If there is no BOM let's try to guess it. If one of the bytes is 0x00, it is
+       probably the most significant one. */
+    *le = utf16[1] == 0;
+    return false;
+}
+
 #if 0 /* currently unused */
 /* Recode any UTF-16 string to UTF-8 */
 unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
