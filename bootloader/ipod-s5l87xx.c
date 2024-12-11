@@ -422,7 +422,7 @@ void main(void)
 #ifdef HAVE_MULTIDRIVE
             for (int i = 0 ; i < NUM_DRIVES ; i++)
 #endif
-                disk_set_sector_multiplier(IF_MD(i,) DEFAULT_VIRT_SECTOR_SIZE);
+                disk_set_sector_multiplier(IF_MD(i,) DEFAULT_VIRT_SECTOR_SIZE/SECTOR_SIZE);
 #endif
         usb_mode();
     }
