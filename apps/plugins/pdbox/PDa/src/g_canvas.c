@@ -14,7 +14,7 @@ to be different but are now unified except for some fossilized names.) */
  * changed the canvas_restore, so that it might accept $args as well
  * (like "pd $0_test")
  * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
+ * 1511:forum::fÃ¼r::umlÃ¤ute:2001
  * changes marked with    IOhannes
  */
 

@@ -6,7 +6,7 @@
 /* IOhannes :
  * changed the canvas_restore in "g_canvas.c", so that it might accept $args as well (like "pd $0_test")
  * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
+ * 1511:forum::fÃ¼r::umlÃ¤ute:2001
  * change marked with    IOhannes
  */
 

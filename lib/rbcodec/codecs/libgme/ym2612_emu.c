@@ -10,7 +10,7 @@
 
 #include "ym2612_emu.h"
 
-/* Copyright (C) 2002 Stéphane Dallongeville (gens AT consolemul.com) */
+/* Copyright (C) 2002 StÃ©phane Dallongeville (gens AT consolemul.com) */
 /* Copyright (C) 2004-2007 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation; either
@@ -1307,7 +1307,7 @@ static void impl_run( struct Ym2612_Impl* impl, int pair_count, short out [] )
 	if ( impl->YM2612.Mode & 3 )
 		run_timer( impl, pair_count );
 	
-	// Mise à jour des pas des compteurs-frequences s'ils ont ete modifies
+	// Mise Ã  jour des pas des compteurs-frequences s'ils ont ete modifies
 	
 	int chi;
 	for ( chi = 0; chi < ym2612_channel_count; chi++ )
@@ -1331,7 +1331,7 @@ static void impl_run( struct Ym2612_Impl* impl, int pair_count, short out [] )
 			int ksr = ch->KC [i2] >> sl->KSR_S;   // keycode attenuation
 			sl->Finc = (finc + sl->DT [ch->KC [i2]]) * sl->MUL;
 			if (sl->KSR != ksr)          // si le KSR a change alors
-			{                       // les differents taux pour l'enveloppe sont mis à jour
+			{                       // les differents taux pour l'enveloppe sont mis Ã  jour
 				sl->KSR = ksr;
 
 				sl->EincA = sl->AR [ksr];

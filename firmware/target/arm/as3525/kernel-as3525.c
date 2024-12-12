@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2008 Rafaël Carré
+ * Copyright Â© 2008 RafaÃ«l CarrÃ©
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

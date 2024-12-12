@@ -1696,26 +1696,26 @@ uint_64_t getConvertedDEHBits(uint_64_t bits) {
                                           MF_JUSTHIT, // 6 In pain. Will try to attack right back after being hit
                                           MF_JUSTATTACKED, // 7 Steps before attack. Will take at least one step before attacking
                                           MF_SPAWNCEILING, // 8 Hangs from ceiling. When the level starts, this thing will be at ceiling height.
-                                          MF_NOGRAVITY, // 9 No gravity – Gravity does not affect this thing
-                                          MF_DROPOFF, // 10 Travels over cliffs – Monsters normally do not walk off ledges/steps they could not walk up. With this set they can walk off any height of cliff. Usually only used for flying monsters.
-                                          MF_PICKUP, // 11 Pick up items – The thing can pick up gettable items.
+                                          MF_NOGRAVITY, // 9 No gravity â€“ Gravity does not affect this thing
+                                          MF_DROPOFF, // 10 Travels over cliffs â€“ Monsters normally do not walk off ledges/steps they could not walk up. With this set they can walk off any height of cliff. Usually only used for flying monsters.
+                                          MF_PICKUP, // 11 Pick up items â€“ The thing can pick up gettable items.
                                           MF_NOCLIP, // 12 No clipping - Thing can walk through walls.
-                                          MF_SLIDE, // 13 Slides along walls – Keep info about sliding along walls (don’t really know much about this one).
-                                          MF_FLOAT, // 14 Floating – Thing can move to any height
-                                          MF_TELEPORT, // 15 Semi no clipping – Don’t cross lines or look at teleport heights. (don’t really know much about this one either).
-                                          MF_MISSILE, // 16 Projectiles – Behaves like a projectile, explodes when hitting something that blocks movement
-                                          MF_DROPPED, // 17 Disappearing weapon – Dropped, not spawned (like an ammo clip) I have not had much success in using this one.
-                                          MF_SHADOW, // 18 Partial invisibility – Drawn like a spectre.
-                                          MF_NOBLOOD, // 19 Puffs (vs. bleeds) – If hit will spawn bullet puffs instead of blood splats.
-                                          MF_CORPSE, // 20 Sliding helpless – Will slide down steps when dead.
+                                          MF_SLIDE, // 13 Slides along walls â€“ Keep info about sliding along walls (donâ€™t really know much about this one).
+                                          MF_FLOAT, // 14 Floating â€“ Thing can move to any height
+                                          MF_TELEPORT, // 15 Semi no clipping â€“ Donâ€™t cross lines or look at teleport heights. (donâ€™t really know much about this one either).
+                                          MF_MISSILE, // 16 Projectiles â€“ Behaves like a projectile, explodes when hitting something that blocks movement
+                                          MF_DROPPED, // 17 Disappearing weapon â€“ Dropped, not spawned (like an ammo clip) I have not had much success in using this one.
+                                          MF_SHADOW, // 18 Partial invisibility â€“ Drawn like a spectre.
+                                          MF_NOBLOOD, // 19 Puffs (vs. bleeds) â€“ If hit will spawn bullet puffs instead of blood splats.
+                                          MF_CORPSE, // 20 Sliding helpless â€“ Will slide down steps when dead.
                                           MF_INFLOAT, // 21 No auto levelling - float but not to target height (?)
-                                          MF_COUNTKILL, // 22 Affects kill % – counted as a killable enemy and affects percentage kills on level summary.
-                                          MF_COUNTITEM, // 23 Affects item % –affects percentage items gathered on level summary.
+                                          MF_COUNTKILL, // 22 Affects kill % â€“ counted as a killable enemy and affects percentage kills on level summary.
+                                          MF_COUNTITEM, // 23 Affects item % â€“affects percentage items gathered on level summary.
                                           MF_SKULLFLY, // 24 Running - special handling for flying skulls.
                                           MF_NOTDMATCH, // 25 Not in deathmatch - do not spawn in deathmatch (like keys)
                                           MF_TRANSLATION1, // 26 Color 1 (grey / red)
                                           MF_TRANSLATION2, // 27 Color 2 (brown / red)
-                                          MF_TRANSLATION, // 28 and 29 allow the green colours in a thing’s graphics to be remapped to a different colour like the players uniforms in multiplayer games. Leaving all the bits alone, the thing stays green. Setting 26 it becomes grey. Setting 27 it becomes brown. Setting both 26 and 27 it becomes red.
+                                          MF_TRANSLATION, // 28 and 29 allow the green colours in a thingâ€™s graphics to be remapped to a different colour like the players uniforms in multiplayer games. Leaving all the bits alone, the thing stays green. Setting 26 it becomes grey. Setting 27 it becomes brown. Setting both 26 and 27 it becomes red.
                                           MF_TRANSLATION,
                                           0,
                                           0

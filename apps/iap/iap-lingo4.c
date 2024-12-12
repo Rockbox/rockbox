@@ -177,15 +177,15 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *  4   0x00  Command ID (bits 15:8)
              *  5   0x01  Command ID (bits 7:0)
              *  6   0xNN  Command result status. Possible values are:
-             *           †0x00 = Success (OK)
+             *            0x00 = Success (OK)
              *            0x01 = ERROR: Unknown database category
-             *           †0x02 = ERROR: Command failed
+             *            0x02 = ERROR: Command failed
              *            0x03 = ERROR: Out of resources
              *            0x04 = ERROR: Bad parameter
              *            0x05 = ERROR: Unknown ID
              *            0x06 = Reserved
              *            0x07 = Accessory not authenticated
-             *           †0x08 - 0xFF = Reserved
+             *            0x08 - 0xFF = Reserved
              *  7  0xNN   The ID of the command being acknowledged (bits 15:8).
              *  8  0xNN   The ID of the command being acknowledged (bits 7:0).
              *  9  0xNN   Telegram payload checksum byte
@@ -429,7 +429,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             /* The following is the description for the Apple Firmware
              *
              * Requests the current iPod audiobook speed state. The iPod
-             * responds with the ìCommand 0x000A: ReturnAudiobookSpeedî
+             * responds with the ‚ÄúCommand 0x000A: ReturnAudiobookSpeed‚Äù
              * telegram indicating the current audiobook speed.
              *
              * Byte Value Meaning
@@ -1283,7 +1283,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * GetNumberCategorizedDBRecords must be called to initialize the
              * category count before selecting a database record using Command
              * 0x0017: SelectDBRecord or Command 0x0038: SelectSortDBRecord
-             * commands. A categoryís record count can change based on the prior
+             * commands. A category‚Äôs record count can change based on the prior
              * categories selected and the database hierarchy. The accessory
              * is expected to call GetNumberCategorizedDBRecords in order to
              * get the valid range of category entries before selecting a
@@ -2214,7 +2214,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * 0x00  Shuffle off
              * 0x01  Shuffle tracks
              * 0x02  Shuffle albums
-             * 0x03 ñ 0xFF Reserved
+             * 0x03 ‚Äì 0xFF Reserved
              *
              */
         {
@@ -2459,7 +2459,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * GetColorDisplayImageLimits telegram to obtain the iPod color
              * display width,height,and pixel formats. The color display
              * information is returned in the Command 0x003A:
-             * ReturnColorDisplayImageLimitsî telegram.
+             * ReturnColorDisplayImageLimits‚Äù telegram.
              * To set a display image, the device must successfully send
              * SetDisplayImage descriptor and data telegrams to the iPod. The
              * SetDisplayImage descriptor telegram (telegram index 0x0000) must
@@ -2486,10 +2486,10 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * classic and iPod 3G nano apply this restriction to both USB and
              * UART transports. Calls made to SetDisplayImage more frequently
              * than every 15 seconds will return a successful ACK command, but
-             * the bitmap will not be displayed on the iPodís screen. Hence use
+             * the bitmap will not be displayed on the iPod‚Äôs screen. Hence use
              * of the SetDisplayImage command should be limited to drawing one
              * bitmap image per accessory connect. The iPod touch will accept
-             * the SetDisplayImage command but will not draw it on the iPodís
+             * the SetDisplayImage command but will not draw it on the iPod‚Äôs
              * screen.
              *
              * Below shows the format of a descriptor telegram. This example
@@ -2527,7 +2527,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * 16   0xNN  Row size (stride) in bytes (bits 23:16)
              * 17   0xNN  Row size (stride) in bytes (bits 15:8)
              * 18   0xNN  Row size (stride) in bytes (bits 7:0)
-             * 19ñN 0xNN  Display image pixel data
+             * 19‚ÄìN 0xNN  Display image pixel data
              * NN   0xNN  Telegram payload checksum byte
              *
              * SetDisplayImage data telegram (telegram index = 0x0001 - 0xNNNN)
@@ -2547,7 +2547,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *            remaining n-1 telegrams are simply data telegrams,
              *            where n is determined by the size of the image.
              *  9   0xNN  Descriptor telegram index (bits 7:0)
-             * 10ñN 0xNN  Display image pixel data
+             * 10‚ÄìN 0xNN  Display image pixel data
              * NN   0xNN  Telegram payload checksum byte
              *
              * Note: A known issue causes SetDisplayImage data telegram
@@ -2894,8 +2894,8 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *                    GetNumberCategorizedDBRecords in step 4.
              *
              * The sort order of artist names ignores certain articles such
-             * that the artist ìThe Doorsî is sorted under the letter ëDí and
-             * not ëTí; this matches the behavior of iTunes. The sort order is
+             * that the artist ‚ÄúThe Doors‚Äù is sorted under the letter ‚ÄòD‚Äô and
+             * not ‚ÄòT‚Äô; this matches the behavior of iTunes. The sort order is
              * different depending on the language setting used in the iPod.
              * The list of ignored articles may change in the future without
              * notice.

@@ -79,8 +79,8 @@
 #define FMT_RADIX_s     0x020  /* string (%s) */
 #define FMT_RADIX_u     0x040  /* unsigned integer type, decimal (%u) */
 #define FMT_RADIX_x     0x080  /* unsigned integer type, hex (%x %X) */
-#define FMT_RADIX_a     0x100  /* hex floating point "[-]0xh.hhhhp±d" */
-#define FMT_RADIX_e     0x200  /* floating point with exponent "[-]d.ddde±dd" */
+#define FMT_RADIX_a     0x100  /* hex floating point "[-]0xh.hhhhpÂ±d" */
+#define FMT_RADIX_e     0x200  /* floating point with exponent "[-]d.dddeÂ±dd" */
 #define FMT_RADIX_f     0x400  /* floating point "[-]ddd.ddd" */
 #define FMT_RADIX_g     0x800  /* floating point exponent or decimal depending
                                   upon value and precision */
@@ -866,7 +866,7 @@ static int format_double_radix(double f,
         }
 
         if (explen) {
-            /* build exponent string: 'e±dd' */
+            /* build exponent string: 'eÂ±dd' */
             char *p = fmt_buf->bufend;
             int signchar = '+';
 

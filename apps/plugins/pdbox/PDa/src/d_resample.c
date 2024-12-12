@@ -7,7 +7,7 @@
  * mfg.gfd.uil
  * IOhannes
  *
- * 2509:forum::für::umläute:2001
+ * 2509:forum::fÃ¼r::umlÃ¤ute:2001
  */
 
 

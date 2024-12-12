@@ -4742,9 +4742,9 @@ static void ceilspritehline (int32_t x2, int32_t y)
     int32_t x1, v, bx, by;
 
     /*
-     * x = x1 + (x2-x1)t + (y1-y2)u  ³  x = 160v
-     * y = y1 + (y2-y1)t + (x2-x1)u  ³  y = (scrx-160)v
-     * z = z1 = z2                   ³  z = posz + (scry-horiz)v
+     * x = x1 + (x2-x1)t + (y1-y2)u  â”‚  x = 160v
+     * y = y1 + (y2-y1)t + (x2-x1)u  â”‚  y = (scrx-160)v
+     * z = z1 = z2                   â”‚  z = posz + (scry-horiz)v
      */
 
     x1 = lastx[y];

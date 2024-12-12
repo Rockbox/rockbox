@@ -24,9 +24,9 @@ struct slot_t
 	int MUL;    // parametre "multiple de frequence"
 	int TL;     // Total Level = volume lorsque l'enveloppe est au plus haut
 	int TLL;    // Total Level ajusted
-	int SLL;    // Sustin Level (ajusted) = volume où l'enveloppe termine sa premiere phase de regression
+	int SLL;    // Sustin Level (ajusted) = volume oÃ¹ l'enveloppe termine sa premiere phase de regression
 	int KSR_S;  // Key Scale Rate Shift = facteur de prise en compte du KSL dans la variations de l'enveloppe
-	int KSR;    // Key Scale Rate = cette valeur est calculee par rapport à la frequence actuelle, elle va influer
+	int KSR;    // Key Scale Rate = cette valeur est calculee par rapport Ã  la frequence actuelle, elle va influer
 				// sur les differents parametres de l'enveloppe comme l'attaque, le decay ...  comme dans la realite !
 	int SEG;    // Type enveloppe SSG
 	int env_xor;
@@ -38,24 +38,24 @@ struct slot_t
 	const int *RR;  // Release Rate (table pointeur) = Taux pour le rel'chement (RR [KSR])
 	int Fcnt;   // Frequency Count = compteur-frequence pour determiner l'amplitude actuelle (SIN [Finc >> 16])
 	int Finc;   // frequency step = pas d'incrementation du compteur-frequence
-				// plus le pas est grand, plus la frequence est aïgu (ou haute)
+				// plus le pas est grand, plus la frequence est aÃ¯gu (ou haute)
 	int Ecurp;  // Envelope current phase = cette variable permet de savoir dans quelle phase
 				// de l'enveloppe on se trouve, par exemple phase d'attaque ou phase de maintenue ...
 				// en fonction de la valeur de cette variable, on va appeler une fonction permettant
-				// de mettre à jour l'enveloppe courante.
-	int Ecnt;   // Envelope counter = le compteur-enveloppe permet de savoir où l'on se trouve dans l'enveloppe
+				// de mettre Ã  jour l'enveloppe courante.
+	int Ecnt;   // Envelope counter = le compteur-enveloppe permet de savoir oÃ¹ l'on se trouve dans l'enveloppe
 	int Einc;   // Envelope step courant
 	int Ecmp;   // Envelope counter limite pour la prochaine phase
 	int EincA;  // Envelope step for Attack = pas d'incrementation du compteur durant la phase d'attaque
-				// cette valeur est egal à AR [KSR]
+				// cette valeur est egal Ã  AR [KSR]
 	int EincD;  // Envelope step for Decay = pas d'incrementation du compteur durant la phase de regression
-				// cette valeur est egal à DR [KSR]
+				// cette valeur est egal Ã  DR [KSR]
 	int EincS;  // Envelope step for Sustain = pas d'incrementation du compteur durant la phase de maintenue
-				// cette valeur est egal à SR [KSR]
+				// cette valeur est egal Ã  SR [KSR]
 	int EincR;  // Envelope step for Release = pas d'incrementation du compteur durant la phase de rel'chement
-				// cette valeur est egal à RR [KSR]
-	int *OUTp;  // pointeur of SLOT output = pointeur permettant de connecter la sortie de ce slot à l'entree
-				// d'un autre ou carrement à la sortie de la voie
+				// cette valeur est egal Ã  RR [KSR]
+	int *OUTp;  // pointeur of SLOT output = pointeur permettant de connecter la sortie de ce slot Ã  l'entree
+				// d'un autre ou carrement Ã  la sortie de la voie
 	int INd;    // input data of the slot = donnees en entree du slot
 	int ChgEnM; // Change envelop mask.
 	int AMS;    // AMS depth level of this SLOT = degre de modulation de l'amplitude par le LFO
@@ -82,10 +82,10 @@ struct state_t
 {
 	int TimerBase;      // TimerBase calculation
 	int Status;         // YM2612 Status (timer overflow)
-	int TimerA;         // timerA limit = valeur jusqu'à laquelle le timer A doit compter
+	int TimerA;         // timerA limit = valeur jusqu'Ã  laquelle le timer A doit compter
 	int TimerAL;
 	int TimerAcnt;      // timerA counter = valeur courante du Timer A
-	int TimerB;         // timerB limit = valeur jusqu'à laquelle le timer B doit compter
+	int TimerB;         // timerB limit = valeur jusqu'Ã  laquelle le timer B doit compter
 	int TimerBL;
 	int TimerBcnt;      // timerB counter = valeur courante du Timer B
 	int Mode;           // Mode actuel des voie 3 et 6 (normal / special)

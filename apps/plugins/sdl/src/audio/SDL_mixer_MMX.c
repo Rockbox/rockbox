@@ -69,7 +69,7 @@ void SDL_MixAudio_MMX_S16(char* dst,char* src,unsigned int size,int volume)
 
 "	movq 8(%1),%%mm4\n" /* mm4 = e|f|g|h */
 
-	/* pré charger le buffer dst dans mm7 */
+	/* prÃ© charger le buffer dst dans mm7 */
 "	movq (%0),%%mm7\n" /* mm7 = dst[0] */
 
 	/* multiplier par le volume */
@@ -92,7 +92,7 @@ void SDL_MixAudio_MMX_S16(char* dst,char* src,unsigned int size,int volume)
 
 "	punpcklwd %%mm5,%%mm6\n" /* mm6 = g*v|h*v */
 
-	/* pré charger le buffer dst dans mm5 */
+	/* prÃ© charger le buffer dst dans mm5 */
 "	movq 8(%0),%%mm5\n" /* mm5 = dst[1] */
 
 	/* diviser par 128 */
@@ -103,13 +103,13 @@ void SDL_MixAudio_MMX_S16(char* dst,char* src,unsigned int size,int volume)
 
 "	psrad $7,%%mm4\n" /* mm4 = e*v/128|f*v/128 */
 
-	/* mm1 = le sample avec le volume modifié */
+	/* mm1 = le sample avec le volume modifiÃ© */
 "	packssdw %%mm1,%%mm3\n" /* mm3 = s(a*v|b*v|c*v|d*v) */
 
 "	psrad $7,%%mm6\n" /* mm6= g*v/128|h*v/128 */
 "	paddsw %%mm7,%%mm3\n" /* mm3 = adjust_volume(src)+dst */
 
-	/* mm4 = le sample avec le volume modifié */
+	/* mm4 = le sample avec le volume modifiÃ© */
 "	packssdw %%mm4,%%mm6\n" /* mm6 = s(e*v|f*v|g*v|h*v) */
 "	movq %%mm3,(%0)\n"
 

@@ -23,13 +23,13 @@ Run firmware_extract on the firmware archive to obtain the files
  updater executable which you originally extracted it from. The new updater
  will update your player with the modifications you've made.
 
-* If you're creating or editing executable code, such as the CENC or ©TL entries,
+* If you're creating or editing executable code, such as the CENC or Â©TL entries,
 you'll need to use zen_crypt to decrypt and/or encrypt them.
-In addition, executable code on some players that use the ©TL entries also needs
+In addition, executable code on some players that use the Â©TL entries also needs
  to be signed using zen_crypt, prior to encrypting them.
 Encrypting FBOOT and FRESC is not supported, as these contain the executable 
  code that makes up the critical Rescue Mode software, contained in flash.
-As opposed to CENC and ©TL which ultimately ends up being stored in the players
+As opposed to CENC and Â©TL which ultimately ends up being stored in the players
  filesystem as a file named Jukebox2.jrm.
 
 

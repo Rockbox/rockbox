@@ -1421,7 +1421,7 @@
 #define SSI_CR1_MULTS        (1 << 22)
 #define SSI_CR1_FMAT_BIT    20
 #define SSI_CR1_FMAT_MASK    (0x3 << SSI_CR1_FMAT_BIT)
-  #define SSI_CR1_FMAT_SPI      (0 << SSI_CR1_FMAT_BIT) /* Motorola¡¯s SPI format */
+  #define SSI_CR1_FMAT_SPI      (0 << SSI_CR1_FMAT_BIT) /* Motorola’s SPI format */
   #define SSI_CR1_FMAT_SSP      (1 << SSI_CR1_FMAT_BIT) /* TI's SSP format */
   #define SSI_CR1_FMAT_MW1      (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
   #define SSI_CR1_FMAT_MW2      (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */

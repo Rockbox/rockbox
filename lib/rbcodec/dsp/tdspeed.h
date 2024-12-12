@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 by Nicolas Pitre <nico@cam.org>
- * Copyright (C) 2006-2007 by Stéphane Doyon <s.doyon@videotron.ca>
+ * Copyright (C) 2006-2007 by StÃ©phane Doyon <s.doyon@videotron.ca>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

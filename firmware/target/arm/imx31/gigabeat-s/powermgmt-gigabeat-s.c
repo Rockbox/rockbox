@@ -109,7 +109,7 @@ int battery_adc_temp(void)
      * R[ohms] = E/I = E[volts] / 0.00002[A] (Thermistor bias current source)
      *
      * Steinhart-Hart thermistor equation:
-     * [A + B*ln(R) + D*ln^3(R)] = 1 / T[°K]
+     * [A + B*ln(R) + D*ln^3(R)] = 1 / T[Â°K]
      *
      * Coeffients that fit experimental data (one thermistor so far, one run):
      * A = 0.0013002631685462800
