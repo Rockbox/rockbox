@@ -43,6 +43,7 @@
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
+#include "pcm_mixer.h"
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
@@ -93,23 +94,26 @@ void pcm_play_unlock(void)
 #define SDL_AUDIO_ALLOW_SAMPLES_CHANGE 0
 #endif
 
-static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len);
+static void sdl_audio_callback(void *handle, Uint8 *stream, int len);
 static void pcm_dma_apply_settings_nolock(void)
 {
     SDL_AudioSpec wanted_spec;
     wanted_spec.freq = pcm_sampr;
     wanted_spec.format = AUDIO_S16SYS;
     wanted_spec.channels = 2;
-    wanted_spec.samples = 2048;
-    wanted_spec.callback =
-        (void (SDLCALL *)(void *userdata,
-            Uint8 *stream, int len))sdl_audio_callback;
+    wanted_spec.samples = MIX_FRAME_SAMPLES * 2;  /* Should be 2048, ie ~5ms @44KHz */
+    wanted_spec.callback = sdl_audio_callback;
     wanted_spec.userdata = &udata;
     if (pcm_devid)
         SDL_CloseAudioDevice(pcm_devid);
+
+    /* pulseaudio seems to be happier with smaller buffers */
+    if (!strcmp("pulseaudio", SDL_GetCurrentAudioDriver()))
+        wanted_spec.samples = MIX_FRAME_SAMPLES;
+
     /* Open the audio device and start playing sound! */
     if((pcm_devid = SDL_OpenAudioDevice(audiodev, 0, &wanted_spec, &obtained, SDL_AUDIO_ALLOW_SAMPLES_CHANGE)) == 0) {
-        panicf("Unable to open audio: %s\n", SDL_GetError());
+        panicf("Unable to open audio: %s", SDL_GetError());
         return;
     }
     switch (obtained.format)
@@ -131,7 +135,7 @@ static void pcm_dma_apply_settings_nolock(void)
         pcm_channel_bytes = 4;
         break;
     default:
-        panicf("Unknown sample format obtained: %u\n",
+        panicf("Unknown sample format obtained: %u",
                 (unsigned)obtained.format);
         return;
     }
@@ -154,7 +158,6 @@ void pcm_dma_apply_settings(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-
     pcm_data = addr;
     pcm_data_size = size;
 
@@ -262,9 +265,11 @@ static void write_to_soundcard(struct pcm_udata *udata)
     }
 }
 
-static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
+static void sdl_audio_callback(void *handle, Uint8 *stream, int len)
 {
-    logf("sdl_audio_callback: len %d, pcm %d\n", len, pcm_data_size);
+    struct pcm_udata *udata = handle;
+
+    logf("sdl_audio_callback: len %d, pcm %zd", len, pcm_data_size);
 
     bool new_buffer = false;
     udata->stream = stream;
@@ -284,6 +289,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
             DEBUGF("sdl_audio_callback: No Data.\n");
             break;
         }
+        logf("audio_callback_cont: len %d, pcm %zd", len, pcm_data_size);
 
     start:
         udata->num_in  = pcm_data_size / pcm_sample_bytes;
@@ -374,7 +380,7 @@ void pcm_play_dma_init(void)
 {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO))
     {
-        panicf("Could not initialize SDL audio subsystem!\n");
+        panicf("Could not initialize SDL audio subsystem!");
         return;
     }
 
@@ -395,7 +401,7 @@ void pcm_play_dma_init(void)
 
     if (!audio_lock)
     {
-        panicf("Could not create audio_lock\n");
+        panicf("Could not create audio_lock");
         return;
     }
 
