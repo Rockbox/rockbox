@@ -381,7 +381,8 @@ static bool track_is_unique(uint32_t hash1, uint32_t hash2)
         /* Found in MRU */
         if ((i.hash1 == hash1) && (i.hash2 == hash2))
         {
-            logf("SCROBBLER: hash [%lx, %lx] found in MRU @ %d", i.hash1, i.hash2, mru);
+            logf("SCROBBLER: hash [%jx, %jx] found in MRU @ %d",
+                        (intmax_t)i.hash1, (intmax_t)i.hash2, mru);
             goto Found;
         }
     }
@@ -395,11 +396,13 @@ static bool track_is_unique(uint32_t hash1, uint32_t hash2)
     }
     else
     {
-        logf("SCROBBLER: hash [%lx, %lx] evicted from MRU", i.hash1, i.hash2);
+        logf("SCROBBLER: hash [%jx, %jx] evicted from MRU",
+                    (intmax_t) i.hash1, (intmax_t) i.hash2);
     }
 
     i = (struct hash64){.hash1 = hash1, .hash2 = hash2};
-    logf("SCROBBLER: hash [%lx, %lx] added to  MRU[%d]", i.hash1, i.hash2, mru_len);
+    logf("SCROBBLER: hash [%jx, %jx] added to  MRU[%d]",
+            (intmax_t)i.hash1, (intmax_t)i.hash2, mru_len);
 
 Found:
 
