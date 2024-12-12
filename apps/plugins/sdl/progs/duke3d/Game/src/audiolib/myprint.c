@@ -102,36 +102,36 @@ void TextFrame
       }
    if ( type == SINGLE_FRAME )
       {
-      DrawText( x1, y1, '⁄', foreground, background );
-      DrawText( x2, y1, 'ø', foreground, background );
-      DrawText( x1, y2, '¿', foreground, background );
-      DrawText( x2, y2, 'Ÿ', foreground, background );
+      DrawText( x1, y1, '\xDA', foreground, background ); /* ‚îå */
+      DrawText( x2, y1, '\xBF', foreground, background ); /* ‚îê */
+      DrawText( x1, y2, '\xC0', foreground, background ); /* ‚îî */
+      DrawText( x2, y2, '\xD9', foreground, background ); /* ‚îò */
       for( x = x1 + 1; x < x2; x++ )
          {
-         DrawText( x, y1, 'ƒ', foreground, background );
-         DrawText( x, y2, 'ƒ', foreground, background );
+         DrawText( x, y1, '\xC4', foreground, background ); /* ‚îÄ */
+         DrawText( x, y2, '\xC4', foreground, background ); /* ‚îÄ */
          }
       for( y = y1 + 1; y < y2; y++ )
          {
-         DrawText( x1, y, '≥', foreground, background );
-         DrawText( x2, y, '≥', foreground, background );
+         DrawText( x1, y, '\xB3', foreground, background ); /* ‚îÇ */
+         DrawText( x2, y, '\xB3', foreground, background ); /* ‚îÇ */
          }
       }
    if ( type == DOUBLE_FRAME )
       {
-      DrawText( x1, y1, '…', foreground, background );
-      DrawText( x2, y1, 'ª', foreground, background );
-      DrawText( x1, y2, '»', foreground, background );
-      DrawText( x2, y2, 'º', foreground, background );
+      DrawText( x1, y1, '\xC9', foreground, background ); /* ‚ïî */
+      DrawText( x2, y1, '\xBB', foreground, background ); /* ‚ïó */
+      DrawText( x1, y2, '\xC8', foreground, background ); /* ‚ïö */
+      DrawText( x2, y2, '\xBC', foreground, background ); /* ‚ïù */
       for( x = x1 + 1; x < x2; x++ )
          {
-         DrawText( x, y1, 'Õ', foreground, background );
-         DrawText( x, y2, 'Õ', foreground, background );
+         DrawText( x, y1, '\xCD', foreground, background ); /* ‚ïê */
+         DrawText( x, y2, '\xCD', foreground, background ); /* ‚ïê */
          }
       for( y = y1 + 1; y < y2; y++ )
          {
-         DrawText( x1, y, '∫', foreground, background );
-         DrawText( x2, y, '∫', foreground, background );
+         DrawText( x1, y, '\xBA', foreground, background ); /* ‚ïë */
+         DrawText( x2, y, '\xBA', foreground, background ); /* ‚ïë */
          }
       }
    }

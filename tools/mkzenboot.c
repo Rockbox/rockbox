@@ -998,7 +998,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     log_message("[INFO] Locating encoded block... ");
     
     i = 8;
-    while(memcmp(&out_buffer[i], " LT©", 4) != 0 && i < ciff_size)
+    while(memcmp(&out_buffer[i], " LT\xA9", 4) != 0 && i < ciff_size) /* " LTÂ©" */
     {
         if(memcmp(&out_buffer[i], "FNIC", 4) == 0)
                 i += 4+4+96;
@@ -1017,7 +1017,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         }
     }
     
-    if(i > ciff_size || memcmp(&out_buffer[i], " LT©", 4) != 0)
+    if(i > ciff_size || memcmp(&out_buffer[i], " LT\xA9", 4) != 0) /* " LTÂ©" */
     {
         log_message("Fail!\n[ERR]  Couldn't find encoded block\n");
         fclose(bootfd);

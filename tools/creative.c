@@ -133,9 +133,9 @@ static const struct device_info devices[] =
     {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",             42, null_key_v2},
     /* Creative Zen Vision:M Go! */
     {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!", 50, null_key_v2},
-    /* Creative Zen Vision © TL */
-    /* The "©" should be ANSI encoded or the device won't accept the firmware package. */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",       46, null_key_v2},
+    /* Creative Zen Vision Â© TL */
+    /* The "Â©" should be ANSI encoded or the device won't accept the firmware package. */
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0\xA9\0T\0L",       46, null_key_v2},
     /* Creative ZEN V */
     {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V",                                  42, null_key_v4},
     /* Creative ZEN */

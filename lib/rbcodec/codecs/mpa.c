@@ -207,7 +207,7 @@ static int get_file_pos(int newtime)
         if (pos == -1 || (skipms_from_curpos >= 0 && pos > curpos) || (skipms_from_curpos < 0 && pos < curpos))
         {
             pos = curpos - skipms_from_curpos * (id3->filesize / id3->length);
-            //LOGF("сurpos relative seek: %d, curpos: %d, newtime: %d", pos, curpos, newtime);
+            //LOGF("curpos relative seek: %d, curpos: %d, newtime: %d", pos, curpos, newtime);
         }
     } else if (id3->bitrate) {
         pos = newtime * (id3->bitrate / 8);

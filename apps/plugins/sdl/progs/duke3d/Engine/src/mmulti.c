@@ -458,7 +458,7 @@ short unstable_getpacket (short *other, char *bufptr)
 				{
 								 /* GOOD! Take second half of double packet */
 #if (PRINTERRORS)
-					printf("\n%ld-%ld .û ",gcom->buffer[0],(gcom->buffer[0]+1)&255);
+					printf("\n%ld-%ld .\xFB ",gcom->buffer[0],(gcom->buffer[0]+1)&255); /* âˆš */
 #endif
 					messleng = ((long)gcom->buffer[3]) + (((long)gcom->buffer[4])<<8);
 					lastpacketleng = gcom->numbytes-7-messleng;
@@ -478,7 +478,7 @@ short unstable_getpacket (short *other, char *bufptr)
 	if ((gcom->buffer[1]&128) == 0)           /* Single packet */
 	{
 #if (PRINTERRORS)
-		printf("\n%ld û  ",gcom->buffer[0]);
+		printf("\n%ld \xFB  ",gcom->buffer[0]); /* âˆš */
 #endif
 
 		messleng = gcom->numbytes-5;
@@ -491,7 +491,7 @@ short unstable_getpacket (short *other, char *bufptr)
 
 														 /* Double packet */
 #if (PRINTERRORS)
-	printf("\n%ld-%ld ûû ",gcom->buffer[0],(gcom->buffer[0]+1)&255);
+	printf("\n%ld-%ld \xFB\xFB ",gcom->buffer[0],(gcom->buffer[0]+1)&255); /* âˆšâˆš */
 #endif
 
 	messleng = ((long)gcom->buffer[3]) + (((long)gcom->buffer[4])<<8);
