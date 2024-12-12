@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <inttypes.h>
 #include <stdbool.h>
 
 #include "config.h"
@@ -28,6 +29,7 @@
 /* returns configured frequency (PLLxFreq, when locked) */
 unsigned pll_get_cfg_freq(int pll)
 {
+#if CONFIG_CPU == S5L8702
     unsigned pdiv, mdiv, sdiv, f_in;
     uint32_t pllpms;
 
@@ -57,6 +59,11 @@ unsigned pll_get_cfg_freq(int pll)
         f_in = S5L8702_OSC1_HZ;
         return (f_in * mdiv * pdiv) >> sdiv; /* multiply */
     }
+#else /* S5L8720 */
+    // TODO
+    (void) pll;
+    return 0;
+#endif
 }
 
 /* returns PLLxClk */
@@ -106,6 +113,7 @@ unsigned cg16_get_freq(volatile uint16_t* cg16)
 
 void soc_set_system_divs(unsigned cdiv, unsigned hdiv, unsigned hprat)
 {
+#if CONFIG_CPU == S5L8702
     uint32_t val = 0;
     unsigned pdiv = hdiv * hprat;
 
@@ -119,11 +127,19 @@ void soc_set_system_divs(unsigned cdiv, unsigned hdiv, unsigned hprat)
         val |= CLKCON1_PDIV_EN_BIT |
                 ((((pdiv >> 1) - 1) & CLKCON1_PDIV_MSK) << CLKCON1_PDIV_POS);
 
+    // TODO: The 8720 puts the EN_BIT here, it is not used in s5l8702, see if it influences,
+    // it seems that it does NOT behave the same, and when it is all 0 -> 0x40 it does not work (TBC), see EFI
     val |= ((hprat - 1) & CLKCON1_HPRAT_MSK) << CLKCON1_HPRAT_POS;
 
     CLKCON1 = val;
 
     while ((CLKCON1 >> 8) != (val >> 8));
+#else
+    // TODO
+    (void) cdiv;
+    (void) hdiv;
+    (void) hprat;
+#endif
 }
 
 unsigned soc_get_system_divs(unsigned *cdiv, unsigned *hdiv, unsigned *pdiv)
@@ -215,10 +231,35 @@ void set_clocking_level(int level)
 
 void clockgate_enable(int gate, bool enable)
 {
-    int i = (gate >> 5) & 1;
+    int i = gate >> 5;
     uint32_t bit = 1 << (gate & 0x1f);
     if (enable) PWRCON(i) &= ~bit;
     else PWRCON(i) |= bit;
+}
+
+int soc_get_sec_epoch(void)
+{
+#if CONFIG_CPU == S5L8702
+#if 1
+    return 0;   // In classics/nano3g it seems to always be 0, also PDAT3 is used by LCD(TBC) and that's why we can't
+    // look at it in RB, only at the beginning of BL
+    // We can also try to read it only in the preinit and save it for later.
+#else
+    GPIOCMD = 0x30500;  /* configure GPIO3.5 as input */
+    return !!(PDAT3 & 0x20);
+#endif
+#elif CONFIG_CPU == S5L8720
+    // TBC: sec_epoch == 0 -> OSC0 = 24MHz (TBC) -> or it is equal to 12
+    //                        internal SDRAM (TBC) -> or maybe it is a multiplier of the SDRAM?
+    //                   1 -> OSC0 = 48MHz (TBC) -> or it is equal to 24
+    //                        external SDRAM (TBC) -> or maybe it is a multiplier of the SDRAM?
+    // according to ROMBOOT bit2 of sec_epoch == 1 -> use /CN=Apple Secure Boot Certification Auth... (see bootrom_main)
+    //                                           0 ->     /CN=Apple IPod Certification Authority...
+    clockgate_enable(CLOCKGATE_CHIPID, true);
+    int sec_epoch = CHIPID_INFO & 1;
+    clockgate_enable(CLOCKGATE_CHIPID, false);
+    return sec_epoch;
+#endif
 }
 
 #ifdef BOOTLOADER
@@ -231,6 +272,7 @@ int pll_config(int pll, int op_mode, int p, int m, int s, int lock_time)
     /* lock_time are PClk ticks */
     PLLCNT(pll) = lock_time & PLLCNT_MSK;
 
+#if CONFIG_CPU == S5L8702
     if (pll < 2)
     {
         if (op_mode == PLLOP_MM) {
@@ -264,6 +306,22 @@ int pll_config(int pll, int op_mode, int p, int m, int s, int lock_time)
     PLLMOD2 = (PLLMOD2 & ~PLLMOD2_ALTOSC_BIT(pll)) |
                 ((op_mode == PLLOP_ALT0) ? 0 : PLLMOD2_ALTOSC_BIT(pll));
 
+#elif CONFIG_CPU == S5L8720
+    // In the 8702, PLL0,1 do not behave the same as in 8702, it seems that they could behave in a similar way
+    // to PLL2 in 8702 (TODO: check, possibly they could not have MM mode),
+    // see the ALTOSC topic, maybe PLLUNK3C does a similar function in 8720 to PLLMOD2 in 8702
+    if (op_mode == PLLOP_DM) {
+        PLLMODE &= ~PLLMODE_PMSMOD_BIT(pll);
+        return 0;
+    }
+    return -1;
+    // TBC:
+    // if (op_mode == PLLOP_MM)
+    //     return -1;  /* PLLx does not support MM */
+    // PLLMODE |= PLLMODE_PMSMOD_BIT(pll);
+    // PLLUNK3C = ???
+#endif
+
     return 0;
 }
 
@@ -289,12 +347,20 @@ int pll_onoff(int pll, bool onoff)
 }
 
 /* configure and enable/disable 16-bit clockgate */
+#if (CONFIG_CPU == S5L8702)
 void cg16_config(volatile uint16_t* cg16,
                     bool onoff, int clksel, int div1, int div2)
+#elif (CONFIG_CPU == S5L8720)
+void cg16_config(volatile uint16_t* cg16,
+                    bool onoff, int clksel, int div1, int div2, int flags)
+#endif
 {
     uint16_t val16 = ((clksel & CG16_SEL_MSK) << CG16_SEL_POS)
                    | (((div1 - 1) & CG16_DIV1_MSK) << CG16_DIV1_POS)
                    | (((div2 - 1) & CG16_DIV2_MSK) << CG16_DIV2_POS)
+#if (CONFIG_CPU == S5L8720)
+                   | flags
+#endif
                    | (onoff ? 0 : CG16_DISABLE_BIT);
 
     volatile uint32_t* reg32 = (uint32_t *)((int)cg16 & ~3);
@@ -311,16 +377,25 @@ void cg16_config(volatile uint16_t* cg16,
  * this clock should be initialized by the bootloader, so USEC_TIMER
  * is ready to use for RB.
  */
+// TODO: I think usec timer is not reset to 0
 void usec_timer_init(void)
 {
     /* select OSC0 for CG16 SEL_OSC */
     PLLMODE &= ~PLLMODE_OSCSEL_BIT;
 
     /* configure and enable ECLK */
+#if CONFIG_CPU == S5L8702
     cg16_config(&CG16_RTIME, true, CG16_SEL_OSC, 1, 1);
 
     /* unmask timer controller clock gate */
     clockgate_enable(CLOCKGATE_TIMER, true);
+#elif CONFIG_CPU == S5L8720
+    cg16_config(&CG16_RTIME, true, CG16_SEL_OSC, 1, 1, 0x0);
+
+    /* unmask timer controller clock gates */
+    clockgate_enable(CLOCKGATE_TIMERE, true);
+    clockgate_enable(CLOCKGATE_TIMERE_2, true);
+#endif
 
     /* configure and start timer E */
     TECON = (4 << 8) |      /* TE_CS = ECLK / 1 */
@@ -331,21 +406,5 @@ void usec_timer_init(void)
     TECMD = (1 << 1) |      /* TE_CLR = initialize timer */
             (1 << 0);       /* TE_EN = enable */
 }
-
-#if 0
-/* - This function is mainly to documment how s5l8702 ROMBOOT and iPod
- *   Classic diagnostic OF detects primary external clock.
- * - ATM it is unknown if 24 MHz are used on other targets (i.e. Nano 3G),
- *   other SoC (ROMBOOT identifies itself as s5l8900/s5l8702), a Classic
- *   prototype, or (probably) never used...
- * - This function should be called only at boot time, GPIO3.5 is also
- *   used for ATA controller.
- */
-unsigned soc_get_osc0(void)
-{
-    GPIOCMD = 0x30500;  /* configure GPIO3.5 as input */
-    return (PDAT3 & 0x20) ? 24000000 : 12000000;
-}
-#endif
 
 #endif  /* BOOTLOADER */
