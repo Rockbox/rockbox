@@ -33,7 +33,7 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include <codecs/libasf/asf.h>
-
+#include "rbunicode.h"
 /* TODO: Just read the GUIDs into a 16-byte array, and use memcmp to compare */
 struct guid_s {
     uint32_t v1;
@@ -154,75 +154,69 @@ static int asf_intdecode(int fd, int type, int length)
     return 0;
 }
 
+static int is_valid_utf16(const unsigned char *data, size_t length)
+{
+    if (length < 2) return 0; // Not enough data for even one UTF-16 character
+
+    // Get the last two bytes as a UTF-16 character (little-endian)
+    uint16_t last = data[length - 2] | (data[length - 1] << 8);
+
+    // Check if the last character is a high surrogate
+    if (last >= 0xD800 && last <= 0xDBFF) {
+        return 0; // Invalid if it's the last character
+    }
+
+    // Check if the last character is a low surrogate
+    if (last >= 0xDC00 && last <= 0xDFFF) {
+        if (length < 4) return 0; // Invalid if there's no preceding character
+        uint16_t second_last = data[length - 4] | (data[length - 3] << 8);
+
+        // Invalid if not preceded by a high surrogate
+        return second_last >= 0xD800 && second_last <= 0xDBFF; 
+    }
+
+    // If it's not a surrogate, it's valid
+    return 1;
+}
+
 /* Decode a LE utf16 string from a disk buffer into a fixed-sized
    utf8 buffer.
 */
-
 static void asf_utf16LEdecode(int fd,
                               uint16_t utf16bytes,
                               unsigned char **utf8,
                               int* utf8bytes
                              )
 {
-    unsigned long ucs;
+    const int reserve_bytes = 6;
     int n;
-    unsigned char utf16buf[256];
-    unsigned char* utf16 = utf16buf;
-    unsigned char* newutf8;
+    unsigned char utf16buf[258];
+    unsigned char* newutf8 = *utf8;
+    const int utf8bytes_initial = *utf8bytes;
 
-    n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
-    utf16bytes -= n;
-
-    while (n > 0) {
-        /* Check for a surrogate pair */
-        if (utf16[1] >= 0xD8 && utf16[1] < 0xE0) {
-            if (n < 4) {
-                /* Run out of utf16 bytes, read some more */
-                utf16buf[0] = utf16[0];
-                utf16buf[1] = utf16[1];
-
-                n = read(fd, utf16buf + 2, MIN(sizeof(utf16buf)-2, utf16bytes));
-                utf16 = utf16buf;
-                utf16bytes -= n;
-                n += 2;
-            }
-
-            if (n < 4) {
-                /* Truncated utf16 string, abort */
-                break;
-            }
-            ucs = 0x10000 + ((utf16[0] << 10) | ((utf16[1] - 0xD8) << 18)
-                             | utf16[2] | ((utf16[3] - 0xDC) << 8));
-            utf16 += 4;
-            n -= 4;
-        } else {
-            ucs = (utf16[0] | (utf16[1] << 8));
-            utf16 += 2;
-            n -= 2;
+    while ((n = read(fd, utf16buf, MIN(sizeof(utf16buf) - 2, utf16bytes))) >= 2)
+    {
+        // If the UTF-16 string ends with an incomplete surrogate pair, try to complete it.
+        if (!is_valid_utf16(utf16buf, n))
+        {
+            n += read(fd, utf16buf + n, 2);
         }
+        newutf8 = utf16decode(utf16buf, newutf8, n>>1, *utf8bytes - reserve_bytes, true);
+        *utf8bytes = utf8bytes_initial - (newutf8 - *utf8);
+        utf16bytes -= n;
 
-        if (*utf8bytes > 6) {
-            newutf8 = utf8encode(ucs, *utf8);
-            *utf8bytes -= (newutf8 - *utf8);
-            *utf8 += (newutf8 - *utf8);
-        }
-
-        /* We have run out of utf16 bytes, read more if available */
-        if ((n == 0) && (utf16bytes > 0)) {
-            n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
-            utf16 = utf16buf;
-            utf16bytes -= n;
-        }
+        if (*utf8bytes <= reserve_bytes)
+            break;
     }
 
-    *utf8[0] = 0;
+    *newutf8 = 0;
     --*utf8bytes;
+    *utf8 = newutf8;
 
     if (utf16bytes > 0) {
         /* Skip any remaining bytes */
         lseek(fd, utf16bytes, SEEK_CUR);
     }
-    return;
 }
 
 static int asf_parse_header(int fd, struct mp3entry* id3,
