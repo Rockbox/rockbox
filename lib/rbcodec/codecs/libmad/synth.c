@@ -931,24 +931,30 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         MLA(hi, lo, (*f)[5], ptr[ 6+offset]); \
         MLA(hi, lo, (*f)[6], ptr[ 4+offset]); \
         MLA(hi, lo, (*f)[7], ptr[ 2+offset]);
-        
-#define PROD_SB(hi, lo, ptr, offset, first_idx, last_idx) \
-        ML0(hi, lo, (*fe)[0], ptr[first_idx]); \
-        MLA(hi, lo, (*fe)[1], ptr[16+offset]); \
-        MLA(hi, lo, (*fe)[2], ptr[18+offset]); \
-        MLA(hi, lo, (*fe)[3], ptr[20+offset]); \
-        MLA(hi, lo, (*fe)[4], ptr[22+offset]); \
-        MLA(hi, lo, (*fe)[5], ptr[24+offset]); \
-        MLA(hi, lo, (*fe)[6], ptr[26+offset]); \
-        MLA(hi, lo, (*fe)[7], ptr[28+offset]); \
-        MLA(hi, lo, (*fo)[7], ptr[29-offset]); \
-        MLA(hi, lo, (*fo)[6], ptr[27-offset]); \
-        MLA(hi, lo, (*fo)[5], ptr[25-offset]); \
-        MLA(hi, lo, (*fo)[4], ptr[23-offset]); \
-        MLA(hi, lo, (*fo)[3], ptr[21-offset]); \
-        MLA(hi, lo, (*fo)[2], ptr[19-offset]); \
-        MLA(hi, lo, (*fo)[1], ptr[17-offset]); \
-        MLA(hi, lo, (*fo)[0], ptr[last_idx ]);
+
+static
+mad_fixed64lo_t prod_sb(mad_fixed_t (*fe)[8], mad_fixed_t (*fo)[8],
+             mad_fixed_t const *ptr, int offset, int first_idx, int last_idx)
+{
+    mad_fixed64lo_t lo;
+    ML0(0, lo, (*fe)[0], ptr[first_idx]);
+    MLA(0, lo, (*fe)[1], ptr[16+offset]);
+    MLA(0, lo, (*fe)[2], ptr[18+offset]);
+    MLA(0, lo, (*fe)[3], ptr[20+offset]);
+    MLA(0, lo, (*fe)[4], ptr[22+offset]);
+    MLA(0, lo, (*fe)[5], ptr[24+offset]);
+    MLA(0, lo, (*fe)[6], ptr[26+offset]);
+    MLA(0, lo, (*fe)[7], ptr[28+offset]);
+    MLA(0, lo, (*fo)[7], ptr[29-offset]);
+    MLA(0, lo, (*fo)[6], ptr[27-offset]);
+    MLA(0, lo, (*fo)[5], ptr[25-offset]);
+    MLA(0, lo, (*fo)[4], ptr[23-offset]);
+    MLA(0, lo, (*fo)[3], ptr[21-offset]);
+    MLA(0, lo, (*fo)[2], ptr[19-offset]);
+    MLA(0, lo, (*fo)[1], ptr[17-offset]);
+    MLA(0, lo, (*fo)[0], ptr[last_idx ]);
+    return lo;
+}
 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
@@ -983,6 +989,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 
       D0ptr = (mad_fixed_t const (*)[32])(D[0]+p);
       D1ptr = (mad_fixed_t const (*)[32])(D[0]-p);
+      /* D1ptr is -p -(0-0xF) PROD_SB adds offsets that point to valid memory */
 
       if(s & 1)
       {
@@ -1007,7 +1014,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           pcm[-sb] = SHIFT(MLZ(hi, lo));
 
           ptr = *D1ptr;
-          PROD_SB(hi, lo, ptr, 1, 15, 30)
+          lo = prod_sb(fe, fo, ptr, 1, 15, 30);
           pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
@@ -1038,7 +1045,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           pcm[-sb] = SHIFT(MLZ(hi, lo));
 
           ptr = *D1ptr;
-          PROD_SB(hi, lo, ptr, 0, 30, 15)
+          lo = prod_sb(fe, fo, ptr, 0, 30, 15);
           pcm[sb] = SHIFT(MLZ(hi, lo));
         }
 
