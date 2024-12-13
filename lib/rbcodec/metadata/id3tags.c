@@ -1123,7 +1123,6 @@ retry_with_limit:
                     break;
 
                 tag[bytesread] = 0;
-                bufferpos += bytesread + 1;
 
                 /* parse the tag if it contains iTunes gapless info */
                 if (itunes_gapless)
@@ -1131,7 +1130,10 @@ retry_with_limit:
                     itunes_gapless = false;
                     entry->lead_trim = get_itunes_int32(tag, 1);
                     entry->tail_trim = get_itunes_int32(tag, 2);
+                    break;
                 }
+
+                bufferpos += bytesread + 1;
 
                 /* Note that parser functions sometimes set *ptag to NULL, so
                  * the "!*ptag" check here doesn't always have the desired
