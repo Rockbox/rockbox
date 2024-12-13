@@ -361,7 +361,7 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 }
 #endif
 
-/* parse user defined text, looking for album artist and replaygain 
+/* parse user defined text, looking for album artist and replaygain
  * information.
  */
 static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
@@ -399,7 +399,7 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
     /* Only parse RVA2 replaygain tags if tag version == 2.4 and channel
      * type is master volume.
      */
-    if (entry->id3version == ID3_VER_2_4 && end_pos < bufferpos 
+    if (entry->id3version == ID3_VER_2_4 && end_pos < bufferpos
             && *value++ == 1) {
         long gain = 0;
         long peak = 0;
@@ -410,12 +410,12 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
         /* The RVA2 specification is unclear on some things (id string and
          * peak volume), but this matches how Quod Libet use them.
          */
-            
+
         gain = (int16_t) ((value[0] << 8) | value[1]);
         value += 2;
         peakbits = *value++;
         peakbytes = (peakbits + 7) / 8;
-    
+
         /* Only use the topmost 24 bits for peak volume */
         if (peakbytes > 3) {
             peakbytes = 3;
@@ -429,14 +429,14 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
                 peak <<= 8;
                 peak += *value++;
             }
-    
+
             peak <<= shift;
-    
+
             if (peakbits > 24) {
                 peak += *value >> (8 - shift);
             }
         }
-    
+
         static const char *tg_options[] = {"album", "track", NULL};
         int tg_op = string_option(tag, tg_options, true);
         if (tg_op == 0) { /*album*/
@@ -462,7 +462,7 @@ static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
     int desc_len = strlen(tag);
     /*DEBUGF("MBID len: %d\n", desc_len);*/
     /* Musicbrainz track IDs are always 36 chars long */
-    const size_t mbtid_len = 36; 
+    const size_t mbtid_len = 36;
 
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos)
     {
@@ -501,8 +501,8 @@ static const struct tag_resolver taglist[] = {
     { "TP2",  3, offsetof(struct mp3entry, albumartist), NULL, false },
     { "TIT1", 4, offsetof(struct mp3entry, grouping), NULL, false },
     { "TT1",  3, offsetof(struct mp3entry, grouping), NULL, false },
-    { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
-    { "COM",  3, offsetof(struct mp3entry, comment), NULL, false }, 
+    { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false },
+    { "COM",  3, offsetof(struct mp3entry, comment), NULL, false },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
 #ifdef HAVE_ALBUMART
@@ -964,13 +964,13 @@ retry_with_limit:
                 }
             }
         }
-        
+
         if (framelen == 0)
             continue;
 
         if (framelen < 0)
             return;
-        
+
         /* Keep track of the remaining frame size */
         totframelen = framelen;
 
@@ -1029,7 +1029,7 @@ retry_with_limit:
                     goto retry_with_limit;
                 }
 
-                /* found a tag matching one in tagList, and not yet filled */
+                /* found a tag matching one in tagList */
                 tag = buffer + bufferpos;
 
                 if(global_unsynch && version <= ID3_VER_2_3)
@@ -1045,7 +1045,7 @@ retry_with_limit:
                 if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
                     bytesread = unsynchronize_frame(tag, bytesread);
 
-                /* the COMM frame has a 3 char field to hold an ISO-639-1 
+                /* the COMM frame has a 3 char field to hold an ISO-639-1
                  * language string and an optional short description;
                  * remove them so unicode_munge can work correctly
                  */
@@ -1165,7 +1165,7 @@ retry_with_limit:
         }
 
         if( i == TAGLIST_SIZE ) {
-            /* no tag in tagList was found, or it was a repeat.
+            /* no tag in tagList was found,
                skip it using the total size */
 
             if(global_unsynch && version <= ID3_VER_2_3) {
