@@ -17,13 +17,13 @@
   * KIND, either express or implied.
   *
   ***************************************************************************/
- 
+
 #include <speex/speex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
 #include "rbspeex.h"
-  
+
  #define USAGE_TEXT \
 "Usage: rbspeexdec infile outfile\n"\
 "rbspeexdec outputs mono 16 bit 16 kHz WAV files.\n"\
@@ -50,13 +50,13 @@ int main(int argc, char **argv)
 
     /* Rockbox speex streams are always assumed to be WB */
     st = speex_decoder_init(&speex_wb_mode);
- 
+
     /* Set the perceptual enhancement on (is default, but doesn't hurt) */
     tmp = 1;
     speex_decoder_ctl(st, SPEEX_SET_ENH, &tmp);
     speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
     speex_decoder_ctl(st, SPEEX_GET_FRAME_SIZE, &frame_size);
- 
+
     if ((fin = fopen(argv[1], "rb")) == NULL) {
         printf("Error: could not open input file\n");
         return 1;
@@ -74,8 +74,8 @@ int main(int argc, char **argv)
     fclose(fin);
 
     /* fill in wav header */
-    strcpy(wavhdr, "RIFF");
-    strcpy(wavhdr + 8, "WAVEfmt ");
+    strcpy((char *) wavhdr, "RIFF");
+    strcpy((char *) wavhdr + 8, "WAVEfmt ");
     put_uint_le(16, wavhdr + 16);
     put_ushort_le(1, wavhdr + 20);      /* PCM data */
     put_ushort_le(1, wavhdr + 22);      /* mono */
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     put_uint_le(16000*2, wavhdr + 28);  /* chan*sr*bbs/8 */
     put_ushort_le(2, wavhdr + 32);      /* chan*bps/8 */
     put_ushort_le(16, wavhdr + 34);     /* bits per sample */
-    strcpy(wavhdr + 36, "data");
+    strcpy((char *) wavhdr + 36, "data");
     fwrite(wavhdr, 1, 44, fout);        /* write header */
     /* make bit buffer use our own buffer */
     speex_bits_set_bit_buffer(&bits, indata, insize);

@@ -52,7 +52,6 @@ static FILE * openoutfile( const char * filename )
 int gigabeat_code(char *infile, char *outfile)
 {
     FILE *in, *out;
-    unsigned long size = 0;
     unsigned long bytes_read;
     unsigned char buf[4];
     unsigned long data;
@@ -66,13 +65,11 @@ int gigabeat_code(char *infile, char *outfile)
 
         /* Read in little-endian */
         data = le2int(buf);
-        
+
         data = data ^ key;
 
         key = key + (key << 1);
         key = key + 0x19751217;
-
-        size += bytes_read;
 
         /* Write out little-endian */
         int2le(data, buf);

@@ -161,7 +161,7 @@ foreach my $define (@sorted_defines)
     }
     elsif(@$define{'value'} =~ /^[0-9]+$/) #number
     {
-        printf "\tprintf(\"%s[\\\"%%s\\\"] = %%d\\n\", stringify(%s), %s);\n", $lua_table, @$define{'name'}, @$define{'name'};
+        printf "\tprintf(\"%s[\\\"%%s\\\"] = %%ld\\n\", stringify(%s), (long) %s);\n", $lua_table, @$define{'name'}, @$define{'name'};
     }
     else #might be a string but we don't know since the macro isn't expanded far enough
     {
@@ -199,7 +199,7 @@ foreach my $define (@sorted_defines)
         }
         elsif ($var =~$num_regex) #it must be a number
         {
-            printf "\tprintf(\"%s[\\\"%%s\\\"] = %%d\\n\", stringify(%s), %s);\n", $lua_table, @$define{'name'}, @$define{'name'};
+            printf "\tprintf(\"%s[\\\"%%s\\\"] = %%ld\\n\", stringify(%s), (long) %s);\n", $lua_table, @$define{'name'}, @$define{'name'};
         }
         else { warn "Skipping ".@$define{'name'}." indeterminate macro type\n"; }
     }

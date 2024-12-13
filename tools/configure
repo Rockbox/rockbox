@@ -16,9 +16,6 @@ LDOPTS=""
 GLOBAL_LDOPTS=""
 LDMAP_OPT="-Map"
 
-HOSTCC=gcc
-HOSTAR=ar
-
 extradefines=""
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
@@ -398,9 +395,7 @@ simcc () {
    if $CC --version | grep -q "clang"; then
     echo "[Warning] Clang compiler ($CC) in your path is unsupported. Trying gcc-14."
     CC=gcc-14
-    HOSTCC=gcc-14
     AR=gcc-ar-14
-    HOSTAR=gcc-ar-14
     CPP=cpp-14
    fi
    LDOPTS="$LDOPTS -ldl"
@@ -4612,8 +4607,8 @@ else
 fi
 
 # figure out the full path to the various commands if possible
-HOSTCC=`findtool ${HOSTCC} --lit`
-HOSTAR=`findtool ${HOSTAR} --lit`
+HOSTCC=`findtool gcc --lit`
+HOSTAR=`findtool ar --lit`
 CC=`findtool ${CC} --lit`
 CPP=`findtool ${CPP} --lit`
 LD=`findtool ${LD} --lit`

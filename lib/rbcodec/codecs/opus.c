@@ -70,7 +70,7 @@ static int seek_ogg_page(uint64_t filepos)
                 break;
             if (memcmp(buf, synccode, sizeof(buf)) == 0) {
                 ci->seek_buffer(ci->curpos - sizeof(buf));
-                LOGF("next page %ld", ci->curpos);
+                LOGF("next page %jd", (intmax_t) ci->curpos);
                 return 1;
             } else
                 ci->seek_buffer(ci->curpos - (sizeof(buf) - 1));
@@ -91,7 +91,7 @@ static int seek_opus_tags(void)
                 break;
             if (memcmp(buf, synccode, sizeof(buf)) == 0) {
                 ci->seek_buffer(ci->curpos - sizeof(buf));
-                LOGF("OpusTags %ld", ci->curpos);
+                LOGF("OpusTags %jd", (intmax_t) ci->curpos);
                 return 1;
             } else
                 ci->seek_buffer(ci->curpos - (sizeof(buf) - 1));

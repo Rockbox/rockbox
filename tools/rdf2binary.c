@@ -58,7 +58,7 @@ long reverse (long N) {
 }
 
 
-int main()
+int main(void)
 {
     FILE *in, *idx_out, *desc_out;
     struct word w;
