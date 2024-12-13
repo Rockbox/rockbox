@@ -725,54 +725,49 @@ bool setid3v1title(int fd, struct mp3entry *entry)
 
 static bool is_cuesheet(char *tag, unsigned char *char_enc, unsigned char *cuesheet_offset)
 {
-    *char_enc = 0;
+    *char_enc = CHAR_ENC_ISO_8859_1;
     /* [enc type]+"CUESHEET\0" = 10 */
     *cuesheet_offset = 10;
-    unsigned char utf16 = 0;
-
-    switch (tag[0])
+    const char* key = "CUESHEET";
+    const int key_size = 8;
+    // check and skip encoding type
+    switch (*(tag++))
     {
-        case 0x00:
-            *char_enc = CHAR_ENC_ISO_8859_1;
-            break;
         case 0x01:
-            if (!memcmp(tag + 1, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
-                utf16 = CHAR_ENC_UTF_16_BE;
-            else if (!memcmp(tag + 1, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
-                utf16 = CHAR_ENC_UTF_16_LE;
+            if (!memcmp(tag, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
+                *char_enc = CHAR_ENC_UTF_16_BE;
+            else if (!memcmp(tag, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
+                *char_enc = CHAR_ENC_UTF_16_LE;
             else
                 return false;
 
             tag+= BOM_UTF_16_SIZE;
-            *char_enc = utf16;
             /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
             *cuesheet_offset = 21;
             break;
+
         case 0x02:
-            utf16 = *char_enc = CHAR_ENC_UTF_16_BE;
+            *char_enc = CHAR_ENC_UTF_16_BE;
             /* \2 + 0C0U0E0S0H0E0E0T00 = 19 */
             *cuesheet_offset = 19;
             break;
+
         case 0x03:
             *char_enc = CHAR_ENC_UTF_8;
-            break;
+        //fallthrough
+        case 0x00:
+            return !strncmp(tag, key, key_size);
+
         default:
             return false;
     }
-    ++tag; //skip encoding type
-    const char* key = "CUESHEET";
 
-    if (!utf16)
-        return !strncmp(tag, key, 8);
-
-    int tag_index;
-    for (int i =0; i < 8; ++i)
+    // check if UTF-16 string is variation of C0U0E0S0H0E0E0T or 0C0U0E0S0H0E0E0T
+    for (int i =0; i < key_size; ++i)
     {
-        tag_index = i<<1;
-        if ( (utf16 == CHAR_ENC_UTF_16_BE && tag[tag_index] == 0 && tag[tag_index + 1] == key[i] )
-            || (tag[tag_index] == key[i] && tag[tag_index + 1] == 0 ))
-            continue;
-        return false;
+        const char* utf16_char = &tag[(i << 1)];
+        if (*utf16_char + *(utf16_char + 1) != key[i])
+            return false;
     }
     return true;
 }
@@ -1093,7 +1088,7 @@ retry_with_limit:
                    aren't binary */
                 if(!tr->binary) {
                     if ( /* Is it an embedded cuesheet? */
-                       (tr->offset == 0 && tr->tag_length == 4 && !memcmp(header, "TXXX", 4)) &&
+                       (ptag == NULL && tr->tag_length == 4 && !memcmp(header, "TXXX", 4)) &&
                        (bytesread >= 14)
                     ) {
                         unsigned char char_enc;
