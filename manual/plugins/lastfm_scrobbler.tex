@@ -1,0 +1,53 @@
+\subsection{LastFm Scrobbler}
+The \setting{LastFm Scrobbler} plugin enables you to parse the rockbox
+playback log for tracks you have played for your own logging or upload
+to scrobbling services, such as Last.fm, Libre.fm or ListenBrainz.
+
+\setting{Playback Logging} must be enabled to record the tracks played
+the plugin will ask you to enable logging if run with logging disabled.
+
+\subsubsection{Menu}
+\begin{itemize}
+\item Remove duplicates - Only keeps the same track with the most time elapsed.
+\item Delete playback log - Remove the current playback log once it has been read.
+\item Save threshold - Percentage of track played to be considered 'L'istened.
+\item Minimum elapsed (ms) - Tracks played less than this will not be recorded in log.
+\item View log - View the current playback log.
+\item Revert to Default - Default settings restored.
+\item Cancel - Exit, you will be asked to save any changes
+\item Export - Append scrobbler log and save any changes, not visible if no playback log exists.
+\end{itemize}
+
+After the plugin has exported the scrobbler log you can find it in the root
+of the drive '.scrobbler.log' open it in the file browser to view the log.
+
+Subsequent exports will be appended to .scrobbler.log thus Delete playback log is advised.
+
+\begin{verbatim}
+A copy of the log can be found in
+'/rockbox/playback.old'
+it will be overwritten with each export
+\end{verbatim}
+
+\subsubsection{Format}
+Data will be saved in Audioscrobbler spec at: (use wayback machine).
+\url{http://www.audioscrobbler.net/wiki/Portable_Player_Logging}.
+
+\begin{verbatim}
+The scrobbler format consists of the following data items
+tab '\t' separated followed by newline '\n'
+\end{verbatim}
+
+\begin{itemize}
+\item ARTIST
+\item ALBUM
+\item TITLE
+\item TRACKNUM
+\item LENGTH
+\item RATING
+\item TIMESTAMP
+\item MUSICBRAINZ-TRACKID
+\end{itemize}
+
+If track info is not available (due to missing file or format limitations)
+the track path will be used instead.

@@ -910,6 +910,7 @@ struct user_settings
 #if defined(HAVE_EROS_QN_CODEC)
     int hp_lo_select; /* indicates automatic, headphone-only, or lineout-only operation */
 #endif
+    bool playback_log; /* ROCKBOX_DIR/playback.log for tracks played */
 };
 
 /** global variables **/

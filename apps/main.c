@@ -200,6 +200,7 @@ int main(void)
 #endif
 
 #if !defined(BOOTLOADER)
+    allocate_playback_log();
     if (!file_exists(ROCKBOX_DIR"/playername.txt"))
     {
         int fd = open(ROCKBOX_DIR"/playername.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);

@@ -841,6 +841,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    add_playbacklog,
 };
 
 static int plugin_buffer_handle;

@@ -77,6 +77,7 @@ enum e_find_type {
 };
 
 static void synclist_set(int selected_item, int items, int sel_size, struct printcell_data_t *pc_data);
+static int scrobbler_read_line(int fd, char* buf, size_t buf_size);
 static void pc_data_set_header(struct printcell_data_t *pc_data);
 
 static void browse_file(char *buf, size_t bufsz)
@@ -286,7 +287,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
         rb->lseek(fd, file_last_seek, SEEK_SET);
         line_num = file_line_num;
 
-        while ((rb->read_line(fd, buf, buf_len)) > 0)
+        while ((scrobbler_read_line(fd, buf, buf_len)) > 0)
         {
             if(buf[0] == '#')
                 continue;
@@ -395,6 +396,45 @@ static enum themable_icons list_icon_cb(int selected_item, void *data)
     return Icon_NOICON;
 }
 
+static int scrobbler_read_line(int fd, char* buf, size_t buf_size)
+{
+    int count = 0;
+    unsigned int pos = 0;
+    char sep = '\t';
+    char ch, last_ch = sep;
+    bool comment = false;
+
+    while (rb->read(fd, &ch, 1) > 0)
+    {
+        if (ch == sep && last_ch == sep && buf_size > pos)
+            buf[pos++] = ' ';
+
+        if (count++ == 0 && ch == '#') /* skip comments */
+            comment = true;
+        else if (!comment && ch != '\r' && buf_size > pos)
+            buf[pos++] = ch;
+
+        last_ch = ch;
+
+        if (pos > PRINTCELL_MAXLINELEN * 2)
+            break;
+
+        if (ch == '\n')
+        {
+            if (!comment)
+            {
+                buf[pos] = '\0';
+                if (buf_size > pos)
+                return count;
+            }
+            last_ch = sep;
+            comment = false;
+            count = 0;
+        }
+    }
+    return count;
+}
+
 /* load file entries into pc_data buffer, file should already be opened
  * and will be closed if the whole file was buffered */
 static int file_load_entries(struct printcell_data_t *pc_data)
@@ -404,18 +444,23 @@ static int file_load_entries(struct printcell_data_t *pc_data)
     int buffered = 0;
     unsigned int pos = 0;
     bool comment = false;
-    char ch;
+    char sep = '\t';
+    char ch, last_ch = sep;
     int fd = pc_data->fd_cur;
     if (fd < 0)
         return 0;
+    size_t buf_size = pc_data->buf_size - 1;
 
     rb->lseek(fd, 0, SEEK_SET);
 
     while (rb->read(fd, &ch, 1) > 0)
     {
+        if (ch == sep && last_ch == sep && buf_size > pos)
+            pc_data->buf[pos++] = ' ';
+
         if (count++ == 0 && ch == '#') /* skip comments */
             comment = true;
-        else if (!comment && ch != '\r' && pc_data->buf_size > pos)
+        else if (!comment && ch != '\r' && buf_size > pos)
             pc_data->buf[pos++] = ch;
 
         if (items == 0 && pos > PRINTCELL_MAXLINELEN * 2)
@@ -426,13 +471,14 @@ static int file_load_entries(struct printcell_data_t *pc_data)
             if (!comment)
             {
                 pc_data->buf[pos] = '\0';
-                if (pc_data->buf_size > pos)
+                if (buf_size > pos)
                 {
                     pos++;
                     buffered++;
                 }
                 items++;
             }
+            last_ch = sep;
             comment = false;
             count = 0;
             rb->yield();
@@ -903,9 +949,32 @@ static void synclist_set(int selected_item, int items, int sel_size, struct prin
                                      SCROBBLER_MIN_COLUMNS, pc_data);
     if (max_cols < SCROBBLER_MIN_COLUMNS) /* not a scrobbler file? */
     {
-        rb->gui_synclist_set_voice_callback(&lists, NULL);
-        pc_data->view_columns = printcell_set_columns(&lists, NULL,
-                                                    "$*512$", Icon_Questionmark);
+        /*check for a playlist_control file or a playback log*/
+
+        max_cols = count_max_columns(items, ':', 3, pc_data);
+
+        if (max_cols >= 3)
+        {
+            char headerbuf[32];
+            int w = gConfig.col_width;
+            rb->snprintf(headerbuf, sizeof(headerbuf),
+                     "$*%d$$*%d$$*%d$$*%d$", w, w, w, w);
+
+
+            struct printcell_settings pcs = {.cell_separator = gConfig.separator,
+                                            .title_delimeter = '$',
+                                            .text_delimeter = ':',
+                                            .hidecol_flags = gConfig.hidecol_flags};
+            rb->gui_synclist_set_voice_callback(&lists, NULL);
+            pc_data->view_columns = printcell_set_columns(&lists, &pcs,
+                                                  headerbuf, Icon_Rockbox);
+        }
+        else
+        {
+            rb->gui_synclist_set_voice_callback(&lists, NULL);
+            pc_data->view_columns = printcell_set_columns(&lists, NULL,
+                                                        "$*512$", Icon_Questionmark);
+        }
     }
 
     int curcol = printcell_get_column_selected();
@@ -951,19 +1020,32 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter)
     {
-        rb->strlcpy(filename, (const char*)parameter, MAX_PATH);
+        rb->strlcpy(filename, (const char*)parameter, sizeof(filename));
         filename[MAX_PATH - 1] = '\0';
+        parameter = NULL;
     }
 
     if (!rb->file_exists(filename))
     {
-        browse_file(filename, sizeof(filename));
-        if (!rb->file_exists(filename))
+        if (rb->strcmp(filename, "-scrobbler_view_pbl") == 0)
         {
-            rb->splash(HZ, "No Scrobbler file Goodbye.");
-            return PLUGIN_ERROR;
+            parameter = PLUGIN_APPS_DIR "/lastfm_scrobbler.rock";
+            rb->strlcpy(filename, ROCKBOX_DIR "/playback.log", MAX_PATH);
+            if (!rb->file_exists(filename))
+            {
+                rb->splashf(HZ * 2, "Viewer: NO log! %s", filename);
+                return rb->plugin_open(parameter, "-resume");
+            }
         }
-
+        else
+        {
+            browse_file(filename, sizeof(filename));
+            if (!rb->file_exists(filename))
+            {
+                rb->splash(HZ, "No file Goodbye.");
+                return PLUGIN_ERROR;
+            }
+        }
     }
 
     config_set_defaults();
@@ -1029,5 +1111,9 @@ enum plugin_status plugin_start(const void* parameter)
     }
     config_save();
     cleanup(&printcell_data);
+    if (parameter)
+    {
+        return rb->plugin_open((const char*)parameter, "-resume");
+    }
     return ret;
 }

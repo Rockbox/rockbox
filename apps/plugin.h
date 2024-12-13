@@ -990,6 +990,7 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*add_playbacklog)(struct mp3entry *id3);
 };
 
 /* plugin header */

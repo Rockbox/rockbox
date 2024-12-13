@@ -2314,6 +2314,7 @@ const struct settings_list settings[] = {
     "auto,headphone,lineout", hp_lo_select_apply, 3,
     ID2P(LANG_AUTO), ID2P(LANG_HEADPHONE), ID2P(LANG_LINEOUT)),
 #endif
+    OFFON_SETTING(0, playback_log, LANG_LOGGING, false, "play log", NULL),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
