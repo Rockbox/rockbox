@@ -247,9 +247,9 @@ void system_reboot(void)
 {
     /* Reset the SoC */
     asm volatile("msr CPSR_c, #0xd3   \n"
-                 "mov r0, #0x100000   \n"
-                 "mov r1, #0x3c800000 \n"
-                 "str r0, [r1]        \n");
+                 "mov r0, #0x100000   \n");
+
+    asm volatile("str r0, [%0]        \n" : : "r"(WDT_BASE));
 
     /* Wait for reboot to kick in */
     while(1);
