@@ -1002,7 +1002,9 @@
 #define ECCCTRL_STARTDECNOSYND (1 << 2)
 
 /* 17. IIS Tx/Rx INTERFACE */
-#define I2S_BASE 0x3CA00000
+#define I2S_BASE              0x3CA00000
+#define I2S_INTERFACE1_OFFSET   0x300000
+#define I2S_INTERFACE2_OFFSET   0xA00000
 
 #define I2SCLKCON               (*(REG32_PTR_T)(I2S_BASE))            /* Clock Control Register */
 #define I2STXCON                (*(REG32_PTR_T)(I2S_BASE + 0x04))     /* Tx configuration Register */
@@ -1279,6 +1281,10 @@
 #define UARTC_BASE_ADDR     0x3CC00000
 #define UARTC_N_PORTS       4
 #define UARTC_PORT_OFFSET   0x4000
+#if CONFIG_CPU == S5L8720
+#define UARTC_DMA_BASE_ADDR   0x3DB00000
+#define UARTC_DMA_PORT_OFFSET 0x100000
+#endif
 #endif
 
 /* 26. LCD INTERFACE CONTROLLER */
@@ -1727,10 +1733,10 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 #define IRQ_EXT6        33
 #endif
 
-#if CONFIG_CPU == S5L8702
-/* Something related to the ATA controller, needed for power up */
+/* Something related to the ATA controller, needed for HDD power up on ipod6g */
 #define ATA_UNKNOWN_BASE 0x38a00000
 
+#if CONFIG_CPU == S5L8702
 #define ATA_UNKNOWN (*((REG32_PTR_T)(ATA_UNKNOWN_BASE)))
 #endif
 
