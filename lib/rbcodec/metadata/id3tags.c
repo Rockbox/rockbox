@@ -574,17 +574,13 @@ static void unicode_munge(unsigned char* string, unsigned char* utf8buf, int *le
     unsigned char *str = string;
     unsigned char* utf8 = utf8buf;
 
-    int i = 0;
-    int templen = 0;
-
     switch (str[0]) {
         case 0x01: /* Unicode with or without BOM */
         case 0x02:
             (*len)--;
             str++;
             bool le;
-
-
+            int i = 0;
             /* Handle frames with more than one string
                (needed for TXXX frames).*/
             do {
@@ -593,24 +589,22 @@ static void unicode_munge(unsigned char* string, unsigned char* utf8buf, int *le
                     str += BOM_UTF_16_SIZE;
                     *len -= BOM_UTF_16_SIZE;
                 }
+                string = str;
 
                 while ((i < *len) && (str[0] || str[1])) {
-                    if(le)
-                        utf8 = utf16LEdecode(str, utf8, 1);
-                    else
-                        utf8 = utf16BEdecode(str, utf8, 1);
-
                     str+=2;
                     i += 2;
                 }
 
+                utf8 = utf16decode(string, utf8, (str-string)>>1 /*(str-string)/2*/, utf8buf_size, le);
                 *utf8++ = 0; /* Terminate the string */
-                templen += (strlen(&utf8buf[templen]) + 1);
+                utf8buf_size -= utf8 - utf8buf;
                 str += 2;
-                i+=2;
-            } while(i < *len);
-            *len = templen - 1;
+                i += 2;
+            } while(i < *len && utf8buf_size > 0);
+            *len = utf8 - utf8buf  - 1;
             break;
+
         /* case 0x03:  UTF-8 encoded string handled by parse_as_utf8 */
 
         case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */

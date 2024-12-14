@@ -265,7 +265,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
     {
         if (char_enc == CHAR_ENC_UTF_16_LE)
         {
-            s = utf16LEdecode(line, utf16_buf, line_len);
+            s = utf16decode(line, utf16_buf, line_len>>1, sizeof(utf16_buf) - 1, true);
             /* terminate the string at the newline */
             *s = '\0';
             strcpy(line, utf16_buf);
@@ -275,7 +275,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
         else if (char_enc == CHAR_ENC_UTF_16_BE)
         {
-            s = utf16BEdecode(line, utf16_buf, line_len);
+            s = utf16decode(line, utf16_buf, line_len>>1, sizeof(utf16_buf) - 1, false);
             *s = '\0';
             strcpy(line, utf16_buf);
         }

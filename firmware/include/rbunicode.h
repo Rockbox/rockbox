@@ -61,6 +61,7 @@ unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int 
 
 unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
+unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8, int count, int utf8_size, bool le);
 bool utf16_has_bom(const unsigned char *utf16, bool *le);
 unsigned long utf8length(const unsigned char *utf8);
 const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
