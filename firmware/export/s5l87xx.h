@@ -170,14 +170,94 @@
 #define CLKCON3      (*((REG32_PTR_T)(CLK_BASE + 0x0C)))
 #define CLKCON4      (*((REG32_PTR_T)(CLK_BASE + 0x10)))
 #define CLKCON5      (*((REG32_PTR_T)(CLK_BASE + 0x14)))
-#define PLL0PMS      (*((REG32_PTR_T)(CLK_BASE + 0x20)))
-#define PLL1PMS      (*((REG32_PTR_T)(CLK_BASE + 0x24)))
-#define PLL2PMS      (*((REG32_PTR_T)(CLK_BASE + 0x28)))
-#define PLL0LCNT     (*((REG32_PTR_T)(CLK_BASE + 0x30)))
-#define PLL1LCNT     (*((REG32_PTR_T)(CLK_BASE + 0x34)))
-#define PLL2LCNT     (*((REG32_PTR_T)(CLK_BASE + 0x38)))
+
+#define CLKCON0_SDR_DISABLE_BIT (1 << 31)
+#if CONFIG_CPU == S5L8720
+#define CLKCON0_UNK30_BIT       (1 << 30)
+#endif
+
+/* CPU/AHB/APB real_divisor =
+   xDIV_EN_BIT ? 2*(reg_value+1) : 1 */
+#define CLKCON1_CDIV_POS        24
+#define CLKCON1_CDIV_MSK        0x1f
+#define CLKCON1_CDIV_EN_BIT     (1 << 30)
+
+#define CLKCON1_HDIV_POS        16
+#define CLKCON1_HDIV_MSK        0x1f
+#define CLKCON1_HDIV_EN_BIT     (1 << 22)
+
+#define CLKCON1_PDIV_POS        8
+#define CLKCON1_PDIV_MSK        0x1f
+#define CLKCON1_PDIV_EN_BIT     (1 << 14)
+
+/* AHB/APB ratio: must be written when HDIV and/or PDIV
+   are modified, real_ratio = reg_value + 1 */
+#define CLKCON1_HPRAT_POS       0
+#define CLKCON1_HPRAT_MSK       0x3f
+
+/* TBC: this bit selects a clock routed (at least) to all I2S modules
+ * (AUDAUX_Clk, see i2s-s5l8702.h), it can be selected as a source
+ * for CODEC_CLK (MCLK), on iPod Classic AUDAUX_Clk is:
+ *  0 -> 12 MHz (TBC: OSC0 ???)
+ *  1 -> 24 MHz (TBC: 2*OSC0 ???)
+ */
+#define CLKCON5_AUDAUXCLK_BIT   (1 << 31)
+
+#define PLLPMS(i)    (*((REG32_PTR_T)(CLK_BASE + 0x20 + ((i) * 4))))
+#define PLL0PMS      PLLPMS(0)
+#define PLL1PMS      PLLPMS(1)
+#define PLL2PMS      PLLPMS(2)
+
+/*
+ *  PLLnPMS
+ */
+#define PLLPMS_PDIV_POS         24      /* pre-divider */
+#define PLLPMS_PDIV_MSK         0x3f
+#define PLLPMS_MDIV_POS         8       /* main divider */
+#define PLLPMS_MDIV_MSK         0xff
+#define PLLPMS_SDIV_POS         0       /* post-divider (2^S) */
+#define PLLPMS_SDIV_MSK         0x7
+
+#define PLLCNT(i)    (*((REG32_PTR_T)(CLK_BASE + 0x30 + ((i) * 4))))
+#define PLLCNT_MSK   0x3fffff
+#define PLL0LCNT     PLLCNT(0)
+#define PLL1LCNT     PLLCNT(1)
+#define PLL2LCNT     PLLCNT(2)
+#if CONFIG_CPU == S5L8720
+#define PLLUNK3C     (*((REG32_PTR_T)(CLK_BASE + 0x3C)))
+#endif
 #define PLLLOCK      (*((REG32_PTR_T)(CLK_BASE + 0x40)))
+
+/* Start status:
+   0 -> in progress, 1 -> locked */
+#define PLLLOCK_LCK_BIT(n)      (1 << (n))
+
+/* Lock status for Divisor Mode (DM):
+   0 -> DM unlocked, 1 -> DM locked */
+#define PLLLOCK_DMLCK_BIT(n)    (1 << (4 + (n)))
+
 #define PLLMODE      (*((REG32_PTR_T)(CLK_BASE + 0x44)))
+
+/* Enable PLL0,1,2:
+   0 -> turned off, 1 -> turned on */
+#define PLLMODE_EN_BIT(n)       (1 << (n))
+
+/* Select PMS mode for PLL0,1:
+   0 -> mutiply mode (MM), 1 -> divide mode (DM) */
+#define PLLMODE_PMSMOD_BIT(n)   (1 << (4 + (n)))
+
+/* Select DMOSC for PLL2:
+   0 -> DMOSC_STD, 1 -> DMOSC_ALT */
+#define PLLMODE_PLL2DMOSC_BIT   (1 << 6)
+
+/* Select oscilator for CG16_SEL_OSC source:
+   0 -> S5L8702_OSC0, 1 -> S5L8702_OSC1 */
+#define PLLMODE_OSCSEL_BIT      (1 << 8)
+
+/* Select PLLxClk (a.k.a. "slow mode", see s3c2440-DS) for PLL0,1,2:
+   O -> S5L8702_OSC1, 1 -> PLLxFreq */
+#define PLLMODE_PLLOUT_BIT(n)   (1 << (16 + (n)))
+
 /* s5l8702 only uses PWRCON0 and PWRCON1 */
 #define PWRCON(i)    (*((REG32_PTR_T)(CLK_BASE \
                                            + ((i) == 4 ? 0x6C : \
@@ -185,6 +265,15 @@
                                              ((i) == 2 ? 0x58 : \
                                              ((i) == 1 ? 0x4C : \
                                                          0x48)))))))
+
+/* TBC: ATM i am assuming that PWRCON_AHB/APB registers are clockgates
+ * for SoC internal controllers sitting on AHB/APB buses, this is based
+ * on other similar SoC documentation and experimental results for many
+ * (not all) s5l8702 controllers.
+ */
+#define PWRCON_AHB  PWRCON(0)
+#define PWRCON_APB  PWRCON(1)
+
 /* SW Reset Control Register */
 #define SWRCON      (*((REG32_PTR_T)(CLK_BASE + 0x50)))
 /* Reset Status Register */
@@ -193,10 +282,24 @@
 #define RSTSR_SWR_BIT   (1 << 1)
 #define RSTSR_HWR_BIT   (1 << 0)
 
-#if CONFIG_CPU==S5L8720
-#define CLKCON6      (*((volatile uint32_t*)(CLK_BASE + 0x70)))
-#endif
-#endif
+#if CONFIG_CPU == S5L8702
+#define PLLMOD2     (*((REG32_PTR_T)(CLK_BASE + 0x60)))
+
+/* Selects ALTOSCx for PLL0,1,2 when DMOSC == DMOSC_ALT:
+   0 -> S5L8702_ALTOSC0, 1 -> S5L8702_ALTOSC1 */
+#define PLLMOD2_ALTOSC_BIT(n)   (1 << (n))
+
+/* Selects DMOSC for PLL0,1:
+   0 -> DMOSC_STD, 1 -> DMOSC_ALT */
+#define PLLMOD2_DMOSC_BIT(n)    (1 << (4 + (n)))
+
+#elif CONFIG_CPU==S5L8720
+#define PLLUNK64    (*((REG32_PTR_T)(CLK_BASE + 0x64))) // used by efi_ClockAndReset
+#define CLKCON6     (*((REG32_PTR_T)(CLK_BASE + 0x70)))
+#endif /* CONFIG_CPU==S5L8720 */
+#endif /* CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720 */
+
+
 
 #if CONFIG_CPU==S5L8700
 #define    CLOCKGATE_UARTC      8
@@ -341,6 +444,78 @@
 #define CLOCKGATE_TIMERD_2  151
 #endif
 
+#if CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8720
+/* CG16_x: for readability and debug, these gates are defined as
+ * 16-bit registers, on HW they are really halves of 32-bit registers.
+ * Some functionallity is not available on all CG16 gates (when so,
+ * related bits are read-only and fixed to 0).
+ *
+ *                CLKCONx   DIV1    DIV2    UNKOSC   UNK14
+ *  CG16_SYS      0L        +
+ *  CG16_2L       2L        +               +(TBC)   +(TBC)
+ *  CG16_SVID     2H        +               +(TBC)
+ *  CG16_AUD0     3L        +       +
+ *  CG16_AUD1     3H        +       +
+ *  CG16_AUD2     4L        +       +
+ *  CG16_RTIME    4H        +       +       +
+ *  CG16_5L       5L        +
+ *
+ * Not all gates are fully tested, this information is mainly based
+ * on experimental test using emCORE:
+ *  - CG16_SYS and CG16_RTIME were tested mainly using time benchs.
+ *  - EClk is used as a fixed clock (not depending on CPU/AHB/APB
+ *    settings) for the timer controller. MIU_Clk is used by the MIU
+ *    controller to generate the DRAM refresh signals.
+ *  - AUDxClk are a source selection for I2Sx modules, so they can
+ *    can be scaled and routed to the I2S GPIO ports, where they
+ *    were sampled (using emCORE) to inspect how they behave.
+ *  - CG16_SVID seem to be used for external video, this info is
+ *    based on OF diagnostics reverse engineering.
+ *  - CG16_2L and CG16_5L usage is unknown.
+ */
+#define CG16_SYS        (*((REG16_PTR_T)(CLK_BASE)))
+#if CONFIG_CPU == S5L8702
+#define CG16_2L         (*((REG16_PTR_T)(CLK_BASE + 0x08)))
+#elif CONFIG_CPU == S5L8720
+#define CG16_LCD        (*((REG16_PTR_T)(CLK_BASE + 0x08)))
+#endif
+#define CG16_SVID       (*((REG16_PTR_T)(CLK_BASE + 0x0A)))
+#define CG16_AUD0       (*((REG16_PTR_T)(CLK_BASE + 0x0C)))
+#define CG16_AUD1       (*((REG16_PTR_T)(CLK_BASE + 0x0E)))
+#define CG16_AUD2       (*((REG16_PTR_T)(CLK_BASE + 0x10)))
+#define CG16_RTIME      (*((REG16_PTR_T)(CLK_BASE + 0x12)))
+#define CG16_5L         (*((REG16_PTR_T)(CLK_BASE + 0x14)))
+#if CONFIG_CPU == S5L8720
+#define CG16_6L         (*((REG16_PTR_T)(CLK_BASE + 0x70)))
+#endif
+
+/* CG16 output frequency =
+   !DISABLE_BIT * SEL_x frequency / DIV1+1 / DIV2+1 */
+#define CG16_DISABLE_BIT    (1 << 15)   /* mask clock output */
+#define CG16_UNK14_BIT      (1 << 14)   /* writable on CG16_2L */
+
+#define CG16_SEL_POS        12          /* source clock selection */
+#define CG16_SEL_MSK        0x3
+#define CG16_SEL_OSC        0
+#define CG16_SEL_PLL0       1
+#define CG16_SEL_PLL1       2
+#define CG16_SEL_PLL2       3
+
+#define CG16_UNKOSC_BIT     (1 << 11)
+
+#define CG16_DIV2_POS       4           /* 2nd divisor */
+#define CG16_DIV2_MSK       0xf
+
+#define CG16_DIV1_POS       0           /* 1st divisor */
+#define CG16_DIV1_MSK       0xf
+
+/* SM1 */
+#define SM1_BASE 0x38500000
+
+/* TBC: Clk_SM1 = HClk / (SM1_DIV[3:0] + 1) */
+#define SM1_DIV     (*((REG32_PTR_T)(SM1_BASE + 0x1000)))
+#endif
+
 /* 06. INTERRUPT CONTROLLER UNIT */
 #define INT_BASE 0x39C00000
 
@@ -423,7 +598,8 @@
 #define MIUCOM                  (*(REG32_PTR_T)(MIU_BASE + 0x104))    /* Command and status register */
 #define MIUMRS                  (*(REG32_PTR_T)(MIU_BASE + 0x110))    /* SDRAM Mode Register Set Value Register */
 
-#define UNK3E000008             (*(REG32_PTR_T)(0x3e000008))
+#define UNK3E000000_BASE        0x3e000000
+#define UNK3E000008             (*(REG32_PTR_T)(UNK3E000000_BASE + 0x08))
 #endif
 
 /* DDR */
