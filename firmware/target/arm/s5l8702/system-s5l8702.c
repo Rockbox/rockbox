@@ -301,7 +301,7 @@ static void set_page_tables(void)
 #endif
 
     /* disable caching for I/O area */
-    map_section(0x38000000, 0x38000000, 0x80, CACHE_NONE);
+    map_section(IO_BASE, IO_BASE, 0x80, CACHE_NONE);
 
     /* map RAM uncached addresses */
     map_section(0, S5L8702_UNCACHED_ADDR(0x0), 0x380, CACHE_NONE);

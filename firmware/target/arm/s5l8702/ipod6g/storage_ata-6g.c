@@ -483,11 +483,11 @@ static int ceata_wait_idle(void)
 
 static int ceata_cancel_command(void)
 {
-    *((uint32_t volatile*)0x3cf00200) = 0x9000e;
+    GPIOCMD = 0x9000e;
     udelay(1);
-    *((uint32_t volatile*)0x3cf00200) = 0x9000f;
+    GPIOCMD = 0x9000f;
     udelay(1);
-    *((uint32_t volatile*)0x3cf00200) = 0x90003;
+    GPIOCMD = 0x90003;
     udelay(1);
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_STOP_TRANSMISSION)
                            | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R1 | SDCI_CMD_RES_BUSY
@@ -669,17 +669,17 @@ static int ata_power_up(void)
         PCON(8) = 0x33333333;
         PCON(9) = 0x00000033;
         PCON(11) |= 0xf;
-        *((uint32_t volatile*)0x38a00000) = 0;
-        *((uint32_t volatile*)0x38700000) = 0;
+        ATA_UNKNOWN = 0;
+        ATA_CONTROL = 0;
         PWRCON(0) &= ~(1 << 9);
         SDCI_RESET = 0xa5;
         sleep(HZ / 100);
-        *((uint32_t volatile*)0x3cf00380) = 0;
-        *((uint32_t volatile*)0x3cf0010c) = 0xff;
+        GPIOUNK380 = 0;
+        PUNK8 = 0xff;
         SDCI_CTRL = SDCI_CTRL_SDCIEN | SDCI_CTRL_CLK_SEL_SDCLK
                   | SDCI_CTRL_BIT_8 | SDCI_CTRL_BIT_14;
         SDCI_CLKDIV = SDCI_CDIV_CLKDIV(260);
-        *((uint32_t volatile*)0x3cf00200) = 0xb000f;
+        GPIOCMD = 0xb000f;
         SDCI_IRQ_MASK = SDCI_IRQ_MASK_MASK_DAT_DONE_INT | SDCI_IRQ_MASK_MASK_IOCARD_IRQ_INT;
         PASS_RC(mmc_init(), 3, 0);
         SDCI_CLKDIV = SDCI_CDIV_CLKDIV(4);
