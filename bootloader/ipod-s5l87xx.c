@@ -32,6 +32,7 @@
 #include "../kernel-internal.h"
 #include "file_internal.h"
 #include "storage.h"
+#include "fat.h"
 #include "disk.h"
 #include "font.h"
 #include "backlight.h"
@@ -56,11 +57,10 @@
 #include "i2c-s5l8702.h"
 #include "gpio-s5l8702.h"
 #include "pmu-target.h"
+#if defined(IPOD_6G) || defined(IPOD_NANO3G)
 #include "norboot-target.h"
+#endif
 
-
-#define FW_ROCKBOX  0
-#define FW_APPLE    1
 
 #define ERR_RB  0
 #define ERR_OF  1
@@ -81,6 +81,7 @@ extern uint32_t start_loc;
 
 extern int line;
 
+#ifndef S5L87XX_DEVELOPMENT_BOOTLOADER
 #ifdef HAVE_BOOTLOADER_USB_MODE
 static void usb_mode(void)
 {
@@ -238,9 +239,11 @@ static void battery_trap(void)
     lcd_set_foreground(LCD_WHITE);
     printf("Battery status ok: %d mV            ", vbat);
 }
+#endif
 
 static int launch_onb(int clkdiv)
 {
+#if defined(IPOD_6G) || defined(IPOD_NANO3G)
     /* SPI clock = PClk/(clkdiv+1) */
     spi_clkdiv(SPI_PORT, clkdiv);
 
@@ -268,6 +271,20 @@ static int launch_onb(int clkdiv)
     /* Branch to start of IRAM */
     asm volatile("mov pc, %0"::"r"(IRAM0_ORIG));
     while(1);
+#elif defined(IPOD_NANO4G)
+    (void) clkdiv;
+
+    lcd_set_foreground(LCD_REDORANGE);
+    printf("Not implemented");
+
+    line++;
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+
+    return 0;
+#endif
 }
 
 /* Launch OF when kernel mode is running */
@@ -281,14 +298,14 @@ static int kernel_launch_onb(void)
 
 /*  The boot sequence is executed on power-on or reset. After power-up
  *  the device could come from a state of hibernation, OF hibernates
- *  the iPod after an inactive period of ~30 minutes (FW 1.1.2), on
- *  this state the SDRAM is in self-refresh mode.
+ *  the iPod after an inactive period of ~30 minutes, on this state the
+ *  SDRAM is in self-refresh mode.
  *
  *  t0 = 0
  *     S5L8702 BOOTROM loads an IM3 image located at NOR:
  *     - IM3 header (first 0x800 bytes) is loaded at IRAM1_ORIG
  *     - IM3 body (decrypted RB bootloader) is loaded at IRAM0_ORIG
- *     The time needed to load the RB bootloader (~90 Kb) is estimated
+ *     The time needed to load the RB bootloader (~100 Kb) is estimated
  *     on 200~250 ms. Once executed, RB booloader moves itself from
  *     IRAM0_ORIG to IRAM1_ORIG+0x800, preserving current IM3 header
  *     that contains the NOR offset where the ONB (original NOR boot),
@@ -317,20 +334,213 @@ static int kernel_launch_onb(void)
  *  t5 = ~2800,~3000 ms.
  *     rockbox.ipod is executed.
  */
+
+#ifdef S5L87XX_DEVELOPMENT_BOOTLOADER
+#include "piezo.h"
+#include "lcd-s5l8702.h"
+extern int lcd_type;
+
+static uint16_t alive[] = { 500,100,0, 0 };
+static uint16_t alivelcd[] = { 2000,200,0, 0 };
+
+static void sleep_test(void)
+{
+#ifndef IPOD_6G
+    int sleep_tmo = 5;
+    int awake_tmo = 3;
+
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    line = 0;
+
+    printf("Entering LCD sleep mode in %d seconds,", sleep_tmo);
+    printf("during sleep mode you will see a white");
+    printf("screen for about %d seconds.", awake_tmo);
+    while (sleep_tmo--) {
+        printf("Sleep in %d...", sleep_tmo);
+        sleep(HZ*1);
+    }
+    lcd_sleep();
+    sleep(HZ*awake_tmo);
+    lcd_awake();
+
+    line++;
+    printf("Awake!");
+
+    line++;
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+#endif
+}
+
+static void pmu_info(void)
+{
+    int loop = 0;
+
+    lcd_clear_display();
+    lcd_update();
+    while (button_status() != BUTTON_NONE);
+
+    while (1)
+    {
+        lcd_set_foreground(LCD_WHITE);
+        lcd_clear_display();
+        line = 0;
+        printf("loop: %d", loop++);
+
+        for (int i = 0; i < 128; i += 8)
+        {
+            unsigned char buf[8];
+
+#if defined(IPOD_NANO3G)
+            if (i == 0) {
+                static int flip = 0;
+                if (flip) {
+                    pmu_write(6, 0xff);
+                    pmu_write(7, 0xff);
+                }
+                else {
+                    pmu_write(6, 0xe7);
+                    pmu_write(7, 0xfe);
+                }
+                flip ^= 1;
+            }
+#elif defined(IPOD_NANO4G)
+            if (i == 120)
+                for (int j = 0; j < 8; j++)
+                    pmu_write(i+j, j);
+#endif
+            for (int j = 0; j < 8; j++)
+                buf[j] = pmu_read(i+j);
+
+            printf(" %2x: %2x %2x %2x %2x %2x %2x %2x %2x", i,
+                    buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],buf[6],buf[7]);
+        }
+        line++;
+        printf("USB: %s    ", (usb_detect() == USB_INSERTED) ? "inserted" : "not inserted");
+#if CONFIG_CHARGING
+        printf("Firewire: %s    ", pmu_firewire_present() ? "inserted" : "not inserted");
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+        printf("Accessory: %s    ", pmu_accessory_present() ? "inserted" : "not inserted");
+#endif
+        printf("Hold Switch: %s  ", pmu_holdswitch_locked() ? "locked" : "unlocked");
+        line++;
+        lcd_set_foreground(LCD_RBYELLOW);
+        printf("Press SELECT to continue");
+        if (button_status() == BUTTON_SELECT)
+            break;
+        sleep(HZ/2);
+    }
+}
+
+static void gpio_info(void)
+{
+    int loop = 0;
+
+    lcd_clear_display();
+
+    while (1)
+    {
+        lcd_set_foreground(LCD_WHITE);
+        lcd_clear_display();
+        line = 0;
+        printf("loop: %d", loop++);
+        for (int i = 0; i < GPIO_N_GROUPS; i ++)
+        {
+            printf(" %x: %8x %2x %4x %2x %2x", i,
+                    PCON(i), PDAT(i), PUNA(i), PUNB(i), PUNC(i));
+        }
+        line++;
+        lcd_set_foreground(LCD_RBYELLOW);
+        printf("Press SELECT to continue");
+        if (button_status() == BUTTON_SELECT)
+            break;
+        sleep(HZ/5);
+    }
+}
+
+static void run_of(void)
+{
+    int tmo = 5;
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    line = 0;
+    while (tmo--) {
+        printf("Booting OF in %d...", tmo);
+        sleep(HZ*1);
+    }
+    kernel_launch_onb();
+}
+
+static void devel_menu(void)
+{
+    while (1)
+    {
+        lcd_clear_display();
+        lcd_set_foreground(LCD_RBYELLOW);
+        line = 0;
+        printf("Select action:");
+        printf(" <LEFT>    LCD sleep/awake test");
+        printf(" <SELECT>  PMU info");
+        printf(" <RIGHT>   GPIO info");
+        printf(" <PLAY>    Launch OF");
+
+        while (button_status() != BUTTON_NONE);
+
+        bool done = false;
+        while (!done)
+        {
+            switch (button_status())
+            {
+                case BUTTON_LEFT:
+                    sleep_test();
+                    done = true;
+                    break;
+                case BUTTON_SELECT:
+                    pmu_info();
+                    done = true;
+                    break;
+                case BUTTON_RIGHT:
+                    gpio_info();
+                    done = true;
+                    break;
+                case BUTTON_PLAY:
+                {
+                    run_of();
+                    done = true;
+                    break;
+                }
+                default:
+                    sleep(HZ/100);
+                    break;
+            }
+        }
+    }
+}
+#endif /* S5L87XX_DEVELOPMENT_BOOTLOADER */
+
 void main(void)
 {
-//    int fw = FW_ROCKBOX;
     int rc = 0;
+
+#ifndef S5L87XX_DEVELOPMENT_BOOTLOADER
     unsigned char *loadbuffer;
     int (*kernel_entry)(void);
+#endif
 
     usec_timer_init();
+
+#ifdef S5L87XX_DEVELOPMENT_BOOTLOADER
+    piezo_seq(alive);
+#endif
 
     /* Configure I2C0 */
     i2c_preinit(0);
 
     if (pmu_is_hibernated()) {
-//        fw = FW_APPLE;
         rc = launch_onb(1); /* 27/2 = 13.5 MHz. */
     }
 
@@ -368,7 +578,6 @@ void main(void)
         if ((btn == BUTTON_MENU)
                 || (btn == (BUTTON_SELECT|BUTTON_LEFT))
                 || (btn == (BUTTON_SELECT|BUTTON_PLAY))) {
-//            fw = FW_APPLE;
             rc = kernel_launch_onb();
         }
     }
@@ -379,8 +588,18 @@ void main(void)
     lcd_clear_display();
     font_init();
     lcd_setfont(FONT_SYSFIXED);
+
+    // TODO: see if removing this causes the nano3g LCD to initialize properly
+#ifdef S5L87XX_DEVELOPMENT_BOOTLOADER
+    sleep(HZ);
+    for (int i = 0; i < lcd_type+1; i++) {
+        sleep(HZ/2);
+        piezo_seq(alivelcd);
+    }
+#endif
+
     lcd_update();
-    sleep(HZ/40);
+    sleep(HZ/40);  /* wait for lcd update */
 
     verbose = true;
 
@@ -389,9 +608,30 @@ void main(void)
 
     backlight_init(); /* Turns on the backlight */
 
+#ifdef S5L87XX_DEVELOPMENT_BOOTLOADER
+    line++;
+    printf("lcd type: %d", lcd_type);
+#ifdef S5L_LCD_WITH_READID
+    extern unsigned char lcd_id[4];
+    printf("lcd id: 0x%x", *((uint32_t*)&lcd_id[0]));
+#endif
+#ifdef IPOD_NANO4G
+    printf("boot cfg: 0x%x", pmu_read(0x7f));
+#endif
+    line++;
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+
+    devel_menu();
+#endif /* S5L87XX_DEVELOPMENT_BOOTLOADER */
+
+#ifndef S5L87XX_DEVELOPMENT_BOOTLOADER
     if (rc == 0) {
+#if (CONFIG_STORAGE & STORAGE_ATA)
         /* Wait until there is enought power to spin-up HDD */
         battery_trap();
+#endif
 
         rc = storage_init();
         if (rc != 0) {
@@ -403,7 +643,6 @@ void main(void)
 
         /* We wait until HDD spins up to check for hold button */
         if (button_hold()) {
-//            fw = FW_APPLE;
             printf("Executing OF...");
             ata_sleepnow();
             rc = kernel_launch_onb();
@@ -458,4 +697,5 @@ void main(void)
     enable_irq();
     printf("ERR: Failed to boot");
     while(1);
+#endif
 }
