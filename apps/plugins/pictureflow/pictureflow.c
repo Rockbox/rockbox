@@ -33,7 +33,6 @@
 #include "lib/grey.h"
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
-#include "lib/id3.h"
 
 /******************************* Globals ***********************************/
 static fb_data *lcd_fb;
@@ -2074,6 +2073,24 @@ static inline void free_borrowed_tracks(void)
     pf_tracks.used = 0;
     pf_tracks.cur_idx = -1;
     buf_ctx_unlock();
+}
+
+/* Fills mp3entry with metadata retrieved from  RAM, if possible, or by reading from
+ * the file directly.  Note that the tagcache only stores a subset of metadata and
+ * will thus not return certain properties of the file, such as frequency, size, or
+ * codec.
+ */
+bool retrieve_id3(struct mp3entry *id3, const char* file)
+{
+#if defined (HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    if (rb->tagcache_fill_tags(id3, file))
+    {
+        rb->strlcpy(id3->path, file, sizeof(id3->path));
+        return true;
+    }
+#endif
+
+    return rb->get_metadata(id3, -1, file);
 }
 
 /**

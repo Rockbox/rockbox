@@ -70,6 +70,4 @@ kbd_helper.c
 pluginlib_touchscreen.c
 #endif
 
-id3.c
-
 mul_id3.c
