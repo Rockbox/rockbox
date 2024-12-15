@@ -1835,7 +1835,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_BANFROMQS, tagcache_autoupdate, LANG_TAGCACHE_AUTOUPDATE, false,
                   "tagcache_autoupdate", NULL),
 #endif
-    CHOICE_SETTING(F_TEMPVAR, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
+    CHOICE_SETTING(F_TEMPVAR, default_codepage, LANG_DEFAULT_CODEPAGE, 14,
                    "default codepage",
                    /* The order must match with that in unicode.c */
                    "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,"
