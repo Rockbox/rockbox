@@ -737,6 +737,38 @@ target/arm/as3525/pcm-as3525.c
 #endif /* BOOTLOADER */
 #endif /* CONFIG_CPU == AS3525 */
 
+#if CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8720
+target/arm/ipod/button-clickwheel.c
+target/arm/s5l8702/kernel-s5l8702.c
+target/arm/s5l8702/system-s5l8702.c
+target/arm/s5l8702/timer-s5l8702.c
+target/arm/s5l8702/gpio-s5l8702.c
+target/arm/s5l8702/pl080.c
+target/arm/s5l8702/dma-s5l8702.c
+target/arm/s5l8702/clocking-s5l8702.c
+#if 0 // TODO
+target/arm/s5l8702/postmortemstub.S
+#endif
+#ifndef BOOTLOADER
+target/arm/s5l8702/pcm-s5l8702.c
+target/arm/s5l8702/debug-s5l8702.c
+#endif
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
+target/arm/s5l8702/usb-s5l8702.c
+#endif
+#ifdef HAVE_SERIAL
+target/arm/uc87xx.c
+target/arm/s5l8702/uart-s5l8702.c
+#endif
+target/arm/s5l8702/crypto-s5l8702.c
+#if CONFIG_CPU == S5L8702
+target/arm/s5l8702/spi-s5l8702.c
+target/arm/s5l8702/norboot-s5l8702.c
+#elif CONFIG_CPU == S5L8720
+/* target/arm/s5l8702/nandboot-s5l8702.c */
+#endif
+#endif /* S5L8702 || S5L8720 */
+
 #if defined(CPU_PP)
 target/arm/pp/i2s-pp.c
 target/arm/pp/kernel-pp.c
@@ -788,7 +820,7 @@ target/arm/tcc780x/crt0.S
 target/arm/imx31/crt0.S
 #elif CONFIG_CPU==S5L8700 || CONFIG_CPU==S5L8701
 target/arm/s5l8700/crt0.S
-#elif CONFIG_CPU==S5L8702
+#elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
 target/arm/s5l8702/crt0.S
 #elif CONFIG_CPU==IMX233
 target/arm/imx233/crt0.S
@@ -850,6 +882,9 @@ target/arm/rk27xx/ihifi2/lcd-ihifi770.c
 target/arm/rk27xx/ihifi2/lcd-ihifi770c.c
 #elif CONFIG_LCD == LCD_IHIFI800
 target/arm/rk27xx/ihifi2/lcd-ihifi800.c
+#elif CONFIG_LCD == LCD_IPOD6GNANO3G4G
+target/arm/s5l8702/lcd-s5l8702.c
+target/arm/s5l8702/lcd-asm-s5l8702.S
 #endif
 
 /* USB Stack */
@@ -1538,6 +1573,7 @@ target/arm/s5l8700/udacodec-meizu.c
 #ifdef IPOD_NANO2G
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/postmortemstub.S
+target/arm/s5l8700/usb-s5l8701.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-asm-nano2g.S
@@ -1546,8 +1582,9 @@ target/arm/s5l8700/ipodnano2g/power-nano2g.c
 target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
 target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
+#if (CONFIG_RTC == RTC_NANO2G)
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
-target/arm/s5l8700/usb-s5l8701.c
+#endif
 #ifdef HAVE_SERIAL
 target/arm/uc87xx.c
 target/arm/s5l8700/uart-s5l8701.c
@@ -1557,44 +1594,24 @@ target/arm/s5l8700/ipodnano2g/serial-nano2g.c
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
-#endif
+#endif /* IPOD_NANO2G */
 
 #ifdef IPOD_6G
-target/arm/ipod/button-clickwheel.c
-target/arm/s5l8702/ipod6g/storage_ata-6g.c
+target/arm/s5l8702/ipod6g/lcd-6g.c
 target/arm/s5l8702/ipod6g/backlight-6g.c
+target/arm/s5l8702/ipod6g/piezo-6g.c
+target/arm/s5l8702/ipod6g/pmu-6g.c
+target/arm/s5l8702/ipod6g/adc-6g.c
 target/arm/s5l8702/ipod6g/powermgmt-6g.c
 target/arm/s5l8702/ipod6g/power-6g.c
-target/arm/s5l8702/kernel-s5l8702.c
-target/arm/s5l8702/system-s5l8702.c
-target/arm/s5l8702/timer-s5l8702.c
-target/arm/s5l8702/gpio-s5l8702.c
-target/arm/s5l8702/pl080.c
-target/arm/s5l8702/dma-s5l8702.c
-target/arm/s5l8702/clocking-s5l8702.c
-target/arm/s5l8702/ipod6g/lcd-6g.c
-target/arm/s5l8702/ipod6g/lcd-asm-6g.S
-target/arm/s5l8702/ipod6g/piezo-6g.c
-target/arm/s5l8702/spi-s5l8702.c
-target/arm/s5l8702/crypto-s5l8702.c
-target/arm/s5l8702/norboot-s5l8702.c
-#if 0 //TODO
-target/arm/s5l8702/postmortemstub.S
-#endif
-target/arm/s5l8702/ipod6g/pmu-6g.c
+target/arm/s5l8702/ipod6g/storage_ata-6g.c
+#if (CONFIG_RTC == RTC_NANO2G)
 target/arm/s5l8702/ipod6g/rtc-6g.c
-target/arm/s5l8702/ipod6g/adc-6g.c
-#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
-target/arm/s5l8702/usb-s5l8702.c
 #endif
 #ifdef HAVE_SERIAL
-target/arm/uc87xx.c
-target/arm/s5l8702/uart-s5l8702.c
 target/arm/s5l8702/ipod6g/serial-6g.c
 #endif
 #ifndef BOOTLOADER
-target/arm/s5l8702/debug-s5l8702.c
-target/arm/s5l8702/pcm-s5l8702.c
 target/arm/s5l8702/ipod6g/audio-6g.c
 target/arm/s5l8702/ipod6g/cscodec-6g.c
 #endif /* BOOTLOADER */

@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-target.h 21478 2009-06-23 18:11:03Z bertrik $
+ * $Id: lcd-nano2g.c 28868 2010-12-21 06:59:17Z Buschel $
  *
- * Copyright (C) 2008 by Marcoen Hirschberg
+ * Copyright (C) 2009 by Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +18,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
+#ifndef __LCD_TARGET_H__
+#define __LCD_TARGET_H__
 
-bool backlight_hw_init(void);
-void backlight_hw_on(void);
-void backlight_hw_off(void);
-void backlight_hw_brightness(int brightness);
+// #include "config.h"
 
-void backlight_hw_kill(void);
+/* define this to add support for LCDs with 16-bit command set */
+#define S5L_LCD_WITH_CMDSET16
 
-#endif
+/* define this to include support for LCD read ID command */
+// #define S5L_LCD_WITH_READID
+
+// struct lcd_info_rec* lcd_target_get_info(void);
+
+
+#endif /* __LCD_TARGET_H__ */

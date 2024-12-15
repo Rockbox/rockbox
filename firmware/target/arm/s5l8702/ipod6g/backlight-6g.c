@@ -43,8 +43,6 @@ void backlight_hw_on(void)
     if (!lcd_active())
     {
         lcd_awake();
-        lcd_update();
-        sleep(HZ/20);
     }
 #endif
     pmu_write(0x29, 1);
@@ -66,4 +64,11 @@ bool backlight_hw_init(void)
     backlight_hw_on();
 
     return true;
+}
+
+/* Kill the backlight, instantly. */
+void backlight_hw_kill(void)
+{
+    pmu_write(0x2b, 0);  /* T_dimstep = 0 */
+    backlight_hw_off();
 }
