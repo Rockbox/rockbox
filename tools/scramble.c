@@ -107,7 +107,8 @@ void usage(void)
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
            "\t                   zxfi, zmoz, zen, zenv, zxfs, e450, e460,\n"
-           "\t                   e470, e580, a10, a20, a860, s750, e350, xdx3)\n");
+           "\t                   e470, e580, a10, a20, a860, s750, e350, xdx3,\n"
+           "\t                   nn3g)\n");
     printf("\nNo option results in nothing being done.\n");
 
     exit(1);
@@ -231,8 +232,8 @@ int main (int argc, char** argv)
             modelnum = 25;
         else if (!strcmp(&argv[1][5], "m200"))
             modelnum = 29;
-        else if(!strcmp(&argv[1][5], "c100")) 
-            modelnum = 30;            
+        else if(!strcmp(&argv[1][5], "c100"))
+            modelnum = 30;
         else if(!strcmp(&argv[1][5], "1630")) /* Philips HDD1630 */
             modelnum = 31;
         else if (!strcmp(&argv[1][5], "i7"))
@@ -335,6 +336,8 @@ int main (int argc, char** argv)
             modelnum = 115;
         else if (!strcmp(&argv[1][5], "erosqnative")) /* Aigo Eros Q Native */
             modelnum = 116;
+        else if (!strcmp(&argv[1][5], "nn3g")) /* iPod Nano 3rd Gen */
+            modelnum = 117;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
@@ -440,7 +443,7 @@ int main (int argc, char** argv)
         int mi4magic;
         char model[4] = "";
         char type[4] = "";
-        
+
         if(!strcmp(&argv[1][4], "v2")) {
             mi4magic = MI4_MAGIC_DEFAULT;
             version = 0x00010201;
@@ -460,12 +463,12 @@ int main (int argc, char** argv)
 
         iname = argv[2];
         oname = argv[3];
-        
+
         if(!strncmp(argv[2], "-model=", 7)) {
             iname = argv[3];
             oname = argv[4];
             strncpy(model, &argv[2][7], 4);
-            
+
             if(!strncmp(argv[3], "-type=", 6)) {
                 iname = argv[4];
                 oname = argv[5];
@@ -475,7 +478,7 @@ int main (int argc, char** argv)
 
         return mi4_encode(iname, oname, version, mi4magic, model, type);
     }
-    
+
     /* open file */
     file = fopen(iname,"rb");
     if (!file) {
@@ -485,9 +488,9 @@ int main (int argc, char** argv)
     fseek(file,0,SEEK_END);
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
-    
 
-    fseek(file,0,SEEK_SET); 
+
+    fseek(file,0,SEEK_SET);
     inbuf = malloc(length);
     if(method == add)
         outbuf = malloc(length + 8);
@@ -582,10 +585,10 @@ int main (int argc, char** argv)
        return -1;
     }
     fclose(file);
-    
+
     free(inbuf);
     free(outbuf);
-    
+
     return 0;
 }
 
@@ -597,7 +600,7 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
     unsigned char *outbuf;
     int i;
     unsigned char sum = 0;
-    
+
     file = fopen(iname, "rb");
     if (!file) {
        perror(iname);
@@ -605,8 +608,8 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
-    fseek(file,0,SEEK_SET); 
+
+    fseek(file,0,SEEK_SET);
     outbuf = malloc(length+0x1030);
 
     if ( !outbuf ) {
@@ -619,10 +622,10 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
         perror(iname);
         return -2;
     }
-    
+
     memset(outbuf, 0, 0x1030);
     strcpy((char *)outbuf, idstring);
-    memcpy(outbuf+0x20, iaudio_bl_flash, 
+    memcpy(outbuf+0x20, iaudio_bl_flash,
            BMPWIDTH_iaudio_bl_flash * (BMPHEIGHT_iaudio_bl_flash/8) * 2);
     short2be(BMPWIDTH_iaudio_bl_flash, &outbuf[0x10]);
     short2be((BMPHEIGHT_iaudio_bl_flash/8), &outbuf[0x12]);
@@ -641,7 +644,7 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, length+0x1030, file);
     if(len < (size_t)length) {
         perror(oname);
@@ -653,14 +656,14 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
 }
 
 
-/* Create an ipod firmware partition image 
+/* Create an ipod firmware partition image
 
    fw_ver = 2 for 3rd Gen ipods, 3 for all later ipods including 5g.
 
    This function doesn't yet handle the Broadcom resource image for the 5g,
    so the resulting images won't be usable.
 
-   This has also only been tested on an ipod Photo 
+   This has also only been tested on an ipod Photo
 */
 
 static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
@@ -699,7 +702,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     bufsize=(length+0x4600);
@@ -721,7 +724,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     fclose(file);
 
-    /* Calculate checksum for later use in header */    
+    /* Calculate checksum for later use in header */
     for(i = 0x4600; i < 0x4600+length;i++)
         sum += outbuf[i];
 
@@ -770,7 +773,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, length+0x4600, file);
     if(len < (size_t)length) {
         perror(oname);
@@ -797,7 +800,7 @@ static int ccpmp_encode(char *iname, char *oname)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     outbuf = malloc(CCPMP_SIZE);
@@ -825,7 +828,7 @@ static int ccpmp_encode(char *iname, char *oname)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, CCPMP_SIZE, file);
     if(len < (size_t)length) {
         perror(oname);

@@ -1604,6 +1604,27 @@ target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
 #endif /* IPOD_NANO2G */
 
+#ifdef IPOD_NANO3G
+target/arm/s5l8702/ipodnano3g/lcd-nano3g.c
+target/arm/s5l8702/ipodnano3g/backlight-nano3g.c
+target/arm/s5l8702/ipodnano3g/piezo-nano3g.c
+target/arm/s5l8702/ipodnano3g/pmu-nano3g.c
+target/arm/s5l8702/ipodnano3g/adc-nano3g.c
+target/arm/s5l8702/ipodnano3g/powermgmt-nano3g.c
+target/arm/s5l8702/ipodnano3g/power-nano3g.c
+target/arm/s5l8702/ipodnano3g/nand-nano3g.c
+#if (CONFIG_RTC == RTC_NANO3G)
+target/arm/s5l8702/ipodnano3g/rtc-nano3g.c              // TODO: -> drivers/rtc/rtc_xxx.c ???
+#endif
+#ifdef HAVE_SERIAL
+target/arm/s5l8702/ipodnano3g/serial-nano3g.c
+#endif
+#ifndef BOOTLOADER
+target/arm/s5l8702/ipodnano3g/audio-nano3g.c
+target/arm/s5l8702/ipodnano3g/cscodec-nano3g.c          // TODO: -> wmcodec-nano3g.c
+#endif
+#endif /* IPOD_NANO3G */
+
 #ifdef IPOD_6G
 target/arm/s5l8702/ipod6g/lcd-6g.c
 target/arm/s5l8702/ipod6g/backlight-6g.c

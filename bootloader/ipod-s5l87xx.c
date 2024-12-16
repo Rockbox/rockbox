@@ -696,7 +696,8 @@ void main(void)
     printf("lcd type: %d", lcd_type);
 #ifdef S5L_LCD_WITH_READID
     extern unsigned char lcd_id[4];
-    printf("lcd id: 0x%x", *((uint32_t*)&lcd_id[0]));
+    uint32_t* lcd_id_32 = (uint32_t *)lcd_id;
+    printf("lcd id: 0x%x", *lcd_id_32);
 #endif
 #ifdef IPOD_NANO4G
     printf("boot cfg: 0x%x", pmu_read(0x7f));

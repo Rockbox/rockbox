@@ -1678,49 +1678,49 @@ cat <<EOF
  40) Gigabeat F/X          27) 1G, 2G            51) Sansa e200R
  41) Gigabeat S            28) Nano 2G           52) Sansa c200
                            29) Classic/6G        55) Sansa Clip
- ==Olympus=                                      56) Sansa e200v2
- 70) M:Robe 50             ==Creative==          57) Sansa m200v4
- 71) M:Robe 100            89) Zen X-Fi Style    58) Sansa Fuze
-                           90) Zen Vision:M 30GB 59) Sansa c200v2
- ==Philips==               91) Zen Vision:M 60GB 60) Sansa Clipv2
- 100) GoGear SA9200        92) Zen Vision        61) Sansa View
- 101) GoGear HDD1630/      93) Zen X-Fi2         62) Sansa Clip+
-      HDD1830              94) Zen X-Fi3         63) Sansa Fuze v2
- 102) GoGear HDD6330       95) Zen V             64) Sansa Fuze+
-                           96) Zen X-Fi          65) Sansa Clip Zip
- ==Meizu==                 97) Zen Mozaic        66) Sansa Connect
- 110) M6SL                 98) Zen
- 111) M6SP                                       ==Lyre project==
- 112) M3                   ==Onda==              130) Lyre proto 1
-                           120) VX747            131) Mini2440
- ==Samsung==               121) VX767
- 140) YH-820               122) VX747+           ==Packard Bell==
- 141) YH-920               123) VX777            160) Vibe 500
- 142) YH-925
- 143) YP-S3                ==MPIO==              ==ROCKCHIP==
-                           170) HD200            180) rk27xx generic
- ==HiFiMAN==               171) HD300
- 190) HM-60x                                     ==HiFi E.T.==
- 191) HM-801               ==Application==       210) MA9
-                           200) SDL              211) MA9C
- ==Sony==                  201) Android          212) MA8
- 219) NWZ-E350 series      202) Nokia N8xx       213) MA8C
- 220) NWZ-E370/E380 series 203) Nokia N900
- 221) NWZ-E360 series      204) Pandora          ==IHIFI==
- 222) NWZ-E450 series      205) Samsung YP-R0    230) 760
- 223) NWZ-E460 series      206) Android MIPS     231) 960
- 224) NWZ-E470 series      207) Android x86      250) 770C
- 225) NWZ-E580 series      208) Samsung YP-R1    251) 770
- 226) NWZ-A10 series                             252) 800
- 227) NW-A20 series        ==iBasso==
- 228) NWZ-A860 series      232) DX50             ==AgpTek==
- 229) NWZ-S750 series      233) DX90             240) Rocker
-
- ==FiiO==                  ==xDuoo==             ==AIGO==
- 244) M3K Linux            241) X3               245) Eros Q / K
- 246) M3K baremetal        242) X3II             247) Eros Q / K native
-                           243) X20                     (hw1/hw2 bl, all hw rb)
- ==Shanling==                                    248) Eros Q / K native
+ ==Olympus=                80) Nano 3G (WIP)     56) Sansa e200v2
+ 70) M:Robe 50                                   57) Sansa m200v4
+ 71) M:Robe 100            ==Creative==          58) Sansa Fuze
+                           89) Zen X-Fi Style    59) Sansa c200v2
+ ==Philips==               90) Zen Vision:M 30GB 60) Sansa Clipv2
+ 100) GoGear SA9200        91) Zen Vision:M 60GB 61) Sansa View
+ 101) GoGear HDD1630/      92) Zen Vision        62) Sansa Clip+
+      HDD1830              93) Zen X-Fi2         63) Sansa Fuze v2
+ 102) GoGear HDD6330       94) Zen X-Fi3         64) Sansa Fuze+
+                           95) Zen V             65) Sansa Clip Zip
+ ==Meizu==                 96) Zen X-Fi          66) Sansa Connect
+ 110) M6SL                 97) Zen Mozaic
+ 111) M6SP                 98) Zen               ==Lyre project==
+ 112) M3                                         130) Lyre proto 1
+                           ==Onda==              131) Mini2440
+ ==Samsung==               120) VX747
+ 140) YH-820               121) VX767            ==Packard Bell==
+ 141) YH-920               122) VX747+           160) Vibe 500
+ 142) YH-925               123) VX777
+ 143) YP-S3                                      ==ROCKCHIP==
+                           ==MPIO==              180) rk27xx generic
+ ==HiFiMAN==               170) HD200
+ 190) HM-60x               171) HD300            ==HiFi E.T.==
+ 191) HM-801                                     210) MA9
+                           ==Application==       211) MA9C
+ ==Sony==                  200) SDL              212) MA8
+ 219) NWZ-E350 series      201) Android          213) MA8C
+ 220) NWZ-E370/E380 series 202) Nokia N8xx
+ 221) NWZ-E360 series      203) Nokia N900       ==IHIFI==
+ 222) NWZ-E450 series      204) Pandora          230) 760
+ 223) NWZ-E460 series      205) Samsung YP-R0    231) 960
+ 224) NWZ-E470 series      206) Android MIPS     250) 770C
+ 225) NWZ-E580 series      207) Android x86      251) 770
+ 226) NWZ-A10 series       208) Samsung YP-R1    252) 800
+ 227) NW-A20 series
+ 228) NWZ-A860 series      ==iBasso==            ==AgpTek==
+ 229) NWZ-S750 series      232) DX50             240) Rocker
+                           233) DX90
+ ==FiiO==                                        ==AIGO==
+ 244) M3K Linux            ==xDuoo==             245) Eros Q / K
+ 246) M3K baremetal        241) X3               247) Eros Q / K native
+                           242) X3II                    (hw1/hw2 bl, all hw rb)
+ ==Shanling==              243) X20              248) Eros Q / K native
  260) Q1                                                (hw3 bl only)
                                                  249) Eros Q / K native
                                                         (hw4 bl only)
@@ -2628,6 +2628,29 @@ fi
     t_soc="pp"
     t_manufacturer="olympus"
     t_model="mrobe-100"
+    ;;
+
+   80|ipodnano3g)
+    target_id=117
+    modelname="ipodnano3g"
+    target="IPOD_NANO3G"
+    memory=32 # always
+    arm926ejscc
+    tool="$rootdir/tools/scramble -add=nn3g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.ipod"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    bootoutput="bootloader-$modelname.ipod"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8702"
+    t_model="ipodnano3g"
     ;;
 
    89|creativezenxfistyle)
