@@ -32,7 +32,6 @@
 #include "../kernel-internal.h"
 #include "file_internal.h"
 #include "storage.h"
-#include "fat.h"
 #include "disk.h"
 #include "font.h"
 #include "backlight.h"
@@ -62,9 +61,9 @@
 #endif
 
 
-#define ERR_RB  0
-#define ERR_OF  1
-#define ERR_HDD 2
+#define ERR_RB      0
+#define ERR_OF      1
+#define ERR_STORAGE 2
 
 /* Safety measure - maximum allowed firmware image size.
    The largest known current (October 2009) firmware is about 6.2MB so
@@ -158,7 +157,7 @@ void fatal_error(int err)
             printf("Hold MENU+SELECT to reboot");
             break;
 #endif
-        case ERR_HDD:
+        case ERR_STORAGE:
             printf("Hold MENU+SELECT to reboot");
             printf("then SELECT+PLAY for disk mode");
             break;
@@ -168,8 +167,10 @@ void fatal_error(int err)
             break;
     }
 
+#if (CONFIG_STORAGE & STORAGE_ATA)
     if (ide_powered())
         ata_sleepnow(); /* Immediately spindown the disk. */
+#endif
 
     line++;
     lcd_set_foreground(LCD_REDORANGE);
@@ -180,6 +181,7 @@ void fatal_error(int err)
     }
 }
 
+#if (CONFIG_STORAGE & STORAGE_ATA)
 static void battery_trap(void)
 {
     int vbat, old_verb;
@@ -239,7 +241,8 @@ static void battery_trap(void)
     lcd_set_foreground(LCD_WHITE);
     printf("Battery status ok: %d mV            ", vbat);
 }
-#endif
+#endif /* CONFIG_STORAGE & STORAGE_ATA */
+#endif /* S5L87XX_DEVELOPMENT_BOOTLOADER */
 
 static int launch_onb(int clkdiv)
 {
@@ -635,8 +638,8 @@ void main(void)
 
         rc = storage_init();
         if (rc != 0) {
-            printf("ATA error: %d", rc);
-            fatal_error(ERR_HDD);
+            printf("Storage error: %d", rc);
+            fatal_error(ERR_STORAGE);
         }
 
         filesystem_init();
@@ -644,7 +647,9 @@ void main(void)
         /* We wait until HDD spins up to check for hold button */
         if (button_hold()) {
             printf("Executing OF...");
+#if (CONFIG_STORAGE & STORAGE_ATA)
             ata_sleepnow();
+#endif
             rc = kernel_launch_onb();
         }
     }
