@@ -224,8 +224,11 @@ static void LCDFN(scroll_worker)(void)
         /* put the line onto the display now */
         makedelay = LCDFN(scroll_now(s));
 
+#ifdef SIMULATOR /* Bugfix sim won't update screen unless called from active thread */
+        LCDFN(set_viewport)(oldvp);
+#else
         LCDFN(set_viewport_ex)(oldvp, 0); /* don't mark the last vp as dirty */
-
+#endif
         if (makedelay)
             s->start_tick += si->delay + si->ticks;
     }
