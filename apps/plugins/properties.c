@@ -187,12 +187,35 @@ static int browse_file_or_dir(struct dir_stats *stats)
             continue;
         switch(button)
         {
-            case ACTION_STD_OK:
+            case ACTION_STD_OK:;
+                int sel_pos = rb->gui_synclist_get_sel_pos(&properties_lists);
+
+                /* "Show Track Info..." selected? */
                 if ((props_type == PROPS_PLAYLIST || props_type == PROPS_DIR) &&
-                      rb->gui_synclist_get_sel_pos(&properties_lists)
-                        == (props_type == PROPS_DIR ?
-                            ARRAY_SIZE(props_dir) : ARRAY_SIZE(props_file)) - 2)
+                    sel_pos == (props_type == PROPS_DIR ?
+                                ARRAY_SIZE(props_dir) : ARRAY_SIZE(props_file)) - 2)
                     return -1;
+                else
+                {
+                    /* Display field in fullscreen */
+                    FOR_NB_SCREENS(i)
+                        rb->viewportmanager_theme_enable(i, false, NULL);
+                    if (props_type == PROPS_DIR)
+                        view_text((char *) p2str(props_dir[sel_pos]),
+                                  (char *)       props_dir[sel_pos + 1]);
+                    else
+                        view_text((char *) p2str(props_file[sel_pos]),
+                                  (char *)       props_file[sel_pos + 1]);
+                    FOR_NB_SCREENS(i)
+                        rb->viewportmanager_theme_undo(i, false);
+
+                    rb->gui_synclist_set_title(&properties_lists,
+                               rb->str(props_type == PROPS_DIR ?
+                                       LANG_PROPERTIES_DIRECTORY_PROPERTIES :
+                                       LANG_PROPERTIES_FILE_PROPERTIES),
+                               NOICON);
+                    rb->gui_synclist_draw(&properties_lists);
+                }
                 break;
             case ACTION_STD_CANCEL:
                 return 0;
