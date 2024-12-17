@@ -6,8 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2009 by Karl Kurbjun 
- *      based on work by Shirour: 
+ *   Copyright (C) 2009 by Karl Kurbjun
+ *      based on work by Shirour:
  *          http://www.mrobe.org/forum/viewtopic.php?f=6&t=2176
  *   $Id$
  *
@@ -28,6 +28,13 @@
 #include <inttypes.h>
 #include <sys/stat.h>
 #include "mr500.h"
+#ifdef __APPLE__
+#include <libkern/OSByteOrder.h>
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define htole16(x) OSSwapHostToLittleInt16(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
+#define le16toh(x) OSSwapLittleToHostInt16(x)
+#endif
 
 /* Notes about firmware:
  *  These notes are based on the work and observations of Shirour on the M:Robe
@@ -54,7 +61,7 @@ int encrypt_array[16];
 
 /* mr500_patch_file: This function modifies the specified file with the patches
  *  struct.
- * 
+ *
  *  Parameters:
  *      filename:       text filename
  *      patches:        pointer to structure array of patches
@@ -68,44 +75,44 @@ int mr500_patch_file(char *filename, struct patch_single *patches,
     int         fdo;
     int         ret=0;
     uint32_t    endian_int;
-    
+
     /* Open the file write only. */
     fdo = open(filename, O_WRONLY);
-    
+
     if(fdo<0) {
         ret=-1;
     }
-    
+
     while(num_patches--) {
         /* seek to patch offset */
-        if(lseek(fdo, patches[num_patches].offset, SEEK_SET) 
+        if(lseek(fdo, patches[num_patches].offset, SEEK_SET)
                 != patches[num_patches].offset) {
             ret=-1;
             break;
         }
-        
+
         /* Make sure patch is written in little endian format */
         endian_int = htole32(patches[num_patches].value);
-        
+
         /* Write the patch value to the file */
         if(write(fdo, (void *) &endian_int, sizeof(endian_int)) < 0) {
             ret = -1;
             break;
         }
     }
-    
+
     /* Close the file and check for errors */
     if(close (fdo) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_save_header: This function saves the Olympus header to the firmware 
- *  image. The values stored in the header are explained above.  Note that this 
+/* mr500_save_header: This function saves the Olympus header to the firmware
+ *  image. The values stored in the header are explained above.  Note that this
  *  will truncate a file.  The header is stored in little endian format.
- * 
+ *
  *  Parameters:
  *      filename: text filename
  *      header: pointer to header structure to be saved
@@ -116,22 +123,22 @@ int mr500_patch_file(char *filename, struct patch_single *patches,
 int mr500_save_header(char *filename, struct olympus_header *header) {
     int fdo;
     int ret=0;
-    
+
     /* Temporary header used for storing the header in little endian. */
     struct olympus_header save;
-    
+
     /* Open the file write only and truncate it.  If it doesn't exist create. */
     fdo = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-    
+
     if(fdo<0) {
         ret=-1;
     }
-    
+
     /* Header is stored at offset 0 (Not really needed) */
     if(lseek(fdo, 0, SEEK_SET) != 0) {
         ret=-1;
     }
-    
+
     /* Convert header to Little Endian */
     memcpy(&save.magic_name, &header->magic_name, 8*sizeof(int8_t));
     save.unknown          = htole32(header->unknown);
@@ -144,19 +151,19 @@ int mr500_save_header(char *filename, struct olympus_header *header) {
     if(write(fdo, (void *) &save, sizeof(save)) < 0) {
         ret = -1;
     }
-    
+
     /* Close the file and check for errors */
     if(close (fdo) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_read_header: This function reads the Olympus header and converts it to 
- *  the host endian format. The values stored in the header are explained above. 
+/* mr500_read_header: This function reads the Olympus header and converts it to
+ *  the host endian format. The values stored in the header are explained above.
  *  The header is stored in little endian format.
- * 
+ *
  *  Parameters:
  *      filename: text filename
  *      header: pointer to header structure to store header read from file
@@ -167,43 +174,43 @@ int mr500_save_header(char *filename, struct olympus_header *header) {
 int mr500_read_header(char *filename, struct olympus_header *header) {
     int fdi;
     int ret = 0;
-    
+
     /* Open the file read only */
     fdi = open(filename, O_RDONLY);
 
     if(fdi<0) {
         ret=-1;
     }
-    
+
     /* Header is stored at offset 0 (Not really needed) */
     if(lseek(fdi, 0, SEEK_SET) != 0) {
         ret=-1;
     }
-    
+
     /* Read in the header */
     if(read(fdi, (void *) header, sizeof(*header)) < 0) {
         ret = -1;
     }
-    
+
     /* Convert header to system endian */
     header->unknown          = le32toh(header->unknown);
     header->header_length    = le16toh(header->header_length);
     header->flags            = le16toh(header->flags);
     header->unknown_zeros    = le32toh(header->unknown_zeros);
     header->image_length     = le32toh(header->image_length);
-    
+
     /* Close the file and check for errors */
     if(close (fdi) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_save_crc: This function saves the 'CRC' of the Olympus firmware image.  
+/* mr500_save_crc: This function saves the 'CRC' of the Olympus firmware image.
  *  Note that the 'CRC' must be calculated on the decrytped image.  It is stored
  *  in little endian.
- * 
+ *
  *  Parameters:
  *      filename: text filename
  *      offset: Offset to store the 'CRC' (header size + data size)
@@ -216,39 +223,39 @@ int mr500_save_crc(char *filename, off_t offset, uint32_t *crc_value) {
     int fdo;
     int ret = 0;
     uint32_t save_crc;
-    
+
     /* Open the file write only */
     fdo = open(filename, O_WRONLY);
-    
+
     if(fdo<0) {
         ret=-1;
     }
-    
+
     /* Seek to offset and check for errors */
     if(lseek(fdo, offset, SEEK_SET) != offset) {
         ret=-1;
     }
-    
+
     /* Convert 'CRC' to little endian from system native endian */
     save_crc = htole32(*crc_value);
-    
+
     /* Write the 'CRC' and check for errors */
     if(write(fdo, (void *) &save_crc, sizeof(unsigned int)) < 0) {
         ret = -1;
     }
-    
+
     /* Close the file and check for errors */
     if(close (fdo) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_read_crc: This function reads the 'CRC' of the Olympus firmware image.  
+/* mr500_read_crc: This function reads the 'CRC' of the Olympus firmware image.
  *  Note that the 'CRC' is calculated on the decrytped values.  It is stored
  *  in little endian.
- * 
+ *
  *  Parameters:
  *      filename: text filename
  *      offset: Offset to read the 'CRC' (header size + data size)
@@ -260,39 +267,39 @@ int mr500_save_crc(char *filename, off_t offset, uint32_t *crc_value) {
 int mr500_read_crc(char *filename, off_t offset, uint32_t *crc_value) {
     int fdi;
     int ret = 0;
-    
+
     /* Open the file read only */
     fdi = open(filename, O_RDONLY);
-    
+
     if(fdi<0) {
         ret = -1;
     }
-    
+
     /* Seek to offset and check for errors */
     if(lseek(fdi, offset, SEEK_SET) != offset) {
         ret=-1;
     }
-    
+
     /* Read in the 'CRC' */
     if(read(fdi, (void *) crc_value, sizeof(uint32_t)) < 0) {
         ret = -1;
     }
-    
+
     /* Convert the 'CRC' from little endian to system native format */
     *crc_value = le32toh(*crc_value);
-    
+
     /* Close the file and check for errors */
     if(close (fdi) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_calculate_crc: This function calculates the 'CRC' of the Olympus 
- *  firmware image.  Note that the 'CRC' must be calculated on decrytped values.  
+/* mr500_calculate_crc: This function calculates the 'CRC' of the Olympus
+ *  firmware image.  Note that the 'CRC' must be calculated on decrytped values.
  *  It is stored in little endian.
- * 
+ *
  *  Parameters:
  *      filename: text filename
  *      offset: Offset to the start of the data (header size)
@@ -302,24 +309,24 @@ int mr500_read_crc(char *filename, off_t offset, uint32_t *crc_value) {
  *  Returns:
  *      Returns 0 if there was no error, -1 if there was an error
  */
-int mr500_calculate_crc(  char *filename, off_t offset, unsigned int length, 
+int mr500_calculate_crc(  char *filename, off_t offset, unsigned int length,
                         uint32_t *crc_value){
     uint32_t temp;
     int fdi;
     int ret = 0;
-    
+
     /* Open the file read only */
     fdi = open(filename, O_RDONLY);
-    
+
     if(fdi<0) {
         ret = -1;
     }
-    
+
     /* Seek to offset and check for errors */
     if(lseek(fdi, offset, SEEK_SET) != offset) {
         ret=-1;
     }
-    
+
     /* Initialize the crc_value to make sure this starts at 0 */
     *crc_value = 0;
     /* Run this loop till the entire sum is created */
@@ -329,22 +336,22 @@ int mr500_calculate_crc(  char *filename, off_t offset, unsigned int length,
             ret = -1;
             break;
         }
-        
+
         /* Keep summing the values */
         *crc_value+=temp;
     } while (length-=4);
-    
+
     /* Close the file and check for errors */
     if(close (fdi) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
-/* mr500_save_data: This function encypts or decrypts the Olympus firmware 
+/* mr500_save_data: This function encypts or decrypts the Olympus firmware
  *      image based on the dictionary passed to it.
- * 
+ *
  *  Parameters:
  *      source_filename: text filename where data is read from
  *      dest_filename: text filename where data is written to
@@ -361,33 +368,33 @@ int mr500_save_data(
     int fdi, fdo;
     int ret = 0;
     int i;
-    
+
     /* read_count stores the number of bytes actually read */
     int read_count;
-    
+
     /* read_request stores the number of bytes to be requested */
     int read_request;
-    
+
     /* These two buffers are used for reading data and scrambling or
      *  descrambling
      */
     int8_t buffer_original[16];
     int8_t buffer_modified[16];
-    
+
     /* Open input read only, output write only */
     fdi = open(source_filename, O_RDONLY);
     fdo = open(dest_filename, O_WRONLY);
-    
+
     /* If there was an error loading the files set ret appropriately */
     if(fdi<0 || fdo < 0) {
         ret = -1;
     }
-    
+
     /* Input file: Seek to offset and check for errors */
     if(lseek(fdi, offset, SEEK_SET) != offset) {
         ret=-1;
     }
-    
+
     /* Output file: Seek to offset and check for errors */
     if(lseek(fdo, offset, SEEK_SET) != offset) {
         ret=-1;
@@ -403,10 +410,10 @@ int mr500_save_data(
         } else {
             read_request = length;
         }
-        
+
         /* Read in the data */
         read_count = read(fdi, (void *) &buffer_original, read_request);
-        
+
         /* If there was an error set the flag and break */
         if(read_count < 0) {
             ret = -1;
@@ -419,14 +426,14 @@ int mr500_save_data(
             /* Handle byte scrambling */
             buffer_modified[dictionary[i]] = buffer_original[i];
         }
-        
+
         /* write the data: If there was an error set the flag and break */
         if(write(fdo, (void *) &buffer_modified, read_count) < 0) {
             ret = -1;
             break;
         }
     } while (length -= read_count);
-    
+
     /* Close the files and check for errors */
     if(close (fdi) < 0) {
         ret = -1;
@@ -434,12 +441,12 @@ int mr500_save_data(
     if(close (fdo) < 0) {
         ret = -1;
     }
-    
+
     return ret;
 }
 
 /* mr500_init: This function initializes the encryption array
- * 
+ *
  *  Parameters:
  *      None
  *
