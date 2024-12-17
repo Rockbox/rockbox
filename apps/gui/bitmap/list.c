@@ -212,7 +212,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 
     struct viewport * last_vp = display->set_viewport(parent);
     display->clear_viewport();
-    display->scroll_stop_viewport(list_text_vp);
+    if (!list->scroll_all)
+        display->scroll_stop_viewport(list_text_vp);
     *list_text_vp = *parent;
     if ((show_title = draw_title(display, list, callback_draw_item)))
     {
