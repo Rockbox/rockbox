@@ -600,16 +600,16 @@ int usb_screen(void)
    return 0;
 }
 
-unsigned short *bidi_l2v(const unsigned char *str, int orientation)
+ucschar_t *bidi_l2v(const unsigned char *str, int orientation)
 {
-    static unsigned short utf16_buf[SCROLL_LINE_SIZE];
-    unsigned short *target;
+    static ucschar_t utf_buf[SCROLL_LINE_SIZE];
+    ucschar_t *target;
     (void)orientation;
 
-    target = utf16_buf;
+    target = utf_buf;
 
     while (*str)
         str = utf8decode(str, target++);
     *target = 0;
-    return utf16_buf;
+    return utf_buf;
 }

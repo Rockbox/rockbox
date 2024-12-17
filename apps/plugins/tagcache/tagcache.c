@@ -135,10 +135,10 @@ static void sleep_yield(void)
     #define yield sleep_yield
 }
 
-/* make sure tag can be displayed by font pf*/
+/* make sure tag can be displayed by font pf */
 static bool text_is_displayable(struct font *pf, unsigned char *src)
 {
-    unsigned short code;
+    ucschar_t code;
     const unsigned char *ptr = src;
     while(*ptr)
     {

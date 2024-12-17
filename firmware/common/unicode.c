@@ -127,7 +127,7 @@ static int volatile cp_table_ref = 0;
 
 /* non-default codepage table buffer (cannot be bufalloced! playback itself
    may be making the load request) */
-static unsigned short codepage_table[MAX_CP_TABLE_SIZE+1];
+static unsigned short codepage_table[MAX_CP_TABLE_SIZE+1]; // XXX convert to ucschar_t if we ever need > 16bit mappings?
 
 #if defined(APPLICATION) && defined(__linux__)
 static const char * const name_codepages_linux[NUM_CODEPAGES+1] =
@@ -344,7 +344,7 @@ unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int 
     cp_lock_leave();
 
     while (count-- && utf8_size > 0) {
-        unsigned short ucs, tmp;
+        ucschar_t ucs, tmp;
 
         if (*iso < 128 || cp == UTF_8) /* Already UTF-8 */
         {
@@ -511,8 +511,25 @@ unsigned long utf8length(const unsigned char *utf8)
     return l;
 }
 
+/* Take a utf8 string and return the encoded length in utf16 code units */
+unsigned long utf16len_utf8(const unsigned char *utf8)
+{
+    ucschar_t cp;
+    unsigned long length = 0;
+    while (*utf8) {
+        utf8 = utf8decode(utf8, &cp);
+#ifdef UNICODE32
+        if (cp >= 0x10000)
+            length++;
+#endif
+        length++;
+    }
+
+    return length;
+}
+
 /* Decode 1 UTF-8 char and return a pointer to the next char. */
-const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
+const unsigned char* utf8decode(const unsigned char *utf8, ucschar_t *ucs)
 {
     unsigned char c = *utf8++;
     unsigned long code;
@@ -552,8 +569,16 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
         /* Invalid UTF-8 char */
         code = 0xfffd;
     }
-    /* currently we don't support chars above U-FFFF */
-    *ucs = (code < 0x10000) ? code : 0xfffd;
+
+#ifdef UNICODE32
+    if (code > 0x10ffff)
+        code = 0xfffd;
+#else
+    if (code > 0xffff)
+        code = 0xfffd;
+#endif
+
+    *ucs = code;
     return utf8;
 }
 

@@ -206,8 +206,8 @@ static int prompt_filename(char *buf, size_t bufsz)
 {
 #define KBD_LAYOUT "abcdefghijklmnop\nqrstuvwxyz |()[]\n1234567890 /._-+\n\n" \
                    "\nABCDEFGHIJKLMNOP\nQRSTUVWXYZ |()[]\n1234567890 /._-+"
-    unsigned short kbd[sizeof(KBD_LAYOUT) + 10];
-    unsigned short *kbd_p = kbd;
+    ucschar_t kbd[sizeof(KBD_LAYOUT) + 10];
+    ucschar_t *kbd_p = kbd;
     if (!kbd_create_layout(KBD_LAYOUT, kbd, sizeof(kbd)))
         kbd_p = NULL;
 
@@ -1002,7 +1002,7 @@ next_line:
                 {
                     bufleft = bufsz - (pctx - filenamebuf);
                     ctx = -1;
-                    int ctx_x_flag_count = (LAST_CONTEXT_PLACEHOLDER 
+                    int ctx_x_flag_count = (LAST_CONTEXT_PLACEHOLDER
                                            * ARRAYLEN(context_flags));
 
                     for (int i=0;i < ctx_x_flag_count ;i++)
@@ -2058,7 +2058,7 @@ static void synclist_set(int id, int selected_item, int items, int sel_size)
     }
     else if (menu_id == MENU_ID(M_SETKEYS))
     {
-        keyset.view_columns = printcell_set_columns(&lists, NULL, 
+        keyset.view_columns = printcell_set_columns(&lists, NULL,
                                                   ACTVIEW_HEADER, Icon_Rockbox);
         printcell_enable(true);
         int curcol = printcell_get_column_selected();

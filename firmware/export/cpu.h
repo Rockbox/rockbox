@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __CPU_H
+#define __CPU_H
+
 #include "config.h"
 
 #if CONFIG_CPU == MCF5249
@@ -80,3 +83,5 @@
 #if CONFIG_CPU == STM32H743
 #include "cpu-stm32h743.h"
 #endif
+
+#endif /* __CPU_H */

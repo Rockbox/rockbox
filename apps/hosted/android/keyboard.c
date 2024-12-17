@@ -82,7 +82,7 @@ static void kdb_init(void)
         sleep(HZ/10);
 }
 
-int kbd_input(char* text, int buflen, unsigned short *kbd)
+int kbd_input(char* text, int buflen, ucschar_t *kbd)
 {
 	(void)kbd;
     JNIEnv e            = *env_ptr;
@@ -107,7 +107,7 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
     e->DeleteLocalRef(env_ptr, str);
     e->DeleteLocalRef(env_ptr, ok_text);
     e->DeleteLocalRef(env_ptr, cancel_text);
-    
+
     return !accepted; /* return 0 on success */
 }
 

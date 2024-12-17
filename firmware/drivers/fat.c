@@ -747,6 +747,8 @@ static bool fatlong_parse_entry(struct fatlong_parse_state *lnparse,
     /* so far so good; save entry information */
     lnparse->ord = ord;
 
+    /* Treat entries as opaque 16-bit values;
+       utf8decode happens in fatlong_parse_finish() */
     uint16_t *ucsp = fatent->ucssegs[ord - 1 + 5];
     unsigned int i = longent_char_first();
 
@@ -797,12 +799,23 @@ static bool fatlong_parse_finish(struct fatlong_parse_state *lnparse,
     /* ensure the last segment is NULL-terminated if it is filled */
     fatent->ucssegs[lnparse->ord_max + 5][0] = 0x0000;
 
-    for (uint16_t *ucsp = fatent->ucssegs[5], ucc = *ucsp;
-         ucc; ucc = *++ucsp)
+    unsigned long ucc;     /* Decoded codepoint */
+    uint16_t *ucsp, ucs;
+    for (ucsp = fatent->ucssegs[5], ucs=*ucsp; ucs; ucs = *++ucsp)
     {
         /* end should be hit before ever seeing padding */
-        if (ucc == 0xffff)
+        if (ucs == 0xffff)
             return false;
+
+#ifdef UNICODE32
+        /* Check for a surrogate UTF16 pair */
+        if (ucs >= 0xd800 && ucs < 0xdc00 &&
+            *(ucsp+1) >= 0xdc00 && *(ucsp+1) < 0xe000) {
+            ucc = 0x10000 + (((ucs & 0x3ff) << 10) | (*(ucsp+1) & 0x3ff));
+            ucsp++;
+        } else
+#endif
+            ucc = ucs;
 
         if ((p = utf8encode(ucc, p)) - name > FAT_DIRENTRY_NAME_MAX)
             return false;
@@ -1612,12 +1625,27 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
 
     for (unsigned long i = 0; i < ucspadlen; i++)
     {
-        if (i < ucslen)
+        if (i < ucslen) {
+#ifdef UNICODE32
+            ucschar_t tmp;
+            name = utf8decode(name, &tmp);
+            /* For codepoints > U+FFFF we will need to use a UTF16 surrogate
+               pair. 'ucslen' already takes this into account! */
+            if (tmp < 0x10000) {
+                ucsname[i] = tmp;
+            } else {
+                tmp -= 0x10000;
+                ucsname[i++] = 0xd800 | ((tmp >> 10) & 0x3ff); /* High */
+                ucsname[i] = 0xdc00 | (tmp & 0x3ff); /* Low */
+            }
+#else
             name = utf8decode(name, &ucsname[i]);
-        else if (i == ucslen)
+#endif
+        } else if (i == ucslen) {
             ucsname[i] = 0x0000; /* name doesn't fill last block */
-        else /* i > ucslen */
+        } else /* i > ucslen */ {
             ucsname[i] = 0xffff; /* pad-out to end */
+        }
     }
 
     dc_lock_cache();
@@ -1744,9 +1772,12 @@ static int add_dir_entry(struct bpb *fat_bpb, struct fat_filestr *parentstr,
         create_dos_name(basisname, name, &n);
         randomize_dos_name(shortname, basisname, &n);
 
-        /* one dir entry needed for every 13 characters of filename,
-           plus one entry for the short name */
-        ucslen = utf8length(name);
+        /* one dir entry needed for every 13 utf16 "code units"
+           of filename, plus one entry for the short name.
+           Keep in mind that a unicode character can take up to
+           two code units!
+        */
+        ucslen = utf16len_utf8(name);
         if (ucslen > 255)
             FAT_ERROR(-2); /* name is too long */
 

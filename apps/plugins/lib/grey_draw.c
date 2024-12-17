@@ -199,8 +199,8 @@ void grey_hline(int x1, int x2, int y)
     /* nothing to draw? */
     if (y < _grey_info.clip_t || y >= _grey_info.clip_b ||
         x1 >= _grey_info.clip_r || x2 < _grey_info.clip_l)
-        return;  
-    
+        return;
+
     /* drawmode and optimisation */
     if (vp->drawmode & DRMODE_INVERSEVID)
     {
@@ -251,7 +251,7 @@ void grey_vline(int x, int y1, int y2)
     unsigned char *dst, *dst_end;
     void (*pfunc)(unsigned char *address);
     int dwidth;
-    
+
     /* direction flip */
     if (y2 < y1)
     {
@@ -264,7 +264,7 @@ void grey_vline(int x, int y1, int y2)
     if (x < _grey_info.clip_l || x >= _grey_info.clip_r ||
         y1 >= _grey_info.clip_b || y2 < _grey_info.clip_t)
         return;
-    
+
     /* clipping */
     if (y1 < _grey_info.clip_t)
         y1 = _grey_info.clip_t;
@@ -425,7 +425,7 @@ void grey_fillrect(int x, int y, int width, int height)
 
     if (height <= 0)
         return;
-    
+
     dwidth  = _grey_info.cb_width;
     dst     = &_grey_info.curbuffer[
                 _GREY_MULUQ(dwidth, _grey_info.vp->y - _grey_info.cb_y + y) +
@@ -653,8 +653,8 @@ void grey_gray_bitmap(const unsigned char *src, int x, int y, int width,
 /* Put a string at a given pixel position, skipping first ofs pixel columns */
 void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
-    int ch;
-    unsigned short *ucs;
+    ucschar_t ch;
+    ucschar_t *ucs;
     struct font* pf;
 
     if (_grey_info.clip_b <= _grey_info.clip_t)
@@ -680,7 +680,7 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         bits = rb->font_get_bits(pf, ch);
 
         grey_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs, pf->height);
-        
+
         x += width - ofs;
         ofs = 0;
     }
@@ -709,7 +709,7 @@ void grey_ub_clear_display(void)
 #endif
 }
 
-/* Assembler optimised helper function for copying a single line to the 
+/* Assembler optimised helper function for copying a single line to the
  * greyvalue buffer. */
 void _grey_line1(int width, unsigned char *dst, const unsigned char *src,
                  const unsigned char *lut);
@@ -725,7 +725,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
         || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -744,7 +744,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _grey_info.height)
         height = _grey_info.height - y;
 
-    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */ 
+    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */
     yc = y;
     ye = y + height;
     dst = _grey_info.values + (x << _GREY_BSHIFT);
@@ -773,7 +773,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         }
         while (src_row < src_end);
 #endif
-        
+
         src += stride;
     }
     while (++yc < ye);

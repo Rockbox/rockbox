@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2020 William Wilgus
@@ -22,6 +22,6 @@
 #define KBD_HELPER_H
 
 /* create a custom keyboard layout for kbd_input */
-int kbd_create_layout(const char *layout, unsigned short *buf, int bufsz);
+int kbd_create_layout(const char *layout, ucschar_t *buf, int bufsz);
 
 #endif /* KBD_HELPER_H */

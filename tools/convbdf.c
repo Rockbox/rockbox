@@ -116,7 +116,7 @@ int gen_h = 0;
 int gen_fnt = 0;
 int gen_map = 1;
 int start_char = 0;
-int limit_char = 65535;
+int limit_char = 0x10FFFF;
 int oflag = 0;
 char outfile[256];
 
@@ -569,7 +569,7 @@ struct font* bdf_read_font(char *path)
 int bdf_read_header(FILE *fp, struct font* pf)
 {
     int encoding;
-    int firstchar = 65535;
+    int firstchar = 0x10FFFF;
     int lastchar = -1;
     char buf[256];
     char facename[256];

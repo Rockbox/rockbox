@@ -385,7 +385,7 @@ static void LCDFN(mono_bmp_part_helper)(const unsigned char *src, int src_x,
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
-    unsigned short *ucs;
+    ucschar_t *ucs;
     struct viewport *vp = LCDFN(current_viewport);
     font_lock(vp->font, true);
     struct font* pf = font_get(vp->font);
@@ -429,7 +429,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         bool is_rtl, is_diac;
         const unsigned char *bits;
         int width, base_width, base_ofs = 0;
-        const unsigned short next_ch = ucs[1];
+        const ucschar_t next_ch = ucs[1];
 
         if (x >= vp->width)
             break;
@@ -447,7 +447,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             {
                 if (!rtl_next_non_diac_width)
                 {
-                    const unsigned short *u;
+                    const ucschar_t *u;
 
                     /* Jump to next non-diacritic char, and calc its width */
                     for (u = &ucs[1]; *u && IS_DIACRITIC(*u); u++);
@@ -529,7 +529,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
-    unsigned short *ucs;
+    ucschar_t *ucs;
     struct viewport *vp = LCDFN(current_viewport);
     struct font* pf = font_get(vp->font);
     const unsigned char *bits;
@@ -567,7 +567,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     /* allow utf but no diacritics or rtl lang */
     for (ucs = bidi_l2v(str, 1); *ucs; ucs++)
     {
-        const unsigned short next_ch = ucs[1];
+        const ucschar_t next_ch = ucs[1];
 
         if (x >= vp->width)
             break;

@@ -44,7 +44,7 @@
 #define XOR(a,b) ((a||b) && !(a&&b))
 
 #ifndef BOOTLOADER
-static const arab_t * arab_lookup(unsigned short uchar)
+static const arab_t * arab_lookup(ucschar_t uchar)
 {
     if (uchar >= 0x621 && uchar <= 0x63a)
         return &(jointable[uchar - 0x621]);
@@ -57,15 +57,15 @@ static const arab_t * arab_lookup(unsigned short uchar)
     return 0;
 }
 
-static void arabjoin(unsigned short * stringprt, int length)
+static void arabjoin(ucschar_t *stringprt, int length)
 {
     bool connected = false;
-    unsigned short * writeprt = stringprt;
+    ucschar_t *writeprt = stringprt;
 
     const arab_t * prev = 0;
     const arab_t * cur;
     const arab_t * ligature = 0;
-    short uchar;
+    ucschar_t uchar;
 
     int i;
     for (i = 0; i <= length; i++) {
@@ -135,13 +135,13 @@ static void arabjoin(unsigned short * stringprt, int length)
 }
 #endif /* !BOOTLOADER */
 
-unsigned short *bidi_l2v(const unsigned char *str, int orientation)
+ucschar_t *bidi_l2v(const unsigned char *str, int orientation)
 {
-    static unsigned short  utf16_buf[SCROLL_LINE_SIZE];
-    unsigned short *target, *tmp;
+    static ucschar_t utf_buf[SCROLL_LINE_SIZE];
+    ucschar_t *target, *tmp;
 #ifndef BOOTLOADER
-    static unsigned short  bidi_buf[SCROLL_LINE_SIZE];
-    unsigned short *heb_str; /* *broken_str */
+    static ucschar_t bidi_buf[SCROLL_LINE_SIZE];
+    ucschar_t *heb_str; /* *broken_str */
     int block_start, block_end, block_type, block_length, i;
     int length = utf8length(str);
     length=length>=SCROLL_LINE_SIZE?SCROLL_LINE_SIZE-1:length;
@@ -152,21 +152,21 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 
     tmp = str;
     */
-    target = tmp = utf16_buf;
-    while (*str && target < &utf16_buf[SCROLL_LINE_SIZE-1])
+    target = tmp = utf_buf;
+    while (*str && target < &utf_buf[SCROLL_LINE_SIZE-1])
         str = utf8decode(str, target++);
     *target = 0;
 
 #ifdef BOOTLOADER
     (void)orientation;
-    return utf16_buf;
-    
+    return utf_buf;
+
 #else /* !BOOTLOADER */
-    if (target == utf16_buf) /* empty string */
+    if (target == utf_buf) /* empty string */
         return target;
 
     /* properly join any arabic chars */
-    arabjoin(utf16_buf, length);
+    arabjoin(utf_buf, length);
 
     block_start=block_end=block_length=0;
 
@@ -204,7 +204,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 
         for (i=block_start; i<=block_end; i++) {
             *target = (block_type == orientation) ?
-                      *(utf16_buf+i) : *(utf16_buf+block_end-i+block_start);
+                      *(utf_buf+i) : *(utf_buf+block_end-i+block_start);
             if (block_type!=orientation) {
                 switch (*target) {
                 case '(':
@@ -226,7 +226,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     *target = 0;
 
 #if 0 /* Is this code really necessary? */
-    broken_str = utf16_buf;
+    broken_str = utf_buf;
     begin=end=length-1;
     target = broken_str;
 
@@ -246,7 +246,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
         if (char_count==max_chars) { /* try to avoid breaking words */
             int new_char_count = char_count;
             int new_begin = begin;
-            
+
             while (new_char_count>0) {
                 if (_isblank(heb_str[new_begin]) ||
                     _isnewline(heb_str[new_begin])) {
@@ -261,11 +261,11 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
             }
         }
         orig_begin=begin;
-        
+
         /* if (_isblank(heb_str[begin])) {
             heb_str[begin]='\n';
         } */
-        
+
         /* skip leading newlines */
         while (begin<=end && _isnewline(heb_str[begin])) {
             begin++;
@@ -282,7 +282,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
             target++;
         }
         begin=orig_begin;
-        
+
         if (begin<=0) {
             *target = 0;
             break;
@@ -295,4 +295,3 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     return heb_str;
 #endif /* !BOOTLOADER */
 }
-

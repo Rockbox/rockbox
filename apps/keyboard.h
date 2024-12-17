@@ -23,7 +23,7 @@
 
 /* '*kbd', same format as https://www.rockbox.org/wiki/LoadableKeyboardLayouts */
 
-int kbd_input(char* buffer, int buflen, unsigned short *kbd);
+int kbd_input(char* buffer, int buflen, ucschar_t *kbd);
 
 int load_kbd(unsigned char* filename);
 

@@ -86,7 +86,7 @@ struct font {
     int          maxwidth;        /* max width in pixels*/
     unsigned int height;          /* height in pixels*/
     int          ascent;          /* ascent (baseline) height*/
-    int          firstchar;       /* first character in bitmap*/
+    unsigned int firstchar;       /* first character in bitmap*/
     int          size;            /* font size in glyphs*/
     int          depth;           /* depth of the font, 0=1bit and 1=4bit */
     const unsigned char *bits;    /* 8-bit column bitmap data*/
@@ -95,24 +95,24 @@ struct font {
     const unsigned char *width;   /* character widths or NULL if fixed*/
     int          defaultchar;     /* default char (not glyph index)*/
     int32_t      bits_size;       /* # bytes of glyph bits*/
-    
+
     /* file, buffer and cache management */
     int          fd;              /* fd for the font file. >= 0 if cached */
     int          fd_width;        /* fd for the font file. >= 0 if cached */
-    int          fd_offset;       /* fd for the font file. >= 0 if cached */    
+    int          fd_offset;       /* fd for the font file. >= 0 if cached */
     int          handle;          /* core_allocator handle */
-    unsigned char *buffer_start;    /* buffer to store the font in */       
-    unsigned char *buffer_position; /* position in the buffer */    
+    unsigned char *buffer_start;    /* buffer to store the font in */
+    unsigned char *buffer_position; /* position in the buffer */
     unsigned char *buffer_end;      /* end of the buffer */
     size_t         buffer_size;     /* size of the buffer in bytes */
     bool         disabled;        /* font disabled (use blank as fallback if not in cache) */
-#ifndef __PCTOOL__    
+#ifndef __PCTOOL__
     struct font_cache cache;
     uint32_t file_width_offset;    /* offset to file width data    */
     uint32_t file_offset_offset;   /* offset to file offset data   */
     int long_offset;
-#endif    
-    
+#endif
+
 };
 
 /* font routines*/
@@ -134,7 +134,7 @@ void font_enable_all(void);
 struct font* font_get(int font);
 int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *h, int fontnumber);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
-int font_get_width(struct font* ft, unsigned short ch);
-const unsigned char * font_get_bits(struct font* ft, unsigned short ch);
+int font_get_width(struct font* ft, ucschar_t ch);
+const unsigned char * font_get_bits(struct font* ft, ucschar_t ch);
 
 #endif
