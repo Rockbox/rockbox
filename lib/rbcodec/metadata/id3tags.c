@@ -1092,9 +1092,9 @@ retry_with_limit:
 
                     if (!parse_as_utf8(tag, &bytesread))
                     {
-                        /* UTF-8 could potentially be 3 times larger */
+                        /* UTF-8 could potentially be 4 times larger */
                         /* so we need to create a new buffer         */
-                        int utf8_size = (3 * bytesread);
+                        int utf8_size = (4 * bytesread);
                         if (utf8_size > ID3V2_BUF_SIZE)
                         {
                             //limit stack allocation to avoid stack overflow

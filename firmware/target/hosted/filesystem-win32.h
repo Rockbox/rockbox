@@ -27,10 +27,10 @@
 /* filesystem-win32.c contains some string functions that could be useful
  * elsewhere; just move them away to unicode.c or something if they prove
  * so. */
-size_t strlcpy_ucs2utf8(char *buffer, const unsigned short *ucs,
-                        size_t bufsize);
+size_t strlcpy_utf16utf8(char *buffer, const unsigned short *utf16,
+                         size_t bufsize);
 
-#define strlcpy_from_os strlcpy_ucs2utf8
+#define strlcpy_from_os strlcpy_utf16utf8
 #endif /* __MINGW32__ */
 
 #endif /* !OSFUNCTIONS_DECLARED */

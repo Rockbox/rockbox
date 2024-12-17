@@ -62,7 +62,7 @@ static const char* get_next_line(const char *text, struct view_info *info)
     total = 0;
     while(*ptr)
     {
-        unsigned short ch;
+        ucschar_t ch;
         n = ((intptr_t)rb->utf8decode(ptr, &ch) - (intptr_t)ptr);
         if (rb->is_diacritic(ch, NULL))
             w = 0;

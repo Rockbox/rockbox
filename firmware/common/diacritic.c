@@ -28,8 +28,8 @@
 #include "system.h"
 
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
-#define DIAC_RTL             (1 << 7)
-#define DIAC_CNT             (0xFF ^ DIAC_RTL)
+#define DIAC_RTL             (1 << 15)
+#define DIAC_CNT             (0xFFFF ^ DIAC_RTL)
 
 /* Each diac_range_ struct defines a Unicode range that begins with
  * N diacritic characters, and continues with non-diacritic characters up to the
@@ -39,8 +39,8 @@
 
 struct diac_range
 {
-    uint16_t base;
-    uint8_t  info; /* [RTL:1 CNT:7] */
+    uint16_t base; /* Not ucschar_t until we need >16b */
+    uint16_t info; /* [RTL:1 CNT:15] */
 };
 
 #define DIAC_RANGE_ENTRY(first_diac, first_non_diac, is_rtl) \
@@ -51,7 +51,7 @@ struct diac_range
 static const struct diac_range diac_ranges[] =
 {
     DIAC_RANGE_ENTRY(0x0000, 0x0000, 0),
-    DIAC_RANGE_ENTRY(FIRST_DIACRITIC, 0x0370, 0),
+    DIAC_RANGE_ENTRY(FIRST_DIACRITIC, 0x0370, 0), /* v1 - v4.1 */
     DIAC_RANGE_ENTRY(0x0483, 0x048a, 0),
     DIAC_RANGE_ENTRY(0x0591, 0x05be, 1),
     DIAC_RANGE_ENTRY(0x05bf, 0x05c0, 1),
@@ -146,6 +146,7 @@ static const struct diac_range diac_ranges[] =
     DIAC_RANGE_ENTRY(0x19c8, 0x19ca, 0),
     DIAC_RANGE_ENTRY(0x1a17, 0x1a1c, 0),
     DIAC_RANGE_ENTRY(0x1a55, 0x1a80, 0),
+    DIAC_RANGE_ENTRY(0x1ab0, 0x1b00, 0), /* v7.0 */
     DIAC_RANGE_ENTRY(0x1b00, 0x1b05, 0),
     DIAC_RANGE_ENTRY(0x1b34, 0x1b45, 0),
     DIAC_RANGE_ENTRY(0x1b6b, 0x1b74, 0),
@@ -156,10 +157,10 @@ static const struct diac_range diac_ranges[] =
     DIAC_RANGE_ENTRY(0x1cd4, 0x1ce9, 0),
     DIAC_RANGE_ENTRY(0x1ced, 0x1cee, 0),
     DIAC_RANGE_ENTRY(0x1cf2, 0x1cf3, 0),
-    DIAC_RANGE_ENTRY(0x1dc0, 0x1e00, 0),
-    DIAC_RANGE_ENTRY(0x20d0, 0x20f1, 0),
+    DIAC_RANGE_ENTRY(0x1dc0, 0x1e00, 0), /* v4.1 - v5.2 */
+    DIAC_RANGE_ENTRY(0x20d0, 0x2100, 0), /* v1.0 - v5.1 */
     DIAC_RANGE_ENTRY(0x2cef, 0x2cf2, 0),
-    DIAC_RANGE_ENTRY(0x2de0, 0x2e00, 0),
+    DIAC_RANGE_ENTRY(0x2de0, 0x2e00, 0), /* v5.1 */
     DIAC_RANGE_ENTRY(0x302a, 0x3030, 0),
     DIAC_RANGE_ENTRY(0x3099, 0x309b, 0),
     DIAC_RANGE_ENTRY(0xa66f, 0xa673, 0),
@@ -188,7 +189,7 @@ static const struct diac_range diac_ranges[] =
     DIAC_RANGE_ENTRY(0xabe3, 0xabeb, 0),
     DIAC_RANGE_ENTRY(0xabec, 0xabee, 0),
     DIAC_RANGE_ENTRY(0xfb1e, 0xfb1f, 0),
-    DIAC_RANGE_ENTRY(0xfe20, 0xfe27, 0),
+    DIAC_RANGE_ENTRY(0xfe20, 0xfe30, 0), /* v1.0 - v8.0 */
     DIAC_RANGE_ENTRY(0xfe70, 0xfe70, 1),
     DIAC_RANGE_ENTRY(0xff00, 0xff00, 0),
     DIAC_RANGE_ENTRY(0xffff, 0xffff, 0),
@@ -196,7 +197,7 @@ static const struct diac_range diac_ranges[] =
 
 #define MRU_MAX_LEN 32
 
-bool is_diacritic(const unsigned short char_code, bool *is_rtl)
+bool is_diacritic(const ucschar_t char_code, bool *is_rtl)
 {
     static uint8_t mru_len = 0;
     static uint8_t diacritic_mru[MRU_MAX_LEN];
@@ -209,7 +210,6 @@ bool is_diacritic(const unsigned short char_code, bool *is_rtl)
     /* Search in MRU */
     for (mru = 0, i = 0; mru < mru_len; mru++)
     {
-
         /* Items shifted >> 1 */
         itmp = i;
         i = diacritic_mru[mru];
@@ -250,10 +250,10 @@ Found:
     if (is_rtl)
         *is_rtl = ((DIAC_RTL & info) == DIAC_RTL);
 
-    return (char_code < diac->base + (info & DIAC_CNT));
+    return (char_code < (diac->base + (info & DIAC_CNT)));
 }
 #else /*BOOTLOADER*/
-inline bool is_diacritic(const unsigned short char_code, bool *is_rtl)
+inline bool is_diacritic(const ucschar_t char_code, bool *is_rtl)
 {
     (void)char_code;
     if (is_rtl)

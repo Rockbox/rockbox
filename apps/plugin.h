@@ -176,7 +176,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 273
+#define PLUGIN_API_VERSION 274
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -296,15 +296,15 @@ struct plugin_api {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     void (*button_queue_post)(long id, intptr_t data);
 #endif
-    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
-    bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
-    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
+    ucschar_t *(*bidi_l2v)(const unsigned char *str, int orientation);
+    bool (*is_diacritic)(const ucschar_t char_code, bool *is_rtl);
+    const unsigned char *(*font_get_bits)(struct font *pf, ucschar_t char_code);
     int (*font_load)(const char *path);
     void (*font_unload)(int font_id);
     struct font* (*font_get)(int font);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
-    int (*font_get_width)(struct font* pf, unsigned short char_code);
+    int (*font_get_width)(struct font* pf, ucschar_t char_code);
     void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
                               int width, int height);
     void (*gui_scrollbar_draw)(struct screen * screen, int x, int y,
@@ -667,7 +667,7 @@ struct plugin_api {
                               const unsigned char * const *units,
                               unsigned int unit_count, bool binary_scale);
     /* unicode stuff */
-    const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
+    const unsigned char* (*utf8decode)(const unsigned char *utf8, ucschar_t *ucs);
     unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
     unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, int count);
     unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, int count);
@@ -923,7 +923,7 @@ struct plugin_api {
     int  (*rand)(void);
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
-    int (*kbd_input)(char* buffer, int buflen, unsigned short *kbd);
+    int (*kbd_input)(char* buffer, int buflen, ucschar_t *kbd);
     struct tm* (*get_time)(void);
     struct tm * (*gmtime_r)(const time_t *timep, struct tm *tm);
 #if CONFIG_RTC

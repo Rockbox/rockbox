@@ -91,7 +91,7 @@ static int eid = DEFAULT_ENCODING_ID;
 static FT_UShort nocmap;
 
 int pct                     = 0; /* display ttc table if it is not zero. */
-FT_Long         max_char    = 65535;
+FT_Long         max_char    = 1024*1024;  /* Unicode maxes out at 2**20 */
 int             pixel_size  = 15;
 FT_Long         start_char  = 0;
 FT_Long         limit_char;

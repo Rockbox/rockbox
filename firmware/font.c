@@ -53,6 +53,12 @@
 #define FONT_EXT "fnt"
 #define GLYPH_CACHE_EXT "gc"
 
+#ifdef UNICODE32
+#define FC_HEADER_VAL 0x01000020
+#else
+#define FC_HEADER_VAL 0x01000010
+#endif
+
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
 #if LCD_HEIGHT > 64
@@ -182,7 +188,7 @@ void font_init(void)
 
 static short readshort(struct font *pf)
 {
-    unsigned short s;
+    uint16_t s;
 
     s = *pf->buffer_position++ & 0xff;
     s |= (*pf->buffer_position++ << 8);
@@ -361,8 +367,8 @@ static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
     size_t bufsize;
 
     /* LRU bytes per glyph */
-    bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
-        sizeof( unsigned short);
+    bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) +
+        sizeof(unsigned short);
     /* Image bytes per glyph */
     bufsize += glyph_bytes(pf, pf->maxwidth);
     bufsize *= glyphs;
@@ -371,7 +377,7 @@ static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
 }
 
 static struct font* font_load_header(int fd, struct font *pheader,
-                                     struct font *pf, 
+                                     struct font *pf,
                                      uint32_t *nwidth, uint32_t *noffset)
 {
     /* Load the header. Readshort() and readlong()              *
@@ -425,11 +431,11 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     struct font header;
     struct font f;
 
-    uint32_t nwidth, noffset;     
+    uint32_t nwidth, noffset;
     if ( !font_load_header( fd, &header, &f, &nwidth, &noffset )
 #if LCD_DEPTH < 16
         || f.depth
-#endif  
+#endif
     )
     {
         close(fd);
@@ -458,7 +464,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         cached = true;
     else
         bufsize = file_size;
-    
+
     /* check already loaded */
     int font_id = find_font_index(path);
 
@@ -503,7 +509,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
                 return -1;
         }
         pd->refcount++;
-        //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount); 
+        //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount);
         close(fd);
         return font_id;
     }
@@ -522,7 +528,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         return -1;
     font_id = open_slot;
     size_t path_bufsz = MAX(path_len + 1, 64); /* enough size for common case */
-    /* allocate mem */    
+    /* allocate mem */
     int handle = core_alloc_ex(
                      bufsize + path_bufsz + sizeof( struct buflib_alloc_data ),
                      &buflibops );
@@ -574,7 +580,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         pf->fd_offset = -1;
     }
     else
-    {           
+    {
         lseek( fd, 0, SEEK_SET);
         read(fd, pf->buffer_start, pf->buffer_size);
 
@@ -723,7 +729,7 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
 {
     struct font* pf = callback_data;
 
-    unsigned short char_code = p->_char_code;
+    ucschar_t char_code = p->_char_code;
     int fd;
 
     lock_font_handle(pf->handle, true);
@@ -788,7 +794,7 @@ static void cache_create(struct font* pf)
      * when the font file is closed during USB */
     unsigned char *cache_buf = pf->buffer_start + bitmap_size;
     size_t cache_size = pf->buffer_size - bitmap_size;
-    ALIGN_BUFFER(cache_buf, cache_size, 2);
+    ALIGN_BUFFER(cache_buf, cache_size, sizeof(ucschar_t));
     memset(pf->buffer_start, 0, bitmap_size);
     /* Initialise cache */
     font_cache_create(&pf->cache, cache_buf, cache_size, bitmap_size);
@@ -797,7 +803,7 @@ static void cache_create(struct font* pf)
 /*
  * Returns width of character
  */
-int font_get_width(struct font* pf, unsigned short char_code)
+int font_get_width(struct font* pf, ucschar_t char_code)
 {
     int width;
     struct font_cache_entry *e;
@@ -820,7 +826,7 @@ int font_get_width(struct font* pf, unsigned short char_code)
     return width;
 }
 
-const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
+const unsigned char* font_get_bits(struct font* pf, ucschar_t char_code)
 {
     const unsigned char* bits;
 
@@ -831,7 +837,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 
     if (pf->fd >= 0 && pf != &sysfont)
     {
-        bits = 
+        bits =
             (unsigned char*)font_cache_get(&pf->cache, char_code,
                                 false, load_cache_entry, pf)->bitmap;
     }
@@ -884,7 +890,7 @@ static void glyph_file_write(void* data)
 {
     struct font_cache_entry* p = data;
     struct font* pf = cache_pf;
-    unsigned short ch;
+    ucschar_t ch;
     static int buffer_pos = 0;
 #define WRITE_BUFFER 256
     static unsigned char buffer[WRITE_BUFFER];
@@ -899,11 +905,19 @@ static void glyph_file_write(void* data)
     }
     if ( p->_char_code == 0xffff )
         return;
-    
+
     ch = p->_char_code + pf->firstchar;
-    buffer[buffer_pos] = ch >> 8;
+#ifdef UNICODE32
+    buffer[buffer_pos] = (ch >> 24) & 0xff;
+    buffer[buffer_pos+1] = (ch >> 16) & 0xff;
+    buffer[buffer_pos+2] = (ch >> 8) & 0xff;
+    buffer[buffer_pos+3] = ch & 0xff;
+    buffer_pos += 2;
+#else
+    buffer[buffer_pos] = (ch >> 8) & 0xff;
     buffer[buffer_pos+1] = ch & 0xff;
     buffer_pos += 2;
+#endif
     return;
 }
 
@@ -928,11 +942,13 @@ static void glyph_cache_save(int font_id)
         fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
         if (fd >= 0)
         {
+            uint32_t header = FC_HEADER_VAL;
+            write(fd, &header, sizeof(header));
             cache_pf = pf;
             cache_fd = fd;
             lru_traverse(&cache_pf->cache._lru, glyph_file_write);
             glyph_file_write(NULL);
-            if (cache_fd >= 0) 
+            if (cache_fd >= 0)
             {
                 close(cache_fd);
                 cache_fd = -1;
@@ -944,22 +960,22 @@ static void glyph_cache_save(int font_id)
 }
 
 
-static int ushortcmp(const void *a, const void *b)
+static int ucscharcmp(const void *a, const void *b)
 {
-    return ((int)(*(unsigned short*)a - *(unsigned short*)b));
+    return ((int)(*(ucschar_t*)a - *(ucschar_t*)b));
 }
 static void glyph_cache_load(const char *font_path, struct font *pf)
 {
 #define MAX_SORT 256
     if (pf->fd >= 0) {
         int i, size, fd;
-        unsigned char tmp[2];
-        unsigned short ch;
-        unsigned short glyphs[MAX_SORT];
-        unsigned short glyphs_lru_order[MAX_SORT];
-        int glyph_file_skip=0, glyph_file_size=0;
-        
-        int sort_size = pf->cache._capacity;        
+        unsigned char tmp[sizeof(ucschar_t)];
+        ucschar_t ch;
+        ucschar_t glyphs[MAX_SORT];
+        ucschar_t glyphs_lru_order[MAX_SORT];
+        unsigned int glyph_file_skip=0, glyph_file_size=0;
+
+        int sort_size = pf->cache._capacity;
         if ( sort_size > MAX_SORT )
              sort_size = MAX_SORT;
 
@@ -973,31 +989,41 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
             fd = open(GLYPH_CACHE_FILE, O_RDONLY|O_BINARY);
 #endif
         if (fd >= 0) {
+            /* Header */
+            uint32_t hdr = 0;
+            read(fd, &hdr, sizeof(hdr));
+            if (hdr != FC_HEADER_VAL)
+                goto latin;
             /* only read what fits */
             glyph_file_size = filesize( fd );
-            if ( glyph_file_size > 2*pf->cache._capacity ) {
-                glyph_file_skip = glyph_file_size - 2*pf->cache._capacity;
-                lseek( fd, glyph_file_skip, SEEK_SET );
+            if (glyph_file_size < sizeof(uint32_t))
+                goto latin;
+            glyph_file_size -= sizeof(uint32_t);
+            if ( glyph_file_size > (int)sizeof(ucschar_t)*pf->cache._capacity ) {
+                glyph_file_skip = glyph_file_size - sizeof(ucschar_t)*pf->cache._capacity;
+                lseek( fd, glyph_file_skip + sizeof(uint32_t), SEEK_SET );
             }
-
             while(1) {
-
                 for ( size = 0;
-                      read( fd, tmp, 2 ) == 2 && size < sort_size;
-                      size++ ) 
+                      read( fd, tmp, sizeof(tmp) ) == sizeof(tmp) && size < sort_size;
+                      size++ )
                 {
+#ifdef UNICODE32
+                    glyphs[size] = (tmp[0] << 24) | (tmp[1] << 16) | (tmp[2] << 8) | tmp[3];
+#else
                     glyphs[size] = (tmp[0] << 8) | tmp[1];
+#endif
                     glyphs_lru_order[size] = glyphs[size];
                 }
-                
+
                 /* sort glyphs array to make sector cache happy */
-                qsort((void *)glyphs, size, sizeof(unsigned short), 
-                      ushortcmp );
+                qsort((void *)glyphs, size, sizeof(ucschar_t),
+                      ucscharcmp );
 
                 /* load font bitmaps */
                 for( i = 0; i < size ; i++ )
-                         font_get_bits(pf, glyphs[i]);
-                
+                    font_get_bits(pf, glyphs[i]);
+
                 /* redo to fix lru order */
                 for ( i = 0; i < size ; i++)
                     font_get_bits(pf, glyphs_lru_order[i]);
@@ -1008,6 +1034,7 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
 
             close(fd);
         } else {
+        latin:
             /* load latin1 chars into cache */
             for ( ch = 32 ; ch < 256  && ch < pf->cache._capacity + 32; ch++ )
                 font_get_bits(pf, ch);
@@ -1039,7 +1066,7 @@ struct font* font_get(int font)
 /*
  * Returns width of character
  */
-int font_get_width(struct font* pf, unsigned short char_code)
+int font_get_width(struct font* pf, ucschar_t char_code)
 {
     /* check input range*/
     if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
@@ -1049,7 +1076,7 @@ int font_get_width(struct font* pf, unsigned short char_code)
     return pf->width? pf->width[char_code]: pf->maxwidth;
 }
 
-const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
+const unsigned char* font_get_bits(struct font* pf, ucschar_t char_code)
 {
     const unsigned char* bits;
 
@@ -1078,7 +1105,7 @@ int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *
 {
     struct font* pf = font_get(fontnum);
     font_lock( fontnum, true );
-    unsigned short ch;
+    ucschar_t ch;
     int width = 0;
     size_t b = maxbytes - 1;
 

@@ -27,7 +27,7 @@
  * Sets is_rtl (if it's not NULL) to whether the character
  * belongs to an RTL language.
 */
-bool is_diacritic(const unsigned short char_code, bool *is_rtl);
+bool is_diacritic(const ucschar_t char_code, bool *is_rtl);
 
 /* Note IS_DIACRITIC macros may elide the function call
  * therefore there is a separate _RTL version that requires a bool pointer

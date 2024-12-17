@@ -41,7 +41,7 @@ static unsigned text_type = TV_TEXT_UNKNOWN;
 
 static const unsigned char *end_ptr;
 
-static unsigned short ucsbuf[TV_MAX_BLOCKS][TV_MAX_CHARS_PER_BLOCK];
+static ucschar_t ucsbuf[TV_MAX_BLOCKS][TV_MAX_CHARS_PER_BLOCK];
 static unsigned char  utf8buf[TV_MAX_CHARS_PER_BLOCK * (2 * 3)];
 static unsigned char  *outbuf;
 
@@ -54,11 +54,11 @@ static bool expand_extra_line = false;
 /* when a line is divided, this value sets true. */
 static bool is_break_line = false;
 
-static unsigned short break_chars[] =
+static unsigned short break_chars[] = // XXX promote to ucschar_t if we get a codepoint > 0xffff
     {
         0,
         /* halfwidth characters */
-        '\t', '\n', 0x0b, 0x0c, ' ', '!', ',', '-', '.', ':', ';', '?', 0xb7, 
+        '\t', '\n', 0x0b, 0x0c, ' ', '!', ',', '-', '.', ':', ';', '?', 0xb7,
         /* fullwidth characters */
         0x2010, /* hyphen */
         0x3000, /* fullwidth space */
@@ -76,7 +76,7 @@ static unsigned short break_chars[] =
     };
 
 /* the characters which is not judged as space with isspace() */
-static unsigned short extra_spaces[] = { 0, 0x3000 };
+static unsigned short extra_spaces[] = { 0, 0x3000 }; // XXX promote to ucschar_t if we get a codepoint > 0xffff
 
 static int tv_glyph_width(int ch)
 {
@@ -93,7 +93,7 @@ static int tv_glyph_width(int ch)
     return rb->font_get_width(rb->font_get(preferences->font_id), ch);
 }
 
-static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
+static unsigned char *tv_get_ucs(const unsigned char *str, ucschar_t *ch)
 {
     int count = 1;
     unsigned char utf8_tmp[3];
@@ -148,7 +148,7 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
     return (unsigned char *)str + count;
 }
 
-static void tv_decode2utf8(const unsigned short *ucs, int count)
+static void tv_decode2utf8(const ucschar_t *ucs, int count)
 {
     int i;
 
@@ -158,7 +158,7 @@ static void tv_decode2utf8(const unsigned short *ucs, int count)
     *outbuf = '\0';
 }
 
-static bool tv_is_line_break_char(unsigned short ch)
+static bool tv_is_line_break_char(ucschar_t ch)
 {
     size_t i;
 
@@ -166,7 +166,7 @@ static bool tv_is_line_break_char(unsigned short ch)
     if (preferences->word_mode == WM_CHOP)
         return false;
 
-    for (i = 0; i < sizeof(break_chars)/sizeof(unsigned short); i++)
+    for (i = 0; i < sizeof(break_chars)/sizeof(ucschar_t); i++)
     {
         if (break_chars[i] == ch)
             return true;
@@ -174,14 +174,14 @@ static bool tv_is_line_break_char(unsigned short ch)
     return false;
 }
 
-static bool tv_isspace(unsigned short ch)
+static bool tv_isspace(ucschar_t ch)
 {
     size_t i;
 
     if (ch < 128 && isspace(ch))
         return true;
 
-    for (i = 0; i < sizeof(extra_spaces)/sizeof(unsigned short); i++)
+    for (i = 0; i < sizeof(extra_spaces)/sizeof(ucschar_t); i++)
     {
         if (extra_spaces[i] == ch)
             return true;
@@ -191,17 +191,17 @@ static bool tv_isspace(unsigned short ch)
 
 static bool tv_is_break_line_join_mode(const unsigned char *next_str)
 {
-    unsigned short ch;
+    ucschar_t ch;
 
     tv_get_ucs(next_str, &ch);
     return tv_isspace(ch);
 }
 
-static int tv_form_reflow_line(unsigned short *ucs, int chars)
+static int tv_form_reflow_line(ucschar_t *ucs, int chars)
 {
-    unsigned short new_ucs[TV_MAX_CHARS_PER_BLOCK];
-    unsigned short *p = new_ucs;
-    unsigned short ch;
+    ucschar_t new_ucs[TV_MAX_CHARS_PER_BLOCK];
+    ucschar_t *p = new_ucs;
+    ucschar_t ch;
     int i;
     int k;
     int expand_spaces;
@@ -262,15 +262,15 @@ static int tv_form_reflow_line(unsigned short *ucs, int chars)
         }
     }
 
-    rb->memcpy(ucs, new_ucs, sizeof(unsigned short) * TV_MAX_CHARS_PER_BLOCK);
+    rb->memcpy(ucs, new_ucs, sizeof(ucschar_t) * TV_MAX_CHARS_PER_BLOCK);
     return indent_chars + nonspace_chars + expand_spaces;
 }
 
 static void tv_align_right(int *block_chars)
 {
-    unsigned short *cur_text;
-    unsigned short *prev_text;
-    unsigned short ch;
+    ucschar_t *cur_text;
+    ucschar_t *prev_text;
+    ucschar_t ch;
     int cur_block = block_count - 1;
     int prev_block;
     int cur_chars;
@@ -335,9 +335,9 @@ static void tv_align_right(int *block_chars)
             if (break_pos < prev_chars)
             {
                 rb->memmove(cur_text + prev_chars - break_pos,
-                            cur_text, block_chars[cur_block] * sizeof(unsigned short));
+                            cur_text, block_chars[cur_block] * sizeof(ucschar_t));
                 rb->memcpy(cur_text, prev_text + break_pos,
-                           (prev_chars - break_pos) * sizeof(unsigned short));
+                           (prev_chars - break_pos) * sizeof(ucschar_t));
 
                 block_chars[prev_block]  = break_pos;
                 block_chars[cur_block ] += prev_chars - break_pos;
@@ -347,15 +347,15 @@ static void tv_align_right(int *block_chars)
     }
 }
 
-static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
+static int tv_parse_text(const unsigned char *src, ucschar_t *ucs,
                              int *ucs_chars, bool is_indent)
 {
     const unsigned char *cur  = src;
     const unsigned char *next = src;
     const unsigned char *line_break_ptr = NULL;
     const unsigned char *line_end_ptr   = NULL;
-    unsigned short ch = 0;
-    unsigned short prev_ch;
+    ucschar_t ch = 0;
+    ucschar_t prev_ch;
     int chars = 0;
     int gw;
     int line_break_width = 0;
@@ -480,7 +480,7 @@ static int tv_parse_text(const unsigned char *src, unsigned short *ucs,
 int tv_create_formed_text(const unsigned char *src, ssize_t bufsize,
                               int block, bool is_multi, const unsigned char **dst)
 {
-    unsigned short ch;
+    ucschar_t ch;
     int chars[block_count];
     int i;
     int size = 0;

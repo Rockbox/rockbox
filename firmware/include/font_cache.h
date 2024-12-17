@@ -21,24 +21,25 @@
 #ifndef _FONT_CACHE_H_
 #define _FONT_CACHE_H_
 #include <stdbool.h>
+#include "config.h"
 #include "lru.h"
 
 /*******************************************************************************
- * 
+ *
  ******************************************************************************/
 struct font_cache
 {
     struct lru _lru;
-    int _size;
-    int _capacity;
-    int _prev_char_code;
+    unsigned int _size;
+    unsigned int _capacity;
+    ucschar_t _prev_char_code;
     int _prev_result;
     short *_index; /* index of lru handles in char_code order */
 };
 
 struct font_cache_entry
 {
-    unsigned short _char_code;
+    ucschar_t _char_code;
     unsigned char width;
     unsigned char bitmap[1]; /* place holder */
 };
@@ -55,7 +56,7 @@ void font_cache_create(
  * Note: With cache_only this can return NULL, which otherwise never happens */
 struct font_cache_entry* font_cache_get(
     struct font_cache* fcache,
-    unsigned short char_code,
+    ucschar_t char_code,
     bool cache_only,
     void (*callback) (struct font_cache_entry* p, void *callback_data),
     void *callback_data);

@@ -969,8 +969,8 @@ static void buffer_alpha_bitmap_part(
 static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
                               int x, int y, int ofs, const unsigned char *str )
 {
-    unsigned short ch;
-    unsigned short *ucs;
+    ucschar_t ch;
+    ucschar_t *ucs;
 
     struct font *pf = rb->font_get( FONT_UI );
     if( !pf ) pf = rb->font_get( FONT_SYSFIXED );

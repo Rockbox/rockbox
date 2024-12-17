@@ -128,7 +128,7 @@ void wait_for_key()
         case PLA_EXIT:
             hot_key_quit();
             break;
-        
+
         case PLA_SELECT:
             return;
         }
@@ -159,7 +159,7 @@ zchar do_input(int timeout, bool show_cursor)
         {
         case PLA_EXIT:
             return ZC_HKEY_QUIT;
-        
+
         case PLA_CANCEL:
             menu_ret = menu();
             if (menu_ret != ZC_BAD)
@@ -174,7 +174,7 @@ zchar do_input(int timeout, bool show_cursor)
             return ZC_BAD;
 
         default:
-            if (timeout != TIMEOUT_BLOCK && 
+            if (timeout != TIMEOUT_BLOCK &&
                     !TIME_BEFORE(*rb->current_tick, timeout_at))
                 return ZC_TIME_OUT;
         }
@@ -185,7 +185,7 @@ zchar os_read_key(int timeout, bool show_cursor)
 {
     int r;
     char inputbuf[5];
-    short key;
+    ucschar_t key;
     zchar zkey;
 
     for(;;)
@@ -214,7 +214,7 @@ zchar os_read_line(int max, zchar *buf, int timeout, int width, int continued)
     char inputbuf[256];
     const char *in;
     char *out;
-    short key;
+    ucschar_t key;
     zchar zkey;
 
     for(;;)

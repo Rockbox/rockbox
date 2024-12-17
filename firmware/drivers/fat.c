@@ -747,6 +747,8 @@ static bool fatlong_parse_entry(struct fatlong_parse_state *lnparse,
     /* so far so good; save entry information */
     lnparse->ord = ord;
 
+    /* Treat entries as opaque 16-bit values;
+       utf8decode happens in fatlong_parse_finish() */
     uint16_t *ucsp = fatent->ucssegs[ord - 1 + 5];
     unsigned int i = longent_char_first();
 
@@ -797,12 +799,22 @@ static bool fatlong_parse_finish(struct fatlong_parse_state *lnparse,
     /* ensure the last segment is NULL-terminated if it is filled */
     fatent->ucssegs[lnparse->ord_max + 5][0] = 0x0000;
 
-    for (uint16_t *ucsp = fatent->ucssegs[5], ucc = *ucsp;
-         ucc; ucc = *++ucsp)
+    unsigned long ucc;     /* Decoded codepoint */
+    uint16_t *ucsp, ucs;
+    for (ucsp = fatent->ucssegs[5], ucs=*ucsp; ucs; ucs = *++ucsp)
     {
         /* end should be hit before ever seeing padding */
-        if (ucc == 0xffff)
+        if (ucs == 0xffff)
             return false;
+
+        /* Check for a surrogate UTF16 pair */
+        if (ucs >= 0xd800 && ucs < 0xdc00 &&
+            *(ucsp+1) >= 0xdc00 && *(ucsp+1) < 0xe000) {
+            ucc = 0x10000 + ((ucs & 0x3ff) << 10) | (*(ucsp+1) & 0x3ff);
+            ucsp++;
+        } else {
+            ucc = ucs;
+        }
 
         if ((p = utf8encode(ucc, p)) - name > FAT_DIRENTRY_NAME_MAX)
             return false;
@@ -1608,7 +1620,7 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
     /* we need to convert the name first since the entries are written in
        reverse order */
     unsigned long ucspadlen = ALIGN_UP(ucslen, FATLONG_NAME_CHARS);
-    uint16_t ucsname[ucspadlen];
+    ucschar_t ucsname[ucspadlen];
 
     for (unsigned long i = 0; i < ucspadlen; i++)
     {
@@ -1626,6 +1638,9 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
     const unsigned int firstentry  = file->e.entry - longentries;
 
     /* longame entries */
+#ifdef UNICODE32
+    long carried_val = -1;
+#endif
     for (unsigned int i = 0; i < longentries; i++)
     {
         ent = cache_direntry(fat_bpb, parentstr, firstentry + i);
@@ -1651,11 +1666,38 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
         ent->ldir_chksum = chksum;
 
         /* set name */
-        uint16_t *ucsptr = &ucsname[(ord - 1) * FATLONG_NAME_CHARS];
+        ucschar_t *ucsptr = &ucsname[(ord - 1) * FATLONG_NAME_CHARS];
         for (unsigned j = longent_char_first(); j; j = longent_char_next(j))
         {
-            uint16_t ucs = *ucsptr++;
-            INT162BYTES(ent->data, j, ucs);
+#ifdef UNICODE32
+            if (carried_val >= 0) {
+                INT162BYTES(ent->data, j, carried_val);
+                carried_val = -1;
+                continue;
+            }
+#endif
+            ucschar_t ucs = *ucsptr++;
+#ifdef UNICODE32
+            if (ucs >= 0x10000) {
+                ucs-=0x10000;
+                uint16_t v = 0xdc00 | (ucs & 0x3ff);
+                unsigned oldj = j;
+                INT162BYTES(ent->data, j, v);
+                j = longent_char_next(j);
+                v = 0xd800 | ((ucs >> 10) & 0x3ff);
+                if (j) {
+                    INT162BYTES(ent->data, j, v);
+                } else if ((i + 1) < longentries) {
+                    /* Carry the other end of the surrogate pair to the next block */
+                    carried_val = v;
+                } else {
+                    /* No more blocks, so re-write the first entry of the pair */
+                    v = 0xfffd;
+                    INT162BYTES(ent->data, oldj, v);
+                }
+            } else
+#endif
+                INT162BYTES(ent->data, j, ucs);
         }
 
         dc_dirty_buf(ent);
@@ -1744,9 +1786,12 @@ static int add_dir_entry(struct bpb *fat_bpb, struct fat_filestr *parentstr,
         create_dos_name(basisname, name, &n);
         randomize_dos_name(shortname, basisname, &n);
 
-        /* one dir entry needed for every 13 characters of filename,
-           plus one entry for the short name */
-        ucslen = utf8length(name);
+        /* one dir entry needed for every 13 "code units"
+           of filename, plus one entry for the short name.
+           Keep in mind that a utf8 character can take 1
+           or 2 code units.
+        */
+        ucslen = utf16len_utf8(name);
         if (ucslen > 255)
             FAT_ERROR(-2); /* name is too long */
 

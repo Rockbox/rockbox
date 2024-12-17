@@ -141,6 +141,7 @@ RB_WRAP(touchscreen_mode)
 
 #endif
 
+// XXX this may be broken with 32-bit ucschar_t
 RB_WRAP(kbd_input)
 {
     /*kbd_input(text, layout)*
@@ -168,7 +169,7 @@ RB_WRAP(kbd_input)
         layout = NULL;
     }
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, (unsigned short *)layout))
+    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, (ucschar_t *)layout))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);

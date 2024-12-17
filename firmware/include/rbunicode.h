@@ -27,7 +27,7 @@
  */
 #ifndef _RBUNICODE_H_
 #define _RBUNICODE_H_
- 
+
 #include "config.h"
 #include <stdbool.h>
 
@@ -63,8 +63,9 @@ unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, in
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, int count);
 unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8, int count, int utf8_size, bool le);
 bool utf16_has_bom(const unsigned char *utf16, bool *le);
+unsigned long utf16len_utf8(const unsigned char *utf8);
 unsigned long utf8length(const unsigned char *utf8);
-const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
+const unsigned char* utf8decode(const unsigned char *utf8, ucschar_t *ucs);
 void set_codepage(int cp);
 int get_codepage(void);
 int utf8seek(const unsigned char* utf8, int offset);

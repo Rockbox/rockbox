@@ -33,6 +33,7 @@ struct lru
     void *_base;
 };
 
+/* LRU_SLOT_OVERHEAD is the fixed portion of struct lru_node */
 #define LRU_SLOT_OVERHEAD (2 * sizeof(short))
 
 /* Create LRU list with specified size from buf. */
@@ -45,4 +46,3 @@ void *lru_data(struct lru* pl, short handle);
 void lru_traverse(struct lru* pl, void (*callback)(void* data));
 
 #endif /* LRU_H */
-

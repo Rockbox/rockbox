@@ -21,6 +21,6 @@
 #ifndef BIDI_H
 #define BIDI_H
 
-extern unsigned short *bidi_l2v(const unsigned char *str, int orientation);
+ucschar_t *bidi_l2v(const unsigned char *str, int orientation);
 
 #endif /* BIDI_H */

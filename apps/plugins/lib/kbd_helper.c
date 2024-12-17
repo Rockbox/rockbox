@@ -22,8 +22,8 @@
 #include "kbd_helper.h"
 
 /*  USAGE:
-    unsigned short kbd[64];
-    unsigned short *kbd_p = kbd;
+    ucschar_t kbd[64];
+    ucschar_t *kbd_p = kbd;
     if (!kbd_create_layout("ABCD1234\n", kbd, sizeof(kbd)))
         kbd_p = NULL;
 
@@ -34,14 +34,14 @@
  * success returns size of buffer used
  * failure returns 0
 */
-int kbd_create_layout(const char *layout, unsigned short *buf, int bufsz)
+int kbd_create_layout(const char *layout, ucschar_t *buf, int bufsz)
 {
-    unsigned short *pbuf;
+    ucschar_t *pbuf;
     const unsigned char *p = layout;
     int len = 0;
     int total_len = 0;
     pbuf = buf;
-    while (*p && (pbuf - buf + (ptrdiff_t) sizeof(unsigned short)) < bufsz)
+    while (*p && (pbuf - buf + (ptrdiff_t) sizeof(ucschar_t)) < bufsz)
     {
         p = rb->utf8decode(p, &pbuf[len+1]);
         if (pbuf[len+1] == '\n')
@@ -60,7 +60,7 @@ int kbd_create_layout(const char *layout, unsigned short *buf, int bufsz)
         *pbuf = len;
         pbuf[len+1] = 0xFEFF;   /* mark end of characters */
         total_len += len + 1;
-        return total_len * sizeof(unsigned short);
+        return total_len * sizeof(ucschar_t);
     }
 
     return 0;

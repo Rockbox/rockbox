@@ -70,7 +70,7 @@ static const char keybd_layout[] =
  * - \n does not create a key, but it also consumes one element
  * - the final null terminator is equivalent to \n
  * - since sizeof includes the null terminator we don't need +1 for that. */
-static unsigned short kbd_buf[sizeof(keybd_layout)];
+static ucschar_t kbd_buf[sizeof(keybd_layout)];
 
 /****************** prototypes ******************/
 void print_scroll(char* string); /* implements a scrolling screen */
@@ -164,7 +164,7 @@ static void config_set_defaults(void)
     gAnnounce.announce_on = 0;
     gAnnounce.grouping = 0;
     gAnnounce.wps_fmt[0] = '\0';
-    gAnnounce.show_prompt = true; 
+    gAnnounce.show_prompt = true;
 }
 
 static void config_reset_voice(void)
@@ -250,7 +250,7 @@ static int announce_menu_cb(int action,
                             struct gui_synclist *this_list)
 {
     (void)this_item;
-    unsigned short* kbd_p;
+    ucschar_t *kbd_p;
 
     int selection = rb->gui_synclist_get_sel_pos(this_list);
 

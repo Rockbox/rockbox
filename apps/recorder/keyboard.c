@@ -90,15 +90,15 @@ enum ekbd_viewports
 struct keyboard_parameters
 {
     struct viewport *kbd_viewports;
-    unsigned short kbd_buf[KBD_BUF_SIZE];
-    unsigned short *kbd_buf_ptr;
+    ucschar_t kbd_buf[KBD_BUF_SIZE];
+    ucschar_t *kbd_buf_ptr;
     unsigned short max_line_len;
     int default_lines;
-    int last_k;
-    int last_i;
-    int font_w;
-    int font_h;
-    int text_w;
+    unsigned int last_k;
+    unsigned int last_i;
+    unsigned short font_w;
+    unsigned short font_h;
+    unsigned int text_w;
     int curfont;
     int main_y;
 #ifdef HAVE_MORSE_INPUT
@@ -128,7 +128,7 @@ struct edit_state
     int editpos;        /* Edit position on all screens */
     bool cur_blink;     /* Cursor on/off flag */
     bool hangul;
-    unsigned short hlead, hvowel, htail;
+    ucschar_t hlead, hvowel, htail;
 #ifdef HAVE_MORSE_INPUT
     bool morse_mode;
     bool morse_reading;
@@ -158,13 +158,13 @@ static void keyboard_layout(struct viewport *kbd_vp,
 {
      /*Note: viewports are initialized to vp_default by kbd_create_viewports */
 
-    int sc_w = sc->getwidth();
-    int sc_h = sc->getheight();
+    unsigned short sc_w = sc->getwidth();
+    unsigned short sc_h = sc->getheight();
 
     /* TEXT */
     struct viewport *vp = &kbd_vp[eKBD_VP_TEXT];
     /* make sure height is even for the text box */
-    int text_height = (MAX(pm->font_h, get_icon_height(sc->screen_type)) & ~1) + 2;
+    unsigned short text_height = (MAX(pm->font_h, (unsigned int)get_icon_height(sc->screen_type)) & ~1) + 2;
     vp->x = 0; /* LEFT */
     vp->y = 0; /* TOP */
     vp->width = sc_w;
@@ -224,7 +224,7 @@ int load_kbd(unsigned char* filename)
     int fd;
     int i, line_len, max_line_len;
     unsigned char buf[4];
-    unsigned short *pbuf;
+    ucschar_t *pbuf;
 
     if (filename == NULL)
     {
@@ -245,7 +245,7 @@ int load_kbd(unsigned char* filename)
         /* check how many bytes to read for this character */
         static const unsigned char sizes[4] = { 0x80, 0xe0, 0xf0, 0xf5 };
         size_t count;
-        unsigned short ch;
+        ucschar_t ch;
 
         for (count = 0; count < ARRAYLEN(sizes); count++)
         {
@@ -297,7 +297,7 @@ int load_kbd(unsigned char* filename)
         struct keyboard_parameters *pm = &kbd_param[l];
 #if NB_SCREENS > 1
         if (l > 0)
-            memcpy(pm->kbd_buf, kbd_param[0].kbd_buf, i*sizeof(unsigned short));
+            memcpy(pm->kbd_buf, kbd_param[0].kbd_buf, i*sizeof(ucschar_t));
 #endif
         /* initialize parameters */
         pm->x = pm->y = pm->page = 0;
@@ -309,7 +309,7 @@ int load_kbd(unsigned char* filename)
 }
 
 /* helper function to spell a char */
-static void kbd_spellchar(unsigned short c)
+static void kbd_spellchar(ucschar_t c)
 {
     unsigned char tmp[5];
     /* store char to pass to talk_spell */
@@ -322,7 +322,7 @@ static void kbd_spellchar(unsigned short c)
         talk_spell(tmp, false);
 }
 
-static void kbd_inschar(struct edit_state *state, unsigned short ch)
+static void kbd_inschar(struct edit_state *state, ucschar_t ch)
 {
     int i, j, len;
     unsigned char tmp[4];
@@ -361,10 +361,10 @@ static void kbd_delchar(struct edit_state *state)
 }
 
 /* Lookup k value based on state of param (pm) */
-static unsigned short get_kbd_ch(struct keyboard_parameters *pm, int x, int y)
+static ucschar_t get_kbd_ch(struct keyboard_parameters *pm, int x, int y)
 {
-    int i = 0, k = pm->page*pm->lines + y, n;
-    unsigned short *pbuf;
+    unsigned int n, i = 0, k = pm->page*pm->lines + y;
+    ucschar_t *pbuf;
     if (k >= pm->last_k)
     {
         i = pm->last_i;
@@ -406,12 +406,12 @@ static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
 static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
                                      struct edit_state *state, int dir);
 
-int kbd_input(char* text, int buflen, unsigned short *kbd)
+int kbd_input(char* text, int buflen, ucschar_t *kbd)
 {
     bool done = false;
     struct keyboard_parameters * const param = kbd_param;
     struct edit_state state;
-    unsigned short ch;
+    ucschar_t ch;
     int ret = 0; /* assume success */
     FOR_NB_SCREENS(l)
     {
@@ -449,7 +449,7 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         FOR_NB_SCREENS(l)
         {
             struct keyboard_parameters *pm = &param[l];
-            unsigned short *pbuf;
+            ucschar_t *pbuf;
             const unsigned char *p;
             int len = 0;
 
@@ -800,8 +800,8 @@ static void kbd_calc_pm_params(struct keyboard_parameters *pm,
 {
     struct font* font;
     const unsigned char *p;
-    unsigned short ch, *pbuf;
-    int i, w;
+    ucschar_t ch, *pbuf;
+    unsigned int i, w;
 #ifdef HAVE_TOUCHSCREEN
     pm->show_buttons = (sc->screen_type == SCREEN_MAIN &&
                                 (touchscreen_get_mode() == TOUCHSCREEN_POINT));
@@ -812,7 +812,7 @@ static void kbd_calc_pm_params(struct keyboard_parameters *pm,
     pm->font_h = font->height;
 
     /* check if FONT_UI fits the screen */
-    if (2*pm->font_h + 3 > sc->getheight())
+    if (pm->font_h*2 + 3 > sc->getheight())
     {
         pm->curfont = FONT_SYSFIXED;
         font = font_get(FONT_SYSFIXED);
@@ -858,9 +858,9 @@ static void kbd_calc_vp_params(struct keyboard_parameters *pm,
 {
     (void) state;
     struct viewport *vp = &pm->kbd_viewports[eKBD_VP_PICKER];
-    int icon_w, sc_w, sc_h;
+    unsigned int icon_w, sc_w, sc_h;
     int i, total_lines;
-    unsigned short *pbuf;
+    ucschar_t *pbuf;
     /* calculate how many characters to put in a row. */
     icon_w = get_icon_width(sc->screen_type);
 
@@ -970,7 +970,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
         x = 0;
         y = 0;
         outline[1] = '\0';
-        
+
         /* Draw morse code table with code descriptions. */
         for (i = 0; morse_alphabets[i] != '\0'; i++) {
             int morse_code;
@@ -1024,7 +1024,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
         /* draw page */
         int i, j;
         int w, h;
-        unsigned short ch;
+        ucschar_t ch;
         unsigned char *utf8;
 
         sc->setfont(pm->curfont);
@@ -1071,7 +1071,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     int sc_w = vp->width;
     int y = (vp->height - pm->font_h) / 2;
 
-    
+
     int text_margin = (sc_w - pm->text_w * pm->max_chars_text) / 2;
 
 #if 0
@@ -1265,12 +1265,12 @@ static void kbd_insert_selected(struct keyboard_parameters *pm,
                                 struct edit_state *state)
 {
     /* find input char */
-    unsigned short ch = get_kbd_ch(pm, pm->x, pm->y);
+    ucschar_t ch = get_kbd_ch(pm, pm->x, pm->y);
 
     /* check for hangul input */
     if (ch >= 0x3131 && ch <= 0x3163)
     {
-        unsigned short tmp;
+        ucschar_t tmp;
 
         if (!state->hangul)
         {
@@ -1335,7 +1335,7 @@ static void kbd_insert_selected(struct keyboard_parameters *pm,
 
 static void kbd_backspace(struct edit_state *state)
 {
-    unsigned short ch;
+    ucschar_t ch;
     if (state->hangul)
     {
         if (state->htail)
