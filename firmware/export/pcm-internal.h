@@ -23,6 +23,7 @@
 #define PCM_INTERNAL_H
 
 #include "config.h"
+#include "gcc_extensions.h" /* for FORCE_INLINE */
 
 #ifdef HAVE_SW_VOLUME_CONTROL
 /* Default settings - architecture may have other optimal values */

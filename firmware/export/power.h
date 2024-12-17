@@ -22,6 +22,7 @@
 #define _POWER_H_
 
 #include "config.h"
+#include <stdbool.h>
 
 #if CONFIG_CHARGING
 enum power_input_flags {

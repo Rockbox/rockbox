@@ -23,6 +23,7 @@
 
 #include <string.h> /* size_t */
 #include <inttypes.h> /* uint32_t */
+#include <stdbool.h>
 #include "config.h"
 
 enum pcm_dma_status

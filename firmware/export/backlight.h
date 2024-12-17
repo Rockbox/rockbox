@@ -22,7 +22,7 @@
 #define BACKLIGHT_H
 
 #include "config.h"
-
+#include <stdbool.h>
 
 
 #if !defined(BOOTLOADER)
