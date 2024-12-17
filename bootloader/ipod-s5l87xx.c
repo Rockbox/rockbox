@@ -478,6 +478,82 @@ static void run_of(void)
     kernel_launch_onb();
 }
 
+static void print_syscfg(void)
+{
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    line = 0;
+
+    struct SysCfg syscfg;
+    const ssize_t result = syscfg_read(&syscfg);
+
+    if (result == -1) {
+        printf("SCfg magic not found. NOR flash is corrupted.");
+        goto end;
+    }
+
+    printf("Total size: %lu bytes, %lu entries", syscfg.header.size, syscfg.header.num_entries);
+
+    if (result > 0) {
+        printf("Wrong size: expected %ld, got %lu", result, syscfg.header.size);
+    }
+
+    if (syscfg.header.num_entries > SYSCFG_MAX_ENTRIES) {
+        printf("Too many entries, showing only first %u", SYSCFG_MAX_ENTRIES);
+    }
+
+    const size_t syscfg_num_entries = MIN(syscfg.header.num_entries, SYSCFG_MAX_ENTRIES);
+
+    for (size_t i = 0; i < syscfg_num_entries; i++) {
+        const struct SysCfgEntry* entry = &syscfg.entries[i];
+        const char* tag = (char *)&entry->tag;
+        const uint32_t* data32 = (uint32_t *)entry->data;
+
+        switch (entry->tag) {
+        case SYSCFG_TAG_SRNM:
+            printf("Serial number (SrNm): %s", entry->data);
+            break;
+        case SYSCFG_TAG_FWID:
+            printf("Firmware ID (FwId): %07lX", data32[1] & 0x0FFFFFFF);
+            break;
+        case SYSCFG_TAG_HWID:
+            printf("Hardware ID (HwId): %08lX", data32[0]);
+            break;
+        case SYSCFG_TAG_HWVR:
+            printf("Hardware version (HwVr): %06lX", data32[1]);
+            break;
+        case SYSCFG_TAG_CODC:
+            printf("Codec (Codc): %s", entry->data);
+            break;
+        case SYSCFG_TAG_SWVR:
+            printf("Software version (SwVr): %s", entry->data);
+            break;
+        case SYSCFG_TAG_MLBN:
+            printf("Logic board serial number (MLBN): %s", entry->data);
+            break;
+        case SYSCFG_TAG_MODN:
+            printf("Model number (Mod#): %s", entry->data);
+            break;
+        case SYSCFG_TAG_REGN:
+            printf("Sales region (Regn): %08lX %08lX", data32[0], data32[1]);
+            break;
+        default:
+            printf("%c%c%c%c: %08lX %08lX %08lX %08lX",
+                tag[3], tag[2], tag[1], tag[0],
+                data32[0], data32[1], data32[2], data32[3]
+            );
+            break;
+        }
+    }
+
+end:
+    line++;
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+}
+
 static void devel_menu(void)
 {
     while (1)
@@ -486,6 +562,7 @@ static void devel_menu(void)
         lcd_set_foreground(LCD_RBYELLOW);
         line = 0;
         printf("Select action:");
+        printf(" <MENU>    Show SysCfg");
         printf(" <LEFT>    LCD sleep/awake test");
         printf(" <SELECT>  PMU info");
         printf(" <RIGHT>   GPIO info");
@@ -498,6 +575,10 @@ static void devel_menu(void)
         {
             switch (button_status())
             {
+                case BUTTON_MENU:
+                    print_syscfg();
+                    done = true;
+                    break;
                 case BUTTON_LEFT:
                     sleep_test();
                     done = true;
