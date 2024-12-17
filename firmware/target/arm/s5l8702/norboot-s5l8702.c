@@ -202,6 +202,37 @@ void bootflash_write(int port, int offset, void* addr, int size)
     }
 }
 
+/*
+ * SysCfg
+ */
+ssize_t syscfg_read(struct SysCfg* syscfg)
+{
+    const size_t syscfg_hdr_size = sizeof(struct SysCfgHeader);
+    const size_t syscfg_entry_size = sizeof(struct SysCfgEntry);
+
+    bootflash_init(SPI_PORT);
+    bootflash_read(SPI_PORT, 0, syscfg_hdr_size, &syscfg->header);
+
+    if (syscfg->header.magic != SYSCFG_MAGIC) {
+        bootflash_close(SPI_PORT);
+        return -1;
+    }
+
+    const size_t calculated_syscfg_size = syscfg_hdr_size + syscfg_entry_size * syscfg->header.num_entries;
+
+    if (syscfg->header.size != calculated_syscfg_size) {
+        bootflash_close(SPI_PORT);
+        return calculated_syscfg_size;
+    }
+
+    const size_t syscfg_num_entries = MIN(syscfg->header.num_entries, SYSCFG_MAX_ENTRIES);
+    const size_t syscfg_entries_size = syscfg_entry_size * syscfg_num_entries;
+
+    bootflash_read(SPI_PORT, syscfg_hdr_size, syscfg_entries_size, &syscfg->entries);
+    bootflash_close(SPI_PORT);
+
+    return 0;
+}
 
 /*
  * IM3

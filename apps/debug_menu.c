@@ -2642,51 +2642,37 @@ static bool dbg_device_data(void)
 
 
 #if defined(IPOD_6G) && !defined(SIMULATOR)
-#define SYSCFG_MAX_ENTRIES 9 // 9 on iPod Classic/6G
-
 static bool dbg_syscfg(void) {
     struct simplelist_info info;
-    struct SysCfgHeader syscfg_hdr;
-    size_t syscfg_hdr_size = sizeof(struct SysCfgHeader);
-    size_t syscfg_entry_size = sizeof(struct SysCfgEntry);
-    struct SysCfgEntry syscfg_entries[SYSCFG_MAX_ENTRIES];
+    struct SysCfg syscfg;
 
     simplelist_info_init(&info, "SysCfg NOR contents", 0, NULL);
     simplelist_reset_lines();
 
-    bootflash_init(SPI_PORT);
-    bootflash_read(SPI_PORT, 0, syscfg_hdr_size, &syscfg_hdr);
+    const ssize_t result = syscfg_read(&syscfg);
 
-    if (syscfg_hdr.magic != SYSCFG_MAGIC) {
+    if (result == -1) {
         simplelist_setline("SCfg magic not found");
-        bootflash_close(SPI_PORT);
         return simplelist_show_list(&info);
     }
 
-    simplelist_addline("Total size: %lu bytes, %lu entries", syscfg_hdr.size, syscfg_hdr.num_entries);
+    simplelist_addline("Total size: %lu bytes, %lu entries", syscfg.header.size, syscfg.header.num_entries);
 
-    size_t calculated_syscfg_size = syscfg_hdr_size + syscfg_entry_size * syscfg_hdr.num_entries;
-
-    if (syscfg_hdr.size != calculated_syscfg_size) {
-        simplelist_addline("Wrong size: expected %zu, got %lu", calculated_syscfg_size, syscfg_hdr.size);
-        bootflash_close(SPI_PORT);
+    if (result > 0) {
+        simplelist_addline("Wrong size: expected %ld, got %lu", result, syscfg.header.size);
         return simplelist_show_list(&info);
     }
 
-    if (syscfg_hdr.num_entries > SYSCFG_MAX_ENTRIES) {
+    if (syscfg.header.num_entries > SYSCFG_MAX_ENTRIES) {
         simplelist_addline("Too many entries, showing only first %u", SYSCFG_MAX_ENTRIES);
     }
 
-    size_t syscfg_num_entries = MIN(syscfg_hdr.num_entries, SYSCFG_MAX_ENTRIES);
-    size_t syscfg_entries_size = syscfg_entry_size * syscfg_num_entries;
-
-    bootflash_read(SPI_PORT, syscfg_hdr_size, syscfg_entries_size, &syscfg_entries);
-    bootflash_close(SPI_PORT);
+    const size_t syscfg_num_entries = MIN(syscfg.header.num_entries, SYSCFG_MAX_ENTRIES);
 
     for (size_t i = 0; i < syscfg_num_entries; i++) {
-        struct SysCfgEntry* entry = &syscfg_entries[i];
-        char* tag = (char *)&entry->tag;
-        uint32_t* data32 = (uint32_t *)entry->data;
+        const struct SysCfgEntry* entry = &syscfg.entries[i];
+        const char* tag = (char *)&entry->tag;
+        const uint32_t* data32 = (uint32_t *)entry->data;
 
         switch (entry->tag) {
             case SYSCFG_TAG_SRNM:

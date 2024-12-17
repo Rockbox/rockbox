@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 #include "config.h"
 #include "crypto-s5l8702.h"
@@ -90,6 +91,8 @@ void bootflash_close(int port);
 /*
  * SysCfg
  */
+#define SYSCFG_MAX_ENTRIES 9 // 9 on iPod Classic/6G
+
 struct SysCfgHeader {
     uint32_t magic; // always 'SCfg'
     uint32_t size;
@@ -104,6 +107,11 @@ struct SysCfgEntry {
     uint8_t data[0x10];
 };
 
+struct SysCfg {
+    struct SysCfgHeader header;
+    struct SysCfgEntry entries[SYSCFG_MAX_ENTRIES];
+};
+
 #define SYSCFG_MAGIC 0x53436667 // SCfg
 
 #define SYSCFG_TAG_SRNM 0x53724e6d // SrNm
@@ -115,6 +123,8 @@ struct SysCfgEntry {
 #define SYSCFG_TAG_MLBN 0x4d4c424e // MLBN
 #define SYSCFG_TAG_MODN 0x4d6f6423 // Mod#
 #define SYSCFG_TAG_REGN 0x5265676e // Regn
+
+ssize_t syscfg_read(struct SysCfg* syscfg);
 
 /*
  * IM3
