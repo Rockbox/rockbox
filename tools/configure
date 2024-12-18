@@ -1101,6 +1101,7 @@ S(m)all C lib, Logf to Ser(i)al port, LTO Build(X), (E)rror on warnings"
       [Ee])
         echo "Treating all warnings as errors"
         GCCOPTS="$GCCOPTS -Werror"
+        CCOPTS="$CCOPTS -Werror"
         ;;
       "") # Match enter press when finished with advanced options
         cont=0

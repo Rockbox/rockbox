@@ -32,10 +32,10 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $(SIMLIB)
 ifeq ($(UNAME), Darwin)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-map,$(BUILDDIR)/rockbox.map
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 else
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
-	-Wl,-Map,$(BUILDDIR)/rockbox.map
+	-Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 endif
 	$(SILENT)$(call objcopy,$@,$@)
 
