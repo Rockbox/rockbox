@@ -108,7 +108,7 @@ void usage(void)
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
            "\t                   zxfi, zmoz, zen, zenv, zxfs, e450, e460,\n"
            "\t                   e470, e580, a10, a20, a860, s750, e350, xdx3,\n"
-           "\t                   nn3g)\n");
+           "\t                   nn3g, nn4g)\n");
     printf("\nNo option results in nothing being done.\n");
 
     exit(1);
@@ -338,6 +338,8 @@ int main (int argc, char** argv)
             modelnum = 116;
         else if (!strcmp(&argv[1][5], "nn3g")) /* iPod Nano 3rd Gen */
             modelnum = 117;
+        else if (!strcmp(&argv[1][5], "nn4g")) /* iPod Nano 4th Gen */
+            modelnum = 118;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

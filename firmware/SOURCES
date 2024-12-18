@@ -1625,6 +1625,27 @@ target/arm/s5l8702/ipodnano3g/cscodec-nano3g.c          // TODO: -> wmcodec-nano
 #endif
 #endif /* IPOD_NANO3G */
 
+#ifdef IPOD_NANO4G
+target/arm/s5l8702/ipodnano4g/lcd-nano4g.c
+target/arm/s5l8702/ipodnano4g/backlight-nano4g.c
+target/arm/s5l8702/ipodnano4g/piezo-nano4g.c
+target/arm/s5l8702/ipodnano4g/pmu-nano4g.c
+target/arm/s5l8702/ipodnano4g/adc-nano4g.c
+target/arm/s5l8702/ipodnano4g/powermgmt-nano4g.c
+target/arm/s5l8702/ipodnano4g/power-nano4g.c
+target/arm/s5l8702/ipodnano4g/nand-nano4g.c
+#if (CONFIG_RTC == RTC_NANO4G)
+target/arm/s5l8702/ipodnano4g/rtc-nano4g.c
+#endif
+#ifdef HAVE_SERIAL
+target/arm/s5l8702/ipodnano4g/serial-nano4g.c
+#endif
+#ifndef BOOTLOADER
+target/arm/s5l8702/ipodnano4g/audio-nano4g.c
+target/arm/s5l8702/ipodnano4g/cscodec-nano4g.c
+#endif
+#endif /* IPOD_NANO4G */
+
 #ifdef IPOD_6G
 target/arm/s5l8702/ipod6g/lcd-6g.c
 target/arm/s5l8702/ipod6g/backlight-6g.c

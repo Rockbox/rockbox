@@ -1,0 +1,605 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id:
+ *
+ * Copyright (C) 2017 Cástor Muñoz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include <stdint.h>
+#include "config.h"
+
+#include "lcd-s5l8702.h"
+#ifdef BOOTLOADER
+#include "piezo.h"
+#endif
+
+// XXX: For nano3g displays see ili9327, which says it supports 8-bit MIDI interface command and 8-bit param
+
+#if defined(HAVE_LCD_SLEEP) || defined(HAVE_LCD_SHUTDOWN)
+/* powersave sequences */
+
+/* 0xb3, 0xe6 */
+static const uint8_t lcd_sleep_seq_03[] =
+{
+    // XXX: MARK 3
+    CMD,   0x28,  0,    /* Display Off */
+    CMD,   0x10,  0,    /* Sleep In */
+    SLEEP, 5,           /* 50 ms */
+    END
+};
+
+/* 0xc4 */
+static const uint8_t lcd_sleep_seq_1[] =
+{
+    // XXX: MARK 3
+    CMD,   0x28,  0,    /* Display Off */
+    CMD,   0x10,  0,    /* Sleep In */
+    SLEEP, 12,          /* 120 ms */
+    END
+};
+
+/* 0xd5 */
+static const uint8_t lcd_sleep_seq_2[] =
+{
+    // XXX: MARK 3
+    CMD,   0x10,  0,    /* Sleep In */
+    END
+};
+#endif /* HAVE_LCD_SLEEP || HAVE_LCD_SHUTDOWN */
+
+
+#if defined(HAVE_LCD_SLEEP)
+/* awake sequences */
+
+/* 0xb3, 0xc4, 0xd5, 0xe6 */
+static const uint8_t lcd_awake_seq_0123[] =
+{
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+};
+#endif /* HAVE_LCD_SLEEP */
+
+
+#if defined(BOOTLOADER)
+/* init sequences */
+// TODO: put something else at the end of the init sequence???, the bootloader without a sleep is very tight ()
+
+/* 0xb3 */
+static const uint8_t lcd_init_seq_0[] =
+{
+    #if 1
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+
+    CMD,   0xfe,  1, 0x00,                      // XXX: This and the above do not make much sense, see nano3g
+    CMD,   0xef,  1, 0x80,
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x0c,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x12, 0x00,
+    CMD,   0xc3,  2, 0x12, 0x00,
+    CMD,   0xc4,  2, 0x12, 0x00,
+    CMD,   0xc5,  2, 0x3a, 0x3e,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x6a, 0x15,
+    CMD,   0xb2,  2, 0x5f, 0x3f,
+    CMD,   0xb3,  2, 0x5f, 0x3f,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x0f, 0x42, 0x24, 0x01, 0x00, 0x02, 0xa6, 0x98,
+                     0x05, 0x04, 0x15,
+    CMD,   0xe1, 11, 0x00, 0x21, 0x44, 0x02, 0x0f, 0x05, 0x89, 0x6a,
+                     0x02, 0x15, 0x04,
+    CMD,   0xe2, 11, 0x7e, 0x04, 0x43, 0x40, 0x00, 0x02, 0x13, 0x00,
+                     0x00, 0x01, 0x0b,
+    CMD,   0xe3, 11, 0x40, 0x40, 0x03, 0x74, 0x0e, 0x00, 0x00, 0x31,
+                     0x02, 0x0b, 0x01,
+    CMD,   0xe4, 11, 0x5a, 0x43, 0x67, 0x56, 0x00, 0x02, 0x67, 0x72,
+                     0x00, 0x05, 0x12,
+    CMD,   0xe5, 11, 0x50, 0x66, 0x47, 0x53, 0x0a, 0x00, 0x27, 0x76,
+                     0x02, 0x12, 0x05,
+
+    CMD,   0x3a,  1, 0x06,  /* Pixel Format Set */
+    CMD,   0x13,  0,        /* Normal Mode On */
+
+    // XXX: MARK3
+
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */                 // orig: 0x1 -> 1ms ???
+    END
+    #else
+
+    CMD,   0xef,  1, 0x80,                                                              // ILI9340: XXX: does not exist
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x06,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x12, 0x00,
+    CMD,   0xc3,  2, 0x12, 0x00,
+    CMD,   0xc4,  2, 0x12, 0x00,
+    CMD,   0xc5,  2, 0x40, 0x38,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x5f, 0x3f,
+    CMD,   0xb2,  2, 0x5f, 0x3f,
+    CMD,   0xb3,  2, 0x5f, 0x3f,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    CMD,   0xfe,  1, 0x00,                                                              // ILI9340: XXX: does not exist
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x0f, 0x70, 0x47, 0x03, 0x02, 0x02, 0xa0, 0x94,
+                     0x05, 0x00, 0x0e,
+    CMD,   0xe1, 11, 0x02, 0x43, 0x77, 0x00, 0x0f, 0x05, 0x49, 0x0a,
+                     0x02, 0x0e, 0x00,
+    CMD,   0xe2, 11, 0x2f, 0x63, 0x20, 0x50, 0x00, 0x07, 0xd1, 0x13,
+                     0x00, 0x00, 0x0e,
+    CMD,   0xe3, 11, 0x50, 0x20, 0x60, 0x23, 0x0f, 0x00, 0x31, 0x1d,
+                     0x07, 0x0e, 0x00,
+    CMD,   0xe4, 11, 0x5e, 0x50, 0x65, 0x27, 0x00, 0x0b, 0xdf, 0xf1,
+                     0x01, 0x00, 0x0e,
+    CMD,   0xe5, 11, 0x20, 0x67, 0x55, 0x50, 0x0e, 0x01, 0x1f, 0xfd,
+                     0x0b, 0x0e, 0x00,
+
+    CMD,   0x3a,  1, 0x06,  /* Pixel Format Set */                                      // XXX: 110b -> 18-bit / pixel
+    CMD,   0x36,  1, 0x60,  /* Memory Access Control */
+    CMD,   0x13,  0,        /* Normal Mode On */
+
+    // XXX: MARK 3
+
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */                 // orig: 0x1 -> 1ms ???
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */                // orig: 0x78 -> 120ms ???
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */                 // orig: 0x1 -> 1ms ???
+    END
+    #endif
+};
+
+/* 0xc4 */
+static const uint8_t lcd_init_seq_1[] =
+{
+    #if 1
+    CMD,   0x01,  0,    /* Software Reset */
+    SLEEP, 1,           /* 10 ms */
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x00,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x34, 0x00,
+    CMD,   0xc3,  2, 0x72, 0x03,
+    CMD,   0xc4,  2, 0x73, 0x03,
+    CMD,   0xc5,  2, 0x3c, 0x3c,
+
+    CMD,   0xfe,  1, 0x00,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x6a, 0x15,
+    CMD,   0xb2,  2, 0x6a, 0x15,
+    CMD,   0xb3,  2, 0x6a, 0x15,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x77, 0x52, 0x76, 0x53, 0x03, 0x03, 0x57, 0x42,
+                     0x10, 0x18, 0x09,
+    CMD,   0xe1, 11, 0x0d, 0x00, 0x23, 0x66, 0x0f, 0x15, 0x4d, 0x85,
+                     0x08, 0x02, 0x10,
+    CMD,   0xe2, 11, 0x39, 0x60, 0x77, 0x05, 0x03, 0x07, 0x96, 0x64,
+                     0x0d, 0x1a, 0x0a,
+    CMD,   0xe3, 11, 0x3f, 0x10, 0x16, 0x44, 0x0e, 0x04, 0x6c, 0x44,
+                     0x04, 0x03, 0x0b,
+    CMD,   0xe4, 11, 0x00, 0x61, 0x77, 0x04, 0x02, 0x04, 0x72, 0x32,
+                     0x09, 0x19, 0x06,
+    CMD,   0xe5, 11, 0x4f, 0x42, 0x27, 0x67, 0x0f, 0x02, 0x26, 0x33,
+                     0x01, 0x03, 0x09,
+
+    CMD,   0x3a,  1, 0x66,  /* Pixel Format Set */
+    CMD,   0x36,  1, 0x00,  /* Memory Access Control */
+
+    // XXX: MARK 3
+
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */                        // TODO: can be removed ???
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+
+    #else
+    CMD,   0x01,  0,    /* Software Reset */
+    SLEEP, 1,           /* 10 ms */
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x01,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x74, 0x00,
+    CMD,   0xc3,  2, 0x72, 0x03,
+    CMD,   0xc4,  2, 0x73, 0x03,
+    CMD,   0xc5,  2, 0x3c, 0x3c,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x6a, 0x15,
+    CMD,   0xb2,  2, 0x6a, 0x15,
+    CMD,   0xb3,  2, 0x6a, 0x15,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x1e, 0x22, 0x44, 0x00, 0x09, 0x01, 0x47, 0xc1,
+                     0x05, 0x02, 0x09,
+    CMD,   0xe1, 11, 0x0f, 0x32, 0x35, 0x00, 0x03, 0x05, 0x5e, 0x78,
+                     0x03, 0x00, 0x03,
+    CMD,   0xe2, 11, 0x0d, 0x74, 0x47, 0x41, 0x07, 0x01, 0x74, 0x41,
+                     0x09, 0x03, 0x07,
+    CMD,   0xe3, 11, 0x5f, 0x41, 0x27, 0x02, 0x00, 0x03, 0x43, 0x55,
+                     0x02, 0x00, 0x03,
+    CMD,   0xe4, 11, 0x1b, 0x53, 0x44, 0x51, 0x0b, 0x01, 0x64, 0x20,
+                     0x05, 0x02, 0x09,
+    CMD,   0xe5, 11, 0x7f, 0x41, 0x26, 0x02, 0x04, 0x00, 0x33, 0x35,
+                     0x01, 0x00, 0x02,
+
+    CMD,   0x3a,  1, 0x66,  /* Pixel Format Set */
+    CMD,   0x36,  1, 0x60,  /* Memory Access Control */
+
+    // XXX: MARK 3
+
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+    #endif
+};
+
+/* 0xd5 */
+static const uint8_t lcd_init_seq_2[] =
+{
+    #if 1
+    CMD,   0xfe,  1, 0x00,
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x01,
+    CMD,   0xc1,  1, 0x01,
+    CMD,   0xc2,  2, 0x03, 0x00,
+    CMD,   0xc3,  2, 0x01, 0x00,
+    CMD,   0xc4,  2, 0x03, 0x00,
+    CMD,   0xc5,  2, 0x34, 0x34,
+    CMD,   0xc7,  1, 0x00,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x6d, 0x15,
+    CMD,   0xb2,  2, 0x6d, 0x15,
+    CMD,   0xb3,  2, 0x6d, 0x15,
+    CMD,   0xb4,  1, 0x03,
+    CMD,   0xb6,  2, 0x11, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x23, 0x42, 0x20, 0x42, 0x0e, 0x01, 0xf5, 0xeb,
+                     0x13, 0x05, 0x18,
+    CMD,   0xe1, 11, 0x5f, 0x22, 0x36, 0x21, 0x03, 0x1e, 0xfe, 0x7b,
+                     0x02, 0x07, 0x18,
+    CMD,   0xe2, 11, 0x5f, 0x34, 0x53, 0x77, 0x0a, 0x00, 0x70, 0xf4,
+                     0x14, 0x06, 0x0f,
+    CMD,   0xe3, 11, 0x0f, 0x23, 0x31, 0x54, 0x0f, 0x0b, 0x8e, 0x08,
+                     0x00, 0x05, 0x15,
+    CMD,   0xe4, 11, 0x5f, 0x33, 0x42, 0x14, 0x0e, 0x04, 0xa6, 0xf7,
+                     0x0e, 0x00, 0x14,
+    CMD,   0xe5, 11, 0x0c, 0x43, 0x44, 0x44, 0x0d, 0x0d, 0x7f, 0x39,
+                     0x03, 0x02, 0x10,
+
+    CMD,   0x3a,  1, 0x66,  /* Pixel Format Set */
+    CMD,   0x36,  1, 0x00,  /* Memory Access Control */
+
+    // XXX: MARK 3
+
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+    END
+
+    #else
+    CMD,   0xfe,  1, 0x00,                                                                  // ILI9340: XXX: does not exist
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x00,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x73, 0x03,
+    CMD,   0xc3,  2, 0x73, 0x03,
+    CMD,   0xc4,  2, 0x73, 0x03,
+    CMD,   0xc5,  2, 0x64, 0x37,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x69, 0x13,
+    CMD,   0xb2,  2, 0x69, 0x13,
+    CMD,   0xb3,  2, 0x69, 0x13,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x03, 0x12,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x08, 0x00, 0x10, 0x00, 0x03, 0x0e, 0xc8, 0x65,
+                     0x05, 0x00, 0x00,
+    CMD,   0xe1, 11, 0x06, 0x20, 0x00, 0x00, 0x00, 0x07, 0x4d, 0x0b,
+                     0x08, 0x00, 0x00,
+    CMD,   0xe2, 11, 0x08, 0x77, 0x27, 0x63, 0x0f, 0x16, 0xcf, 0x25,
+                     0x03, 0x00, 0x00,
+    CMD,   0xe3, 11, 0x5f, 0x53, 0x77, 0x06, 0x00, 0x02, 0x4b, 0x7b,
+                     0x0f, 0x00, 0x00,
+    CMD,   0xe4, 11, 0x08, 0x46, 0x57, 0x52, 0x0f, 0x16, 0xcf, 0x25,
+                     0x04, 0x00, 0x00,
+    CMD,   0xe5, 11, 0x6f, 0x44, 0x57, 0x06, 0x00, 0x04, 0x43, 0x7b,
+                     0x0f, 0x00, 0x00,
+
+    CMD,   0x3a,  1, 0x66,  /* Pixel Format Set */
+    CMD,   0x36,  1, 0x60,  /* Memory Access Control */
+
+    // XXX: MARK 3
+
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+    #endif
+};
+
+/* 0xe6 */
+static const uint8_t lcd_init_seq_3[] =
+{
+    #if 1
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+
+    CMD,   0xfe,  1, 0x00,
+    CMD,   0xef,  1, 0x80,
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x13,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x12, 0x00,
+    CMD,   0xc3,  2, 0x12, 0x00,
+    CMD,   0xc4,  2, 0x12, 0x00,
+    CMD,   0xc5,  2, 0x2a, 0x3c,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x6a, 0x15,
+    CMD,   0xb2,  2, 0x5f, 0x3f,
+    CMD,   0xb3,  2, 0x5f, 0x3f,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x0f, 0x53, 0x45, 0x07, 0x00, 0x00, 0xb9, 0xf6,
+                     0x08, 0x04, 0x18,
+    CMD,   0xe1, 11, 0x00, 0x47, 0x55, 0x03, 0x0f, 0x08, 0x6f, 0x9b,
+                     0x00, 0x18, 0x04,
+    CMD,   0xe2, 11, 0x7e, 0x03, 0x54, 0x75, 0x00, 0x00, 0x3a, 0x52,
+                     0x03, 0x02, 0x10,
+    CMD,   0xe3, 11, 0x70, 0x55, 0x04, 0x73, 0x0e, 0x03, 0x25, 0xa3,
+                     0x00, 0x10, 0x02,
+    CMD,   0xe4, 11, 0x1a, 0x72, 0x33, 0x76, 0x00, 0x00, 0xeb, 0x97,
+                     0x03, 0x05, 0x17,
+    CMD,   0xe5, 11, 0x70, 0x36, 0x73, 0x12, 0x0a, 0x03, 0x79, 0xbe,
+                     0x00, 0x17, 0x05,
+
+    CMD,   0x3a,  1, 0x06,  /* Pixel Format Set */
+    CMD,   0x13,  0,        /* Normal Mode On */
+
+    // XXX: MARK 3
+
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+//     CMD,   0x11,  0,    /* Sleep Out */
+//     SLEEP, 12,          /* 120 ms */
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */
+//     END
+
+    #else
+    CMD,   0xef,  1, 0x80, // ILI9340: XXX: does not exist, enter privileged mode (to write 0xCx and 0xBx) ???
+
+    /* Power control */
+    CMD,   0xc0,  1, 0x0a,
+    CMD,   0xc1,  1, 0x03,
+    CMD,   0xc2,  2, 0x12, 0x00,
+    CMD,   0xc3,  2, 0x12, 0x00,
+    CMD,   0xc4,  2, 0x12, 0x00,
+    CMD,   0xc5,  2, 0x38, 0x38,
+
+    /* Display control */
+    CMD,   0xb1,  2, 0x5f, 0x3f,
+    CMD,   0xb2,  2, 0x5f, 0x3f,
+    CMD,   0xb3,  2, 0x5f, 0x3f,
+    CMD,   0xb4,  1, 0x02,
+    CMD,   0xb6,  2, 0x12, 0x02,
+
+    CMD,   0x35,  1, 0x00,  /* Tearing Effect Line On */
+    CMD,   0x26,  1, 0x10,  /* Gamma Set */
+
+    CMD,   0xfe,  1, 0x00,                                                              // ILI9340: XXX: does not exist
+
+    /* Gamma settings */
+    CMD,   0xe0, 11, 0x0f, 0x70, 0x47, 0x03, 0x02, 0x02, 0xa0, 0x94,
+                     0x05, 0x00, 0x0e,
+    CMD,   0xe1, 11, 0x02, 0x43, 0x77, 0x00, 0x0f, 0x05, 0x49, 0x0a,
+                     0x02, 0x0e, 0x00,
+    CMD,   0xe2, 11, 0x2f, 0x63, 0x20, 0x50, 0x00, 0x07, 0xd1, 0x13,
+                     0x00, 0x00, 0x0e,
+    CMD,   0xe3, 11, 0x50, 0x20, 0x60, 0x23, 0x0f, 0x00, 0x31, 0x1d,
+                     0x07, 0x0e, 0x00,
+    CMD,   0xe4, 11, 0x5e, 0x50, 0x65, 0x27, 0x00, 0x0b, 0xdf, 0xf1,
+                     0x01, 0x00, 0x0e,
+    CMD,   0xe5, 11, 0x20, 0x67, 0x55, 0x50, 0x0e, 0x01, 0x1f, 0xfd,
+                     0x0b, 0x0e, 0x00,
+
+    CMD,   0x3a,  1, 0x06,  /* Pixel Format Set */
+    CMD,   0x36,  1, 0x60,  /* Memory Control Access */
+    CMD,   0x13,  0,        /* Normal Mode On */
+
+    // XXX: MARK 3
+
+//     CMD,   0x29,  0,    /* Display On */
+//     SLEEP, 1,           /* 10 ms */
+    CMD,   0x11,  0,    /* Sleep Out */
+    SLEEP, 12,          /* 120 ms */
+    CMD,   0x29,  0,    /* Display On */
+    SLEEP, 1,           /* 10 ms */
+    END
+    #endif
+};
+#endif /* BOOTLOADER */
+
+
+/* Supported LCD types */
+enum {
+    LCD_TYPE_UNKNOWN = -1,
+    LCD_TYPE_B3 = 0,
+    LCD_TYPE_C4,
+    LCD_TYPE_D5,
+    LCD_TYPE_E6,
+    N_LCD_TYPES
+};
+
+static struct lcd_info_rec lcd_info_list[] =
+{
+    [LCD_TYPE_B3] = {
+        .lcd_type   = LCD_TYPE_B3,
+        .mpuiface   = LCD_MPUIFACE_SERIAL,
+    #if defined(HAVE_LCD_SLEEP) || defined(HAVE_LCD_SHUTDOWN)
+        .seq_sleep  = (void*) lcd_sleep_seq_03,
+    #endif
+    #ifdef HAVE_LCD_SLEEP
+        .seq_awake  = (void*) lcd_awake_seq_0123,
+    #endif
+    #ifdef BOOTLOADER
+        .seq_init   = (void*) lcd_init_seq_0,
+    #endif
+    },
+
+    [LCD_TYPE_C4] = {
+        .lcd_type   = LCD_TYPE_C4,
+        .mpuiface   = LCD_MPUIFACE_SERIAL,
+    #if defined(HAVE_LCD_SLEEP) || defined(HAVE_LCD_SHUTDOWN)
+        .seq_sleep  = (void*) lcd_sleep_seq_1,
+    #endif
+    #ifdef HAVE_LCD_SLEEP
+        .seq_awake  = (void*) lcd_awake_seq_0123,
+    #endif
+    #ifdef BOOTLOADER
+        .seq_init   = (void*) lcd_init_seq_1,
+    #endif
+    },
+
+    [LCD_TYPE_D5] = {
+        .lcd_type   = LCD_TYPE_D5,
+        .mpuiface   = LCD_MPUIFACE_SERIAL,
+    #if defined(HAVE_LCD_SLEEP) || defined(HAVE_LCD_SHUTDOWN)
+        .seq_sleep  = (void*) lcd_sleep_seq_2,
+    #endif
+    #ifdef HAVE_LCD_SLEEP
+        .seq_awake  = (void*) lcd_awake_seq_0123,
+    #endif
+    #ifdef BOOTLOADER
+        .seq_init   = (void*) lcd_init_seq_2,
+    #endif
+    },
+
+    [LCD_TYPE_E6] = {
+        .lcd_type   = LCD_TYPE_E6,
+        .mpuiface   = LCD_MPUIFACE_SERIAL,
+    #if defined(HAVE_LCD_SLEEP) || defined(HAVE_LCD_SHUTDOWN)
+        .seq_sleep  = (void*) lcd_sleep_seq_03,
+    #endif
+    #ifdef HAVE_LCD_SLEEP
+        .seq_awake  = (void*) lcd_awake_seq_0123,
+    #endif
+    #ifdef BOOTLOADER
+        .seq_init   = (void*) lcd_init_seq_3,
+    #endif
+    },
+};
+
+uint8_t lcd_id[4]; // XXX: DEBUG
+
+struct lcd_info_rec* lcd_target_get_info(void)
+{
+    // uint8_t lcd_id[4];
+    int type = LCD_TYPE_UNKNOWN;
+    int retry = 3;
+
+    while (retry--)
+    {
+        lcd_read_display_id(LCD_MPUIFACE_SERIAL, &lcd_id[0]);
+
+        if (lcd_id[1] == 0x38) {
+            if      (lcd_id[2] == 0xb3) type = LCD_TYPE_B3;
+            else if (lcd_id[2] == 0xc4) type = LCD_TYPE_C4;
+            else if (lcd_id[2] == 0xd5) type = LCD_TYPE_D5;
+            else if (lcd_id[2] == 0xe6) type = LCD_TYPE_E6;
+        }
+
+        if (type != LCD_TYPE_UNKNOWN)
+            return &lcd_info_list[type];
+    }
+
+#ifdef BOOTLOADER
+    while (1)
+    {
+        uint16_t fatal[] = { 3000,500,500, 0 };
+        piezo_seq(fatal);
+    }
+#else
+    // TODO: What we do?
+    return lcd_info_list;
+#endif
+}

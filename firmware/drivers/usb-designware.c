@@ -73,7 +73,7 @@
 #elif CONFIG_CPU == S5L8701
 # define USB_DW_PHYSADDR(x)     x
 # define NO_UNCACHED_ADDR       /* Not known how to form uncached addresses */
-#elif CONFIG_CPU == S5L8702
+#elif CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8720
 # define USB_DW_PHYSADDR(x)     S5L8702_PHYSICAL_ADDR(x)
 # define USB_DW_UNCACHEDADDR(x) S5L8702_UNCACHED_ADDR(x)
 #elif !defined(USB_DW_ARCH_SLAVE)
