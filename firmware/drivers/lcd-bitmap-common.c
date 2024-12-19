@@ -684,7 +684,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
 
     cwidth = font_get(vp->font)->maxwidth;
     /* get width (pixels) of the string */
-    LCDFN(getstringsize)(string, &w, &h);
+    font_getstringsize(string, &w, &h, vp->font);
     height = h;
 
     y = y * (linebased ? height : 1);
@@ -713,6 +713,8 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
 
     /* copy contents to the line buffer */
     strmemccpy(s->linebuffer, string, sizeof(s->linebuffer));
+    s->line_stringsize = w;
+
     /* scroll bidirectional or forward only depending on the string width */
     if ( LCDFN(scroll_info).bidir_limit ) {
         s->bidir = w < (vp->width) *

@@ -124,6 +124,8 @@ struct scrollinfo
     int width, height;
     /* pixel to skip from the beginning of the string, increments as the text scrolls */
     int offset;
+    /* getstringsize width of linebuffer */
+    unsigned short line_stringsize;
     /* scroll presently forward or backward? */
     bool backward;
     bool bidir;

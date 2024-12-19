@@ -122,7 +122,9 @@ void LCDFN(bidir_scroll)(int percent)
  * Returns true if the text scrolled to the end */
 bool LCDFN(scroll_now)(struct scrollinfo *s)
 {
-    int width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
+    int width = s->line_stringsize; /* Calculated by LCDFN puts_scroll_worker() */
+    /*int width = font_getstringsize(s->linebuffer, NULL, NULL, s->vp->font);*/
+
     bool ended = false;
     /* assume s->scroll_func() don't yield; otherwise this buffer might need
      * to be mutex'd (the worst case would be minor glitches though) */
@@ -149,7 +151,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
         snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
             s->linebuffer, "   ", s->linebuffer);
         s->line = line_buf;
-        width += LCDFN(getstringsize)("   ", NULL, NULL);
+        width += font_getstringsize(" ", NULL, NULL, s->vp->font) * 3;
         /* scroll forward the whole time */
         if (s->offset >= width) {
             s->offset = 0;
@@ -184,53 +186,53 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
 static void LCDFN(scroll_worker)(void)
 {
     int index;
-    bool makedelay;
     struct scroll_screen_info *si = &LCDFN(scroll_info);
-    struct scrollinfo *s;
     struct viewport *oldvp;
-    int step;
+
+    if (global_settings.disable_mainmenu_scrolling
+        && get_current_activity() == ACTIVITY_MAINMENU) {
+        /* No scrolling on the main menu if disabled
+         (to not break themes with lockscreens) */
+        return;
+    }
 
     for ( index = 0; index < si->lines; index++ )
     {
-        s = &si->scroll[index];
+        struct scrollinfo *s = &si->scroll[index];
 
         /* check pause */
         if (TIME_BEFORE(current_tick, s->start_tick)) {
             continue;
         }
 
-        if (global_settings.disable_mainmenu_scrolling && get_current_activity() == ACTIVITY_MAINMENU) {
-            // No scrolling on the main menu if disabled (to not break themes with lockscreens)
-            continue;
-        }
-
         s->start_tick = current_tick;
 
+        if (s->backward)
+            s->offset -= si->step;
+        else
+            s->offset += si->step;
+
         /* this runs out of the ui thread, thus we need to
-         * save and restore the current viewport since the ui thread
-         * is unaware of the swapped viewports. the vp must
-         * be switched early so that lcd_getstringsize() picks the
-         * correct font */
+         * save and restore the current viewport since the
+         * ui thread is unaware of the swapped viewports. */
         oldvp = LCDFN(set_viewport_ex)(s->vp, 0); /* don't mark the last vp as dirty */
 
-        makedelay = false;
-        step = si->step;
-
-        if (s->backward)
-            s->offset -= step;
-        else
-            s->offset += step;
-
         /* put the line onto the display now */
-        makedelay = LCDFN(scroll_now(s));
+        bool makedelay = LCDFN(scroll_now(s));
+        if (makedelay)
+        {
+#if 0 /* haven't found a case in which this matters .. yet?? --Bilgus */
+            /* re-calculate stringsize in case the font changed */
+            s->line_stringsize = font_getstringsize(s->linebuffer, NULL, NULL, s->vp->font);
+#endif
+            s->start_tick += si->delay + si->ticks;
+        }
 
 #ifdef SIMULATOR /* Bugfix sim won't update screen unless called from active thread */
         LCDFN(set_viewport)(oldvp);
 #else
         LCDFN(set_viewport_ex)(oldvp, 0); /* don't mark the last vp as dirty */
 #endif
-        if (makedelay)
-            s->start_tick += si->delay + si->ticks;
     }
 }
 #endif /*!BOOTLOADER*/
