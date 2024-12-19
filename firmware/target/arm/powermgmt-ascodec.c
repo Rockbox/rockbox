@@ -105,6 +105,9 @@ static void disable_charger(void)
 /* Enable charger with specified settings. Start timers, etc. */
 static void enable_charger(void)
 {
+    if (++ charger_total_timer < 0)
+        return; /* wait to re-enable charging */
+
     ascodec_write_charger(BATT_CHG_I | BATT_CHG_V);
 
     sleep(HZ/10); /* Allow charger turn-on time (it could be gradual). */
@@ -131,6 +134,7 @@ void powermgmt_init_target(void)
 
 static inline void charger_plugged(void)
 {
+    charger_total_timer = 0;
     batt_threshold = BATT_FULL_VOLTAGE; /* Start with topped value. */
     battery_voltage_sync();
 }
@@ -171,7 +175,8 @@ static inline void charger_control(void)
             charge_state = CHARGE_STATE_ERROR;
         }
         /* else end of charge */
-
+        charger_total_timer = -(HZ * 600) / POWER_THREAD_STEP_TICKS;
+        /* wait 10 minutes before re-enabling charging again */
         disable_charger();
         break;
         } /* CHARGING: */
