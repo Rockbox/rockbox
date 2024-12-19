@@ -280,15 +280,12 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
 
 unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8, int cp, int count)
 {
-    return iso_decode_ex(iso, utf8, cp, count, -1);
+    return iso_decode_ex(iso, utf8, cp, count, INT_MAX);
 }
 
 /* Recode an iso encoded string to UTF-8 */
 unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int cp, int count, int utf8_size)
 {
-    if (utf8_size == -1)
-        utf8_size = INT_MAX;
-
     uint16_t *table = NULL;
 
     cp_lock_enter();
@@ -423,9 +420,6 @@ unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int 
 unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
         int count, int utf8_size, bool le)
 {
-    if (utf8_size == -1)
-        utf8_size = INT_MAX;
-
     // little-endian flag is used as significant byte index
     if (le)
         le = 1;
@@ -453,13 +447,13 @@ unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
 unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8,
         int count)
 {
-    return utf16decode(utf16, utf8, count, -1, true);
+    return utf16decode(utf16, utf8, count, INT_MAX, true);
 }
 
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
         int count)
 {
-    return utf16decode(utf16, utf8, count, -1, false);
+    return utf16decode(utf16, utf8, count, INT_MAX, false);
 }
 
 bool utf16_has_bom(const unsigned char *utf16, bool *le)
