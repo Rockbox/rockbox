@@ -712,14 +712,18 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
         }
         while (try_line != start && !suitable);
 
+        if (info->refresh_type == SKIN_REFRESH_ALL
+            || try_line != alternator->current_line)
+        {
+            info->force_redraw = true;
+        }
+        info->refresh_type = SKIN_REFRESH_ALL;
+
         if (suitable)
         {
             alternator->current_line = try_line;
             alternator->next_change_tick = current_tick + rettimeout;
         }
-
-        info->refresh_type = SKIN_REFRESH_ALL;
-        info->force_redraw = true;
     }
     bool ret = skin_render_line(get_child(element->children, alternator->current_line), info);
     info->refresh_type = old_refresh;
