@@ -393,7 +393,6 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    if $CC --version | grep -q "clang"; then
-    echo "[Warning] Clang compiler ($CC) in your path is unsupported. Trying gcc-14."
     CC=gcc-14
     AR=gcc-ar-14
     CPP=cpp-14
