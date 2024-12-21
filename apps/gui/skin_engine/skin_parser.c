@@ -1357,6 +1357,10 @@ static int parse_filetext(struct skin_element *element,
                   __func__, filename, element->params_count);
         return WPS_ERROR_INVALID_PARAM;
     }
+
+    while(*filename == PATH_SEPCH) /* no absolute paths! */
+        filename++;
+
     path_append(buf, ROCKBOX_DIR, filename, sizeof(buf));
     DEBUGF("%s %s[%d]\n", __func__, buf, line);
 
