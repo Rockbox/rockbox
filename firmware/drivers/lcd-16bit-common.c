@@ -169,32 +169,41 @@ void lcd_fillrect(int x, int y, int width, int height)
     len  = STRIDE_MAIN(width, height);
     step = STRIDE_MAIN(ROW_INC, COL_INC);
 
-    do
+    switch (fillopt)
     {
-        switch (fillopt)
+        case OPT_SET:
         {
-          case OPT_SET:
-            memset16(dst, bits, len);
-            break;
-
-          case OPT_COPY:
-            memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
-                   len * sizeof(fb_data));
-            break;
-
-          case OPT_NONE:  /* DRMODE_COMPLEMENT */
-          {
-            fb_data *start = dst;
-            fb_data *end = start + len;
             do
-                *start = ~(*start);
-            while (++start < end);
+            {
+                memset16(dst, bits, len);
+                dst += step;
+            } while (dst <= dst_end);
             break;
-          }
         }
-        dst += step;
+        case OPT_COPY:
+        {
+            do
+            {
+                memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
+                       len * sizeof(fb_data));
+                dst += step;
+            } while (dst <= dst_end);
+            break;
+        }
+        case OPT_NONE:  /* DRMODE_COMPLEMENT */
+        {
+            do
+            {
+                fb_data *start = dst;
+                fb_data *end = start + len;
+                do
+                    *start = ~(*start);
+                while (++start < end);
+                dst += step;
+            } while (dst <= dst_end);
+            break;
+        }
     }
-    while (dst <= dst_end);
 }
 
 /* About Rockbox' internal monochrome bitmap format:
