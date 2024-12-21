@@ -963,8 +963,8 @@ static int parse_timeout_tag(struct skin_element *element,
                 return 0;
             }
         }
-        token->value.i = val * TIMEOUT_UNIT;
     }
+    token->value.i = val * TIMEOUT_UNIT;
     return 0;
 }
 
