@@ -1343,14 +1343,30 @@ static int parse_filetext(struct skin_element *element,
     (void)wps_data;
     const char* filename;
     char buf[MAX_PATH];
+    char *buf_start = buf;
     int fd;
     int line = 0;
+    const char *search_text = NULL;
+    int search_len = 0;
 
-    /* format: %ft(filename[,line]) */
+    /* format: %ft(filename[,line|search text]) */
     filename = get_param_text(element, 0);
 
     if (element->params_count == 2)
-        line = get_param(element, 1)->data.number;
+    {
+        struct skin_tag_parameter *param1 = get_param(element, 1);
+        if (param1->type == INTEGER)
+            line = param1->data.number;
+        else if (param1->type == STRING)
+        {
+            search_text = get_param_text(element, 1);
+            line = 0x3FF; /* 1k lines is a pretty large file */
+            search_len = strlen(search_text);
+            DEBUGF("%s: found search text %s\n", __func__, search_text);
+        }
+        else
+            return WPS_ERROR_INVALID_PARAM;
+    }
     else if (element->params_count != 1)
     {
         DEBUGF("%s(file, line): %s Error: param count %d\n",
@@ -1364,7 +1380,7 @@ static int parse_filetext(struct skin_element *element,
     path_append(buf, ROCKBOX_DIR, filename, sizeof(buf));
     DEBUGF("%s %s[%d]\n", __func__, buf, line);
 
-    if ((fd = open_utf8(buf, O_RDONLY)) < 0)
+    if (line > 0x3FF || (fd = open_utf8(buf, O_RDONLY)) < 0)
     {
         DEBUGF("%s: Error Opening %s\n", __func__, buf);
         goto failure;
@@ -1373,8 +1389,15 @@ static int parse_filetext(struct skin_element *element,
     int rd = 0;
     while (line >= 0)
     {
-        if ((rd = read_line(fd, buf, sizeof(buf))) < 0)
+        if ((rd = read_line(fd, buf, sizeof(buf))) <= 0)
             break;
+        if (search_text && strncasecmp(buf, search_text, search_len) == 0)
+        {
+            buf_start += search_len;
+            rd -= search_len;
+            DEBUGF("%s: found '%s' Reading '%s'\n", __func__, search_text, buf);
+            break;
+        }
         line--;
     }
 
@@ -1386,10 +1409,11 @@ static int parse_filetext(struct skin_element *element,
 
     if (element->is_conditional)
     {
+        buf_start = buf;
         rd = 1; /* just alloc enough for the conditional to work*/
     }
 
-    buf[rd] = '\0';
+    buf_start[rd] = '\0';
 
     char * skinbuf = skin_buffer_alloc(rd+1);
 
@@ -1399,7 +1423,7 @@ static int parse_filetext(struct skin_element *element,
         close(fd);
         return WPS_ERROR_INVALID_PARAM;
     }
-    strcpy(skinbuf, buf);
+    strcpy(skinbuf, buf_start);
     close(fd);
     token->value.data = PTRTOSKINOFFSET(skin_buffer, skinbuf);
     token->type = SKIN_TOKEN_STRING;
