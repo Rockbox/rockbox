@@ -7,7 +7,6 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 Dan Everton
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,20 +18,24 @@
  *
  ****************************************************************************/
 
-#ifndef __LCDSDL_H__
-#define __LCDSDL_H__
+#ifndef __WINDOWSDL_H__
+#define __WINDOWSDL_H__
 
-#include "lcd.h"
 #include "SDL.h"
 
-void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
-                     int height, int max_x, int max_y,
-                     unsigned long (*getpixel)(int, int));
+extern SDL_Texture *gui_texture; /* Window content, including background */
+extern SDL_Surface *sim_lcd_surface; /* LCD content */
 
-void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
-                    int height, int max_x, int max_y, int ui_x, int ui_y);
+/* Renders GUI texture. Sets up new texture, if necessary */
+void sdl_window_render(void);
 
-void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
-                      int first, int steps);
+/* Updates size, aspect ratio, and re-renders window content */
+bool sdl_window_adjust(void);
 
-#endif /* #ifndef __LCDSDL_H__ */
+/* Needs to be called when window size, scale quality, or background should change */
+void sdl_window_adjustment_needed(bool destroy_texture);
+
+/* Creates window, renderer, and LCD surface when app launches */
+void sdl_window_setup(void);
+
+#endif /* #ifndef __WINDOWSDL_H__ */

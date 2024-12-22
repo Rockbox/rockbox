@@ -31,7 +31,7 @@
 #include "backlight.h"
 #include "system.h"
 #include "button-sdl.h"
-#include "lcd-sdl.h"
+#include "window-sdl.h"
 #include "sim_tasks.h"
 #include "buttonmap.h"
 #include "debug.h"
@@ -243,7 +243,7 @@ static bool event_handler(SDL_Event *event)
             sdl_app_has_input_focus = 0;
         else if(event->window.event == SDL_WINDOWEVENT_RESIZED)
         {
-            sdl_window_needs_update();
+            sdl_window_adjustment_needed(false);
 #if !defined (__APPLE__) && !defined(__WIN32)
             static unsigned long last_tick;
             if (TIME_AFTER(current_tick, last_tick + HZ/20) && !button_queue_full())
@@ -370,7 +370,7 @@ static void button_event(int key, bool pressed)
                         strcmp(SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY) ?:
                         "best", "best") ? "best": "nearest");
 
-        sdl_window_needs_update();
+        sdl_window_adjustment_needed(!display_zoom);
 #if !defined(__WIN32) && !defined (__APPLE__)
         button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
 #endif

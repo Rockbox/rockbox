@@ -32,7 +32,7 @@
 #include "thread-sdl.h"
 #include "system-sdl.h"
 #include "sim-ui-defines.h"
-#include "lcd-sdl.h"
+#include "window-sdl.h"
 #include "lcd-bitmap.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote-bitmap.h"
@@ -44,14 +44,9 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "maemo-thread.h"
-
 #endif
 
 #define SIMULATOR_DEFAULT_ROOT "simdisk"
-
-SDL_Surface    *gui_surface;
-SDL_Window     *window;
-SDL_Renderer   *sdlRenderer;
 
 bool            background = true;          /* use backgrounds by default */
 #ifdef HAVE_REMOTE_LCD
@@ -61,8 +56,6 @@ bool            mapping = false;
 const char      *audiodev = NULL;
 bool            debug_buttons = false;
 
-bool            lcd_display_redraw = true;  /* Used for player simulator */
-char            having_new_lcd = true;      /* Used for player simulator */
 bool            sim_alarm_wakeup = false;
 const char     *sim_root_dir = SIMULATOR_DEFAULT_ROOT;
 
@@ -74,59 +67,6 @@ bool debug_audio = false;
 
 bool debug_wps = false;
 int wps_verbose_level = 3;
-
-static void sdl_window_setup(void)
-{
-    SDL_Surface *picture_surface = NULL;
-    int width, height;
-    int depth;
-    Uint32 flags = 0;
-
-    /* Try and load the background image. If it fails go without */
-    if (background) {
-        picture_surface = SDL_LoadBMP("UI256.bmp");
-        if (picture_surface == NULL) {
-            background = false;
-            DEBUGF("warn: %s\n", SDL_GetError());
-        }
-    }
-
-    sdl_get_window_dimensions(&width, &height);
-    depth = LCD_DEPTH;
-    if (depth < 8)
-        depth = 16;
-
-#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
-    /* Fullscreen mode for maemo app */
-    flags |= SDL_WINDOW_FULLSCREEN;
-#endif
-
-    if (display_zoom == 1)
-        flags |= SDL_WINDOW_RESIZABLE;
-
-    flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-
-    if ((window = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                      width * display_zoom, height * display_zoom , flags)) == NULL)
-        panicf("%s", SDL_GetError());
-    if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
-        panicf("%s", SDL_GetError());
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, display_zoom == 1 ? "best" : "nearest");
-    display_zoom = 0; /* keeps track of user requesting a scale level change */
-    SDL_RenderSetLogicalSize(sdlRenderer, width, height);
-
-    if ((gui_surface = SDL_CreateRGBSurface(0, width, height, depth,
-                                       0, 0, 0, 0)) == NULL)
-        panicf("%s", SDL_GetError());
-
-    /* If we have a background, blit it over to the display surface */
-    if (background && picture_surface)
-    {
-        SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
-        SDL_FreeSurface(picture_surface);
-    }
-}
 
 #ifndef __APPLE__ /* MacOS requires events to be handled on main thread */
 /*
@@ -173,8 +113,7 @@ static int sdl_event_thread(void * param)
     /* let system_init proceed */
     SDL_SemPost((SDL_sem *)param);
 
-    /*
-     * finally enter the button loop */
+    /* finally enter the button loop */
     gui_message_loop();
 
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
@@ -354,11 +293,6 @@ void sys_handle_argv(int argc, char *argv[])
                 printf("Disabling remote image.\n");
             }
 #endif
-            else if (!strcmp("--old_lcd", argv[x]))
-            {
-                having_new_lcd = false;
-                printf("Using old LCD layout.\n");
-            }
             else if (!strcmp("--zoom", argv[x]))
             {
                 x++;
@@ -413,7 +347,6 @@ void sys_handle_argv(int argc, char *argv[])
 #ifdef HAVE_REMOTE_LCD
                 printf("  --noremote \t Disable the remote image (will disable backgrounds)\n");
 #endif
-                printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
                 printf("  --zoom [VAL]\t Window zoom (will disable backgrounds)\n");
                 printf("  --alarm \t Simulate a wake-up on alarm\n");
                 printf("  --root [DIR]\t Set root directory\n");
