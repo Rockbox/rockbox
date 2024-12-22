@@ -386,26 +386,27 @@ static void LCDFN(mono_bmp_part_helper)(const unsigned char *src, int src_x,
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
-    font_lock(LCDFN(current_viewport)->font, true);
-    struct font* pf = font_get(LCDFN(current_viewport)->font);
-    int vp_flags = LCDFN(current_viewport)->flags;
+    struct viewport *vp = LCDFN(current_viewport);
+    font_lock(vp->font, true);
+    struct font* pf = font_get(vp->font);
+
     int rtl_next_non_diac_width, last_non_diacritic_width;
 
-    if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
+    if ((vp->flags & VP_FLAG_ALIGNMENT_MASK) != 0)
     {
         int w;
 
-        LCDFN(getstringsize)(str, &w, NULL);
+        font_getstringsize(str, &w, NULL, vp->font);
         /* center takes precedence */
-        if (vp_flags & VP_FLAG_ALIGN_CENTER)
+        if (vp->flags & VP_FLAG_ALIGN_CENTER)
         {
-            x = ((LCDFN(current_viewport)->width - w)/ 2) + x;
+            x = ((vp->width - w)/ 2) + x;
             if (x < 0)
                 x = 0;
         }
         else
         {
-            x = LCDFN(current_viewport)->width - w - x;
+            x = vp->width - w - x;
             x += ofs;
             ofs = 0;
         }
@@ -430,7 +431,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         int width, base_width, base_ofs = 0;
         const unsigned short next_ch = ucs[1];
 
-        if (x >= LCDFN(current_viewport)->width)
+        if (x >= vp->width)
             break;
 
         is_diac = is_diacritic(*ucs, &is_rtl);
@@ -493,13 +494,13 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
              * buffer using OR, and then draw the final bitmap instead of the
              * chars, without touching the drawmode
              **/
-            int drawmode = LCDFN(current_viewport)->drawmode;
-            LCDFN(current_viewport)->drawmode = DRMODE_FG;
+            int drawmode = vp->drawmode;
+            vp->drawmode = DRMODE_FG;
             base_ofs = (base_width - width) / 2;
 
             bmp_part_fn(bits, ofs, 0, width, x + base_ofs, y, width - ofs, pf->height);
 
-            LCDFN(current_viewport)->drawmode = drawmode;
+            vp->drawmode = drawmode;
         }
         else
         {
@@ -522,33 +523,33 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             }
         }
     }
-    font_lock(LCDFN(current_viewport)->font, false);
+    font_lock(vp->font, false);
 }
 #else /* BOOTLOADER */
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
-    struct font* pf = font_get(LCDFN(current_viewport)->font);
-    int vp_flags = LCDFN(current_viewport)->flags;
+    struct viewport *vp = LCDFN(current_viewport);
+    struct font* pf = font_get(vp->font);
     const unsigned char *bits;
     int width;
 
-    if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
+    if ((vp->flags & VP_FLAG_ALIGNMENT_MASK) != 0)
     {
         int w;
 
-        LCDFN(getstringsize)(str, &w, NULL);
+        font_getstringsize(str, &w, NULL, vp->font);
         /* center takes precedence */
-        if (vp_flags & VP_FLAG_ALIGN_CENTER)
+        if (vp->flags & VP_FLAG_ALIGN_CENTER)
         {
-            x = ((LCDFN(current_viewport)->width - w)/ 2) + x;
+            x = ((vp->width - w)/ 2) + x;
             if (x < 0)
                 x = 0;
         }
         else
         {
-            x = LCDFN(current_viewport)->width - w - x;
+            x = vp->width - w - x;
             x += ofs;
             ofs = 0;
         }
@@ -568,7 +569,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     {
         const unsigned short next_ch = ucs[1];
 
-        if (x >= LCDFN(current_viewport)->width)
+        if (x >= vp->width)
             break;
 
         /* Get proportional width and glyph bits */
