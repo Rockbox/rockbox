@@ -351,6 +351,30 @@ static void button_event(int key, bool pressed)
     switch (key)
     {
 #ifdef SIMULATOR
+    case SDLK_0:
+        display_zoom = 0.5;
+    case SDLK_1:
+        display_zoom = display_zoom ?: 1;
+    case SDLK_2:
+        display_zoom = display_zoom ?: 2;
+    case SDLK_3:
+        display_zoom = display_zoom ?: 3;
+    case SDLK_4:
+        if (pressed)
+        {
+            display_zoom = 0;
+            return;
+        }
+        if (!display_zoom)
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,
+                        strcmp(SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY) ?:
+                        "best", "best") ? "best": "nearest");
+
+        sdl_window_needs_update();
+#if !defined(__WIN32) && !defined (__APPLE__)
+        button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
+#endif
+        return;
     case USB_KEY:
         if (!pressed)
         {

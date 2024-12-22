@@ -113,6 +113,7 @@ static void sdl_window_setup(void)
         panicf("%s", SDL_GetError());
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, display_zoom == 1 ? "best" : "nearest");
+    display_zoom = 0; /* keeps track of user requesting a scale level change */
     SDL_RenderSetLogicalSize(sdlRenderer, width, height);
 
     if ((gui_surface = SDL_CreateRGBSurface(0, width, height, depth,

@@ -65,37 +65,45 @@ static inline void sdl_render(void)
 #define SNAP_MARGIN 50
 int sdl_update_window(void)
 {
+    int w, h;
+
     if (!window_needs_update)
         return false;
     window_needs_update = false;
 
-#if defined (__APPLE__) || defined(__WIN32) /* Constrain aspect ratio */
+    sdl_get_window_dimensions(&w, &h);
+
     if (!(SDL_GetWindowFlags(window) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN)))
     {
-        float aspect_ratio;
-        int w, h;
-
-        sdl_get_window_dimensions(&w, &h);
-        aspect_ratio = (float) h / w;
-
-        int original_height = h;
-        int original_width = w;
-
-        SDL_GetWindowSize(window, &w, &h);
-        if (w != original_width || h != original_height)
+        if (display_zoom)
         {
-            if (abs(original_width - w) < SNAP_MARGIN)
-            {
-                w = original_width;
-                h = original_height;
-            }
-            else
-                h = w * aspect_ratio;
-
-            SDL_SetWindowSize(window, w, h);
+            SDL_SetWindowSize(window, display_zoom * w, display_zoom * h);
         }
-    }
+#if defined(__APPLE__) || defined(__WIN32)
+        else /* Constrain aspect ratio on Windows and MacOS */
+        {
+
+            float aspect_ratio = (float) h / w;
+            int original_height = h;
+            int original_width = w;
+
+            SDL_GetWindowSize(window, &w, &h);
+            if (w != original_width || h != original_height)
+            {
+                if (abs(original_width - w) < SNAP_MARGIN)
+                {
+                    w = original_width;
+                    h = original_height;
+                }
+                else
+                    h = w * aspect_ratio;
+
+                SDL_SetWindowSize(window, w, h);
+            }
+        }
 #endif
+    }
+    display_zoom = 0;
     sdl_render();
     return true;
 }
