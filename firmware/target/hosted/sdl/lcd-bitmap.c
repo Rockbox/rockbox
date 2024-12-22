@@ -183,15 +183,11 @@ void sim_backlight(int value)
 void lcd_init_device(void)
 {
 #if LCD_DEPTH >= 16
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                       SIM_LCD_WIDTH * display_zoom,
-                                       SIM_LCD_HEIGHT * display_zoom,
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                                        LCD_DEPTH, 0, 0, 0, 0);
     SDL_SetSurfaceBlendMode(lcd_surface, SDL_BLENDMODE_BLEND);
 #elif LCD_DEPTH <= 8
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                       SIM_LCD_WIDTH * display_zoom,
-                                       SIM_LCD_HEIGHT * display_zoom,
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                                        8, 0, 0, 0, 0);
 
 #ifdef HAVE_BACKLIGHT

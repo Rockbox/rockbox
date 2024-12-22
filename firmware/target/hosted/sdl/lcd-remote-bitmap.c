@@ -80,11 +80,11 @@ void sim_remote_backlight(int value)
 {
     if (remote_surface)
     {
-        if (value > 0) 
+        if (value > 0)
         {
             sdl_set_gradient(remote_surface, &remote_bl_color_dark,
                              &remote_bl_color_bright, 0, NUM_SHADES);
-        } 
+        }
         else
         {
             sdl_set_gradient(remote_surface, &remote_color_dark,
@@ -102,10 +102,8 @@ void lcd_remote_init_device(void)
 {
     if (!showremote)
         return;
-    remote_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                          LCD_REMOTE_WIDTH * display_zoom,
-                                          LCD_REMOTE_HEIGHT * display_zoom,
-                                          8, 0, 0, 0, 0);
+    remote_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_REMOTE_WIDTH,
+                                          LCD_REMOTE_HEIGHT, 8, 0, 0, 0, 0);
 
     sdl_set_gradient(remote_surface, &remote_bl_color_dark,
                      &remote_bl_color_bright, 0, NUM_SHADES);

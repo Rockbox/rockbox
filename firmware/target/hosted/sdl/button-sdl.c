@@ -284,8 +284,8 @@ static bool event_handler(SDL_Event *event)
     case SDL_MOUSEMOTION:
         if (event->motion.state & SDL_BUTTON(1))
         {
-            int x = event->motion.x / display_zoom;
-            int y = event->motion.y / display_zoom;
+            int x = event->motion.x;
+            int y = event->motion.y;
             touchscreen_event(x, y);
         }
         break;
@@ -295,8 +295,6 @@ static bool event_handler(SDL_Event *event)
     case SDL_MOUSEBUTTONDOWN:
     {
         SDL_MouseButtonEvent *mev = &event->button;
-        mev->x /= display_zoom;
-        mev->y /= display_zoom;
         mouse_event(mev, event->type == SDL_MOUSEBUTTONUP);
         break;
     }

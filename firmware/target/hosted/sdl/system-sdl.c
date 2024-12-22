@@ -112,10 +112,10 @@ static void sdl_window_setup(void)
     if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
         panicf("%s", SDL_GetError());
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_RenderSetLogicalSize(sdlRenderer, width * display_zoom, height * display_zoom);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, display_zoom == 1 ? "best" : "nearest");
+    SDL_RenderSetLogicalSize(sdlRenderer, width, height);
 
-    if ((gui_surface = SDL_CreateRGBSurface(0, width * display_zoom, height * display_zoom, depth,
+    if ((gui_surface = SDL_CreateRGBSurface(0, width, height, depth,
                                        0, 0, 0, 0)) == NULL)
         panicf("%s", SDL_GetError());
 

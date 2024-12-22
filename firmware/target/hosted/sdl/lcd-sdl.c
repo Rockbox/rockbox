@@ -26,7 +26,6 @@
 #include "misc.h"
 
 double display_zoom = 1;
-
 static bool window_needs_update;
 
 void sdl_get_window_dimensions(int *w, int *h)
@@ -138,18 +137,8 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
     src.w = width;
     src.h = height;
 
-    if (display_zoom == 1) {
-        dest = src;
-        SDL_BlitSurface(lcd, &src, surface, &dest);
-    } else {
-        /* Note: SDL_SoftStretch is currently marked as DO NOT USE
-           but there are no real alternatives for efficent zooming. */
-        dest.x = src.x * display_zoom;
-        dest.y = src.y * display_zoom;
-        dest.w = src.w * display_zoom;
-        dest.h = src.h * display_zoom;
-        SDL_SoftStretch(lcd, &src, surface, &dest);
-    }
+    dest = src;
+    SDL_BlitSurface(lcd, &src, surface, &dest);
     SDL_FreeSurface(lcd);
 #else
     int x, y;
@@ -163,26 +152,26 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
     if(ymax >= max_y)
         ymax = max_y;
 
-    dest.w = display_zoom;
-    dest.h = display_zoom;
+    dest.w = 1;
+    dest.h = 1;
 
     for (x = x_start; x < xmax; x++) {
-        dest.x = x * display_zoom;
+        dest.x = x;
 
 #ifdef HAVE_LCD_SPLIT
         for (y = y_start; y < MIN(ymax, LCD_SPLIT_POS); y++) {
-            dest.y = y * display_zoom;
+            dest.y = y;
 
             SDL_FillRect(surface, &dest, (Uint32)(getpixel(x, y) | 0x80));
         }
         for (y = MAX(y_start, LCD_SPLIT_POS); y < ymax; y++) {
-            dest.y = (y + LCD_SPLIT_LINES) * display_zoom ;
+            dest.y = (y + LCD_SPLIT_LINES) ;
 
             SDL_FillRect(surface, &dest, (Uint32)getpixel(x, y));
         }
 #else
         for (y = y_start; y < ymax; y++) {
-            dest.y = y * display_zoom;
+            dest.y = y;
 
             SDL_FillRect(surface, &dest, (Uint32)getpixel(x, y));
         }
@@ -199,11 +188,8 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
     if (y_start + height > max_y)
         height = max_y - y_start;
 
-    SDL_Rect src = {x_start * display_zoom, y_start * display_zoom,
-                    width * display_zoom, height * display_zoom};
-    SDL_Rect dest= {(ui_x + x_start) * display_zoom,
-                    (ui_y + y_start) * display_zoom,
-                    width * display_zoom, height * display_zoom};
+    SDL_Rect src = {x_start, y_start, width, height};
+    SDL_Rect dest= {ui_x + x_start, ui_y + y_start, width, height};
 
     uint8_t alpha;
     if (SDL_GetSurfaceAlphaMod(surface,&alpha) == 0 && alpha < 255)
