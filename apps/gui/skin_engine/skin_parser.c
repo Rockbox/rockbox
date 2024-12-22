@@ -398,16 +398,18 @@ static int parse_image_load(struct skin_element *element,
         subimages = get_param(element, 2)->data.number;
     else if (element->params_count > 3)
     {
-        struct skin_tag_parameter *param2 = get_param(element, 2);
-        struct skin_tag_parameter *param3 = get_param(element, 3);
-        if (param2->type == PERCENT)
-            x = param2->data.number * curr_vp->vp.width / 1000;
+        struct skin_tag_parameter *param;
+        param = get_param(element, 2);
+        if (param->type == PERCENT)
+            x = param->data.number * curr_vp->vp.width / 1000;
         else
-            x = param2->data.number;
-        if (param3->type == PERCENT)
-            y = param3->data.number * curr_vp->vp.height / 1000;
+            x = param->data.number;
+
+        param = get_param(element, 3);
+        if (param->type == PERCENT)
+            y = param->data.number * curr_vp->vp.height / 1000;
         else
-            y = param3->data.number;
+            y = param->data.number;
 
         if (element->params_count == 5)
             subimages = get_param(element, 4)->data.number;
@@ -489,7 +491,7 @@ static int parse_font_load(struct skin_element *element,
 #endif
     /* make sure the filename contains .fnt,
      * we dont actually use it, but require it anyway */
-    ptr = strchr(filename, '.');
+    ptr = strrchr(filename, '.');
     if (!ptr || strncmp(ptr, ".fnt", 4))
         return WPS_ERROR_INVALID_PARAM;
     skinfonts[id-2].id = -1;
@@ -1272,7 +1274,8 @@ static int parse_progressbar_tag(struct skin_element* element,
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     else if (token->type == SKIN_TOKEN_SETTING)
-	token->type = SKIN_TOKEN_SETTINGBAR;
+        token->type = SKIN_TOKEN_SETTINGBAR;
+
     pb->type = token->type;
 
 #ifdef HAVE_TOUCHSCREEN
@@ -1450,32 +1453,35 @@ static int parse_albumart_load(struct skin_element* element,
         return -1;
 
     /* reset albumart info in wps */
-    aa->width = -1;
-    aa->height = -1;
     aa->xalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
     aa->yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
 
-    struct skin_tag_parameter *param0 = get_param(element, 0);
-    struct skin_tag_parameter *param1 = get_param(element, 1);
-    struct skin_tag_parameter *param2 = get_param(element, 2);
-    struct skin_tag_parameter *param3 = get_param(element, 3);
+    struct skin_tag_parameter *param;
 
-    aa->x = param0->data.number;
-    aa->y = param1->data.number;
-    aa->width = param2->data.number;
-    aa->height = param3->data.number;
+    param = get_param(element, 0);
+    if (!isdefault(param) && param->type == PERCENT)
+        aa->x = param->data.number * curr_vp->vp.width / 1000;
+    else
+        aa->x = param->data.number;
 
-    if (!isdefault(param0) && param0->type == PERCENT)
-        aa->x = param0->data.number * curr_vp->vp.width / 1000;
+    param = get_param(element, 1);
+    if (!isdefault(param) && param->type == PERCENT)
+        aa->y = param->data.number * curr_vp->vp.height / 1000;
+    else
+        aa->y = param->data.number;
 
-    if (!isdefault(param1) && param1->type == PERCENT)
-        aa->y = param1->data.number * curr_vp->vp.height / 1000;
+    param = get_param(element, 2);
+    if (!isdefault(param) && param->type == PERCENT)
+        aa->width = param->data.number * curr_vp->vp.width / 1000;
+    else
+        aa->width = param->data.number;
 
-    if (!isdefault(param2) && param2->type == PERCENT)
-        aa->width = param2->data.number * curr_vp->vp.width / 1000;
+    param = get_param(element, 3);
 
-    if (!isdefault(param3) && param3->type == PERCENT)
-        aa->height = param3->data.number * curr_vp->vp.height / 1000;
+    if (!isdefault(param) && param->type == PERCENT)
+        aa->height = param->data.number * curr_vp->vp.height / 1000;
+    else
+        aa->height = param->data.number;
 
     aa->draw_handle = -1;
 
@@ -1502,21 +1508,18 @@ static int parse_albumart_load(struct skin_element* element,
 
     if (element->params_count > 4 && !isdefault(get_param(element, 4)))
     {
-        switch (*get_param_text(element, 4))
+        switch (tolower(*get_param_text(element, 4)))
         {
             case 'l':
-            case 'L':
                 if (swap_for_rtl)
                     aa->xalign = WPS_ALBUMART_ALIGN_RIGHT;
                 else
                     aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
                 break;
             case 'c':
-            case 'C':
                 aa->xalign = WPS_ALBUMART_ALIGN_CENTER;
                 break;
             case 'r':
-            case 'R':
                 if (swap_for_rtl)
                     aa->xalign = WPS_ALBUMART_ALIGN_LEFT;
                 else
@@ -1526,18 +1529,15 @@ static int parse_albumart_load(struct skin_element* element,
     }
     if (element->params_count > 5 && !isdefault(get_param(element, 5)))
     {
-        switch (*get_param_text(element, 5))
+        switch (tolower(*get_param_text(element, 5)))
         {
             case 't':
-            case 'T':
                 aa->yalign = WPS_ALBUMART_ALIGN_TOP;
                 break;
             case 'c':
-            case 'C':
                 aa->yalign = WPS_ALBUMART_ALIGN_CENTER;
                 break;
             case 'b':
-            case 'B':
                 aa->yalign = WPS_ALBUMART_ALIGN_BOTTOM;
                 break;
         }
