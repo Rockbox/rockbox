@@ -758,26 +758,18 @@ a horizontal progressbar which doesn't fill and draws the image
 \end{description}
 
 \begin{tagmap}
-  \config{\%ft(filename [,line|search_text]} & Get a line of text from a file.\\
+  \config{\%ft(filename [,line]} & Get a line of text from a file.\\
 \end{tagmap}
     Use this tag to check for the existence of a file or read a line of text from a file.
     Checking if a file exists can be done with \%?(ft(filename)<Found|NotFound>
     similarly you can also check if a specific line exists with \%?(ft(filename, n)<Found|NotFound>
      where n is the desired line.
-    or supply search text and do a search (ignoring case) of the beginning of each line.
-    If found this prefix will be removed and the rest of the string returned to the end of line.
-     \%?(ft(filename, search_text)<Found|NotFound>
-
     Note: empty files or files that do not exist are ignored by the skin engine otherwise
 \begin{description}
     \item[filename] -- filename Note: files can only be found in \fname{/.rockbox} directory or one of its children.
             eg. \%ft(wps/file.txt) would refer to \fname{/.rockbox/wps/file.txt}
     \item[line] -- OPTIONAL, which line to grab, defaults to the first line.
-                    Note: lines must end  with CR or LF but may not exceed 320 characters, Max 1023 lines
-    \item[search_text] -- OPTIONAL, instead of a line number find a line that begins with search_text.
-                    Note: search_text will be stripped from beginning of string quotes should not be included
-                     unless you want to search for a string containing them
-                     lines must end  with CR or LF but may not exceed 320 characters including search text.
+                    Note: lines must end  with CR or LF but may not exceed 320 characters
 \end{description}
 
 \begin{tagmap}
