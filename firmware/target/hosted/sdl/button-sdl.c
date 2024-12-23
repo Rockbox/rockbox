@@ -351,6 +351,16 @@ static void button_event(int key, bool pressed)
     switch (key)
     {
 #ifdef SIMULATOR
+    case SDLK_TAB:
+        if (!pressed)
+        {
+            background = !background;
+            sdl_window_adjustment_needed(true);
+#if !defined(__WIN32) && !defined (__APPLE__)
+            button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
+#endif
+        }
+        return;
     case SDLK_0:
         display_zoom = 0.5;
     case SDLK_1:
