@@ -823,7 +823,11 @@ const char *get_token_value(struct gui_wps *gwps,
                 byte_len = end_byte - start_byte;
 
                 if (token_val != buf)
+                {
+                    if (byte_len >= buf_size) /* the resulting string exceeds buf */
+                        return &token_val[start_byte]; /* just return the string */
                     memcpy(buf, &token_val[start_byte], byte_len);
+                }
                 else
                     buf = &buf[start_byte];
 

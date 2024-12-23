@@ -758,18 +758,23 @@ a horizontal progressbar which doesn't fill and draws the image
 \end{description}
 
 \begin{tagmap}
-  \config{\%ft(filename [,line]} & Get a line of text from a file.\\
+  \config{\%ft(filename [,line|search text]} & Get a line of text from a file.\\
 \end{tagmap}
-    Use this tag to check for the existence of a file or read a line of text from a file.
-    Checking if a file exists can be done with \%?(ft(filename)<Found|NotFound>
-    similarly you can also check if a specific line exists with \%?(ft(filename, n)<Found|NotFound>
-     where n is the desired line.
-    Note: empty files or files that do not exist are ignored by the skin engine otherwise
+    Use this tag to check for the existence of a file, read a line or search for a line in a file.
+    Checking if a file exists can be done with \%?ft(filename)<Found|NotFound>\newline
+    Check if a specific line exists with \%?ft(filename, n)<Found|NotFound> where n is the desired line.\newline
+    Search (ignoring case) of the beginning of each line with \%?ft(filename,search text)<Found|NotFound>\newline
+    Note: empty files or files that do not exist are treated by the skin engine as a comment and ignored.\newline
+          lines must end  with CR or LF but may not exceed 320 characters including search text \newline
+          Maximum 1023 lines will be accessible to the theme.
 \begin{description}
     \item[filename] -- filename Note: files can only be found in \fname{/.rockbox} directory or one of its children.
             eg. \%ft(wps/file.txt) would refer to \fname{/.rockbox/wps/file.txt}
     \item[line] -- OPTIONAL, which line to grab, defaults to the first line.
-                    Note: lines must end  with CR or LF but may not exceed 320 characters
+    \item[search text] -- OPTIONAL, instead of a line number find (ignoring case) a line that begins with search text.
+                    Note: If found this search text will be removed and the rest of the string returned to the end of line.\newline
+                    Quotes and spaces should not be included unless you want to search for a string containing them.\newline
+                    ie. \%ft(filename,text) is not the same as \%ft(filename,'text') and \%ft(filename,text) is not the same as \%ft(filename, text)
 \end{description}
 
 \begin{tagmap}
