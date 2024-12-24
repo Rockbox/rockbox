@@ -190,7 +190,7 @@ const char * get_codec_filename(int cod_spec)
         tmp_fmt = AFMT_UNKNOWN;
     }
     fname = (type == CODEC_TYPE_ENCODER) ?
-            audio_formats[tmp_fmt].codec_enc_root_fn :
+            get_codec_enc_root_fn(tmp_fmt) :
             audio_formats[tmp_fmt].codec_root_fn;
     
     logf("%s: %d - %s",

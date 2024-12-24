@@ -55,13 +55,14 @@ bool write_metadata_log = false;
 
 const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 {
+ /* NOTE enc_root_fname is ignored here but kept for consistency see get_codec_enc_root_fn() */
     /* Unknown file format */
     [0 ... AFMT_NUM_CODECS-1] =
-        AFMT_ENTRY("???", NULL,    NULL,        NULL, "\0"  ),
+        AFMT_ENTRY("???", NULL,    "N/A",        NULL, "\0"  ),
 
     /* MPEG Audio layer 2 */
     [AFMT_MPA_L2] =
-        AFMT_ENTRY("MP2",   "mpa",  NULL,       get_mp3_metadata,   "mpa\0mp2\0"),
+        AFMT_ENTRY("MP2",   "mpa",  "N/A",       get_mp3_metadata,   "mpa\0mp2\0"),
 
     /* MPEG Audio layer 3 */
     [AFMT_MPA_L3] =
@@ -69,7 +70,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 
     /* MPEG Audio layer 1 */
     [AFMT_MPA_L1] =
-        AFMT_ENTRY("MP1",   "mpa",  NULL,       get_mp3_metadata,   "mp1\0"),
+        AFMT_ENTRY("MP1",   "mpa",  "N/A",       get_mp3_metadata,   "mp1\0"),
     /* Audio Interchange File Format */
     [AFMT_AIFF] =
         AFMT_ENTRY("AIFF",  "aiff", "aiff_enc", get_aiff_metadata,  "aiff\0aif\0"),
@@ -78,165 +79,179 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("WAV",   "wav",  "wav_enc",  get_wave_metadata,  "wav\0at3\0"),
     /* Ogg Vorbis */
     [AFMT_OGG_VORBIS] =
-        AFMT_ENTRY("Ogg", "vorbis", NULL,       get_ogg_metadata,   "ogg\0oga\0"),
+        AFMT_ENTRY("Ogg", "vorbis", "N/A",       get_ogg_metadata,   "ogg\0oga\0"),
     /* FLAC */
     [AFMT_FLAC] =
-        AFMT_ENTRY("FLAC",  "flac", NULL,       get_flac_metadata,  "flac\0"),
+        AFMT_ENTRY("FLAC",  "flac", "N/A",       get_flac_metadata,  "flac\0"),
     /* Musepack SV7 */
     [AFMT_MPC_SV7] =
-        AFMT_ENTRY("MPCv7", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
+        AFMT_ENTRY("MPCv7", "mpc",  "N/A",       get_musepack_metadata,"mpc\0"),
     /* A/52 (aka AC3) audio */
     [AFMT_A52] =
-        AFMT_ENTRY("AC3",   "a52",  NULL,       get_a52_metadata,   "a52\0ac3\0"),
+        AFMT_ENTRY("AC3",   "a52",  "N/A",       get_a52_metadata,   "a52\0ac3\0"),
     /* WavPack */
     [AFMT_WAVPACK] =
         AFMT_ENTRY("WV","wavpack","wavpack_enc",get_wavpack_metadata,"wv\0"),
     /* Apple Lossless Audio Codec */
     [AFMT_MP4_ALAC] =
-        AFMT_ENTRY("ALAC",  "alac", NULL,       get_mp4_metadata,   "m4a\0m4b\0"),
+        AFMT_ENTRY("ALAC",  "alac", "N/A",       get_mp4_metadata,   "m4a\0m4b\0"),
     /* Advanced Audio Coding in M4A container */
     [AFMT_MP4_AAC] =
-        AFMT_ENTRY("AAC",   "aac",  NULL,       get_mp4_metadata,   "mp4\0"),
+        AFMT_ENTRY("AAC",   "aac",  "N/A",       get_mp4_metadata,   "mp4\0"),
     /* Shorten */
     [AFMT_SHN] =
-        AFMT_ENTRY("SHN","shorten", NULL,       get_shn_metadata,   "shn\0"),
+        AFMT_ENTRY("SHN","shorten", "N/A",       get_shn_metadata,   "shn\0"),
     /* SID File Format */
     [AFMT_SID] =
-        AFMT_ENTRY("SID",   "sid",  NULL,       get_sid_metadata,   "sid\0"),
+        AFMT_ENTRY("SID",   "sid",  "N/A",       get_sid_metadata,   "sid\0"),
     /* ADX File Format */
     [AFMT_ADX] =
-        AFMT_ENTRY("ADX",   "adx",  NULL,       get_adx_metadata,   "adx\0"),
+        AFMT_ENTRY("ADX",   "adx",  "N/A",       get_adx_metadata,   "adx\0"),
     /* NESM (NES Sound Format) */
     [AFMT_NSF] =
-        AFMT_ENTRY("NSF",   "nsf",  NULL,       get_nsf_metadata,   "nsf\0nsfe\0"),
+        AFMT_ENTRY("NSF",   "nsf",  "N/A",       get_nsf_metadata,   "nsf\0nsfe\0"),
     /* Speex File Format */
     [AFMT_SPEEX] =
-        AFMT_ENTRY("Speex", "speex",NULL,       get_ogg_metadata,   "spx\0"),
+        AFMT_ENTRY("Speex", "speex","N/A",       get_ogg_metadata,   "spx\0"),
     /* SPC700 Save State */
     [AFMT_SPC] =
-        AFMT_ENTRY("SPC",   "spc",  NULL,       get_spc_metadata,   "spc\0"),
+        AFMT_ENTRY("SPC",   "spc",  "N/A",       get_spc_metadata,   "spc\0"),
     /* APE (Monkey's Audio) */
     [AFMT_APE] =
-        AFMT_ENTRY("APE",   "ape",  NULL,       get_monkeys_metadata,"ape\0mac\0"),
+        AFMT_ENTRY("APE",   "ape",  "N/A",       get_monkeys_metadata,"ape\0mac\0"),
     /* WMA (WMAV1/V2 in ASF) */
     [AFMT_WMA] =
-        AFMT_ENTRY("WMA",   "wma",  NULL,       get_asf_metadata,"wma\0wmv\0asf\0"),
+        AFMT_ENTRY("WMA",   "wma",  "N/A",       get_asf_metadata,"wma\0wmv\0asf\0"),
     /* WMA Professional in ASF */
     [AFMT_WMAPRO] =
-        AFMT_ENTRY("WMAPro","wmapro",NULL,      NULL,            "wma\0wmv\0asf\0"),
+        AFMT_ENTRY("WMAPro","wmapro","N/A",      NULL,            "wma\0wmv\0asf\0"),
     /* Amiga MOD File */
     [AFMT_MOD] =
-        AFMT_ENTRY("MOD",   "mod",  NULL,       get_mod_metadata,   "mod\0"),
+        AFMT_ENTRY("MOD",   "mod",  "N/A",       get_mod_metadata,   "mod\0"),
     /* Atari SAP File */
     [AFMT_SAP] =
-        AFMT_ENTRY("SAP",   "asap", NULL,       get_asap_metadata,  "sap\0"),
+        AFMT_ENTRY("SAP",   "asap", "N/A",       get_asap_metadata,  "sap\0"),
     /* Cook in RM/RA */
     [AFMT_RM_COOK] =
-        AFMT_ENTRY("Cook",  "cook", NULL,       get_rm_metadata,"rm\0ra\0rmvb\0"),
+        AFMT_ENTRY("Cook",  "cook", "N/A",       get_rm_metadata,"rm\0ra\0rmvb\0"),
     /* AAC in RM/RA */
     [AFMT_RM_AAC] =
-        AFMT_ENTRY("RAAC",  "raac", NULL,       NULL,           "rm\0ra\0rmvb\0"),
+        AFMT_ENTRY("RAAC",  "raac", "N/A",       NULL,           "rm\0ra\0rmvb\0"),
     /* AC3 in RM/RA */
     [AFMT_RM_AC3] =
-        AFMT_ENTRY("AC3", "a52_rm", NULL,       NULL,           "rm\0ra\0rmvb\0"),
+        AFMT_ENTRY("AC3", "a52_rm", "N/A",       NULL,           "rm\0ra\0rmvb\0"),
     /* ATRAC3 in RM/RA */
     [AFMT_RM_ATRAC3] =
-        AFMT_ENTRY("ATRAC3","atrac3_rm",NULL,   NULL,           "rm\0ra\0rmvb\0"),
+        AFMT_ENTRY("ATRAC3","atrac3_rm","N/A",   NULL,           "rm\0ra\0rmvb\0"),
     /* Atari CMC File */
     [AFMT_CMC] =
-        AFMT_ENTRY("CMC",   "asap", NULL,       get_other_asap_metadata,"cmc\0"),
+        AFMT_ENTRY("CMC",   "asap", "N/A",       get_other_asap_metadata,"cmc\0"),
     /* Atari CM3 File */
     [AFMT_CM3] =
-        AFMT_ENTRY("CM3",   "asap", NULL,       get_other_asap_metadata,"cm3\0"),
+        AFMT_ENTRY("CM3",   "asap", "N/A",       get_other_asap_metadata,"cm3\0"),
     /* Atari CMR File */
     [AFMT_CMR] =
-        AFMT_ENTRY("CMR",   "asap", NULL,       get_other_asap_metadata,"cmr\0"),
+        AFMT_ENTRY("CMR",   "asap", "N/A",       get_other_asap_metadata,"cmr\0"),
     /* Atari CMS File */
     [AFMT_CMS] =
-        AFMT_ENTRY("CMS",   "asap", NULL,       get_other_asap_metadata,"cms\0"),
+        AFMT_ENTRY("CMS",   "asap", "N/A",       get_other_asap_metadata,"cms\0"),
     /* Atari DMC File */
     [AFMT_DMC] =
-        AFMT_ENTRY("DMC",   "asap", NULL,       get_other_asap_metadata,"dmc\0"),
+        AFMT_ENTRY("DMC",   "asap", "N/A",       get_other_asap_metadata,"dmc\0"),
     /* Atari DLT File */
     [AFMT_DLT] =
-        AFMT_ENTRY("DLT",   "asap", NULL,       get_other_asap_metadata,"dlt\0"),
+        AFMT_ENTRY("DLT",   "asap", "N/A",       get_other_asap_metadata,"dlt\0"),
     /* Atari MPT File */
     [AFMT_MPT] =
-        AFMT_ENTRY("MPT",   "asap", NULL,       get_other_asap_metadata,"mpt\0"),
+        AFMT_ENTRY("MPT",   "asap", "N/A",       get_other_asap_metadata,"mpt\0"),
     /* Atari MPD File */
     [AFMT_MPD] =
-        AFMT_ENTRY("MPD",   "asap", NULL,       get_other_asap_metadata,"mpd\0"),
+        AFMT_ENTRY("MPD",   "asap", "N/A",       get_other_asap_metadata,"mpd\0"),
     /* Atari RMT File */
     [AFMT_RMT] =
-        AFMT_ENTRY("RMT",   "asap", NULL,       get_other_asap_metadata,"rmt\0"),
+        AFMT_ENTRY("RMT",   "asap", "N/A",       get_other_asap_metadata,"rmt\0"),
     /* Atari TMC File */
     [AFMT_TMC] =
-        AFMT_ENTRY("TMC",   "asap", NULL,       get_other_asap_metadata,"tmc\0"),
+        AFMT_ENTRY("TMC",   "asap", "N/A",       get_other_asap_metadata,"tmc\0"),
     /* Atari TM8 File */
     [AFMT_TM8] =
-        AFMT_ENTRY("TM8",   "asap", NULL,       get_other_asap_metadata,"tm8\0"),
+        AFMT_ENTRY("TM8",   "asap", "N/A",       get_other_asap_metadata,"tm8\0"),
     /* Atari TM2 File */
     [AFMT_TM2] =
-        AFMT_ENTRY("TM2",   "asap", NULL,       get_other_asap_metadata,"tm2\0"),
+        AFMT_ENTRY("TM2",   "asap", "N/A",       get_other_asap_metadata,"tm2\0"),
     /* Atrac3 in Sony OMA Container */
     [AFMT_OMA_ATRAC3] =
-        AFMT_ENTRY("ATRAC3","atrac3_oma",NULL,  get_oma_metadata,   "oma\0aa3\0"),
+        AFMT_ENTRY("ATRAC3","atrac3_oma","N/A",  get_oma_metadata,   "oma\0aa3\0"),
     /* SMAF (Synthetic music Mobile Application Format) */
     [AFMT_SMAF] =
-        AFMT_ENTRY("SMAF",  "smaf", NULL,       get_smaf_metadata,  "mmf\0"),
+        AFMT_ENTRY("SMAF",  "smaf", "N/A",       get_smaf_metadata,  "mmf\0"),
     /* Sun Audio file */
     [AFMT_AU] =
-        AFMT_ENTRY("AU",    "au",   NULL,       get_au_metadata,    "au\0snd\0"),
+        AFMT_ENTRY("AU",    "au",   "N/A",       get_au_metadata,    "au\0snd\0"),
     /* VOX (Dialogic telephony file formats) */
     [AFMT_VOX] =
-        AFMT_ENTRY("VOX",   "vox",  NULL,       get_vox_metadata,   "vox\0"),
+        AFMT_ENTRY("VOX",   "vox",  "N/A",       get_vox_metadata,   "vox\0"),
     /* Wave64 */
     [AFMT_WAVE64] =
-        AFMT_ENTRY("WAVE64","wav64",NULL,       get_wave64_metadata,"w64\0"),
+        AFMT_ENTRY("WAVE64","wav64","N/A",       get_wave64_metadata,"w64\0"),
     /* True Audio */
     [AFMT_TTA] =
-        AFMT_ENTRY("TTA",   "tta",  NULL,       get_tta_metadata,   "tta\0"),
+        AFMT_ENTRY("TTA",   "tta",  "N/A",       get_tta_metadata,   "tta\0"),
     /* WMA Voice in ASF */
     [AFMT_WMAVOICE] =
-        AFMT_ENTRY("WMAVoice","wmavoice",NULL,  NULL,               "wma\0wmv\0"),
+        AFMT_ENTRY("WMAVoice","wmavoice","N/A",  NULL,               "wma\0wmv\0"),
     /* Musepack SV8 */
     [AFMT_MPC_SV8] =
-        AFMT_ENTRY("MPCv8", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
+        AFMT_ENTRY("MPCv8", "mpc",  "N/A",       get_musepack_metadata,"mpc\0"),
     /* Advanced Audio Coding High Efficiency in M4A container */
     [AFMT_MP4_AAC_HE] =
-        AFMT_ENTRY("AAC-HE","aac",  NULL,       get_mp4_metadata,   "mp4\0"),
+        AFMT_ENTRY("AAC-HE","aac",  "N/A",       get_mp4_metadata,   "mp4\0"),
     /* AY (ZX Spectrum, Amstrad CPC Sound Format) */
     [AFMT_AY] =
-        AFMT_ENTRY("AY",    "ay",  NULL, get_ay_metadata,           "ay\0"),
+        AFMT_ENTRY("AY",    "ay",  "N/A", get_ay_metadata,           "ay\0"),
     /* AY (ZX Spectrum Sound Format) */
 #ifdef HAVE_FPU
     [AFMT_VTX] =
-        AFMT_ENTRY("VTX",   "vtx", NULL, get_vtx_metadata,          "vtx\0"),
+        AFMT_ENTRY("VTX",   "vtx", "N/A", get_vtx_metadata,          "vtx\0"),
 #endif
     /* GBS (Game Boy Sound Format) */
     [AFMT_GBS] =
-        AFMT_ENTRY("GBS",   "gbs",  NULL,       get_gbs_metadata,   "gbs\0"),
+        AFMT_ENTRY("GBS",   "gbs",  "N/A",       get_gbs_metadata,   "gbs\0"),
     /* HES (Hudson Entertainment System Sound Format) */
     [AFMT_HES] =
-        AFMT_ENTRY("HES",   "hes",  NULL,       get_hes_metadata,   "hes\0"),
+        AFMT_ENTRY("HES",   "hes",  "N/A",       get_hes_metadata,   "hes\0"),
     /* SGC (Sega Master System, Game Gear, Coleco Vision Sound Format) */
     [AFMT_SGC] =
-        AFMT_ENTRY("SGC", "sgc", NULL, get_sgc_metadata,     "sgc\0"),
+        AFMT_ENTRY("SGC", "sgc", "N/A", get_sgc_metadata,     "sgc\0"),
     /* VGM (Video Game Music Format) */
     [AFMT_VGM] =
-        AFMT_ENTRY("VGM", "vgm", NULL, get_vgm_metadata,   "vgm\0vgz\0"),
+        AFMT_ENTRY("VGM", "vgm", "N/A", get_vgm_metadata,   "vgm\0vgz\0"),
     /* KSS (MSX computer KSS Music File) */
     [AFMT_KSS] =
-        AFMT_ENTRY("KSS", "kss", NULL, get_kss_metadata,   "kss\0"),
+        AFMT_ENTRY("KSS", "kss", "N/A", get_kss_metadata,   "kss\0"),
     /* Opus */
     [AFMT_OPUS] =
-        AFMT_ENTRY("Opus", "opus", NULL, get_ogg_metadata,   "opus\0"),
+        AFMT_ENTRY("Opus", "opus", "N/A", get_ogg_metadata,   "opus\0"),
     /* AAC bitstream format */
     [AFMT_AAC_BSF] =
-        AFMT_ENTRY("AAC", "aac_bsf", NULL, get_aac_metadata,   "aac\0"),
+        AFMT_ENTRY("AAC", "aac_bsf", "N/A", get_aac_metadata,   "aac\0"),
 };
 
 #if defined (HAVE_RECORDING)
+inline const char *get_codec_enc_root_fn(int type) /* filename of encoder codec */
+{
+    /* NOTE these are the same as above audio_formats but only enc_root_fname is used.. */
+    if (type == AFMT_MPA_L3)
+        return AFMT_ENTRY_ENC("MP3",   "mpa",  "mp3_enc",  get_mp3_metadata,   "mp3\0");
+    if (type == AFMT_AIFF)
+        return AFMT_ENTRY_ENC("AIFF",  "aiff", "aiff_enc", get_aiff_metadata,  "aiff\0aif\0");
+    if (type == AFMT_PCM_WAV)
+        return AFMT_ENTRY_ENC("WAV",   "wav",  "wav_enc",  get_wave_metadata,  "wav\0at3\0");
+    if (AFMT_WAVPACK)
+        return AFMT_ENTRY_ENC("WV","wavpack","wavpack_enc",get_wavpack_metadata,"wv\0");
+    return NULL;
+}
+
 /* get REC_FORMAT_* corresponding AFMT_* */
 const int rec_format_afmt[REC_NUM_FORMATS] =
 {

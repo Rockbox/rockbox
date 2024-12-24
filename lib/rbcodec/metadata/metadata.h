@@ -153,7 +153,9 @@ extern const int rec_format_afmt[REC_NUM_FORMATS];
 /* unused: extern const int afmt_rec_format[AFMT_NUM_CODECS]; */
 
 #define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
-    { label, root_fname, enc_root_fname, func, ext_list }
+    { label, root_fname, func, ext_list }
+#define AFMT_ENTRY_ENC(label, root_fname, enc_root_fname, func, ext_list) enc_root_fname
+const char *get_codec_enc_root_fn(int type);
 #else /* !HAVE_RECORDING */
 #define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
     { label, root_fname, func, ext_list }
@@ -166,9 +168,6 @@ struct afmt_entry
 {
     const char *label;      /* format label */
     const char *codec_root_fn; /* root codec filename (sans _enc and .codec) */
-#ifdef HAVE_RECORDING
-    const char *codec_enc_root_fn; /* filename of encoder codec */
-#endif
     bool (*parse_func)(int fd, struct mp3entry *id3); /* return true on success */
     const char *ext_list;    /* NULL terminated extension
                                list for type with the first as
