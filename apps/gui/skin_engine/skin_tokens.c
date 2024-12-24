@@ -911,9 +911,44 @@ static const char* get_rtc_token_value(struct wps_token *token,
 }
 
 #ifdef HAVE_QUICKSCREEN
-static const char* get_qs_token_value(enum quickscreen_item item, bool data_token,
-                                       char *buf, int buf_size)
+static const char* get_qs_token_value(struct wps_token *token, char *buf, int buf_size)
 {
+    enum quickscreen_item item;
+    bool data_token = true;
+
+    switch(token->type)
+    {
+        case SKIN_TOKEN_TOP_QUICKSETTING_NAME:
+            data_token = false;
+            /*fall-through*/
+        case SKIN_TOKEN_TOP_QUICKSETTING_VALUE:
+            item = QUICKSCREEN_TOP;
+            break;
+
+        case SKIN_TOKEN_RIGHT_QUICKSETTING_NAME:
+            data_token = false;
+            /*fall-through*/
+        case SKIN_TOKEN_RIGHT_QUICKSETTING_VALUE:
+            item = QUICKSCREEN_RIGHT;
+            break;
+
+        case SKIN_TOKEN_BOTTOM_QUICKSETTING_NAME:
+            data_token = false;
+            /*fall-through*/
+        case SKIN_TOKEN_BOTTOM_QUICKSETTING_VALUE:
+            item = QUICKSCREEN_BOTTOM;
+            break;
+
+        case SKIN_TOKEN_LEFT_QUICKSETTING_NAME:
+            data_token = false;
+            /*fall-through*/
+        case SKIN_TOKEN_LEFT_QUICKSETTING_VALUE:
+            item = QUICKSCREEN_LEFT;
+            break;
+
+        default:
+            return NULL;
+    }
     const struct settings_list *qs_setting = global_settings.qs_items[item];
 
     if (qs_setting == NULL)
@@ -925,7 +960,7 @@ static const char* get_qs_token_value(enum quickscreen_item item, bool data_toke
 
     return P2STR(ID2P(qs_setting->lang_id));
 }
-#endif
+#endif /*def HAVE_QUICKSCREEN */
 
 /* Return the tags value as text. buf should be used as temp storage if needed.
 
@@ -1423,21 +1458,14 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #ifdef HAVE_QUICKSCREEN
         case SKIN_TOKEN_TOP_QUICKSETTING_NAME:
-            return get_qs_token_value(QUICKSCREEN_TOP, false, buf, buf_size);
         case SKIN_TOKEN_TOP_QUICKSETTING_VALUE:
-            return get_qs_token_value(QUICKSCREEN_TOP, true, buf, buf_size);
         case SKIN_TOKEN_RIGHT_QUICKSETTING_NAME:
-            return get_qs_token_value(QUICKSCREEN_RIGHT, false, buf, buf_size);
         case SKIN_TOKEN_RIGHT_QUICKSETTING_VALUE:
-            return get_qs_token_value(QUICKSCREEN_RIGHT, true, buf, buf_size);
         case SKIN_TOKEN_BOTTOM_QUICKSETTING_NAME:
-            return get_qs_token_value(QUICKSCREEN_BOTTOM, false, buf, buf_size);
         case SKIN_TOKEN_BOTTOM_QUICKSETTING_VALUE:
-            return get_qs_token_value(QUICKSCREEN_BOTTOM, true, buf, buf_size);
         case SKIN_TOKEN_LEFT_QUICKSETTING_NAME:
-            return get_qs_token_value(QUICKSCREEN_LEFT, false, buf, buf_size);
         case SKIN_TOKEN_LEFT_QUICKSETTING_VALUE:
-            return get_qs_token_value(QUICKSCREEN_LEFT, true, buf, buf_size);
+            return get_qs_token_value(token, buf, buf_size);
 #endif
 
         case SKIN_TOKEN_SETTING:
