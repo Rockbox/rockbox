@@ -132,10 +132,10 @@ static void read_test(volatile int *buf, int buf_size, int loop_cnt)
             : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory", "cc"
         );
 #else
-    int x;
-    for(int i = 0; i < loop_cnt; i++)
+    int x, i, j;
+    for(i = 0; i < loop_cnt; i++)
     {
-        for(int j = 0; j < buf_size; j+=4)
+        for(j = 0; j < buf_size - 4; j+=4)
         {
             x = buf[j  ];
             x = buf[j+2];
