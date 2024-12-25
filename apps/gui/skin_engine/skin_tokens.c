@@ -592,7 +592,7 @@ static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
     int numeric_ret = -1;
     const char *numeric_buf = buf;
 
-#ifdef sizeof(mp3entry) <= 2048
+#if ID3V2_BUF_SIZE <= 900
     struct mp3entry tempid3, *id3;
 #else
     static struct mp3entry tempid3, *id3;
