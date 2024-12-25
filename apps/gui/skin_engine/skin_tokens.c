@@ -591,7 +591,13 @@ static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
     char *filename = NULL;
     int numeric_ret = -1;
     const char *numeric_buf = buf;
-    struct mp3entry tempid3, *id3;/* Note: struct mp3entry is huge */
+
+#ifdef sizeof(mp3entry) <= 2048
+    struct mp3entry tempid3, *id3;
+#else
+    static struct mp3entry tempid3, *id3;
+#endif
+
     id3 = get_mp3entry_from_offset(token->next? 1: offset, &tempid3, &filename);
 
     if (token->type == SKIN_TOKEN_REPLAYGAIN)
