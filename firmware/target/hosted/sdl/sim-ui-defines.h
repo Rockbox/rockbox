@@ -272,8 +272,8 @@
 #define UI_TITLE                    "Sansa Clip"CLIP_VERSION
 #define UI_WIDTH                    205 /* width of GUI window */
 #define UI_HEIGHT                   325 /* height of GUI window */
-#define UI_LCD_POSX                 38 /* x position of lcd */
-#define UI_LCD_POSY                 38 /* y position of lcd */
+#define UI_LCD_POSX                 42 /* x position of lcd */
+#define UI_LCD_POSY                 42 /* y position of lcd */
 
 #elif defined(SANSA_CLIPPLUS)
 #define UI_TITLE                    "Sansa Clip+"
