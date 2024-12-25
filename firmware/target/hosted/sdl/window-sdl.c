@@ -99,7 +99,7 @@ static void rebuild_gui_texture(void)
     get_window_dimensions(&w, &h);
     SDL_RenderSetLogicalSize(sdlRenderer, w, h);
     if ((gui_texture = SDL_CreateTexture(sdlRenderer, SDL_MasksToPixelFormatEnum(depth,
-                                         0, 0, 0, 0), SDL_TEXTUREACCESS_STATIC, w, h)) == NULL)
+                                         0, 0, 0, 0), SDL_TEXTUREACCESS_STREAMING, w, h)) == NULL)
         panicf("%s", SDL_GetError());
 
     if (SDL_GetWindowFlags(window) & SDL_WINDOW_RESIZABLE)
