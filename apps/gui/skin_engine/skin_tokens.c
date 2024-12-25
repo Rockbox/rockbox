@@ -542,7 +542,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 }
 #endif
 
-static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
+static struct mp3entry* get_mp3entry_from_offset(int offset, struct mp3entry *bufid3, char **filename)
 {
     struct mp3entry* pid3 = NULL;
     struct wps_state *state = get_wps_state();
@@ -556,25 +556,24 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
         pid3 = state->nid3;
     else
     {
-        static struct mp3entry tempid3; /* Note: path gets passed to outside fns */
-        memset(&tempid3, 0, sizeof(struct mp3entry));
+        memset(bufid3, 0, sizeof(*bufid3));
         /*static char filename_buf[MAX_PATH + 1];removed g#5926 */
-        fname = playlist_peek(offset, tempid3.path, sizeof(tempid3.path));
+        fname = playlist_peek(offset, bufid3->path, sizeof(bufid3->path));
         *filename = (char*)fname;
 
         if (
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-            tagcache_fill_tags(&tempid3, NULL) ||
+            tagcache_fill_tags(bufid3, NULL) ||
 #endif
-            audio_peek_track(&tempid3, offset)
+            audio_peek_track(bufid3, offset)
         )
         {
-            pid3 = &tempid3;
+            pid3 = bufid3;
         }
         else /* failed */
         {
             /* ensure *filename gets the path, audio_peek_track() cleared it */
-            fname = playlist_peek(offset, tempid3.path, sizeof(tempid3.path));
+            fname = playlist_peek(offset, bufid3->path, sizeof(bufid3->path));
             *filename = (char*)fname;
         }
     }
@@ -582,8 +581,9 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
     return pid3;
 }
 
-/* Tokens which use current id3 go here */
-static const char * try_id3_token(struct wps_token *token, int offset,
+/* Don't inline this; it was broken out of get_token_value to reduce stack usage.
+ * Tokens which use current id3 go here */
+static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
                                               char *buf, int buf_size,
                                               int limit, int *intval)
 {
@@ -591,8 +591,8 @@ static const char * try_id3_token(struct wps_token *token, int offset,
     char *filename = NULL;
     int numeric_ret = -1;
     const char *numeric_buf = buf;
-    struct mp3entry *id3;
-    id3 = get_mp3entry_from_offset(token->next? 1: offset, &filename);
+    struct mp3entry tempid3, *id3;/* Note: struct mp3entry is huge */
+    id3 = get_mp3entry_from_offset(token->next? 1: offset, &tempid3, &filename);
 
     if (token->type == SKIN_TOKEN_REPLAYGAIN)
     {
