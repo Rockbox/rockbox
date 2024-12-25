@@ -93,4 +93,6 @@ size_t audio_get_filebuflen(void);
 
 unsigned int playback_status(void);
 
+struct mp3entry* get_temp_mp3entry(struct mp3entry *free);
+
 #endif /* _PLAYBACK_H */

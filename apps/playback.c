@@ -428,6 +428,30 @@ static inline struct mp3entry * id3_get(enum audio_id3_types id3_num)
     }
 }
 
+struct mp3entry* get_temp_mp3entry(struct mp3entry *free)
+{
+    /* free should be NULL on first call pass back the returned mp3entry to unlock */
+    enum audio_id3_types id3_num = UNBUFFERED_ID3;
+    /* playback hasn't started return NEXTTRACK_ID3 (statically allocated) */
+    if (!audio_scratch_memory)
+        id3_num = NEXTTRACK_ID3;
+
+    if (free)
+    {
+        /* scratch_mem_init() has to aquire the lock
+         * to change id3_num via audio_scratch_memory.. */
+        if (free == id3_get(id3_num))
+            id3_mutex_unlock();
+
+        return NULL;
+    }
+    id3_mutex_lock();
+
+    struct mp3entry *temp_id3 = id3_get(id3_num);
+    wipe_mp3entry(temp_id3);
+    return temp_id3;
+}
+
 /* Copy an mp3entry into one of the mp3 entries */
 static void id3_write(enum audio_id3_types id3_num,
                       const struct mp3entry *id3_src)

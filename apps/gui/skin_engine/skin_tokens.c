@@ -542,12 +542,14 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 }
 #endif
 
-static struct mp3entry* get_mp3entry_from_offset(int offset, struct mp3entry *bufid3, char **filename)
+static struct mp3entry* get_mp3entry_from_offset(int offset,
+                                   struct mp3entry **freeid3, char **filename)
 {
     struct mp3entry* pid3 = NULL;
     struct wps_state *state = get_wps_state();
     struct cuesheet *cue = state->id3 ? state->id3->cuesheet : NULL;
     const char *fname = NULL;
+
     if (cue && cue->curr_track_idx + offset < cue->track_count)
         pid3 = state->id3;
     else if (offset == 0)
@@ -556,8 +558,9 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, struct mp3entry *bu
         pid3 = state->nid3;
     else
     {
-        memset(bufid3, 0, sizeof(*bufid3));
-        /*static char filename_buf[MAX_PATH + 1];removed g#5926 */
+        /* we had to get a temp id3 entry, fill freeid3 to free later */
+        struct mp3entry *bufid3 = get_temp_mp3entry(NULL);
+        *freeid3 = bufid3;
         fname = playlist_peek(offset, bufid3->path, sizeof(bufid3->path));
         *filename = (char*)fname;
 
@@ -581,27 +584,22 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, struct mp3entry *bu
     return pid3;
 }
 
-/* Don't inline this; it was broken out of get_token_value to reduce stack usage.
- * Tokens which use current id3 go here */
-static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
+/* Tokens which use current id3 go here */
+static const char *try_id3_token(struct wps_token *token, int offset,
                                               char *buf, int buf_size,
                                               int limit, int *intval)
 {
     const char *out_text = NULL;
     char *filename = NULL;
-    int numeric_ret = -1;
-    const char *numeric_buf = buf;
+    struct mp3entry *id3, *freeid3 = NULL;
 
-#if ID3V2_BUF_SIZE <= 900
-    struct mp3entry tempid3, *id3;
-#else
-    static struct mp3entry tempid3, *id3;
-#endif
-
-    id3 = get_mp3entry_from_offset(token->next? 1: offset, &tempid3, &filename);
+    /* if freeid3 is filled on return we need to free the id3 when finished */
+    id3 = get_mp3entry_from_offset(token->next? 1: offset, &freeid3, &filename);
 
     if (token->type == SKIN_TOKEN_REPLAYGAIN)
     {
+        int numeric_ret = -1;
+        const char *numeric_buf = buf;
         int globtype = global_settings.replaygain_settings.type;
         int val;
 
@@ -642,7 +640,8 @@ static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
         {
             *intval = numeric_ret;
         }
-        return numeric_buf;
+        out_text = numeric_buf;
+        goto free_id3_outtext;
     }
 
     struct wps_state *state = get_wps_state();
@@ -651,18 +650,25 @@ static const char * NOINLINE try_id3_token(struct wps_token *token, int offset,
         out_text = get_cuesheetid3_token(token, id3,
                                          token->next?1:offset, buf, buf_size);
         if (out_text)
-            return out_text;
+            goto free_id3_outtext;
     }
 
     out_text = get_id3_token(token, id3, filename, buf, buf_size, limit, intval);
-    if (out_text)
-        return out_text;
 
+    if (out_text)
+        goto free_id3_outtext;
+
+    if (freeid3)
+        get_temp_mp3entry(freeid3);
 #if CONFIG_TUNER
     return get_radio_token(token, offset, buf, buf_size, limit, intval);
 #else
     return NULL;
 #endif
+free_id3_outtext:
+    if (freeid3)
+        get_temp_mp3entry(freeid3);
+    return out_text;
 }
 
 /* Don't inline this; it was broken out of get_token_value to reduce stack
