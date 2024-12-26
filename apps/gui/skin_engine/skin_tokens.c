@@ -775,8 +775,7 @@ static const char* get_rtc_token_value(struct wps_token *token,
         default:
             return "?";
 
-        case SKIN_TOKEN_RTC_PRESENT:
-            return "c";
+
         case SKIN_TOKEN_RTC_12HOUR_CFG:
             snprintf(buf, buf_size, "%d", global_settings.timeformat);
             numeric_ret = global_settings.timeformat + 1;
@@ -894,8 +893,7 @@ static const char* get_rtc_token_value(struct wps_token *token,
     {
         default:
             return "?";
-        case SKIN_TOKEN_RTC_PRESENT:
-            return NULL;
+
         case SKIN_TOKEN_RTC_DAY_OF_MONTH:
         case SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
         case SKIN_TOKEN_RTC_HOUR_24_ZERO_PADDED:
@@ -1350,6 +1348,12 @@ const char *get_token_value(struct gui_wps *gwps,
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
 
+        case SKIN_TOKEN_RTC_PRESENT:
+#if CONFIG_RTC
+            return "c";
+#else
+            return NULL;
+#endif
         /* peakmeter */
         case SKIN_TOKEN_PEAKMETER_LEFT:
         case SKIN_TOKEN_PEAKMETER_RIGHT:
