@@ -33,6 +33,8 @@ extern SDL_Surface *remote_surface;
 SDL_Texture  *gui_texture;
 SDL_Surface  *sim_lcd_surface;
 
+SDL_mutex *window_mutex;
+
 static SDL_Window   *window;
 static SDL_Renderer *sdlRenderer;
 static SDL_Surface  *picture_surface;
@@ -220,4 +222,5 @@ void sdl_window_setup(void)
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, display_zoom == 1 ? "best" : "nearest");
     display_zoom = 0; /* reset to 0 unless/until user requests a scale level change */
+    window_mutex = SDL_CreateMutex();
 }

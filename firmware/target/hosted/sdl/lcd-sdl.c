@@ -102,6 +102,9 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
     SDL_Rect dest= {ui_x + x_start, ui_y + y_start, width, height};
 
     uint8_t alpha;
+
+    SDL_LockMutex(window_mutex);
+
     if (SDL_GetSurfaceAlphaMod(surface,&alpha) == 0 && alpha < 255)
         SDL_FillRect(sim_lcd_surface, NULL, 0); /* alpha needs a black background */
 
@@ -111,6 +114,7 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
 
     if (!sdl_window_adjust()) /* already calls sdl_window_render itself */
         sdl_window_render();
+    SDL_UnlockMutex(window_mutex);
 }
 
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */

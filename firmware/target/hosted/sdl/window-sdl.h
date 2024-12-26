@@ -26,6 +26,9 @@
 extern SDL_Texture *gui_texture; /* Window content, including background */
 extern SDL_Surface *sim_lcd_surface; /* LCD content */
 
+extern SDL_mutex *window_mutex;  /* prevent concurrent drawing from event thread &
+                                    main thread on MS Windows */
+
 /* Renders GUI texture. Sets up new texture, if necessary */
 void sdl_window_render(void);
 

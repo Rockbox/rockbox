@@ -243,7 +243,9 @@ static bool event_handler(SDL_Event *event)
             sdl_app_has_input_focus = 0;
         else if(event->window.event == SDL_WINDOWEVENT_RESIZED)
         {
+            SDL_LockMutex(window_mutex);
             sdl_window_adjustment_needed(false);
+            SDL_UnlockMutex(window_mutex);
 #if !defined (__APPLE__) && !defined(__WIN32)
             static unsigned long last_tick;
             if (TIME_AFTER(current_tick, last_tick + HZ/20) && !button_queue_full())
@@ -354,8 +356,10 @@ static void button_event(int key, bool pressed)
     case SDLK_TAB:
         if (!pressed)
         {
+            SDL_LockMutex(window_mutex);
             background = !background;
             sdl_window_adjustment_needed(true);
+            SDL_UnlockMutex(window_mutex);
 #if !defined(__WIN32) && !defined (__APPLE__)
             button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
 #endif
@@ -375,12 +379,14 @@ static void button_event(int key, bool pressed)
             display_zoom = 0;
             return;
         }
+        SDL_LockMutex(window_mutex);
         if (!display_zoom)
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,
                         strcmp(SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY) ?:
                         "best", "best") ? "best": "nearest");
 
         sdl_window_adjustment_needed(!display_zoom);
+        SDL_UnlockMutex(window_mutex);
 #if !defined(__WIN32) && !defined (__APPLE__)
         button_queue_post(SDLK_UNKNOWN, 0); /* update window on main thread */
 #endif

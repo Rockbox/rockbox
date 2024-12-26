@@ -175,6 +175,8 @@ void power_off(void)
 void sim_do_exit()
 {
     sim_kernel_shutdown();
+    SDL_UnlockMutex(window_mutex);
+    SDL_DestroyMutex(window_mutex);
 
     SDL_Quit();
     exit(EXIT_SUCCESS);
