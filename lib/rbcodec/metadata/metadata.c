@@ -522,8 +522,11 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
 
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
 {
-    memcpy(dest, orig, sizeof(struct mp3entry));
-    adjust_mp3entry(dest, dest, orig);
+    if (dest != orig)
+    {
+        memcpy(dest, orig, sizeof(struct mp3entry));
+        adjust_mp3entry(dest, dest, orig);
+    }
 }
 
 /* A shortcut to simplify the common task of clearing the struct */
