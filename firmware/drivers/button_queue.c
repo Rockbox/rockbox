@@ -48,7 +48,7 @@ static void button_boost(bool state)
             cpu_boost(true);
         }
     }
-    else if (!button_boosted && TIME_AFTER(current_tick, button_unboost_tick))
+    else if (button_boosted && TIME_AFTER(current_tick, button_unboost_tick))
     {
         button_boosted = false;
         cpu_boost(false);
