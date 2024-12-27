@@ -22,6 +22,7 @@
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include <string.h>
+#include "core_alloc.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file
  * #define LOGF_ENABLE
@@ -66,7 +67,8 @@ static int32_t hp1y1 IBSS_ATTR;             /* hpf2 y[n-1]  */
 static int32_t hp2y1 IBSS_ATTR;             /* hpf2 y[n-1]  */
 
 /* Delay Line for look-ahead compression */
-static int32_t labuf[MAX_CH][MAX_DLY];      /* look-ahead buffer */
+static int labuf_handle = -1;
+//static int32_t labuf[MAX_CH][MAX_DLY];      /* look-ahead buffer */
 static int32_t  delay_time;
 static int32_t  delay_write;
 static int32_t  delay_read;
@@ -150,7 +152,24 @@ static bool compressor_update(struct dsp_config *dsp,
         attcb = 0;
     }
 
-
+    if (threshold < 0 && labuf_handle <= 0)
+    {
+        labuf_handle = core_alloc(sizeof(int32_t[MAX_CH][MAX_DLY]));
+        if (labuf_handle < 0)
+        {
+            logf("%s Failed to allocate %d bytes",
+                 __func__, (int)sizeof(int32_t[MAX_CH][MAX_DLY]));
+            return false;
+        }
+        logf("   Compressor Allocated %d bytes", (int)sizeof(int32_t[MAX_CH][MAX_DLY]));
+    }
+#if 0 /* don't really need this */
+    if (threshold >= 0 && labuf_handle > 0)
+    {
+        labuf_handle = core_free(labuf_handle);
+        logf("   Compressor Freed %d bytes", (int)sizeof(int32_t[MAX_CH][MAX_DLY]));
+    }
+#endif
     /* Sidechain pre-emphasis filter coefficients */
     hp1ca = fs + 0x003C1; /** The "magic" constant is 1/RC.  This filter
                            *  cut-off is approximately 237 Hz
@@ -437,7 +456,8 @@ static void compressor_process(struct dsp_proc_entry *this,
     struct dsp_buffer *buf = *buf_p;
     int count = buf->remcount;
     int32_t *in_buf[2] = { buf->p32[0], buf->p32[1] };
-    const int num_chan = buf->format.num_channels;
+    const int num_chan = MIN(buf->format.num_channels, MAX_CH);
+    int32_t (*labufp)[MAX_CH][MAX_DLY] = core_get_data(labuf_handle);
 
     while (count-- > 0)
     {
@@ -452,7 +472,7 @@ static void compressor_process(struct dsp_proc_entry *this,
         {
             tmpx = *in_buf[ch];
             x += tmpx;
-            labuf[ch][delay_write] = tmpx;
+            (*labufp)[ch][delay_write] = tmpx;
             /* Limiter detection */
             if(tmpx < 0) tmpx = -(tmpx + 1);
             if(tmpx > in_buf_max_level) in_buf_max_level = tmpx;
@@ -541,7 +561,7 @@ static void compressor_process(struct dsp_proc_entry *this,
         {
             for (int ch = 0; ch < num_chan; ch++)
             {
-              *in_buf[ch]  = FRACMUL_SHL(total_gain, labuf[ch][delay_read], 7);
+              *in_buf[ch]  = FRACMUL_SHL(total_gain, (*labufp)[ch][delay_read], 7);
             }
         }
         in_buf[0]++;
@@ -575,13 +595,14 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
         /* Fall-through */
     case DSP_RESET:
     case DSP_FLUSH:
-
+    {
+        int32_t (*labufp)[MAX_CH][MAX_DLY] = core_get_data(labuf_handle);
         release_gain = UNITY;
         for(i=0; i<MAX_CH; i++)
         {
             for(j=0; j<MAX_DLY; j++)
             {
-                labuf[i][j] = 0;  /* All Silence */
+                (*labufp)[i][j] = 0;  /* All Silence */
             }
         }
 
@@ -599,7 +620,7 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
                                                     *  look-ahead limiter
                                                     */
         break;
-
+    }
     case DSP_SET_OUT_FREQUENCY:
         compressor_update(dsp, &curr_set);
         break;
