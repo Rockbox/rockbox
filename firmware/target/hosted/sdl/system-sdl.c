@@ -157,6 +157,9 @@ void power_off(void)
     /* since sim_thread_shutdown() grabs the mutex we need to let it free,
      * otherwise SDL_WaitThread will deadlock */
     struct thread_entry* t = sim_thread_unlock();
+
+    if (!evt_thread) /* no event thread on MacOS */
+        sim_thread_shutdown();
 #endif
     /* wait for event thread to finish */
     SDL_WaitThread(evt_thread, NULL);
