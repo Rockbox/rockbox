@@ -4194,6 +4194,9 @@ static bool context_menu_ready(void)
 #ifdef USEGSLIB
     rb->lcd_set_foreground(N_BRIGHT(0));
     rb->lcd_set_background(N_BRIGHT(255));
+#elif defined (HAVE_LCD_COLOR)
+    rb->lcd_set_background(rb->global_settings->bg_color);
+    rb->lcd_set_foreground(rb->global_settings->fg_color);
 #endif
 #endif
     insert_whole_album = (pf_state != pf_show_tracks) || show_tracks_while_browsing;
@@ -4211,6 +4214,9 @@ static void context_menu_cleanup(void)
         free_borrowed_tracks();
 #ifdef USEGSLIB
     grey_show(true);
+#elif LCD_DEPTH > 1 && defined(HAVE_LCD_COLOR)
+    rb->lcd_set_background(N_BRIGHT(0));
+    rb->lcd_set_foreground(N_BRIGHT(255));
 #endif
     mylcd_set_drawmode(DRMODE_FG);
 }
