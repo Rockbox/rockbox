@@ -67,7 +67,7 @@ static void get_window_dimensions(int *w, int *h)
     }
 }
 
-#define SNAP_MARGIN 50
+#if defined(__APPLE__) || defined(__WIN32)
 static void restore_aspect_ratio(int w, int h)
 {
     float aspect_ratio = (float) h / w;
@@ -81,31 +81,51 @@ static void restore_aspect_ratio(int w, int h)
     SDL_GetWindowSize(sdlWindow, &w, &h);
     if (w != original_width || h != original_height)
     {
-        if (abs(original_width - w) < SNAP_MARGIN)
-        {
-            w = original_width;
-            h = original_height;
-        }
-        else
-            h = w * aspect_ratio;
-
+        h = w * aspect_ratio;
         SDL_SetWindowSize(sdlWindow, w, h);
     }
 }
+#endif
 
 static void rebuild_gui_texture(void)
 {
     SDL_Surface *gui_surface;
-    int w, h, depth = LCD_DEPTH < 8 ? 16 : LCD_DEPTH;
+    int prev_w, prev_h, x, y,
+        w, h, depth = LCD_DEPTH < 8 ? 16 : LCD_DEPTH;
+    Uint32 flags = SDL_GetWindowFlags(sdlWindow);
 
     get_window_dimensions(&w, &h);
+    SDL_RenderGetLogicalSize(sdlRenderer, &prev_w, &prev_h);
     SDL_RenderSetLogicalSize(sdlRenderer, w, h);
     if ((gui_texture = SDL_CreateTexture(sdlRenderer, SDL_MasksToPixelFormatEnum(depth,
                                          0, 0, 0, 0), SDL_TEXTUREACCESS_STREAMING, w, h)) == NULL)
         panicf("%s", SDL_GetError());
 
-    if (SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_RESIZABLE)
-        restore_aspect_ratio(w, h);
+    /* Did background change? */
+    if ((flags & SDL_WINDOW_RESIZABLE) &&
+        !(flags & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN)) &&
+        prev_w && prev_w != w)
+    {
+        SDL_GetWindowSize(sdlWindow, &x, NULL);
+
+        /* Maintain LCD's size */
+        float ratio = (float) x / prev_w;
+        SDL_SetWindowSize(sdlWindow, w * ratio, h * ratio);
+
+        /* move LCD back into previous position */
+        SDL_GetWindowPosition(sdlWindow, &x, &y);
+        if (background)
+        {
+            x -= (UI_LCD_POSX * ratio);
+            y -= (UI_LCD_POSY * ratio);
+        }
+        else
+        {
+            x += (UI_LCD_POSX * ratio);
+            y += (UI_LCD_POSY * ratio);
+        }
+        SDL_SetWindowPosition(sdlWindow, x > 0 ? x : 0, y > 0 ? y : 0);
+    }
 
     if (background && picture_surface &&
         (gui_surface = SDL_ConvertSurface(picture_surface, sim_lcd_surface->format, 0)))
@@ -159,7 +179,10 @@ bool sdl_window_adjust(void)
         SDL_SetWindowSize(sdlWindow, display_zoom * w, display_zoom * h);
     }
 #if defined(__APPLE__) || defined(__WIN32)
-    restore_aspect_ratio(w, h);
+    int logical_w, logical_h;
+    SDL_RenderGetLogicalSize(sdlRenderer, &logical_w, &logical_h);
+    if (logical_w == w && logical_h == h) /* background unchanged */
+        restore_aspect_ratio(w, h);
 #endif
     display_zoom = 0;
     sdl_window_render();
