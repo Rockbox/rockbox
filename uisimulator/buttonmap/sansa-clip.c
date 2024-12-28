@@ -78,6 +78,10 @@ struct button_map bm[] = {
     { SDLK_KP_4,          32, 211,  14, "Left" },
     { SDLK_KP_6,         112, 211,  14, "Right" },
     { SDLK_KP_2,          81, 231,  14, "Menu" },
+    { SDLK_PAGEUP,         1,  70,  10, "Vol+" },
+    { SDLK_PAGEDOWN,       1, 130,  10, "Vol-" },
+    { SDLK_ESCAPE,        81,   1,  10, "Power" },
+
     { 0, 0, 0, 0, "None" }
 };
 #else
@@ -93,6 +97,11 @@ struct button_map bm[] = {
     { SDLK_KP_6,         140, 236,  19, "Right" },
     { SDLK_KP_2,         98, 272,  19, "Menu" },
     { SDLK_KP_2,         104, 272,  19, "Menu" },
+#ifdef SANSA_CLIPPLUS
+    { SDLK_PAGEUP,         1, 95,  10, "Vol+" },
+    { SDLK_PAGEDOWN,       1, 155,  10, "Vol-" },
+    { SDLK_ESCAPE,       150,   1,  10, "Power" },
+#endif
     { 0, 0, 0, 0, "None" }
 };
 #endif
