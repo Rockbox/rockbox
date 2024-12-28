@@ -35,7 +35,7 @@ SDL_Surface  *sim_lcd_surface;
 
 SDL_mutex *window_mutex;
 
-static SDL_Window   *window;
+SDL_Window   *sdlWindow;
 static SDL_Renderer *sdlRenderer;
 static SDL_Surface  *picture_surface;
 
@@ -74,11 +74,11 @@ static void restore_aspect_ratio(int w, int h)
     int original_height = h;
     int original_width = w;
 
-    if ((SDL_GetWindowFlags(window) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN))
+    if ((SDL_GetWindowFlags(sdlWindow) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN))
         || display_zoom)
         return;
 
-    SDL_GetWindowSize(window, &w, &h);
+    SDL_GetWindowSize(sdlWindow, &w, &h);
     if (w != original_width || h != original_height)
     {
         if (abs(original_width - w) < SNAP_MARGIN)
@@ -89,7 +89,7 @@ static void restore_aspect_ratio(int w, int h)
         else
             h = w * aspect_ratio;
 
-        SDL_SetWindowSize(window, w, h);
+        SDL_SetWindowSize(sdlWindow, w, h);
     }
 }
 
@@ -104,7 +104,7 @@ static void rebuild_gui_texture(void)
                                          0, 0, 0, 0), SDL_TEXTUREACCESS_STREAMING, w, h)) == NULL)
         panicf("%s", SDL_GetError());
 
-    if (SDL_GetWindowFlags(window) & SDL_WINDOW_RESIZABLE)
+    if (SDL_GetWindowFlags(sdlWindow) & SDL_WINDOW_RESIZABLE)
         restore_aspect_ratio(w, h);
 
     if (background && picture_surface &&
@@ -153,10 +153,10 @@ bool sdl_window_adjust(void)
 
     get_window_dimensions(&w, &h);
 
-    if (!(SDL_GetWindowFlags(window) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN))
+    if (!(SDL_GetWindowFlags(sdlWindow) & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN))
         && display_zoom)
     {
-        SDL_SetWindowSize(window, display_zoom * w, display_zoom * h);
+        SDL_SetWindowSize(sdlWindow, display_zoom * w, display_zoom * h);
     }
 #if defined(__APPLE__) || defined(__WIN32)
     restore_aspect_ratio(w, h);
@@ -200,11 +200,11 @@ void sdl_window_setup(void)
 
     get_window_dimensions(&width, &height);
 
-    if ((window = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED,
+    if ((sdlWindow = SDL_CreateWindow(UI_TITLE, SDL_WINDOWPOS_CENTERED,
                                    SDL_WINDOWPOS_CENTERED, width * display_zoom,
                                    height * display_zoom , flags)) == NULL)
         panicf("%s", SDL_GetError());
-    if ((sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
+    if ((sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_PRESENTVSYNC)) == NULL)
         panicf("%s", SDL_GetError());
 
     /* Surface for LCD content only. Needs to fit largest LCD */

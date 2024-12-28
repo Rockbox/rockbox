@@ -69,7 +69,14 @@ int remote_type(void)
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
+#ifdef SIMULATOR
+static bool cursor_isfocus = false;
+SDL_Cursor *sdl_focus_cursor = NULL;
+SDL_Cursor *sdl_arrow_cursor = NULL;
+#endif
+
 int sdl_app_has_input_focus = 1;
+
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
 static int n900_updown_key_pressed = 0;
 #endif
@@ -254,6 +261,19 @@ static bool event_handler(SDL_Event *event)
                   last_tick = current_tick;
 #endif
         }
+#ifdef SIMULATOR
+        if (event->window.event == SDL_WINDOWEVENT_FOCUS_LOST
+            || event->window.event == SDL_WINDOWEVENT_LEAVE
+            || event->window.event == SDL_WINDOWEVENT_RESIZED
+            || event->window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+        {
+            if (cursor_isfocus)
+            {
+                cursor_isfocus = false;
+                SDL_SetCursor(sdl_arrow_cursor);
+            }
+        }
+#endif
         break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
@@ -282,17 +302,59 @@ static bool event_handler(SDL_Event *event)
 #endif
         button_event(ev_key, event->type == SDL_KEYDOWN);
         break;
-#ifdef HAVE_TOUCHSCREEN
+
+
+
     case SDL_MOUSEMOTION:
+    {
+#ifdef SIMULATOR
+        static uint32_t next_check = 0;
+        if (background && sdl_app_has_input_focus
+            && (TIME_AFTER(event->motion.timestamp, next_check)))
+        {
+            int x = event->motion.x;
+            int y = event->motion.y;
+
+            extern struct button_map bm[];
+            int i;
+            for (i = 0; bm[i].button; i++)
+            {
+                int xd = (x-bm[i].x)*(x-bm[i].x);
+                int yd = (y-bm[i].y)*(y-bm[i].y);
+                /* check distance from center of button < radius */
+                if ( xd + yd < bm[i].radius*bm[i].radius ) {
+                    break;
+                }
+            }
+
+            if (bm[i].button)
+            {
+                if (!cursor_isfocus)
+                {
+                    cursor_isfocus = true;
+                    SDL_SetCursor(sdl_focus_cursor);
+                }
+            }
+            else if (cursor_isfocus)
+            {
+                cursor_isfocus = false;
+                SDL_SetCursor(sdl_arrow_cursor);
+            }
+
+            next_check = event->motion.timestamp + 10; /* ms */
+        }
+#endif
+#ifdef HAVE_TOUCHSCREEN
         if (event->motion.state & SDL_BUTTON(1))
         {
             int x = event->motion.x;
             int y = event->motion.y;
             touchscreen_event(x, y);
         }
-        break;
 #endif
+        break;
 
+    }
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN:
     {
@@ -560,4 +622,10 @@ int button_read_device(void)
 
 void button_init_device(void)
 {
+#ifdef SIMULATOR
+    if (!sdl_focus_cursor)
+        sdl_focus_cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+    if (!sdl_arrow_cursor)
+        sdl_arrow_cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+#endif
 }

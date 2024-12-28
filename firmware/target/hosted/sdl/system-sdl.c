@@ -177,6 +177,15 @@ void power_off(void)
 
 void sim_do_exit()
 {
+#ifdef SIMULATOR
+    extern SDL_Cursor *sdl_focus_cursor;
+    extern SDL_Cursor *sdl_arrow_cursor;
+    if (sdl_focus_cursor)
+        SDL_FreeCursor(sdl_focus_cursor);
+    if (sdl_arrow_cursor)
+        SDL_FreeCursor(sdl_arrow_cursor);
+#endif
+
     sim_kernel_shutdown();
     SDL_UnlockMutex(window_mutex);
     SDL_DestroyMutex(window_mutex);
