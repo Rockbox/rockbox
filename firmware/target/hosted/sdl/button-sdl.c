@@ -382,11 +382,11 @@ static bool event_handler(SDL_Event *event)
 }
 
 #ifdef __APPLE__
-void handle_sdl_events(void)
+int sdl_event_filter(void *userdata, SDL_Event * event)
 {
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
-        event_handler(&event);
+    (void) userdata;
+    event_handler(event);
+    return 0;
 }
 #endif
 

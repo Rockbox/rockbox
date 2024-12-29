@@ -33,6 +33,7 @@
 #include "system-sdl.h"
 #include "sim-ui-defines.h"
 #include "window-sdl.h"
+#include "button-sdl.h"
 #include "lcd-bitmap.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote-bitmap.h"
@@ -235,6 +236,8 @@ void system_init(void)
     SDL_SemWait(s);
     /* cleanup */
     SDL_DestroySemaphore(s);
+#else
+    SDL_AddEventWatch(sdl_event_filter, NULL);
 #endif
 }
 

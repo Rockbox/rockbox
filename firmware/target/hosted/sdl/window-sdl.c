@@ -81,8 +81,10 @@ static void restore_aspect_ratio(int w, int h)
     SDL_GetWindowSize(sdlWindow, &w, &h);
     if (w != original_width || h != original_height)
     {
+        SDL_DisplayMode sdl_dm;
         h = w * aspect_ratio;
-        SDL_SetWindowSize(sdlWindow, w, h);
+        if (SDL_GetCurrentDisplayMode(0, &sdl_dm) || h <= sdl_dm.h)
+            SDL_SetWindowSize(sdlWindow, w, h);
     }
 }
 #endif

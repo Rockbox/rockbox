@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "button.h"
 #ifdef HAVE_SDL
-#include "button-sdl.h"
+#include "SDL.h"
 #include "window-sdl.h"
 #endif
 
@@ -101,7 +101,7 @@ static inline void button_queue_wait(struct queue_event *evp, int timeout)
     unsigned long curr_tick, remaining;
     while(true)
     {
-        handle_sdl_events(); /* Includes window updates after resize events */
+        SDL_PumpEvents();
         queue_wait_w_tmo(&button_queue, evp, TIMEOUT_NOBLOCK);
         if (evp->id != SYS_TIMEOUT || timeout == TIMEOUT_NOBLOCK)
             return;
