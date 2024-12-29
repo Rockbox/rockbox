@@ -409,12 +409,100 @@ void gui_message_loop(void)
     } while(!quit);
 }
 
+#if defined(SIMULATOR)
+static void show_sim_help(void)
+{
+    extern SDL_Window *sdlWindow;
+    extern struct button_map bm[];
+
+    uint32_t flags = SDL_MESSAGEBOX_INFORMATION;
+    static char helptext[4096] = {'\0'};
+
+    if (helptext[0] != '\0')
+    {
+        SDL_ShowSimpleMessageBox(flags, UI_TITLE, helptext, sdlWindow);
+        return;
+    }
+
+    const char *keyname = SDL_GetKeyName(SDLK_HELP);
+    strlcat(helptext, "Rockbox simulator\n[Key] Description\n\n[", sizeof(helptext)-1);
+    /* simulator keys */
+    #define HELPTXT(SDLK,litdesc)                       \
+        keyname = SDL_GetKeyName(SDLK);                 \
+        if (keyname[0]) {                               \
+        strlcat(helptext, keyname, sizeof(helptext)-1); \
+        strlcat(helptext, "] "litdesc"\n[", sizeof(helptext)-1);}
+    /*HELPTXT(, "");*/
+    HELPTXT(SDLK_HELP, "display this window");
+    HELPTXT(SDLK_KP_0, "screendump");
+    HELPTXT(SDLK_F5, "screendump");
+    HELPTXT(SDLK_TAB, "hide device background");
+    HELPTXT(SDLK_0, "zoom display level 1/2");
+    HELPTXT(SDLK_1, "zoom display level 1");
+    HELPTXT(SDLK_2, "zoom display level 2");
+    HELPTXT(SDLK_3, "zoom display level 3");
+    HELPTXT(SDLK_4, "toggle display quality");
+    HELPTXT(USB_KEY, "toggle USB");
+
+#ifdef HAVE_HEADPHONE_DETECTION
+    HELPTXT(SDLK_p, "toggle headphone");
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+    HELPTXT(SDLK_p, "toggle lineout");
+#endif
+#ifdef HAVE_HOTSWAP
+    HELPTXT(EXT_KEY, "toggle external drive");
+#endif
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
+    HELPTXT(SDLK_LCTRL, "shutdown");
+#endif
+#ifdef HAS_BUTTON_HOLD
+    HELPTXT(SDLK_h, "toggle hold button");
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    HELPTXT(SDLK_j, "toggle remote hold button");
+#endif
+#if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
+    HELPTXT(SDLK_t, "toggle remote type");
+#endif
+#ifdef HAVE_TOUCHSCREEN
+    HELPTXT(SDLK_F4, "toggle touch mode");
+#endif
+
+    /* device specific keymap */
+    for (int i = 0; bm[i].button; i++)
+    {
+        keyname = SDL_GetKeyName(bm[i].button);
+        strlcat(helptext, keyname, sizeof(helptext)-1);
+        strlcat(helptext, "] ", sizeof(helptext)-1);
+        strlcat(helptext, bm[i].description, sizeof(helptext)-1);
+        strlcat(helptext, "\n[", sizeof(helptext)-1);
+    }
+
+    /* last one doesn't use the macro */
+    keyname = SDL_GetKeyName(SDLK_F1);
+    strlcat(helptext, keyname, sizeof(helptext)-1);
+    strlcat(helptext, "] display this window\n\n", sizeof(helptext)-1);
+
+strlcat(helptext, "Note: If you don't have a keypad\n" \
+                  "alternate keys are in uisimulator/buttonmap\n\n", sizeof(helptext)-1);
+
+    DEBUGF("[%u] characters\n%s", (unsigned int)strlen(helptext), helptext);
+    SDL_ShowSimpleMessageBox(flags, UI_TITLE, helptext, sdlWindow);
+}
+#endif
+
 static void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     switch (key)
     {
 #ifdef SIMULATOR
+    case SDLK_HELP:
+    case SDLK_F1:
+        if (!pressed)
+            show_sim_help();
+        return;
     case SDLK_TAB:
         if (!pressed)
         {
