@@ -57,17 +57,16 @@ struct axp_supply_info {
 };
 
 static const struct axp_adc_info axp_adc_info[AXP2101_NUM_ADC_CHANNELS] = {
-    // TODO: Datasheet ADC conversion table doesn't seem to make any sense...
-    // 0x000    0x001   0x002 ... 0xFFF
+    // 0x000    0x001   0x002 ... 0x1FFF
     // 0mV      1mV     2mV   ... 8.192V
     [AXP2101_ADC_VBAT_VOLTAGE]      = {AXP2101_REG_ADC_VBAT_H,  AXP2101_REG_ADCCHNENABLE, 1 << 0, 1, 1},
     // 0mV      1mV     2mV   ... 8.192V
     [AXP2101_ADC_VBUS_VOLTAGE]      = {AXP2101_REG_ADC_VBUS_H,  AXP2101_REG_ADCCHNENABLE, 1 << 2, 1, 1},
     // 0mV      1mV     2mV   ... 8.192V
     [AXP2101_ADC_VSYS_VOLTAGE]      = {AXP2101_REG_ADC_VSYS_H,  AXP2101_REG_ADCCHNENABLE, 1 << 3, 1, 1},
-    // 0mV      0.5mV   1mV   ... 4.096V
-    [AXP2101_ADC_TS_VOLTAGE]        = {AXP2101_REG_ADC_TS_H,    AXP2101_REG_ADCCHNENABLE, 1 << 1, 1, 1},
-    // 0mV      0.1mV   2mV   ... 0.8192V
+    // 0mV      0.5mV   0.1mV   ... 4.096V
+    [AXP2101_ADC_TS_VOLTAGE]        = {AXP2101_REG_ADC_TS_H,    AXP2101_REG_ADCCHNENABLE, 1 << 1, 1, 2},
+    // see axp2101_adc_conv_raw() for conversion
     [AXP2101_ADC_DIE_TEMPERATURE]   = {AXP2101_REG_ADC_TDIE_H,  AXP2101_REG_ADCCHNENABLE, 1 << 4, 1, 1},
 };
 
@@ -309,7 +308,7 @@ void axp2101_supply_set_voltage(int supply, int voltage)
     if(voltage > 0 && info->step_mV != 0) {
         if(voltage < info->min_mV)
             return;
-        
+
         int regval;
 
         // there's probably a more elegant way to do this...
@@ -446,11 +445,20 @@ int axp2101_adc_read_raw(int adc)
         return INT_MIN;
 
     /* Parse the value */
-    return ((buf[0] & 0x3f) << 8) | (buf[1] & 0xff);
+    return ((int)(buf[0] & 0x3f) << 8) | (buf[1] & 0xff);
 }
 
 int axp2101_adc_conv_raw(int adc, int value)
 {
+    if (adc == AXP2101_ADC_DIE_TEMPERATURE)
+        return 22 + ((7274 - value) / 20);
+
+    // seems to be a signed 14-bit value, but
+    // let's clamp it to zero. Seems to give sane results
+    // on v_bus and v_ts channels
+    if (value & 0x2000)
+        return 0;
+
     return axp_adc_info[adc].num * value / axp_adc_info[adc].den;
 }
 
@@ -472,12 +480,12 @@ void axp2101_adc_set_enabled(int adc_bits)
     i2c_reg_write(AXP_PMU_BUS, AXP_PMU_ADDR, AXP2101_REG_ADCCHNENABLE, 1, &xfer[0]);
 }
 
-// TODO: See if we can figure out "optimum" battery chemistry-type settings
-// like constant-current charging, charge curves... that stuff is all configurable
-// as far as I can tell! Probably important to at least figure out if the defaults
-// are clearly wrong or not!
-
-// TODO: what are DATA_BUFFER 0-3 for????
+int axp2101_egauge_read(void)
+{
+    uint8_t buf;
+    i2c_reg_read(AXP_PMU_BUS, AXP_PMU_ADDR, AXP2101_REG_BATT_PERCENTAGE, 1, &buf);
+    return (int)buf;
+}
 
 // there are many current settings:
 // Reg 16: Input current limit control
@@ -534,6 +542,7 @@ enum {
     AXP_DEBUG_BATTERY_STATUS,
     AXP_DEBUG_INPUT_STATUS,
     AXP_DEBUG_CHARGE_CURRENT,
+    AXP_DEBUG_EGAUGE_VALUE,
     AXP_DEBUG_FIRST_ADC,
     AXP_DEBUG_FIRST_SUPPLY = AXP_DEBUG_FIRST_ADC + AXP2101_NUM_ADC_CHANNELS,
     AXP_DEBUG_NUM_ENTRIES = AXP_DEBUG_FIRST_SUPPLY + AXP2101_NUM_SUPPLIES,
@@ -555,11 +564,11 @@ static const char* axp2101_debug_menu_get_name(int item, void* data,
     (void)data;
 
     static const char* const adc_names[] = {
-        "V_bat", "V_bus", "V_sys", "V_ts", "V_die",
+        "V_bat", "V_bus", "V_sys", "V_ts", "T_die",
     };
 
     static const char* const adc_units[] = {
-        "mV", "mV", "mV", "mV", "C*100",
+        "mV", "mV", "mV", "mV", "C",
     };
 
     static const char* const supply_names[] = {
@@ -622,6 +631,12 @@ static const char* axp2101_debug_menu_get_name(int item, void* data,
     case AXP_DEBUG_CHARGE_CURRENT: {
         int current = axp2101_get_charge_current();
         snprintf(buf, buflen, "Max charge current: %d mA", current);
+        return buf;
+    } break;
+
+    case AXP_DEBUG_EGAUGE_VALUE: {
+        int percent = axp2101_egauge_read();
+        snprintf(buf, buflen, "EGauge percent: %d", percent);
         return buf;
     } break;
 

@@ -97,10 +97,6 @@ void power_init(void)
         }
         
         // These match the OF as far as I can discern
-        // TODO: These values are set in EFUSE apparently, could
-        // do a "check then set if necessary"...
-        // Also if we had a fresh device we could verify what
-        // the OF sets.
         axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC1, 3300);
         axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC2, 1200);
         axp2101_supply_set_voltage(AXP2101_SUPPLY_DCDC3, 2800);
@@ -123,6 +119,12 @@ void power_init(void)
         /* Set the default charging current. This is the same as the
         * OF's setting, although it's not strictly within the USB spec. */
         axp2101_set_charge_current(780);
+
+        /* delay to allow ADC to get a good sample -
+         * may give bogus (high) readings otherwise. */
+#ifndef BOOTLOADER
+        mdelay(150);
+#endif
     } else {
         axp_init();
         /* Set lowest sample rate */
@@ -138,7 +140,6 @@ void power_init(void)
             (1 << ADC_INTERNAL_TEMP) |
             (1 << ADC_APS_VOLTAGE));
         
-        /* TODO: Set Output Voltages! */
         i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
                         AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
         i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
