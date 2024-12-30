@@ -45,6 +45,7 @@
 /* 32 bit */
 #if ULONG_MAX == 0xfffffffful
 
+#define SIZE_MAX    ULONG_MAX
 #define INT32_MIN   LONG_MIN
 #define INT32_MAX   LONG_MAX
 #define UINT32_MAX  ULONG_MAX
@@ -59,6 +60,7 @@
 
 #elif UINT_MAX == 0xffffffffu
 
+#define SIZE_MAX    UINT_MAX
 #define INT32_MIN   INT_MIN
 #define INT32_MAX   INT_MAX
 #define UINT32_MAX  UINT_MAX
@@ -82,6 +84,7 @@
 
 #if ULONG_MAX == 0xffffffffffffffffull
 
+#define SIZE_MAX    ULONG_MAX
 #define INT64_MIN   LONG_MIN
 #define INT64_MAX   LONG_MAX
 #define UINT64_MAX  ULONG_MAX
