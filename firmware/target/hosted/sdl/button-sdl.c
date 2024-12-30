@@ -70,6 +70,7 @@ int remote_type(void)
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
 #ifdef SIMULATOR
+#include "strlcat.h"
 static bool cursor_isfocus = false;
 SDL_Cursor *sdl_focus_cursor = NULL;
 SDL_Cursor *sdl_arrow_cursor = NULL;
