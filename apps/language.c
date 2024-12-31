@@ -137,11 +137,12 @@ int lang_english_to_id(const char *english)
 {
     int i;
     unsigned char *ptr = (unsigned char *) core_language_builtin;
-    
+    size_t ptrlen, len = strlen(english);
     for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
-        if (!strcmp(ptr, english))
+        ptrlen = strlen((char *)ptr);
+        if ((ptrlen == len) && memcmp(ptr, english, ptrlen) == 0)
             return i;
-        ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
+        ptr += ptrlen + 1; /* advance pointer to next string */
     }
     return -1;
 }
