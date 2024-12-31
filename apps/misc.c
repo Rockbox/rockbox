@@ -187,7 +187,8 @@ char *output_dyn_value(char *buf,
  * returns true if the playlist should be replaced */
 bool warn_on_pl_erase(void)
 {
-    if (global_settings.warnon_erase_dynplaylist &&
+    if (global_status.resume_index != -1 &&
+        global_settings.warnon_erase_dynplaylist &&
         !global_settings.party_mode &&
         playlist_modified(NULL))
     {
