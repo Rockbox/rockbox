@@ -6,40 +6,43 @@
 # it stopped
 set -e
 
-SDK_DOWNLOAD_URL="http://developer.android.com/sdk/index.html"
-NDK_DOWNLOAD_URL="http://developer.android.com/sdk/ndk/index.html"
+SDK_DOWNLOAD_URL="https://developer.android.com/studio"
+SDK_DOWNLOAD_KEYWORD="commandlinetools"
+NDK_DOWNLOAD_URL="https://github.com/android/ndk/wiki/Unsupported-Downloads"
+NDK_DOWNLOAD_KEYWORD="r10e"
 
 find_url() {
     base_url="$1"
-    os="$2"
-    wget -q -O - $base_url | grep dl.google.com | sed 's/.*"\(http:\/\/.*\)".*/\1/' | grep $os | grep -v bundle | grep -v .exe # Windows hack
+    keyword="$2"
+    os="$3"
+    wget -q -O - $base_url | grep dl.google.com | sed 's/.*"\(https:\/\/dl.google.com\/.*\.zip\)".*/\1/' | grep $os | grep $keyword | grep -v bundle | grep -v .exe
 }
 
 OS=`uname`
 case $OS in
     Linux)
-    SDK_URL=$(find_url $SDK_DOWNLOAD_URL linux)
-    NDK_URL=$(find_url $NDK_DOWNLOAD_URL linux)
-    ANDROID=tools/android
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL $SDK_DOWNLOAD_KEYWORD linux)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL $NDK_DOWNLOAD_KEYWORD linux)
+    ANDROID=cmdline-tools/latest/bin/sdkmanager
     ;;
     
     Darwin)
-    SDK_URL=$(find_url $SDK_DOWNLOAD_URL mac)
-    NDK_URL=$(find_url $NDK_DOWNLOAD_URL darwin)
-    ANDROID=tools/android
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL $SDK_DOWNLOAD_KEYWORD mac)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL $NDK_DOWNLOAD_KEYWORD darwin)
+    ANDROID=cmdline-tools/latest/bin/sdkmanager
     ;;
 
     CYGWIN*)
-    SDK_URL=$(find_url $SDK_DOWNLOAD_URL windows)
-    NDK_URL=$(find_url $NDK_DOWNLOAD_URL windows)
-    ANDROID=tools/android.bat
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL $SDK_DOWNLOAD_KEYWORD windows)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL $NDK_DOWNLOAD_KEYWORD windows)
+    ANDROID=cmdline-tools/latest/bin/sdkmanager.exe
     ;;
 esac
 
 prefix="${INSTALL_PREFIX:-$HOME}"
 dldir="${DOWNLOAD_DIR:-/tmp}"
 
-SDK_PATH=$(find $prefix -maxdepth 1 -name "android-sdk-*")
+SDK_PATH=${ANDROID_HOME:-$(find $prefix -maxdepth 1 -name "android-sdk")}
 NDK_PATH=$(find $prefix -maxdepth 1 -name "android-ndk-*")
 
 download_and_extract() {
@@ -52,35 +55,24 @@ download_and_extract() {
     fi
 
     echo " * Extracting $name..."
-    case ${local_file} in
-        *.zip)
-            unzip -qo -d "$prefix" "$local_file"
-            ;;
-        *.tgz|*.tar.gz)
-            (cd $prefix; tar -xzf "$local_file")
-            ;;
-        *.tar.bz2)
-            (cd $prefix; tar -xjf "$local_file")
-            ;;
-        *)
-            echo "Couldn't figure out how to extract $local_file" ! 1>&2
-            ;;
-    esac
+    unzip -qo -d "$prefix" "$local_file"
 }
 
 if [ -z "$SDK_PATH" ]; then
+    mkdir -p "$prefix/android-sdk/cmdline-tools"
     download_and_extract $SDK_URL
+    mv "$prefix/cmdline-tools" "$prefix/android-sdk/cmdline-tools/latest"
     # OS X doesn't know about realname, use basename instead.
-    SDK_PATH=$prefix/$(basename $prefix/android-sdk-*)
+    SDK_PATH=$prefix/$(basename $prefix/android-sdk)
 fi
 if [ -z "$NDK_PATH" ]; then
     download_and_extract $NDK_URL
     NDK_PATH=$prefix/$(basename $prefix/android-ndk-*)
 fi
 
-if [ -z "$(find $SDK_PATH/platforms -type d -name 'android-*')" ]; then
+if [ ! -d "$SDK_PATH/platforms/android-19" ] || [ ! -d "$SDK_PATH/build-tools/19.1.0" ]; then
     echo " * Installing Android platforms..."
-    $SDK_PATH/$ANDROID update sdk --no-ui --filter platform,platform-tool,tool
+    $SDK_PATH/$ANDROID --install "platforms;android-19" "build-tools;19.1.0"
 fi
 
 cat <<EOF

@@ -794,11 +794,16 @@ androidcc () {
         exit
     fi
     if [ -z "$ANDROID_NDK_PATH" ]; then
-        echo "ERROR: You need the Android NDK installed (r10e or higher) and have the ANDROID_NDK_PATH"
+        echo "ERROR: You need the Android NDK installed (r10e to r17) and have the ANDROID_NDK_PATH"
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
     make_toolchain="${ANDROID_NDK_PATH}/build/tools/make-standalone-toolchain.sh"
+    if [ ! -f "$make_toolchain" ]; then
+        echo "ERROR: You need the Android NDK installed (r10e to r17). Please note that"
+        echo "versions newer than r17 are not supported because they do not contain GCC."
+        exit
+    fi
 
     # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
     buildhost=$(uname | tr "[:upper:]" "[:lower:]")-x86_64
@@ -815,6 +820,7 @@ androidcc () {
     ANDROID_PLATFORM_VERSION=$1
     GCCOPTS="$GCCOPTS $3"
     gccchoice="4.9"
+    rm -rf "${pwd}/android-toolchain" # old toolchain must be removed before running script
     # arch dependant stuff
     case $ANDROID_ARCH in
         armeabi)

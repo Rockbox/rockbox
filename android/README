@@ -3,16 +3,16 @@ application for android.
 
 * Prerequisites
 
-Download and install the Android SDK[1] and NDK[2], or run installToolchain.sh.
-After you extracted the SDK, you need to run <sdk-dir>/tools/android in order to
+Download and install the Android SDK[1] and NDK r10e[2], or run installToolchain.sh.
+After you extracted the SDK, you need to run the SDKManager in order to
 install the actual platform sdk from the available packages tab (SDK Platform
-Android 1.5 or above should work).
+Android 4.4 should work).
 In the virtual devices tab you can also setup a emulator.
 
 
 Then, make sure you have the ANDROID_SDK_PATH and ANDROID_NDK_PATH (pointing to
 the each's root directory) environment variables set up, otherwise configure will fail to find the compiler and
-compiling the java files will fail.
+compiling the java files will fail. The installToolchain.sh script will provide reasonable values.
 
 * Build instructions
 
@@ -32,7 +32,5 @@ compiling the java files will fail.
    "$ANDROID_SDK_PATH/tools/adb install -r rockbox.apk"
 
 
-[1]: http://developer.android.com/sdk/index.html 
-[2]: http://developer.android.com/sdk/ndk/index.html
-[3]: http://asantoso.wordpress.com/2009/09/15/how-to-build-android-application-package-apk-from-the-command-line-using-the-sdk-tools-continuously-integrated-using-cruisecontrol/
-[4]: http://developer.android.com/sdk/installing.html
+[1]: https://developer.android.com/studio
+[2]: https://github.com/android/ndk/wiki/Unsupported-Downloads
