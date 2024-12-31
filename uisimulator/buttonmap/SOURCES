@@ -33,6 +33,8 @@ mrobe100.c
 cowon-d2.c
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 creative-zvm.c
+#elif CONFIG_KEYPAD == CREATIVEZV_PAD
+creative-zv.c
 #elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
 meizu-m6sl.c
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
