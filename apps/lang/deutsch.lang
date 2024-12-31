@@ -35,6 +35,7 @@
 # - Udo Schläpfer
 # - Johannes Rauh
 # - Wilfried Winkler
+# - Karl Huber
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -10725,23 +10726,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "~Line Out"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Analogausgang"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HOTKEY_WPS
   desc: hotkey menu
   user: core
@@ -16231,62 +16215,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Stereo-Umschaltmodus"
-  </dest>
-  <voice>
-    *: "Stereo-Umschaltmodus"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Umgekehrt"
-  </dest>
-  <voice>
-    *: "Umgekehrt"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Immer 0"
-  </dest>
-  <voice>
-    *: "Immer 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Immer 1"
-  </dest>
-  <voice>
-    *: "Immer 1"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LEGAL_NOTICES
   desc: in system menu
   user: core
@@ -16522,5 +16450,70 @@
   </dest>
   <voice>
     *: "Zeige Albumcover"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Ausgangsauswahl"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Ausgangsauswahl"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Kopfhörer"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Kopfhörer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Line Ausgang"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Line Ausgang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Schriftart konnte nicht geladen werden: (%s)"
+  </dest>
+  <voice>
+    *: "Titel gespeichert"
   </voice>
 </phrase>
