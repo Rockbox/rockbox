@@ -340,6 +340,7 @@ struct system_status
     int last_volume_change; /* tick the last volume change happened. skins use this */
     int font_id[NB_SCREENS]; /* font id of the settings font for each screen */
 
+    bool resume_modified; /* playlist is modified (=> warn before erase) */
 };
 
 struct user_settings
