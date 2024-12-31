@@ -570,7 +570,7 @@ size_t path_append_ex(char *buf, const char *basepath, size_t basepath_max,
         if (basepath_max < len) /*if needed truncate basepath to basepath_max */
         {
             len = basepath_max;
-            buf[basepath_max] = '\0';
+            buf[MIN(bufsize - 1, basepath_max)] = '\0';
         }
     }
 
