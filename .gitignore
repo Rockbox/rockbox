@@ -9,6 +9,7 @@
 *.a
 *~
 __pycache__
+.DS_STORE
 
 # Intermediate language files
 /apps/lang/*.update
@@ -131,6 +132,7 @@ __pycache__
 /tools/iaudio_bl_flash.h
 /tools/.vagrant
 /tools/*-console.log
+/tools/*.dSYM
 
 # /tools/database/
 /tools/database/database
