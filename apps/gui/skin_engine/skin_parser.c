@@ -1974,7 +1974,7 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
         goto abort;
 
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
-    int *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
+    int16_t *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
     while (list)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
@@ -2192,7 +2192,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 static bool skin_load_fonts(struct wps_data *data)
 {
     /* don't spit out after the first failue to aid debugging */
-    int id_array[MAXUSERFONTS];
+    int16_t id_array[MAXUSERFONTS];
     int font_count = 0;
     bool success = true;
     struct skin_element *vp_list;
@@ -2262,7 +2262,7 @@ static bool skin_load_fonts(struct wps_data *data)
     }
     if (font_count)
     {
-        int *font_ids = skin_buffer_alloc(font_count * sizeof(int));
+        int16_t *font_ids = skin_buffer_alloc(font_count * sizeof(font_ids[0]));
         if (!success || font_ids == NULL)
         {
             while (font_count > 0)
@@ -2273,7 +2273,7 @@ static bool skin_load_fonts(struct wps_data *data)
             data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL);
             return false;
         }
-        memcpy(font_ids, id_array, sizeof(int)*font_count);
+        memcpy(font_ids, id_array, sizeof(font_ids[0])*font_count);
         data->font_count = font_count;
         data->font_ids = PTRTOSKINOFFSET(skin_buffer, font_ids);
     }
