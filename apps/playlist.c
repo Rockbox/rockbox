@@ -476,11 +476,7 @@ static void update_playlist_filename_unlocked(struct playlist_info* playlist,
 static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
 {
     pl_close_playlist(playlist);
-
-    if(playlist->control_fd >= 0)
-    {
-        close(playlist->control_fd);
-    }
+    pl_close_control(playlist);
 
     playlist->filename[0] = '\0';
 
@@ -489,8 +485,6 @@ static void empty_playlist_unlocked(struct playlist_info* playlist, bool resume)
     playlist->utf8 = true;
     playlist->control_created = false;
     playlist->flags = 0;
-
-    playlist->control_fd = -1;
 
     playlist->index = 0;
     playlist->first_index = 0;
@@ -1941,10 +1935,16 @@ void playlist_init(void)
     mutex_init(&current_playlist.mutex);
     mutex_init(&on_disk_playlist.mutex);
 
-    strmemccpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
-            sizeof(playlist->control_filename));
-    playlist->fd = -1;
-    playlist->control_fd = -1;
+    strmemccpy(current_playlist.control_filename, PLAYLIST_CONTROL_FILE,
+               sizeof(current_playlist.control_filename));
+
+    strmemccpy(on_disk_playlist.control_filename, PLAYLIST_CONTROL_FILE ".tmp",
+               sizeof(on_disk_playlist.control_filename));
+
+    current_playlist.fd = -1;
+    on_disk_playlist.fd = -1;
+    current_playlist.control_fd = -1;
+    on_disk_playlist.control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
 
     handle = core_alloc_ex(playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
@@ -2018,7 +2018,8 @@ size_t playlist_get_index_bufsz(size_t max_sz)
 
 /*
  * Load a playlist off disk for viewing/editing.
- * Make sure to close a previously loaded playlist before calling this again!
+ * This will close a previously loaded playlist and its control file,
+ * if one has been left open.
  *
  * The index_buffer is used to store playlist indices. If no index buffer is
  * provided, the current playlist's index buffer is shared.
@@ -2033,16 +2034,6 @@ struct playlist_info* playlist_load(const char* dir, const char* file,
                                     void* temp_buffer, int temp_buffer_size)
 {
     struct playlist_info* playlist = &on_disk_playlist;
-
-    /* Initialize playlist structure */
-    int r = rand() % 10;
-
-    /* Use random name for control file */
-    snprintf(playlist->control_filename, sizeof(playlist->control_filename),
-             "%s.%d", PLAYLIST_CONTROL_FILE, r);
-    playlist->fd = -1;
-    playlist->control_fd = -1;
-
     if (index_buffer)
     {
         int num_indices = index_buffer_size / sizeof(*playlist->indices);
@@ -3581,7 +3572,10 @@ int playlist_set_current(struct playlist_info* playlist)
     int result = -1;
 
     if (!playlist || (check_control(playlist) < 0))
+    {
+        playlist_close(playlist);
         return result;
+    }
 
     dc_thread_stop(&current_playlist);
     playlist_write_lock(&current_playlist);
@@ -3592,7 +3586,10 @@ int playlist_set_current(struct playlist_info* playlist)
         sizeof(current_playlist.filename));
 
     current_playlist.utf8 = playlist->utf8;
+
+    /* Transfer ownership of fd to current playlist */
     current_playlist.fd = playlist->fd;
+    playlist->fd = -1;
 
     pl_close_control(playlist);
     pl_close_control(&current_playlist);

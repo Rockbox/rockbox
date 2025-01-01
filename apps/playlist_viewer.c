@@ -1066,12 +1066,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                 struct playlist_entry * current_track =
                             playlist_buffer_get_track(&viewer.buffer,
                                                       viewer.selected_track);
-
+                int ret_val;
                 if (viewer.moving_track >= 0)
                 {
                     /* Move track */
-                    int ret_val;
-
                     ret_val = playlist_move(viewer.playlist,
                                             viewer.moving_playlist_index,
                                             current_track->index);
@@ -1108,7 +1106,12 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
                         break;
                     }
                     /* New playlist */
-                    if (playlist_set_current(viewer.playlist) < 0)
+                    ret_val = playlist_set_current(viewer.playlist);
+
+                    /* Playlist effectively closed */
+                    viewer.playlist = NULL;
+
+                    if (ret_val < 0)
                         goto exit;
                     if (global_settings.playlist_shuffle)
                         start_index = playlist_shuffle(current_tick, start_index);
