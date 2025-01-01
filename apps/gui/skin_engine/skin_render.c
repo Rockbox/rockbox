@@ -18,7 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,7 +50,7 @@
 #include "misc.h"
 #include "list.h"
 #include "wps.h"
-
+#include "strmemccpy.h"
 
 #define MAX_LINE 1024
 
@@ -106,19 +105,15 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
     switch (token->type)
     {
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+        case SKIN_TOKEN_VIEWPORT_BGCOLOUR:
         case SKIN_TOKEN_VIEWPORT_FGCOLOUR:
         {
             struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             if (!col) return false;
-            skin_vp->vp.fg_pattern = col->colour;
-            skin_vp->fgbg_changed = true;
-        }
-        break;
-        case SKIN_TOKEN_VIEWPORT_BGCOLOUR:
-        {
-            struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-            if (!col) return false;
-            skin_vp->vp.bg_pattern = col->colour;
+            if (token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR)
+                skin_vp->vp.fg_pattern = col->colour;
+            else
+                skin_vp->vp.bg_pattern = col->colour;
             skin_vp->fgbg_changed = true;
         }
         break;
@@ -294,19 +289,22 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_ALBUMART
         case SKIN_TOKEN_ALBUMART_DISPLAY:
         {
-            struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, data->albumart);
             /* now draw the AA */
-            if (do_refresh && aa)
+            if (do_refresh)
             {
-                int handle = playback_current_aa_hid(data->playback_aa_slot);
+                struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, data->albumart);
+                if (aa)
+                {    
+                    int handle = playback_current_aa_hid(data->playback_aa_slot);
 #if CONFIG_TUNER
-                if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
-                {
-                    struct dim dim = {aa->width, aa->height};
-                    handle = radio_get_art_hid(&dim);
-                }
+                    if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
+                    {
+                        struct dim dim = {aa->width, aa->height};
+                        handle = radio_get_art_hid(&dim);
+                    }
 #endif
-                aa->draw_handle = handle;
+                    aa->draw_handle = handle;
+                }
             }
             break;
         }
@@ -433,26 +431,29 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                             {
                                 skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
                                 skin_backdrop_show(-1);
-                                gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
-                                gwps->display->clear_viewport();
-                                gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
+                            }
+
+                            gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
+                            gwps->display->clear_viewport();
+                            gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
+
+                            if (skin_viewport->output_to_backdrop_buffer)
+                            {
                                 skin_backdrop_set_buffer(-1, skin_viewport);
                                 skin_backdrop_show(data->backdrop_id);
                             }
-                            else
+#else
+                            gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
+                            gwps->display->clear_viewport();
+                            gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
 #endif
-                            {
-                                gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
-                                gwps->display->clear_viewport();
-                                gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
-                            }
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
                         }
                     }
                 }
             }
 #ifdef HAVE_ALBUMART
-            else if (data->albumart && token->type == SKIN_TOKEN_ALBUMART_DISPLAY)
+            else if (token->type == SKIN_TOKEN_ALBUMART_DISPLAY && data->albumart)
             {
                 draw_album_art(gwps,
                         playback_current_aa_hid(data->playback_aa_slot), true);
@@ -473,33 +474,29 @@ static void fix_line_alignment(struct skin_draw_info *info, struct skin_element 
     {
         case SKIN_TOKEN_ALIGN_LEFT:
             align->left = next_pos;
-            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_LEFT_RTL:
             if (UNLIKELY(lang_is_rtl()))
                 align->right = next_pos;
             else
                 align->left = next_pos;
-            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_CENTER:
             align->center = next_pos;
-            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_RIGHT:
             align->right = next_pos;
-            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_RIGHT_RTL:
             if (UNLIKELY(lang_is_rtl()))
                 align->left = next_pos;
             else
                 align->right = next_pos;
-            info->cur_align_start = next_pos;
             break;
         default:
             return;
     }
+    info->cur_align_start = next_pos;
     *cur_pos = '\0';
     *next_pos = '\0';
 }
@@ -547,11 +544,13 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                     if (last_value >= 0 && value != last_value && last_value < child->children_count)
                         do_tags_in_hidden_conditional(get_child(child->children, last_value), info);
                 }
-                if (get_child(child->children, value)->type == LINE_ALTERNATOR)
+
+                struct skin_element* se_child =  get_child(child->children, value);
+                if (se_child->type == LINE_ALTERNATOR)
                 {
                     func = skin_render_alternator;
                 }
-                else if (get_child(child->children, value)->type == LINE)
+                else if (se_child->type == LINE)
                     func = skin_render_line;
 
                 if (value != last_value)
@@ -560,7 +559,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                     info->force_redraw = true;
                 }
 
-                if (func(get_child(child->children, value), info))
+                if (func(se_child, info))
                     needs_update = true;
                 else
                     needs_update = needs_update || (last_value != value);
@@ -568,7 +567,6 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 info->refresh_type = old_refresh_mode;
                 break;
             case TAG:
-
                 if (child->tag->flags & NOBREAK)
                     info->no_line_break = true;
                 if (child->tag->type == SKIN_TOKEN_SUBLINE_SCROLL)
@@ -580,12 +578,16 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 {
                     break;
                 }
+
                 if (!do_non_text_tags(info->gwps, info, child))
                 {
-                    static char tempbuf[128];
-                    const char *valuestr = get_token_value(info->gwps, SKINOFFSETTOPTR(skin_buffer, child->data),
-                                                        info->offset, tempbuf,
-                                                        sizeof(tempbuf), NULL);
+                    size_t used = strlen(info->cur_align_start);
+                    char *bufstart = info->cur_align_start + used;
+                    size_t bufsz = info->buf_size - used;
+
+                    const char *valuestr = get_token_value(info->gwps,
+                                               SKINOFFSETTOPTR(skin_buffer, child->data),
+                                               info->offset, bufstart, bufsz, NULL);
                     if (valuestr)
                     {
 #if CONFIG_RTC
@@ -594,9 +596,13 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
 #endif
                         needs_update = needs_update ||
                                 ((child->tag->flags&info->refresh_type)!=0);
-                        strlcat(info->cur_align_start, valuestr,
-                                info->buf_size - (info->cur_align_start-info->buf));
+                        if (valuestr != bufstart)
+                        {
+                            strmemccpy(bufstart, valuestr, bufsz);
+                        }
                     }
+                    else
+                        bufstart[0] = '\0';
                 }
                 break;
             case TEXT:
@@ -699,9 +705,11 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
             try_line++;
             if (try_line >= element->children_count)
                 try_line = 0;
-            if (get_child(element->children, try_line)->children_count != 0)
+
+            struct skin_element* child =  get_child(element->children, try_line);
+            if (child->children_count != 0)
             {
-                current_line = get_child(element->children, try_line);
+                current_line = child;
                 rettimeout = get_subline_timeout(info->gwps,
                                     get_child(current_line->children, 0));
                 if (rettimeout > 0)
@@ -814,9 +822,11 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         if (refresh_type && (needs_update || update_all))
         {
             if (info.force_redraw)
+            {
+                int h = display->getcharheight();
                 display->scroll_stop_viewport_rect(&skin_viewport->vp,
-                    0, info.line_number*display->getcharheight(),
-                    skin_viewport->vp.width, display->getcharheight());
+                    0, info.line_number*h, skin_viewport->vp.width, h);
+            }
             write_line(display, align, info.line_number,
                     info.line_scrolls, &info.line_desc);
         }
@@ -1003,9 +1013,11 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         {
             struct viewport *vp = &skin_viewport->vp;
             if (!info.force_redraw)
+            {
+                int h = display->getcharheight();
                 display->scroll_stop_viewport_rect(vp,
-                    0, info.line_number*display->getcharheight(),
-                    vp->width, display->getcharheight());
+                    0, info.line_number*h, vp->width, h);
+            }
             write_line(display, align, info.line_number,
                     info.line_scrolls, &info.line_desc);
         }
