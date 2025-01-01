@@ -37,24 +37,25 @@ typedef unsigned chartype;
 char* strcasestr (const char* haystack, const char* needle)
 {
     const char* match, *needle_search;
-    chartype needle_ch, needle_upch, ch_h;
-
+    chartype needle_ch, ch_h;
+    chartype first_ch, first_upch;
     if (*needle == 0) /* if needle empty return haystack */
         return (char*)haystack;
 
+    first_ch = tolower(*needle++); /*store first & step to 2nd needle character */
+    first_upch = toupper(first_ch);
+
     while(1)
     {
-        needle_search = needle;
-        needle_ch = tolower(*needle_search++);
-        needle_upch = toupper(needle_ch);
         /* find the first matching character */
         do
         {
             ch_h = *haystack++;
             if (ch_h == 0) /* end of haystack no match.. */
                 return NULL;
-        } while (ch_h != needle_ch && ch_h != needle_upch);
-        match = haystack;
+        } while (ch_h != first_ch && ch_h != first_upch);
+        match = haystack; /* keep progress thru haystack */
+        needle_search = needle; /* reset needle to second character */
         goto case_match;
 
         /* find the first non-matching character */
@@ -66,10 +67,9 @@ case_match:
             if (needle_ch == 0) /* end of needle, found match.. */
                 return (char*)haystack - 1;
         }
-        needle_upch = toupper(needle_ch);
-        if (ch_h == needle_upch)
+        needle_ch = toupper(needle_ch);
+        if (ch_h == needle_ch)
             goto case_match;
-        haystack = match;
     }
 }
 #else
