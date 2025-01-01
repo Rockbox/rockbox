@@ -34,13 +34,14 @@
 static struct skin_backdrop {
     char name[MAX_PATH];
     char *buffer;
-    enum screen_type screen;
-    bool loaded;
     int buflib_handle;
     int ref_count;
+    bool initialized;
+    bool loaded;
+    bool UNUSED_;
+    int8_t screen;
 } backdrops[NB_BDROPS];
 
-#define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
 static int current_lcd_backdrop[NB_SCREENS];
 
 bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *size)
@@ -52,7 +53,7 @@ bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *siz
     *path = backdrops[index].name;
     *ref_count = backdrops[index].ref_count;
 
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) /* HAVE_REMOTE_LCD */
     enum screen_type screen = backdrops[index].screen;
     if (screen == SCREEN_REMOTE)
         *size = REMOTE_LCD_BACKDROP_BYTES;
@@ -74,28 +75,28 @@ static int buflib_move_callback(int handle, void* current, void* new)
             break;
         }
     }
-    FOR_NB_SCREENS(i)
-        skin_backdrop_show(current_lcd_backdrop[i]);
+    FOR_NB_SCREENS(n)
+        skin_backdrop_show(current_lcd_backdrop[n]);
     return BUFLIB_CB_OK;
 }
 static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
-static bool first_go = true;
+
 bool skin_backdrop_init(void)
 {
-    bool go_status = first_go;
-    if (first_go)
+    bool go_status = !backdrops[0].initialized;
+    if (go_status)
     {
         for (int i=0; i<NB_BDROPS; i++)
         {
             backdrops[i].buflib_handle = -1;
             backdrops[i].name[0] = '\0';
             backdrops[i].buffer = NULL;
+            backdrops[i].initialized = true;
             backdrops[i].loaded = false;
             backdrops[i].ref_count = 0;
         }
         FOR_NB_SCREENS(i)
             current_lcd_backdrop[i] = -1;
-        first_go = false;
     }
     return go_status;
 }
@@ -129,7 +130,11 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
             free = i;
             break;
         }
+#if !defined(HAVE_REMOTE_LCD)
+        else if (!strcmp(backdrops[i].name, filename))
+#else /* HAVE_REMOTE_LCD */
         else if (!strcmp(backdrops[i].name, filename) && backdrops[i].screen == screen)
+#endif
         {
             backdrops[i].ref_count++;
             break;
@@ -139,7 +144,11 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
     {
         strmemccpy(backdrops[free].name, filename, MAX_PATH);
         backdrops[free].buffer = NULL;
+#if defined(HAVE_REMOTE_LCD)
         backdrops[free].screen = screen;
+#else /* HAVE_REMOTE_LCD */
+        (void) screen;
+#endif
         backdrops[free].ref_count = 1;
         return free;
     }
@@ -158,8 +167,10 @@ bool skin_backdrops_preload(void)
         if (backdrops[i].name[0] && !backdrops[i].buffer)
         {
             size_t buf_size;
-            enum screen_type screen = backdrops[i].screen;
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+
+            enum screen_type screen = SCREEN_MAIN;
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) /* HAVE_REMOTE_LCD */
+            screen = backdrops[i].screen;
             if (screen == SCREEN_REMOTE)
                 buf_size = REMOTE_LCD_BACKDROP_BYTES;
             else
@@ -222,9 +233,9 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
         return;
     }
 
-    enum screen_type screen = backdrops[backdrop_id].screen;
-    svp->framebuf.ch_ptr = backdrops[backdrop_id].buffer;
-#if defined(HAVE_REMOTE_LCD)
+    enum screen_type screen = SCREEN_MAIN;
+#if defined(HAVE_REMOTE_LCD) /* HAVE_REMOTE_LCD */
+    screen = backdrops[backdrop_id].screen;
     if (screen == SCREEN_REMOTE)
         svp->framebuf.elems = REMOTE_LCD_BACKDROP_BYTES / sizeof(fb_remote_data);
     else
@@ -232,6 +243,7 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
     {
         svp->framebuf.elems = LCD_BACKDROP_BYTES / sizeof(fb_data);
     }
+    svp->framebuf.ch_ptr = backdrops[backdrop_id].buffer;
     svp->framebuf.stride = 0; /* default stride */
     svp->framebuf.get_address_fn = NULL; /*Default iterator*/
     screens[screen].viewport_set_buffer(&svp->vp, &svp->framebuf);
@@ -245,7 +257,12 @@ void skin_backdrop_show(int backdrop_id)
         current_lcd_backdrop[0] = -1;
         return;
     }
+#if !defined(HAVE_REMOTE_LCD)
+    enum screen_type screen = SCREEN_MAIN;
+#else /* HAVE_REMOTE_LCD */
     enum screen_type screen = backdrops[backdrop_id].screen;
+#endif
+
     if ((backdrops[backdrop_id].loaded == false) ||
         (backdrops[backdrop_id].name[0] == '-' &&
         backdrops[backdrop_id].name[2] == '\0'))
@@ -279,7 +296,11 @@ void skin_backdrop_load_setting(void)
     int i;
     for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
     {
+#if !defined(HAVE_REMOTE_LCD)
+        if (backdrops[i].name[0] == '-')
+#else /* HAVE_REMOTE_LCD */
         if (backdrops[i].name[0] == '-' && backdrops[i].screen == SCREEN_MAIN)
+#endif
         {
             if (global_settings.backdrop_file[0] &&
                 global_settings.backdrop_file[0] != '-')
