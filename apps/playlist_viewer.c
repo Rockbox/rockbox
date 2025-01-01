@@ -349,18 +349,16 @@ static bool update_playlist(bool force)
         viewer.num_tracks = nb_tracks;
         if (viewer.num_tracks <= 0)
         {
-            global_status.resume_index = -1;
-            global_status.resume_offset = -1;
-            global_status.resume_elapsed = -1;
+            if (!viewer.playlist)
+                playlist_update_resume_info(NULL);
             return false;
         }
         playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
                           viewer.selected_track);
         if (viewer.buffer.num_loaded <= 0)
         {
-            global_status.resume_index = -1;
-            global_status.resume_offset = -1;
-            global_status.resume_elapsed = -1;
+            if (!viewer.playlist)
+                playlist_update_resume_info(NULL);
             return false;
         }
     }
