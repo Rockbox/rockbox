@@ -31,6 +31,7 @@
 #include "power.h"
 #include "system.h"
 #include "logf.h"
+#include "rbversion.h"
 
 #ifdef HAVE_RB_BACKTRACE
 #include "gcc_extensions.h"
@@ -109,7 +110,7 @@ void panicf( const char *fmt, ...)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    lcd_puts(1, y++, (unsigned char *)"*PANIC*");
+    lcd_puts(1, y++, (unsigned char *) "*PANIC* (" RBVERSION ")");
     {
         /* wrap panic line */
         int i, len = strlen(panic_buf);
@@ -138,7 +139,7 @@ void panicf( const char *fmt, ...)
         cpu_boost_unlock();
     }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
-    
+
 #ifdef HAVE_ATA_POWER_OFF
     ide_power_enable(false);
 #endif
