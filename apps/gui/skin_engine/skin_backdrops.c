@@ -39,7 +39,7 @@ static struct skin_backdrop {
     bool initialized;
     bool loaded;
     bool UNUSED_;
-    int8_t screen;
+    uint8_t screen;
 } backdrops[NB_BDROPS];
 
 static int current_lcd_backdrop[NB_SCREENS];
