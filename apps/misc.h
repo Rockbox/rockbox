@@ -256,8 +256,22 @@ void pop_current_activity(void);
 void pop_current_activity_without_refresh(void);
 enum current_activity get_current_activity(void);
 
-/* format a sound value like: -1.05 dB */
-int format_sound_value(char *buf, size_t len, int snd, int val);
+/* Format a sound value like: "-1.05 dB"    (negative values)
+ *                            " 1.05 dB"    (positive values include leading space)
+ */
+void format_sound_value(char *buf, size_t buf_sz, int snd, int val);
+
+/* Set skin_token parameter to true to format a sound value for
+ * display in themes, like:   "-1.05"       (negative values)
+ *                            "1.05"        (positive values without leading space)
+ *
+ * (The new formatting includes a unit based on the AUDIOHW_SETTING
+ * definition -- on all targets, it's defined to be "dB". But the
+ * old formatting was just an integer value, and many themes append
+ * "dB" manually. So we need to strip the unit to unbreak all those
+ * existing themes.)
+ */
+void format_sound_value_ex(char *buf, size_t buf_sz, int snd, int val, bool skin_token);
 
 #ifndef PLUGIN
 enum core_load_bmp_error

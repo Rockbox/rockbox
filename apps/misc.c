@@ -1167,8 +1167,7 @@ void replaygain_update(void)
     dsp_replaygain_set_settings(&settings);
 }
 
-/* format a sound value like: -1.05 dB */
-int format_sound_value(char *buf, size_t size, int snd, int val)
+void format_sound_value_ex(char *buf, size_t buf_sz, int snd, int val, bool skin_token)
 {
     int numdec = sound_numdecimals(snd);
     const char *unit = sound_unit(snd);
@@ -1183,8 +1182,15 @@ int format_sound_value(char *buf, size_t size, int snd, int val)
     unsigned int av = abs(physval);
     unsigned int i = av / factor;
     unsigned int d = av - i*factor;
-    return snprintf(buf, size, "%c%u%.*s%.*u %s", " -"[physval < 0],
-                    i, numdec, ".", numdec, d, unit);
+
+    snprintf(buf, buf_sz, "%s%u%.*s%.*u%s%s", physval < 0 ? "-" : &" "[skin_token],
+             i, numdec, ".", numdec, d, &" "[skin_token], skin_token ? "" : unit);
+}
+
+/* format a sound value as "-1.05 dB", or " 1.05 dB" */
+void format_sound_value(char *buf, size_t buf_sz, int snd, int val)
+{
+    format_sound_value_ex(buf, buf_sz, snd, val, false);
 }
 
 #endif /* !defined(__PCTOOL__) */
