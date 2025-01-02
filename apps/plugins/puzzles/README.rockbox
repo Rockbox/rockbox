@@ -2,18 +2,23 @@ Introduction
 ============
 
 This is the readme for the Rockbox port of Simon Tatham's Portable
-Puzzle Collection.
+Puzzle Collection. The port was originally done by Franklin Wei in
+2017, and has been regularly maintained since then to remain in sync
+with Simon's upstream sources.
 
 Source structure
 ================
 
-Most of the upstream files in src/ are essentially untouched, apart
-from some minor adjustments to make them compile and run happily on
-Rockbox. The majority of the rockbox-specific code is found in
-rockbox.c, with some minor stuff in rbwrappers.c and rbmalloc.c.
+The upstream source files reside in src/. As of 2024, these sources
+are bit-for-bit identical to Simon's upstream sources. The
+Rockbox-specific code in the parent puzzles/ directory provides a set
+of shims (rbcompat.h, rbwrappers.c), which emulate missing parts of
+the standard library to enable the upstream puzzles code to work
+happily on Rockbox. The implementation of the Rockbox frontend resides
+in rockbox.c.
 
 NOTE: the build makefile (puzzles.make) automatically includes
-`rbcompat.h` when compiling! Check there when things break.
+`rbcompat.h` when compiling! Check there if things break.
 
 Help feature
 ============
@@ -33,14 +38,14 @@ As of 2024, Simon's tree is located at:
 
 https://git.tartarus.org/?p=simon/puzzles.git
 
-For a long time (i.e. 2017-2024), our version of the puzzles tree
-contained several modifications by myself (notably cursor interfaces
-to Untangle and Palisade). These divergent changes complicated
-maintenance of this port, as merge conflicts often arose when upstream
-changes to these games conflicted with our changes. To remedy this, I
-sent most of these patches back upstream in summer 2024, and since
-then, Simon has merged them into his repo. We are now able to run with
-a fully unmodified puzzles source tree.
+For a long time (2017-2024), our version of the puzzles tree contained
+several patches to make certain games playable on Rockbox (notably
+cursor interfaces to Untangle and Palisade). These divergent changes
+complicated maintenance of the port, as merge conflicts often arose
+when upstream changes to these games conflicted with ours. To remedy
+this, I sent most of these patches back upstream in summer 2024, and
+since then, Simon has merged them into his repo. We are now able to
+run with a fully unmodified puzzles source tree.
 
 Maintenance
 ===========
@@ -108,3 +113,5 @@ August 2024: Resync to ee5e327 (branched from Simon's
 
 August 2024: Resync to Simon's 262f709 (unmodified). Uses new scanline
 polygon filling algorithm. Updates drawing API.
+
+January 2024: Resync to Simon's XXXXXXX (TBD). Cleans up resync.sh.
