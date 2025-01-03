@@ -638,8 +638,14 @@ static void close_playlist_viewer(void)
         if (viewer.initial_selection)
             *(viewer.initial_selection) = viewer.selected_track;
 
-        if(playlist_modified(viewer.playlist) && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
-            save_playlist_screen(viewer.playlist);
+        if(playlist_modified(viewer.playlist))
+        {
+            if (viewer.num_tracks && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
+                save_playlist_screen(viewer.playlist);
+            else if (!viewer.num_tracks &&
+                     confirm_delete_yesno(viewer.playlist->filename) == YESNO_YES)
+                remove(viewer.playlist->filename);
+        }
         playlist_close(viewer.playlist);
     }
 }
