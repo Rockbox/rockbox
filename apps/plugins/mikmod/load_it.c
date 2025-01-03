@@ -76,6 +76,7 @@ typedef struct ITHEADER {
 
 /* sample information */
 typedef struct ITSAMPLE {
+	UBYTE	id[4];		/* 'IMPS' */
 	CHAR	filename[12];
 	UBYTE	zerobyte;
 	UBYTE	globvol;
@@ -102,6 +103,7 @@ typedef struct ITSAMPLE {
 #define ITENVCNT 25
 #define ITNOTECNT 120
 typedef struct ITINSTHEADER {
+	UBYTE	id[4];			/* 'IMPI' */
 	ULONG	size;			/* (dword) Instrument size */
 	CHAR	filename[12];	/* (char) Instrument filename */
 	UBYTE	zerobyte;		/* (byte) Instrument type (always 0) */
@@ -194,8 +196,8 @@ static int IT_Init(void)
 	if(!(mh=(ITHEADER*)MikMod_malloc(sizeof(ITHEADER)))) return 0;
 	if(!(poslookup=(UBYTE*)MikMod_malloc(256*sizeof(UBYTE)))) return 0;
 	if(!(itpat=(ITNOTE*)MikMod_malloc(200*64*sizeof(ITNOTE)))) return 0;
-	if(!(mask=(UBYTE*)MikMod_malloc(64*sizeof(UBYTE)))) return 0;
-	if(!(last=(ITNOTE*)MikMod_malloc(64*sizeof(ITNOTE)))) return 0;
+	if(!(mask=(UBYTE*)MikMod_calloc(64,sizeof(UBYTE)))) return 0;
+	if(!(last=(ITNOTE*)MikMod_calloc(64,sizeof(ITNOTE)))) return 0;
 
 	return 1;
 }
@@ -277,7 +279,10 @@ static UBYTE* IT_ConvertTrack(ITNOTE* tr,UWORD numrows)
 				UniNote(note);
 		}
 
-		if((ins)&&(ins<100))
+		/* Impulse Tracker only allows up to 99 instruments and crashes when it
+		   encounters instruments >=100. But the file format supports them just
+		   fine and there are many MPT-created ITs with that many instruments. */
+		if((ins)&&(ins<253))
 			UniInstrument(ins-1);
 		else if(ins==253)
 			UniWriteByte(UNI_KEYOFF);
@@ -632,7 +637,16 @@ static int IT_Load(int curious)
 		ITSAMPLE s;
 
 		/* seek to sample position */
-		_mm_fseek(modreader,(long)(paraptr[mh->insnum+t]+4),SEEK_SET);
+		_mm_fseek(modreader,(long)(paraptr[mh->insnum+t]),SEEK_SET);
+		if(!_mm_read_UBYTES(s.id,4,modreader)||
+		   memcmp(s.id,"IMPS",4) != 0) {
+			/* no error so that use-brdg.it and use-funk.it
+			 * to load correctly (both IT 2.04) (from libxmp) */
+#ifdef MIKMOD_DEBUG
+			fprintf(stderr,"Bad magic in sample %d\n",t);
+#endif
+			continue;
+		}
 
 		/* load sample info */
 		_mm_read_string(s.filename,12,modreader);
@@ -702,7 +716,8 @@ static int IT_Load(int curious)
 		if(s.flag&16) q->flags|=SF_LOOP;
 		if(s.flag&64) q->flags|=SF_BIDI;
 
-		if(mh->cwt>=0x200) {
+		if(s.convert==0xff) q->flags|=SF_ADPCM4|SF_SIGNED; /* MODPlugin ADPCM */
+		else if(mh->cwt>=0x200) {
 			if(s.convert&1) q->flags|=SF_SIGNED;
 			if(s.convert&4) q->flags|=SF_DELTA;
 		}
@@ -719,7 +734,12 @@ static int IT_Load(int curious)
 			ITINSTHEADER ih;
 
 			/* seek to instrument position */
-			_mm_fseek(modreader,paraptr[t]+4,SEEK_SET);
+			_mm_fseek(modreader,paraptr[t],SEEK_SET);
+			if(!_mm_read_UBYTES(ih.id,4,modreader)||
+			   memcmp(ih.id,"IMPI",4) != 0) {
+				_mm_errno = MMERR_LOADING_SAMPLEINFO;
+				return 0;
+			}
 
 			/* load instrument info */
 			_mm_read_string(ih.filename,12,modreader);
@@ -988,8 +1008,6 @@ static int IT_Load(int curious)
 	if(!AllocTracks()) return 0;
 
 	for(t=0;t<of.numpat;t++) {
-		UWORD packlen;
-
 		/* seek to pattern position */
 		if(!paraptr[mh->insnum+mh->smpnum+t]) { /* 0 -> empty 64 row pattern */
 			of.pattrows[t]=64;
@@ -1002,8 +1020,7 @@ static int IT_Load(int curious)
 			}
 		} else {
 			_mm_fseek(modreader,((long)paraptr[mh->insnum+mh->smpnum+t]),SEEK_SET);
-			packlen=_mm_read_I_UWORD(modreader);
-			(void)packlen; /* unused */
+			(void) _mm_read_I_UWORD(modreader);			/* packlen */
 			of.pattrows[t]=_mm_read_I_UWORD(modreader);
 			_mm_read_I_ULONG(modreader);
 			if(!IT_ReadPattern(of.pattrows[t])) return 0;

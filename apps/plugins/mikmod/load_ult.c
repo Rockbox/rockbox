@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
-
   Ultratracker (ULT) module loader
 
 ==============================================================================*/
@@ -183,17 +181,19 @@ static int ULT_Load(int curious)
 		}
 
 		q->samplename=DupStr(s.samplename,32,1);
-		/* The correct formula for the coefficient would be
-		   pow(2,(double)s.finetume/OCTAVE/32768), but to avoid floating point
-		   here, we'll use a first order approximation here.
+		/* The correct formula would be
+		   s.speed * pow(2, (double)s.finetune / (OCTAVE * 32768))
+		   but to avoid libm, we'll use a first order approximation.
 		   1/567290 == Ln(2)/OCTAVE/32768 */
-		q->speed=s.speed+s.speed*(((SLONG)s.speed*(SLONG)s.finetune)/567290);
+		if(!s.finetune) q->speed = s.speed;
+		else q->speed= s.speed*((double)s.finetune/567290.0 + 1.0);
 		q->length    = s.sizeend-s.sizestart;
 		q->volume    = s.volume>>2;
 		q->loopstart = s.loopstart;
 		q->loopend   = s.loopend;
 		q->flags = SF_SIGNED;
 		if(s.flags&ULTS_LOOP) q->flags|=SF_LOOP;
+		else q->loopstart = q->loopend = 0;
 		if(s.flags&ULTS_16BITS) {
 			s.sizeend+=(s.sizeend-s.sizestart);
 			s.sizestart<<=1;
@@ -246,6 +246,11 @@ static int ULT_Load(int curious)
 
 	for(t=0;t<of.numtrk;t++) {
 		int rep,row=0;
+		/* FIXME: unrolling continuous portamento is a HACK and needs to
+		 * be replaced with a real continuous effect. This implementation
+		 * breaks when tone portamento continues between patterns. See
+		 * discussion in https://github.com/sezero/mikmod/pull/40 . */
+		int continuePortaToNote = 0;
 
 		UniReset();
 		while(row<64) {
@@ -261,14 +266,22 @@ static int ULT_Load(int curious)
 				int offset;
 
 				if(ev.sample) UniInstrument(ev.sample-1);
-				if(ev.note)   UniNote(ev.note+2*OCTAVE-1);
+				if(ev.note) {
+					UniNote(ev.note+2*OCTAVE-1);
+					continuePortaToNote = 0;
+				}
 
 				/* first effect - various fixes by Alexander Kerkhove and
 				                  Thomas Neumann */
 				eff = ev.eff>>4;
+
+				if (continuePortaToNote && (eff != 0x3) && ((ev.eff & 0xf) != 0x3))
+					UniEffect(UNI_ITEFFECTG, 0);
+
 				switch(eff) {
 					case 0x3: /* tone portamento */
 						UniEffect(UNI_ITEFFECTG,ev.dat2);
+						continuePortaToNote = 1;
 						break;
 					case 0x5:
 						break;
@@ -293,6 +306,7 @@ static int ULT_Load(int curious)
 				switch(eff) {
 					case 0x3: /* tone portamento */
 						UniEffect(UNI_ITEFFECTG,ev.dat1);
+						continuePortaToNote = 1;
 						break;
 					case 0x5:
 						break;
@@ -343,6 +357,5 @@ MIKMODAPI MLOADER load_ult={
 	ULT_Cleanup,
 	ULT_LoadTitle
 };
-
 
 /* ex:set ts=4: */

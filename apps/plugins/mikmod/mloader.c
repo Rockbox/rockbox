@@ -115,18 +115,20 @@ MIKMODAPI void MikMod_RegisterLoader(struct MLOADER* ldr)
 int ReadComment(UWORD len)
 {
 	if(len) {
-		int i;
+		CHAR *ptr;
 
-		if(!(of.comment=(CHAR*)MikMod_malloc(len+1))) return 0;
+		of.comment=(CHAR*)MikMod_calloc(1,len+1);
+		if(!of.comment) return 0;
 		_mm_read_UBYTES(of.comment,len,modreader);
 
 		/* translate IT linefeeds */
-		for(i=0;i<len;i++)
-			if(of.comment[i]=='\r') of.comment[i]='\n';
-
-		of.comment[len]=0;	/* just in case */
+		ptr=of.comment;
+		while(*ptr) {
+			if(*ptr=='\r') *ptr='\n';
+			++ptr;
+		}
 	}
-	if(!of.comment[0]) {
+	if(of.comment && !of.comment[0]) {
 		MikMod_free(of.comment);
 		of.comment=NULL;
 	}
@@ -142,16 +144,17 @@ int ReadLinedComment(UWORD len,UWORD linelen)
 	if (!linelen) return 0;
 	if (!len) return 1;
 
-	if (!(buf = (CHAR *) MikMod_malloc(len))) return 0;
 	numlines = (len + linelen - 1) / linelen;
 	cnt = (linelen + 1) * numlines;
-	if (!(storage = (CHAR *) MikMod_malloc(cnt + 1))) {
+	buf = (CHAR *) MikMod_calloc(1, len);
+	if (!buf) return 0;
+	storage = (CHAR *) MikMod_calloc(1, cnt + 1);
+	if (!storage) {
 		MikMod_free(buf);
 		return 0;
 	}
 
 	_mm_read_UBYTES(buf,len,modreader);
-	storage[cnt] = 0;
 	for (line = 0, fpos = 0, cpos = 0; line < numlines; line++, fpos += linelen, cpos += (linelen + 1))
 	{
 		cnt = len - fpos;

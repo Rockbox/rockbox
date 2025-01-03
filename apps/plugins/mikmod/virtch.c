@@ -20,19 +20,14 @@
 
 /*==============================================================================
 
-  $Id$
-
   Sample mixing routines, using a 32 bits mixing buffer.
-
-==============================================================================*/
-
-/*
 
   Optional features include:
     (a) 4-step reverb (for 16 bit output only)
     (b) Interpolation of sample data during mixing
     (c) Dolby Surround Sound
-*/
+
+==============================================================================*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -129,7 +124,7 @@ static	SLONG *RVbufR1=NULL,*RVbufR2=NULL,*RVbufR3=NULL,*RVbufR4=NULL,
 #if defined HAVE_SSE2 || defined HAVE_ALTIVEC
 
 # if !defined(NATIVE_64BIT_INT)
-static SINTPTR_T MixSIMDMonoNormal(const SWORD* srce,SLONG* dest,SINTPTR_T idx,SINTPTR_T increment,SINTPTR_T todo)
+static SSIZE_T MixSIMDMonoNormal(const SWORD* srce,SLONG* dest,SSIZE_T idx,SSIZE_T increment,SSIZE_T todo)
 {
 	/* TODO: */
 	SWORD sample;
@@ -145,7 +140,7 @@ static SINTPTR_T MixSIMDMonoNormal(const SWORD* srce,SLONG* dest,SINTPTR_T idx,S
 }
 # endif /* !NATIVE_64BIT_INT */
 
-static SINTPTR_T MixSIMDStereoNormal(const SWORD* srce,SLONG* dest,SINTPTR_T idx,SINTPTR_T increment,SINTPTR_T todo)
+static SSIZE_T MixSIMDStereoNormal(const SWORD* srce,SLONG* dest,SSIZE_T idx,SSIZE_T increment,SSIZE_T todo)
 {
 	SWORD vol[8] = {vnf->lvolsel, vnf->rvolsel};
 	SWORD sample;
@@ -289,7 +284,7 @@ static SLONG Mix32MonoNormal(const SWORD* srce,SLONG* dest,SLONG idx,SLONG incre
 }
 
 /* FIXME: This mixer should works also on 64-bit platform */
-/* Hint : changes SLONG / SLONGLONG mess with intptr */
+/* Hint : changes SLONG / SLONGLONG mess with ssize_t */
 static SLONG Mix32StereoNormal(const SWORD* srce,SLONG* dest,SLONG idx,SLONG increment,SLONG todo)
 {
 #if defined HAVE_ALTIVEC || defined HAVE_SSE2
@@ -1029,9 +1024,10 @@ static void AddChannel(SLONG* ptr,NATIVE todo)
 		     (vnf->flags&SF_LOOP)?idxlend:idxsize;
 
 		/* if the sample is not blocked... */
-		if((end==vnf->current)||(!vnf->increment))
+		if((vnf->increment>0 && vnf->current>=end) ||
+		   (vnf->increment<0 && vnf->current<=end) || !vnf->increment) {
 			done=0;
-		else {
+		} else {
 			done=MIN((end-vnf->current)/vnf->increment+1,todo);
 			if(done<0) done=0;
 		}

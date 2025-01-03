@@ -225,7 +225,7 @@ static UBYTE *STM_ConvertTrack(STMNOTE *n)
 	return UniDup();
 }
 
-static int STM_LoadPatterns(void)
+static int STM_LoadPatterns(unsigned int pattoload)
 {
 	unsigned int t,s,tracks=0;
 
@@ -233,7 +233,7 @@ static int STM_LoadPatterns(void)
 	if(!AllocTracks()) return 0;
 
 	/* Allocate temporary buffer for loading and converting the patterns */
-	for(t=0;t<of.numpat;t++) {
+	for(t=0;t<pattoload;t++) {
 		for(s=0;s<(64U*of.numchn);s++) {
 			stmbuf[s].note   = _mm_read_UBYTE(modreader);
 			stmbuf[s].insvol = _mm_read_UBYTE(modreader);
@@ -254,11 +254,13 @@ static int STM_LoadPatterns(void)
 
 static int STM_Load(int curious)
 {
+	int blankpattern=0;
+	int pattoload;
 	int t;
-	ULONG MikMod_ISA; /* We must generate our own ISA, it's not stored in stm */
+	ULONG samplestart;
+	ULONG sampleend;
 	SAMPLE *q;
 	(void)curious;
-
 	/* try to read stm header */
 	_mm_read_string(mh->songname,20,modreader);
 	_mm_read_string(mh->trackername,8,modreader);
@@ -318,22 +320,38 @@ static int STM_Load(int curious)
 	t=0;
 	if(!AllocPositions(0x80)) return 0;
 	/* 99 terminates the patorder list */
-	while((mh->patorder[t]<=99)&&(mh->patorder[t]<mh->numpat)) {
+	while(mh->patorder[t]<99) {
 		of.positions[t]=mh->patorder[t];
+
+		/* Screamtracker 2 treaks patterns >= numpat as blank patterns.
+		 * Example modules: jimmy.stm, Rauno/dogs.stm, Skaven/hevijanis istu maas.stm.
+		 *
+		 * Patterns>=64 have unpredictable behavior in Screamtracker 2,
+		 * but nothing seems to rely on them, so they're OK to blank too.
+		 */
+		if(of.positions[t]>=mh->numpat) {
+			of.positions[t]=mh->numpat;
+			blankpattern=1;
+		}
+
 		if(++t == 0x80) {
 			_mm_errno = MMERR_NOT_A_MODULE;
 			return 0;
 		}
 	}
-	if(mh->patorder[t]<=99) t++;
+	/* Allocate an extra blank pattern if the module references one. */
+	pattoload=of.numpat;
+	if(blankpattern) of.numpat++;
 	of.numpos=t;
 	of.numtrk=of.numpat*of.numchn;
 	of.numins=of.numsmp=31;
 
 	if(!AllocSamples()) return 0;
-	if(!STM_LoadPatterns()) return 0;
-	MikMod_ISA=_mm_ftell(modreader);
-	MikMod_ISA=(MikMod_ISA+15)&0xfffffff0;	/* normalize */
+	if(!STM_LoadPatterns(pattoload)) return 0;
+
+	samplestart=_mm_ftell(modreader);
+	_mm_fseek(modreader,0,SEEK_END);
+	sampleend=_mm_ftell(modreader);
 
 	for(q=of.samples,t=0;t<of.numsmp;t++,q++) {
 		/* load sample info */
@@ -341,19 +359,46 @@ static int STM_Load(int curious)
 		q->speed      = (mh->sample[t].c2spd * 8363) / 8448;
 		q->volume     = mh->sample[t].volume;
 		q->length     = mh->sample[t].length;
-		if (/*!mh->sample[t].volume || */q->length==1) q->length=0;
+		if (!mh->sample[t].volume || q->length==1) q->length=0;
 		q->loopstart  = mh->sample[t].loopbeg;
 		q->loopend    = mh->sample[t].loopend;
-		q->seekpos    = MikMod_ISA;
+		q->seekpos    = mh->sample[t].reserved << 4;
 
-		MikMod_ISA+=q->length;
-		MikMod_ISA=(MikMod_ISA+15)&0xfffffff0;	/* normalize */
+		/* Sanity checks to make sure samples are bounded within the file. */
+		if(q->length) {
+			if(q->seekpos<samplestart) {
+#ifdef MIKMOD_DEBUG
+				fprintf(stderr,"rejected sample # %d (seekpos=%u < samplestart=%u)\n",t,q->seekpos,samplestart);
+#endif
+				_mm_errno = MMERR_LOADING_SAMPLEINFO;
+				return 0;
+			}
+			/* Some .STMs seem to rely on allowing truncated samples... */
+			if(q->seekpos>=sampleend) {
+#ifdef MIKMOD_DEBUG
+				fprintf(stderr,"truncating sample # %d from length %u to 0\n",t,q->length);
+#endif
+				q->seekpos = q->length = 0;
+			} else if(q->seekpos+q->length>sampleend) {
+#ifdef MIKMOD_DEBUG
+				fprintf(stderr,"truncating sample # %d from length %u to %u\n",t,q->length,sampleend - q->seekpos);
+#endif
+				q->length = sampleend - q->seekpos;
+			}
+		}
+		else
+			q->seekpos = 0;
 
 		/* contrary to the STM specs, sample data is signed */
 		q->flags = SF_SIGNED;
 
-		if(q->loopend && q->loopend != 0xffff)
-				q->flags|=SF_LOOP;
+		if(q->loopend && q->loopend != 0xffff && q->loopstart < q->length) {
+			q->flags|=SF_LOOP;
+			if (q->loopend > q->length)
+				q->loopend = q->length;
+		}
+		else
+			q->loopstart = q->loopend = 0;
 	}
 	return 1;
 }

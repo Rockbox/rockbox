@@ -29,12 +29,7 @@
  *
  * UPKG parsing partially based on Unreal Media Ripper (UMR) v0.3
  * by Andy Ward <wardwh@swbell.net>, with additional updates
- * by O. Sezer - see git repo at https://github.com/sezero/umr/
- *
- * The cheaper way, i.e. linear search of music object like libxmp
- * and libmodplug does, is possible. With this however we're using
- * the embedded offset, size and object type directly from the umx
- * file, and I feel safer with it.
+ * by O. Sezer - see git repo at https://github.com/sezero/umr.git
  */
 
 #ifdef HAVE_CONFIG_H
@@ -79,11 +74,10 @@ struct upkg_hdr {
 	ULONG guid[4];
 	SLONG generation_count;
 #define UPKG_HDR_SIZE 64			/* 64 bytes up until here */
-	/*struct _genhist *gen;*/
+	struct _genhist *gen;
 };
 /* compile time assert for upkg_hdr size */
-/*typedef int _check_hdrsize[2 * (offsetof(struct upkg_hdr, gen) == UPKG_HDR_SIZE) - 1];*/
-typedef int _check_hdrsize[2 * (sizeof(struct upkg_hdr) == UPKG_HDR_SIZE) - 1];
+typedef int _check_hdrsize[2 * (offsetof(struct upkg_hdr, gen) == UPKG_HDR_SIZE) - 1];
 
 /*========== Supported content types */
 
@@ -145,6 +139,7 @@ static int get_objtype (SLONG ofs, int type)
 {
 	char sig[16];
 _retry:
+	memset(sig, 0, sizeof(sig));
 	_mm_fseek(modreader, ofs, SEEK_SET);
 	_mm_read_UBYTES(sig, 16, modreader);
 	if (type == UMUSIC_IT) {
@@ -207,20 +202,21 @@ static int read_export (const struct upkg_hdr *hdr,
 }
 
 static int read_typname(const struct upkg_hdr *hdr,
-			int idx, char *out)
+			int idx, char *out, long end)
 {
 	int i, s;
 	long l;
 	char buf[64];
 
 	if (idx >= hdr->name_count) return -1;
-	buf[63] = '\0';
+	memset(buf, 0, 64);
 	for (i = 0, l = 0; i <= idx; i++) {
+		if (hdr->name_offset + l >= end) return -1;
 		_mm_fseek(modreader, hdr->name_offset + l, SEEK_SET);
 		_mm_read_UBYTES(buf, 63, modreader);
 		if (hdr->file_version >= 64) {
 			s = *(signed char *)buf; /* numchars *including* terminator */
-			if (s <= 0 || s > 64) return -1;
+			if (s <= 0) return -1;
 			l += s + 5;	/* 1 for buf[0], 4 for int32_t name_flags */
 		} else {
 			l += (long)strlen(buf);
@@ -243,6 +239,12 @@ static int probe_umx   (const struct upkg_hdr *hdr,
 	idx = 0;
 	_mm_fseek(modreader, 0, SEEK_END);
 	fsiz = _mm_ftell(modreader);
+
+	if (hdr->name_offset	>= fsiz ||
+	    hdr->export_offset	>= fsiz ||
+	    hdr->import_offset	>= fsiz) {
+		return -1;
+	}
 
 	/* Find the offset and size of the first IT, S3M or XM
 	 * by parsing the exports table. The umx files should
@@ -267,7 +269,7 @@ static int probe_umx   (const struct upkg_hdr *hdr,
 	if ((t = read_export(hdr, &pos, &s)) < 0) return -1;
 	if (s <= 0 || s > fsiz - pos) return -1;
 
-	if (read_typname(hdr, t, buf) < 0) return -1;
+	if (read_typname(hdr, t, buf, fsiz) < 0) return -1;
 	for (i = 0; mustype[i] != NULL; i++) {
 		if (!strcasecmp(buf, mustype[i])) {
 			t = i;
@@ -282,33 +284,34 @@ static int probe_umx   (const struct upkg_hdr *hdr,
 	return t;
 }
 
-static SLONG probe_header (void *header)
+static SLONG probe_header (struct upkg_hdr *hdr)
 {
-	struct upkg_hdr *hdr;
-	unsigned char *p;
-	ULONG *swp;
-	int i;
+	hdr->tag           = _mm_read_I_ULONG(modreader);
+	hdr->file_version  = _mm_read_I_SLONG(modreader);
+	hdr->pkg_flags     = _mm_read_I_ULONG(modreader);
+	hdr->name_count    = _mm_read_I_SLONG(modreader);
+	hdr->name_offset   = _mm_read_I_SLONG(modreader);
+	hdr->export_count  = _mm_read_I_SLONG(modreader);
+	hdr->export_offset = _mm_read_I_SLONG(modreader);
+	hdr->import_count  = _mm_read_I_SLONG(modreader);
+	hdr->import_offset = _mm_read_I_SLONG(modreader);
 
-	/* byte swap the header - all members are 32 bit LE values */
-	p = (unsigned char *) header;
-	swp = (ULONG *) header;
-	for (i = 0; i < UPKG_HDR_SIZE/4; i++, p += 4) {
-		swp[i] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
-	}
-
-	hdr = (struct upkg_hdr *) header;
+	if (_mm_eof(modreader)) return -1;
 	if (hdr->tag != UPKG_HDR_TAG) {
 		return -1;
 	}
 	if (hdr->name_count	< 0	||
-	    hdr->name_offset	< 0	||
 	    hdr->export_count	< 0	||
-	    hdr->export_offset	< 0	||
 	    hdr->import_count	< 0	||
-	    hdr->import_offset	< 0	) {
+	    hdr->name_offset	< 36	||
+	    hdr->export_offset	< 36	||
+	    hdr->import_offset	< 36	) {
 		return -1;
 	}
 
+#if 1 /* no need being overzealous */
+	return 0;
+#else
 	switch (hdr->file_version) {
 	case 35: case 37:	/* Unreal beta - */
 	case 40: case 41:				/* 1998 */
@@ -324,29 +327,19 @@ static SLONG probe_header (void *header)
 	}
 
 	return -1;
+#endif /* #if 0  */
 }
 
 static int process_upkg (SLONG *ofs, SLONG *objsize)
 {
-	char header[UPKG_HDR_SIZE];
+	struct upkg_hdr header;
 
-	if (!_mm_read_UBYTES(header, UPKG_HDR_SIZE, modreader))
-		return -1;
-	if (probe_header(header) < 0)
+	memset(&header, 0, sizeof(header));
+	if (probe_header(&header) < 0)
 		return -1;
 
-	return probe_umx((struct upkg_hdr *)header, ofs, objsize);
+	return probe_umx(&header, ofs, objsize);
 }
-
-/*========== Loader vars */
-
-typedef struct _umx_info {
-	int	type;
-	SLONG	ofs, size;
-	MLOADER* loader;
-} umx_info;
-
-static umx_info *umx_data = NULL;
 
 /*========== Loader code */
 
@@ -359,15 +352,23 @@ static umx_info *umx_data = NULL;
  * and always clear it when returning from LoadTitle() or Cleanup().
  */
 
+typedef struct _umx_info {
+	int	type;
+	SLONG	ofs, size;
+	MLOADER* loader;
+} umx_info;
+
+static umx_info *umx_data = NULL;
+
 static int UMX_Test(void)
 {
 	int type;
 	SLONG ofs = 0, size = 0;
 
 	if (umx_data) {
-#ifdef MIKMOD_DEBUG
+		#ifdef MIKMOD_DEBUG
 		fprintf(stderr, "UMX_Test called while a previous instance is active\n");
-#endif
+		#endif
 		MikMod_free(umx_data);
 		umx_data = NULL;
 	}

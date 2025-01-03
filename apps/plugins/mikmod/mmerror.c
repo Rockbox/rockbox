@@ -202,14 +202,14 @@ static const char *_mm_errmsg[MMERR_MAX+1] =
 
 /* MacOS X/Darwin driver errors */
 #ifdef DRV_OSX
-	"Unknown device",
-	"Bad property",
+	_mmerr_invalid,
+	_mmerr_invalid,
 	"Could not set playback format",
-	"Could not set mono/stereo setting",
-	"Could not create playback buffers",
-	"Could not create playback thread",
+	_mmerr_invalid,
+	_mmerr_invalid,
+	_mmerr_invalid,
 	"Could not start audio device",
-	"Could not create buffer thread",
+	_mmerr_invalid,
 #else
 	_mmerr_invalid, _mmerr_invalid, _mmerr_invalid,
 	_mmerr_invalid, _mmerr_invalid, _mmerr_invalid,

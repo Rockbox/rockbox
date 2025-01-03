@@ -34,11 +34,7 @@
 
 #include <string.h>
 #include <stdarg.h>
-#ifdef SRANDOM_IN_MATH_H
-#include <math.h>
-#else
 #include <stdlib.h>
-#endif
 
 #include <limits.h>
 
@@ -56,6 +52,11 @@ MODULE *pf = NULL;
 
 #define	HIGH_OCTAVE		2	/* number of above-range octaves */
 
+enum vibratoflags {
+	VIB_PT_BUGS	= 0x01, /* MOD vibrato is not applied on tick 0. */
+	VIB_TICK_0	= 0x02, /* Increment LFO position on tick 0. */
+};
+
 static	const UWORD oldperiods[OCTAVE*2]={
 	0x6b00, 0x6800, 0x6500, 0x6220, 0x5f50, 0x5c80,
 	0x5a00, 0x5740, 0x54d0, 0x5260, 0x5010, 0x4dc0,
@@ -63,20 +64,15 @@ static	const UWORD oldperiods[OCTAVE*2]={
 	0x3f90, 0x3dc0, 0x3c10, 0x3a40, 0x38b0, 0x3700
 };
 
-static	const UBYTE VibratoTable[32]={
-	  0, 24, 49, 74, 97,120,141,161,180,197,212,224,235,244,250,253,
-	255,253,250,244,235,224,212,197,180,161,141,120, 97, 74, 49, 24
-};
-
-static	const UBYTE avibtab[128]={
-	 0, 1, 3, 4, 6, 7, 9,10,12,14,15,17,18,20,21,23,
-	24,25,27,28,30,31,32,34,35,36,38,39,40,41,42,44,
-	45,46,47,48,49,50,51,52,53,54,54,55,56,57,57,58,
-	59,59,60,60,61,61,62,62,62,63,63,63,63,63,63,63,
-	64,63,63,63,63,63,63,63,62,62,62,61,61,60,60,59,
-	59,58,57,57,56,55,54,54,53,52,51,50,49,48,47,46,
-	45,44,42,41,40,39,38,36,35,34,32,31,30,28,27,25,
-	24,23,21,20,18,17,15,14,12,10, 9, 7, 6, 4, 3, 1
+static	const UBYTE VibratoTable[128]={
+	  0,  6, 13, 19, 25, 31, 37, 44, 50, 56, 62, 68, 74, 80, 86, 92,
+	 98,103,109,115,120,126,131,136,142,147,152,157,162,167,171,176,
+	180,185,189,193,197,201,205,208,212,215,219,222,225,228,231,233,
+	236,238,240,242,244,246,247,249,250,251,252,253,254,254,255,255,
+	255,255,255,254,254,253,252,251,250,249,247,246,244,242,240,238,
+	236,233,231,228,225,222,219,215,212,208,205,201,197,193,189,185,
+	180,176,171,167,162,157,152,147,142,136,131,126,120,115,109,103,
+	 98, 92, 86, 80, 74, 68, 62, 56, 50, 44, 37, 31, 25, 19, 13,  6,
 };
 
 /* Triton's linear periods to frequency translation table (for XM modules) */
@@ -228,6 +224,11 @@ static	const SBYTE PanbrelloTable[256]={
 	-24,-23,-22,-20,-19,-17,-16,-14,-12,-11,- 9,- 8,- 6,- 5,- 3,- 2
 };
 
+/* tempo[0] = 256; tempo[i] = floor(128 /i) */
+static const int far_tempos[16] = {
+	256, 128, 64, 42, 32, 25, 21, 18, 16, 14, 12, 11, 10, 9, 9, 8
+};
+
 /* returns a random value between 0 and ceil-1, ceil must be a power of two */
 static int getrandom(int ceilval)
 {
@@ -368,6 +369,12 @@ static SWORD StartEnvelope(ENVPR *t,UBYTE flg,UBYTE pts,UBYTE susbeg,UBYTE susen
 		return t->env[0].val;
 	}
 
+	/* Ignore junk loops */
+	if (beg > pts || beg > end)
+		t->flg &= ~EF_LOOP;
+	if (susbeg > pts || susbeg > susend)
+		t->flg &= ~EF_SUSTAIN;
+
 	/* Imago Orpheus sometimes stores an extra initial point in the envelope */
 	if ((t->pts>=2)&&(t->env[0].pos==t->env[1].pos)) {
 		t->a++;
@@ -404,6 +411,9 @@ static SWORD StartEnvelope(ENVPR *t,UBYTE flg,UBYTE pts,UBYTE susbeg,UBYTE susen
 */
 static SWORD ProcessEnvelope(MP_VOICE *aout, ENVPR *t, SWORD v)
 {
+	if (!t->pts) {	/* happens with e.g. Vikings In The Hood!.xm */
+		return v;
+	}
 	if (t->flg & EF_ON) {
 		UBYTE a, b;		/* actual points in the envelope */
 		UWORD p;		/* the 'tick counter' - real point being played */
@@ -479,6 +489,30 @@ static SWORD ProcessEnvelope(MP_VOICE *aout, ENVPR *t, SWORD v)
 	return v;
 }
 
+/* Set envelope tick to the position given */
+static void SetEnvelopePosition(ENVPR *t, ENVPT *p, SWORD pos)
+{
+	if (t->pts > 0)	{
+		UWORD i;
+
+		for (i = 0; i < t->pts - 1; i++) {
+
+			if ((pos >= p[i].pos) && (pos < p[i + 1].pos)) {
+				t->a = i;
+				t->b = i + 1;
+				t->p = pos;
+				return;
+			}
+		}
+
+		/* If position is after the last envelope point, just set
+		   it to the last one */
+		t->a = t->pts - 1;
+		t->b = t->pts;
+		t->p = p[t->a].pos;
+	}
+}
+
 /* XM linear period to frequency conversion */
 ULONG getfrequency(UWORD flags,ULONG period)
 {
@@ -491,6 +525,81 @@ ULONG getfrequency(UWORD flags,ULONG period)
 			return lintab[period % 768] << (-shift);
 	} else
 		return (8363L*1712L)/(period?period:1);
+}
+
+static SWORD LFOVibrato(SBYTE position, UBYTE waveform)
+{
+	SWORD amp;
+
+	switch (waveform) {
+	case 0: /* sine */
+		amp = VibratoTable[position & 0x7f];
+		return (position >= 0) ? amp : -amp;
+	case 1: /* ramp down - ramps up because MOD/S3M apply these to period. */
+		return ((UBYTE)position << 1) - 255;
+	case 2: /* square wave */
+		return (position >= 0) ? 255 : -255;
+	case 3: /* random wave */
+		return getrandom(512) - 256;
+	}
+	return 0;
+}
+
+static SWORD LFOTremolo(SBYTE position, UBYTE waveform)
+{
+	switch (waveform) {
+	case 1: /* ramp down */
+		/* Tremolo ramp down actually ramps down. */
+		return 255 - ((UBYTE)position << 1);
+	}
+	return LFOVibrato(position, waveform);
+}
+
+static SWORD LFOVibratoIT(SBYTE position, UBYTE waveform)
+{
+	switch (waveform) {
+	case 1: /* ramp down */
+		/* IT ramp down actually ramps down. */
+		return 255 - ((UBYTE)position << 1);
+	case 2: /* square wave */
+		/* IT square wave oscillates between 0 and 255. */
+		return (position >= 0) ? 255 : 0;
+	}
+	return LFOVibrato(position, waveform);
+}
+
+static SWORD LFOPanbrello(SBYTE position, UBYTE waveform)
+{
+	switch (waveform) {
+	case 0: /* sine */
+		return PanbrelloTable[(UBYTE)position];
+	case 1: /* ramp down */
+		return 64 - ((UBYTE)position >> 1);
+	case 2: /* square wave */
+		return (position >= 0) ? 64 : 0;
+	case 3: /* random */
+		return getrandom(128) - 64;
+	}
+	return 0;
+}
+
+static SWORD LFOAutoVibratoXM(SBYTE position, UBYTE waveform)
+{
+	/* XM auto-vibrato uses a different set of waveforms than vibrato/tremolo. */
+	SWORD amp;
+
+	switch (waveform) {
+	case 0: /* sine */
+		amp = VibratoTable[position & 0x7f];
+		return (position >= 0) ? amp : -amp;
+	case 1: /* square wave */
+		return (position >= 0) ? 255 : -255;
+	case 2: /* ramp down */
+		return -((SWORD)position << 1);
+	case 3: /* ramp up */
+		return (SWORD)position << 1;
+	}
+	return 0;
 }
 
 /*========== Protracker effects */
@@ -651,43 +760,22 @@ static int DoPTEffect3(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	return 0;
 }
 
-static void DoVibrato(UWORD tick, MP_CONTROL *a)
+static void DoVibrato(UWORD tick, MP_CONTROL *a, UWORD flags)
 {
-	UBYTE q;
-	UWORD temp = 0;	/* silence warning */
+	SWORD temp;
 
-	if (!tick)
+	if (!tick && (flags & VIB_PT_BUGS))
 		return;
 
-	q=(a->vibpos>>2)&0x1f;
-
-	switch (a->wavecontrol&3) {
-	case 0: /* sine */
-		temp=VibratoTable[q];
-		break;
-	case 1: /* ramp down */
-		q<<=3;
-		if (a->vibpos<0) q=255-q;
-		temp=q;
-		break;
-	case 2: /* square wave */
-		temp=255;
-		break;
-	case 3: /* random wave */
-		temp=getrandom(256);
-		break;
-	}
-
+	temp = LFOVibrato(a->vibpos, a->wavecontrol & 3);
 	temp*=a->vibdepth;
-	temp>>=7;temp<<=2;
+	temp>>=7;
+	temp<<=2;
 
-	if (a->vibpos>=0)
-		a->main.period=a->tmpperiod+temp;
-	else
-		a->main.period=a->tmpperiod-temp;
+	a->main.period = a->tmpperiod + temp;
 	a->ownper = 1;
 
-	if (tick != 0)
+	if (tick != 0 || (flags & VIB_TICK_0))
 		a->vibpos+=a->vibspd;
 }
 
@@ -704,7 +792,26 @@ static int DoPTEffect4(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		if (dat&0xf0) a->vibspd=(dat&0xf0)>>2;
 	}
 	if (a->main.period)
-		DoVibrato(tick, a);
+		DoVibrato(tick, a, VIB_PT_BUGS);
+
+	return 0;
+}
+
+static int DoPTEffect4Fix(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	/* PT-equivalent vibrato but without the tick 0 bug. */
+	UBYTE dat;
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	dat=UniGetByte();
+	if (!tick) {
+		if (dat&0x0f) a->vibdepth=dat&0xf;
+		if (dat&0xf0) a->vibspd=(dat&0xf0)>>2;
+	}
+	if (a->main.period)
+		DoVibrato(tick, a, 0);
 
 	return 0;
 }
@@ -741,54 +848,61 @@ static int DoPTEffect5(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 
 /* DoPTEffect6 after DoPTEffectA */
 
+static void DoTremolo(UWORD tick, MP_CONTROL *a, UWORD flags)
+{
+	SWORD temp;
+
+	if (!tick && (flags & VIB_PT_BUGS))
+		return;
+
+	temp = LFOTremolo(a->trmpos, (a->wavecontrol >> 4) & 3);
+	temp*=a->trmdepth;
+	temp>>=6;
+
+	a->volume = a->tmpvolume + temp;
+	if (a->volume>64) a->volume=64;
+	if (a->volume<0) a->volume=0;
+	a->ownvol = 1;
+
+	if (tick || (flags & VIB_TICK_0))
+		a->trmpos+=a->trmspd;
+}
+
 static int DoPTEffect7(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-	UBYTE q;
-	UWORD temp = 0;	/* silence warning */
-    (void)flags;
-    (void)mod;
-    (void)channel;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
 	dat=UniGetByte();
 	if (!tick) {
 		if (dat&0x0f) a->trmdepth=dat&0xf;
 		if (dat&0xf0) a->trmspd=(dat&0xf0)>>2;
 	}
-	if (a->main.period) {
-		q=(a->trmpos>>2)&0x1f;
+	/* TODO: PT should have the same tick 0 bug here that vibrato does. Several other
+	   formats use this effect and rely on it not being broken, so don't right now. */
+	if (a->main.period)
+		DoTremolo(tick, a, 0);
 
-		switch ((a->wavecontrol>>4)&3) {
-		case 0: /* sine */
-			temp=VibratoTable[q];
-			break;
-		case 1: /* ramp down */
-			q<<=3;
-			if (a->trmpos<0) q=255-q;
-			temp=q;
-			break;
-		case 2: /* square wave */
-			temp=255;
-			break;
-		case 3: /* random wave */
-			temp=getrandom(256);
-			break;
-		}
-		temp*=a->trmdepth;
-		temp>>=6;
+	return 0;
+}
 
-		if (a->trmpos>=0) {
-			a->volume=a->tmpvolume+temp;
-			if (a->volume>64) a->volume=64;
-		} else {
-			a->volume=a->tmpvolume-temp;
-			if (a->volume<0) a->volume=0;
-		}
-		a->ownvol = 1;
+static int DoPTEffect7Fix(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	/* PT equivalent vibrato but without the tick 0 bug. */
+	UBYTE dat;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
-		if (tick)
-			a->trmpos+=a->trmspd;
+	dat=UniGetByte();
+	if (!tick) {
+		if (dat&0x0f) a->trmdepth=dat&0xf;
+		if (dat&0xf0) a->trmspd=(dat&0xf0)>>2;
 	}
+	if (a->main.period)
+		DoTremolo(tick, a, 0);
 
 	return 0;
 }
@@ -843,7 +957,7 @@ static int DoPTEffectA(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffect6(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	if (a->main.period)
-		DoVibrato(tick, a);
+		DoVibrato(tick, a, VIB_PT_BUGS);
 	DoPTEffectA(tick, flags, a, mod, channel);
 
 	return 0;
@@ -943,6 +1057,43 @@ static int DoPTEffectD(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	return 0;
 }
 
+static void DoLoop(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, UBYTE param)
+{
+	if (tick) return;
+	if (param) { /* set reppos or repcnt ? */
+		/* set repcnt, so check if repcnt already is set, which means we
+		   are already looping */
+		if (a->pat_repcnt)
+			a->pat_repcnt--; /* already looping, decrease counter */
+		else {
+#if 0
+			/* this would make walker.xm, shipped with Xsoundtracker,
+			   play correctly, but it's better to remain compatible
+			   with FT2 */
+			if ((!(flags&UF_NOWRAP))||(a->pat_reppos!=POS_NONE))
+#endif
+				a->pat_repcnt=param; /* not yet looping, so set repcnt */
+		}
+
+		if (a->pat_repcnt) { /* jump to reppos if repcnt>0 */
+			if (a->pat_reppos==POS_NONE)
+				a->pat_reppos=mod->patpos-1;
+			if (a->pat_reppos==-1) {
+				mod->pat_repcrazy=1;
+				mod->patpos=0;
+			} else
+				mod->patpos=a->pat_reppos;
+		} else a->pat_reppos=POS_NONE;
+	} else {
+		a->pat_reppos=mod->patpos-1; /* set reppos - can be (-1) */
+		/* emulate the FT2 pattern loop (E60) bug:
+		 * http://milkytracker.org/docs/MilkyTracker.html#fxE6x
+		 * roadblas.xm plays correctly with this. */
+		if (flags & UF_FT2QUIRKS) mod->patbrk=mod->patpos;
+	}
+	return;
+}
+
 static void DoEEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod,
 	SWORD channel, UBYTE dat)
 {
@@ -978,39 +1129,7 @@ static void DoEEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod,
 		}
 		break;
 	case 0x6: /* set patternloop */
-		if (tick)
-			break;
-		if (nib) { /* set reppos or repcnt ? */
-			/* set repcnt, so check if repcnt already is set, which means we
-			   are already looping */
-			if (a->pat_repcnt)
-				a->pat_repcnt--; /* already looping, decrease counter */
-			else {
-#if 0
-				/* this would make walker.xm, shipped with Xsoundtracker,
-				   play correctly, but it's better to remain compatible
-				   with FT2 */
-				if ((!(flags&UF_NOWRAP))||(a->pat_reppos!=POS_NONE))
-#endif
-					a->pat_repcnt=nib; /* not yet looping, so set repcnt */
-			}
-
-			if (a->pat_repcnt) { /* jump to reppos if repcnt>0 */
-				if (a->pat_reppos==POS_NONE)
-					a->pat_reppos=mod->patpos-1;
-				if (a->pat_reppos==-1) {
-					mod->pat_repcrazy=1;
-					mod->patpos=0;
-				} else
-					mod->patpos=a->pat_reppos;
-			} else a->pat_reppos=POS_NONE;
-		} else {
-			a->pat_reppos=mod->patpos-1; /* set reppos - can be (-1) */
-			/* emulate the FT2 pattern loop (E60) bug:
-			 * http://milkytracker.org/docs/MilkyTracker.html#fxE6x
-			 * roadblas.xm plays correctly with this. */
-			if (flags & UF_FT2QUIRKS) mod->patbrk=mod->patpos;
-		}
+		DoLoop(tick, flags, a, mod, nib);
 		break;
 	case 0x7: /* set tremolo waveform */
 		a->wavecontrol&=0x0f;
@@ -1024,10 +1143,16 @@ static void DoEEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod,
 		}
 		break;
 	case 0x9: /* retrig note */
-		/* do not retrigger on tick 0, until we are emulating FT2 and effect
-		   data is zero */
-		if (!tick && !((flags & UF_FT2QUIRKS) && (!nib)))
-			break;
+		/* Protracker: retriggers on tick 0 first; does nothing when nib=0.
+		   Fasttracker 2: retriggers on tick nib first, including nib=0. */
+		if (!tick) {
+			if (flags & UF_FT2QUIRKS)
+				a->retrig=nib;
+			else if (nib)
+				a->retrig=0;
+			else
+				break;
+		}
 		/* only retrigger if data nibble > 0, or if tick 0 (FT2 compat) */
 		if (nib || !tick) {
 			if (!a->retrig) {
@@ -1115,8 +1240,18 @@ static int DoS3MEffectA(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 	if (tick || mod->patdly2)
 		return 0;
 
+#if 0
+	/* This was added between MikMod 3.1.2 and libmikmod 3.1.5 with
+	 * no documentation justifying its inclusion. Players for relevant
+	 * formats (S3M, IT, DSMI AMF, GDM, IMF) all allow values between
+	 * 128 and 255, so it's not clear what the purpose of this was.
+	 * See the following pull request threads:
+	 *
+	 * https://github.com/sezero/mikmod/pull/42
+	 * https://github.com/sezero/mikmod/pull/35 */
 	if (speed > 128)
 		speed -= 128;
+#endif
 	if (speed) {
 		mod->sngspd = speed;
 		mod->vbtick = 0;
@@ -1331,8 +1466,8 @@ static int DoS3MEffectQ(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 
 static int DoS3MEffectR(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	UBYTE dat, q;
-	UWORD temp=0;	/* silence warning */
+	UBYTE dat;
+	SWORD temp;
     (void)flags;
     (void)mod;
     (void)channel;
@@ -1343,35 +1478,13 @@ static int DoS3MEffectR(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 		if (dat&0xf0) a->trmspd=(dat&0xf0)>>2;
 	}
 
-	q=(a->trmpos>>2)&0x1f;
-
-	switch ((a->wavecontrol>>4)&3) {
-	case 0: /* sine */
-		temp=VibratoTable[q];
-		break;
-	case 1: /* ramp down */
-		q<<=3;
-		if (a->trmpos<0) q=255-q;
-		temp=q;
-		break;
-	case 2: /* square wave */
-		temp=255;
-		break;
-	case 3: /* random */
-		temp=getrandom(256);
-		break;
-	}
-
+	temp = LFOTremolo(a->trmpos, (a->wavecontrol >> 4) & 3);
 	temp*=a->trmdepth;
 	temp>>=7;
 
-	if (a->trmpos>=0) {
-		a->volume=a->tmpvolume+temp;
-		if (a->volume>64) a->volume=64;
-	} else {
-		a->volume=a->tmpvolume-temp;
-		if (a->volume<0) a->volume=0;
-	}
+	a->volume = a->tmpvolume + temp;
+	if (a->volume>64) a->volume=64;
+	if (a->volume<0) a->volume=0;
 	a->ownvol = 1;
 
 	if (tick)
@@ -1399,8 +1512,8 @@ static int DoS3MEffectT(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 
 static int DoS3MEffectU(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	UBYTE dat, q;
-	UWORD temp = 0;	/* silence warning */
+	UBYTE dat;
+	SWORD temp;
     (void)flags;
     (void)mod;
     (void)channel;
@@ -1409,38 +1522,18 @@ static int DoS3MEffectU(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 	if (!tick) {
 		if (dat&0x0f) a->vibdepth=dat&0xf;
 		if (dat&0xf0) a->vibspd=(dat&0xf0)>>2;
-	} else
-		if (a->main.period) {
-			q=(a->vibpos>>2)&0x1f;
-
-			switch (a->wavecontrol&3) {
-			case 0: /* sine */
-				temp=VibratoTable[q];
-				break;
-			case 1: /* ramp down */
-				q<<=3;
-				if (a->vibpos<0) q=255-q;
-				temp=q;
-				break;
-			case 2: /* square wave */
-				temp=255;
-				break;
-			case 3: /* random */
-				temp=getrandom(256);
-				break;
-			}
-
-			temp*=a->vibdepth;
-			temp>>=8;
-
-			if (a->vibpos>=0)
-				a->main.period=a->tmpperiod+temp;
-			else
-				a->main.period=a->tmpperiod-temp;
-			a->ownper = 1;
-
-			a->vibpos+=a->vibspd;
 	}
+	if (a->main.period) {
+		temp = LFOVibrato(a->vibpos, a->wavecontrol & 3);
+		temp*=a->vibdepth;
+		temp>>=7;
+
+		a->main.period = a->tmpperiod + temp;
+		a->ownper = 1;
+
+		if (tick)
+ 			a->vibpos+=a->vibspd;
+ 	}
 
 	return 0;
 }
@@ -1515,7 +1608,7 @@ static int DoXMEffect6(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
     (void)mod;
     (void)channel;
 	if (a->main.period)
-		DoVibrato(tick, a);
+		DoVibrato(tick, a, 0);
 
 	return DoXMEffectA(tick, flags, a, mod, channel);
 }
@@ -1562,11 +1655,11 @@ static int DoXMEffectEA(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
     (void)channel;
 
 	dat=UniGetByte();
-	if (!tick)
+	if (!tick) {
 		if (dat) a->fslideupspd=dat;
-	a->tmpvolume+=a->fslideupspd;
-	if (a->tmpvolume>64) a->tmpvolume=64;
-
+		a->tmpvolume+=a->fslideupspd;
+		if (a->tmpvolume>64) a->tmpvolume=64;
+	}
 	return 0;
 }
 
@@ -1578,11 +1671,11 @@ static int DoXMEffectEB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
     (void)channel;
 
 	dat=UniGetByte();
-	if (!tick)
+	if (!tick) {
 		if (dat) a->fslidednspd=dat;
-	a->tmpvolume-=a->fslidednspd;
-	if (a->tmpvolume<0) a->tmpvolume=0;
-
+		a->tmpvolume-=a->fslidednspd;
+		if (a->tmpvolume<0) a->tmpvolume=0;
+	}
 	return 0;
 }
 
@@ -1631,18 +1724,20 @@ static int DoXMEffectL(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 
 	dat=UniGetByte();
 	if ((!tick)&&(a->main.i)) {
-		UWORD points;
 		INSTRUMENT *i=a->main.i;
 		MP_VOICE *aout;
 
 		if ((aout=a->slave) != NULL) {
 			if (aout->venv.env) {
-				points=i->volenv[i->volpts-1].pos;
-				aout->venv.p=aout->venv.env[(dat>points)?points:dat].pos;
+				SetEnvelopePosition(&aout->venv, i->volenv, dat);
 			}
 			if (aout->penv.env) {
-				points=i->panenv[i->panpts-1].pos;
-				aout->penv.p=aout->penv.env[(dat>points)?points:dat].pos;
+				/* Because of a bug in FastTracker II, only the panning envelope
+				   position is set if the volume sustain flag is set. Other players
+				   may set the panning all the time */
+				if (!(mod->flags & UF_FT2QUIRKS) || (i->volflg & EF_SUSTAIN)) {
+					SetEnvelopePosition(&aout->penv, i->panenv, dat);
+				}
 			}
 		}
 	}
@@ -1779,10 +1874,14 @@ static int DoITEffectG(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	return 0;
 }
 
-static void DoITVibrato(UWORD tick, MP_CONTROL *a, UBYTE dat)
+enum itvibratoflags {
+	ITVIB_FINE = 0x01,
+	ITVIB_OLD  = 0x02,
+};
+
+static void DoITVibrato(UWORD tick, MP_CONTROL *a, UBYTE dat, UWORD flags)
 {
-	UBYTE q;
-	UWORD temp=0;
+	SWORD temp;
 
 	if (!tick) {
 		if (dat&0x0f) a->vibdepth=dat&0xf;
@@ -1791,44 +1890,53 @@ static void DoITVibrato(UWORD tick, MP_CONTROL *a, UBYTE dat)
 	if (!a->main.period)
 		return;
 
-	q=(a->vibpos>>2)&0x1f;
-
-	switch (a->wavecontrol&3) {
-	case 0: /* sine */
-		temp=VibratoTable[q];
-		break;
-	case 1: /* square wave */
-		temp=255;
-		break;
-	case 2: /* ramp down */
-		q<<=3;
-		if (a->vibpos<0) q=255-q;
-		temp=q;
-		break;
-	case 3: /* random */
-		temp=getrandom(256);
-		break;
-	}
-
+	temp = LFOVibratoIT(a->vibpos, a->wavecontrol & 3);
 	temp*=a->vibdepth;
-	temp>>=8;
-	temp<<=2;
 
-	if (a->vibpos>=0)
-		a->main.period=a->tmpperiod+temp;
-	else
-		a->main.period=a->tmpperiod-temp;
-	a->ownper=1;
+	if (!(flags & ITVIB_OLD)) {
+		temp>>=8;
+		if (!(flags & ITVIB_FINE))
+			temp<<=2;
+
+		/* Subtract vibrato from period so positive vibrato translates to increase in pitch. */
+		a->main.period = a->tmpperiod - temp;
+		a->ownper=1;
+	} else {
+		/* Old IT vibrato is twice as deep. */
+		temp>>=7;
+		if (!(flags & ITVIB_FINE))
+			temp<<=2;
+
+		/* Old IT vibrato uses the same waveforms but they are applied reversed. */
+		a->main.period = a->tmpperiod + temp;
+		a->ownper=1;
+
+		/* Old IT vibrato does not update on the first tick. */
+		if (!tick)
+			return;
+	}
 
 	a->vibpos+=a->vibspd;
 }
 
 static int DoITEffectH(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-    (void)flags;
-    (void)mod;
-    (void)channel;
-	DoITVibrato(tick, a, UniGetByte());
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	DoITVibrato(tick, a, UniGetByte(), 0);
+
+	return 0;
+}
+
+static int DoITEffectHOld(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	DoITVibrato(tick, a, UniGetByte(), ITVIB_OLD);
 
 	return 0;
 }
@@ -1982,48 +2090,20 @@ static int DoITEffectT(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 
 static int DoITEffectU(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	UBYTE dat, q;
-	UWORD temp = 0;	/* silence warning */
+	DoITVibrato(tick, a, UniGetByte(), ITVIB_FINE);
     (void)flags;
     (void)mod;
     (void)channel;
 
-	dat = UniGetByte();
-	if (!tick) {
-		if (dat&0x0f) a->vibdepth=dat&0xf;
-		if (dat&0xf0) a->vibspd=(dat&0xf0)>>2;
-	}
-	if (a->main.period) {
-		q=(a->vibpos>>2)&0x1f;
+	return 0;
+}
 
-		switch (a->wavecontrol&3) {
-		case 0: /* sine */
-			temp=VibratoTable[q];
-			break;
-		case 1: /* square wave */
-			temp=255;
-			break;
-		case 2: /* ramp down */
-			q<<=3;
-			if (a->vibpos<0) q=255-q;
-			temp=q;
-			break;
-		case 3: /* random */
-			temp=getrandom(256);
-			break;
-		}
-
-		temp*=a->vibdepth;
-		temp>>=8;
-
-		if (a->vibpos>=0)
-			a->main.period=a->tmpperiod+temp;
-		else
-			a->main.period=a->tmpperiod-temp;
-		a->ownper = 1;
-
-		a->vibpos+=a->vibspd;
-	}
+static int DoITEffectUOld(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	DoITVibrato(tick, a, UniGetByte(), ITVIB_FINE | ITVIB_OLD);
+    (void)flags;
+    (void)mod;
+    (void)channel;
 
 	return 0;
 }
@@ -2068,8 +2148,8 @@ static int DoITEffectW(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 
 static int DoITEffectY(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	UBYTE dat, q;
-	SLONG temp = 0;	/* silence warning */
+	UBYTE dat;
+	SLONG temp;
     (void)flags;
 
 
@@ -2079,31 +2159,15 @@ static int DoITEffectY(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		if (dat&0xf0) a->panbspd=(dat&0xf0)>>4;
 	}
 	if (mod->panflag) {
-		q=a->panbpos;
-
-		switch (a->panbwave) {
-		case 0: /* sine */
-			temp=PanbrelloTable[q];
-			break;
-		case 1: /* square wave */
-			temp=(q<0x80)?64:0;
-			break;
-		case 2: /* ramp down */
-			q<<=3;
-			temp=q;
-			break;
-		case 3: /* random */
-			temp=getrandom(256);
-			break;
-		}
-
+		/* TODO: when wave is random, each random value persists for a number of
+		   ticks equal to the speed nibble. This behavior is unique to panbrello. */
+		temp = LFOPanbrello(a->panbpos, a->panbwave);
 		temp*=a->panbdepth;
 		temp=(temp/8)+mod->panning[channel];
 
 		a->main.panning=
 			(temp<PAN_LEFT)?PAN_LEFT:(temp>PAN_RIGHT?PAN_RIGHT:temp);
 		a->panbpos+=a->panbspd;
-
 	}
 
 	return 0;
@@ -2234,7 +2298,7 @@ static int DoVolEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 			DoITToneSlide(tick, a, inf);
 			break;
 		case VOL_VIBRATO:
-			DoITVibrato(tick, a, inf);
+			DoITVibrato(tick, a, inf, 0);
 			break;
 	}
 
@@ -2277,24 +2341,154 @@ static int DoMEDSpeed(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD
 	return 0;
 }
 
+static int DoMEDEffectVib(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	/* MED vibrato (larger speed/depth range than PT vibrato). */
+	UBYTE rate  = UniGetByte();
+	UBYTE depth = UniGetByte();
+	if (!tick) {
+		a->vibspd   = rate;
+		a->vibdepth = depth;
+	}
+	if (a->main.period)
+		DoVibrato(tick, a, VIB_TICK_0);
+
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	return 0;
+}
+
 static int DoMEDEffectF1(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	DoEEffects(tick, flags, a, mod, channel, 0x90|(mod->sngspd/2));
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
+	/* "Play twice." Despite the documentation, this only retriggers exactly one time
+	   on the third tick (i.e. it is not equivalent to PT E93). */
+	if (tick == 3) {
+		if (a->main.period)
+			a->main.kick = KICK_NOTE;
+	}
 	return 0;
 }
 
 static int DoMEDEffectF2(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	DoEEffects(tick, flags, a, mod, channel, 0xd0|(mod->sngspd/2));
+	/* Delay for 3 ticks before playing. */
+	DoEEffects(tick, flags, a, mod, channel, 0xd3);
 
 	return 0;
 }
 
 static int DoMEDEffectF3(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
-	DoEEffects(tick, flags, a, mod, channel, 0x90|(mod->sngspd/3));
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
+	/* "Play three times." Actually, it's just a regular retrigger every 2 ticks,
+	   starting from tick 2. */
+	if (!tick) a->retrig=2;
+	if (!a->retrig) {
+		if (a->main.period) a->main.kick = KICK_NOTE;
+		a->retrig=2;
+	}
+	a->retrig--;
+
+	return 0;
+}
+
+static int DoMEDEffectFD(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+	(void)tick;
+
+	/* Set pitch without triggering a new note. */
+	a->main.kick = KICK_ABSENT;
+	return 0;
+}
+
+static int DoMEDEffect16(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)channel;
+
+	/* Loop (similar to PT E6x but with an extended range).
+	   TODO: currently doesn't support the loop point persisting between patterns.
+	   It's not clear if anything actually relies on that. */
+	UBYTE param = UniGetByte();
+	int reppos;
+	int i;
+
+	DoLoop(tick, flags, a, mod, param);
+
+	/* OctaMED repeat position is global so set it for every channel...
+	   This fixes a playback bug found in "(brooker) #01.med", which sets
+	   the jump position in track 2 but jumps in track 1. */
+	reppos = a->pat_reppos;
+	for (i = 0; i < pf->numchn; i++)
+		pf->control[i].pat_reppos = reppos;
+
+	return 0;
+}
+
+static int DoMEDEffect18(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	/* Cut note (same as PT ECx but with an extended range). */
+	UBYTE param = UniGetByte();
+	if (tick >= param)
+		a->tmpvolume=0;
+
+	return 0;
+}
+
+static int DoMEDEffect1E(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)a;
+	(void)channel;
+
+	/* Pattern delay (same as PT EEx but with an extended range). */
+	UBYTE param = UniGetByte();
+	if (!tick && !mod->patdly2)
+		mod->patdly = (param<255) ? param+1 : 255;
+
+	return 0;
+}
+
+static int DoMEDEffect1F(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	/* Combined note delay and retrigger (same as PT E9x and EDx but can be combined).
+	   The high nibble is delay and the low nibble is retrigger. */
+	UBYTE param = UniGetByte();
+	UBYTE retrig = param & 0xf;
+
+	if (!tick) {
+		a->main.notedelay = (param & 0xf0) >> 4;
+		a->retrig = retrig;
+	} else if (a->main.notedelay) {
+		a->main.notedelay--;
+	}
+
+	if (!a->main.notedelay) {
+		if (retrig && !a->retrig) {
+			if (a->main.period) a->main.kick = KICK_NOTE;
+			a->retrig = retrig;
+		}
+		a->retrig--;
+	}
 	return 0;
 }
 
@@ -2316,6 +2510,310 @@ static int DoOktArp(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD c
 	}
 	if (a->main.period)
 		DoArpeggio(tick, flags, a, dat2);
+
+	return 0;
+}
+
+/*========== Farandole effects */
+
+static void DoFarTonePorta(MP_CONTROL *a)
+{
+	int reachedNote;
+
+	if (!a->main.fadevol)
+		a->main.kick = (a->main.kick == KICK_NOTE) ? KICK_NOTE : KICK_KEYOFF;
+	else
+		a->main.kick = (a->main.kick == KICK_NOTE) ? KICK_ENV : KICK_ABSENT;
+
+	a->farcurrentvalue += a->fartoneportaspeed;
+
+	/* Have we reached our note */
+	if (a->fartoneportaspeed > 0) {
+		reachedNote = (a->farcurrentvalue >> 16) >= a->wantedperiod;
+	} else {
+		reachedNote = (a->farcurrentvalue >> 16) <= a->wantedperiod;
+	}
+	if (reachedNote) {
+		/* Stop the porta and set the periods to the reached note */
+		a->tmpperiod = a->main.period = a->wantedperiod;
+		a->fartoneportarunning = 0;
+	}
+	else {
+		/* Do the porta */
+		a->tmpperiod = a->main.period = (UWORD)(a->farcurrentvalue >> 16);
+	}
+
+	a->ownper = 1;
+}
+
+static SWORD GetFARTempo(MODULE *mod)
+{
+	return mod->control[0].fartempobend + far_tempos[mod->control[0].farcurtempo];
+}
+
+/* Set the right speed and BPM for Farandole modules */
+static void SetFARTempo(MODULE *mod)
+{
+	/* According to the Farandole document, the tempo of the song is
+	   32/tempo notes per second. Internally, it tracks time using
+	   (128/tempo + fine_tempo) ticks per second, and (usually) four ticks
+	   per row. Since almost everything else uses Amiga-style BPM instead,
+	   this needs to be converted to BPM.
+
+	   Amiga-style BPM converts a value of 125 BPM to 50 Hz (ticks/second)
+	   (see https://modarchive.org/forums/index.php?topic=2709.0), so
+	   the factor is 125/50 = 2.5. To get an Amiga-compatible BPM from
+	   Farandole Composer ticks per second,: BPM/Hz = 2.5 -> BPM = 2.5 * Hz.
+
+	   Example: at tempo 4, Hz = 128/4 + 0 = 32, so use BPM = 2.5*32 = 80.
+
+	   This is further complicated by the bizarre timing system it uses for
+	   slower tempos. Farandole Composer uses the programmable interval timer
+	   to determine when to execute the player interrupt, which requires
+	   calculating a divisor from the original Hz. The PIT only supports
+	   divisors up to 0x10000, which corresponds to 18.2Hz.
+
+	   When the computed divisor is > 0xffff, Farandole iteratively divides
+	   the divisor by 2 (effectively doubling Hz) and increments the number
+	   of ticks/second by 1. It also adds 1 to the number of ticks/second if
+	   two or more of these divisions occur. Further strange behavior can
+	   occur with negative ticks/second, which overflows to very slow tempos.
+
+	   Note: to compute the divisor it uses 1197255 Hz instead of the rate
+	   of the programmable interval timer (1193182 Hz). This results in a
+	   slightly slower speed than computed, but it's not worth supporting.
+
+	   Note: Farandole Composer also has an "old tempo mode" that uses 33
+	   ticks/second and only executes every 8th tick. Nothing uses it and
+	   it's not supported here. */
+
+	SWORD bpm = GetFARTempo(mod);
+	SLONG speed;
+	ULONG divisor;
+	if (!bpm)
+		return;
+
+	speed = 0;
+	divisor = 1197255 / bpm;
+
+	while (divisor > 0xffff) {
+		divisor >>= 1;
+		bpm <<= 1;
+		speed++;
+	}
+
+	/* Negative tempos can result in low BPMs, so clamp them to 18Hz. */
+	if (bpm <= 18)
+		bpm = 18;
+
+	if (speed >= 2)
+		speed++;
+
+	mod->sngspd = speed + 4;
+	mod->bpm = (UWORD)(bpm * 5) >> 1;
+}
+
+static int DoFAREffect1(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (!tick) {
+		a->slidespeed = (UWORD)dat << 2;
+
+		if (a->main.period)
+			a->tmpperiod -= a->slidespeed;
+
+		a->fartoneportarunning = 0;
+	}
+
+	return 0;
+}
+
+static int DoFAREffect2(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (!tick) {
+		a->slidespeed = (UWORD)dat << 2;
+
+		if (a->main.period)
+			a->tmpperiod += a->slidespeed;
+
+		a->fartoneportarunning = 0;
+	}
+
+	return 0;
+}
+
+static int DoFAREffect3(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (!tick) {
+		/* We have to slide a.Main.Period toward a.WantedPeriod,
+		  compute the difference between those two values */
+		SLONG dist = a->wantedperiod - a->main.period;
+		SWORD tempo = GetFARTempo(mod);
+
+		/* Adjust effect argument */
+		if (dat == 0)
+			dat = 1;
+		/* This causes crashes and other weird behavior in Farandole Composer. */
+		if (tempo <= 0)
+			tempo = 1;
+
+		/* The data is supposed to be the number of rows until completion of
+		   the slide, but because it's Farandole Composer, it isn't. While
+		   that claim holds for tempo 4, for tempo 2 it takes param*2 rows,
+		   for tempo 1 it takes param*4 rows, etc. This calculation is based
+		   on the final tempo/interrupts per second count. */
+		a->fartoneportaspeed = (dist << 16) * 8 / (tempo * dat);
+		a->farcurrentvalue = (SLONG)a->main.period << 16;
+		a->fartoneportarunning = 1;
+	}
+
+	return 0;
+}
+
+static int DoFAREffect4(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	/* Here the argument is the number of retrigs to play evenly
+	   spaced in the current row */
+	if (!tick) {
+		if (dat) {
+			a->farretrigcount = dat;
+			a->retrig = 0;
+		}
+	}
+
+	if (dat && a->newnote) {
+		if (!a->retrig) {
+			if (a->farretrigcount > 0) {
+				/* When retrig counter reaches 0,
+				   reset counter and restart the sample */
+				if (a->main.period != 0)
+					a->main.kick = KICK_NOTE;
+
+				a->farretrigcount--;
+				if (a->farretrigcount > 0) {
+					SWORD delay = GetFARTempo(mod) / dat;
+					/* Effect divides by 4, timer increments
+					   by 2 (round up). */
+					a->retrig = ((delay >> 2) + 1) >> 1;
+					if (a->retrig <= 0)
+						a->retrig = 1;
+				}
+			}
+		}
+		a->retrig--;
+	}
+
+	return 0;
+}
+
+static int DoFAREffect6(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)mod;
+	(void)channel;
+
+	UBYTE dat;
+
+	dat = UniGetByte();
+	if (!tick) {
+		if (dat & 0x0f) a->vibdepth = dat & 0xf;
+		if (dat & 0xf0) a->vibspd = (dat & 0xf0) * 6;
+	}
+	if (a->main.period)
+		DoVibrato(tick, a, VIB_TICK_0);
+
+	return 0;
+}
+
+static int DoFAREffectD(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)a;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (tick == 0) {
+		MP_CONTROL *firstControl = &mod->control[0];
+
+		if (dat != 0) {
+			firstControl->fartempobend -= dat;
+
+			if (GetFARTempo(mod) <= 0)
+				firstControl->fartempobend = 0;
+		}
+		else
+			firstControl->fartempobend = 0;
+
+		SetFARTempo(mod);
+	}
+
+	return 0;
+}
+
+static int DoFAREffectE(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)a;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (tick == 0) {
+		MP_CONTROL *firstControl = &mod->control[0];
+
+		if (dat != 0) {
+			firstControl->fartempobend += dat;
+
+			if (GetFARTempo(mod) >= 100)
+				firstControl->fartempobend = 100;
+		}
+		else
+			firstControl->fartempobend = 0;
+
+		SetFARTempo(mod);
+	}
+
+	return 0;
+}
+
+static int DoFAREffectF(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
+{
+	(void)flags;
+	(void)a;
+	(void)channel;
+
+	UBYTE dat = UniGetByte();
+
+	if (!tick) {
+		MP_CONTROL *firstControl = &mod->control[0];
+
+		firstControl->farcurtempo = dat;
+		mod->vbtick = 0;
+
+		SetFARTempo(mod);
+	}
 
 	return 0;
 }
@@ -2368,7 +2866,7 @@ static effect_func effects[UNI_LAST] = {
 	DoKeyOff,	/* UNI_KEYOFF */
 	DoKeyFade,	/* UNI_KEYFADE */
 	DoVolEffects,	/* UNI_VOLEFFECTS */
-	DoPTEffect4,	/* UNI_XMEFFECT4 */
+	DoPTEffect4Fix,	/* UNI_XMEFFECT4 */
 	DoXMEffect6,	/* UNI_XMEFFECT6 */
 	DoXMEffectA,	/* UNI_XMEFFECTA */
 	DoXMEffectE1,	/* UNI_XMEFFECTE1 */
@@ -2399,6 +2897,27 @@ static effect_func effects[UNI_LAST] = {
 	DoMEDEffectF2,	/* UNI_MEDEFFECTF2 */
 	DoMEDEffectF3,	/* UNI_MEDEFFECTF3 */
 	DoOktArp,	/* UNI_OKTARP */
+	DoNothing,	/* unused */
+	DoPTEffect4Fix, /* UNI_S3MEFFECTH */
+	DoITEffectHOld, /* UNI_ITEFFECTH_OLD */
+	DoITEffectUOld, /* UNI_ITEFFECTU_OLD */
+	DoPTEffect4Fix,	/* UNI_GDMEFFECT4 */
+	DoPTEffect7Fix,	/* UNI_GDMEFFECT7 */
+	DoS3MEffectU,   /* UNI_GDMEFFECT14 */
+	DoMEDEffectVib, /* UNI_MEDEFFECT_VIB */
+	DoMEDEffectFD,	/* UNI_MEDEFFECT_FD */
+	DoMEDEffect16,	/* UNI_MEDEFFECT_16 */
+	DoMEDEffect18,	/* UNI_MEDEFFECT_18 */
+	DoMEDEffect1E,	/* UNI_MEDEFFECT_1E */
+	DoMEDEffect1F,	/* UNI_MEDEFFECT_1F */
+	DoFAREffect1,	/* UNI_FAREFFECT1 */
+	DoFAREffect2,	/* UNI_FAREFFECT2 */
+	DoFAREffect3,	/* UNI_FAREFFECT3 */
+	DoFAREffect4,	/* UNI_FAREFFECT4 */
+	DoFAREffect6,	/* UNI_FAREFFECT6 */
+	DoFAREffectD,	/* UNI_FAREFFECTD */
+	DoFAREffectE,	/* UNI_FAREFFECTE */
+	DoFAREffectF,	/* UNI_FAREFFECTF */
 };
 
 static int pt_playeffects(MODULE *mod, SWORD channel, MP_CONTROL *a)
@@ -2586,24 +3105,17 @@ static void pt_UpdateVoices(MODULE *mod, int max_volume)
 			else
 				Voice_SetPanning_internal(channel,aout->main.panning);
 
-		if (aout->main.period && s->vibdepth)
-			switch (s->vibtype) {
-			case 0:
-				vibval=avibtab[s->avibpos&127];
-				if (aout->avibpos & 0x80) vibval=-vibval;
-				break;
-			case 1:
-				vibval=64;
-				if (aout->avibpos & 0x80) vibval=-vibval;
-				break;
-			case 2:
-				vibval=63-(((aout->avibpos+128)&255)>>1);
-				break;
-			default:
-				vibval=(((aout->avibpos+128)&255)>>1)-64;
-				break;
+		if (aout->main.period && s->vibdepth) {
+			if (s->vibflags & AV_IT) {
+				/* IT auto-vibrato uses regular waveforms. */
+				vibval = LFOVibratoIT((SBYTE)aout->avibpos, s->vibtype);
+			} else {
+				/* XM auto-vibrato uses its own set of waveforms.
+				   Also, uses LFO amplitudes on [-63,63], possibly to compensate
+				   for depth being multiplied by 4 in the loader(?). */
+				vibval = LFOAutoVibratoXM((SBYTE)aout->avibpos, s->vibtype) >> 2;
 			}
-		else
+		} else
 			vibval=0;
 
 		if (s->vibflags & AV_IT) {
@@ -2614,7 +3126,10 @@ static void pt_UpdateVoices(MODULE *mod, int max_volume)
 				vibdpt=s->vibdepth<<8;
 			vibval=(vibval*vibdpt)>>16;
 			if (aout->mflag) {
-				if (!(mod->flags&UF_LINEAR)) vibval>>=1;
+				/* This vibrato value is the correct value in fine linear slide
+				   steps, but MikMod linear periods are halved, so the final
+				   value also needs to be halved in linear mode. */
+				if (mod->flags&UF_LINEAR) vibval>>=1;
 				aout->main.period-=vibval;
 			}
 		} else {
@@ -2684,8 +3199,8 @@ static void pt_UpdateVoices(MODULE *mod, int max_volume)
 		}
 
 		md_bpm=mod->bpm+mod->relspd;
-		if (md_bpm<32)
-			md_bpm=32;
+		if (md_bpm<mod->bpmlimit)
+			md_bpm=mod->bpmlimit;
 		else if ((!(mod->flags&UF_HIGHBPM)) && md_bpm>255)
 			md_bpm=255;
 	}
@@ -2711,10 +3226,11 @@ static void pt_Notes(MODULE *mod)
 		}
 
 		a->row=(tr<mod->numtrk)?UniFindRow(mod->tracks[tr],mod->patpos):NULL;
+		a->newnote=0;
 		a->newsamp=0;
 		if (!mod->vbtick) a->main.notedelay=0;
 
-		if (!a->row) continue;
+		if (!a->row || (mod->numrow == 0)) continue;
 		UniSetRow(a->row);
 		funky=0;
 
@@ -2726,11 +3242,13 @@ static void pt_Notes(MODULE *mod)
 				a->main.kick =KICK_NOTE;
 				a->main.start=-1;
 				a->sliding=0;
+				a->newnote=1;
+				a->fartoneportarunning = 0;
 
 				/* retrig tremolo and vibrato waves ? */
-				if (!(a->wavecontrol & 0x80)) a->trmpos=0;
-				if (!(a->wavecontrol & 0x08)) a->vibpos=0;
-				if (!a->panbwave) a->panbpos=0;
+				if (!(a->wavecontrol & 0x40)) a->trmpos=0;
+				if (!(a->wavecontrol & 0x04)) a->vibpos=0;
+				a->panbpos=0;
 				break;
 			case UNI_INSTRUMENT:
 				inst=UniGetByte();
@@ -2860,6 +3378,10 @@ static void pt_EffectsPass1(MODULE *mod)
 			else if (a->tmpvolume)
 				a->sliding = explicitslides;
 		}
+
+		/* keep running Farandole tone porta */
+		if (a->fartoneportarunning)
+			DoFarTonePorta(a);
 
 		if (!a->ownper)
 			a->main.period=a->tmpperiod;
@@ -3066,7 +3588,7 @@ void Player_HandleTick(void)
 
 		/* do we have to get a new patternpointer ? (when pf->patpos reaches the
 		   pattern size, or when a patternbreak is active) */
-		if (((pf->patpos>=pf->numrow)&&(pf->numrow>0))&&(!pf->posjmp))
+		if ((pf->patpos>=pf->numrow)&&(!pf->posjmp))
 			pf->posjmp=3;
 
 		if (pf->posjmp) {
@@ -3087,11 +3609,18 @@ void Player_HandleTick(void)
 				if (!pf->wrap) return;
 				if (!(pf->sngpos=pf->reppos)) {
 				    pf->volume=pf->initvolume>128?128:pf->initvolume;
-					if(pf->initspeed!=0)
-						pf->sngspd=pf->initspeed<32?pf->initspeed:32;
-					else
-						pf->sngspd=6;
-					pf->bpm=pf->inittempo<32?32:pf->inittempo;
+					if (pf->flags & UF_FARTEMPO) {
+						pf->control[0].farcurtempo = pf->initspeed;
+						pf->control[0].fartempobend = 0;
+						SetFARTempo(pf);
+					}
+					else {
+						if(pf->initspeed!=0)
+							pf->sngspd=pf->initspeed<pf->bpmlimit?pf->initspeed:pf->bpmlimit;
+						else
+							pf->sngspd=6;
+						pf->bpm=pf->inittempo<pf->bpmlimit?pf->bpmlimit:pf->inittempo;
+					}
 				}
 			}
 		}
@@ -3132,16 +3661,26 @@ static void Player_Init_internal(MODULE* mod)
 
 	mod->pat_repcrazy=0;
 	mod->sngpos=0;
-	if(mod->initspeed!=0)
-		mod->sngspd=mod->initspeed<32?mod->initspeed:32;
-	else
-		mod->sngspd=6;
+
+	if (mod->flags & UF_FARTEMPO) {
+		mod->control[0].farcurtempo = mod->initspeed;
+		mod->control[0].fartempobend = 0;
+		SetFARTempo(mod);
+	}
+	else {
+		if(mod->initspeed!=0)
+			mod->sngspd=mod->initspeed<mod->bpmlimit?mod->initspeed:mod->bpmlimit;
+		else
+			mod->sngspd=6;
+
+		mod->bpm=mod->inittempo<mod->bpmlimit?mod->bpmlimit:mod->inittempo;
+	}
+
 	mod->volume=mod->initvolume>128?128:mod->initvolume;
 
 	mod->vbtick=mod->sngspd;
 	mod->patdly=0;
 	mod->patdly2=0;
-	mod->bpm=mod->inittempo<32?32:mod->inittempo;
 	mod->realchn=0;
 
 	mod->patpos=0;

@@ -20,20 +20,14 @@
 
 /*==============================================================================
 
-  $Id$
-
   High-quality sample mixing routines, using a 32 bits mixing buffer,
   interpolation, and sample smoothing to improve sound quality and remove
   clicks.
 
-==============================================================================*/
-
-/*
-
   Future Additions:
-	Low-Pass filter to remove annoying staticy buzz.
+  - Low-Pass filter to remove annoying staticy buzz.
 
-*/
+==============================================================================*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1074,9 +1068,10 @@ static void AddChannel(SLONG* ptr,NATIVE todo)
 		     (vnf->flags&SF_LOOP)?idxlend:idxsize;
 
 		/* if the sample is not blocked... */
-		if((end==vnf->current)||(!vnf->increment))
+		if((vnf->increment>0 && vnf->current>=end) ||
+		   (vnf->increment<0 && vnf->current<=end) || !vnf->increment) {
 			done=0;
-		else {
+		} else {
 			done=MIN((end-vnf->current)/vnf->increment+1,todo);
 			if(done<0) done=0;
 		}

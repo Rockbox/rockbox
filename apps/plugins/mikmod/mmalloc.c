@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
-
   Dynamic memory routines
 
 ==============================================================================*/
@@ -106,7 +104,12 @@ void* MikMod_realloc(void *data, size_t size)
 /* Same as malloc, but sets error variable _mm_error when fails */
 void* MikMod_malloc(size_t size)
 {
-	return MikMod_calloc(1, size);
+	void *d = malloc(size);
+	if (d) return d;
+
+	_mm_errno = MMERR_OUT_OF_MEMORY;
+	if(_mm_errorhandler) _mm_errorhandler();
+	return NULL;
 }
 
 /* Same as calloc, but sets error variable _mm_error when fails */
@@ -134,8 +137,8 @@ CHAR *MikMod_strdup(const CHAR *s)
 	if (!s) return NULL;
 
 	l = strlen(s) + 1;
-	d = (CHAR *) MikMod_calloc(1, l * sizeof(CHAR));
-	if (d) strcpy(d, s);
+	d = (CHAR *) MikMod_malloc(l);
+	if (d) memcpy(d, s, l);
 	return d;
 }
 

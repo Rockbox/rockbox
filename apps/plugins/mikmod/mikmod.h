@@ -41,7 +41,7 @@ extern "C" {
  *
  * ========== NOTE TO WINDOWS DEVELOPERS:
  * If you are compiling for Windows and will link to the static library
- * (libmikmod.a with MinGW, or mikmod_static.lib with MSVC or LCC, etc),
+ * (libmikmod.a with MinGW, or mikmod_static.lib with MSVC, Watcom, ..),
  * you must define MIKMOD_STATIC in your project.  Otherwise, dllimport
  * will be assumed.
  */
@@ -76,7 +76,7 @@ extern "C" {
 
 #define LIBMIKMOD_VERSION_MAJOR 3L
 #define LIBMIKMOD_VERSION_MINOR 3L
-#define LIBMIKMOD_REVISION     11L
+#define LIBMIKMOD_REVISION     12L
 
 #define LIBMIKMOD_VERSION \
     ((LIBMIKMOD_VERSION_MAJOR<<16)| \
@@ -89,7 +89,7 @@ MIKMODAPI extern long MikMod_GetVersion(void);
  *  ========== Dependency platform headers
  */
 
-#ifdef _WIN32
+#if defined(_WIN32)||defined(__CYGWIN__)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -136,10 +136,8 @@ typedef unsigned char      UBYTE;
 #endif
 
 /* 2 bytes, signed and unsigned: */
-#if !(defined __LCC__ && defined _WIN32)
 typedef signed short int   SWORD;
-#endif
-#if !((defined __LCC__ && defined _WIN32) || defined(_MIKMOD_AMIGA))
+#if !defined(_MIKMOD_AMIGA)
 typedef unsigned short int UWORD;
 #endif
 
@@ -147,13 +145,13 @@ typedef unsigned short int UWORD;
 #if defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
         /* 64 bit architectures: */
 typedef signed int         SLONG;
-#if !(defined(_WIN32) || defined(_MIKMOD_AMIGA))
+#if !defined(_MIKMOD_AMIGA)
 typedef unsigned int       ULONG;
 #endif
 
 #else  /* 32 bit architectures: */
 typedef signed long int    SLONG;
-#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_WIN32) || defined(_MIKMOD_AMIGA))
+#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_AMIGA))
 typedef unsigned long int  ULONG;
 #endif
 #endif
@@ -254,14 +252,14 @@ enum {
     MMERR_MAC_SPEED,
     MMERR_MAC_START,
 
-    MMERR_OSX_UNKNOWN_DEVICE,
-    MMERR_OSX_BAD_PROPERTY,
+    MMERR_OSX_UNKNOWN_DEVICE, /* obsolete */
+    MMERR_OSX_BAD_PROPERTY,   /* obsolete */
     MMERR_OSX_UNSUPPORTED_FORMAT,
-    MMERR_OSX_SET_STEREO,
-    MMERR_OSX_BUFFER_ALLOC,
-    MMERR_OSX_ADD_IO_PROC,
+    MMERR_OSX_SET_STEREO,     /* obsolete */
+    MMERR_OSX_BUFFER_ALLOC,   /* obsolete */
+    MMERR_OSX_ADD_IO_PROC,    /* obsolete */
     MMERR_OSX_DEVICE_START,
-    MMERR_OSX_PTHREAD,
+    MMERR_OSX_PTHREAD,        /* obsolete */
 
     MMERR_DOSWSS_STARTDMA,
     MMERR_DOSSB_STARTDMA,
@@ -376,8 +374,9 @@ typedef struct MWRITER {
 #define SF_BIG_ENDIAN   0x0008
 #define SF_DELTA        0x0010
 #define SF_ITPACKED     0x0020
+#define SF_ADPCM4       0x0040
 
-#define SF_FORMATMASK   0x003F
+#define SF_FORMATMASK   0x007F
 
 /* General Playback flags */
 
@@ -551,6 +550,7 @@ struct MP_VOICE;
 #define UF_FT2QUIRKS    0x0200 /* emulate some FT2 replay quirks */
 #define UF_PANNING      0x0400 /* module uses panning effects or have
                                   non-tracker default initial panning */
+#define UF_FARTEMPO     0x0800 /* Module uses Farandole tempo calculations */
 
 typedef struct MODULE {
  /* general module information */

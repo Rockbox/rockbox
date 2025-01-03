@@ -20,10 +20,8 @@
 
 /*==============================================================================
 
-  $Id$
-
   Common source parts between the two software mixers.
-  This file is probably the ugliest part of libmikmod...
+  This file is probably the ugliest part of libmikmod.
 
 ==============================================================================*/
 

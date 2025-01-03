@@ -45,6 +45,7 @@ static int curfile = 0, direction = DIR_NEXT, entries = 0;
 /* list of the mod files */
 static char **file_pt;
 
+static int inited = 0;
 
 /* The MP3 audio buffer which we will use as heap memory */
 static unsigned char* audio_buffer;
@@ -532,7 +533,7 @@ static void applysettings(void)
     }
 #endif
 
-    if (md_mixfreq != rb->hw_freq_sampr[settings.sample_rate]) {
+    if (inited && (md_mixfreq != rb->hw_freq_sampr[settings.sample_rate])) {
         md_mixfreq = rb->hw_freq_sampr[settings.sample_rate];
 //	MikMod_Reset("");  BROKEN!
 	rb->pcm_play_stop();
@@ -992,6 +993,8 @@ enum plugin_status plugin_start(const void* parameter)
         mm_errorhandler();
         return PLUGIN_ERROR;
     }
+
+    inited = 1;
 
     do
     {

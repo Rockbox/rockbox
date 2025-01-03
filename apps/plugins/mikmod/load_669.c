@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id: $
-
   Composer 669 module loader
 
 ==============================================================================*/
@@ -321,7 +319,8 @@ static int S69_Load(int curious)
 		sample.length=_mm_read_I_SLONG(modreader);
 		sample.loopbeg=_mm_read_I_SLONG(modreader);
 		sample.loopend=_mm_read_I_SLONG(modreader);
-		if (sample.loopend==0xfffff) sample.loopend=0;
+		/* Note: 'Lost in Germany' has 0xf0ffff as marker */
+		if (sample.loopend>=0xfffff) sample.loopend=0;
 
 		if((sample.length<0)||(sample.loopbeg<-1)||(sample.loopend<-1)) {
 			_mm_errno = MMERR_LOADING_HEADER;
@@ -330,7 +329,7 @@ static int S69_Load(int curious)
 
 		current->samplename=DupStr(sample.filename,13,1);
 		current->seekpos=0;
-		current->speed=0;
+		current->speed=128; /* Used as finetune when UF_XMPERIODS is enabled; 128 is centered. */
 		current->length=sample.length;
 		current->loopstart=sample.loopbeg;
 		current->loopend=sample.loopend;

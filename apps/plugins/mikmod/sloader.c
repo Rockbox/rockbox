@@ -20,8 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
-
   Routines for loading samples. The sample loader utilizes the routines
   provided by the "registered" sample loader.
 
@@ -56,7 +54,7 @@ typedef struct ITPACK {
 int SL_Init(SAMPLOAD* s)
 {
 	if(!sl_buffer)
-		if(!(sl_buffer=(SWORD*)MikMod_malloc(SLBUFSIZE*sizeof(SWORD)))) return 0;
+		if(!(sl_buffer=(SWORD*)MikMod_calloc(1,SLBUFSIZE*sizeof(SWORD)))) return 0;
 
 	sl_rlength = s->length;
 	if(s->infmt & SF_16BITS) sl_rlength>>=1;
@@ -221,7 +219,7 @@ static int read_itcompr16(ITPACK *status,MREADER *reader,SWORD *out,UWORD count,
 	return (dest-out);
 }
 
-static int SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefactor,ULONG length,MREADER* reader,int dither)
+static int SL_LoadInternal(void *buffer,UWORD infmt,UWORD outfmt,int scalefactor,ULONG length,MREADER *reader,int dither)
 {
 	SBYTE *bptr = (SBYTE*)buffer;
 	SWORD *wptr = (SWORD*)buffer;
@@ -230,6 +228,10 @@ static int SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefactor
 	int result,c_block=0;	/* compression bytes until next block */
 	ITPACK status;
 	UWORD incnt = 0;
+
+	SBYTE compressionTable[16];
+	SWORD adpcmDelta = 0;
+	int hasTable = 0;
 
 	status.buf = 0;
 	status.last = 0;
@@ -260,6 +262,22 @@ static int SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefactor
 				return 1;
 			}
 			c_block -= stodo;
+		} else if (infmt&SF_ADPCM4) {
+			if (!hasTable) {
+				/* Read compression table */
+				_mm_read_SBYTES(compressionTable, 16, reader);
+				hasTable = 1;
+			}
+
+			// 4-bit ADPCM data, used by MOD plugin
+			for(t=0;t<stodo;t+=2) {
+				UBYTE b = _mm_read_UBYTE(reader);
+
+				adpcmDelta += compressionTable[b & 0x0f];
+				sl_buffer[t] = adpcmDelta << 8;
+				adpcmDelta += compressionTable[(b >> 4) & 0x0f];
+				sl_buffer[t+1] = adpcmDelta << 8;
+			}
 		} else {
 			if(infmt&SF_16BITS) {
 				if(_mm_eof(reader)) {
@@ -368,7 +386,7 @@ SAMPLOAD* SL_RegisterSample(SAMPLE* s,int type,MREADER* reader)
 		return NULL;
 
 	/* Allocate and add structure to the END of the list */
-	if(!(news=(SAMPLOAD*)MikMod_malloc(sizeof(SAMPLOAD)))) return NULL;
+	if(!(news=(SAMPLOAD*)MikMod_calloc(1, sizeof(SAMPLOAD)))) return NULL;
 
 	if(cruise) {
 		while(cruise->next) cruise=cruise->next;
