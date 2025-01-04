@@ -780,9 +780,16 @@ static int load_plugin_screen(char *key)
             ret_val = GO_TO_WPS;
         else if (ret == PLUGIN_GOTO_PLUGIN)
         {
-            if (key == (char*)LANG_SHORTCUTS && op_entry->lang_id == LANG_OPEN_PLUGIN)
+            if(op_entry->lang_id == LANG_OPEN_PLUGIN)
             {
-                op_entry->lang_id = LANG_SHORTCUTS;
+                if (key == (char*)LANG_SHORTCUTS)
+                {
+                    op_entry->lang_id = LANG_SHORTCUTS;
+                }
+                else /* Bugfix ensure proper key */
+                {
+                    key = (char*)LANG_OPEN_PLUGIN;
+                }
             }
             continue;
         }
