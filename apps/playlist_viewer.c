@@ -647,7 +647,10 @@ static void close_playlist_viewer(void)
                 save_playlist_screen(viewer.playlist);
             else if (!viewer.num_tracks &&
                      confirm_delete_yesno(viewer.playlist->filename) == YESNO_YES)
+            {
                 remove(viewer.playlist->filename);
+                reload_directory();
+            }
         }
         playlist_close(viewer.playlist);
     }
