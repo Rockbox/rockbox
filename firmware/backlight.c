@@ -676,7 +676,7 @@ void backlight_thread(void)
             case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
                 locked = true;      /* go off before power is actually cut. */
 #if !defined(BOOTLOADER)
-#if defined(HAVE_LCD_SLEEP) && defined(IPOD_6G) /* bugfix ipod 6G crashes if screen off at shutdown */
+#if defined(HAVE_LCD_SLEEP) /* bugfix ipod Video, 6G crashes if screen off at shutdown */
                 lcd_awake();
 #endif
                 if (!global_settings.show_shutdown_message)
