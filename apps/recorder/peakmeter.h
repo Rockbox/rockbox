@@ -21,7 +21,7 @@
 #ifndef __PEAKMETER_H__
 #define __PEAKMETER_H__
 
-#define PEAK_METER_FPS 20
+#define PEAK_METER_FPS 10 /* bugfix FS#10686*/
 #define MAX_PEAK 0x8000
 
 /*#define PM_DEBUG */
