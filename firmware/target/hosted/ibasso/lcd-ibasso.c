@@ -177,6 +177,10 @@ void lcd_enable(bool on)
     }
 }
 
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
 
 void lcd_sleep(void)
 {

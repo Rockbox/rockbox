@@ -260,6 +260,11 @@ static void LCD_SPI_powerdown(void)
     LCD_CTRL_clock(false);
 }
 
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
 void lcd_sleep(void)
 {
     if (lcd_powered)

@@ -48,3 +48,8 @@ void lcd_sleep(void)
 {
     backlight_hw_off();
 }
+
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}

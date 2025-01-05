@@ -305,6 +305,11 @@ static void lcd_power_off(void)
     lcd_write_reg(R_POWER_CONTROL1, 0x0000);
 }
 
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
 void lcd_sleep(void)
 {
     if (power_on)

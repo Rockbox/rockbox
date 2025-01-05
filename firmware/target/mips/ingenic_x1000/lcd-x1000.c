@@ -512,6 +512,11 @@ void lcd_enable(bool en)
 # error "Do not define HAVE_LCD_SLEEP if target has LCD_X1000_FASTSLEEP"
 #endif
 
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
 void lcd_sleep(void)
 {
     if(!lcd_sleeping) {

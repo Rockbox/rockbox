@@ -457,6 +457,11 @@ void lcd_enable(bool on)
 #endif
 
 #if defined(HAVE_LCD_SLEEP)
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
 void lcd_sleep(void)
 {
     LCD_REG_6 &= ~1;

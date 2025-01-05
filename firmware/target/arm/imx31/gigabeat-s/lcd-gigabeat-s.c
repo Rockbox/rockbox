@@ -171,6 +171,11 @@ void INIT_ATTR lcd_init_device(void)
     lcd_sync_settings();
 }
 
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
 void lcd_sleep(void)
 {
     if (!lcd_powered)
