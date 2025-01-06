@@ -293,6 +293,14 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_MENU         BUTTON_MENU
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+
 #else
 #error Keymap not defined!
 

@@ -351,6 +351,15 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN    BUTTON_DOWN
 #define PAUSE   BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MA_PAD
+
+#define QUIT    BUTTON_BACK
+#define LEFT    BUTTON_LEFT
+#define RIGHT   BUTTON_RIGHT
+#define UP      BUTTON_UP
+#define DOWN    BUTTON_DOWN
+#define PAUSE   BUTTON_PLAY
+
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 

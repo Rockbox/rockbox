@@ -405,6 +405,16 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define CUBE_QUIT          BUTTON_BACK
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     (BUTTON_PLAY|BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

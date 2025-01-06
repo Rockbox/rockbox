@@ -20,8 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-
-
 /* variable button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -498,6 +496,18 @@
 
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
+
+#elif CONFIG_KEYPAD == MA_PAD
+
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         (BUTTON_BACK|BUTTON_REPEAT)
+#define FLIPIT_SHUFFLE      BUTTON_MENU
+#define FLIPIT_SOLVE        (BUTTON_MENU|BUTTON_REPEAT)
+#define FLIPIT_STEP_BY_STEP (BUTTON_PLAY|BUTTON_REPEAT)
+#define FLIPIT_TOGGLE       BUTTON_PLAY
 
 #else
 #error No keymap defined!

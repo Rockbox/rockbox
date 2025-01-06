@@ -672,6 +672,23 @@
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "POWER"
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define STAR_QUIT           BUTTON_BACK
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_PLAY
+#define STAR_LEVEL_UP       (BUTTON_MENU|BUTTON_UP)
+#define STAR_LEVEL_DOWN     (BUTTON_MENU|BUTTON_DOWN)
+#define STAR_LEVEL_REPEAT   BUTTON_MENU
+#define STAR_TOGGLE_CONTROL_NAME "PLAY"
+#define STAR_QUIT_NAME "BACK"
+#define STAR_LEVEL_UP_NAME "MENU+UP"
+#define STAR_LEVEL_DOWN_NAME "MENU+DOWN"
+#define STAR_LEVEL_REPEAT_NAME "MENU"
+
+
 #else
 #error No keymap defined!
 #endif

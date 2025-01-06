@@ -457,6 +457,17 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define VUMETER_QUIT    BUTTON_BACK
+#define VUMETER_HELP    BUTTON_LEFT
+#define VUMETER_MENU    BUTTON_MENU
+#define VUMETER_UP      BUTTON_UP
+#define VUMETER_DOWN    BUTTON_DOWN
+#define LABEL_HELP      "LEFT"
+#define LABEL_QUIT      "BACK"
+#define LABEL_MENU      "MENU"
+#define LABEL_VOLUME    "UP/DOWN"
+
 #else
 #error No keymap defined!
 #endif

@@ -507,6 +507,18 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 #define FRACTAL_QUIT            BUTTON_POWER
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define FRACTAL_QUIT            BUTTON_BACK
+#define FRACTAL_UP              BUTTON_UP
+#define FRACTAL_DOWN            BUTTON_DOWN
+#define FRACTAL_LEFT            BUTTON_LEFT
+#define FRACTAL_RIGHT           BUTTON_RIGHT
+#define FRACTAL_ZOOM_IN         (BUTTON_MENU | BUTTON_UP)
+#define FRACTAL_ZOOM_OUT        (BUTTON_MENU | BUTTON_DOWN)
+#define FRACTAL_PRECISION_INC   (BUTTON_BACK | BUTTON_UP)
+#define FRACTAL_PRECISION_DEC   (BUTTON_BACK | BUTTON_DOWN)
+#define FRACTAL_RESET           BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

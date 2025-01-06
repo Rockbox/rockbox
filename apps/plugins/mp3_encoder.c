@@ -2586,6 +2586,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define MP3ENC_PREV     BUTTON_LEFT
+#define MP3ENC_NEXT     BUTTON_RIGHT
+#define MP3ENC_DONE     BUTTON_BACK
+#define MP3ENC_SELECT   BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif
@@ -2691,7 +2697,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         rb->lcd_clear_display();
 #if LCD_WIDTH <= 128
-        rb->lcd_putsxy(0, 30, "Conversion:"); 
+        rb->lcd_putsxy(0, 30, "Conversion:");
         rb->lcd_putsxyf(0, 40,"%ld.%02lds    ", tim/100, tim%100);
         tim = frames * cfg.smpl_per_frm * 100 / (cfg.samplerate != 0 ? cfg.samplerate : 1); /* unit=.01s */
         rb->lcd_putsxy(0, 10, "WAV-Length:");

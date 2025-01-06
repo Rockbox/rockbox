@@ -237,6 +237,12 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define BATTERY_ON     BUTTON_PLAY
+#define BATTERY_OFF    BUTTON_BACK
+#define BATTERY_ON_TXT  "Play"
+#define BATTERY_OFF_TXT "Back"
+
 #else
 #error "No keymap defined!"
 #endif
@@ -314,7 +320,7 @@ static int exit_tsr(bool reenter)
             /* remove the thread's queue from the broadcast list */
             rb->queue_delete(&thread_q);
             exit_status = (reenter ? PLUGIN_TSR_TERMINATE : PLUGIN_TSR_SUSPEND);
-            
+
         }
         else exit_status = PLUGIN_TSR_CONTINUE;
 

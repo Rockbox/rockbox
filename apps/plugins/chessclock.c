@@ -398,6 +398,16 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 #define CHC_QUIT            BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == MA_PAD)
+#define CHC_QUIT            (BUTTON_BACK|BUTTON_REPEAT)
+#define CHC_STARTSTOP       BUTTON_PLAY
+#define CHC_RESET           BUTTON_BACK
+#define CHC_MENU            BUTTON_MENU
+#define CHC_SETTINGS_INC    BUTTON_UP
+#define CHC_SETTINGS_DEC    BUTTON_DOWN
+#define CHC_SETTINGS_OK     BUTTON_PLAY
+#define CHC_SETTINGS_CANCEL BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

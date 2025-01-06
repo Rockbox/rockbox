@@ -264,6 +264,14 @@
 #define BTN_UP_LEFT     BUTTON_TOPLEFT
 #define BTN_UP_RIGHT    BUTTON_TOPRIGHT
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define BTN_UP          BUTTON_UP
+#define BTN_DOWN        BUTTON_DOWN
+#define BTN_LEFT        BUTTON_LEFT
+#define BTN_RIGHT       BUTTON_RIGHT
+#define BTN_FIRE        BUTTON_PLAY
+#define BTN_PAUSE       BUTTON_MENU
+
 #else
 #error Unsupported keypad
 #endif

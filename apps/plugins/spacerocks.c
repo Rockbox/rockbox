@@ -375,6 +375,15 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define AST_PAUSE       BUTTON_MENU
+#define AST_QUIT        BUTTON_BACK
+#define AST_THRUST      BUTTON_PLAY
+#define AST_HYPERSPACE  BUTTON_UP
+#define AST_LEFT        BUTTON_LEFT
+#define AST_RIGHT       BUTTON_RIGHT
+#define AST_FIRE        BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

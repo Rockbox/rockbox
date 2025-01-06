@@ -291,6 +291,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+
+#define QUIT  BUTTON_BACK
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE  BUTTON_PLAY
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

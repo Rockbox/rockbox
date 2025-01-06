@@ -471,6 +471,20 @@ static void setoptions (void)
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
         /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
+        options.LEFT    = BUTTON_LEFT;
+        options.RIGHT   = BUTTON_RIGHT;
+
+        options.A       = BUTTON_PLAY;
+        options.B       = BUTTON_BACK;
+
+        options.START   = (BUTTON_PLAY|BUTTON_BACK);
+        options.SELECT  = (BUTTON_PLAY|BUTTON_MENU);
+        options.MENU    = BUTTON_MENU;
+
+
 #else
 #error No Keymap Defined!
 #endif

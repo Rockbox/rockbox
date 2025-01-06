@@ -408,6 +408,16 @@
 #define PACMAN_2UP      BUTTON_BOTTOMRIGHT
 #define PACMAN_COIN     BUTTON_CENTER
 
+#elif CONFIG_KEYPAD == MA_PAD
+
+#define PACMAN_UP      BUTTON_UP
+#define PACMAN_DOWN    BUTTON_DOWN
+#define PACMAN_LEFT    BUTTON_LEFT
+#define PACMAN_RIGHT   BUTTON_RIGHT
+#define PACMAN_1UP     BUTTON_BACK
+#define PACMAN_COIN    BUTTON_PLAY
+#define PACMAN_MENU    BUTTON_MENU
+
 #else
 
 #error Keymap not defined!

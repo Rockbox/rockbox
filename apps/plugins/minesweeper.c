@@ -23,8 +23,6 @@
 
 #include "lib/playback_control.h"
 
-
-
 /* what the minesweeper() function can return */
 enum minesweeper_status {
     MINESWEEPER_WIN,
@@ -441,6 +439,17 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_TOGGLE_PRE   BUTTON_SELECT
 #   define MINESWP_TOGGLE       (BUTTON_SELECT|BUTTON_REL)
 #   define MINESWP_DISCOVER     (BUTTON_SELECT|BUTTON_REPEAT)
+#   define MINESWP_INFO         BUTTON_MENU
+
+#elif CONFIG_KEYPAD == MA_PAD
+#   define MINESWP_LEFT         BUTTON_LEFT
+#   define MINESWP_RIGHT        BUTTON_RIGHT
+#   define MINESWP_UP           BUTTON_UP
+#   define MINESWP_DOWN         BUTTON_DOWN
+#   define MINESWP_QUIT         BUTTON_BACK
+#   define MINESWP_TOGGLE_PRE   BUTTON_PLAY
+#   define MINESWP_TOGGLE       (BUTTON_PLAY|BUTTON_REL)
+#   define MINESWP_DISCOVER     (BUTTON_MENU|BUTTON_REPEAT)
 #   define MINESWP_INFO         BUTTON_MENU
 
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD

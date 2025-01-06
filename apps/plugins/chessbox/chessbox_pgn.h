@@ -584,6 +584,21 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == MA_PAD
+#define CB_SELECT       BUTTON_BACK
+#define CB_UP           BUTTON_UP
+#define CB_DOWN         BUTTON_DOWN
+#define CB_LEFT         BUTTON_LEFT
+#define CB_RIGHT        BUTTON_RIGHT
+#define CB_PLAY         BUTTON_PLAY
+#define CB_MENU         BUTTON_MENU
+#define CB_LEVEL        (BUTTON_BACK|BUTTON_REPEAT)
+#define CB_SCROLL_UP    (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN  (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT  (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT (BUTTON_RIGHT|BUTTON_REPEAT)
+
+
 #else
 #error No keymap defined!
 #endif
