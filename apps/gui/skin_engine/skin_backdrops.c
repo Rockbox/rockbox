@@ -203,7 +203,24 @@ bool skin_backdrops_preload(void)
                         }
                     }
                     else
+                    {
                         backdrops[i].loaded = true;
+                        /* Bugfix themes which don't use %VB properly */
+                        extern struct frame_buffer_t lcd_framebuffer_default;
+#if defined(HAVE_REMOTE_LCD) /* HAVE_REMOTE_LCD */
+                        extern struct frame_buffer_t lcd_remote_framebuffer_default;
+                        if (screen == SCREEN_REMOTE)
+                        {
+                            memcpy(backdrops[i].buffer,
+                                    lcd_remote_framebuffer_default.data, REMOTE_LCD_BACKDROP_BYTES);
+                        }
+                        else
+#endif
+                        {
+                            memcpy(backdrops[i].buffer,
+                                    lcd_framebuffer_default.data, LCD_BACKDROP_BYTES);
+                        }
+                    }
                 }
                 else
                     retval = false;
