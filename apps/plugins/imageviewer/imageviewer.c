@@ -1066,14 +1066,20 @@ static bool find_album_art(int *offset, int *filesize, int *status)
             (*status) = IMAGE_JPEG;
             break;
         default:
-            if (rb->search_albumart_files(current_track, "", np_file, MAX_PATH))
-            {
-                (*status) = get_image_type(np_file, false);
-                return true;
-            } else
-            {
-                return false;
-            }
+            (*status) = IMAGE_UNKNOWN;
+    }
+
+    if (IMAGE_UNKNOWN == *status
+        || AA_PREFER_IMAGE_FILE == rb->global_settings->album_art)
+    {
+        if (rb->search_albumart_files(current_track, "", np_file, MAX_PATH))
+        {
+            (*status) = get_image_type(np_file, false);
+            return true;
+        }
+
+        if (*status == IMAGE_UNKNOWN)
+            return false;
     }
     rb->strcpy(np_file, current_track->path);
     (*offset) = current_track->albumart.pos;
