@@ -214,7 +214,7 @@ static int tnetv_hw_reset(void)
     VL_CTRL &= ~VLYNQ_CTL_RESET_MASK;
 
     timeout = 0;
-    while (!(VL_STAT & VLYNQ_STS_LINK_MASK) && timeout++ < 50);
+    while (!(VL_STAT & VLYNQ_STS_LINK_MASK) && timeout++ < 50)
     {
         mdelay(40);
     }
