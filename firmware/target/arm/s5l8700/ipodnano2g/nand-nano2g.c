@@ -29,6 +29,7 @@
 #include "nand-target.h"
 #include <pmu-target.h>
 #include <mmu-arm.h>
+#include <cpucache-arm.h>
 #include <string.h>
 #include "led.h"
 #include "storage.h"

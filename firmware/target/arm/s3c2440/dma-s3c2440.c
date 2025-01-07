@@ -23,7 +23,6 @@
 #include "config.h"
 #include "panic.h"
 #include "system.h"
-#include "mmu-arm.h"
 #include "s3c2440.h"
 #include "dma-target.h"
 #include "system-target.h"

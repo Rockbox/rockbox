@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 /* High enough for most tasks but low enough for reduced voltage */
 #define CPUFREQ_DEFAULT     264000000

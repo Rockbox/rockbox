@@ -21,7 +21,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
-#include "mmu-arm.h"
 #include "cpu.h"
 #include "gcc_extensions.h"
 

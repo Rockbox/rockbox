@@ -27,7 +27,6 @@
 #include "file.h"
 #include "dsp-target.h"
 #include "dsp/ipc.h"
-#include "mmu-arm.h"
 #include "pcm-internal.h"
 
 /* This is global to save some latency when pcm_play_dma_get_peak_buffer is 

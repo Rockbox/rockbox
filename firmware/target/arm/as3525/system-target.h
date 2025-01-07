@@ -26,6 +26,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 #include "panic.h"
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */

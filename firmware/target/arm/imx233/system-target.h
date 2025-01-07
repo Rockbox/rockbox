@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 #include "panic.h"
 #include "clkctrl-imx233.h"
 #include "icoll-imx233.h"

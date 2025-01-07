@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 #ifdef SANSA_CONNECT
 #define CPUFREQ_DEFAULT  74250000

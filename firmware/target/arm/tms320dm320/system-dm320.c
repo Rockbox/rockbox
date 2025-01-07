@@ -20,7 +20,6 @@
  *
  ****************************************************************************/
 #include "cpu.h"
-#include "mmu-arm.h"
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"

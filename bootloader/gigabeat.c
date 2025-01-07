@@ -44,7 +44,6 @@
 #include "loader_strerror.h"
 #include "rbunicode.h"
 #include "usb.h"
-#include "mmu-arm.h"
 #include "rtc.h"
 #include "version.h"
 

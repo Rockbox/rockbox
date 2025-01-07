@@ -29,7 +29,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "string-extra.h" /* memset16() */
-#include "mmu-arm.h"
 #include "system-target.h"
 #include "lcd.h"
 #include "lcd-target.h"

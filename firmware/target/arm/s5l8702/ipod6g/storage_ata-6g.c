@@ -27,7 +27,6 @@
 #include "string.h"
 #include "power.h"
 #include "panic.h"
-#include "mmu-arm.h"
 #include "mmcdefs-target.h"
 #include "s5l87xx.h"
 #include "led.h"

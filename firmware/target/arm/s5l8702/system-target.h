@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 #define CPUFREQ_SLEEP   32768
 

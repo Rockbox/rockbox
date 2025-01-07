@@ -31,6 +31,7 @@
 #include "pcm_sampr.h"
 #include "dma-target.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
 

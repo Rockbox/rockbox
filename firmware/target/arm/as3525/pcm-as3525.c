@@ -29,6 +29,7 @@
 #include "as3514.h"
 #include "audiohw.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 #include "pcm-internal.h"
 
 #define MAX_TRANSFER (4*((1<<11)-1)) /* maximum data we can transfer via DMA

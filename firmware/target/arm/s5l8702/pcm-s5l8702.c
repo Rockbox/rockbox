@@ -29,7 +29,6 @@
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
-#include "mmu-arm.h"
 #include "pcm-target.h"
 #include "dma-s5l8702.h"
 

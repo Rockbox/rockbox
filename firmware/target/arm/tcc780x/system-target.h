@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 #define CPUFREQ_DEFAULT 32000000
 #define CPUFREQ_NORMAL  48000000

@@ -23,6 +23,7 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
+#include "cpucache-arm.h"
 
 /* NB: These values must match the register settings in s3c2440/crt0.S */
 

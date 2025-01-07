@@ -27,7 +27,6 @@
 #include "file.h"
 #include "dsp-target.h"
 #include "dsp/ipc.h"
-#include "mmu-arm.h"
 #include "pcm-internal.h"
 #include "dma-target.h"
 
