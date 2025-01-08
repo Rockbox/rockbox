@@ -245,8 +245,10 @@ static int ata_perform_flush_cache(void)
 
     if (!canflush) {
         return 0;
+#ifdef HAVE_LBA48
     } else if (ata_lba48 && identify_info[83] & (1 << 13)) {
         cmd = CMD_FLUSH_CACHE_EXT;  /* Flag, optional, ATA-6 and up, for use with LBA48 devices */
+#endif
     } else if (identify_info[83] & (1 << 12)) {
         cmd = CMD_FLUSH_CACHE; /* Flag, mandatory, ATA-6 and up */
     } else if (identify_info[80] >= (1 << 5)) { /* Use >= instead of '&' because bits lower than the latest standard we support don't have to be set */
