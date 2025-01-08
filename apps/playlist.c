@@ -2048,6 +2048,7 @@ struct playlist_info* playlist_load(const char* dir, const char* file,
     {
         playlist->max_playlist_size = current_playlist.max_playlist_size;
         playlist->indices = current_playlist.indices;
+        current_playlist.started = false;
     }
 
     new_playlist_unlocked(playlist, dir, file);

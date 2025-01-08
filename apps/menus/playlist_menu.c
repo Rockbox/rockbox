@@ -48,6 +48,21 @@ int save_playlist_screen(struct playlist_info* playlist)
 
     char temp[MAX_PATH+1], *p;
     int len;
+    bool audio_stopped = !(audio_status() & AUDIO_STATUS_PLAY);
+
+    /* After a reboot, we may need to resume the playlist
+       first, or it will not contain any indices when
+       user selects "Save Current Playlist" from playlist
+       catalogue's context menu in root menu */
+    if (!playlist && audio_stopped && !playlist_get_current()->started)
+    {
+        if (!file_exists(PLAYLIST_CONTROL_FILE) || playlist_resume() == -1)
+       {
+            splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));
+            return 0;
+        }
+    }
+
 
     catalog_get_directory(directoryonly, sizeof(directoryonly));
     playlist_get_name(playlist, temp, sizeof(temp)-1);
