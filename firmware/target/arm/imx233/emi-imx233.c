@@ -40,6 +40,7 @@ struct emi_reg_t
  * Values from IMX233 manual, for Mobile DDR 7.5ns (133 MHz and 64MHz)
  * Make sure the last value is written to register 40. */
 
+#if IMX233_SUBTARGET >= 3700
 static struct emi_reg_t settings_60M[15] ICONST_ATTR =
 {
     {4, 0x01000101}, /* DLL bypass mode, concurrent auto-precharge and bank split */
@@ -82,7 +83,6 @@ static struct emi_reg_t settings_155M[15] ICONST_ATTR __attribute__((alias("sett
 
 static void set_frequency(unsigned long freq) ICODE_ATTR;
 
-#if IMX233_SUBTARGET >= 3700
 static void set_frequency(unsigned long freq)
 {
     /** WARNING all restriction of imx233_emi_set_frequency apply here !! */

@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2011 by Amaury Pouly
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -262,9 +262,9 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width)
 {
     (void) enable_pullups;
     (void) bus_width;
+#ifdef VPIN_SSP2_CMD
     unsigned clk_drive = PINCTRL_DRIVE_8mA;
     unsigned dat_drive = PINCTRL_DRIVE_4mA;
-#ifdef VPIN_SSP2_CMD
     /* SSP_{CMD,SCK} */
     imx233_pinctrl_setup_vpin(VPIN_SSP2_CMD, "ssp2_cmd", dat_drive, enable_pullups);
     imx233_pinctrl_setup_vpin(VPIN_SSP2_SCK, "ssp2_sck", clk_drive, false);

@@ -25,8 +25,6 @@
    explicitly if different */
 #define INPUT_SRC_CAPS SRC_CAP_MIC
 
-
-
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
@@ -161,7 +159,7 @@
 #define CURRENT_MAX_CHG   200
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      454000000
+#define CPU_FREQ      200000000
 
 /* Type of LCD */
 #define CONFIG_LCD LCD_CREATIVEZENV
@@ -188,5 +186,3 @@
 #define BOOTDIR "/.rockbox"
 
 #define INCLUDE_TIMEOUT_API
-
- 
