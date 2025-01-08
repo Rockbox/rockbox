@@ -439,7 +439,11 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'creativezen' => {
         name => 'Creative Zen',
-        status => 2
+        status => 2,
+    },
+    'creativezenv' => {
+        name => 'Creative Zen V',
+        status => 1,
     },
     'creativezenmozaic' => {
         name => 'Creative Zen Mozaic',
