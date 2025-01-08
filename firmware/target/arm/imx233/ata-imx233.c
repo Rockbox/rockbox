@@ -27,6 +27,7 @@
 #include "clkctrl-imx233.h"
 #include "ata-target.h"
 #include "ata-defines.h"
+#include "kernel.h"
 
 #include "regs/gpmi.h"
 
@@ -131,6 +132,7 @@ void ata_reset(void)
 
 void ata_enable(bool on)
 {
+    (void)on;
 }
 
 bool ata_is_coldstart(void)
@@ -221,6 +223,3 @@ void ata_device_init(void)
 }
 
 #endif /* ATA_IMX233_H */
-
-
- 
