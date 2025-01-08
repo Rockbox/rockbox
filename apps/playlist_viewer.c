@@ -372,7 +372,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 {
     char *buffer, *index_buffer = NULL;
     size_t buffer_size, index_buffer_size = 0;
-    bool is_playing = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
+    bool is_playing = audio_status() & AUDIO_STATUS_PLAY; /* playing or paused */
 
     /* FIXME: On devices with a plugin buffer smaller than 512 KiB, the index buffer
               is shared with the current playlist when playback is stopped, to enable
@@ -731,7 +731,8 @@ static enum pv_context_result context_menu(int index)
 {
     struct playlist_entry *current_track = playlist_buffer_get_track(&viewer.buffer,
                                                                      index);
-    bool current_was_playing = (current_track->index == viewer.current_playing_track);
+    bool current_was_playing = (audio_status() & AUDIO_STATUS_PLAY) && /* or paused */
+                               (current_track->index == viewer.current_playing_track);
 
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
                         ID2P(LANG_PLAYING_NEXT), ID2P(LANG_ADD_TO_PL),
