@@ -608,6 +608,8 @@ target/arm/mmu-arm.S
 # elif ARM_ARCH == 6
 target/arm/bits-armv6.S
 target/arm/mmu-armv6.S
+# elif ARM_ARCH == 7 && ARM_PROFILE == ARM_PROFILE_MICRO
+target/arm/cpucache-armv7m.c
 # endif
 
 #if defined(CPU_ARM_CLASSIC)
