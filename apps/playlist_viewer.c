@@ -387,7 +387,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     if (!filename && !is_playing)
     {
         /* Try to restore the list from control file */
-        if (!file_exists(PLAYLIST_CONTROL_FILE) || playlist_resume() == -1)
+        if (playlist_resume() == -1)
         {
             /* Nothing to view, exit */
             splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));

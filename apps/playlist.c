@@ -3176,6 +3176,9 @@ int playlist_resume(void)
 
     empty_playlist_unlocked(playlist, true);
 
+    if (!file_exists(playlist->control_filename))
+        goto out;
+
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     if (playlist->control_fd < 0)
     {

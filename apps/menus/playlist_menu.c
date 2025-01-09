@@ -56,7 +56,7 @@ int save_playlist_screen(struct playlist_info* playlist)
        catalogue's context menu in root menu */
     if (!playlist && audio_stopped && !playlist_get_current()->started)
     {
-        if (!file_exists(PLAYLIST_CONTROL_FILE) || playlist_resume() == -1)
+        if (playlist_resume() == -1)
        {
             splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));
             return 0;
