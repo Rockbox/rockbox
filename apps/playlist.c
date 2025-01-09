@@ -3532,6 +3532,9 @@ int playlist_resume(void)
         }
     }
 
+    if (global_status.resume_index != -1)
+        playlist->index = global_status.resume_index;
+
 out:
     playlist_write_unlock(playlist);
     dc_thread_start(playlist, true);
