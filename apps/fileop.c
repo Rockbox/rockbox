@@ -510,7 +510,7 @@ int copy_move_fileobject(const char *src_path, const char *dst_path, unsigned in
         int rc;
         if (file_exists(dst.path)) {
             /* If user chooses not to overwrite, cancel */
-            if (confirm_overwrite_yesno() == YESNO_NO) {
+            if (!yesno_pop(ID2P(LANG_REALLY_OVERWRITE))) {
                 return FORC_NOOVERWRT;
             }
 

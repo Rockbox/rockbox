@@ -175,8 +175,6 @@ int hex_to_rgb(const char* hex, int* color);
 #endif
 
 int confirm_delete_yesno(const char *name);
-int confirm_overwrite_yesno(void);
-int confirm_remove_queued_yesno(void);
 
 char* strrsplt(char* str, int c);
 char* skip_whitespace(char* const str);

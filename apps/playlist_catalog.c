@@ -423,7 +423,7 @@ bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
         if (!curr_pl_name || strcmp(curr_pl_name, pl_name))
         {
             if (file_exists(pl_name))
-                do_save = confirm_overwrite_yesno() == YESNO_YES;
+                do_save = yesno_pop(ID2P(LANG_REALLY_OVERWRITE));
 
             if (do_save) /* delete bookmark file unrelated to new playlist */
             {

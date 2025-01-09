@@ -4096,7 +4096,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     for (int i = playlist->amount - 1; i >= 0; i--)
         if (playlist->indices[i] & PLAYLIST_QUEUED)
         {
-            if (reload_tracks || (reload_tracks = (confirm_remove_queued_yesno() == YESNO_YES)))
+            if (reload_tracks || (reload_tracks =
+                (yesno_pop(ID2P(LANG_REMOVE_QUEUED_TRACKS)))))
                 remove_track_unlocked(playlist, i, false);
             else
                 break;
