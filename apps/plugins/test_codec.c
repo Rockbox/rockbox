@@ -593,7 +593,7 @@ static void init_ci(void)
     ci.semaphore_release = rb->semaphore_release;
 #endif
 
-#if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(ARM_NEED_DIV0)
     ci.__div0 = rb->__div0;
 #endif
 }

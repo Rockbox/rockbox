@@ -25,7 +25,9 @@
 #define nop \
   asm volatile ("nop")
 
+#if defined(ARM_NEED_DIV0)
 void __div0(void);
+#endif
 
 #define IRQ_ENABLED      0x00
 #define IRQ_DISABLED     0x80

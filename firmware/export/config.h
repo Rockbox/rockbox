@@ -700,8 +700,14 @@ Lyre prototype 1 */
 #define ARM_PROFILE ARCH_PROFILE /* Classic, Microcontroller */
 # if ARM_PROFILE == ARM_PROFILE_MICRO
 #  define CPU_ARM_MICRO
+#  if (ARM_ARCH >= 7)
+#   define ARM_HAVE_HW_DIV
+#  endif
 # elif ARM_PROFILE == ARM_PROFILE_CLASSIC
 #  define CPU_ARM_CLASSIC
+# endif
+# if !defined(ARM_HAVE_HW_DIV) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#  define ARM_NEED_DIV0
 # endif
 #endif
 

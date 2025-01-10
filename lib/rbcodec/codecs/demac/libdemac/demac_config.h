@@ -125,7 +125,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #ifndef __ASSEMBLER__
 
-#if defined(CPU_ARM) && (ARM_ARCH < 5 || defined(USE_IRAM))
+#if defined(CPU_ARM) && (ARM_ARCH < 5 || defined(USE_IRAM)) && !defined(ARM_HAVE_HW_DIV)
 /* optimised unsigned integer division for ARMv4, in IRAM */
 unsigned udiv32_arm(unsigned a, unsigned b);
 #define UDIV32(a, b) udiv32_arm(a, b)

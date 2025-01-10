@@ -91,7 +91,7 @@ struct codec_api ci = {
     NULL, /* loop_track */
 
     /* kernel/ system */
-#if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
+#if defined(ARM_NEED_DIV0)
     __div0,
 #endif
     sleep,

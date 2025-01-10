@@ -537,7 +537,7 @@ struct plugin_api {
     void (*talk_force_enqueue_next)(void);
 
     /* kernel/ system */
-#if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
+#if defined(ARM_NEED_DIV0)
     void (*__div0)(void);
 #endif
     unsigned (*sleep)(unsigned ticks);

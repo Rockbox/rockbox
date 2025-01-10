@@ -463,7 +463,7 @@ static const struct plugin_api rockbox_api = {
     talk_force_enqueue_next,
 
     /* kernel/ system */
-#if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
+#if defined(ARM_NEED_DIV0)
     __div0,
 #endif
     sleep,

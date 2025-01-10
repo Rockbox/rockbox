@@ -66,7 +66,7 @@ enum codec_status codec_start(enum codec_entry_call_reason reason)
     return codec_main(reason);
 }
 
-#if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(ARM_NEED_DIV0)
 void __attribute__((naked)) __div0(void)
 {
     asm volatile("bx %0" : : "r"(ci->__div0));

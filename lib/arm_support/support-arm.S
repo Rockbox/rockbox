@@ -219,7 +219,7 @@
 .endif
 .endm
 
-#else
+#else /* ARM_ARCH >= 5 */
 .macro ARMV5_UDIV32_BODY numerator, divisor, quotient, remainder, bits, inv, neg, div0label, return
     cmp     \numerator, \divisor
     clz     \bits, \divisor
@@ -398,7 +398,7 @@
 .else
     b       99f
 .endif
-#endif
+#endif /* ARM_ARCH >= 6 */
 99:
 .endm
 
@@ -594,7 +594,7 @@
 .endif
 99:
 .endm
-#endif
+#endif /* ARM_ARCH */
 
     .section .text
 
@@ -671,7 +671,7 @@ __aeabi_idivmod:
     .size __aeabi_idivmod, . - __aeabi_idivmod
 #endif
 
-#else
+#elif !defined(ARM_HAVE_HW_DIV) /* && ARM_ARCH >= 5 */
 #ifndef __ARM_EABI__
 __udivsi3:
     ARMV5_UDIV32_BODY r0, r1, r0, "", r2, r3, ip, __div0_wrap, 1
@@ -717,6 +717,7 @@ __aeabi_idivmod:
     .global     __popcountdi2
     .type       __popcountdi2, %function
     .set        __popcountdi2, __popcountsi2
+    .align      2
 
 __popcountsi2:
     ldr     r2, .L2            @ r2 = 0x55555555
