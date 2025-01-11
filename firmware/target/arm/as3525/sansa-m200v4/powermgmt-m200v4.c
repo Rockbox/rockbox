@@ -28,20 +28,20 @@
   early uncalibrated values. But read-out value should be correct
  */
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
     900
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
     1000
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* TODO: simple uncalibrated curve, linear except for first 10% */
     { 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500 }

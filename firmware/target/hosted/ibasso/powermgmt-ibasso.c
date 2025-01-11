@@ -35,13 +35,13 @@
 /* Based on batterymonitor with PISEN and Samsung SIII battery. */
 
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3600
 };
 
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3500
 };
@@ -55,14 +55,14 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     < 3660 (0%), < 3730 (1% - 10%), < 3780 (11% - 20%), < 3830 (21% - 40%), < 3950 (41% - 60%),
     < 4080 (61% - 80%), > 4081 (81% - 100%)
 */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     { 3522, 3660, 3720, 3752, 3784, 3827, 3896, 3978, 4072, 4168, 4255 }
 };
 
 
 /* Copied from percent_to_volt_discharge. */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     3500, 3544, 3578, 3623, 3660, 3773, 3782, 3853, 3980, 4130, 4360
 };

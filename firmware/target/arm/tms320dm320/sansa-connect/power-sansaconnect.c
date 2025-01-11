@@ -32,24 +32,24 @@
 #include "logf.h"
 
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3450
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3400
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     { 3400, 3508, 3630, 3703, 3727, 3750, 3803, 3870, 3941, 4026, 4142 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     3540, 3788, 3860, 3890, 3916, 3956, 4016, 4085, 4164, 4180, 4190
 };

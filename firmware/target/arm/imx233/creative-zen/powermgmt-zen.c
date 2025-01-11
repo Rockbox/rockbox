@@ -22,25 +22,25 @@
 #include "powermgmt-target.h"
 #include "power-imx233.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     0
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     0
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* Sansa Fuze+ Li Ion 600mAH figured from discharge curve */
     { 3100, 3650, 3720, 3750, 3780, 3820, 3880, 4000, 4040, 4125, 4230 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     /* Sansa Fuze+ Li Ion 600mAH figured from charge curve */
     3480, 3790, 3845, 3880, 3900, 3935, 4005, 4070, 4150, 4250, 4335

@@ -23,25 +23,25 @@
 #include "config.h"
 #include "powermgmt.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3400
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* Sansa Li Ion 750mAH, took from battery benchs */
     { 3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     /* Sansa Li Ion 750mAH */
     3700, 3900, 3950, 3985, 4030, 4095, 4150, 4173, 4185, 4195, 4200

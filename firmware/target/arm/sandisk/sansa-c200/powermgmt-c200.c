@@ -23,18 +23,18 @@
 #include "config.h"
 #include "powermgmt.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3400
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
 
     /* Taken from BertrikSikken's bench on 2008-09-22 */
@@ -42,7 +42,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     /* Sansa c200 has a 530 mAh LiPo battery */
     3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200

@@ -32,26 +32,26 @@
     Charge curve have not been calibrated yet.
 */
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
     3350,
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3300,
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* FIXME: Uncalibrated curve */
     { 3300, 3350, 3433, 3516, 3600, 3683, 3767, 3850, 3933, 4017, 4100 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
     /* TODO: simple copy of discharge curve */
     { 3300, 3350, 3433, 3516, 3600, 3683, 3767, 3850, 3933, 4017, 4100 };
 

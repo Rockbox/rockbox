@@ -201,11 +201,11 @@ static void battery_trap(void)
          *    differ as much as more than 200 mV when charge current is at
          *    maximum (~340 mA).
          *  - RB uses some sort of average/compensation for battery voltage
-         *    measurements, battery icon blinks at battery_level_dangerous,
+         *    measurements, battery icon blinks at battery_level_disksafe,
          *    when the HDD is used heavily (large database) the level drops
          *    to battery_level_shutoff quickly.
          */
-        if (vbat >= battery_level_dangerous[0] + th)
+        if (vbat >= battery_level_disksafe[0] + th)
             break;
         th = 200;
 

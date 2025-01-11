@@ -19,6 +19,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
+#include <ctype.h>
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
@@ -34,6 +36,9 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "rtc.h"
+#include "misc.h"
+#include "splash.h"
+#include "version.h"
 #if CONFIG_TUNER
 #include "fmradio.h"
 #endif
@@ -51,6 +56,27 @@
     && !defined (SIMULATOR)
 #include "pcf50606.h"
 #endif
+
+extern unsigned short power_history[POWER_HISTORY_LEN];
+extern unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT];
+extern unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
+extern unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+#if CONFIG_CHARGING
+extern unsigned short percent_to_volt_charge[11];
+#endif
+
+struct battery_tables_t device_battery_tables =
+{
+    .history = power_history,
+    .disksafe = &battery_level_disksafe[0],
+    .shutoff = &battery_level_shutoff[0],
+    .discharge = percent_to_volt_discharge[0],
+#if CONFIG_CHARGING
+    .charge = percent_to_volt_charge,
+#endif
+    .elems = ARRAYLEN(percent_to_volt_discharge[0]),
+    .isdefault = true,
+};
 
 static int last_sent_battery_level = 100;
 static void set_sleep_timer(int seconds);
@@ -487,15 +513,15 @@ bool battery_level_safe(void)
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return true;
 #elif ((CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE))
-    return voltage_now > battery_level_dangerous[battery_type];
+    return voltage_now > battery_level_disksafe[battery_type];
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return percent_now > 0;
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
      * device could be powered externally. */
-    return input_millivolts() > battery_level_dangerous[battery_type];
+    return input_millivolts() > battery_level_disksafe[battery_type];
 #else
-    return voltage_now > battery_level_dangerous[battery_type];
+    return voltage_now > battery_level_disksafe[battery_type];
 #endif
 }
 
@@ -822,6 +848,184 @@ static void power_thread(void)
         }
     }
 } /* power_thread */
+
+
+static bool battery_table_readln(int fd, char * buf, size_t bufsz,
+                        const char *name, char **value, int* linect) INIT_ATTR;
+static bool battery_table_readln(int fd, char * buf, size_t bufsz,
+                                    const char *name, char **value, int* linect)
+{
+    /* reads a line from user battery level file skips comments
+    * if name is NULL and the line is a continuation (no setting:)
+    * or name matches the found setting then remaining line contents are returned in value
+    * name if supplied should contain the name of the setting you are searching for */
+    int rd;
+    char *setting;
+    if (name)
+    {
+        /* DEBUGF("%s Searching for '%s'\n", __func__, name); */
+        lseek(fd, 0, SEEK_SET);
+        *linect = 0;
+    }
+
+    while(1)
+    {
+        rd = read_line(fd, buf, bufsz);
+        if (rd > 0)
+        {
+            /*DEBUGF("\nREAD '%s'\n", buf);*/
+            *linect = *linect + 1;
+            if (buf[0] == '#' || buf[0] == '\0')
+                continue; /* skip empty lines and comments to EOL */
+
+            bool found = settings_parseline(buf, &setting, value);
+
+            if (!name) /* if name is not supplied just return value */
+            {
+                *value = buf;
+                if(found) /* expected more values but got a new setting instead */
+                    return false; /* error */
+            }
+            else if (strcasecmp(name, setting) != 0)
+                continue; /* not the correct setting */
+        }
+        break;
+    }
+    return rd > 0;
+}
+
+void init_battery_tables(void)
+{
+    /* parse and load user battery levels file */
+#define PWRELEMS (ARRAYLEN(percent_to_volt_discharge[0]))
+
+#if !defined(BOOTLOADER)
+    unsigned short tmparr[PWRELEMS];
+    char buf[MAX_PATH];
+    unsigned int i, bl_op;
+
+    enum { eSHUTOFF = 0, eDISKSAFE, eDISCHARGE, eCHARGE };
+    static const char * const bl_options[4] = {
+        [eSHUTOFF] = "shutoff",
+        [eDISKSAFE] = "disksafe",
+        [eDISCHARGE] = "discharge",
+        [eCHARGE] = "charge"
+    };
+
+    int fd = open(BATTERY_LEVELS_USER, O_RDONLY);
+    int line_num = 0;
+
+    unsigned short val;
+    unsigned short disksafe = *device_battery_tables.disksafe;
+    unsigned short shutoff = *device_battery_tables.shutoff;
+    char *value;
+
+    if (fd < 0)
+        return;
+
+    DEBUGF("%s  %s\n", __func__, BATTERY_LEVELS_USER);
+    /* force order of reads to do error checking of values */
+    for(bl_op = 0; bl_op < ARRAYLEN(bl_options); bl_op++)
+    {
+        if(!battery_table_readln(fd, buf, sizeof(buf),
+           bl_options[bl_op], &value, &line_num))
+        {
+            continue;
+        }
+
+        switch(bl_op)
+        {
+        default:
+            goto error_loading;
+        case eSHUTOFF:
+            /*fall-through*/
+        case eDISKSAFE:
+            /* parse single short */
+            DEBUGF("%s ", bl_options[bl_op]);
+
+            while (*value != '\0' && !isdigit(*value))
+                value++;
+            if (*value)
+            {
+                val = atoi(value);
+                DEBUGF("value = %u\n", val);
+                if (bl_op == eDISKSAFE)
+                {
+                    if (val < shutoff)
+                    {
+                        goto error_loading;
+                    }
+                    disksafe = val;
+                    break;
+                }
+                /* shutoff */
+                shutoff = val;
+                break;
+            }
+            goto error_loading;
+        case eDISCHARGE:
+            /*fall-through*/
+        case eCHARGE:
+            /* parse array of short */
+            DEBUGF("%s = { ", bl_options[bl_op]);
+            val = shutoff; /* don't allow a value lower than shutoff */
+            i = 0;
+            while(i < PWRELEMS)
+            {
+                while (*value != '\0' && !isdigit(*value))
+                    {value++;}
+                if (*value)
+                {
+                    tmparr[i] = atoi(value);
+                    while (isdigit(*value)) /* skip digits just read */
+                        {value++;}
+                    if (tmparr[i] < val)
+                    {
+                        goto error_loading; /* value is not >= previous */
+                    }
+                    val = tmparr[i];
+                    DEBUGF("%u, ", val);
+                    i++;
+                }
+                else if (!battery_table_readln(fd, buf, sizeof(buf),
+                                            NULL, &value, &line_num))
+                {
+                    goto error_loading; /* failed to get another line */
+                }
+
+            } /* while */
+            DEBUGF("}\n");
+
+            /* if we made it here, the values should be OK to use */
+            if (bl_op == eCHARGE)
+            {
+#if CONFIG_CHARGING
+                memcpy(device_battery_tables.charge, &tmparr, PWRELEMS);
+#endif
+                break;
+            }
+            memcpy(device_battery_tables.discharge, &tmparr, PWRELEMS);
+            break;
+        } /* switch */
+    } /* for */
+    close(fd);
+
+    *device_battery_tables.disksafe = disksafe;
+    *device_battery_tables.shutoff = shutoff;
+    device_battery_tables.isdefault = false;
+    battery_status_update();
+
+    return;
+
+error_loading:
+    if (fd >= 0)
+         close(fd);
+    splashf(HZ * 2, "Error line:(%d) loading %s", line_num, BATTERY_LEVELS_USER);
+    DEBUGF("Error line:(%d) loading %s\n", line_num, BATTERY_LEVELS_USER);
+
+#endif /* ndef BOOTLOADER*/
+#undef PWRELEMS
+}
 
 void powermgmt_init(void)
 {

@@ -913,10 +913,11 @@ static bool tsc2100_debug(void)
 
 static bool view_battery(void)
 {
+    extern struct battery_tables_t device_battery_tables; /* powermgmt.c */
+    unsigned short *power_history = device_battery_tables.history;
     int view = 0;
     int i, x, y, z, y1, y2, grid, graph;
     unsigned short maxv, minv;
-
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)

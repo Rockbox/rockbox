@@ -61,3 +61,20 @@ As \setting{Battery Benchmark} needs to write the data held in memory to
 disk in order to save them, it is possible that should Rockbox shut down
 due to low battery then there will not be enough power remaining to write the
 data to disk. Therefore all measurements since the previous save will be lost.
+
+\subsubsection{Advanced}
+On first run \setting{Battery Benchmark} will export the default battery tables
+to '/.rockbox/battery\_levels.default'
+You can use the values recorded by \setting{Battery Benchmark}
+to more accurately reflect the capacity of your individual battery.
+Once you have made your changes rename '.default' to '.cfg' and your custom
+battery table will be loaded next boot.
+
+\note{\setting{WARNING} be aware 'shutoff' and 'disksafe' levels are to protect your player
+both over-discharge of the battery and to prevent dataloss.
+Setting these values incorrectly may cause damage to your \dap{}, battery, data, or disk.
+However, 'discharge' and 'charge' tables are only used to calibrate the battery
+meter and should be safe to change to any value.
+Each entry should be greater or equal to 'shutdown' and or the previous table entry
+otherwise the battery tables will be rejected.
+}

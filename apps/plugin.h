@@ -991,6 +991,7 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     void (*add_playbacklog)(struct mp3entry *id3);
+    struct battery_tables_t *device_battery_tables;
 };
 
 /* plugin header */

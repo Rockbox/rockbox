@@ -27,7 +27,7 @@
 #include "pcf50605.h"
 #include "audiohw.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
 #if   defined(IPOD_NANO)
     3330
@@ -43,7 +43,7 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #endif
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
 #if   defined(IPOD_NANO)
     3230
@@ -60,7 +60,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
 #if   defined(IPOD_NANO)
     /* measured values */
@@ -83,7 +83,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
 #if   defined(IPOD_NANO)
     /* measured values */

@@ -437,6 +437,7 @@ static void init(void)
     settings_reset();
     settings_load();
     settings_apply(true);
+    init_battery_tables();
 #ifdef HAVE_DIRCACHE
     init_dircache(true);
     init_dircache(false);
@@ -701,7 +702,9 @@ static void init(void)
         settings_reset();
     }
 #endif
-
+    CHART(">init_battery_tables");
+    init_battery_tables();
+    CHART("<init_battery_tables");
 #ifdef HAVE_DIRCACHE
     CHART(">init_dircache(true)");
     rc = init_dircache(true);

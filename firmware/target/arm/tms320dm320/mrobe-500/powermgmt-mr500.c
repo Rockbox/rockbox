@@ -30,13 +30,13 @@ unsigned short current_aux = 4100;
 static unsigned short current_voltage = 4100;
 
 /* This specifies the battery level that writes are still safe */
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3600
 };
 
 /* Below this the player cannot be considered to operate reliably */
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3580
 };
@@ -48,13 +48,13 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* 6.10 format */
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     { 3600, 3650, 3700, 3750, 3800, 3850, 3900, 3950, 4000, 4090, 4150 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     4000, 4105, 4210, 4315, 4420, 4525, 4630, 4735, 4840, 4945, 5050,
 };

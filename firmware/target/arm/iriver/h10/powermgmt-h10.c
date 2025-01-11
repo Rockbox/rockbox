@@ -24,7 +24,7 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
 #if   defined(IRIVER_H10)
     3733
@@ -33,7 +33,7 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #endif
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
 #if   defined(IRIVER_H10)
     3627
@@ -43,7 +43,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
 #if   defined(IRIVER_H10)
     { 3733, 3772, 3821, 3840, 3869, 3917, 3985, 4034, 4072, 4140, 4198 }
@@ -53,7 +53,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
 #if   defined(IRIVER_H10)
     3956, 3995, 4024, 4043, 4063, 4082, 4111, 4140, 4179, 4218, 4266

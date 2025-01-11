@@ -23,7 +23,7 @@
 #include "config.h"
 #include "powermgmt.h"
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     /*
      * about 10%, calibrated with C240v2 battery profile at
@@ -32,13 +32,13 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
     3600
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /*
      * Below table is calibrated according to
@@ -49,7 +49,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     /* TODO: simple uncalibrated curve with 10% knee at 3.60V */
     3400, 3600, 3670, 3740, 3810, 3880, 3950, 4020, 4090, 4160, 4230

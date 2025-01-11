@@ -86,6 +86,8 @@ static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
 static void plugin_tsr(int (*exit_callback)(bool));
 
+extern struct battery_tables_t device_battery_tables; /* powermgmt.c */
+
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 /* File handle leak prophylaxis */
 #include "bitarray.h"
@@ -842,6 +844,7 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     add_playbacklog,
+    &device_battery_tables,
 };
 
 static int plugin_buffer_handle;

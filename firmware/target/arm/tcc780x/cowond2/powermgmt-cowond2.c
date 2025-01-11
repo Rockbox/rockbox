@@ -29,18 +29,18 @@
 
 unsigned short current_voltage = 3910;
 
-const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
 {
     3380
 };
 
-const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     /* Standard D2 internal battery */
     { 3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170 }
@@ -50,7 +50,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+unsigned short percent_to_volt_charge[11] =
 {
     /* FIXME: voltages seem to be offset during charging (eg. 4500+) */
     3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170
