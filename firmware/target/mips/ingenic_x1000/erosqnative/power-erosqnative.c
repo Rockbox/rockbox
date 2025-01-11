@@ -212,6 +212,21 @@ bool charging_state(void)
     }
 }
 
+int _battery_level(void)
+{
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.hw_rev;
+#endif
+    if (devicever >= 4){
+        return axp2101_egauge_read();
+    } else {
+        return -1;
+    }
+}
+
 int _battery_voltage(void)
 {
     int devicever;

@@ -302,8 +302,9 @@ static void send_battery_level_event(int percent)
     }
 }
 
-#if !(CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && \
-    (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
+#if (!(CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && \
+    (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)) || \
+    (CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE))
 /* Look into the percent_to_volt_* table and estimate the battery level. */
 static int voltage_to_percent(int voltage, const short* table)
 {
@@ -360,7 +361,12 @@ static int voltage_to_battery_level(int millivolts)
  */
 static void battery_status_update(void)
 {
-#if CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
+#if CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE)
+    int level = _battery_level();
+    if (level == -1) {
+        level = voltage_to_battery_level(voltage_now);
+    }
+#elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     int level = _battery_level();
 #elif CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
     int level = voltage_to_battery_level(voltage_now);
@@ -429,7 +435,12 @@ void battery_read_info(int *voltage, int *level)
         *voltage = millivolts;
 
     if (level)  {
-#if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+#if (CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE))
+        *level = _battery_level();
+        if (*level == -1) {
+            *level = voltage_to_battery_level(millivolts);
+        }
+#elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
         *level = _battery_level();
 #elif (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
         *level = voltage_to_battery_level(millivolts);
@@ -477,6 +488,9 @@ bool battery_level_safe(void)
 {
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return true;
+#elif CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE)
+    /* if we have both, prefer voltage? */
+    return voltage_now > battery_level_dangerous[battery_type];
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return percent_now > 0;
 #elif defined(HAVE_BATTERY_SWITCH)
@@ -508,6 +522,8 @@ bool query_force_shutdown(void)
 
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return false;
+#elif CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE)
+    return voltage_now < battery_level_shutoff[battery_type];
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return percent_now == 0;
 #elif defined(HAVE_BATTERY_SWITCH)

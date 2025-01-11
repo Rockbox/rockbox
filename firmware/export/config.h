@@ -204,6 +204,9 @@
                             * use the charging hardware. */
 
 /* CONFIG_BATTERY_MEASURE bits */
+/* If both VOLTAGE_MEASURE and PERCENTAGE_MEASURE are defined, 
+ * _battery_level() (percentage) will be preferred, unless _battery_level()
+ * returns -1, then voltage will be used from _voltage_level(). */
 #define VOLTAGE_MEASURE     1 /* Target can report battery voltage
                                * Usually native ports */
 #define PERCENTAGE_MEASURE  2 /* Target can report remaining capacity in %

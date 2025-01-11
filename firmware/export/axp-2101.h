@@ -196,6 +196,8 @@ extern int axp2101_adc_conv_raw(int adc, int value);
 extern void axp2101_adc_set_enabled(int adc_bits);
 extern int axp2101_adc_get_rate(void);
 
+extern int axp2101_egauge_read(void);
+
 /* Set/get maximum charging current in milliamps */
 extern void axp2101_set_charge_current(int current_mA);
 extern int axp2101_get_charge_current(void);

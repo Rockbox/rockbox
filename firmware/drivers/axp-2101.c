@@ -394,13 +394,12 @@ int axp2101_supply_get_voltage(int supply)
     return val;
 }
 
-/* TODO: can we trust the battery current direction? */
 int axp2101_battery_status(void)
 {
     int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP2101_REG_PMU_STATUS2);
-    if((r >> 5) & 0x03 == 0) {
+    if(((r >> 5) & 0x03) == 0) {
         return AXP2101_BATT_FULL;
-    } else if((r >> 5) & 0x03 == 01) {
+    } else if(((r >> 5) & 0x03) == 1) {
         return AXP2101_BATT_CHARGING;
     } else {
         return AXP2101_BATT_DISCHARGING;
