@@ -730,6 +730,9 @@ static int scrobbler_context_menu(struct printcell_data_t *pc_data)
     menu_item[2]= "Include";
     menu_item[3]= "Custom Filter";
 
+    if (pc_data->view_columns < SCROBBLER_MIN_COLUMNS)
+        col = -1;
+
     if (col == -1)
     {
         menu_item[0]= hide_col ? "Hide All":"Show All";
