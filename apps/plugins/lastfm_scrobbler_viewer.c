@@ -62,7 +62,7 @@ struct printcell_data_t {
     size_t buf_size;
     off_t buf_used;
     char header[PRINTCELL_MAXLINELEN];
-
+    bool is_scrobbler;
 };
 
 enum e_find_type {
@@ -730,7 +730,7 @@ static int scrobbler_context_menu(struct printcell_data_t *pc_data)
     menu_item[2]= "Include";
     menu_item[3]= "Custom Filter";
 
-    if (pc_data->view_columns < SCROBBLER_MIN_COLUMNS)
+    if (!pc_data->is_scrobbler)
         col = -1;
 
     if (col == -1)
@@ -947,11 +947,11 @@ static void synclist_set(int selected_item, int items, int sel_size, struct prin
                                                   pc_data->header, Icon_Rockbox);
     printcell_enable(true);
 
-
     int max_cols = count_max_columns(items, pcs.text_delimeter,
                                      SCROBBLER_MIN_COLUMNS, pc_data);
     if (max_cols < SCROBBLER_MIN_COLUMNS) /* not a scrobbler file? */
     {
+        pc_data->is_scrobbler = false;
         /*check for a playlist_control file or a playback log*/
 
         max_cols = count_max_columns(items, ':', 3, pc_data);
@@ -1064,6 +1064,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->memset(&printcell_data, 0, sizeof (struct printcell_data_t));
     printcell_data.fd_cur = -1;
     printcell_data.view_lastcol = -1;
+    printcell_data.is_scrobbler = true;
 
     if (rb->file_exists(filename))
     {

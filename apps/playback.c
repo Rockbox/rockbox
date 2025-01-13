@@ -1259,7 +1259,7 @@ void add_playbacklog(struct mp3entry *id3)
     if (!global_settings.playback_log)
         return;
     ssize_t used = 0;
-    unsigned long timestamp = current_tick;
+    unsigned long timestamp = current_tick * (1000 / HZ); /* milliseconds */
 #if (CONFIG_STORAGE & STORAGE_ATA)
     char *buf = NULL;
     ssize_t bufsz;

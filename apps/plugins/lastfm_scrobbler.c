@@ -82,12 +82,6 @@ Example
 
 /****************** constants ******************/
 
-
-#define ERR_NONE (0)
-#define ERR_WRITING_FILE (-1)
-#define ERR_ENTRY_LENGTH (-2)
-#define ERR_WRITING_DATA (-3)
-
 /* increment this on any code change that effects output */
 #define SCROBBLER_VERSION "1.1"
 
@@ -96,7 +90,7 @@ Example
 #define SCROBBLER_BAD_ENTRY "# FAILED - "
 
 /* longest entry I've had is 323, add a safety margin */
-#define SCROBBLER_MAXENTRY_LEN (512)
+#define SCROBBLER_MAXENTRY_LEN (MAX_PATH + 60 + 10)
 
 #define ITEM_HDR "#ARTIST #ALBUM #TITLE #TRACKNUM #LENGTH #RATING #TIMESTAMP #MUSICBRAINZ_TRACKID\n"
 
@@ -113,7 +107,6 @@ Example
 
 /****************** prototypes ******************/
 enum plugin_status plugin_start(const void* parameter); /* entry */
-void play_tone(unsigned int frequency, unsigned int duration);
 static int view_playback_log(void);
 static int export_scrobbler_file(void);
 
@@ -308,7 +301,7 @@ static inline const char* str_chk_valid(const char *s, const char *alt)
     return (s != NULL ? s : alt);
 }
 
-static void get_scrobbler_filename(char *path, size_t size)
+static void scrobbler_get_filename(char *path, size_t size)
 {
     int used;
 
@@ -422,7 +415,7 @@ static int open_create_scrobbler_log(void)
     int fd;
     char scrobbler_file[MAX_PATH];
 
-    get_scrobbler_filename(scrobbler_file, sizeof(scrobbler_file));
+    scrobbler_get_filename(scrobbler_file, sizeof(scrobbler_file));
 
     /* If the file doesn't exist, create it. */
     if(!rb->file_exists(scrobbler_file))
@@ -486,61 +479,77 @@ static bool playbacklog_parse_entry(struct scrobbler_entry *entry, char *begin)
     return true; /* success */
 }
 
-static bool cull_playback_duplicates(int fd, struct scrobbler_entry *curentry,
+static inline bool pbl_cull_duplicates(int fd, struct scrobbler_entry *curentry,
                                      int cur_line, char*buf, size_t bufsz)
 {
-    int line_num = 0;
-    int rd, pos, pos_end;
+    /* child function of remove_duplicates */
+    int line_num = cur_line;
+    int rd, start_pos, pos;
     struct scrobbler_entry compare;
-    rb->lseek(fd, 0, SEEK_SET);
+    pos = rb->lseek(fd, 0, SEEK_CUR);
     while(1)
     {
-        pos = rb->lseek(fd, 0, SEEK_CUR);
         if ((rd = rb->read_line(fd, buf, bufsz)) <= 0)
-            break;
+            break; /* EOF */
+
+        /* save start of entry in case we need to remove it */
+        start_pos = pos;
+        pos += rd;
         line_num++;
         if (buf[0] == '#' || buf[0] == '\0') /* skip comments and empty lines */
             continue;
-        if (line_num == cur_line || !playbacklog_parse_entry(&compare, buf))
+        if (!playbacklog_parse_entry(&compare, buf))
             continue;
 
         rb->yield();
-        if (rb->strcmp(curentry->path, compare.path) != 0)
+
+        unsigned long length = compare.length;
+        if (curentry->length != length
+            || rb->strcmp(curentry->path, compare.path) != 0)
             continue; /* different track */
 
-        if (curentry->elapsed > compare.elapsed)
+        /* if this is two distinct plays keep both */
+        if  ((cur_line + 1 == line_num) /* unless back to back then its probably a resume */
+            || (curentry->timestamp <= compare.timestamp + length
+            && compare.timestamp <= curentry->timestamp + length))
         {
-            /*logf("entry %s (%lu) @ %d culled\n", compare.path, compare.elapsed, line_num);*/
-            pos_end = rb->lseek(fd, 0, SEEK_CUR);
-            rb->lseek(fd, pos, SEEK_SET);
-            rb->write(fd, "#", 1); /* make this entry a comment */
-            rb->lseek(fd, pos_end, SEEK_SET);
-        }
-        else if (curentry->elapsed < compare.elapsed)
-        {
-            /*entry is not the greatest elapsed*/
-            return false;
+
+            if (curentry->elapsed >= compare.elapsed)
+            {
+                /* compare entry is not the greatest elapsed */
+                /*logf("entry %s (%lu) @ %d culled\n", compare.path, compare.elapsed, line_num);*/
+                rb->lseek(fd, start_pos, SEEK_SET);
+                rb->write(fd, "#", 1); /* make this entry a comment */
+                rb->lseek(fd, pos, SEEK_SET);
+            }
+            else
+            {
+                /*current entry is not the greatest elapsed*/
+                return false;
+            }
         }
     }
     return true; /* this item is unique or the greatest elapsed */
 }
 
-static void remove_playback_duplicates(int fd, char *buf, size_t bufsz)
+static void playbacklog_remove_duplicates(int fd, char *buf, size_t bufsz)
 {
     logf("%s()\n", __func__);
     struct scrobbler_entry entry;
     char tmp_buf[SCROBBLER_MAXENTRY_LEN];
-    int pos, endpos;
+    int start_pos, pos = 0;
     int rd;
     int line_num = 0;
     rb->lseek(fd, 0, SEEK_SET);
 
     while(1)
     {
-        pos = rb->lseek(fd, 0, SEEK_CUR);
         if ((rd = rb->read_line(fd, buf, bufsz)) <= 0)
-            break;
+            break;  /* EOF */
 
+        /* save start of entry in case we need to remove it */
+        start_pos = pos;
+        pos += rd;
         line_num++;
         if (buf[0] == '#' || buf[0] == '\0') /* skip comments and empty lines */
             continue;
@@ -549,18 +558,15 @@ static void remove_playback_duplicates(int fd, char *buf, size_t bufsz)
             /*logf("%s failed parsing entry @ %d\n", __func__, line_num);*/
             continue;
         }
-        //logf("current entry %s (%lu) @ %d", entry.path, entry.elapsed, line_num);
+        /*logf("current entry %s (%lu) @ %d", entry.path, entry.elapsed, line_num);*/
 
-        endpos = rb->lseek(fd, 0, SEEK_CUR);
-        if (!cull_playback_duplicates(fd, &entry, line_num, tmp_buf, sizeof(tmp_buf)))
+        if (!pbl_cull_duplicates(fd, &entry, line_num, tmp_buf, sizeof(tmp_buf)))
         {
-            rb->lseek(fd, pos, SEEK_SET);
+            rb->lseek(fd, start_pos, SEEK_SET);
             /*logf("entry: %s @ %d is a duplicate", entry.path, line_num);*/
             rb->write(fd, "#", 1); /* make this entry a comment */
-            endpos = 0;
-            line_num = 0;
         }
-        rb->lseek(fd, endpos, SEEK_SET);
+        rb->lseek(fd, pos, SEEK_SET);
     }
 }
 
@@ -589,32 +595,35 @@ static int export_scrobbler_file(void)
     /* We don't want any writes while copying and (possibly) deleting the log */
     bool log_enabled = rb->global_settings->playback_log;
     rb->global_settings->playback_log = false;
+
     int fd = rb->open_utf8(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->global_settings->playback_log = log_enabled; /* re-enable logging */
+        rb->global_settings->playback_log = log_enabled; /* restore logging */
         logf("Scrobbler Error opening: %s\n", filename);
         rb->splashf(HZ *2, "Scrobbler Error opening: %s", filename);
         return PLUGIN_ERROR;
     }
+    /* copy loop playback.log => playback.old */
     while(rb->read_line(fd, buf, sizeof(buf)) > 0)
     {
         line_num++;
         if (buf[0] == '#' || buf[0] == '\0') /* skip comments and empty lines */
             continue;
+        /* parse entry will fail if elapsed > length or other invalid entry */
         if (!playbacklog_parse_entry(&entry, buf))
         {
             logf("%s failed parsing entry @ line: %d\n", __func__, line_num);
             continue;
         }
-
+        /* don't copy entries that do not meet users minimum play length */
         if ((int) entry.elapsed < gConfig.minms)
         {
             logf("Skipping path:'%s' @ line: %d\nelapsed: %ld length: %ld\nmin: %d\n",
              entry.path, line_num, entry.elapsed, entry.length, gConfig.minms);
             continue;
         }
-        /* add a space to beginning of every line remove_playback_duplicates
+        /* add a space to beginning of every line playbacklog_remove_duplicates
          * will use this to prepend '#' to entries that will be ignored */
         rb->fdprintf(fd_copy, " %s\n", buf);
         tracks_saved++;
@@ -626,10 +635,10 @@ static int export_scrobbler_file(void)
     {
         rb->remove(filename);
     }
-    rb->global_settings->playback_log = log_enabled; /* re-enable logging */
+    rb->global_settings->playback_log = log_enabled; /* restore logging */
 
     if (gConfig.remove_dup && tracks_saved > 0)
-        remove_playback_duplicates(fd_copy, buf, sizeof(buf));
+        playbacklog_remove_duplicates(fd_copy, buf, sizeof(buf));
 
     rb->lseek(fd_copy, 0, SEEK_SET);
 
