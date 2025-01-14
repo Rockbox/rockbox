@@ -769,7 +769,10 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     }
 
     FOR_NB_SCREENS(i)
+    {
         viewportmanager_theme_undo(i, false);
+        skinlist_set_cfg(i, NULL); /* Bugfix dangling reference in skin_draw() */
+    }
 #ifdef HAVE_TOUCHSCREEN
     /* This is needed because this function runs the settings menu and we do
      * not want to switch back to the old mode if the user intentionally went
