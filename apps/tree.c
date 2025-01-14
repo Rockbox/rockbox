@@ -695,6 +695,12 @@ void set_current_file(const char *path)
 }
 
 
+static int exit_to_new_screen(int screen)
+{
+    gui_synclist_scroll_stop(&tree_lists);
+    return screen;
+}
+
 /* main loop, handles key events */
 static int dirbrowse(void)
 {
@@ -727,12 +733,12 @@ static int dirbrowse(void)
     numentries = update_dir();
     reload_dir = false;
     if (numentries == -1)
-        return GO_TO_PREVIOUS;  /* currdir is not a directory */
+        return exit_to_new_screen(GO_TO_PREVIOUS);  /* currdir is not a directory */
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
         splash(HZ*2, ID2P(LANG_NO_FILES));
-        return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
+        return exit_to_new_screen(GO_TO_PREVIOUS);  /* No files found for rockbox_browse() */
     }
 
     while(tc.browse && tc.is_browsing) {
@@ -776,7 +782,7 @@ static int dirbrowse(void)
                     {
                         tc.browse->flags |= BROWSE_SELECTED;
                         get_current_file(tc.browse->buf, tc.browse->bufsize);
-                        return GO_TO_PREVIOUS;
+                        return exit_to_new_screen(GO_TO_PREVIOUS);
                     }
                 }
 #ifdef HAVE_TAGCACHE
@@ -787,12 +793,12 @@ static int dirbrowse(void)
                 {
                     case GO_TO_FILEBROWSER: reload_dir = true; break;
                     case GO_TO_PLUGIN:
-                        return GO_TO_PLUGIN;
+                        return exit_to_new_screen(GO_TO_PLUGIN);
                     case GO_TO_WPS:
-                        return GO_TO_WPS;
+                        return exit_to_new_screen(GO_TO_WPS);
 #if CONFIG_TUNER
                     case GO_TO_FM:
-                        return GO_TO_FM;
+                        return exit_to_new_screen(GO_TO_FM);
 #endif
                     case GO_TO_ROOT: exit_func = true; break;
                     default:
@@ -802,6 +808,7 @@ static int dirbrowse(void)
                 break;
 
             case ACTION_STD_CANCEL:
+                exit_to_new_screen(0);
                 if (*tc.dirfilter > NUM_FILTER_MODES && tc.dirlevel < 1) {
                     exit_func = true;
                     break;
@@ -812,7 +819,7 @@ static int dirbrowse(void)
                     if (oldbutton == ACTION_TREE_PGLEFT)
                         break;
                     else
-                        return GO_TO_ROOT;
+                        return exit_to_new_screen(GO_TO_ROOT);
                 }
 
 #ifdef HAVE_TAGCACHE
@@ -832,16 +839,16 @@ static int dirbrowse(void)
                 break;
 
             case ACTION_STD_MENU:
-                return GO_TO_ROOT;
+                return exit_to_new_screen(GO_TO_ROOT);
                 break;
 
 #ifdef HAVE_RECORDING
             case ACTION_STD_REC:
-                return GO_TO_RECSCREEN;
+                return exit_to_new_screen(GO_TO_RECSCREEN);
 #endif
 
             case ACTION_TREE_WPS:
-                return GO_TO_PREVIOUS_MUSIC;
+                return exit_to_new_screen(GO_TO_PREVIOUS_MUSIC);
                 break;
 #ifdef HAVE_QUICKSCREEN
             case ACTION_STD_QUICKSCREEN:
@@ -866,7 +873,7 @@ static int dirbrowse(void)
                     if (shortcut_ret == GO_TO_PREVIOUS)
                         global_status.last_screen = last_screen;
                     else
-                        return shortcut_ret;
+                        return exit_to_new_screen(shortcut_ret);
                 }
                 else if (enter_shortcuts_menu) /* currently disabled */
                 {
@@ -932,7 +939,7 @@ static int dirbrowse(void)
                 switch (onplay_result)
                 {
                     case ONPLAY_MAINMENU:
-                        return GO_TO_ROOT;
+                        return exit_to_new_screen(GO_TO_ROOT);
                         break;
 
                     case ONPLAY_OK:
@@ -944,11 +951,11 @@ static int dirbrowse(void)
                         break;
 
                     case ONPLAY_START_PLAY:
-                        return GO_TO_WPS;
+                        return exit_to_new_screen(GO_TO_WPS);
                         break;
 
                     case ONPLAY_PLUGIN:
-                        return GO_TO_PLUGIN;
+                        return exit_to_new_screen(GO_TO_PLUGIN);
                         break;
                 }
                 break;
@@ -978,7 +985,7 @@ static int dirbrowse(void)
                 break;
         }
         if (start_wps)
-            return GO_TO_WPS;
+            return exit_to_new_screen(GO_TO_WPS);
         if (button && !IS_SYSEVENT(button))
         {
             storage_spin();
@@ -1017,9 +1024,11 @@ static int dirbrowse(void)
         }
 
         if (exit_func)
-            return GO_TO_PREVIOUS;
+            return exit_to_new_screen(GO_TO_PREVIOUS);
 
         if (restore || reload_dir) {
+            FOR_NB_SCREENS(i)
+                screens[i].scroll_stop();
             /* restore display */
             numentries = update_dir();
             reload_dir = false;
@@ -1030,7 +1039,7 @@ static int dirbrowse(void)
             }
         }
     }
-    return GO_TO_ROOT;
+    return exit_to_new_screen(GO_TO_ROOT);
 }
 
 int create_playlist(void)
