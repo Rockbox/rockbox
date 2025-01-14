@@ -16481,15 +16481,15 @@
   user: core
   <source>
     *: none
-    lineout_poweroff,erosqnative: "Line Out"
+    erosqnative,lineout_poweroff: "Line Out"
   </source>
   <dest>
     *: none
-    lineout_poweroff,erosqnative: "Wyjście liniowe"
+    erosqnative,lineout_poweroff: "Wyjście liniowe"
   </dest>
   <voice>
     *: none
-    lineout_poweroff,erosqnative: "Wyjście liniowe"
+    erosqnative,lineout_poweroff: "Wyjście liniowe"
   </voice>
 </phrase>
 <phrase>
@@ -16504,5 +16504,33 @@
   </dest>
   <voice>
     *: "Nie można załadować czcionki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Rejestrowanie"
+  </dest>
+  <voice>
+    *: "Rejestrowanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Wyświetl dziennik"
+  </dest>
+  <voice>
+    *: "Wyświetl dziennik"
   </voice>
 </phrase>

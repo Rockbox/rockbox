@@ -16502,3 +16502,31 @@
     *: "parçalar kaydedildi"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Kaydediliyor"
+  </dest>
+  <voice>
+    *: "kayıt ediliyor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Kayıtları incele"
+  </dest>
+  <voice>
+    *: "Kayıtları incele"
+  </voice>
+</phrase>
