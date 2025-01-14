@@ -16513,3 +16513,31 @@
     *: "저장된 트랙"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "로깅"
+  </dest>
+  <voice>
+    *: "로깅"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "로그 보기"
+  </dest>
+  <voice>
+    *: "로그 보기"
+  </voice>
+</phrase>
