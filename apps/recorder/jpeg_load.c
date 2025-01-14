@@ -26,7 +26,7 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
-#include "embedded_metadata.h"
+#include "metadata_common.h"
 #include "plugin.h"
 #include "debug.h"
 #include "jpeg_load.h"
@@ -81,6 +81,7 @@ struct jpeg
     int buf_index;
 
     int (*read_buf)(struct jpeg* p_jpeg, size_t count);
+    bool (*skip_bytes_seek)(struct jpeg* p_jpeg);
     void* custom_param;
 #endif
     unsigned long len;
@@ -881,21 +882,49 @@ static int read_buf(struct jpeg* p_jpeg, size_t count)
     return read(p_jpeg->fd, p_jpeg->buf, count);
 }
 
+INLINE void fill_buf(struct jpeg* p_jpeg)
+{
+    p_jpeg->buf_left = p_jpeg->read_buf(p_jpeg, MIN(JPEG_READ_BUF_SIZE, p_jpeg->len));
+    p_jpeg->buf_index = 0;
+    if (p_jpeg->buf_left > 0)
+        p_jpeg->len -= p_jpeg->buf_left;
+}
+
 #ifdef HAVE_ALBUMART
 static int read_buf_id3_unsync(struct jpeg* p_jpeg, size_t count)
 {
     count = read(p_jpeg->fd, p_jpeg->buf, count);
     return id3_unsynchronize(p_jpeg->buf, count, (bool*) &p_jpeg->custom_param);
 }
-#endif
 
-INLINE void fill_buf(struct jpeg* p_jpeg)
+static int read_buf_vorbis_base64(struct jpeg* p_jpeg, size_t count)
 {
-        p_jpeg->buf_left = p_jpeg->read_buf(p_jpeg, MIN(JPEG_READ_BUF_SIZE, p_jpeg->len));
-        p_jpeg->buf_index = 0;
-        if (p_jpeg->buf_left > 0)
-            p_jpeg->len -= p_jpeg->buf_left;
+    struct ogg_file* ogg = p_jpeg->custom_param;
+    unsigned char* buf = p_jpeg->buf;
+    count = ogg_file_read(ogg, buf, count);
+    if (count == (size_t) -1)
+        return 0;
+
+    return base64_decode(buf, count, buf);
 }
+
+/* when pjpeg->read_buf involves additional data processing (like base64 decoding)
+ * we can't use lseek and have to call pjpeg->read_buf for proper seek */
+static bool skip_bytes_read_buf(struct jpeg* p_jpeg)
+{
+    do
+    {
+        int count = -p_jpeg->buf_left;
+        fill_buf(p_jpeg);
+        if (p_jpeg->buf_left < 0)
+            return false;
+        p_jpeg->buf_left -= count;
+        p_jpeg->buf_index += count;
+    } while (p_jpeg->buf_left < 0);
+    return true;
+}
+
+#endif /* HAVE_ALBUMART */
 
 static unsigned char *jpeg_getc(struct jpeg* p_jpeg)
 {
@@ -907,7 +936,7 @@ static unsigned char *jpeg_getc(struct jpeg* p_jpeg)
     return (p_jpeg->buf_index++) + p_jpeg->buf;
 }
 
-INLINE bool skip_bytes_seek(struct jpeg* p_jpeg)
+static bool skip_bytes_seek(struct jpeg* p_jpeg)
 {
     if (UNLIKELY(lseek(p_jpeg->fd, -p_jpeg->buf_left, SEEK_CUR) < 0))
         return false;
@@ -919,7 +948,7 @@ static bool skip_bytes(struct jpeg* p_jpeg, int count)
 {
     p_jpeg->buf_left -= count;
     p_jpeg->buf_index += count;
-    return p_jpeg->buf_left >= 0 || skip_bytes_seek(p_jpeg);
+    return p_jpeg->buf_left >= 0 || p_jpeg->skip_bytes_seek(p_jpeg);
 }
 
 static void jpeg_putc(struct jpeg* p_jpeg)
@@ -2055,6 +2084,7 @@ int clip_jpeg_fd(int fd, int flags,
         p_jpeg->len = filesize(p_jpeg->fd);
 
     p_jpeg->read_buf = read_buf;
+    p_jpeg->skip_bytes_seek = skip_bytes_seek;
 
 #ifdef HAVE_ALBUMART
     if (flags & AA_FLAG_ID3_UNSYNC)
@@ -2062,9 +2092,34 @@ int clip_jpeg_fd(int fd, int flags,
         p_jpeg->read_buf = read_buf_id3_unsync;
         p_jpeg->custom_param = false;
     }
+    else if (flags & AA_FLAG_VORBIS_BASE64)
+    {
+        struct ogg_file* ogg = alloca(sizeof(*ogg));
+        off_t pic_pos = lseek(fd, 0, SEEK_CUR);
+
+        // we need 92 bytes for format probing, reuse some available space
+        unsigned char* buf_format = (unsigned char*) p_jpeg->quanttable;
+        int type = get_ogg_format_and_move_to_comments(fd, buf_format);
+
+        ogg_file_init(ogg, fd, type, 0);
+        bool packet_found;
+        do
+        {
+            int seek_from_cur_pos = pic_pos - lseek(fd, 0, SEEK_CUR);
+            packet_found = seek_from_cur_pos <= ogg->packet_remaining;
+            if (ogg_file_read(ogg, NULL, packet_found ? seek_from_cur_pos : ogg->packet_remaining) < 0)
+                return -1;
+        }
+        while (!packet_found);
+
+        p_jpeg->read_buf = read_buf_vorbis_base64;
+        p_jpeg->skip_bytes_seek = skip_bytes_read_buf;
+        p_jpeg->custom_param = ogg;
+    }
 #else
     (void)flags;
-#endif
+#endif /* HAVE_ALBUMART */
+
 #endif
     status = process_markers(p_jpeg);
 #ifndef JPEG_FROM_MEM

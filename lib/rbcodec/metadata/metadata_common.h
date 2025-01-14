@@ -39,6 +39,25 @@ bool read_ape_tags(int fd, struct mp3entry* id3);
 long read_vorbis_tags(int fd, struct mp3entry *id3,
     long tag_remaining);
 
+struct ogg_file
+{
+    int fd;
+    bool packet_ended;
+    long packet_remaining;
+};
+
+#ifdef HAVE_ALBUMART
+int id3_unsynchronize(char* tag, int len, bool *ff_found);
+
+size_t base64_decode(const char *in, size_t in_len, unsigned char *out);
+
+bool parse_flac_album_art(unsigned char *buf, int bytes_read, enum mp3_aa_type *type, int *picframe_pos);
+
+int get_ogg_format_and_move_to_comments(int fd, unsigned char *buf);
+bool ogg_file_init(struct ogg_file* file, int fd, int type, int remaining);
+ssize_t ogg_file_read(struct ogg_file* file, void* buffer, size_t buffer_size);
+#endif
+
 int string_option(const char *option, const char *const oplist[], bool ignore_case);
 bool skip_id3v2(int fd, struct mp3entry *id3);
 long read_string(int fd, char* buf, long buf_size, int eos, long size);

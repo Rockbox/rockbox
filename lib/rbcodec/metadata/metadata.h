@@ -207,6 +207,7 @@ enum mp3_aa_type {
     AA_TYPE_JPG,
 
     AA_FLAG_ID3_UNSYNC = 1 << (AA_FLAGS_SHIFT + 0),
+    AA_FLAG_VORBIS_BASE64 = 1 << (AA_FLAGS_SHIFT + 1),
 };
 
 struct mp3_albumart {

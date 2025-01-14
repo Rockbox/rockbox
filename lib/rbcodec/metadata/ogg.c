@@ -30,6 +30,58 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
+//NOTE: buf size must be >= 92 bytes
+int get_ogg_format_and_move_to_comments(int fd, unsigned char *buf)
+{
+    /* 92 bytes is enough for both Vorbis and Speex headers */
+    if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 92) < 92))
+    {
+        return AFMT_UNKNOWN;
+    }
+
+    /* All Ogg streams start with OggS */
+    if (memcmp(buf, "OggS", 4) != 0)
+    {
+        return AFMT_UNKNOWN;
+    }
+
+    /* Check for format magic and then get metadata */
+    if (memcmp(&buf[29], "vorbis", 6) == 0)
+    {
+        /* Comments are in second Ogg page (byte 58 onwards for Vorbis) */
+        if (lseek(fd, 58, SEEK_SET) < 0)
+        {
+            return AFMT_UNKNOWN;
+        }
+        return AFMT_OGG_VORBIS;
+    }
+    else if (memcmp(&buf[28], "Speex   ", 8) == 0)
+    {
+        uint32_t header_size = get_long_le(&buf[60]);
+
+        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
+        if (lseek(fd, 28 + header_size, SEEK_SET) < 0)
+        {
+            return AFMT_UNKNOWN;
+        }
+
+        return AFMT_SPEEX;
+    }
+    else if (memcmp(&buf[28], "OpusHead", 8) == 0)
+    {
+        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
+        if (lseek(fd, 47, SEEK_SET) < 0)
+        {
+            DEBUGF("Could not seek to ogg");
+            return AFMT_UNKNOWN;
+        }
+        return AFMT_OPUS;
+    }
+    /* Unsupported format, try to print the marker, catches Ogg/FLAC at least */
+    DEBUGF("Unsupported format in Ogg stream: %16s\n", &buf[28]);
+    return AFMT_UNKNOWN;
+}
+
 /* A simple parser to read vital metadata from an Ogg Vorbis file. 
  * Can also handle parsing Ogg Speex files for metadata. Returns
  * false if metadata needed by the codec couldn't be read.
@@ -56,71 +108,30 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     /* Use the path name of the id3 structure as a temporary buffer. */
     unsigned char* buf = (unsigned char *)id3->path;
     long comment_size;
-    long remaining = 0;
     long last_serial = 0;
     long serial, r;
-    int segments, header_size;
+    int segments;
     int i;
     bool eof = false;
 
-    /* 92 bytes is enough for both Vorbis and Speex headers */
-    if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 92) < 92))
+    id3->codectype = get_ogg_format_and_move_to_comments(fd, buf);
+    switch (id3->codectype)
     {
-        return false;
-    }
-
-    /* All Ogg streams start with OggS */
-    if (memcmp(buf, "OggS", 4) != 0)
-    {
-        return false;
-    }
-
-    /* Check for format magic and then get metadata */
-    if (memcmp(&buf[29], "vorbis", 6) == 0)
-    {
-        id3->codectype = AFMT_OGG_VORBIS;
-        id3->frequency = get_long_le(&buf[40]);
-        id3->vbr = true;
-
-        /* Comments are in second Ogg page (byte 58 onwards for Vorbis) */
-        if (lseek(fd, 58, SEEK_SET) < 0)
-        {
+        case AFMT_OGG_VORBIS:
+            id3->frequency = get_long_le(&buf[40]);
+            id3->vbr = true;
+            break;
+        case AFMT_SPEEX:
+            id3->frequency = get_slong(&buf[64]);
+            id3->vbr = get_long_le(&buf[88]);
+            break;
+        case AFMT_OPUS:
+            id3->frequency = 48000;
+            id3->vbr = true;
+            // FIXME handle an actual channel mapping table
+            break;
+        default:
             return false;
-        }
-    }
-    else if (memcmp(&buf[28], "Speex   ", 8) == 0)
-    {
-        id3->codectype = AFMT_SPEEX;
-        id3->frequency = get_slong(&buf[64]);
-        id3->vbr = get_long_le(&buf[88]);
-
-        header_size = get_long_le(&buf[60]);
-
-        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
-        if (lseek(fd, 28 + header_size, SEEK_SET) < 0)
-        {
-            return false;
-        }
-    }
-    else if (memcmp(&buf[28], "OpusHead", 8) == 0)
-    {
-        id3->codectype = AFMT_OPUS;
-        id3->frequency = 48000;
-        id3->vbr = true;
-
-// FIXME handle an actual channel mapping table
-        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
-        if (lseek(fd, 47, SEEK_SET) < 0)
-        {
-            DEBUGF("Couldnotseektoogg");
-            return false;
-        }
-    }
-    else
-    {
-        /* Unsupported format, try to print the marker, catches Ogg/FLAC at least */
-        DEBUGF("Usupported format in Ogg stream: %16s\n", &buf[28]);
-        return false;
     }
 
     id3->filesize = filesize(fd);
@@ -129,6 +140,7 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
      * one from the last page (since we only support a single bitstream).
      */
     serial = get_long_le(&buf[14]);
+    long remaining = 0;
     comment_size = read_vorbis_tags(fd, id3, remaining);
 
     /* We now need to search for the last page in the file - identified by 
@@ -140,8 +152,6 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     {
         return false;
     }
-
-    remaining = 0;
 
     while (!eof) 
     {

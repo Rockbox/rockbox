@@ -45,7 +45,6 @@
 #include "mp3data.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "embedded_metadata.h"
 #include "misc.h"
 
 static unsigned long unsync(unsigned long b0,

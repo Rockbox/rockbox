@@ -26,26 +26,17 @@
 #include "platform.h"
 #include "metadata.h"
 #include "metadata_common.h"
-#include "metadata_parsers.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
-
-struct file
-{
-    int fd;
-    bool packet_ended;
-    long packet_remaining;
-};
-
 
 /* Read an Ogg page header. file->packet_remaining is set to the size of the
  * first packet on the page; file->packet_ended is set to true if the packet
  * ended on the current page. Returns true if the page header was
  * successfully read.
  */
-static bool file_read_page_header(struct file* file)
+static bool file_read_page_header(struct ogg_file* file)
 {
     unsigned char buffer[64];
     ssize_t table_left;
@@ -110,7 +101,7 @@ static bool file_read_page_header(struct file* file)
  * 0 if there is no more data to read (in the packet or the file), < 0 if a
  * read error occurred.
  */
-static ssize_t file_read(struct file* file, void* buffer, size_t buffer_size)
+ssize_t ogg_file_read(struct ogg_file* file, void* buffer, size_t buffer_size)
 {
     ssize_t done = 0;
     ssize_t count = -1;
@@ -167,11 +158,11 @@ static ssize_t file_read(struct file* file, void* buffer, size_t buffer_size)
 
 /* Read an int32 from file. Returns false if a read error occurred.
  */
-static bool file_read_int32(struct file* file, int32_t* value)
+static bool file_read_int32(struct ogg_file* file, int32_t* value)
 {
     char buf[sizeof(int32_t)];
 
-    if (file_read(file, buf, sizeof(buf)) < (ssize_t) sizeof(buf))
+    if (ogg_file_read(file, buf, sizeof(buf)) < (ssize_t) sizeof(buf))
     {
         return false;
     }
@@ -190,7 +181,7 @@ static bool file_read_int32(struct file* file, int32_t* value)
  * Unfortunately this is a slightly modified copy of read_string() in
  * metadata_common.c...
  */
-static long file_read_string(struct file* file, char* buffer,
+static long file_read_string(struct ogg_file* file, char* buffer,
     long buffer_size, int eos, long size)
 {
     long read_bytes = 0;
@@ -199,7 +190,7 @@ static long file_read_string(struct file* file, char* buffer,
     {
         char c;
 
-        if (file_read(file, &c, 1) != 1)
+        if (ogg_file_read(file, &c, 1) != 1)
         {
             read_bytes = -1;
             break;
@@ -221,7 +212,7 @@ static long file_read_string(struct file* file, char* buffer,
         else if (eos == -1)
         {
             /* No point in reading any more, skip remaining data */
-            if (file_read(file, NULL, size) < 0)
+            if (ogg_file_read(file, NULL, size) < 0)
             {
                 read_bytes = -1;
             }
@@ -244,7 +235,7 @@ static long file_read_string(struct file* file, char* buffer,
  * max amount to read if codec type is FLAC; it is ignored otherwise.
  * Returns true if the file was successfully initialized.
  */
-static bool file_init(struct file* file, int fd, int type, int remaining)
+bool ogg_file_init(struct ogg_file* file, int fd, int type, int remaining)
 {
     memset(file, 0, sizeof(*file));
     file->fd = fd;
@@ -262,7 +253,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
         char buffer[7];
 
         /* Read packet header (type and id string) */
-        if (file_read(file, buffer, sizeof(buffer)) < (ssize_t) sizeof(buffer))
+        if (ogg_file_read(file, buffer, sizeof(buffer)) < (ssize_t) sizeof(buffer))
         {
             return false;
         }
@@ -280,7 +271,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
         char buffer[8];
 
         /* Read comment header */
-        if (file_read(file, buffer, sizeof(buffer)) < (ssize_t) sizeof(buffer))
+        if (ogg_file_read(file, buffer, sizeof(buffer)) < (ssize_t) sizeof(buffer))
         {
             return false;
         }
@@ -300,6 +291,64 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
     return true;
 }
 
+#define B64_START_CHAR '+'
+/* maps char codes to BASE64 codes ('A': 0, 'B': 1,... '+': 62, '-': 63 */
+const char b64_codes[] =
+{   /* Starts from first valid base 64 char '+' with char code 43 (B64_START_CHAR)
+     * For valid base64 chars: index in 0..63; for invalid: -1, for =: -2 */
+    62, -1, -1, -1, 63, /* 43-47 (+ /) */
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -2, -1, -1, /* 48-63 (0-9 and =) */
+    -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, /* 64-79 (A-O) */
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, /* 80-95 (P-Z) */
+    -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, /* 96-111 (a-o) */
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 /* 112-127 (p-z) */
+};
+
+size_t base64_decode(const char *in, size_t in_len, unsigned char *out)
+{
+    size_t i = 0;
+    int val = 0;
+    size_t len = 0;
+
+    while (i < in_len)
+    {
+        if (in[i] == '=') //is it padding?
+        {
+            switch (i & 3)
+            {
+                case 2:
+                    out[len++] = (val >> 4) & 0xFF;
+                break;
+                case 3:
+                    out[len++] = (val >> 10) & 0xFF;
+                out[len++] = (val >>  2) & 0xFF;
+                break;
+            }
+            break;
+        }
+
+        val = (val << 6) | b64_codes[in[i] - B64_START_CHAR];
+
+        if ((++i & 3) == 0)
+        {
+            out[len++] = (val >> 16) & 0xFF;
+            out[len++] = (val >> 8) & 0xFF;
+            out[len++] = val & 0xFF;
+        }
+    }
+    return len;
+}
+
+size_t base64_encoded_size(size_t inlen)
+{
+    size_t ret = inlen;
+    if (inlen % 3 != 0)
+        ret += 3 - (inlen % 3);
+    ret /= 3;
+    ret *= 4;
+
+    return ret;
+}
 
 /* Read the items in a Vorbis comment packet. For Ogg files, the file must
  * be located on a page start, for other files, the beginning of the comment
@@ -309,7 +358,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
 long read_vorbis_tags(int fd, struct mp3entry *id3, 
     long tag_remaining)
 {
-    struct file file;
+    struct ogg_file file;
     char *buf = id3->id3v2buf;
     int32_t comment_count;
     int32_t len;
@@ -317,14 +366,14 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
     int buf_remaining = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
     int i;
     
-    if (!file_init(&file, fd, id3->codectype, tag_remaining))
+    if (!ogg_file_init(&file, fd, id3->codectype, tag_remaining))
     {
         return 0;
     }
     
     /* Skip vendor string */
 
-    if (!file_read_int32(&file, &len) || (file_read(&file, NULL, len) < 0))
+    if (!file_read_int32(&file, &len) || (ogg_file_read(&file, NULL, len) < 0))
     {
         return 0;
     }
@@ -355,6 +404,9 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
         }
 
         len -= read_len;
+#ifdef HAVE_ALBUMART
+        int before_block_pos = lseek(fd, 0, SEEK_CUR);
+#endif
         read_len = file_read_string(&file, id3->path, sizeof(id3->path), -1, len);
 
         if (read_len < 0)
@@ -363,7 +415,31 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
         }
 
         logf("Vorbis comment %d: %s=%s", i, name, id3->path);
+#ifdef HAVE_ALBUMART
+        if (!id3->has_embedded_albumart /* only use the first PICTURE */
+            && !strcasecmp(name, "METADATA_BLOCK_PICTURE"))
+        {
+            int after_block_pos = lseek(fd, 0, SEEK_CUR);
 
+            char* buf = id3->path;
+            size_t outlen = base64_decode(buf, MIN(read_len, (int32_t) sizeof(id3->path)), buf);
+
+            int picframe_pos;
+            parse_flac_album_art(buf, outlen, &id3->albumart.type, &picframe_pos);
+            if(id3->albumart.type != AA_TYPE_UNKNOWN)
+            {
+                //NOTE: This is not exact location due to padding in base64 (up to 3 chars)!!
+                // But it's OK with our jpeg decoder if we add or miss few bytes in jpeg header
+                const int picframe_pos_b64 = base64_encoded_size(picframe_pos + 4);
+
+                id3->has_embedded_albumart = true;
+                id3->albumart.type |= AA_FLAG_VORBIS_BASE64;
+                id3->albumart.pos = picframe_pos_b64 + before_block_pos;
+                id3->albumart.size = after_block_pos - id3->albumart.pos;
+            }
+        }
+        else
+#endif
         /* Is it an embedded cuesheet? */
         if (!strcasecmp(name, "CUESHEET"))
         {
@@ -385,7 +461,7 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
     /* Skip to the end of the block (needed by FLAC) */
     if (file.packet_remaining)
     {
-        if (file_read(&file, NULL, file.packet_remaining) < 0)
+        if (ogg_file_read(&file, NULL, file.packet_remaining) < 0)
         {
             return 0;
         }
