@@ -112,13 +112,47 @@ struct entry* tree_get_entry_at(struct tree_context *t, int index)
     return &entries[index];
 }
 
+static struct entry *tree_get_valid_entry_at(const char* funcname,
+                                             struct tree_context *t, int index)
+{
+    struct entry *entry = tree_get_entry_at(t, index);
+    if (!entry)
+        panicf("Invalid tree entry %s", funcname);
+    /*DEBUGF("%s tc: %x idx: %d\n", funcname, t, index);*/
+    return entry;
+}
+
+static bool ext_stripit(bool isdir, int attr, int dirfilter)
+{
+    if(!isdir)
+    {
+        switch(global_settings.show_filename_ext)
+        {
+            case 0:
+                /* show file extension: off */
+                return true;
+                break;
+            case 1:
+                /* show file extension: on */
+                break;
+            case 2:
+                /* show file extension: only unknown types */
+                return filetype_supported(attr);
+            case 3:
+            default:
+                /* show file extension: only when viewing all */
+                return (dirfilter != SHOW_ID3DB && dirfilter != SHOW_ALL);
+        }
+    }
+    return false;
+}
+
 static const char* tree_get_filename(int selected_item, void *data,
                                      char *buffer, size_t buffer_len)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
-    bool stripit = false;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
@@ -129,38 +163,13 @@ static const char* tree_get_filename(int selected_item, void *data,
     else
 #endif
     {
-        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
-        if (!entry)
-            panicf("Invalid tree entry %s", __func__);
+        struct entry *entry =
+                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
         name = entry->name;
         attr = entry->attr;
     }
 
-    if(!(attr & ATTR_DIRECTORY))
-    {
-        switch(global_settings.show_filename_ext)
-        {
-            case 0:
-                /* show file extension: off */
-                stripit = true;
-                break;
-            case 1:
-                /* show file extension: on */
-                break;
-            case 2:
-                /* show file extension: only unknown types */
-                stripit = filetype_supported(attr);
-                break;
-            case 3:
-            default:
-                /* show file extension: only when viewing all */
-                stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
-                          (*(local_tc->dirfilter) != SHOW_ALL);
-                break;
-        }
-    }
-
-    if(stripit)
+    if(ext_stripit((attr & ATTR_DIRECTORY), attr, *(local_tc->dirfilter)))
     {
         return(strip_extension(buffer, buffer_len, name));
     }
@@ -173,9 +182,8 @@ static int tree_get_filecolor(int selected_item, void * data)
     if (*tc.dirfilter == SHOW_ID3DB)
         return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
-    struct entry *entry = tree_get_entry_at(local_tc, selected_item);
-    if (!entry)
-        panicf("Invalid tree entry %s", __func__);
+    struct entry *entry =
+                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
 
     return filetype_get_color(entry->name, entry->attr);
 }
@@ -192,9 +200,8 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     else
 #endif
     {
-        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
-        if (!entry)
-            panicf("Invalid tree entry %s", __func__);
+        struct entry *entry =
+                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
 
         return filetype_get_icon(entry->attr);
     }
@@ -219,10 +226,8 @@ static int tree_voice_cb(int selected_item, void * data)
     else
 #endif
     {
-        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
-        if (!entry)
-            panicf("Invalid tree entry %s", __func__);
-
+        struct entry *entry =
+                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
         name = entry->name;
         attr = entry->attr;
     }
@@ -278,38 +283,17 @@ static int tree_voice_cb(int selected_item, void * data)
 
     /* spell name AFTER voicing filetype */
     if (spell_name) {
-        bool stripit = false;
-        char *ext = NULL;
+            bool stripit = ext_stripit(is_dir, attr, *(local_tc->dirfilter));
+            char *ext = NULL;
 
-        /* Don't spell the extension if it's not displayed */
-        if (!is_dir) {
-            switch(global_settings.show_filename_ext) {
-            case 0:
-                /* show file extension: off */
-                stripit = true;
-                break;
-            case 1:
-                /* show file extension: on */
-                stripit = false;
-                break;
-            case 2:
-                /* show file extension: only unknown types */
-                stripit = filetype_supported(attr);
-                break;
-            case 3:
-            default:
-                /* show file extension: only when viewing all */
-                stripit = (*(local_tc->dirfilter) != SHOW_ID3DB) &&
-                          (*(local_tc->dirfilter) != SHOW_ALL);
-                break;
-            }
+            /* Don't spell the extension if it's not displayed */
 
             if (stripit) {
                 ext = strrchr(name, '.');
                 if (ext)
                     *ext = 0;
             }
-        }
+
         talk_spell(name, true);
 
         if (stripit && ext)
@@ -341,7 +325,6 @@ void tree_init(void)
     check_rockboxdir();
     strcpy(tc.currdir, "/");
 }
-
 
 struct tree_context* tree_get_context(void)
 {
@@ -773,10 +756,8 @@ static int dirbrowse(void)
                     break;
                 if (tc.browse->flags & BROWSE_SELECTONLY)
                 {
-                    struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
-                    if (!entry)
-                        panicf("Invalid tree entry %s", __func__);
-
+                    struct entry *entry =
+                       tree_get_valid_entry_at(__func__, &tc, tc.selected_item);
                     short attr = entry->attr;
                     if(!(attr & ATTR_DIRECTORY))
                     {
@@ -925,9 +906,8 @@ static int dirbrowse(void)
                     else
 #endif
                     {
-                        struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
-                        if (!entry)
-                            panicf("Invalid tree entry %s", __func__);
+                        struct entry *entry =
+                         tree_get_valid_entry_at(__func__, &tc, tc.selected_item);
 
                         attr = entry->attr;
 
@@ -1045,19 +1025,6 @@ static int dirbrowse(void)
 int create_playlist(void)
 {
     bool ret;
-#if 0 /* handled in catalog_add_to_a_playlist() */
-    char filename[MAX_PATH + 16]; /* add enough space for extension */
-    const char *playlist_dir = catalog_get_directory();
-    if (tc.currdir[1] && strcmp(tc.currdir, playlist_dir) != 0)
-        snprintf(filename, sizeof filename, "%s.m3u8", tc.currdir);
-    else
-        snprintf(filename, sizeof filename, "%s/all.m3u8", playlist_dir);
-
-    if (kbd_input(filename, MAX_PATH, NULL))
-        return 0;
-    splashf(0, "%s %s", str(LANG_CREATING), filename);
-#endif
-
     trigger_cpu_boost();
     ret = catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, NULL, NULL);
     cancel_cpu_boost();
