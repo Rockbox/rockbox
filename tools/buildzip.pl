@@ -395,6 +395,9 @@ sub buildzip {
     # create the file so the talkclip generation skips this folder
     open(IGNORE, ">$temp_dir/talkclips.ignore")  || die "can't open talkclips.ignore";
     close(IGNORE);
+    # create the file so bookmark generation skips this folder
+    open(IGNORE, ">$temp_dir/bookmark.ignore")  || die "can't open bookmark.ignore";
+    close(IGNORE);
 
     # the samsung ypr0 has a loader script that's needed in the zip
     if ($modelname =~ /samsungypr[01]/) {

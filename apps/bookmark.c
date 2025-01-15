@@ -50,6 +50,14 @@
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
+#define BOOKMARK_IGNORE "/bookmark.ignore"
+#define BOOKMARK_UNIGNORE "/bookmark.unignore"
+
+/* flags for write_bookmark() */
+#define BMARK_WRITE        0x0
+#define BMARK_ASK_USER     0x1
+#define BMARK_CREATE_FILE  0x2
+#define BMARK_CHECK_IGNORE 0x4
 
 /* Used to buffer bookmarks while displaying the bookmark list. */
 struct bookmark_list
@@ -540,6 +548,41 @@ static void get_track_resume_info(struct resume_info *resume_info)
 }
 
 /* ----------------------------------------------------------------------- */
+/* This function checks for bookmark ignore and unignore files to allow    */
+/* directories to be ignored or included in bookmarks */
+/* ----------------------------------------------------------------------- */
+static bool bookmark_has_ignore(struct resume_info *resume_info)
+{
+    if (!resume_info->id3)
+        return false;
+
+    char *buf = global_temp_buffer;
+    size_t bufsz = sizeof(global_temp_buffer);
+
+    strmemccpy(buf, resume_info->id3->path, bufsz);
+
+    char *slash;
+    while ((slash = strrchr(buf, '/')))
+    {
+        size_t rem = bufsz - (slash - buf);
+        if (strmemccpy(slash, BOOKMARK_UNIGNORE, rem) != NULL && file_exists(buf))
+        {
+            /* unignore exists we want bookmarks */
+            logf("unignore bookmark found %s\n", buf);
+            return false;
+        }
+        if (strmemccpy(slash, BOOKMARK_IGNORE, rem) != NULL && file_exists(buf))
+        {
+            /* ignore exists we do not want bookmarks */
+            logf("ignore bookmark found %s\n", buf);
+            return true;
+        }
+        *slash = '\0';
+    }
+    return false;
+}
+
+/* ----------------------------------------------------------------------- */
 /* This function takes the current current resume information and writes   */
 /* that to the beginning of the bookmark file.                             */
 /* This file will contain N number of bookmarks in the following format:   */
@@ -550,11 +593,16 @@ static void get_track_resume_info(struct resume_info *resume_info)
 /* possible that a bookmark is successfully added to the most recent       */
 /* bookmark list but fails to be added to the bookmark file or vice versa. */
 /* ------------------------------------------------------------------------*/
-static bool write_bookmark(bool create_bookmark_file)
+static bool write_bookmark(unsigned int flags)
 {
-    logf("%s", __func__);
+    logf("%s flags: %d", __func__, flags);
     char bm_filename[MAX_PATH];
     bool ret=true;
+
+    bool create_bookmark_file = flags & BMARK_CREATE_FILE;
+    bool check_ignore = flags & BMARK_CHECK_IGNORE;
+    bool ask_user = flags & BMARK_ASK_USER;
+    bool usemrb = global_settings.usemrb;
 
     char *name = NULL;
     size_t namelen = 0;
@@ -564,8 +612,27 @@ static bool write_bookmark(bool create_bookmark_file)
     if (bookmark_is_bookmarkable_state())
     {
         get_track_resume_info(&resume_info);
+
+        if (check_ignore
+            && (create_bookmark_file || ask_user || usemrb))
+        {
+            if (bookmark_has_ignore(&resume_info))
+                return false;
+        }
+
+        if (ask_user)
+        {
+            if (yesno_pop(ID2P(LANG_AUTO_BOOKMARK_QUERY)))
+            {
+                if (global_settings.autocreatebookmark != BOOKMARK_RECENT_ONLY_ASK)
+                    create_bookmark_file = true;
+            }
+            else
+                return false;
+        }
+
         /* writing the most recent bookmark */
-        if (global_settings.usemrb)
+        if (usemrb)
         {
             /* since we use the same buffer bookmark needs created each time */
             bm = create_bookmark(&name, &namelen, &resume_info);
@@ -1103,7 +1170,7 @@ bool bookmark_create_menu(void)
     if (!bookmark_is_bookmarkable_state())
         save_playlist_screen(NULL);
 
-    return write_bookmark(true);
+    return write_bookmark(BMARK_CREATE_FILE);
 }
 /* ----------------------------------------------------------------------- */
 /* This function acts as the load interface from the context menu.         */
@@ -1175,29 +1242,23 @@ bool bookmark_autobookmark(bool prompt_ok)
     update = (global_settings.autoupdatebookmark && bookmark_exists());
 
     if (update)
-        return write_bookmark(true);
+        return write_bookmark(BMARK_CREATE_FILE | BMARK_CHECK_IGNORE);
 
     switch (global_settings.autocreatebookmark)
     {
         case BOOKMARK_YES:
-            return write_bookmark(true);
+            return write_bookmark(BMARK_CREATE_FILE | BMARK_CHECK_IGNORE);
 
         case BOOKMARK_NO:
             return false;
 
         case BOOKMARK_RECENT_ONLY_YES:
-            return write_bookmark(false);
+            return write_bookmark(BMARK_CHECK_IGNORE);
     }
-    const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
-    const struct text_message message={lines, 1};
 
-    if(prompt_ok && gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
-    {
-        if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
-            return write_bookmark(false);
-        else
-            return write_bookmark(true);
-    }
+    if(prompt_ok)
+        return write_bookmark(BMARK_ASK_USER | BMARK_CHECK_IGNORE);
+
     return false;
 }
 

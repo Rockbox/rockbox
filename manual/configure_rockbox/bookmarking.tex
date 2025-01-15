@@ -14,6 +14,20 @@
   the bookmark to load. There are other ways to load a bookmarks mentioned
   below.
 
+  You can also configure what directories will save bookmarks by creating a file
+  named 'bookmark.ignore' in a directory if you would like to never create a bookmark
+  when files are played from it.
+
+  \note{You can still manually create a bookmark but ignored directories will
+         not update existing bookmarks nor auto create them for files located
+         in ignored directories. }
+
+  The file 'bookmark.unignore' provides the opposite functionality.
+  For instance in the root of the drive you could create '/bookmark.ignore'
+  and no files played from this drive would get bookmarks.
+  If you then created '/podcasts/bookmark.unignore' tracks played from the podcast
+  directory would get bookmarks.
+
   \note{If the current playlist has been modified or is unsaved, such as when
         playing tracks from the \setting{Database}, Rockbox will automatically
         offer to save the playlist to a file when you attempt to create a bookmark. 
