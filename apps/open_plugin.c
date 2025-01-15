@@ -413,9 +413,15 @@ void open_plugin_browse(const char *key)
     if (rockbox_browse(&browse) == GO_TO_PREVIOUS)
     {
         open_plugin_add_path(key, tmp_buf, NULL);
+        const char *path = tmp_buf;
+#ifdef HAVE_MULTIVOLUME
+        path = strstr(path, ROCKBOX_DIR);
+        if (!path)
+            path = tmp_buf;
+#endif
         /* if this is a viewer ask the user if they want to set a parameter */
         if (op_entry->lang_id > 0
-            && strncmp(tmp_buf, VIEWERS_DIR, sizeof(VIEWERS_DIR) -1) == 0)
+            && strncmp(path, VIEWERS_DIR, sizeof(VIEWERS_DIR) -1) == 0)
         {
             if (yesno_pop(ID2P(LANG_PARAMETER)))
             {
