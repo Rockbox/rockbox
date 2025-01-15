@@ -185,6 +185,20 @@ void button_clear_queue(void)
     queue_clear(&button_queue);
 }
 
+/* clears anything but release and sysevents */
+void button_clear_pressed(void)
+{
+    long button;
+    for (int count = queue_count(&button_queue); count > 0; count--)
+    {
+        button = button_get(false);
+        if (button & (BUTTON_REL | SYS_EVENT))
+        {
+            button_queue_post(button, button_data);
+        }
+    }
+}
+
 long button_get_w_tmo(int ticks)
 {
     struct queue_event ev;

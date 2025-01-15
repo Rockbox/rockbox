@@ -1204,6 +1204,7 @@ void action_wait_for_release(void)
 {
     if (!(action_last.button & BUTTON_REL))
         action_last.wait_for_release = true;
+    button_clear_pressed();
 }
 
 int get_action(int context, int timeout)

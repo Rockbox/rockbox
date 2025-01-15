@@ -253,7 +253,6 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
 
     /* make sure to eat any extranous keypresses */
     action_wait_for_release();
-    button_clear_queue();
 
     /* hook into UI update events to avoid the dialog disappearing
      * in case the skin decides to do a full refresh */

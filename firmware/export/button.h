@@ -71,6 +71,7 @@ int button_queue_count(void);
 bool button_queue_empty(void);
 bool button_queue_full(void);
 void button_clear_queue(void);
+void button_clear_pressed(void);
 long button_get(bool block);
 long button_get_w_tmo(int ticks);
 intptr_t button_get_data(void);
