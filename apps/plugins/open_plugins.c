@@ -337,8 +337,6 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
     else
         hash = op_entry.hash;
 
-
-
     if (plugin)
     {
         int fattr = rb->filetype_get_attr(plugin);
@@ -380,9 +378,14 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
 
             if(parameter)
             {
-                if (parameter[0] == '\0' &&
-                    _yesno_pop(ID2P(LANG_PARAMETER)))
+                /* param matches lang_id so we want to set parameter */
+                bool needs_param = op_entry.lang_id >= 0
+                        && (rb->strcmp(parameter, rb->str(op_entry.lang_id)) == 0);
+                if (needs_param
+                    || (parameter[0] == '\0' && _yesno_pop(ID2P(LANG_PARAMETER))))
                 {
+                    if (needs_param)
+                        op_entry.param[0] = '\0';
                     op_entry_set_param();
                 }
                 else if (parameter != op_entry.param)
@@ -841,9 +844,19 @@ reopen_datfile:
             {
                 if (op_entry_read(fd_dat, selection, op_entry_sz))
                 {
-                    ret = op_entry_run();
-                    if (ret == PLUGIN_GOTO_PLUGIN)
+                    /* param matches lang_id so we want to set the parameter */
+                    if (op_entry.lang_id >= 0
+                        && rb->strcmp(op_entry.param, rb->str(op_entry.lang_id)) == 0)
+                    {
+                        op_entry_add_path(NULL, op_entry.path, op_entry.param, false);
                         exit = true;
+                    }
+                    else
+                    {
+                        ret = op_entry_run();
+                        if (ret == PLUGIN_GOTO_PLUGIN)
+                            exit = true;
+                    }
                 }
             }
             else

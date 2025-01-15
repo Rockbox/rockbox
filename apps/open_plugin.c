@@ -411,7 +411,21 @@ void open_plugin_browse(const char *key)
     };
 
     if (rockbox_browse(&browse) == GO_TO_PREVIOUS)
+    {
         open_plugin_add_path(key, tmp_buf, NULL);
+        /* if this is a viewer ask the user if they want to set a parameter */
+        if (op_entry->lang_id > 0
+            && strncmp(tmp_buf, VIEWERS_DIR, sizeof(VIEWERS_DIR) -1) == 0)
+        {
+            if (yesno_pop(ID2P(LANG_PARAMETER)))
+            {
+                strcpy(op_entry->param, str(op_entry->lang_id));
+                op_update_dat(op_entry, true); /* flush to disk so plugin can find it */
+                plugin_load(VIEWERS_DIR "/open_plugins.rock",
+                            P2STR((unsigned char *)key));
+            }
+        }
+    }
 }
 
 /* open_plugin_load_entry()
