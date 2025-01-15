@@ -16534,3 +16534,17 @@
     *: "Wyświetl dziennik"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Lista odtwarzania ukończona. Odtworzyć ponownie?"
+  </dest>
+  <voice>
+    *: "Lista odtwarzania ukończona. Odtworzyć ponownie?"
+  </voice>
+</phrase>
