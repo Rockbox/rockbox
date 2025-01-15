@@ -16524,3 +16524,17 @@
     *: "view log"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Playlist finished. Play again?"
+  </dest>
+  <voice>
+    *: "Playlist finished. Play again?"
+  </voice>
+</phrase>
