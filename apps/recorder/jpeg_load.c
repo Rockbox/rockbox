@@ -881,11 +881,13 @@ static int read_buf(struct jpeg* p_jpeg, size_t count)
     return read(p_jpeg->fd, p_jpeg->buf, count);
 }
 
+#ifdef HAVE_ALBUMART
 static int read_buf_id3_unsync(struct jpeg* p_jpeg, size_t count)
 {
     count = read(p_jpeg->fd, p_jpeg->buf, count);
     return id3_unsynchronize(p_jpeg->buf, count, (bool*) &p_jpeg->custom_param);
 }
+#endif
 
 INLINE void fill_buf(struct jpeg* p_jpeg)
 {
@@ -2054,11 +2056,15 @@ int clip_jpeg_fd(int fd, int flags,
 
     p_jpeg->read_buf = read_buf;
 
+#ifdef HAVE_ALBUMART
     if (flags & AA_FLAG_ID3_UNSYNC)
     {
         p_jpeg->read_buf = read_buf_id3_unsync;
         p_jpeg->custom_param = false;
     }
+#else
+    (void)flags;
+#endif
 #endif
     status = process_markers(p_jpeg);
 #ifndef JPEG_FROM_MEM
