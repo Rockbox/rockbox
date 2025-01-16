@@ -10727,23 +10727,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Salida de línea"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Salida de línea"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -16293,62 +16276,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Cambiar Modo Estéreo"
-  </dest>
-  <voice>
-    *: "Cambiar Modo Estéreo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Reversa"
-  </dest>
-  <voice>
-    *: "Reversa"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Siempre 0"
-  </dest>
-  <voice>
-    *: "Siempre 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Siempre 1"
-  </dest>
-  <voice>
-    *: "Siempre 1"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LEGAL_NOTICES
   desc: in system menu
   user: core
@@ -16514,5 +16441,112 @@
   </dest>
   <voice>
     *: "Ver la Carátula del Álbum"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Output Select"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Output Select"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Audífono"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Audífono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "No fue posible cargar la fuente: (%s)"
+  </dest>
+  <voice>
+    *: "pistas guardadas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Logging"
+  </dest>
+  <voice>
+    *: "logging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Ver registro"
+  </dest>
+  <voice>
+    *: "ver registro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Lista de reproducción finalizada. ¿Reproducir nuevamente?"
+  </dest>
+  <voice>
+    *: "Lista de reproducción finalizada. ¿Reproducir nuevamente?"
   </voice>
 </phrase>
