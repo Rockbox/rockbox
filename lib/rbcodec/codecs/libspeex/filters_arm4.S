@@ -33,6 +33,7 @@
 */
 
 #include "config.h"
+    .syntax unified
 #if CONFIG_CPU == PP5002
     .section .icode,"ax",%progbits
 #else

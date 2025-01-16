@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 */
 #include "demac_config.h"
 
+    .syntax     unified
     .section    ICODE_SECTION_DEMAC_ARM,"ax",%progbits
 
     .align      2

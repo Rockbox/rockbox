@@ -22,6 +22,7 @@
 #include "config.h"
 #include "mad_iram.h"
 
+    .syntax     unified
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
 
     .global synth_full_odd_sbsample

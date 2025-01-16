@@ -40,6 +40,7 @@
 
 #include "config.h"
 
+        .syntax         unified
         .text
         .align
         .global         decorr_stereo_pass_cont_arml

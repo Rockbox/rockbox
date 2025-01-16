@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+    .syntax unified
     .section .text, "ax", %progbits
 
 

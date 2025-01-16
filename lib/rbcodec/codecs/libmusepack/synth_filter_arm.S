@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+    .syntax unified
 #if defined(CPU_S5L87XX)
     /* Moving this asm routine to iram is (little) faster on S5L87xx. */
     .section .icode, "ax", %progbits

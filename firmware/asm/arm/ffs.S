@@ -32,6 +32,7 @@
  *   31 - bit 31 is set
  *   32 - no bits set
  ****************************************************************************/
+    .syntax unified
     .align  2
     .global find_first_set_bit
     .type   find_first_set_bit,%function

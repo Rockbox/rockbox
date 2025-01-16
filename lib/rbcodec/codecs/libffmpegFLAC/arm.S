@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+    .syntax unified
+
 /* The following is an assembler optimised version of the LPC filtering
    routines needed for FLAC decoding. It is optimised for use with ARM 
    processors.

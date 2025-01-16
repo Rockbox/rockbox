@@ -189,6 +189,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     {
         int w, px;
         asm volatile (
+            BEGIN_ARM_ASM_SYNTAX_UNIFIED
         ".rowstart:                              \n"
             "mov     %[w], %[width]              \n" /* Load width for inner loop */
         ".nextpixel:                             \n"
@@ -196,15 +197,16 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
             "add     %[d], %[d], #2              \n" /* Uncoditionally increment dst */
                                                  /* done here for better pipelining */
             "cmp     %[px], %[fgcolor]           \n" /* Compare to foreground color */
-            "streqh  %[fgpat], [%[d], #-2]       \n" /* Store foregroud if match */
+            "strheq  %[fgpat], [%[d], #-2]       \n" /* Store foregroud if match */
             "cmpne   %[px], %[transcolor]        \n" /* Compare to transparent color */
-            "strneh  %[px], [%[d], #-2]          \n" /* Store dst if not transparent */
+            "strhne  %[px], [%[d], #-2]          \n" /* Store dst if not transparent */
             "subs    %[w], %[w], #1              \n" /* Width counter has run down? */
             "bgt     .nextpixel                  \n" /* More in this row? */
             "add     %[s], %[s], %[sstp], lsl #1 \n" /* Skip over to start of next line */
             "add     %[d], %[d], %[dstp], lsl #1 \n"
             "subs    %[h], %[h], #1              \n" /* Height counter has run down? */
             "bgt     .rowstart                   \n" /* More rows? */
+            END_ARM_ASM_SYNTAX_UNIFIED
             : [w]"=&r"(w), [h]"+&r"(height), [px]"=&r"(px),
               [s]"+&r"(src), [d]"+&r"(dst)
             : [width]"r"(width),
