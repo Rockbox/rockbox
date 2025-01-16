@@ -4256,6 +4256,7 @@ static int context_menu(void)
                     /* add a leading slash so that catalog_add_to_a_playlist
                        later prefills the name when creating a new playlist */
                     rb->snprintf(album_name, MAX_PATH, "/%s", get_album_name(center_index));
+                    rb->fix_path_part(album_name, 1, sizeof(album_name) - 2);
                     file_name = album_name;
                     attr = ATTR_DIRECTORY;
                 }

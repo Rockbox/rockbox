@@ -900,6 +900,7 @@ static int dirbrowse(void)
                             attr = ATTR_DIRECTORY;
                             tagtree_get_entry_name(&tc, tc.selected_item,
                                                    buf, sizeof(buf));
+                            fix_path_part(buf, 0, sizeof(buf) - 1);
                         }
                     }
                     else
