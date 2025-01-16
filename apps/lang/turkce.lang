@@ -16530,3 +16530,17 @@
     *: "Kayıtları incele"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Dinleme listesi bitti. Yeniden dinlemek ister misin?"
+  </dest>
+  <voice>
+    *: "Dinleme listesi bitti. Yeniden dinlemek ister misin?"
+  </voice>
+</phrase>
