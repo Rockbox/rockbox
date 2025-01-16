@@ -128,7 +128,23 @@
                : [x]"r"(X), [y]"r"(Y)); \
             lo; \
          })
-      
+
+    #if defined (CPU_ARM_MICRO)
+      /* Calculate: result = (X*Y)>>Z */
+      #define MPC_MULTIPLY_EX(X,Y,Z) \
+         ({ \
+            MPC_SAMPLE_FORMAT lo; \
+            MPC_SAMPLE_FORMAT hi; \
+            asm volatile ( \
+               "smull %[lo], %[hi], %[x], %[y] \n\t" /* multiply */ \
+               "mov   %[lo], %[lo], lsr %[shr] \n\t" /* lo >>= Z */ \
+               "lsl   %[hi], %[hi], %[shl]     \n\t" /* hi <<= 32 - Z */ \
+               "orr   %[lo], %[lo], %[hi]      \n\t" /* lo |= hi */ \
+               : [lo]"=&r"(lo), [hi]"=&r"(hi) \
+               : [x]"r"(X), [y]"r"(Y), [shr]"r"(Z), [shl]"r"(32-Z)); \
+            lo; \
+         })
+    #else
       /* Calculate: result = (X*Y)>>Z */
       #define MPC_MULTIPLY_EX(X,Y,Z) \
          ({ \
@@ -142,6 +158,7 @@
                : [x]"r"(X), [y]"r"(Y), [shr]"r"(Z), [shl]"r"(32-Z)); \
             lo; \
          })
+    #endif
    #else /* libmusepack standard */
 
       #define MPC_MULTIPLY_NOTRUNCATE(X,Y) \
