@@ -16541,3 +16541,17 @@
     *: "로그 보기"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "재생목록이 완료되었습니다. 다시 재생할까요?"
+  </dest>
+  <voice>
+    *: "재생목록이 완료되었습니다. 다시 재생할까요?"
+  </voice>
+</phrase>
