@@ -160,8 +160,9 @@ static void gui_statusbar_time(struct screen * display, struct tm *time);
  * Initializes a status bar
  *  - bar : the bar to initialize
  */
-static void gui_statusbar_init(struct gui_statusbar * bar)
+static void gui_statusbar_init(struct screen * display, struct gui_statusbar * bar)
 {
+    bar->display = display;
     bar->redraw_volume = true;
     bar->volume_icon_switch_tick = bar->battery_icon_switch_tick = current_tick;
     memset((void*)&(bar->lastinfo), 0, sizeof(struct status_info));
@@ -170,24 +171,12 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 #endif
 }
 
-#define GET_RECT(vp, vals,display)      do {                        \
-        viewport_set_fullscreen(&(vp), (display)->screen_type);     \
-        (vp).flags &= ~VP_FLAG_ALIGN_RIGHT;                              \
-        (vp).height = STATUSBAR_HEIGHT;                             \
-        (vp).x = STATUSBAR_X_POS;                                   \
-        if ((vals) != STATUSBAR_BOTTOM)                             \
-            (vp).y = 0;                                             \
-        else                                                        \
-            (vp).y = (display)->lcdheight - STATUSBAR_HEIGHT;       \
-        } while(0)
-
-void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct viewport *vp)
+static struct screen * sb_fill_bar_info(struct gui_statusbar * bar)
 {
-    struct screen * display = bar->display;
-    struct viewport *last_vp = NULL;
+    struct screen *display = bar->display;
 
     if (!display)
-        return;
+        return display;
 
     bar->info.battlevel = battery_level();
 #ifdef HAVE_USB_POWER
@@ -213,7 +202,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         else
         {
 #else /* CONFIG_CHARGING < CHARGING_MONITOR */
-        lasttime = current_tick;
+            lasttime = current_tick;
         {
 #endif /* CONFIG_CHARGING < CHARGING_MONITOR */
             /* animate in (max.) 4 steps, starting near the current charge level */
@@ -240,7 +229,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
                 bar->battery_icon_switch_tick = current_tick + HZ;
             }
     }
-
     bar->info.volume = global_settings.volume;
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
@@ -253,14 +241,23 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
 #endif
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
-
+#if CONFIG_RTC
+    bar->time = get_time();
+#endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     if(!display->has_disk_led)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
-#if CONFIG_RTC
-    bar->time = get_time();
-#endif /* CONFIG_RTC */
+
+    return display;
+}
+
+void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct viewport *vp)
+{
+    struct viewport *last_vp = NULL;
+    struct screen * display = sb_fill_bar_info(bar);
+    if (!display)
+        return;
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw || bar->redraw_volume ||
@@ -273,6 +270,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fill_viewport();
         display->set_drawmode(DRMODE_SOLID);
+        display->setfont(FONT_SYSFIXED);
 
         if (bar->info.battery_state)
             gui_statusbar_icon_battery(display, bar->info.battlevel,
@@ -311,22 +309,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         else
 #endif
         {
-            switch (bar->info.repeat) {
-#ifdef AB_REPEAT_ENABLE
-                case REPEAT_AB:
-                    gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
-                    break;
-#endif /* AB_REPEAT_ENABLE */
+            gui_statusbar_icon_play_mode(display, bar->info.repeat);
 
-                case REPEAT_ONE:
-                    gui_statusbar_icon_play_mode(display, Icon_RepeatOne);
-                    break;
-
-                case REPEAT_ALL:
-                case REPEAT_SHUFFLE:
-                    gui_statusbar_icon_play_mode(display, Icon_Repeat);
-                    break;
-            }
             if (bar->info.shuffle)
                 gui_statusbar_icon_shuffle(display);
         }
@@ -342,8 +326,11 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
 #endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)
+        {
             gui_statusbar_led(display);
+        }
 #endif
+        display->setfont(FONT_UI);
         display->update_viewport();
         display->set_viewport(last_vp);
         bar->lastinfo = bar->info;
@@ -389,14 +376,13 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     if (global_settings.battery_display && (percent > -1) && (percent <= 100)) {
 #endif
         /* Numeric display */
-        display->setfont(FONT_SYSFIXED);
         snprintf(buffer, sizeof(buffer), "%3d", percent);
-        display->getstringsize(buffer, &width, &height);
-        if (height <= STATUSBAR_HEIGHT)
-            display->putsxy(STATUSBAR_BATTERY_X_POS
+        font_getstringsize(buffer, &width, &height, FONT_SYSFIXED);
+        if (height <= STATUSBAR_HEIGHT) {
+             display->putsxy(STATUSBAR_BATTERY_X_POS
                              + STATUSBAR_BATTERY_WIDTH / 2
                              - width/2, STATUSBAR_Y_POS, buffer);
-        display->setfont(FONT_UI);
+        }
 
     }
     else {
@@ -424,10 +410,8 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     }
 
     if (percent == -1 || percent > 100) {
-        display->setfont(FONT_SYSFIXED);
         display->putsxy(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH / 2
-                         - 4, STATUSBAR_Y_POS, "?");
-        display->setfont(FONT_UI);
+                          - 4, STATUSBAR_Y_POS, "?");
     }
 }
 
@@ -444,13 +428,9 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
     int type = global_settings.volume_type;
     struct screen * display=bar->display;
     const int minvol = sound_min(SOUND_VOLUME);
-    const int maxvol = sound_max(SOUND_VOLUME);
-    const int num_decimals = sound_numdecimals(SOUND_VOLUME);
 
     if (volume < minvol)
         volume = minvol;
-    if (volume > maxvol)
-        volume = maxvol;
 
     if (volume == minvol) {
         display->mono_bitmap(bitmap_icons_7x8[Icon_Mute],
@@ -458,6 +438,10 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
                     STATUSBAR_Y_POS, 7, SB_ICON_HEIGHT);
     }
     else {
+        const int maxvol = sound_max(SOUND_VOLUME);
+
+        if (volume > maxvol)
+            volume = maxvol;
         /* We want to redraw the icon later on */
         if (bar->last_volume != volume && bar->last_volume >= minvol) {
             bar->volume_icon_switch_tick = current_tick + HZ;
@@ -473,18 +457,17 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
         /* display volume level numerical? */
         if (type)
         {
+            const int num_decimals = sound_numdecimals(SOUND_VOLUME);
             if (num_decimals)
                 volume /= 10 * num_decimals;
-            display->setfont(FONT_SYSFIXED);
+
             snprintf(buffer, sizeof(buffer), "%2d", volume);
-            display->getstringsize(buffer, &width, &height);
-            if (height <= STATUSBAR_HEIGHT)
-            {
+            font_getstringsize(buffer, &width, &height, FONT_SYSFIXED);
+            if (height <= STATUSBAR_HEIGHT) {
                 display->putsxy(STATUSBAR_VOLUME_X_POS
-                                 + STATUSBAR_VOLUME_WIDTH / 2
-                                 - width/2, STATUSBAR_Y_POS, buffer);
+                                  + STATUSBAR_VOLUME_WIDTH / 2
+                                  - width/2, STATUSBAR_Y_POS, buffer);
             }
-            display->setfont(FONT_UI);
         } else {
             /* display volume bar */
             vol = (volume - minvol) * 14 / (maxvol - minvol);
@@ -515,11 +498,32 @@ static void gui_statusbar_icon_play_state(struct screen * display, int state)
  */
 static void gui_statusbar_icon_play_mode(struct screen * display, int mode)
 {
-    display->mono_bitmap(bitmap_icons_7x8[mode], STATUSBAR_PLAY_MODE_X_POS,
-                    STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
-                    SB_ICON_HEIGHT);
-}
+    switch (mode) {
+#ifdef AB_REPEAT_ENABLE
+        case REPEAT_AB:
+            display->mono_bitmap(bitmap_icons_7x8[Icon_RepeatAB],
+                                 STATUSBAR_PLAY_MODE_X_POS,
+                                 STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
+                                 SB_ICON_HEIGHT);
+            break;
+#endif /* AB_REPEAT_ENABLE */
 
+        case REPEAT_ONE:
+            display->mono_bitmap(bitmap_icons_7x8[Icon_RepeatOne],
+                                 STATUSBAR_PLAY_MODE_X_POS,
+                                 STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
+                                 SB_ICON_HEIGHT);
+            break;
+
+        case REPEAT_ALL:
+        case REPEAT_SHUFFLE:
+            display->mono_bitmap(bitmap_icons_7x8[Icon_Repeat],
+                                 STATUSBAR_PLAY_MODE_X_POS,
+                                 STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
+                                 SB_ICON_HEIGHT);
+            break;
+    }
+}
 /*
  * Print shuffle mode to status bar
  */
@@ -589,13 +593,13 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
     else {
         p = "--:--";
     }
-    display->setfont(FONT_SYSFIXED);
-    display->getstringsize(p, &width, &height);
+
+    font_getstringsize(p, &width, &height, FONT_SYSFIXED);
     if (height <= STATUSBAR_HEIGHT) {
         display->putsxy(STATUSBAR_TIME_X_END(display->getwidth()) - width,
                         STATUSBAR_Y_POS, p);
     }
-    display->setfont(FONT_UI);
+
 }
 #endif
 
@@ -647,7 +651,6 @@ static void gui_statusbar_write_format_info(struct screen * display)
                 xpos += BM_GLYPH_WIDTH;
         }
     }
-
 
     /* Show bitmap - clipping right edge if needed */
     display->mono_bitmap_part(bm, 0, 0, STATUSBAR_ENCODER_WIDTH,
@@ -720,8 +723,7 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
 void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 {
     FOR_NB_SCREENS(i) {
-        gui_statusbar_init( &(bars->statusbars[i]) );
-        gui_statusbar_set_screen( &(bars->statusbars[i]), &(screens[i]) );
+        gui_statusbar_init(&(screens[i]), &(bars->statusbars[i]));
     }
 }
 

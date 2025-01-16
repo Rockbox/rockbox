@@ -57,14 +57,15 @@ enum statusbar_values { STATUSBAR_OFF = 0, STATUSBAR_TOP, STATUSBAR_BOTTOM };
 
 struct gui_statusbar
 {
-    long battery_icon_switch_tick;
-
-    long volume_icon_switch_tick;
-    int last_volume;
-    bool redraw_volume; /* true if the volume gauge needs updating */
-
     struct status_info info;
     struct status_info lastinfo;
+
+    bool redraw_volume; /* true if the volume gauge needs updating */
+    int last_volume;
+    long volume_icon_switch_tick;
+
+    long battery_icon_switch_tick;
+
 #if CONFIG_RTC
     struct tm *time;
     int last_tm_min;
