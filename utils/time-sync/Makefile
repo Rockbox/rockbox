@@ -11,7 +11,7 @@ clean:
 	gcc ${CFLAGS} -c -o $@ $^
 
 time-sync: ${OBJS}
-	gcc ${CFLAGS} -lsgutils2 -o $@ $^
+	gcc ${CFLAGS} -o $@ $^ -lsgutils2
 
 install: time-sync
 	cp time-sync /usr/local/bin/
