@@ -52,3 +52,11 @@ void serial_tx(const unsigned char * buf)
         }
     }
 }
+
+void serial_tx_raw(const unsigned char * buf, int len)
+{
+    for (int i = 0; i < len; i++) {
+        while (!tx_rdy());
+        tx_writec(buf[i]);
+    }
+}
