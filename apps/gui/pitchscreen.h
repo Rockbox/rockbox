@@ -22,6 +22,8 @@
 #ifndef _PITCHSCREEN_H_
 #define _PITCHSCREEN_H_
 
+#define PITCH_CFG_FILE ROCKBOX_DIR "/pitch.cfg"
 int gui_syncpitchscreen_run(void);
+int reset_pitch(void);
 
 #endif /* _PITCHSCREEN_H_ */

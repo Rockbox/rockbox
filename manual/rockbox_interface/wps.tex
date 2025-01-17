@@ -287,11 +287,18 @@ This may even be the whole track.
     same ratio as well as remain between 50\% and 200\%.
 
   The value of the rate, pitch and speed
-  is not persistent, i.e. after the \dap\ is turned on it will
-  always be set to 100\%.  However, the rate, pitch and speed
-  information will be stored in any bookmarks you may create
-  (see \reference{ref:Bookmarkconfigactual}) and will be restored upon
+  is persistent, i.e. when the \dap\ is turned on it will
+  always be set to your last value.  Selecting \setting{Pitch} again
+  will now display a menu with \setting{Pitch} and \setting{Reset Setting}.
+  Selecting \setting{Reset Setting} will reset the pitch to 100\% now and at next boot.
+  However the rate, pitch and speed information will be stored in any bookmarks
+  you may create (see \reference{ref:Bookmarkconfigactual})
+  while the pitch is altered and will be restored upon
   playing back those bookmarks.
+
+  \note{ If a bookmark has changed pitch, settings will remain till
+  the \dap{} is restarted and your (possibly different or default)
+  persistent settings will then be restored.}  
 
   \begin{btnmap}
     \ActionPsToggleMode

@@ -49,8 +49,15 @@ int configfile_save(const char *filename, const struct configdata *cfg,
     int i;
     char buf[MAX_PATH];
 
-    get_cfg_filename(buf, MAX_PATH, filename);
-    fd = rb->creat(buf, 0666);
+
+    if (rb->strncmp(filename, ROCKBOX_DIR, sizeof(ROCKBOX_DIR) - 1) != 0)
+    {
+        get_cfg_filename(buf, MAX_PATH, filename);
+        fd = rb->creat(buf, 0666);
+    }
+    else /* allow saving to the rockbox directory */
+        fd = rb->creat(filename, 0666);
+
     if(fd < 0)
         return fd*10 - 1;
 

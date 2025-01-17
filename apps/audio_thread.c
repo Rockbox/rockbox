@@ -38,6 +38,11 @@
 #include "talk.h"
 #include "settings.h"
 
+#if defined(HAVE_PITCHCONTROL)
+#include "pitchscreen.h"
+#include "misc.h"
+#include "strcasecmp.h"
+#endif
 /* Macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -185,4 +190,36 @@ void INIT_ATTR audio_init(void)
     audio_is_initialized = true;
 
     sound_settings_apply();
+
+#if defined(HAVE_PITCHCONTROL)
+    int fd;
+    char line[64];
+    char* name;
+    char* value;
+    int32_t num;
+
+    fd = open_utf8(PITCH_CFG_FILE, O_RDONLY);
+    if (fd >= 0)
+    {
+        while (read_line(fd, line, sizeof line) > 0)
+        {
+            if (!settings_parseline(line, &name, &value))
+                continue;
+            if (strcasecmp(name, "pitch") == 0)
+            {
+                num = atoi(value);
+                if (num != PITCH_SPEED_100)
+                    sound_set_pitch(num);
+            }
+            if (strcasecmp(name, "stretch") == 0)
+            {
+                num = atoi(value);
+                if (num != PITCH_SPEED_100)
+                    dsp_set_timestretch(num);
+            }
+        }
+    }
+#endif
+
+
 }

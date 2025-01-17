@@ -22,6 +22,11 @@
 #include "plugin.h"
 #include "lib/icon_helper.h"
 #include "lib/arg_helper.h"
+#include "lib/configfile.h"
+#include "../gui/pitchscreen.h" /*PITCH_CFG_FILE*/
+
+#define CFG_FILE PITCH_CFG_FILE
+#define CFG_VER  1
 
 #define ICON_BORDER 12 /* icons are currently 7x8, so add ~2 pixels  */
                        /*   on both sides when drawing */
@@ -48,6 +53,12 @@ struct pvars
     int32_t flags;
 };
 static struct pvars pitch_vars;
+
+static struct configdata pitchcfg[] =
+{
+    {TYPE_INT, PITCH_MIN,  PITCH_MAX, { .int_p = &pitch_vars.pitch }, "pitch", NULL},
+    {TYPE_INT, STRETCH_MIN, STRETCH_MAX, { .int_p = &pitch_vars.stretch }, "stretch", NULL},
+};
 
 enum
 {
@@ -1218,6 +1229,9 @@ enum plugin_status plugin_start(const void* parameter)
     bool gui = false;
     rb->pcmbuf_set_low_latency(true);
 
+    struct pvars cur;
+    fill_pitchvars(&cur);
+
     /* Figure out whether to be in timestretch mode */
     if (parameter == NULL) /* gui mode */
     {
@@ -1230,8 +1244,6 @@ enum plugin_status plugin_start(const void* parameter)
     }
     else
     {
-        struct pvars cur;
-        fill_pitchvars(&cur);
         fill_pitchvars(&pitch_vars);
         argparse((const char*) parameter, -1, NULL, &arg_callback);
         if (pitch_vars.pitch != cur.pitch)
@@ -1275,6 +1287,19 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (gui && gui_syncpitchscreen_run() == 1)
             return PLUGIN_USB_CONNECTED;
+
+    if (gui)
+    {
+        fill_pitchvars(&pitch_vars);
+
+        if (pitch_vars.pitch != cur.pitch || pitch_vars.stretch != cur.stretch)
+        {
+            if (configfile_save(CFG_FILE, pitchcfg, 2, CFG_VER) >= 0)
+                rb->splash(HZ, ID2P(LANG_SETTINGS_SAVED));
+            else
+                rb->splash(HZ, ID2P(LANG_ERROR_WRITING_CONFIG));
+        }
+    }
     rb->pcmbuf_set_low_latency(false);
     return PLUGIN_OK;
 }

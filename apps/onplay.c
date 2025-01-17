@@ -711,7 +711,35 @@ MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_MENU_SHOW_I
 #ifdef HAVE_PITCHCONTROL
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, Icon_Audio);
-#endif
+MENUITEM_FUNCTION(pitch_reset_item, 0, ID2P(LANG_RESET_SETTING),
+                  reset_pitch, NULL, Icon_Submenu_Entered);
+
+static int pitch_callback(int action,
+                          const struct menu_item_ex *this_item,
+                          struct gui_synclist *this_list)
+{
+    if (action == ACTION_ENTER_MENUITEM)
+    {
+        int32_t ts = dsp_get_timestretch();
+        if (sound_get_pitch() == PITCH_SPEED_100 && ts == PITCH_SPEED_100)
+        { /* if default then run pitch screen directly */
+            gui_syncpitchscreen_run();
+            action = ACTION_EXIT_MENUITEM;
+        }
+    }
+    return action;
+
+    (void)this_item;
+    (void)this_list;
+}
+
+/* pitch submenu */
+MAKE_ONPLAYMENU(pitch_menu, ID2P(LANG_PITCH),
+                pitch_callback, Icon_Audio,
+                &pitch_screen_item,
+                &pitch_reset_item);
+
+#endif /*def HAVE_PITCHCONTROL*/
 #ifdef HAVE_ALBUMART
 MENUITEM_FUNCTION(view_album_art_item, 0, ID2P(LANG_VIEW_ALBUMART),
                   view_album_art, NULL, Icon_NOICON);
@@ -1037,7 +1065,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &browse_id3_item, &list_viewers_item,
            &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHCONTROL
-           &pitch_screen_item,
+           &pitch_menu,
 #endif
 #ifdef HAVE_ALBUMART
            &view_album_art_item,

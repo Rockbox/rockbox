@@ -19,7 +19,17 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "pitchscreen.h"
+
 int gui_syncpitchscreen_run(void)
 {
     return (plugin_load(VIEWERS_DIR"/pitch_screen.rock", NULL) == PLUGIN_USB_CONNECTED);
+}
+
+int reset_pitch(void)
+{
+    sound_set_pitch(PITCH_SPEED_100);
+    dsp_set_timestretch(PITCH_SPEED_100);
+    remove(PITCH_CFG_FILE);
+    return 0;
 }
