@@ -475,7 +475,10 @@ static void run_of(void)
         printf("Booting OF in %d...", tmo);
         sleep(HZ*1);
     }
-    kernel_launch_onb();
+    
+    int rc = kernel_launch_onb();
+    printf("Load OF error: %d", rc);
+    sleep(HZ*10);
 }
 
 static void print_syscfg(void)
