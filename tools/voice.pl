@@ -687,7 +687,7 @@ $ENV{'PATH'} = dirname($0) . ':' . $ENV{'PATH'};
 my $tts_object = init_tts($s, $S, $l);
 
 # Do what we're told
-if ($V == 1) {
+if (defined($V) && $V == 1) {
     # Only do the panic cleanup for voicefiles
     $SIG{INT} = \&panic_cleanup;
     $SIG{KILL} = \&panic_cleanup;
