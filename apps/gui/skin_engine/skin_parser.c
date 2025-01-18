@@ -1407,6 +1407,7 @@ static int parse_filetext(struct skin_element *element,
     if (rd <= 0) /* empty line? */
     {
         DEBUGF("%s: Error(%d) Reading %s\n", __func__, rd, filename);
+        close(fd);
         goto failure;
     }
 
