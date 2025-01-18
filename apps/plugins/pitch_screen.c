@@ -56,8 +56,8 @@ static struct pvars pitch_vars;
 
 static struct configdata pitchcfg[] =
 {
-    {TYPE_INT, PITCH_MIN,  PITCH_MAX, { .int_p = &pitch_vars.pitch }, "pitch", NULL},
-    {TYPE_INT, STRETCH_MIN, STRETCH_MAX, { .int_p = &pitch_vars.stretch }, "stretch", NULL},
+    {TYPE_INT, PITCH_MIN,  PITCH_MAX, { .int32_p = &pitch_vars.pitch }, "pitch", NULL},
+    {TYPE_INT, STRETCH_MIN, STRETCH_MAX, { .int32_p = &pitch_vars.stretch }, "stretch", NULL},
 };
 
 enum

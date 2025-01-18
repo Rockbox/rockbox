@@ -37,6 +37,7 @@ struct configdata
         int *int_p;
         bool *bool_p;
         char *string;
+        int32_t *int32_p;
     };             /* Pointer to value, a union of the possible types */
     char *name;    /* Pointer to the name of the item */
     char **values; /* List of strings for enums, NULL if not enum */
