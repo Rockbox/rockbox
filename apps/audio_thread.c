@@ -197,26 +197,29 @@ void INIT_ATTR audio_init(void)
     char* name;
     char* value;
     int32_t num;
-
-    fd = open_utf8(PITCH_CFG_FILE, O_RDONLY);
-    if (fd >= 0)
+    if (file_exists(PITCH_CFG_FILE))
     {
-        while (read_line(fd, line, sizeof line) > 0)
+        fd = open_utf8(PITCH_CFG_FILE, O_RDONLY);
+        if (fd >= 0)
         {
-            if (!settings_parseline(line, &name, &value))
-                continue;
-            if (strcasecmp(name, "pitch") == 0)
+            while (read_line(fd, line, sizeof line) > 0)
             {
-                num = atoi(value);
-                if (num != PITCH_SPEED_100)
-                    sound_set_pitch(num);
+                if (!settings_parseline(line, &name, &value))
+                    continue;
+                if (strcasecmp(name, "pitch") == 0)
+                {
+                    num = atoi(value);
+                    if (num != PITCH_SPEED_100)
+                        sound_set_pitch(num);
+                }
+                if (strcasecmp(name, "stretch") == 0)
+                {
+                    num = atoi(value);
+                    if (num != PITCH_SPEED_100)
+                        dsp_set_timestretch(num);
+                }
             }
-            if (strcasecmp(name, "stretch") == 0)
-            {
-                num = atoi(value);
-                if (num != PITCH_SPEED_100)
-                    dsp_set_timestretch(num);
-            }
+            close(fd);
         }
     }
 #endif

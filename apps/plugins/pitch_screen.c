@@ -1241,6 +1241,21 @@ enum plugin_status plugin_start(const void* parameter)
             rb->settings_save();
         }
         gui = true;
+        if (rb->file_exists(CFG_FILE))
+        {
+            if (configfile_load(CFG_FILE, pitchcfg, 2, CFG_VER) >= 0)
+            {
+                if (pitch_vars.pitch != cur.pitch || pitch_vars.stretch != cur.stretch)
+                {
+                    if (rb->yesno_pop(ID2P(LANG_REVERT_TO_DEFAULT_SETTINGS)))
+                    {
+                        rb->sound_set_pitch(pitch_vars.pitch);
+                        rb->dsp_set_timestretch(pitch_vars.stretch);
+                    }
+                }
+            }
+        }
+
     }
     else
     {
@@ -1294,9 +1309,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (pitch_vars.pitch != cur.pitch || pitch_vars.stretch != cur.stretch)
         {
-            if (configfile_save(CFG_FILE, pitchcfg, 2, CFG_VER) >= 0)
-                rb->splash(HZ, ID2P(LANG_SETTINGS_SAVED));
-            else
+            if (configfile_save(CFG_FILE, pitchcfg, 2, CFG_VER) < 0)
                 rb->splash(HZ, ID2P(LANG_ERROR_WRITING_CONFIG));
         }
     }
