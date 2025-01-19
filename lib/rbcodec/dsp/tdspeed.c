@@ -27,7 +27,7 @@
 #include "dsp-util.h"
 #include "dsp_proc_entry.h"
 #include "tdspeed.h"
-#ifdef ROCKBOX
+#if defined(ROCKBOX) && !defined(WARBLE)
 #include "settings.h"
 #endif
 
@@ -405,7 +405,7 @@ void dsp_set_timestretch(int32_t percent)
 
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_configure(dsp, TIMESTRETCH_SET_FACTOR, percent);
-#ifdef ROCKBOX /* filter out invalid by grabbing the value actually set */
+#if defined(ROCKBOX) && !defined(WARBLE) /* filter out invalid by grabbing the value actually set */
     global_status.resume_speed = st->factor;
 #endif
 }

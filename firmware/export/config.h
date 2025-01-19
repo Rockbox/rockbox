@@ -1364,7 +1364,9 @@ Lyre prototype 1 */
 #define HAVE_PCM_FULL_DUPLEX
 #endif
 
+#if !defined(BOOTLOADER)
 #define HAVE_PITCHCONTROL
+#endif
 
 /* enable logging messages to disk*/
 #if !defined(BOOTLOADER) && !defined(__PCTOOL__)
