@@ -146,7 +146,7 @@ long lasttime = 0;
 
 static unsigned int nvram_crc(char *buf, int max_len)
 {
-    return crc_32(&buf[NVRAM_DATA_START], max_len - NVRAM_DATA_START - 1, 0xffffffff);
+    return crc_32(&buf[NVRAM_DATA_START], max_len - NVRAM_DATA_START - 1, NVRAM_BLOCK_SIZE);
 }
 
 static void read_nvram_data(void)
