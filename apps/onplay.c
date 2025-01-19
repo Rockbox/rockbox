@@ -708,6 +708,7 @@ static int browse_id3_wrapper(void)
 /* CONTEXT_WPS items */
 MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_MENU_SHOW_ID3_INFO),
                   browse_id3_wrapper, NULL, Icon_NOICON);
+
 #ifdef HAVE_PITCHCONTROL
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, Icon_Audio);
@@ -716,15 +717,38 @@ MENUITEM_FUNCTION(pitch_reset_item, 0, ID2P(LANG_RESET_SETTING),
 
 static int pitch_callback(int action,
                           const struct menu_item_ex *this_item,
+                          struct gui_synclist *this_list);
+
+/* need special handling so we can toggle the icon */
+#define MAKE_PITCHMENU( name, str, callback, icon, ... )           \
+    static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};  \
+    struct menu_callback_with_desc name##__ = {callback,str,icon}; \
+    static const struct menu_item_ex name =                        \
+        {MT_MENU|MENU_HAS_DESC|MENU_EXITAFTERTHISMENU|             \
+         MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),       \
+            { (void*)name##_},{.callback_and_desc = & name##__}};
+
+MAKE_PITCHMENU(pitch_menu, ID2P(LANG_PITCH),
+                pitch_callback, Icon_Audio,
+                &pitch_screen_item,
+                &pitch_reset_item);
+
+static int pitch_callback(int action,
+                          const struct menu_item_ex *this_item,
                           struct gui_synclist *this_list)
 {
-    if (action == ACTION_ENTER_MENUITEM)
+    if (action == ACTION_ENTER_MENUITEM || action == ACTION_REQUEST_MENUITEM)
     {
+        pitch_menu__.icon_id = Icon_Submenu; /* if setting changed show + */
         int32_t ts = dsp_get_timestretch();
         if (sound_get_pitch() == PITCH_SPEED_100 && ts == PITCH_SPEED_100)
-        { /* if default then run pitch screen directly */
-            gui_syncpitchscreen_run();
-            action = ACTION_EXIT_MENUITEM;
+        {
+            pitch_menu__.icon_id = Icon_Audio;
+            if (action == ACTION_ENTER_MENUITEM)
+            { /* if default then run pitch screen directly */
+                gui_syncpitchscreen_run();
+                action = ACTION_EXIT_MENUITEM;
+            }
         }
     }
     return action;
@@ -732,14 +756,8 @@ static int pitch_callback(int action,
     (void)this_item;
     (void)this_list;
 }
-
-/* pitch submenu */
-MAKE_ONPLAYMENU(pitch_menu, ID2P(LANG_PITCH),
-                pitch_callback, Icon_Audio,
-                &pitch_screen_item,
-                &pitch_reset_item);
-
 #endif /*def HAVE_PITCHCONTROL*/
+
 #ifdef HAVE_ALBUMART
 MENUITEM_FUNCTION(view_album_art_item, 0, ID2P(LANG_VIEW_ALBUMART),
                   view_album_art, NULL, Icon_NOICON);

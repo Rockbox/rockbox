@@ -30,6 +30,5 @@ int reset_pitch(void)
 {
     sound_set_pitch(PITCH_SPEED_100);
     dsp_set_timestretch(PITCH_SPEED_100);
-    remove(PITCH_CFG_FILE);
     return 0;
 }

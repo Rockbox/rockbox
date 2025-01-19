@@ -636,6 +636,8 @@ void sound_set_pitch(int32_t pitch)
         return;
 
     audiohw_set_pitch(pitch);
+    /* filter out invalid by grabbing the value actually set */
+    global_status.resume_pitch = dsp_get_pitch();
 }
 
 int32_t sound_get_pitch(void)

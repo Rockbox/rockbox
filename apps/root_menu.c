@@ -321,9 +321,19 @@ static int recscrn(void* param)
 static int wpsscrn(void* param)
 {
     int ret_val = GO_TO_PREVIOUS;
+    int audstatus = audio_status();
     (void)param;
     push_current_activity(ACTIVITY_WPS);
-    if (audio_status())
+
+#ifdef HAVE_PITCHCONTROL
+    if (!audstatus)
+    {
+        sound_set_pitch(global_status.resume_pitch);
+        dsp_set_timestretch(global_status.resume_speed);
+    }
+#endif
+
+    if (audstatus)
     {
         talk_shutup();
         ret_val = gui_wps_show();
