@@ -1173,30 +1173,30 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_VOLUME:
             format_sound_value_ex(buf, buf_size, SOUND_VOLUME,
-                                  global_settings.volume, true);
+                                  global_status.volume, true);
 
             if (intval)
             {
                 int minvol = sound_min(SOUND_VOLUME);
                 if (limit == TOKEN_VALUE_ONLY)
                 {
-                    numeric_ret = global_settings.volume;
+                    numeric_ret = global_status.volume;
                 }
-                else if (global_settings.volume == minvol)
+                else if (global_status.volume == minvol)
                 {
                     numeric_ret = 1;
                 }
-                else if (global_settings.volume == 0)
+                else if (global_status.volume == 0)
                 {
                     numeric_ret = limit - 1;
                 }
-                else if (global_settings.volume > 0)
+                else if (global_status.volume > 0)
                 {
                     numeric_ret = limit;
                 }
                 else
                 {
-                    numeric_ret = (limit-3) * (global_settings.volume - minvol - 1)
+                    numeric_ret = (limit-3) * (global_status.volume - minvol - 1)
                                 / (-1 - minvol) + 2;
                 }
             }

@@ -326,7 +326,7 @@ static void showinfo(void)
         module->sngspd, module->bpm);
     rb->lcd_putsxy(1, 1 + 6 * font_h, statustext);
 
-    sprintf(statustext, "vol: %ddB", rb->global_settings->volume);
+    sprintf(statustext, "vol: %ddB", rb->global_status->volume);
     rb->lcd_putsxy(1, 1 + 7 * font_h, statustext);
 
     sprintf(statustext, "time: %d:%02d",

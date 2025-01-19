@@ -3777,7 +3777,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
             global_status.resume_elapsed = id3->elapsed;
             global_status.resume_offset = id3->offset;
             global_status.resume_modified = pl_modified;
-            status_save();
+            status_save(false);
         }
     }
     else
@@ -3787,7 +3787,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
         global_status.resume_elapsed = -1;
         global_status.resume_offset = -1;
         global_status.resume_modified = false;
-        status_save();
+        status_save(true);
         return -1;
     }
 

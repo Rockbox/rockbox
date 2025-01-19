@@ -829,7 +829,7 @@ int ft_enter(struct tree_context* c)
                 playlist_get_filename_crc32(NULL, start_index);
             global_status.resume_elapsed = 0;
             global_status.resume_offset = 0;
-            status_save();
+            status_save(false);
             rc = GO_TO_WPS;
         }
         else {

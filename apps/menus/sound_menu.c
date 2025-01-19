@@ -87,7 +87,7 @@ static int volume_limit_callback(int action,
 
 /***********************************/
 /*    SOUND MENU                   */
-MENUITEM_SETTING(volume, &global_settings.volume, NULL);
+MENUITEM_SETTING(volume, &global_status.volume, NULL);
 MENUITEM_SETTING(volume_limit, &global_settings.volume_limit, volume_limit_callback);
 #ifdef AUDIOHW_HAVE_BASS
 MENUITEM_SETTING(bass, &global_settings.bass,

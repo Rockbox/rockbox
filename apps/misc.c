@@ -345,7 +345,7 @@ static bool clean_shutdown(enum shutdown_type sd_type,
         talk_disable(true);
     }
 
-    status_save();
+    status_save(true);
 
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
@@ -751,8 +751,8 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
              * event data is available in the last button data */
             int volume = button_get_data();
             DEBUGF("SYS_VOLUME_CHANGED: %d\n", volume);
-            if (global_settings.volume != volume) {
-                global_settings.volume = volume;
+            if (global_status.volume != volume) {
+                global_status.volume = volume;
                 if (firstvolume) {
                     setvol();
                     firstvolume = false;
@@ -859,16 +859,17 @@ void setvol(void)
 {
     const int min_vol = sound_min(SOUND_VOLUME);
     const int max_vol = sound_max(SOUND_VOLUME);
-    if (global_settings.volume < min_vol)
-        global_settings.volume = min_vol;
-    if (global_settings.volume > max_vol)
-        global_settings.volume = max_vol;
-    if (global_settings.volume > global_settings.volume_limit)
-        global_settings.volume = global_settings.volume_limit;
-
-    sound_set_volume(global_settings.volume);
+    int volume = global_status.volume;
+    if (volume < min_vol)
+        volume = min_vol;
+    if (volume > max_vol)
+        volume = max_vol;
+    if (volume > global_settings.volume_limit)
+        volume = global_settings.volume_limit;
+    global_status.volume = volume;
+    sound_set_volume(volume);
     global_status.last_volume_change = current_tick;
-    settings_save();
+    status_save(false);
 }
 
 #ifdef HAVE_PERCEPTUAL_VOLUME
@@ -920,7 +921,7 @@ void set_normalized_volume(int vol)
     if (vol >= norm_tab_size)
         vol = norm_tab_size - 1;
 
-    global_settings.volume = norm_tab[vol];
+    global_status.volume = norm_tab[vol];
 }
 
 int get_normalized_volume(void)
@@ -931,7 +932,7 @@ int get_normalized_volume(void)
     while (a != b)
     {
         int i = (a + b + 1) / 2;
-        if (global_settings.volume < norm_tab[i])
+        if (global_status.volume < norm_tab[i])
             b = i - 1;
         else
             a = i;
@@ -942,12 +943,12 @@ int get_normalized_volume(void)
 #else
 void set_normalized_volume(int vol)
 {
-    global_settings.volume = vol * sound_steps(SOUND_VOLUME);
+    global_status.volume = vol * sound_steps(SOUND_VOLUME);
 }
 
 int get_normalized_volume(void)
 {
-    return global_settings.volume / sound_steps(SOUND_VOLUME);
+    return global_status.volume / sound_steps(SOUND_VOLUME);
 }
 #endif
 
@@ -971,7 +972,7 @@ void adjust_volume_ex(int steps, enum volume_adjust_mode mode)
 #endif
     case VOLUME_ADJUST_DIRECT:
     default:
-        global_settings.volume += steps * sound_steps(SOUND_VOLUME);
+        global_status.volume += steps * sound_steps(SOUND_VOLUME);
         break;
     }
 

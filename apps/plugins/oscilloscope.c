@@ -2113,13 +2113,13 @@ enum plugin_status plugin_start(const void* parameter)
             case OSCILLOSCOPE_VOL_UP:
             case OSCILLOSCOPE_VOL_UP | BUTTON_REPEAT:
             {
-                int vol = rb->global_settings->volume;
+                int vol = rb->global_status->volume;
 
                 if (vol < rb->sound_max(SOUND_VOLUME))
                 {
                     vol++;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    rb->global_status->volume = vol;
                 }
 
                 osc_popupmsg(OSC_MSG_VOLUME, vol);
@@ -2129,13 +2129,13 @@ enum plugin_status plugin_start(const void* parameter)
             case OSCILLOSCOPE_VOL_DOWN:
             case OSCILLOSCOPE_VOL_DOWN | BUTTON_REPEAT:
             {
-                int vol = rb->global_settings->volume;
+                int vol = rb->global_status->volume;
 
                 if (vol > rb->sound_min(SOUND_VOLUME))
                 {
                     vol--;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    rb->global_status->volume = vol;
                 }
 
                 osc_popupmsg(OSC_MSG_VOLUME, vol);

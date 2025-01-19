@@ -229,7 +229,7 @@ static struct screen * sb_fill_bar_info(struct gui_statusbar * bar)
                 bar->battery_icon_switch_tick = current_tick + HZ;
             }
     }
-    bar->info.volume = global_settings.volume;
+    bar->info.volume = global_status.volume;
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
     bar->info.keylock = button_hold();

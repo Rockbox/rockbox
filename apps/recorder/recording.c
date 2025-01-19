@@ -773,7 +773,7 @@ static const char* reclist_get_name(int selected_item, void * data,
         case ITEM_VOLUME:
             snprintf(buffer, buffer_len, "%s: %s", str(LANG_VOLUME),
                      fmt_gain(SOUND_VOLUME,
-                              global_settings.volume,
+                              global_status.volume,
                               buf2, sizeof(buf2)));
             break;
 #endif
@@ -896,7 +896,7 @@ static void recording_step_levels(int setting_id, int steps)
     switch(setting_id)
     {
         case SOUND_VOLUME:
-            global_settings.volume += steps;
+            global_status.volume += steps;
             setvol();
             break;
 #if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
@@ -1020,7 +1020,7 @@ bool recording_screen(bool no_source)
 #endif
 
     audio_init_recording();
-    sound_set_volume(global_settings.volume);
+    sound_set_volume(global_status.volume);
 
 #if CONFIG_RTC == 0
     /* Create new filename for recording start */

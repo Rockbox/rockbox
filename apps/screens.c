@@ -889,8 +889,7 @@ static const char* runtime_get_data(int selected_item, void* data,
     {
         case 0:return str(LANG_RUNNING_TIME);
         case 1: {
-            global_status.runtime += ((current_tick - lasttime) / HZ);
-            lasttime = current_tick;
+            update_runtime();
              t = global_status.runtime;
             break;
         }

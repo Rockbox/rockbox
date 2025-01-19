@@ -1910,7 +1910,7 @@ static int parse_touchregion(struct skin_element *element,
 
     if (region->action == ACTION_TOUCH_MUTE)
     {
-        region->value = global_settings.volume;
+        region->value = global_status.volume;
     }
 
 

@@ -1321,7 +1321,7 @@ void tree_flush(void)
     }
 
     if (old_val != global_status.dircache_size)
-        status_save();
+        status_save(true);
 
     #ifdef HAVE_EEPROM_SETTINGS
         if (savecache)

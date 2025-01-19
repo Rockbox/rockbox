@@ -117,7 +117,7 @@ int sound_current(int setting)
     {
 #ifndef BOOTLOADER
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
-        SOUND_CUR_SET(VOLUME,             global_settings.volume)
+        SOUND_CUR_SET(VOLUME,             global_status.volume)
 #endif
 #if defined(AUDIOHW_HAVE_BASS)
         SOUND_CUR_SET(BASS,               global_settings.bass)

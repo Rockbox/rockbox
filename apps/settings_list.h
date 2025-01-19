@@ -119,6 +119,7 @@ struct table_setting {
    Should really only be used if the value you want to store in global_settings
    is very different to the string you want to use in the config. */
 #define F_CUSTOM_SETTING 0x8000
+
 struct custom_setting {
     /* load the saved value from the .cfg
         setting: pointer into global_settings
@@ -146,28 +147,18 @@ struct custom_setting {
 
 #define F_TIME_SETTING  0x10000 /* int,table format hh:mm:ss.mss auto ranged */
 #define F_HAS_CFGVALS   0x20000 /* uses setting union to carry cfg_vals */
-
-
+#define F_RESUMESETTING 0x40000 /* saved to a separate cfg file on shutdown */
+/*#define _AVAILABLE_   0x80000*/
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
 #define F_MAX_ISFUNC    0x200000 /* max(above) is function pointer to above type */
 #define F_DEF_ISFUNC    0x400000 /* default_val is function pointer to above type */
-
 #define F_THEMESETTING  0x800000
 #define F_RECSETTING    0x1000000
 #define F_EQSETTING     0x2000000
 #define F_SOUNDSETTING  0x4000000
-
-#define F_NVRAM_BYTES_MASK     0xE0000 /*0-4 bytes can be stored */
-#define F_NVRAM_MASK_SHIFT     17
-#define NVRAM_CONFIG_VERSION   9
-/* Above define should be bumped if
-- a new NVRAM setting is added between 2 other NVRAM settings
-- number of bytes for a NVRAM setting is changed
-- a NVRAM setting is removed
-*/
-
+/*#define _AVAILABLE_   0x8000000*/
 #define F_CB_ON_SELECT_ONLY 0x10000000 /* option_callback only called if selected */
 #define F_CB_ONLY_IF_CHANGED 0x20000000 /* option_callback only called if setting changed */
 

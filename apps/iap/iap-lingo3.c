@@ -265,7 +265,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
             device.play_status = audio_status();
             /* TODO: Fix this */
             device.mute = false;
-            device.volume = global_settings.volume;
+            device.volume = global_status.volume;
             device.power_state = charger_input_state;
             device.battery_level = battery_level();
             /* TODO: Fix this */
@@ -441,7 +441,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                         /* Mute status False*/
                         IAP_TX_PUT(0x00);
                         /* Volume */
-                        IAP_TX_PUT(0xFF & (int)((global_settings.volume + 90) * 2.65625));
+                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
 
                     } else {
                         /* Mute status True*/
@@ -630,8 +630,8 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                         /* Mute status False*/
                         IAP_TX_PUT(0x00);
                         /* Volume */
-                        IAP_TX_PUT(0xFF & (int)((global_settings.volume + 90) * 2.65625));
-                        IAP_TX_PUT(0xFF & (int)((global_settings.volume + 90) * 2.65625));
+                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
+                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
 
                     } else {
                         /* Mute status True*/
@@ -766,7 +766,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(5);
                     if (buf[0x03]==0x00){
                         /* Not Muted */
-                        global_settings.volume = (int) (buf[0x04]/2.65625)-90;
+                        global_status.volume = (int) (buf[0x04]/2.65625)-90;
                         device.mute = false;
                     }
                     else {
@@ -940,7 +940,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(7);
                     if (buf[0x03]==0x00){
                         /* Not Muted */
-                        global_settings.volume = (int) (buf[0x04]/2.65625)-90;
+                        global_status.volume = (int) (buf[0x04]/2.65625)-90;
                         device.mute = false;
                     }
                     else {

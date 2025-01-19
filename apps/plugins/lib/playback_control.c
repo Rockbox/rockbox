@@ -65,7 +65,7 @@ static bool nexttrack(void)
 static bool volume(void)
 {
     const struct settings_list* vol = 
-        rb->find_setting(&rb->global_settings->volume);
+        rb->find_setting(&rb->global_status->volume);
     return rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
 }
 

@@ -428,7 +428,7 @@ static void do_opt_menu(void)
     options.dirty=1; /* Assume that the settings have been changed */
 
     struct viewport *parentvp = NULL;
-    const struct settings_list* vol = rb->find_setting(&rb->global_settings->volume);
+    const struct settings_list* vol = rb->find_setting(&rb->global_status->volume);
 
     while(!done)
     {

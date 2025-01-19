@@ -113,11 +113,12 @@
 #define CODEPAGE_DIR        ROCKBOX_DIR "/codepages"
 
 #define VIEWERS_CONFIG      ROCKBOX_DIR "/viewers.config"
+
+#define RESUMEFILE          ROCKBOX_DIR "/.resume.cfg"
 #define CONFIGFILE          ROCKBOX_DIR "/config.cfg"
 #define FIXEDSETTINGSFILE   ROCKBOX_DIR "/fixed.cfg"
 
 #define PLAYLIST_CONTROL_FILE   ROCKBOX_DIR "/.playlist_control"
-#define NVRAM_FILE              ROCKBOX_DIR "/nvram.bin"
 #define GLYPH_CACHE_FILE        ROCKBOX_DIR "/.glyphcache"
 
 #endif /* __PATHS_H__ */

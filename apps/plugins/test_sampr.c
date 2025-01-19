@@ -174,7 +174,7 @@ static void set_frequency(int index)
 #ifndef HAVE_VOLUME_IN_LIST
 static void set_volume(int value)
 {
-    rb->global_settings->volume = value;
+    rb->global_status->volume = value;
     rb->sound_set(SOUND_VOLUME, value);
 }
 
@@ -243,7 +243,7 @@ static void play_tone(bool volume_set)
 #ifndef HAVE_VOLUME_IN_LIST
     if (volume_set)
     {
-        int volume = rb->global_settings->volume;
+        int volume = rb->global_status->volume;
 
         rb->set_int("Volume", NULL, -1, &volume,
                     set_volume, 1, rb->sound_min(SOUND_VOLUME),

@@ -274,12 +274,12 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             case ACTION_TOUCH_MUTE:
             {
                 const int min_vol = sound_min(SOUND_VOLUME);
-                if (global_settings.volume == min_vol)
-                    global_settings.volume = temp->value;
+                if (global_status.volume == min_vol)
+                    global_status.volume = temp->value;
                 else
                 {
-                    temp->value = global_settings.volume;
-                    global_settings.volume = min_vol;
+                    temp->value = global_status.volume;
+                    global_status.volume = min_vol;
                 }
                 setvol();
                 returncode = ACTION_REDRAW;

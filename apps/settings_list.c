@@ -73,10 +73,6 @@
 #include "usb-ibasso.h"
 #endif
 
-#define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
-/** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
-     and you may need to update it if you edit this file */
-
 #define UNUSED {.RESERVED=NULL}
 #define INT(a) {.int_ = a}
 #define UINT(a) {.uint_ = a}
@@ -122,11 +118,18 @@
             BOOL_SETTING(flags,var,lang_id,default,name,off_on,             \
                 LANG_SET_BOOL_YES,LANG_SET_BOOL_NO,cb)
 
-/* int variable which is NOT saved to .cfg files,
-    (Use NVRAM() in the flags to save to the nvram (or nvram.bin file) */
-#define SYSTEM_SETTING(flags,var,default)                           \
-            {flags|F_T_INT, &global_status.var,-1, INT(default),    \
-                NULL, UNUSED}
+/*system_status int variable which is saved to resume.cfg */
+#define SYSTEM_STATUS(flags,var,default,name)                \
+            {flags|F_RESUMESETTING|F_T_INT, &global_status.var,-1, \
+             INT(default), name, UNUSED}
+/* system_status settings items will be saved to resume.cfg
+   Use for int which use the set_sound() function to set them
+   These items WILL be included in the users exported settings files
+ */
+#define SYSTEM_STATUS_SOUND(flags,var,lang_id,name,setting)                 \
+            {flags|F_T_INT|F_T_SOUND|F_SOUNDSETTING|F_ALLOW_ARBITRARY_VALS| \
+             F_RESUMESETTING, &global_status.var, lang_id, NODEFAULT,name,  \
+                {.sound_setting=(struct sound_setting[]){{setting}}} }
 
 /* setting which stores as a filename (or another string) in the .cfgvals
     The string must be a char array (which all of our string settings are),
@@ -828,8 +831,21 @@ static void hp_lo_select_apply(int arg)
 #endif
 
 const struct settings_list settings[] = {
-    /* sound settings */
-    SOUND_SETTING(F_NO_WRAP, volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+/* system_status settings .resume.cfg */
+    SYSTEM_STATUS_SOUND(F_NO_WRAP, volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+#ifdef HAVE_PITCHCONTROL
+    SYSTEM_STATUS(F_SOUNDSETTING, resume_pitch, PITCH_SPEED_100, "pitch"),
+    SYSTEM_STATUS(F_SOUNDSETTING, resume_speed, PITCH_SPEED_100, "speed"),
+#endif
+    SYSTEM_STATUS(0, resume_index,   -1,     "IDX"),
+    SYSTEM_STATUS(0, resume_crc32,   -1,     "CRC"),
+    SYSTEM_STATUS(0, resume_elapsed, -1,     "ELA"),
+    SYSTEM_STATUS(0, resume_offset,  -1,     "OFF"),
+    SYSTEM_STATUS(0, resume_modified, false, "PLM"),
+    SYSTEM_STATUS(0, runtime,         0,     "CRT"),
+    SYSTEM_STATUS(0, topruntime,      0,     "TRT"),
+    SYSTEM_STATUS(0, last_screen,    -1,     "PVS"),
+/* sound settings */
     CUSTOM_SETTING(F_NO_WRAP, volume_limit, LANG_VOLUME_LIMIT,
                   NULL, "volume limit",
                   volume_limit_load_from_cfg, volume_limit_write_to_cfg,
@@ -972,15 +988,6 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED, playlist_shuffle,
                   LANG_SHUFFLE, false, "shuffle", shuffle_playlist_callback),
 
-    SYSTEM_SETTING(NVRAM(4), resume_index, -1),
-    SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
-    SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
-    SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
-    SYSTEM_SETTING(NVRAM(4), resume_modified, false),
-#ifdef HAVE_PITCHCONTROL
-    SYSTEM_SETTING(NVRAM(4), resume_pitch, PITCH_SPEED_100),
-    SYSTEM_SETTING(NVRAM(4), resume_speed, PITCH_SPEED_100),
-#endif
     CHOICE_SETTING(F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED, repeat_mode,
                    LANG_REPEAT, REPEAT_OFF, "repeat", "off,all,one,shuffle"
 #ifdef AB_REPEAT_ENABLE
@@ -1121,8 +1128,6 @@ const struct settings_list settings[] = {
                 "idle poweroff", UNIT_MIN, 0,60,1,
                 formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,
                 set_poweroff_timeout),
-    SYSTEM_SETTING(NVRAM(4), runtime, 0),
-    SYSTEM_SETTING(NVRAM(4), topruntime, 0),
     INT_SETTING(F_BANFROMQS, max_files_in_playlist,
                 LANG_MAX_FILES_IN_PLAYLIST,
 #if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022
@@ -1172,7 +1177,7 @@ const struct settings_list settings[] = {
 #endif /* IPOD_VIDEO */
 #endif
 #if CONFIG_CHARGING
-    OFFON_SETTING(NVRAM(1), car_adapter_mode,
+    OFFON_SETTING(0, car_adapter_mode,
                   LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
     INT_SETTING_NOWRAP(0, car_adapter_mode_delay, LANG_CAR_ADAPTER_MODE_DELAY,
                 5, "delay before resume", UNIT_SEC, 5, 30, 5,
@@ -1196,7 +1201,7 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
     OFFON_SETTING(0, fm_force_mono, LANG_FM_MONO_MODE,
                   false, "force fm mono", toggle_mono_mode),
-    SYSTEM_SETTING(NVRAM(4), last_frequency, 0),
+    SYSTEM_STATUS(0, last_frequency, 0, "PFQ"),
 #endif
 #if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
     OFFON_SETTING(0, sync_rds_time, LANG_FM_SYNC_RDS_TIME, false, "sync_rds_time", NULL),
@@ -1827,7 +1832,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_DIRCACHE
     /*enable dircache for all targets > 2MB of RAM by default*/
     OFFON_SETTING(F_BANFROMQS,dircache,LANG_DIRCACHE_ENABLE,true,"dircache",NULL),
-    SYSTEM_SETTING(NVRAM(4),dircache_size,0),
+    SYSTEM_STATUS(0, dircache_size, 0, "DSZ"),
 #endif
 
 #ifdef HAVE_TAGCACHE
@@ -2049,7 +2054,6 @@ const struct settings_list settings[] = {
                    ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
                    ID2P(LANG_OPEN_PLUGIN)
                   ),
-    SYSTEM_SETTING(NVRAM(1),last_screen,-1),
 #if defined(HAVE_RTC_ALARM) && \
     (defined(HAVE_RECORDING) || CONFIG_TUNER)
     {F_T_INT|F_HAS_CFGVALS, &global_settings.alarm_wake_up_screen, LANG_ALARM_WAKEUP_SCREEN,

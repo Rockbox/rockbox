@@ -245,15 +245,11 @@ enum {  ALARM_START_WPS = 0,
 
 
 /** function prototypes **/
-
-/* argument bits for settings_load() */
-#define SETTINGS_RTC (BIT_N(0)) /* only the settings from the RTC nonvolatile RAM */
-#define SETTINGS_HD  (BIT_N(1)) /* only the settings from the disk sector */
-#define SETTINGS_ALL (SETTINGS_RTC|SETTINGS_HD) /* both */
-void settings_load(int which) INIT_ATTR;
+void update_runtime(void);
+void settings_load(void) INIT_ATTR;
 bool settings_load_config(const char* file, bool apply);
 
-void status_save(void);
+void status_save(bool force);
 int settings_save(void);
 void reset_runtime(void);
 /* defines for the options paramater */
@@ -266,6 +262,7 @@ enum {
     SETTINGS_SAVE_RECPRESETS,
 #endif
     SETTINGS_SAVE_EQPRESET,
+    SETTINGS_SAVE_RESUMEINFO,
 };
 bool settings_save_config(int options);
 
@@ -322,6 +319,7 @@ const char* setting_get_cfgvals(const struct settings_list *setting);
 
 struct system_status
 {
+    int volume;     /* audio output volume in decibels range depends on the dac */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     uint32_t resume_crc32; /* crc32 of the name of the file */
     uint32_t resume_elapsed; /* elapsed time in last file */
@@ -350,8 +348,6 @@ struct system_status
 struct user_settings
 {
     /* audio settings */
-
-    int volume;     /* audio output volume in decibels range depends on the dac */
     int balance;    /* stereo balance: -100 - +100 -100=left  0=bal +100=right  */
     int bass;       /* bass boost/cut in decibels                               */
     int treble;     /* treble boost/cut in decibels                             */

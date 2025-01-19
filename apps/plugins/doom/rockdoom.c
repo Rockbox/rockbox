@@ -718,8 +718,8 @@ enum plugin_status plugin_start(const void* parameter)
 
    int mod = (rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15;
    if(mod == 0)
-       mod = rb->global_settings->volume;
-   systemvol= rb->global_settings->volume-rb->global_settings->volume%mod;
+       mod = rb->global_status->volume;
+   systemvol= rb->global_status->volume-rb->global_status->volume%mod;
    general_translucency = default_translucency;                    // phares
 
 

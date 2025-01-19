@@ -601,23 +601,23 @@ int beatboxmain()
         /*
                 case BTN_UP:
                 case BTN_UP | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
+                    vol = rb->global_status->volume;
                     if (vol < rb->sound_max(SOUND_VOLUME))
                     {
                         vol++;
                         rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
+                        rb->global_status->volume = vol;
                     }
                     break;
 
                 case BTN_DOWN:
                 case BTN_DOWN | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
+                    vol = rb->global_status->volume;
                     if (vol > rb->sound_min(SOUND_VOLUME))
                     {
                         vol--;
                         rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
+                        rb->global_status->volume = vol;
                     }
                     break;
 

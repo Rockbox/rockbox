@@ -322,7 +322,7 @@ void iap_set_remote_volume(void)
     IAP_TX_INIT(0x03, 0x0D);
     IAP_TX_PUT(0x04);
     IAP_TX_PUT(0x00);
-    IAP_TX_PUT(0xFF & (int)((global_settings.volume + 90) * 2.65625));
+    IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
     iap_send_tx();
 }
 
@@ -882,7 +882,7 @@ void iap_periodic(void)
         IAP_TX_INIT(0x03, 0x09);
         IAP_TX_PUT(0x04);
         IAP_TX_PUT(0x00);
-        IAP_TX_PUT(0xFF &(int)((global_settings.volume + 90) * 2.65625));
+        IAP_TX_PUT(0xFF &(int)((global_status.volume + 90) * 2.65625));
         device.changed_notifications |= BIT_N(4);
         iap_send_tx();
     }

@@ -710,7 +710,7 @@ static inline int load_screen(int screen)
     if (screen == old_previous)
         old_previous = GO_TO_ROOT;
     global_status.last_screen = (char)screen;
-    status_save();
+    status_save(false);
 
     if (screen == GO_TO_BROWSEPLUGINS)
         activity = ACTIVITY_PLUGINBROWSER;
@@ -774,7 +774,6 @@ static int load_plugin_screen(char *key)
     int old_global = global_status.last_screen;
     last_screen = next_screen;
     global_status.last_screen = (char)next_screen;
-    /*status_save(); //only needed if we crash */
 
     while(loops-- > 0) /* just to keep things from getting out of hand */
     {

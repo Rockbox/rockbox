@@ -319,7 +319,7 @@ static int INIT_ATTR init_dircache(bool preinit)
             struct dircache_info info;
             dircache_get_info(&info);
             global_status.dircache_size = info.size;
-            status_save();
+            status_save(true);
         }
         /* else don't wait or already enabled by load */
     }
@@ -435,7 +435,7 @@ static void init(void)
     pcm_init();
     dsp_init();
     settings_reset();
-    settings_load(SETTINGS_ALL);
+    settings_load();
     settings_apply(true);
 #ifdef HAVE_DIRCACHE
     init_dircache(true);
@@ -679,9 +679,9 @@ static void init(void)
     pcm_init();
     dsp_init();
 
-    CHART(">settings_load(ALL)");
-    settings_load(SETTINGS_ALL);
-    CHART("<settings_load(ALL)");
+    CHART(">settings_load");
+    settings_load();
+    CHART("<settings_load");
 
 #if defined(BUTTON_REC) || \
     (CONFIG_KEYPAD == GIGABEAT_PAD) || \

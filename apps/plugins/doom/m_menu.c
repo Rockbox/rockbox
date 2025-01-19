@@ -878,7 +878,7 @@ void M_SystemVol(int choice)
       {
          systemvol-=5;
          rb->sound_set(SOUND_VOLUME, systemvol);
-         rb->global_settings->volume = systemvol;
+         rb->global_status->volume = systemvol;
       }
       break;
    case 1:
@@ -886,7 +886,7 @@ void M_SystemVol(int choice)
       {
          systemvol+=5;
          rb->sound_set(SOUND_VOLUME, systemvol);
-         rb->global_settings->volume = systemvol;
+         rb->global_status->volume = systemvol;
       }
       break;
    }

@@ -588,12 +588,12 @@ static int midimain(const void * filename)
             case MIDI_VOL_UP:
             case MIDI_VOL_UP | BUTTON_REPEAT:
             {
-                vol = rb->global_settings->volume;
+                vol = rb->global_status->volume;
                 if (vol < rb->sound_max(SOUND_VOLUME))
                 {
                     vol++;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    rb->global_status->volume = vol;
                 }
                 break;
             }
@@ -601,12 +601,12 @@ static int midimain(const void * filename)
             case MIDI_VOL_DOWN:
             case MIDI_VOL_DOWN | BUTTON_REPEAT:
             {
-                vol = rb->global_settings->volume;
+                vol = rb->global_status->volume;
                 if (vol > rb->sound_min(SOUND_VOLUME))
                 {
                     vol--;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    rb->global_status->volume = vol;
                 }
                 break;
             }
