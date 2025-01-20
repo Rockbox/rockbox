@@ -361,7 +361,7 @@ static int voltage_to_battery_level(int millivolts)
  */
 static void battery_status_update(void)
 {
-#if CONFIG_BATTERY_MEASURE & (PERCENTAGE_MEASURE | VOLTAGE_MEASURE)
+#if ((CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE))
     int level = _battery_level();
     if (level == -1) {
         level = voltage_to_battery_level(voltage_now);
