@@ -556,7 +556,7 @@ static struct mp3entry* get_mp3entry_from_offset(int offset,
         pid3 = state->id3;
     else if (offset == 1)
         pid3 = state->nid3;
-    else
+    else if (audio_status() & AUDIO_STATUS_PLAY)
     {
         /* we had to get a temp id3 entry, fill freeid3 to free later */
         struct mp3entry *bufid3 = get_temp_mp3entry(NULL);
