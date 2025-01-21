@@ -914,8 +914,6 @@ struct user_settings
     bool playback_log; /* ROCKBOX_DIR/playback.log for tracks played */
 };
 
-/** global variables **/
-extern long lasttime;
 /* global settings */
 extern struct user_settings global_settings;
 /* global status */

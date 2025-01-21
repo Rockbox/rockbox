@@ -80,7 +80,7 @@ struct user_settings global_settings;
 struct system_status global_status;
 static uint32_t user_settings_crc;
 static long next_status_update_tick;
-long lasttime = 0;
+static long lasttime = 0;
 
 /* flush system_status more often for spinning harddisks as we may not be able
  * to spin up at shutdown in order to save so keep the gap minimal */
@@ -636,6 +636,7 @@ static void flush_config_block_callback(void)
 
 void reset_runtime(void)
 {
+    update_runtime(); /* in case this is > topruntimetime */
     lasttime = current_tick;
     global_status.runtime = 0;
 }
