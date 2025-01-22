@@ -913,18 +913,16 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
         )
     {
-        lc_close(current_plugin_handle);
-        current_plugin_handle = NULL;
-        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_MODEL));
-        return -1;
+        hdr = NULL;
     }
 
-    if (hdr->api_version != PLUGIN_API_VERSION ||
+    if (hdr == NULL || hdr->api_version != PLUGIN_API_VERSION ||
         p_hdr->api_size > sizeof(struct plugin_api))
     {
         lc_close(current_plugin_handle);
         current_plugin_handle = NULL;
-        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_VERSION));
+        splash(HZ*2, hdr ? ID2P(LANG_PLUGIN_WRONG_VERSION)
+                         : ID2P(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
 
@@ -969,7 +967,9 @@ int plugin_load(const char* plugin, const void* parameter)
 
     int rc = p_hdr->entry_point(parameter);
 
-    tree_unlock_cache(tree_get_context());
+    struct tree_context *tc = tree_get_context();
+    tree_unlock_cache(tc);
+    tc->dirfilter = &global_settings.dirfilter;
 
     pop_current_activity_without_refresh();
     if (get_current_activity() != ACTIVITY_WPS)
