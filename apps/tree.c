@@ -609,7 +609,7 @@ static void set_current_file_ex(const char *path, const char *filename)
         return;
 #endif
 
-    if (!filename) /* path and filename supplied combined */
+    if (!filename && !dir_exists(path)) /* path and filename supplied combined */
     {
         /* separate directory from filename */
         /* gets the directory's name and put it into tc.currdir */
@@ -628,6 +628,8 @@ static void set_current_file_ex(const char *path, const char *filename)
     }
     else /* path and filename came in separate ensure an ending '/' */
     {
+        if (!filename)
+            filename = "";
         char *end_p = strmemccpy(tc.currdir, path, MAX_PATH);
         size_t endpos = end_p - tc.currdir;
         if (endpos < MAX_PATH)
@@ -1053,7 +1055,7 @@ int rockbox_browse(struct browse_context *browse)
     if (backup_count >= 0)
         backups[backup_count] = tc;
     backup_count++;
-
+    int *prev_dirfilter = tc.dirfilter;
     tc.dirfilter = &dirfilter;
     tc.sort_dir = global_settings.sort_dir;
 
@@ -1110,6 +1112,7 @@ int rockbox_browse(struct browse_context *browse)
     }
 
     tc.is_browsing = false;
+    tc.dirfilter = prev_dirfilter; /* Bugfix restore dirfilter*/
 
     backup_count--;
     if (backup_count >= 0)
