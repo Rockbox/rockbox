@@ -630,7 +630,7 @@ sub gentalkclips {
 	# Apply corrections
 	$voice = correct_string($voice, $language, $tts_object);
 
-        printf("Talkclip %s: %s", $enc, $voice) if $verbose;
+        printf("Talkclip %s: %s\n", $enc, $voice) if $verbose;
 	# Don't generate encoded file if it already exists
 	next if (-f $enc && !$force);
 
