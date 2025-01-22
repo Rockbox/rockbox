@@ -43,7 +43,7 @@ static const char* build_sc_list(int selected_item, void *data,
                                  char *buffer, size_t buffer_len);
 
 /* Returns LOOP_EXIT iff we should leave the main loop */
-int list_sc(void);
+int list_sc(int *selected_item);
 
 int goto_entry(char *file_or_dir);
 bool ends_with(char *str, char *suffix);
@@ -98,9 +98,8 @@ static const char* build_sc_list(int selected_item, void *data,
 }
 
 
-int list_sc(void)
+int list_sc(int *selected_item)
 {
-    int selected_item = 0;
     enum sc_list_action_type action = SCLA_NONE;
     struct gui_synclist gui_sc;
 
@@ -110,7 +109,7 @@ int list_sc(void)
     rb->gui_synclist_set_title(&gui_sc,
         (user_file?"Shortcuts (sealed)":"Shortcuts (editable)"), NOICON);
     rb->gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);
-    rb->gui_synclist_select_item(&gui_sc, 0);
+    rb->gui_synclist_select_item(&gui_sc, *selected_item);
 
     /* Draw the prepared widget to the LCD now */
     action = draw_sc_list(&gui_sc);
@@ -119,9 +118,9 @@ int list_sc(void)
     }
 
     /* which item do we action? */
-    selected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
+    *selected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
 
-    if (!is_valid_index(&sc_file, selected_item)) {
+    if (!is_valid_index(&sc_file, *selected_item)) {
         /* This should never happen */
         rb->splash(HZ*2, "Bad entry selected!");
         return PLUGIN_ERROR;
@@ -132,10 +131,10 @@ int list_sc(void)
      * in the filebrowser tree */
     switch(action) {
         case SCLA_SELECT:
-            return goto_entry(sc_file.entries[selected_item].path);
+            return goto_entry(sc_file.entries[*selected_item].path);
         case SCLA_DELETE:
-            rb->splashf(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
-            remove_entry(&sc_file, selected_item);
+            rb->splashf(HZ, "Deleting %s", sc_file.entries[*selected_item].disp);
+            remove_entry(&sc_file, *selected_item);
             dump_sc_file(&sc_file, link_filename);
             return (sc_file.entry_cnt == 0)? LOOP_EXIT : PLUGIN_OK;
         default:
@@ -180,10 +179,13 @@ static bool callback_show_item(char *name, int attr, struct tree_context *tc)
     (void)name;
     if(attr & ATTR_DIRECTORY)
     {
-        if ((tc->browse->flags & BROWSE_SELECTED) == 0 &&
-            rb->strlen(tc->currdir) < root_len)
+        if ((tc->browse->flags & BROWSE_SELECTED) == 0)
         {
-            tc->is_browsing = false; /* exit immediately */
+            size_t curlen = rb->strlen(tc->currdir);
+            if (curlen < root_len)
+                tc->is_browsing = false; /* exit immediately */
+            else if (curlen == root_len)
+                tc->browse->title = tc->currdir;
         }
     }
 
@@ -202,6 +204,8 @@ bool open_browse(char *path, char *buf, size_t bufsz)
         .bufsize = bufsz,
         .callback_show_item = callback_show_item,
     };
+
+    /* if the final slash isn't included return brings you up a level, feature not bug. */
     root_len = 0;
     char *name = rb->strrchr(path, '/');
     if (name)
@@ -215,7 +219,7 @@ int goto_entry(char *file_or_dir)
 {
     DEBUGF("Trying to go to '%s'...\n", file_or_dir);
 
-    bool is_dir = ends_with(file_or_dir, PATH_SEPARATOR);
+    bool is_dir = ends_with(file_or_dir, PATH_SEPARATOR) || rb->dir_exists(file_or_dir);
     bool exists;
     char *what;
     if (is_dir) {
@@ -297,9 +301,11 @@ enum plugin_status plugin_start(const void* void_parameter)
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 
+    int selected_item = 0;
     do {
         /* Display a menu to choose between the entries */
-        ret = list_sc();
+        DEBUGF("list_sc(%d)\n", selected_item);
+        ret = list_sc(&selected_item);
     } while (ret == PLUGIN_OK);
     if (ret == LOOP_EXIT)
         ret = PLUGIN_OK;
