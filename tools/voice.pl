@@ -592,19 +592,20 @@ sub gentalkclips {
     our $verbose;
     my ($dir, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts, $i) = @_;
     my $d = new DirHandle $dir;
+
     while (my $file = $d->read) {
 	$file = Encode::decode( locale_fs => $file);
         my ($voice, $wav, $enc);
 	my $format = $tts_object->{'format'};
 
-        # Print some progress information
-        if (++$i % 10 == 0 and !$verbose) {
-            print(".");
-        }
-
         # Ignore dot-dirs and talk files
         if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
             next;
+        }
+
+        # Print some progress information
+        if (++$i % 10 == 0 and !$verbose) {
+            print(".");
         }
 
         $voice = $file;
@@ -620,7 +621,7 @@ sub gentalkclips {
         if ( -d $path) { # Element is a dir
 	    $enc = sprintf("%s/_dirname.talk", $path);
             if (! -e "$path/talkclips.ignore") { # Skip directories containing "talkclips.ignore"
-                gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
+                gentalkclips($path, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts, $i);
             }
         } else { # Element is a file
             $enc = sprintf("%s.talk", $path);
