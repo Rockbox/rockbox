@@ -949,7 +949,9 @@ int plugin_load(const char* plugin, const void* parameter)
         push_current_activity(ACTIVITY_PLUGIN);
     /* some plugins assume the entry cache doesn't move and save pointers to it
      * they should be fixed properly instead of this lock */
-    tree_lock_cache(tree_get_context());
+    struct tree_context *tc = tree_get_context();
+    tree_lock_cache(tc);
+    int *last_dirfilter_p = tc->dirfilter; /* store incoming dirfilter pointer */
 
     if (!theme_enabled)
         FOR_NB_SCREENS(i)
@@ -965,11 +967,11 @@ int plugin_load(const char* plugin, const void* parameter)
 
     plugin_check_open_close__enter();
 
-    int rc = p_hdr->entry_point(parameter);
+    int rc = p_hdr->entry_point(parameter); /* run the loaded plugin */
 
-    struct tree_context *tc = tree_get_context();
+    /* unlock the tree and restore the dirfilter pointer */
     tree_unlock_cache(tc);
-    tc->dirfilter = &global_settings.dirfilter;
+    tc->dirfilter = last_dirfilter_p;
 
     pop_current_activity_without_refresh();
     if (get_current_activity() != ACTIVITY_WPS)
