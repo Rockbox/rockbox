@@ -635,25 +635,8 @@ int ft_enter(struct tree_context* c)
 #if CONFIG_TUNER
                 /* fmr preset file */
             case FILE_ATTR_FMR:
-                splash(0, ID2P(LANG_WAIT));
-
-                /* Preset inside the default folder. */
-                if(!strncasecmp(FMPRESET_PATH, buf, strlen(FMPRESET_PATH)))
-                {
-                    set_file(buf, global_settings.fmr_file, MAX_FILENAME);
-                    radio_load_presets(global_settings.fmr_file);
-                }
-                /*
-                 * Preset outside default folder, we can choose such only
-                 * if we are out of the radio screen, so the check for the
-                 * radio status isn't neccessary
-                 */
-                else
-                {
-                    radio_load_presets(buf);
-                }
+                radio_load_presets(buf);
                 rc = GO_TO_FM;
-
                 break;
             case FILE_ATTR_FMS:
                 ft_apply_skin_file(buf, global_settings.fms_file, MAX_FILENAME);

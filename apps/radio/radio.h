@@ -34,7 +34,7 @@ enum radio_scan_mode {
 };
 
 #if CONFIG_TUNER
-void radio_load_presets(char *filename);
+void radio_load_presets(const char *filename);
 void radio_save_presets(void);
 void radio_init(void) INIT_ATTR;
 void radio_screen(void);
