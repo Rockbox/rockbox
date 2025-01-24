@@ -513,29 +513,37 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
                 if (type == MT_SETTING_W_TEXT || type == MT_SETTING)
                 {
-#ifdef HAVE_QUICKSCREEN
-                    MENUITEM_STRINGLIST(quickscreen_able_option,
+                    const struct menu_item_ex *context_menu;
+                    const struct settings_list *setting =
+                            find_setting(temp->variable);
+
+                    MENUITEM_STRINGLIST(settings_op_menu,
                                         ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                                         ID2P(LANG_RESET_SETTING),
+#ifndef HAVE_QUICKSCREEN
+                                        };
+                    context_menu = &settings_op_menu;
+#else
                                         ID2P(LANG_TOP_QS_ITEM),
                                         ID2P(LANG_LEFT_QS_ITEM),
                                         ID2P(LANG_BOTTOM_QS_ITEM),
                                         ID2P(LANG_RIGHT_QS_ITEM),
+                                        ID2P(LANG_ADD_CURRENT_TO_FAVES),
                                         ID2P(LANG_ADD_TO_FAVES));
-#endif
-                    MENUITEM_STRINGLIST(notquickscreen_able_option,
-                                        ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
-                                        ID2P(LANG_RESET_SETTING));
-                    const struct menu_item_ex *context_menu;
-                    const struct settings_list *setting =
-                            find_setting(temp->variable);
-#ifdef HAVE_QUICKSCREEN
-                    if (is_setting_quickscreenable(setting))
-                        context_menu = &quickscreen_able_option;
-                    else
-#endif
-                        context_menu = &notquickscreen_able_option;
 
+                    /* re-use the strings and desc from the settings_op_menu */
+                    static const struct menu_item_ex non_quickscreen_op_menu =
+                    {MT_RETURN_ID|MENU_HAS_DESC|MENU_ITEM_COUNT(1),
+                    { .strings = settings_op_menu_},
+                    {.callback_and_desc = &settings_op_menu__}};
+
+                    if (is_setting_quickscreenable(setting))
+                        context_menu = &settings_op_menu;
+                    else
+                    {
+                        context_menu = &non_quickscreen_op_menu;
+                    }
+#endif
                     int msel = do_menu(context_menu, NULL, NULL, false);
 
                     switch (msel)
@@ -560,7 +568,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                         case 4: /* set as right QS item */
                             global_settings.qs_items[QUICKSCREEN_RIGHT] = setting;
                             break;
-                        case 5: /* Add to faves. Same limitation on which can be
+                        case 5: /* Add current value of setting to faves.
+                                   Same limitation on which can be
+                                   added to the shortcuts menu as the quickscreen */
+                            shortcuts_add(SHORTCUT_SETTING_APPLY, (void*)setting);
+                            break;
+                        case 6: /* Add to faves. Same limitation on which can be
                                   added to the shortcuts menu as the quickscreen */
                             shortcuts_add(SHORTCUT_SETTING, (void*)setting);
                             break;

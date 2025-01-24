@@ -52,10 +52,11 @@
 #endif
 
 #define MAX_SHORTCUT_NAME 64
+#define SHORTCUTS_HDR "[shortcut]"
 #define SHORTCUTS_FILENAME ROCKBOX_DIR "/shortcuts.txt"
 static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_SETTING] = "setting",
-    [SHORTCUT_FILE] = "file",
+    [SHORTCUT_SETTING_APPLY] = "apply",
     [SHORTCUT_DEBUGITEM] = "debug",
     [SHORTCUT_BROWSER] = "browse",
     [SHORTCUT_PLAYLISTMENU] = "playlist menu",
@@ -63,16 +64,17 @@ static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_SHUTDOWN] = "shutdown",
     [SHORTCUT_REBOOT] = "reboot",
     [SHORTCUT_TIME] = "time",
+    [SHORTCUT_FILE] = "file",
 };
 
 struct shortcut {
     enum shortcut_type type;
+    int8_t icon;
     char name[MAX_SHORTCUT_NAME];
     char talk_clip[MAX_PATH];
-    int icon;
+    const struct settings_list *setting;
     union {
         char path[MAX_PATH];
-        const struct settings_list *setting;
         struct {
 #if CONFIG_RTC
             bool talktime;
@@ -81,6 +83,7 @@ struct shortcut {
         } timedata;
     } u;
 };
+
 #define SHORTCUTS_PER_HANDLE 4
 struct shortcut_handle {
     struct shortcut shortcuts[SHORTCUTS_PER_HANDLE];
@@ -121,19 +124,34 @@ static void reset_shortcuts(void)
     shortcut_count = 0;
 }
 
-static struct shortcut* get_shortcut(int index)
+static struct shortcut_handle * alloc_first_sc_handle(void)
+{
+    struct shortcut_handle *h = NULL;
+#if 0 /* all paths are guarded, compiler doesn't recognize INIT_ATTR callers */
+    if (first_handle != 0)
+        return h; /* No re-init allowed */
+#endif
+    first_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
+    if (first_handle > 0)
+    {
+        h = core_get_data(first_handle);
+        h->next_handle = 0;
+    }
+
+    return h;
+}
+
+static struct shortcut* get_shortcut(int index, struct shortcut *fail)
 {
     int handle_count, handle_index;
     int current_handle = first_handle;
-    struct shortcut_handle *h = NULL;
+    struct shortcut_handle *h;
 
     if (first_handle == 0)
     {
-        first_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
-        if (first_handle <= 0)
-            return NULL;
-        h = core_get_data(first_handle);
-        h->next_handle = 0;
+        h = alloc_first_sc_handle();
+        if (!h)
+            return fail;
         current_handle = first_handle;
     }
 
@@ -143,15 +161,18 @@ static struct shortcut* get_shortcut(int index)
         h = core_get_data(current_handle);
         current_handle = h->next_handle;
         handle_count--;
-    } while (handle_count > 0 && current_handle > 0);
-    if (handle_count > 0 && handle_index == 0)
+        if(handle_count <= 0)
+            return &h->shortcuts[handle_index];
+    } while (current_handle > 0);
+
+    if (handle_index == 0)
     {
         /* prevent invalidation of 'h' during compaction */
         ++buflib_move_lock;
         h->next_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
         --buflib_move_lock;
         if (h->next_handle <= 0)
-            return NULL;
+            return fail;
         h = core_get_data(h->next_handle);
         h->next_handle = 0;
     }
@@ -161,11 +182,11 @@ static struct shortcut* get_shortcut(int index)
 static void remove_shortcut(int index)
 {
     int this = index, next = index + 1;
-    struct shortcut *prev = get_shortcut(this);
+    struct shortcut *prev = get_shortcut(this, NULL);
 
     while (next <= shortcut_count)
     {
-        struct shortcut *sc = get_shortcut(next);
+        struct shortcut *sc = get_shortcut(next, NULL);
         memcpy(prev, sc, sizeof(struct shortcut));
         next++;
         prev = sc;
@@ -183,8 +204,9 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_FILE:
         case SHORTCUT_PLAYLISTMENU:
             return sc->u.path[0] != '\0';
+        case SHORTCUT_SETTING_APPLY:
         case SHORTCUT_SETTING:
-            return sc->u.setting != NULL;
+            return sc->setting != NULL;
         case SHORTCUT_TIME:
 #if CONFIG_RTC
             if (sc->u.timedata.talktime)
@@ -203,10 +225,8 @@ static bool verify_shortcut(struct shortcut* sc)
 
 static void init_shortcut(struct shortcut* sc)
 {
+    memset(sc, 0, sizeof(*sc));
     sc->type = SHORTCUT_UNDEFINED;
-    sc->name[0] = '\0';
-    sc->u.path[0] = '\0';
-    sc->talk_clip[0] = '\0';
     sc->icon = Icon_NOICON;
 }
 
@@ -215,7 +235,7 @@ static bool overwrite_shortcuts = false;
 static void shortcuts_ata_idle_callback(void)
 {
     int fd;
-    char buf[MAX_PATH];
+
     int current_idx = first_idx_to_writeback;
     int append = overwrite_shortcuts ? O_TRUNC : O_APPEND;
 
@@ -231,17 +251,16 @@ static void shortcuts_ata_idle_callback(void)
 
     while (current_idx < shortcut_count)
     {
-        struct shortcut* sc = get_shortcut(current_idx++);
+        struct shortcut* sc = get_shortcut(current_idx++, NULL);
         const char *type;
-        int len;
+
         if (!sc)
             break;
         type = type_strings[sc->type];
-        len = snprintf(buf, MAX_PATH, "[shortcut]\ntype: %s\ndata: ", type);
-        write(fd, buf, len);
-        if (sc->type == SHORTCUT_SETTING)
-            write(fd, sc->u.setting->cfg_name, strlen(sc->u.setting->cfg_name));
-        else if (sc->type == SHORTCUT_TIME)
+
+        fdprintf(fd, SHORTCUTS_HDR "\ntype: %s\ndata: ", type);
+
+        if (sc->type == SHORTCUT_TIME)
         {
 #if CONFIG_RTC
             if (sc->u.timedata.talktime)
@@ -249,23 +268,25 @@ static void shortcuts_ata_idle_callback(void)
             else
 #endif
             {
-                write(fd, "sleep ", 6);
-                if (sc->u.timedata.sleep_timeout >= 0)
-                {
-                    len = snprintf(buf, MAX_PATH, "%d", sc->u.timedata.sleep_timeout);
-                    write(fd, buf, len);
-                }
+                write(fd, "sleep", 5);
+                if(sc->u.timedata.sleep_timeout >= 0)
+                    fdprintf(fd, " %d", sc->u.timedata.sleep_timeout);
             }
+        }
+        else if (sc->type == SHORTCUT_SETTING_APPLY)
+        {
+            fdprintf(fd, "%s: %s", sc->setting->cfg_name, sc->u.path);
+        }
+        else if (sc->type == SHORTCUT_SETTING)
+        {
+            write(fd, sc->setting->cfg_name, strlen(sc->setting->cfg_name));
         }
         else
             write(fd, sc->u.path, strlen(sc->u.path));
 
         /* write name:, icon:, talkclip: */
-        len = snprintf(buf, MAX_PATH, "\nname: %s\nicon: %d\ntalkclip: ",
-                       sc->name, sc->icon);
-        write(fd, buf, len);
-        write(fd, sc->talk_clip, strlen(sc->talk_clip));
-        write(fd, "\n\n", 2);
+        fdprintf(fd, "\nname: %s\nicon: %d\ntalkclip: %s\n\n",
+                 sc->name, sc->icon, sc->talk_clip);
     }
     close(fd);
     if (first_idx_to_writeback == 0)
@@ -282,13 +303,17 @@ static void shortcuts_ata_idle_callback(void)
 
 void shortcuts_add(enum shortcut_type type, const char* value)
 {
-    struct shortcut* sc = get_shortcut(shortcut_count++);
+    struct shortcut* sc = get_shortcut(shortcut_count++, NULL);
     if (!sc)
         return;
     init_shortcut(sc);
     sc->type = type;
-    if (type == SHORTCUT_SETTING)
-        sc->u.setting = (void*)value;
+    if (type == SHORTCUT_SETTING || type == SHORTCUT_SETTING_APPLY)
+    {
+        sc->setting = (void*)value;
+        /* write the current value, will be ignored for SHORTCUT_SETTING */
+        cfg_to_string(sc->setting, sc->u.path,  sizeof(sc->u.path));
+    }
     else
         strmemccpy(sc->u.path, value, MAX_PATH);
 
@@ -306,11 +331,13 @@ static int readline_cb(int n, char *buf, void *parameters)
     struct shortcut* sc = *param;
     char *name, *value;
 
-    if (!strcasecmp(skip_whitespace(buf), "[shortcut]"))
+    buf = skip_whitespace(buf);
+
+    if (!strcasecmp(buf, SHORTCUTS_HDR))
     {
         if (sc && verify_shortcut(sc))
             shortcut_count++;
-        sc = get_shortcut(shortcut_count);
+        sc = get_shortcut(shortcut_count, NULL);
         if (!sc)
             return 1;
         init_shortcut(sc);
@@ -319,7 +346,7 @@ static int readline_cb(int n, char *buf, void *parameters)
     else if (sc && settings_parseline(buf, &name, &value))
     {
         static const char * const nm_options[] = {"type", "name", "data",
-                                        "icon", "talkclip", NULL};
+                                                  "icon", "talkclip", NULL};
         int nm_op = string_option(name, nm_options, false);
 
         if (nm_op == 0) /*type*/
@@ -347,8 +374,19 @@ static int readline_cb(int n, char *buf, void *parameters)
                 case SHORTCUT_PLAYLISTMENU:
                     strmemccpy(sc->u.path, value, MAX_PATH);
                     break;
+                case SHORTCUT_SETTING_APPLY:
                 case SHORTCUT_SETTING:
-                    sc->u.setting = find_setting_by_cfgname(value);
+                    /* can handle 'name: value' pair for either type */
+                    if (settings_parseline(value, &name, &value))
+                    {
+                        sc->setting = find_setting_by_cfgname(name);
+                        strmemccpy(sc->u.path, value, MAX_PATH);
+                    }
+                    else /* force SHORTCUT_SETTING, no 'name: value' pair */
+                    {
+                        sc->type = SHORTCUT_SETTING;
+                        sc->setting = find_setting_by_cfgname(value);
+                    }
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
@@ -357,11 +395,13 @@ static int readline_cb(int n, char *buf, void *parameters)
                         sc->u.timedata.talktime = true;
                     else
 #endif
-                    if (!strncasecmp(value, "sleep", strlen("sleep")))
+                    if (!strncasecmp(value, "sleep", sizeof("sleep")-1))
                     {
                         /* 'sleep' may appear alone or followed by number after a space */
-                        sc->u.timedata.sleep_timeout = strlen(&value[5]) > 1 ?
-                            atoi(&value[strlen("sleep ")]) : -1;
+                        if (strlen(value) > sizeof("sleep")) /* sizeof 1 larger (+space chr..) */
+                            sc->u.timedata.sleep_timeout = atoi(&value[sizeof("sleep")-1]);
+                        else
+                            sc->u.timedata.sleep_timeout = -1;
                     }
                     else
                         sc->type = SHORTCUT_UNDEFINED; /* error */
@@ -374,7 +414,8 @@ static int readline_cb(int n, char *buf, void *parameters)
         }
         else if (nm_op == 3) /*icon*/
         {
-            if (!strcmp(value, "filetype") && sc->type != SHORTCUT_SETTING && sc->u.path[0])
+            if (!strcmp(value, "filetype") && sc->type != SHORTCUT_SETTING
+                && sc->type != SHORTCUT_SETTING_APPLY && sc->u.path[0])
             {
                 sc->icon = filetype_get_icon(filetype_get_attr(sc->u.path));
             }
@@ -401,17 +442,14 @@ void shortcuts_init(void)
     fd = open_utf8(SHORTCUTS_FILENAME, O_RDONLY);
     if (fd < 0)
         return;
-    first_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
-    if (first_handle <= 0) {
+    h = alloc_first_sc_handle();
+    if (!h) {
         close(fd);
         return;
     }
 
-    h = core_get_data(first_handle);
-    h->next_handle = 0;
-
     /* we enter readline_cb() multiple times with a buffer
-       obtained when we encounter a "[shortcut]" section.
+       obtained when we encounter a SHORTCUTS_HDR ("[shortcut]") section.
        fast_readline() might yield() -> protect buffer */
     ++buflib_move_lock;
 
@@ -429,11 +467,19 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
                                            char * buffer, size_t buffer_len)
 {
     (void)data;
-    struct shortcut *sc = get_shortcut(selected_item);
+    struct shortcut *sc = get_shortcut(selected_item, NULL);
     if (!sc)
         return "";
-    if (sc->type == SHORTCUT_SETTING)
-        return sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id));
+    const char *ret = sc->u.path;
+
+    if (sc->type == SHORTCUT_SETTING && sc->name[0] == '\0')
+        return P2STR(ID2P(sc->setting->lang_id));
+    else if (sc->type == SHORTCUT_SETTING_APPLY && sc->name[0] == '\0')
+    {
+        snprintf(buffer, buffer_len, "%s (%s)",
+                 P2STR(ID2P(sc->setting->lang_id)), sc->u.path);
+        return buffer;
+    }
     else if (sc->type == SHORTCUT_SEPARATOR)
         return sc->name;
     else if (sc->type == SHORTCUT_TIME)
@@ -463,13 +509,13 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         }
     }
 
-    return sc->name[0] ? sc->name : sc->u.path;
+    return sc->name[0] ? sc->name : ret;
 }
 
 static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
-    struct shortcut *sc = get_shortcut(selected_item);
+    struct shortcut *sc = get_shortcut(selected_item, NULL);
     if (sc)
     {
         if (sc->talk_clip[0])
@@ -523,9 +569,13 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
             case SHORTCUT_PLAYLISTMENU:
                 talk_file_or_spell(NULL, sc->u.path, NULL, false);
                 break;
+            case SHORTCUT_SETTING_APPLY:
             case SHORTCUT_SETTING:
-                talk_id(sc->u.setting->lang_id, false);
+                talk_id(sc->setting->lang_id, false);
+                if (sc->type == SHORTCUT_SETTING_APPLY)
+                    talk_spell(sc->u.path, true);
                 break;
+
             case SHORTCUT_TIME:
 #if CONFIG_RTC
                 if (sc->u.timedata.talktime)
@@ -557,11 +607,7 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
 static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 {
     (void)lists;
-    if (action == ACTION_STD_OK || action == ACTION_STD_MENU)
-        return ACTION_STD_CANCEL;
-    else if (action == ACTION_STD_QUICKSCREEN && action != ACTION_STD_CONTEXT)
-        return ACTION_STD_CANCEL;
-    else if (action == ACTION_STD_CONTEXT)
+    if (action == ACTION_STD_CONTEXT)
     {
         int selection = gui_synclist_get_sel_pos(lists);
 
@@ -580,50 +626,72 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
         first_idx_to_writeback = 0;
         overwrite_shortcuts = true;
         shortcuts_ata_idle_callback();
-        if (shortcut_count == 0)
-            return ACTION_STD_CANCEL;
 
-        shortcut_menu_speak_item(gui_synclist_get_sel_pos(lists), NULL);
-        return ACTION_REDRAW;
+        if (shortcut_count > 0)
+        {
+            shortcut_menu_speak_item(gui_synclist_get_sel_pos(lists), NULL);
+            return ACTION_REDRAW;
+        }
+
+        return ACTION_STD_CANCEL;
     }
+
+    if (action == ACTION_STD_OK
+     || action == ACTION_STD_MENU
+     || action == ACTION_STD_QUICKSCREEN)
+    {
+        return ACTION_STD_CANCEL;
+    }
+
     return action;
 }
 
 static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data)
 {
+    static const int8_t type_icons[SHORTCUT_TYPE_COUNT] = {
+        [SHORTCUT_SETTING] = Icon_Menu_setting,
+        [SHORTCUT_SETTING_APPLY] = Icon_Queued,
+        [SHORTCUT_DEBUGITEM] = Icon_Menu_functioncall,
+        [SHORTCUT_BROWSER] = Icon_Folder,
+        [SHORTCUT_PLAYLISTMENU] = Icon_Playlist,
+        [SHORTCUT_SEPARATOR] = Icon_NOICON,
+        [SHORTCUT_SHUTDOWN] = Icon_System_menu,
+        [SHORTCUT_REBOOT] = Icon_System_menu,
+        [SHORTCUT_TIME] = Icon_Menu_functioncall,
+        [SHORTCUT_FILE] = Icon_NOICON,
+    };
+
     (void)data;
     int icon;
-    struct shortcut *sc = get_shortcut(selected_item);
+    struct shortcut *sc = get_shortcut(selected_item, NULL);
     if (!sc)
         return Icon_NOICON;
     if (sc->icon == Icon_NOICON)
     {
-
-        switch (sc->type)
+        if (sc->type == SHORTCUT_BROWSER || sc->type == SHORTCUT_FILE)
         {
-            case SHORTCUT_FILE:
-                return filetype_get_icon(filetype_get_attr(sc->u.path));
-            case SHORTCUT_BROWSER:
-                icon = filetype_get_icon(filetype_get_attr(sc->u.path));
-                if (icon <= 0)
-                    icon = Icon_Folder;
+            icon = filetype_get_icon(filetype_get_attr(sc->u.path));
+            if (icon > 0)
                 return icon;
-            case SHORTCUT_SETTING:
-                return Icon_Menu_setting;
-            case SHORTCUT_DEBUGITEM:
-                return Icon_Menu_functioncall;
-            case SHORTCUT_PLAYLISTMENU:
-                return Icon_Playlist;
-            case SHORTCUT_SHUTDOWN:
-            case SHORTCUT_REBOOT:
-                return Icon_System_menu;
-            case SHORTCUT_TIME:
-                return Icon_Menu_functioncall;
-            default:
-                break;
         }
+        /* excluding SHORTCUT_UNDEFINED (-1) */
+        if (sc->type >= 0 && sc->type < SHORTCUT_TYPE_COUNT)
+            return type_icons[sc->type];
     }
     return sc->icon;
+}
+
+static void apply_new_setting(const struct settings_list *setting)
+{
+    settings_apply(false);
+    if (setting->flags & F_THEMESETTING)
+    {
+        settings_apply_skins();
+    }
+    if (setting->setting == &global_settings.sleeptimer_duration && get_sleep_timer())
+    {
+        set_sleeptimer_duration(global_settings.sleeptimer_duration);
+    }
 }
 
 int do_shortcut_menu(void *ignored)
@@ -665,7 +733,7 @@ int do_shortcut_menu(void *ignored)
             break;
         else
         {
-            sc = get_shortcut(list.selection);
+            sc = get_shortcut(list.selection, NULL);
 
             if (!sc)
                 continue;
@@ -711,22 +779,19 @@ int do_shortcut_menu(void *ignored)
 
                 }
                 break;
+                case SHORTCUT_SETTING_APPLY:
+                {
+                    bool theme_changed;
+                    string_to_cfg(sc->setting->cfg_name, sc->u.path, &theme_changed);
+                    settings_save();
+                    apply_new_setting(sc->setting);
+                    break;
+                }
                 case SHORTCUT_SETTING:
                 {
-                    int old_sleeptimer_duration = global_settings.sleeptimer_duration;
-#ifdef HAVE_ALBUMART
-                    int old_album_art = global_settings.album_art;
-#endif
-                    do_setting_screen(sc->u.setting,
-                            sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id)),NULL);
-
-#ifdef HAVE_ALBUMART
-                    if (old_album_art != global_settings.album_art)
-                        set_albumart_mode(global_settings.album_art);
-#endif
-                    if (old_sleeptimer_duration != global_settings.sleeptimer_duration &&
-                        get_sleep_timer())
-                        set_sleeptimer_duration(global_settings.sleeptimer_duration);
+                    do_setting_screen(sc->setting,
+                        sc->name[0] ? sc->name : P2STR(ID2P(sc->setting->lang_id)),NULL);
+                    apply_new_setting(sc->setting);
                     break;
                 }
                 case SHORTCUT_DEBUGITEM:

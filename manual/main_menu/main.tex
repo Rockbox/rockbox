@@ -286,6 +286,8 @@ settings. With a shortcut,
         a specified file or folder
   \item A file's or folder's ``Playing Next...'' context menu item can
         be displayed
+  \item A settings current value (any which can be added to the
+        \setting{Quick Screen})
   \item A setting can be configured (any which can be added to the
         \setting{Quick Screen})
   \item A debug menu item can be displayed (useful for developers mostly)
@@ -320,6 +322,9 @@ Available types are:
 \item[playlist menu] \config{data} is the file or the folder to open the
   ``Playing Next...'' context menu item on (see \reference{ref:playingnext_submenu})
 \item[setting] \config{data} is the config name of the setting you want to change
+  (see \reference{ref:config_file_options} for the list of the possible settings)
+\item[apply] \config{data} is the config name of the setting followed by ':' 
+  and the value you want applied. ex. 'data: volume: 20' would set the volume to 20 when selected
   (see \reference{ref:config_file_options} for the list of the possible settings)
 \item[debug] \config{data} is the name of the debug menu item to display
 \item[separator] \config{data} is ignored; \config{name} can be used to display text,

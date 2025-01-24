@@ -258,14 +258,114 @@ bool copy_filename_setting(char *buf, size_t buflen, const char *input,
     return true;
 }
 
+void string_to_cfg(const char *name, char* value, bool *theme_changed)
+{
+    const struct settings_list *setting = find_setting_by_cfgname(name);
+    if (!setting)
+        return;
+
+    uint32_t flags = setting->flags;
+
+    if (flags & F_THEMESETTING)
+        *theme_changed = true;
+
+    switch (flags & F_T_MASK)
+    {
+    case F_T_CUSTOM:
+        setting->custom_setting->load_from_cfg(setting->setting, value);
+        logf("Val: %s\r\n",value);
+        break;
+    case F_T_INT:
+    case F_T_UINT:
+#ifdef HAVE_LCD_COLOR
+        if (flags & F_RGB)
+        {
+            hex_to_rgb(value, (int*)setting->setting);
+            logf("Val: %s\r\n", value);
+        }
+        else
+#endif
+            if (setting_get_cfgvals(setting) == NULL)
+            {
+                *(int*)setting->setting = atoi(value);
+                logf("Val: %s\r\n",value);
+            }
+            else
+            {
+                int temp, *v = (int*)setting->setting;
+                bool found = cfg_string_to_int(setting, &temp, value);
+                if (found)
+                {
+                    if (flags & F_TABLE_SETTING)
+                        *v = setting->table_setting->values[temp];
+                    else
+                        *v = temp;
+                    logf("Val: %d\r\n", *v);
+                }
+                else if (flags & F_ALLOW_ARBITRARY_VALS)
+                {
+                    *v = atoi(value);
+                    logf("Val: %s = %d\r\n", value, *v);
+                }
+                else if (flags & F_TABLE_SETTING)
+                {
+                    const struct table_setting *info = setting->table_setting;
+                    temp = atoi(value);
+                    *v = setting->default_val.int_;
+                    if (info->values)
+                    {
+                        for(int i = 0; i < info->count; i++)
+                        {
+                            if (info->values[i] == temp)
+                            {
+                                *v = temp;
+                                break;
+                            }
+                        }
+                    }
+                    logf("Val: %s", *v == temp ? "Found":"Error Not Found");
+                    logf("Val: %s = %d\r\n", value, *v);
+                }
+
+                else
+                {
+                    logf("Error: %s: Not Found! [%s]\r\n",
+                                      setting->cfg_name, value);
+                }
+            }
+        break;
+    case F_T_BOOL:
+    {
+        int temp;
+        if (cfg_string_to_int(setting, &temp, value))
+        {
+            *(bool*)setting->setting = !!temp;
+            logf("Val: %s\r\n", value);
+        }
+        if (setting->bool_setting->option_callback)
+        {
+            setting->bool_setting->option_callback(!!temp);
+        }
+        break;
+    }
+    /* these can be plain text, filenames, or dirnames */
+    case F_T_CHARPTR:
+    case F_T_UCHARPTR:
+    {
+        const struct filename_setting *fs = setting->filename_setting;
+        copy_filename_setting((char*)setting->setting,
+                              fs->max_len, value, fs);
+        logf("Val: %s\r\n", value);
+        break;
+    }
+    }
+}
+
 bool settings_load_config(const char* file, bool apply)
 {
     logf("%s()\r\n", __func__);
-    const struct settings_list *setting;
     int fd;
     char line[128];
-    char* name;
-    char* value;
     bool theme_changed = false;
 
     fd = open_utf8(file, O_RDONLY);
@@ -274,106 +374,10 @@ bool settings_load_config(const char* file, bool apply)
 
     while (read_line(fd, line, sizeof line) > 0)
     {
+        char *name, *value;
         if (!settings_parseline(line, &name, &value))
             continue;
-
-        setting = find_setting_by_cfgname(name);
-        if (!setting)
-            continue;
-
-        if (setting->flags & F_THEMESETTING)
-            theme_changed = true;
-
-        switch (setting->flags & F_T_MASK)
-        {
-        case F_T_CUSTOM:
-            setting->custom_setting->load_from_cfg(setting->setting, value);
-            logf("Val: %s\r\n",value);
-            break;
-        case F_T_INT:
-        case F_T_UINT:
-#ifdef HAVE_LCD_COLOR
-            if (setting->flags & F_RGB)
-            {
-                hex_to_rgb(value, (int*)setting->setting);
-                logf("Val: %s\r\n", value);
-            }
-            else
-#endif
-                if (setting_get_cfgvals(setting) == NULL)
-                {
-                    *(int*)setting->setting = atoi(value);
-                    logf("Val: %s\r\n",value);
-                }
-                else
-                {
-                    int temp, *v = (int*)setting->setting;
-                    bool found = cfg_string_to_int(setting, &temp, value);
-                    if (found)
-                    {
-                        if (setting->flags & F_TABLE_SETTING)
-                            *v = setting->table_setting->values[temp];
-                        else
-                            *v = temp;
-                        logf("Val: %d\r\n", *v);
-                    }
-                    else if (setting->flags & F_ALLOW_ARBITRARY_VALS)
-                    {
-                        *v = atoi(value);
-                        logf("Val: %s = %d\r\n", value, *v);
-                    }
-                    else if (setting->flags & F_TABLE_SETTING)
-                    {
-                        const struct table_setting *info = setting->table_setting;
-                        temp = atoi(value);
-                        *v = setting->default_val.int_;
-                        if (info->values)
-                        {
-                            for(int i = 0; i < info->count; i++)
-                            {
-                                if (info->values[i] == temp)
-                                {
-                                    *v = temp;
-                                    break;
-                                }
-                            }
-                        }
-                        logf("Val: %s", *v == temp ? "Found":"Error Not Found");
-                        logf("Val: %s = %d\r\n", value, *v);
-                    }
-
-                    else
-                    {
-                        logf("Error: %s: Not Found! [%s]\r\n",
-                                          setting->cfg_name, value);
-                    }
-                }
-            break;
-        case F_T_BOOL:
-        {
-            int temp;
-            if (cfg_string_to_int(setting, &temp, value))
-            {
-                *(bool*)setting->setting = !!temp;
-                logf("Val: %s\r\n", value);
-            }
-            if (setting->bool_setting->option_callback)
-            {
-                setting->bool_setting->option_callback(!!temp);
-            }
-            break;
-        }
-        /* these can be plain text, filenames, or dirnames */
-        case F_T_CHARPTR:
-        case F_T_UCHARPTR:
-        {
-            const struct filename_setting *fs = setting->filename_setting;
-            copy_filename_setting((char*)setting->setting,
-                                  fs->max_len, value, fs);
-            logf("Val: %s\r\n", value);
-            break;
-        }
-        }
+        string_to_cfg(name, value, &theme_changed);
     } /* while(...) */
 
     close(fd);

@@ -288,6 +288,8 @@ const struct settings_list* find_setting_by_cfgname(const char* name);
 bool cfg_int_to_string(const struct settings_list *setting, int val, char* buf, int buf_len);
 bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str);
 void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len);
+void string_to_cfg(const char *name, char* value, bool *theme_changed);
+
 bool copy_filename_setting(char *buf, size_t buflen, const char *input,
                            const struct filename_setting *fs);
 bool set_bool_options(const char* string, const bool* variable,
