@@ -197,7 +197,7 @@ void radio_save_presets(void)
         close(fd);
 
         if (strcasestr(filepreset, FMPRESET_PATH))
-            set_file(filepreset, global_settings.fmr_file, MAX_FILENAME);
+            set_file(filepreset, global_settings.fmr_file);
         presets_changed = false;
     }
     else
@@ -240,7 +240,7 @@ void radio_load_presets(const char *filename)
 
     /* Preset inside the default folder? */
     if (strcasestr(filepreset, FMPRESET_PATH))
-        set_file(filepreset, global_settings.fmr_file, MAX_FILENAME);
+        set_file(filepreset, global_settings.fmr_file);
     /* else Temporary preset, loaded until player shuts down. */
 
     fd = open_utf8(filepreset, O_RDONLY);

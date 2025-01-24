@@ -308,7 +308,7 @@ bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              const char* (*formatter)(char*, size_t, int, const char*),
              int32_t (*get_talk_id)(int, int));
 
-void set_file(const char* filename, char* setting, const int maxlen);
+void set_file(const char* filename, char* setting);
 
 bool set_option(const char* string, const void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));

@@ -461,15 +461,15 @@ static void ft_load_font(char *file)
     {
         case 0: /* main lcd */
             screen = SCREEN_MAIN;
-            set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
+            set_file(file, (char *)global_settings.font_file);
             break;
         case 1: /* remote */
             screen = SCREEN_REMOTE;
-            set_file(file, (char *)global_settings.remote_font_file, MAX_FILENAME);
+            set_file(file, (char *)global_settings.remote_font_file);
             break;
     }
 #else
-    set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
+    set_file(file, (char *)global_settings.font_file);
 #endif
     splash(0, ID2P(LANG_WAIT));
     current_font_id = screens[screen].getuifont();
@@ -480,10 +480,10 @@ static void ft_load_font(char *file)
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
 }
 
-static void ft_apply_skin_file(char *buf, char *file, const int maxlen)
+static void ft_apply_skin_file(char *buf, char *file)
 {
     splash(0, ID2P(LANG_WAIT));
-    set_file(buf, file, maxlen);
+    set_file(buf, file);
     settings_apply_skins();
 }
 
@@ -639,30 +639,30 @@ int ft_enter(struct tree_context* c)
                 rc = GO_TO_FM;
                 break;
             case FILE_ATTR_FMS:
-                ft_apply_skin_file(buf, global_settings.fms_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.fms_file);
                 break;
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RFMS:
-                ft_apply_skin_file(buf, global_settings.rfms_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.rfms_file);
                 break;
 #endif
 #endif
             case FILE_ATTR_SBS:
-                ft_apply_skin_file(buf, global_settings.sbs_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.sbs_file);
                 break;
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RSBS:
-                ft_apply_skin_file(buf, global_settings.rsbs_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.rsbs_file);
                 break;
 #endif
                 /* wps config file */
             case FILE_ATTR_WPS:
-                ft_apply_skin_file(buf, global_settings.wps_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.wps_file);
                 break;
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case FILE_ATTR_RWPS:
-                ft_apply_skin_file(buf, global_settings.rwps_file, MAX_FILENAME);
+                ft_apply_skin_file(buf, global_settings.rwps_file);
                 break;
 #endif
             case FILE_ATTR_CFG:
@@ -685,8 +685,7 @@ int ft_enter(struct tree_context* c)
                     splash(HZ, ID2P(LANG_FAILED));
                     break;
                 }
-                set_file(buf, (char *)global_settings.lang_file,
-                        MAX_FILENAME);
+                set_file(buf, (char *)global_settings.lang_file);
                 talk_init(); /* use voice of same language */
                 viewportmanager_theme_changed(THEME_LANGUAGE);
                 settings_apply_skins();
@@ -701,7 +700,7 @@ int ft_enter(struct tree_context* c)
                 splash(0, ID2P(LANG_WAIT));
                 if (!load_kbd(buf))
                     splash(HZ, ID2P(LANG_KEYBOARD_LOADED));
-                set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
+                set_file(buf, (char *)global_settings.kbd_file);
                 break;
 
 #if defined(HAVE_ROLO)

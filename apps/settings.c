@@ -1284,8 +1284,9 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
  * Takes filename, removes the directory and the extension,
  * and then copies the basename into setting, unless the basename exceeds maxlen
  **/
-void set_file(const char* filename, char* setting, const int maxlen)
+void set_file(const char* filename, char* setting)
 {
+    const int maxlen = MAX_FILENAME;
     const char* fptr = strrchr(filename,'/');
     const char* extptr;
     int len;
@@ -1305,9 +1306,12 @@ void set_file(const char* filename, char* setting, const int maxlen)
 
     len = strlen(fptr) - extlen + 1;
 
-    /* error if filename isn't in ROCKBOX_DIR */
-    if (len > maxlen)
+    /* error later if filename isn't in ROCKBOX_DIR */
+    if (len > maxlen || !file_exists(filename))
+    {
+        DEBUGF("%s Error %s\n", __func__, filename);
         return;
+    }
 
     strmemccpy(setting, fptr, len);
     settings_save();
