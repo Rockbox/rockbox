@@ -535,6 +535,8 @@ private:
     void print_inst(const pseudo_node_inst_t& inst, bool end = true); // debug
     std::vector< soc_ref_t > list_socs(const std::vector< pseudo_node_inst_t >& list);
     bool generate_register(std::ostream& os, const pseudo_node_inst_t& reg);
+    bool generate_node(std::ostream& os, const pseudo_node_inst_t& node);
+    std::string generate_param_str(const std::vector<std::string>& params);
     bool generate_macro_header(error_context_t& ectx);
 protected:
     /// return true to generate support macros
@@ -543,6 +545,8 @@ protected:
     virtual bool has_support_macros() const = 0;
     /// return true to generate selector files
     virtual bool has_selectors() const = 0;
+    /// return true to generate node address and register offset macros
+    virtual bool has_offsets() const = 0;
     /// [selector only] return the directory name for the soc
     virtual std::string selector_soc_dir(const soc_ref_t& ref) const = 0;
     /// [selector only] return the header to include to select betweens socs
@@ -593,7 +597,9 @@ protected:
     /// prefix/suffix type
     enum macro_type_t
     {
+        MT_NODE_ADDR, /// node address
         MT_REG_ADDR, /// register address
+        MT_REG_OFFSET, /// register address relative to parent node
         MT_REG_TYPE, /// register type
         MT_REG_NAME, /// register prefix for fields
         MT_REG_INDEX, /// register index/indices
@@ -645,7 +651,7 @@ protected:
     /// generate address string for a register instance, and fill the parametric
     /// argument list, default does it the obvious way and parameters are _n1, _n2, ...
     virtual std::string register_address(const pseudo_node_inst_t& reg,
-        std::vector< std::string >& params) const;
+        std::vector< std::string >& params, bool offset_only = false) const;
     /// return access type for a variant and a given register access
     /// NOTE variant with the unspecified access type will be promoted to register access
     virtual access_type_t register_access(const std::string& variant, access_t access) const = 0;
@@ -766,8 +772,9 @@ std::string common_generator::safe_macro_paste(bool left, const std::string& mac
 void common_generator::gather_files(const pseudo_node_inst_t& inst, const std::string& prefix,
     std::map< std::string, std::vector< pseudo_node_inst_t > >& map)
 {
-    if(inst.inst.node().reg().valid())
+    if(!inst.inst.is_root())
         map[prefix + register_header(inst.inst)].push_back(inst);
+
     // if asked, generate one for each instance
     std::vector< node_inst_t > list = inst.inst.children();
     for(size_t i = 0; i < list.size(); i++)
@@ -814,15 +821,17 @@ std::string common_generator::header_include_guard(const std::string& filename)
 }
 
 std::string common_generator::register_address(const pseudo_node_inst_t& reg,
-    std::vector< std::string >& params) const
+    std::vector< std::string >& params, bool offset_only) const
 {
     std::ostringstream oss;
     unsigned counter = 1;
+    size_t start_index = offset_only ? reg.parametric.size() - 1 : 0;
     oss << "(";
-    for(size_t i = 0; i < reg.parametric.size(); i++)
+    for(size_t i = start_index; i < reg.parametric.size(); i++)
     {
-        if(i != 0)
+        if(i != start_index)
             oss << " + ";
+
         node_inst_t ninst = reg.inst.parent(reg.parametric.size() - i - 1);
         instance_t& inst = *ninst.get();
         if(reg.parametric[i])
@@ -889,19 +898,13 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
 {
     os << "\n";
     define_align_context_t ctx;
-    std::vector< std::string > params;
-    std::string addr = register_address(reg, params);
+    std::vector< std::string > addr_params;
+    std::vector< std::string > offset_params;
+    std::string addr = register_address(reg, addr_params);
+    std::string offset = register_address(reg, offset_params, true);
     std::string basename = macro_basename(reg);
-    std::string param_str;
-    std::string param_str_no_paren;
-    std::string param_str_no_paren_comma;
-    if(params.size() > 0)
-    {
-        for(size_t i = 0; i < params.size(); i++)
-            param_str_no_paren += (i == 0 ? "" : ",") + params[i];
-        param_str = "(" + param_str_no_paren + ")";
-        param_str_no_paren_comma = param_str_no_paren + ",";
-    }
+    std::string addr_param_str = generate_param_str(addr_params);
+    std::string offset_param_str = generate_param_str(offset_params);
     std::string bp_prefix = macro_basename(reg, MT_FIELD_BP) + field_prefix();
     std::string bm_prefix = macro_basename(reg, MT_FIELD_BM) + field_prefix();
     std::string bf_prefix = macro_basename(reg, MT_FIELD_BF) + field_prefix();
@@ -914,19 +917,26 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
     std::vector< std::string > var_prefix;
     std::vector< std::string > var_suffix;
     std::vector< std::string > var_addr;
+    std::vector< std::string > var_offset;
     std::vector< access_type_t > var_access;
+
     var_prefix.push_back("");
     var_suffix.push_back("");
     var_access.push_back(register_access("", regr.get()->access));
     var_addr.push_back(addr);
+    var_offset.push_back(offset);
+
     std::vector< variant_ref_t > variants = regr.variants();
     for(size_t i = 0; i < variants.size(); i++)
     {
         var_prefix.push_back(variant_xfix(variants[i].type(), true));
         var_suffix.push_back(variant_xfix(variants[i].type(), false));
         var_addr.push_back("(" + type_xfix(MT_REG_ADDR, true) + basename +
-            type_xfix(MT_REG_ADDR, false) + param_str + " + " +
+            type_xfix(MT_REG_ADDR, false) + addr_param_str + " + " +
             to_hex(variants[i].offset()) + ")");
+        var_offset.push_back("(" + type_xfix(MT_REG_OFFSET, true) + basename +
+            type_xfix(MT_REG_OFFSET, false) + offset_param_str + " + " +
+            to_hex(variants[i].offset()));
         access_t acc = variants[i].get()->access;
         if(acc == UNSPECIFIED)
             acc = regr.get()->access; // fallback to register access
@@ -940,6 +950,8 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
             type_xfix(MT_REG_VAR, false);
         std::string macro_addr = type_xfix(MT_REG_ADDR, true) + var_basename +
             type_xfix(MT_REG_ADDR, false);
+        std::string macro_offset = type_xfix(MT_REG_OFFSET, true) + var_basename +
+            type_xfix(MT_REG_OFFSET, false);
         std::string macro_type = type_xfix(MT_REG_TYPE, true) + var_basename +
             type_xfix(MT_REG_TYPE, false);
         std::string macro_prefix = type_xfix(MT_REG_NAME, true) + var_basename +
@@ -953,22 +965,29 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
         if(!has_support_macros())
         {
             std::ostringstream oss;
-            oss << "(*(volatile uint" << regr.get()->width << "_t *)" << macro_addr + param_str << ")";
-            ctx.add(macro_var + param_str, oss.str());
+            oss << "(*(volatile uint" << regr.get()->width << "_t *)" << macro_addr + addr_param_str << ")";
+            ctx.add(macro_var + addr_param_str, oss.str());
         }
         else
-            ctx.add(macro_var + param_str, macro_name(MN_VARIABLE) + "(" + var_basename + param_str + ")");
+            ctx.add(macro_var + addr_param_str, macro_name(MN_VARIABLE) + "(" + var_basename + addr_param_str + ")");
         /* print ADDR macro */
-        ctx.add(macro_addr + param_str, var_addr[i]);
+        ctx.add(macro_addr + addr_param_str, var_addr[i]);
+
+        if(has_offsets())
+        {
+            /* print OFFSET macro */
+            ctx.add(macro_offset + offset_param_str, var_offset[i]);
+        }
+
         /* disable macros if needed */
         if(has_support_macros())
         {
             /* print TYPE macro */
-            ctx.add(macro_type + param_str, register_type_name(var_access[i], regr.get()->width));
+            ctx.add(macro_type + addr_param_str, register_type_name(var_access[i], regr.get()->width));
             /* print PREFIX macro */
-            ctx.add(macro_prefix + param_str, basename);
+            ctx.add(macro_prefix + addr_param_str, basename);
             /* print INDEX macro */
-            ctx.add(macro_index + param_str, param_str);
+            ctx.add(macro_index + addr_param_str, addr_param_str);
         }
     }
     /* print fields */
@@ -1007,6 +1026,40 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
 
     ctx.print(os);
     return true;
+}
+
+bool common_generator::generate_node(std::ostream& os, const pseudo_node_inst_t& node)
+{
+    os << "\n";
+    define_align_context_t ctx;
+    std::vector< std::string > params;
+    std::string addr = register_address(node, params);
+    std::string basename = macro_basename(node);
+    std::string param_str = generate_param_str(params);
+    std::string macro_addr = type_xfix(MT_NODE_ADDR, true) + basename +
+        type_xfix(MT_NODE_ADDR, false);
+
+    ctx.add(macro_addr + param_str, addr);
+
+    ctx.print(os);
+    return true;
+}
+
+std::string common_generator::generate_param_str(const std::vector<std::string>& params)
+{
+    std::string param_str;
+
+    if(params.size() > 0)
+    {
+        param_str = "(";
+
+        for(size_t i = 0; i < params.size(); i++)
+            param_str += (i == 0 ? "" : ",") + params[i];
+
+        param_str += ")";
+    }
+
+    return param_str;
 }
 
 bool common_generator::generate_macro_header(error_context_t& ectx)
@@ -1564,11 +1617,23 @@ bool common_generator::generate(error_context_t& ectx)
 
         for(size_t i = 0; i < it->second.size(); i++)
         {
-            if(!generate_register(fout, it->second[i]))
+            if(it->second[i].inst.node().reg().valid())
             {
-                printf("Cannot generate register");
-                print_inst(it->second[i]);
-                return false;
+                if(!generate_register(fout, it->second[i]))
+                {
+                    printf("Cannot generate register ");
+                    print_inst(it->second[i]);
+                    return false;
+                }
+            }
+            else if(has_offsets() && !it->second[i].inst.node().is_root())
+            {
+                if(!generate_node(fout, it->second[i]))
+                {
+                    printf("Cannot generate node ");
+                    print_inst(it->second[i]);
+                    return false;
+                }
             }
         }
 
@@ -1644,6 +1709,11 @@ class jz_generator : public common_generator
     bool has_selectors() const
     {
         return m_soc.size() >= 2;
+    }
+
+    bool has_offsets() const
+    {
+        return false;
     }
 
     std::string selector_soc_dir(const soc_ref_t& ref) const
@@ -1811,6 +1881,11 @@ class imx_generator : public common_generator
         return m_soc.size() >= 2;
     }
 
+    bool has_offsets() const
+    {
+        return false;
+    }
+
     std::string selector_soc_dir(const soc_ref_t& ref) const
     {
         return ref.get()->name;
@@ -1974,6 +2049,11 @@ class atj_generator : public common_generator
     }
 
     bool has_selectors() const
+    {
+        return false;
+    }
+
+    bool has_offsets() const
     {
         return false;
     }
