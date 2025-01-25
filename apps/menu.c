@@ -408,7 +408,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     menu_callback_type menu_callback = &empty_menu_callback;
 
     /* if hide_theme is true, assume parent has been fixed before passed into
-     * this function, e.g. with viewport_set_defaults(parent, screen) 
+     * this function, e.g. with viewport_set_defaults(parent, screen)
      * start_action allows an action to be processed
      * by menu logic by bypassing get_action on the initial run */
     start_action = init_menu_lists(menu, &lists, selected, true, parent);
@@ -521,7 +521,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                         ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                                         ID2P(LANG_RESET_SETTING),
 #ifndef HAVE_QUICKSCREEN
-                                        };
+                                       );
                     context_menu = &settings_op_menu;
 #else
                                         ID2P(LANG_TOP_QS_ITEM),
@@ -610,7 +610,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             {
                 stack_top--;
                 menu = mstack[stack_top].menu;
-                int msel = mstack[stack_top].selected; 
+                int msel = mstack[stack_top].selected;
                 if (!exiting_menu && (menu->flags&MENU_EXITAFTERTHISMENU))
                     done = true;
                 else
