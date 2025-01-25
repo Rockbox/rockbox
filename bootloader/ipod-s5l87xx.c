@@ -613,11 +613,6 @@ void main(void)
 {
     int rc = 0;
 
-#ifndef S5L87XX_DEVELOPMENT_BOOTLOADER
-    unsigned char *loadbuffer;
-    int (*kernel_entry)(void);
-#endif
-
     usec_timer_init();
 
 #ifdef S5L87XX_DEVELOPMENT_BOOTLOADER
@@ -763,7 +758,7 @@ void main(void)
     }
 
     printf("Loading Rockbox...");
-    loadbuffer = (unsigned char *)DRAM_ORIG;
+    unsigned char *loadbuffer = (unsigned char *)DRAM_ORIG;
     rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
 
     if (rc <= EFILE_EMPTY) {
@@ -778,7 +773,7 @@ void main(void)
     /* If we get here, we have a new firmware image at 0x08000000, run it */
     disable_irq();
 
-    kernel_entry = (void*) loadbuffer;
+    int (*kernel_entry)(void) = (void*)loadbuffer;
     commit_discard_idcache();
     rc = kernel_entry();
 
