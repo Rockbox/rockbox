@@ -559,6 +559,45 @@ end:
     while (button_status() != BUTTON_SELECT)
         sleep(HZ/100);
 }
+
+#ifdef HAVE_SERIAL
+
+#define FLASH_PAGES (FLASH_SIZE >> 12)
+#define FLASH_PAGE_SIZE (FLASH_SIZE >> 8)
+
+static void dump_bootflash(void)
+{
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    line = 0;
+    
+    uint8_t page[FLASH_PAGE_SIZE];
+    printf("Total pages: %d", FLASH_PAGES);
+    
+    bootflash_init(SPI_PORT);
+
+    for (int i = 0; i < FLASH_PAGES; i++) {
+        printf("Reading flash... %d", i + 1);
+        bootflash_read(SPI_PORT, i << 12, FLASH_PAGE_SIZE, page);
+
+        printf("Sending over UART... %d", i + 1);
+        serial_tx_raw(page, FLASH_PAGE_SIZE);
+        line -= 2;
+    }
+
+    bootflash_close(SPI_PORT);
+
+    line += 2;
+    printf("Done!");
+    piezo_seq(alive);
+
+    line++;
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+}
+#endif /* HAVE_SERIAL */
 #endif /* IPOD_6G || IPOD_NANO3G */
 
 static void devel_menu(void)
@@ -571,6 +610,9 @@ static void devel_menu(void)
         "GPIO info",
 #if defined(IPOD_6G) || defined(IPOD_NANO3G)
         "Show SysCfg",
+#ifdef HAVE_SERIAL
+        "Dump bootflash to UART",
+#endif
 #endif
         "Launch OF",
         //"Launch Rockbox",
@@ -585,6 +627,9 @@ static void devel_menu(void)
         gpio_info,
 #if defined(IPOD_6G) || defined(IPOD_NANO3G)
         print_syscfg,
+#ifdef HAVE_SERIAL
+        dump_bootflash,
+#endif
 #endif
         run_of,
         //run_rockbox,
