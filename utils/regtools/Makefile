@@ -24,3 +24,4 @@ $(LIB):
 
 clean:
 	rm -fr $(EXEC)
+	make -C lib clean

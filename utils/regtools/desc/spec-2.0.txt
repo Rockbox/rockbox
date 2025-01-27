@@ -146,7 +146,43 @@ are:
 - F[2] at 0x50+(2/2)*0x100+(2%2)*0x10 = 0x50+0x100 = 0x150
 - F[3] at 0x50+(3/2)*0x100+(3%2)*0x10 = 0x50+0x100+0x10 = 0x160
 
-1.3) Node description
+1.3) Floating and 'nochild' instances
+-------------------------------------
+
+Floating instances do not have an fixed address and instead "float" relative
+to a base address provided at runtime. Child nodes and registers are generated
+as usual, except that their addresses will not be defined, only their offsets
+relative to their floating parent node.
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>F</name>
+    <floating>1</floating>
+  </instance>
+</node>
+
+Instances with the 'nochild' flag will emit their own base address, but won't
+generate any child nodes or registers themselves. They can be used alongside
+floating nodes to provide the base addresses for SoC peripheral instances:
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>F</name>
+    <nochild>1</nochild>
+    <address>0x1234</address>
+  </instance>
+</node>
+
+Nochild instances can use both <address> and <range> for specifying their
+address.
+
+For generic code, storing the base address and computing offsets can generate
+more efficient code compared to indexed macros that calculate the base address,
+especially when the addresses don't follow a simple formula.
+
+1.4) Node description
 ---------------------
 
 For documentation purposes, node can of course carry some description, as well
@@ -177,7 +213,7 @@ The following example illustrates this:
   </instance>
 </node>
 
-1.4) Register description
+1.5) Register description
 --------------------------
 
 The goal of the register description is of course to describe registers!
@@ -247,7 +283,7 @@ In this example, the 8-bit registers has three fields:
 - PRIORITY(2:1): it has no named values
 - ARM_MODE(3): it has two named values IRQ(0) and FIQ(1)
 
-1.5) Register inheritance
+1.6) Register inheritance
 -------------------------
 
 The node hierarchy specifies instances, that is pairs of (path,address),
@@ -286,7 +322,7 @@ This example describes one register (let's call it blabla) and 9 instances:
 - DMAC.I2C_CHAN.CLR at 0x80000018, register blabla
 - DMAC.I2C_CHAN.TOG at 0x8000001C, register blabla
 
-1.6) Soc description
+1.7) Soc description
 --------------------
 
 The description file must also specify some information about the system-on-chip
@@ -352,8 +388,10 @@ It can contain at most one of each of the following tags:
 - desc: free form description of the instance
 - address: address for a single instance (non-negative number)
 - range: address range for multiple instances
-Note that address and range are mutually exclusive, and at least one of them
-must exists.
+- floating: 0 or 1, if 1 then the instance is floating and has no address
+- nochild: 0 or 1, if 1 then no child instances/registers are generated
+Note that address, range, and floating are mutually exclusive, and at least
+one of them must exist. An instance cannot be both floating and nochild.
 
 Element: range
 --------------

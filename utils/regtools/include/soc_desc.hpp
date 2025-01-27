@@ -230,7 +230,8 @@ struct instance_t
     enum type_t
     {
         SINGLE, /** There is a single instance at a specified address */
-        RANGE /** There are multiple addresses forming a range */
+        RANGE, /** There are multiple addresses forming a range */
+        FLOATING, /** Instance generates child register offsets/fields only */
     };
 
     soc_id_t id; /** ID (must be unique among node instances) */
@@ -240,9 +241,10 @@ struct instance_t
     type_t type; /** Instance type */
     soc_word_t addr; /** Address (for SINGLE) */
     range_t range; /** Range (for RANGE) */
+    bool nochild; /** Disable child node generation if set */
 
     /** Default constructor: single instance at 0 */
-    instance_t():id(DEFAULT_ID), type(SINGLE), addr(0) {}
+    instance_t():id(DEFAULT_ID), type(SINGLE), addr(0), nochild(false) {}
 };
 
 /** Node information */
@@ -544,6 +546,8 @@ public:
     node_inst_t child(const std::string& name, size_t index) const;
     /** Returns a list of all instances of subnodes of this node's instance */
     std::vector< node_inst_t > children() const;
+    /** Check if the instance's nochild flag is set */
+    bool is_nochild() const;
     /** Returns the name of the instance */
     std::string name() const;
     /** Checks whether this instance is indexed */

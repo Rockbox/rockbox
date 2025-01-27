@@ -887,6 +887,8 @@ std::string common_generator::register_address(const pseudo_node_inst_t& reg,
         }
         else if(inst.type == instance_t::SINGLE)
             oss << to_hex(inst.addr);
+        else if (inst.type == instance_t::FLOATING)
+            return "";
         else
             return "#error unknown instance type";
     }
@@ -911,6 +913,7 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
     std::string bfm_prefix = macro_basename(reg, MT_FIELD_BFM) + field_prefix();
     std::string bfv_prefix = macro_basename(reg, MT_FIELD_BFV) + field_prefix();
     std::string bfmv_prefix = macro_basename(reg, MT_FIELD_BFMV) + field_prefix();
+    bool has_addr = !addr.empty();
 
     register_ref_t regr = reg.inst.node().reg();
     /* handle register the same way as variants */
@@ -923,7 +926,8 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
     var_prefix.push_back("");
     var_suffix.push_back("");
     var_access.push_back(register_access("", regr.get()->access));
-    var_addr.push_back(addr);
+    if(has_addr)
+        var_addr.push_back(addr);
     var_offset.push_back(offset);
 
     std::vector< variant_ref_t > variants = regr.variants();
@@ -931,9 +935,12 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
     {
         var_prefix.push_back(variant_xfix(variants[i].type(), true));
         var_suffix.push_back(variant_xfix(variants[i].type(), false));
-        var_addr.push_back("(" + type_xfix(MT_REG_ADDR, true) + basename +
-            type_xfix(MT_REG_ADDR, false) + addr_param_str + " + " +
-            to_hex(variants[i].offset()) + ")");
+        if (has_addr)
+        {
+            var_addr.push_back("(" + type_xfix(MT_REG_ADDR, true) + basename +
+                type_xfix(MT_REG_ADDR, false) + addr_param_str + " + " +
+                to_hex(variants[i].offset()) + ")");
+        }
         var_offset.push_back("(" + type_xfix(MT_REG_OFFSET, true) + basename +
             type_xfix(MT_REG_OFFSET, false) + offset_param_str + " + " +
             to_hex(variants[i].offset()));
@@ -962,16 +969,26 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
          * if we have support macros then we generate something like HW(basename)
          * where HW is some support macros to support complex operations. Otherwise
          * we just generate something like (*(volatile unsigned uintN_t)basename_addr) */
-        if(!has_support_macros())
+        if (has_addr)
         {
-            std::ostringstream oss;
-            oss << "(*(volatile uint" << regr.get()->width << "_t *)" << macro_addr + addr_param_str << ")";
-            ctx.add(macro_var + addr_param_str, oss.str());
+            if(!has_support_macros())
+            {
+                std::ostringstream oss;
+                oss << "(*(volatile uint" << regr.get()->width << "_t *)" <<
+                    macro_addr + addr_param_str << ")";
+                ctx.add(macro_var + addr_param_str, oss.str());
+            }
+            else
+            {
+                ctx.add(macro_var + addr_param_str, macro_name(MN_VARIABLE) +
+                    "(" + var_basename + addr_param_str + ")");
+            }
+
+            /* print ADDR macro */
+            ctx.add(macro_addr + addr_param_str, var_addr[i]);
         }
         else
             ctx.add(macro_var + addr_param_str, macro_name(MN_VARIABLE) + "(" + var_basename + addr_param_str + ")");
-        /* print ADDR macro */
-        ctx.add(macro_addr + addr_param_str, var_addr[i]);
 
         if(has_offsets())
         {
@@ -1030,7 +1047,6 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
 
 bool common_generator::generate_node(std::ostream& os, const pseudo_node_inst_t& node)
 {
-    os << "\n";
     define_align_context_t ctx;
     std::vector< std::string > params;
     std::string addr = register_address(node, params);
@@ -1038,8 +1054,13 @@ bool common_generator::generate_node(std::ostream& os, const pseudo_node_inst_t&
     std::string param_str = generate_param_str(params);
     std::string macro_addr = type_xfix(MT_NODE_ADDR, true) + basename +
         type_xfix(MT_NODE_ADDR, false);
+    bool has_addr = !addr.empty();
 
-    ctx.add(macro_addr + param_str, addr);
+    if (has_addr)
+    {
+        os << "\n";
+        ctx.add(macro_addr + param_str, addr);
+    }
 
     ctx.print(os);
     return true;

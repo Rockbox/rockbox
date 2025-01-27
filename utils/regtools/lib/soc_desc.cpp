@@ -458,24 +458,37 @@ bool parse_instance_elem(xmlNode *node, instance_t& inst, error_context_t& ctx)
 {
     bool ret = true;
     bool has_name = false, has_title = false, has_desc = false, has_range = false;
-    bool has_address = false;
+    bool has_address = false, has_floating = false, has_nochild = false;
+    unsigned floating = 0, nochild = 0;
     BEGIN_NODE_MATCH(node->children)
         MATCH_UNIQUE_TEXT_NODE("name", inst.name, has_name, parse_name_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("title", inst.title, has_title, parse_text_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("desc", inst.desc, has_desc, parse_text_elem, ctx)
+        MATCH_UNIQUE_TEXT_NODE("nochild", nochild, has_nochild, parse_unsigned_elem, ctx)
+        MATCH_UNIQUE_TEXT_NODE("floating", floating, has_floating, parse_unsigned_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("address", inst.addr, has_address, parse_unsigned_elem, ctx)
         MATCH_UNIQUE_ELEM_NODE("range", inst.range, has_range, parse_range_elem, ctx)
         MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "name", has_name, ctx)
-    if(!has_address && !has_range)
+    if(!has_address && !has_range && !floating)
         ret = ret && parse_missing_error(node, "address> or <range", ctx);
     if(has_address && has_range)
         ret = ret && parse_conflict_error(node, "address", "range", ctx);
-    if(has_address)
+    if(floating && has_address)
+        ret = ret && parse_conflict_error(node, "floating", "address", ctx);
+    if(floating && has_range)
+        ret = ret && parse_conflict_error(node, "floating", "range", ctx);
+    if(floating && nochild)
+        ret = ret && parse_conflict_error(node, "floating", "nochild", ctx);
+    if(floating)
+        inst.type = instance_t::FLOATING;
+    else if(has_address)
         inst.type = instance_t::SINGLE;
     else
         inst.type = instance_t::RANGE;
+    if (nochild)
+        inst.nochild = true;
     return ret;
 }
 
@@ -1620,7 +1633,7 @@ node_inst_t node_inst_t::child(const std::string& name) const
 node_inst_t node_inst_t::child(const std::string& name, size_t index) const
 {
     std::vector< node_t > *nodes = get_children(m_node);
-    if(nodes == 0)
+    if(nodes == 0 || is_nochild())
         return node_inst_t();
     node_ref_t child_node = m_node;
     for(size_t i = 0; i < nodes->size(); i++)
@@ -1648,7 +1661,7 @@ std::vector< node_inst_t > node_inst_t::children() const
     std::vector< node_t > *nodes = get_children(m_node);
     std::vector< soc_id_t > n_path = m_id_path;
     std::vector< size_t > i_path = m_index_path;
-    if(nodes == 0)
+    if(nodes == 0 || is_nochild())
         return list;
     node_ref_t child_node = m_node;
     for(size_t i = 0; i < nodes->size(); i++)
@@ -1661,6 +1674,7 @@ std::vector< node_inst_t > node_inst_t::children() const
             n_path.push_back(inst.id);
             switch(inst.type)
             {
+                case instance_t::FLOATING:
                 case instance_t::SINGLE:
                     i_path.push_back(INST_NO_INDEX);
                     list.push_back(node_inst_t(child_node, n_path, i_path));
@@ -1682,6 +1696,12 @@ std::vector< node_inst_t > node_inst_t::children() const
         child_node.m_path.pop_back();
     }
     return list;
+}
+
+bool node_inst_t::is_nochild() const
+{
+    instance_t *inst = get();
+    return inst == 0 ? false : inst->nochild;
 }
 
 std::string node_inst_t::name() const
