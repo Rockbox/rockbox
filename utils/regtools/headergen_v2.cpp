@@ -529,15 +529,6 @@ class common_generator : public abstract_generator
     };
 public:
     virtual bool generate(error_context_t& ctx);
-private:
-    void gather_files(const pseudo_node_inst_t& inst, const std::string& prefix,
-        std::map< std::string, std::vector< pseudo_node_inst_t > >& map);
-    void print_inst(const pseudo_node_inst_t& inst, bool end = true); // debug
-    std::vector< soc_ref_t > list_socs(const std::vector< pseudo_node_inst_t >& list);
-    bool generate_register(std::ostream& os, const pseudo_node_inst_t& reg);
-    bool generate_node(std::ostream& os, const pseudo_node_inst_t& node);
-    std::string generate_param_str(const std::vector<std::string>& params);
-    bool generate_macro_header(error_context_t& ectx);
 protected:
     /// return true to generate support macros
     /// if false then all macros are disabled except MT_REG_ADDR, MT_REG_VAR,
@@ -583,7 +574,7 @@ protected:
         MN_VARIABLE, /// return variable-like for register
     };
     /// return macro name defined in the macro header
-    virtual std::string macro_name(macro_name_t macro) const = 0;
+    virtual std::string macro_name(macro_name_t macro, bool relative = false) const = 0;
     /// flag to consider
     enum register_flag_t
     {
@@ -658,7 +649,7 @@ protected:
     /// return register type name
     virtual std::string register_type_name(access_type_t access, int width) const;
     /// get register operation name
-    virtual std::string register_op_name(register_op_t op) const;
+    virtual std::string register_op_name(register_op_t op, bool relative = false) const;
     /// register operation prefix
     virtual std::string register_op_prefix() const;
     /// generate a macro pasting that is safe even when macro is empty
@@ -670,6 +661,21 @@ protected:
     /// return the associated SCT variant (only if RF_GENERATE_SCT)
     /// empty means don't generate
     virtual std::string sct_variant(macro_name_t name) const = 0;
+
+private:
+    void gather_files(const pseudo_node_inst_t& inst, const std::string& prefix,
+        std::map< std::string, std::vector< pseudo_node_inst_t > >& map);
+    void print_inst(const pseudo_node_inst_t& inst, bool end = true); // debug
+    std::vector< soc_ref_t > list_socs(const std::vector< pseudo_node_inst_t >& list);
+    bool generate_register(std::ostream& os, const pseudo_node_inst_t& reg);
+    bool generate_node(std::ostream& os, const pseudo_node_inst_t& node);
+    std::string generate_param_str(const std::vector<std::string>& params);
+    void generate_macro_type_ops(access_type_t at, int width, bool relative,
+                                 define_align_context_t& ctx);
+    void generate_macro_reg_ops(const std::string& bf_readx,
+                                const std::string& bf_or,
+                                bool relative, std::ofstream& fout);
+    bool generate_macro_header(error_context_t& ectx);
 };
 
 std::string common_generator::instance_name(const node_inst_t& inst, bool parametric) const
@@ -745,14 +751,14 @@ std::string common_generator::register_type_name(access_type_t access, int width
     return type_xfix(MT_IO_TYPE, true) + oss.str() + type_xfix(MT_IO_TYPE, false);
 }
 
-std::string common_generator::register_op_name(register_op_t op) const
+std::string common_generator::register_op_name(register_op_t op, bool relative) const
 {
     switch(op)
     {
-        case RO_VAR: return "VAR";
-        case RO_READ: return "RD";
-        case RO_WRITE: return "WR";
-        case RO_RMW: return "RMW";
+        case RO_VAR: return relative ? "VARREL" : "VAR";
+        case RO_READ: return relative ? "RDREL" : "RD";
+        case RO_WRITE: return relative ? "WRREL" : "WR";
+        case RO_RMW: return relative ? "RMWREL" : "RMW";
         default: return "<op>";
     }
 }
@@ -1083,6 +1089,352 @@ std::string common_generator::generate_param_str(const std::vector<std::string>&
     return param_str;
 }
 
+void common_generator::generate_macro_type_ops(access_type_t at, int width, bool relative,
+                                               define_align_context_t& ctx)
+{
+    std::string io_type = register_type_name(at, width);
+    macro_type_t mt = relative ? MT_REG_OFFSET : MT_REG_ADDR;
+    std::string args = relative ? "name, base" : "name";
+    std::string reg_addr = safe_macro_paste(false, type_xfix(mt, true))
+        + "name" + safe_macro_paste(true, type_xfix(mt, false));
+
+    if(relative)
+        reg_addr = "(base) + " + reg_addr;
+
+    // read
+    std::ostringstream oss;
+    if(at == AT_RO)
+        oss << "(*(const volatile uint" << width << "_t *)(" << reg_addr << "))";
+    else if(at == AT_RW)
+        oss << "(*(volatile uint" << width << "_t *)(" << reg_addr << "))";
+    else
+        oss << "({_Static_assert(0, #name \" is write-only\"); 0;})";
+    ctx.add(io_type + register_op_prefix() + register_op_name(RO_READ, relative) + "(" + args + ", ...)",
+            oss.str());
+    // write
+    oss.str("");
+    if(at != AT_RO)
+        oss << "(*(volatile uint" << width << "_t *)(" << reg_addr << ")) = (val)";
+    else
+        oss << "_Static_assert(0, #name \" is read-only\")";
+    ctx.add(io_type + register_op_prefix() + register_op_name(RO_WRITE, relative) + "(" + args + ", val)",
+            oss.str());
+    // read-modify-write
+    oss.str("");
+    if(at == AT_RW)
+    {
+        oss << io_type << register_op_prefix() << register_op_name(RO_WRITE, relative) + "(" + args + ", ";
+        oss << "(" << io_type << register_op_prefix() << register_op_name(RO_READ, relative) + "(" + args + ") & (vand))";
+        oss << " | (vor))";
+    }
+    else if(at == AT_WO)
+        oss << io_type << register_op_prefix() << register_op_name(RO_WRITE, relative) + "(" + args + ", vor)";
+    else
+        oss << "_Static_assert(0, #name \" is read-only\")";
+    ctx.add(io_type + register_op_prefix() + register_op_name(RO_RMW, relative) + "(" + args + ", vand, vor)",
+            oss.str());
+    // variable
+    oss.str("");
+    if(at == AT_RO)
+        oss << "(*(const volatile uint" << width << "_t *)(" << reg_addr << "))";
+    else
+        oss << "(*(volatile uint" << width << "_t *)(" << reg_addr << "))";
+    ctx.add(io_type + register_op_prefix() + register_op_name(RO_VAR, relative) + "(" + args + ", ...)",
+            oss.str());
+}
+
+void common_generator::generate_macro_reg_ops(const std::string& bf_readx,
+                                              const std::string& bf_or,
+                                              bool relative, std::ofstream& fout)
+{
+    std::string args = relative ? "base, name" : "name";
+    std::string argswap = relative ? "name, base" : "name";
+    std::string argbase = relative ? "base, " : "";
+    std::string docline;
+
+    if(relative)
+        docline = " * register address is calculated by offsetting from the base address\n";
+
+    /* print REG_READ macro */
+    std::string reg_read = macro_name(MN_REG_READ, relative);
+    fout << "/** " << reg_read << "\n";
+    fout << " *\n";
+    fout << " * usage: " << reg_read << "(" << argbase << "register)\n";
+    fout << " *\n";
+    fout << " * effect: read the register and return its value\n";
+    fout << docline;
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " *\n";
+    fout << " * example: " << reg_read << "(" << argbase << "ICOLL_STATUS)\n";
+    fout << " *          " << reg_read << "(" << argbase << "ICOLL_ENABLE(42))\n";
+    fout << " */\n";
+    fout << "#define " << reg_read << "(" << args << ") "
+         << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+         << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+         << "(" << register_op_name(RO_READ, relative) << ", " << argswap << ")\n";
+    fout << "\n";
+
+    /* print FIELD_READ macro */
+    std::string bf_read = macro_name(MN_FIELD_READ, relative);
+    fout << "/** " << bf_read << "\n";
+    fout << " *\n";
+    fout << " * usage: " << bf_read << "(" << argbase << "register, field)\n";
+    fout << " *\n";
+    fout << " * effect: read a register and return the value of a particular field\n";
+    fout << docline;
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " *\n";
+    fout << " * example: " << bf_read << "(" << argbase << "ICOLL_CTRL, SFTRST)\n";
+    fout << " *          " << bf_read << "(" << argbase << "ICOLL_ENABLE(3), CPU0_PRIO)\n";
+    fout << " */\n";
+    fout << "#define " << bf_read << "(" << args << ", field) " << bf_read << "_("
+         << reg_read << "(" << args << "), " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+         << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", field)\n";
+    fout << "#define " << bf_read << "_(...) " << bf_readx << "(__VA_ARGS__)\n";
+    fout << "\n";
+
+    /* print REG_WRITE macro */
+    std::string reg_write = macro_name(MN_REG_WRITE, relative);
+    fout << "/** " << reg_write << "\n";
+    fout << " *\n";
+    fout << " * usage: " << reg_write << "(" << argbase << "register, value)\n";
+    fout << " *\n";
+    fout << " * effect: write a register\n";
+    fout << docline;
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " *\n";
+    fout << " * example: " << reg_write << "(" << argbase << "ICOLL_CTRL, 0x42)\n";
+    fout << " *          " << reg_write << "(" << argbase << "ICOLL_ENABLE_SET(3), 0x37)\n";
+    fout << " */\n";
+    fout << "#define " << reg_write << "(" << args << ", val) "
+         << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+         << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+         << "(" << register_op_name(RO_WRITE, relative) << ", " << argswap << ", val)\n";
+    fout << "\n";
+
+    /* print FIELD_WRITE macro */
+    std::string bf_write = macro_name(MN_FIELD_WRITE, relative);
+    fout << "/** " << bf_write << "\n";
+    fout << " *\n";
+    fout << " * usage: " << bf_write << "(" << argbase << "register, f1(v1), f2(v2), ...)\n";
+    fout << " *\n";
+    fout << " * effect: change the register value so that field fi has value vi\n";
+    fout << docline;
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " * note: this macro may perform a read-modify-write\n";
+    fout << " *\n";
+    fout << " * example: " << bf_write << "(" << argbase << "ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
+    fout << " *          " << bf_write << "(" << argbase << "ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
+    fout << " */\n";
+    fout << "#define " << bf_write << "(" << args << ", ...) "
+         << bf_write << "_(" << args << ", " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+         << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
+    fout << "#define " << bf_write << "_(" << args << ", name2, ...) "
+         << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+         << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+         << "(" << register_op_name(RO_RMW, relative) << ", " << argswap << ", "
+         << "~" << macro_name(MN_FIELD_OR_MASK) << "(name2, __VA_ARGS__), "
+         << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
+    fout << "\n";
+
+    /* print FIELD_OVERWRITE macro */
+    std::string bf_overwrite = macro_name(MN_FIELD_OVERWRITE, relative);
+    fout << "/** " << bf_overwrite << "\n";
+    fout << " *\n";
+    fout << " * usage: " << bf_overwrite << "(" << argbase << "register, f1(v1), f2(v2), ...)\n";
+    fout << " *\n";
+    fout << " * effect: change the register value so that field fi has value vi and other fields have value zero\n";
+    fout << docline;
+    fout << " *         thus this macro is equivalent to:\n";
+    fout << " *         " << reg_write << "(" << argbase << "register, " << bf_or << "(register, f1(v1), ...))\n";
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " * note: this macro will overwrite the register (it is NOT a read-modify-write)\n";
+    fout << " *\n";
+    fout << " * example: " << bf_overwrite << "(ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
+    fout << " *          " << bf_overwrite << "(ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
+    fout << " */\n";
+    fout << "#define " << bf_overwrite << "(" << args << ", ...) "
+         << bf_overwrite << "_(" << args << ", " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+         << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
+    fout << "#define " << bf_overwrite << "_(" << args << ", name2, ...) "
+         << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+         << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+         << "(" << register_op_name(RO_WRITE, relative) << ", " << argswap << ", "
+         << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
+    fout << "\n";
+
+    /* print FIELD_SET/FIELD_CLEAR macro */
+    for(int i = 0; i < 2; i++)
+    {
+        macro_name_t n = (i == 0) ? MN_FIELD_SET : MN_FIELD_CLEAR;
+        std::string bf_set = macro_name(n, relative);
+        std::string set_var = sct_variant(n);
+
+        fout << "/** " << bf_set << "\n";
+        fout << " *\n";
+        fout << " * usage: " << bf_set << "(" << argbase << "register, f1, f2, ...)\n";
+        fout << " *\n";
+        fout << " * effect: change the register value so that field fi has ";
+        if(i == 0)
+            fout << "maximum value\n";
+        else
+            fout << "value zero\n";
+        fout << docline;
+        if(has_sct())
+            fout << " * IMPORTANT: this macro performs a write to the " << set_var << " variant of the register\n";
+        else
+            fout << " * note: this macro will perform a read-modify-write\n";
+
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << bf_set << "(" << argbase << "ICOLL_CTRL, SFTRST, CLKGATE)\n";
+        fout << " *          " << bf_set << "(" << argbase << "ICOLL_ENABLE(3), CPU0_PRIO, CPU0_TYPE)\n";
+        fout << " */\n";
+
+        if(has_sct())
+        {
+            fout << "#define " << bf_set << "(" << args << ", ...) " << bf_set << "_(" << argbase
+                 << macro_name(MN_GET_VARIANT) << "(name, " << variant_xfix(set_var, true)
+                 << ", " << variant_xfix(set_var, false) << "), "
+                 << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+                 << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false))
+                 << ", __VA_ARGS__)\n";
+            fout << "#define " << bf_set << "_(" << args << ", name2, ...) " << macro_name(MN_REG_WRITE, relative)
+                 << "(" << args << ", " << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__))\n";
+        }
+        else
+        {
+            fout << "#define " << bf_set << "(" << args << ", ...) "
+                 << bf_set << "_(" << args << ", " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+                 << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
+            fout << "#define " << bf_set << "_(" << args << ", name2, ...) "
+                 << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+                 << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+                 << "(" << register_op_name(RO_RMW, relative) << ", " << argswap << ", ~";
+            if(i == 0)
+                fout << "0," << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__))\n";
+            else
+                fout << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__), 0)\n";
+        }
+        fout << "\n";
+    }
+
+    if(has_sct())
+    {
+        std::string set_var = sct_variant(MN_FIELD_SET);
+        std::string clr_var = sct_variant(MN_FIELD_CLEAR);
+
+        /* print REG_SET */
+        std::string reg_set = macro_name(MN_REG_SET, relative);
+        fout << "/** " << reg_set << "\n";
+        fout << " *\n";
+        fout << " * usage: " << reg_set << "(" << argbase << "register, set_value)\n";
+        fout << " *\n";
+        fout << " * effect: set some bits using " << set_var << " variant\n";
+        fout << docline;
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << reg_set << "(" << argbase << "ICOLL_CTRL, 0x42)\n";
+        fout << " *          " << reg_set << "(" << argbase << "ICOLL_ENABLE(3), 0x37)\n";
+        fout << " */\n";
+        fout << "#define " << reg_set << "(" << args << ", sval) "
+             << reg_set << "_(" << argbase << macro_name(MN_GET_VARIANT) << "(name, "
+             << variant_xfix(set_var, true) << ", " << variant_xfix(set_var, false)
+             << "), sval)\n";
+        fout << "#define " << reg_set << "_(" << args << ", sval) "
+             << macro_name(MN_REG_WRITE, relative) << "(" << args << ", sval)\n";
+        fout << "\n";
+
+        /* print REG_CLR */
+        std::string reg_clr = macro_name(MN_REG_CLEAR, relative);
+        fout << "/** " << reg_clr << "\n";
+        fout << " *\n";
+        fout << " * usage: " << reg_clr << "(" << argbase << "register, clr_value)\n";
+        fout << " *\n";
+        fout << " * effect: clear some bits using " << clr_var << " variant\n";
+        fout << docline;
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << reg_clr << "(" << argbase << "ICOLL_CTRL, 0x42)\n";
+        fout << " *          " << reg_clr << "(" << argbase << "ICOLL_ENABLE(3), 0x37)\n";
+        fout << " */\n";
+        fout << "#define " << reg_clr << "(" << args << ", cval) "
+             << reg_clr << "_(" << argbase << macro_name(MN_GET_VARIANT) << "(name, "
+             << variant_xfix(clr_var, true) << ", " << variant_xfix(clr_var, false)
+             << "), cval)\n";
+        fout << "#define " << reg_clr << "_(" << args << ", cval) "
+             << macro_name(MN_REG_WRITE, relative) << "(" << args << ", cval)\n";
+        fout << "\n";
+
+        /* print REG_CS */
+        std::string reg_cs = macro_name(MN_REG_CLEAR_SET, relative);
+        fout << "/** " << reg_cs << "\n";
+        fout << " *\n";
+        fout << " * usage: " << reg_cs << "(" << argbase << "register, clear_value, set_value)\n";
+        fout << " *\n";
+        fout << " * effect: clear some bits using " << clr_var << " variant and then set some using " << set_var << " variant\n";
+        fout << docline;
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << reg_cs << "(" << argbase << "ICOLL_CTRL, 0xff, 0x42)\n";
+        fout << " *          " << reg_cs << "(" << argbase << "ICOLL_ENABLE(3), 0xff, 0x37)\n";
+        fout << " */\n";
+        fout << "#define " << reg_cs << "(" << args << ", cval, sval) "
+             << reg_cs << "_(" << argbase << macro_name(MN_GET_VARIANT) << "(name, "
+             << variant_xfix(clr_var, true) << ", " << variant_xfix(clr_var, false) << "), "
+             << macro_name(MN_GET_VARIANT) << "(name, " << variant_xfix(set_var, true)
+             << ", " << variant_xfix(set_var, false) << "), cval, sval)\n";
+        fout << "#define " << reg_cs << "_(" << argbase << "cname, sname, cval, sval) "
+             << "do { " << macro_name(MN_REG_WRITE) << "(" << argbase << "cname, cval); "
+             << macro_name(MN_REG_WRITE, relative) << "(" << argbase << "sname, sval); } while(0)\n";
+        fout << "\n";
+
+        /* print BF_CS */
+        std::string bf_cs = macro_name(MN_FIELD_CLEAR_SET, relative);
+        fout << "/** " << bf_cs << "\n";
+        fout << " *\n";
+        fout << " * usage: " << bf_cs << "(" << argbase << "register, f1(v1), f2(v2), ...)\n";
+        fout << " *\n";
+        fout << " * effect: change the register value so that field fi has value vi using " << clr_var << " and " << set_var << " variants\n";
+        fout << docline;
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " * note: this macro will NOT perform a read-modify-write and is thus safer\n";
+        fout << " * IMPORTANT: this macro will set some fields to 0 temporarily, make sure this is acceptable\n";
+        fout << " *\n";
+        fout << " * example: " << bf_cs << "(" << argbase << "ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
+        fout << " *          " << bf_cs << "(" << argbase << "ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
+        fout << " */\n";
+        fout << "#define " << bf_cs << "(" << args << ", ...) "
+             << bf_cs << "_(" << args << ", " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+             << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
+        fout << "#define " << bf_cs << "_(" << args << ", name2, ...) "
+             << macro_name(MN_REG_CLEAR_SET, relative) << "(" << args << ", " << macro_name(MN_FIELD_OR_MASK)
+             << "(name2, __VA_ARGS__), " << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
+        fout << "\n";
+    }
+
+    /* print REG_VAR macro */
+    std::string reg_var = macro_name(MN_VARIABLE, relative);
+    fout << "/** " << reg_var << "\n";
+    fout << " *\n";
+    fout << " * usage: " << reg_var << "(" << argbase << "register)\n";
+    fout << " *\n";
+    fout << " * effect: return a variable-like expression that can be read/written\n";
+    fout << docline;
+    fout << " * note: register must be fully qualified if indexed\n";
+    fout << " * note: read-only registers will yield a constant expression\n";
+    fout << " *\n";
+    fout << " * example: unsigned x = " << reg_var << "(" << argbase << "ICOLL_STATUS)\n";
+    fout << " *          unsigned x = " << reg_var << "(" << argbase << "ICOLL_ENABLE(42))\n";
+    fout << " *          " << reg_var << "(" << argbase << "ICOLL_ENABLE(42)) = 64\n";
+    fout << " */\n";
+    fout << "#define " << reg_var << "(" << args << ") "
+         << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
+         << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
+         << "(" << register_op_name(RO_VAR, relative) << ", " << args << ")\n";
+    fout << "\n";
+}
+
 bool common_generator::generate_macro_header(error_context_t& ectx)
 {
     /* only generate if we need support macros */
@@ -1163,48 +1515,11 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
         {
             std::string io_type = register_type_name(at[i], width[j]);
             ctx.add(io_type + "(op, name, ...)", io_type + register_op_prefix() + "##op(name, __VA_ARGS__)");
-            // read
-            std::ostringstream oss;
-            std::string reg_addr = safe_macro_paste(false, type_xfix(MT_REG_ADDR, true))
-                + "name" + safe_macro_paste(true, type_xfix(MT_REG_ADDR, false));
-            if(at[i] == AT_RO)
-                oss << "(*(const volatile uint" << width[j] << "_t *)(" << reg_addr << "))";
-            else if(at[i] == AT_RW)
-                oss << "(*(volatile uint" << width[j] << "_t *)(" << reg_addr << "))";
-            else
-                oss << "({_Static_assert(0, #name \" is write-only\"); 0;})";
-            ctx.add(io_type + register_op_prefix() + register_op_name(RO_READ) + "(name, ...)",
-                oss.str());
-            // write
-            oss.str("");
-            if(at[i] != AT_RO)
-                oss << "(*(volatile uint" << width[j] << "_t *)(" << reg_addr << ")) = (val)";
-            else
-                oss << "_Static_assert(0, #name \" is read-only\")";
-            ctx.add(io_type + register_op_prefix() + register_op_name(RO_WRITE) + "(name, val)",
-                oss.str());
-            // read-modify-write
-            oss.str("");
-            if(at[i] == AT_RW)
-            {
-                oss << io_type << register_op_prefix() << register_op_name(RO_WRITE) + "(name, ";
-                oss << "(" << io_type << register_op_prefix() << register_op_name(RO_READ) + "(name) & (vand))";
-                oss << " | (vor))";
-            }
-            else if(at[i] == AT_WO)
-                oss << io_type << register_op_prefix() << register_op_name(RO_WRITE) + "(name, vor)";
-            else
-                oss << "_Static_assert(0, #name \" is read-only\")";
-            ctx.add(io_type + register_op_prefix() + register_op_name(RO_RMW) + "(name, vand, vor)",
-                oss.str());
-            // variable
-            oss.str("");
-            if(at[i] == AT_RO)
-                oss << "(*(const volatile uint" << width[j] << "_t *)(" << reg_addr << "))";
-            else
-                oss << "(*(volatile uint" << width[j] << "_t *)(" << reg_addr << "))";
-            ctx.add(io_type + register_op_prefix() + register_op_name(RO_VAR) + "(name, ...)",
-                oss.str());
+
+            generate_macro_type_ops(at[i], width[j], false, ctx);
+
+            if(has_offsets())
+                generate_macro_type_ops(at[i], width[j], true, ctx);
 
             ctx.add_raw("\n");
         }
@@ -1285,24 +1600,6 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
         << "##reg##" << field_prefix() << ", __VA_ARGS__)\n\n";
     fout << "\n";
 
-    /* print REG_READ macro */
-    std::string reg_read = macro_name(MN_REG_READ);
-    fout << "/** " << reg_read << "\n";
-    fout << " *\n";
-    fout << " * usage: " << reg_read << "(register)\n";
-    fout << " *\n";
-    fout << " * effect: read a register and return its value\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " *\n";
-    fout << " * example: " << reg_read << "(ICOLL_STATUS)\n";
-    fout << " *          " << reg_read << "(ICOLL_ENABLE(42))\n";
-    fout << " */\n";
-    fout << "#define " << reg_read << "(name) "
-        << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-        << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-        << "(" << register_op_name(RO_READ) << ", name)\n";
-    fout << "\n";
-
     /* print FIELD_READX macro */
     std::string bf_readx = macro_name(MN_FIELD_READX);
     fout << "/** " << bf_readx << "\n";
@@ -1325,91 +1622,6 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
         << ")\n";
     fout << "\n";
 
-    /* print FIELD_READ macro */
-    std::string bf_read = macro_name(MN_FIELD_READ);
-    fout << "/** " << bf_read << "\n";
-    fout << " *\n";
-    fout << " * usage: " << bf_read << "(register, field)\n";
-    fout << " *\n";
-    fout << " * effect: read a register and return the value of a particular field\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " *\n";
-    fout << " * example: " << bf_read << "(ICOLL_CTRL, SFTRST)\n";
-    fout << " *          " << bf_read << "(ICOLL_ENABLE(3), CPU0_PRIO)\n";
-    fout << " */\n";
-    fout << "#define " << bf_read << "(name, field) " << bf_read << "_("
-        << reg_read << "(name), " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-        << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", field)\n";
-    fout << "#define " << bf_read << "_(...) " << bf_readx << "(__VA_ARGS__)\n";
-    fout << "\n";
-
-    /* print REG_WRITE macro */
-    std::string reg_write = macro_name(MN_REG_WRITE);
-    fout << "/** " << reg_write << "\n";
-    fout << " *\n";
-    fout << " * usage: " << reg_write << "(register, value)\n";
-    fout << " *\n";
-    fout << " * effect: write a register\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " *\n";
-    fout << " * example: " << reg_write << "(ICOLL_CTRL, 0x42)\n";
-    fout << " *          " << reg_write << "(ICOLL_ENABLE_SET(3), 0x37)\n";
-    fout << " */\n";
-    fout << "#define " << reg_write << "(name, val) "
-        << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-        << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-        << "(" << register_op_name(RO_WRITE) << ", name, val)\n";
-    fout << "\n";
-
-    /* print FIELD_WRITE macro */
-    std::string bf_write = macro_name(MN_FIELD_WRITE);
-    fout << "/** " << bf_write << "\n";
-    fout << " *\n";
-    fout << " * usage: " << bf_write << "(register, f1(v1), f2(v2), ...)\n";
-    fout << " *\n";
-    fout << " * effect: change the register value so that field fi has value vi\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " * note: this macro may perform a read-modify-write\n";
-    fout << " *\n";
-    fout << " * example: " << bf_write << "(ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
-    fout << " *          " << bf_write << "(ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
-    fout << " */\n";
-    fout << "#define " << bf_write << "(name, ...) "
-        << bf_write << "_(name, " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-        << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
-    fout << "#define " << bf_write << "_(name, name2, ...) "
-        << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-        << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-        << "(" << register_op_name(RO_RMW) << ", name, "
-        << "~" << macro_name(MN_FIELD_OR_MASK) << "(name2, __VA_ARGS__), "
-        << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
-    fout << "\n";
-
-    /* print FIELD_OVERWRITE macro */
-    std::string bf_overwrite = macro_name(MN_FIELD_OVERWRITE);
-    fout << "/** " << bf_overwrite << "\n";
-    fout << " *\n";
-    fout << " * usage: " << bf_overwrite << "(register, f1(v1), f2(v2), ...)\n";
-    fout << " *\n";
-    fout << " * effect: change the register value so that field fi has value vi and other fields have value zero\n";
-    fout << " *         thus this macro is equivalent to:\n";
-    fout << " *         " << reg_write << "(register, " << bf_or << "(register, f1(v1), ...))\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " * note: this macro will overwrite the register (it is NOT a read-modify-write)\n";
-    fout << " *\n";
-    fout << " * example: " << bf_overwrite << "(ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
-    fout << " *          " << bf_overwrite << "(ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
-    fout << " */\n";
-    fout << "#define " << bf_overwrite << "(name, ...) "
-        << bf_overwrite << "_(name, " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-        << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
-    fout << "#define " << bf_overwrite << "_(name, name2, ...) "
-        << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-        << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-        << "(" << register_op_name(RO_WRITE) << ", name, "
-        << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
-    fout << "\n";
-
     /* print FIELD_WRITEX macro */
     std::string bf_writex = macro_name(MN_FIELD_WRITEX);
     fout << "/** " << bf_writex << "\n";
@@ -1427,170 +1639,10 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
         << macro_name(MN_FIELD_OR_MASK) << "(name, __VA_ARGS__) & (var))\n";
     fout << "\n";
 
-    /* print FIELD_SET/FIELD_CLEAR macro */
-    for(int i = 0; i < 2; i++)
-    {
-        macro_name_t n = (i == 0) ? MN_FIELD_SET : MN_FIELD_CLEAR;
-        std::string bf_set = macro_name(n);
-        std::string set_var = sct_variant(n);
+    generate_macro_reg_ops(bf_readx, bf_or, false, fout);
 
-        fout << "/** " << bf_set << "\n";
-        fout << " *\n";
-        fout << " * usage: " << bf_set << "(register, f1, f2, ...)\n";
-        fout << " *\n";
-        fout << " * effect: change the register value so that field fi has ";
-        if(i == 0)
-            fout << "maximum value\n";
-        else
-            fout << "value zero\n";
-        if(has_sct())
-            fout << " * IMPORTANT: this macro performs a write to the " << set_var << " variant of the register\n";
-        else
-            fout << " * note: this macro will perform a read-modify-write\n";
-
-        fout << " * note: register must be fully qualified if indexed\n";
-        fout << " *\n";
-        fout << " * example: " << bf_set << "(ICOLL_CTRL, SFTRST, CLKGATE)\n";
-        fout << " *          " << bf_set << "(ICOLL_ENABLE(3), CPU0_PRIO, CPU0_TYPE)\n";
-        fout << " */\n";
-
-        if(has_sct())
-        {
-            fout << "#define " << bf_set << "(name, ...) " << bf_set << "_("
-                << macro_name(MN_GET_VARIANT) << "(name, " << variant_xfix(set_var, true)
-                << ", " << variant_xfix(set_var, false) << "), "
-                << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-                << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false))
-                << ", __VA_ARGS__)\n";
-            fout << "#define " << bf_set << "_(name, name2, ...) " << macro_name(MN_REG_WRITE)
-                << "(name, " << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__))\n";
-        }
-        else
-        {
-            fout << "#define " << bf_set << "(name, ...) "
-                << bf_set << "_(name, " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-                << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
-            fout << "#define " << bf_set << "_(name, name2, ...) "
-                << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-                << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-                << "(" << register_op_name(RO_RMW) << ", name, ~";
-            if(i == 0)
-                fout << "0," << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__))\n";
-            else
-                fout << macro_name(MN_MASK_OR) << "(name2, __VA_ARGS__), 0)\n";
-        }
-        fout << "\n";
-    }
-
-    if(has_sct())
-    {
-        std::string set_var = sct_variant(MN_FIELD_SET);
-        std::string clr_var = sct_variant(MN_FIELD_CLEAR);
-
-        /* print REG_SET */
-        std::string reg_set = macro_name(MN_REG_SET);
-        fout << "/** " << reg_set << "\n";
-        fout << " *\n";
-        fout << " * usage: " << reg_set << "(register, set_value)\n";
-        fout << " *\n";
-        fout << " * effect: set some bits using " << set_var << " variant\n";
-        fout << " * note: register must be fully qualified if indexed\n";
-        fout << " *\n";
-        fout << " * example: " << reg_set << "(ICOLL_CTRL, 0x42)\n";
-        fout << " *          " << reg_set << "(ICOLL_ENABLE(3), 0x37)\n";
-        fout << " */\n";
-        fout << "#define " << reg_set << "(name, sval) "
-            << reg_set << "_(" << macro_name(MN_GET_VARIANT) << "(name, "
-            << variant_xfix(set_var, true) << ", " << variant_xfix(set_var, false)
-            << "), sval)\n";
-        fout << "#define " << reg_set << "_(sname, sval) "
-            << macro_name(MN_REG_WRITE) << "(sname, sval)\n";
-        fout << "\n";
-
-        /* print REG_CLR */
-        std::string reg_clr = macro_name(MN_REG_CLEAR);
-        fout << "/** " << reg_clr << "\n";
-        fout << " *\n";
-        fout << " * usage: " << reg_clr << "(register, clr_value)\n";
-        fout << " *\n";
-        fout << " * effect: clear some bits using " << clr_var << " variant\n";
-        fout << " * note: register must be fully qualified if indexed\n";
-        fout << " *\n";
-        fout << " * example: " << reg_clr << "(ICOLL_CTRL, 0x42)\n";
-        fout << " *          " << reg_clr << "(ICOLL_ENABLE(3), 0x37)\n";
-        fout << " */\n";
-        fout << "#define " << reg_clr << "(name, cval) "
-            << reg_clr << "_(" << macro_name(MN_GET_VARIANT) << "(name, "
-            << variant_xfix(clr_var, true) << ", " << variant_xfix(clr_var, false)
-            << "), cval)\n";
-        fout << "#define " << reg_clr << "_(cname, cval) "
-            << macro_name(MN_REG_WRITE) << "(cname, cval)\n";
-        fout << "\n";
-
-        /* print REG_CS */
-        std::string reg_cs = macro_name(MN_REG_CLEAR_SET);
-        fout << "/** " << reg_cs << "\n";
-        fout << " *\n";
-        fout << " * usage: " << reg_cs << "(register, clear_value, set_value)\n";
-        fout << " *\n";
-        fout << " * effect: clear some bits using " << clr_var << " variant and then set some using " << set_var << " variant\n";
-        fout << " * note: register must be fully qualified if indexed\n";
-        fout << " *\n";
-        fout << " * example: " << reg_cs << "(ICOLL_CTRL, 0xff, 0x42)\n";
-        fout << " *          " << reg_cs << "(ICOLL_ENABLE(3), 0xff, 0x37)\n";
-        fout << " */\n";
-        fout << "#define " << reg_cs << "(name, cval, sval) "
-            << reg_cs << "_(" << macro_name(MN_GET_VARIANT) << "(name, "
-            << variant_xfix(clr_var, true) << ", " << variant_xfix(clr_var, false) << "), "
-            << macro_name(MN_GET_VARIANT) << "(name, " << variant_xfix(set_var, true)
-            << ", " << variant_xfix(set_var, false) << "), cval, sval)\n";
-        fout << "#define " << reg_cs << "_(cname, sname, cval, sval) "
-            << "do { " << macro_name(MN_REG_WRITE) << "(cname, cval); "
-            << macro_name(MN_REG_WRITE) << "(sname, sval); } while(0)\n";
-        fout << "\n";
-
-        /* print BF_CS */
-        std::string bf_cs = macro_name(MN_FIELD_CLEAR_SET);
-        fout << "/** " << bf_cs << "\n";
-        fout << " *\n";
-        fout << " * usage: " << bf_cs << "(register, f1(v1), f2(v2), ...)\n";
-        fout << " *\n";
-        fout << " * effect: change the register value so that field fi has value vi using " << clr_var << " and " << set_var << " variants\n";
-        fout << " * note: register must be fully qualified if indexed\n";
-        fout << " * note: this macro will NOT perform a read-modify-write and is thus safer\n";
-        fout << " * IMPORTANT: this macro will set some fields to 0 temporarily, make sure this is acceptable\n";
-        fout << " *\n";
-        fout << " * example: " << bf_cs << "(ICOLL_CTRL, SFTRST(1), CLKGATE(0), TZ_LOCK_V(UNLOCKED))\n";
-        fout << " *          " << bf_cs << "(ICOLL_ENABLE(3), CPU0_PRIO(1), CPU0_TYPE_V(FIQ))\n";
-        fout << " */\n";
-        fout << "#define " << bf_cs << "(name, ...) "
-            << bf_cs << "_(name, " << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-            << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", __VA_ARGS__)\n";
-        fout << "#define " << bf_cs << "_(name, name2, ...) "
-            << macro_name(MN_REG_CLEAR_SET) << "(name, " << macro_name(MN_FIELD_OR_MASK)
-            << "(name2, __VA_ARGS__), " << macro_name(MN_FIELD_OR) << "(name2, __VA_ARGS__))\n";
-        fout << "\n";
-    }
-
-    /* print REG_VAR macro */
-    std::string reg_var = macro_name(MN_VARIABLE);
-    fout << "/** " << reg_var << "\n";
-    fout << " *\n";
-    fout << " * usage: " << reg_var << "(register)\n";
-    fout << " *\n";
-    fout << " * effect: return a variable-like expression that can be read/written\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " * note: read-only registers will yield a constant expression\n";
-    fout << " *\n";
-    fout << " * example: unsigned x = " << reg_var << "(ICOLL_STATUS)\n";
-    fout << " *          unsigned x = " << reg_var << "(ICOLL_ENABLE(42))\n";
-    fout << " *          " << reg_var << "(ICOLL_ENABLE(42)) = 64\n";
-    fout << " */\n";
-    fout << "#define " << reg_var << "(name) "
-        << safe_macro_paste(false, type_xfix(MT_REG_TYPE, true)) << "name"
-        << safe_macro_paste(true, type_xfix(MT_REG_TYPE, false))
-        << "(" << register_op_name(RO_VAR) << ", name)\n";
-    fout << "\n";
+    if(has_offsets())
+        generate_macro_reg_ops(bf_readx, bf_or, true, fout);
 
     print_guard(fout, guard, false);
     fout.close();
@@ -1763,7 +1815,7 @@ class jz_generator : public common_generator
             return register_header(inst.parent());
     }
 
-    std::string macro_name(macro_name_t macro) const
+    std::string macro_name(macro_name_t macro, bool relative) const
     {
         switch(macro)
         {
@@ -1933,7 +1985,7 @@ class imx_generator : public common_generator
             return register_header(inst.parent());
     }
 
-    std::string macro_name(macro_name_t macro) const
+    std::string macro_name(macro_name_t macro, bool relative) const
     {
         switch(macro)
         {
@@ -2107,7 +2159,7 @@ class atj_generator : public common_generator
             return register_header(inst.parent());
     }
 
-    std::string macro_name(macro_name_t macro) const
+    std::string macro_name(macro_name_t macro, bool relative) const
     {
         // no macros are generated
         return "<macro_name>";
