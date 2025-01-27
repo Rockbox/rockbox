@@ -2896,7 +2896,7 @@ int debug_menu(void)
 bool run_debug_screen(char* screen)
 {
     for (unsigned i=0; i<ARRAYLEN(menuitems); i++)
-        if (!strcmp(screen, menuitems[i].desc))
+        if (!strcasecmp(screen, menuitems[i].desc))
         {
             FOR_NB_SCREENS(j)
                viewportmanager_theme_enable(j, false, NULL);
