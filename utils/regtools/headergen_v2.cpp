@@ -1459,7 +1459,7 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
      * and more n>=2, using multiple layers of macros:
      * __VAR_ORn(pre, s01, s02, ..., sn) expands to pre##s01 | .. | pre##sn */
     std::string var_or = "__VAR_OR";
-    const int MAX_N = 13;
+    const int MAX_N = 20;
 
     fout << "#define " << var_or << "1(prefix, suffix) \\\n";
     fout << "    (prefix##suffix)\n";
