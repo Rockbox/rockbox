@@ -16555,3 +16555,17 @@
     *: "재생목록이 완료되었습니다. 다시 재생할까요?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "현재 항목을 바로가기에 추가"
+  </dest>
+  <voice>
+    *: "현재 항목을 바로가기에 추가"
+  </voice>
+</phrase>

@@ -16500,3 +16500,59 @@
     *: "traccia salvata"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Aggiungi corrente alle scorciatoie"
+  </dest>
+  <voice>
+    *: "Aggiungi corrente alle scorciatoie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "~Logging"
+  </dest>
+  <voice>
+    *: "~logging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Visualizza log"
+  </dest>
+  <voice>
+    *: "visualizza log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "La playlist è finita. Riprodurla di nuovo?"
+  </dest>
+  <voice>
+    *: "La playlist è finita. Riprodurla di nuovo?"
+  </voice>
+</phrase>

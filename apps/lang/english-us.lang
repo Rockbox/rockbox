@@ -16538,3 +16538,17 @@
     *: "Playlist finished. Play again?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Add Current to Shortcuts"
+  </dest>
+  <voice>
+    *: "Add Current to Shortcuts"
+  </voice>
+</phrase>

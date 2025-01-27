@@ -16548,3 +16548,17 @@
     *: "Lista odtwarzania ukończona. Odtworzyć ponownie?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Dodaj bieżące do skrótów"
+  </dest>
+  <voice>
+    *: "Dodaj bieżące do skrótów"
+  </voice>
+</phrase>
