@@ -73,11 +73,14 @@ class Node:
         return node
 
 class Instance:
-    def __init__(self, name, addr, stride=None, count=None):
+    def __init__(self, name, addr=None, stride=None, count=None,
+                 floating=False, nochild=False):
         self.name = name
         self.address = addr
         self.stride = stride
         self.count = count
+        self.floating = floating
+        self.nochild = nochild
 
     def gen(self):
         node = E("instance", E("name", self.name))
@@ -88,8 +91,14 @@ class Instance:
                           E("count", self.count),
                           E("base", self.address),
                           E("stride", self.stride)))
-        else:
+        elif self.address is not None:
             node.append(E("address", self.address))
+
+        if self.floating:
+            node.append(E("floating", "1"))
+
+        if self.nochild:
+            node.append(E("nochild", "1"))
 
         return node
 
@@ -262,19 +271,36 @@ class Parser:
 
     def parse_instance(self, default_name):
         words = self.parse_wordline(False)[0]
+        is_floating = False
+        is_nochild = False
 
-        if len(words) == 1:
+        while len(words) > 0:
+            if words[0] == 'floating':
+                is_floating = True
+            elif words[0] == 'nochild':
+                is_nochild = True
+            else:
+                break
+            words = words[1:]
+
+        if is_floating:
+            if len(words) != 0:
+                self.err('malformed instance statement')
+            return Instance(default_name, floating=True)
+        elif len(words) == 1:
             # instance ADDR
-            return Instance(default_name, words[0])
+            return Instance(default_name, words[0], nochild=is_nochild)
         elif len(words) == 2:
             # instance NAME ADDR
-            return Instance(words[0], words[1])
+            return Instance(words[0], words[1], nochild=is_nochild)
         elif len(words) == 3:
             # instance ADDR STRIDE COUNT
-            return Instance(default_name, words[0], words[1], words[2])
+            return Instance(default_name, words[0], words[1], words[2],
+                            nochild=is_nochild)
         elif len(words) == 4:
             # instance NAME ADDR STRIDE COUNT
-            return Instance(words[0], words[1], words[2], words[3])
+            return Instance(words[0], words[1], words[2], words[3],
+                            nochild=is_nochild)
         else:
             self.err('malformed instance statement')
 
