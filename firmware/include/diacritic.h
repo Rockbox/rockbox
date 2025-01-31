@@ -22,9 +22,19 @@
 #define _DIACRITIC_H_
 #include "system.h"
 
+#define FIRST_DIACRITIC (0x0300)
 /* Tests whether a given charactor code is a diacritic mark.
  * Sets is_rtl (if it's not NULL) to whether the character
  * belongs to an RTL language.
- */
+*/
 bool is_diacritic(const unsigned short char_code, bool *is_rtl);
+
+/* Note IS_DIACRITIC macros may elide the function call
+ * therefore there is a separate _RTL version that requires a bool pointer
+ * as it sets the variable to false when the is_diacritic func is skipped
+*/
+#define IS_DIACRITIC(c) (c >= FIRST_DIACRITIC && is_diacritic(c, NULL))
+/* sets the rtl variable to false when function call is skipped */
+#define IS_DIACRITIC_RTL(c, rtl) ((c >= FIRST_DIACRITIC || ( (*rtl = false) )) && is_diacritic(c, rtl))
+
 #endif

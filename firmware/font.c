@@ -1084,7 +1084,7 @@ int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *
 
     for (str = utf8decode(str, &ch); ch != 0 && b < maxbytes; str = utf8decode(str, &ch), b--)
     {
-        if (is_diacritic(ch, NULL))
+        if (IS_DIACRITIC(ch))
             continue;
 
         /* get proportional width and glyph bits*/

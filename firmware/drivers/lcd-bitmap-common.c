@@ -434,7 +434,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         if (x >= vp->width)
             break;
 
-        is_diac = is_diacritic(*ucs, &is_rtl);
+        is_diac = IS_DIACRITIC_RTL(*ucs, &is_rtl);
 
         /* Get proportional width and glyph bits */
         width = font_get_width(pf, *ucs);
@@ -450,7 +450,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
                     const unsigned short *u;
 
                     /* Jump to next non-diacritic char, and calc its width */
-                    for (u = &ucs[1]; *u && is_diacritic(*u, NULL); u++);
+                    for (u = &ucs[1]; *u && IS_DIACRITIC(*u); u++);
 
                     rtl_next_non_diac_width = *u ?  font_get_width(pf, *u) : 0;
                 }
@@ -510,7 +510,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         if (next_ch)
         {
             bool next_is_rtl;
-            bool next_is_diacritic = is_diacritic(next_ch, &next_is_rtl);
+            bool next_is_diacritic = IS_DIACRITIC_RTL(next_ch, &next_is_rtl);
 
             /* Increment if:
              *  LTR: Next char is not diacritic,

@@ -50,7 +50,7 @@ struct diac_range
 static const struct diac_range diac_ranges[] =
 {
     DIAC_RANGE_ENTRY(0x0000, 0x0000, 0),
-    DIAC_RANGE_ENTRY(0x0300, 0x0370, 0),
+    DIAC_RANGE_ENTRY(FIRST_DIACRITIC, 0x0370, 0),
     DIAC_RANGE_ENTRY(0x0483, 0x048a, 0),
     DIAC_RANGE_ENTRY(0x0591, 0x05be, 1),
     DIAC_RANGE_ENTRY(0x05bf, 0x05c0, 1),
