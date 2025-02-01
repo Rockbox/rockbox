@@ -33,6 +33,7 @@
 # - Michaël Burtin
 # - Olivier Kaloudoff
 # - Jaussoin Timothée
+# - CHAPUIS Adhemar
 #
 # Original comments below:
 #
@@ -138,10 +139,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Normal"
+    *: "~Normal"
   </dest>
   <voice>
-    *: "Normal"
+    *: "~Normal"
   </voice>
 </phrase>
 <phrase>
@@ -152,10 +153,10 @@
     *: "Gain"
   </source>
   <dest>
-    *: "Gain"
+    *: "~Gain"
   </dest>
   <voice>
-    *: "Gain"
+    *: "~Gain"
   </voice>
 </phrase>
 <phrase>
@@ -183,7 +184,7 @@
     *: "Chargement... %d%% fait (%s)"
   </dest>
   <voice>
-    *: "Chargement... %d%% fait (%s)"
+    *: "Chargement"
   </voice>
 </phrase>
 <phrase>
@@ -644,10 +645,10 @@
     *: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: "~Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: "~Volume"
   </voice>
 </phrase>
 <phrase>
@@ -686,10 +687,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "Balance"
+    *: "~Balance"
   </dest>
   <voice>
-    *: "Balance"
+    *: "~Balance"
   </voice>
 </phrase>
 <phrase>
@@ -728,10 +729,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -2306,12 +2307,12 @@
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: "Backlight on Lock"
-    hold_button: "Rétro-éclairage quand touches verrouillées"
+    *: "Rétro-éclairage sur verrouillage"
+    hold_button: "Rétroéclairage sur touche de maintien"
   </dest>
   <voice>
-    *: "Backlight on Lock"
-    hold_button: "Rétro-éclairage quand touches verrouillées"
+    *: "Rétro-éclairage sur verrouillage"
+    hold_button: "Rétroéclairage sur touche de maintien"
   </voice>
 </phrase>
 <phrase>
@@ -3461,13 +3462,13 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Nouveau (1500 mAh)"
+    battery_types: "~NiMH"
+    xduoox3: "Ancien (1500 mAh)"
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
-    xduoox3: "Nouveau 1500 milliampère heure"
+    battery_types: "Nickel-Métal Hydrure"
+    xduoox3: "Ancien 1500 milliampère heure"
   </voice>
 </phrase>
 <phrase>
@@ -3787,7 +3788,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "Janvier"
@@ -3815,7 +3816,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Mars"
@@ -3857,7 +3858,7 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Jun"
+    *: "~Jun"
   </dest>
   <voice>
     *: "Juin"
@@ -3871,7 +3872,7 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Jul"
+    *: "~Jul"
   </dest>
   <voice>
     *: "Juillet"
@@ -3899,7 +3900,7 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
     *: "Septembre"
@@ -3913,7 +3914,7 @@
     *: "Oct"
   </source>
   <dest>
-    *: "Oct"
+    *: "~Oct"
   </dest>
   <voice>
     *: "Octobre"
@@ -3927,7 +3928,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "Novembre"
@@ -4884,11 +4885,11 @@
   </source>
   <dest>
     *: none
-    radio: "Europe"
+    radio: "~Europe"
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "~Europe"
   </voice>
 </phrase>
 <phrase>
@@ -4950,10 +4951,10 @@
     *: "Format"
   </source>
   <dest>
-    *: "Format"
+    *: "~Format"
   </dest>
   <voice>
-    *: "Format"
+    *: "~Format"
   </voice>
 </phrase>
 <phrase>
@@ -5984,7 +5985,7 @@
     *: "Libre:"
   </dest>
   <voice>
-    *: "Espace disque libre:"
+    *: "Espace disque libre"
   </voice>
 </phrase>
 <phrase>
@@ -6020,17 +6021,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
+    hibylinux: "~USB:"
     multivolume: "DD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
+    hibylinux: "~U S B"
     multivolume: "D D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
-    xduoox3: "micro S D 2"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -6041,10 +6042,10 @@
     *: "Version"
   </source>
   <dest>
-    *: "Version"
+    *: "~Version"
   </dest>
   <voice>
-    *: "Version"
+    *: "~Version"
   </voice>
 </phrase>
 <phrase>
@@ -6240,7 +6241,7 @@
     *: "Recherche... %d trouvé (%s)"
   </dest>
   <voice>
-    *: "Recherche... %d trouvé (%s)"
+    *: "trouvé"
   </voice>
 </phrase>
 <phrase>
@@ -6433,10 +6434,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -6461,10 +6462,10 @@
     *: "Genre"
   </source>
   <dest>
-    *: "Genre"
+    *: "~Genre"
   </dest>
   <voice>
-    *: "Genre"
+    *: "~Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7081,10 +7082,10 @@
     *: "Pause"
   </source>
   <dest>
-    *: "Pause"
+    *: "~Pause"
   </dest>
   <voice>
-    *: "Pause"
+    *: "~Pause"
   </voice>
 </phrase>
 <phrase>
@@ -7095,10 +7096,10 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Mode:"
+    *: "~Mode:"
   </dest>
   <voice>
-    *: "Mode"
+    *: "~Mode"
   </voice>
 </phrase>
 <phrase>
@@ -7477,10 +7478,10 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "~."
   </dest>
   <voice>
-    *: "virgule"
+    *: "~point"
   </voice>
 </phrase>
 <phrase>
@@ -7914,7 +7915,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "~million"
   </voice>
 </phrase>
 <phrase>
@@ -7956,7 +7957,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "~plus"
   </voice>
 </phrase>
 <phrase>
@@ -8012,7 +8013,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "~minute"
   </voice>
 </phrase>
 <phrase>
@@ -8026,7 +8027,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "~minutes"
   </voice>
 </phrase>
 <phrase>
@@ -8068,7 +8069,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "~kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -8124,7 +8125,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -8152,7 +8153,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8600,7 +8601,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -8614,7 +8615,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "~configuration"
   </voice>
 </phrase>
 <phrase>
@@ -8743,7 +8744,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -8760,7 +8761,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Temps actuel:"
+    rtc: "Temps actuel"
   </voice>
 </phrase>
 <phrase>
@@ -8789,20 +8790,6 @@
   </dest>
   <voice>
     *: "Fréquence de coupure"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: "Gain"
   </voice>
 </phrase>
 <phrase>
@@ -8844,7 +8831,7 @@
     *: "Applications"
   </dest>
   <voice>
-    *: "Applications"
+    *: "~Applications"
   </voice>
 </phrase>
 <phrase>
@@ -8984,7 +8971,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "~oh"
   </voice>
 </phrase>
 <phrase>
@@ -9384,7 +9371,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -9533,7 +9520,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "barre oblique"
   </voice>
 </phrase>
 <phrase>
@@ -9840,7 +9827,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "~Auto"
   </dest>
   <voice>
     *: none
@@ -10512,10 +10499,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "~Auto"
   </dest>
   <voice>
-    *: "Auto"
+    *: "Automatique"
   </voice>
 </phrase>
 <phrase>
@@ -10803,23 +10790,6 @@
   <voice>
     *: none
     histogram: "Intervalle de l'histogramme"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Sortie audio"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Sortie audio"
   </voice>
 </phrase>
 <phrase>
@@ -11174,11 +11144,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11253,11 +11223,11 @@
   </source>
   <dest>
     *: none
-    radio: "Puissance du signal:"
+    radio: "Intensité du signal:"
   </dest>
   <voice>
     *: none
-    radio: "Puissance du signal:"
+    radio: "Intensité du signal"
   </voice>
 </phrase>
 <phrase>
@@ -11563,7 +11533,7 @@
     *: "Simple (Meier)"
   </dest>
   <voice>
-    *: "Simple"
+    *: "~Simple"
   </voice>
 </phrase>
 <phrase>
@@ -11755,20 +11725,6 @@
   </dest>
   <voice>
     *: "f(x2)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12225,10 +12181,10 @@
     *: "New Game"
   </source>
   <dest>
-    *: "New Game"
+    *: "Nouvelle Partie"
   </dest>
   <voice>
-    *: "New Game"
+    *: "Nouvelle Partie"
   </voice>
 </phrase>
 <phrase>
@@ -12298,10 +12254,10 @@
     *: "Loading position"
   </source>
   <dest>
-    *: "Loading position"
+    *: "Chargement de la position"
   </dest>
   <voice>
-    *: "Loading position"
+    *: "Chargement de la position"
   </voice>
 </phrase>
 <phrase>
@@ -12399,10 +12355,10 @@
     *: "Spacing"
   </source>
   <dest>
-    *: "Spacing"
+    *: "Espacement"
   </dest>
   <voice>
-    *: "Spacing"
+    *: "Espacement"
   </voice>
 </phrase>
 <phrase>
@@ -12537,10 +12493,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: "Niveau 3: 60 coups / 30 minutes"
+    *: "Niveau 3: 60 mouvements / 30 minutes"
   </dest>
   <voice>
-    *: "Niveau 3: 60 coups en 30 minutes"
+    *: "Niveau 3, 60 mouvements par 30 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -12554,7 +12510,7 @@
     *: "Réflexion en cours..."
   </dest>
   <voice>
-    *: "Réflexion en cours..."
+    *: "Réflexion en cours"
   </voice>
 </phrase>
 <phrase>
@@ -12694,10 +12650,10 @@
     *: "Show at the bottom"
   </source>
   <dest>
-    *: "Show at the bottom"
+    *: "Afficher en bas"
   </dest>
   <voice>
-    *: "Show at the bottom"
+    *: "Afficher en bas"
   </voice>
 </phrase>
 <phrase>
@@ -12722,10 +12678,10 @@
     *: "Error while gathering info"
   </source>
   <dest>
-    *: "Error while gathering info"
+    *: "Erreur lors de la collecte d'informations"
   </dest>
   <voice>
-    *: "Error while gathering info"
+    *: "Erreur lors de la collecte d'informations"
   </voice>
 </phrase>
 <phrase>
@@ -12751,11 +12707,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Skip frames"
+    *: "Passer les images"
     lowmem: none
   </dest>
   <voice>
-    *: "Skip frames"
+    *: "Passer les images"
     lowmem: none
   </voice>
 </phrase>
@@ -12767,10 +12723,10 @@
     *: "Slideshow Time"
   </source>
   <dest>
-    *: "Slideshow Time"
+    *: "L'Heure du Diaporama"
   </dest>
   <voice>
-    *: "Slide show Time"
+    *: "L'Heure du Diaporama"
   </voice>
 </phrase>
 <phrase>
@@ -12783,11 +12739,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "Contourner"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "Contourner"
   </voice>
 </phrase>
 <phrase>
@@ -12801,7 +12757,7 @@
     *: "[Sous-rep]"
   </dest>
   <voice>
-    *: "[Sous-rep]"
+    *: "Sous-rep"
   </voice>
 </phrase>
 <phrase>
@@ -12815,7 +12771,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Marked"
+    *: "Marqué"
   </voice>
 </phrase>
 <phrase>
@@ -12829,7 +12785,7 @@
     *: ""
   </dest>
   <voice>
-    *: "castle"
+    *: "château"
   </voice>
 </phrase>
 <phrase>
@@ -12899,7 +12855,7 @@
     *: "Débit binaire moyen :"
   </dest>
   <voice>
-    *: "Débit binaire moyen :"
+    *: "Débit binaire moyen"
   </voice>
 </phrase>
 <phrase>
@@ -12910,10 +12866,10 @@
     *: "Diffusion"
   </source>
   <dest>
-    *: "Diffusion"
+    *: "~Diffusion"
   </dest>
   <voice>
-    *: "Diffusion"
+    *: "~Diffusion"
   </voice>
 </phrase>
 <phrase>
@@ -12924,10 +12880,10 @@
     *: "Save Game"
   </source>
   <dest>
-    *: "Save Game"
+    *: "Sauvegarder la Partie"
   </dest>
   <voice>
-    *: "Save Game"
+    *: "Sauvegarder la Partie"
   </voice>
 </phrase>
 <phrase>
@@ -12939,11 +12895,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Backlight brightness"
+    *: "Luminosité du rétro-éclairage"
     lowmem: none
   </dest>
   <voice>
-    *: "Backlight brightness"
+    *: "Luminosité du rétro-éclairage"
     lowmem: none
   </voice>
 </phrase>
@@ -13076,10 +13032,10 @@
     *: "Restart Game"
   </source>
   <dest>
-    *: "Restart Game"
+    *: "Redémarrer la Partie"
   </dest>
   <voice>
-    *: "Restart Game"
+    *: "Redémarrer la Partie"
   </voice>
 </phrase>
 <phrase>
@@ -13118,10 +13074,10 @@
     *: "Show album at the top"
   </source>
   <dest>
-    *: "Show album at the top"
+    *: "Montrer l'Album en haut"
   </dest>
   <voice>
-    *: "Show album at the top"
+    *: "Montrer l'Album en haut"
   </voice>
 </phrase>
 <phrase>
@@ -13149,7 +13105,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Done"
+    *: "Fait"
   </voice>
 </phrase>
 <phrase>
@@ -13309,10 +13265,10 @@
     *: "Error writing config"
   </source>
   <dest>
-    *: "Error writing config"
+    *: "Erreur lors de l'écriture de la configuration"
   </dest>
   <voice>
-    *: "Error writing config"
+    *: "Erreur lors de l'écriture de la configuration"
   </voice>
 </phrase>
 <phrase>
@@ -13368,10 +13324,10 @@
     *: "View Played Games"
   </source>
   <dest>
-    *: "View Played Games"
+    *: "Voir les Parties Jouées"
   </dest>
   <voice>
-    *: "View Played Games"
+    *: "Voir les Parties Jouées"
   </voice>
 </phrase>
 <phrase>
@@ -13382,10 +13338,10 @@
     *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: "Niveau 6: 40 coups / 120 minutes"
+    *: "Niveau 6: 40 mouvements / 120 minutes"
   </dest>
   <voice>
-    *: "Niveau 6: 40 coups en 120 minutes"
+    *: "Niveau 6, 40 mouvements par 120 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13410,10 +13366,10 @@
     *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: "Toggle Slideshow Mode"
+    *: "Activer/Désactiver le Mode Diaporama"
   </dest>
   <voice>
-    *: "Toggle Slide show Mode"
+    *: "Activer/Désactiver le Mode Diaporama"
   </voice>
 </phrase>
 <phrase>
@@ -13469,10 +13425,10 @@
     *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: "Level 5: 40 moves / 60 min"
+    *: "Niveau 5: 40 mouvements / 60 min"
   </dest>
   <voice>
-    *: "Level 5: 40 moves per 60 minutes"
+    *: "Niveau 5, 40 mouvements par 60 min"
   </voice>
 </phrase>
 <phrase>
@@ -13483,10 +13439,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "Agrandir"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "Agrandir"
   </voice>
 </phrase>
 <phrase>
@@ -13500,7 +13456,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Black"
+    *: "Noir"
   </voice>
 </phrase>
 <phrase>
@@ -13528,10 +13484,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "Level 4: 40 moves / 30 min"
+    *: "Niveau 4: 40 mouvements / 30 min"
   </dest>
   <voice>
-    *: "Level 4: 40 moves per 30 minutes"
+    *: "Niveau 4: 40 mouvements par 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13803,10 +13759,10 @@
     *: "At the beginning of the game"
   </source>
   <dest>
-    *: "At the beginning of the game"
+    *: "Au début de la partie"
   </dest>
   <voice>
-    *: "At the beginning of the game"
+    *: "Au début de la partie"
   </voice>
 </phrase>
 <phrase>
@@ -14016,10 +13972,10 @@
     *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: "Niveau 1: 60 coups / 5 minutes"
+    *: "Niveau 1: 60 mouvements / 5 minutes"
   </dest>
   <voice>
-    *: "Niveau 1: 60 coups en 5 minutes"
+    *: "Niveau 1, 60 mouvements par 5 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14100,10 +14056,10 @@
     *: "[Date]"
   </source>
   <dest>
-    *: "[Date]"
+    *: "~[Date]"
   </dest>
   <voice>
-    *: "Date"
+    *: "~Date"
   </voice>
 </phrase>
 <phrase>
@@ -14176,10 +14132,10 @@
     *: "Level 10: 1 move / 600 min"
   </source>
   <dest>
-    *: "Niveau 10: 1 coup / 600 minutes"
+    *: "Niveau 10: 1 mouvement / 600 minutes"
   </dest>
   <voice>
-    *: "Niveau 10: 1 coup en 600 minutes"
+    *: "Niveau 10: 1 mouvement par 600 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14204,10 +14160,10 @@
     *: "Level 8: 1 move / 15 min"
   </source>
   <dest>
-    *: "Niveau 8: 1 coup / 15 minutes"
+    *: "Niveau 8: 1 mouvement / 15 minutes"
   </dest>
   <voice>
-    *: "Niveau 8: 1 coup par 15 minutes"
+    *: "Niveau 8: 1 mouvement par 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14235,7 +14191,7 @@
     *: "Piste :"
   </dest>
   <voice>
-    *: "Piste :"
+    *: "Piste"
   </voice>
 </phrase>
 <phrase>
@@ -14333,10 +14289,10 @@
     *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: "Niveau 2: 60 coups / 15 minutes"
+    *: "Niveau 2: 60 mouvements / 15 minutes"
   </dest>
   <voice>
-    *: "Niveau 2: 60 coups en 15 minutes"
+    *: "Niveau 2, 60 mouvements par 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14375,10 +14331,10 @@
     *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: "Niveau 7: 40 coups / 240 minutes"
+    *: "Niveau 7: 40 mouvements / 240 minutes"
   </dest>
   <voice>
-    *: "Niveau 7: 40 coups en 240 minutes"
+    *: "Niveau 7: 40 mouvements par 240 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14420,10 +14376,10 @@
     *: "Number of slides"
   </source>
   <dest>
-    *: "Number of slides"
+    *: "Nombre de diapositives"
   </dest>
   <voice>
-    *: "Number of slides"
+    *: "Nombre de diapositives"
   </voice>
 </phrase>
 <phrase>
@@ -14476,10 +14432,10 @@
     *: "Level 9: 1 move / 60 min"
   </source>
   <dest>
-    *: "Niveau 9: 1 coup / 60 minutes"
+    *: "Niveau 9: 1 mouvement / 60 minutes"
   </dest>
   <voice>
-    *: "Niveau 9: 1 coup en 60 minutes"
+    *: "Niveau 9: 1 mouvement par 60 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14725,11 +14681,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Très lent"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Très lent"
   </voice>
 </phrase>
 <phrase>
@@ -14982,33 +14938,33 @@
     xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </source>
   <dest>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    *: "Appuyer sur GAUCHE pour annuler."
+    android,hifietma*,zenvision: "Appuyer sur RETOUR pour annuler."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
+    ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
+    ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
+    iriverh10,samsungyh*: "Double appuis sur GAUCHE pour annuler"
     mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
+    mpiohd300: "Double appuis sur MENU pour annuler."
+    rx27generic: "Appuyer sur VOLUME pour annuler."
     sonynwza860: "Keymaps incomplete."
     touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    vibe500: "Appuyer sur AVANT pour annuler."
+    xduoox20,xduoox3,xduoox3ii: "Double appuis sur ACCEUIL pour annuler."
   </dest>
   <voice>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    *: "Appuyer sur GAUCHE pour annuler."
+    android,hifietma*,zenvision: "Appuyer sur RETOUR pour annuler."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
+    ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
+    ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
+    iriverh10,samsungyh*: "Double appuis sur GAUCHE pour annuler."
     mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
+    mpiohd300: "Double appuis sur MENU pour annuler"
+    rx27generic: "Appuyer sur VOLUME pour annuler."
     touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    vibe500: "Appuyer sur AVANT pour annuler."
+    xduoox20,xduoox3,xduoox3ii: "Double appuis sur ACCEUIL pour annuler."
   </voice>
 </phrase>
 <phrase>
@@ -15033,10 +14989,10 @@
     *: "Clear all"
   </source>
   <dest>
-    *: "Clear all"
+    *: "Effacer tout"
   </dest>
   <voice>
-    *: "Clear all"
+    *: "Effacer tout"
   </voice>
 </phrase>
 <phrase>
@@ -15236,7 +15192,7 @@
     *: "N'est pas un module: %s"
   </dest>
   <voice>
-    *: "N'est pas un module: %s"
+    *: "N'est pas un module"
   </voice>
 </phrase>
 <phrase>
@@ -15785,11 +15741,11 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Effacer les paramètres lorsque le bouton de réinitialisation est maintenu enfoncé pendant le démarrage"
+    clear_settings_on_hold,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo,iriverh10: "Effacer les paramètres lorsque le bouton de réinitialisation est maintenu enfoncé pendant le démarrage"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Effacer les paramètres lorsque le bouton de réinitialisation est maintenu enfoncé pendant le démarrage"
+    clear_settings_on_hold,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo,iriverh10: "Effacer les paramètres lorsque le bouton de réinitialisation est maintenu enfoncé pendant le démarrage"
   </voice>
 </phrase>
 <phrase>
@@ -16148,10 +16104,10 @@
     *: "View Map"
   </source>
   <dest>
-    *: "View Map"
+    *: "Voir Carte"
   </dest>
   <voice>
-    *: "View Map"
+    *: "Voir Carte"
   </voice>
 </phrase>
 <phrase>
@@ -16162,10 +16118,10 @@
     *: "Show Compass"
   </source>
   <dest>
-    *: "Show Compass"
+    *: "Montrer la Boussole"
   </dest>
   <voice>
-    *: "Show Compass"
+    *: "Montrer la Boussole"
   </voice>
 </phrase>
 <phrase>
@@ -16176,10 +16132,10 @@
     *: "Show Map"
   </source>
   <dest>
-    *: "Show Map"
+    *: "Voir Carte"
   </dest>
   <voice>
-    *: "Show Map"
+    *: "Voir Carte"
   </voice>
 </phrase>
 <phrase>
@@ -16190,10 +16146,10 @@
     *: "Remember Path"
   </source>
   <dest>
-    *: "Remember Path"
+    *: "Retenir le Chemin"
   </dest>
   <voice>
-    *: "Remember Path"
+    *: "Retenir le Chemin"
   </voice>
 </phrase>
 <phrase>
@@ -16218,10 +16174,10 @@
     *: "Show Solution"
   </source>
   <dest>
-    *: "Show Solution"
+    *: "Montrer la Solution"
   </dest>
   <voice>
-    *: "Show Solution"
+    *: "Montrer la Solution"
   </voice>
 </phrase>
 <phrase>
@@ -16232,10 +16188,10 @@
     *: "Quit without saving"
   </source>
   <dest>
-    *: "Quit without saving"
+    *: "Quitter sans sauvegarder"
   </dest>
   <voice>
-    *: "Quit without saving"
+    *: "Quitter sans sauvegarder"
   </voice>
 </phrase>
 <phrase>
@@ -16246,10 +16202,10 @@
     *: "Generating maze..."
   </source>
   <dest>
-    *: "Generating maze..."
+    *: "Génération du labyrinthe..."
   </dest>
   <voice>
-    *: "Generating maze"
+    *: "Génération du labyrinthe..."
   </voice>
 </phrase>
 <phrase>
@@ -16260,10 +16216,10 @@
     *: "You win!"
   </source>
   <dest>
-    *: "You win!"
+    *: "Vous avez gagné!"
   </dest>
   <voice>
-    *: "You win!"
+    *: "Vous avez gagné!"
   </voice>
 </phrase>
 <phrase>
@@ -16274,10 +16230,10 @@
     *: "You cheated!"
   </source>
   <dest>
-    *: "You cheated!"
+    *: "Tu as triché!"
   </dest>
   <voice>
-    *: "You cheated!"
+    *: "Tu as triché!"
   </voice>
 </phrase>
 <phrase>
@@ -16288,10 +16244,10 @@
     *: "Easy"
   </source>
   <dest>
-    *: "Easy"
+    *: "Facile"
   </dest>
   <voice>
-    *: "Easy"
+    *: "Facile"
   </voice>
 </phrase>
 <phrase>
@@ -16302,10 +16258,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Moyen"
   </dest>
   <voice>
-    *: "Medium"
+    *: "Moyen"
   </voice>
 </phrase>
 <phrase>
@@ -16316,10 +16272,10 @@
     *: "Hard"
   </source>
   <dest>
-    *: "Hard"
+    *: "Difficile"
   </dest>
   <voice>
-    *: "Hard"
+    *: "Difficile"
   </voice>
 </phrase>
 <phrase>
@@ -16330,66 +16286,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "~Expert"
   </dest>
   <voice>
-    *: "Expert"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Stereo Switch Mode"
-  </dest>
-  <voice>
-    *: "Stereo Switch Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Inversé"
-  </dest>
-  <voice>
-    *: "Inversé"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Toujours 0"
-  </dest>
-  <voice>
-    *: "Toujours 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Toujours 1"
-  </dest>
-  <voice>
-    *: "Toujours 1"
+    *: "~Expert"
   </voice>
 </phrase>
 <phrase>
@@ -16428,10 +16328,10 @@
     *: "Mikmod Settings"
   </source>
   <dest>
-    *: "Mikmod Settings"
+    *: "Paramètres de Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Settings"
+    *: "Paramètres de Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16442,10 +16342,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Mikmod Menu"
+    *: "Menu de Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Menu"
+    *: "Menu de Mikmod"
   </voice>
 </phrase>
 <phrase>
@@ -16516,5 +16416,168 @@
   </dest>
   <voice>
     *: "Restant"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Réinitialiser EQ"
+  </dest>
+  <voice>
+    *: "Réinitialiser EQ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Add Current to Shortcuts"
+  </dest>
+  <voice>
+    *: "Add Current to Shortcuts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disc"
+  </dest>
+  <voice>
+    *: "Disc"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Voir l'art de l'Album"
+  </dest>
+  <voice>
+    *: "Voir l'art de l'Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Output Select"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Output Select"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Ecouteurs"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Ecouteurs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Ne peut pas charger les polices: (%s)"
+  </dest>
+  <voice>
+    *: "Pistes sauvegardés"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Logging"
+  </dest>
+  <voice>
+    *: "logging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Voir les journaux"
+  </dest>
+  <voice>
+    *: "Voir les journaux"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Playlist terminée. Rejouer?"
+  </dest>
+  <voice>
+    *: "Playlist terminée. Rejouer?"
   </voice>
 </phrase>
