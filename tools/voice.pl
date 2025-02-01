@@ -101,6 +101,7 @@ my %gtts_lang_map = (
     'francais' => '-l fr',
     'greek' => '-l el',
     'italiano' => '-l it',
+    'japanese' => '-l ja',
     'korean' => '-l ko',
     'magyar' => '-l hu',
     'nederlands' => '-l nl',

@@ -615,7 +615,7 @@ sub simbuilds {
 	'lang' => 'bulgarian',
 	'name' => 'Български (Bulgarian)',
         'short' => 'bg',
-        'defengine' => 'espeak',  # XXX Switch to gtts when buildserver is updated
+        'defengine' => 'gtts',
 	'engines' => {
 	    'espeak' => '-vbg',
 	    'gtts' => '-l bg',
@@ -757,7 +757,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
-    'korean' => {  #
+    'japanese' => {
+	'lang' => 'japanese',
+	'name' => '日本語 (Japanese)',
+        'short' => 'ja',
+        'defengine' => 'gtts',
+	'engines' => {
+	    'espeak' => '-vja',
+	    'gtts' => '-l ja',
+	},
+        'enabled' => 1,
+    },
+    'korean' => {
 	'lang' => 'korean',
 	'name' => '한국어 (Korean)',
         'short' => 'ko',
