@@ -16544,3 +16544,17 @@
     *: "Dinleme listesi bitti. Yeniden dinlemek ister misin?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Mevcut Kısayollara Ekle"
+  </dest>
+  <voice>
+    *: "Mevcut kısayollara ekle"
+  </voice>
+</phrase>
