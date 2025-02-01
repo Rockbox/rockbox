@@ -990,10 +990,6 @@ void set_keypress_restarts_sleep_timer(bool enable)
 #ifndef BOOTLOADER
 static void handle_sleep_timer(void)
 {
-    if (!sleeptimer_active)
-      return;
-
-    /* Handle sleeptimer */
     if (TIME_AFTER(current_tick, sleeptimer_endtick)) {
         if (usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
@@ -1055,9 +1051,8 @@ void handle_auto_poweroff(void)
 #endif
         !usb_inserted() &&
         (audio_stat == 0 ||
-         (audio_stat == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE) &&
-          !sleeptimer_active))) {
-
+         audio_stat == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE)))
+    {
         if (TIME_AFTER(tick, last_event_tick + timeout)
 #if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
             && TIME_AFTER(tick, storage_last_disk_activity() + timeout)
@@ -1065,7 +1060,9 @@ void handle_auto_poweroff(void)
         ) {
             sys_poweroff();
         }
-    } else
+    }
+
+    if (sleeptimer_active)
         handle_sleep_timer();
 #endif
 }
