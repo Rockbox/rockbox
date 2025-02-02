@@ -615,7 +615,7 @@ sub simbuilds {
 	'lang' => 'bulgarian',
 	'name' => 'Български (Bulgarian)',
         'short' => 'bg',
-        'defengine' => 'gtts',
+        'defengine' => 'espeak',
 	'engines' => {
 	    'espeak' => '-vbg',
 	    'gtts' => '-l bg',
@@ -761,7 +761,7 @@ sub simbuilds {
 	'lang' => 'japanese',
 	'name' => '日本語 (Japanese)',
         'short' => 'ja',
-        'defengine' => 'gtts',
+        'defengine' => 'espeak',
 	'engines' => {
 	    'espeak' => '-vja',
 	    'gtts' => '-l ja',
