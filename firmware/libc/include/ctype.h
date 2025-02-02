@@ -46,7 +46,7 @@ extern const unsigned char _ctype_[257];
 #define isalpha(c)      ((_ctype_+1)[(unsigned char)(c)]&(_U|_L))
 #define isupper(c)      ((_ctype_+1)[(unsigned char)(c)]&_U)
 #define islower(c)      ((_ctype_+1)[(unsigned char)(c)]&_L)
-#define isdigit(c)      ((_ctype_+1)[(unsigned char)(c)]&_N)
+/*#define isdigit(c)      ((_ctype_+1)[(unsigned char)(c)]&_N)*/
 #define isxdigit(c)     ((_ctype_+1)[(unsigned char)(c)]&(_X|_N))
 #define isspace(c)      ((_ctype_+1)[(unsigned char)(c)]&_S)
 #define ispunct(c)      ((_ctype_+1)[(unsigned char)(c)]&_P)
@@ -54,6 +54,9 @@ extern const unsigned char _ctype_[257];
 #define isprint(c)      ((_ctype_+1)[(unsigned char)(c)]&(_P|_U|_L|_N|_B))
 #define isgraph(c)      ((_ctype_+1)[(unsigned char)(c)]&(_P|_U|_L|_N))
 #define iscntrl(c)      ((_ctype_+1)[(unsigned char)(c)]&_C)
+
+/* should be slightly faster without array access */
+#define isdigit(c)      (((unsigned int) (c) - '0') < 10)
 /* Non-gcc versions will get the library versions, and will be
    slightly slower */
 #ifdef __GNUC__
