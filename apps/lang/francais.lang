@@ -3133,10 +3133,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "~Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -3301,10 +3301,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -4984,11 +4984,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "Onde PCM"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "Onde de Modulation d’Impulsion Codée"
   </voice>
 </phrase>
 <phrase>
@@ -5120,11 +5120,11 @@
   </source>
   <dest>
     *: none
-    recording: "Source"
+    recording: "~Source"
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "~Source"
   </voice>
 </phrase>
 <phrase>
@@ -5495,11 +5495,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "Arrêt"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Arrêt"
   </voice>
 </phrase>
 <phrase>
@@ -5954,7 +5954,7 @@
   </source>
   <dest>
     *: "Batterie: %d%% %dh %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batterie: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Niveau de la batterie"
@@ -5998,14 +5998,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Interne"
-    hibylinux: "micro S D"
-    xduoox3: "micro S D 1"
+    hibylinux: "~micro S D"
+    xduoox3: "~micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -7421,11 +7421,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batterie: en charge..."
+    charging: "Batterie: en charge"
   </dest>
   <voice>
     *: none
-    charging: "Batterie: en charge"
+    charging: "Batterie en charge"
   </voice>
 </phrase>
 <phrase>
@@ -8828,7 +8828,7 @@
     *: "Applications"
   </source>
   <dest>
-    *: "Applications"
+    *: "~Applications"
   </dest>
   <voice>
     *: "~Applications"
@@ -8943,7 +8943,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "De l'Après-Midi"
   </voice>
 </phrase>
 <phrase>
@@ -8957,7 +8957,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "Du Matin"
   </voice>
 </phrase>
 <phrase>
@@ -10918,7 +10918,7 @@
   </source>
   <dest>
     *: none
-    radio: "Station:"
+    radio: "~Station:"
   </dest>
   <voice>
     *: none
@@ -11128,10 +11128,10 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "Flux d'Images"
   </dest>
   <voice>
-    *: "Ouvrir picture flow"
+    *: "Flux d'Images"
   </voice>
 </phrase>
 <phrase>
@@ -11530,7 +11530,7 @@
     *: "Simple (Meier)"
   </source>
   <dest>
-    *: "Simple (Meier)"
+    *: "~Simple (Meier)"
   </dest>
   <voice>
     *: "~Simple"
@@ -12917,7 +12917,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone mode"
+    pitchscreen: "Mode Demi-ton"
   </voice>
 </phrase>
 <phrase>
@@ -13002,11 +13002,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </voice>
 </phrase>
@@ -13018,10 +13018,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "Ordonné"
   </dest>
   <voice>
-    *: "Ordered"
+    *: "Ordonné"
   </voice>
 </phrase>
 <phrase>
@@ -13131,11 +13131,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Clear all resumes"
+    *: "Effacer tous les résumés"
     lowmem: none
   </dest>
   <voice>
-    *: "Clear all resumes"
+    *: "Effacer tous les résumés"
     lowmem: none
   </voice>
 </phrase>
@@ -13206,10 +13206,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "Arghs Par Nourriture"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Arghs Par Nourriture"
   </voice>
 </phrase>
 <phrase>
@@ -13468,11 +13468,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Interpolation"
+    *: "~Interpolation"
     lowmem: none
   </dest>
   <voice>
-    *: "Interpolation"
+    *: "~Interpolation"
     lowmem: none
   </voice>
 </phrase>
@@ -13487,7 +13487,7 @@
     *: "Niveau 4: 40 mouvements / 30 min"
   </dest>
   <voice>
-    *: "Niveau 4: 40 mouvements par 30 min"
+    *: "Niveau 4, 40 mouvements par 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13574,10 +13574,10 @@
     *: "Number of Worms"
   </source>
   <dest>
-    *: "Number of Worms"
+    *: "Nombre de Vers"
   </dest>
   <voice>
-    *: "Number of Worms"
+    *: "Nombre de Vers"
   </voice>
 </phrase>
 <phrase>
@@ -13602,10 +13602,10 @@
     *: "Direct"
   </source>
   <dest>
-    *: "Direct"
+    *: "~Direct"
   </dest>
   <voice>
-    *: "Direct"
+    *: "~Direct"
   </voice>
 </phrase>
 <phrase>
@@ -14135,7 +14135,7 @@
     *: "Niveau 10: 1 mouvement / 600 minutes"
   </dest>
   <voice>
-    *: "Niveau 10: 1 mouvement par 600 minutes"
+    *: "Niveau 10, 1 mouvement par 600 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14163,7 +14163,7 @@
     *: "Niveau 8: 1 mouvement / 15 minutes"
   </dest>
   <voice>
-    *: "Niveau 8: 1 mouvement par 15 minutes"
+    *: "Niveau 8, 1 mouvement par 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14334,7 +14334,7 @@
     *: "Niveau 7: 40 mouvements / 240 minutes"
   </dest>
   <voice>
-    *: "Niveau 7: 40 mouvements par 240 minutes"
+    *: "Niveau 7, 40 mouvements par 240 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14435,7 +14435,7 @@
     *: "Niveau 9: 1 mouvement / 60 minutes"
   </dest>
   <voice>
-    *: "Niveau 9: 1 mouvement par 60 minutes"
+    *: "Niveau 9, 1 mouvement par 60 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14664,11 +14664,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Court, Lent"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Court, Lent"
   </voice>
 </phrase>
 <phrase>
@@ -14698,11 +14698,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linéaire, Rapide"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linéaire, Rapide"
   </voice>
 </phrase>
 <phrase>
@@ -14715,11 +14715,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linéaire, Lent"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linéaire, Lent"
   </voice>
 </phrase>
 <phrase>
@@ -14732,11 +14732,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minimum, Rapide"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minimum, Rapide"
   </voice>
 </phrase>
 <phrase>
@@ -14749,11 +14749,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minimum, Lent"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minimum, Lent"
   </voice>
 </phrase>
 <phrase>
@@ -14766,11 +14766,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodisation type 1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodisation type 1"
   </voice>
 </phrase>
 <phrase>
@@ -14783,11 +14783,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodisation type 2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodisation type 2"
   </voice>
 </phrase>
 <phrase>
@@ -14800,11 +14800,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Hybride, Rapide"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Hybride, Rapide"
   </voice>
 </phrase>
 <phrase>
@@ -14817,11 +14817,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Mur de briques"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Mur de briques"
   </voice>
 </phrase>
 <phrase>
@@ -14835,13 +14835,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Mode d'alimentation DAC"
+    es9218: "Niveau de sortie DAC"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Mode d'alimentation DAC"
+    es9218: "Niveau de sortie DAC"
   </voice>
 </phrase>
 <phrase>
@@ -14855,13 +14855,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Haute performance"
+    es9218: "Haut Gain (2 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Haute performance"
+    es9218: "Haut Gain (2 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -14875,13 +14875,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Économiseur de batterie"
+    es9218: "Gain Faible (1 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Économiseur de batterie"
+    es9218: "Gain Faible (1 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -14893,11 +14893,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "Mixer de HQ"
     lowmem: none
   </dest>
   <voice>
-    *: "High Quality Mixer"
+    *: "Mixer de Haute Qualité"
     lowmem: none
   </voice>
 </phrase>
@@ -14910,11 +14910,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Sample Rate"
+    *: "Taux d'échantillonnage"
     lowmem: none
   </dest>
   <voice>
-    *: "Sample Rate"
+    *: "Taux d'échantillonnage"
     lowmem: none
   </voice>
 </phrase>
@@ -14939,31 +14939,29 @@
   </source>
   <dest>
     *: "Appuyer sur GAUCHE pour annuler."
-    android,hifietma*,zenvision: "Appuyer sur RETOUR pour annuler."
+    android,hifietma*,zenvision,vibe500: "Appuyer sur RETOUR pour annuler."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
     ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
     ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
     iriverh10,samsungyh*: "Double appuis sur GAUCHE pour annuler"
-    mpiohd200: "Double tap REC to cancel."
+    mpiohd200: "Double appuis sur ENREGISTRER pour annuler."
     mpiohd300: "Double appuis sur MENU pour annuler."
     rx27generic: "Appuyer sur VOLUME pour annuler."
-    sonynwza860: "Keymaps incomplete."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Appuyer sur AVANT pour annuler."
+    sonynwza860: "Mappages de touches incomplets."
+    touchscreen: "Appuyez sur le bouton central gauche pour annuler."
     xduoox20,xduoox3,xduoox3ii: "Double appuis sur ACCEUIL pour annuler."
   </dest>
   <voice>
     *: "Appuyer sur GAUCHE pour annuler."
-    android,hifietma*,zenvision: "Appuyer sur RETOUR pour annuler."
+    android,hifietma*,zenvision,vibe500: "Appuyer sur RETOUR pour annuler."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
     ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
     ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
     iriverh10,samsungyh*: "Double appuis sur GAUCHE pour annuler."
-    mpiohd200: "Double tap REC to cancel."
+    mpiohd200: "Double appuis sur ENREGISTRER pour annuler."
     mpiohd300: "Double appuis sur MENU pour annuler"
     rx27generic: "Appuyer sur VOLUME pour annuler."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Appuyer sur AVANT pour annuler."
+    touchscreen: "Appuyez sur le bouton central gauche pour annuler."
     xduoox20,xduoox3,xduoox3ii: "Double appuis sur ACCEUIL pour annuler."
   </voice>
 </phrase>
@@ -15203,10 +15201,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Set Wps Context Plugin"
+    *: "Définir le Plugin de Contexte WPS"
   </dest>
   <voice>
-    *: "Set WPS Context Plugin"
+    *: "Définir le plugin de contexte WPS"
   </voice>
 </phrase>
 <phrase>
@@ -15427,10 +15425,10 @@
     *: "Always Autolock"
   </source>
   <dest>
-    *: "Always Autolock"
+    *: "Toujours Verrouiller Automatiquement"
   </dest>
   <voice>
-    *: "Always Autolock"
+    *: "Toujours Verrouiller Automatiquement"
   </voice>
 </phrase>
 <phrase>
@@ -15583,11 +15581,11 @@
   </source>
   <dest>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Synchroniser le Temps du RDS"
   </dest>
   <voice>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Synchroniser le Temps du Système de Données Radio"
   </voice>
 </phrase>
 <phrase>
@@ -15963,11 +15961,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptuel"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptuel"
   </voice>
 </phrase>
 <phrase>
@@ -16076,10 +16074,10 @@
     *: "Amaze Main Menu"
   </source>
   <dest>
-    *: "Amaze Main Menu"
+    *: "Menu Principale de Amaze"
   </dest>
   <voice>
-    *: "Amaze Main Menu"
+    *: "Menu Principale de Amaze"
   </voice>
 </phrase>
 <phrase>
@@ -16090,10 +16088,10 @@
     *: "Set Maze Size"
   </source>
   <dest>
-    *: "Set Maze Size"
+    *: "Définir la Taille du Labyrinthe"
   </dest>
   <voice>
-    *: "Set Maze Size"
+    *: "Définir la Taille du Labyrinthe"
   </voice>
 </phrase>
 <phrase>
@@ -16160,10 +16158,10 @@
     *: "Use Large Tiles"
   </source>
   <dest>
-    *: "Use Large Tiles"
+    *: "Utiliser des Carreaux Larges"
   </dest>
   <voice>
-    *: "Use Large Tiles"
+    *: "Utiliser des Carreaux Larges"
   </voice>
 </phrase>
 <phrase>
@@ -16205,7 +16203,7 @@
     *: "Génération du labyrinthe..."
   </dest>
   <voice>
-    *: "Génération du labyrinthe..."
+    *: "Génération du labyrinthe"
   </voice>
 </phrase>
 <phrase>
@@ -16356,10 +16354,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Menu de Chessbox"
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Menu de Chessbox"
   </voice>
 </phrase>
 <phrase>
@@ -16384,7 +16382,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
@@ -16440,10 +16438,10 @@
     *: "Add Current to Shortcuts"
   </source>
   <dest>
-    *: "Add Current to Shortcuts"
+    *: "Ajouter la sélection aux raccourcis"
   </dest>
   <voice>
-    *: "Add Current to Shortcuts"
+    *: "Ajouter la sélection aux raccourcis"
   </voice>
 </phrase>
 <phrase>
@@ -16454,10 +16452,10 @@
     *: "Disc"
   </source>
   <dest>
-    *: "Disc"
+    *: "Disque"
   </dest>
   <voice>
-    *: "Disc"
+    *: "Disque"
   </voice>
 </phrase>
 <phrase>
@@ -16484,11 +16482,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Sélection de sortie"
   </dest>
   <voice>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Sélection de sortie"
   </voice>
 </phrase>
 <phrase>
@@ -16518,11 +16516,11 @@
   </source>
   <dest>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Sortie de ligne"
   </dest>
   <voice>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Sortie de ligne"
   </voice>
 </phrase>
 <phrase>
@@ -16547,10 +16545,10 @@
     *: "Logging"
   </source>
   <dest>
-    *: "Logging"
+    *: "Enregistrement"
   </dest>
   <voice>
-    *: "logging"
+    *: "Enregistrement"
   </voice>
 </phrase>
 <phrase>
@@ -16575,9 +16573,9 @@
     *: "Playlist finished. Play again?"
   </source>
   <dest>
-    *: "Playlist terminée. Rejouer?"
+    *: "Liste de lecture terminée. Rejouer?"
   </dest>
   <voice>
-    *: "Playlist terminée. Rejouer?"
+    *: "Liste de lecture terminée. Rejouer?"
   </voice>
 </phrase>
