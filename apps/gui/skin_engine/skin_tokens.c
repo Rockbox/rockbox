@@ -256,7 +256,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 if (id3->disc_string)
                     return id3->disc_string;
                 if (id3->discnum) {
-                    snprintf(buf, buf_size, "%d", id3->discnum);
+                    itoa(buf, buf_size, id3->discnum);
                     return buf;
                 }
                 return NULL;
@@ -264,7 +264,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 if (id3->track_string)
                     return id3->track_string;
                 if (id3->tracknum) {
-                    snprintf(buf, buf_size, "%d", id3->tracknum);
+                    itoa(buf, buf_size, id3->tracknum);
                     return buf;
                 }
                 return NULL;
@@ -291,7 +291,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 if( id3->year_string )
                     return id3->year_string;
                 if (id3->year) {
-                    snprintf(buf, buf_size, "%d", id3->year);
+                    itoa(buf, buf_size, id3->year);
                     return buf;
                 }
                 return NULL;
@@ -299,7 +299,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 return id3->comment;
             case SKIN_TOKEN_FILE_BITRATE:
                 if(id3->bitrate)
-                    snprintf(buf, buf_size, "%d", id3->bitrate);
+                    itoa(buf, buf_size, id3->bitrate);
                 else
                     return "?";
                 return buf;
@@ -360,12 +360,12 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 return get_codectype(id3);
 
             case SKIN_TOKEN_FILE_FREQUENCY:
-                snprintf(buf, buf_size, "%ld", id3->frequency);
+                itoa(buf, buf_size, id3->frequency);
                 return buf;
             case SKIN_TOKEN_FILE_FREQUENCY_KHZ:
                 /* ignore remainders < 100, so 22050 Hz becomes just 22k */
                 if ((id3->frequency % 1000) < 100)
-                    snprintf(buf, buf_size, "%ld", id3->frequency / 1000);
+                    itoa(buf, buf_size, id3->frequency / 1000);
                 else
                     snprintf(buf, buf_size, "%ld.%lu",
                             id3->frequency / 1000,
@@ -374,24 +374,24 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
             case SKIN_TOKEN_FILE_VBR:
                 return (id3->vbr) ? "(avg)" : NULL;
             case SKIN_TOKEN_FILE_SIZE:
-                snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
+                itoa(buf, buf_size, id3->filesize / 1024);
                 return buf;
 
 #ifdef HAVE_TAGCACHE
         case SKIN_TOKEN_DATABASE_PLAYCOUNT:
             if (intval)
                 *intval = id3->playcount + 1;
-            snprintf(buf, buf_size, "%ld", id3->playcount);
+            itoa(buf, buf_size, id3->playcount);
             return buf;
         case SKIN_TOKEN_DATABASE_RATING:
             if (intval)
                 *intval = id3->rating + 1;
-            snprintf(buf, buf_size, "%d", id3->rating);
+            itoa(buf, buf_size, id3->rating);
             return buf;
         case SKIN_TOKEN_DATABASE_AUTOSCORE:
             if (intval)
                 *intval = id3->score + 1;
-            snprintf(buf, buf_size, "%d", id3->score);
+            itoa(buf, buf_size, id3->score);
             return buf;
 #endif
 
@@ -473,7 +473,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                             region_data->freq_step, buf, buf_size);
 #ifdef HAVE_RADIO_RSSI
         case SKIN_TOKEN_TUNER_RSSI:
-            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI));
+            itoa(buf, buf_size,tuner_get(RADIO_RSSI));
             if (intval)
             {
                 int val = tuner_get(RADIO_RSSI);
@@ -490,10 +490,10 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             }
             return buf;
         case SKIN_TOKEN_TUNER_RSSI_MIN:
-            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI_MIN));
+            itoa(buf, buf_size,tuner_get(RADIO_RSSI_MIN));
             return buf;
         case SKIN_TOKEN_TUNER_RSSI_MAX:
-            snprintf(buf, buf_size, "%d",tuner_get(RADIO_RSSI_MAX));
+            itoa(buf, buf_size,tuner_get(RADIO_RSSI_MAX));
             return buf;
 #endif
         case SKIN_TOKEN_PRESET_NAME:
@@ -515,11 +515,11 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 format_freq_MHz(radio_get_preset_freq(preset),
                                 region_data->freq_step, buf, buf_size);
             else
-                snprintf(buf, buf_size, "%d", preset + 1);
+                itoa(buf, buf_size, preset + 1);
             return buf;
         }
         case SKIN_TOKEN_PRESET_COUNT:
-            snprintf(buf, buf_size, "%d", radio_preset_count());
+            itoa(buf, buf_size, radio_preset_count());
             if (intval)
                 *intval = radio_preset_count();
             return buf;
@@ -777,7 +777,7 @@ static const char* get_rtc_token_value(struct wps_token *token,
 
 
         case SKIN_TOKEN_RTC_12HOUR_CFG:
-            snprintf(buf, buf_size, "%d", global_settings.timeformat);
+            itoa(buf, buf_size, global_settings.timeformat);
             numeric_ret = global_settings.timeformat + 1;
             break;
         case SKIN_TOKEN_RTC_DAY_OF_MONTH:
@@ -1110,14 +1110,14 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_PLAYLIST_ENTRIES:
             numeric_ret = playlist_amount();
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         case SKIN_TOKEN_LIST_TITLE_TEXT:
             return sb_get_title(gwps->display->screen_type);
         case SKIN_TOKEN_LIST_TITLE_ICON:
             numeric_ret = sb_get_icon(gwps->display->screen_type);
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         case SKIN_TOKEN_LIST_ITEM_TEXT:
@@ -1128,17 +1128,17 @@ const char *get_token_value(struct gui_wps *gwps,
         }
         case SKIN_TOKEN_LIST_ITEM_ROW:
             numeric_ret = skinlist_get_item_row() + 1;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         case SKIN_TOKEN_LIST_ITEM_COLUMN:
             numeric_ret = skinlist_get_item_column() + 1;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         case SKIN_TOKEN_LIST_ITEM_NUMBER:
             numeric_ret = skinlist_get_item_number() + 1;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
@@ -1149,7 +1149,7 @@ const char *get_token_value(struct gui_wps *gwps,
             if (!li) return NULL;
             int icon = skinlist_get_item_icon(li->offset, li->wrap);
             numeric_ret = icon;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }
@@ -1160,7 +1160,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_PLAYLIST_POSITION:
             numeric_ret = playlist_get_display_index()+offset;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
 
@@ -1248,7 +1248,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
 
             if (l > -1) {
-                snprintf(buf, buf_size, "%d", l);
+                itoa(buf, buf_size, l);
                 numeric_buf = buf;
                 goto gtv_ret_numeric_tag_info;
             } else {
@@ -1327,13 +1327,13 @@ const char *get_token_value(struct gui_wps *gwps,
                 break;
             }
 
-            snprintf(buf, buf_size, "%d", numeric_ret-1);
+            itoa(buf, buf_size, numeric_ret-1);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }
 
         case SKIN_TOKEN_REPEAT_MODE:
-            snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
+            itoa(buf, buf_size, global_settings.repeat_mode);
             numeric_ret = global_settings.repeat_mode + 1;
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
@@ -1354,7 +1354,7 @@ const char *get_token_value(struct gui_wps *gwps,
                     left : right;
             val = peak_meter_scale_value(val, limit==1 ? MAX_PEAK : limit);
             numeric_ret = val;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             data->peak_meter_enabled = true;
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
@@ -1362,10 +1362,10 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_CROSSFADE:
 #ifdef HAVE_CROSSFADE
-            snprintf(buf, buf_size, "%d", global_settings.crossfade);
+            itoa(buf, buf_size, global_settings.crossfade);
             numeric_ret = global_settings.crossfade + 1;
 #else
-            snprintf(buf, buf_size, "%d", 0);
+            itoa(buf, buf_size, 0);
 #endif
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
@@ -1753,7 +1753,7 @@ const char *get_token_value(struct gui_wps *gwps,
         {
             int curr_screen = get_current_activity();
             numeric_ret = curr_screen;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }
@@ -1767,7 +1767,7 @@ const char *get_token_value(struct gui_wps *gwps,
             char *skin_base = get_skin_buffer(data);
             struct skin_var* var = SKINOFFSETTOPTR(skin_base, token->value.data);
             numeric_ret = var->value;
-            snprintf(buf, buf_size, "%d", numeric_ret);
+            itoa(buf, buf_size, numeric_ret);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }

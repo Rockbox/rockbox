@@ -219,6 +219,7 @@ target/hosted/maemo/maemo-thread.c
 #ifndef BOOTLOADER
 chunk_alloc.c
 common/strptokspn.c
+common/itoa.c
 common/ap_int.c
 #endif
 common/version.c

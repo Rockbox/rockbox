@@ -18,12 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <stdio.h>
 #include "config.h"
 #include "font.h"
 #include "kernel.h"
 #include "string.h" /* for memcmp oO*/
+#include "string-extra.h" /* for itoa */
 #include "sound.h"
 #include "settings.h"
 #include "viewport.h"
@@ -611,7 +611,7 @@ static int write_bitmap_number(struct screen * display, int value,
                                int x, int y)
 {
     char buf[12], *ptr;
-    snprintf(buf, sizeof(buf), "%d", value);
+    itoa(buf, sizeof(buf), value);
 
     for (ptr = buf; *ptr != '\0'; ptr++, x += BM_GLYPH_WIDTH)
         display->mono_bitmap(bitmap_glyphs_4x8[*ptr - '0'], x, y,

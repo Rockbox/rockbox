@@ -239,6 +239,15 @@ static const char * const tag_type_str[] = {
 #define logf_clauses logf
 #endif /* ndef LOGF_ENABLE */
 
+#if !defined(itoa)
+char *itoa(char *buf, size_t bufsz, long int i)
+{
+    snprintf(buf, bufsz, "%ld", i);
+    return buf;
+}
+#endif
+
+
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
 
@@ -1912,7 +1921,7 @@ static bool get_next(struct tagcache_search *tcs, bool is_numeric, char *buf, lo
 
     if (is_numeric)
     {
-        snprintf(buf, bufsz, "%ld", tcs->position);
+        itoa(buf, bufsz, tcs->position);
         tcs->result = buf;
         tcs->result_len = strlen(buf) + 1;
         return true;
@@ -3982,7 +3991,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         {
             if (TAGCACHE_IS_NUMERIC(j))
             {
-                snprintf(temp, sizeof temp, "%d", (int)idx.tag_seek[j]);
+                itoa(temp, sizeof temp, (int)idx.tag_seek[j]);
                 write_tag(clfd, tagcache_tag_to_str(j), temp);
                 continue;
             }

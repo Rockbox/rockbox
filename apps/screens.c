@@ -519,7 +519,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_TAGNAVI_ALL_TRACKS:
                 if (info->track_ct <= 1)
                     return NULL;
-                snprintf(buffer, buffer_len, "%d", info->track_ct);
+                itoa(buffer, buffer_len, info->track_ct);
                 val = buffer;
                 if(say_it)
                     talk_number(info->track_ct, true);
@@ -558,7 +558,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 else if (id3->discnum)
                 {
-                    snprintf(buffer, buffer_len, "%d", id3->discnum);
+                    itoa(buffer, buffer_len, id3->discnum);
                     val = buffer;
                     if(say_it)
                         talk_number(id3->discnum, true);
@@ -573,7 +573,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 else if (id3->tracknum)
                 {
-                    snprintf(buffer, buffer_len, "%d", id3->tracknum);
+                    itoa(buffer, buffer_len, id3->tracknum);
                     val = buffer;
                     if(say_it)
                         talk_number(id3->tracknum, true);
@@ -602,7 +602,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 else if (id3->year)
                 {
-                    snprintf(buffer, buffer_len, "%d", id3->year);
+                    itoa(buffer, buffer_len, id3->year);
                     val = buffer;
                     if(say_it)
                         talk_value(id3->year, UNIT_DATEYEAR, true);
