@@ -16507,3 +16507,59 @@
     *: "字体加载失败"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "添加当前项到捷径菜单"
+  </dest>
+  <voice>
+    *: "添加当前项到捷径菜单"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "记录日志"
+  </dest>
+  <voice>
+    *: "记录日志"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "查看日志"
+  </dest>
+  <voice>
+    *: "查看日志"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "播放完毕 再来一遍？"
+  </dest>
+  <voice>
+    *: "当前播放列表播放完毕 是否要重新播放"
+  </voice>
+</phrase>
