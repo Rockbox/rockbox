@@ -16517,3 +16517,59 @@
     *: "Titel gespeichert"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "zu Verknüpfungen hinzufügen"
+  </dest>
+  <voice>
+    *: "zu Verknüpfungen hinzufügen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Protokollierung"
+  </dest>
+  <voice>
+    *: "Protokollierung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Protokoll anzeigen"
+  </dest>
+  <voice>
+    *: "Protokoll anzeigen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Wiedergabliste beendet. Erneut abspielen?"
+  </dest>
+  <voice>
+    *: "Wiedergabliste beendet. Erneut abspielen?"
+  </voice>
+</phrase>
