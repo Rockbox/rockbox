@@ -106,12 +106,16 @@ void ide_power_enable(bool on)
     if (on)
     {
         GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+        GPIO_CLEAR_BITWISE(GPIOI_ENABLE, 0xBF);
+        GPIO_CLEAR_BITWISE(GPIOK_ENABLE, 0x1F);
         DEV_EN |= DEV_IDE0;
     }
     else
     {
         DEV_EN &= ~DEV_IDE0;
         GPIO_SET_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+        GPIO_SET_BITWISE(GPIOI_ENABLE, 0xBF);
+        GPIO_SET_BITWISE(GPIOK_ENABLE, 0x1F);
     }
 #elif defined(IPOD_VIDEO)
     if (on)
