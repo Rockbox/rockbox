@@ -6539,6 +6539,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Artistes de l'album"
+  </dest>
+  <voice>
+    *: "Artistes de l'album"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_ID3_DISCNUM
   desc: in tag viewer
   user: core
@@ -16456,6 +16470,20 @@
   </dest>
   <voice>
     *: "Artistes par Première Lettre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artistes de l'album par Première Lettre"
+  </dest>
+  <voice>
+    *: "Artistes de l'album par Première Lettre"
   </voice>
 </phrase>
 <phrase>
