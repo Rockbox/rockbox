@@ -3044,6 +3044,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Special character"
+  </dest>
+  <voice>
+    *: "Special character"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PM_MENU
   desc: in the display menu
   user: core

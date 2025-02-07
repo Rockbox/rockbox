@@ -2972,6 +2972,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Caractère spécial"
+  </dest>
+  <voice>
+    *: "Caractère spécial"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PM_MENU
   desc: in the display menu
   user: core

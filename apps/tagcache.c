@@ -234,6 +234,9 @@ static const char * const tag_type_str[] = {
     [clause_oneof] = "clause_oneof",
     [clause_begins_oneof] = "clause_begins_oneof",
     [clause_ends_oneof] = "clause_ends_oneof",
+    [clause_not_oneof] = "clause_not_oneof",
+    [clause_not_begins_oneof] = "clause_not_begins_oneof",
+    [clause_not_ends_oneof] = "clause_not_ends_oneof",
     [clause_logical_or] = "clause_logical_or"
  };
 #define logf_clauses logf
@@ -1441,11 +1444,18 @@ static bool check_against_clause(long numeric, const char *str,
                 return !str_ends_with(str, clause->str);
             case clause_oneof:
                 return str_oneof(str, clause->str);
+            case clause_not_oneof:
+                return !str_oneof(str, clause->str);
             case clause_ends_oneof:
                 /* Fall-Through */
             case clause_begins_oneof:
                 return str_begins_ends_oneof(str, clause->str,
                                              clause->type == clause_begins_oneof);
+            case clause_not_ends_oneof:
+                /* Fall-Through */
+            case clause_not_begins_oneof:
+                return !str_begins_ends_oneof(str, clause->str,
+                                            clause->type == clause_not_begins_oneof);
             default:
                 logf("Incorrect tag: %d", clause->type);
         }

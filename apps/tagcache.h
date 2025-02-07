@@ -74,7 +74,8 @@ enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
     clause_lt, clause_lteq, clause_contains, clause_not_contains, 
     clause_begins_with, clause_not_begins_with, clause_ends_with,
     clause_not_ends_with, clause_oneof,
-    clause_begins_oneof, clause_ends_oneof,
+    clause_begins_oneof, clause_ends_oneof, clause_not_oneof,
+    clause_not_begins_oneof, clause_not_ends_oneof,
     clause_logical_or };
 
 struct tagcache_stat {
