@@ -1124,9 +1124,12 @@ static void build_firstletter_menu(char *buf, size_t bufsz)
     const char * const showsub = /* album subitem for canonicalartist */
         ((strcasestr(subitem, "artist") == NULL) ? "title" : "album -> title");
 
-    const char * fmt_numeric ="\"%s\"-> %s ? %s @^ \"0|1|2|3|4|5|6|7|8|9\" -> %s =\"fmt_title\"";
+    /* Using >= "0" & <= "9" does not work as intended in all cases
+    we need to use the previous & the next character in the ASCII table
+    which are "/" and ":" to get the intended effect */
+    const char * fmt_numeric ="\"%s\"-> %s ? %s > \"/\" & %s < \":\" -> %s =\"fmt_title\"";
     snprintf(buf, bufsz, fmt_numeric,
-            str(LANG_DISPLAY_NUMERIC), subitem, subitem, showsub);
+            str(LANG_DISPLAY_NUMERIC), subitem, subitem, subitem, showsub);
 
     if (!alloc_menu_parse_buf(buf, menu_byfirstletter))
     {
@@ -1144,10 +1147,11 @@ static void build_firstletter_menu(char *buf, size_t bufsz)
         }
     }
 
-    const char * fmt_special ="\"%s\"-> %s ? %s *^ \"0|1|2|3|4|5|6|7|8|9\" & "\
-    "%s *^ \"A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z\" -> %s =\"fmt_title\"";
+    /* use lower character there because strncasecmp works will convert them anyway */
+    const char * fmt_special ="\"%s\"-> %s ? %s *^ "\
+    "\"a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9\" -> %s =\"fmt_title\"";
     snprintf(buf, bufsz, fmt_special,
-        str(LANG_DISPLAY_SPECIAL_CHARACTER), subitem, subitem, subitem, showsub);
+        str(LANG_DISPLAY_SPECIAL_CHARACTER), subitem, subitem, showsub);
 
     if (!alloc_menu_parse_buf(buf, menu_byfirstletter))
     {
