@@ -70,9 +70,7 @@ static void exception_dump(void* frame, unsigned long epc,
     lcd_set_viewport(NULL);
 #if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
-    lcd_set_drawmode(DRMODE_SOLID);
-    lcd_set_foreground(LCD_BLACK);
-    lcd_set_background(LCD_WHITE);
+    lcd_set_drawinfo(DRMODE_SOLID, LCD_BLACK, LCD_WHITE);
 #endif
 
     lcd_clear_display();
