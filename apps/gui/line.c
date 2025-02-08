@@ -345,10 +345,10 @@ static void style_line(struct screen *display,
                                             height*line->line);
             break;
         case STYLE_COLORBAR:
-            display->set_drawmode(DRMODE_FG);
+            /*display->set_drawmode(DRMODE_FG);*/
             display->set_foreground(line->line_color);
-            display->fillrect(x, y, width - x, bar_height);
-            break;
+            /*display->fillrect(x, y, width - x, bar_height);*/
+            /* Fall through */
 #endif
         case STYLE_INVERT:
             display->set_drawmode(DRMODE_FG);
@@ -396,10 +396,10 @@ void vput_line(struct screen *display,
     print_line(display, x, y, line, fmt, ap);
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
     if (display->depth > 1 && line->style > STYLE_INVERT)
-    {    
-        display->set_foreground(fg);
-        display->set_background(bg);
+    {
+         display->set_drawinfo(DRMODE_SOLID, fg, bg);
     }
+    else
 #endif
     display->set_drawmode(DRMODE_SOLID);
 }

@@ -201,6 +201,7 @@ struct screen screens[NB_SCREENS] =
         .get_foreground=&lcd_get_foreground,
         .set_background=&lcd_set_background,
         .set_foreground=&lcd_set_foreground,
+        .set_drawinfo = &lcd_set_drawinfo,
 #endif /* LCD_DEPTH > 1 */
         .update_rect=&lcd_update_rect,
         .update_viewport_rect=&lcd_update_viewport_rect,
@@ -289,6 +290,7 @@ struct screen screens[NB_SCREENS] =
         .get_foreground=&lcd_remote_get_foreground,
         .set_background=&lcd_remote_set_background,
         .set_foreground=&lcd_remote_set_foreground,
+        .set_drawinfo = &lcd_remote_set_drawinfo,
 #endif /* LCD_REMOTE_DEPTH > 1 */
         .update_rect=&lcd_remote_update_rect,
         .update_viewport_rect=&lcd_remote_update_viewport_rect,

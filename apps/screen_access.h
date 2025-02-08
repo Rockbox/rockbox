@@ -94,6 +94,7 @@ struct screen
     unsigned (*get_foreground)(void);
     void (*set_background)(unsigned background);
     void (*set_foreground)(unsigned foreground);
+    void (*set_drawinfo)(int mode, unsigned foreground, unsigned background);
 #endif /* (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1) */
     void (*update_rect)(int x, int y, int width, int height);
     void (*update_viewport_rect)(int x, int y, int width, int height);

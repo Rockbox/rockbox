@@ -119,18 +119,6 @@ static inline unsigned get_black_or_white(const struct rgb_pick *rgb)
 #define SELECTOR_WIDTH          get_icon_width(display->screen_type)
 #define SELECTOR_HEIGHT         8 /* Height of > and < bitmaps            */
 
-/* dunno why lcd_set_drawinfo should be left out of struct screen */
-static void set_drawinfo(struct screen *display, int mode,
-                         unsigned foreground, unsigned background)
-{
-    display->set_drawmode(mode);
-    if (display->depth > 1)
-    {
-        display->set_foreground(foreground);
-        display->set_background(background);
-    }
-}
-
 /* Figure out widest label character in case they vary -
    this function assumes labels are one character */
 static int label_get_max_width(struct screen *display)
@@ -174,7 +162,7 @@ static void draw_screen(struct screen *display, char *title,
     }
 
     /* Draw title string */
-    set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
+    display->set_drawinfo(DRMODE_SOLID, text_color, background_color);
     vp.flags |= VP_FLAG_ALIGN_CENTER;
     display->putsxy(0, MARGIN_TOP, title);
 
@@ -212,7 +200,7 @@ static void draw_screen(struct screen *display, char *title,
 
         if (i == row)
         {
-            set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
+            display->set_drawinfo(DRMODE_SOLID, text_color, background_color);
 
             if (global_settings.cursor_style != 0)
             {
@@ -249,7 +237,7 @@ static void draw_screen(struct screen *display, char *title,
         else if (!display_three_rows)
             continue;
 
-        set_drawinfo(display, mode, fg, bg);
+        display->set_drawinfo(mode, fg, bg);
 
         /* Draw label */
         vp.flags &= ~VP_FLAG_ALIGNMENT_MASK;
@@ -294,14 +282,14 @@ static void draw_screen(struct screen *display, char *title,
             display->fillrect(text_x, top, width, height);
 
             /* Draw RGB: #rrggbb in middle of swatch */
-            set_drawinfo(display, DRMODE_FG, get_black_or_white(rgb),
+            display->set_drawinfo(DRMODE_FG, get_black_or_white(rgb),
                          background_color);
             /* Format RGB: #rrggbb */
             display->putsxyf(0, top + (height - char_height) / 2,
                 str(LANG_COLOR_RGB_VALUE), rgb->red, rgb->green, rgb->blue);
 
             /* Draw border around the rect */
-            set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
+            display->set_drawinfo(DRMODE_SOLID, text_color, background_color);
             display->drawrect(text_x, top, width, height);
         }
     }
@@ -313,7 +301,7 @@ static void draw_screen(struct screen *display, char *title,
 
         if (height >= char_height)
         {
-            set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
+            display->set_drawinfo(DRMODE_SOLID, text_color, background_color);
             /* Format RGB: #rrggbb */
             display->putsxyf(0, top + (height - char_height) / 2,
                     str(LANG_COLOR_RGB_VALUE), rgb->red, rgb->green, rgb->blue);
