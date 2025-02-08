@@ -951,7 +951,17 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
 #ifdef HAVE_MORSE_INPUT
     if (state->morse_mode)
     {
-        const int w = 6, h = 9; /* sysfixed font width, height */
+        const int w = SYSFONT_WIDTH, h = SYSFONT_HEIGHT; /* sysfixed font width, height */
+        const int rect_morse_long_width = 1;
+        const int rect_morse_short_width = 1;
+        const int rect_morse_long_height = (h * 75 / 100);
+        const int rect_morse_short_height = rect_morse_long_height / 2;
+        const int spacing_between_morse_codes = 4;
+        const int morse_code_long_height_offset_percentage = (100 - (100 * rect_morse_long_height / h)) / 2;
+        const int morse_code_long_height_offset = (h * morse_code_long_height_offset_percentage / 100);
+        const int morse_code_short_height_offset_percentage = (100 - (100 * rect_morse_short_height / rect_morse_long_height)) / 2;
+        const int morse_code_short_height_offset = (rect_morse_long_height * morse_code_short_height_offset_percentage / 100);
+        const int letters_block_spacing = w / 2;
         int i, iNext, j, x, y;
         int sc_w = vp->width, sc_h = vp->height;//pm->main_y - pm->keyboard_margin - 1;
 
@@ -970,17 +980,19 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
             for (j = 0; morse_code > 0x01; morse_code >>= 1) {
                 j++;
             }
-            x += w + 3 + j * 4;
+            x += w + 3 + j * (rect_morse_long_width + spacing_between_morse_codes);
             morse_code = morse_codes[i];
             for (; morse_code > 0x01; morse_code >>= 1) {
-                x -= 4;
+                x -= (rect_morse_long_width + spacing_between_morse_codes);
                 if (morse_code & 0x01) {
-                    sc->fillrect(x, y + 2, 3, 4);
+                    sc->fillrect(x, y + morse_code_long_height_offset,
+                        rect_morse_long_width, rect_morse_long_height);
                 } else {
-                    sc->fillrect(x, y + 3, 1, 2);
+                    sc->fillrect(x, y + morse_code_long_height_offset + morse_code_short_height_offset,
+                        rect_morse_short_width, rect_morse_short_height);
                 }
             }
-            x += j * 4;
+            x += j * (rect_morse_long_width + spacing_between_morse_codes);
             iNext = i + 1;
             if (morse_alphabets[iNext] == '\0') {
                 break;
@@ -990,7 +1002,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                 j++;
             }
             // If the next one will go out of line
-            bool needNewLine = x + w + 3 + j * 4 + w >= sc_w;
+            bool needNewLine = x + w + 3 + j * (rect_morse_long_width + spacing_between_morse_codes) + letters_block_spacing >= sc_w;
             if (needNewLine) {
                 if (y + h >= sc_h) {
                     // No more height space
@@ -1000,7 +1012,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                 y += h;
             } else {
                 // Some pixels for spacing in the same line
-                x += w;
+                x += letters_block_spacing;
             }
         }
     }
