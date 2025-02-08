@@ -29,7 +29,7 @@ dlwhere="${RBDEV_DOWNLOAD:-$TMP/rbdev-dl}"
 # Note that the user running this script must be able to do make install in
 # this given prefix directory. Also make sure that this given root dir
 # exists.
-prefix="${RBDEV_PREFIX:-$TMP/local}"
+prefix="${RBDEV_PREFIX:-/usr/local}"
 
 # This directory is used to extract all files and to build everything in. It
 # must not exist before this script is invoked (as a security measure).
