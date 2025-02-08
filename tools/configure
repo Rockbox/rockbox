@@ -1967,6 +1967,7 @@ fi
     t_soc="pp"
     t_manufacturer="ipod"
     t_model="video"
+    sysfont="14-Rockbox-Mix"
     ;;
 
    23|ipod3g)
@@ -2126,6 +2127,7 @@ fi
     t_cpu="arm"
     t_manufacturer="s5l8702"
     t_model="ipod6g"
+    sysfont="14-Rockbox-Mix"
     ;;
 
    30|iaudiox5)
