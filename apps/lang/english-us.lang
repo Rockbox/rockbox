@@ -16552,3 +16552,479 @@
     *: "Add Current to Shortcuts"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Special character"
+  </dest>
+  <voice>
+    *: "Special character"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Album Artists"
+  </dest>
+  <voice>
+    *: "Album Artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "First Letter"
+  </dest>
+  <voice>
+    *: "First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "By First Letter..."
+  </dest>
+  <voice>
+    *: "By First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Album Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Album Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albums by First Letter"
+  </dest>
+  <voice>
+    *: "Albums by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Tracks by First Letter"
+  </dest>
+  <voice>
+    *: "Tracks by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Artists"
+  </dest>
+  <voice>
+    *: "Artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albums"
+  </dest>
+  <voice>
+    *: "Albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Tracks"
+  </dest>
+  <voice>
+    *: "Tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Shuffle Songs"
+  </dest>
+  <voice>
+    *: "Shuffle Songs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Filename"
+  </dest>
+  <voice>
+    *: "Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Title (with track duration)"
+  </dest>
+  <voice>
+    *: "Title with track duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "User Rating"
+  </dest>
+  <voice>
+    *: "User Rating"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Search"
+  </dest>
+  <voice>
+    *: "Search"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Search by..."
+  </dest>
+  <voice>
+    *: "Search by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Recently Added"
+  </dest>
+  <voice>
+    *: "Recently Added"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Playback History"
+  </dest>
+  <voice>
+    *: "Playback History"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Custom menu"
+  </dest>
+  <voice>
+    *: "Custom menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Same as currently played track"
+  </dest>
+  <voice>
+    *: "Same as currently played track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Directory"
+  </dest>
+  <voice>
+    *: "Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albums by Year"
+  </dest>
+  <voice>
+    *: "Albums by Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albums between Years"
+  </dest>
+  <voice>
+    *: "Albums between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Artists between Years"
+  </dest>
+  <voice>
+    *: "Artists between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Most played (Plays|Score)"
+  </dest>
+  <voice>
+    *: "Most played by Plays then by Score"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Recently played tracks"
+  </dest>
+  <voice>
+    *: "Recently played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Never played tracks"
+  </dest>
+  <voice>
+    *: "Never played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Favourite artists"
+  </dest>
+  <voice>
+    *: "Favorite artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Favourite albums"
+  </dest>
+  <voice>
+    *: "Favorite albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Recent favourites"
+  </dest>
+  <voice>
+    *: "Recent favorites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "New favourites"
+  </dest>
+  <voice>
+    *: "New favorites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Forgotten favourites"
+  </dest>
+  <voice>
+    *: "Forgotten favorites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Tracks by"
+  </dest>
+  <voice>
+    *: "Tracks by"
+  </voice>
+</phrase>
