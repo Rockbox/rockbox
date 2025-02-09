@@ -358,69 +358,66 @@ static int get_token_str(char *buf, int size)
 
 static int get_tag(int *tag)
 {
-    #define TAG_MATCH(str, tag) {str, sizeof(str) - 1, tag}
-    struct match {const char* str; uint16_t len; uint16_t symbol;};
-    static const struct match get_tag_match[] =
+#define TAG_TABLE \
+        TAG_MATCH("lm", tag_virt_length_min) \
+        TAG_MATCH("ls", tag_virt_length_sec) \
+        TAG_MATCH("pm", tag_virt_playtime_min) \
+        TAG_MATCH("ps", tag_virt_playtime_sec) \
+        TAG_MATCH("->", menu_next) \
+        TAG_MATCH("~>", menu_shuffle_songs) \
+        TAG_MATCH("==>", menu_load) \
+        TAG_MATCH("year", tag_year) \
+        TAG_MATCH("album", tag_album) \
+        TAG_MATCH("genre", tag_genre) \
+        TAG_MATCH("title", tag_title) \
+        TAG_MATCH("%sort", var_sorttype) \
+        TAG_MATCH("artist", tag_artist) \
+        TAG_MATCH("length", tag_length) \
+        TAG_MATCH("rating", tag_rating) \
+        TAG_MATCH("%limit", var_limit) \
+        TAG_MATCH("%strip", var_strip) \
+        TAG_MATCH("bitrate", tag_bitrate) \
+        TAG_MATCH("comment", tag_comment) \
+        TAG_MATCH("discnum", tag_discnumber) \
+        TAG_MATCH("%format", var_format) \
+        TAG_MATCH("%reload", menu_reload) \
+        TAG_MATCH("filename", tag_filename) \
+        TAG_MATCH("basename", tag_virt_basename) \
+        TAG_MATCH("tracknum", tag_tracknumber) \
+        TAG_MATCH("composer", tag_composer) \
+        TAG_MATCH("ensemble", tag_albumartist) \
+        TAG_MATCH("grouping", tag_grouping) \
+        TAG_MATCH("entryage", tag_virt_entryage) \
+        TAG_MATCH("commitid", tag_commitid) \
+        TAG_MATCH("%include", var_include) \
+        TAG_MATCH("playcount", tag_playcount) \
+        TAG_MATCH("autoscore", tag_virt_autoscore) \
+        TAG_MATCH("lastplayed", tag_lastplayed) \
+        TAG_MATCH("lastoffset", tag_lastoffset) \
+        TAG_MATCH("%root_menu", var_rootmenu) \
+        TAG_MATCH("albumartist", tag_albumartist) \
+        TAG_MATCH("lastelapsed", tag_lastelapsed) \
+        TAG_MATCH("%menu_start", var_menu_start) \
+        TAG_MATCH("%byfirstletter", menu_byfirstletter) \
+        TAG_MATCH("canonicalartist", tag_virt_canonicalartist) \
+    /* END OF TAG_TABLE MACRO */
+
+    /* build two separate arrays tag strings and symbol map*/
+    #define TAG_MATCH(str, tag) str,
+    static const char * const get_tag_match[] =
     {
-        TAG_MATCH("lm", tag_virt_length_min),
-        TAG_MATCH("ls", tag_virt_length_sec),
-        TAG_MATCH("pm", tag_virt_playtime_min),
-        TAG_MATCH("ps", tag_virt_playtime_sec),
-        TAG_MATCH("->", menu_next),
-        TAG_MATCH("~>", menu_shuffle_songs),
-
-        TAG_MATCH("==>", menu_load),
-
-        TAG_MATCH("year", tag_year),
-
-        TAG_MATCH("album", tag_album),
-        TAG_MATCH("genre", tag_genre),
-        TAG_MATCH("title", tag_title),
-        TAG_MATCH("%sort", var_sorttype),
-
-        TAG_MATCH("artist", tag_artist),
-        TAG_MATCH("length", tag_length),
-        TAG_MATCH("rating", tag_rating),
-        TAG_MATCH("%limit", var_limit),
-        TAG_MATCH("%strip", var_strip),
-
-        TAG_MATCH("bitrate", tag_bitrate),
-        TAG_MATCH("comment", tag_comment),
-        TAG_MATCH("discnum", tag_discnumber),
-        TAG_MATCH("%format", var_format),
-        TAG_MATCH("%reload", menu_reload),
-
-        TAG_MATCH("filename", tag_filename),
-        TAG_MATCH("basename", tag_virt_basename),
-        TAG_MATCH("tracknum", tag_tracknumber),
-        TAG_MATCH("composer", tag_composer),
-        TAG_MATCH("ensemble", tag_albumartist),
-        TAG_MATCH("grouping", tag_grouping),
-        TAG_MATCH("entryage", tag_virt_entryage),
-        TAG_MATCH("commitid", tag_commitid),
-        TAG_MATCH("%include", var_include),
-
-        TAG_MATCH("playcount", tag_playcount),
-        TAG_MATCH("autoscore", tag_virt_autoscore),
-
-        TAG_MATCH("lastplayed", tag_lastplayed),
-        TAG_MATCH("lastoffset", tag_lastoffset),
-        TAG_MATCH("%root_menu", var_rootmenu),
-
-        TAG_MATCH("albumartist", tag_albumartist),
-        TAG_MATCH("lastelapsed", tag_lastelapsed),
-        TAG_MATCH("%menu_start", var_menu_start),
-
-        TAG_MATCH("%byfirstletter", menu_byfirstletter),
-        TAG_MATCH("canonicalartist", tag_virt_canonicalartist),
-
-        TAG_MATCH("", 0) /* sentinel */
+        TAG_TABLE
     };
     #undef TAG_MATCH
-    const size_t max_cmd_sz = 32; /* needs to be >= to len of longest tagstr */
+    #define TAG_MATCH(str, tag) tag,
+    static const uint8_t get_tag_symbol[]=
+    {
+        TAG_TABLE
+    };
+    #undef TAG_MATCH
+
     const char *tagstr;
-    uint16_t tagstr_len;
-    const struct match *match;
+    ptrdiff_t tagstr_len;
 
     /* Find the start. */
     while (*strp == ' ' || *strp == '>')
@@ -430,24 +427,24 @@ static int get_tag(int *tag)
         return 0;
 
     tagstr = strp;
-    for (tagstr_len = 0; tagstr_len < max_cmd_sz; tagstr_len++)
+    while(*strp != '\0' && *strp != ' ') /* walk to the end of the tag */
     {
-        if (*strp == '\0' || *strp == ' ')
-            break ;
         strp++;
     }
+    tagstr_len = strp - tagstr;
 
-    for (match = get_tag_match; match->len != 0; match++)
+    for (size_t i = 0; i < ARRAYLEN(get_tag_match); i++)
     {
-        if (tagstr_len != match->len)
-            continue;
-        else if (strncasecmp(tagstr, match->str, match->len) == 0)
+        const char *match = get_tag_match[i];
+        if ((ptrdiff_t)strlen(match) == tagstr_len)
         {
-            *tag = match->symbol;
-            return 1;
+            if (strncasecmp(tagstr, match, tagstr_len) == 0)
+            {
+                *tag = get_tag_symbol[i];
+                return 1;
+            }
         }
     }
-
     logf("NO MATCH: %.*s\n", tagstr_len, tagstr);
 
     return -1;
@@ -456,10 +453,10 @@ static int get_tag(int *tag)
 static int get_clause(int *condition)
 {
     /* one or two operator conditionals */
-    #define OPS2VAL(op1, op2) ((int)op1 << 8 | (int)op2)
+    #define OPS2VAL(op1, op2) ((uint16_t)op1 << 8 | (uint16_t)op2)
     #define CLAUSE(op1, op2, symbol) {OPS2VAL(op1, op2), symbol }
 
-    struct clause_symbol {int value;int symbol;};
+    struct clause_symbol {uint16_t value;uint16_t symbol;};
     const struct clause_symbol *match;
     static const struct clause_symbol get_clause_match[] =
     {
@@ -497,7 +494,7 @@ static int get_clause(int *condition)
     if (op2 == '"') /*allow " to end a single op conditional */
         op2 = ' ';
 
-    int value = OPS2VAL(op1, op2);
+    uint16_t value = OPS2VAL(op1, op2);
 
     for (match = get_clause_match; match->value != 0; match++)
     {
