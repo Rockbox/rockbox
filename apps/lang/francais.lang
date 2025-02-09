@@ -16892,6 +16892,7 @@
     *: "Pistes par"
   </voice>
 </phrase>
+<phrase>
   id: LANG_RESET_EQUALIZER
   desc: in the equalizer settings menu
   user: core
