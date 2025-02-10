@@ -358,6 +358,7 @@ static int get_token_str(char *buf, int size)
 
 static int get_tag(int *tag)
 {
+    /* case insensitive matching ahead - these should all be lower case */
 #define TAG_TABLE \
         TAG_MATCH("lm", tag_virt_length_min) \
         TAG_MATCH("ls", tag_virt_length_sec) \
@@ -433,12 +434,16 @@ static int get_tag(int *tag)
     }
     tagstr_len = strp - tagstr;
 
+    char first = tolower(*tagstr++); /* get the first letter elide cmp fn call */
+
     for (size_t i = 0; i < ARRAYLEN(get_tag_match); i++)
     {
         const char *match = get_tag_match[i];
-        if ((ptrdiff_t)strlen(match) == tagstr_len)
+
+        if (first == match[0] && strncasecmp(tagstr, match + 1, tagstr_len - 1) == 0)
         {
-            if (strncasecmp(tagstr, match, tagstr_len) == 0)
+            /* check for full match */
+            if ((ptrdiff_t)strlen(match) == tagstr_len)
             {
                 *tag = get_tag_symbol[i];
                 return 1;
