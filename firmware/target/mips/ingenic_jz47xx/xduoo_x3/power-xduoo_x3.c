@@ -29,7 +29,7 @@
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
 {
-    return !__gpio_get_pin(PIN_USB_DET) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+    return __gpio_get_pin(PIN_USB_DET) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void power_init(void)
