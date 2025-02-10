@@ -29,13 +29,7 @@
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
 {
-    int rval = POWER_INPUT_NONE;
-    if(!__gpio_get_pin(PIN_USB_DET))
-        rval |= POWER_INPUT_USB;
-    if(!__gpio_get_pin(CHARGE_STAT_GPIO))
-	rval |= POWER_INPUT_USB_CHARGER;
-
-    return rval;
+    return !__gpio_get_pin(PIN_USB_DET) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 void power_init(void)
@@ -46,5 +40,5 @@ void power_init(void)
 
 bool charging_state(void)
 {
-    return (power_input_status() & POWER_INPUT_USB_CHARGER);
+    return power_input_status() && !__gpio_get_pin(CHARGE_STAT_GPIO);
 }
