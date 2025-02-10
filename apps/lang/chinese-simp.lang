@@ -16563,3 +16563,479 @@
     *: "当前播放列表播放完毕 是否要重新播放"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "特殊字符"
+  </dest>
+  <voice>
+    *: "特殊字符"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "专辑艺术家"
+  </dest>
+  <voice>
+    *: "专辑艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "首字母"
+  </dest>
+  <voice>
+    *: "首字母"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "按首字母查找…"
+  </dest>
+  <voice>
+    *: "按首字母查找"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "按首字母查找艺术家"
+  </dest>
+  <voice>
+    *: "按首字母查找艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "按首字母查找专辑艺术家"
+  </dest>
+  <voice>
+    *: "按首字母查找专辑艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "按首字母查找专辑"
+  </dest>
+  <voice>
+    *: "按首字母查找专辑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "按首字母查找曲目"
+  </dest>
+  <voice>
+    *: "按首字母查找曲目"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "艺术家"
+  </dest>
+  <voice>
+    *: "艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "专辑"
+  </dest>
+  <voice>
+    *: "专辑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "曲目"
+  </dest>
+  <voice>
+    *: "曲目"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "随机乐曲"
+  </dest>
+  <voice>
+    *: "随机乐曲"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "文件名"
+  </dest>
+  <voice>
+    *: "文件名"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "标题（带长度）"
+  </dest>
+  <voice>
+    *: "标题 带长度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "用户评级"
+  </dest>
+  <voice>
+    *: "用户评级"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "搜索"
+  </dest>
+  <voice>
+    *: "搜索"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "搜索依据…"
+  </dest>
+  <voice>
+    *: "搜索依据"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "最近添加"
+  </dest>
+  <voice>
+    *: "最近添加"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "播放历史记录"
+  </dest>
+  <voice>
+    *: "播放历史记录"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "自定菜单"
+  </dest>
+  <voice>
+    *: "自定菜单"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "与当前曲目相同的"
+  </dest>
+  <voice>
+    *: "与当前曲目相同的"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "目录"
+  </dest>
+  <voice>
+    *: "目录"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "按年份查找专辑"
+  </dest>
+  <voice>
+    *: "按年份查找专辑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "按年份区间查找专辑"
+  </dest>
+  <voice>
+    *: "按年份区间查找专辑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "按年份区间查找艺术家"
+  </dest>
+  <voice>
+    *: "按年份区间查找艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "最多播放(播放|评分)"
+  </dest>
+  <voice>
+    *: "最多播放"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "最近播放"
+  </dest>
+  <voice>
+    *: "最近播放"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "未曾播放"
+  </dest>
+  <voice>
+    *: "未曾播放"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "最爱艺术家"
+  </dest>
+  <voice>
+    *: "最爱艺术家"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "最爱专辑"
+  </dest>
+  <voice>
+    *: "最爱专辑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "最近喜爱"
+  </dest>
+  <voice>
+    *: "最近喜爱"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "新喜爱"
+  </dest>
+  <voice>
+    *: "新喜爱"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "遗忘的喜爱"
+  </dest>
+  <voice>
+    *: "遗忘的喜爱"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "曲目"
+  </dest>
+  <voice>
+    *: "曲目"
+  </voice>
+</phrase>
