@@ -959,7 +959,7 @@ static int set_features(void)
     if (identify_info[53] & (1<<2)) {
         int max_udma = ATA_MAX_UDMA;
 #if ATA_MAX_UDMA > 2
-        if (!(identify_info[93] & (1<<13)))
+        if (!identify_info[76] && !(identify_info[93] & (1<<13))) /* w93b13 is only valid for PATA, w76 is 0 PATA */
             max_udma = 2;
 #endif
         /* Ultra DMA mode info present, find a mode */

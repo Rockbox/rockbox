@@ -726,7 +726,7 @@ static int ata_power_up(void)
         {
             int max_udma = ATA_MAX_UDMA;
 #if ATA_MAX_UDMA > 2
-            if (!(identify_info[93] & BIT(13)))
+            if (!identify_info[76] && !(identify_info[93] & BIT(13))) /* w93b13 is only valid for PATA, w76 is 0 PATA */
                 max_udma = 2;
 #endif
             param = ata_get_best_mode(identify_info[88], max_udma, 0x40);
