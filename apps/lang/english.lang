@@ -92,6 +92,21 @@
 # Samsung
 # YH820/YH920/YH925 samsungyh*
 <phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user: core
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Rockbox"
+  </dest>
+  <voice>
+    *: "Rockbox"
+  </voice>
+</phrase>
+# First item will be shown when P2STR is passed a NULL pointer
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user: core
@@ -351,20 +366,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ROCKBOX_TITLE
-  desc: main menu title
-  user: core
-  <source>
-    *: "Rockbox"
-  </source>
-  <dest>
-    *: "Rockbox"
-  </dest>
-  <voice>
-    *: "Rockbox"
   </voice>
 </phrase>
 <phrase>

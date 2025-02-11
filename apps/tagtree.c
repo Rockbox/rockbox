@@ -443,14 +443,14 @@ static int get_tag(int *tag)
         if (first == match[0] && strncasecmp(tagstr, match + 1, tagstr_len - 1) == 0)
         {
             /* check for full match */
-            if ((ptrdiff_t)strlen(match) == tagstr_len)
+            if (match[tagstr_len] == '\0')
             {
                 *tag = get_tag_symbol[i];
                 return 1;
             }
         }
     }
-    logf("NO MATCH: %.*s\n", tagstr_len, tagstr);
+    logf("NO MATCH: %.*s\n", (int)tagstr_len, tagstr);
 
     return -1;
 }
@@ -2293,6 +2293,8 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 
 int tagtree_get_custom_action(struct tree_context* c)
 {
+    if (c->dirlength == 0)
+        return 0;
     return tagtree_get_entry(c, c->selected_item)->customaction;
 }
 
