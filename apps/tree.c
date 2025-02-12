@@ -112,8 +112,8 @@ struct entry* tree_get_entry_at(struct tree_context *t, int index)
     return &entries[index];
 }
 
-static struct entry *tree_get_valid_entry_at(const char* funcname,
-                                             struct tree_context *t, int index)
+static struct entry *get_valid_entry(const char* funcname,
+                                     struct tree_context *t, int index)
 {
     struct entry *entry = tree_get_entry_at(t, index);
     if (!entry)
@@ -163,8 +163,7 @@ static const char* tree_get_filename(int selected_item, void *data,
     else
 #endif
     {
-        struct entry *entry =
-                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
+        struct entry *entry = get_valid_entry(__func__, local_tc, selected_item);
         name = entry->name;
         attr = entry->attr;
     }
@@ -182,8 +181,7 @@ static int tree_get_filecolor(int selected_item, void * data)
     if (*tc.dirfilter == SHOW_ID3DB)
         return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
-    struct entry *entry =
-                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
+    struct entry *entry = get_valid_entry(__func__, local_tc, selected_item);
 
     return filetype_get_color(entry->name, entry->attr);
 }
@@ -200,8 +198,7 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     else
 #endif
     {
-        struct entry *entry =
-                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
+        struct entry *entry = get_valid_entry(__func__, local_tc, selected_item);
 
         return filetype_get_icon(entry->attr);
     }
@@ -251,8 +248,7 @@ static int tree_voice_cb(int selected_item, void * data)
     else
 #endif
     {
-        struct entry *entry =
-                     tree_get_valid_entry_at(__func__, local_tc, selected_item);
+        struct entry *entry = get_valid_entry(__func__, local_tc, selected_item);
         name = entry->name;
         attr = entry->attr;
     }
@@ -484,7 +480,7 @@ static int update_dir(void)
             if (tc.dirlevel > 0 && *tc.dirfilter == SHOW_PLUGINS)
             {
                 char *subdir = strrchr(tc.currdir, '/');
-                if (subdir)
+                if (subdir != NULL)
                     title = subdir + 1; /* step past the separator */
             }
         }
@@ -782,7 +778,7 @@ static int dirbrowse(void)
                 if (tc.browse->flags & BROWSE_SELECTONLY)
                 {
                     struct entry *entry =
-                       tree_get_valid_entry_at(__func__, &tc, tc.selected_item);
+                                get_valid_entry(__func__, &tc, tc.selected_item);
                     short attr = entry->attr;
                     if(!(attr & ATTR_DIRECTORY))
                     {
@@ -932,7 +928,7 @@ static int dirbrowse(void)
 #endif
                     {
                         struct entry *entry =
-                         tree_get_valid_entry_at(__func__, &tc, tc.selected_item);
+                               get_valid_entry(__func__, &tc, tc.selected_item);
 
                         attr = entry->attr;
 
