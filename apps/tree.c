@@ -1194,13 +1194,12 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
     char* suffix = strrchr(resume_file, '.');
     bool started = false;
 
-    if (suffix != NULL &&
-        (!strcasecmp(suffix, ".m3u") || !strcasecmp(suffix, ".m3u8")))
+    if (suffix != NULL && !strncasecmp(suffix, ".m3u", sizeof(".m3u") - 1)) /* gets m3u8 too */
     {
         /* Playlist playback */
         char* slash;
         /* check that the file exists */
-        if(!file_exists(resume_file))
+        if (!file_exists(resume_file))
             return false;
 
         slash = strrchr(resume_file,'/');
@@ -1217,8 +1216,6 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
             {
                 if (global_settings.playlist_shuffle)
                     playlist_shuffle(seed, -1);
-
-                playlist_start(index, elapsed, offset);
                 started = true;
             }
             *slash='/';
@@ -1238,45 +1235,37 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
 
             /* Check if the file is at the same spot in the directory,
                else search for it */
-            peek_filename = playlist_peek(index, filename_buf,
-                sizeof(filename_buf));
-
-            if (peek_filename == NULL)
+            int amt = playlist_amount();
+            for ( i=0; i < amt; i++ )
             {
-                /* playlist has shrunk, search from the top */
-                index = 0;
-                peek_filename = playlist_peek(index, filename_buf,
+                int modidx = (i + index) % amt;
+                peek_filename = playlist_peek(modidx, filename_buf,
                     sizeof(filename_buf));
+
                 if (peek_filename == NULL)
-                    return false;
-            }
-
-            if (strcmp(strrchr(peek_filename, '/') + 1, filename))
-            {
-                for ( i=0; i < playlist_amount(); i++ )
                 {
-                    peek_filename = playlist_peek(i, filename_buf,
-                        sizeof(filename_buf));
-
-                    if (peek_filename == NULL)
+                    if (index == 0) /* searched every entry didn't find a match */ 
                         return false;
-
-                    if (!strcmp(strrchr(peek_filename, '/') + 1, filename))
-                        break;
+                    /* playlist has shrunk, search from the top */
+                    i = 0;
+                    amt = index;
+                    index = 0;
                 }
-                if (i < playlist_amount())
-                    index = i;
-                else
-                    return false;
+                else if (!strcmp(strrchr(peek_filename, '/') + 1, filename))
+                {
+                    started = true;
+                    index = modidx;
+                    break;
+                }
             }
-
-            playlist_start(index, elapsed, offset);
-            started = true;
         }
     }
 
     if (started)
+    {
+        playlist_start(index, elapsed, offset);
         start_wps = true;
+    }
     return started;
 }
 
