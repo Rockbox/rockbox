@@ -237,7 +237,7 @@ enum {  ALARM_START_WPS = 0,
 #define VIRT_PTR ((unsigned char*)0x1000)
 #elif CONFIG_CPU == S3C2440 || defined(CPU_PP) || CONFIG_CPU==IMX31L
 /* up to 64MB of DRAM at 0x0 */
-#define VIRT_PTR ((unsigned char*)0x40000000)
+#define VIRT_PTR ((unsigned char*)0x4000000)
 #else
 /* offset from 0x0 slightly */
 #define VIRT_PTR ((unsigned char*)sizeof(char*))
