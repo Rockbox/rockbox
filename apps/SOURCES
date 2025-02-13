@@ -299,4 +299,6 @@ keymaps/keymap-fiiom3k.c
 keymaps/keymap-erosq.c
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 keymaps/keymap-shanlingq1.c
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+keymaps/keymap-echor1.c
 #endif

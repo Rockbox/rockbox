@@ -76,6 +76,9 @@
 #elif CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8720
 # define USB_DW_PHYSADDR(x)     S5L8702_PHYSICAL_ADDR(x)
 # define USB_DW_UNCACHEDADDR(x) S5L8702_UNCACHED_ADDR(x)
+#elif CONFIG_CPU == STM32H743
+# define USB_DW_PHYSADDR(x)     x
+# define NO_UNCACHED_ADDR       /* TODO: maybe implement this */
 #elif !defined(USB_DW_ARCH_SLAVE)
 # error "Must define USB_DW_PHYSADDR / USB_DW_UNCACHEDADDR!"
 #endif

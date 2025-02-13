@@ -423,6 +423,8 @@ drivers/rtc/rtc_s35380a.c
 drivers/rtc/rtc_d2.c
 #elif (CONFIG_RTC == RTC_IMX233)
 drivers/rtc/rtc_imx233.c
+#elif (CONFIG_RTC == RTC_STM32H743)
+drivers/rtc/rtc_stm32h7.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* PLATFORM_NATIVE */
 
@@ -1968,6 +1970,30 @@ target/arm/rk27xx/ihifi2/audio-ihifi770.c
 target/arm/rk27xx/ihifi2/powermgmt-ihifi800.c
 target/arm/rk27xx/ihifi2/audio-ihifi800.c
 #endif
+#endif
+
+#if CONFIG_CPU == STM32H743
+target/arm/stm32/crt0-stm32h7.S
+target/arm/stm32/vectors-stm32h7.S
+target/arm/stm32/adc-stm32h7.c
+target/arm/stm32/debug-stm32h7.c
+target/arm/stm32/gpio-stm32h7.c
+target/arm/stm32/i2c-stm32h7.c
+target/arm/stm32/pcm-stm32h7.c
+target/arm/stm32/sd-stm32h7.c
+target/arm/stm32/spi-stm32h7.c
+target/arm/stm32/system-stm32h7.c
+target/arm/stm32/timer-stm32h7.c
+target/arm/stm32/usb-stm32h7.c
+#endif
+
+#if defined(ECHO_R1)
+target/arm/stm32/echoplayer/audiohw-echoplayer.c
+target/arm/stm32/echoplayer/backlight-echoplayer.c
+target/arm/stm32/echoplayer/button-echoplayer.c
+target/arm/stm32/echoplayer/lcd-echoplayer.c
+target/arm/stm32/echoplayer/power-echoplayer.c
+target/arm/stm32/echoplayer/system-echoplayer.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)

@@ -84,6 +84,7 @@
 #define IMX233        233
 #define RK27XX       2700
 #define X1000        1000
+#define STM32H743   32743
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -163,6 +164,7 @@
 #define EROSQ_PAD          72
 #define FIIO_M3K_PAD       73
 #define SHANLING_Q1_PAD    74
+#define ECHO_R1_PAD        75
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -282,6 +284,7 @@
 #define LCD_FIIOM3K       69 /* as used by the FiiO M3K */
 #define LCD_SHANLING_Q1   70 /* as used by the Shanling Q1 */
 #define LCD_EROSQ         71 /* as used by the ErosQ (native) */
+#define LCD_ECHO_R1       72 /* ILI9342, as used by the Echo R1 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -359,6 +362,7 @@ Lyre prototype 1 */
 #define RTC_CONNECT  24 /* Sansa Connect AVR */
 #define RTC_NANO3G   25 /* Dialog Semiconductor D1671 ??? */
 #define RTC_NANO4G   26 /* Dialog Semiconductor D1759 ??? */
+#define RTC_STM32H743 27
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
@@ -610,6 +614,8 @@ Lyre prototype 1 */
 #include "config/shanlingq1.h"
 #elif defined(EROS_QN)
 #include "config/erosqnative.h"
+#elif defined(ECHO_R1)
+#include "config/echor1.h"
 #else
 //#error "unknown hwardware platform!"
 #endif

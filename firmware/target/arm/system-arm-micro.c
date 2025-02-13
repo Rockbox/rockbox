@@ -64,3 +64,13 @@ void debugmonitor_handler(void) ATTR_IRQ_HANDLER;
 #if ARCH_VERSION >= 8
 void securefault_handler(void) ATTR_IRQ_HANDLER;
 #endif
+
+/*
+ * The weak alias attribute above only works if the alias is defined
+ * in the same translation unit. So each platform should declare its
+ * IRQ handlers in a file and include it below, so that unused ones
+ * can be aliased to UIE.
+ */
+#if CONFIG_CPU == STM32H743
+# include "irqhandlers-stm32h743.c"
+#endif
