@@ -326,7 +326,7 @@ you to configure settings related to audio playback.
     \setting{Prefer Embedded} album art.
 }
 
-\section{Logging}\index{Logging}
+\section{Logging}\index{Logging}\label{sec:playbacklogging}
   This option will record information about tracks played on the device
   in the following format 'timestamp:elapsed(ms):length(ms):path'
   Devices without a Real Time Clock will use current system tick.
@@ -337,7 +337,7 @@ you to configure settings related to audio playback.
          devices with Real Time Clock will record the date and time as well.
          When the log gets too large (\textasciitilde 1500 tracks) it will be split into playback\_nnnn.log
          where nnnn is 0001-9999}
-  see \setting{LastFm Scrobbler} plugin.
+  see  \setting{LastFm Scrobbler} plugin [\ref{sec:scrobbler}].
 \begin{verbatim}
   the log can be found under '/.rockbox/playback.log'
 \end{verbatim}

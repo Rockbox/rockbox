@@ -1,33 +1,55 @@
-\subsection{LastFm Scrobbler}
+\subsection{LastFm Scrobbler}\label{sec:scrobbler}
 The \setting{LastFm Scrobbler} plugin enables you to parse the rockbox
 playback log for tracks you have played for your own logging or upload
 to scrobbling services, such as Last.fm, Libre.fm or ListenBrainz.
 
-\setting{Playback Logging} must be enabled to record the tracks played
-the plugin will ask you to enable logging if run with logging disabled.
+\setting{Playback Logging} [\ref{sec:playbacklogging}] must be enabled to record the tracks played.
+The plugin will ask you to enable logging if run with logging disabled.
 
 \subsubsection{Menu}
 \begin{itemize}
 \item Remove duplicates - Only keeps the same track with the most time elapsed.
+  \begin{description}
+  \item[Off.] Disables duplicate scanning, all tracks saved.
+      %
+  \item[Resume Playback.] No duplicates across track resumes, back to back plays
+        were probably just a track resume, only the longest elapsed play will be saved.
+      %
+  \item[All.] No duplicates, only the longest elapsed play will be saved regardless of when it was played.
+  \end{description}
 \item Delete playback log - Remove the current playback log once it has been read.
-\item Save threshold - Percentage of track played to be considered 'L'istened.
+\item Threshold - Percentage of track played to be considered 'L'istened.
 \item Minimum elapsed (ms) - Tracks played less than this will not be recorded in log.
+\item Track Info - Only keeps tracks with metadata.
+  \begin{description}
+  \item[All.] Tracks saved regardless of metadata availibility.
+      %
+  \item[Skip if Missing.] Tracks without metadata will not be saved.
+      %
+  \item[Track Name Only.] Tracks not scanned for metadata, only filename saved.
+  \end{description}
 \item View log - View the current playback log.
 \item Revert to Default - Default settings restored.
 \item Cancel - Exit, you will be asked to save any changes
 \item Export - Append scrobbler log and save any changes, not visible if no playback log exists.
 \end{itemize}
 
-After the plugin has exported the scrobbler log you can find it in the root
+\note{\begin{itemize}
+\item After the plugin has exported the scrobbler log you can find it in the root
 of the drive '.scrobbler.log' open it in the file browser to view the log.
+    %
+\item Subsequent exports will be appended to .scrobbler.log thus Delete playback log is advised.
+    %
+\item Once setup you may run the scrobbler plugin from a shortcut and it will
+      auto export the playback log and exit.
+      If you would like to change settings run \setting{LastFm Scrobbler} from
+      the \setting{Plugins Menu}.
+    %
+\item A copy of the playback log can be found in '/rockbox/playback\_old.log' it will be overwritten with each export.
 
-Subsequent exports will be appended to .scrobbler.log thus Delete playback log is advised.
+\end{itemize}
+}
 
-\begin{verbatim}
-A copy of the log can be found in
-'/rockbox/playback.old'
-it will be overwritten with each export
-\end{verbatim}
 
 \subsubsection{Format}
 Data will be saved in Audioscrobbler spec at: (use wayback machine).
@@ -49,5 +71,5 @@ tab '\t' separated followed by newline '\n'
 \item MUSICBRAINZ-TRACKID
 \end{itemize}
 
-If track info is not available (due to missing file or format limitations)
-the track path will be used instead.
+\note{If track info is not available (due to missing file or format limitations)
+the track path will be used instead (except when \setting{Skip if Missing} is selected).}
