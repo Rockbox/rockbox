@@ -16505,7 +16505,7 @@
     *: "No fue posible cargar la fuente: (%s)"
   </dest>
   <voice>
-    *: "pistas guardadas"
+    *: "No fue posible cargar la fuente"
   </voice>
 </phrase>
 <phrase>
