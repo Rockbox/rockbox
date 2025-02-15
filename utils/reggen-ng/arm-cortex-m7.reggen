@@ -1,0 +1,81 @@
+name    "cortex_m7"
+title   "Cortex-M7"
+isa     "armv7-m"
+version "1.0"
+author  "Aidan MacDonald"
+
+node CACHE {
+    title "Cache control"
+    addr 0xe000e000
+
+    reg ICIALLU  0xf50
+    reg ICIMVAU  0xf58
+    reg DCIMVAC  0xf5c
+    reg DCISW    0xf60
+    reg DCCMVAU  0xf64
+    reg DCCMVAC  0xf68
+    reg DCCSW    0xf6c
+    reg DCCIMVAC 0xf70
+    reg DCCISW   0xf74
+}
+
+node NVIC {
+    title "Nested vectored interrupt controller"
+    addr 0xe000e000
+
+    reg ISER { instance 0x100 0x4 8 }
+    reg ICER { instance 0x180 0x4 8 }
+    reg ISPR { instance 0x200 0x4 8 }
+    reg ICPR { instance 0x280 0x4 8 }
+    reg IABR { instance 0x300 0x4 8 }
+    reg IPR  { instance 0x400 0x4 60 }
+
+    reg STIR 0xf00 {
+        fld 8 0 INTID
+    }
+}
+
+node SCB {
+    title "System control block"
+    addr 0xe000e000
+
+    reg VTOR 0xd08
+
+    reg CCR 0xd14 {
+        bit 18 BP
+        bit 17 IC
+        bit 16 DC
+        bit  9 STKALIGN
+        bit  8 BFHFNMIGN
+        bit  4 DIV_0_TRP
+        bit  3 UNALIGN_TRP
+        bit  1 USERETMPEND
+        bit  0 NONBASETHRDENA
+    }
+}
+
+node SYSTICK {
+    title "System timer"
+    addr 0xe000e000
+
+    reg CSR 0x10 {
+        bit 16 COUNTFLAG
+        bit  2 CLKSOURCE { enum EXT 0; enum CPU 1 }
+        bit  1 TICKINT
+        bit  0 ENABLE
+    }
+
+    reg RVR 0x14 {
+        fld 23 0 VALUE
+    }
+
+    reg CVR 0x18 {
+        fld 23 0 VALUE
+    }
+
+    reg CALIB 0x1c {
+        bit    31 NOREF
+        bit    30 SKEW
+        fld 23  0 TENMS
+    }
+}
