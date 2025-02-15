@@ -154,6 +154,30 @@ const char* setting_get_cfgvals(const struct settings_list *setting)
     return NULL;
 }
 
+/* calculates and stores crc of settings, returns true if settings have changed */
+static bool settings_crc_changed(void)
+{
+    char value[MAX_PATH];
+    uint32_t custom_crc = 0xFFFFFFFF;
+    for(int i=0; i<nb_settings; i++)
+    {
+        const struct settings_list *setting = &settings[i];
+        if (!(setting->flags & F_CUSTOM_SETTING))
+            continue;
+        cfg_to_string(setting, value, sizeof(value));
+        custom_crc = crc_32(value, strlen(value), custom_crc);
+    }
+
+    uint32_t crc = crc_32(&global_settings, sizeof(global_settings), custom_crc);
+    if (crc != user_settings_crc)
+    {
+        user_settings_crc = crc;
+        return true;
+    }
+
+    return false;
+}
+
 /** Reading from a config file **/
 /*
  * load settings from disk
@@ -174,8 +198,7 @@ void settings_load(void)
     settings_load_config(FIXEDSETTINGSFILE, false);
 
     /* set initial CRC value - settings_save checks, if changed writes to disk */
-    user_settings_crc = crc_32(&global_settings,
-                               sizeof(global_settings), 0xFFFFFFFF);
+    settings_crc_changed();
 }
 
 bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str)
@@ -615,13 +638,11 @@ static void flush_global_status_callback(void)
 
 static void flush_config_block_callback(void)
 {
-    uint32_t crc = crc_32(&global_settings, sizeof(global_settings), 0xFFFFFFFF);
-    if (user_settings_crc != crc)
+    if (settings_crc_changed())
     {
         DEBUGF("Writing changed user_settings to disk\n");
         logf("Writing changed user_settings to disk");
 
-        user_settings_crc = crc; /* update immediately in case we yield */
         if (!settings_write_config(CONFIGFILE_TEMP, SETTINGS_SAVE_CHANGED))
         {
             user_settings_crc = 0;
