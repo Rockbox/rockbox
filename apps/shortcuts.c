@@ -369,11 +369,24 @@ static int readline_cb(int n, char *buf, void *parameters)
                     *param = NULL;
                     break;
                 case SHORTCUT_BROWSER:
+                {
+                    char *p = strmemccpy(sc->u.path, value, MAX_PATH);
+                    if (p && dir_exists(value))
+                    {
+                        /* ensure ending slash */
+                        *p = '\0';
+                        if (*(p-2) != '/')
+                            *(p-1) = '/';
+                    }
+                    break;
+                }
                 case SHORTCUT_FILE:
                 case SHORTCUT_DEBUGITEM:
                 case SHORTCUT_PLAYLISTMENU:
+                {
                     strmemccpy(sc->u.path, value, MAX_PATH);
                     break;
+                }
                 case SHORTCUT_SETTING_APPLY:
                 case SHORTCUT_SETTING:
                     /* can handle 'name: value' pair for either type */
