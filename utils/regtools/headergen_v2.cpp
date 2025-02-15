@@ -1527,28 +1527,31 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
     ctx.print(fout);
     fout << "\n";
 
-    /* print GET_VARIANT macro */
-    std::string get_var = macro_name(MN_GET_VARIANT);
-    fout << "/** " <<  get_var << "\n";
-    fout << " *\n";
-    fout << " * usage: " << get_var << "(register, variant_prefix, variant_postfix)\n";
-    fout << " *\n";
-    fout << " * effect: expands to register variant given as argument\n";
-    fout << " * note: internal usage\n";
-    fout << " * note: register must be fully qualified if indexed\n";
-    fout << " *\n";
-    fout << " * example: " << get_var << "(ICOLL_CTRL, , _SET)\n";
-    fout << " * example: " << get_var << "(ICOLL_ENABLE(3), , _CLR)\n";
-    fout << " */\n";
-    fout << "#define " << get_var << "(name, varp, vars) "
-        << get_var << "_(" << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
-        << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", "
-        << safe_macro_paste(false, type_xfix(MT_REG_INDEX, true))
-        << "name" << safe_macro_paste(true, type_xfix(MT_REG_INDEX, false)) << ", varp, vars)\n";
-    fout << "#define " << get_var << "_(...) " << get_var << "__(__VA_ARGS__)\n";
-    fout << "#define " << get_var << "__(name, index, varp, vars) "
-        << "varp##name##vars index\n";
-    fout << "\n";
+    if(has_sct())
+    {
+        /* print GET_VARIANT macro */
+        std::string get_var = macro_name(MN_GET_VARIANT);
+        fout << "/** " <<  get_var << "\n";
+        fout << " *\n";
+        fout << " * usage: " << get_var << "(register, variant_prefix, variant_postfix)\n";
+        fout << " *\n";
+        fout << " * effect: expands to register variant given as argument\n";
+        fout << " * note: internal usage\n";
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << get_var << "(ICOLL_CTRL, , _SET)\n";
+        fout << " * example: " << get_var << "(ICOLL_ENABLE(3), , _CLR)\n";
+        fout << " */\n";
+        fout << "#define " << get_var << "(name, varp, vars) "
+             << get_var << "_(" << safe_macro_paste(false, type_xfix(MT_REG_NAME, true))
+             << "name" << safe_macro_paste(true, type_xfix(MT_REG_NAME, false)) << ", "
+             << safe_macro_paste(false, type_xfix(MT_REG_INDEX, true))
+             << "name" << safe_macro_paste(true, type_xfix(MT_REG_INDEX, false)) << ", varp, vars)\n";
+        fout << "#define " << get_var << "_(...) " << get_var << "__(__VA_ARGS__)\n";
+        fout << "#define " << get_var << "__(name, index, varp, vars) "
+             << "varp##name##vars index\n";
+        fout << "\n";
+    }
 
     /* print BF_OR macro */
     std::string bf_or = macro_name(MN_FIELD_OR);
