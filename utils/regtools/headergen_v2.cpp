@@ -2251,6 +2251,170 @@ class atj_generator : public common_generator
 };
 
 /**
+ * Generator: cortex_m
+ */
+class cortex_m_generator : public common_generator
+{
+    bool has_support_macros() const
+    {
+        return true;
+    }
+
+    bool has_selectors() const
+    {
+        return m_soc.size() >= 2;
+    }
+
+    bool has_offsets() const
+    {
+        return false;
+    }
+
+    std::string selector_soc_dir(const soc_ref_t& ref) const
+    {
+        return ref.get()->name;
+    }
+
+    std::string selector_include_header() const
+    {
+        return "select.h";
+    }
+
+    std::string selector_soc_macro(const soc_ref_t& ref) const
+    {
+        return toupper(ref.get()->name) + "_INCLUDE";
+    }
+
+    std::string register_header(const node_inst_t& inst) const
+    {
+        /* one register header per top-level block */
+        if(inst.is_root())
+            return "<error>";
+        if(inst.parent().is_root())
+            return tolower(inst.node().name()) + ".h";
+        else
+            return register_header(inst.parent());
+    }
+
+    std::string header_include_guard(const std::string& filename)
+    {
+        // Replace the default include guard to prevent conflicts with
+        // other SoC-specific headergen-generated files
+        std::string guard = "__ARM_CORTEX_M_" + toupper(filename) + "__";
+        for(size_t i = 0; i < guard.size(); i++)
+            if(!isalnum(guard[i]))
+                guard[i] = '_';
+        return guard;
+    }
+
+    std::string macro_name(macro_name_t macro, bool relative) const
+    {
+        switch(macro)
+        {
+            case MN_REG_READ: return "cm_read";
+            case MN_FIELD_READ: return "cm_readf";
+            case MN_FIELD_READX: return "cm_vreadf";
+            case MN_REG_WRITE: return "cm_write";
+            case MN_FIELD_WRITE: return "cm_writef";
+            case MN_FIELD_OVERWRITE: return "cm_overwritef";
+            case MN_FIELD_WRITEX: return "cm_vwritef";
+            case MN_FIELD_SET: return "cm_setf";
+            case MN_FIELD_CLEAR: return "cm_clrf";
+            case MN_FIELD_OR: return "cm_orf";
+            case MN_FIELD_OR_MASK: return "__cm_orfm"; // internal macro
+            case MN_MASK_OR: return "cm_orm";
+            case MN_GET_VARIANT: return "__cm_variant"; // internal macro
+            case MN_VARIABLE: return "cm_reg";
+            default: return "<macro_name>";
+        }
+    }
+
+    std::string macro_header() const
+    {
+        return "macro.h";
+    }
+
+    bool register_flag(const node_inst_t& inst, register_flag_t flag) const
+    {
+        /* make everything parametrized */
+        switch(flag)
+        {
+            case RF_GENERATE_ALL_INST: return false;
+            case RF_GENERATE_PARAM_INST: return true;
+            default: return false;
+        }
+    }
+
+    std::string type_xfix(macro_type_t type, bool prefix) const
+    {
+        switch(type)
+        {
+            case MT_REG_ADDR: return prefix ? "CMA_" : "";
+            case MT_REG_TYPE: return prefix ? "CMT_" : "";
+            case MT_REG_NAME: return prefix ? "CMN_" : "";
+            case MT_REG_VAR: return prefix ? "REG_" : "";
+            case MT_FIELD_BP: return prefix ? "BP_" : "";
+            case MT_FIELD_BM: return prefix ? "BM_" : "";
+            case MT_FIELD_BV: return prefix ? "BV_" : "";
+            case MT_FIELD_BF: return prefix ? "BF_" : "";
+            case MT_FIELD_BFM: return prefix ? "BFM_" : "";
+            case MT_FIELD_BFV: return prefix ? "BF_" : "_V";
+            case MT_FIELD_BFMV: return prefix ? "BFM_" : "_V";
+            case MT_IO_TYPE: return prefix ? "CMIO_" : "";
+            default: return "<xfix>";
+        }
+    }
+
+    std::string variant_xfix(const std::string& variant, bool prefix) const
+    {
+        return "<variant>";
+    }
+
+    std::string inst_prefix(const node_inst_t& inst) const
+    {
+        /* separate blocks with _: block_reg */
+        return "_";
+    }
+
+    std::string field_prefix() const
+    {
+        /* separate fields with _: block_reg_field */
+        return "_";
+    }
+
+    std::string enum_prefix() const
+    {
+        /* separate enums with __: block_reg_field__enum */
+        return "__";
+    }
+
+    std::string enum_name(const enum_ref_t& enum_) const
+    {
+        return enum_.get()->name;
+    }
+
+    access_type_t register_access(const std::string& variant, access_t access) const
+    {
+        if(access == WRITE_ONLY)
+            return AT_WO;
+        else if(access == READ_ONLY)
+            return AT_RO;
+        else
+            return AT_RW;
+    }
+
+    bool has_sct() const
+    {
+        return false;
+    }
+
+    std::string sct_variant(macro_name_t name) const
+    {
+        return "<variant>";
+    }
+};
+
+/**
  * Driver
  */
 
@@ -2262,6 +2426,8 @@ abstract_generator *get_generator(const std::string& name)
         return new imx_generator();
     else if(name == "atj")
         return new atj_generator();
+    else if(name == "cortex_m")
+        return new cortex_m_generator();
     else
         return 0;
 }
