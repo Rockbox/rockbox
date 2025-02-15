@@ -1009,8 +1009,12 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
             ctx.add(macro_type + addr_param_str, register_type_name(var_access[i], regr.get()->width));
             /* print PREFIX macro */
             ctx.add(macro_prefix + addr_param_str, basename);
-            /* print INDEX macro */
-            ctx.add(macro_index + addr_param_str, addr_param_str);
+
+            if(has_sct())
+            {
+                /* print INDEX macro */
+                ctx.add(macro_index + addr_param_str, addr_param_str);
+            }
         }
     }
     /* print fields */
