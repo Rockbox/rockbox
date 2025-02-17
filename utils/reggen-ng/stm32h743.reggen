@@ -1,0 +1,685 @@
+name    "stm32h743"
+title   "STM32H743"
+isa     "armv7-m"
+version "1.0"
+author  "Aidan MacDonald"
+
+node FLASH {
+    title "Embedded flash memory"
+    addr 0x52002000
+
+    reg ACR 0x00 {
+        fld 5 3 WRHIGHFREQ
+        fld 3 0 LATENCY
+    }
+}
+
+node PWR {
+    title "Power control"
+    addr 0x58024800
+
+    reg CR1 0x00 {
+        fld 18 17 ALS
+        bit    16 AVDEN
+        fld 15 14 SVOS
+        bit     9 FLPS
+        bit     8 DBP
+        fld  7  5 PLS
+        bit     4 PVDE
+        bit     0 LPDS
+    }
+
+    reg CSR1 0x04 {
+        bit    16 AVDO
+        fld 15 14 ACTVOS
+        bit    13 ACTVOSRDY
+        bit     4 PVDO
+    }
+
+    reg CR3 0x0c {
+        bit 26 USB33RDY
+        bit 25 USBREGEN
+        bit 24 USB33DEN
+        bit  9 VBRS
+        bit  8 VBE
+        bit  2 SCUEN
+        bit  1 LDOEN
+        bit  0 BYPASS
+    }
+
+    reg D3CR 0x18 {
+        fld 15 14 VOS { enum VOS3 1; enum VOS2 2; enum VOS1 3; }
+        bit    13 VOSRDY
+    }
+}
+
+node RCC {
+    title "Reset and clock control"
+    addr 0x58024400
+
+    reg CR 0x00 {
+        bit  29 PLL3RDY
+        bit  28 PLL3ON
+        bit  27 PLL2RDY
+        bit  26 PLL2ON
+        bit  25 PLL1RDY
+        bit  24 PLL1ON
+        bit  19 HSECSSON
+        bit  18 HSEBYP
+        bit  17 HSERDY
+        bit  16 HSEON
+        bit  15 D2CKRDY
+        bit  14 D1CKRDY
+        bit  13 HSI48RDY
+        bit  12 HSI48ON
+        bit   9 CSIKERON
+        bit   8 CSIRDY
+        bit   7 CSION
+        bit   5 HSIDIVF
+        fld 4 3 HSIDIV
+        bit   2 HSIRDY
+        bit   1 HSIKERON
+        bit   0 HSION
+    }
+
+    reg CFGR 0x10 {
+        fld 31 29 MCO2 { enum SYSCLK 0; enum PLL2P 1; enum HSE 2; enum PLL1P 3; enum CSI 4; enum LSI 5 }
+        fld 28 25 MCO2PRE
+        fld 24 22 MCO1 { enum HSI 0; enum LSE 1; enum HSE 2; enum PLL1Q 3; enum HSI48 4 }
+        fld 21 18 MCO1PRE
+        bit    15 TIMPRE
+        bit    14 HRTIMSEL
+        fld 13  8 RTCPRE
+        bit     7 STOPKERWUCK
+        bit     6 STOPWUCK
+        fld  5  3 SWS
+        fld  2  0 SW { enum HSI 0; enum CSI 1; enum HSE 2; enum PLL1P 3; }
+    }
+
+    reg D1CFGR 0x18 {
+        fld 11 8 D1CPRE
+        fld  6 4 D1PPRE
+        fld  4 0 HPRE
+    }
+
+    reg D2CFGR 0x1c {
+        fld 10 8 D2PPRE2
+        fld  6 4 D2PPRE1
+    }
+
+    reg D3CFGR 0x20 {
+        fld 6 4 D3PPRE
+    }
+
+    reg PLLCKSELR 0x28 {
+        fld 25 20 DIVM3
+        fld 17 12 DIVM2
+        fld  9  4 DIVM1
+        fld  1  0 PLLSRC { enum HSI 0; enum CSI 1; enum HSE 2; enum NONE 3; }
+    }
+
+    reg PLLCFGR 0x2c {
+        bit    24 DIVR3EN
+        bit    23 DIVQ3EN
+        bit    22 DIVP3EN
+        bit    21 DIVR2EN
+        bit    20 DIVQ2EN
+        bit    19 DIVP2EN
+        bit    18 DIVR1EN
+        bit    17 DIVQ1EN
+        bit    16 DIVP1EN
+        fld 11 10 PLL3RGE       { enum 1_2MHZ 0; enum 2_4MHz 1; enum 4_8MHz 2; enum 8_16MHz 3; }
+        bit     9 PLL3VCOSEL    { enum WIDE 0; enum MEDIUM 1; }
+        bit     8 PLL3FRACEN
+        fld 7   6 PLL2RGE       { enum 1_2MHZ 0; enum 2_4MHz 1; enum 4_8MHz 2; enum 8_16MHz 3; }
+        bit     5 PLL2VCOSEL    { enum WIDE 0; enum MEDIUM 1; }
+        bit     4 PLL2FRACEN
+        fld 3   2 PLL1RGE       { enum 1_2MHZ 0; enum 2_4MHz 1; enum 4_8MHz 2; enum 8_16MHz 3; }
+        bit     1 PLL1VCOSEL    { enum WIDE 0; enum MEDIUM 1; }
+        bit     0 PLL1FRACEN
+    }
+
+    reg PLLxDIVR {
+        instance PLL1DIVR 0x30
+        instance PLL2DIVR 0x38
+        instance PLL3DIVR 0x40
+
+        fld 30 24 DIVR
+        fld 22 16 DIVQ
+        fld 15  9 DIVP
+        fld  8  0 DIVN
+    }
+
+    reg PLLxFRACR {
+        instance PLL1FRACR 0x34
+        instance PLL2FRACR 0x3c
+        instance PLL3FRACR 0x44
+
+        fld 15 3 FRACN
+    }
+
+    reg D1CCIPR 0x4c {
+        fld 29 28 CKPERSEL { enum HSI 0; enum CSI 1; enum HSE 2; }
+        bit    16 SDMMCSEL { enum PLL1Q 0; enum PLL2R 1; }
+        fld  5  4 QSPISEL  { enum AHB 0; enum PLL1Q 1; enum PLL2R 2; enum PER 3; }
+        fld  1  0 FMCSEL   { enum AHB 0; enum PLL1Q 1; enum PLL2R 2; enum PER 3; }
+    }
+
+    reg D2CCIP1R 0x50 {
+        bit    31 SWPSEL    { enum APB1 0; enum HSI 1; }
+        fld 29 28 FDCANSEL  { enum HSE 0; enum PLL1Q 1; enum PLL2Q 1; }
+        bit    24 DFSDM1SEL { enum APB2 0; enum SYSCLK 1; }
+        fld 21 20 SPDIFSEL  { enum PLL1Q 0; enum PLL2R 1; enum PLL3R 2; enum HSI 3; }
+        fld 18 16 SPI45SEL  { enum APB2 0; enum PLL2Q 1; enum PLL3Q 2; enum HSI 3;
+                              enum CSI 4; enum HSE 5; }
+        fld 14 12 SPI123SEL { enum PLL1Q 0; enum PLL2P 1; enum PLL3P 2; enum I2SCKIN 3;
+                              enum PER 4; }
+        fld  8  6 SAI23SEL { enum PLL1Q 0; enum PLL2P 1; enum PLL3P 2; enum I2SCKIN 4;
+                             enum PER 4; }
+        fld  2  0 SAI1SEL { enum PLL1Q 0; enum PLL2P 1; enum PLL3P 2; enum I2SCKIN 4;
+                            enum PER 4; }
+    }
+
+    reg D2CCIP2R 0x54 {
+        fld 30 28 LPTIM1SEL { enum APB1 0; enum PLL2P 1; enum PLL3R 2;
+                              enum LSE 3; enum LSI 4; enum PER 5; }
+        fld 23 22 CECSEL { enum LSE 0; enum LSI 1; enum CSI 2; }
+        fld 21 20 USBSEL { enum DISABLE 0; enum PLL1Q 1; enum PLL3Q 2; enum HSI48 3; }
+        fld 13 12 I2C123SEL { enum APB1 0; enum PLL3R 1; enum HSI 2; enum CSI 3; }
+        fld  9  8 RNGSEL { enum HSI 0; enum PLL1Q 1; enum LSE 2; enum LSI 3; }
+        fld  5  3 USART16SEL { enum APB2 0; enum PLL2Q 1; enum PLL3Q 2;
+                               enum HSI 3; enum CSI 4; enum LSE 5; }
+        fld  2  0 USART234578SEL { enum APB1 0; enum PLL2Q 1; enum PLL3Q 2;
+                                   enum HSI 3; enum CSI 4; enum LSE 5; }
+    }
+
+    reg D3CCIPR 0x58 {
+        fld 30 28 SPI6SEL { enum APB4 0; enum PLL2Q 1; enum PLL3Q 2;
+                            enum HSI 3; enum CSI 4; enum HSE 5; }
+        fld 26 24 SAI4BSEL { enum PLL1Q 0; enum PLL2P 1; enum PLL3P 2;
+                             enum I2S_CKIN 3; enum PER 4; }
+        fld 23 21 SAI4ASEL { enum PLL1Q 0; enum PLL2P 1; enum PLL3P 2;
+                             enum I2S_CKIN 3; enum PER 4; }
+        fld 17 16 ADCSEL { enum PLL2P 0; enum PLL3R 1; enum PER 2; }
+        fld 15 13 LPTIM345SEL { enum APB4 0; enum PLL2P 1; enum PLL3R 2;
+                                enum LSE 3; enum LSI 4; enum PER 5; }
+        fld 12 10 LPTIM2SEL { enum APB4 0; enum PLL2P 1; enum PLL3R 2;
+                              enum LSE 3; enum LSI 4; enum PER 5; }
+        fld  9  8 I2C4SEL { enum APB4 0; enum PLL3R 1; enum HSI 2; enum CSI 3; }
+        fld  2  0 LPUART1SEL { enum APB4 0; enum PLL2Q 1; enum PLL3Q 2;
+                               enum HSI 3; enum CSI 4; enum LSE 5; }
+    }
+
+    reg BDCR 0x70 {
+        bit   16 BDRST
+        bit   15 RTCEN
+        fld 9  8 RTCSEL { enum NONE 0; enum LSE 1; enum LSI 2; enum HSE 3; }
+        bit    6 LSECSSD
+        bit    5 LSECSSON
+        fld 4  3 LSEDRV { enum LOW 0; enum MED_LOW 1; enum MED_HIGH 2; enum HIGH 3; }
+        bit    2 LSEBYP
+        bit    1 LSERDY
+        bit    0 LSEON
+    }
+
+    reg CSR 0x74 {
+        bit 1 LSIRDY
+        bit 0 LSION
+    }
+
+    reg AHB3EN {
+        instance AHB3ENR 0xd4
+        instance AHB3LPENR 0xfc
+
+        # note:
+        # - bits 8 and 28-31 exist in AHB3LPENR only
+        # - all other bits are common
+
+        bit 31 AXISRAMEN
+        bit 30 ITCMEN
+        bit 29 DTCM2EN
+        bit 28 D1DTCM1EN
+        bit 16 SDMMC1EN
+        bit 14 QSPIEN
+        bit 12 FMCEN
+        bit  8 FLASHEN
+        bit  5 JPEGDECEN
+        bit  4 DMA2DEN
+        bit  0 MDMAEN
+    }
+
+    reg AHB4EN {
+        instance AHB4ENR 0xe0
+        instance AHB4LPENR 0x108
+
+        # note:
+        # - bit 29 exists in AHB4LPENR only
+        # - bit 25 exists in AHB4ENR only
+        # - all other bits are common
+
+        bit 29 SRAM4EN
+        bit 28 BKPRAMEN
+        bit 25 HSEMEN
+        bit 24 ADC3EN
+        bit 21 BDMAEN
+        bit 19 CRCEN
+        bit 10 GPIOKEN
+        bit  9 GPIOJEN
+        bit  8 GPIOIEN
+        bit  7 GPIOHEN
+        bit  6 GPIOGEN
+        bit  5 GPIOFEN
+        bit  4 GPIOEEN
+        bit  3 GPIODEN
+        bit  2 GPIOCEN
+        bit  1 GPIOBEN
+        bit  0 GPIOAEN
+    }
+
+    reg APB3EN {
+        instance APB3ENR 0xe4
+        instance APB3LPENR 0x10c
+
+        bit 6 WWDG1EN
+        bit 3 LTDCEN
+    }
+
+    reg APB1LEN {
+        instance APB1LENR 0xe8
+        instance APB1LLPENR 0x110
+
+        bit 31 UART8EN
+        bit 30 UART7EN
+        bit 29 DAC12EN
+        bit 27 CECEN
+        bit 23 I2C3EN
+        bit 22 I2C2EN
+        bit 21 I2C1EN
+        bit 20 UART5EN
+        bit 19 UART4EN
+        bit 18 USART3EN
+        bit 17 USART2EN
+        bit 16 SPDIFRXEN
+        bit 15 SPI3EN
+        bit 14 SPI2EN
+        bit  9 LPTIM1EN
+        bit  8 TIM14EN
+        bit  7 TIM13EN
+        bit  6 TIM12EN
+        bit  5 TIM7EN
+        bit  4 TIM6EN
+        bit  3 TIM5EN
+        bit  2 TIM4EN
+        bit  1 TIM3EN
+        bit  0 TIM2EN
+    }
+
+    reg APB1HEN {
+        instance APB1HENR 0xec
+        instance APB1HLPENR 0x114
+
+        bit 8 FDCANEN
+        bit 5 MDIOSEN
+        bit 4 OPAMPEN
+        bit 2 SWPEN
+        bit 1 CRSEN
+    }
+
+    reg APB2EN {
+        instance APB2ENR 0xf0
+        instance APB2LPENR 0x118
+
+        bit 29 HRTIMEN
+        bit 28 DFSDM1EN
+        bit 24 SAI3EN
+        bit 23 SAI2EN
+        bit 22 SAI1EN
+        bit 20 SPI5EN
+        bit 18 TIM17EN
+        bit 17 TIM16EN
+        bit 16 TIM15EN
+        bit 13 SPI4EN
+        bit 12 SPI1EN
+        bit  5 USART6EN
+        bit  4 USART1EN
+        bit  1 TIM8EN
+        bit  0 TIM1EN
+    }
+
+    reg APB4EN {
+        instance APB4ENR 0xf4
+        instance APB4LPENR 0x11c
+
+        bit 21 SAI4EN
+        bit 16 RTCAPBEN
+        bit 15 VREFEN
+        bit 14 COMP12EN
+        bit 12 LPTIM5EN
+        bit 11 LPTIM4EN
+        bit 10 LPTIM3EN
+        bit  9 LPTIM2EN
+        bit  7 I2C4EN
+        bit  5 SPI6EN
+        bit  3 LPUART1EN
+        bit  1 SYSCFGEN
+    }
+}
+
+node GPIO {
+    title "General-purpose I/Os"
+    instance 0x58020000 0x400 11
+
+    reg MODER 0x00
+    reg OTYPER 0x04
+    reg OSPEEDR 0x08
+    reg PUPDR 0x0c
+    reg IDR 0x10
+    reg ODR 0x14
+    reg BSRR 0x18
+    reg LCKR 0x1c
+    reg AFRL 0x20
+    reg AFRH 0x24
+}
+
+node SYSCFG {
+    title "System configuration controller"
+    addr 0x58000400
+
+    reg PWRCFG 0x2c {
+        bit 0 ODEN
+    }
+}
+
+node FMC {
+    title "Flexible memory controller"
+    addr 0x52004000
+
+    reg BCR {
+        instance 0x000 0x8 4
+
+        bit    31 FMCEN
+        fld 25 24 BMAP
+        bit    21 WFDIS
+    }
+
+    reg SDCR {
+        instance 0x140 0x4 2
+
+        fld 14 13 RPIPE
+        bit    12 RBURST
+        fld 11 10 SDCLK
+        bit     9 WP
+        fld  8  7 CAS
+        bit     6 NB
+        fld  5  4 MWID
+        fld  3  2 NR
+        fld  1  0 NC
+    }
+
+    reg SDTR {
+        instance 0x148 0x4 2
+
+        fld 27 24 TRCD
+        fld 23 20 TRP
+        fld 19 16 TWR
+        fld 15 12 TRC
+        fld 11  8 TRAS
+        fld  7  4 TXSR
+        fld  3  0 TMRD
+    }
+
+    reg SDCMR 0x150 {
+        fld 22 9 MRD
+        fld  8 5 NRFS
+        bit    4 CTB1
+        bit    3 CTB2
+        fld  2 0 MODE
+    }
+
+    reg SDRTR 0x154 {
+        bit    14 REIE
+        fld 13  1 COUNT
+        bit     0 CRE
+    }
+
+    reg SDSR 0x158 {
+        fld 4 3 MODES2
+        fld 2 1 MODES1
+        bit   0 RE
+    }
+}
+
+node RTC {
+    title "Real time clock"
+    addr 0x58004000
+
+    reg TR {
+        instance TR 0x00
+        instance TSTR 0x30
+
+        bit    22 PM
+        fld 21 20 HT
+        fld 19 16 HU
+        fld 14 12 MNT
+        fld 11  8 MNU
+        fld  6  4 ST
+        fld  3  0 SU
+    }
+
+    reg DR {
+        instance DR 0x04
+        instance DRTR 0x34
+
+        fld 23 20 YT
+        fld 19 16 YU
+        fld 15 13 WDU
+        bit    12 MT
+        fld 11  8 MU
+        fld  5  4 DT
+        fld  3  0 DU
+    }
+
+    reg CR 0x08 {
+        bit    24 ITSE
+        bit    23 COE
+        fld 22 21 OSEL { enum DISABLED 0; enum ALARM_A 1; enum ALARM_B 2; enum WAKEUP 3; }
+        bit    20 POL
+        bit    19 COSEL
+        bit    18 BKP
+        bit    17 SUB1H
+        bit    16 ADD1H
+        bit    15 TSIE
+        bit    14 WUTIE
+        bit    13 ALRBIE
+        bit    12 ALRAIE
+        bit    11 TSE
+        bit    10 WUTE
+        bit     9 ALRBE
+        bit     8 ALRAE
+        bit     6 FMT
+        bit     5 BYPSHAD
+        bit     4 REFCKON
+        bit     3 TSEDGE
+        bit  2  0 WUCKSEL { enum RTC_16 0; enum RTC_8 1; enum RTC_4 2; enum RTC_2 3;
+                            enum CK_SPRE 4; enum CK_SPRE_ADDWUT 6; }
+    }
+
+    reg ISR 0x0c {
+        bit 17 ITSF
+        bit 16 RECALPF
+        bit 15 TAMP3F
+        bit 14 TAMP2F
+        bit 13 TAMP1F
+        bit 12 TSOVF
+        bit 11 TSF
+        bit 10 WUTF
+        bit  9 ALRBF
+        bit  8 ALRAF
+        bit  7 INIT
+        bit  6 INITF
+        bit  5 RSF
+        bit  4 INITS
+        bit  3 SHPF
+        bit  2 WUTWF
+        bit  1 ALRBWF
+        bit  0 ALRAWF
+    }
+
+    reg PRER 0x10 {
+        fld 22 16 PREDIV_A
+        fld 14  0 PREDIV_S
+    }
+
+    reg WPR 0x24 {
+        fld 7 0 KEY { enum KEY1 0xCA; enum KEY2 0x53; }
+    }
+
+    reg SSR {
+        instance SSR 0x28
+        instance TSSSR 0x38
+
+        fld 15 0 SS
+    }
+
+    reg OR 0x4c {
+        bit 1 RTC_OUT_RMP
+        bit 0 RTC_ALARM_TYPE { enum OPEN_DRAIN 0; enum PUSH_PULL 1; }
+    }
+
+    reg BKPR {
+        instance 0x50 0x4 32
+    }
+}
+
+node SPI {
+    title "Serial peripheral interface"
+    instance nochild SPI1 0x40013000
+    instance nochild SPI2 0x40003800
+    instance nochild SPI3 0x40003c00
+    instance nochild SPI4 0x40013400
+    instance nochild SPI5 0x40015000
+    instance nochild SPI6 0x58001400
+    instance floating
+
+    reg CR1 0x00 {
+        bit 16 IO_LOCK
+        bit 15 TCRCINI
+        bit 14 RCRCINI
+        bit 13 CRC33_17
+        bit 12 SSI
+        bit 11 HDDIR
+        bit 10 CSUSP
+        bit  9 CSTART
+        bit  8 MASRX
+        bit  0 SPE
+    }
+
+    reg CR2 0x04 {
+        fld 31 16 TSER
+        fld 15  0 TSIZE
+    }
+
+    reg CFG1 0x08 {
+        fld 30 28 MBR
+        bit    22 CRCEN
+        fld 20 16 CRCSIZE
+        bit    15 TXDMAEN
+        bit    14 RXDMAEN
+        fld 12 11 UDRDET
+        fld 10  9 UDRCFG
+        fld  8  5 FTHLV
+        fld  4  0 DSIZE
+    }
+
+    reg CFG2 0x0c {
+        bit    31 AFCNTR
+        bit    30 SSOM
+        bit    29 SSOE
+        bit    28 SSIOP
+        bit    26 SSM { enum SS_PAD 0; enum SSI_BIT 1; }
+        bit    25 CPOL
+        bit    24 CPHA
+        bit    23 LSBFIRST
+        bit    22 MASTER
+        fld 21 19 SP { enum MOTOROLA 0; enum TI 1; }
+        fld 18 17 COMM { enum DUPLEX 0; enum TXONLY 1; enum RXONLY 2; enum HALF_DUPLEX 3; }
+        bit    15 IOSWP
+        fld  7  4 MIDI
+        fld  3  0 MSSI
+    }
+
+    reg IER 0x10 {
+        bit 10 TSERFIE
+        bit  9 MODFIE
+        bit  8 TIFREIE
+        bit  7 CRCEIE
+        bit  6 OVRIE
+        bit  5 UDRIE
+        bit  4 TXTFIE
+        bit  3 EOTIE
+        bit  2 DXPIE
+        bit  1 TXPIE
+        bit  0 RXPIE
+    }
+
+    reg SR 0x14 {
+        fld 31 16 CTSIZE
+        bit    15 RXWNE
+        fld 14 13 RXPLVL
+        bit    12 TXC
+        bit    11 SUSP
+        bit    10 TSERF
+        bit     9 MODF
+        bit     8 TIFRE
+        bit     7 CRCE
+        bit     6 OVR
+        bit     5 UDR
+        bit     4 TXTF
+        bit     3 EOT
+        bit     2 DXP
+        bit     1 TXP
+        bit     0 RXP
+    }
+
+    reg IFCR 0x18 {
+        bit 11 SUSPC
+        bit 10 TSERFC
+        bit  9 MODFC
+        bit  8 TIFREC
+        bit  7 CRCEC
+        bit  6 OVRC
+        bit  5 UDRC
+        bit  4 TXTFC
+        bit  3 EOTC
+    }
+
+    reg  8  TXDR8 0x20
+    reg 16 TXDR16 0x20
+    reg 32 TXDR32 0x20
+    reg  8  RXDR8 0x30
+    reg 16 RXDR16 0x30
+    reg 32 RXDR32 0x30
+
+    reg CRCPOLY 0x40
+    reg TXCRC 0x44
+    reg RXCRC 0x48
+    reg UDRDR 0x4c
+
+    reg I2SCFGR 0x50 {
+        bit    25 MCKOE
+        bit    24 ODD
+        fld 23 16 I2SDIV
+        bit    14 DATFMT { enum RIGHT_ALIGNED 0; enum LEFT_ALIGNED 1; }
+        bit    13 WSINV
+        bit    12 FIXCH
+        bit    11 CKPOL
+        bit    10 CHLEN { enum 16BIT 0; enum 32BIT 1; }
+        fld  9  8 DATLEN { enum 16BIT 0; enum 24BIT 1; enum 32BIT 2; }
+        bit     7 PCMSYNC { enum SHORT 0; enum LONG 1; }
+        fld  5  4 I2SSTD { enum I2S 0; enum MSB_JUSTIFIED 1; enum LSB_JUSTIFIED 2; enum PCM 3; }
+        fld  3  1 I2SCFG { enum SLAVE_TX 0; enum SLAVE_RX 1;
+                           enum MASTER_TX 2; enum MASTER_RX 3;
+                           enum SLAVE_DUPLEX 4; enum MASTER_DUPLEX 5; }
+        bit     0 I2SMOD
+    }
+}
