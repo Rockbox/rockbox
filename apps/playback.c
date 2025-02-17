@@ -22,6 +22,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "version.h"
 #include "kernel.h"
 #include "panic.h"
 #include "core_alloc.h"
@@ -45,7 +46,7 @@
 #include "misc.h"
 #include "settings.h"
 #include "audiohw.h"
-
+#include "general.h"
 #include <stdio.h>
 
 #ifdef HAVE_TAGCACHE
@@ -348,6 +349,9 @@ static int  codec_skip_status;
 static bool codec_seeking = false;          /* Codec seeking ack expected? */
 static unsigned int position_key = 0;
 
+#define PLAYBACK_LOG_PATH ROCKBOX_DIR "/playback.log"
+#define PLAYBACK_LOG_MAX_FILESZ_BYTES (511 << 10) /* 512k approx 1000-2500 tracks */
+#define PLAYBACK_LOG_MIN_ELAPSED_MS   (500) /* 500 milliseconds */
 #if (CONFIG_STORAGE & STORAGE_ATA)
 #define PLAYBACK_LOG_BUFSZ (MAX_PATH * 10)
 static int playback_log_handle = 0; /* core_alloc handle for playback log buffer */
@@ -1239,8 +1243,14 @@ static void audio_handle_track_load_status(int trackstat)
 void allocate_playback_log(void) INIT_ATTR;
 void allocate_playback_log(void)
 {
+    int fd;
+    char filename[MAX_PATH];
+
+    if (!global_settings.playback_log)
+        return;
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
-    if (global_settings.playback_log && playback_log_handle == 0)
+    if (playback_log_handle == 0)
     {
         playback_log_handle = core_alloc(PLAYBACK_LOG_BUFSZ);
         if (playback_log_handle > 0)
@@ -1248,22 +1258,51 @@ void allocate_playback_log(void)
             DEBUGF("%s Allocated %d bytes\n", __func__, PLAYBACK_LOG_BUFSZ); 
             char *buf = core_get_data(playback_log_handle);
             buf[0] = '\0';
-            return;
         }
     }
 #endif
+
+    while (1)
+    {
+        DEBUGF("Opening %s \n", PLAYBACK_LOG_PATH);
+        fd = open(PLAYBACK_LOG_PATH, O_WRONLY|O_CREAT|O_APPEND, 0666);
+        if (fd >= 0)
+        {
+            /* check if the playback log is excessive */
+            if (lseek(fd, 0, SEEK_END) > PLAYBACK_LOG_MAX_FILESZ_BYTES)
+            {
+                close(fd);
+                create_numbered_filename(filename, ROCKBOX_DIR, "playback_",
+                                         ".log", 4 IF_CNFN_NUM_(, NULL));
+                DEBUGF("Renaming %s => %s\n", PLAYBACK_LOG_PATH, filename);
+                if (rename(PLAYBACK_LOG_PATH, filename) < 0)
+                    break; /*failure*/
+                continue;
+            }
+            else
+            {
+#if CONFIG_RTC
+                create_datetime_filename(filename, "", " Time ", "", false);
+                fdprintf(fd, "# Started Ver. %s %s\n", rbversion, filename);
+#else
+                fdprintf(fd, "# Started Ver. %s\n", rbversion);
+#endif
+            }
+            close(fd);
+        }
+        break;
+    }
 }
 
 void add_playbacklog(struct mp3entry *id3)
 {
     if (!global_settings.playback_log)
         return;
+    unsigned long timestamp = 0;
     ssize_t used = 0;
-    unsigned long timestamp = current_tick * (1000 / HZ); /* milliseconds */
 #if (CONFIG_STORAGE & STORAGE_ATA)
+    ssize_t bufsz = 0;
     char *buf = NULL;
-    ssize_t bufsz;
-
     /* if the user just enabled playback logging rather than stopping playback
      * to allocate a buffer or if buffer too large just flush direct to disk
      * buffer will attempt to be allocated next start-up */
@@ -1271,15 +1310,20 @@ void add_playbacklog(struct mp3entry *id3)
     {
         buf = core_get_data(playback_log_handle);
         used = strlen(buf);
-        bufsz = PLAYBACK_LOG_BUFSZ - used;
-        buf += used;
+        if (used < PLAYBACK_LOG_BUFSZ)
+        {
+            bufsz = PLAYBACK_LOG_BUFSZ - used;
+            buf += used;
+        }
         DEBUGF("%s Used %lu Remain: %lu\n", __func__, used, bufsz);
     }
 #endif
-    if (id3 && id3->elapsed > 500) /* 500 ms*/
+    if (id3 && id3->elapsed > PLAYBACK_LOG_MIN_ELAPSED_MS)
     {
 #if     CONFIG_RTC
         timestamp = mktime(get_time());
+#else
+        timestamp = current_tick * (1000 / HZ); /* milliseconds */
 #endif
 #if (CONFIG_STORAGE & STORAGE_ATA)
         if (buf)  /* we have a buffer allocd from core */
@@ -1291,7 +1335,7 @@ void add_playbacklog(struct mp3entry *id3)
             if (entrylen < bufsz)
             {
                 DEBUGF("BUFFERED: time: %lu elapsed %ld/%ld saving file: %s\n",
-                                timestamp, id3->elapsed, id3->length, id3->path);
+                    timestamp, (long)id3->elapsed, (long)id3->length, id3->path);
                 return; /* succeed or snprintf fail return */
             }
             buf[0] = '\0';
@@ -1304,8 +1348,8 @@ void add_playbacklog(struct mp3entry *id3)
 
     if (id3 || used > 0) /* flush */
     {
-        DEBUGF("Opening %s \n", ROCKBOX_DIR "/playback.log");
-        int fd = open(ROCKBOX_DIR "/playback.log", O_WRONLY|O_CREAT|O_APPEND, 0666);
+        DEBUGF("Opening %s \n", PLAYBACK_LOG_PATH);
+        int fd = open(PLAYBACK_LOG_PATH, O_WRONLY|O_CREAT|O_APPEND, 0666);
         if (fd < 0)
         {
             return; /* failure */
@@ -1324,7 +1368,7 @@ void add_playbacklog(struct mp3entry *id3)
         {
             /* we have the timestamp from when we tried to add to buffer */
             DEBUGF("LOGGED: time: %lu elapsed %ld/%ld saving file: %s\n",
-                                timestamp, id3->elapsed, id3->length, id3->path);
+                    timestamp, (long)id3->elapsed, (long)id3->length, id3->path);
             fdprintf(fd, "%lu:%ld:%ld:%s\n",
                     timestamp, (long)id3->elapsed, (long)id3->length, id3->path);
         }
@@ -3115,7 +3159,7 @@ static void audio_stop_playback(void)
     /* Go idle */
     filling = STATE_IDLE;
     cancel_cpu_boost();
-    add_playbacklog(NULL);
+    add_playbacklog(NULL); /* flush playback log */
 }
 
 /* Pause the playback of the current track
