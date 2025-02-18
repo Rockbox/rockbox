@@ -710,7 +710,7 @@ Lyre prototype 1 */
 # elif ARM_PROFILE == ARM_PROFILE_CLASSIC
 #  define CPU_ARM_CLASSIC
 # endif
-# if !defined(ARM_HAVE_HW_DIV) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+# if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #  define ARM_NEED_DIV0
 # endif
 #endif

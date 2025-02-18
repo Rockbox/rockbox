@@ -38,6 +38,14 @@ void UIE(void)
     while (1);
 }
 
+void __div0(void)
+{
+    while (1);
+}
+
+void __aeabi_idiv0(void) __attribute__((alias("__div0")));
+void __aeabi_ldiv0(void) __attribute__((alias("__div0")));
+
 #define ATTR_IRQ_HANDLER __attribute__((weak, alias("UIE")))
 
 void nmi_handler(void) ATTR_IRQ_HANDLER;
