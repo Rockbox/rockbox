@@ -2,6 +2,7 @@
 database.c
 ../../apps/misc.c
 ../../apps/tagcache.c
+../../firmware/common/itoa_buf.c
 ../../firmware/common/crc32.c
 ../../firmware/common/pathfuncs.c
 ../../firmware/common/strmemccpy.c
