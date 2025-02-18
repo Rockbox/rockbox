@@ -611,7 +611,7 @@ static int write_bitmap_number(struct screen * display, int value,
                                int x, int y)
 {
     char buf[12], *ptr;
-    itoa(buf, sizeof(buf), value);
+    itoa_buf(buf, sizeof(buf), value);
 
     for (ptr = buf; *ptr != '\0'; ptr++, x += BM_GLYPH_WIDTH)
         display->mono_bitmap(bitmap_glyphs_4x8[*ptr - '0'], x, y,

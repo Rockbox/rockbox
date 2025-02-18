@@ -479,7 +479,7 @@ void cfg_to_string(const struct settings_list *setting, char* buf, int buf_len)
                 break; /* we got a value */
             }
 
-            itoa(buf, buf_len, *(int*)setting->setting);
+            itoa_buf(buf, buf_len, *(int*)setting->setting);
             break;
         case F_T_BOOL:
             cfg_int_to_string(setting, *(bool*)setting->setting, buf, buf_len);

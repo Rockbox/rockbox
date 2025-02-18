@@ -806,7 +806,7 @@ static void volume_limit_load_from_cfg(void* var, char*value)
 static char* volume_limit_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     int current = *(int*)setting;
-    itoa(buf, buf_len, current);
+    itoa_buf(buf, buf_len, current);
     return buf;
 }
 static bool volume_limit_is_changed(void* setting, void* defaultval)

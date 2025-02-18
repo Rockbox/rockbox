@@ -22,7 +22,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
 #define INT_DIGITS 19		/* enough for 64 bit integer */
 
-char *itoa(char *buf, size_t bufsz, long int i)
+char *itoa_buf(char *buf, size_t bufsz, long int i)
 {
   /* Room for INT_DIGITS digits, - and '\0' */
   static char intbuf[INT_DIGITS + 2];

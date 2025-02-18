@@ -70,6 +70,6 @@ static inline char * strmemcpy(char *dst, const char *src, size_t len)
        strmemdupa(__s, MIN(__n, __len)); })
 #endif /* strndupa */
 
-char *itoa(char *buf, size_t bufsz, long int i); /* Not std */
+char *itoa_buf(char *buf, size_t bufsz, long int i);
 
 #endif /* STRING_EXTRA_H */
