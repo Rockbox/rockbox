@@ -13436,48 +13436,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Level 8: 1 move / 15 min"
-  </dest>
-  <voice>
-    *: "Level 8, 1 move per 15 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Level 9: 1 move / 60 min"
-  </dest>
-  <voice>
-    *: "Level 9, 1 move per 60 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Level 10: 1 move / 600 min"
-  </dest>
-  <voice>
-    *: "Level 10, 1 move per 600 minutes"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_PGN_PARSE_ERROR
   desc: in the chessbox game viewer
   user: core

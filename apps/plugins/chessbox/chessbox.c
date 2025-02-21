@@ -35,6 +35,8 @@
 #include "opening.h"
 #include "chessbox_pgn.h"
 
+#define MAX_LEVEL 7
+
 /* type definitions */
 struct cb_command {
     int type;
@@ -86,10 +88,7 @@ const char *level_string[] = { ID2P(LANG_CHESSBOX_LEVEL_1) ,
                         ID2P(LANG_CHESSBOX_LEVEL_4) ,
                         ID2P(LANG_CHESSBOX_LEVEL_5) ,
                         ID2P(LANG_CHESSBOX_LEVEL_6) ,
-                        ID2P(LANG_CHESSBOX_LEVEL_7) ,
-                        ID2P(LANG_CHESSBOX_LEVEL_8) ,
-                        ID2P(LANG_CHESSBOX_LEVEL_9) ,
-                        ID2P(LANG_CHESSBOX_LEVEL_10) };
+                        ID2P(LANG_CHESSBOX_LEVEL_7) };
 
 /* "While thinking" command */
 int wt_command = COMMAND_NOP;
@@ -243,7 +242,7 @@ static void cb_wt_callback ( void ) {
 
 /* ---- set playing parameters depending on level ---- */
 static void cb_setlevel ( int lev ) {
-    Level = (lev > 7) ? 7 : ( (lev < 1) ? 1 : lev ) ;
+    Level = (lev > MAX_LEVEL) ? MAX_LEVEL : ( (lev < 1) ? 1 : lev ) ;
     switch (Level) {
         case 1 :
             TCmoves = 60;
@@ -273,18 +272,6 @@ static void cb_setlevel ( int lev ) {
             TCmoves = 40;
             TCminutes = 240;
             break;
-        case 8 :
-            TCmoves = 1;
-            TCminutes = 15;
-            break;
-          case 9 :
-            TCmoves = 1;
-            TCminutes = 60;
-            break;
-          case 10 :
-            TCmoves = 1;
-            TCminutes = 600;
-            break;
     }
     TCflag = (TCmoves > 1);
     SetTimeControl();
@@ -292,7 +279,7 @@ static void cb_setlevel ( int lev ) {
 
 /* ---- increase playing level ---- */
 static void cb_levelup ( void ) {
-    if ( Level == 7 )
+    if ( Level >= MAX_LEVEL )
         cb_setlevel ( 1 );
     else
         cb_setlevel ( Level+1 );
