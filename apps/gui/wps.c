@@ -150,7 +150,15 @@ void wps_do_action(enum wps_do_action_type action, bool updatewps)
     #endif
         }
     }
-    if (updatewps)
+
+    /* Bugfix only do a skin refresh if in one of the below screens */
+    enum current_activity act = get_current_activity();
+
+    bool refresh = (act == ACTIVITY_FM ||
+                    act == ACTIVITY_WPS ||
+                    act == ACTIVITY_RECORDING);
+
+    if (updatewps && refresh)
         update_non_static();
 }
 

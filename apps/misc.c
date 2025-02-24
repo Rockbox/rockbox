@@ -566,12 +566,7 @@ static void hp_unplug_change(bool inserted)
                     headphone_caused_pause &&
                     global_settings.unplug_mode > 1 )
             {
-                enum current_activity act = get_current_activity();
-                /* only do a skin refresh if in one of the below screens */
-                bool refresh = (act == ACTIVITY_FM ||
-                                act == ACTIVITY_WPS ||
-                                act == ACTIVITY_RECORDING);
-                unpause_action(refresh);
+                unpause_action(true);
             }
             headphone_caused_pause = false;
         } else {
