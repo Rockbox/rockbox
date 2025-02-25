@@ -795,13 +795,13 @@ static int load_plugin_screen(char *key)
         {
             if(op_entry->lang_id == LANG_OPEN_PLUGIN)
             {
-                if (key == (char*)LANG_SHORTCUTS)
+                if (key == (char*)ID2P(LANG_SHORTCUTS))
                 {
                     op_entry->lang_id = LANG_SHORTCUTS;
                 }
                 else /* Bugfix ensure proper key */
                 {
-                    key = (char*)LANG_OPEN_PLUGIN;
+                    key = ID2P(LANG_OPEN_PLUGIN);
                 }
             }
             continue;
