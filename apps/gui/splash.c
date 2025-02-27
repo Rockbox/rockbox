@@ -32,6 +32,9 @@
 #include "strptokspn_r.h"
 #include "scrollbar.h"
 #include "font.h"
+#ifndef BOOTLOADER
+#include "misc.h" /* get_current_activity */
+#endif
 
 static long progress_next_tick = 0;
 
@@ -43,6 +46,20 @@ static long progress_next_tick = 0;
 static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                             struct viewport *vp, int addl_lines)
 {
+    static int max_width[NB_SCREENS] = {2*RECT_SPACING};
+#ifndef BOOTLOADER
+    static enum current_activity last_act = ACTIVITY_UNKNOWN;
+    enum current_activity act = get_current_activity();
+
+    if (last_act != act) /* changed activities reset max_width */
+    {
+        FOR_NB_SCREENS(i)
+            max_width[i] = 2*RECT_SPACING;
+        last_act = act;
+    }
+#endif
+    /* prevent screen artifacts by keeping the max width seen */
+    int min_width = max_width[screen->screen_type];
     char splash_buf[MAXBUFFER];
     struct splash_lines {
         const char *str;
@@ -56,7 +73,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     int y, i;
     int space_w, w, chr_h;
     int width, height;
-    int maxw = 0;
+    int maxw = min_width - 2*RECT_SPACING;
     int fontnum = vp->font;
 
     char lastbrkchr;
@@ -145,6 +162,9 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     vp->y += (vp->height - height) / 2;
     vp->width = width;
     vp->height = height;
+
+    /* prevent artifacts by locking to max width observed on repeated calls */
+    max_width[screen->screen_type] = width;
 
     vp->flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
