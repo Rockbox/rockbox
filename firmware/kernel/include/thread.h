@@ -196,6 +196,7 @@ struct thread_debug_info
     char         statusstr[4];
     char         name[32];
 #ifndef HAVE_SDL_THREADS
+    unsigned int stack_usage_cur;
     unsigned int stack_usage;
 #endif
 #if NUM_CORES > 1

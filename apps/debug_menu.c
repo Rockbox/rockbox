@@ -152,7 +152,7 @@ static const char* threads_getname(int selected_item, void *data,
     {
         struct core_debug_info coreinfo;
         core_get_debug_info(selected_item, &coreinfo);
-        snprintf(buffer, buffer_len, "Idle (%d): %2d%%", selected_item,
+        snprintf(buffer, buffer_len, "Idle (%2d): %2d%%", selected_item,
                  coreinfo.idle_stack_usage);
         return buffer;
     }
@@ -165,8 +165,8 @@ static const char* threads_getname(int selected_item, void *data,
     struct thread_debug_info threadinfo;
     if (thread_get_debug_info(selected_item, &threadinfo) > 0)
     {
-        fmtstr = "%2d:" IF_COP(" (%d)") " %s%n" IF_PRIO(" %d %d")
-                 IFN_SDL(" %2d%%") " %s";
+        fmtstr = "%2d:" IF_COP(" (%d)") " %s%n" IF_PRIO(" %2d %2d")
+                 IFN_SDL(" %2d%% %2d%%") " %s";
     }
     int status_len;
     size_t len = snprintf(buffer, buffer_len, fmtstr,
@@ -175,7 +175,7 @@ static const char* threads_getname(int selected_item, void *data,
              threadinfo.statusstr,
              &status_len,
              IF_PRIO(threadinfo.base_priority, threadinfo.current_priority,)
-             IFN_SDL(threadinfo.stack_usage,)
+             IFN_SDL(threadinfo.stack_usage_cur, threadinfo.stack_usage,)
              threadinfo.name);
 
     int start = 0;

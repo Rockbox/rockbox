@@ -306,6 +306,11 @@ int thread_get_debug_info(unsigned int thread_id,
 #endif
 #ifndef HAVE_SDL_THREADS
         infop->stack_usage = stack_usage(thread->stack, thread->stack_size);
+
+        size_t stack_used_current =
+            thread->stack_size - (thread->context.sp - (uintptr_t)thread->stack);
+
+        infop->stack_usage_cur = stack_used_current * 100 / thread->stack_size;
 #endif
 #if NUM_CORES > 1
         infop->core = thread->core;
