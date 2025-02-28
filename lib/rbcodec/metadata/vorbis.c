@@ -327,7 +327,14 @@ size_t base64_decode(const char *in, size_t in_len, unsigned char *out)
             break;
         }
 
-        val = (val << 6) | b64_codes[in[i] - B64_START_CHAR];
+        int index = in[i] - B64_START_CHAR;
+        if (index < 0 || index >= (int)ARRAYLEN(b64_codes))
+        {
+            out[len] = '\0';
+            break;
+        }
+
+        val = (val << 6) | b64_codes[index];
 
         if ((++i & 3) == 0)
         {
