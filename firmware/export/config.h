@@ -1075,7 +1075,7 @@ Lyre prototype 1 */
  * Older versions of GCC emit assembly in divided syntax with no option
  * to enable unified syntax.
  */
-#if (__GNUC__ < 8)
+#if (__GNUC__ < 8) && defined(CPU_ARM_CLASSIC)
 #define BEGIN_ARM_ASM_SYNTAX_UNIFIED ".syntax unified\n"
 #define END_ARM_ASM_SYNTAX_UNIFIED   ".syntax divided\n"
 #else

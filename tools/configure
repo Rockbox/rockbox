@@ -4617,6 +4617,16 @@ else
    GCCOPTS="$GCCOPTS -Wno-expansion-to-defined -Wimplicit-fallthrough=0"
  fi
 
+ case "$GCCOPTS" in
+   *-mcpu=cortex-m7*)
+     # Cortex-M7 support wasn't added until GCC 5. Since we don't use any
+     # M7-specific features, we can compile as Cortex-M4 when on GCC 4.9.
+     if test "$gccnum" -lt "500"; then
+       GCCOPTS=$(echo "$GCCOPTS" | sed -e "s/-mcpu=cortex-m7/-mcpu=cortex-m4 -mthumb/")
+     fi
+     ;;
+ esac
+
  case $prefix in
    ""|"$CROSS_COMPILE")
      # simulator

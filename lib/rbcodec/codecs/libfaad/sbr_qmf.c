@@ -460,7 +460,8 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
         p_buf_1 = qmfs->v + qmfs->v_index;
 
         /* calculate 64 output samples and window */
-#ifdef CPU_ARM
+        /* note: GCC 4.9 complains about the inline asm on Cortex-M targets */
+#if defined(CPU_ARM_CLASSIC) || (defined(CPU_ARM_MICRO) && __GNUC__ > 4)
         const real_t *qtab = qmf_c;
         real_t *pbuf = p_buf_1;
         for (k = 0; k < 64; k++, pbuf++)
