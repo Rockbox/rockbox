@@ -158,7 +158,7 @@ struct custom_setting {
 #define F_RECSETTING    0x1000000
 #define F_EQSETTING     0x2000000
 #define F_SOUNDSETTING  0x4000000
-/*#define _AVAILABLE_   0x8000000*/
+#define F_NEEDAPPLY     0x8000000 /*F_THEMESETTING needs apply to effect setting change*/
 #define F_CB_ON_SELECT_ONLY 0x10000000 /* option_callback only called if selected */
 #define F_CB_ONLY_IF_CHANGED 0x20000000 /* option_callback only called if setting changed */
 

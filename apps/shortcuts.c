@@ -697,9 +697,9 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
 static void apply_new_setting(const struct settings_list *setting)
 {
     settings_apply(false);
-    if (setting->flags & F_THEMESETTING)
+    if ((setting->flags & (F_THEMESETTING|F_NEEDAPPLY)) == (F_THEMESETTING|F_NEEDAPPLY))
     {
-        settings_apply_skins();
+            settings_apply_skins();
     }
     if (setting->setting == &global_settings.sleeptimer_duration && get_sleep_timer())
     {

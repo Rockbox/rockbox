@@ -213,7 +213,7 @@
         {load_from_cfg, write_to_cfg, is_change, set_default}}}}
 
 #define VIEWPORT_SETTING(var,name)      \
-        TEXT_SETTING(F_THEMESETTING,var,name,"-", NULL, NULL)
+        TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,var,name,"-", NULL, NULL)
 
 /* some sets of values which are used more than once, to save memory */
 static const char off[] = "off";
@@ -1080,12 +1080,12 @@ const struct settings_list settings[] = {
                     ID2P(LANG_INVERT_CURSOR_POINTER),
                     ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
-    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
+    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR|F_NEEDAPPLY, statusbar,
                   LANG_STATUS_BAR, STATUSBAR_TOP, "statusbar","off,top,bottom",
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #ifdef HAVE_REMOTE_LCD
-    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, remote_statusbar,
+    CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR|F_NEEDAPPLY, remote_statusbar,
                   LANG_REMOTE_STATUSBAR, STATUSBAR_TOP, "remote statusbar","off,top,bottom",
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_STATUSBAR_TOP),
                   ID2P(LANG_STATUSBAR_BOTTOM)),
@@ -1969,35 +1969,35 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
     TEXT_SETTING(0, fmr_file, "fmr", "-",
                      FMPRESET_PATH "/", ".fmr"),
-    TEXT_SETTING(F_THEMESETTING,fms_file, "fms",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,fms_file, "fms",
                      DEFAULT_FMS_NAME, SBS_DIR "/", ".fms"),
 #ifdef HAVE_REMOTE_LCD
-    TEXT_SETTING(F_THEMESETTING,rfms_file, "rfms",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,rfms_file, "rfms",
                      DEFAULT_FMS_NAME, SBS_DIR "/", ".rfms"),
 #endif
 #endif /* CONFIG_TUNER */
-    TEXT_SETTING(F_THEMESETTING, font_file, "font",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
     INT_SETTING(0, glyphs_to_cache, LANG_GLYPHS, DEFAULT_GLYPHS,
                 "glyphs", UNIT_INT, MIN_GLYPHS, MAX_GLYPHS, 10,
                 NULL, NULL, NULL),
 #ifdef HAVE_REMOTE_LCD
-    TEXT_SETTING(F_THEMESETTING, remote_font_file, "remote font",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, remote_font_file, "remote font",
                      DEFAULT_REMOTE_FONTNAME, FONT_DIR "/", ".fnt"),
 #endif
-    TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
-    TEXT_SETTING(F_THEMESETTING,sbs_file, "sbs",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,sbs_file, "sbs",
                      DEFAULT_SBSNAME, SBS_DIR "/", ".sbs"),
 #ifdef HAVE_REMOTE_LCD
-    TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,rwps_file,"rwps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".rwps"),
-    TEXT_SETTING(F_THEMESETTING,rsbs_file, "rsbs",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,rsbs_file, "rsbs",
                      DEFAULT_SBSNAME, SBS_DIR "/", ".rsbs"),
 #endif
     TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
-    TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY,backdrop_file,"backdrop",
                      DEFAULT_BACKDROP, NULL, NULL),
 #endif
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
@@ -2061,20 +2061,20 @@ const struct settings_list settings[] = {
 #endif /* HAVE_RTC_ALARM */
 
     /* Customizable icons */
-    TEXT_SETTING(F_THEMESETTING, icon_file, "iconset", DEFAULT_ICONSET,
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, icon_file, "iconset", DEFAULT_ICONSET,
                      ICON_DIR "/", ".bmp"),
-    TEXT_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, viewers_icon_file, "viewers iconset",
                      DEFAULT_VIEWERS_ICONSET,
                      ICON_DIR "/", ".bmp"),
 #ifdef HAVE_REMOTE_LCD
-    TEXT_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "-",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, remote_icon_file, "remote iconset", "-",
                      ICON_DIR "/", ".bmp"),
-    TEXT_SETTING(F_THEMESETTING, remote_viewers_icon_file,
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, remote_viewers_icon_file,
                      "remote viewers iconset", "-",
                      ICON_DIR "/", ".bmp"),
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_LCD_COLOR
-    TEXT_SETTING(F_THEMESETTING, colors_file, "filetype colours", "-",
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, colors_file, "filetype colours", "-",
                      THEME_DIR "/", ".colours"),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
