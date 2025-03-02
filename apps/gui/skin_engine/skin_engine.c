@@ -179,6 +179,16 @@ void settings_apply_skins(void)
         audio_stop();
 
     bool first_run = skin_backdrop_init();
+    
+    if (!first_run)
+    {
+        /* Make sure all skins unloaded */
+        for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+        {
+            FOR_NB_SCREENS(j)
+                skin_reset_buffers(i, j);
+        }
+    }
     skins_initialised = true;
 
     /* Make sure each skin is loaded */
@@ -187,11 +197,6 @@ void settings_apply_skins(void)
         FOR_NB_SCREENS(j)
         {
             get_skin_filename(filename, MAX_PATH, i,j);
-
-            if (!first_run)
-            {
-                skin_reset_buffers(i, j);
-            }
             gui_skin_reset(&skins[i][j]);
             skins[i][j].gui_wps.display = &screens[j];
             if (skin_helpers[i]->load_on_boot)
