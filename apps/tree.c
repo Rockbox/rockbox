@@ -378,7 +378,11 @@ static int tree_get_file_position(char * filename)
     /* use lastfile to determine the selected item (default=0) */
     for (i=0; i < tc.filesindir; i++)
     {
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__APPLE__) || defined(_WIN32) || defined(__CYGWIN__))
         if (!strcasecmp(entries[i].name, filename))
+#else
+        if (!strcmp(entries[i].name, filename))
+#endif
         {
             ret = i;
             break;
