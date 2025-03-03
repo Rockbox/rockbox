@@ -373,6 +373,14 @@ static int parse_image_display(struct skin_element *element,
     return 0;
 }
 
+/* helper function if param type is PERCENT multiply by mult and divide by 1000 */
+static int percent_parse_param(struct skin_tag_parameter *param, int mult)
+{
+    if (param->type == PERCENT)
+        return param->data.number * mult / 1000;
+    return param->data.number;
+}
+
 static int parse_image_load(struct skin_element *element,
                             struct wps_token *token,
                             struct wps_data *wps_data)
@@ -398,18 +406,8 @@ static int parse_image_load(struct skin_element *element,
         subimages = get_param(element, 2)->data.number;
     else if (element->params_count > 3)
     {
-        struct skin_tag_parameter *param;
-        param = get_param(element, 2);
-        if (param->type == PERCENT)
-            x = param->data.number * curr_vp->vp.width / 1000;
-        else
-            x = param->data.number;
-
-        param = get_param(element, 3);
-        if (param->type == PERCENT)
-            y = param->data.number * curr_vp->vp.height / 1000;
-        else
-            y = param->data.number;
+        x = percent_parse_param(get_param(element, 2), curr_vp->vp.width);
+        y = percent_parse_param(get_param(element, 3), curr_vp->vp.height);
 
         if (element->params_count == 5)
             subimages = get_param(element, 4)->data.number;
@@ -666,33 +664,20 @@ static int parse_drawrectangle( struct skin_element *element,
     if (!rect)
         return -1;
 
-    param = get_param(element, 0);
-    if (param->type == PERCENT)
-        rect->x = param->data.number * curr_vp->vp.width / 1000;
-    else
-        rect->x = param->data.number;
-
-    param = get_param(element, 1);
-    if (param->type == PERCENT)
-        rect->y = param->data.number * curr_vp->vp.height / 1000;
-    else
-        rect->y = param->data.number;
+    rect->x = percent_parse_param(get_param(element, 0), curr_vp->vp.width);
+    rect->y = percent_parse_param(get_param(element, 1), curr_vp->vp.height);
 
     param = get_param(element, 2);
     if (isdefault(param))
         rect->width = curr_vp->vp.width - rect->x;
-    else if (param->type == PERCENT)
-        rect->width = param->data.number * curr_vp->vp.width / 1000;
     else
-        rect->width = param->data.number;
+        rect->width = percent_parse_param(param, curr_vp->vp.width);
 
     param = get_param(element, 3);
     if (isdefault(param))
         rect->height = curr_vp->vp.height - rect->y;
-    else if (param->type == PERCENT)
-        rect->height = param->data.number * curr_vp->vp.height / 1000;
     else
-        rect->height = param->data.number;
+        rect->height = percent_parse_param(param, curr_vp->vp.height);
 
     rect->start_colour = curr_vp->vp.fg_pattern;
     rect->end_colour = curr_vp->vp.fg_pattern;
@@ -1039,12 +1024,8 @@ static int parse_progressbar_tag(struct skin_element* element,
     /* (x, y, width, height, ...) */
     if (!isdefault(param))
     {
-        if (param->type == PERCENT)
-        {
-            pb->x = param->data.number *  vp->width / 1000;
-        }
-        else
-            pb->x = param->data.number;
+        pb->x = percent_parse_param(param, vp->width);
+
         if (pb->x < 0 || pb->x >= vp->width)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -1054,12 +1035,8 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (!isdefault(param))
     {
-        if (param->type == PERCENT)
-        {
-           pb->y = param->data.number *  vp->height / 1000;
-        }
-        else
-            pb->y = param->data.number;
+        pb->y = percent_parse_param(param, vp->height);
+
         if (pb->y < 0 || pb->y >= vp->height)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -1069,12 +1046,8 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (!isdefault(param))
     {
-        if (param->type == PERCENT)
-        {
-           pb->width = param->data.number *  vp->width / 1000;
-        }
-        else
-            pb->width = param->data.number;
+        pb->width = percent_parse_param(param, vp->width);
+
         if (pb->width <= 0 || (pb->x + pb->width) > vp->width)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -1085,12 +1058,8 @@ static int parse_progressbar_tag(struct skin_element* element,
     if (!isdefault(param))
     {
         int max;
-        if (param->type == PERCENT)
-        {
-           pb->height = param->data.number *  vp->height / 1000;
-        }
-        else
-           pb->height = param->data.number;
+        pb->height = percent_parse_param(param, vp->height);
+
         /* include y in check only if it was non-default */
         max = (pb->y > 0) ? pb->y + pb->height : pb->height;
         if (pb->height <= 0 || max > vp->height)
@@ -1441,6 +1410,7 @@ failure:
 }
 
 #ifdef HAVE_ALBUMART
+
 static int parse_albumart_load(struct skin_element* element,
                                struct wps_token *token,
                                struct wps_data *wps_data)
@@ -1457,33 +1427,10 @@ static int parse_albumart_load(struct skin_element* element,
     aa->xalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
     aa->yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
 
-    struct skin_tag_parameter *param;
-
-    param = get_param(element, 0);
-    if (!isdefault(param) && param->type == PERCENT)
-        aa->x = param->data.number * curr_vp->vp.width / 1000;
-    else
-        aa->x = param->data.number;
-
-    param = get_param(element, 1);
-    if (!isdefault(param) && param->type == PERCENT)
-        aa->y = param->data.number * curr_vp->vp.height / 1000;
-    else
-        aa->y = param->data.number;
-
-    param = get_param(element, 2);
-    if (!isdefault(param) && param->type == PERCENT)
-        aa->width = param->data.number * curr_vp->vp.width / 1000;
-    else
-        aa->width = param->data.number;
-
-    param = get_param(element, 3);
-
-    if (!isdefault(param) && param->type == PERCENT)
-        aa->height = param->data.number * curr_vp->vp.height / 1000;
-    else
-        aa->height = param->data.number;
-
+    aa->x = percent_parse_param(get_param(element, 0), curr_vp->vp.width);
+    aa->y =  percent_parse_param(get_param(element, 1), curr_vp->vp.height);
+    aa->width =  percent_parse_param(get_param(element, 2), curr_vp->vp.width);
+    aa->height =  percent_parse_param(get_param(element, 3), curr_vp->vp.height);
     aa->draw_handle = -1;
 
     /* if we got here, we parsed everything ok .. ! */
