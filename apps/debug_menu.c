@@ -430,7 +430,7 @@ static bool dbg_buffering_thread(void)
 
             screens[i].putsf(0, line++, fmt_used, "pcm", (long) bufused, (long) bufsize);
 
-            gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+            gui_scrollbar_draw(&screens[i],0, line*SYSFONT_HEIGHT, screens[i].lcdwidth, 6,
                                bufsize, 0, bufused, HORIZONTAL);
             line++;
 
@@ -440,14 +440,14 @@ static bool dbg_buffering_thread(void)
 #if LCD_HEIGHT > 80 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_HEIGHT > 80)
             if (screens[i].lcdheight > 80)
             {
-                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                gui_scrollbar_draw(&screens[i],0, line*SYSFONT_HEIGHT, screens[i].lcdwidth, 6,
                                    filebuflen, 0, audio_filebufused(), HORIZONTAL);
                 line++;
 
                 screens[i].putsf(0, line++, fmt_used, "real", (long)d.buffered_data,
                                 (long)filebuflen);
 
-                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                gui_scrollbar_draw(&screens[i],0, line*SYSFONT_HEIGHT, screens[i].lcdwidth, 6,
                                    filebuflen, 0, (long)d.buffered_data, HORIZONTAL);
                 line++;
             }
@@ -459,7 +459,7 @@ static bool dbg_buffering_thread(void)
 #if LCD_HEIGHT > 80 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_HEIGHT > 80)
             if (screens[i].lcdheight > 80)
             {
-                gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
+                gui_scrollbar_draw(&screens[i],0, line*SYSFONT_HEIGHT, screens[i].lcdwidth, 6,
                                    filebuflen, 0, d.useful_data, HORIZONTAL);
                 line++;
             }

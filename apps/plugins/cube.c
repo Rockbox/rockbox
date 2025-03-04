@@ -797,7 +797,7 @@ enum plugin_status plugin_start(const void* parameter)
                          axes[curr].label,
                          paused ? axes[curr].angle : axes[curr].speed,
                          highspeed ? "(hs)" : "");
-            MYLCD(putsxy)(0, LCD_HEIGHT-8, buffer);
+            MYLCD(putsxy)(0, LCD_HEIGHT-SYSFONT_HEIGHT, buffer);
             if (t_disp == 0)
                 redraw = true;
         }
