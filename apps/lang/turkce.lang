@@ -16558,3 +16558,479 @@
     *: "Mevcut kısayollara ekle"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Özel karakter"
+  </dest>
+  <voice>
+    *: "Özel karakter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Albüm Sanatçıları"
+  </dest>
+  <voice>
+    *: "Albüm Sanatçıları"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "İlk Harf"
+  </dest>
+  <voice>
+    *: "İlk Harf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "İlk Harfe Göre..."
+  </dest>
+  <voice>
+    *: "İlk Harfe Göre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "İlk Harfe Göre Sanatçılar"
+  </dest>
+  <voice>
+    *: "İlk Harfe Göre Sanatçılar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "İlk Harfe Göre Albüm Sanatçıları"
+  </dest>
+  <voice>
+    *: "İlk Harfe Göre Albüm Sanatçıları"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "İlk Harfe Göre Albümler"
+  </dest>
+  <voice>
+    *: "İlk Harfe Göre Albümler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "İlk Harfe Göre Parçalar"
+  </dest>
+  <voice>
+    *: "İlk Harfe Göre Parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Sanatçılar"
+  </dest>
+  <voice>
+    *: "Sanatçılar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albümler"
+  </dest>
+  <voice>
+    *: "Albümler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Parçalar"
+  </dest>
+  <voice>
+    *: "Parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Parçaları Karıştır"
+  </dest>
+  <voice>
+    *: "Parçaları Karıştır"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Dosya adı"
+  </dest>
+  <voice>
+    *: "Dosya adı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Başlık (uzunluk ile beraber)"
+  </dest>
+  <voice>
+    *: "Başlık (uzunluk ile beraber)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Kullanıcı Puanı"
+  </dest>
+  <voice>
+    *: "Kullanıcı Puanı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Ara"
+  </dest>
+  <voice>
+    *: "Ara"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Şununla ara..."
+  </dest>
+  <voice>
+    *: "Şununla ara"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Yakın Zamanda Eklendi"
+  </dest>
+  <voice>
+    *: "Yakın Zamanda Eklendi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Oynatma Geçmişi"
+  </dest>
+  <voice>
+    *: "Oynatma Geçmişi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Özel Menü"
+  </dest>
+  <voice>
+    *: "Özel Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Şu anda oynatılan parça ile aynı"
+  </dest>
+  <voice>
+    *: "Şu anda oynatılan parça ile aynı"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Dizin"
+  </dest>
+  <voice>
+    *: "Dizin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Yıllara göre Albümler"
+  </dest>
+  <voice>
+    *: "Yıllara göre Albümler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Yıllar arası Albümler"
+  </dest>
+  <voice>
+    *: "Yıllar arası Albümler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Yıllar arası Sanatçılar"
+  </dest>
+  <voice>
+    *: "Yıllar arası Sanatçılar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "En çok oynatılanlar (Oynatma|Skor)"
+  </dest>
+  <voice>
+    *: "En çok oynatılanlar önce oynatma sonra skora göre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Yakın zamanda oynatılan parçalar"
+  </dest>
+  <voice>
+    *: "Yakın zamanda oynatılan parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Hiç oynatılmamış parçalar"
+  </dest>
+  <voice>
+    *: "Hiç oynatılmamış parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Favori sanatçılar"
+  </dest>
+  <voice>
+    *: "Favori sanatçılar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Favori albümler"
+  </dest>
+  <voice>
+    *: "Favori albümler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Yakın zamandaki favoriler"
+  </dest>
+  <voice>
+    *: "Yakın zamandaki favoriler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Yeni favoriler"
+  </dest>
+  <voice>
+    *: "Yeni favoriler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Unutulmuş favoriler"
+  </dest>
+  <voice>
+    *: "Unutulmuş favoriler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Şuna göre parçalar"
+  </dest>
+  <voice>
+    *: "Şuna göre parçalar"
+  </voice>
+</phrase>
