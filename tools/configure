@@ -1967,7 +1967,6 @@ fi
     t_soc="pp"
     t_manufacturer="ipod"
     t_model="video"
-    sysfont="14-Rockbox-Mix"
     ;;
 
    23|ipod3g)
@@ -2127,7 +2126,6 @@ fi
     t_cpu="arm"
     t_manufacturer="s5l8702"
     t_model="ipod6g"
-    sysfont="14-Rockbox-Mix"
     ;;
 
    30|iaudiox5)
@@ -4098,7 +4096,6 @@ fi
     t_manufacturer="aigo"
     t_model="erosq"
     sysfontbl="16-Terminus"
-    sysfont="14-Rockbox-Mix"
     ;;
 
    246|fiiom3k)
@@ -4138,7 +4135,6 @@ fi
     output="rockbox.erosq"
     bootoutput="bootloader.erosq"
     sysfontbl="16-Terminus"
-    sysfont="14-Rockbox-Mix"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$x1000tools"
@@ -4166,7 +4162,6 @@ fi
     output="rockbox.erosq"
     bootoutput="bootloader.erosq"
     sysfontbl="16-Terminus"
-    sysfont="14-Rockbox-Mix"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$x1000tools"
