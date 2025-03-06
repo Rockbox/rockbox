@@ -32,9 +32,9 @@ struct battery_tables_t {
     unsigned short * const discharge;
 #if CONFIG_CHARGING
     unsigned short * const charge;
+#endif
     const unsigned short elems;
     bool isdefault;
-#endif
 };
 
 #define BATTERY_LEVELS_DEFAULT ROCKBOX_DIR"/battery_levels.default"
