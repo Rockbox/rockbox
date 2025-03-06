@@ -54,10 +54,12 @@
 #include "pcf50606.h"
 #endif
 
+#if (BATTERY_CAPACITY_DEFAULT > 0)
 extern unsigned short power_history[POWER_HISTORY_LEN];
 extern unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT];
 extern unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
 extern unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+#endif
 #if CONFIG_CHARGING
 extern unsigned short percent_to_volt_charge[11];
 #endif
@@ -68,6 +70,7 @@ extern unsigned short percent_to_volt_charge[11];
 
 struct battery_tables_t device_battery_tables =
 {
+#if (BATTERY_CAPACITY_DEFAULT > 0)
     .history = power_history,
     .disksafe = &battery_level_disksafe[0],
     .shutoff = &battery_level_shutoff[0],
@@ -76,6 +79,7 @@ struct battery_tables_t device_battery_tables =
     .charge = percent_to_volt_charge,
 #endif
     .elems = ARRAYLEN(percent_to_volt_discharge[0]),
+#endif
     .isdefault = true,
 };
 #endif
@@ -851,7 +855,7 @@ static void power_thread(void)
     }
 } /* power_thread */
 
-#if !defined(BOOTLOADER)
+#if (BATTERY_CAPACITY_DEFAULT > 0) && !defined(BOOTLOADER)
 static bool battery_table_readln(int fd, char * buf, size_t bufsz,
                         const char *name, char **value, int* linect) INIT_ATTR;
 static bool battery_table_readln(int fd, char * buf, size_t bufsz,
@@ -899,10 +903,11 @@ static bool battery_table_readln(int fd, char * buf, size_t bufsz,
 
 void init_battery_tables(void)
 {
+#if (BATTERY_CAPACITY_DEFAULT > 0) && !defined(BOOTLOADER)
     /* parse and load user battery levels file */
 #define PWRELEMS (ARRAYLEN(percent_to_volt_discharge[0]))
 
-#if !defined(BOOTLOADER)
+
     unsigned short tmparr[PWRELEMS];
     char buf[MAX_PATH];
     unsigned int i, bl_op;
@@ -1025,9 +1030,8 @@ error_loading:
          close(fd);
     splashf(HZ * 2, "Error line:(%d) loading %s", line_num, BATTERY_LEVELS_USER);
     DEBUGF("Error line:(%d) loading %s\n", line_num, BATTERY_LEVELS_USER);
-
-#endif /* ndef BOOTLOADER*/
 #undef PWRELEMS
+#endif /* ndef BOOTLOADER*/
 }
 
 void powermgmt_init(void)
