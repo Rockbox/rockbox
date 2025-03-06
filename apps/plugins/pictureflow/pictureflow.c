@@ -566,7 +566,7 @@ static struct mp3entry id3;
 void reset_track_list(void);
 
 static bool thread_is_running;
-static bool wants_to_quit = false;
+static bool wants_to_quit;
 
 /*
     Prevent picture loading thread from allocating
@@ -574,7 +574,7 @@ static bool wants_to_quit = false;
     performing buffer-shifting operations.
 */
 static struct mutex buf_ctx_mutex;
-static bool buf_ctx_locked = false;
+static bool buf_ctx_locked;
 
 static int cover_animation_keyframe;
 static int extra_fade;
@@ -3169,11 +3169,56 @@ static inline void set_current_slide(const int slide_index)
 
 
 static void skip_animation_to_idle_state(void);
-static bool sort_albums(int new_sorting, bool from_settings)
+static void return_to_idle_state(void)
+{
+    if (pf_state == pf_show_tracks)
+        free_borrowed_tracks();
+    if (pf_state == pf_show_tracks ||
+        pf_state == pf_cover_in ||
+        pf_state == pf_cover_out)
+        skip_animation_to_idle_state();
+    else if (pf_state == pf_scrolling)
+        set_current_slide(target);
+
+    pf_state = pf_idle;
+}
+
+
+static void set_initial_slide(const char* selected_file)
+{
+    if (selected_file)
+        set_current_slide(retrieve_id3(&id3, selected_file) ?
+                            id3_get_index(&id3) :
+                            pf_cfg.last_album);
+    else
+        set_current_slide(rb->audio_status() ?
+                            id3_get_index(rb->audio_current_track()) :
+                            pf_cfg.last_album);
+
+}
+
+static void reselect(unsigned int hash_album, unsigned int hash_artist)
 {
     int i, album_idx, artist_idx;
-    char* current_album_name = NULL;
-    char* current_album_artist = NULL;
+    for (i = 0; i < pf_idx.album_ct; i++ )
+    {
+        album_idx = pf_idx.album_index[i].name_idx;
+        artist_idx = pf_idx.album_index[i].artist_idx;
+
+        if(hash_album == mfnv(pf_idx.album_names + album_idx) &&
+           hash_artist == mfnv(pf_idx.artist_names + artist_idx))
+        {
+            set_current_slide(i);
+            pf_cfg.last_album = i;
+            return;
+        }
+    }
+    set_initial_slide(NULL);
+}
+
+static bool sort_albums(int new_sorting, bool from_settings)
+{
+    unsigned int hash_album, hash_artist;
     static const char* sort_options[] = {
         ID2P(LANG_ARTIST_PLUS_NAME),
         ID2P(LANG_ARTIST_PLUS_YEAR),
@@ -3196,16 +3241,7 @@ static bool sort_albums(int new_sorting, bool from_settings)
         return false;
     }
 
-    /* set idle state */
-    if (pf_state == pf_show_tracks)
-        free_borrowed_tracks();
-    if (pf_state == pf_show_tracks ||
-        pf_state == pf_cover_in ||
-        pf_state == pf_cover_out)
-        skip_animation_to_idle_state();
-    else if (pf_state == pf_scrolling)
-        set_current_slide(target);
-    pf_state = pf_idle;
+    return_to_idle_state();
 
     pf_cfg.sort_albums_by = new_sorting;
     if (!from_settings)
@@ -3225,8 +3261,8 @@ static bool sort_albums(int new_sorting, bool from_settings)
 #endif
     }
 
-    current_album_artist = get_album_artist(center_index);
-    current_album_name = get_album_name(center_index);
+    hash_album = mfnv(get_album_name(center_index));
+    hash_artist = mfnv(get_album_artist(center_index));
 
     end_pf_thread(); /* stop loading of covers  */
 
@@ -3240,19 +3276,8 @@ static bool sort_albums(int new_sorting, bool from_settings)
     is_initial_slide = true;
     create_pf_thread();
 
-    /* Go to previously selected slide */
-    for (i = 0; i < pf_idx.album_ct; i++ )
-    {
-        album_idx = pf_idx.album_index[i].name_idx;
-        artist_idx = pf_idx.album_index[i].artist_idx;
+    reselect(hash_album, hash_artist);
 
-        if(!rb->strcmp(pf_idx.album_names + album_idx, current_album_name) &&
-            !rb->strcmp(pf_idx.artist_names + artist_idx, current_album_artist))
-        {
-            set_current_slide(i);
-            pf_cfg.last_album = i;
-        }
-    }
     return true;
 }
 
@@ -3630,16 +3655,14 @@ static int settings_menu(void)
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
-                break;
+                return -3; /* re-init */
             case 11:
                 pf_cfg.update_albumart = true;
                 pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
-                break;
+                return -3; /* re-init */
             case 12:
                 rb->set_option(rb->str(LANG_WPS_INTEGRATION),
                                &pf_cfg.auto_wps, RB_INT, wps_options, 3, NULL);
@@ -3727,7 +3750,8 @@ static int main_menu(void)
 #endif
             case PF_MENU_SETTINGS:
                 result = settings_menu();
-                if ( result != 0 ) return result;
+                if (result != 0)
+                    return result;
                 break;
             case PF_MENU_QUIT:
                 return -1;
@@ -4390,20 +4414,6 @@ static void draw_album_text(void)
     }
 }
 
-
-static void set_initial_slide(const char* selected_file)
-{
-    if (selected_file)
-        set_current_slide(retrieve_id3(&id3, selected_file) ?
-                            id3_get_index(&id3) :
-                            pf_cfg.last_album);
-    else
-        set_current_slide(rb->audio_status() ?
-                            id3_get_index(rb->audio_current_track()) :
-                            pf_cfg.last_album);
-
-}
-
 /**
   Display an error message and wait for input.
 */
@@ -4415,32 +4425,69 @@ static void error_wait(const char *message)
     rb->sleep(2 * HZ);
 }
 
-/**
-  Main function that also contain the main plasma
-  algorithm.
- */
-static int pictureflow_main(const char* selected_file)
+static bool init(void)
 {
     int ret = SUCCESS;
+    void * buf;
+    size_t buf_size;
 
-    rb->lcd_setfont(FONT_UI);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true); /* revert in cleanup */
+#endif
 
-    if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
-        if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
-            error_wait("Could not create directory " CACHE_PREFIX);
-            return PLUGIN_OK;
-        }
-    }
+    wants_to_quit = false;
 
+    /* must appear before config load */
     rb->memset(&aa_cache, 0, sizeof(struct albumart_t));
-    config_set_defaults(&pf_cfg);
 
+    config_set_defaults(&pf_cfg); /* must appear before configfile_save */
     configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
 #ifdef HAVE_BACKLIGHT
     if(pf_cfg.backlight_mode == 0)
-        backlight_ignore_timeout();
+        backlight_ignore_timeout(); /* restore in cleanup */
 #endif
+
+#if PF_PLAYBACK_CAPABLE
+    buf = rb->plugin_get_buffer(&buf_size);
+#else
+    buf = rb->plugin_get_audio_buffer(&buf_size);
+#ifndef SIMULATOR
+    if ((uintptr_t)buf < (uintptr_t)plugin_start_addr)
+    {
+        uint32_t tmp_size = (uintptr_t)plugin_start_addr - (uintptr_t)buf;
+        buf_size = MIN(buf_size, tmp_size);
+    }
+#endif
+#endif
+
+#ifdef USEGSLIB
+    long grey_buf_used;
+    if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
+                   LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
+    {
+        error_wait("Greylib init failed!");
+        return false;
+    }
+    grey_setfont(FONT_UI);
+    buf_size -= grey_buf_used;
+    buf = (void*)(grey_buf_used + (char*)buf);
+#endif
+
+    /* store buffer pointers and sizes */
+    pf_idx.buf = buf;
+    pf_idx.buf_sz = buf_size;
+
+    rb->lcd_setfont(FONT_UI);
+
+    if (!rb->dir_exists(CACHE_PREFIX))
+    {
+        if (rb->mkdir( CACHE_PREFIX ) < 0)
+        {
+            error_wait("Could not create directory " CACHE_PREFIX);
+            return false;
+        }
+    }
 
     rb->mutex_init(&buf_ctx_mutex);
 
@@ -4448,25 +4495,30 @@ static int pictureflow_main(const char* selected_file)
     init_reflect_table();
 
     /*Scan will trigger when no file is found or the option was activated*/
-    if ((pf_cfg.cache_version != CACHE_VERSION)||(load_album_index() < 0)){
+    if ((pf_cfg.cache_version != CACHE_VERSION)|| (load_album_index() < 0))
+    {
         ret = create_album_index();
 
-        if (ret == 0){
+        if (ret == 0)
+        {
             pf_cfg.cache_version = CACHE_REBUILD;
-            if (save_album_index() < 0) {
+            if (save_album_index() < 0)
                 rb->splash(HZ, "Could not write index");
-            };
         }
     }
 
-    if (ret == ERROR_BUFFER_FULL) {
+    if (ret == ERROR_BUFFER_FULL)
+    {
         error_wait("Not enough memory for album names");
-        return PLUGIN_OK;
-    } else if (ret == ERROR_NO_ALBUMS) {
+        return false;
+    }
+    else if (ret == ERROR_NO_ALBUMS)
+    {
         error_wait("No albums found. Please enable database");
-        return PLUGIN_OK;
-    } else if (ret == ERROR_USER_ABORT)
-        return PLUGIN_OK;
+        return false;
+    }
+    else if (ret == ERROR_USER_ABORT)
+        return false;
 
     number_of_slides = pf_idx.album_ct;
 
@@ -4474,7 +4526,7 @@ static int pictureflow_main(const char* selected_file)
     if (aa_bufsz < DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(pix_t))
     {
         error_wait("Not enough memory for album art cache");
-        return PLUGIN_OK;
+        return false;
     }
 
     ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, sizeof(long));
@@ -4484,38 +4536,39 @@ static int pictureflow_main(const char* selected_file)
     pf_idx.buf += aa_bufsz;
     pf_idx.buf_sz -= aa_bufsz;
 
-    if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION)) {
+    rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
+    initialize_slide_cache();
+    is_initial_slide = true;
+
+    if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION))
+    {
         config_save(CACHE_REBUILD, false);
         error_wait("Could not load the empty slide");
-        return PLUGIN_OK;
+        return false;
     }
 
-    if ((pf_cfg.cache_version != CACHE_VERSION) && !create_albumart_cache()) {
+    if ((pf_cfg.cache_version != CACHE_VERSION) && !create_albumart_cache())
+    {
         config_save(CACHE_REBUILD, false);
         error_wait("Could not create album art cache");
-    } else if(aa_cache.inspected < pf_idx.album_ct) {
-        rb->splash(HZ * 2, "Updating album art cache in background");
     }
+    else if(aa_cache.inspected < pf_idx.album_ct)
+        rb->splash(HZ * 2, "Updating album art cache in background");
 
     if (pf_cfg.cache_version != CACHE_VERSION)
-    {
         config_save(CACHE_VERSION, pf_cfg.update_albumart);
-    }
-
-    rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
 
     if ((empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)) < 0)
     {
         error_wait("Unable to load empty slide image");
-        return PLUGIN_OK;
+        return false;
     }
 
-    if (!create_pf_thread()) {
+    if (!create_pf_thread())
+    {
         error_wait("Cannot create thread!");
-        return PLUGIN_OK;
+        return false;
     }
-
-    initialize_slide_cache();
 
     buffer = LCD_BUF;
 
@@ -4533,24 +4586,49 @@ static int pictureflow_main(const char* selected_file)
 
     recalc_offsets();
     reset_slides();
-    set_initial_slide(selected_file);
 
+#ifdef USEGSLIB
+    grey_show(true);
+    grey_set_drawmode(DRMODE_FG);
+#endif
+    rb->lcd_set_drawmode(DRMODE_FG);
+
+    return true;
+}
+
+static bool reinit(void)
+{
+    return_to_idle_state();
+
+    unsigned int hash_album = mfnv(get_album_name(center_index));
+    unsigned int hash_artist = mfnv(get_album_artist(center_index));
+
+    cleanup();
+    if (init())
+    {
+        reselect(hash_album, hash_artist);
+        return true;
+    }
+    return false;
+}
+
+/**
+  Main function that also contain the main plasma
+  algorithm.
+ */
+static int pictureflow_main(void)
+{
+    int ret;
     char fpstxt[10];
     int button;
-
     int frames = 0;
     long last_update = *rb->current_tick;
     long current_update;
     long update_interval = 100;
     int fps = 0;
     int fpstxt_y;
-
     bool instant_update;
-#ifdef USEGSLIB
-    grey_show(true);
-    grey_set_drawmode(DRMODE_FG);
-#endif
-    rb->lcd_set_drawmode(DRMODE_FG);
+
     while (true) {
         current_update = *rb->current_tick;
         frames++;
@@ -4668,13 +4746,25 @@ static int pictureflow_main(const char* selected_file)
             ret = main_menu();
             FOR_NB_SCREENS(i)
                 rb->viewportmanager_theme_undo(i, false);
-            if ( ret == -2 ) return PLUGIN_GOTO_WPS;
-            if ( ret == -1 ) return PLUGIN_OK;
-            if ( ret != 0 ) return ret;
+
+            if (ret == -3)
+            {
+                if (!reinit())
+                    return PLUGIN_OK;
+            }
+            else if (ret == -2)
+                return PLUGIN_GOTO_WPS;
+            else if (ret == -1)
+                return PLUGIN_OK;
+            else if (ret != 0 )
+                return ret;
+            else
+            {
 #ifdef USEGSLIB
-            grey_show(true);
+                grey_show(true);
 #endif
-            mylcd_set_drawmode(DRMODE_FG);
+                mylcd_set_drawmode(DRMODE_FG);
+            }
             break;
 
         case PF_NEXT:
@@ -4822,9 +4912,6 @@ enum plugin_status plugin_start(const void *parameter)
 
     int ret;
     const char *file = parameter;
-
-    void * buf;
-    size_t buf_size;
     bool file_id3 = (parameter && (((char *) parameter)[0] == '/'));
 
     if (!check_database())
@@ -4832,48 +4919,23 @@ enum plugin_status plugin_start(const void *parameter)
         error_wait("Please enable database");
         return PLUGIN_OK;
     }
-
     atexit(cleanup);
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
-#if PF_PLAYBACK_CAPABLE
-    buf = rb->plugin_get_buffer(&buf_size);
-#else
-    buf = rb->plugin_get_audio_buffer(&buf_size);
-#ifndef SIMULATOR
-    if ((uintptr_t)buf < (uintptr_t)plugin_start_addr)
+    if (init())
     {
-        uint32_t tmp_size = (uintptr_t)plugin_start_addr - (uintptr_t)buf;
-        buf_size = MIN(buf_size, tmp_size);
+        set_initial_slide(file_id3 ? file : NULL);
+        ret = pictureflow_main();
     }
-#endif
-#endif
+    else
+        ret = PLUGIN_OK;
 
-#ifdef USEGSLIB
-    long grey_buf_used;
-    if (!grey_init(buf, buf_size, GREY_BUFFERED|GREY_ON_COP,
-                   LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
+    if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS)
     {
-        error_wait("Greylib init failed!");
-        return PLUGIN_OK;
-    }
-    grey_setfont(FONT_UI);
-    buf_size -= grey_buf_used;
-    buf = (void*)(grey_buf_used + (char*)buf);
-#endif
-
-    /* store buffer pointers and sizes */
-    pf_idx.buf = buf;
-    pf_idx.buf_sz = buf_size;
-
-    ret = file_id3 ? pictureflow_main(file) : pictureflow_main(NULL);
-    if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
         if (pf_state == pf_scrolling)
             pf_cfg.last_album = target;
         else
             pf_cfg.last_album = center_index;
+
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {

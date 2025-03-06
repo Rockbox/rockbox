@@ -14828,16 +14828,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </dest>
   <voice>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </voice>
 </phrase>
 <phrase>
