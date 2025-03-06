@@ -182,6 +182,7 @@ void fatal_error(int err)
 }
 
 #if (CONFIG_STORAGE & STORAGE_ATA)
+extern unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT];
 static void battery_trap(void)
 {
     int vbat, old_verb;

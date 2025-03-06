@@ -113,9 +113,9 @@ struct battery_tables_t {
     unsigned short * const discharge;
 #if CONFIG_CHARGING
     unsigned short * const charge;
+#endif
     const unsigned short elems;
     bool isdefault;
-#endif
 };
 
 /* Returns battery status, filtered for runtime estimation */
