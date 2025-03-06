@@ -662,18 +662,25 @@ static bool check_database(void)
     return true;
 }
 
-static bool confirm_quit(void)
+static bool progress_cancel(int step, int count, char *msg)
 {
-    const struct text_message prompt =
-             { (const char*[]) {"Quit?", "Progress will be lost"}, 2};
-    enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
-    while (rb->button_get(false) == BUTTON_NONE)
-    {;;}
+    const struct text_message prompt = {
+            (const char*[]) {"Quit?", "Progress will be lost"}, 2};
 
-    if(response == YESNO_NO)
-        return false;
+    int action = rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK);
+    if (action == ACTION_STD_CANCEL || action == ACTION_STD_MENU)
+    {
+        if (rb->gui_syncyesno_run(&prompt, NULL, NULL) == YESNO_YES)
+            return true;
+        rb->lcd_clear_display();
+    }
     else
-        return true;
+        msg = NULL;
+
+    if (count)
+        draw_progressbar(step, count, msg);
+
+    return false;
 }
 
 static void config_save(int cache_version, bool update_albumart)
@@ -1160,14 +1167,10 @@ static int get_tcs_search_res(int type, struct tagcache_search *tcs,
 
     while (rb->tagcache_get_next(tcs, tcs_buf, tcs_bufsz))
     {
-        if (rb->button_get(false) > BUTTON_NONE)
+        if (progress_cancel(0, 0, NULL))
         {
-            if (confirm_quit())
-            {
-                ret = ERROR_USER_ABORT;
-                break;
-            } else
-                rb->lcd_clear_display();
+            ret = ERROR_USER_ABORT;
+            break;
         }
 
         *bufsz -= data_size;
@@ -1194,6 +1197,12 @@ static int get_tcs_search_res(int type, struct tagcache_search *tcs,
     return ret;
 }
 
+#define STR_STEP_INDEXING_UNTAGGED "1/5 Find " UNTAGGED
+#define STR_STEP_ASSIGNING_ALBUMS "2/5 Find Albums"
+#define STR_STEP_ASSIGNING_ALBUM_YEAR "3/5 Check Album Year"
+#define STR_STEP_REMOVING_DUPLICATES "4/5 Remove Duplicates"
+#define STR_STEP_PREPARING_ARTWORK "5/5 Prepare Artwork"
+
 /*adds <untagged> albums/artist to existing album index */
 static int create_album_untagged(struct tagcache_search *tcs,
                                  void **buf, size_t *bufsz)
@@ -1207,7 +1216,7 @@ static int create_album_untagged(struct tagcache_search *tcs,
     int last, final, retry;
     int i, j;
     draw_splashscreen(*buf, *bufsz);
-    draw_progressbar(0, total_count, "Searching " UNTAGGED);
+    draw_progressbar(0, total_count, STR_STEP_INDEXING_UNTAGGED);
 
     /* search tagcache for all <untagged> albums & save the albumartist seek pos */
     if (rb->tagcache_search(tcs, tag_albumartist))
@@ -1216,18 +1225,10 @@ static int create_album_untagged(struct tagcache_search *tcs,
 
         while (rb->tagcache_get_next(tcs, tcs_buf, tcs_bufsz))
         {
-            if (rb->button_get(false) > BUTTON_NONE) {
-                if (confirm_quit())
-                {
-                    rb->tagcache_search_finish(tcs);
-                    return ERROR_USER_ABORT;
-                }
-                else
-                {
-                    rb->lcd_clear_display();
-                    draw_progressbar(pf_idx.album_ct, total_count,
-                                     "Searching " UNTAGGED);
-                }
+            if (progress_cancel(pf_idx.album_ct, total_count, STR_STEP_INDEXING_UNTAGGED))
+            {
+                rb->tagcache_search_finish(tcs);
+                return ERROR_USER_ABORT;
             }
 
             if (tcs->result_seek ==
@@ -1246,13 +1247,12 @@ static int create_album_untagged(struct tagcache_search *tcs,
                                pf_idx.album_untagged_seek, -1, tcs->result_seek);
 
             pf_idx.album_ct++;
-            draw_progressbar(pf_idx.album_ct, total_count, NULL);
         }
         rb->tagcache_search_finish(tcs);
 
         if (ret == SUCCESS) {
             draw_splashscreen(*buf, *bufsz);
-            draw_progressbar(0, pf_idx.album_ct, "Finalizing " UNTAGGED);
+            draw_progressbar(0, pf_idx.album_ct, STR_STEP_INDEXING_UNTAGGED);
 
             last = 0;
             final = pf_idx.artist_ct;
@@ -1261,17 +1261,9 @@ static int create_album_untagged(struct tagcache_search *tcs,
             /* map the artist_seek position to the artist name index */
             for (j = album_count; j < pf_idx.album_ct; j++)
             {
-                if (rb->button_get(false) > BUTTON_NONE) {
-                    if (confirm_quit())
-                        return ERROR_USER_ABORT;
-                    else
-                    {
-                        rb->lcd_clear_display();
-                        draw_progressbar(j, pf_idx.album_ct, "Finalizing " UNTAGGED);
-                    }
-                }
+                if (progress_cancel(j, pf_idx.album_ct, STR_STEP_INDEXING_UNTAGGED))
+                    return ERROR_USER_ABORT;
 
-                draw_progressbar(j, pf_idx.album_ct, NULL);
                 seek = pf_idx.album_index[-j].artist_seek;
 
     retry_artist_lookup:
@@ -1343,28 +1335,19 @@ static int build_artist_index(struct tagcache_search *tcs,
     return res;
 }
 
-
 static int assign_album_year(void)
 {
     char tcs_buf[TAGCACHE_BUFSZ];
     const long tcs_bufsz = sizeof(tcs_buf);
-    draw_progressbar(0, pf_idx.album_ct, "Assigning Album Year");
+    draw_progressbar(0, pf_idx.album_ct, STR_STEP_ASSIGNING_ALBUM_YEAR);
     for (int album_idx = 0; album_idx < pf_idx.album_ct; album_idx++)
     {
         /* Prevent idle poweroff */
         rb->reset_poweroff_timer();
 
-        if (rb->button_get(false) > BUTTON_NONE)
-        {
-            if (confirm_quit())
-                return ERROR_USER_ABORT;
-            else
-            {
-                rb->lcd_clear_display();
-                draw_progressbar(album_idx, pf_idx.album_ct, "Assigning Album Year");
-            }
-        }
-        draw_progressbar(album_idx, pf_idx.album_ct, NULL);
+        if (progress_cancel(album_idx, pf_idx.album_ct, STR_STEP_ASSIGNING_ALBUM_YEAR))
+            return ERROR_USER_ABORT;
+
         int album_year = 0;
 
         if (rb->tagcache_search(&tcs, tag_year))
@@ -1447,25 +1430,15 @@ static int create_album_index(void)
 
     /* Assign indices */
     draw_splashscreen(buf, buf_size);
-    draw_progressbar(0, pf_idx.album_ct, "Assigning Albums");
+    draw_progressbar(0, pf_idx.album_ct, STR_STEP_ASSIGNING_ALBUMS);
     for (j = 0; j < pf_idx.album_ct; j++)
     {
         /* Prevent idle poweroff */
         rb->reset_poweroff_timer();
 
-        if (rb->button_get(false) > BUTTON_NONE)
-        {
-            if (confirm_quit())
-                return ERROR_USER_ABORT;
-            else
-            {
-                rb->lcd_clear_display();
-                draw_progressbar(j, pf_idx.album_ct, "Assigning Albums");
-            }
+        if (progress_cancel(j, pf_idx.album_ct, STR_STEP_ASSIGNING_ALBUMS))
+            return ERROR_USER_ABORT;
 
-        }
-
-        draw_progressbar(j, pf_idx.album_ct, NULL);
         if (pf_idx.album_index[j].artist_seek >= 0) { continue; }
 
         rb->tagcache_search(&tcs, tag_albumartist);
@@ -1515,17 +1488,19 @@ retry_artist_lookup:
               sizeof(struct album_data), compare_album_artists);
 
     draw_splashscreen(buf, buf_size);
-    draw_progressbar(0, pf_idx.album_ct, "Removing duplicates");
+    draw_progressbar(0, pf_idx.album_ct, STR_STEP_REMOVING_DUPLICATES);
     /* mark duplicate albums for deletion */
     for (i = 0; i < pf_idx.album_ct - 1; i++) /* -1 don't check last entry */
     {
         /* Prevent idle poweroff */
         rb->reset_poweroff_timer();
 
+        if (progress_cancel(i, pf_idx.album_ct, STR_STEP_REMOVING_DUPLICATES))
+            return ERROR_USER_ABORT;
+
         int idxi = pf_idx.album_index[i].artist_idx;
         int seeki = pf_idx.album_index[i].seek;
 
-        draw_progressbar(i, pf_idx.album_ct, NULL);
         for (j = i + 1; j < pf_idx.album_ct; j++)
         {
             if (idxi > 0 &&
@@ -2343,7 +2318,7 @@ aa_success:
 static bool create_albumart_cache(void)
 {
     draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
-    draw_progressbar(0, pf_idx.album_ct, "Preparing artwork");
+    draw_progressbar(0, pf_idx.album_ct, STR_STEP_PREPARING_ARTWORK);
     aa_cache.inspected = 0;
     for (int i=0; i < pf_idx.album_ct; i++)
     {
@@ -4453,7 +4428,7 @@ static int pictureflow_main(const char* selected_file)
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
         if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
             error_wait("Could not create directory " CACHE_PREFIX);
-            return PLUGIN_ERROR;
+            return PLUGIN_OK;
         }
     }
 
@@ -4474,7 +4449,6 @@ static int pictureflow_main(const char* selected_file)
 
     /*Scan will trigger when no file is found or the option was activated*/
     if ((pf_cfg.cache_version != CACHE_VERSION)||(load_album_index() < 0)){
-        rb->splash(HZ/2,"Creating index, please wait");
         ret = create_album_index();
 
         if (ret == 0){
@@ -4487,14 +4461,12 @@ static int pictureflow_main(const char* selected_file)
 
     if (ret == ERROR_BUFFER_FULL) {
         error_wait("Not enough memory for album names");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     } else if (ret == ERROR_NO_ALBUMS) {
         error_wait("No albums found. Please enable database");
-        return PLUGIN_ERROR;
-    } else if (ret == ERROR_USER_ABORT) {
-        error_wait("User aborted.");
-        return PLUGIN_ERROR;
-    }
+        return PLUGIN_OK;
+    } else if (ret == ERROR_USER_ABORT)
+        return PLUGIN_OK;
 
     number_of_slides = pf_idx.album_ct;
 
@@ -4502,7 +4474,7 @@ static int pictureflow_main(const char* selected_file)
     if (aa_bufsz < DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(pix_t))
     {
         error_wait("Not enough memory for album art cache");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     }
 
     ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, sizeof(long));
@@ -4515,7 +4487,7 @@ static int pictureflow_main(const char* selected_file)
     if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION)) {
         config_save(CACHE_REBUILD, false);
         error_wait("Could not load the empty slide");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     }
 
     if ((pf_cfg.cache_version != CACHE_VERSION) && !create_albumart_cache()) {
@@ -4535,12 +4507,12 @@ static int pictureflow_main(const char* selected_file)
     if ((empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)) < 0)
     {
         error_wait("Unable to load empty slide image");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     }
 
     if (!create_pf_thread()) {
         error_wait("Cannot create thread!");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     }
 
     initialize_slide_cache();
@@ -4885,7 +4857,7 @@ enum plugin_status plugin_start(const void *parameter)
                    LCD_WIDTH, LCD_HEIGHT, &grey_buf_used))
     {
         error_wait("Greylib init failed!");
-        return PLUGIN_ERROR;
+        return PLUGIN_OK;
     }
     grey_setfont(FONT_UI);
     buf_size -= grey_buf_used;
@@ -4909,7 +4881,7 @@ enum plugin_status plugin_start(const void *parameter)
             grey_show(false);
 #endif
             rb->splash(HZ, ID2P(LANG_ERROR_WRITING_CONFIG));
-            ret = PLUGIN_ERROR;
+            ret = PLUGIN_OK;
         }
     }
     return ret;
