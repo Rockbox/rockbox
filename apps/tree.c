@@ -923,8 +923,26 @@ static int dirbrowse(void)
                         else
                         {
                             attr = ATTR_DIRECTORY;
-                            tagtree_get_entry_name(&tc, tc.selected_item,
-                                                   buf, sizeof(buf));
+                            int title_len = 0;
+
+                            /* In case of "special entries", add table title as
+                               prefix, e.g. "The Beatles [All Tracks]", instead
+                               of just "[All Tracks]", to improve the suggested
+                               playlist filename.
+                            */
+                            if (tc.selected_item < tc.special_entry_count)
+                            {
+                                title_len = snprintf(buf, sizeof(buf), "%s ",
+                                                     tagtree_get_title(&tc));
+                                if (title_len < 0)
+                                    title_len = 0;
+                            }
+
+                            if (title_len < (int) sizeof(buf))
+                                tagtree_get_entry_name(&tc, tc.selected_item,
+                                                       buf + title_len,
+                                                       sizeof(buf) - title_len);
+
                             fix_path_part(buf, 0, sizeof(buf) - 1);
                         }
                     }
