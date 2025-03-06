@@ -36,9 +36,6 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "rtc.h"
-#include "misc.h"
-#include "splash.h"
-#include "version.h"
 #if CONFIG_TUNER
 #include "fmradio.h"
 #endif
@@ -65,6 +62,10 @@ extern unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 extern unsigned short percent_to_volt_charge[11];
 #endif
 
+#ifndef BOOTLOADER
+#include "misc.h"
+#include "splash.h"
+
 struct battery_tables_t device_battery_tables =
 {
     .history = power_history,
@@ -77,6 +78,7 @@ struct battery_tables_t device_battery_tables =
     .elems = ARRAYLEN(percent_to_volt_discharge[0]),
     .isdefault = true,
 };
+#endif
 
 static int last_sent_battery_level = 100;
 static void set_sleep_timer(int seconds);
@@ -849,7 +851,7 @@ static void power_thread(void)
     }
 } /* power_thread */
 
-
+#if !defined(BOOTLOADER)
 static bool battery_table_readln(int fd, char * buf, size_t bufsz,
                         const char *name, char **value, int* linect) INIT_ATTR;
 static bool battery_table_readln(int fd, char * buf, size_t bufsz,
@@ -893,6 +895,7 @@ static bool battery_table_readln(int fd, char * buf, size_t bufsz,
     }
     return rd > 0;
 }
+#endif
 
 void init_battery_tables(void)
 {

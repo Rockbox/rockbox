@@ -113,7 +113,7 @@ struct battery_tables_t {
     unsigned short * const discharge;
 #if CONFIG_CHARGING
     unsigned short * const charge;
-    const size_t elems;
+    const unsigned short elems;
     bool isdefault;
 #endif
 };
