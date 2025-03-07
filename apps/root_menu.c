@@ -503,9 +503,6 @@ MENUITEM_RETURNVALUE(db_browser, ID2P(LANG_TAGCACHE), GO_TO_DBBROWSER,
 MENUITEM_RETURNVALUE(rocks_browser, ID2P(LANG_PLUGINS), GO_TO_BROWSEPLUGINS,
                         NULL, Icon_Plugin);
 
-MENUITEM_RETURNVALUE(playlist_browser, ID2P(LANG_CATALOG), GO_TO_PLAYLIST_VIEWER,
-                        NULL, Icon_Playlist);
-
 static char *get_wps_item_name(int selected_item, void * data,
                                char *buffer, size_t buffer_len)
 {
@@ -529,7 +526,7 @@ MENUITEM_RETURNVALUE(menu_, ID2P(LANG_SETTINGS), GO_TO_MAINMENU,
 MENUITEM_RETURNVALUE(bookmarks, ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
                         GO_TO_RECENTBMARKS,  item_callback,
                         Icon_Bookmark);
-MENUITEM_RETURNVALUE(playlists, ID2P(LANG_CATALOG), GO_TO_PLAYLISTS_SCREEN,
+MENUITEM_RETURNVALUE(playlists, ID2P(LANG_PLAYLISTS), GO_TO_PLAYLISTS_SCREEN,
                      NULL, Icon_Playlist);
 MENUITEM_RETURNVALUE(system_menu_, ID2P(LANG_SYSTEM), GO_TO_SYSTEM_SCREEN,
                      NULL, Icon_System_menu);

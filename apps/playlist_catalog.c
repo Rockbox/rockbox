@@ -160,8 +160,8 @@ static int display_playlists(char* playlist, enum catbrowse_status_flags status)
     struct browse_context browse = {
         .dirfilter = SHOW_M3U,
         .flags = BROWSE_SELECTONLY | (view ? 0 : BROWSE_NO_CONTEXT_MENU),
-        .title = str(LANG_CATALOG),
-        .icon = Icon_NOICON,
+        .title = str(LANG_PLAYLISTS),
+        .icon = Icon_Playlist,
         .root = selected_playlist,
         .selected = &most_recent_playlist[playlist_dir_length + 1],
         .buf = selected_playlist,

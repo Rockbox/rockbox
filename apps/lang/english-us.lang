@@ -410,7 +410,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the file view setting
+  desc: in the main menu and Playlist settings menu
   user: core
   <source>
     *: "Playlists"

@@ -488,7 +488,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the file view setting
+  desc: in the main menu and Playlist settings menu
   user: core
   <source>
     *: "Playlists"
@@ -5937,16 +5937,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Playlist Catalogue"
+    *: ""
   </dest>
   <voice>
-    *: "Playlist Catalogue"
+    *: ""
   </voice>
 </phrase>
 <phrase>

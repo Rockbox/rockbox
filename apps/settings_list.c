@@ -1893,7 +1893,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_TAGCACHE
                       ID2P(LANG_TAGCACHE),
 #endif
-                      ID2P(LANG_CATALOG)),
+                      ID2P(LANG_PLAYLISTS)),
 
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, backlight_on_button_hold,

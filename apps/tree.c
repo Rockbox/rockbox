@@ -745,7 +745,8 @@ static int dirbrowse(void)
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
-        splash(HZ*2, ID2P(LANG_NO_FILES));
+        splash(HZ*2, *tc.dirfilter == SHOW_M3U ?
+                     ID2P(LANG_CATALOG_NO_PLAYLISTS) : ID2P(LANG_NO_FILES));
         return exit_to_new_screen(GO_TO_PREVIOUS);  /* No files found for rockbox_browse() */
     }
 
