@@ -156,7 +156,14 @@ void skin_debug_tree(struct skin_element* root)
             break;
 
         case VIEWPORT:
-            printf("{ Viewport \n");
+            if (current->params_count == 0)
+                printf("{ Implicit root viewport\n");
+            else {
+                printf("{ Viewport w/ %d Parameters (font id is last one)\n", current->params_count);
+                debug_indent_level+=2;
+                skin_debug_params(current->params_count, SKINOFFSETTOPTR(skin_buffer, current->params));
+                debug_indent_level-=2;
+            }
 
             debug_indent_level++;
             skin_debug_tree(get_child(current->children, 0));
