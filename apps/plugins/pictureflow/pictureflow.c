@@ -3527,29 +3527,97 @@ static void adjust_album_display_for_setting(int old_val, int new_val)
         skip_animation_to_show_tracks();
 }
 
+static int display_settings_menu(void)
+{
+    int selection = 0;
+    int old_val;
+
+    MENUITEM_STRINGLIST(display_menu, ID2P(LANG_DISPLAY), NULL,
+                        ID2P(LANG_BACKLIGHT),
+                        ID2P(LANG_DISPLAY_FPS),
+                        ID2P(LANG_SPACING),
+                        ID2P(LANG_CENTRE_MARGIN),
+                        ID2P(LANG_NUMBER_OF_SLIDES),
+                        ID2P(LANG_ZOOM),
+                        ID2P(LANG_RESIZE_COVERS));
+
+    static const struct opt_items backlight_options[] = {
+        { STR(LANG_ALWAYS_ON) },
+        { STR(LANG_NORMAL) }};
+
+    do {
+        selection=rb->do_menu(&display_menu, &selection, NULL, false);
+        switch(selection) {
+            case 0:
+                rb->set_option(rb->str(LANG_BACKLIGHT),
+                        &pf_cfg.backlight_mode, RB_INT, backlight_options, 2, NULL);
+                break;
+            case 1:
+                old_val = pf_cfg.show_fps;
+                rb->set_bool(rb->str(LANG_DISPLAY_FPS), &pf_cfg.show_fps);
+                if (old_val != pf_cfg.show_fps)
+                    reset_track_list();
+                break;
+            case 2:
+                old_val = pf_cfg.slide_spacing;
+                rb->set_int(rb->str(LANG_SPACING), "", 1,
+                            &pf_cfg.slide_spacing,
+                            NULL, 1, 0, 100, NULL );
+                adjust_album_display_for_setting(old_val, pf_cfg.slide_spacing);
+                break;
+            case 3:
+                old_val = pf_cfg.center_margin;
+                rb->set_int(rb->str(LANG_CENTRE_MARGIN), "", 1,
+                            &pf_cfg.center_margin,
+                            NULL, 1, 0, 80, NULL );
+                adjust_album_display_for_setting(old_val, pf_cfg.center_margin);
+                break;
+            case 4:
+                old_val = pf_cfg.num_slides;
+                rb->set_int(rb->str(LANG_NUMBER_OF_SLIDES), "", 1,
+                        &pf_cfg.num_slides, NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
+                adjust_album_display_for_setting(old_val, pf_cfg.num_slides);
+                break;
+            case 5:
+                old_val = pf_cfg.zoom;
+                rb->set_int(rb->str(LANG_ZOOM), "", 1, &pf_cfg.zoom,
+                            NULL, 1, 10, 300, NULL );
+                adjust_album_display_for_setting(old_val, pf_cfg.zoom);
+                break;
+            case 6:
+                old_val = pf_cfg.resize;
+                rb->set_bool(rb->str(LANG_RESIZE_COVERS), &pf_cfg.resize);
+                if (old_val == pf_cfg.resize) /* changed? */
+                    break;
+
+                pf_cfg.update_albumart = false;
+                pf_cfg.cache_version = CACHE_REBUILD;
+                rb->remove(EMPTY_SLIDE);
+                configfile_save(CONFIG_FILE, config,
+                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
+                return -3; /* re-init */
+            case MENU_ATTACHED_USB:
+                return PLUGIN_USB_CONNECTED;
+        }
+    } while (selection >= 0);
+
+    return 0;
+}
+
 /**
   Shows the settings menu
  */
 static int settings_menu(void)
 {
     int selection = 0;
-    int old_val;
+    int old_val, result;
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL,
                         ID2P(LANG_SHOW_ALBUM_TITLE),
                         ID2P(LANG_SHOW_YEAR_IN_ALBUM_TITLE),
-                        ID2P(LANG_SORT_ALBUMS_BY),
                         ID2P(LANG_YEAR_SORT_ORDER),
-                        ID2P(LANG_DISPLAY_FPS),
-                        ID2P(LANG_SPACING),
-                        ID2P(LANG_CENTRE_MARGIN),
-                        ID2P(LANG_NUMBER_OF_SLIDES),
-                        ID2P(LANG_ZOOM),
-                        ID2P(LANG_RESIZE_COVERS),
-                        ID2P(LANG_REBUILD_CACHE),
-                        ID2P(LANG_UPDATE_CACHE),
                         ID2P(LANG_WPS_INTEGRATION),
-                        ID2P(LANG_BACKLIGHT));
+                        ID2P(LANG_DISPLAY));
 
     static const struct opt_items album_name_options[] = {
         { STR(LANG_HIDE_ALBUM_TITLE_NEW) },
@@ -3557,12 +3625,6 @@ static int settings_menu(void)
         { STR(LANG_SHOW_AT_THE_TOP_NEW) },
         { STR(LANG_SHOW_ALL_AT_THE_TOP) },
         { STR(LANG_SHOW_ALL_AT_THE_BOTTOM) },
-    };
-    static const struct opt_items sort_options[] = {
-        { STR(LANG_ARTIST_PLUS_NAME) },
-        { STR(LANG_ARTIST_PLUS_YEAR) },
-        { STR(LANG_ID3_YEAR) },
-        { STR(LANG_NAME) }
     };
     static const struct opt_items year_sort_order_options[] = {
         { STR(LANG_ASCENDING) },
@@ -3572,10 +3634,6 @@ static int settings_menu(void)
         { STR(LANG_OFF) },
         { STR(LANG_DIRECT) },
         { STR(LANG_VIA_TRACK_LIST) }
-    };
-    static const struct opt_items backlight_options[] = {
-        { STR(LANG_ALWAYS_ON) },
-        { STR(LANG_NORMAL) },
     };
 
     do {
@@ -3591,14 +3649,6 @@ static int settings_menu(void)
                 rb->set_bool(rb->str(LANG_SHOW_YEAR_IN_ALBUM_TITLE), &pf_cfg.show_year);
                 break;
             case 2:
-                old_val = pf_cfg.sort_albums_by;
-                rb->set_option(rb->str(LANG_SORT_ALBUMS_BY),
-                      &pf_cfg.sort_albums_by, RB_INT, sort_options, 4, NULL);
-                if (old_val != pf_cfg.sort_albums_by &&
-                    !sort_albums(pf_cfg.sort_albums_by, true))
-                    pf_cfg.sort_albums_by = old_val;
-                break;
-            case 3:
                 old_val = pf_cfg.year_sort_order;
                 rb->set_option(rb->str(LANG_YEAR_SORT_ORDER),
                       &pf_cfg.year_sort_order, RB_INT, year_sort_order_options, 2, NULL);
@@ -3606,76 +3656,19 @@ static int settings_menu(void)
                     !sort_albums(pf_cfg.sort_albums_by, true))
                     pf_cfg.year_sort_order = old_val;
                 break;
-            case 4:
-                old_val = pf_cfg.show_fps;
-                rb->set_bool(rb->str(LANG_DISPLAY_FPS), &pf_cfg.show_fps);
-                if (old_val != pf_cfg.show_fps)
-                    reset_track_list();
-                break;
-
-            case 5:
-                old_val = pf_cfg.slide_spacing;
-                rb->set_int(rb->str(LANG_SPACING), "", 1,
-                            &pf_cfg.slide_spacing,
-                            NULL, 1, 0, 100, NULL );
-                adjust_album_display_for_setting(old_val, pf_cfg.slide_spacing);
-                break;
-
-            case 6:
-                old_val = pf_cfg.center_margin;
-                rb->set_int(rb->str(LANG_CENTRE_MARGIN), "", 1,
-                            &pf_cfg.center_margin,
-                            NULL, 1, 0, 80, NULL );
-                adjust_album_display_for_setting(old_val, pf_cfg.center_margin);
-                break;
-
-            case 7:
-                old_val = pf_cfg.num_slides;
-                rb->set_int(rb->str(LANG_NUMBER_OF_SLIDES), "", 1,
-                        &pf_cfg.num_slides, NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
-                adjust_album_display_for_setting(old_val, pf_cfg.num_slides);
-                break;
-
-            case 8:
-                old_val = pf_cfg.zoom;
-                rb->set_int(rb->str(LANG_ZOOM), "", 1, &pf_cfg.zoom,
-                            NULL, 1, 10, 300, NULL );
-                adjust_album_display_for_setting(old_val, pf_cfg.zoom);
-                break;
-
-            case 9:
-                old_val = pf_cfg.resize;
-                rb->set_bool(rb->str(LANG_RESIZE_COVERS), &pf_cfg.resize);
-                if (old_val == pf_cfg.resize) /* changed? */
-                    break;
-                /* fallthrough if changed, since cache needs to be rebuilt */
-            case 10:
-                pf_cfg.update_albumart = false;
-                pf_cfg.cache_version = CACHE_REBUILD;
-                rb->remove(EMPTY_SLIDE);
-                configfile_save(CONFIG_FILE, config,
-                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                return -3; /* re-init */
-            case 11:
-                pf_cfg.update_albumart = true;
-                pf_cfg.cache_version = CACHE_REBUILD;
-                rb->remove(EMPTY_SLIDE);
-                configfile_save(CONFIG_FILE, config,
-                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                return -3; /* re-init */
-            case 12:
+            case 3:
                 rb->set_option(rb->str(LANG_WPS_INTEGRATION),
                                &pf_cfg.auto_wps, RB_INT, wps_options, 3, NULL);
                 break;
-            case 13:
-                rb->set_option(rb->str(LANG_BACKLIGHT),
-                        &pf_cfg.backlight_mode, RB_INT, backlight_options, 2, NULL);
+            case 4:
+                if ((result = display_settings_menu()))
+                    return result;
                 break;
-
             case MENU_ATTACHED_USB:
                 return PLUGIN_USB_CONNECTED;
         }
     } while ( selection >= 0 );
+
     return 0;
 }
 
@@ -3683,12 +3676,15 @@ static int settings_menu(void)
   Show the main menu
  */
 enum {
+    PF_SORT_ALBUMS_BY,
     PF_SHOW_TRACKS_WHILE_BROWSING,
     PF_GOTO_LAST_ALBUM,
     PF_GOTO_WPS,
 #if PF_PLAYBACK_CAPABLE
     PF_MENU_PLAYBACK_CONTROL,
 #endif
+    PF_REBUILD_CACHE,
+    PF_UPDATE_CACHE,
     PF_MENU_SETTINGS,
     PF_MENU_QUIT,
 };
@@ -3696,23 +3692,43 @@ enum {
 static int main_menu(void)
 {
     int selection = 0;
-    int result, curr_album;
+    int result, curr_album, old_val;
 
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(255));
 #endif
 
     MENUITEM_STRINGLIST(main_menu, "PictureFlow Main Menu", NULL,
+                        ID2P(LANG_SORT_ALBUMS_BY),
                         ID2P(LANG_SHOW_TRACKS_WHILE_BROWSING),
                         ID2P(LANG_GOTO_LAST_ALBUM),
                         ID2P(LANG_GOTO_WPS),
 #if PF_PLAYBACK_CAPABLE
                         ID2P(LANG_PLAYBACK_CONTROL),
 #endif
+                        ID2P(LANG_REBUILD_CACHE),
+                        ID2P(LANG_UPDATE_CACHE),
                         ID2P(LANG_SETTINGS),
                         ID2P(LANG_MENU_QUIT));
+
+    static const struct opt_items sort_options[] = {
+        { STR(LANG_ARTIST_PLUS_NAME) },
+        { STR(LANG_ARTIST_PLUS_YEAR) },
+        { STR(LANG_ID3_YEAR) },
+        { STR(LANG_NAME) }};
+
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
+            case PF_SORT_ALBUMS_BY:
+                old_val = pf_cfg.sort_albums_by;
+                rb->set_option(rb->str(LANG_SORT_ALBUMS_BY),
+                      &pf_cfg.sort_albums_by, RB_INT, sort_options, 4, NULL);
+                if (old_val != pf_cfg.sort_albums_by &&
+                    !sort_albums(pf_cfg.sort_albums_by, true))
+                    pf_cfg.sort_albums_by = old_val;
+                if (old_val == pf_cfg.sort_albums_by)
+                    break;
+                return 0;
             case PF_SHOW_TRACKS_WHILE_BROWSING:
                 if (pf_state != pf_show_tracks)
                 {
@@ -3748,6 +3764,20 @@ static int main_menu(void)
                 playback_control(NULL);
                 break;
 #endif
+            case PF_REBUILD_CACHE:
+                pf_cfg.update_albumart = false;
+                pf_cfg.cache_version = CACHE_REBUILD;
+                rb->remove(EMPTY_SLIDE);
+                configfile_save(CONFIG_FILE, config,
+                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
+                return -3; /* re-init */
+            case PF_UPDATE_CACHE:
+                pf_cfg.update_albumart = true;
+                pf_cfg.cache_version = CACHE_REBUILD;
+                rb->remove(EMPTY_SLIDE);
+                configfile_save(CONFIG_FILE, config,
+                                CONFIG_NUM_ITEMS, CONFIG_VERSION);
+                return -3; /* re-init */
             case PF_MENU_SETTINGS:
                 result = settings_menu();
                 if (result != 0)

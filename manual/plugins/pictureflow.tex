@@ -34,8 +34,8 @@ reduces the time it takes for cover art to be displayed.}}
 
   \begin{itemize}
     \item PictureFlow needs to build an album index the first time it's launched
-    (Cancel/Quit by pressing any button) and then writes an album art cache to disk.
-    During the latter, press any button to skip past the progress bar screen and
+    (Cancel/Quit by pressing \ActionStdCancel{} or \ActionStdMenu{}) and then writes an album art cache to disk.
+    During the latter (5th step), press any button to skip past the progress bar screen and
     to start browsing immediately. Processing of album art will continue in the
     background. An indicator in the screen corner shows you the completed percentage.
     When the cache is being built, the UI may be slow to react to your input.
@@ -200,10 +200,14 @@ reduces the time it takes for cover art to be displayed.}}
 
 \subsubsection{Main Menu}
 \begin{description}
+  \item[Sort albums by.] Change the sorting of albums in PictureFlow.
   \item[Show Tracks While Browsing.] Scroll through albums from their track list.
   \item[Go to Last Album.] Go to selected album when PictureFlow was last quit or the sorting changed.
   \item[Go to WPS.] Leave PictureFlow and enter the While Playing Screen.
   \item[Playback Control.] Control music playback from within the plugin.
+  \item[Rebuild cache.] Creates a fresh album index and builds the artwork cache from scratch.
+  \item[Update cache.] Creates a fresh album index and updates the existing artwork cache to
+  include newly added albums.
   \item[Settings.] Enter the settings menu.
   \item[Quit.] Exit PictureFlow plugin.
 \end{description}
@@ -215,9 +219,16 @@ reduces the time it takes for cover art to be displayed.}}
   shown above or below the cover art, or not at all.
   \item[Show year in album title.] Set whether a year will be displayed next to each album
   title (determined by the release year of the latest track on an album).
-  \item[Sort albums by.] Change the sorting of albums in PictureFlow.
   \item[Year sort order.] Determines whether albums are sorted in ascending or descending
   order, when sorting by year.
+  \item[WPS integration.] Integrate PictureFlow with the While Playing Screen.
+  \item[Display.] Enter the Display settings menu.
+\end{description}
+
+\subsubsection{Display Settings Menu}
+
+\begin{description}
+  \item[Backlight.] Force backlight on while running pictureflow.
   \item[Display FPS.] Displays frames per second on screen.
   \item[Spacing.] The distance between the front edges of the side slides, i.e. changes
   the degree of overlap of the side slides. A larger number means less overlap. Scales with zoom.
@@ -229,9 +240,4 @@ reduces the time it takes for cover art to be displayed.}}
   \item[Zoom.] Changes the distance at which slides are rendered from the ``camera''.
   \item[Resize Covers.] Set whether to automatically resize the covers or to leave
   them at their original size.
-  \item[Rebuild cache.] Creates a fresh album index and builds the artwork cache from scratch.
-  \item[Update cache.] Creates a fresh album index and updates the existing artwork cache to
-  include newly added albums.
-  \item[WPS integration.] Integrate PictureFlow with the While Playing Screen.
-  \item[Backlight.] Force backlight on while running pictureflow.
 \end{description}
