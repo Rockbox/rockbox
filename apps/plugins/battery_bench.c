@@ -539,14 +539,6 @@ void do_export_battery_tables(void)
             rb->fdprintf(fd, "# Rename to %s\n# " MODEL_NAME " Battery Levels (%s)\n\n",
                      BATTERY_LEVELS_USER, rb->rbversion);
 
-            rb->fdprintf(fd, "# Battery voltage(millivolt) lower than this %s\n",
-                             "player will shutdown");
-            rb->fdprintf(fd, "shutoff: %d\n\n", *rb->device_battery_tables->shutoff);
-
-            rb->fdprintf(fd, "# Battery voltage(millivolt) lower than this %s\n",
-                             "won't access the disk to write");
-            rb->fdprintf(fd, "disksafe: %d\n\n", *rb->device_battery_tables->disksafe);
-
             rb->fdprintf(fd, "# Battery voltage(millivolt) of {");
             for(i= 0;i < elems;i++)
             {
@@ -577,10 +569,22 @@ void do_export_battery_tables(void)
             rb->lseek(fd, -2, SEEK_CUR); /*remove last comma */
             rb->fdprintf(fd, "}\n\n");
 #endif
+
+            rb->fdprintf(fd, "# WARNING 'shutoff' and 'disksafe' levels protect " \
+                             "from battery over-discharge and dataloss\n\n");
+
+            rb->fdprintf(fd, "# Battery voltage(millivolt) lower than this %s\n",
+                             "player will shutdown");
+
+            rb->fdprintf(fd, "#shutoff: %d\n\n", *rb->device_battery_tables->shutoff);
+
+            rb->fdprintf(fd, "# Battery voltage(millivolt) lower than this %s\n",
+                             "won't access the disk to write");
+            rb->fdprintf(fd, "#disksafe: %d\n\n", *rb->device_battery_tables->disksafe);
+
             rb->close(fd);
         }
     }
-
 }
 
 enum plugin_status plugin_start(const void* parameter)
