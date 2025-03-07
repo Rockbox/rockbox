@@ -1071,11 +1071,7 @@ static int parse_progressbar_tag(struct skin_element* element,
             pb->height = -1; /* calculate at display time */
         else
         {
-#ifndef __PCTOOL__
             pb->height = font_get(vp->font)->height;
-#else
-            pb->height = 8;
-#endif
         }
     }
     /* optional params, first is the image filename if it isnt recognised as a keyword */
@@ -2164,6 +2160,10 @@ static bool skin_load_fonts(struct wps_data *data)
         else if (font_id <= 0)
         {
             vp->font = FONT_SYSFIXED;
+            DEBUGF("WARNING: Do not use SYSFONT (id 0) in viewports!\n");
+#ifdef __PCTOOL__
+//            success = false;
+#endif
             continue;
         }
 
@@ -2190,7 +2190,7 @@ static bool skin_load_fonts(struct wps_data *data)
             font->id = font_load_ex(path, 0, skinfonts[font_id-2].glyphs);
 
 #else
-                font->id = font_load(path);
+            font->id = font_load(path);
 #endif
             //printf("[%d] %s -> %d\n",font_id, font->name, font->id);
             id_array[font_count++] = font->id;
