@@ -148,6 +148,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     }
     else
     {
+        s->backward = false; /* bugfix we only account for forward scrolling here */
         snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
             s->linebuffer, "   ", s->linebuffer);
         s->line = line_buf;
