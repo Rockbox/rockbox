@@ -1,0 +1,21 @@
+\subsection{Multiboot Select}
+The \setting{Multiboot Select} plugin allows you to select from multiple
+versions of rockbox on devices that support it.
+
+\subsubsection{How it works}
+Normally your \setting{Rockbox} install lives in the root of your main drive
+On devices with multiboot your rockbox install can live in a separate folder
+\opt{multidrive_usb}{on the external drive}.
+
+Once several installs exist, \setting{Multiboot Select} will allow you to
+select them for next boot or even reboot with your selected install immediately.
+
+\subsubsection{Menu}
+\begin{description}
+\item[Select root] Displays a list of installs found on the device.
+\item[Clear redirect] Removes all redirects returning to default install
+\item[Using root] Displays the currently selected install path
+\item[Save and Exit] Saves the currently selected install to be run next boot.
+\item[Save and Reboot] Saves the currently selected install and reboots immediately.
+\item[Save and Exit] Exit without saving changes.
+\end{description}

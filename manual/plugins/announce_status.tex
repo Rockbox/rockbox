@@ -1,0 +1,99 @@
+\subsection{Announce Status}
+
+The \setting{Announce Status} plugin allows you to use the voice system to announce things in the audio stream
+
+Currently the list includes:
+\begin{itemize}
+\item Time (If applicable)
+\item Date (If applicable)
+\item Track name (spelled)
+\item Artist name (spelled)
+\item Track Elapsed / Remaining
+\item Playlist position
+\item Battery level
+\item Sleep Timer remaining
+\item Running time
+\end{itemize}
+
+\subsubsection{Configuration}
+The input for announce format is actually a parsed string of options
+while you can edit the items directly to get your preferred order preset options are included.
+If you choose to manually edit the option string the input box helpfully has all valid options for the parser
+
+
+\setting{TIME}
+\begin{itemize}
+\item DT current time
+\item D1 'time'
+\item DD current date
+\item D2 'date'
+\end{itemize}
+
+\setting{TRACK}
+\begin{itemize}
+\item TT title (spelled)
+\item TA artist (spelled)
+\item TE elapsed
+\item TL length
+\item TR remaining
+\item T1 'elapsed'
+\item T2 'remaining'
+\item T3 'of'
+\end{itemize}
+
+\setting{PLAYLIST}
+\begin{itemize}
+\item PC current track
+\item PN total tracks
+\item PR remaining tracks
+\item P1 'track'
+\item P2 'of'
+\end{itemize}
+
+\setting{BATTERY}
+\begin{itemize}
+\item BP level (percentage 0-100)
+\item BM remaining time (HMS)
+\item B1 'battery level'
+\end{itemize}
+
+\setting{SLEEPTIMER/RUNTIME}
+\begin{itemize}
+\item RT runtime (HMS)
+\item R1 'running time'
+\item RS sleep timer remaining (HMS)
+\item R2 'sleep time'
+\item R3 'remaining'
+\end{itemize}
+
+\subsubsection{Usage}
+\begin{description}
+\item[Timeout] [0-360] seconds announcements will not repeat until timeout is met. 
+\item[Announce on] [Off, Track Change].
+\item[Grouping] [0-7] 0- play all, 1-7 only announce the first n items.
+                Helpful for infrequently used items.
+\item[Announcement format] Select from preset options or manually enter your own.
+\item[Quit] Exit without Saving.
+\item[Save and Exit] Save settings and exit
+\end{description}
+
+Now that we have configuration out of the way (don't forget the preset options if this looks daunting)
+
+Not quite out of the woods yet though...
+
+You can choose to get announcements each track change or only when you run the plugin again
+it would get quite annoying to have to go run the plugin every time you wanted a status update though
+
+Enter the \setting{WPS Hotkey}
+now we will assign the wps hotkey to announce_status
+Settings>General Settings>What's Playing Screen>WPS Hotkey
+choose 'OpenPlugin' browse to 'demos'
+finally choose 'announce_status'
+
+Now you should be able to press your wps hotkey and get status updates on command.
+
+\note{
+This is actually a plugin running on top of the WPS screen and as such running other plugins stops the announce plugin
+so if you only choose the track change option you should probably set the announce plugin to open on startup and keep
+in mind that you may have to start the plugin again later.}
+}
