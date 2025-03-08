@@ -219,7 +219,9 @@ int get_hid_usb_action(void)
     return action;
 }
 
-int keypad_mode_name_get(void)
+int keypad_mode_name_get(unsigned int mode)
 {
-    return hid_key_mappings[usb_keypad_mode]->lang_name;
+    if (mode >= ARRAYLEN(hid_key_mappings))
+        return -1;
+    return hid_key_mappings[mode]->lang_name;
 }

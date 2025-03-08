@@ -23,6 +23,6 @@
 
 int get_hid_usb_action(void);
 
-int keypad_mode_name_get(void);
+int keypad_mode_name_get(unsigned int mode);
 
 #endif

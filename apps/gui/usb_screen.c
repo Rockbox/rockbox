@@ -191,6 +191,13 @@ static void usb_screen_fix_viewports(struct screen *screen,
             logo->y = parent->y;
             title->y = parent->y + logo->height;
         }
+
+        int i =0, langid = LANG_USB_KEYPAD_MODE;
+        while (langid >= 0) /* ensure the USB mode strings get cached */
+        {
+            font_getstringsize(str(langid), NULL, NULL, title->font);
+            langid = keypad_mode_name_get(i++);
+        }
     }
 #endif
 }
@@ -229,7 +236,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
                 usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
                 snprintf(modestring, sizeof(modestring), "%s: %s",
                         str(LANG_USB_KEYPAD_MODE),
-                        str(keypad_mode_name_get()));
+                        str(keypad_mode_name_get(usb_keypad_mode)));
                 screen->puts_scroll(0, 0, modestring);
             }
 #endif /* USB_ENABLE_HID */
@@ -278,9 +285,12 @@ void gui_usb_screen_run(bool early_usb)
         usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
     }
 
+#if 0 /* handled in usb_screen_fix_viewports() */
     /* update the UI before disabling fonts, this maximizes the propability
      * that font cache lookups succeed during USB */
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+#endif
+
     if(!early_usb)
     {
         /* The font system leaves the .fnt fd's open, so we need for force close them all */
