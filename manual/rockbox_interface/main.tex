@@ -794,57 +794,47 @@ The default directory structure that is assumed by some parts of Rockbox
 
 \subsection{The first contact}
 
-After you have first started the \dap{}, you'll be presented by the
-\setting{Main Menu}. From this menu you can reach every function of Rockbox,
-for more information (see \reference{ref:main_menu}). To browse the files
+After you have first started the \dap{}, you'll be presented with the
+\setting{Main Menu}. From this menu you can reach every function of Rockbox.
+For more information, see \reference{ref:main_menu}. To browse the files
 on your \dap{}, select \setting{Files} (see \reference{ref:file_browser}), and to
-browse in a view that is based on the meta-data\footnote{ID3 Tags, Vorbis
+browse based on the meta-data\footnote{ID3 Tags, Vorbis
 comments, etc.} of your audio files, select \setting{Database} (see
 \reference{ref:database}).
 
 \subsection{Basic controls}
-When browsing files and moving through menus you usually get a list view
-presented. The navigation in these lists are usually the same and should be
-pretty intuitive.
-In the tree view use \ActionStdNext{} and \ActionStdPrev{} to move around
-the selection. Use \ActionStdOk{} to select an item. \opt{wheel_acceleration}{
-Note that the scroll speed is accelerating the faster you rotate the wheel.}
-When browsing the file system selecting an audio file plays it. The view
-switches to the ``While playing screen'', usually abbreviated as ``WPS'' (see
-\reference{ref:WPS}. The dynamic playlist gets replaced with the contents of
-the current directory. This way you can easily treat directories as playlists.
-The created dynamic playlist can be extended or modified while playing. This is
-also known as ``on-the-fly playlist''.
-To go back to the \setting{File Browser} stop the playback with the
-\ActionWpsStop{} button or return to the file browser while keeping playback
-running using \ActionWpsBrowse{}.
-In list views you can go back one step with \ActionTreeParentDirectory.
+Use \ActionStdNext{} and \ActionStdPrev{} to adjust the selection when browsing
+through menus. \opt{wheel_acceleration}{
+Note that scroll speed accelerates, the faster you rotate the wheel.}
+Press \ActionStdOk{} to select an item. Selecting an audio file in the File Browser
+will play it. The ``While playing screen'' (``WPS'', see \reference{ref:WPS}) will
+be displayed, and the current playlist will be replaced with tracks from the current
+directory. To go back to the bowser, either stop playback using the
+\ActionWpsStop{} button, or press \ActionWpsBrowse{}, which keeps playback
+running.
+When browsing files, return to parent directories with \ActionTreeParentDirectory.
 
 \subsection{Basic concepts}
 \subsubsection{Playlists}
-Rockbox is playlist oriented. This means that every time you play an audio file,
-a so-called ``dynamic playlist'' is generated, unless you play a saved
-playlist. You can modify the dynamic playlist while playing and also save
-it to a file. If you do not want to use playlists you can simply play your
-files directory based.
+Rockbox is playlist-oriented. This means that every time you play an audio file,
+a current playlist is generated.
+You can modify the current playlist in many ways while playing, and also save
+it to a file. But you are not forced to do so.
 Playlists are covered in detail in \reference{ref:working_with_playlists}.
 
 \subsubsection{Menu}
-From the menu you can customise Rockbox. Rockbox itself is very customisable.
-Also there are some special menus for quick access to frequently used
-functions.
+Menus are the primary way of interacting with Rockbox and offer quick access
+to frequently-used functions.
 
 \subsubsection{Context Menu}
-Some views, especially the file browser and the WPS have a context menu.
-From the file browser this can be accessed with \ActionStdContext{}.
-The contents of the context menu vary, depending on the situation it gets
-called. The context menu itself presents you with some operations you can
-perform with the currently highlighted file. In the file browser this is
-the file (or directory) that is highlighted by the cursor. From the WPS this is
-the currently playing file. Also there are some actions that do not apply
-to the current file but refer to the screen from which the context menu
-gets called. One example is the playback menu, which can be called using
-the context menu from within the WPS.
+In many places, a context menu can be accessed by pressing \ActionStdContext{}.
+A context menu allows you to perform actions relevant to your current selection, and may
+include more advanced commands.
+In the file browser, the relevant selection may be a file (or directory).
+On the WPS, it is the currently playing track. Some actions do not apply
+to the selection, but relate to the screen itself, from which the context menu
+was accessed. Playback settings accessible from the “While playing screen” are one such
+example.
 
 \section{Customising Rockbox}
 Rockbox' User Interface can be customised using ``Themes''. Themes usually

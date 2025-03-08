@@ -153,38 +153,38 @@ The details of this menu are covered in
 
 \opt{radio}{\input{main_menu/fmradio.tex}}
 
-\section{\label{ref:playlistoptions}Playlist Catalogue}
-  This menu provides a simple interface to maintain
-  several playlists (see \reference{ref:working_with_playlists}). Playlists can be created in
-  three ways. Playing a file in a directory causes all the files in it
-  to be placed in a playlist. Playlists can be created manually by
-  either using the  \setting{Context Menu} (see \reference{ref:Contextmenu}) or using
-  the \setting{Current Playlist} menu. Both automatically and manually created
-  playlists can be edited using this menu.
+\section{\label{ref:playlistoptions}Playlists}
+  This menu provides easy access to the playlists residing in \fname{/Playlists} (or another
+  directory of your choice). Selecting a playlist will display its contents.
+  Playlists can be created, or the playlist directory can be changed, from the
+  \setting{Context Menu} (see \reference{ref:Contextmenu}).
+  To create a new playlist, you can also use the \setting{Save} option from the
+  \setting{Current Playlist} menu (see \reference{ref:WPS}).
 
-\subsection{\label{ref:playlistcatalogue_contextmenu}The Playlist Catalogue Context Menu}
+\subsection{\label{ref:playlistcatalogue_contextmenu}Playlists Context Menu}
 
 \begin{description}
-\item[Create Playlist:]
-  Rockbox will create a playlist with all tracks from the directory that is
-currently selected in the \setting{File Browser}, including
-all of its sub-directories. If you have selected the root level or your Playlist Catalogue directory,
-Rockbox will instead create a playlist with all tracks from all directories. The playlist
-will be saved in the Playlist Catalogue directory.
-
 \item[View Current Playlist:]
-  Displays the contents of the current dynamic playlist.
+  Displays the contents of the current playlist.
 
 \item[Save Current Playlist:]
-  Saves the current dynamic playlist, excluding queued tracks, to the
+  Saves the current playlist, excluding queued tracks, to the
 specified file. Asks for confirmation whether to remove queued tracks
 from the current playlist, so that bookmarks can be created
 (see \reference{ref:createbookmark}).
-If no path is provided then playlist is saved to the current directory.
+If no path is provided, playlist is saved to the root directory.
+
+\item[Create Playlist:]
+  Rockbox will create a playlist with all tracks from the directory that is
+currently selected in the \setting{File Browser}.
+If you have selected the root level, or your Playlist directory, Rockbox
+will create a playlist with tracks from the root directory.
+Sub-directories will be included, unless the option to recursively insert
+directories has been turned off, see \reference{ref:PlaylistOptions}.
 
 \item[Reset Playlist Catalogue Directory:]
   Will reset the default location for playlists to the \fname{/Playlists}
-directory. Playlists stored in other locations are not included in the catalogue.
+directory.
 
 \end{description}
 
