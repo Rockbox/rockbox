@@ -3983,7 +3983,7 @@ static void show_track_list_loading(void)
 /**
   Display the list of tracks
  */
-static void show_track_list(void)
+static bool show_track_list(void)
 {
     mylcd_clear_display();
     if ( center_slide.slide_index != pf_tracks.cur_idx ) {
@@ -3996,7 +3996,7 @@ static void show_track_list(void)
         {
             pf_state = pf_cover_out;
             free_borrowed_tracks();
-            return;
+            return false;
         }
         reset_track_list();
     }
@@ -4030,6 +4030,8 @@ static void show_track_list(void)
         mylcd_putsxy(titletxt_x,titletxt_y,trackname);
         titletxt_y += titletxt_h;
     }
+
+    return true;
 }
 
 static void select_next_track(void)
@@ -4642,6 +4644,32 @@ static bool reinit(void)
     return false;
 }
 
+static bool prompt_reinit(void)
+{
+    const struct text_message prompt = {
+      (const char*[]) {ID2P(LANG_TAGCACHE_BUSY), ID2P(LANG_TAGCACHE_UPDATE)}, 2};
+#ifdef USEGSLIB
+    grey_show(false);
+#endif
+    if (rb->gui_syncyesno_run(&prompt, NULL, NULL) == YESNO_YES)
+    {
+        pf_cfg.update_albumart = true;
+        pf_cfg.cache_version = CACHE_REBUILD;
+        rb->remove(EMPTY_SLIDE);
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+        if (!reinit())
+            return false;
+    }
+    else
+    {
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+        mylcd_set_drawmode(DRMODE_FG);
+    }
+    return true;
+}
+
 /**
   Main function that also contain the main plasma
   algorithm.
@@ -4687,7 +4715,8 @@ static int pictureflow_main(void)
                 instant_update = true;
                 break;
             case pf_show_tracks:
-                show_track_list();
+                if (!show_track_list() && !prompt_reinit())
+                    return PLUGIN_OK;
                 break;
             case pf_idle:
                 show_tracks_while_browsing = false;
@@ -4887,6 +4916,8 @@ static int pictureflow_main(void)
                     context_menu_cleanup();
                     if ( ret != 0 ) return ret;
                 }
+                else if (!prompt_reinit())
+                    return PLUGIN_OK;
             }
             break;
 #endif
