@@ -153,5 +153,5 @@ MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           &viewer_settings_menu, &recursive_dir_insert, &currentplaylist_settings_menu);
 MAKE_MENU(playlist_options, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
-          &create_playlist_item, &view_cur_playlist,
-          &save_playlist, &clear_catalog_directory_item);
+          &view_cur_playlist, &save_playlist,
+          &create_playlist_item, &clear_catalog_directory_item);
