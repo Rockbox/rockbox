@@ -1574,7 +1574,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     int i;
     int namebufused = 0;
     int total_count = 0;
-    int special_entry_count = 0;
+    c->special_entry_count = 0;
     int level = c->currextra;
     int tag;
     bool sort = false;
@@ -1691,7 +1691,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
-            special_entry_count++;
+            c->special_entry_count++;
         }
         if (offset <= 1)
         {
@@ -1701,7 +1701,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             dptr->customaction = ONPLAY_NO_CUSTOMACTION;
             dptr++;
             current_entry_count++;
-            special_entry_count++;
+            c->special_entry_count++;
         }
 
         total_count += 2;
@@ -1839,8 +1839,8 @@ entry_skip_formatter:
             qsort_fn = sort_inverse ? strncasecmp_inv : strncasecmp;
 
         struct tagentry *entries = get_entries(c);
-        qsort(&entries[special_entry_count],
-              current_entry_count - special_entry_count,
+        qsort(&entries[c->special_entry_count],
+              current_entry_count - c->special_entry_count,
               sizeof(struct tagentry),
               compare);
     }
@@ -1882,7 +1882,7 @@ entry_skip_formatter:
     if (strip)
     {
         dptr = get_entries(c);
-        for (i = special_entry_count; i < current_entry_count; i++, dptr++)
+        for (i = c->special_entry_count; i < current_entry_count; i++, dptr++)
         {
             int len = strlen(dptr->name);
 

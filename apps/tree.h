@@ -92,6 +92,7 @@ struct tree_context {
 #ifdef HAVE_TAGCACHE
     int currtable; /* db use */
     int currextra; /* db use */
+    int special_entry_count; /* db use */
 #endif
     int sort_dir; /* directory sort order */
     int out_of_tree; /* shortcut from elsewhere */
