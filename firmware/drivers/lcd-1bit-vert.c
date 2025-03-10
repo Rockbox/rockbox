@@ -402,6 +402,9 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     }
     else
     {
+        if (height <= 8)
+            stride = 0; /* ASAN fix keep from reading beyond buffer */
+
         dst_end = dst + width;
         do
         {
