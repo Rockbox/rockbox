@@ -230,8 +230,8 @@ MENUITEM_FUNCTION(playing_time_item, 0, ID2P(LANG_PLAYING_TIME),
                   playing_time, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  NULL, Icon_Playlist,
-                 &wps_view_cur_playlist_item, &search_playlist_item,
-                 &playlist_save_item, &reshuffle_item, &playing_time_item
+                 &wps_view_cur_playlist_item, &playlist_save_item,
+                 &search_playlist_item, &reshuffle_item, &playing_time_item
                );
 
 /* argument for add_to_playlist (for use by menu callbacks) */
