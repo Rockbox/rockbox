@@ -105,7 +105,7 @@
 #define BATTERY_CAPACITY_MIN 700  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 900 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 10   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
+
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 

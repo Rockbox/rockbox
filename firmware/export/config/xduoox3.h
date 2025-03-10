@@ -108,7 +108,7 @@
 #define BATTERY_CAPACITY_MIN 500      /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 2000     /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 100      /* capacity increment */
-#define BATTERY_TYPES_COUNT  2        /* Two types (2000mAh and 1500mAh) */
+
 
 #define CURRENT_NORMAL 167      // 2.78mA * 60s
 #define CURRENT_BACKLIGHT 180   // 15mA * 60s

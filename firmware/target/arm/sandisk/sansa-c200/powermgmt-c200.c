@@ -23,22 +23,16 @@
 #include "config.h"
 #include "powermgmt.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_disksafe = 3400;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3300
-};
+unsigned short battery_level_shutoff = 3300;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
 
     /* Taken from BertrikSikken's bench on 2008-09-22 */
-    { 3400, 3689, 3744, 3773, 3798, 3831, 3886, 3947, 4005, 4102, 4220 },
+    3400, 3689, 3744, 3773, 3798, 3831, 3886, 3947, 4005, 4102, 4220
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

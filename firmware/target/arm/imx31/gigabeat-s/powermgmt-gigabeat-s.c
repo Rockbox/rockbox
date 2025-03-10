@@ -30,21 +30,15 @@
 #include "power.h"
 #include "power-gigabeat-s.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3659
-};
+unsigned short battery_level_disksafe = 3659;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3630
-};
+unsigned short battery_level_shutoff = 3630;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */
-    { 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },
+    3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

@@ -118,7 +118,7 @@
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
+
 
 /* R1's fuel gauge max17040 can supply both kind of values */
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE

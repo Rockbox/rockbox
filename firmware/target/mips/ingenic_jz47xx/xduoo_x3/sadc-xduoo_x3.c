@@ -199,24 +199,12 @@ void KEY_INT_IRQ(void)
 
 */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    /* 5% */
-    3414, 3634
-};
-
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    /* 0% */
-    3307, 3307
-};
+unsigned short battery_level_disksafe = 3634; /* 5% */
+unsigned short battery_level_shutoff = 3307;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
-{
-    { 3307, 3459, 3530, 3575, 3608, 3648, 3723, 3819, 3918, 4022, 4162 },
-    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 }
-};
+unsigned short percent_to_volt_discharge[11] =
+    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

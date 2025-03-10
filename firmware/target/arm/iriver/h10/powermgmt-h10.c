@@ -24,16 +24,13 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
 #if   defined(IRIVER_H10)
-    3733
+    unsigned short battery_level_disksafe = 3733;
 #elif defined(IRIVER_H10_5GB)
-    3700
+    unsigned short battery_level_disksafe = 3700;
 #endif
-};
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+unsigned short battery_level_shutoff =
 {
 #if   defined(IRIVER_H10)
     3627
@@ -43,12 +40,12 @@ unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
 #if   defined(IRIVER_H10)
-    { 3733, 3772, 3821, 3840, 3869, 3917, 3985, 4034, 4072, 4140, 4198 }
+    3733, 3772, 3821, 3840, 3869, 3917, 3985, 4034, 4072, 4140, 4198
 #elif defined(IRIVER_H10_5GB)
-    { 3700, 3800, 3850, 3880, 3910, 3960, 4000, 4070, 4120, 4210, 4280 }
+    3700, 3800, 3850, 3880, 3910, 3960, 4000, 4070, 4120, 4210, 4280
 #endif
 };
 

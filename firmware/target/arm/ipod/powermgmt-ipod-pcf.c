@@ -27,57 +27,53 @@
 #include "pcf50605.h"
 #include "audiohw.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
+unsigned short battery_level_disksafe =
 #if   defined(IPOD_NANO)
-    3330
+    3330;
 #elif defined(IPOD_VIDEO)
-    3500
+    3500;
 #elif defined(IPOD_COLOR)
-    3300
+    3300;
 #elif defined(IPOD_3G)
-    3700
+    3700;
 #else
     /* FIXME: calibrate value for other iPods */
-    3300
+    3300;
 #endif
-};
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
+unsigned short battery_level_shutoff =
 #if   defined(IPOD_NANO)
-    3230
+    3230;
 #elif defined(IPOD_VIDEO)
-    3300
+    3300;
 #elif defined(IPOD_COLOR)
-    3300
+    3300;
 #elif defined(IPOD_3G)
-    3500
+    3500;
 #else
     /* FIXME: calibrate value for other iPods */
-    3000
+    3000;
 #endif
-};
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
 #if   defined(IPOD_NANO)
     /* measured values */
-    { 3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160 },
+    3230, 3620, 3700, 3730, 3750, 3780, 3830, 3890, 3950, 4030, 4160
 #elif defined(IPOD_VIDEO)
     /* iPod Video 30GB Li-Ion 400mAh */
-    { 3600, 3720, 3750, 3780, 3810, 3840, 3880, 3950, 4020, 4100, 4180 },
+    3600, 3720, 3750, 3780, 3810, 3840, 3880, 3950, 4020, 4100, 4180
 #elif defined(IPOD_COLOR)
     /* iPod Photo 30GB, see FS#9072 */
-    { 3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170 },
+    3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170
 #elif defined(IPOD_3G)
     /* iPod 3G 40GB, first approach based upon measurements */
-    { 3720, 3740, 3760, 3780, 3830, 3870, 3910, 3970, 4020, 4060, 4090 },
+    3720, 3740, 3760, 3780, 3830, 3870, 3910, 3970, 4020, 4060, 4090
 #else
     /* FIXME: calibrate value for other iPods */
     /* Table is "provisional" from IPOD_COLOR */
-    { 3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170 }
+    3450, 3660, 3700, 3730, 3750, 3770, 3820, 3870, 3920, 4040, 4170
 #endif
 };
 

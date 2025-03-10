@@ -56,34 +56,23 @@ void max17040_close(void)
 }
 
 #if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3470
-};
+unsigned short battery_level_disksafe = 3470;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3450
-};
+unsigned short battery_level_shutoff = 3450;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200 }
+    3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200
 };
 #else /* FIX ME what level should disksafe be?*/
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-};
+unsigned short battery_level_disksafe = 0;
 
-/* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-};
+unsigned short battery_level_shutoff = 0;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
 };
 #endif

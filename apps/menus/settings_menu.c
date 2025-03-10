@@ -263,9 +263,7 @@ static int filemenu_callback(int action,
 #if BATTERY_CAPACITY_INC > 0
 MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 #endif
-#if BATTERY_TYPES_COUNT > 1
-MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
-#endif
+
 #ifdef HAVE_USB_CHARGING_ENABLE
 static int usbcharging_callback(int action,
                                 const struct menu_item_ex *this_item,
@@ -286,9 +284,6 @@ MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callba
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #if BATTERY_CAPACITY_INC > 0
             &battery_capacity,
-#endif
-#if BATTERY_TYPES_COUNT > 1
-            &battery_type,
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
             &usb_charging,
@@ -430,7 +425,7 @@ MENUITEM_SETTING(governor, &global_settings.governor, NULL);
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
-#if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1) || defined(HAVE_USB_CHARGING_ENABLE)
+#if (BATTERY_CAPACITY_INC > 0) || defined(HAVE_USB_CHARGING_ENABLE)
             &battery_menu,
 #endif
 #if defined(HAVE_DIRCACHE) || defined(HAVE_DISK_STORAGE)

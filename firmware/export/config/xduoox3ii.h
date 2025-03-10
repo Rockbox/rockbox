@@ -31,9 +31,6 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ           1008000000
 
-/* Battery */
-#define BATTERY_TYPES_COUNT  1
-
 /* Audio codec */
 #define HAVE_XDUOO_LINUX_CODEC
 

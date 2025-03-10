@@ -56,9 +56,9 @@
 
 #if (BATTERY_CAPACITY_DEFAULT > 0)
 extern unsigned short power_history[POWER_HISTORY_LEN];
-extern unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT];
-extern unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT];
-extern unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+extern unsigned short battery_level_disksafe;
+extern unsigned short battery_level_shutoff;
+extern unsigned short percent_to_volt_discharge[11];
 #endif
 #if CONFIG_CHARGING
 extern unsigned short percent_to_volt_charge[11];
@@ -72,13 +72,13 @@ struct battery_tables_t device_battery_tables =
 {
 #if (BATTERY_CAPACITY_DEFAULT > 0)
     .history = power_history,
-    .disksafe = &battery_level_disksafe[0],
-    .shutoff = &battery_level_shutoff[0],
-    .discharge = percent_to_volt_discharge[0],
+    .disksafe = &battery_level_disksafe,
+    .shutoff = &battery_level_shutoff,
+    .discharge = percent_to_volt_discharge,
 #if CONFIG_CHARGING
     .charge = percent_to_volt_charge,
 #endif
-    .elems = ARRAYLEN(percent_to_volt_discharge[0]),
+    .elems = ARRAYLEN(percent_to_volt_discharge),
 #endif
     .isdefault = true,
 };
@@ -115,12 +115,6 @@ static long last_event_tick = 0;
 static int battery_capacity = BATTERY_CAPACITY_DEFAULT;
 #else
 # define battery_capacity BATTERY_CAPACITY_DEFAULT
-#endif
-
-#if BATTERY_TYPES_COUNT > 1
-static int battery_type = 0;
-#else
-#define battery_type 0
 #endif
 
 /* Power history: power_history[0] is the newest sample */
@@ -277,8 +271,8 @@ static void average_init(void)
     if(!charger_inserted())
 #endif
     {
-        voltage_now += (percent_to_volt_discharge[battery_type][6] -
-                        percent_to_volt_discharge[battery_type][5]) / 2;
+        voltage_now += (percent_to_volt_discharge[6] -
+                        percent_to_volt_discharge[5]) / 2;
     }
 #endif /* HAVE_DISK_STORAGE */
 
@@ -377,7 +371,7 @@ static int voltage_to_battery_level(int millivolts)
 #endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
     {
         /* DISCHARGING or error state */
-        level = voltage_to_percent(millivolts, percent_to_volt_discharge[battery_type]);
+        level = voltage_to_percent(millivolts, percent_to_volt_discharge);
     }
 
     return level;
@@ -480,19 +474,6 @@ void battery_read_info(int *voltage, int *level)
     }
 }
 
-#if BATTERY_TYPES_COUNT > 1
-void set_battery_type(int type)
-{
-    if(type < 0 || type > BATTERY_TYPES_COUNT)
-        type = 0;
-
-    if (type != battery_type) {
-        battery_type = type;
-        battery_status_update(); /* recalculate the battery status */
-    }
-}
-#endif
-
 #if BATTERY_CAPACITY_INC > 0
 void set_battery_capacity(int capacity)
 {
@@ -519,15 +500,15 @@ bool battery_level_safe(void)
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return true;
 #elif ((CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE))
-    return voltage_now > battery_level_disksafe[battery_type];
+    return voltage_now > battery_level_disksafe;
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return percent_now > 0;
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
      * device could be powered externally. */
-    return input_millivolts() > battery_level_disksafe[battery_type];
+    return input_millivolts() > battery_level_disksafe;
 #else
-    return voltage_now > battery_level_disksafe[battery_type];
+    return voltage_now > battery_level_disksafe;
 #endif
 }
 
@@ -553,15 +534,15 @@ bool query_force_shutdown(void)
     return false;
 #elif ((CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE))
     /* If we have both, prefer voltage */
-    return voltage_now < battery_level_shutoff[battery_type];
+    return voltage_now < battery_level_shutoff;
 #elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return percent_now == 0;
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
      * device could be powered externally. */
-    return input_millivolts() < battery_level_shutoff[battery_type];
+    return input_millivolts() < battery_level_shutoff;
 #else
-    return voltage_now < battery_level_shutoff[battery_type];
+    return voltage_now < battery_level_shutoff;
 #endif
 }
 
@@ -905,7 +886,7 @@ void init_battery_tables(void)
 {
 #if (BATTERY_CAPACITY_DEFAULT > 0) && !defined(BOOTLOADER)
     /* parse and load user battery levels file */
-#define PWRELEMS (ARRAYLEN(percent_to_volt_discharge[0]))
+#define PWRELEMS (ARRAYLEN(percent_to_volt_discharge))
 
 
     unsigned short tmparr[PWRELEMS];

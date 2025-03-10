@@ -24,21 +24,15 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3540
-};
+unsigned short battery_level_disksafe = 3540;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3500
-};
+unsigned short battery_level_shutoff = 3500;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* average measured values from X5 and M5L */
-    { 3500, 3650, 3720, 3740, 3760, 3790, 3840, 3900, 3950, 4040, 4120 }
+    3500, 3650, 3720, 3740, 3760, 3790, 3840, 3900, 3950, 4040, 4120
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

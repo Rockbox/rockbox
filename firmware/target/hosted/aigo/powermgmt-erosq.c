@@ -21,22 +21,16 @@
 #include "power.h"
 #include "power-erosq.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3435
-};
+unsigned short battery_level_disksafe = 3435;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_shutoff = 3400;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* ErosQ's 1300mAh battery */
-    { 3400, 3478, 3547, 3581, 3618, 3654, 3725, 3820, 3909, 3999, 4159 }
+    3400, 3478, 3547, 3581, 3618, 3654, 3725, 3820, 3909, 3999, 4159
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

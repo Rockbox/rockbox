@@ -31,22 +31,15 @@
     Discharge and charge curves have not been calibrated yet.
 */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    /* OF power off device when this value reached  */
-    430
-};
+unsigned short battery_level_disksafe = 430;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    425
-};
+unsigned short battery_level_shutoff = 425; /* OF power off device when this value reached  */
 
 /* adc values of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* TODO: simple uncalibrated curve */
-    { 425, 430, 440, 450, 460, 470,  480, 490, 500, 510, 520 }
+    425, 430, 440, 450, 460, 470,  480, 490, 500, 510, 520
 };
 
 /* adc values of 0%, 10%, ... 100% when charging enabled */

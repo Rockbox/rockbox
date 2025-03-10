@@ -27,20 +27,14 @@
 /* THIS CONTAINS CURRENTLY DUMMY CODE! */
 
 static const unsigned short current_voltage = 3910;
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    0
-};
+unsigned short battery_level_disksafe = 0
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    0
-};
+unsigned short battery_level_shutoff = 0
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320 },
+    100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

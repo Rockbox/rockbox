@@ -147,7 +147,7 @@
 #define BATTERY_CAPACITY_MIN 700     /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1000    /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 100     /* capacity increment */
-#define BATTERY_TYPES_COUNT  1       /* only one type */
+
 
 /* bq27000 provides voltage, percentage and time measure.
  * Voltage reading is available every 2.56 seconds and does not need filtering.

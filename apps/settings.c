@@ -904,10 +904,6 @@ void settings_apply(bool read_disk)
     set_battery_capacity(global_settings.battery_capacity);
 #endif
 
-#if BATTERY_TYPES_COUNT > 1
-    set_battery_type(global_settings.battery_type);
-#endif
-
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display(global_settings.invert);
 #endif

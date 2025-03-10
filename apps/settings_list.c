@@ -1207,15 +1207,6 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, sync_rds_time, LANG_FM_SYNC_RDS_TIME, false, "sync_rds_time", NULL),
 #endif
 
-#if BATTERY_TYPES_COUNT > 1
-    CHOICE_SETTING(0, battery_type, LANG_BATTERY_TYPE, 0, "battery type",
-#ifdef XDUOO_X3
-                   "new_2000mAh,old_1500mAh",
-#else
-                   "alkaline,nimh",
-#endif
-                   NULL, 2, ID2P(LANG_BATTERY_TYPE_1), ID2P(LANG_BATTERY_TYPE_2)),
-#endif
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     INT_SETTING(0, remote_contrast, LANG_CONTRAST,

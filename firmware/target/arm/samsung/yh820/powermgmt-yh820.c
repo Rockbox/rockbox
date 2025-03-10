@@ -24,21 +24,15 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_disksafe = 3400;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3199
-};
+unsigned short battery_level_shutoff = 3199;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 /* NOTE: readout clips at around 4000mV */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3199, 3492, 3543, 3601, 3626, 3651, 3702, 3769, 3794, 3865, 3995 }
+    3199, 3492, 3543, 3601, 3626, 3651, 3702, 3769, 3794, 3865, 3995
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

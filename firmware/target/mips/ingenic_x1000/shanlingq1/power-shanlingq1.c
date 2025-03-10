@@ -47,21 +47,15 @@
  * devices is getting confused.
  */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3470
-};
+unsigned short battery_level_disksafe = 3470;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_shutoff = 3400;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159 }
+    3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

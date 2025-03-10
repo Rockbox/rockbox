@@ -25,20 +25,14 @@
 #include "power.h"
 #include "audiohw.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3600
-};
+unsigned short battery_level_disksafe = 3600;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3350
-};
+unsigned short battery_level_shutoff = 3350;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3550, 3783, 3830, 3882, 3911, 3949, 3996, 4067, 4148, 4228, 4310 }
+    3550, 3783, 3830, 3882, 3911, 3949, 3996, 4067, 4148, 4228, 4310
 };
 
 #if CONFIG_CHARGING

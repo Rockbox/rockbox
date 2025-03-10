@@ -28,23 +28,16 @@
   early uncalibrated values. But read-out value should be correct
  */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    /* TODO: this is just an initial guess */
-    900
-};
+unsigned short battery_level_disksafe = 1000; /* TODO: this is just an initial guess */
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    /* TODO: this is just an initial guess */
-    1000
-};
+unsigned short battery_level_shutoff = 900; /* TODO: this is just an initial guess */
+
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* TODO: simple uncalibrated curve, linear except for first 10% */
-    { 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500 }
+    1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500
 };
 
 /* ADC should read 0x3ff=5.12V */

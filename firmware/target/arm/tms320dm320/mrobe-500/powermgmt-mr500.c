@@ -30,16 +30,10 @@ unsigned short current_aux = 4100;
 static unsigned short current_voltage = 4100;
 
 /* This specifies the battery level that writes are still safe */
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3600
-};
+unsigned short battery_level_disksafe = 3600;
 
 /* Below this the player cannot be considered to operate reliably */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3580
-};
+unsigned short battery_level_shutoff = 3580;
 
 /* Right now these are linear translations, it would be good to model them
  * appropriate to the actual battery curve.
@@ -48,15 +42,15 @@ unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* 6.10 format */
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3600, 3650, 3700, 3750, 3800, 3850, 3900, 3950, 4000, 4090, 4150 },
+    3600, 3650, 3700, 3750, 3800, 3850, 3900, 3950, 4000, 4090, 4150
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 unsigned short percent_to_volt_charge[11] =
 {
-    4000, 4105, 4210, 4315, 4420, 4525, 4630, 4735, 4840, 4945, 5050,
+    4000, 4105, 4210, 4315, 4420, 4525, 4630, 4735, 4840, 4945, 5050
 };
 
 /* Returns battery voltage from ADC [millivolts] */

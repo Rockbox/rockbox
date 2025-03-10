@@ -182,7 +182,7 @@ void fatal_error(int err)
 }
 
 #if (CONFIG_STORAGE & STORAGE_ATA)
-extern unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT];
+extern unsigned short battery_level_disksafe;
 static void battery_trap(void)
 {
     int vbat, old_verb;
@@ -206,7 +206,7 @@ static void battery_trap(void)
          *    when the HDD is used heavily (large database) the level drops
          *    to battery_level_shutoff quickly.
          */
-        if (vbat >= battery_level_disksafe[0] + th)
+        if (vbat >= battery_level_disksafe + th)
             break;
         th = 200;
 

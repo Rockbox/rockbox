@@ -102,12 +102,12 @@ static void battery_status_update(void)
     batt_current = charging ? BATT_CHARGE_STEP : BATT_DISCHARGE_STEP;
 }
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] = { 3200 };
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] = { 3200 };
+unsigned short battery_level_disksafe = 3200;
+unsigned short battery_level_shutoff = 3200;
 
 /* make the simulated curve nicely linear */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
-{ { 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300 } };
+unsigned short percent_to_volt_discharge[11] =
+{ 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300 };
 unsigned short percent_to_volt_charge[11] =
 { 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300  };
 

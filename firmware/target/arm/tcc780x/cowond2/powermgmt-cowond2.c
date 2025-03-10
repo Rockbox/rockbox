@@ -29,21 +29,15 @@
 
 unsigned short current_voltage = 3910;
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3380
-};
+unsigned short battery_level_disksafe = 3380;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3300
-};
+unsigned short battery_level_shutoff = 3300;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* Standard D2 internal battery */
-    { 3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170 }
+    3370, 3690, 3750, 3775, 3790, 3820, 3880, 3940, 3980, 4090, 4170
 
     /* TODO: DIY replacements eg. Nokia BP-4L ? */
 };

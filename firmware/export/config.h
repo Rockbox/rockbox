@@ -741,10 +741,6 @@ Lyre prototype 1 */
 #define CONFIG_RTC 0
 #endif
 
-#ifndef BATTERY_TYPES_COUNT
-#define BATTERY_TYPES_COUNT 0
-#endif
-
 #ifndef BATTERY_CAPACITY_DEFAULT
 #define BATTERY_CAPACITY_DEFAULT 0
 #endif

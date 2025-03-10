@@ -21,21 +21,15 @@
 #include "power.h"
 #include "power-agptek.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3470
-};
+unsigned short battery_level_disksafe = 3470;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_shutoff = 3400;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3400, 3675, 3715, 3750, 3775, 3810, 3850, 3915, 3985, 4060, 4155 }
+    3400, 3675, 3715, 3750, 3775, 3810, 3850, 3915, 3985, 4060, 4155
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

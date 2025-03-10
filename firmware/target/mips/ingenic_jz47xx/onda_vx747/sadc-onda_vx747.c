@@ -76,22 +76,15 @@ static volatile bool pen_down = false;
 static struct mutex battery_mtx;
 static struct semaphore battery_done;
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    1600
-};
+unsigned short battery_level_disksafe = 1600;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    1550
-};
+unsigned short battery_level_shutoff = 1550;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 1550, 1790, 1810, 1825, 1855, 1865, 1875, 1900, 1930, 1985, 2200 },
+    1550, 1790, 1810, 1825, 1855, 1865, 1875, 1900, 1930, 1985, 2200
 };
-
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 unsigned short percent_to_volt_charge[11] =
 {

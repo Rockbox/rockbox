@@ -20,10 +20,6 @@ alarm
 backlight_brightness
 #endif
 
-#if BATTERY_TYPES_COUNT > 1
-battery_types
-#endif
-
 #if defined(HAVE_BUTTON_LIGHT)
 button_light
 #endif

@@ -24,20 +24,14 @@
 /* The battery manufacturer's website shows discharge curves down to 3.0V,
    so 'disksafe' and 'shutoff' levels of 3.4V and 3.3V should be safe.
  */
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3400
-};
+unsigned short battery_level_disksafe = 3400;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3300
-};
+unsigned short battery_level_shutoff = 3300;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3300, 3676, 3715, 3749, 3783, 3812, 3850, 3918, 3982, 4065, 4148 }
+    3300, 3676, 3715, 3749, 3783, 3812, 3850, 3918, 3982, 4065, 4148
 
 };
 

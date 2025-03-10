@@ -28,22 +28,15 @@
  * Battery voltage calculation and discharge/charge curves for the HiFi E.T MA9.
  */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    /* TODO: this is just an initial guess */
-    6700
-};
+unsigned short battery_level_disksafe = 6700; /* TODO: this is just an initial guess */
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    6600
-};
+unsigned short battery_level_shutoff = 6600;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* Uncalibrated curve */
-    { 6600, 6936, 7042, 7124, 7218, 7288, 7382, 7534, 7674, 7838, 8200 }
+    6600, 6936, 7042, 7124, 7218, 7288, 7382, 7534, 7674, 7838, 8200
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

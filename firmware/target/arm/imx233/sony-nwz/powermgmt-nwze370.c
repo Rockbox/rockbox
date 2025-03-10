@@ -21,21 +21,15 @@
 #include "config.h"
 #include "powermgmt-target.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3660
-};
+unsigned short battery_level_disksafe = 3660;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3630
-};
+unsigned short battery_level_shutoff = 3630;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* figured from discharge curve */
-    { 3630, 3700, 3745, 3775, 3800, 3830, 3880, 3940, 4000, 4070, 4140 },
+    3630, 3700, 3745, 3775, 3800, 3830, 3880, 3940, 4000, 4070, 4140
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

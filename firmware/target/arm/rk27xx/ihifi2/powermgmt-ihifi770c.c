@@ -32,22 +32,14 @@
     Charge curve have not been calibrated yet.
 */
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    /* 5% */
-    3500,
-};
+unsigned short battery_level_disksafe = 3500; /* 5% */
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    /* 0% */
-    3300,
-};
+unsigned short battery_level_shutoff = 3300; /* 0% */
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3300, 3570, 3660, 3696, 3712, 3742, 3798, 3865, 3935, 4020, 4130 }
+    3300, 3570, 3660, 3696, 3712, 3742, 3798, 3865, 3935, 4020, 4130
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

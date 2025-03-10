@@ -3503,59 +3503,59 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types: ""
+    xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types: ""
+    xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer 2000 milliamp hour"
+    battery_types: ""
+    xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types: ""
+    xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types: ""
+    xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
-    xduoox3: "Older 1500 milliamp hour"
+    battery_types: ""
+    xduoox3: ""
   </voice>
 </phrase>
 <phrase>

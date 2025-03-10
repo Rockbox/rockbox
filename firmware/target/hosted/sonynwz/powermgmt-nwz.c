@@ -21,21 +21,15 @@
 #include "power.h"
 #include "power-nwz.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3470
-};
+unsigned short battery_level_disksafe = 3470;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3450
-};
+unsigned short battery_level_shutoff = 3450;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3450, 3698, 3746, 3781, 3792, 3827, 3882, 3934, 3994, 4060, 4180 }
+    3450, 3698, 3746, 3781, 3792, 3827, 3882, 3934, 3994, 4060, 4180
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

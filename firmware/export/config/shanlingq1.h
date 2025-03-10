@@ -89,7 +89,7 @@
 #define BATTERY_CAPACITY_MIN     1100
 #define BATTERY_CAPACITY_MAX     1100
 #define BATTERY_CAPACITY_INC     0
-#define BATTERY_TYPES_COUNT      1
+
 
 /* Multiboot */
 #define HAVE_BOOTDATA

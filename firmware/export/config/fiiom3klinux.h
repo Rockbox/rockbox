@@ -112,9 +112,6 @@
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
 
-/* Battery */
-#define BATTERY_TYPES_COUNT  1
-
 /* Audio codec */
 #define HAVE_FIIO_LINUX_CODEC
 #define HAVE_ALSA_32BIT

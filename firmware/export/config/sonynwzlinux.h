@@ -117,9 +117,6 @@
 #endif
 #define HAVE_STORAGE_FLUSH
 
-/* Battery */
-#define BATTERY_TYPES_COUNT  1
-
 /* special define to be use in various places */
 #define SONY_NWZ_LINUX
 

@@ -37,21 +37,15 @@ static bool first_readout = true;
 static int power_status = CHARGER_NOT_CONNECTED;
 static int charging_status = BATT_NOT_CHARGING;
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3470
-};
+unsigned short battery_level_disksafe = 3470;
 
 /* the OF shuts down at this voltage */
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3450
-};
+unsigned short battery_level_shutoff = 3450;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
-    { 3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200 }
+    3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200
 };
 
 #if CONFIG_CHARGING

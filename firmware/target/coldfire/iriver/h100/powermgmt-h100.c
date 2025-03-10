@@ -24,21 +24,15 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-unsigned short battery_level_disksafe[BATTERY_TYPES_COUNT] =
-{
-    3380
-};
+unsigned short battery_level_disksafe = 3380;
 
-unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
-{
-    3020
-};
+unsigned short battery_level_shutoff = 3020;
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+unsigned short percent_to_volt_discharge[11] =
 {
     /* Below 3370 the backlight starts flickering during HD access */
-    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
+    3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
