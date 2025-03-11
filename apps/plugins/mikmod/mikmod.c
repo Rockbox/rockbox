@@ -790,7 +790,11 @@ static int playfile(char* filename)
         button = rb->get_action(CONTEXT_WPS, TIMEOUT_NOBLOCK);
         switch (button)
         {
+#ifdef HAVE_SCROLLWHEEL
         case ACTION_WPS_VOLUP:
+#else
+        case ACTION_WPS_VOLDOWN:
+#endif
             if ( display != DISPLAY_INFO )
             {
                 if ( textlines-vscroll >= MAX_LINES )
@@ -804,7 +808,11 @@ static int playfile(char* filename)
             rb->adjust_volume(1);
             break;
 
+#ifdef HAVE_SCROLLWHEEL
         case ACTION_WPS_VOLDOWN:
+#else
+        case ACTION_WPS_VOLUP:
+#endif
             if ( display != DISPLAY_INFO )
             {
                 if ( vscroll > 0 )
