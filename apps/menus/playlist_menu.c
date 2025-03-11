@@ -39,6 +39,8 @@
 #include "playlist_catalog.h"
 #include "splash.h"
 #include "general.h"
+#include "pathfuncs.h"
+#include "dir.h"
 
 /* load a screen to save the playlist passed in (or current playlist if NULL is passed) */
 int save_playlist_screen(struct playlist_info* playlist)
@@ -72,11 +74,12 @@ int save_playlist_screen(struct playlist_info* playlist)
     if (len <= 1) /* root or dynamic playlist */
         create_numbered_filename(temp, directoryonly, PLAYLIST_UNTITLED_PREFIX, ".m3u8",
                                  1 IF_CNFN_NUM_(, NULL));
-    else if (!strcmp((temp + len - 1), "/")) /* dir playlists other than root  */
+    else if (temp[len - 1] == PATH_SEPCH /* dir playlists other than root  */
+              && temp[len] == '\0')
     {
         temp[len - 1] = '\0';
 
-        if ((p = strrchr(temp, '/'))) /* use last path component as playlist name */
+        if ((p = strrchr(temp, PATH_SEPCH))) /* use last path component as playlist name */
         {
             strlcat(directoryonly, p, sizeof(directoryonly));
             strlcat(directoryonly, ".m3u8", sizeof(directoryonly));
@@ -91,6 +94,19 @@ int save_playlist_screen(struct playlist_info* playlist)
                                        playlist ? playlist->filename :
                                        playlist_get_current()->filename))
     {
+        /* Create dir if necessary */
+        if ((p = strrchr(temp, PATH_SEPCH)) && p != (char *) temp)
+        {
+            *p = '\0';
+
+            if (!dir_exists(temp) && mkdir(temp) < 0)
+            {
+                splashf(HZ, ID2P(LANG_CATALOG_NO_DIRECTORY), temp);
+                return 0;
+            }
+            *p = PATH_SEPCH;
+        }
+
         playlist_save(playlist, temp);
 
         /* reload in case playlist was saved to cwd */
