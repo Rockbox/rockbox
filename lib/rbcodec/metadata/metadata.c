@@ -427,16 +427,8 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
     const struct afmt_entry *entry;
     int logfd = 0;
     DEBUGF("Read metadata for %s\n", trackname);
-    if (write_metadata_log)
-    {
-        logfd = open("/metadata.log", O_WRONLY | O_APPEND | O_CREAT, 0666);
-        if (logfd >= 0)
-        {
-            write(logfd, trackname, strlen(trackname));
-            write(logfd, "\n", 1);
-            close(logfd);
-        }
-    }
+    const char *res_str = "\n";
+
     /* Clear the mp3entry to avoid having bogus pointers appear */
     wipe_mp3entry(id3);
 
@@ -447,7 +439,9 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
         if (fd < 0)
         {
             DEBUGF("Error opening %s\n", trackname);
-            return false; /*Failure*/
+            res_str = " - [Error opening]\n";
+            success = false;
+            goto log_on_exit;
         }
     }
 
@@ -464,11 +458,13 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
     if (!entry->parse_func)
     {
         DEBUGF("nothing to parse for %s (format %s)\n", trackname, entry->label);
+        res_str = " - [No parser]\n";
         success = false;
     }
     else if (!entry->parse_func(fd, id3))
     {
         DEBUGF("parsing %s failed (format: %s)\n", trackname, entry->label);
+        res_str = " - [Parser failed]\n";
         success = false;
         wipe_mp3entry(id3); /* ensure the mp3entry is clear */
     }
@@ -483,6 +479,18 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
         strlcpy(id3->path, trackname, sizeof(id3->path));
     }
     /* have we successfully read the metadata from the file? */
+log_on_exit:
+    if (write_metadata_log)
+    {
+        logfd = open("/metadata.log", O_WRONLY | O_APPEND | O_CREAT, 0666);
+        if (logfd >= 0)
+        {
+            write(logfd, trackname, strlen(trackname));
+            write(logfd, res_str, strlen(res_str));
+            close(logfd);
+        }
+    }
+
     return success;
 }
 
