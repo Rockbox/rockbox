@@ -1187,6 +1187,15 @@ int bookmark_load_menu(void)
     char* bookmark;
     int ret = BOOKMARK_FAIL;
 
+    /* To prevent root dir ("/") bookmarks  from being displayed
+       when 'List Bookmarks' hotkey or button is pressed, check:
+    */
+    if (playlist_dynamic_only())
+    {
+        splash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
+        return ret;
+    }
+
     push_current_activity(ACTIVITY_BOOKMARKSLIST);
 
     char* name = playlist_get_name(NULL, global_temp_buffer,
