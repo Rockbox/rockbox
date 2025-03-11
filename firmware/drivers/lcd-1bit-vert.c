@@ -402,9 +402,6 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     }
     else
     {
-        if (height <= 8)
-            stride = 0; /* ASAN fix keep from reading beyond buffer */
-
         dst_end = dst + width;
         do
         {
@@ -429,7 +426,10 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
                 dst_col += stride_dst;
                 data >>= 8;
             }
-            data |= *src_col << shift;
+#if !(CONFIG_PLATFORM & PLATFORM_NATIVE)
+            if (y>=shift) /* ASAN fix keep from reading beyond buffer */
+#endif
+                data |= *src_col << shift;
             bfunc(dst_col, mask_col & mask_bottom, data);
         }
         while (dst < dst_end);
