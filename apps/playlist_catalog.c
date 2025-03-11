@@ -411,16 +411,33 @@ static int remove_extension(char* path)
 bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
                                     const char* curr_pl_name)
 {
-    char bmark_file[MAX_PATH + 7];
+    char bmark_file[MAX_PATH + 7], *p;
     bool do_save = false;
     while (!do_save && !remove_extension(pl_name) &&
            !kbd_input(pl_name, buf_size - 7, NULL))
     {
-        do_save = true;
+        if (*pl_name == PATH_SEPCH) /* Require absolute filenames */
+        {
+            p = strrchr(pl_name, PATH_SEPCH);
+            do_save = *(p + 1);   /* Disallow empty filename */
+
+            /* prevent illegal characters */
+            fix_path_part(p, 1, strlen(p + 1));
+
+            /* Create dir if necessary */
+            if (do_save && p != (char *) pl_name)
+            {
+                *p = '\0';
+                do_save = dir_exists(pl_name) || mkdir(pl_name) == 0;
+                if (!do_save)
+                    splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), pl_name);
+                *p = PATH_SEPCH;
+            }
+        }
         apply_playlist_extension(pl_name, buf_size);
 
         /* warn before overwriting existing (different) playlist */
-        if (!curr_pl_name || strcmp(curr_pl_name, pl_name))
+        if (do_save && (!curr_pl_name || strcmp(curr_pl_name, pl_name)))
         {
             if (file_exists(pl_name))
                 do_save = yesno_pop(ID2P(LANG_REALLY_OVERWRITE));
