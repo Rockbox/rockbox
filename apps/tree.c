@@ -1070,7 +1070,7 @@ int create_playlist(void)
 {
     bool ret;
     trigger_cpu_boost();
-    ret = catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, NULL, NULL);
+    ret = catalog_add_to_a_playlist(PATH_ROOTSTR, ATTR_DIRECTORY, true, NULL, NULL);
     cancel_cpu_boost();
 
     return (ret) ? 1 : 0;

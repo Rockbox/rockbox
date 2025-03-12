@@ -348,13 +348,16 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
     else if (sel_attr & ATTR_DIRECTORY)
     {
         /* search directory for tracks and append to playlist */
-        bool recurse = false;
+        bool recurse;
         const char *lines[] = {
             ID2P(LANG_RECURSE_DIRECTORY_QUESTION), sel};
         const struct text_message message={lines, 2};
         struct add_track_context context;
 
-        if (global_settings.recursive_dir_insert != RECURSE_ASK)
+
+        if (sel[1] == '\0' && sel[0] == PATH_ROOTCHR)
+            recurse = true;
+        else if (global_settings.recursive_dir_insert != RECURSE_ASK)
             recurse = (bool)global_settings.recursive_dir_insert;
         else
         {
