@@ -715,6 +715,23 @@ static void mm_errorhandler(void)
     quit = true;
 }
 
+static void do_vscroll(int up)
+{
+    if (up) {
+        if ( textlines-vscroll >= MAX_LINES )
+        {
+            vscroll++;
+            screenupdated = false;
+        }
+    } else {
+        if ( vscroll > 0 )
+        {
+            vscroll--;
+            screenupdated = false;
+        }
+    }
+}
+
 static int playfile(char* filename)
 {
     int button;
@@ -793,11 +810,11 @@ static int playfile(char* filename)
         case ACTION_WPS_VOLUP:
             if ( display != DISPLAY_INFO )
             {
-                if ( textlines-vscroll >= MAX_LINES )
-                {
-                    vscroll++;
-                    screenupdated = false;
-                }
+#ifdef HAVE_SCROLLWHEEL
+                do_vscroll(1);
+#else
+                do_vscroll(0);
+#endif
                 break;
             }
 
@@ -807,11 +824,11 @@ static int playfile(char* filename)
         case ACTION_WPS_VOLDOWN:
             if ( display != DISPLAY_INFO )
             {
-                if ( vscroll > 0 )
-                {
-                    vscroll--;
-                    screenupdated = false;
-                }
+#ifdef HAVE_SCROLLWHEEL
+                do_vscroll(0);
+#else
+                do_vscroll(1);
+#endif
                 break;
             }
 
