@@ -546,6 +546,7 @@ static void gwps_leave_wps(bool theme_enabled)
 #ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(sb_get_backdrop(i));
 #endif
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
             viewportmanager_theme_undo(i, skin_has_sbs(gwps));
         }
     }
