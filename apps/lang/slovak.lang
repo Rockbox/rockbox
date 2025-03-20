@@ -5620,7 +5620,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Hlasitosť- : Znovu zapnúť)"
+    remote: "(Hlasitosť mínus pre opätovné zapnutie)"
   </voice>
 </phrase>
 <phrase>
@@ -12559,7 +12559,7 @@
     *: "Úroveň 5: 40 ťahov / 60 min"
   </dest>
   <voice>
-    *: "Úroveň 5: 40 ťahov za 60 minút"
+    *: "Úroveň 5, 40 ťahov za 60 minút"
   </voice>
 </phrase>
 <phrase>
@@ -12657,7 +12657,7 @@
     *: "Úroveň 4: 40 ťahov / 30 min"
   </dest>
   <voice>
-    *: "Úroveň 4: 40 ťahov za 30 minút"
+    *: "Úroveň 4, 40 ťahov za 30 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13047,10 +13047,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "Pomer jedu a potravy"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Pomer jedu a potravy"
   </voice>
 </phrase>
 <phrase>
@@ -13522,7 +13522,7 @@
     *: "Úroveň 2: 60 ťahov / 15 min"
   </dest>
   <voice>
-    *: "úroveň 2: 60 ťahov za 15 minút"
+    *: "Úroveň 2, 60 ťahov za 15 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13696,7 +13696,7 @@
     *: "Úroveň 6: 40 ťahov / 120 min"
   </dest>
   <voice>
-    *: "Úroveň 6: 40 ťahov za 120 minút"
+    *: "Úroveň 6, 40 ťahov za 120 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13918,7 +13918,7 @@
     *: "Úroveň 1: 60 ťahov / 5 min"
   </dest>
   <voice>
-    *: "Úroveň 1: 60 ťahov za 5 minút"
+    *: "Úroveň 1, 60 ťahov za 5 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14002,7 +14002,7 @@
     *: "Úroveň 7: 40 ťahov / 240 min"
   </dest>
   <voice>
-    *: "Úroveň 7: 40 ťahov za 240 minút"
+    *: "Úroveň 7, 40 ťahov za 240 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14016,7 +14016,7 @@
     *: "Úroveň 3: 60 ťahov / 30 min"
   </dest>
   <voice>
-    *: "Úroveň 3: 60 ťahov za 30 minút"
+    *: "Úroveň 3, 60 ťahov za 30 minút"
   </voice>
 </phrase>
 <phrase>
@@ -15863,10 +15863,10 @@
     *: "Add to Existing Playlist"
   </source>
   <dest>
-    *: "Pridať do existujúceho plejlistu..."
+    *: "Pridať do existujúceho plejlistu"
   </dest>
   <voice>
-    *: "Pridať do existujúceho plejlistu..."
+    *: "Pridať do existujúceho plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -16404,7 +16404,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
