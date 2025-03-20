@@ -537,20 +537,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Vymazať"
-  </dest>
-  <voice>
-    *: "Vymazať"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -692,30 +678,30 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "~Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "~Stereo"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -785,10 +771,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -985,20 +971,6 @@
   </dest>
   <voice>
     *: "Prehľadávať predvoľby ekvalizéra"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Upraviť Režim: %s"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2171,10 +2143,10 @@
     *: "Font"
   </source>
   <dest>
-    *: "Font"
+    *: "~Font"
   </dest>
   <voice>
-    *: "Font"
+    *: "~Font"
   </voice>
 </phrase>
 <phrase>
@@ -2258,15 +2230,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Podsvietenie pri uzamknutí"
     hold_button: "Podsvietenie pri Aktívnom Zámku"
   </dest>
   <voice>
-    *: none
+    *: "Podsvietenie pri uzamknutí"
     hold_button: "Podsvietenie pri aktívnom zámku"
   </voice>
 </phrase>
@@ -2934,10 +2906,10 @@
     *: "Peak Meter"
   </source>
   <dest>
-    *: "Peak Meter"
+    *: "~Peak Meter"
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "~Peak Meter"
   </voice>
 </phrase>
 <phrase>
@@ -3088,10 +3060,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "~Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -3256,10 +3228,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -3371,59 +3343,47 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Typ Batérie"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Typ batérie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Alkalická"
-    xduoox3: "Newer (2000 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Alkalická"
-    xduoox3: "Newer 2000 milliamp hour"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Nikel metal hydridová"
-    xduoox3: "Older 1500 milliamp hour"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3434,10 +3394,10 @@
     *: "Disk"
   </source>
   <dest>
-    *: "Disk"
+    *: "~Disk"
   </dest>
   <voice>
-    *: "Disk"
+    *: "~Disk"
   </voice>
 </phrase>
 <phrase>
@@ -3743,7 +3703,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "Január"
@@ -3757,7 +3717,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "Február"
@@ -3771,7 +3731,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Marec"
@@ -3785,7 +3745,7 @@
     *: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: "~Apr"
   </dest>
   <voice>
     *: "Apríl"
@@ -3841,10 +3801,10 @@
     *: "Aug"
   </source>
   <dest>
-    *: "Aug"
+    *: "~Aug"
   </dest>
   <voice>
-    *: "August"
+    *: "~August"
   </voice>
 </phrase>
 <phrase>
@@ -3855,10 +3815,10 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
-    *: "September"
+    *: "~September"
   </voice>
 </phrase>
 <phrase>
@@ -3883,10 +3843,10 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
-    *: "November"
+    *: "~November"
   </voice>
 </phrase>
 <phrase>
@@ -3897,10 +3857,10 @@
     *: "Dec"
   </source>
   <dest>
-    *: "Dec"
+    *: "~Dec"
   </dest>
   <voice>
-    *: "December"
+    *: "~December"
   </voice>
 </phrase>
 <phrase>
@@ -4059,23 +4019,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Budík Je Nastavený"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Budík je nastavený"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -4085,25 +4028,11 @@
   </source>
   <dest>
     *: none
-    alarm: "%Čas Budenia Je Príliš Skorý"
+    alarm: "Čas budenia je príliš skorý"
   </dest>
   <voice>
     *: none
     alarm: "Čas budenia je príliš skorý"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4953,11 +4882,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -5304,40 +5233,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Priečinok"
-  </dest>
-  <voice>
-    *: none
-    recording: "Priečinok"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
-  user: core
-  <source>
-    *: none
-    recording: "Set As Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Nastaviť Ako Priečinok Nahrávok"
-  </dest>
-  <voice>
-    *: none
-    recording: "Nastaviť ako priečinok nahrávok"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLEAR_REC_DIR
   desc:
   user: core
@@ -5517,11 +5412,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "~Stop"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "~Stop"
   </voice>
 </phrase>
 <phrase>
@@ -5870,16 +5765,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Katalóg Plejlistov"
+    *: ""
   </dest>
   <voice>
-    *: "Katalóg plejlistov"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5946,10 +5841,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox Info"
+    *: "Info o Rockboxe"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Info o Rockboxe"
   </voice>
 </phrase>
 <phrase>
@@ -5960,7 +5855,7 @@
     *: "Buffer:"
   </source>
   <dest>
-    *: "Buffer:"
+    *: "~Buffer:"
   </dest>
   <voice>
     *: "Veľkosť buffera"
@@ -5990,7 +5885,7 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Disk:"
+    *: "~Disk:"
   </dest>
   <voice>
     *: "Veľkosť disku"
@@ -6020,13 +5915,13 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "MSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~MSD1:"
   </dest>
   <voice>
     *: "Interný"
-    hibylinux: "micro S D"
+    hibylinux: "mikro S D"
     xduoox3: "mikro S D 1"
   </voice>
 </phrase>
@@ -6036,19 +5931,22 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~MSD:"
+    xduoox3: "~MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
+    hibylinux: "~U S B"
+    multivolume: "~HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro S D"
     xduoox3: "mikro S D 2"
   </voice>
@@ -6138,62 +6036,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert"
-  </source>
-  <dest>
-    *: "Vložiť"
-  </dest>
-  <voice>
-    *: "Vložiť"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Next"
-  </source>
-  <dest>
-    *: "Vložiť Ako Ďalší"
-  </dest>
-  <voice>
-    *: "Vložiť ako ďalší"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Last"
-  </source>
-  <dest>
-    *: "Vložiť Na Koniec"
-  </dest>
-  <voice>
-    *: "Vložiť nakoniec"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user: core
-  <source>
-    *: "Insert Shuffled"
-  </source>
-  <dest>
-    *: "Vložiť Zamiešané"
-  </dest>
-  <voice>
-    *: "Vložiť zamiešané"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
   user: core
@@ -6247,20 +6089,6 @@
   </dest>
   <voice>
     *: "Zaradiť zamiešané"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6345,34 +6173,6 @@
   </dest>
   <voice>
     *: "Znovu zamiešať"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Zobraziť Katalóg"
-  </dest>
-  <voice>
-    *: "Zobraziť katalóg"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "Add to Playlist"
-  </source>
-  <dest>
-    *: "Pridať Do Plejlistu"
-  </dest>
-  <voice>
-    *: "Pridať do plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -6551,10 +6351,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -6723,20 +6523,6 @@
   </dest>
   <voice>
     *: "Zosilnenie Stopy"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Zosilnenie Albumu"
-  </dest>
-  <voice>
-    *: "Zosilnenie Albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7150,20 +6936,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Chyba pri aktualizácii Kontrolného súboru plejlistu"
-  </dest>
-  <voice>
-    *: "Chyba pri aktualizácii kontrolného súboru plejlistu"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_ACCESS_ERROR
   desc: Playlist error
   user: core
@@ -7244,7 +7016,7 @@
     *: "Režim:"
   </dest>
   <voice>
-    *: "Režim:"
+    *: "Režim"
   </voice>
 </phrase>
 <phrase>
@@ -7346,23 +7118,6 @@
   <voice>
     *: none
     iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-nek"
-  </dest>
-  <voice>
-    *: none
-    recording: "mínus nekonečno"
   </voice>
 </phrase>
 <phrase>
@@ -7587,24 +7342,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Batéria: nabíjanie"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Batéria: Trickle Nab"
-  </dest>
-  <voice>
-    *: none
-    charging: "Trickle Nabíjanie"
+    charging: "Batéria sa nabíja"
   </voice>
 </phrase>
 <phrase>
@@ -8136,7 +7874,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "~plus"
   </voice>
 </phrase>
 <phrase>
@@ -8248,7 +7986,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "~kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -8262,7 +8000,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -8276,7 +8014,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "~percent"
   </voice>
 </phrase>
 <phrase>
@@ -8332,7 +8070,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8780,7 +8518,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -8836,7 +8574,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "~font"
   </voice>
 </phrase>
 <phrase>
@@ -8864,7 +8602,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -8923,7 +8661,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -8940,7 +8678,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Aktuálny čas:"
+    rtc: "Aktuálny čas"
   </voice>
 </phrase>
 <phrase>
@@ -8969,20 +8707,6 @@
   </dest>
   <voice>
     *: "Frekvencia rezu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Zosilnenie"
-  </dest>
-  <voice>
-    *: "Zosilnenie"
   </voice>
 </phrase>
 <phrase>
@@ -9164,7 +8888,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "~oh"
   </voice>
 </phrase>
 <phrase>
@@ -9342,7 +9066,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "Editovať"
   </voice>
 </phrase>
 <phrase>
@@ -9646,7 +9370,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "~Auto"
   </dest>
   <voice>
     *: none
@@ -9863,7 +9587,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "~AGC"
   </dest>
   <voice>
     *: none
@@ -10385,11 +10109,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "~Limit"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "~Limit"
   </voice>
 </phrase>
 <phrase>
@@ -10506,20 +10230,6 @@
   </dest>
   <voice>
     *: "Dĺžka rolovacieho pásu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Umiestnenie Rolovacieho Pásu"
-  </dest>
-  <voice>
-    *: "Umiestnenie rolovacieho pásu"
   </voice>
 </phrase>
 <phrase>
@@ -10679,10 +10389,10 @@
     *: "Limit"
   </source>
   <dest>
-    *: "Limit"
+    *: "~Limit"
   </dest>
   <voice>
-    *: "Limit"
+    *: "~Limit"
   </voice>
 </phrase>
 <phrase>
@@ -10707,10 +10417,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "~Auto"
   </dest>
   <voice>
-    *: "Auto"
+    *: "~Auto"
   </voice>
 </phrase>
 <phrase>
@@ -10784,20 +10494,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Vlastné"
-  </dest>
-  <voice>
-    *: "Vlastné"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_SBS
   desc: spoken only, for file extension
   user: core
@@ -10843,20 +10539,6 @@
   <voice>
     *: none
     usb_hid: "USB Human Interface Device"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
-  user: core
-  <source>
-    *: "Insert Last Shuffled"
-  </source>
-  <dest>
-    *: "Vložiť Nakoniec Zamiešané"
-  </dest>
-  <voice>
-    *: "Vložiť nakoniec zamiešané"
   </voice>
 </phrase>
 <phrase>
@@ -10918,7 +10600,7 @@
     *: "Nasleduje stopa:"
   </dest>
   <voice>
-    *: "Nasleduje stopa:"
+    *: "Nasleduje stopa"
   </voice>
 </phrase>
 <phrase>
@@ -10932,7 +10614,7 @@
     *: "Nasleduje:"
   </dest>
   <voice>
-    *: "Nasleduje:"
+    *: "Nasleduje"
   </voice>
 </phrase>
 <phrase>
@@ -11026,23 +10708,6 @@
   <voice>
     *: none
     histogram: "Interval histogramu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Linkový Výstup"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Linkový výstup"
   </voice>
 </phrase>
 <phrase>
@@ -11381,7 +11046,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "Otvoriť picture flow"
@@ -11397,11 +11062,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11428,11 +11093,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </voice>
 </phrase>
 <phrase>
@@ -11467,20 +11132,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
-  user: core
-  <source>
-    *: "Start File Browser Here"
-  </source>
-  <dest>
-    *: "Začať Prezeranie Súborov tu"
-  </dest>
-  <voice>
-    *: "Začať prezeranie súborov tu"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILESIZE
   desc: in record timesplit options and in track information viewer
   user: core
@@ -11504,11 +11155,11 @@
   </source>
   <dest>
     *: none
-    radio: "Sila Signálu:"
+    radio: "Sila signálu:"
   </dest>
   <voice>
     *: none
-    radio: "Sila Signálu:"
+    radio: "Sila signálu"
   </voice>
 </phrase>
 <phrase>
@@ -11565,20 +11216,6 @@
   </dest>
   <voice>
     *: "Aktuálny Plejlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
-  user: core
-  <source>
-    *: "Set As Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "Nastaviť Ako Priečinok Katalógu Plejlistov"
-  </dest>
-  <voice>
-    *: "Nastaviť Ako Priečinok Katalógu Plejlistov"
   </voice>
 </phrase>
 <phrase>
@@ -11655,20 +11292,6 @@
   <voice>
     *: none
     touchscreen: "Zarovnanie Riadka v Zoznamoch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOMATIC
-  desc: generic automatic
-  user: core
-  <source>
-    *: "Automatic"
-  </source>
-  <dest>
-    *: "Automaticky"
-  </dest>
-  <voice>
-    *: "Automaticky"
   </voice>
 </phrase>
 <phrase>
@@ -11947,20 +11570,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_LIMIT
   desc: in sound_settings
   user: core
@@ -12064,10 +11673,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Dry / Wet Mix"
+    *: "Mix Suchý/Mokrý"
   </dest>
   <voice>
-    *: "Dry / Wet Mix"
+    *: "Mix Suchý/Mokrý"
   </voice>
 </phrase>
 <phrase>
@@ -12106,10 +11715,10 @@
     *: "SIDE ONLY"
   </source>
   <dest>
-    *: "SIDE ONLY"
+    *: "LEN BOČNÉ"
   </dest>
   <voice>
-    *: "SIDE ONLY"
+    *: "LEN BOČNÉ"
   </voice>
 </phrase>
 <phrase>
@@ -12134,10 +11743,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </dest>
   <voice>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </voice>
 </phrase>
 <phrase>
@@ -12179,10 +11788,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </dest>
   <voice>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -12438,20 +12047,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "Prehliadače nenájdené"
-  </dest>
-  <voice>
-    *: "prehliadače nenájdené"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ACTION_PLAY
   desc: Selective Actions
   user: core
@@ -12648,20 +12243,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_TITLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_CHESSBOX_QUEENSIDE
   desc: spoken only, for announcing chess moves
   user: core
@@ -12757,11 +12338,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Limit FPS"
+    *: "~Limit FPS"
     lowmem: none
   </dest>
   <voice>
-    *: "Limit FPS"
+    *: "~Limit FPS"
     lowmem: none
   </voice>
 </phrase>
@@ -12944,10 +12525,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist prehraté: %s / %s %ld%%"
+    *: "Playlist prehraté:"
   </dest>
   <voice>
     *: "Playlist prehraté"
@@ -13213,7 +12794,7 @@
 </phrase>
 <phrase>
   id: LANG_DIRECT
-  desc: in the pictureflow settings
+  desc: in the pictureflow settings, also a volume adjustment mode
   user: core
   <source>
     *: "Direct"
@@ -13234,11 +12815,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </voice>
 </phrase>
@@ -13278,10 +12859,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Stopa %d / %d %d%%"
+    *: "Stopa:"
   </dest>
   <voice>
     *: "Stopa"
@@ -13403,7 +12984,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_DURATION
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
   desc: deprecated
   user: core
   <source>
@@ -13414,20 +12995,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Cache will be rebuilt on next restart"
-  </source>
-  <dest>
-    *: "Cache bude vytvorená po reštarte"
-  </dest>
-  <voice>
-    *: "Cache bude vytvorená po reštarte"
   </voice>
 </phrase>
 <phrase>
@@ -13519,10 +13086,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Stopa prehraté: %s / %s %ld%%"
+    *: "Stopa prehraté:"
   </dest>
   <voice>
     *: "Stopa prehraté"
@@ -13745,20 +13312,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_PLAYLIST
-  desc: in the pictureflow main menu
-  user: core
-  <source>
-    *: "Clear playlist"
-  </source>
-  <dest>
-    *: "vičistiť playlist"
-  </dest>
-  <voice>
-    *: "vičistiť playlist"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PROPERTIES_SUBDIRS
   desc: in properties plugin
   user: core
@@ -13826,11 +13379,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Single"
+    *: "~Single"
     lowmem: none
   </dest>
   <voice>
-    *: "Single"
+    *: "~Single"
     lowmem: none
   </voice>
 </phrase>
@@ -13991,10 +13544,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Miesto: %s (dokončené %s, zostáva %s)"
+    *: "Miesto: (dokončené / zostaáva)"
   </dest>
   <voice>
     *: "Miesto"
@@ -14066,11 +13619,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </voice>
 </phrase>
 <phrase>
@@ -14115,7 +13668,7 @@
     *: "Premýšľam..."
   </dest>
   <voice>
-    *: ""
+    *: "Premýšľam"
   </voice>
 </phrase>
 <phrase>
@@ -14251,20 +13804,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PROPERTIES_ARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TOGGLE_ITEM
   desc: in main_menu_config
   user: core
@@ -14345,10 +13884,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Stopa zostáva: %s"
+    *: "Stopa zostáva:"
   </dest>
   <voice>
     *: "Stopa zostáva"
@@ -14379,7 +13918,7 @@
     *: "Úroveň 1: 60 ťahov / 5 min"
   </dest>
   <voice>
-    *: "Úroveň 1: 60 ťahov / 5 min"
+    *: "Úroveň 1: 60 ťahov za 5 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14393,7 +13932,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "~GNU Chess"
   </voice>
 </phrase>
 <phrase>
@@ -14401,27 +13940,13 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Priemerný bitrate: %ld kbps"
+    *: "Priemerný bitrate:"
   </dest>
   <voice>
-    *: "Priemerný bit rate"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
+    *: "Priemerný bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -14457,10 +13982,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Priemerná dĺžka stopy: %s"
+    *: "Priemerná dĺžka stopy:"
   </dest>
   <voice>
     *: "Priemerná dĺžka stopy"
@@ -14477,7 +14002,7 @@
     *: "Úroveň 7: 40 ťahov / 240 min"
   </dest>
   <voice>
-    *: "Úroveň 7: 40 ťahov počas 240 minút"
+    *: "Úroveň 7: 40 ťahov za 240 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14638,20 +14163,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Playlist vymazaný"
-  </dest>
-  <voice>
-    *: "Playlist vymazaný"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PROPERTIES_SIZE
   desc: in properties plugin
   user: core
@@ -14684,16 +14195,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining: %s"
+    *: ""
   </source>
   <dest>
-    *: "Playlist zostáva: %s"
+    *: ""
   </dest>
   <voice>
-    *: "Playlist zostáva"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14728,20 +14239,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Pridané do playlistu"
-  </dest>
-  <voice>
-    *: "Pridané do playlistu"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYBACK_CONTROL
   desc: in playback control menu
   user: core
@@ -14764,11 +14261,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "CPU Boost"
+    *: "~CPU Boost"
     lowmem: none
   </dest>
   <voice>
-    *: "CPU Boost"
+    *: "~CPU Boost"
     lowmem: none
   </voice>
 </phrase>
@@ -15011,7 +14508,7 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "HQ mixér"
     lowmem: none
   </dest>
   <voice>
@@ -15325,11 +14822,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "~Short Sharp"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "~Short Sharp"
   </voice>
 </phrase>
 <phrase>
@@ -15342,11 +14839,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "~Short Slow"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "~Short Slow"
   </voice>
 </phrase>
 <phrase>
@@ -15359,11 +14856,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "~Super Slow"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "~Super Slow"
   </voice>
 </phrase>
 <phrase>
@@ -15376,11 +14873,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "~Linear Fast"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "~Linear Fast"
   </voice>
 </phrase>
 <phrase>
@@ -15393,11 +14890,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "~Linear Slow"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "~Linear Slow"
   </voice>
 </phrase>
 <phrase>
@@ -15410,11 +14907,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "~Minimum Fast"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "~Minimum Fast"
   </voice>
 </phrase>
 <phrase>
@@ -15427,11 +14924,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "~Minimum Slow"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "~Minimum Slow"
   </voice>
 </phrase>
 <phrase>
@@ -15444,11 +14941,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "~Apodizing type 1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "~Apodizing type 1"
   </voice>
 </phrase>
 <phrase>
@@ -15461,11 +14958,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "~Apodizing type 2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "~Apodizing type 2"
   </voice>
 </phrase>
 <phrase>
@@ -15478,11 +14975,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "~Hybrid Fast"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "~Hybrid Fast"
   </voice>
 </phrase>
 <phrase>
@@ -15495,11 +14992,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "~Brick Wall"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "~Brick Wall"
   </voice>
 </phrase>
 <phrase>
@@ -15513,13 +15010,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Režim napájania digitálno-analógového prevodníka"
+    es9218: "Výstupná úroveň digitálno-analógového prevodníka"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Režim napájania digitálno-analógového prevodníka"
+    es9218: "Výstupná úroveň digitálno-analógového prevodníka"
   </voice>
 </phrase>
 <phrase>
@@ -15533,13 +15030,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Vysoký výkon"
+    es9218: "Veľké zosilnenie (2 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Vysoký výkon"
+    es9218: "Veľké zosilnenie (2 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -15553,13 +15050,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Šetrič batérie"
+    es9218: "Malé zosilnenie (1 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Šetrič batérie"
+    es9218: "Malé zosilnenie (1 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -15598,10 +15095,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Set Wps Context Plugin"
+    *: "Nastaviť zásuvný modul pre obrazovku práve hrá"
   </dest>
   <voice>
-    *: "Set WPS Context Plugin"
+    *: "Nastaviť zásuvný modul pre obrazovku práve hrá"
   </voice>
 </phrase>
 <phrase>
@@ -15612,10 +15109,10 @@
     *: "Parameter"
   </source>
   <dest>
-    *: "Parameter"
+    *: "~Parameter"
   </dest>
   <voice>
-    *: "Parameter"
+    *: "~Parameter"
   </voice>
 </phrase>
 <phrase>
@@ -15731,20 +15228,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE_MENU
   desc: in onplay menu
   user: core
@@ -15752,10 +15235,10 @@
     *: "Queue..."
   </source>
   <dest>
-    *: "Poradovník..."
+    *: "Poradie..."
   </dest>
   <voice>
-    *: "Poradovník..."
+    *: "Poradie"
   </voice>
 </phrase>
 <phrase>
@@ -15766,10 +15249,10 @@
     *: "Show Queue Options"
   </source>
   <dest>
-    *: "Ukázať voľby poradovníka"
+    *: "Ukázať voľby poradia"
   </dest>
   <voice>
-    *: "Ukázať voľby poradovníka"
+    *: "Ukázať voľby poradia"
   </voice>
 </phrase>
 <phrase>
@@ -15798,20 +15281,6 @@
   </dest>
   <voice>
     *: "V podmenu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15854,146 +15323,6 @@
   </dest>
   <voice>
     *: "Vždy automaticky zamknúť"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: reload playlist after saving
-  user: core
-  <source>
-    *: "Reload After Saving"
-  </source>
-  <dest>
-    *: "Načítať znovu po uložení"
-  </dest>
-  <voice>
-    *: "Načítať znovu po uložení"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUMARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_GENRE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMMENT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMPOSER
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_YEAR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TRACKNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DISCNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FREQUENCY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_BITRATE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16305,5 +15634,1390 @@
   </dest>
   <voice>
     *: "Slovenčina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Resetovať ekvalizér"
+  </dest>
+  <voice>
+    *: "Resetovať ekvalizér"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Názov a album z ID3 tagov"
+  </dest>
+  <voice>
+    *: "Názov a album z tagov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Názov z ID3 tagov"
+  </dest>
+  <voice>
+    *: "Názov z tagov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Výber príliš veľký, %d náhodných stôp bude vybraných"
+  </dest>
+  <voice>
+    *: "Výber príliš veľký, menej náhodných stôp bude vybraných"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Špeciálny znak"
+  </dest>
+  <voice>
+    *: "Špeciálny znak"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Interpreti albumov"
+  </dest>
+  <voice>
+    *: "Interpreti albumov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Pridať aktuálne do skratiek"
+  </dest>
+  <voice>
+    *: "Pridať aktuálne do skratiek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disk"
+  </dest>
+  <voice>
+    *: "Disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Vymazať nastavenia, keď je pri štarte stlačené tlačidlo reset"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Vymazať nastavenia, keď je pri štarte stlačené tlačidlo uzamknutia"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Vymazať nastavenia, keď je pri štarte stlačené tlačidlo reset"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Vymazať nastavenia, keď je pri štarte stlačené tlačidlo uzamknutia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Pretáčať naprieč stopami"
+  </dest>
+  <voice>
+    *: "Pretáčať naprieč stopami"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Nastaviť ako..."
+  </dest>
+  <voice>
+    *: "Nastaviť ako"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Adresár plejlistov"
+  </dest>
+  <voice>
+    *: "Adresár plejlistov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Počiatočný adresár"
+  </dest>
+  <voice>
+    *: "Počiatočný adresár"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Adresár nahrávania"
+  </dest>
+  <voice>
+    *: none
+    recording: "Adresár nahrávania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Pridať do plejlistu..."
+  </dest>
+  <voice>
+    *: "Pridať do plejlistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Pridať do existujúceho plejlistu..."
+  </dest>
+  <voice>
+    *: "Pridať do existujúceho plejlistu..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Prehrať ako nasledujúce..."
+  </dest>
+  <voice>
+    *: "Prehrať ako nasledujúce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Prehrať ako nasledujúce"
+  </dest>
+  <voice>
+    *: "Prehrať ako nasledujúce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Pridať zamiešané"
+  </dest>
+  <voice>
+    *: "Pridať zamiešané"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Prehrať ako posledné"
+  </dest>
+  <voice>
+    *: "Prehrať ako posledné"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Prehrať ako posledné zamiešané"
+  </dest>
+  <voice>
+    *: "Prehrať ako posledné zamiešané"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Režim úpravy hlasitosti"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Režim úpravy hlasitosti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Počet krokov hlasitosti"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Počet krokov hlasitosti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Vnímaná"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Vnímaná"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Ukázať stopy počas prehliadania"
+  </dest>
+  <voice>
+    *: "Ukázať stopy počas prehliadania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Prejsť na posledný album"
+  </dest>
+  <voice>
+    *: "Prejsť na posledný album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Adresár databázy"
+  </dest>
+  <voice>
+    *: "Adresár databázy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Odstrániť zaradené stopy?"
+  </dest>
+  <voice>
+    *: "Odstrániť zaradené stopy?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Rýchle (Ignorovať adresáre vo vyrovnávacej pamäti)"
+  </dest>
+  <voice>
+    *: "Rýchle (Ignorovať adresáre vo vyrovnávacej pamäti)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Obrazovka práve hrá"
+  </dest>
+  <voice>
+    *: "Obrazovka práve hrá"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Predvolený prehliadač"
+  </dest>
+  <voice>
+    *: "Predvolený prehliadač"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Hlavná ponuka Amaze"
+  </dest>
+  <voice>
+    *: "Hlavná ponuka Amaze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Zadať veľkosť labirintu"
+  </dest>
+  <voice>
+    *: "Zadať veľkosť labirintu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Zobraziť mapu"
+  </dest>
+  <voice>
+    *: "Zobraziť mapu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Ukázať kompas"
+  </dest>
+  <voice>
+    *: "Ukázať kompas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Ukázať mapu"
+  </dest>
+  <voice>
+    *: "Ukázať mapu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Pamätať si cestu"
+  </dest>
+  <voice>
+    *: "Pamätať si cestu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Používať veľké dlaždice"
+  </dest>
+  <voice>
+    *: "Používať veľké dlaždice"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Ukázať riešenie"
+  </dest>
+  <voice>
+    *: "Ukázať riešenie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Ukončiť bez uloženia"
+  </dest>
+  <voice>
+    *: "Ukončiť bez uloženia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generovanie labirintu..."
+  </dest>
+  <voice>
+    *: "Generovanie labirintu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Vyhrali ste!"
+  </dest>
+  <voice>
+    *: "Vyhrali ste!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "To je podvádzanie!"
+  </dest>
+  <voice>
+    *: "To je podvádzanie!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Ľahké"
+  </dest>
+  <voice>
+    *: "Ľahké"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Stredné"
+  </dest>
+  <voice>
+    *: "Stredné"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Ťažké"
+  </dest>
+  <voice>
+    *: "Ťažké"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "~Expert"
+  </dest>
+  <voice>
+    *: "~Expert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Právne oznámenia"
+  </dest>
+  <voice>
+    *: "Právne oznámenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Chyba: %s"
+  </dest>
+  <voice>
+    *: "Chyba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Nastavenia Mikmodu"
+  </dest>
+  <voice>
+    *: "Nastavenia Mik modu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Ponuka Mikmod"
+  </dest>
+  <voice>
+    *: "Ponuka Mik mod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Ponuka Chessbox"
+  </dest>
+  <voice>
+    *: "Ponuka Chess box"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Neplatný voice súbor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Vybrať súbor"
+  </dest>
+  <voice>
+    *: "Vybrať súbor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Vypnúť rolovanie v hlavnej ponuke"
+  </dest>
+  <voice>
+    *: "Vypnúť rolovanie v hlavnej ponuke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Zostáva"
+  </dest>
+  <voice>
+    *: "Zostáva"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "Začiatočné písmeno"
+  </dest>
+  <voice>
+    *: "Začiatočné písmeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "Podľa začiatočného písmena..."
+  </dest>
+  <voice>
+    *: "Podľa začiatočného písmena"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Interpreti začínajúci písmenom"
+  </dest>
+  <voice>
+    *: "Interpreti začínajúci písmenom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Interpreti albumu začínajúci písmenom"
+  </dest>
+  <voice>
+    *: "Interpreti albumu začínajúci písmenom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albumy začínajúce písmenom"
+  </dest>
+  <voice>
+    *: "Albumy začínajúce písmenom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Stopy začínajúce písmenom"
+  </dest>
+  <voice>
+    *: "Stopy začínajúce písmenom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Interpreti"
+  </dest>
+  <voice>
+    *: "Interpreti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albumy"
+  </dest>
+  <voice>
+    *: "Albumy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Stopy"
+  </dest>
+  <voice>
+    *: "Stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Miešať skladby"
+  </dest>
+  <voice>
+    *: "Miešať skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Názov súboru"
+  </dest>
+  <voice>
+    *: "Názov súboru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Názov (s dĺžkou stopy)"
+  </dest>
+  <voice>
+    *: "Názov s dĺžkou stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Hodnotenie používateľa"
+  </dest>
+  <voice>
+    *: "Hodnotenie používateľa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Hľadať"
+  </dest>
+  <voice>
+    *: "Hľadať"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Hľadať podľa..."
+  </dest>
+  <voice>
+    *: "Hľadať podľa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Naposledy pridané"
+  </dest>
+  <voice>
+    *: "Naposledy pridané"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "História prehrávania"
+  </dest>
+  <voice>
+    *: "História prehrávania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Vlastná ponuka"
+  </dest>
+  <voice>
+    *: "Vlastná ponuka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Rovnaké ako práve prehrávaná skladba"
+  </dest>
+  <voice>
+    *: "Rovnaké ako práve prehrávaná skladba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Adresár"
+  </dest>
+  <voice>
+    *: "Adresár"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albumy podľa roku"
+  </dest>
+  <voice>
+    *: "Albumy podľa roku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albumy medzi rokmi"
+  </dest>
+  <voice>
+    *: "Albumy medzi rokmi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Interpreti medzi rokmi"
+  </dest>
+  <voice>
+    *: "Interpreti medzi rokmi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Najčastejšie hrané (Prehratia|Skóre)"
+  </dest>
+  <voice>
+    *: "Najčastejšie hrané podľa počtu prehratí, potom podľa skóre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Naposledy prehraté stopy"
+  </dest>
+  <voice>
+    *: "Naposledy prehraté stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Nikdy neprehraté stopy"
+  </dest>
+  <voice>
+    *: "Nikdy neprehraté stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Obľúbení interpreti"
+  </dest>
+  <voice>
+    *: "Obľúbení interpreti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Obľúbené albumy"
+  </dest>
+  <voice>
+    *: "Obľúbené albumy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Posledné obľúbené"
+  </dest>
+  <voice>
+    *: "Posledné obľúbené"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Nové obľúbené"
+  </dest>
+  <voice>
+    *: "Nové obľúbené"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Zabudnuté obľúbené"
+  </dest>
+  <voice>
+    *: "Zabudnuté obľúbené"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Stopy podľa"
+  </dest>
+  <voice>
+    *: "Stopy podľa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Zobraziť obal albumu"
+  </dest>
+  <voice>
+    *: "Zobraziť obal albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Zvoliť výstup"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Zvoliť výstup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Slúchadlá"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Slúchadlá"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "~Line Out"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "~Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Nepodarilo sa načítať font: (%s)"
+  </dest>
+  <voice>
+    *: "Nepodarilo sa načítať font"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Logovanie"
+  </dest>
+  <voice>
+    *: "logovanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Zobraziť log"
+  </dest>
+  <voice>
+    *: "Zobraziť log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Plejlist sa skončil. Prehrať znova?"
+  </dest>
+  <voice>
+    *: "Plejlist sa skončil. Prehrať znova?"
   </voice>
 </phrase>
