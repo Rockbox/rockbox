@@ -867,6 +867,9 @@ refresh_info:
             }
         }
     }
+    FOR_NB_SCREENS(i)
+        screens[i].scroll_stop(); /* when custom lists are used */
+
     if (is_curr_track_info)
         pop_current_activity();
     return ret;
