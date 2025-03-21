@@ -15,7 +15,7 @@
 # KIND, either express or implied.
 #
 # Slovak translation by:
-# Peter Lecký
+# Peter Lecký and Matej Golian
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -6337,10 +6337,10 @@
     *: "Artist"
   </source>
   <dest>
-    *: "Interprét"
+    *: "Interpret"
   </dest>
   <voice>
-    *: "Interprét"
+    *: "Interpret"
   </voice>
 </phrase>
 <phrase>
@@ -6449,10 +6449,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Interprét Albumu"
+    *: "Interpret Albumu"
   </dest>
   <voice>
-    *: "Interprét Albumu"
+    *: "Interpret Albumu"
   </voice>
 </phrase>
 <phrase>
@@ -15095,10 +15095,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Nastaviť zásuvný modul pre obrazovku práve hrá"
+    *: "Nastaviť zásuvný modul pre kontext obrazovky Teraz hrá"
   </dest>
   <voice>
-    *: "Nastaviť zásuvný modul pre obrazovku práve hrá"
+    *: "Nastaviť zásuvný modul pre kontext obrazovky Teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -15919,10 +15919,10 @@
     *: "Play Last"
   </source>
   <dest>
-    *: "Prehrať ako posledné"
+    *: "Prehrať Nakoniec"
   </dest>
   <voice>
-    *: "Prehrať ako posledné"
+    *: "Prehrať nakoniec"
   </voice>
 </phrase>
 <phrase>
@@ -15933,10 +15933,10 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Prehrať ako posledné zamiešané"
+    *: "Prehrať Nakoniec Zamiešané"
   </dest>
   <voice>
-    *: "Prehrať ako posledné zamiešané"
+    *: "Prehrať nakoniec zamiešané"
   </voice>
 </phrase>
 <phrase>
@@ -15983,11 +15983,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Vnímaná"
+    perceptual_volume: "Vnímaný"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Vnímaná"
+    perceptual_volume: "Vnímaný"
   </voice>
 </phrase>
 <phrase>
@@ -16068,10 +16068,10 @@
     *: "What's Playing Screen"
   </source>
   <dest>
-    *: "Obrazovka práve hrá"
+    *: "Obrazovka Teraz hrá"
   </dest>
   <voice>
-    *: "Obrazovka práve hrá"
+    *: "Obrazovka Teraz hrá"
   </voice>
 </phrase>
 <phrase>
