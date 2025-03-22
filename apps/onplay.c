@@ -912,6 +912,7 @@ static bool set_backdrop(void)
                    sizeof(global_settings.backdrop_file));
 
     skin_backdrop_load_setting();
+    viewportmanager_theme_changed(THEME_STATUSBAR);
     skin_backdrop_show(sb_get_backdrop(SCREEN_MAIN));
     return true;
 }
