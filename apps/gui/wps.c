@@ -1056,6 +1056,7 @@ long gui_wps_show(void)
               * it requests a full update here */
             case ACTION_REDRAW:
                 skin_request_full_update(WPS);
+                skin_request_full_update(CUSTOM_STATUSBAR); /* if SBS is used */
                 break;
             case ACTION_NONE: /* Timeout, do a partial update */
                 update = true;

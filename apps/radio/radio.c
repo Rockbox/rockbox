@@ -642,6 +642,7 @@ void radio_screen(void)
               * it requests a full update here */
             case ACTION_REDRAW:
                 skin_request_full_update(FM_SCREEN);
+                skin_request_full_update(CUSTOM_STATUSBAR); /* if SBS is used */
                 break;
 
             default:
