@@ -10751,11 +10751,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Skratka Pre WPS"
+    hotkey: "Skratka Pre obrazovku Teraz hrá"
   </dest>
   <voice>
     *: none
-    hotkey: "Skratka pre wps"
+    hotkey: "Skratka pre obrazovku Teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -15067,10 +15067,10 @@
     *: "Open Plugin"
   </source>
   <dest>
-    *: "Otvoriť plugin"
+    *: "Otvoriť zásuvný modul"
   </dest>
   <voice>
-    *: "Otvoriť plugin"
+    *: "Otvoriť zásuvný modul"
   </voice>
 </phrase>
 <phrase>
@@ -15081,10 +15081,10 @@
     *: "Not a plugin: %s"
   </source>
   <dest>
-    *: "Nie je plugin: %s"
+    *: "Nie je zásuvný modul: %s"
   </dest>
   <voice>
-    *: "Nie je plugin"
+    *: "Nie je zásuvný modul"
   </voice>
 </phrase>
 <phrase>
@@ -16096,10 +16096,10 @@
     *: "Amaze Main Menu"
   </source>
   <dest>
-    *: "Hlavná ponuka Amaze"
+    *: "Hlavná ponuka Amazeu"
   </dest>
   <voice>
-    *: "Hlavná ponuka Amaze"
+    *: "Hlavná ponuka Amazeu"
   </voice>
 </phrase>
 <phrase>
@@ -16362,10 +16362,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Ponuka Mikmod"
+    *: "Ponuka Mikmodu"
   </dest>
   <voice>
-    *: "Ponuka Mik mod"
+    *: "Ponuka Mikmodu"
   </voice>
 </phrase>
 <phrase>
@@ -16376,10 +16376,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Ponuka Chessbox"
+    *: "Ponuka Chessboxu"
   </dest>
   <voice>
-    *: "Ponuka Chess box"
+    *: "Ponuka Chessboxu"
   </voice>
 </phrase>
 <phrase>
@@ -16958,11 +16958,11 @@
   </source>
   <dest>
     *: none
-    erosqnative,lineout_poweroff: "~Line Out"
+    erosqnative,lineout_poweroff: "Linkový výstup"
   </dest>
   <voice>
     *: none
-    erosqnative,lineout_poweroff: "~Line Out"
+    erosqnative,lineout_poweroff: "Linkový výstup"
   </voice>
 </phrase>
 <phrase>
