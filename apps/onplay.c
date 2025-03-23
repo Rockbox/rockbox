@@ -906,14 +906,31 @@ static void set_dir_helper(char* dirnamebuf, size_t bufsz)
 }
 
 #if LCD_DEPTH > 1
-static bool set_backdrop(void)
-{
-    set_dir_helper(global_settings.backdrop_file,
-                   sizeof(global_settings.backdrop_file));
 
+static void show_updated_backdrop(void)
+{
     skin_backdrop_load_setting();
     viewportmanager_theme_changed(THEME_STATUSBAR);
     skin_backdrop_show(sb_get_backdrop(SCREEN_MAIN));
+}
+
+static bool set_backdrop(void)
+{
+    char previous_backdrop[sizeof global_settings.backdrop_file];
+    strcpy(previous_backdrop, global_settings.backdrop_file);
+
+    path_append(global_settings.backdrop_file, selected_file.path,
+                PA_SEP_HARD, sizeof(global_settings.backdrop_file));
+
+    show_updated_backdrop();
+
+    if (!yesno_pop(ID2P(LANG_SET_AS_BACKDROP))) {
+        strcpy(global_settings.backdrop_file, previous_backdrop);
+        show_updated_backdrop();
+    }
+    else
+        settings_save();
+
     return true;
 }
 MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
