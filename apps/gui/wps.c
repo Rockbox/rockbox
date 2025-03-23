@@ -542,7 +542,18 @@ static void gwps_leave_wps(bool theme_enabled)
         struct gui_wps *gwps = skin_get_gwps(WPS, i);
         gwps->display->scroll_stop();
         if (theme_enabled)
+        {
+#ifdef HAVE_BACKDROP_IMAGE
+            skin_backdrop_show(sb_get_backdrop(i));
+
+            /* The following is supposed to erase any traces of %VB
+               viewports drawn by the WPS. May need further thought... */
+            struct wps_data *sbs = skin_get_gwps(CUSTOM_STATUSBAR, i)->data;
+            if (gwps->data->use_extra_framebuffer && sbs->use_extra_framebuffer)
+                skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+#endif
             viewportmanager_theme_undo(i, skin_has_sbs(gwps));
+        }
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)

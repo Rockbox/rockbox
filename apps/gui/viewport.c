@@ -57,7 +57,6 @@
 #include "language.h"
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
-#include "skin_engine/wps_internals.h"
 #include "debug.h"
 
 #define VPSTACK_DEPTH 16
@@ -123,17 +122,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
 #ifdef HAVE_BACKDROP_IMAGE
-        int backdrop_id = sb_get_backdrop(screen);
-        if (get_current_activity() == ACTIVITY_WPS)
-        {
-            struct wps_data *sbs = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
-            struct wps_data *wps = skin_get_gwps(WPS, screen)->data;
-            /* Extra framebuffer shared between WPS and SBS;
-               prevents flashing previous backdrop: */
-            if (wps->use_extra_framebuffer && sbs->use_extra_framebuffer)
-                backdrop_id = -1;
-        }
-        skin_backdrop_show(backdrop_id);
+        skin_backdrop_show(sb_get_backdrop(screen));
 #endif
         if (LIKELY(after_boot[screen]) && (!was_enabled[screen] || force))
         {
