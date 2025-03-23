@@ -779,6 +779,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'latviesu' => {
+	'lang' => 'latviesu',
+	'name' => 'Latviešu (Latvian)',
+        'short' => 'lv',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vlv',
+	    'gtts' => '-l lv',
+            'piper' => 'lv_LV-aivars-medium.onnx',
+	},
+	'enabled' => 0,
+    },
     'nederlands' => {
 	'lang' => 'nederlands',
 	'name' => 'Nederlands (Dutch)',
