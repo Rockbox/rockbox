@@ -789,7 +789,7 @@ sub simbuilds {
 	    'gtts' => '-l lv',
             'piper' => 'lv_LV-aivars-medium.onnx',
 	},
-	'enabled' => 0,
+	'enabled' => 1,
     },
     'nederlands' => {
 	'lang' => 'nederlands',
@@ -837,7 +837,7 @@ sub simbuilds {
 	    'gtts' => '-l pt -t br',
             'piper' => 'pt_BR-faber-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'russian' => {
 	'lang' => 'russian',
