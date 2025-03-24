@@ -154,7 +154,7 @@
     *: "Ielādē... %d%% gatavs (%s)"
   </dest>
   <voice>
-    *: "Notiek ielaade"
+    *: "notiek ielaade"
   </voice>
 </phrase>
 <phrase>
@@ -391,7 +391,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Balss ierakstiishana"
+    recording: "balss ierakstiishana"
   </voice>
 </phrase>
 <phrase>
@@ -422,7 +422,7 @@
     *: "Atskaņošanas saraksti"
   </dest>
   <voice>
-    *: "Atskanosanas saraksti"
+    *: "atskanjoshanas saraksti"
   </voice>
 </phrase>
 <phrase>
@@ -730,7 +730,7 @@
     *: "Mono kreisā"
   </dest>
   <voice>
-    *: "mono kreisais"
+    *: "mono kreisaa"
   </voice>
 </phrase>
 <phrase>
@@ -744,7 +744,7 @@
     *: "Mono labā"
   </dest>
   <voice>
-    *: "mono labais"
+    *: "mono labaa"
   </voice>
 </phrase>
 <phrase>
@@ -757,11 +757,11 @@
   </source>
   <dest>
     *: none
-    recording: "Kreisais + Labais"
+    recording: "Mono kreisā + labā"
   </dest>
   <voice>
     *: none
-    recording: "mono kreisais plus labais"
+    recording: "mono kreisaa plus labaa"
   </voice>
 </phrase>
 <phrase>
@@ -926,7 +926,7 @@
     *: "Simple EQ Settings"
   </source>
   <dest>
-    *: "Vienkāršots ekvalaizers"
+    *: "Vienkāršs ekvalaizers"
   </dest>
   <voice>
     *: "vienkaarshotais ekvalaizers"
@@ -1122,7 +1122,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Jaukt secību"
+    *: "Secības jaukšana/-ā"
   </dest>
   <voice>
     *: "jaukt seciibu"
@@ -1265,7 +1265,7 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Izdzišana pie Stop/Pauzes"
+    *: "Izdziest, apturot/pauzējot"
   </dest>
   <voice>
     *: "izdzishana pie stop vai pauzes"
@@ -1329,7 +1329,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Tikai Pārslēdzot"
+    crossfade: "Tikai manuāli pārslēdzot dziesmas"
   </dest>
   <voice>
     *: none
@@ -1346,7 +1346,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Jaukta Secība Vai Pārslēdzoties"
+    crossfade: "Secības jaukšanā vai manuāli pārslēdzot dziesmas"
   </dest>
   <voice>
     *: none
@@ -1363,11 +1363,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Ievada Aizture"
+    crossfade: "Ieskanēšanās aizkave"
   </dest>
   <voice>
     *: none
-    crossfade: "ievada aizture"
+    crossfade: "ieskaneeshanaas aizkave"
   </voice>
 </phrase>
 <phrase>
@@ -1380,11 +1380,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Ievada Garums"
+    crossfade: "Ieskanēšanās ilgums"
   </dest>
   <voice>
     *: none
-    crossfade: "ievada garums"
+    crossfade: "ieskaneeshanaas ilgums"
   </voice>
 </phrase>
 <phrase>
@@ -1397,11 +1397,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Beigu Aizture"
+    crossfade: "Izdzišanas aizkave"
   </dest>
   <voice>
     *: none
-    crossfade: "beigu aizture"
+    crossfade: "izdzishanas aizkave"
   </voice>
 </phrase>
 <phrase>
@@ -1414,11 +1414,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Beigu Garums"
+    crossfade: "Izdzišanas ilgums"
   </dest>
   <voice>
     *: none
-    crossfade: "beigu garums"
+    crossfade: "izdzishanas ilgums"
   </voice>
 </phrase>
 <phrase>
@@ -1431,11 +1431,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Beigu Režīms"
+    crossfade: "Izdzišanas režīms"
   </dest>
   <voice>
     *: none
-    crossfade: "beigu rezhiims"
+    crossfade: "izdzishanas rezhiims"
   </voice>
 </phrase>
 <phrase>
@@ -1463,7 +1463,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Skaļuma Normalizācija"
+    *: "Skaļuma normalizācija"
   </dest>
   <voice>
     *: "skaljuma normalizaacija"
@@ -1477,10 +1477,10 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Novērst Pārlieku Skaļumu"
+    *: "Novērst kropļojumus"
   </dest>
   <voice>
-    *: "noveerst paarlieku skaljumu"
+    *: "noveerst kropljojumus"
   </voice>
 </phrase>
 <phrase>
@@ -1491,7 +1491,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Normalizācijas Veids"
+    *: "Normalizācijas veids"
   </dest>
   <voice>
     *: "normalizaacijas veids"
@@ -1505,10 +1505,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Albūmu Skaļums"
+    *: "Albumu pastiprinājums"
   </dest>
   <voice>
-    *: "albuumu skaljums"
+    *: "albumu pastiprinaajums"
   </voice>
 </phrase>
 <phrase>
@@ -1519,10 +1519,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Dziesmu Skaļums"
+    *: "Dziesmu pastiprinājums"
   </dest>
   <voice>
-    *: "dziesmu skaljums"
+    *: "dziesmu pastiprinaajums"
   </voice>
 </phrase>
 <phrase>
@@ -1533,10 +1533,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Dziesmu Ja Jaukta Secība"
+    *: "Dziesmu pastiprinājums secības jaukšanā"
   </dest>
   <voice>
-    *: "dziesmu ja jaukta seciiba"
+    *: "dziesmu pastiprinaajums seciibas jaukshanaa"
   </voice>
 </phrase>
 <phrase>
@@ -1547,10 +1547,10 @@
     *: "Pre-amp"
   </source>
   <dest>
-    *: "Priekšpastiprinājums"
+    *: "Priekšpastiprinātājs"
   </dest>
   <voice>
-    *: "priekshpastiprinaajums"
+    *: "priekshpastiprinaataajs"
   </voice>
 </phrase>
 <phrase>
@@ -1561,7 +1561,7 @@
     *: "Track Skip Beep"
   </source>
   <dest>
-    *: "Dz.Pārslēgšanas Pīkstiens"
+    *: "Pīkstiens pārslēdzot dziesmas"
   </dest>
   <voice>
     *: "dziesmu paarsleegshanas piikstiens"
@@ -1619,7 +1619,7 @@
   </source>
   <dest>
     *: none
-    spdif_power: "Optiskā Izeja"
+    spdif_power: "Optiskā izeja"
   </dest>
   <voice>
     *: none
@@ -1634,7 +1634,7 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Automātiski Mainīt Mapi"
+    *: "Automātiski mainīt mapi"
   </dest>
   <voice>
     *: "automaatiski mainiit mapi"
@@ -1648,7 +1648,7 @@
     *: "Random"
   </source>
   <dest>
-    *: "Jauktā Secībā"
+    *: "Jauktā secībā"
   </dest>
   <voice>
     *: "jauktaa seciibaa"
@@ -1662,10 +1662,10 @@
     *: "Last.fm Logger"
   </source>
   <dest>
-    *: "Veidot Last.fm Logu"
+    *: "Veidot Last.fm žurnālu"
   </dest>
   <voice>
-    *: "veidot Last.fm logu"
+    *: "veidot Last.fm zhurnaalu"
   </voice>
 </phrase>
 <phrase>
@@ -1676,10 +1676,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cue Atbalsts"
+    *: "Cuesheet atbalsts"
   </dest>
   <voice>
-    *: "cue atbalsts"
+    *: "kueshiit atbalsts"
   </voice>
 </phrase>
 <phrase>
@@ -1692,7 +1692,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Atvienojot Austiņas Nopauzēt"
+    headphone_detection: "Pauzēt, atvienojot austiņas"
   </dest>
   <voice>
     *: none
@@ -1709,11 +1709,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Nopauzēt Un Atsākt"
+    headphone_detection: "Pauzēt un atsākt"
   </dest>
   <voice>
     *: none
-    headphone_detection: "nopauzeet un atsaakt"
+    headphone_detection: "pauzeet un atsaakt"
   </voice>
 </phrase>
 <phrase>
@@ -1726,7 +1726,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Izsl Atsākt Palaižot ja Austiņas Izrautas"
+    headphone_detection: "Startējot neturpināt atskaņot, ja austiņas atvienotas"
   </dest>
   <voice>
     *: none
@@ -1741,7 +1741,7 @@
     *: "File View"
   </source>
   <dest>
-    *: "Failu Pārlūks"
+    *: "Failu pārlūks"
   </dest>
   <voice>
     *: "failu paarluuks"
@@ -1755,7 +1755,7 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Šķirot Pēc Liel.Burt."
+    *: "Reģistrjutīga kārtošana"
   </dest>
   <voice>
     *: "shkjirot peec lielajiem burtiem"
@@ -1769,7 +1769,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Šķirot Mapes"
+    *: "Kārtot mapes"
   </dest>
   <voice>
     *: "shkjirot mapes"
@@ -1783,7 +1783,7 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Šķirot Failus"
+    *: "Kārtot failus"
   </dest>
   <voice>
     *: "shkjirot failus"
@@ -1797,7 +1797,7 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "Alfabētiski"
+    *: "Pēc alfabēta"
   </dest>
   <voice>
     *: "alfabeetiski"
@@ -1811,7 +1811,7 @@
     *: "By Date"
   </source>
   <dest>
-    *: "Pēc Vecuma"
+    *: "Pēc vecākā datuma"
   </dest>
   <voice>
     *: "peec vecuma"
@@ -1825,7 +1825,7 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "Pēc Jaunākā"
+    *: "Pēc jaunākā datuma"
   </dest>
   <voice>
     *: "peec jaunaakaa"
@@ -1839,10 +1839,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "Pēc Veida"
+    *: "Pēc tipa"
   </dest>
   <voice>
-    *: "peec veida"
+    *: "peec tipa"
   </voice>
 </phrase>
 <phrase>
@@ -1853,7 +1853,7 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Rādīt Failus"
+    *: "Failu pārlūkā rādīt"
   </dest>
   <voice>
     *: "raadiit failus"
@@ -1867,7 +1867,7 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Atbalstītos"
+    *: "Atbalstītos failus"
   </dest>
   <voice>
     *: "raadiit atbalstiitos failus"
@@ -1881,7 +1881,7 @@
     *: "Music"
   </source>
   <dest>
-    *: "Mūzikas"
+    *: "Mūzikas failus"
   </dest>
   <voice>
     *: "raadiit tikai muuzikas failus"
@@ -1895,7 +1895,7 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Sekot Sarakstam"
+    *: "Sekot atskaņošanas sarakstam"
   </dest>
   <voice>
     *: "sekot sarakstam"
@@ -1909,7 +1909,7 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Rādīt Ceļu"
+    *: "Adreses joslā rādīt"
   </dest>
   <voice>
     *: "raadiit celju"
@@ -1923,7 +1923,7 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Tikai Patreizējo Mapi"
+    *: "Tikai atvērto mapi"
   </dest>
   <voice>
     *: "tikai patreizeejo mapi"
@@ -1937,7 +1937,7 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Pilnu Ceļu"
+    *: "Pilnu mērķa atrašanās vietu"
   </dest>
   <voice>
     *: "pilnu celju"
@@ -1955,11 +1955,11 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
-    *: "Veidoju datubāzi... %d atrastas (OFF lai turpinātu)"
-    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Veidoju datubāzi... %d atrastas (LEFT lai turpinātu)"
-    gogearsa9200: "Veidoju datubāzi... %d atrastas (REW lai turpinātu)"
-    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Veidoju datubāzi... %d atrastas (PREV lai turpinātu)"
-    iriverh100,iriverh120,iriverh300: "Veidoju datubāzi... %d atrastas (STOP lai turpinātu)"
+    *: "Veidoju datubāzi... %d atrastas (OFF lai atgrieztos)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Veidoju datubāzi... %d atrastas (LEFT lai atgrieztos)"
+    gogearsa9200: "Veidoju datubāzi... %d atrastas (REW lai atgrieztos)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Veidoju datubāzi... %d atrastas (PREV lai atgrieztos)"
+    iriverh100,iriverh120,iriverh300: "Veidoju datubāzi... %d atrastas (STOP lai atgrieztos)"
   </dest>
   <voice>
     *: "atrasti ieraksti datubaazei"
@@ -1975,7 +1975,7 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "Ielādēt Atmiņā"
+    tc_ramcache: "Ielādēt operatīvajā atmiņā"
   </dest>
   <voice>
     *: none
@@ -1990,7 +1990,7 @@
     *: "Auto Update"
   </source>
   <dest>
-    *: "Atjaunot Automātiski"
+    *: "Automātiski atjaunināt"
   </dest>
   <voice>
     *: "atjaunot automaatiski"
@@ -2004,7 +2004,7 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Inicializēt Tagad"
+    *: "Inicializēt tagad"
   </dest>
   <voice>
     *: "inicializeet tagad"
@@ -2018,7 +2018,7 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Atjaunot Tagad"
+    *: "Atjaunināt tagad"
   </dest>
   <voice>
     *: "atjaunot tagad"
@@ -2032,7 +2032,7 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Krāt Statistiku"
+    *: "Krāt statistiku"
   </dest>
   <voice>
     *: "kraat statistiku"
@@ -2046,7 +2046,7 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Eksportēt Izmaiņas"
+    *: "Eksportēt izmaiņas"
   </dest>
   <voice>
     *: "eksporteet izmainjas"
@@ -2060,7 +2060,7 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Importēt Izmaiņas"
+    *: "Importēt izmaiņas"
   </dest>
   <voice>
     *: "importeet izmainjas"
@@ -2088,7 +2088,7 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Palaiž datubāzi"
+    *: "Datubāze tiek veidota"
   </dest>
   <voice>
     *: "palaizh datubaazi"
@@ -2102,7 +2102,7 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Datubāze vēl darbojas"
+    *: "Datubāze nav gatava"
   </dest>
   <voice>
     *: "datubaaze veel darbojas"
@@ -2130,10 +2130,10 @@
     *: "Display"
   </source>
   <dest>
-    *: "Attēls"
+    *: "Displejs"
   </dest>
   <voice>
-    *: "atteels"
+    *: "displejs"
   </voice>
 </phrase>
 <phrase>
@@ -2158,7 +2158,7 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Atskaņošanas Ekrāns"
+    *: "Atskaņotāja skats"
   </dest>
   <voice>
     *: "atskanjoshanas ekraans"
@@ -2174,7 +2174,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Atskaņošanas Ekrāns"
+    remote: "Papildekrāna atskaņotāja skats"
   </dest>
   <voice>
     *: none
@@ -2189,7 +2189,7 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "Ekrāna Uzstādījumi"
+    *: "Displeja iestatījumi"
   </dest>
   <voice>
     *: "ekraana uzstaadiijumi"
@@ -2203,7 +2203,7 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "Apgaismojums"
+    *: "Apgaismojuma ilgums"
   </dest>
   <voice>
     *: "apgaismojums"
@@ -2219,7 +2219,7 @@
   </source>
   <dest>
     *: none
-    charging: "Apgaismojums (Lādējot)"
+    charging: "Apgaismojums (uzlādes laikā)"
   </dest>
   <voice>
     *: none
@@ -2235,11 +2235,11 @@
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: "Backlight on Lock"
-    hold_button: "Apgaismojums kad Hold"
+    *: "Apgaismojums (kad aizbloķēts)"
+    hold_button: "Apgaismojums (kad aizbloķēts)"
   </dest>
   <voice>
-    *: "Backlight on Lock"
+    *: "apgaismojums ar noblokjeetiem taustinjiem"
     hold_button: "apgaismojums ar noblokjeetiem taustinjiem"
   </voice>
 </phrase>
@@ -2251,7 +2251,7 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Nosaukuma Apgaismojums"
+    *: "Apgaismojums (pārslēdzoties dziesmai)"
   </dest>
   <voice>
     *: "nosaukuma apgaismojums"
@@ -2267,7 +2267,7 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Apgaismojuma iesl.laiks"
+    backlight_fade*: "Apgaismojuma iedegšanās aizture"
   </dest>
   <voice>
     *: none
@@ -2284,7 +2284,7 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Apgaismojuma izsl.laiks"
+    backlight_fade*: "Apgaismojuma izdzišanas aizture"
   </dest>
   <voice>
     *: none
@@ -2299,7 +2299,7 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "Pirmais Spiediens Ieslēdz Tikai Apgaismojumu"
+    *: "Pirmais pogas spiediens aktivizē tikai apgaismojumu"
   </dest>
   <voice>
     *: "pirmais spiediens Iesleedz tikai apgaismojumu"
@@ -2315,7 +2315,7 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Ekrāna Izslēgšanas Laiks"
+    lcd_sleep: "Miega režīms (pēc apgaismojuma izdzišanas)"
   </dest>
   <voice>
     *: none
@@ -2333,7 +2333,7 @@
     *: "Nekad"
   </dest>
   <voice>
-    *: ""Nekad"
+    *: "nekad"
   </voice>
 </phrase>
 <phrase>
@@ -2377,7 +2377,7 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "Ekrāna Režīms"
+    lcd_invert,remote_lcd_invert: "Attēlošanas režīms"
   </dest>
   <voice>
     *: none
@@ -2409,7 +2409,7 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Kājām Gaisā"
+    *: "Apgriezts otrādi"
   </dest>
   <voice>
     *: "kaajaam gaisaa"
@@ -2423,7 +2423,7 @@
     *: "Line Selector Type"
   </source>
   <dest>
-    *: "Līnija"
+    *: "Rindu atlasītāja tips"
   </dest>
   <voice>
     *: "liinija"
@@ -2437,7 +2437,7 @@
     *: "Pointer"
   </source>
   <dest>
-    *: "Kursors"
+    *: "Rādītājs"
   </dest>
   <voice>
     *: "kursors"
@@ -2451,7 +2451,7 @@
     *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Rinda (Apvērsta)"
+    *: "Josla (negatīvā)"
   </dest>
   <voice>
     *: "apveersta rinda"
@@ -2467,7 +2467,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Novākt Fonu"
+    lcd_non-mono: "Notīrīt fonu"
   </dest>
   <voice>
     *: none
@@ -2484,7 +2484,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Fona Krāsa"
+    lcd_color: "Fona krāsa"
   </dest>
   <voice>
     *: none
@@ -2501,7 +2501,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Priekšplāna Krāsa"
+    lcd_color: "Priekšplāna krāsa"
   </dest>
   <voice>
     *: none
@@ -2518,7 +2518,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Noklusētās Krāsas"
+    lcd_color: "Atiestatīt krāsas"
   </dest>
   <voice>
     *: none
@@ -2535,7 +2535,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "SaZaZi"
+    lcd_color: "~RGB"
   </dest>
   <voice>
     *: none
@@ -2552,7 +2552,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "SaZaZi: %02X%02X%02X"
+    lcd_color: "~RGB: %02X%02X%02X	"
   </dest>
   <voice>
     *: none
@@ -2569,7 +2569,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Nederīga Krāsa"
+    lcd_color: "Nederīga krāsa"
   </dest>
   <voice>
     *: none
@@ -2586,7 +2586,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Ekrāna Uzstādījumi"
+    remote: "Papildekrāna iestatījumi"
   </dest>
   <voice>
     *: none
@@ -2603,7 +2603,7 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Samazināt Tikšķi"
+    remote_ticking: "Samazināt tikšķi"
   </dest>
   <voice>
     *: none
@@ -2618,7 +2618,7 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Rādīt Ikonas"
+    *: "Rādīt ikonas"
   </dest>
   <voice>
     *: "raadiit ikonas"
@@ -2632,7 +2632,7 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "Rullēšana"
+    *: "Ritināšana"
   </dest>
   <voice>
     *: "rulleeshana"
@@ -2646,7 +2646,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Rullēšanas Ātruma Piemērs"
+    *: "Ritināšanas ātruma piemērs"
   </dest>
   <voice>
     *: ""
@@ -2660,7 +2660,7 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Rullēšanas Ātrums"
+    *: "Ritināšanas ātrums"
   </dest>
   <voice>
     *: "rulleeshanas aatrums"
@@ -2674,7 +2674,7 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Rullēšanas Aizture"
+    *: "Ritināšanas aizture"
   </dest>
   <voice>
     *: "rulleeshanas aizture"
@@ -2688,7 +2688,7 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Rullēšanas Solis"
+    *: "Ritināšanas solis"
   </dest>
   <voice>
     *: "rulleeshanas solis"
@@ -2702,7 +2702,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Rullēšanas Soļa Piemērs"
+    *: "Ritināšanas soļa piemērs"
   </dest>
   <voice>
     *: ""
@@ -2716,7 +2716,7 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Abpusējas Rullēšanas Limits"
+    *: "Divvirzienu ritināšanas limits"
   </dest>
   <voice>
     *: "abpuseejas rulleeshanas limits"
@@ -2732,7 +2732,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Rullēšanas Opcijas"
+    remote: "Papildekrāna ritināšanas iestatījumi"
   </dest>
   <voice>
     *: none
@@ -2747,7 +2747,7 @@
     *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: "Teksts Izrullējas Ārpus Ekrāna"
+    *: "Ekrānu var izritināt ārpus skata"
   </dest>
   <voice>
     *: "teksts izrulleejas aarpus ekraana"
@@ -2761,7 +2761,7 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Ekrāna Rullēšanas Solis"
+    *: "Ekrāna ritināšanas solis"
   </dest>
   <voice>
     *: "ekraana rulleeshanas solis"
@@ -2775,7 +2775,7 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "Rullēt Lapas"
+    *: "Ritināšana pa lapām"
   </dest>
   <voice>
     *: "rulleet lapas"
@@ -2790,7 +2790,7 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "Saraksta Rullēšanas Aizture"
+    *: "Saraksta paātrinājuma sākuma aizkave"
     wheel_acceleration: none
   </dest>
   <voice>
@@ -2807,7 +2807,7 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "Saraksta Paātrinājums"
+    *: "Saraksta paātrinājums"
     wheel_acceleration: none
   </dest>
   <voice>
@@ -2823,7 +2823,7 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Statusa-/Rulljosla"
+    *: "Statusa un ritināšanas joslas"
   </dest>
   <voice>
     *: "statusa rulljosla"
@@ -2837,7 +2837,7 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Rulljosla"
+    *: "Ritināšanas josla"
   </dest>
   <voice>
     *: "rulljosla"
@@ -2851,7 +2851,7 @@
     *: "Status Bar"
   </source>
   <dest>
-    *: "Statusa Josla"
+    *: "Statusa josla"
   </dest>
   <voice>
     *: "statusa josla"
@@ -2865,7 +2865,7 @@
     *: "Volume Display"
   </source>
   <dest>
-    *: "Skaļuma Attēlošana"
+    *: "Skaļuma attēlošana"
   </dest>
   <voice>
     *: "skaljuma atteeloshana"
@@ -2879,7 +2879,7 @@
     *: "Battery Display"
   </source>
   <dest>
-    *: "Batterijas Attēlošana"
+    *: "Batterijas attēlošana"
   </dest>
   <voice>
     *: "baterijas atteeloshana"
@@ -2907,7 +2907,7 @@
     *: "Numeric"
   </source>
   <dest>
-    *: "Numeriski"
+    *: "Skaitliski"
   </dest>
   <voice>
     *: "numeriski"
@@ -2921,7 +2921,7 @@
     *: "Peak Meter"
   </source>
   <dest>
-    *: "Līmeņa Indikators"
+    *: "Pīķa mērītājs"
   </dest>
   <voice>
     *: "liimenja indikators"
@@ -2935,7 +2935,7 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Kropļojuma Aizture"
+    *: "Kropļojuma noturēšanas ilgums"
   </dest>
   <voice>
     *: "kropljojuma indikaacijas aizture"
@@ -2949,7 +2949,7 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Pīķa Aiztures"
+    *: "Pīķa noturēšanas ilgums"
   </dest>
   <voice>
     *: "piikja indikaacijas aizture"
@@ -2977,7 +2977,7 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "Pīķa Atlaišana"
+    *: "Pīķa atlaišanas ātrums"
   </dest>
   <voice>
     *: "piikja indikaacijas atlaishana"
@@ -3033,7 +3033,7 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "Skalas Sākums"
+    *: "Diapazona minimums"
   </dest>
   <voice>
     *: "skalas saakums"
@@ -3047,7 +3047,7 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "Skalas Beigas"
+    *: "Diapazona maksimums"
   </dest>
   <voice>
     *: "skalas beigas"
@@ -3061,7 +3061,7 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Noklusētais Kodējums"
+    *: "Noklusējuma kodējums"
   </dest>
   <voice>
     *: "nokluseetais kodeejums"
@@ -3260,8 +3260,8 @@
   </source>
   <dest>
     *: none
-    button_light: "Pogu Apgaismojums"
-    sansae200*,sansafuze*: "Ripuļa Apgaismojums"
+    button_light: "Pogu izgaismojuma noildze"
+    sansae200*,sansafuze*: "Ripuļa izgaismojuma noildze"
   </dest>
   <voice>
     *: none
@@ -3279,7 +3279,7 @@
   </source>
   <dest>
     *: none
-    buttonlight_brightness: "Pogu Spilgtums"
+    buttonlight_brightness: "Pogu spilgtums"
   </dest>
   <voice>
     *: none
@@ -3294,7 +3294,7 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Sākuma Logs"
+    *: "Sākuma ekrāns"
   </dest>
   <voice>
     *: "saakuma logs"
@@ -3308,7 +3308,7 @@
     *: "Main Menu"
   </source>
   <dest>
-    *: "Galvenā Izvēlne"
+    *: "Galvenā izvēlne"
   </dest>
   <voice>
     *: "galvenaa izveelne"
@@ -3322,7 +3322,7 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Iepriekšējā Izvēlne"
+    *: "Iepriekšējā sesija"
   </dest>
   <voice>
     *: "ieprieksheejaa izveelne"
@@ -3365,10 +3365,12 @@
     battery_types: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -3380,10 +3382,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3395,10 +3399,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3424,7 +3430,7 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Diska Apstādināšana"
+    *: "Diska apstādināšana"
     flash_storage: none
   </dest>
   <voice>
@@ -3442,7 +3448,7 @@
   </source>
   <dest>
     *: none
-    dircache: "Mapju Buferis"
+    dircache: "Mapju kešatmiņa"
   </dest>
   <voice>
     *: none
@@ -3459,7 +3465,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Laiks & Datums"
+    rtc: "Laiks un datums"
   </dest>
   <voice>
     *: none
@@ -3476,7 +3482,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Uzstādīt Laiku/Datumu"
+    rtc: "Uzstādīt laiku/datumu"
   </dest>
   <voice>
     *: none
@@ -3491,7 +3497,7 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Laika Formāts"
+    *: "Laika formāts"
   </dest>
   <voice>
     *: "laika formaats"
@@ -3505,7 +3511,7 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "12 Stundu Pulkstenis"
+    *: "12 stundu pulkstenis"
   </dest>
   <voice>
     *: "divpadsmit stundu pulkstenis"
@@ -3519,7 +3525,7 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "24 Stundu Pulkstenis"
+    *: "24 stundu pulkstenis"
   </dest>
   <voice>
     *: "divdesmit chetru stundu pulkstenis"
@@ -3551,7 +3557,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3588,7 +3594,7 @@
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3601,7 +3607,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Sv"
+    rtc: "Sv."
   </dest>
   <voice>
     *: none
@@ -3618,7 +3624,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Prm"
+    rtc: "P."
   </dest>
   <voice>
     *: none
@@ -3635,7 +3641,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Otr"
+    rtc: "O."
   </dest>
   <voice>
     *: none
@@ -3652,7 +3658,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Tre"
+    rtc: "T."
   </dest>
   <voice>
     *: none
@@ -3669,7 +3675,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Cet"
+    rtc: "C."
   </dest>
   <voice>
     *: none
@@ -3686,7 +3692,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Pkt"
+    rtc: "Pk."
   </dest>
   <voice>
     *: none
@@ -3703,7 +3709,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Sst"
+    rtc: "S."
   </dest>
   <voice>
     *: none
@@ -3718,7 +3724,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "janvaaris"
@@ -3732,7 +3738,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "februaaris"
@@ -3746,7 +3752,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "marts"
@@ -3760,7 +3766,7 @@
     *: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: "~Apr"
   </dest>
   <voice>
     *: "apriilis"
@@ -3816,7 +3822,7 @@
     *: "Aug"
   </source>
   <dest>
-    *: "Aug"
+    *: "~Aug"
   </dest>
   <voice>
     *: "augusts"
@@ -3830,7 +3836,7 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
     *: "septembris"
@@ -3858,7 +3864,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "novembris"
@@ -3872,7 +3878,7 @@
     *: "Dec"
   </source>
   <dest>
-    *: "Dec"
+    *: "~Dec"
   </dest>
   <voice>
     *: "decembris"
@@ -3886,7 +3892,7 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Automātiskā Izslēgšanās"
+    *: "Automātiska izslēgšanās"
   </dest>
   <voice>
     *: "automaatiskaa izsleegshanaas"
@@ -3900,7 +3906,7 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Miega Taimeris"
+    *: "Miega taimeris"
   </dest>
   <voice>
     *: "miega taimeris"
@@ -3928,7 +3934,7 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Maks. Faili Pārlūkā"
+    *: "Maks. ierakstu skaits failu pārlūkā"
   </dest>
   <voice>
     *: "maksimaalais failu skaits paarluukaa"
@@ -3942,7 +3948,7 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Maks Saraksta Izmērs"
+    *: "Maks. atskaņošanas saraksta izmērs"
   </dest>
   <voice>
     *: "maksimaalais dziesmu saraksta izmeers"
@@ -3958,7 +3964,7 @@
   </source>
   <dest>
     *: none
-    charging: "Automašīnas Režīms"
+    charging: "Automašīnas režīms"
   </dest>
   <voice>
     *: none
@@ -3992,7 +3998,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Modinātāja Darbība"
+    alarm: "Modinātāja ekrāns"
   </dest>
   <voice>
     *: none
@@ -4026,7 +4032,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Pamošanās %d:%02d"
+    alarm: "Pamošanās pēc %d:%02d"
   </dest>
   <voice>
     *: none
@@ -4060,7 +4066,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Modinātājs Izslēgts"
+    alarm: "Modinātājs izslēgts"
   </dest>
   <voice>
     *: none
@@ -4089,7 +4095,7 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Grāmatzīme Apstājoties"
+    *: "Grāmatzīme apstājoties"
   </dest>
   <voice>
     *: "izveidot graamatziimi apstaajoties"
@@ -4103,7 +4109,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Jā - Tikai pēdējo"
+    *: "Jā - tikai pēdējo"
   </dest>
   <voice>
     *: "jaa tikai peedeejo"
@@ -4117,7 +4123,7 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Jautāt - Tikai pēdējo"
+    *: "Jautāt - tikai pēdējo"
   </dest>
   <voice>
     *: "jautaat tikai peedeejo"
@@ -4131,7 +4137,7 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Ielādēt Pēdējo Grāmatzīmi"
+    *: "Ielādēt pēdējo grāmatzīmi"
   </dest>
   <voice>
     *: "ielaadeet peedeejo graamatziimi"
@@ -4145,7 +4151,7 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Uzturēt Grāmatzīmju Sarakstu?"
+    *: "Uzturēt pēdējo grāmatzīmju sarakstu?"
   </dest>
   <voice>
     *: "vai uztureet peedeejo graamatziimju sarakstu"
@@ -4173,7 +4179,7 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Valoda Nomainīta"
+    *: "Valoda nomainīta"
   </dest>
   <voice>
     *: "valoda nomainiita"
@@ -4187,7 +4193,7 @@
     *: "Voice"
   </source>
   <dest>
-    *: "Balss"
+    *: "Balss norādes"
   </dest>
   <voice>
     *: "balss"
@@ -4201,7 +4207,7 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Izrunāt Izvēlnes"
+    *: "Izrunāt izvēlnes"
   </dest>
   <voice>
     *: "izrunaat izveelnes"
@@ -4215,7 +4221,7 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Izrunāt Mapes"
+    *: "Izrunāt mapju nosaukumus"
   </dest>
   <voice>
     *: "izrunaat mapes"
@@ -4229,7 +4235,7 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Izmantot Mapes .talk Klipus"
+    *: "Izmantot mapju .talk klipus"
   </dest>
   <voice>
     *: "izmantot mapes .talk klipus"
@@ -4243,7 +4249,7 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Izrunāt Failu Nosaukumus"
+    *: "Izrunāt failu nosaukumus"
   </dest>
   <voice>
     *: "izrunaat failu nosaukumus"
@@ -4257,7 +4263,7 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Izmantot Failu .talk Klipus"
+    *: "Izmantot failu .talk klipus"
   </dest>
   <voice>
     *: "izmantot failu .talk klipus"
@@ -4271,7 +4277,7 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Numuri"
+    *: "Nolasīt numerāciju"
   </dest>
   <voice>
     *: "numuri"
@@ -4285,7 +4291,7 @@
     *: "Spell"
   </source>
   <dest>
-    *: "Izrunāt"
+    *: "Nolasīt nosaukumu"
   </dest>
   <voice>
     *: "izrunaat"
@@ -4299,7 +4305,7 @@
     *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk Klips"
+    *: ".talk klips"
   </dest>
   <voice>
     *: "talk klips"
@@ -4313,7 +4319,7 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Rediģēt Uzstādījumus"
+    *: "Rediģēt iestatījumus"
   </dest>
   <voice>
     *: "redigjeet uzstaadiijumus"
@@ -4327,7 +4333,7 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Aplūkot .cfg Failus"
+    *: "Aplūkot .cfg failus"
   </dest>
   <voice>
     *: "apluukot konfiguraacijas failus"
@@ -4341,7 +4347,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Uzstādījumi Ielādēti"
+    *: "Iestatījumi ielādēti"
   </dest>
   <voice>
     *: "uzstaadiijumi ielaadeeti"
@@ -4355,7 +4361,7 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Atgriezt Noklusējumu"
+    *: "Atiestatīt iestatījumus"
   </dest>
   <voice>
     *: "atgriezt nokluseetos uzstaadiijumus"
@@ -4369,7 +4375,7 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "Atgriezts Noklusējums"
+    *: "Iestatījumi atiestatīti"
   </dest>
   <voice>
     *: "atgriezti nokluseetie uzstaadiijumi"
@@ -4383,7 +4389,7 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Saglabāt .cfg Failu"
+    *: "Saglabāt .cfg failu"
   </dest>
   <voice>
     *: "saglabaat konfiguraacijas failu"
@@ -4397,7 +4403,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Uzstādījumi Saglabāti"
+    *: "Iestatījumi saglabāti"
   </dest>
   <voice>
     *: "uzstaadiijumi saglabaati"
@@ -4411,7 +4417,7 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Saglabāt Tēmas Uzstādījumus"
+    *: "Saglabāt tēmas iestatījumus"
   </dest>
   <voice>
     *: "saglabaat teemas uzstaadiijumus"
@@ -4425,7 +4431,7 @@
     *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Aplūkot Tēmu Failus"
+    *: "Aplūkot tēmas"
   </dest>
   <voice>
     *: "apluukot teemu failus"
@@ -4441,7 +4447,7 @@
   </source>
   <dest>
     *: none
-    recording: "Ieraksta Uzstādījumi"
+    recording: "Balss ieraksta iestatījumi"
   </dest>
   <voice>
     *: none
@@ -4458,7 +4464,7 @@
   </source>
   <dest>
     *: none
-    radio: "FM Radio Izvēlne"
+    radio: "FM Radio izvēlne"
   </dest>
   <voice>
     *: none
@@ -4475,7 +4481,7 @@
   </source>
   <dest>
     *: none
-    radio: "Nav Staciju"
+    radio: "Nav staciju"
   </dest>
   <voice>
     *: none
@@ -4492,7 +4498,7 @@
   </source>
   <dest>
     *: none
-    radio: "Pievienot Staciju"
+    radio: "Pievienot staciju"
   </dest>
   <voice>
     *: none
@@ -4509,7 +4515,7 @@
   </source>
   <dest>
     *: none
-    radio: "Labot Staciju"
+    radio: "Labot staciju"
   </dest>
   <voice>
     *: none
@@ -4526,7 +4532,7 @@
   </source>
   <dest>
     *: none
-    radio: "Izdzēst Staciju"
+    radio: "Izdzēst staciju"
   </dest>
   <voice>
     *: none
@@ -4543,7 +4549,7 @@
   </source>
   <dest>
     *: none
-    radio: "Staciju Neizdevās Saglabāt"
+    radio: "Staciju neizdevās saglabāt"
   </dest>
   <voice>
     *: none
@@ -4560,7 +4566,7 @@
   </source>
   <dest>
     *: none
-    radio: "Saraksts Ir Pilns"
+    radio: "Saraksts ir pilns"
   </dest>
   <voice>
     *: none
@@ -4594,7 +4600,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ieslēgt Mono"
+    radio: "Mono režīms"
   </dest>
   <voice>
     *: none
@@ -4611,7 +4617,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ekrāns Sastindzis!"
+    radio: "Ekrāns sastindzis!"
   </dest>
   <voice>
     *: none
@@ -4628,7 +4634,7 @@
   </source>
   <dest>
     *: none
-    radio: "Noskanēt Stacijas"
+    radio: "Skenēt stacijas"
   </dest>
   <voice>
     *: none
@@ -4645,7 +4651,7 @@
   </source>
   <dest>
     *: none
-    radio: "Izdzēst Esošās Stacijas?"
+    radio: "Izdzēst esošās stacijas?"
   </dest>
   <voice>
     *: none
@@ -4662,7 +4668,7 @@
   </source>
   <dest>
     *: none
-    radio: "Skanē %d.%02d MHz"
+    radio: "Skenē %d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -4696,7 +4702,7 @@
   </source>
   <dest>
     *: none
-    radio: "Skanēt"
+    radio: "Skenēt"
   </dest>
   <voice>
     *: none
@@ -4713,7 +4719,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ielādēt Stacijas"
+    radio: "Ielādēt staciju sarakstu"
   </dest>
   <voice>
     *: none
@@ -4730,7 +4736,7 @@
   </source>
   <dest>
     *: none
-    radio: "Saglabāt Stacijas"
+    radio: "Saglabāt staciju sarakstu"
   </dest>
   <voice>
     *: none
@@ -4747,7 +4753,7 @@
   </source>
   <dest>
     *: none
-    radio: "Izdzēst Stacijas"
+    radio: "Izdzēst staciju sarakstu"
   </dest>
   <voice>
     *: none
@@ -4764,7 +4770,7 @@
   </source>
   <dest>
     *: none
-    radio: "Staciju Saraksts"
+    radio: "Staciju saraksts"
   </dest>
   <voice>
     *: none
@@ -4781,7 +4787,7 @@
   </source>
   <dest>
     *: none
-    radio: "Nav Uzstādījumu. Skanēt?"
+    radio: "Nav iestatījumu. Skenēt stacijas?"
   </dest>
   <voice>
     *: none
@@ -4897,11 +4903,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -4914,11 +4920,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -4931,11 +4937,11 @@
   </source>
   <dest>
     *: none
-    recording: "WavPack"
+    recording: "~WavPack"
   </dest>
   <voice>
     *: none
-    recording: "WavPack"
+    recording: "~WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -4948,11 +4954,11 @@
   </source>
   <dest>
     *: none
-    recording: "AIFF"
+    recording: "~AIFF"
   </dest>
   <voice>
     *: none
-    recording: "AIFF"
+    recording: "~AIFF"
   </voice>
 </phrase>
 <phrase>
@@ -4965,7 +4971,7 @@
   </source>
   <dest>
     *: none
-    recording: "Kodējuma Uzstādījumi"
+    recording: "Kodētāja iestatījumi"
   </dest>
   <voice>
     *: none
@@ -4982,7 +4988,7 @@
   </source>
   <dest>
     *: none
-    recording: "Bitreits"
+    recording: "Bitu pārraides ātrums"
   </dest>
   <voice>
     *: none
@@ -4999,7 +5005,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Nav Uzstādījumu)"
+    recording: "(Nav iestatījumu)"
   </dest>
   <voice>
     *: none
@@ -5033,7 +5039,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Kā Avots)"
+    recording: "(Kā avots)"
   </dest>
   <voice>
     *: none
@@ -5068,7 +5074,7 @@
   </source>
   <dest>
     *: none
-    iriverh100,iriverh120,iriverh300: "Ievūvētais Mikrofons"
+    iriverh100,iriverh120,iriverh300: "Iebūvētais mikrofons"
     recording: "Mikrofons"
   </dest>
   <voice>
@@ -5087,7 +5093,7 @@
   </source>
   <dest>
     *: none
-    recording: "Digitāls"
+    recording: "Digitālā ieeja"
   </dest>
   <voice>
     *: none
@@ -5121,7 +5127,7 @@
   </source>
   <dest>
     *: none
-    recording: "Failu Sadalīšanas Opcijas"
+    recording: "Failu sadalīšanas opcijas"
   </dest>
   <voice>
     *: none
@@ -5138,7 +5144,7 @@
   </source>
   <dest>
     *: none
-    recording: "Sadalīšanas Kritērijs"
+    recording: "Sadalīšanas kritērijs"
   </dest>
   <voice>
     *: none
@@ -5155,7 +5161,7 @@
   </source>
   <dest>
     *: none
-    recording: "Ko Darīt Pēc Sadalīšanas"
+    recording: "Ko darīt pēc sadalīšanas"
   </dest>
   <voice>
     *: none
@@ -5172,7 +5178,7 @@
   </source>
   <dest>
     *: none
-    recording: "Sākt Jaunu Failu"
+    recording: "Sākt jaunu failu"
   </dest>
   <voice>
     *: none
@@ -5189,7 +5195,7 @@
   </source>
   <dest>
     *: none
-    recording: "Beigt Ierakstu"
+    recording: "Beigt ierakstu"
   </dest>
   <voice>
     *: none
@@ -5206,7 +5212,7 @@
   </source>
   <dest>
     *: none
-    recording: "Sadalīšanas Laiks"
+    recording: "Sadalīšanas laiks"
   </dest>
   <voice>
     *: none
@@ -5223,7 +5229,7 @@
   </source>
   <dest>
     *: none
-    recording: "Sadalīšanas Izmērs"
+    recording: "Sadalīšanas izmērs"
   </dest>
   <voice>
     *: none
@@ -5257,7 +5263,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pārstatīt Ieraksta Mapi"
+    recording: "Notīrīt ierakstu mapi"
   </dest>
   <voice>
     *: none
@@ -5291,7 +5297,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pārlīmeņa Gaisma"
+    recording: "Kropļojumu indikators"
   </dest>
   <voice>
     *: none
@@ -5308,7 +5314,7 @@
   </source>
   <dest>
     *: none
-    remote: "Tikai Uz Ekrāna"
+    remote: "Tikai uz pamatekrāna"
   </dest>
   <voice>
     *: none
@@ -5325,7 +5331,7 @@
   </source>
   <dest>
     *: none
-    remote: "Tikai Uz Pults"
+    remote: "Tikai uz papildekrāna"
   </dest>
   <voice>
     *: none
@@ -5342,7 +5348,7 @@
   </source>
   <dest>
     *: none
-    remote: "Uz Ekrāna Un Pults"
+    remote: "Uz pamatekrāna un papildekrāna"
   </dest>
   <voice>
     *: none
@@ -5410,7 +5416,7 @@
   </source>
   <dest>
     *: none
-    recording: "Jauns Fails"
+    recording: "Jauns fails"
   </dest>
   <voice>
     *: none
@@ -5444,7 +5450,7 @@
   </source>
   <dest>
     *: none
-    recording: "Sākt Virs"
+    recording: "Sākt virs"
   </dest>
   <voice>
     *: none
@@ -5461,7 +5467,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pēc Vismaz"
+    recording: "Pēc vismaz"
   </dest>
   <voice>
     *: none
@@ -5478,7 +5484,7 @@
   </source>
   <dest>
     *: none
-    recording: "Apstāties Zem"
+    recording: "Apstāties zem"
   </dest>
   <voice>
     *: none
@@ -5495,7 +5501,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pirmssadales Sprauga"
+    recording: "Pirmssadales atstarpe"
   </dest>
   <voice>
     *: none
@@ -5529,7 +5535,7 @@
   </source>
   <dest>
     *: none
-    agc: "Drošība (Skaļums)"
+    agc: "Drošība (skaļums)"
   </dest>
   <voice>
     *: none
@@ -5614,7 +5620,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Ekrāns Izslēgts"
+    remote: "Papildekrāns izslēgts"
   </dest>
   <voice>
     *: none
@@ -5646,7 +5652,7 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Izveidot Sarakstu"
+    *: "Izveidot atskaņošanas sarakstu"
   </dest>
   <voice>
     *: "izveidot sarakstu"
@@ -5660,7 +5666,7 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Sarakstu Skatītāja Uzstādījumi"
+    *: "Atskaņošanas saraksta iestatījumi"
   </dest>
   <voice>
     *: "sarakstu skatiitaaja uzstaadiijumi"
@@ -5674,7 +5680,7 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Aplūkot Patreizējo Sarakstu"
+    *: "Skatīt pašreizējo atskaņošanas sarakstu"
   </dest>
   <voice>
     *: "apluukot patreizeejo sarakstu"
@@ -5702,7 +5708,7 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Rādīt Indeksus"
+    *: "Rādīt indeksus"
   </dest>
   <voice>
     *: "raadiit indeksus"
@@ -5716,7 +5722,7 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Parādīt Dziesmu"
+    *: "Parādīt dziesmu"
   </dest>
   <voice>
     *: "paraadiit dziesmu"
@@ -5730,7 +5736,7 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "Tikai Nosaukumu"
+    *: "Tikai nosaukumu"
   </dest>
   <voice>
     *: "tikai nosaukumu"
@@ -5744,7 +5750,7 @@
     *: "Remove"
   </source>
   <dest>
-    *: "Aizvākt"
+    *: "Noņemt"
   </dest>
   <voice>
     *: "aizvaakt"
@@ -5758,7 +5764,7 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Saglabāt Patreizējo Sarakstu"
+    *: "Saglabāt pašreizējo atskaņošanas sarakstu"
   </dest>
   <voice>
     *: "saglabaat patreizeejo sarakstu"
@@ -5800,7 +5806,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Ievietot Mapes Ar Apakšmapēm"
+    *: "Ievietot mapes ar apakšmapēm"
   </dest>
   <voice>
     *: "ievietot mapes ar apakshmapeem"
@@ -5814,7 +5820,7 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "Ar Apakšmapēm?"
+    *: "Ar apakšmapēm?"
   </dest>
   <voice>
     *: "vai ar apakshmapeem"
@@ -5828,7 +5834,7 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Brīdināt Dzēšot Dinamisku sarakstu"
+    *: "Brīdināt dzēšot dinamisku atskaņošanas sarakstu"
   </dest>
   <voice>
     *: "briidinaat dzeeshot dinamisku sarakstu"
@@ -5842,7 +5848,7 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Izdzēst Dinamisku Sarakstu?"
+    *: "Dzēst dinamisko atskaņošanas sarakstu?"
   </dest>
   <voice>
     *: "vai izdzeest dinamisku sarakstu"
@@ -5885,8 +5891,8 @@
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "Baterija: %d%% %ds %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Bat: %d%% %ds %dm"
+    *: "Uzlāde: %d%% %ds %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Uzl: %d%% %ds %dm"
   </dest>
   <voice>
     *: "baterijas liimenis"
@@ -5917,7 +5923,7 @@
     *: "Brīvs:"
   </dest>
   <voice>
-    *: "briivaa vieta:"
+    *: "briivaa vieta"
   </voice>
 </phrase>
 <phrase>
@@ -5930,14 +5936,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Ieķš:"
-    hibylinux: "mSD:"
-    xduoox3: "MSD1:"
+    *: "Iekš:"
+    hibylinux: "~mSD:"
+    xduoox3: "~MSD1:"
   </dest>
   <voice>
     *: "ieksheejais"
-    hibylinux: "micro S D"
-    xduoox3: "mikro es dee 1"
+    hibylinux: "micro es dii"
+    xduoox3: "mikro es dii 1"
   </voice>
 </phrase>
 <phrase>
@@ -5953,18 +5959,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~MSD:"
+    xduoox3: "~MSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
+    hibylinux: "ju es bii"
     multivolume: "haa dee viens"
-    sansac200*,sansae200*,sansafuze*: "mikro es dee"
-    sansaclipplus: "micro S D"
-    xduoox3: "mikro es dee 2"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro es dii"
+    xduoox3: "mikro es dii 2"
   </voice>
 </phrase>
 <phrase>
@@ -5989,7 +5994,7 @@
     *: "Running Time"
   </source>
   <dest>
-    *: "Ieslēgts"
+    *: "Sistēmas darba ilgums"
   </dest>
   <voice>
     *: "iesleegts"
@@ -6003,7 +6008,7 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Ilgākais"
+    *: "Ilgākais laiks"
   </dest>
   <voice>
     *: "ilgaakais"
@@ -6017,7 +6022,7 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "Izdzēst Laiku?"
+    *: "Izdzēst laiku?"
   </dest>
   <voice>
     *: "vai izdzeest laiku"
@@ -6031,7 +6036,7 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Kļūdas (Neaiztiec!)"
+    *: "Kļūdas (neaiztiec!)"
   </dest>
   <voice>
     *: "kljuudas neaiztiec"
@@ -6045,7 +6050,7 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Saraksts"
+    *: "Atskaņošanas saraksts"
   </dest>
   <voice>
     *: "saraksts"
@@ -6073,7 +6078,7 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Rindā Nākamo"
+    *: "Rindā nākamo"
   </dest>
   <voice>
     *: "rindaa naakamo"
@@ -6087,7 +6092,7 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Rindā Pēdējo"
+    *: "Rindā pēdējo"
   </dest>
   <voice>
     *: "rindā peedeejo"
@@ -6101,7 +6106,7 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Rindā Sajaukti"
+    *: "Rindā sajaukti"
   </dest>
   <voice>
     *: "rindaa sajaukti"
@@ -6115,7 +6120,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Ievietotas %d dziesmas (%s)"
+    *: "Pievienotas %d dziesmas (%s)"
   </dest>
   <voice>
     *: "ievietotas dziesmas"
@@ -6143,7 +6148,7 @@
     *: "View"
   </source>
   <dest>
-    *: "Aplūkot"
+    *: "Apskatīt"
   </dest>
   <voice>
     *: "apluukot"
@@ -6157,7 +6162,7 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "Meklēt Sarakstā"
+    *: "Meklēt atskaņošanas sarakstā"
   </dest>
   <voice>
     *: "mekleet sarakstaa"
@@ -6174,7 +6179,7 @@
     *: "Meklē... %d atrastas (%s)"
   </dest>
   <voice>
-    *: "Meklē... %d atrastas (%s)"
+    *: "Meklē dziesmas, atrastas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -6185,7 +6190,7 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Pārkārtot"
+    *: "Atkārtoti sajaukt"
   </dest>
   <voice>
     *: "paarkaartot"
@@ -6199,7 +6204,7 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Pievienot Jaunam Sarakstam"
+    *: "Pievienot jaunam atskaņošanas sarakstam"
   </dest>
   <voice>
     *: "pievienot jaunam sarakstam"
@@ -6227,7 +6232,7 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "Nav Sarakstu"
+    *: "Nav atskaņošanas sarakstu"
   </dest>
   <voice>
     *: "nav sarakstu"
@@ -6255,7 +6260,7 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Izveidot Grāmatzīmi"
+    *: "Izveidot grāmatzīmi"
   </dest>
   <voice>
     *: "izveidot graamatziimi"
@@ -6269,7 +6274,7 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Sakārtot Grāmatzīmes"
+    *: "Parādīt grāmatzīmes"
   </dest>
   <voice>
     *: "sakaartot graamatziimes"
@@ -6297,7 +6302,7 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Uzlikt Vērtējumu"
+    *: "Novērtēt dziesmu"
   </dest>
   <voice>
     *: "uzlikt veerteejumu"
@@ -6311,7 +6316,7 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Aplūkot cue"
+    *: "Aplūkot cuesheet"
   </dest>
   <voice>
     *: "apluukot cue"
@@ -6325,7 +6330,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Dziesmas Info"
+    *: "Informācija par dziesmu"
   </dest>
   <voice>
     *: "paraadiit dziesmas info"
@@ -6342,7 +6347,7 @@
     *: "Nosaukums"
   </dest>
   <voice>
-    *: "Nosaukums"
+    *: "nosaukums"
   </voice>
 </phrase>
 <phrase>
@@ -6356,7 +6361,7 @@
     *: "Izpildītājs"
   </dest>
   <voice>
-    *: "Izpildītājs"
+    *: "izpildītājs"
   </voice>
 </phrase>
 <phrase>
@@ -6367,10 +6372,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Albūms"
+    *: "Albums"
   </dest>
   <voice>
-    *: "Albūms"
+    *: "albums"
   </voice>
 </phrase>
 <phrase>
@@ -6384,7 +6389,7 @@
     *: "Numurs"
   </dest>
   <voice>
-    *: "Numurs"
+    *: "numurs"
   </voice>
 </phrase>
 <phrase>
@@ -6398,7 +6403,7 @@
     *: "Žanrs"
   </dest>
   <voice>
-    *: "Žanrs"
+    *: "žanrs"
   </voice>
 </phrase>
 <phrase>
@@ -6412,7 +6417,7 @@
     *: "Gads"
   </dest>
   <voice>
-    *: "Gads"
+    *: "gads"
   </voice>
 </phrase>
 <phrase>
@@ -6437,7 +6442,7 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Saraksts"
+    *: "Atskaņošanas saraksts"
   </dest>
   <voice>
     *: "Saraksts"
@@ -6451,7 +6456,7 @@
     *: "Bitrate"
   </source>
   <dest>
-    *: "Bitreits"
+    *: "Bitu pārraides ātrums"
   </dest>
   <voice>
     *: "Bitreits"
@@ -6465,10 +6470,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Albūma Izpildītājs"
+    *: "Albuma izpildītājs"
   </dest>
   <voice>
-    *: "Albūma Izpildītājs"
+    *: "Albuma Izpildītājs"
   </voice>
 </phrase>
 <phrase>
@@ -6479,7 +6484,7 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "Diska Numurs"
+    *: "Diska numurs"
   </dest>
   <voice>
     *: "Diska Numurs"
@@ -6507,7 +6512,7 @@
     *: " (VBR)"
   </source>
   <dest>
-    *: " (MBR)"
+    *: "(MBR)"
   </dest>
   <voice>
     *: "MBR"
@@ -6535,7 +6540,7 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Dziesmas Skaļums"
+    *: "Dziesmas skaļums"
   </dest>
   <voice>
     *: "Dziesmas Skaļums"
@@ -6563,7 +6568,7 @@
     *: "[No Info]"
   </source>
   <dest>
-    *: "[Nav Informācijas]"
+    *: "[Nav informācijas]"
   </dest>
   <voice>
     *: "Nav Informācijas"
@@ -6633,7 +6638,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fails/mape jau ir. Pārrakstīt?"
+    *: "Fails/mape jau eksistē. Pārrakstīt?"
   </dest>
   <voice>
     *: "fails vai mape jau ir. vai paarrakstiit"
@@ -6647,7 +6652,7 @@
     *: "Delete"
   </source>
   <dest>
-    *: "Izdzēst"
+    *: "Dzēst"
   </dest>
   <voice>
     *: "izdzeest"
@@ -6661,7 +6666,7 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Izdzēst Mapi"
+    *: "Dzēst mapi"
   </dest>
   <voice>
     *: "izdzeest mapi"
@@ -6703,7 +6708,7 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "Izdzēš..."
+    *: "Dzēš..."
   </dest>
   <voice>
     *: "izdzeesh"
@@ -6747,7 +6752,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Uzlikt Kā Fonu"
+    lcd_non-mono: "Uzlikt kā fonu"
   </dest>
   <voice>
     *: none
@@ -6762,7 +6767,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Atvērt Ar..."
+    *: "Atvērt ar..."
   </dest>
   <voice>
     *: "atveert ar"
@@ -6776,7 +6781,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Izveidot Mapi"
+    *: "Izveidot mapi"
   </dest>
   <voice>
     *: "izveidot mapi"
@@ -6790,7 +6795,7 @@
     *: "Properties"
   </source>
   <dest>
-    *: "Parametri"
+    *: "Rekvizīti"
   </dest>
   <voice>
     *: "parametri"
@@ -6804,7 +6809,7 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Pievienot Saīsnēm"
+    *: "Pievienot saīsnēm"
   </dest>
   <voice>
     *: "pievienot saiisneem"
@@ -6820,7 +6825,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Ātrums"
+    pitchscreen: "Tonis"
   </dest>
   <voice>
     *: none
@@ -6837,7 +6842,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Paaugstināt"
+    pitchscreen: "Paaugstināt toni"
   </dest>
   <voice>
     *: none
@@ -6854,7 +6859,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pazemināt"
+    pitchscreen: "Pazemināt toni"
   </dest>
   <voice>
     *: none
@@ -6871,7 +6876,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pustoni Uz Augšu"
+    pitchscreen: "Paaugstināt par pustoni"
   </dest>
   <voice>
     *: none
@@ -6888,7 +6893,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pustoni Uz Leju"
+    pitchscreen: "Pazemināt par pustoni"
   </dest>
   <voice>
     *: none
@@ -6903,7 +6908,7 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Sarakstu Buferis Pilns"
+    *: "Atskaņošanas saraksta buferis ir pilns"
   </dest>
   <voice>
     *: "sarakstu buferis pilns"
@@ -6917,7 +6922,7 @@
     *: "End of Song List"
   </source>
   <dest>
-    *: "Dziesmu Saraksta Beigas"
+    *: "Dziesmu saraksta beigas"
   </dest>
   <voice>
     *: "saraksta beigas"
@@ -6945,7 +6950,7 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "Nav Ko Atsākt"
+    *: "Nav ko atsākt"
   </dest>
   <voice>
     *: "nav ko atsaakt"
@@ -6959,7 +6964,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Kļūda Atverot Saraksta Failu"
+    *: "Kļūda piekļūstot failam"
   </dest>
   <voice>
     *: "kljuuda atverot saraksta failu"
@@ -6973,7 +6978,7 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Kļūda Atverot Saraksta Kontroles Failu"
+    *: "Kļūda piekļūstot kontroles failam"
   </dest>
   <voice>
     *: "kljuuda atverot saraksta kontroles failu"
@@ -6987,7 +6992,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Kļūda Atverot Mapi"
+    *: "Kļūda piekļūstot mapei"
   </dest>
   <voice>
     *: "kljuuda atverot mapi"
@@ -7001,7 +7006,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Saraksta Kontroles Fails Nederīgs"
+    *: "Kontroles fails ir nederīgs"
   </dest>
   <voice>
     *: "saraksta kontroles fails ir nederiigs"
@@ -7032,7 +7037,7 @@
     *: "Režīms:"
   </dest>
   <voice>
-    *: "Režīms:"
+    *: "Režīms"
   </voice>
 </phrase>
 <phrase>
@@ -7059,11 +7064,11 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Lādēt ar USB"
+    usb_charging_enable: "Lādēt USB savienojuma laikā"
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "laadeet ar uuesbee"
+    usb_charging_enable: "laadeet ar uuesbii"
   </voice>
 </phrase>
 <phrase>
@@ -7074,7 +7079,7 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Pogas Nobloķētas"
+    *: "Pogas ir bloķētas"
   </dest>
   <voice>
     *: ""
@@ -7088,7 +7093,7 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Pogas Atbloķētas"
+    *: "Pogas ir atbloķētas"
   </dest>
   <voice>
     *: ""
@@ -7144,7 +7149,7 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "Fails Izmainīts"
+    *: "Sāknēšanas fails ir mainīts"
   </dest>
   <voice>
     *: "fails izmainiits"
@@ -7198,7 +7203,7 @@
     *: "No files"
   </source>
   <dest>
-    *: "Nav Failu"
+    *: "Nav failu"
   </dest>
   <voice>
     *: "nav failu"
@@ -7212,7 +7217,7 @@
     *: "New Keyboard"
   </source>
   <dest>
-    *: "Jauna Klaviatūra"
+    *: "Jauna klaviatūra"
   </dest>
   <voice>
     *: "jauna klaviatuura"
@@ -7296,7 +7301,7 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Failu Veidu Saraksts Pilns"
+    *: "Failu tipu masīvs ir pilns"
   </dest>
   <voice>
     *: "failu veidu saraksts pilns"
@@ -7310,7 +7315,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Mapes Buferis Ir Pilns!"
+    *: "Mapju buferis ir pilns!"
   </dest>
   <voice>
     *: "mapes buferis ir pilns"
@@ -7324,7 +7329,7 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Nederīgs Faila Nosaukums!"
+    *: "Nederīgs faila nosaukums!"
   </dest>
   <voice>
     *: "nederiigs faila nosaukums"
@@ -7338,7 +7343,7 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Pārstartējiet Lai Ieslēgtu"
+    *: "Pārstartējiet, lai aktivizētu"
   </dest>
   <voice>
     *: "paarstarteejiet lai iesleegtu"
@@ -7354,7 +7359,7 @@
   </source>
   <dest>
     *: none
-    charging: "Baterija: Lādējas"
+    charging: "Uzlāde: notiek uzlāde"
   </dest>
   <voice>
     *: none
@@ -7369,7 +7374,7 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "Baterija Gandrīz Tukša!"
+    *: "BRĪDINĀJUMS! Zems uzlādes līmenis!"
   </dest>
   <voice>
     *: "baterija gandriiz tuksha"
@@ -7383,7 +7388,7 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Baterija Tukša! JĀLĀDĒ!"
+    *: "Akumulators tukšs! Uzlādējiet!"
   </dest>
   <voice>
     *: "baterija tuksha jaalaadee"
@@ -7411,10 +7416,10 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: ","
   </dest>
   <voice>
-    *: "punkts"
+    *: "komats"
   </voice>
 </phrase>
 <phrase>
@@ -7890,7 +7895,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "pluss"
   </voice>
 </phrase>
 <phrase>
@@ -8464,7 +8469,7 @@
     *: ""
   </dest>
   <voice>
-    *: "zed"
+    *: "zee"
   </voice>
 </phrase>
 <phrase>
@@ -8534,7 +8539,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -8635,7 +8640,7 @@
   </dest>
   <voice>
     *: none
-    remote: "pults atskanjoshanas ekraans"
+    remote: "papildekraana atskanjoshanas skats"
   </voice>
 </phrase>
 <phrase>
@@ -8694,7 +8699,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Patreizeejais laiks:"
+    rtc: "Pashreizeejais laiks"
   </voice>
 </phrase>
 <phrase>
@@ -8705,7 +8710,7 @@
     *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: "Izmainit: %s %s"
+    *: "Maina: %s %s"
   </dest>
   <voice>
     *: ""
@@ -8803,7 +8808,7 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Rādīt Paplašinājumus"
+    *: "Rādīt failu tipu paplašinājumus"
   </dest>
   <voice>
     *: "raadiit paplashinaajumus"
@@ -8817,7 +8822,7 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Tikai Nezināmiem"
+    *: "Tikai nezināmiem failiem"
   </dest>
   <voice>
     *: "tikai nezinaamiem"
@@ -8831,7 +8836,7 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Tikai Skatoties Visus Veidus"
+    *: "Tikai skatot visus failus"
   </dest>
   <voice>
     *: "tikai skatoties visus veidus"
@@ -8917,7 +8922,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pārlīmeņa Skaitītājs"
+    recording: "Kropļojumu skaitītājs"
   </dest>
   <voice>
     *: none
@@ -8934,7 +8939,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Primārā Krāsa"
+    lcd_color: "Primārā krāsa"
   </dest>
   <voice>
     *: none
@@ -8951,7 +8956,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Sekundārā Krāsa"
+    lcd_color: "Sekundārā krāsa"
   </dest>
   <voice>
     *: none
@@ -8968,7 +8973,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Teksta Krāsa"
+    lcd_color: "Teksta krāsa"
   </dest>
   <voice>
     *: none
@@ -8985,7 +8990,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Josla (Vienkrāsaina)"
+    lcd_color: "Josla (vienkrāsaina)"
   </dest>
   <voice>
     *: none
@@ -9002,7 +9007,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Josla (Mainīgas Krasas)"
+    lcd_color: "Josla (gradientā)"
   </dest>
   <voice>
     *: none
@@ -9031,7 +9036,7 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "Tēmas Uzstādījumi"
+    *: "Tēmas iestatījumi"
   </dest>
   <voice>
     *: "teemas uzstaadiijumi"
@@ -9064,7 +9069,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Izvēles Joslas Krāsas"
+    lcd_color: "Atlases joslas krāsas"
   </dest>
   <voice>
     *: none
@@ -9138,7 +9143,7 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Izrunāt Baterijas Līmeni"
+    *: "Izrunāt uzlādes līmeni"
   </dest>
   <voice>
     *: "izrunaat baterijas liimeni"
@@ -9152,7 +9157,7 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Izrunāt Faila Veidu"
+    *: "Izrunāt faila tipu"
   </dest>
   <voice>
     *: "izrunaat faila veidu"
@@ -9168,7 +9173,7 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Basu Robežfrekvence"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Basu robežfrekvence"
   </dest>
   <voice>
     *: none
@@ -9185,7 +9190,7 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "AF Robežfrekvence"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "AF robežfrekvence"
   </dest>
   <voice>
     *: none
@@ -9214,7 +9219,7 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Saglabāt Skaņas Uzstādījumus"
+    *: "Saglabāt skaņas iestatījumus"
   </dest>
   <voice>
     *: "saglabaat skanjas uzstaadiijumus"
@@ -9242,7 +9247,7 @@
     *: "Keyclick Repeats"
   </source>
   <dest>
-    *: "Klikšķu Atkārtošana"
+    *: "Klikšķu atkārtošana"
   </dest>
   <voice>
     *: "klikshkju atkaartoshana"
@@ -9258,7 +9263,7 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Aksesuāru Barošana"
+    accessory_supply: "Aksesuāru barošana"
   </dest>
   <voice>
     *: none
@@ -9317,7 +9322,7 @@
   </source>
   <dest>
     *: none
-    recording: "Beigt Ierakstu Un Izslēgties"
+    recording: "Beigt ierakstu un izslēgties"
   </dest>
   <voice>
     *: none
@@ -9334,12 +9339,11 @@
   </source>
   <dest>
     *: none
-    fiiom3k,gigabeatfx,sansafuzeplus: "Skārienvirsmas Jūtība"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Skārienvirsmas jutība"
   </dest>
   <voice>
     *: none
-    fiiom3k,sansafuzeplus: "Touchpad Sensitivity"
-    gigabeatfx: "skaarienvirsmas juutiiba"
+    fiiom3k,gigabeatfx,sansafuzeplus: "skaarienvirsmas jutiiba"
   </voice>
 </phrase>
 <phrase>
@@ -9369,7 +9373,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Seriālais Bitreits"
+    serial_port: "Sērijas pārraides ātrums"
   </dest>
   <voice>
     *: none
@@ -9469,7 +9473,7 @@
     *: "Very slow"
   </source>
   <dest>
-    *: "Ļoti Lēns"
+    *: "Ļoti lēns"
   </dest>
   <voice>
     *: "ljoti leens"
@@ -9497,7 +9501,7 @@
     *: "Very fast"
   </source>
   <dest>
-    *: "Ļoti Ātrs"
+    *: "Ļoti ātrs"
   </dest>
   <voice>
     *: "ljoti aatrs"
@@ -9525,7 +9529,7 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Izlaišanas Garums"
+    *: "Izlaišanas ilgums"
   </dest>
   <voice>
     *: "izlaishanas garums"
@@ -9539,7 +9543,7 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Izlaist Dziesmu"
+    *: "Izlaist dziesmu"
   </dest>
   <voice>
     *: "izlaist dziesmu"
@@ -9569,7 +9573,7 @@
   </source>
   <dest>
     *: none
-    recording: "Kreisais Kanāls"
+    recording: "Kreisais kanāls"
   </dest>
   <voice>
     *: none
@@ -9586,7 +9590,7 @@
   </source>
   <dest>
     *: none
-    recording: "Labais Kanāls"
+    recording: "Labais kanāls"
   </dest>
   <voice>
     *: none
@@ -9671,7 +9675,7 @@
   </source>
   <dest>
     *: none
-    recording: "PĀRSN:"
+    recording: "PĪĶI:"
   </dest>
   <voice>
     *: none
@@ -9688,7 +9692,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pārtraukuma Laiks:"
+    recording: "Pārtraukuma laiks:"
   </dest>
   <voice>
     *: none
@@ -9737,7 +9741,7 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "Meklēšanas Rezultāti"
+    *: "Meklēšanas rezultāti"
   </dest>
   <voice>
     *: "mekleeshanas rezultaati"
@@ -9751,7 +9755,7 @@
     *: "Left"
   </source>
   <dest>
-    *: "Pa Kreisi"
+    *: "Pa kreisi"
   </dest>
   <voice>
     *: "pa kreisi"
@@ -9765,7 +9769,7 @@
     *: "Right"
   </source>
   <dest>
-    *: "Pa Labi"
+    *: "Pa labi"
   </dest>
   <voice>
     *: "pa labi"
@@ -9779,7 +9783,7 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Atjaunot Uzstādījumu"
+    *: "Atiestatīt iestatījumus"
   </dest>
   <voice>
     *: "atjaunot uzstaadiijumu"
@@ -9795,7 +9799,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Uzlikt Kā Kr.Ātro Uzstādījumu"
+    quickscreen: "Iestatīt kā kreiso ātrās piekļuves vienumu"
   </dest>
   <voice>
     *: none
@@ -9812,7 +9816,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Uzlikt Kā L.Ātro Uzstādījumu"
+    quickscreen: "Iestatīt kā labo ātrās piekļuves vienumu"
   </dest>
   <voice>
     *: none
@@ -9829,7 +9833,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Uzlikt Kā Ap.Ātro Uzstādījumu"
+    quickscreen: "Iestatīt kā apakšējo ātrās piekļuves vienumu"
   </dest>
   <voice>
     *: none
@@ -9858,7 +9862,7 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Numuru Interpretācija Kārtojot"
+    *: "Interpretēt numurus kārtošanas laikā"
   </dest>
   <voice>
     *: "numuru interpretaacija kaartojot"
@@ -9886,7 +9890,7 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "Kā numurus"
+    *: "Kā veselus skaitļus"
   </dest>
   <voice>
     *: "kaa numurus"
@@ -9902,7 +9906,7 @@
   </source>
   <dest>
     *: none
-    speaker: "Ieslēgt Skaļruni"
+    speaker: "Ieslēgt skaļruni"
   </dest>
   <voice>
     *: none
@@ -9919,7 +9923,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Skārienjūtīgais Ekrāns"
+    touchscreen: "Skārienekrāna režīms"
   </dest>
   <voice>
     *: none
@@ -9953,7 +9957,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Absolūtais Punkts"
+    touchscreen: "Absolūtais punkts"
   </dest>
   <voice>
     *: none
@@ -9968,7 +9972,7 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Novērst Dziesmu Izlaišanu"
+    *: "Novērst dziesmu izlaišanu"
   </dest>
   <voice>
     *: "noveerst dziesmu izlaishanu"
@@ -9982,7 +9986,7 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Ātruma Maiņa"
+    *: "Laika izstiepšana"
   </dest>
   <voice>
     *: "aatruma mainja"
@@ -10012,7 +10016,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Sk.Ekrāna Uzstādījumi"
+    touchscreen: "Skārienekrāna iestatījumi"
   </dest>
   <voice>
     *: none
@@ -10046,7 +10050,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Izdzēst Kalibrāciju"
+    touchscreen: "Atiestatīt kalibrējumu"
   </dest>
   <voice>
     *: none
@@ -10091,7 +10095,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Statusajosla"
+    remote: "Papildekrāna statusjosla"
   </dest>
   <voice>
     *: none
@@ -10176,11 +10180,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimēdiju"
+    usb_hid: "Multimediju vadība"
   </dest>
   <voice>
     *: none
-    usb_hid: "multimeediju"
+    usb_hid: "multimediju"
   </voice>
 </phrase>
 <phrase>
@@ -10193,7 +10197,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Prezentāciju"
+    usb_hid: "Prezentāciju vadība"
   </dest>
   <voice>
     *: none
@@ -10210,7 +10214,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Pārlūks"
+    usb_hid: "Pārlūka vadība"
   </dest>
   <voice>
     *: none
@@ -10227,7 +10231,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Pele"
+    usb_hid: "Peles vadība"
   </dest>
   <voice>
     *: none
@@ -10242,7 +10246,7 @@
     *: "Scroll Bar Width"
   </source>
   <dest>
-    *: "Rulljoslas Platums"
+    *: "Ritjoslas platums"
   </dest>
   <voice>
     *: "rulljoslas platums"
@@ -10272,7 +10276,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Uzlikt Kā Aug.Ātro Uzstādījumu"
+    quickscreen: "Iestatīt kā augšējo ātrās piekļuves vienumu"
   </dest>
   <voice>
     *: none
@@ -10321,7 +10325,7 @@
     *: "Threshold"
   </source>
   <dest>
-    *: "Slieksnis"
+    *: "Robežvērtība"
   </dest>
   <voice>
     *: "slieksnis"
@@ -10419,7 +10423,7 @@
     *: "Makeup Gain"
   </source>
   <dest>
-    *: "Beigu Pastiprinājums"
+    *: "Kompensējošais pastiprinājums"
   </dest>
   <voice>
     *: "beigu pastiprinaajums"
@@ -10447,7 +10451,7 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Pāreja"
+    *: "Pārejas punkts"
   </dest>
   <voice>
     *: "paareja"
@@ -10461,7 +10465,7 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Asa Pāreja"
+    *: "Asa pāreja"
   </dest>
   <voice>
     *: "asa paareja"
@@ -10475,7 +10479,7 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Izlīdzināta Pāreja"
+    *: "Izlīdzināta pāreja"
   </dest>
   <voice>
     *: "izliidzinaata paareja"
@@ -10489,7 +10493,7 @@
     *: "Release Time"
   </source>
   <dest>
-    *: "Samazināšanas Laiks"
+    *: "Samazināšanas laiks"
   </dest>
   <voice>
     *: "samazinaashanas laiks"
@@ -10503,7 +10507,7 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Pārslēgt Uz Beigām"
+    *: "Pārslēgt uz beigām"
   </dest>
   <voice>
     *: "paarsleegt uz beigaam"
@@ -10537,7 +10541,7 @@
   </dest>
   <voice>
     *: none
-    remote: "pults statusa joslas aada"
+    remote: "papildekraana joslas aada"
   </voice>
 </phrase>
 <phrase>
@@ -10550,7 +10554,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB Ievades Ierīce"
+    usb_hid: "USB ievades ierīce"
   </dest>
   <voice>
     *: none
@@ -10565,7 +10569,7 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Ielikt Sajaukti Rindā"
+    *: "Ielikt rindā sajauktus secībā"
   </dest>
   <voice>
     *: "ielikt sajaukti rindaa"
@@ -10581,7 +10585,7 @@
   </source>
   <dest>
     *: none
-    morse_input: "Izmantot Morzes Ievadi"
+    morse_input: "Izmantot Morzes koda ievadi"
   </dest>
   <voice>
     *: none
@@ -10598,7 +10602,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Tikai Automātiski Pārslēdzoties"
+    crossfade: "Tikai automātiski pārslēdzot dziesmas"
   </dest>
   <voice>
     *: none
@@ -10613,7 +10617,7 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Nākamā Dziesma:"
+    *: "Nākamā dz.:"
   </dest>
   <voice>
     *: "naakamaa dziesma"
@@ -10655,7 +10659,7 @@
     *: "Base Skin"
   </source>
   <dest>
-    *: "Pamatāda"
+    *: "Pamattēma"
   </dest>
   <voice>
     *: "pamataada"
@@ -10669,7 +10673,7 @@
     *: "Remote Base Skin"
   </source>
   <dest>
-    *: "Pults Pamatāda"
+    *: "Papildekrāna pamattēma"
   </dest>
   <voice>
     *: "pults pamataada"
@@ -10685,7 +10689,7 @@
   </source>
   <dest>
     *: none
-    remote: "Ierīces Ekrāns"
+    remote: "Pamatekrāns"
   </dest>
   <voice>
     *: none
@@ -10702,7 +10706,7 @@
   </source>
   <dest>
     *: none
-    remote: "Pults Ekrāns"
+    remote: "Papildekrāns"
   </dest>
   <voice>
     *: none
@@ -10719,7 +10723,7 @@
   </source>
   <dest>
     *: none
-    hotkey: "Karstie Taustiņi"
+    hotkey: "Karstie taustiņi"
   </dest>
   <voice>
     *: none
@@ -10736,7 +10740,7 @@
   </source>
   <dest>
     *: none
-    hotkey: "Atskaņ. Loga Taustiņš"
+    hotkey: "Atskaņotāja taustiņš"
   </dest>
   <voice>
     *: none
@@ -10753,7 +10757,7 @@
   </source>
   <dest>
     *: none
-    hotkey: "Falu Pārlūka Taustiņš"
+    hotkey: "Falu pārlūka taustiņš"
   </dest>
   <voice>
     *: none
@@ -10768,7 +10772,7 @@
     *: "Rewind Before Resume"
   </source>
   <dest>
-    *: "Attīt Pirms Atsākt"
+    *: "Attīt pirms atsākt"
   </dest>
   <voice>
     *: "attiit pirms atsaakt"
@@ -10784,7 +10788,7 @@
   </source>
   <dest>
     *: none
-    radio_remote: "Pults Radio Ekrāns"
+    radio_remote: "Radio papildekrāns"
   </dest>
   <voice>
     *: none
@@ -10852,7 +10856,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Toņa Kontroles"
+    gigabeats,samsungypr1: "Toņa kontroles"
   </dest>
   <voice>
     *: none
@@ -10869,7 +10873,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Papildus Toņa Kontroles Uzstādījumi"
+    gigabeats,samsungypr1: "Papildus toņa kontroles iestatījumi"
   </dest>
   <voice>
     *: none
@@ -10886,7 +10890,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Joslas %d Pastiprinājums"
+    gigabeats,samsungypr1: "Joslas %d pastiprinājums"
   </dest>
   <voice>
     *: none
@@ -10903,7 +10907,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Joslas %d Frekvence"
+    gigabeats,samsungypr1: "Joslas %d frekvence"
   </dest>
   <voice>
     *: none
@@ -10920,7 +10924,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Joslas %d Platums"
+    gigabeats,samsungypr1: "Joslas %d platums"
   </dest>
   <voice>
     *: none
@@ -10971,7 +10975,7 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Paplašinājums"
+    depth_3d: "3-D paplašinājums"
   </dest>
   <voice>
     *: none
@@ -11002,11 +11006,11 @@
   </source>
   <dest>
     *: none
-    radio: "Radio Ekrāns"
+    radio: "Radio skats"
   </dest>
   <voice>
     *: none
-    radio: "eadio ekraans"
+    radio: "radio ekraans"
   </voice>
 </phrase>
 <phrase>
@@ -11045,7 +11049,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "Attēlu Plūsma"
+    *: "Atvērt PictureFlow"
   </dest>
   <voice>
     *: "atveert atteelu pluusmu"
@@ -11095,7 +11099,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Atteikties"
+    touchscreen: "Atcelt"
   </dest>
   <voice>
     *: none
@@ -11110,7 +11114,7 @@
     *: "Update on Stop"
   </source>
   <dest>
-    *: "Atjaunot Apstājoties"
+    *: "Atjaunināt, apturot"
   </dest>
   <voice>
     *: "atjaunot apstaajoties"
@@ -11124,7 +11128,7 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Pārstatīt Failu Pārlūku uz /"
+    *: "Atiestatīt failu pārlūku uz /"
   </dest>
   <voice>
     *: "paarstatiit failu paarluuku uz pamatmapi"
@@ -11140,7 +11144,7 @@
   </source>
   <dest>
     *: none
-    radio: "Signāla Stiprums:"
+    radio: "Signāla stiprums:"
   </dest>
   <voice>
     *: none
@@ -11169,7 +11173,7 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "Atsākt Automātiski"
+    *: "Atsākt automātiski"
   </dest>
   <voice>
     *: "atsaakt automaatiski"
@@ -11183,7 +11187,7 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Atsākt Automātiski Pārslēdzoties"
+    *: "Atsākt pie automātiskas dziesmas maiņas"
   </dest>
   <voice>
     *: "atsaakt automaatiski paarsleedzoties"
@@ -11197,7 +11201,7 @@
     *: "In custom directories only"
   </source>
   <dest>
-    *: "Tikai Norādītās Mapēs"
+    *: "Tikai norādītajās mapēs"
   </dest>
   <voice>
     *: "tikai noraadiitaas mapees"
@@ -11211,7 +11215,7 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Attīt Nopauzējot"
+    *: "Attīt, pauzējot"
   </dest>
   <voice>
     *: "attiit nopauzeejot"
@@ -11225,7 +11229,7 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "°Patreizējais Saraksts"
+    *: "Pašreizējais atskaņošanas saraksts"
   </dest>
   <voice>
     *: "patreizeejais saraksts"
@@ -11241,7 +11245,7 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "Savienojoties Paslēpt Iekšējo Disku"
+    multidrive_usb: "USB slēpt iekšējo disku"
   </dest>
   <voice>
     *: none
@@ -11256,7 +11260,7 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Saglabāt Izmaiņas?"
+    *: "Saglabāt izmaiņas?"
   </dest>
   <voice>
     *: "vai saglabaat izmainjas"
@@ -11270,7 +11274,7 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Pārstatīt Sarakstu Kataloga Mapi"
+    *: "Atiestatīt atskaņošanas saraksta mapi"
   </dest>
   <voice>
     *: "paarstatiit sarakstu kataloga mapi"
@@ -11286,7 +11290,7 @@
   </source>
   <dest>
     *: none
-    histogram: "Vizualizācijas Intervāls"
+    histogram: "Vizualizācijas intervāls"
   </dest>
   <voice>
     *: none
@@ -11301,7 +11305,7 @@
     *: "Glyphs To Cache"
   </source>
   <dest>
-    *: "Zīmes Atmiņā"
+    *: "Simboli kešatmiņā"
   </dest>
   <voice>
     *: "ziimes atminjaa"
@@ -11317,7 +11321,7 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Skaļruņa Klikšķis"
+    hardware_click: "Klikšķis no skaļruņa"
   </dest>
   <voice>
     *: none
@@ -11334,7 +11338,7 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Austiņu Klikšķis"
+    hardware_click: "Klikšķis austiņās"
   </dest>
   <voice>
     *: none
@@ -11351,7 +11355,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Līnijas Izplešana Sarakstos"
+    touchscreen: "Rindu atstarpes sarakstos"
   </dest>
   <voice>
     *: none
@@ -11380,7 +11384,7 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Izslēgt Izslēgšanos"
+    *: "Atcelt miega taimeri"
   </dest>
   <voice>
     *: "izsleegt izsleegshanos"
@@ -11394,7 +11398,7 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Noklusētais Izslēgšanās Laiks"
+    *: "Noklusējuma miega taimera ilgums"
   </dest>
   <voice>
     *: "nokluseetais izsleegshanaas laiks"
@@ -11408,7 +11412,7 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Sākt Izslēgšanas Laiku Ieslēdzot"
+    *: "Sākt miega taimeri ieslēdzot ierīci"
   </dest>
   <voice>
     *: "saakt izsleegshanas laika atskaiti iesleedzot"
@@ -11436,7 +11440,7 @@
     *: "Start Sleep Timer"
   </source>
   <dest>
-    *: "Palaist Izslēgšanās Laiku"
+    *: "Sākt miega taimeri"
   </dest>
   <voice>
     *: "palaist izsleegshanaas laiku"
@@ -11478,7 +11482,7 @@
     *: "Startup/Shutdown"
   </source>
   <dest>
-    *: "Ieslēgšanās/Izslēgšanās"
+    *: "Startēšana un izslēgšana"
   </dest>
   <voice>
     *: "iesleegshanaas izsleegshanaas"
@@ -11492,7 +11496,7 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Pārstartēt Izsl Laiku Nospiežot Pogu"
+    *: "Atiestatīt miega taimeri, kad nospiesta poga"
   </dest>
   <voice>
     *: "paarstarteet izsleegshanaas laiku nospiezhot pogu"
@@ -11508,7 +11512,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Izmantot Saīšņu Izvēlni Ātrā Loga Vietā"
+    quickscreen: "Izmantot saīšņu izvēlni ātrā loga vietā"
   </dest>
   <voice>
     *: none
@@ -11523,9 +11527,5459 @@
     *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Ierobežot Mapju Maiņu"
+    *: "Ierobežot automātisko maiņu"
   </dest>
   <voice>
     *: "ierobezhot mapju mainju"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Atiestatīt ekvalaizeri"
+  </dest>
+  <voice>
+    *: "atiestatiit ekvalaizeri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Individuālais režīms"
+  </dest>
+  <voice>
+    *: "individualais rezims"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Nosaukums un albums no ID3 tagiem"
+  </dest>
+  <voice>
+    *: "nosaukums un albums no ID3 tagiem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Nosaukums no ID3 tagiem"
+  </dest>
+  <voice>
+    *: "nosaukums no ID3 tagiem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Izvēle ir pārāk liela, tiks atlasītas %d nejaušas dziesmas"
+  </dest>
+  <voice>
+    *: "Izvele ir parak liela, tiks atlasitas dazas nejausas dziesmas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Īpaša rakstzīme"
+  </dest>
+  <voice>
+    *: "ipasa rakstzime"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Albuma izpildītāji"
+  </dest>
+  <voice>
+    *: "albuma izpilditaji"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Pievienot pie saīsnēm"
+  </dest>
+  <voice>
+    *: "pievienot pie saisnem"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Balss komandas skaļums"
+  </dest>
+  <voice>
+    *: "balss komandas skalums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Attack Time"
+  </source>
+  <dest>
+    *: "Attack Time"
+  </dest>
+  <voice>
+    *: "Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disks"
+  </dest>
+  <voice>
+    *: "disks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Rindu atdalītājs"
+  </dest>
+  <voice>
+    *: "rindu atdalitajs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Rindu atdalītāja krāsa"
+  </dest>
+  <voice>
+    *: "rindu atdalitaja krasa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Atlasīt vienu vai vairākas mapes"
+  </dest>
+  <voice>
+    *: "Atlasīt vienu vai vairākas mapes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Atlasīt mapes skenēšanai"
+  </dest>
+  <voice>
+    *: "Atlasīt mapes skenēšanai"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "DAC filter roll-off"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "DAC filtra norietes slīpums"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "DAC filtra norietes slīpums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Straujš"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Straujš"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Lēns"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Lēns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Īss un straujš"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Īss un straujš"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Īss un lēns"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Īss un lēns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Īpaši lēns"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Īpaši lēns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Īss"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Īss"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Tiešā izvade"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Tiešā izvade"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Lineāri ātrs"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Lineāri ātrs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Lineāri lēns"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Lineāri lēns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimāli ātrs"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimāli ātrs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimāli lēns"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimāli lēns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizācijas 1. tips"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizācijas pirmais tips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizācijas 2. tips"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizācijas otrais tips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Ātrs hibrīds"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Ātrs hibrīds"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Absolūta griešanas robeža"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Absolūta griešanas robeža"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC enerģijas režīms"
+    es9218: "DAC izejas līmenis"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC enerģijas režīms"
+    es9218: "DAC izejas līmenis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Augsta veiktspēja"
+    es9218: "Augsts pastiprinājums (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Augsta veiktspēja"
+    es9218: "Augsts pastiprinājums divi volti RMS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Enerģijas taupīšana"
+    es9218: "Zems pastiprinājums (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Enerģijas taupīšana"
+    es9218: "Zems pastiprinājums viens volts RMS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maksimālā skaļuma ierobežojums"
+  </dest>
+  <voice>
+    *: "Maksimālā skaļuma ierobežojums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: "Uztveres basa pastiprināšana"
+  </dest>
+  <voice>
+    *: "Uztveres basa pastiprināšana"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: "Dzirdes noguruma mazināšana"
+  </dest>
+  <voice>
+    *: "Dzirdes noguruma mazināšana"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: "Haas Surround"
+  </source>
+  <dest>
+    *: "Haas telpiska skaņa"
+  </dest>
+  <voice>
+    *: "Haas telpiska skaņa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "f(x1)"
+  </source>
+  <dest>
+    *: "~f(x1)"
+  </dest>
+  <voice>
+    *: "fx1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "f(x2)"
+  </source>
+  <dest>
+    *: "~f(x2)"
+  </dest>
+  <voice>
+    *: "fx2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "SIDE ONLY"
+  </source>
+  <dest>
+    *: "Tikai sānu skaņa"
+  </dest>
+  <voice>
+    *: "Tikai sānu skaņa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: "Sausas / mitras skaņas apvienojums"
+  </dest>
+  <voice>
+    *: "Sausas un Mitras skaņas apvienojums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50,ibassodx90: "Frekvences mērogošanas pārvaldnieks"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50,ibassodx90: "Frekvences mērogošanas pārvaldnieks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: "USB Mode"
+  </source>
+  <dest>
+    *: "USB režīms"
+  </dest>
+  <voice>
+    *: "USB režīms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: "Mass Storage"
+  </source>
+  <dest>
+    *: "Piekļuve krātuvei"
+  </dest>
+  <voice>
+    *: "Piekļuve krātuvei"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: "Charge Only"
+  </source>
+  <dest>
+    *: "Tikai uzlāde"
+  </dest>
+  <voice>
+    *: "Tikai uzlāde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: "Android atkļūdošanas tilts (ADB)"
+  </dest>
+  <voice>
+    *: "Android atkļūdošanas tilts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Iespējots"
+  </dest>
+  <voice>
+    *: "Iespējots"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Play"
+  </source>
+  <dest>
+    *: "Exempt Play"
+  </dest>
+  <voice>
+    *: "Exempt Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Seek"
+  </source>
+  <dest>
+    *: "Exempt Seek"
+  </dest>
+  <voice>
+    *: "Exempt Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Skip"
+  </source>
+  <dest>
+    *: "Exempt Skip"
+  </dest>
+  <voice>
+    *: "Exempt Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Backlight Exemptions"
+  </dest>
+  <voice>
+    *: "Backlight Exemptions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Disable on External Power"
+  </dest>
+  <voice>
+    *: "Disable on External Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Disable Unmapped Keys"
+  </dest>
+  <voice>
+    *: "Disable Unmapped Keys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Advanced Key Lock"
+  </dest>
+  <voice>
+    *: "Advanced Key Lock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Autolock On"
+  </dest>
+  <voice>
+    *: "Autolock On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Autolock Off"
+  </dest>
+  <voice>
+    *: "Autolock Off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Locked Reminders"
+  </source>
+  <dest>
+    *: "Disable Locked Reminders"
+  </dest>
+  <voice>
+    *: "Disable Locked Reminders"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Disable Touch"
+  </dest>
+  <voice>
+    *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "~KiB"
+  </dest>
+  <voice>
+    *: "kibibits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "~MiB"
+  </dest>
+  <voice>
+    *: "mebibits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "~GiB"
+  </dest>
+  <voice>
+    *: "gibibits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "One per playlist"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "One per track"
+  </dest>
+  <voice>
+    *: "One per track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Track to move"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed:"
+  </source>
+  <dest>
+    *: "Playlist elapsed:"
+  </dest>
+  <voice>
+    *: "Playlist elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed:"
+  </source>
+  <dest>
+    *: "Track elapsed:"
+  </dest>
+  <voice>
+    *: "Track elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining:"
+  </source>
+  <dest>
+    *: "Track remaining:"
+  </dest>
+  <voice>
+    *: "Track remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track:"
+  </source>
+  <dest>
+    *: "Dziesma:"
+  </dest>
+  <voice>
+    *: "Dziesma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage (Done / Remaining):"
+  </source>
+  <dest>
+    *: "Storage (Done / Remaining):"
+  </dest>
+  <voice>
+    *: "Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Done"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size:"
+  </source>
+  <dest>
+    *: "Vidējais dziesmas izmērs:"
+  </dest>
+  <voice>
+    *: "Vidējais dziesmas izmērs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate:"
+  </source>
+  <dest>
+    *: "Average bitrate:"
+  </dest>
+  <voice>
+    *: "Average bit rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Kļūda iegūstot informāciju"
+  </dest>
+  <voice>
+    *: "Kļūda iegūstot informāciju"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Atskaņošanas laiks"
+  </dest>
+  <voice>
+    *: "Atskaņošanas laiks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Delay Before Resume"
+  </dest>
+  <voice>
+    *: none
+    charging: "Delay Before Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Absolute mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Time stretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Remote Control"
+  </dest>
+  <voice>
+    *: "Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "No Rem. Control"
+  </dest>
+  <voice>
+    *: "No Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Out of Control"
+  </dest>
+  <voice>
+    *: "Out of Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Key Control"
+  </dest>
+  <voice>
+    *: "2 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Key Control"
+  </dest>
+  <voice>
+    *: "4 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Play Wormlet!"
+  </source>
+  <dest>
+    *: "Play Wormlet!"
+  </dest>
+  <voice>
+    *: "Play Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Number of Worms"
+  </source>
+  <dest>
+    *: "Number of Worms"
+  </dest>
+  <voice>
+    *: "Number of Worms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: "Worm Growth Per Food"
+  </dest>
+  <voice>
+    *: "Worm Growth Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Speed"
+  </source>
+  <dest>
+    *: "Worm Speed"
+  </dest>
+  <voice>
+    *: "Worm Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Arghs Per Food"
+  </source>
+  <dest>
+    *: "Arghs Per Food"
+  </dest>
+  <voice>
+    *: "Arghs Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Argh Size"
+  </source>
+  <dest>
+    *: "Argh Size"
+  </dest>
+  <voice>
+    *: "Argh Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Food Size"
+  </source>
+  <dest>
+    *: "Food Size"
+  </dest>
+  <voice>
+    *: "Food Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Number of Players"
+  </dest>
+  <voice>
+    *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Control Style"
+  </dest>
+  <voice>
+    *: "Control Style"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Revert to Default Settings"
+  </dest>
+  <voice>
+    *: "Revert to Default Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Iziet"
+  </dest>
+  <voice>
+    *: "Iziet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Parādīt opcijas"
+  </dest>
+  <voice>
+    *: "Parādīt opcijas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Iepriekšējā dziesma"
+  </dest>
+  <voice>
+    *: "Iepriekšējā dziesma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pauzēt / Atskaņot"
+  </dest>
+  <voice>
+    *: "Pauzēt vai atskaņot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Apturēt atskaņošanu"
+  </dest>
+  <voice>
+    *: "Apturēt atskaņošanu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Nākamā dziesma"
+  </dest>
+  <voice>
+    *: "Nākamā dziesma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Mainīt skaļumu"
+  </dest>
+  <voice>
+    *: "Mainīt skaļumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Secības jaukšana"
+  </dest>
+  <voice>
+    *: "Secības jaukšana"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Mainīt atkārtošanas režīmu"
+  </dest>
+  <voice>
+    *: "Mainīt atkārtošanas režīmu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Atskaņotāja vadība"
+  </dest>
+  <voice>
+    *: "Atskaņotāja vadība"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Checkmate!"
+  </source>
+  <dest>
+    *: "Checkmate!"
+  </dest>
+  <voice>
+    *: "Checkmate!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Illegal move!"
+  </source>
+  <dest>
+    *: "Illegal move!"
+  </dest>
+  <voice>
+    *: "Illegal move!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "New Game"
+  </source>
+  <dest>
+    *: "Jauna spēle"
+  </dest>
+  <voice>
+    *: "Jauna spēle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Resume Game"
+  </source>
+  <dest>
+    *: "Turpināt spēli"
+  </dest>
+  <voice>
+    *: "Turpināt spēli"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Save Game"
+  </source>
+  <dest>
+    *: "Saglabāt spēli"
+  </dest>
+  <voice>
+    *: "Saglabāt spēli"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restore Game"
+  </source>
+  <dest>
+    *: "Restore Game"
+  </dest>
+  <voice>
+    *: "Restore Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restart Game"
+  </source>
+  <dest>
+    *: "Restartēt spēli"
+  </dest>
+  <voice>
+    *: "Restartēt spēli"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Select Other Game"
+  </source>
+  <dest>
+    *: "Select Other Game"
+  </dest>
+  <voice>
+    *: "Select Other Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: "Level 1: 60 moves / 5 min"
+  </dest>
+  <voice>
+    *: "Level 1, 60 moves per 5 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: "Level 2: 60 moves / 15 min"
+  </dest>
+  <voice>
+    *: "Level 2, 60 moves per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 3: 60 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 3, 60 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 4: 40 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 4, 40 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: "Level 5: 40 moves / 60 min"
+  </dest>
+  <voice>
+    *: "Level 5, 40 moves per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: "Level 6: 40 moves / 120 min"
+  </dest>
+  <voice>
+    *: "Level 6, 40 moves per 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: "Level 7: 40 moves / 240 min"
+  </dest>
+  <voice>
+    *: "Level 7, 40 moves per 240 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "Error parsing game !"
+  </source>
+  <dest>
+    *: "Error parsing game !"
+  </dest>
+  <voice>
+    *: "Error parsing game !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "No games found !"
+  </source>
+  <dest>
+    *: "No games found !"
+  </dest>
+  <voice>
+    *: "No games found!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the beginning of the game"
+  </source>
+  <dest>
+    *: "At the beginning of the game"
+  </dest>
+  <voice>
+    *: "At the beginning of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the end of the game"
+  </source>
+  <dest>
+    *: "At the end of the game"
+  </dest>
+  <voice>
+    *: "At the end of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Player"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "GNU Chess"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Marked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Unmarked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "White"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Black"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Check!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "captures"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "castle"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "king side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "queen side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Pawn"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Knight"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bishop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Rook"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "King"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Spēles"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Saving position"
+  </source>
+  <dest>
+    *: "Saving position"
+  </dest>
+  <voice>
+    *: "Saving position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Loading position"
+  </source>
+  <dest>
+    *: "Loading position"
+  </dest>
+  <voice>
+    *: "Loading position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Thinking..."
+  </source>
+  <dest>
+    *: "Thinking..."
+  </dest>
+  <voice>
+    *: "Thinking"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Battery bench is already running"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Press play to run battery bench or stop to cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: "Cannot restart playback"
+  </source>
+  <dest>
+    *: "Cannot restart playback"
+  </dest>
+  <voice>
+    *: "Cannot restart playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Ordered"
+  </source>
+  <dest>
+    *: "Ordered"
+  </dest>
+  <voice>
+    *: "Ordered"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Diffusion"
+  </source>
+  <dest>
+    *: "Diffusion"
+  </dest>
+  <voice>
+    *: "Diffusion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Grayscale"
+  </source>
+  <dest>
+    *: "Grayscale"
+  </dest>
+  <voice>
+    *: "Grayscale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: "Toggle Slideshow Mode"
+  </dest>
+  <voice>
+    *: "Toggle Slide show Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Slideshow Time"
+  </source>
+  <dest>
+    *: "Slideshow Time"
+  </dest>
+  <voice>
+    *: "Slide show Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Return"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "View Played Games"
+  </source>
+  <dest>
+    *: "View Played Games"
+  </dest>
+  <voice>
+    *: "View Played Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Audio Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Audio Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play Mode"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play Mode"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Single"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Single"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use sound setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use sound setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play from beginning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play from beginning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Set resume time (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Set resume time"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: "Display FPS"
+  </source>
+  <dest>
+    *: "Display FPS"
+  </dest>
+  <voice>
+    *: "Display FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Limit FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Skip frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Skip frames"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Backlight brightness"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Backlight brightness"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use common setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use common setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Tone controls"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Tone controls"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu if not completed"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu if not completed"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume automatically"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume automatically"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Clear all resumes"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Clear all resumes"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Unavailable"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Unavailable"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Toggle Item"
+  </dest>
+  <voice>
+    *: "Toggle Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Ielādēt noklusējuma iestatījumus"
+  </dest>
+  <voice>
+    *: "Ielādēt noklusējuma iestatījumus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Saglabāt un iziet"
+  </dest>
+  <voice>
+    *: "Saglabāt un iziet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Rockbox galvenās izvēlnes secība"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Ceļš]"
+  </dest>
+  <voice>
+    *: "Ceļš"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Nosaukums]"
+  </dest>
+  <voice>
+    *: "Nosaukums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Lielums]"
+  </dest>
+  <voice>
+    *: "Lielums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Datums]"
+  </dest>
+  <voice>
+    *: "Datums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Laiks]"
+  </dest>
+  <voice>
+    *: "Laiks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Apakšdirektorijas]"
+  </dest>
+  <voice>
+    *: "Apakšdirektorijas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Faili]"
+  </dest>
+  <voice>
+    *: "Faili"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Mapes rekvizīti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "Mapes rekvizīti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Neizdevās iegūt informāciju"
+  </dest>
+  <voice>
+    *: "Neizdevās iegūt informāciju"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Apmainīt kanālus"
+  </dest>
+  <voice>
+    *: "Apmainīt kanālus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Panning Separation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Panning Separation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Reverberācija"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Reverberācija"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Interpolācija"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Interpolācija"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Telpiska skaņa"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Telpiska skaņa"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "HQ Mixer"
+    lowmem: none
+  </source>
+  <dest>
+    *: "HQ Mixer"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "High Quality Mixer"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Sample Rate"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Sample Rate"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Sample Rate"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: "CPU Boost"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "CPU Boost"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Spacing"
+  </source>
+  <dest>
+    *: "Spacing"
+  </dest>
+  <voice>
+    *: "Spacing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Centre margin"
+  </source>
+  <dest>
+    *: "Centre margin"
+  </dest>
+  <voice>
+    *: "Centre margin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Number of slides"
+  </source>
+  <dest>
+    *: "Number of slides"
+  </dest>
+  <voice>
+    *: "Number of slides"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Zoom"
+  </source>
+  <dest>
+    *: "Zoom"
+  </dest>
+  <voice>
+    *: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Show album title"
+  </source>
+  <dest>
+    *: "Show album title"
+  </dest>
+  <voice>
+    *: "Show album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Resize Covers"
+  </source>
+  <dest>
+    *: "Resize Covers"
+  </dest>
+  <voice>
+    *: "Resize Covers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Rebuild cache"
+  </source>
+  <dest>
+    *: "Rebuild cache"
+  </dest>
+  <voice>
+    *: "Rebuild cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "WPS Integration"
+  </source>
+  <dest>
+    *: "WPS Integration"
+  </dest>
+  <voice>
+    *: "WPS Integration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: "Go to WPS"
+  </source>
+  <dest>
+    *: "Go to WPS"
+  </dest>
+  <voice>
+    *: "Go to WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide album title"
+  </source>
+  <dest>
+    *: "Hide album title"
+  </dest>
+  <voice>
+    *: "Hide album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the bottom"
+  </source>
+  <dest>
+    *: "Show at the bottom"
+  </dest>
+  <voice>
+    *: "Show at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the top"
+  </source>
+  <dest>
+    *: "Show at the top"
+  </dest>
+  <voice>
+    *: "Show at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings, also a volume adjustment mode
+  user: core
+  <source>
+    *: "Direct"
+  </source>
+  <dest>
+    *: "Direct"
+  </dest>
+  <voice>
+    *: "Direct"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Via Track list"
+  </source>
+  <dest>
+    *: "Via Track list"
+  </dest>
+  <voice>
+    *: "Via Track list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Always On"
+  </source>
+  <dest>
+    *: "Always On"
+  </dest>
+  <voice>
+    *: "Always On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "No album art found"
+  </source>
+  <dest>
+    *: "No album art found"
+  </dest>
+  <voice>
+    *: "No album art found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Error writing config"
+  </source>
+  <dest>
+    *: "Error writing config"
+  </dest>
+  <voice>
+    *: "Error writing config"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Not a VBR file"
+  </dest>
+  <voice>
+    *: "Not a VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "File error: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Update cache"
+  </dest>
+  <voice>
+    *: "Update cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide information"
+  </source>
+  <dest>
+    *: "Hide information"
+  </dest>
+  <voice>
+    *: "Hide information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the bottom"
+  </source>
+  <dest>
+    *: "Show album at the bottom"
+  </dest>
+  <voice>
+    *: "Show album at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the top"
+  </source>
+  <dest>
+    *: "Show album at the top"
+  </dest>
+  <voice>
+    *: "Show album at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: "Show album and artist at the top"
+  </dest>
+  <voice>
+    *: "Show album and artist at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: "Show album and artist at the bottom"
+  </dest>
+  <voice>
+    *: "Show album and artist at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </dest>
+  <voice>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Datums"
+  </dest>
+  <voice>
+    *: "Datums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Notīrīt visu"
+  </dest>
+  <voice>
+    *: "Notīrīt visu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Atcelt"
+  </dest>
+  <voice>
+    *: "Atcelt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Saglabāt"
+  </dest>
+  <voice>
+    *: "Saglabāt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Timeout"
+  </dest>
+  <voice>
+    *: "Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: "Track"
+  </source>
+  <dest>
+    *: "Dziesma"
+  </dest>
+  <voice>
+    *: "Dziesma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: "Elapsed"
+  </source>
+  <dest>
+    *: "Pagājis"
+  </dest>
+  <voice>
+    *: "Pagājis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announcement format"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announcement format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Atlicis"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Atlicis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Grouping"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Grouping"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announce on"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announce on"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Track change"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Track change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hold for settings"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hold for settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Atvērt spraudni"
+  </dest>
+  <voice>
+    *: "Atvērt spraudni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Not a plugin: %s"
+  </dest>
+  <voice>
+    *: "Not a plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Set Wps Context Plugin"
+  </dest>
+  <voice>
+    *: "Set WPS Context Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parameter"
+  </dest>
+  <voice>
+    *: "Parameter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Name"
+  </dest>
+  <voice>
+    *: "Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Pievienot"
+  </dest>
+  <voice>
+    *: "Pievienot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Atpakaļ"
+  </dest>
+  <voice>
+    *: "Atpakaļ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Labot"
+  </dest>
+  <voice>
+    *: "Labot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Run"
+  </dest>
+  <voice>
+    *: "Run"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Eksportēt"
+  </dest>
+  <voice>
+    *: "Eksportēt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Browse"
+  </dest>
+  <voice>
+    *: "Browse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Enter USB mass storage mode?"
+  </dest>
+  <voice>
+    *: "Enter USB mass storage mode?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Show Queue Options"
+  </dest>
+  <voice>
+    *: "Show Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Show Shuffled Adding Options"
+  </dest>
+  <voice>
+    *: "Show Shuffled Adding Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "In Submenu"
+  </dest>
+  <voice>
+    *: "In Submenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disable All Lock Notifications"
+  </dest>
+  <voice>
+    *: "Disable All Lock Notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Exempt Volume"
+  </dest>
+  <voice>
+    *: "Exempt Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Always Autolock"
+  </dest>
+  <voice>
+    *: "Always Autolock"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Rādīt izslēgšanas paziņojumu"
+  </dest>
+  <voice>
+    *: "Rādīt izslēgšanas paziņojumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "List Order"
+  </dest>
+  <voice>
+    *: "List Order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Augošā secībā"
+  </dest>
+  <voice>
+    *: "Augošā secībā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Dilstošā secībā"
+  </dest>
+  <voice>
+    *: "Dilstošā secībā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Albuma vāks"
+  </dest>
+  <voice>
+    *: "Albuma vāks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Dot priekšroku iegultajam"
+  </dest>
+  <voice>
+    *: "Dot priekšroku iegultajam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Dot priekšroku attēla failam"
+  </dest>
+  <voice>
+    *: "Dot priekšroku attēla failam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Sync RDS Time"
+  </dest>
+  <voice>
+    *: none
+    rds: "Sync RDS Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Kārtot albumus pēc"
+  </dest>
+  <voice>
+    *: "Kārtot albumus pēc"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Izpildītāja + Nosaukuma"
+  </dest>
+  <voice>
+    *: "Izpildītāja un nosaukuma"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Izpildītāja + Gada"
+  </dest>
+  <voice>
+    *: "Izpildītāja un gada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Year sort order"
+  </dest>
+  <voice>
+    *: "Year sort order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Rādīt gadu albuma nosaukumā"
+  </dest>
+  <voice>
+    *: "Rādīt gadu albuma nosaukumā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Cache needs to finish updating first!"
+  </dest>
+  <voice>
+    *: "Cache needs to finish updating first!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Dziesmas informācija"
+  </dest>
+  <voice>
+    *: "Dziesmas informācija"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Atskaņot"
+  </dest>
+  <voice>
+    *: "Atskaņot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Atskaņot jauktā secībā"
+  </dest>
+  <voice>
+    *: "Atskaņot jauktā secībā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Keep Current Track When Replacing Playlist"
+  </dest>
+  <voice>
+    *: "Keep Current Track When Replacing Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Notīrīt iestatījumus, kad startēšanas laikā tiek turēta restartēšanas poga"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Notīrīt iestatījumus, kad startēšanas laikā ir ieslēgta taustiņu bloķēšana"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Notīrīt iestatījumus, kad startēšanas laikā tiek turēta restartēšanas poga"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Notīrīt iestatījumus, kad startēšanas laikā ir ieslēgta taustiņu bloķēšana"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Rewind Across Tracks"
+  </dest>
+  <voice>
+    *: "Rewind across tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Set As..."
+  </dest>
+  <voice>
+    *: "Set As"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Atskaņošanas saraksta mape"
+  </dest>
+  <voice>
+    *: "Atskaņošanas saraksta mape"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Start Directory"
+  </dest>
+  <voice>
+    *: "Start Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Pievienot atskaņošanas sarakstam..."
+  </dest>
+  <voice>
+    *: "Pievienot atskaņošanas sarakstam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Pievienot esošam atskaņošanas sarakstam"
+  </dest>
+  <voice>
+    *: "Pievienot esošam atskaņošanas sarakstam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Playing Next..."
+  </dest>
+  <voice>
+    *: "Playing Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Atskaņot nākamo"
+  </dest>
+  <voice>
+    *: "Atskaņot nākamo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Add Shuffled"
+  </dest>
+  <voice>
+    *: "Add Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Play Last"
+  </dest>
+  <voice>
+    *: "Play Last"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Play Last Shuffled"
+  </dest>
+  <voice>
+    *: "Play Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Perceptual"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Perceptual"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Show Tracks While Browsing"
+  </dest>
+  <voice>
+    *: "Show Tracks While Browsing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Go to Last Album"
+  </dest>
+  <voice>
+    *: "Go to Last Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Datubāzes mape"
+  </dest>
+  <voice>
+    *: "Datubāzes mape"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Remove Queued Tracks?"
+  </dest>
+  <voice>
+    *: "Remove Queued Tracks?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Quick (Ignore Directory Cache)"
+  </dest>
+  <voice>
+    *: "Quick (Ignore Directory Cache)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "What's Playing Screen"
+  </dest>
+  <voice>
+    *: "What's Playing Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Default Browser"
+  </dest>
+  <voice>
+    *: "Default Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze Main Menu"
+  </dest>
+  <voice>
+    *: "Amaze Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Set Maze Size"
+  </dest>
+  <voice>
+    *: "Set Maze Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "View Map"
+  </dest>
+  <voice>
+    *: "View Map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Show Compass"
+  </dest>
+  <voice>
+    *: "Show Compass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Show Map"
+  </dest>
+  <voice>
+    *: "Show Map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Remember Path"
+  </dest>
+  <voice>
+    *: "Remember Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Use Large Tiles"
+  </dest>
+  <voice>
+    *: "Use Large Tiles"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Show Solution"
+  </dest>
+  <voice>
+    *: "Show Solution"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Iziet nesaglabājot"
+  </dest>
+  <voice>
+    *: "Iziet nesaglabājot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generating maze..."
+  </dest>
+  <voice>
+    *: "Generating maze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "You win!"
+  </dest>
+  <voice>
+    *: "You win!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "You cheated!"
+  </dest>
+  <voice>
+    *: "You cheated!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Easy"
+  </dest>
+  <voice>
+    *: "Easy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Hard"
+  </dest>
+  <voice>
+    *: "Hard"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Expert"
+  </dest>
+  <voice>
+    *: "Expert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Legal Notices"
+  </dest>
+  <voice>
+    *: "Legal Notices"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Error: %s"
+  </dest>
+  <voice>
+    *: "Error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Mikmod Settings"
+  </dest>
+  <voice>
+    *: "Mik mod Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Mikmod Menu"
+  </dest>
+  <voice>
+    *: "Mik mod Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Chessbox Menu"
+  </dest>
+  <voice>
+    *: "Chess box Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Invalid Voice File"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_LANG_NAME
+  desc: Spoken name of the language
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Choose File"
+  </dest>
+  <voice>
+    *: "Choose File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Disable main menu scrolling"
+  </dest>
+  <voice>
+    *: "Disable main menu scrolling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Remaining"
+  </dest>
+  <voice>
+    *: "Remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "First Letter"
+  </dest>
+  <voice>
+    *: "First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "By First Letter..."
+  </dest>
+  <voice>
+    *: "By First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Album Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Album Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albums by First Letter"
+  </dest>
+  <voice>
+    *: "Albums by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Tracks by First Letter"
+  </dest>
+  <voice>
+    *: "Tracks by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Izpildītāji"
+  </dest>
+  <voice>
+    *: "Izpildītāji"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albumi"
+  </dest>
+  <voice>
+    *: "Izpildītāji"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Dziesmas"
+  </dest>
+  <voice>
+    *: "Dziesmas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Shuffle Songs"
+  </dest>
+  <voice>
+    *: "Shuffle Songs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Nosaukums"
+  </dest>
+  <voice>
+    *: "Nosaukums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Title (with track duration)"
+  </dest>
+  <voice>
+    *: "Title with track duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Vērtējums"
+  </dest>
+  <voice>
+    *: "Vērtējums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Meklēt"
+  </dest>
+  <voice>
+    *: "Meklēt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Meklēt pēc..."
+  </dest>
+  <voice>
+    *: "Meklēt pēc"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Recently Added"
+  </dest>
+  <voice>
+    *: "Recently Added"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Atskaņošanas vēsture"
+  </dest>
+  <voice>
+    *: "Atskaņošanas vēsture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Custom menu"
+  </dest>
+  <voice>
+    *: "Custom menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Same as currently played track"
+  </dest>
+  <voice>
+    *: "Same as currently played track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Directory"
+  </dest>
+  <voice>
+    *: "Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albums by Year"
+  </dest>
+  <voice>
+    *: "Albums by Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albums between Years"
+  </dest>
+  <voice>
+    *: "Albums between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Artists between Years"
+  </dest>
+  <voice>
+    *: "Artists between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Most played (Plays|Score)"
+  </dest>
+  <voice>
+    *: "Most played by Plays then by Score"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Recently played tracks"
+  </dest>
+  <voice>
+    *: "Recently played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Never played tracks"
+  </dest>
+  <voice>
+    *: "Never played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Favourite artists"
+  </dest>
+  <voice>
+    *: "Favourite artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Favourite albums"
+  </dest>
+  <voice>
+    *: "Favourite albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Recent favourites"
+  </dest>
+  <voice>
+    *: "Recent favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "New favourites"
+  </dest>
+  <voice>
+    *: "New favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Forgotten favourites"
+  </dest>
+  <voice>
+    *: "Forgotten favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Tracks by"
+  </dest>
+  <voice>
+    *: "Tracks by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "View Album Art"
+  </dest>
+  <voice>
+    *: "View Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Output Select"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Output Select"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Headphone"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Headphone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Unable to load font: (%s)"
+  </dest>
+  <voice>
+    *: "Unable to load font"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Logging"
+  </dest>
+  <voice>
+    *: "logging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "View log"
+  </dest>
+  <voice>
+    *: "view log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Atskaņošanas saraksts pabeigts. Atskaņot vēlreiz?"
+  </dest>
+  <voice>
+    *: "Atskaņošanas saraksts pabeigts. Atskaņot vēlreiz?"
   </voice>
 </phrase>
