@@ -827,6 +827,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'portugues-brasileiro' => {
+	'lang' => 'portugues-brasileiro',
+	'name' => 'Portuguese (Brazilian)',
+        'short' => 'pt-br',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vpt-br',
+	    'gtts' => '-l pt -t br',
+            'piper' => 'pt_BR-faber-medium.onnx',
+	},
+        'enabled' => 0,
+    },
     'russian' => {
 	'lang' => 'russian',
 	'name' => 'Русский (Russian)',

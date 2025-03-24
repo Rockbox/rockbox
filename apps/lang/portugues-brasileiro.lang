@@ -155,7 +155,7 @@
     *: "Carregando... %d%% Feito (%s)"
   </dest>
   <voice>
-    *: "Carregando..."
+    *: "Carregando"
   </voice>
 </phrase>
 <phrase>
@@ -5938,7 +5938,7 @@
   <voice>
     *: "Interno"
     hibylinux: "micro S D"
-    xduoox3: "MSD1:"
+    xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -5963,8 +5963,8 @@
     *: none
     hibylinux: "U S B"
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D "
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -8694,7 +8694,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Tempo atual:"
+    rtc: "Tempo atual"
   </voice>
 </phrase>
 <phrase>
@@ -10615,7 +10615,7 @@
     *: "Próxima Faixa:"
   </dest>
   <voice>
-    *: "Próxima Faixa:"
+    *: "Próxima Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -10629,7 +10629,7 @@
     *: "Próxima:"
   </dest>
   <voice>
-    *: "Próxima:"
+    *: "Próxima"
   </voice>
 </phrase>
 <phrase>
@@ -15702,11 +15702,11 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Limpar configurações quando o botão de reinicialização é pressionado durante a inicialização"
+    clear_settings_on_hold,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo,iriverh10: "Limpar configurações quando o botão de reinicialização é pressionado durante a inicialização"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Limpar configurações quando o botão de reinicialização é pressionado durante a inicialização"
+    clear_settings_on_hold,ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo,iriverh10: "Limpar configurações quando o botão de reinicialização é pressionado durante a inicialização"
   </voice>
 </phrase>
 <phrase>
@@ -16931,7 +16931,7 @@
     *: "Não foi possível carregar fonte: (%s)"
   </dest>
   <voice>
-    *: "Não foi possível carregar fonte: (%s)"
+    *: "Não foi possível carregar fonte"
   </voice>
 </phrase>
 <phrase>
