@@ -252,22 +252,28 @@ char* sb_create_from_settings(enum screen_type screen)
             comma = strchr(comma+1, ',');
 
         } while (comma && param_count < 6);
-        if (comma)
+        if (comma && strchr(comma+1, ','))
         {
             char *end = comma;
             char fg[8], bg[8];
             int i = 0;
             comma++;
-            while (*comma != ',')
+            while (*comma != ',' && i < (int) sizeof(fg) - 1)
                 fg[i++] = *comma++;
             fg[i] = '\0'; comma++; i=0;
-            while (*comma != ')')
+            while (*comma != ')'  && i < (int) sizeof(bg) - 1)
                 bg[i++] = *comma++;
             bg[i] = '\0';
             len += snprintf(end, remaining-len, ") %%Vf(%s) %%Vb(%s)\n", fg, bg);
         }
+        else
+        {
+            ptr2[0] = '-';
+            ptr2[1] = '\0';
+        }
     }
-    else
+
+    if (!ptr2[0] || ptr2[0] == '-')
     {
         int y = 0, height;
         switch (bar_position)
