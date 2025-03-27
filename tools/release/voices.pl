@@ -84,8 +84,18 @@ for my $b (&usablebuilds) {
     next if ($builds{$b}{voice}); # no variants
 
     for my $v (&allvoices) {
-#        print " runone $b $v ($voices{$v}->{lang} via $voices{$v}->{defengine})\n";
-	runone($b, $v, $voices{$v}->{lang}, $voices{$v}->{defengine},
-	       "-1", $voices{$v}->{engines}->{$voices{$v}->{defengine}});
-        }
+	my %voice = %{$voices{$v}};
+
+	my $engine = $voice{"defengine"};
+	my ($opts, $vf);
+	if ($engine eq 'piper') {
+	    $vf = $voice{"engines"}->{$engine};
+	    $opts = "";
+	} else {
+	    $vf = -1;
+	    $opts = $voice{"engines"}->{$engine};
+	}
+	#            print " runone $b $v ($voice{lang} via $engine)\n";
+	runone($b, $v, $voice{"lang"}, $engine, $vf, $opts);
     }
+}
