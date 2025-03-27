@@ -1,0 +1,113 @@
+% $Id$
+
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonPrev}{\btnfnt{Prev}}
+\newcommand{\ButtonNext}{\btnfnt{Next}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonPrev}
+\newcommand{\ActionStdOk}{\ButtonRight or \ButtonPlay}
+\newcommand{\ActionStdMenu}{Long \ButtonMenu{}}
+\newcommand{\ActionStdContext}{Long \ButtonPlay}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu{}}
+\newcommand{\ActionQuickScreenExit}{\ButtonPrev{} or \ButtonPower}
+\newcommand{\ActionStdRec}{Long \ButtonRec}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsStop}{\ButtonPower}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsBrowse}{\ButtonRight}
+\newcommand{\ActionWpsContext}{Long \ButtonRight}
+\newcommand{\ActionWpsHotkey}{\ButtonNext}
+\newcommand{\ActionWpsPlaylist}{Long \ButtonPrev}
+\newcommand{\ActionWpsMenu}{\ButtonLeft}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu{}}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPower{}+\ButtonNext}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPower{}+\ButtonPrev}
+\newcommand{\ActionWpsAbReset}{\ButtonPower{}+\ButtonUp}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{Long \ButtonPrev}
+\newcommand{\ActionTreeStop}{Long \ButtonNext}
+\newcommand{\ActionTreeEnter}{Long \ButtonPrev} %% Not sure about this one **
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft} %% Not sure about this one **
+\newcommand{\ActionTreeHotkey}{\ButtonNext}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonPlay}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Alarm screen
+\newcommand{\ActionAlarmSet}{\ButtonPlay}
+\newcommand{\ActionAlarmCancel}{Long \Buttonplay}
+\newcommand{\ActionAlarmHoursDec}{\ButtonDown}
+\newcommand{\ActionAlarmHoursInc}{\ButtonUp}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonPlay}
+\newcommand{\ActionKbdDone}{Long \ButtonRight}
+\newcommand{\ActionKbdAbort}{Long \ButtonLeft}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+\newcommand{\ActionKbdCursorLeft}{\ButtonPrev{}}
+\newcommand{\ActionKbdCursorRight}{\ButtonNext{}}
+\newcommand{\ActionKbdBackSpace}{\ButtonVolUp{} or Long \ButtonVolUp{}}
+\newcommand{\ActionKbdMorseInput}{\ButtonMenu{}+\ButtonPlay}
+\newcommand{\ActionKbdMorseSelect}{\ButtonPlay}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonRight}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonLeft}
+\newcommand{\ActionPsExit}{\ButtonPlay}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{Long \ButtonNext}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\ButtonUp}
+\newcommand{\PluginDown}{\ButtonDown}
+\newcommand{\PluginLeft}{\ButtonLeft}
+\newcommand{\PluginRight}{\ButtonRight}
+\newcommand{\PluginUpRepeat}{Long \ButtonUp}
+\newcommand{\PluginDownRepeat}{Long \ButtonDown}
+\newcommand{\PluginLeftRepeat}{Long \ButtonLeft}
+\newcommand{\PluginRightRepeat}{Long \ButtonRight}
+\newcommand{\PluginCancel}{\ButtonLeft}
+\newcommand{\PluginExit}{\ButtonRight}
+\newcommand{\PluginSelect}{\ButtonPlay}
+\newcommand{\PluginSelectRepeat}{Long \ButtonPlay}
+
+
+\newcommand{\ActionKbdPageFlip}{}
+\newcommand{\ActionStdUsbCharge}{}
+\newcommand{\ButtonSelect}{\btnfnt{Play}} %%is this correct? **
+\newcommand{\ButtonHold}{} %% this is not correct **
