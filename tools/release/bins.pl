@@ -45,7 +45,7 @@ sub runone {
     }
 
     print "remove all contents in build-$dir\n" if($verbose);
-    system("rm -rf build-$dir");
+    system("rm -rf buildb-$dir");
 
     return $a;
 };

@@ -35,6 +35,8 @@ sub runone {
         system("mkdir -p output/$target");
         system("mkdir -p .rockbox/langs");
         system("cp $o .rockbox/langs");
+        system("cp $lang.lng.talk .rockbox/langs");
+        system("cp InvalidVoice_$lang.talk .rockbox/langs");
         system("zip -q -r $newo .rockbox");
         system("rm -rf .rockbox");
         `chmod a+r $newo`;
@@ -68,7 +70,7 @@ sub buildit {
 # run make in tools first to make sure they're up-to-date
 `(cd tools && make ) >/dev/null 2>&1`;
 
-if (!defined($ENV{'POOL'}) {
+if (!defined($ENV{'POOL'})) {
     my $home=$ENV{'HOME'};
     my $pool="$home/tmp/rockbox-voices-$version/voice-pool";
     `mkdir -p $pool`;
@@ -82,8 +84,6 @@ for my $b (&usablebuilds) {
     next if ($builds{$b}{voice}); # no variants
 
     for my $v (&allvoices) {
-	my %voice = $voices{$v};
-
 #        print " runone $b $v ($voices{$v}->{lang} via $voices{$v}->{defengine})\n";
 	runone($b, $v, $voices{$v}->{lang}, $voices{$v}->{defengine},
 	       "-1", $voices{$v}->{engines}->{$voices{$v}->{defengine}});
