@@ -326,14 +326,14 @@ size_t base64_decode(const char *in, size_t in_len, unsigned char *out)
             }
             break;
         }
-
         int index = in[i] - B64_START_CHAR;
-        if (index < 0 || index >= (int)ARRAYLEN(b64_codes))
+#ifdef SIMULATOR
+        if (index < 0 || index >= (int)ARRAYLEN(b64_codes) || b64_codes[index] < 0)
         {
-            out[len] = '\0';
+            DEBUGF("Invalid base64 char: '%c', char code: %i.\n", in[i], in[i]);
             break;
         }
-
+#endif
         val = (val << 6) | b64_codes[index];
 
         if ((++i & 3) == 0)
@@ -429,7 +429,7 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
             int after_block_pos = lseek(fd, 0, SEEK_CUR);
 
             char* buf = id3->path;
-            size_t outlen = base64_decode(buf, MIN(read_len, (int32_t) sizeof(id3->path)), buf);
+            size_t outlen = base64_decode(buf, MIN(read_len, (int32_t) sizeof(id3->path) - 1), buf);
 
             int picframe_pos;
             parse_flac_album_art(buf, outlen, &id3->albumart.type, &picframe_pos);
