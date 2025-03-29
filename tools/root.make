@@ -320,10 +320,12 @@ tar: $(BUILDDIR)/rockbox.tar
 
 fontzip: BUILDZIPOPTS=-f 1
 fontzip: ZIPFILESUFFIX=-fonts
+fontzip: NODEPS=1
 fontzip: zip
 
 font7zip: BUILDZIPOPTS=-f 1
 font7zip: ZIPFILESUFFIX=-fonts
+font7zip: NODEPS=1
 font7zip: 7zip
 
 fullzip: BUILDZIPOPTS=-f 2
@@ -338,7 +340,7 @@ fulltar: BUILDZIPOPTS=-f 2
 fulltar: ZIPFILESUFFIX=-full
 fulltar: tar
 
-ifdef NODEPS
+ifneq ($(NODEPS),,)
 $(BUILDDIR)/rockbox.zip:
 else
 $(BUILDDIR)/rockbox.zip: build
@@ -352,7 +354,7 @@ mapzip:
 elfzip:
 	$(SILENT)find . -name "*.elf" | xargs zip rockbox-elfs.zip
 
-ifdef NODEPS
+ifneq ($(NODEPS),,)
 $(BUILDDIR)/rockbox.7z:
 else
 $(BUILDDIR)/rockbox.7z: build
@@ -360,7 +362,7 @@ endif
 	$(call PRINTS,7Z rockbox$(ZIPFILESUFFIX).7z)
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o $(BUILDDIR)/rockbox$(ZIPFILESUFFIX).7z  -z "7za a -mx=9" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(BUILDZIPOPTS) $(TARGET) $(BINARY)
 
-ifdef NODEPS
+ifneq ($(NODEPS),,)
 $(BUILDDIR)/rockbox.tar:
 else
 $(BUILDDIR)/rockbox.tar: build

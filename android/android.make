@@ -147,7 +147,7 @@ $(KEYSTORE):
 		-sigalg MD5withRSA -keyalg RSA -keysize 1024 \
 		-dname "CN=Android Debug,O=Android,C=US"
 
-ifdef NODEPS
+ifneq ($(NODEPS),,)
 $(APK): $(TEMP_APK) $(KEYSTORE)
 else
 $(APK): $(TEMP_APK) $(BUILDDIR)/rockbox.zip $(KEYSTORE)
