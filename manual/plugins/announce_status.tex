@@ -4,8 +4,10 @@ The \setting{Announce Status} plugin allows you to use the voice system to annou
 
 Currently the list includes:
 \begin{itemize}
-\item Time (If applicable)
-\item Date (If applicable)
+\opt{rtc}{
+\item Time
+\item Date
+  }
 \item Track name (spelled)
 \item Artist name (spelled)
 \item Track Elapsed / Remaining
@@ -20,7 +22,7 @@ The input for announce format is actually a parsed string of options
 while you can edit the items directly to get your preferred order preset options are included.
 If you choose to manually edit the option string the input box helpfully has all valid options for the parser
 
-
+\opt{rtc}{
 \setting{TIME}
 \begin{itemize}
 \item DT current time
@@ -28,6 +30,7 @@ If you choose to manually edit the option string the input box helpfully has all
 \item DD current date
 \item D2 'date'
 \end{itemize}
+}
 
 \setting{TRACK}
 \begin{itemize}
@@ -68,13 +71,13 @@ If you choose to manually edit the option string the input box helpfully has all
 
 \subsubsection{Usage}
 \begin{description}
-\item[Timeout] [0-360] seconds announcements will not repeat until timeout is met. 
-\item[Announce on] [Off, Track Change].
-\item[Grouping] [0-7] 0- play all, 1-7 only announce the first n items.
+\item [Timeout] [0-360] seconds announcements will not repeat until timeout is met.
+\item [Announce on] [Off, Track Change].
+\item [Grouping] [0-7] 0- play all, 1-7 only announce the first n items.
                 Helpful for infrequently used items.
-\item[Announcement format] Select from preset options or manually enter your own.
-\item[Quit] Exit without Saving.
-\item[Save and Exit] Save settings and exit
+\item [Announcement format] Select from preset options or manually enter your own.
+\item [Quit] Exit without Saving.
+\item [Save and Exit] Save settings and exit
 \end{description}
 
 Now that we have configuration out of the way (don't forget the preset options if this looks daunting)
@@ -85,10 +88,10 @@ You can choose to get announcements each track change or only when you run the p
 it would get quite annoying to have to go run the plugin every time you wanted a status update though
 
 Enter the \setting{WPS Hotkey}
-now we will assign the wps hotkey to announce_status
+now we will assign the wps hotkey to announce\_status
 Settings>General Settings>What's Playing Screen>WPS Hotkey
 choose 'OpenPlugin' browse to 'demos'
-finally choose 'announce_status'
+finally choose 'announce\_status'
 
 Now you should be able to press your wps hotkey and get status updates on command.
 
@@ -96,4 +99,3 @@ Now you should be able to press your wps hotkey and get status updates on comman
 This is actually a plugin running on top of the WPS screen and as such running other plugins stops the announce plugin
 so if you only choose the track change option you should probably set the announce plugin to open on startup and keep
 in mind that you may have to start the plugin again later.}
-}
