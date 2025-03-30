@@ -24,7 +24,6 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/iaudio_bl_flash.h
 TOOLS += $(foreach tool,$(TOOLSET),$(TOOLSDIR)/$(tool))
 
-
 ifeq (,$(PREFIX))
 ifdef APP_TYPE
 # for sims, set simdisk/ as default
@@ -221,7 +220,7 @@ tools: $(TOOLS)
 veryclean: clean
 	$(SILENT)rm -rf $(TOOLS)
 
-clean::
+clean:
 	$(SILENT)echo Cleaning build directory
 	$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz \
 		rockbox.tar.xz rockbox-full.* rockbox-fonts.* TAGS apps \
@@ -340,7 +339,7 @@ fulltar: BUILDZIPOPTS=-f 2
 fulltar: ZIPFILESUFFIX=-full
 fulltar: tar
 
-ifneq ($(NODEPS),,)
+ifneq ($(NODEPS),)
 $(BUILDDIR)/rockbox.zip:
 else
 $(BUILDDIR)/rockbox.zip: build
@@ -354,7 +353,7 @@ mapzip:
 elfzip:
 	$(SILENT)find . -name "*.elf" | xargs zip rockbox-elfs.zip
 
-ifneq ($(NODEPS),,)
+ifneq ($(NODEPS),)
 $(BUILDDIR)/rockbox.7z:
 else
 $(BUILDDIR)/rockbox.7z: build
@@ -362,7 +361,7 @@ endif
 	$(call PRINTS,7Z rockbox$(ZIPFILESUFFIX).7z)
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o $(BUILDDIR)/rockbox$(ZIPFILESUFFIX).7z  -z "7za a -mx=9" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(BUILDZIPOPTS) $(TARGET) $(BINARY)
 
-ifneq ($(NODEPS),,)
+ifneq ($(NODEPS),)
 $(BUILDDIR)/rockbox.tar:
 else
 $(BUILDDIR)/rockbox.tar: build
