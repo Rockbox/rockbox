@@ -28,7 +28,7 @@
     *: "Jā"
   </dest>
   <voice>
-    *: "jaa"
+    *: "Jā"
   </voice>
 </phrase>
 <phrase>
@@ -42,7 +42,7 @@
     *: "Nē"
   </dest>
   <voice>
-    *: "nee"
+    *: "Nē"
   </voice>
 </phrase>
 <phrase>
@@ -56,7 +56,7 @@
     *: "Ieslēgts"
   </dest>
   <voice>
-    *: "iesleegts"
+    *: "Ieslēgts"
   </voice>
 </phrase>
 <phrase>
@@ -70,7 +70,7 @@
     *: "Izslēgts"
   </dest>
   <voice>
-    *: "izsleegts"
+    *: "Izslēgts"
   </voice>
 </phrase>
 <phrase>
@@ -84,7 +84,7 @@
     *: "Prasīt"
   </dest>
   <voice>
-    *: "prasiit"
+    *: "Prasīt"
   </voice>
 </phrase>
 <phrase>
@@ -98,7 +98,7 @@
     *: "Vienmēr"
   </dest>
   <voice>
-    *: "vienmeer"
+    *: "Vienmēr"
   </voice>
 </phrase>
 <phrase>
@@ -112,7 +112,7 @@
     *: "Normāls"
   </dest>
   <voice>
-    *: "normaals"
+    *: "Normāls"
   </voice>
 </phrase>
 <phrase>
@@ -126,7 +126,7 @@
     *: "Pastiprinājums"
   </dest>
   <voice>
-    *: "pastiprinaajums"
+    *: "Pastiprinājums"
   </voice>
 </phrase>
 <phrase>
@@ -140,7 +140,7 @@
     *: "Ielādē..."
   </dest>
   <voice>
-    *: "notiek ielaade"
+    *: "Ielādē"
   </voice>
 </phrase>
 <phrase>
@@ -154,7 +154,7 @@
     *: "Ielādē... %d%% gatavs (%s)"
   </dest>
   <voice>
-    *: "notiek ielaade"
+    *: "Notiek ielāde"
   </voice>
 </phrase>
 <phrase>
@@ -168,7 +168,7 @@
     *: "Skenē atmiņu..."
   </dest>
   <voice>
-    *: "skenee atminju"
+    *: "Skenē atmiņu"
   </voice>
 </phrase>
 <phrase>
@@ -182,7 +182,7 @@
     *: "Izslēdzas..."
   </dest>
   <voice>
-    *: "izsleedzas"
+    *: "Izslēdzas"
   </voice>
 </phrase>
 <phrase>
@@ -196,7 +196,7 @@
     *: "Atcelts"
   </dest>
   <voice>
-    *: "atcelts"
+    *: "Atcelts"
   </voice>
 </phrase>
 <phrase>
@@ -210,7 +210,7 @@
     *: "Neizdevās"
   </dest>
   <voice>
-    *: "neizdevaas"
+    *: "Neizdevās"
   </voice>
 </phrase>
 <phrase>
@@ -224,7 +224,7 @@
     *: "Kanāli"
   </dest>
   <voice>
-    *: "kanaali"
+    *: "Kanāli"
   </voice>
 </phrase>
 <phrase>
@@ -238,7 +238,7 @@
     *: "Vai esi pārliecināts?"
   </dest>
   <voice>
-    *: "vai esi paarliecinaats"
+    *: "Vai esi pārliecināts?"
   </voice>
 </phrase>
 <phrase>
@@ -290,7 +290,7 @@
     *: "Rockbox"
   </dest>
   <voice>
-    *: "Rockbox"
+    *: "Rokbokss"
   </voice>
 </phrase>
 <phrase>
@@ -301,10 +301,10 @@
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Nesenās Grāmatzīmes"
+    *: "Nesenās grāmatzīmes"
   </dest>
   <voice>
-    *: "nesenaas graamatziimes"
+    *: "Nesenās grāmatzīmes"
   </voice>
 </phrase>
 <phrase>
@@ -318,7 +318,7 @@
     *: "Failu pārlūks"
   </dest>
   <voice>
-    *: "failu paarluuks"
+    *: "Failu pārlūks"
   </voice>
 </phrase>
 <phrase>
@@ -332,7 +332,7 @@
     *: "Datubāze"
   </dest>
   <voice>
-    *: "datubaaze"
+    *: "Datubāze"
   </voice>
 </phrase>
 <phrase>
@@ -346,7 +346,7 @@
     *: "Šobrīd atskaņo"
   </dest>
   <voice>
-    *: "shobriid atskanjo"
+    *: "Šobrīd atskaņo"
   </voice>
 </phrase>
 <phrase>
@@ -360,7 +360,7 @@
     *: "Turpināt atskaņošanu"
   </dest>
   <voice>
-    *: "turpinaat atskanjoshanu"
+    *: "Turpināt atskaņošanu"
   </voice>
 </phrase>
 <phrase>
@@ -374,7 +374,7 @@
     *: "Iestatījumi"
   </dest>
   <voice>
-    *: "iestatiijumi"
+    *: "Iestatījumi"
   </voice>
 </phrase>
 <phrase>
@@ -391,7 +391,7 @@
   </dest>
   <voice>
     *: none
-    recording: "balss ierakstiishana"
+    recording: "Balss ierakstīšana"
   </voice>
 </phrase>
 <phrase>
@@ -408,7 +408,7 @@
   </dest>
   <voice>
     *: none
-    radio: "fm radio"
+    radio: "FM Radio"
   </voice>
 </phrase>
 <phrase>
@@ -422,7 +422,7 @@
     *: "Atskaņošanas saraksti"
   </dest>
   <voice>
-    *: "atskanjoshanas saraksti"
+    *: "Atskaņošanas saraksti"
   </voice>
 </phrase>
 <phrase>
@@ -436,7 +436,7 @@
     *: "Spraudņi"
   </dest>
   <voice>
-    *: "spraudnji"
+    *: "Spraudņi"
   </voice>
 </phrase>
 <phrase>
@@ -450,7 +450,7 @@
     *: "Sistēma"
   </dest>
   <voice>
-    *: "sisteema"
+    *: "Sistēma"
   </voice>
 </phrase>
 <phrase>
@@ -464,7 +464,7 @@
     *: "Izvēlēties grāmatzīmi"
   </dest>
   <voice>
-    *: "izveeleeties graamatziimi"
+    *: "Izvēlēties grāmatzīmi"
   </voice>
 </phrase>
 <phrase>
@@ -478,7 +478,7 @@
     *: "[Neatsākt]"
   </dest>
   <voice>
-    *: "neatsaakt"
+    *: "Neatsākt"
   </voice>
 </phrase>
 <phrase>
@@ -506,7 +506,7 @@
     *: "[Nederīga grāmatzīme]"
   </dest>
   <voice>
-    *: "nederiiga graamatziime"
+    *: "Nederīga grāmatzīme"
   </voice>
 </phrase>
 <phrase>
@@ -520,7 +520,7 @@
     *: "Grāmatzīmju darbības"
   </dest>
   <voice>
-    *: "graamatziimju darbiibas"
+    *: "Grāmatzīmju darbības"
   </voice>
 </phrase>
 <phrase>
@@ -534,7 +534,7 @@
     *: "Atsākt"
   </dest>
   <voice>
-    *: "atsaakt"
+    *: "Atsākt"
   </voice>
 </phrase>
 <phrase>
@@ -548,7 +548,7 @@
     *: "Izveidot grāmatzīmi?"
   </dest>
   <voice>
-    *: "vai izveidot graamatziimi"
+    *: "Izveidot grāmatzīmi?"
   </voice>
 </phrase>
 <phrase>
@@ -562,7 +562,7 @@
     *: "Grāmatzīme izveidota"
   </dest>
   <voice>
-    *: "graamatziime izveidota"
+    *: "Grāmatzīme izveidota"
   </voice>
 </phrase>
 <phrase>
@@ -576,7 +576,7 @@
     *: "Neizdevās izveidot!"
   </dest>
   <voice>
-    *: "neizdevaas izveidot"
+    *: "Neizdevās izveidot!"
   </voice>
 </phrase>
 <phrase>
@@ -590,7 +590,7 @@
     *: "Tukša grāmatzīme"
   </dest>
   <voice>
-    *: "tuksha graamatziime"
+    *: "Tukša grāmatzīme"
   </voice>
 </phrase>
 <phrase>
@@ -604,7 +604,7 @@
     *: "Skaņas iestatījumi"
   </dest>
   <voice>
-    *: "skanjas iestatiijumi"
+    *: "Skaņas iestatījumi"
   </voice>
 </phrase>
 <phrase>
@@ -618,7 +618,7 @@
     *: "Skaļums"
   </dest>
   <voice>
-    *: "skaljums"
+    *: "Skaļums"
   </voice>
 </phrase>
 <phrase>
@@ -632,7 +632,7 @@
     *: "Basi"
   </dest>
   <voice>
-    *: "basi"
+    *: "Basi"
   </voice>
 </phrase>
 <phrase>
@@ -646,7 +646,7 @@
     *: "Augšas"
   </dest>
   <voice>
-    *: "augshas"
+    *: "Augšas"
   </voice>
 </phrase>
 <phrase>
@@ -660,7 +660,7 @@
     *: "Balanss"
   </dest>
   <voice>
-    *: "balanss"
+    *: "Balanss"
   </voice>
 </phrase>
 <phrase>
@@ -674,7 +674,7 @@
     *: "Kanālu konfigurācija"
   </dest>
   <voice>
-    *: "kanaalu konfiguraacija"
+    *: "Kanālu konfigurācija"
   </voice>
 </phrase>
 <phrase>
@@ -688,7 +688,7 @@
     *: "~Stereo"
   </dest>
   <voice>
-    *: "stereo"
+    *: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -702,7 +702,7 @@
     *: "~Mono"
   </dest>
   <voice>
-    *: "mono"
+    *: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -713,10 +713,10 @@
     *: "Custom"
   </source>
   <dest>
-    *: "Pielāgots"
+    *: "Pielāgota"
   </dest>
   <voice>
-    *: "pielaagots"
+    *: "Pielāgota"
   </voice>
 </phrase>
 <phrase>
@@ -730,7 +730,7 @@
     *: "Mono kreisā"
   </dest>
   <voice>
-    *: "mono kreisaa"
+    *: "Mono kreisā"
   </voice>
 </phrase>
 <phrase>
@@ -744,7 +744,7 @@
     *: "Mono labā"
   </dest>
   <voice>
-    *: "mono labaa"
+    *: "Mono labā"
   </voice>
 </phrase>
 <phrase>
@@ -761,7 +761,7 @@
   </dest>
   <voice>
     *: none
-    recording: "mono kreisaa plus labaa"
+    recording: "Mono kreisā un labā"
   </voice>
 </phrase>
 <phrase>
@@ -775,7 +775,7 @@
     *: "~Karaoke"
   </dest>
   <voice>
-    *: "karaoke"
+    *: "Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -789,7 +789,7 @@
     *: "Stereo platums"
   </dest>
   <voice>
-    *: "stereo platums"
+    *: "Stereo platums"
   </voice>
 </phrase>
 <phrase>
@@ -803,7 +803,7 @@
     *: "Kanālu izlīdzināšana"
   </dest>
   <voice>
-    *: "kanaalu izliidzinaashana"
+    *: "Kanālu izlīdzināšana"
   </voice>
 </phrase>
 <phrase>
@@ -817,7 +817,7 @@
     *: "Tiešais pastiprinājums"
   </dest>
   <voice>
-    *: "tieshais pastiprinaajums"
+    *: "Tiešais pastiprinājums"
   </voice>
 </phrase>
 <phrase>
@@ -831,7 +831,7 @@
     *: "Starpskaļums"
   </dest>
   <voice>
-    *: "starpskaljums"
+    *: "Starpskaļums"
   </voice>
 </phrase>
 <phrase>
@@ -845,7 +845,7 @@
     *: "Augsto frekvenču vājinājums"
   </dest>
   <voice>
-    *: "augsto frekvenchu vaajinaajums"
+    *: "Augsto frekvenču vājinājums"
   </voice>
 </phrase>
 <phrase>
@@ -859,7 +859,7 @@
     *: "Augsto frekvenču robežvērtība"
   </dest>
   <voice>
-    *: "augsto frekvenchu robezhveertiiba"
+    *: "Augsto frekvenču robežvērtība"
   </voice>
 </phrase>
 <phrase>
@@ -873,7 +873,7 @@
     *: "Ekvalaizers"
   </dest>
   <voice>
-    *: "ekvalaizers"
+    *: "Ekvalaizers"
   </voice>
 </phrase>
 <phrase>
@@ -887,7 +887,7 @@
     *: "Ieslēgt ekvalaizeru"
   </dest>
   <voice>
-    *: "iesleegt ekvalaizeru"
+    *: "Ieslēgt ekvalaizeru"
   </voice>
 </phrase>
 <phrase>
@@ -901,7 +901,7 @@
     *: "Grafisks ekvalaizers"
   </dest>
   <voice>
-    *: "grafiskais ekvalaizers"
+    *: "Grafisks ekvalaizers"
   </voice>
 </phrase>
 <phrase>
@@ -915,7 +915,7 @@
     *: "Skaļuma nogriezums"
   </dest>
   <voice>
-    *: "kopeejais frekvenchu nogriezums"
+    *: "Skaļuma nogriezums"
   </voice>
 </phrase>
 <phrase>
@@ -929,7 +929,7 @@
     *: "Vienkāršs ekvalaizers"
   </dest>
   <voice>
-    *: "vienkaarshotais ekvalaizers"
+    *: "Vienkāršs ekvalaizers"
   </voice>
 </phrase>
 <phrase>
@@ -943,7 +943,7 @@
     *: "Papildu iestatījumi"
   </dest>
   <voice>
-    *: "papildu iestatiijumi"
+    *: "Papildu iestatījumi"
   </voice>
 </phrase>
 <phrase>
@@ -957,7 +957,7 @@
     *: "Saglabāt profilu"
   </dest>
   <voice>
-    *: "saglabaat ekvalaizera iestatiijumus"
+    *: "Saglabāt profilu"
   </voice>
 </phrase>
 <phrase>
@@ -971,7 +971,7 @@
     *: "Aplūkot profilus"
   </dest>
   <voice>
-    *: "apluukot ekvalaizera iestatiijumus"
+    *: "Aplūkot profilus"
   </voice>
 </phrase>
 <phrase>
@@ -985,7 +985,7 @@
     *: "%d Hz joslas pastiprinājums"
   </dest>
   <voice>
-    *: "joslas stiprums hercos"
+    *: "Joslas stiprums hercos"
   </voice>
 </phrase>
 <phrase>
@@ -999,7 +999,7 @@
     *: "Zemfrekvenču filtrs"
   </dest>
   <voice>
-    *: "zemo frekvenchu filtrs"
+    *: "Zemfrekvenču filtrs"
   </voice>
 </phrase>
 <phrase>
@@ -1013,7 +1013,7 @@
     *: "Pīķa filtrs %d"
   </dest>
   <voice>
-    *: "piikja filtrs"
+    *: "Pīķa filtrs"
   </voice>
 </phrase>
 <phrase>
@@ -1027,7 +1027,7 @@
     *: "Augstfrekvenču filtrs"
   </dest>
   <voice>
-    *: "augsto frekvenchu filtrs"
+    *: "Augstfrekvenču filtrs"
   </voice>
 </phrase>
 <phrase>
@@ -1041,7 +1041,7 @@
     *: "Robežfrekvence"
   </dest>
   <voice>
-    *: "robezhfrekvence"
+    *: "Robežfrekvence"
   </voice>
 </phrase>
 <phrase>
@@ -1055,7 +1055,7 @@
     *: "Centra frekvence"
   </dest>
   <voice>
-    *: "centra frekvence"
+    *: "Centra frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -1069,7 +1069,7 @@
     *: "Platums"
   </dest>
   <voice>
-    *: "platums"
+    *: "Platums"
   </voice>
 </phrase>
 <phrase>
@@ -1083,7 +1083,7 @@
     *: "Skaņas izlīdzināšana"
   </dest>
   <voice>
-    *: "skanjas izliidzinaashana"
+    *: "Skaņas izlīdzināšana"
   </voice>
 </phrase>
 <phrase>
@@ -1097,7 +1097,7 @@
     *: "Vispārīgi iestatījumi"
   </dest>
   <voice>
-    *: "vispaariigi iestatiijumi"
+    *: "Vispārīgi iestatījumi"
   </voice>
 </phrase>
 <phrase>
@@ -1111,7 +1111,7 @@
     *: "Atskaņošanas iestatījumi"
   </dest>
   <voice>
-    *: "atskanjoshanas iestatiijumi"
+    *: "Atskaņošanas iestatījumi"
   </voice>
 </phrase>
 <phrase>
@@ -1122,10 +1122,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Secības jaukšana/-ā"
+    *: "Secības jaukšana"
   </dest>
   <voice>
-    *: "jaukt seciibu"
+    *: "Secības jaukšana"
   </voice>
 </phrase>
 <phrase>
@@ -1139,7 +1139,7 @@
     *: "Atkārtot"
   </dest>
   <voice>
-    *: "atkaartot"
+    *: "Atkārtot"
   </voice>
 </phrase>
 <phrase>
@@ -1153,7 +1153,7 @@
     *: "Visu"
   </dest>
   <voice>
-    *: "visu"
+    *: "Visu"
   </voice>
 </phrase>
 <phrase>
@@ -1167,7 +1167,7 @@
     *: "Vienu dziesmu"
   </dest>
   <voice>
-    *: "vienu dziesmu"
+    *: "Vienu dziesmu"
   </voice>
 </phrase>
 <phrase>
@@ -1181,7 +1181,7 @@
     *: "A-B"
   </dest>
   <voice>
-    *: "aa-bee"
+    *: "A uz B"
   </voice>
 </phrase>
 <phrase>
@@ -1192,10 +1192,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Atskaņot atlasīto vispirms"
+    *: "Atskaņot vispirms atlasīto"
   </dest>
   <voice>
-    *: "izveeleeto failu atskanjot pirmo"
+    *: "Atskaņot vispirms atlasīto"
   </voice>
 </phrase>
 <phrase>
@@ -1209,7 +1209,7 @@
     *: "Pārtīšana/Attīšana"
   </dest>
   <voice>
-    *: "aatraa paartiishana un attiishana"
+    *: "Ātrā pārtīšana un attīšana"
   </voice>
 </phrase>
 <phrase>
@@ -1223,7 +1223,7 @@
     *: "Tīšanas minimālais solis"
   </dest>
   <voice>
-    *: "minimaalais solis"
+    *: "Tīšanas minimālais solis"
   </voice>
 </phrase>
 <phrase>
@@ -1237,7 +1237,7 @@
     *: "Tīšanas paātrinājums"
   </dest>
   <voice>
-    *: "Paaatrinaajums"
+    *: "Tīšanas paātrinājums"
   </voice>
 </phrase>
 <phrase>
@@ -1253,7 +1253,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "pretraustiishanaas buferis"
+    *: "Pretraustīšanās buferis"
     flash_storage: none
   </voice>
 </phrase>
@@ -1268,7 +1268,7 @@
     *: "Izdziest, apturot/pauzējot"
   </dest>
   <voice>
-    *: "izdzishana pie stop vai pauzes"
+    *: "Izdziest apturot vai pauzējot"
   </voice>
 </phrase>
 <phrase>
@@ -1282,7 +1282,7 @@
     *: "Ballītes režīms"
   </dest>
   <voice>
-    *: "balliites rezhiims"
+    *: "Ballītes režīms"
   </voice>
 </phrase>
 <phrase>
@@ -1299,7 +1299,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "paarklaashanaas"
+    crossfade: "Pārklāšanās"
   </voice>
 </phrase>
 <phrase>
@@ -1316,7 +1316,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "izmantot paarklaashanos"
+    crossfade: "Izmantot pārklāšanos"
   </voice>
 </phrase>
 <phrase>
@@ -1333,7 +1333,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "tikai paarsleedzot dziesmas"
+    crossfade: "Tikai manuāli pārslēdzot dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -1350,7 +1350,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "atskanjojot jauktaa seciibaa vai paarsleedzoties"
+    crossfade: "Secības jaukšanā vai manuāli pārslēdzot dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -1367,7 +1367,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "ieskaneeshanaas aizkave"
+    crossfade: "Ieskanēšanās aizkave"
   </voice>
 </phrase>
 <phrase>
@@ -1384,7 +1384,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "ieskaneeshanaas ilgums"
+    crossfade: "Ieskanēšanās ilgums"
   </voice>
 </phrase>
 <phrase>
@@ -1401,7 +1401,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "izdzishanas aizkave"
+    crossfade: "Izdzišanas aizkave"
   </voice>
 </phrase>
 <phrase>
@@ -1418,7 +1418,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "izdzishanas ilgums"
+    crossfade: "Izdzišanas ilgums"
   </voice>
 </phrase>
 <phrase>
@@ -1435,7 +1435,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "izdzishanas rezhiims"
+    crossfade: "Izdzišanas režīms"
   </voice>
 </phrase>
 <phrase>
@@ -1452,7 +1452,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "sajaukshanaas"
+    crossfade: "Sajaukšanās"
   </voice>
 </phrase>
 <phrase>
@@ -1466,7 +1466,7 @@
     *: "Skaļuma normalizācija"
   </dest>
   <voice>
-    *: "skaljuma normalizaacija"
+    *: "Skaļuma normalizācija"
   </voice>
 </phrase>
 <phrase>
@@ -1480,7 +1480,7 @@
     *: "Novērst kropļojumus"
   </dest>
   <voice>
-    *: "noveerst kropljojumus"
+    *: "Novērst kropļojumus"
   </voice>
 </phrase>
 <phrase>
@@ -1494,7 +1494,7 @@
     *: "Normalizācijas veids"
   </dest>
   <voice>
-    *: "normalizaacijas veids"
+    *: "Normalizācijas veids"
   </voice>
 </phrase>
 <phrase>
@@ -1508,7 +1508,7 @@
     *: "Albumu pastiprinājums"
   </dest>
   <voice>
-    *: "albumu pastiprinaajums"
+    *: "Albumu pastiprinājums"
   </voice>
 </phrase>
 <phrase>
@@ -1522,7 +1522,7 @@
     *: "Dziesmu pastiprinājums"
   </dest>
   <voice>
-    *: "dziesmu pastiprinaajums"
+    *: "Dziesmu pastiprinājums"
   </voice>
 </phrase>
 <phrase>
@@ -1536,7 +1536,7 @@
     *: "Dziesmu pastiprinājums secības jaukšanā"
   </dest>
   <voice>
-    *: "dziesmu pastiprinaajums seciibas jaukshanaa"
+    *: "Dziesmu pastiprinājums secības jaukšanā"
   </voice>
 </phrase>
 <phrase>
@@ -1550,7 +1550,7 @@
     *: "Priekšpastiprinātājs"
   </dest>
   <voice>
-    *: "priekshpastiprinaataajs"
+    *: "Priekšpastiprinātājs"
   </voice>
 </phrase>
 <phrase>
@@ -1937,10 +1937,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Pilnu mērķa atrašanās vietu"
+    *: "Mērķa atrašanās vieta"
   </dest>
   <voice>
-    *: "pilnu celju"
+    *: "Mērķa atrašanās vieta"
   </voice>
 </phrase>
 <phrase>
@@ -1975,11 +1975,11 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "Ielādēt operatīvajā atmiņā"
+    tc_ramcache: "Ielādēšana operatīvajā atmiņā"
   </dest>
   <voice>
     *: none
-    tc_ramcache: "ielaadeet operatiivajaa atminjaa"
+    tc_ramcache: "Ielādēšana operatīvajā atmiņā"
   </voice>
 </phrase>
 <phrase>
@@ -2158,10 +2158,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Atskaņotāja skats"
+    *: "Atskaņotāja skata tēma"
   </dest>
   <voice>
-    *: "atskanjoshanas ekraans"
+    *: "Atskaņotāja skata tēma"
   </voice>
 </phrase>
 <phrase>
@@ -3365,12 +3365,10 @@
     battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3382,12 +3380,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3399,12 +3395,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3557,7 +3551,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3594,7 +3588,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
+    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5246,11 +5240,11 @@
   </source>
   <dest>
     *: none
-    recording: "Pirmsieraksta Laiks"
+    recording: "Pirmsieraksta laiks"
   </dest>
   <voice>
     *: none
-    recording: "pirmsieraksta laiks"
+    recording: "Pirmsieraksta laiks"
   </voice>
 </phrase>
 <phrase>
@@ -5267,7 +5261,7 @@
   </dest>
   <voice>
     *: none
-    recording: "paarstatiit ieraksta mapi"
+    recording: "Notīrīt ierakstu mapi"
   </voice>
 </phrase>
 <phrase>
@@ -5280,11 +5274,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nevar saglabāt ieraksta mapē"
+    recording: "Nevar saglabāt ierakstu mapē"
   </dest>
   <voice>
     *: none
-    recording: "nevar saglabaat ieraksta mapee"
+    recording: "Nevar saglabāt ierakstu mapē"
   </voice>
 </phrase>
 <phrase>
@@ -5997,7 +5991,7 @@
     *: "Sistēmas darba ilgums"
   </dest>
   <voice>
-    *: "iesleegts"
+    *: "Sistēmas darba ilgums"
   </voice>
 </phrase>
 <phrase>
@@ -6008,10 +6002,10 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Ilgākais laiks"
+    *: "Ilgākais sasniegtais laiks"
   </dest>
   <voice>
-    *: "ilgaakais"
+    *: "Ilgākais sasniegtais laiks"
   </voice>
 </phrase>
 <phrase>
@@ -6036,7 +6030,7 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Kļūdas (neaiztiec!)"
+    *: "Kļūdas (Neaiztiec!)"
   </dest>
   <voice>
     *: "kljuudas neaiztiec"
@@ -6344,10 +6338,10 @@
     *: "Title"
   </source>
   <dest>
-    *: "Nosaukums"
+    *: "Dziesmas nosaukuma"
   </dest>
   <voice>
-    *: "nosaukums"
+    *: "Dziesmas nosaukuma"
   </voice>
 </phrase>
 <phrase>
@@ -6358,10 +6352,10 @@
     *: "Artist"
   </source>
   <dest>
-    *: "Izpildītājs"
+    *: "Izpildītāji"
   </dest>
   <voice>
-    *: "izpildītājs"
+    *: "Izpildītāji"
   </voice>
 </phrase>
 <phrase>
@@ -6372,10 +6366,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Albums"
+    *: "Albumi"
   </dest>
   <voice>
-    *: "albums"
+    *: "Albumi"
   </voice>
 </phrase>
 <phrase>
@@ -6389,7 +6383,7 @@
     *: "Numurs"
   </dest>
   <voice>
-    *: "numurs"
+    *: "Numurs"
   </voice>
 </phrase>
 <phrase>
@@ -6400,10 +6394,10 @@
     *: "Genre"
   </source>
   <dest>
-    *: "Žanrs"
+    *: "Žanri"
   </dest>
   <voice>
-    *: "žanrs"
+    *: "Žanri"
   </voice>
 </phrase>
 <phrase>
@@ -6414,10 +6408,10 @@
     *: "Year"
   </source>
   <dest>
-    *: "Gads"
+    *: "Gadi"
   </dest>
   <voice>
-    *: "gads"
+    *: "Gadi"
   </voice>
 </phrase>
 <phrase>
@@ -6470,10 +6464,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Albuma izpildītājs"
+    *: "Albumu izpildītāji"
   </dest>
   <voice>
-    *: "Albuma Izpildītājs"
+    *: "Albumu izpildītāji"
   </voice>
 </phrase>
 <phrase>
@@ -9205,10 +9199,10 @@
     *: "[Random]"
   </source>
   <dest>
-    *: "[Dažādi]"
+    *: "[Izvēlēties nejauši]"
   </dest>
   <voice>
-    *: "dazhaadi"
+    *: "Izvēlēties nejauši"
   </voice>
 </phrase>
 <phrase>
@@ -10493,10 +10487,10 @@
     *: "Release Time"
   </source>
   <dest>
-    *: "Samazināšanas laiks"
+    *: "Atbrīvošanas laiks"
   </dest>
   <voice>
-    *: "samazinaashanas laiks"
+    *: "Atbrīvošanas laiks"
   </voice>
 </phrase>
 <phrase>
@@ -10740,11 +10734,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Atskaņotāja taustiņš"
+    hotkey: "Atskaņošanas taustiņa darbība"
   </dest>
   <voice>
     *: none
-    hotkey: "atskanjoshanas loga taustinjsh"
+    hotkey: "Atskaņošanas taustiņa darbība"
   </voice>
 </phrase>
 <phrase>
@@ -10757,11 +10751,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Falu pārlūka taustiņš"
+    hotkey: "Failu pārlūka taustiņš"
   </dest>
   <voice>
     *: none
-    hotkey: "failu paarluuka taustinjsh"
+    hotkey: "Failu pārlūka taustiņš"
   </voice>
 </phrase>
 <phrase>
@@ -10990,10 +10984,10 @@
     *: "[Untagged]"
   </source>
   <dest>
-    *: "[Neatzīmēts]"
+    *: "[Trūkst šīs birkas]"
   </dest>
   <voice>
-    *: "neatziimeets"
+    *: "Trūkst šīs birkas"
   </voice>
 </phrase>
 <phrase>
@@ -11006,11 +11000,11 @@
   </source>
   <dest>
     *: none
-    radio: "Radio skats"
+    radio: "Radio skata tēma"
   </dest>
   <voice>
     *: none
-    radio: "radio ekraans"
+    radio: "Radio skata tēma"
   </voice>
 </phrase>
 <phrase>
@@ -11021,10 +11015,10 @@
     *: "Composer"
   </source>
   <dest>
-    *: "Komponists"
+    *: "Komponisti"
   </dest>
   <voice>
-    *: "Komponists"
+    *: "Komponisti"
   </voice>
 </phrase>
 <phrase>
@@ -11625,10 +11619,10 @@
     *: "Album Artists"
   </source>
   <dest>
-    *: "Albuma izpildītāji"
+    *: "Albumu izpildītāji"
   </dest>
   <voice>
-    *: "albuma izpilditaji"
+    *: "Albumu izpildītāji"
   </voice>
 </phrase>
 <phrase>
@@ -11684,10 +11678,10 @@
     *: "Attack Time"
   </source>
   <dest>
-    *: "Attack Time"
+    *: "Uzbrukuma laiks"
   </dest>
   <voice>
-    *: "Attack Time"
+    *: "Uzbrukuma laiks"
   </voice>
 </phrase>
 <phrase>
@@ -11754,10 +11748,10 @@
     *: "Select directories to scan"
   </source>
   <dest>
-    *: "Atlasīt mapes skenēšanai"
+    *: "Atlasīt mapes datubāzei"
   </dest>
   <voice>
-    *: "Atlasīt mapes skenēšanai"
+    *: "Atlasīt mapes datubāzei"
   </voice>
 </phrase>
 <phrase>
@@ -13823,10 +13817,10 @@
     *: "Return"
   </source>
   <dest>
-    *: "Return"
+    *: "Atgriezties"
   </dest>
   <voice>
-    *: "Return"
+    *: "Atgriezties"
   </voice>
 </phrase>
 <phrase>
@@ -13839,11 +13833,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Ierakstu mape"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Ierakstu mape"
   </voice>
 </phrase>
 <phrase>
@@ -15169,10 +15163,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Set Wps Context Plugin"
+    *: "Uzstādīt atskaņotāja konteksta spraudni"
   </dest>
   <voice>
-    *: "Set WPS Context Plugin"
+    *: "Uzstādīt atskaņotāja konteksta spraudni"
   </voice>
 </phrase>
 <phrase>
@@ -15724,10 +15718,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rewind Across Tracks"
+    *: "Atļaut attīt starp dziesmām"
   </dest>
   <voice>
-    *: "Rewind across tracks"
+    *: "Atļaut attīt starp dziesmām"
   </voice>
 </phrase>
 <phrase>
@@ -15738,10 +15732,10 @@
     *: "Set As..."
   </source>
   <dest>
-    *: "Set As..."
+    *: "Uzstādīt kā..."
   </dest>
   <voice>
-    *: "Set As"
+    *: "Uzstādīt kā"
   </voice>
 </phrase>
 <phrase>
@@ -15782,11 +15776,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Ierakstu mape"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Ierakstu mape"
   </voice>
 </phrase>
 <phrase>
@@ -15825,10 +15819,10 @@
     *: "Playing Next..."
   </source>
   <dest>
-    *: "Playing Next..."
+    *: "Atskaņot kā nākamo..."
   </dest>
   <voice>
-    *: "Playing Next"
+    *: "Atskaņot kā nākamo"
   </voice>
 </phrase>
 <phrase>
@@ -16002,7 +15996,7 @@
     *: "Quick (Ignore Directory Cache)"
   </source>
   <dest>
-    *: "Quick (Ignore Directory Cache)"
+    *: "Ātra (ignorēt mapju kešatmiņu)"
   </dest>
   <voice>
     *: "Quick (Ignore Directory Cache)"
@@ -16016,10 +16010,10 @@
     *: "What's Playing Screen"
   </source>
   <dest>
-    *: "What's Playing Screen"
+    *: "Atskaņotāja ekrāns"
   </dest>
   <voice>
-    *: "What's Playing Screen"
+    *: "Atskaņotāja ekrāns"
   </voice>
 </phrase>
 <phrase>
@@ -16030,10 +16024,10 @@
     *: "Default Browser"
   </source>
   <dest>
-    *: "Default Browser"
+    *: "Noklusējuma pārlūks"
   </dest>
   <voice>
-    *: "Default Browser"
+    *: "Noklusējuma pārlūks"
   </voice>
 </phrase>
 <phrase>
@@ -16268,10 +16262,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "Legal Notices"
+    *: "Juridiskie paziņojumi"
   </dest>
   <voice>
-    *: "Legal Notices"
+    *: "Juridiskie paziņojumi"
   </voice>
 </phrase>
 <phrase>
@@ -16422,10 +16416,10 @@
     *: "First Letter"
   </source>
   <dest>
-    *: "First Letter"
+    *: "Alfabēta secībā"
   </dest>
   <voice>
-    *: "First Letter"
+    *: "Alfabēta secībā"
   </voice>
 </phrase>
 <phrase>
@@ -16436,10 +16430,10 @@
     *: "By First Letter..."
   </source>
   <dest>
-    *: "By First Letter..."
+    *: "Sakārtoti pēc pirmā burta..."
   </dest>
   <voice>
-    *: "By First Letter"
+    *: "Sakārtoti pēc pirmā burta"
   </voice>
 </phrase>
 <phrase>
@@ -16548,10 +16542,10 @@
     *: "Shuffle Songs"
   </source>
   <dest>
-    *: "Shuffle Songs"
+    *: "Jauktā secībā"
   </dest>
   <voice>
-    *: "Shuffle Songs"
+    *: "Jauktā secībā"
   </voice>
 </phrase>
 <phrase>
@@ -16562,10 +16556,10 @@
     *: "Filename"
   </source>
   <dest>
-    *: "Nosaukums"
+    *: "Faila nosaukuma"
   </dest>
   <voice>
-    *: "Nosaukums"
+    *: "Faila nosaukuma"
   </voice>
 </phrase>
 <phrase>
@@ -16576,10 +16570,10 @@
     *: "Title (with track duration)"
   </source>
   <dest>
-    *: "Title (with track duration)"
+    *: "Dziesmas nosaukuma (ar tā ilgumu)"
   </dest>
   <voice>
-    *: "Title with track duration"
+    *: "Dziesmas nosaukums ar tā ilgumu"
   </voice>
 </phrase>
 <phrase>
@@ -16590,10 +16584,10 @@
     *: "User Rating"
   </source>
   <dest>
-    *: "Vērtējums"
+    *: "Vērtējumi"
   </dest>
   <voice>
-    *: "Vērtējums"
+    *: "Vērtējumi"
   </voice>
 </phrase>
 <phrase>
@@ -16632,10 +16626,10 @@
     *: "Recently Added"
   </source>
   <dest>
-    *: "Recently Added"
+    *: "Nesen pievienotas"
   </dest>
   <voice>
-    *: "Recently Added"
+    *: "Nesen pievienotas"
   </voice>
 </phrase>
 <phrase>
@@ -16660,10 +16654,10 @@
     *: "Custom menu"
   </source>
   <dest>
-    *: "Custom menu"
+    *: "Pielāgota izvēlne"
   </dest>
   <voice>
-    *: "Custom menu"
+    *: "Pielāgota izvēlne"
   </voice>
 </phrase>
 <phrase>
@@ -16674,10 +16668,10 @@
     *: "Same as currently played track"
   </source>
   <dest>
-    *: "Same as currently played track"
+    *: "Meklēt, kas sakrīt ar šobrīd atskaņoto dziesmu"
   </dest>
   <voice>
-    *: "Same as currently played track"
+    *: "Meklēt, kas sakrīt ar šobrīd atskaņoto dziesmu"
   </voice>
 </phrase>
 <phrase>
@@ -16688,10 +16682,10 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Directory"
+    *: "Mape"
   </dest>
   <voice>
-    *: "Directory"
+    *: "Mape"
   </voice>
 </phrase>
 <phrase>
@@ -16702,10 +16696,10 @@
     *: "Albums by Year"
   </source>
   <dest>
-    *: "Albums by Year"
+    *: "Albumi pēc gadiem"
   </dest>
   <voice>
-    *: "Albums by Year"
+    *: "Albumi pēc gadiem"
   </voice>
 </phrase>
 <phrase>
@@ -16716,10 +16710,10 @@
     *: "Albums between Years"
   </source>
   <dest>
-    *: "Albums between Years"
+    *: "Albumi starp gadiem"
   </dest>
   <voice>
-    *: "Albums between Years"
+    *: "Albumi starp gadiem"
   </voice>
 </phrase>
 <phrase>
@@ -16730,10 +16724,10 @@
     *: "Artists between Years"
   </source>
   <dest>
-    *: "Artists between Years"
+    *: "Izpildītāji starp gadiem"
   </dest>
   <voice>
-    *: "Artists between Years"
+    *: "Izpildītāji starp gadiem"
   </voice>
 </phrase>
 <phrase>
@@ -16744,10 +16738,10 @@
     *: "Most played (Plays|Score)"
   </source>
   <dest>
-    *: "Most played (Plays|Score)"
+    *: "Visbiežāk atskaņotas dziesmas (reizes|vērtējums)"
   </dest>
   <voice>
-    *: "Most played by Plays then by Score"
+    *: "Visbiežāk atskaņotas dziesmas pēc reižu skaita, tad pēc vērtējuma"
   </voice>
 </phrase>
 <phrase>
@@ -16758,10 +16752,10 @@
     *: "Recently played tracks"
   </source>
   <dest>
-    *: "Recently played tracks"
+    *: "Nesen atskaņotas dziesmas"
   </dest>
   <voice>
-    *: "Recently played tracks"
+    *: "Nesen atskaņotas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -16772,10 +16766,10 @@
     *: "Never played tracks"
   </source>
   <dest>
-    *: "Never played tracks"
+    *: "Nekad neatskaņotas dziesmas"
   </dest>
   <voice>
-    *: "Never played tracks"
+    *: "Nekad neatskaņotas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -16786,10 +16780,10 @@
     *: "Favourite artists"
   </source>
   <dest>
-    *: "Favourite artists"
+    *: "Iecienīti izpildītāji"
   </dest>
   <voice>
-    *: "Favourite artists"
+    *: "Iecienīti izpildītāji"
   </voice>
 </phrase>
 <phrase>
@@ -16800,10 +16794,10 @@
     *: "Favourite albums"
   </source>
   <dest>
-    *: "Favourite albums"
+    *: "Iecienīti albumi"
   </dest>
   <voice>
-    *: "Favourite albums"
+    *: "Iecienīti albumi"
   </voice>
 </phrase>
 <phrase>
@@ -16814,10 +16808,10 @@
     *: "Recent favourites"
   </source>
   <dest>
-    *: "Recent favourites"
+    *: "Nesen iecienītas dziesmas"
   </dest>
   <voice>
-    *: "Recent favourites"
+    *: "Nesen iecienītas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -16828,10 +16822,10 @@
     *: "New favourites"
   </source>
   <dest>
-    *: "New favourites"
+    *: "Jaunas iecienītas dziesmas"
   </dest>
   <voice>
-    *: "New favourites"
+    *: "Jaunas iecienītas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -16842,10 +16836,10 @@
     *: "Forgotten favourites"
   </source>
   <dest>
-    *: "Forgotten favourites"
+    *: "Aizmirstas iecienītas dziesmas"
   </dest>
   <voice>
-    *: "Forgotten favourites"
+    *: "Aizmirstas iecienītas dziesmas"
   </voice>
 </phrase>
 <phrase>
@@ -16856,10 +16850,10 @@
     *: "Tracks by"
   </source>
   <dest>
-    *: "Tracks by"
+    *: "Dziesmas pēc"
   </dest>
   <voice>
-    *: "Tracks by"
+    *: "Dziesmas pēc"
   </voice>
 </phrase>
 <phrase>
@@ -16870,10 +16864,10 @@
     *: "View Album Art"
   </source>
   <dest>
-    *: "View Album Art"
+    *: "Skatīt albuma vāku"
   </dest>
   <voice>
-    *: "View Album Art"
+    *: "Skatīt albuma vāku"
   </voice>
 </phrase>
 <phrase>
@@ -16886,11 +16880,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Audio izvades izvēle"
   </dest>
   <voice>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Audio izvades izvēle"
   </voice>
 </phrase>
 <phrase>
@@ -16903,11 +16897,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Headphone"
+    erosqnative: "Austiņas"
   </dest>
   <voice>
     *: none
-    erosqnative: "Headphone"
+    erosqnative: "Austiņas"
   </voice>
 </phrase>
 <phrase>
@@ -16920,11 +16914,11 @@
   </source>
   <dest>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Lineārā izeja"
   </dest>
   <voice>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Lineārā izeja"
   </voice>
 </phrase>
 <phrase>
@@ -16935,10 +16929,10 @@
     *: "Unable to load font: (%s)"
   </source>
   <dest>
-    *: "Unable to load font: (%s)"
+    *: "Nevar ielādēt fontu: (%s)"
   </dest>
   <voice>
-    *: "Unable to load font"
+    *: "Nevar ielādēt fontu"
   </voice>
 </phrase>
 <phrase>
@@ -16949,10 +16943,10 @@
     *: "Logging"
   </source>
   <dest>
-    *: "Logging"
+    *: "Žurnalēšana"
   </dest>
   <voice>
-    *: "logging"
+    *: "Žurnalēšana"
   </voice>
 </phrase>
 <phrase>
@@ -16963,10 +16957,10 @@
     *: "View log"
   </source>
   <dest>
-    *: "View log"
+    *: "Skatīt žurnālus"
   </dest>
   <voice>
-    *: "view log"
+    *: "Skatīt žurnālus"
   </voice>
 </phrase>
 <phrase>
