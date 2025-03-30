@@ -220,7 +220,7 @@ tools: $(TOOLS)
 veryclean: clean
 	$(SILENT)rm -rf $(TOOLS)
 
-clean:
+clean::
 	$(SILENT)echo Cleaning build directory
 	$(SILENT)rm -rf rockbox.zip rockbox.7z rockbox.tar rockbox.tar.gz \
 		rockbox.tar.xz rockbox-full.* rockbox-fonts.* TAGS apps \
