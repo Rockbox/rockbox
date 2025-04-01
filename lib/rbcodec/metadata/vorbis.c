@@ -444,8 +444,8 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
                 id3->albumart.pos = picframe_pos_b64 + before_block_pos;
                 id3->albumart.size = after_block_pos - id3->albumart.pos;
             }
+            continue;
         }
-        else
 #endif
         /* Is it an embedded cuesheet? */
         if (!strcasecmp(name, "CUESHEET"))
@@ -454,12 +454,10 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
             id3->embedded_cuesheet.pos = lseek(file.fd, 0, SEEK_CUR) - read_len;
             id3->embedded_cuesheet.size = len;
             id3->embedded_cuesheet.encoding = CHAR_ENC_UTF_8;
+            continue;
         }
-        else
-        {
-            len = parse_tag(name, id3->path, id3, buf, buf_remaining,
-                TAGTYPE_VORBIS);
-        }
+
+        len = parse_tag(name, id3->path, id3, buf, buf_remaining, TAGTYPE_VORBIS);
 
         buf += len;
         buf_remaining -= len;
