@@ -1,9 +1,9 @@
 # Note!  This is used by the www.rockbox.org infrastructure
 # to know what targets/etc should be displayed, built, and so forth.
 #
-$publicrelease="3.15";
-$releasedate="15 Nov 2019";
-$releasenotes="/wiki/ReleaseNotes315";
+$publicrelease="4.0";
+$releasedate="1 Apr 2025";
+$releasenotes="/wiki/ReleaseNotes400";
 
 ################################################################
 
@@ -15,7 +15,7 @@ $releasenotes="/wiki/ReleaseNotes315";
 #    manual => 'modelname2',             # optional (uses modelname2's manual)
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
 #    voice => 'modelname4'               # optional (uses modelname4's voice)
-#    release => '3.14',                  # optional (final release version, if different from above)
+#    release => '3.14',                  # optional (final release version, if different from above. can be in future)
 #    manualok => 1,                      # optional (defaults 1 for status 3 and 0 for rest)
 # }
 
@@ -453,24 +453,20 @@ $releasenotes="/wiki/ReleaseNotes315";
     'agptekrocker' => {
         name => 'Agptek Rocker',
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox3' => {
         name => 'xDuoo X3',
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox3ii' => {
         name => 'xDuoo X3ii',
         manualok => 0,     # Remove when manual is written
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'xduoox20' => {
         name => 'xDuoo X20',
         manualok => 0,     # Remove when manual is written
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'fiiom3klinux' => {
         name => 'FiiO M3K (Linux)',
@@ -479,16 +475,15 @@ $releasenotes="/wiki/ReleaseNotes315";
     'fiiom3k' => {
         name => 'FiiO M3K',
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'aigoerosq' => {
         name => 'AIGO EROS Q / K (Hosted)',
         status => 2,  # Do we promote this to stable?
+        # manual => "erosqnative",
     },
     'erosqnative' => {
         name => 'AIGO EROS Q / K (Native)',
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
@@ -505,7 +500,6 @@ $releasenotes="/wiki/ReleaseNotes315";
     'shanlingq1' => {
         name => 'Shanling Q1',
         status => 3,
-        release => '4.0',  # Remove once 4.0 lands
     },
 );
 

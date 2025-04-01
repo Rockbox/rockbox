@@ -112,7 +112,7 @@ sub buildfonts {
     `$c`;
 
     print "Run 'make fontzip'\n" if($verbose);
-    `make fontzip`;
+    `make fontzip NODEPS=1`;
 }
 
 `git checkout $tag`;
