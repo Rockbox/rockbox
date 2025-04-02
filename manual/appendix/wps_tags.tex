@@ -319,6 +319,23 @@ Examples:
   viewport.  If \config{\%Lt} is present anywhere in the \fname{.sbs}, then the
   \config{\%Vi} viewport will not show the title.
 
+\section{Drawing the lists using a skin}
+  \begin{tagmap}
+    \config{\%LT[(offset, nowrap)]} & Get the current items text, can be used in normal viewports to get the selected items text.\\
+    \config{\%LI[(offset, nowrap)]} & Get the current items icon number, can be used in normal viewports to get the selected items icon number.\\
+    \config{\%LN} & Get the position of the current item in the list (1-based). Useful for displaying numbered lists.\\
+    \config{\%LR} & Get the row number on which the current item will be drawn (1-based). Can be used to change the style based on where on the screen the item appears.\\
+    \config{\%Lc} & Get the column number on which the current item will be drawn (1-based). Can be used to change the style based on where on the screen the item appears.\\
+    \config{\%LC} & Use as a conditional to determine if the current item is the selected item\\
+    \config{\%Lb} & BAR TAG to show the scroll bar, params/options like other bar types. It still needs a bit of work though. Use as a conditional to find out if the bar is actually needed\\
+    \config{\%LB(viewport, width, height [,tile])} & specify the viewport label to draw for each item and the size of each item. if the last param is 'tile' it will form a grid instead of a list\\
+  \end{tagmap}
+  \note{To do this you need at least one viewport which will be drawn for each item on the screen, and the ui viewport configured (using the %Vi tag). To make this work do the following:
+    Setup the ui viewport as normal. As many items as can fit in this viewport will be displayed (Titles are not included and need to be drawn in a seperate viewport manually)
+    Create one or more viewports with a shared label which you want to display for each item. The x/y position is relative to an imaginary box which each item fits in inside the ui viewport.
+    Tell the skin to draw the lists using the \%LB() tag}
+
+
 \section{Changing Volume}
   \begin{tagmap}
     \config{\%mv(t)} & ``v'' if the volume is being changed\\
