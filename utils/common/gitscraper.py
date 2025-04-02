@@ -206,7 +206,7 @@ def scrape_files(repo, treehash, filelist, dest=None, timestamp_files=None):
 
 
 def archive_files(repo, treehash, filelist, basename, tmpfolder=None,
-                  archive="tbz"):
+                  archive="txz"):
     '''Archive list of files into tarball.
     @param repo Path to repository root.
     @param treehash Hash identifying the tree.
@@ -216,7 +216,7 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder=None,
                     basename inside of the archive as well (i.e. no tarbomb).
     @param tmpfolder Folder to put intermediate files in. If no folder is given
                      a temporary one will get used.
-    @param archive Type of archive to create. Supported values are "tbz" and
+    @param archive Type of archive to create. Supported values are "txz", "tbz", and
                    "7z". The latter requires the 7z binary available in the
                    system's path.
     @return Output filename.
@@ -241,6 +241,11 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder=None,
     elif archive == "tbz":
         outfile = basename + ".tar.bz2"
         tf = tarfile.open(outfile, "w:bz2")
+        tf.add(workfolder, basename)
+        tf.close()
+    elif archive == "txz":
+        outfile = basename + ".tar.xz"
+        tf = tarfile.open(outfile, "w:xz")
         tf.add(workfolder, basename)
         tf.close()
     else:

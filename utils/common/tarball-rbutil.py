@@ -58,7 +58,9 @@ filelist = ["utils/rbutilqt",
             "utils/imxtools",
             "utils/nwztools",
             "utils/tomcrypt",
+            "utils/themeeditor",
             "lib/rbcodec/codecs/libspeex",
+            "lib/skin_parser",
             "docs/COPYING",
             "docs/gpl-2.0.html",
             "docs/logo/rockbox-clef.svg",
@@ -80,6 +82,6 @@ filelist = ["utils/rbutilqt",
             "tools/sapi_voice.vbs"]
 
 print(f"Getting git revision {tree}")
-gitscraper.archive_files(repository, tree, filelist, basename, archive="tbz")
+gitscraper.archive_files(repository, tree, filelist, basename, archive="txz")
 
-print(f"Created {basename}.tar.bz2.")
+print(f"Created {basename}.tar.xz.")
