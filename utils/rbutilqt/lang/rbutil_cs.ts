@@ -2175,27 +2175,27 @@ Prosím nastavte engine syntézy řeči.</translation>
 <context>
     <name>PlayerBuildInfo</name>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="337"/>
+        <location filename="../base/playerbuildinfo.cpp" line="339"/>
         <source>Stable (Retired)</source>
         <translation>Stabilní (historická)</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="340"/>
+        <location filename="../base/playerbuildinfo.cpp" line="342"/>
         <source>Unusable</source>
         <translation>Nepoužitelný</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="343"/>
+        <location filename="../base/playerbuildinfo.cpp" line="345"/>
         <source>Unstable</source>
         <translation>Nestabilní</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="346"/>
+        <location filename="../base/playerbuildinfo.cpp" line="348"/>
         <source>Stable</source>
         <translation>Stabilní</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="349"/>
+        <location filename="../base/playerbuildinfo.cpp" line="351"/>
         <source>Unknown</source>
         <translation>Neznámý</translation>
     </message>
@@ -2270,42 +2270,52 @@ Prosím nastavte engine syntézy řeči.</translation>
         <translation>(neznámé zařízení)</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="107"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="106"/>
+        <source>Before Bootloader installation begins, Please check the following:</source>
+        <translation>Před instalací zavaděče prosím zkontrolujte následující:</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="112"/>
+        <source>&lt;li&gt;Ensure your SD card is formatted as FAT. exFAT is &lt;i&gt;not&lt;/i&gt; supported. You can reformat using the Original Firmware on your player if need be. It is located under (System Settings --&gt; Reset --&gt; Format TF Card).&lt;/li&gt;&lt;li&gt;Please use a quality SD card from a reputable source. The SD cards that come bundled with players are often of substandard quality and may cause issues.&lt;/li&gt;</source>
+        <translation>&lt;li&gt;Zkontrolujte, zda je vaše SD karta naformátována souborovým systémem FAT. Souborový systém exFAT &lt;i&gt;není&lt;/i&gt; podporován. Kartu můžete v případě potřeby přeformátovat pomocí původního firmware vašeho přehrávače. Tuto možnost najdete v (Nastavení systému --&gt; Reset --&gt; Formátovat TF kartu).&lt;/li&gt;&lt;li&gt;Prosíme použijte kvalitní SD kartu od důvěryhodného dodavatele. SD karty dodávané s přehrávači jsou často nevalné kvality a mohou způsobovat potíže.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="135"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>Instalace zavaděče je téměř hotova. Instalace od vás &lt;b&gt;vyžaduje&lt;/b&gt; provést následující kroky ručně:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="113"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="141"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Bezpečně odeberte váš přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="119"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="148"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Restartujte váš přehrávač do původního firmware.&lt;/li&gt;&lt;li&gt;Aktualizujte firmware pomocí aktualizačního procesu původního firmware. Podobnosti se dočtete v návodu k vašemu přehrávači.&lt;br/&gt;&lt;b&gt;Důležité:&lt;/b&gt; aktualizace firmware je kritický proces, který nesmí být přerušen. &lt;b&gt;Ujistěte se, že je přehrávač nabitý před zahájením aktualizace.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Po aktualizaci firmware restartujte přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="130"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="159"/>
         <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
         <translation>&lt;li&gt;Vyjměte jakoukoli dříve vloženou microSD kartu&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="131"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="160"/>
         <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Odpojte váš přehrávač. Přehrávač bude restartován a provede aktualizaci původního firmware. Podobnosti se dočtete v návodu k vašemu přehrávači.&lt;br/&gt;&lt;b&gt;Důležité:&lt;/b&gt; aktualizace firmware je kritický proces, který nesmí být přerušen. &lt;b&gt;Ujistěte se, že je přehrávač nabitý před odpojením.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Po aktualizaci firmware restartujte přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="142"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="171"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Vypněte přehrávač&lt;/li&gt;&lt;li&gt;Připojte nabíječku&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="147"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="176"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;li&gt;Odpojte USB a nabíjecí zařízení&lt;/li&gt;&lt;li&gt;Držte tlačítko&lt;i&gt;Napájení&lt;/i&gt; pro vypnutí přehrávače&lt;/li&gt;&lt;li&gt;Přepněte přepínač baterie na přehrávači&lt;/li&gt;&lt;li&gt;Držte tlačítko&lt;i&gt;Napájení&lt;/i&gt; pro spuštění Rockboxu&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="153"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="182"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Poznámka:&lt;/b&gt; Můžete nejprve bezpečně instalovat zbývající části, ale výše uvedené kroky jsou &lt;b&gt;nezbytné&lt;/b&gt; pro dokončení instalace!&lt;/p&gt;</translation>
     </message>
@@ -2331,23 +2341,23 @@ Prosím nastavte engine syntézy řeči.</translation>
         <translation>Použité knihovny</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="383"/>
+        <location filename="../rbutilqt.cpp" line="384"/>
         <source>New installation</source>
         <translation>Nová instalace</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="384"/>
+        <location filename="../rbutilqt.cpp" line="385"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>Toto je nová instalace nebo verze Rockbox Utility. Nyní se otevře nastavení programu.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="391"/>
-        <location filename="../rbutilqt.cpp" line="622"/>
+        <location filename="../rbutilqt.cpp" line="392"/>
+        <location filename="../rbutilqt.cpp" line="623"/>
         <source>Configuration error</source>
         <translation>Chyba nastavení</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="392"/>
+        <location filename="../rbutilqt.cpp" line="393"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>Vaše nastavení je neplatné. Pravděpodobně kvůli změně cesty k zařízení. Nyní se otevře okno nastavení, které vám dovolí opravit problém.</translation>
     </message>
@@ -2412,7 +2422,7 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
         <translation type="vanished">Potvrdit instalaci</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="562"/>
+        <location filename="../rbutilqt.cpp" line="563"/>
         <source>Mount point is wrong!</source>
         <translation>Připojovací bod je špatně!</translation>
     </message>
@@ -2437,32 +2447,32 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
         <translation type="vanished">Opravdu chcete instalovat hlasové soubory?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="493"/>
+        <location filename="../rbutilqt.cpp" line="494"/>
         <source>Confirm Uninstallation</source>
         <translation>Potvrdit odinstalování</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="494"/>
+        <location filename="../rbutilqt.cpp" line="495"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Opravdu chcete odinstalovat zavaděč?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="506"/>
+        <location filename="../rbutilqt.cpp" line="507"/>
         <source>No uninstall method for this target known.</source>
         <translation>Pro toto zařízení není známý způsob odinstalace.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="713"/>
+        <location filename="../rbutilqt.cpp" line="714"/>
         <source>New version of Rockbox Utility available.</source>
         <translation>Je k dispozici aktualizace Rockbox Utility.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="716"/>
+        <location filename="../rbutilqt.cpp" line="717"/>
         <source>Rockbox Utility is up to date.</source>
         <translation>Rockbox Utilita je aktuální.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="548"/>
+        <location filename="../rbutilqt.cpp" line="549"/>
         <source>Confirm installation</source>
         <translation>Potvrdit instalaci</translation>
     </message>
@@ -2475,67 +2485,67 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
         <translation type="vanished">Je instalována vývojová verze Rockboxu. Předpřipravené hlasy jsou k dispozici jen pro stabilní vydání. Prosím vytvořte si hlas pomocí funkce &quot;Vytvoření hlasového souboru&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="518"/>
+        <location filename="../rbutilqt.cpp" line="519"/>
         <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
         <translation>Rockbox Utilita nemůže instalovat zavaděč na váš přehrávač. Proveďte aktualizaci firmware způsobem používaným výrobcem vašeho přehrávače.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="521"/>
+        <location filename="../rbutilqt.cpp" line="522"/>
         <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
         <translation>Důležité: Spusťte na vašem přehrávači původní firmware před tím, než použijete aktualizační postup vašeho výrobce.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="529"/>
+        <location filename="../rbutilqt.cpp" line="530"/>
         <source>No Rockbox bootloader found.</source>
         <translation>Nenalezen zavaděč Rockboxu.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="549"/>
+        <location filename="../rbutilqt.cpp" line="550"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Opravdu chcete instalovat Rockbox Utilitu na váš přehrávač? Po instalaci ji můžete spustit z disku přehrávače.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="558"/>
+        <location filename="../rbutilqt.cpp" line="559"/>
         <source>Installing Rockbox Utility</source>
         <translation>Instaluji Rockbox Utilitu</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="576"/>
+        <location filename="../rbutilqt.cpp" line="577"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Chyba instalace Rocxbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="580"/>
+        <location filename="../rbutilqt.cpp" line="581"/>
         <source>Installing user configuration</source>
         <translation>Instalace uživatelských nastavení</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="584"/>
+        <location filename="../rbutilqt.cpp" line="585"/>
         <source>Error installing user configuration</source>
         <translation>Chyba instalace uživatelských nastavení</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="588"/>
+        <location filename="../rbutilqt.cpp" line="589"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Úspěšná instalace Rockbox Utility.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="623"/>
+        <location filename="../rbutilqt.cpp" line="624"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Vaše nastavení je neplatné. Prosím zkontrolujte nastavení, zda jsou všechny vybrané hodnoty správné.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="644"/>
+        <location filename="../rbutilqt.cpp" line="645"/>
         <source>Checking for update ...</source>
         <translation>Kontroluji aktualizace ...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="708"/>
+        <location filename="../rbutilqt.cpp" line="709"/>
         <source>Rockbox Utility Update available</source>
         <translation>Je k dispozici aktualizace Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="709"/>
+        <location filename="../rbutilqt.cpp" line="710"/>
         <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
         <translation>&lt;b&gt;Je k dispozici nová verze Rockbox Utility&lt;/b&gt;&lt;br&gt;&lt;br&gt;Používáte verzi %1. Stáhněte si verzi %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</translation>
     </message>
@@ -2548,22 +2558,22 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
         <translation type="vanished">&lt;b&gt;Je k dispozici nová verze Rockbox Utility.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Stáhněte si ji zde: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="739"/>
+        <location filename="../rbutilqt.cpp" line="740"/>
         <source>Device ejected</source>
         <translation>Zařízení odebráno</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="740"/>
+        <location filename="../rbutilqt.cpp" line="741"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
         <translation>Zařízení úspěšně odebráno. Přehrávač můžete odpojit od počítače.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="744"/>
+        <location filename="../rbutilqt.cpp" line="745"/>
         <source>Ejecting failed</source>
         <translation>Odebrání selhalo</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="745"/>
+        <location filename="../rbutilqt.cpp" line="746"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
         <translation>Odpojení zařízení selhalo. Ujistěte se, že žádný program nepracuje se zařízením. Pokud odpojení opětovně selže, použijte funkci odpojení vašeho operačního systému,.</translation>
     </message>
@@ -3143,12 +3153,13 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
         <translation>Nelze vytvořit soubor se zálohou. Pokračovat?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="419"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="418"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="430"/>
         <source>Manual steps required</source>
         <translation>Nutné ruční kroky</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="640"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="652"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
         <translation>Vaše instalace nepotřebuje žádné dodatečné soubory, přeskakuji.</translation>
     </message>
@@ -3542,22 +3553,22 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
         <translation>Vytváření .talk souboru dokončeno</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="242"/>
+        <location filename="../base/talkfile.cpp" line="248"/>
         <source>File copy aborted</source>
         <translation>Kopírování souboru přerušeno</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="261"/>
+        <location filename="../base/talkfile.cpp" line="267"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>Kopírování od %1 do %2 selhalo</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="283"/>
+        <location filename="../base/talkfile.cpp" line="289"/>
         <source>Cleaning up...</source>
         <translation>Čištění...</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="294"/>
+        <location filename="../base/talkfile.cpp" line="300"/>
         <source>Finished</source>
         <translation>Dokončeno</translation>
     </message>
@@ -3668,31 +3679,31 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
         <translation>žádný výběr</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="122"/>
+        <location filename="../themesinstallwindow.cpp" line="127"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Chyba připojení: %1.
 Prosím zkontrolujte nastavení sítě a proxy.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="135"/>
+        <location filename="../themesinstallwindow.cpp" line="140"/>
         <source>the following error occured:
 %1</source>
         <translation>došlo k následující chybě:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="141"/>
+        <location filename="../themesinstallwindow.cpp" line="146"/>
         <source>done.</source>
         <translation>hotovo.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="178"/>
+        <location filename="../themesinstallwindow.cpp" line="183"/>
         <source>Information</source>
         <translation>Informace</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="198"/>
+        <location filename="../themesinstallwindow.cpp" line="203"/>
         <source>Download size %L1 kiB (%n item(s))</source>
         <translation>
             <numerusform>Stahovaná velikost je %L1 kiB (%n položka)</numerusform>
@@ -3701,70 +3712,70 @@ Prosím zkontrolujte nastavení sítě a proxy.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="214"/>
+        <location filename="../themesinstallwindow.cpp" line="219"/>
         <source>fetching details for %1</source>
         <translation>načítám podrobnosti o %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="217"/>
+        <location filename="../themesinstallwindow.cpp" line="222"/>
         <source>fetching preview ...</source>
         <translation>načítám náhled ...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="230"/>
+        <location filename="../themesinstallwindow.cpp" line="235"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Autor:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="231"/>
-        <location filename="../themesinstallwindow.cpp" line="233"/>
+        <location filename="../themesinstallwindow.cpp" line="236"/>
+        <location filename="../themesinstallwindow.cpp" line="238"/>
         <source>unknown</source>
         <translation>neznámý</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="232"/>
+        <location filename="../themesinstallwindow.cpp" line="237"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Verze:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="234"/>
+        <location filename="../themesinstallwindow.cpp" line="239"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Popis:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="235"/>
+        <location filename="../themesinstallwindow.cpp" line="240"/>
         <source>no description</source>
         <translation>žádný popis</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="251"/>
+        <location filename="../themesinstallwindow.cpp" line="256"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
         <translation>Stahování náhledu tématu selhalo.
 Kód HTTP odpovědi: %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="262"/>
+        <location filename="../themesinstallwindow.cpp" line="267"/>
         <source>no theme preview</source>
         <translation>žádný náhled tématu</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="290"/>
+        <location filename="../themesinstallwindow.cpp" line="295"/>
         <source>Select</source>
         <translation>Vybrat</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="297"/>
+        <location filename="../themesinstallwindow.cpp" line="302"/>
         <source>getting themes information ...</source>
         <translation>stahuji informace o tématu ...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="325"/>
+        <location filename="../themesinstallwindow.cpp" line="330"/>
         <source>No themes selected, skipping</source>
         <translation>Nevybráno žádné téma, přeskakuji</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="354"/>
+        <location filename="../themesinstallwindow.cpp" line="359"/>
         <source>Mount point is wrong!</source>
         <translation>Připojovací bod je špatně!</translation>
     </message>
@@ -3929,37 +3940,37 @@ Jsou nutná administrátorská práva.&lt;/li&gt;</translation>
         <translation>Čtení řetězců...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="276"/>
+        <location filename="../base/voicefile.cpp" line="275"/>
         <source>The downloaded file was empty!</source>
         <translation>Stažený soubor byl prázdný!</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="302"/>
+        <location filename="../base/voicefile.cpp" line="301"/>
         <source>Creating voicefiles...</source>
         <translation>Vytváří se hlasový soubor...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="307"/>
+        <location filename="../base/voicefile.cpp" line="306"/>
         <source>Error opening downloaded file</source>
         <translation>Chyba otevírání staženého souboru</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="318"/>
+        <location filename="../base/voicefile.cpp" line="317"/>
         <source>Error opening output file</source>
         <translation>Chyba při otevírání výstupního souboru</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="338"/>
+        <location filename="../base/voicefile.cpp" line="341"/>
         <source>successfully created.</source>
         <translation>úspěšně vytvořeno.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="347"/>
+        <location filename="../base/voicefile.cpp" line="350"/>
         <source>Cleaning up...</source>
         <translation>Čištění...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="358"/>
+        <location filename="../base/voicefile.cpp" line="361"/>
         <source>Finished</source>
         <translation>Dokončeno</translation>
     </message>
