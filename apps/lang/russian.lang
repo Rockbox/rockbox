@@ -30,6 +30,7 @@
 # - Roman Levkin-Taymenev
 # - Igor Poretsky
 # - Dmitry Prozorov
+# - Fedor Pomazkov
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -16458,7 +16459,7 @@
     *: "По первой букве..."
   </dest>
   <voice>
-    *: "По первой букве..."
+    *: "По первой букве"
   </voice>
 </phrase>
 <phrase>
