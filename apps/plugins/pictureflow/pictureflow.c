@@ -3256,9 +3256,6 @@ static bool sort_albums(int new_sorting, bool from_settings)
         rb->lcd_update();
 #endif
         rb->splash(HZ, sort_options[pf_cfg.sort_albums_by]);
-#ifdef USEGSLIB
-        grey_show(true);
-#endif
     }
 
     hash_album = mfnv(get_album_name(center_index));
@@ -3276,8 +3273,12 @@ static bool sort_albums(int new_sorting, bool from_settings)
     is_initial_slide = true;
     create_pf_thread();
 
-    reselect(hash_album, hash_artist);
+    reselect(hash_album, hash_artist); /* splash if not found */
 
+#ifdef USEGSLIB
+    if (!from_settings)
+        grey_show(true);
+#endif
     return true;
 }
 
@@ -4620,7 +4621,6 @@ static bool init(void)
     reset_slides();
 
 #ifdef USEGSLIB
-    grey_show(true);
     grey_set_drawmode(DRMODE_FG);
 #endif
     rb->lcd_set_drawmode(DRMODE_FG);
@@ -4638,7 +4638,10 @@ static bool reinit(void)
     cleanup();
     if (init())
     {
-        reselect(hash_album, hash_artist);
+        reselect(hash_album, hash_artist); /* splash if not found */
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
         return true;
     }
     return false;
@@ -4984,7 +4987,10 @@ enum plugin_status plugin_start(const void *parameter)
 
     if (init())
     {
-        set_initial_slide(file_id3 ? file : NULL);
+        set_initial_slide(file_id3 ? file : NULL); /* may call splash */
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
         ret = pictureflow_main();
     }
     else
