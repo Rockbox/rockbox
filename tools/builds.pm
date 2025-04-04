@@ -639,7 +639,7 @@ sub simbuilds {
 	    'gtts' => '-l cs',
 	    'piper' => 'cs_CZ-jirka-medium.onnx',
 	},
-        'enabled' => 1,
+        'enabled' => 0,
     },
     'dansk' => {
 	'lang' => 'dansk',
@@ -807,7 +807,7 @@ sub simbuilds {
 	    'gtts' => '-l no',
             'piper' => 'no_NO-talesyntese-medium.onnx',
 	},
-        'enabled' => 1,
+        'enabled' => 0,
     },
     'polski' => {
 	'lang' => 'polski',
