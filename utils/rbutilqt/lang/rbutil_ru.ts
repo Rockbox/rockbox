@@ -99,18 +99,18 @@
         <translation>Для удаления выполните нормальное обновление с неизменённой фирменной прошивкой</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="obsolete">Установка загрузчика потребует от вас копию оригинальной прошивки Sandisk\&apos;а (bin файл). Эта прошивка будет пропатчена и затем установлена в ваш плеер вместе с зарузчиком Rockbox\&apos;а. По причинам легальности данного действия вам нужно будет самим скачать загрузчик. Зайдите на &lt;a href=\&apos;http://forums.sandisk.com/sansa/\&apos;&gt;Sansa Forums\&apos;&lt;/a&gt; или обратитесь к &lt;a href=\&apos;http://www.rockbox.org/manual.shtml\&apos;&gt;инструкции&lt;/a&gt; и вики-странице &lt;a href=\&apos;http://www.rockbox.org/wiki/SansaAMS\&apos;&gt;SansaAMS&lt;/a&gt; за помощью с получением файла.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="obsolete">Установка загрузчика потребует от вас копию оригинальной прошивки Sandisk\&apos;а (bin файл). Эта прошивка будет пропатчена и затем установлена в ваш плеер вместе с зарузчиком Rockbox\&apos;а. По причинам легальности данного действия вам нужно будет самим скачать загрузчик. Зайдите на &lt;a href=\&apos;http://forums.sandisk.com/sansa/\&apos;&gt;Sansa Forums\&apos;&lt;/a&gt; или обратитесь к &lt;a href=\&apos;https://www.rockbox.org/manual.shtml\&apos;&gt;инструкции&lt;/a&gt; и вики-странице &lt;a href=\&apos;https://www.rockbox.org/wiki/SansaAMS\&apos;&gt;SansaAMS&lt;/a&gt; за помощью с получением файла.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Установка загрузчика потребует от вас копию оригинальной прошивки от Sandisk (bin-файл). Эта прошивка будет пропатчена, а затем установлена на ваш плеер вместе с зарузчиком Rockbox\&apos;а. По законным причинам, Вам необходимо скачать файл самостоятельно. Зайдите на &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;форумы Sansa&lt;/a&gt; или читайте &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;инструкцию&lt;/a&gt; и вики-страничку &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; о том, как получить файл.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Установка загрузчика потребует от вас копию оригинальной прошивки от Sandisk (bin-файл). Эта прошивка будет пропатчена, а затем установлена на ваш плеер вместе с зарузчиком Rockbox\&apos;а. По законным причинам, Вам необходимо скачать файл самостоятельно. Зайдите на &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;форумы Sansa&lt;/a&gt; или читайте &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;инструкцию&lt;/a&gt; и вики-страничку &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; о том, как получить файл.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
     </message>
 </context>
 <context>
     <name>BootloaderInstallBSPatch</name>
     <message>
-        <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -224,8 +224,8 @@
 <context>
     <name>BootloaderInstallChinaChip</name>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Чтобы установить загрузчик, требуется файл фирменной прошивки (HXF-файл). По законодательным причинам, этот файл вам необходимо скачать самостоятельно. О том, как получить этот файл, смотрите в &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;руководстве по эксплуатации&lt;/a&gt; и на &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;вики-страничке OndaVX747&lt;/a&gt;. &lt;br/&gt; Нажмине на ОК, чтобы продолжить и указать путь к прошивке на Вашем компьютере.</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Чтобы установить загрузчик, требуется файл фирменной прошивки (HXF-файл). По законодательным причинам, этот файл вам необходимо скачать самостоятельно. О том, как получить этот файл, смотрите в &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;руководстве по эксплуатации&lt;/a&gt; и на &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;вики-страничке OndaVX747&lt;/a&gt;. &lt;br/&gt; Нажмине на ОК, чтобы продолжить и указать путь к прошивке на Вашем компьютере.</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -450,8 +450,8 @@
         <translation>неизвестная ошибка</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Для установки загрузчика требуется файл прошивки с фирменной прошивкой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Для установки загрузчика требуется файл прошивки с фирменной прошивкой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
     </message>
     <message>
         <source>invalid file: &quot;length3&quot; field wrong</source>
@@ -473,8 +473,8 @@
 <context>
     <name>BootloaderInstallImx</name>
     <message>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Установка загрузчика потребует от вас копию оригинальной прошивки от Sandisk (файл firmware.sb). Эта прошивка будет пропатчена, а затем установлена на ваш плеер вместе с зарузчиком Rockbox. По законным причинам, Вам необходимо скачать файл самостоятельно. Зайдите на &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;форумы Sansa&lt;/a&gt; или читайте вики-страничку &lt;a href=&apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; о том, как получить файл.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Установка загрузчика потребует от вас копию оригинальной прошивки от Sandisk (файл firmware.sb). Эта прошивка будет пропатчена, а затем установлена на ваш плеер вместе с зарузчиком Rockbox. По законным причинам, Вам необходимо скачать файл самостоятельно. Зайдите на &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;форумы Sansa&lt;/a&gt; или читайте вики-страничку &lt;a href=&apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; о том, как получить файл.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
     </message>
     <message>
         <source>Could not read original firmware file</source>
@@ -569,9 +569,9 @@
     </message>
     <message>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
-See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
+See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Предупреждение: это - MacPod, Rockbox работает только на WinPod&apos;ах.
-См. http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
+См. https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <source>Successfull added bootloader</source>
@@ -644,8 +644,8 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
 <context>
     <name>BootloaderInstallMpio</name>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Для установки загрузчика требуется файл прошивки с фирменной микропрограммой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Для установки загрузчика требуется файл прошивки с фирменной микропрограммой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -855,12 +855,12 @@ This is required to install the bootloader</source>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
-See http://www.rockbox.org/wiki/SansaE200Install
+See https://www.rockbox.org/wiki/SansaE200Install
 </source>
         <translation>ОБНАРУЖЕНА СТАРАЯ УСТАНОВКА ROCKBOX, ОПЕРАЦИЯ ОТМЕНЯЕТСЯ.
 Вам необходимо переустановить фирменную микропрограмму 
 вашего плеера перед первым запуском sansapatcher&apos;а.
-См. http://www.rockbox.org/wiki/SansaE200Install</translation>
+См. https://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
         <source>Could not open Sansa in R/W mode</source>
@@ -958,8 +958,8 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation>Изменённый файл прошивки успешно создан</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Для установки загрузчика требуется файл прошивки с фирменной микропрограммой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Для установки загрузчика требуется файл прошивки с фирменной микропрограммой (hex-файл). По законодательным причинам, вам необходимо скачать этот файл самостоятельно. Как найти этот файл, смотрите в &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;руководстве по экслуатации&lt;/a&gt; и на вики-странице &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt;.&lt;br/&gt;Чтобы продолжить, нажмите на OK и укажите файл прошивки на компьютере.</translation>
     </message>
     <message>
         <source>Could not patch firmware</source>
@@ -3300,8 +3300,8 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Мастер установки и управления Rockbox, микропрограммы с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;проекта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Мастер установки и управления Rockbox, микропрограммы с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;проекта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>

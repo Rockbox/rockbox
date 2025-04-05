@@ -65,7 +65,7 @@ bool BootloaderInstallIpod::install(void)
     }
     if(ipod.macpod) {
         emit logItem(tr("Warning: This is a MacPod, Rockbox only runs on WinPods. \n"
-                    "See http://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
+                    "See https://www.rockbox.org/wiki/IpodConversionToFAT32"), LOGERROR);
         emit done(true);
         return false;
     }

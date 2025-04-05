@@ -84,8 +84,8 @@
     <name>BootloaderInstallAms</name>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（bin 文件）。此固件文件将被修补，然后与rockbox bootloader一起安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览&lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;此文件在您的播放器上不存在，安装后将自动消失。&lt;br/&gt;&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（bin 文件）。此固件文件将被修补，然后与rockbox bootloader一起安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览&lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;此文件在您的播放器上不存在，安装后将自动消失。&lt;br/&gt;&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="58"/>
@@ -226,8 +226,8 @@
     <name>BootloaderInstallChinaChip</name>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（HXF 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki 页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（HXF 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki 页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="50"/>
@@ -527,16 +527,16 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="50"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader安装需要提供一个原始固件的文件（二进制文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅&lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt;和&lt;a href=&apos;http://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;wiki页面。按确定继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader安装需要提供一个原始固件的文件（二进制文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅&lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt;和&lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;wiki页面。按确定继续并浏览您的计算机以获取固件文件。</translation>
     </message>
 </context>
 <context>
     <name>BootloaderInstallImx</name>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（firmware.sb 文件）。此文件将使用 Rockbox 引导加载程序进行修补并安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;按确定继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（firmware.sb 文件）。此文件将使用 Rockbox 引导加载程序进行修补并安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;按确定继续并浏览您的计算机以获取固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="94"/>
@@ -606,8 +606,8 @@
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="75"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
-See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation>警告：这是苹果格式的iPod，Rockbox仅能运行于Windows格式的iPod。参阅http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
+See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
+        <translation>警告：这是苹果格式的iPod，Rockbox仅能运行于Windows格式的iPod。参阅https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="94"/>
@@ -749,8 +749,8 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <name>BootloaderInstallMpio</name>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="34"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="53"/>
@@ -858,11 +858,11 @@ This is required to install the bootloader</source>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
-See http://www.rockbox.org/wiki/SansaE200Install
+See https://www.rockbox.org/wiki/SansaE200Install
 </source>
         <translation>检测到旧的 ROCKBOX 安装，安装中止。
 在首次运行Sansapatcher之前，您必须重新安装原始的 Sansa 固件
-请参阅 http://www.rockbox.org/wiki/SansaE200Install</translation>
+请参阅 https://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="102"/>
@@ -950,8 +950,8 @@ See http://www.rockbox.org/wiki/SansaE200Install
     <name>BootloaderInstallTcc</name>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取文件，请参阅 &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 或 &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki页面。&lt;br/&gt;按确定键继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 或 &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki页面。&lt;br/&gt;按确定键继续并浏览您的计算机以获取固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="50"/>
@@ -3639,8 +3639,8 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     </message>
     <message utf8="true">
         <location filename="../aboutbox.ui" line="54"/>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Rockbox 开源数字音频播放器固件的安装程序和管理实用程序。&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;在 GNU 通用公共许可证 v2 下发布。&lt;br/&gt;使用的图标来自 &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Rockbox 开源数字音频播放器固件的安装程序和管理实用程序。&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;在 GNU 通用公共许可证 v2 下发布。&lt;br/&gt;使用的图标来自 &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="74"/>

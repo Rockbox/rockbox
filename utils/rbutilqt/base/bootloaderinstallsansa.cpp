@@ -60,7 +60,7 @@ bool BootloaderInstallSansa::install(void)
         emit logItem(tr("OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
                "You must reinstall the original Sansa firmware before running\n"
                "sansapatcher for the first time.\n"
-               "See http://www.rockbox.org/wiki/SansaE200Install\n"),
+               "See https://www.rockbox.org/wiki/SansaE200Install\n"),
                LOGERROR);
         emit done(true);
         return false;
@@ -164,7 +164,7 @@ bool BootloaderInstallSansa::uninstall(void)
         emit logItem(tr("OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
                     "You must reinstall the original Sansa firmware before running\n"
                     "sansapatcher for the first time.\n"
-                    "See http://www.rockbox.org/wiki/SansaE200Install\n"),
+                    "See https://www.rockbox.org/wiki/SansaE200Install\n"),
                     LOGERROR);
         emit done(true);
         return false;

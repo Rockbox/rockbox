@@ -76,7 +76,7 @@ QString BootloaderInstallImx::ofHint()
               "yourself due to legal reasons. Please browse the "
               "<a href='http://forums.sandisk.com/sansa/'>Sansa Forums</a> "
               "or refer to the "
-              "<a href= 'http://www.rockbox.org/wiki/SansaFuzePlus'>SansaFuzePlus</a> "
+              "<a href= 'https://www.rockbox.org/wiki/SansaFuzePlus'>SansaFuzePlus</a> "
               "wiki page on how to obtain this file.<br/>"
               "Press Ok to continue and browse your computer for the firmware "
               "file.");

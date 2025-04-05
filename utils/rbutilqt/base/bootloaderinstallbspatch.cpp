@@ -67,7 +67,7 @@ QString BootloaderInstallBSPatch::ofHint()
               "This file will be patched with the Rockbox bootloader and "
               "installed to your player. You need to download this file "
               "yourself due to legal reasons. Please refer to the "
-              "<a href='http://www.rockbox.org/wiki/'>rockbox wiki</a> "
+              "<a href='https://www.rockbox.org/wiki/'>rockbox wiki</a> "
               "pages on how to obtain this file.<br/>"
               "Press Ok to continue and browse your computer for the firmware "
               "file.");

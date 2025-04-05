@@ -35,8 +35,8 @@ QString BootloaderInstallMpio::ofHint()
               "a firmware file of the original firmware (bin file). "
               "You need to download this file yourself due to legal "
               "reasons. Please refer to the "
-              "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and "
-              "the <a href='http://www.rockbox.org/wiki/MPIOHD200Port'>MPIOHD200Port</a> "
+              "<a href='https://www.rockbox.org/manual.shtml'>manual</a> and "
+              "the <a href='https://www.rockbox.org/wiki/MPIOHD200Port'>MPIOHD200Port</a> "
               "wiki page on how to obtain this file.<br/>"
               "Press Ok to continue and browse your computer for the firmware "
               "file.");
