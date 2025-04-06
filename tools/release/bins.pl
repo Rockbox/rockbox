@@ -121,7 +121,7 @@ sub buildfonts {
 print "cd tools && make\n" if($verbose);
 `(cd tools && make ) >/dev/null`;
 
-for my $b (&usablebuilds) {
+for my $b (&stablebuilds) {
     my $configname = $builds{$b}{configname} ? $builds{$b}{configname} : $b;
     runone($b, $configname, $builds{$b}{ram});
 }

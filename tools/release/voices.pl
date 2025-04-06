@@ -80,7 +80,7 @@ if (!defined($ENV{'POOL'})) {
 
 `mkdir -p $outdir`;
 
-for my $b (&usablebuilds) {
+for my $b (&stablebuilds) {
     next if ($builds{$b}{voice}); # no variants
 
     for my $v (&allvoices) {
