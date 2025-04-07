@@ -18,6 +18,7 @@
 # - Adilson V. Xavier
 # - Kessia Pinheiro
 # - Luyara Muniz
+# - Santiago Silva
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -110,10 +111,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Normal"
+    *: "~Normal"
   </dest>
   <voice>
-    *: "Normal"
+    *: "~Normal"
   </voice>
 </phrase>
 <phrase>
@@ -420,10 +421,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: "~Playlists"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "~Playlists"
   </voice>
 </phrase>
 <phrase>
@@ -434,10 +435,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Plugins"
+    *: "~Plugins"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "~Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -616,10 +617,10 @@
     *: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: "~Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: "~Volume"
   </voice>
 </phrase>
 <phrase>
@@ -700,10 +701,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -801,10 +802,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -1081,10 +1082,10 @@
     *: "Dithering"
   </source>
   <dest>
-    *: "Dithering"
+    *: "~Dithering"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "~Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1296,11 +1297,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "~Crossfade"
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "~Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -1449,11 +1450,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "~Mix"
   </dest>
   <voice>
     *: none
-    crossfade: "Mixagem"
+    crossfade: "~Mix"
   </voice>
 </phrase>
 <phrase>
@@ -2236,11 +2237,11 @@
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: "Backlight on Lock"
-    hold_button: "Luz de Fundo (Quando em Modo Hold)"
+    *: "Luz de Fundo em Modo Bloqueio"
+    hold_button: "Luz de Fundo em Modo Hold"
   </dest>
   <voice>
-    *: "Backlight on Lock"
+    *: "Luz de Fundo em Modo Bloqueio"
     hold_button: "Luz de Fundo em Modo Hold"
   </voice>
 </phrase>
@@ -2331,10 +2332,10 @@
     *: "Never"
   </source>
   <dest>
-    *: "Never"
+    *: "Nunca"
   </dest>
   <voice>
-    *: "Never"
+    *: "Nunca"
   </voice>
 </phrase>
 <phrase>
@@ -3020,10 +3021,10 @@
     *: "Linear (%)"
   </source>
   <dest>
-    *: "Linear (%)"
+    *: "~Linear (%)"
   </dest>
   <voice>
-    *: "Linear por cento"
+    *: "Linear porcentagem"
   </voice>
 </phrase>
 <phrase>
@@ -3244,10 +3245,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -3719,7 +3720,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "Janeiro"
@@ -3747,7 +3748,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Março"
@@ -3789,7 +3790,7 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Jun"
+    *: "~Jun"
   </dest>
   <voice>
     *: "Junho"
@@ -3803,7 +3804,7 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Jul"
+    *: "~Jul"
   </dest>
   <voice>
     *: "Julho"
@@ -3859,7 +3860,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "Novembro"
@@ -5088,11 +5089,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </voice>
 </phrase>
 <phrase>
@@ -5632,11 +5633,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Re-habilitar)"
+    remote: "(Vol- : Reativar)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-habilitar)"
+    remote: "(Volume menos para Reativar)"
   </voice>
 </phrase>
 <phrase>
@@ -5871,7 +5872,7 @@
     *: "Buffer:"
   </source>
   <dest>
-    *: "Buffer:"
+    *: "~Buffer:"
   </dest>
   <voice>
     *: "Tamanho do buffer"
@@ -5931,14 +5932,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "MSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Interno"
-    hibylinux: "micro S D"
-    xduoox3: "micro S D 1"
+    hibylinux: "~micro S D"
+    xduoox3: "~micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -5954,17 +5955,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
-    xduoox3: "MSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D "
-    xduoox3: "micro S D 2"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -6045,10 +6046,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "~Playlist"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "~Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6171,10 +6172,10 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Procurando... %d encontrada(s) (%s)"
+    *: "Procurando... %d encontrado (%s)"
   </dest>
   <voice>
-    *: "Procurando... %d encontrada(s) (%s)"
+    *: "Encontrado"
   </voice>
 </phrase>
 <phrase>
@@ -6437,10 +6438,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "~Playlist"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "~Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6820,11 +6821,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Tom"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Tom"
   </voice>
 </phrase>
 <phrase>
@@ -7358,7 +7359,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Bateria: Carregando"
+    charging: "A Bateria está Carregando"
   </voice>
 </phrase>
 <phrase>
@@ -8002,7 +8003,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "quilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -8016,7 +8017,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -8058,7 +8059,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -8086,7 +8087,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8534,7 +8535,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "áudio"
   </voice>
 </phrase>
 <phrase>
@@ -8576,7 +8577,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "~plugin"
   </voice>
 </phrase>
 <phrase>
@@ -8618,7 +8619,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -8663,7 +8664,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "~cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -8775,10 +8776,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "Demonstrações"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demonstrações"
   </voice>
 </phrase>
 <phrase>
@@ -8876,7 +8877,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -8890,7 +8891,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -8904,7 +8905,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "e"
   </voice>
 </phrase>
 <phrase>
@@ -9228,10 +9229,10 @@
     *: "Keyclick"
   </source>
   <dest>
-    *: "Keyclick"
+    *: "Tecla de clique"
   </dest>
   <voice>
-    *: "Keyclick"
+    *: "Tecla de clique"
   </voice>
 </phrase>
 <phrase>
@@ -9304,7 +9305,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -9385,7 +9386,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "~Auto"
   </dest>
   <voice>
     *: none
@@ -9602,11 +9603,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "~AGC"
   </dest>
   <voice>
     *: none
-    agc: "Controle automático de ganho"
+    agc: "Controle de ganho automático"
   </voice>
 </phrase>
 <phrase>
@@ -9670,7 +9671,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -9981,10 +9982,10 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Timestretch"
+    *: "~Timestretch"
   </dest>
   <voice>
-    *: "Timestretch"
+    *: "~Time stretch"
   </voice>
 </phrase>
 <phrase>
@@ -10226,11 +10227,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "~Mouse"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "~Mouse"
   </voice>
 </phrase>
 <phrase>
@@ -10255,10 +10256,10 @@
     *: "Compressor"
   </source>
   <dest>
-    *: "Compressor"
+    *: "~Compressor"
   </dest>
   <voice>
-    *: "Compressor"
+    *: "~Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -10432,10 +10433,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "~Auto"
   </dest>
   <voice>
-    *: "Auto"
+    *: "~Auto"
   </voice>
 </phrase>
 <phrase>
@@ -10735,11 +10736,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Hotkey"
+    hotkey: "Tecla Rápida"
   </dest>
   <voice>
     *: none
-    hotkey: "Hotkey"
+    hotkey: "Tecla Rápida"
   </voice>
 </phrase>
 <phrase>
@@ -10987,11 +10988,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: "Aprimoramento 3-D"
   </dest>
   <voice>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: "Aprimoramento 3-D"
   </voice>
 </phrase>
 <phrase>
@@ -11061,7 +11062,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "abrir picture flow"
@@ -11077,11 +11078,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11094,11 +11095,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </voice>
 </phrase>
 <phrase>
@@ -11564,10 +11565,10 @@
     *: "Reset EQ"
   </source>
   <dest>
-    *: "Reset EQ"
+    *: "Resetar EQ"
   </dest>
   <voice>
-    *: "Reset EQ"
+    *: "Resetar EQ"
   </voice>
 </phrase>
 <phrase>
@@ -11578,10 +11579,10 @@
     *: "Single Mode"
   </source>
   <dest>
-    *: "Single Mode"
+    *: "Modo Único"
   </dest>
   <voice>
-    *: "Single Mode"
+    *: "Modo Único"
   </voice>
 </phrase>
 <phrase>
@@ -11592,10 +11593,10 @@
     *: "Title & Album from ID3 tags"
   </source>
   <dest>
-    *: "Title & Album from ID3 tags"
+    *: "Título e Álbum das tags ID3"
   </dest>
   <voice>
-    *: "Title and Album from tags"
+    *: "Título e Álbum das tags"
   </voice>
 </phrase>
 <phrase>
@@ -11606,10 +11607,10 @@
     *: "Title from ID3 tags"
   </source>
   <dest>
-    *: "Title from ID3 tags"
+    *: "Título das tags ID3"
   </dest>
   <voice>
-    *: "Title from tags"
+    *: "Título das tags"
   </voice>
 </phrase>
 <phrase>
@@ -11620,10 +11621,10 @@
     *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: "Selection too big, %d random tracks will be selected"
+    *: "Seleção muito grande, %d faixas aleatórias serão selecionadas"
   </dest>
   <voice>
-    *: "Selection too big, fewer random tracks will be selected"
+    *: "Seleção muito grande, menos faixas aleatórias serão selecionadas"
   </voice>
 </phrase>
 <phrase>
@@ -11634,10 +11635,10 @@
     *: "Special character"
   </source>
   <dest>
-    *: "Special character"
+    *: "Caractere especial"
   </dest>
   <voice>
-    *: "Special character"
+    *: "Caractere especial"
   </voice>
 </phrase>
 <phrase>
@@ -11648,10 +11649,10 @@
     *: "Album Artists"
   </source>
   <dest>
-    *: "Album Artists"
+    *: "Artistas do Álbum"
   </dest>
   <voice>
-    *: "Album Artists"
+    *: "Artistas do Álbum"
   </voice>
 </phrase>
 <phrase>
@@ -11662,10 +11663,10 @@
     *: "Add Current to Shortcuts"
   </source>
   <dest>
-    *: "Add Current to Shortcuts"
+    *: "Adicionar Item Atual aos Atalhos"
   </dest>
   <voice>
-    *: "Add Current to Shortcuts"
+    *: "Adicionar Item Atual aos Atalhos"
   </voice>
 </phrase>
 <phrase>
@@ -11676,10 +11677,10 @@
     *: "Voice prompt volume"
   </source>
   <dest>
-    *: "Voice prompt volume"
+    *: "Volume do prompt de voz"
   </dest>
   <voice>
-    *: "Voice prompt volume"
+    *: "Volume do prompt de voz"
   </voice>
 </phrase>
 <phrase>
@@ -11692,11 +11693,11 @@
   </source>
   <dest>
     *: none
-    sansafuzeplus: "Touchpad Dead Zone"
+    sansafuzeplus: "Zona Morta do Touchpad"
   </dest>
   <voice>
     *: none
-    sansafuzeplus: "Touchpad Dead Zone"
+    sansafuzeplus: "Zona Morta do Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -11707,10 +11708,10 @@
     *: "Attack Time"
   </source>
   <dest>
-    *: "Attack Time"
+    *: "Tempo de Ataque"
   </dest>
   <voice>
-    *: "Attack Time"
+    *: "Tempo de Ataque"
   </voice>
 </phrase>
 <phrase>
@@ -11721,10 +11722,10 @@
     *: "Disc"
   </source>
   <dest>
-    *: "Disc"
+    *: "Disco"
   </dest>
   <voice>
-    *: "Disc"
+    *: "Disco"
   </voice>
 </phrase>
 <phrase>
@@ -11735,10 +11736,10 @@
     *: "Line Separator"
   </source>
   <dest>
-    *: "Line Separator"
+    *: "Separador de Linha"
   </dest>
   <voice>
-    *: "Line Separator"
+    *: "Separador de Linha"
   </voice>
 </phrase>
 <phrase>
@@ -11749,10 +11750,10 @@
     *: "Line Separator Colour"
   </source>
   <dest>
-    *: "Line Separator Colour"
+    *: "Cor do Separador de Linha"
   </dest>
   <voice>
-    *: "Line Separator Colour"
+    *: "Cor do Separador de Linha"
   </voice>
 </phrase>
 <phrase>
@@ -11765,11 +11766,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "DAC filter roll-off"
+    filter_roll_off: "Filtro roll-off do DAC"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "DAC filter roll-off"
+    filter_roll_off: "Filtro roll-off do DAC"
   </voice>
 </phrase>
 <phrase>
@@ -11782,11 +11783,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Sharp"
+    filter_roll_off: "Agudo"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Sharp"
+    filter_roll_off: "Agudo"
   </voice>
 </phrase>
 <phrase>
@@ -11799,11 +11800,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Slow"
+    filter_roll_off: "Lento"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Slow"
+    filter_roll_off: "Lento"
   </voice>
 </phrase>
 <phrase>
@@ -11816,11 +11817,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Curto Agudo"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Curto Agudo"
   </voice>
 </phrase>
 <phrase>
@@ -11833,11 +11834,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Curto Lento"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Curto Lento"
   </voice>
 </phrase>
 <phrase>
@@ -11850,11 +11851,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super Lento"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super Lento"
   </voice>
 </phrase>
 <phrase>
@@ -11867,11 +11868,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Short"
+    es9018: "Curto"
   </dest>
   <voice>
     *: none
-    es9018: "Short"
+    es9018: "Curto"
   </voice>
 </phrase>
 <phrase>
@@ -11884,11 +11885,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "~Bypass"
   </voice>
 </phrase>
 <phrase>
@@ -11901,11 +11902,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linear Rápido"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linear Rápido"
   </voice>
 </phrase>
 <phrase>
@@ -11918,11 +11919,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linear Lento"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linear Lento"
   </voice>
 </phrase>
 <phrase>
@@ -11935,11 +11936,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Mínimo Rápido"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Mínimo Rápido"
   </voice>
 </phrase>
 <phrase>
@@ -11952,11 +11953,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Mínimo Lento"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Mínimo Lento"
   </voice>
 </phrase>
 <phrase>
@@ -11969,11 +11970,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodização tipo 1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodização tipo 1"
   </voice>
 </phrase>
 <phrase>
@@ -11986,11 +11987,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodização tipo 2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodização tipo 2"
   </voice>
 </phrase>
 <phrase>
@@ -12003,11 +12004,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Híbrido Rápido"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Híbrido Rápido"
   </voice>
 </phrase>
 <phrase>
@@ -12020,11 +12021,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "~Brick Wall"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "~Brick Wall"
   </voice>
 </phrase>
 <phrase>
@@ -12038,13 +12039,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Modo de energia do DAC"
+    es9218: "Nível de saída do DAC"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Modo de energia do DAC"
+    es9218: "Nível de saída do DAC"
   </voice>
 </phrase>
 <phrase>
@@ -12058,13 +12059,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Alto desempenho"
+    es9218: "Alto Ganho (2 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Alto desempenho"
+    es9218: "Alto Ganho (2 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -12078,13 +12079,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Economizar bateria"
+    es9218: "Baixo Ganho (1 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Economizar bateria"
+    es9218: "Baixo Ganho (1 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -12095,10 +12096,10 @@
     *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: "Maximum Volume Limit"
+    *: "Limite de Volume Máximo"
   </dest>
   <voice>
-    *: "Maximum Volume Limit"
+    *: "Limite de Volume Máximo"
   </voice>
 </phrase>
 <phrase>
@@ -12109,10 +12110,10 @@
     *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: "Perceptual Bass Enhancement"
+    *: "Melhoria Perceptual de Graves"
   </dest>
   <voice>
-    *: "Perceptual Bass Enhancement"
+    *: "Melhoria Perceptual de Graves"
   </voice>
 </phrase>
 <phrase>
@@ -12123,10 +12124,10 @@
     *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: "Auditory Fatigue Reduction"
+    *: "Redução de Fatiga Auditiva"
   </dest>
   <voice>
-    *: "Auditory Fatigue Reduction"
+    *: "Redução de Fatiga Auditiva"
   </voice>
 </phrase>
 <phrase>
@@ -12137,10 +12138,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </dest>
   <voice>
-    *: "Haas Surround"
+    *: "~Haas Surround"
   </voice>
 </phrase>
 <phrase>
@@ -12179,10 +12180,10 @@
     *: "SIDE ONLY"
   </source>
   <dest>
-    *: "SIDE ONLY"
+    *: "SOMENTE LATERAL"
   </dest>
   <voice>
-    *: "SIDE ONLY"
+    *: "SOMENTE LATERAL"
   </voice>
 </phrase>
 <phrase>
@@ -12193,10 +12194,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Dry / Wet Mix"
+    *: "Mix Dry / Wet"
   </dest>
   <voice>
-    *: "Dry / Wet Mix"
+    *: "Mix Dry / Wet"
   </voice>
 </phrase>
 <phrase>
@@ -12209,11 +12210,11 @@
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Regulador de Escala de Frequência"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Regulador de Escala de Frequência"
   </voice>
 </phrase>
 <phrase>
@@ -12224,10 +12225,10 @@
     *: "USB Mode"
   </source>
   <dest>
-    *: "USB Mode"
+    *: "Modo USB"
   </dest>
   <voice>
-    *: "USB Mode"
+    *: "Modo USB"
   </voice>
 </phrase>
 <phrase>
@@ -12238,10 +12239,10 @@
     *: "Mass Storage"
   </source>
   <dest>
-    *: "Mass Storage"
+    *: "Armazenamento"
   </dest>
   <voice>
-    *: "Mass Storage"
+    *: "Armazenamento"
   </voice>
 </phrase>
 <phrase>
@@ -12252,10 +12253,10 @@
     *: "Charge Only"
   </source>
   <dest>
-    *: "Charge Only"
+    *: "Somente Carga"
   </dest>
   <voice>
-    *: "Charge Only"
+    *: "Somente Carga"
   </voice>
 </phrase>
 <phrase>
@@ -12266,10 +12267,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </dest>
   <voice>
-    *: "Android Debug Bridge"
+    *: "~Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -12280,10 +12281,10 @@
     *: "Enabled"
   </source>
   <dest>
-    *: "Enabled"
+    *: "Habilitado"
   </dest>
   <voice>
-    *: "Enabled"
+    *: "Habilitado"
   </voice>
 </phrase>
 <phrase>
@@ -12294,10 +12295,10 @@
     *: "Exempt Play"
   </source>
   <dest>
-    *: "Exempt Play"
+    *: "Reprodução Isenta"
   </dest>
   <voice>
-    *: "Exempt Play"
+    *: "Reprodução Isenta"
   </voice>
 </phrase>
 <phrase>
@@ -12308,10 +12309,10 @@
     *: "Exempt Seek"
   </source>
   <dest>
-    *: "Exempt Seek"
+    *: "Busca Isenta"
   </dest>
   <voice>
-    *: "Exempt Seek"
+    *: "Busca Isenta"
   </voice>
 </phrase>
 <phrase>
@@ -12322,10 +12323,10 @@
     *: "Exempt Skip"
   </source>
   <dest>
-    *: "Exempt Skip"
+    *: "Pulo de Faixa Isenta"
   </dest>
   <voice>
-    *: "Exempt Skip"
+    *: "Pulo de Faixa Isenta"
   </voice>
 </phrase>
 <phrase>
@@ -12336,10 +12337,10 @@
     *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "Backlight Exemptions"
+    *: "Exceções de Luz de Fundo"
   </dest>
   <voice>
-    *: "Backlight Exemptions"
+    *: "Exceções de Luz de Fundo"
   </voice>
 </phrase>
 <phrase>
@@ -12350,10 +12351,10 @@
     *: "Disable on External Power"
   </source>
   <dest>
-    *: "Disable on External Power"
+    *: "Desabilitar com Alimentação Externa"
   </dest>
   <voice>
-    *: "Disable on External Power"
+    *: "Desabilitar com Alimentação Externa"
   </voice>
 </phrase>
 <phrase>
@@ -12364,10 +12365,10 @@
     *: "Disable Unmapped Keys"
   </source>
   <dest>
-    *: "Disable Unmapped Keys"
+    *: "Desabilitar Teclas Não Mapeadas"
   </dest>
   <voice>
-    *: "Disable Unmapped Keys"
+    *: "Desabilitar Teclas Não Mapeadas"
   </voice>
 </phrase>
 <phrase>
@@ -12378,10 +12379,10 @@
     *: "Advanced Key Lock"
   </source>
   <dest>
-    *: "Advanced Key Lock"
+    *: "Bloqueio de Tecla Avançado"
   </dest>
   <voice>
-    *: "Advanced Key Lock"
+    *: "Bloqueio de Tecla Avançado"
   </voice>
 </phrase>
 <phrase>
@@ -12392,10 +12393,10 @@
     *: "Autolock On"
   </source>
   <dest>
-    *: "Autolock On"
+    *: "Bloqueio Automático Ativado"
   </dest>
   <voice>
-    *: "Autolock On"
+    *: "Bloqueio Automático Ativado"
   </voice>
 </phrase>
 <phrase>
@@ -12406,10 +12407,10 @@
     *: "Autolock Off"
   </source>
   <dest>
-    *: "Autolock Off"
+    *: "Bloqueio Automático Desativado"
   </dest>
   <voice>
-    *: "Autolock Off"
+    *: "Bloqueio Automático Desativado"
   </voice>
 </phrase>
 <phrase>
@@ -12420,10 +12421,10 @@
     *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disable Locked Reminders"
+    *: "Desabilitar Lembretes de Bloqueio"
   </dest>
   <voice>
-    *: "Disable Locked Reminders"
+    *: "Desabilitar Lembretes de Bloqueio"
   </voice>
 </phrase>
 <phrase>
@@ -12434,10 +12435,10 @@
     *: "Disable Touch"
   </source>
   <dest>
-    *: "Disable Touch"
+    *: "Desabilitar Toque"
   </dest>
   <voice>
-    *: "Disable Touch"
+    *: "Desabilitar Toque"
   </voice>
 </phrase>
 <phrase>
@@ -12490,10 +12491,10 @@
     *: "One per playlist"
   </source>
   <dest>
-    *: "One per playlist"
+    *: "Um por playlist"
   </dest>
   <voice>
-    *: "One per playlist"
+    *: "Um por playlist"
   </voice>
 </phrase>
 <phrase>
@@ -12504,10 +12505,10 @@
     *: "One per track"
   </source>
   <dest>
-    *: "One per track"
+    *: "Um por faixa"
   </dest>
   <voice>
-    *: "One per track"
+    *: "Um por faixa"
   </voice>
 </phrase>
 <phrase>
@@ -12521,7 +12522,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Track to move"
+    *: "Faixa a ser movida"
   </voice>
 </phrase>
 <phrase>
@@ -12535,7 +12536,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queued"
+    *: "Na fila"
   </voice>
 </phrase>
 <phrase>
@@ -12549,7 +12550,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bad track"
+    *: "Faixa com defeito"
   </voice>
 </phrase>
 <phrase>
@@ -12563,7 +12564,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Moving track"
+    *: "Movendo faixa"
   </voice>
 </phrase>
 <phrase>
@@ -12574,10 +12575,10 @@
     *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist elapsed:"
+    *: "Tempo decorrido da playlist:"
   </dest>
   <voice>
-    *: "Playlist elapsed"
+    *: "Tempo decorrido da playlist"
   </voice>
 </phrase>
 <phrase>
@@ -12588,10 +12589,10 @@
     *: "Track elapsed:"
   </source>
   <dest>
-    *: "Track elapsed:"
+    *: "Tempo decorrido da faixa:"
   </dest>
   <voice>
-    *: "Track elapsed"
+    *: "Tempo decorrido da faixa"
   </voice>
 </phrase>
 <phrase>
@@ -12616,10 +12617,10 @@
     *: "Track remaining:"
   </source>
   <dest>
-    *: "Track remaining:"
+    *: "Faixa restante:"
   </dest>
   <voice>
-    *: "Track remaining"
+    *: "Faixa restante"
   </voice>
 </phrase>
 <phrase>
@@ -12630,10 +12631,10 @@
     *: "Track:"
   </source>
   <dest>
-    *: "Track:"
+    *: "Faixa:"
   </dest>
   <voice>
-    *: "Track"
+    *: "Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -12644,10 +12645,10 @@
     *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Storage (Done / Remaining):"
+    *: "Armazenamento (Concluído / Restante):"
   </dest>
   <voice>
-    *: "Storage"
+    *: "Armazenamento"
   </voice>
 </phrase>
 <phrase>
@@ -12661,7 +12662,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Done"
+    *: "Concluído"
   </voice>
 </phrase>
 <phrase>
@@ -12672,10 +12673,10 @@
     *: "Average track size:"
   </source>
   <dest>
-    *: "Average track size:"
+    *: "Tamanho médio de faixa:"
   </dest>
   <voice>
-    *: "Average track size"
+    *: "Tamanho médio de faixa"
   </voice>
 </phrase>
 <phrase>
@@ -12686,10 +12687,10 @@
     *: "Average bitrate:"
   </source>
   <dest>
-    *: "Average bitrate:"
+    *: "Taxa de bits média:"
   </dest>
   <voice>
-    *: "Average bit rate"
+    *: "Taxa de bits média"
   </voice>
 </phrase>
 <phrase>
@@ -12700,10 +12701,10 @@
     *: "Error while gathering info"
   </source>
   <dest>
-    *: "Error while gathering info"
+    *: "Erro ao coletar informações"
   </dest>
   <voice>
-    *: "Error while gathering info"
+    *: "Erro ao coletar informações"
   </voice>
 </phrase>
 <phrase>
@@ -12714,10 +12715,10 @@
     *: "Playing time"
   </source>
   <dest>
-    *: "Playing time"
+    *: "Tempo de reprodução"
   </dest>
   <voice>
-    *: "Playing time"
+    *: "Tempo de reprodução"
   </voice>
 </phrase>
 <phrase>
@@ -12730,11 +12731,11 @@
   </source>
   <dest>
     *: none
-    charging: "Delay Before Resume"
+    charging: "Tempo Antes de Resumir"
   </dest>
   <voice>
     *: none
-    charging: "Delay Before Resume"
+    charging: "Tempo Antes de Resumir"
   </voice>
 </phrase>
 <phrase>
@@ -12751,7 +12752,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Absolute mode"
+    pitchscreen: "Modo absoluto"
   </voice>
 </phrase>
 <phrase>
@@ -12768,7 +12769,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone mode"
+    pitchscreen: "Modo semitom"
   </voice>
 </phrase>
 <phrase>
@@ -12785,7 +12786,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Time stretch"
+    pitchscreen: "~Time stretch"
   </voice>
 </phrase>
 <phrase>
@@ -12796,10 +12797,10 @@
     *: "Remote Control"
   </source>
   <dest>
-    *: "Remote Control"
+    *: "Controle Remoto"
   </dest>
   <voice>
-    *: "Remote Control"
+    *: "Controle Remoto"
   </voice>
 </phrase>
 <phrase>
@@ -12810,10 +12811,10 @@
     *: "No Rem. Control"
   </source>
   <dest>
-    *: "No Rem. Control"
+    *: "Sem Controle Rem."
   </dest>
   <voice>
-    *: "No Remote Control"
+    *: "Sem Controle Remoto"
   </voice>
 </phrase>
 <phrase>
@@ -12824,10 +12825,10 @@
     *: "Out of Control"
   </source>
   <dest>
-    *: "Out of Control"
+    *: "Fora de Controle"
   </dest>
   <voice>
-    *: "Out of Control"
+    *: "Fora de Controle"
   </voice>
 </phrase>
 <phrase>
@@ -12838,10 +12839,10 @@
     *: "2 Key Control"
   </source>
   <dest>
-    *: "2 Key Control"
+    *: "Controle de 2 Teclas"
   </dest>
   <voice>
-    *: "2 Key Control"
+    *: "Controle de 2 Teclas"
   </voice>
 </phrase>
 <phrase>
@@ -12852,10 +12853,10 @@
     *: "4 Key Control"
   </source>
   <dest>
-    *: "4 Key Control"
+    *: "Controle de 4 Teclas"
   </dest>
   <voice>
-    *: "4 Key Control"
+    *: "Controle de 4 Teclas"
   </voice>
 </phrase>
 <phrase>
@@ -12866,10 +12867,10 @@
     *: "Play Wormlet!"
   </source>
   <dest>
-    *: "Play Wormlet!"
+    *: "Jogar Wormlet!"
   </dest>
   <voice>
-    *: "Play Wormlet!"
+    *: "Jogar Wormlet!"
   </voice>
 </phrase>
 <phrase>
@@ -12880,10 +12881,10 @@
     *: "Number of Worms"
   </source>
   <dest>
-    *: "Number of Worms"
+    *: "Número de Minhocas"
   </dest>
   <voice>
-    *: "Number of Worms"
+    *: "Número de Minhocas"
   </voice>
 </phrase>
 <phrase>
@@ -12894,10 +12895,10 @@
     *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: "Worm Growth Per Food"
+    *: "Crescimento de Minhocas por Comida"
   </dest>
   <voice>
-    *: "Worm Growth Per Food"
+    *: "Crescimento de Minhocas por Comida"
   </voice>
 </phrase>
 <phrase>
@@ -12908,10 +12909,10 @@
     *: "Worm Speed"
   </source>
   <dest>
-    *: "Worm Speed"
+    *: "Velocidade da Minhoca"
   </dest>
   <voice>
-    *: "Worm Speed"
+    *: "Velocidade da Minhoca"
   </voice>
 </phrase>
 <phrase>
@@ -12922,10 +12923,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "Arghs Por Comida"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Arghs Por Comida"
   </voice>
 </phrase>
 <phrase>
@@ -12936,10 +12937,10 @@
     *: "Argh Size"
   </source>
   <dest>
-    *: "Argh Size"
+    *: "Tamanho do Argh"
   </dest>
   <voice>
-    *: "Argh Size"
+    *: "Tamanho do Argh"
   </voice>
 </phrase>
 <phrase>
@@ -12950,10 +12951,10 @@
     *: "Food Size"
   </source>
   <dest>
-    *: "Food Size"
+    *: "Tamanho da Comida"
   </dest>
   <voice>
-    *: "Food Size"
+    *: "Tamanho da Comida"
   </voice>
 </phrase>
 <phrase>
@@ -12964,10 +12965,10 @@
     *: "Number of Players"
   </source>
   <dest>
-    *: "Number of Players"
+    *: "Número de Jogadores"
   </dest>
   <voice>
-    *: "Number of Players"
+    *: "Número de Jogadores"
   </voice>
 </phrase>
 <phrase>
@@ -12978,10 +12979,10 @@
     *: "Control Style"
   </source>
   <dest>
-    *: "Control Style"
+    *: "Estilo de Controle"
   </dest>
   <voice>
-    *: "Control Style"
+    *: "Estilo de Controle"
   </voice>
 </phrase>
 <phrase>
@@ -12992,10 +12993,10 @@
     *: "Revert to Default Settings"
   </source>
   <dest>
-    *: "Revert to Default Settings"
+    *: "Reverter para as configurações padrão"
   </dest>
   <voice>
-    *: "Revert to Default Settings"
+    *: "Reverter para as configurações padrão"
   </voice>
 </phrase>
 <phrase>
@@ -13006,10 +13007,10 @@
     *: "Quit"
   </source>
   <dest>
-    *: "Quit"
+    *: "Sair"
   </dest>
   <voice>
-    *: "Quit"
+    *: "Sair"
   </voice>
 </phrase>
 <phrase>
@@ -13020,10 +13021,10 @@
     *: "Display Options"
   </source>
   <dest>
-    *: "Display Options"
+    *: "Opções de Exibição"
   </dest>
   <voice>
-    *: "Display Options"
+    *: "Opções de Exibição"
   </voice>
 </phrase>
 <phrase>
@@ -13034,10 +13035,10 @@
     *: "Previous Track"
   </source>
   <dest>
-    *: "Previous Track"
+    *: "Faixa Anterior"
   </dest>
   <voice>
-    *: "Previous Track"
+    *: "Faixa Anterior"
   </voice>
 </phrase>
 <phrase>
@@ -13048,10 +13049,10 @@
     *: "Pause / Play"
   </source>
   <dest>
-    *: "Pause / Play"
+    *: "~Pause / Play"
   </dest>
   <voice>
-    *: "Pause / Play"
+    *: "~Pause / Play"
   </voice>
 </phrase>
 <phrase>
@@ -13062,10 +13063,10 @@
     *: "Stop Playback"
   </source>
   <dest>
-    *: "Stop Playback"
+    *: "Parar a Reprodução"
   </dest>
   <voice>
-    *: "Stop Playback"
+    *: "Parar a Reprodução"
   </voice>
 </phrase>
 <phrase>
@@ -13076,10 +13077,10 @@
     *: "Next Track"
   </source>
   <dest>
-    *: "Next Track"
+    *: "Próxima Faixa"
   </dest>
   <voice>
-    *: "Next Track"
+    *: "Próxima Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -13090,10 +13091,10 @@
     *: "Change Volume"
   </source>
   <dest>
-    *: "Change Volume"
+    *: "Ajustar Volume"
   </dest>
   <voice>
-    *: "Change Volume"
+    *: "Ajustar Volume"
   </voice>
 </phrase>
 <phrase>
@@ -13104,10 +13105,10 @@
     *: "Shuffle Mode"
   </source>
   <dest>
-    *: "Shuffle Mode"
+    *: "Modo de Repetição Aleatória"
   </dest>
   <voice>
-    *: "Shuffle Mode"
+    *: "Modo de Repetição Aleatória"
   </voice>
 </phrase>
 <phrase>
@@ -13118,10 +13119,10 @@
     *: "Change Repeat Mode"
   </source>
   <dest>
-    *: "Change Repeat Mode"
+    *: "Alterar Modo de Repetição"
   </dest>
   <voice>
-    *: "Change Repeat Mode"
+    *: "Alterar Modo de Repetição"
   </voice>
 </phrase>
 <phrase>
@@ -13132,10 +13133,10 @@
     *: "Playback Control"
   </source>
   <dest>
-    *: "Playback Control"
+    *: "Controle de Reprodução"
   </dest>
   <voice>
-    *: "Playback Control"
+    *: "Controle de Reprodução"
   </voice>
 </phrase>
 <phrase>
@@ -13146,10 +13147,10 @@
     *: "Checkmate!"
   </source>
   <dest>
-    *: "Checkmate!"
+    *: "Xeque-mate!"
   </dest>
   <voice>
-    *: "Checkmate!"
+    *: "Xeque-mate!"
   </voice>
 </phrase>
 <phrase>
@@ -13160,10 +13161,10 @@
     *: "Illegal move!"
   </source>
   <dest>
-    *: "Illegal move!"
+    *: "Movimento Ilegal!"
   </dest>
   <voice>
-    *: "Illegal move!"
+    *: "Movimento Ilegal!"
   </voice>
 </phrase>
 <phrase>
@@ -13174,10 +13175,10 @@
     *: "New Game"
   </source>
   <dest>
-    *: "New Game"
+    *: "Novo Jogo"
   </dest>
   <voice>
-    *: "New Game"
+    *: "Novo Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13188,10 +13189,10 @@
     *: "Resume Game"
   </source>
   <dest>
-    *: "Resume Game"
+    *: "Retomar o Jogo"
   </dest>
   <voice>
-    *: "Resume Game"
+    *: "Retomar o Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13202,10 +13203,10 @@
     *: "Save Game"
   </source>
   <dest>
-    *: "Save Game"
+    *: "Salvar Jogo"
   </dest>
   <voice>
-    *: "Save Game"
+    *: "Salvar Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13216,10 +13217,10 @@
     *: "Restore Game"
   </source>
   <dest>
-    *: "Restore Game"
+    *: "Carregar Jogo"
   </dest>
   <voice>
-    *: "Restore Game"
+    *: "Carregar Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13230,10 +13231,10 @@
     *: "Restart Game"
   </source>
   <dest>
-    *: "Restart Game"
+    *: "Reiniciar Jogo"
   </dest>
   <voice>
-    *: "Restart Game"
+    *: "Reiniciar Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13244,10 +13245,10 @@
     *: "Select Other Game"
   </source>
   <dest>
-    *: "Select Other Game"
+    *: "Selecionar Outro Jogo"
   </dest>
   <voice>
-    *: "Select Other Game"
+    *: "Selecionar Outro Jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13258,10 +13259,10 @@
     *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: "Level 1: 60 moves / 5 min"
+    *: "Nível 1: 60 movimentos / 5 min"
   </dest>
   <voice>
-    *: "Level 1, 60 moves per 5 minutes"
+    *: "Nível 1, 60 movimentos a cada 5 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13272,10 +13273,10 @@
     *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: "Level 2: 60 moves / 15 min"
+    *: "Nível 2: 60 movimentos / 15 min"
   </dest>
   <voice>
-    *: "Level 2, 60 moves per 15 minutes"
+    *: "Nível 2, 60 movimentos a cada 15 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13286,10 +13287,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: "Level 3: 60 moves / 30 min"
+    *: "Nível 3: 60 movimentos / 30 min"
   </dest>
   <voice>
-    *: "Level 3, 60 moves per 30 minutes"
+    *: "Nível 3, 60 movimentos a cada 30 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13300,10 +13301,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "Level 4: 40 moves / 30 min"
+    *: "Nível 4: 40 movimentos / 30 min"
   </dest>
   <voice>
-    *: "Level 4, 40 moves per 30 minutes"
+    *: "Nível 4, 40 movimentos a cada 30 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13314,10 +13315,10 @@
     *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: "Level 5: 40 moves / 60 min"
+    *: "Nível 5: 40 movimentos / 60 min"
   </dest>
   <voice>
-    *: "Level 5, 40 moves per 60 minutes"
+    *: "Nível 5, 40 movimentos a cada 60 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13328,10 +13329,10 @@
     *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: "Level 6: 40 moves / 120 min"
+    *: "Nível 6: 40 movimentos / 120 min"
   </dest>
   <voice>
-    *: "Level 6, 40 moves per 120 minutes"
+    *: "Nível 6, 40 movimentos a cada 120 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13342,10 +13343,10 @@
     *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: "Level 7: 40 moves / 240 min"
+    *: "Nível 7: 40 movimentos / 240 min"
   </dest>
   <voice>
-    *: "Level 7, 40 moves per 240 minutes"
+    *: "Nível 7, 40 movimentos a cada 240 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -13356,10 +13357,10 @@
     *: "Error parsing game !"
   </source>
   <dest>
-    *: "Error parsing game !"
+    *: "Erro ao analisar o jogo !"
   </dest>
   <voice>
-    *: "Error parsing game !"
+    *: "Erro ao analisar o jogo !"
   </voice>
 </phrase>
 <phrase>
@@ -13370,10 +13371,10 @@
     *: "No games found !"
   </source>
   <dest>
-    *: "No games found !"
+    *: "Nenhum jogo encontrado !"
   </dest>
   <voice>
-    *: "No games found!"
+    *: "Nenhum jogo encontrado !"
   </voice>
 </phrase>
 <phrase>
@@ -13384,10 +13385,10 @@
     *: "At the beginning of the game"
   </source>
   <dest>
-    *: "At the beginning of the game"
+    *: "No início do jogo"
   </dest>
   <voice>
-    *: "At the beginning of the game"
+    *: "No início do jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13398,10 +13399,10 @@
     *: "At the end of the game"
   </source>
   <dest>
-    *: "At the end of the game"
+    *: "No final do jogo"
   </dest>
   <voice>
-    *: "At the end of the game"
+    *: "No final do jogo"
   </voice>
 </phrase>
 <phrase>
@@ -13415,7 +13416,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Player"
+    *: "Jogador"
   </voice>
 </phrase>
 <phrase>
@@ -13429,7 +13430,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "Xadrez GNU"
   </voice>
 </phrase>
 <phrase>
@@ -13443,7 +13444,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Marked"
+    *: "Marcado"
   </voice>
 </phrase>
 <phrase>
@@ -13457,7 +13458,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Unmarked"
+    *: "Não marcado"
   </voice>
 </phrase>
 <phrase>
@@ -13471,7 +13472,7 @@
     *: ""
   </dest>
   <voice>
-    *: "White"
+    *: "Branco"
   </voice>
 </phrase>
 <phrase>
@@ -13485,7 +13486,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Black"
+    *: "Preto"
   </voice>
 </phrase>
 <phrase>
@@ -13499,7 +13500,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Check!"
+    *: "Xeque!"
   </voice>
 </phrase>
 <phrase>
@@ -13513,7 +13514,7 @@
     *: ""
   </dest>
   <voice>
-    *: "captures"
+    *: "capturas"
   </voice>
 </phrase>
 <phrase>
@@ -13527,7 +13528,7 @@
     *: ""
   </dest>
   <voice>
-    *: "castle"
+    *: "castelo"
   </voice>
 </phrase>
 <phrase>
@@ -13541,7 +13542,7 @@
     *: ""
   </dest>
   <voice>
-    *: "king side"
+    *: "lado do rei"
   </voice>
 </phrase>
 <phrase>
@@ -13555,7 +13556,7 @@
     *: ""
   </dest>
   <voice>
-    *: "queen side"
+    *: "lado da rainha"
   </voice>
 </phrase>
 <phrase>
@@ -13569,7 +13570,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Pawn"
+    *: "Peão"
   </voice>
 </phrase>
 <phrase>
@@ -13583,7 +13584,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Knight"
+    *: "Cavalo"
   </voice>
 </phrase>
 <phrase>
@@ -13597,7 +13598,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bishop"
+    *: "Bispo"
   </voice>
 </phrase>
 <phrase>
@@ -13611,7 +13612,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Rook"
+    *: "Torre"
   </voice>
 </phrase>
 <phrase>
@@ -13625,7 +13626,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queen"
+    *: "Rainha"
   </voice>
 </phrase>
 <phrase>
@@ -13639,7 +13640,7 @@
     *: ""
   </dest>
   <voice>
-    *: "King"
+    *: "Rei"
   </voice>
 </phrase>
 <phrase>
@@ -13650,7 +13651,7 @@
     *: "Games"
   </source>
   <dest>
-    *: "Games"
+    *: "Jogos"
   </dest>
   <voice>
     *: ""
@@ -13664,10 +13665,10 @@
     *: "Saving position"
   </source>
   <dest>
-    *: "Saving position"
+    *: "Salvando posição"
   </dest>
   <voice>
-    *: "Saving position"
+    *: "Salvando posição"
   </voice>
 </phrase>
 <phrase>
@@ -13678,10 +13679,10 @@
     *: "Loading position"
   </source>
   <dest>
-    *: "Loading position"
+    *: "Carregando posição"
   </dest>
   <voice>
-    *: "Loading position"
+    *: "Carregando posição"
   </voice>
 </phrase>
 <phrase>
@@ -13692,10 +13693,10 @@
     *: "Thinking..."
   </source>
   <dest>
-    *: "Thinking..."
+    *: "Pensando..."
   </dest>
   <voice>
-    *: "Thinking"
+    *: "Pensando"
   </voice>
 </phrase>
 <phrase>
@@ -13709,7 +13710,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Battery bench is already running"
+    *: "Teste de performance da bateria já em andamento"
   </voice>
 </phrase>
 <phrase>
@@ -13723,7 +13724,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Press play to run battery bench or stop to cancel"
+    *: "Pressione play para executar o teste de performance da bateria ou stop para cancelar"
   </voice>
 </phrase>
 <phrase>
@@ -13734,10 +13735,10 @@
     *: "Cannot restart playback"
   </source>
   <dest>
-    *: "Cannot restart playback"
+    *: "Não é possível reiniciar a reprodução"
   </dest>
   <voice>
-    *: "Cannot restart playback"
+    *: "Não é possível reiniciar a reprodução"
   </voice>
 </phrase>
 <phrase>
@@ -13748,10 +13749,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "Ordenado"
   </dest>
   <voice>
-    *: "Ordered"
+    *: "Ordenado"
   </voice>
 </phrase>
 <phrase>
@@ -13762,10 +13763,10 @@
     *: "Diffusion"
   </source>
   <dest>
-    *: "Diffusion"
+    *: "Difusão"
   </dest>
   <voice>
-    *: "Diffusion"
+    *: "Difusão"
   </voice>
 </phrase>
 <phrase>
@@ -13776,10 +13777,10 @@
     *: "Grayscale"
   </source>
   <dest>
-    *: "Grayscale"
+    *: "Escala de Cinza"
   </dest>
   <voice>
-    *: "Grayscale"
+    *: "Escala de Cinza"
   </voice>
 </phrase>
 <phrase>
@@ -13790,10 +13791,10 @@
     *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: "Toggle Slideshow Mode"
+    *: "Alternar Modo Apresentação"
   </dest>
   <voice>
-    *: "Toggle Slide show Mode"
+    *: "Alternar Modo Apresentação"
   </voice>
 </phrase>
 <phrase>
@@ -13804,10 +13805,10 @@
     *: "Slideshow Time"
   </source>
   <dest>
-    *: "Slideshow Time"
+    *: "Tempo de Apresentação"
   </dest>
   <voice>
-    *: "Slide show Time"
+    *: "Tempo de Apresentação"
   </voice>
 </phrase>
 <phrase>
@@ -13818,10 +13819,10 @@
     *: "Return"
   </source>
   <dest>
-    *: "Return"
+    *: "Voltar"
   </dest>
   <voice>
-    *: "Return"
+    *: "Voltar"
   </voice>
 </phrase>
 <phrase>
@@ -13834,11 +13835,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Pasta de Gravações"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Pasta de Gravações"
   </voice>
 </phrase>
 <phrase>
@@ -13849,10 +13850,10 @@
     *: "View Played Games"
   </source>
   <dest>
-    *: "View Played Games"
+    *: "Ver Jogos Previamente Jogados"
   </dest>
   <voice>
-    *: "View Played Games"
+    *: "Ver Jogos Previamente Jogados"
   </voice>
 </phrase>
 <phrase>
@@ -13864,11 +13865,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Audio Options"
+    *: "Opções de Áudio"
     lowmem: none
   </dest>
   <voice>
-    *: "Audio Options"
+    *: "Opções de Áudio"
     lowmem: none
   </voice>
 </phrase>
@@ -13881,11 +13882,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume Options"
+    *: "Opções de Resumo"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume Options"
+    *: "Opções de Resumo"
     lowmem: none
   </voice>
 </phrase>
@@ -13915,11 +13916,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Single"
+    *: "Único"
     lowmem: none
   </dest>
   <voice>
-    *: "Single"
+    *: "Único"
     lowmem: none
   </voice>
 </phrase>
@@ -13966,11 +13967,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Set resume time (min)"
+    *: "Definir tempo de resumo (min)"
     lowmem: none
   </dest>
   <voice>
-    *: "Set resume time"
+    *: "Definir tempo de resumo"
     lowmem: none
   </voice>
 </phrase>
@@ -14133,11 +14134,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Clear all resumes"
+    *: "Limpar todos os resumos"
     lowmem: none
   </dest>
   <voice>
-    *: "Clear all resumes"
+    *: "Limpar todos os resumos"
     lowmem: none
   </voice>
 </phrase>
@@ -14405,11 +14406,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Panning Separation"
+    *: "Separação de Panning"
     lowmem: none
   </dest>
   <voice>
-    *: "Panning Separation"
+    *: "Separação de Panning"
     lowmem: none
   </voice>
 </phrase>
@@ -14456,11 +14457,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </voice>
 </phrase>
@@ -14568,7 +14569,7 @@
     *: "~Zoom"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "~Zoom"
   </voice>
 </phrase>
 <phrase>
@@ -14792,7 +14793,7 @@
     *: "Erro de arquivo: %d"
   </dest>
   <voice>
-    *: "Erro de arquivo: %d"
+    *: "Erro de arquivo"
   </voice>
 </phrase>
 <phrase>
@@ -14909,7 +14910,7 @@
     mpiohd300: "Toque duas vezes em MENU para cancelar."
     rx27generic: "Pressione VOLUME para cancelar."
     sonynwza860: "Mapeamento de teclas incompleto."
-    touchscreen: "Press Middle Left to cancel."
+    touchscreen: "Pressione Middle Left para cancelar."
     vibe500: "Pressione PREV para cancelar."
     xduoox20,xduoox3,xduoox3ii: "Toque duas vezes em HOME para cancelar."
   </dest>
@@ -14923,7 +14924,7 @@
     mpiohd200: "Toque duas vezes em REC para cancelar."
     mpiohd300: "Toque duas vezes em MENU para cancelar."
     rx27generic: "Pressione VOLUME para cancelar."
-    touchscreen: "Press Middle Left to cancel."
+    touchscreen: "Pressione Middle Left para cancelar."
     vibe500: "Pressione PREV para cancelar."
     xduoox20,xduoox3,xduoox3ii: "Toque duas vezes em HOME para cancelar."
   </voice>
@@ -15248,10 +15249,10 @@
     *: "Run"
   </source>
   <dest>
-    *: "Run"
+    *: "Iniciar"
   </dest>
   <voice>
-    *: "Run"
+    *: "Iniciar"
   </voice>
 </phrase>
 <phrase>
@@ -15307,7 +15308,7 @@
     *: "Fila..."
   </dest>
   <voice>
-    *: "Fila..."
+    *: "Fila"
   </voice>
 </phrase>
 <phrase>
@@ -15374,10 +15375,10 @@
     *: "Exempt Volume"
   </source>
   <dest>
-    *: "Exempt Volume"
+    *: "Volume Isento"
   </dest>
   <voice>
-    *: "Exempt Volume"
+    *: "Volume Isento"
   </voice>
 </phrase>
 <phrase>
@@ -15430,10 +15431,10 @@
     *: "List Wraparound"
   </source>
   <dest>
-    *: "List Wraparound"
+    *: "Resumo da Lista"
   </dest>
   <voice>
-    *: "List Wraparound"
+    *: "Resumo da Lista"
   </voice>
 </phrase>
 <phrase>
@@ -15544,11 +15545,11 @@
   </source>
   <dest>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Sincronizar Horário com o RDS"
   </dest>
   <voice>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Sincronizar Horário com o RDS"
   </voice>
 </phrase>
 <phrase>
@@ -15731,10 +15732,10 @@
     *: "Set As..."
   </source>
   <dest>
-    *: "Definir como..."
+    *: "Definir Como..."
   </dest>
   <voice>
-    *: "Definir como..."
+    *: "Definir Como"
   </voice>
 </phrase>
 <phrase>
@@ -15790,10 +15791,10 @@
     *: "Add to Playlist..."
   </source>
   <dest>
-    *: "Adicionar à playlist..."
+    *: "Adicionar à Playlist..."
   </dest>
   <voice>
-    *: "Adicionar à playlist..."
+    *: "Adicionar à Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -16250,7 +16251,7 @@
     *: "~Expert"
   </dest>
   <voice>
-    *: "Expert"
+    *: "Especialista"
   </voice>
 </phrase>
 <phrase>
@@ -16289,10 +16290,10 @@
     *: "Mikmod Settings"
   </source>
   <dest>
-    *: "Mikmod Settings"
+    *: "Configuração do Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Settings"
+    *: "Configuração do Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16303,10 +16304,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Mikmod Menu"
+    *: "Menu do Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Menu"
+    *: "Menu do Mik mod"
   </voice>
 </phrase>
 <phrase>
@@ -16317,10 +16318,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Menu do Chessbox"
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Menu do Chess box"
   </voice>
 </phrase>
 <phrase>
@@ -16334,7 +16335,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Invalid Voice File"
+    *: "Arquivo de Voz Inválido"
   </voice>
 </phrase>
 <phrase>
@@ -16359,7 +16360,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
@@ -16429,10 +16430,10 @@
     *: "By First Letter..."
   </source>
   <dest>
-    *: "Por primeira letra..."
+    *: "Da primeira letra..."
   </dest>
   <voice>
-    *: "Por primeira letra..."
+    *: "Da primeira letra"
   </voice>
 </phrase>
 <phrase>
@@ -16737,10 +16738,10 @@
     *: "Most played (Plays|Score)"
   </source>
   <dest>
-    *: "Mais reproduzidas (Reproduções|Pontuação)"
+    *: "Mais Tocadas (Reproduções|Pontuação)"
   </dest>
   <voice>
-    *: "Mais reproduzidas (Reproduções|Pontuação)"
+    *: "Mais Tocadas com base em Reproduções e Depois Pontuação"
   </voice>
 </phrase>
 <phrase>
@@ -16896,11 +16897,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "~Headphone"
+    erosqnative: "Fone de Ouvido"
   </dest>
   <voice>
     *: none
-    erosqnative: "Headphone"
+    erosqnative: "Fone de Ouvido"
   </voice>
 </phrase>
 <phrase>
@@ -16913,11 +16914,11 @@
   </source>
   <dest>
     *: none
-    erosqnative,lineout_poweroff: "~Line Out"
+    erosqnative,lineout_poweroff: "Saída de Linha"
   </dest>
   <voice>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Saída de Linha"
   </voice>
 </phrase>
 <phrase>
