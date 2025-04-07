@@ -737,7 +737,7 @@ sub simbuilds {
 	    'gtts' => '-l el',
             'piper' => 'el_GR-rapunzelina-low.onnx',
 	},
-        'enabled' => 1,
+        'enabled' => 0,
     },
     'italiano' => {
 	'lang' => 'italiano',
