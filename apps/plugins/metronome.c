@@ -847,6 +847,9 @@ static void metronome_draw(struct screen* display, int state)
     ps = part;
     display->clear_display();
     display->setfont(FONT_SYSFIXED);
+    int rectangle_height = display->lcdheight - ((SYSFONT_HEIGHT + 1) * 7);
+    if (rectangle_height < 12)
+        rectangle_height = 12;
     switch(state)
     {
         case 0:
@@ -863,18 +866,18 @@ static void metronome_draw(struct screen* display, int state)
         case 1:
             if((beat+1) % 2 == 0)
                 display->fillrect( display->lcdwidth/2,  0
-                                 , display->lcdwidth,   12 );
+                                 , display->lcdwidth,   rectangle_height );
             else
                 display->fillrect(                     0,  0
-                                 , display->lcdwidth/2-1, 12 );
+                                 , display->lcdwidth/2-1, rectangle_height );
         break;
         case 2:
             if((beat+1) % 2 == 0)
-                display->fillrect( display->lcdwidth/2, display->lcdheight-13
-                                 , display->lcdwidth,                      12 );
+                display->fillrect( display->lcdwidth/2, display->lcdheight - rectangle_height - 1
+                                 , display->lcdwidth,                      rectangle_height );
             else
-                display->fillrect(                   0, display->lcdheight-13
-                                 , display->lcdwidth/2-1,                  12 );
+                display->fillrect(                   0, display->lcdheight - rectangle_height - 1
+                                 , display->lcdwidth/2-1,                  rectangle_height );
          break;
         case 3:
             display->puts((textlen-3)/2,0, "o.O");
