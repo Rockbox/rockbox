@@ -607,7 +607,10 @@ bool folder_select(char * header_text, char* setting, int setting_len)
     info.get_name = folder_get_name;
     info.action_callback = folder_action_callback;
     info.get_icon = folder_get_icon;
+    bool show_icons = rb->global_settings->show_icons;
+    rb->global_settings->show_icons = true;
     rb->simplelist_show_list(&info);
+    rb->global_settings->show_icons = show_icons;
     logf("folder_select %d bytes free", (int)(buffer_end - buffer_front));
     /* done editing. check for changes */
     if (hash != save_folders(root, hashed.buf, setting_len))

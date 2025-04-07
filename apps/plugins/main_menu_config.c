@@ -168,6 +168,8 @@ static int menu_speak_item(int selected_item, void *data)
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
+    bool show_icons = rb->global_settings->show_icons;
+    rb->global_settings->show_icons = true;
     struct gui_synclist list;
     bool done = false;
     int action, cur_sel;
@@ -241,6 +243,6 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-
+    rb->global_settings->show_icons = show_icons;
     return PLUGIN_OK;
 }

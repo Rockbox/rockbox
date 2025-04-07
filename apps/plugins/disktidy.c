@@ -686,7 +686,10 @@ static enum plugin_status tidy_lcd_menu(void)
                 list.get_icon = get_icon;
                 list.get_name = get_name;
                 list.action_callback = list_action_callback;
+                bool show_icons = rb->global_settings->show_icons;
+                rb->global_settings->show_icons = true;
                 rb->simplelist_show_list(&list);
+                rb->global_settings->show_icons = show_icons;
                 break;
             case 2:
                 disktidy_status = display_run_stats();
