@@ -27,7 +27,7 @@ void catalog_get_directory(char* dirbuf, size_t dirbuf_sz);
 /* Set the playlist catalog dir */
 void catalog_set_directory(const char* directory);
 
-/* 
+/*
  * View list of playlists in catalog.
  *  ret : true if item was selected
  */
@@ -36,7 +36,10 @@ bool catalog_view_playlists(void);
 bool catalog_pick_new_playlist_name(char *pl_name, size_t buf_size,
                                     const char* curr_pl_name);
 
-/* 
+int catalog_insert_into(const char* playlist, bool new_playlist,
+                        const char* sel, int sel_attr);
+
+/*
  * Add something to a playlist (new or select from list of playlists in
  * catalog).
  *  sel          : the path of the music file, playlist or directory to add

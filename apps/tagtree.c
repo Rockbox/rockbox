@@ -59,6 +59,7 @@
 #include "onplay.h"
 #include "plugin.h"
 #include "language.h"
+#include "playlist_catalog.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
@@ -2544,7 +2545,10 @@ static bool tagtree_insert_selection(int position, bool queue,
         if (tagtree_get_filename(tc, buf, sizeof buf) < 0)
             return false;
 
-        playlist_insert_track(NULL, buf, position, queue, true);
+        if (!playlist)
+            playlist_insert_track(NULL, buf, position, queue, true);
+        else
+            catalog_insert_into(playlist, new_playlist, buf, FILE_ATTR_AUDIO);
 
         return true;
     }

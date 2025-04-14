@@ -64,6 +64,9 @@
 #include "pathfuncs.h"
 #include "shortcuts.h"
 #include "misc.h"
+#ifdef HAVE_DISK_STORAGE
+#include "storage.h"
+#endif
 
 static int onplay_result = ONPLAY_OK;
 static bool in_queue_submenu = false;
@@ -267,6 +270,11 @@ static void op_playlist_insert_selected(int position, bool queue)
         ctx_current_playlist_insert(position, queue, false);
         return;
     }
+    else if (selected_file.context == CONTEXT_ID3DB)
+    {
+        tagtree_current_playlist_insert(position, queue);
+        return;
+    }
 #endif
     if ((selected_file.attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         playlist_insert_track(NULL, selected_file.path, position, queue, true);
@@ -274,13 +282,6 @@ static void op_playlist_insert_selected(int position, bool queue)
         playlist_insert_playlist(NULL, selected_file.path, position, queue);
     else if (selected_file.attr & ATTR_DIRECTORY)
     {
-#ifdef HAVE_TAGCACHE
-        if (selected_file.context == CONTEXT_ID3DB)
-        {
-            tagtree_current_playlist_insert(position, queue);
-            return;
-        }
-#endif
         bool recurse = (global_settings.recursive_dir_insert == RECURSE_ON);
         if (global_settings.recursive_dir_insert == RECURSE_ASK)
         {
@@ -839,16 +840,33 @@ static bool list_viewers(void)
 #ifdef HAVE_TAGCACHE
 static bool prepare_database_sel(void *param)
 {
-    if (selected_file.context == CONTEXT_ID3DB &&
-        (selected_file.attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
+    if (selected_file.context == CONTEXT_ID3DB)
     {
-        if (!strcmp(param, "properties"))
+        if (param && !strcmp(param, "properties")
+            && (selected_file.attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
+        {
             strmemccpy(selected_file.buf, MAKE_ACT_STR(ACTIVITY_DATABASEBROWSER),
                        sizeof(selected_file.buf));
-        else if (!tagtree_get_subentry_filename(selected_file.buf, MAX_PATH))
+        }
+        else
         {
-            onplay_result = ONPLAY_RELOAD_DIR;
-            return false;
+            /* If database is not loaded into RAM, or tagcache_ram is
+               set to "quick", filename needs to be retrieved from disk! */
+#ifdef HAVE_DISK_STORAGE
+            if ((selected_file.attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO
+                && !storage_disk_is_active()
+#ifdef HAVE_TC_RAMCACHE
+                && (global_settings.tagcache_ram != TAGCACHE_RAM_ON
+                    || !tagcache_is_in_ram())
+#endif
+            )
+                splash(0, ID2P(LANG_WAIT));
+#endif
+             if (!tagtree_get_subentry_filename(selected_file.buf, MAX_PATH))
+            {
+                onplay_result = ONPLAY_RELOAD_DIR;
+                return false;
+            }
         }
 
         selected_file.path = selected_file.buf;
@@ -1173,6 +1191,9 @@ static bool hotkey_delete_item(void)
     if (selected_file.context == CONTEXT_ID3DB &&
         (selected_file.attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
         return false;
+
+     if (!prepare_database_sel(NULL))
+        return false;
 #endif
 
     return clipboard_delete_selected_fileobject();
@@ -1185,6 +1206,10 @@ static bool hotkey_open_with(void)
         return false;
 #ifdef HAVE_MULTIVOLUME
     if (selected_file.attr & ATTR_VOLUME)
+        return false;
+#endif
+#ifdef HAVE_TAGCACHE
+    if (!prepare_database_sel(NULL))
         return false;
 #endif
     return list_viewers();
@@ -1341,8 +1366,7 @@ int onplay(char* file, int attr, int from_context, bool hotkey, int customaction
     selected_file_set(from_context, NULL, attr);
 
 #ifdef HAVE_TAGCACHE
-    if (from_context == CONTEXT_ID3DB &&
-        (attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
+    if (from_context == CONTEXT_ID3DB)
     {
         ctx_add_to_playlist = tagtree_add_to_playlist;
         if (file != NULL)

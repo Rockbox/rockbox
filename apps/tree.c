@@ -919,7 +919,10 @@ static int dirbrowse(void)
                         if (tagtree_get_attr(&tc) == FILE_ATTR_AUDIO)
                         {
                             attr = FILE_ATTR_AUDIO;
-                            tagtree_get_filename(&tc, buf, sizeof(buf));
+
+                            /* Look up the filename only once it is needed, so we
+                               don't have to wait for the disk to wake up here. */
+                            buf[0] = '\0';
                         }
                         else
                         {
@@ -1261,7 +1264,7 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
 
                 if (peek_filename == NULL)
                 {
-                    if (index == 0) /* searched every entry didn't find a match */ 
+                    if (index == 0) /* searched every entry didn't find a match */
                         return false;
                     /* playlist has shrunk, search from the top */
                     i = 0;

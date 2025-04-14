@@ -286,8 +286,8 @@ static int add_track_to_playlist(char* filename, void* context)
 
 /* Add "sel" file into specified "playlist".  How to insert depends on type
    of file */
-static int add_to_playlist(const char* playlist, bool new_playlist,
-                           const char* sel, int sel_attr)
+int catalog_insert_into(const char* playlist, bool new_playlist,
+                        const char* sel, int sel_attr)
 {
     int fd;
     int result = -1;
@@ -514,7 +514,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         result = ctx_add_to_playlist(playlist, new_playlist);
     }
     else
-        result = add_to_playlist(playlist, new_playlist, sel, sel_attr);
+        result = catalog_insert_into(playlist, new_playlist, sel, sel_attr);
 
     return (result == 0);
 }
