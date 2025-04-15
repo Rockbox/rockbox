@@ -636,16 +636,24 @@ static void init(void)
         CHART("<disk_mount_all");
         if (rc<=0)
         {
+            int line=0;
             lcd_clear_display();
-            lcd_puts(0, 0, "No partition");
-            lcd_putsf(0, 1, "found (%d).", rc);
+            lcd_putsf(0, line++, "No partition found (%d).", rc);
 #ifndef USB_NONE
-            lcd_puts(0, 2, "Insert USB cable");
-            lcd_puts(0, 3, "and fix it.");
+            lcd_puts(0, line++, "Insert USB cable");
+            lcd_puts(0, line++, "and fix it.");
 #elif !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
-            lcd_puts(0, 2, "Rebooting in 5s");
+            lcd_puts(0, line++, "Rebooting in 5s");
 #endif
-            lcd_puts(0, 4, rbversion);
+            lcd_puts(0, line++, rbversion);
+
+            struct partinfo pinfo;
+            for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+                disk_partinfo(i, &pinfo);
+                if (pinfo.type)
+                    lcd_putsf(0, line++, "P%d T%02x S%08lx",
+                              i, pinfo.type, pinfo.size);
+            }
             lcd_update();
 
 #if defined(MAX_VIRT_SECTOR_SIZE) && defined(DEFAULT_VIRT_SECTOR_SIZE)

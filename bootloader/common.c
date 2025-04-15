@@ -43,6 +43,7 @@
 #else
 #include "rb-loader.h"
 #endif
+#include "disk.h"
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
    on a button press - currently only the ipod, H10, Vibe 500, Sansa, and xDuoo x3 versions do. */
@@ -113,10 +114,17 @@ void error(int errortype, int error, bool shutdown)
         printf("ATA error: %d", error);
         break;
 
-    case EDISK:
+    case EDISK: {
+        struct partinfo pinfo;
         printf("No partition found");
+        for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+            disk_partinfo(i, &pinfo);
+            if (pinfo.type)
+                printf("P%d T%02x S%08lx",
+                       i, pinfo.type, pinfo.size);
+        }
         break;
-
+    }
     case EBOOTFILE:
         printf(loader_strerror(error));
         break;

@@ -364,13 +364,16 @@ void* main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
+        for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+            disk_partinfo(i, &pinfo);
+            if (pinfo.type)
+                printf("P%d T%02x S%08lx",
+                       i, pinfo.type, pinfo.size);
+        }
+
         printf("No partition found");
         fatal_error();
     }
-
-    disk_partinfo(1, &pinfo);
-    printf("Partition 1: 0x%02x %ld sectors",
-           pinfo.type, pinfo.size);
 
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then

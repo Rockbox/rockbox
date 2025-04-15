@@ -476,7 +476,7 @@ static void run_of(void)
         printf("Booting OF in %d...", tmo);
         sleep(HZ*1);
     }
-    
+
     int rc = kernel_launch_onb();
     printf("Load OF error: %d", rc);
     sleep(HZ*10);
@@ -754,7 +754,14 @@ void main(void)
 
     rc = disk_mount_all();
     if (rc <= 0) {
+        struct partinfo pinfo;
         printf("No partition found");
+        for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+            disk_partinfo(i, &pinfo);
+            if (pinfo.type)
+                printf("P%d T%02x S%08lx",
+                       i, pinfo.type, pinfo.size);
+        }
         fatal_error(ERR_RB);
     }
 

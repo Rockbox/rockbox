@@ -621,8 +621,15 @@ void main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
+        struct partinfo pinfo;
         reset_screen();
         printf("No partition found");
+        for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+            disk_partinfo(i, &pinfo);
+            if (pinfo.type)
+                printf("P%d T%02x S%08lx",
+                       i, pinfo.type, pinfo.size);
+        }
         while(button_get(true) != SYS_USB_CONNECTED) {};
     }
 
