@@ -2210,21 +2210,22 @@ int clip_jpeg_fd(int fd, int flags,
         bm_size = cformat->get_size(bm);
     else
         bm_size = BM_SIZE(bm->width,bm->height,FORMAT_NATIVE,false);
-    if (bm_size > maxsize)
-        return -1;
+
     char *buf_start = (char *)bm->data + bm_size;
     char *buf_end = (char *)bm->data + maxsize;
-    maxsize = buf_end - buf_start;
+    bool return_size = format & FORMAT_RETURN_SIZE;
 #ifndef JPEG_FROM_MEM
     ALIGN_BUFFER(buf_start, maxsize, sizeof(long));
-    if (maxsize < (int)sizeof(struct jpeg))
-        return -1;
-    memmove(buf_start, p_jpeg, sizeof(struct jpeg));
-    p_jpeg = (struct jpeg *)buf_start;
+    if (!return_size)
+    {
+        if (maxsize < (int)sizeof(struct jpeg))
+            return -1;
+        memmove(buf_start, p_jpeg, sizeof(struct jpeg));
+        p_jpeg = (struct jpeg *)buf_start;
+    }
     buf_start += sizeof(struct jpeg);
-    maxsize = buf_end - buf_start;
 #endif
-    fix_huff_tables(p_jpeg);
+    maxsize = buf_end - buf_start;
 #ifdef HAVE_LCD_COLOR
     int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[1])
         << p_jpeg->v_scale[1];
@@ -2236,9 +2237,27 @@ int clip_jpeg_fd(int fd, int flags,
 #endif
     decode_buf_size *= JPEG_PIX_SZ;
     JDEBUGF("decode buffer size: %d\n", decode_buf_size);
-    p_jpeg->img_buf = (jpeg_pix_t *)buf_start;
+    if (return_size)
+    {
+        return (buf_start - (char *) bm->data) + decode_buf_size
+               + (resize
+                      ?
+                      /* buffer for 1 line + 2 spare lines */
+#ifdef HAVE_LCD_COLOR
+                      sizeof(struct uint32_argb)
+#else
+                      sizeof(uint32_t)
+#endif
+                      * 3 * bm->width
+                      : 0);
+    }
+
     if (buf_end - buf_start < decode_buf_size)
         return -1;
+
+    fix_huff_tables(p_jpeg);
+
+    p_jpeg->img_buf = (jpeg_pix_t *)buf_start;
     buf_start += decode_buf_size;
     maxsize = buf_end - buf_start;
     memset(p_jpeg->img_buf, 0, decode_buf_size);
