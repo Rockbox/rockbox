@@ -65,10 +65,8 @@ static fb_data shadowfb[LCD_HEIGHT*LCD_WIDTH] __attribute__((aligned(64)));
 /* Signals DMA copy to shadow FB is done */
 static volatile int fbcopy_done;
 
-#if defined(HAVE_LCD_SLEEP) || defined(LCD_X1000_FASTSLEEP)
 /* True if we're in sleep mode */
 static bool lcd_sleeping = false;
-#endif
 static bool lcd_on = false;
 
 /* Check if running with interrupts disabled (eg: panic screen) */
@@ -464,7 +462,7 @@ void lcd_shutdown(void)
 }
 #endif
 
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+#if defined(HAVE_LCD_ENABLE)
 bool lcd_active(void)
 {
     return lcd_on;
@@ -481,18 +479,13 @@ void lcd_enable(bool en)
 #endif
 
     /* Deal with sleep mode */
-#if defined(HAVE_LCD_SLEEP) || defined(LCD_X1000_FASTSLEEP)
-#if defined(LCD_X1000_FASTSLEEP)
     if(state && !en) {
         lcd_tgt_sleep(true);
         lcd_sleeping = true;
-    } else
-#endif
-    if(!state && en && lcd_sleeping) {
+    } else if(!state && en && lcd_sleeping) {
         lcd_tgt_sleep(false);
         lcd_sleeping = false;
     }
-#endif
 
     /* Handle turning the LCD back on */
     if(!state && en)
@@ -503,26 +496,6 @@ void lcd_enable(bool en)
 #else
         lcd_dma_start(MODE_SLEEP);
 #endif
-    }
-}
-#endif
-
-#if defined(HAVE_LCD_SLEEP)
-#if defined(LCD_X1000_FASTSLEEP)
-# error "Do not define HAVE_LCD_SLEEP if target has LCD_X1000_FASTSLEEP"
-#endif
-
-void lcd_awake(void)
-{
-    /* Nothing to do */
-}
-
-void lcd_sleep(void)
-{
-    if(!lcd_sleeping) {
-        lcd_enable(false);
-        lcd_tgt_sleep(true);
-        lcd_sleeping = true;
     }
 }
 #endif

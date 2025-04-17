@@ -35,7 +35,6 @@
 #define HAVE_LCD_COLOR
 #define HAVE_LCD_BITMAP
 #define HAVE_LCD_ENABLE
-#define LCD_X1000_FASTSLEEP
 #define LCD_X1000_DMA_WAIT_FOR_FRAME
 
 /* Backlight defines */
