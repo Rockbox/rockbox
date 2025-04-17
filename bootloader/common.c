@@ -115,14 +115,16 @@ void error(int errortype, int error, bool shutdown)
         break;
 
     case EDISK: {
-        struct partinfo pinfo;
         printf("No partition found");
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
         for (int i = 0 ; i < NUM_VOLUMES ; i++) {
+            struct partinfo pinfo;
             disk_partinfo(i, &pinfo);
             if (pinfo.type)
                 printf("P%d T%02x S%08lx",
                        i, pinfo.type, pinfo.size);
         }
+#endif
         break;
     }
     case EBOOTFILE:
