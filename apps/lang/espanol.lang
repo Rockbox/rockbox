@@ -22,6 +22,7 @@
 # - Chelo Sacristán
 # - Francisco Vila, 2009, 2010
 # - Lianela Sky
+# - Guillermo Garcia Rojas
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -1870,59 +1871,47 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Tipo de batería"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Tipo de batería"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Alcalina"
-    xduoox3: "Nueva (2000 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Alcalina"
-    xduoox3: "Nueva 2000 miliamperios hora"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "~NiMH"
-    xduoox3: "Vieja (1500 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Hidruro metálico de níquel"
-    xduoox3: "Vieja 1500 miliamperios hora"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5853,16 +5842,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Catálogo de listas de reproducción"
+    *: ""
   </dest>
   <voice>
-    *: "Catálogo de listas de reproducción"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11718,16 +11707,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "El caché se reconstruirá después de reiniciar"
+    *: ""
   </dest>
   <voice>
-    *: "El caché se reconstruirá después de reiniciar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13646,48 +13635,6 @@
   </dest>
   <voice>
     *: "Nivel 7, 40 movimientos por 240 minutos"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Nivel 8: 1 movimiento / 15 min"
-  </dest>
-  <voice>
-    *: "Nivel 8, 1 movimiento por 15 minutos"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Nivel 9: 1 movimiento / 60 min"
-  </dest>
-  <voice>
-    *: "Nivel 9, 1 movimiento por 60 minutos"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Nivel 10: 1 movimiento / 600 min"
-  </dest>
-  <voice>
-    *: "Nivel 10, 1 movimiento por 600 minutos"
   </voice>
 </phrase>
 <phrase>
@@ -16453,11 +16400,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Selección de Salida"
   </dest>
   <voice>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: "Selección de Salida"
   </voice>
 </phrase>
 <phrase>
@@ -16487,11 +16434,11 @@
   </source>
   <dest>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Linea de Salida"
   </dest>
   <voice>
     *: none
-    erosqnative,lineout_poweroff: "Line Out"
+    erosqnative,lineout_poweroff: "Linea de Salida"
   </voice>
 </phrase>
 <phrase>
@@ -16516,10 +16463,10 @@
     *: "Logging"
   </source>
   <dest>
-    *: "Logging"
+    *: "Registro"
   </dest>
   <voice>
-    *: "logging"
+    *: "Registro"
   </voice>
 </phrase>
 <phrase>
@@ -16548,5 +16495,495 @@
   </dest>
   <voice>
     *: "Lista de reproducción finalizada. ¿Reproducir nuevamente?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Caracter especial"
+  </dest>
+  <voice>
+    *: "Caracter especial"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Albumes por Artista"
+  </dest>
+  <voice>
+    *: "Albumes por Artista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Añadir Actual a Acceso Directo"
+  </dest>
+  <voice>
+    *: "Añadir Actual a Acceso Directo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "Primera Letra"
+  </dest>
+  <voice>
+    *: "Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "Por Primera Letra..."
+  </dest>
+  <voice>
+    *: "Por Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artistas por Primera Letra"
+  </dest>
+  <voice>
+    *: "Artistas por Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Albumes de Artistas por Primera Letra"
+  </dest>
+  <voice>
+    *: "Albumes de Artistas por Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albumes por Primera Letra"
+  </dest>
+  <voice>
+    *: "Albumes por Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Pistas por Primera Letra"
+  </dest>
+  <voice>
+    *: "Pistas por Primera Letra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Artistas"
+  </dest>
+  <voice>
+    *: "Artistas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albumes"
+  </dest>
+  <voice>
+    *: "Albumes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Pistas"
+  </dest>
+  <voice>
+    *: "Pistas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Canciones en Aleatorio"
+  </dest>
+  <voice>
+    *: "Canciones en Aleatorio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Nombre de Archivo"
+  </dest>
+  <voice>
+    *: "Nombre de Archivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Título (con duración de pista)"
+  </dest>
+  <voice>
+    *: "Título (con duración de pista)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Calificación del Usuario"
+  </dest>
+  <voice>
+    *: "Calificación del Usuario"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Búsqueda"
+  </dest>
+  <voice>
+    *: "Búsqueda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Buscar por..."
+  </dest>
+  <voice>
+    *: "Buscar por"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Añadidas Recientemente"
+  </dest>
+  <voice>
+    *: "Añadidas Recientemente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Historial de Reproducción"
+  </dest>
+  <voice>
+    *: "Historial de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Menú Personalizado"
+  </dest>
+  <voice>
+    *: "Menú Personalizado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Igual que la pista reproducida actualmente"
+  </dest>
+  <voice>
+    *: "Igual que la pista reproducida actualmente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Directorio"
+  </dest>
+  <voice>
+    *: "Directorio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albumes por Año"
+  </dest>
+  <voice>
+    *: "Albumes por Año"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albumes entre Años"
+  </dest>
+  <voice>
+    *: "Albumes entre Años"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Artistas entre Años"
+  </dest>
+  <voice>
+    *: "Artistas entre Años"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Mas Reproducidas ( Reproducciones|Calificación)"
+  </dest>
+  <voice>
+    *: "Mas Reproducidas ( Reproducciones|Calificación)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Pistas reproducidas recientemente"
+  </dest>
+  <voice>
+    *: "Pistas reproducidas recientemente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Pistas nunca reproducidas"
+  </dest>
+  <voice>
+    *: "Pistas nunca reproducidas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Artistas Favoritos"
+  </dest>
+  <voice>
+    *: "Artistas Favoritos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Albumes Favoritos"
+  </dest>
+  <voice>
+    *: "Albumes Favoritos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Favoritas Recientes"
+  </dest>
+  <voice>
+    *: "Favoritas Recientes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Nuevas Favoritas"
+  </dest>
+  <voice>
+    *: "Nuevas Favoritas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Favoritas Olvidadas"
+  </dest>
+  <voice>
+    *: "Favoritas Olvidadas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Pistas por"
+  </dest>
+  <voice>
+    *: "Pistas por"
   </voice>
 </phrase>
