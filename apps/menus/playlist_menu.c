@@ -157,9 +157,11 @@ MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
           &show_shuffled_adding_options,
           &show_queue_options);
 
+MENUITEM_SETTING(sort_playlists, &global_settings.sort_playlists, NULL);
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
-          &viewer_settings_menu, &recursive_dir_insert, &currentplaylist_settings_menu);
+          &sort_playlists, &viewer_settings_menu, &recursive_dir_insert,
+          &currentplaylist_settings_menu);
 MAKE_MENU(playlist_options, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
           &view_cur_playlist, &save_playlist,

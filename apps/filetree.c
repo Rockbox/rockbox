@@ -58,6 +58,7 @@
 static struct compare_data
 {
     int sort_dir; /* qsort key for sorting directories */
+    int sort_file; /*       ...for sorting files       */
     int(*_compar)(const char*, const char*, size_t);
 } cmp_data;
 
@@ -234,7 +235,7 @@ static int compare(const void* p1, const void* p2)
 
     if (cmp_data.sort_dir == SORT_AS_FILE)
     {   /* treat as two files */
-        criteria = global_settings.sort_file;
+        criteria = cmp_data.sort_file;
     }
     else if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
     {   /* two directories */
@@ -253,7 +254,7 @@ static int compare(const void* p1, const void* p2)
     }
     else if (!(e1->attr & ATTR_DIRECTORY) && !(e2->attr & ATTR_DIRECTORY))
     {   /* two files */
-        criteria = global_settings.sort_file;
+        criteria = cmp_data.sort_file;
     }
     else /* dir and file, dir goes first */
         return (e2->attr & ATTR_DIRECTORY) - (e1->attr & ATTR_DIRECTORY);
@@ -424,6 +425,10 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     /* allow directories to be sorted into file list */
     cmp_data.sort_dir = (*c->dirfilter == SHOW_PLUGINS) ? SORT_AS_FILE : c->sort_dir;
+
+    /* playlist catalog uses sorting independent from file browser */
+    cmp_data.sort_file = (*c->dirfilter == SHOW_M3U) ?
+                         global_settings.sort_playlists : global_settings.sort_file;
 
     if (global_settings.sort_case)
     {

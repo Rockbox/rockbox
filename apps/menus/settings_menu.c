@@ -220,10 +220,13 @@ static int filemenu_callback(int action,
 {
     (void)this_list;
 
+    /* Show File View menu in Settings or File Browser,
+       but not in Database or Playlist Catalog */
     if (action == ACTION_REQUEST_MENUITEM &&
         this_item == &file_menu &&
-        get_onplay_context() == CONTEXT_ID3DB &&
-        get_current_activity() != ACTIVITY_SETTINGS)
+        get_current_activity() != ACTIVITY_SETTINGS &&
+        (get_onplay_context() != CONTEXT_TREE
+         || *tree_get_context()->dirfilter == SHOW_M3U))
         return ACTION_EXIT_MENUITEM;
 
     return action;

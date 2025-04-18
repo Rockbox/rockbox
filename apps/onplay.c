@@ -1132,6 +1132,23 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #endif
          );
 
+int sort_playlists_callback(int action,
+                            const struct menu_item_ex *this_item,
+                            struct gui_synclist *this_list)
+{
+    (void) this_list;
+    (void) this_item;
+
+    if (action == ACTION_REQUEST_MENUITEM &&
+        *tree_get_context()->dirfilter != SHOW_M3U)
+    {
+        return ACTION_EXIT_MENUITEM;
+    }
+    return action;
+}
+
+MENUITEM_SETTING(sort_playlists, &global_settings.sort_playlists, sort_playlists_callback);
+
 MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
                   view_playlist,
                   onplaymenu_callback, Icon_Playlist);
@@ -1149,7 +1166,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #if LCD_DEPTH > 1
            &set_backdrop_item,
 #endif
-           &add_to_faves_item, &set_as_dir_menu, &file_menu,
+           &add_to_faves_item, &set_as_dir_menu, &file_menu, &sort_playlists,
          );
 static int onplaymenu_callback(int action,
                                const struct menu_item_ex *this_item,

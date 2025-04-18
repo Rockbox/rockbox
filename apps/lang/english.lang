@@ -16956,3 +16956,17 @@
     *: "Playlist finished. Play again?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Sort Playlists"
+  </dest>
+  <voice>
+    *: "sort playlists"
+  </voice>
+</phrase>

@@ -682,6 +682,7 @@ struct user_settings
     bool sort_case; /* dir sort order: 0=case insensitive, 1=sensitive */
     int sort_dir;   /* 0=alpha, 1=date (old first), 2=date (new first) */
     int sort_file;  /* 0=alpha, 1=date, 2=date (new first), 3=type */
+    int sort_playlists; /* in playlist catalog 0=alpha, 1=date, 2=date (new first) */
     int interpret_numbers; /* true=strnatcmp, false=strcmp */
 
     /* power settings */
