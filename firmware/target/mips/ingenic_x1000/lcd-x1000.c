@@ -308,7 +308,7 @@ typedef enum {
     MODE_SLEEP
 } DMA_Mode;
 
-static void lcd_dma_start(DMA_Mode mode)
+static void lcd_dma_start(void)
 {
     /* Set format conversion bit, seems necessary for DMA mode.
      * Must set DTIMES here if we use an 8-bit bus type. */
@@ -337,12 +337,8 @@ static void lcd_dma_start(DMA_Mode mode)
 
     /* Begin DMA transfer. Need to start a dummy frame or else we will
      * not be able to pass lcd_wait_frame() at the first lcd_update(). */
-    // if (mode == MODE_INIT) { // Run this only once on Startup
     jz_write(LCD_DA, PHYSADDR(&lcd_dma_desc[0]));
     jz_writef(LCD_CTRL, ENABLE(1));
-    // }
-
-    (void)mode;
 
     lcd_on = true;
 }
@@ -446,7 +442,7 @@ void lcd_init_device(void)
 
     lcd_tgt_enable(true);
 
-    lcd_dma_start(MODE_INIT);
+    lcd_dma_start();
 }
 
 #ifdef HAVE_LCD_SHUTDOWN
@@ -491,11 +487,7 @@ void lcd_enable(bool en)
     if(!state && en)
     {
         send_event(LCD_EVENT_ACTIVATION, NULL);
-#if defined(BOOTLOADER)
-        lcd_dma_start(MODE_INIT);
-#else
-        lcd_dma_start(MODE_SLEEP);
-#endif
+        lcd_dma_start();
     }
 }
 #endif
