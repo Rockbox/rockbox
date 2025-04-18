@@ -153,6 +153,15 @@ static uint32_t nand_wait_addrdone(void)
     return 0;
 }
 
+static uint32_t nand_wait_transdone(void)
+{
+    long timeout = current_tick + HZ / 50;
+    while (!(FMCSTAT & FMCSTAT_TRANSDONE))
+        if (nand_timeout(timeout)) return 1;
+    FMCSTAT = FMCSTAT_TRANSDONE;
+    return 0;
+}
+
 static uint32_t nand_wait_chip_ready(uint32_t bank)
 {
     long timeout = current_tick + HZ / 50;
@@ -171,7 +180,7 @@ static void nand_set_fmctrl0(uint32_t bank, uint32_t flags)
 static uint32_t nand_send_cmd(uint32_t cmd)
 {
     FMCMD = cmd;
-    return nand_wait_rbbdone();
+    return nand_wait_cmddone();
 }
 
 static uint32_t nand_send_address(uint32_t page, uint32_t offset)
@@ -180,7 +189,7 @@ static uint32_t nand_send_address(uint32_t page, uint32_t offset)
     FMADDR0 = (page << 16) | offset;
     FMADDR1 = (page >> 16) & 0xFF;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    return nand_wait_cmddone();
+    return nand_wait_addrdone();
 }
 
 uint32_t nand_reset(uint32_t bank)
@@ -206,7 +215,7 @@ static uint32_t nand_wait_status_ready(uint32_t bank)
         if (nand_timeout(timeout)) return 1;
         FMDNUM = 0;
         FMCTRL1 = FMCTRL1_DOREADDATA;
-        if (nand_wait_addrdone()) return 1;
+        if (nand_wait_transdone()) return 1;
         if ((FMFIFO & NAND_STATUS_READY)) break;
         FMCTRL1 = FMCTRL1_CLEARRFIFO;
     }
@@ -238,7 +247,7 @@ static uint32_t nand_transfer_data_collect(uint32_t direction)
     while ((DMAALLST & DMAALLST_DMABUSY3))
         if (nand_timeout(timeout)) return 1;
     if (!direction) commit_discard_dcache();
-    if (nand_wait_addrdone()) return 1;
+    if (nand_wait_transdone()) return 1;
     if (!direction) FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     else FMCTRL1 = FMCTRL1_CLEARRFIFO;
     return 0;
@@ -308,10 +317,10 @@ static uint32_t nand_get_chip_type(uint32_t bank)
     FMANUM = 0;
     FMADDR0 = 0;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    if (nand_wait_cmddone()) return nand_unlock(0xFFFFFFFC);
+    if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFC);
     FMDNUM = 4;
     FMCTRL1 = FMCTRL1_DOREADDATA;
-    if (nand_wait_addrdone()) return nand_unlock(0xFFFFFFFB);
+    if (nand_wait_transdone()) return nand_unlock(0xFFFFFFFB);
     result = FMFIFO;
     FMCTRL1 = FMCTRL1_CLEARRFIFO;
     return nand_unlock(result);
@@ -494,7 +503,7 @@ uint32_t nand_block_erase(uint32_t bank, uint32_t page)
     FMANUM = 2;
     FMADDR0 = page;
     FMCTRL1 = FMCTRL1_DOTRANSADDR;
-    if (nand_wait_cmddone()) return nand_unlock(1);
+    if (nand_wait_addrdone()) return nand_unlock(1);
     if (nand_send_cmd(NAND_CMD_ERASECNFRM)) return nand_unlock(1);
     if (nand_wait_status_ready(bank)) return nand_unlock(1);
     return nand_unlock(0);
@@ -690,7 +699,7 @@ static uint32_t nand_block_erase_fast(uint32_t page)
         FMANUM = 2;
         FMADDR0 = page;
         FMCTRL1 = FMCTRL1_DOTRANSADDR;
-        if (nand_wait_cmddone())
+        if (nand_wait_addrdone())
         {
             rc |= 1 << i;
             continue;
