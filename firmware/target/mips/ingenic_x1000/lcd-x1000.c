@@ -358,10 +358,6 @@ static bool lcd_wait_frame(void)
 
 static void lcd_dma_stop(DMA_Mode mode)
 {
-    int irq = disable_irq_save();
-        lcd_on = false;
-    restore_irq(irq);
-
     if (mode == MODE_INIT) { // Run this only once when endinng
 #ifdef LCD_X1000_DMA_WAIT_FOR_FRAME
         /* Wait for frame to finish to avoid misaligning the write pointer */
@@ -388,6 +384,8 @@ static void lcd_dma_stop(DMA_Mode mode)
     /* Clear format conversion bit, disable vsync */
     jz_writef(LCD_MCFG_NEW, FMT_CONV(0), DTIMES(0));
     jz_writef(LCD_MCTRL, NARROW_TE(0), TE_INV(0), NOT_USE_TE(1));
+
+    lcd_on = false;
 }
 
 static void lcd_send(uint32_t d)
@@ -468,7 +466,7 @@ void lcd_enable(bool en)
 {
     bool state = lcd_active();
     if(state && !en)
-#if defined(BOOTLOADER)
+#if defined(BOOTLOADER) || defined(LCD_X1000_DMA_WAIT_FOR_FRAME)
         lcd_dma_stop(MODE_INIT);
 #else
         lcd_dma_stop(MODE_SLEEP);
