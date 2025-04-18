@@ -1049,9 +1049,13 @@ static int clipboard_callback(int action,
             else if (selected_file.path)
             {
                 /* requires an actual file */
-                if (this_item == &rename_file_item ||
-                    this_item == &clipboard_cut_item ||
-                    this_item == &clipboard_copy_item ||
+                if (this_item == &clipboard_cut_item ||
+                    this_item == &clipboard_copy_item)
+                {
+                    if (*tree_get_context()->dirfilter != SHOW_M3U)
+                        return action;
+                }
+                else if (this_item == &rename_file_item ||
                     (this_item == &track_info_item &&
                         (selected_file.attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO) ||
                     (this_item == &properties_item &&
@@ -1076,12 +1080,14 @@ static int clipboard_callback(int action,
                         )
                         return action;
                 }
-                else if (this_item == &delete_file_item ||
-                         this_item == &list_viewers_item)
-                {
                     /* only for files */
-                    return action;
+                else if (this_item == &list_viewers_item)
+                {
+                    if (*tree_get_context()->dirfilter != SHOW_M3U)
+                        return action;
                 }
+                else if (this_item == &delete_file_item)
+                    return action;
 #if LCD_DEPTH > 1
                 else if (this_item == &set_backdrop_item)
                 {
