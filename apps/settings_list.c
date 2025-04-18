@@ -65,6 +65,7 @@
 #include "misc.h" /* current activity */
 #endif
 #include "playlist.h"
+#include "tree.h"
 
 #include "voice_thread.h"
 
@@ -681,6 +682,12 @@ static void repeat_mode_callback(int repeat)
         audio_flush_and_reload_tracks();
     }
     (void)repeat;
+}
+
+static void treesort_callback(int value)
+{
+    (void) value;
+    reload_directory();
 }
 
 #ifdef HAVE_QUICKSCREEN
@@ -1399,15 +1406,15 @@ const struct settings_list settings[] = {
     /* file sorting */
     OFFON_SETTING(0, sort_case, LANG_SORT_CASE, false, "sort case", NULL),
     CHOICE_SETTING(0, sort_dir, LANG_SORT_DIR, 0 ,
-                   "sort dirs", "alpha,oldest,newest", NULL, 3,
+                   "sort dirs", "alpha,oldest,newest", treesort_callback, 3,
                    ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
                    ID2P(LANG_SORT_DATE_REVERSE)),
     CHOICE_SETTING(0, sort_file, LANG_SORT_FILE, 0 ,
-                   "sort files", "alpha,oldest,newest,type", NULL, 4,
+                   "sort files", "alpha,oldest,newest,type", treesort_callback, 4,
                    ID2P(LANG_SORT_ALPHA), ID2P(LANG_SORT_DATE),
                    ID2P(LANG_SORT_DATE_REVERSE) , ID2P(LANG_SORT_TYPE)),
     CHOICE_SETTING(0, interpret_numbers, LANG_SORT_INTERPRET_NUMBERS, 1,
-                    "sort interpret number", "digits,numbers",NULL, 2,
+                    "sort interpret number", "digits,numbers",treesort_callback, 2,
                     ID2P(LANG_SORT_INTERPRET_AS_DIGIT),
                     ID2P(LANG_SORT_INTERPRET_AS_NUMBERS)),
     CHOICE_SETTING(0, show_filename_ext, LANG_SHOW_FILENAME_EXT, 3,

@@ -180,14 +180,10 @@ MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 
 /***********************************/
 /*    FILE VIEW MENU               */
-static int fileview_callback(int action,
-                             const struct menu_item_ex *this_item,
-                             struct gui_synclist *this_list);
-
 MENUITEM_SETTING(sort_case, &global_settings.sort_case, NULL);
-MENUITEM_SETTING(sort_dir, &global_settings.sort_dir, fileview_callback);
-MENUITEM_SETTING(sort_file, &global_settings.sort_file, fileview_callback);
-MENUITEM_SETTING(interpret_numbers, &global_settings.interpret_numbers, fileview_callback);
+MENUITEM_SETTING(sort_dir, &global_settings.sort_dir, NULL);
+MENUITEM_SETTING(sort_file, &global_settings.sort_file, NULL);
+MENUITEM_SETTING(interpret_numbers, &global_settings.interpret_numbers, NULL);
 MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
 MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
@@ -205,25 +201,6 @@ static int clear_start_directory(void)
 }
 MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR),
                   clear_start_directory, NULL, Icon_file_view_menu);
-static int fileview_callback(int action,
-                             const struct menu_item_ex *this_item,
-                             struct gui_synclist *this_list)
-{
-    (void)this_list;
-    static int oldval;
-    int *variable = this_item->variable;
-    switch (action)
-    {
-        case ACTION_ENTER_MENUITEM: /* on entering an item */
-            oldval = *variable;
-            break;
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            if (*variable != oldval)
-                reload_directory(); /* force reload if this has changed */
-            break;
-    }
-    return action;
-}
 
 static int filemenu_callback(int action,
                              const struct menu_item_ex *this_item,
