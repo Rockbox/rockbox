@@ -126,6 +126,8 @@ static uint32_t nand_timeout(long timeout)
     }
 }
 
+// unused
+#if 0
 static uint32_t nand_wait_rbbdone(void)
 {
     long timeout = current_tick + HZ / 50;
@@ -134,6 +136,7 @@ static uint32_t nand_wait_rbbdone(void)
     FMCSTAT = FMCSTAT_RBBDONE;
     return 0;
 }
+#endif
 
 static uint32_t nand_wait_cmddone(void)
 {
