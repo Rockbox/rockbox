@@ -78,6 +78,9 @@ manual-txt-zip: manual-txt
 manual-zip: manual-html
 	$(SILENT)$(MAKE) -C $(OBJDIR) htmlzip
 
+manual-7zip: manual-html
+	$(SILENT)$(MAKE) -C $(OBJDIR) html7zip
+
 clean: objdir-check
 	$(SILENT)rm -rf $(OBJDIR)/manual $(OBJDIR)/*.pdf
 	$(SILENT)rm -rf $(OBJDIR)/html $(OBJDIR)/txt

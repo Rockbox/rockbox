@@ -50,7 +50,7 @@ RBINFO = $(BUILDDIR)/rockbox-info.txt
 
 .PHONY: all clean tags zip tools manual bin build info langs
 
-ifeq (,$(filter clean veryclean reconf tags voice voicetools manual manual-pdf manual-html manual-zhtml manual-txt manual-ztxt manual-zip help fontzip ,$(MAKECMDGOALS)))
+ifeq (,$(filter clean veryclean reconf tags voice voicetools manual manual-pdf manual-html manual-zhtml manual-txt manual-ztxt manual-zip manual-7zip help fontzip ,$(MAKECMDGOALS)))
 # none of the above
 DEPFILE = $(BUILDDIR)/make.dep
 
@@ -394,6 +394,8 @@ manual-ztxt:
 	$(SILENT)$(MAKE) -C $(MANUALDIR) OBJDIR=$(BUILDDIR)/manual manual-txt-zip
 manual-zip:
 	$(SILENT)$(MAKE) -C $(MANUALDIR) OBJDIR=$(BUILDDIR)/manual manual-zip
+manual-7zip:
+	$(SILENT)$(MAKE) -C $(MANUALDIR) OBJDIR=$(BUILDDIR)/manual manual-7zip
 
 ifdef TTS_ENGINE
 
@@ -452,6 +454,7 @@ help:
 	@echo "manual         - builds a manual (pdf)"
 	@echo "manual-html    - HTML manual"
 	@echo "manual-zip     - HTML manual (zipped)"
+	@echo "manual-7zip    - HTML manual (7zipped)"
 	@echo "manual-txt     - txt manual"
 	@echo "zip            - creates a rockbox.zip of your build (no fonts)"
 	@echo "gzip           - creates a rockbox.tar.gz of your build (no fonts)"

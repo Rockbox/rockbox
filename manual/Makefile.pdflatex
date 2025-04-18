@@ -32,6 +32,12 @@ htmlzip: buildhtml
 	zip -r $(OBJDIR)/rockbox-manual.zip html; \
 	cp $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/../ )
 
+html7zip: buildhtml
+	@(cd $(OBJDIR); \
+	7z a $(OBJDIR)/rockbox-manual.7z html; \
+	cp $(OBJDIR)/rockbox-manual.7z $(OBJDIR)/../ )
+
+
 txtzip: buildtxt
 	@(cd $(OBJDIR); \
 	zip -r $(OBJDIR)/rockbox-manual-txt.zip txt; \
