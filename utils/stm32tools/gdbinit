@@ -1,0 +1,13 @@
+## Example GDB script for loading a bootloader binary using OpenOCD
+
+# Set target binary and connect to OpenOCD
+file "./bootloader.elf"
+target extended-remote localhost:3333
+
+# Reset target and flush register cache since GDB is apparently
+# not smart enough to do this itself.
+monitor reset halt
+maintenance flush register-cache
+
+# Download binary to target
+load "./bootloader.elf"
