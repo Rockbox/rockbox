@@ -40,11 +40,14 @@ static const char * menu_get_name(int selected_item, void * data,
                                    char * buffer, size_t buffer_len)
 {
     (void)data;
-    (void)buffer;
-    (void)buffer_len;
     unsigned char *p = menu_items[selected_item].name;
     int id = P2ID(p);
-    return (id != -1) ? rb->str(id) : p;
+
+    rb->snprintf(buffer, buffer_len, "%s: %s", (id != -1) ? rb->str(id) : p,
+                 menu_items[selected_item].enabled ?
+                 rb->str(LANG_ON) : rb->str(LANG_OFF));
+
+    return buffer;
 }
 
 static enum themable_icons menu_get_icon(int selected_item, void * data)
@@ -157,7 +160,8 @@ static int menu_speak_item(int selected_item, void *data)
 
     if (id != -1)
     {
-        rb->talk_id(id, false);
+        rb->talk_number(selected_item + 1, false);
+        rb->talk_id(id, true);
         rb->talk_id(menu_items[selected_item].enabled ? LANG_ON : LANG_OFF, true);
     }
 
@@ -172,6 +176,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->global_settings->show_icons = true;
     struct gui_synclist list;
     bool done = false;
+    bool changed = false;
     int action, cur_sel;
 
     menu_table = rb->root_menu_get_options(&menu_item_count);
@@ -182,59 +187,72 @@ enum plugin_status plugin_start(const void* parameter)
         rb->gui_synclist_set_voice_callback(&list, menu_speak_item);
     rb->gui_synclist_set_icon_callback(&list, menu_get_icon);
     rb->gui_synclist_set_nb_items(&list, menu_item_count);
-    rb->gui_synclist_set_title(&list, rb->str(LANG_MAIN_MENU_ORDER), Icon_Rockbox);
-    rb->gui_synclist_draw(&list);
+    rb->gui_synclist_set_title(&list, rb->str(LANG_MAIN_MENU), Icon_Rockbox);
     rb->gui_synclist_speak_item(&list);
 
     while (!done)
     {
+        rb->gui_synclist_draw(&list);
         cur_sel = rb->gui_synclist_get_sel_pos(&list);
-        action = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        action = rb->get_action(CONTEXT_LIST, HZ/10);
         if (rb->gui_synclist_do_button(&list, &action))
             continue;
 
         switch (action)
         {
             case ACTION_STD_OK:
+                menu_items[cur_sel].enabled = !menu_items[cur_sel].enabled;
+                rb->gui_synclist_speak_item(&list);
+                changed = true;
+                break;
+            case ACTION_STD_CONTEXT:
             {
-                MENUITEM_STRINGLIST(menu, "Main Menu Editor", NULL,
-                                    ID2P(LANG_TOGGLE_ITEM),
+                MENUITEM_STRINGLIST(menu, ID2P(LANG_MAIN_MENU), NULL,
                                     ID2P(LANG_MOVE_ITEM_UP),
                                     ID2P(LANG_MOVE_ITEM_DOWN),
-                                    "----------",
-                                    ID2P(LANG_LOAD_DEFAULT_CONFIGURATION),
-                                    ID2P(LANG_SAVE_EXIT));
+                                    ID2P(LANG_LOAD_DEFAULT_CONFIGURATION));
                 switch (rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
-                        menu_items[cur_sel].enabled = !menu_items[cur_sel].enabled;
+                        if (cur_sel == 0)
+                        {
+                            rb->splash(HZ, ID2P(LANG_FAILED));
+                            break;
+                        }
+                        swap_items(cur_sel, cur_sel - 1);
+                        rb->gui_synclist_select_item(&list, cur_sel - 1); /* speaks */
+                        changed = true;
                         break;
                     case 1:
-                        if (cur_sel == 0)
-                            break;
-                        swap_items(cur_sel, cur_sel - 1);
-                        break;
-                    case 2:
                         if (cur_sel + 1 == menu_item_count)
+                        {
+                            rb->splash(HZ, ID2P(LANG_FAILED));
                             break;
+                        }
                         swap_items(cur_sel, cur_sel + 1);
+                        rb->gui_synclist_select_item(&list, cur_sel + 1); /* speaks */
+                        changed = true;
                         break;
-                    case 4:
-                        rb->root_menu_set_default(&rb->global_settings->root_menu_customized, NULL);
-                        load_from_cfg();
-                        break;
-                    case 5:
-                        done = true;
-                        save_to_cfg();
-                        rb->global_settings->root_menu_customized = true;
-                        rb->settings_save();
-                        break;
+                    case 2:;
+                        static const char *lines[] =
+                            {ID2P(LANG_RESET_ASK), ID2P(LANG_LOAD_DEFAULT_CONFIGURATION)};
+                        static const struct text_message message={lines, 2};
+
+                        switch(rb->gui_syncyesno_run(&message, NULL, NULL))
+                        {
+                            case YESNO_YES:
+                                rb->root_menu_set_default(&rb->global_settings->root_menu_customized, NULL);
+                                load_from_cfg();
+                                break;
+                            default:
+                                rb->splash(HZ, ID2P(LANG_CANCEL));
+                                break;
+                        }
+                        /* fall-through */
+                    default:
+                        rb->gui_synclist_speak_item(&list);
                 }
-                if (!done)
-                {
-                    rb->gui_synclist_draw(&list);
-                    rb->gui_synclist_speak_item(&list);
-                }
+                rb->gui_synclist_set_title(&list, rb->str(LANG_MAIN_MENU), Icon_Rockbox);
                 break;
             }
             case ACTION_STD_CANCEL:
@@ -243,6 +261,13 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
+    if (changed)
+    {
+        save_to_cfg();
+        rb->global_settings->root_menu_customized = true;
+        rb->settings_save();
+    }
     rb->global_settings->show_icons = show_icons;
+
     return PLUGIN_OK;
 }

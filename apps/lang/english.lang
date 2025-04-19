@@ -14152,16 +14152,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Toggle Item"
+    *: ""
   </dest>
   <voice>
-    *: "Toggle Item"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14222,13 +14222,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </dest>
   <voice>
     *: ""

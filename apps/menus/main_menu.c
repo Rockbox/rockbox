@@ -495,6 +495,15 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
 /*      INFO MENU                  */
 /***********************************/
 
+static int main_menu_config(void)
+{
+    plugin_load(PLUGIN_APPS_DIR "/main_menu_config.rock", NULL);
+    return 0;
+}
+
+MENUITEM_FUNCTION(main_menu_config_item, 0, ID2P(LANG_MAIN_MENU),
+                  main_menu_config, NULL, Icon_Rockbox);
+
 /***********************************/
 /*    MAIN MENU                    */
 
@@ -509,6 +518,7 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), NULL,
 #if CONFIG_RTC
         &timedate_item,
 #endif
+        &main_menu_config_item,
         &manage_settings,
         );
 /*    MAIN MENU                    */
