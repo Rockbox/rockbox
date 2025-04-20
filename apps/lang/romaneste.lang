@@ -1277,7 +1277,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Încărcare baterie..."
+    charging: "Încărcare baterie"
   </voice>
 </phrase>
 <phrase>
@@ -6333,7 +6333,7 @@
     *: "Liber:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Free disk space"
   </voice>
 </phrase>
 <phrase>
@@ -6420,7 +6420,7 @@
     *: "Încărcare..."
   </dest>
   <voice>
-    *: "Încărcare..."
+    *: "Încărcare"
   </voice>
 </phrase>
 <phrase>
@@ -7751,7 +7751,7 @@
     *: "Se mută..."
   </dest>
   <voice>
-    *: "Se mută..."
+    *: "Se mută"
   </voice>
 </phrase>
 <phrase>
@@ -8535,7 +8535,7 @@
     *: "Disc:"
   </dest>
   <voice>
-    *: "Disc:"
+    *: "Disk size"
   </voice>
 </phrase>
 <phrase>
@@ -16356,7 +16356,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Română"
   </voice>
 </phrase>
 <phrase>
