@@ -17,7 +17,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 #include "soc_desc.hpp"
 #include <cstdio>
 #include <cstdlib>
@@ -150,7 +150,7 @@ struct limited_column_context_t
                 m_cur_line = m_prefix;
             size_t len = std::min(text.size() - i, m_nr_col - m_cur_line.size());
             // prevent word cut
-            if(m_prevent_wordcut && !isspace(text[i + len - 1]) && 
+            if(m_prevent_wordcut && !isspace(text[i + len - 1]) &&
                     i + len < text.size() && !isspace(text[i + len]))
             {
                 size_t pos = text.find_last_of(" \t\n\v\r\f", i + len - 1);
@@ -443,7 +443,7 @@ void abstract_generator::add_soc(const soc_t& soc)
  *
  * In order to generate the macro name, the generate relies on you providing detailled
  * information. Given an pseudo-instance I and a macro type MT, the generator
- * will always call type_xfix(MT) to know which prefix/suffix you want for the 
+ * will always call type_xfix(MT) to know which prefix/suffix you want for the
  * macro and generate names of the form:
  *   type_xfix(MT, true)basename(I)type_xfix(MT, false)
  * The basename() functions will call inst_prefix() for each each instance on the
@@ -2599,7 +2599,7 @@ void usage()
     printf("usage: headergen [options] <desc files...>\n");
     printf("options:\n");
     printf("  -?/--help              Dispaly this help\n");
-    printf("  -g/--generator <gen>   Select generator (jz, imx)\n");
+    printf("  -g/--generator <gen>   Select generator (jz, imx, atj, cortex_m, st)\n");
     printf("  -o/--outdir <dir>      Output directory\n");
     exit(1);
 }
