@@ -69,7 +69,7 @@ Contributing code
 -----------------
 We have a public code review system based on git, which is also how you can
 check out the latest version of the Rockbox sources.
-See http://www.rockbox.org/wiki/UsingGit for details on how to setup your
+See https://www.rockbox.org/wiki/UsingGit for details on how to setup your
 environment and how to upload a change you have made for review.
 
 We'd prefer that you don't submit patches to the bug tracker any more,

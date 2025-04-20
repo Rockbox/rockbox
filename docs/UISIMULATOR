@@ -12,8 +12,8 @@
   Get the very latest sources off the SVN server (or possibly get a recent
   source code tarball).
 
-  All SVN details can be found here:
-  http://www.rockbox.org/wiki/UsingSVN
+  All Git details can be found here:
+  https://www.rockbox.org/wiki/UsingGit
 
 2. Build Uisimulator
 
