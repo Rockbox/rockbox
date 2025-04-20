@@ -245,10 +245,10 @@ foreach (@missingorder) {
     if ($_ eq 'VOICE_LANG_NAME') {
         $lang{$_} = $english{$_};
 	$lang{$_}{'voice'}{'*'} = "";
-        $lang{$_}{'notes'} .= "### This phrase is missing entirely, please fill out\n";
+        $lang{$_}{'notes'} .= "### The phrase '$_' is missing entirely, please fill out\n";
     } else {
         $lang{$_} = $english{$_};
-        $lang{$_}{'notes'} .= "### This phrase is missing entirely, copying from english!\n";
+        $lang{$_}{'notes'} .= "### The phrase '$_' is missing entirely, copying from english!\n";
     }
     $lang{$_}{'new'} = 1;
 }
@@ -269,8 +269,10 @@ foreach my $id (@langorder) {
 #	    print "#!! '$id' deprecated, deleting\n";
 	    $lang{$id} = $english{$id};
 	} else {
-	    $lang{$id}{'notes'} .= "### The 'desc' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{desc}\n";
-	    $lang{$id}{'phrase'}{'desc'} = 	$english{$id}{'phrase'}{'desc'};
+	    $lang{$id}{'notes'} .= "### The 'desc' field for '$id' differs from the english!\n";
+	    $lang{$id}{'notes'} .= "#### the previously used desc is commented below:\n";
+	    $lang{$id}{'notes'} .= "##### desc: $lp{desc}\n";
+	    $lang{$id}{'phrase'}{'desc'} = $english{$id}{'phrase'}{'desc'};
 	    #	print "#!! '$id' changed description\n";
 	}
     }
@@ -280,7 +282,9 @@ foreach my $id (@langorder) {
     }
 
     if (!defined($lp{'user'}) || $lp{'user'} ne $ep{'user'}) {
-	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{user}\n";
+	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n";
+	$lang{$id}{'notes'} .= "#### the previously used desc is commented below:\n";
+	$lang{$id}{'notes'} .= "##### desc: $lp{user}\n";
 	if (!defined($lp{'user'}) || length($lp{'user'}) == 0) {
 	    $lp{'user'} = $ep{'user'};
 	}
@@ -320,8 +324,8 @@ foreach my $id (@langorder) {
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    # If the source string differs, complain, and copy from English
 	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' differs from the english!\n";
-	    $lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-            $lang{$id}{'notes'} .= "### $english{$id}{source}{$tgt}\n";
+	    $lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
+	    $lang{$id}{'notes'} .= "##### $english{$id}{source}{$tgt}\n";
 #	    print "#!! '$id:$tgt' source changed ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 	    $lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
 	}
@@ -365,8 +369,8 @@ foreach my $id (@langorder) {
 	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
 		# It should be kept blank!
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is not blank!\n";
-		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-		$lang{$id}{'notes'} .= "### $english{$id}{dest}{$tgt}\n";
+		$lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "##### $english{$id}{dest}{$tgt}\n";
 #		print "#!! '$id:$tgt' dest not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	    }
@@ -380,8 +384,8 @@ foreach my $id (@langorder) {
 	    $sane =~ tr/YAmd~//d;
 	    if (length($sane) != 0) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has illegal characters!  Restoring from English!\n";
-		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-		$lang{$id}{'notes'} .= "### $lang{$id}{dest}{$tgt}\n";
+		$lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "##### $lang{$id}{dest}{$tgt}\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	    }
 	}
@@ -398,8 +402,8 @@ foreach my $id (@langorder) {
 	    }
 	    if ($fmt1 ne $fmt2) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' has incorrect format specifiers! Copying from English!\n";
-		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-		$lang{$id}{'notes'} .= "### $lang{$id}{dest}{$tgt}\n";
+		$lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "##### $lang{$id}{dest}{$tgt}\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 #	        print "#!! '$id:$tgt' dest does not match src format args: '$fmt1' vs '$fmt2'\n";
 	    }
@@ -462,8 +466,8 @@ foreach my $id (@langorder) {
 		if ($id ne 'VOICE_NUMERIC_TENS_SWAP_SEPARATOR') {
 		    # If it's not blank, clear it and complain!
 		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is not blank!\n";
-		    $lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-		    $lang{$id}{'notes'} .= "### $english{$id}{voice}{$tgt}\n";
+		    $lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
+		    $lang{$id}{'notes'} .= "##### $english{$id}{voice}{$tgt}\n";
 		    #		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 		}

@@ -28,7 +28,7 @@ ENGLISH="$LANGDIR"/english.lang
 
         while read LINE; do
             case $LINE in
-                "### This phrase is missing entirely"*)
+                "### The phrase "*)
                     MISSING=`expr $MISSING + 1`
                 ;;
                 "### The 'desc' field for"*|"### The 'user' field for"*)
