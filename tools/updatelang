@@ -269,7 +269,7 @@ foreach my $id (@langorder) {
 #	    print "#!! '$id' deprecated, deleting\n";
 	    $lang{$id} = $english{$id};
 	} else {
-	    $lang{$id}{'notes'} .= "### The 'desc' field for '$id' differs from the english!\n";
+	    $lang{$id}{'notes'} .= "### The 'desc' field for '$id' differs from English!\n";
 	    $lang{$id}{'notes'} .= "#### the previously used desc is commented below:\n";
 	    $lang{$id}{'notes'} .= "##### desc: $lp{desc}\n";
 	    $lang{$id}{'phrase'}{'desc'} = $english{$id}{'phrase'}{'desc'};
@@ -282,7 +282,7 @@ foreach my $id (@langorder) {
     }
 
     if (!defined($lp{'user'}) || $lp{'user'} ne $ep{'user'}) {
-	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n";
+	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from English!\n";
 	$lang{$id}{'notes'} .= "#### the previously used desc is commented below:\n";
 	$lang{$id}{'notes'} .= "##### desc: $lp{user}\n";
 	if (!defined($lp{'user'}) || length($lp{'user'}) == 0) {
@@ -323,7 +323,7 @@ foreach my $id (@langorder) {
 	    $lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    # If the source string differs, complain, and copy from English
-	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' differs from the english!\n";
+	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' differs from English!\n";
 	    $lang{$id}{'notes'} .= "#### the previously used one is commented below:\n";
 	    $lang{$id}{'notes'} .= "##### $english{$id}{source}{$tgt}\n";
 #	    print "#!! '$id:$tgt' source changed ('$lp{$tgt}' vs '$ep{$tgt}')\n";
