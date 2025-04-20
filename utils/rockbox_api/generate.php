@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?
+<?php
 require_once("functions.php");
 
 echo   '# Auto generated documentation by Rockbox plugin API generator v2'."\n";

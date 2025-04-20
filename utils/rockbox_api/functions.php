@@ -1,4 +1,4 @@
-<?
+<?php
 $svn = "http://svn.rockbox.org/viewvc.cgi/trunk/";
 $wiki = "http://www.rockbox.org/wiki/";
 
@@ -12,10 +12,10 @@ function func_sort($a, $b)
 function get_newest()
 {
     global $svn;
-    
-    $mypath = $_SERVER['SCRIPT_FILENAME'];
-    $mypath = substr($mypath, 0, strrpos($mypath, "/"))."/";
-    
+
+    $mypath = "./"; //$_SERVER['SCRIPT_FILENAME'];
+//    $mypath = substr($mypath, 0, strrpos($mypath, "/"))."/";
+
     $text = file_get_contents($mypath."../../apps/plugin.h");
 
     $text = str_replace(array("\r\n", "\r"), "\n", $text);
@@ -55,7 +55,7 @@ function get_newest()
     for($i=0; $i<count($text); $i++)
     {
         $tmp = trim($text[$i]);
-        
+
         if(substr($tmp, 0, 1) == '#')
         {
             $tmp = trim(substr($tmp, 1));
@@ -196,7 +196,7 @@ function get_args($func)
     $buffer = "";
     for($i=0; $i<strlen($func); $i++)
     {
-        switch($func{$i})
+        switch($func[$i])
         {
             case "(":
                 $level++;
@@ -234,7 +234,7 @@ function get_args($func)
                     $buffer .= ",";
             break;
             default:
-                $buffer .= $func{$i};
+                $buffer .= $func[$i];
             break;
         }
     }
@@ -295,8 +295,8 @@ function split_var($var)
 
 function _simplify($text)
 {
-    $text = ereg_replace('\(!\( (.*)[ ]?\)\)', '!\1', $text);
-    $text = ereg_replace('\(\(([^ ])\)\)', '\1', $text);
+//    $text = ereg_replace('\(!\( (.*)[ ]?\)\)', '!\1', $text);
+//    $text = preg_replace('/\(\((.*])\)\)/', '${1}', $text);
     return $text;
 }
 
@@ -313,7 +313,7 @@ function do_see_markup($data)
     foreach($data as $el)
     {
         $el = trim($el);
-        
+
         if(substr($el, 0, 1) != "[")
            $ret[] = do_markup("[F[".$el."]]");
         else

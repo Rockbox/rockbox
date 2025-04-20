@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?
+<?php
 require_once("functions.php");
 
 function get_group($text)

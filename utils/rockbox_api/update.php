@@ -1,5 +1,5 @@
 #!/usr/bin/php
-<?
+<?php
 require_once("functions.php");
 
 $input = file_get_contents($argv[1]);
