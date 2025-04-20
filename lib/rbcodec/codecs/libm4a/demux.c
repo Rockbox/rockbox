@@ -437,8 +437,8 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
     uint32_t i, k, old_i;
     uint32_t numentries;
     uint32_t frame;
-    uint32_t old_first, new_first;
-    uint32_t old_frame, new_frame;
+    uint32_t old_first = 0, new_first;
+    uint32_t old_frame = 0, new_frame;
     size_t size_remaining = chunk_len - 8;
 
     /* version + flags */
@@ -508,23 +508,23 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 
     idx = 0;
     i = 1;
-    old_i = 1;
+    old_i = 0;
     frame = 0;
 
     int32_t current_offset = stream_tell(qtmovie->stream);
     stream_seek(qtmovie->stream, qtmovie->res->sample_to_chunk_offset);
-    stream_read_sample_to_chunk(qtmovie->stream, &old_first, &old_frame);
     stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
-    for (k = 1; k < numentries + 1; ++k)
+    for (k = 1; k <= numentries; ++k)
     {
-        for (; i < qtmovie->res->num_sample_to_chunks; ++i)
+        for (; i <= qtmovie->res->num_sample_to_chunks; ++i)
         {
             if (i > old_i)
             {
                 /* Only access sample_to_chunk[] if new data is required. */
                 old_first = new_first;
                 old_frame = new_frame;
-                stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
+                if (i < qtmovie->res->num_sample_to_chunks)
+                    stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
                 old_i = i;
             }
             
