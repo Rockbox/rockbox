@@ -199,7 +199,7 @@ void init_memory (void)
     static struct {
     enum story story_id;
     zword release;
-    zbyte serial[6];
+    zbyte serial[6] __NONSTRING;
     } records[] = {
     {       SHERLOCK,  21, "871214" },
     {       SHERLOCK,  26, "880127" },
@@ -426,7 +426,7 @@ static void free_undo (int count)
 
 void reset_memory (void)
 {
-    if (story_fp != -1) 
+    if (story_fp != -1)
     fclose (story_fp);
     story_fp = -1;
 

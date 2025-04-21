@@ -56,15 +56,12 @@
 /***************************************************************************
  * TODO: Implement a merge sort for files larger than the buffer
  ****************************************************************************/
-
-
-
 size_t buf_size;
 static char *filename;
 static int num_entries;
 static char **pointers;
 static char *stringbuffer;
-static char crlf[2] = "\r\n";
+static char crlf[2] __NONSTRING = "\r\n";
 static int bomsize;
 
 /* Compare function for sorting backwards */

@@ -29,7 +29,7 @@ struct svar
     int len;
     union
     {
-        char key_[4];
+        char _key[4] __NONSTRING;
         un32 key;
     } k;
     void *ptr;
@@ -39,10 +39,10 @@ static int ver;
 static int sramblock, iramblock, vramblock;
 static int hramofs, hiofs, palofs, oamofs, wavofs;
 
-struct svar svars[] = 
+struct svar svars[] =
 {
     I4("GbSs", &ver),
-    
+
     I2("PC  ", &PC),
     I2("SP  ", &SP),
     I2("HL  ", &HL),
@@ -57,7 +57,7 @@ struct svar svars[] =
     I2("BC  ", &BC),
     I2("DE  ", &DE),
     I2("AF  ", &AF),
-#endif    
+#endif
     I4("IME ", &cpu.ime),
     I4("ima ", &cpu.ima),
     I4("spd ", &cpu.speed),
@@ -66,17 +66,17 @@ struct svar svars[] =
     I4("tim ", &cpu.tim),
     I4("lcdc", &cpu.lcdc),
     I4("snd ", &cpu.snd),
-    
+
     I1("ints", &hw.ilines),
     I1("pad ", &hw.pad),
     I4("cgb ", &hw.cgb),
-    
+
     I4("mbcm", &mbc.model),
     I4("romb", &mbc.rombank),
     I4("ramb", &mbc.rambank),
     I4("enab", &mbc.enableram),
     I4("batt", &mbc.batt),
-    
+
     I4("rtcR", &rtc.sel),
     I4("rtcL", &rtc.latch),
     I4("rtcC", &rtc.carry),
@@ -113,26 +113,26 @@ struct svar svars[] =
     I4("S4ec", &snd.ch[3].enlen),
 
     I4("hdma", &hw.hdma),
-    
+
     I4("sram", &sramblock),
     I4("iram", &iramblock),
     I4("vram", &vramblock),
     I4("hi  ", &hiofs),
     I4("pal ", &palofs),
     I4("oam ", &oamofs),
-    
+
     /* NOSAVE is a special code to prevent the rest of the table
      * from being saved, used to support old stuff for backwards
      * compatibility... */
     NOSAVE,
 
     /* the following are obsolete as of 0x104 */
-    
+
     I4("hram", &hramofs),
     /* I4("gba ", &hw.gba), */
     /* I4("S1sf", &snd.ch[0].swfreq), */
     I4("wav ", &wavofs),
-    
+
     R(P1), R(SB), R(SC),
     R(DIV), R(TIMA), R(TMA), R(TAC),
     R(IE), R(IF),
@@ -155,7 +155,7 @@ struct svar svars[] =
     I1("DMA3", &R_HDMA3),
     I1("DMA4", &R_HDMA4),
     I1("DMA5", &R_HDMA5),
-    
+
     END
 };
 
@@ -174,9 +174,9 @@ void loadstate(int fd)
     ver = hramofs = hiofs = palofs = oamofs = wavofs = 0;
 
     base_offset = lseek(fd, 0, SEEK_CUR);
-  
+
     read(fd,buf, 4096);
-    
+
     for (j = 0; header[j][0]; j++)
     {
         for (i = 0; svars[i].ptr; i++)
@@ -203,23 +203,23 @@ void loadstate(int fd)
     /* obsolete as of version 0x104 */
     if (hramofs) memcpy(ram.hi+128, buf+hramofs, 127);
     if (wavofs) memcpy(ram.hi+48, buf+wavofs, 16);
-    
+
     if (hiofs) memcpy(ram.hi, buf+hiofs, sizeof ram.hi);
     if (palofs) memcpy(lcd.pal, buf+palofs, sizeof lcd.pal);
     if (oamofs) memcpy(lcd.oam.mem, buf+oamofs, sizeof lcd.oam);
 
     lseek(fd, base_offset + (iramblock << 12), SEEK_SET);
     read(fd,ram.ibank, 4096*irl);
-    
+
     lseek(fd, base_offset + (vramblock << 12), SEEK_SET);
     read(fd,lcd.vbank, 4096*vrl);
-    
+
     lseek(fd, base_offset + (sramblock << 12), SEEK_SET);
     read(fd,ram.sbank, 4096*srl);
     vram_dirty();
     pal_dirty();
     sound_dirty();
-    mem_updatemap();            
+    mem_updatemap();
 }
 
 void savestate(int fd)
@@ -269,13 +269,13 @@ void savestate(int fd)
     /* (we'll seek relative to that from now on) */
     base_offset = lseek(fd, 0, SEEK_CUR);
     write(fd,buf, 4096);
-    
+
     lseek(fd, base_offset + (iramblock << 12), SEEK_SET);
     write(fd,ram.ibank, 4096*irl);
-    
+
     lseek(fd, base_offset + (vramblock << 12), SEEK_SET);
     write(fd,lcd.vbank, 4096*vrl);
-    
+
     lseek(fd, base_offset + (sramblock << 12), SEEK_SET);
     write(fd,ram.sbank, 4096*srl);
 }

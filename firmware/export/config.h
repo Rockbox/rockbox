@@ -1070,6 +1070,17 @@ Lyre prototype 1 */
 #define ROCKBOX_STRICT_ALIGN 1
 #endif
 
+/* -Wunterminates-string-initialization will complain if we try to shove
+  a "string" into an array that is too small.  Sometimes this actually
+  intentional, where you are merely using "string" as a standin for
+  "non-terminated sequence of bytes" -- in which case we need to mark
+  the "string" as "not actually a string" with an attribute.  Applies to
+  GCC >=8, but this warning isn't pulled in by -Wextra until >= 15.
+*/
+#if __GNUC__ >= 8
+#define __NONSTRING __attribute__((__nonstring__))
+#endif
+
 /*
  * These macros are for switching on unified syntax in inline assembly.
  * Older versions of GCC emit assembly in divided syntax with no option

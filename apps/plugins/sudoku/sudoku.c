@@ -120,7 +120,7 @@ static const char default_game[9][9] =
 #define MARK_SIZE   1   /* Mark width and height */
 
 #elif (LCD_HEIGHT==110) && (LCD_WIDTH==138) \
-   || (LCD_HEIGHT==128) && (LCD_WIDTH==128) 
+   || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
 /* iPod Mini - 138x110, 9 cells @ 10x10 with 14 border lines */
 /* iriver H10 5-6GB - 128x128, 9 cells @ 10x10 with 14 border lines */
 #define MARK_OFFS   1   /* Pixels between border and mark */
@@ -326,7 +326,7 @@ static void default_state(struct sudoku_state_t* state)
         for (c=0;c<9;c++) {
             state->startboard[r][c]=default_game[r][c];
             state->currentboard[r][c]=default_game[r][c];
-#ifdef SUDOKU_BUTTON_POSSIBLE 
+#ifdef SUDOKU_BUTTON_POSSIBLE
             state->possiblevals[r][c]=0;
 #endif
         }
@@ -349,7 +349,7 @@ static void clear_state(struct sudoku_state_t* state)
         for (c=0;c<9;c++) {
             state->startboard[r][c]='0';
             state->currentboard[r][c]='0';
-#ifdef SUDOKU_BUTTON_POSSIBLE 
+#ifdef SUDOKU_BUTTON_POSSIBLE
             state->possiblevals[r][c]=0;
 #endif
         }
@@ -382,7 +382,7 @@ static bool check_status(struct sudoku_state_t* state)
         }
     }
 
-    /* Second, check the row */  
+    /* Second, check the row */
     for (cell=0;cell<9;cell++) {
         check[cell]=0;
     }
@@ -460,7 +460,7 @@ static bool load_sudoku(struct sudoku_state_t* state, char* filename)
                 break;
             case '\n':
                 if (valid) {
-                    r++; 
+                    r++;
                     valid=0;
                 }
                 c = 0;
@@ -527,11 +527,11 @@ static bool save_sudoku(struct sudoku_state_t* state)
     int i;
 #ifdef SUDOKU_BUTTON_POSSIBLE
     int x;
-    char line[41]="...|...|... ;                          \r\n";
+    char line[41] __NONSTRING ="...|...|... ;                          \r\n";
 #else
-    char line[13]="...|...|...\r\n";
+    char line[13] __NONSTRING = "...|...|...\r\n";
 #endif
-    char sep[13]="-----------\r\n";
+    char sep[13]__NONSTRING = "-----------\r\n";
 
     rb->splash(0, "Saving...");
 
@@ -630,7 +630,7 @@ static void update_cell(struct sudoku_state_t* state, int r, int c)
 }
 
 
-static void display_board(struct sudoku_state_t* state) 
+static void display_board(struct sudoku_state_t* state)
 {
     int r,c;
 #ifdef SUDOKU_BUTTON_POSSIBLE
@@ -666,7 +666,7 @@ static void display_board(struct sudoku_state_t* state)
     for (r=0;r<9;r++) {
         rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
         rb->lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
-        if ((r % 3)==0) { 
+        if ((r % 3)==0) {
             rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-2);
             rb->lcd_vline(XOFS+cellxpos[r]-2,YOFS,YOFS+BOARD_HEIGHT-1);
         }
@@ -1021,7 +1021,7 @@ static void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 
     /* Redraw current and old cells */
     update_cell(state,oldx,oldy);
-    update_cell(state,newx,newy);  
+    update_cell(state,newx,newy);
 }
 
 /* plugin entry point */
@@ -1036,7 +1036,7 @@ enum plugin_status plugin_start(const void* parameter)
     int rc = PLUGIN_OK;
     long ticks;
     struct sudoku_state_t state;
-    
+
 #if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
@@ -1065,7 +1065,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    
+
     display_board(&state);
 
     /* The main game loop */
@@ -1111,7 +1111,7 @@ enum plugin_status plugin_start(const void* parameter)
                 /* Increment digit */
                 ticks=*rb->current_tick;
                 if (state.editmode) {
-                    if (state.startboard[state.y][state.x]=='9') { 
+                    if (state.startboard[state.y][state.x]=='9') {
                         state.startboard[state.y][state.x]='0';
                         state.currentboard[state.y][state.x]='0';
                     } else {
@@ -1120,7 +1120,7 @@ enum plugin_status plugin_start(const void* parameter)
                     }
                 } else {
                     if (state.startboard[state.y][state.x]=='0') {
-                        if (state.currentboard[state.y][state.x]=='9') { 
+                        if (state.currentboard[state.y][state.x]=='9') {
                             state.currentboard[state.y][state.x]='0';
                         } else {
                             state.currentboard[state.y][state.x]++;
@@ -1141,7 +1141,7 @@ enum plugin_status plugin_start(const void* parameter)
                 /* Decrement digit */
                 ticks=*rb->current_tick;
                 if (state.editmode) {
-                    if (state.startboard[state.y][state.x]=='0') { 
+                    if (state.startboard[state.y][state.x]=='0') {
                         state.startboard[state.y][state.x]='9';
                         state.currentboard[state.y][state.x]='9';
                     } else {
@@ -1150,7 +1150,7 @@ enum plugin_status plugin_start(const void* parameter)
                     }
                 } else {
                     if (state.startboard[state.y][state.x]=='0') {
-                        if (state.currentboard[state.y][state.x]=='0') { 
+                        if (state.currentboard[state.y][state.x]=='0') {
                             state.currentboard[state.y][state.x]='9';
                         } else {
                             state.currentboard[state.y][state.x]--;
@@ -1186,7 +1186,7 @@ enum plugin_status plugin_start(const void* parameter)
                     }
                 }
                 break;
-                
+
                 /* move cursor right */
             case SUDOKU_BUTTON_RIGHT:
             case (SUDOKU_BUTTON_RIGHT | BUTTON_REPEAT):
@@ -1219,7 +1219,7 @@ enum plugin_status plugin_start(const void* parameter)
             case (SUDOKU_BUTTON_UP | BUTTON_REPEAT):
                 if (state.y==0) {
                     move_cursor(&state,state.x,8);
-                } else { 
+                } else {
                     move_cursor(&state,state.x,state.y-1);
                 }
                 break;
@@ -1231,7 +1231,7 @@ enum plugin_status plugin_start(const void* parameter)
             case (SUDOKU_BUTTON_DOWN | BUTTON_REPEAT):
                 if (state.y==8) {
                     move_cursor(&state,state.x,0);
-                } else { 
+                } else {
                     move_cursor(&state,state.x,state.y+1);
                 }
                 break;
