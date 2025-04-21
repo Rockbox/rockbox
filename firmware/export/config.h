@@ -1079,6 +1079,8 @@ Lyre prototype 1 */
 */
 #if __GNUC__ >= 8
 #define __NONSTRING __attribute__((__nonstring__))
+#else
+#define __NONSTRING
 #endif
 
 /*
