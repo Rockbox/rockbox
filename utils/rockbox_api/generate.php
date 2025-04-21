@@ -13,7 +13,7 @@ echo <<<MOO
 #                     \/            \/     \/    \/            \/
 # \$Id$
 #
-# Generated from $svn\x61pps/plugin.h
+# Generated from $svn\x61apps/plugin.h
 #
 # Format:
 # \\group memory and strings

@@ -21,15 +21,18 @@ foreach($new as $name => $el)
 {
     unset($new[$name]);
     $name = clean_func($el["func"]);
-    
+
     $new[$name] = array(
                     "group" => array($el["group"]),
                     "description" => array("")
     );
-    
-    if(strlen($el["cond"]) > 2)
+
+    if(strlen($el["cond"]) > 2) {
         $new[$name]["conditions"][0] = $el["cond"];
-    
+    } else {
+        $new[$name]["conditions"][0] = "";
+    }
+
     $args = get_args($el["func"]);
     if(count($args) > 0)
     {
@@ -40,7 +43,7 @@ foreach($new as $name => $el)
         }
         $new[$name]["param"] = $args;
     }
-    
+
     if(get_return($el["func"]) !== false)
         $new[$name]["return"][0] = "";
 }
@@ -53,10 +56,10 @@ foreach($new as $name => $el)
     {
         $merged[$name] = $input[$name];
         $merged[$name]["conditions"] = $new[$name]["conditions"];
-        
+
         if(strlen($el["group"][0]) > 0)
             $merged[$name]["group"] = $el["group"];
-        
+
         if(isset($el["param"]))
         {
             foreach($el["param"] as $nr => $parel)
@@ -65,7 +68,7 @@ foreach($new as $name => $el)
                 {
                     $param = trim($parel);
                     $p1 = substr($param, 0, strpos($param, " "));
-                    
+
                     $param = trim($input[$name]["param"][$nr]);
                     $p2 = substr($param, strpos($param, " "));
                     $merged[$name]["params"][] = $p1." ".$p2." [AUTO-ADDED]";
@@ -74,10 +77,10 @@ foreach($new as $name => $el)
                     $merged[$name]["params"][] = $parel;
             }
         }
-        
+
         if(!isset($el["return"]) && isset($merged[$name]["return"]))
             unset($merged[$name]["return"]);
-        
+
         unset($input[$name]);
     }
     else
@@ -101,7 +104,7 @@ echo <<<MOO
 #                     \/            \/     \/    \/            \/
 # \$Id$
 #
-# Generated from $svn\x61pps/plugin.h
+# Generated from $svn\x61apps/plugin.h
 #
 # Format:
 # \\group memory and strings
@@ -125,10 +128,10 @@ foreach($merged as $func => $line)
 {
     echo "\n".clean_func($func)."\n";
 
-    if(strlen($line["group"]) > 0)
+    if(strlen($line["group"][0]) > 0)
         echo "    \\group ".trim($line["group"][0])."\n";
 
-    if(strlen($line["conditions"]) > 2)
+    if(strlen($line["conditions"][0]) > 2)
         echo "    \\conditions ".trim(_simplify($line["conditions"][0]))."\n";
 
     if(isset($line["param"]))
@@ -142,17 +145,17 @@ foreach($merged as $func => $line)
 
     if(isset($line["return"]))
     {
-        if(trim($line["return"]) == "")
+        if(trim($line["return"][0]) == "")
             echo "    \\return\n";
         else
             echo "    \\return ".trim($line["return"][0])."\n";
     }
-    
-    if(trim($line["description"]) == "")
+
+    if(trim($line["description"][0]) == "")
         echo "    \\description\n";
     else
         echo "    \\description ".trim($line["description"][0])."\n";
-    
+
     if(isset($line["see"]))
         echo "    \\see ".trim($line["see"][0])."\n";
 }

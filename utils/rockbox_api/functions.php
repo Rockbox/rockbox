@@ -1,6 +1,6 @@
 <?php
-$svn = "http://svn.rockbox.org/viewvc.cgi/trunk/";
-$wiki = "http://www.rockbox.org/wiki/";
+$svn = "https://git.rockbox.org/cgit/rockbox.git/";
+$wiki = "https://www.rockbox.org/wiki/";
 
 function func_sort($a, $b)
 {

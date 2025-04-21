@@ -8,7 +8,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-# Generated from http://svn.rockbox.org/viewvc.cgi/trunk/apps/plugin.h
+# Generated from https://git.rockbox.org/cgit/rockbox.git/aapps/plugin.h
 #
 # Format:
 # \group memory and strings
@@ -81,12 +81,13 @@ int atoi(const char *str)
     \group strings and memory
     \param str
     \return
-    \description
+    \description he atoi() function converts the initial portion of a string pointed to by str to int
 
 struct mp3entry* audio_current_track(void)
     \group playback control
-    \return
+    \return the mp3entry struct of the currently playing track
     \description
+    \see [S[firmware/export/id3.h]]
 
 void audio_ff_rewind(long newtime)
     \group playback control
@@ -113,8 +114,9 @@ void audio_next(void)
 
 struct mp3entry* audio_next_track(void)
     \group playback control
-    \return
+    \return the mp3entry struct of the upcoming track
     \description
+    \see [S[firmware/export/id3.h]]
 
 void audio_pause(void)
     \group playback control
@@ -167,12 +169,12 @@ void audio_stop(void)
 void backlight_off(void)
     \group For OLED targets like the Sansa Clip, the backlight_* functions control * the display enable, which has essentially the same effect.
     \conditions (defined(HAVE_BACKLIGHT))
-    \description
+    \description Turns the backlight off
 
 void backlight_on(void)
     \group For OLED targets like the Sansa Clip, the backlight_* functions control * the display enable, which has essentially the same effect.
     \conditions (defined(HAVE_BACKLIGHT))
-    \description
+    \description Turns the backlight on
 
 void backlight_set_brightness(int val)
     \group For OLED targets like the Sansa Clip, the backlight_* functions control * the display enable, which has essentially the same effect.
@@ -183,8 +185,8 @@ void backlight_set_brightness(int val)
 void backlight_set_timeout(int index)
     \group For OLED targets like the Sansa Clip, the backlight_* functions control * the display enable, which has essentially the same effect.
     \conditions (defined(HAVE_BACKLIGHT))
-    \param index
-    \description
+    \param index 0 : backlight always off%BR%1 : no time out%BR%2 : 1s%BR%3 : 2s%BR%4 : 3s%BR%5 : 4s%BR%6 : 5s%BR%7 : 6s%BR%8 : 7s%BR%9 : 8s%BR%10 : 9s%BR%11 : 10s%BR%12 : 15s%BR%13 : 20s%BR%14 : 25s%BR%15 : 30s%BR%16 : 45s%BR%17 : 60s%BR%18 : 90s%BR%other : backlight always off
+    \description Set the backlight timeout
 
 void backlight_set_timeout_plugged(int index)
     \conditions (defined(HAVE_BACKLIGHT)) && (CONFIG_CHARGING)
@@ -198,8 +200,8 @@ int battery_current(void)
 
 int battery_level(void)
     \group power
-    \return
-    \description
+    \return battery level in percent
+    \description On the simulator, battery_level is always 75
 
 bool battery_level_safe(void)
     \group power
@@ -335,12 +337,12 @@ void buttonlight_set_timeout(int value)
 
 void button_clear_queue(void)
     \group button
-    \description
+    \description Empty the button queue
 
 long button_get(bool block)
     \group button
-    \param block
-    \return
+    \param block If is set TRUE, button_get won't return until a key is pressed
+    \return a bitmask for which keys were pressed
     \description
 
 intptr_t button_get_data(void)
@@ -358,8 +360,8 @@ bool button_get_sw_poweroff_state(void)
 long button_get_w_tmo(int ticks)
     \group button
     \param ticks
-    \return
-    \description
+    \return a bitmask for which keys were pressed; if no key was pressed, return BUTTON_NONE
+    \description Wait for a key press for =ticks= ticks. (there are HZ ticks per second)
 
 bool button_hold(void)
     \group button
@@ -386,7 +388,7 @@ void button_set_sw_poweroff_state(bool enable)
 
 int button_status(void)
     \group button
-    \return
+    \return a bitmask for which keys are currently pressed
     \description
 
 int button_status_wdata(int *pdata)
@@ -399,7 +401,7 @@ int button_status_wdata(int *pdata)
 void cancel_cpu_boost(void)
     \group kernel/ system
     \conditions (defined(HAVE_SCHEDULER_BOOSTCTRL))
-    \description
+    \description Unboosts the CPU for the current thread
 
 const struct cbmp_bitmap_info_entry *core_bitmaps
     \return
@@ -436,17 +438,11 @@ bool charging_state(void)
     \return
     \description
 
-int close(int fildes)
-    \group file
-    \param fildes
-    \return
-    \description
-
-int closedir(DIR *dirp)
+int closedir(DIR* dirp)
     \group dir
-    \param dirp
+    \param dir
     \return
-    \description
+    \description The closedir() function closes the directory stream associated with =dir=. The directory stream descriptor dir is not available after this call.
 
 int codec_close(void)
     \group misc
@@ -502,7 +498,7 @@ void cpu_boost(bool on_off)
     \group kernel/ system
     \conditions ((CONFIG_PLATFORM & PLATFORM_NATIVE)) && (defined(HAVE_ADJUSTABLE_CPU_FREQ)) && (!( defined(CPU_BOOST_LOGGING) ))
     \param on_off
-    \description
+    \description Boosts the CPU if =on_off= is true, otherwise it unboosts the CPU
 
 void cpu_boost_(bool on_off,char*location,int line)
     \group kernel/ system
@@ -515,7 +511,7 @@ void cpu_boost_(bool on_off,char*location,int line)
 long *cpu_frequency
     \group kernel/ system
     \conditions ((CONFIG_PLATFORM & PLATFORM_NATIVE))
-    \return
+    \return the current cpu frequency
     \description
 
 uint32_t crc_32(const void *src, uint32_t len, uint32_t crc32)
@@ -531,13 +527,6 @@ uint32_t crc_32r(const void *src, uint32_t len, uint32_t crc32)
     \param src
     \param len
     \param crc32
-    \return
-    \description
-
-int creat(const char *path, mode_t mode)
-    \group file
-    \param path
-    \param mode
     \return
     \description
 
@@ -561,8 +550,8 @@ unsigned int create_thread(void (*function)(void), void* stack, size_t stack_siz
     \param priority
     \param core
     \param name
-    \return
-    \description
+    \description Creates a thread
+    \return its ID if context area could be allocated, else return -1
 
 int create_xing_header(int fd, long startpos, long filesize, unsigned char *buf, unsigned long num_frames, unsigned long rec_time, unsigned long header_template, void (*progressfunc)(int), bool generate_toc, unsigned char* tempbuf, size_t tempbuf_len)
     \group metadata
@@ -589,12 +578,12 @@ void debugf(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2)
     \group misc
     \conditions (defined(DEBUG) || defined(SIMULATOR))
     \param fmt
-    \description
+    \description Prints =fmt= in a printf-like fashion to STDERR
 
 long default_event_handler(long event)
     \group kernel/ system
     \param event
-    \return
+    \return SYS_USB_CONNECTED and call usb_screen() if =event= equals to SYS_USB_CONNECTED, else do nothing and return 0
     \description
 
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
@@ -709,14 +698,8 @@ int fdprintf(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3)
     \group file
     \param fildes
     \param fmt
-    \return
-    \description
-
-off_t filesize(int fildes)
-    \group file
-    \param fildes
-    \return
-    \description
+    \return number of characters writen to =fd= or a negative value upon error
+    \description Write a formated string in the =fd=
 
 int filetype_get_attr(const char* file)
     \param file
@@ -752,8 +735,9 @@ void fix_path_part(char* path, int offset, int count)
 
 struct font* font_get(int font)
     \param font
-    \return
-    \description
+    \return the font structure for =font=
+    \description If the requested font isn't loaded/compiled-in, decrement the font number and try again.
+    \see [S[firmware/export/font.h]]
 
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
     \param str
@@ -771,8 +755,9 @@ int font_get_width(struct font* pf, unsigned short char_code)
 
 int font_load(const char *path)
     \param path
-    \return
-    \description
+    \description Load font =path=
+    \return returns ID or -1 if failed
+    \see [S[firmware/export/font.h]]
 
 void font_unload(int font_id)
     \param font_id
@@ -842,16 +827,21 @@ int get_sleep_timer(void)
 
 struct tm* get_time(void)
     \group misc
-    \return
+    \return current time
     \description
+    \see [S[firmware/include/time.h]]
 
 struct user_settings* global_settings
-    \return
+    \group misc
+    \return the global_settings struct
     \description
+    \see [S[apps/settings.h]]
 
 struct system_status *global_status
-    \return
+    \group misc
+    \return the global_status struct
     \description
+    \see [S[apps/settings.h]]
 
 struct tm * gmtime_r(const time_t *timep, struct tm *tm)
     \group misc
@@ -986,9 +976,9 @@ int kbd_input(char* buffer, int buflen, unsigned short *kbd)
     \group misc
     \param buffer
     \param buflen
-    \param kbd
-    \return
-    \description
+    \param *kbd
+    \return 0 upon success, negative upon failure
+    \description Prompt for a string to be stored in =buffer= which is of length =buflen=
 
 void keyclick_click(bool rawbutton, int action)
     \param rawbutton
@@ -1008,7 +998,7 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     \param y
     \param width
     \param height
-    \description
+    \description Put a bitmap at given XY coordinates. Element src[i] is the binary representation of column number i of the bitmap read from bottom to top.
 
 void lcd_bitmap_part(const fb_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
     \group lcd
@@ -1107,21 +1097,21 @@ void lcd_bmp_part(const struct bitmap *bm, int src_x, int src_y, int x, int y, i
 
 void lcd_clear_display(void)
     \group lcd
-    \description
+    \description Clears the LCD and the framebuffer
 
 void lcd_drawline(int x1, int y1, int x2, int y2)
     \group lcd
-    \param x1
-    \param y1
-    \param x2
-    \param y2
-    \description
+    \param x1 X top coordinate
+    \param y1 Y top coordinate
+    \param x2 X bottom coordinate
+    \param y2 Y bottom coordinate
+    \description Draws a line at (=x1=, =y1=) -> (=x2=, =y2=) within current drawing mode
 
 void lcd_drawpixel(int x, int y)
     \group lcd
     \param x
     \param y
-    \description
+    \description Draws a pixel at (=x=, =y=) within current drawing mode
 
 void lcd_drawrect(int x, int y, int width, int height)
     \group lcd
@@ -1129,7 +1119,7 @@ void lcd_drawrect(int x, int y, int width, int height)
     \param y
     \param width
     \param height
-    \description
+    \description Draws a rectangle at (=x=, =y=) -> (=x= + =width=, =y= + =height=) within current drawing mode
 
 void lcd_fillrect(int x, int y, int width, int height)
     \group lcd
@@ -1137,21 +1127,22 @@ void lcd_fillrect(int x, int y, int width, int height)
     \param y
     \param width
     \param height
-    \description
+    \description Draws a filled rectangle at (=x=, =y=) -> (=x= + =width=, =y= + =height=) within current drawing mode
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
     \group lcd
-    \param str
-    \param w
-    \param h
-    \return
-    \description
+    \param str String
+    \param w Width
+    \param h Height
+    \return Success or not
+    \description Stores the width and height of the string in =w= and =h=
 
 fb_data* lcd_get_backdrop(void)
     \group lcd
     \conditions (LCD_DEPTH > 1)
-    \return
-    \description
+    \return Pointer to framebuffer data
+    \description Gets the current backdrop
+    \see lcd_framebuffer
 
 unsigned lcd_get_background(void)
     \group lcd
@@ -1161,7 +1152,7 @@ unsigned lcd_get_background(void)
 
 int lcd_get_drawmode(void)
     \group lcd
-    \return
+    \return current LCD drawing mode
     \description
 
 unsigned lcd_get_foreground(void)
@@ -1172,10 +1163,10 @@ unsigned lcd_get_foreground(void)
 
 void lcd_hline(int x1, int x2, int y)
     \group lcd
-    \param x1
-    \param x2
-    \param y
-    \description
+    \param x1 X start coordinate
+    \param x2 X end coordinate
+    \param y Y coordinate
+    \description Draws a horizontal line at (=x1=, =y=) -> (=x2=, =y=) within current drawing mode
 
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
     \group lcd
@@ -1206,10 +1197,10 @@ void lcd_pal256_update_pal(fb_data *palette)
 
 void lcd_puts(int x, int y, const unsigned char *string)
     \group lcd
-    \param x
-    \param y
+    \param x Row X
+    \param y Column Y
     \param string
-    \description
+    \description Puts string on the LCD at row =x= and column =y=
 
 void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
     \group lcd
@@ -1220,10 +1211,10 @@ void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
 
 void lcd_putsxy(int x, int y, const unsigned char *string)
     \group lcd
-    \param x
-    \param y
+    \param x X coordinate
+    \param y Y coordinate
     \param string
-    \description
+    \description Puts string on the LCD at position (=x=, =y=)
 
 void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
     \group lcd
@@ -1234,11 +1225,11 @@ void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
 
 bool lcd_puts_scroll(int x, int y, const unsigned char* string)
     \group lcd
-    \param x
-    \param y
+    \param x Row X
+    \param y Column Y
     \param string
     \return
-    \description
+    \description Puts scrolling string on the LCD at row =x= and column =y=. The scrolling style is STYLE_DEFAULT.
 
 void lcd_remote_bitmap(const fb_remote_data *src, int x, int y, int width, int height)
     \group remote lcd
@@ -1271,18 +1262,18 @@ void lcd_remote_clear_display(void)
 void lcd_remote_drawline(int x1, int y1, int x2, int y2)
     \group remote lcd
     \conditions (defined(HAVE_REMOTE_LCD))
-    \param x1
-    \param y1
-    \param x2
-    \param y2
-    \description
+    \param x1 X top coordinate
+    \param y1 Y top coordinate
+    \param x2 X bottom coordinate
+    \param y2 Y bottom coordinate
+    \description Draws a line at (=x1=, =y1=) -> (=x2=, =y2=) within current drawing mode
 
 void lcd_remote_drawpixel(int x, int y)
     \group remote lcd
     \conditions (defined(HAVE_REMOTE_LCD))
     \param x
     \param y
-    \description
+    \description Draws a pixel at (=x=, =y=) within current drawing mode
 
 void lcd_remote_drawrect(int x, int y, int nx, int ny)
     \group remote lcd
@@ -1305,11 +1296,11 @@ void lcd_remote_fillrect(int x, int y, int nx, int ny)
 int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
     \group remote lcd
     \conditions (defined(HAVE_REMOTE_LCD))
-    \param str
-    \param w
-    \param h
-    \return
-    \description
+    \param str String
+    \param w Width
+    \param h Height
+    \return Success or not
+    \description Stores the width and height of the string in =w= and =h=
 
 unsigned lcd_remote_get_background(void)
     \group remote lcd
@@ -1394,7 +1385,7 @@ void lcd_remote_setfont(int font)
     \group remote lcd
     \conditions (defined(HAVE_REMOTE_LCD))
     \param font
-    \description
+    \description Set default font
 
 void lcd_remote_set_background(unsigned background)
     \group remote lcd
@@ -1449,13 +1440,14 @@ void lcd_scroll_stop(void)
 void lcd_setfont(int font)
     \group lcd
     \param font
-    \description
+    \description Set default font
 
 void lcd_set_backdrop(fb_data* backdrop)
     \group lcd
     \conditions (LCD_DEPTH > 1)
-    \param backdrop
-    \description
+    \param backdrop Pointer to backdrop image
+    \description Set the backdrop to =backdrop=
+    \see lcd_framebuffer
 
 void lcd_set_background(unsigned foreground)
     \group lcd
@@ -1466,8 +1458,8 @@ void lcd_set_background(unsigned foreground)
 void lcd_set_contrast(int x)
     \group lcd
     \conditions (defined(HAVE_LCD_CONTRAST))
-    \param x
-    \description
+    \param x Should be between =MIN_CONTRAST_SETTING= and =MAX_CONTRAST_SETTING=
+    \description Sets LCD contrast to value =x=
 
 void lcd_set_drawmode(int mode)
     \group lcd
@@ -1500,22 +1492,22 @@ struct viewport* lcd_set_viewport(struct viewport* vp)
 
 void lcd_update(void)
     \group lcd
-    \description
+    \description Pushes LCD framebuffer changes to the LCD
 
 void lcd_update_rect(int x, int y, int width, int height)
     \group lcd
-    \param x
-    \param y
-    \param width
-    \param height
-    \description
+    \param x measured in pixels
+    \param y measured in pixels
+    \param width measured in pixels
+    \param height measured in pixels
+    \description Pushes LCD framebuffer changes to the LCD within rectangle (=x=, =y=) -> (=x= + =width=, =y= + =height=). Notice that the smallest vertical resolution in updates that the hardware supports is 8 pixels.
 
 void lcd_vline(int x, int y1, int y2)
     \group lcd
-    \param x
-    \param y1
-    \param y2
-    \description
+    \param x X coordinate
+    \param y1 Y start coordinate
+    \param y2 Y end coordinate
+    \description Draws a vertical line at (=x=, =y1=) -> (=x=, =y2=) within current drawing mode
 
 void lcd_yuv_set_options(unsigned options)
     \group lcd
@@ -1576,14 +1568,6 @@ const unsigned long *rec_freq_sampr
     \return
     \description
 
-off_t lseek(int fildes, off_t offset, int whence)
-    \group file
-    \param fildes
-    \param offset
-    \param whence
-    \return
-    \description
-
 void *memchr(const void *s1, int c, size_t n)
     \group strings and memory
     \param s1
@@ -1606,7 +1590,7 @@ void* memcpy(void *out, const void *in, size_t n)
     \param in
     \param n
     \return
-    \description
+    \description Copies =n= bytes of data in memory from =in= to =out=
 
 void* memmove(void *out, const void *in, size_t n)
     \group strings and memory
@@ -1622,7 +1606,7 @@ void* memset(void *dst, int c, size_t length)
     \param c
     \param length
     \return
-    \description
+    \description Fills a memory region with specified byte value =c=
 
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel, struct pcm_peaks *peaks)
     \param channel
@@ -1729,8 +1713,8 @@ int open(const char *path, int oflag, ...)
 DIR * opendir(const char *dirname)
     \group dir
     \param dirname
-    \return
-    \description
+    \return a pointer to the directory stream
+    \description The opendir() function opens a directory stream corresponding to the directory name.  The stream is positioned at the first entry in the directory.
 
 int open_utf8(const char* pathname, int flags)
     \group file
@@ -1800,15 +1784,15 @@ void pcm_init_recording(void)
 
 bool pcm_is_playing(void)
     \group sound
-    \return
+    \return true unless playback is paused
     \description
 
 void pcm_play_data(pcm_play_callback_type get_more, pcm_status_callback_type status_cb, const void *start, size_t size)
     \group sound
-    \param get_more
-    \param status_cb
-    \param start
-    \param size
+    \param get_more Optional callback
+    \param status_cb Optional status callback
+    \param start is the address of raw 16-16, interleaved PCM data
+    \param size is the size of the data to play
     \description
 
 void pcm_play_lock(void)
@@ -1817,7 +1801,7 @@ void pcm_play_lock(void)
 
 void pcm_play_stop(void)
     \group sound
-    \description
+    \description Stops the playback and empties the audio buffer.
 
 void pcm_play_unlock(void)
     \group sound
@@ -1844,7 +1828,7 @@ void pcm_stop_recording(void)
 
 int playlist_amount(void)
     \group playback control
-    \return
+    \return the number of tracks in current playlist
     \description
 
 int playlist_create(const char *dir, const char *file)
@@ -1864,7 +1848,7 @@ bool playlist_entries_iterate(const char *filename, struct playlist_insert_conte
 
 struct playlist_info* playlist_get_current(void)
     \group playback control
-    \return
+    \return pointer to current playlist
     \description
 
 int playlist_get_display_index(void)
@@ -1969,12 +1953,12 @@ void* plugin_get_audio_buffer(size_t *buffer_size)
     \group plugin
     \param buffer_size
     \return
-    \description
+    \description Steals =buffer_size= bytes from the available RAM, reducing the available buffer for audio buffering
 
 void* plugin_get_buffer(size_t *buffer_size)
     \group plugin
-    \param buffer_size
-    \return
+    \param buffer_size this is the memory size left in plugin buffer upon return
+    \return a pointer to the portion of the plugin buffer that is not already being used. If no plugin is loaded, returns the entire plugin buffer.
     \description
 
 char* plugin_get_current_filename(void)
@@ -2004,6 +1988,83 @@ void plugin_tsr(int (*exit_callback)(bool reenter))
     \param exit_callback
     \description
 
+int close(int filedes)
+    \group file
+    \param fiedes
+    \return 0 upon success
+    \description The close() function will deallocate the file descriptor indicated by =fd=.  To deallocate means to make the file descriptor available for return by subsequent calls to open() or other functions that allocate file descriptors.
+
+int creat(const char *pathname, mode_t mode)
+    \group file
+    \param pathname
+    \param mode
+    \return the file descriptor associated to this file
+    \description Create a file with mode O_RDONLY, O_WRONLY or O_RDWR
+
+off_t filesize(int filedes)
+    \group file
+    \param filedes
+    \return size of a file; upon error, returns -1
+    \description
+
+int ftruncate(int fildes, off_t length)
+    \group file
+    \param fildes
+    \param length
+    \return
+    \description Truncate file to the specified =length=
+
+off_t lseek(int fildes, off_t offset, int whence)
+    \group file
+    \param fildes
+    \param offset
+    \param whence
+    \return
+    \description The lseek() function sets the file pointer associated with the open file descriptor specified by =fd= as follows: If =whence= is SEEK_SET, the pointer is set to =offset= bytes. If =whence= is SEEK_CUR, the pointer is set to its current location plus =offset=. If =whence= is SEEK_END, the pointer is set to the size of the file plus =offset=.
+
+int open(const char *path, int oflag, ...)
+    \group file
+    \param path
+    \param oflag
+    \return
+    \description The open() function establishes the connection between a file and a file descriptor. It creates an open file description that refers to a file and a file descriptor that refers to that open file description. The file descriptor is used by other I/O functions to refer to that file.
+
+ssize_t read(int fildes, void *buf, size_t nbyte)
+    \group file
+    \param fildes
+    \param buf
+    \param nbyte
+    \return
+    \description The read() function attempts to read =count= bytes from the file associated with the open file descriptor, =fd=, into the buffer pointed to by =buf=
+
+int remove(const char *path)
+    \group file
+    \param path
+    \return
+    \description remove() deletes a name from the filesystem. It calls unlink for files, and rmdir for directories.
+
+
+int rename(const char *old, const char *new)
+    \group file
+    \param old points to the pathname of the file to be renamed
+    \param new points to the new pathname of the file
+    \return
+    \description The rename() function changes the name of a file
+
+unsigned sleep(unsigned ticks)
+    \group kernel/ system
+    \param ticks
+    \return
+    \description Sleep a specified number of =ticks=, we have HZ ticks per second
+
+ssize_t write(int fildes, const void *buf, size_t nbyte)
+    \group file
+    \param fildes
+    \param buf
+    \param nbyte
+    \return
+    \description Write writes up to =count= bytes to the file referenced by the file descriptor =fd= from the buffer starting at =buf=
+
 void profile_func_enter(void *this_fn, void *call_site)
     \conditions (defined(RB_PROFILE))
     \param this_fn
@@ -2026,11 +2087,11 @@ void profstop(void)
 
 void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *))
     \group misc
-    \param base
-    \param nmemb
-    \param size
+    \param base start of array
+    \param nmemb number of elements
+    \param size describes the size of each element of the array
     \param compar
-    \description
+    \description qsort sorts an array (begining at =base=) of =nmemb= objects
 
 void queue_delete(struct event_queue *q)
     \param q
@@ -2088,25 +2149,17 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
 int rand(void)
     \group misc
-    \return
+    \return a pseudo random number between 0 and 0x7fffffff
     \description
 
 const char *rbversion
-    \return
-    \description
-
-ssize_t read(int fildes, void *buf, size_t nbyte)
-    \group file
-    \param fildes
-    \param buf
-    \param nbyte
-    \return
+    \return version of the plugin API
     \description
 
 struct dirent * readdir(DIR *dirp)
     \group dir
     \param dirp
-    \return
+    \return a pointer to a dirent structure representing the next directory entry in the directory stream pointed to by =dir= or NULL on reaching the end-of-file or if an error occurred
     \description
 
 int read_bmp_fd(int fd, struct bitmap *bm, int maxsize, int format, const struct custom_format *cformat)
@@ -2152,8 +2205,8 @@ int read_line(int fd, char* buffer, int buffer_size)
     \param fd
     \param buffer
     \param buffer_size
-    \return
-    \description
+    \return number of bytes read (which may be larger than the number of bytes stored in buffer) or upon error -1 (and buffer contains whatever could be read)
+    \description Read (up to) a line of text from =fd= into =buffer=. A line is terminated by a LF char. Neither LF nor CR chars are stored in buffer.
 
 void register_storage_idle_func(void (*function)(void))
     \group file
@@ -2167,11 +2220,11 @@ void reload_directory(void)
 
 void remote_backlight_off(void)
     \conditions (defined(HAVE_BACKLIGHT)) && (defined(HAVE_REMOTE_LCD))
-    \description
+    \description Turns the remote backlight off
 
 void remote_backlight_on(void)
     \conditions (defined(HAVE_BACKLIGHT)) && (defined(HAVE_REMOTE_LCD))
-    \description
+    \description Turns the remote backlight on
 
 void remote_backlight_set_timeout(int index)
     \conditions (defined(HAVE_BACKLIGHT)) && (defined(HAVE_REMOTE_LCD))
@@ -2181,12 +2234,6 @@ void remote_backlight_set_timeout(int index)
 void remote_backlight_set_timeout_plugged(int index)
     \conditions (defined(HAVE_BACKLIGHT)) && (defined(HAVE_REMOTE_LCD)) && (CONFIG_CHARGING)
     \param index
-    \description
-
-int remove(const char *path)
-    \group file
-    \param path
-    \return
     \description
 
 int remove_array_ptr(void **arr, void *ptr)
@@ -2202,16 +2249,9 @@ void remove_event(unsigned short id, void (*handler)(unsigned short id, void *da
     \param handler
     \description
 
-int rename(const char *old, const char *new)
-    \group file
-    \param old
-    \param new
-    \return
-    \description
-
 void reset_poweroff_timer(void)
     \group kernel/ system
-    \description
+    \description The function name pretty much says what it's supposed to do
 
 int rmdir(const char *path)
     \group dir
@@ -2281,10 +2321,10 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string, 
     \conditions (defined(HAVE_ALBUMART))
     \param id3
     \param size_string
-    \param buf
-    \param buflen
-    \return
-    \description
+    \param buf Pointer to output
+    \param buflen Max length for =buf=
+    \return true if an album art was found
+    \description Searches the the album art file for the given =id3= struct, appending the =size_string= to the search pattern (cover.bmp). It writes the complete path into =buf=, but not more bytes than =buflen=.
 
 void semaphore_init(struct semaphore *s, int max, int start)
     \group kernel/ system
@@ -2317,6 +2357,7 @@ void send_event(unsigned short id, void *data)
 const struct settings_list* find_setting(const void* variable)
     \group options
     \param variable
+    \param id
     \return
     \description
 
@@ -2331,8 +2372,8 @@ bool settings_parseline(char* line, char** name, char** value)
     \param line
     \param name
     \param value
-    \return
-    \description
+    \return false if no valid config entry was found
+    \description Parse a line from a configuration file. The line format is: 'name: value'. Any whitespace before setting name or value (after ':') is ignored. A # as first non-whitespace character discards the whole line. Function sets pointers to null-terminated setting name and value.
 
 int settings_save(void)
     \group options
@@ -2454,8 +2495,8 @@ int snprintf(char *buf, size_t size, const char *fmt, ...) ATTRIBUTE_PRINTF(3, 4
     \param buf
     \param size
     \param fmt
-    \return
-    \description
+    \return the number of characters printed or that would have been printed if the output was truncated (not including the trailing NULL character) upon success
+    \description Write a formatted string =fmt= in buffer =buf= of size =size= (including the trailing NULL character). These support %c, %s, %d and %x only with the width and zero padding flag only.
 
 int sound_current(int setting); /*stub*
     \group sound
@@ -2524,7 +2565,7 @@ void splash(int ticks, const char *str)
     \group lcd
     \param ticks
     \param str
-    \description
+    \description Display a formatted string in a box for =ticks= time. The string is formatted as with the printf function. (there are =HZ= ticks per second)
 
 void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3)
     \group lcd
@@ -2547,7 +2588,7 @@ void splash_progress_set_delay(long delay_ticks)
 void srand(unsigned int seed)
     \group misc
     \param seed
-    \description
+    \description Seed the random number generator
 
 void storage_sleep(void)
     \group file
@@ -2564,17 +2605,17 @@ void storage_spindown(int seconds)
 
 int strcasecmp(const char *, const char *)
     \group strings and memory
-    \param 
-    \param 
-    \return
-    \description
+    \param
+    \param
+    \return an integer less than, equal to, or greater than zero if s1 is found, respectively, to be less than, to match, or be greater than s2
+    \description The  strcasecmp() function compares the two strings s1 and s2, ignoring the case of the characters
 
 char *strcat(char *s1, const char *s2)
     \group strings and memory
     \param s1
     \param s2
-    \return
-    \description
+    \return =s1= concatenated with =s2=
+    \description Appends =s2= to =s1=, replacing the NULL terminating character of =s1= and returns it
 
 char *strchr(const char *s, int c)
     \group strings and memory
@@ -2585,17 +2626,17 @@ char *strchr(const char *s, int c)
 
 int strcmp(const char *, const char *)
     \group strings and memory
-    \param 
-    \param 
+    \param
+    \param
     \return
-    \description
+    \description strcmp() compares the string a to string b. If a sorts lexicographically after b, strcmp returns a number greater than zero. If the two strings match, strcmp returns zero. If a sorts lexicographically before b, strcmp returns a number less than zero.
 
 char* strcpy(char *dst, const char *src)
     \group strings and memory
     \param dst
     \param src
-    \return
-    \description
+    \return the initial value of =dst=
+    \description strcpy() copies the string pointed to by =src= (including the terminating null character) to the array pointed to by =dst=
 
 char* strip_extension(char* buffer, int buffer_size, const char *filename)
     \group file
@@ -2624,8 +2665,8 @@ size_t strlcpy(char *dst, const char *src, size_t length)
 size_t strlen(const char *str)
     \group strings and memory
     \param str
-    \return
-    \description
+    \return the character count
+    \description The strlen() function works out the length of the string starting at =str= by counting characters until it reaches a null character.
 
 int strncasecmp(const char *s1, const char *s2, size_t n)
     \group strings and memory
@@ -2633,12 +2674,13 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
     \param s2
     \param n
     \return
-    \description
+    \description Like strcasecmp() but only on the first =n= characters
+    \see strcasecmp
 
 int strncmp(const char *, const char *, size_t)
     \group strings and memory
-    \param 
-    \param 
+    \param
+    \param
     \param size_t
     \return
     \description
@@ -2647,8 +2689,8 @@ char * strrchr(const char *s, int c)
     \group strings and memory
     \param s
     \param c
-    \return
-    \description
+    \return a pointer to the located character, or a null pointer if =c= does not occur in string.
+    \description This function finds the last occurence of =c= (converted to a char) in the string pointed to by string (including the terminating null character)
 
 char* strtok_r(char *ptr, const char *sep, char **end)
     \group strings and memory
@@ -2896,12 +2938,6 @@ void thread_wait(unsigned int thread_id)
     \param thread_id
     \description
 
-unsigned sleep(unsigned ticks)
-    \group kernel/ system
-    \param ticks
-    \return
-    \description
-
 bool timer_register(int reg_prio, void (*unregister_callback)(void), long cycles, void (*timer_callback)(void) IF_COP(, int core))
     \param reg_prio
     \param unregister_callback
@@ -2952,7 +2988,7 @@ struct entry* tree_get_entry_at(struct tree_context* t, int index)
 void trigger_cpu_boost(void)
     \group kernel/ system
     \conditions (defined(HAVE_SCHEDULER_BOOSTCTRL))
-    \description
+    \description Boosts the CPU for the current thread
 
 void unregister_storage_idle_func(void (*function)(void), bool run)
     \group file
@@ -3090,7 +3126,8 @@ bool yesno_pop(const char* text)
 
 void yield(void)
     \group kernel/ system
-    \description
+    \description Let another thread run. This should be used as soon as you have to "wait" for something or similar, and also if you do anything that takes "a long time". This function is the entire foundation that our "cooperative multitasking" is based on. Use it!
+    \see [W[RockboxKernel]]
 
 void __div0(void)
     \group kernel/ system
