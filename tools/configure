@@ -4196,7 +4196,7 @@ fi
     ;;
 
    248|erosqnative_v3)
-    target_id=117
+    target_id=116
     modelname="erosqnative_v3"
     target="EROS_QN"
     memory=32
@@ -4223,7 +4223,7 @@ fi
     ;;
 
     249|erosqnative_v4)
-    target_id=118
+    target_id=116
     modelname="erosqnative_v4"
     target="EROS_QN"
     memory=32
