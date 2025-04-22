@@ -79,6 +79,11 @@ ifneq ($(MEMORYSIZE),2)
 include $(RBCODECLIB_DIR)/codecs/cRSID/cRSID.make
 endif
 
+ifeq ($(shell expr $(GCCNUM) \> 600),1)
+$(MUSEPACKLIB): CODECFLAGS += -Wno-shift-negative-value
+$(WMALIB): CODECFLAGS += -Wno-shift-negative-value
+endif
+
 ifndef DEBUG
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
