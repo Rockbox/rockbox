@@ -27,7 +27,7 @@
 
 /*
         NOTE: storage_idle_notify usage notes..
-        
+
 1) The callbacks are called in the ata thread, not main/your thread.
 2) Asynchronous callbacks (like the buffer refill) should be avoided.
     If you must use an async callback, remember to check storage_is_active() before
@@ -46,10 +46,12 @@ enum {
 /* Enable storage callbacks everywhere except for bootloaders. Both
  * hosted and native targets need this.
  */
-#define USING_STORAGE_CALLBACK  !defined(BOOTLOADER) && !defined(APPLICATION) && !defined(__PCTOOL__)
+#if !defined(BOOTLOADER) && !defined(APPLICATION) && !defined(__PCTOOL__)
+#define USING_STORAGE_CALLBACK
+#endif
 
 extern void register_storage_idle_func(void (*function)(void));
-#if USING_STORAGE_CALLBACK
+#ifdef USING_STORAGE_CALLBACK
 extern void unregister_storage_idle_func(void (*function)(void), bool run);
 extern bool call_storage_idle_notifys(bool force);
 #else

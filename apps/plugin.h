@@ -474,7 +474,7 @@ struct plugin_api {
     void (*storage_sleep)(void);
     void (*storage_spin)(void);
     void (*storage_spindown)(int seconds);
-#if USING_STORAGE_CALLBACK
+#ifdef USING_STORAGE_CALLBACK
     void (*register_storage_idle_func)(void (*function)(void));
     void (*unregister_storage_idle_func)(void (*function)(void), bool run);
 #endif /* USING_STORAGE_CALLBACK */

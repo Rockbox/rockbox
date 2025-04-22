@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "string.h"
 
-#if USING_STORAGE_CALLBACK
+#if defined(USING_STORAGE_CALLBACK)
 static void wrapper(unsigned short id, void *ev_data, void *user_data)
 {
     (void)id;
@@ -37,7 +37,7 @@ static void wrapper(unsigned short id, void *ev_data, void *user_data)
 
 void register_storage_idle_func(void (*function)(void))
 {
-#if USING_STORAGE_CALLBACK
+#if defined(USING_STORAGE_CALLBACK)
     add_event_ex(DISK_EVENT_SPINUP, true, wrapper, function);
 #else
     function(); /* just call the function now */
@@ -47,11 +47,11 @@ void register_storage_idle_func(void (*function)(void))
 #endif
 }
 
-#if USING_STORAGE_CALLBACK
+#if defined(USING_STORAGE_CALLBACK)
 void unregister_storage_idle_func(void (*func)(void), bool run)
 {
     remove_event_ex(DISK_EVENT_SPINUP, wrapper, func);
-    
+
     if (run)
         func();
 }
@@ -68,7 +68,7 @@ bool call_storage_idle_notifys(bool force)
     lock_until = current_tick + 30*HZ;
 
     send_event(DISK_EVENT_SPINUP, NULL);
-    
+
     return true;
 }
 #endif

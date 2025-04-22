@@ -458,7 +458,7 @@ static void thread(void)
             bat[buf_idx].flags = charge_state();
 #endif
             buf_idx++;
-#if USING_STORAGE_CALLBACK
+#ifdef USING_STORAGE_CALLBACK
             rb->register_storage_idle_func(flush_buffer);
 #endif
         }
@@ -497,7 +497,7 @@ static void thread(void)
         }
     }
 
-#if USING_STORAGE_CALLBACK
+#ifdef USING_STORAGE_CALLBACK
     /* unregister flush callback and flush to disk */
     rb->unregister_storage_idle_func(flush_buffer, true);
 #else
