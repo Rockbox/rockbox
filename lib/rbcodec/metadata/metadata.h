@@ -196,10 +196,11 @@ enum {
     ID3_VER_2_4
 };
 
-#define AA_FLAGS_SHIFT 4
-#define AA_CLEAR_FLAGS_MASK ~(-1 << AA_FLAGS_SHIFT)
-
 #ifdef HAVE_ALBUMART
+
+#define AA_FLAGS_SHIFT 4
+#define AA_CLEAR_FLAGS_MASK ~(-1UL << AA_FLAGS_SHIFT)
+
 enum mp3_aa_type {
     AA_TYPE_UNKNOWN,
     AA_TYPE_BMP,
