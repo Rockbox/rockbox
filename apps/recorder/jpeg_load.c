@@ -43,6 +43,11 @@
 #define JDEBUGF(...)
 #endif
 
+#if (__GNUC__ >= 6)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
+
 /**************** begin JPEG code ********************/
 
 #ifdef HAVE_LCD_COLOR

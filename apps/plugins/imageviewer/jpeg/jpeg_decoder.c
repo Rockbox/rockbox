@@ -1081,6 +1081,11 @@ static const int extend_test[16] =   /* entry n is 2**(n-1) */
     0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000
 };
 
+#if (__GNUC__ >= 6)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
+
 static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
 {
     0, ((-1)<<1) + 1, ((-1)<<2) + 1, ((-1)<<3) + 1, ((-1)<<4) + 1,
@@ -1088,6 +1093,9 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
     ((-1)<<9) + 1, ((-1)<<10) + 1, ((-1)<<11) + 1, ((-1)<<12) + 1,
     ((-1)<<13) + 1, ((-1)<<14) + 1, ((-1)<<15) + 1
 };
+#if (__GNUC__ >= 6)
+#pragma GCC diagnostic pop
+#endif
 
 /* Decode a single value */
 INLINE int huff_decode_dc(struct bitstream* bs, struct derived_tbl* tbl)

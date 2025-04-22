@@ -46,6 +46,10 @@ jpeg81.c
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#if (__GNUC__ >= 6)
+#pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
+
 ///////////////////////////////////////// LOSSLESS /////////////////////////////////////////
 
 static int P1(struct COMP *C, TSAMP *samp)	// Px = Ra
