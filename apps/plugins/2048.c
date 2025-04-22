@@ -82,9 +82,11 @@ static const unsigned int WINNING_TILE = 2048;
 #  define BEST_SCORE_Y (2*max_numeral_height)
 #endif /* LCD_WIDTH < LCD_HEIGHT */
 
+#if LCD_DEPTH > 1
 /* where to draw the background bitmap */
 static const int BACKGROUND_X = (BASE_X-MIN_SPACE);
 static const int BACKGROUND_Y = (BASE_Y-MIN_SPACE);
+#endif
 
 /* key mappings */
 #define KEY_UP PLA_UP

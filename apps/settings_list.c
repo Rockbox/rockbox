@@ -224,7 +224,9 @@ static const char off_number_spell[] = "off,number,spell";
 static const int timeout_sec_common[] = {-1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,
                                         45,60,90,120,180,240,300,600,900,1200,
                                         1500,1800,2700,3600,4500,5400,6300,7200};
+#if defined(HAVE_RECORDING)
 static const int time_recording_trigger[] = {0,1,2,5,10,15,20,25,30,60,120,300,600};
+#endif
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
 static const int backlight_fade[] = {0,100,200,300,500,1000,2000,3000,5000,10000};
 #endif
@@ -1017,7 +1019,7 @@ const struct settings_list settings[] = {
                   play_frequency, LANG_FREQUENCY, 0, "playback frequency", "auto",
                   UNIT_KHZ, formatter_freq_unit_0_is_auto,
                   getlang_freq_unit_0_is_auto,
-                  playback_frequency_callback, 
+                  playback_frequency_callback,
 #if HAVE_PLAY_FREQ >= 192
                   7,0,SAMPR_44,SAMPR_48,SAMPR_88,SAMPR_96,SAMPR_176,SAMPR_192),
 #elif HAVE_PLAY_FREQ >= 96
@@ -1138,7 +1140,7 @@ const struct settings_list settings[] = {
     INT_SETTING(F_BANFROMQS, max_files_in_playlist,
                 LANG_MAX_FILES_IN_PLAYLIST,
 #if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022
-                  /** Slow CPU benefits greatly from building smaller playlists 
+                  /** Slow CPU benefits greatly from building smaller playlists
                   On the iPod Mini 2nd gen, creating a playlist of 2000 entries takes around 10 seconds */
                   2000,
 #elif MEMORYSIZE > 1
@@ -1896,7 +1898,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, backlight_on_button_hold,
                    LANG_BACKLIGHT_ON_BUTTON_HOLD,
-#ifdef HAS_BUTTON_HOLD                   
+#ifdef HAS_BUTTON_HOLD
                    1,
 #else
                    0,

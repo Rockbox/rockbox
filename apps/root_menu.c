@@ -485,7 +485,7 @@ static const struct root_items items[] = {
     [GO_TO_SHORTCUTMENU] = { do_shortcut_menu, NULL, NULL },
 
 };
-static const int nb_items = sizeof(items)/sizeof(*items);
+//static const int nb_items = sizeof(items)/sizeof(*items);
 
 static int item_callback(int action,
                          const struct menu_item_ex *this_item,

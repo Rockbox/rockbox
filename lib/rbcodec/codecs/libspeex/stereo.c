@@ -58,11 +58,13 @@ static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
 static const float e_ratio_quant_bounds[3] = {0.2825f, 0.356f, 0.4485f};
 #else
 static const spx_word16_t e_ratio_quant[4] = {8192, 10332, 13009, 16384};
+#ifndef SPEEX_DISABLE_ENCODER
 static const spx_word16_t e_ratio_quant_bounds[3] = {9257, 11665, 14696};
 static const spx_word16_t balance_bounds[31] = {18, 23, 30, 38, 49, 63,  81, 104,
    134, 172, 221,  284, 364, 468, 600, 771,
    990, 1271, 1632, 2096, 2691, 3455, 4436, 5696,
    7314, 9392, 12059, 15484, 19882, 25529, 32766};
+#endif
 #endif
 
 /* This is an ugly compatibility hack that properly resets the stereo state

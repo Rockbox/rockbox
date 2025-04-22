@@ -116,11 +116,13 @@ int sb_decoder_ctl(void *state, int request, void *ptr)
 
 #ifdef FIXED_POINT
 static const spx_word16_t gc_quant_bound[16] ICONST_ATTR = {125, 164, 215, 282, 370, 484, 635, 832, 1090, 1428, 1871, 2452, 3213, 4210, 5516, 7228};
+#ifndef SPEEX_DISABLE_ENCODER
 static const spx_word16_t fold_quant_bound[32] ICONST_ATTR = {
    39, 44, 50, 57, 64, 73, 83, 94,
    106, 120, 136, 154, 175, 198, 225, 255,
    288, 327, 370, 420, 476, 539, 611, 692,
    784, 889, 1007, 1141, 1293, 1465, 1660, 1881};
+#endif
 #define LSP_MARGIN 410
 #define LSP_DELTA1 6553
 #define LSP_DELTA2 1638
@@ -188,7 +190,7 @@ static const float h0[64] = {
 extern const spx_word16_t lag_window[];
 extern const spx_word16_t lpc_window[];
 
-#ifndef SPEEX_DISABLE_ENCODER 
+#ifndef SPEEX_DISABLE_ENCODER
 void *sb_encoder_init(const SpeexMode *m)
 {
    int i;

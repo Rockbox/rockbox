@@ -117,6 +117,7 @@ static inline ogg_int32_t toBARK(int n){
   }
 }
 
+#ifndef _V_LSP_MATH_ASM
 static const unsigned char MLOOP_1[64]  ={
    0,10,11,11, 12,12,12,12, 13,13,13,13, 13,13,13,13,
   14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,
@@ -132,6 +133,7 @@ static const unsigned char MLOOP_2[64]  ={
 };
 
 static const unsigned char MLOOP_3[8]  ={0,1,2,2,3,3,3,3};
+#endif
 
 static void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
                                 ogg_int32_t *lsp,int m,

@@ -183,6 +183,7 @@ static int font_height = 0;
 
 /* - - - TINYFONT - - - */
 
+#if LCD_DEPTH > 1
 static const long int periodic_tinyfont_bitmaps[] = {
     0x00000000, 0x00220200, 0x00550000, 0x00575750, 0x00236200, 0x00514500, 0x00236300, 0x00220000,
     0x00244200, 0x00211200, 0x00272720, 0x00027200, 0x00000240, 0x00007000, 0x00000200, 0x00122400,
@@ -200,7 +201,6 @@ static const long int periodic_tinyfont_bitmaps[] = {
     0x00052500, 0x00055360, 0x00072700, 0x00162100, 0x00222220, 0x00432400, 0x00630000, 0x00525250
 };
 
-#if LCD_DEPTH > 1
 static void periodic_tinyfont_draw_char(int x, int y, char ch)
 {
     int i,j;
@@ -234,7 +234,7 @@ static void periodic_tinyfont_draw_string(int x, int y, char * s)
         t++;
     }
 }
-#endif
+#endif /* LCD_DEPTH > 1 */
 
 /*
   void periodic_tinyfont_draw_chart(int x, int y, ttk_color col)

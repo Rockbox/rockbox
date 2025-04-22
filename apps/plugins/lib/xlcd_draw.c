@@ -270,8 +270,8 @@ void xlcd_drawcircle(int cx, int cy, int radius)
 
 
 #if LCD_DEPTH >= 8 && LCD_DEPTH <= 16
-
-#ifdef HAVE_LCD_COLOR
+#if 0 /* unused functions, enable when needed */
+#if defined(HAVE_LCD_COLOR) && (LCD_DEPTH == 16)
 static const fb_data graylut[256] = {
 #if LCD_PIXELFORMAT == RGB565
     0x0000, 0x0000, 0x0000, 0x0020, 0x0020, 0x0821, 0x0821, 0x0841,
@@ -341,10 +341,8 @@ static const fb_data graylut[256] = {
     0xbef7, 0xdef7, 0xdef7, 0xdfff, 0xdfff, 0xffff, 0xffff, 0xffff
 #endif /* LCD_PIXELFORMAT */
 };
-#endif /* HAVE_LCD_COLOR */
+#endif /* HAVE_LCD_COLOR && LCD_DEPTH == 16 */
 
-/* unused functions, enable when needed */
-#if 0
 /* Draw a partial greyscale bitmap, canonical 8 bit format */
 void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
@@ -412,7 +410,7 @@ void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
 {
     xlcd_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
-#endif
+#endif // unused functions
 
 #ifdef HAVE_LCD_COLOR
 /* Draw a partial colour bitmap, canonical 24 bit RGB format */
