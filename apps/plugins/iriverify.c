@@ -31,12 +31,12 @@ ssize_t buf_size;
 static char *filename;
 static int readsize;
 static char *stringbuffer;
-static char crlf[2] = "\r\n";
+static char crlf[2] __NONSTRING = "\r\n";
 
 int read_buffer(int offset)
 {
     int fd;
-    
+
     fd = rb->open(filename, O_RDONLY);
     if(fd < 0)
         return 10 * fd - 1;
@@ -64,9 +64,9 @@ static int write_file(void)
     char *str_begin;
 
     /* Create a temporary file */
-    
+
     rb->snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
-    
+
     fd = rb->creat(tmpfilename, 0666);
     if(fd < 0)
         return 10 * fd - 1;
@@ -83,7 +83,7 @@ static int write_file(void)
         /* We have no complete string ? It's only a leading \n or \r ? */
         if (!str_begin)
         continue;
-        
+
         /* Terminate string */
         *buf_ptr = 0;
 
@@ -126,7 +126,7 @@ static int write_file(void)
     if(rc < 0) {
         return 10 * rc - 5;
     }
-    
+
     return 0;
 }
 
@@ -144,7 +144,7 @@ enum plugin_status plugin_start(const void* parameter)
     FOR_NB_SCREENS(i)
         rb->screens[i]->clear_display();
     rb->splash(0, "Converting...");
-    
+
     rc = read_buffer(0);
     FOR_NB_SCREENS(i)
         rb->screens[i]->clear_display();
