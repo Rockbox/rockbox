@@ -31,7 +31,7 @@ mplayer.c
 munitrk.c
 npertab.c
 sloader.c
-strdup.c
+//strdup.c
 strstr.c
 virtch.c
 virtch2.c
