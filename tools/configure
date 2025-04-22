@@ -4606,12 +4606,6 @@ else
    GCCOPTS="$GCCOPTS -Wno-override-init"
  fi
 
- if test "$gccnum" -ge "601"; then
-   # gcc 6 adds a lot of warnings that while useful are too time-consuming
-   # to clean up right away
-   GCCOPTS="$GCCOPTS -Wno-tautological-compare"
- fi
-
  if test "$gccnum" -ge "700"; then
    # gcc 7 spews a bunch of warnings by default
    GCCOPTS="$GCCOPTS -Wimplicit-fallthrough=0"
