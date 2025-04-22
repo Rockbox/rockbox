@@ -30,17 +30,17 @@
 #include "lcd-remote.h" /* for remote_type() */
 #include "settings.h"
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 
 /* CONTEXT_CUSTOM's used in this file...
 
 CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
-CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens 
+CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens
                                   i.e where up/down is inc/dec
                CONTEXT_SETTINGS = up/down is prev/next, l/r is inc/dec
 
@@ -52,19 +52,19 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_OFF,                 BUTTON_NONE },
-    
+
     { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_SELECT },
 
-    { ACTION_STD_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,  BUTTON_MODE }, 
+    { ACTION_STD_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,  BUTTON_MODE },
     { ACTION_STD_MENU,          BUTTON_MODE|BUTTON_REL,     BUTTON_MODE },
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,       BUTTON_NONE },
     { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -93,10 +93,10 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ID3SCREEN,     BUTTON_ON|BUTTON_MODE,          BUTTON_NONE },
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_WPS_HOTKEY,        BUTTON_REC|BUTTON_REL,          BUTTON_REC },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
-   
+
 static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,     BUTTON_ON|BUTTON_UP,                 BUTTON_NONE },
     { ACTION_LISTTREE_PGUP,     BUTTON_ON|BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
@@ -116,7 +116,7 @@ static const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
-    { ACTION_NONE,              BUTTON_ON,                              BUTTON_NONE }, 
+    { ACTION_NONE,              BUTTON_ON,                              BUTTON_NONE },
     { ACTION_TREE_PGLEFT,       BUTTON_ON|BUTTON_LEFT,                  BUTTON_NONE },
     { ACTION_TREE_ROOT_INIT,    BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_ON|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
@@ -145,7 +145,7 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
@@ -158,7 +158,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */
 
@@ -205,7 +205,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_MODE,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -224,7 +224,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
@@ -235,13 +235,13 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_ON|BUTTON_LEFT,                 BUTTON_NONE },
@@ -273,20 +273,20 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PLAY,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
-    
+
 };
 
 /*****************************************************************************
- *    Remote control mappings 
+ *    Remote control mappings
  *****************************************************************************/
- 
- 
+
+
 static const struct button_mapping button_context_standard_h100remote[]  = {
     { ACTION_STD_PREV,          BUTTON_RC_REW,                  BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_RC_FF,                   BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     { ACTION_STD_CANCEL,        BUTTON_RC_STOP,                 BUTTON_NONE },
     { ACTION_STD_CONTEXT,       BUTTON_RC_MENU|BUTTON_REPEAT,   BUTTON_RC_MENU },
 
@@ -294,7 +294,7 @@ static const struct button_mapping button_context_standard_h100remote[]  = {
     { ACTION_STD_MENU,          BUTTON_RC_MODE|BUTTON_REL,      BUTTON_RC_MODE },
     { ACTION_STD_OK,            BUTTON_RC_ON,                   BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RC_MENU|BUTTON_REL,      BUTTON_RC_MENU },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard_h100lcdremote */
 
@@ -311,7 +311,7 @@ static const struct button_mapping button_context_standard_h300lcdremote[]  = {
     { ACTION_STD_MENU,          BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE },
     { ACTION_STD_OK,            BUTTON_RC_MENU|BUTTON_REL,          BUTTON_RC_MENU },
     { ACTION_STD_OK,            BUTTON_RC_FF,                       BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 
 };
@@ -336,11 +336,11 @@ static const struct button_mapping button_context_wps_remotescommon[]  = {
     { ACTION_WPS_MENU,              BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE },
     { ACTION_WPS_CONTEXT,           BUTTON_RC_MENU|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_WPS_BROWSE,            BUTTON_RC_MENU|BUTTON_REL,          BUTTON_RC_MENU },
-/* Now the specific combos, because H100 & H300 LCD remotes have different 
- * keys, capable of acting as "modifier" - H100 : RC_ON; H300: RC_MENU 
- */    
+/* Now the specific combos, because H100 & H300 LCD remotes have different
+ * keys, capable of acting as "modifier" - H100 : RC_ON; H300: RC_MENU
+ */
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_REMOTE|CONTEXT_WPS)
-}; 
+};
 
 
 static const struct button_mapping button_context_wps_h100remote[] = {
@@ -367,7 +367,7 @@ static const struct button_mapping *button_context_list_h300lcdremote =
 
 
 static const struct button_mapping button_context_tree_h100remote[]  = {
-    { ACTION_TREE_WPS,    BUTTON_RC_ON,                     BUTTON_NONE },   
+    { ACTION_TREE_WPS,    BUTTON_RC_ON,                     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
 }; /* button_context_tree_h100remote */
@@ -377,7 +377,7 @@ static const struct button_mapping button_context_tree_h300lcdremote[] = {
     { ACTION_TREE_WPS,      BUTTON_RC_ON,                   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
 };  /* button_context_tree_h300lcdremote */
-               
+
 
 static const struct button_mapping button_context_listtree_scroll_w_cmb_h100remote[]  = {
     { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW,               BUTTON_NONE },
@@ -387,7 +387,7 @@ static const struct button_mapping button_context_listtree_scroll_w_cmb_h100remo
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF,                BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP,                         BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE }, 
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
@@ -405,7 +405,7 @@ static const struct button_mapping button_context_listtree_scroll_wo_cmb_h100rem
     { ACTION_TREE_ROOT_INIT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_RC_VOL_DOWN },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP,                 BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },    
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
@@ -428,7 +428,7 @@ static const struct button_mapping button_context_settings_h100remote[]  = {
 /*    { ACTION_NONE,                  BUTTON_RC_ON,                   BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_STOP,                 BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_MENU|BUTTON_REL,      BUTTON_NONE },
-*/    
+*/
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
@@ -439,11 +439,11 @@ static const struct button_mapping button_context_settings_h300lcdremote[]  = {
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_REW,                  BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RC_FF,                   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
- 
+
 
 static const struct button_mapping button_context_settingsgraphical_h100remote[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_RC_FF,                  BUTTON_NONE },
@@ -454,7 +454,7 @@ static const struct button_mapping button_context_settingsgraphical_h100remote[]
     { ACTION_STD_PREVREPEAT,        BUTTON_RC_SOURCE|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_RC_BITRATE,             BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical_h100remote */
 
@@ -467,7 +467,7 @@ static const struct button_mapping button_context_settingsgraphical_h300lcdremot
     { ACTION_STD_PREVREPEAT,        BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_RC_VOL_DOWN,         BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical_h300remote */
 
@@ -497,7 +497,7 @@ static const struct button_mapping button_context_quickscreen_nonlcdremote[]  = 
     { ACTION_QS_RIGHT,      BUTTON_RC_FF,                     BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_FF|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_RC_ON,                   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -515,7 +515,7 @@ static const struct button_mapping button_context_quickscreen_h100lcdremote[]  =
     { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE,                  BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_RC_MODE,                     BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -529,7 +529,7 @@ static const struct button_mapping button_context_quickscreen_h300lcdremote[]  =
     { ACTION_QS_RIGHT,      BUTTON_RC_FF,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_RC_MODE,                 BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -547,7 +547,7 @@ static const struct button_mapping button_context_pitchscreen_nonlcdremote[]  = 
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,             BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
@@ -565,7 +565,7 @@ static const struct button_mapping button_context_pitchscreen_h100lcdremote[]  =
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,                 BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_RC_SOURCE|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
@@ -583,7 +583,7 @@ static const struct button_mapping button_context_pitchscreen_h300lcdremote[]  =
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,             BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
@@ -595,7 +595,7 @@ static const struct button_mapping button_context_recscreen_h100remote[]  = {
     { ACTION_SETTINGS_INCREPEAT,  BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,        BUTTON_RC_SOURCE,                   BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,  BUTTON_RC_SOURCE|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen_h100remote */
 
@@ -607,13 +607,13 @@ static const struct button_mapping button_context_recscreen_h300lcdremote[]  = {
     { ACTION_SETTINGS_INC,        BUTTON_RC_FF|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,        BUTTON_RC_REW,                 BUTTON_NONE },
     { ACTION_SETTINGS_DEC,        BUTTON_RC_REW|BUTTON_REPEAT,   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen_h300lcdremote */
 
 static const struct button_mapping button_context_keyboard_h100remote[]  = {
     { ACTION_KBD_LEFT,         BUTTON_RC_REW,                            BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF,                             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_ON|BUTTON_RC_REW,               BUTTON_NONE },
@@ -642,7 +642,7 @@ static const struct button_mapping button_context_keyboard_h100remote[]  = {
 
 static const struct button_mapping button_context_keyboard_h300lcdremote[]  = {
     { ACTION_KBD_LEFT,         BUTTON_RC_REW,                            BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF,                             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RC_FF|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_SOURCE,                         BUTTON_NONE },
@@ -703,7 +703,6 @@ static const struct button_mapping button_context_radio_h300lcdremote[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 };
 
-
 static const struct button_mapping button_context_time_remote[]  = {
     { ACTION_STD_CANCEL,       BUTTON_OFF,  BUTTON_NONE },
     { ACTION_STD_OK,           BUTTON_ON,   BUTTON_NONE },
@@ -713,8 +712,8 @@ static const struct button_mapping button_context_time_remote[]  = {
 }; /* button_context_settings_bmark */
 
 /* the actual used tables */
-static const struct button_mapping 
-        *remote_btn_ctxt_std = 0, 
+static const struct button_mapping
+        *remote_btn_ctxt_std = 0,
         *remote_btn_ctxt_wps = 0,
         *remote_btn_ctxt_list = 0,
         *remote_btn_ctxt_tree = 0,
@@ -738,7 +737,7 @@ static void remap_remote(void)
     switch(_remote_type)
     {
         case REMOTETYPE_UNPLUGGED:
-            remote_btn_ctxt_std = NULL; 
+            remote_btn_ctxt_std = NULL;
             remote_btn_ctxt_wps = NULL;
             remote_btn_ctxt_list = NULL;
             remote_btn_ctxt_tree = NULL;
@@ -756,16 +755,16 @@ static void remap_remote(void)
             break;
 
         case REMOTETYPE_H100_LCD:
-            remote_btn_ctxt_std = button_context_standard_h100remote, 
+            remote_btn_ctxt_std = button_context_standard_h100remote,
             remote_btn_ctxt_wps = button_context_wps_h100remote,
             remote_btn_ctxt_list = button_context_list_h100remote,
             remote_btn_ctxt_tree = button_context_tree_h100remote,
-            remote_btn_ctxt_listtree_scroll_w_cmb 
+            remote_btn_ctxt_listtree_scroll_w_cmb
                 = button_context_listtree_scroll_w_cmb_h100remote,
-            remote_btn_ctxt_listtree_scroll_wo_cmb 
+            remote_btn_ctxt_listtree_scroll_wo_cmb
                 = button_context_listtree_scroll_wo_cmb_h100remote,
             remote_btn_ctxt_settings = button_context_settings_h100remote,
-            remote_btn_ctxt_settingsgrph 
+            remote_btn_ctxt_settingsgrph
                 = button_context_settingsgraphical_h100remote,
             remote_btn_ctxt_yesno = button_context_yesno_h100remote,
             remote_btn_ctxt_bmark = button_context_bmark_h100remote,
@@ -773,25 +772,25 @@ static void remap_remote(void)
                     = button_context_quickscreen_h100lcdremote,
             remote_btn_ctxt_pitchscreen
                     = button_context_pitchscreen_h100lcdremote,
-            remote_btn_ctxt_recscreen 
+            remote_btn_ctxt_recscreen
                 = button_context_recscreen_h100remote,
-            remote_btn_ctxt_keyboard 
+            remote_btn_ctxt_keyboard
                 = button_context_keyboard_h100remote,
             remote_btn_ctxt_radio
                 = button_context_radio_h100remote;
             break;
 
         case REMOTETYPE_H300_LCD:
-            remote_btn_ctxt_std = button_context_standard_h300lcdremote, 
+            remote_btn_ctxt_std = button_context_standard_h300lcdremote,
             remote_btn_ctxt_wps = button_context_wps_h300lcdremote,
             remote_btn_ctxt_list = button_context_list_h300lcdremote,
             remote_btn_ctxt_tree = button_context_tree_h300lcdremote,
-            remote_btn_ctxt_listtree_scroll_w_cmb 
+            remote_btn_ctxt_listtree_scroll_w_cmb
                 = button_context_listtree_scroll_w_cmb_h300lcdremote,
-            remote_btn_ctxt_listtree_scroll_wo_cmb 
+            remote_btn_ctxt_listtree_scroll_wo_cmb
                 = button_context_listtree_scroll_wo_cmb_h300lcdremote,
             remote_btn_ctxt_settings = button_context_settings_h300lcdremote,
-            remote_btn_ctxt_settingsgrph 
+            remote_btn_ctxt_settingsgrph
                 = button_context_settingsgraphical_h300lcdremote,
             remote_btn_ctxt_yesno = button_context_yesno_h300lcdremote,
             remote_btn_ctxt_bmark = button_context_bmark_h300lcdremote,
@@ -801,23 +800,23 @@ static void remap_remote(void)
                 = button_context_pitchscreen_h300lcdremote,
             remote_btn_ctxt_recscreen
                 = button_context_recscreen_h300lcdremote,
-            remote_btn_ctxt_keyboard 
+            remote_btn_ctxt_keyboard
                 = button_context_keyboard_h300lcdremote,
             remote_btn_ctxt_radio
                 = button_context_radio_h300lcdremote;
             break;
 
-        case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */        
-            remote_btn_ctxt_std = button_context_standard_h300lcdremote, 
+        case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */
+            remote_btn_ctxt_std = button_context_standard_h300lcdremote,
             remote_btn_ctxt_wps = button_context_wps_h300lcdremote,
             remote_btn_ctxt_list = button_context_list_h300lcdremote,
             remote_btn_ctxt_tree = button_context_tree_h300lcdremote,
-            remote_btn_ctxt_listtree_scroll_w_cmb 
+            remote_btn_ctxt_listtree_scroll_w_cmb
                 = button_context_listtree_scroll_w_cmb_h300lcdremote,
-            remote_btn_ctxt_listtree_scroll_wo_cmb 
+            remote_btn_ctxt_listtree_scroll_wo_cmb
                 = button_context_listtree_scroll_wo_cmb_h300lcdremote,
             remote_btn_ctxt_settings = button_context_settings_h300lcdremote,
-            remote_btn_ctxt_settingsgrph 
+            remote_btn_ctxt_settingsgrph
                 = button_context_settingsgraphical_h300lcdremote,
             remote_btn_ctxt_yesno = button_context_yesno_h300lcdremote,
             remote_btn_ctxt_bmark = button_context_bmark_h300lcdremote,
@@ -827,26 +826,26 @@ static void remap_remote(void)
                 = button_context_pitchscreen_nonlcdremote,
             remote_btn_ctxt_recscreen
                 = button_context_recscreen_h300lcdremote,
-            remote_btn_ctxt_keyboard 
+            remote_btn_ctxt_keyboard
                 = button_context_keyboard_h300lcdremote,
             remote_btn_ctxt_radio
                 = button_context_radio_h300lcdremote;
-#if 0 
-            remote_btn_ctxt_std = 
-            remote_btn_ctxt_wps = 
-            remote_btn_ctxt_list = 
-            remote_btn_ctxt_tree = 
-            remote_btn_ctxt_listtree_scroll_w_cmb = 
-            remote_btn_ctxt_listtree_scroll_wo_cmb = 
-            remote_btn_ctxt_settings = 
-            remote_btn_ctxt_settingsgrph = 
-            remote_btn_ctxt_yesno = 
-            remote_btn_ctxt_bmark = 
-            remote_btn_ctxt_quickscreen = 
-            remote_btn_ctxt_pitchscreen = 
-            remote_btn_ctxt_recscreen = 
-            remote_btn_ctxt_keyboard = 
-            remote_btn_ctxt_radio = 
+#if 0
+            remote_btn_ctxt_std =
+            remote_btn_ctxt_wps =
+            remote_btn_ctxt_list =
+            remote_btn_ctxt_tree =
+            remote_btn_ctxt_listtree_scroll_w_cmb =
+            remote_btn_ctxt_listtree_scroll_wo_cmb =
+            remote_btn_ctxt_settings =
+            remote_btn_ctxt_settingsgrph =
+            remote_btn_ctxt_yesno =
+            remote_btn_ctxt_bmark =
+            remote_btn_ctxt_quickscreen =
+            remote_btn_ctxt_pitchscreen =
+            remote_btn_ctxt_recscreen =
+            remote_btn_ctxt_keyboard =
+            remote_btn_ctxt_radio =
 #endif
             break;
 
@@ -859,7 +858,7 @@ static const struct button_mapping* get_context_mapping_remote(int context)
     if(remote_type() != _remote_type)
         remap_remote();
     context ^= CONTEXT_REMOTE;
-    
+
     switch (context)
     {
         case CONTEXT_STD:
@@ -868,7 +867,7 @@ static const struct button_mapping* get_context_mapping_remote(int context)
             return button_context_wps_remotescommon;
 
         case CONTEXT_CUSTOM|CONTEXT_WPS:
-            return remote_btn_ctxt_wps; 
+            return remote_btn_ctxt_wps;
 
         case CONTEXT_LIST:
             return remote_btn_ctxt_list;
@@ -876,22 +875,23 @@ static const struct button_mapping* get_context_mapping_remote(int context)
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return remote_btn_ctxt_listtree_scroll_wo_cmb;
-            else 
-                return remote_btn_ctxt_listtree_scroll_w_cmb; 
+            else
+                return remote_btn_ctxt_listtree_scroll_w_cmb;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return remote_btn_ctxt_tree;
         case CONTEXT_SETTINGS_TIME:
+            return button_context_time_remote;
         case CONTEXT_SETTINGS_RECTRIGGER:
             return remote_btn_ctxt_settingsgrph;
-            
+
         case CONTEXT_SETTINGS:
             return remote_btn_ctxt_settings;
-            
+
         case CONTEXT_YESNOSCREEN:
             return remote_btn_ctxt_yesno;
-            
+
         case CONTEXT_BOOKMARKSCREEN:
-            return remote_btn_ctxt_bmark; 
+            return remote_btn_ctxt_bmark;
         case CONTEXT_QUICKSCREEN:
             return remote_btn_ctxt_quickscreen;
         case CONTEXT_PITCHSCREEN:
@@ -903,49 +903,49 @@ static const struct button_mapping* get_context_mapping_remote(int context)
             return remote_btn_ctxt_keyboard;
         case CONTEXT_FM:
             return remote_btn_ctxt_radio;
-    } 
-    return remote_btn_ctxt_std; 
+    }
+    return remote_btn_ctxt_std;
 }
 
 const struct button_mapping* get_context_mapping(int context)
 {
     if (context&CONTEXT_REMOTE)
         return get_context_mapping_remote(context);
-    
+
     switch (context)
     {
         case CONTEXT_STD:
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-            
+
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
-            else 
+            else
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
-        
+
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
-        
+
         case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_colorchooser;
         case CONTEXT_SETTINGS_EQ:
             return button_context_eq;
-            
+
         case CONTEXT_SETTINGS_TIME:
             return button_context_time;
-            
+
         case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;            
+            return button_context_yesno;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:
@@ -959,6 +959,6 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_keyboard;
         case CONTEXT_FM:
             return button_context_radio;
-    } 
+    }
     return button_context_standard;
 }
