@@ -207,7 +207,7 @@ void celt_iir(const opus_val32 *_x,
 #endif
 }
 
-#if (__GNUC__ == 14) // XXX nuke later?
+#if (__GNUC__ >= 14) // XXX nuke later?
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif

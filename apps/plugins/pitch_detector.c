@@ -143,6 +143,7 @@ typedef int32_t fixed;
 #define LCD_FACTOR (fp_div(int2fixed(LCD_WIDTH), int2fixed(100)))
 /* The threshold for the YIN algorithm */
 #define DEFAULT_YIN_THRESHOLD 5  /* 0.10 */
+#ifndef SIMULATOR
 static const fixed yin_threshold_table[] IDATA_ATTR =
 {
     float2fixed(0.01),
@@ -160,6 +161,7 @@ static const fixed yin_threshold_table[] IDATA_ATTR =
     float2fixed(0.45),
     float2fixed(0.50),
 };
+#endif /* !SIMULATOR */
 
 /* Structure for the reference frequency (frequency of A)
  * It's used for scaling the frequency before finding out

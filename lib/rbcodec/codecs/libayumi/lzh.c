@@ -209,7 +209,7 @@ int make_table(int nchar, uchar * bitlen, int tablebits, ushort * table)
 }
 
 /* huf.c */
-#if (__GNUC__ == 14) // XXX nuke later?
+#if (__GNUC__ >= 14) // XXX nuke later?
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
