@@ -830,10 +830,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "Diffusion croisée (Crossfeed)"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: "Diffusion croisée dite Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -3430,59 +3430,47 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Type de batterie"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Type de batterie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Alcaline"
-    xduoox3: "Nouveau (2000 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Alcaline"
-    xduoox3: "Nouveau 2000 milliampère heure"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "~NiMH"
-    xduoox3: "Ancien (1500 mAh)"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Nickel-Métal Hydrure"
-    xduoox3: "Ancien 1500 milliampère heure"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4981,11 +4969,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -5862,16 +5850,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Catalogue de listes de lecture"
+    *: ""
   </dest>
   <voice>
-    *: "Catalogue de listes de lecture"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8758,7 +8746,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "~cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -9663,7 +9651,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -13204,11 +13192,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Panning Separation"
+    *: "Séparation Panoramique"
     lowmem: none
   </dest>
   <voice>
-    *: "Panning Separation"
+    *: "Séparation Panoramique"
     lowmem: none
   </voice>
 </phrase>
@@ -13753,16 +13741,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Le cache sera reconstruit au prochain redémarrage"
+    *: ""
   </dest>
   <voice>
-    *: "Le cache sera reconstruit au prochain redémarrage"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14153,20 +14141,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Niveau 10: 1 mouvement / 600 minutes"
-  </dest>
-  <voice>
-    *: "Niveau 10, 1 mouvement par 600 minutes"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_BAT_BENCH_KEYS
   desc: Battery bench start up message
   user: core
@@ -14178,20 +14152,6 @@
   </dest>
   <voice>
     *: "Appuyer sur lecture pour lancer le test batterie ou sur stop pour annuler"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Niveau 8: 1 mouvement / 15 minutes"
-  </dest>
-  <voice>
-    *: "Niveau 8, 1 mouvement par 15 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -14453,20 +14413,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Niveau 9: 1 mouvement / 60 minutes"
-  </dest>
-  <voice>
-    *: "Niveau 9, 1 mouvement par 60 minutes"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
   desc: in the chessbox menu
   user: core
@@ -14578,7 +14524,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Battery bench is already running"
+    *: "La mesure des performances de la batterie est déjà en cours d'exécution"
   </voice>
 </phrase>
 <phrase>
@@ -14592,7 +14538,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "GNU Échecs"
   </voice>
 </phrase>
 <phrase>
@@ -14675,11 +14621,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Rapide court"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Rapide court"
   </voice>
 </phrase>
 <phrase>
@@ -14967,7 +14913,7 @@
   </source>
   <dest>
     *: "Appuyer sur GAUCHE pour annuler."
-    android,hifietma*,zenvision,vibe500: "Appuyer sur RETOUR pour annuler."
+    android,hifietma*,vibe500,zenvision: "Appuyer sur RETOUR pour annuler."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
     ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
     ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
@@ -14981,7 +14927,7 @@
   </dest>
   <voice>
     *: "Appuyer sur GAUCHE pour annuler."
-    android,hifietma*,zenvision,vibe500: "Appuyer sur RETOUR pour annuler."
+    android,hifietma*,vibe500,zenvision: "Appuyer sur RETOUR pour annuler."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Appuyer sur ETEINDRE pour annuler."
     ihifi760,ihifi960: "Double appuis sur RETOURNER pour annuler."
     ihifi770,ihifi770c,ihifi800: "Appuyer sur ACCEUIL pour annuler."
@@ -15495,10 +15441,10 @@
     *: "List Wraparound"
   </source>
   <dest>
-    *: "List Wraparound"
+    *: "Navigation des listes d'un bout à l'autre"
   </dest>
   <voice>
-    *: "List Wraparound"
+    *: "Navigation des listes d'un bout à l'autre"
   </voice>
 </phrase>
 <phrase>
@@ -16550,10 +16496,10 @@
     *: "Albums"
   </source>
   <dest>
-    *: "Albums"
+    *: "~Albums"
   </dest>
   <voice>
-    *: "Albums"
+    *: "~Albums"
   </voice>
 </phrase>
 <phrase>
@@ -16586,7 +16532,7 @@
 </phrase>
 <phrase>
   id: LANG_FILENAME
-  desc: Database menu
+  desc: Database and recording menus
   user: core
   <source>
     *: "Filename"
