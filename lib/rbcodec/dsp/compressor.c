@@ -276,7 +276,7 @@ static bool compressor_update(struct dsp_config *dsp,
         db_curve[2].db = db_curve[1].db + (3 << 16);
         if (ratio)
             /* offset = -3db * (ratio - 1) / ratio */
-            db_curve[2].offset = (int32_t)((long long)(-3 << 16)
+            db_curve[2].offset = (int32_t)((long long)(-3UL << 16)
                 * (ratio - 1) / ratio);
         else
             /* offset = -3db for hard limit */
