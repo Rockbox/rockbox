@@ -889,7 +889,7 @@ unsigned int wakeup_thread_(struct thread_entry *thread
             UNLOCK_THREAD(thread);
             return THREAD_OK; /* timed out */
         }
-
+        /* fallthrough */
     default:
         UNLOCK_THREAD(thread);
         return THREAD_NONE;
@@ -1044,7 +1044,7 @@ void switch_thread(void)
             break;
 
         thread = NULL;
-        
+
         /* Enter sleep mode to reduce power usage */
         RTR_UNLOCK(corep);
         core_sleep(IF_COP(core));

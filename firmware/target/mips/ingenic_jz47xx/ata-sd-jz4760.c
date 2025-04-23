@@ -788,7 +788,7 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
               (unsigned char *) ((unsigned int) request->response + 5);
             request->block_len = 8;
             request->nob = 1;
-
+            /* fallthrough */
         case SD_READ_DAT_UNTIL_STOP:
         case SD_READ_SINGLE_BLOCK:
         case SD_READ_MULTIPLE_BLOCK:

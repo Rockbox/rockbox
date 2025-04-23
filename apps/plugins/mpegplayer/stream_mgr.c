@@ -693,6 +693,7 @@ static intptr_t send_video_msg(long id, intptr_t data)
         case VIDEO_PRINT_FRAME:
             if (data)
                 break;
+            /* fallthrough */
         case VIDEO_PRINT_THUMBNAIL:
             if (disk_buf_status() != STREAM_STOPPED)
                 break; /* Prepare image if not playing */
@@ -1132,7 +1133,7 @@ int stream_init(void)
         rb->splash(HZ, "Parser init failed!");
     }
     else
-    {    
+    {
         return STREAM_OK;
     }
 

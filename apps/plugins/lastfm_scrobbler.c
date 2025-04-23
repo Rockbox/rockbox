@@ -248,6 +248,7 @@ static int scrobbler_menu_action(int selection, bool has_log)
                     return -1;
                 }
             }
+            /* fallthrough */
         case 10: /* Export & exit */
         {
             res = configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);

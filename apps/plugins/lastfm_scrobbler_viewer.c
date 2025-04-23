@@ -809,7 +809,7 @@ static int scrobbler_context_menu(struct printcell_data_t *pc_data)
 
                 if (find_type == FIND_ALL)
                     find_type = FIND_INCLUDE;
-                /* fall-through */
+                /* fallthrough */
             }
             case 3: /*Custom Filter / Settings */
             {

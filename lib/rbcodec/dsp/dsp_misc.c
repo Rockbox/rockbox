@@ -170,6 +170,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
         dsp_pitch_update(dsp);
 #endif
         value = (intptr_t)NULL; /* Default gains */
+        /* fallthrough */
     case REPLAYGAIN_SET_GAINS:
         dsp_replaygain_set_gains((void *)value);
         break;

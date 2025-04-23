@@ -374,7 +374,7 @@ unsigned char* iso_decode_ex(const unsigned char *iso, unsigned char *utf8, int 
                         ucs = table[tmp];
                         break;
                     }
-
+                    /* fallthrough */
                 case CP_TID_936: /* Simplified Chinese */
                 case CP_TID_949: /* Korean */
                 case CP_TID_950: /* Traditional Chinese */
