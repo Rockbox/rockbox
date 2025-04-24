@@ -115,10 +115,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Normal"
+    *: "~Normal"
   </dest>
   <voice>
-    *: "Normal"
+    *: "~Normal"
   </voice>
 </phrase>
 <phrase>
@@ -160,7 +160,7 @@
     *: "Läser... %d%% klart (%s)"
   </dest>
   <voice>
-    *: "Läser... %d%% klart (%s)"
+    *: "Läser"
   </voice>
 </phrase>
 <phrase>
@@ -454,10 +454,10 @@
     *: "System"
   </source>
   <dest>
-    *: "System"
+    *: "~System"
   </dest>
   <voice>
-    *: "System"
+    *: "~System"
   </voice>
 </phrase>
 <phrase>
@@ -692,10 +692,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "~Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "~Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -706,10 +706,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -779,10 +779,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -877,10 +877,10 @@
     *: "Equalizer"
   </source>
   <dest>
-    *: "Equalizer"
+    *: "~Equalizer"
   </dest>
   <voice>
-    *: "Equalizer"
+    *: "~Equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -1017,10 +1017,10 @@
     *: "Peak Filter %d"
   </source>
   <dest>
-    *: "Peak-filter %d"
+    *: "toppfilter %d"
   </dest>
   <voice>
-    *: "Peak-filter %d"
+    *: "toppfilter"
   </voice>
 </phrase>
 <phrase>
@@ -1087,10 +1087,10 @@
     *: "Dithering"
   </source>
   <dest>
-    *: "Dithering"
+    *: "~Dithering"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "~Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -3082,10 +3082,10 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "~Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -3250,10 +3250,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -3582,8 +3582,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "PÅ/AV = Avbryt"
-    gigabeats: "BAKÅT = Avbryt"
-    sansafuzeplus: "BACK = Revert"
+    gigabeats,sansafuzeplus: "BAKÅT = Avbryt"
     gogearsa9200: "VÄNSTER = Avbryt"
     iaudiom5,iaudiox5: "SPELA IN = Avbryt"
     ipod*,mpiohd300,sansac200*: "MENY = Avbryt"
@@ -3726,7 +3725,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "Januari"
@@ -3740,7 +3739,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "Februari"
@@ -3754,7 +3753,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "~Mar"
   </dest>
   <voice>
     *: "Mars"
@@ -3768,10 +3767,10 @@
     *: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: "~Apr"
   </dest>
   <voice>
-    *: "April"
+    *: "~April"
   </voice>
 </phrase>
 <phrase>
@@ -3796,10 +3795,10 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Jun"
+    *: "~Jun"
   </dest>
   <voice>
-    *: "Juni"
+    *: "~Juni"
   </voice>
 </phrase>
 <phrase>
@@ -3810,10 +3809,10 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Jul"
+    *: "~Jul"
   </dest>
   <voice>
-    *: "Juli"
+    *: "~Juli"
   </voice>
 </phrase>
 <phrase>
@@ -3824,10 +3823,10 @@
     *: "Aug"
   </source>
   <dest>
-    *: "Aug"
+    *: "~Aug"
   </dest>
   <voice>
-    *: "Augusti"
+    *: "~Augusti"
   </voice>
 </phrase>
 <phrase>
@@ -3838,10 +3837,10 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
-    *: "september"
+    *: "~september"
   </voice>
 </phrase>
 <phrase>
@@ -3866,10 +3865,10 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
-    *: "November"
+    *: "~November"
   </voice>
 </phrase>
 <phrase>
@@ -3880,10 +3879,10 @@
     *: "Dec"
   </source>
   <dest>
-    *: "Dec"
+    *: "~Dec"
   </dest>
   <voice>
-    *: "December"
+    *: "~December"
   </voice>
 </phrase>
 <phrase>
@@ -4806,11 +4805,11 @@
   </source>
   <dest>
     *: none
-    radio: "Region"
+    radio: "Område"
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Område"
   </voice>
 </phrase>
 <phrase>
@@ -4857,11 +4856,11 @@
   </source>
   <dest>
     *: none
-    radio: "Japan"
+    radio: "~Japan"
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "~Japan"
   </voice>
 </phrase>
 <phrase>
@@ -4874,11 +4873,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </voice>
 </phrase>
 <phrase>
@@ -5095,11 +5094,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "~Digital"
   </voice>
 </phrase>
 <phrase>
@@ -5894,7 +5893,7 @@
   </source>
   <dest>
     *: "Batteri: %d%% %dh %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "~Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterinivå"
@@ -5938,9 +5937,9 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Internt"
@@ -5961,15 +5960,15 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
+    hibylinux: "~USB:"
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "H D 1"
+    hibylinux: "~U S B"
+    multivolume: "~HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro S D"
     xduoox3: "mikro S D 2"
   </voice>
@@ -5982,10 +5981,10 @@
     *: "Version"
   </source>
   <dest>
-    *: "Version"
+    *: "~Version"
   </dest>
   <voice>
-    *: "Version"
+    *: "~Version"
   </voice>
 </phrase>
 <phrase>
@@ -6374,10 +6373,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -6402,10 +6401,10 @@
     *: "Genre"
   </source>
   <dest>
-    *: "Genre"
+    *: "~Genre"
   </dest>
   <voice>
-    *: "Genre"
+    *: "~Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7188,11 +7187,11 @@
     *: "AV = avbryt"
     gigabeatfx: "PÅ/AV = Avbryt"
     gigabeats: "BAKÅT = Avbryt"
-    sansafuzeplus: "BACK för att avbryta"
     iaudiom5,iaudiox5: "Lång SPELA = Avbryt"
     ipod*: "SPELA/PAUSA = Avbryt"
     iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "FÖREGÅENDE = Avbryt"
     iriverh100,iriverh120,iriverh300: "STOPP = Avbryt"
+    sansafuzeplus: "BACK för att avbryta"
   </dest>
   <voice>
     *: ""
@@ -7884,7 +7883,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "~minus"
   </voice>
 </phrase>
 <phrase>
@@ -7898,7 +7897,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "~plus"
   </voice>
 </phrase>
 <phrase>
@@ -8010,7 +8009,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "~kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -8024,7 +8023,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -8066,7 +8065,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -8094,7 +8093,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8671,7 +8670,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "~cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -8685,7 +8684,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -8884,7 +8883,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -8898,7 +8897,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -10183,11 +10182,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -10200,11 +10199,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "~Presentation"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "~Presentation"
   </voice>
 </phrase>
 <phrase>
@@ -11689,11 +11688,11 @@
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "frekvensskalningsstyrande"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "frekvensskalningsstyrande"
   </voice>
 </phrase>
 <phrase>
@@ -12211,11 +12210,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: " Super Långsam"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: " Super Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12874,10 +12873,10 @@
     *: "Play Wormlet!"
   </source>
   <dest>
-    *: "Play Wormlet!"
+    *: "Spela Wormlet!"
   </dest>
   <voice>
-    *: "Play Wormlet!"
+    *: "Spela Wormlet!"
   </voice>
 </phrase>
 <phrase>
@@ -12888,10 +12887,10 @@
     *: "Number of Worms"
   </source>
   <dest>
-    *: "Number of Worms"
+    *: " Antal maskar"
   </dest>
   <voice>
-    *: "Number of Worms"
+    *: " Antal maskar"
   </voice>
 </phrase>
 <phrase>
@@ -12902,10 +12901,10 @@
     *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: "Worm Growth Per Food"
+    *: " Masktillväxt per mat"
   </dest>
   <voice>
-    *: "Worm Growth Per Food"
+    *: " Masktillväxt per mat"
   </voice>
 </phrase>
 <phrase>
@@ -12916,10 +12915,10 @@
     *: "Worm Speed"
   </source>
   <dest>
-    *: "Worm Speed"
+    *: " Maskhastighet"
   </dest>
   <voice>
-    *: "Worm Speed"
+    *: " Maskhastighet"
   </voice>
 </phrase>
 <phrase>
@@ -12930,10 +12929,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "Arghs per mat"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Arghs Per mat"
   </voice>
 </phrase>
 <phrase>
@@ -12944,10 +12943,10 @@
     *: "Argh Size"
   </source>
   <dest>
-    *: "Argh Size"
+    *: " Argh storlek"
   </dest>
   <voice>
-    *: "Argh Size"
+    *: " Argh storlek"
   </voice>
 </phrase>
 <phrase>
@@ -12958,10 +12957,10 @@
     *: "Food Size"
   </source>
   <dest>
-    *: "Food Size"
+    *: " Matstorlek"
   </dest>
   <voice>
-    *: "Food Size"
+    *: " Matstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -12972,10 +12971,10 @@
     *: "Number of Players"
   </source>
   <dest>
-    *: "Number of Players"
+    *: " Antal spelare"
   </dest>
   <voice>
-    *: "Number of Players"
+    *: " Antal spelare"
   </voice>
 </phrase>
 <phrase>
@@ -12986,10 +12985,10 @@
     *: "Control Style"
   </source>
   <dest>
-    *: "Control Style"
+    *: "Kontrollstil"
   </dest>
   <voice>
-    *: "Control Style"
+    *: "Kontrollstil"
   </voice>
 </phrase>
 <phrase>
@@ -13000,10 +12999,10 @@
     *: "Revert to Default Settings"
   </source>
   <dest>
-    *: "Revert to Default Settings"
+    *: "Återställ till standardinställningar"
   </dest>
   <voice>
-    *: "Revert to Default Settings"
+    *: "Återställ till standardinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -13014,10 +13013,10 @@
     *: "Quit"
   </source>
   <dest>
-    *: "Quit"
+    *: "Avsluta"
   </dest>
   <voice>
-    *: "Quit"
+    *: "Avsluta"
   </voice>
 </phrase>
 <phrase>
@@ -13028,10 +13027,10 @@
     *: "Display Options"
   </source>
   <dest>
-    *: "Display Options"
+    *: "Visningsalternativ"
   </dest>
   <voice>
-    *: "Display Options"
+    *: "Visningsalternativ"
   </voice>
 </phrase>
 <phrase>
@@ -13042,10 +13041,10 @@
     *: "Previous Track"
   </source>
   <dest>
-    *: "Previous Track"
+    *: "Föregående låt"
   </dest>
   <voice>
-    *: "Previous Track"
+    *: "Föregående låt"
   </voice>
 </phrase>
 <phrase>
@@ -13056,10 +13055,10 @@
     *: "Pause / Play"
   </source>
   <dest>
-    *: "Pause / Play"
+    *: "Pausa / Spela upp"
   </dest>
   <voice>
-    *: "Pause / Play"
+    *: "Pausa / Spela upp"
   </voice>
 </phrase>
 <phrase>
@@ -13070,10 +13069,10 @@
     *: "Stop Playback"
   </source>
   <dest>
-    *: "Stop Playback"
+    *: "Stoppa uppspelning"
   </dest>
   <voice>
-    *: "Stop Playback"
+    *: "Stoppa uppspelning"
   </voice>
 </phrase>
 <phrase>
@@ -13084,10 +13083,10 @@
     *: "Next Track"
   </source>
   <dest>
-    *: "Next Track"
+    *: "Nästa låt"
   </dest>
   <voice>
-    *: "Next Track"
+    *: "Nästa låt"
   </voice>
 </phrase>
 <phrase>
@@ -13098,10 +13097,10 @@
     *: "Change Volume"
   </source>
   <dest>
-    *: "Change Volume"
+    *: "Ändra volym"
   </dest>
   <voice>
-    *: "Change Volume"
+    *: "Ändra volym"
   </voice>
 </phrase>
 <phrase>
@@ -13112,10 +13111,10 @@
     *: "Shuffle Mode"
   </source>
   <dest>
-    *: "Shuffle Mode"
+    *: "Slumpmässig uppspelning"
   </dest>
   <voice>
-    *: "Shuffle Mode"
+    *: "Slumpmässig uppspelning"
   </voice>
 </phrase>
 <phrase>
@@ -13126,10 +13125,10 @@
     *: "Change Repeat Mode"
   </source>
   <dest>
-    *: "Change Repeat Mode"
+    *: "Ändra uppspelningsläge"
   </dest>
   <voice>
-    *: "Change Repeat Mode"
+    *: "Ändra uppspelningsläge"
   </voice>
 </phrase>
 <phrase>
@@ -13140,10 +13139,10 @@
     *: "Playback Control"
   </source>
   <dest>
-    *: "Playback Control"
+    *: "Uppspelningskontroll"
   </dest>
   <voice>
-    *: "Playback Control"
+    *: "Uppspelningskontroll"
   </voice>
 </phrase>
 <phrase>
@@ -13154,10 +13153,10 @@
     *: "Checkmate!"
   </source>
   <dest>
-    *: "Checkmate!"
+    *: "Schackmatt!"
   </dest>
   <voice>
-    *: "Checkmate!"
+    *: "Schackmatt!"
   </voice>
 </phrase>
 <phrase>
@@ -13168,10 +13167,10 @@
     *: "Illegal move!"
   </source>
   <dest>
-    *: "Illegal move!"
+    *: "Otillåtet drag!"
   </dest>
   <voice>
-    *: "Illegal move!"
+    *: "Otillåtet drag!"
   </voice>
 </phrase>
 <phrase>
@@ -13182,10 +13181,10 @@
     *: "New Game"
   </source>
   <dest>
-    *: "New Game"
+    *: "Nytt spel"
   </dest>
   <voice>
-    *: "New Game"
+    *: "Nytt spel"
   </voice>
 </phrase>
 <phrase>
@@ -13196,10 +13195,10 @@
     *: "Resume Game"
   </source>
   <dest>
-    *: "Resume Game"
+    *: "Fortsätt spel"
   </dest>
   <voice>
-    *: "Resume Game"
+    *: "Fortsätt spel"
   </voice>
 </phrase>
 <phrase>
@@ -13210,10 +13209,10 @@
     *: "Save Game"
   </source>
   <dest>
-    *: "Save Game"
+    *: "Spara spel"
   </dest>
   <voice>
-    *: "Save Game"
+    *: "Spara spel"
   </voice>
 </phrase>
 <phrase>
@@ -13224,10 +13223,10 @@
     *: "Restore Game"
   </source>
   <dest>
-    *: "Restore Game"
+    *: "Återställ spel"
   </dest>
   <voice>
-    *: "Restore Game"
+    *: "Återställ spel"
   </voice>
 </phrase>
 <phrase>
@@ -13238,10 +13237,10 @@
     *: "Restart Game"
   </source>
   <dest>
-    *: "Restart Game"
+    *: "Starta om spelet"
   </dest>
   <voice>
-    *: "Restart Game"
+    *: "Starta om spelet"
   </voice>
 </phrase>
 <phrase>
@@ -13252,10 +13251,10 @@
     *: "Select Other Game"
   </source>
   <dest>
-    *: "Select Other Game"
+    *: "Välj annat spel"
   </dest>
   <voice>
-    *: "Select Other Game"
+    *: "Välj annat spel"
   </voice>
 </phrase>
 <phrase>
@@ -13266,10 +13265,10 @@
     *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: "Level 1: 60 moves / 5 min"
+    *: "Nivå 1: 60 drag / 5 min"
   </dest>
   <voice>
-    *: "Level 1, 60 moves per 5 minutes"
+    *: "Nivå 1: 60 drag / 5 min"
   </voice>
 </phrase>
 <phrase>
@@ -13280,10 +13279,10 @@
     *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: "Level 2: 60 moves / 15 min"
+    *: "Nivå 2: 60 drag / 15 min"
   </dest>
   <voice>
-    *: "Level 2, 60 moves per 15 minutes"
+    *: "Nivå 2: 60 drag / 15 min"
   </voice>
 </phrase>
 <phrase>
@@ -13294,10 +13293,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: "Level 3: 60 moves / 30 min"
+    *: " Nivå 3: 60 drag / 30 min"
   </dest>
   <voice>
-    *: "Level 3, 60 moves per 30 minutes"
+    *: " Nivå 3: 60 drag / 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13308,10 +13307,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "Level 4: 40 moves / 30 min"
+    *: " Nivå 4: 40 drag / 30 min"
   </dest>
   <voice>
-    *: "Level 4, 40 moves per 30 minutes"
+    *: " Nivå 4: 40 drag / 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13322,10 +13321,10 @@
     *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: "Level 5: 40 moves / 60 min"
+    *: "Nivå 5: 40 drag / 60 min"
   </dest>
   <voice>
-    *: "Level 5, 40 moves per 60 minutes"
+    *: "Nivå 5: 40 drag / 60 min"
   </voice>
 </phrase>
 <phrase>
@@ -13336,10 +13335,10 @@
     *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: "Level 6: 40 moves / 120 min"
+    *: "Nivå 6: 40 drag / 120 min"
   </dest>
   <voice>
-    *: "Level 6, 40 moves per 120 minutes"
+    *: "Nivå 6: 40 drag / 120 min"
   </voice>
 </phrase>
 <phrase>
@@ -13350,10 +13349,10 @@
     *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: "Level 7: 40 moves / 240 min"
+    *: "Nivå 7: 40 drag / 240 min"
   </dest>
   <voice>
-    *: "Level 7, 40 moves per 240 minutes"
+    *: "Nivå 7: 40 drag / 240 min"
   </voice>
 </phrase>
 <phrase>
@@ -13364,10 +13363,10 @@
     *: "Error parsing game !"
   </source>
   <dest>
-    *: "Error parsing game !"
+    *: "Fel vid tolkning av spelet!"
   </dest>
   <voice>
-    *: "Error parsing game !"
+    *: "Fel vid tolkning av spelet!"
   </voice>
 </phrase>
 <phrase>
@@ -13378,10 +13377,10 @@
     *: "No games found !"
   </source>
   <dest>
-    *: "No games found !"
+    *: "Inga spel hittades!"
   </dest>
   <voice>
-    *: "No games found!"
+    *: "Inga spel hittades!"
   </voice>
 </phrase>
 <phrase>
@@ -13392,10 +13391,10 @@
     *: "At the beginning of the game"
   </source>
   <dest>
-    *: "At the beginning of the game"
+    *: " I början av spelet"
   </dest>
   <voice>
-    *: "At the beginning of the game"
+    *: " I början av spelet"
   </voice>
 </phrase>
 <phrase>
@@ -13406,10 +13405,10 @@
     *: "At the end of the game"
   </source>
   <dest>
-    *: "At the end of the game"
+    *: " I slutet av spelet"
   </dest>
   <voice>
-    *: "At the end of the game"
+    *: " I slutet av spelet"
   </voice>
 </phrase>
 <phrase>
@@ -13423,7 +13422,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Player"
+    *: "Spelare"
   </voice>
 </phrase>
 <phrase>
@@ -13437,7 +13436,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: " GNU schack"
   </voice>
 </phrase>
 <phrase>
@@ -13451,7 +13450,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Marked"
+    *: "markerad"
   </voice>
 </phrase>
 <phrase>
@@ -13465,7 +13464,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Unmarked"
+    *: "Omärkt"
   </voice>
 </phrase>
 <phrase>
@@ -13479,7 +13478,7 @@
     *: ""
   </dest>
   <voice>
-    *: "White"
+    *: "Vit"
   </voice>
 </phrase>
 <phrase>
@@ -13493,7 +13492,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Black"
+    *: "Svart"
   </voice>
 </phrase>
 <phrase>
@@ -13507,7 +13506,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Check!"
+    *: "Schack!"
   </voice>
 </phrase>
 <phrase>
@@ -13521,7 +13520,7 @@
     *: ""
   </dest>
   <voice>
-    *: "captures"
+    *: "Fångar"
   </voice>
 </phrase>
 <phrase>
@@ -13535,7 +13534,7 @@
     *: ""
   </dest>
   <voice>
-    *: "castle"
+    *: "Slott"
   </voice>
 </phrase>
 <phrase>
@@ -13549,7 +13548,7 @@
     *: ""
   </dest>
   <voice>
-    *: "king side"
+    *: "Kungens sida"
   </voice>
 </phrase>
 <phrase>
@@ -13563,7 +13562,7 @@
     *: ""
   </dest>
   <voice>
-    *: "queen side"
+    *: "Drottningens sida"
   </voice>
 </phrase>
 <phrase>
@@ -13577,7 +13576,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Pawn"
+    *: "Bonde"
   </voice>
 </phrase>
 <phrase>
@@ -13591,7 +13590,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Knight"
+    *: "Springare"
   </voice>
 </phrase>
 <phrase>
@@ -13605,7 +13604,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bishop"
+    *: "Löpare"
   </voice>
 </phrase>
 <phrase>
@@ -13619,7 +13618,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Rook"
+    *: "Torn"
   </voice>
 </phrase>
 <phrase>
@@ -13633,7 +13632,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queen"
+    *: "Drottning"
   </voice>
 </phrase>
 <phrase>
@@ -13647,7 +13646,7 @@
     *: ""
   </dest>
   <voice>
-    *: "King"
+    *: "Kung"
   </voice>
 </phrase>
 <phrase>
@@ -13658,7 +13657,7 @@
     *: "Games"
   </source>
   <dest>
-    *: "Games"
+    *: "Spel"
   </dest>
   <voice>
     *: ""
@@ -13672,10 +13671,10 @@
     *: "Saving position"
   </source>
   <dest>
-    *: "Saving position"
+    *: "Spara position"
   </dest>
   <voice>
-    *: "Saving position"
+    *: "Spara position"
   </voice>
 </phrase>
 <phrase>
@@ -13686,10 +13685,10 @@
     *: "Loading position"
   </source>
   <dest>
-    *: "Loading position"
+    *: "Laddar position"
   </dest>
   <voice>
-    *: "Loading position"
+    *: "Laddar position"
   </voice>
 </phrase>
 <phrase>
@@ -13700,10 +13699,10 @@
     *: "Thinking..."
   </source>
   <dest>
-    *: "Thinking..."
+    *: "Tänker..."
   </dest>
   <voice>
-    *: "Thinking"
+    *: "Tänker"
   </voice>
 </phrase>
 <phrase>
@@ -13717,7 +13716,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Battery bench is already running"
+    *: "Batteribänken är redan igång"
   </voice>
 </phrase>
 <phrase>
@@ -13731,7 +13730,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Press play to run battery bench or stop to cancel"
+    *: "Tryck på play för att köra batteribänken eller på stopp för att avbryta"
   </voice>
 </phrase>
 <phrase>
@@ -13742,10 +13741,10 @@
     *: "Cannot restart playback"
   </source>
   <dest>
-    *: "Cannot restart playback"
+    *: ""Kan inte starta om uppspelningen"
   </dest>
   <voice>
-    *: "Cannot restart playback"
+    *: ""Kan inte starta om uppspelningen"
   </voice>
 </phrase>
 <phrase>
@@ -13756,10 +13755,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "Ordnad "
   </dest>
   <voice>
-    *: "Ordered"
+    *: "Ordnad "
   </voice>
 </phrase>
 <phrase>
@@ -13784,10 +13783,10 @@
     *: "Grayscale"
   </source>
   <dest>
-    *: "Grayscale"
+    *: "gråskala"
   </dest>
   <voice>
-    *: "Grayscale"
+    *: "gråskala"
   </voice>
 </phrase>
 <phrase>
@@ -13798,10 +13797,10 @@
     *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: "Toggle Slideshow Mode"
+    *: "Växla bildspel-läge"
   </dest>
   <voice>
-    *: "Toggle Slide show Mode"
+    *: "Växla bildspel-läge"
   </voice>
 </phrase>
 <phrase>
@@ -13812,10 +13811,10 @@
     *: "Slideshow Time"
   </source>
   <dest>
-    *: "Slideshow Time"
+    *: "Bildspelstid"
   </dest>
   <voice>
-    *: "Slide show Time"
+    *: "Bildspelstid"
   </voice>
 </phrase>
 <phrase>
@@ -13826,10 +13825,10 @@
     *: "Return"
   </source>
   <dest>
-    *: "Return"
+    *: "Tillbaka"
   </dest>
   <voice>
-    *: "Return"
+    *: "Tillbaka"
   </voice>
 </phrase>
 <phrase>
@@ -13842,11 +13841,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Inspelningsmapp"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Inspelningsmapp"
   </voice>
 </phrase>
 <phrase>
@@ -13857,10 +13856,10 @@
     *: "View Played Games"
   </source>
   <dest>
-    *: "View Played Games"
+    *: "Visa spelade spel"
   </dest>
   <voice>
-    *: "View Played Games"
+    *: "Visa spelade spel"
   </voice>
 </phrase>
 <phrase>
@@ -13872,11 +13871,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Audio Options"
+    *: "Ljudinställningar"
     lowmem: none
   </dest>
   <voice>
-    *: "Audio Options"
+    *: "Ljudinställningar"
     lowmem: none
   </voice>
 </phrase>
@@ -13889,11 +13888,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume Options"
+    *: "Återuppta alternativ"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume Options"
+    *: "Återuppta alternativ"
     lowmem: none
   </voice>
 </phrase>
@@ -13906,11 +13905,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play Mode"
+    *: "Spelläge"
     lowmem: none
   </dest>
   <voice>
-    *: "Play Mode"
+    *: "Spelläge"
     lowmem: none
   </voice>
 </phrase>
@@ -13923,11 +13922,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Single"
+    *: "Singel"
     lowmem: none
   </dest>
   <voice>
-    *: "Single"
+    *: "Singel"
     lowmem: none
   </voice>
 </phrase>
@@ -13940,11 +13939,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use sound setting"
+    *: "Använd ljudinställningar"
     lowmem: none
   </dest>
   <voice>
-    *: "Use sound setting"
+    *: "Använd ljudinställningar"
     lowmem: none
   </voice>
 </phrase>
@@ -13957,11 +13956,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play from beginning"
+    *: "Spela från början"
     lowmem: none
   </dest>
   <voice>
-    *: "Play from beginning"
+    *: "Spela från början"
     lowmem: none
   </voice>
 </phrase>
@@ -13974,11 +13973,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Set resume time (min)"
+    *: "Ställ in återupptagningstid (min)"
     lowmem: none
   </dest>
   <voice>
-    *: "Set resume time"
+    *: "Ställ in återupptagningstid"
     lowmem: none
   </voice>
 </phrase>
@@ -13990,10 +13989,10 @@
     *: "Display FPS"
   </source>
   <dest>
-    *: "Display FPS"
+    *: "Visa FPS"
   </dest>
   <voice>
-    *: "Display FPS"
+    *: "Visa FPS"
   </voice>
 </phrase>
 <phrase>
@@ -14005,11 +14004,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Limit FPS"
+    *: "Limitera FPS"
     lowmem: none
   </dest>
   <voice>
-    *: "Limit FPS"
+    *: "Limitera FPS"
     lowmem: none
   </voice>
 </phrase>
@@ -14022,11 +14021,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Skip frames"
+    *: "Hoppa över frames"
     lowmem: none
   </dest>
   <voice>
-    *: "Skip frames"
+    *: "Hoppa över frames"
     lowmem: none
   </voice>
 </phrase>
@@ -14039,11 +14038,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Backlight brightness"
+    *: "Bakgrundsbelysningens ljusstyrka"
     lowmem: none
   </dest>
   <voice>
-    *: "Backlight brightness"
+    *: "Bakgrundsbelysningens ljusstyrka"
     lowmem: none
   </voice>
 </phrase>
@@ -14056,11 +14055,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use common setting"
+    *: "Använd standardinställning"
     lowmem: none
   </dest>
   <voice>
-    *: "Use common setting"
+    *: "Använd standardinställning"
     lowmem: none
   </voice>
 </phrase>
@@ -14073,11 +14072,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Tone controls"
+    *: "Tonkontroller"
     lowmem: none
   </dest>
   <voice>
-    *: "Tone controls"
+    *: "Tonkontroller"
     lowmem: none
   </voice>
 </phrase>
@@ -14090,11 +14089,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu"
+    *: "Startmeny"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu"
+    *: "Startmeny"
     lowmem: none
   </voice>
 </phrase>
@@ -14107,11 +14106,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu if not completed"
+    *: "Startmeny om inte slutfört"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu if not completed"
+    *: "Startmeny om inte slutfört"
     lowmem: none
   </voice>
 </phrase>
@@ -14124,11 +14123,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume automatically"
+    *: "Återuppta automatiskt"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume automatically"
+    *: "Återuppta automatiskt"
     lowmem: none
   </voice>
 </phrase>
@@ -14141,11 +14140,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Clear all resumes"
+    *: "Rensa alla fortsättningar"
     lowmem: none
   </dest>
   <voice>
-    *: "Clear all resumes"
+    *: "Rensa alla fortsättningar"
     lowmem: none
   </voice>
 </phrase>
@@ -14158,11 +14157,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Unavailable"
+    *: "Otillgänglig"
     lowmem: none
   </dest>
   <voice>
-    *: "Unavailable"
+    *: "Otillgänglig"
     lowmem: none
   </voice>
 </phrase>
@@ -14174,10 +14173,10 @@
     *: "Toggle Item"
   </source>
   <dest>
-    *: "Toggle Item"
+    *: "Växla objekt"
   </dest>
   <voice>
-    *: "Toggle Item"
+    *: "Växla objekt"
   </voice>
 </phrase>
 <phrase>
@@ -14188,10 +14187,10 @@
     *: "Move Item Up"
   </source>
   <dest>
-    *: "Move Item Up"
+    *: "Flytta objekt upp"
   </dest>
   <voice>
-    *: "Move Item Up"
+    *: "Flytta objekt upp"
   </voice>
 </phrase>
 <phrase>
@@ -14202,10 +14201,10 @@
     *: "Move Item Down"
   </source>
   <dest>
-    *: "Move Item Down"
+    *: "Flytta objekt ner"
   </dest>
   <voice>
-    *: "Move Item Down"
+    *: "Flytta objekt ner"
   </voice>
 </phrase>
 <phrase>
@@ -14216,10 +14215,10 @@
     *: "Load Default Configuration"
   </source>
   <dest>
-    *: "Load Default Configuration"
+    *: "Ladda standardkonfiguration"
   </dest>
   <voice>
-    *: "Load Default Configuration"
+    *: "Ladda standardkonfiguration"
   </voice>
 </phrase>
 <phrase>
@@ -14230,10 +14229,10 @@
     *: "Save and Exit"
   </source>
   <dest>
-    *: "Save and Exit"
+    *: "Spara och avsluta"
   </dest>
   <voice>
-    *: "Save and Exit"
+    *: "Spara och avsluta"
   </voice>
 </phrase>
 <phrase>
@@ -14244,7 +14243,7 @@
     *: "Rockbox Main Menu Order"
   </source>
   <dest>
-    *: "Rockbox Main Menu Order"
+    *: "Rockbox huvudmenyordning"
   </dest>
   <voice>
     *: ""
@@ -14258,10 +14257,10 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[Path]"
+    *: "[Sökväg]"
   </dest>
   <voice>
-    *: "Path"
+    *: "Sökväg"
   </voice>
 </phrase>
 <phrase>
@@ -14272,10 +14271,10 @@
     *: "[Filename]"
   </source>
   <dest>
-    *: "[Filename]"
+    *: "[Filnamn]"
   </dest>
   <voice>
-    *: "Filename"
+    *: "Filnamn"
   </voice>
 </phrase>
 <phrase>
@@ -14286,10 +14285,10 @@
     *: "[Size]"
   </source>
   <dest>
-    *: "[Size]"
+    *: "[Storlek]"
   </dest>
   <voice>
-    *: "Size"
+    *: "Storlek"
   </voice>
 </phrase>
 <phrase>
@@ -14300,10 +14299,10 @@
     *: "[Date]"
   </source>
   <dest>
-    *: "[Date]"
+    *: "[Datum]"
   </dest>
   <voice>
-    *: "Date"
+    *: "Datum"
   </voice>
 </phrase>
 <phrase>
@@ -14314,10 +14313,10 @@
     *: "[Time]"
   </source>
   <dest>
-    *: "[Time]"
+    *: "[Tid]"
   </dest>
   <voice>
-    *: "Time"
+    *: "Tid"
   </voice>
 </phrase>
 <phrase>
@@ -14328,10 +14327,10 @@
     *: "[Subdirs]"
   </source>
   <dest>
-    *: "[Subdirs]"
+    *: "[Underkataloger]"
   </dest>
   <voice>
-    *: "Subdirs"
+    *: "Underkataloger"
   </voice>
 </phrase>
 <phrase>
@@ -14342,10 +14341,10 @@
     *: "[Files]"
   </source>
   <dest>
-    *: "[Files]"
+    *: "[Filer]"
   </dest>
   <voice>
-    *: "Files"
+    *: "Filer"
   </voice>
 </phrase>
 <phrase>
@@ -14356,7 +14355,7 @@
     *: "Directory properties"
   </source>
   <dest>
-    *: "Directory properties"
+    *: "Egenskaper för katalog"
   </dest>
   <voice>
     *: ""
@@ -14370,7 +14369,7 @@
     *: "File properties"
   </source>
   <dest>
-    *: "File properties"
+    *: "Filegenskaper"
   </dest>
   <voice>
     *: ""
@@ -14384,10 +14383,10 @@
     *: "Failed to gather information"
   </source>
   <dest>
-    *: "Failed to gather information"
+    *: "Misslyckades med att samla information"
   </dest>
   <voice>
-    *: "Failed to gather information"
+    *: "Misslyckades med att samla information"
   </voice>
 </phrase>
 <phrase>
@@ -14398,10 +14397,10 @@
     *: "Swap Channels"
   </source>
   <dest>
-    *: "Swap Channels"
+    *: "Byt kanaler"
   </dest>
   <voice>
-    *: "Swap Channels"
+    *: "Byt kanaler"
   </voice>
 </phrase>
 <phrase>
@@ -14498,11 +14497,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Sample Rate"
+    *: "Samplingsfrekvens"
     lowmem: none
   </dest>
   <voice>
-    *: "Sample Rate"
+    *: "Samplingsfrekvens"
     lowmem: none
   </voice>
 </phrase>
@@ -14531,10 +14530,10 @@
     *: "Spacing"
   </source>
   <dest>
-    *: "Spacing"
+    *: "Avstånd"
   </dest>
   <voice>
-    *: "Spacing"
+    *: "Avstånd"
   </voice>
 </phrase>
 <phrase>
@@ -14545,10 +14544,10 @@
     *: "Centre margin"
   </source>
   <dest>
-    *: "Centre margin"
+    *: "Mittenmarginal"
   </dest>
   <voice>
-    *: "Centre margin"
+    *: "Mittenmarginal"
   </voice>
 </phrase>
 <phrase>
@@ -14559,10 +14558,10 @@
     *: "Number of slides"
   </source>
   <dest>
-    *: "Number of slides"
+    *: "Antal bilder"
   </dest>
   <voice>
-    *: "Number of slides"
+    *: "Antal bilder"
   </voice>
 </phrase>
 <phrase>
@@ -14573,10 +14572,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "~Zoom"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "~Zoom"
   </voice>
 </phrase>
 <phrase>
@@ -14587,10 +14586,10 @@
     *: "Show album title"
   </source>
   <dest>
-    *: "Show album title"
+    *: "Visa albumtitel"
   </dest>
   <voice>
-    *: "Show album title"
+    *: "Visa albumtitel"
   </voice>
 </phrase>
 <phrase>
@@ -14601,10 +14600,10 @@
     *: "Resize Covers"
   </source>
   <dest>
-    *: "Resize Covers"
+    *: "Ändra storlek på omslag"
   </dest>
   <voice>
-    *: "Resize Covers"
+    *: "Ändra storlek på omslag"
   </voice>
 </phrase>
 <phrase>
@@ -14615,10 +14614,10 @@
     *: "Rebuild cache"
   </source>
   <dest>
-    *: "Rebuild cache"
+    *: "Återskapa cache"
   </dest>
   <voice>
-    *: "Rebuild cache"
+    *: "Återskapa cache"
   </voice>
 </phrase>
 <phrase>
@@ -14629,10 +14628,10 @@
     *: "WPS Integration"
   </source>
   <dest>
-    *: "WPS Integration"
+    *: "WPS-integration"
   </dest>
   <voice>
-    *: "WPS Integration"
+    *: "WPS-integration"
   </voice>
 </phrase>
 <phrase>
@@ -14643,10 +14642,10 @@
     *: "Go to WPS"
   </source>
   <dest>
-    *: "Go to WPS"
+    *: "Gå till WPS"
   </dest>
   <voice>
-    *: "Go to WPS"
+    *: "Gå till WPS"
   </voice>
 </phrase>
 <phrase>
@@ -14657,10 +14656,10 @@
     *: "Hide album title"
   </source>
   <dest>
-    *: "Hide album title"
+    *: "Dölj albumtitel"
   </dest>
   <voice>
-    *: "Hide album title"
+    *: "Dölj albumtitel"
   </voice>
 </phrase>
 <phrase>
@@ -14671,10 +14670,10 @@
     *: "Show at the bottom"
   </source>
   <dest>
-    *: "Show at the bottom"
+    *: "Visa längst ner"
   </dest>
   <voice>
-    *: "Show at the bottom"
+    *: "Visa längst ner"
   </voice>
 </phrase>
 <phrase>
@@ -14685,10 +14684,10 @@
     *: "Show at the top"
   </source>
   <dest>
-    *: "Show at the top"
+    *: "Visa högst upp"
   </dest>
   <voice>
-    *: "Show at the top"
+    *: "Visa högst upp"
   </voice>
 </phrase>
 <phrase>
@@ -14699,10 +14698,10 @@
     *: "Direct"
   </source>
   <dest>
-    *: "Direct"
+    *: "Direkt"
   </dest>
   <voice>
-    *: "Direct"
+    *: "Direkt"
   </voice>
 </phrase>
 <phrase>
@@ -14713,10 +14712,10 @@
     *: "Via Track list"
   </source>
   <dest>
-    *: "Via Track list"
+    *: "Via Spårlista"
   </dest>
   <voice>
-    *: "Via Track list"
+    *: "Via Spårlista"
   </voice>
 </phrase>
 <phrase>
@@ -14727,10 +14726,10 @@
     *: "Always On"
   </source>
   <dest>
-    *: "Always On"
+    *: "Alltid på"
   </dest>
   <voice>
-    *: "Always On"
+    *: "Alltid på"
   </voice>
 </phrase>
 <phrase>
@@ -14741,10 +14740,10 @@
     *: "No album art found"
   </source>
   <dest>
-    *: "No album art found"
+    *: "Inget albumomslag hittades"
   </dest>
   <voice>
-    *: "No album art found"
+    *: "Inget albumomslag hittades"
   </voice>
 </phrase>
 <phrase>
@@ -14769,10 +14768,10 @@
     *: "Error writing config"
   </source>
   <dest>
-    *: "Error writing config"
+    *: "Fel vid skrivning av konfiguration"
   </dest>
   <voice>
-    *: "Error writing config"
+    *: "Fel vid skrivning av konfiguration"
   </voice>
 </phrase>
 <phrase>
@@ -14783,10 +14782,10 @@
     *: "Not a VBR file"
   </source>
   <dest>
-    *: "Not a VBR file"
+    *: "Inte en VBR-fil"
   </dest>
   <voice>
-    *: "Not a VBR file"
+    *: "Inte en VBR-fil"
   </voice>
 </phrase>
 <phrase>
@@ -14797,10 +14796,10 @@
     *: "File error: %d"
   </source>
   <dest>
-    *: "File error: %d"
+    *: "Filfel: %d"
   </dest>
   <voice>
-    *: "File error"
+    *: "Filfel"
   </voice>
 </phrase>
 <phrase>
@@ -14811,10 +14810,10 @@
     *: "Update cache"
   </source>
   <dest>
-    *: "Update cache"
+    *: "Uppdatera cache"
   </dest>
   <voice>
-    *: "Update cache"
+    *: "Uppdatera cache"
   </voice>
 </phrase>
 <phrase>
@@ -14825,10 +14824,10 @@
     *: "Hide information"
   </source>
   <dest>
-    *: "Hide information"
+    *: "Göm information"
   </dest>
   <voice>
-    *: "Hide information"
+    *: "Göm information"
   </voice>
 </phrase>
 <phrase>
@@ -14839,10 +14838,10 @@
     *: "Show album at the bottom"
   </source>
   <dest>
-    *: "Show album at the bottom"
+    *: "Visa album längst ner"
   </dest>
   <voice>
-    *: "Show album at the bottom"
+    *: "Visa album längst ner"
   </voice>
 </phrase>
 <phrase>
@@ -14853,10 +14852,10 @@
     *: "Show album at the top"
   </source>
   <dest>
-    *: "Show album at the top"
+    *: "Visa album högst upp"
   </dest>
   <voice>
-    *: "Show album at the top"
+    *: "Visa album högst upp"
   </voice>
 </phrase>
 <phrase>
@@ -14867,10 +14866,10 @@
     *: "Show album and artist at the top"
   </source>
   <dest>
-    *: "Show album and artist at the top"
+    *: "Visa album och artist högst upp"
   </dest>
   <voice>
-    *: "Show album and artist at the top"
+    *: "Visa album och artist högst upp"
   </voice>
 </phrase>
 <phrase>
@@ -14881,10 +14880,10 @@
     *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: "Show album and artist at the bottom"
+    *: "Visa album och artist längst ner"
   </dest>
   <voice>
-    *: "Show album and artist at the bottom"
+    *: "Visa album och artist längst ner"
   </voice>
 </phrase>
 <phrase>
@@ -14907,33 +14906,33 @@
     xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </source>
   <dest>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
-    mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
-    sonynwza860: "Keymaps incomplete."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    *: "Tryck på VÄNSTER för att avbryta."
+    android,hifietma*,zenvision: "Tryck på TILLBAKA för att avbryta."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Tryck på POWER för att avbryta."
+    ihifi760,ihifi960: "Dubbelklicka på RETURN för att avbryta."
+    ihifi770,ihifi770c,ihifi800: "Tryck på HOME för att avbryta."
+    iriverh10,samsungyh*: "Dubbeltryck på VÄNSTER för att avbryta."
+    mpiohd200: "Dubbelklicka på REC för att avbryta."
+    mpiohd300: "Dubbelklicka på MENU för att avbryta."
+    rx27generic: "Tryck på VOLUME för att avbryta."
+    sonynwza860: "Tangentkartor ofullständig"
+    touchscreen: "Tryck på mitten-vänster för att avbryta."
+    vibe500: "Tryck på FÖREGÅENDE för att avbryta."
+    xduoox20,xduoox3,xduoox3ii: "Dubbeltryck på HEM för att avbryta."
   </dest>
   <voice>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
-    mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    *: "Tryck på VÄNSTER för att avbryta."
+    android,hifietma*,zenvision: "Tryck på TILLBAKA för att avbryta."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Tryck på POWER för att avbryta."
+    ihifi760,ihifi960: "Dubbelklicka på RETURN för att avbryta."
+    ihifi770,ihifi770c,ihifi800: "Tryck på HOME för att avbryta."
+    iriverh10,samsungyh*: "Dubbeltryck på VÄNSTER för att avbryta."
+    mpiohd200: "Dubbelklicka på REC för att avbryta."
+    mpiohd300: "Dubbelklicka på MENU för att avbryta."
+    rx27generic: "Tryck på VOLUME för att avbryta."
+    touchscreen: "Tryck på mitten-vänster för att avbryta."
+    vibe500: "Tryck på FÖREGÅENDE för att avbryta."
+    xduoox20,xduoox3,xduoox3ii: "Dubbeltryck på HEM för att avbryta."
   </voice>
 </phrase>
 <phrase>
