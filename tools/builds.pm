@@ -879,7 +879,7 @@ sub simbuilds {
 	    'gtts' => '-l sv',
             'piper' => 'sv_SE-nst-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'turkce' => {
 	'lang' => 'turkce',
