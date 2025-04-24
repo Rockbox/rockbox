@@ -15157,7 +15157,7 @@
     *: "Not a plugin: %s"
   </source>
   <dest>
-    *: ""Inte ett plugin: %s"
+    *: "Inte ett plugin: %s"
   </dest>
   <voice>
     *: "Inte ett plugin"
