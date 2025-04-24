@@ -4888,10 +4888,10 @@
     *: "Format"
   </source>
   <dest>
-    *: "Format"
+    *: "~Format"
   </dest>
   <voice>
-    *: "Format"
+    *: "~Format"
   </voice>
 </phrase>
 <phrase>
@@ -14957,10 +14957,10 @@
     *: "Clear all"
   </source>
   <dest>
-    *: "Clear all"
+    *: " Rensa alla"
   </dest>
   <voice>
-    *: "Clear all"
+    *: " Rensa alla"
   </voice>
 </phrase>
 <phrase>
@@ -15580,10 +15580,10 @@
     *: "Artist + Name"
   </source>
   <dest>
-    *: "Artist + Name"
+    *: "Konstnär + Name"
   </dest>
   <voice>
-    *: "Artist And Name"
+    *: " Konstnär Och Namn"
   </voice>
 </phrase>
 <phrase>
