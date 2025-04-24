@@ -15622,10 +15622,10 @@
     *: "Show year in album title"
   </source>
   <dest>
-    *: "Show year in album title"
+    *: "Visa årtal i albumtitel"
   </dest>
   <voice>
-    *: "Show year in album title"
+    *: "Visa årtal i albumtitel"
   </voice>
 </phrase>
 <phrase>
@@ -15650,10 +15650,10 @@
     *: "Track Info"
   </source>
   <dest>
-    *: "Track Info"
+    *: "Spårinformation"
   </dest>
   <voice>
-    *: "Track Info"
+    *: "Spårinformation"
   </voice>
 </phrase>
 <phrase>
@@ -15664,10 +15664,10 @@
     *: "Play"
   </source>
   <dest>
-    *: "Play"
+    *: "Spela"
   </dest>
   <voice>
-    *: "Play"
+    *: "Spela"
   </voice>
 </phrase>
 <phrase>
@@ -15678,10 +15678,10 @@
     *: "Play Shuffled"
   </source>
   <dest>
-    *: "Play Shuffled"
+    *: "Spela blandade"
   </dest>
   <voice>
-    *: "Play Shuffled"
+    *: "Spela blandade"
   </voice>
 </phrase>
 <phrase>
@@ -15692,10 +15692,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Behåll aktuellt spår när spellistan ersätts"
   </dest>
   <voice>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Behåll aktuellt spår när spellistan ersätts"
   </voice>
 </phrase>
 <phrase>
@@ -15709,13 +15709,13 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Rensa inställningar när reset-knappen hålls intryckt under uppstart"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Rensa inställningar när hold-omkopplaren är påslagen under uppstart"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Rensa inställningar när reset-knappen hålls intryckt under uppstart"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Rensa inställningar när hold-omkopplaren är påslagen under uppstart"
   </voice>
 </phrase>
 <phrase>
@@ -15726,10 +15726,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rewind Across Tracks"
+    *: "Spola tillbaka mellan spåren"
   </dest>
   <voice>
-    *: "Rewind across tracks"
+    *: "Spola tillbaka mellan spåren"
   </voice>
 </phrase>
 <phrase>
@@ -15740,10 +15740,10 @@
     *: "Set As..."
   </source>
   <dest>
-    *: "Set As..."
+    *: "Ställ in som..."
   </dest>
   <voice>
-    *: "Set As"
+    *: "Ställ in som"
   </voice>
 </phrase>
 <phrase>
@@ -15799,10 +15799,10 @@
     *: "Add to Playlist..."
   </source>
   <dest>
-    *: "Add to Playlist..."
+    *: "Lägg till i spellista..."
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Lägg till i spellista"
   </voice>
 </phrase>
 <phrase>
@@ -15813,10 +15813,10 @@
     *: "Add to Existing Playlist"
   </source>
   <dest>
-    *: "Add to Existing Playlist"
+    *: "Lägg till i befintlig spellista"
   </dest>
   <voice>
-    *: "Add to Existing Playlist"
+    *: "Lägg till i befintlig spellista"
   </voice>
 </phrase>
 <phrase>
@@ -15827,10 +15827,10 @@
     *: "Playing Next..."
   </source>
   <dest>
-    *: "Playing Next..."
+    *: "Spelar nästa..."
   </dest>
   <voice>
-    *: "Playing Next"
+    *: "Spelar nästa"
   </voice>
 </phrase>
 <phrase>
@@ -15841,10 +15841,10 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "Play Next"
+    *: "Spela nästa"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Spela nästa"
   </voice>
 </phrase>
 <phrase>
@@ -15855,10 +15855,10 @@
     *: "Add Shuffled"
   </source>
   <dest>
-    *: "Add Shuffled"
+    *: "Lägg till blandad"
   </dest>
   <voice>
-    *: "Add Shuffled"
+    *: "Lägg till blandad"
   </voice>
 </phrase>
 <phrase>
@@ -15869,10 +15869,10 @@
     *: "Play Last"
   </source>
   <dest>
-    *: "Play Last"
+    *: "Spela sista"
   </dest>
   <voice>
-    *: "Play Last"
+    *: "Spela sista"
   </voice>
 </phrase>
 <phrase>
@@ -15883,10 +15883,10 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Play Last Shuffled"
+    *: "Spela senast blandade"
   </dest>
   <voice>
-    *: "Play Last Shuffled"
+    *: "Spela senast blandade"
   </voice>
 </phrase>
 <phrase>
@@ -15899,11 +15899,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Volume Adjustment Mode"
+    perceptual_volume: "Volymjusteringsläge"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Volume Adjustment Mode"
+    perceptual_volume: "Volymjusteringsläge"
   </voice>
 </phrase>
 <phrase>
@@ -15916,11 +15916,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Number of Volume Steps"
+    perceptual_volume: "Antal volymsteg"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Number of Volume Steps"
+    perceptual_volume: "Antal volymsteg"
   </voice>
 </phrase>
 <phrase>
@@ -15976,10 +15976,10 @@
     *: "Database Directory"
   </source>
   <dest>
-    *: "Database Directory"
+    *: "Databaskatalog"
   </dest>
   <voice>
-    *: "Database Directory"
+    *: "Databaskatalog"
   </voice>
 </phrase>
 <phrase>
@@ -15990,10 +15990,10 @@
     *: "Remove Queued Tracks?"
   </source>
   <dest>
-    *: "Remove Queued Tracks?"
+    *: "Ta bort köade låtar?"
   </dest>
   <voice>
-    *: "Remove Queued Tracks?"
+    *: "Ta bort köade låtar?"
   </voice>
 </phrase>
 <phrase>
@@ -16032,10 +16032,10 @@
     *: "Default Browser"
   </source>
   <dest>
-    *: "Default Browser"
+    *: "Standardwebbläsare"
   </dest>
   <voice>
-    *: "Default Browser"
+    *: "Standardwebbläsare"
   </voice>
 </phrase>
 <phrase>
@@ -16074,10 +16074,10 @@
     *: "View Map"
   </source>
   <dest>
-    *: "View Map"
+    *: "Se karta"
   </dest>
   <voice>
-    *: "View Map"
+    *: "Se karta"
   </voice>
 </phrase>
 <phrase>
@@ -16088,10 +16088,10 @@
     *: "Show Compass"
   </source>
   <dest>
-    *: "Show Compass"
+    *: "Visa kompassen"
   </dest>
   <voice>
-    *: "Show Compass"
+    *: "Visa kompassen"
   </voice>
 </phrase>
 <phrase>
@@ -16102,10 +16102,10 @@
     *: "Show Map"
   </source>
   <dest>
-    *: "Show Map"
+    *: "Visa kartan"
   </dest>
   <voice>
-    *: "Show Map"
+    *: "Visa kartan"
   </voice>
 </phrase>
 <phrase>
@@ -16116,10 +16116,10 @@
     *: "Remember Path"
   </source>
   <dest>
-    *: "Remember Path"
+    *: "Kom ihåg vägen"
   </dest>
   <voice>
-    *: "Remember Path"
+    *: "Kom ihåg vägen"
   </voice>
 </phrase>
 <phrase>
@@ -16130,10 +16130,10 @@
     *: "Use Large Tiles"
   </source>
   <dest>
-    *: "Use Large Tiles"
+    *: "Använd stora plattor"
   </dest>
   <voice>
-    *: "Use Large Tiles"
+    *: "Använd stora plattor"
   </voice>
 </phrase>
 <phrase>
@@ -16144,10 +16144,10 @@
     *: "Show Solution"
   </source>
   <dest>
-    *: "Show Solution"
+    *: "Visa lösning"
   </dest>
   <voice>
-    *: "Show Solution"
+    *: "Visa lösning"
   </voice>
 </phrase>
 <phrase>
@@ -16158,10 +16158,10 @@
     *: "Quit without saving"
   </source>
   <dest>
-    *: "Quit without saving"
+    *: "Avsluta utan att spara"
   </dest>
   <voice>
-    *: "Quit without saving"
+    *: "Avsluta utan att spara"
   </voice>
 </phrase>
 <phrase>
@@ -16172,10 +16172,10 @@
     *: "Generating maze..."
   </source>
   <dest>
-    *: "Generating maze..."
+    *: "Genererar labyrint..."
   </dest>
   <voice>
-    *: "Generating maze"
+    *: "Genererar labyrint"
   </voice>
 </phrase>
 <phrase>
@@ -16186,10 +16186,10 @@
     *: "You win!"
   </source>
   <dest>
-    *: "You win!"
+    *: "Du vann!"
   </dest>
   <voice>
-    *: "You win!"
+    *: "Du vann!"
   </voice>
 </phrase>
 <phrase>
@@ -16200,10 +16200,10 @@
     *: "You cheated!"
   </source>
   <dest>
-    *: "You cheated!"
+    *: "Du fuskade!"
   </dest>
   <voice>
-    *: "You cheated!"
+    *: "Du fuskade!"
   </voice>
 </phrase>
 <phrase>
@@ -16256,10 +16256,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "~Expert"
   </dest>
   <voice>
-    *: "Expert"
+    *: "~Expert"
   </voice>
 </phrase>
 <phrase>
@@ -16270,10 +16270,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "Legal Notices"
+    *: "Juridiska meddelanden"
   </dest>
   <voice>
-    *: "Legal Notices"
+    *: "Juridiska meddelanden"
   </voice>
 </phrase>
 <phrase>
@@ -16284,10 +16284,10 @@
     *: "Error: %s"
   </source>
   <dest>
-    *: "Error: %s"
+    *: "Fel: %s"
   </dest>
   <voice>
-    *: "Error"
+    *: "Fel"
   </voice>
 </phrase>
 <phrase>
@@ -16326,10 +16326,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Schackbox Meny"
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Schackbox Meny"
   </voice>
 </phrase>
 <phrase>
@@ -16343,7 +16343,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Invalid Voice File"
+    *: "Ogiltig röstfil"
   </voice>
 </phrase>
 <phrase>
@@ -16382,10 +16382,10 @@
     *: "Choose File"
   </source>
   <dest>
-    *: "Choose File"
+    *: "Välj fil"
   </dest>
   <voice>
-    *: "Choose File"
+    *: "Välj fil"
   </voice>
 </phrase>
 <phrase>
@@ -16396,10 +16396,10 @@
     *: "Disable main menu scrolling"
   </source>
   <dest>
-    *: "Disable main menu scrolling"
+    *: "Inaktivera rullning av huvudmeny"
   </dest>
   <voice>
-    *: "Disable main menu scrolling"
+    *: "Inaktivera rullning av huvudmeny"
   </voice>
 </phrase>
 <phrase>
@@ -16410,10 +16410,10 @@
     *: "Remaining"
   </source>
   <dest>
-    *: "Remaining"
+    *: "Återstående"
   </dest>
   <voice>
-    *: "Remaining"
+    *: "Återstående"
   </voice>
 </phrase>
 <phrase>
@@ -16424,10 +16424,10 @@
     *: "First Letter"
   </source>
   <dest>
-    *: "First Letter"
+    *: "Första bokstaven"
   </dest>
   <voice>
-    *: "First Letter"
+    *: "Första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16438,10 +16438,10 @@
     *: "By First Letter..."
   </source>
   <dest>
-    *: "By First Letter..."
+    *: "Genom första bokstaven..."
   </dest>
   <voice>
-    *: "By First Letter"
+    *: "Genom första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16452,10 +16452,10 @@
     *: "Artists by First Letter"
   </source>
   <dest>
-    *: "Artists by First Letter"
+    *: "Artister efter första bokstaven"
   </dest>
   <voice>
-    *: "Artists by First Letter"
+    *: "Artister efter första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16466,10 +16466,10 @@
     *: "Album Artists by First Letter"
   </source>
   <dest>
-    *: "Album Artists by First Letter"
+    *: "Albumartister efter Första bokstaven"
   </dest>
   <voice>
-    *: "Album Artists by First Letter"
+    *: "Albumartister efter Första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16480,10 +16480,10 @@
     *: "Albums by First Letter"
   </source>
   <dest>
-    *: "Albums by First Letter"
+    *: "Album från Första bokstaven"
   </dest>
   <voice>
-    *: "Albums by First Letter"
+    *: "Album från Första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16494,10 +16494,10 @@
     *: "Tracks by First Letter"
   </source>
   <dest>
-    *: "Tracks by First Letter"
+    *: "Spår av första bokstaven"
   </dest>
   <voice>
-    *: "Tracks by First Letter"
+    *: "Spår av första bokstaven"
   </voice>
 </phrase>
 <phrase>
@@ -16508,10 +16508,10 @@
     *: "Artists"
   </source>
   <dest>
-    *: "Artists"
+    *: "Artister"
   </dest>
   <voice>
-    *: "Artists"
+    *: "Artister"
   </voice>
 </phrase>
 <phrase>
@@ -16522,10 +16522,10 @@
     *: "Albums"
   </source>
   <dest>
-    *: "Albums"
+    *: "Album"
   </dest>
   <voice>
-    *: "Albums"
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -16536,10 +16536,10 @@
     *: "Tracks"
   </source>
   <dest>
-    *: "Tracks"
+    *: "Spår"
   </dest>
   <voice>
-    *: "Tracks"
+    *: "Spår"
   </voice>
 </phrase>
 <phrase>
@@ -16550,10 +16550,10 @@
     *: "Shuffle Songs"
   </source>
   <dest>
-    *: "Shuffle Songs"
+    *: "Blanda låtar"
   </dest>
   <voice>
-    *: "Shuffle Songs"
+    *: "Blanda låtar"
   </voice>
 </phrase>
 <phrase>
@@ -16564,10 +16564,10 @@
     *: "Filename"
   </source>
   <dest>
-    *: "Filename"
+    *: "Filnamn"
   </dest>
   <voice>
-    *: "Filename"
+    *: "Filnamn"
   </voice>
 </phrase>
 <phrase>
@@ -16578,10 +16578,10 @@
     *: "Title (with track duration)"
   </source>
   <dest>
-    *: "Title (with track duration)"
+    *: "Titel (med spårlängd)"
   </dest>
   <voice>
-    *: "Title with track duration"
+    *: "Titel med spårlängd"
   </voice>
 </phrase>
 <phrase>
@@ -16592,10 +16592,10 @@
     *: "User Rating"
   </source>
   <dest>
-    *: "User Rating"
+    *: "Användarens betyg"
   </dest>
   <voice>
-    *: "User Rating"
+    *: "Användarens betyg"
   </voice>
 </phrase>
 <phrase>
@@ -16606,10 +16606,10 @@
     *: "Search"
   </source>
   <dest>
-    *: "Search"
+    *: "Sök"
   </dest>
   <voice>
-    *: "Search"
+    *: "Sök"
   </voice>
 </phrase>
 <phrase>
@@ -16620,10 +16620,10 @@
     *: "Search by..."
   </source>
   <dest>
-    *: "Search by..."
+    *: "Sök efter..."
   </dest>
   <voice>
-    *: "Search by"
+    *: "Sök efter"
   </voice>
 </phrase>
 <phrase>
@@ -16634,10 +16634,10 @@
     *: "Recently Added"
   </source>
   <dest>
-    *: "Recently Added"
+    *: "Nyligen tillagd"
   </dest>
   <voice>
-    *: "Recently Added"
+    *: "Nyligen tillagd"
   </voice>
 </phrase>
 <phrase>
@@ -16648,10 +16648,10 @@
     *: "Playback History"
   </source>
   <dest>
-    *: "Playback History"
+    *: "Uppspelningshistorik"
   </dest>
   <voice>
-    *: "Playback History"
+    *: "Uppspelningshistorik"
   </voice>
 </phrase>
 <phrase>
@@ -16662,10 +16662,10 @@
     *: "Custom menu"
   </source>
   <dest>
-    *: "Custom menu"
+    *: "Anpassad meny"
   </dest>
   <voice>
-    *: "Custom menu"
+    *: "Anpassad meny"
   </voice>
 </phrase>
 <phrase>
@@ -16676,10 +16676,10 @@
     *: "Same as currently played track"
   </source>
   <dest>
-    *: "Same as currently played track"
+    *: "Samma som aktuellt spelat spår"
   </dest>
   <voice>
-    *: "Same as currently played track"
+    *: "Samma som aktuellt spelat spår"
   </voice>
 </phrase>
 <phrase>
@@ -16690,10 +16690,10 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Directory"
+    *: "Katalog"
   </dest>
   <voice>
-    *: "Directory"
+    *: "Katalog"
   </voice>
 </phrase>
 <phrase>
@@ -16704,10 +16704,10 @@
     *: "Albums by Year"
   </source>
   <dest>
-    *: "Albums by Year"
+    *: "Album per år"
   </dest>
   <voice>
-    *: "Albums by Year"
+    *: "Album per år"
   </voice>
 </phrase>
 <phrase>
@@ -16718,10 +16718,10 @@
     *: "Albums between Years"
   </source>
   <dest>
-    *: "Albums between Years"
+    *: "Album mellan åren"
   </dest>
   <voice>
-    *: "Albums between Years"
+    *: "Album mellan åren"
   </voice>
 </phrase>
 <phrase>
@@ -16732,10 +16732,10 @@
     *: "Artists between Years"
   </source>
   <dest>
-    *: "Artists between Years"
+    *: "Artister mellan åren"
   </dest>
   <voice>
-    *: "Artists between Years"
+    *: "Artister mellan åren"
   </voice>
 </phrase>
 <phrase>
@@ -16760,10 +16760,10 @@
     *: "Recently played tracks"
   </source>
   <dest>
-    *: "Recently played tracks"
+    *: "Nyligen spelade spår"
   </dest>
   <voice>
-    *: "Recently played tracks"
+    *: "Nyligen spelade spår"
   </voice>
 </phrase>
 <phrase>
@@ -16774,10 +16774,10 @@
     *: "Never played tracks"
   </source>
   <dest>
-    *: "Never played tracks"
+    *: "Aldrig spelade spår"
   </dest>
   <voice>
-    *: "Never played tracks"
+    *: "Aldrig spelade spår"
   </voice>
 </phrase>
 <phrase>
@@ -16788,10 +16788,10 @@
     *: "Favourite artists"
   </source>
   <dest>
-    *: "Favourite artists"
+    *: "Favoritartister"
   </dest>
   <voice>
-    *: "Favourite artists"
+    *: "Favoritartister"
   </voice>
 </phrase>
 <phrase>
@@ -16802,10 +16802,10 @@
     *: "Favourite albums"
   </source>
   <dest>
-    *: "Favourite albums"
+    *: "Favoritalbum"
   </dest>
   <voice>
-    *: "Favourite albums"
+    *: "Favoritalbum"
   </voice>
 </phrase>
 <phrase>
@@ -16816,10 +16816,10 @@
     *: "Recent favourites"
   </source>
   <dest>
-    *: "Recent favourites"
+    *: "Senaste favoriterna"
   </dest>
   <voice>
-    *: "Recent favourites"
+    *: "Senaste favoriterna"
   </voice>
 </phrase>
 <phrase>
@@ -16830,10 +16830,10 @@
     *: "New favourites"
   </source>
   <dest>
-    *: "New favourites"
+    *: "Nya favoriter"
   </dest>
   <voice>
-    *: "New favourites"
+    *: "Nya favoriter"
   </voice>
 </phrase>
 <phrase>
@@ -16844,10 +16844,10 @@
     *: "Forgotten favourites"
   </source>
   <dest>
-    *: "Forgotten favourites"
+    *: "Bortglömda favoriter"
   </dest>
   <voice>
-    *: "Forgotten favourites"
+    *: "Bortglömda favoriter"
   </voice>
 </phrase>
 <phrase>
@@ -16858,10 +16858,10 @@
     *: "Tracks by"
   </source>
   <dest>
-    *: "Tracks by"
+    *: "Låtar av"
   </dest>
   <voice>
-    *: "Tracks by"
+    *: "Låtar av"
   </voice>
 </phrase>
 <phrase>
@@ -16872,10 +16872,10 @@
     *: "View Album Art"
   </source>
   <dest>
-    *: "View Album Art"
+    *: " Visa albumomslag"
   </dest>
   <voice>
-    *: "View Album Art"
+    *: " Visa albumomslag"
   </voice>
 </phrase>
 <phrase>
@@ -16888,11 +16888,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: " Utgångsval"
   </dest>
   <voice>
     *: none
-    erosqnative: "Output Select"
+    erosqnative: " Utgångsval"
   </voice>
 </phrase>
 <phrase>
@@ -16905,11 +16905,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: "Headphone"
+    erosqnative: "Hörlurar"
   </dest>
   <voice>
     *: none
-    erosqnative: "Headphone"
+    erosqnative: "Hörlurar"
   </voice>
 </phrase>
 <phrase>
@@ -16937,10 +16937,10 @@
     *: "Unable to load font: (%s)"
   </source>
   <dest>
-    *: "Unable to load font: (%s)"
+    *: "Det gick inte att ladda teckensnitt: (%s)"
   </dest>
   <voice>
-    *: "Unable to load font"
+    *: "Det gick inte att ladda teckensnitt"
   </voice>
 </phrase>
 <phrase>
@@ -16965,10 +16965,10 @@
     *: "View log"
   </source>
   <dest>
-    *: "View log"
+    *: " visa logg"
   </dest>
   <voice>
-    *: "view log"
+    *: " visa logg"
   </voice>
 </phrase>
 <phrase>
@@ -16979,9 +16979,9 @@
     *: "Playlist finished. Play again?"
   </source>
   <dest>
-    *: "Playlist finished. Play again?"
+    *: "Spellistan är klar. Spela igen?"
   </dest>
   <voice>
-    *: "Playlist finished. Play again?"
+    *: "Spellistan är klar. Spela igen?"
   </voice>
 </phrase>
