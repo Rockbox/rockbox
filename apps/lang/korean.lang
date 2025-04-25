@@ -3372,59 +3372,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "배터리 유형"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "배터리 유형"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "알카라인"
-    xduoox3: "최신 (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "알카라인"
-    xduoox3: "최신 2000 밀리암페어 시간"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "~NiMH"
-    xduoox3: "오래됨 (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "니켈 수소"
-    xduoox3: "오래됨 1500 밀리암페어 시간"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3557,8 +3551,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3568,7 +3562,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "선택 버튼 = 설정"
-    gogearsa9200,samsungyh*: "재생 버튼 = 설정"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "재생 버튼 = 설정"
     iriverh100,iriverh120,iriverh300: "탐색 버튼 = 설정"
     mpiohd300: "진입 버튼 = 설정"
     mrobe500: "하트 버튼 = 설정"
@@ -3586,8 +3580,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3601,7 +3595,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "전원 버터느 = 반복"
-    gigabeats,sansafuzeplus: "뒤로가기 버튼 = 반복"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "뒤로가기 버튼 = 반복"
     gogearsa9200: "왼쪽 버튼 = 반복"
     iaudiom5,iaudiox5: "녹음 버튼 = 반복"
     ipod*,mpiohd300,sansac200*: "메뉴 버튼 = 반복"
@@ -5806,16 +5800,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "재생목록 카탈로그"
+    *: ""
   </dest>
   <voice>
-    *: "재생목록 카탈로그"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13262,48 +13256,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "레벨 8: 1 이동 / 15 분"
-  </dest>
-  <voice>
-    *: "레벨 8, 15 분당 1 이동"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "레벨 9: 1 이동 / 60 분"
-  </dest>
-  <voice>
-    *: "레벨 9, 60 분당 1 이동"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "레벨 10: 1 이동 / 600 분"
-  </dest>
-  <voice>
-    *: "레벨 10, 600 분당 1 이동"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_PGN_PARSE_ERROR
   desc: in the chessbox game viewer
   user: core
@@ -14696,16 +14648,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "다음에 다시 시작할 때 캐시가 다시 작성됨"
+    *: ""
   </dest>
   <voice>
-    *: "다음에 다시 시작할 때 캐시가 다시 작성됨"
+    *: ""
   </voice>
 </phrase>
 <phrase>

@@ -3372,10 +3372,12 @@
     battery_types: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -3387,10 +3389,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3402,10 +3406,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3538,8 +3544,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3549,7 +3555,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "VÄLJ = Ställ"
-    gogearsa9200,samsungyh*: "SPELA = Ställ"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "SPELA = Ställ"
     iriverh100,iriverh120,iriverh300: "NAVI = Ställ"
     mpiohd300: "ENTER = Ställ"
     mrobe500: "HJÄRTA = Ställ"
@@ -3567,8 +3573,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3582,7 +3588,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "PÅ/AV = Avbryt"
-    gigabeats,sansafuzeplus: "BAKÅT = Avbryt"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BAKÅT = Avbryt"
     gogearsa9200: "VÄNSTER = Avbryt"
     iaudiom5,iaudiox5: "SPELA IN = Avbryt"
     ipod*,mpiohd300,sansac200*: "MENY = Avbryt"
@@ -11818,10 +11824,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: " Torr/Våtblandning"
+    *: "Torr/Våtblandning"
   </dest>
   <voice>
-    *: " Torr/ Våtblandning"
+    *: "Torr/ Våtblandning"
   </voice>
 </phrase>
 <phrase>
@@ -11888,10 +11894,10 @@
     *: "Exempt Skip"
   </source>
   <dest>
-    *: " Undantag Skip"
+    *: "Undantag Skip"
   </dest>
   <voice>
-    *: " Undantag Skip"
+    *: "Undantag Skip"
   </voice>
 </phrase>
 <phrase>
@@ -11902,10 +11908,10 @@
     *: "SIDE ONLY"
   </source>
   <dest>
-    *: " ENDAST SIDA"
+    *: "ENDAST SIDA"
   </dest>
   <voice>
-    *: " ENDAST SIDA"
+    *: "ENDAST SIDA"
   </voice>
 </phrase>
 <phrase>
@@ -11918,11 +11924,11 @@
   </source>
   <dest>
     *: none
-    sansafuzeplus: " Pekplatta död zon"
+    sansafuzeplus: "Pekplatta död zon"
   </dest>
   <voice>
     *: none
-    sansafuzeplus: " Pekplatta död zon"
+    sansafuzeplus: "Pekplatta död zon"
   </voice>
 </phrase>
 <phrase>
@@ -12034,10 +12040,10 @@
     *: "Reset EQ"
   </source>
   <dest>
-    *: " Återställ EQ"
+    *: "Återställ EQ"
   </dest>
   <voice>
-    *: " Återställ EQ"
+    *: "Återställ EQ"
   </voice>
 </phrase>
 <phrase>
@@ -12048,10 +12054,10 @@
     *: "Single Mode"
   </source>
   <dest>
-    *: " Enkelläge"
+    *: "Enkelläge"
   </dest>
   <voice>
-    *: " Enkelläge"
+    *: "Enkelläge"
   </voice>
 </phrase>
 <phrase>
@@ -12076,10 +12082,10 @@
     *: "Title from ID3 tags"
   </source>
   <dest>
-    *: " Titel från ID3-taggar"
+    *: "Titel från ID3-taggar"
   </dest>
   <voice>
-    *: " Titel från taggar"
+    *: "Titel från taggar"
   </voice>
 </phrase>
 <phrase>
@@ -12090,7 +12096,7 @@
     *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: " Urvalet är för stort, %d slumpmässiga spår kommer att väljas"
+    *: "Urvalet är för stort, %d slumpmässiga spår kommer att väljas"
   </dest>
   <voice>
     *: "Urvalet är för stort, färre slumpmässiga spår kommer att väljas"
@@ -12104,10 +12110,10 @@
     *: "Special character"
   </source>
   <dest>
-    *: " Specialkaraktär"
+    *: "Specialkaraktär"
   </dest>
   <voice>
-    *: " Specialkaraktär"
+    *: "Specialkaraktär"
   </voice>
 </phrase>
 <phrase>
@@ -12118,10 +12124,10 @@
     *: "Album Artists"
   </source>
   <dest>
-    *: " Albumartister"
+    *: "Albumartister"
   </dest>
   <voice>
-    *: " Albumartister"
+    *: "Albumartister"
   </voice>
 </phrase>
 <phrase>
@@ -12132,10 +12138,10 @@
     *: "Add Current to Shortcuts"
   </source>
   <dest>
-    *: " Lägg till aktuell till genvägar"
+    *: "Lägg till aktuell till genvägar"
   </dest>
   <voice>
-    *: " Lägg till aktuell till genvägar"
+    *: "Lägg till aktuell till genvägar"
   </voice>
 </phrase>
 <phrase>
@@ -12146,10 +12152,10 @@
     *: "Voice prompt volume"
   </source>
   <dest>
-    *: " Volym för röstmeddelanden"
+    *: "Volym för röstmeddelanden"
   </dest>
   <voice>
-    *: " Volym för röstmeddelanden"
+    *: "Volym för röstmeddelanden"
   </voice>
 </phrase>
 <phrase>
@@ -12176,11 +12182,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: " Kort Sharp"
+    filter_roll_off: "Kort Sharp"
   </dest>
   <voice>
     *: none
-    filter_roll_off: " Kort Sharp"
+    filter_roll_off: "Kort Sharp"
   </voice>
 </phrase>
 <phrase>
@@ -12193,11 +12199,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: " Kort Långsam"
+    filter_roll_off: "Kort Långsam"
   </dest>
   <voice>
     *: none
-    filter_roll_off: " Kort Långsam"
+    filter_roll_off: "Kort Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12210,11 +12216,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: " Super Långsam"
+    filter_roll_off: "Super Långsam"
   </dest>
   <voice>
     *: none
-    filter_roll_off: " Super Långsam"
+    filter_roll_off: "Super Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12261,11 +12267,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Linjär snabb"
+    es9218: "Linjär snabb"
   </dest>
   <voice>
     *: none
-    es9218: " Linjär snabb"
+    es9218: "Linjär snabb"
   </voice>
 </phrase>
 <phrase>
@@ -12278,11 +12284,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Linjär Långsam"
+    es9218: "Linjär Långsam"
   </dest>
   <voice>
     *: none
-    es9218: " Linjär Långsam"
+    es9218: "Linjär Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12295,11 +12301,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Minimum snabb"
+    es9218: "Minimum snabb"
   </dest>
   <voice>
     *: none
-    es9218: " Minimum snabb"
+    es9218: "Minimum snabb"
   </voice>
 </phrase>
 <phrase>
@@ -12312,11 +12318,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Minimum Långsam"
+    es9218: "Minimum Långsam"
   </dest>
   <voice>
     *: none
-    es9218: " Minimum Långsam"
+    es9218: "Minimum Långsam"
   </voice>
 </phrase>
 <phrase>
@@ -12329,11 +12335,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Apodisering typ 1"
+    es9218: "Apodisering typ 1"
   </dest>
   <voice>
     *: none
-    es9218: " Apodisering typ 1"
+    es9218: "Apodisering typ 1"
   </voice>
 </phrase>
 <phrase>
@@ -12346,11 +12352,11 @@
   </source>
   <dest>
     *: none
-    es9218: " Apodisering typ 2"
+    es9218: "Apodisering typ 2"
   </dest>
   <voice>
     *: none
-    es9218: " Apodisering typ 2"
+    es9218: "Apodisering typ 2"
   </voice>
 </phrase>
 <phrase>
@@ -12398,13 +12404,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: " DAC-strömläge"
-    es9218: " DAC-utgångsnivå"
+    dac_power_mode: "DAC-strömläge"
+    es9218: "DAC-utgångsnivå"
   </dest>
   <voice>
     *: none
-    dac_power_mode: " DAC-strömläge"
-    es9218: " DAC-utgångsnivå"
+    dac_power_mode: "DAC-strömläge"
+    es9218: "DAC-utgångsnivå"
   </voice>
 </phrase>
 <phrase>
@@ -12438,13 +12444,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: " Spara batteri"
-    es9218: " Låg förstärkning (1 Vrms)"
+    dac_power_mode: "Spara batteri"
+    es9218: "Låg förstärkning (1 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: " Spara batteri"
-    es9218: " Låg förstärkning (1 Vrms)"
+    dac_power_mode: "Spara batteri"
+    es9218: "Låg förstärkning (1 Vrms)"
   </voice>
 </phrase>
 <phrase>
@@ -12497,10 +12503,10 @@
     *: "One per playlist"
   </source>
   <dest>
-    *: " En per spellista"
+    *: "En per spellista"
   </dest>
   <voice>
-    *: " En per spellista"
+    *: "En per spellista"
   </voice>
 </phrase>
 <phrase>
@@ -12511,10 +12517,10 @@
     *: "One per track"
   </source>
   <dest>
-    *: " En per låt"
+    *: "En per låt"
   </dest>
   <voice>
-    *: " En per låt"
+    *: "En per låt"
   </voice>
 </phrase>
 <phrase>
@@ -12528,7 +12534,7 @@
     *: ""
   </dest>
   <voice>
-    *: " Spår att flytta"
+    *: "Spår att flytta"
   </voice>
 </phrase>
 <phrase>
@@ -12556,7 +12562,7 @@
     *: ""
   </dest>
   <voice>
-    *: " Dåligt spår"
+    *: "Dåligt spår"
   </voice>
 </phrase>
 <phrase>
@@ -12570,7 +12576,7 @@
     *: ""
   </dest>
   <voice>
-    *: " Flytta spår"
+    *: "Flytta spår"
   </voice>
 </phrase>
 <phrase>
@@ -12623,10 +12629,10 @@
     *: "Track remaining:"
   </source>
   <dest>
-    *: " Återstående spår:"
+    *: "Återstående spår:"
   </dest>
   <voice>
-    *: " Återstående spår"
+    *: "Återstående spår"
   </voice>
 </phrase>
 <phrase>
@@ -12693,10 +12699,10 @@
     *: "Average bitrate:"
   </source>
   <dest>
-    *: " Genomsnittlig bithastighet:"
+    *: "Genomsnittlig bithastighet:"
   </dest>
   <voice>
-    *: " Genomsnittlig bithastighet"
+    *: "Genomsnittlig bithastighet"
   </voice>
 </phrase>
 <phrase>
@@ -12758,7 +12764,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: " Absolut läge"
+    pitchscreen: "Absolut läge"
   </voice>
 </phrase>
 <phrase>
@@ -12775,7 +12781,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: " Halvtonsläge"
+    pitchscreen: "Halvtonsläge"
   </voice>
 </phrase>
 <phrase>
@@ -12817,10 +12823,10 @@
     *: "No Rem. Control"
   </source>
   <dest>
-    *: " Ingen fjärrkontroll"
+    *: "Ingen fjärrkontroll"
   </dest>
   <voice>
-    *: " Ingen fjärrkontroll"
+    *: "Ingen fjärrkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -12831,10 +12837,10 @@
     *: "Out of Control"
   </source>
   <dest>
-    *: " Utom kontroll"
+    *: "Utom kontroll"
   </dest>
   <voice>
-    *: " Utom kontroll"
+    *: "Utom kontroll"
   </voice>
 </phrase>
 <phrase>
@@ -12845,10 +12851,10 @@
     *: "2 Key Control"
   </source>
   <dest>
-    *: " 2 Knappkontroll"
+    *: "2 Knappkontroll"
   </dest>
   <voice>
-    *: " 2 Knappkontroll"
+    *: "2 Knappkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -12887,10 +12893,10 @@
     *: "Number of Worms"
   </source>
   <dest>
-    *: " Antal maskar"
+    *: "Antal maskar"
   </dest>
   <voice>
-    *: " Antal maskar"
+    *: "Antal maskar"
   </voice>
 </phrase>
 <phrase>
@@ -12901,10 +12907,10 @@
     *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: " Masktillväxt per mat"
+    *: "Masktillväxt per mat"
   </dest>
   <voice>
-    *: " Masktillväxt per mat"
+    *: "Masktillväxt per mat"
   </voice>
 </phrase>
 <phrase>
@@ -12915,10 +12921,10 @@
     *: "Worm Speed"
   </source>
   <dest>
-    *: " Maskhastighet"
+    *: "Maskhastighet"
   </dest>
   <voice>
-    *: " Maskhastighet"
+    *: "Maskhastighet"
   </voice>
 </phrase>
 <phrase>
@@ -12943,10 +12949,10 @@
     *: "Argh Size"
   </source>
   <dest>
-    *: " Argh storlek"
+    *: "Argh storlek"
   </dest>
   <voice>
-    *: " Argh storlek"
+    *: "Argh storlek"
   </voice>
 </phrase>
 <phrase>
@@ -12957,10 +12963,10 @@
     *: "Food Size"
   </source>
   <dest>
-    *: " Matstorlek"
+    *: "Matstorlek"
   </dest>
   <voice>
-    *: " Matstorlek"
+    *: "Matstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -12971,10 +12977,10 @@
     *: "Number of Players"
   </source>
   <dest>
-    *: " Antal spelare"
+    *: "Antal spelare"
   </dest>
   <voice>
-    *: " Antal spelare"
+    *: "Antal spelare"
   </voice>
 </phrase>
 <phrase>
@@ -13293,10 +13299,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: " Nivå 3: 60 drag / 30 min"
+    *: "Nivå 3: 60 drag / 30 min"
   </dest>
   <voice>
-    *: " Nivå 3 60 drag 30 min"
+    *: "Nivå 3 60 drag 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13307,10 +13313,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: " Nivå 4: 40 drag / 30 min"
+    *: "Nivå 4: 40 drag / 30 min"
   </dest>
   <voice>
-    *: " Nivå 4 40 drag 30 min"
+    *: "Nivå 4 40 drag 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13391,10 +13397,10 @@
     *: "At the beginning of the game"
   </source>
   <dest>
-    *: " I början av spelet"
+    *: "I början av spelet"
   </dest>
   <voice>
-    *: " I början av spelet"
+    *: "I början av spelet"
   </voice>
 </phrase>
 <phrase>
@@ -13405,10 +13411,10 @@
     *: "At the end of the game"
   </source>
   <dest>
-    *: " I slutet av spelet"
+    *: "I slutet av spelet"
   </dest>
   <voice>
-    *: " I slutet av spelet"
+    *: "I slutet av spelet"
   </voice>
 </phrase>
 <phrase>
@@ -13436,7 +13442,7 @@
     *: ""
   </dest>
   <voice>
-    *: " GNU schack"
+    *: "GNU schack"
   </voice>
 </phrase>
 <phrase>
@@ -14957,10 +14963,10 @@
     *: "Clear all"
   </source>
   <dest>
-    *: " Rensa alla"
+    *: "Rensa alla"
   </dest>
   <voice>
-    *: " Rensa alla"
+    *: "Rensa alla"
   </voice>
 </phrase>
 <phrase>
@@ -15583,7 +15589,7 @@
     *: "Konstnär + Name"
   </dest>
   <voice>
-    *: " Konstnär Och Namn"
+    *: "Konstnär Och Namn"
   </voice>
 </phrase>
 <phrase>
@@ -16872,10 +16878,10 @@
     *: "View Album Art"
   </source>
   <dest>
-    *: " Visa albumomslag"
+    *: "Visa albumomslag"
   </dest>
   <voice>
-    *: " Visa albumomslag"
+    *: "Visa albumomslag"
   </voice>
 </phrase>
 <phrase>
@@ -16888,11 +16894,11 @@
   </source>
   <dest>
     *: none
-    erosqnative: " Utgångsval"
+    erosqnative: "Utgångsval"
   </dest>
   <voice>
     *: none
-    erosqnative: " Utgångsval"
+    erosqnative: "Utgångsval"
   </voice>
 </phrase>
 <phrase>
@@ -16965,10 +16971,10 @@
     *: "View log"
   </source>
   <dest>
-    *: " visa logg"
+    *: "Visa logg"
   </dest>
   <voice>
-    *: " visa logg"
+    *: "Visa logg"
   </voice>
 </phrase>
 <phrase>

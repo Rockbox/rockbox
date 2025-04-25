@@ -3361,59 +3361,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Тип на батерията"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Тип на батерията"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Алкална"
-    xduoox3: "Нов модел (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Алкална"
-    xduoox3: "Нов модел 2000 милиампер часа"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "NiMH "
-    xduoox3: "Стар модел (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Никел Метал Хидридна"
-    xduoox3: "Стар модел 1500 милиампер часа"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3546,8 +3540,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3557,7 +3551,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Запази"
-    gogearsa9200,samsungyh*: "PLAY = Запази"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Запази"
     iriverh100,iriverh120,iriverh300: "NAVI = Запази"
     mpiohd300: "ENTER = Запази"
     mrobe500: "HEART = Запази"
@@ -3575,8 +3569,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3590,7 +3584,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = отказ"
-    gigabeats,sansafuzeplus: "BACK = отказ"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = отказ"
     gogearsa9200: "LEFT = отказ"
     iaudiom5,iaudiox5: "RECORD = отказ"
     ipod*,mpiohd300,sansac200*: "MENU = отказ"
@@ -5795,16 +5789,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Каталог с плейлисти"
+    *: ""
   </dest>
   <voice>
-    *: "Каталог с плейлисти"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8740,20 +8734,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Усилване"
-  </dest>
-  <voice>
-    *: "Усилване"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user: core
@@ -10754,23 +10734,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Линеен изход"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Линеен изход"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
   user: core
@@ -11613,20 +11576,6 @@
   </dest>
   <voice>
     *: "Време за нападение"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12543,16 +12492,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist remaining:"
+    *: ""
   </source>
   <dest>
-    *: "Оставащо време в плейлистата:"
+    *: ""
   </dest>
   <voice>
-    *: "Оставащо време в плейлистата"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13293,48 +13242,6 @@
   </dest>
   <voice>
     *: "Ниво 7, 40 хода за 240 минути"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Ниво 8: 1 ход / 15 мин"
-  </dest>
-  <voice>
-    *: "Ниво 8, 1 ход за 15 минути"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Ниво 9: 1 ход / 60 мин"
-  </dest>
-  <voice>
-    *: "Ниво 9, 1 ход за 60 минути"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Ниво 10: 1 ход / 600 мин"
-  </dest>
-  <voice>
-    *: "Ниво 10, 1 ход за 600 минути"
   </voice>
 </phrase>
 <phrase>
@@ -14730,16 +14637,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Кешът ще се прегенерира при следващия рестарт"
+    *: ""
   </dest>
   <voice>
-    *: "Кешът ще се прегенерира при следващия рестарт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16242,62 +16149,6 @@
   </dest>
   <voice>
     *: "Експертно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STEREOSW_MODE
-  desc: Stereo Switch Mode
-  user: core
-  <source>
-    *: "Stereo Switch Mode"
-  </source>
-  <dest>
-    *: "Разменяне на стерео"
-  </dest>
-  <voice>
-    *: "Разменяне на стерео"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REVERSE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Reverse"
-  </source>
-  <dest>
-    *: "Обърнато"
-  </dest>
-  <voice>
-    *: "Обърнато"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ZERO
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 0"
-  </source>
-  <dest>
-    *: "Винаги 0"
-  </dest>
-  <voice>
-    *: "Винаги 0"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALWAYS_ONE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Always 1"
-  </source>
-  <dest>
-    *: "Винаги 1"
-  </dest>
-  <voice>
-    *: "Винаги 1"
   </voice>
 </phrase>
 <phrase>

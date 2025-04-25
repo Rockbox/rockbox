@@ -3351,59 +3351,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Typ baterii"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Typ baterii"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Alkaliczna"
-    xduoox3: "Nowsza (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaliczna"
-    xduoox3: "Nowsza 2000 miliamperogodzin"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "~NiMH"
-    xduoox3: "Starsza (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Niklowo metalowo wodorkowa"
-    xduoox3: "Starsza 1500 miliamperogodzin"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3536,8 +3530,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3547,7 +3541,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Ustaw"
-    gogearsa9200,samsungyh*: "PLAY = Ustaw"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Ustaw"
     iriverh100,iriverh120,iriverh300: "NAVI = Ustaw"
     mpiohd300: "ENTER = Ustaw"
     mrobe500: "HEART = Ustaw"
@@ -3565,8 +3559,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3580,7 +3574,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Przywróć"
-    gigabeats,sansafuzeplus: "BACK = Przywróć"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Przywróć"
     gogearsa9200: "LEFT = Przywróć"
     iaudiom5,iaudiox5: "RECORD = Przywróć"
     ipod*,mpiohd300,sansac200*: "MENU = Przywróć"
@@ -5785,16 +5779,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Katalog list odtwarzania"
+    *: ""
   </dest>
   <voice>
-    *: "Katalog list odtwarzania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12588,20 +12582,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Poziom 8: 1 ruch / 15 min"
-  </dest>
-  <voice>
-    *: "Poziom 8 1 ruch na 15 minut"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_PLAYER
   desc: spoken only, for announcing player's id
   user: core
@@ -13759,20 +13739,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Poziom 10: 1 ruch / 600 min"
-  </dest>
-  <voice>
-    *: "Poziom 10 1 ruch na 600 minut"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPACING
   desc: in the pictureflow settings menu
   user: core
@@ -14267,20 +14233,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Poziom 9: 1 ruch / 60 min"
-  </dest>
-  <voice>
-    *: "Poziom 9 1 ruch na 60 minut"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SLIDESHOW_MODE
   desc: in the imageviewer settings menu
   user: core
@@ -14366,16 +14318,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Pamięć podręczna zostanie odbudowana po restarcie"
+    *: ""
   </dest>
   <voice>
-    *: "Pamięć podręczna zostanie odbudowana po restarcie"
+    *: ""
   </voice>
 </phrase>
 <phrase>

@@ -3345,59 +3345,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Tipo batteria"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Tipo batteria"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Alcalina"
-    xduoox3: "Nuovo tipo (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Alcalina"
-    xduoox3: "Nuovo tipo 2000 milliamp ora"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Nickel metal idrato"
-    xduoox3: "Vecchio tipo (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal idrato"
-    xduoox3: "Vecchio tipo 1500 milliamp ora"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3530,8 +3524,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3541,7 +3535,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Imposta"
-    gogearsa9200,samsungyh*: "PLAY = Imposta"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Imposta"
     iriverh100,iriverh120,iriverh300: "NAVI = Imposta"
     mpiohd300: "ENTER = Imposta"
     mrobe500: "HEART = Imposta"
@@ -3559,8 +3553,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3574,7 +3568,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Annulla"
-    gigabeats,sansafuzeplus: "BACK = Annulla"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Annulla"
     gogearsa9200: "LEFT = Annulla"
     iaudiom5,iaudiox5: "RECORD = Annulla"
     ipod*,mpiohd300,sansac200*: "MENU = Annulla"
@@ -5779,16 +5773,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Catalogo Playlist"
+    *: ""
   </dest>
   <voice>
-    *: "Catalogo playlist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12408,34 +12402,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Livello 9: 1 mossa / 60 min"
-  </dest>
-  <voice>
-    *: "Livello 9, 1 mossa ogni 60 minuti"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Livello 8: 1 mossa / 15 min"
-  </dest>
-  <voice>
-    *: "Livello 8, 1 mossa ogni 15 minuti"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_UNAVAILABLE
   desc: in mpegplayer settings
   user: core
@@ -12923,16 +12889,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "La cache sarà ricostruita al prossimo riavvio"
+    *: ""
   </dest>
   <voice>
-    *: "La cache sarà ricostruita al prossimo riavvio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13214,20 +13180,6 @@
   </dest>
   <voice>
     *: "Visualizza Partite Giocate"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Livello 10: 1 mossa / 600 min"
-  </dest>
-  <voice>
-    *: "Livello 10, 1 mossa ogni 600 minuti"
   </voice>
 </phrase>
 <phrase>

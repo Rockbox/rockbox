@@ -3365,59 +3365,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "電源の種類"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "電源の種類"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "アルカリ"
-    xduoox3: "新しい方（2000 mAh）"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "アルカリ"
-    xduoox3: "新しい二千ミリアンペア・アワー"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "ニッケル水素"
-    xduoox3: "旧型（1500 mAh）"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "ニッケル水素"
-    xduoox3: "年長 千五百ミリアンペア時"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3550,8 +3544,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3561,7 +3555,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = 設定"
-    gogearsa9200,samsungyh*: "PLAY = 設定"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     mpiohd300: "ENTER = 設定"
     mrobe500: "HEART = 設定"
@@ -3579,8 +3573,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3594,7 +3588,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = 元に戻す"
-    gigabeats,sansafuzeplus: "BACK = 元に戻す"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
     iaudiom5,iaudiox5: "RECORD = 元に戻す"
     ipod*,mpiohd300,sansac200*: "MENU = 元に戻す"
@@ -5799,16 +5793,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "プレイリスト カタログ"
+    *: ""
   </dest>
   <voice>
-    *: "プレイリスト カタログ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13339,48 +13333,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Level 8: 1 move / 15 min"
-  </dest>
-  <voice>
-    *: "Level 8, 1 move per 15 minutes"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "レベル9、60分につき1手"
-  </dest>
-  <voice>
-    *: "レベル9、60分につき1手"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "レベル10、600分に1手"
-  </dest>
-  <voice>
-    *: "レベル10、600分に1手"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_PGN_PARSE_ERROR
   desc: in the chessbox game viewer
   user: core
@@ -14773,16 +14725,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "キャッシュは次回再起動時に再構築される"
+    *: ""
   </dest>
   <voice>
-    *: "キャッシュは次回再起動時に再構築される"
+    *: ""
   </voice>
 </phrase>
 <phrase>

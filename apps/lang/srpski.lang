@@ -1490,7 +1490,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "Риплејгејн"
   </dest>
   <voice>
     *: "Риплејгејн"
@@ -3427,59 +3427,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Тип батерије"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Тип батерије"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Алкална"
-    xduoox3: "Новија (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Алкална"
-    xduoox3: "Новија двехиљаде милиампер часова"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Старија (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Никл метал хидридна"
-    xduoox3: "Старија хиљадупетсто милиампер часова"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3612,8 +3606,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3623,7 +3617,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Постави"
-    gogearsa9200,samsungyh*: "PLAY = Постави"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Постави"
     iriverh100,iriverh120,iriverh300: "NAVI = Постави"
     mpiohd300: "ENTER = Постави"
     mrobe500: "HEART = Постави"
@@ -3641,8 +3635,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3656,7 +3650,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Врати на старо"
-    gigabeats,sansafuzeplus: "BACK = Врати на старо"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Врати на старо"
     gogearsa9200: "LEFT = Врати на старо"
     iaudiom5,iaudiox5: "RECORD = Врати на старо"
     ipod*,mpiohd300,sansac200*: "MENU = Врати на старо"
@@ -4978,7 +4972,7 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "Емпег лејер три"
   </dest>
   <voice>
     *: none
@@ -5861,16 +5855,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Каталог плејлисти"
+    *: ""
   </dest>
   <voice>
-    *: "Каталог плејлисти"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11261,7 +11255,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Del"
+    touchscreen: "Дел"
   </dest>
   <voice>
     *: none
@@ -13359,48 +13353,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Ниво 8: 1 потез / 15 минута"
-  </dest>
-  <voice>
-    *: "Ниво осам један потез за петнаест минута"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Ниво 9: 1 потез / 60 мин"
-  </dest>
-  <voice>
-    *: "Ниво девет један потез за шездесет минута"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Ниво 10: 1 потез / 600 мин"
-  </dest>
-  <voice>
-    *: "Ниво десет један потез за шесто минута"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_PGN_PARSE_ERROR
   desc: in the chessbox game viewer
   user: core
@@ -14793,16 +14745,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Кеш ће да се изгради при наредном поновном покретању"
+    *: ""
   </dest>
   <voice>
-    *: "Кеш ће да се изгради при наредном поновном покретању"
+    *: ""
   </voice>
 </phrase>
 <phrase>

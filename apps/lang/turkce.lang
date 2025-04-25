@@ -1707,8 +1707,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -1718,7 +1718,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SEÇ Tuşu = Ayarla"
-    gogearsa9200,samsungyh*: "PLAY Tuşu = Ayarla"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY Tuşu = Ayarla"
     iriverh100,iriverh120,iriverh300: "NAVI Tuşu = Ayarla"
     mpiohd300: "Tamam Tuşu = Ayarla"
     mrobe500: "Kalp Tuşu = Ayarla"
@@ -1736,8 +1736,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -1751,7 +1751,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Geri Döndür"
-    gigabeats: "LEFT =  Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "LEFT =  Revert"
     gogearsa9200: "LEFT = Geri Döndür"
     iaudiom5,iaudiox5: "RECORD = Geri Döndür"
     ipod*,mpiohd300,sansac200*: "MENU = Geri Döndür"
@@ -1760,7 +1760,6 @@
     mrobe100: "DISPLAY = Geri Döndür"
     rtc: "OFF = Geri Döndür"
     samsungyh*: "REW = Geri Döndür"
-    sansafuzeplus: "BACK = Geri Döndür"
     vibe500: "C = Geri Döndür"
   </dest>
   <voice>
@@ -3460,19 +3459,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Pil Türü"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Pil Türü"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -7550,16 +7549,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Oynatma Listesi Kataloğu"
+    *: ""
   </dest>
   <voice>
-    *: "Oynatma Listesi Kataloğu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9137,22 +9136,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "NiMH Nikel metal Hidrit"
-    xduoox3: "Daha eski (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Nikel metal Hidrit"
-    xduoox3: "Daha eski 1500 miliamper saat"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -11901,22 +11897,19 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "Alkalin"
-    xduoox3: "Daha yeni (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Alkalin"
-    xduoox3: "Daha yeni 2000 mAh den"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -13249,48 +13242,6 @@
   </dest>
   <voice>
     *: "7. Seviye 240 dakikada 40 hamle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Seviye 8: 1 hamle / 15 dk."
-  </dest>
-  <voice>
-    *: "Seviye 8 15 dakikada 1 hamle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Seviye 9: 1 hamle / 60 dk."
-  </dest>
-  <voice>
-    *: "Seviye 9 60 dakikada 1 hamle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Seviye 10: 1 hamle / 600 dk."
-  </dest>
-  <voice>
-    *: "Seviye 10, 600 dakikada 1 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -14686,16 +14637,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Önbellek bir sonraki yeniden başlatmada yeniden oluşturulacak"
+    *: ""
   </dest>
   <voice>
-    *: "Önbellek bir sonraki yeniden başlatmada yeniden oluşturulacak"
+    *: ""
   </voice>
 </phrase>
 <phrase>

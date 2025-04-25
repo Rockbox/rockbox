@@ -1878,10 +1878,12 @@
     battery_types: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -1893,10 +1895,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -1908,10 +1912,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -2441,8 +2447,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -2455,8 +2461,8 @@
   </source>
   <dest>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "ATRÁS = Cancelar"
     gigabeatfx,mrobe500: "POWER = Cancelar"
-    gigabeats: "ATRÁS = Cancelar"
     gogearsa9200: "IZQUIERDA = Cancelar"
     iaudiom5,iaudiox5: "RECORD = Cancelar"
     ipod*,mpiohd300,sansac200*: "MENÚ = Cancelar"
@@ -2465,7 +2471,6 @@
     mrobe100: "DISPLAY = Cancelar"
     rtc: "OFF = Cancelar"
     samsungyh*: "REW = Cancelar"
-    sansafuzeplus: "BACK = Cancelar"
     vibe500: "C = Cancelar"
   </dest>
   <voice>
@@ -7956,8 +7961,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -7966,8 +7971,8 @@
   </source>
   <dest>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Fijar"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Fijar"
-    gogearsa9200,samsungyh*: "PLAY = Fijar"
     iriverh100,iriverh120,iriverh300: "NAVI = Fijar"
     mpiohd300: "ENTER = Fijar"
     mrobe500: "HEART = Fijar"

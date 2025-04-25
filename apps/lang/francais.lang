@@ -3437,10 +3437,12 @@
     battery_types: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -3452,10 +3454,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3467,10 +3471,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3603,8 +3609,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3614,7 +3620,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Valider"
-    gogearsa9200,samsungyh*: "PLAY = Valider"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Valider"
     iriverh100,iriverh120,iriverh300: "NAVI = Valider"
     mpiohd300: "ENTER = Valider"
     mrobe500: "HEART = Valider"
@@ -3632,8 +3638,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3647,7 +3653,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Annuler"
-    gigabeats,sansafuzeplus: "BACK = Annuler"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Annuler"
     gogearsa9200: "LEFT = Annuler"
     iaudiom5,iaudiox5: "RECORD = Annuler"
     ipod*,mpiohd300,sansac200*: "MENU = Annuler"

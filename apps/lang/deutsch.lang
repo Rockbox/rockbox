@@ -3347,59 +3347,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "Batterietyp"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Batterietyp"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "~Alkaline"
-    xduoox3: "Neuer (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "~Alkaline"
-    xduoox3: "Nuwer 2000 milliamp hour"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "~NiMH"
-    xduoox3: "Älter (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel-Metallhydrid"
-    xduoox3: "Älter 1500 Milliamperestunden"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3532,8 +3526,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3543,7 +3537,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Speichern"
-    gogearsa9200,samsungyh*: "PLAY = Speichern"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Speichern"
     iriverh100,iriverh120,iriverh300: "NAVI = Speichern"
     mpiohd300: "ENTER = Speichern"
     mrobe500: "HEART = Speichern"
@@ -3561,8 +3555,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3576,7 +3570,7 @@
   <dest>
     *: none
     gigabeatfx,mrobe500: "POWER = Abbrechen"
-    gigabeats,sansafuzeplus: "BACK = Abbrechen"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Abbrechen"
     gogearsa9200: "LEFT = Abbrechen"
     iaudiom5,iaudiox5: "RECORD = Abbrechen"
     ipod*,mpiohd300,sansac200*: "MENU = Abbrechen"
@@ -5781,16 +5775,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Wiedergabelisten-Katalog"
+    *: ""
   </dest>
   <voice>
-    *: "Wiedergabelisten-Katalog"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13014,20 +13008,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Level 9: 1 Züge / 60 min"
-  </dest>
-  <voice>
-    *: "Level 9, 1 Züge pro 60 Minuten"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHANGE_VOLUME
   desc: in playback control menu
   user: core
@@ -13683,16 +13663,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "Zwischenspeicher wird bei Neustart neu erstellt"
+    *: ""
   </dest>
   <voice>
-    *: "Zwischenspeicher wird bei Neustart neu erstellt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14280,20 +14260,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Level 10: 1 Zug / 600 min"
-  </dest>
-  <voice>
-    *: "Level 10, 1 Zug pro 600 Minuten"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_MENU_NEW_GAME
   desc: in the chessbox menu
   user: core
@@ -14347,20 +14313,6 @@
   </dest>
   <voice>
     *: "Wormlet spielen!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Level 8: 1 Zug / 15 min"
-  </dest>
-  <voice>
-    *: "Level 8, 1 Zug pro 15 Minuten"
   </voice>
 </phrase>
 <phrase>

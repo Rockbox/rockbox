@@ -3125,59 +3125,53 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
     *: none
-    battery_types: "电池类型"
+    battery_types: ""
   </dest>
   <voice>
     *: none
-    battery_types: "电池类型"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "碱性"
-    xduoox3: "新电池 (2000 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "碱性"
-    xduoox3: "新电池"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: "锂镁氢"
-    xduoox3: "旧电池 (1500 mAh)"
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: "锂镁氢"
-    xduoox3: "旧电池"
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3930,8 +3924,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3945,7 +3939,7 @@
   <dest>
     *: none
     gigabeatfx: "POWER:取消"
-    gigabeats,sansafuzeplus: "BACK:取消"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK:取消"
     gogearsa9200: "LEFT:取消"
     iaudiom5,iaudiox5: "RECORD:取消"
     ipod*,mpiohd300,sansac200*: "MENU:取消"
@@ -7453,8 +7447,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -7464,7 +7458,7 @@
   <dest>
     *: none
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:设置"
-    gogearsa9200,samsungyh*: "PLAY:设置"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY:设置"
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
     mpiohd300: "ENTER:设置"
     mrobe500: "HEART:设置"
@@ -7988,16 +7982,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "播放列表目录"
+    *: ""
   </dest>
   <voice>
-    *: "播放列表目录"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13255,48 +13249,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Level 8: 1 步 / 15 分钟"
-  </dest>
-  <voice>
-    *: "Level 8, 1 步 每15 分钟"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Level 9: 1 步 / 60 分钟"
-  </dest>
-  <voice>
-    *: "Level 9, 1 步 每60 分钟"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Level 10: 1 步 / 600 分钟"
-  </dest>
-  <voice>
-    *: "Level 10, 1 步 每 600 分钟"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_PGN_PARSE_ERROR
   desc: in the chessbox game viewer
   user: core
@@ -14689,16 +14641,16 @@
 </phrase>
 <phrase>
   id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
+  desc: deprecated
   user: core
   <source>
-    *: "Cache will be rebuilt on next restart"
+    *: ""
   </source>
   <dest>
-    *: "下次启动时重建缓存"
+    *: ""
   </dest>
   <voice>
-    *: "下次启动时重建缓存"
+    *: ""
   </voice>
 </phrase>
 <phrase>
