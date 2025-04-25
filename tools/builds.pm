@@ -872,7 +872,7 @@ sub simbuilds {
     'svenska' => {
 	'lang' => 'svenska',
 	'name' => 'Svenska (Swedish)',
-        'short' => 'sr',
+        'short' => 'sv',
         'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vsv',
