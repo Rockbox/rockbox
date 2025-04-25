@@ -110,6 +110,9 @@
 #ifndef BOOTLOADER
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
+#else /* BOOTLOADER */
+#define DISABLE_ALPHA_BITMAP
+#define DISABLE_BACKTRACE
 #endif
 #define HAVE_LCD_SLEEP
 
