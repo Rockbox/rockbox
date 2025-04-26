@@ -429,7 +429,7 @@ void run_file(const char *name)
     pid_t pid = fork();
     if(pid == 0)
     {
-        execlp("sh", "sh", buf, NULL);
+        execlp("/bin/sh", "sh", buf, NULL);
         _exit(42);
     }
     int status;
