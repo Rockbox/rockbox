@@ -396,6 +396,13 @@ int disk_mount(int drive)
         mounted = 1;
         init_volume(&volumes[volume], drive, 0);
         volume_onmount_internal(IF_MV(volume));
+
+        struct storage_info info;
+        storage_get_info(drive, &info);
+
+        pinfo[0].type = PARTITION_TYPE_FAT32_LBA;
+        pinfo[0].start = 0;
+        pinfo[0].size = info.num_sectors;
     }
 
     if (mounted == 0 && volume != -1) /* not a "superfloppy"? */
