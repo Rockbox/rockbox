@@ -833,6 +833,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'romaneste' => {
+	'lang' => 'romaneste',
+	'name' => 'Română (Romanian)',
+        'short' => 'ro',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vro',
+	    'gtts' => '-l ro',
+            'piper' => 'ro_RO-mihai-medium.onnx',
+	},
+        'enabled' => 0,
+    },
     'russian' => {
 	'lang' => 'russian',
 	'name' => 'Русский (Russian)',
