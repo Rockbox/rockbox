@@ -843,7 +843,7 @@ sub simbuilds {
 	    'gtts' => '-l ro',
             'piper' => 'ro_RO-mihai-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'russian' => {
 	'lang' => 'russian',
