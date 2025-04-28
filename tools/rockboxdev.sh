@@ -536,24 +536,18 @@ build() {
 }
 
 # build a cross compiler toolchain for linux
-# $1=target
-# $2=binutils version
-# $3=binutils configure extra options
-# $4=gcc version
-# $5=gcc configure extra options
-# $6=linux version
-# $7=glibc version
-# $8=glibc configure extra options
 build_linux_toolchain () {
     target="$1"
     binutils_ver="$2"
     binutils_opts="$3"
-    gcc_ver="$4"
-    gcc_opts="$5"
-    linux_ver="$6"
-    glibc_ver="$7"
-    glibc_opts="$8"
-    glibc_patches="$9"
+    binutils_patches="$4"
+    gcc_ver="$5"
+    gcc_opts="$6"
+    linux_ver="$7"
+    linux_patches="$8"
+    glibc_ver="$9"
+    glibc_opts="${10}"
+    glibc_patches="${11}"
 
     # where to put the sysroot
     sysroot="$prefix/$target/sysroot"
@@ -596,11 +590,30 @@ build_linux_toolchain () {
     extract "linux-$linux_ver"
     extract "glibc-$glibc_ver"
 
-    # do we have a patch?
+    # do we have any patches?
+    for p in $binutils_patches; do
+        echo "ROCKBOXDEV: applying patch $p"
+	(cd $builddir/binutils-$binutils_ver ; patch -p1 < "$patch_dir/$p")
+
+	# check if the patch applied cleanly
+        if [ $? -gt 0 ]; then
+            echo "ROCKBOXDEV: failed to apply patch $p"
+            exit
+        fi
+    done
     for p in $glibc_patches; do
         echo "ROCKBOXDEV: applying patch $p"
 	(cd $builddir/glibc-$glibc_ver ; patch -p1 < "$patch_dir/$p")
 
+	# check if the patch applied cleanly
+        if [ $? -gt 0 ]; then
+            echo "ROCKBOXDEV: failed to apply patch $p"
+            exit
+        fi
+    done
+    for p in $linux_patches; do
+        echo "ROCKBOXDEV: applying patch $p"
+	(cd $builddir/linux-$linux_ver ; patch -p1 < "$patch_dir/$p")
 	# check if the patch applied cleanly
         if [ $? -gt 0 ]; then
             echo "ROCKBOXDEV: failed to apply patch $p"
@@ -613,7 +626,7 @@ build_linux_toolchain () {
     # to restart (binutils, gcc)
 
     # install binutils, with support for sysroot
-    buildtool "binutils" "$binutils_ver" "--target=$target --disable-werror \
+    buildtool "binutils" "$binutils_ver" "$binutils_opts --target=$target --disable-werror \
         --with-sysroot=$sysroot --disable-nls" "" ""
     # build stage 1 compiler: disable headers, disable threading so that
     # pthread headers are not included, pretend we use newlib so that libgcc
@@ -784,7 +797,7 @@ do
     echo ""
     case $arch in
         [Ii])
-            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror" "gmp isl"
+            build "binutils" "mipsel-elf" "2.26.1" "binutils-c23.patch" "--disable-werror" "gmp isl"
             build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc isl"
             ;;
 
@@ -823,7 +836,7 @@ do
             # Sony NWZ:
             #   gcc: 4.9.4 is the latest 4.9.x stable branch, also the only one that
             #        compiles with GCC >6
-            #   kernel: 2.6.32.68 is the latest 2.6.x stable kernel, the device
+            #   kernel: 2.6.32.71 is the latest 2.6.x stable kernel, the device
             #           runs kernel 2.6.23 or 2.6.35 or 3.x for the most recent
             #   glibc: 2.19 is the latest version that supports kernel 2.6.23 which
             #          is used on many Sony players, but we need to support ABI 2.7
@@ -834,8 +847,8 @@ do
             # We use a recent 2.26.1 binutils to avoid any build problems and
             # avoid patches/bugs.
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
-            build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "4.9.4" \
-                "$gccopts" "2.6.32.68" "2.19" "$glibcopts" "glibc-220-make44.patch"
+            build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "" "4.9.4" \
+                "$gccopts" "2.6.32.71" "" "2.19" "$glibcopts" "glibc-220-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
@@ -863,15 +876,15 @@ do
             #   glibc: 2.16
             #   alsa: 1.0.26
             #
-            # To maximize compatibility, we use kernel 3.2.85 which is the lastest
+            # To maximize compatibility, we use kernel 3.2.89 which is the latest
             # longterm 3.2 kernel and is supported by the latest glibc, and we
             # require support for up to glibc 2.16
             # We use a recent 2.26.1 binutils to avoid any build problems and
             # avoid patches/bugs.
             glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16"
             # FIXME: maybe add -mhard-float
-            build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
-                "$gccopts" "3.2.85" "2.25" "$glibcopts" "glibc-225-make44.patch"
+            build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "binutils-c23.patch" "4.9.4" \
+                "$gccopts" "3.2.89" "linux-c23.patch" "2.25" "$glibcopts" "glibc-225-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
