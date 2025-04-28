@@ -14,7 +14,7 @@
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
 #
-# Romanian language file, translated by:
+# Romanian (ro_RO) language file, translated by:
 # - Unknown (FS#1419)
 # - Tiberiu Gabriel Ana
 # - George Tamplaru
@@ -946,10 +946,10 @@
     *: "Numeric"
   </source>
   <dest>
-    *: "Numeric"
+    *: "~Numeric"
   </dest>
   <voice>
-    *: "Numeric"
+    *: "~Numeric"
   </voice>
 </phrase>
 <phrase>
@@ -1293,7 +1293,7 @@
     ipodmini1g,ipodmini2g,iriverh10: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Baterie: %d%% %dh %dm"
+    *: "Nivel baterie"
   </voice>
 </phrase>
 <phrase>
@@ -1926,10 +1926,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Buffer directoare plin!"
+    *: "Buffer dosare plin!"
   </dest>
   <voice>
-    *: "Buffer directoare plin!"
+    *: "Bafăr dosare plin!"
   </voice>
 </phrase>
 <phrase>
@@ -1984,11 +1984,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "Undă PCM"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "Undă pe ce me"
   </voice>
 </phrase>
 <phrase>
@@ -2092,7 +2092,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "unități per tic"
   </voice>
 </phrase>
 <phrase>
@@ -2325,10 +2325,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Eroare accesare director"
+    *: "Eroare accesare dosar"
   </dest>
   <voice>
-    *: "Eroare accesare director"
+    *: "Eroare accesare dosar"
   </voice>
 </phrase>
 <phrase>
@@ -2389,10 +2389,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Schimbare automată director"
+    *: "Schimbă automat dosarul"
   </dest>
   <voice>
-    *: "Schimbare automată director"
+    *: "Schimbă automat dosarul"
   </voice>
 </phrase>
 <phrase>
@@ -2462,7 +2462,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Spațiu"
   </voice>
 </phrase>
 <phrase>
@@ -3045,7 +3045,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Încarcă in timpul conexiunii U S B"
+    usb_charging_enable: "Încarcă in timpul conexiunii u se be"
   </voice>
 </phrase>
 <phrase>
@@ -3123,11 +3123,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Dezactivare reluare la pornire, dacă caștile lipsesc"
+    headphone_detection: "Dezactivează reluare la pornire dacă căștile lipsesc"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Dezactivare reluare la pornire, dacă caștile lipsesc"
+    headphone_detection: "Dezactivează reluare la pornire, dacă căștile lipsesc"
   </voice>
 </phrase>
 <phrase>
@@ -3957,11 +3957,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauză și reluare"
+    headphone_detection: "Pauză și apoi reluare"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauză și reluare"
+    headphone_detection: "Pauză și apoi reluare"
   </voice>
 </phrase>
 <phrase>
@@ -3988,11 +3988,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nu se poate scrie în directorul de înregistrare"
+    recording: "Nu se poate scrie în dosarul de înregistrări"
   </dest>
   <voice>
     *: none
-    recording: "Nu se poate scrie în directorul de înregistrare"
+    recording: "Nu se poate scrie în dosarul de înregistrări"
   </voice>
 </phrase>
 <phrase>
@@ -4501,7 +4501,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "o"
   </voice>
 </phrase>
 <phrase>
@@ -4733,9 +4733,9 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    *: "~Int:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Internă"
@@ -4767,11 +4767,11 @@
   </source>
   <dest>
     *: none
-    recording: "Anulare director de înregistrare"
+    recording: "Golește dosarul de înregistrări"
   </dest>
   <voice>
     *: none
-    recording: "Anulare director de înregistrare"
+    recording: "Golește dosarul de înregistrări"
   </voice>
 </phrase>
 <phrase>
@@ -5256,11 +5256,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Re-activare)"
+    remote: "(Vol- : Reactivează)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-activare)"
+    remote: "(Volum minus pentru reactivare)"
   </voice>
 </phrase>
 <phrase>
@@ -5396,7 +5396,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "oh"
   </voice>
 </phrase>
 <phrase>
@@ -5515,10 +5515,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "Reluare redare"
+    *: "Reia redarea"
   </dest>
   <voice>
-    *: "Reluare redare"
+    *: "Reia redarea"
   </voice>
 </phrase>
 <phrase>
@@ -5678,7 +5678,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: ","
   </dest>
   <voice>
     *: "virgulă"
@@ -5866,10 +5866,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Melodii %d inserate (%s)"
+    *: "S-au inserat %d piste (%s)"
   </dest>
   <voice>
-    *: "Melodii %d inserate (%s)"
+    *: "piste inserate"
   </voice>
 </phrase>
 <phrase>
@@ -5967,10 +5967,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Inserare directoare recursiv"
+    *: "Inserează dosare recursiv"
   </dest>
   <voice>
-    *: "Inserare directoare recursiv"
+    *: "Inserează dosare recursiv"
   </voice>
 </phrase>
 <phrase>
@@ -6225,10 +6225,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Piste %d introduse (%s)"
+    *: "S-au pus în coadă %d piste (%s)"
   </dest>
   <voice>
-    *: "Piste %d introduse (%s)"
+    *: "piste puse în coadă"
   </voice>
 </phrase>
 <phrase>
@@ -6270,10 +6270,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fișierul/directorul există. Suprascrieți?"
+    *: "Fișierul/dosarul există. Suprascrii?"
   </dest>
   <voice>
-    *: "Fișierul/directorul există. Suprascrieți?"
+    *: "Fișierul/dosarul există. Suprascrii?"
   </voice>
 </phrase>
 <phrase>
@@ -6768,7 +6768,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -6844,10 +6844,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "Melodii %d salvate (%s)"
+    *: "S-au salvat %d piste (%s)"
   </dest>
   <voice>
-    *: "Melodii %d salvate (%s)"
+    *: "piste salvate"
   </voice>
 </phrase>
 <phrase>
@@ -6860,11 +6860,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Cache directoare "
+    dircache: "Cache dosare"
   </dest>
   <voice>
     *: none
-    dircache: "Cache directoare "
+    dircache: "Keș dosare"
   </voice>
 </phrase>
 <phrase>
@@ -6878,7 +6878,7 @@
     *: "Se caută... %d găsite (%s)"
   </dest>
   <voice>
-    *: "Se caută... %d găsite (%s)"
+    *: "Găsite"
   </voice>
 </phrase>
 <phrase>
@@ -7082,17 +7082,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1:"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
     hibylinux: "u se be"
     multivolume: "haș de unu"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro es de"
-    xduoox3: "~micro es de doi"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro es de"
+    xduoox3: "micro es de doi"
   </voice>
 </phrase>
 <phrase>
@@ -8228,7 +8228,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "ecran de redare la distanță"
   </voice>
 </phrase>
 <phrase>
@@ -8374,10 +8374,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "Câștig pistă"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Câștig pistă"
   </voice>
 </phrase>
 <phrase>
@@ -9298,7 +9298,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "sleș"
   </voice>
 </phrase>
 <phrase>
@@ -9374,10 +9374,10 @@
     *: "Keyclick"
   </source>
   <dest>
-    *: "Clic buton"
+    *: "Sunet apăsare buton"
   </dest>
   <voice>
-    *: "Clic buton"
+    *: "Sunet apăsare buton"
   </voice>
 </phrase>
 <phrase>
@@ -9390,7 +9390,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -9574,10 +9574,10 @@
     *: "Keyclick Repeats"
   </source>
   <dest>
-    *: "Repetare clic buton"
+    *: "Repetare sunet apăsare buton"
   </dest>
   <voice>
-    *: "Repetare clic buton"
+    *: "Repetare sunet apăsare buton"
   </voice>
 </phrase>
 <phrase>
@@ -9831,10 +9831,10 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "Rezultate Cautăre"
+    *: "Rezultate cautăre"
   </dest>
   <voice>
-    *: "Rezultate Cautăre"
+    *: "Rezultate cautăre"
   </voice>
 </phrase>
 <phrase>
@@ -10279,11 +10279,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Prezentare"
+    usb_hid: "Control prezentare"
   </dest>
   <voice>
     *: none
-    usb_hid: "Prezentare"
+    usb_hid: "Control prezentare"
   </voice>
 </phrase>
 <phrase>
@@ -10418,10 +10418,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Următoarea:"
+    *: "Urm.:"
   </dest>
   <voice>
-    *: "Următoarea:"
+    *: "Următoarea"
   </voice>
 </phrase>
 <phrase>
@@ -10432,10 +10432,10 @@
     *: "Ratio"
   </source>
   <dest>
-    *: "Rată"
+    *: "Raport"
   </dest>
   <voice>
-    *: "Rată"
+    *: "Raport"
   </voice>
 </phrase>
 <phrase>
@@ -10735,11 +10735,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Regimul USB"
+    usb_hid: "Mod HID USB"
   </dest>
   <voice>
     *: none
-    usb_hid: "Regimul USB"
+    usb_hid: "Mod hid u se be"
   </voice>
 </phrase>
 <phrase>
@@ -10780,11 +10780,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Navigator"
+    usb_hid: "Control navigator web"
   </dest>
   <voice>
     *: none
-    usb_hid: "Navigator"
+    usb_hid: "Control navigator ueb"
   </voice>
 </phrase>
 <phrase>
@@ -10797,11 +10797,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Utilizare ca dispozitiv de interacțiune cu PC-ul (USB HID)"
+    usb_hid: "Utilizează ca HID USB"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Human Interface Device"
+    usb_hid: "Utilizează ca hid u se be"
   </voice>
 </phrase>
 <phrase>
@@ -10818,7 +10818,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "remote radio screen skin"
+    radio_remote: "temă ecran radio la distanță"
   </voice>
 </phrase>
 <phrase>
@@ -10863,10 +10863,10 @@
     *: "Rewind Before Resume"
   </source>
   <dest>
-    *: "Rebobinare înainte de reluare"
+    *: "Derulează înapoi înainte de reluare"
   </dest>
   <voice>
-    *: "Rebobinare înainte de reluare"
+    *: "Derulează înapoi înainte de reluare"
   </voice>
 </phrase>
 <phrase>
@@ -10877,10 +10877,10 @@
     *: "[Untagged]"
   </source>
   <dest>
-    *: "[fără taguri]"
+    *: "[fără etichete]"
   </dest>
   <voice>
-    *: "fără taguri"
+    *: "fără etichete"
   </voice>
 </phrase>
 <phrase>
@@ -11051,11 +11051,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "~Multimedia"
+    usb_hid: "Control multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "~Multimedia"
+    usb_hid: "Control multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -11142,10 +11142,10 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
-    *: "PictureFlow"
+    *: "deschide pikciăr flău"
   </voice>
 </phrase>
 <phrase>
@@ -11215,10 +11215,10 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Rebobinare la pauză"
+    *: "Derulează înapoi la pauză"
   </dest>
   <voice>
-    *: "Rebobinare la pauză"
+    *: "Derulează înapoi la pauză"
   </voice>
 </phrase>
 <phrase>
@@ -11231,7 +11231,7 @@
   </source>
   <dest>
     *: none
-    histogram: "Histogram interval"
+    histogram: "Interval histogramă"
   </dest>
   <voice>
     *: none
@@ -11260,10 +11260,10 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Salvare modificări?"
+    *: "Salvezi modificările?"
   </dest>
   <voice>
-    *: "Salvare modificări?"
+    *: "Salvezi modificările?"
   </voice>
 </phrase>
 <phrase>
@@ -11321,11 +11321,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Clic tastă difuzor"
+    hardware_click: "Sunet butoane în difuzor"
   </dest>
   <voice>
     *: none
-    hardware_click: "Clic tastă difuzor"
+    hardware_click: "Sunet butoane în difuzor"
   </voice>
 </phrase>
 <phrase>
@@ -11338,11 +11338,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Clic tastă căști"
+    hardware_click: "Sunet butoane în căști"
   </dest>
   <voice>
     *: none
-    hardware_click: "Clic tastă căști"
+    hardware_click: "Sunet butoane în căști"
   </voice>
 </phrase>
 <phrase>
@@ -11412,10 +11412,10 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Pornește temporizator ațipire la pornire"
+    *: "Pornește temporizator ațipire după inițializare"
   </dest>
   <voice>
-    *: "Pornește temporizator ațipire la pornire"
+    *: "Pornește temporizator ațipire după inițializare"
   </voice>
 </phrase>
 <phrase>
@@ -11524,10 +11524,10 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Reporneşte temporizator ațipire la apăsare tastă"
+    *: "Reporneşte temporizator ațipire la apăsare buton"
   </dest>
   <voice>
-    *: "Reporneşte temporizator ațipire la apăsarea unei tastă"
+    *: "Reporneşte temporizator ațipire la apăsarea unui buton"
   </voice>
 </phrase>
 <phrase>
@@ -11763,10 +11763,10 @@
     *: "Special character"
   </source>
   <dest>
-    *: "Special character"
+    *: "Caracter special"
   </dest>
   <voice>
-    *: "Special character"
+    *: "Caracter special"
   </voice>
 </phrase>
 <phrase>
@@ -11791,10 +11791,10 @@
     *: "Add Current to Shortcuts"
   </source>
   <dest>
-    *: "Add Current to Shortcuts"
+    *: "Adaugă curent la scurtături"
   </dest>
   <voice>
-    *: "Add Current to Shortcuts"
+    *: "Adaugă curent la scurtături"
   </voice>
 </phrase>
 <phrase>
@@ -11819,10 +11819,10 @@
     *: "Disc"
   </source>
   <dest>
-    *: "Disc"
+    *: "~Disc"
   </dest>
   <voice>
-    *: "Disc"
+    *: "~Disc"
   </voice>
 </phrase>
 <phrase>
@@ -11903,11 +11903,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Bypass"
+    es9018: "Evită"
   </dest>
   <voice>
     *: none
-    es9018: "Bypass"
+    es9018: "Evită"
   </voice>
 </phrase>
 <phrase>
@@ -11920,11 +11920,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linear rapid"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Fast"
+    es9218: "Linear rapid"
   </voice>
 </phrase>
 <phrase>
@@ -11937,11 +11937,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linear lent"
   </dest>
   <voice>
     *: none
-    es9218: "Linear Slow"
+    es9218: "Linear lent"
   </voice>
 </phrase>
 <phrase>
@@ -12039,11 +12039,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Perete de cărămidă"
   </dest>
   <voice>
     *: none
-    es9218: "Brick Wall"
+    es9218: "Perete de cărămidă"
   </voice>
 </phrase>
 <phrase>
@@ -12077,13 +12077,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Performanță mare"
+    es9218: "Câștig mare (2 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "High performance"
-    es9218: "High Gain (2 Vrms)"
+    dac_power_mode: "Performanță mare"
+    es9218: "Câștig mare (2 volți ar em es)"
   </voice>
 </phrase>
 <phrase>
@@ -12097,13 +12097,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Economisește bateria"
+    es9218: "Câștig mic (1 Vrms)"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "Save battery"
-    es9218: "Low Gain (1 Vrms)"
+    dac_power_mode: "Economisește bateria"
+    es9218: "Câștig mic (1 volt ar em es)"
   </voice>
 </phrase>
 <phrase>
@@ -12114,10 +12114,10 @@
     *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: "Perceptual Bass Enhancement"
+    *: "Îmbunătățire bas perceput"
   </dest>
   <voice>
-    *: "Perceptual Bass Enhancement"
+    *: "Îmbunătățire bas perceput"
   </voice>
 </phrase>
 <phrase>
@@ -12128,10 +12128,10 @@
     *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: "Auditory Fatigue Reduction"
+    *: "Reducere oboseală auditivă"
   </dest>
   <voice>
-    *: "Auditory Fatigue Reduction"
+    *: "Reducere oboseală auditivă"
   </voice>
 </phrase>
 <phrase>
@@ -12142,10 +12142,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Haas Surround"
+    *: "Surround Haas"
   </dest>
   <voice>
-    *: "Haas Surround"
+    *: "Suraund has"
   </voice>
 </phrase>
 <phrase>
@@ -12198,10 +12198,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Dry / Wet Mix"
+    *: "Mixaj uscat / umed"
   </dest>
   <voice>
-    *: "Dry / Wet Mix"
+    *: "Mixaj uscat umed"
   </voice>
 </phrase>
 <phrase>
@@ -12355,10 +12355,10 @@
     *: "Disable on External Power"
   </source>
   <dest>
-    *: "Disable on External Power"
+    *: "Dezactivează la alimentare externă"
   </dest>
   <voice>
-    *: "Disable on External Power"
+    *: "Dezactivează la alimentare externă"
   </voice>
 </phrase>
 <phrase>
@@ -12369,10 +12369,10 @@
     *: "Disable Unmapped Keys"
   </source>
   <dest>
-    *: "Disable Unmapped Keys"
+    *: "Dezactivează butoanele neasociate"
   </dest>
   <voice>
-    *: "Disable Unmapped Keys"
+    *: "Dezactivează butoanele neasociate"
   </voice>
 </phrase>
 <phrase>
@@ -12383,10 +12383,10 @@
     *: "Advanced Key Lock"
   </source>
   <dest>
-    *: "Advanced Key Lock"
+    *: "Blocare butoane avansată"
   </dest>
   <voice>
-    *: "Advanced Key Lock"
+    *: "Blocare butoane avansată"
   </voice>
 </phrase>
 <phrase>
@@ -12397,10 +12397,10 @@
     *: "Autolock On"
   </source>
   <dest>
-    *: "Autolock On"
+    *: "Blocare automată activată"
   </dest>
   <voice>
-    *: "Autolock On"
+    *: "Blocare automată activată"
   </voice>
 </phrase>
 <phrase>
@@ -12411,10 +12411,10 @@
     *: "Autolock Off"
   </source>
   <dest>
-    *: "Autolock Off"
+    *: "Blocare automată dezactivată"
   </dest>
   <voice>
-    *: "Autolock Off"
+    *: "Blocare automată dezactivată"
   </voice>
 </phrase>
 <phrase>
@@ -12526,7 +12526,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Track to move"
+    *: "Pistă de mutat"
   </voice>
 </phrase>
 <phrase>
@@ -12540,7 +12540,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queued"
+    *: "Pus în coadă"
   </voice>
 </phrase>
 <phrase>
@@ -12554,7 +12554,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Bad track"
+    *: "Pistă defectă"
   </voice>
 </phrase>
 <phrase>
@@ -12568,7 +12568,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Moving track"
+    *: "Se mută pista"
   </voice>
 </phrase>
 <phrase>
@@ -12969,10 +12969,10 @@
     *: "Number of Players"
   </source>
   <dest>
-    *: "Number of Players"
+    *: "Număr de jucători"
   </dest>
   <voice>
-    *: "Number of Players"
+    *: "Număr de jucători"
   </voice>
 </phrase>
 <phrase>
@@ -13151,10 +13151,10 @@
     *: "Checkmate!"
   </source>
   <dest>
-    *: "Checkmate!"
+    *: "Șah mat!"
   </dest>
   <voice>
-    *: "Checkmate!"
+    *: "Șah mat!"
   </voice>
 </phrase>
 <phrase>
@@ -13165,10 +13165,10 @@
     *: "Illegal move!"
   </source>
   <dest>
-    *: "Illegal move!"
+    *: "Mutare ilegală!"
   </dest>
   <voice>
-    *: "Illegal move!"
+    *: "Mutare ilegală!"
   </voice>
 </phrase>
 <phrase>
@@ -13179,10 +13179,10 @@
     *: "New Game"
   </source>
   <dest>
-    *: "New Game"
+    *: "Joc nou"
   </dest>
   <voice>
-    *: "New Game"
+    *: "Joc nou"
   </voice>
 </phrase>
 <phrase>
@@ -13193,10 +13193,10 @@
     *: "Resume Game"
   </source>
   <dest>
-    *: "Resume Game"
+    *: "Continuă jocul"
   </dest>
   <voice>
-    *: "Resume Game"
+    *: "Continuă jocul"
   </voice>
 </phrase>
 <phrase>
@@ -13207,10 +13207,10 @@
     *: "Save Game"
   </source>
   <dest>
-    *: "Save Game"
+    *: "Salvează jocul"
   </dest>
   <voice>
-    *: "Save Game"
+    *: "Salvează jocul"
   </voice>
 </phrase>
 <phrase>
@@ -13235,10 +13235,10 @@
     *: "Restart Game"
   </source>
   <dest>
-    *: "Restart Game"
+    *: "Repornește jocul"
   </dest>
   <voice>
-    *: "Restart Game"
+    *: "Repornește jocul"
   </voice>
 </phrase>
 <phrase>
@@ -13753,10 +13753,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "Ordonat"
   </dest>
   <voice>
-    *: "Ordered"
+    *: "Ordonat"
   </voice>
 </phrase>
 <phrase>
@@ -13839,11 +13839,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Dosarul de înregistrări"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Dosarul de înregistrări"
   </voice>
 </phrase>
 <phrase>
@@ -13903,11 +13903,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play Mode"
+    *: "Mod redare"
     lowmem: none
   </dest>
   <voice>
-    *: "Play Mode"
+    *: "Mod redare"
     lowmem: none
   </voice>
 </phrase>
@@ -13954,11 +13954,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play from beginning"
+    *: "Redă de la început"
     lowmem: none
   </dest>
   <voice>
-    *: "Play from beginning"
+    *: "Redă de la început"
     lowmem: none
   </voice>
 </phrase>
@@ -14155,11 +14155,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Unavailable"
+    *: "Indisponibil"
     lowmem: none
   </dest>
   <voice>
-    *: "Unavailable"
+    *: "Indisponibil"
     lowmem: none
   </voice>
 </phrase>
@@ -14171,10 +14171,10 @@
     *: "Toggle Item"
   </source>
   <dest>
-    *: "Toggle Item"
+    *: "Comută element"
   </dest>
   <voice>
-    *: "Toggle Item"
+    *: "Comută element"
   </voice>
 </phrase>
 <phrase>
@@ -14185,10 +14185,10 @@
     *: "Move Item Up"
   </source>
   <dest>
-    *: "Move Item Up"
+    *: "Mută element în sus"
   </dest>
   <voice>
-    *: "Move Item Up"
+    *: "Mută element în sus"
   </voice>
 </phrase>
 <phrase>
@@ -14199,10 +14199,10 @@
     *: "Move Item Down"
   </source>
   <dest>
-    *: "Move Item Down"
+    *: "Mută element în jos"
   </dest>
   <voice>
-    *: "Move Item Down"
+    *: "Mută element în jos"
   </voice>
 </phrase>
 <phrase>
@@ -14213,10 +14213,10 @@
     *: "Load Default Configuration"
   </source>
   <dest>
-    *: "Load Default Configuration"
+    *: "Încarcă configurația implicită"
   </dest>
   <voice>
-    *: "Load Default Configuration"
+    *: "Încarcă configurația implicită"
   </voice>
 </phrase>
 <phrase>
@@ -14227,10 +14227,10 @@
     *: "Save and Exit"
   </source>
   <dest>
-    *: "Save and Exit"
+    *: "Salvează și ieși"
   </dest>
   <voice>
-    *: "Save and Exit"
+    *: "Salvează și ieși"
   </voice>
 </phrase>
 <phrase>
@@ -14241,7 +14241,7 @@
     *: "Rockbox Main Menu Order"
   </source>
   <dest>
-    *: "Rockbox Main Menu Order"
+    *: "Ordine meniu principal Rockbox"
   </dest>
   <voice>
     *: ""
@@ -14381,10 +14381,10 @@
     *: "Failed to gather information"
   </source>
   <dest>
-    *: "Failed to gather information"
+    *: "A eșuat colectarea informațiilor"
   </dest>
   <voice>
-    *: "Failed to gather information"
+    *: "A eșuat colectarea informațiilor"
   </voice>
 </phrase>
 <phrase>
@@ -14461,11 +14461,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "Săraund"
     lowmem: none
   </voice>
 </phrase>
@@ -14478,11 +14478,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "Mixer calitate înaltă"
     lowmem: none
   </dest>
   <voice>
-    *: "High Quality Mixer"
+    *: "Mixer calitate înaltă"
     lowmem: none
   </voice>
 </phrase>
@@ -14495,11 +14495,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Sample Rate"
+    *: "Rata de eșantionare"
     lowmem: none
   </dest>
   <voice>
-    *: "Sample Rate"
+    *: "Rata de eșantionare"
     lowmem: none
   </voice>
 </phrase>
@@ -14512,11 +14512,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "CPU Boost"
+    *: "Boost CPU"
     lowmem: none
   </dest>
   <voice>
-    *: "CPU Boost"
+    *: "bust ce pe u"
     lowmem: none
   </voice>
 </phrase>
@@ -14542,10 +14542,10 @@
     *: "Centre margin"
   </source>
   <dest>
-    *: "Centre margin"
+    *: "Centrează marginea"
   </dest>
   <voice>
-    *: "Centre margin"
+    *: "Centrează marginea"
   </voice>
 </phrase>
 <phrase>
@@ -14556,10 +14556,10 @@
     *: "Number of slides"
   </source>
   <dest>
-    *: "Number of slides"
+    *: "Numărul de diapozitive"
   </dest>
   <voice>
-    *: "Number of slides"
+    *: "Numărul de diapozitive"
   </voice>
 </phrase>
 <phrase>
@@ -14598,10 +14598,10 @@
     *: "Resize Covers"
   </source>
   <dest>
-    *: "Resize Covers"
+    *: "Redimensionează copertele"
   </dest>
   <voice>
-    *: "Resize Covers"
+    *: "Redimensionează copertele"
   </voice>
 </phrase>
 <phrase>
@@ -14612,10 +14612,10 @@
     *: "Rebuild cache"
   </source>
   <dest>
-    *: "Rebuild cache"
+    *: "Reconstruiește cache-ul"
   </dest>
   <voice>
-    *: "Rebuild cache"
+    *: "Reconstruiește keșul"
   </voice>
 </phrase>
 <phrase>
@@ -14626,10 +14626,10 @@
     *: "WPS Integration"
   </source>
   <dest>
-    *: "WPS Integration"
+    *: "Integrare cu ecranul de redare"
   </dest>
   <voice>
-    *: "WPS Integration"
+    *: "Integrare cu ecranul de redare"
   </voice>
 </phrase>
 <phrase>
@@ -14640,10 +14640,10 @@
     *: "Go to WPS"
   </source>
   <dest>
-    *: "Go to WPS"
+    *: "Mergi la ecranul de redare"
   </dest>
   <voice>
-    *: "Go to WPS"
+    *: "Mergi la ecranul de redare"
   </voice>
 </phrase>
 <phrase>
@@ -14654,10 +14654,10 @@
     *: "Hide album title"
   </source>
   <dest>
-    *: "Hide album title"
+    *: "Ascunde titlul albumului"
   </dest>
   <voice>
-    *: "Hide album title"
+    *: "Ascunde titlul albumului"
   </voice>
 </phrase>
 <phrase>
@@ -14668,10 +14668,10 @@
     *: "Show at the bottom"
   </source>
   <dest>
-    *: "Show at the bottom"
+    *: "Arată în subsol"
   </dest>
   <voice>
-    *: "Show at the bottom"
+    *: "Arată în subsol"
   </voice>
 </phrase>
 <phrase>
@@ -14682,10 +14682,10 @@
     *: "Show at the top"
   </source>
   <dest>
-    *: "Show at the top"
+    *: "Arată în antet"
   </dest>
   <voice>
-    *: "Show at the top"
+    *: "Arată în antet"
   </voice>
 </phrase>
 <phrase>
@@ -14710,10 +14710,10 @@
     *: "Via Track list"
   </source>
   <dest>
-    *: "Via Track list"
+    *: "Via lista de piste"
   </dest>
   <voice>
-    *: "Via Track list"
+    *: "Via lista de piste"
   </voice>
 </phrase>
 <phrase>
@@ -14724,10 +14724,10 @@
     *: "Always On"
   </source>
   <dest>
-    *: "Always On"
+    *: "Mereu activ"
   </dest>
   <voice>
-    *: "Always On"
+    *: "Mereu activ"
   </voice>
 </phrase>
 <phrase>
@@ -14780,10 +14780,10 @@
     *: "Not a VBR file"
   </source>
   <dest>
-    *: "Not a VBR file"
+    *: "Nu este un fișier VBR"
   </dest>
   <voice>
-    *: "Not a VBR file"
+    *: "Nu este un fișier ve be re"
   </voice>
 </phrase>
 <phrase>
@@ -14822,10 +14822,10 @@
     *: "Hide information"
   </source>
   <dest>
-    *: "Hide information"
+    *: "Ascunde informațiile"
   </dest>
   <voice>
-    *: "Hide information"
+    *: "Ascunde informațiile"
   </voice>
 </phrase>
 <phrase>
@@ -14836,10 +14836,10 @@
     *: "Show album at the bottom"
   </source>
   <dest>
-    *: "Show album at the bottom"
+    *: "Arată albumul în subsol"
   </dest>
   <voice>
-    *: "Show album at the bottom"
+    *: "Arată albumul în subsol"
   </voice>
 </phrase>
 <phrase>
@@ -14850,10 +14850,10 @@
     *: "Show album at the top"
   </source>
   <dest>
-    *: "Show album at the top"
+    *: "Arată albumul în antet"
   </dest>
   <voice>
-    *: "Show album at the top"
+    *: "Arată albumul în antet"
   </voice>
 </phrase>
 <phrase>
@@ -14864,10 +14864,10 @@
     *: "Show album and artist at the top"
   </source>
   <dest>
-    *: "Show album and artist at the top"
+    *: "Arată albumul și artistul în antet"
   </dest>
   <voice>
-    *: "Show album and artist at the top"
+    *: "Arată albumul și artistul în antet"
   </voice>
 </phrase>
 <phrase>
@@ -14878,10 +14878,10 @@
     *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: "Show album and artist at the bottom"
+    *: "Arată albumul și artistul în subsol"
   </dest>
   <voice>
-    *: "Show album and artist at the bottom"
+    *: "Arată albumul și artistul în subsol"
   </voice>
 </phrase>
 <phrase>
@@ -14955,10 +14955,10 @@
     *: "Clear all"
   </source>
   <dest>
-    *: "Clear all"
+    *: "Golește tot"
   </dest>
   <voice>
-    *: "Clear all"
+    *: "Golește tot"
   </voice>
 </phrase>
 <phrase>
@@ -14997,10 +14997,10 @@
     *: "Timeout"
   </source>
   <dest>
-    *: "Timeout"
+    *: "Timp inavtivitate"
   </dest>
   <voice>
-    *: "Timeout"
+    *: "Timp inavtivitate"
   </voice>
 </phrase>
 <phrase>
@@ -15041,11 +15041,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Announcement format"
+    hotkey: "Format anunț"
   </dest>
   <voice>
     *: none
-    hotkey: "Announcement format"
+    hotkey: "Format anunț"
   </voice>
 </phrase>
 <phrase>
@@ -15092,11 +15092,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Announce on"
+    hotkey: "Anunțuri activate"
   </dest>
   <voice>
     *: none
-    hotkey: "Announce on"
+    hotkey: "Anunțuri activate"
   </voice>
 </phrase>
 <phrase>
@@ -15109,11 +15109,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Track change"
+    hotkey: "Schimbare de pistă"
   </dest>
   <voice>
     *: none
-    hotkey: "Track change"
+    hotkey: "Schimbare de pistă"
   </voice>
 </phrase>
 <phrase>
@@ -15169,10 +15169,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Set Wps Context Plugin"
+    *: "Setează plugin pentru context ecran redare"
   </dest>
   <voice>
-    *: "Set WPS Context Plugin"
+    *: "Setează plaghin pentru context ecran redare"
   </voice>
 </phrase>
 <phrase>
@@ -15281,10 +15281,10 @@
     *: "Browse"
   </source>
   <dest>
-    *: "Browse"
+    *: "Răsfoiește"
   </dest>
   <voice>
-    *: "Browse"
+    *: "Răsfoiește"
   </voice>
 </phrase>
 <phrase>
@@ -15295,10 +15295,10 @@
     *: "Enter USB mass storage mode?"
   </source>
   <dest>
-    *: "Enter USB mass storage mode?"
+    *: "Activezi modul de stocare USB în masă?"
   </dest>
   <voice>
-    *: "Enter USB mass storage mode?"
+    *: "Activezi modul de stocare u se be în masă?"
   </voice>
 </phrase>
 <phrase>
@@ -15323,10 +15323,10 @@
     *: "Show Queue Options"
   </source>
   <dest>
-    *: "Show Queue Options"
+    *: "Arată opțiuni coadă"
   </dest>
   <voice>
-    *: "Show Queue Options"
+    *: "Arată opțiuni coadă"
   </voice>
 </phrase>
 <phrase>
@@ -15337,10 +15337,10 @@
     *: "Show Shuffled Adding Options"
   </source>
   <dest>
-    *: "Show Shuffled Adding Options"
+    *: "Arată opțiuni de adăugare aleatoare"
   </dest>
   <voice>
-    *: "Show Shuffled Adding Options"
+    *: "Arată opțiuni de adăugare aleatoare"
   </voice>
 </phrase>
 <phrase>
@@ -15351,10 +15351,10 @@
     *: "In Submenu"
   </source>
   <dest>
-    *: "In Submenu"
+    *: "În submeniu"
   </dest>
   <voice>
-    *: "In Submenu"
+    *: "În submeniu"
   </voice>
 </phrase>
 <phrase>
@@ -15393,10 +15393,10 @@
     *: "Always Autolock"
   </source>
   <dest>
-    *: "Always Autolock"
+    *: "Blochează automat mereu"
   </dest>
   <voice>
-    *: "Always Autolock"
+    *: "Blochează automat mereu"
   </voice>
 </phrase>
 <phrase>
@@ -15435,10 +15435,10 @@
     *: "List Wraparound"
   </source>
   <dest>
-    *: "List Wraparound"
+    *: "Listă circulară"
   </dest>
   <voice>
-    *: "List Wraparound"
+    *: "Listă circulară"
   </voice>
 </phrase>
 <phrase>
@@ -15549,11 +15549,11 @@
   </source>
   <dest>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Sincronizează timpul cu RDS"
   </dest>
   <voice>
     *: none
-    rds: "Sync RDS Time"
+    rds: "Sincronizează timpul cu er de es"
   </voice>
 </phrase>
 <phrase>
@@ -15564,10 +15564,10 @@
     *: "Sort albums by"
   </source>
   <dest>
-    *: "Sort albums by"
+    *: "Sortează albumele după"
   </dest>
   <voice>
-    *: "Sort albums by"
+    *: "Sortează albumele după"
   </voice>
 </phrase>
 <phrase>
@@ -15578,10 +15578,10 @@
     *: "Artist + Name"
   </source>
   <dest>
-    *: "Artist + Name"
+    *: "Artist și nume"
   </dest>
   <voice>
-    *: "Artist And Name"
+    *: "Artist și nume"
   </voice>
 </phrase>
 <phrase>
@@ -15592,10 +15592,10 @@
     *: "Artist + Year"
   </source>
   <dest>
-    *: "Artist + Year"
+    *: "Artist și an"
   </dest>
   <voice>
-    *: "Artist And Year"
+    *: "Artist și an"
   </voice>
 </phrase>
 <phrase>
@@ -15606,10 +15606,10 @@
     *: "Year sort order"
   </source>
   <dest>
-    *: "Year sort order"
+    *: "Ordinea de sortare a anilor"
   </dest>
   <voice>
-    *: "Year sort order"
+    *: "Ordinea de sortare a anilor"
   </voice>
 </phrase>
 <phrase>
@@ -15620,10 +15620,10 @@
     *: "Show year in album title"
   </source>
   <dest>
-    *: "Show year in album title"
+    *: "Afișează anul în titlul albumului"
   </dest>
   <voice>
-    *: "Show year in album title"
+    *: "Afișează anul în titlul albumului"
   </voice>
 </phrase>
 <phrase>
@@ -15634,10 +15634,10 @@
     *: "Cache needs to finish updating first!"
   </source>
   <dest>
-    *: "Cache needs to finish updating first!"
+    *: "Cache-ul trebuie să se termine de actualizat mai întâi!"
   </dest>
   <voice>
-    *: "Cache needs to finish updating first!"
+    *: "Keșul trebuie să se termine de actualizat mai întâi!"
   </voice>
 </phrase>
 <phrase>
@@ -15676,10 +15676,10 @@
     *: "Play Shuffled"
   </source>
   <dest>
-    *: "Play Shuffled"
+    *: "Redă aleator"
   </dest>
   <voice>
-    *: "Play Shuffled"
+    *: "Redă aleator"
   </voice>
 </phrase>
 <phrase>
@@ -15690,10 +15690,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Păstrează pista curentă la înlocuirea listei de redare"
   </dest>
   <voice>
-    *: "Keep Current Track When Replacing Playlist"
+    *: "Păstrează pista curentă la înlocuirea listei de redare"
   </voice>
 </phrase>
 <phrase>
@@ -15707,13 +15707,13 @@
   </source>
   <dest>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Golește setările când butonul de resetare este ținut apăsat la pornire"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Golește setările când butonul de blocare este activat la pornire"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
-    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold,iriverh10: "Golește setările când butonul de resetare este ținut apăsat la pornire"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Golește setările când butonul de blocare este activat la pornire"
   </voice>
 </phrase>
 <phrase>
@@ -15724,10 +15724,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rewind Across Tracks"
+    *: "Rebobinează prin piste"
   </dest>
   <voice>
-    *: "Rewind across tracks"
+    *: "Rebobinează prin piste"
   </voice>
 </phrase>
 <phrase>
@@ -15853,10 +15853,10 @@
     *: "Add Shuffled"
   </source>
   <dest>
-    *: "Add Shuffled"
+    *: "Adaugă aleator"
   </dest>
   <voice>
-    *: "Add Shuffled"
+    *: "Adaugă aleator"
   </voice>
 </phrase>
 <phrase>
@@ -15881,10 +15881,10 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Play Last Shuffled"
+    *: "Redă ultimul amestec"
   </dest>
   <voice>
-    *: "Play Last Shuffled"
+    *: "Redă ultimul amestec"
   </voice>
 </phrase>
 <phrase>
@@ -15931,11 +15931,11 @@
   </source>
   <dest>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptiv"
   </dest>
   <voice>
     *: none
-    perceptual_volume: "Perceptual"
+    perceptual_volume: "Perceptiv"
   </voice>
 </phrase>
 <phrase>
@@ -15946,10 +15946,10 @@
     *: "Show Tracks While Browsing"
   </source>
   <dest>
-    *: "Show Tracks While Browsing"
+    *: "Arată pistele în timpul răsfoirii"
   </dest>
   <voice>
-    *: "Show Tracks While Browsing"
+    *: "Arată pistele în timpul răsfoirii"
   </voice>
 </phrase>
 <phrase>
@@ -15960,10 +15960,10 @@
     *: "Go to Last Album"
   </source>
   <dest>
-    *: "Go to Last Album"
+    *: "Mergi la ultimul album"
   </dest>
   <voice>
-    *: "Go to Last Album"
+    *: "Mergi la ultimul album"
   </voice>
 </phrase>
 <phrase>
@@ -15988,10 +15988,10 @@
     *: "Remove Queued Tracks?"
   </source>
   <dest>
-    *: "Remove Queued Tracks?"
+    *: "Elimini pistele din coadă?"
   </dest>
   <voice>
-    *: "Remove Queued Tracks?"
+    *: "Elimini pistele din coadă?"
   </voice>
 </phrase>
 <phrase>
@@ -16002,10 +16002,10 @@
     *: "Quick (Ignore Directory Cache)"
   </source>
   <dest>
-    *: "Quick (Ignore Directory Cache)"
+    *: "Rapid (ignoră cache-ul dosarului)"
   </dest>
   <voice>
-    *: "Quick (Ignore Directory Cache)"
+    *: "Rapid (ignoră keșul dosarului)"
   </voice>
 </phrase>
 <phrase>
@@ -16030,10 +16030,10 @@
     *: "Default Browser"
   </source>
   <dest>
-    *: "Default Browser"
+    *: "Navigator implicit"
   </dest>
   <voice>
-    *: "Default Browser"
+    *: "Navigator implicit"
   </voice>
 </phrase>
 <phrase>
@@ -16044,10 +16044,10 @@
     *: "Amaze Main Menu"
   </source>
   <dest>
-    *: "Amaze Main Menu"
+    *: "Meniu principal Amaze"
   </dest>
   <voice>
-    *: "Amaze Main Menu"
+    *: "Meniu principal a meiz"
   </voice>
 </phrase>
 <phrase>
@@ -16086,10 +16086,10 @@
     *: "Show Compass"
   </source>
   <dest>
-    *: "Show Compass"
+    *: "Afișează busola"
   </dest>
   <voice>
-    *: "Show Compass"
+    *: "Afișează busola"
   </voice>
 </phrase>
 <phrase>
@@ -16114,10 +16114,10 @@
     *: "Remember Path"
   </source>
   <dest>
-    *: "Remember Path"
+    *: "Ține minte calea"
   </dest>
   <voice>
-    *: "Remember Path"
+    *: "Ține minte calea"
   </voice>
 </phrase>
 <phrase>
@@ -16128,10 +16128,10 @@
     *: "Use Large Tiles"
   </source>
   <dest>
-    *: "Use Large Tiles"
+    *: "Folosește dale mari"
   </dest>
   <voice>
-    *: "Use Large Tiles"
+    *: "Folosește dale mari"
   </voice>
 </phrase>
 <phrase>
@@ -16142,10 +16142,10 @@
     *: "Show Solution"
   </source>
   <dest>
-    *: "Show Solution"
+    *: "Arată soluția"
   </dest>
   <voice>
-    *: "Show Solution"
+    *: "Arată soluția"
   </voice>
 </phrase>
 <phrase>
@@ -16170,10 +16170,10 @@
     *: "Generating maze..."
   </source>
   <dest>
-    *: "Generating maze..."
+    *: "Se generează labirint..."
   </dest>
   <voice>
-    *: "Generating maze"
+    *: "Se generează labirint"
   </voice>
 </phrase>
 <phrase>
@@ -16184,10 +16184,10 @@
     *: "You win!"
   </source>
   <dest>
-    *: "You win!"
+    *: "Ai câștigat!"
   </dest>
   <voice>
-    *: "You win!"
+    *: "Ai câștigat!"
   </voice>
 </phrase>
 <phrase>
@@ -16198,10 +16198,10 @@
     *: "You cheated!"
   </source>
   <dest>
-    *: "You cheated!"
+    *: "Ai trișat!"
   </dest>
   <voice>
-    *: "You cheated!"
+    *: "Ai trișat!"
   </voice>
 </phrase>
 <phrase>
@@ -16212,10 +16212,10 @@
     *: "Easy"
   </source>
   <dest>
-    *: "Easy"
+    *: "Ușor"
   </dest>
   <voice>
-    *: "Easy"
+    *: "Ușor"
   </voice>
 </phrase>
 <phrase>
@@ -16226,10 +16226,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Mediu"
   </dest>
   <voice>
-    *: "Medium"
+    *: "Mediu"
   </voice>
 </phrase>
 <phrase>
@@ -16240,10 +16240,10 @@
     *: "Hard"
   </source>
   <dest>
-    *: "Hard"
+    *: "Dificil"
   </dest>
   <voice>
-    *: "Hard"
+    *: "Dificil"
   </voice>
 </phrase>
 <phrase>
@@ -16254,10 +16254,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "~Expert"
   </dest>
   <voice>
-    *: "Expert"
+    *: "~Expert"
   </voice>
 </phrase>
 <phrase>
@@ -16268,10 +16268,10 @@
     *: "Legal Notices"
   </source>
   <dest>
-    *: "Legal Notices"
+    *: "Notificări legale"
   </dest>
   <voice>
-    *: "Legal Notices"
+    *: "Notificări legale"
   </voice>
 </phrase>
 <phrase>
@@ -16282,10 +16282,10 @@
     *: "Error: %s"
   </source>
   <dest>
-    *: "Error: %s"
+    *: "Eroare: %s"
   </dest>
   <voice>
-    *: "Error"
+    *: "Eroare"
   </voice>
 </phrase>
 <phrase>
@@ -16296,10 +16296,10 @@
     *: "Mikmod Settings"
   </source>
   <dest>
-    *: "Mikmod Settings"
+    *: "Setări Mikimod"
   </dest>
   <voice>
-    *: "Mik mod Settings"
+    *: "Setări miki mod"
   </voice>
 </phrase>
 <phrase>
@@ -16310,10 +16310,10 @@
     *: "Mikmod Menu"
   </source>
   <dest>
-    *: "Mikmod Menu"
+    *: "Meniu Mikmod"
   </dest>
   <voice>
-    *: "Mik mod Menu"
+    *: "Meniu miki mod"
   </voice>
 </phrase>
 <phrase>
@@ -16324,10 +16324,10 @@
     *: "Chessbox Menu"
   </source>
   <dest>
-    *: "Chessbox Menu"
+    *: "Meniu Chessbox "
   </dest>
   <voice>
-    *: "Chess box Menu"
+    *: "Meniu ces boks"
   </voice>
 </phrase>
 <phrase>
@@ -16394,10 +16394,10 @@
     *: "Disable main menu scrolling"
   </source>
   <dest>
-    *: "Disable main menu scrolling"
+    *: "Dezactivează derularea meniului principal"
   </dest>
   <voice>
-    *: "Disable main menu scrolling"
+    *: "Dezactivează derularea meniului principal"
   </voice>
 </phrase>
 <phrase>
@@ -16674,10 +16674,10 @@
     *: "Same as currently played track"
   </source>
   <dest>
-    *: "Same as currently played track"
+    *: "La fel cu pista curentă"
   </dest>
   <voice>
-    *: "Same as currently played track"
+    *: "La fel cu pista curentă"
   </voice>
 </phrase>
 <phrase>
@@ -16744,10 +16744,10 @@
     *: "Most played (Plays|Score)"
   </source>
   <dest>
-    *: "Most played (Plays|Score)"
+    *: "Cele mai redate (Nr. redări|Evaluare)"
   </dest>
   <voice>
-    *: "Most played by Plays then by Score"
+    *: "Cele mai redate după număr redări, apoi după evaluare"
   </voice>
 </phrase>
 <phrase>
@@ -16772,10 +16772,10 @@
     *: "Never played tracks"
   </source>
   <dest>
-    *: "Never played tracks"
+    *: "Piste neredate niciodată"
   </dest>
   <voice>
-    *: "Never played tracks"
+    *: "Piste neredate niciodată"
   </voice>
 </phrase>
 <phrase>
@@ -16786,10 +16786,10 @@
     *: "Favourite artists"
   </source>
   <dest>
-    *: "Favourite artists"
+    *: "Artiști favoriți"
   </dest>
   <voice>
-    *: "Favourite artists"
+    *: "Artiști favoriți"
   </voice>
 </phrase>
 <phrase>
@@ -16842,10 +16842,10 @@
     *: "Forgotten favourites"
   </source>
   <dest>
-    *: "Forgotten favourites"
+    *: "Favorite uitate"
   </dest>
   <voice>
-    *: "Forgotten favourites"
+    *: "Favorite uitate"
   </voice>
 </phrase>
 <phrase>
@@ -16856,10 +16856,10 @@
     *: "Tracks by"
   </source>
   <dest>
-    *: "Tracks by"
+    *: "Piste după"
   </dest>
   <voice>
-    *: "Tracks by"
+    *: "Piste după"
   </voice>
 </phrase>
 <phrase>
