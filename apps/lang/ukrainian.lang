@@ -3365,10 +3365,12 @@
     battery_types: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -3380,10 +3382,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3395,10 +3399,12 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </dest>
   <voice>
-    *: ""
+    *: none
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -10905,7 +10911,7 @@
   </dest>
   <voice>
     *: none
-    depth_3d: "Підсилення 3-D "
+    depth_3d: "Підсилення 3-D"
   </voice>
 </phrase>
 <phrase>
@@ -11590,11 +11596,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Використовувати меню ярликів замість Експрес-Екрану "
+    quickscreen: "Використовувати меню ярликів замість Експрес-Екрану"
   </dest>
   <voice>
     *: none
-    quickscreen: "Використовувати меню ярликів замість Експрес-Екрану "
+    quickscreen: "Використовувати меню ярликів замість Експрес-Екрану"
   </voice>
 </phrase>
 <phrase>
@@ -12419,10 +12425,10 @@
     *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Вимкнути заблоковані нагадування	"
+    *: "Вимкнути заблоковані нагадування"
   </dest>
   <voice>
-    *: "Вимкнути заблоковані нагадування	"
+    *: "Вимкнути заблоковані нагадування"
   </voice>
 </phrase>
 <phrase>
@@ -13540,7 +13546,7 @@
     *: ""
   </dest>
   <voice>
-    *: "королівська сторона	"
+    *: "королівська сторона"
   </voice>
 </phrase>
 <phrase>
@@ -13803,10 +13809,10 @@
     *: "Slideshow Time"
   </source>
   <dest>
-    *: "Час слайд шоу "
+    *: "Час слайд шоу"
   </dest>
   <voice>
-    *: "Час слайд шоу "
+    *: "Час слайд шоу"
   </voice>
 </phrase>
 <phrase>
@@ -14907,7 +14913,7 @@
     mpiohd200: "Двічі торкніться REC, щоб скасувати."
     mpiohd300: "Двічі торкніться МЕНЮ, щоб скасувати."
     rx27generic: "Натисніть клавішу VOLUME, щоб скасувати."
-    sonynwza860: "Карти клавіш неповні.	"
+    sonynwza860: "Карти клавіш неповні."
     touchscreen: "Натисніть зліва посередині, щоб скасувати."
     vibe500: "Натисніть PREV, щоб скасувати."
     xduoox20,xduoox3,xduoox3ii: "Двічі торкніться HOME, щоб скасувати."
