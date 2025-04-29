@@ -2330,7 +2330,7 @@
     *: "Never"
   </source>
   <dest>
-    *: "Never"
+    *: "Ніколи"
   </dest>
   <voice>
     *: "Ніколи"
@@ -3551,7 +3551,7 @@
   </dest>
   <voice>
     *: none
-    gogearsa9200,samsungyh*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3576,19 +3576,19 @@
     *: none
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "НАЗАД = Скасувати"
     gigabeatfx: "ЖИВЛЕННЯ = Скасувати"
-    mrobe500,rtc: "ВИМК. = Скасувати"
     gogearsa9200: "ВЛIВО = Скасувати"
     iaudiom5,iaudiox5: "ЗАПИС = Скасувати"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Скасувати"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "ПОПЕРЕД. = Скасувати"
     iriverh100,iriverh120,iriverh300: "СТОП = Скасувати"
     mrobe100: "ДИСПЛЕЙ = Скасувати"
+    mrobe500,rtc: "ВИМК. = Скасувати"
     samsungyh*: "REW = Скасувати"
     vibe500: "C = Скасувати"
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4897,11 +4897,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "~MPEG Layer 3"
   </voice>
 </phrase>
 <phrase>
@@ -4914,11 +4914,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -5635,7 +5635,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Гучнiсть- : Переiнiцiалiзацiя)"
+    remote: "Гучнiсть Переiнiцiалiзацiя"
   </voice>
 </phrase>
 <phrase>
@@ -5886,7 +5886,7 @@
   </source>
   <dest>
     *: "Акумулятор: %d%% %dh %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Акумулятор: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Рiвень Заряду Акумулятору"
@@ -5931,13 +5931,13 @@
   </source>
   <dest>
     *: "Пам'ять:"
-    hibylinux: "mSD:"
-    xduoox3: "microSD1:"
+    hibylinux: "~mSD:"
+    xduoox3: "~microSD1:"
   </dest>
   <voice>
     *: "Пам'ять"
-    hibylinux: "micro SD"
-    xduoox3: "microSD1"
+    hibylinux: "карта пам'яті"
+    xduoox3: "карта пам'яті один"
   </voice>
 </phrase>
 <phrase>
@@ -5953,17 +5953,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
-    xduoox3: "microSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~microSD:"
+    xduoox3: "~microSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
-    xduoox3: "microSD2:"
+    hibylinux: "~U S B"
+    multivolume: "~H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -7031,7 +7031,7 @@
     *: "Режим:"
   </dest>
   <voice>
-    *: "Режим:"
+    *: "Режим"
   </voice>
 </phrase>
 <phrase>
@@ -8875,7 +8875,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -8889,7 +8889,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -9303,7 +9303,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -10171,11 +10171,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "~OK"
   </voice>
 </phrase>
 <phrase>
@@ -11282,7 +11282,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "відкрити перегляд зображень"
@@ -13033,7 +13033,7 @@
     *: "Previous Track"
   </source>
   <dest>
-    *: "Previous Track"
+    *: "Попередній трек"
   </dest>
   <voice>
     *: "Попередній трек"
@@ -13103,7 +13103,7 @@
     *: "Shuffle Mode"
   </source>
   <dest>
-    *: "Shuffle Mode"
+    *: "Режим перемішування"
   </dest>
   <voice>
     *: "Режим перемішування"
@@ -13145,7 +13145,7 @@
     *: "Checkmate!"
   </source>
   <dest>
-    *: "Checkmate!"
+    *: "Шах і мат!"
   </dest>
   <voice>
     *: "Шах і мат!"
@@ -13243,7 +13243,7 @@
     *: "Select Other Game"
   </source>
   <dest>
-    *: "Select Other Game"
+    *: "Виберіть іншу гру"
   </dest>
   <voice>
     *: "Виберіть іншу гру"
@@ -13428,7 +13428,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "~GNU Chess"
   </voice>
 </phrase>
 <phrase>
@@ -13817,7 +13817,7 @@
     *: "Return"
   </source>
   <dest>
-    *: "Return"
+    *: "Ввід"
   </dest>
   <voice>
     *: "Ввід"
@@ -14305,7 +14305,7 @@
     *: "[Time]"
   </source>
   <dest>
-    *: "[Time]"
+    *: "[Час]"
   </dest>
   <voice>
     *: "Час"
@@ -14442,7 +14442,7 @@
     lowmem: none
   </dest>
   <voice>
-    *: "Interpolation"
+    *: "Інтер-поляція"
     lowmem: none
   </voice>
 </phrase>
@@ -14536,10 +14536,10 @@
     *: "Centre margin"
   </source>
   <dest>
-    *: "Centre margin"
+    *: "Центральний відступ"
   </dest>
   <voice>
-    *: "Centre margin"
+    *: "Центральний відступ"
   </voice>
 </phrase>
 <phrase>
@@ -14903,10 +14903,10 @@
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Натисніть POWER, щоб скасувати."
     ihifi760,ihifi960: "Двічі торкніться RETURN, щоб скасувати."
     ihifi770,ihifi770c,ihifi800: "Натисніть HOME, щоб скасувати."
-    iriverh10,rx27generic: ""
-    samsungyh*: "Двічі торкніться ЛІВОРУЧ, щоб скасувати."
+    iriverh10,samsungyh*: "Двічі торкніться ЛІВОРУЧ, щоб скасувати."
     mpiohd200: "Двічі торкніться REC, щоб скасувати."
     mpiohd300: "Двічі торкніться МЕНЮ, щоб скасувати."
+    rx27generic: "Натисніть клавішу VOLUME, щоб скасувати."
     sonynwza860: "Карти клавіш неповні.	"
     touchscreen: "Натисніть зліва посередині, щоб скасувати."
     vibe500: "Натисніть PREV, щоб скасувати."
@@ -16360,7 +16360,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
@@ -16416,10 +16416,10 @@
     *: "First Letter"
   </source>
   <dest>
-    *: ""
+    *: "Перша буква"
   </dest>
   <voice>
-    *: ""
+    *: "Перша буква"
   </voice>
 </phrase>
 <phrase>
