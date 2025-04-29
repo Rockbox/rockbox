@@ -905,6 +905,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'ukrainian' => {
+	'lang' => 'ukrainian',
+	'name' => 'украї́нська (Ukrainian)',
+        'short' => 'uk',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vuk',
+	    'gtts' => '-l uk',
+            'piper' => 'uk_UA-ukrainian_tts-medium.onnx',
+	},
+        'enabled' => 1,
+    },
 );
 
 sub byshortname {

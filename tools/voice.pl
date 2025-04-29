@@ -115,6 +115,7 @@ my %gtts_lang_map = (
     'srpski' => '-l sr',
     'svenska' => '-l sv',
     'turkce' => '-l tr',
+    'ukrainian' => '-l uk',
 );
 
 my %espeak_lang_map = (
@@ -145,6 +146,7 @@ my %espeak_lang_map = (
     'srpski' => '-vsr',
     'svenska' => '-vsv',
     'turkce' => '-vtr',
+    'ukrainian' => '-vuk',
     );
 
 my %piper_lang_map = (
@@ -175,6 +177,7 @@ my %piper_lang_map = (
     'srpski' => 'sr_RS-serbski_institut-medium.onnx',
     'svenska' => 'sv_SE-nst-medium.onnx',
     'turkce' => 'tr_TR-fettah-medium.onnx',
+    'ukrainian' => 'uk_UA-ukrainian_tts-medium',
 );
 
 my $trim_thresh = 250;   # Trim silence if over this, in ms
