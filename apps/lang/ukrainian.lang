@@ -16,6 +16,7 @@
 #
 # Ukrainian language file, translated by:
 # - Mykhailo Radzievskyi
+# - Pavlo Rudy
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -153,7 +154,7 @@
     *: "Завантаження... %d%% завершено (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Завантаження"
   </voice>
 </phrase>
 <phrase>
@@ -246,18 +247,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "ВIДТВОР. = Так"
-    archosplayer: "(ВIДТВОР./СТОП)"
     cowond2*: "Меню або прав. верх. = Так"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВИБРАТИ = так"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВИБРАТИ = так"
     iriverh100,iriverh120,iriverh300: "НАВIГ. = Так"
     mrobe500: "ВІДТВ, ВИМКН., або правю верх. = Так"
     vibe500: "OK = Так"
@@ -272,15 +271,12 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "Будь-яка Iнша Кнопка = Нi"
-    archosplayer: none
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -542,20 +538,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Видалити"
-  </dest>
-  <voice>
-    *: "Видалити"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO_BOOKMARK_QUERY
   desc: prompt for user to decide to create an bookmark
   user: core
@@ -697,7 +679,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
@@ -711,7 +693,7 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
@@ -993,20 +975,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Режим редагування: %s"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_EQUALIZER_GAIN_ITEM
   desc: in the equalizer settings menu
   user: core
@@ -1106,7 +1074,7 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: "Dithering"
@@ -1116,159 +1084,6 @@
   </dest>
   <voice>
     *: "Зглажування"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Середнi Частоти"
-  </dest>
-  <voice>
-    *: none
-    masf: "Середнi Частоти"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Автогучнiсть"
-  </dest>
-  <voice>
-    *: none
-    masf: "Автогучнiсть"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "Час затухання автогучностi"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Супер Бас"
-  </dest>
-  <voice>
-    *: none
-    masf: "Супер Бас"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "Ввiмкнути MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Ввiмкнути MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "Сила MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Сила MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "Гармонiки MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Гармонiки MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "Центральна частота MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Центральна частота MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "Фома сигналу MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Фома сигналу MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1841,10 +1656,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Звiт по Last.fm"
@@ -1943,7 +1758,7 @@
     *: "Сортувати з Врахуванням Регiстру"
   </dest>
   <voice>
-    *: ""
+    *: "Сортувати з Врахуванням Регiстру"
   </voice>
 </phrase>
 <phrase>
@@ -2134,7 +1949,6 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    archosplayer: "Building DB %d found"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
@@ -2142,7 +1956,6 @@
   </source>
   <dest>
     *: "Створення Бази Даних ... %d знайдено (ВИМК. для скасування)"
-    archosplayer: "Створення БД %d знайдено"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Створення Бази Даних... %d знайдено (ЛIВО для скасування)"
     gogearsa9200: "Створення Бази Даних... %d знайдено (ПЕРЕМ. для скасування)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Створення Бази Даних... %d знайдено (ПОПЕРЕД. для скасування)"
@@ -2418,16 +2231,16 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
-    hold_button: "Пiдсвiтка при Блокуваннi"
+    *: "Пiдсвiтка при Блокуваннi"
+    hold_button: "Пiдсвiтка при натисненні"
   </dest>
   <voice>
-    *: none
-    hold_button: "Пiдсвiтка при Блокуваннi"
+    *: "Пiдсвiтка при Блокуваннi"
+    hold_button: "Пiдсвiтка при натисненні"
   </voice>
 </phrase>
 <phrase>
@@ -2514,16 +2327,13 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </source>
   <dest>
-    *: none
-    lcd_sleep: "Нiколи"
+    *: "Never"
   </dest>
   <voice>
-    *: none
-    lcd_sleep: "Нiколи"
+    *: "Ніколи"
   </voice>
 </phrase>
 <phrase>
@@ -3048,23 +2858,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Панель Кнопок"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Панель Кнопок"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
   user: core
@@ -3126,15 +2919,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Рiвень Сигналу"
-    masd: none
   </dest>
   <voice>
     *: "Рiвень Сигналу"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3143,15 +2933,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Час Затримки Iндикатора"
-    masd: none
   </dest>
   <voice>
     *: "Час Затримки Iндикатора"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3160,15 +2947,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Час Затримки Пiкiв"
-    masd: none
   </dest>
   <voice>
     *: "Час Затримки Пiкiв"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3177,15 +2961,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Постiйно"
-    masd: none
   </dest>
   <voice>
     *: "Постiйно"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3194,15 +2975,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Скидання Пiкiв"
-    masd: none
   </dest>
   <voice>
     *: "Скидання Пiкiв"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3211,15 +2989,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Масштаб"
-    masd: none
   </dest>
   <voice>
     *: "Масштаб"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3228,15 +3003,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Логарифмiчний (dB)"
-    masd: none
   </dest>
   <voice>
     *: "Логарифмiчний децибел"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3245,15 +3017,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Лiнiйний (%)"
-    masd: none
   </dest>
   <voice>
     *: "Лiнiйний вiдсотки"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3262,15 +3031,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Нижня Межа Дiапазону"
-    masd: none
   </dest>
   <voice>
     *: "Нижня Межа Дiапазону"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3279,15 +3045,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Верхня Межа Дiапазону"
-    masd: none
   </dest>
   <voice>
     *: "Верхня Межа Дiапазону"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3595,53 +3358,47 @@
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Battery Type"
+    battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Тип Акумулятору"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Тип Акумулятору"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "Alkaline"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "Лужний"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Лужний"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    battery_types: "NiMH"
+    battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types: "NiMH"
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: "Нiкель метал гiдридна"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3774,8 +3531,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3784,8 +3541,8 @@
   </source>
   <dest>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "ПРОГРАВ. = Встановити"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВИБРАТИ = Встановити"
-    gogearsa9200,samsungyh*: "ПРОГРАВ. = Встановити"
     iriverh100,iriverh120,iriverh300: "НАВIГ. = Встановити"
     mpiohd300: "ENTER = Встановити"
     mrobe500: "СЕРЦЕ = Встановити"
@@ -3794,6 +3551,7 @@
   </dest>
   <voice>
     *: none
+    gogearsa9200,samsungyh*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,iriverh100,iriverh120,iriverh300,rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3802,8 +3560,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3816,20 +3574,21 @@
   </source>
   <dest>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "НАЗАД = Скасувати"
     gigabeatfx: "ЖИВЛЕННЯ = Скасувати"
-    gigabeats: "НАЗАД = Скасувати"
+    mrobe500,rtc: "ВИМК. = Скасувати"
     gogearsa9200: "ВЛIВО = Скасувати"
     iaudiom5,iaudiox5: "ЗАПИС = Скасувати"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Скасувати"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "ПОПЕРЕД. = Скасувати"
     iriverh100,iriverh120,iriverh300: "СТОП = Скасувати"
     mrobe100: "ДИСПЛЕЙ = Скасувати"
-    mrobe500,rtc: "ВИМК. = Скасувати"
     samsungyh*: "REW = Скасувати"
     vibe500: "C = Скасувати"
   </dest>
   <voice>
     *: none
+    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4275,23 +4034,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Встановити Будильник"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Встановити Будильник"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_ERROR
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user: core
@@ -4306,35 +4048,6 @@
   <voice>
     *: none
     alarm: "Час Будильнику Дуже Скоро!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
-  </source>
-  <dest>
-    *: none
-    alarm: "ВIДТВОР.=Встановити ВИМК.=Вiдмiнити"
-    gigabeats: "ВИБIР=Встановити ЖИВЛ.=Вiдмiнити"
-    ipod*: "ВИБIР=Встановити МЕНЮ=Вiдмiнити"
-    iriverh10,iriverh10_5gb: "ВИБIР=Встановити ПОПЕРЕД.=Вiдмiнити"
-    mpiohd300: "ENTER=Встановити MENU=Вiдмiнити"
-    sansafuzeplus: "SELECT=Встановити  BACK=Вiдмiнити"
-    vibe500: "OK=Встановити C=Вiдмiнити"
-  </dest>
-  <voice>
-    *: none
-    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4436,20 +4149,6 @@
   </dest>
   <voice>
     *: "Вести Список Останнiх Закладок?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
-  user: core
-  <source>
-    *: "Unique only"
-  </source>
-  <dest>
-    *: "Тiльки Унiкальнi"
-  </dest>
-  <voice>
-    *: "Тiльки Унiкальнi"
   </voice>
 </phrase>
 <phrase>
@@ -4869,57 +4568,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Меню"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Вихiд"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Дiя"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu
   user: core
@@ -4934,40 +4582,6 @@
   <voice>
     *: none
     radio: "Пресет"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Додати"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Запис"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5393,23 +5007,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Якiсть"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Якiсть"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -5512,23 +5109,6 @@
   <voice>
     *: none
     recording: "Лiнiйний Вхiд"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Незалежнi Вiдрiзки"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Незалежнi Вiдрiзки"
   </voice>
 </phrase>
 <phrase>
@@ -5665,40 +5245,6 @@
   <voice>
     *: none
     recording: "Час попереднього запису"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Папка"
-  </dest>
-  <voice>
-    *: none
-    recording: "Папка"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
-  user: core
-  <source>
-    *: none
-    recording: "Set As Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Встановити як Папку для Запису"
-  </dest>
-  <voice>
-    *: none
-    recording: "Встановити як Папку для Запису"
   </voice>
 </phrase>
 <phrase>
@@ -6234,16 +5780,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in main menu and onplay menu
+  desc: deprecated
   user: core
   <source>
-    *: "Playlist Catalogue"
+    *: ""
   </source>
   <dest>
-    *: "Каталог Спискiв Вiдтвореня"
+    *: ""
   </dest>
   <voice>
-    *: "Каталог Спискiв Вiдтвореня"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6303,23 +5849,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Вимкнути"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Вимкнути"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen and in the info menu
   user: core
@@ -6339,11 +5868,9 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Буфер:"
-    archosplayer: "Буф:"
   </dest>
   <voice>
     *: "Розмiр буферу"
@@ -6356,12 +5883,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Акумулятор: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Рiвень Заряду Акумулятору"
@@ -6392,7 +5917,7 @@
     *: "Вiльно:"
   </dest>
   <voice>
-    *: "Вiльно на диску:"
+    *: "Вiльно на диску"
   </voice>
 </phrase>
 <phrase>
@@ -6401,41 +5926,44 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Пам'ять:"
+    hibylinux: "mSD:"
     xduoox3: "microSD1:"
   </dest>
   <voice>
-    *: "Память"
-    xduoox3: "micro S D 1"
+    *: "Пам'ять"
+    hibylinux: "micro SD"
+    xduoox3: "microSD1"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    archosondio*: "MMC:"
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    archosondio*: "MMC:"
+    hibylinux: "USB:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
     xduoox3: "microSD2:"
   </dest>
   <voice>
     *: none
-    archosondio*: "M M C"
-    multivolume: "H D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
-    xduoox3: "micro S D 2"
+    hibylinux: "U S B"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
+    xduoox3: "microSD2:"
   </voice>
 </phrase>
 <phrase>
@@ -6523,62 +6051,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert"
-  </source>
-  <dest>
-    *: "Вставити"
-  </dest>
-  <voice>
-    *: "Вставити"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Next"
-  </source>
-  <dest>
-    *: "Вставити Наступним"
-  </dest>
-  <voice>
-    *: "Вставити Наступним"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Last"
-  </source>
-  <dest>
-    *: "Вставити Останнiм"
-  </dest>
-  <voice>
-    *: "Вставити Останнiм"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user: core
-  <source>
-    *: "Insert Shuffled"
-  </source>
-  <dest>
-    *: "Вставити у випадкове мiсце"
-  </dest>
-  <voice>
-    *: "Вставити у випадкове мiсце"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
   user: core
@@ -6632,20 +6104,6 @@
   </dest>
   <voice>
     *: "В Чергу у Випадкове Мiсце"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
-  user: core
-  <source>
-    *: "Play Next"
-  </source>
-  <dest>
-    *: "Вiдтворити Наступне"
-  </dest>
-  <voice>
-    *: "Вiдтворити Наступне"
   </voice>
 </phrase>
 <phrase>
@@ -6715,7 +6173,7 @@
     *: "Пошук... %d знайдено (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Пошук"
   </voice>
 </phrase>
 <phrase>
@@ -6730,34 +6188,6 @@
   </dest>
   <voice>
     *: "Перемiшати"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Переглянути Каталог"
-  </dest>
-  <voice>
-    *: "Переглянути Каталог"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "Add to Playlist"
-  </source>
-  <dest>
-    *: "Додатти до Списку Вiдтворення"
-  </dest>
-  <voice>
-    *: "Додатти до Списку Вiдтворення"
   </voice>
 </phrase>
 <phrase>
@@ -7108,20 +6538,6 @@
   </dest>
   <voice>
     *: "Пiдсилення Треку"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Пiдсилення Альбому"
-  </dest>
-  <voice>
-    *: "Пiдсилення Альбому"
   </voice>
 </phrase>
 <phrase>
@@ -7498,11 +6914,9 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
     *: "Кiнець Списку Пiсень"
-    archosplayer: "Кiнець Списку"
   </dest>
   <voice>
     *: "Кiнець Списку Пiсень"
@@ -7534,20 +6948,6 @@
   </dest>
   <voice>
     *: "Нiчого продовжувати"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Помилка оновлення файлу списку вiдтворення"
-  </dest>
-  <voice>
-    *: "Помилка оновлення файлу списку вiдтворення"
   </voice>
 </phrase>
 <phrase>
@@ -7732,58 +7132,7 @@
   </dest>
   <voice>
     *: none
-    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-inf"
-  </dest>
-  <voice>
-    *: none
-    recording: "minus infinity"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Натиснiть OFF для вимкнення"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Будьласк витягнiть вставлену MMC"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Будьласк витягнiть вставлену multimedia card"
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -7816,7 +7165,7 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
@@ -7898,7 +7247,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -7907,7 +7256,7 @@
     *: "Несумiсний режим"
   </dest>
   <voice>
-    *: ""
+    *: "Несумiсний режим"
   </voice>
 </phrase>
 <phrase>
@@ -7921,7 +7270,7 @@
     *: "Несумiсна версiя"
   </dest>
   <voice>
-    *: ""
+    *: "Несумiсна версiя"
   </voice>
 </phrase>
 <phrase>
@@ -7932,10 +7281,10 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Плагiн повернув помилку"
+    *: "Плагiн видав помилку"
   </dest>
   <voice>
-    *: ""
+    *: "Плагiн видав помилку"
   </voice>
 </phrase>
 <phrase>
@@ -8012,40 +7361,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Акумулятор: Більше Можливого"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Акумулятор: Більше Можливого"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Акумулятор: Iмульс. Заряд"
-  </dest>
-  <voice>
-    *: none
-    charging: "TАкумулятор Iмульс. Заряд"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_WARNING_BATTERY_LOW
   desc: general warning
   user: core
@@ -8088,48 +7403,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "KB"
-  </source>
-  <dest>
-    *: "KB"
-  </dest>
-  <voice>
-    *: "kilobyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "MB"
-  </source>
-  <dest>
-    *: "MB"
-  </dest>
-  <voice>
-    *: "megabyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "GB"
-  </source>
-  <dest>
-    *: "GB"
-  </dest>
-  <voice>
-    *: "gigabyte"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
   user: core
@@ -8137,7 +7410,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "точка"
   </dest>
   <voice>
     *: "точка"
@@ -9288,7 +8561,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "під час відтворення екрану"
   </voice>
 </phrase>
 <phrase>
@@ -9389,7 +8662,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "розмітка"
   </voice>
 </phrase>
 <phrase>
@@ -9403,7 +8676,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "індекс"
   </voice>
 </phrase>
 <phrase>
@@ -9420,7 +8693,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Поточний час:"
+    rtc: "Поточний час"
   </voice>
 </phrase>
 <phrase>
@@ -9449,255 +8722,6 @@
   </dest>
   <voice>
     *: "Частота Зрiзання"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Пiдсилення"
-  </dest>
-  <voice>
-    *: "Пiдсилення"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Режим:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Меню"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Властивостi"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "РКД"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "Стерео"
-  </dest>
-  <voice>
-    *: none
-    recording: "Стерео"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "Моно"
-  </dest>
-  <voice>
-    *: none
-    recording: "Моно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Якiсть"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Якiсть"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "Частота"
-  </dest>
-  <voice>
-    *: none
-    recording: "Частота"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "Джерело"
-  </dest>
-  <voice>
-    *: none
-    recording: "Джерело"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "Вбуд. Мiкрофон"
-  </dest>
-  <voice>
-    *: none
-    recording: "Вбудований Мiкрофон"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "Лiнiйний вхiд"
-  </dest>
-  <voice>
-    *: none
-    recording: "Лiнiйний вхiд"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "Цифровий"
-  </dest>
-  <voice>
-    *: none
-    recording: "Цифровий"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "Канали"
-  </dest>
-  <voice>
-    *: none
-    recording: "Канали"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "Тригер"
-  </dest>
-  <voice>
-    *: none
-    recording: "Тригер"
   </voice>
 </phrase>
 <phrase>
@@ -11134,7 +10158,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbar skin"
+    *: "обкладинка рядка стану"
   </voice>
 </phrase>
 <phrase>
@@ -11236,15 +10260,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Смужка %d підсилення"
+    gigabeats,samsungypr1: "Смужка %d підсилення"
   </dest>
   <voice>
     *: none
-    gigabeats: "Смужка підсилення"
+    gigabeats,samsungypr1: "Підсилення смуги пропускання"
   </voice>
 </phrase>
 <phrase>
@@ -11290,23 +10314,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Лінійний вихід"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Лінійний вихід"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_FMS
   desc: spoken only, for file extension
   user: core
@@ -11320,7 +10327,7 @@
   </dest>
   <voice>
     *: none
-    radio: "radio screen skin"
+    radio: "обкладинка радіоекрану"
   </voice>
 </phrase>
 <phrase>
@@ -11329,15 +10336,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Ширина"
+    gigabeats,samsungypr1: "Ширина"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина"
+    gigabeats,samsungypr1: "Ширина"
   </voice>
 </phrase>
 <phrase>
@@ -11355,20 +10362,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Позиція смужки прокручування"
-  </dest>
-  <voice>
-    *: "Позиція смужки прокручування"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_RSBS
   desc: spoken only, for file extension
   user: core
@@ -11382,7 +10375,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote statusbar skin"
+    remote: "віддалена оболонка рядка стану"
   </voice>
 </phrase>
 <phrase>
@@ -11442,20 +10435,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
-  user: core
-  <source>
-    *: "Insert Last Shuffled"
-  </source>
-  <dest>
-    *: "Додати випадковий до кінця"
-  </dest>
-  <voice>
-    *: "Додати випадковий до кінця"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_SOFT_KNEE
   desc: in sound settings
   user: core
@@ -11494,7 +10473,7 @@
     *: "Наступний:"
   </dest>
   <voice>
-    *: "Наступний:"
+    *: "Наступний"
   </voice>
 </phrase>
 <phrase>
@@ -11600,11 +10579,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "USB: сховати внутрішній диск"
+    multidrive_usb: "USB сховати внутрішній диск"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "USB: сховати внутрішній диск"
+    multidrive_usb: "USB сховати внутрішній диск"
   </voice>
 </phrase>
 <phrase>
@@ -11690,20 +10669,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
-  user: core
-  <source>
-    *: "Set As Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "Встановити як папку каталогів списків"
-  </dest>
-  <voice>
-    *: "Встановити як папку каталогів списків"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_RFMS
   desc: spoken only, for file extension
   user: core
@@ -11717,7 +10682,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "remote radio screen skin"
+    radio_remote: "віддалена обкладинка радіоекрану"
   </voice>
 </phrase>
 <phrase>
@@ -11743,15 +10708,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Вузький"
+    gigabeats,samsungypr1: "Вузький"
   </dest>
   <voice>
     *: none
-    gigabeats: "Вузький"
+    gigabeats,samsungypr1: "Вузький"
   </voice>
 </phrase>
 <phrase>
@@ -11879,20 +10844,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTOMATIC
-  desc: generic automatic
-  user: core
-  <source>
-    *: "Automatic"
-  </source>
-  <dest>
-    *: "Автоматично"
-  </dest>
-  <voice>
-    *: "Автоматично"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_RATIO_10
   desc: in sound settings
   user: core
@@ -11929,15 +10880,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Дод. налаштування управління тоном"
+    gigabeats,samsungypr1: "Дод. налаштування управління тоном"
   </dest>
   <voice>
     *: none
-    gigabeats: "Дод. налаштування управління тоном"
+    gigabeats,samsungypr1: "Дод. налаштування управління тоном"
   </voice>
 </phrase>
 <phrase>
@@ -11946,15 +10897,15 @@
   user: core
   <source>
     *: none
-    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D Збільшення"
+    depth_3d: "Підсилення 3-D"
   </dest>
   <voice>
     *: none
-    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D Збільшення"
+    depth_3d: "Підсилення 3-D "
   </voice>
 </phrase>
 <phrase>
@@ -12078,15 +11029,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Смуга %d частот"
+    gigabeats,samsungypr1: "Смуга %d частот"
   </dest>
   <voice>
     *: none
-    gigabeats: "Смуга частот"
+    gigabeats,samsungypr1: "Смуга частот"
   </voice>
 </phrase>
 <phrase>
@@ -12103,7 +11054,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Потужність сигналу:"
+    radio: "Потужність сигналу"
   </voice>
 </phrase>
 <phrase>
@@ -12112,15 +11063,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Ширина %d смуги"
+    gigabeats,samsungypr1: "Ширина %d смуги"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина смуги"
+    gigabeats,samsungypr1: "Ширина смуги"
   </voice>
 </phrase>
 <phrase>
@@ -12169,20 +11120,6 @@
   <voice>
     *: none
     usb_hid: "Мультимедіа"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Користувацький"
-  </dest>
-  <voice>
-    *: "Користувацький"
   </voice>
 </phrase>
 <phrase>
@@ -12348,7 +11285,7 @@
     *: "PictureFlow"
   </dest>
   <voice>
-    *: "open picture flow"
+    *: "відкрити перегляд зображень"
   </voice>
 </phrase>
 <phrase>
@@ -12399,15 +11336,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Налаштування тону"
+    gigabeats,samsungypr1: "Налаштування тону"
   </dest>
   <voice>
     *: none
-    gigabeats: "Налаштування тону"
+    gigabeats,samsungypr1: "Налаштування тону"
   </voice>
 </phrase>
 <phrase>
@@ -12483,7 +11420,7 @@
     *: "Наступний трек:"
   </dest>
   <voice>
-    *: "Наступний трек:"
+    *: "Наступний трек"
   </voice>
 </phrase>
 <phrase>
@@ -12543,20 +11480,6 @@
   </dest>
   <voice>
     *: "з"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
-  user: core
-  <source>
-    *: "Start File Browser Here"
-  </source>
-  <dest>
-    *: "Починати показ файлів тут"
-  </dest>
-  <voice>
-    *: "Починати показ файлів тут"
   </voice>
 </phrase>
 <phrase>
@@ -12686,5 +11609,5371 @@
   </dest>
   <voice>
     *: "Обмеження автоматичних змін"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Скидання EQ"
+  </dest>
+  <voice>
+    *: "Скидання EQ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Одиночний режим"
+  </dest>
+  <voice>
+    *: "Одиночний режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Назва та альбом з тегів ID3"
+  </dest>
+  <voice>
+    *: "Назва та альбом з тегів ID3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Назва з тегів ID3"
+  </dest>
+  <voice>
+    *: "Назва з тегів ID3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Вибірка занадто велика, буде вибрано %d випадкових треків"
+  </dest>
+  <voice>
+    *: "Вибірка занадто велика, буде вибрано менше випадкових треків"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Спецсимвол"
+  </dest>
+  <voice>
+    *: "Спецсимвол"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Артисти альбому"
+  </dest>
+  <voice>
+    *: "Артисти альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Додати поточний до ярликів"
+  </dest>
+  <voice>
+    *: "Додати поточний до ярликів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Гучність голосових підказок"
+  </dest>
+  <voice>
+    *: "Гучність голосових підказок"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Мертва зона тачпада"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Мертва зона тачпада"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Диск"
+  </dest>
+  <voice>
+    *: "Диск"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "DAC filter roll-off"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Розгорнутий фільтр ЦАП"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Розгорнутий фільтр ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Різкість"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Різкість"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Повільніше"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Повільніше"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Коротка різкість"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Коротка різкість"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Коротка різкість"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Коротка різкість"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Надповільний"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Надповільний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Коротко"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Коротко"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Обхід"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Обхід"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Лінійний швидкий"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Лінійний швидкий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Лінійний повільний"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Лінійний повільний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Мінімально швидкий"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Мінімально швидкий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Мінімально повільний"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Мінімально повільний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Тип аподизації 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Тип аподизації 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Тип аподизації 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Тип аподизації 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Гібридний швидкий"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Гібридний швидкий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Цегляний мур"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Цегляний мур"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Режим живлення ЦАП"
+    es9218: "Вихідний рівень ЦАП"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Режим живлення ЦАП"
+    es9218: "Вихідний рівень ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Висока продуктивність"
+    es9218: "Високе посилення (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Висока продуктивність"
+    es9218: "Високе посилення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Економія батареї"
+    es9218: "Низьке посилення (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Економія батареї"
+    es9218: "Низьке посилення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: "Покращення сприйняття басів"
+  </dest>
+  <voice>
+    *: "Покращення сприйняття басів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: "Зменшення слухової втоми"
+  </dest>
+  <voice>
+    *: "Зменшення слухової втоми"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: "Haas Surround"
+  </source>
+  <dest>
+    *: "Об'ємне звучання"
+  </dest>
+  <voice>
+    *: "Об'ємне звучання"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "f(x1)"
+  </source>
+  <dest>
+    *: "f(x1)"
+  </dest>
+  <voice>
+    *: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "f(x2)"
+  </source>
+  <dest>
+    *: "f(x2)"
+  </dest>
+  <voice>
+    *: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "SIDE ONLY"
+  </source>
+  <dest>
+    *: "ТІЛЬКИ ЗБОКУ"
+  </dest>
+  <voice>
+    *: "ТІЛЬКИ ЗБОКУ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: "Сухe / вологе змішування"
+  </dest>
+  <voice>
+    *: "Сухe / вологе змішування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50,ibassodx90: "Регулятор масштабування частот"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50,ibassodx90: "Регулятор масштабування частот"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: "USB Mode"
+  </source>
+  <dest>
+    *: "USB Режим"
+  </dest>
+  <voice>
+    *: "USB Режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: "Mass Storage"
+  </source>
+  <dest>
+    *: "Накопичувач"
+  </dest>
+  <voice>
+    *: "Накопичувач"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: "Charge Only"
+  </source>
+  <dest>
+    *: "Тільки заряджання"
+  </dest>
+  <voice>
+    *: "Тільки заряджання"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: "Налагоджувальний міст Android"
+  </dest>
+  <voice>
+    *: "Налагоджувальний міст Android"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Ввімкнено"
+  </dest>
+  <voice>
+    *: "Ввімкнено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Play"
+  </source>
+  <dest>
+    *: "Вільна гра"
+  </dest>
+  <voice>
+    *: "Вільна гра"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Seek"
+  </source>
+  <dest>
+    *: "Вільний пошук"
+  </dest>
+  <voice>
+    *: "Вільний пошук"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Skip"
+  </source>
+  <dest>
+    *: "Вільний пропуск"
+  </dest>
+  <voice>
+    *: "Вільний пропуск"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Винятки для підсвітки"
+  </dest>
+  <voice>
+    *: "Винятки для підсвітки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Вимкнути при зовнішньому живленні"
+  </dest>
+  <voice>
+    *: "Вимкнути при зовнішньому живленні"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Вимкнути нерозпізнані клавіші"
+  </dest>
+  <voice>
+    *: "Вимкнути нерозпізнані клавіші"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Розширене блокування клавіш"
+  </dest>
+  <voice>
+    *: "Розширене блокування клавіш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Автоблокування ввімкнено"
+  </dest>
+  <voice>
+    *: "Автоблокування ввімкнено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Автоблокування вимкнено"
+  </dest>
+  <voice>
+    *: "Автоблокування вимкнено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Locked Reminders"
+  </source>
+  <dest>
+    *: "Вимкнути заблоковані нагадування	"
+  </dest>
+  <voice>
+    *: "Вимкнути заблоковані нагадування	"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Вимкнути сенсорний режим"
+  </dest>
+  <voice>
+    *: "Вимкнути сенсорний режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "кібібайт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "мебібайт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "гібібайт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "По одному на плейлист"
+  </dest>
+  <voice>
+    *: "По одному на плейлист"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "По одному на трек"
+  </dest>
+  <voice>
+    *: "По одному на трек"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Трек для руху"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "В черзі"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Поганий трек"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Рухомий трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed:"
+  </source>
+  <dest>
+    *: "Плейлист закінчився:"
+  </dest>
+  <voice>
+    *: "Плейлист закінчився"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed:"
+  </source>
+  <dest>
+    *: "Трек закінчився:"
+  </dest>
+  <voice>
+    *: "Трек закінчився"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining:"
+  </source>
+  <dest>
+    *: "Залишився трек:"
+  </dest>
+  <voice>
+    *: "Залишився трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track:"
+  </source>
+  <dest>
+    *: "Трек:"
+  </dest>
+  <voice>
+    *: "Трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage (Done / Remaining):"
+  </source>
+  <dest>
+    *: "Накопичувач (всього / залишилося)"
+  </dest>
+  <voice>
+    *: "Накопичувач"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Готово"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size:"
+  </source>
+  <dest>
+    *: "Середній розмір треку:"
+  </dest>
+  <voice>
+    *: "Середній розмір треку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate:"
+  </source>
+  <dest>
+    *: "Середній бітрейт:"
+  </dest>
+  <voice>
+    *: "Середній бітрейт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Помилка при зборі інформації"
+  </dest>
+  <voice>
+    *: "Помилка при зборі інформації"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Час відтворення"
+  </dest>
+  <voice>
+    *: "Час відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Затримка перед поновленням"
+  </dest>
+  <voice>
+    *: none
+    charging: "Затримка перед поновленням"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Абсолютний режим"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Режим напівтонів"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Розтягування часу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Дистанційне керування"
+  </dest>
+  <voice>
+    *: "Дистанційне керування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "Без дист. керування"
+  </dest>
+  <voice>
+    *: "Без дист. керування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Поза контролем"
+  </dest>
+  <voice>
+    *: "Поза контролем"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Клавішне керування"
+  </dest>
+  <voice>
+    *: "2 Клавішне керування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Клавішне керування"
+  </dest>
+  <voice>
+    *: "4 Клавішне керування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Play Wormlet!"
+  </source>
+  <dest>
+    *: "Грай Вормлета!"
+  </dest>
+  <voice>
+    *: "Грай Вормлета!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Number of Worms"
+  </source>
+  <dest>
+    *: "Кількість хробаків"
+  </dest>
+  <voice>
+    *: "Кількість хробаків"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: "Ріст черв'яків на один корм"
+  </dest>
+  <voice>
+    *: "Ріст черв'яків на один корм"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Speed"
+  </source>
+  <dest>
+    *: "Швидкість черв'яка"
+  </dest>
+  <voice>
+    *: "Швидкість черв'яка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Arghs Per Food"
+  </source>
+  <dest>
+    *: "Арг на їжу"
+  </dest>
+  <voice>
+    *: "Арг на їжу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Argh Size"
+  </source>
+  <dest>
+    *: "Аргх розмір"
+  </dest>
+  <voice>
+    *: "Аргх розмір"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Food Size"
+  </source>
+  <dest>
+    *: "Розмір їжі"
+  </dest>
+  <voice>
+    *: "Розмір їжі"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Кількість гравців"
+  </dest>
+  <voice>
+    *: "Кількість гравців"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Стиль керування"
+  </dest>
+  <voice>
+    *: "Стиль керування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Повернутися до стандартних налаштувань"
+  </dest>
+  <voice>
+    *: "Повернутися до стандартних налаштувань"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Вихід"
+  </dest>
+  <voice>
+    *: "Вихід"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Параметри відображення"
+  </dest>
+  <voice>
+    *: "Параметри відображення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Previous Track"
+  </dest>
+  <voice>
+    *: "Попередній трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Пауза/Відтворення"
+  </dest>
+  <voice>
+    *: "Пауза/Відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Зупинити відтворення"
+  </dest>
+  <voice>
+    *: "Зупинити відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Наступний трек"
+  </dest>
+  <voice>
+    *: "Наступний трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Змінити гучність"
+  </dest>
+  <voice>
+    *: "Змінити гучність"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Shuffle Mode"
+  </dest>
+  <voice>
+    *: "Режим перемішування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Змінити режим повтору"
+  </dest>
+  <voice>
+    *: "Змінити режим повтору"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Керування відтворенням"
+  </dest>
+  <voice>
+    *: "Керування відтворенням"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Checkmate!"
+  </source>
+  <dest>
+    *: "Checkmate!"
+  </dest>
+  <voice>
+    *: "Шах і мат!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Illegal move!"
+  </source>
+  <dest>
+    *: "Заборонений рух!"
+  </dest>
+  <voice>
+    *: "Заборонений рух!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "New Game"
+  </source>
+  <dest>
+    *: "Нова гра"
+  </dest>
+  <voice>
+    *: "Нова гра"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Resume Game"
+  </source>
+  <dest>
+    *: "Гра-резюме"
+  </dest>
+  <voice>
+    *: "Гра-резюме"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Save Game"
+  </source>
+  <dest>
+    *: "Зберегти гру"
+  </dest>
+  <voice>
+    *: "Зберегти гру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restore Game"
+  </source>
+  <dest>
+    *: "Відновити гру"
+  </dest>
+  <voice>
+    *: "Відновити гру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restart Game"
+  </source>
+  <dest>
+    *: "Перезапустити гру"
+  </dest>
+  <voice>
+    *: "Перезапустити гру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Select Other Game"
+  </source>
+  <dest>
+    *: "Select Other Game"
+  </dest>
+  <voice>
+    *: "Виберіть іншу гру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: "Рівень 1: 60 ходів / 5 хв"
+  </dest>
+  <voice>
+    *: "Рівень 1 60 ходів за 5 хв"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: "Рівень 2: 60 ходів / 15 хв"
+  </dest>
+  <voice>
+    *: "Рівень 2 60 ходів за 15 хв"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: "Рівень 3: 60 ходів / 30 хв"
+  </dest>
+  <voice>
+    *: "Рівень 3 60 ходів за 30 хв"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: "Рівень 4: 40 ходів / 30 хв"
+  </dest>
+  <voice>
+    *: "Рівень 4, 40 ходів за 30 хвилин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: "Рівень 5: 40 ходів / 60 хв"
+  </dest>
+  <voice>
+    *: "Рівень 5, 40 ходів за 60 хвилин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: "Рівень 6: 40 ходів / 120 хв"
+  </dest>
+  <voice>
+    *: "Рівень 6, 40 ходів за 120 хвилин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: "Рівень 7: 40 ходів / 240 хв"
+  </dest>
+  <voice>
+    *: "Рівень 7, 40 ходів за 240 хвилин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "Error parsing game !"
+  </source>
+  <dest>
+    *: "Помилка розбору гри !"
+  </dest>
+  <voice>
+    *: "Помилка розбору гри !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "No games found !"
+  </source>
+  <dest>
+    *: "Не знайдено жодної гри!"
+  </dest>
+  <voice>
+    *: "Не знайдено жодної гри!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the beginning of the game"
+  </source>
+  <dest>
+    *: "На початку гри"
+  </dest>
+  <voice>
+    *: "На початку гри"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the end of the game"
+  </source>
+  <dest>
+    *: "Наприкінці гри"
+  </dest>
+  <voice>
+    *: "Наприкінці гри"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Програвач"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "GNU Chess"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Позначено"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Без позначки"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Білий"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Чорний"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Перевірка!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "захоплення"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "замок"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "королівська сторона	"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "ферзева сторона"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Пішак"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Лицар"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Єпископ"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Грач"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Королева"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Король"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Ігри"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Saving position"
+  </source>
+  <dest>
+    *: "Збереження позиції"
+  </dest>
+  <voice>
+    *: "Збереження позиції"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Loading position"
+  </source>
+  <dest>
+    *: "Завантаження позиції"
+  </dest>
+  <voice>
+    *: "Завантаження позиції"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Thinking..."
+  </source>
+  <dest>
+    *: "Гадаю..."
+  </dest>
+  <voice>
+    *: "Гадаю"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Акумуляторний тест вже працює"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Натисніть кнопку відтворення, щоб запустити тест батареї"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: "Cannot restart playback"
+  </source>
+  <dest>
+    *: "Не вдається перезапустити відтворення"
+  </dest>
+  <voice>
+    *: "Не вдається перезапустити відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Ordered"
+  </source>
+  <dest>
+    *: "Замовлено"
+  </dest>
+  <voice>
+    *: "Замовлено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Diffusion"
+  </source>
+  <dest>
+    *: "Дифузія"
+  </dest>
+  <voice>
+    *: "Дифузія"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Grayscale"
+  </source>
+  <dest>
+    *: "Градації сірого"
+  </dest>
+  <voice>
+    *: "Градації сірого"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: "Увімкнути режим показу слайдів"
+  </dest>
+  <voice>
+    *: "Увімкнути режим показу слайдів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Slideshow Time"
+  </source>
+  <dest>
+    *: "Час слайд шоу "
+  </dest>
+  <voice>
+    *: "Час слайд шоу "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Ввід"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Каталог записів"
+  </dest>
+  <voice>
+    *: none
+    recording: "Каталог записів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "View Played Games"
+  </source>
+  <dest>
+    *: "Перегляд зіграних ігор"
+  </dest>
+  <voice>
+    *: "Перегляд зіграних ігор"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Параметри аудіо"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Параметри аудіо"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Параметри відновлення"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Параметри відновлення"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Режим відтворення"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Режим відтворення"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Одиночний"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Одиночний"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Використовуйте налаштування звуку"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Використовуйте налаштування звуку"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Відтворення з початку"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Відтворення з початку"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Встановіть час відновлення (хв)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Встановіть час відновлення"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: "Display FPS"
+  </source>
+  <dest>
+    *: "Відображення FPS"
+  </dest>
+  <voice>
+    *: "Відображення FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Обмеження FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Обмеження FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Пропустити кадри"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Пропустити кадри"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Яскравість підсвічування"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Яскравість підсвічування"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Використовуйте загальні налаштування"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Використовуйте загальні налаштування"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Регулятори тембру"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Регулятори тембру"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Стартове меню"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Стартове меню"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Стартове меню якщо не заповнено"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Стартове меню якщо не заповнено"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Поновити автоматично"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Поновити автоматично"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Очистити всі повтори"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Очистити всі повтори"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Недоступно"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Недоступно"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Переключити елемент"
+  </dest>
+  <voice>
+    *: "Переключити елемент"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Перемістити елемент вгору"
+  </dest>
+  <voice>
+    *: "Перемістити елемент вгору"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Перемістити елемент вниз"
+  </dest>
+  <voice>
+    *: "Перемістити елемент униз"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Завантажити конфігурацію за замовчуванням"
+  </dest>
+  <voice>
+    *: "Завантажити конфігурацію за замовчуванням"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Зберегти та вийти"
+  </dest>
+  <voice>
+    *: "Зберегти та вийти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Порядок головного меню Rockbox"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Шлях]"
+  </dest>
+  <voice>
+    *: "Шлях"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Ім'я файлу]"
+  </dest>
+  <voice>
+    *: "Ім'я файлу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Розмір]"
+  </dest>
+  <voice>
+    *: "Розмір"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Дата]"
+  </dest>
+  <voice>
+    *: "Дата"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Time]"
+  </dest>
+  <voice>
+    *: "Час"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Підкаталоги]"
+  </dest>
+  <voice>
+    *: "Підкаталоги"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Файли]"
+  </dest>
+  <voice>
+    *: "Файли"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Властивості каталогу"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "Властивості файлу"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Не вдалось зібрати інформацію"
+  </dest>
+  <voice>
+    *: "Не вдалось зібрати інформацію"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Перемикання каналів"
+  </dest>
+  <voice>
+    *: "Перемикання каналів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Поділ панорамування"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Поділ панорамування"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Реверберація"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Реверберація"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Інтерполяція"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Interpolation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Об'єм"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Об'єм"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "HQ Mixer"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Мікшер HQ"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Мікшер HQ"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Sample Rate"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Частота дискретизації"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Частота дискретизації"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Прискорення процесора"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Прискорення процесора"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Spacing"
+  </source>
+  <dest>
+    *: "Інтервал"
+  </dest>
+  <voice>
+    *: "Інтервал"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Centre margin"
+  </source>
+  <dest>
+    *: "Centre margin"
+  </dest>
+  <voice>
+    *: "Centre margin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Number of slides"
+  </source>
+  <dest>
+    *: "Центральний відступ"
+  </dest>
+  <voice>
+    *: "Центральний відступ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Zoom"
+  </source>
+  <dest>
+    *: "Збільшення"
+  </dest>
+  <voice>
+    *: "Збільшення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Show album title"
+  </source>
+  <dest>
+    *: "Показати назву альбому"
+  </dest>
+  <voice>
+    *: "Показати назву альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Resize Covers"
+  </source>
+  <dest>
+    *: "Змінити розмір обкладинки"
+  </dest>
+  <voice>
+    *: "Змінити розмір обкладинки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Rebuild cache"
+  </source>
+  <dest>
+    *: "Перебудувати кеш"
+  </dest>
+  <voice>
+    *: "Перебудувати кеш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "WPS Integration"
+  </source>
+  <dest>
+    *: "Інтеграція WPS"
+  </dest>
+  <voice>
+    *: "Інтеграція WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: "Go to WPS"
+  </source>
+  <dest>
+    *: "Перейти до WPS"
+  </dest>
+  <voice>
+    *: "Перейти до WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide album title"
+  </source>
+  <dest>
+    *: "Приховати назву альбому"
+  </dest>
+  <voice>
+    *: "Приховати назву альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the bottom"
+  </source>
+  <dest>
+    *: "Показати внизу"
+  </dest>
+  <voice>
+    *: "Показати внизу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the top"
+  </source>
+  <dest>
+    *: "Показати вгорі"
+  </dest>
+  <voice>
+    *: "Показати вгорі"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings, also a volume adjustment mode
+  user: core
+  <source>
+    *: "Direct"
+  </source>
+  <dest>
+    *: "Прямо"
+  </dest>
+  <voice>
+    *: "Прямо"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Via Track list"
+  </source>
+  <dest>
+    *: "Через список треків"
+  </dest>
+  <voice>
+    *: "Через список треків"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Always On"
+  </source>
+  <dest>
+    *: "Завжди увімкнено"
+  </dest>
+  <voice>
+    *: "Завжди увімкнено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "No album art found"
+  </source>
+  <dest>
+    *: "Обкладинку альбому не знайдено"
+  </dest>
+  <voice>
+    *: "Обкладинку альбому не знайдено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Error writing config"
+  </source>
+  <dest>
+    *: "Помилка запису конфігурації"
+  </dest>
+  <voice>
+    *: "Помилка запису конфігурації"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Не VBR-файл"
+  </dest>
+  <voice>
+    *: "Не VBR-файл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "Помилка файлу: %d"
+  </dest>
+  <voice>
+    *: "Помилка файлу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Оновити кеш"
+  </dest>
+  <voice>
+    *: "Оновити кеш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide information"
+  </source>
+  <dest>
+    *: "Приховати інформацію"
+  </dest>
+  <voice>
+    *: "Приховати інформацію"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the bottom"
+  </source>
+  <dest>
+    *: "Показати альбом внизу"
+  </dest>
+  <voice>
+    *: "Показати альбом внизу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the top"
+  </source>
+  <dest>
+    *: "Показати альбом вгорі"
+  </dest>
+  <voice>
+    *: "Показати альбом вгорі"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: "Показати альбом і виконавця вгорі"
+  </dest>
+  <voice>
+    *: "Показати альбом і виконавця вгорі"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: "Показати альбом та виконавця внизу"
+  </dest>
+  <voice>
+    *: "Показати альбом та виконавця внизу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Натисніть LEFT, щоб скасувати."
+    android,hifietma*,zenvision: "Натисніть BACK, щоб скасувати."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Натисніть POWER, щоб скасувати."
+    ihifi760,ihifi960: "Двічі торкніться RETURN, щоб скасувати."
+    ihifi770,ihifi770c,ihifi800: "Натисніть HOME, щоб скасувати."
+    iriverh10,rx27generic: ""
+    samsungyh*: "Двічі торкніться ЛІВОРУЧ, щоб скасувати."
+    mpiohd200: "Двічі торкніться REC, щоб скасувати."
+    mpiohd300: "Двічі торкніться МЕНЮ, щоб скасувати."
+    sonynwza860: "Карти клавіш неповні.	"
+    touchscreen: "Натисніть зліва посередині, щоб скасувати."
+    vibe500: "Натисніть PREV, щоб скасувати."
+    xduoox20,xduoox3,xduoox3ii: "Двічі торкніться HOME, щоб скасувати."
+  </dest>
+  <voice>
+    *: "Натисніть LEFT, щоб скасувати."
+    android,hifietma*,zenvision: "Натисніть BACK, щоб скасувати."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Натисніть POWER, щоб скасувати."
+    ihifi760,ihifi960: "Двічі торкніться RETURN, щоб скасувати."
+    ihifi770,ihifi770c,ihifi800: "Натисніть HOME, щоб скасувати."
+    iriverh10,samsungyh*: "Двічі торкніться ЛІВОРУЧ, щоб скасувати."
+    mpiohd200: "Двічі торкніться REC, щоб скасувати."
+    mpiohd300: "Двічі торкніться МЕНЮ, щоб скасувати. tap MENU to cancel."
+    rx27generic: "Натисніть клавішу VOLUME, щоб скасувати."
+    touchscreen: "Натисніть зліва посередині, щоб скасувати."
+    vibe500: "Натисніть PREV, щоб скасувати."
+    xduoox20,xduoox3,xduoox3ii: "Двічі торкніться HOME, щоб скасувати."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Дата"
+  </dest>
+  <voice>
+    *: "Дата"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Зачистити все."
+  </dest>
+  <voice>
+    *: "Зачистити все."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Скасувати"
+  </dest>
+  <voice>
+    *: "Скасувати"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Зберегти"
+  </dest>
+  <voice>
+    *: "Зберегти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Тайм-аут."
+  </dest>
+  <voice>
+    *: "Тайм-аут."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: "Track"
+  </source>
+  <dest>
+    *: "Трек"
+  </dest>
+  <voice>
+    *: "Трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: "Elapsed"
+  </source>
+  <dest>
+    *: "Минуло"
+  </dest>
+  <voice>
+    *: "Минуло"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Формат анонсу"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Формат анонсу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Залишилося"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Залишилося"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Групування"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Групування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Анонсувати на"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Анонсувати на"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Зміна треку"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Зміна треку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Утримуйте для налаштувань"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Утримуйте для налаштувань"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Відкрити плагін"
+  </dest>
+  <voice>
+    *: "Відкрити плагін"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Не плагін: %s"
+  </dest>
+  <voice>
+    *: "Не плагін"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Встановити контекстний плагін WPS"
+  </dest>
+  <voice>
+    *: "Встановити контекстний плагін WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Параметр"
+  </dest>
+  <voice>
+    *: "Параметр"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Ім'я"
+  </dest>
+  <voice>
+    *: "Ім'я"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Додати"
+  </dest>
+  <voice>
+    *: "Додати"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Назад"
+  </dest>
+  <voice>
+    *: "Назад"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Редагувати"
+  </dest>
+  <voice>
+    *: "Редагувати"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Запуск"
+  </dest>
+  <voice>
+    *: "Запуск"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Експорт"
+  </dest>
+  <voice>
+    *: "Експорт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Огляд"
+  </dest>
+  <voice>
+    *: "Огляд"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Увімкнути режим USB-накопичувача?"
+  </dest>
+  <voice>
+    *: "Увімкнути режим USB-накопичувача?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Черга..."
+  </dest>
+  <voice>
+    *: "Черга"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Показати параметри черги"
+  </dest>
+  <voice>
+    *: "Показати параметри черги"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Показати параметри додавання у випадковому порядку"
+  </dest>
+  <voice>
+    *: "Показати параметри додавання у випадковому порядку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "У підменю"
+  </dest>
+  <voice>
+    *: "У підменю"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Вимкнути всі сповіщення про блокування"
+  </dest>
+  <voice>
+    *: "Вимкнути всі сповіщення про блокування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Звільнений обсяг"
+  </dest>
+  <voice>
+    *: "Звільнений обсяг"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Завжди автоблокування"
+  </dest>
+  <voice>
+    *: "Завжди автоблокування"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "Обхід списку"
+  </dest>
+  <voice>
+    *: "Обхід списку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Показати повідомлення про вимкнення"
+  </dest>
+  <voice>
+    *: "Показати повідомлення про вимкнення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "Порядок списку"
+  </dest>
+  <voice>
+    *: "Порядок списку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Висхідний"
+  </dest>
+  <voice>
+    *: "Висхідний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Спадний"
+  </dest>
+  <voice>
+    *: "Спадний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Обкладинка альбому"
+  </dest>
+  <voice>
+    *: "Обкладинка альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Надати перевагу вбудованому"
+  </dest>
+  <voice>
+    *: "Надати перевагу вбудованому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Надати перевагу файлу зображення"
+  </dest>
+  <voice>
+    *: "Надати перевагу файлу зображення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Синхронізація часу RDS"
+  </dest>
+  <voice>
+    *: none
+    rds: "Синхронізація часу RDS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Сортувати альбоми за"
+  </dest>
+  <voice>
+    *: "Сортувати альбоми за"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Артист + Ім'я"
+  </dest>
+  <voice>
+    *: "Артист та Ім'я"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Артист + Рік"
+  </dest>
+  <voice>
+    *: "Артист та Рік"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Порядок сортування за роками"
+  </dest>
+  <voice>
+    *: "Порядок сортування за роками"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Показувати рік у назві альбому"
+  </dest>
+  <voice>
+    *: "Показувати рік у назві альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Кеш повинен спочатку завершити оновлення!"
+  </dest>
+  <voice>
+    *: "Кеш повинен спочатку завершити оновлення!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Інформація про трек"
+  </dest>
+  <voice>
+    *: "Інформація про трек"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Грати"
+  </dest>
+  <voice>
+    *: "Грати"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Грати в перетасованому порядку"
+  </dest>
+  <voice>
+    *: "Грати в перетасованому порядку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Збереження поточного треку при заміні списку відтворення"
+  </dest>
+  <voice>
+    *: "Збереження поточного треку при заміні списку відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Очищення налаштувань, якщо утримувати кнопку скидання під час запуску"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Очищення налаштувань, якщо під час запуску увімкнено перемикач утримання"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Очищення налаштувань, якщо утримувати кнопку скидання під час запуску"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Очищення налаштувань, якщо під час запуску увімкнено перемикач утримання"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Перемотати назад через треки"
+  </dest>
+  <voice>
+    *: "Перемотати назад через треки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Встановити як..."
+  </dest>
+  <voice>
+    *: "Встановити як"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Каталог плейлистів"
+  </dest>
+  <voice>
+    *: "Каталог плейлистів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Початковий каталог"
+  </dest>
+  <voice>
+    *: "Початковий каталог"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Каталог записів"
+  </dest>
+  <voice>
+    *: none
+    recording: "Каталог записів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Додати до списку відтворення"
+  </dest>
+  <voice>
+    *: "Додати до списку відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Додати до існуючого списку відтворення"
+  </dest>
+  <voice>
+    *: "Додати до існуючого списку відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Playing Next...Програється наступний"
+  </dest>
+  <voice>
+    *: "Програється наступний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Грати наступний"
+  </dest>
+  <voice>
+    *: "Грати наступний"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Додати перетасований"
+  </dest>
+  <voice>
+    *: "Додати перетасований"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Відтворити останнім"
+  </dest>
+  <voice>
+    *: "Відтворити останнім"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Зіграти останній перетасований"
+  </dest>
+  <voice>
+    *: "Зіграти останній перетасований"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Режим регулювання гучності"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Режим регулювання гучності"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Кількість кроків гучності"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Кількість кроків гучності"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Сприйняття"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Сприйняття"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Показувати треки під час перегляду"
+  </dest>
+  <voice>
+    *: "Показувати треки під час перегляду"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Перейти до останнього альбому"
+  </dest>
+  <voice>
+    *: "Перейти до останнього альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Каталог баз даних"
+  </dest>
+  <voice>
+    *: "Каталог баз даних"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Видалення доріжок у черзі?"
+  </dest>
+  <voice>
+    *: "Видалення доріжок у черзі?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Швидко (ігнорувати кеш каталогів)"
+  </dest>
+  <voice>
+    *: "Швидко (ігнорувати кеш каталогів)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "Що грає на екрані"
+  </dest>
+  <voice>
+    *: "Що грає на екрані"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Браузер за замовчуванням"
+  </dest>
+  <voice>
+    *: "Браузер за замовчуванням"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Перетворити головне меню"
+  </dest>
+  <voice>
+    *: "Перетворити головне меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Встановити розмір лабіринту"
+  </dest>
+  <voice>
+    *: "Встановити розмір лабіринту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "Переглянути мапу"
+  </dest>
+  <voice>
+    *: "Переглянути мапу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Показати компас"
+  </dest>
+  <voice>
+    *: "Показати компас"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Показати мапу"
+  </dest>
+  <voice>
+    *: "Показати мапу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Запам'ятати шлях"
+  </dest>
+  <voice>
+    *: "Запам'ятати шлях"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Використовуйте великі плитки"
+  </dest>
+  <voice>
+    *: "Використовуйте великі плитки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Показати рішення"
+  </dest>
+  <voice>
+    *: "Показати рішення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Вийти без збереження"
+  </dest>
+  <voice>
+    *: "Вийти без збереження"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Генерація лабіринту..."
+  </dest>
+  <voice>
+    *: "Генерація лабіринту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "Ти переміг!"
+  </dest>
+  <voice>
+    *: "Ти переміг!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "Ти шахраював!"
+  </dest>
+  <voice>
+    *: "Ти шахраював!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Легкий"
+  </dest>
+  <voice>
+    *: "Легкий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Середній"
+  </dest>
+  <voice>
+    *: "Середній"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Важкий"
+  </dest>
+  <voice>
+    *: "Важкий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Експерт"
+  </dest>
+  <voice>
+    *: "Експерт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Правові повідомлення"
+  </dest>
+  <voice>
+    *: "Правові повідомлення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Помилка: %s"
+  </dest>
+  <voice>
+    *: "Помилка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Налаштування Mikmod"
+  </dest>
+  <voice>
+    *: "Налаштування Mikmod"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Mikmod меню"
+  </dest>
+  <voice>
+    *: "Mikmod меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Меню шахової дошки"
+  </dest>
+  <voice>
+    *: "Меню шахової дошки"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Неправильний голосовий файл"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_LANG_NAME
+  desc: Spoken name of the language
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "украї́нська"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Виберіть файл"
+  </dest>
+  <voice>
+    *: "Виберіть файл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Вимкнути прокрутку головного меню"
+  </dest>
+  <voice>
+    *: "Вимкнути прокрутку головного меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Залишилось"
+  </dest>
+  <voice>
+    *: "Залишилось"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "За першою літерою..."
+  </dest>
+  <voice>
+    *: "За першою літерою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Артисти за першою літерою"
+  </dest>
+  <voice>
+    *: "Артисти за першою літерою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Виконавці альбому за першою літерою"
+  </dest>
+  <voice>
+    *: "Виконавці альбому за першою літерою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Альбоми за першою літерою"
+  </dest>
+  <voice>
+    *: "Альбоми за першою літерою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Треки за першою літерою"
+  </dest>
+  <voice>
+    *: "Треки за першою літерою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Артисти"
+  </dest>
+  <voice>
+    *: "Артисти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Треки"
+  </dest>
+  <voice>
+    *: "Треки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Треки"
+  </dest>
+  <voice>
+    *: "Треки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Випадкові пісні"
+  </dest>
+  <voice>
+    *: "Випадкові пісні"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Ім'я файлу"
+  </dest>
+  <voice>
+    *: "Ім'я файлу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Назва з тривалістю треку"
+  </dest>
+  <voice>
+    *: "Назва з тривалістю треку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Рейтинг користувачів"
+  </dest>
+  <voice>
+    *: "Рейтинг користувачів"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Пошук"
+  </dest>
+  <voice>
+    *: "Пошук"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Пошук по..."
+  </dest>
+  <voice>
+    *: "Пошук по"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Нещодавно додано"
+  </dest>
+  <voice>
+    *: "Нещодавно додано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Історія програвання"
+  </dest>
+  <voice>
+    *: "Історія програвання"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Користувацьке меню"
+  </dest>
+  <voice>
+    *: "Користувацьке меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Те саме, що й поточна відтворювана доріжка"
+  </dest>
+  <voice>
+    *: "Те саме, що й поточна відтворювана доріжка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Каталог"
+  </dest>
+  <voice>
+    *: "Каталог"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Альбоми за роками"
+  </dest>
+  <voice>
+    *: "Альбоми за роками"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Альбоми між роками"
+  </dest>
+  <voice>
+    *: "Альбоми між роками"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Артисти між роками"
+  </dest>
+  <voice>
+    *: "Артисти між роками"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Найчастіше грали (Кількість|Оцінка)"
+  </dest>
+  <voice>
+    *: "Найчастіше грали за кількістю та оцінкою"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Нещодавно відтворені треки"
+  </dest>
+  <voice>
+    *: "Нещодавно відтворені треки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Ніколи не відтворювані треки"
+  </dest>
+  <voice>
+    *: "Ніколи не відтворювані треки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Улюблені артисти"
+  </dest>
+  <voice>
+    *: "Улюблені артисти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Улюблені альбоми"
+  </dest>
+  <voice>
+    *: "Улюблені альбоми"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Нещодавні улюбленці"
+  </dest>
+  <voice>
+    *: "Нещодавні улюбленці"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Нові улюбленці"
+  </dest>
+  <voice>
+    *: "Нові улюбленці"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Забуті улюбленці"
+  </dest>
+  <voice>
+    *: "Забуті улюбленці"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Треки від"
+  </dest>
+  <voice>
+    *: "Треки від"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Переглянути обкладинку альбому"
+  </dest>
+  <voice>
+    *: "Переглянути обкладинку альбому"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Вибір виходу"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Вибір виходу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Навушники"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Навушники"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Лінійний вихід"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Лінійний вихід"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Не вдалося завантажити шрифт: (%s)"
+  </dest>
+  <voice>
+    *: "Не вдалося завантажити шрифт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Журналювання"
+  </dest>
+  <voice>
+    *: "Журналювання"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "переглянути журнал"
+  </dest>
+  <voice>
+    *: "переглянути журнал"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Список відтворення завершено. Пограти ще раз?"
+  </dest>
+  <voice>
+    *: "Список відтворення завершено. Пограти ще раз?"
   </voice>
 </phrase>
