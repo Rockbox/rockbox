@@ -666,7 +666,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_ID3_BITRATE:
                 if (!id3->bitrate)
                     return NULL;
-                snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
+                snprintf(buffer, buffer_len, "%d kbps%s%s", id3->bitrate,
+            id3->vbr ? " " : "",
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 val=buffer;
                 if(say_it)

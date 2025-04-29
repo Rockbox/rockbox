@@ -20,6 +20,7 @@ sub trim {
     my ($string) = @_;
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
+    $string =~ tr/\t//d;
     return $string;
 }
 
@@ -61,7 +62,13 @@ sub parselangfile {
 	    }
 	} elsif ($pos ne 'phrase' && $line =~ /^([^:]+): ?\"?([^\"]*)\"?$/) {
 	    my @targets = split(',', $1);
-	    my $w = $2;
+	    my $w;
+
+	    if ($id ne 'VOICE_PAUSE') {
+               $w = trim($2);
+            } else {
+               $w = $2;
+            }
 
 	    foreach (@targets) {
 		my $l = trim($_);

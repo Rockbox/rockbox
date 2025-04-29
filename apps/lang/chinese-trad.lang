@@ -4432,7 +4432,7 @@
   desc: in browse_id3
   user: core
   <source>
-    *: " (VBR)"
+    *: "(VBR)"
   </source>
   <dest>
     *: " (變動位元率)"

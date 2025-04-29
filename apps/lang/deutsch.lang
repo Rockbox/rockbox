@@ -6498,10 +6498,10 @@
   desc: in browse_id3
   user: core
   <source>
-    *: " (VBR)"
+    *: "(VBR)"
   </source>
   <dest>
-    *: " (VBR)"
+    *: "(VBR)"
   </dest>
   <voice>
     *: "VBR"

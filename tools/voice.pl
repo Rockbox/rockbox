@@ -698,6 +698,9 @@ if (defined($v) or defined($ENV{'V'})) {
 # add the tools dir to the path temporarily, for calling various tools
 $ENV{'PATH'} = dirname($0) . ':' . $ENV{'PATH'};
 
+# logging needs to be UTF8
+binmode(*STDOUT, ':encoding(utf8)');
+
 my $tts_object = init_tts($s, $S, $l);
 
 # Do what we're told

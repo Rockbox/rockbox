@@ -91,6 +91,7 @@
 # GoGear SA9200     gogearsa9200
 # Samsung
 # YH820/YH920/YH925 samsungyh*
+# First item will be shown when P2STR is passed a NULL pointer
 <phrase>
   id: LANG_ROCKBOX_TITLE
   desc: main menu title
@@ -105,7 +106,6 @@
     *: "Rockbox"
   </voice>
 </phrase>
-# First item will be shown when P2STR is passed a NULL pointer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3524,18 +3524,15 @@
   user: core
   <source>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3544,18 +3541,15 @@
   user: core
   <source>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </source>
   <dest>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </dest>
   <voice>
     *: none
-    battery_types: ""
-    xduoox3: ""
+    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -3688,8 +3682,8 @@
   user: core
   <source>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3698,8 +3692,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3717,8 +3711,8 @@
   user: core
   <source>
     *: none
-    gigabeatfx,mrobe500: "POWER = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3731,8 +3725,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -6674,10 +6668,10 @@
   desc: in browse_id3
   user: core
   <source>
-    *: " (VBR)"
+    *: "(VBR)"
   </source>
   <dest>
-    *: " (VBR)"
+    *: "(VBR)"
   </dest>
   <voice>
     *: "VBR"
@@ -6994,7 +6988,6 @@
     *: "Add Current to Shortcuts"
   </voice>
 </phrase>
-
 <phrase>
   id: LANG_PITCH
   desc: "pitch" in the pitch screen
@@ -16998,15 +16991,15 @@
   user: core
   <source>
     *: none
-    lineout_poweroff,erosqnative: "Line Out"
+    erosqnative,lineout_poweroff: "Line Out"
   </source>
   <dest>
     *: none
-    lineout_poweroff,erosqnative: "Line Out"
+    erosqnative,lineout_poweroff: "Line Out"
   </dest>
   <voice>
     *: none
-    lineout_poweroff,erosqnative: "Line Out"
+    erosqnative,lineout_poweroff: "Line Out"
   </voice>
 </phrase>
 <phrase>
