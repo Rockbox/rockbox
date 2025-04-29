@@ -484,30 +484,30 @@ build() {
         cd "$toolname-$version"
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
-            getfile "gmp-6.2.1.tar.bz2" "$GNU_MIRROR/gmp"
-            tar xjf $dlwhere/gmp-6.2.1.tar.bz2
-            ln -s gmp-6.2.1 gmp
+            getfile "gmp-6.1.2.tar.xz" "$GNU_MIRROR/gmp"
+            tar xJf $dlwhere/gmp-6.1.2.tar.xz
+            ln -s gmp-6.1.2 gmp
         fi
 
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-4.1.1.tar.xz" "$GNU_MIRROR/mpfr"
-            tar xJf $dlwhere/mpfr-4.1.1.tar.xz
-            ln -s mpfr-4.1.1 mpfr
+            getfile "mpfr-3.1.6.tar.xz" "$GNU_MIRROR/mpfr"
+            tar xJf $dlwhere/mpfr-3.1.6.tar.xz
+            ln -s mpfr-3.1.6 mpfr
         fi
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-1.2.1.tar.gz" "http://www.multiprecision.org/downloads"
-            tar xzf $dlwhere/mpc-1.2.1.tar.gz
-            ln -s mpc-1.2.1 mpc
+            getfile "mpc-1.0.1.tar.gz" "http://www.multiprecision.org/downloads"
+            tar xzf $dlwhere/mpc-1.0.1.tar.gz
+            ln -s mpc-1.0.1 mpc
         fi
 
         if (echo $needs_libs | grep -q isl && test ! -d isl); then
             echo "ROCKBOXDEV: Getting ISL"
-            getfile "isl-0.18.tar.bz2" "https://gcc.gnu.org/pub/gcc/infrastructure"
-            tar xjf $dlwhere/isl-0.18.tar.bz2
-            ln -s isl-0.18 isl
+            getfile "isl-0.15.tar.bz2" "https://gcc.gnu.org/pub/gcc/infrastructure"
+            tar xjf $dlwhere/isl-0.15.tar.bz2
+            ln -s isl-0.15 isl
         fi
         cd $builddir
     fi
@@ -556,9 +556,9 @@ build_linux_toolchain () {
 
     # check libraries:
     # contrary to other toolchains that rely on a hack to avoid installing
-    # gmp, mpc, and mpfr, we simply require that they are installed on
-    # the system this is not a huge requirement since virtually all systems
-    # these days provide dev packages for them
+    # gmp, mpc and mpfr, we simply require that they are installed on the system
+    # this is not a huge requirement since virtually all systems these days
+    # provide dev packages for them
     # FIXME: maybe add an option to download and install them automatically
     checklib "mpc" "gmp" "mpfr"
 
@@ -797,26 +797,26 @@ do
     echo ""
     case $arch in
         [Ii])
-            build "binutils" "mipsel-elf" "2.38" "binutils-c23.patch" "--disable-werror" "gmp isl"
-            build "gcc" "mipsel-elf" "9.5.0" "" "" "gmp mpfr mpc isl"
+            build "binutils" "mipsel-elf" "2.26.1" "binutils-c23.patch" "--disable-werror" "gmp isl"
+            build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc isl"
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.38" "" "--disable-werror" "gmp isl"
-            build "gcc" "m68k-elf" "9.5.0" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc isl"
+            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror" "gmp isl"
+            build "gcc" "m68k-elf" "4.9.4" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
 
         [Aa])
             binopts=""
-            gccopts="--with-multilib-list=rmprofile"
+            gccopts=""
             case $system in
                 Darwin)
                     binopts="--disable-nls"
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.38" "" "$binopts --disable-werror" "gmp isl"
-            build "gcc" "arm-elf-eabi" "9.5.0" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-9.5.0.diff" "$gccopts MAKEINFO=missing" "gmp mpfr mpc isl"
+            build "binutils" "arm-elf-eabi" "2.26.1" "" "$binopts --disable-werror" "gmp isl"
+            build "gcc" "arm-elf-eabi" "4.9.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.9.4.diff" "$gccopts MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
         [Xx])
             # IMPORTANT NOTE
@@ -825,19 +825,30 @@ do
             #
             # Samsung YP-R0/R1:
             #  ARM1176JZF-S, softfp EABI
-	    #   kernel: device runs 2.6.24, but oem toolchain is built against 2.6.27.59
-	    #   glibc:  device runs 2.4.2
-	    #
-            # Sony NWZ:
-	    #   kernel: Varies from device to device; 2.6.23, 2.6.35, and 3.x seen.
-	    #   glibc:  device runs 2.7
+            #   gcc: 4.9.4 is the latest 4.9.x stable branch, also the only one that
+            #        compiles with GCC >6
+            #   kernel: 2.6.27.59 is the same 2.6.x stable kernel as used by the
+            #           original ct-ng toolchain, the device runs kernel 2.6.24
+            #   glibc: 2.19 is the latest version that supports kernel 2.6.24 which
+            #          is used on the device, but we need to support ABI 2.4 because
+            #          the device uses glibc 2.4.2
             #
-            # Thus the lowest common denominator is to target 2.6.23 and glibc 2.4
-	    # Use a recent 2.6.32 LTS kernel, but glibc 2.20 targeting 2.6.23 and API 2.4
-	    #
+            # Sony NWZ:
+            #   gcc: 4.9.4 is the latest 4.9.x stable branch, also the only one that
+            #        compiles with GCC >6
+            #   kernel: 2.6.32.71 is the latest 2.6.x stable kernel, the device
+            #           runs kernel 2.6.23 or 2.6.35 or 3.x for the most recent
+            #   glibc: 2.19 is the latest version that supports kernel 2.6.23 which
+            #          is used on many Sony players, but we need to support ABI 2.7
+            #          because the device uses glibc 2.7
+            #
+            # Thus the lowest common denominator is to use the latest 2.6.x stable
+            # kernel but compile glibc to support kernel 2.6.23 and glibc 2.4.
+            # We use a recent 2.26.1 binutils to avoid any build problems and
+            # avoid patches/bugs.
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
-            build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.38" "" "" "9.5.0" \
-                "$gccopts" "2.6.32.71" "" "2.20" "$glibcopts" "glibc-220-make44.patch"
+            build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "" "4.9.4" \
+                "$gccopts" "2.6.32.71" "" "2.19" "$glibcopts" "glibc-220-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
@@ -852,22 +863,28 @@ do
             # This toolchain must support several targets and thus must support
             # the oldest possible configuration.
             #
-            # AGPTek Rocker (and other HibyOS players):
+            # AGPTek Rocker:
+            #   XBurst release 1 (something inbetween mips32r1 and mips32r2)
+            #   gcc: 4.9.4 is the latest 4.9.x stable branch, also the only one that
+            #        compiles with GCC >6
             #   kernel: 3.10.14
             #   glibc: 2.16
             #   alsa: 1.0.29
             #
-            # FiiO M3K Linux (Based on Ingenic SDK):
+            # FiiO M3K Linux:
             #   kernel: 3.10.14
             #   glibc: 2.16
             #   alsa: 1.0.26
             #
-	    # Use a recent 3.10 LTS kernel, but glibc 2.27 targeting 3.2.x and API 2.16
-	    #
-            glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16 --disable-werror"
-            # FIXME: maybe add -mhard-float?
-            build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.38" "" "binutils-c23.patch" "9.5.0" \
-                "$gccopts" "3.10.108" "linux-c23.patch" "2.27" "$glibcopts" "glibc-227-make44.patch"
+            # To maximize compatibility, we use kernel 3.2.89 which is the latest
+            # longterm 3.2 kernel and is supported by the latest glibc, and we
+            # require support for up to glibc 2.16
+            # We use a recent 2.26.1 binutils to avoid any build problems and
+            # avoid patches/bugs.
+            glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16"
+            # FIXME: maybe add -mhard-float
+            build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "binutils-c23.patch" "4.9.4" \
+                "$gccopts" "3.2.89" "linux-c23.patch" "2.25" "$glibcopts" "glibc-225-make44.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
@@ -875,10 +892,7 @@ do
             gettool "alsa-lib" "$alsalib_ver"
             extract "alsa-lib-$alsalib_ver"
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
-                  "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
-
-	    ### Everything below here is needed only for bluetooth support
-
+                "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
             # build libffi
 	    libffi_ver="3.2.1"
 	    gettool "libffi" "$libffi_ver"
@@ -899,7 +913,7 @@ do
 	    gettool "glib" "$glib_ver"
 	    extract "glib-$glib_ver"
 	    prefix="/usr" buildtool "glib" "$glib_ver" \
-               "--host=$target --with-sysroot=$prefix/$target/sysroot --disable-libelf glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes CFLAGS=-Wno-error=format-nonliteral" "" "install DESTDIR=$prefix/$target/sysroot"
+               "--host=$target --with-sysroot=$prefix/$target/sysroot --disable-libelf glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes" "" "install DESTDIR=$prefix/$target/sysroot"
 
             # build expat
 	    expat_ver="2.1.0"
@@ -914,6 +928,7 @@ do
 	    extract "dbus-$dbus_ver"
 	    prefix="/usr" buildtool "dbus" "$dbus_ver" \
                "--host=$target --with-sysroot=$prefix/$target/sysroot --includedir=/usr/include --enable-abstract-sockets ac_cv_lib_expat_XML_ParserCreate_MM=yes --disable-systemd --disable-launchd --enable-x11-autolaunch=no --with-x=no -disable-selinux --disable-apparmor --disable-doxygen-docs " "" "install DESTDIR=$prefix/$target/sysroot "
+
 
             ;;
         *)
