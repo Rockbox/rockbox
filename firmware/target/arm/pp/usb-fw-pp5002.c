@@ -78,4 +78,8 @@ int usb_detect(void)
 
     return USB_EXTRACTED;
 }
-bool usb_plugged(void) __attribute__((alias("usb_detect")));
+
+bool usb_plugged(void)
+{
+    return (usb_detect() == USB_INSERTED);
+}
