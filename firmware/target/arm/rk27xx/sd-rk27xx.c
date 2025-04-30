@@ -701,13 +701,13 @@ long sd_last_disk_activity(void)
 {
     return last_disk_activity;
 }
+#endif /* BOOTLOADER */
 
 tCardInfo *card_get_info_target(int card_no)
 {
     (void)card_no;
     return &card_info;
 }
-#endif /* BOOTLOADER */
 
 #ifdef HAVE_HOTSWAP
 /* Not complete and disabled in config */
