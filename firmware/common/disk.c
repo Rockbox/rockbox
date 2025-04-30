@@ -165,10 +165,10 @@ bool disk_init(IF_MD_NONVOID(int drive))
     if (!sector)
         return false;
 
-#if (CONFIG_STORAGE & STORAGE_ATA)
     /* Query logical sector size */
     struct storage_info *info = (struct storage_info*) sector;
     storage_get_info(IF_MD_DRV(drive), info);
+#if (CONFIG_STORAGE & STORAGE_ATA)
     disk_writer_lock();
 #ifdef MAX_VARIABLE_LOG_SECTOR
     disk_log_sector_size[IF_MD_DRV(drive)] = info->sector_size;
@@ -226,8 +226,6 @@ bool disk_init(IF_MD_NONVOID(int drive))
 	    }
 	}
 
-        // XXX backup GPT header at final LBA of drive...
-
 	while (is_gpt) {
 	    /* Re-start partition parsing using GPT */
 	    uint64_t part_lba;
@@ -235,13 +233,21 @@ bool disk_init(IF_MD_NONVOID(int drive))
 	    uint32_t part_entry_size;
             unsigned char* ptr = sector;
 
-	    storage_read_sectors(IF_MD(drive,) 1, 1, sector);
+            // XXX this doesn't take into account virtual sector size... ugh.
+            storage_read_sectors(IF_MD(drive,) 1, 1, sector);
 
-	    part_lba = BYTES2INT64(ptr, 0);
+            part_lba = BYTES2INT64(ptr, 0);
             if (part_lba != 0x5452415020494645ULL) {
-                DEBUGF("GPT: Invalid signature\n");
-                break;
+                /* Try backup GPT header at final LBA of drive */
+                // XXX this doesn't take into account virtual sector size... ugh.
+                storage_read_sectors(IF_MD(drive,) info->num_sectors-1, 1, sector);
+                part_lba = BYTES2INT64(ptr, 0);
+                if (part_lba != 0x5452415020494645ULL) {
+                    DEBUGF("GPT: Invalid signature\n");
+                    break;
+                }
             }
+
             part_entry_size = BYTES2INT32(ptr, 8);
             if (part_entry_size != 0x00010000) {
                 DEBUGF("GPT: Invalid version\n");
