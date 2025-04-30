@@ -23,6 +23,9 @@ __pycache__
 /tools/checkwps/rockbox-info.txt
 /tools/checkwps/checkwps.failures
 
+# Release
+/tools/release/output
+
 # android: java build system
 /android/bin
 /android/data
