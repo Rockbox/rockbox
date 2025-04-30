@@ -46,6 +46,7 @@ struct diac_range
 #define DIAC_RANGE_ENTRY(first_diac, first_non_diac, is_rtl) \
  { first_diac, ((first_non_diac - first_diac) & DIAC_CNT) | (is_rtl * DIAC_RTL)}
 
+#ifndef BOOTLOADER
 /* Sorted by Unicode value */
 static const struct diac_range diac_ranges[] =
 {
@@ -194,7 +195,7 @@ static const struct diac_range diac_ranges[] =
 };
 
 #define MRU_MAX_LEN 32
-#ifndef BOOTLOADER
+
 bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
     static uint8_t mru_len = 0;

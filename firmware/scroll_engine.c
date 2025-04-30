@@ -41,11 +41,13 @@
 #endif
 #include "scroll_engine.h"
 
+#if !defined(BOOTLOADER)
 static const char scroll_tick_table[18] = {
  /* Hz values [f(x)=100.8/(x+.048)]:
     1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33, 49.2, 96.2 */
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1
 };
+#endif
 
 #include "drivers/lcd-scroll.c"
 
