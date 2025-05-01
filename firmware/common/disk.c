@@ -168,6 +168,11 @@ bool disk_init(IF_MD_NONVOID(int drive))
     /* Query logical sector size */
     struct storage_info *info = (struct storage_info*) sector;
     storage_get_info(IF_MD_DRV(drive), info);
+    sector_t num_sectors = info->num_sectors;
+#ifdef DEFAULT_VIRT_SECTOR_SIZE
+    unsigned int sector_size = info->sector_size;
+#endif
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
     disk_writer_lock();
 #ifdef MAX_VARIABLE_LOG_SECTOR
@@ -216,8 +221,7 @@ bool disk_init(IF_MD_NONVOID(int drive))
                    i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
 
             /* extended? */
-            if ( pinfo[i].type == 5 )
-            {
+            if ( pinfo[i].type == 0x05 || pinfo[i].type == 0x0f ) {
                 /* not handled yet */
             }
 
@@ -229,23 +233,35 @@ bool disk_init(IF_MD_NONVOID(int drive))
 	while (is_gpt) {
 	    /* Re-start partition parsing using GPT */
 	    uint64_t part_lba;
-	    uint32_t part_entries;
 	    uint32_t part_entry_size;
+	    uint32_t part_entries = 0;
             unsigned char* ptr = sector;
 
-            // XXX this doesn't take into account virtual sector size... ugh.
-            storage_read_sectors(IF_MD(drive,) 1, 1, sector);
+#ifdef DEFAULT_VIRT_SECTOR_SIZE
+            sector_t try_gpt[4] = { 1, num_sectors - 1,
+                    DEFAULT_VIRT_SECTOR_SIZE / sector_size,
+                    (num_sectors / (DEFAULT_VIRT_SECTOR_SIZE / sector_size)) - 1
+            };
 
-            part_lba = BYTES2INT64(ptr, 0);
-            if (part_lba != 0x5452415020494645ULL) {
-                /* Try backup GPT header at final LBA of drive */
-                // XXX this doesn't take into account virtual sector size... ugh.
-                storage_read_sectors(IF_MD(drive,) info->num_sectors-1, 1, sector);
+#else
+            sector_t try_gpt[2] = { 1, num_sectors - 1 };
+#endif
+
+            for (unsigned int i = 0 ; i < (sizeof(try_gpt) / sizeof(try_gpt[0])) ; i++) {
+                storage_read_sectors(IF_MD(drive,) try_gpt[i], 1, sector);
                 part_lba = BYTES2INT64(ptr, 0);
-                if (part_lba != 0x5452415020494645ULL) {
-                    DEBUGF("GPT: Invalid signature\n");
+                if (part_lba == 0x5452415020494645ULL) {
+                    part_entries = 1;
+#ifdef MAX_VIRT_SECTOR_SIZE
+                    if (i >= 2)
+                        disk_sector_multiplier[IF_MD_DRV(drive)] = try_gpt[2]; // XXX use this later?
+#endif
                     break;
                 }
+            }
+            if (!part_entries) {
+                DEBUGF("GPT: Invalid signature\n");
+                break;
             }
 
             part_entry_size = BYTES2INT32(ptr, 8);
