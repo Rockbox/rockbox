@@ -232,6 +232,8 @@ struct sound_settings_info
 #include "codec-dx90.h"
 #elif defined(HAVE_ROCKER_CODEC)
 #include "rocker_codec.h"
+#elif defined(HAVE_SURFANS_LINUX_CODEC)
+#include "surfanslinux_codec.h"
 #elif defined(HAVE_XDUOO_LINUX_CODEC)
 #include "xduoolinux_codec.h"
 #elif defined(HAVE_FIIO_LINUX_CODEC)

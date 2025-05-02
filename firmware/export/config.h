@@ -165,6 +165,7 @@
 #define FIIO_M3K_PAD       73
 #define SHANLING_Q1_PAD    74
 #define ECHO_R1_PAD        75
+#define SURFANS_F28_PAD    76
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -206,7 +207,7 @@
                             * use the charging hardware. */
 
 /* CONFIG_BATTERY_MEASURE bits */
-/* If both VOLTAGE_MEASURE and PERCENTAGE_MEASURE are defined, 
+/* If both VOLTAGE_MEASURE and PERCENTAGE_MEASURE are defined,
  * _battery_level() (percentage) will be preferred, unless _battery_level()
  * returns -1, then voltage will be used from _voltage_level(). */
 #define VOLTAGE_MEASURE     1 /* Target can report battery voltage
@@ -616,6 +617,8 @@ Lyre prototype 1 */
 #include "config/erosqnative.h"
 #elif defined(ECHO_R1)
 #include "config/echor1.h"
+#elif defined(SURFANS_F28)
+#include "config/surfansf28.h"
 #else
 //#error "unknown hwardware platform!"
 #endif

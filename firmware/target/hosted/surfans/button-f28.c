@@ -7,7 +7,6 @@
  *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2017 Marcin Bukat
- * Copyright (C) 2018 Roman Stolyarov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,53 +19,34 @@
  ****************************************************************************/
 #include <linux/input.h>
 
+#include "sysfs.h"
 #include "button.h"
 #include "button-target.h"
+#include "surfanslinux_codec.h"
 
-#include "kernel.h"
-#include "xduoolinux_codec.h"
-
-#define USE_REMOTE /* Comment out to disable headphone remote */
+/*
+   /dev/input/event0: rotary encoder (left/right)
+   /dev/input/event1: adc (prev/play)
+   /dev/input/event2: touchscreen
+   /dev/input/event3: gpios (power/next)
+*/
 
 int button_map(int keycode)
 {
     switch(keycode)
     {
-        case KEY_BACK:
-            return BUTTON_HOME;
-
-        case KEY_MENU:
-            return BUTTON_OPTION;
-
-        case KEY_UP:
-            return BUTTON_NEXT;
-
-        case KEY_DOWN:
-            return BUTTON_PREV;
-
-        case KEY_ENTER:
+        case KEY_LEFT:
+            return BUTTON_LEFT;
+        case KEY_RIGHT:
+            return BUTTON_RIGHT;
+        case KEY_PLAYPAUSE:
             return BUTTON_PLAY;
-
-        case KEY_VOLUMEUP:
-            return BUTTON_VOL_UP;
-
-        case KEY_VOLUMEDOWN:
-            return BUTTON_VOL_DOWN;
-
+        case KEY_NEXTSONG:
+            return BUTTON_NEXT;
+        case KEY_PREVIOUSSONG:
+            return BUTTON_PREV;
         case KEY_POWER:
             return BUTTON_POWER;
-
-#if defined(XDUOO_X3II) && defined(USE_REMOTE) /* Headphone remote */
-        case KEY_NEXTSONG:
-            return headphones_inserted()? (BUTTON_NEXT | BUTTON_DELAY_RELEASE) : 0;
-
-        case KEY_PLAYPAUSE:
-            return headphones_inserted()? (BUTTON_PLAY | BUTTON_DELAY_RELEASE) : 0;
-
-        case KEY_PREVIOUSSONG:
-            return headphones_inserted()? (BUTTON_PREV | BUTTON_DELAY_RELEASE) : 0;
-
-#endif
         default:
             return 0;
     }
@@ -81,14 +61,4 @@ bool headphones_inserted(void)
 #endif
 
     return (ps == 2 || ps == 3);
-}
-
-bool lineout_inserted(void)
-{
-#ifdef BOOTLOADER
-    int ps = 0;
-#else
-    int ps = surfans_get_outputs();
-#endif
-    return (ps == 1);
 }

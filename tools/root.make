@@ -105,12 +105,8 @@ endif
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   ifneq (,$(findstring sonynwz,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
-  else ifneq (,$(findstring rocker,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
-  else ifneq (,$(findstring xduoo,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/xduoo/xduoo.make
-  else ifneq (,$(findstring erosq,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/aigo/erosq.make
+  else ifneq (,$(findstring hibyos,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/hibyos.make
   else ifneq (,$(findstring fiio,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/fiio/fiio.make
   else ifneq (,$(findstring ingenic_x1000,$(MANUFACTURER)))
@@ -153,20 +149,12 @@ else # core
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
   endif
 
-  ifneq (,$(findstring rocker,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
-  endif
-
-  ifneq (,$(findstring xduoo,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/xduoo/xduoo.make
+  ifneq (,$(findstring hibyos,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/hibyos.make
   endif
 
   ifneq (,$(findstring fiio,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/fiio/fiio.make
-  endif
-
-  ifneq (,$(findstring erosq,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/aigo/erosq.make
   endif
 
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))

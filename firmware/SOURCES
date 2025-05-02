@@ -151,6 +151,13 @@ target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
 #endif
 
+#if defined(SURFANS_F28) && !defined(SIMULATOR)
+target/hosted/surfans/button-f28.c
+target/hosted/surfans/debug-f28.c
+target/hosted/surfans/power-f28.c
+target/hosted/surfans/powermgmt-f28.c
+#endif
+
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
 target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
@@ -543,6 +550,8 @@ target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
 #elif defined(HAVE_ROCKER_CODEC) && !defined(SIMULATOR)
 drivers/audio/rocker_codec.c
+#elif defined(HAVE_SURFANS_LINUX_CODEC) && !defined(SIMULATOR)
+drivers/audio/surfanslinux_codec.c
 #elif defined(HAVE_XDUOO_LINUX_CODEC) && !defined(SIMULATOR)
 drivers/audio/xduoolinux_codec.c
 #elif defined(HAVE_FIIO_LINUX_CODEC) && !defined(SIMULATOR)

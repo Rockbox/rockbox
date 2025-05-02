@@ -42,6 +42,8 @@ if ($model eq 'rocker') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
 } elsif ($model eq 'eros_q') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
+} elsif ($model eq 'f28') {
+    @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
 } elsif ($model eq 'm3k') {
     @ubiopts = ("-e", "124KiB", "-c", "2048", "-m", "2048", "-j", "8192KiB", "-U");
     $hiby = 0;

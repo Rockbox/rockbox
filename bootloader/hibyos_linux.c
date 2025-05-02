@@ -90,6 +90,15 @@
 #define BUTTON_DOWN   BUTTON_SCROLL_FWD
 #define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
+#elif defined(SURFANS_F28)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
+#include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
 #endif

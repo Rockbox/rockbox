@@ -1730,8 +1730,8 @@ cat <<EOF
  ==Shanling==              242) X3II             248) Eros Q / K native
  260) Q1                   243) X20                     (hw3 bl only)
                                                  249) Eros Q / K native
-                                                        (hw4 bl only)
- ==Echo project==
+                           ==Surfans==                  (hw4 bl only)
+ ==Echo project==          280) F28 (WIP)
  270) Echo R1 (WIP)
 EOF
 
@@ -4019,7 +4019,7 @@ fi
 
    240|agptekrocker)
     application="yes"
-    app_type="rocker"
+    app_type="hibyos"
     target_id=97
     modelname="agptekrocker"
     target="AGPTEK_ROCKER"
@@ -4064,7 +4064,7 @@ fi
    242|xduoox3ii)
     target_id=110
     application=yes
-    app_type="xduoo"
+    app_type="hibyos"
     modelname="xduoox3ii"
     target="XDUOO_X3II"
     memory=8
@@ -4087,7 +4087,7 @@ fi
    243|xduoox20)
     target_id=111
     application=yes
-    app_type="xduoo"
+    app_type="hibyos"
     modelname="xduoox20"
     target="XDUOO_X20"
     memory=8
@@ -4133,7 +4133,7 @@ fi
    245|aigoerosq|erosq)
     target_id=113
     application=yes
-    app_type="erosq"
+    app_type="hibyos"
     modelname="aigoerosq"
     target="EROS_Q"
     memory=8
@@ -4371,6 +4371,29 @@ fi
     t_cpu="arm"
     t_manufacturer="stm32"
     t_model="echoplayer"
+    ;;
+
+    280|surfansf28)
+    target_id=120
+    application=yes
+    app_type="hibyos"
+    modelname="surfansf28"
+    target="SURFANS_F28"
+    memory=32 # 64 total!
+    mipsellinuxcc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
+    output="rockbox.f28"
+    bootoutput="bootloader.f28"
+    appextra="recorder:gui:hosted"
+    plugins="no"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="surfans"
+    t_model="f28"
+    sysfontbl="16-Terminus"
     ;;
 
    *)
