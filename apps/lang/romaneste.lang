@@ -87,10 +87,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "Eșec"
+    *: "eșuată"
   </dest>
   <voice>
-    *: "Eșec"
+    *: "eșuată"
   </voice>
 </phrase>
 <phrase>
@@ -328,10 +328,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Reinițializare setări"
+    *: "Reinițializează setările"
   </dest>
   <voice>
-    *: "Reinițializare setări"
+    *: "Reinițializează setările"
   </voice>
 </phrase>
 <phrase>
@@ -415,10 +415,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Depanare (utilizați cu atenție!)"
+    *: "Depanare (atenție!)"
   </dest>
   <voice>
-    *: "Depanare (Utilizați cu atentie!)"
+    *: "Depanare. Utilizează cu atenție!"
   </voice>
 </phrase>
 <phrase>
@@ -429,10 +429,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Aleator"
+    *: "Ordonează aleator"
   </dest>
   <voice>
-    *: "Aleator"
+    *: "Ordonează aleator"
   </voice>
 </phrase>
 <phrase>
@@ -661,11 +661,11 @@
   </source>
   <dest>
     *: none
-    play_frequency,recording: "Frecvența"
+    play_frequency,recording: "Rata de eșantionare"
   </dest>
   <voice>
     *: none
-    play_frequency,recording: "Frecvența"
+    play_frequency,recording: "Rata de eșantionare"
   </voice>
 </phrase>
 <phrase>
@@ -1215,10 +1215,10 @@
     *: "Delete?"
   </source>
   <dest>
-    *: "Confirmi ștergerea?"
+    *: "Dorești să ștergi?"
   </dest>
   <voice>
-    *: "Confirmi ștergerea?"
+    *: "Dorești să ștergi?"
   </voice>
 </phrase>
 <phrase>
@@ -1350,8 +1350,8 @@
   user: core
   <source>
     *: none
-    gigabeatfx,mrobe500: "POWER = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -1364,8 +1364,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER pentru anulare"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK pentru anulare"
+    gigabeatfx,mrobe500: "POWER pentru anulare"
     gogearsa9200: "LEFT pentru anulare"
     iaudiom5,iaudiox5: "RECORD pentru anulare"
     ipod*,mpiohd300,sansac200*: "MENU pentru anulare"
@@ -3152,10 +3152,10 @@
     *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "~Thai (ISO-8859-11)"
+    *: "Tailandeză (ISO-8859-11)"
   </dest>
   <voice>
-    *: "~Thai"
+    *: "Tailandeză"
   </voice>
 </phrase>
 <phrase>
@@ -3402,10 +3402,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Setări vizualizare listă de redare"
+    *: "Setări vizualizare listă"
   </dest>
   <voice>
-    *: "Setări vizualizare listă de redare"
+    *: "Setări vizualizare listă"
   </voice>
 </phrase>
 <phrase>
@@ -4053,8 +4053,8 @@
   user: core
   <source>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -4063,8 +4063,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECTARE = Setat"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "RULARE = Setat"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECTARE = Setat"
     iriverh100,iriverh120,iriverh300: "NAVI = Setat"
     mpiohd300: "ENTER = Setat"
     mrobe500: "INIMĂ = Setat"
@@ -4140,10 +4140,10 @@
     *: "Track Skip Beep"
   </source>
   <dest>
-    *: "Bip la salt pistă"
+    *: "Sunet la omitere pistă"
   </dest>
   <voice>
-    *: "Bip la salt pistă"
+    *: "Sunet la omitere pistă"
   </voice>
 </phrase>
 <phrase>
@@ -4185,10 +4185,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demonstrații"
+    *: "Vizualizări"
   </dest>
   <voice>
-    *: "Demonstrații"
+    *: "Vizualizări"
   </voice>
 </phrase>
 <phrase>
@@ -4689,7 +4689,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "ecran de redare"
   </voice>
 </phrase>
 <phrase>
@@ -5105,10 +5105,10 @@
     *: "Remove"
   </source>
   <dest>
-    *: "Îndepărtare"
+    *: "Elimină"
   </dest>
   <voice>
-    *: "Îndepărtare"
+    *: "Elimină"
   </voice>
 </phrase>
 <phrase>
@@ -5396,7 +5396,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9011,10 +9011,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Sunteți sigur?"
+    *: "Ești sigur?"
   </dest>
   <voice>
-    *: "Sunteți sigur?"
+    *: "Ești sigur?"
   </voice>
 </phrase>
 <phrase>
@@ -10341,11 +10341,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Scurtătură WPS"
+    hotkey: "Acțiune scurtătură"
   </dest>
   <voice>
     *: none
-    hotkey: "Scurtătură WPS"
+    hotkey: "Acțiune scurtătură"
   </voice>
 </phrase>
 <phrase>
@@ -11749,10 +11749,10 @@
     *: "Selection too big, %d random tracks will be selected"
   </source>
   <dest>
-    *: "Selection too big, %d random tracks will be selected"
+    *: "Selecția este prea mare, %d piste vor fi selectate aleator"
   </dest>
   <voice>
-    *: "Selection too big, fewer random tracks will be selected"
+    *: "Selecția este prea mare, mai puține piste vor fi selectate aleator"
   </voice>
 </phrase>
 <phrase>
@@ -11835,11 +11835,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Scurt ascuțit"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Sharp"
+    filter_roll_off: "Scurt ascuțit"
   </voice>
 </phrase>
 <phrase>
@@ -11852,11 +11852,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Scurt lent"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Short Slow"
+    filter_roll_off: "Scurt lent"
   </voice>
 </phrase>
 <phrase>
@@ -11869,11 +11869,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super lent"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Super Slow"
+    filter_roll_off: "Super lent"
   </voice>
 </phrase>
 <phrase>
@@ -11886,11 +11886,11 @@
   </source>
   <dest>
     *: none
-    es9018: "Short"
+    es9018: "Scurt"
   </dest>
   <voice>
     *: none
-    es9018: "Short"
+    es9018: "Scurt"
   </voice>
 </phrase>
 <phrase>
@@ -11954,11 +11954,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minim rapid"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Fast"
+    es9218: "Minim rapid"
   </voice>
 </phrase>
 <phrase>
@@ -11971,11 +11971,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minim lent"
   </dest>
   <voice>
     *: none
-    es9218: "Minimum Slow"
+    es9218: "Minim lent"
   </voice>
 </phrase>
 <phrase>
@@ -11988,11 +11988,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodizant de tip 1"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 1"
+    es9218: "Apodizant de tip 1"
   </voice>
 </phrase>
 <phrase>
@@ -12005,11 +12005,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodizant de tip 2"
   </dest>
   <voice>
     *: none
-    es9218: "Apodizing type 2"
+    es9218: "Apodizant de tip 2"
   </voice>
 </phrase>
 <phrase>
@@ -12022,11 +12022,11 @@
   </source>
   <dest>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Hibrid rapid"
   </dest>
   <voice>
     *: none
-    es9218: "Hybrid Fast"
+    es9218: "Hibrid rapid"
   </voice>
 </phrase>
 <phrase>
@@ -12057,13 +12057,13 @@
   </source>
   <dest>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Mod energetic DAC"
+    es9218: "Nivel ieșire DAC"
   </dest>
   <voice>
     *: none
-    dac_power_mode: "DAC power mode"
-    es9218: "DAC output level"
+    dac_power_mode: "Mod energetic DAC"
+    es9218: "Nivel ieșire DAC"
   </voice>
 </phrase>
 <phrase>
@@ -12184,10 +12184,10 @@
     *: "SIDE ONLY"
   </source>
   <dest>
-    *: "SIDE ONLY"
+    *: "DOAR LATERAL"
   </dest>
   <voice>
-    *: "SIDE ONLY"
+    *: "DOAR LATERAL"
   </voice>
 </phrase>
 <phrase>
@@ -12198,10 +12198,10 @@
     *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: "Mixaj uscat / umed"
+    *: "Raport uscat / umed"
   </dest>
   <voice>
-    *: "Mixaj uscat umed"
+    *: "Raport uscat umed"
   </voice>
 </phrase>
 <phrase>
@@ -12214,11 +12214,11 @@
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Guvernator de scalare frecvență"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Guvernator de scalare frecvență"
   </voice>
 </phrase>
 <phrase>
@@ -12425,10 +12425,10 @@
     *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disable Locked Reminders"
+    *: "Dezactivează memento blocare"
   </dest>
   <voice>
-    *: "Disable Locked Reminders"
+    *: "Dezactivează memento blocare"
   </voice>
 </phrase>
 <phrase>
@@ -12735,11 +12735,11 @@
   </source>
   <dest>
     *: none
-    charging: "Delay Before Resume"
+    charging: "Întârziere înainte de reluare"
   </dest>
   <voice>
     *: none
-    charging: "Delay Before Resume"
+    charging: "Întârziere înainte de reluare"
   </voice>
 </phrase>
 <phrase>
@@ -12756,7 +12756,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Absolute mode"
+    pitchscreen: "Mod absolut"
   </voice>
 </phrase>
 <phrase>
@@ -12773,7 +12773,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone mode"
+    pitchscreen: "Mod semiton"
   </voice>
 </phrase>
 <phrase>
@@ -12790,7 +12790,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Time stretch"
+    pitchscreen: "Întindere în timp"
   </voice>
 </phrase>
 <phrase>
@@ -12801,10 +12801,10 @@
     *: "Remote Control"
   </source>
   <dest>
-    *: "Remote Control"
+    *: "Control de la distanță"
   </dest>
   <voice>
-    *: "Remote Control"
+    *: "Control de la distanță"
   </voice>
 </phrase>
 <phrase>
@@ -12815,10 +12815,10 @@
     *: "No Rem. Control"
   </source>
   <dest>
-    *: "No Rem. Control"
+    *: "Fără control de la distanță"
   </dest>
   <voice>
-    *: "No Remote Control"
+    *: "Fără control de la distanță"
   </voice>
 </phrase>
 <phrase>
@@ -12829,10 +12829,10 @@
     *: "Out of Control"
   </source>
   <dest>
-    *: "Out of Control"
+    *: "Scăpat de sub control"
   </dest>
   <voice>
-    *: "Out of Control"
+    *: "Scăpat de sub control"
   </voice>
 </phrase>
 <phrase>
@@ -12843,10 +12843,10 @@
     *: "2 Key Control"
   </source>
   <dest>
-    *: "2 Key Control"
+    *: "Control cu 2 taste"
   </dest>
   <voice>
-    *: "2 Key Control"
+    *: "Control cu 2 taste"
   </voice>
 </phrase>
 <phrase>
@@ -12857,10 +12857,10 @@
     *: "4 Key Control"
   </source>
   <dest>
-    *: "4 Key Control"
+    *: "Control cu 4 taste"
   </dest>
   <voice>
-    *: "4 Key Control"
+    *: "Control cu 4 taste"
   </voice>
 </phrase>
 <phrase>
@@ -12871,10 +12871,10 @@
     *: "Play Wormlet!"
   </source>
   <dest>
-    *: "Play Wormlet!"
+    *: "Joacă Wormlet!"
   </dest>
   <voice>
-    *: "Play Wormlet!"
+    *: "Joacă Wormlet!"
   </voice>
 </phrase>
 <phrase>
@@ -12885,10 +12885,10 @@
     *: "Number of Worms"
   </source>
   <dest>
-    *: "Number of Worms"
+    *: "Numărul de râme"
   </dest>
   <voice>
-    *: "Number of Worms"
+    *: "Numărul de râme"
   </voice>
 </phrase>
 <phrase>
@@ -12899,10 +12899,10 @@
     *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: "Worm Growth Per Food"
+    *: "Creșterea râmei per mâncare"
   </dest>
   <voice>
-    *: "Worm Growth Per Food"
+    *: "Creșterea râmei per mâncare"
   </voice>
 </phrase>
 <phrase>
@@ -12913,10 +12913,10 @@
     *: "Worm Speed"
   </source>
   <dest>
-    *: "Worm Speed"
+    *: "Viteza râmei"
   </dest>
   <voice>
-    *: "Worm Speed"
+    *: "Viteza râmei"
   </voice>
 </phrase>
 <phrase>
@@ -12927,10 +12927,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "Argh-uri per mâncare"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Argh-uri per mâncare"
   </voice>
 </phrase>
 <phrase>
@@ -12941,10 +12941,10 @@
     *: "Argh Size"
   </source>
   <dest>
-    *: "Argh Size"
+    *: "Mărime Argh"
   </dest>
   <voice>
-    *: "Argh Size"
+    *: "Mărime Argh"
   </voice>
 </phrase>
 <phrase>
@@ -12955,10 +12955,10 @@
     *: "Food Size"
   </source>
   <dest>
-    *: "Food Size"
+    *: "Mărime mâncare"
   </dest>
   <voice>
-    *: "Food Size"
+    *: "Mărime mâncare"
   </voice>
 </phrase>
 <phrase>
@@ -12983,10 +12983,10 @@
     *: "Control Style"
   </source>
   <dest>
-    *: "Control Style"
+    *: "Stil control"
   </dest>
   <voice>
-    *: "Control Style"
+    *: "Stil control"
   </voice>
 </phrase>
 <phrase>
@@ -12997,10 +12997,10 @@
     *: "Revert to Default Settings"
   </source>
   <dest>
-    *: "Revert to Default Settings"
+    *: "Restabilește setările implicite"
   </dest>
   <voice>
-    *: "Revert to Default Settings"
+    *: "Restabilește setările implicite"
   </voice>
 </phrase>
 <phrase>
@@ -13221,10 +13221,10 @@
     *: "Restore Game"
   </source>
   <dest>
-    *: "Restore Game"
+    *: "Restaurează jocul"
   </dest>
   <voice>
-    *: "Restore Game"
+    *: "Restaurează jocul"
   </voice>
 </phrase>
 <phrase>
@@ -13249,10 +13249,10 @@
     *: "Select Other Game"
   </source>
   <dest>
-    *: "Select Other Game"
+    *: "Alege alt joc"
   </dest>
   <voice>
-    *: "Select Other Game"
+    *: "Alege alt joc"
   </voice>
 </phrase>
 <phrase>
@@ -13263,10 +13263,10 @@
     *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: "Level 1: 60 moves / 5 min"
+    *: "Nivel 1: 60 mutări / 5 min"
   </dest>
   <voice>
-    *: "Level 1, 60 moves per 5 minutes"
+    *: "Nivel 1, 60 mutări în 5 min"
   </voice>
 </phrase>
 <phrase>
@@ -13277,10 +13277,10 @@
     *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: "Level 2: 60 moves / 15 min"
+    *: "Nivel 2: 60 mutări / 15 min"
   </dest>
   <voice>
-    *: "Level 2, 60 moves per 15 minutes"
+    *: "Nivel 2, 60 mutări în 15 min"
   </voice>
 </phrase>
 <phrase>
@@ -13291,10 +13291,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: "Level 3: 60 moves / 30 min"
+    *: "Nivel 3: 60 mutări / 30 min"
   </dest>
   <voice>
-    *: "Level 3, 60 moves per 30 minutes"
+    *: "Nivel 3, 60 mutări în 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13305,10 +13305,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "Level 4: 40 moves / 30 min"
+    *: "Nivel 4: 40 mutări / 30 min"
   </dest>
   <voice>
-    *: "Level 4, 40 moves per 30 minutes"
+    *: "Nivel 4, 40 mutări în 30 min"
   </voice>
 </phrase>
 <phrase>
@@ -13319,10 +13319,10 @@
     *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: "Level 5: 40 moves / 60 min"
+    *: "Nivel 5: 40 mutări / 60 min"
   </dest>
   <voice>
-    *: "Level 5, 40 moves per 60 minutes"
+    *: "Nivel 5, 40 mutări în 60 min"
   </voice>
 </phrase>
 <phrase>
@@ -13333,10 +13333,10 @@
     *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: "Level 6: 40 moves / 120 min"
+    *: "Nivel 6: 40 mutări / 120 min"
   </dest>
   <voice>
-    *: "Level 6, 40 moves per 120 minutes"
+    *: "Nivel 6, 40 mutări în 120 min"
   </voice>
 </phrase>
 <phrase>
@@ -13347,10 +13347,10 @@
     *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: "Level 7: 40 moves / 240 min"
+    *: "Nivel 7: 40 mutări / 240 min"
   </dest>
   <voice>
-    *: "Level 7, 40 moves per 240 minutes"
+    *: "Nivel 7, 40 mutări în 240 min"
   </voice>
 </phrase>
 <phrase>
@@ -13361,10 +13361,10 @@
     *: "Error parsing game !"
   </source>
   <dest>
-    *: "Error parsing game !"
+    *: "Eroare la parcurgerea jocului !"
   </dest>
   <voice>
-    *: "Error parsing game !"
+    *: "Eroare la parcurgerea jocului !"
   </voice>
 </phrase>
 <phrase>
@@ -13669,10 +13669,10 @@
     *: "Saving position"
   </source>
   <dest>
-    *: "Saving position"
+    *: "Se salvează poziția"
   </dest>
   <voice>
-    *: "Saving position"
+    *: "Se salvează poziția"
   </voice>
 </phrase>
 <phrase>
@@ -13683,10 +13683,10 @@
     *: "Loading position"
   </source>
   <dest>
-    *: "Loading position"
+    *: "Se încarcă poziția"
   </dest>
   <voice>
-    *: "Loading position"
+    *: "Se încarcă poziția"
   </voice>
 </phrase>
 <phrase>
@@ -13714,7 +13714,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Battery bench is already running"
+    *: "Evaluarea bateriei deja rulează"
   </voice>
 </phrase>
 <phrase>
@@ -13728,7 +13728,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Press play to run battery bench or stop to cancel"
+    *: "Apasă redare pentru a rula evaluarea bateriei"
   </voice>
 </phrase>
 <phrase>
@@ -13739,10 +13739,10 @@
     *: "Cannot restart playback"
   </source>
   <dest>
-    *: "Cannot restart playback"
+    *: "Nu se poate reporni redarea"
   </dest>
   <voice>
-    *: "Cannot restart playback"
+    *: "Nu se poate reporni redarea"
   </voice>
 </phrase>
 <phrase>
@@ -13767,10 +13767,10 @@
     *: "Diffusion"
   </source>
   <dest>
-    *: "Diffusion"
+    *: "Difuzie"
   </dest>
   <voice>
-    *: "Diffusion"
+    *: "Difuzie"
   </voice>
 </phrase>
 <phrase>
@@ -13854,10 +13854,10 @@
     *: "View Played Games"
   </source>
   <dest>
-    *: "View Played Games"
+    *: "Vezi jocurile jucate"
   </dest>
   <voice>
-    *: "View Played Games"
+    *: "Vezi jocurile jucate"
   </voice>
 </phrase>
 <phrase>
@@ -13869,11 +13869,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Audio Options"
+    *: "Opțiuni audio"
     lowmem: none
   </dest>
   <voice>
-    *: "Audio Options"
+    *: "Opțiuni audio"
     lowmem: none
   </voice>
 </phrase>
@@ -13886,11 +13886,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume Options"
+    *: "Opțiuni reluare"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume Options"
+    *: "Opțiuni reluare"
     lowmem: none
   </voice>
 </phrase>
@@ -13937,11 +13937,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use sound setting"
+    *: "Folosește setarea de sunet"
     lowmem: none
   </dest>
   <voice>
-    *: "Use sound setting"
+    *: "Folosește setarea de sunet"
     lowmem: none
   </voice>
 </phrase>
@@ -13971,11 +13971,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Set resume time (min)"
+    *: "Setează timpul de reluare (min)"
     lowmem: none
   </dest>
   <voice>
-    *: "Set resume time"
+    *: "Setează timpul de reluare"
     lowmem: none
   </voice>
 </phrase>
@@ -13987,10 +13987,10 @@
     *: "Display FPS"
   </source>
   <dest>
-    *: "Display FPS"
+    *: "Afișează FPS"
   </dest>
   <voice>
-    *: "Display FPS"
+    *: "Afișează fe pe se"
   </voice>
 </phrase>
 <phrase>
@@ -14002,11 +14002,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Limit FPS"
+    *: "Limitează FPS"
     lowmem: none
   </dest>
   <voice>
-    *: "Limit FPS"
+    *: "Limitează fe pe se"
     lowmem: none
   </voice>
 </phrase>
@@ -14036,11 +14036,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Backlight brightness"
+    *: "Luminozitate iluminare"
     lowmem: none
   </dest>
   <voice>
-    *: "Backlight brightness"
+    *: "Luminozitate iluminare"
     lowmem: none
   </voice>
 </phrase>
@@ -14053,11 +14053,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use common setting"
+    *: "Folosește setarea comună"
     lowmem: none
   </dest>
   <voice>
-    *: "Use common setting"
+    *: "Folosește setarea comună"
     lowmem: none
   </voice>
 </phrase>
@@ -14070,11 +14070,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Tone controls"
+    *: "Controale ton"
     lowmem: none
   </dest>
   <voice>
-    *: "Tone controls"
+    *: "Controale ton"
     lowmem: none
   </voice>
 </phrase>
@@ -14087,11 +14087,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu"
+    *: "Meniu pornire"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu"
+    *: "Meniu pornire"
     lowmem: none
   </voice>
 </phrase>
@@ -14104,11 +14104,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu if not completed"
+    *: "Pornește meniul dacă nu este finalizat"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu if not completed"
+    *: "Pornește meniul dacă nu este finalizat"
     lowmem: none
   </voice>
 </phrase>
@@ -14121,11 +14121,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume automatically"
+    *: "Reia automat"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume automatically"
+    *: "Reia automat"
     lowmem: none
   </voice>
 </phrase>
@@ -14138,11 +14138,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Clear all resumes"
+    *: "Șterge toate reluările"
     lowmem: none
   </dest>
   <voice>
-    *: "Clear all resumes"
+    *: "Șterge toate reluările"
     lowmem: none
   </voice>
 </phrase>
@@ -14410,11 +14410,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Panning Separation"
+    *: "Separație panoramare"
     lowmem: none
   </dest>
   <voice>
-    *: "Panning Separation"
+    *: "Separație panoramare"
     lowmem: none
   </voice>
 </phrase>
@@ -14808,10 +14808,10 @@
     *: "Update cache"
   </source>
   <dest>
-    *: "Update cache"
+    *: "Actualizează cache"
   </dest>
   <voice>
-    *: "Update cache"
+    *: "Actualizează keș"
   </voice>
 </phrase>
 <phrase>
@@ -14904,33 +14904,33 @@
     xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </source>
   <dest>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
-    mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
-    sonynwza860: "Keymaps incomplete."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    *: "Apasă STÂNGA pentru a anula."
+    android,hifietma*,zenvision: "Apasă ÎNAPOI pentru a anula."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Apasă PORNIRE pentru a anula."
+    ihifi760,ihifi960: "Atinge de 2 ori ÎNAPOI pentru a anula."
+    ihifi770,ihifi770c,ihifi800: "Apasă ACASĂ pentru a anula."
+    iriverh10,samsungyh*: "Atinge de 2 ori STÂNGA pentru a anula."
+    mpiohd200: "Atinge de 2 ori REC pentru a anula."
+    mpiohd300: "Atinge de 2 ori MENIU pentru a anula."
+    rx27generic: "Apasă VOLUM pentru a anula."
+    sonynwza860: "Asocieri de taste incomplete."
+    touchscreen: "Apasă Mijloc-Stânga pentru a anula."
+    vibe500: "Apasă PREV pentru a anula."
+    xduoox20,xduoox3,xduoox3ii: "Atinge de 2 ori ACASĂ pentru a anula."
   </dest>
   <voice>
-    *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
-    ihifi760,ihifi960: "Double tap RETURN to cancel."
-    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
-    iriverh10,samsungyh*: "Double tap LEFT to cancel."
-    mpiohd200: "Double tap REC to cancel."
-    mpiohd300: "Double tap MENU to cancel."
-    rx27generic: "Press VOLUME to cancel."
-    touchscreen: "Press Middle Left to cancel."
-    vibe500: "Press PREV to cancel."
-    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+    *: "Apasă STÂNGA pentru a anula."
+    android,hifietma*,zenvision: "Apasă ÎNAPOI pentru a anula."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Apasă PORNIRE pentru a anula."
+    ihifi760,ihifi960: "Atinge de 2 ori ÎNAPOI pentru a anula."
+    ihifi770,ihifi770c,ihifi800: "Apasă ACASĂ pentru a anula."
+    iriverh10,samsungyh*: "Atinge de 2 ori STÂNGA pentru a anula."
+    mpiohd200: "Atinge de 2 ori REC pentru a anula."
+    mpiohd300: "Atinge de 2 ori MENIU pentru a anula."
+    rx27generic: "Apasă VOLUM pentru a anula."
+    touchscreen: "Apasă Mijloc-Stânga pentru a anula."
+    vibe500: "Apasă PREV pentru a anula."
+    xduoox20,xduoox3,xduoox3ii: "Atinge de 2 ori ACASĂ pentru a anula."
   </voice>
 </phrase>
 <phrase>
@@ -15169,10 +15169,10 @@
     *: "Set Wps Context Plugin"
   </source>
   <dest>
-    *: "Setează plugin pentru context ecran redare"
+    *: "Alege plugin implicit"
   </dest>
   <voice>
-    *: "Setează plaghin pentru context ecran redare"
+    *: "Alege plaghin implicit"
   </voice>
 </phrase>
 <phrase>
@@ -15724,10 +15724,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rebobinează prin piste"
+    *: "Derulează printre piste"
   </dest>
   <voice>
-    *: "Rebobinează prin piste"
+    *: "Derulează printre piste"
   </voice>
 </phrase>
 <phrase>
