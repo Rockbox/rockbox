@@ -809,6 +809,18 @@ sub simbuilds {
 	},
         'enabled' => 0,
     },
+    'moldoveneste' => {
+	'lang' => 'moldoveneste',
+	'name' => 'Moldovenească (Moldavian)',
+        'short' => 'ro_MD',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vro',
+	    'gtts' => '-t md -l ro',
+            'piper' => 'ro_RO-mihai-medium.onnx',
+	},
+        'enabled' => 0,
+    },
     'polski' => {
 	'lang' => 'polski',
 	'name' => 'Polski (Polish)',
