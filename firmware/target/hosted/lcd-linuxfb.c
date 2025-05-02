@@ -69,6 +69,7 @@ void lcd_init_device(void)
         vinfo.bits_per_pixel = LCD_DEPTH;
         vinfo.xres = LCD_WIDTH;
         vinfo.yres = LCD_HEIGHT;
+        vinfo.yres_virtual = vinfo.yres; /* Ensure we're on the correct bank */
         if (ioctl(fd, FBIOPUT_VSCREENINFO, &vinfo)) {
             panicf("Cannot set framebuffer to %dx%dx%d",
                vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
@@ -76,9 +77,11 @@ void lcd_init_device(void)
     }
     /* Note: we use a framebuffer size of width*height*bbp. We cannot trust the
      * values returned by the driver for line_length */
+    if (finfo.smem_len < FRAMEBUFFER_SIZE)
+        panicf("FRAMEBUFFER_SIZE too large for hardware? (%u vs %u)", FRAMEBUFFER_SIZE, finfo.smem_len);
 
     /* map framebuffer */
-    framebuffer = mmap(NULL, FRAMEBUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    framebuffer = mmap(NULL, finfo.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if((void *)framebuffer == MAP_FAILED)
     {
         panicf("Cannot map framebuffer");
