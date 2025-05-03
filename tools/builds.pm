@@ -620,7 +620,7 @@ sub simbuilds {
     'chinese-simp' => {  # Mandarin?
 	'lang' => 'chinese-simp',
 	'name' => '简体中文 (Chinese Simplified)',
-        'short' => 'zh_cn',
+        'short' => 'zh-cn',
         'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vzh',
@@ -812,7 +812,7 @@ sub simbuilds {
     'moldoveneste' => {
 	'lang' => 'moldoveneste',
 	'name' => 'Moldovenească (Moldavian)',
-        'short' => 'ro_MD',
+        'short' => 'ro-md',
         'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vro',
