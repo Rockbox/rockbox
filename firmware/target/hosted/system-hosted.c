@@ -125,10 +125,16 @@ void system_exception_wait(void)
     backlight_hw_on();
     backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     /* wait until button press and release */
-    while(button_read_device() != 0) {}
-    while(button_read_device() == 0) {}
-    while(button_read_device() != 0) {}
-    while(button_read_device() == 0) {}
+#ifdef HAVE_BUTTON_DATA
+    int bdata;
+#define BDATA &bdata
+#else
+#define BDATA
+#endif
+    while(button_read_device(BDATA) != 0) {}
+    while(button_read_device(BDATA) == 0) {}
+    while(button_read_device(BDATA) != 0) {}
+    while(button_read_device(BDATA) == 0) {}
 }
 
 bool hostfs_removable(IF_MD_NONVOID(int drive))
