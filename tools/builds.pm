@@ -819,7 +819,7 @@ sub simbuilds {
 	    'gtts' => '-t md -l ro',
             'piper' => 'ro_RO-mihai-medium.onnx',
 	},
-        'enabled' => 0,
+        'enabled' => 1,
     },
     'polski' => {
 	'lang' => 'polski',
