@@ -42,7 +42,7 @@ Usage: genlang [options] <langv2 file>
 
  -t=<target>
     Specify which target you want the translations/phrases for. Required when
-    -b or -p is used.
+    -b, -o, or -p is used.
 
     The target can in fact be specified as numerous different strings,
     separated with colons. This will make genlang to use all the specified
@@ -103,15 +103,19 @@ if(!$target) {
 # discard any duplicates generated for us in the process of constructing the
 # state machine, so we don't bother to check.
 my $target_regex = "(?:^|,) *(?:\\*";
+my $model_regex = "";  # This matches the player model only!
 foreach my $target_part (split ':', $target) {
     for (my $c=1; $c<=length $target_part; $c++) {
         my $partial = substr $target_part, 0, $c;
         $target_regex .= "|$partial\\*";
     }
     $target_regex .= "|$target_part";
+    $model_regex = $target_regex if (!$model_regex);
 }
 $target_regex .= ") *(?:,|\$)";
 $target_regex = qr/$target_regex/;
+$model_regex .= ") *(?:,|\$)";
+$model_regex = qr/$model_regex/;
 
 my $binpath = "";
 if ($binary =~ m|(.*)/[^/]+|) {
@@ -170,7 +174,8 @@ sub parsetarget {
     my $string;
     if ($n =~ $target_regex) {
         $string = $v;
-        $$strref = $string;
+        # Only override the previously set string if this is a device-specific match
+        $$strref = $string if (!$$strref || $$strref eq 'none' || $n =~ $model_regex);
         return $string;
     }
 }

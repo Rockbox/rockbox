@@ -17,9 +17,6 @@
 # This is the master of the language files. This is the original, the one with
 # all the existing strings Rockbox features.
 #
-# The target names used for target-specific strings are set in the ARCHOS
-# variable in the root Makefile
-#
 # *WARNING*
 #
 # If you want to add a new string, add it to the end of this file!
@@ -31,8 +28,6 @@
 # If you re-order things or remove entries, you must bump the binary language
 # file version number in both the 'genlang' tool and the language loader code.
 #
-# The "voice" entry contains how we want the speech UI to pronounce the phrase.
-#
 # Since this file is both the master for the language system, as well as the
 # source for generating english strings, make sure that all <source> strings
 # are *identical* to the <dest> strings within the english.lang file. The
@@ -41,57 +36,34 @@
 # used to simply get the full set of english strings for a particular target.
 #
 # All phrases have a default string like: *: "default" that will be used if no
-# other string matches for the particular model you build the language for. If
-# you want a particular string for the iriver iriverh300 series you'd write it like:
-# iriverh300: "iriverh300-specific string" (below the default line). If your string isn't
-# used for all targets set the default to none like: *: none (no quotes!) this
-# will not include the string for target that will not need it, see
-# apps/features.txt for available categories that can be used instead of the
-# target name, for example: swcodec: "swcodec-specific string".
+# other string matches for the particular model you are building for. If
+# you want a particular string for the a specific target, you would write it like:
+# target: "target-specific string" (below the default line). If your string isn't
+# used for all targets set the default to none like: *: none (no quotes!) to ensure
+# it will not be included for targets that do not need it.  See apps/features.txt
+# for all available target features that can be used instead of or in addition
+# to the target name.
 #
 # The target names used are picked from the configure script and are set in the
-# MODELNAME variable in the root makefile. This is an incomplete list:
-# Target        Target string
-# iriver
-# H100/H110/H115    iriverh100
-# H120/H140         iriverh120
-# H320/H340         iriverh300
-# H10               iriverh10
-# iaudio/Cowon
-# X5                iaudiox5
-# M5                iaudiom5
-# D2                cowond2*
-# ipod
-# All iPods         ipod*
-# 4G Color/Photo    ipodcolor
-# Nano              ipodnano1g
-# Video (5G)        ipodvideo
-# 3G                ipod3g
-# 4G gray           ipod4g
-# mini              ipodmini1g
-# mini 2G           ipodmini2g
-# Toshiba
-# All gigabeats     gigabeat*
-# Gigabeat Fxx      gigabeatfx
-# Gigabeat Sxx      gigabeats
-# Sandisk
-# Sansa E200        sansae200*
-# Sansa C200        sansac200*
-# Sansa Fuze        sansafuze*
-# Sansa Clip        sansaclip*
-# Olympus
-# m:robe 100        mrobe100
-# m:robe 500        mrobe500
-# Mpio
-# HD200             mpiohd200
-# HD300             mpiohd300
-# Packard Bell
-# Vibe 500          vibe500
-# Philips
-# GoGear SA9200     gogearsa9200
-# Samsung
-# YH820/YH920/YH925 samsungyh*
-# First item will be shown when P2STR is passed a NULL pointer
+# MODELNAME variable in the root makefile.
+#
+# The indidivual entries under the <voice> section of a phrase contain the text
+# the speech UI will use to pronounce the phrase.  This is usually the same
+# as the <dest> section, but there are more limitations.  For example, most
+# punctuation and strings with C format specifiers are not allowed. If a
+# phrase is not intended to be voiced at all, you can use '*: none' under
+# its <voice> section.
+#
+# To validate the contents of a translation, you can use the Rockbox translation
+# site at https://translate.rockbox.org.  Alternatively, you can use the command-
+# line 'updatelang' tool as follows:
+#
+#  tools/updatelang apps/lang/english.lang path/to/translation.lang - |less
+#
+# All problematic areas will be marked with '###'
+#
+####
+# This is the first item, and will be shown when P2STR is passed a NULL pointer
 <phrase>
   id: LANG_ROCKBOX_TITLE
   desc: main menu title
@@ -3702,7 +3674,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3739,7 +3710,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>

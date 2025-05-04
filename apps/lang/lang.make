@@ -37,10 +37,9 @@ $(BUILDDIR)/lang/lang_core.o: $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core
 # instead we pretend that genlang create lang_core.c and that lang.c depends from lang.h
 # it will work fine as long as one never manually removes lang.c and not lang.h, and it will avoid
 # race conditions such as running genlang twice or worse in parallel with other things!
-$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(ENGLISH).lang $(BUILDDIR)/apps/features $(TOOLSDIR)/genlang
+$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(ENGLISH).lang $(BUILDDIR)/apps/genlang-features $(TOOLSDIR)/genlang
 	$(call PRINTS,GEN lang.h)
-	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
+	$(SILENT)$(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME):`cat $(BUILDDIR)/apps/genlang-features` $<
 $(BUILDDIR)/lang/lang_core.c: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
 
 $(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
