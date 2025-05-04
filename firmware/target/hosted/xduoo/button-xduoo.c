@@ -77,7 +77,7 @@ bool headphones_inserted(void)
 #ifdef BOOTLOADER
     int ps = 0;
 #else
-    int ps = surfans_get_outputs();
+    int ps = xduoo_get_outputs();
 #endif
 
     return (ps == 2 || ps == 3);
@@ -88,7 +88,7 @@ bool lineout_inserted(void)
 #ifdef BOOTLOADER
     int ps = 0;
 #else
-    int ps = surfans_get_outputs();
+    int ps = xduoo_get_outputs();
 #endif
     return (ps == 1);
 }
