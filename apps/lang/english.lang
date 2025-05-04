@@ -17,14 +17,16 @@
 # This is the master of the language files. This is the original, the one with
 # all the existing strings Rockbox features.
 #
+# The target names used for target-specific strings are set in the ARCHOS
+# variable in the root Makefile
+#
 # *WARNING*
 #
 # If you want to add a new string, add it to the end of this file!
-# Removing strings will break the numbering of strings in binary lang
-# files and voice files so instead of removing a unused <phrase>, change
-# the desc field to "deprecated" (without quotes) and either blank the
-# strings or change them to "deprecated" (without quotes) and do *not*
-# change the targets.
+# Removing strings will break the numbering of strings in binary lang files and
+# voice files so instead of removing a unused <phrase>, change the desc field
+# to "deprecated" (without quotes) and either blank the strings or change them to
+# "deprecated" (without quotes) and do *not* change the targets.
 #
 # If you re-order things or remove entries, you must bump the binary language
 # file version number in both the 'genlang' tool and the language loader code.
@@ -38,31 +40,57 @@
 # when doing updates etc, while the <dest> ones are used when this file is
 # used to simply get the full set of english strings for a particular target.
 #
-# All phrases have a default string like:
-#  *: "default"
-# that will be used if no other string matches for the particular model you
-# build the anguage for. If you want a particular string for the iriver
-# iriverh300 series you'd write it like:
-#   iriverh300: "iriverh300-specific string" (below the default line).
-# If your string isn't used for all targets set the default to none like:
-#   *: none (no quotes!)
-# this will not include the string for target that will not need it, see
-# apps/features.txt for available categories that can be used instead of
-# the target name, for example: swcodec: "swcodec-specific string".
+# All phrases have a default string like: *: "default" that will be used if no
+# other string matches for the particular model you build the language for. If
+# you want a particular string for the iriver iriverh300 series you'd write it like:
+# iriverh300: "iriverh300-specific string" (below the default line). If your string isn't
+# used for all targets set the default to none like: *: none (no quotes!) this
+# will not include the string for target that will not need it, see
+# apps/features.txt for available categories that can be used instead of the
+# target name, for example: swcodec: "swcodec-specific string".
 #
-# The target names are either the model name picked from the
-# configure script, or various feature flags.  Look at the 'rockbox-info.txt'
-# file in your build directory for a list of all of the feature flags
-# supported by your build; typicall there are well over a dozen.
-#
-# It is possible for there to be multiple matches.  When this is deteted
-# the build system will treat this as a failure.  There is a special
-# case where this is intentional. Some strings refer to key actions that
-# may be unique for a given device, but we need a way to flag an error
-# if that is not properly defined.  In this case, the feature flag
-# is given a special value "FALLBACK".  As an example of this, see
-# the 'rtc' string of of LANG_TIME_SET_BUTTON.
-####
+# The target names used are picked from the configure script and are set in the
+# MODELNAME variable in the root makefile. This is an incomplete list:
+# Target        Target string
+# iriver
+# H100/H110/H115    iriverh100
+# H120/H140         iriverh120
+# H320/H340         iriverh300
+# H10               iriverh10
+# iaudio/Cowon
+# X5                iaudiox5
+# M5                iaudiom5
+# D2                cowond2*
+# ipod
+# All iPods         ipod*
+# 4G Color/Photo    ipodcolor
+# Nano              ipodnano1g
+# Video (5G)        ipodvideo
+# 3G                ipod3g
+# 4G gray           ipod4g
+# mini              ipodmini1g
+# mini 2G           ipodmini2g
+# Toshiba
+# All gigabeats     gigabeat*
+# Gigabeat Fxx      gigabeatfx
+# Gigabeat Sxx      gigabeats
+# Sandisk
+# Sansa E200        sansae200*
+# Sansa C200        sansac200*
+# Sansa Fuze        sansafuze*
+# Sansa Clip        sansaclip*
+# Olympus
+# m:robe 100        mrobe100
+# m:robe 500        mrobe500
+# Mpio
+# HD200             mpiohd200
+# HD300             mpiohd300
+# Packard Bell
+# Vibe 500          vibe500
+# Philips
+# GoGear SA9200     gogearsa9200
+# Samsung
+# YH820/YH920/YH925 samsungyh*
 # First item will be shown when P2STR is passed a NULL pointer
 <phrase>
   id: LANG_ROCKBOX_TITLE
@@ -3659,7 +3687,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "FALLBACK"
+    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
@@ -3669,7 +3697,7 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "FALLBACK"
+    rtc: "ON = Set"
     vibe500: "OK = Set"
   </dest>
   <voice>
@@ -3691,7 +3719,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "FALLBACK"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
@@ -3705,7 +3733,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "FALLBACK"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </dest>
