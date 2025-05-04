@@ -6454,10 +6454,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Album-Künstler"
+    *: "Album Künstler"
   </dest>
   <voice>
-    *: "Album-Künstler"
+    *: "Album Künstler"
   </voice>
 </phrase>
 <phrase>
@@ -16570,10 +16570,10 @@
     *: "By First Letter..."
   </source>
   <dest>
-    *: "Alphabetisch"
+    *: "Nach Anfangsbuchstaben"
   </dest>
   <voice>
-    *: "Alphabetisch"
+    *: "Nach Anfangsbuchstaben"
   </voice>
 </phrase>
 <phrase>
@@ -16584,10 +16584,10 @@
     *: "Artists by First Letter"
   </source>
   <dest>
-    *: "Künstler Alphabetisch"
+    *: "Künstler nach Anfangsbuchstaben"
   </dest>
   <voice>
-    *: "Künstler Alphabetisch"
+    *: "Künstler nach Anfangsbuchstaben"
   </voice>
 </phrase>
 <phrase>
@@ -16598,10 +16598,10 @@
     *: "Album Artists by First Letter"
   </source>
   <dest>
-    *: "Album Künstler Alphabetisch"
+    *: "Album Künstler nach Anfangsbuchstaben"
   </dest>
   <voice>
-    *: "Album Künstler Alphabetisch"
+    *: "Album Künstler nach Anfangsbuchstaben"
   </voice>
 </phrase>
 <phrase>
@@ -16612,10 +16612,10 @@
     *: "Albums by First Letter"
   </source>
   <dest>
-    *: "Albums Alphabetisch"
+    *: "Alben nach Anfangsbuchstaben"
   </dest>
   <voice>
-    *: "Albums Alphabetisch"
+    *: "Alben nach Anfangsbuchstaben"
   </voice>
 </phrase>
 <phrase>
@@ -16626,10 +16626,10 @@
     *: "Tracks by First Letter"
   </source>
   <dest>
-    *: "Lieder Alphabetisch"
+    *: "Lieder nach Anfangsbuchstaben"
   </dest>
   <voice>
-    *: "Lieder Alphabetisch"
+    *: "Lieder nach Anfangsbuchstaben"
   </voice>
 </phrase>
 <phrase>
@@ -16654,10 +16654,10 @@
     *: "Albums"
   </source>
   <dest>
-    *: "Albums"
+    *: "Alben"
   </dest>
   <voice>
-    *: "Albums"
+    *: "Alben"
   </voice>
 </phrase>
 <phrase>
@@ -16808,10 +16808,10 @@
     *: "Same as currently played track"
   </source>
   <dest>
-    *: "Same as currently played track"
+    *: "Gleich wie der aktuell gespielte Titel"
   </dest>
   <voice>
-    *: "Same as currently played track"
+    *: "Gleich wie der aktuell gespielte Titel"
   </voice>
 </phrase>
 <phrase>
@@ -16836,10 +16836,10 @@
     *: "Albums by Year"
   </source>
   <dest>
-    *: "Albums nach Jahr"
+    *: "Alben nach Jahr"
   </dest>
   <voice>
-    *: "Albums nach Jahr"
+    *: "Alben nach Jahr"
   </voice>
 </phrase>
 <phrase>
@@ -16850,10 +16850,10 @@
     *: "Albums between Years"
   </source>
   <dest>
-    *: "Albums zwischen den Jahren"
+    *: "Alben zwischen den Jahren"
   </dest>
   <voice>
-    *: "Albums zwischen den Jahren"
+    *: "Alben zwischen den Jahren"
   </voice>
 </phrase>
 <phrase>
@@ -16934,10 +16934,10 @@
     *: "Favourite albums"
   </source>
   <dest>
-    *: "Lieblingsalbum"
+    *: "Lieblingsalben"
   </dest>
   <voice>
-    *: "Lieblingsalbum"
+    *: "Lieblingsalben"
   </voice>
 </phrase>
 <phrase>
