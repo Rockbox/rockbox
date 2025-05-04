@@ -36,6 +36,7 @@
 # - Johannes Rauh
 # - Wilfried Winkler
 # - Karl Huber
+# - Yannic Schmidt
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3354,12 +3355,10 @@
     battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3371,12 +3370,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3388,12 +3385,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3536,8 +3531,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Speichern"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Speichern"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Speichern"
     iriverh100,iriverh120,iriverh300: "NAVI = Speichern"
     mpiohd300: "ENTER = Speichern"
     mrobe500: "HEART = Speichern"
@@ -3569,8 +3564,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Abbrechen"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Abbrechen"
+    gigabeatfx,mrobe500: "POWER = Abbrechen"
     gogearsa9200: "LEFT = Abbrechen"
     iaudiom5,iaudiox5: "RECORD = Abbrechen"
     ipod*,mpiohd300,sansac200*: "MENU = Abbrechen"
@@ -16523,5 +16518,481 @@
   </dest>
   <voice>
     *: "Wiedergabliste beendet. Erneut abspielen?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Sonderzeichen"
+  </dest>
+  <voice>
+    *: "Sonderzeichen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Album Künstler"
+  </dest>
+  <voice>
+    *: "Album Künstler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "Anfangsbuchstabe"
+  </dest>
+  <voice>
+    *: "Anfangsbuchstabe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "Alphabetisch"
+  </dest>
+  <voice>
+    *: "Alphabetisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Künstler Alphabetisch"
+  </dest>
+  <voice>
+    *: "Künstler Alphabetisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Album Künstler Alphabetisch"
+  </dest>
+  <voice>
+    *: "Album Künstler Alphabetisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albums Alphabetisch"
+  </dest>
+  <voice>
+    *: "Albums Alphabetisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Lieder Alphabetisch"
+  </dest>
+  <voice>
+    *: "Lieder Alphabetisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Künstler"
+  </dest>
+  <voice>
+    *: "Künstler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albums"
+  </dest>
+  <voice>
+    *: "Albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Lieder"
+  </dest>
+  <voice>
+    *: "Lieder"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Zufallswiedergabe"
+  </dest>
+  <voice>
+    *: "Zufallswiedergabe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Dateinamen"
+  </dest>
+  <voice>
+    *: "Dateinamen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Titel (mit Spieldauer)"
+  </dest>
+  <voice>
+    *: "Titel mit Spieldauer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Benutzerbewertung"
+  </dest>
+  <voice>
+    *: "Benutzerbewertung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Suche"
+  </dest>
+  <voice>
+    *: "Suche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Suche nach"
+  </dest>
+  <voice>
+    *: "Suche nach"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Kürzlich hinzugefügt"
+  </dest>
+  <voice>
+    *: "Kürzlich hinzugefügt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Wiedergabeverlauf"
+  </dest>
+  <voice>
+    *: "Wiedergabeverlauf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "individuelles Menü"
+  </dest>
+  <voice>
+    *: "individuelles Menü"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Same as currently played track"
+  </dest>
+  <voice>
+    *: "Same as currently played track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Verzeichnis"
+  </dest>
+  <voice>
+    *: "Verzeichnis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albums nach Jahr"
+  </dest>
+  <voice>
+    *: "Albums nach Jahr"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albums zwischen den Jahren"
+  </dest>
+  <voice>
+    *: "Albums zwischen den Jahren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Künstler zwischen den Jahren"
+  </dest>
+  <voice>
+    *: "Künstler zwischen den Jahren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Meistgespielt (Anzahl|Punktzahl)"
+  </dest>
+  <voice>
+    *: "Meistgespielt nach Anzahl dann nach Punktzahl"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Kürzlich gespielt"
+  </dest>
+  <voice>
+    *: "Kürzlich gespielt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Noch nie gespielt"
+  </dest>
+  <voice>
+    *: "Noch nie gespielt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Lieblingskünstler"
+  </dest>
+  <voice>
+    *: "Lieblingskünstler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Lieblingsalbum"
+  </dest>
+  <voice>
+    *: "Lieblingsalbum"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Aktuelle Favoriten "
+  </dest>
+  <voice>
+    *: "Aktuelle Favoriten "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Neue Favoriten "
+  </dest>
+  <voice>
+    *: "Neue Favoriten "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Vergessene Favoriten"
+  </dest>
+  <voice>
+    *: "Vergessene Favoriten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Titel nach"
+  </dest>
+  <voice>
+    *: "Titel nach"
   </voice>
 </phrase>
