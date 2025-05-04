@@ -555,6 +555,7 @@ foreach my $id (@finalorder) {
     print $fh "  <source>\n";
     foreach my $tgt (sort(keys(%lp))) {
 	my $w = NFC($lp{$tgt});
+	next if ($w eq 'FALLBACK');
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
 	} else {
@@ -568,6 +569,7 @@ foreach my $id (@finalorder) {
     print $fh "  <dest>\n";
     foreach my $tgt (sort(keys(%lp))) {
 	my $w = NFC($lp{$tgt});
+	next if ($w eq 'FALLBACK');
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
 	} else {
@@ -581,6 +583,7 @@ foreach my $id (@finalorder) {
     print $fh "  <voice>\n";
     foreach my $tgt (sort(keys(%lp))) {
 	my $w = NFC($lp{$tgt});
+	next if ($w eq 'FALLBACK');
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
 	} else {

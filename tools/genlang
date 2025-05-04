@@ -235,6 +235,7 @@ sub readenglish {
     my $withindest;
     my $numphrases = 0;
     my $numusers = 1; # core is already in the users map
+    my $deststr;
 
     while(<ENG>) {
 
@@ -243,8 +244,7 @@ sub readenglish {
 
         if($_ =~ /^ *\<phrase\>/) {
             # this is the start of a phrase
-        }
-        elsif($_ =~ /\<\/phrase\>/) {
+        } elsif($_ =~ /\<\/phrase\>/) {
 
             # if id is something, when we count and store this phrase
             if($id) {
@@ -253,8 +253,7 @@ sub readenglish {
                     # Assign an ID number to this entry
                     $idmap[$user]{$id}=$vidnum[$user];
                     $vidnum[$user]++;
-                }
-                else {
+                } else {
                     # Assign an ID number to this entry
                     $idmap[$user]{$id}=$idnum[$user];
                     $idnum[$user]++;
@@ -266,8 +265,7 @@ sub readenglish {
             }
             undef @phrase;
             $id="";
-        }
-        elsif($_ ne "\n") {
+        } elsif($_ ne "\n") {
             # gather everything related to this phrase
             push @phrase, $_;
             if($_ =~ /^ *\<dest\>/i) {
@@ -278,12 +276,10 @@ sub readenglish {
                 $withindest=0;
 
                 if($deststr && ($deststr !~ /^none\z/i)) {
-                    # we unconditionally always use all IDs when the "update"
-                    # feature is used
+		    die ("Missing specific target match for $maybeid\n") if ($deststr eq '"FALLBACK"');
                     $id = $maybeid;
     #                print "DEST: use this id $id\n";
-                }
-                else {
+                } else {
     #                print "skip $maybeid for $name\n";
                 }
             }
@@ -293,11 +289,24 @@ sub readenglish {
                 # model name isn't "ours"
                 dest($_, $name, $val);
 
-                if($dest) {
-                    # Store the current dest string. If this target matches
-                    # multiple strings, it will get updated several times.
-                    $deststr = $dest;
-                }
+		## If $dest is nonnull (ie we have a match for this target)
+		##   if $deststr is null, accept
+		##   if $name is '*', accept
+		##   if $name is not '*' and $deststr is not null, COMPLAIN.
+
+		if ($dest) {
+		    if (!$deststr) {
+			$deststr = $dest;
+		    } elsif ($name eq '*') {
+			$deststr = $dest;
+		    } elsif ($deststr ne 'none' && $val ne '"FALLBACK"') {
+			die("multiple matches on $maybeid ($name:$val / $deststr)\n");
+		    } elsif ($deststr ne 'none' && $val eq '"FALLBACK"') {
+			# Ignore FALLBACK row if we already have a match
+		    } else {
+			$deststr = $dest;
+		    }
+		}
             }
         }
 
