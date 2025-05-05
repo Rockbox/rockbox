@@ -32,6 +32,8 @@
 #define BUTTON_RIGHT                0x00000020
 #define BUTTON_MAIN                 0x0000003f
 
+#define BUTTON_TOUCH                0x00000040
+
 /* Touchscreen virtual buttons */
 #define BUTTON_TOPLEFT      0x00001000
 #define BUTTON_TOPMIDDLE    0x00002000

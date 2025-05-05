@@ -301,4 +301,6 @@ keymaps/keymap-erosq.c
 keymaps/keymap-shanlingq1.c
 #elif CONFIG_KEYPAD == ECHO_R1_PAD
 keymaps/keymap-echor1.c
+#elif CONFIG_KEYPAD == SURFANS_F28_PAD
+keymaps/keymap-surfansf28.c
 #endif

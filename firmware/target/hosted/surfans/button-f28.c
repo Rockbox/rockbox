@@ -47,6 +47,8 @@ int button_map(int keycode)
             return BUTTON_PREV;
         case KEY_POWER:
             return BUTTON_POWER;
+        case KEY_KPMINUS:
+            return BUTTON_TOUCH;
         default:
             return 0;
     }

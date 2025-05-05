@@ -84,23 +84,12 @@ static int muted = -1;
 
 void audiohw_mute(int mute)
 {
-    logf("mute %d", mute);
-
-    if (!hw_init || muted == mute)
+    if (hw_init < 0 || muted == mute)
        return;
 
     muted = mute;
 
-    if(mute)
-    {
-        long int ps0 = 0;
-        alsa_controls_set_ints("Output Port Switch", 1, &ps0);
-    }
-    else
-    {
-        last_ps = 0;
-        surfans_get_outputs();
-    }
+    alsa_controls_set_bool("Hardware Mute", !!mute);
 }
 
 int surfans_get_outputs(void){
@@ -144,7 +133,8 @@ void audiohw_preinit(void)
     alsa_controls_init("default");
     hw_init = 1;
 
-    audiohw_mute(false);  /* No need */
+    audiohw_mute(false);  /* No need ? */
+    alsa_controls_set_bool("isDSD", 0);
 }
 
 void audiohw_postinit(void)

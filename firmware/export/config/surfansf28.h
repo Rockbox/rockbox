@@ -17,9 +17,12 @@
 //#define HAVE_QUICKSCREEN
 //#define HAVE_HOTKEY
 
+#define HAVE_HEADPHONE_DETECTION
+
+#ifndef BOOTLOADER
 #define HAVE_BUTTON_DATA
 #define HAVE_TOUCHSCREEN
-#define HAVE_HEADPHONE_DETECTION
+#endif
 
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SURFANS_F28_PAD
