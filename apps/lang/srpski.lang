@@ -3434,12 +3434,10 @@
     battery_types: ""
   </source>
   <dest>
-    *: none
-    battery_types: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3451,12 +3449,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3468,12 +3464,10 @@
     battery_types,xduoox3: ""
   </source>
   <dest>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    battery_types,xduoox3: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3616,8 +3610,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Постави"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Постави"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Постави"
     iriverh100,iriverh120,iriverh300: "NAVI = Постави"
     mpiohd300: "ENTER = Постави"
     mrobe500: "HEART = Постави"
@@ -3626,7 +3620,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3649,8 +3642,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Врати на старо"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Врати на старо"
+    gigabeatfx,mrobe500: "POWER = Врати на старо"
     gogearsa9200: "LEFT = Врати на старо"
     iaudiom5,iaudiox5: "RECORD = Врати на старо"
     ipod*,mpiohd300,sansac200*: "MENU = Врати на старо"
@@ -3663,7 +3656,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4989,7 +4981,7 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
@@ -6006,8 +5998,8 @@
   </source>
   <dest>
     *: "Инт:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Интерни"
@@ -6028,10 +6020,10 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
@@ -11222,7 +11214,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "покрени ток слика"
