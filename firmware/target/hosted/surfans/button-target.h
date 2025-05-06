@@ -28,8 +28,8 @@
 #define BUTTON_PREV                 0x00000002
 #define BUTTON_NEXT                 0x00000004
 #define BUTTON_PLAY                 0x00000008
-#define BUTTON_LEFT                 0x00000010
-#define BUTTON_RIGHT                0x00000020
+#define BUTTON_SCROLL_BACK          0x00000010
+#define BUTTON_SCROLL_FWD           0x00000020
 #define BUTTON_MAIN                 0x0000003f
 
 #define BUTTON_TOUCH                0x00000040

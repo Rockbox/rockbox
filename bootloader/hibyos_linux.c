@@ -98,6 +98,8 @@
 #define BUTTON_UP     BUTTON_PREV
 #define BUTTON_DOWN   BUTTON_NEXT
 #define BUTTON_SELECT BUTTON_PLAY
+#define BUTTON_LEFT   BUTTON_SCROLL_BACK
+#define BUTTON_RIGHT  BUTTON_SCROLL_FWD
 #include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"

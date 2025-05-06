@@ -5,10 +5,10 @@
 AUDIOHW_SETTING(VOLUME, "dB", 1, 5, -102*10,  0, -30*10)
 #endif
 
-// We want this, but the codec takes over a second to unmute!
 //#define AUDIOHW_MUTE_ON_STOP
-
+#define AUDIOHW_MUTE_ON_SRATE_CHANGE
 //#define AUDIOHW_NEEDS_INITIAL_UNMUTE
+
 AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 #define AUDIOHW_HAVE_SHORT2_ROLL_OFF
 

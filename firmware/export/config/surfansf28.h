@@ -18,6 +18,8 @@
 //#define HAVE_HOTKEY
 
 #define HAVE_HEADPHONE_DETECTION
+#define HAVE_SCROLLWHEEL
+#define NO_BUTTON_LR
 
 #ifndef BOOTLOADER
 #define HAVE_BUTTON_DATA
@@ -40,7 +42,6 @@
 
 /* Audio codec */
 #define HAVE_SURFANS_LINUX_CODEC
-#define HAVE_ALSA_32BIT
 
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS

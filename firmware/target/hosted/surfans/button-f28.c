@@ -36,9 +36,9 @@ int button_map(int keycode)
     switch(keycode)
     {
         case KEY_LEFT:
-            return BUTTON_LEFT;
+            return BUTTON_SCROLL_BACK;
         case KEY_RIGHT:
-            return BUTTON_RIGHT;
+            return BUTTON_SCROLL_FWD;
         case KEY_PLAYPAUSE:
             return BUTTON_PLAY;
         case KEY_NEXTSONG:
