@@ -58,7 +58,7 @@ $(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
 $(BUILDDIR)/lang/lang.h: $(ROOTDIR)/apps/lang/$(ENGLISH).lang $(BUILDDIR)/apps/features $(TOOLSDIR)/genlang
 	$(call PRINTS,GEN lang.h)
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
-		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
+		perl -s $(TOOLSDIR)/genlang -e=$(ROOTDIR)/apps/lang/$(ENGLISH).lang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 
 $(BUILDDIR)/lang/lang_core.c: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
 
