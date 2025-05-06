@@ -122,6 +122,7 @@ static bool handle_touchscreen_event(__u16 code, __s32 value)
 
     switch(code)
     {
+        case ABS_X:
         case ABS_MT_POSITION_X:
         {
             _last_x = value;
@@ -132,6 +133,7 @@ static bool handle_touchscreen_event(__u16 code, __s32 value)
             break;
         }
 
+        case ABS_Y:
         case ABS_MT_POSITION_Y:
         {
             _last_y = value;
@@ -159,7 +161,7 @@ static bool handle_touchscreen_event(__u16 code, __s32 value)
 }
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
+#ifdef HAVE_BUTTON_DATA
 #define BDATA int *data
 #else
 #define BDATA void
@@ -168,6 +170,10 @@ int button_read_device(BDATA)
 {
     static int button_bitmap = 0;
     struct input_event event;
+
+#if defined(HAVE_BUTTON_DATA) && !defined(HAVE_TOUCHSCREEN)
+    (void)data;
+#endif
 
 #ifdef HAVE_SCROLLWHEEL
     int wheel_ticks = 0;
@@ -183,16 +189,12 @@ int button_read_device(BDATA)
 #endif
 
     /* check if there are any events pending and process them */
-    while(poll(poll_fds, num_devices, 0))
-    {
-        for(int i = 0; i < num_devices; i++)
-        {
+    while(poll(poll_fds, num_devices, 0)) {
+        for(int i = 0; i < num_devices; i++) {
             /* read only if non-blocking */
-            if(poll_fds[i].revents & POLLIN)
-            {
+            if(poll_fds[i].revents & POLLIN) {
                 int size = read(poll_fds[i].fd, &event, sizeof(event));
-                if(size == (int)sizeof(event))
-                {
+                if(size == (int)sizeof(event)) {
                     switch(event.type) {
                     case EV_KEY: {
                         /* map linux event code to rockbox button bitmap */
@@ -201,8 +203,7 @@ int button_read_device(BDATA)
                         /* event.value == 0x10000 means press
                          * event.value == 0 means release
                          */
-                        if(event.value)
-                        {
+                        if(event.value) {
 #ifdef HAVE_SCROLLWHEEL
                             /* Filter out wheel ticks */
                             if (bmap & BUTTON_SCROLL_BACK)
@@ -214,25 +215,36 @@ int button_read_device(BDATA)
 #ifdef BUTTON_DELAY_RELEASE
                             bmap &= ~BUTTON_DELAY_RELEASE;
 #endif
+#if defined(HAVE_TOUCHSCREEN) && defined(BUTTON_TOUCH)
+                            /* Some touchscreens give us actual touch/untouch as a "key" */
+                            if (bmap & BUTTON_TOUCH) {
+                                handle_touchscreen_event(ABS_MT_TRACKING_ID, EVENT_VALUE_TOUCHSCREEN_PRESS);
+                                bmap &= ~BUTTON_TOUCH;
+                            }
+#endif
                             button_bitmap |= bmap;
-                        }
-                        else
-                        {
+                        } else {
+#if defined(HAVE_TOUCHSCREEN) && defined(BUTTON_TOUCH)
+                            /* Some touchscreens give us actual touch/untouch as a "key" */
+                            if (bmap & BUTTON_TOUCH) {
+                                handle_touchscreen_event(ABS_MT_TRACKING_ID, 0);
+                                bmap &= ~BUTTON_TOUCH;
+                            }
+#endif
 #ifdef BUTTON_DELAY_RELEASE
                             /* Delay the release of any requested buttons */
-                            if (bmap & BUTTON_DELAY_RELEASE)
-                            {
+                            if (bmap & BUTTON_DELAY_RELEASE) {
                                 button_delay_release |= bmap & ~BUTTON_DELAY_RELEASE;
                                 delay_tick = current_tick + HZ/20;
                                 bmap = 0;
                             }
 #endif
-                        }
 #ifdef HAVE_SCROLLWHEEL
-                        /* Wheel gives us press+release back to back; ignore the release */
-                        bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
+                            /* Wheel gives us press+release back to back; ignore the release */
+                            bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
-                        button_bitmap &= ~bmap;
+                            button_bitmap &= ~bmap;
+                        }
                         break;
                     }
 #ifdef HAVE_TOUCHSCREEN
