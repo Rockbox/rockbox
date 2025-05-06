@@ -38,7 +38,7 @@ Usage: genlang [options] <langv2 file>
 
  -e=<english lang file>
     Point out the english (original source) file, to use that as master
-    language template. Used in combination with -b.
+    language template. Always required.
 
  -t=<target>
     Specify which target you want the translations/phrases for. Required when
@@ -64,23 +64,11 @@ MOO
 my $prefix = $p;
 my $binary = $b;
 my $binvoice = $c;
-
-my $english = $e;
 my $voiceout = $o;
 
-my $check = ($binary?.5:0) + ($prefix?1:0) + ($voiceout?1:0) + ($binvoice?.5:0);
-
-if($check > 1) {
-    print STDERR "Please use only one of -p, -o, -b, and -c\n";
-    exit;
-}
-if(!$check) {
-    print STDERR "Please use at least one of -p, -o, -c, and -e\n";
-    exit;
-}
-
-if(($binary || $voiceout) && !$english) {
-    print STDERR "Please use -e too when you use -b, or -o\n";
+my $english = $e;
+if (!$english) {
+    print STDERR "Please specify the english lang source (with -e)!\n";
     exit;
 }
 
@@ -93,6 +81,16 @@ if($binary && !$target_id) {
 my $target = $t;
 if(!$target) {
     print STDERR "Please specify a target (with -t)!\n";
+    exit;
+}
+
+my $check = ($binary?.5:0) + ($prefix?1:0) + ($voiceout?1:0) + ($binvoice?.5:0);
+if($check > 1) {
+    print STDERR "Please use only one of -p, -o, -b, and -c\n";
+    exit;
+}
+if(!$check) {
+    print STDERR "Please use at least one of -p, -o, -c, and -e\n";
     exit;
 }
 
@@ -218,7 +216,6 @@ sub readenglish {
     my @idnum = ((0));       # start with a true number
     my @vidnum = ((0x8000)); # first voice id
 
-
     if ($binary and file_is_newer("$binpath/english.list", $english)) {
         open(ENG, "<$binpath/english.list") ||
             die "Error: can't open $binpath/english.list";
@@ -242,15 +239,12 @@ sub readenglish {
     my $numusers = 1; # core is already in the users map
 
     while(<ENG>) {
-
         # get rid of DOS newlines
         $_ =~ tr/\r//d;
 
         if($_ =~ /^ *\<phrase\>/) {
             # this is the start of a phrase
-        }
-        elsif($_ =~ /\<\/phrase\>/) {
-
+        } elsif($_ =~ /\<\/phrase\>/) {
             # if id is something, when we count and store this phrase
             if($id) {
                 # voice-only entries get a difference range
@@ -258,8 +252,7 @@ sub readenglish {
                     # Assign an ID number to this entry
                     $idmap[$user]{$id}=$vidnum[$user];
                     $vidnum[$user]++;
-                }
-                else {
+                } else {
                     # Assign an ID number to this entry
                     $idmap[$user]{$id}=$idnum[$user];
                     $idnum[$user]++;
@@ -271,28 +264,23 @@ sub readenglish {
             }
             undef @phrase;
             $id="";
-        }
-        elsif($_ ne "\n") {
+        } elsif($_ ne "\n") {
             # gather everything related to this phrase
             push @phrase, $_;
             if($_ =~ /^ *\<dest\>/i) {
                 $withindest=1;
                 $deststr="";
-            }
-            elsif($withindest && ($_ =~ /^ *\<\/dest\>/i)) {
+            } elsif($withindest && ($_ =~ /^ *\<\/dest\>/i)) {
                 $withindest=0;
-
                 if($deststr && ($deststr !~ /^none\z/i)) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
     #                print "DEST: use this id $id\n";
-                }
-                else {
+                } else {
     #                print "skip $maybeid for $name\n";
                 }
-            }
-            elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
+            } elsif($withindest && ($_ =~ / *([^:]+): *(.*)/)) {
                 my ($name, $val)=($1, $2);
                 $dest=""; # in case it is left untouched for when the
                 # model name isn't "ours"
@@ -375,18 +363,14 @@ while(<LANG>) {
                 my $idstr = $phrase{'id'};
                 my $idnum;
 
-                if(($binary || $binvoice || $voiceout) && !$english{$idstr}) {
-                    # $idstr doesn't exist for english, skip it\n";
-		    # FIXME/TODO:  Any reason this filter shouldn't always be enabled?
-                }
-                elsif($dest =~ /^none\z/i) {
+                if($english && !$english{$idstr}) {
+                    # print STDERR "$idstr doesn't exist for english, skip it\n";
+                } elsif($dest =~ /^none\z/i || $src =~ /^none\z/i ) {
                     # "none" as dest (without quotes) means that this entire
                     # phrase is to be ignored
-                }
-                elsif($sortfile) {
+                } elsif($sortfile) {
                     $allphrases{$idstr}=join('',@phrase);
-                }
-                else {
+                } else {
                     # allow the keyword 'deprecated' to be used on dest and
                     # voice strings to mark that as deprecated. It will then
                     # be replaced with "".
@@ -422,8 +406,7 @@ while(<LANG>) {
                         if($english) {
                            print STDERR "$input:$line:1: warning: user was not found in $english!\n";
                            $user = keys %users;  # set to an invalid user so it won't be added
-                        }
-                        else {
+                        } else {
                             # we found a new user, add it to the usermap
                             $user = ++$numusers;
                             $users{$userstr} = $user;
@@ -436,8 +419,7 @@ while(<LANG>) {
 
                     if($idstr =~ /^VOICE/) {
                         $idnum = $voiceid[$user]++;
-                    }
-                    else {
+                    } else {
                         $idnum = $idcount[$user]++;
                     }
 
@@ -735,7 +717,7 @@ if ($binary and !file_is_newer("$binpath/english.list", $english)) {
     open(ENGLIST, ">$binpath/english.list") ||
         die "Failed creating $binpath/english.list";
     for my $user (keys %users) {
-        for my $id (keys %{$idmap[$user]}) {
+        for my $id (sort { $idmap[$user]{$a} <=> $idmap[$user]{$b} } keys %{$idmap[$user]}) {
             print ENGLIST "$user:$id:$idmap[$user]{$id}\n";
         }
     }
