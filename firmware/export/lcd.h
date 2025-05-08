@@ -657,4 +657,8 @@ extern void lcd_nine_segment_bmp(const struct bitmap* bm, int x, int y,
     extern int lcd_get_dpi(void);
 #endif /* LCD_DPI */
 
+#ifdef FB_DOUBLEBUF
+extern int doublebuf;
+#endif
+
 #endif /* __LCD_H__ */

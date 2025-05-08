@@ -43,7 +43,7 @@ fb_data *framebuffer = NULL; /* global variable, see lcd-target.h */
 
 #ifdef FB_DOUBLEBUF
 static int fb_plane;
-static int doublebuf;
+int doublebuf;
 #else
 #define fb_plane 0
 #endif
