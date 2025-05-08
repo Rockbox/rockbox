@@ -68,10 +68,15 @@ void TestTalkGenerator::testCorrectString()
     QFETCH(QString, from);
     QFETCH(QString, to);
 
+    QFile corrfile(":/builtin/voice-corrections.txt");
+    corrfile.open(QIODevice::ReadOnly);
+
     TalkGenerator t(this);
-    t.setLang(language);
+    t.setLang(language, &corrfile);
+
     QString corrected = t.correctString(from);
     QCOMPARE(corrected, to);
+    corrfile.close();
 }
 
 
@@ -80,4 +85,3 @@ QTEST_MAIN(TestTalkGenerator)
 // this include is needed because we don't use a separate header file for the
 // test class. It also needs to be at the end.
 #include "test-talkgenerator.moc"
-

@@ -72,21 +72,40 @@ bool VoiceFileCreator::createVoiceFile()
         ZipUtil z(this);
         if(z.open(fn)) {
             QStringList contents = z.files();
-            int index;
-            for(index = 0; index < contents.size(); ++index) {
+            int vindex = -1, cindex = -1;
+            for(int index = 0; index < contents.size(); ++index) {
                 // strip any path, we don't know the structure in the zip
-                if(QFileInfo(contents.at(index)).baseName() == m_lang) {
+                if(QFileInfo(contents.at(index)).baseName() == m_lang)
+                    vindex = index;
+                if(QFileInfo(contents.at(index)).baseName() == "voice-corrections")
+                    cindex = index;
+                if (vindex != -1 && cindex != -1)
                     break;
+            }
+            if(cindex != -1) {
+                LOG_INFO() << "extracting voice corrections file";
+                QTemporaryFile corrfileT;
+                corrfileT.open();
+                QString cfn = corrfileT.fileName();
+                if(z.extractArchive(cfn, QFileInfo(contents.at(cindex)).fileName())) {
+                    emit logItem(tr("Extracted voice corrections file from installation"), LOGINFO);
+                    corrFile = &corrfileT;
+                } else {
+                    corrfileT.close();
+                    emit logItem(tr("Using internal voice corrections file"), LOGINFO);
+                    QFile corrfile(":/builtin/voice-corrections.txt");
+                    corrfile.open(QIODevice::ReadOnly);
+                    corrFile = &corrfile;
                 }
             }
-            if(index < contents.size()) {
+            if(vindex != -1) {
                 LOG_INFO() << "extracting strings file from zip";
                 // extract strings
                 QTemporaryFile stringsfile;
                 stringsfile.open();
                 QString sfn = stringsfile.fileName();
                 // ZipUtil::extractArchive() only compares the filename.
-                if(z.extractArchive(sfn, QFileInfo(contents.at(index)).fileName())) {
+                if(z.extractArchive(sfn, QFileInfo(contents.at(vindex)).fileName())) {
                     emit logItem(tr("Extracted voice strings from installation"), LOGINFO);
 
                     stringsfile.seek(0);
@@ -135,6 +154,8 @@ bool VoiceFileCreator::createVoiceFile()
 
                         // everything successful, now create the actual voice file.
                         create();
+                        if (corrFile->isOpen())
+                            corrFile->close();
                         return true;
                     }
 
@@ -282,7 +303,7 @@ void VoiceFileCreator::create(void)
         TalkGenerator generator(this);
         // set language for string correction. If not set no correction will be made.
         if(useCorrection)
-            generator.setLang(m_lang);
+            generator.setLang(m_lang, corrFile);
         connect(&generator, &TalkGenerator::done, this, &VoiceFileCreator::done);
         connect(&generator, &TalkGenerator::logItem, this, &VoiceFileCreator::logItem);
         connect(&generator, &TalkGenerator::logProgress, this, &VoiceFileCreator::logProgress);

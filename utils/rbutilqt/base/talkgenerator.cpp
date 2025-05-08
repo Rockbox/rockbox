@@ -277,14 +277,12 @@ QString TalkGenerator::correctString(const QString& s)
     return corrected;
 }
 
-void TalkGenerator::setLang(const QString& name)
+void TalkGenerator::setLang(const QString& name, QFile *correctionsFile)
 {
     m_lang = name;
 
     // re-initialize corrections list
-    m_corrections.clear();
-    QFile correctionsFile(":/builtin/voice-corrections.txt");
-    correctionsFile.open(QIODevice::ReadOnly);
+    correctionsFile->seek(0);
 
     QString engine = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this, RbSettings::value(RbSettings::Tts).toString());
@@ -300,7 +298,7 @@ void TalkGenerator::setLang(const QString& name)
         m_lang = "english";
     LOG_INFO() << "building string corrections list for"
                << m_lang << engine << vendor;
-    QTextStream stream(&correctionsFile);
+    QTextStream stream(correctionsFile);
     while(!stream.atEnd()) {
         QString line = stream.readLine();
         if(line.startsWith(" ") || line.length() < 10)
@@ -333,5 +331,4 @@ void TalkGenerator::setLang(const QString& name)
         co.modifier = items.at(5);
         m_corrections.append(co);
     }
-    correctionsFile.close();
 }

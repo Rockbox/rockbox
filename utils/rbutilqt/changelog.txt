@@ -51,3 +51,5 @@ Version 1.5.1
 Version 1.5.2
 * Add support for Native Port to AIGO Eros Q and various clones
 * Make Hosted Port to AIGO Eros Q and various clones "disabled" (can be reenabled by checking the "show disabled targets" checkbox)
+* When installing development builds, fall back to daily artefacts for non-firmware files
+* Where possible, extract voice corrections file from the actual device

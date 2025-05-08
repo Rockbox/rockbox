@@ -68,10 +68,10 @@ private:
     QString m_versionstring; // version string to be used for logging
     int m_wavtrimThreshold;
     int m_voiceformat;
+    QFile *corrFile; // the voice-corrections file
 
     bool m_abort;
     QList<TalkGenerator::TalkEntry> m_talkList;
 };
 
 #endif
-

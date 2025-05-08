@@ -57,7 +57,7 @@ public:
 
 public slots:
     void abort();
-    void setLang(const QString& name);
+    void setLang(const QString& name, QFile *correctionsFile);
 
 signals:
     void done(bool);
@@ -88,4 +88,3 @@ private:
 
 
 #endif
-
