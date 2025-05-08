@@ -76,7 +76,12 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, "lo: %d", lineout_inserted());
 #endif
 
+#ifdef HAVE_BUTTON_DATA
+        uint32_t bdata;
+        btn = button_read_device(&bdata);
+#else
         btn = button_read_device();
+#endif
         lcd_putsf(0, line++, "btn: %d", btn);
 
         lcd_update();
