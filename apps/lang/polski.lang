@@ -3583,7 +3583,7 @@
     mrobe100: "DISPLAY = Przywróć"
     rtc: "OFF = Przywróć"
     samsungyh*: "REW = Przywróć"
-    vibe500: "C = Przywróć"
+    vibe500: "CANCEL = Przywróć"
   </dest>
   <voice>
     *: none
