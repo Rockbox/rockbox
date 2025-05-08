@@ -342,6 +342,19 @@ static void button_tick(void)
                         skip_release = false;
 #endif
                         post = false;
+                        /* Need to post back/buttonlight_on() on repeat buttons */
+#ifdef HAVE_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                        if (btn & BUTTON_REMOTE) {
+                            remote_backlight_on();
+                        }
+                        else
+#endif
+                        {
+                            backlight_on();
+                            buttonlight_on();
+                        }
+#endif
                     }
                 }
                 else
