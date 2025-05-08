@@ -9168,7 +9168,7 @@
   desc: Relative volume of voice prompts
   user: core
   <source>
-    *: "Voice prompt volume"
+    *: "Voice Prompt Volume"
   </source>
   <dest>
     *: "음성 안내 볼륨"
@@ -11246,7 +11246,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "자동 재시작"
@@ -15068,13 +15068,13 @@
   desc: open plugin module
   user: core
   <source>
-    *: "Set Wps Context Plugin"
+    *: "Set WPS Context Plugin"
   </source>
   <dest>
-    *: "Wps 컨텍스트 플러그인 설정"
+    *: "WPS 컨텍스트 플러그인 설정"
   </dest>
   <voice>
-    *: "Wps 컨텍스트 플러그인 설정"
+    *: "WPS 컨텍스트 플러그인 설정"
   </voice>
 </phrase>
 <phrase>

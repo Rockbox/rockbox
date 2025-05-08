@@ -10329,7 +10329,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "單檔案斷點續撥"
@@ -10904,7 +10904,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "單檔案斷點續撥"

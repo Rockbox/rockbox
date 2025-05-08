@@ -11191,7 +11191,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "オートレジューム"
@@ -11952,7 +11952,7 @@
   desc: Relative volume of voice prompts
   user: core
   <source>
-    *: "Voice prompt volume"
+    *: "Voice Prompt Volume"
   </source>
   <dest>
     *: "音声プロンプトの音量"
@@ -15145,7 +15145,7 @@
   desc: open plugin module
   user: core
   <source>
-    *: "Set Wps Context Plugin"
+    *: "Set WPS Context Plugin"
   </source>
   <dest>
     *: "再生中に画面のコンテキストを設定するプラグイン"

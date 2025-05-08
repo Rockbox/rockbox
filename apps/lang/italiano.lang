@@ -11174,7 +11174,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "Riprendi Automaticamente"
@@ -14780,10 +14780,10 @@
   desc: open plugin module
   user: core
   <source>
-    *: "Set Wps Context Plugin"
+    *: "Set WPS Context Plugin"
   </source>
   <dest>
-    *: "Imposta un Plugin Contestuale per Wps"
+    *: "Imposta un Plugin Contestuale per WPS"
   </dest>
   <voice>
     *: "Imposta un Plugin Contestuale per WPS"
@@ -14906,7 +14906,7 @@
   desc: Relative volume of voice prompts
   user: core
   <source>
-    *: "Voice prompt volume"
+    *: "Voice Prompt Volume"
   </source>
   <dest>
     *: "Volume dei prompt vocali"

@@ -4846,7 +4846,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "Otomatik Devam"
@@ -12046,7 +12046,7 @@
   desc: Relative volume of voice prompts
   user: core
   <source>
-    *: "Voice prompt volume"
+    *: "Voice Prompt Volume"
   </source>
   <dest>
     *: "Ses istemi ses seviyesi"
@@ -15056,13 +15056,13 @@
   desc: open plugin module
   user: core
   <source>
-    *: "Set Wps Context Plugin"
+    *: "Set WPS Context Plugin"
   </source>
   <dest>
-    *: "Wps Bağlam Eklentisini Ayarla"
+    *: "WPS Bağlam Eklentisini Ayarla"
   </dest>
   <voice>
-    *: "Wps Bağlam Eklentisini Ayarla"
+    *: "WPS Bağlam Eklentisini Ayarla"
   </voice>
 </phrase>
 <phrase>

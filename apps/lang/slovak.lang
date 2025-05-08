@@ -11173,7 +11173,7 @@
   desc: resume settings menu
   user: core
   <source>
-    *: "Automatic resume"
+    *: "Automatic Resume"
   </source>
   <dest>
     *: "Automatické Obnovenie Prehrávania"
@@ -14767,7 +14767,7 @@
   desc: Relative volume of voice prompts
   user: core
   <source>
-    *: "Voice prompt volume"
+    *: "Voice Prompt Volume"
   </source>
   <dest>
     *: "Hlasitosť ozvučenia"
@@ -15056,7 +15056,7 @@
   desc: open plugin module
   user: core
   <source>
-    *: "Set Wps Context Plugin"
+    *: "Set WPS Context Plugin"
   </source>
   <dest>
     *: "Nastaviť zásuvný modul pre kontext obrazovky Teraz hrá"
