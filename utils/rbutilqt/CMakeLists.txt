@@ -431,6 +431,8 @@ add_executable(test_talkgenerator
     base/talkgenerator.h
     base/encttssettings.cpp
     base/encttssettings.h
+    base/playerbuildinfo.h
+    base/playerbuildinfo.cpp
     base/ttsbase.h
     test/stubs/stubs-talkgenerator.cpp
     test/test-talkgenerator.qrc
@@ -443,4 +445,3 @@ target_compile_definitions(test_talkgenerator PRIVATE UNICODE)
 qtest_discover_tests(test_talkgenerator)
 set_property(TARGET test_talkgenerator PROPERTY AUTOMOC ON)
 set_property(TARGET test_talkgenerator PROPERTY AUTORCC ON)
-

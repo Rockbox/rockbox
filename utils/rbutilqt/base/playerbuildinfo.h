@@ -31,6 +31,7 @@
 class PlayerBuildInfo : public QObject
 {
     Q_OBJECT
+
 public:
 
     enum BuildType {

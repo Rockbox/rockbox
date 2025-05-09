@@ -82,23 +82,4 @@ EncoderBase* EncoderBase::getEncoder(QObject*, QString)
     return nullptr;
 }
 
-QVariant PlayerBuildInfo::value(PlayerBuildInfo::DeviceInfo /*item*/, QString /*target*/)
-{
-    return QVariant();
-}
-
-PlayerBuildInfo* PlayerBuildInfo::infoInstance = nullptr;
-
-PlayerBuildInfo::PlayerBuildInfo()
-{
-}
-
-PlayerBuildInfo* PlayerBuildInfo::instance()
-{
-    if (infoInstance == nullptr) {
-        infoInstance = new PlayerBuildInfo();
-    }
-    return infoInstance;
-}
-
 #include "stubs-talkgenerator.moc"
