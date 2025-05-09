@@ -1265,7 +1265,7 @@
     *: "Fade on Stop/Pause"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Fade on Stop and Pause"
   </voice>
 </phrase>
 <phrase>
@@ -2741,13 +2741,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </source>
   <dest>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </voice>
 </phrase>
 <phrase>
@@ -3027,13 +3027,13 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
   </source>
   <dest>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
   </voice>
 </phrase>
 <phrase>
@@ -3041,13 +3041,13 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
   </source>
   <dest>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
   </voice>
 </phrase>
 <phrase>
@@ -4025,11 +4025,11 @@
   user: core
   <source>
     *: none
-    alarm: "Waking Up In %d:%02d"
+    alarm: "Waking Up in %d:%02d"
   </source>
   <dest>
     *: none
-    alarm: "Waking Up In %d:%02d"
+    alarm: "Waking Up in %d:%02d"
   </dest>
   <voice>
     *: none
@@ -5032,15 +5032,15 @@
   user: core
   <source>
     *: none
-    recording: "(Same As Source)"
+    recording: "(Same as Source)"
   </source>
   <dest>
     *: none
-    recording: "(Same As Source)"
+    recording: "(Same as Source)"
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "Same as Source"
   </voice>
 </phrase>
 <phrase>
@@ -6156,13 +6156,13 @@
   desc: in playlist menu.
   user: core
   <source>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </source>
   <dest>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6745,15 +6745,15 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Set as Backdrop"
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Set as Backdrop"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Set as Backdrop"
   </voice>
 </phrase>
 <phrase>
@@ -9311,7 +9311,7 @@
 </phrase>
 <phrase>
   id: VOICE_OK
-  desc: spoken only, On exiting a context, specifically the quick screen
+  desc: spoken only, on exiting a context, specifically the quick screen
   user: core
   <source>
     *: ""
@@ -9329,15 +9329,15 @@
   user: core
   <source>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop Recording and Shutdown"
   </source>
   <dest>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop Recording and Shutdown"
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop Recording and Shutdown"
   </voice>
 </phrase>
 <phrase>
@@ -11375,13 +11375,13 @@
   desc: whether sleep timer starts on power up
   user: core
   <source>
-    *: "Start Sleep Timer On Boot"
+    *: "Start Sleep Timer on Boot"
   </source>
   <dest>
-    *: "Start Sleep Timer On Boot"
+    *: "Start Sleep Timer on Boot"
   </dest>
   <voice>
-    *: "Start Sleep Timer On Boot"
+    *: "Start Sleep Timer on Boot"
   </voice>
 </phrase>
 <phrase>
@@ -11507,13 +11507,13 @@
   desc: whether to restart running sleep timer on keypress
   user: core
   <source>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Restart Sleep Timer on Keypress"
   </source>
   <dest>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Restart Sleep Timer on Keypress"
   </dest>
   <voice>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Restart Sleep Timer on Keypress"
   </voice>
 </phrase>
 <phrase>
@@ -15466,7 +15466,7 @@
     *: "Artist + Name"
   </dest>
   <voice>
-    *: "Artist And Name"
+    *: "Artist and Name"
   </voice>
 </phrase>
 <phrase>
@@ -15480,7 +15480,7 @@
     *: "Artist + Year"
   </dest>
   <voice>
-    *: "Artist And Year"
+    *: "Artist and Year"
   </voice>
 </phrase>
 <phrase>

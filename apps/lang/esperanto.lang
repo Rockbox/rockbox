@@ -3104,7 +3104,7 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </source>
   <dest>
     *: "Ekrano Rulumas Ekster Vido"
@@ -3342,7 +3342,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
   </source>
   <dest>
     *: "Ampleksa Minimumo"
@@ -3356,7 +3356,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
   </source>
   <dest>
     *: "Ampleksa Maksimumo"
@@ -3678,7 +3678,7 @@
   desc: text for onplay menu entry
   user: core
   <source>
-    *: "Set As Backdrop"
+    *: "Set as Backdrop"
   </source>
   <dest>
     *: "Uzi kiel Fono"
@@ -3916,7 +3916,7 @@
   desc: in playlist menu.
   user: core
   <source>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </source>
   <dest>
     *: "Serĉi En Leglisto"
@@ -4415,7 +4415,7 @@
   desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
   user: core
   <source>
-    *: "Waking Up In %d:%02d"
+    *: "Waking Up in %d:%02d"
   </source>
   <dest>
     *: "Vekonta Je %d:%02d"

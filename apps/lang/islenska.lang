@@ -943,7 +943,7 @@
     *: "Dofnun við Stop/Pásu"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Fade on Stop and Pause"
   </voice>
 </phrase>
 <phrase>
@@ -2436,7 +2436,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
     masd: none
   </source>
   <dest>
@@ -2444,7 +2444,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
     masd: none
   </voice>
 </phrase>
@@ -2453,7 +2453,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
     masd: none
   </source>
   <dest>
@@ -2461,7 +2461,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
     masd: none
   </voice>
 </phrase>
@@ -3435,7 +3435,7 @@
   user: core
   <source>
     *: none
-    alarm: "Waking Up In %d:%02d"
+    alarm: "Waking Up in %d:%02d"
   </source>
   <dest>
     *: none

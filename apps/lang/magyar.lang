@@ -1277,7 +1277,7 @@
     *: "Lekeverés megálláskor"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Fade on Stop and Pause"
   </voice>
 </phrase>
 <phrase>
@@ -2738,13 +2738,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </source>
   <dest>
     *: "Gördítés képernyőn túl"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out of View"
   </voice>
 </phrase>
 <phrase>
@@ -3024,7 +3024,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Minimum Of Range"
+    *: "Minimum of Range"
   </source>
   <dest>
     *: "Legkisebb érték"
@@ -3038,7 +3038,7 @@
   desc: in the peak meter menu
   user: core
   <source>
-    *: "Maximum Of Range"
+    *: "Maximum of Range"
   </source>
   <dest>
     *: "Legnagyobb érték"
@@ -4027,7 +4027,7 @@
   user: core
   <source>
     *: none
-    alarm: "Waking Up In %d:%02d"
+    alarm: "Waking Up in %d:%02d"
   </source>
   <dest>
     *: none
@@ -5079,7 +5079,7 @@
   user: core
   <source>
     *: none
-    recording: "(Same As Source)"
+    recording: "(Same as Source)"
   </source>
   <dest>
     *: none
@@ -5087,7 +5087,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "Same as Source"
   </voice>
 </phrase>
 <phrase>
@@ -5320,7 +5320,7 @@
   user: core
   <source>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Set as Recording Directory"
   </source>
   <dest>
     *: none
@@ -5328,7 +5328,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Set as Recording Directory"
   </voice>
 </phrase>
 <phrase>
@@ -6303,13 +6303,13 @@
   desc: in playlist menu.
   user: core
   <source>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </source>
   <dest>
     *: "Keresés lejátszólistában"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Search in Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6934,7 +6934,7 @@
   user: core
   <source>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Set as Backdrop"
   </source>
   <dest>
     *: none
@@ -6942,7 +6942,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Set as Backdrop"
   </voice>
 </phrase>
 <phrase>
@@ -9596,7 +9596,7 @@
   user: core
   <source>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop Recording and Shutdown"
   </source>
   <dest>
     *: none
@@ -9604,7 +9604,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop Recording and Shutdown"
   </voice>
 </phrase>
 <phrase>
@@ -10032,7 +10032,7 @@
 </phrase>
 <phrase>
   id: VOICE_OK
-  desc: spoken only, On exiting a context, specifically the quick screen
+  desc: spoken only, on exiting a context, specifically the quick screen
   user: core
   <source>
     *: ""
@@ -11688,7 +11688,7 @@
   desc: used in the onplay menu to set a playlist catalogue dir
   user: core
   <source>
-    *: "Set As Playlist Catalogue Directory"
+    *: "Set as Playlist Catalogue Directory"
   </source>
   <dest>
     *: "Beállítás lej. lista katalógus könyvtárként"
@@ -11733,7 +11733,7 @@
   desc: whether to restart running sleep timer on keypress
   user: core
   <source>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Restart Sleep Timer on Keypress"
   </source>
   <dest>
     *: "Elalváskapcsoló Újraindítása Gombnyomásra"
@@ -12169,7 +12169,7 @@
   desc: whether sleep timer starts on power up
   user: core
   <source>
-    *: "Start Sleep Timer On Boot"
+    *: "Start Sleep Timer on Boot"
   </source>
   <dest>
     *: "Elalváskapcsoló Be Induláskor"

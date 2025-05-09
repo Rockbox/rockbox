@@ -581,7 +581,7 @@
   desc: in display_settings_menu
   user: core
   <source>
-    *: "Backlight On When Plugged"
+    *: "Backlight on When Plugged"
   </source>
   <dest>
     *: "Beligting Tydens Laai"
