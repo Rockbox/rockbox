@@ -32,6 +32,7 @@
 
 class System : public QObject
 {
+    Q_OBJECT
 public:
     System() {}
 
@@ -50,4 +51,3 @@ public:
 
 };
 #endif
-

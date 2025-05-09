@@ -29,6 +29,7 @@
 
 class Utils : public QObject
 {
+    Q_OBJECT
 public:
     enum Size {
         FilesystemTotal,
@@ -61,4 +62,3 @@ public:
 };
 
 #endif
-
