@@ -92,6 +92,7 @@ PlayerBuildInfo::PlayerBuildInfo() :
      serverInfo(nullptr),
      playerInfo(":/ini/rbutil.ini", QSettings::IniFormat)
 {
+    playerInfo.setIniCodec("UTF-8");
 
 }
 
@@ -371,4 +372,3 @@ QStringList PlayerBuildInfo::targetNames(bool all)
     }
     return result;
 }
-
