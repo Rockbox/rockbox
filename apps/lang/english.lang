@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,53 +13,74 @@
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
 #
-# This is the master of the language files. This is the original, the one with
-# all the existing strings Rockbox features.
+# This is the root source of truth for Rockbox's translatable strings,
+# contianing all strings for all Rockbox features.  All other languages
+# overlay on top of this one.
 #
-# *WARNING*
+# IMPORTANT NOTES:
 #
-# If you want to add a new string, add it to the end of this file!
-# Removing strings will break the numbering of strings in binary lang files and
-# voice files so instead of removing a unused <phrase>, change the desc field
-# to "deprecated" (without quotes) and either blank the strings or change them to
-# "deprecated" (without quotes) and do *not* change the targets.
+# * If you want to add a new string, add it to the end of this file!
+# * Removing strings will break the numbering of strings in binary lang
+#   and voice files, so instead of removing a unused <phrase>, change the
+#   desc field to "deprecated" (without quotes) and blank the strings.
+#   Do *not* change the targets.
+# * Due to strict run-time checks, binary lang and voice files are not
+#   portable from one device to another.  They may not even be compatible
+#   from one build to another on the same device, especially if phrases
+#   or strings were added (or removed) from this file, or if the features
+#   list for your device have changed.
 #
-# If you re-order things or remove entries, you must bump the binary language
-# file version number in both the 'genlang' tool and the language loader code.
+# As this file is both the master for the language system, as well as the
+# source for generating english strings, all <source> strings *must* be
+# *identical* to the <dest> strings within the english.lang file. The
+# <source> strings are referenced by other languages when doing updates,
+# while the <dest> strings are used when this file is used to as the
+# source of english strings for a particular target.  In other files,
+# the <dest> string is the translated text.
 #
-# Since this file is both the master for the language system, as well as the
-# source for generating english strings, make sure that all <source> strings
-# are *identical* to the <dest> strings within the english.lang file. The
-# <source> strings are the ones that'll be exposed and used by other languages
-# when doing updates etc, while the <dest> ones are used when this file is
-# used to simply get the full set of english strings for a particular target.
+# 'Targets' refer to both the unique device name (as specified in the
+# configure file and stored in MODELNAME of the top-level Makefile) and
+# to various common features that are shared between more than one
+# device.  See apps/features.txt for all available features that can be
+# used instead of or in addition to the device name itself.
 #
-# All phrases have a default string like: *: "default" that will be used if no
-# other string matches for the particular model you are building for. If
-# you want a particular string for the a specific target, you would write it like:
-# target: "target-specific string" (below the default line). If your string isn't
-# used for all targets set the default to none like: *: none (no quotes!) to ensure
-# it will not be included for targets that do not need it.  See apps/features.txt
-# for all available target features that can be used instead of or in addition
-# to the target name.
+# All phrases have a default string, designated with a target
+# of '*' (eg: *: "default text") that will be used if no other target
+# matches the particular device you are building for. If you want to
+# designate a particular string for a specific target, you would write
+# it like:
+#   target: "target-specific string"
+# and locate it below the the default line. If the phrase will not be
+# used for all targets, set the default to none, eg:
+#   *: none
+# to ensure it will not be included when it is not needed.
 #
-# The target names used are picked from the configure script and are set in the
-# MODELNAME variable in the root makefile.
+# Phrases starting with LANG_ are displayed in the UI, and are usually
+# voiced as well. Phrases starting with VOICE_ are only voiced. They
+# *must* have empty (ie "") <source> and <dest> strings, and non-empty
+# <voice> strings.
 #
-# The indidivual entries under the <voice> section of a phrase contain the text
-# the speech UI will use to pronounce the phrase.  This is usually the same
-# as the <dest> section, but there are more limitations.  For example, most
-# punctuation and strings with C format specifiers are not allowed. If a
-# phrase is not intended to be voiced at all, you can use '*: none' under
-# its <voice> section.
+# The individual entries under the <voice> section of a phrase contain
+# the text the speech UI will use to pronounce the phrase.  This is
+# usually the same as the <dest> section, albeit with some limitations.
+# For example, most punctuation and any dynamic strings (ie with with C
+# format specifiers) are not allowed.  If a phrase is not intended to be
+# voiced, you may use either an empty string (ie "") or 'none' under its
+# <voice> section.
 #
-# To validate the contents of a translation, you can use the Rockbox translation
-# site at https://translate.rockbox.org.  Alternatively, you can use the command-
-# line 'updatelang' tool as follows:
+# In <voice> sections, keep in mind that the text will be spoken by TTS
+# engines, so some changes from the <dest> may be necessary for clarity.
+# For example, you may want to separate acronyms into their individual
+# letters so they are spoken separately.  Some adjustments are made
+# automatically; please see tools/voice-corrections.txt for further details.
 #
-#  tools/updatelang apps/lang/english.lang path/to/translation.lang - |less
+# To validate the contents of a translation, you can use the Rockbox
+# translation site at https://translate.rockbox.org.  Alternatively, you
+# can use the command-line 'updatelang' tool as follows:
 #
-# All problematic areas will be marked with '###'
+#  tools/updatelang apps/lang/english.lang path/to/translation.lang path/to/updated.lang
+#
+# You can then examine the updated file. All problematic areas will be marked with '###'
 #
 ####
 # This is the first item, and will be shown when P2STR is passed a NULL pointer

@@ -5,30 +5,34 @@
     Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                       \/            \/     \/    \/            \/
 
-  Voice string corrections for voice.pl to support TTS engines.
+  Voice string corrections for TTS engines.
+
   The list items are separated by the separator that is defined by the first
   character on the line. If the first character is a whitespace the line will
-  get treated as comment.
+  get treated as comment.  The format is as follows:
 
-  Format:
-  /language/engine/vendor/string/replacement/
+     /language/engine/vendor/string/replacement/flags
 
-  Where / is the separator, and all strings are Perl regexes.
-  Empty lines and lines starting with a whitespace are ignored, for all other
-  lines the first character will become the separator.
+   '/' is the separator, and all strings (other than flags) are Perl regexes.
+
+  Empty lines and lines starting with a whitespace are ignored, for all
+  others the first character will become the separator.
+
+  Flags may be left blank, but 'g' (ie "global") and "i" (case-insensitive)
+  are typically used.
 
   Note that the contents of this file are applied IN ORDER, so you must place
   more generic rules at the end.  For example, the Russian-specific
   correction for 'USB' conflicts with the generic correction.
 
-  English
+  ** English
 
 /english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
 /english/festival/.*/\ba\b/ay/ig
 /english/festival/.*//$/./
 /english/.*/.*/ no\./number /ig
 
-  German (deutsch)
+  ** German (deutsch)
 
 /deutsch/.*/.*/alkaline/alkalein/ig
 /deutsch/.*/.*/byte(s?)/beit$1/ig
@@ -50,8 +54,9 @@
 /deutsch/sapi/AT&T Labs/\Blauf\b/-lauf/ig;
 /deutsch/sapi/AT&T Labs/\bnumerisch\b/numehrisch/ig;
 
-  Italian (italiano)
-  for all italian engines (e.g. for english words)
+  ** Italian (italiano)
+
+     for all italian engines (e.g. for english words)
 
 /italiano/.*/.*/Replaygain/Ripleyghein/ig
 /italiano/.*/.*/Crossfade/Crossfeid/ig
@@ -74,7 +79,7 @@
 /italiano/sapi/ScanSoft, Inc/X/x/ig
 /italiano/sapi/ScanSoft, Inc/stop/stohp/ig
 
-   Japanese
+  ** Japanese
 
 /japanese/sapi/L&H/・//ig
 /japanese/sapi/L&H/ /・/ig
@@ -100,15 +105,16 @@
 /japanese/sapi/Voiceware/無い場合レジューム/無い場合、れじゅうむ/ig
 /japanese/sapi/Create System Development Co, Ltd./一杯/いっぱい/ig
 
-  Russian
+  ** Russian
 
 /russian/.*/.*/USB/Ю Эс Би/g
 /russian/.*/.*/VBR/Ви Би Ар/g
 /russian/.*/.*/ПДУ/П Д У/g
 /russian/.*/.*/ЖКД/Ж Ка Д/g
 
-  Swedish (svenska)
-  for all swedish engines (e.g. for english words)
+  ** Swedish (svenska)
+
+     for all swedish engines (e.g. for english words)
 
 /svenska/.*/.*/kilobyte/kilobajt/ig
 /svenska/.*/.*/megabyte/megabajt/ig
@@ -124,7 +130,7 @@
 /svenska/espeak/.*/spellistor/spelistor/ig
 /svenska/espeak/.*/cuesheet/qjyschiit/ig
 
-  General for all engines and languages
+  ** General for all engines and languages
 
 /.*/.*/.*/USB/U S B/g
 /.*/.*/.*/LCD/L C D/g
