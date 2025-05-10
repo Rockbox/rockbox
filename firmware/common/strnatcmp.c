@@ -154,6 +154,15 @@ static int strnatcmp0(char const *a, char const *b,
                    return cmp_fn(a,b);
           }
 
+          // Place dots before any chars (but after end of line '\0')
+          // It makes filenames sorting more natural by placing shorter names before longer ones.
+          // Without fix: Song (Live).mp3, Song.mp3
+          // With fix: Song.mp3, Song (Live).mp3
+          if (ca == '.')
+               ca = 1;
+          if (cb == '.')
+               cb = 1;
+
           if (cmp_fn == &strcasecmp) {
                ca = nat_unify_case(ca);
                cb = nat_unify_case(cb);
