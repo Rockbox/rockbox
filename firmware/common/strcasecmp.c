@@ -5,12 +5,14 @@
 #ifndef strcasecmp
 int strcasecmp(const char *s1, const char *s2)
 {
-    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) {
-        s1++;
-        s2++;
+    int d, c1, c2;
+    do
+    {
+        c1 = tolower(*s1++);
+        c2 = tolower(*s2++);
     }
-
-    return tolower(*(unsigned char *) s1) - tolower(*(unsigned char *) s2);
+    while ((d = c1 - c2) == 0 && c1 && c2);
+    return d;
 }
 #endif
 
