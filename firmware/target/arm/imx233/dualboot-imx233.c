@@ -182,7 +182,7 @@
 
 unsigned imx233_dualboot_get_field(enum imx233_dualboot_field_t field)
 {
-    unsigned val = HW_RTC_PERSISTENT5;
+    unsigned val = REG_DUALBOOT;
     /* if signature doesn't match, assume everything is 0 */
     if((val & MAGIC_MASK) != MAGIC_VALUE)
         return 0;
@@ -199,7 +199,7 @@ unsigned imx233_dualboot_get_field(enum imx233_dualboot_field_t field)
 
 void imx233_dualboot_set_field(enum imx233_dualboot_field_t field, unsigned fval)
 {
-    unsigned val = HW_RTC_PERSISTENT5;
+    unsigned val = REG_DUALBOOT;
     /* if signature doesn't match, create an empty register */
     if((val & MAGIC_MASK) != MAGIC_VALUE)
         val = MAGIC_VALUE; /* all field are 0 */
@@ -214,7 +214,7 @@ void imx233_dualboot_set_field(enum imx233_dualboot_field_t field, unsigned fval
         match(BOOT)
         default: break;
     }
-    HW_RTC_PERSISTENT5 = val;
+    REG_DUALBOOT = val;
 #undef match
 }
 
