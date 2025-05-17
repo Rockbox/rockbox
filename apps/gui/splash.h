@@ -38,7 +38,7 @@ extern void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
  *  - str : what to say, if this is a LANG_* string (from ID2P)
  *          it will be voiced
  */
-extern void splash(int ticks, const char *str);
+#define splash(__ticks, __str) splashf(__ticks, __str)
 
 /* set a delay before displaying the progress meter the first time */
 extern void splash_progress_set_delay(long delay_ticks);

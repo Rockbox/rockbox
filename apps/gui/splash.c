@@ -215,6 +215,13 @@ void splashf(int ticks, const char *fmt, ...)
 {
     va_list ap;
 
+    /* fmt may be a so called virtual pointer. See settings.h. */
+    long id;
+    if((id = P2ID((const unsigned char*)fmt)) >= 0)
+        /* If fmt specifies a voicefont ID, and voice menus are
+           enabled, then speak it. */
+        cond_talk_ids_fq(id);
+
     /* If fmt is a lang ID then get the corresponding string (which
        still might contain % place holders). */
     fmt = P2STR((unsigned char *)fmt);
@@ -234,19 +241,6 @@ void splashf(int ticks, const char *fmt, ...)
     }
     if (ticks)
         sleep(ticks);
-}
-
-void splash(int ticks, const char *str)
-{
-#if !defined(SIMULATOR)
-    long id;
-    /* fmt may be a so called virtual pointer. See settings.h. */
-    if((id = P2ID((const unsigned char*)str)) >= 0)
-        /* If fmt specifies a voicefont ID, and voice menus are
-           enabled, then speak it. */
-        cond_talk_ids_fq(id);
-#endif
-    splashf(ticks, "%s", P2STR((const unsigned char*)str));
 }
 
 /* set delay before progress meter is shown */

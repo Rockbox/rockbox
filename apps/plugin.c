@@ -184,7 +184,6 @@ static const struct plugin_api rockbox_api = {
     language_strings,
     &core_bitmaps[0],
     /* lcd */
-    splash,
     splashf,
     splash_progress,
     splash_progress_set_delay,
