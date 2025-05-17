@@ -348,7 +348,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 
     logf("OP add_path Invalid, *Clearing entry*");
     if (lang_id != LANG_SHORTCUTS) /* from shortcuts menu */
-        splashf(HZ * 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+        splashf(HZ * 2, ID2P(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
     op_clear_entry(op_entry);
     return 0;
 }

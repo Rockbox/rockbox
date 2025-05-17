@@ -100,7 +100,7 @@ static int initialize_catalog_buf(char* dirbuf, size_t dirbuf_sz)
                 talk_dir_or_spell(dirbuf, NULL, true);
                 talk_force_enqueue_next();
             }
-            splashf(HZ*2, str(LANG_CATALOG_NO_DIRECTORY), dirbuf);
+            splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), dirbuf);
             return -1;
         }
         else {
@@ -265,7 +265,7 @@ static void display_insert_count(int count)
         talk_id(LANG_PLAYLIST_INSERT_COUNT, true);
     }
 
-    splashf(0, str(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
+    splashf(0, ID2P(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
 }
 
 /* Add specified track into playlist.  Callback from directory insert */

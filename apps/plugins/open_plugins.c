@@ -361,7 +361,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
             plugin = rb->filetype_get_plugin(fattr, buf, sizeof(buf));
             if (!plugin)
             {
-                rb->splashf(HZ * 2, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+                rb->splashf(HZ * 2, ID2P(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
                 return 0;
             }
         }
@@ -420,7 +420,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
         else
         {
             if (op_entry.lang_id != LANG_SHORTCUTS)
-                rb->splashf(HZ * 2, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+                rb->splashf(HZ * 2, ID2P(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
             return 0;
         }
     }

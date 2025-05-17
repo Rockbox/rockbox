@@ -2173,7 +2173,7 @@ static bool skin_load_fonts(struct wps_data *data)
         {
             if (success)
             {
-                splashf(HZ, str(LANG_FONT_LOAD_ERROR), "(no name)");
+                splashf(HZ, ID2P(LANG_FONT_LOAD_ERROR), "(no name)");
                 DEBUGF("font %d not specified\n", font_id);
             }
             success = false;
@@ -2198,7 +2198,7 @@ static bool skin_load_fonts(struct wps_data *data)
 
         if (font->id < 0)
         {
-            splashf(HZ, str(LANG_FONT_LOAD_ERROR), font->name);
+            splashf(HZ, ID2P(LANG_FONT_LOAD_ERROR), font->name);
             DEBUGF("Unable to load font %d: '%s'\n", font_id, font->name);
             font->name = NULL; /* to stop trying to load it again if we fail */
             success = false;

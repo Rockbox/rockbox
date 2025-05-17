@@ -1065,7 +1065,7 @@ int tagtree_export(void)
 {
     struct tagcache_search tcs;
 
-    splash(0, str(LANG_CREATING));
+    splash(0, ID2P(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
         splash(HZ*2, ID2P(LANG_FAILED));
@@ -1872,7 +1872,7 @@ entry_skip_formatter:
             talk_value(total_count, UNIT_INT, true);
         }
 
-        splashf(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        splashf(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
@@ -2012,10 +2012,10 @@ int tagtree_load(struct tree_context* c)
     if (count < 0)
     {
         if (count != RELOAD_TAGTREE)
-            splash(HZ, str(LANG_TAGCACHE_BUSY));
+            splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
         else /* unload and re-init tagtree */
         {
-            splash(HZ, str(LANG_WAIT));
+            splash(HZ, ID2P(LANG_WAIT));
             tagtree_unload(c);
             if (!initialize_tagtree())
                 return 0;
@@ -2404,7 +2404,7 @@ static bool insert_all_playlist(struct tree_context *c,
                                                            n, slots_remaining);
 
             talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
-            splashf(HZ * 2, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
+            splashf(HZ * 2, ID2P(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
                     slots_remaining);
         }
     }
@@ -2414,7 +2414,7 @@ static bool insert_all_playlist(struct tree_context *c,
     {
         if (TIME_AFTER(current_tick, last_tick + HZ/4))
         {
-            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT)); // XXX not voiced
             if (action_userabort(TIMEOUT_NOBLOCK))
             {
                 exit_loop_now = true;
@@ -2592,7 +2592,7 @@ bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
         n = tc->filesindir;
         for (i = 0; i < n; i++)
         {
-            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT)); // XXX not voiced
             if (TIME_AFTER(current_tick, last_tick + HZ/4))
             {
                 if (action_userabort(TIMEOUT_NOBLOCK))

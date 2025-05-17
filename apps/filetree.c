@@ -122,7 +122,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
         }
         cpu_boost(false);
     }
-    
+
     playlist_insert_context_release(&pl_context);
 
     tree_unlock_cache(c);
@@ -455,7 +455,7 @@ static void ft_load_font(char *file)
     int current_font_id;
     enum screen_type screen = SCREEN_MAIN;
 #if NB_SCREENS > 1
-    MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL, 
+    MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL,
                         ID2P(LANG_MAIN_SCREEN), ID2P(LANG_REMOTE_SCREEN))
     switch (do_menu(&menu, NULL, NULL, false))
     {
@@ -560,7 +560,7 @@ int ft_enter(struct tree_context* c)
     struct entry* file = tree_get_entry_at(c, c->selected_item);
     if (!file)
     {
-        splashf(HZ, str(LANG_READ_FAILED), str(LANG_UNKNOWN));
+        splashf(HZ, ID2P(LANG_READ_FAILED), str(LANG_UNKNOWN));
         return rc;
     }
 
@@ -602,7 +602,7 @@ int ft_enter(struct tree_context* c)
                 if (!warn_on_pl_erase())
                     break;
 
-                if (global_settings.party_mode && audio_status()) 
+                if (global_settings.party_mode && audio_status())
                 {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true, true);
@@ -768,7 +768,7 @@ int ft_enter(struct tree_context* c)
                 file = tree_get_entry_at(c, c->selected_item);
                 if (!file)
                 {
-                    splashf(HZ, str(LANG_READ_FAILED), str(LANG_UNKNOWN));
+                    splashf(HZ, ID2P(LANG_READ_FAILED), str(LANG_UNKNOWN));
                     return rc;
                 }
 
@@ -833,7 +833,7 @@ int ft_exit(struct tree_context* c)
     extern char lastfile[]; /* from tree.c */
     char buf[MAX_PATH];
     int rc = 0;
-    bool exit_func = false; 
+    bool exit_func = false;
     int i = strlen(c->currdir);
 
     /* strip trailing slashes */

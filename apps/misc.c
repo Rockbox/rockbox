@@ -222,7 +222,7 @@ bool show_search_progress(bool init, int display_count, int current, int total)
                             display_count, str(LANG_OFF_ABORT));
         }
         else
-            splashf(0, str(LANG_PLAYLIST_SEARCH_MSG),
+            splashf(0, ID2P(LANG_PLAYLIST_SEARCH_MSG),
                     display_count, str(LANG_OFF_ABORT));
 
         if (action_userabort(TIMEOUT_NOBLOCK))

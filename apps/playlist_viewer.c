@@ -1271,7 +1271,7 @@ bool search_playlist(void)
     {
         if (found_indicies_count != last_found_count)
         {
-            splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
+            splashf(0, ID2P(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
                        str(LANG_OFF_ABORT));
             last_found_count = found_indicies_count;
         }

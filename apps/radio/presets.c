@@ -581,7 +581,7 @@ int presets_scan(void *viewports)
             frac = freq % 100;
             freq /= 100;
 
-            splashf(0, str(LANG_FM_SCANNING), freq, frac);
+            splashf(0, ID2P(LANG_FM_SCANNING), freq, frac);
 
             if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
