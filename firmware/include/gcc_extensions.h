@@ -24,7 +24,7 @@
 /* Support for some GCC extensions */
 
 /* Compile time check of format for printf/scanf like functions */
-#ifdef __GNUC__ && __GNUC__ != 7
+#if defined(__GNUC__) && (__GNUC__ != 7)
 #define ATTRIBUTE_PRINTF(fmt, arg1) __attribute__( ( format( printf, fmt, arg1 ) ) )
 #define ATTRIBUTE_SCANF(fmt, arg1) __attribute__( ( format( scanf, fmt, arg1 ) ) )
 #else
