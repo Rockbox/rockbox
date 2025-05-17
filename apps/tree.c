@@ -223,9 +223,9 @@ static int tree_voice_cb(int selected_item, void * data)
         /* See if name is an encoded ID, if it is, then speak it normally */
         int lang_id = P2ID(name);
         /*debugf("%s Found name %s id %d\n", __func__, P2STR(name), lang_id);*/
-        if (lang_id >= 0)
-        {
-            talk_id(lang_id, true);
+        if (lang_id >= 0) {
+            if (global_settings.talk_menu)
+                talk_id(lang_id, true);
             return 0;
         }
 
@@ -237,12 +237,14 @@ static int tree_voice_cb(int selected_item, void * data)
         // each entry type ("artist", "album", etc) should be delineated
         // so we can split the clips into subdirs.
 #if 0
-        if (talk_file(LANG_DIR"/database/", NULL,
-                      P2STR(name), file_thumbnail_ext, NULL, true) > 0)
-        {
+        if (global_settings.talk_file_clip) {
+            if (talk_file(LANG_DIR"/database/", NULL,
+                          P2STR(name), file_thumbnail_ext, NULL, true) > 0)
+                return 0;
+
+            // XXX fall back to spelling it out?
             return 0;
         }
-        // XXX fall back to spelling it out?
 #endif
     }
     else
