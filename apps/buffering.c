@@ -1440,6 +1440,62 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     return size;
 }
 
+ssize_t bufgettail(int handle_id, size_t size, void **data)
+{
+    if (thread_self() != buffering_thread_id)
+        return ERR_WRONG_THREAD; /* only from buffering thread */
+
+    /* We don't support tail requests of > guardbuf_size, for simplicity */
+    if (size > GUARD_BUFSIZE)
+        return ERR_INVALID_VALUE;
+
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+
+    if (h->end >= h->filesize) {
+        size_t tidx = ringbuf_sub_empty(h->widx, size);
+
+        if (tidx + size > buffer_len) {
+            size_t copy_n = tidx + size - buffer_len;
+            memcpy(guard_buffer, ringbuf_ptr(0), copy_n);
+        }
+
+        *data = ringbuf_ptr(tidx);
+    }
+    else {
+        size = ERR_HANDLE_NOT_DONE;
+    }
+
+    return size;
+}
+
+ssize_t bufcuttail(int handle_id, size_t size)
+{
+    if (thread_self() != buffering_thread_id)
+        return ERR_WRONG_THREAD; /* only from buffering thread */
+
+    struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+
+    if (h->end >= h->filesize) {
+        /* Cannot trim to before read position */
+        size_t available = h->end - MAX(h->start, h->pos);
+        if (available < size)
+            size = available;
+
+        h->widx = ringbuf_sub_empty(h->widx, size);
+        h->filesize -= size;
+        h->end -= size;
+    } else {
+        size = ERR_HANDLE_NOT_DONE;
+    }
+
+    return size;
+}
+
+
 /*
 SECONDARY EXPORTED FUNCTIONS
 ============================

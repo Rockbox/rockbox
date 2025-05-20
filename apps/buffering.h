@@ -46,7 +46,8 @@ enum data_type {
 #define ERR_FILE_ERROR          -4
 #define ERR_HANDLE_NOT_DONE     -5
 #define ERR_UNSUPPORTED_TYPE    -6
-#define ERR_BITMAP_TOO_LARGE    -7
+#define ERR_WRONG_THREAD        -7
+#define ERR_BITMAP_TOO_LARGE    -8
 
 /* Initialise the buffering subsystem */
 void buffering_init(void) INIT_ATTR;
@@ -67,6 +68,8 @@ bool buffering_reset(char *buf, size_t buflen);
  * bufftell  : Return the handle's file read position
  * bufread   : Copy data from a handle to a buffer
  * bufgetdata: Obtain a pointer for linear access to a "size" amount of data
+ * bufgettail: Out-of-band get the last size bytes of a handle.
+ * bufcuttail: Out-of-band remove the trailing 'size' bytes of a handle.
  *
  * NOTE: bufread and bufgetdata will block the caller until the requested
  * amount of data is ready (unless EOF is reached).
@@ -82,6 +85,8 @@ int bufadvance(int handle_id, off_t offset);
 off_t bufftell(int handle_id);
 ssize_t bufread(int handle_id, size_t size, void *dest);
 ssize_t bufgetdata(int handle_id, size_t size, void **data);
+ssize_t bufgettail(int handle_id, size_t size, void **data);
+ssize_t bufcuttail(int handle_id, size_t size);
 
 /***************************************************************************
  * SECONDARY FUNCTIONS
