@@ -89,6 +89,7 @@ struct codec_api ci = {
     NULL, /* configure */
     NULL, /* get_command */
     NULL, /* loop_track */
+    NULL, /* strip_filesize */
 
     /* kernel/ system */
 #if defined(ARM_NEED_DIV0)

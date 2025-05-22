@@ -81,6 +81,7 @@ int bufseek(int handle_id, size_t newpos);
 int bufadvance(int handle_id, off_t offset);
 off_t bufftell(int handle_id);
 ssize_t bufread(int handle_id, size_t size, void *dest);
+off_t bufstripsize(int handle_id, off_t size);
 ssize_t bufgetdata(int handle_id, size_t size, void **data);
 
 /***************************************************************************
