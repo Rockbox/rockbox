@@ -57,11 +57,11 @@
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%al%Sx(Next:) %?It<%It|%Fn>;%s%al%t(1, 300)%ft(playername.txt)
+%s%al%Sx(Next:) %?It<%It|%Fn>
 #
 # Track Info - No Album Art
 %Vl(b,0,10,-,48,1)
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%Sx(Next:) %?It<%It|%Fn>;%s%ac%t(1, 300)%ft(playername.txt)
+%s%ac%Sx(Next:) %?It<%It|%Fn>

@@ -21,7 +21,7 @@
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 
-%ac%Sx(Next Track:);%ac%t(1, 300)%ft(playername.txt)
+%ac%Sx(Next Track:)
 %s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
 
 #
@@ -38,7 +38,7 @@
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 
-%s%al%Sx(Next Track:);%s%al%t(1, 300)%ft(playername.txt)
+%s%al%Sx(Next Track:)
 %s%al%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
 
 # playtime

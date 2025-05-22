@@ -53,4 +53,4 @@
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%Sx(Next:) %ac%It;%s%ac%t(1, 300)%ft(playername.txt)
+%s%Sx(Next:) %ac%It
