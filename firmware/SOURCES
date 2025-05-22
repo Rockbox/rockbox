@@ -2032,7 +2032,6 @@ target/hosted/lc-unix.c
 target/hosted/ibasso/audiohw-ibasso.c
 target/hosted/ibasso/backlight-ibasso.c
 target/hosted/ibasso/button-ibasso.c
-target/hosted/power-linux.c
 #ifdef DEBUG
 target/hosted/ibasso/debug-ibasso.c
 #endif

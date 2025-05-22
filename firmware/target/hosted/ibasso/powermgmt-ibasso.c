@@ -112,3 +112,31 @@ int _battery_voltage(void)
 
     return(val / 1000);
 }
+
+/* NOTE:  This is largely lifted from the generic hostedpower-linux.c
+   but that uses a different sysfs api (expecting a path strning rather than
+   an enumeration */
+#include "tick.h"
+#include "power.h"
+
+static long last_tick = 0;
+static bool last_power = false;
+bool charging_state(void)
+{
+    if ((current_tick - last_tick) > HZ/2 ) {
+        char buf[12] = {0};
+        sysfs_get_string(SYSFS_BATTERY_STATUS, buf, sizeof(buf));
+
+        last_tick = current_tick;
+        last_power = (strncmp(buf, "Charging", 8) == 0);
+    }
+    return last_power;
+}
+
+unsigned int power_input_status(void)
+{
+    int present = 0;
+    sysfs_get_int(SYSFS_USB_POWER_ONLINE, &present);
+
+    return present ? POWER_INPUT_USB_CHARGER : POWER_INPUT_NONE;
+}

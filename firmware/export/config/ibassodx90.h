@@ -137,7 +137,3 @@
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
 #define MULTIDRIVE_DIR "/mnt/external_sd"
-
-/* More common stuff */
-#define BATTERY_DEV_NAME "battery"
-#define POWER_DEV_NAME "usb"
