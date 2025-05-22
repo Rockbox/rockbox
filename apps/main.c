@@ -206,7 +206,7 @@ int main(void)
         int fd = open(ROCKBOX_DIR"/playername.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
         if(fd >= 0)
         {
-            fdprintf(fd, "%s!", str(LANG_ROCKBOX_TITLE));
+            fdprintf(fd, "%s", MODEL_NAME);
             close(fd);
         }
     }
