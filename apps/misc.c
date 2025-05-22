@@ -178,7 +178,7 @@ char *output_dyn_value(char *buf,
     }
     else
     {
-        talk_fractional(tbuf, value, P2ID(units[unit_no]));
+        talk_fractional(tbuf, value2, P2ID(units[unit_no]));
     }
     return buf;
 }
