@@ -559,7 +559,13 @@ enum codec_status codec_run(void)
 
                 /* Fill the buffer */
                 if (stream.next_frame)
-                    advance_stream_buffer(stream.next_frame - stream.buffer);
+                {
+                    size_t frame_size = stream.next_frame - stream.buffer;
+                    if (frame_size == 0)
+                        break;
+
+                    advance_stream_buffer(frame_size);
+                }
                 else
                     advance_stream_buffer(size);
                 stream.error = 0; /* Must get new inputbuffer next time */
