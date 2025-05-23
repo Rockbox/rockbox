@@ -35,6 +35,7 @@
 #include FT_TRUETYPE_TABLES_H
 
 #include <string.h>
+#include <stdint.h>
 /*
  * Set the default values used to generate a BDF font.
  */
@@ -114,26 +115,26 @@ int             trim_aa     = 0; /* trim ascent  actual  */
 int             ft_load_opts = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP;
 
 struct font_header_struct {
-    char header[4];                 /* magic number and version bytes */
-    unsigned short maxwidth;        /* max width in pixels */
-    unsigned short height;          /* height in pixels */
-    unsigned short ascent;          /* ascent (baseline) height */
-    unsigned short depth;           /* depth 0=1-bit, 1=4-bit */
-    unsigned long firstchar;        /* first character in font */
-    unsigned long defaultchar;      /* default character in font */
-    unsigned long size;             /* # characters in font */
-    unsigned long nbits;            /* # bytes imagebits data in file */ /* = bits_size */
+    uint8_t header[4];        /* magic number and version bytes */
+    uint16_t maxwidth;        /* max width in pixels */
+    uint16_t height;          /* height in pixels */
+    uint16_t ascent;          /* ascent (baseline) height */
+    uint16_t depth;           /* depth 0=1-bit, 1=4-bit */
+    uint32_t firstchar;       /* first character in font */
+    uint32_t defaultchar;     /* default character in font */
+    uint32_t size;            /* # characters in font */
+    uint32_t nbits;           /* # bytes imagebits data in file */ /* = bits_size */
 
-    FT_Long noffset;          /* # longs offset data in file */
-    FT_Long nwidth;           /* # bytes width data in file */
+    uint32_t noffset;          /* # longs offset data in file */
+    uint32_t nwidth;           /* # bytes width data in file */
 };
 
 struct font_struct {
     struct font_header_struct header;
-    unsigned char *chars_data;
-    unsigned short *offset;
-    FT_Long *offset_long;
-    unsigned char *width;
+    uint8_t *chars_data;
+    uint16_t *offset;
+    uint32_t *offset_long;
+    uint8_t *width;
 };
 
 struct ttc_table{
@@ -189,7 +190,7 @@ void usage(void)
         "       Default output-file : <font-size>-<basename>.fnt.\n"
         "                              When '-ta' or '-tc' is specified in command line,\n "
         "                               default output-file is: \n"
-        "                             <font-size>-<internal postscript-name of input-file>.fnt.\n" 
+        "                             <font-size>-<internal postscript-name of input-file>.fnt.\n"
         "Options:\n"
         "    -s N   Start output at character encodings >= N\n"
         "    -l N   Limit output to character encodings <= N\n"
@@ -421,7 +422,7 @@ int get_ttc_table(char *path, struct ttc_table *ttcname )
     ttcname->ttc_count = 0;
 
     /* Initialize engine */
-    if ( ( err = FT_Init_FreeType( &library ) ) != 0 ) 
+    if ( ( err = FT_Init_FreeType( &library ) ) != 0 )
     {
         panic( "Error while initializing engine" );
         return err;
@@ -499,11 +500,11 @@ void print_raw_glyph( FT_Face face)
     width = face->glyph->metrics.width >> 6;
 
     printf("\n---Raw-Glyph---\n");
-    for(row=0; row < face->glyph->metrics.height >> 6; row++) 
+    for(row=0; row < face->glyph->metrics.height >> 6; row++)
     {
         printf("_");
         for(col=0; col < width; col++)
-        { 
+        {
             pixel = *(face->glyph->bitmap.buffer+width*row+col)/26;
             if ( pixel ) printf("%d",pixel); else printf(" ");
         }
@@ -561,7 +562,7 @@ FT_Long check_digit_width( FT_Face face )
     return last_advance >> 6;
 }
 
-void trim_glyph( FT_GlyphSlot glyph, int *empty_first_col, 
+void trim_glyph( FT_GlyphSlot glyph, int *empty_first_col,
                 int *empty_last_col, int *width )
 {
     int row;
@@ -629,7 +630,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     unsigned char pixel_per_byte = CHAR_BIT / bit_shift;
     struct font_struct export_font;
     char pad[] = {0,0,0,0};
-    int skip,i;
+    unsigned int skip,i;
     FILE *file;
 
     /* Initialize engine */
@@ -697,8 +698,8 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         empty_first_col = empty_last_col = 0;
         if(trimming)
             trim_glyph( face->glyph, &empty_first_col, &empty_last_col, &w);
-        
-        if (export_font.header.maxwidth < w) 
+
+        if (export_font.header.maxwidth < w)
             export_font.header.maxwidth = w;
 
 
@@ -717,7 +718,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     export_font.header.nbits = idx;
     export_font.header.noffset = export_font.header.size;
     export_font.header.nwidth  = export_font.header.size;
-    
+
     /* check if we need to use long offsets */
     use_long_offset = (export_font.header.nbits >= 0xFFDB );
 
@@ -725,17 +726,17 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     export_font.offset = NULL;
     export_font.offset_long = NULL;
     if (use_long_offset)
-        export_font.offset_long = 
+        export_font.offset_long =
             malloc( sizeof(FT_Long)* export_font.header.noffset );
     else
-        export_font.offset = 
+        export_font.offset =
             malloc( sizeof(unsigned short)* export_font.header.noffset );
 
-    export_font.width = 
+    export_font.width =
             malloc( sizeof(unsigned char) * export_font.header.nwidth );
-    export_font.chars_data = 
+    export_font.chars_data =
             malloc( sizeof(unsigned char) * export_font.header.nbits );
-            
+
     /* for now we use the full height for each character */
     h = export_font.header.height;
 
@@ -761,7 +762,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
 
         /* Get gylph index from the char and render it */
         charindex = getcharindex( face, code);
-        if ( !charindex ) 
+        if ( !charindex )
         {
             if ( use_long_offset )
                 export_font.offset_long[code - firstchar] = export_font.offset_long[0];
@@ -770,7 +771,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
             export_font.width[code - firstchar] = export_font.width[0];
             continue;
         }
-        
+
         err = FT_Load_Glyph(face, charindex, ft_load_opts);
         if ( err ) {
             continue;
@@ -791,7 +792,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
 
         if(trimming)
             trim_glyph( face->glyph, &empty_first_col, &empty_last_col, &w );
-        
+
         if ( use_long_offset )
             export_font.offset_long[code - firstchar] = idx;
         else
@@ -839,7 +840,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         field = 0;
         numbits = pixel_per_byte;
 
-        for(row=0; row < h; row++) 
+        for(row=0; row < h; row++)
         {
             for(col=0; col < w; col++)
             {
@@ -937,23 +938,23 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     writeint(file, export_font.header.noffset);
     writeint(file, export_font.header.nwidth);
 
-    fwrite( (char*)export_font.chars_data, 1, 
+    fwrite( (char*)export_font.chars_data, 1,
                export_font.header.nbits, file);
     free(export_font.chars_data);
 
 
 
-    if ( use_long_offset ) 
+    if ( use_long_offset )
     {
-        skip = ((export_font.header.nbits + 3) & ~3) - 
+        skip = ((export_font.header.nbits + 3) & ~3) -
             export_font.header.nbits;
         fwrite(pad, 1, skip, file); /* pad */
         for(i = 0; i < export_font.header.noffset; i++)
             writeint(file, export_font.offset_long[i]);
     }
-    else 
+    else
     {
-        skip = ((export_font.header.nbits + 1) & ~1) - 
+        skip = ((export_font.header.nbits + 1) & ~1) -
             export_font.header.nbits;
         fwrite(pad, 1, skip, file); /* pad */
         for(i = 0; i < export_font.header.noffset; i++)
@@ -964,9 +965,9 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         writebyte(file, export_font.width[i]);
     free(export_font.width);
 
-    if ( use_long_offset ) 
+    if ( use_long_offset )
         free(export_font.offset_long);
-    else 
+    else
         free(export_font.offset);
 
     fclose(file);
@@ -984,14 +985,14 @@ void convttc(char* path)
 
     get_ttc_table(path, &ttcname);
 
-    if (ttcname.ttc_count == 0) 
+    if (ttcname.ttc_count == 0)
     {
         printf("This file is a not true type font.\n");
         return;
     }
 
     /* default */
-    if (!flg_all_ttc && ttc_index    == -1) 
+    if (!flg_all_ttc && ttc_index    == -1)
     {
         if (!oflag)
         {   /* generate filename */
@@ -1005,12 +1006,12 @@ void convttc(char* path)
     else if (!flg_all_ttc)
     {
         print_ttc_table(path);
-        if ( !oflag ) 
+        if ( !oflag )
         {
-            if (ttc_index >= 0 && 
+            if (ttc_index >= 0 &&
                 ttc_index < ttcname.ttc_count)
             {
-                if (strcmp(ttcname.ttf_name[ttc_index], "") != 0) 
+                if (strcmp(ttcname.ttf_name[ttc_index], "") != 0)
                 {
                     snprintf(outfile, sizeof(outfile), "%d-%s.fnt",
                              pixel_size, ttcname.ttf_name[ttc_index]);
@@ -1060,7 +1061,7 @@ void getopts(int *pac, char ***pav)
     start_char  = 0;
 
     while (ac > 0 && av[0][0] == '-') {
-        p = &av[0][1]; 
+        p = &av[0][1];
         while( *p)
             switch(*p++) {
             case 'h':case 'H':
@@ -1278,13 +1279,13 @@ int main(int ac, char **av)
 
     getopts(&ac, &av);  /* read command line options*/
 
-    if (ac < 1) 
+    if (ac < 1)
     {
         usage();
     }
-    if (oflag) 
+    if (oflag)
     {
-        if (ac > 1) 
+        if (ac > 1)
         {
             usage();
         }
@@ -1296,14 +1297,14 @@ int main(int ac, char **av)
         exit(0);
     }
 
-    while (pct && ac > 0) 
+    while (pct && ac > 0)
     {
         print_ttc_table(av[0]);
         ++av; --ac;
         exit(0);
     }
 
-    while (ac > 0) 
+    while (ac > 0)
     {
         convttc(av[0]);
         ++av; --ac;
@@ -1330,7 +1331,7 @@ typedef struct {
 static node_t *nodes;
 static unsigned long nodes_used = 0;
 
-int 
+int
 otf2bdf_remap(unsigned short *code)
 {
     unsigned long i, n, t;
