@@ -885,13 +885,12 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         return -3;
     }
     
-    fclose(infd);
-    
     /* Rudimentary Win32 PE reading */
     if(memcmp(&buffer[0], "MZ", 2) != 0 &&
        memcmp(&buffer[0x118], "PE", 2) != 0)
     {
         log_message("[ERR]  Input file isn't an executable\n");
+        fclose(infd);
         free(buffer);
         return -4;
     }
@@ -910,6 +909,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     if(data_ptr == 0 || data_size == 0)
     {
         log_message("[ERR]  Couldn't find .data section\n");
+        fclose(infd);
         free(buffer);
         return -5;
     }
@@ -920,6 +920,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     if(fw_offset == 0)
     {
         log_message("[ERR]  Couldn't find firmware offset\n");
+        fclose(infd);
         free(buffer);
         return -6;
     }
@@ -927,6 +928,8 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     log_message("[INFO] Firmware offset is at 0x%x with size 0x%x\n", data_ptr+fw_offset, fw_size);
     
     fw_key = find_firmware_key(&buffer[0], filesize(infd));
+    fclose(infd);
+
     if(fw_key == NULL)
     {
         log_message("[ERR]  Couldn't find firmware key\n");

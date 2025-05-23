@@ -5,8 +5,8 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-CFLAGS := -O -g -W -Wall -Wshadow -pedantic
-LDFLAGS := -g
+CFLAGS := -Os -Wall -Wextra
+LDFLAGS :=
 
 .PHONY: rbspeexenc uclpack
 
