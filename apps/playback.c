@@ -1255,7 +1255,7 @@ void allocate_playback_log(void)
         playback_log_handle = core_alloc(PLAYBACK_LOG_BUFSZ);
         if (playback_log_handle > 0)
         {
-            DEBUGF("%s Allocated %d bytes\n", __func__, PLAYBACK_LOG_BUFSZ);
+            DEBUGF("%s Allocated %d bytes\n", __func__, PLAYBACK_LOG_BUFSZ); 
             char *buf = core_get_data(playback_log_handle);
             buf[0] = '\0';
         }
@@ -3748,11 +3748,6 @@ static void buffer_event_finished_callback(unsigned short id, void *ev_data)
         break;
 
     case TYPE_PACKET_AUDIO:
-        /* Strip any useless trailing tags that are left.
-           Note this is needed to prevent playback noise at the
-           end of MP3 files with ID3v1 or APEv2 tags! */
-        strip_tags(hid);
-        /* Fall-through */
     case TYPE_ATOMIC_AUDIO:
         LOGFQUEUE("buffering > audio Q_AUDIO_HANDLE_FINISHED: %d", hid);
         audio_queue_post(Q_AUDIO_HANDLE_FINISHED, hid);
