@@ -178,6 +178,7 @@ enum plugin_status plugin_start(const void* parameter)
     bool done = false;
     bool changed = false;
     int action, cur_sel;
+    int ret = PLUGIN_OK;
 
     menu_table = rb->root_menu_get_options(&menu_item_count);
     load_from_cfg();
@@ -188,11 +189,11 @@ enum plugin_status plugin_start(const void* parameter)
     rb->gui_synclist_set_icon_callback(&list, menu_get_icon);
     rb->gui_synclist_set_nb_items(&list, menu_item_count);
     rb->gui_synclist_set_title(&list, rb->str(LANG_MAIN_MENU), Icon_Rockbox);
+    rb->gui_synclist_draw(&list);
     rb->gui_synclist_speak_item(&list);
 
     while (!done)
     {
-        rb->gui_synclist_draw(&list);
         cur_sel = rb->gui_synclist_get_sel_pos(&list);
         action = rb->get_action(CONTEXT_LIST, HZ/10);
         if (rb->gui_synclist_do_button(&list, &action))
@@ -256,9 +257,20 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             }
             case ACTION_STD_CANCEL:
+            case ACTION_STD_MENU:
                 done = true;
                 break;
+            default:
+                if (rb->default_event_handler(action) == SYS_USB_CONNECTED)
+                {
+                    ret = PLUGIN_USB_CONNECTED;
+                    done = true;
+                }
+                continue;
         }
+
+        if (!done)
+            rb->gui_synclist_draw(&list);
     }
 
     if (changed)
@@ -269,5 +281,5 @@ enum plugin_status plugin_start(const void* parameter)
     }
     rb->global_settings->show_icons = show_icons;
 
-    return PLUGIN_OK;
+    return ret;
 }
