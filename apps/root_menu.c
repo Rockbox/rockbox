@@ -257,8 +257,8 @@ static int browser(void* param)
                     }
                     else
                     {
-                        splashf(0, ID2P(LANG_BUILDING_DATABASE),
-                                   stat->processed_entries);
+                        splashf(0, str(LANG_BUILDING_DATABASE),
+                                   stat->processed_entries); /* (voiced above) */
                     }
                 }
             }

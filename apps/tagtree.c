@@ -2404,8 +2404,8 @@ static bool insert_all_playlist(struct tree_context *c,
                                                            n, slots_remaining);
 
             talk_id(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY, true);
-            splashf(HZ * 2, ID2P(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
-                    slots_remaining);
+            splashf(HZ * 2, str(LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY),
+                    slots_remaining); /* voiced above */
         }
     }
 

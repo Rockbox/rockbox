@@ -130,7 +130,7 @@ static void fileerror(int rc)
         rb->talk_force_enqueue_next();
     }
 
-    rb->splashf(HZ*2, ID2P(LANG_FILE_ERROR), rc);
+    rb->splashf(HZ*2, rb->str(LANG_FILE_ERROR), rc); /* (voiced above) */
 }
 
 static const unsigned char empty_id3_header[] =

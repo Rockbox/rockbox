@@ -264,8 +264,8 @@ static void display_insert_count(int count)
         talk_number(count, false);
         talk_id(LANG_PLAYLIST_INSERT_COUNT, true);
     }
-
-    splashf(0, ID2P(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
+    /* (voiced above) */
+    splashf(0, str(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
 }
 
 /* Add specified track into playlist.  Callback from directory insert */

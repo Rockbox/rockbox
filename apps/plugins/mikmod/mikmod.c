@@ -711,7 +711,8 @@ static void mm_errorhandler(void)
         rb->talk_value_decimal(MikMod_errno, UNIT_INT, 0, true);
         rb->talk_force_enqueue_next();
     }
-    rb->splashf(HZ, ID2P(LANG_ERROR_FORMATSTR), MikMod_strerror(MikMod_errno));
+    /* (voiced above) */
+    rb->splashf(HZ, rb->str(LANG_ERROR_FORMATSTR), MikMod_strerror(MikMod_errno));
     quit = true;
 }
 

@@ -684,7 +684,7 @@ static void display_playlist_count(int count, const unsigned char *fmt,
         }
     }
 
-    splashf(0, fmt, count, str(LANG_OFF_ABORT));
+    splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT)); /* (voiced above) */
 }
 
 /*
