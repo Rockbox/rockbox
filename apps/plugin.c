@@ -844,6 +844,7 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
     add_playbacklog,
     &device_battery_tables,
+    yesno_pop_confirm,
 };
 
 static int plugin_buffer_handle;

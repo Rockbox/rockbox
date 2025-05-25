@@ -234,20 +234,11 @@ enum plugin_status plugin_start(const void* parameter)
                         rb->gui_synclist_select_item(&list, cur_sel + 1); /* speaks */
                         changed = true;
                         break;
-                    case 2:;
-                        static const char *lines[] =
-                            {ID2P(LANG_RESET_ASK), ID2P(LANG_LOAD_DEFAULT_CONFIGURATION)};
-                        static const struct text_message message={lines, 2};
-
-                        switch(rb->gui_syncyesno_run(&message, NULL, NULL))
+                    case 2:
+                        if (rb->yesno_pop_confirm(ID2P(LANG_LOAD_DEFAULT_CONFIGURATION)))
                         {
-                            case YESNO_YES:
-                                rb->root_menu_set_default(&rb->global_settings->root_menu_customized, NULL);
-                                load_from_cfg();
-                                break;
-                            default:
-                                rb->splash(HZ, ID2P(LANG_CANCEL));
-                                break;
+                            rb->root_menu_set_default(&rb->global_settings->root_menu_customized, NULL);
+                            load_from_cfg();
                         }
                         /* fall-through */
                     default:

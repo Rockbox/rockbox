@@ -774,6 +774,8 @@ static enum pv_context_result context_menu(int index)
                 return show_track_info(current_track);
             case 5:
                 /* shuffle */
+                if (!yesno_pop_confirm(ID2P(LANG_SHUFFLE)))
+                    return PV_CONTEXT_UNCHANGED;
                 playlist_sort(viewer.playlist, !viewer.playlist);
                 playlist_randomise(viewer.playlist, current_tick, !viewer.playlist);
                 viewer.selected_track = 0;

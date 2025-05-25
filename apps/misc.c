@@ -196,7 +196,13 @@ bool warn_on_pl_erase(void)
             {ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
         static const struct text_message message={lines, 1};
 
-        return (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES);
+        if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+            return true;
+        else
+        {
+            splash(HZ, ID2P(LANG_CANCEL));
+            return false;
+        }
     }
     else
         return true;

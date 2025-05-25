@@ -3590,6 +3590,11 @@ static int display_settings_menu(void)
                 rb->set_bool(rb->str(LANG_RESIZE_COVERS), &pf_cfg.resize);
                 if (old_val == pf_cfg.resize) /* changed? */
                     break;
+                else if (!rb->yesno_pop_confirm(ID2P(LANG_RESIZE_COVERS)))
+                {
+                    pf_cfg.resize = old_val;
+                    break;
+                }
 
                 pf_cfg.update_albumart = false;
                 pf_cfg.cache_version = CACHE_REBUILD;
@@ -3766,6 +3771,8 @@ static int main_menu(void)
                 break;
 #endif
             case PF_REBUILD_CACHE:
+                if (!rb->yesno_pop_confirm(ID2P(LANG_REBUILD_CACHE)))
+                    break;
                 pf_cfg.update_albumart = false;
                 pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
@@ -3773,6 +3780,8 @@ static int main_menu(void)
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
                 return -3; /* re-init */
             case PF_UPDATE_CACHE:
+                if (!rb->yesno_pop_confirm(ID2P(LANG_UPDATE_CACHE)))
+                    break;
                 pf_cfg.update_albumart = true;
                 pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);

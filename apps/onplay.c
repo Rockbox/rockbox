@@ -183,7 +183,7 @@ static int bookmark_menu_callback(int action,
 /* CONTEXT_WPS playlist options */
 static bool shuffle_playlist(void)
 {
-    if (!warn_on_pl_erase())
+    if (!yesno_pop_confirm(ID2P(LANG_SHUFFLE)))
         return false;
     playlist_sort(NULL, true);
     playlist_randomise(NULL, current_tick, true);

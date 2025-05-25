@@ -368,14 +368,35 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                              main_message, yes_message, no_message);
 }
 
-/* Function to manipulate all yesno dialogues.
-   This function needs the prompt text as an argument. */
-bool yesno_pop(const char* text)
+static bool yesno_pop_lines(const char *lines[], int line_cnt)
 {
-    const char *lines[]={text};
-    const struct text_message message={lines, 1};
+    const struct text_message message={lines, line_cnt};
     bool ret = (gui_syncyesno_run(&message,NULL,NULL)== YESNO_YES);
     FOR_NB_SCREENS(i)
         screens[i].clear_viewport();
     return ret;
+}
+
+/* YES/NO dialog, uses text parameter as prompt */
+bool yesno_pop(const char* text)
+{
+    const char *lines[]= {text};
+    return yesno_pop_lines(lines, 1);
+}
+
+/* YES/NO dialog, asks "Are you sure?", displays
+   text parameter on second line.
+
+   Says "Cancelled" if answered negatively.
+*/
+bool yesno_pop_confirm(const char* text)
+{
+    bool confirmed;
+    const char *lines[] = {ID2P(LANG_ARE_YOU_SURE), text};
+    confirmed = yesno_pop_lines(lines, 2);
+
+    if (!confirmed)
+        splash(HZ, ID2P(LANG_CANCEL));
+
+    return confirmed;
 }

@@ -57,5 +57,6 @@ extern enum yesno_res gui_syncyesno_run_w_tmo(
                                      const struct text_message * no_message);
 
 bool yesno_pop(const char* text);
+bool yesno_pop_confirm(const char* text);
 
 #endif /* _GUI_YESNO_H_ */

@@ -57,7 +57,7 @@ static int show_info(void);
 
 static int reset_settings(void)
 {
-    static const char *lines[]={ID2P(LANG_RESET_ASK)};
+    static const char *lines[]={ID2P(LANG_ARE_YOU_SURE), ID2P(LANG_RESET)};
     static const char *yes_lines[]={
         ID2P(LANG_SETTINGS),
         ID2P(LANG_RESET_DONE_CLEAR)
@@ -66,7 +66,7 @@ static int reset_settings(void)
         ID2P(LANG_SETTINGS),
         ID2P(LANG_CANCEL)
     };
-    static const struct text_message message={lines, 1};
+    static const struct text_message message={lines, 2};
     static const struct text_message yes_message={yes_lines, 2};
     static const struct text_message no_message={no_lines, 2};
 
