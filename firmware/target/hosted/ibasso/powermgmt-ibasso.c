@@ -23,7 +23,7 @@
 
 
 #include <stdio.h>
-
+#include <string.h>
 #include "config.h"
 #include "debug.h"
 #include "panic.h"
