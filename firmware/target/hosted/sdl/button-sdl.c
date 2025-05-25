@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdlib.h>         /* EXIT_SUCCESS */
+#include <stdio.h>
 #include "sim-ui-defines.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"

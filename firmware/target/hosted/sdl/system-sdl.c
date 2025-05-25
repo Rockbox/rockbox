@@ -22,6 +22,7 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
 #ifdef __unix__

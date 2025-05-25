@@ -145,7 +145,7 @@ typedef unsigned short int UWORD;
 #if defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
         /* 64 bit architectures: */
 typedef signed int         SLONG;
-#if !defined(_MIKMOD_AMIGA)
+#if !defined(_MIKMOD_AMIGA) && !defined(WIN32)
 typedef unsigned int       ULONG;
 #endif
 
