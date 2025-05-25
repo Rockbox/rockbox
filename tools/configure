@@ -393,9 +393,9 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    if $CC --version | grep -q "clang"; then
-    CC=gcc-14
-    AR=gcc-ar-14
-    CPP=cpp-14
+    CC=gcc-15
+    AR=gcc-ar-15
+    CPP=cpp-15
    fi
    LDOPTS="$LDOPTS -ldl"
    SHARED_LDFLAGS="-dynamiclib -Wl,-no_warn_duplicate_libraries"
