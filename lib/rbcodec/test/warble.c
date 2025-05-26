@@ -614,6 +614,11 @@ static long ci_get_command(intptr_t *param)
     return ret;
 }
 
+void ci_strip_filesize(off_t size)
+{
+    ci.filesize = size;
+}
+
 static bool ci_should_loop(void)
 {
     return enable_loop;
@@ -664,7 +669,7 @@ static struct codec_api ci = {
     ci_configure,
     ci_get_command,
     ci_should_loop,
-
+    ci_strip_filesize,
     ci_sleep,
     stub_void_void, /* yield */
 
