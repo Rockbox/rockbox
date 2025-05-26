@@ -73,6 +73,7 @@
 
 #define LCD_RBYELLOW    LCD_RGBPACK(255,192,0)
 #define LCD_REDORANGE   LCD_RGBPACK(255,70,0)
+#define LCD_GREEN       LCD_RGBPACK(0,255,0)
 
 extern void bss_init(void);
 extern uint32_t _movestart;
@@ -347,9 +348,9 @@ extern int lcd_type;
 static uint16_t alive[] = { 500,100,0, 0 };
 static uint16_t alivelcd[] = { 2000,200,0, 0 };
 
+#ifndef IPOD_6G
 static void sleep_test(void)
 {
-#ifndef IPOD_6G
     int sleep_tmo = 5;
     int awake_tmo = 3;
 
@@ -376,8 +377,8 @@ static void sleep_test(void)
     printf("Press SELECT to continue");
     while (button_status() != BUTTON_SELECT)
         sleep(HZ/100);
-#endif
 }
+#endif
 
 static void pmu_info(void)
 {
@@ -482,6 +483,7 @@ static void run_of(void)
     sleep(HZ*10);
 }
 
+#if defined(IPOD_6G) || defined(IPOD_NANO3G)
 static void print_syscfg(void)
 {
     lcd_clear_display();
@@ -557,21 +559,53 @@ end:
     while (button_status() != BUTTON_SELECT)
         sleep(HZ/100);
 }
+#endif /* IPOD_6G || IPOD_NANO3G */
 
 static void devel_menu(void)
 {
+    const char *items[] = {
+#ifndef IPOD_6G
+        "LCD sleep/awake test",
+#endif
+        "PMU info",
+        "GPIO info",
+#if defined(IPOD_6G) || defined(IPOD_NANO3G)
+        "Show SysCfg",
+#endif
+        "Launch OF",
+        //"Launch Rockbox",
+        "Restart",
+        "Power off",
+    };
+    void (*handlers[])(void) = {
+#ifndef IPOD_6G
+        sleep_test,
+#endif
+        pmu_info,
+        gpio_info,
+#if defined(IPOD_6G) || defined(IPOD_NANO3G)
+        print_syscfg,
+#endif
+        run_of,
+        //run_rockbox,
+        system_reboot,
+        power_off,
+    };
+    const size_t items_count = sizeof(items) / sizeof(items[0]);
+    unsigned char selected_item = 0;
+
     while (1)
     {
         lcd_clear_display();
         lcd_set_foreground(LCD_RBYELLOW);
         line = 0;
-        printf("Select action:");
-        printf(" <MENU>    Show SysCfg");
-        printf(" <LEFT>    LCD sleep/awake test");
-        printf(" <SELECT>  PMU info");
-        printf(" <RIGHT>   GPIO info");
-        printf(" <PLAY>    Launch OF");
-
+        printf("Development menu");
+        
+        for (size_t i = 0; i < items_count; i++) {
+            lcd_set_foreground(i == selected_item ? LCD_GREEN : LCD_WHITE);
+            printf(items[i]);
+        }
+        
         while (button_status() != BUTTON_NONE);
 
         bool done = false;
@@ -580,27 +614,29 @@ static void devel_menu(void)
             switch (button_status())
             {
                 case BUTTON_MENU:
-                    print_syscfg();
-                    done = true;
-                    break;
                 case BUTTON_LEFT:
-                    sleep_test();
-                    done = true;
-                    break;
-                case BUTTON_SELECT:
-                    pmu_info();
-                    done = true;
-                    break;
-                case BUTTON_RIGHT:
-                    gpio_info();
-                    done = true;
+                    if (selected_item > 0) {
+                        selected_item--;
+                        done = true;
+                    }
+                    else {
+                        sleep(HZ/100);
+                    }
                     break;
                 case BUTTON_PLAY:
-                {
-                    run_of();
+                case BUTTON_RIGHT:
+                    if (selected_item < items_count - 1) {
+                        selected_item++;
+                        done = true;
+                    }
+                    else {
+                        sleep(HZ/100);
+                    }
+                    break;
+                case BUTTON_SELECT:
+                    handlers[selected_item]();
                     done = true;
                     break;
-                }
                 default:
                     sleep(HZ/100);
                     break;
