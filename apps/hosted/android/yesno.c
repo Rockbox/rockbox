@@ -28,6 +28,7 @@
 #include "settings.h"
 #include "lang.h"
 #include "kernel.h"
+#include "splash.h"
 
 extern JNIEnv   *env_ptr;
 static jobject   RockboxYesno_instance = NULL;
@@ -99,7 +100,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     (void)yes_message;
     (void)no_message;
     yesno_init();
-    
+
     JNIEnv e = *env_ptr;
     jstring message = build_message(main_message);
     jstring yes = (*env_ptr)->NewStringUTF(env_ptr, str(LANG_SET_BOOL_YES));
@@ -107,7 +108,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 
     e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func,
                       message, yes, no);
-    
+
     semaphore_wait(&yesno_done, TIMEOUT_BLOCK);
 
     e->DeleteLocalRef(env_ptr, message);
