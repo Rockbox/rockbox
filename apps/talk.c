@@ -752,6 +752,7 @@ static void do_enqueue(bool enqueue)
 static int _talk_spell(const char* spell, size_t len, bool enqueue)
 {
     char c; /* currently processed char */
+    int button = BUTTON_NONE;
 
     if (talk_is_disabled())
         return -1;
@@ -780,8 +781,15 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
         else if (c == PATH_SEPCH)
             talk_id(VOICE_CHAR_SLASH, true);
 
-        while (QUEUE_LEVEL == QUEUE_SIZE - 1) /* queue full - busy loop */
-            yield();
+
+        if (QUEUE_LEVEL == QUEUE_SIZE - 1)
+            button = button_get(false); /* prevent UI unresponsiveness */
+
+        if (button == BUTTON_NONE || IS_SYSEVENT(button))
+            while (QUEUE_LEVEL == QUEUE_SIZE - 1) /* queue full - busy loop */
+                yield();
+        else
+            return 0; /* truncate spelled-out string */
     }
     return 0;
 }
