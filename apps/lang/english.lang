@@ -4757,7 +4757,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Scanning"
   </voice>
 </phrase>
 <phrase>
@@ -7347,7 +7347,7 @@
     *: "Failed reading %s"
   </dest>
   <voice>
-    *: ""
+    *: "Failed reading file"
   </voice>
 </phrase>
 <phrase>
