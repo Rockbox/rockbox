@@ -223,10 +223,9 @@ bool show_search_progress(bool init, int display_count, int current, int total)
     if (TIME_AFTER(current_tick, last_tick + HZ/10))
     {
         if (total != current)
-        {
+            /* (voiced) */
             splash_progress(current, total, str(LANG_PLAYLIST_SEARCH_MSG),
                             display_count, str(LANG_OFF_ABORT));
-        }
         else
             splashf(0, ID2P(LANG_PLAYLIST_SEARCH_MSG),
                     display_count, str(LANG_OFF_ABORT));

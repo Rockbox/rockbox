@@ -36,7 +36,7 @@
 #include "misc.h" /* get_current_activity */
 #endif
 
-static long progress_next_tick = 0;
+static long progress_next_tick, talked_tick;
 
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
@@ -247,6 +247,7 @@ void splashf(int ticks, const char *fmt, ...)
 void splash_progress_set_delay(long delay_ticks)
 {
     progress_next_tick = current_tick + delay_ticks;
+    talked_tick = 0;
 }
 
 /* splash a progress meter */
@@ -264,6 +265,15 @@ void splash_progress(int current, int total, const char *fmt, ...)
         /* limit to 20fps */
         progress_next_tick = now + HZ/20;
         vp_flag = 0; /* don't mark vp dirty to prevent flashing */
+    }
+
+    if (global_settings.talk_menu &&
+        total > 0 &&
+        TIME_AFTER(current_tick, talked_tick + HZ*5))
+    {
+        talked_tick = current_tick;
+        talk_ids(false, LANG_LOADING_PERCENT,
+                 TALK_ID(current * 100 / total, UNIT_PERCENT));
     }
 
     /* If fmt is a lang ID then get the corresponding string (which

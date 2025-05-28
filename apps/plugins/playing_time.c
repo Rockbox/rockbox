@@ -420,21 +420,13 @@ static int pt_add_track(int i, enum ePT_SUM section, struct playing_time_info *p
 {
     struct mp3entry id3;
     struct playlist_track_info pl_track;
-    static unsigned long talked_tick;
     int progress_total = pti->remaining_only ?
                          (pti->nb_tracks - pti->curr_display_index) + 1 :
                          pti->nb_tracks;
 
+    /* (voiced) */
     rb->splash_progress(pti->counted, progress_total, "%s (%s)",
                         rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
-
-    if (rb->global_settings->talk_menu && TIME_AFTER(*rb->current_tick, talked_tick + HZ*5))
-    {
-        talked_tick = *rb->current_tick;
-        rb_talk_ids(false, LANG_LOADING_PERCENT,
-                    TALK_ID(pti->counted * 100 / progress_total,
-                    UNIT_PERCENT));
-    }
 
     if (rb->action_userabort(TIMEOUT_NOBLOCK))
         return -1;

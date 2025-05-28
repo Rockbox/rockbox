@@ -2415,7 +2415,8 @@ static bool insert_all_playlist(struct tree_context *c,
     {
         if (TIME_AFTER(current_tick, last_tick + HZ/4))
         {
-            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT)); // XXX not voiced
+            /* (voiced) */
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
             if (action_userabort(TIMEOUT_NOBLOCK))
             {
                 exit_loop_now = true;
@@ -2593,7 +2594,8 @@ bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
         n = tc->filesindir;
         for (i = 0; i < n; i++)
         {
-            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT)); // XXX not voiced
+            /* (voiced) */
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
             if (TIME_AFTER(current_tick, last_tick + HZ/4))
             {
                 if (action_userabort(TIMEOUT_NOBLOCK))

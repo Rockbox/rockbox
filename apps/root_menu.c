@@ -238,6 +238,10 @@ static int browser(void* param)
                     }
                     if (stat->commit_step > 0)
                     {
+                        /* (prevent redundant voicing by splash_progress */
+                        bool tmp = global_settings.talk_menu;
+                        global_settings.talk_menu = false;
+
                         if (lang_is_rtl())
                         {
                             splash_progress(stat->commit_step,
@@ -254,6 +258,7 @@ static int browser(void* param)
                                             stat->commit_step,
                                             tagcache_get_max_commit_step());
                         }
+                        global_settings.talk_menu = tmp;
                     }
                     else
                     {
