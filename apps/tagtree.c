@@ -1872,7 +1872,8 @@ entry_skip_formatter:
             talk_value(total_count, UNIT_INT, true);
         }
 
-        splashf(HZ*4, ID2P(LANG_SHOWDIR_BUFFER_FULL), total_count);
+        /* (voiced above) */
+        splashf(HZ*4, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }

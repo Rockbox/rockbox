@@ -100,7 +100,8 @@ static int initialize_catalog_buf(char* dirbuf, size_t dirbuf_sz)
                 talk_dir_or_spell(dirbuf, NULL, true);
                 talk_force_enqueue_next();
             }
-            splashf(HZ*2, ID2P(LANG_CATALOG_NO_DIRECTORY), dirbuf);
+            /* (voiced above) */
+            splashf(HZ*2, str(LANG_CATALOG_NO_DIRECTORY), dirbuf);
             return -1;
         }
         else {
