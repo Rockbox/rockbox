@@ -7333,7 +7333,7 @@
     *: "Can't open %s"
   </dest>
   <voice>
-    *: ""
+    *: "Can't open plugin"
   </voice>
 </phrase>
 <phrase>

@@ -902,6 +902,13 @@ int plugin_load(const char* plugin, const void* parameter)
     strcpy(current_plugin, plugin);
     current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
     if (current_plugin_handle == NULL) {
+        if (global_settings.talk_menu)
+        {
+            talk_id(LANG_PLUGIN_CANT_OPEN, false);
+            talk_spell(plugin, true);
+            talk_force_enqueue_next();
+        }
+        /* (voiced above) */
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
     }
