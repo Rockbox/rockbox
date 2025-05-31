@@ -679,8 +679,18 @@ static void display_playlist_count(int count, const unsigned char *fmt,
         if(count && TIME_AFTER(current_tick, next_tick))
         {
             talked_tick = current_tick;
-            talk_number(count, false);
-            talk_id(id, true);
+            if (final)
+            {
+                talk_id(LANG_ALL, false);
+                talk_number(count, true);
+                talk_id(id, true);
+                talk_force_enqueue_next(); /* Don't interrupt final announcement */
+            }
+            else
+            {
+                talk_number(count, false);
+                talk_id(id, true);
+            }
         }
     }
 

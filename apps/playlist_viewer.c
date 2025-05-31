@@ -1295,7 +1295,7 @@ bool search_playlist(void)
 
     cpu_boost(false);
 
-    cond_talk_ids_fq(TALK_ID(found_indicies_count, UNIT_INT),
+    cond_talk_ids_fq(LANG_ALL, TALK_ID(found_indicies_count, UNIT_INT),
                      LANG_PLAYLIST_SEARCH_MSG);
     if (!found_indicies_count)
     {
