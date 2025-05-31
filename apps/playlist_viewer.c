@@ -1255,6 +1255,7 @@ bool search_playlist(void)
     int found_indicies_count = 0, last_found_count = -1;
     int button;
     int track_display = global_settings.playlist_viewer_track_display;
+    long talked_tick = 0;
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
@@ -1273,7 +1274,15 @@ bool search_playlist(void)
     {
         if (found_indicies_count != last_found_count)
         {
-            splashf(0, ID2P(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
+            if (global_settings.talk_menu &&
+                TIME_AFTER(current_tick, talked_tick + (HZ * 5)))
+            {
+                talked_tick = current_tick;
+                talk_number(found_indicies_count, false);
+                talk_id(LANG_PLAYLIST_SEARCH_MSG, true);
+            }
+            /* (voiced above) */
+            splashf(0, str(LANG_PLAYLIST_SEARCH_MSG), found_indicies_count,
                        str(LANG_OFF_ABORT));
             last_found_count = found_indicies_count;
         }

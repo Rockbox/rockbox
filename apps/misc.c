@@ -210,12 +210,13 @@ bool warn_on_pl_erase(void)
 
 bool show_search_progress(bool init, int display_count, int current, int total)
 {
-    static int last_tick = 0;
+    static long last_tick, talked_tick;
 
     /* Don't show splashes for 1/2 second after starting search */
     if (init)
     {
         last_tick = current_tick + HZ/2;
+        talked_tick = 0;
         return true;
     }
 
@@ -227,8 +228,18 @@ bool show_search_progress(bool init, int display_count, int current, int total)
             splash_progress(current, total, str(LANG_PLAYLIST_SEARCH_MSG),
                             display_count, str(LANG_OFF_ABORT));
         else
-            splashf(0, ID2P(LANG_PLAYLIST_SEARCH_MSG),
+        {
+            if (global_settings.talk_menu &&
+                TIME_AFTER(current_tick, talked_tick + (HZ * 5)))
+            {
+                talked_tick = current_tick;
+                talk_number(display_count, false);
+                talk_id(LANG_PLAYLIST_SEARCH_MSG, true);
+            }
+            /* (voiced above) */
+            splashf(0, str(LANG_PLAYLIST_SEARCH_MSG),
                     display_count, str(LANG_OFF_ABORT));
+        }
 
         if (action_userabort(TIMEOUT_NOBLOCK))
             return false;

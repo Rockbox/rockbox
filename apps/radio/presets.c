@@ -553,6 +553,7 @@ int presets_scan(void *viewports)
 {
     bool do_scan = true;
     int curr_freq = radio_get_current_frequency();
+    long talked_tick = 0;
     struct viewport *vp = (struct viewport *)viewports;
 
     FOR_NB_SCREENS(i)
@@ -581,7 +582,15 @@ int presets_scan(void *viewports)
             frac = freq % 100;
             freq /= 100;
 
-            splashf(0, ID2P(LANG_FM_SCANNING), freq, frac);
+            if (global_settings.talk_menu &&
+                TIME_AFTER(current_tick, talked_tick + (HZ * 5)))
+            {
+                talked_tick = current_tick;
+                talk_id(LANG_FM_SCANNING, false);
+                talk_value_decimal(curr_freq, UNIT_INT, 6, true);
+            }
+            /* (voiced above) */
+            splashf(0, str(LANG_FM_SCANNING), freq, frac);
 
             if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
@@ -592,6 +601,8 @@ int presets_scan(void *viewports)
             }
 
             curr_freq += fmr->freq_step;
+
+            yield(); /* (voice_thread) */
         }
         radio_set_current_frequency(curr_freq);
 
