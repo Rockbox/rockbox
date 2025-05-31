@@ -3357,57 +3357,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3547,8 +3496,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Uzstādīt"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Uzstādīt"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Uzstādīt"
     iriverh100,iriverh120,iriverh300: "NAVI = Uzstādīt"
     mpiohd300: "ENTER = Uzstādīt"
     mrobe500: "HEART = Uzstādīt"
@@ -3557,7 +3506,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3580,8 +3528,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Atcelt"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Atcelt"
+    gigabeatfx,mrobe500: "POWER = Atcelt"
     gogearsa9200: "LEFT = Atcelt"
     iaudiom5,iaudiox5: "RECORD = Atcelt"
     ipod*,mpiohd300,sansac200*: "MENU = Atcelt"
@@ -3594,7 +3542,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4672,7 +4619,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Skenē"
   </voice>
 </phrase>
 <phrase>
@@ -5782,20 +5729,6 @@
   </dest>
   <voice>
     *: "Saglabātas dziesmas"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7248,7 +7181,7 @@
     *: "Neizdevās nolasīt %s"
   </dest>
   <voice>
-    *: ""
+    *: "Neizdevās nolasīt failu"
   </voice>
 </phrase>
 <phrase>
@@ -12600,20 +12533,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -14165,16 +14084,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Pārslēgt vienumu"
+    *: ""
   </dest>
   <voice>
-    *: "Pārslēgt vienumu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14235,13 +14154,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox galvenās izvēlnes secība"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14742,20 +14661,6 @@
   </dest>
   <voice>
     *: "Albuma vāks nav atrasts"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16981,5 +16886,19 @@
   </dest>
   <voice>
     *: "Atskaņošanas saraksts pabeigts. Atskaņot vēlreiz?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Kārtot atskaņošanas sarakstus"
+  </dest>
+  <voice>
+    *: "Kārtot atskaņošanas sarakstus"
   </voice>
 </phrase>

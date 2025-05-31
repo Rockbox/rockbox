@@ -3344,57 +3344,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3534,8 +3483,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Imposta"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Imposta"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Imposta"
     iriverh100,iriverh120,iriverh300: "NAVI = Imposta"
     mpiohd300: "ENTER = Imposta"
     mrobe500: "HEART = Imposta"
@@ -3544,7 +3493,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3567,8 +3515,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Annulla"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Annulla"
+    gigabeatfx,mrobe500: "POWER = Annulla"
     gogearsa9200: "LEFT = Annulla"
     iaudiom5,iaudiox5: "RECORD = Annulla"
     ipod*,mpiohd300,sansac200*: "MENU = Annulla"
@@ -3581,7 +3529,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4659,7 +4606,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Ricerca"
   </voice>
 </phrase>
 <phrase>
@@ -5769,20 +5716,6 @@
   </dest>
   <voice>
     *: "Traccie salvate"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7235,7 +7168,7 @@
     *: "Errore in lettura di %s"
   </dest>
   <voice>
-    *: ""
+    *: "Errore nella lettura del file"
   </voice>
 </phrase>
 <phrase>
@@ -12816,13 +12749,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Ordine Menu Principale Rockbox"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -12885,20 +12818,6 @@
   <voice>
     *: "Cancella tutti i ripristini"
     lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13483,20 +13402,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PROPERTIES_PATH
   desc: in properties plugin
   user: core
@@ -13804,16 +13709,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Commuta l'elemento"
+    *: ""
   </dest>
   <voice>
-    *: "Commuta l'elemento"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16982,5 +16887,19 @@
   </dest>
   <voice>
     *: "Tracce per"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Ordina Playlist"
+  </dest>
+  <voice>
+    *: "Ordina Playlist"
   </voice>
 </phrase>

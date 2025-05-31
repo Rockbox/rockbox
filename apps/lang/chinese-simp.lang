@@ -3124,57 +3124,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPINDOWN
   desc: in settings_menu
   user: core
@@ -3938,8 +3887,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "POWER:取消"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK:取消"
+    gigabeatfx: "POWER:取消"
     gogearsa9200: "LEFT:取消"
     iaudiom5,iaudiox5: "RECORD:取消"
     ipod*,mpiohd300,sansac200*: "MENU:取消"
@@ -3953,7 +3902,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -6286,7 +6234,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "正在扫描"
   </voice>
 </phrase>
 <phrase>
@@ -6570,7 +6518,7 @@
     *: "读取%s失败"
   </dest>
   <voice>
-    *: ""
+    *: "读取文件失败"
   </voice>
 </phrase>
 <phrase>
@@ -7457,8 +7405,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:设置"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY:设置"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:设置"
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
     mpiohd300: "ENTER:设置"
     mrobe500: "HEART:设置"
@@ -7467,7 +7415,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7978,20 +7925,6 @@
   <voice>
     *: none
     headphone_detection: "拔出耳机后自动暂停"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12495,20 +12428,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -14060,16 +13979,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "切换项目"
+    *: ""
   </dest>
   <voice>
-    *: "切换项目"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14130,13 +14049,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox主屏幕菜单定制"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14637,20 +14556,6 @@
   </dest>
   <voice>
     *: "未找到专辑艺术"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16989,5 +16894,19 @@
   </dest>
   <voice>
     *: "无法加载字体"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "排序播放列表"
+  </dest>
+  <voice>
+    *: "排序播放列表"
   </voice>
 </phrase>
