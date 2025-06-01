@@ -269,6 +269,7 @@ static bool codec_advance_buffer_counters(size_t amount)
 {
     if (bufadvance(ci.audio_hid, amount) < 0)
     {
+        bufseek(ci.audio_hid, ci.filesize);
         ci.curpos = ci.filesize;
         return false;
     }
