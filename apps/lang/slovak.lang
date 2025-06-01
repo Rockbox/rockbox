@@ -3342,57 +3342,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3532,8 +3481,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Nastaviť"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Nastaviť"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Nastaviť"
     iriverh100,iriverh120,iriverh300: "NAVI = Nastaviť"
     mpiohd300: "ENTER = Nastaviť"
     mrobe500: "HEART = Nastaviť"
@@ -3542,7 +3491,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3565,8 +3513,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = Vrátiť"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Vrátiť"
+    gigabeatfx,mrobe500: "POWER = Vrátiť"
     gogearsa9200: "LEFT = Vrátiť"
     iaudiom5,iaudiox5: "RECORD = Vrátiť"
     ipod*,mpiohd300,sansac200*: "MENU = Vrátiť"
@@ -3579,7 +3527,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4657,7 +4604,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Skenujem"
   </voice>
 </phrase>
 <phrase>
@@ -5767,20 +5714,6 @@
   </dest>
   <voice>
     *: "Stôp uložených"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7233,7 +7166,7 @@
     *: "Zlihalo čítanie %s"
   </dest>
   <voice>
-    *: ""
+    *: "Čítanie súboru zlihalo"
   </voice>
 </phrase>
 <phrase>
@@ -12935,13 +12868,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox poradie hlavnej ponuky"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -12959,20 +12892,6 @@
   </dest>
   <voice>
     *: "Strana kráľa"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13783,16 +13702,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "prepnúť položku"
+    *: ""
   </dest>
   <voice>
-    *: "prepnúť položku"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14169,20 +14088,6 @@
   <voice>
     *: "nastaviť čas obnovenia"
     lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16983,5 +16888,19 @@
   </dest>
   <voice>
     *: "Plejlist sa skončil. Prehrať znova?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Triediť plejlisty"
+  </dest>
+  <voice>
+    *: "Triediť plejlisty"
   </voice>
 </phrase>
