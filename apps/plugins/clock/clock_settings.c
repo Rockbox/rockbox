@@ -102,9 +102,13 @@ void clock_settings_skin_previous(struct clock_settings* settings){
 static enum settings_file_status clock_settings_load(
         struct clock_settings* settings,char* filename){
     int fd = rb->open(filename, O_RDONLY);
-    if(fd >= 0){ /* does file exist? */
+    if(fd >= 0)
+    {
         /* basic consistency check */
-        if(rb->filesize(fd) == sizeof(*settings)){
+        if(rb->filesize(fd) != sizeof(*settings))
+            rb->close(fd);
+        else
+        {
             rb->read(fd, settings, sizeof(*settings));
             rb->close(fd);
             apply_backlight_setting(settings->general.backlight);
@@ -148,7 +152,7 @@ static void draw_message(struct screen* display, int msg, int y){
                       display->getwidth(), message->slide_height);
     display->set_drawmode(DRMODE_SOLID);
     vertical_picture_draw_sprite(display, message, msg,
-                                 0, display->getheight() - 
+                                 0, display->getheight() -
                                     (message->slide_height*y));
 }
 
