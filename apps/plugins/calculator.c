@@ -1619,9 +1619,7 @@ static void printResult(void)
     switch_Status:
     switch(calStatus){
         case cal_exit:
-            rb->lcd_clear_display();
-            rb->splash(HZ/3, "Bye now!");
-            break;
+            return;
         case cal_error:
             clearbuf();
             rb->snprintf(buf, 19, "%18s","Error");
