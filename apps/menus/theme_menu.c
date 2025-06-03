@@ -325,6 +325,7 @@ int browse_folder(void *param)
         browse.title = str(lang_id);
     }
 
+    tree_get_context()->browse = NULL;  /*bugfix - force root dir reload */
     return rockbox_browse(&browse);
 }
 
