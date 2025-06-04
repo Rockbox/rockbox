@@ -259,13 +259,13 @@ static enum plugin_status display_run_stats(void)
     rb->snprintf(dirs_removed, sizeof(dirs_removed), "%d",
                  run_stats.dirs_removed);
 
-    char removed_size[9];
-    rb->snprintf(removed_size, sizeof(removed_size), "%d.%d%s",
+    char removed_size[11];
+    rb->snprintf(removed_size, sizeof(removed_size), "(%d.%d%s)",
                  (int)rm_size, (int)((rm_size - (int)rm_size) * 100),
                  size_units[magnitude]);
 
-    char run_time[9];
-    rb->snprintf(run_time, sizeof(run_time), "%02d:%02d:%02d",
+    char run_time[12];
+    rb->snprintf(run_time, sizeof(run_time), "in %02d:%02d:%02d",
                  run_stats.run_duration / 3600, run_stats.run_duration / 60,
                  run_stats.run_duration % 60);
 
@@ -279,35 +279,38 @@ static enum plugin_status display_run_stats(void)
 #endif
 
     char* last_run_text[] = {
-        "Last Run Stats" , ""           , "",
-        "Total Removed: ", total_removed, "",
-        "Files Removed: ", files_removed, "",
-        "Dirs Removed: " , dirs_removed , "",
-        "Removed Size: " , removed_size , "",
-        "Run Time: "     , run_time     , "",
 #if CONFIG_RTC
-        "Run: "          , last_run
+        last_run, "",
 #endif
+        total_removed, "removed", removed_size,  "",
+        files_removed, run_stats.files_removed == 1 ? "file" : "files,",
+        dirs_removed , run_stats.dirs_removed == 1 ? "dir" : "dirs", "",
+        run_time     , "",
     };
 
     static struct style_text display_style[] = {
-        { 0, C_ORANGE | TEXT_CENTER },
-        { 3, C_BLUE },
-        { 6, C_BLUE },
-        { 9, C_BLUE },
-        { 12, C_BLUE },
-        { 15, C_BLUE },
 #if CONFIG_RTC
-        { 18, C_BLUE },
+        { 0, TEXT_CENTER },
 #endif
         LAST_STYLE_ITEM
     };
 
+    struct viewport vp;
+    rb->viewport_set_defaults(&vp, SCREEN_MAIN);
+
     if (display_text(ARRAYLEN(last_run_text), last_run_text,
-                     display_style, NULL, true)) {
+                     display_style, &vp, false)) {
         return PLUGIN_USB_CONNECTED;
     }
+    while (true) /* keep info on screen until cancelled */
+    {
+        int button = rb->get_action(CONTEXT_STD, HZ/2);
+        if (button == ACTION_STD_CANCEL || button == ACTION_STD_MENU)
+            break;
 
+        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            return PLUGIN_USB_CONNECTED;
+    }
     return PLUGIN_OK;
 }
 
@@ -337,15 +340,26 @@ static bool tidy_remove_item(const char *item, int attr)
     return false;
 }
 
-static void tidy_lcd_status(const char *name)
+static void tidy_lcd_status(const char *name, struct viewport *vp)
 {
-    /* display status text */
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Working ...");
-    rb->lcd_puts(0, 1, name);
-    rb->lcd_putsf(0, 2, "Cleaned up %d items",
+    static long next_tick;
+
+    if (TIME_AFTER(next_tick, *rb->current_tick))
+        return;
+
+    next_tick = *rb->current_tick + HZ/10;
+
+    struct screen *display = rb->screens[SCREEN_MAIN];
+    struct viewport *last_vp = display->set_viewport(vp);
+
+    display->clear_viewport();
+    display->puts(0, 0, "Cleaning...");
+    display->puts(0, 1, name);
+    display->putsf(0, 2, "%d items removed",
         run_stats.files_removed + run_stats.dirs_removed);
-    rb->lcd_update();
+    display->update_viewport();
+
+    display->set_viewport(last_vp);
 }
 
 static int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
@@ -396,6 +410,8 @@ static enum plugin_status tidy_clean(char *path, int *path_length) {
     struct dir_info dinfo;
     struct dirent *entry;
     struct dirinfo info;
+    struct viewport vp;
+    rb->viewport_set_defaults(&vp, SCREEN_MAIN);
     DIR *dir, *dir_test;
     /* Set to true when directory and its contents are to be deleted */
     bool rm_all = false;
@@ -424,7 +440,7 @@ static enum plugin_status tidy_clean(char *path, int *path_length) {
         /* Restore path to poped dir */
         tidy_path_remove_entry(path, dinfo.path_length, path_length);
         dir = dinfo.dir;
-        tidy_lcd_status(path);
+        tidy_lcd_status(path, &vp);
 
         while ((entry = rb->readdir(dir))) {
             /* Check for user input and usb connect */
@@ -474,7 +490,7 @@ static enum plugin_status tidy_clean(char *path, int *path_length) {
 
                         if (dir_test) {
                             dir = dir_test;
-                            tidy_lcd_status(path);
+                            tidy_lcd_status(path, &vp);
                         }
                     }
                 }
@@ -506,7 +522,7 @@ static enum plugin_status tidy_clean(char *path, int *path_length) {
                             rm_all_start_depth = dir_stack_size(&dstack);
                         }
 
-                        tidy_lcd_status(path);
+                        tidy_lcd_status(path, &vp);
                     }
                 }
             } else {
@@ -567,15 +583,11 @@ static enum plugin_status tidy_do(void)
 
     if (status == PLUGIN_OK)
     {
-        rb->lcd_clear_display();
         if (user_abort)
         {
-            rb->splash(HZ, "User aborted");
-            rb->lcd_clear_display();
+            user_abort = false;
+            rb->splash(HZ, ID2P(LANG_CANCEL));
         }
-        rb->lcd_update();
-        rb->splashf(HZ*2, "Cleaned up %d items",
-            run_stats.files_removed + run_stats.dirs_removed);
     }
 
     return status;
@@ -666,7 +678,7 @@ static enum plugin_status tidy_lcd_menu(void)
     int selection = 0;
     struct simplelist_info list;
 
-    MENUITEM_STRINGLIST(menu, "Disktidy Menu", disktidy_menu_cb,
+    MENUITEM_STRINGLIST(menu, "Disktidy", disktidy_menu_cb,
                         "Start Cleaning", "Files to Clean", "Last Run Stats",
                         "Playback Control", "Quit");
 
@@ -675,6 +687,8 @@ static enum plugin_status tidy_lcd_menu(void)
             case 0:
                 if (tidy_types_selected()) {
                     disktidy_status = tidy_do();
+                    if (disktidy_status == PLUGIN_OK)
+                        disktidy_status = display_run_stats();
                 } else {
                     rb->splash(HZ * 2, "Select at least one file type to clean");
                 }
@@ -719,7 +733,7 @@ static void save_config(void)
         return;
 
     for (unsigned i=0; i<tidy_type_count; i++)
-        rb->fdprintf(fd, "%s%s%s: %s\n", 
+        rb->fdprintf(fd, "%s%s%s: %s\n",
                      tidy_types[i].filestring[0] == '#' ? "\\" : "",
                      tidy_types[i].filestring,
                      tidy_types[i].directory ? "/" : "",

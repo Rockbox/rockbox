@@ -31,7 +31,7 @@ static bool wait_key_press(void)
         button = rb->button_get(true);
         if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
             return true;
-    } while( ( button == BUTTON_NONE )
+    } while(IS_SYSEVENT(button) || ( button == BUTTON_NONE )
             || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
     return false;
 }
@@ -39,6 +39,7 @@ static bool wait_key_press(void)
 bool display_text(unsigned short words, char** text, struct style_text* style,
                   struct viewport* vp_text, bool wait_key)
 {
+    bool ret = false;
     int prev_drawmode;
 #ifdef HAVE_LCD_COLOR
     int standard_fgcolor;
@@ -52,7 +53,7 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
         vp_width = vp_text->width;
         vp_height = vp_text->height;
     }
-    rb->screens[SCREEN_MAIN]->set_viewport(vp_text);
+    struct viewport *last_vp = rb->screens[SCREEN_MAIN]->set_viewport(vp_text);
     prev_drawmode = rb->lcd_get_drawmode();
     rb->lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_COLOR
@@ -80,7 +81,10 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
             y = MARGIN;
             rb->screens[SCREEN_MAIN]->update_viewport();
             if (wait_key_press())
-                return true;
+            {
+                ret = true;
+                goto cleanup;
+            }
             rb->screens[SCREEN_MAIN]->clear_viewport();
         }
         /* no text formatting available */
@@ -132,7 +136,10 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
     if (wait_key)
     {
         if (wait_key_press())
-            return true;
+            ret = true;
     }
-    return false;
+
+cleanup:
+    rb->screens[SCREEN_MAIN]->set_viewport(last_vp);
+    return ret;
 }
