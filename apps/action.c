@@ -1318,7 +1318,11 @@ int get_custom_action(int context,int timeout,
     action_cur_t current;
     init_act_cur(&current, context, timeout, get_context_map);
 
-    return get_action_worker(&action_last, &current);
+    int action = get_action_worker(&action_last, &current);
+
+    action = do_backlight(&action_last, &current, action);
+
+    return action;
 }
 
 intptr_t get_action_data(void)
