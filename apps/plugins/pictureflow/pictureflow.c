@@ -3552,6 +3552,10 @@ static int display_settings_menu(void)
             case 0:
                 rb->set_option(rb->str(LANG_BACKLIGHT),
                         &pf_cfg.backlight_mode, RB_INT, backlight_options, 2, NULL);
+                if(pf_cfg.backlight_mode == 0)
+                    backlight_ignore_timeout();
+                else
+                    backlight_use_settings();
                 break;
             case 1:
                 old_val = pf_cfg.show_fps;
@@ -4485,10 +4489,8 @@ static bool init(void)
     config_set_defaults(&pf_cfg); /* must appear before configfile_save */
     configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 
-#ifdef HAVE_BACKLIGHT
     if(pf_cfg.backlight_mode == 0)
         backlight_ignore_timeout(); /* restore in cleanup */
-#endif
 
 #if PF_PLAYBACK_CAPABLE
     buf = rb->plugin_get_buffer(&buf_size);
