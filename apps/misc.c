@@ -1555,13 +1555,14 @@ int toggle_sleeptimer(void)
     return 0;
 }
 
-void talk_sleeptimer(void)
+void talk_sleeptimer(int custom_duration)
 {
-    int seconds = get_sleep_timer();
+    int seconds = custom_duration < 0 ? get_sleep_timer() : custom_duration*60;
     long talk_ids[] = {
-        seconds ? LANG_SLEEP_TIMER_CANCEL_CURRENT
-            : LANG_SLEEP_TIMER_START_CURRENT,
+        custom_duration >= 0 ? LANG_SLEEP_TIMER :
+        (seconds ? LANG_SLEEP_TIMER_CANCEL_CURRENT : LANG_SLEEP_TIMER_START_CURRENT),
         VOICE_PAUSE,
+        custom_duration == 0 ? LANG_OFF :
         (seconds ? seconds_to_min(seconds)
             : global_settings.sleeptimer_duration) | UNIT_MIN << UNIT_SHIFT,
         TALK_FINAL_ID

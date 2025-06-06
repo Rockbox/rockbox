@@ -607,10 +607,10 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                     talk_timedate();
                 else
 #endif
-                if (sc->u.timedata.sleep_timeout < 0)
-                    talk_sleeptimer();
-                else if (sc->name[0])
+                if (sc->name[0])
                     talk_spell(sc->name, false);
+                else
+                    talk_sleeptimer(sc->u.timedata.sleep_timeout);
                 break;
             case SHORTCUT_SHUTDOWN:
             case SHORTCUT_REBOOT:

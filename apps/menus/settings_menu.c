@@ -485,7 +485,7 @@ int sleeptimer_voice(int selected_item, void*data)
 {
     (void)selected_item;
     (void)data;
-    talk_sleeptimer();
+    talk_sleeptimer(-1);
     return 0;
 }
 
