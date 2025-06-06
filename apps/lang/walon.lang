@@ -9426,20 +9426,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_CURRENT_TIME
-  desc: spoken only, for wall clock announce
+  id: LANG_CURRENT_TIME
+  desc: for wall clock announce
   user: core
   <source>
     *: none
-    rtc: ""
+    rtc: "Current Time"
   </source>
   <dest>
     *: none
-    rtc: ""
+    rtc: "eure do moumint"
   </dest>
   <voice>
     *: none
-    rtc: "eure do moumint:"
+    rtc: "eure do moumint"
   </voice>
 </phrase>
 <phrase>

@@ -240,7 +240,7 @@ static int info_speak_item(int selected_item, void * data)
 
 #if CONFIG_RTC
         case INFO_TIME:
-            talk_id(VOICE_CURRENT_TIME, false);
+            talk_id(LANG_CURRENT_TIME, false);
             /* fallthrough */
         case INFO_DATE:
             tm = get_time();

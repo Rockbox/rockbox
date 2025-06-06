@@ -208,11 +208,6 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_SETTING:
             return sc->setting != NULL;
         case SHORTCUT_TIME:
-#if CONFIG_RTC
-            if (sc->u.timedata.talktime)
-                return sc->name[0] != '\0';
-#endif
-            return sc->name[0] != '\0' || sc->u.timedata.sleep_timeout < 0;
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
         case SHORTCUT_SHUTDOWN:
@@ -504,7 +499,24 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         ) /* String representation for toggling sleep timer */
             return string_sleeptimer(buffer, buffer_len);
 
-        return sc->name;
+        if (sc->name[0])
+            return sc->name;
+
+#if CONFIG_RTC
+        if (sc->u.timedata.talktime)
+            return P2STR(ID2P(LANG_CURRENT_TIME));
+        else
+#endif
+        {
+            format_sleeptimer(sc->name, sizeof(sc->name),
+                              sc->u.timedata.sleep_timeout, NULL);
+            snprintf(buffer, buffer_len, "%s (%s)",
+                     P2STR(ID2P(LANG_SLEEP_TIMER)),
+                     sc->name[0] ? sc->name : P2STR(ID2P(LANG_OFF)));
+            sc->name[0] = '\0';
+            return buffer;
+        }
+
     }
     else if ((sc->type == SHORTCUT_SHUTDOWN || sc->type == SHORTCUT_REBOOT) &&
              sc->name[0] == '\0')

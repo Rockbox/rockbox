@@ -1575,7 +1575,7 @@ void talk_timedate(void)
     struct tm *tm = get_time();
     if (!global_settings.talk_menu)
         return;
-    talk_id(VOICE_CURRENT_TIME, false);
+    talk_id(LANG_CURRENT_TIME, false);
     if (valid_time(tm))
     {
         talk_time(tm, true);
