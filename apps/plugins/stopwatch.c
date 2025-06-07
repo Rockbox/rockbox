@@ -352,38 +352,31 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     ticks -= (HZ * seconds);
     cs = ticks;
     if (!lap)
-    {
         rb->snprintf(buf, buflen,
-                     "%2d:%02d:%02d.%02d",
-                     hours, minutes, seconds, cs);
+                     "%2d:%02d:%02d.%02d  ",       /* add some blank space, in case  */
+                     hours, minutes, seconds, cs); /* char width differs, since we   */
+                                                   /* don't clear the viewport       */
+    else if (lap > 1)
+    {
+        int last_ticks, last_hours, last_minutes, last_seconds, last_cs;
+        last_ticks = lap_times[(lap-1)%MAX_LAPS] - lap_times[(lap-2)%MAX_LAPS];
+        last_hours = last_ticks / (HZ * 3600);
+        last_ticks -= (HZ * last_hours * 3600);
+        last_minutes = last_ticks / (HZ * 60);
+        last_ticks -= (HZ * last_minutes * 60);
+        last_seconds = last_ticks / HZ;
+        last_ticks -= (HZ * last_seconds);
+        last_cs = last_ticks;
+
+        rb->snprintf(buf, buflen,
+                     "%2d %2d:%02d:%02d.%02d [%2d:%02d:%02d.%02d]",
+                     lap, hours, minutes, seconds, cs, last_hours,
+                     last_minutes, last_seconds, last_cs);
     }
     else
-    {
-
-        if (lap > 1)
-        {
-            int last_ticks, last_hours, last_minutes, last_seconds, last_cs;
-            last_ticks = lap_times[(lap-1)%MAX_LAPS] - lap_times[(lap-2)%MAX_LAPS];
-            last_hours = last_ticks / (HZ * 3600);
-            last_ticks -= (HZ * last_hours * 3600);
-            last_minutes = last_ticks / (HZ * 60);
-            last_ticks -= (HZ * last_minutes * 60);
-            last_seconds = last_ticks / HZ;
-            last_ticks -= (HZ * last_seconds);
-            last_cs = last_ticks;
-
-            rb->snprintf(buf, buflen,
-                         "%2d %2d:%02d:%02d.%02d [%2d:%02d:%02d.%02d]",
-                         lap, hours, minutes, seconds, cs, last_hours,
-                         last_minutes, last_seconds, last_cs);
-        }
-        else
-        {
-            rb->snprintf(buf, buflen,
-                         "%2d %2d:%02d:%02d.%02d",
-                         lap, hours, minutes, seconds, cs);
-        }
-    }
+        rb->snprintf(buf, buflen,
+                     "%2d %2d:%02d:%02d.%02d",
+                     lap, hours, minutes, seconds, cs);
 }
 
 /*
@@ -391,14 +384,9 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
  */
 static void load_stopwatch(void)
 {
-    int fd;
-
-    fd = rb->open(STOPWATCH_FILE, O_RDONLY);
-
+    int fd = rb->open(STOPWATCH_FILE, O_RDONLY);
     if (fd < 0)
-    {
         return;
-    }
 
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
@@ -431,14 +419,9 @@ static void load_stopwatch(void)
  */
 static void save_stopwatch(void)
 {
-    int fd;
-
-    fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
-
+    int fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
     if (fd < 0)
-    {
         return;
-    }
 
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
@@ -457,75 +440,72 @@ static void save_stopwatch(void)
 
 enum plugin_status plugin_start(const void* parameter)
 {
+    struct viewport vp, *last_vp;
+    struct screen *display;
     char buf[32];
     int button;
     int lap;
     int done = false;
     bool update_lap = true;
     int lines;
-
+    int ret = PLUGIN_OK;
     (void)parameter;
-
     int h;
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("M", NULL, &h);
-    lines = (LCD_HEIGHT / h) - (LAP_Y);
+
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
+
+    rb->viewport_set_defaults(&vp, SCREEN_MAIN);
+    display = rb->screens[SCREEN_MAIN];
+
+    display->setfont(FONT_UI);
+    display->getstringsize("M", NULL, &h);
+    lines = (vp.height / h) - (LAP_Y);
 
     load_stopwatch();
 
-    rb->lcd_clear_display();
-
     while (!done)
     {
+        rb->send_event(GUI_EVENT_ACTIONUPDATE, NULL); /* update status bar */
         if (counting)
-        {
             stopwatch = prev_total + *rb->current_tick - start_at;
-        }
         else
-        {
             stopwatch = prev_total;
-        }
 
         ticks_to_string(stopwatch,0,32,buf);
-        rb->lcd_puts(0, TIMER_Y, buf);
+        last_vp = display->set_viewport(&vp);
 
         if(update_lap)
         {
+            display->clear_viewport();
+            display->puts(0, TIMER_Y, buf);
             lap_start = curr_lap - lap_scroll;
             for (lap = lap_start; lap > lap_start - lines; lap--)
             {
                 if (lap > 0)
                 {
                     ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
-                    rb->lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
+                    display->puts_scroll(0, LAP_Y + lap_start - lap, buf);
                 }
                 else
-                {
-                    rb->lcd_puts(0, LAP_Y + lap_start - lap,
-                                 "                  ");
-                }
+                    display->puts(0, LAP_Y + lap_start - lap,
+                                  "                  ");
             }
             update_lap = false;
         }
-
-        rb->lcd_update();
-
-        if (! counting)
-        {
-            button = rb->button_get(true);
-        }
+        else
+            display->puts(0, TIMER_Y, buf);
+        display->update_viewport();
+        display->set_viewport(last_vp);
+        if (!counting)
+            button = rb->button_get_w_tmo(HZ/2);
         else
         {
-            button = rb->button_get_w_tmo(10);
-
-            /* Make sure that the jukebox isn't powered off
-               automatically */
+            button = rb->button_get_w_tmo(HZ/10);
             rb->reset_poweroff_timer();
         }
         switch (button)
         {
-
-            /* exit */
 #ifdef STOPWATCH_RC_QUIT
             case STOPWATCH_RC_QUIT:
 #endif
@@ -555,6 +535,7 @@ enum plugin_status plugin_start(const void* parameter)
                  {
                      prev_total = 0;
                      curr_lap = 0;
+                     lap_scroll = 0;
                      update_lap = true;
                  }
                  break;
@@ -580,7 +561,7 @@ enum plugin_status plugin_start(const void* parameter)
             case STOPWATCH_SCROLL_UP:
                  if (lap_scroll > 0)
                  {
-                     lap_scroll --;
+                     lap_scroll--;
                      update_lap = true;
                  }
                  break;
@@ -590,16 +571,18 @@ enum plugin_status plugin_start(const void* parameter)
                  if ((lap_scroll < curr_lap - lines) &&
                      (lap_scroll < (MAX_LAPS - lines)) )
                  {
-                     lap_scroll ++;
+                     lap_scroll++;
                      update_lap = true;
                  }
                  break;
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
+                    ret = PLUGIN_USB_CONNECTED;
                 break;
         }
     }
-    return PLUGIN_OK;
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
+    return ret;
 }
