@@ -65,7 +65,6 @@ const struct button_mapping* plugin_contexts[]={
  *************************/
 static void cleanup(void)
 {
-    clock_draw_restore_colors();
     if(clock_settings.general.save_settings == 1)
         save_settings();
 
@@ -181,7 +180,6 @@ enum plugin_status plugin_start(const void* parameter){
                 break;
 #endif
             case ACTION_MENU:
-                clock_draw_restore_colors();
                 FOR_NB_SCREENS(i)
                     rb->viewportmanager_theme_enable(i, true, NULL);
                 exit_clock=main_menu();
@@ -198,7 +196,8 @@ enum plugin_status plugin_start(const void* parameter){
                 break;
         }
 
-        if(redraw){
+        if (redraw && !exit_clock)
+        {
             clock_draw_set_colors();
             FOR_NB_SCREENS(i)
                 clock_draw(rb->screens[i], &time, &counter);

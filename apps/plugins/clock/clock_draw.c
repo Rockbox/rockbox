@@ -64,25 +64,11 @@ static void skin_set_background(struct screen* display, int mode, int skin){
         white_background(display);
 }
 
-static void skin_restore_background(struct screen* display, int mode, int skin){
-    if(skin_require_black_background(mode, skin) )
-        white_background(display);
-}
-
 void clock_draw_set_colors(void){
     FOR_NB_SCREENS(i)
         skin_set_background(rb->screens[i],
                             clock_settings.mode,
                             clock_settings.skin[clock_settings.mode]);
-}
-
-void clock_draw_restore_colors(void){
-    FOR_NB_SCREENS(i){
-            skin_restore_background(rb->screens[i],
-                                    clock_settings.mode,
-                                    clock_settings.skin[clock_settings.mode]);
-            rb->screens[i]->update();
-    }
 }
 
 void clock_draw(struct screen* display, struct time* time,

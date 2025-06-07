@@ -58,11 +58,25 @@ static bool settings_needs_saving(struct clock_settings* settings){
 
 void clock_settings_reset(struct clock_settings* settings){
     settings->mode = ANALOG;
-    int i;
-    for(i=0;i<NB_CLOCK_MODES;i++){
-        settings->skin[i]=0;
-    }
     settings->general.date_format = EUROPEAN;
+    settings->skin[ANALOG] = 1; /* round */
+    settings->skin[DIGITAL] = 1; /* LCD-style */
+    settings->skin[BINARY] = 2; /* LCD-style */
+    for (const char *ptr = rb->str(LANG_VOICED_DATE_FORMAT) ; *ptr; ptr++)
+    {
+        if (*ptr == 'd')
+            break;
+        else if (*ptr == 'Y')
+        {
+            settings->general.date_format = JAPANESE;
+            break;
+        }
+        else if (*ptr == 'A' || *ptr == 'm')
+        {
+            settings->general.date_format = ENGLISH;
+            break;
+        }
+    }
     settings->general.save_settings = true;
     settings->general.idle_poweroff=true;
     settings->general.backlight = ROCKBOX_SETTING;
