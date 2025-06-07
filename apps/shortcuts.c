@@ -730,11 +730,7 @@ int do_shortcut_menu(void *ignored)
     simplelist_info_init(&list, P2STR(ID2P(LANG_SHORTCUTS)), shortcut_count, NULL);
     list.get_name = shortcut_menu_get_name;
     list.action_callback = shortcut_menu_get_action;
-    if (global_settings.show_icons)
-        list.get_icon = shortcut_menu_get_icon;
     list.title_icon = Icon_Bookmark;
-    if (global_settings.talk_menu)
-        list.get_talk = shortcut_menu_speak_item;
 
     if (shortcut_count == 0)
     {
@@ -749,7 +745,10 @@ int do_shortcut_menu(void *ignored)
 
     while (done == GO_TO_PREVIOUS)
     {
-        list.count = shortcut_count;
+        list.count = shortcut_count; /* in case shortcut was deleted */
+        list.title = P2STR(ID2P(LANG_SHORTCUTS)); /* in case language changed */
+        list.get_icon = global_settings.show_icons ? shortcut_menu_get_icon : NULL;
+        list.get_talk = global_settings.talk_menu ? shortcut_menu_speak_item : NULL;
 
         if (simplelist_show_list(&list))
             break; /* some error happened?! */
