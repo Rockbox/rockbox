@@ -125,7 +125,8 @@ of before installing.
       \note{The SD card that sometimes come bundled with these players are usually
       of substandard quality and are not to be trusted. It is recommended to source
       a card of a reputable brand, from a reputable source, such as direct from
-      the manufacturer.}
+      the manufacturer. Do check the bundled card for any update file which may
+      be included, though. It may be useful for the community if it is a new version.}
     }
   \item[USB DAC.] This feature is not supported by Rockbox, but you can
     dual-boot the original firmware if you want to use it.
@@ -389,6 +390,10 @@ in installing.
 
 \subsection{Automated Installation}
 
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
+\note{Rockbox Utility does not currently support the \playertype{} and you will
+therefore need to follow the manual install instructions.}}
+\nopt{erosqnative}{
 To automatically install Rockbox, download the official installer and
 housekeeping tool \caps{Rockbox Utility}. It allows you to:
 \begin{itemize}
@@ -404,10 +409,6 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
 Prebuilt binaries for Windows, Linux and Mac OS X are
 available at the \wikilink{RockboxUtility} wiki page.\\
 
-\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
-\note{Rockbox Utility does not currently support the \playertype{} and you will
-therefore need to follow the manual install instructions below.\\}}
-
 When first starting \caps{Rockbox Utility} run ``Autodetect'',
 found in the configuration dialog (File $\rightarrow$ Configure). Autodetection
 can detect most player types. If autodetection fails or is unable to detect
@@ -416,6 +417,11 @@ the location of the \dap{} in your filesystem. On Windows, this is the drive
 letter the \dap{} gets assigned, on other systems this is a path in the
 filesystem.\\*
 
+\opt{erosqnative}{
+  Due to some quirks with the original firmware on the \playertype{}, you will need
+  to match the brand and original firmware version in \caps{Rockbox Utility} to your
+  player. This, unfortunately, cannot be done automatically by \caps{Rockbox Utility}.
+}
 
 \opt{iriverh100,iriverh300}{
   Rockbox Utility will ask you for a compatible copy of the original
@@ -493,6 +499,7 @@ filesystem.\\*
     utility like mentioned in the prerequisites section to extract the
     \fname{firmware.sb} from the \fname{.zip} file to your desktop.}
 }
+}
 \subsubsection{Choosing a Rockbox version}\label{sec:choosing_version}
 
 There are three different versions of Rockbox available from the
@@ -504,6 +511,10 @@ select either ``Minimal Installation'' or ``Complete Installation'' from the
 ``Quick Start'' tab, then Rockbox Utility will automatically install the
 release version of Rockbox. Using the ``Installation'' tab will allow you
 to select which version you wish to install.
+
+\note{\textbf{There are two different versions of Rockbox for the \playertype{}. This manual only
+refers to the \playertype{} Native version, and thus when downloading Rockbox, ensure
+that the download name includes "erosqnative"!}}
 
 \begin{description}
 
@@ -534,13 +545,16 @@ Please now go to \reference{ref:finish_install} to complete the installation pro
 
 \subsection{Manual Installation}
 
+\nopt{erosqnative}{
 The manual installation method is still available to you, should you need or desire it
 by following the instructions below. If you have used Rockbox Utility
 to install Rockbox, then you do not need to follow the next section and can skip
-straight to \reference{ref:finish_install}
+straight to \reference{ref:finish_install}.
+}
 
-\opt{gigabeats}{\subsubsection{Installing the bootloader}
-    \input{getting_started/gigabeats_install.tex}
+\opt{gigabeats,erosqnative}{\subsubsection{Installing the bootloader}
+    \opt{gigabeats}{input{getting_started/gigabeats_install.tex}}
+    \opt{erosqnative}{\input{getting_started/hibyos_nativeinstall.tex}}
 }
 
 \subsubsection{Installing the firmware}\label{sec:installing_firmware}
@@ -551,15 +565,47 @@ partition (containing at least a file called \fname{nk.bin}) and
 the main data partition. Rockbox \emph{must} be installed onto the main
 data partition.}}
 
+\opt{erosqnative}{
+  Rockbox itself is installed to the SD card, and unlike the Bootloader,
+  the installation of it does not modify the device \textit{at all}.
+  Please follow the instructions below to install it to your SD card.
+
+  \note{Remember that this operation will need to be repeated if you switch to a different SD card!}
+}
+
 \begin{enumerate}
 \item Download your chosen version of Rockbox from the links in the
   previous section.
 
+  \opt{erosqnative}{
+    \note{\textbf{There are two different versions of Rockbox for the \playertype{}. This manual only
+      refers to the \playertype{} Native version, and thus when downloading Rockbox, ensure
+      that the download name includes "erosqnative"!}}
+
+    \item Ensure that your SD card is formatted as FAT32, \textit{not exFAT!} Reformat
+      the SD card with the original firmware's formatting tool by doing the following:
+
+      \begin{enumerate}
+        \item Insert the SD card into the \dap{}.
+        \item With the player OFF, boot the \dap{} into the original firmware by
+          holding \ButtonPlay{} and \ButtonPower{}.
+        \item Ensure that any files on the card you want to save are backed up,
+          as this operation will wipe the drive entirely.
+        \item Go to \fname{System Settings --> Reset --> Format TF Card} in the stock
+          firmware to format the SD card to FAT32.
+      \end{enumerate}
+  }
+
 \item Connect your \dap{} to the computer via USB
-  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}
-  { in MSC mode }
-  \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
-  the manual that came with your \dap{}.
+  \nopt{erosqnative}{
+    \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}
+    { in MSC mode }
+    \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
+    the manual that came with your \dap{}.
+  }
+  \opt{erosqnative}{by, with the player OFF, holding \ButtonPlay{} and \ButtonPower{}
+    to boot into the original firmware, and then plugging in the USB cable.
+  }
 
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract
@@ -585,7 +631,7 @@ have a directory called \fname{.rockbox}, which contains all the files needed
 by Rockbox, in the main directory of your \daps{} drive.
 
 \opt{swcodec}{%
-    \nopt{gigabeats}{%
+    \nopt{gigabeats,erosqnative}{%
     \subsubsection{Installing the bootloader}
         \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
         \opt{mpiohd200,mpiohd300}{\input{getting_started/mpio_install.tex}}
@@ -608,7 +654,6 @@ by Rockbox, in the main directory of your \daps{} drive.
         \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
         \opt{xduoox3ii,xduoox20,agptekrocker,aigoerosq}{\input{getting_started/hibyos_install.tex}}
         \opt{fiiom3k,shanlingq1}{\input{getting_started/jztool_install.tex}}
-        \opt{erosqnative}{\input{getting_started/hibyos_nativeinstall.tex}}
     }
 }
 
@@ -705,7 +750,7 @@ by Rockbox, in the main directory of your \daps{} drive.
 \opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
 
 \opt{fiiom3k,shanlingq1,erosqnative}{
-  Safely eject / unmount your \dap{}.
+  Safely eject / unmount your \dap{} and reboot it.
 }
 
 
@@ -791,17 +836,19 @@ need to be updated.\\
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus}{
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
 
 \subsection{Automatic Uninstallation}
-\opt{gigabeats}{\note{Rockbox can only be uninstalled manually for now.}}
+\opt{gigabeats,erosqnative}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
 
-You can uninstall Rockbox automatically by using Rockbox Utility. If you
-installed Rockbox manually you can still use Rockbox Utility for uninstallation
-but will not be able to do this selectively.
+\nopt{erosqnative}{
+  You can uninstall Rockbox automatically by using Rockbox Utility. If you
+  installed Rockbox manually you can still use Rockbox Utility for uninstallation
+  but will not be able to do this selectively.
+}
 
 \opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
@@ -889,12 +936,12 @@ completely follow the manual uninstallation instructions below.}}
     update file for your brand player and original firmware version number. The
     uninstallation procedure can then be done as follows:
 
-    \begin{itemize}
+    \begin{enumerate}
       \item If the update file is unmodified, use \fname{tools/hibyos\_nativepatcher/hibyos\_nativepatcher.sh} to mark the original bootloader for updating
       \item Place the update file on the SD card and ensure it is named \emph{exactly} \fname{update.upt}
       \item Boot into the Rockbox bootloader menu: With the player off, hold \ButtonVolUp{} + \ButtonPower{}
       \item Select "Aigo Recovery"
-    \end{itemize}
+    \end{enumerate}
 }
 
 \nopt{gigabeats}{
@@ -931,7 +978,14 @@ completely follow the manual uninstallation instructions below.}}
 }
 
 \section{Troubleshooting}
+\opt{erosqnative}{
+  For common troubleshooting issues, please see wiki page ErosQNativeTroubleshooting
+  at \url{https://www.rockbox.org/wiki/ErosQNativeTroubleshooting.html}.
+  
+  For more detailed information about this device, please see the wiki page AIGOErosQK
+  at \url{https://www.rockbox.org/wiki/AIGOErosQK}.}
 \begin{description}
+
 \opt{sansa,ipod}{
   \item[Bootloader install problems]
   If you have trouble installing the bootloader,
@@ -965,9 +1019,15 @@ completely follow the manual uninstallation instructions below.}}
   file to the proper location, and should not happen when Rockbox has been
   installed with Rockbox Utility.
 
+  \nopt{erosqnative}{
   To fix this, either install Rockbox with the Rockbox Utility which will take care
   of this for you, or recheck the Manual Install section to see where the files
   need to be located.
+  }
+  \opt{erosqnative}{
+    To fix this, re-copy the entirety of the \fname{.zip} file's contents to the root
+    of the SD card and reboot the device.
+  }
 \end{description}
 
 \optv{gigabeats}{

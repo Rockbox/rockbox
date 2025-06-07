@@ -69,8 +69,11 @@ The areas of the touchscreen in the 3$\times$3 grid mode are in turn referred as
 \end{table}
 }%
 Whenever a button name is prefixed by ``Long'', a long press of approximately
-one second should be performed on that button. The buttons are described in
+one second should be performed on that button.
+
+The buttons are described in
 detail in the following paragraph.
+
 \blind{%
   Additional information for blind users is available on the Rockbox website at
   \wikilink{BlindFAQ}.
@@ -519,6 +522,26 @@ detail in the following paragraph.
   the bottom panel of the \dap{}.
   }
   %
+  \opt{erosqnative}{
+  Hold or lay the \dap{} so that the side with the controls and LCD is facing towards you.
+  Below the LCD is a scrollwheel, with clockwise movement being \ButtonScrollFwd{} and counterclockwise
+  movement being \ButtonScrollBack{}. In the center of the scrollwheel is \ButtonPlay{}.
+
+  To the right of the scrollwheel are a pair of buttons, the upper one being \ButtonPrev{} (which doubles as \ButtonRW{})
+  and the lower one being \ButtonNext{} (which doubles as \ButtonFF{}). Below and to the left of the scrollwheel is the
+  \ButtonMenu{} button, and below and to the right of the scrollwheel is the \ButtonBack{} button.
+
+  \note{While every effort was made to make the scrollwheel as reliable as possible, it is not perfect and sometimes
+  can go two menu entries for one indent on the wheel. Fortunately, Rockbox menus (as well as original firmware menus)
+  also allow using the \ButtonPrev{} and \ButtonNext{} buttons to scroll through them, which can be much more reliable.}
+
+  On the right-hand edge of the device is, from top to bottom, \ButtonVolUp{}, \ButtonVolDown{}, and the microSD
+  slot.
+
+  On the top edge of the device is the \ButtonPower{} button.
+
+  On the bottom edge of the device is, from left to right, the headphone jack, the USB port, and the line-out jack.
+  }
 }
 
 \subsection{Turning the \dap{} on and off}
@@ -750,9 +773,9 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 
     \subsection{Entering the recovery menu}
     You can access the Rockbox bootloader's ``recovery menu'' by holding
-    \ActionBootRecoveryMenu{}. This menu can be used to connect your \dap{}
-    over USB to transfer files, update the Rockbox bootloader, or revert to a
-    bootloader you've previously backed up.
+    \ActionBootRecoveryMenu{} while powering on the player. This menu can be
+    used to connect your \dap{} over USB to transfer files, update the Rockbox
+    bootloader, or revert to a bootloader you've previously backed up.
     }
 
   }
