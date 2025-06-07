@@ -30,11 +30,6 @@ enum date_format{
     JAPANESE,
 };
 
-enum hour_format{
-    H24,
-    H12
-};
-
 enum clock_modes{
     ANALOG,
     DIGITAL,
@@ -50,9 +45,7 @@ enum backlight_handling{
 
 
 struct general_settings{
-    int hour_format;/* 0:24h, 1:12h*/
     int date_format;
-    bool show_counter;
     bool save_settings;
     bool idle_poweroff;
     int backlight;
@@ -78,6 +71,7 @@ struct clock_settings{
 };
 
 extern struct clock_settings clock_settings;
+extern bool show_counter;
 
 /* settings are saved to this location */
 #define settings_filename PLUGIN_APPS_DIR "/.clock_settings"

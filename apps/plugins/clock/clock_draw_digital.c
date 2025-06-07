@@ -50,13 +50,13 @@ void digital_clock_draw(struct screen* display,
     else
         display_colon=true;
 
-    if(settings->general.hour_format==H12 && time->hour>12)/* AM/PM format */
+    if(rb->global_settings->timeformat && time->hour>12)/* AM/PM format */
         hour -= 12;
 
     buffer_printf(buffer, buffer_pos, "%02d", hour);
     buffer_printf(buffer, buffer_pos, "%c", display_colon?':':' ');
     buffer_printf(buffer, buffer_pos, "%02d", time->minute);
-    if(settings->general.hour_format==H12){
+    if(rb->global_settings->timeformat){
         if(time->hour>=12){
             buffer_printf(buffer, buffer_pos, "P");/* PM */
         }else{

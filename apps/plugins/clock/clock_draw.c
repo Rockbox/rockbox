@@ -87,7 +87,7 @@ void clock_draw_restore_colors(void){
 
 void clock_draw(struct screen* display, struct time* time,
                 struct counter* counter){
-    if(!clock_settings.general.show_counter)
+    if(!show_counter)
         counter=0;
     int skin=clock_settings.skin[clock_settings.mode];
     skin_set_background(display, clock_settings.mode, skin);

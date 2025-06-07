@@ -46,8 +46,9 @@ enum settings_file_status{
 };
 
 struct clock_settings clock_settings;
+bool show_counter;
 
-/* The settings as they exist on the hard disk, so that 
+/* The settings as they exist on the hard disk, so that
  * we can know at saving time if changes have been made */
 struct clock_settings hdd_clock_settings;
 
@@ -61,9 +62,7 @@ void clock_settings_reset(struct clock_settings* settings){
     for(i=0;i<NB_CLOCK_MODES;i++){
         settings->skin[i]=0;
     }
-    settings->general.hour_format = H12;
     settings->general.date_format = EUROPEAN;
-    settings->general.show_counter = true;
     settings->general.save_settings = true;
     settings->general.idle_poweroff=true;
     settings->general.backlight = ROCKBOX_SETTING;
