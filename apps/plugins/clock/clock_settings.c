@@ -156,58 +156,51 @@ static void draw_message(struct screen* display, int msg, int y){
                                     (message->slide_height*y));
 }
 
-void load_settings(void){
+void load_settings(void)
+{
     struct screen* display;
-    FOR_NB_SCREENS(i){
-        display=rb->screens[i];
-        display->clear_display();
-        draw_logo(display);
-        draw_message(display, MESSAGE_LOADING, 1);
-        display->update();
-    }
+    enum settings_file_status load_status = LOADED;
 
-    enum settings_file_status load_status=
-        clock_settings_load(&clock_settings, settings_filename);
+    if (rb->file_exists(settings_filename))
+        load_status = clock_settings_load(&clock_settings, settings_filename);
+    else
+        clock_settings_reset(&clock_settings);
 
-    FOR_NB_SCREENS(i){
-        display=rb->screens[i];
-        if(load_status==LOADED)
-            draw_message(display, MESSAGE_LOADED, 1);
-        else
+    if (load_status != LOADED)
+    {
+        FOR_NB_SCREENS(i)
+        {
+            display = rb->screens[i];
+            display->clear_display();
+            draw_logo(display);
             draw_message(display, MESSAGE_ERRLOAD, 1);
-        display->update();
+            display->update();
+        }
+        rb->sleep(HZ);
     }
     rb->storage_sleep();
-    rb->sleep(HZ);
 }
 
-void save_settings(void){
+void save_settings(void)
+{
     struct screen* display;
-    if(!settings_needs_saving(&clock_settings))
-        return;
+    enum settings_file_status save_status = SAVED;
 
-    FOR_NB_SCREENS(i){
-        display=rb->screens[i];
-        display->clear_display();
-        draw_logo(display);
+    if (settings_needs_saving(&clock_settings))
+        save_status = clock_settings_save(&clock_settings, settings_filename);
 
-        draw_message(display, MESSAGE_SAVING, 1);
-
-        display->update();
-    }
-    enum settings_file_status load_status=
-        clock_settings_save(&clock_settings, settings_filename);
-
-    FOR_NB_SCREENS(i){
-        display=rb->screens[i];
-
-        if(load_status==SAVED)
-            draw_message(display, MESSAGE_SAVED, 1);
-        else
+    if (save_status != SAVED)
+    {
+        FOR_NB_SCREENS(i)
+        {
+            display = rb->screens[i];
+            display->clear_display();
+            draw_logo(display);
             draw_message(display, MESSAGE_ERRSAVE, 1);
-        display->update();
+            display->update();
+        }
+        rb->sleep(HZ);
     }
-    rb->sleep(HZ);
 }
 
 void save_settings_wo_gui(void){
