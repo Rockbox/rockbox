@@ -42,6 +42,7 @@
 #ifdef HAVE_ALBUMART
 #include "playback.h"
 #endif
+#include "appevents.h"
 
  /* 1 top, 1 bottom, 2 on either side, 1 for the icons
   * if enough space, top and bottom have 2 lines */
@@ -51,6 +52,18 @@
   * and between text and parent boundaries */
 #define MARGIN 10
 #define CENTER_ICONAREA_SIZE (MARGIN+8*2)
+
+static bool redraw;
+
+static void quickscreen_update_callback(unsigned short id,
+                                        void *data, void *userdata)
+{
+    (void)id;
+    (void)data;
+    (void)userdata;
+
+    redraw = true;
+}
 
 static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
                                         struct screen *display,
@@ -335,6 +348,8 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 
     push_current_activity(ACTIVITY_QUICKSCREEN);
 
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_update_callback, NULL);
+
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
@@ -355,6 +370,13 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
     if (qs->items[QUICKSCREEN_LEFT] != qs->items[QUICKSCREEN_RIGHT])
         talk_qs_option(qs->items[QUICKSCREEN_RIGHT], true);
     while (true) {
+        if (redraw)
+        {
+            redraw = false;
+            FOR_NB_SCREENS(i)
+                gui_quickscreen_draw(qs, &screens[i], &parent[i],
+                                     vps[i], &vp_icons[i]);
+        }
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
@@ -369,9 +391,8 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         {
             ret |= QUICKSCREEN_CHANGED;
             can_quit = true;
-            FOR_NB_SCREENS(i)
-                gui_quickscreen_draw(qs, &screens[i], &parent[i],
-                                     vps[i], &vp_icons[i]);
+            redraw = true;
+
             if (qs->callback)
                 qs->callback(qs);
         }
@@ -411,6 +432,8 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         pop_current_activity_without_refresh();   /* transition to Shortcuts */
     else
         pop_current_activity();
+
+    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, quickscreen_update_callback, NULL);
 
     return ret;
 }
