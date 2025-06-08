@@ -39,9 +39,6 @@
 #include "option_select.h"
 #include "debug.h"
 #include "shortcuts.h"
-#ifdef HAVE_ALBUMART
-#include "playback.h"
-#endif
 #include "appevents.h"
 
  /* 1 top, 1 bottom, 2 on either side, 1 for the icons
@@ -438,9 +435,6 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 int quick_screen_quick(int button_enter)
 {
     struct gui_quickscreen qs;
-#ifdef HAVE_ALBUMART
-    int old_album_art = global_settings.album_art;
-#endif
     bool usb = false;
 
     for (int i = 0; i < 4; ++i)
@@ -453,13 +447,7 @@ int quick_screen_quick(int button_enter)
 
     int ret = gui_syncquickscreen_run(&qs, button_enter, &usb);
     if (ret & QUICKSCREEN_CHANGED)
-    {
         settings_save();
-#ifdef HAVE_ALBUMART
-        if (old_album_art != global_settings.album_art)
-            set_albumart_mode(global_settings.album_art);
-#endif
-    }
     if (usb)
         return QUICKSCREEN_IN_USB;
     return ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU ? QUICKSCREEN_GOTO_SHORTCUTS_MENU :

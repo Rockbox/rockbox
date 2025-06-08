@@ -47,9 +47,6 @@
 #include "screens.h"
 #include "talk.h"
 #include "yesno.h"
-#ifdef HAVE_ALBUMART
-#include "playback.h"
-#endif
 
 #define MAX_SHORTCUT_NAME 64
 #define SHORTCUTS_HDR "[shortcut]"

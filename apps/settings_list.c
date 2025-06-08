@@ -656,6 +656,13 @@ static void playback_frequency_callback(int sample_rate_hz)
 }
 #endif /* HAVE_PLAY_FREQ */
 
+#ifdef HAVE_ALBUMART
+static void albumart_callback(int mode)
+{
+    set_albumart_mode(mode);
+}
+#endif
+
 /* perform shuffle/unshuffle of the current playlist based on the boolean provided */
 static void shuffle_playlist_callback(bool shuffle)
 {
@@ -1032,12 +1039,12 @@ const struct settings_list settings[] = {
 #endif /* HAVE_PLAY_FREQ */
 
 #ifdef HAVE_ALBUMART
-    CHOICE_SETTING(0, album_art, LANG_ALBUM_ART, 1,
-                      "album art", "off,prefer embedded,prefer image file",
-                      NULL, 3,
-                      ID2P(LANG_OFF),
-                      ID2P(LANG_PREFER_EMBEDDED),
-                      ID2P(LANG_PREFER_IMAGE_FILE)),
+    CHOICE_SETTING(F_CB_ON_SELECT_ONLY|F_CB_ONLY_IF_CHANGED, album_art,
+                   LANG_ALBUM_ART, 1, "album art",
+                   "off,prefer embedded,prefer image file",
+                   albumart_callback, 3,
+                   ID2P(LANG_OFF), ID2P(LANG_PREFER_EMBEDDED),
+                   ID2P(LANG_PREFER_IMAGE_FILE)),
 #endif
 
     /* LCD */
