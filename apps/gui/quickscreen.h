@@ -46,8 +46,6 @@ enum quickscreen_return {
 struct gui_quickscreen
 {
     const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
-    void (*callback)(struct gui_quickscreen * qs); /* called after a
-                                                    item is changed */
 };
 
 extern int quick_screen_quick(int button_enter);

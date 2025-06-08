@@ -392,9 +392,6 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
             ret |= QUICKSCREEN_CHANGED;
             can_quit = true;
             redraw = true;
-
-            if (qs->callback)
-                qs->callback(qs);
         }
         else if (button == button_enter)
             can_quit = true;
@@ -454,7 +451,6 @@ int quick_screen_quick(int button_enter)
             qs.items[i] = NULL;
     }
 
-    qs.callback = NULL;
     int ret = gui_syncquickscreen_run(&qs, button_enter, &usb);
     if (ret & QUICKSCREEN_CHANGED)
     {
