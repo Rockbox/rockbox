@@ -114,7 +114,7 @@ Font.480x800x(16|24): 35-Adobe-Helvetica.fnt
 Font.400x240x(16|24): 15-Adobe-Helvetica.fnt
 Font.360x400x16:      18-Adobe-Helvetica.fnt
 Font.320x480x(16|24|32): 27-Adobe-Helvetica.fnt
-Font.320x240x(16|24): 15-Adobe-Helvetica.fnt
+Font.320x240x(16|24|32): 15-Adobe-Helvetica.fnt
 Font.240x400x(16|24): 16-Adobe-Helvetica.fnt
 Font.240x320x(16|24|32): 18-Adobe-Helvetica.fnt
 Font.220x176x(16|24): 12-Adobe-Helvetica.fnt
