@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "rbpaths.h"
 #include "menu.h"
+#include "dir.h"
 #include "tree.h"
 #include "list.h"
 #include "color_picker.h"
@@ -42,6 +43,7 @@
 #include "viewport.h"
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
+#include "splash.h"
 #include "icons.h"
 #ifdef HAVE_LCD_COLOR
 #include "filetypes.h"
@@ -257,6 +259,11 @@ int browse_folder(void *param)
         .icon = Icon_NOICON,
         .root = info->dir,
     };
+
+    if (!dir_exists(info->dir)) {
+        splash(HZ, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        return GO_TO_PREVIOUS;
+    }
 
     /* if we are in a special settings folder, center the current setting */
     switch(info->show_options)
