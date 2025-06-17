@@ -1364,17 +1364,17 @@
   </source>
   <dest>
     *: none
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "Ține ÎNAPOI = anulare"
-    gigabeatfx,mrobe500: "POWER = anulare"
-    gogearsa9200: "STÂNGA = anulare"
-    iaudiom5,iaudiox5: "REC = anulare"
-    ipod*,mpiohd300,sansac200*: "MENIU = anulare"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = anulare"
-    iriverh100,iriverh120,iriverh300: "STOP = anulare"
-    mrobe100: "DISPLAY = anulare"
-    rtc: "OFF = anulare"
-    samsungyh*: "REW = anulare"
-    vibe500: "C = anulare"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "ÎNAPOI = Anulează"
+    gigabeatfx,mrobe500: "POWER = Anulează"
+    gogearsa9200: "STÂNGA = Anulează"
+    iaudiom5,iaudiox5: "REC = Anulează"
+    ipod*,mpiohd300,sansac200*: "MENIU = Anulează"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Anulează"
+    iriverh100,iriverh120,iriverh300: "STOP = Anulează"
+    mrobe100: "DISPLAY = Anulează"
+    rtc: "OFF = Anulează"
+    samsungyh*: "REW = Anulează"
+    vibe500: "C = Anulează"
   </dest>
   <voice>
     *: none
