@@ -367,6 +367,28 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
     return sbr;
 }
 
+static void read_mp4_tag_i_from_n(int fd, int *i, char** i_from_n_string, uint32_t size, unsigned int *buffer_left, char **buffer)
+{
+    uint16_t x[3];
+    *i = 0;
+    *i_from_n_string = NULL;
+    if (read_mp4_tag(fd, size, (char*) &x, sizeof(x))  == sizeof(x))
+    {
+        *i = betoh16(x[1]);
+        int n = betoh16(x[2]);
+        if (n > 0)
+        {
+            int string_length = snprintf(*buffer, *buffer_left, "%d/%d", *i, n) + 1;
+            if (string_length <= *buffer_left)
+            {
+                *i_from_n_string = *buffer;
+                *buffer += string_length;
+                *buffer_left -= string_length;
+            }
+        }
+    }
+}
+
 static bool read_mp4_tags(int fd, struct mp3entry* id3, 
                           uint32_t size_left)
 {
@@ -456,21 +478,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             break;
 
         case MP4_disk:
-            {
-                unsigned short n[2];
-                id3->discnum = 0;
-                if (read_mp4_tag(fd, size, (char*) &n, sizeof(n))  == sizeof(n))
-                    id3->discnum = betoh16(n[1]);
-            }
+            read_mp4_tag_i_from_n(fd, &id3->discnum, &id3->disc_string, size, &buffer_left, &buffer);
             break;
 
         case MP4_trkn:
-            {
-                unsigned short n[2];
-                id3->tracknum = 0;
-                if (read_mp4_tag(fd, size, (char*) &n, sizeof(n)) == sizeof(n))
-                    id3->tracknum = betoh16(n[1]);
-            }
+            read_mp4_tag_i_from_n(fd, &id3->tracknum, &id3->track_string, size, &buffer_left, &buffer);
             break;
 
 #ifdef HAVE_ALBUMART
