@@ -813,8 +813,14 @@ you turn the unit on, Rockbox should load.}
 }
 
 \section{Updating Rockbox}
-Rockbox can be easily updated with Rockbox Utility.
-You can also update Rockbox manually -- download a Rockbox build
+\nopt{erosqnative}{
+Rockbox can be easily updated with Rockbox Utility. You can also update Rockbox
+}
+\opt{erosqnative}{
+The Native Port to \playername{} is not supported by Rockbox Utility yet, so Rockbox Utility cannot update it.
+Rockbox is easily updated
+}
+manually -- download a Rockbox build
 as detailed above, and unzip the build to the root directory
 of your \dap{} as in the manual installation stage. If your unzip
 program asks you whether to overwrite files, choose the ``Yes to all'' option.
@@ -831,8 +837,10 @@ The new build will be installed over your current build.\\
 The bootloader only changes rarely, and should not normally
 need to be updated.\\
 
+\nopt{erosqnative}{
 \note{If you use Rockbox Utility be aware that it cannot detect manually
         installed components.}
+}
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
@@ -1016,8 +1024,9 @@ completely follow the manual uninstallation instructions below.}}
   \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''}
   from the bootloader, then the bootloader cannot find the Rockbox firmware.
   This is usually a result of not extracting the contents of the \fname{.zip}
-  file to the proper location, and should not happen when Rockbox has been
-  installed with Rockbox Utility.
+  file to the proper location\nopt{erosqnative}{, and should not happen when Rockbox has been
+  installed with Rockbox Utility.}\opt{erosqnative}{. It could also be due to the SD card
+  not being formatted correctly to FAT32.}
 
   \nopt{erosqnative}{
   To fix this, either install Rockbox with the Rockbox Utility which will take care
@@ -1025,8 +1034,9 @@ completely follow the manual uninstallation instructions below.}}
   need to be located.
   }
   \opt{erosqnative}{
-    To fix this, re-copy the entirety of the \fname{.zip} file's contents to the root
-    of the SD card and reboot the device.
+    To fix this, ensure that the SD card is formatted to FAT32 (the original firmware
+    can be used to do this easily), re-copy the entirety of the \fname{.zip} file's
+    contents to the root of the SD card and reboot the device.
   }
 \end{description}
 
