@@ -378,7 +378,7 @@ static void read_mp4_tag_i_from_n(int fd, int *i, char** i_from_n_string, uint32
         int n = betoh16(x[2]);
         if (n > 0)
         {
-            int string_length = snprintf(*buffer, *buffer_left, "%d/%d", *i, n) + 1;
+            unsigned int string_length = snprintf(*buffer, *buffer_left, "%d/%d", *i, n) + 1;
             if (string_length <= *buffer_left)
             {
                 *i_from_n_string = *buffer;
