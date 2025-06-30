@@ -503,19 +503,11 @@ void browse_cuesheet(struct cuesheet *cue)
                 if (!startit || !*cue->file)
                     break;
 
-                /* check that this cue is the same one that would be found by
-                   a search from playback */
                 char file[MAX_PATH];
                 strmemccpy(file, cue->file, MAX_PATH);
-
-                if (!strcmp(cue->path, file) || /* if embedded */
-                    (search_for_cuesheet(file, &cue_file) &&
-                     !strcmp(cue->path, cue_file.path)))
-                {
-                    char *fname = strrsplt(file, '/');
-                    char *dirname = fname <= file + 1 ? "/" : file;
-                    bookmark_play(dirname, 0, elapsed, 0, current_tick, fname);
-                }
+                char *fname = strrsplt(file, '/');
+                char *dirname = fname <= file + 1 ? "/" : file;
+                bookmark_play(dirname, 0, elapsed, 0, current_tick, fname);
                 break;
                 } /* ACTION_STD_OK */
 
