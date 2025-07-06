@@ -2714,6 +2714,37 @@ static bool dbg_syscfg(void) {
 
     return simplelist_show_list(&info);
 }
+
+#define FLASH_PAGES (FLASH_SIZE >> 12)
+#define FLASH_PAGE_SIZE (FLASH_SIZE >> 8)
+
+static bool dbg_bootflash_dump(void) {
+    splashf(HZ, "Please wait...");
+
+    int fd;
+
+    fd = creat("/bootflash.bin", 0666);
+
+    if (fd < 0)
+    {
+        splashf(HZ * 3, "Error opening file");
+        return false;
+    }
+
+    uint8_t page[FLASH_PAGE_SIZE];
+    bootflash_init(SPI_PORT);
+
+    for (int i = 0; i < FLASH_PAGES; i++) {
+        bootflash_read(SPI_PORT, i << 12, FLASH_PAGE_SIZE, page);
+        write(fd, page, FLASH_PAGE_SIZE);
+    }
+
+    bootflash_close(SPI_PORT);
+    close(fd);
+    splashf(HZ * 3, "Dump saved to /bootflash.bin");
+
+    return false;
+}
 #endif
 
 /****** The menu *********/
@@ -2833,6 +2864,7 @@ static const struct {
 
 #if defined(IPOD_6G) && !defined(SIMULATOR)
         {"View SysCfg", dbg_syscfg },
+        {"Dump bootflash to file", dbg_bootflash_dump },
 #endif
 };
 
