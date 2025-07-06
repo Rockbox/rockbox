@@ -560,6 +560,79 @@ end:
         sleep(HZ/100);
 }
 
+static void print_bootloader_hash(void)
+{
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    line = 0;
+
+    struct Im3Info hinfo;
+    int rc = im3_read(NORBOOT_OFF, &hinfo, NULL);
+
+    if (rc != 0) {
+        printf("Error loading the primary bootloader: %d", rc);
+        goto end;
+    }
+
+    unsigned char primary_hash[SIGN_SZ];
+
+    memcpy(primary_hash, hinfo.u.enc12.data_sign, SIGN_SZ);
+    hwkeyaes(HWKEYAES_DECRYPT, HWKEYAES_UKEY, primary_hash, SIGN_SZ);
+
+    unsigned bl_nor_sz = im3_nor_sz(&hinfo);
+    rc = im3_read(NORBOOT_OFF + bl_nor_sz, &hinfo, NULL);
+
+    if (rc == 0) {
+        // Rockbox bootloader is installed as primary
+        // Stock bootloader is backed up
+        unsigned char backup_hash[SIGN_SZ];
+        memcpy(backup_hash, hinfo.u.enc12.data_sign, SIGN_SZ);
+        hwkeyaes(HWKEYAES_DECRYPT, HWKEYAES_UKEY, backup_hash, SIGN_SZ);
+
+        printf("Rockbox bootloader hash:");
+
+        for (int i = 0; i < SIGN_SZ; i++) {
+            lcd_putsf(i * 2, line, "%02X", primary_hash[i]);
+        }
+
+        line += 2;
+        lcd_update();
+
+        printf("Stock bootloader hash:");
+
+        for (int i = 0; i < SIGN_SZ; i++) {
+            lcd_putsf(i * 2, line, "%02X", backup_hash[i]);
+        }
+
+        line++;
+        lcd_update();
+    }
+    else {
+        // Stock bootloader is installed as primary
+        // No backup bootloader
+        printf("Rockbox bootloader is not installed!");
+        line++;
+
+        printf("Stock bootloader hash:");
+
+        for (int i = 0; i < SIGN_SZ; i++) {
+            lcd_putsf(i * 2, line, "%02X", primary_hash[i]);
+        }
+
+        line++;
+        lcd_update();
+    }
+
+end:
+    line++;
+    while (button_status() != BUTTON_NONE)
+        sleep(HZ/100);
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Press SELECT to continue");
+    while (button_status() != BUTTON_SELECT)
+        sleep(HZ/100);
+}
+
 #ifdef HAVE_SERIAL
 
 #define FLASH_PAGES (FLASH_SIZE >> 12)
@@ -610,6 +683,7 @@ static void devel_menu(void)
         "GPIO info",
 #if defined(IPOD_6G) || defined(IPOD_NANO3G)
         "Show SysCfg",
+        "Show bootloader hash",
 #ifdef HAVE_SERIAL
         "Dump bootflash to UART",
 #endif
@@ -627,6 +701,7 @@ static void devel_menu(void)
         gpio_info,
 #if defined(IPOD_6G) || defined(IPOD_NANO3G)
         print_syscfg,
+        print_bootloader_hash,
 #ifdef HAVE_SERIAL
         dump_bootflash,
 #endif
