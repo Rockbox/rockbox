@@ -123,9 +123,9 @@ static int show_credits(void)
 
 static int show_legal(void)
 {
-    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", "/.rockbox/docs/COPYING.txt") != PLUGIN_OK)
+    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", ROCKBOX_DIR "/docs/COPYING.txt") != PLUGIN_OK)
         show_info();
-    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", "/.rockbox/docs/LICENSES.txt") != PLUGIN_OK)
+    if (plugin_load(VIEWERS_DIR "/text_viewer.rock", ROCKBOX_DIR "/docs/LICENSES.txt") != PLUGIN_OK)
         show_info();
     return 0;
 }
