@@ -31,6 +31,7 @@
 # - Igor Poretsky
 # - Dmitry Prozorov
 # - Fedor Pomazkov
+# - Vladislav Voronichev
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -2921,57 +2922,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPINDOWN
   desc: in settings_menu
   user: core
@@ -3633,8 +3583,8 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500,rtc: "ВЫКЛ. = Отмена"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "НАЗАД = Отмена"
+    gigabeatfx,mrobe500,rtc: "ВЫКЛ. = Отмена"
     gogearsa9200: "ЛЕВО = Отмена"
     iaudiom5,iaudiox5: "ЗАПИСЬ = Отмена"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Отмена"
@@ -3646,7 +3596,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5899,7 +5848,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Сканирование МГц"
   </voice>
 </phrase>
 <phrase>
@@ -6169,7 +6118,7 @@
     *: "Ошибка при чтении %s"
   </dest>
   <voice>
-    *: ""
+    *: "Ошибка при чтении"
   </voice>
 </phrase>
 <phrase>
@@ -7116,8 +7065,8 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВЫБОР = Установить"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "ВОСПР. = Установить"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВЫБОР = Установить"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Установить"
     mpiohd300: "ENTER = Установить"
     mrobe500: "СЕРДЦЕ = Установить"
@@ -7126,7 +7075,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7862,20 +7810,6 @@
   <voice>
     *: none
     headphone_detection: "Пауза при отключении наушников"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12201,16 +12135,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Сменить Статус"
+    *: ""
   </dest>
   <voice>
-    *: "Сменить Статус"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12271,13 +12205,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Настройка Главного Меню Rockbox"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -12590,20 +12524,6 @@
   </dest>
   <voice>
     *: "Обложек не найдено"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12960,20 +12880,6 @@
   <voice>
     *: none
     pitchscreen: "Полутоновый режим"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16993,5 +16899,19 @@
   </dest>
   <voice>
     *: "Конец плэйлиста. Воспроизвести сначала?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Сортировать плейлисты"
+  </dest>
+  <voice>
+    *: "Сортировать плейлисты"
   </voice>
 </phrase>
