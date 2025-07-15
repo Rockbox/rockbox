@@ -964,6 +964,53 @@ mipsellinuxcc () {
  prefixtools "mipsel-rockbox-linux-gnu-"
 }
 
+rgnanocc () {
+    if [ -z "$FUNKEY_SDK_PATH" ]; then
+        echo "ERROR: You need the FunKey-SDK installed and have the FUNKEY_SDK_PATH"
+        echo "environment variable point to the root directory of the FunKey-SDK."
+        echo "More info at https://wiki.funkey-project.com/wiki/Setting_up_the_SDK"
+        exit
+    fi
+
+    $FUNKEY_SDK_PATH/relocate-sdk.sh
+
+    arch="arm"
+    arch_version="7"
+    arch_profile="classic"
+
+    CC=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-gcc
+    CPP=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-cpp
+    LD=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-ld
+    AR=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-gcc-ar
+    AS=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-as
+    OC=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-objcopy
+    WINDRES=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-windres
+    DLLTOOL=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-dlltool
+    DLLWRAP=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-dllwrap
+    RANLIB=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-gcc-ranlib
+
+    GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib// -e s/\ -Wundef//`
+
+    if [ "yes" = "$use_debug" ]; then
+        GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`
+    fi
+
+    GCCOPTS="$GCCOPTS -fno-builtin -g -Wno-unused-result"
+    GCCOPTS="$GCCOPTS -I$FUNKEY_SDK_PATH/arm-funkey-linux-musleabihf/sysroot/usr/include/SDL"
+    GCCOPTS="$GCCOPTS -D_GNU_SOURCE=1 -D_REENTRANT -masm-syntax-unified"
+
+    SHARED_LDFLAGS="-shared"
+    SHARED_CFLAGS="-fPIC -fvisibility=hidden"
+
+    LDOPTS="-lm -ldl $LDOPTS -L$FUNKEY_SDK_PATH/arm-funkey-linux-musleabihf/sysroot/usr/lib -lSDL -lpthread"
+    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+
+    thread_support="HAVE_SDL_THREADS"
+    sdl="$FUNKEY_SDK_PATH/arm-funkey-linux-musleabihf/sysroot/usr/bin/sdl-config"
+    rbdir="/FunKey/rockbox"
+}
+
+
 do_bootloader() {
       appsdir='$(ROOTDIR)/bootloader'
       apps="bootloader"
@@ -1720,19 +1767,19 @@ cat <<EOF
  225) NWZ-E580 series      206) Android MIPS     251) 770
  226) NWZ-A10 series       207) Android x86      252) 800
  227) NW-A20 series        208) Samsung YP-R1
- 228) NWZ-A860 series                            ==AgpTek==
- 229) NWZ-S750 series      ==iBasso==            240) Rocker
-                           232) DX50
- ==FiiO==                  233) DX90             ==AIGO==
- 244) M3K Linux                                  245) Eros Q / K
- 246) M3K baremetal        ==xDuoo==             247) Eros Q / K native
-                           241) X3                      (hw1/hw2 bl, all hw rb)
- ==Shanling==              242) X3II             248) Eros Q / K native
- 260) Q1                   243) X20                     (hw3 bl only)
-                                                 249) Eros Q / K native
-                           ==Surfans==                  (hw4 bl only)
- ==Echo project==          280) F28 (WIP)
- 270) Echo R1 (WIP)
+ 228) NWZ-A860 series      209) Anbernic RG Nano ==AgpTek==
+ 229) NWZ-S750 series                            240) Rocker
+                           ==iBasso==
+ ==FiiO==                  232) DX50             ==AIGO==
+ 244) M3K Linux            233) DX90             245) Eros Q / K
+ 246) M3K baremetal                              247) Eros Q / K native
+                           ==xDuoo==                    (hw1/hw2 bl, all hw rb)
+ ==Shanling==              241) X3               248) Eros Q / K native
+ 260) Q1                   242) X3II                    (hw3 bl only)
+                           243) X20              249) Eros Q / K native
+                                                        (hw4 bl only)
+ ==Echo project==          ==Surfans==
+ 270) Echo R1 (WIP)        280) F28 (WIP)
 EOF
 
   buildfor=`input`;
@@ -3598,6 +3645,29 @@ fi
     t_cpu="hosted"
     t_manufacturer="samsungypr"
     t_model="ypr1"
+    ;;
+
+   209|rgnano)
+    target_id=120
+    application="yes"
+    modelname="rgnano"
+    app_type="sdl-app"
+    target="RG_NANO"
+    memory=32
+    uname=`uname`
+    rgnanocc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui"
+    plugins="yes"
+    t_cpu="hosted"
+    t_manufacturer="anbernic"
+    t_model="rgnano"
+    extradefines="$extradefines -DOS_USE_BYTESWAP_H"
     ;;
 
    210|hifietma9)

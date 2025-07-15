@@ -509,6 +509,20 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_PLAY|BUTTON_REPEAT)
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_NEXT         BUTTON_R
+#define FLIPIT_PREV         BUTTON_L
+#define FLIPIT_QUIT         BUTTON_START
+#define FLIPIT_SHUFFLE      BUTTON_B
+#define FLIPIT_SOLVE        BUTTON_X
+#define FLIPIT_STEP_BY_STEP BUTTON_Y
+#define FLIPIT_TOGGLE       BUTTON_A
+
 #else
 #error No keymap defined!
 #endif

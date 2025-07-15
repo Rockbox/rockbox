@@ -714,6 +714,20 @@
 #define BUTTON_SAVE        (BUTTON_MENU|BUTTON_BACK)
 #define BUTTON_SAVE_NAME   "BACK"
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define SOKOBAN_LEFT         BUTTON_LEFT
+#define SOKOBAN_RIGHT        BUTTON_RIGHT
+#define SOKOBAN_UP           BUTTON_UP
+#define SOKOBAN_DOWN         BUTTON_DOWN
+#define SOKOBAN_MENU         BUTTON_START
+#define SOKOBAN_UNDO         BUTTON_B
+#define SOKOBAN_REDO         BUTTON_Y
+#define SOKOBAN_LEVEL_REPEAT BUTTON_R
+#define SOKOBAN_QUIT_REPLAY  BUTTON_X
+#define SOKOBAN_PAUSE        BUTTON_L
+#define BUTTON_SAVE          BUTTON_A
+#define BUTTON_SAVE_NAME    "A"
+
 #else
 #error No keymap defined!
 #endif

@@ -74,7 +74,9 @@ target/hosted/sdl/lcd-bitmap.c
 target/hosted/sdl/lcd-remote-bitmap.c
 #endif
 target/hosted/sdl/lcd-sdl.c
+#if SDL_MAJOR_VERSION > 1
 target/hosted/sdl/window-sdl.c
+#endif
 target/hosted/sdl/system-sdl.c
 #ifdef HAVE_SDL_THREADS
 target/hosted/sdl/filesystem-sdl.c
@@ -86,7 +88,9 @@ target/hosted/sdl/key_to_touch-sdl.c
 #endif
 #ifdef APPLICATION
 target/hosted/sdl/app/load_code-sdl-app.c
+#ifndef RG_NANO
 target/hosted/sdl/app/button-application.c
+#endif
 #ifdef WIN32
 target/hosted/filesystem-win32.c
 #else /* !WIN32 */
@@ -221,6 +225,15 @@ target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
 target/hosted/maemo/maemo-thread.c
 #endif
+
+#ifdef RG_NANO
+target/hosted/sysfs.c
+target/hosted/power-linux.c
+target/hosted/backlight-unix.c
+target/hosted/anbernic/power-rgnano.c
+target/hosted/anbernic/button-rgnano.c
+target/hosted/anbernic/powermgmt-rgnano.c
+#endif /* RG_NANO */
 
 /* Common */
 #ifndef BOOTLOADER

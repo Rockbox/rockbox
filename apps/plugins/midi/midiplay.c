@@ -336,6 +336,14 @@
 #define MIDI_VOL_DOWN     BUTTON_DOWN
 #define MIDI_PLAYPAUSE    BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define MIDI_QUIT         BUTTON_START
+#define MIDI_FFWD         BUTTON_RIGHT
+#define MIDI_REWIND       BUTTON_LEFT
+#define MIDI_VOL_UP       BUTTON_UP
+#define MIDI_VOL_DOWN     BUTTON_DOWN
+#define MIDI_PLAYPAUSE    BUTTON_A
+
 #else
 #error No keymap defined!
 #endif

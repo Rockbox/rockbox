@@ -500,6 +500,8 @@ jewels.160x128x16.bmp
 jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 jewels.220x176x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 240)
+jewels.240x240x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)

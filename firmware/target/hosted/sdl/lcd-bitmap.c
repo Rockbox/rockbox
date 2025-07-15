@@ -142,7 +142,7 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 }
 
-#ifdef HAVE_BACKLIGHT
+#if defined(HAVE_BACKLIGHT) && (SDL_MAJOR_VERSION > 1)
 void sim_backlight(int value)
 {
 #if LCD_DEPTH <= 8
@@ -185,7 +185,9 @@ void lcd_init_device(void)
 #if LCD_DEPTH >= 16
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                                        LCD_DEPTH, 0, 0, 0, 0);
+#if SDL_MAJOR_VERSION > 1
     SDL_SetSurfaceBlendMode(lcd_surface, SDL_BLENDMODE_BLEND);
+#endif
 #elif LCD_DEPTH <= 8
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                                        8, 0, 0, 0, 0);

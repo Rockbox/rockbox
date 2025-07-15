@@ -61,7 +61,9 @@ static const void *pcm_data;
 static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
+#if SDL_MAJOR_VERSION > 1
 static SDL_AudioDeviceID pcm_devid = 0;
+#endif
 
 static struct pcm_udata
 {
@@ -104,18 +106,26 @@ static void pcm_dma_apply_settings_nolock(void)
     wanted_spec.samples = MIX_FRAME_SAMPLES * 2;  /* Should be 2048, ie ~5ms @44KHz */
     wanted_spec.callback = sdl_audio_callback;
     wanted_spec.userdata = &udata;
+
+#if SDL_MAJOR_VERSION > 1
     if (pcm_devid)
         SDL_CloseAudioDevice(pcm_devid);
 
     /* pulseaudio seems to be happier with smaller buffers */
     if (!strcmp("pulseaudio", SDL_GetCurrentAudioDriver()))
         wanted_spec.samples = MIX_FRAME_SAMPLES;
+#endif
 
     /* Open the audio device and start playing sound! */
+#if SDL_MAJOR_VERSION > 1
     if((pcm_devid = SDL_OpenAudioDevice(audiodev, 0, &wanted_spec, &obtained, SDL_AUDIO_ALLOW_SAMPLES_CHANGE)) == 0) {
+#else
+    if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
+#endif
         panicf("Unable to open audio: %s", SDL_GetError());
         return;
     }
+
     switch (obtained.format)
     {
     case AUDIO_U8:
@@ -128,12 +138,14 @@ static void pcm_dma_apply_settings_nolock(void)
     case AUDIO_S16MSB:
         pcm_channel_bytes = 2;
         break;
+#if SDL_MAJOR_VERSION > 1 /* Not supported by SDL 1.2 */
     case AUDIO_S32MSB:
     case AUDIO_S32LSB:
     case AUDIO_F32MSB:
     case AUDIO_F32LSB:
         pcm_channel_bytes = 4;
         break;
+#endif
     default:
         panicf("Unknown sample format obtained: %u",
                 (unsigned)obtained.format);
@@ -161,12 +173,21 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_data = addr;
     pcm_data_size = size;
 
+#if SDL_MAJOR_VERSION > 1
     SDL_PauseAudioDevice(pcm_devid, 0);
+#else
+    SDL_PauseAudio(0);
+#endif
 }
 
 void pcm_play_dma_stop(void)
 {
+#if SDL_MAJOR_VERSION > 1
     SDL_PauseAudioDevice(pcm_devid, 1);
+#else
+    SDL_PauseAudio(1);
+#endif
+
 #ifdef DEBUG
     if (udata.debug != NULL) {
         fclose(udata.debug);

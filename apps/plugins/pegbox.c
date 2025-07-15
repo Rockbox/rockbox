@@ -731,6 +731,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define PEGBOX_SELECT   BUTTON_A
+#define PEGBOX_QUIT     BUTTON_START
+#define PEGBOX_RESTART  BUTTON_B
+#define PEGBOX_LVL_UP   BUTTON_R
+#define PEGBOX_LVL_DOWN BUTTON_L
+#define PEGBOX_UP       BUTTON_UP
+#define PEGBOX_DOWN     BUTTON_DOWN
+#define PEGBOX_RIGHT    BUTTON_RIGHT
+#define PEGBOX_LEFT     BUTTON_LEFT
+
+#define SELECT_TEXT "A"
+#define QUIT_TEXT "START"
+#define RESTART_TEXT "B"
+#define LVL_UP_TEXT "R"
+#define LVL_DOWN_TEXT "L"
+
 #else
 #error "Unsupported keymap!"
 #endif

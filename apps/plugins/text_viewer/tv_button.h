@@ -587,6 +587,18 @@
 #define TV_LINE_DOWN    BUTTON_DOWN
 #define TV_BOOKMARK     (BUTTON_MENU|BUTTON_PLAY)
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define TV_QUIT         BUTTON_START
+#define TV_SCROLL_UP    BUTTON_UP
+#define TV_SCROLL_DOWN  BUTTON_DOWN
+#define TV_SCREEN_LEFT  BUTTON_LEFT
+#define TV_SCREEN_RIGHT BUTTON_RIGHT
+#define TV_MENU         BUTTON_B
+#define TV_AUTOSCROLL   BUTTON_X
+#define TV_LINE_UP      BUTTON_R
+#define TV_LINE_DOWN    BUTTON_L
+#define TV_BOOKMARK     BUTTON_A
+
 #else
 #error No keymap defined!
 #endif

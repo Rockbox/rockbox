@@ -272,6 +272,14 @@
 #define BTN_FIRE        BUTTON_PLAY
 #define BTN_PAUSE       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define BTN_UP          BUTTON_UP
+#define BTN_DOWN        BUTTON_DOWN
+#define BTN_LEFT        BUTTON_LEFT
+#define BTN_RIGHT       BUTTON_RIGHT
+#define BTN_FIRE        BUTTON_A
+#define BTN_PAUSE       BUTTON_START
+
 #else
 #error Unsupported keypad
 #endif

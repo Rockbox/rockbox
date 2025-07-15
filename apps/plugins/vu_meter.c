@@ -468,6 +468,17 @@
 #define LABEL_MENU      "MENU"
 #define LABEL_VOLUME    "UP/DOWN"
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define VUMETER_QUIT    BUTTON_START
+#define VUMETER_HELP    BUTTON_A
+#define VUMETER_MENU    BUTTON_B
+#define VUMETER_UP      BUTTON_UP
+#define VUMETER_DOWN    BUTTON_DOWN
+#define LABEL_HELP      "A"
+#define LABEL_QUIT      "START"
+#define LABEL_MENU      "B"
+#define LABEL_VOLUME    "UP/DOWN"
+
 #else
 #error No keymap defined!
 #endif

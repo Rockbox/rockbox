@@ -2592,6 +2592,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define MP3ENC_DONE     BUTTON_BACK
 #define MP3ENC_SELECT   BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define MP3ENC_PREV     BUTTON_UP
+#define MP3ENC_NEXT     BUTTON_DOWN
+#define MP3ENC_DONE     BUTTON_START
+#define MP3ENC_SELECT   BUTTON_A
+
 #else
 #error No keymap defined!
 #endif

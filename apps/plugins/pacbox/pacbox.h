@@ -418,6 +418,17 @@
 #define PACMAN_COIN    BUTTON_PLAY
 #define PACMAN_MENU    BUTTON_MENU
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define PACMAN_UP      BUTTON_UP
+#define PACMAN_DOWN    BUTTON_DOWN
+#define PACMAN_LEFT    BUTTON_LEFT
+#define PACMAN_RIGHT   BUTTON_RIGHT
+#define PACMAN_1UP     BUTTON_L
+#define PACMAN_2UP     BUTTON_R
+#define PACMAN_COIN    BUTTON_A
+#define PACMAN_MENU    BUTTON_START
+
 #else
 
 #error Keymap not defined!

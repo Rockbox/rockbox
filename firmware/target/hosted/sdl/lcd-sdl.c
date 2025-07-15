@@ -23,7 +23,9 @@
 #include "lcd-sdl.h"
 #include "sim-ui-defines.h"
 #include "system.h" /* for MIN() and MAX() */
+#if SDL_MAJOR_VERSION > 1
 #include "window-sdl.h"
+#endif
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,
@@ -101,6 +103,8 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
     SDL_Rect src = {x_start, y_start, width, height};
     SDL_Rect dest= {ui_x + x_start, ui_y + y_start, width, height};
 
+
+#if SDL_MAJOR_VERSION > 1
     uint8_t alpha;
 
     SDL_LockMutex(window_mutex);
@@ -115,6 +119,14 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
     if (!sdl_window_adjust()) /* already calls sdl_window_render itself */
         sdl_window_render();
     SDL_UnlockMutex(window_mutex);
+#else
+    if (surface->flags & SDL_SRCALPHA) /* alpha needs a black background */
+        SDL_FillRect(gui_surface, &dest, 0);
+
+    SDL_BlitSurface(surface, &src, gui_surface, &dest);
+
+    SDL_Flip(gui_surface);
+#endif
 }
 
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */
@@ -130,7 +142,11 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
         palette[i].b = start->b + (end->b - start->b) * i / (steps - 1);
     }
 
+#if SDL_MAJOR_VERSION > 1
     SDL_SetPaletteColors(surface->format->palette, palette, first , steps);
+#else
+    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, first, steps);
+#endif
 }
 
 int lcd_get_dpi(void)

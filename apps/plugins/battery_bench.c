@@ -259,6 +259,12 @@ struct battery_tables_t {
 #define BATTERY_ON_TXT  "Play"
 #define BATTERY_OFF_TXT "Back"
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define BATTERY_ON  BUTTON_A
+#define BATTERY_OFF BUTTON_X
+#define BATTERY_ON_TXT  "A"
+#define BATTERY_OFF_TXT "X"
+
 #else
 #error "No keymap defined!"
 #endif

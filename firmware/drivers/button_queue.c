@@ -24,7 +24,9 @@
 #include "button.h"
 #ifdef HAVE_SDL
 #include "SDL.h"
+#if SDL_MAJOR_VERSION > 1
 #include "window-sdl.h"
+#endif
 #endif
 
 static struct event_queue button_queue SHAREDBSS_ATTR;
@@ -118,7 +120,7 @@ static inline void button_queue_wait(struct queue_event *evp, int timeout)
     }
 #else
     queue_wait_w_tmo(&button_queue, evp, timeout);
-#ifdef HAVE_SDL
+#if defined(HAVE_SDL) && (SDL_MAJOR_VERSION > 1)
     sdl_window_adjust(); /* Window may have been resized */
 #endif
 #endif

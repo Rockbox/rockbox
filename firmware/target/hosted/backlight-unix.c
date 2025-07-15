@@ -31,11 +31,19 @@
 #include "panic.h"
 #include "lcd.h"
 
+#ifdef BACKLIGHT_RG_NANO
+static const char * const sysfs_bl_brightness =
+    "/sys/class/backlight/backlight/brightness";
+
+static const char * const sysfs_bl_power =
+    "/sys/class/backlight/backlight/bl_power";
+#else
 static const char * const sysfs_bl_brightness =
     "/sys/class/backlight/pwm-backlight.0/brightness";
 
 static const char * const sysfs_bl_power =
     "/sys/class/backlight/pwm-backlight.0/bl_power";
+#endif
 
 bool backlight_hw_init(void)
 {

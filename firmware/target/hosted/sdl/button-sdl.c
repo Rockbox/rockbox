@@ -32,7 +32,9 @@
 #include "backlight.h"
 #include "system.h"
 #include "button-sdl.h"
+#if SDL_MAJOR_VERSION > 1
 #include "window-sdl.h"
+#endif
 #include "sim_tasks.h"
 #include "buttonmap.h"
 #include "debug.h"
@@ -241,10 +243,15 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 
 static bool event_handler(SDL_Event *event)
 {
+#if SDL_MAJOR_VERSION > 1
     SDL_Keycode ev_key;
+#else
+    SDLKey ev_key;
+#endif
 
     switch(event->type)
     {
+#if SDL_MAJOR_VERSION > 1
     case SDL_WINDOWEVENT:
         if (event->window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
             sdl_app_has_input_focus = 1;
@@ -263,6 +270,7 @@ static bool event_handler(SDL_Event *event)
                   last_tick = current_tick;
 #endif
         }
+#endif /* SDL_MAJOR_VERSION */
 #ifdef SIMULATOR
         if (event->window.event == SDL_WINDOWEVENT_FOCUS_LOST
             || event->window.event == SDL_WINDOWEVENT_LEAVE
@@ -578,8 +586,12 @@ static void button_event(int key, bool pressed)
         return;
 #endif
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA) || defined(RG_NANO)
+#ifdef RG_NANO
+    case SDLK_q:
+#else
     case SDLK_LCTRL:
+#endif
         /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
         sys_poweroff();
         break;

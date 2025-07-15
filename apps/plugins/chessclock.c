@@ -408,6 +408,16 @@
 #define CHC_SETTINGS_OK     BUTTON_PLAY
 #define CHC_SETTINGS_CANCEL BUTTON_BACK
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define CHC_QUIT            BUTTON_START
+#define CHC_STARTSTOP       BUTTON_A
+#define CHC_RESET           BUTTON_X
+#define CHC_MENU            BUTTON_B
+#define CHC_SETTINGS_INC    BUTTON_UP
+#define CHC_SETTINGS_DEC    BUTTON_DOWN
+#define CHC_SETTINGS_OK     BUTTON_A
+#define CHC_SETTINGS_CANCEL BUTTON_B
+
 #else
 #error No keymap defined!
 #endif

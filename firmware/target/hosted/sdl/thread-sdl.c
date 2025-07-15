@@ -340,7 +340,12 @@ unsigned int create_thread(void (*function)(void),
         return 0;
     }
 
+#if SDL_MAJOR_VERSION > 1
     SDL_Thread *t = SDL_CreateThread(runthread, NULL, thread);
+#else
+    SDL_Thread *t = SDL_CreateThread(runthread, thread);
+#endif
+
     if (t == NULL)
     {
         DEBUGF("Failed to create SDL thread\n");

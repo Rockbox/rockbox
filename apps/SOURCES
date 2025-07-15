@@ -303,4 +303,6 @@ keymaps/keymap-shanlingq1.c
 keymaps/keymap-echor1.c
 #elif CONFIG_KEYPAD == SURFANS_F28_PAD
 keymaps/keymap-surfansf28.c
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+keymaps/keymap-rgnano.c
 #endif

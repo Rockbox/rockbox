@@ -688,6 +688,22 @@
 #define STAR_LEVEL_DOWN_NAME "MENU+DOWN"
 #define STAR_LEVEL_REPEAT_NAME "MENU"
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define STAR_QUIT           BUTTON_START
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_A
+#define STAR_LEVEL_UP       BUTTON_R
+#define STAR_LEVEL_DOWN     BUTTON_L
+#define STAR_LEVEL_REPEAT   BUTTON_B
+#define STAR_TOGGLE_CONTROL_NAME "A"
+#define STAR_QUIT_NAME      "START"
+#define STAR_LEVEL_UP_NAME  "R"
+#define STAR_LEVEL_DOWN_NAME "L"
+#define STAR_LEVEL_REPEAT_NAME "B"
 
 #else
 #error No keymap defined!

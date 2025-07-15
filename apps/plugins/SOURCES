@@ -26,7 +26,6 @@ playing_time.c
 properties.c
 random_folder_advance_config.c
 rb_info.c
-rockblox.c
 search.c
 settings_dumper.c
 snow.c
@@ -89,7 +88,7 @@ crypt_firmware.c
 
 /* Overlays loaders */
 
-#if defined(HAVE_LCD_COLOR) && (LCD_STRIDEFORMAT == HORIZONTAL_STRIDE)
+#if defined(HAVE_LCD_COLOR) && (LCD_STRIDEFORMAT == HORIZONTAL_STRIDE) && !defined(RG_NANO) /* Build issues */
 #if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE |PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS))
 duke3d.c
 quake.c
@@ -140,9 +139,15 @@ robotfindskitten.c
 xobox.c
 spacerocks.c
 
+#if (LCD_WIDTH != 240) && (LCD_HEIGHT != 240)
+/* No 240x240 support */
+rockblox.c
+bubbles.c
+wormlet.c
+#endif
+
 blackjack.c
 bounce.c
-bubbles.c
 calculator.c
 chip8.c
 chopper.c
@@ -162,7 +167,6 @@ sokoban.c
 star.c
 starfield.c
 vu_meter.c
-wormlet.c
 
 #ifdef HAVE_HOTKEY
 announce_status.c
@@ -199,7 +203,7 @@ rocklife.c
 matrix.c
 speedread.c
 
-#if (LCD_WIDTH > 138)
+#if (LCD_WIDTH > 138) && ((LCD_WIDTH != 240) && (LCD_HEIGHT != 240))
 invadrox.c
 superdom.c
 #endif

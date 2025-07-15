@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Rockbox
+Comment=Open source jukebox firmware
+Terminal=false
+Type=Application
+Exec=run.sh
+Icon=icon
+Categories=applications
+FK-Keymap=mapping.key

@@ -13,7 +13,7 @@ clock
 xworld
 
 /* for duke3d, wolf3d and quake */
-#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS))
+#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS)) && !defined(RG_NANO)
 sdl
 #endif
 
@@ -41,7 +41,10 @@ fft
 chessbox
 fractals
 imageviewer
+#if (LCD_WIDTH != 240) && (LCD_HEIGHT != 240)
+/* No 240x240 support */
 sudoku
+#endif
 reversi
 goban
 frotz

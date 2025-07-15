@@ -373,6 +373,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP          BUTTON_UP
 #define DOWN        BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define CONTINUE_TEXT   "A To Continue"
+#define QUIT            BUTTON_START
+#define LEFT            BUTTON_LEFT
+#define RIGHT           BUTTON_RIGHT
+#define SELECT          BUTTON_A
+#define UP              BUTTON_UP
+#define DOWN            BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

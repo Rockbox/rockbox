@@ -557,10 +557,20 @@
 #define IMGVIEW_MENU        (BUTTON_PLAY|BUTTON_REPEAT)
 #define IMGVIEW_SLIDE_SHOW  BUTTON_PLAY
 
-
-
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
+
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define IMGVIEW_ZOOM_IN     BUTTON_X
+#define IMGVIEW_ZOOM_OUT    BUTTON_Y
+#define IMGVIEW_UP          BUTTON_UP
+#define IMGVIEW_DOWN        BUTTON_DOWN
+#define IMGVIEW_LEFT        BUTTON_LEFT
+#define IMGVIEW_RIGHT       BUTTON_RIGHT
+#define IMGVIEW_NEXT        BUTTON_R
+#define IMGVIEW_PREVIOUS    BUTTON_L
+#define IMGVIEW_MENU        BUTTON_B
+#define IMGVIEW_QUIT        BUTTON_START
 
 #else
 #error No keymap defined!

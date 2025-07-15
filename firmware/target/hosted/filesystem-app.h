@@ -49,7 +49,11 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #endif /* _FILESYSTEM_APP_H_ */
 
 #ifdef HAVE_SDL
+#ifdef RG_NANO
+#include "../sdl/filesystem-sdl.h"
+#else
 #include "filesystem-sdl.h"
+#endif /* RG_NANO */
 #endif /* HAVE_SDL */
 #ifdef WIN32
 #include "filesystem-win32.h"

@@ -365,6 +365,16 @@ struct mpeg_settings settings;
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_A
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_LEFT2       BUTTON_L
+#define MPEG_START_TIME_RIGHT2      BUTTON_R
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_START
+
 #else
 #error No keymap defined!
 #endif

@@ -455,6 +455,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#   define MINESWP_LEFT         BUTTON_LEFT
+#   define MINESWP_RIGHT        BUTTON_RIGHT
+#   define MINESWP_UP           BUTTON_UP
+#   define MINESWP_DOWN         BUTTON_DOWN
+#   define MINESWP_QUIT         BUTTON_START
+#   define MINESWP_TOGGLE       BUTTON_X
+#   define MINESWP_DISCOVER     BUTTON_A
+#   define MINESWP_INFO         BUTTON_Y
+
 #else
 #error No keymap defined!
 #endif

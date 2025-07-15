@@ -33,7 +33,7 @@
 #include "serial.h"
 #include "power.h"
 #include "powermgmt.h"
-#ifdef HAVE_SDL
+#if defined(HAVE_SDL) && (SDL_MAJOR_VERSION > 1)
 #include "button-sdl.h"
 #else
 #include "button-target.h"
