@@ -662,7 +662,7 @@ static void flush_config_block_callback(void)
 void reset_runtime(void)
 {
     update_runtime(); /* in case this is > topruntimetime */
-    lasttime = current_tick;
+    zero_runtime();
     global_status.runtime = 0;
 }
 
@@ -679,6 +679,11 @@ void update_runtime(void)
 
     if ( global_status.runtime > global_status.topruntime )
         global_status.topruntime = global_status.runtime;
+}
+
+void zero_runtime(void)
+{
+    lasttime = current_tick;
 }
 
 void status_save(bool force)

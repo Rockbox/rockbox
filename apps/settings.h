@@ -262,13 +262,15 @@ enum {  ALARM_START_WPS = 0,
 
 
 /** function prototypes **/
+void reset_runtime(void);
 void update_runtime(void);
+void zero_runtime(void);
 void settings_load(void) INIT_ATTR;
 bool settings_load_config(const char* file, bool apply);
 
 void status_save(bool force);
 int settings_save(void);
-void reset_runtime(void);
+
 /* defines for the options paramater */
 enum {
     SETTINGS_SAVE_CHANGED = 0,

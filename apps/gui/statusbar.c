@@ -192,7 +192,7 @@ static struct screen * sb_fill_bar_info(struct gui_statusbar * bar)
 
         /* zero battery run time if charging */
         if (charge_state > DISCHARGING)
-            reset_runtime();
+            zero_runtime();
 
         /* animate battery if charging */
         if ((charge_state == DISCHARGING) || (charge_state == TRICKLE))
@@ -202,7 +202,7 @@ static struct screen * sb_fill_bar_info(struct gui_statusbar * bar)
         else
         {
 #else /* CONFIG_CHARGING < CHARGING_MONITOR */
-            reset_runtime();
+            zero_runtime();
         {
 #endif /* CONFIG_CHARGING < CHARGING_MONITOR */
             /* animate in (max.) 4 steps, starting near the current charge level */
