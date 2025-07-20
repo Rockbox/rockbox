@@ -69,6 +69,6 @@
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%?iy<%iy|>
 
-%ac%Sx(Next Track:)
+%ac%Sx(Next Track:);%ac%t(1, 300)%ft(playername.txt)
 %s%ac%?It<%It|%Fn>
 %s%ac%?Ia<%Ia|%?IA<%IA>>

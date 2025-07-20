@@ -62,7 +62,7 @@
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 
-%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
+%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>;%s%ac%t(1, 300)%ft(playername.txt)
 #
 # Track Info - No Album Art
 %Vl(b,0,56,-,247,1)
@@ -75,7 +75,7 @@
 %ac%?fv<%(vbr%) |>%fb kbit/s %fc
 
 
-%ac%Sx(Next:)
+%ac%Sx(Next:);%ac%t(1, 300)%ft(playername.txt)
 %s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>
 %ac%s%?It<%It|%Fn>
 %s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>

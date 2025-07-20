@@ -35,7 +35,7 @@
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 #%s%al%iy
 
-%s%al%Sx(Next Track:)
+%s%al%Sx(Next Track:);%s%al%t(1, 300)%ft(playername.txt)
 %s%al%?It<%It|%Fn>
 %s%al%?Ia<%Ia|%IA>
 
@@ -45,7 +45,7 @@
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%iy
 
-%ac%Sx(Next Track:)
+%ac%Sx(Next Track:);%ac%t(1, 300)%ft(playername.txt)
 %s%ac%?It<%It|%Fn>
 %s%ac%?Ia<%Ia|%IA>
 
