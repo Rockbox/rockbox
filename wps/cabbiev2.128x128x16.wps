@@ -49,7 +49,7 @@
 #
 # Next Track Info
 %V(3,73,122,12,-)
-%s%ac%Sx(Next:) %?It<%It|%Fn>;%s%ac%t(1, 300)%ft(playername.txt)
+%s%ac%Sx(Next:) %?It<%It|%Fn>
 #
 # Time Elapsed/Remaining
 %V(3,95,122,12,1)

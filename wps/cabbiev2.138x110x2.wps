@@ -61,7 +61,7 @@
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%al%Sx(Next Track:);%s%al%t(1, 300)%ft(playername.txt)
+%s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
 #
 # Track Info - No Album Art
@@ -69,5 +69,5 @@
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%Sx(Next Track:);%s%ac%t(1, 300)%ft(playername.txt)
+%s%ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>

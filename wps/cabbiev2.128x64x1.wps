@@ -59,4 +59,4 @@
 #
 # Next Track Info
 %V(0,42,128,8,1)
-%ac%s%Sx(Next:) %?It<%It|%Fn>;%s%ac%t(1, 300)%ft(playername.txt)
+%ac%s%Sx(Next:) %?It<%It|%Fn>
