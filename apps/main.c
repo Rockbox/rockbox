@@ -201,6 +201,7 @@ int main(void)
 
 #if !defined(BOOTLOADER)
     allocate_playback_log();
+    static char playername[64];
     if (!file_exists(ROCKBOX_DIR"/playername.txt"))
     {
         int fd = open(ROCKBOX_DIR"/playername.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
@@ -208,6 +209,17 @@ int main(void)
         {
             fdprintf(fd, "%s", MODEL_NAME);
             close(fd);
+        }
+    }
+    else
+    {
+        int fd = open(ROCKBOX_DIR"/playername.txt", O_RDONLY);
+        if(fd >= 0)
+        {
+            read_line(fd, playername, sizeof(playername));
+            close(fd);
+            if (strcmp(playername, MODEL_NAME) != 0)
+                splashf(HZ * 2, "%s", playername);
         }
     }
 #endif
