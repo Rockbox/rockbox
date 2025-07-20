@@ -2782,7 +2782,9 @@ static void toolbar( void )
                 }
                 inv_cursor(true);
                 break;
-
+            case ROCKPAINT_QUIT:
+                if (state != State0)
+                    break;
             case ROCKPAINT_TOOLBAR:
             case ROCKPAINT_TOOLBAR2:
                 return;
