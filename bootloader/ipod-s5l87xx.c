@@ -348,7 +348,7 @@ extern int lcd_type;
 static uint16_t alive[] = { 500,100,0, 0 };
 static uint16_t alivelcd[] = { 2000,200,0, 0 };
 
-#ifndef IPOD_6G
+#ifdef HAVE_LCD_SLEEP
 static void sleep_test(void)
 {
     int sleep_tmo = 5;
@@ -676,7 +676,7 @@ static void dump_bootflash(void)
 static void devel_menu(void)
 {
     const char *items[] = {
-#ifndef IPOD_6G
+#ifdef HAVE_LCD_SLEEP
         "LCD sleep/awake test",
 #endif
         "PMU info",
@@ -694,7 +694,7 @@ static void devel_menu(void)
         "Power off",
     };
     void (*handlers[])(void) = {
-#ifndef IPOD_6G
+#ifdef HAVE_LCD_SLEEP
         sleep_test,
 #endif
         pmu_info,
