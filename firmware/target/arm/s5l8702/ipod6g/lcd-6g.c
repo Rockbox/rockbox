@@ -57,8 +57,13 @@ static const uint16_t lcd_deepstandby_seq_23[] =
     MREG16(1),  0x100, 0x0700,
 
     /* Deep Standby Mode */
+    /* Sending this on type 2 or 3 LCD causes Rockbox to crash after a few seconds
+    Disabling it until the root cause is found, it's probably a busy wait somewhere
+    or a mutex that's not being unlocked in a timely manner */
+#if 0
     MREG16(1),  0x100, 0x0704,
     SLEEP16(5),
+#endif
     END
 };
 #endif /* HAVE_LCD_SLEEP || HAVE_LCD_SHUTDOWN */
