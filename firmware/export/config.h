@@ -1453,4 +1453,9 @@ Lyre prototype 1 */
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
 
+/* Trying to enable the setting without the underlying functions doesn't work */
+#if defined(HAVE_LCD_SLEEP_SETTING) && !defined(HAVE_LCD_SLEEP)
+#error "HAVE_LCD_SLEEP_SETTING requires HAVE_LCD_SLEEP"
+#endif
+
 #endif /* __CONFIG_H__ */
