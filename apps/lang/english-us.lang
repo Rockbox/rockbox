@@ -7164,7 +7164,7 @@
     *: "Can't open %s"
   </dest>
   <voice>
-    *: ""
+    *: "Can't open plugin"
   </voice>
 </phrase>
 <phrase>
@@ -16897,5 +16897,19 @@
   </dest>
   <voice>
     *: "sort playlists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[By album]"
+  </dest>
+  <voice>
+    *: "All tracks sorted by album"
   </voice>
 </phrase>
