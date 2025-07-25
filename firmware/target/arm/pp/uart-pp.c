@@ -188,11 +188,25 @@ static unsigned char rx_readc(void)
     return (*base_RBR & 0xFF);
 }
 
-void SERIAL_ISR(void)
+void SERIAL_ISR(int port)
 {
     static int badbaud = 0;
     static bool newpkt = true;
     char temp;
+
+    if (port && base_RBR != &SER1_RBR) {
+        base_RBR = &SER1_RBR;
+        base_THR = &SER1_THR;
+        base_LCR = &SER1_LCR;
+        base_LSR = &SER1_LSR;
+        base_DLL = &SER1_DLL;
+    } else if (!port && base_RBR != &SER0_RBR) {
+        base_RBR = &SER0_RBR;
+        base_THR = &SER0_THR;
+        base_LCR = &SER0_LCR;
+        base_LSR = &SER0_LSR;
+        base_DLL = &SER0_DLL;
+    }
 
     while(rx_rdy())
     {
