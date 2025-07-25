@@ -7157,10 +7157,10 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "Nie mogę otworzyć %s"
+    *: "Nie można otworzyć %s"
   </dest>
   <voice>
-    *: ""
+    *: "Nie można otworzyć wtyczki"
   </voice>
 </phrase>
 <phrase>
@@ -16907,5 +16907,19 @@
   </dest>
   <voice>
     *: "Sortuj listy odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Według albumu]"
+  </dest>
+  <voice>
+    *: "Wszystkie utwory posortowane według albumu"
   </voice>
 </phrase>

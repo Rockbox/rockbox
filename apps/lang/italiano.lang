@@ -7151,10 +7151,10 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "Non riesco ad aprire %s"
+    *: "Impossibile aprire %s"
   </dest>
   <voice>
-    *: ""
+    *: "Impossibile aprire il plugin"
   </voice>
 </phrase>
 <phrase>
@@ -16901,5 +16901,19 @@
   </dest>
   <voice>
     *: "Ordina Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Per album]"
+  </dest>
+  <voice>
+    *: "Ordina tutte le tracce per album"
   </voice>
 </phrase>

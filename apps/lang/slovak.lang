@@ -7152,7 +7152,7 @@
     *: "Nemožno otvoriť %s"
   </dest>
   <voice>
-    *: ""
+    *: "Nemožno otvoriť zásuvný modul"
   </voice>
 </phrase>
 <phrase>
@@ -16902,5 +16902,19 @@
   </dest>
   <voice>
     *: "Triediť plejlisty"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Podľa albumu]"
+  </dest>
+  <voice>
+    *: "Všetky stopy zoradené podľa albumu"
   </voice>
 </phrase>

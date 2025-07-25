@@ -7388,7 +7388,7 @@
     *: "Nu se poate deschide %s"
   </dest>
   <voice>
-    *: ""
+    *: "Nu se poate deschide plaghinul"
   </voice>
 </phrase>
 <phrase>
@@ -16906,5 +16906,19 @@
   </dest>
   <voice>
     *: "ordonează listele de redare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[După album]"
+  </dest>
+  <voice>
+    *: "Toate pistele sortate după album"
   </voice>
 </phrase>

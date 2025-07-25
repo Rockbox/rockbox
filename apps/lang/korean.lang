@@ -7181,7 +7181,7 @@
     *: "%s 을(를) 열 수 없음"
   </dest>
   <voice>
-    *: ""
+    *: "플러그인을 열 수 없음"
   </voice>
 </phrase>
 <phrase>
@@ -16914,5 +16914,19 @@
   </dest>
   <voice>
     *: "재생 목록 정렬"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[앨범별]"
+  </dest>
+  <voice>
+    *: "모든 트랙을 앨범별로 정렬"
   </voice>
 </phrase>
