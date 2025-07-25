@@ -643,6 +643,7 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
     this->hidden->h = current->h = height;
     current->pitch = current->w * (bpp / 8);
     current->pixels = this->hidden->direct ? lcd_fb : this->hidden->buffer;
+    current->flags |= SDL_PREALLOC;
 
     /* We're done */
     return(current);
