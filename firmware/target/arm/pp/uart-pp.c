@@ -48,9 +48,40 @@ void serial_setup (void)
 {
     int tmp;
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+#if defined(IPOD_NANO) || defined(IPOD_VIDEO)
+    /* Route the Tx/Rx pins. 5G Ipods. ser0, dock conncetor */
+    (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
+    GPO32_ENABLE &= ~0x0C;
 
-    /* Route the Tx/Rx pins.  4G Ipod, MINI & MINI2G ser1, dock connector */
+    base_RBR = &SER0_RBR;
+    base_THR = &SER0_THR;
+    base_LCR = &SER0_LCR;
+    base_LSR = &SER0_LSR;
+    base_DLL = &SER0_DLL;
+
+    DEV_EN = DEV_EN | DEV_SER0;
+    CPU_HI_INT_DIS = SER0_MASK;
+
+    DEV_RS |= DEV_SER0;
+    sleep(1);
+    DEV_RS &= ~DEV_SER0;
+
+    SER0_LCR = 0x80; /* Divisor latch enable */
+    SER0_DLM = 0x00;
+    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    SER0_IER = 0x01;
+
+    SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = SER0_MASK;
+    tmp = SER0_RBR;
+
+    serial_bitrate(0);
+
+#elif defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+
+    /* Route the Tx/Rx pins. 4G Ipods, MINI & MINI2G. ser1, dock connector */
     GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x6);
     GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x6);
 
@@ -80,39 +111,9 @@ void serial_setup (void)
     CPU_HI_INT_EN = SER1_MASK;
     tmp = SER1_RBR;
 
-#elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
-    /* Route the Tx/Rx pins.  5G Ipod */
-    (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
-    GPO32_ENABLE &= ~0x0C;
+    serial_bitrate(0);
 
-    base_RBR = &SER0_RBR;
-    base_THR = &SER0_THR;
-    base_LCR = &SER0_LCR;
-    base_LSR = &SER0_LSR;
-    base_DLL = &SER0_DLL;
-
-    DEV_EN = DEV_EN | DEV_SER0;
-    CPU_HI_INT_DIS = SER0_MASK;
-
-    DEV_RS |= DEV_SER0;
-    sleep(1);
-    DEV_RS &= ~DEV_SER0;
-
-    SER0_LCR = 0x80; /* Divisor latch enable */
-    SER0_DLM = 0x00;
-    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-    SER0_IER = 0x01;
-
-    SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
-
-    CPU_INT_EN = HI_MASK;
-    CPU_HI_INT_EN = SER0_MASK;
-    tmp = SER0_RBR;
-
-#else
-
-    /* Default Route the Tx/Rx pins.  4G Ipod, ser0, top connector */
-
+    /* Route the Tx/Rx pins.  4G Ipod, ser0, top connector */
     GPIO_CLEAR_BITWISE(GPIOC_INT_EN, 0x8);
     GPIO_CLEAR_BITWISE(GPIOC_INT_LEV, 0x8);
     GPIOC_INT_CLR = 0x8;
@@ -141,11 +142,12 @@ void serial_setup (void)
     CPU_HI_INT_EN = SER0_MASK;
     tmp = SER0_RBR;
 
+    serial_bitrate(0);
+
 #endif
 
     (void)tmp;
 
-    serial_bitrate(0);
 }
 
 void serial_bitrate(int rate)
