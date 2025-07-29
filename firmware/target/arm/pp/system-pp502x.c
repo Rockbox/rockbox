@@ -190,9 +190,11 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
         else if (CPU_HI_INT_STAT & SER0_MASK) {
             SERIAL_ISR(0);
         }
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
         else if (CPU_HI_INT_STAT & SER1_MASK) {
             SERIAL_ISR(1);
         }
+#endif
 #endif
     } else {
         if (COP_INT_STAT & TIMER2_MASK)
