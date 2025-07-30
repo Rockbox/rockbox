@@ -74,7 +74,7 @@ target/hosted/sdl/lcd-bitmap.c
 target/hosted/sdl/lcd-remote-bitmap.c
 #endif
 target/hosted/sdl/lcd-sdl.c
-#if SDL_MAJOR_VERSION > 1
+#ifndef RG_NANO
 target/hosted/sdl/window-sdl.c
 #endif
 target/hosted/sdl/system-sdl.c
