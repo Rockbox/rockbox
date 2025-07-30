@@ -246,6 +246,11 @@ $releasenotes="/wiki/ReleaseNotes400";
         status => 1,
 	sim => 1,
     },
+    'rgnano' => {
+        name => 'Anbernic RG Nano',
+        sim => 0,
+        status => 2,
+    },
     'rk27generic' => {
         name => 'Rockchip rk27xx',
         status => 1,
