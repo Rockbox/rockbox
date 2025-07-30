@@ -32,7 +32,7 @@
 #include "core_alloc.h"
 
 /* Define this as 1 to show informational messages that are not errors. */
-#define THREAD_SDL_DEBUGF_ENABLED 1
+#define THREAD_SDL_DEBUGF_ENABLED 0
 
 #if THREAD_SDL_DEBUGF_ENABLED
 #define THREAD_SDL_DEBUGF(...) DEBUGF(__VA_ARGS__)
