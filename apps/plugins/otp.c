@@ -44,7 +44,7 @@ struct account_t {
 
     union {
         uint64_t hotp_counter;
-        int totp_period;
+        unsigned long totp_period;
     };
 
     int digits;
@@ -528,12 +528,12 @@ static void show_code(int acct)
 #if CONFIG_RTC
     else
     {
-        rb->splashf(0, "%0*d (%ld seconds(s) left)", accounts[acct].digits,
+        rb->splashf(0, "%0*d (%lu seconds(s) left)", accounts[acct].digits,
                                                      TOTP(accounts[acct].secret,
                                                           accounts[acct].sec_len,
                                                           accounts[acct].totp_period,
                                                           accounts[acct].digits),
-                    accounts[acct].totp_period - get_utc() % accounts[acct].totp_period);
+                    accounts[acct].totp_period - (unsigned long) get_utc() % accounts[acct].totp_period);
     }
 #else
     else
@@ -693,7 +693,7 @@ static void edit_menu(int acct)
             if(accounts[acct].is_totp)
                 rb->snprintf(data_buf, sizeof(data_buf), "%d", (int)accounts[acct].hotp_counter);
             else
-                rb->snprintf(data_buf, sizeof(data_buf), "%d", accounts[acct].totp_period);
+                rb->snprintf(data_buf, sizeof(data_buf), "%lu", accounts[acct].totp_period);
 
             if(rb->kbd_input(data_buf, sizeof(data_buf), NULL) < 0)
                 break;
