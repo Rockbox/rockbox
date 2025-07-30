@@ -52,7 +52,7 @@ uintptr_t * const idle_stacks[NUM_CORES] =
  * initializations.
  *---------------------------------------------------------------------------
  */
-static void INIT_ATTR core_thread_init(unsigned int core) 
+static void INIT_ATTR core_thread_init(unsigned int core)
 {
     if (core == CPU)
     {
@@ -154,7 +154,7 @@ struct core_semaphores
 
 static struct core_semaphores core_semaphores[NUM_CORES] IBSS_ATTR;
 
-#if 1 /* Select ASM */
+#if 0 /* Select ASM */
 /*---------------------------------------------------------------------------
  * Put core in a power-saving state if waking list wasn't repopulated and if
  * no other core requested a wakeup for it to perform a task.
@@ -294,7 +294,7 @@ static inline void core_sleep(unsigned int core)
         "mov    r0, r0, lsl %[c]           \n"
         "str    r0, [%[mbx], #4]           \n" /* signal intent to sleep */
         "ldr    r1, [%[mbx], #0]           \n" /* && !(MBX_MSG_STAT & (0x10<<core)) ? */
-        "tst    r1, r0, lsl #2             \n"  
+        "tst    r1, r0, lsl #2             \n"
         "moveq  r1, #0x80000000            \n" /* Then sleep */
         "streq  r1, [%[ctl], %[c], lsl #2] \n"
         "moveq  r1, #0                     \n" /* Clear control reg */
