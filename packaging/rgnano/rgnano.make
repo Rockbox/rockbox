@@ -38,3 +38,6 @@ opk: opkclean opkdir $(MKSQUASHFS) build
 
 	# Make opk
 	$(MKSQUASHFS) $(OPK_BUILD_DIR) rockbox_funkey-s.opk -all-root -noappend -no-exports -no-xattrs
+
+opk-zip: opk
+	zip -9 -q rockbox-opk.zip rockbox_funkey-s.opk rockbox-info.txt
