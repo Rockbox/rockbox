@@ -4588,6 +4588,7 @@ fi
       simcc "checkwps"
       toolset='';
       GCCOPTS='';
+      LDOPTS='';
       rbdir='.'
       extradefines="$extradefines  -DDEBUG"
       appsdir='$(ROOTDIR)/tools/checkwps';
@@ -4620,6 +4621,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
+      LDOPTS='';
       extradefines="$extradefines  -DDEBUG -DWARBLE"
       output='warble.'${modelname};
       echo "Warble build selected"
@@ -5125,6 +5127,7 @@ export LCDORIENTATION=${lcd_orientation}
 export ANDROID_ARCH=${ANDROID_ARCH}
 export ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
 export ANDROID_SDK_PATH=${ANDROID_SDK_PATH}
+export FUNKEY_SDK_PATH=${FUNKEY_SDK_PATH}
 export ANDROID_PLATFORM_VERSION=${ANDROID_PLATFORM_VERSION}
 export TOOLSET=${toolset}
 export PIPER_MODEL_DIR=${PIPER_MODEL_DIR}
