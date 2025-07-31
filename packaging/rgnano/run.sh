@@ -11,10 +11,10 @@ if [ ! -d $RBDIR ]; then
   cp -r ./install/* $RBDIR
   notif clear
 else
-  OPKV=$(cat ./install/rockbox-info.txt | grep Version: | cut -d'-' -f2)
-  SDV=$(cat $RBDIR/rockbox-info.txt | grep Version: | cut -d'-' -f2)
+  OPKV=$(cat ./install/rockbox-info.txt | grep Version)
+  SDV=$(cat $RBDIR/rockbox-info.txt | grep Version)
 
-  if [[ $OPKV -gt  $SDV ]]; then
+  if [[ "$OPKV" != "$SDV" ]]; then
     notif set 0 " Updating rockbox..."
     cp -r -f -u ./install/* $RBDIR
     notif clear
