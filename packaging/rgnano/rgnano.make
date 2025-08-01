@@ -10,7 +10,7 @@ opkclean:
 	rm -rf $(OPK_BUILD_DIR)
 
 opk: opkclean opkdir $(MKSQUASHFS) build
-	make PREFIX=$(OPK_BUILD_DIR)/rockbox fullinstall
+	make PREFIX=$(OPK_BUILD_DIR)/rockbox install
 
 	# Install opk files
 	cp $(RG_NANO_DIR)/icon.png $(OPK_BUILD_DIR)
