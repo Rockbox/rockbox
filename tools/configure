@@ -3648,7 +3648,7 @@ fi
     ;;
 
    209|rgnano)
-    target_id=120
+    target_id=121
     application="yes"
     modelname="rgnano"
     app_type="sdl-app"
