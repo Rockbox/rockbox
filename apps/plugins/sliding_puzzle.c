@@ -900,6 +900,10 @@ enum plugin_status plugin_start(
         rb->lcd_putsxy(0, 18, "[REC] to stop");
         rb->lcd_putsxy(0, 28, "[MODE] shuffle");
         rb->lcd_putsxy(0, 38, "[MENU] change pic");
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+        rb->lcd_putsxy(0, 18, "[Start] to stop");
+        rb->lcd_putsxy(0, 28, "[B] shuffle");
+        rb->lcd_putsxy(0, 38, "[A] change pic");
 #endif
 #ifdef HAVE_TOUCHSCREEN
         rb->lcd_putsxy(0, 18, PUZZLE_QUIT_TEXT " to stop");
