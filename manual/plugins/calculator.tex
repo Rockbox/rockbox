@@ -10,11 +10,12 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD%
       ,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
       ,GIGABEAT_S_PAD,MROBE100_PAD,IRIVER_H10_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD%
-      ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
+      ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,RG_NANO_PAD}
       {\ButtonLeft{} / \ButtonRight{} /}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
       ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
-      ,SANSA_FUZE_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
+      ,SANSA_FUZE_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD%
+      ,RG_NANO_PAD}
       {\ButtonUp{} / \ButtonDown}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{/}
     \opt{scrollwheel}{\ButtonScrollFwd{} / \ButtonScrollBack}
@@ -35,6 +36,7 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
     \opt{MPIO_HD200_PAD}{\ButtonFunc}
     \opt{MPIO_HD300_PAD}{\ButtonEnter}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonA}
     & Select a button\\
     %
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{
@@ -49,6 +51,7 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
         \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
        \opt{HAVEREMOTEKEYMAP}{& }
+       \opt{RG_NANO_PAD}{\ButtonB}
         & Delete last entered digit or clear after calculation\\
         %
     }
@@ -68,6 +71,7 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
     \opt{COWON_D2_PAD}{\TouchBottomRight}
     \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonX}
     & Calculate\\
     %
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
@@ -84,5 +88,6 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
        }
+    \opt{RG_NANO_PAD}{\ButtonStart}
     & Quit\\
 \end{btnmap}

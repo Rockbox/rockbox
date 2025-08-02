@@ -33,7 +33,7 @@ text files%
 
 \input{plugins/brickmania.tex}
 
-\input{plugins/bubbles.tex}
+\nopt{rgnano}{\input{plugins/bubbles.tex}}
 
 \input{plugins/chessbox.tex}
 
@@ -47,13 +47,13 @@ text files%
 
 \nopt{xduoox3}{\nopt{lowmem}{\input{plugins/doom.tex}}}
 
-\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300}{\input{plugins/duke3d.tex}}}
+\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300,rgnano}{\input{plugins/duke3d.tex}}}
 
 \input{plugins/flipit.tex}
 
 \input{plugins/goban.tex}
 
-\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,c200,c200v2,mpiohd200,clipzip,samsungyh820}{
+\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,c200,c200v2,mpiohd200,clipzip,samsungyh820,rgnano}{
   \input{plugins/invadrox.tex}}}
 
 \input{plugins/jackpot.tex}
@@ -74,13 +74,13 @@ text files%
 
 \input{plugins/pong.tex}
 
-\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300}{\input{plugins/quake.tex}}}
+\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300,rgnano}{\input{plugins/quake.tex}}}
 
 \input{plugins/reversi.tex}
 
 \input{plugins/robotfindskitten.tex}
 
-\input{plugins/rockblox.tex}
+\nopt{rgnano}{\input{plugins/rockblox.tex}}
 
 \input{plugins/rockblox1d.tex}
 
@@ -100,14 +100,14 @@ text files%
 
 \input{plugins/star.tex}
 
-\input{plugins/sudoku.tex}
+\nopt{rgnano}{\input{plugins/sudoku.tex}}
 
-\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,c200,c200v2,mpiohd200,clipzip,samsungyh820}{
+\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,c200,c200v2,mpiohd200,clipzip,samsungyh820,rgnano}{
   \input{plugins/superdom.tex}}}
 
-\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300}{\input{plugins/wolf3d.tex}}}
+\opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300,rgnano}{\input{plugins/wolf3d.tex}}}
 
-\input{plugins/wormlet.tex}
+\nopt{rgnano}{\input{plugins/wormlet.tex}}
 
 \input{plugins/xobox.tex}
 
@@ -290,7 +290,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \input{plugins/resistor.tex}
 
-\opt{lcd_color}{\input{plugins/rockpaint.tex}}
+\opt{lcd_color}{\nopt{rgnano}{\input{plugins/rockpaint.tex}}}
 
 \input{plugins/stats.tex}
 

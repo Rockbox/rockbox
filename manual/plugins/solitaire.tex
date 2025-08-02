@@ -16,14 +16,14 @@ visit
 \begin{btnmap}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,PBELL_VIBE500_PAD%
-        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
+        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,RG_NANO_PAD}
       {\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
         ,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD%
-        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
+        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,RG_NANO_PAD}
       {/ \ButtonLeft{} / \ButtonRight}
     \opt{COWON_D2_PAD}{\TouchTopMiddle{} / \TouchBottomMiddle{} / \TouchMidLeft{} / \TouchMidRight}
     \opt{XDUOO_X3_PAD}{\ButtonPrev / \ButtonNext / \ButtonHome / \ButtonOption}
@@ -40,6 +40,7 @@ visit
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
     \opt{MPIO_HD300_PAD}{\ButtonEnter}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonA}
       & Select cards, move cards, reveal hidden cards...\\
     %
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
@@ -53,6 +54,7 @@ visit
     \opt{COWON_D2_PAD}{\TouchTopLeft}
     \opt{PBELL_VIBE500_PAD,MPIO_HD300_PAD}{\ButtonMenu}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
+    \opt{RG_NANO_PAD}{\ButtonX}
     \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
        \opt{HAVEREMOTEKEYMAP}{& }
       & If a card was selected -- unselect it, else\\
@@ -76,6 +78,7 @@ visit
     \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay{} + \ButtonDown}
     \opt{SAMSUNG_YH820_PAD}{\ButtonRec{} + \ButtonDown}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonL}
       & Put the card from the top of the remains stack on top of the cursor\\
     %
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
@@ -92,6 +95,7 @@ visit
     \opt{SAMSUNG_YH820_PAD}{\ButtonRec{} + \ButtonUp}
     \opt{XDUOO_X3_PAD}{Long \ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonB}
       & Put the card under the cursor on one of the 4 final colour stacks.\\
     %
     \opt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonRight}
@@ -108,6 +112,7 @@ visit
     \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay{} + \ButtonRight}
     \opt{SAMSUNG_YH820_PAD}{\ButtonRec{} + \ButtonRight}
        \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonR}
       & Put the card on top of the remains stack on one of the final colour stacks.\\
     %
     \opt{IRIVER_H300_PAD,IRIVER_H100_PAD}{\ButtonOff}
@@ -123,5 +128,6 @@ visit
        \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
         }
+    \opt{RG_NANO_PAD}{\ButtonStart}
       & Show menu\\
 \end{btnmap}

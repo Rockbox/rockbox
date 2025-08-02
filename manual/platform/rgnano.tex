@@ -1,0 +1,24 @@
+% $Id$ %
+\def\UseOption{rgnano}
+\edef\UseOption{\UseOption,RG_NANO_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,rgnano}
+
+\newcommand{\playerman}{Anbernic}
+\newcommand{\playertype}{RG Nano}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{240}
+\newcommand{\dapdisplayheight}{240}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{rgnano}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{handheld}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{handheld's}
+\newcommand{\firmwarefilename}{\fname{rockbox_funkey-s.opk}}
+\newcommand{\firmwareextension}{\fname{opk}}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{SD card}
+
+% link external keymap file
+\input{platform/keymap-rgnano.tex}

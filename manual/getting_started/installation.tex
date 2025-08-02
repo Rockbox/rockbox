@@ -160,9 +160,9 @@ of before installing.
   \item[Firewire connection.]
 }
   To transfer Rockbox to your \dap{} you need to
-  connect it to your computer. For manual installation/uninstallation, or
+  connect it to your computer.\nopt{rgnano}{For manual installation/uninstallation, or
   should autodetection fail during automatic installation, you need to know
-  where to access the \dap{}. On Windows this means you need to know
+  where to access the \dap{}.} On Windows this means you need to know
   the drive letter associated with the \dap{}. On Linux you need to know
   the mount point of your \dap{}. On Mac OS X you need to know the volume
   name of your \dap{}.
@@ -269,7 +269,9 @@ of before installing.
 \end{description}
 }
 
-\subsection{Storage/Capacity Limits}
+\nopt{rgnano}{
+  \subsection{Storage/Capacity Limits}
+}
 
 \opt{disk_storage}{
 Rockbox supports very large drive capacities when used with GPT partitioning on devices that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
@@ -323,11 +325,29 @@ It is also worth noting that you will not likely see improved data transfer rate
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
-There are two ways to install Rockbox: automated and manual. The automated
-way is the preferred method of installing Rockbox for the majority of
-people. Rockbox Utility is a graphical application that does almost everything
-for you. However, should you encounter a problem, then the manual way is
-still available to you.\\
+\nopt{rgnano}{
+  There are two ways to install Rockbox: automated and manual. The automated
+  way is the preferred method of installing Rockbox for the majority of
+  people. Rockbox Utility is a graphical application that does almost everything
+  for you. However, should you encounter a problem, then the manual way is
+  still available to you.\\
+}
+
+\opt{rgnano}{
+  Before installing Rockbox in your \dap{} it needs to be updated to the latest
+  DrUm78's FunKey OS CFW release, for this a microSD card reader is required, to update:
+
+  \begin{itemize}
+    \item Download the latest release of DrUm78's FunKey OS from \url{https://github.com/DrUm78/FunKey-OS/releases}, make sure to download the file named \\
+    \fname{FunKey-sdcard-DrUm78\_RG\_Nano.img}.
+    \item Download balenaEtcher for your preferred OS (Windows, macOS or Linux) from \url{https://etcher.balena.io/\#download-etcher}.
+    \item Remove the microSD card from your \dap{} and insert it into the microSD card reader.
+    \item Run balenaEtcher, click on \fname{Flash from file} and select the previously downloaded \fname{FunKey-sdcard-DrUm78\_RG\_Nano.img}.
+    \item Click on \fname{Select target} and select the microSD card previously inserted.
+    \item Click on \fname{Flash!} and wait for the process to finish.
+    \item Once the flashing process is done remove the microSD card from the reader, insert it into your \dap{} and long press the power button to power it up.
+  \end{itemize}
+}
 
 \opt{gigabeats,fiiom3k,shanlingq1}{
   \note{The automated install is not yet available for the
@@ -340,6 +360,8 @@ still available to you.\\
     two of which need to be installed in order to run Rockbox:}
   \opt{HAVE_RB_BL_IN_FLASH}{There are two separate components
     which need to be installed in order to run Rockbox:}
+  \opt{rgnano}{There is one main component which needs to be
+    installed in order to run Rockbox:}
 
 \begin{description}
 \opt{HAVE_RB_BL_ON_DISK}{
@@ -350,6 +372,7 @@ still available to you.\\
   memory in your \playerman{} and comes factory-installed. It is not necessary
   to modify this in order to install Rockbox.}
 
+\opt{HAVE_RB_BL_ON_DISK,HAVE_RB_BL_IN_FLASH}{
 \item[The Rockbox bootloader.] \index{Bootloader}
   \opt{HAVE_RB_BL_ON_DISK}{The Rockbox bootloader is loaded from disk by
   the \playerman{} bootloader. It is responsible for loading the Rockbox
@@ -373,6 +396,15 @@ still available to you.\\
   update Rockbox. The build consists of a directory called
   \fname{.rockbox} which contains all of the Rockbox files, and is
   located in the root of your \daps{} drive.
+}
+
+\opt{rgnano}{
+\item[The Rockbox application.]
+All of the Rockbox code is contained in an .opk file. This makes it easy to
+  update Rockbox. When launcing the .opk it installs a directory called
+  \fname{rockbox} which contains all of the Rockbox files, and is
+  located in the \fname{FunKey} folder of your \daps{} microSD card.
+}
 \end{description}
 
 Apart from the required parts there are some addons you might be interested
@@ -390,10 +422,10 @@ in installing.
 
 \subsection{Automated Installation}
 
-\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative,rgnano}{
 \note{Rockbox Utility does not currently support the \playertype{} and you will
 therefore need to follow the manual install instructions.}}
-\nopt{erosqnative}{
+\nopt{erosqnative,rgnano}{
 To automatically install Rockbox, download the official installer and
 housekeeping tool \caps{Rockbox Utility}. It allows you to:
 \begin{itemize}
@@ -506,15 +538,17 @@ There are three different versions of Rockbox available from the
 Rockbox website:
 \label{Version}
 Release version, current build and archived daily build. You need to decide which one
-you want to install and get the appropriate version for your \dap{}. If you
+you want to install and get the appropriate version for your \dap{}. \nopt{rgnano}{If you
 select either ``Minimal Installation'' or ``Complete Installation'' from the
 ``Quick Start'' tab, then Rockbox Utility will automatically install the
 release version of Rockbox. Using the ``Installation'' tab will allow you
-to select which version you wish to install.
+to select which version you wish to install.}
 
+\opt{erosqnative}{
 \note{\textbf{There are two different versions of Rockbox for the \playertype{}. This manual only
 refers to the \playertype{} Native version, and thus when downloading Rockbox, ensure
 that the download name includes "erosqnative"!}}
+}
 
 \begin{description}
 
@@ -547,9 +581,9 @@ Please now go to \reference{ref:finish_install} to complete the installation pro
 
 \nopt{erosqnative}{
 The manual installation method is still available to you, should you need or desire it
-by following the instructions below. If you have used Rockbox Utility
+by following the instructions below. \nopt{rgnano}{If you have used Rockbox Utility
 to install Rockbox, then you do not need to follow the next section and can skip
-straight to \reference{ref:finish_install}.
+straight to \reference{ref:finish_install}.}
 }
 
 \opt{gigabeats,erosqnative}{\subsubsection{Installing the bootloader}
@@ -557,7 +591,8 @@ straight to \reference{ref:finish_install}.
     \opt{erosqnative}{\input{getting_started/hibyos_nativeinstall.tex}}
 }
 
-\subsubsection{Installing the firmware}\label{sec:installing_firmware}
+\nopt{rgnano}{\subsubsection{Installing the firmware}\label{sec:installing_firmware}}
+\opt{rgnano}{\subsubsection{Installing the application}\label{sec:installing_firmware}}
 
 \opt{gigabeats}{\note{When your \dap{} is in the Rockbox USB or bootloader
 USB mode, you will see two visible partitions -- the 150~MB firmware
@@ -596,12 +631,12 @@ data partition.}}
       \end{enumerate}
   }
 
-\item Connect your \dap{} to the computer via USB
+\item Connect your \dap{} to the computer via USB%
   \nopt{erosqnative}{
-    \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}
-    { in MSC mode }
-    \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
-    the manual that came with your \dap{}.
+    \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}%
+    {in MSC mode }%
+    \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }%
+    as described in the manual that came with your \dap{}.
   }
   \opt{erosqnative}{by, with the player OFF, holding \ButtonPlay{} and \ButtonPower{}
     to boot into the original firmware, and then plugging in the USB cable.
@@ -609,15 +644,17 @@ data partition.}}
 
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract
- the files onto
- \opt{gigabeats,fuzeplus}{the main data partition of }
- \opt{cowond2}{either an SD card or the internal memory of }
- \opt{ondavx777}{the MicroSD of }
+ the files onto %
+ \opt{gigabeats,fuzeplus}{the main data partition of }%
+ \opt{cowond2}{either an SD card or the internal memory of }%
+ \opt{ondavx777}{the MicroSD of }%
+ \opt{rgnano}{the \fname{Applications} folder of the microSD card of }%
  your \dap{}.
  \opt{cowond2}{\note{If you have chosen to extract to the internal memory, it
      will not be possible to save settings.}}
 \end{enumerate}
 
+\nopt{rgnano}{
 \note{The entire contents of the \fname{.zip} file should be extracted
 directly to the root of your \daps{} drive. Do not try to
 create a separate directory on your \dap{} for the Rockbox
@@ -629,9 +666,10 @@ structure that Rockbox needs.\\}
 If the contents of the \fname{.zip} file are extracted correctly, you will
 have a directory called \fname{.rockbox}, which contains all the files needed
 by Rockbox, in the main directory of your \daps{} drive.
+}
 
 \opt{swcodec}{%
-    \nopt{gigabeats,erosqnative}{%
+    \nopt{gigabeats,erosqnative,rgnano}{%
     \subsubsection{Installing the bootloader}
         \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
         \opt{mpiohd200,mpiohd300}{\input{getting_started/mpio_install.tex}}
@@ -694,7 +732,7 @@ by Rockbox, in the main directory of your \daps{} drive.
   Don't try to power off the device, it will shutdown by itself after a minute.
 }
 
-\opt{gigabeats}{
+\opt{gigabeats,rgnano}{
   Safely eject / unmount your \dap{}.
 }
 
@@ -769,7 +807,7 @@ Rockbox Utility can also aid in the production of talk files, which allow Rockbo
 to speak file and folder names.
 
 \section{Running Rockbox}
-\nopt{ipod,gigabeats,cowond2}{When
+\nopt{ipod,gigabeats,cowond2,rgnano}{When
 you turn the unit on, Rockbox should load.}
 \opt{ipod}{Hard reset the Ipod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{} and \ButtonSelect{} simultaneously}%
@@ -812,19 +850,26 @@ you turn the unit on, Rockbox should load.}
   \fixme{Add a note about the charging trick and place it here?}
 }
 
+\opt{rgnano}{
+  Start Rockbox from the \fname{Applications} category in gmenu2x.
+}
+
 \section{Updating Rockbox}
-\nopt{erosqnative}{
-Rockbox can be easily updated with Rockbox Utility. You can also update Rockbox
+
+\nopt{rgnano}{
+  \nopt{erosqnative}{
+  Rockbox can be easily updated with Rockbox Utility. You can also update Rockbox
+  }
+  \opt{erosqnative}{
+  The Native Port to \playername{} is not supported by Rockbox Utility yet, so Rockbox Utility cannot update it.
+  Rockbox is easily updated
+  }
+  manually -- download a Rockbox build
+  as detailed above, and unzip the build to the root directory
+  of your \dap{} as in the manual installation stage. If your unzip
+  program asks you whether to overwrite files, choose the ``Yes to all'' option.
+  The new build will be installed over your current build.\\
 }
-\opt{erosqnative}{
-The Native Port to \playername{} is not supported by Rockbox Utility yet, so Rockbox Utility cannot update it.
-Rockbox is easily updated
-}
-manually -- download a Rockbox build
-as detailed above, and unzip the build to the root directory
-of your \dap{} as in the manual installation stage. If your unzip
-program asks you whether to overwrite files, choose the ``Yes to all'' option.
-The new build will be installed over your current build.\\
 
 \opt{gigabeats}{
   \note{When your \dap{} is in the Rockbox USB or bootloader
@@ -834,33 +879,42 @@ The new build will be installed over your current build.\\
   data partition.\\}
 }
 
+\nopt{erosqnative,rgnano}{
 The bootloader only changes rarely, and should not normally
 need to be updated.\\
+}
 
-\nopt{erosqnative}{
+\nopt{erosqnative,rgnano}{
 \note{If you use Rockbox Utility be aware that it cannot detect manually
         installed components.}
 }
 
+\opt{rgnano}{
+  Rockbox can be easily updated by replacing the \fname{rockbox-funkey-s.opk}
+  file in the \fname{Applications} folder of the microSD card with a newer version.
+}
+
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative}{
-  \note{The Rockbox bootloader allows you to choose between Rockbox and
-  the original firmware. (See \reference{ref:Dualboot} for more information.)}
+\nopt{rgnano}{
+  \nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative}{
+    \note{The Rockbox bootloader allows you to choose between Rockbox and
+    the original firmware. (See \reference{ref:Dualboot} for more information.)}
+  }
+
+  \subsection{Automatic Uninstallation}
+  \opt{gigabeats,erosqnative}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
+
+  \nopt{erosqnative}{
+    You can uninstall Rockbox automatically by using Rockbox Utility. If you
+    installed Rockbox manually you can still use Rockbox Utility for uninstallation
+    but will not be able to do this selectively.
+  }
+
+  \opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
+  the fact that it requires a flashing procedure. To uninstall the bootloader
+  completely follow the manual uninstallation instructions below.}}
 }
-
-\subsection{Automatic Uninstallation}
-\opt{gigabeats,erosqnative}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
-
-\nopt{erosqnative}{
-  You can uninstall Rockbox automatically by using Rockbox Utility. If you
-  installed Rockbox manually you can still use Rockbox Utility for uninstallation
-  but will not be able to do this selectively.
-}
-
-\opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
-the fact that it requires a flashing procedure. To uninstall the bootloader
-completely follow the manual uninstallation instructions below.}}
 
 \subsection{Manual Uninstallation}
 
@@ -952,7 +1006,7 @@ completely follow the manual uninstallation instructions below.}}
     \end{enumerate}
 }
 
-\nopt{gigabeats}{
+\nopt{gigabeats,rgnano}{
   If you wish to clean up your disk, you may also wish to delete the
   \fname{.rockbox} directory and its contents.
   \nopt{iaudiom3,iaudiom5,iaudiox5,fiiom3k,shanlingq1}{
@@ -985,11 +1039,20 @@ completely follow the manual uninstallation instructions below.}}
   removing all files.}
 }
 
+\opt{rgnano}{
+  You can uninstall Rockbox simply by removing:
+  \begin{itemize}
+  \item The \fname{Applications/rockbox-funkey-s.opk} file.
+  \item The \fname{FunKey/rockbox} folder.
+  \end{itemize}
+  in the microSD card of your \dap{}.
+}
+
 \section{Troubleshooting}
 \opt{erosqnative}{
   For common troubleshooting issues, please see wiki page ErosQNativeTroubleshooting
   at \url{https://www.rockbox.org/wiki/ErosQNativeTroubleshooting.html}.
-  
+
   For more detailed information about this device, please see the wiki page AIGOErosQK
   at \url{https://www.rockbox.org/wiki/AIGOErosQK}.}
 \begin{description}
@@ -1017,27 +1080,37 @@ completely follow the manual uninstallation instructions below.}}
   the update if the filename is correct, including case. Make sure that the patched
   Iriver firmware is called \fname{.hex}.}
 
-\nopt{iriverh100,iriverh300,mpiohd200}{\item[``File Not Found'']}
-\opt{iriverh100,iriverh300,mpiohd200}{\item[``-1 error'']}
-  If you receive a
-  \nopt{iriverh100,iriverh300,mpiohd200}{``File Not Found''}
-  \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''}
-  from the bootloader, then the bootloader cannot find the Rockbox firmware.
-  This is usually a result of not extracting the contents of the \fname{.zip}
-  file to the proper location\nopt{erosqnative}{, and should not happen when Rockbox has been
-  installed with Rockbox Utility.}\opt{erosqnative}{. It could also be due to the SD card
-  not being formatted correctly to FAT32.}
+\nopt{rgnano}{
+  \nopt{iriverh100,iriverh300,mpiohd200}{\item[``File Not Found'']}
+  \opt{iriverh100,iriverh300,mpiohd200}{\item[``-1 error'']}
+    If you receive a
+    \nopt{iriverh100,iriverh300,mpiohd200,rgnano}{``File Not Found''}
+    \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''}
+    from the bootloader, then the bootloader cannot find the Rockbox firmware.
+    This is usually a result of not extracting the contents of the \fname{.zip}
+    file to the proper location\nopt{erosqnative}{, and should not happen when Rockbox has been
+    installed with Rockbox Utility.}\opt{erosqnative}{. It could also be due to the SD card
+    not being formatted correctly to FAT32.}
 
-  \nopt{erosqnative}{
-  To fix this, either install Rockbox with the Rockbox Utility which will take care
-  of this for you, or recheck the Manual Install section to see where the files
-  need to be located.
-  }
-  \opt{erosqnative}{
-    To fix this, ensure that the SD card is formatted to FAT32 (the original firmware
-    can be used to do this easily), re-copy the entirety of the \fname{.zip} file's
-    contents to the root of the SD card and reboot the device.
-  }
+    \nopt{erosqnative}{
+    To fix this, either install Rockbox with the Rockbox Utility which will take care
+    of this for you, or recheck the Manual Install section to see where the files
+    need to be located.
+    }
+    \opt{erosqnative}{
+      To fix this, ensure that the SD card is formatted to FAT32 (the original firmware
+      can be used to do this easily), re-copy the entirety of the \fname{.zip} file's
+      contents to the root of the SD card and reboot the device.
+    }
+}
+
+\opt{rgnano}{
+  \item [Rockbox doesn't show up in gmenu2x.]
+  If rockbox doesn't show up in gmenu2x after installing it means you're still running
+  the stock Anbernic FunKey OS firmware and need to update to the latest DrUm78's
+  FunKey OS CFW as described in \reference{sec:installing_rockbox}.
+}
+
 \end{description}
 
 \optv{gigabeats}{

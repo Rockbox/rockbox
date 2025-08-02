@@ -549,6 +549,7 @@ detail in the following paragraph.
   the default.\\}
 To turn on and off your Rockbox enabled \dap{} use the following keys:
     \begin{btnmap}
+      \opt{RG_NANO_PAD}{Long \ButtonPower & Turn on the \dap{} \\}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
       \opt{MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}%
           {Long \ButtonPlay}%
@@ -560,6 +561,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           }{\ButtonPower}%
       \opt{COWON_D2_PAD} {\ButtonPower{}, then \ButtonHold}%
       \opt{ONDA_VX777_PAD} {\ButtonPower{}}%
+      \opt{RG_NANO_PAD}{\ButtonA{} (in gmenu2x)}%
       \opt{AGPTEK_ROCKER_PAD}{\ButtonPower{}}%
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -578,6 +580,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD%
           ,PBELL_VIBE500_PAD,ONDA_VX777_PAD,SANSA_FUZEPLUS_PAD,XDUOO_X3_PAD,AIGO_EROSQ_PAD%
           }{Long \ButtonPower}%
+      \opt{RG_NANO_PAD}{\ButtonPower}%
       \opt{AGPTEK_ROCKER_PAD}{Long \ButtonPower{}}%
           &
       \opt{HAVEREMOTEKEYMAP}{
@@ -587,6 +590,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 
       Shutdown Rockbox
           \\
+      \opt{RG_NANO_PAD}{Long \ButtonPower & Turn off the \dap{} \\}
     \end{btnmap}
 
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
@@ -615,7 +619,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   performed by inserting a paperclip gently into the Reset hole.
 }%
 
-\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5}
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,rgnano}
   {
   \subsection{Starting the original firmware}
   \label{ref:Dualboot}
