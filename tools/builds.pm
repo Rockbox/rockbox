@@ -249,6 +249,7 @@ $releasenotes="/wiki/ReleaseNotes400";
     'rgnano' => {
         name => 'Anbernic RG Nano',
         sim => 0,
+        manualok => 1,
         status => 2,
     },
     'rk27generic' => {
