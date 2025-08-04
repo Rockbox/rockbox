@@ -89,5 +89,7 @@ erosq.c
 fiio-m3k.c
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 shanling-q1.c
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+rg-nano.c
 #endif
 #endif /* SIMULATOR */

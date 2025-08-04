@@ -283,6 +283,11 @@ simcc () {
    LDOPTS="$LDOPTS -fsanitize=undefined"
  fi
 
+ # Clear FUNKEY_SDK SDL1.2 path from LDOPTS
+ if [ "$modelname" = "rgnano" ]; then
+   LDOPTS=""
+ fi
+
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
  GCCOPTS="$GCCOPTS -Wno-unused-result"
@@ -3667,7 +3672,6 @@ fi
     t_cpu="hosted"
     t_manufacturer="anbernic"
     t_model="rgnano"
-    extradefines="$extradefines -DOS_USE_BYTESWAP_H"
     ;;
 
    210|hifietma9)

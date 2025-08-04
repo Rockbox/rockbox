@@ -74,7 +74,7 @@ target/hosted/sdl/lcd-bitmap.c
 target/hosted/sdl/lcd-remote-bitmap.c
 #endif
 target/hosted/sdl/lcd-sdl.c
-#ifndef RG_NANO
+#if !defined(RG_NANO) || defined(SIMULATOR)
 target/hosted/sdl/window-sdl.c
 #endif
 target/hosted/sdl/system-sdl.c
@@ -226,7 +226,7 @@ target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
 target/hosted/maemo/maemo-thread.c
 #endif
 
-#ifdef RG_NANO
+#if defined(RG_NANO) && !defined(SIMULATOR)
 target/hosted/sysfs.c
 target/hosted/power-linux.c
 target/hosted/backlight-unix.c

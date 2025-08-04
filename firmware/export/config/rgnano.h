@@ -3,8 +3,11 @@
  */
 
 /* We don't run on hardware directly */
+#ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #define PIVOT_ROOT "/mnt"
+#endif
+
 #define HAVE_FPU
 
 /* For Rolo and boot loader */
@@ -12,7 +15,9 @@
 
 #define MODEL_NAME   "RG Nano"
 
+#ifndef SIMULATOR
 #define USB_NONE
+#endif
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

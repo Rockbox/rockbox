@@ -536,6 +536,13 @@
 #define UI_LCD_POSX                 46
 #define UI_LCD_POSY                 61
 
+#elif defined(RG_NANO)
+#define UI_TITLE                    "Anbernic RG Nano"
+#define UI_WIDTH                    370
+#define UI_HEIGHT                   604
+#define UI_LCD_POSX                 64
+#define UI_LCD_POSY                 78
+
 
 #elif defined(SIMULATOR)
 #error no UI defines
