@@ -96,7 +96,7 @@ static void battery_status_update(void)
         }
     }
 
-    batt_percent = (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
+    batt_percent = ((float) (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT)) * 100;
     batt_runtime = batt_percent * BATT_MAXRUNTIME;
     /* current is completely bogus... */
     batt_current = charging ? BATT_CHARGE_STEP : BATT_DISCHARGE_STEP;
