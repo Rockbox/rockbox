@@ -124,7 +124,7 @@ static struct entry *get_valid_entry(const char* funcname,
 
 static bool ext_stripit(bool isdir, int attr, int dirfilter)
 {
-    if(!isdir)
+    if((dirfilter != SHOW_ID3DB) && !isdir)
     {
         switch(global_settings.show_filename_ext)
         {
@@ -141,7 +141,7 @@ static bool ext_stripit(bool isdir, int attr, int dirfilter)
             case 3:
             default:
                 /* show file extension: only when viewing all */
-                return (dirfilter != SHOW_ID3DB && dirfilter != SHOW_ALL);
+                return (dirfilter != SHOW_ALL);
         }
     }
     return false;
