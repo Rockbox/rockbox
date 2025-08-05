@@ -29,6 +29,8 @@
 #include "ftl-target.h"
 #include "nand-target.h"
 
+uint32_t ftl_banks;
+const struct nand_device_info_type* ftl_nand_type;
 /* This file provides only STUBS for now */
 
 /** static, private data **/

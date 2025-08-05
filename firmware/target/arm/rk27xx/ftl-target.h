@@ -31,10 +31,10 @@
 #endif
 
 /* Pointer to an info structure regarding the flash type used */
-const struct nand_device_info_type* ftl_nand_type;
+extern const struct nand_device_info_type* ftl_nand_type;
 
 /* Number of banks we detected a chip on */
-uint32_t ftl_banks;
+extern uint32_t ftl_banks;
 
 uint32_t ftl_init(void);
 uint32_t ftl_read(uint32_t sector, uint32_t count, void* buffer);
