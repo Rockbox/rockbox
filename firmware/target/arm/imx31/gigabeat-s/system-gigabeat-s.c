@@ -35,6 +35,8 @@
 #include "mc13783.h"
 #include "dvfs_dptc-imx31.h"
 
+struct ARM_REGS regs;
+
 static unsigned long product_rev;
 static unsigned long system_rev;
 

@@ -84,7 +84,7 @@ struct ARM_REGS {
     int lr;
     int pc;
     int cpsr;
-} regs;
+};
 
 void dumpregs(void);
 
