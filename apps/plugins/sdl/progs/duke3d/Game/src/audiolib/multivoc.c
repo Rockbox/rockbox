@@ -78,6 +78,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // #define IS_QUIET( ptr )  ( ( void * )( ptr ) == ( void * )&MV_VolumeTable[ 0 ] )
 #define IS_QUIET( vol ) ( ( vol ) == 0 )
 
+SDL_mutex* reverbMutex;
 static int       MV_ReverbLevel;
 int       MV_ReverbDelay;
 #if 0

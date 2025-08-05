@@ -71,6 +71,10 @@ static int32 mousePositionY = 0;
 static int32 mouseRelativeX = 0;
 static int32 mouseRelativeY = 0;
 
+struct _KeyMapping KeyMapping[MAXGAMEBUTTONS];
+int32 MouseMapping[MAXMOUSEBUTTONS];
+int32 MouseDigitalAxeMapping[MAXMOUSEAXES][2];
+
 //***************************************************************************
 //
 // FUNCTIONS

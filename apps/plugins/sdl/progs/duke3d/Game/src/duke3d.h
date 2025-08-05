@@ -344,9 +344,9 @@ struct animwalltype
 extern struct animwalltype animwall[MAXANIMWALLS];
 extern short numanimwalls,probey,lastprobey;
 
-char  *mymembuf;
+extern char  *mymembuf;
 extern uint8_t  typebuflen;
-char typebuf[41];
+extern char typebuf[41];
 extern uint8_t  MusicPtr[72000];
 extern int32_t msx[2048],msy[2048];
 extern short cyclers[MAXCYCLERS][6],numcyclers;

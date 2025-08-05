@@ -35,6 +35,8 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 char  *mymembuf;
 uint8_t  MusicPtr[72000];
 
+char  **_argv;
+int _argc;
 
 crc32_t crc32lookup[] = {
 		// good:

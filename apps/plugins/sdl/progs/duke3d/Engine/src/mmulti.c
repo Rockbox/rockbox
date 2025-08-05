@@ -50,7 +50,7 @@ static short bakpacketptr[MAXPLAYERS][256], bakpacketlen[MAXPLAYERS][256];
 static char bakpacketbuf[BAKSIZ];
 static long bakpacketplc = 0;
 
-short myconnectindex, numplayers;
+short myconnectindex = 0, numplayers = 1;
 short connecthead, connectpoint2[MAXPLAYERS];
 char syncstate = 0;
 

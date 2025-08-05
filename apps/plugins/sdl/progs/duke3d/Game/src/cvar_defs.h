@@ -22,18 +22,16 @@ void CVARDEFS_FunctionHelp(void* var);
 //
 // Variable declarations
 //
-int g_CV_console_text_color;
-int g_CV_num_console_lines;
-int g_CV_classic;
-int g_CV_TransConsole;
-int g_CV_DebugJoystick;
-int g_CV_DebugSound;
-int g_CV_DebugFileAccess;
-uint32_t sounddebugActiveSounds;
-uint32_t sounddebugAllocateSoundCalls;
-uint32_t sounddebugDeallocateSoundCalls;
-
-
-int g_CV_CubicInterpolation;
+extern int g_CV_console_text_color;
+extern int g_CV_num_console_lines;
+extern int g_CV_classic;
+extern int g_CV_TransConsole;
+extern int g_CV_DebugJoystick;
+extern int g_CV_DebugSound;
+extern int g_CV_DebugFileAccess;
+extern uint32_t sounddebugActiveSounds;
+extern uint32_t sounddebugAllocateSoundCalls;
+extern uint32_t sounddebugDeallocateSoundCalls;
+extern int g_CV_CubicInterpolation;
 
 #endif

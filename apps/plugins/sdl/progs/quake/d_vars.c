@@ -42,12 +42,12 @@ int		d_sdivzstepv_fxp, d_tdivzstepv_fxp, d_zistepv_fxp;
 int		d_sdivzorigin_fxp, d_tdivzorigin_fxp, d_ziorigin_fxp;
 #endif
 
-int d_ziorigin_fxp, d_zistepv_fxp, d_zistepu_fxp;
+//int d_ziorigin_fxp, d_zistepv_fxp, d_zistepu_fxp;
 
 #ifdef USE_PQ_OPT
 //JB: Optimization
-int sdivzstepu, tdivzstepu, zistepu;
-int sdivzstepv, tdivzstepv, zistepv;
+//int sdivzstepu, tdivzstepu, zistepu;
+//int sdivzstepv, tdivzstepv, zistepv;
 int sdivzorigin, tdivzorigin, ziorigin;
 #endif
 

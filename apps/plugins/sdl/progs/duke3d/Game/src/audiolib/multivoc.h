@@ -122,6 +122,6 @@ int   MV_Shutdown( void );
 void  MV_UnlockMemory( void );
 int   MV_LockMemory( void );
 
-SDL_mutex* reverbMutex;
+extern SDL_mutex* reverbMutex;
 
 #endif

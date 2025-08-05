@@ -89,10 +89,10 @@ extern fixedpoint_t	d_sdivzoriginFPM, d_tdivzoriginFPM, d_zioriginFPM;
 
 //Dan: ID Software was already using a minute amount of fixed point.  I duplicated
 //these just for consistancy in the conversion, and so the types would match.
-fixed16_t		sadjust, tadjust;
-fixed16_t		bbextents, bbextentt;
-fixedpoint_t	sadjustFPM, tadjustFPM;
-fixedpoint_t	bbextentsFPM, bbextenttFPM;
+extern fixed16_t		sadjust, tadjust;
+extern fixed16_t		bbextents, bbextentt;
+//fixedpoint_t	sadjustFPM, tadjustFPM;
+//fixedpoint_t	bbextentsFPM, bbextenttFPM;
 
 
 void D_DrawSpans8 (espan_t *pspans);
@@ -110,7 +110,7 @@ void D_DrawSkyScans8 (espan_t *pspan);
 void D_DrawSkyScans16 (espan_t *pspan);
 
 void R_ShowSubDiv (void);
-void (*prealspandrawer)(void);
+// void (*prealspandrawer)(void);
 surfcache_t	*D_CacheSurface (msurface_t *surface, int miplevel);
 
 extern int D_MipLevelForScale (float scale);

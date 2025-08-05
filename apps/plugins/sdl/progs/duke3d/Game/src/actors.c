@@ -27,7 +27,7 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 #include "duke3d.h"
 
 extern int32_t numenvsnds;
-uint8_t  actor_tog;
+extern uint8_t  actor_tog;
 
 void updateinterpolations()  //Stick at beginning of domovethings
 {
