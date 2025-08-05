@@ -14,6 +14,7 @@ if [ "$system" == "Darwin" ]; then
     READLINK=greadlink
     TMP="$TMPDIR"
     SED=gsed
+    PATH="$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin:${PATH}"
 else
     READLINK=readlink
     parallel=`nproc`
