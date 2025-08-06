@@ -37,5 +37,6 @@ const unsigned char *iap_get_serbuf(void);
 #ifdef HAVE_LINE_REC
 extern bool iap_record(bool onoff);
 #endif
-
+void iap_reset_state(int port); /* 0 is dock, 1 is headphone */
+bool dbg_iap(void);
 #endif

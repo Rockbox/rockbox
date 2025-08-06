@@ -118,10 +118,6 @@
 #include "usb_core.h"
 #endif
 
-#if defined(IPOD_ACCESSORY_PROTOCOL)
-#include "iap.h"
-#endif
-
 #include "talk.h"
 
 #if defined(HAVE_DEVICEDATA)// && !defined(SIMULATOR)
@@ -138,6 +134,10 @@
 
 #if defined(IPOD_6G) && !defined(SIMULATOR)
 #include "norboot-target.h"
+#endif
+
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+#include "iap.h"
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
@@ -2852,6 +2852,9 @@ static const struct {
 #if (defined(HAVE_WHEEL_ACCELERATION) && (CONFIG_KEYPAD==IPOD_4G_PAD) \
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
+#endif
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+        {"Debug IAP", dbg_iap },
 #endif
         {"Talk engine stats", dbg_talk },
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)

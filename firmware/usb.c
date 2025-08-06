@@ -51,6 +51,10 @@
 #include "gui/skin_engine/skin_engine.h"
 #endif
 
+#if defined(IPOD_ACCESSORY_PROTOCOL)
+#include "iap.h"
+#endif
+
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || \
      (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) || \
@@ -520,6 +524,10 @@ static void NORETURN_ATTR usb_thread(void)
 
             if(usb_state == USB_POWERED || usb_state == USB_INSERTED)
                 usb_stack_enable(false);
+
+#ifdef IPOD_ACCESSORY_PROTOCOL
+            iap_reset_state(0);
+#endif
 
             /* Only disable the USB slave mode if we really have enabled
                it. Some expected acks may not have been received. */

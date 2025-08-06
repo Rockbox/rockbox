@@ -45,6 +45,10 @@
 #include "lcd.h"       /* lcd_active() prototype */
 #endif
 
+#if defined(IPOD_ACCESSORY_PROTOCOL) && (defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G))
+#include "iap.h"
+#endif
+
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
@@ -102,6 +106,12 @@ static int hp_detect_callback(struct timeout *tmo)
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_PHONE_PLUGGED : SYS_PHONE_UNPLUGGED;
     button_queue_post_remove_head(id, 0);
+
+#if defined(IPOD_ACCESSORY_PROTOCOL) && (defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G))
+    if (id == SYS_PHONE_UNPLUGGED)
+         iap_reset_state(1);
+#endif
+
     return 0;
     /*misc.c:hp_unplug_change*/
 }
@@ -113,6 +123,7 @@ static int lo_detect_callback(struct timeout *tmo)
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_LINEOUT_PLUGGED : SYS_LINEOUT_UNPLUGGED;
     button_queue_post_remove_head(id, 0);
+
     return 0;
     /*misc.c:lo_unplug_change*/
 }

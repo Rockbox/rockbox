@@ -177,7 +177,7 @@ unsigned char lingo_versions[32][2] = {
 
 /* states of the iap de-framing state machine */
 enum fsm_state {
-    ST_SYNC,    /* wait for 0xFF sync byte */
+    ST_SYNC = 0,    /* wait for 0xFF sync byte */
     ST_SOF,     /* wait for 0x55 start-of-frame byte */
     ST_LEN,     /* receive length byte (small packet) */
     ST_LENH,    /* receive length high byte (large packet) */
@@ -209,6 +209,17 @@ static struct buflib_callbacks iap_buflib_callbacks = {
 #endif
 
 static void iap_malloc(void);
+
+static void iap_reset_buffers(void)
+{
+    iap_txstart = iap_buffers;
+    iap_txpayload = iap_txstart+5;
+    iap_txnext = iap_txpayload;
+    iap_rxstart = iap_buffers+(TX_BUFLEN+6);
+    iap_rxpayload = iap_rxstart;
+    iap_rxnext = iap_rxpayload;
+    iap_rxlen = RX_BUFLEN+2;
+}
 
 void put_u16(unsigned char *buf, const uint16_t data)
 {
@@ -295,6 +306,27 @@ void iap_reset_auth(struct auth_t* auth)
     auth->next_section = 0;
 }
 
+void iap_reset_state(int port)
+{
+    if (!iap_running)
+        return;
+
+    /* 0 is dock, 1 is headphone.  This is for
+       when we eventually maintain independent state */
+    (void)port;
+
+    iap_reset_device(&device);
+    iap_bitrate_set(global_settings.serial_bitrate);
+
+#if 0  // XXX this is still screwed up
+    memset(&frame_state, 0, sizeof(frame_state));
+    interface_state = IST_STANDARD;
+    frame_state.state = ST_SYNC;
+
+    iap_reset_buffers();
+#endif
+}
+
 void iap_reset_device(struct device_t* device)
 {
     iap_reset_auth(&(device->auth));
@@ -325,7 +357,6 @@ void iap_set_remote_volume(void)
     IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
     iap_send_tx();
 }
-
 
 /* This thread is waiting for events posted to iap_queue and calls
  * the appropriate subroutines in response
@@ -460,13 +491,8 @@ static void iap_malloc(void)
 #else
     iap_buffers = serbuf;
 #endif
-    iap_txstart = iap_buffers;
-    iap_txpayload = iap_txstart+5;
-    iap_txnext = iap_txpayload;
-    iap_rxstart = iap_buffers+(TX_BUFLEN+6);
-    iap_rxpayload = iap_rxstart;
-    iap_rxnext = iap_rxpayload;
-    iap_rxlen = RX_BUFLEN+2;
+
+    iap_reset_buffers();
     iap_running = true;
 }
 
@@ -996,7 +1022,7 @@ void iap_periodic(void)
         if (device.play_status != play_status)
         {
 			/* If play_status = PAUSE/STOP we should mute else
-			 * we should unmute 
+			 * we should unmute
 			 * 0 = Stopped
 			 * 1 = Playing
 			 * 2 = Pause
@@ -1417,4 +1443,33 @@ void iap_fill_power_state(void)
         IAP_TX_PUT(0x04);
         IAP_TX_PUT(0x00);
     }
+}
+
+#include "lcd.h"
+#include "font.h"
+bool dbg_iap(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while (1)
+    {
+        if (action_userabort(HZ/10))
+            break;
+
+        lcd_clear_display();
+
+        /* show internal state of IAP subsystem */
+        lcd_putsf(0, 0, "auth: %d acc: %d", device.auth.state, device.accinfo);
+        lcd_putsf(0, 1, "lin: %08x", device.lingoes);
+        lcd_putsf(0, 2, "notif: %08x", device.notifications);
+        lcd_putsf(0, 3, "cap: %08x/%08x", device.capabilities, device.capabilities_queried);
+
+        // frame_state.state
+        // serial state
+
+        lcd_update();
+    }
+
+    lcd_setfont(FONT_UI);
+    return false;
 }
