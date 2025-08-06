@@ -50,6 +50,11 @@
 #include "maemo-thread.h"
 #endif
 
+#ifdef RG_NANO
+#include <signal.h>
+#include "instant_play.h"
+#endif
+
 #define SIMULATOR_DEFAULT_ROOT "simdisk"
 
 #if SDL_MAJOR_VERSION == 1
@@ -193,6 +198,11 @@ void power_off(void)
     /* wait for event thread to finish */
     SDL_WaitThread(evt_thread, NULL);
 
+#ifdef RG_NANO
+    /* Reset volume/brightness to the values before launching rockbox */
+    ip_reset_values();
+#endif
+
 #ifdef HAVE_SDL_THREADS
     /* lock again before entering the scheduler */
     sim_thread_lock(t);
@@ -240,6 +250,13 @@ void system_init(void)
     g_type_init();
 #endif
 
+#ifdef RG_NANO
+    /* Instant play handling */
+    struct sigaction ip_sa;
+    ip_sa.sa_handler = ip_handle_sigusr1;
+    sigaction(SIGUSR1, &ip_sa, NULL);
+#endif
+
     if (SDL_InitSubSystem(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
 
@@ -284,6 +301,11 @@ void system_init(void)
 
 void system_reboot(void)
 {
+#ifdef RG_NANO
+    /* Reset volume/brightness to the values before launching rockbox */
+    ip_reset_values();
+#endif
+
 #ifdef HAVE_SDL_THREADS
     sim_thread_exception_wait();
 #else

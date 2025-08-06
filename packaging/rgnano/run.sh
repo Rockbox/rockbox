@@ -4,6 +4,11 @@ RBDIR=/mnt/FunKey/rockbox
 CFGFILE=$RBDIR/config.cfg
 BLPATH=/sys/class/backlight/backlight/brightness
 
+_send_sigusr1()
+{
+  kill -s USR1 "$rb_pid" 2>/dev/null
+}
+
 # Install the rockbox folder
 if [ ! -d $RBDIR ]; then
   notif set 0 " Installing rockbox..."
@@ -27,12 +32,13 @@ if [ ! -f $CFGFILE ]; then
   cp ./config.cfg $CFGFILE
 fi
 
-# Get current volume/brightness -> launch rockbox -> restore previous values
-CUR_VOL=$(volume get)
-CUR_BL=$(cat $BLPATH)
-volume set 100
+# Set volume to max with amixer so it's not permanent
+amixer -q sset 'Headphone' 63 unmute
 
-./rockbox
+# Need to send SIGUSR1 to the rockbox process for instant play support
+trap _send_sigusr1 SIGUSR1
 
-volume set $CUR_VOL
-echo $CUR_BL > $BLPATH
+./rockbox &
+
+rb_pid=$!
+wait "$rb_pid"

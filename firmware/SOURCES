@@ -230,6 +230,7 @@ target/hosted/maemo/maemo-thread.c
 target/hosted/sysfs.c
 target/hosted/power-linux.c
 target/hosted/backlight-unix.c
+target/hosted/anbernic/instant_play.c
 target/hosted/anbernic/power-rgnano.c
 target/hosted/anbernic/button-rgnano.c
 target/hosted/anbernic/powermgmt-rgnano.c
