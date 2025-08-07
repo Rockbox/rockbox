@@ -50,7 +50,7 @@
 #include "maemo-thread.h"
 #endif
 
-#ifdef RG_NANO
+#if defined(RG_NANO) && !defined(SIMULATOR)
 #include <signal.h>
 #include "instant_play.h"
 #endif
@@ -198,7 +198,7 @@ void power_off(void)
     /* wait for event thread to finish */
     SDL_WaitThread(evt_thread, NULL);
 
-#ifdef RG_NANO
+#if defined(RG_NANO) && !defined(SIMULATOR)
     /* Reset volume/brightness to the values before launching rockbox */
     ip_reset_values();
 #endif
@@ -250,7 +250,7 @@ void system_init(void)
     g_type_init();
 #endif
 
-#ifdef RG_NANO
+#if defined(RG_NANO) && !defined(SIMULATOR)
     /* Instant play handling */
     struct sigaction ip_sa;
     ip_sa.sa_handler = ip_handle_sigusr1;
@@ -301,7 +301,7 @@ void system_init(void)
 
 void system_reboot(void)
 {
-#ifdef RG_NANO
+#if defined(RG_NANO) && !defined(SIMULATOR)
     /* Reset volume/brightness to the values before launching rockbox */
     ip_reset_values();
 #endif
