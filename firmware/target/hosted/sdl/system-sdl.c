@@ -99,11 +99,8 @@ static int sdl_event_thread(void * param)
     sdl_window_setup();
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    SDL_sem *wait_for_maemo_startup;
-#endif
-
-#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA)) || defined(RG_NANO)
+#if !defined(SIMULATOR)
+#if defined(HAVE_TOUCHSCREEN)
     /* SDL touch screen fix: Work around a SDL assumption that returns
        relative mouse coordinates when you get to the screen edges
        using the touchscreen and a disabled mouse cursor.
@@ -113,11 +110,15 @@ static int sdl_event_thread(void * param)
 
     SDL_ShowCursor(SDL_ENABLE);
     SDL_SetCursor(hiddenCursor);
-#endif
+#else /* !HAVE_TOUCHSCREEN */
+    /* Explicitly disable the cursor on non-touch targets */
+    SDL_ShowCursor(SDL_DISABLE);
+#endif /* !HAVE_TOUCHSCREEN */
+#endif /* !SIMULATOR */
 
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
     /* start maemo thread: Listen to display on/off events and battery monitoring */
-    wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
+    SDL_sem *wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
     SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, NULL, wait_for_maemo_startup);
     SDL_SemWait(wait_for_maemo_startup);
     SDL_DestroySemaphore(wait_for_maemo_startup);
