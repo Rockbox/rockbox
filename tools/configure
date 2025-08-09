@@ -1012,7 +1012,7 @@ rgnanocc () {
 
     thread_support="HAVE_SDL_THREADS"
     sdl="$FUNKEY_SDK_PATH/arm-funkey-linux-musleabihf/sysroot/usr/bin/sdl-config"
-    rbdir="/FunKey/rockbox"
+    rbdir="/FunKey/.rockbox"
 }
 
 

@@ -5,10 +5,6 @@
 # Disable Status Bar
 %wd
 #
-#
-# Preload Fonts
-%Fl(3,14-Rockbox-Mix.fnt)
-#
 # Load Backdrop
 %X(wpsbackdrop-240x240x16.bmp)
 #
@@ -52,7 +48,7 @@
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
 #
 # Time Elapsed/Remaining
-%V(10,180,220,20,3)
+%V(10,180,220,20,-)
 %al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
 #
 # Album Art
@@ -61,7 +57,7 @@
 %Cd
 #
 # Track Info - Album Art
-%ax%Vl(a,113,40,-,130,3)
+%ax%Vl(a,113,30,-,130,-)
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
@@ -72,7 +68,7 @@
 %s%al%?Ia<%Ia|%?IA<%IA>>
 #
 # Track Info - No Album Art
-%ax%Vl(b,0,30,-,130,3)
+%ax%Vl(b,0,30,-,130,-)
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>

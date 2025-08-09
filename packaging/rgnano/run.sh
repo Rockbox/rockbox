@@ -1,6 +1,7 @@
 #!/bin/sh
 
-RBDIR=/mnt/FunKey/rockbox
+RBDIR_OLD=/mnt/FunKey/rockbox
+RBDIR=/mnt/FunKey/.rockbox
 CFGFILE=$RBDIR/config.cfg
 BLPATH=/sys/class/backlight/backlight/brightness
 
@@ -9,7 +10,13 @@ _send_sigusr1()
   kill -s USR1 "$rb_pid" 2>/dev/null
 }
 
-# Install the rockbox folder
+# Check if the old folder exists and rename it
+# TODO: Remove this later, maybe when there's a new stable update?
+if [ -d $RBDIR_OLD ]; then
+  mv $RBDIR_OLD $RBDIR
+fi
+
+# Install or update the rockbox folder
 if [ ! -d $RBDIR ]; then
   notif set 0 " Installing rockbox..."
   mkdir -p $RBDIR
