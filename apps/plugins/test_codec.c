@@ -524,6 +524,11 @@ static void configure(int setting, intptr_t value)
 
 }
 
+static void strip_filesize(off_t size)
+{
+    ci.filesize = size;
+}
+
 static void init_ci(void)
 {
     /* --- Our "fake" implementations of the codec API functions. --- */
@@ -547,6 +552,7 @@ static void init_ci(void)
     ci.configure = configure;
     ci.get_command = get_command;
     ci.loop_track = loop_track;
+    ci.strip_filesize = strip_filesize;
 
     /* --- "Core" functions --- */
 
