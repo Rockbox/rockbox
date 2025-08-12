@@ -202,11 +202,7 @@ const unsigned char versions_builtin[7][20] =
    "TNT"
 };
 
-#ifdef RG_NANO /* Path is a bit longer */
-const unsigned char wads_builtin[7][34] =
-#else
-const unsigned char wads_builtin[7][30] =
-#endif
+const unsigned char wads_builtin[7][35] =
 {
    GAMEBASE"doom1.wad",
    GAMEBASE"doom.wad",
