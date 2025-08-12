@@ -22,4 +22,9 @@ CORE_LIBS := $(RBCODECLIB) $(CORE_LIBS)
 $(RBCODECLIB): $(RBCODECLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
+# Force use of -O2 for DSP code
+ifneq ($(MEMORYSIZE),2)
+$(BUILDDIR)/lib/rbcodec/dsp/%: CFLAGS += -O2
+endif
+
 include $(RBCODECLIB_DIR)/codecs/codecs.make
