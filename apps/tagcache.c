@@ -503,7 +503,7 @@ read_tagfile_entry_and_tag(int fd, struct tagfile_entry *tfe,
         return e_TAG_SIZEMISMATCH;
 
     str_setlen(buf, tag_length);
-    return tag_length > 0 ? e_SUCCESS : e_SUCCESS_LEN_ZERO;
+    return (tag_length > 0 && *buf) ? e_SUCCESS : e_SUCCESS_LEN_ZERO;
 }
 
 static ssize_t read_index_entries(int fd, struct index_entry *buf, size_t count)
