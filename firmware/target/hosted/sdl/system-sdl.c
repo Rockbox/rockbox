@@ -202,6 +202,7 @@ void power_off(void)
 #if defined(RG_NANO) && !defined(SIMULATOR)
     /* Reset volume/brightness to the values before launching rockbox */
     ip_reset_values();
+    ip_power_off();
 #endif
 
 #ifdef HAVE_SDL_THREADS
@@ -252,6 +253,9 @@ void system_init(void)
 #endif
 
 #if defined(RG_NANO) && !defined(SIMULATOR)
+    /* Set system volume to max with amixer */
+    system("amixer -q sset 'Headphone' 63 unmute");
+
     /* Instant play handling */
     struct sigaction ip_sa;
     ip_sa.sa_handler = ip_handle_sigusr1;
@@ -305,6 +309,8 @@ void system_reboot(void)
 #if defined(RG_NANO) && !defined(SIMULATOR)
     /* Reset volume/brightness to the values before launching rockbox */
     ip_reset_values();
+    SDL_Quit();
+    exit(EXIT_SUCCESS);
 #endif
 
 #ifdef HAVE_SDL_THREADS

@@ -586,14 +586,16 @@ static void button_event(int key, bool pressed)
         return;
 #endif
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_PANDORA) || defined(RG_NANO)
-#ifdef RG_NANO
-    case SDLK_q:
-#else
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
     case SDLK_LCTRL:
-#endif
         /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
         sys_poweroff();
+        break;
+#endif
+#ifdef RG_NANO
+    case SDLK_q:
+        /* Use reboot to exit without shutting down */
+        sys_reboot();
         break;
 #endif
 #ifdef HAS_BUTTON_HOLD

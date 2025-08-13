@@ -20,6 +20,7 @@
 #ifndef _INSTANT_PLAY_H_
 #define _INSTANT_PLAY_H_
 
-void ip_handle_sigusr1(int sig);
 void ip_reset_values(void);
+void ip_power_off(void);
+void ip_handle_sigusr1(int sig);
 #endif /* _INSTANT_PLAY_H_ */

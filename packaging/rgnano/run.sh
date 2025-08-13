@@ -39,9 +39,6 @@ if [ ! -f $CFGFILE ]; then
   cp ./config.cfg $CFGFILE
 fi
 
-# Set volume to max with amixer so it's not permanent
-amixer -q sset 'Headphone' 63 unmute
-
 # Need to send SIGUSR1 to the rockbox process for instant play support
 trap _send_sigusr1 SIGUSR1
 

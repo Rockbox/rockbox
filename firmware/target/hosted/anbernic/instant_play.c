@@ -80,27 +80,32 @@ void ip_reset_values(void)
     }
 }
 
+void ip_power_off(void)
+{
+    /* Stop the powerdown countdown */
+    system("powerdown handle");
+
+    /* Write the instant_play file */
+    char buf[60];
+    size_t nbytes;
+    int fd;
+
+    fd = open("/mnt/instant_play", O_WRONLY | O_CREAT, 0640);
+
+    strcpy(buf, "'/opk/rockbox' &\npid record $!\nwait $!\npid erase\n");
+    nbytes = strlen(buf);
+    write(fd, buf, nbytes);
+
+    close(fd);
+
+    /* Powerdown the handheld after writting the file */
+    system("powerdown now");
+}
+
 void ip_handle_sigusr1(int sig)
 {
     if (sig == SIGUSR1)
     {
-        /* Stop the powerdown countdown */
-        system("powerdown handle");
-
-        /* Write the instant_play file */
-        char buf[60];
-        size_t nbytes;
-        int fd;
-
-        fd = open("/mnt/instant_play", O_WRONLY | O_CREAT, 0640);
-
-        strcpy(buf, "'/opk/rockbox' &\npid record $!\nwait $!\npid erase\n");
-        nbytes = strlen(buf);
-        write(fd, buf, nbytes);
-
-        close(fd);
-
-        /* Powerdown the handheld after writting the file */
-        system("powerdown now");
+        ip_power_off();
     }
 }
