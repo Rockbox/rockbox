@@ -5075,7 +5075,14 @@ void do_tagcache_build(const char *path[])
     {
         logf("Search root %s", this->path);
         strmemccpy(curpath, this->path, sizeof(curpath));
-        ret = ret && check_dir(this->path, true);
+
+        if (ret)
+        {
+            if (dir_exists(this->path))
+                ret = check_dir(this->path, true);
+            else
+                logf("Dir not found %s", this->path);
+        }
     }
     free_search_roots(&roots_ll[0]);
 
