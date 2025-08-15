@@ -220,7 +220,7 @@ static void iap_rx_isr(int len, char *data, char *err, uint32_t abr_cnt)
             uartc_port_set_rx_mode(&ser_port, UCON_MODE_INTREQ);
 
             /* enter SOF state */
-            iap_getc(0xff);
+            iap_getc(IF_IAP_MP(0,) 0xff);
 
             abr_status = ABR_STATUS_SYNCING;
             sync_retry = 2; /* we are expecting [0xff] 0x55 */
@@ -230,7 +230,7 @@ static void iap_rx_isr(int len, char *data, char *err, uint32_t abr_cnt)
     /* process received data */
     while (len--)
     {
-        bool sync_done = !iap_getc(*data++);
+        bool sync_done = !iap_getc(IF_IAP_MP(0,) *data++);
 
         if (abr_status == ABR_STATUS_SYNCING)
         {

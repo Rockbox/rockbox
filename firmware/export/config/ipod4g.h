@@ -213,6 +213,7 @@
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
 #define IPOD_ACCESSORY_PROTOCOL
+#define HAVE_IAP_MULTIPORT
 #define HAVE_SERIAL
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */

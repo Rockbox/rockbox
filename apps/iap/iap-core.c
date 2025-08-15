@@ -306,14 +306,14 @@ void iap_reset_auth(struct auth_t* auth)
     auth->next_section = 0;
 }
 
-void iap_reset_state(int port)
+void iap_reset_state(IF_IAP_MP_NONVOID(int port))
 {
     if (!iap_running)
         return;
 
     /* 0 is dock, 1 is headphone.  This is for
        when we eventually maintain independent state */
-    (void)port;
+    IF_IAP_MP((void)port);
 
     iap_reset_device(&device);
     iap_bitrate_set(global_settings.serial_bitrate);
@@ -593,7 +593,7 @@ void iap_send_pkt(const unsigned char * data, const int len)
     iap_send_tx();
 }
 
-bool iap_getc(const unsigned char x)
+bool iap_getc(IF_IAP_MP(int port,) const unsigned char x)
 {
     struct state_t *s = &frame_state;
     static long pkt_timeout;
@@ -606,7 +606,7 @@ bool iap_getc(const unsigned char x)
         /* Packet timeouts only make sense while not waiting for the
          * sync byte */
          s->state = ST_SYNC;
-         return iap_getc(x);
+         return iap_getc(IF_IAP_MP(port,) x);
     }
 
 
@@ -633,7 +633,7 @@ bool iap_getc(const unsigned char x)
             s->state = ST_LEN;
         } else {
             s->state = ST_SYNC;
-            return iap_getc(x);
+            return iap_getc(IF_IAP_MP(port,) x);
         }
         break;
     case ST_LEN:

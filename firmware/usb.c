@@ -526,7 +526,7 @@ static void NORETURN_ATTR usb_thread(void)
                 usb_stack_enable(false);
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
-            iap_reset_state(0);
+            iap_reset_state(IF_IAP_MP(0));
 #endif
 
             /* Only disable the USB slave mode if we really have enabled

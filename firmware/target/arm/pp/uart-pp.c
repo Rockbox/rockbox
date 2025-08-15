@@ -188,11 +188,12 @@ void SERIAL_ISR(int port)
     static bool newpkt = true;
     char temp;
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+#ifdef HAVE_IAP_MULTIPORT
     if (port && SERn != &SER1)
         SERn = &SER1;
     else if (!port && SERn != &SER0)
         SERn = &SER0;
+    port = !port;  /* UART0 is headphone, ie IAP1 */
 #else
     (void)port;
 #endif
@@ -261,7 +262,7 @@ void SERIAL_ISR(int port)
                 }
             }
         }
-        bool pkt = iap_getc(temp);
+        bool pkt = iap_getc(IF_IAP_MP(port,) temp);
         if(newpkt && !pkt)
             SERn->autobaud = 0; /* Found good baud */
         newpkt = pkt;

@@ -109,7 +109,7 @@ static int hp_detect_callback(struct timeout *tmo)
 
 #if defined(IPOD_ACCESSORY_PROTOCOL) && (defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G))
     if (id == SYS_PHONE_UNPLUGGED)
-         iap_reset_state(1);
+        iap_reset_state(IF_IAP_MP(1));
 #endif
 
     return 0;
