@@ -36,8 +36,11 @@ void kernel_device_init(void);
 #define STORAGE_WANTS_ALIGN
 
 /* We can use a interrupt-based mechanism on the fuzev2 */
-#define INCREASED_SCROLLWHEEL_POLLING \
-    (defined(HAVE_SCROLLWHEEL) && (CONFIG_CPU == AS3525))
+#if (defined(HAVE_SCROLLWHEEL) && (CONFIG_CPU == AS3525))
+#define INCREASED_SCROLLWHEEL_POLLING 1
+#else
+#define INCREASED_SCROLLWHEEL_POLLING 0
+#endif
 
 #if INCREASED_SCROLLWHEEL_POLLING
 /* let the timer interrupt twice as often for the scrollwheel polling */
