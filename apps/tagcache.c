@@ -212,10 +212,10 @@ static const char * const tags_str[] = { "artist", "album", "genre", "title",
     "discnumber", "tracknumber", "canonicalartist", "bitrate", "length",
     "playcount", "rating", "playtime", "lastplayed", "commitid", "mtime",
     "lastelapsed", "lastoffset"
-#if !defined(LOGF_ENABLE)
+#if !defined(LOGF_ENABLE) || !defined(LOGF_CLAUSES)
 };
 #define logf_clauses(...) do { } while(0)
-#elif defined(LOGF_CLAUSES) /* strings for logf debugging */
+#else /* strings for logf debugging */
     "tag_virt_basename", "tag_virt_length_min", "tag_virt_length_sec",
     "tag_virt_playtime_min", "tag_virt_playtime_sec",
     "tag_virt_entryage", "tag_virt_autoscore"
@@ -240,7 +240,7 @@ static const char * const tag_type_str[] = {
     [clause_logical_or] = "clause_logical_or"
  };
 #define logf_clauses logf
-#endif /* ndef LOGF_ENABLE */
+#endif /* !defined(LOGF_ENABLE) || !defined(LOGF_CLAUSES) */
 
 #if defined(PLUGIN)
 char *itoa_buf(char *buf, size_t bufsz, long int i)
