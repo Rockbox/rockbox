@@ -60,10 +60,10 @@ int key_to_button(int keyboard_button)
         case SDLK_a:
             new_btn = BUTTON_Y;
             break;
-        case SDLK_q:
+        case SDLK_d:
             new_btn = BUTTON_L;
             break;
-        case SDLK_w:
+        case SDLK_c:
             new_btn = BUTTON_R;
             break;
         case SDLK_n:
@@ -77,5 +77,17 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
+    { SDLK_LEFT,       52,  432, 22, "Left" },
+    { SDLK_RIGHT,      137, 432, 22, "Right" },
+    { SDLK_UP,         95,  390, 22, "Up" },
+    { SDLK_DOWN,       95,  474, 22, "Down" },
+    { SDLK_RETURN,     313, 432, 25, "A" },
+    { SDLK_ESCAPE,     271, 475, 25, "B" },
+    { SDLK_s,          271, 391, 25, "X" },
+    { SDLK_a,          229, 432, 25, "Y" },
+    { SDLK_d,          41,    8, 50, "L" },
+    { SDLK_c,          329,   8, 50, "R" },
+    { SDLK_n,          149, 542, 20, "SE" },
+    { SDLK_m,          209, 542, 20, "ST" },
     { 0, 0, 0, 0, "None" }
 };
