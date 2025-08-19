@@ -106,7 +106,7 @@ if you select Exit, so any unsaved changes will be lost.}
 \begin{btnmap}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
         \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD%
-             ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
+             ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,RG_NANO_PAD}
             {\ButtonPower}
         \opt{IRIVER_H300_PAD}{\ButtonOff}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
@@ -114,6 +114,7 @@ if you select Exit, so any unsaved changes will be lost.}
         \opt{PBELL_VIBE500_PAD}{\ButtonRec}
         \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{Long \ButtonRew}
           \opt{HAVEREMOTEKEYMAP}{& }
+        \opt{RG_NANO_PAD}{\ButtonStart}
         & Quits Rockpaint immediately.\\
     }
 
@@ -137,6 +138,7 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}%
     \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}%
       \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonB}
     & Displays the Main Menu.\\
 
     \opt{IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD}{\ButtonRec}
@@ -152,15 +154,17 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{SAMSUNG_YH92X_PAD}{\ButtonFF{} or \ButtonLeft+\ButtonFF}%
     \opt{SAMSUNG_YH820_PAD}{\ButtonFF{} or \ButtonRec}%
       \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonX{} or \ButtonY}
     & Displays the toolbar.\\
 
     \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
-         ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonSelect}%
+         ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,RG_NANO_PAD}{\ButtonSelect}%
     \opt{IRIVER_H10_PAD}{\ButtonFF}%
     \opt{touchscreen}{\TouchCenter}
     \opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
       \opt{HAVEREMOTEKEYMAP}{& }
+    \opt{RG_NANO_PAD}{\ButtonA}
     & Toggles the brush and selects objects.\\
 
 \end{btnmap}

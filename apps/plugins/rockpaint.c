@@ -429,6 +429,17 @@
 #define ROCKPAINT_LEFT      BUTTON_LEFT
 #define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+#define ROCKPAINT_QUIT      BUTTON_START
+#define ROCKPAINT_DRAW      BUTTON_A
+#define ROCKPAINT_MENU      BUTTON_B
+#define ROCKPAINT_TOOLBAR   BUTTON_X
+#define ROCKPAINT_TOOLBAR2  BUTTON_Y
+#define ROCKPAINT_UP        BUTTON_UP
+#define ROCKPAINT_DOWN      BUTTON_DOWN
+#define ROCKPAINT_LEFT      BUTTON_LEFT
+#define ROCKPAINT_RIGHT     BUTTON_RIGHT
+
 #else
 #error "Please define keys for this keypad"
 #endif

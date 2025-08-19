@@ -40,8 +40,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 240
-#define LCD_DEPTH  24
-#define LCD_PIXELFORMAT RGB888
+#define LCD_DEPTH  16
+#define LCD_PIXELFORMAT RGB565
 
 /* define this to indicate your device's keypad */
 #define HAVE_BUTTON_DATA
