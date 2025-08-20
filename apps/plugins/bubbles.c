@@ -124,6 +124,17 @@ enum {
 #define XOFS          144
 #define MAX_FPS       40
 
+/* custom text positioning */
+#define LEVEL_TXT_X     58
+#define LEVEL_TXT_WIDTH 32
+#define LEVEL_TXT_Y     8
+#define SCORE_TXT_X     58
+#define SCORE_TXT_WIDTH 32
+#define SCORE_TXT_Y     62
+#define NEXT_BB_X       58
+#define NEXT_BB_WIDTH   32
+#define NEXT_BB_Y       402
+
 #elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
 #define XOFS          128
 #define MAX_FPS       40
@@ -144,10 +155,26 @@ enum {
 #define XOFS          72
 #define MAX_FPS       40
 
+/* custom text positioning */
+#define NEXT_BB_X       20
+#define NEXT_BB_WIDTH   32
+#define NEXT_BB_Y       200
+
 /* 22x22 bubbles (Gigabeat, Onda VX747) */
 #elif ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)) && (LCD_WIDTH == 240)
 #define XOFS          64
 #define MAX_FPS       30
+
+/* custom text positioning */
+#define LEVEL_TXT_X     21
+#define LEVEL_TXT_WIDTH 32
+#define LEVEL_TXT_Y     2
+#define SCORE_TXT_X     20
+#define SCORE_TXT_WIDTH 32
+#define SCORE_TXT_Y     29
+#define NEXT_BB_X       20
+#define NEXT_BB_WIDTH   32
+#define NEXT_BB_Y       200
 
 /* 16x16 bubbles (H300, iPod Color, HDD6330) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
@@ -1471,8 +1498,14 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     /* clear screen */
     rb->lcd_clear_display();
+#if ((LCD_HEIGHT >= 128) && (LCD_WIDTH <= 320)) || ((LCD_WIDTH == 132) && (LCD_HEIGHT == 80))
+    h = rb->font_get(FONT_SYSFIXED)->height + 1;
+#elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
+    h = rb->font_get(FONT_SYSFIXED)->height + 6;
+#else
     int font = rb->screens[SCREEN_MAIN]->getuifont();
     h = rb->font_get(font)->height + 1;
+#endif
     /* draw background */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
