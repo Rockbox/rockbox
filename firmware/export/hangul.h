@@ -21,4 +21,5 @@
 
 extern const char jamo_table[51][3];
 
-ucschar_t hangul_join(ucschar_t lead, ucschar_t vowel, ucschar_t tail);
+unsigned short hangul_join(unsigned short lead, unsigned short vowel,
+                                unsigned short tail);

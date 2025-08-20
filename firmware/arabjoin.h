@@ -1,5 +1,3 @@
-/* Note these are not ucschar_t becuase all arabic
-   codepoints are <16bit, so no need to waste table space */
 typedef struct {
     unsigned short isolated;
     unsigned short final;

@@ -422,7 +422,7 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     int nlrcbrpos = 0, max_lrcbrpos;
     uifont = rb->screens[0]->getuifont();
     struct font* pf = rb->font_get(uifont);
-    ucschar_t ch;
+    unsigned short ch;
     struct snap {
         int count, width;
         int nword;

@@ -1073,8 +1073,8 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
 
 static void draw_putsxy_oriented(int x, int y, const char *str)
 {
-    ucschar_t ch;
-    ucschar_t *ucs;
+    unsigned short ch;
+    unsigned short *ucs;
     int ofs = MIN(x, 0);
     struct font* pf = rb->font_get(osd.font);
 

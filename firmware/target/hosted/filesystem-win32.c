@@ -63,78 +63,55 @@ static void win32_last_error_errno(void)
 static HANDLE win32_open(const char *ospath);
 static int win32_stat(const char *ospath, LPBY_HANDLE_FILE_INFORMATION lpInfo);
 
-static unsigned short * strcpy_utf8utf16(unsigned short *buffer,
-                                         const unsigned char *utf8)
+unsigned short * strcpy_utf8ucs2(unsigned short *buffer,
+                                 const unsigned char *utf8)
 {
-    for (wchar_t *ucs = buffer; *ucs ; ucs++) {
-        ucschar_t cp;
-        utf8 = utf8decode(utf8, &cp);
-#ifdef UNICODE32
-        if (cp > 0x10000) {
-            cp -= 0x10000;
-            *ucs++ = 0xd800 | (cp >> 10);
-            cp = 0xdc00 | (cp & 0x3ff);
-        }
-#endif
-        *ucs = cp;
-    }
+    for (wchar_t *ucs2 = buffer;
+         ((utf8 = utf8decode(utf8, ucs2)), *ucs2); ucs2++);
     return buffer;
 }
 
-#if 0 /* Unused in current code */
-static unsigned char * strcpy_utf16utf8(unsigned char *buffer,
-                                        const unsigned short *utf16buf)
+#if 0
+unsigned char * strcpy_ucs2utf8(unsigned char *buffer,
+                                const unsigned short *ucs2)
 {
-    unsigned char *utf8 = buffer;
-
-    /* windows is always LE */
-    const int le = 1;
-
-    while (*utf16buf) {
-        const unsigned char *utf16 = (const unsigned char *)utf16buf;
-        unsigned long ucs;
-        /* Check for a surrogate pair */
-        if (*(utf16 + le) >= 0xD8 && *(utf16 + le) < 0xE0) {
-            ucs = 0x10000 + ((utf16[1 - le] << 10) | ((utf16[le] - 0xD8) << 18)
-                  | utf16[2 + (1 - le)] | ((utf16[2 + le] - 0xDC) << 8));
-            utf16buf += 2;
-        } else {
-            ucs = utf16[le] << 8 | utf16[1 - le];
-            utf16buf++;
-        }
-        utf8 = utf8encode(ucs, utf8);
-    }
+    for (unsigned char *utf8 = buffer;
+         ((utf8 = utf8encode(*ucs2, utf8)), *ucs2); ucs2++);
     return buffer;
 }
-static size_t strlen_utf16utf8(const unsigned short *utf16buf)
+
+size_t strlen_utf8ucs2(const unsigned char *utf8)
+{
+    /* This won't properly count multiword ucs2 so use the alternative
+       below for now which doesn't either */
+    size_t length = 0;
+    unsigned short ucschar[2];
+    for (unsigned char c = *utf8; c;
+         ((utf8 = utf8decode(utf8, ucschar)), c = *utf8))
+        length++;
+
+    return length;
+}
+#endif /* 0 */
+
+size_t strlen_utf8ucs2(const unsigned char *utf8)
+{
+    return utf8length(utf8);
+}
+
+size_t strlen_ucs2utf8(const unsigned short *ucs2)
 {
     size_t length = 0;
     unsigned char utf8char[4];
 
-    /* windows is always LE */
-    const int le = 1;
+    for (unsigned short c = *ucs2; c; (c = *++ucs2))
+        length += utf8encode(c, utf8char) - utf8char;
 
-    while (*utf16buf) {
-        const unsigned char *utf16 = (const unsigned char *)utf16buf;
-        unsigned long ucs;
-        /* Check for a surrogate pair */
-        if (*(utf16 + le) >= 0xD8 && *(utf16 + le) < 0xE0) {
-            ucs = 0x10000 + ((utf16[1 - le] << 10) | ((utf16[le] - 0xD8) << 18)
-                  | utf16[2 + (1 - le)] | ((utf16[2 + le] - 0xDC) << 8));
-            utf16buf += 2;
-        } else {
-            ucs = utf16[le] << 8 | utf16[1 - le];
-            utf16buf++;
-        }
-        length += utf8encode(ucs, utf8char) - utf8char;
-    }
     return length;
 }
-#endif
 
-/* Note: Must be exported */
-size_t strlcpy_utf16utf8(char *buffer, const unsigned short *utf16,
-                         size_t bufsize)
+size_t strlcpy_ucs2utf8(char *buffer, const unsigned short *ucs2,
+                        size_t bufsize)
 {
     if (!buffer)
         bufsize = 0;
@@ -142,24 +119,12 @@ size_t strlcpy_utf16utf8(char *buffer, const unsigned short *utf16,
     size_t length = 0;
     unsigned char utf8char[4];
 
-    unsigned long ucc;
-    while(*utf16)
+    for (unsigned short c = *ucs2; c; (c = *++ucs2))
     {
-        /* Check for a surrogate UTF16 pair */
-        if (*utf16 >= 0xd800 && *utf16 < 0xdc00 &&
-            *(utf16+1) >= 0xdc00 && *(utf16+1) < 0xe000) {
-            ucc = 0x10000 + ((*utf16 & 0x3ff) << 10) | (*(utf16+1) & 0x3ff);
-            utf16++;
-        } else {
-            ucc = *utf16;
-        }
-
         /* If the last character won't fit, this won't split it */
-        size_t utf8size = utf8encode(ucc, utf8char) - utf8char;
+        size_t utf8size = utf8encode(c, utf8char) - utf8char;
         if ((length += utf8size) < bufsize)
             buffer = mempcpy(buffer, utf8char, utf8size);
-
-        utf16++;
     }
 
     /* Above won't ever copy to very end */
@@ -169,44 +134,44 @@ size_t strlcpy_utf16utf8(char *buffer, const unsigned short *utf16,
     return length;
 }
 
-#define _toutf16(utf8) \
+#define _toucs2(utf8) \
     ({ const char *_utf8 = (utf8);         \
-       size_t _l = utf16len_utf8(_utf8); \
+       size_t _l = strlen_utf8ucs2(_utf8); \
        void *_buffer = alloca((_l + 1)*2); \
-       strcpy_utf8utf16(_buffer, _utf8); })
+       strcpy_utf8ucs2(_buffer, _utf8); })
 
-#define _toutf8(utf16) \
-    ({ const char *_ucs = (utf16);         \
-       size_t _l = strlen_utf16utf8(_ucs); \
+#define _toutf8(ucs2) \
+    ({ const char *_ucs2 = (ucs2);         \
+       size_t _l = strlen_ucs2utf8(_ucs2); \
        void *_buffer = alloca(_l + 1);     \
-       strcpy_utf16utf8(_buffer, _ucs); })
+       strcpy_ucs2utf8(_buffer, _ucs2); })
 
 int os_open(const char *ospath, int oflag, ...)
 {
-    return _wopen(_toutf16(ospath), oflag __OPEN_MODE_ARG);
+    return _wopen(_toucs2(ospath), oflag __OPEN_MODE_ARG);
 }
 
 int os_creat(const char *ospath, mode_t mode)
 {
-    return _wcreat(_toutf16(ospath), mode);
+    return _wcreat(_toucs2(ospath), mode);
 }
 
 int os_stat(const char *ospath, struct _stat *s)
 {
-    return _wstat(_toutf16(ospath), s);
+    return _wstat(_toucs2(ospath), s);
 }
 
 int os_remove(const char *ospath)
 {
-    return _wremove(_toutf16(ospath));
+    return _wremove(_toucs2(ospath));
 }
 
 int os_rename(const char *osold, const char *osnew)
 {
     int errnum = errno;
 
-    const wchar_t *wchosold = _toutf16(osold);
-    const wchar_t *wchosnew = _toutf16(osnew);
+    const wchar_t *wchosold = _toucs2(osold);
+    const wchar_t *wchosnew = _toucs2(osnew);
 
     int rc = _wrename(wchosold, wchosnew);
     if (rc < 0 && errno == EEXIST)
@@ -248,18 +213,18 @@ bool os_file_exists(const char *ospath)
 
 _WDIR * os_opendir(const char *osdirname)
 {
-    return _wopendir(_toutf16(osdirname));
+    return _wopendir(_toucs2(osdirname));
 }
 
 int os_mkdir(const char *ospath, mode_t mode)
 {
-    return _wmkdir(_toutf16(ospath));
+    return _wmkdir(_toucs2(ospath));
     (void)mode;
 }
 
 int os_rmdir(const char *ospath)
 {
-    return _wrmdir(_toutf16(ospath));
+    return _wrmdir(_toucs2(ospath));
 }
 
 int os_dirfd(_WDIR *osdirp)
@@ -323,7 +288,7 @@ static HANDLE win32_open(const char *ospath)
 {
     /* FILE_FLAG_BACKUP_SEMANTICS is required for this to succeed at opening
        a directory */
-    HANDLE h = CreateFileW(_toutf16(ospath), GENERIC_READ,
+    HANDLE h = CreateFileW(_toucs2(ospath), GENERIC_READ,
                            FILE_SHARE_READ | FILE_SHARE_WRITE |
                            FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
                            FILE_FLAG_BACKUP_SEMANTICS, NULL);
@@ -514,7 +479,7 @@ void volume_size(IF_MV(int volume,) sector_t *sizep, sector_t *freep)
 
     char volpath[MAX_PATH];
     if (os_volume_path(IF_MV(volume, ) volpath, sizeof (volpath)) >= 0)
-        GetDiskFreeSpaceExW(_toutf16(volpath), &free, &size, NULL);
+        GetDiskFreeSpaceExW(_toucs2(volpath), &free, &size, NULL);
 
     if (sizep)
         *sizep = size.QuadPart / 1024;

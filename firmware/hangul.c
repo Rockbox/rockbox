@@ -18,7 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 #include "hangul.h"
 
 const char jamo_table[51][3] = {
@@ -76,9 +75,10 @@ const char jamo_table[51][3] = {
 };
 
 /* takes three jamo chars and joins them into one hangul */
-ucschar_t hangul_join(ucschar_t lead, ucschar_t vowel, ucschar_t tail)
+unsigned short hangul_join(unsigned short lead, unsigned short vowel,
+                                unsigned short tail)
 {
-    ucschar_t ch = 0xfffd;
+    unsigned short ch = 0xfffd;
 
     if (lead < 0x3131 || lead > 0x3163)
         return ch;

@@ -1461,11 +1461,4 @@ Lyre prototype 1 */
 #error "HAVE_LCD_SLEEP_SETTING requires HAVE_LCD_SLEEP"
 #endif
 
-// XXX Figure out a better place to put this?
-#ifdef UNICODE32
-#define ucschar_t unsigned int
-#else
-#define ucschar_t unsigned short
-#endif
-
 #endif /* __CONFIG_H__ */
