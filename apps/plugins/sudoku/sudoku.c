@@ -141,6 +141,12 @@ static const char default_game[9][9] =
 #define MARK_SPACE  1   /* Pixels between two marks */
 #define MARK_SIZE   4   /* Mark width and height */
 
+#elif (LCD_HEIGHT==240) && (LCD_WIDTH==240)
+/* Anbernic RG Nano - 240x240, 9 cells @ 20x20 with 14 border lines */
+#define MARK_OFFS   1   /* Pixels between border and mark */
+#define MARK_SPACE  1   /* Pixels between two marks */
+#define MARK_SIZE   4   /* Mark width and height */
+
 #elif (LCD_HEIGHT==240) && (LCD_WIDTH==320)
 /* iPod Video - 320x240, 9 cells @ 24x24 with 14 border lines */
 #define MARK_OFFS   1   /* Pixels between border and mark */

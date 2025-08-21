@@ -176,6 +176,22 @@ enum {
 #define NEXT_BB_WIDTH   32
 #define NEXT_BB_Y       200
 
+/* 22x22 bubbles (Anbernic RG Nano) */
+#elif (LCD_HEIGHT == 240) && (LCD_WIDTH == 240)
+#define XOFS            64
+#define MAX_FPS         40
+
+/* custom text positioning */
+#define SCORE_TXT_X     12
+#define SCORE_TXT_WIDTH 32
+#define SCORE_TXT_Y     29
+#define LEVEL_TXT_X     12
+#define LEVEL_TXT_WIDTH 32
+#define LEVEL_TXT_Y     2
+#define NEXT_BB_X       12
+#define NEXT_BB_WIDTH   32
+#define NEXT_BB_Y       200
+
 /* 16x16 bubbles (H300, iPod Color, HDD6330) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
 #define XOFS          46

@@ -41,10 +41,7 @@ fft
 chessbox
 fractals
 imageviewer
-#if (LCD_WIDTH != 240) && (LCD_HEIGHT != 240)
-/* No 240x240 support */
 sudoku
-#endif
 reversi
 goban
 frotz

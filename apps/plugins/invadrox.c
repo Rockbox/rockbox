@@ -298,6 +298,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_RIGHT
 #define FIRE  BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define QUIT  BUTTON_START
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE  BUTTON_A
+
 #else
     #error INVADROX: Unsupported keypad
 #endif
@@ -420,6 +427,30 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
 #define SCORENUM_Y SCORE_Y + (2 * (FONT_HEIGHT + 1) + 1)
 #define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 5 * NUM_SPACING)
+#define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
+#define LIVES_X 10
+#define MAX_Y 18
+
+/* Anbernic RG Nano defines */
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 240)
+
+/* Original arcade game size 224x240, 1bpp with
+ * red overlay at top and green overlay at bottom.
+ *
+ * Anbernic RG Nano: 240x240x16
+ * ======================
+ * X: 8p padding at left/right gives 224p playfield in middle.
+ *    10p "border" gives 204p actual playfield. UFO use full 224p.
+ * Y: Use full 240p.
+*/
+
+#define ARCADISH_GRAPHICS
+#define PLAYFIELD_X 8
+#define SHIP_Y (PLAYFIELD_Y - 3 * SHIP_HEIGHT)
+#define ALIEN_START_Y (UFO_Y + 3 * ALIEN_HEIGHT)
+#define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH) + 10
+#define SCORENUM_Y SCORE_Y + (2 * (FONT_HEIGHT + 1) + 1)
+#define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 8 * NUM_SPACING)
 #define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
 #define LIVES_X 10
 #define MAX_Y 18

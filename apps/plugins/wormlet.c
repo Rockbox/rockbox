@@ -419,6 +419,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT        BUTTON_BACK
 #define BTN_STOPRESET   BUTTON_MENU
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define BTN_DIR_UP      BUTTON_UP
+#define BTN_DIR_DOWN    BUTTON_DOWN
+#define BTN_DIR_LEFT    BUTTON_LEFT
+#define BTN_DIR_RIGHT   BUTTON_RIGHT
+#define BTN_STARTPAUSE  BUTTON_A
+#define BTN_QUIT        BUTTON_START
+#define BTN_STOPRESET   BUTTON_B
+
 #else
 #error No keymap defined!
 #endif
@@ -503,7 +513,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ARGH_SIZE 6
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
-#elif ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
+#elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 240)) || \
+    ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
     ((LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))) || \
     ((LCD_WIDTH == 360) && (LCD_HEIGHT == 400))
 #define FOOD_SIZE 7

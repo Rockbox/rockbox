@@ -479,6 +479,18 @@
 #define ROCKBLOX_DROP           BUTTON_MENU
 #define ROCKBLOX_RESTART        BUTTON_BACK
 
+#elif CONFIG_KEYPAD == RG_NANO_PAD
+
+#define ROCKBLOX_OFF           BUTTON_START
+#define ROCKBLOX_ROTATE_CCW    BUTTON_X
+#define ROCKBLOX_ROTATE_CW     BUTTON_Y
+#define ROCKBLOX_ROTATE        BUTTON_UP
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_A
+#define ROCKBLOX_RESTART       BUTTON_B
+
 #else
 #error No keymap defined!
 #endif
@@ -592,6 +604,22 @@
 #define HIGH_LABEL_X   172
 #define HIGH_SCORE_Y   163
 #define HIGH_LEVEL_Y   172
+
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 240)
+
+#define BLOCK_WIDTH 12
+#define BLOCK_HEIGHT 12
+#define BOARD_X 20
+#define BOARD_Y 0
+#define PREVIEW_X 176
+#define PREVIEW_Y 187
+#define LABEL_X 172
+#define SCORE_Y 19
+#define LEVEL_Y 51
+#define LINES_Y 84
+#define HIGH_LABEL_X 172
+#define HIGH_SCORE_Y 122
+#define HIGH_LEVEL_Y 172
 
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 

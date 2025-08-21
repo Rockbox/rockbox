@@ -26,6 +26,7 @@ playing_time.c
 properties.c
 random_folder_advance_config.c
 rb_info.c
+rockblox.c
 search.c
 settings_dumper.c
 snow.c
@@ -139,15 +140,9 @@ robotfindskitten.c
 xobox.c
 spacerocks.c
 
-#if (LCD_WIDTH != 240) && (LCD_HEIGHT != 240)
-/* No 240x240 support */
-rockblox.c
-bubbles.c
-wormlet.c
-#endif
-
 blackjack.c
 bounce.c
+bubbles.c
 calculator.c
 chip8.c
 chopper.c
@@ -167,6 +162,7 @@ sokoban.c
 star.c
 starfield.c
 vu_meter.c
+wormlet.c
 
 #ifdef HAVE_HOTKEY
 announce_status.c
@@ -203,7 +199,7 @@ rocklife.c
 matrix.c
 speedread.c
 
-#if (LCD_WIDTH > 138) && ((LCD_WIDTH != 240) && (LCD_HEIGHT != 240))
+#if (LCD_WIDTH > 138)
 invadrox.c
 superdom.c
 #endif
