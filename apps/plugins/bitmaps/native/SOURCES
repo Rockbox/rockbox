@@ -941,7 +941,7 @@ superdom_boarditems.220x176x16.bmp
       ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220))
 superdom_boarditems.176x132x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 240)) || \
-      ((LCD_WIDTH == 320) && (LCD_HEIGHT == 220))
+      ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240))
 superdom_boarditems.320x240x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400)) || \
