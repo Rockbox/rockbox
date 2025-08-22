@@ -1347,7 +1347,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
             simplelist_addline(
                     "Nsac: %d clk", card->nsac);
             simplelist_addline(
-                    "R2W: *%d", card->r2w_factor);
+                    "R2W: *%d", 1 << card->r2w_factor);
 #if (CONFIG_STORAGE & STORAGE_SD)
             int csd_structure = card_extract_bits(card->csd, 127, 2);
             const char *ver;
