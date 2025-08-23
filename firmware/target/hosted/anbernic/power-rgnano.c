@@ -29,8 +29,31 @@
 #include "panic.h"
 #include "sysfs.h"
 
+const char * const sysfs_bat_voltage =
+    "/sys/class/power_supply/axp20x-battery/voltage_now";
+
+const char * const sysfs_bat_current =
+    "/sys/class/power_supply/axp20x-battery/current_now";
+
 const char * const sysfs_bat_level =
     "/sys/class/power_supply/axp20x-battery/capacity";
+
+unsigned int rgnano_power_get_battery_voltage(void)
+{
+    int battery_voltage;
+    sysfs_get_int(sysfs_bat_voltage, &battery_voltage);
+
+    return battery_voltage;
+}
+
+unsigned int rgnano_power_get_battery_current(void)
+{
+    int battery_current;
+    sysfs_get_int(sysfs_bat_current, &battery_current);
+
+    /* Current is in microamps */
+    return (battery_current / 1000);
+}
 
 unsigned int rgnano_power_get_battery_capacity(void)
 {

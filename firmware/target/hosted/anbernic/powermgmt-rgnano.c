@@ -22,6 +22,34 @@
 #include "power.h"
 #include "power-rgnano.h"
 
+/* System handles powering off at 2% */
+unsigned short battery_level_disksafe = 0;
+unsigned short battery_level_shutoff = 0;
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+/* read from /sys/class/power_supply/axp20x-battery/voltage_now */
+/* in 5s intervals and averaged out */
+unsigned short percent_to_volt_discharge[11] =
+{
+    3400, 3597, 3665, 3701, 3736, 3777, 3824, 3882, 3944, 4023, 4162
+};
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+unsigned short percent_to_volt_charge[11] =
+{
+    3512, 3729, 3795, 3831, 3865, 3906, 3953, 4010, 4072, 4150, 4186
+};
+
+int _battery_voltage(void)
+{
+    return rgnano_power_get_battery_voltage();
+}
+
+int _battery_current(void)
+{
+    return rgnano_power_get_battery_current();
+}
+
 int _battery_level(void)
 {
     return rgnano_power_get_battery_capacity();

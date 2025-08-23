@@ -1,5 +1,5 @@
 RG_NANO_DIR=$(ROOTDIR)/packaging/rgnano
-MKSQUASHFS=$(dir $(CPP))mksquashfs
+MKSQUASHFS=$(FUNKEY_SDK_PATH)/bin/mksquashfs
 INSTALL_DIR=$(OPK_BUILD_DIR)/install
 OPK_BUILD_DIR=opkdir
 

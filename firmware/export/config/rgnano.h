@@ -13,7 +13,7 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 100
 
-#define MODEL_NAME   "RG Nano"
+#define MODEL_NAME   "Anbernic RG Nano"
 
 #ifndef SIMULATOR
 #define USB_NONE
@@ -60,11 +60,16 @@
 #define AB_REPEAT_ENABLE
 
 /* Battery stuff */
-#define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
+#define CONFIG_BATTERY_MEASURE (PERCENTAGE_MEASURE|VOLTAGE_MEASURE|CURRENT_MEASURE)
 #define CONFIG_CHARGING CHARGING_MONITOR
 #define HAVE_POWEROFF_WHILE_CHARGING
 #define BATTERY_DEV_NAME "axp20x-battery"
 #define POWER_DEV_NAME "axp20x-usb"
+
+#define BATTERY_CAPACITY_DEFAULT 1050 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1050  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1050 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 0   /* capacity increment */
 
 /* Define this for LCD backlight available */
 #define BACKLIGHT_RG_NANO

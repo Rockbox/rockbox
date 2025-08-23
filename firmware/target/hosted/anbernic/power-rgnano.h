@@ -23,5 +23,7 @@
 #include <stdbool.h>
 #include "config.h"
 
+unsigned int rgnano_power_get_battery_voltage(void);
+unsigned int rgnano_power_get_battery_current(void);
 unsigned int rgnano_power_get_battery_capacity(void);
 #endif /* _POWER_RGNANO_H_ */
