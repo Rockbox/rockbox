@@ -165,6 +165,13 @@
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
 #define do_timed_yield() do { } while(0)
+static void db_log(const char *prefix, const char *msg);
+#endif
+
+#ifdef __PCTOOL__
+#define DB_LOG(__prefix, __file) db_log(__prefix, __file)
+#else
+#define DB_LOG(...)
 #endif
 
 #ifndef __PCTOOL__
@@ -2203,6 +2210,23 @@ static int check_if_empty(char **tag)
     return length + 1;
 }
 
+#ifdef __PCTOOL__
+static void db_log(const char *prefix, const char *msg)
+{
+    /* Crude logging for the sim - to aid in debugging */
+    int logfd = open(ROCKBOX_DIR "/database.log",
+                     O_WRONLY | O_APPEND | O_CREAT, 0666);
+    if (logfd >= 0)
+    {
+        write(logfd, prefix, strlen(prefix));
+        write(logfd, ": ", 2);
+        write(logfd, msg, strlen(msg));
+        write(logfd, "\n", 1);
+        close(logfd);
+    }
+}
+#endif
+
 /* GCC 3.4.6 for Coldfire can choose to inline this function. Not a good
  * idea, as it uses lots of stack and is called from a recursive function
  * (check_dir).
@@ -2225,17 +2249,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     bool has_artist;
     bool has_grouping;
 
-#ifdef SIMULATOR
-    /* Crude logging for the sim - to aid in debugging */
-    int logfd = open(ROCKBOX_DIR "/database.log",
-                     O_WRONLY | O_APPEND | O_CREAT, 0666);
-    if (logfd >= 0)
-    {
-        write(logfd, path, strlen(path));
-        write(logfd, "\n", 1);
-        close(logfd);
-    }
-#endif /* SIMULATOR */
+    DB_LOG("file", path);
 
     if (cachefd < 0)
         return ;
@@ -2245,6 +2259,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     {
         /* Path can't be shortened. */
         logf("Too long path: %s", path);
+        DB_LOG("error", "path too long");
         return ;
     }
 
@@ -2272,6 +2287,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
         if (!get_index(-1, idx_id, &idx, true))
         {
             logf("failed to retrieve index entry");
+            DB_LOG("error", "failed to retrieve index entry");
             return ;
         }
 
@@ -2283,9 +2299,11 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
 
         /* Metadata might have been changed. Delete the entry. */
         logf("Re-adding: %s", path);
+        DB_LOG("info", "re-adding");
         if (!delete_entry(idx_id))
         {
             logf("delete_entry failed: %d", idx_id);
+            DB_LOG("error", "delete entry failed");
             return ;
         }
     }
@@ -2297,7 +2315,8 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
 
     if (!ret)
     {
-        logf("get_metadata fail: %s", path);
+        logf("get_metadata failed: %s", path);
+        DB_LOG("error", "get_metadata failed");
         return ;
     }
 
