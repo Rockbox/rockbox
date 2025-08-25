@@ -29,10 +29,8 @@
 #include <stdio.h>
 #endif
 #include "config.h"
+#include "fs_defines.h"
 #include "gcc_extensions.h"
-
-#undef MAX_PATH /* this avoids problems when building simulator */
-#define MAX_PATH 260
 
 enum relate_result
 {

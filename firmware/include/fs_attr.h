@@ -23,9 +23,6 @@
 
 #include <stdbool.h>
 
-#undef MAX_PATH /* this avoids problems when building simulator */
-#define MAX_PATH 260
-
 /* also used by fat.c so values must not change */
 #define ATTR_READ_ONLY   0x01
 #define ATTR_HIDDEN      0x02

@@ -26,6 +26,7 @@
 #include <time.h>
 #include "config.h"
 #include "fs_attr.h"
+#include "fs_defines.h"
 
 #if defined (APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"

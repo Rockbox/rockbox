@@ -21,6 +21,9 @@
 /* HZ, TIME_AFTER, current_tick */
 #include "kernel.h"
 
+/* MAX_PATH */
+#include "fs_defines.h"
+
 /* Structure to record some info during processing call */
 struct dsp_loop_context
 {
