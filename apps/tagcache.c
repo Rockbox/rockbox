@@ -2255,7 +2255,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
         return ;
 
     /* Check for overlength file path. */
-    if (path_length > TAG_MAXLEN)
+    if (path_length > MAX_PATH || path_length > TAG_MAXLEN)
     {
         /* Path can't be shortened. */
         logf("Too long path: %s", path);
