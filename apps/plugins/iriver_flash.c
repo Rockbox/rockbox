@@ -41,17 +41,17 @@ enum firmware
 #define WORD_SIZE 2
 #define BOOT_VECTOR_SIZE 8
 #define BOOT_SECTOR_OFFSET 0
-#define SECTOR_SIZE 4096
+#define FLASH_SECTOR_SIZE 4096
 #define BOOTLOADER_MAX_SIZE 65536
-#define BOOTLOADER_SECTORS (BOOTLOADER_MAX_SIZE / SECTOR_SIZE)
+#define BOOTLOADER_SECTORS (BOOTLOADER_MAX_SIZE / FLASH_SECTOR_SIZE)
 #define RAM_IMAGE_RAW_SIZE (FLASH_ROMIMAGE_ENTRY - FLASH_RAMIMAGE_ENTRY)
 #define RAM_IMAGE_MAX_SIZE (RAM_IMAGE_RAW_SIZE - sizeof(struct flash_header))
-#define RAM_IMAGE_SECTORS (RAM_IMAGE_RAW_SIZE / SECTOR_SIZE)
+#define RAM_IMAGE_SECTORS (RAM_IMAGE_RAW_SIZE / FLASH_SECTOR_SIZE)
 #define ROM_IMAGE_RAW_SIZE (BOOTLOADER_ENTRYPOINT - FLASH_ROMIMAGE_ENTRY)
 #define ROM_IMAGE_MAX_SIZE (ROM_IMAGE_RAW_SIZE - sizeof(struct flash_header))
-#define ROM_IMAGE_SECTORS (ROM_IMAGE_RAW_SIZE / SECTOR_SIZE)
+#define ROM_IMAGE_SECTORS (ROM_IMAGE_RAW_SIZE / FLASH_SECTOR_SIZE)
 #define ROM_IMAGE_RELOCATION (FLASH_ROMIMAGE_ENTRY + sizeof(struct flash_header))
-#define WHOLE_FIRMWARE_SECTORS (BOOTLOADER_ENTRYPOINT / SECTOR_SIZE)
+#define WHOLE_FIRMWARE_SECTORS (BOOTLOADER_ENTRYPOINT / FLASH_SECTOR_SIZE)
 #define FIRMWARE_OFFSET 544
 
 #if BOOTLOADER_ENTRYPOINT + BOOTLOADER_MAX_SIZE != FLASH_SIZE
@@ -250,7 +250,7 @@ static void flash_erase_sectors(uint32_t offset, uint32_t sectors,
 {
     for (uint32_t i = 0; i < sectors; i++)
     {
-        flash_erase_sector(offset + i * SECTOR_SIZE);
+        flash_erase_sector(offset + i * FLASH_SECTOR_SIZE);
 
         /* display a progress report if requested */
         if (progress)
@@ -276,7 +276,7 @@ static void flash_program_bytes(uint32_t offset, const void* ptr,
         flash_program_word(offset + i, word);
 
         /* display a progress report if requested */
-        if (progress && ((i % SECTOR_SIZE) == 0 || k == len))
+        if (progress && ((i % FLASH_SECTOR_SIZE) == 0 || k == len))
         {
             rb->lcd_putsf(0, 4, "Programming... %u%%", k * 100 / len);
             rb->lcd_update();
@@ -300,7 +300,7 @@ static bool flash_verify_bytes(uint32_t offset, const void* ptr,
             return false;
 
         /* display a progress report if requested */
-        if (progress && ((i % SECTOR_SIZE) == 0 || j == len))
+        if (progress && ((i % FLASH_SECTOR_SIZE) == 0 || j == len))
         {
             rb->lcd_putsf(0, 5, "Verifying... %u%%", j * 100 / len);
             rb->lcd_update();
@@ -533,7 +533,7 @@ static bool flash_bootloader(const char* filename)
     bool show_fatal = false;
     const void* data;
     size_t data_len;
-    static uint8_t boot_sector[SECTOR_SIZE];
+    static uint8_t boot_sector[FLASH_SECTOR_SIZE];
 
     /* load the firmware */
     if (!load_firmware(filename, FIRMWARE_ROCKBOX, &data, &data_len))
@@ -558,7 +558,7 @@ static bool flash_bootloader(const char* filename)
         goto bail;
 
     /* copy the original boot sector */
-    rb->memcpy(boot_sector, flash(BOOT_SECTOR_OFFSET), SECTOR_SIZE);
+    rb->memcpy(boot_sector, flash(BOOT_SECTOR_OFFSET), FLASH_SECTOR_SIZE);
 
     /* update the boot vector */
     rb->memcpy(boot_sector, data, BOOT_VECTOR_SIZE);
@@ -570,13 +570,13 @@ static bool flash_bootloader(const char* filename)
     flash_erase_sectors(BOOTLOADER_ENTRYPOINT, BOOTLOADER_SECTORS, false);
 
     /* program the new boot sector */
-    flash_program_bytes(BOOT_SECTOR_OFFSET, boot_sector, SECTOR_SIZE, false);
+    flash_program_bytes(BOOT_SECTOR_OFFSET, boot_sector, FLASH_SECTOR_SIZE, false);
 
     /* program the new bootloader */
     flash_program_bytes(BOOTLOADER_ENTRYPOINT, data, data_len, false);
 
     /* verify the new boot sector */
-    if (!flash_verify_bytes(BOOT_SECTOR_OFFSET, boot_sector, SECTOR_SIZE, false))
+    if (!flash_verify_bytes(BOOT_SECTOR_OFFSET, boot_sector, FLASH_SECTOR_SIZE, false))
     {
         msg = "Boot sector corrupt!";
         show_fatal = true;
