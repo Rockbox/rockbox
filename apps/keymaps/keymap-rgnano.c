@@ -70,6 +70,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_HOTKEY,            BUTTON_L|BUTTON_REL,            BUTTON_L },
     { ACTION_WPS_QUICKSCREEN,       BUTTON_R|BUTTON_REL,            BUTTON_R },
     { ACTION_WPS_BROWSE,            BUTTON_Y|BUTTON_REL,            BUTTON_Y },
+    { ACTION_WPS_ID3SCREEN,         BUTTON_X|BUTTON_REL,            BUTTON_X },
+    { ACTION_WPS_PITCHSCREEN,       BUTTON_R|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_A|BUTTON_LEFT,           BUTTON_A },
     { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_A|BUTTON_RIGHT,          BUTTON_A },
     { ACTION_WPS_ABRESET,           BUTTON_A|BUTTON_UP,             BUTTON_A },
@@ -83,6 +85,10 @@ static const struct button_mapping button_context_list[] = {
     { ACTION_LIST_VOLUP,      BUTTON_FN|BUTTON_A|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_LIST_VOLDOWN,    BUTTON_FN|BUTTON_Y,                  BUTTON_NONE },
     { ACTION_LIST_VOLDOWN,    BUTTON_FN|BUTTON_Y|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_LISTTREE_PGUP,   BUTTON_LEFT,                         BUTTON_NONE },
+    { ACTION_LISTTREE_PGUP,   BUTTON_LEFT|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN, BUTTON_RIGHT,                        BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN, BUTTON_RIGHT|BUTTON_REPEAT,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
@@ -155,14 +161,18 @@ static const struct button_mapping button_context_time[]  = {
 }; /* button_context_time */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_QS_TOP,        BUTTON_UP,                      BUTTON_NONE },
-    { ACTION_QS_TOP,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
-    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
-    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
-    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_UP,                        BUTTON_NONE },
+    { ACTION_QS_TOP,        BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_QS_DOWN,       BUTTON_DOWN,                      BUTTON_NONE },
+    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_QS_VOLUP,      BUTTON_FN|BUTTON_A,               BUTTON_NONE },
+    { ACTION_QS_VOLUP,      BUTTON_FN|BUTTON_A|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_QS_VOLDOWN,    BUTTON_FN|BUTTON_Y,               BUTTON_NONE },
+    { ACTION_QS_VOLDOWN,    BUTTON_FN|BUTTON_Y|BUTTON_REPEAT, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
