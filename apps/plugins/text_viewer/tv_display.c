@@ -360,8 +360,10 @@ void tv_finalize_display(void)
     }
 
     /* undo viewport */
-    if (is_initialized_vp)
+    if (is_initialized_vp) {
         rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+        is_initialized_vp = false;  // Workaround for musl libc
+    }
 }
 
 bool tv_exist_scrollbar(void)
