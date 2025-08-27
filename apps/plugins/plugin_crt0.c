@@ -32,8 +32,10 @@ PLUGIN_HEADER
 #define EXIT_MAGIC 0x0CDEBABE
 
 extern enum plugin_status plugin_start(const void*);
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 extern unsigned char plugin_bss_start[];
 extern unsigned char plugin_end_addr[];
+#endif
 
 static jmp_buf __exit_env;
 /* only 1 atexit handler for now, chain in the exit handler if you need more */
