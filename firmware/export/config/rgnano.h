@@ -45,7 +45,6 @@
 
 /* define this to indicate your device's keypad */
 #define HAVE_BUTTON_DATA
-#define HAS_BUTTON_HOLD
 #define HAVE_VOLUME_IN_LIST
 
 /* define this if you have a real-time clock */

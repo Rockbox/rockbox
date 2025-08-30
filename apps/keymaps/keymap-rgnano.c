@@ -47,6 +47,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_MENU,          BUTTON_Y|BUTTON_REL,        BUTTON_Y },
     { ACTION_STD_CONTEXT,       BUTTON_START|BUTTON_REL,    BUTTON_START },
     { ACTION_STD_QUICKSCREEN,   BUTTON_R|BUTTON_REL,        BUTTON_R },
+    { ACTION_STD_KEYLOCK,       BUTTON_FN|BUTTON_START,     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -76,6 +77,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_A|BUTTON_RIGHT,          BUTTON_A },
     { ACTION_WPS_ABRESET,           BUTTON_A|BUTTON_UP,             BUTTON_A },
     { ACTION_WPS_ABRESET,           BUTTON_A|BUTTON_DOWN,           BUTTON_A },
+    { ACTION_STD_KEYLOCK,           BUTTON_FN|BUTTON_START,         BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -223,7 +225,7 @@ static const struct button_mapping button_context_radio[]  = {
 
 const struct button_mapping* get_context_mapping(int context)
 {
-    switch (context)
+    switch (context & ~CONTEXT_LOCKED)
     {
         case CONTEXT_STD:
             return button_context_standard;
