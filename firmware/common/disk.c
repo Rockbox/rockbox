@@ -228,6 +228,15 @@ bool disk_init(IF_MD_NONVOID(int drive))
             if (pinfo[i].type == PARTITION_TYPE_GPT_GUARD) {
 		is_gpt = 1;
 	    }
+
+#if 0 // Currently done in disk_mount() upon successful mount only
+            /* Auto-correct partition entries */
+            if (i == 0 && pinfo[i].type == 0 &&
+                pinfo[i].start != 0 && pinfo[i].size != 0) {
+                pinfo[i].type = PARTITION_TYPE_FAT32_LBA;
+                // XXX consider correcting MBR and writing sector back?
+            }
+#endif
 	}
 
 	while (is_gpt) {
@@ -433,7 +442,9 @@ int disk_mount(int drive)
              volume != -1 && i < MAX_PARTITIONS_PER_DRIVE && mounted < NUM_VOLUMES_PER_DRIVE;
              i++)
         {
-            if (pinfo[i].type == 0 || pinfo[i].type == 5)
+            if (pinfo[i].type == 0x05 ||
+                pinfo[i].type == 0x0f ||
+                (i != 0 && pinfo[i].type == 0))
                 continue;  /* skip free/extended partitions */
 
             DEBUGF("Trying to mount partition %d.\n", i);
@@ -450,6 +461,10 @@ int disk_mount(int drive)
                     disk_sector_multiplier[drive] = j;
                     volume_onmount_internal(IF_MV(volume));
                     volume = get_free_volume(); /* prepare next entry */
+                    if (pinfo[i].type == 0) {
+                        pinfo[i].type = PARTITION_TYPE_FAT32_LBA;
+                        // XXX write the sector back.?
+                    }
                     break;
                 }
             }
@@ -460,6 +475,11 @@ int disk_mount(int drive)
                 init_volume(&volumes[volume], drive, i);
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
+                if (pinfo[i].type == 0) {
+                    pinfo[i].type = PARTITION_TYPE_FAT32_LBA;
+                    // XXX write the sector back.?
+                }
+
             }
 #endif /* MAX_VIRT_SECTOR_SIZE */
         }
