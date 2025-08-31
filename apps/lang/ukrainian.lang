@@ -7167,7 +7167,7 @@
     *: "Неможливо вiдкрити %s"
   </dest>
   <voice>
-    *: ""
+    *: "Неможливо відкрити плагін"
   </voice>
 </phrase>
 <phrase>
@@ -16900,5 +16900,19 @@
   </dest>
   <voice>
     *: "сортувати списки відтворення"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[По альбомах]"
+  </dest>
+  <voice>
+    *: "Сортувати усі треки по альбомах"
   </voice>
 </phrase>

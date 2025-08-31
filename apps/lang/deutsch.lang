@@ -3347,51 +3347,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3541,7 +3496,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3578,7 +3532,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4656,7 +4609,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Suche"
   </voice>
 </phrase>
 <phrase>
@@ -5766,20 +5719,6 @@
   </dest>
   <voice>
     *: "Titel abgespeichert"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7218,7 +7157,7 @@
     *: "Kann %s nicht öffnen"
   </dest>
   <voice>
-    *: ""
+    *: "Kann das Plugin nicht öffnen"
   </voice>
 </phrase>
 <phrase>
@@ -7232,7 +7171,7 @@
     *: "Fehler beim Lesen von %s"
   </dest>
   <voice>
-    *: ""
+    *: "Fehler beim Lesen von Datei"
   </voice>
 </phrase>
 <phrase>
@@ -13315,13 +13254,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox Anordnung Hauptmenü"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -13508,20 +13447,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESTART_PLAYBACK
   desc: in the mpegplayer settings menu
   user: core
@@ -13654,20 +13579,6 @@
   </dest>
   <voice>
     *: "Nächster Titel"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13950,16 +13861,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Element umschalten"
+    *: ""
   </dest>
   <voice>
-    *: "Element umschalten"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16948,10 +16859,10 @@
     *: "Recent favourites"
   </source>
   <dest>
-    *: "Aktuelle Favoriten "
+    *: "Aktuelle Favoriten"
   </dest>
   <voice>
-    *: "Aktuelle Favoriten "
+    *: "Aktuelle Favoriten"
   </voice>
 </phrase>
 <phrase>
@@ -16962,10 +16873,10 @@
     *: "New favourites"
   </source>
   <dest>
-    *: "Neue Favoriten "
+    *: "Neue Favoriten"
   </dest>
   <voice>
-    *: "Neue Favoriten "
+    *: "Neue Favoriten"
   </voice>
 </phrase>
 <phrase>
@@ -16994,5 +16905,33 @@
   </dest>
   <voice>
     *: "Titel nach"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Nach Album]"
+  </dest>
+  <voice>
+    *: "Alle Titel sortiert nach Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Playlists sortieren"
+  </dest>
+  <voice>
+    *: "playlists sortieren"
   </voice>
 </phrase>
