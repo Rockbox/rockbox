@@ -23,6 +23,7 @@
 # - Francisco Vila, 2009, 2010
 # - Lianela Sky
 # - Guillermo Garcia Rojas
+# - Sergio Delgado
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -219,10 +220,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Explorar plugins"
+    *: "Explorar complementos"
   </dest>
   <voice>
-    *: "Explorar plugins"
+    *: "Explorar complementos"
   </voice>
 </phrase>
 <phrase>
@@ -275,10 +276,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "Equilibrio"
+    *: "Balance"
   </dest>
   <voice>
-    *: "Equilibrio"
+    *: "Balance"
   </voice>
 </phrase>
 <phrase>
@@ -488,7 +489,7 @@
     *: "Explorar archivos de configuración (.cfg)"
   </dest>
   <voice>
-    *: "Explorar archivos c f g de configuración"
+    *: "Explorar archivos C F G de configuración"
   </voice>
 </phrase>
 <phrase>
@@ -499,10 +500,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Reiniciar configuraciones"
+    *: "Reiniciar ajustes"
   </dest>
   <voice>
-    *: "Reiniciar configuraciones"
+    *: "Reiniciar ajustes"
   </voice>
 </phrase>
 <phrase>
@@ -530,7 +531,7 @@
     *: "Guardar .cfg"
   </dest>
   <voice>
-    *: "Guardar c f g"
+    *: "Guardar C F G"
   </voice>
 </phrase>
 <phrase>
@@ -628,10 +629,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Depuración (¡no tocar!)"
+    *: "Depuración (Zona de peligro)"
   </dest>
   <voice>
-    *: "Depuración (¡no tocar!)"
+    *: "Depuración (Zona de peligro)"
   </voice>
 </phrase>
 <phrase>
@@ -670,10 +671,10 @@
     *: "One"
   </source>
   <dest>
-    *: "Una"
+    *: "Repetir una"
   </dest>
   <voice>
-    *: "Una"
+    *: "Repetir una"
   </voice>
 </phrase>
 <phrase>
@@ -855,10 +856,10 @@
     *: "Supported"
   </source>
   <dest>
-    *: "Archivos soportados"
+    *: "Archivos compatibles"
   </dest>
   <voice>
-    *: "Archivos soportados"
+    *: "Archivos compatibles"
   </voice>
 </phrase>
 <phrase>
@@ -911,10 +912,10 @@
     *: "Font"
   </source>
   <dest>
-    *: "Fuente"
+    *: "Tipografía"
   </dest>
   <voice>
-    *: "Fuente"
+    *: "Tipografía"
   </voice>
 </phrase>
 <phrase>
@@ -1118,11 +1119,11 @@
   </source>
   <dest>
     *: none
-    charging: "Modo adaptador de automóvil"
+    charging: "Modo adaptador de vehículo"
   </dest>
   <voice>
     *: none
-    charging: "Modo adaptador de automóvil"
+    charging: "Modo adaptador de vehículo"
   </voice>
 </phrase>
 <phrase>
@@ -1377,11 +1378,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tiempo de pregrabación"
+    recording: "Tiempo antes de grabar"
   </dest>
   <voice>
     *: none
-    recording: "Tiempo de Pregrabación"
+    recording: "Tiempo antes de grabar"
   </voice>
 </phrase>
 <phrase>
@@ -1436,11 +1437,11 @@
   </source>
   <dest>
     *: none
-    charging: "Luz de fondo (mientras está conectado)"
+    charging: "Luz de fondo (cargando)"
   </dest>
   <voice>
     *: none
-    charging: "Luz de fondo (mientras está conectado)"
+    charging: "Luz de fondo cuando está cargando"
   </voice>
 </phrase>
 <phrase>
@@ -1513,10 +1514,10 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Cabeza abajo"
+    *: "Dado la vuelta"
   </dest>
   <voice>
-    *: "Cabeza abajo"
+    *: "Dado la vuelta"
   </voice>
 </phrase>
 <phrase>
@@ -1527,10 +1528,10 @@
     *: "Line Selector Type"
   </source>
   <dest>
-    *: "Tipo de selector de línea"
+    *: "Tipo de línea"
   </dest>
   <voice>
-    *: "Tipo de selector de línea"
+    *: "Tipo de línea"
   </voice>
 </phrase>
 <phrase>
@@ -1810,7 +1811,7 @@
     *: "Logarítmica (dB)"
   </dest>
   <voice>
-    *: "Logarítmica decibelio"
+    *: "Logarítmica usando decibelios"
   </voice>
 </phrase>
 <phrase>
@@ -1824,7 +1825,7 @@
     *: "Lineal (%)"
   </dest>
   <voice>
-    *: "Lineal, porcentaje"
+    *: "Lineal, usando porcentajes"
   </voice>
 </phrase>
 <phrase>
@@ -1867,57 +1868,6 @@
   </dest>
   <voice>
     *: "Capacidad de la batería"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
   </voice>
 </phrase>
 <phrase>
@@ -1973,7 +1923,7 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "Reloj 12 horas"
+    *: "Reloj 12 horas (AM/PM)"
   </dest>
   <voice>
     *: "Reloj doce horas"
@@ -2183,10 +2133,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Cola"
+    *: "Añadir a la cola"
   </dest>
   <voice>
-    *: "Cola"
+    *: "Añadir a la cola"
   </voice>
 </phrase>
 <phrase>
@@ -2197,10 +2147,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "En cola como siguiente"
+    *: "Añadir a la cola como siguiente"
   </dest>
   <voice>
-    *: "En cola como siguiente"
+    *: "Añadir a la cola como siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -2211,10 +2161,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "En cola al final"
+    *: "Añadir al final de la cola"
   </dest>
   <voice>
-    *: "En cola al final"
+    *: "Añadir al final de la cola"
   </voice>
 </phrase>
 <phrase>
@@ -2461,21 +2411,20 @@
   </source>
   <dest>
     *: none
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "ATRÁS = Cancelar"
-    gigabeatfx,mrobe500: "POWER = Cancelar"
-    gogearsa9200: "IZQUIERDA = Cancelar"
-    iaudiom5,iaudiox5: "RECORD = Cancelar"
-    ipod*,mpiohd300,sansac200*: "MENÚ = Cancelar"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Cancelar"
-    iriverh100,iriverh120,iriverh300: "STOP = Cancelar"
-    mrobe100: "DISPLAY = Cancelar"
-    rtc: "OFF = Cancelar"
-    samsungyh*: "REW = Cancelar"
-    vibe500: "C = Cancelar"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "ATRÁS = Descartar"
+    gigabeatfx,mrobe500: "POWER = Descartar"
+    gogearsa9200: "IZQUIERDA = Descartar"
+    iaudiom5,iaudiox5: "RECORD = Descartar"
+    ipod*,mpiohd300,sansac200*: "MENÚ = Descartar"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Descartar"
+    iriverh100,iriverh120,iriverh300: "STOP = Descartar"
+    mrobe100: "DISPLAY = Descartar"
+    rtc: "OFF = Descartar"
+    samsungyh*: "REW = Descartar"
+    vibe500: "C = Descartar"
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -2529,8 +2478,7 @@
     iaudiom5,iaudiox5: "Disco duro lleno. Pulse POWER para continuar"
     iriverh100,iriverh120,iriverh300: "Disco duro lleno. Pulse STOP para continuar"
     recording: "Disco duro lleno. Pulse OFF para continuar"
-    samsungyh*: "Disco duro lleno. Pulse LEFT para continuar"
-    sansac200*,sansae200*,vibe500: "Disco duro lleno. Pulse PREV para continuar"
+    samsungyh*,sansac200*,sansae200*,vibe500: "Disco duro lleno. Pulse RETR. para continuar"
   </dest>
   <voice>
     *: none
@@ -2820,7 +2768,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Mie"
+    rtc: "Mié"
   </dest>
   <voice>
     *: none
@@ -3673,7 +3621,7 @@
     *: ""
   </dest>
   <voice>
-    *: "miliamperios hora"
+    *: "miliamperios la hora"
   </voice>
 </phrase>
 <phrase>
@@ -4135,7 +4083,7 @@
     *: ""
   </dest>
   <voice>
-    *: " "
+    *: " pausar"
   </voice>
 </phrase>
 <phrase>
@@ -4219,7 +4167,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugín"
+    *: "complemento"
   </voice>
 </phrase>
 <phrase>
@@ -4233,7 +4181,7 @@
     *: ""
   </dest>
   <voice>
-    *: "tipo de letra"
+    *: "tipografía"
   </voice>
 </phrase>
 <phrase>
@@ -4300,7 +4248,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Añadidas %d pistas (%s)"
+    *: "%d Pistas añadidas (%s)"
   </dest>
   <voice>
     *: "Pistas añadidas"
@@ -4314,7 +4262,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "En cola %d pistas (%s)"
+    *: "%d Pistas en cola (%s)"
   </dest>
   <voice>
     *: "Pistas en cola"
@@ -4328,7 +4276,7 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "Guardadas %d pistas (%s)"
+    *: "%d Pistas guardadas (%s)"
   </dest>
   <voice>
     *: "Pistas guardadas"
@@ -4342,10 +4290,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "¿Recursivamente?"
+    *: "¿De forma repetida?"
   </dest>
   <voice>
-    *: "¿Recursivamente?"
+    *: "¿De forma repetida?"
   </voice>
 </phrase>
 <phrase>
@@ -4370,7 +4318,7 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Error al acceder al archivo de control de listas de reproducción"
+    *: "Error al acceder al archivo de control de listas de reprd."
   </dest>
   <voice>
     *: "Error al acceder al archivo de control de listas de reproducción"
@@ -4606,8 +4554,8 @@
   <dest>
     *: "OFF para cancelar"
     gigabeatfx: "POWER para cancelar"
-    gigabeats,sansafuzeplus: "BACK para cancelar"
-    iaudiom5,iaudiox5: "Pulsación larga de PLAY para cancelar"
+    gigabeats,sansafuzeplus: "RETR. para cancelar"
+    iaudiom5,iaudiox5: "Mantén PLAY para cancelar"
     ipod*: "PLAY/PAUSE para cancelar"
     iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV para cancelar"
     iriverh100,iriverh120,iriverh300: "STOP para cancelar"
@@ -4725,7 +4673,7 @@
     *: "No se puede abrir %s"
   </dest>
   <voice>
-    *: ""
+    *: "No se puede abrir %s"
   </voice>
 </phrase>
 <phrase>
@@ -4736,10 +4684,10 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Fallo al cargar %s"
+    *: "Error al cargar %s"
   </dest>
   <voice>
-    *: ""
+    *: "Error al cargar %s"
   </voice>
 </phrase>
 <phrase>
@@ -4778,10 +4726,10 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "El plugin devolvió un error"
+    *: "El complemento devolvió un error"
   </dest>
   <voice>
-    *: "El plugin devolvió un error"
+    *: "El complemento devolvió un error"
   </voice>
 </phrase>
 <phrase>
@@ -4879,10 +4827,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Colocar puntuación"
+    *: "Establacer puntuación"
   </dest>
   <voice>
-    *: "Colocar puntuación"
+    *: "Establecer puntuación"
   </voice>
 </phrase>
 <phrase>
@@ -5155,7 +5103,7 @@
     *: "Tailandés (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Tailandés, iso 8859 11"
+    *: "Tailandés, código iso 8859 guión 11"
   </voice>
 </phrase>
 <phrase>
@@ -5270,7 +5218,7 @@
     *: "Hebreo (ISO 8859-8)"
   </dest>
   <voice>
-    *: "Hebreo, iso 8859 8"
+    *: "Hebreo,código iso 8859 guión 8"
   </voice>
 </phrase>
 <phrase>
@@ -5343,10 +5291,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "La Base de Datos no esta lista"
+    *: "La base de datos aún no está lista"
   </dest>
   <voice>
-    *: "La Base de Datos no esta lista"
+    *: "La base de datos aún no está lista"
   </voice>
 </phrase>
 <phrase>
@@ -5374,7 +5322,7 @@
     *: "Turco (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turco, iso 8859 9"
+    *: "Turco, código iso 8859 guión 9"
   </voice>
 </phrase>
 <phrase>
@@ -5387,11 +5335,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Color de fuentes"
+    lcd_color: "Color del texto"
   </dest>
   <voice>
     *: none
-    lcd_color: "Color de fuentes"
+    lcd_color: "Color del texto"
   </voice>
 </phrase>
 <phrase>
@@ -5491,11 +5439,11 @@
   </source>
   <dest>
     *: none
-    backlight_brightness: "Luminosidad"
+    backlight_brightness: "Brillo"
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Luminosidad"
+    backlight_brightness: "Brillo"
   </voice>
 </phrase>
 <phrase>
@@ -5522,11 +5470,11 @@
   </source>
   <dest>
     *: none
-    remote: "Unidad principal sólo"
+    remote: "Solo la unidad principal"
   </dest>
   <voice>
     *: none
-    remote: "Unidad principal sólo"
+    remote: "Solo la unidad principal"
   </voice>
 </phrase>
 <phrase>
@@ -5573,11 +5521,11 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "Cargar a RAM"
+    tc_ramcache: "Cargar en memoria"
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Cargar a RAM"
+    tc_ramcache: "Cargar en memoria"
   </voice>
 </phrase>
 <phrase>
@@ -5605,7 +5553,7 @@
     *: "Griego (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Griego, iso 8859 7"
+    *: "Griego, código iso 8859 guión 7"
   </voice>
 </phrase>
 <phrase>
@@ -5746,7 +5694,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Volumen, rehabilitar"
+    remote: "Reducir volumen para reactivar"
   </voice>
 </phrase>
 <phrase>
@@ -5777,7 +5725,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Escaneo de frecuencias en progreso"
   </voice>
 </phrase>
 <phrase>
@@ -5843,20 +5791,6 @@
   <voice>
     *: none
     radio: "Escanear"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6061,10 +5995,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Desordenar de nuevo"
+    *: "Re-ordenar aleatoriamente"
   </dest>
   <voice>
-    *: "Desordenar de nuevo"
+    *: "Reordenar aleatoriamente"
   </voice>
 </phrase>
 <phrase>
@@ -6266,11 +6200,11 @@
   </source>
   <dest>
     *: none
-    radio: "No se encontraron configuraciones, ¿Autoescanear?"
+    radio: "No se encontraron configuraciones, ¿Escanear automáticamente?"
   </dest>
   <voice>
     *: none
-    radio: "No se encontraron configuraciones, ¿autoescanear?"
+    radio: "No se encontraron configuraciones, ¿Escanear automáticamente?"
   </voice>
 </phrase>
 <phrase>
@@ -6345,11 +6279,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Sólo saltar pista"
+    crossfade: "Solo salto manual"
   </dest>
   <voice>
     *: none
-    crossfade: "Sólo saltar pista"
+    crossfade: "Solo salto manual"
   </voice>
 </phrase>
 <phrase>
@@ -6376,11 +6310,11 @@
   </source>
   <dest>
     *: none
-    radio: "Borrar lista de presintonías"
+    radio: "Vaciar lista de presintonías"
   </dest>
   <voice>
     *: none
-    radio: "Borrar lista de presintonías"
+    radio: "Vaciar lista de presintonías"
   </voice>
 </phrase>
 <phrase>
@@ -6408,7 +6342,7 @@
     *: "Latín Extendido (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latín extendido, iso 8859 2"
+    *: "Latín extendido, código iso 8859 guión 2"
   </voice>
 </phrase>
 <phrase>
@@ -6445,10 +6379,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "Música (Base de Datos)"
+    *: "Música (Base de datos)"
   </dest>
   <voice>
-    *: "Música (Base de Datos)"
+    *: "Música (Base de datos)"
   </voice>
 </phrase>
 <phrase>
@@ -6555,7 +6489,7 @@
   </dest>
   <voice>
     *: none
-    recording: "¿Qué hacer al dividir?"
+    recording: "Qué hacer al dividir"
   </voice>
 </phrase>
 <phrase>
@@ -6569,7 +6503,7 @@
     *: "~Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "~Latin 1"
+    *: "~Latin 1, código ISO 8859 guión 1"
   </voice>
 </phrase>
 <phrase>
@@ -6718,7 +6652,7 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "Atenuación de altas frecuencias"
+    *: "Reducción de altas frecuencias"
   </dest>
   <voice>
     *: "Atenuación de altas frecuencias"
@@ -6841,11 +6775,11 @@
   </source>
   <dest>
     *: none
-    radio: "Auto-escanear presintonías"
+    radio: "Escanear presintonías automáticamente"
   </dest>
   <voice>
     *: none
-    radio: "Auto escanear presintonías"
+    radio: "Escanear presintonías automáticamente"
   </voice>
 </phrase>
 <phrase>
@@ -6856,7 +6790,7 @@
     *: "Browse EQ Presets"
   </source>
   <dest>
-    *: "Explorar EQ preestablecidas"
+    *: "Explorar ajustes de EQ. preestablecidos"
   </dest>
   <voice>
     *: "Explorar Ecualizaciones Preestablecidas"
@@ -6870,10 +6804,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Codificación por defecto"
+    *: "Codificación predeterminada"
   </dest>
   <voice>
-    *: "Codificación por defecto"
+    *: "Codificación predeterminada"
   </voice>
 </phrase>
 <phrase>
@@ -6915,10 +6849,10 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "Nada que retomar"
+    *: "Nada que reanudar"
   </dest>
   <voice>
-    *: "Nada que retomar"
+    *: "Nada que reanudar"
   </voice>
 </phrase>
 <phrase>
@@ -6979,11 +6913,11 @@
   </source>
   <dest>
     *: none
-    radio: "¿Borrar presintonías actuales?"
+    radio: "¿Vaciar presintonías?"
   </dest>
   <voice>
     *: none
-    radio: "¿Borrar presintonías actuales?"
+    radio: "¿Borrar presintonías?"
   </voice>
 </phrase>
 <phrase>
@@ -7028,7 +6962,7 @@
     *: "%s no existe"
   </dest>
   <voice>
-    *: "no existe"
+    *: "El directorio de la lista de reproducción no existe"
   </voice>
 </phrase>
 <phrase>
@@ -7100,11 +7034,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Aleatorio y saltar pista"
+    crossfade: "Aleatorio o salto de pista manual"
   </dest>
   <voice>
     *: none
-    crossfade: "Aleatorio y saltar pista"
+    crossfade: "Aleatorio o salto de pista manual"
   </voice>
 </phrase>
 <phrase>
@@ -7115,10 +7049,10 @@
     *: "Running Time"
   </source>
   <dest>
-    *: "Tiempo ejecutando"
+    *: "Tiempo activo"
   </dest>
   <voice>
-    *: "Tiempo ejecutando"
+    *: "Tiempo de actividad"
   </voice>
 </phrase>
 <phrase>
@@ -7173,11 +7107,11 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Cargar durante conexión USB"
+    usb_charging_enable: "Habilitar carga durante conexión USB"
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Cargar durante conexión u s b"
+    usb_charging_enable: "Habilitar carga durante conexión u s b"
   </voice>
 </phrase>
 <phrase>
@@ -7216,10 +7150,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Soporte de Cuesheet"
+    *: "Soporte de H. de referencia"
   </dest>
   <voice>
-    *: "Soporte de kiusiit"
+    *: "Soporte de hojas de referencia"
   </voice>
 </phrase>
 <phrase>
@@ -7232,11 +7166,11 @@
   </source>
   <dest>
     *: none
-    radio: "Menú Radio FM"
+    radio: "Menú de Radio FM"
   </dest>
   <voice>
     *: none
-    radio: "Menú radio f m"
+    radio: "Menú de radio f m"
   </voice>
 </phrase>
 <phrase>
@@ -7373,7 +7307,7 @@
     iriverh100,iriverh120,iriverh300: "Construyendo base de datos... %d encontrados (STOP para volver)"
   </dest>
   <voice>
-    *: "elementos encontrados en base de datos"
+    *: "Se han encontrado elementos en la base de datos"
   </voice>
 </phrase>
 <phrase>
@@ -7651,11 +7585,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Deshabilitar continuar al iniciar si los auriculares están desconectados"
+    headphone_detection: "Deshabilitar reanudar al iniciar si los auriculares están desconectados"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Deshabilitar continuar al iniciar si los auriculares están desconectados"
+    headphone_detection: "Deshabilitar reanudar al iniciar si los auriculares están desconectados"
   </voice>
 </phrase>
 <phrase>
@@ -7759,10 +7693,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Configuración de la lista de reproducción"
+    *: "Configuración del visor de listas de repr."
   </dest>
   <voice>
-    *: "Configuración de la lista de reproducción"
+    *: "Configuración del visor de listas de reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -7775,11 +7709,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Fijar fecha y hora"
+    rtc: "Ajustar fecha y hora"
   </dest>
   <voice>
     *: none
-    rtc: "Fijar fecha y hora"
+    rtc: "Ajustar fecha y hora"
   </voice>
 </phrase>
 <phrase>
@@ -7981,7 +7915,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8006,10 +7939,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Navegar por Cuesheet"
+    *: "Navegar por H. de referencias"
   </dest>
   <voice>
-    *: "Navegar por el kiusiit"
+    *: "Navegar por la hoja de referencias"
   </voice>
 </phrase>
 <phrase>
@@ -8020,10 +7953,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "~Demos"
+    *: "~Muestras"
   </dest>
   <voice>
-    *: "~Demos"
+    *: "~Muestras"
   </voice>
 </phrase>
 <phrase>
@@ -8214,10 +8147,10 @@
     *: "End of Song List"
   </source>
   <dest>
-    *: "Fin de la lista de canciones"
+    *: "Fin de la lista de repr."
   </dest>
   <voice>
-    *: "Fin de la lista de canciones"
+    *: "Fin de la lista de reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -8343,11 +8276,11 @@
   </source>
   <dest>
     *: none
-    recording: "para al menos"
+    recording: "por al menos"
   </dest>
   <voice>
     *: none
-    recording: "para al menos"
+    recording: "por al menos"
   </voice>
 </phrase>
 <phrase>
@@ -8529,7 +8462,7 @@
   </source>
   <dest>
     *: none
-    radio: "EEUU / Canadá"
+    radio: "E.E.U.U. / Canadá"
   </dest>
   <voice>
     *: none
@@ -8609,10 +8542,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Reinicie para habilitarlo"
+    *: "Por favor, reiniciar para habilitar"
   </dest>
   <voice>
-    *: "Reinicie para habilitarlo"
+    *: "Por favor, reinicie para habilitar"
   </voice>
 </phrase>
 <phrase>
@@ -8702,7 +8635,7 @@
     *: "Cargando... %d%% completado (%s)"
   </dest>
   <voice>
-    *: "Cargando"
+    *: "Cargando . . ."
   </voice>
 </phrase>
 <phrase>
@@ -8715,11 +8648,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Barra (color liso)"
+    lcd_color: "Barra (color sólido)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Barra, color liso"
+    lcd_color: "Barra, color sólido"
   </voice>
 </phrase>
 <phrase>
@@ -8730,10 +8663,10 @@
     *: "[Don't Resume]"
   </source>
   <dest>
-    *: "[No continuar]"
+    *: "[No reanudar]"
   </dest>
   <voice>
-    *: "No continuar"
+    *: "No reanudar"
   </voice>
 </phrase>
 <phrase>
@@ -8879,7 +8812,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kiusiit"
+    *: "hoja de referencias"
   </voice>
 </phrase>
 <phrase>
@@ -9048,10 +8981,10 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Sólo los tipos desconocidos"
+    *: "Sólo tipos desconocidos"
   </dest>
   <voice>
-    *: "Sólo los tipos desconocidos"
+    *: "Sólo tipos desconocidos"
   </voice>
 </phrase>
 <phrase>
@@ -9106,11 +9039,11 @@
   </source>
   <dest>
     *: "Luz de fondo al bloquear"
-    hold_button: "Luz de fondo mientras teclado bloqueado"
+    hold_button: "Luz de fondo mientras los controles estén bloq."
   </dest>
   <voice>
     *: "Luz de fondo al bloquear"
-    hold_button: "Luz de fondo mientras teclado bloqueado"
+    hold_button: "Luz de fondo mientras los controles estén bloqueados"
   </voice>
 </phrase>
 <phrase>
@@ -9399,7 +9332,7 @@
     *: "Unknown"
   </source>
   <dest>
-    *: "Desconocido"
+    *: "Desconocido/a"
   </dest>
   <voice>
     *: "Desconocido"
@@ -9430,7 +9363,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Okei"
+    *: "Aceptar"
   </voice>
 </phrase>
 <phrase>
@@ -9583,7 +9516,7 @@
   </dest>
   <voice>
     *: none
-    agc: "C A G control automático de ganancia"
+    agc: "Control automático de ganancia"
   </voice>
 </phrase>
 <phrase>
@@ -9645,10 +9578,10 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Reiniciar la configuración"
+    *: "Reiniciar el ajuste"
   </dest>
   <voice>
-    *: "Reiniciar configuración"
+    *: "Reiniciar el ajuste"
   </voice>
 </phrase>
 <phrase>
@@ -9693,10 +9626,10 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "Resultado de la búsqueda"
+    *: "Resultados de la búsqueda"
   </dest>
   <voice>
-    *: "Resultado de la búsqueda"
+    *: "Resultados de la búsqueda"
   </voice>
 </phrase>
 <phrase>
@@ -9774,11 +9707,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Bitrate del puerto serie"
+    serial_port: "Bitrate del puerto en serie"
   </dest>
   <voice>
     *: none
-    serial_port: "Bit rate del puerto serie"
+    serial_port: "Bit reit del puerto en serie"
   </voice>
 </phrase>
 <phrase>
@@ -9932,11 +9865,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Rejilla 3x3"
+    touchscreen: "Cuadrícula 3x3"
   </dest>
   <voice>
     *: none
-    touchscreen: "rejilla de 3 por 3"
+    touchscreen: "Cuadrícula de 3 por 3"
   </voice>
 </phrase>
 <phrase>
@@ -10082,10 +10015,10 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Codo"
+    *: "Curva"
   </dest>
   <voice>
-    *: "Codo"
+    *: "Curva"
   </voice>
 </phrase>
 <phrase>
@@ -10110,10 +10043,10 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Codo suave"
+    *: "Curva suave"
   </dest>
   <voice>
-    *: "Codo suave"
+    *: "Curva suave"
   </voice>
 </phrase>
 <phrase>
@@ -10169,10 +10102,10 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Codo duro"
+    *: "Curva fuerte"
   </dest>
   <voice>
-    *: "Codo duro"
+    *: "Curva fuerte"
   </voice>
 </phrase>
 <phrase>
@@ -10233,11 +10166,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Modo de navegador"
+    usb_hid: "Navegador"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo de navegador"
+    usb_hid: "Navegador"
   </voice>
 </phrase>
 <phrase>
@@ -10254,7 +10187,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "Dispositivo de interfaz humano USB"
+    usb_hid: "Dispositivo de interfaz humana U S B"
   </voice>
 </phrase>
 <phrase>
@@ -10428,11 +10361,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Modo del ratón"
+    usb_hid: "Modo de ratón"
   </dest>
   <voice>
     *: none
-    usb_hid: "Modo del ratón"
+    usb_hid: "Modo de ratón"
   </voice>
 </phrase>
 <phrase>
@@ -10488,10 +10421,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Saltar a Outro"
+    *: "Saltar al final de la pista"
   </dest>
   <voice>
-    *: "Saltar a Outro"
+    *: "Saltar al final de la pista"
   </voice>
 </phrase>
 <phrase>
@@ -10877,11 +10810,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: " Mejora 3-D"
+    depth_3d: "Mejora 3D"
   </dest>
   <voice>
     *: none
-    depth_3d: " Mejora 3-D"
+    depth_3d: "Mejora 3 D"
   </voice>
 </phrase>
 <phrase>
@@ -11064,7 +10997,7 @@
     *: "~PictureFlow"
   </dest>
   <voice>
-    *: "abrir open flow"
+    *: "abrir pictur flou"
   </voice>
 </phrase>
 <phrase>
@@ -11154,10 +11087,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Iniciar examinador en /"
+    *: "Iniciar explorador de archivos en /"
   </dest>
   <voice>
-    *: "Iniciar examinador de archivos en la raíz"
+    *: "Iniciar explorador de archivos en la raíz"
   </voice>
 </phrase>
 <phrase>
@@ -11708,20 +11641,6 @@
   </dest>
   <voice>
     *: "Ir a Pantalla de Reproducción"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12998,20 +12917,6 @@
   </dest>
   <voice>
     *: "Transcurrido en la pista"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14426,16 +14331,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Alternar Ítem"
+    *: ""
   </dest>
   <voice>
-    *: "Alternar Ítem"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14496,13 +14401,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Orden del Menú Principal de Rockbox"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -16990,5 +16895,33 @@
   </dest>
   <voice>
     *: "Pistas por"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Por álbum]"
+  </dest>
+  <voice>
+    *: "Todas las pistas ordenadas por álbum"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Ordenar pistas de repr."
+  </dest>
+  <voice>
+    *: "Ordenar pistas de reproducción"
   </voice>
 </phrase>
