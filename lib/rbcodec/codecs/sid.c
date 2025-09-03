@@ -34,17 +34,15 @@ CODEC_HEADER
 #define SID_BUFFER_SIZE 0x10000
 #define SAMPLE_RATE 44100
 
-static int32_t samples_r[CHUNK_SIZE] IBSS_ATTR;
-static int32_t samples_l[CHUNK_SIZE] IBSS_ATTR;
+static int16_t samples[CHUNK_SIZE] IBSS_ATTR;
 
-void sid_render(int32_t *buffer_r, int32_t *buffer_l, unsigned long len) ICODE_ATTR;
-void sid_render(int32_t *buffer_r, int32_t *buffer_l, unsigned long len) {
+static void sid_render(int16_t *buffer, unsigned long len) ICODE_ATTR;
+
+static void sid_render(int16_t *buffer, unsigned long len) {
     unsigned long bp;
-    int output;
 
     for (bp = 0; bp < len; bp++) {
-        output = cRSID_generateSample(&cRSID_C64) << 12;
-        *(buffer_r + bp) = output; *(buffer_l + bp) = output;
+        buffer[bp] = cRSID_generateSample(&cRSID_C64);
     }
 }
 
@@ -52,8 +50,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         ci->configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
         cRSID_init(SAMPLE_RATE, CHUNK_SIZE);
     }
 
@@ -105,8 +103,8 @@ enum codec_status codec_run(void)
             cRSID_initSIDtune(&cRSID_C64, SIDheader, subSong + 1);
         }
 
-        sid_render(samples_r, samples_l, CHUNK_SIZE);
-        ci->pcmbuf_insert(samples_r, samples_l, CHUNK_SIZE);
+        sid_render(samples, CHUNK_SIZE);
+        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
 
         /* New time is in param */
         action = ci->get_command(&param);
