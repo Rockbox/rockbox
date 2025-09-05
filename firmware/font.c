@@ -161,7 +161,7 @@ static inline unsigned char *buffer_from_handle(int handle)
 
 /* Font cache structures */
 static void cache_create(struct font* pf);
-static void glyph_cache_load(const char *font_path, struct font *pf);
+static NO_INLINE void glyph_cache_load(const char *font_path, struct font *pf);
 /* End Font cache structures */
 
 void font_init(void)
@@ -948,7 +948,8 @@ static int ushortcmp(const void *a, const void *b)
 {
     return ((int)(*(unsigned short*)a - *(unsigned short*)b));
 }
-static void glyph_cache_load(const char *font_path, struct font *pf)
+
+static NO_INLINE void glyph_cache_load(const char *font_path, struct font *pf)
 {
 #define MAX_SORT 256
     if (pf->fd >= 0) {
