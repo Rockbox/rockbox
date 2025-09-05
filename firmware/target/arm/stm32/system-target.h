@@ -23,6 +23,10 @@
 
 #include "system-arm.h"
 #include "cpucache-armv7m.h"
+#include <stdbool.h>
+
+/* Enable/disable debug clock domain during sleep mode. */
+void system_debug_enable(bool enable);
 
 /* Implemented by the target -- can be a no-op if not needed */
 void gpio_init(void) INIT_ATTR;

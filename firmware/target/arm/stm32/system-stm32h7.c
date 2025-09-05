@@ -27,6 +27,7 @@
 #include "regs/stm32h743/pwr.h"
 #include "regs/stm32h743/syscfg.h"
 #include "regs/stm32h743/flash.h"
+#include "regs/stm32h743/dbgmcu.h"
 
 /* EXT timer is 1/8th of CPU clock */
 #define SYSTICK_FREQ            (CPU_FREQ / 8)
@@ -168,6 +169,10 @@ static void stm_init_lse(void)
 
 void system_init(void)
 {
+#if defined(DEBUG)
+    system_debug_enable(true);
+#endif
+
     /* Ensure IRQs are disabled and set vector table address */
     disable_irq();
     reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
@@ -190,6 +195,23 @@ void system_init(void)
     /* Call target-specific initialization */
     gpio_init();
     fmc_init();
+}
+
+void system_debug_enable(bool enable)
+{
+    /*
+     * Debug infrastructure is split across D3 and D1 power domains and
+     * normally these domains can be automatically clock gated when the
+     * CPU enters sleep mode. Because of this, the debugger might not be
+     * able to properly attach if the CPU is in sleep mode.
+     *
+     * Overriding clock gating using DBGMCU_CR makes debugger attaches
+     * more reliable, although it will increase power consumption.
+     */
+    reg_writef(DBGMCU_CR,
+               D1DBGCKEN(enable),
+               D3DBGCKEN(enable),
+               DBGSLEEP_D1(enable));
 }
 
 void tick_start(unsigned int interval_in_ms)
