@@ -3500,22 +3500,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "켬 버튼 = 설정"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "재생 버튼 = 설정"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "선택 버튼 = 설정"
     iriverh100,iriverh120,iriverh300: "탐색 버튼 = 설정"
     mpiohd300: "진입 버튼 = 설정"
     mrobe500: "하트 버튼 = 설정"
-    rtc: "켬 버튼 = 설정"
     vibe500: "확인 버튼 = 설정"
   </dest>
   <voice>
@@ -3528,6 +3528,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3536,12 +3537,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "끔 버튼 = 반복"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "뒤로가기 버튼 = 반복"
     gigabeatfx,mrobe500: "전원 버터느 = 반복"
     gogearsa9200: "왼쪽 버튼 = 반복"
@@ -3550,7 +3551,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "이전 버튼 = 반복"
     iriverh100,iriverh120,iriverh300: "정지 버튼 = 반복"
     mrobe100: "화면 버튼 = 반복"
-    rtc: "끔 버튼 = 반복"
     samsungyh*: "되감기 버튼 = 반복"
     vibe500: "취소 버튼 = 반복"
   </dest>

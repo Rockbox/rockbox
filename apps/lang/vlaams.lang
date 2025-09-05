@@ -4305,6 +4305,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -4313,12 +4314,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = terugzetten"
     gigabeatfx,mrobe500: "POWER = terugzetten"
     gigabeats,sansafuzeplus: "BACK = terugzetten"
     gogearsa9200: "LINKS = terugzetten"
@@ -4327,12 +4328,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = terugzetten"
     iriverh100,iriverh120,iriverh300: "STOP = terugzetten"
     mrobe100: "DISPLAY = terugzetten"
-    rtc: "OFF = terugzetten"
     samsungyh*: "REW = terugzetten"
     vibe500: "C = terugzetten"
   </dest>
   <voice>
     *: none
+    rtc: "OFF = terugzetten"
     gigabeatfx,mrobe500: "POWER = terugzetten"
     gigabeats,sansafuzeplus: "BACK = terugzetten"
     gogearsa9200: "LINKS = terugzetten"
@@ -4341,7 +4342,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = terugzetten"
     iriverh100,iriverh120,iriverh300: "STOP = terugzetten"
     mrobe100: "DISPLAY = terugzetten"
-    rtc: "OFF = terugzetten"
     samsungyh*: "REW = terugzetten"
     vibe500: "C = terugzetten"
   </voice>
@@ -9304,32 +9304,32 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = instellen"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = instellen"
     gogearsa9200,samsungyh*: "PLAY = instellen"
     iriverh100,iriverh120,iriverh300: "NAVI = instellen"
     mpiohd300: "ENTER = instellen"
     mrobe500: "HEART = instellen"
-    rtc: "ON = instellen"
     vibe500: "OK = instellen"
   </dest>
   <voice>
     *: none
+    rtc: "ON = instellen"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = instellen"
     gogearsa9200,samsungyh*: "PLAY = instellen"
     iriverh100,iriverh120,iriverh300: "NAVI = instellen"
     mpiohd300: "ENTER = instellen"
     mrobe500: "HEART = instellen"
-    rtc: "ON = instellen"
     vibe500: "OK = instellen"
   </voice>
 </phrase>

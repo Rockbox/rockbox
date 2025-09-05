@@ -41,8 +41,10 @@
 # 'Targets' refer to both the unique device name (as specified in the
 # configure file and stored in MODELNAME of the top-level Makefile) and
 # to various common features that are shared between more than one
-# device.  See apps/features.txt for all available features that can be
-# used instead of or in addition to the device name itself.
+# device. If mixed, the feature string must be placed at the top as a
+# default, so it gets overwritten by subsequent device strings.
+# See apps/features.txt for all available features that can be used
+# instead of or in addition to the device name itself.
 #
 # All phrases have a default string, designated with a target
 # of '*' (eg: *: "default text") that will be used if no other target
@@ -3624,22 +3626,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </dest>
   <voice>
@@ -3652,6 +3654,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3660,12 +3663,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3674,7 +3677,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </dest>

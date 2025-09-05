@@ -3961,6 +3961,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3969,12 +3970,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = 返回"
     gigabeatfx: "POWER = 返回"
     gigabeats,sansafuzeplus: "BACK = 返回"
     gogearsa9200,ipod*,mpiohd300,sansac200*: "MENU = 返回"
@@ -3983,7 +3984,6 @@
     iriverh100,iriverh120,iriverh300: "STOP = 返回"
     mrobe100: "DISPLAY = 返回"
     mrobe500: "POWER = Revert"
-    rtc: "OFF = 返回"
     samsungyh*: "REW = 返回"
     vibe500: "CANCEL = 返回"
   </dest>
@@ -7577,22 +7577,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = 設定"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = 設定"
     gogearsa9200,samsungyh*: "PLAY = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     mpiohd300: "ENTER = 設定"
     mrobe500: "HEART = Set"
-    rtc: "ON = 設定"
     sansaclip*,sansaconnect,sansafuze*: "SELECT = Set"
     vibe500: "OK = 設定"
   </dest>

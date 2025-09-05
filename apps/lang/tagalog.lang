@@ -3773,22 +3773,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = Ilagay"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Ilagay"
     gogearsa9200,samsungyh*: "PLAY = Ilagay"
     iriverh100,iriverh120,iriverh300: "NAVI = Ilagay"
     mpiohd300: "ENTER = Ilagay"
     mrobe500: "HEART =Ilagay"
-    rtc: "ON = Ilagay"
     vibe500: "OK = Ilagay"
   </dest>
   <voice>
@@ -3801,6 +3801,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3809,12 +3810,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = Mabalik"
     gigabeatfx,mrobe500: "POWER = Mabalik"
     gigabeats,sansafuzeplus: "BACK = Mabalik"
     gogearsa9200: "LEFT = Mabalik"
@@ -3823,7 +3824,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mabalik"
     iriverh100,iriverh120,iriverh300: "STOP = Mabalik"
     mrobe100: "DISPLAY = Mabalik"
-    rtc: "OFF = Mabalik"
     samsungyh*: "REW = Mabalik"
     vibe500: "C = Mabalik"
   </dest>

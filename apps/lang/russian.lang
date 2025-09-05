@@ -3569,6 +3569,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3577,14 +3578,14 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "ВЫКЛ. = Отмена"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "НАЗАД = Отмена"
-    gigabeatfx,mrobe500,rtc: "ВЫКЛ. = Отмена"
+    gigabeatfx,mrobe500: "ВЫКЛ. = Отмена"
     gogearsa9200: "ЛЕВО = Отмена"
     iaudiom5,iaudiox5: "ЗАПИСЬ = Отмена"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Отмена"
@@ -7055,22 +7056,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ВКЛ. = Установить"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "ВОСПР. = Установить"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "ВЫБОР = Установить"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Установить"
     mpiohd300: "ENTER = Установить"
     mrobe500: "СЕРДЦЕ = Установить"
-    rtc: "ВКЛ. = Установить"
     vibe500: "OK = Установить"
   </dest>
   <voice>

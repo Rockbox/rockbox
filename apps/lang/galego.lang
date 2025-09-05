@@ -2904,6 +2904,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -2912,12 +2913,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = desfacer"
     gigabeatfx,mrobe500: "POWER = desfacer"
     gigabeats,sansafuzeplus: "BACK = desfacer"
     gogearsa9200: "LEFT = desfacer"
@@ -2926,12 +2927,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = desfacer"
     iriverh100,iriverh120,iriverh300: "STOP = desfacer"
     mrobe100: "DISPLAY = desfacer"
-    rtc: "OFF = desfacer"
     samsungyh*: "REW = desfacer"
     vibe500: "CANCEL = desfacer"
   </dest>
   <voice>
     *: none
+    rtc: "OFF = desfacer"
     gigabeatfx,mrobe500: "POWER = desfacer"
     gigabeats,sansafuzeplus: "BACK = desfacer"
     gogearsa9200: "LEFT = desfacer"
@@ -2940,7 +2941,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = desfacer"
     iriverh100,iriverh120,iriverh300: "STOP = desfacer"
     mrobe100: "DISPLAY = desfacer"
-    rtc: "OFF = desfacer"
     samsungyh*: "REW = desfacer"
     vibe500: "CANCEL = desfacer"
   </voice>
@@ -7673,22 +7673,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = Aceptar"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Aceptar"
     gogearsa9200,samsungyh*: "PLAY = Aceptar"
     iriverh100,iriverh120,iriverh300: "NAVI = Aceptar"
     mpiohd300: "ENTER = Aceptar"
     mrobe500: "HEART = Aceptar"
-    rtc: "ON = Aceptar"
     vibe500: "OK = Aceptar"
   </dest>
   <voice>

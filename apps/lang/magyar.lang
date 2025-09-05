@@ -3456,22 +3456,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = Beállít"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Beállít"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Beállít"
     iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     mpiohd300: "ENTER = Beállít"
     mrobe500: "SZÍV = Beállít"
-    rtc: "ON = Beállít"
     vibe500: "OK = Beállít"
   </dest>
   <voice>
@@ -3484,6 +3484,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3492,12 +3493,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "KI = mégsem"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus: "VISSZA = Mégsem"
     gigabeatfx,mrobe500: "POWER = Mégsem"
     gogearsa9200: "BAL = Mégsem"
@@ -3506,7 +3507,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mégsem"
     iriverh100,iriverh120,iriverh300: "STOP = Mégsem"
     mrobe100: "DISPLAY = Mégsem"
-    rtc: "KI = Mégsem"
     samsungyh*: "REW = Mégsem"
     vibe500: "CANCEL = Mégsem"
   </dest>
