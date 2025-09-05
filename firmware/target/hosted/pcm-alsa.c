@@ -97,7 +97,7 @@ static unsigned int xruns = 0;
 
 static snd_async_handler_t *ahandler = NULL;
 static pthread_mutex_t pcm_mtx;
-static char signal_stack[SIGSTKSZ];
+static long signal_stack[SIGSTKSZ/sizeof(long)];
 
 static const char *playback_dev = DEFAULT_PLAYBACK_DEVICE;
 

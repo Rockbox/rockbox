@@ -68,7 +68,7 @@ static int samples_taken;
 static clock_t initial_time, hz;
 
 
-static char cputime_thread_stack[DEFAULT_STACK_SIZE + 0x100];
+static long cputime_thread_stack[(DEFAULT_STACK_SIZE + 0x100)/sizeof(long)];
 static char cputime_thread_name[] = "cputime";
 static int  cputime_threadid;
 static void cputime_thread(void);

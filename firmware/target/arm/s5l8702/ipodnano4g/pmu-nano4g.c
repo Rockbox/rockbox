@@ -162,7 +162,7 @@ unsigned short pmu_read_adc(const struct pmu_adc_channel *ch)
  */
 #define Q_EINT  0
 
-static char pmu_thread_stack[DEFAULT_STACK_SIZE/2];
+static long pmu_thread_stack[DEFAULT_STACK_SIZE/2/sizeof(long)];
 static struct event_queue pmu_queue;
 static unsigned char ints_msk[3];
 

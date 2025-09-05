@@ -194,7 +194,7 @@ static void scroll_thread(void)
 
 void scroll_init(void)
 {
-    static char scroll_stack[DEFAULT_STACK_SIZE*3];
+    static long scroll_stack[(DEFAULT_STACK_SIZE*3)/sizeof(long)];
 #ifdef HAVE_REMOTE_LCD
     queue_init(&scroll_queue, true);
 #endif

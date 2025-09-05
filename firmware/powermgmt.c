@@ -122,9 +122,9 @@ unsigned short power_history[POWER_HISTORY_LEN] = {0};
 
 #if (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) || \
     (CONFIG_CPU == X1000) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
-static char power_stack[DEFAULT_STACK_SIZE];
+static long power_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 #else
-static char power_stack[DEFAULT_STACK_SIZE/2];
+static long power_stack[DEFAULT_STACK_SIZE/2/sizeof(long)];
 #endif
 static const char power_thread_name[] = "power";
 

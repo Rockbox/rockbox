@@ -25,7 +25,7 @@
 #include "pca9555.h"
 
 static struct semaphore pca9555_sem;
-static char pca9555_thread_stack[DEFAULT_STACK_SIZE];
+static long pca9555_thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 volatile unsigned short pca9555_in_ports;
 
 void INT_GPIO1(void)
