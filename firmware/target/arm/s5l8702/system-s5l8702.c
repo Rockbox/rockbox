@@ -33,10 +33,6 @@
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked, \
-                                      weak, alias("fiq_dummy")));
-
 default_interrupt(INT_EXT0);    /* GPIOIC group 6 (GPIO 0..31) */
 default_interrupt(INT_EXT1);    /* GPIOIC group 5 (GPIO 32..63) */
 default_interrupt(INT_EXT2);    /* GPIOIC group 4 (GPIO 64..95) */
@@ -108,7 +104,7 @@ default_interrupt(INT_IRQ61);
 default_interrupt(INT_IRQ62);
 default_interrupt(INT_IRQ63);
 
-static int current_irq;
+static int current_irq IBSS_ATTR;
 
 static const struct clocking_mode clk_modes[] =
 {
@@ -162,19 +158,22 @@ static void UIRQ(void)
     panicf("Unhandled IRQ %d!", current_irq);
 }
 
+#ifdef NAKED
+void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
+#else
+void irq_handler(void) __attribute__((interrupt ("IRQ")));
+#endif
 void irq_handler(void)
 {
     /*
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
      */
-
+#ifdef NAKED
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
-
-    const void* dummy0 = VIC0ADDRESS;
-    (void)dummy0;
-    const void* dummy1 = VIC1ADDRESS;
-    (void)dummy1;
+#endif
+    (void)VIC0ADDRESS;
+    (void)VIC1ADDRESS;
     uint32_t irqs0 = VIC0IRQSTATUS;
     uint32_t irqs1 = VIC1IRQSTATUS;
     for (current_irq = 0; irqs0; current_irq++, irqs0 >>= 1)
@@ -185,12 +184,15 @@ void irq_handler(void)
             irqvector[current_irq]();
     VIC0ADDRESS = NULL;
     VIC1ADDRESS = NULL;
-
+#ifdef NAKED
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
+#endif
 }
 
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked, \
+                                      weak, alias("fiq_dummy")));
 void fiq_dummy(void)
 {
     asm volatile (
