@@ -924,6 +924,7 @@ reopen_datfile:
                         rb->gui_synclist_draw(&lists);
                         break;
                     }
+                    /* Inentional fallthrough */
                 case ACTION_STD_OK:
                     if (op_entry_read(fd_dat, selection, op_entry_sz))
                     {
