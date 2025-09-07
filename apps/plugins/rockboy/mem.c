@@ -269,6 +269,7 @@ static byte ioreg_read(byte r)
     case RI_HDMA4:
     case RI_HDMA5:
         if (hw.cgb) return REG(r);
+        /* Intentional fallthrough */
     default:
         return 0xff;
     }

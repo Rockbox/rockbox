@@ -152,6 +152,7 @@ free_tree_sgf (void)
     {
         rb->splash (5 * HZ,
                     "Error allocating first node!  Please exit immediately.");
+        return;
     }
 
     get_node (tree_head)->props = NO_PROP;
@@ -498,4 +499,3 @@ get_prop (int handle)
     }
     return &(storage_buffer[index][handle].prop);
 }
-

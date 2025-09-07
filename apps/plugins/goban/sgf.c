@@ -1304,7 +1304,7 @@ read_comment_sgf (char *buffer, size_t buffer_size)
             {
                 break;
             }
-
+            /* Intentional fallthrough */
         default:
             *buffer = temp;
             ++buffer;

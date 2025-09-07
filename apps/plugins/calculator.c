@@ -1735,6 +1735,7 @@ static void typingProcess(void){
                         clearOperand();
                     calStatus = cal_typing;
                     /* go on typing, no break */
+                    /* Intentional fallthrough */
                 case cal_typing:
                 case cal_dotted:
                     switch(CAL_BUTTON){

@@ -406,6 +406,7 @@ static int ask_and_get_audio_buffer(const char *filename)
                 break;
 #endif
 #endif
+            /* Intentional fallthrough */
             case IMGVIEW_MENU:
                 return PLUGIN_OK;
 
