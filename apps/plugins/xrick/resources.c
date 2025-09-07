@@ -23,7 +23,7 @@
 #include "xrick/system/basic_funcs.h"
 
 #include "xrick/system/miniz_config.h"
-#include "miniz/miniz.c"
+#include "xrick/3rdparty/miniz/miniz.c"
 
 /*
  * prototypes

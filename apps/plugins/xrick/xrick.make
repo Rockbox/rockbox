@@ -10,8 +10,7 @@
 XRICKSRCDIR := $(APPSDIR)/plugins/xrick
 XRICKBUILDDIR := $(BUILDDIR)/apps/plugins/xrick
 
-XRICKINCLUDES += -I$(XRICKSRCDIR)../ \
-                 -I$(XRICKSRCDIR)/3rd_party
+XRICKINCLUDES += -I$(XRICKSRCDIR)../
 
 ROCKS += $(XRICKBUILDDIR)/xrick.rock
 
@@ -21,7 +20,7 @@ XRICK_OBJ := $(call c2obj, $(XRICK_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(XRICK_SRC)
 
-XRICKCFLAGS = $(PLUGINFLAGS) -O2  $(XRICKINCLUDES)
+XRICKCFLAGS = $(PLUGINFLAGS) -O2 $(XRICKINCLUDES)
 
 $(XRICKBUILDDIR)/xrick.rock: $(XRICK_OBJ)
 
