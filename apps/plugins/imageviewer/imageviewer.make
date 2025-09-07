@@ -26,13 +26,13 @@ IMGDECFLAGS = $(PLUGINFLAGS) -DIMGDEC
 IMGVSUBDIRS := $(call preprocess, $(IMGVSRCDIR)/SUBDIRS)
 $(foreach dir,$(IMGVSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 
-IMGDECLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.refmap
+IMGDECLDFLAGS = $(GLOBAL_LDOPTS) -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.refmap
 
 ifndef APP_TYPE
     IMGDEC_OUTLDS = $(IMGVBUILDDIR)/%.link
-    IMGDEC_OVLFLAGS = -T$(IMGVBUILDDIR)/$*.link -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.map
+    IMGDEC_OVLFLAGS = $(GLOBAL_LDOPTS) -T$(IMGVBUILDDIR)/$*.link -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.map
 else
-    IMGDEC_OVLFLAGS = $(PLUGINLDFLAGS) -Wl,$(LDMAP_OPT),$(IMGVBUILDDIR)/$*.map
+    IMGDEC_OVLFLAGS = $(GLOBAL_LDOPTS) $(PLUGINLDFLAGS) -Wl,$(LDMAP_OPT),$(IMGVBUILDDIR)/$*.map
 endif
 
 $(IMGVBUILDDIR)/%.ovl: $(IMGDEC_OUTLDS)
@@ -52,4 +52,3 @@ $(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUG
 $(IMGVBUILDDIR)/%.link: $(PLUGIN_LDS) $(IMGVBUILDDIR)/%.refmap
 	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DIMGVDECODER_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(IMGVBUILDDIR)/$*.refmap))
-

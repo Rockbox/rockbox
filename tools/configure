@@ -776,6 +776,7 @@ arm1176jzlinuxcc () {
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs" # warn about undefined symbols in shared libraries
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs -Wl,-z,noexecstack" # Stack is not executable
  SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS=''
  endian="little"
@@ -4694,6 +4695,10 @@ if [ "yes" = "$simulator" ] || [ "yes" = "$application" ] && [ $uname = "Darwin"
  ldnum=0
 else
  ldnum=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
+fi
+
+if test "$ldnum" -ge "239"; then
+  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,--no-warn-rwx-segments"
 fi
 
 if test "$ldnum" -ge "227"; then
