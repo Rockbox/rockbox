@@ -29,7 +29,6 @@
 #define REG16_PTR_T          volatile uint16_t *
 #define REG32_PTR_T          volatile uint32_t *
 #define VOID_PTR_PTR_T       void* volatile*
-#define CONST_VOID_PTR_PTR_T const void* volatile*
 
 #if CONFIG_CPU==S5L8700 || CONFIG_CPU==S5L8701
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
@@ -1596,7 +1595,7 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 #define AESAUXADDR             (*((REG32_PTR_T)(AES_BASE + 0x30)))
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
 #define AESOUTADDR          (*((VOID_PTR_PTR_T)(AES_BASE + 0x20)))
-#define AESINADDR     (*((CONST_VOID_PTR_PTR_T)(AES_BASE + 0x28)))
+#define AESINADDR           (*((VOID_PTR_PTR_T)(AES_BASE + 0x28)))
 #define AESAUXADDR          (*((VOID_PTR_PTR_T)(AES_BASE + 0x30)))
 #define AESKEY                   ((REG32_PTR_T)(AES_BASE + 0x4c))
 #define AESIV                    ((REG32_PTR_T)(AES_BASE + 0x74))
@@ -1698,7 +1697,7 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 #define VICPRIORITYDAISY(v)            (*((REG32_PTR_T)(VICBASE(v) + 0x28)))
 #define VICVECTADDR(v, i)              (*((REG32_PTR_T)(VICBASE(v) + 0x100 + 4 * (i))))
 #define VICVECTPRIORITY(v, i)          (*((REG32_PTR_T)(VICBASE(v) + 0x200 + 4 * (i))))
-#define VICADDRESS(v)         (*((CONST_VOID_PTR_PTR_T)(VICBASE(v) + 0xF00)))
+#define VICADDRESS(v)                  (*((VOID_PTR_PTR_T)(VICBASE(v) + 0xF00)))
 
 #define VIC0IRQSTATUS         VICIRQSTATUS(0)
 #define VIC0FIQSTATUS         VICFIQSTATUS(0)
