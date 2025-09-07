@@ -4936,16 +4936,14 @@ static int pictureflow_main(void)
             break;
 #endif
         case PF_TRACKLIST:
-            if ( pf_cfg.auto_wps == 1 && pf_state == pf_idle ) {
-                pf_state = pf_cover_in;
-                break;
-            }
         case PF_SELECT:
-            if ( pf_state == pf_idle || pf_state == pf_scrolling) {
+            if (pf_state == pf_idle || pf_state == pf_scrolling)
+            {
                 if (pf_state == pf_scrolling)
                     set_current_slide(target);
 #if PF_PLAYBACK_CAPABLE
-                if(pf_cfg.auto_wps == 1) {
+                if(pf_cfg.auto_wps == 1 && button == PF_SELECT)
+                {
                     if (start_playback(true))
                         return PLUGIN_GOTO_WPS;
                 }
