@@ -110,7 +110,7 @@ default_interrupt(INT_IRQ63);
 
 static int current_irq;
 
-static struct clocking_mode clk_modes[] =
+static const struct clocking_mode clk_modes[] =
 {
    /* cdiv  hdiv  hprat  hsdiv */    /* CClk  HClk  PClk  SM1Clk  FPS */
     { 1,    2,    2,     4 },        /* 216   108   54    27      42  */

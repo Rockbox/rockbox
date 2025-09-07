@@ -252,7 +252,7 @@ struct clocking_mode
     uint8_t hsdiv;  /* TBC: SM1_Clk = HClk / hsdiv, hsdiv >= 1 */
 };
 
-void clocking_init(struct clocking_mode *modes, int init_level);
+void clocking_init(const struct clocking_mode *modes, int init_level);
 void set_clocking_level(int level);
 unsigned get_system_freqs(unsigned *cclk, unsigned *hclk, unsigned *pclk);
 void clockgate_enable(int gate, bool enable);

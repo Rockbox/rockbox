@@ -183,10 +183,10 @@ int soc_get_hsdiv(void)
 }
 
 /* each target/app could define its own clk_modes table */
-struct clocking_mode *clk_modes;
+const struct clocking_mode *clk_modes;
 int cur_level = -1;
 
-void clocking_init(struct clocking_mode *modes, int level)
+void clocking_init(const struct clocking_mode *modes, int level)
 {
     /* at this point, CK16_SYS should be already configured
        and enabled by emCORE/bootloader */
@@ -196,14 +196,14 @@ void clocking_init(struct clocking_mode *modes, int level)
     cur_level = level;
 
     /* start initial level */
-    struct clocking_mode *m = clk_modes + cur_level;
+    const struct clocking_mode *m = clk_modes + cur_level;
     soc_set_hsdiv(m->hsdiv);
     soc_set_system_divs(m->cdiv, m->hdiv, m->hprat);
 }
 
 void set_clocking_level(int level)
 {
-    struct clocking_mode *cur, *next;
+    const struct clocking_mode *cur, *next;
 
     int step = (level < cur_level) ? -1 : 1;
 
