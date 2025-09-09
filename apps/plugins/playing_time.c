@@ -418,8 +418,8 @@ static void pt_store_converted_totals(struct playing_time_info *pti)
 
 static int pt_add_track(int i, enum ePT_SUM section, struct playing_time_info *pti)
 {
-    struct mp3entry id3;
-    struct playlist_track_info pl_track;
+    static struct mp3entry id3;
+    static struct playlist_track_info pl_track;
     int progress_total = pti->remaining_only ?
                          (pti->nb_tracks - pti->curr_display_index) + 1 :
                          pti->nb_tracks;
