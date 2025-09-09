@@ -25,8 +25,10 @@ In order to minimise memory usage, a small number of hard-coded limits
 are present in decoder.h - mainly limiting the supported blocksize
 (number of samples in a frame) to 4608.  This is the default value
 used by the reference FLAC encoder at all standard compression
-settings.
-
+settings.  However, it is increasingly common for high-resolution/freq
+files to use 8K block sizes, so on devices that can play back such
+files natively and/or have sufficient processor oomph to downmix in
+realtime, we use that larger limit.
 
 TESTING
 
@@ -39,7 +41,7 @@ called "test.wav" in the current directory.  This has been tested with
 
 This can be used to test the accuracy of the decoder by comparing the
 md5sum of the WAV file produced by this decoder with a WAV file
-produced by the official libFLAC decoder.  
+produced by the official libFLAC decoder.
 
 This test program could be extended to perform an internal md5sum
 calculation and comparing that against the md5sum stored in the FLAC

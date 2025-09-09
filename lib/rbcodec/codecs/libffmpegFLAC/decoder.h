@@ -4,7 +4,9 @@
 #include "bitstream.h"
 
 #define MAX_CHANNELS   7      /* Maximum supported channels, only left/right will be played back */
+#ifndef MAX_BLOCKSIZE
 #define MAX_BLOCKSIZE  4608   /* Maxsize in samples of one uncompressed frame */
+#endif
 #define MAX_FRAMESIZE  65536  /* Maxsize in bytes of one compressed frame */
 #define MIN_FRAME_SIZE 11     /* smallest valid FLAC frame possible */
 

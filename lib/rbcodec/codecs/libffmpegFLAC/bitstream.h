@@ -19,22 +19,13 @@
 #endif
 
 #if (CONFIG_CPU == MCF5250) || (CONFIG_CPU == PP5022) || \
-    (CONFIG_CPU == PP5024) || (CONFIG_CPU == S5L8702)
+    (CONFIG_CPU == PP5024)
 #define ICODE_ATTR_FLAC ICODE_ATTR
 #define IBSS_ATTR_FLAC  IBSS_ATTR
 /* Enough IRAM to move additional data to it. */
 #define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
 #define IBSS_ATTR_FLAC_XLARGE_IRAM
 #define IBSS_ATTR_FLAC_XXLARGE_IRAM
-
-#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
-#define ICODE_ATTR_FLAC ICODE_ATTR
-#define IBSS_ATTR_FLAC  IBSS_ATTR
-/* Enough IRAM to move even more additional data to it. */
-#define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
-#define IBSS_ATTR_FLAC_XLARGE_IRAM  IBSS_ATTR
-#define IBSS_ATTR_FLAC_XXLARGE_IRAM
-
 #else
 #define ICODE_ATTR_FLAC ICODE_ATTR
 #define IBSS_ATTR_FLAC  IBSS_ATTR
@@ -42,6 +33,12 @@
 #define IBSS_ATTR_FLAC_LARGE_IRAM
 #define IBSS_ATTR_FLAC_XLARGE_IRAM
 #define IBSS_ATTR_FLAC_XXLARGE_IRAM
+#endif
+
+#if (ARCH == ARCH_M68K) || defined(CPU_PP) || MEMORYSIZE <= 2
+#define MAX_BLOCKSIZE 4608
+#else
+#define MAX_BLOCKSIZE 8192
 #endif
 
 /* Endian conversion routines for standalone compilation */
