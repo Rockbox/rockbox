@@ -636,7 +636,8 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
         if (confirm_delete_yesno("") != YESNO_YES)
         {
             gui_synclist_set_title(lists, lists->title, lists->title_icon);
-            shortcut_menu_speak_item(selection, NULL);
+            if (global_settings.talk_menu)
+                shortcut_menu_speak_item(selection, NULL);
             return ACTION_REDRAW;
         }
 
@@ -651,7 +652,8 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 
         if (shortcut_count > 0)
         {
-            shortcut_menu_speak_item(gui_synclist_get_sel_pos(lists), NULL);
+            if (global_settings.talk_menu)
+                shortcut_menu_speak_item(gui_synclist_get_sel_pos(lists), NULL);
             return ACTION_REDRAW;
         }
 
