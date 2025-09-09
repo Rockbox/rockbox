@@ -35,7 +35,7 @@
 #define IBSS_ATTR_FLAC_XXLARGE_IRAM
 #endif
 
-#if (ARCH == ARCH_M68K) || defined(CPU_PP) || MEMORYSIZE <= 2
+#if (ARCH == ARCH_M68K) || defined(CPU_PP) || defined(CPU_TCC780X) || (MEMORYSIZE <= 2)
 #define MAX_BLOCKSIZE 4608
 #else
 #define MAX_BLOCKSIZE 8192
