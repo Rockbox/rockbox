@@ -13,7 +13,11 @@ STARTUP(target/arm/crt0.o)
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAM_ORIG + DRAMSIZE)
 
-#define CODEC_BUFFER_FILLS_IRAM defined(AMS_LOWMEM) || (CONFIG_CPU == AS3525v2)
+#if defined(AMS_LOWMEM) || (CONFIG_CPU == AS3525v2)
+#define CODEC_BUFFER_FILLS_IRAM 1
+#else
+#define CODEC_BUFFER_FILLS_IRAM 0
+#endif
 
 #if CODEC_BUFFER_FILLS_IRAM
 /* Entire codec buffer in IRAM */
