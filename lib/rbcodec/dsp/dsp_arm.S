@@ -570,7 +570,7 @@ pga_process:
  */
 #define HIGH_PRECISION 0
 
-#if CONFIG_CPU == PP5002
+#if defined(CPU_PP)
     .section    .icode,"ax",%progbits
 #else
     .section    .text, "ax",%progbits
