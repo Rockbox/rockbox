@@ -92,7 +92,9 @@ PlayerBuildInfo::PlayerBuildInfo() :
      serverInfo(nullptr),
      playerInfo(":/ini/rbutil.ini", QSettings::IniFormat)
 {
+#if QT_VERSION < 0x060000
     playerInfo.setIniCodec("UTF-8");
+#endif
 
 }
 
