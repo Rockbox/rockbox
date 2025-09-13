@@ -1816,8 +1816,9 @@ fi
   # modelname: short model name used all over to identify this target
   # memory:    number of megabytes of RAM this target has. If the amount can
   #            be selected by the size prompt, let memory be unset here
-  #            Note that for hsoted/application builds, this is the size
-  #            reserved for the audio buffer, not the total RAM size.
+  #            Note for hosted/application builds, (memory-1) defines the
+  #            audiobuffer size; actual memory usage will likely be
+  #            larger and is found in rockbox-info.txt after compilation.
   # target:    -Ddefine passed to the build commands to make the correct
   #            config-*.h file get included etc
   # tool:      the tool that takes a plain binary and converts that into a
