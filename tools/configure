@@ -4054,7 +4054,7 @@ fi
     app_type="android_ndk"
     lcd_orientation="landscape"
     # Actually 408260kB
-    memory=256
+    memory=192
     uname=`uname`
     androidndkcc 16 armeabi "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp"
     tool="cp "
@@ -4078,7 +4078,7 @@ fi
     target="DX90"
     app_type="android_ndk"
     lcd_orientation="landscape"
-    memory=256
+    memory=192
     uname=`uname`
     androidndkcc 16 armeabi "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp"
     tool="cp "
