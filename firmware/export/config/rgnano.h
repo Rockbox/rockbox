@@ -51,10 +51,10 @@
 #define CONFIG_RTC APPLICATION
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x400000
+#define CODEC_SIZE 0x200000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x800000
+#define PLUGIN_BUFFER_SIZE 0x200000
 
 #define AB_REPEAT_ENABLE
 
