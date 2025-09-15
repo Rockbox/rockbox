@@ -115,6 +115,9 @@
 #define SCSI_REPORT_LUNS          0xa0
 #define SCSI_WRITE_BUFFER         0x3b
 
+#define SAT_ATA_PASSTHROUGH_12    0xa1
+#define SAT_ATA_PASSTHROUGH_16    0x85
+
 #define SCSI_READ_16              0x88
 #define SCSI_WRITE_16             0x8a
 
@@ -675,6 +678,31 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 #endif /* CONFIG_RTC */
     }
 }
+
+#if (CONFIG_STORAGE & STORAGE_ATA)
+static void usb_storage_send_ata_identify(void)
+{
+    unsigned short* identify_info = ata_get_identify();
+
+    for (int i = 0 ; i < ATA_IDENTIFY_WORDS ; i++) {
+        tb.transfer_buffer[i*2] = identify_info[i] & 0xff;
+        tb.transfer_buffer[i*2+1] = identify_info[i] >> 8;
+    }
+    cur_cmd.count = 0;
+    cur_cmd.last_result = 0;
+    send_block_data(cur_cmd.data[0], 512);
+}
+#ifdef HAVE_ATA_SMART
+static void usb_storage_send_smart(void)
+{
+    ata_read_smart((struct ata_smart_values*) tb.transfer_buffer);
+    cur_cmd.count = 0;
+    cur_cmd.last_result = 0;
+    cur_cmd.data[0] = tb.transfer_buffer;
+    send_block_data(cur_cmd.data[0], 512);
+}
+#endif /* HAVE_ATA_SMART */
+#endif /* STORAGE_ATA */
 
 /* called by usb_core_control_request() */
 bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
@@ -1325,6 +1353,46 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             break;
 #endif /* CONFIG_RTC */
 
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    case SAT_ATA_PASSTHROUGH_12:
+            if (cbw->command_block[1] == 0x08 &&
+                cbw->command_block[2] == 0x0e &&
+                cbw->command_block[4] == 0x01) {
+                if (cbw->command_block[9] == 0xa1) { // ??? suspicious
+                    usb_storage_send_ata_identify();
+                    break;
+#ifdef HAVE_ATA_SMART
+                } else if (cbw->command_block[9] == 0xb0) {
+                    usb_storage_send_smart();
+                    break;
+#endif
+                }
+            }
+            send_csw(UMS_STATUS_FAIL);
+            cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+            cur_sense_data.asc=ASC_INVALID_COMMAND;
+            cur_sense_data.ascq=0;
+            break;
+    case SAT_ATA_PASSTHROUGH_16:
+            if (cbw->command_block[1] == 0x08 &&
+                cbw->command_block[2] == 0x0e &&
+                cbw->command_block[6] == 0x01) {
+                if (cbw->command_block[14] == 0xec) {
+                    usb_storage_send_ata_identify();
+                    break;
+#ifdef HAVE_ATA_SMART
+                } else if (cbw->command_block[14] == 0xb0) {
+                    usb_storage_send_smart();
+                    break;
+#endif
+                }
+            }
+            send_csw(UMS_STATUS_FAIL);
+            cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+            cur_sense_data.asc=ASC_INVALID_COMMAND;
+            cur_sense_data.ascq=0;
+            break;
+#endif /* STORAGE_ATA */
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
             send_csw(UMS_STATUS_FAIL);
