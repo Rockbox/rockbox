@@ -1170,8 +1170,18 @@ int ata_init(void)
     /* Logical sector size */
     if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
         log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
+    else if (ceata)
+        log_sector_size = 1 << identify_info[106];
     else
         log_sector_size = 512;
+
+#ifndef MAX_VARIABLE_LOG_SECTOR
+    if (log_sector_size != SECTOR_SIZE)
+        panicf("Bad logical sector size (%ld)", log_sector_size);
+#else
+    if (log_sector_size > MAX_VARIABLE_LOG_SECTOR)
+        panicf("Logical sector size too large (%ld)", log_sector_size);
+#endif
 
 #ifdef MAX_PHYS_SECTOR_SIZE
     rc = ata_get_phys_sector_mult();

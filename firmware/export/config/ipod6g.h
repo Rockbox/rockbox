@@ -203,7 +203,7 @@
 #define MAX_PHYS_SECTOR_SIZE 4096
 
 /* define this if we want to support 512n and 4Kn drives */
-//#define MAX_VARIABLE_LOG_SECTOR 4096
+#define MAX_VARIABLE_LOG_SECTOR 4096
 
 #define HAVE_HARDWARE_CLICK
 
