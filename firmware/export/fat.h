@@ -148,7 +148,7 @@ int fat_modtime(struct fat_file *parent, struct fat_file *file,
                 time_t modtime);
 
 #if defined(MAX_VARIABLE_LOG_SECTOR)
-int fat_file_sector_size(const struct fat_file *file);
+int fat_file_sector_size(IF_MV_NONVOID(const struct fat_file *file));
 #else
 #define fat_file_sector_size(__file) SECTOR_SIZE
 #endif

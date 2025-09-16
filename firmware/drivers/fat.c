@@ -2035,7 +2035,7 @@ static int free_cluster_chain(struct bpb *fat_bpb, long startcluster)
 /** File entity functions **/
 
 #if defined(MAX_VARIABLE_LOG_SECTOR)
-int fat_file_sector_size(const struct fat_file *file)
+int fat_file_sector_size(IF_MV_NONVOID(const struct fat_file *file))
 {
     const struct bpb *fat_bpb = FAT_BPB(file->volume);
 

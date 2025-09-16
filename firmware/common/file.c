@@ -199,7 +199,7 @@ file_error:
 /* Handle syncing all file's streams to the truncation */
 static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
-    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+    uint16_t sector_size = fat_file_sector_size(IF_MV(file->stream.fatstr.fatfilep));
     unsigned long filesectors = filesize_sectors(sector_size, size);
 
     struct filestr_base *s = NULL;
@@ -230,7 +230,7 @@ static int ftruncate_internal(struct filestr_desc *file, file_size_t size,
     file_size_t cursize = *file->sizep;
     file_size_t truncsize = MIN(size, cursize);
 
-    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+    uint16_t sector_size = fat_file_sector_size(IF_MV(file->stream.fatstr.fatfilep));
 
     if (write_now)
     {
@@ -295,7 +295,7 @@ static int fsync_internal(struct filestr_desc *file)
 
     file_size_t size = *file->sizep;
     unsigned int foflags = fileobj_get_flags(&file->stream);
-    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+    uint16_t sector_size = fat_file_sector_size(IF_MV(file->stream.fatstr.fatfilep));
 
     /* flush sector cache? */
     struct filestr_cache *const cachep = file->stream.cachep;
@@ -653,7 +653,7 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
 
     struct filestr_cache * const cachep = file->stream.cachep;
     void * const bufstart = buf;
-    uint16_t sector_size = fat_file_sector_size(file->stream.fatstr.fatfilep);
+    uint16_t sector_size = fat_file_sector_size(IF_MV(file->stream.fatstr.fatfilep));
 
     const unsigned long filesectors = filesize_sectors(sector_size, size);
     unsigned long sector = file->offset / sector_size;
