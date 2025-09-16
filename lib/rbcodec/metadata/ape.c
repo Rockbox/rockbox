@@ -151,7 +151,7 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                     r = read_string(fd, value, sizeof(value), 0, -1);
                     r += read_string(fd, value, sizeof(value), -1, 4);
 
-                    if (r == -1)
+                    if (r < 0)
                     {
                         return false;
                     }
@@ -175,7 +175,7 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                     if (id3->albumart.type != AA_TYPE_UNKNOWN)
                     {
                         id3->albumart.pos  = lseek(fd, - 4, SEEK_CUR);
-                        id3->albumart.size = item.length - r;
+                        id3->albumart.size = item.length - r - 4;
                         id3->has_embedded_albumart = true;
                     }
                     
