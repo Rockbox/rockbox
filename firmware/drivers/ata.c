@@ -730,6 +730,45 @@ static int STORAGE_INIT_ATTR ata_hard_reset(void)
     return ret;
 }
 
+#ifdef HAVE_ATA_SMART
+static int ata_smart(uint16_t *buf, uint8_t cmd)
+{
+    int i;
+
+    ATA_OUT8(ATA_SELECT, ata_device);
+
+    if(!wait_for_rdy()) {
+        DEBUGF("identify() - not RDY\n");
+        return -1;
+    }
+
+    ATA_OUT8(&ATA_PIO_FED, cmd);
+    ATA_OUT8(&ATA_PIO_HCYL, 0xc2);
+    ATA_OUT8(&ATA_PIO_LCYL, 0x4f);
+    ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device);
+    ATA_OUT8(ATA_COMMAND, CMD_SMART);
+
+    if (!wait_for_start_of_transfer())
+    {
+        DEBUGF("identify() - CMD failed\n");
+        return -2;
+    }
+
+    for (i = 0 ; i < 256 ; i++) {
+        /* The SMART words are already swapped, so we need to treat
+           this info differently that normal sector data */
+        buf[i] = ATA_SWAP_IDENTIFY(ATA_IN16(ATA_DATA));
+    }
+}
+int ata_read_smart(struct ata_smart_values* smart_data, uint8_t cmd)
+{
+    mutex_lock(&ata_mutex);
+    int rc = ata_smart((uint16_t*)smart_data, cmd);
+    mutex_unlock(&ata_mutex);
+    return rc;
+}
+#endif /* HAVE_ATA_SMART */
+
 // not putting this into STORAGE_INIT_ATTR, as ATA spec recommends to
 // re-read identify_info after soft reset. So we'll do that.
 static int identify(void)

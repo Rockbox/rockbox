@@ -693,9 +693,9 @@ static void usb_storage_send_ata_identify(void)
     send_block_data(cur_cmd.data[0], 512);
 }
 #ifdef HAVE_ATA_SMART
-static void usb_storage_send_smart(void)
+static void usb_storage_send_smart(uint8_t cmd)
 {
-    ata_read_smart((struct ata_smart_values*) tb.transfer_buffer);
+    ata_read_smart((struct ata_smart_values*) tb.transfer_buffer, cmd);
     cur_cmd.count = 0;
     cur_cmd.last_result = 0;
     cur_cmd.data[0] = tb.transfer_buffer;
@@ -1358,12 +1358,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             if (cbw->command_block[1] == 0x08 &&
                 cbw->command_block[2] == 0x0e &&
                 cbw->command_block[4] == 0x01) {
-                if (cbw->command_block[9] == 0xa1) { // ??? suspicious
+                if (cbw->command_block[9] == 0xa1 ||
+                    cbw->command_block[9] == 0xec) {
                     usb_storage_send_ata_identify();
                     break;
 #ifdef HAVE_ATA_SMART
                 } else if (cbw->command_block[9] == 0xb0) {
-                    usb_storage_send_smart();
+                    usb_storage_send_smart(cbw->command_block[3]);
                     break;
 #endif
                 }
@@ -1377,12 +1378,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             if (cbw->command_block[1] == 0x08 &&
                 cbw->command_block[2] == 0x0e &&
                 cbw->command_block[6] == 0x01) {
-                if (cbw->command_block[14] == 0xec) {
+                if (cbw->command_block[14] == 0xa1 ||
+                    cbw->command_block[14] == 0xec) {
                     usb_storage_send_ata_identify();
                     break;
 #ifdef HAVE_ATA_SMART
                 } else if (cbw->command_block[14] == 0xb0) {
-                    usb_storage_send_smart();
+                    usb_storage_send_smart(cbw->command_block[4]);
                     break;
 #endif
                 }

@@ -1753,7 +1753,7 @@ static int ata_smart_callback(int btn, struct gui_synclist *lists)
     {
         int rc;
         memset(&smart_data, 0, sizeof(struct ata_smart_values));
-        rc = ata_read_smart(&smart_data);
+        rc = ata_read_smart(&smart_data, ATA_SMART_READ_DATA);
         simplelist_reset_lines();
         if (rc == 0)
         {

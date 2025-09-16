@@ -83,6 +83,8 @@ struct ata_smart_attribute {
 /* 6-15: Reserved for future use */
 #define ATTRIBUTE_FLAGS_OTHER(x) ((x) & 0xffc0)
 
+#define ATA_SMART_READ_DATA    0xD0
+
 struct ata_smart_values
 {
     unsigned short int revnumber;
@@ -226,7 +228,7 @@ int ata_get_dma_mode(void);
 
 #ifdef HAVE_ATA_SMART
 /* Returns current S.M.A.R.T. data */
-int ata_read_smart(struct ata_smart_values*);
+int ata_read_smart(struct ata_smart_values*, uint8_t cmd);
 #endif
 
 #ifdef BOOTLOADER

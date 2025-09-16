@@ -1183,7 +1183,7 @@ int ata_init(void)
 }
 
 #ifdef HAVE_ATA_SMART
-static int ata_smart(uint16_t* buf)
+static int ata_smart(uint16_t* buf, uint8_t cmd)
 {
     if (!ata_powered) PASS_RC(ata_power_up(), 3, 0);
     if (ceata)
@@ -1200,7 +1200,7 @@ static int ata_smart(uint16_t* buf)
             PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 2);
             PASS_RC(ceata_check_error(), 3, 3);
         }
-        ceata_taskfile[0x9] = 0xd0; /* SMART read data */
+        ceata_taskfile[0x9] = cmd;
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 4);
         PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 5);
     }
@@ -1208,7 +1208,7 @@ static int ata_smart(uint16_t* buf)
     {
         int i;
         PASS_RC(ata_wait_for_not_bsy(10000000), 3, 6);
-        ata_write_cbr(&ATA_PIO_FED, 0xd0);
+        ata_write_cbr(&ATA_PIO_FED, cmd);
         ata_write_cbr(&ATA_PIO_LMR, 0x4f);
         ata_write_cbr(&ATA_PIO_LHR, 0xc2);
         ata_write_cbr(&ATA_PIO_DVR, BIT(6));
@@ -1221,10 +1221,10 @@ static int ata_smart(uint16_t* buf)
     return 0;
 }
 
-int ata_read_smart(struct ata_smart_values* smart_data)
+int ata_read_smart(struct ata_smart_values* smart_data, uint8_t cmd)
 {
     mutex_lock(&ata_mutex);
-    int rc = ata_smart((uint16_t*)smart_data);
+    int rc = ata_smart((uint16_t*)smart_data, cmd);
     mutex_unlock(&ata_mutex);
     return rc;
 }
