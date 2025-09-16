@@ -153,6 +153,9 @@
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF
 
+/* Turn on SMART support */
+#define HAVE_ATA_SMART
+
 /* Define this if you want to use the PP5002 i2c interface */
 #define CONFIG_I2C I2C_PP5002
 

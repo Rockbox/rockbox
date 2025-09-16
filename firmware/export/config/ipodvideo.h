@@ -182,6 +182,9 @@
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF
 
+/* Turn on SMART support */
+#define HAVE_ATA_SMART
+
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
 

@@ -742,9 +742,9 @@ static int ata_smart(uint16_t *buf, uint8_t cmd)
         return -1;
     }
 
-    ATA_OUT8(&ATA_PIO_FED, cmd);
-    ATA_OUT8(&ATA_PIO_HCYL, 0xc2);
-    ATA_OUT8(&ATA_PIO_LCYL, 0x4f);
+    ATA_OUT8(ATA_FEATURE, cmd);
+    ATA_OUT8(ATA_HCYL, 0xc2);
+    ATA_OUT8(ATA_LCYL, 0x4f);
     ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device);
     ATA_OUT8(ATA_COMMAND, CMD_SMART);
 
@@ -759,6 +759,7 @@ static int ata_smart(uint16_t *buf, uint8_t cmd)
            this info differently that normal sector data */
         buf[i] = ATA_SWAP_IDENTIFY(ATA_IN16(ATA_DATA));
     }
+    return 0;
 }
 int ata_read_smart(struct ata_smart_values* smart_data, uint8_t cmd)
 {
