@@ -255,6 +255,7 @@ common/crc32-rkw.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 common/dir.c
 common/disk_cache.c
+common/fat.c
 common/file.c
 common/file_internal.c
 common/disk.c
@@ -396,7 +397,6 @@ drivers/sd.c
 drivers/ramdisk.c
 #endif
 storage.c
-drivers/fat.c
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 sdmmc.c
 #endif
