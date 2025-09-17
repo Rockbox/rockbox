@@ -759,7 +759,7 @@ static int ata_power_up(void)
     spinup_time = current_tick - spinup_start;
 
     ata_total_sectors = (identify_info[61] << 16) | identify_info[60];
-    if ( identify_info[83] & BIT(10) && ata_total_sectors == 0x0FFFFFFF)
+    if (ceata || (identify_info[83] & BIT(10) && ata_total_sectors == 0x0FFFFFFF))
     {
         ata_total_sectors = ((uint64_t)identify_info[103] << 48) |
                 ((uint64_t)identify_info[102] << 32) |
@@ -1099,7 +1099,7 @@ void ata_sleepnow(void)
 
     ata_flush_cache();
 
-    if (ata_disk_can_sleep()) {
+    if (ceata || ata_disk_can_sleep()) {
         logf("ata SLEEP %ld", current_tick);
 
         if (ceata) {
@@ -1123,7 +1123,7 @@ void ata_sleepnow(void)
         }
     }
 
-    if (ata_disk_can_sleep() || canflush)
+    if (ceata || ata_disk_can_sleep() || canflush)
         ata_power_down(); // XXX add a powerdown delay similar to main ATA driver?
 
     mutex_unlock(&ata_mutex);
@@ -1168,10 +1168,10 @@ int ata_init(void)
         return rc;
 
     /* Logical sector size */
-    if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
-        log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
-    else if (ceata)
+    if (ceata)
         log_sector_size = 1 << identify_info[106];
+    else if ((identify_info[106] & 0xd000) == 0x5000) /* B14, B12 */
+        log_sector_size = (identify_info[117] | (identify_info[118] << 16)) * 2;
     else
         log_sector_size = 512;
 
