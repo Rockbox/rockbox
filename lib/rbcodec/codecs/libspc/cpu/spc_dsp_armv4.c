@@ -50,6 +50,7 @@ static inline int gaussian_fast_interp( int16_t const* samples,
     return output;
 }
 
+#if 0 // first asm block generates "Rd and Rm should be different in mul" error
 #define SPC_GAUSSIAN_FAST_AMP
 static inline int gaussian_fast_amp( struct voice_t* voice, int output,
                                      int* amp_0, int* amp_1 )
@@ -73,6 +74,7 @@ static inline int gaussian_fast_amp( struct voice_t* voice, int output,
 
     return output;
 }
+#endif
 
 #define SPC_GAUSSIAN_SLOW_INTERP
 static inline int gaussian_slow_interp( int16_t const* samples,
@@ -144,7 +146,7 @@ static inline int linear_interp( int16_t const* samples, int32_t position )
 
     asm volatile(
     "mov    %[y1], %[f], lsr #12        \n"
-    "eor    %[f], %[f], %[y1], lsl #12  \n" 
+    "eor    %[f], %[f], %[y1], lsl #12  \n"
     "add    %[y1], %[y0], %[y1], lsl #1 \n"
     "ldrsh  %[y0], [%[y1], #2]          \n"
     "ldrsh  %[y1], [%[y1], #4]          \n"
