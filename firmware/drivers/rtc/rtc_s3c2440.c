@@ -67,13 +67,13 @@ int rtc_write_datetime(const struct tm *tm)
 /* Check whether the unit has been started by the RTC alarm function */
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    if (GSTATUS3) 
+    if (GSTATUS3)
     {
-        GSTATUS3 &= ~release_alarm;  
+        GSTATUS3 &= ~release_alarm;
         return true;
-    } 
-    else 
-    { 
+    }
+    else
+    {
         return false;
     }
 }
