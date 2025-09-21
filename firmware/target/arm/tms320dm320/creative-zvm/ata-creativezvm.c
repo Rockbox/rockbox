@@ -263,7 +263,7 @@ static void cfs_init(void)
     /* Read root inode's first sector */
     _ata_read_sectors(CFS_CLUSTER2CLUSTER(root_inode->first_class_chain[0]), 64, &sector2);
     root_direntry = (struct cfs_direntry*)&sector2;
-    root_direntry_items = (struct cfs_direntry_item*)(&sector2+sizeof(struct cfs_direntry));
+    root_direntry_items = (struct cfs_direntry_item*)(&sector2[0]+sizeof(struct cfs_direntry));
 
     logf("0x%x", root_direntry->identifier);
 
@@ -291,7 +291,7 @@ static void cfs_init(void)
         /* Read VFAT inode's first sector */
         _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inode->first_class_chain[0]), 64, &sector2);
         vfat_direntry = (struct cfs_direntry*)&sector2;
-        vfat_direntry_items = (struct cfs_direntry_item*)(&sector2+sizeof(struct cfs_direntry));
+        vfat_direntry_items = (struct cfs_direntry_item*)(&sector2[0]+sizeof(struct cfs_direntry));
 
         /* Search for VFAT's subinodes */
         for(i=0; i < vfat_direntry->items; i++)

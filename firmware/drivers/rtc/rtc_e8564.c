@@ -195,7 +195,7 @@ bool rtc_check_alarm_started(bool release_alarm)
     if (run_before)
     {
         started = alarm_state;
-        alarm_state &= ~release_alarm;
+        alarm_state &= !release_alarm;
     }
     else
     {

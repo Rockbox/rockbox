@@ -99,7 +99,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 static const struct button_mapping button_context_yesno[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
-
+#if 0
 static const struct button_mapping button_context_colorchooser[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_colorchooser */
@@ -107,7 +107,7 @@ static const struct button_mapping button_context_colorchooser[]  = {
 static const struct button_mapping button_context_eq[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_eq */
-
+#endif
 /** Bookmark Screen **/
 static const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),

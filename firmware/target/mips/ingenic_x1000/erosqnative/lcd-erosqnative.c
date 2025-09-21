@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -30,6 +29,7 @@
 /* for reference on these command/data hex values, see the mipi dcs lcd spec.  *
  * Not everything here is there, but all the standard stuff is.                */
 
+
 /* New Display Eroq 2.1 / Hifiwalker 1.7+ / Surfans v3.2, unknown Controller  *
  * (partially GC9A01 register compatible)                                     *
  *   https://espruino.microcosm.app/api/v1/files/ \                           *
@@ -39,6 +39,7 @@
  * Init sequence From 'EROS Q （c口）_V2.1_20231209固件.zip'                  *
  * update.upt/.iso -> In 'uboot.bin' at 0x52da0-0x5305f                       *
  *  http://www.eroshifi.com/download/firmware/122.html                        */
+#if !defined(BOOTLOADER) || (EROSQN_VER >= 3)
 static const uint32_t erosqnative_lcd_cmd_enable_v3[] = {
 
     /* Unlock EXTC? */
@@ -154,7 +155,9 @@ static const uint32_t erosqnative_lcd_cmd_enable_v3[] = {
     LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
+#endif
 
+#if !defined(BOOTLOADER) || (EROSQN_VER < 3)
 /* Original Display / Hifiwalker -1.5 / Surfans -2.7 */
 static const uint32_t erosqnative_lcd_cmd_enable_v1[] = {
     /* Set EXTC? */
@@ -228,6 +231,7 @@ static const uint32_t erosqnative_lcd_cmd_enable_v1[] = {
     LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
+#endif
 
 static const uint32_t erosqnative_lcd_of_compat_cmd[] = {
     /* Pixel Format Set */

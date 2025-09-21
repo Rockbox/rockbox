@@ -301,7 +301,7 @@ bool rtc_check_alarm_started(bool release_alarm)
     if (run_before)
     {
         rc = int_flag;
-        int_flag &= ~release_alarm;
+        int_flag &= !release_alarm;
     }
     else
     {
