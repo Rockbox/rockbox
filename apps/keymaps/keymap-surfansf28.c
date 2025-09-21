@@ -193,6 +193,7 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_SETTINGS_COLOURCHOOSER:    { return button_context_colorchooser; }
         case CONTEXT_SETTINGS_EQ:               { return button_context_eq; }
         case CONTEXT_SETTINGS_TIME:             { return button_context_time; }
+        case CONTEXT_YESNOSCREEN:               { return button_context_yesno; }
         case CONTEXT_KEYBOARD:                  { return button_context_keyboard; }
         case CONTEXT_FM:                        { return button_context_radio; }
         case CONTEXT_BOOKMARKSCREEN:            { return button_context_bmark; }
