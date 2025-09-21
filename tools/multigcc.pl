@@ -35,13 +35,12 @@ elsif ($^O eq 'solaris') {
     $cores = 1 if ($?);
 }
 else {
-    if (open CPUINFO, "</proc/cpuinfo") {
-        $cores = scalar grep /^processor/i, <CPUINFO>;
-        close CPUINFO;
-    }
-    else {
-        $cores = 1;
-    }
+    chomp($cores = `/usr/bin/nproc`);
+    $cores = 1 if ($?);
+#    if (open CPUINFO, "</proc/cpuinfo") {
+#        $cores = scalar grep /^processor/i, <CPUINFO>;
+#        close CPUINFO;
+#    }
 }
 
 # fork children
