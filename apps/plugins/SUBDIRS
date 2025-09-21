@@ -61,7 +61,7 @@ pacbox
 
 #if (defined(HAVE_LCD_COLOR) || defined(MROBE_100) || defined(SANSA_CLIPPLUS) \
     || defined(SANSA_CLIPV2) || (LCD_DEPTH == 2)) \
-    && (MEMORYSIZE > 2 && !defined(RB_PROFILE))
+    && (MEMORYSIZE > 2 && !defined(RB_PROFILE)) && !defined(RG_NANO) /* musl libc issues */
 doom
 #endif
 
