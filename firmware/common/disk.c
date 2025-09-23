@@ -111,7 +111,7 @@ static void init_volume(struct volumeinfo *vi, int drive, int part)
 }
 
 #ifdef MAX_VIRT_SECTOR_SIZE
-static uint16_t disk_sector_multiplier[NUM_DRIVES] =
+static uint8_t disk_sector_multiplier[NUM_DRIVES] =
     { [0 ... NUM_DRIVES-1] = 1 };
 
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
@@ -126,7 +126,7 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 }
 
 #ifdef DEFAULT_VIRT_SECTOR_SIZE
-void disk_set_sector_multiplier(IF_MD(int drive,) uint16_t mult)
+void disk_set_sector_multiplier(IF_MD(int drive,) int mult)
 {
     if (!CHECK_DRV(drive))
         return;
@@ -247,8 +247,8 @@ bool disk_init(IF_MD_NONVOID(int drive))
             unsigned char* ptr = sector;
 
 #ifdef DEFAULT_VIRT_SECTOR_SIZE
-            sector_t try_gpt[4] = { 1, num_sectors - 1,
-                    DEFAULT_VIRT_SECTOR_SIZE / sector_size,
+            const sector_t try_gpt[4] = { 1, num_sectors - 1,
+                    (DEFAULT_VIRT_SECTOR_SIZE / sector_size),
                     (num_sectors / (DEFAULT_VIRT_SECTOR_SIZE / sector_size)) - 1
             };
 
@@ -263,7 +263,7 @@ bool disk_init(IF_MD_NONVOID(int drive))
                     part_entries = 1;
 #ifdef MAX_VIRT_SECTOR_SIZE
                     if (i >= 2)
-                        disk_sector_multiplier[IF_MD_DRV(drive)] = try_gpt[2]; // XXX use this later?
+                        disk_sector_multiplier[IF_MD_DRV(drive)] = try_gpt[2];
 #endif
                     break;
                 }
@@ -411,7 +411,7 @@ int disk_mount(int drive)
         return 0;
     }
 
-    struct partinfo *pinfo = &part[IF_MD_DRV(drive)*4];
+    struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
 #ifdef MAX_VIRT_SECTOR_SIZE
     disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
 #endif
@@ -479,14 +479,13 @@ int disk_mount(int drive)
                     pinfo[i].type = PARTITION_TYPE_FAT32_LBA;
                     // XXX write the sector back.?
                 }
-
             }
 #endif /* MAX_VIRT_SECTOR_SIZE */
         }
 
 #if defined(MAX_VIRT_SECTOR_SIZE) && defined(MAX_PHYS_SECTOR_SIZE)
         if (mounted)
-            ata_set_phys_sector_mult(disk_sector_multiplier[drive]);
+            ata_set_phys_sector_mult(disk_sector_multiplier[IF_MD_DRV(drive)]);
 #endif
     }
 

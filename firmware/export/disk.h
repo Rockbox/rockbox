@@ -52,7 +52,7 @@ int disk_unmount(int drive);
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 /* The logical sector size to use when we have no valid paritions */
 #ifdef DEFAULT_VIRT_SECTOR_SIZE
-void disk_set_sector_multiplier(IF_MD(int drive,) uint16_t mult);
+void disk_set_sector_multiplier(IF_MD(int drive,) int mult);
 #endif
 #endif
 
