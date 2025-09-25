@@ -17,6 +17,7 @@
 # Hungarian language file, translated by:
 # - Imre Herceg
 # - Gergely Békési
+# - Matyas Kadlicsko
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -28,7 +29,7 @@
     *: "Igen"
   </dest>
   <voice>
-    *: "Yes"
+    *: "Igen"
   </voice>
 </phrase>
 <phrase>
@@ -42,7 +43,7 @@
     *: "Nem"
   </dest>
   <voice>
-    *: "No"
+    *: "Nem"
   </voice>
 </phrase>
 <phrase>
@@ -56,7 +57,7 @@
     *: "Be"
   </dest>
   <voice>
-    *: "On"
+    *: "Be"
   </voice>
 </phrase>
 <phrase>
@@ -70,7 +71,7 @@
     *: "Ki"
   </dest>
   <voice>
-    *: "Off"
+    *: "Ki"
   </voice>
 </phrase>
 <phrase>
@@ -84,7 +85,7 @@
     *: "Rákérdez"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Rákérdez"
   </voice>
 </phrase>
 <phrase>
@@ -98,7 +99,7 @@
     *: "Mindig"
   </dest>
   <voice>
-    *: "Always"
+    *: "Mindig"
   </voice>
 </phrase>
 <phrase>
@@ -112,7 +113,7 @@
     *: "Normál"
   </dest>
   <voice>
-    *: "Normal"
+    *: "Normál"
   </voice>
 </phrase>
 <phrase>
@@ -126,7 +127,7 @@
     *: "Módosítás"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -168,7 +169,7 @@
     *: "Átnézem a lemezt..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "Átnézem a lemezt"
   </voice>
 </phrase>
 <phrase>
@@ -182,7 +183,7 @@
     *: "Kikapcsolás..."
   </dest>
   <voice>
-    *: "Shutting down"
+    *: "Kikapcsolás"
   </voice>
 </phrase>
 <phrase>
@@ -196,7 +197,7 @@
     *: "Megszakítva"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "Megszakítva"
   </voice>
 </phrase>
 <phrase>
@@ -224,7 +225,7 @@
     *: "Csatornák"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Csatornák"
   </voice>
 </phrase>
 <phrase>
@@ -238,7 +239,7 @@
     *: "Biztos vagy benne?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "Biztos vagy benne?"
   </voice>
 </phrase>
 <phrase>
@@ -247,16 +248,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    cowond2*: "MENU, or top-right = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Igen"
     cowond2*: "MENU = Igen"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Igen"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Igen"
     iriverh100,iriverh120,iriverh300: "NAVI = Igen"
+    mrobe500: "PLAY, POWER, vagy jobb-felső = Igen"
     vibe500: "OK = Igen"
   </dest>
   <voice>
@@ -302,7 +305,7 @@
     *: "Legújabb könyvjelzők"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Legújabb könyvjelzők"
   </voice>
 </phrase>
 <phrase>
@@ -316,7 +319,7 @@
     *: "Fájlok"
   </dest>
   <voice>
-    *: "Files"
+    *: "Fájlok"
   </voice>
 </phrase>
 <phrase>
@@ -330,7 +333,7 @@
     *: "Adatbázis"
   </dest>
   <voice>
-    *: "Database"
+    *: "Adatbázis"
   </voice>
 </phrase>
 <phrase>
@@ -344,7 +347,7 @@
     *: "Most játszom"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "Most játszom"
   </voice>
 </phrase>
 <phrase>
@@ -358,7 +361,7 @@
     *: "Lejátszás folytatása"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Lejátszás folytatása"
   </voice>
 </phrase>
 <phrase>
@@ -372,7 +375,7 @@
     *: "Beállítások"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -389,7 +392,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording"
+    recording: "Felvétel"
   </voice>
 </phrase>
 <phrase>
@@ -406,7 +409,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "Rádió"
   </voice>
 </phrase>
 <phrase>
@@ -448,7 +451,7 @@
     *: "Rendszer"
   </dest>
   <voice>
-    *: "System"
+    *: "Rendszer"
   </voice>
 </phrase>
 <phrase>
@@ -476,7 +479,7 @@
     *: "[Nincs folytatás]"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "Nincs folytatás"
   </voice>
 </phrase>
 <phrase>
@@ -504,7 +507,7 @@
     *: "[Érvénytelen könyvjelző]"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "Érvénytelen könyvjelző"
   </voice>
 </phrase>
 <phrase>
@@ -518,7 +521,7 @@
     *: "Könyvjelző műveletek"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "Könyvjelző műveletek"
   </voice>
 </phrase>
 <phrase>
@@ -532,21 +535,7 @@
     *: "Folytatás"
   </dest>
   <voice>
-    *: "Resume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Törlés"
-  </dest>
-  <voice>
-    *: "Delete"
+    *: "Folytatás"
   </voice>
 </phrase>
 <phrase>
@@ -560,7 +549,7 @@
     *: "Készítsek könyvjelzőt?"
   </dest>
   <voice>
-    *: "Create a Bookmark?"
+    *: "Készítsek könyvjelzőt?"
   </voice>
 </phrase>
 <phrase>
@@ -574,7 +563,7 @@
     *: "Könyvjelző létrehozva"
   </dest>
   <voice>
-    *: "Bookmark Created"
+    *: "Könyvjelző létrehozva"
   </voice>
 </phrase>
 <phrase>
@@ -588,7 +577,7 @@
     *: "Könyvjelző létrehozása nem sikerült!"
   </dest>
   <voice>
-    *: "Bookmark Failed!"
+    *: "Könyvjelző létrehozása nem sikerült!"
   </voice>
 </phrase>
 <phrase>
@@ -616,7 +605,7 @@
     *: "Hangbeállítások"
   </dest>
   <voice>
-    *: "Sound Settings"
+    *: "Hangbeállítások"
   </voice>
 </phrase>
 <phrase>
@@ -630,7 +619,7 @@
     *: "Hangerő"
   </dest>
   <voice>
-    *: "Volume"
+    *: "Hangerő"
   </voice>
 </phrase>
 <phrase>
@@ -686,12 +675,12 @@
     *: "Csatorna beállítás"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "Csatorna beállítás"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
@@ -700,12 +689,12 @@
     *: "Sztereó"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "Sztereó"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
@@ -714,7 +703,7 @@
     *: "Monó"
   </dest>
   <voice>
-    *: "Mono"
+    *: "Monó"
   </voice>
 </phrase>
 <phrase>
@@ -728,7 +717,7 @@
     *: "Egyéni"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Egyéni"
   </voice>
 </phrase>
 <phrase>
@@ -742,7 +731,7 @@
     *: "Monó bal"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "Monó bal"
   </voice>
 </phrase>
 <phrase>
@@ -756,7 +745,7 @@
     *: "Monó jobb"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "Monó jobb"
   </voice>
 </phrase>
 <phrase>
@@ -767,10 +756,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -812,7 +801,7 @@
     *: "Közvetlen módosítás"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: "Közvetlen módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -826,7 +815,7 @@
     *: "Módosítás mértéke"
   </dest>
   <voice>
-    *: "Cross gain"
+    *: "Módosítás mértéke"
   </voice>
 </phrase>
 <phrase>
@@ -840,7 +829,7 @@
     *: "Magas frekvencia enyhítés"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: "Magas frekvencia enyhítés"
   </voice>
 </phrase>
 <phrase>
@@ -854,7 +843,7 @@
     *: "Magas frekvencia levágás"
   </dest>
   <voice>
-    *: "High-frequency cutoff"
+    *: "Magas frekvencia levágás"
   </voice>
 </phrase>
 <phrase>
@@ -865,10 +854,10 @@
     *: "Equalizer"
   </source>
   <dest>
-    *: "Equalizer"
+    *: "Hangszínszabályzó"
   </dest>
   <voice>
-    *: "Equalizer"
+    *: "Hangszínszabályzó"
   </voice>
 </phrase>
 <phrase>
@@ -952,7 +941,7 @@
     *: "EQ beállítások elmentése"
   </dest>
   <voice>
-    *: "Save equalizer preset"
+    *: "EQ beállítások elmentése"
   </voice>
 </phrase>
 <phrase>
@@ -966,21 +955,7 @@
     *: "Elmentett EQ beállítások"
   </dest>
   <voice>
-    *: "Browse equalizer presets"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Mód: %s"
-  </dest>
-  <voice>
-    *: ""
+    *: "Elmentett EQ beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -1050,7 +1025,7 @@
     *: "Határfrekvencia"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: "Határfrekvencia"
   </voice>
 </phrase>
 <phrase>
@@ -1083,7 +1058,7 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: "Dithering"
@@ -1106,7 +1081,7 @@
     *: "Általános beállítások"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "Általános beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -1117,10 +1092,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Lejátszás beállítása"
+    *: "Lejátszási beállítások"
   </dest>
   <voice>
-    *: "Playback Settings"
+    *: "Lejátszási beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -1134,7 +1109,7 @@
     *: "Véletlenszerű lejátszás"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "Véletlenszerű lejátszás"
   </voice>
 </phrase>
 <phrase>
@@ -1148,7 +1123,7 @@
     *: "Ismétlés"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "Ismétlés"
   </voice>
 </phrase>
 <phrase>
@@ -1162,7 +1137,7 @@
     *: "Mindent"
   </dest>
   <voice>
-    *: "All"
+    *: "Mindent"
   </voice>
 </phrase>
 <phrase>
@@ -1176,7 +1151,7 @@
     *: "Egy számot"
   </dest>
   <voice>
-    *: "One"
+    *: "Egy számot"
   </voice>
 </phrase>
 <phrase>
@@ -1204,7 +1179,7 @@
     *: "Először a kiválasztott szám lejátszása"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "Először a kiválasztott szám lejátszása"
   </voice>
 </phrase>
 <phrase>
@@ -1218,7 +1193,7 @@
     *: "Előre/Hátra"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Előre/Hátra"
   </voice>
 </phrase>
 <phrase>
@@ -1232,7 +1207,7 @@
     *: "Csévélés legkisebb egysége"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "Csévélés legkisebb egysége"
   </voice>
 </phrase>
 <phrase>
@@ -1246,7 +1221,7 @@
     *: "Gyorsabb csévélés"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "Gyorsabb csévélés"
   </voice>
 </phrase>
 <phrase>
@@ -1262,7 +1237,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "Rázkódásvédelmi puffer"
     flash_storage: none
   </voice>
 </phrase>
@@ -1277,7 +1252,7 @@
     *: "Lekeverés megálláskor"
   </dest>
   <voice>
-    *: "Fade on Stop and Pause"
+    *: "Lekeverés megálláskor"
   </voice>
 </phrase>
 <phrase>
@@ -1288,10 +1263,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Party Mode"
+    *: "Parti Mód"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Parti Mód"
   </voice>
 </phrase>
 <phrase>
@@ -1308,7 +1283,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Átúsztatás"
   </voice>
 </phrase>
 <phrase>
@@ -1338,11 +1313,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Csak szám átugrása"
+    crossfade: "Csak szám manuális átugrásnál"
   </dest>
   <voice>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Csak szám manuális átugrásnál"
   </voice>
 </phrase>
 <phrase>
@@ -1355,11 +1330,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Keverés és szám átugrása"
+    crossfade: "Véletlenszerű vagy manuális átugrás"
   </dest>
   <voice>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Véletlenszerű vagy manuális átugrás"
   </voice>
 </phrase>
 <phrase>
@@ -1426,7 +1401,8 @@
     crossfade: "Lekeverés hossza"
   </dest>
   <voice>
-    *: "Fade-Out Duration"
+    *: none
+    crossfade: "Lekeverés hossza"
   </voice>
 </phrase>
 <phrase>
@@ -1443,7 +1419,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Mode"
+    crossfade: "Lekeveréses mód"
   </voice>
 </phrase>
 <phrase>
@@ -1460,7 +1436,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "Keverés"
   </voice>
 </phrase>
 <phrase>
@@ -1474,7 +1450,7 @@
     *: "Hangerő-kiegyenlítés"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "Hangerő-kiegyenlítés"
   </voice>
 </phrase>
 <phrase>
@@ -1558,7 +1534,7 @@
     *: "Előerősítés"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "Előerősítés"
   </voice>
 </phrase>
 <phrase>
@@ -1586,7 +1562,7 @@
     *: "Halk"
   </dest>
   <voice>
-    *: "Weak"
+    *: "Halk"
   </voice>
 </phrase>
 <phrase>
@@ -1600,7 +1576,7 @@
     *: "Közepes"
   </dest>
   <voice>
-    *: "Moderate"
+    *: "Közepes"
   </voice>
 </phrase>
 <phrase>
@@ -1614,7 +1590,7 @@
     *: "Hangos"
   </dest>
   <voice>
-    *: "Strong"
+    *: "Hangos"
   </voice>
 </phrase>
 <phrase>
@@ -1659,21 +1635,21 @@
     *: "Véletlen"
   </dest>
   <voice>
-    *: "Random"
+    *: "Véletlen"
   </voice>
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Last.fm naplófájl"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm naplófájl"
   </voice>
 </phrase>
 <phrase>
@@ -1687,7 +1663,7 @@
     *: "Cuesheet támogatás"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Cuesheet támogatás"
   </voice>
 </phrase>
 <phrase>
@@ -1704,7 +1680,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Szünet fejhallgató kihúzásakor"
   </voice>
 </phrase>
 <phrase>
@@ -1721,7 +1697,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Szünet és folytatás"
   </voice>
 </phrase>
 <phrase>
@@ -1738,7 +1714,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Ha a fejhallgató nincs csatlakoztatva, nincs folytatás bekapcsoláskor"
   </voice>
 </phrase>
 <phrase>
@@ -1752,7 +1728,7 @@
     *: "Fájl nézet"
   </dest>
   <voice>
-    *: "File View"
+    *: "Fájl nézet"
   </voice>
 </phrase>
 <phrase>
@@ -1766,7 +1742,7 @@
     *: "Nagy- és kisbetű különbözik"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "Nagy és kisbetű különbözik"
   </voice>
 </phrase>
 <phrase>
@@ -1780,7 +1756,7 @@
     *: "Könyvtárak rendezése"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "Könyvtárak rendezése"
   </voice>
 </phrase>
 <phrase>
@@ -1794,7 +1770,7 @@
     *: "Fájlok rendezése"
   </dest>
   <voice>
-    *: "sort files"
+    *: "Fájlok rendezése"
   </voice>
 </phrase>
 <phrase>
@@ -1808,7 +1784,7 @@
     *: "Ábécé szerint"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Ábécé szerint"
   </voice>
 </phrase>
 <phrase>
@@ -1822,7 +1798,7 @@
     *: "Dátum szerint"
   </dest>
   <voice>
-    *: "By Date"
+    *: "Dátum szerint"
   </voice>
 </phrase>
 <phrase>
@@ -1836,7 +1812,7 @@
     *: "Legújabb elől"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "Legújabb elől"
   </voice>
 </phrase>
 <phrase>
@@ -1850,7 +1826,7 @@
     *: "Típus szerint"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Típus szerint"
   </voice>
 </phrase>
 <phrase>
@@ -1864,7 +1840,7 @@
     *: "Megjelenített fájlok"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "Megjelenített fájlok"
   </voice>
 </phrase>
 <phrase>
@@ -1878,7 +1854,7 @@
     *: "Támogatott fájlok"
   </dest>
   <voice>
-    *: "Supported"
+    *: "Támogatott fájlok"
   </voice>
 </phrase>
 <phrase>
@@ -1892,7 +1868,7 @@
     *: "Zenei fájlok"
   </dest>
   <voice>
-    *: "Music"
+    *: "Zenei fájlok"
   </voice>
 </phrase>
 <phrase>
@@ -1906,7 +1882,7 @@
     *: "Lejátszólista követése"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "Lejátszólista követése"
   </voice>
 </phrase>
 <phrase>
@@ -1920,7 +1896,7 @@
     *: "Elérési út megmutatása"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Elérési út megmutatása"
   </voice>
 </phrase>
 <phrase>
@@ -1934,7 +1910,7 @@
     *: "Csak az aktuális könyvtárat"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "Csak az aktuális könyvtárat"
   </voice>
 </phrase>
 <phrase>
@@ -1948,7 +1924,7 @@
     *: "Elérési út"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Elérési út"
   </voice>
 </phrase>
 <phrase>
@@ -1970,7 +1946,7 @@
     iriverh100,iriverh120,iriverh300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "találatok az adatbázishoz"
   </voice>
 </phrase>
 <phrase>
@@ -1987,7 +1963,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Load to RAM"
+    tc_ramcache: "Memóriába tölt"
   </voice>
 </phrase>
 <phrase>
@@ -2001,7 +1977,7 @@
     *: "Automatikus frissítés"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Automatikus frissítés"
   </voice>
 </phrase>
 <phrase>
@@ -2015,7 +1991,7 @@
     *: "Indítás most"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "Indítás most"
   </voice>
 </phrase>
 <phrase>
@@ -2043,7 +2019,7 @@
     *: "Futási idő adatok gyűjtése"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Futási idő adatok gyűjtése"
   </voice>
 </phrase>
 <phrase>
@@ -2057,7 +2033,7 @@
     *: "Változtatások exportálása"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Változtatások exportálása"
   </voice>
 </phrase>
 <phrase>
@@ -2071,7 +2047,7 @@
     *: "Változtatások importálása"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Változtatások importálása"
   </voice>
 </phrase>
 <phrase>
@@ -2085,7 +2061,7 @@
     *: "Frissítés a háttérben"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Frissítés a háttérben"
   </voice>
 </phrase>
 <phrase>
@@ -2099,7 +2075,7 @@
     *: "Hozzáadás adatbázishoz"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Hozzáadás adatbázishoz"
   </voice>
 </phrase>
 <phrase>
@@ -2113,7 +2089,7 @@
     *: "Az adatbázis még nincs kész"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Az adatbázis még nincs kész"
   </voice>
 </phrase>
 <phrase>
@@ -2127,7 +2103,7 @@
     *: "[Minden szám]"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Minden szám"
   </voice>
 </phrase>
 <phrase>
@@ -2141,7 +2117,7 @@
     *: "Kijelző"
   </dest>
   <voice>
-    *: "Display"
+    *: "Kijelző"
   </voice>
 </phrase>
 <phrase>
@@ -2200,7 +2176,7 @@
     *: "Kijelző beállítása"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "Kijelző beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -2214,7 +2190,7 @@
     *: "Világítás"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "Világítás"
   </voice>
 </phrase>
 <phrase>
@@ -2239,16 +2215,16 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Világítás lezáráskor"
     hold_button: "Világítás (Hold gomb lenyomásakor)"
   </dest>
   <voice>
-    *: none
-    hold_button: "Világítás (Hold gomb lenyomásakor)"
+    *: "Világítás lezáráskor"
+    hold_button: "Világítás Hold gomb lenyomásakor"
   </voice>
 </phrase>
 <phrase>
@@ -2327,7 +2303,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "Energiatakarékos mód világítás kikapcsolása után"
   </voice>
 </phrase>
 <phrase>
@@ -2344,7 +2320,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "Fényerő"
   </voice>
 </phrase>
 <phrase>
@@ -2358,7 +2334,7 @@
     *: "Kontraszt"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "Kontraszt"
   </voice>
 </phrase>
 <phrase>
@@ -2375,7 +2351,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "Képernyő mód"
   </voice>
 </phrase>
 <phrase>
@@ -2392,7 +2368,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Negatív kép"
   </voice>
 </phrase>
 <phrase>
@@ -2406,7 +2382,7 @@
     *: "Fejjel lefelé"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: "Fejjel lefelé"
   </voice>
 </phrase>
 <phrase>
@@ -2420,7 +2396,7 @@
     *: "Sor kiválasztása"
   </dest>
   <voice>
-    *: "Line Selector Type"
+    *: "Sor kiválasztása"
   </voice>
 </phrase>
 <phrase>
@@ -2434,7 +2410,7 @@
     *: "Mutató"
   </dest>
   <voice>
-    *: "Pointer"
+    *: "Mutató"
   </voice>
 </phrase>
 <phrase>
@@ -2448,7 +2424,7 @@
     *: "Teljes sor kiemelése"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: "Teljes sor kiemelése"
   </voice>
 </phrase>
 <phrase>
@@ -2465,7 +2441,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Háttér eltávolítása"
   </voice>
 </phrase>
 <phrase>
@@ -2482,7 +2458,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Background Colour"
+    lcd_color: "Háttérszín"
   </voice>
 </phrase>
 <phrase>
@@ -2499,7 +2475,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Foreground Colour"
+    lcd_color: "Előtérszín"
   </voice>
 </phrase>
 <phrase>
@@ -2516,7 +2492,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Reset Colours"
+    lcd_color: "Színek visszaállítása"
   </voice>
 </phrase>
 <phrase>
@@ -2584,7 +2560,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote LCD settings"
+    remote: "Távirányító beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -2601,7 +2577,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Pattanás csökkentése"
   </voice>
 </phrase>
 <phrase>
@@ -2615,7 +2591,7 @@
     *: "Ikonok megjelenítése"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Ikonok megjelenítése"
   </voice>
 </phrase>
 <phrase>
@@ -2629,7 +2605,7 @@
     *: "Gördítés beállítása"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "Gördítés beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -2657,7 +2633,7 @@
     *: "Gördítés sebessége"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "Gördítés sebessége"
   </voice>
 </phrase>
 <phrase>
@@ -2671,7 +2647,7 @@
     *: "Gördítés késleltetése"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Gördítés késleltetése"
   </voice>
 </phrase>
 <phrase>
@@ -2685,7 +2661,7 @@
     *: "Gördítés alapegysége"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Gördítés alapegysége"
   </voice>
 </phrase>
 <phrase>
@@ -2713,7 +2689,7 @@
     *: "Kétirányú gördítési határ"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Kétirányú gördítési határ"
   </voice>
 </phrase>
 <phrase>
@@ -2730,7 +2706,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Távirányító görgetési beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -2744,7 +2720,7 @@
     *: "Gördítés képernyőn túl"
   </dest>
   <voice>
-    *: "Screen Scrolls Out of View"
+    *: "Gördítés képernyőn túl"
   </voice>
 </phrase>
 <phrase>
@@ -2758,7 +2734,7 @@
     *: "Képernyőgördítés egysége"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Képernyőgördítés egysége"
   </voice>
 </phrase>
 <phrase>
@@ -2772,7 +2748,7 @@
     *: "Oldal gördítés"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Oldal gördítés"
   </voice>
 </phrase>
 <phrase>
@@ -2788,7 +2764,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Lista gyorsítás késleltetése"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -2805,7 +2781,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Lista gyorsítás sebessége"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -2820,7 +2796,7 @@
     *: "Állapot-/Gördítősáv"
   </dest>
   <voice>
-    *: "Status- and Scrollbar"
+    *: "Állapot Gördítősáv"
   </voice>
 </phrase>
 <phrase>
@@ -2834,7 +2810,7 @@
     *: "Gördítő sáv"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: "Gördítő sáv"
   </voice>
 </phrase>
 <phrase>
@@ -2848,7 +2824,7 @@
     *: "Állapotjelző"
   </dest>
   <voice>
-    *: "Status Bar"
+    *: "Állapotjelző"
   </voice>
 </phrase>
 <phrase>
@@ -2862,7 +2838,7 @@
     *: "Hangerő kijelzés"
   </dest>
   <voice>
-    *: "Volume Display"
+    *: "Hangerő kijelzés"
   </voice>
 </phrase>
 <phrase>
@@ -2876,7 +2852,7 @@
     *: "Akku kijelzés"
   </dest>
   <voice>
-    *: "Battery Display"
+    *: "Akku kijelzés"
   </voice>
 </phrase>
 <phrase>
@@ -2890,7 +2866,7 @@
     *: "Grafikusan"
   </dest>
   <voice>
-    *: "Graphic"
+    *: "Grafikusan"
   </voice>
 </phrase>
 <phrase>
@@ -2929,10 +2905,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Clip Hold Time"
+    *: "Túlvezérlés Tartási Idő"
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "Túlvezérlés Tartási Idő"
   </voice>
 </phrase>
 <phrase>
@@ -2943,10 +2919,10 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Peak Hold Time"
+    *: "Csúcs Tartási Idő"
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "Csúcs Tartási Idő"
   </voice>
 </phrase>
 <phrase>
@@ -2971,10 +2947,10 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "Peak Release"
+    *: "Csúcs Csökkenés"
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "Csúcs Csökkenés"
   </voice>
 </phrase>
 <phrase>
@@ -3016,7 +2992,7 @@
     *: "Lineáris (%)"
   </dest>
   <voice>
-    *: "Linear percent"
+    *: "Lineáris százalék"
   </voice>
 </phrase>
 <phrase>
@@ -3072,7 +3048,7 @@
     *: "Nyugati (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "Nyugati"
   </voice>
 </phrase>
 <phrase>
@@ -3086,7 +3062,7 @@
     *: "Görög (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Görög"
   </voice>
 </phrase>
 <phrase>
@@ -3100,7 +3076,7 @@
     *: "Héber (ISO-8859-8)"
   </dest>
   <voice>
-    *: "Hebrew"
+    *: "Héber"
   </voice>
 </phrase>
 <phrase>
@@ -3114,7 +3090,7 @@
     *: "Cirill (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "Cirill"
   </voice>
 </phrase>
 <phrase>
@@ -3125,10 +3101,10 @@
     *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "Thai (ISO-8859-11)"
+    *: "~Thai (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Thai"
+    *: "~Thai"
   </voice>
 </phrase>
 <phrase>
@@ -3142,7 +3118,7 @@
     *: "Arab (CP1256)"
   </dest>
   <voice>
-    *: "Arabic"
+    *: "Arab"
   </voice>
 </phrase>
 <phrase>
@@ -3156,7 +3132,7 @@
     *: "Török (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "Török"
   </voice>
 </phrase>
 <phrase>
@@ -3170,7 +3146,7 @@
     *: "Közép-európai (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "Közép-európai"
   </voice>
 </phrase>
 <phrase>
@@ -3198,7 +3174,7 @@
     *: "Egyszerűsített kínai (GB2312)"
   </dest>
   <voice>
-    *: "Simplified Chinese"
+    *: "Egyszerűsített kínai"
   </voice>
 </phrase>
 <phrase>
@@ -3212,7 +3188,7 @@
     *: "Koreai (KSX1001)"
   </dest>
   <voice>
-    *: "Korean"
+    *: "Koreai"
   </voice>
 </phrase>
 <phrase>
@@ -3226,7 +3202,7 @@
     *: "Hagyományos kínai (BIG5)"
   </dest>
   <voice>
-    *: "Traditional Chinese"
+    *: "Hagyományos kínai"
   </voice>
 </phrase>
 <phrase>
@@ -3240,7 +3216,7 @@
     *: "UTF-8"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "UTF-8"
   </voice>
 </phrase>
 <phrase>
@@ -3291,7 +3267,7 @@
     *: "Kezdő képernyő"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Kezdő képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -3302,10 +3278,10 @@
     *: "Main Menu"
   </source>
   <dest>
-    *: "-Fő menü"
+    *: "Fő menü"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "Fő menü"
   </voice>
 </phrase>
 <phrase>
@@ -3319,7 +3295,7 @@
     *: "Előző képernyő"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Előző képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -3333,7 +3309,7 @@
     *: "Akku"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Akku"
   </voice>
 </phrase>
 <phrase>
@@ -3347,64 +3323,7 @@
     *: "Akku kapacitás"
   </dest>
   <voice>
-    *: "Battery Capacity"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "Battery Type"
-  </source>
-  <dest>
-    *: none
-    battery_types: "Akku fajtája"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Battery type"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
-  </source>
-  <dest>
-    *: none
-    battery_types: "Alkáli"
-    xduoox3: "Újabb (2000 mAh)"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Alkaline"
-    xduoox3: "Újabb 2000 m A h"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
-  </source>
-  <dest>
-    *: none
-    battery_types: "NiMH"
-    xduoox3: "Régebbi (1500 mAh)"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Nickel metal hydride"
-    xduoox3: "Régebbi 1500 m A h"
+    *: "Akku kapacitás"
   </voice>
 </phrase>
 <phrase>
@@ -3418,7 +3337,7 @@
     *: "Merevlemez"
   </dest>
   <voice>
-    *: "Disk"
+    *: "Merevlemez"
   </voice>
 </phrase>
 <phrase>
@@ -3434,7 +3353,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "Merevlemez leállításának időtartama"
     flash_storage: none
   </voice>
 </phrase>
@@ -3452,7 +3371,7 @@
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Lemez tartalmának beolvasása"
   </voice>
 </phrase>
 <phrase>
@@ -3469,7 +3388,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Time and Date"
+    rtc: "Dátum és idő"
   </voice>
 </phrase>
 <phrase>
@@ -3486,7 +3405,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "Dátum/Idő beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -3500,7 +3419,7 @@
     *: "Időformátum"
   </dest>
   <voice>
-    *: "Time Format"
+    *: "Időformátum"
   </voice>
 </phrase>
 <phrase>
@@ -3514,7 +3433,7 @@
     *: "12 órás"
   </dest>
   <voice>
-    *: "12 Hour Clock"
+    *: "12 órás"
   </voice>
 </phrase>
 <phrase>
@@ -3528,7 +3447,7 @@
     *: "24 órás"
   </dest>
   <voice>
-    *: "24 Hour Clock"
+    *: "24 órás"
   </voice>
 </phrase>
 <phrase>
@@ -3537,8 +3456,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    gogearsa9200,samsungyh*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -3547,8 +3466,8 @@
   </source>
   <dest>
     *: none
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Beállít"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Beállít"
-    gogearsa9200,samsungyh*: "PLAY = Beállít"
     iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     mpiohd300: "ENTER = Beállít"
     mrobe500: "SZÍV = Beállít"
@@ -3565,8 +3484,8 @@
   user: core
   <source>
     *: none
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -3579,18 +3498,17 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,mrobe500: "POWER = mégsem"
-    gigabeats: "VISSZA = mégsem"
-    gogearsa9200: "BAL = mégsem"
-    iaudiom5,iaudiox5: "RECORD = mégsem"
-    ipod*,mpiohd300,sansac200*: "MENU = mégsem"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = mégsem"
-    iriverh100,iriverh120,iriverh300: "STOP = mégsem"
-    mrobe100: "DISPLAY = mégsem"
-    rtc: "KI = mégsem"
-    samsungyh*: "REW = mégsem"
-    sansafuzeplus: "BACK = mégsem"
-    vibe500: "C = mégsem"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "VISSZA = Mégsem"
+    gigabeatfx,mrobe500: "POWER = Mégsem"
+    gogearsa9200: "BAL = Mégsem"
+    iaudiom5,iaudiox5: "RECORD = Mégsem"
+    ipod*,mpiohd300,sansac200*: "MENU = Mégsem"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mégsem"
+    iriverh100,iriverh120,iriverh300: "STOP = Mégsem"
+    mrobe100: "DISPLAY = Mégsem"
+    rtc: "KI = Mégsem"
+    samsungyh*: "REW = Mégsem"
+    vibe500: "CANCEL = Mégsem"
   </dest>
   <voice>
     *: none
@@ -3723,10 +3641,10 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
-    *: "January"
+    *: "Január"
   </voice>
 </phrase>
 <phrase>
@@ -3737,10 +3655,10 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
-    *: "February"
+    *: "Február"
   </voice>
 </phrase>
 <phrase>
@@ -3754,7 +3672,7 @@
     *: "Már"
   </dest>
   <voice>
-    *: "March"
+    *: "Március"
   </voice>
 </phrase>
 <phrase>
@@ -3768,7 +3686,7 @@
     *: "Ápr"
   </dest>
   <voice>
-    *: "April"
+    *: "Április"
   </voice>
 </phrase>
 <phrase>
@@ -3782,7 +3700,7 @@
     *: "Máj"
   </dest>
   <voice>
-    *: "May"
+    *: "Május"
   </voice>
 </phrase>
 <phrase>
@@ -3796,7 +3714,7 @@
     *: "Jún"
   </dest>
   <voice>
-    *: "June"
+    *: "Június"
   </voice>
 </phrase>
 <phrase>
@@ -3810,7 +3728,7 @@
     *: "Júl"
   </dest>
   <voice>
-    *: "July"
+    *: "Július"
   </voice>
 </phrase>
 <phrase>
@@ -3821,10 +3739,10 @@
     *: "Aug"
   </source>
   <dest>
-    *: "Aug"
+    *: "~Aug"
   </dest>
   <voice>
-    *: "August"
+    *: "Augusztus"
   </voice>
 </phrase>
 <phrase>
@@ -3838,7 +3756,7 @@
     *: "Sze"
   </dest>
   <voice>
-    *: "September"
+    *: "Szeptember"
   </voice>
 </phrase>
 <phrase>
@@ -3852,7 +3770,7 @@
     *: "Okt"
   </dest>
   <voice>
-    *: "October"
+    *: "Október"
   </voice>
 </phrase>
 <phrase>
@@ -3863,7 +3781,7 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
     *: "November"
@@ -3877,7 +3795,7 @@
     *: "Dec"
   </source>
   <dest>
-    *: "Dec"
+    *: "~Dec"
   </dest>
   <voice>
     *: "December"
@@ -3894,7 +3812,7 @@
     *: "Automatikus kikapcsolás"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "Automatikus kikapcsolás"
   </voice>
 </phrase>
 <phrase>
@@ -3908,7 +3826,7 @@
     *: "Kikapcsolás ideje"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Kikapcsolás ideje"
   </voice>
 </phrase>
 <phrase>
@@ -3922,7 +3840,7 @@
     *: "Határértékek"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Határértékek"
   </voice>
 </phrase>
 <phrase>
@@ -3950,7 +3868,7 @@
     *: "Lejátszólisták max. hossza"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "Lejátszólisták max hossza"
   </voice>
 </phrase>
 <phrase>
@@ -3967,7 +3885,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Car Adapter Mode"
+    charging: "Autóadapter mód"
   </voice>
 </phrase>
 <phrase>
@@ -3984,7 +3902,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "Ébresztő"
   </voice>
 </phrase>
 <phrase>
@@ -4001,7 +3919,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Ébresztőóra képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -4035,24 +3953,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Ébresztés beállítva"
-  </dest>
-  <voice>
-    *: none
-    alarm: ""
+    alarm: "Ébresztés ekkor"
   </voice>
 </phrase>
 <phrase>
@@ -4069,36 +3970,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
-  </source>
-  <dest>
-    *: none
-    alarm: "PLAY=OK KI=Mégsem"
-    gigabeats: "SELECT=OK POWER=Mégsem"
-    ipod*: "SELECT=OK MENU=Mégsem"
-    iriverh10,iriverh10_5gb: "SELECT=OK PREV=Mégsem"
-    mpiohd300: "ENTER=OK MENU=Mégsem"
-    sansafuzeplus: "SELECT=OK  BACK=Mégsem"
-    vibe500: "OK=OK C=Mégsem"
-  </dest>
-  <voice>
-    *: none
-    alarm,ipod*: ""
+    alarm: "Ébresztés túl korai!"
   </voice>
 </phrase>
 <phrase>
@@ -4115,7 +3987,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Ébresztő kikapcsolva"
   </voice>
 </phrase>
 <phrase>
@@ -4129,7 +4001,7 @@
     *: "Könyvjelzők"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Könyvjelzők"
   </voice>
 </phrase>
 <phrase>
@@ -4143,7 +4015,7 @@
     *: "Leállításkor könyvjelző készítése"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Leállításkor könyvjelző készítése"
   </voice>
 </phrase>
 <phrase>
@@ -4157,7 +4029,7 @@
     *: "Igen - Csak az újak közé"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Igen - Csak az újak közé"
   </voice>
 </phrase>
 <phrase>
@@ -4171,7 +4043,7 @@
     *: "Rákérdez - Csak az újak közé"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Rákérdez - Csak az újak közé"
   </voice>
 </phrase>
 <phrase>
@@ -4185,7 +4057,7 @@
     *: "Utolsó könyvjelző betöltése"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Utolsó könyvjelző betöltése"
   </voice>
 </phrase>
 <phrase>
@@ -4199,7 +4071,7 @@
     *: "Vezessek listák az új könyvjelzőkről?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Vezessek listák az új könyvjelzőkről?"
   </voice>
 </phrase>
 <phrase>
@@ -4213,7 +4085,7 @@
     *: "Nyelv"
   </dest>
   <voice>
-    *: "Language"
+    *: "Nyelv"
   </voice>
 </phrase>
 <phrase>
@@ -4252,10 +4124,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Menük"
+    *: "Hang Menük"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Hang Menük"
   </voice>
 </phrase>
 <phrase>
@@ -4266,10 +4138,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Könyvtárak"
+    *: "Hang Könyvtárak"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Hang Könyvtárak"
   </voice>
 </phrase>
 <phrase>
@@ -4283,7 +4155,7 @@
     *: ".talk klip könyvtár használata"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: ".talk klip könyvtár használata"
   </voice>
 </phrase>
 <phrase>
@@ -4294,10 +4166,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Fájlnevek"
+    *: "Hang Fájlnevek"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "Hang Fájlnevek"
   </voice>
 </phrase>
 <phrase>
@@ -4311,7 +4183,7 @@
     *: ".talk fájlok használata"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: ".talk fájlok használata"
   </voice>
 </phrase>
 <phrase>
@@ -4367,7 +4239,7 @@
     *: "Beállítások"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -4378,10 +4250,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Konfig fájl választás"
+    *: "Konfig fájlok böngészése"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "Konfig fájlok böngészése"
   </voice>
 </phrase>
 <phrase>
@@ -4395,7 +4267,7 @@
     *: "Beállítások betöltve"
   </dest>
   <voice>
-    *: "Settings Loaded"
+    *: "Beállítások betöltve"
   </voice>
 </phrase>
 <phrase>
@@ -4409,7 +4281,7 @@
     *: "Beállítások visszaállítása"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "Beállítások visszaállítása"
   </voice>
 </phrase>
 <phrase>
@@ -4423,7 +4295,7 @@
     *: "Törölve"
   </dest>
   <voice>
-    *: "Settings Cleared"
+    *: "Törölve"
   </voice>
 </phrase>
 <phrase>
@@ -4451,7 +4323,7 @@
     *: "Beállítások elmentve"
   </dest>
   <voice>
-    *: "Settings Saved"
+    *: "Beállítások elmentve"
   </voice>
 </phrase>
 <phrase>
@@ -4465,7 +4337,7 @@
     *: "Témabeállítások mentése"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Témabeállítások mentése"
   </voice>
 </phrase>
 <phrase>
@@ -4496,7 +4368,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording Settings"
+    recording: "Felvétel beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -4512,7 +4384,8 @@
     radio: "Rádió menü"
   </dest>
   <voice>
-    *: "FM Radio Menu"
+    *: none
+    radio: "FM Radio Menu"
   </voice>
 </phrase>
 <phrase>
@@ -4529,7 +4402,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "Nincsenek beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -4563,7 +4436,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Edit Preset"
+    radio: "Adó módosítása"
   </voice>
 </phrase>
 <phrase>
@@ -4580,7 +4453,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "Adó eltávolítása"
   </voice>
 </phrase>
 <phrase>
@@ -4597,7 +4470,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Adó mentése nem sikerült"
   </voice>
 </phrase>
 <phrase>
@@ -4614,7 +4487,7 @@
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Az adók listája tele van"
   </voice>
 </phrase>
 <phrase>
@@ -4648,7 +4521,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Force Mono"
+    radio: "Monó"
   </voice>
 </phrase>
 <phrase>
@@ -4682,7 +4555,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "Állomások átnézése"
   </voice>
 </phrase>
 <phrase>
@@ -4716,7 +4589,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Keresés"
   </voice>
 </phrase>
 <phrase>
@@ -4767,7 +4640,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "Beállított állomások listájának betöltése"
   </voice>
 </phrase>
 <phrase>
@@ -4784,7 +4657,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "Beállított adók listájának mentése"
   </voice>
 </phrase>
 <phrase>
@@ -4801,7 +4674,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Beállított adók listájának törlése"
   </voice>
 </phrase>
 <phrase>
@@ -4818,7 +4691,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Beállított adók listája"
   </voice>
 </phrase>
 <phrase>
@@ -4835,7 +4708,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Nem találtam beállításokat. Végignézzem a fogható adókat?"
   </voice>
 </phrase>
 <phrase>
@@ -4852,7 +4725,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Régió"
   </voice>
 </phrase>
 <phrase>
@@ -4869,7 +4742,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Európa"
   </voice>
 </phrase>
 <phrase>
@@ -4903,7 +4776,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "Japán"
   </voice>
 </phrase>
 <phrase>
@@ -4916,11 +4789,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </voice>
 </phrase>
 <phrase>
@@ -4934,7 +4807,7 @@
     *: "Formátum"
   </dest>
   <voice>
-    *: "Format"
+    *: "Formátum"
   </voice>
 </phrase>
 <phrase>
@@ -4951,7 +4824,7 @@
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </voice>
 </phrase>
 <phrase>
@@ -4968,7 +4841,7 @@
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "WAV"
   </voice>
 </phrase>
 <phrase>
@@ -5019,7 +4892,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Kódoló beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -5036,7 +4909,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Bitrate"
+    recording: "Bitráta"
   </voice>
 </phrase>
 <phrase>
@@ -5053,7 +4926,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "(Nincs beállítás)"
   </voice>
 </phrase>
 <phrase>
@@ -5087,7 +4960,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same as Source"
+    recording: "ugyanaz mint a forrás"
   </voice>
 </phrase>
 <phrase>
@@ -5104,7 +4977,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Forrás"
   </voice>
 </phrase>
 <phrase>
@@ -5141,7 +5014,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "Digitális"
   </voice>
 </phrase>
 <phrase>
@@ -5175,7 +5048,7 @@
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "Több darabba"
   </voice>
 </phrase>
 <phrase>
@@ -5192,7 +5065,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Felosztás kritériuma"
   </voice>
 </phrase>
 <phrase>
@@ -5209,7 +5082,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Mi a teendő fájl darabolásakor"
   </voice>
 </phrase>
 <phrase>
@@ -5226,7 +5099,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Új fájl kezdés"
   </voice>
 </phrase>
 <phrase>
@@ -5243,7 +5116,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "Felvétel leállítása"
   </voice>
 </phrase>
 <phrase>
@@ -5260,7 +5133,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Új fájl ennyi idő után"
   </voice>
 </phrase>
 <phrase>
@@ -5277,7 +5150,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Fájl szeletelés mérete"
   </voice>
 </phrase>
 <phrase>
@@ -5294,41 +5167,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Pre-Record time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Könyvtár"
-  </dest>
-  <voice>
-    *: none
-    recording: "Directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: used in the onplay menu to set a recording dir
-  user: core
-  <source>
-    *: none
-    recording: "Set as Recording Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Ide kerülnek a felvételek"
-  </dest>
-  <voice>
-    *: none
-    recording: "Set as Recording Directory"
+    recording: "Előfelvétel hossza"
   </voice>
 </phrase>
 <phrase>
@@ -5345,7 +5184,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Felvételek könyvtárának kiürítése"
   </voice>
 </phrase>
 <phrase>
@@ -5362,7 +5201,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Nem tudok írni a felvételek könyvtárába"
   </voice>
 </phrase>
 <phrase>
@@ -5396,7 +5235,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main unit only"
+    remote: "Csak a főegység"
   </voice>
 </phrase>
 <phrase>
@@ -5413,7 +5252,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote unit only"
+    remote: "Csak a távirányító"
   </voice>
 </phrase>
 <phrase>
@@ -5430,7 +5269,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main and remote unit"
+    remote: "Főegység és távirányító"
   </voice>
 </phrase>
 <phrase>
@@ -5447,7 +5286,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Indító"
   </voice>
 </phrase>
 <phrase>
@@ -5464,7 +5303,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Egyszer"
   </voice>
 </phrase>
 <phrase>
@@ -5477,11 +5316,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "Indító típusa"
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Indító típusa"
   </voice>
 </phrase>
 <phrase>
@@ -5515,7 +5354,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Leállít"
   </voice>
 </phrase>
 <phrase>
@@ -5532,7 +5371,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "E fölött indít"
   </voice>
 </phrase>
 <phrase>
@@ -5549,7 +5388,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "legalább"
   </voice>
 </phrase>
 <phrase>
@@ -5566,7 +5405,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Ez alatt leáll"
   </voice>
 </phrase>
 <phrase>
@@ -5583,7 +5422,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Presplit gap"
   </voice>
 </phrase>
 <phrase>
@@ -5617,7 +5456,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Biztonság (túlvezérlés)"
   </voice>
 </phrase>
 <phrase>
@@ -5634,7 +5473,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Élő (lassú)"
   </voice>
 </phrase>
 <phrase>
@@ -5651,7 +5490,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ berendezés (lassú)"
   </voice>
 </phrase>
 <phrase>
@@ -5668,7 +5507,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Közepes"
   </voice>
 </phrase>
 <phrase>
@@ -5685,7 +5524,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Beszéd (gyors)"
   </voice>
 </phrase>
 <phrase>
@@ -5702,7 +5541,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Távirányító kijelző kikapcsolva"
   </voice>
 </phrase>
 <phrase>
@@ -5719,7 +5558,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Hangerő mínusz az újraaktiváláshoz)"
   </voice>
 </phrase>
 <phrase>
@@ -5733,7 +5572,7 @@
     *: "Lejátszólista készítés"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Lejátszólista készítés"
   </voice>
 </phrase>
 <phrase>
@@ -5747,7 +5586,7 @@
     *: "Lejátszólista megtekintő beállítása"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Lejátszólista megtekintő beállítása"
   </voice>
 </phrase>
 <phrase>
@@ -5761,7 +5600,7 @@
     *: "Aktuális lejátszólista megtekintése"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Aktuális lejátszólista megtekintése"
   </voice>
 </phrase>
 <phrase>
@@ -5775,7 +5614,7 @@
     *: "Áthelyezés"
   </dest>
   <voice>
-    *: "Move"
+    *: "Áthelyezés"
   </voice>
 </phrase>
 <phrase>
@@ -5789,7 +5628,7 @@
     *: "Indexek mutatása"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Indexek mutatása"
   </voice>
 </phrase>
 <phrase>
@@ -5803,7 +5642,7 @@
     *: "Szám adatainak megjelenítése"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Szám adatainak megjelenítése"
   </voice>
 </phrase>
 <phrase>
@@ -5831,7 +5670,7 @@
     *: "Eltávolítás"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Eltávolítás"
   </voice>
 </phrase>
 <phrase>
@@ -5845,7 +5684,7 @@
     *: "Aktuális lejátszólista mentése"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Aktuális lejátszólista mentése"
   </voice>
 </phrase>
 <phrase>
@@ -5859,21 +5698,7 @@
     *: "%d szám mentve (%s)"
   </dest>
   <voice>
-    *: "tracks saved"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: in main menu and onplay menu
-  user: core
-  <source>
-    *: "Playlist Catalogue"
-  </source>
-  <dest>
-    *: "Lejátszási lista katalógus"
-  </dest>
-  <voice>
-    *: "Lejátszási lista katalógus"
+    *: "számok mentve"
   </voice>
 </phrase>
 <phrase>
@@ -5887,7 +5712,7 @@
     *: "Könyvtárak beillesztése alkönyvtárakkal együtt"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Könyvtárak beillesztése alkönyvtárakkal együtt"
   </voice>
 </phrase>
 <phrase>
@@ -5901,7 +5726,7 @@
     *: "Alkönyvtárakat is?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "Alkönyvtárakat is?"
   </voice>
 </phrase>
 <phrase>
@@ -5915,7 +5740,7 @@
     *: "Figyelmeztet dinamikus lejátszólista törlésekor"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Figyelmeztet dinamikus lejátszólista törlésekor"
   </voice>
 </phrase>
 <phrase>
@@ -5929,7 +5754,7 @@
     *: "Töröljem a dinamikus lejátszólistát?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "Töröljem a dinamikus lejátszólistát?"
   </voice>
 </phrase>
 <phrase>
@@ -5957,7 +5782,7 @@
     *: "Puffer:"
   </dest>
   <voice>
-    *: "Puffer:"
+    *: "Puffer mérete"
   </voice>
 </phrase>
 <phrase>
@@ -5967,15 +5792,13 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Akku: %d%% %d óra %d perc"
     ipodmini1g,ipodmini2g,iriverh10: "Akku: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Akku szint"
   </voice>
 </phrase>
 <phrase>
@@ -5989,7 +5812,7 @@
     *: "Lemezterület:"
   </dest>
   <voice>
-    *: ""
+    *: "Lemezterület"
   </voice>
 </phrase>
 <phrase>
@@ -6000,10 +5823,10 @@
     *: "Free:"
   </source>
   <dest>
-    *: "Üres:"
+    *: "Szabad:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Szabad terület"
   </voice>
 </phrase>
 <phrase>
@@ -6012,38 +5835,44 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Belső:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
-    *: "Internal"
-    xduoox3: "micro Secure Digital card 1:"
+    *: "Belső"
+    hibylinux: "mikro S D"
+    xduoox3: "mikro S D 1"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    multivolume: "HD1"
+    hibylinux: "USB:"
+    multivolume: "HD1:"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
+    hibylinux: "U S B"
     multivolume: "H D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro Secure Digital card:"
-    xduoox3: "micro Secure Digital card 2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro SD kártya"
+    xduoox3: "mikro SD kártya 2"
   </voice>
 </phrase>
 <phrase>
@@ -6057,7 +5886,7 @@
     *: "Verzió"
   </dest>
   <voice>
-    *: "Version"
+    *: "Verzió"
   </voice>
 </phrase>
 <phrase>
@@ -6071,7 +5900,7 @@
     *: "Futási idő"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "Futási idő"
   </voice>
 </phrase>
 <phrase>
@@ -6085,7 +5914,7 @@
     *: "Legjobb idő"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "Legjobb idő"
   </voice>
 </phrase>
 <phrase>
@@ -6099,7 +5928,7 @@
     *: "Töröljem az időt?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Töröljem az időt?"
   </voice>
 </phrase>
 <phrase>
@@ -6113,7 +5942,7 @@
     *: "Hibakeresés (Ne lépj be!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "Hibakeresés, Ne lépj be!"
   </voice>
 </phrase>
 <phrase>
@@ -6127,63 +5956,7 @@
     *: "Lejátszólista"
   </dest>
   <voice>
-    *: "Playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert"
-  </source>
-  <dest>
-    *: "Beillesztés"
-  </dest>
-  <voice>
-    *: "Insert"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Next"
-  </source>
-  <dest>
-    *: "Beillesztés következőnek"
-  </dest>
-  <voice>
-    *: "Insert Next"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: in onplay menu.  append a track/playlist into dynamic playlist.
-  user: core
-  <source>
-    *: "Insert Last"
-  </source>
-  <dest>
-    *: "Beillesztés utolsóként"
-  </dest>
-  <voice>
-    *: "Insert Last"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-  user: core
-  <source>
-    *: "Insert Shuffled"
-  </source>
-  <dest>
-    *: "Beillesztés véletlen sorrendben"
-  </dest>
-  <voice>
-    *: "Insert Shuffled"
+    *: "Lejátszólista"
   </voice>
 </phrase>
 <phrase>
@@ -6197,7 +5970,7 @@
     *: "Felvétel listára"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Felvétel listára"
   </voice>
 </phrase>
 <phrase>
@@ -6211,7 +5984,7 @@
     *: "Ez lesz a következő"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "Ez lesz a következő"
   </voice>
 </phrase>
 <phrase>
@@ -6225,7 +5998,7 @@
     *: "Ez lesz az utolsó"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "Ez lesz az utolsó"
   </voice>
 </phrase>
 <phrase>
@@ -6239,21 +6012,7 @@
     *: "Felveszem véletlen helyre"
   </dest>
   <voice>
-    *: "Queue Shuffled"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
-  user: core
-  <source>
-    *: "Play Next"
-  </source>
-  <dest>
-    *: "Következő lejátszása"
-  </dest>
-  <voice>
-    *: "Play Next"
+    *: "Felveszem véletlen helyre"
   </voice>
 </phrase>
 <phrase>
@@ -6267,7 +6026,7 @@
     *: "%d szám beillesztve (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "számok beillesztve"
   </voice>
 </phrase>
 <phrase>
@@ -6281,7 +6040,7 @@
     *: "%d szám felvéve (%s)"
   </dest>
   <voice>
-    *: "tracks queued"
+    *: "számok felvéve"
   </voice>
 </phrase>
 <phrase>
@@ -6295,7 +6054,7 @@
     *: "Nézet"
   </dest>
   <voice>
-    *: "View"
+    *: "Nézet"
   </voice>
 </phrase>
 <phrase>
@@ -6309,7 +6068,7 @@
     *: "Keresés lejátszólistában"
   </dest>
   <voice>
-    *: "Search in Playlist"
+    *: "Keresés lejátszólistában"
   </voice>
 </phrase>
 <phrase>
@@ -6323,7 +6082,7 @@
     *: "Keresek... %d találtam (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "találat"
   </voice>
 </phrase>
 <phrase>
@@ -6337,35 +6096,7 @@
     *: "Sorrend újrakeverése"
   </dest>
   <voice>
-    *: "Reshuffle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Katalógus megtekintése"
-  </dest>
-  <voice>
-    *: "View catalog"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "Add to Playlist"
-  </source>
-  <dest>
-    *: "Hozzáadás lejátszólistához"
-  </dest>
-  <voice>
-    *: "Add to playlist"
+    *: "Sorrend újrakeverése"
   </voice>
 </phrase>
 <phrase>
@@ -6393,7 +6124,7 @@
     *: "%s nem létezik"
   </dest>
   <voice>
-    *: ""
+    *: "A lejátszólista könyvtára nem létezik"
   </voice>
 </phrase>
 <phrase>
@@ -6407,7 +6138,7 @@
     *: "Nincs lejátszólista"
   </dest>
   <voice>
-    *: ""
+    *: "Nincs lejátszólista"
   </voice>
 </phrase>
 <phrase>
@@ -6421,7 +6152,7 @@
     *: "Könyvjelzők"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Könyvjelzők"
   </voice>
 </phrase>
 <phrase>
@@ -6435,7 +6166,7 @@
     *: "Könyvjelző létrehozása"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Könyvjelző létrehozása"
   </voice>
 </phrase>
 <phrase>
@@ -6449,7 +6180,7 @@
     *: "Könyvjelzők listája"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "Könyvjelzők listája"
   </voice>
 </phrase>
 <phrase>
@@ -6491,7 +6222,7 @@
     *: "Cuesheet böngészés"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Cuesheet böngészés"
   </voice>
 </phrase>
 <phrase>
@@ -6505,7 +6236,7 @@
     *: "Fájl info"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Fájl info"
   </voice>
 </phrase>
 <phrase>
@@ -6719,20 +6450,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Albumonkénti módosítás"
-  </dest>
-  <voice>
-    *: "Albumonkénti módosítás"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_PATH
   desc: in tag viewer
   user: core
@@ -6771,7 +6488,7 @@
     *: "Átnevezés"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Átnevezés"
   </voice>
 </phrase>
 <phrase>
@@ -6785,7 +6502,7 @@
     *: "Kivág"
   </dest>
   <voice>
-    *: "Cut"
+    *: "Kivág"
   </voice>
 </phrase>
 <phrase>
@@ -6799,7 +6516,7 @@
     *: "Másol"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Másol"
   </voice>
 </phrase>
 <phrase>
@@ -6813,7 +6530,7 @@
     *: "Beilleszt"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Beilleszt"
   </voice>
 </phrase>
 <phrase>
@@ -6827,7 +6544,7 @@
     *: "Fájl/könyvtár létezik. Felülírjam?"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: "Fájl vagy könyvtár létezik. Felülírjam?"
   </voice>
 </phrase>
 <phrase>
@@ -6841,7 +6558,7 @@
     *: "Törlés"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Törlés"
   </voice>
 </phrase>
 <phrase>
@@ -6855,7 +6572,7 @@
     *: "Könyvtár törlése"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "Könyvtár törlése"
   </voice>
 </phrase>
 <phrase>
@@ -6869,7 +6586,7 @@
     *: "Töröljem?"
   </dest>
   <voice>
-    *: "Really delete?"
+    *: "Töröljem?"
   </voice>
 </phrase>
 <phrase>
@@ -6883,7 +6600,7 @@
     *: "Másolok..."
   </dest>
   <voice>
-    *: "Copying"
+    *: "Másolás"
   </voice>
 </phrase>
 <phrase>
@@ -6897,7 +6614,7 @@
     *: "Törlöm..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "Törlés"
   </voice>
 </phrase>
 <phrase>
@@ -6911,7 +6628,7 @@
     *: "Áthelyezem..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "Áthelyezés"
   </voice>
 </phrase>
 <phrase>
@@ -6925,7 +6642,7 @@
     *: "Törölve"
   </dest>
   <voice>
-    *: "Deleted"
+    *: "Törölve"
   </voice>
 </phrase>
 <phrase>
@@ -6942,7 +6659,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set as Backdrop"
+    lcd_non-mono: "Beállítás háttérnek"
   </voice>
 </phrase>
 <phrase>
@@ -6956,7 +6673,7 @@
     *: "Megnyitás mással..."
   </dest>
   <voice>
-    *: "open with"
+    *: "Megnyitás mással"
   </voice>
 </phrase>
 <phrase>
@@ -6984,7 +6701,7 @@
     *: "Tulajdonságok"
   </dest>
   <voice>
-    *: "Properties"
+    *: "Tulajdonságok"
   </voice>
 </phrase>
 <phrase>
@@ -7015,7 +6732,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Hangmagasság"
   </voice>
 </phrase>
 <phrase>
@@ -7097,7 +6814,7 @@
     *: "Lejátszólista puffer tele van"
   </dest>
   <voice>
-    *: "Playlist Buffer Full"
+    *: "Lejátszólista puffer tele van"
   </voice>
 </phrase>
 <phrase>
@@ -7111,7 +6828,7 @@
     *: "Vége a számok listájának"
   </dest>
   <voice>
-    *: "End of Song List"
+    *: "Vége a számok listájának"
   </voice>
 </phrase>
 <phrase>
@@ -7139,21 +6856,7 @@
     *: "Nincs mit folytatni"
   </dest>
   <voice>
-    *: "Nothing to resume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Hiba a lejátszólista frissítésekor"
-  </dest>
-  <voice>
-    *: "Error updating playlist control file"
+    *: "Nincs mit folytatni"
   </voice>
 </phrase>
 <phrase>
@@ -7167,7 +6870,7 @@
     *: "Hiba a lejátszólista megnyitása során"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "Hiba a lejátszólista megnyitása során"
   </voice>
 </phrase>
 <phrase>
@@ -7181,7 +6884,7 @@
     *: "Hiba a lejátszólista megnyitása során"
   </dest>
   <voice>
-    *: "Error accessing playlist control file"
+    *: "Hiba a lejátszólista megnyitása során"
   </voice>
 </phrase>
 <phrase>
@@ -7195,7 +6898,7 @@
     *: "Hiba a könyvtár megnyitása során"
   </dest>
   <voice>
-    *: "Error accessing directory"
+    *: "Hiba a könyvtár megnyitása során"
   </voice>
 </phrase>
 <phrase>
@@ -7209,7 +6912,7 @@
     *: "Lejátszólista érvénytelen"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "Lejátszólista érvénytelen"
   </voice>
 </phrase>
 <phrase>
@@ -7223,7 +6926,7 @@
     *: "Szünet"
   </dest>
   <voice>
-    *: "Pause"
+    *: "Szünet"
   </voice>
 </phrase>
 <phrase>
@@ -7237,7 +6940,7 @@
     *: "Mód:"
   </dest>
   <voice>
-    *: "Mód:"
+    *: "Mód"
   </voice>
 </phrase>
 <phrase>
@@ -7251,7 +6954,7 @@
     *: "Idő"
   </dest>
   <voice>
-    *: "Time"
+    *: "Idő"
   </voice>
 </phrase>
 <phrase>
@@ -7268,7 +6971,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Charge During U S B Connection"
+    usb_charging_enable: "Töltés USB kapcsolódás alatt"
   </voice>
 </phrase>
 <phrase>
@@ -7338,24 +7041,7 @@
   </dest>
   <voice>
     *: none
-    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-végtelen"
-  </dest>
-  <voice>
-    *: none
-    recording: "-végtelen"
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -7369,7 +7055,7 @@
     *: "Rendszertöltő megváltozott"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "Rendszertöltő megváltozott"
   </voice>
 </phrase>
 <phrase>
@@ -7383,7 +7069,7 @@
     *: "Újrainduljak?"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "Újrainduljak?"
   </voice>
 </phrase>
 <phrase>
@@ -7424,7 +7110,7 @@
     *: "Nincs fájl"
   </dest>
   <voice>
-    *: "No files"
+    *: "Nincs fájl"
   </voice>
 </phrase>
 <phrase>
@@ -7438,7 +7124,7 @@
     *: "Új billentyűzet"
   </dest>
   <voice>
-    *: "New Keyboard"
+    *: "Új billentyűzet"
   </voice>
 </phrase>
 <phrase>
@@ -7452,7 +7138,7 @@
     *: "Nem tudom %s-t megnyitni"
   </dest>
   <voice>
-    *: ""
+    *: "Nem tudom a plugint megnyitni"
   </voice>
 </phrase>
 <phrase>
@@ -7466,12 +7152,12 @@
     *: "Hiba %s olvasásakor"
   </dest>
   <voice>
-    *: ""
+    *: "Hiba fájl olvasásakor"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -7522,7 +7208,7 @@
     *: "Fájltípusok listája teljes"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "Fájltípusok listája tele"
   </voice>
 </phrase>
 <phrase>
@@ -7550,7 +7236,7 @@
     *: "Rossz fájlnév!"
   </dest>
   <voice>
-    *: "Invalid Filename"
+    *: "Rossz fájlnév"
   </voice>
 </phrase>
 <phrase>
@@ -7564,7 +7250,7 @@
     *: "A módosítások csak újraindítás után érvényesülnek"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "A módosítások csak újraindítás után érvényesülnek"
   </voice>
 </phrase>
 <phrase>
@@ -7585,23 +7271,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </dest>
-  <voice>
-    *: none
-    charging: "Trickle charge"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_WARNING_BATTERY_LOW
   desc: general warning
   user: core
@@ -7612,7 +7281,7 @@
     *: "VIGYÁZAT! Akku töltöttsége alacsony!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "FIGYELEM! Akku töltöttsége alacsony!"
   </voice>
 </phrase>
 <phrase>
@@ -7626,7 +7295,7 @@
     *: "Akku üres! TÖLTSD FEL!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "Akku üres! TÖLTSD FEL!"
   </voice>
 </phrase>
 <phrase>
@@ -7654,7 +7323,7 @@
     *: ","
   </dest>
   <voice>
-    *: "point"
+    *: ","
   </voice>
 </phrase>
 <phrase>
@@ -8060,7 +7729,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "száz"
   </voice>
 </phrase>
 <phrase>
@@ -8074,7 +7743,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "ezer"
   </voice>
 </phrase>
 <phrase>
@@ -8088,7 +7757,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "millió"
   </voice>
 </phrase>
 <phrase>
@@ -8102,7 +7771,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "milliárd"
   </voice>
 </phrase>
 <phrase>
@@ -8116,7 +7785,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "mínusz"
   </voice>
 </phrase>
 <phrase>
@@ -8130,7 +7799,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "plusz"
   </voice>
 </phrase>
 <phrase>
@@ -8144,7 +7813,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "ezredmásodperc"
   </voice>
 </phrase>
 <phrase>
@@ -8158,7 +7827,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "másodperc"
   </voice>
 </phrase>
 <phrase>
@@ -8172,7 +7841,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "másodperc"
   </voice>
 </phrase>
 <phrase>
@@ -8186,7 +7855,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "perc"
   </voice>
 </phrase>
 <phrase>
@@ -8200,7 +7869,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "perc"
   </voice>
 </phrase>
 <phrase>
@@ -8214,7 +7883,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "óra"
   </voice>
 </phrase>
 <phrase>
@@ -8228,7 +7897,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "óra"
   </voice>
 </phrase>
 <phrase>
@@ -8242,7 +7911,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "~kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -8256,7 +7925,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -8270,7 +7939,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "százalék"
   </voice>
 </phrase>
 <phrase>
@@ -8284,7 +7953,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "miliamper-óra"
   </voice>
 </phrase>
 <phrase>
@@ -8298,7 +7967,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -8312,7 +7981,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "másodpercenként"
   </voice>
 </phrase>
 <phrase>
@@ -8326,7 +7995,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -8340,7 +8009,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "kilobit másodpercenként"
   </voice>
 </phrase>
 <phrase>
@@ -8718,7 +8387,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "pont"
   </voice>
 </phrase>
 <phrase>
@@ -8746,7 +8415,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "fájl"
   </voice>
 </phrase>
 <phrase>
@@ -8760,7 +8429,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "mappa"
   </voice>
 </phrase>
 <phrase>
@@ -8774,7 +8443,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "~audio"
   </voice>
 </phrase>
 <phrase>
@@ -8788,7 +8457,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "konfiguráció"
   </voice>
 </phrase>
 <phrase>
@@ -8802,7 +8471,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "lejátszás közbeni képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -8816,7 +8485,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "~plugin"
   </voice>
 </phrase>
 <phrase>
@@ -8830,7 +8499,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "betűtípus"
   </voice>
 </phrase>
 <phrase>
@@ -8844,7 +8513,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "könyvjelző"
   </voice>
 </phrase>
 <phrase>
@@ -8858,7 +8527,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -8875,7 +8544,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "távoli lejátszás közbeni képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -8889,7 +8558,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "billentyűzet"
   </voice>
 </phrase>
 <phrase>
@@ -8917,7 +8586,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -8930,11 +8599,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Current Time"
+    rtc: "Jelenlegi Idő"
   </dest>
   <voice>
     *: none
-    rtc: "Current time"
+    rtc: "Jelenlegi Idő"
   </voice>
 </phrase>
 <phrase>
@@ -8966,20 +8635,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Módosítás"
-  </dest>
-  <voice>
-    *: "Gain"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_OF
   desc: spoken only, as in 3/8 => 3 of 8
   user: core
@@ -8990,7 +8645,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "osztva"
   </voice>
 </phrase>
 <phrase>
@@ -9004,7 +8659,7 @@
     *: "Játékok"
   </dest>
   <voice>
-    *: "Games"
+    *: "Játékok"
   </voice>
 </phrase>
 <phrase>
@@ -9018,7 +8673,7 @@
     *: "Alkalmazások"
   </dest>
   <voice>
-    *: "Applications"
+    *: "Alkalmazások"
   </voice>
 </phrase>
 <phrase>
@@ -9032,7 +8687,7 @@
     *: "Demó"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demó"
   </voice>
 </phrase>
 <phrase>
@@ -9060,7 +8715,7 @@
     *: "Mutassa a fájlkiterjesztéseket"
   </dest>
   <voice>
-    *: "Show Filename Extensions"
+    *: "Mutassa a fájlkiterjesztéseket"
   </voice>
 </phrase>
 <phrase>
@@ -9074,7 +8729,7 @@
     *: "Csak ismeretlen típusok"
   </dest>
   <voice>
-    *: "Only Unknown Types"
+    *: "Csak ismeretlen típusok"
   </voice>
 </phrase>
 <phrase>
@@ -9088,7 +8743,7 @@
     *: "Csak minden típus megjelenítésekor"
   </dest>
   <voice>
-    *: "Only When Viewing All Types"
+    *: "Csak minden típus megjelenítésekor"
   </voice>
 </phrase>
 <phrase>
@@ -9116,7 +8771,7 @@
     *: ""
   </dest>
   <voice>
-    *: "o'clock"
+    *: "óra"
   </voice>
 </phrase>
 <phrase>
@@ -9130,7 +8785,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "délután"
   </voice>
 </phrase>
 <phrase>
@@ -9144,7 +8799,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "délelőtt"
   </voice>
 </phrase>
 <phrase>
@@ -9223,7 +8878,7 @@
     *: "Fájl típus bemondása"
   </dest>
   <voice>
-    *: "Say File Type"
+    *: "Fájl típus bemondása"
   </voice>
 </phrase>
 <phrase>
@@ -9240,7 +8895,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "Nem található"
   </voice>
 </phrase>
 <phrase>
@@ -9291,7 +8946,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "Maximális erősítés"
   </voice>
 </phrase>
 <phrase>
@@ -9308,7 +8963,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "Fő szín"
   </voice>
 </phrase>
 <phrase>
@@ -9322,7 +8977,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Üres"
   </voice>
 </phrase>
 <phrase>
@@ -9339,7 +8994,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Mono Left plus Right"
+    recording: "Monó bal és jobb"
   </voice>
 </phrase>
 <phrase>
@@ -9348,15 +9003,15 @@
   user: core
   <source>
     *: none
-    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Érintőpad érzékenysége"
   </dest>
   <voice>
     *: none
-    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Érintőpad érzékenysége"
   </voice>
 </phrase>
 <phrase>
@@ -9370,7 +9025,7 @@
     *: "Akku töltöttségének bemondása"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "Akku töltöttségének bemondása"
   </voice>
 </phrase>
 <phrase>
@@ -9387,7 +9042,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "Sorkiemelés színe"
   </voice>
 </phrase>
 <phrase>
@@ -9401,7 +9056,7 @@
     *: "Gyors"
   </dest>
   <voice>
-    *: "Fast"
+    *: "Gyors"
   </voice>
 </phrase>
 <phrase>
@@ -9414,11 +9069,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Soros port szélessége"
+    serial_port: "Soros port bitráta"
   </dest>
   <voice>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Soros port bitráta"
   </voice>
 </phrase>
 <phrase>
@@ -9432,7 +9087,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "Üres lista"
   </voice>
 </phrase>
 <phrase>
@@ -9460,10 +9115,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Ugrás egysége"
+    *: "Ugrás Hossza"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "Ugrás Hossza"
   </voice>
 </phrase>
 <phrase>
@@ -9480,7 +9135,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    quickscreen: "Beállítás gyorsmenü baloldali elemének"
   </voice>
 </phrase>
 <phrase>
@@ -9494,7 +9149,7 @@
     *: "Beállítások törlése"
   </dest>
   <voice>
-    *: "Reset Setting"
+    *: "Beállítások törlése"
   </voice>
 </phrase>
 <phrase>
@@ -9508,7 +9163,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "per"
   </voice>
 </phrase>
 <phrase>
@@ -9519,10 +9174,10 @@
     *: "[Random]"
   </source>
   <dest>
-    *: "[Véletlenszerűen]"
+    *: "[Véletlenszerű]"
   </dest>
   <voice>
-    *: "Random"
+    *: "Véletlenszerű"
   </voice>
 </phrase>
 <phrase>
@@ -9539,7 +9194,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    quickscreen: "Beállítás gyorsmenü alsó elemének"
   </voice>
 </phrase>
 <phrase>
@@ -9556,7 +9211,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Szöveg színe"
   </voice>
 </phrase>
 <phrase>
@@ -9570,7 +9225,7 @@
     *: "Téma beállítások"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "Téma beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -9604,7 +9259,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording and Shutdown"
+    recording: "Felvétel leállítása és kikapcsolás"
   </voice>
 </phrase>
 <phrase>
@@ -9635,7 +9290,7 @@
     *: "Hangbeállítások mentése"
   </dest>
   <voice>
-    *: "Save Sound Settings"
+    *: "Hangbeállítások mentése"
   </voice>
 </phrase>
 <phrase>
@@ -9649,7 +9304,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "Szerkesztés"
   </voice>
 </phrase>
 <phrase>
@@ -9666,7 +9321,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "Beállítás gyorsmenü jobboldali elemének"
   </voice>
 </phrase>
 <phrase>
@@ -9680,7 +9335,7 @@
     *: "Nagyon lassú"
   </dest>
   <voice>
-    *: "Very slow"
+    *: "Nagyon lassú"
   </voice>
 </phrase>
 <phrase>
@@ -9694,7 +9349,7 @@
     *: "Billentyűhangok"
   </dest>
   <voice>
-    *: "Keyclick"
+    *: "Billentyűhangok"
   </voice>
 </phrase>
 <phrase>
@@ -9745,7 +9400,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "Jobb csatorna módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -9776,7 +9431,7 @@
     *: "Lassú"
   </dest>
   <voice>
-    *: "Slow"
+    *: "Lassú"
   </voice>
 </phrase>
 <phrase>
@@ -9790,7 +9445,7 @@
     *: "Köszönetnyilvánítás"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Köszönetnyilvánítás"
   </voice>
 </phrase>
 <phrase>
@@ -9803,11 +9458,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Sor (halványodó)"
+    lcd_color: "Sor (színátmenettel)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "Sor (színátmenettel)"
   </voice>
 </phrase>
 <phrase>
@@ -9824,7 +9479,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "Bal csatorna módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -9838,7 +9493,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Gyors képernyő"
   </voice>
 </phrase>
 <phrase>
@@ -9852,7 +9507,7 @@
     *: "Nagyon gyors"
   </dest>
   <voice>
-    *: "Very fast"
+    *: "Nagyon gyors"
   </voice>
 </phrase>
 <phrase>
@@ -9869,7 +9524,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Sor (egyszínű)"
   </voice>
 </phrase>
 <phrase>
@@ -9886,7 +9541,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "Színek"
   </voice>
 </phrase>
 <phrase>
@@ -9900,7 +9555,7 @@
     *: "Keresés eredménye"
   </dest>
   <voice>
-    *: "Search Results"
+    *: "Keresés eredménye"
   </voice>
 </phrase>
 <phrase>
@@ -9934,7 +9589,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "Második szín"
   </voice>
 </phrase>
 <phrase>
@@ -9968,7 +9623,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Mono mode"
+    recording: "Monó mód"
   </voice>
 </phrase>
 <phrase>
@@ -9982,7 +9637,7 @@
     *: "Közép-európai (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "Közép-európai"
   </voice>
 </phrase>
 <phrase>
@@ -9996,7 +9651,7 @@
     *: "Ismeretlen"
   </dest>
   <voice>
-    *: "Unknown"
+    *: "Ismeretlen"
   </voice>
 </phrase>
 <phrase>
@@ -10009,11 +9664,11 @@
   </source>
   <dest>
     *: none
-    agc: "Túlvezérlés küszöbértéke"
+    agc: "AGC Túlvezérlés küszöbértéke"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC Túlvezérlés küszöbértéke"
   </voice>
 </phrase>
 <phrase>
@@ -10027,7 +9682,7 @@
     *: "Kihagyja a számot"
   </dest>
   <voice>
-    *: "Skip Track"
+    *: "Kihagyja a számot"
   </voice>
 </phrase>
 <phrase>
@@ -10041,7 +9696,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "oké"
   </voice>
 </phrase>
 <phrase>
@@ -10055,7 +9710,7 @@
     *: "Billentyűhang ismétlés"
   </dest>
   <voice>
-    *: "Keyclick Repeats"
+    *: "Billentyűhang ismétlés"
   </voice>
 </phrase>
 <phrase>
@@ -10072,7 +9727,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Magas"
   </voice>
 </phrase>
 <phrase>
@@ -10089,7 +9744,7 @@
   </dest>
   <voice>
     *: none
-    serial_port: "Automatic"
+    serial_port: "Automatikus"
   </voice>
 </phrase>
 <phrase>
@@ -10103,7 +9758,7 @@
     *: "Számok nem maradnak ki"
   </dest>
   <voice>
-    *: "Prevent Track Skipping"
+    *: "Számok nem maradnak ki"
   </voice>
 </phrase>
 <phrase>
@@ -10120,7 +9775,7 @@
   </dest>
   <voice>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Hangszóró engedélyezése"
   </voice>
 </phrase>
 <phrase>
@@ -10134,7 +9789,7 @@
     *: "Számok értelmezése sorbarakásnál"
   </dest>
   <voice>
-    *: "Interpret numbers when sorting"
+    *: "Számok értelmezése sorbarakásnál"
   </voice>
 </phrase>
 <phrase>
@@ -10151,7 +9806,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Absolute Point"
+    touchscreen: "Abszolút pont"
   </voice>
 </phrase>
 <phrase>
@@ -10165,7 +9820,7 @@
     *: "Teljes számként"
   </dest>
   <voice>
-    *: "As whole numbers"
+    *: "Teljes számként"
   </voice>
 </phrase>
 <phrase>
@@ -10182,7 +9837,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "3 by 3 grid"
+    touchscreen: "háromszor hármas rács"
   </voice>
 </phrase>
 <phrase>
@@ -10199,7 +9854,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Mode"
+    touchscreen: "Érintőképernyős mód"
   </voice>
 </phrase>
 <phrase>
@@ -10213,21 +9868,7 @@
     *: "Számjegyenként"
   </dest>
   <voice>
-    *: "As digits"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Gördítősáv pozíció"
-  </dest>
-  <voice>
-    *: "Gördítősáv pozíció"
+    *: "Számjegyenként"
   </voice>
 </phrase>
 <phrase>
@@ -10305,11 +9946,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Félhang"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Félhang"
   </voice>
 </phrase>
 <phrase>
@@ -10322,11 +9963,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "Határ"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "Határ"
   </voice>
 </phrase>
 <phrase>
@@ -10531,10 +10172,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "Automata"
   </dest>
   <voice>
-    *: "Auto"
+    *: "Automata"
   </voice>
 </phrase>
 <phrase>
@@ -10583,20 +10224,6 @@
   <voice>
     *: none
     usb_hid: "USB billentyűzet mód"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q érték"
-  </dest>
-  <voice>
-    *: "Q érték"
   </voice>
 </phrase>
 <phrase>
@@ -10776,21 +10403,7 @@
     *: "4:1"
   </dest>
   <voice>
-    *: "4:1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Egyéni"
-  </dest>
-  <voice>
-    *: "Egyéni"
+    *: "4 az 1-hez"
   </voice>
 </phrase>
 <phrase>
@@ -10808,23 +10421,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Vonalkimenet"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Vonalkimenet"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_RATIO_2
   desc: in sound settings
   user: core
@@ -10835,7 +10431,7 @@
     *: "2:1"
   </dest>
   <voice>
-    *: "2:1"
+    *: "2 az 1-hez"
   </voice>
 </phrase>
 <phrase>
@@ -10974,20 +10570,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTOMATIC
-  desc: generic automatic
-  user: core
-  <source>
-    *: "Automatic"
-  </source>
-  <dest>
-    *: "Automatikus"
-  </dest>
-  <voice>
-    *: "Automatikus"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LIST_LINE_PADDING
   desc: list padding, in display settings
   user: core
@@ -11083,7 +10665,7 @@
     *: "Következik:"
   </dest>
   <voice>
-    *: "Következik:"
+    *: "Következő szám"
   </voice>
 </phrase>
 <phrase>
@@ -11260,7 +10842,7 @@
     *: "6:1"
   </dest>
   <voice>
-    *: "6:1"
+    *: "6 az 1-hez"
   </voice>
 </phrase>
 <phrase>
@@ -11292,20 +10874,6 @@
   </dest>
   <voice>
     *: "Működési idő"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: used in the onplay menu to set a starting browser dir
-  user: core
-  <source>
-    *: "Start File Browser Here"
-  </source>
-  <dest>
-    *: "Fájlkezelő Kezdőpontja"
-  </dest>
-  <voice>
-    *: "Fájlkezelő Kezdőpontja"
   </voice>
 </phrase>
 <phrase>
@@ -11684,20 +11252,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
-  user: core
-  <source>
-    *: "Set as Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "Beállítás lej. lista katalógus könyvtárként"
-  </dest>
-  <voice>
-    *: "Beállítás lej. lista katalógus könyvtárként"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LIST_SEPARATOR_COLOR
   desc: line between lines in lists
   user: core
@@ -11829,7 +11383,7 @@
     *: "Következik:"
   </dest>
   <voice>
-    *: "Következik:"
+    *: "Következik"
   </voice>
 </phrase>
 <phrase>
@@ -11929,20 +11483,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
-  user: core
-  <source>
-    *: "Insert Last Shuffled"
-  </source>
-  <dest>
-    *: "Beszúrás a lista végére keverve"
-  </dest>
-  <voice>
-    *: "Beszúrás a lista végére keverve"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_RATIO_10
   desc: in sound settings
   user: core
@@ -11953,7 +11493,7 @@
     *: "10:1"
   </dest>
   <voice>
-    *: "10:1"
+    *: "10 az 1-hez"
   </voice>
 </phrase>
 <phrase>
@@ -12043,7 +11583,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "~PictureFlow"
   </dest>
   <voice>
     *: "picture flow megnyitása"
@@ -12063,7 +11603,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Jelerősség:"
+    radio: "Jelerősség"
   </voice>
 </phrase>
 <phrase>
@@ -12235,5 +11775,5146 @@
   </dest>
   <voice>
     *: "Mélyhangkiemelés"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Reset EQ"
+  </dest>
+  <voice>
+    *: "Reset EQ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Single Mode"
+  </dest>
+  <voice>
+    *: "Single Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Title & Album from ID3 tags"
+  </dest>
+  <voice>
+    *: "Title and Album from tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Title from ID3 tags"
+  </dest>
+  <voice>
+    *: "Title from tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Selection too big, %d random tracks will be selected"
+  </dest>
+  <voice>
+    *: "Selection too big, fewer random tracks will be selected"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Special character"
+  </dest>
+  <voice>
+    *: "Special character"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Album Artists"
+  </dest>
+  <voice>
+    *: "Album Artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Add Current to Shortcuts"
+  </dest>
+  <voice>
+    *: "Add Current to Shortcuts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice Prompt Volume"
+  </source>
+  <dest>
+    *: "Voice Prompt Volume"
+  </dest>
+  <voice>
+    *: "Voice Prompt Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disc"
+  </dest>
+  <voice>
+    *: "Disc"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Short"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Short"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Bypass"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Bypass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybrid Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybrid Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Brick Wall"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Brick Wall"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC power mode"
+    es9218: "DAC output level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Enabled"
+  </dest>
+  <voice>
+    *: "Enabled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Play"
+  </source>
+  <dest>
+    *: "Exempt Play"
+  </dest>
+  <voice>
+    *: "Exempt Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Seek"
+  </source>
+  <dest>
+    *: "Exempt Seek"
+  </dest>
+  <voice>
+    *: "Exempt Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Exempt Skip"
+  </source>
+  <dest>
+    *: "Exempt Skip"
+  </dest>
+  <voice>
+    *: "Exempt Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Backlight Exemptions"
+  </dest>
+  <voice>
+    *: "Backlight Exemptions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Disable on External Power"
+  </dest>
+  <voice>
+    *: "Disable on External Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Disable Unmapped Keys"
+  </dest>
+  <voice>
+    *: "Disable Unmapped Keys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Advanced Key Lock"
+  </dest>
+  <voice>
+    *: "Advanced Key Lock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Autolock On"
+  </dest>
+  <voice>
+    *: "Autolock On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Autolock Off"
+  </dest>
+  <voice>
+    *: "Autolock Off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Locked Reminders"
+  </source>
+  <dest>
+    *: "Disable Locked Reminders"
+  </dest>
+  <voice>
+    *: "Disable Locked Reminders"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Disable Touch"
+  </dest>
+  <voice>
+    *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "One per playlist"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "One per track"
+  </dest>
+  <voice>
+    *: "One per track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Track to move"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Never"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed:"
+  </source>
+  <dest>
+    *: "Playlist elapsed:"
+  </dest>
+  <voice>
+    *: "Playlist elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed:"
+  </source>
+  <dest>
+    *: "Track elapsed:"
+  </dest>
+  <voice>
+    *: "Track elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining:"
+  </source>
+  <dest>
+    *: "Track remaining:"
+  </dest>
+  <voice>
+    *: "Track remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track:"
+  </source>
+  <dest>
+    *: "Track:"
+  </dest>
+  <voice>
+    *: "Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage (Done / Remaining):"
+  </source>
+  <dest>
+    *: "Storage (Done / Remaining):"
+  </dest>
+  <voice>
+    *: "Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Done"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size:"
+  </source>
+  <dest>
+    *: "Average track size:"
+  </dest>
+  <voice>
+    *: "Average track size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate:"
+  </source>
+  <dest>
+    *: "Average bitrate:"
+  </dest>
+  <voice>
+    *: "Average bit rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Error while gathering info"
+  </dest>
+  <voice>
+    *: "Error while gathering info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Playing time"
+  </dest>
+  <voice>
+    *: "Playing time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Delay Before Resume"
+  </dest>
+  <voice>
+    *: none
+    charging: "Delay Before Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Absolute mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Time stretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Remote Control"
+  </dest>
+  <voice>
+    *: "Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "No Rem. Control"
+  </dest>
+  <voice>
+    *: "No Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Out of Control"
+  </dest>
+  <voice>
+    *: "Out of Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Key Control"
+  </dest>
+  <voice>
+    *: "2 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Key Control"
+  </dest>
+  <voice>
+    *: "4 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Play Wormlet!"
+  </source>
+  <dest>
+    *: "Play Wormlet!"
+  </dest>
+  <voice>
+    *: "Play Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Number of Worms"
+  </source>
+  <dest>
+    *: "Number of Worms"
+  </dest>
+  <voice>
+    *: "Number of Worms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: "Worm Growth Per Food"
+  </dest>
+  <voice>
+    *: "Worm Growth Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Speed"
+  </source>
+  <dest>
+    *: "Worm Speed"
+  </dest>
+  <voice>
+    *: "Worm Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Arghs Per Food"
+  </source>
+  <dest>
+    *: "Arghs Per Food"
+  </dest>
+  <voice>
+    *: "Arghs Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Argh Size"
+  </source>
+  <dest>
+    *: "Argh Size"
+  </dest>
+  <voice>
+    *: "Argh Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Food Size"
+  </source>
+  <dest>
+    *: "Food Size"
+  </dest>
+  <voice>
+    *: "Food Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Number of Players"
+  </dest>
+  <voice>
+    *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Control Style"
+  </dest>
+  <voice>
+    *: "Control Style"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Revert to Default Settings"
+  </dest>
+  <voice>
+    *: "Revert to Default Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Quit"
+  </dest>
+  <voice>
+    *: "Quit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Display Options"
+  </dest>
+  <voice>
+    *: "Display Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Previous Track"
+  </dest>
+  <voice>
+    *: "Previous Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pause / Play"
+  </dest>
+  <voice>
+    *: "Pause / Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Stop Playback"
+  </dest>
+  <voice>
+    *: "Stop Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Next Track"
+  </dest>
+  <voice>
+    *: "Next Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Change Volume"
+  </dest>
+  <voice>
+    *: "Change Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Shuffle Mode"
+  </dest>
+  <voice>
+    *: "Shuffle Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Change Repeat Mode"
+  </dest>
+  <voice>
+    *: "Change Repeat Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Playback Control"
+  </dest>
+  <voice>
+    *: "Playback Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Checkmate!"
+  </source>
+  <dest>
+    *: "Checkmate!"
+  </dest>
+  <voice>
+    *: "Checkmate!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Illegal move!"
+  </source>
+  <dest>
+    *: "Illegal move!"
+  </dest>
+  <voice>
+    *: "Illegal move!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "New Game"
+  </source>
+  <dest>
+    *: "New Game"
+  </dest>
+  <voice>
+    *: "New Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Resume Game"
+  </source>
+  <dest>
+    *: "Resume Game"
+  </dest>
+  <voice>
+    *: "Resume Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Save Game"
+  </source>
+  <dest>
+    *: "Save Game"
+  </dest>
+  <voice>
+    *: "Save Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restore Game"
+  </source>
+  <dest>
+    *: "Restore Game"
+  </dest>
+  <voice>
+    *: "Restore Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restart Game"
+  </source>
+  <dest>
+    *: "Restart Game"
+  </dest>
+  <voice>
+    *: "Restart Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Select Other Game"
+  </source>
+  <dest>
+    *: "Select Other Game"
+  </dest>
+  <voice>
+    *: "Select Other Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: "Level 1: 60 moves / 5 min"
+  </dest>
+  <voice>
+    *: "Level 1, 60 moves per 5 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: "Level 2: 60 moves / 15 min"
+  </dest>
+  <voice>
+    *: "Level 2, 60 moves per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 3: 60 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 3, 60 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 4: 40 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 4, 40 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: "Level 5: 40 moves / 60 min"
+  </dest>
+  <voice>
+    *: "Level 5, 40 moves per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: "Level 6: 40 moves / 120 min"
+  </dest>
+  <voice>
+    *: "Level 6, 40 moves per 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: "Level 7: 40 moves / 240 min"
+  </dest>
+  <voice>
+    *: "Level 7, 40 moves per 240 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "Error parsing game !"
+  </source>
+  <dest>
+    *: "Error parsing game !"
+  </dest>
+  <voice>
+    *: "Error parsing game !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "No games found !"
+  </source>
+  <dest>
+    *: "No games found !"
+  </dest>
+  <voice>
+    *: "No games found!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the beginning of the game"
+  </source>
+  <dest>
+    *: "At the beginning of the game"
+  </dest>
+  <voice>
+    *: "At the beginning of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the end of the game"
+  </source>
+  <dest>
+    *: "At the end of the game"
+  </dest>
+  <voice>
+    *: "At the end of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Player"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "GNU Chess"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Marked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Unmarked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "White"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Black"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Check!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "captures"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "castle"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "king side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "queen side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Pawn"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Knight"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bishop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Rook"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "King"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Games"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Saving position"
+  </source>
+  <dest>
+    *: "Saving position"
+  </dest>
+  <voice>
+    *: "Saving position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Loading position"
+  </source>
+  <dest>
+    *: "Loading position"
+  </dest>
+  <voice>
+    *: "Loading position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Thinking..."
+  </source>
+  <dest>
+    *: "Thinking..."
+  </dest>
+  <voice>
+    *: "Thinking"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Battery bench is already running"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Press play to run battery bench or stop to cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: "Cannot restart playback"
+  </source>
+  <dest>
+    *: "Cannot restart playback"
+  </dest>
+  <voice>
+    *: "Cannot restart playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Ordered"
+  </source>
+  <dest>
+    *: "Ordered"
+  </dest>
+  <voice>
+    *: "Ordered"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Diffusion"
+  </source>
+  <dest>
+    *: "Diffusion"
+  </dest>
+  <voice>
+    *: "Diffusion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Grayscale"
+  </source>
+  <dest>
+    *: "Grayscale"
+  </dest>
+  <voice>
+    *: "Grayscale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: "Toggle Slideshow Mode"
+  </dest>
+  <voice>
+    *: "Toggle Slide show Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Slideshow Time"
+  </source>
+  <dest>
+    *: "Slideshow Time"
+  </dest>
+  <voice>
+    *: "Slide show Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Return"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "View Played Games"
+  </source>
+  <dest>
+    *: "View Played Games"
+  </dest>
+  <voice>
+    *: "View Played Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Audio Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Audio Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play Mode"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play Mode"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Single"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Single"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use sound setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use sound setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play from beginning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play from beginning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Set resume time (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Set resume time"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: "Display FPS"
+  </source>
+  <dest>
+    *: "Display FPS"
+  </dest>
+  <voice>
+    *: "Display FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Limit FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Skip frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Skip frames"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Backlight brightness"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Backlight brightness"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use common setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use common setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Tone controls"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Tone controls"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu if not completed"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu if not completed"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume automatically"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume automatically"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Clear all resumes"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Clear all resumes"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Unavailable"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Unavailable"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Load Default Configuration"
+  </dest>
+  <voice>
+    *: "Load Default Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Save and Exit"
+  </dest>
+  <voice>
+    *: "Save and Exit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Path]"
+  </dest>
+  <voice>
+    *: "Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Filename]"
+  </dest>
+  <voice>
+    *: "Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Size]"
+  </dest>
+  <voice>
+    *: "Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Date]"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Time]"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Subdirs]"
+  </dest>
+  <voice>
+    *: "Subdirs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Files]"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Directory properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "File properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Failed to gather information"
+  </dest>
+  <voice>
+    *: "Failed to gather information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Swap Channels"
+  </dest>
+  <voice>
+    *: "Swap Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Panning Separation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Panning Separation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Reverberation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Reverberation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Interpolation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Interpolation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Surround"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Surround"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "HQ Mixer"
+    lowmem: none
+  </source>
+  <dest>
+    *: "HQ Mixer"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "High Quality Mixer"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Sample Rate"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Sample Rate"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Sample Rate"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: "CPU Boost"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "CPU Boost"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Spacing"
+  </source>
+  <dest>
+    *: "Spacing"
+  </dest>
+  <voice>
+    *: "Spacing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Centre margin"
+  </source>
+  <dest>
+    *: "Centre margin"
+  </dest>
+  <voice>
+    *: "Centre margin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Number of slides"
+  </source>
+  <dest>
+    *: "Number of slides"
+  </dest>
+  <voice>
+    *: "Number of slides"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Zoom"
+  </source>
+  <dest>
+    *: "Zoom"
+  </dest>
+  <voice>
+    *: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Show album title"
+  </source>
+  <dest>
+    *: "Show album title"
+  </dest>
+  <voice>
+    *: "Show album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Resize Covers"
+  </source>
+  <dest>
+    *: "Resize Covers"
+  </dest>
+  <voice>
+    *: "Resize Covers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Rebuild cache"
+  </source>
+  <dest>
+    *: "Rebuild cache"
+  </dest>
+  <voice>
+    *: "Rebuild cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "WPS Integration"
+  </source>
+  <dest>
+    *: "WPS Integration"
+  </dest>
+  <voice>
+    *: "WPS Integration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: "Go to WPS"
+  </source>
+  <dest>
+    *: "Go to WPS"
+  </dest>
+  <voice>
+    *: "Go to WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide album title"
+  </source>
+  <dest>
+    *: "Hide album title"
+  </dest>
+  <voice>
+    *: "Hide album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the bottom"
+  </source>
+  <dest>
+    *: "Show at the bottom"
+  </dest>
+  <voice>
+    *: "Show at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the top"
+  </source>
+  <dest>
+    *: "Show at the top"
+  </dest>
+  <voice>
+    *: "Show at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings, also a volume adjustment mode
+  user: core
+  <source>
+    *: "Direct"
+  </source>
+  <dest>
+    *: "Direct"
+  </dest>
+  <voice>
+    *: "Direct"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Via Track list"
+  </source>
+  <dest>
+    *: "Via Track list"
+  </dest>
+  <voice>
+    *: "Via Track list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Always On"
+  </source>
+  <dest>
+    *: "Always On"
+  </dest>
+  <voice>
+    *: "Always On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "No album art found"
+  </source>
+  <dest>
+    *: "No album art found"
+  </dest>
+  <voice>
+    *: "No album art found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Error writing config"
+  </source>
+  <dest>
+    *: "Error writing config"
+  </dest>
+  <voice>
+    *: "Error writing config"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Not a VBR file"
+  </dest>
+  <voice>
+    *: "Not a VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "File error: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Update cache"
+  </dest>
+  <voice>
+    *: "Update cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide information"
+  </source>
+  <dest>
+    *: "Hide information"
+  </dest>
+  <voice>
+    *: "Hide information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the bottom"
+  </source>
+  <dest>
+    *: "Show album at the bottom"
+  </dest>
+  <voice>
+    *: "Show album at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the top"
+  </source>
+  <dest>
+    *: "Show album at the top"
+  </dest>
+  <voice>
+    *: "Show album at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: "Show album and artist at the top"
+  </dest>
+  <voice>
+    *: "Show album and artist at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: "Show album and artist at the bottom"
+  </dest>
+  <voice>
+    *: "Show album and artist at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </dest>
+  <voice>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Date"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Clear all"
+  </dest>
+  <voice>
+    *: "Clear all"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Cancel"
+  </dest>
+  <voice>
+    *: "Cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Save"
+  </dest>
+  <voice>
+    *: "Save"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Timeout"
+  </dest>
+  <voice>
+    *: "Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: "Track"
+  </source>
+  <dest>
+    *: "Track"
+  </dest>
+  <voice>
+    *: "Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: "Elapsed"
+  </source>
+  <dest>
+    *: "Elapsed"
+  </dest>
+  <voice>
+    *: "Elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announcement format"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announcement format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Remain"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Remain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Grouping"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Grouping"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announce on"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announce on"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Track change"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Track change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hold for settings"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hold for settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Open Plugin"
+  </dest>
+  <voice>
+    *: "Open Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Not a plugin: %s"
+  </dest>
+  <voice>
+    *: "Not a plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set WPS Context Plugin"
+  </source>
+  <dest>
+    *: "Set WPS Context Plugin"
+  </dest>
+  <voice>
+    *: "Set WPS Context Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parameter"
+  </dest>
+  <voice>
+    *: "Parameter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Name"
+  </dest>
+  <voice>
+    *: "Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Add"
+  </dest>
+  <voice>
+    *: "Add"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Back"
+  </dest>
+  <voice>
+    *: "Back"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Edit"
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Run"
+  </dest>
+  <voice>
+    *: "Run"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Export"
+  </dest>
+  <voice>
+    *: "Export"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Browse"
+  </dest>
+  <voice>
+    *: "Browse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Enter USB mass storage mode?"
+  </dest>
+  <voice>
+    *: "Enter USB mass storage mode?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Show Queue Options"
+  </dest>
+  <voice>
+    *: "Show Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Show Shuffled Adding Options"
+  </dest>
+  <voice>
+    *: "Show Shuffled Adding Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "In Submenu"
+  </dest>
+  <voice>
+    *: "In Submenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disable All Lock Notifications"
+  </dest>
+  <voice>
+    *: "Disable All Lock Notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Exempt Volume"
+  </dest>
+  <voice>
+    *: "Exempt Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Always Autolock"
+  </dest>
+  <voice>
+    *: "Always Autolock"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Show Shutdown Message"
+  </dest>
+  <voice>
+    *: "Show Shutdown Message"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "List Order"
+  </dest>
+  <voice>
+    *: "List Order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Ascending"
+  </dest>
+  <voice>
+    *: "Ascending"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Descending"
+  </dest>
+  <voice>
+    *: "Descending"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Album Art"
+  </dest>
+  <voice>
+    *: "Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Prefer Embedded"
+  </dest>
+  <voice>
+    *: "Prefer Embedded"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Prefer Image File"
+  </dest>
+  <voice>
+    *: "Prefer Image File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Sync RDS Time"
+  </dest>
+  <voice>
+    *: none
+    rds: "Sync RDS Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Sort albums by"
+  </dest>
+  <voice>
+    *: "Sort albums by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Artist + Name"
+  </dest>
+  <voice>
+    *: "Artist and Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Artist + Year"
+  </dest>
+  <voice>
+    *: "Artist and Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Year sort order"
+  </dest>
+  <voice>
+    *: "Year sort order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Show year in album title"
+  </dest>
+  <voice>
+    *: "Show year in album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Cache needs to finish updating first!"
+  </dest>
+  <voice>
+    *: "Cache needs to finish updating first!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Track Info"
+  </dest>
+  <voice>
+    *: "Track Info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Play"
+  </dest>
+  <voice>
+    *: "Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Play Shuffled"
+  </dest>
+  <voice>
+    *: "Play Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Keep Current Track When Replacing Playlist"
+  </dest>
+  <voice>
+    *: "Keep Current Track When Replacing Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Rewind Across Tracks"
+  </dest>
+  <voice>
+    *: "Rewind across tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Set As..."
+  </dest>
+  <voice>
+    *: "Set As"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Playlist Directory"
+  </dest>
+  <voice>
+    *: "Playlist Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Start Directory"
+  </dest>
+  <voice>
+    *: "Start Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Add to Playlist..."
+  </dest>
+  <voice>
+    *: "Add to Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Add to Existing Playlist"
+  </dest>
+  <voice>
+    *: "Add to Existing Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Playing Next..."
+  </dest>
+  <voice>
+    *: "Playing Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Play Next"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Add Shuffled"
+  </dest>
+  <voice>
+    *: "Add Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Play Last"
+  </dest>
+  <voice>
+    *: "Play Last"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Play Last Shuffled"
+  </dest>
+  <voice>
+    *: "Play Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Perceptual"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Perceptual"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Show Tracks While Browsing"
+  </dest>
+  <voice>
+    *: "Show Tracks While Browsing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Go to Last Album"
+  </dest>
+  <voice>
+    *: "Go to Last Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Database Directory"
+  </dest>
+  <voice>
+    *: "Database Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_QUEUED_TRACKS
+  desc: Confirmation dialog
+  user: core
+  <source>
+    *: "Remove Queued Tracks?"
+  </source>
+  <dest>
+    *: "Remove Queued Tracks?"
+  </dest>
+  <voice>
+    *: "Remove Queued Tracks?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUICK_IGNORE_DIRACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Quick (Ignore Directory Cache)"
+  </source>
+  <dest>
+    *: "Quick (Ignore Directory Cache)"
+  </dest>
+  <voice>
+    *: "Quick (Ignore Directory Cache)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "What's Playing Screen"
+  </dest>
+  <voice>
+    *: "What's Playing Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Default Browser"
+  </dest>
+  <voice>
+    *: "Default Browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AMAZE_MENU
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Amaze Main Menu"
+  </source>
+  <dest>
+    *: "Amaze Main Menu"
+  </dest>
+  <voice>
+    *: "Amaze Main Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_MAZE_SIZE
+  desc: Maze size in Amaze game
+  user: core
+  <source>
+    *: "Set Maze Size"
+  </source>
+  <dest>
+    *: "Set Maze Size"
+  </dest>
+  <voice>
+    *: "Set Maze Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "View Map"
+  </source>
+  <dest>
+    *: "View Map"
+  </dest>
+  <voice>
+    *: "View Map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_COMPASS
+  desc: Compass in Amaze game
+  user: core
+  <source>
+    *: "Show Compass"
+  </source>
+  <dest>
+    *: "Show Compass"
+  </dest>
+  <voice>
+    *: "Show Compass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_MAP
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Map"
+  </source>
+  <dest>
+    *: "Show Map"
+  </dest>
+  <voice>
+    *: "Show Map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMEMBER_PATH
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Remember Path"
+  </source>
+  <dest>
+    *: "Remember Path"
+  </dest>
+  <voice>
+    *: "Remember Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LARGE_TILES
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Use Large Tiles"
+  </source>
+  <dest>
+    *: "Use Large Tiles"
+  </dest>
+  <voice>
+    *: "Use Large Tiles"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SOLUTION
+  desc: Map in Amaze game
+  user: core
+  <source>
+    *: "Show Solution"
+  </source>
+  <dest>
+    *: "Show Solution"
+  </dest>
+  <voice>
+    *: "Show Solution"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUIT_WITHOUT_SAVING
+  desc:
+  user: core
+  <source>
+    *: "Quit without saving"
+  </source>
+  <dest>
+    *: "Quit without saving"
+  </dest>
+  <voice>
+    *: "Quit without saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERATING_MAZE
+  desc: Amaze game
+  user: core
+  <source>
+    *: "Generating maze..."
+  </source>
+  <dest>
+    *: "Generating maze..."
+  </dest>
+  <voice>
+    *: "Generating maze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_WIN
+  desc: Success in game
+  user: core
+  <source>
+    *: "You win!"
+  </source>
+  <dest>
+    *: "You win!"
+  </dest>
+  <voice>
+    *: "You win!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YOU_CHEATED
+  desc: Cheated in game
+  user: core
+  <source>
+    *: "You cheated!"
+  </source>
+  <dest>
+    *: "You cheated!"
+  </dest>
+  <voice>
+    *: "You cheated!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EASY
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Easy"
+  </source>
+  <dest>
+    *: "Easy"
+  </dest>
+  <voice>
+    *: "Easy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_MEDIUM
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_HARD
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Hard"
+  </source>
+  <dest>
+    *: "Hard"
+  </dest>
+  <voice>
+    *: "Hard"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFICULTY_EXPERT
+  desc: Game difficulty
+  user: core
+  <source>
+    *: "Expert"
+  </source>
+  <dest>
+    *: "Expert"
+  </dest>
+  <voice>
+    *: "Expert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Legal Notices"
+  </dest>
+  <voice>
+    *: "Legal Notices"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Error: %s"
+  </dest>
+  <voice>
+    *: "Error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Mikmod Settings"
+  </dest>
+  <voice>
+    *: "Mik mod Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "Mikmod Menu"
+  </dest>
+  <voice>
+    *: "Mik mod Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "Chessbox Menu"
+  </dest>
+  <voice>
+    *: "Chess box Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Invalid Voice File"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_LANG_NAME
+  desc: Spoken name of the language
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Choose File"
+  </dest>
+  <voice>
+    *: "Choose File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Disable main menu scrolling"
+  </dest>
+  <voice>
+    *: "Disable main menu scrolling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Remaining"
+  </dest>
+  <voice>
+    *: "Remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "First Letter"
+  </dest>
+  <voice>
+    *: "First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "By First Letter..."
+  </dest>
+  <voice>
+    *: "By First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Album Artists by First Letter"
+  </dest>
+  <voice>
+    *: "Album Artists by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albums by First Letter"
+  </dest>
+  <voice>
+    *: "Albums by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Tracks by First Letter"
+  </dest>
+  <voice>
+    *: "Tracks by First Letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Artists"
+  </dest>
+  <voice>
+    *: "Artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albums"
+  </dest>
+  <voice>
+    *: "Albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Tracks"
+  </dest>
+  <voice>
+    *: "Tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Shuffle Songs"
+  </dest>
+  <voice>
+    *: "Shuffle Songs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Filename"
+  </dest>
+  <voice>
+    *: "Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Title (with track duration)"
+  </dest>
+  <voice>
+    *: "Title with track duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "User Rating"
+  </dest>
+  <voice>
+    *: "User Rating"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Search"
+  </dest>
+  <voice>
+    *: "Search"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Search by..."
+  </dest>
+  <voice>
+    *: "Search by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Recently Added"
+  </dest>
+  <voice>
+    *: "Recently Added"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Playback History"
+  </dest>
+  <voice>
+    *: "Playback History"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Custom menu"
+  </dest>
+  <voice>
+    *: "Custom menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Same as currently played track"
+  </dest>
+  <voice>
+    *: "Same as currently played track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Directory"
+  </dest>
+  <voice>
+    *: "Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albums by Year"
+  </dest>
+  <voice>
+    *: "Albums by Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albums between Years"
+  </dest>
+  <voice>
+    *: "Albums between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Artists between Years"
+  </dest>
+  <voice>
+    *: "Artists between Years"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Most played (Plays|Score)"
+  </dest>
+  <voice>
+    *: "Most played by Plays then by Score"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Recently played tracks"
+  </dest>
+  <voice>
+    *: "Recently played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Never played tracks"
+  </dest>
+  <voice>
+    *: "Never played tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Favourite artists"
+  </dest>
+  <voice>
+    *: "Favourite artists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Favourite albums"
+  </dest>
+  <voice>
+    *: "Favourite albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Recent favourites"
+  </dest>
+  <voice>
+    *: "Recent favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "New favourites"
+  </dest>
+  <voice>
+    *: "New favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Forgotten favourites"
+  </dest>
+  <voice>
+    *: "Forgotten favourites"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Tracks by"
+  </dest>
+  <voice>
+    *: "Tracks by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "View Album Art"
+  </dest>
+  <voice>
+    *: "View Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[By album]"
+  </dest>
+  <voice>
+    *: "All tracks sorted by album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Output Select"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Output Select"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Headphone"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Headphone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Unable to load font: (%s)"
+  </dest>
+  <voice>
+    *: "Unable to load font"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Logging"
+  </dest>
+  <voice>
+    *: "logging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "View log"
+  </dest>
+  <voice>
+    *: "view log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Playlist finished. Play again?"
+  </dest>
+  <voice>
+    *: "Playlist finished. Play again?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Sort Playlists"
+  </dest>
+  <voice>
+    *: "sort playlists"
   </voice>
 </phrase>
