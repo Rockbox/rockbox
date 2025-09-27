@@ -2698,6 +2698,7 @@ fi
    80|ipodnano3g)
     target_id=117
     modelname="ipodnano3g"
+    blonly="yes"
     target="IPOD_NANO3G"
     memory=32 # always
     arm926ejscc
@@ -2707,7 +2708,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2721,6 +2721,7 @@ fi
    81|ipodnano4g)
     target_id=118
     modelname="ipodnano4g"
+    blonly="yes"
     target="IPOD_NANO4G"
     memory=32 # always
     arm1176jzscc
@@ -2730,7 +2731,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3015,6 +3015,7 @@ fi
    110|meizum6sl)
     target_id=49
     modelname="meizum6sl"
+    blonly="yes"
     target="MEIZU_M6SL"
     memory=16 # always
     arm940tbecc
@@ -3036,6 +3037,7 @@ fi
    111|meizum6sp)
     target_id=46
     modelname="meizum6sp"
+    blonly="yes"
     target="MEIZU_M6SP"
     memory=16 # always
     arm940tbecc
@@ -4285,6 +4287,7 @@ fi
    248|erosqnative_v3)
     target_id=116
     modelname="erosqnative_v3"
+    blonly="yes"
     target="EROS_QN"
     memory=32
     mipsr2elcc
@@ -4312,6 +4315,7 @@ fi
     249|erosqnative_v4)
     target_id=116
     modelname="erosqnative_v4"
+    blonly="yes"
     target="EROS_QN"
     memory=32
     mipsr2elcc
