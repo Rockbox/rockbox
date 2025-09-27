@@ -89,6 +89,18 @@
 #endif
 #define NODEFAULT INT(0)
 
+#ifdef HAVE_TOUCHSCREEN
+#if defined(APPLICATION) \
+ || defined(ONDA_VX747)  \
+ || defined(ONDA_VX767)  \
+ || defined(ONDA_VX747P) \
+ || defined(ONDA_VX777)
+#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_POINT
+#else
+#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_BUTTON
+#endif
+#endif /* HAVE_TOUCHSCREEN */
+
 /* in all the following macros the args are:
     - flags: bitwise | or the F_ bits in settings_list.h
     - var: pointer to the variable being changed (usually in global_settings)
@@ -115,16 +127,16 @@
    yes_id is the lang_id for the 'yes' (or 'on') option in the menu
    no_id is the lang_id for the 'no' (or 'off') option in the menu
  */
-#ifdef __PCTOOL_
-#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes_id,no_id,cb)\
-            {flags|F_BOOL_SETTING, &global_settings.var,                    \
-                lang_id, BOOL(default),name,                                \
-                {.bool_setting=(struct bool_setting[]){{cb,yes_id,no_id,cfgvals}}} }
-#else
+#ifdef __PCTOOL__
 #define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes_id,no_id,cb)\
             {flags|F_BOOL_SETTING, &global_settings.var,                    \
                 lang_id, BOOL(default),name,                                \
                 {.bool_setting=(struct bool_setting[]){{NULL,yes_id,no_id,cfgvals}}} }
+#else
+#define BOOL_SETTING(flags,var,lang_id,default,name,cfgvals,yes_id,no_id,cb)\
+            {flags|F_BOOL_SETTING, &global_settings.var,                    \
+                lang_id, BOOL(default),name,                                \
+                {.bool_setting=(struct bool_setting[]){{cb,yes_id,no_id,cfgvals}}} }
 #endif
 
 /* bool setting which does use LANG_YES and _NO and save as "off,on" */
@@ -186,6 +198,15 @@
 
 /* Similar to above, except the strings to display are taken from cfg_vals,
    the ... arg is a list of ID's to talk for the strings, can use TALK_ID()'s */
+#ifdef __PCTOOL__
+#define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,          \
+                                                                cb,count,...)  \
+            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                     \
+                &global_settings.var, lang_id,                                 \
+                INT(default), name,                                            \
+                {.choice_setting = (struct choice_setting[]){                  \
+                    {NULL, count, cfg_vals, {.talks = (const int[]){__VA_ARGS__}}}}}}
+#else
 #define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,          \
                                                                 cb,count,...)  \
             {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                     \
@@ -193,6 +214,7 @@
                 INT(default), name,                                            \
                 {.choice_setting = (struct choice_setting[]){                  \
                     {cb, count, cfg_vals, {.talks = (const int[]){__VA_ARGS__}}}}}}
+#endif
 
 /*  for settings which use the set_int() setting screen.
     unit is the UNIT_ define to display/talk.
@@ -263,7 +285,7 @@
                        is_change, set_default)                          \
             {flags|F_CUSTOM_SETTING|F_T_CUSTOM|F_BANFROMQS,             \
                 &global_settings.var, lang_id,                          \
-                {.custom = (void*)default}, name,                       \
+                {.custom = NULL}, name,                                 \
             {.custom_setting = (struct custom_setting[]){               \
              {NULL, NULL, NULL, NULL}}}}
 #else
@@ -798,19 +820,8 @@ static void qs_set_default(void* var, void* defaultval)
     *(const struct settings_list **)var = find_setting(defaultval);
 }
 #endif
+
 #ifdef HAVE_TOUCHSCREEN
-
-#if defined(APPLICATION) \
- || defined(ONDA_VX747)  \
- || defined(ONDA_VX767)  \
- || defined(ONDA_VX747P) \
- || defined(ONDA_VX777)
-
-#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_POINT
-#else
-#define DEFAULT_TOUCHSCREEN_MODE TOUCHSCREEN_BUTTON
-#endif
-
 static void tsc_load_from_cfg(void* setting, char*value)
 {
     struct touchscreen_parameter *var = (struct touchscreen_parameter*) setting;
