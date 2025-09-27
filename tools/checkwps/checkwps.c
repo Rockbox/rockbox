@@ -39,9 +39,6 @@ bool debug_wps = false;
 int wps_verbose_level = 0;
 char *skin_buffer;
 
-const struct settings_list *settings;
-const int nb_settings = 0;
-
 #ifdef SIMULATOR
 #error beep beep
 #endif

@@ -76,11 +76,13 @@
 #include "bootchart.h"
 #include "scroll_engine.h"
 
+#ifndef __PCTOOL__
 struct user_settings global_settings;
 struct system_status global_status;
 static uint32_t user_settings_crc;
 static long next_status_update_tick;
 static long lasttime = 0;
+#endif
 
 /* flush system_status more often for spinning harddisks as we may not be able
  * to spin up at shutdown in order to save so keep the gap minimal */
@@ -106,6 +108,14 @@ static long lasttime = 0;
 #include "usb-ibasso.h"
 #endif
 
+#ifdef LOGF_ENABLE
+static char *debug_get_flags(uint32_t flags);
+#undef DEBUGF /* allow DEBUGF or logf not both */
+#define DEBUGF(...) do { } while(0)
+#endif
+
+#ifndef __PCTOOL__
+
 #ifdef ROCKBOX_NO_TEMP_SETTINGS_FILE /* Overwrites same file each time */
 #define CONFIGFILE_TEMP CONFIGFILE
 #define RESUMEFILE_TEMP RESUMEFILE
@@ -114,11 +124,6 @@ static long lasttime = 0;
 #define CONFIGFILE_TEMP CONFIGFILE".new"
 #define RESUMEFILE_TEMP RESUMEFILE".new"
 
-#ifdef LOGF_ENABLE
-static char *debug_get_flags(uint32_t flags);
-#undef DEBUGF /* allow DEBUGF or logf not both */
-#define DEBUGF(...) do { } while(0)
-#endif
 static void debug_available_settings(void);
 
 static void rename_temp_file(const char *tempfile,
@@ -1166,6 +1171,7 @@ const struct settings_list* find_setting(const void* variable)
 
     return NULL;
 }
+#endif /* __PCTOOL__ */
 
 const struct settings_list* find_setting_by_cfgname(const char* name)
 {
@@ -1187,6 +1193,7 @@ const struct settings_list* find_setting_by_cfgname(const char* name)
     return NULL;
 }
 
+#ifndef __PCTOOL__
 bool set_bool(const char* string, const bool* variable )
 {
     return set_bool_options(string, variable,
@@ -1457,3 +1464,4 @@ static void debug_available_settings(void)
     logf("End Available Settings\r\n");
 #endif
 }
+#endif /* __PCTOOL__ */

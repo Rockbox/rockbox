@@ -21,18 +21,17 @@
 #ifndef _ICONS_H_
 #define _ICONS_H_
 
-#ifndef PLUGIN
+#if !defined(PLUGIN) && !defined(__PCTOOL__)
 
 #include <lcd.h>
 #include "metadata.h"
 
 /* External bitmaps */
-
 #include "bitmaps/rockboxlogo.h"
 #ifdef HAVE_REMOTE_LCD
 #include "bitmaps/remote_rockboxlogo.h"
 #endif
-#endif /* PLUGIN */
+#endif /* !(PLUGIN || __PCTOOL__) */
 
 struct cbmp_bitmap_info_entry /* */
 {

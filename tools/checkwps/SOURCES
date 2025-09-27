@@ -4,6 +4,8 @@
 ../../apps/gui/viewport.c
 ../../apps/language.c
 ../../apps/misc.c
+../../apps/settings.c
+../../apps/settings_list.c
 ../../firmware/common/strmemccpy.c
 ../../firmware/common/strlcpy.c
 ../../firmware/common/pathfuncs.c

@@ -829,19 +829,12 @@ static int parse_setting_and_lang(struct skin_element *element,
     }
     else
     {
-    /* NOTE: The string validations that happen here will
-     * automatically PASS on checkwps because its too hard to get
-     * settings_list.c built for a specific target.
-     * If that ever changes remove the #ifndef __PCTOOL__ here
-     */
-#ifndef __PCTOOL__
         const struct settings_list *setting = find_setting_by_cfgname(temp);
         if (!setting) {
             DEBUGF("Invalid setting [%s]\n", temp);
             return WPS_ERROR_INVALID_PARAM;
         }
         token->value.xdata = (void *)setting;
-#endif
     }
     return 0;
 }
