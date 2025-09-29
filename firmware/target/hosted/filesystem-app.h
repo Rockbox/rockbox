@@ -58,7 +58,11 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #ifdef WIN32
 #include "filesystem-win32.h"
 #else /* !WIN32 */
+#if defined(CTRU) && !defined(SIMULATOR)
+#include "filesystem-ctru.h"
+#else
 #include "filesystem-unix.h"
+#endif
 #endif /* WIN32 */
 #include "filesystem-hosted.h"
 

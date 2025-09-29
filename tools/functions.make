@@ -40,6 +40,8 @@ ifndef APP_TYPE
 objcopy = $(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $(1) $(2)	# objcopy native
 else ifneq (,$(findstring sdl-sim,$(APP_TYPE)))
 objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)		# objcopy simulator
+else ifneq (,$(findstring ctru,$(MODELNAME))) 		# 3dsxtool requires symbols
+objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)
 else
   ifdef DEBUG
     objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)	# objcopy hosted (DEBUG)

@@ -128,7 +128,12 @@ void tree_unlock_cache(struct tree_context *t);
 #else
 #define getcwd_size_t size_t
 #endif
+#ifdef CTRU
+/* devkitarm already defines getcwd */
+char *__wrap_getcwd(char *buf, getcwd_size_t size);
+#else
 char *getcwd(char *buf, getcwd_size_t size);
+#endif
 void reload_directory(void);
 bool check_rockboxdir(void);
 struct tree_context* tree_get_context(void);

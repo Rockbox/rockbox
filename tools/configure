@@ -1009,6 +1009,90 @@ rgnanocc () {
     rbdir="/FunKey/.rockbox"
 }
 
+devkitarmcc () {
+    if [ -z "$DEVKITPRO" ]; then
+        echo "ERROR: You need a devkitPro toolchain and libraries installed"
+        echo "and have the DEVKITPRO environment variable point to the root"
+        echo "of the devkitPro installation."
+        echo "More info at https://devkitpro.org/wiki/Getting_Started"
+        exit
+    fi
+
+    if [ -z "$DEVKITARM" ]; then
+        echo "ERROR: You need devkitARM toolchain installed and have the DEVKITARM"
+        echo "environment variable point to the root directory of the sdk."
+        exit
+    fi
+
+    # check for additional dependencies
+    if [ ! -e "$DEVKITPRO/portlibs/3ds/lib/libCTRL.a" ]; then
+        echo "ERROR: You need to install libCTRL utility library."
+        echo "https://github.com/kynex7510/CTRL"
+        exit
+    fi
+
+    if [ ! -e "$DEVKITPRO/portlibs/3ds/lib/libdl.a" ]; then
+        echo "ERROR: You need to install libdl implementation for 3ds (CTRDL)"
+        echo "https://github.com/kynex7510/CTRDL"
+        exit
+    fi
+
+    if [ ! -n "`findtool makerom`" ]; then
+        echo "ERROR: makerom not found, please install and run configure again."
+        echo "https://github.com/3DSGuy/Project_CTR"
+        exit
+    fi
+
+    if [ ! -n "`findtool bannertool`" ]; then
+        echo "ERROR: bannertool not found, please install and run configure again."
+        echo "https://github.com/carstene1ns/3ds-bannertool"
+        exit
+    fi
+
+    arch="arm"
+    arch_version="6"
+    arch_profile="classic"
+
+    CC=$DEVKITARM/bin/arm-none-eabi-gcc
+    CPP=$DEVKITARM/bin/arm-none-eabi-cpp
+    LD=$DEVKITARM/bin/arm-none-eabi-ld
+    AR=$DEVKITARM/bin/arm-none-eabi-gcc-ar
+    AS=$DEVKITARM/bin/arm-none-eabi-as
+    OC=$DEVKITARM/bin/arm-none-eabi-objcopy
+    WINDRES=windres
+    DLLTOOL=dlltool
+    DLLWRAP=dllwrap
+    RANLIB=$DEVKITARM/bin/arm-none-eabi-gcc-ranlib
+
+    if [ "yes" = "$use_debug" ]; then
+        GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`
+    fi
+
+    GCCOPTS="$GCCOPTS -fno-builtin -g -Wno-unused-result"
+    GCCOPTS="$GCCOPTS -I$DEVKITPRO/libctru/include -I$DEVKITPRO/portlibs/3ds/include"
+    GCCOPTS="$GCCOPTS -mword-relocations -ffunction-sections -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft"
+    GCCOPTS="$GCCOPTS -D_GNU_SOURCE=1 -D_REENTRANT -masm-syntax-unified"
+
+    SHARED_LDFLAGS="-shared"
+    SHARED_CFLAGS="-fPIC -fvisibility=hidden"
+
+    LDOPTS="-specs=3dsx.specs -L$DEVKITPRO/libctru/lib -L$DEVKITPRO/portlibs/3ds/lib -ldl -lCTRL -lctru -lm"
+    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft"
+
+    # let's allow building shared libraries even if unresolved symbols are found,
+    # CTRDL (libdl) implementation will use a custom resolver for resolve symbols at runtime.
+    # TODO: use ResGen command to automatically detect unresolved symbols.
+    GLOBAL_LDOPTS=`echo $GLOBAL_LDOPTS | sed -e s/\-Wl,-z,defs//`
+
+    # devkitarm already defines getcwd
+    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-wrap,getcwd"
+
+    ARG_PREFIX="romfs"
+
+    extradefines="-D__3DS__"
+    rbdir="/3ds/.rockbox"
+}
+
 
 do_bootloader() {
       appsdir='$(ROOTDIR)/bootloader'
@@ -1779,6 +1863,9 @@ cat <<EOF
                                                         (hw4 bl only)
  ==Echo project==          ==Surfans==
  270) Echo R1 (WIP)        280) F28 (WIP)
+
+ ==Nintendo==
+ 290) Nintendo 3DS (WIP)
 EOF
 
   buildfor=`input`;
@@ -4471,6 +4558,28 @@ fi
     sysfontbl="16-Terminus"
     ;;
 
+    290|ctru)
+    target_id=122
+    application="yes"
+    modelname="ctru"
+    app_type="ctru-app"
+    target="CTRU"
+    memory=16
+    uname=`uname`
+    devkitarmcc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui"
+    plugins="no"
+    t_cpu="hosted"
+    t_manufacturer="ctru"
+    t_model="app"
+    ;;
+
    *)
     echo "Please select a supported target platform!"
     exit 7
@@ -5024,6 +5133,9 @@ if test -n "$t_cpu"; then
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
   elif [ "$t_manufacturer" = "ibasso" ]; then
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ibasso/tinyalsa/include"
+  elif [ "$application" = "yes" ] && [ "$t_manufacturer" = "ctru" ]; then
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ctru/lib"
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ctru/lib/bfile"
   fi
 
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"

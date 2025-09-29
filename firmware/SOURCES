@@ -25,7 +25,7 @@ target/hosted/rtc.c
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0 && \
     !defined(DX50) && !defined(DX90) && \
-    (defined(DEBUG) || defined(SIMULATOR)) /* sim should define DEBUG instead */
+    (defined(DEBUG) || defined(SIMULATOR) || defined(CTRU)) /* sim should define DEBUG instead */
 target/hosted/debug-hosted.c
 #endif
 
@@ -94,12 +94,14 @@ target/hosted/sdl/app/button-application.c
 #ifdef WIN32
 target/hosted/filesystem-win32.c
 #else /* !WIN32 */
+#ifndef CTRU
 target/hosted/filesystem-unix.c
+#endif /* CTRU */
 #endif /* WIN32 */
 #endif /* APPLICATION */
 #endif /* HAVE_SDL */
 
-#ifdef APPLICATION
+#if defined(APPLICATION) && !defined(CTRU)
 target/hosted/filesystem-app.c
 #endif /* APPLICATION */
 
@@ -581,6 +583,8 @@ target/hosted/maemo/pcm-gstreamer.c
 target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 
+#elif defined(CTRU)
+drivers/audio/ctru.c
 #endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 
@@ -2071,6 +2075,28 @@ target/hosted/ibasso/dx90/button-dx90.c
 #endif
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_CTRU)
+asm/arm/lcd-as-memframe.S
+target/hosted/ctru/backlight-ctru.c
+target/hosted/ctru/button-ctru.c
+target/hosted/ctru/kernel-ctru.c
+target/hosted/ctru/thread-ctru.c
+target/hosted/ctru/lcd-bitmap.c
+target/hosted/ctru/luminance-ctru.c
+target/hosted/ctru/system-ctru.c
+target/hosted/ctru/filesystem-ctru.c
+target/hosted/ctru/lc-ctru.c
+target/hosted/ctru/lc-program-resolver.c
+target/hosted/ctru/powermgmt-ctru.c
+target/hosted/ctru/timer-ctru.c
+target/hosted/ctru/pcm-ctru.c
+target/hosted/ctru/lib/sys_file.c
+target/hosted/ctru/lib/sys_dir.c
+target/hosted/ctru/lib/sys_thread.c
+target/hosted/ctru/lib/sys_timer.c
+target/hosted/ctru/lib/bfile/bfile.c
+#endif
+
 #else /* defined(SIMULATOR) */
 
 #ifdef WIN32
@@ -2119,9 +2145,9 @@ kernel/queue.c
 #ifdef HAVE_SEMAPHORE_OBJECTS
 kernel/semaphore.c
 #endif
-#if defined(HAVE_SDL_THREADS)
+#ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
-#else
+#elif !defined(CTRU)
 kernel/thread.c
 #endif
 kernel/thread-common.c

@@ -21,8 +21,9 @@
 #ifndef HOSTED_CODEC_H
 #define HOSTED_CODEC_H
 
-#if defined(HAVE_SDL_AUDIO) \
-    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
+#if (defined(HAVE_SDL_AUDIO) \
+    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)) \
+    || (CONFIG_PLATFORM & PLATFORM_CTRU)
 AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
 #else
 #define AUDIOHW_CAPS    (MONO_VOL_CAP)

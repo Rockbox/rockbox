@@ -28,7 +28,9 @@
 #include "fs_attr.h"
 #include "fs_defines.h"
 
-#if defined (APPLICATION) || defined(CHECKWPS)
+#if defined(CTRU) && !defined(SIMULATOR)
+#include "filesystem-ctru.h"
+#elif defined (APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"
 #elif defined(SIMULATOR) || defined(DBTOOL)
 #include "../../uisimulator/common/filesystem-sim.h"

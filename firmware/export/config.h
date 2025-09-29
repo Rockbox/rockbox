@@ -85,6 +85,7 @@
 #define RK27XX       2700
 #define X1000        1000
 #define STM32H743   32743
+#define N10480H     10480
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -98,6 +99,7 @@
 #define PLATFORM_MAEMO5  (1<<5)
 #define PLATFORM_MAEMO   (PLATFORM_MAEMO4|PLATFORM_MAEMO5)
 #define PLATFORM_PANDORA (1<<6)
+#define PLATFORM_CTRU    (1<<7)
 
 /* CONFIG_KEYPAD */
 #define IRIVER_H100_PAD     4
@@ -167,6 +169,7 @@
 #define ECHO_R1_PAD        75
 #define SURFANS_F28_PAD    76
 #define RG_NANO_PAD        77
+#define CTRU_PAD           78
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -623,6 +626,8 @@ Lyre prototype 1 */
 #include "config/surfansf28.h"
 #elif defined(RG_NANO)
 #include "config/rgnano.h"
+#elif defined(CTRU)
+#include "config/ctru.h"
 #else
 #error "unknown hardware platform!"
 #endif
@@ -650,7 +655,7 @@ Lyre prototype 1 */
 # define CONFIG_BUFLIB_BACKEND BUFLIB_BACKEND_MEMPOOL
 #endif
 
-#ifdef APPLICATION
+#if defined(APPLICATION)
 #ifndef CONFIG_CPU
 #define CONFIG_CPU 0
 #endif
@@ -1033,7 +1038,8 @@ Lyre prototype 1 */
 
 #if defined(ASSEMBLER_THREADS) \
     || defined(HAVE_WIN32_FIBER_THREADS) \
-    || defined(HAVE_SIGALTSTACK_THREADS)
+    || defined(HAVE_SIGALTSTACK_THREADS) \
+    || defined(CTRU)
 #define HAVE_PRIORITY_SCHEDULING
 #endif
 
@@ -1104,7 +1110,7 @@ Lyre prototype 1 */
  * Older versions of GCC emit assembly in divided syntax with no option
  * to enable unified syntax.
  */
-#if (__GNUC__ < 8) && defined(CPU_ARM_CLASSIC)
+#if (__GNUC__ < 8) && defined(CPU_ARM_CLASSIC) || defined(CTRU)
 #define BEGIN_ARM_ASM_SYNTAX_UNIFIED ".syntax unified\n"
 #define END_ARM_ASM_SYNTAX_UNIFIED   ".syntax divided\n"
 #else

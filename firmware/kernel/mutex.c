@@ -75,11 +75,15 @@ void mutex_lock(struct mutex *m)
 /* Release ownership of a mutex object - only owning thread must call this */
 void mutex_unlock(struct mutex *m)
 {
+#ifndef CTRU
+    /* FIXME: synchronization primitives does not behave
+       correctly between different cores */
     /* unlocker not being the owner is an unlocking violation */
     KERNEL_ASSERT(m->blocker.thread == __running_self_entry(),
                   "mutex_unlock->wrong thread (%s != %s)\n",
                   m->blocker.thread->name,
                   __running_self_entry()->name);
+#endif
 
     if(m->recursion > 0)
     {

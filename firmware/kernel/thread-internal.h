@@ -32,7 +32,7 @@
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
 
-#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__)
+#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(CTRU)
 struct regs
 {
     void *t;             /* OS thread */

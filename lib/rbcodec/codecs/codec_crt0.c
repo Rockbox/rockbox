@@ -31,6 +31,12 @@ extern unsigned char plugin_end_addr[];
  * avoid warning with certain compilers */
 int _start(void) {return 0;}
 
+#ifdef CTRU
+/* dummy undefined symbols */
+void __aeabi_unwind_cpp_pr0(void) {}
+struct _reent * _EXFUN(__getreent, (void)) {}
+#endif
+
 enum codec_status codec_start(enum codec_entry_call_reason reason)
 {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)

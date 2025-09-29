@@ -171,6 +171,9 @@ else # core
   ifneq (,$(findstring rgnano, $(MODELNAME)))
 	include $(ROOTDIR)/packaging/rgnano/rgnano.make
   endif
+  ifneq (,$(findstring ctru, $(APP_TYPE)))
+  include $(ROOTDIR)/packaging/ctru/ctru.make
+  endif
 
 endif # bootloader
 

@@ -35,6 +35,10 @@ extern void ldebugf(const char* file, int line, const char *fmt, ...)
     || (defined(APPLICATION) && defined(DEBUG))
 #define DEBUGF  debugf
 #define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
+#elif (CONFIG_PLATFORM & PLATFORM_CTRU)
+/* let's use second display for debug output */
+#define DEBUGF debugf
+#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
 #elif defined(DEBUG) /* DEBUG on native targets */
 
 #ifdef HAVE_GDB_API

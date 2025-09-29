@@ -40,7 +40,9 @@ enum relate_result
     RELATE_PREFIX,        /* the path2 contains path1 as a prefix */
 };
 
-#if defined(APPLICATION) || defined(CHECKWPS)
+#if defined(CTRU) && !defined(SIMULATOR)
+#include "filesystem-ctru.h"
+#elif defined(APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"
 #elif defined(SIMULATOR) || defined(DBTOOL)
 #include "../../uisimulator/common/filesystem-sim.h"

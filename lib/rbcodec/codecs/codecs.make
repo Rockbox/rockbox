@@ -137,6 +137,10 @@ ifeq ($(ARCH),arch_arm)
   $(SGCLIB) : CODECFLAGS +=  -O1
   $(VGMLIB) : CODECFLAGS +=  -O1
   $(WAVPACKLIB) : CODECFLAGS += -O3
+  ifneq (,$(findstring ctru, $(MODELNAME)))
+    # segfault with -O1
+    $(SPCLIB) : CODECFLAGS += -O2
+  endif
 else ifeq ($(ARCH),arch_m68k)
   $(CODECLIB) : CODECFLAGS += -O2
   $(A52LIB) : CODECFLAGS += -O2
