@@ -191,6 +191,65 @@ static const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
 
+static const struct button_mapping button_context_usb_hid[] = {
+    {ACTION_USB_HID_MODE_SWITCH_NEXT,               BUTTON_POWER,        BUTTON_NONE},
+    LAST_ITEM_IN_LIST,
+}; /* button_context_usb_hid */
+
+static const struct button_mapping button_context_usb_hid_mode_multimedia[] = {
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_VOL_UP,                  BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_SCROLL_FWD,              BUTTON_NONE}, // might be annoying
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_VOL_DOWN,                BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_SCROLL_BACK,             BUTTON_NONE}, // might be annoying
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_MUTE,         BUTTON_MENU|BUTTON_REL,         BUTTON_MENU},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_PLAY_PAUSE, BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       BUTTON_POWER|BUTTON_REPEAT,     BUTTON_POWER},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_PREV, BUTTON_PREV,                    BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_TRACK_NEXT, BUTTON_NEXT,                    BUTTON_NONE},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_multimedia */
+
+static const struct button_mapping button_context_usb_hid_mode_presentation[] = {
+    // TODO
+    // {ACTION_USB_HID_PRESENTATION_SLIDESHOW_START,   BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY},
+    // {ACTION_USB_HID_PRESENTATION_SLIDESHOW_LEAVE,   BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_PLAY},
+    // {ACTION_USB_HID_PRESENTATION_SLIDE_PREV,        BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT},
+    // {ACTION_USB_HID_PRESENTATION_SLIDE_NEXT,        BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT},
+    // {ACTION_USB_HID_PRESENTATION_SLIDE_FIRST,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT},
+    // {ACTION_USB_HID_PRESENTATION_SLIDE_LAST,        BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT},
+    // {ACTION_USB_HID_PRESENTATION_SCREEN_BLACK,      BUTTON_VOL_UP,                  BUTTON_NONE},
+    // {ACTION_USB_HID_PRESENTATION_SCREEN_WHITE,      BUTTON_VOL_DOWN,                BUTTON_NONE},
+    // {ACTION_USB_HID_PRESENTATION_LINK_PREV,         BUTTON_MENU,                    BUTTON_NONE},
+    // {ACTION_USB_HID_PRESENTATION_LINK_NEXT,         BUTTON_BACK,                    BUTTON_NONE},
+    // {ACTION_USB_HID_PRESENTATION_MOUSE_CLICK,       BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT},
+    // {ACTION_USB_HID_PRESENTATION_MOUSE_OVER,        BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_presentation */
+
+static const struct button_mapping button_context_usb_hid_mode_browser[] = {
+    // TODO
+    // {ACTION_USB_HID_BROWSER_SCROLL_UP,              BUTTON_SCROLL_BACK,                 BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_UP,              BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_DOWN,            BUTTON_SCROLL_FWD,                  BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_DOWN,            BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_PAGE_DOWN,       BUTTON_DOWN,                        BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_PAGE_UP,         BUTTON_UP,                          BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_PAGE_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_SCROLL_PAGE_UP,         BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_ZOOM_IN,                BUTTON_VOL_UP,                      BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_ZOOM_OUT,               BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    // {ACTION_USB_HID_BROWSER_ZOOM_RESET,             BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    // {ACTION_USB_HID_BROWSER_TAB_PREV,               BUTTON_LEFT|BUTTON_REL,             BUTTON_LEFT},
+    // {ACTION_USB_HID_BROWSER_TAB_NEXT,               BUTTON_RIGHT|BUTTON_REL,            BUTTON_RIGHT},
+    // {ACTION_USB_HID_BROWSER_TAB_CLOSE,              BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT},
+    // {ACTION_USB_HID_BROWSER_HISTORY_BACK,           BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_LEFT},
+    // {ACTION_USB_HID_BROWSER_HISTORY_FORWARD,        BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_RIGHT},
+    // {ACTION_USB_HID_BROWSER_VIEW_FULL_SCREEN,       BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_browser */
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -234,6 +293,18 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_KEYBOARD:
         case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
+
+        case CONTEXT_USB_HID:
+            return button_context_usb_hid;
+
+        case CONTEXT_USB_HID_MODE_MULTIMEDIA:
+            return button_context_usb_hid_mode_multimedia;
+
+        case CONTEXT_USB_HID_MODE_PRESENTATION:
+            return button_context_usb_hid_mode_presentation;
+
+        case CONTEXT_USB_HID_MODE_BROWSER:
+            return button_context_usb_hid_mode_browser;
 
         default:
             return button_context_standard;
