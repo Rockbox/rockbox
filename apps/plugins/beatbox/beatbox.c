@@ -606,7 +606,6 @@ int beatboxmain()
                     {
                         vol++;
                         rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_status->volume = vol;
                     }
                     break;
 
@@ -617,7 +616,6 @@ int beatboxmain()
                     {
                         vol--;
                         rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_status->volume = vol;
                     }
                     break;
 

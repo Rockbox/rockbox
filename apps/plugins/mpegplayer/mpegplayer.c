@@ -1897,10 +1897,8 @@ static void osd_set_volume(int delta)
     }
 
     /* Sync the global settings */
-    if (vol != rb->global_status->volume) {
+    if (vol != rb->global_status->volume)
         rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_status->volume = vol;
-    }
 
     /* Update the volume display */
     osd_refresh(OSD_REFRESH_VOLUME);

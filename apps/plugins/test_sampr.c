@@ -174,7 +174,6 @@ static void set_frequency(int index)
 #ifndef HAVE_VOLUME_IN_LIST
 static void set_volume(int value)
 {
-    rb->global_status->volume = value;
     rb->sound_set(SOUND_VOLUME, value);
 }
 

@@ -601,7 +601,6 @@ static int midimain(const void * filename)
                 {
                     vol++;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_status->volume = vol;
                 }
                 break;
             }
@@ -614,7 +613,6 @@ static int midimain(const void * filename)
                 {
                     vol--;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_status->volume = vol;
                 }
                 break;
             }

@@ -594,9 +594,6 @@ bool option_screen(const struct settings_list *setting,
             if (!cb_on_changed || (*variable != oldvalue))
             {
                 function(*variable);
-                /* if the volume is changing we need to let the skins know */
-                if (function == sound_get_fn(SOUND_VOLUME))
-                    global_status.last_volume_change = current_tick;
             }
         }
 

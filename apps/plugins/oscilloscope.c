@@ -2131,7 +2131,6 @@ enum plugin_status plugin_start(const void* parameter)
                 {
                     vol++;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_status->volume = vol;
                 }
 
                 osc_popupmsg(OSC_MSG_VOLUME, vol);
@@ -2147,7 +2146,6 @@ enum plugin_status plugin_start(const void* parameter)
                 {
                     vol--;
                     rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_status->volume = vol;
                 }
 
                 osc_popupmsg(OSC_MSG_VOLUME, vol);

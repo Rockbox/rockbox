@@ -316,6 +316,11 @@ void sound_set_volume(int value)
     if (!audio_is_initialized)
         return;
 
+#ifndef BOOTLOADER
+    global_status.volume = value;
+    global_status.last_volume_change = current_tick;
+#endif
+
 #if defined(AUDIOHW_HAVE_CLIPPING)
     audiohw_set_volume(value);
 #else

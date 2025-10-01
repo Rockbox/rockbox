@@ -654,7 +654,6 @@ static void change_volume(int delta) {
     else if (vol < minvol) vol = minvol;
     if (vol != rb->global_status->volume) {
         rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_status->volume = vol;
         rb->lcd_putsxyf(0,0, "%d", vol);
         rb->lcd_update();
         rb->sleep(HZ/12);
