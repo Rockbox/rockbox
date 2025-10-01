@@ -791,6 +791,18 @@ sub simbuilds {
 	},
 	'enabled' => 1,
     },
+    'magyar' => {
+	'lang' => 'magyar',
+	'name' => 'Magyar (Hungarian)',
+        'short' => 'hu',
+        'defengine' => 'piper',
+	'engines' => {
+	    'espeak' => '-vhu',
+	    'gtts' => '-l hu',
+            'piper' => 'hu_HU-berta-medium.onnx',
+	},
+	'enabled' => 0,
+    },
     'nederlands' => {
 	'lang' => 'nederlands',
 	'name' => 'Nederlands (Dutch)',
