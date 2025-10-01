@@ -76,7 +76,7 @@ EOF
     # Parse out puzzle definitions to build SOURCES.games, but exclude
     # nullgame, and also #ifdef also memory-intensive games on
     # low-memory targets.
-    EXCLUDE_GAMES_ALWAYS="nullgame|group|separate"
+    EXCLUDE_GAMES_ALWAYS="nullgame|separate"
 
     cat src/CMakeLists.txt |
         awk '/puzzle\(/{p=1} p{print} /\)/{p=0}' | # parse out puzzle(...)
@@ -92,6 +92,15 @@ EOF
     popd > /dev/null
 
     EXCLUDE_GAMES_LOW_MEMORY="loopy|pearl|solo"
+
+    # Linking on win32 (i.e. for sim/app builds) blows up with
+    # un-overridden weak symbols, which are used by nullhelp.c to
+    # provide fallback help text variables for the unfinished
+    # plugins. A possible fix to support those games on win32 would be
+    # to compile two versions of rockbox.o with a preprocessor flag to
+    # prevent referencing the help variables in unfinished builds.
+    #
+    # But for now, we just disable the unfinished plugins on win32.
     EXCLUDE_GAMES_WIN32="unfinished"
 
     cat src/unfinished/CMakeLists.txt |

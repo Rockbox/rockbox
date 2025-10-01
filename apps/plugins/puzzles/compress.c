@@ -158,7 +158,7 @@ int main()
     printf("};\n\n");
     printf("const unsigned short help_text_len = %d;\n", help_text_len);
     printf("const unsigned short help_text_words = %d;\n", word_idx);
-    printf("const bool help_valid = true;\n");
+    printf("const bool help_text_valid = true;\n");
 
     return 0;
 }

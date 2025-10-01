@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016-2024 Franklin Wei
+ * Copyright (C) 2016-2025 Franklin Wei
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -328,6 +328,9 @@ extern bool audiobuf_available; /* defined in rbmalloc.c */
 
 static fb_data *zoom_fb; /* dynamically allocated */
 static int zoom_x = -1, zoom_y = -1, zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
+
+static int game_w, game_h;
+
 static bool zoom_force_center;
 static int cur_font = FONT_UI;
 
@@ -1159,6 +1162,14 @@ static void rb_blitter_save(drawing *dr, blitter *bl, int x, int y)
 #endif
 }
 
+/*
+ * This works around a breaking change introduced by this upstream
+ * commit:
+ *
+ * https://git.tartarus.org/?p=simon/puzzles.git;a=commit;h=c9070b4b40dcf1d1c5294bc827fe996a8925e7f5
+ */
+#define BLITTER_FROMSAVED -16000
+
 static void rb_blitter_load(drawing *dr, blitter *bl, int x, int y)
 {
     LOGF("rb_blitter_load");
@@ -1224,6 +1235,8 @@ static void rb_start_draw(drawing *dr)
     ud_r = LCD_WIDTH;
     ud_u = 0;
     ud_d = LCD_HEIGHT;
+
+    rb_clip(NULL, 0, 0, game_w, game_h);
 }
 
 static void rb_end_draw(drawing *dr)
@@ -2717,8 +2730,11 @@ static int pausemenu_cb(int action,
                 return ACTION_EXIT_MENUITEM;
             break;
 	case 7:
+	    if(!quick_help_valid)
+		return ACTION_EXIT_MENUITEM;
+	    break;
 	case 8:
-	    if(!help_valid)
+	    if(!help_text_valid)
 		return ACTION_EXIT_MENUITEM;
 	    break;
         case 9:
@@ -2911,11 +2927,13 @@ static size_t giant_buffer_len = 0; /* set on start */
 
 static void fix_size(void)
 {
-    int w = LCD_WIDTH, h = LCD_HEIGHT, h_x;
+    int h_x;
+    game_w = LCD_WIDTH, game_h = LCD_HEIGHT;
+
     rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize("X", NULL, &h_x);
-    h -= h_x;
-    midend_size(me, &w, &h, true, 1.0);
+    game_h -= h_x;
+    midend_size(me, &game_w, &game_h, true, 1.0);
 }
 
 static void init_tlsf(void)
@@ -3054,6 +3072,7 @@ static void tune_input(const char *name)
 
     static const char *number_chooser_games[] = {
         "Filling",
+        "Group",
         "Keen",
         "Solo",
         "Towers",
@@ -3345,8 +3364,11 @@ static int mainmenu_cb(int action,
                 return ACTION_EXIT_MENUITEM;
             break;
 	case 2:
+	    if(!quick_help_valid)
+		return ACTION_EXIT_MENUITEM;
+	    break;
         case 3:
-	    if(!help_valid)
+	    if(!help_text_valid)
 		return ACTION_EXIT_MENUITEM;
 	    break;
         case 4:

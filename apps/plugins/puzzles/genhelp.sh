@@ -6,7 +6,7 @@
 #
 # Also requires host CC and lz4 library to be available
 
-halibut --text src/puzzles.but
+halibut --text -Ctext-chapter-underline: src/puzzles.but
 
 # preprocess the input
 
@@ -105,8 +105,8 @@ EOF
 
 # TODO: Perhaps ask Simon to include special header/footer comments to
 # make this less brittle?
-cat src/CMakeLists.txt  | awk '/puzzle\(/{p=1} p{print} /\)/{p=0}' >> parsed_cmakelists.txt
-cmake -P parsed_cmakelists.txt 2>&1 | awk -F ":" '{print "const char quick_help_text[] = \""$2"\";" >> "help/"$1".c" }'
+cat src/CMakeLists.txt src/unfinished/CMakeLists.txt | awk '/puzzle\(/{p=1} p{print} /\)/{p=0}' >> parsed_cmakelists.txt
+cmake -P parsed_cmakelists.txt 2>&1 | awk -F ":" '{print "const char quick_help_text[] = \""$2"\";\nconst bool quick_help_valid = true;" >> "help/"$1".c" }'
 
 rm parsed_cmakelists.txt
 rm puzzles.txt

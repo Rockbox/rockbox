@@ -1,3 +1,6 @@
+/*
+ * This file can be safely modified, unlike SOURCES and SOURCES.games.
+ */
 rockbox.c
 rbwrappers.c
 rbmalloc.c

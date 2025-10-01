@@ -43,6 +43,12 @@ static char *string(int n, const char *fmt, ...)
     return ret;
 }
 
+enum {
+  PREF_CURSOR_MODE,
+  PREF_CLEAR_COMPLETE_REGIONS,
+  N_PREF_ITEMS
+};
+
 struct game_params {
     int w, h, k;
 };
@@ -875,6 +881,7 @@ struct game_ui {
     bool show;
 
     bool legacy_cursor;
+    bool clear_complete_regions;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -883,6 +890,7 @@ static game_ui *new_ui(const game_state *state)
     ui->x = ui->y = 1;
     ui->show = getenv_bool("PUZZLES_SHOW_CURSOR", false);
     ui->legacy_cursor = false;
+    ui->clear_complete_regions = false;
     return ui;
 }
 
@@ -890,24 +898,33 @@ static config_item *get_prefs(game_ui *ui)
 {
     config_item *cfg;
 
-    cfg = snewn(2, config_item);
+    cfg = snewn(N_PREF_ITEMS+1, config_item);
 
-    cfg[0].name = "Cursor mode";
-    cfg[0].kw = "cursor-mode";
-    cfg[0].type = C_CHOICES;
-    cfg[0].u.choices.choicenames = ":Half-grid:Full-grid";
-    cfg[0].u.choices.choicekws = ":half:full";
-    cfg[0].u.choices.selected = ui->legacy_cursor;
+    cfg[PREF_CURSOR_MODE].name = "Cursor mode";
+    cfg[PREF_CURSOR_MODE].kw = "cursor-mode";
+    cfg[PREF_CURSOR_MODE].type = C_CHOICES;
+    cfg[PREF_CURSOR_MODE].u.choices.choicenames = ":Half-grid:Full-grid";
+    cfg[PREF_CURSOR_MODE].u.choices.choicekws = ":half:full";
+    cfg[PREF_CURSOR_MODE].u.choices.selected = ui->legacy_cursor;
 
-    cfg[1].name = NULL;
-    cfg[1].type = C_END;
+    cfg[PREF_CLEAR_COMPLETE_REGIONS].name =
+        "Automatically clear edges in completed regions";
+    cfg[PREF_CLEAR_COMPLETE_REGIONS].kw = "clear-complete-regions";
+    cfg[PREF_CLEAR_COMPLETE_REGIONS].type = C_BOOLEAN;
+    cfg[PREF_CLEAR_COMPLETE_REGIONS].u.boolean.bval =
+        ui->clear_complete_regions;
+
+    cfg[N_PREF_ITEMS].name = NULL;
+    cfg[N_PREF_ITEMS].type = C_END;
 
     return cfg;
 }
 
 static void set_prefs(game_ui *ui, const config_item *cfg)
 {
-    ui->legacy_cursor = cfg[0].u.choices.selected;
+    ui->legacy_cursor = cfg[PREF_CURSOR_MODE].u.choices.selected;
+    ui->clear_complete_regions =
+        cfg[PREF_CLEAR_COMPLETE_REGIONS].u.boolean.bval;
 }
 
 static void free_ui(game_ui *ui)
@@ -1128,8 +1145,12 @@ static game_state *execute_move(const game_state *state, const char *move)
 static void game_compute_size(const game_params *params, int tilesize,
                               const game_ui *ui, int *x, int *y)
 {
-    *x = (params->w + 1) * tilesize;
-    *y = (params->h + 1) * tilesize;
+    /* Ick: fake up `ds->tilesize' for macro expansion purposes */
+    struct { int tilesize; } ads, *ds = &ads;
+    ads.tilesize = tilesize;
+
+    *x = params->w * tilesize + WIDTH + 2 * MARGIN;
+    *y = params->h * tilesize + WIDTH + 2 * MARGIN;
 }
 
 static void game_set_size(drawing *dr, game_drawstate *ds,
@@ -1243,14 +1264,16 @@ static void draw_tile(drawing *dr, game_drawstate *ds, int r, int c,
     draw_update(dr, x, y, TILESIZE + WIDTH, TILESIZE + WIDTH);
 }
 
-static void draw_cursor(drawing *dr, game_drawstate *ds,
-                        int cur_x, int cur_y, bool legacy_cursor)
+static void get_cursor_location(
+    const game_drawstate *ds, int cur_x, int cur_y, bool legacy_cursor,
+    int *center_x, int *center_y, int *w, int *h, bool *corners)
 {
     int off_x = cur_x % 2, off_y = cur_y % 2;
 
     /* Figure out the tile coordinates corresponding to these cursor
      * coordinates. */
-    int x = MARGIN + TILESIZE * (cur_x / 2), y = MARGIN + TILESIZE * (cur_y / 2);
+    int x = MARGIN + TILESIZE * (cur_x / 2),
+        y = MARGIN + TILESIZE * (cur_y / 2);
 
     /* off_x and off_y are either 0 or 1. The possible cases are
      * therefore:
@@ -1260,10 +1283,12 @@ static void draw_cursor(drawing *dr, game_drawstate *ds,
      * (1, 0): the cursor is on the top border of the tile.
      * (1, 1): the cursor is in the center of the tile.
      */
-    enum { TOP_LEFT_CORNER, LEFT_BORDER, TOP_BORDER, TILE_CENTER } cur_type = (off_x << 1) + off_y;
+    enum {
+        TOP_LEFT_CORNER, LEFT_BORDER, TOP_BORDER, TILE_CENTER
+    } cur_type = (off_x << 1) + off_y;
 
-    int center_x = x + ((off_x == 0) ? WIDTH/2 : CENTER),
-        center_y = y + ((off_y == 0) ? WIDTH/2 : CENTER);
+    *center_x = x + ((off_x == 0) ? WIDTH/2 : CENTER);
+    *center_y = y + ((off_y == 0) ? WIDTH/2 : CENTER);
 
     struct { int w, h; } cursor_dimensions[] = {
         { TILESIZE / 3, TILESIZE / 3 },         /* top left corner */
@@ -1272,16 +1297,25 @@ static void draw_cursor(drawing *dr, game_drawstate *ds,
         { 2 * TILESIZE / 3, 2 * TILESIZE / 3 }  /* center */
     }, *dims = cursor_dimensions + cur_type;
 
-    if(legacy_cursor && cur_type == TILE_CENTER)
+    *w = dims->w;
+    *h = dims->h;
+    *corners = legacy_cursor && cur_type == TILE_CENTER;
+}
+
+static void draw_cursor(drawing *dr, const game_drawstate *ds,
+                        int cur_x, int cur_y, bool legacy_cursor) {
+    int center_x, center_y, w, h;
+    bool corners;
+    get_cursor_location(ds, cur_x, cur_y, legacy_cursor, &center_x, &center_y,
+                        &w, &h, &corners);
+
+    if(corners)
         draw_rect_corners(dr, center_x, center_y, TILESIZE / 3, COL_GRID);
     else
-        draw_rect_outline(dr,
-                          center_x - dims->w / 2, center_y - dims->h / 2,
-                          dims->w, dims->h, COL_GRID);
+        draw_rect_outline(dr, center_x - w / 2, center_y - h / 2,
+                          w, h, COL_GRID);
 
-    draw_update(dr,
-                center_x - dims->w / 2, center_y - dims->h / 2,
-                dims->w, dims->h);
+    draw_update(dr, center_x - w / 2, center_y - h / 2, w, h);
 }
 
 #define FLASH_TIME 0.7F
@@ -1298,7 +1332,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
 
     if (!ds->grid) {
         char buf[40];
-        int bgw = (w+1) * ds->tilesize, bgh = (h+1) * ds->tilesize;
+        int bgw = w * ds->tilesize + WIDTH + 2 * MARGIN,
+            bgh = h * ds->tilesize + WIDTH + 2 * MARGIN;
 
         for (r = 0; r <= h; ++r)
             for (c = 0; c <= w; ++c)
@@ -1374,6 +1409,10 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
                     flags |= BORDER_ERROR(BORDER(dir));
             }
 
+            if (ui->clear_complete_regions &&
+                dsf_size(black_border_dsf, i) == k)
+                flags |= BORDER_MASK << 4;
+
             if (flags == ds->grid[i]) continue;
             ds->grid[i] = flags;
             draw_tile(dr, ds, r, c, ds->grid[i], clue);
@@ -1409,9 +1448,12 @@ static void game_get_cursor_location(const game_ui *ui,
                                      int *x, int *y, int *w, int *h)
 {
     if(ui->show) {
-        *x = MARGIN + TILESIZE * ui->x;
-        *y = MARGIN + TILESIZE * ui->y;
-        *w = *h = TILESIZE;
+        int center_x, center_y;
+        bool corners;
+        get_cursor_location(ds, ui->x, ui->y, ui->legacy_cursor,
+                            &center_x, &center_y, w, h, &corners);
+        *x = center_x - *w / 2;
+        *y = center_y - *h / 2;
     }
 }
 

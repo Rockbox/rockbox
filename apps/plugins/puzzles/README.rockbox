@@ -114,4 +114,5 @@ August 2024: Resync to ee5e327 (branched from Simon's
 August 2024: Resync to Simon's 262f709 (unmodified). Uses new scanline
 polygon filling algorithm. Updates drawing API.
 
-January 2024: Resync to Simon's XXXXXXX (TBD). Cleans up resync.sh.
+September 2025: Resync to Simon's e00cb46 (unmodified). Introduces
+"Group".

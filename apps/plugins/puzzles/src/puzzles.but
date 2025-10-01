@@ -1684,7 +1684,9 @@ computer's. So in the above example, you could put the fifth ball at
 \e{any} of the locations marked with an \cw{x}, and you would still
 win.
 
-Black Box was contributed to this collection by James Harvey.
+Acornsoft published versions of Black Box for the Acorn Atom and the
+BBC Microcomputer in the early 1980s.  The puzzle was contributed to
+this collection by James Harvey.
 
 \H{blackbox-controls} \i{Black Box controls}
 
@@ -2619,7 +2621,7 @@ fill the square containing the cursor with that number; typing 0 will clear
 it.  You can also select multiple squares for numbering or clearing with the
 return and arrow keys, before typing a digit to fill or clear the highlighted
 squares (as above).  The space bar adds and removes single squares to and from
-the selection.  Backspace and escape remove all squares from the selection.
+the selection.  Escape removes all squares from the selection.
 
 (All the actions described in \k{common-actions} are also available.)
 

@@ -11,8 +11,8 @@ add_library(core_obj OBJECT
   penrose.c penrose-legacy.c ps.c random.c sort.c tdq.c tree234.c
   version.c
   ${platform_common_sources})
-add_library(core $<TARGET_OBJECTS:core_obj>)
-add_library(common $<TARGET_OBJECTS:core_obj> hat.c spectre.c)
+add_library(core STATIC $<TARGET_OBJECTS:core_obj>)
+add_library(common STATIC $<TARGET_OBJECTS:core_obj> hat.c spectre.c)
 
 cliprogram(polygon-test draw-poly.c
   SDL2_LIB COMPILE_DEFINITIONS STANDALONE_POLYGON)
@@ -167,7 +167,7 @@ puzzle(pearl
   OBJECTIVE "Draw a single closed loop, given clues about corner and \
 straight squares.")
 solver(pearl)
-cliprogram(pearlbench pearl.c COMPILE_DEFINITIONS STANDALONE_SOLVER)
+cliprogram(pearlbench pearl.c COMPILE_DEFINITIONS STANDALONE_SOAK_TEST)
 
 puzzle(pegs
   DISPLAYNAME "Pegs"
@@ -268,6 +268,8 @@ puzzle(untangle
   DISPLAYNAME "Untangle"
   DESCRIPTION "Planar graph layout puzzle"
   OBJECTIVE "Reposition the points so that the lines do not cross.")
+guiprogram(grapheditor untangle.c
+  COMPILE_DEFINITIONS EDITOR)
 
 add_subdirectory(unfinished)
 add_subdirectory(auxiliary)
