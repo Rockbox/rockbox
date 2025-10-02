@@ -3541,7 +3541,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3552,7 +3552,7 @@
     *: none
     rtc: "ON = Запази"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Запази"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Запази"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Запази"
     iriverh100,iriverh120,iriverh300: "NAVI = Запази"
     mpiohd300: "ENTER = Запази"
     mrobe500: "HEART = Запази"
@@ -3570,7 +3570,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3585,7 +3585,7 @@
     *: none
     rtc: "OFF = отказ"
     gigabeatfx,mrobe500: "POWER = отказ"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = отказ"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = отказ"
     gogearsa9200: "LEFT = отказ"
     iaudiom5,iaudiox5: "RECORD = отказ"
     ipod*,mpiohd300,sansac200*: "MENU = отказ"

@@ -3477,7 +3477,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3487,7 +3487,7 @@
   <dest>
     *: none
     rtc: "ON = Speichern"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Speichern"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Speichern"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Speichern"
     iriverh100,iriverh120,iriverh300: "NAVI = Speichern"
     mpiohd300: "ENTER = Speichern"
@@ -3505,7 +3505,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3519,7 +3519,7 @@
   <dest>
     *: none
     rtc: "OFF = Abbrechen"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Abbrechen"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Abbrechen"
     gigabeatfx,mrobe500: "POWER = Abbrechen"
     gogearsa9200: "LEFT = Abbrechen"
     iaudiom5,iaudiox5: "RECORD = Abbrechen"

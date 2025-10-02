@@ -3501,7 +3501,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3511,7 +3511,7 @@
   <dest>
     *: none
     rtc: "켬 버튼 = 설정"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "재생 버튼 = 설정"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "재생 버튼 = 설정"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "선택 버튼 = 설정"
     iriverh100,iriverh120,iriverh300: "탐색 버튼 = 설정"
     mpiohd300: "진입 버튼 = 설정"
@@ -3529,7 +3529,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3543,7 +3543,7 @@
   <dest>
     *: none
     rtc: "끔 버튼 = 반복"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "뒤로가기 버튼 = 반복"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "뒤로가기 버튼 = 반복"
     gigabeatfx,mrobe500: "전원 버터느 = 반복"
     gogearsa9200: "왼쪽 버튼 = 반복"
     iaudiom5,iaudiox5: "녹음 버튼 = 반복"

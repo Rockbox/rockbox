@@ -1350,7 +1350,7 @@
   user: core
   <source>
     *: none
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -1364,7 +1364,7 @@
   </source>
   <dest>
     *: none
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "ÎNAPOI = Anulează"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "ÎNAPOI = Anulează"
     gigabeatfx,mrobe500: "POWER = Anulează"
     gogearsa9200: "STÎNGA = Anulează"
     iaudiom5,iaudiox5: "REC = Anulează"
@@ -4037,7 +4037,7 @@
   user: core
   <source>
     *: none
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -4047,7 +4047,7 @@
   </source>
   <dest>
     *: none
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "REDARE = Setează"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "REDARE = Setează"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECTARE = Setează"
     iriverh100,iriverh120,iriverh300: "NAVI = Setează"
     mpiohd300: "ENTER = Setează"

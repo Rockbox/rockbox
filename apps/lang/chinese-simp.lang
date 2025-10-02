@@ -3874,7 +3874,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3888,7 +3888,7 @@
   <dest>
     *: none
     rtc: "OFF:取消"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK:取消"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK:取消"
     gigabeatfx: "POWER:取消"
     gogearsa9200: "LEFT:取消"
     iaudiom5,iaudiox5: "RECORD:取消"
@@ -7396,7 +7396,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -7406,7 +7406,7 @@
   <dest>
     *: none
     rtc: "ON:设置"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY:设置"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY:设置"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:设置"
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
     mpiohd300: "ENTER:设置"

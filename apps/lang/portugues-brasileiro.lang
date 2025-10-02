@@ -3540,7 +3540,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3551,7 +3551,7 @@
     *: none
     rtc: "ON = Ajustar"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Ajustar"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Ajustar"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Ajustar"
     iriverh100,iriverh120,iriverh300: "NAVI = Ajustar"
     mpiohd300: "ENTER = Ajustar"
     mrobe500: "HEART = Ajustar"
@@ -3569,7 +3569,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3584,7 +3584,7 @@
     *: none
     rtc: "OFF = Reverter"
     gigabeatfx,mrobe500: "POWER = Reverter"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Reverter"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Reverter"
     gogearsa9200: "LEFT = Reverter"
     iaudiom5,iaudiox5: "RECORD = Reverter"
     ipod*,mpiohd300,sansac200*: "MENU = Reverter"

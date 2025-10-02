@@ -3457,7 +3457,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3467,7 +3467,7 @@
   <dest>
     *: none
     rtc: "ON = Beállít"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*: "PLAY = Beállít"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Beállít"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Beállít"
     iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     mpiohd300: "ENTER = Beállít"
@@ -3485,7 +3485,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3499,7 +3499,7 @@
   <dest>
     *: none
     rtc: "KI = mégsem"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus: "VISSZA = Mégsem"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "VISSZA = Mégsem"
     gigabeatfx,mrobe500: "POWER = Mégsem"
     gogearsa9200: "BAL = Mégsem"
     iaudiom5,iaudiox5: "RECORD = Mégsem"
