@@ -43,22 +43,22 @@ static inline void piezo_hw_init(void)
 {
 #ifndef SIMULATOR
     /*logf("PIEZO: hw_init");*/
-    outl(inl(0x70000010) & ~0xc, 0x70000010);
-    outl(inl(0x6000600c) | 0x20000, 0x6000600c);    /* enable device */
+    DEV_INIT1 &= ~0xc;
+    DEV_EN |= DEV_PWM;
 #endif
 }
 
 static void piezo_hw_tick(unsigned int form_and_period)
 {
 #ifndef SIMULATOR
-    outl(0x80000000 | form_and_period, 0x7000a000); /* set pitch */
+    PWM0_CTRL = 0x80000000 | form_and_period;
 #endif
 }
 
 static inline void piezo_hw_stop(void)
 {
 #ifndef SIMULATOR
-    outl(0x0, 0x7000a000);    /* piezo off */
+    PWM0_CTRL = 0;
 #endif
 }
 

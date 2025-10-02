@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Thom Johansen 
+ * Copyright (C) 2004 by Thom Johansen
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -96,7 +96,7 @@
 #define CPU_HI_INT_EN       (*(volatile unsigned long*)(0x60004124))
 #define CPU_HI_INT_DIS      (*(volatile unsigned long*)(0x60004128))
 #define CPU_HI_INT_PRIORITY (*(volatile unsigned long*)(0x6000412c))
- 
+
 #define COP_HI_INT_EN_STAT  (*(volatile unsigned long*)(0x60004130))
 #define COP_HI_INT_EN       (*(volatile unsigned long*)(0x60004134))
 #define COP_HI_INT_DIS      (*(volatile unsigned long*)(0x60004138))
@@ -550,6 +550,9 @@
 
 #define LCD2_BLOCK_READY    0x04000000
 #define LCD2_BLOCK_TXOK     0x01000000
+
+/* PWM */
+#define PWM0_CTRL           (*(volatile unsigned long*)(0x7000a000))
 
 /* I2C */
 #define I2C_BASE            0x7000c000

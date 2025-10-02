@@ -658,13 +658,13 @@ target/arm/ipod/power-ipod.c
 # if LCD_DEPTH == 2
 target/arm/ipod/lcd-as-gray.S
 # endif
-# ifndef IPOD_1G2G
-#  ifndef IPOD_3G
+# if defined(CPU_PP502x)
 target/arm/ipod/piezo.c
-#  endif /* IPOD_3G */
+# endif /* CPU_PP502x */
+# ifndef IPOD_1G2G
 drivers/pcf50605.c
 target/arm/ipod/powermgmt-ipod-pcf.c
-# endif /* IPOD_1G2G */
+# endif /* !IPOD_1G2G */
 #endif /* CPU_PP && IPOD_ARCH */
 
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
