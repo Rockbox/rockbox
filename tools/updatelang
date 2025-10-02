@@ -13,6 +13,8 @@ use utf8;
 use File::Basename;
 use Unicode::Normalize;
 
+use strict;
+
 use open qw( :std :encoding(UTF-8) );
 binmode(STDOUT, ":encoding(UTF-8)");
 
@@ -32,10 +34,12 @@ sub parselangfile {
 		  #'source' => {},
 		  #'dest' => {},
 		  #'voice' => {},
+		  #'targetorder' => {},
 		  'notes' => "",
 		  'new' => 0
 	);
     my %thisphrase = %empty;
+    my %targetorder;
 
     open(FH, "<$filename") || die ("Can't open $filename");
     my @lines = <FH>;
@@ -85,6 +89,9 @@ sub parselangfile {
 
 		$w = NFD($w); # Unicode decompose
 		$thisphrase{$pos}->{$l} = $w;
+
+		# Store the ordering of the targets.
+		$targetorder{$l} = scalar(keys(%targetorder)) if (!defined($targetorder{$l}));
 	    }
 	}
 	if ($line eq '</voice>' ||
@@ -94,8 +101,11 @@ sub parselangfile {
 	    $pos = 'phrase';
 	} elsif ($line eq '</phrase>') {
 	    my %copy = %thisphrase;
+	    my %targetordercopy = %targetorder;
+	    $copy{'targetorder'} = \%targetordercopy;
 	    $phrases{$id} = \%copy;
 	    %thisphrase = %empty;
+	    %targetorder = ();
 	    $pos = 'lang';
 	    $id = '';
 	} elsif ($line eq '<source>') {
@@ -165,7 +175,6 @@ sub reduceformat($) {
 
     return $out;
 }
-
 
 ##################
 
@@ -526,7 +535,50 @@ if ($ENV{'ENGLISHORDER'}) {
     @finalorder = @langorder;
 }
 
-foreach my $id (@finalorder) {
+my ($id, %tgtorder);
+
+# When LANG_TIME_SET_BUTTON and LANG_TIME_REVERT are fixed to not
+# include a default 'rtc' value, then this abobmination can be
+# replaced with { $a cmp $b } to restore simple alphabetical
+# ordering.  We should NOT be mixing feature and target options
+# in the same phrase.
+sub bytarget {
+    my $xa = $a;
+    my $xb = $b;
+
+    my $rval = 0;
+#    print "ORDER:  ". join("|", %tgtorder) . "\n";
+    my $da = defined($tgtorder{$xa});
+    if (!$da) { # try the first entry of a list
+	my @foo = split(',', $xa);
+	$xa = $foo[0];
+	$da = defined($tgtorder{$xa});
+    }
+    my $db = defined($tgtorder{$xb});
+    if (!$db) { # try the first entry of a list
+	my @foo = split(',', $xb);
+	$xb = $foo[0];
+	$db = defined($tgtorder{$xb});
+    }
+    if ($xa eq "*") {
+	$rval = -1;
+    } elsif ($xb eq "*") {
+	$rval = 1;
+    } elsif ($da && $db) {
+	$rval = ($tgtorder{$xa} <=> $tgtorder{$xb});
+    } elsif (!$da && !$db) {
+	$rval = ($xa cmp $xb);
+    } elsif ($da && !$db) {
+	$rval = -1;
+    } elsif (!$da && $db) {
+	$rval = 1;
+    }
+#    print "~~~ '$xa' vs '$xb' ($da/$db) = $rval\n";
+
+    return $rval;
+}
+
+foreach $id (@finalorder) {
     if (!defined($english{$id})) {
 	next;
     }
@@ -534,6 +586,8 @@ foreach my $id (@finalorder) {
 
     # phrase
     %lp = %{$lang{$id}{'phrase'}};
+
+    %tgtorder = %{ $english{$id}{'targetorder'}};
 
     # Drop all deprecated phrases?
 #    next if ($lp{'desc'} eq 'deprecated');
@@ -553,7 +607,7 @@ foreach my $id (@finalorder) {
     # source
     %lp = combinetgts(%{$lang{$id}{'source'}});
     print $fh "  <source>\n";
-    foreach my $tgt (sort(keys(%lp))) {
+    foreach my $tgt (sort bytarget keys(%lp)) {
 	my $w = NFC($lp{$tgt});
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
@@ -566,7 +620,7 @@ foreach my $id (@finalorder) {
     # dest
     %lp = combinetgts(%{$lang{$id}{'dest'}});
     print $fh "  <dest>\n";
-    foreach my $tgt (sort(keys(%lp))) {
+    foreach my $tgt (sort bytarget keys(%lp)) {
 	my $w = NFC($lp{$tgt});
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
@@ -579,7 +633,7 @@ foreach my $id (@finalorder) {
     # voice
     %lp = combinetgts(%{$lang{$id}{'voice'}});
     print $fh "  <voice>\n";
-    foreach my $tgt (sort(keys(%lp))) {
+    foreach my $tgt (sort bytarget keys(%lp)) {
 	my $w = NFC($lp{$tgt});
 	if ($w eq 'none') {
 	    print $fh "    $tgt: $w\n";
