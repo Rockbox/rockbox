@@ -3529,7 +3529,7 @@
   <dest>
     *: none
     rtc: "OFF = Atcelt"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Atcelt"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Atcelt"
     gigabeatfx,mrobe500: "POWER = Atcelt"
     gogearsa9200: "LEFT = Atcelt"
     iaudiom5,iaudiox5: "RECORD = Atcelt"

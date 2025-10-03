@@ -3545,7 +3545,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3556,7 +3556,7 @@
     *: none
     rtc: "PÅ = Ställ"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "VÄLJ = Ställ"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "SPELA = Ställ"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "SPELA = Ställ"
     iriverh100,iriverh120,iriverh300: "NAVI = Ställ"
     mpiohd300: "ENTER = Ställ"
     mrobe500: "HJÄRTA = Ställ"
@@ -3574,7 +3574,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3589,7 +3589,7 @@
     *: none
     rtc: "AV = Avbryt"
     gigabeatfx,mrobe500: "PÅ/AV = Avbryt"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BAKÅT = Avbryt"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BAKÅT = Avbryt"
     gogearsa9200: "VÄNSTER = Avbryt"
     iaudiom5,iaudiox5: "SPELA IN = Avbryt"
     ipod*,mpiohd300,sansac200*: "MENY = Avbryt"

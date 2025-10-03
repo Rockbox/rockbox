@@ -4010,7 +4010,7 @@
     *: none
     rtc: "OFF = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -4024,7 +4024,7 @@
     *: none
     rtc: "OFF = Terugzetten"
     gigabeatfx,mrobe500: "POWER = Terugzetten"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Terugzetten"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Terugzetten"
     gogearsa9200: "LINKS = Terugzetten"
     iaudiom5,iaudiox5: "RECORD = Terugzetten"
     ipod*,mpiohd300,sansac200*: "MENU = Terugzetten"
@@ -8662,7 +8662,7 @@
     *: none
     rtc: "ON = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -8672,7 +8672,7 @@
     *: none
     rtc: "ON = Instellen"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Instellen"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Instellen"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Instellen"
     iriverh100,iriverh120,iriverh300: "NAVI = Instellen"
     mpiohd300: "ENTER = Instellen"
     mrobe500: "HEART = Instellen"

@@ -1365,7 +1365,7 @@
   <dest>
     *: none
     rtc: "OFF = anulare"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "ÎNAPOI = Anulează"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "ÎNAPOI = Anulează"
     gigabeatfx,mrobe500: "POWER = Anulează"
     gogearsa9200: "STÂNGA = Anulează"
     iaudiom5,iaudiox5: "REC = Anulează"

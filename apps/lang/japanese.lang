@@ -3545,7 +3545,7 @@
   <source>
     *: none
     rtc: "ON = Set"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = Set"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
@@ -3556,7 +3556,7 @@
     *: none
     rtc: "ON = 設定"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = 設定"
-    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3* "PLAY = 設定"
+    aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     mpiohd300: "ENTER = 設定"
     mrobe500: "HEART = 設定"
@@ -3574,7 +3574,7 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = Revert"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
@@ -3589,7 +3589,7 @@
     *: none
     rtc: "OFF = 元に戻す"
     gigabeatfx,mrobe500: "POWER = 元に戻す"
-    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3* "BACK = 元に戻す"
+    aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
     iaudiom5,iaudiox5: "RECORD = 元に戻す"
     ipod*,mpiohd300,sansac200*: "MENU = 元に戻す"
