@@ -879,6 +879,7 @@ void setvol(void)
         volume = global_settings.volume_limit;
 
     sound_set_volume(volume);
+    global_status.last_volume_change = current_tick;
     status_save(false);
 }
 
