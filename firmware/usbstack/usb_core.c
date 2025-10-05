@@ -373,16 +373,17 @@ static void set_serial_descriptor(void)
     }
 
     if (is_printable) {
-        /* trim trailing spaces */
-        while (length > 0 && sn[length - 1] == ' ') {
-            length--;
-        }
-
+        /* trim ALL spaces */
+        int totallen = length;
         for (i = 0; i < length; i++) {
+            if (sn[i] == ' ') {
+                totallen--;
+                continue;
+            }
             *p++ = sn[i];
         }
 
-        usb_string_iSerial.bLength = 2 + 2 * (1 + length);
+        usb_string_iSerial.bLength = 2 + 2 * (1 + totallen);
     }
     else {
         for (i = 0; i < length; i++) {
@@ -597,8 +598,38 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
         if(drivers[i].enabled &&
                 drivers[i].control_request &&
                 drivers[i].first_interface <= interface &&
-                drivers[i].last_interface > interface)
-        {
+                drivers[i].last_interface > interface) {
+            /* Check for SET_INTERFACE and GET_INTERFACE */
+            if((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE &&
+                    (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
+
+                if(req->bRequest == USB_REQ_SET_INTERFACE) {
+                    logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
+                    if(drivers[i].set_interface &&
+                            drivers[i].set_interface(req->wIndex, req->wValue) >= 0) {
+                        sleep(1);
+                        usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                        handled = true;
+                    }
+                    break;
+                }
+                else if(req->bRequest == USB_REQ_GET_INTERFACE) {
+                    int alt = -1;
+                    logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
+
+                    if(drivers[i].get_interface)
+                        alt = drivers[i].get_interface(req->wIndex);
+
+                    if(alt >= 0 && alt < 255) {
+                        response_data[0] = alt;
+                        usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+                        handled = true;
+                    }
+                    break;
+                }
+                /* fallback */
+            }
+
             handled = drivers[i].control_request(req, reqdata, response_data);
             if(handled)
                 break;
