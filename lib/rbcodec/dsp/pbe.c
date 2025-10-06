@@ -159,24 +159,27 @@ static void pbe_process(struct dsp_proc_entry *this,
     {
         for (int i = 0; i < count; i++)
         {
+            int32_t fracmul1 = FRACMUL(buf->p32[ch][i], tcoef1);
+            int32_t fracmul2 = FRACMUL(buf->p32[ch][i], tcoef2);
             /* 160hz - 500hz no delay */
-            temp_buffer = FRACMUL(buf->p32[ch][i], tcoef1) -
-                          FRACMUL(buf->p32[ch][i], tcoef2);
+            temp_buffer = fracmul1 -
+                          fracmul2;
 
             /* delay below 160hz*/
             x = buf->p32[ch][i] -
-                FRACMUL(buf->p32[ch][i], tcoef1);
+                fracmul1;
             temp_buffer += dequeue(b0[ch], &b0_r[ch], b0_level);
             enqueue(x, b0[ch], &b0_w[ch], b0_level );
 
+            int32_t fracmul3 = FRACMUL(buf->p32[ch][i], tcoef3);
             /* delay 500-1150hz */
-            x = FRACMUL(buf->p32[ch][i], tcoef2) -
-                FRACMUL(buf->p32[ch][i], tcoef3);
+            x = fracmul2 -
+                fracmul3;
             temp_buffer += dequeue(b2[ch], &b2_r[ch], b2_level);
             enqueue(x, b2[ch], &b2_w[ch], b2_level );
 
             /* delay anything beyond 1150hz */
-            x = FRACMUL(buf->p32[ch][i], tcoef3);
+            x = fracmul3;
             temp_buffer += dequeue(b3[ch], &b3_r[ch], B3_DLY);
             enqueue(x, b3[ch], &b3_w[ch], B3_DLY );
 
