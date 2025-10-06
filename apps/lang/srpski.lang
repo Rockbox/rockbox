@@ -3426,51 +3426,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -4733,7 +4688,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Скенирам"
   </voice>
 </phrase>
 <phrase>
@@ -5843,20 +5798,6 @@
   </dest>
   <voice>
     *: "снимљене нумере"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7323,7 +7264,7 @@
     *: "Не могу да отворим %s"
   </dest>
   <voice>
-    *: ""
+    *: "Не могу да отворим додатак"
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7278,7 @@
     *: "Неуспело читање %s"
   </dest>
   <voice>
-    *: ""
+    *: "Неуспело читање фајла"
   </voice>
 </phrase>
 <phrase>
@@ -12591,20 +12532,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -14156,16 +14083,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Преклопи ставку"
+    *: ""
   </dest>
   <voice>
-    *: "Преклопи ставку"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14226,13 +14153,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Редослед Rockbox главног менија"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14733,20 +14660,6 @@
   </dest>
   <voice>
     *: "Није пронађена ниједна слика албума"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16972,5 +16885,33 @@
   </dest>
   <voice>
     *: "Плејлиста се завршила. Желите ли да се пусти поново?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[по албуму]"
+  </dest>
+  <voice>
+    *: "Све нумере сортиране по албуму"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Сортирај плејлисте"
+  </dest>
+  <voice>
+    *: "сортирај плејлисте"
   </voice>
 </phrase>
