@@ -2542,7 +2542,12 @@ static int dbg_usb_audio_cb(int action, struct gui_synclist *lists)
     simplelist_addline("out ep: 0x%X in ep: 0x%X", usb_audio_get_out_ep(), usb_audio_get_in_ep());
     simplelist_addline("Volume: %d", usb_audio_get_cur_volume());
     simplelist_addline("Playback Frequency: %lu", usb_audio_get_playback_sampling_frequency());
-    simplelist_addline("Buffers filled: %d", usb_audio_get_prebuffering());
+    simplelist_addline("Frames dropped: %d", usb_audio_get_frames_dropped());
+    simplelist_addline("Buffers filled: %f", (double)usb_audio_get_prebuffering_avg()/(1<<16)); // convert from 16.16 fixed to float
+    simplelist_addline("Min: %d / Max: %d", usb_audio_get_prebuffering_maxmin(false), usb_audio_get_prebuffering_maxmin(true));
+    simplelist_addline("Samples used per Frame: %f", (double)usb_audio_get_samplesperframe()/(1<<16)); // convert from 16.16 fixed to float
+    simplelist_addline("Samples received per frame: %f", (double)usb_audio_get_samples_rx_perframe()/(1<<16)); // convert from 16.16 fixed to float
+    simplelist_addline("Samples diff: %f", (double)(usb_audio_get_samplesperframe()-usb_audio_get_samples_rx_perframe())/(1<<16)); // convert from 16.16 fixed to float
     simplelist_addline("%s", usb_audio_get_underflow()?"UNDERFLOW!":" ");
     simplelist_addline("%s", usb_audio_get_overflow()?"OVERFLOW!":" ");
     simplelist_addline("%s", usb_audio_get_alloc_failed()?"ALLOC FAILED!":" ");

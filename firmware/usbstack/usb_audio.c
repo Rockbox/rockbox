@@ -16,6 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+/* NOTE
+ *
+ * This is USBAudio 1.0. USBAudio 2.0 is notably _not backwards compatible!_
+ * USBAudio 1.0 over _USB_ 2.0 is perfectly valid!
+ *
+ * Relevant specifications are USB 2.0 and USB Audio Class 1.0.
+ */
+
 #include "string.h"
 #include "system.h"
 #include "usb_core.h"
@@ -36,6 +45,11 @@
 
 #define LOGF_ENABLE
 #include "logf.h"
+
+// is there a "best practices" for converting between floats and fixed point?
+// NOTE: SIGNED
+#define TO_16DOT16_FIXEDPT(val) ((int32_t)(val) * (1<<16))
+#define TO_DOUBLE(val) ((double)(val) / (1<<16))
 
 /* Audio Control Interface */
 static struct usb_interface_descriptor
@@ -58,7 +72,7 @@ static struct usb_ac_header ac_header =
     .bLength            = USB_AC_SIZEOF_HEADER(1), /* one interface */
     .bDescriptorType    = USB_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_AC_HEADER,
-    .bcdADC             = 0x0100,
+    .bcdADC             = 0x0100, /* Identifies this as usb audio class 1.0 */
     .wTotalLength       = 0, /* fill later */
     .bInCollection      = 1, /* one interface */
     .baInterfaceNr      = {0}, /* fill later */
@@ -140,7 +154,7 @@ static struct usb_interface_descriptor
     .bDescriptorType    = USB_DT_INTERFACE,
     .bInterfaceNumber   = 0,
     .bAlternateSetting  = 1,
-    .bNumEndpoints      = 1,
+    .bNumEndpoints      = 2, // iso audio, iso feedback
     .bInterfaceClass    = USB_CLASS_AUDIO,
     .bInterfaceSubClass = USB_SUBCLASS_AUDIO_STREAMING,
     .bInterfaceProtocol = 0,
@@ -176,35 +190,64 @@ static struct usb_as_format_type_i_discrete
     }
 };
 
-/*
- * TODO:
- * It appears that "Adaptive" sync mode means it it the device's duty
- * to adapt its consumption rate of data to whatever the host sends, which
- * has the possibility to cause trouble in underflows/overflows, etc.
- * In practice, this is probably not a large concern, as we have a fairly large
- * amount of buffering in the PCM system.
- * An improvement may be to use "Asynchronous", but this is more complicated
- * due to the need to inform the host about how fast the device will consume
- * the data.
- * So implementation of "Asynchronous" mode will be left for a later improvement.
- */
-static struct usb_iso_audio_endpoint_descriptor
-    out_iso_ep =
+static struct usb_as_iso_audio_endpoint
+    as_iso_audio_out_ep =
 {
-    .bLength          = sizeof(struct usb_iso_audio_endpoint_descriptor),
+    .bLength          = sizeof(struct usb_as_iso_audio_endpoint),
     .bDescriptorType  = USB_DT_ENDPOINT,
     .bEndpointAddress = USB_DIR_OUT, /* filled later */
-    .bmAttributes     = USB_ENDPOINT_XFER_ISOC | USB_ENDPOINT_SYNC_ADAPTIVE,
+    .bmAttributes     = USB_ENDPOINT_XFER_ISOC | USB_ENDPOINT_SYNC_ASYNC | USB_ENDPOINT_USAGE_DATA,
     .wMaxPacketSize   = 0, /* filled later */
-    .bInterval        = 0, /* filled later */
+    .bInterval        = 0, /* filled later - 1 for full speed, 4 for high-speed */
     .bRefresh         = 0,
-    .bSynchAddress    = 0 /* filled later */
+    .bSynchAddress    = 0 /* filled later to the address of as_iso_synch_in_ep */
 };
 
-static struct usb_as_iso_endpoint
-    as_out_iso_ep =
+/*
+ * Updaing the desired sample frequency:
+ *
+ * The iso OUT ep is inextricably linked to the feedback iso IN ep
+ * when using Asynchronous mode. It periodically describes to the host
+ * how fast to send the data.
+ *
+ * Some notes from the usbaudio 1.0 documentation:
+ * - bSyncAddress of the iso OUT ep must be set to the address of the iso IN feedback ep
+ * - bSyncAddress of the iso IN feedback ep must be zero
+ * - F_f (desired sampling frequency) describes directly the number of samples the endpoint
+ *     wants to receive per frame to match the actual sampling frequency F_s
+ * - There is a value, (2^(10-P)), which is how often (in 1mS frames) the F_f value will be sent
+ * - P appears to be somewhat arbitrary, though the spec wants it to relate the real sample rate
+ *     F_s to the master clock rate F_m by the relationship (F_m = F_s * (2^(P-1)))
+ * - The above description of P is somewhat moot because of how much buffering we have. I suspect it
+ *     was written for devices with essentially zero buffering.
+ * - bRefresh of the feedback endpoint descriptor should be set to (10-P). This can range from 1 to 9.
+ *     A value of 1 would mean refreshing every 2^1 mS = 2 mS, a value of 9 would mean refreshing every
+ *     2^9 mS = 512 mS.
+ * - The F_f value should be encoded in "10.10" format, but justified to the leftmost 24 bits,
+ *     so it ends up looking like "10.14" format. This format is 3 bytes long. On USB 2.0, it seems that
+ *     the USB spec overrides the UAC 1.0 spec here, so high-speed bus operation needs "16.16" format,
+ *     in a 4 byte packet.
+ */
+#define FEEDBACK_UPDATE_RATE_P 5
+#define FEEDBACK_UPDATE_RATE_REFRESH (10-FEEDBACK_UPDATE_RATE_P)
+#define FEEDBACK_UPDATE_RATE_FRAMES (0x1<<FEEDBACK_UPDATE_RATE_REFRESH)
+static struct usb_as_iso_synch_endpoint
+    as_iso_synch_in_ep =
 {
-    .bLength            = sizeof(struct usb_as_iso_endpoint),
+    .bLength          = sizeof(struct usb_as_iso_synch_endpoint),
+    .bDescriptorType  = USB_DT_ENDPOINT,
+    .bEndpointAddress = USB_DIR_IN, /* filled later */
+    .bmAttributes     = USB_ENDPOINT_XFER_ISOC | USB_ENDPOINT_SYNC_NONE | USB_ENDPOINT_USAGE_FEEDBACK,
+    .wMaxPacketSize   = 4,
+    .bInterval        = 0, /* filled later - 1 or 4 depending on bus speed */
+    .bRefresh         = FEEDBACK_UPDATE_RATE_REFRESH, /* This describes how often this ep will update F_f (see above) */
+    .bSynchAddress    = 0  /* MUST be zero! */
+};
+
+static struct usb_as_iso_ctrldata_endpoint
+    as_iso_ctrldata_samfreq =
+{
+    .bLength            = sizeof(struct usb_as_iso_ctrldata_endpoint),
     .bDescriptorType    = USB_DT_CS_ENDPOINT,
     .bDescriptorSubType = USB_AS_EP_GENERAL,
     .bmAttributes       = USB_AS_EP_CS_SAMPLING_FREQ_CTL,
@@ -216,12 +259,14 @@ static const struct usb_descriptor_header* const ac_cs_descriptors_list[] =
 {
     (struct usb_descriptor_header *) &ac_header,
     (struct usb_descriptor_header *) &ac_playback_input,
+    (struct usb_descriptor_header *) &ac_playback_feature,
     (struct usb_descriptor_header *) &ac_playback_output,
-    (struct usb_descriptor_header *) &ac_playback_feature
 };
 
 #define AC_CS_DESCRIPTORS_LIST_SIZE (sizeof(ac_cs_descriptors_list)/sizeof(ac_cs_descriptors_list[0]))
 
+// TODO: AudioControl Interrupt endpoint to inform the host that changes were made on-device!
+// The most immediately useful of this capability is volume and mute changes.
 static const struct usb_descriptor_header* const usb_descriptors_list[] =
 {
     /* Audio Control */
@@ -237,8 +282,11 @@ static const struct usb_descriptor_header* const usb_descriptors_list[] =
     (struct usb_descriptor_header *) &as_interface_alt_playback,
     (struct usb_descriptor_header *) &as_playback_cs_interface,
     (struct usb_descriptor_header *) &as_playback_format_type_i,
-    (struct usb_descriptor_header *) &out_iso_ep,
-    (struct usb_descriptor_header *) &as_out_iso_ep,
+    /* NOTE: the order of these three is important for maximum compatibility.
+     * Synch ep should follow iso out ep, with ctrldata descriptor coming first. */
+    (struct usb_descriptor_header *) &as_iso_ctrldata_samfreq,
+    (struct usb_descriptor_header *) &as_iso_audio_out_ep,
+    (struct usb_descriptor_header *) &as_iso_synch_in_ep,
 };
 
 #define USB_DESCRIPTORS_LIST_SIZE (sizeof(usb_descriptors_list)/sizeof(usb_descriptors_list[0]))
@@ -249,7 +297,7 @@ static int usb_as_playback_intf_alt; /* playback streaming interface alternate s
 static int as_playback_freq_idx; /* audio playback streaming frequency index (in hw_freq_sampr) */
 
 static int out_iso_ep_adr; /* output isochronous endpoint */
-static int in_iso_ep_adr; /* input isochronous endpoint */
+static int in_iso_feedback_ep_adr; /* input feedback isochronous endpoint */
 
 /* small buffer used for control transfers */
 static unsigned char usb_buffer[128] USB_DEVBSS_ATTR;
@@ -314,6 +362,33 @@ bool playback_audio_underflow;
 /* usb overflow ? */
 bool usb_rx_overflow;
 
+/* feedback variables */
+#define USB_FRAME_MAX 0x7FF
+#define NR_SAMPLES_HISTORY 32
+int32_t samples_fb;
+int32_t buffers_filled_old;
+long buffers_filled_accumulator;
+long buffers_filled_accumulator_old;
+int buffers_filled_avgcount;
+int buffers_filled_avgcount_old;
+static uint8_t sendFf[4] USB_DEVBSS_ATTR;
+static bool sent_fb_this_frame = false;
+int fb_startframe = 0;
+bool send_fb = false;
+
+/* debug screen sample count display variables */
+static unsigned long samples_received;
+static unsigned long samples_received_last;
+int32_t samples_received_report;
+int buffers_filled_min;
+int buffers_filled_min_last;
+int buffers_filled_max;
+int buffers_filled_max_last;
+
+/* frame drop recording variables */
+static int last_frame = 0;
+static int frames_dropped = 0;
+
 /* Schematic view of the RX situation:
  * (in case NR_BUFFERS = 4)
  *
@@ -352,6 +427,37 @@ static unsigned long decode3(uint8_t arr[3])
     return arr[0] | (arr[1] << 8) | (arr[2] << 16);
 }
 
+// size is samples per frame!
+static void encodeFBfixedpt(uint8_t arr[4], int32_t value, bool portspeed)
+{
+    uint32_t fixedpt;
+    // high-speed
+    if (portspeed)
+    {
+        // Q16.16
+        fixedpt = value;
+
+        arr[0] = (fixedpt & 0xFF);
+        arr[1] = (fixedpt>>8) & 0xFF;
+        arr[2] = (fixedpt>>16) & 0xFF;
+        arr[3] = (fixedpt>>24) & 0xFF;
+    }
+    else // full-speed
+    {
+        // Q16.16 --> Q10.10 --> Q10.14
+        fixedpt = value / (1<<2); // convert from Q16.16 to Q10.14
+
+        // then aligned so it's more like Q10.14
+        // NOTE: this line left for posterity
+        // fixedpt = fixedpt << (4);
+
+        arr[0] = (fixedpt & 0xFF);
+        arr[1] = (fixedpt>>8) & 0xFF;
+        arr[2] = (fixedpt>>16) & 0xFF;
+    }
+
+}
+
 static void set_playback_sampling_frequency(unsigned long f)
 {
     // only values 44.1k and higher (array is in descending order)
@@ -373,8 +479,7 @@ static void set_playback_sampling_frequency(unsigned long f)
 
 unsigned long usb_audio_get_playback_sampling_frequency(void)
 {
-    logf("usbaudio: get playback sampl freq %lu Hz",
-         hw_freq_sampr[as_playback_freq_idx]);
+    // logf("usbaudio: get playback sampl freq %lu Hz", hw_freq_sampr[as_playback_freq_idx]);
     return hw_freq_sampr[as_playback_freq_idx];
 }
 
@@ -382,7 +487,7 @@ void usb_audio_init(void)
 {
     unsigned int i;
     /* initialized tSamFreq array */
-    logf("usbaudio: supported frequencies");
+    logf("usbaudio: (init) supported frequencies");
     // only values 44.1k and higher (array is in descending order)
     for(i = 0; i <= HW_FREQ_44; i++)
     {
@@ -393,7 +498,6 @@ void usb_audio_init(void)
 
 int usb_audio_request_buf(void)
 {
-
     // stop playback first thing
     audio_stop();
 
@@ -439,18 +543,21 @@ int usb_audio_request_endpoints(struct usb_class_driver *drv)
         return -1;
     }
 
-    in_iso_ep_adr = usb_core_request_endpoint(USB_ENDPOINT_XFER_ISOC, USB_DIR_IN, drv);
-    if(in_iso_ep_adr < 0)
+    in_iso_feedback_ep_adr = usb_core_request_endpoint(USB_ENDPOINT_XFER_ISOC, USB_DIR_IN, drv);
+    if(in_iso_feedback_ep_adr < 0)
     {
         usb_core_release_endpoint(out_iso_ep_adr);
-        logf("usbaudio: cannot get an out iso endpoint");
+        logf("usbaudio: cannot get an in iso endpoint");
         return -1;
     }
 
-    logf("usbaudio: iso out ep is 0x%x, in ep is 0x%x", out_iso_ep_adr, in_iso_ep_adr);
+    logf("usbaudio: iso out ep is 0x%x, in ep is 0x%x", out_iso_ep_adr, in_iso_feedback_ep_adr);
 
-    out_iso_ep.bEndpointAddress = out_iso_ep_adr;
-    out_iso_ep.bSynchAddress = 0;
+    as_iso_audio_out_ep.bEndpointAddress = out_iso_ep_adr;
+    as_iso_audio_out_ep.bSynchAddress = in_iso_feedback_ep_adr;
+
+    as_iso_synch_in_ep.bEndpointAddress = in_iso_feedback_ep_adr;
+    as_iso_synch_in_ep.bSynchAddress = 0;
 
     return 0;
 }
@@ -462,7 +569,7 @@ unsigned int usb_audio_get_out_ep(void)
 
 unsigned int usb_audio_get_in_ep(void)
 {
-    return in_iso_ep_adr;
+    return in_iso_feedback_ep_adr;
 }
 
 int usb_audio_set_first_interface(int interface)
@@ -478,7 +585,7 @@ int usb_audio_get_config_descriptor(unsigned char *dest, int max_packet_size)
     unsigned int i;
     unsigned char *orig_dest = dest;
 
-    // logf("get config descriptors");
+    logf("get config descriptors");
 
     /** Configuration */
 
@@ -498,16 +605,23 @@ int usb_audio_get_config_descriptor(unsigned char *dest, int max_packet_size)
     as_interface_alt_playback.bInterfaceNumber = usb_interface + 1;
 
     /* endpoints */
-    out_iso_ep.wMaxPacketSize = 1023; /* one micro-frame per transaction */
+    as_iso_audio_out_ep.wMaxPacketSize = 1023;
+
     /** Endpoint Interval calculation:
      * typically sampling frequency is 44100 Hz and top is 192000 Hz, which
      * account for typical 44100*2(stereo)*2(16-bit) ~= 180 kB/s
-     * and top 770 kB/s. Since there are 1000 frames per seconds and maximum
+     * and top 770 kB/s. Since there are ~1000 frames per seconds and maximum
      * packet size is set to 1023, one transaction per frame is good enough
-     * for over 1 MB/s. At high-speed, add 3 to this value because there are
-     * 8 = 2^3 micro-frames per frame.
+     * for over 1 MB/s.
      * Recall that actual is 2^(bInterval - 1) */
-    out_iso_ep.bInterval = usb_drv_port_speed() ? 4 : 1;
+
+    /* In simpler language, This is intended to emulate full-speed's
+     * one-packet-per-frame rate on high-speed, where we have multiple microframes per millisecond.
+     */
+    as_iso_audio_out_ep.bInterval = usb_drv_port_speed() ? 4 : 1;
+    as_iso_synch_in_ep.bInterval = usb_drv_port_speed() ? 4 : 1; // per spec
+
+    logf("usbaudio: port_speed=%s", usb_drv_port_speed()?"hs":"fs");
 
     /** Packing */
     for(i = 0; i < USB_DESCRIPTORS_LIST_SIZE; i++)
@@ -535,6 +649,7 @@ static void playback_audio_get_more(const void **start, size_t *size)
     *start = rx_buffer + (rx_play_idx * REAL_BUF_SIZE);
     *size = rx_buf_size[rx_play_idx];
     rx_play_idx = (rx_play_idx + 1) % NR_BUFFERS;
+
     /* if usb RX buffers had overflowed, we can start to receive again
      * guard against IRQ to avoid race with completion usb completion (although
      * this function is probably running in IRQ context anyway) */
@@ -556,6 +671,23 @@ static void usb_audio_start_playback(void)
     rx_play_idx = 0;
     rx_usb_idx = 0;
 
+    // feedback initialization
+    fb_startframe = usb_drv_get_frame_number();
+    samples_fb = 0;
+    samples_received_report = 0;
+
+    // debug screen info - frame drop counter
+    frames_dropped = 0;
+    last_frame = -1;
+    buffers_filled_min = -1;
+    buffers_filled_min_last = -1;
+    buffers_filled_max = -1;
+    buffers_filled_max_last = -1;
+
+    // debug screen info - sample counters
+    samples_received = 0;
+    samples_received_last = 0;
+
     // TODO: implement recording from the USB stream
 #if (INPUT_SRC_CAPS != 0)
     audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
@@ -570,12 +702,13 @@ static void usb_audio_start_playback(void)
 
 static void usb_audio_stop_playback(void)
 {
-    // logf("usbaudio: stop playback");
+    logf("usbaudio: stop playback");
     if(usb_audio_playing)
     {
         mixer_channel_stop(PCM_MIXER_CHAN_USBAUDIO);
         usb_audio_playing = false;
     }
+    send_fb = false;
 }
 
 int usb_audio_set_interface(int intf, int alt)
@@ -642,8 +775,18 @@ int usb_audio_get_alt_intf(void)
 {
     return usb_as_playback_intf_alt;
 }
+    
+int32_t usb_audio_get_samplesperframe(void)
+{
+    return samples_fb;
+}
 
-static bool usb_audio_as_playback_endpoint_request(struct usb_ctrlrequest* req, void *reqdata)
+int32_t usb_audio_get_samples_rx_perframe(void)
+{
+    return samples_received_report;
+}
+
+static bool usb_audio_as_ctrldata_endpoint_request(struct usb_ctrlrequest* req, void *reqdata)
 {
     /* only support sampling frequency */
     if(req->wValue != (USB_AS_EP_CS_SAMPLING_FREQ_CTL << 8))
@@ -707,7 +850,7 @@ static bool usb_audio_endpoint_request(struct usb_ctrlrequest* req, void *reqdat
     int ep = req->wIndex & 0xff;
 
     if(ep == out_iso_ep_adr)
-        return usb_audio_as_playback_endpoint_request(req, reqdata);
+        return usb_audio_as_ctrldata_endpoint_request(req, reqdata);
     else
     {
         logf("usbaudio: unhandled ep req (ep=%d)", ep);
@@ -727,7 +870,7 @@ static bool feature_unit_set_mute(int value, uint8_t cmd)
     {
         logf("usbaudio: mute !");
         tmp_saved_vol = sound_current(SOUND_VOLUME);
-        // sound_set_volume(sound_min(SOUND_VOLUME));
+
         // setvol does range checking for us!
         global_status.volume = sound_min(SOUND_VOLUME);
         setvol();
@@ -736,7 +879,7 @@ static bool feature_unit_set_mute(int value, uint8_t cmd)
     else if(value == 0)
     {
         logf("usbaudio: not muted !");
-        // sound_set_volume(tmp_saved_vol);
+
         // setvol does range checking for us!
         global_status.volume = tmp_saved_vol;
         setvol();
@@ -808,7 +951,6 @@ static bool feature_unit_set_volume(int value, uint8_t cmd)
 
     logf("usbaudio: set volume=%d dB", usb_audio_volume_to_db(value, sound_numdecimals(SOUND_VOLUME)));
 
-    // sound_set_volume(usb_audio_volume_to_db(value, sound_numdecimals(SOUND_VOLUME)));
     // setvol does range checking for us!
     // we cannot guarantee the host will send us a volume within our range
     global_status.volume = usb_audio_volume_to_db(value, sound_numdecimals(SOUND_VOLUME));
@@ -829,7 +971,7 @@ static bool feature_unit_get_volume(int *value, uint8_t cmd)
             return false;
     }
 
-    logf("usbaudio: get %s volume=%d dB", usb_audio_ac_ctl_req_str(cmd), usb_audio_volume_to_db(*value, sound_numdecimals(SOUND_VOLUME)));
+    // logf("usbaudio: get %s volume=%d dB", usb_audio_ac_ctl_req_str(cmd), usb_audio_volume_to_db(*value, sound_numdecimals(SOUND_VOLUME)));
     return true;
 }
 
@@ -856,7 +998,7 @@ static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, void *re
         return false;
     }
     /* selectors */
-    /* all send/received values are integers so already read data if necessary and store in it in an integer */
+    /* all send/received values are integers already - read data if necessary and store in it in an integer */
     if(req->bRequest & USB_AC_GET_REQ)
     {
         /* get */
@@ -987,9 +1129,10 @@ static bool usb_audio_interface_request(struct usb_ctrlrequest* req, void *reqda
     }
 }
 
-bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata)
+bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata, unsigned char* dest)
 {
     (void) reqdata;
+    (void) dest;
 
     switch(req->bRequestType & USB_RECIP_MASK)
     {
@@ -1034,7 +1177,7 @@ bool usb_audio_get_playing(void)
 /* determine if enough prebuffering has been done to restart audio */
 bool prebuffering_done(void)
 {
-    /* restart audio if at least two buffers are filled */
+    /* restart audio if at least MINIMUM_BUFFERS_QUEUED buffers are filled */
     int diff = (rx_usb_idx - rx_play_idx + NR_BUFFERS) % NR_BUFFERS;
     return diff >= MINIMUM_BUFFERS_QUEUED;
 }
@@ -1042,6 +1185,28 @@ bool prebuffering_done(void)
 int usb_audio_get_prebuffering(void)
 {
     return (rx_usb_idx - rx_play_idx + NR_BUFFERS) % NR_BUFFERS;
+}
+
+int32_t usb_audio_get_prebuffering_avg(void)
+{
+    if (buffers_filled_avgcount == 0)
+    {
+        return TO_16DOT16_FIXEDPT(usb_audio_get_prebuffering());
+    } else {
+        return (TO_16DOT16_FIXEDPT(buffers_filled_accumulator)/buffers_filled_avgcount) + TO_16DOT16_FIXEDPT(MINIMUM_BUFFERS_QUEUED);
+    }
+}
+
+int usb_audio_get_prebuffering_maxmin(bool max)
+{
+    if (max)
+    {
+        return buffers_filled_max == -1 ? buffers_filled_max_last : buffers_filled_max;
+    }
+    else
+    {
+        return buffers_filled_min == -1 ? buffers_filled_min_last : buffers_filled_min;
+    }
 }
 
 bool usb_audio_get_underflow(void)
@@ -1052,6 +1217,11 @@ bool usb_audio_get_underflow(void)
 bool usb_audio_get_overflow(void)
 {
     return usb_rx_overflow;
+}
+
+int usb_audio_get_frames_dropped(void)
+{
+    return frames_dropped;
 }
 
 void usb_audio_transfer_complete(int ep, int dir, int status, int length)
@@ -1067,15 +1237,37 @@ void usb_audio_transfer_complete(int ep, int dir, int status, int length)
 bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
 {
     (void) dir;
+    bool retval = false;
 
     if(ep == out_iso_ep_adr && usb_as_playback_intf_alt == 1)
     {
-        // logf("usbaudio: frame: %d", usb_drv_get_frame_number());
+        // check for dropped frames
+        if (last_frame != usb_drv_get_frame_number())
+        {
+            if ((((last_frame + 1) % (USB_FRAME_MAX + 1)) != usb_drv_get_frame_number()) && (last_frame != -1))
+            {
+                frames_dropped++;
+            }
+            last_frame = usb_drv_get_frame_number();
+        }
+
+        // If audio and feedback EPs happen to have the same base number (with opposite directions, of course),
+        // we will get replies to the feedback here, don't want that to be interpreted as data.
+        if (length <= 4)
+        {
+            return true;
+        }
+
+        logf("usbaudio: frame: %d bytes: %d", usb_drv_get_frame_number(), length);
         if(status != 0)
             return true; /* FIXME how to handle error here ? */
         /* store length, queue buffer */
         rx_buf_size[rx_usb_idx] = length;
         rx_usb_idx = (rx_usb_idx + 1) % NR_BUFFERS;
+
+        // debug screen counter
+        samples_received = samples_received + length;
+    
         /* guard against IRQ to avoid race with completion audio completion */
         int oldlevel = disable_irq_save();
         /* setup a new transaction except if we ran out of buffers */
@@ -1098,8 +1290,88 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
             mixer_channel_play_data(PCM_MIXER_CHAN_USBAUDIO, playback_audio_get_more, NULL, 0);
         }
         restore_irq(oldlevel);
-        return true;
+        retval =  true;
     }
     else
-        return false;
+    {
+        retval = false;
+    }
+    
+    // send feedback value every N frames!
+    // NOTE: important that we need to queue this up _the frame before_ it's needed - on MacOS especially!
+    if ((usb_drv_get_frame_number()+1) % FEEDBACK_UPDATE_RATE_FRAMES == 0 && send_fb)
+    {
+        if (!sent_fb_this_frame)
+        {
+            /* NOTE: the division of frequency must be staged to avoid overflow of 16-bit signed int
+             * as well as truncating the result to ones place!
+             * Must avoid values > 32,768 (2^15)
+             * Largest value: 192,000 --> /10: 19,200 --> /100: 192
+             * Smallest value: 44,100 --> /10: 4,410 --> /100: 44.1
+             */
+            int32_t samples_base = TO_16DOT16_FIXEDPT(hw_freq_sampr[as_playback_freq_idx]/10)/100;
+            int32_t buffers_filled = 0;
+
+            if (buffers_filled_avgcount != 0)
+            {
+                buffers_filled = TO_16DOT16_FIXEDPT((int32_t)buffers_filled_accumulator) / buffers_filled_avgcount;
+            }
+            buffers_filled_accumulator = buffers_filled_accumulator - buffers_filled_accumulator_old;
+            buffers_filled_avgcount = buffers_filled_avgcount - buffers_filled_avgcount_old;
+            buffers_filled_accumulator_old = buffers_filled_accumulator;
+            buffers_filled_avgcount_old = buffers_filled_avgcount;
+
+            // someone who has implemented actual PID before might be able to do this correctly,
+            // but this seems to work good enough?
+            // Coefficients were 1, 0.25, 0.025 in float math --> 1, /4, /40 in fixed-point math
+            samples_fb = samples_base - (buffers_filled/4) + ((buffers_filled_old - buffers_filled)/40);
+            buffers_filled_old = buffers_filled;
+
+            // must limit to +/- 1 sample from nominal
+            samples_fb = samples_fb > (samples_base + TO_16DOT16_FIXEDPT(1)) ? samples_base + TO_16DOT16_FIXEDPT(1) : samples_fb;
+            samples_fb = samples_fb < (samples_base - TO_16DOT16_FIXEDPT(1)) ? samples_base - TO_16DOT16_FIXEDPT(1) : samples_fb;
+
+            encodeFBfixedpt(sendFf, samples_fb, usb_drv_port_speed());
+            logf("usbaudio: frame %d fbval 0x%02X%02X%02X%02X", usb_drv_get_frame_number(), sendFf[3], sendFf[2], sendFf[1], sendFf[0]);
+            usb_drv_send_nonblocking(in_iso_feedback_ep_adr, sendFf, usb_drv_port_speed()?4:3);
+
+            // debug screen counters
+            //
+            // samples_received NOTE: need some "division staging" to not overflow signed 16-bit value
+            // samples / (feedback frames * 2) --> samples/2
+            // samples_report / (2ch * 2bytes per sample) --> samples/4
+            // total: samples/8
+            samples_received_report = TO_16DOT16_FIXEDPT(samples_received/8) / FEEDBACK_UPDATE_RATE_FRAMES;
+            samples_received = samples_received - samples_received_last;
+            samples_received_last = samples_received;
+            buffers_filled_max_last = buffers_filled_max;
+            buffers_filled_max = -1;
+            buffers_filled_min_last = buffers_filled_min;
+            buffers_filled_min = -1;
+        }
+        sent_fb_this_frame = true;
+    }
+    else
+    {
+        sent_fb_this_frame = false;
+        if (!send_fb)
+        {
+            // arbitrary wait during startup
+            if (usb_drv_get_frame_number() == (fb_startframe + (FEEDBACK_UPDATE_RATE_FRAMES*2))%(USB_FRAME_MAX+1))
+            {
+                send_fb = true;
+            }
+        }
+        buffers_filled_accumulator = buffers_filled_accumulator + (usb_audio_get_prebuffering() - MINIMUM_BUFFERS_QUEUED);
+        buffers_filled_avgcount++;
+        if (usb_audio_get_prebuffering() < buffers_filled_min || buffers_filled_min == -1)
+        {
+            buffers_filled_min = usb_audio_get_prebuffering();
+        } else if (usb_audio_get_prebuffering() > buffers_filled_max)
+        {
+            buffers_filled_max = usb_audio_get_prebuffering();
+        }
+    }
+
+    return retval;
 }

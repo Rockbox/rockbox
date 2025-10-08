@@ -345,6 +345,10 @@ struct usb_endpoint_descriptor {
 #define USB_ENDPOINT_SYNC_ADAPTIVE      (2 << 2)
 #define USB_ENDPOINT_SYNC_SYNC          (3 << 2)
 
+#define USB_ENDPOINT_USAGE_DATA         (0 << 4) /* in bmAttributes */
+#define USB_ENDPOINT_USAGE_FEEDBACK     (1 << 4)
+#define USB_ENDPOINT_USAGE_IMPLICITFEEDBACK (2 << 4)
+
 #define USB_ENDPOINT_XFERTYPE_MASK      0x03    /* in bmAttributes */
 #define USB_ENDPOINT_XFER_CONTROL       0
 #define USB_ENDPOINT_XFER_ISOC          1

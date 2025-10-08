@@ -18,6 +18,14 @@
  ****************************************************************************/
 /* Parts of this file are based on Frank Gevaerts work and on audio.h from linux */
 
+/* NOTE
+ *
+ * This is USBAudio 1.0. USBAudio 2.0 is notably _not backwards compatible!_
+ * USBAudio 1.0 over _USB_ 2.0 is perfectly valid!
+ *
+ * Relevant specifications are USB 2.0 and USB Audio Class 1.0.
+ */
+
 #ifndef USB_AUDIO_DEF_H
 #define USB_AUDIO_DEF_H
 
@@ -188,25 +196,54 @@ struct usb_as_interface {
 #define USB_AS_EP_CS_SAMPLING_FREQ_CTL  0x01
 #define USB_AS_EP_CS_PITCH_CTL          0x02
 
-struct usb_iso_audio_endpoint_descriptor {
+// Standard* AudioStreaming Isochronous Audio Data Endpoint Descriptor
+//
+// *Note, per usbaudio 1.0 this is explititly identical
+//  to a standard endpoint descriptor but with extra information
+struct usb_as_iso_audio_endpoint {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
     uint8_t  bEndpointAddress;
     uint8_t  bmAttributes;
     uint16_t wMaxPacketSize;
-    uint8_t  bInterval;
-    uint8_t  bRefresh;
-    uint8_t  bSynchAddress;
+    uint8_t  bInterval;     /* MUST be set to 1 (full speed), +3 for high-speed? */
+    uint8_t  bRefresh;      /* USB Audio Class 1.0 specific: set to 0 */
+    uint8_t  bSynchAddress; /* USB Audio Class 1.0 specific: used to identify synch ep */
 } __attribute__ ((packed));
 
-struct usb_as_iso_endpoint {
+// Class-Specific AudioStreaming Isochronous Audio* (Control) Data Endpoint Descriptor
+//
+// *The name is a bit misleading, this is for _control_ of audio,
+//  such as sampling frequency or pitch.
+struct usb_as_iso_ctrldata_endpoint {
     uint8_t  bLength;
     uint8_t  bDescriptorType; /* USB_DT_CS_ENDPOINT */
     uint8_t  bDescriptorSubType; /* USB_AS_EP_GENERAL */
     uint8_t  bmAttributes;
-    uint8_t  bLockDelayUnits;
-    uint16_t wLockDelay;
+    uint8_t  bLockDelayUnits;   /* USB Audio Class 1.0 specific */
+    uint16_t wLockDelay;        /* USB Audio Class 1.0 specific */
+} __attribute__ ((packed));
+
+// Standard* AudioStreaming Isochronous Synch (Feedback) Endpoint Descriptor
+//
+// *Note, per usbaudio 1.0 this is explititly identical
+//  to a standard endpoint descriptor but with extra information
+struct usb_as_iso_synch_endpoint {
+    uint8_t  bLength;
+    uint8_t  bDescriptorType;   /* USB_DT_CS_ENDPOINT */
+
+    uint8_t  bEndpointAddress;  /* D7: direction (0 = source, 1 = sink)
+                                 * D6..4: Zeros
+                                 * D3..0: EP Number */
+    uint8_t  bmAttributes;      /* USBAudio 1.0:
+                                 * D3..2: Synch type (00 = None)
+                                 * D1..0: Transfer type (01 = Isochronous)
+                                 */
+    uint16_t wMaxPacketSize;
+    uint8_t  bInterval;         /* MUST be set to 1 (full speed), +3 for high-speed? */
+    uint8_t  bRefresh;          /* USB Audio Class 1.0 specific: Range of 1 to 9 (full-speed). high-speed, probably range of 1 to 16? */
+    uint8_t  bSynchAddress;     /* USB Audio Class 1.0 specific: MUST be set to 0 */
 } __attribute__ ((packed));
 
 #define USB_AS_FORMAT_TYPE_I_UNDEFINED  0x0
