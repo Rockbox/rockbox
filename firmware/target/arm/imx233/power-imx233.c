@@ -510,7 +510,7 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
         [BV_POWER_MISC_FREQSEL__20MHz] = 20000,
         [BV_POWER_MISC_FREQSEL__24MHz] = 24000,
         [BV_POWER_MISC_FREQSEL__19p2MHz] = 19200,
-        [BV_POWER_MISC_FREQSEL__14p4MHz] = 14200,
+        [BV_POWER_MISC_FREQSEL__14p4MHz] = 14400,
         [BV_POWER_MISC_FREQSEL__18MHz] = 18000,
         [BV_POWER_MISC_FREQSEL__21p6MHz] = 21600,
         [BV_POWER_MISC_FREQSEL__17p28MHz] = 17280,
