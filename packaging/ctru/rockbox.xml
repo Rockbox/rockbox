@@ -1,0 +1,7 @@
+<shortcut>
+    <executable>/3ds/.rockbox/rockbox.3dsx</executable>
+    <icon>.rockbox/icon.icn</icon>
+    <name>rockbox</name>
+    <description>Open Source Jukebox Firmware</description>
+    <author>rockbox.org</author>
+</shortcut>

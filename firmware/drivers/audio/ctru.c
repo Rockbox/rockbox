@@ -1,0 +1,92 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright © 2010 Thomas Martitz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include "config.h"
+#include "sound.h"
+#include "pcm_sampr.h"
+#ifdef HAVE_SW_VOLUME_CONTROL
+#include "pcm_sw_volume.h"
+#include "fixedpoint.h"
+#endif
+
+/**
+ * Audio Hardware api. Make some of them do nothing as we cannot properly
+ * simulate with SDL. if we used DSP we would run code that doesn't actually
+ * run on the target
+ **/
+
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    (void)vol_l; (void)vol_r;
+}
+
+#if defined(AUDIOHW_HAVE_BALANCE)
+void audiohw_set_balance(int value)     { (void)value; }
+#endif
+#ifndef HAVE_SW_TONE_CONTROLS
+#if defined(AUDIOHW_HAVE_BASS)
+void audiohw_set_bass(int value)        { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE)
+void audiohw_set_treble(int value)      { (void)value; }
+#endif
+#endif /* HAVE_SW_TONE_CONTROLS */
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
+void audiohw_set_bass_cutoff(int value) { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
+void audiohw_set_treble_cutoff(int value){ (void)value; }
+#endif
+/* EQ-based tone controls */
+#if defined(AUDIOHW_HAVE_EQ)
+void audiohw_set_eq_band_gain(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_EQ_FREQUENCY)
+void audiohw_set_eq_band_frequency(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_EQ_WIDTH)
+void audiohw_set_eq_band_width(unsigned int band, int value)
+    { (void)band; (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_DEPTH_3D)
+void audiohw_set_depth_3d(int value)
+    { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_LINEOUT)
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
+    { (void)vol_l; (void)vol_r; }
+#endif
+#if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
+void audiohw_set_filter_roll_off(int value)
+    { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_POWER_MODE)
+void audiohw_set_power_mode(int value)
+    { (void)value; }
+#endif
+
+#ifdef CONFIG_SAMPR_TYPES
+unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
+                                   unsigned int type)
+    { return samplerate; (void)type; }
+#endif /* CONFIG_SAMPR_TYPES */

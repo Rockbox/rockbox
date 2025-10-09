@@ -1,0 +1,166 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2025 Mauricio G.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+#include "system-ctru.h"
+#include "thread-ctru.h"
+#include "kernel.h"
+#include "thread.h"
+#include "panic.h"
+#include "debug.h"
+
+static int tick_timer_id;
+long start_tick;
+
+/* Condition to signal that "interrupts" may proceed */
+static sysCond *sim_thread_cond;
+/* Mutex to serialize changing levels and exclude other threads while
+ * inside a handler */
+static RecursiveLock sim_irq_mtx;
+/* Level: 0 = enabled, not 0 = disabled */
+static int volatile interrupt_level = HIGHEST_IRQ_LEVEL;
+/* How many handers waiting? Not strictly needed because CondSignal is a
+ * noop if no threads were waiting but it filters-out calls to functions
+ * with higher overhead and provides info when debugging. */
+static int handlers_pending = 0;
+/* 1 = executing a handler; prevents CondSignal calls in set_irq_level
+ * while in a handler */
+static int status_reg = 0;
+
+/* Nescessary logic:
+ * 1) All threads must pass unblocked
+ * 2) Current handler must always pass unblocked
+ * 3) Threads must be excluded when irq routine is running
+ * 4) No more than one handler routine should execute at a time
+ */
+int set_irq_level(int level)
+{
+    RecursiveLock_Lock(&sim_irq_mtx);
+
+    int oldlevel = interrupt_level;
+
+    if (status_reg == 0 && level == 0 && oldlevel != 0)
+    {
+        /* Not in a handler and "interrupts" are going from disabled to
+         * enabled; signal any pending handlers still waiting */
+        if (handlers_pending > 0)
+            sys_cond_broadcast(sim_thread_cond);
+    }
+
+    interrupt_level = level; /* save new level */
+
+    RecursiveLock_Unlock(&sim_irq_mtx);
+    return oldlevel;
+}
+
+void sim_enter_irq_handler(void)
+{
+    RecursiveLock_Lock(&sim_irq_mtx);
+    handlers_pending++;
+
+    /* Check each time before proceeding: disabled->enabled->...->disabled
+     * is possible on an app thread before a handler thread is ever granted
+     * the mutex; a handler can also leave "interrupts" disabled during
+     * its execution */
+    while (interrupt_level != 0)
+        sys_cond_wait(sim_thread_cond, &sim_irq_mtx);
+
+    status_reg = 1;
+}
+
+void sim_exit_irq_handler(void)
+{
+    /* If any others are waiting, give the signal */
+    if (--handlers_pending > 0)
+        sys_cond_signal(sim_thread_cond);
+
+    status_reg = 0;
+    RecursiveLock_Unlock(&sim_irq_mtx);
+}
+
+static bool sim_kernel_init(void)
+{
+    RecursiveLock_Init(&sim_irq_mtx);
+    sim_thread_cond = sys_cond_create();
+    if (sim_thread_cond == NULL)
+    {
+        panicf("Cannot create sim_thread_cond\n");
+        return false;
+    }
+    return true;
+}
+
+void sim_kernel_shutdown(void)
+{
+    sys_remove_timer(tick_timer_id);
+    enable_irq();
+    while(handlers_pending > 0)
+        sys_delay(10);
+
+    sys_cond_destroy(sim_thread_cond);
+}
+
+u32 tick_timer(u32 interval, void *param)
+{
+    long new_tick;
+
+    (void) interval;
+    (void) param;
+
+    new_tick = (sys_get_ticks() - start_tick) / (1000/HZ);
+
+    while(new_tick != current_tick)
+    {
+        sim_enter_irq_handler();
+
+        /* Run through the list of tick tasks - increments tick
+         * on each iteration. */
+        call_tick_tasks();
+
+        sim_exit_irq_handler();
+    }
+
+    return interval;
+}
+
+void tick_start(unsigned int interval_in_ms)
+{
+    if (!sim_kernel_init())
+    {
+        panicf("Could not initialize kernel!");
+        exit(-1);
+    }
+
+    if (tick_timer_id != 0)
+    {
+        sys_remove_timer(tick_timer_id);
+        tick_timer_id = 0;
+    }
+    else
+    {
+        start_tick = sys_get_ticks();
+    }
+
+    tick_timer_id = sys_add_timer(interval_in_ms, tick_timer, NULL);
+}
+
