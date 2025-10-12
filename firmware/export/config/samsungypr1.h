@@ -112,7 +112,7 @@
 /* R1 has a standard linux RTC driver on /dev/rtc1 (->/dev/rtc)
  * The RTC is S35392 A
  */
-#define CONFIG_RTC APPLICATION
+#define CONFIG_RTC RTC_HOSTED
 
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */

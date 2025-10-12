@@ -44,7 +44,7 @@
 #define HAVE_BUTTON_DATA
 
 /* define this if you have a real-time clock */
-#define CONFIG_RTC APPLICATION
+#define CONFIG_RTC RTC_HOSTED
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000

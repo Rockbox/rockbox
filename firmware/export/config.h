@@ -340,6 +340,7 @@ Lyre prototype 1 */
 #define NAND_IMX233  6
 
 /* CONFIG_RTC */
+#define RTC_HOSTED   1 /* Generic hosted */
 #define RTC_PCF50605 2 /* iPod 3G, 4G & Mini */
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
@@ -642,6 +643,7 @@ Lyre prototype 1 */
 #undef HAVE_MULTIDRIVE
 #undef CONFIG_STORAGE_MULTI
 #undef CONFIG_STORAGE
+#define CONFIG_STORAGE 0
 #endif
 
 #ifndef CONFIG_BUFLIB_BACKEND
