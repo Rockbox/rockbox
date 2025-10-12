@@ -262,7 +262,7 @@ simcc () {
  app_type=$1
  winbuild=""
  macbuild=""
- GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib// -e s/\ -Wundef//`
+ GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib//`
 
  if [ "yes" = "$use_debug" ]; then
     GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`
@@ -638,7 +638,7 @@ maemocc () {
  # Scratchbox sets up "gcc" based on the active target
  prefixtools ""
 
- GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
  GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
@@ -733,7 +733,7 @@ pandoracc () {
  LDOPTS="-L$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib -Wl,-rpath,$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib $LDOPTS"
  PKG_CONFIG="pkg-config"
 
- GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
  GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
@@ -813,7 +813,7 @@ androidcc () {
 
     # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
     buildhost=$(uname | tr "[:upper:]" "[:lower:]")-x86_64
-    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
     LDOPTS="$LDOPTS -ldl -llog"
     if [ "$modelname" != "ibassodx50" ] && [ "$modelname" != "ibassodx90" ]; then
         LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared"
@@ -903,7 +903,7 @@ androidndkcc()
     # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
     buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")-x86_64
 
-    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
     LDOPTS="$LDOPTS -ldl -llog"
     SHARED_LDFLAGS="-shared"
     SHARED_CFLAGS=''
@@ -988,7 +988,7 @@ rgnanocc () {
     DLLWRAP=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-dllwrap
     RANLIB=$FUNKEY_SDK_PATH/bin/arm-funkey-linux-musleabihf-gcc-ranlib
 
-    GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib// -e s/\ -Wundef//`
+    GCCOPTS=`echo $CCOPTS | sed -e s/\ -ffreestanding// -e s/\ -nostdlib//`
 
     if [ "yes" = "$use_debug" ]; then
         GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`

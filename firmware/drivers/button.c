@@ -33,11 +33,14 @@
 #include "serial.h"
 #include "power.h"
 #include "powermgmt.h"
-#if defined(HAVE_SDL) && (SDL_MAJOR_VERSION > 1)
+#if defined(HAVE_SDL)
+#include <SDL.h>
+#if (SDL_MAJOR_VERSION > 1)
 #include "button-sdl.h"
 #else
 #include "button-target.h"
 #endif
+#endif /* HAVE_SDL */
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif

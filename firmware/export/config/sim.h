@@ -2,6 +2,7 @@
    target specific configs */
 
 #undef CONFIG_CPU
+#define CONFIG_CPU 0
 
 #undef HAVE_FMADC
 
@@ -17,6 +18,8 @@
 #undef HAVE_ATA_POWER_OFF
 
 #undef CONFIG_LCD
+#define CONFIG_LCD 0
+
 #undef LCD_DPI /* likely to be too different on a PC */
 
 #undef CONFIG_LED
@@ -86,7 +89,8 @@
 
 #undef BUTTON_DRIVER_CLOSE
 
-#if     CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG
+#if defined(CONFIG_BACKLIGHT_FADING)
+#if     (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
 #undef  CONFIG_BACKLIGHT_FADING
         /* simulate SW_SETTING, as we handle sdl very similary */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
@@ -95,7 +99,8 @@
         CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_TARGET)
         /* we don't simulate that yet */
 #undef  CONFIG_BACKLIGHT_FADING
-#endif
+#endif /* CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG */
+#endif /* defined(CONFIG_BACKLIGHT_FADING) */
 
 #ifdef  HAVE_BACKLIGHT_BRIGHTNESS
 #undef  DEFAULT_BRIGHTNESS_SETTING

@@ -623,7 +623,7 @@ Lyre prototype 1 */
 #elif defined(RG_NANO)
 #include "config/rgnano.h"
 #else
-//#error "unknown hwardware platform!"
+#error "unknown hardware platform!"
 #endif
 
 #ifndef CONFIG_CPU
@@ -649,7 +649,9 @@ Lyre prototype 1 */
 #endif
 
 #ifdef APPLICATION
+#ifndef CONFIG_CPU
 #define CONFIG_CPU 0
+#endif
 #endif
 
 /* keep this include after the target configs */
