@@ -54,6 +54,10 @@ static int hp_unmute_cb(struct timeout *tmo)
 
 void imx233_audioout_preinit(void)
 {
+    /* we forego setting HP output to ground; it seems it doesn't have an
+       audible benefit, but produces loud noise if done at the wrong place */
+    /* when RoLo-ing the headphone is still unmuted; mute to reduce noise */
+    BF_SET(AUDIOOUT_HPVOL, MUTE);
     /* Enable AUDIOOUT block */
     imx233_reset_block(&HW_AUDIOOUT_CTRL);
     /* Enable digital filter clock */
@@ -70,10 +74,14 @@ void imx233_audioout_preinit(void)
     BF_SET(AUDIOOUT_CTRL, WORD_LENGTH);
     /* Power up DAC */
     BF_CLR(AUDIOOUT_PWRDN, DAC);
-    /* Hold HP to ground to avoid pop, then release and power up HP */
-    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
+    /* power up HP */
     BF_CLR(AUDIOOUT_PWRDN, HEADPHONE);
-    /* Set HP mode to AB */
+    /* wait until voltages have settled after powering on HP amp.
+     * The time delay may be target dependant; on CreativeZEN (STMP3760)
+     * 1.5 sec still isn't enough (only softening the pop) */
+    sleep(HZ*2);
+    /* Set HP mode to class AB. This must be done after HP is released from
+     * GND; releasing while AB mode is activated leads to a REALLY loud pop! */
     BF_SET(AUDIOOUT_ANACTRL, HP_CLASSAB);
     /* change bias to -50% */
     BF_WR(AUDIOOUT_TEST, HP_I1_ADJ(1));
@@ -82,8 +90,6 @@ void imx233_audioout_preinit(void)
     BF_SET(AUDIOOUT_REFCTRL, RAISE_REF);
 #endif
     BF_SET(AUDIOOUT_REFCTRL, XTAL_BGR_BIAS);
-    /* Stop holding to ground */
-    BF_CLR(AUDIOOUT_ANACTRL, HP_HOLD_GND);
     /* Set dmawait count to 31 (see errata, workaround random stop) */
     BF_WR(AUDIOOUT_CTRL, DMAWAIT_COUNT(31));
     /* start converting audio */
@@ -107,8 +113,6 @@ void imx233_audioout_close(void)
 {
     /* Switch to class A */
     BF_CLR(AUDIOOUT_ANACTRL, HP_CLASSAB);
-    /* Hold HP to ground */
-    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
     /* Mute HP and power down */
     BF_SET(AUDIOOUT_HPVOL, MUTE);
     /* Power down HP */
@@ -123,6 +127,9 @@ void imx233_audioout_close(void)
     imx233_clkctrl_enable(CLK_FILT, false);
     /* will also gate off the module */
     BF_CLR(AUDIOOUT_CTRL, RUN);
+    /* power-off-pop is reduced when waiting after shutting off
+     * the audioout module and before powering down the whole chip. */
+    sleep(HZ*2);
 }
 
 /* volume in half dB
