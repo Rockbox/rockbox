@@ -821,7 +821,7 @@ int do_shortcut_menu(void *ignored)
                     run_debug_screen(sc->u.path);
                     break;
                 case SHORTCUT_SHUTDOWN:
-#if CONFIG_CHARGING
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                     if (charger_inserted())
                         charging_splash();
                     else
@@ -829,7 +829,7 @@ int do_shortcut_menu(void *ignored)
                         sys_poweroff();
                     break;
                 case SHORTCUT_REBOOT:
-#if CONFIG_CHARGING
+#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                     if (charger_inserted())
                         charging_splash();
                     else
