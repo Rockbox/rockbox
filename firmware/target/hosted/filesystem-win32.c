@@ -66,8 +66,8 @@ static int win32_stat(const char *ospath, LPBY_HANDLE_FILE_INFORMATION lpInfo);
 static unsigned short * strcpy_utf8utf16(unsigned short *buffer,
                                          const unsigned char *utf8)
 {
-    for (wchar_t *ucs = buffer; *ucs ; ucs++) {
-        ucschar_t cp;
+    ucschar_t cp = 0xffffffff;
+    for (wchar_t *ucs = buffer; cp ; ucs++) {
         utf8 = utf8decode(utf8, &cp);
 #ifdef UNICODE32
         if (cp > 0x10000) {
