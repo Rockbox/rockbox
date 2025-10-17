@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     const char *paths[] = { "/", NULL };
     tagcache_init();
 
-    fprintf(stderr, "Scanning files (may take some time)...");
+    fprintf(stderr, "Scanning files (may take some time)...\n");
 
     do_tagcache_build(paths);
     tagcache_reverse_scan();
