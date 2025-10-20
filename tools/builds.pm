@@ -947,6 +947,18 @@ sub simbuilds {
 	},
         'enabled' => 1,
     },
+    'vietnamese' => {
+        'lang' => 'vietnamese',
+        'name' => 'Tiếng Việt (Vietnamese)',
+        'short' => 'vi',
+        'defengine' => 'piper',
+        'engines' => {
+            'espeak' => '-vvi',
+	    'gtts' => '-l vi',
+            'piper' => 'vi_VN-vais1000-medium.onnx',
+        },
+        'enabled' => 1,
+    },
 );
 
 sub byshortname {
