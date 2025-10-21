@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -272,7 +272,7 @@
     *: "Any Other = No"
   </source>
   <dest>
-    *: "Čokoľvek iné = No"
+    *: "Čokoľvek iné = Nie"
   </dest>
   <voice>
     *: ""
@@ -342,10 +342,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "Teraz Hrá"
+    *: "Teraz hrá"
   </dest>
   <voice>
-    *: "Teraz Hrá"
+    *: "Teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -359,7 +359,7 @@
     *: "Obnoviť prehrávanie"
   </dest>
   <voice>
-    *: "Obnoviť Prehrávanie"
+    *: "Obnoviť prehrávanie"
   </voice>
 </phrase>
 <phrase>
@@ -432,10 +432,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Zásuvné Moduly"
+    *: "Zásuvné moduly"
   </dest>
   <voice>
-    *: "Zásuvné Moduly"
+    *: "Zásuvné moduly"
   </voice>
 </phrase>
 <phrase>
@@ -460,10 +460,10 @@
     *: "Select Bookmark"
   </source>
   <dest>
-    *: "Výber Záložky"
+    *: "Výber záložky"
   </dest>
   <voice>
-    *: "Výber Záložky"
+    *: "Výber záložky"
   </voice>
 </phrase>
 <phrase>
@@ -488,7 +488,7 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", Miešať"
+    *: ", miešať"
   </dest>
   <voice>
     *: ""
@@ -502,10 +502,10 @@
     *: "[Invalid Bookmark]"
   </source>
   <dest>
-    *: "[Neplatná Záložka]"
+    *: "[Neplatná záložka]"
   </dest>
   <voice>
-    *: "Neplatná Záložka"
+    *: "Neplatná záložka"
   </voice>
 </phrase>
 <phrase>
@@ -516,10 +516,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "Možnosti Záložky"
+    *: "Možnosti záložky"
   </dest>
   <voice>
-    *: "Možnosti Záložky"
+    *: "Možnosti záložky"
   </voice>
 </phrase>
 <phrase>
@@ -544,10 +544,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Vytvoriť Záložku?"
+    *: "Vytvoriť záložku?"
   </dest>
   <voice>
-    *: "Vytvoriť Záložku?"
+    *: "Vytvoriť záložku?"
   </voice>
 </phrase>
 <phrase>
@@ -558,10 +558,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Záložka Bola Vytvorená"
+    *: "Záložka bola vytvorená"
   </dest>
   <voice>
-    *: "Záložka Bola Vytvorená"
+    *: "Záložka bola vytvorená"
   </voice>
 </phrase>
 <phrase>
@@ -572,10 +572,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Vytváranie Záložky Zlihalo!"
+    *: "Vytváranie záložky zlihalo!"
   </dest>
   <voice>
-    *: "Vytváranie Záložky Zlihalo!"
+    *: "Vytváranie záložky zlihalo!"
   </voice>
 </phrase>
 <phrase>
@@ -586,10 +586,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Žiadne Záložky"
+    *: "Žiadne záložky"
   </dest>
   <voice>
-    *: "Žiadne Záložky"
+    *: "Žiadne záložky"
   </voice>
 </phrase>
 <phrase>
@@ -600,10 +600,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Nastavenia Zvuku"
+    *: "Nastavenia zvuku"
   </dest>
   <voice>
-    *: "Nastavenia Zvuku"
+    *: "Nastavenia zvuku"
   </voice>
 </phrase>
 <phrase>
@@ -670,10 +670,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Nastavenie Kanálov"
+    *: "Nastavenie kanálov"
   </dest>
   <voice>
-    *: "Nastavenie Kanálov"
+    *: "Nastavenie kanálov"
   </voice>
 </phrase>
 <phrase>
@@ -726,10 +726,10 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Mono Ľavý"
+    *: "Mono ľavý"
   </dest>
   <voice>
-    *: "Mono Ľavý"
+    *: "Mono ľavý"
   </voice>
 </phrase>
 <phrase>
@@ -740,10 +740,10 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Mono Pravý"
+    *: "Mono pravý"
   </dest>
   <voice>
-    *: "Mono Pravý"
+    *: "Mono pravý"
   </voice>
 </phrase>
 <phrase>
@@ -785,10 +785,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Šírka Sterea"
+    *: "Šírka sterea"
   </dest>
   <voice>
-    *: "Šírka Sterea"
+    *: "Šírka sterea"
   </voice>
 </phrase>
 <phrase>
@@ -799,10 +799,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Krížový prenos (Crossfeed)"
+    *: "Krížový prenos (crossfeed)"
   </dest>
   <voice>
-    *: "Krížový Prenos zátvorka Crossfeed koniec zátvorky"
+    *: "Krížový prenos zátvorka crossfeed koniec zátvorky"
   </voice>
 </phrase>
 <phrase>
@@ -813,10 +813,10 @@
     *: "Direct Gain"
   </source>
   <dest>
-    *: "Zosilnenie Priameho Sygnálu"
+    *: "Zosilnenie priameho signálu"
   </dest>
   <voice>
-    *: "Zosilnenie Priameho Sygnálu"
+    *: "Zosilnenie priameho signálu"
   </voice>
 </phrase>
 <phrase>
@@ -827,10 +827,10 @@
     *: "Cross Gain"
   </source>
   <dest>
-    *: "Zosilnenie Prenášaného Sygnálu"
+    *: "Zosilnenie prenášaného signálu"
   </dest>
   <voice>
-    *: "Zosilnenie Prenášaného Sygnálu"
+    *: "Zosilnenie prenášaného signálu"
   </voice>
 </phrase>
 <phrase>
@@ -841,10 +841,10 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "Tlmenie Vysokých Frekvencií"
+    *: "Tlmenie vysokých frekvencií"
   </dest>
   <voice>
-    *: "Tlmenie Vysokých Frekvencií"
+    *: "Tlmenie vysokých frekvencií"
   </voice>
 </phrase>
 <phrase>
@@ -855,10 +855,10 @@
     *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "Hranica Tlmenia Vysokých Frekvencií"
+    *: "Hranica tlmenia vysokých frekvencií"
   </dest>
   <voice>
-    *: "Hranica tlmenia Vysokých Frekvencií"
+    *: "Hranica tlmenia vysokých frekvencií"
   </voice>
 </phrase>
 <phrase>
@@ -886,7 +886,7 @@
     *: "Zapnúť EKV"
   </dest>
   <voice>
-    *: "Zapnúť Ekvalizér"
+    *: "Zapnúť ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -900,7 +900,7 @@
     *: "Grafický EKV"
   </dest>
   <voice>
-    *: "Grafický Ekvalizér"
+    *: "Grafický ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -911,10 +911,10 @@
     *: "Precut"
   </source>
   <dest>
-    *: "Celkové Zosilnenie"
+    *: "Celkové zosilnenie"
   </dest>
   <voice>
-    *: "Celkové Zosilnenie"
+    *: "Celkové zosilnenie"
   </voice>
 </phrase>
 <phrase>
@@ -925,10 +925,10 @@
     *: "Simple EQ Settings"
   </source>
   <dest>
-    *: "Jednoduché Nastavenie EKV"
+    *: "Jednoduché nastavenie EKV"
   </dest>
   <voice>
-    *: "Jednoduché Nastavenie Ekvalizéra"
+    *: "Jednoduché nastavenie ekvalizéra"
   </voice>
 </phrase>
 <phrase>
@@ -939,7 +939,7 @@
     *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "Pokročilé Nastavenie EKV"
+    *: "Pokročilé nastavenie EKV"
   </dest>
   <voice>
     *: "Pokročilé nastavenie ekvalizéra"
@@ -953,7 +953,7 @@
     *: "Save EQ Preset"
   </source>
   <dest>
-    *: "Uložiť Ako Predvoľbu"
+    *: "Uložiť ako predvoľbu"
   </dest>
   <voice>
     *: "Uložiť ako predvoľbu"
@@ -967,7 +967,7 @@
     *: "Browse EQ Presets"
   </source>
   <dest>
-    *: "Prehľadávať Predvoľby EKV"
+    *: "Prehľadávať predvoľby EKV"
   </dest>
   <voice>
     *: "Prehľadávať predvoľby ekvalizéra"
@@ -981,7 +981,7 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz Zosilnenie Pásma"
+    *: "%d Hz zosilnenie pásma"
   </dest>
   <voice>
     *: "hertz zosilnenie pásma"
@@ -995,7 +995,7 @@
     *: "Low Shelf Filter"
   </source>
   <dest>
-    *: "Filter Dolného Prahu"
+    *: "Filter dolného prahu"
   </dest>
   <voice>
     *: "Filter dolného prahu"
@@ -1009,10 +1009,10 @@
     *: "Peak Filter %d"
   </source>
   <dest>
-    *: "Filter Pásma %d"
+    *: "Filter pásma %d"
   </dest>
   <voice>
-    *: "Filter Pásma"
+    *: "Filter pásma"
   </voice>
 </phrase>
 <phrase>
@@ -1023,7 +1023,7 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "Filter Horného Prahu"
+    *: "Filter horného prahu"
   </dest>
   <voice>
     *: "Filter horného prahu"
@@ -1037,7 +1037,7 @@
     *: "Cutoff Frequency"
   </source>
   <dest>
-    *: "Hraničná Frekvencia"
+    *: "Hraničná frekvencia"
   </dest>
   <voice>
     *: "Hraničná frekvencia"
@@ -1051,7 +1051,7 @@
     *: "Centre Frequency"
   </source>
   <dest>
-    *: "Stredová Frekvencia"
+    *: "Stredová frekvencia"
   </dest>
   <voice>
     *: "Stredová frekvencia"
@@ -1093,7 +1093,7 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Všeobecné Nastavenia"
+    *: "Všeobecné nastavenia"
   </dest>
   <voice>
     *: "Všeobecné nastavenia"
@@ -1107,10 +1107,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Nastavenia Prehrávania"
+    *: "Nastavenia prehrávania"
   </dest>
   <voice>
-    *: "Nastavenia Prehrávania"
+    *: "Nastavenia prehrávania"
   </voice>
 </phrase>
 <phrase>
@@ -1191,7 +1191,7 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Prehrať Najprv Označenú"
+    *: "Prehrať najprv označenú"
   </dest>
   <voice>
     *: "Prehrať najprv označenú"
@@ -1219,7 +1219,7 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Min Krok Pretáčania"
+    *: "Min krok pretáčania"
   </dest>
   <voice>
     *: "Minimálny krok"
@@ -1233,7 +1233,7 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Zrýchlenie Pretáčania"
+    *: "Zrýchlenie pretáčania"
   </dest>
   <voice>
     *: "Zrýchlenie"
@@ -1264,10 +1264,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Stišovať pri Stop/pauza"
+    *: "Stišovať pri Stop/Pauza"
   </dest>
   <voice>
-    *: "Stišovať Pri Stop a Pauza"
+    *: "Stišovať pri Stop a Pauza"
   </voice>
 </phrase>
 <phrase>
@@ -1278,7 +1278,7 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Párty Režim"
+    *: "Párty režim"
   </dest>
   <voice>
     *: "Párty režim"
@@ -1462,7 +1462,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Normalizácia Hlasitosti"
+    *: "Normalizácia hlasitosti"
   </dest>
   <voice>
     *: "Normalizácia hlasitosti"
@@ -1476,7 +1476,7 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Zabrániť Praskaniu"
+    *: "Zabrániť praskaniu"
   </dest>
   <voice>
     *: "Zabrániť praskaniu"
@@ -1490,7 +1490,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "použiť Zosilnenie"
+    *: "použiť zosilnenie"
   </dest>
   <voice>
     *: "Použiť zosilnenie"
@@ -1504,7 +1504,7 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Zosilnenie Albumu"
+    *: "Zosilnenie albumu"
   </dest>
   <voice>
     *: "Zosilnenie albumu"
@@ -1518,7 +1518,7 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Zosilnenie Stopy"
+    *: "Zosilnenie stopy"
   </dest>
   <voice>
     *: "Zosilnenie stopy"
@@ -1532,7 +1532,7 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Zosilnenie Stopy ak Sa Mieša"
+    *: "Zosilnenie stopy ak sa mieša"
   </dest>
   <voice>
     *: "Zosilnenie stopy ak sa mieša"
@@ -1560,7 +1560,7 @@
     *: "Track Skip Beep"
   </source>
   <dest>
-    *: "Pípnutie pri Preskočení stopy"
+    *: "Pípnutie pri preskočení stopy"
   </dest>
   <voice>
     *: "Pípnutie pri preskočení stopy"
@@ -1588,7 +1588,7 @@
     *: "Moderate"
   </source>
   <dest>
-    *: "Stredne Silné"
+    *: "Stredne silné"
   </dest>
   <voice>
     *: "Stredne silné"
@@ -1633,7 +1633,7 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Automatická Zmena Priečinka"
+    *: "Automatická zmena priečinka"
   </dest>
   <voice>
     *: "Automatická zmena priečinka"
@@ -1675,7 +1675,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Podpora Hárkov stôp (Cuesheet)"
+    *: "Podpora hárkov stôp (Cuesheet)"
   </dest>
   <voice>
     *: "Podpora hárkov stôp (cuesheet)"
@@ -1740,7 +1740,7 @@
     *: "File View"
   </source>
   <dest>
-    *: "Zobrazenie Súborov"
+    *: "Zobrazenie súborov"
   </dest>
   <voice>
     *: "Zobrazenie súborov"
@@ -1768,7 +1768,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Triediť Priečinky"
+    *: "Triediť priečinky"
   </dest>
   <voice>
     *: "Triediť priečinky"
@@ -1782,7 +1782,7 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Triediť Súbory"
+    *: "Triediť súbory"
   </dest>
   <voice>
     *: "Triediť súbory"
@@ -1810,7 +1810,7 @@
     *: "By Date"
   </source>
   <dest>
-    *: "Podľa Dátumu"
+    *: "Podľa dátumu"
   </dest>
   <voice>
     *: "Podľa dátumu"
@@ -1838,7 +1838,7 @@
     *: "By Type"
   </source>
   <dest>
-    *: "Podľa Typu"
+    *: "Podľa typu"
   </dest>
   <voice>
     *: "Podľa typu"
@@ -1852,7 +1852,7 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Ukázať Súbory"
+    *: "Ukázať súbory"
   </dest>
   <voice>
     *: "Ukázať súbory"
@@ -1894,10 +1894,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Nasledovať Plejlist"
+    *: "Nasledovať plejlist"
   </dest>
   <voice>
-    *: "Nasledovať Plejlist"
+    *: "Nasledovať plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -1908,7 +1908,7 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Ukázať Cestu"
+    *: "Ukázať cestu"
   </dest>
   <voice>
     *: "Ukázať cestu"
@@ -1922,7 +1922,7 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Len Aktuálny Priečinok"
+    *: "Len aktuálny priečinok"
   </dest>
   <voice>
     *: "Len aktuálny priečinok"
@@ -1936,7 +1936,7 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Celú Cestu"
+    *: "Celú cestu"
   </dest>
   <voice>
     *: "Celú cestu"
@@ -2003,7 +2003,7 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Inicializovať Teraz"
+    *: "Inicializovať teraz"
   </dest>
   <voice>
     *: "Inicializovať teraz"
@@ -2017,7 +2017,7 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Aktualizovať Teraz"
+    *: "Aktualizovať teraz"
   </dest>
   <voice>
     *: "Aktualizovať teraz"
@@ -2045,7 +2045,7 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Exportovať Modifikácie"
+    *: "Exportovať modifikácie"
   </dest>
   <voice>
     *: "Exportovať modifikácie"
@@ -2059,7 +2059,7 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Importovať Modifikácie"
+    *: "Importovať modifikácie"
   </dest>
   <voice>
     *: "Importovať modifikácie"
@@ -2073,7 +2073,7 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Aktualizácia na Pozadí"
+    *: "Aktualizácia na pozadí"
   </dest>
   <voice>
     *: "Aktualizácia na pozadí"
@@ -2087,7 +2087,7 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Ukladám Databázu"
+    *: "Ukladám databázu"
   </dest>
   <voice>
     *: "Ukladám databázu"
@@ -2101,10 +2101,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Databáza Nieje Dokončená"
+    *: "Databáza nie je dokončená"
   </dest>
   <voice>
-    *: "Databáza nieje dokončená"
+    *: "Databáza nie je dokončená"
   </voice>
 </phrase>
 <phrase>
@@ -2157,7 +2157,7 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Obrazovka Prehrávania"
+    *: "Obrazovka prehrávania"
   </dest>
   <voice>
     *: "Obrazovka prehrávania"
@@ -2298,7 +2298,7 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "Prvé Stlačenie Tlačidla Len Aktivuje Podsvietenie"
+    *: "Prvé stlačenie tlačidla len aktivuje podsvietenie"
   </dest>
   <voice>
     *: "Prvé stlačenie tlačidla len aktivuje podsvietenie"
@@ -2394,7 +2394,7 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Hore Nohami"
+    *: "Hore nohami"
   </dest>
   <voice>
     *: "Hore nohami"
@@ -2436,7 +2436,7 @@
     *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Inverzný Kurzor"
+    *: "Inverzný kurzor"
   </dest>
   <voice>
     *: "Inverzný kurzor"
@@ -2603,7 +2603,7 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Zobraziť Ikony"
+    *: "Zobraziť ikony"
   </dest>
   <voice>
     *: "Zobraziť ikony"
@@ -2631,7 +2631,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Príklad Nastavenia Rýchlosti Rolovania"
+    *: "Príklad nastavenia rýchlosti rolovania"
   </dest>
   <voice>
     *: ""
@@ -2645,7 +2645,7 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Rýchlosť Rolovania"
+    *: "Rýchlosť rolovania"
   </dest>
   <voice>
     *: "Rýchlosť rolovania"
@@ -2659,7 +2659,7 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Čakanie Pred Rolovaním"
+    *: "Čakanie pred rolovaním"
   </dest>
   <voice>
     *: "Čakanie pred rolovaním"
@@ -2673,7 +2673,7 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Veľkosť Kroku Rolovania"
+    *: "Veľkosť kroku rolovania"
   </dest>
   <voice>
     *: "Veľkosť kroku rolovania"
@@ -2687,7 +2687,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Príklad Textu Pre Nastavenie Veľkosti Kroku Rolovania"
+    *: "Príklad textu pre nastavenie veľkosti kroku rolovania"
   </dest>
   <voice>
     *: ""
@@ -2701,7 +2701,7 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Limit Pre Obojsmerné Rolovanie"
+    *: "Limit pre obojsmerné rolovanie"
   </dest>
   <voice>
     *: "Limit pre obojsmerné rolovanie"
@@ -2732,7 +2732,7 @@
     *: "Screen Scrolls Out of View"
   </source>
   <dest>
-    *: "Obrazovka Roluje Mimo Zobrazenia"
+    *: "Obrazovka roluje mimo zobrazenia"
   </dest>
   <voice>
     *: "Obrazovka roluje mimo zobrazenia"
@@ -2746,7 +2746,7 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Dĺžka Kroku Obrazovkového Rolovania"
+    *: "Dĺžka kroku obrazovkového rolovania"
   </dest>
   <voice>
     *: "Dĺžka kroku obrazovkového rolovania"
@@ -2760,7 +2760,7 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "Stránkové Rolovanie"
+    *: "Stránkové rolovanie"
   </dest>
   <voice>
     *: "Stránkové rolovanie"
@@ -2808,7 +2808,7 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Stavový Riadok / Posuvník"
+    *: "Stavový riadok/posuvník"
   </dest>
   <voice>
     *: "Stavový riadok alebo posuvník"
@@ -2822,7 +2822,7 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Rolovací Pás"
+    *: "Rolovací pás"
   </dest>
   <voice>
     *: "Rolovací pás"
@@ -2850,7 +2850,7 @@
     *: "Volume Display"
   </source>
   <dest>
-    *: "Zobrazenie Hlasitosti"
+    *: "Zobrazenie hlasitosti"
   </dest>
   <voice>
     *: "Zobrazenie hlasitosti"
@@ -2864,7 +2864,7 @@
     *: "Battery Display"
   </source>
   <dest>
-    *: "Zobrazenie Batérie"
+    *: "Zobrazenie batérie"
   </dest>
   <voice>
     *: "Zobrazenie batérie"
@@ -2920,7 +2920,7 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Dĺžka Zobrazenia Indikátora Klikania"
+    *: "Dĺžka zobrazenia indikátora klikania"
   </dest>
   <voice>
     *: "Dĺžka zobrazenia indikátora klikania"
@@ -2934,7 +2934,7 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Interval Resetu Indikátora Peaku"
+    *: "Interval resetu indikátora Peaku"
   </dest>
   <voice>
     *: "Interval resetu indikátora peaku"
@@ -2993,7 +2993,7 @@
     *: "Logaritmicky (dB)"
   </dest>
   <voice>
-    *: "Logaritmicky v Decibeloch"
+    *: "Logaritmicky v decibeloch"
   </voice>
 </phrase>
 <phrase>
@@ -3018,7 +3018,7 @@
     *: "Minimum of Range"
   </source>
   <dest>
-    *: "Minimum Rozsahu"
+    *: "Minimum rozsahu"
   </dest>
   <voice>
     *: "Minimum rozsahu"
@@ -3032,7 +3032,7 @@
     *: "Maximum of Range"
   </source>
   <dest>
-    *: "Maximum Rozsahu"
+    *: "Maximum rozsahu"
   </dest>
   <voice>
     *: "Maximum rozsahu"
@@ -3046,7 +3046,7 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Predvolená Kódová Stránka"
+    *: "Predvolená kódová stránka"
   </dest>
   <voice>
     *: "Predvolená kódová stránka"
@@ -3279,7 +3279,7 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Úvodná Obrazovka"
+    *: "Úvodná obrazovka"
   </dest>
   <voice>
     *: "Úvodná obrazovka"
@@ -3293,7 +3293,7 @@
     *: "Main Menu"
   </source>
   <dest>
-    *: "Hlavná Ponuka"
+    *: "Hlavná ponuka"
   </dest>
   <voice>
     *: "Hlavná ponuka"
@@ -3307,7 +3307,7 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Predchádzajúca Obrazovka"
+    *: "Predchádzajúca obrazovka"
   </dest>
   <voice>
     *: "Predchádzajúca obrazovka"
@@ -3335,7 +3335,7 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Kapacita Batérie"
+    *: "Kapacita batérie"
   </dest>
   <voice>
     *: "Kapacita batérie"
@@ -3445,10 +3445,10 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "12 Hodinový Čas"
+    *: "12 hodinový čas"
   </dest>
   <voice>
-    *: "12 Hodinový čas"
+    *: "12 hodinový čas"
   </voice>
 </phrase>
 <phrase>
@@ -3459,7 +3459,7 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "24 Hodinový Čas"
+    *: "24 hodinový čas"
   </dest>
   <voice>
     *: "24 hodinový čas"
@@ -3824,7 +3824,7 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Vypnúť Pri Nečinnosti"
+    *: "Vypnúť pri nečinnosti"
   </dest>
   <voice>
     *: "Vypnúť pri nečinnosti"
@@ -3880,7 +3880,7 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max. Veľkosť Plejlistu"
+    *: "Max. veľkosť plejlistu"
   </dest>
   <voice>
     *: "Maximálna veľkosť plejlistu"
@@ -4027,7 +4027,7 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Záložka Pri Zastavení"
+    *: "Záložka pri zastavení"
   </dest>
   <voice>
     *: "Záložka pri zastavení"
@@ -4041,7 +4041,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Áno Len Najnovšie"
+    *: "Áno len najnovšie"
   </dest>
   <voice>
     *: "Áno len najnovšie"
@@ -4055,7 +4055,7 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Opýtať Sa Len Najnovšie"
+    *: "Opýtať sa len najnovšie"
   </dest>
   <voice>
     *: "Opýtať sa len najnovšie"
@@ -4069,7 +4069,7 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Načítať Poslednú Záložku"
+    *: "Načítať poslednú záložku"
   </dest>
   <voice>
     *: "Načítať poslednú záložku"
@@ -4083,7 +4083,7 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Udržiavať Zoznam Majnovších Záložiek"
+    *: "Udržiavať zoznam najnovších záložiek"
   </dest>
   <voice>
     *: "Udržiavať zoznam najnovších záložiek"
@@ -4111,7 +4111,7 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Nový Jazyk"
+    *: "Nový jazyk"
   </dest>
   <voice>
     *: "Nový jazyk"
@@ -4125,7 +4125,7 @@
     *: "Voice"
   </source>
   <dest>
-    *: "Ozvučenie Hlasom"
+    *: "Ozvučenie hlasom"
   </dest>
   <voice>
     *: "Ozvučenie hlasom"
@@ -4167,7 +4167,7 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Používať .talk Klipy Pre Priečinky"
+    *: "Používať .talk klipy pre priečinky"
   </dest>
   <voice>
     *: "Používať .talk klipy pre priečinky"
@@ -4181,7 +4181,7 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Ozvučiť Mená Súborov"
+    *: "Ozvučiť mená súborov"
   </dest>
   <voice>
     *: "Ozvučiť mená súborov"
@@ -4195,7 +4195,7 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Používať .talk Klipy Pre Súbory"
+    *: "Používať .talk klipy pre súbory"
   </dest>
   <voice>
     *: "Používať .talk klipy pre súbory"
@@ -4237,7 +4237,7 @@
     *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 Klip"
+    *: ".talk mp3 klip"
   </dest>
   <voice>
     *: "talk mp3 klip"
@@ -4251,7 +4251,7 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Správa Nastavení"
+    *: "Správa nastavení"
   </dest>
   <voice>
     *: "Správa nastavení"
@@ -4265,7 +4265,7 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Prehľadávať .cfg Súbory"
+    *: "Prehľadávať .cfg súbory"
   </dest>
   <voice>
     *: "Prehľadávať konfiguračné súbory"
@@ -4279,7 +4279,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Nastavenia Boli Načítané"
+    *: "Nastavenia boli načítané"
   </dest>
   <voice>
     *: "Nastavenia boli načítané"
@@ -4293,7 +4293,7 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Reset Nastavení"
+    *: "Reset nastavení"
   </dest>
   <voice>
     *: "Reset nastavení"
@@ -4321,7 +4321,7 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Uložiť .cfg Súbor"
+    *: "Uložiť .cfg súbor"
   </dest>
   <voice>
     *: "Uložiť konfiguračný súbor"
@@ -4335,7 +4335,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Nastavenia Boli Uložené"
+    *: "Nastavenia boli uložené"
   </dest>
   <voice>
     *: "Nastavenia boli uložené"
@@ -4349,7 +4349,7 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Uložiť Nastavenia Motívu"
+    *: "Uložiť nastavenia motívu"
   </dest>
   <voice>
     *: "Uložiť nastavenia motívu"
@@ -4363,7 +4363,7 @@
     *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Prehľadávať Súbory Motívu"
+    *: "Prehľadávať súbory motívu"
   </dest>
   <voice>
     *: "Prehľadávať súbory motívu"
@@ -5584,7 +5584,7 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Vytvoriť Plejlist"
+    *: "Vytvoriť plejlist"
   </dest>
   <voice>
     *: "Vytvoriť plejlist"
@@ -5598,7 +5598,7 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Nastavenia Prehliadača Plejlistu"
+    *: "Nastavenia Prehliadača plejlistu"
   </dest>
   <voice>
     *: "Nastavenia prehliadača plejlistu"
@@ -5612,7 +5612,7 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Zobraziť Aktuálny Plejlist"
+    *: "Zobraziť aktuálny plejlist"
   </dest>
   <voice>
     *: "Zobraziť aktuálny plejlist"
@@ -5640,7 +5640,7 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Ukázať Indície"
+    *: "Ukázať indície"
   </dest>
   <voice>
     *: "Ukázať indície"
@@ -5654,7 +5654,7 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Zobrazenie Stopy"
+    *: "Zobrazenie stopy"
   </dest>
   <voice>
     *: "Zobrazenie stopy"
@@ -5668,7 +5668,7 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "Len Názov Stopy"
+    *: "Len názov stopy"
   </dest>
   <voice>
     *: "Len názov stopy"
@@ -5696,7 +5696,7 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Uložiť Aktuálny Plejlist"
+    *: "Uložiť aktuálny plejlist"
   </dest>
   <voice>
     *: "Uložiť aktuálny plejlist"
@@ -5724,7 +5724,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Vložiť Priečinky Rekurzívne"
+    *: "Vložiť priečinky rekurzívne"
   </dest>
   <voice>
     *: "Vložiť priečinky rekurzívne"
@@ -5752,7 +5752,7 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Varovať Pri Mazaní Dynamického Plejlistu"
+    *: "Varovať pri mazaní dynamického plejlistu"
   </dest>
   <voice>
     *: "Varovať pri mazaní dynamického plejlistu"
@@ -5766,7 +5766,7 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Vymazať Dynamický Plejlist?"
+    *: "Vymazať dynamický plejlist?"
   </dest>
   <voice>
     *: "Vymazať dynamický plejlist?"
@@ -5780,10 +5780,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Info o Rockboxe"
+    *: "Rockbox Info"
   </dest>
   <voice>
-    *: "Info o Rockboxe"
+    *: "Rockbox Info"
   </voice>
 </phrase>
 <phrase>
@@ -5912,7 +5912,7 @@
     *: "Running Time"
   </source>
   <dest>
-    *: "Čas Behu"
+    *: "Čas behu"
   </dest>
   <voice>
     *: "Čas behu"
@@ -5996,7 +5996,7 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Zaradiť Ako Nasledujúce"
+    *: "Zaradiť ako nasledujúce"
   </dest>
   <voice>
     *: "Zaradiť ako nasledujúce"
@@ -6010,7 +6010,7 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Zaradiť Na Koniec"
+    *: "Zaradiť na koniec"
   </dest>
   <voice>
     *: "Zaradiť na koniec"
@@ -6024,7 +6024,7 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Zaradiť Zamiešané"
+    *: "Zaradiť zamiešané"
   </dest>
   <voice>
     *: "Zaradiť zamiešané"
@@ -6080,7 +6080,7 @@
     *: "Search in Playlist"
   </source>
   <dest>
-    *: "Hľadať V Plejliste"
+    *: "Hľadať v plejliste"
   </dest>
   <voice>
     *: "Hľadať v plejliste"
@@ -6108,7 +6108,7 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Znovu Zamiešať"
+    *: "Znovu zamiešať"
   </dest>
   <voice>
     *: "Znovu zamiešať"
@@ -6122,7 +6122,7 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Pridať Do Nového Plejlistu"
+    *: "Pridať do nového plejlistu"
   </dest>
   <voice>
     *: "Pridať do nového plejlistu"
@@ -6150,7 +6150,7 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "Žiadne Plejlisty"
+    *: "Žiadne plejlisty"
   </dest>
   <voice>
     *: "Žiadne plejlisty"
@@ -6178,7 +6178,7 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Vytvoriť Záložku"
+    *: "Vytvoriť záložku"
   </dest>
   <voice>
     *: "Vytvoriť záložku"
@@ -6192,7 +6192,7 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Zobraziť Zoznam Záložiek"
+    *: "Zobraziť zoznam záložiek"
   </dest>
   <voice>
     *: "Zobraziť zoznam záložiek"
@@ -6206,7 +6206,7 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Kontextová Ponuka"
+    *: "Kontextová ponuka"
   </dest>
   <voice>
     *: "Kontextová ponuka"
@@ -6220,7 +6220,7 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Nastaviť Hodnotenie Piesne"
+    *: "Nastaviť hodnotenie piesne"
   </dest>
   <voice>
     *: "Nastaviť hodnotenie piesne"
@@ -6234,7 +6234,7 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Prehľadávať Hárky Stôp"
+    *: "Prehľadávať hárky stôp"
   </dest>
   <voice>
     *: "Prehľadávať hárky stôp"
@@ -6248,7 +6248,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Zobraziť Info o Stope"
+    *: "Zobraziť info o stope"
   </dest>
   <voice>
     *: "Zobraziť info o stope"
@@ -6304,10 +6304,10 @@
     *: "Tracknum"
   </source>
   <dest>
-    *: "Č. Stopy"
+    *: "Č. stopy"
   </dest>
   <voice>
-    *: "Č. Stopy"
+    *: "Č. stopy"
   </voice>
 </phrase>
 <phrase>
@@ -6374,10 +6374,10 @@
     *: "Bitrate"
   </source>
   <dest>
-    *: "Počet Bitov"
+    *: "Počet bitov"
   </dest>
   <voice>
-    *: "Počet Bitov"
+    *: "Počet bitov"
   </voice>
 </phrase>
 <phrase>
@@ -6388,10 +6388,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Interpret Albumu"
+    *: "Interpret albumu"
   </dest>
   <voice>
-    *: "Interpret Albumu"
+    *: "Interpret albumu"
   </voice>
 </phrase>
 <phrase>
@@ -6402,10 +6402,10 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "Č. Disku"
+    *: "Č. disku"
   </dest>
   <voice>
-    *: "Č. Disku"
+    *: "Č. disku"
   </voice>
 </phrase>
 <phrase>
@@ -6458,10 +6458,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Zosilnenie Stopy"
+    *: "Zosilnenie stopy"
   </dest>
   <voice>
-    *: "Zosilnenie Stopy"
+    *: "Zosilnenie stopy"
   </voice>
 </phrase>
 <phrase>
@@ -6486,10 +6486,10 @@
     *: "[No Info]"
   </source>
   <dest>
-    *: "[Bez Infa]"
+    *: "[Bez infa]"
   </dest>
   <voice>
-    *: "Bez Infa"
+    *: "Bez infa"
   </voice>
 </phrase>
 <phrase>
@@ -6556,7 +6556,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Súbor/priečinok existuje. Nahradiť?"
+    *: "Súbor/Priečinok existuje. Nahradiť?"
   </dest>
   <voice>
     *: "Súbor alebo priečinok už existuje. Nahradiť?"
@@ -6584,7 +6584,7 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Vymazať Priečinok"
+    *: "Vymazať priečinok"
   </dest>
   <voice>
     *: "Vymazať priečinok"
@@ -6685,7 +6685,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Otvoriť V Programe..."
+    *: "Otvoriť v programe..."
   </dest>
   <voice>
     *: "Otvoriť v programe"
@@ -6699,7 +6699,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Vytvoriť Priečinok"
+    *: "Vytvoriť priečinok"
   </dest>
   <voice>
     *: "Vytvoriť priečinok"
@@ -6727,7 +6727,7 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Pridať Do Skratiek"
+    *: "Pridať do skratiek"
   </dest>
   <voice>
     *: "Pridať do skratiek"
@@ -6997,7 +6997,7 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Tlačidlá Sú Zamknuté"
+    *: "Tlačidlá sú zamknuté"
   </dest>
   <voice>
     *: ""
@@ -7011,7 +7011,7 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Tlačidlá Sú Odomknuté"
+    *: "Tlačidlá sú odomknuté"
   </dest>
   <voice>
     *: ""
@@ -7292,10 +7292,10 @@
     *: "WARNING! Low Battery!"
   </source>
   <dest>
-    *: "VAROVANIE! Slabá Batéria!"
+    *: "VAROVANIE! Slabá batéria!"
   </dest>
   <voice>
-    *: "VAROVANIE! Slabá Batéria!"
+    *: "VAROVANIE! Slabá batéria!"
   </voice>
 </phrase>
 <phrase>
@@ -7967,7 +7967,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mili-ampér Hodín"
+    *: "miliampérhodín"
   </voice>
 </phrase>
 <phrase>
@@ -8628,7 +8628,7 @@
     *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: "Režim Editovania: %s %s"
+    *: "Režim editovania: %s %s"
   </dest>
   <voice>
     *: ""
@@ -8726,7 +8726,7 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Ukázať Prípony Názvov Súborov"
+    *: "Ukázať prípony názvov súborov"
   </dest>
   <voice>
     *: "Ukázať prípony názvov súborov"
@@ -8740,7 +8740,7 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Len Neznáme Typy"
+    *: "Len neznáme typy"
   </dest>
   <voice>
     *: "Len neznáme typy"
@@ -8754,7 +8754,7 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Len Pri Zobrazení Všetkých Typov"
+    *: "Len pri zobrazení všetkých typov"
   </dest>
   <voice>
     *: "Len pri zobrazení všetkých typov"
@@ -8940,7 +8940,7 @@
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "Stredo Európske (CP1250)"
+    *: "Stredoeurópske (CP1250)"
   </dest>
   <voice>
     *: "Stredo európske"
@@ -8954,7 +8954,7 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "Nastavenia Motívu"
+    *: "Nastavenia motívu"
   </dest>
   <voice>
     *: "Nastavenia motívu"
@@ -9061,7 +9061,7 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Oznamovať Stav Batérie"
+    *: "Oznamovať stav batérie"
   </dest>
   <voice>
     *: "Oznamovať stav batérie"
@@ -9075,7 +9075,7 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Povedať Typ Súboru"
+    *: "Povedať typ súboru"
   </dest>
   <voice>
     *: "Povedať typ súboru"
@@ -9137,7 +9137,7 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Uložiť Nastavenia Zvuku"
+    *: "Uložiť nastavenia zvuku"
   </dest>
   <voice>
     *: "Uložiť nastavenia zvuku"
@@ -9151,7 +9151,7 @@
     *: "Keyclick"
   </source>
   <dest>
-    *: "Klikanie Pri Klávesoch"
+    *: "Klikanie pri klávesoch"
   </dest>
   <voice>
     *: "Klikanie pri klávesoch"
@@ -9165,7 +9165,7 @@
     *: "Keyclick Repeats"
   </source>
   <dest>
-    *: "Opakované Klikanie"
+    *: "Opakované klikanie"
   </dest>
   <voice>
     *: "Opakované klikanie"
@@ -9392,7 +9392,7 @@
     *: "Very slow"
   </source>
   <dest>
-    *: "Veľmi Pomaly"
+    *: "Veľmi pomaly"
   </dest>
   <voice>
     *: "Veľmi pomaly"
@@ -9420,7 +9420,7 @@
     *: "Very fast"
   </source>
   <dest>
-    *: "Veľmi Rýchlo"
+    *: "Veľmi rýchlo"
   </dest>
   <voice>
     *: "Veľmi rýchlo"
@@ -9448,7 +9448,7 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Dĺžka Skoku"
+    *: "Dĺžka skoku"
   </dest>
   <voice>
     *: "Dĺžka skoku"
@@ -9462,7 +9462,7 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Preskočiť Stopu"
+    *: "Preskočiť stopu"
   </dest>
   <voice>
     *: "Preskočiť stopu"
@@ -9660,7 +9660,7 @@
     *: "Search Results"
   </source>
   <dest>
-    *: "Výsledky Vyhľadávania"
+    *: "Výsledky vyhľadávania"
   </dest>
   <voice>
     *: "Výsledky vyhľadávania"
@@ -9702,7 +9702,7 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Inicializovať Nastavenie"
+    *: "Inicializovať nastavenie"
   </dest>
   <voice>
     *: "Inicializovať nastavenie"
@@ -9781,7 +9781,7 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Interpretovať Čísla Pri Triedení"
+    *: "Interpretovať Čísla pri triedení"
   </dest>
   <voice>
     *: "Interpretovať čísla pri triedení"
@@ -9809,7 +9809,7 @@
     *: "As whole numbers"
   </source>
   <dest>
-    *: "Ako Celé Čísla"
+    *: "Ako celé čísla"
   </dest>
   <voice>
     *: "Ako celé čísla"
@@ -9891,7 +9891,7 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Zabrániť Preskočeniu Stopy"
+    *: "Zabrániť preskočeniu stopy"
   </dest>
   <voice>
     *: "Zabrániť preskočeniu stopy"
@@ -9905,10 +9905,10 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Úprava Rýchlosti"
+    *: "Úprava rýchlosti"
   </dest>
   <voice>
-    *: "Úprava Rýchlosti"
+    *: "Úprava rýchlosti"
   </voice>
 </phrase>
 <phrase>
@@ -10342,7 +10342,7 @@
     *: "Makeup Gain"
   </source>
   <dest>
-    *: "Zosilnenie Po Kompresii"
+    *: "Zosilnenie po kompresii"
   </dest>
   <voice>
     *: "Zosilnenie po kompresii"
@@ -10370,7 +10370,7 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Prechod Do Kompresie"
+    *: "Prechod do kompresie"
   </dest>
   <voice>
     *: "Prechod do kompresie"
@@ -10384,7 +10384,7 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Tvrdý Prechod"
+    *: "Tvrdý prechod"
   </dest>
   <voice>
     *: "Tvrdý prechod"
@@ -10398,7 +10398,7 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Mäkký Prechod"
+    *: "Mäkký prechod"
   </dest>
   <voice>
     *: "Mäkký prechod"
@@ -10412,7 +10412,7 @@
     *: "Release Time"
   </source>
   <dest>
-    *: "Čas Zotavenia"
+    *: "Čas zotavenia"
   </dest>
   <voice>
     *: "Čas zotavenia"
@@ -10426,7 +10426,7 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Preskočiť Na Záver"
+    *: "Preskočiť na záver"
   </dest>
   <voice>
     *: "Preskočiť na záver"
@@ -10488,10 +10488,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Zaradiť Nakoniec Zamiešané"
+    *: "Zaradiť na koniec zamiešané"
   </dest>
   <voice>
-    *: "Zaradiť nakoniec zamiešané"
+    *: "Zaradiť na koniec zamiešané"
   </voice>
 </phrase>
 <phrase>
@@ -10578,7 +10578,7 @@
     *: "Base Skin"
   </source>
   <dest>
-    *: "Základný Vzhľad"
+    *: "Základný vzhľad"
   </dest>
   <voice>
     *: "Základný vzhľad"
@@ -10592,7 +10592,7 @@
     *: "Remote Base Skin"
   </source>
   <dest>
-    *: "Vzdialený Základný Vzhľad"
+    *: "Vzdialený základný vzhľad"
   </dest>
   <voice>
     *: "Vzdialený základný vzhľad"
@@ -10674,7 +10674,7 @@
     *: "Rewind Before Resume"
   </source>
   <dest>
-    *: "Vrátiť Pred Obnovením Prehrávania"
+    *: "Vrátiť pred obnovením prehrávania"
   </dest>
   <voice>
     *: "Vrátiť pred obnovením prehrávania"
@@ -11016,7 +11016,7 @@
     *: "Update on Stop"
   </source>
   <dest>
-    *: "Aktualizovať Pri Zastavení"
+    *: "Aktualizovať pri zastavení"
   </dest>
   <voice>
     *: "Aktualizovať pri zastavení"
@@ -11064,7 +11064,7 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Začať Prezeranie Súborov na /"
+    *: "Začať prezeranie súborov na /"
   </dest>
   <voice>
     *: "Začať prezeranie súborov v koreňovom priečinku"
@@ -11078,10 +11078,10 @@
     *: "Filesize"
   </source>
   <dest>
-    *: "Veľkosť Súboru"
+    *: "Veľkosť súboru"
   </dest>
   <voice>
-    *: "Veľkosť Súboru"
+    *: "Veľkosť súboru"
   </voice>
 </phrase>
 <phrase>
@@ -11109,7 +11109,7 @@
     *: "Automatic Resume"
   </source>
   <dest>
-    *: "Automatické Obnovenie Prehrávania"
+    *: "Automatické obnovenie prehrávania"
   </dest>
   <voice>
     *: "Automatické obnovenie prehrávania"
@@ -11123,10 +11123,10 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Obnoviť Pri Automatickej Zmene Stopy"
+    *: "Obnoviť pri automatickej zmene stopy"
   </dest>
   <voice>
-    *: "Obnoviť Pri Automatickej Zmene Stopy"
+    *: "Obnoviť pri automatickej zmene stopy"
   </voice>
 </phrase>
 <phrase>
@@ -11137,10 +11137,10 @@
     *: "In custom directories only"
   </source>
   <dest>
-    *: "Len v Zvolených Priečinkoch"
+    *: "Len v zvolených priečinkoch"
   </dest>
   <voice>
-    *: "Len v Zvolených Priečinkoch"
+    *: "Len v zvolených priečinkoch"
   </voice>
 </phrase>
 <phrase>
@@ -11151,10 +11151,10 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "Aktuálny Plejlist"
+    *: "Aktuálny plejlist"
   </dest>
   <voice>
-    *: "Aktuálny Plejlist"
+    *: "Aktuálny plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -11165,10 +11165,10 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Uložiť Zmeny?"
+    *: "Uložiť zmeny?"
   </dest>
   <voice>
-    *: "Uložiť Zmeny?"
+    *: "Uložiť zmeny?"
   </voice>
 </phrase>
 <phrase>
@@ -11179,10 +11179,10 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Vrátiť Pri Pozastavení"
+    *: "Vrátiť pri pozastavení"
   </dest>
   <voice>
-    *: "Vrátiť Pri Pozastavení"
+    *: "Vrátiť pri pozastavení"
   </voice>
 </phrase>
 <phrase>
@@ -11193,10 +11193,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Resetovať Priečinok Katalógu Plejlistov"
+    *: "Resetovať priečinok Katalógu plejlistov"
   </dest>
   <voice>
-    *: "Resetovať Priečinok Katalógu Plejlistov"
+    *: "Resetovať priečinok Katalógu plejlistov"
   </voice>
 </phrase>
 <phrase>
@@ -11241,10 +11241,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Zrušiť Časovač Spánku"
+    *: "Zrušiť Časovač spánku"
   </dest>
   <voice>
-    *: "Zrušiť Časovač Spánku"
+    *: "Zrušiť Časovač spánku"
   </voice>
 </phrase>
 <phrase>
@@ -11255,10 +11255,10 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Predvolené Trvanie Pre Časovač Spánku"
+    *: "Predvolené trvanie pre Časovač spánku"
   </dest>
   <voice>
-    *: "Predvolené Trvanie Pre Časovač Spánku"
+    *: "Predvolené trvanie pre Časovač spánku"
   </voice>
 </phrase>
 <phrase>
@@ -11269,10 +11269,10 @@
     *: "Start Sleep Timer on Boot"
   </source>
   <dest>
-    *: "Aktivovať Časovač Spánku Po Zapnutí"
+    *: "Aktivovať Časovač spánku po zapnutí"
   </dest>
   <voice>
-    *: "Aktivovať Časovač Spánku Po Zapnutí"
+    *: "Aktivovať Časovač spánku po zapnutí"
   </voice>
 </phrase>
 <phrase>
@@ -11345,10 +11345,10 @@
     *: "Startup/Shutdown"
   </source>
   <dest>
-    *: "Spúšťanie / Vypínanie"
+    *: "Spúšťanie/Vypínanie"
   </dest>
   <voice>
-    *: "Spúšťanie / Vypínanie"
+    *: "Spúšťanie/Vypínanie"
   </voice>
 </phrase>
 <phrase>
@@ -11359,10 +11359,10 @@
     *: "Restart Sleep Timer on Keypress"
   </source>
   <dest>
-    *: "Stlačenie Tlačidla Reštartuje Časovač Spánku"
+    *: "Stlačenie tlačidla reštartuje Časovač spánku"
   </dest>
   <voice>
-    *: "Stlačenie Tlačidla Reštartuje Časovač Spánku"
+    *: "Stlačenie tlačidla reštartuje Časovač spánku"
   </voice>
 </phrase>
 <phrase>
@@ -11387,10 +11387,10 @@
     *: "Start Sleep Timer"
   </source>
   <dest>
-    *: "Spustiť Časovač Spánku"
+    *: "Spustiť Časovač spánku"
   </dest>
   <voice>
-    *: "Spustiť Časovač Spánku"
+    *: "Spustiť Časovač spánku"
   </voice>
 </phrase>
 <phrase>
@@ -11446,10 +11446,10 @@
     *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Obmedziť Automatickú Zmenu"
+    *: "Obmedziť automatickú zmenu"
   </dest>
   <voice>
-    *: "Obmedziť Automatickú Zmenu"
+    *: "Obmedziť automatickú zmenu"
   </voice>
 </phrase>
 <phrase>
@@ -11460,10 +11460,10 @@
     *: "Select one or more directories"
   </source>
   <dest>
-    *: "Vyberte Jeden Alebo Viacero Priečinkov"
+    *: "Vyberte jeden alebo viacero priečinkov"
   </dest>
   <voice>
-    *: "Vyberte Jeden Alebo Viacero Priečinkov"
+    *: "Vyberte jeden alebo viacero priečinkov"
   </voice>
 </phrase>
 <phrase>
@@ -11474,10 +11474,10 @@
     *: "Select directories to scan"
   </source>
   <dest>
-    *: "Vyberte Priečinky Pre Prehľadávanie"
+    *: "Vyberte priečinky pre prehľadávanie"
   </dest>
   <voice>
-    *: "Vyberte Priečinky Pre Prehľadávanie"
+    *: "Vyberte priečinky pre prehľadávanie"
   </voice>
 </phrase>
 <phrase>
@@ -11488,10 +11488,10 @@
     *: "Line Separator Colour"
   </source>
   <dest>
-    *: "Farba Oddeľovačov Riadkov"
+    *: "Farba oddeľovačov riadkov"
   </dest>
   <voice>
-    *: "Farba Oddeľovačov Riadkov"
+    *: "Farba oddeľovačov riadkov"
   </voice>
 </phrase>
 <phrase>
@@ -11502,10 +11502,10 @@
     *: "Line Separator"
   </source>
   <dest>
-    *: "Oddeľovač Riadkov"
+    *: "Oddeľovač riadkov"
   </dest>
   <voice>
-    *: "Oddeľovač Riadkov"
+    *: "Oddeľovač riadkov"
   </voice>
 </phrase>
 <phrase>
@@ -11516,10 +11516,10 @@
     *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: "Obmedzenie Maximálnej Hlasitosti"
+    *: "Obmedzenie maximálnej hlasitosti"
   </dest>
   <voice>
-    *: "Obmedzenie Maximálnej Hlasitosti"
+    *: "Obmedzenie maximálnej hlasitosti"
   </voice>
 </phrase>
 <phrase>
@@ -11547,10 +11547,10 @@
     *: "Attack Time"
   </source>
   <dest>
-    *: "Čas Začiatku"
+    *: "Čas začiatku"
   </dest>
   <voice>
-    *: "Čas Začiatku"
+    *: "Čas začiatku"
   </voice>
 </phrase>
 <phrase>
@@ -11769,7 +11769,7 @@
     *: "Charge Only"
   </source>
   <dest>
-    *: "Iba Nabíjanie"
+    *: "Iba nabíjanie"
   </dest>
   <voice>
     *: "Iba nabíjanie"
@@ -12293,10 +12293,10 @@
     *: "WPS Integration"
   </source>
   <dest>
-    *: "Integrácia WPS"
+    *: "Integrácia Obrazovky teraz hrá"
   </dest>
   <voice>
-    *: "Integrácia WPS"
+    *: "Integrácia Obrazovky teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -12860,10 +12860,10 @@
     *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: "Nárast Worma po Potrave"
+    *: "Nárast worma po potrave"
   </dest>
   <voice>
-    *: "Nárast Worma po Potrave"
+    *: "Nárast worma po potrave"
   </voice>
 </phrase>
 <phrase>
@@ -13028,10 +13028,10 @@
     *: "Pause / Play"
   </source>
   <dest>
-    *: "Pauza / Play"
+    *: "Pauza/Play"
   </dest>
   <voice>
-    *: "Pauza / Play"
+    *: "Pauza/Play"
   </voice>
 </phrase>
 <phrase>
@@ -13458,10 +13458,10 @@
     *: "Not a VBR file"
   </source>
   <dest>
-    *: "Toto nieje súbor VBR"
+    *: "Toto nie je súbor VBR"
   </dest>
   <voice>
-    *: "Toto nieje súbor VBR"
+    *: "Toto nie je súbor VBR"
   </voice>
 </phrase>
 <phrase>
@@ -13955,10 +13955,10 @@
     *: "Go to WPS"
   </source>
   <dest>
-    *: "Choď na WPS"
+    *: "Choď na Obrazovku teraz hrá"
   </dest>
   <voice>
-    *: "Choď na WPS"
+    *: "Choď na Obrazovku teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -14964,10 +14964,10 @@
     *: "Set WPS Context Plugin"
   </source>
   <dest>
-    *: "Nastaviť zásuvný modul pre kontext obrazovky Teraz hrá"
+    *: "Nastaviť zásuvný modul pre kontext Obrazovky teraz hrá"
   </dest>
   <voice>
-    *: "Nastaviť zásuvný modul pre kontext obrazovky Teraz hrá"
+    *: "Nastaviť zásuvný modul pre kontext Obrazovky teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -15788,7 +15788,7 @@
     *: "Play Last"
   </source>
   <dest>
-    *: "Prehrať Nakoniec"
+    *: "Prehrať nakoniec"
   </dest>
   <voice>
     *: "Prehrať nakoniec"
@@ -15802,7 +15802,7 @@
     *: "Play Last Shuffled"
   </source>
   <dest>
-    *: "Prehrať Nakoniec Zamiešané"
+    *: "Prehrať nakoniec zamiešané"
   </dest>
   <voice>
     *: "Prehrať nakoniec zamiešané"
@@ -15937,10 +15937,10 @@
     *: "What's Playing Screen"
   </source>
   <dest>
-    *: "Obrazovka Teraz hrá"
+    *: "Obrazovka teraz hrá"
   </dest>
   <voice>
-    *: "Obrazovka Teraz hrá"
+    *: "Obrazovka teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -16220,7 +16220,7 @@
     *: "Nastavenia Mikmodu"
   </dest>
   <voice>
-    *: "Nastavenia Mik modu"
+    *: "Nastavenia Mikmodu"
   </voice>
 </phrase>
 <phrase>
