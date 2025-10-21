@@ -5780,10 +5780,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox Info"
+    *: "Info o Rockboxe"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Info o Rockboxe"
   </voice>
 </phrase>
 <phrase>
@@ -14424,8 +14424,8 @@
   <dest>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
@@ -14440,8 +14440,8 @@
   <voice>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
