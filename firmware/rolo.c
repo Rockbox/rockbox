@@ -64,7 +64,7 @@
 #include "ascodec.h"
 #endif
 
-#if defined(FIIO_M3K)
+#if defined(FIIO_M3K) || defined(SONY_NWZE370)
 #include "backlight-target.h"
 #endif
 
@@ -318,7 +318,7 @@ int rolo_load(const char* filename)
     lcd_remote_update();
 #endif
 
-#if defined(FIIO_M3K)
+#if defined(FIIO_M3K) || defined(SONY_NWZE370)
     /* Avoids the LCD backlight ramping down & up weirdly */
     backlight_hw_off();
 #endif

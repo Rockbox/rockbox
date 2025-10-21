@@ -31,6 +31,9 @@
 
 #ifdef HAVE_LCD_ENABLE
 static bool lcd_on;
+#ifdef HAVE_LCD_INVERT
+static bool lcd_inverted;
+#endif
 #endif
 
 static void lcd_write_reg(uint8_t reg, void *data, int data_len)
@@ -120,6 +123,9 @@ static void lcd_enable_seq(bool enable)
     if(enable)
     {
         lcd_write_reg(0x11, NULL, 0);
+#ifdef HAVE_LCD_INVERT
+        lcd_set_invert_display(lcd_inverted);
+#endif
         lcd_write_reg(0x29, NULL, 0);
     }
     else
@@ -143,6 +149,22 @@ void lcd_enable(bool enable)
         imx233_lcdif_enable(false);
     else
         send_event(LCD_EVENT_ACTIVATION, NULL);
+}
+#endif
+
+#ifdef HAVE_LCD_SHUTDOWN
+void lcd_shutdown(void) {
+    backlight_hw_off();
+}
+#endif
+
+#ifdef HAVE_LCD_INVERT
+void lcd_set_invert_display(bool yesno)
+{
+    lcd_write_reg(yesno ? 0x21 : 0x20, NULL, 0);
+#ifdef HAVE_LCD_ENABLE
+    lcd_inverted = yesno;
+#endif
 }
 #endif
 

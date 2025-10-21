@@ -22,6 +22,12 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
+
+/* Define this if the LCD can shut down */
+#define HAVE_LCD_SHUTDOWN
+
 #ifndef BOOTLOADER
 #define HAVE_ALBUMART
 
@@ -42,9 +48,6 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well.
 #define HAVE_LCD_SLEEP
@@ -55,9 +58,8 @@
 #define HAVE_LCD_FLIP
 */
 
-/* define this if you can invert the colours on your LCD
+/* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
-*/
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_IMX233
@@ -108,8 +110,8 @@
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      0
-#define MAX_BRIGHTNESS_SETTING      100
-#define DEFAULT_BRIGHTNESS_SETTING  50
+#define MAX_BRIGHTNESS_SETTING      88
+#define DEFAULT_BRIGHTNESS_SETTING  44
 
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
