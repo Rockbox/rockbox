@@ -38,7 +38,7 @@
 #define HAVE_JPEG
 
 /* Define this if a programmable hotkey is mapped */
-#define HAVE_HOTKEY
+//#define HAVE_HOTKEY
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
