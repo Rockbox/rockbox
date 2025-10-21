@@ -742,11 +742,11 @@
     recording: "Mono Left + Right"
   </source>
   <dest>
-    *: "trống"
+    *: none
     recording: "Mono Trái + Phải"
   </dest>
   <voice>
-    *: "trống"
+    *: none
     recording: "Mono Trái + Phải"
   </voice>
 </phrase>
@@ -2645,11 +2645,11 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Giảm nháy màn hình"
+    remote_ticking: "Hạn chế nhấp nháy màn hình"
   </dest>
   <voice>
     *: none
-    remote_ticking: "Giảm nháy màn hình"
+    remote_ticking: "Hạn chế nhấp nháy màn hình"
   </voice>
 </phrase>
 <phrase>
@@ -3303,12 +3303,12 @@
   <dest>
     *: none
     button_light: "Thời gian Tắt Đèn phím"
-    sansae200*,sansafuze*: "Thời gian Tắt Đèn Wheel"
+    sansae200*,sansafuze*: "Thời gian Tắt Đèn phím Wheel"
   </dest>
   <voice>
     *: none
     button_light: "Thời gian Tắt Đèn phím"
-    sansae200*,sansafuze*: "Thời gian Tắt Đèn Wheel"
+    sansae200*,sansafuze*: "Thời gian Tắt Đèn phím Wheel"
   </voice>
 </phrase>
 <phrase>
@@ -3528,22 +3528,22 @@
   user: core
   <source>
     *: none
+    rtc: "ON = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
-    rtc: "ON = Set"
     vibe500: "OK = Set"
   </source>
   <dest>
     *: none
+    rtc: "ON = Đặt"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Đặt"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Đặt"
     iriverh100,iriverh120,iriverh300: "NAVI = Đặt"
     mpiohd300: "ENTER = Đặt"
     mrobe500: "HEART = Đặt"
-    rtc: "ON = Đặt"
     vibe500: "OK = Đặt"
   </dest>
   <voice>
@@ -3556,6 +3556,7 @@
   user: core
   <source>
     *: none
+    rtc: "OFF = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
     gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3564,12 +3565,12 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
     mrobe100: "DISPLAY = Revert"
-    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
+    rtc: "OFF = Hủy bỏ"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Hủy bỏ"
     gigabeatfx,mrobe500: "POWER = Hủy bỏ"
     gogearsa9200: "LEFT = Hủy bỏ"
@@ -3578,7 +3579,6 @@
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Hủy bỏ"
     iriverh100,iriverh120,iriverh300: "STOP = Hủy bỏ"
     mrobe100: "DISPLAY = Hủy bỏ"
-    rtc: "OFF = Hủy bỏ"
     samsungyh*: "REW = Hủy bỏ"
     vibe500: "CANCEL = Hủy bỏ"
   </dest>
@@ -7197,8 +7197,6 @@
     *: "Bàn phím mới"
   </voice>
 </phrase>
-### The <voice> section for 'LANG_PLUGIN_CANT_OPEN:*' is blank! Copying from translated <dest>!
-### The <voice> section for 'LANG_PLUGIN_CANT_OPEN:*' has some suspicious characters (eg %,",~,:,<,>,[,],{,},|), please correct!
 <phrase>
   id: LANG_PLUGIN_CANT_OPEN
   desc: Plugin open error message
@@ -7210,7 +7208,7 @@
     *: "Không thể mở %s"
   </dest>
   <voice>
-    *: "Không thể mở %s"
+    *: "Không thể mở"
   </voice>
 </phrase>
 <phrase>
@@ -8812,7 +8810,7 @@
     *: ""
   </dest>
   <voice>
-    *: "đơn vị mỗi tích"
+    *: "đơn vị mỗi tích tắc"
   </voice>
 </phrase>
 <phrase>
@@ -8826,7 +8824,7 @@
     *: ""
   </dest>
   <voice>
-    *: "giờ"
+    *: "giờ đúng"
   </voice>
 </phrase>
 <phrase>
@@ -8857,7 +8855,6 @@
     *: "sáng"
   </voice>
 </phrase>
-### The <voice> section for 'VOICE_OH:*' is identical to english! (correct or prefix with ~)
 <phrase>
   id: VOICE_OH
   desc: spoken only, for wall clock announce
@@ -8869,7 +8866,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "không"
   </voice>
 </phrase>
 <phrase>
