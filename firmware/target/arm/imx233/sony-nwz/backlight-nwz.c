@@ -48,8 +48,13 @@ bool backlight_hw_init(void)
     imx233_pinctrl_acquire(0, 10, "backlight_enable");
     imx233_pinctrl_set_function(0, 10, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 10, true);
+#ifndef BOOTLOADER
     backlight_hw_brightness(0);
     return false;
+#else
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    return true;
+#endif
 }
 
 void backlight_hw_on(void)
