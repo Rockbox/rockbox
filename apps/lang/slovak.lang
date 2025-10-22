@@ -403,11 +403,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM Rádio"
+    radio: "FM rádio"
   </dest>
   <voice>
     *: none
-    radio: "FM Rádio"
+    radio: "FM rádio"
   </voice>
 </phrase>
 <phrase>
@@ -756,11 +756,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mono Ľavý + Pravý"
+    recording: "Mono ľavý + pravý"
   </dest>
   <voice>
     *: none
-    recording: "Mono Ľavý plus Pravý"
+    recording: "Mono ľavý plus pravý"
   </voice>
 </phrase>
 <phrase>
@@ -1311,11 +1311,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Zapnúť Prelínanie"
+    crossfade: "Zapnúť prelínanie"
   </dest>
   <voice>
     *: none
-    crossfade: "Zapnúť Prelínanie"
+    crossfade: "Zapnúť prelínanie"
   </voice>
 </phrase>
 <phrase>
@@ -1328,7 +1328,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Len Pri Ručnej Zmene Stopy"
+    crossfade: "Len pri ručnej zmene stopy"
   </dest>
   <voice>
     *: none
@@ -1345,7 +1345,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Pri Zamiešaní Alebo Ručnej Zmene Stopy"
+    crossfade: "Pri zamiešaní alebo ručnej zmene stopy"
   </dest>
   <voice>
     *: none
@@ -1362,7 +1362,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Zdržanie Zosilňovania"
+    crossfade: "Zdržanie zosilňovania"
   </dest>
   <voice>
     *: none
@@ -1379,7 +1379,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Dĺžka Zosilňovania"
+    crossfade: "Dĺžka zosilňovania"
   </dest>
   <voice>
     *: none
@@ -1396,7 +1396,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Zdržanie Stišovania"
+    crossfade: "Zdržanie stišovania"
   </dest>
   <voice>
     *: none
@@ -1413,7 +1413,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Dĺžka Stišovania"
+    crossfade: "Dĺžka stišovania"
   </dest>
   <voice>
     *: none
@@ -1430,7 +1430,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Režim Stišovania"
+    crossfade: "Režim stišovania"
   </dest>
   <voice>
     *: none
@@ -1618,7 +1618,7 @@
   </source>
   <dest>
     *: none
-    spdif_power: "Optický Výstup"
+    spdif_power: "Optický výstup"
   </dest>
   <voice>
     *: none
@@ -1675,7 +1675,7 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Podpora hárkov stôp (Cuesheet)"
+    *: "Podpora hárkov stôp (cuesheet)"
   </dest>
   <voice>
     *: "Podpora hárkov stôp (cuesheet)"
@@ -1691,7 +1691,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauza Pri Odpojení Slúchadiel"
+    headphone_detection: "Pauza pri odpojení slúchadiel"
   </dest>
   <voice>
     *: none
@@ -2173,7 +2173,7 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdialená Obrazovka Prehrávania"
+    remote: "Vzdialená obrazovka prehrávania"
   </dest>
   <voice>
     *: none
@@ -2218,7 +2218,7 @@
   </source>
   <dest>
     *: none
-    charging: "Podsvietenie (Pri Pripojení)"
+    charging: "Podsvietenie (Pri pripojení)"
   </dest>
   <voice>
     *: none
@@ -2235,7 +2235,7 @@
   </source>
   <dest>
     *: "Podsvietenie pri uzamknutí"
-    hold_button: "Podsvietenie pri Aktívnom Zámku"
+    hold_button: "Podsvietenie pri aktívnom zámku"
   </dest>
   <voice>
     *: "Podsvietenie pri uzamknutí"
@@ -2266,7 +2266,7 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Zosilňovanie Podsvietenia"
+    backlight_fade*: "Zosilňovanie podsvietenia"
   </dest>
   <voice>
     *: none
@@ -2283,7 +2283,7 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Zoslabovanie Podsvietenia"
+    backlight_fade*: "Zoslabovanie podsvietenia"
   </dest>
   <voice>
     *: none
@@ -2314,7 +2314,7 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Uspať (Po Vypnutí Podsvietenia)"
+    lcd_sleep: "Uspať (po vypnutí podsvietenia)"
   </dest>
   <voice>
     *: none
@@ -2452,7 +2452,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Odstrániť Obrázok na Pozadí"
+    lcd_non-mono: "Odstrániť obrázok na pozadí"
   </dest>
   <voice>
     *: none
@@ -2469,7 +2469,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Farba Pozadia"
+    lcd_color: "Farba pozadia"
   </dest>
   <voice>
     *: none
@@ -2486,7 +2486,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Farba Popredia"
+    lcd_color: "Farba popredia"
   </dest>
   <voice>
     *: none
@@ -2503,7 +2503,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Resetovať Farby"
+    lcd_color: "Resetovať farby"
   </dest>
   <voice>
     *: none
@@ -2554,7 +2554,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Neplatná Farba"
+    lcd_color: "Neplatná farba"
   </dest>
   <voice>
     *: none
@@ -2588,7 +2588,7 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Redukovať Tikanie"
+    remote_ticking: "Redukovať tikanie"
   </dest>
   <voice>
     *: none
@@ -2717,7 +2717,7 @@
   </source>
   <dest>
     *: none
-    remote: "Nastavenia Vzdialeného Rolovania"
+    remote: "Nastavenia vzdialeného rolovania"
   </dest>
   <voice>
     *: none
@@ -3245,8 +3245,8 @@
   </source>
   <dest>
     *: none
-    button_light: "Časový Limit Podsvietenia Tlačidla"
-    sansae200*,sansafuze*: "Časový Limit Podsvietenia Kolieska"
+    button_light: "Časový limit podsvietenia tlačidla"
+    sansae200*,sansafuze*: "Časový limit podsvietenia kolieska"
   </dest>
   <voice>
     *: none
@@ -3264,7 +3264,7 @@
   </source>
   <dest>
     *: none
-    buttonlight_brightness: "Jas Podsvietenia Tlačidla"
+    buttonlight_brightness: "Jas podsvietenia tlačidla"
   </dest>
   <voice>
     *: none
@@ -3364,11 +3364,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Vypínanie Disku"
+    *: "Vypínanie disku"
     flash_storage: none
   </dest>
   <voice>
-    *: "Vypínanie Disku"
+    *: "Vypínanie disku"
     flash_storage: none
   </voice>
 </phrase>
@@ -3382,7 +3382,7 @@
   </source>
   <dest>
     *: none
-    dircache: "Pamäť Priečinkov"
+    dircache: "Pamäť priečinkov"
   </dest>
   <voice>
     *: none
@@ -3399,7 +3399,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Čas a Dátum"
+    rtc: "Čas a dátum"
   </dest>
   <voice>
     *: none
@@ -3416,7 +3416,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Nastaviť Čas / Dátum"
+    rtc: "Nastaviť čas/dátum"
   </dest>
   <voice>
     *: none
@@ -3896,7 +3896,7 @@
   </source>
   <dest>
     *: none
-    charging: "Režim Autoadaptéra"
+    charging: "Režim autoadaptéra"
   </dest>
   <voice>
     *: none
@@ -3930,11 +3930,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Obrazovka Budíka"
+    alarm: "Obrazovka budíka"
   </dest>
   <voice>
     *: none
-    alarm: "Obrazovka Budíka"
+    alarm: "Obrazovka budíka"
   </voice>
 </phrase>
 <phrase>
@@ -3947,7 +3947,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Čas Budenia:"
+    alarm: "Čas budenia:"
   </dest>
   <voice>
     *: none
@@ -3964,7 +3964,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Budenie O %d:%02d"
+    alarm: "Budenie o %d:%02d"
   </dest>
   <voice>
     *: none
@@ -3998,7 +3998,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Budík Je Vypnutý"
+    alarm: "Budík je vypnutý"
   </dest>
   <voice>
     *: none
@@ -4379,11 +4379,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavenia Nahrávania"
+    recording: "Nastavenia nahrávania"
   </dest>
   <voice>
     *: none
-    recording: "Nastavenia Nahrávania"
+    recording: "Nastavenia nahrávania"
   </voice>
 </phrase>
 <phrase>
@@ -4396,7 +4396,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ponuka FM Rádia"
+    radio: "Ponuka FM rádia"
   </dest>
   <voice>
     *: none
@@ -4413,7 +4413,7 @@
   </source>
   <dest>
     *: none
-    radio: "Žiadne Predvoľby"
+    radio: "Žiadne predvoľby"
   </dest>
   <voice>
     *: none
@@ -4430,7 +4430,7 @@
   </source>
   <dest>
     *: none
-    radio: "Pridať Predvoľbu"
+    radio: "Pridať predvoľbu"
   </dest>
   <voice>
     *: none
@@ -4447,7 +4447,7 @@
   </source>
   <dest>
     *: none
-    radio: "Upraviť Predvoľbu"
+    radio: "Upraviť predvoľbu"
   </dest>
   <voice>
     *: none
@@ -4464,7 +4464,7 @@
   </source>
   <dest>
     *: none
-    radio: "Odstrániť Predvoľbu"
+    radio: "Odstrániť predvoľbu"
   </dest>
   <voice>
     *: none
@@ -4481,7 +4481,7 @@
   </source>
   <dest>
     *: none
-    radio: "Ukladanie Predvoľby Zlihalo"
+    radio: "Ukladanie predvoľby zlihalo"
   </dest>
   <voice>
     *: none
@@ -4498,7 +4498,7 @@
   </source>
   <dest>
     *: none
-    radio: "Zoznam Predvolieb Je Plný"
+    radio: "Zoznam predvolieb je plný"
   </dest>
   <voice>
     *: none
@@ -4532,7 +4532,7 @@
   </source>
   <dest>
     *: none
-    radio: "Vnútiť Mono"
+    radio: "Vnútiť mono"
   </dest>
   <voice>
     *: none
@@ -4549,7 +4549,7 @@
   </source>
   <dest>
     *: none
-    radio: "Obrazovka Je Zamrznutá"
+    radio: "Obrazovka je zamrznutá"
   </dest>
   <voice>
     *: none
@@ -4566,7 +4566,7 @@
   </source>
   <dest>
     *: none
-    radio: "Auto-sken Predvolieb"
+    radio: "Auto-sken predvolieb"
   </dest>
   <voice>
     *: none
@@ -4583,7 +4583,7 @@
   </source>
   <dest>
     *: none
-    radio: "Vymazať Aktuálne Predvoľby"
+    radio: "Vymazať aktuálne predvoľby"
   </dest>
   <voice>
     *: none
@@ -4651,7 +4651,7 @@
   </source>
   <dest>
     *: none
-    radio: "Načítať Zoznam Predvolieb"
+    radio: "Načítať zoznam predvolieb"
   </dest>
   <voice>
     *: none
@@ -4668,7 +4668,7 @@
   </source>
   <dest>
     *: none
-    radio: "Uložiť Zoznam Predvolieb"
+    radio: "Uložiť zoznam predvolieb"
   </dest>
   <voice>
     *: none
@@ -4685,7 +4685,7 @@
   </source>
   <dest>
     *: none
-    radio: "Vymazať Zoznam Predvolieb"
+    radio: "Vymazať zoznam predvolieb"
   </dest>
   <voice>
     *: none
@@ -4702,7 +4702,7 @@
   </source>
   <dest>
     *: none
-    radio: "Zoznam Predvolieb"
+    radio: "Zoznam predvolieb"
   </dest>
   <voice>
     *: none
@@ -4719,7 +4719,7 @@
   </source>
   <dest>
     *: none
-    radio: "Nastavenia Nenájdené. Automaticky Skenovať?"
+    radio: "Nastavenia nenájdené. Automaticky skenovať?"
   </dest>
   <voice>
     *: none
@@ -4770,7 +4770,7 @@
   </source>
   <dest>
     *: none
-    radio: "USA / Kanada"
+    radio: "USA/Kanada"
   </dest>
   <voice>
     *: none
@@ -4903,11 +4903,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavenia Enkodéra"
+    recording: "Nastavenia enkódera"
   </dest>
   <voice>
     *: none
-    recording: "Nastavenia Enkodéra"
+    recording: "Nastavenia enkódera"
   </voice>
 </phrase>
 <phrase>
@@ -4920,7 +4920,7 @@
   </source>
   <dest>
     *: none
-    recording: "Počet Bitov"
+    recording: "Počet bitov"
   </dest>
   <voice>
     *: none
@@ -4937,7 +4937,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Žiadne Nastavenia)"
+    recording: "(Žiadne nastavenia)"
   </dest>
   <voice>
     *: none
@@ -4971,7 +4971,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Ako Zdroj)"
+    recording: "(Ako zdroj)"
   </dest>
   <voice>
     *: none
@@ -5006,7 +5006,7 @@
   </source>
   <dest>
     *: none
-    iriverh100,iriverh120,iriverh300: "Interný Mikrofón"
+    iriverh100,iriverh120,iriverh300: "Interný mikrofón"
     recording: "Mikrofón"
   </dest>
   <voice>
@@ -5025,7 +5025,7 @@
   </source>
   <dest>
     *: none
-    recording: "Digitálny Vstup"
+    recording: "Digitálny vstup"
   </dest>
   <voice>
     *: none
@@ -5042,7 +5042,7 @@
   </source>
   <dest>
     *: none
-    recording: "Linkový Vstup"
+    recording: "Linkový vstup"
   </dest>
   <voice>
     *: none
@@ -5059,7 +5059,7 @@
   </source>
   <dest>
     *: none
-    recording: "Nastavenia Delenia Súboru"
+    recording: "Nastavenia delenia súboru"
   </dest>
   <voice>
     *: none
@@ -5076,7 +5076,7 @@
   </source>
   <dest>
     *: none
-    recording: "Mierka Delenia"
+    recording: "Mierka delenia"
   </dest>
   <voice>
     *: none
@@ -5093,7 +5093,7 @@
   </source>
   <dest>
     *: none
-    recording: "Čo Robiť Pri Rozdeľovaní"
+    recording: "Čo robiť pri rozdeľovaní"
   </dest>
   <voice>
     *: none
@@ -5110,7 +5110,7 @@
   </source>
   <dest>
     *: none
-    recording: "Začať Nový súbor"
+    recording: "Začať nový súbor"
   </dest>
   <voice>
     *: none
@@ -5127,7 +5127,7 @@
   </source>
   <dest>
     *: none
-    recording: "Zastaviť Nahrávanie"
+    recording: "Zastaviť nahrávanie"
   </dest>
   <voice>
     *: none
@@ -5144,7 +5144,7 @@
   </source>
   <dest>
     *: none
-    recording: "Čas Delenia"
+    recording: "Čas delenia"
   </dest>
   <voice>
     *: none
@@ -5161,7 +5161,7 @@
   </source>
   <dest>
     *: none
-    recording: "Veˇlkosť Delenia"
+    recording: "Veľkosť delenia"
   </dest>
   <voice>
     *: none
@@ -5178,7 +5178,7 @@
   </source>
   <dest>
     *: none
-    recording: "Dĺžka Prednahrávania"
+    recording: "Dĺžka prednahrávania"
   </dest>
   <voice>
     *: none
@@ -5195,7 +5195,7 @@
   </source>
   <dest>
     *: none
-    recording: "Zabudnúť Priečinok Nahrávok"
+    recording: "Zabudnúť priečinok nahrávok"
   </dest>
   <voice>
     *: none
@@ -5212,7 +5212,7 @@
   </source>
   <dest>
     *: none
-    recording: "Nemožno Zapisovať Do Priečinka Nahrávok"
+    recording: "Nemožno zapisovať do priečinka nahrávok"
   </dest>
   <voice>
     *: none
@@ -5229,7 +5229,7 @@
   </source>
   <dest>
     *: none
-    recording: "Indikácia Klikania Podsvietením"
+    recording: "Indikácia klikania podsvietením"
   </dest>
   <voice>
     *: none
@@ -5246,7 +5246,7 @@
   </source>
   <dest>
     *: none
-    remote: "Len Na Hlavnej Jednotke"
+    remote: "Len na hlavnej jednotke"
   </dest>
   <voice>
     *: none
@@ -5263,7 +5263,7 @@
   </source>
   <dest>
     *: none
-    remote: "Len Na Vzdialenej Jednotke"
+    remote: "Len na vzdialenej jednotke"
   </dest>
   <voice>
     *: none
@@ -5280,7 +5280,7 @@
   </source>
   <dest>
     *: none
-    remote: "Na Hlavnej Aj Vzdialenej Jednotke"
+    remote: "Na hlavnej Aj vzdialenej jednotke"
   </dest>
   <voice>
     *: none
@@ -5297,7 +5297,7 @@
   </source>
   <dest>
     *: none
-    recording: "Automatické Spúšťanie"
+    recording: "Automatické spúšťanie"
   </dest>
   <voice>
     *: none
@@ -5331,7 +5331,7 @@
   </source>
   <dest>
     *: none
-    recording: "Typ Spúš."
+    recording: "Typ spúš."
   </dest>
   <voice>
     *: none
@@ -5348,7 +5348,7 @@
   </source>
   <dest>
     *: none
-    recording: "Nový Súbor"
+    recording: "Nový súbor"
   </dest>
   <voice>
     *: none
@@ -5382,7 +5382,7 @@
   </source>
   <dest>
     *: none
-    recording: "Začať Nad"
+    recording: "Začať nad"
   </dest>
   <voice>
     *: none
@@ -5399,7 +5399,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pri Trvaní Aspoň"
+    recording: "Pri trvaní aspoň"
   </dest>
   <voice>
     *: none
@@ -5416,7 +5416,7 @@
   </source>
   <dest>
     *: none
-    recording: "Zastaviť Pod"
+    recording: "Zastaviť pod"
   </dest>
   <voice>
     *: none
@@ -5433,7 +5433,7 @@
   </source>
   <dest>
     *: none
-    recording: "Medzera Pred Rozdelením"
+    recording: "Medzera pred rozdelením"
   </dest>
   <voice>
     *: none
@@ -5552,7 +5552,7 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdialený Displej Vypnutý"
+    remote: "Vzdialený displej vypnutý"
   </dest>
   <voice>
     *: none
@@ -5569,7 +5569,7 @@
   </source>
   <dest>
     *: none
-    remote: "(Hlasitosť- : Znovu Zapnúť)"
+    remote: "(Hlasitosť- : Znovu zapnúť)"
   </dest>
   <voice>
     *: none
@@ -6670,7 +6670,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Nastaviť Ako Pozadie"
+    lcd_non-mono: "Nastaviť ako pozadie"
   </dest>
   <voice>
     *: none
@@ -6794,7 +6794,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "O Poltón Vyššie"
+    pitchscreen: "O poltón vyššie"
   </dest>
   <voice>
     *: none
@@ -6811,7 +6811,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "O Poltón Nižšie"
+    pitchscreen: "O poltón nižšie"
   </dest>
   <voice>
     *: none
@@ -6982,7 +6982,7 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Nabíjať Počas Pripojenia USB"
+    usb_charging_enable: "Nabíjať počas pripojenia USB"
   </dest>
   <voice>
     *: none
@@ -7101,7 +7101,7 @@
     iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
-    *: "OFF Pre prerušenie"
+    *: "OFF pre prerušenie"
     gigabeatfx: "POWER pre prerušenie"
     gigabeats,sansafuzeplus: "BACK pre prerušenie"
     iaudiom5,iaudiox5: "Long PLAY pre prerušenie"
@@ -8840,7 +8840,7 @@
   </source>
   <dest>
     *: none
-    recording: "Počítadlo Klikov"
+    recording: "Počítadlo klikov"
   </dest>
   <voice>
     *: none
@@ -8857,7 +8857,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Primárna Farba"
+    lcd_color: "Primárna farba"
   </dest>
   <voice>
     *: none
@@ -8874,7 +8874,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Sekundárna Farba"
+    lcd_color: "Sekundárna farba"
   </dest>
   <voice>
     *: none
@@ -8891,7 +8891,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Farba Textu"
+    lcd_color: "Farbatextu"
   </dest>
   <voice>
     *: none
@@ -8908,7 +8908,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Inverzný Kurzor (Farba Bez Prechodu)"
+    lcd_color: "Inverznýkurzor (Farba bez prechodu)"
   </dest>
   <voice>
     *: none
@@ -8925,7 +8925,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Inverzný Kurzor (Farba S Prechodom)"
+    lcd_color: "Inverzný kurzor (Farba s prechodom)"
   </dest>
   <voice>
     *: none
@@ -8987,7 +8987,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Farby Kurzora"
+    lcd_color: "Farby kurzora"
   </dest>
   <voice>
     *: none
@@ -9091,7 +9091,7 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Hranica Hĺbok"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Hranica hĺbok"
   </dest>
   <voice>
     *: none
@@ -9108,7 +9108,7 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Hranica Výšok"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Hranica výšok"
   </dest>
   <voice>
     *: none
@@ -9181,7 +9181,7 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Napájanie Príslušenstva"
+    accessory_supply: "Napájanie príslušenstva"
   </dest>
   <voice>
     *: none
@@ -9240,7 +9240,7 @@
   </source>
   <dest>
     *: none
-    recording: "Zastaviť Nahrávanie a Vypnúť"
+    recording: "Zastaviť nahrávanie a vypnúť"
   </dest>
   <voice>
     *: none
@@ -9257,11 +9257,11 @@
   </source>
   <dest>
     *: none
-    fiiom3k,gigabeatfx,sansafuzeplus: "Citlivosť Dotykovej Plochy"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Citlivosť dotykovej plochy"
   </dest>
   <voice>
     *: none
-    fiiom3k,sansafuzeplus: "Citlivosť Dotykovej Plochy"
+    fiiom3k,sansafuzeplus: "Citlivosť dotykovej plochy"
     gigabeatfx: "Citlivosť dotykovej plochy"
   </voice>
 </phrase>
@@ -9543,7 +9543,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC Čas Klipu"
+    agc: "AGC čas klipu"
   </dest>
   <voice>
     *: none
@@ -9577,7 +9577,7 @@
   </source>
   <dest>
     *: none
-    recording: "Názov Súboru:"
+    recording: "Názov súboru:"
   </dest>
   <voice>
     *: none
@@ -9611,7 +9611,7 @@
   </source>
   <dest>
     *: none
-    recording: "Čas Rozdelenia:"
+    recording: "Čas rozdelenia:"
   </dest>
   <voice>
     *: none
@@ -9649,7 +9649,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Režim mono"
+    recording: "Režim Mono"
   </voice>
 </phrase>
 <phrase>
@@ -9718,7 +9718,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastaviť Ako Ľavú Položku Rýchlej Obrazovky"
+    quickscreen: "Nastaviť ako ľavú položku Rýchlej obrazovky"
   </dest>
   <voice>
     *: none
@@ -9735,7 +9735,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastaviť Ako Pravú Položku Rýchlej Obrazovky"
+    quickscreen: "Nastaviť ako pravú položku Rýchlej obrazovky"
   </dest>
   <voice>
     *: none
@@ -9752,7 +9752,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastaviť Ako Spodnú Položku Rýchlej Obrazovky"
+    quickscreen: "Nastaviť ako spodnú položku Rýchlej obrazovky"
   </dest>
   <voice>
     *: none
@@ -9825,7 +9825,7 @@
   </source>
   <dest>
     *: none
-    speaker: "Zapnúť Reproduktor"
+    speaker: "Zapnúť reproduktor"
   </dest>
   <voice>
     *: none
@@ -9842,7 +9842,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Režim Dotykovej Obrazovky"
+    touchscreen: "Režim dotykovej obrazovky"
   </dest>
   <voice>
     *: none
@@ -9876,7 +9876,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Absolútny Bod"
+    touchscreen: "Absolútny bod"
   </dest>
   <voice>
     *: none
@@ -9935,7 +9935,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Nastavenia Dotykovej Obrazovky"
+    touchscreen: "Nastavenia dotykovej obrazovky"
   </dest>
   <voice>
     *: none
@@ -9969,7 +9969,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Resetovať Kalibráciu"
+    touchscreen: "Resetovať kalibráciu"
   </dest>
   <voice>
     *: none
@@ -10014,7 +10014,7 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdialený Stavový Riadok"
+    remote: "Vzdialený stavový riadok"
   </dest>
   <voice>
     *: none
@@ -10082,7 +10082,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Režim USB Klávesnice"
+    usb_hid: "Režim USB klávesnice"
   </dest>
   <voice>
     *: none
@@ -10195,7 +10195,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Nastaviť Ako Hornú Položku Rýchlej Obrazovky"
+    quickscreen: "Nastaviť ako hornú položku Rýchlej obrazovky"
   </dest>
   <voice>
     *: none
@@ -10521,7 +10521,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Len Pri Automatickej Zmene Stopy"
+    crossfade: "Len pri automatickej zmene stopy"
   </dest>
   <voice>
     *: none
@@ -10608,7 +10608,7 @@
   </source>
   <dest>
     *: none
-    remote: "Vzdialená Obrazovka"
+    remote: "Vzdialená obrazovka"
   </dest>
   <voice>
     *: none
@@ -10625,7 +10625,7 @@
   </source>
   <dest>
     *: none
-    remote: "Hlavná Obrazovka"
+    remote: "Hlavná obrazovka"
   </dest>
   <voice>
     *: none
@@ -10642,7 +10642,7 @@
   </source>
   <dest>
     *: none
-    histogram: "Interval Histogramu"
+    histogram: "Interval histogramu"
   </dest>
   <voice>
     *: none
@@ -10659,7 +10659,7 @@
   </source>
   <dest>
     *: none
-    hotkey: "Klávesová Skratka"
+    hotkey: "Klávesová skratka"
   </dest>
   <voice>
     *: none
@@ -10690,11 +10690,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Skratka Pre obrazovku Teraz hrá"
+    hotkey: "Skratka pre Obrazovku teraz hrá"
   </dest>
   <voice>
     *: none
-    hotkey: "Skratka pre obrazovku Teraz hrá"
+    hotkey: "Skratka pre Obrazovku teraz hrá"
   </voice>
 </phrase>
 <phrase>
@@ -10741,7 +10741,7 @@
   </source>
   <dest>
     *: none
-    hotkey: "Skratka Prezerania Súborov"
+    hotkey: "Skratka prezerania súborov"
   </dest>
   <voice>
     *: none
@@ -10775,7 +10775,7 @@
   </source>
   <dest>
     *: none
-    radio_remote: "Vzdialená Obrazovka Rádia"
+    radio_remote: "Vzdialená obrazovka rádia"
   </dest>
   <voice>
     *: none
@@ -10792,11 +10792,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Hlasitosť Pásma %d"
+    gigabeats,samsungypr1: "Hlasitosť pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Hlasitosť Pásma"
+    gigabeats,samsungypr1: "Hlasitosť pásma"
   </voice>
 </phrase>
 <phrase>
@@ -10857,11 +10857,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Pokročilé Nastavenia Tónov"
+    gigabeats,samsungypr1: "Pokročilé nastavenia tónov"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Pokročilé Nastavenia Tónov"
+    gigabeats,samsungypr1: "Pokročilé nastavenia tónov"
   </voice>
 </phrase>
 <phrase>
@@ -10874,11 +10874,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Rozšírenie"
+    depth_3d: "3-D rozšírenie"
   </dest>
   <voice>
     *: none
-    depth_3d: "3-D Rozšírenie"
+    depth_3d: "3-D rozšírenie"
   </voice>
 </phrase>
 <phrase>
@@ -10891,11 +10891,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Frekvencia Pásma %d"
+    gigabeats,samsungypr1: "Frekvencia pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Frekvencia Pásma"
+    gigabeats,samsungypr1: "Frekvencia pásma"
   </voice>
 </phrase>
 <phrase>
@@ -10908,11 +10908,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Šírka Pásma %d"
+    gigabeats,samsungypr1: "Šírka pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Šírka Pásma "
+    gigabeats,samsungypr1: "Šírka pásma "
   </voice>
 </phrase>
 <phrase>
@@ -10925,7 +10925,7 @@
   </source>
   <dest>
     *: none
-    radio: "Obrazovka Rádia"
+    radio: "Obrazovka rádia"
   </dest>
   <voice>
     *: none
@@ -10942,11 +10942,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Ovládanie Tónov"
+    gigabeats,samsungypr1: "Ovládanie tónov"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Ovládanie Tónov"
+    gigabeats,samsungypr1: "Ovládanie tónov"
   </voice>
 </phrase>
 <phrase>
@@ -11209,11 +11209,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "USB Skryť Interný Disk"
+    multidrive_usb: "USB Skryť interný disk"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "USB Skryť Interný Disk"
+    multidrive_usb: "USB Skryť interný disk"
   </voice>
 </phrase>
 <phrase>
@@ -11226,11 +11226,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Zarovnanie Riadka v Zoznamoch"
+    touchscreen: "Zarovnanie riadka v zoznamoch"
   </dest>
   <voice>
     *: none
-    touchscreen: "Zarovnanie Riadka v Zoznamoch"
+    touchscreen: "Zarovnanie riadka v zoznamoch"
   </voice>
 </phrase>
 <phrase>
@@ -11299,11 +11299,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Klik v Reproduktore"
+    hardware_click: "Klik v reproduktore"
   </dest>
   <voice>
     *: none
-    hardware_click: "Klik v Reproduktore"
+    hardware_click: "Klik v reproduktore"
   </voice>
 </phrase>
 <phrase>
@@ -11316,11 +11316,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Klik v Slúchadlách"
+    hardware_click: "Klik v slúchadlách"
   </dest>
   <voice>
     *: none
-    hardware_click: "Klik v Slúchadlách"
+    hardware_click: "Klik v slúchadlách"
   </voice>
 </phrase>
 <phrase>
@@ -11431,11 +11431,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Používať Ponuku Skratky Miesto Rýchlej Obrazovky"
+    quickscreen: "Používať ponuku Skratky miesto Rýchlej obrazovky"
   </dest>
   <voice>
     *: none
-    quickscreen: "Používať Ponuku Skratky Miesto Rýchlej Obrazovky"
+    quickscreen: "Používať ponuku Skratky miesto Rýchlej obrazovky"
   </voice>
 </phrase>
 <phrase>
@@ -14381,7 +14381,7 @@
     lowmem: none
   </dest>
   <voice>
-    *: "Kvalitný Mixér"
+    *: "Kvalitný mixér"
     lowmem: none
   </voice>
 </phrase>
@@ -14424,8 +14424,8 @@
   <dest>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
+    hifietma*,zenvision: "Stlačte BACK pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
@@ -14440,8 +14440,8 @@
   <voice>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
+    hifietma*,zenvision: "Stlačte BACK pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
