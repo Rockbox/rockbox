@@ -9,9 +9,6 @@
 #
 # Copyright (C) 2006 - 2008 by Daniel Stenberg
 #
-use utf8;
-use Unicode::Normalize;
-use Encode qw( encode_utf8 );
 
 # See apps/language.c (TODO: Use common include for both)
 # Cookie and binary version for the binary lang file
@@ -325,8 +322,6 @@ for (keys %users) {
 #
 
 open(LANG, "<$input") || die "Error: couldn't read language file named $input\n";
-binmode(LANG, ":utf8");
-
 my @phrase;
 my $langoptions = 0;
 
@@ -615,7 +610,7 @@ elsif($binary || $binvoice) {
             $langoptions); # magic lang file header
     }
     if($binvoice) {
-        open(OUTV, ">$binvoice") or die "Error: Can't create $binvoice";
+        open(OUTV, ">$binvoice") or die "Error: Can't create $binary";
         binmode OUTV;
         printf OUTV ("%c%c%c%c", $VOICE_COOKIE, $LANGUAGE_VERSION, $target_id,
             $langoptions); # magic lang file header
@@ -651,19 +646,17 @@ elsif($binary || $binvoice) {
 
             if($dest && $n < 0x8000 && $binary) {
                 $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
-                $dest = encode_utf8(NFD($dest)); # Decompose
 
                 # Now, make sure we get the number from the english sort order:
                 $idnum = $idmap[$_]{$name};
 
-                printf OUTF ("%c%c%s\x00", (($idnum>>8)&0xff), ($idnum&0xff), $dest);
+                printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
             }
             if($voice && $binvoice) {
                 $voice =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
-                $voice = encode_utf8($voice);
                 # Now, make sure we get the number from the english sort order:
                 $idnum = $idmap[$_]{$name};
-                printf OUTV ("%c%c%s\x00", (($idnum>>8)&0xff), ($idnum&0xff), $voice);
+                printf OUTV ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $voice);
             }
         }
     }
