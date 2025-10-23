@@ -8541,7 +8541,7 @@
     *: ""
   </dest>
   <voice>
-    *: "~firmware"
+    *: "firmvér"
   </voice>
 </phrase>
 <phrase>
@@ -13516,11 +13516,11 @@
   </source>
   <dest>
     *: none
-    es9018: "~Bypass"
+    es9018: "Obísť"
   </dest>
   <voice>
     *: none
-    es9018: "~Bypass"
+    es9018: "Obísť"
   </voice>
 </phrase>
 <phrase>
@@ -14691,11 +14691,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "~Short Sharp"
+    filter_roll_off: "Krátky ostrý"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "~Short Sharp"
+    filter_roll_off: "Krátky ostrý"
   </voice>
 </phrase>
 <phrase>
@@ -14708,11 +14708,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "~Short Slow"
+    filter_roll_off: "Krátky pomalý"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "~Short Slow"
+    filter_roll_off: "Krátky pomalý"
   </voice>
 </phrase>
 <phrase>
@@ -14725,11 +14725,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "~Super Slow"
+    filter_roll_off: "Super pomalý"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "~Super Slow"
+    filter_roll_off: "Super pomalý"
   </voice>
 </phrase>
 <phrase>
@@ -14742,11 +14742,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Linear Fast"
+    es9218: "Lineárny rýchly"
   </dest>
   <voice>
     *: none
-    es9218: "~Linear Fast"
+    es9218: "Lineárny rýchly"
   </voice>
 </phrase>
 <phrase>
@@ -14759,11 +14759,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Linear Slow"
+    es9218: "Lineárny pomalý"
   </dest>
   <voice>
     *: none
-    es9218: "~Linear Slow"
+    es9218: "Lineárny pomalý"
   </voice>
 </phrase>
 <phrase>
@@ -14776,11 +14776,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Minimum Fast"
+    es9218: "Minimálny rýchly"
   </dest>
   <voice>
     *: none
-    es9218: "~Minimum Fast"
+    es9218: "Minimálny rýchly"
   </voice>
 </phrase>
 <phrase>
@@ -14793,11 +14793,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Minimum Slow"
+    es9218: "Minimálny pomalý"
   </dest>
   <voice>
     *: none
-    es9218: "~Minimum Slow"
+    es9218: "Minimálny pomalý"
   </voice>
 </phrase>
 <phrase>
@@ -14810,11 +14810,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Apodizing type 1"
+    es9218: "Apodizačný typ 1"
   </dest>
   <voice>
     *: none
-    es9218: "~Apodizing type 1"
+    es9218: "Apodizačný typ 1"
   </voice>
 </phrase>
 <phrase>
@@ -14827,11 +14827,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Apodizing type 2"
+    es9218: "Apodizačný typ 2"
   </dest>
   <voice>
     *: none
-    es9218: "~Apodizing type 2"
+    es9218: "Apodizačný typ 2"
   </voice>
 </phrase>
 <phrase>
@@ -14844,11 +14844,11 @@
   </source>
   <dest>
     *: none
-    es9218: "~Hybrid Fast"
+    es9218: "Hybridný rýchly"
   </dest>
   <voice>
     *: none
-    es9218: "~Hybrid Fast"
+    es9218: "Hybridný rýchly"
   </voice>
 </phrase>
 <phrase>
