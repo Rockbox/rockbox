@@ -734,10 +734,12 @@ static const char* formatter_freq_unit_0_is_auto(char *buffer, size_t buffer_siz
 
 static int32_t getlang_freq_unit_0_is_auto(int value, int unit)
 {
-    if (value == 0)
+    if (value == 0) {
         return LANG_AUTO;
-    else
-        return talk_value_decimal(value, unit, 3, false);
+    } else {
+        talk_value_decimal(value, unit, 3, false);
+        return -1;
+    }
 }
 
 static void playback_frequency_callback(int sample_rate_hz)
