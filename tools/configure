@@ -1064,6 +1064,9 @@ devkitarmcc () {
     DLLWRAP=dllwrap
     RANLIB=$DEVKITARM/bin/arm-none-eabi-gcc-ranlib
 
+    # default cflags, we need -nostdlib and -ffreestanding for shared libraries to work in devkitARM
+    GCCOPTS="$CCOPTS"
+
     if [ "yes" = "$use_debug" ]; then
         GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`
     fi
