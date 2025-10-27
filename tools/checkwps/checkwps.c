@@ -226,10 +226,41 @@ bool radio_hardware_present(void)
 }
 #endif
 
+#include "fontbundle.h"
+
 static int loaded_fonts = 0;
 static struct font _font;
 int font_load(const char *path)
 {
+    /* First see if it exists in the theme */
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        char buf[1024];
+        sprintf(buf, ".rockbox/%s", path);
+        fd = open(buf, O_RDONLY);
+        if (fd < 0) {
+            char *first = strrchr(buf, '/');
+            char *final = strrchr(buf, '.');
+            *final = 0;
+            int missing = 1;
+            /* Check if font is included in the bundle */
+            for (int i = 0 ; bundledfonts[i] != NULL ; i++) {
+                if (!strcmp(first+1, bundledfonts[i])) {
+                    missing = 0;
+                    break;
+                }
+            }
+            if (missing) {
+                //printf("Font missing >%s<\n", first+1);
+                return -1;
+            } else {
+                printf("INFO: Theme requires rockbox font bundle\n");
+            }
+        }
+    }
+    if (fd >= 0)
+        close(fd);
+
     int id = 2 + loaded_fonts;
     loaded_fonts++;
     return id;

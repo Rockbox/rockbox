@@ -67,13 +67,6 @@ lngdump: lngdump.c
 ipod_fw:	ipod_fw.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
-checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c \
-	../firmware/common/ctype.c ../apps/misc.c ../apps/recorder/bmp.c
-	$(SILENT)$(CC) $(CFLAGS) -I ../apps/gui -I../firmware/export \
-	    -D__PCTOOL__ -DDEBUG -DROCKBOX_HAS_LOGF -DIPOD_COLOR \
-	    -D ROCKBOX_DIR_LEN -D WPS_DIR=\".\" -I../apps \
-	    -I../firmware/target/arm/ipod -I../firmware/include $+ -o $@
-
 convbdf: convbdf.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
@@ -106,4 +99,3 @@ clean:
 	    echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
 	$(SILENT)$(MAKE) -C ucl clean
 	$(SILENT)$(MAKE) -C rbspeex clean
-
