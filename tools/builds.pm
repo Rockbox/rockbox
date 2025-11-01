@@ -801,7 +801,7 @@ sub simbuilds {
 	    'gtts' => '-l hu',
             'piper' => 'hu_HU-berta-medium.onnx',
 	},
-	'enabled' => 0,
+	'enabled' => 1,
     },
     'nederlands' => {
 	'lang' => 'nederlands',
