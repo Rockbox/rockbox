@@ -741,7 +741,7 @@ sub simbuilds {
 	'engines' => {
 	    'espeak' => '-vel',
 	    'gtts' => '-l el',
-            'piper' => 'el_GR-rapunzelina-low.onnx',
+            'piper' => 'el_GR-rapunzelina-medium.onnx',
 	},
         'enabled' => 0,
     },
