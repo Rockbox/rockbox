@@ -455,7 +455,7 @@ static void ci_pcmbuf_insert(const void *ch1, const void *ch2, int count)
             dst.p16out = buf;
             dst.bufcount = out_count;
 
-            dsp_process(ci.dsp, &src, &dst);
+            dsp_process(ci.dsp, &src, &dst, true);
 
             if (dst.remcount > 0) {
                 if (mode == MODE_WRITE)

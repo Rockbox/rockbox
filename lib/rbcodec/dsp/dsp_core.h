@@ -136,7 +136,7 @@ unsigned int dsp_get_id(const struct dsp_config *dsp);
 
 /* Process the given buffer - see implementation in dsp.c for more */
 void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
-                 struct dsp_buffer *dst);
+                 struct dsp_buffer *dst, bool thread_yield);
 
 /* Change DSP settings */
 intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,

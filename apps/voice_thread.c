@@ -511,7 +511,7 @@ static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
         dst.bufcount = VOICE_PCM_FRAME_COUNT;
 
         td->dst = &dst;
-        dsp_process(td->dsp, &td->src, &dst);
+        dsp_process(td->dsp, &td->src, &dst, true);
         td->dst = NULL;
 
         voice_buf_commit(dst.remcount);

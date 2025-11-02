@@ -249,7 +249,7 @@ static void codec_pcmbuf_insert_callback(
         }
         else
         {
-            dsp_process(ci.dsp, &src, &dst);
+            dsp_process(ci.dsp, &src, &dst, true);
 
             if (dst.remcount > 0)
             {

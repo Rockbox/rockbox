@@ -42,6 +42,7 @@
 #include "settings.h"
 #include "core_alloc.h"
 #include "pcm_mixer.h"
+#include "dsp_core.h"
 
 #define LOGF_ENABLE
 #include "logf.h"
@@ -352,7 +353,7 @@ int tmp_saved_vol;
 static unsigned char *rx_buffer;
 int rx_buffer_handle;
 /* buffer size */
-static int rx_buf_size[NR_BUFFERS];
+static int rx_buf_size[NR_BUFFERS]; // only used for debug screen counter now
 /* index of the next buffer to play */
 static int rx_play_idx;
 /* index of the next buffer to fill */
@@ -361,6 +362,14 @@ static int rx_usb_idx;
 bool playback_audio_underflow;
 /* usb overflow ? */
 bool usb_rx_overflow;
+
+/* dsp processing buffers */
+#define DSP_BUF_SIZE (BUFFER_SIZE*4) // arbitrarily x4
+#define REAL_DSP_BUF_SIZE   ALIGN_UP(DSP_BUF_SIZE, 32)
+static uint16_t *dsp_buf;
+int dsp_buf_handle;
+static int dsp_buf_size[NR_BUFFERS];
+struct dsp_config *dsp = NULL;
 
 /* feedback variables */
 #define USB_FRAME_MAX 0x7FF
@@ -502,7 +511,7 @@ int usb_audio_request_buf(void)
     audio_stop();
 
     // attempt to allocate the receive buffers
-    rx_buffer_handle = core_alloc(NR_BUFFERS * REAL_BUF_SIZE);
+    rx_buffer_handle = core_alloc(REAL_BUF_SIZE);
     if (rx_buffer_handle < 0)
     {
         alloc_failed = true;
@@ -518,6 +527,23 @@ int usb_audio_request_buf(void)
         // get the pointer to the actual buffer location
         rx_buffer = core_get_data(rx_buffer_handle);
     }
+
+    dsp_buf_handle = core_alloc(NR_BUFFERS * REAL_DSP_BUF_SIZE);
+    if (dsp_buf_handle < 0)
+    {
+        alloc_failed = true;
+        rx_buffer_handle = core_free(rx_buffer_handle);
+        rx_buffer = NULL;
+        return -1;
+    }
+    else
+    {
+        alloc_failed = false;
+
+        core_pin(dsp_buf_handle);
+
+        dsp_buf = core_get_data(dsp_buf_handle);
+    }
     // logf("usbaudio: got buffer");
     return 0;
 }
@@ -527,6 +553,9 @@ void usb_audio_free_buf(void)
     // logf("usbaudio: free buffer");
     rx_buffer_handle = core_free(rx_buffer_handle);
     rx_buffer = NULL;
+
+    dsp_buf_handle = core_free(dsp_buf_handle);
+    dsp_buf = NULL;
 }
 
 int usb_audio_request_endpoints(struct usb_class_driver *drv)
@@ -644,10 +673,11 @@ static void playback_audio_get_more(const void **start, size_t *size)
         *size = 0;
         return;
     }
+
     /* give buffer and advance */
     logf("usbaudio: buf adv");
-    *start = rx_buffer + (rx_play_idx * REAL_BUF_SIZE);
-    *size = rx_buf_size[rx_play_idx];
+    *start = dsp_buf + (rx_play_idx * REAL_DSP_BUF_SIZE/sizeof(*dsp_buf));
+    *size = dsp_buf_size[rx_play_idx];
     rx_play_idx = (rx_play_idx + 1) % NR_BUFFERS;
 
     /* if usb RX buffers had overflowed, we can start to receive again
@@ -658,7 +688,7 @@ static void playback_audio_get_more(const void **start, size_t *size)
     {
         logf("usbaudio: recover usb rx overflow");
         usb_rx_overflow = false;
-        usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer + (rx_usb_idx * REAL_BUF_SIZE), BUFFER_SIZE);
+        usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
     }
     restore_irq(oldlevel);
 }
@@ -697,7 +727,8 @@ static void usb_audio_start_playback(void)
     mixer_set_frequency(hw_freq_sampr[as_playback_freq_idx]);
     pcm_apply_settings();
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_USBAUDIO, MIX_AMP_UNITY);
-    usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer + (rx_usb_idx * REAL_BUF_SIZE), BUFFER_SIZE);
+
+    usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
 }
 
 static void usb_audio_stop_playback(void)
@@ -1150,6 +1181,15 @@ void usb_audio_init_connection(void)
 {
     logf("usbaudio: init connection");
 
+    dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_configure(dsp, DSP_RESET, 0);
+    dsp_configure(dsp, DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+    dsp_configure(dsp, DSP_SET_SAMPLE_DEPTH, 16);
+#ifdef HAVE_PITCHCONTROL
+    sound_set_pitch(PITCH_SPEED_100);
+    dsp_set_timestretch(PITCH_SPEED_100);
+#endif
+
     usb_as_playback_intf_alt = 0;
     set_playback_sampling_frequency(HW_SAMPR_DEFAULT);
     tmp_saved_vol = sound_current(SOUND_VOLUME);
@@ -1261,20 +1301,36 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
         logf("usbaudio: frame: %d bytes: %d", usb_drv_get_frame_number(), length);
         if(status != 0)
             return true; /* FIXME how to handle error here ? */
+
         /* store length, queue buffer */
         rx_buf_size[rx_usb_idx] = length;
-        rx_usb_idx = (rx_usb_idx + 1) % NR_BUFFERS;
 
         // debug screen counter
         samples_received = samples_received + length;
-    
+
+        // process through DSP right away!
+        struct dsp_buffer src;
+        src.remcount = length/4; // in samples
+        src.pin[0] = rx_buffer;
+        src.proc_mask = 0;
+
+        struct dsp_buffer dst;
+        dst.remcount = 0;
+        dst.bufcount = DSP_BUF_SIZE/4; // in samples
+        dst.p16out = dsp_buf + (rx_usb_idx * REAL_DSP_BUF_SIZE/sizeof(*dsp_buf)); // array index
+
+        dsp_process(dsp, &src, &dst, false);
+        dsp_buf_size[rx_usb_idx] = dst.remcount * 2 * sizeof(*dsp_buf); // need value in bytes
+
+        rx_usb_idx = (rx_usb_idx + 1) % NR_BUFFERS;
+
         /* guard against IRQ to avoid race with completion audio completion */
         int oldlevel = disable_irq_save();
         /* setup a new transaction except if we ran out of buffers */
         if(rx_usb_idx != rx_play_idx)
         {
             logf("usbaudio: new transaction");
-            usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer + (rx_usb_idx*REAL_BUF_SIZE), BUFFER_SIZE);
+            usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
         }
         else
         {

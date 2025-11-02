@@ -665,7 +665,7 @@ static void audio_thread(void)
             }
 
             dst.bufcount = size / (2 * sizeof (int16_t));
-            rb->dsp_process(td.dsp, &td.src, &dst);
+            rb->dsp_process(td.dsp, &td.src, &dst, true);
 
             if (dst.remcount > 0)
             {

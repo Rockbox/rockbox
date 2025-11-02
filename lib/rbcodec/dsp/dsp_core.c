@@ -37,8 +37,8 @@
 
 #ifndef DSP_PROCESS_START
 /* These do nothing if not previously defined */
-#define DSP_PROCESS_START()
-#define DSP_PROCESS_LOOP()
+#define DSP_PROCESS_START(yield)
+#define DSP_PROCESS_LOOP(yield)
 #define DSP_PROCESS_END()
 #endif /* !DSP_PROCESS_START */
 
@@ -433,7 +433,7 @@ static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
  * of the call and how they function internally.
  */
 void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
-                 struct dsp_buffer *dst)
+                 struct dsp_buffer *dst, bool thread_yield)
 {
     if (dst->bufcount <= 0)
     {
@@ -441,7 +441,7 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
         return;
     }
 
-    DSP_PROCESS_START();
+    DSP_PROCESS_START(thread_yield);
 
     /* Tag input with codec-specified sample format */
     src->format = dsp->io_data.format;
@@ -479,7 +479,7 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
         dsp_advance_buffer32(buf, outcount);
         dsp_advance_buffer_output(dst, outcount);
 
-        DSP_PROCESS_LOOP();
+        DSP_PROCESS_LOOP(thread_yield);
     } /* while */
 
     DSP_PROCESS_END();

@@ -751,7 +751,7 @@ struct plugin_api {
                               unsigned int setting, intptr_t value);
     struct dsp_config * (*dsp_get_config)(unsigned int dsp_id);
     void (*dsp_process)(struct dsp_config *dsp, struct dsp_buffer *src,
-                        struct dsp_buffer *dst);
+                        struct dsp_buffer *dst, bool thread_yield);
 
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
     const void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel,

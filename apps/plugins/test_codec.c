@@ -230,7 +230,7 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
     while (1)
     {
         int old_remcount = dst.remcount;
-        rb->dsp_process(ci.dsp, &src, &dst);
+        rb->dsp_process(ci.dsp, &src, &dst, true);
         
         if (dst.bufcount <= 0 ||
             (src.remcount <= 0 && dst.remcount <= old_remcount))

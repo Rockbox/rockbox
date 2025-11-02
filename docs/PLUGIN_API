@@ -664,11 +664,12 @@ int32_t dsp_get_timestretch(void)
     \return
     \description
 
-void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src, struct dsp_buffer *dst)
+void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src, struct dsp_buffer *dst, bool thread_yield)
     \group sound
     \param dsp
     \param src
     \param dst
+    \param thread_yield
     \description
 
 void dsp_set_crossfeed_type(int type)

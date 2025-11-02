@@ -444,7 +444,7 @@ static inline void synthbuf(void)
         dst.remcount = 0;
         dst.bufcount = available;
         dst.p16out = (int16_t *)outptr;
-        rb->dsp_process(dsp, &src, &dst);
+        rb->dsp_process(dsp, &src, &dst, true);
         if (dst.remcount > 0)
         {
             outptr += dst.remcount;
