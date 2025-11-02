@@ -117,6 +117,7 @@ my %gtts_lang_map = (
     'svenska' => '-l sv',
     'turkce' => '-l tr',
     'ukrainian' => '-l uk',
+    'vietnamese' => '-l vi',
 );
 
 my %espeak_lang_map = (
@@ -149,11 +150,12 @@ my %espeak_lang_map = (
     'svenska' => '-vsv',
     'turkce' => '-vtr',
     'ukrainian' => '-vuk',
+    'vietnamese' => '-vvi',
     );
 
 my %piper_lang_map = (
     'english' => 'en_GB-semaine-medium.onnx',  # Always first, it's the golden master
-#    'bulgarian' => '-vbg',
+    'bulgarian' => 'bg_BG-dimitar-medium.onnx',
     'chinese-simp' => 'zh_CN-huayan-medium.onnx',
     'czech' => 'cs_CZ-jirka-medium.onnx',
     'dansk' => 'da_DK-talesyntese-medium.onnx',
@@ -181,6 +183,7 @@ my %piper_lang_map = (
     'svenska' => 'sv_SE-nst-medium.onnx',
     'turkce' => 'tr_TR-fettah-medium.onnx',
     'ukrainian' => 'uk_UA-ukrainian_tts-medium',
+    'vietnamese' => 'vi_VN-vais1000-medium.onnx',
 );
 
 my $trim_thresh = 250;   # Trim silence if over this, in ms

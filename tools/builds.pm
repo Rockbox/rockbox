@@ -615,11 +615,11 @@ sub simbuilds {
 	'lang' => 'bulgarian',
 	'name' => 'Български (Bulgarian)',
         'short' => 'bg',
-        'defengine' => 'espeak',
+        'defengine' => 'piper',
 	'engines' => {
 	    'espeak' => '-vbg',
 	    'gtts' => '-l bg',
-            # No piper voice yet.
+	    'piper' => 'bg_BG-dimitar-medium.onnx',
 	},
         'enabled' => 1,
     },
