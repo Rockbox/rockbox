@@ -1135,10 +1135,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Mindent"
+    *: "Mindet"
   </dest>
   <voice>
-    *: "Mindent"
+    *: "Mindet"
   </voice>
 </phrase>
 <phrase>
@@ -1177,10 +1177,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Először a kiválasztott zeneszám lejátszása"
+    *: "Először a kiválasztott szám lejátszása"
   </dest>
   <voice>
-    *: "Először a kiválasztott zeneszám lejátszása"
+    *: "Először a kiválasztott szám lejátszása"
   </voice>
 </phrase>
 <phrase>
@@ -1546,10 +1546,10 @@
     *: "Track Skip Beep"
   </source>
   <dest>
-    *: "Pittyegés erőssége zeneszám ugrásnál"
+    *: "Pittyegés erőssége szám ugrásnál"
   </dest>
   <voice>
-    *: "Pittyegés erőssége zeneszám ugrásnál"
+    *: "Pittyegés erőssége szám ugrásnál"
   </voice>
 </phrase>
 <phrase>
@@ -2603,10 +2603,10 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "Gördítés beállítása"
+    *: "Gördítés beállításai"
   </dest>
   <voice>
-    *: "Gördítés beállítása"
+    *: "Gördítés beállításai"
   </voice>
 </phrase>
 <phrase>
@@ -2617,7 +2617,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Görgetés sebességének beállítása"
+    *: "Gördítés sebességének beállítása"
   </dest>
   <voice>
     *: ""
@@ -2703,11 +2703,11 @@
   </source>
   <dest>
     *: none
-    remote: "Távirányító görgetési beállítások"
+    remote: "Távirányító gördítési beállítások"
   </dest>
   <voice>
     *: none
-    remote: "Távirányító görgetési beállítások"
+    remote: "Távirányító gördítési beállítások"
   </voice>
 </phrase>
 <phrase>
@@ -3866,10 +3866,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Lejátszólisták max. hossza"
+    *: "Lejátszási listák max. hossza"
   </dest>
   <voice>
-    *: "Lejátszólisták max hossza"
+    *: "Lejátszási listák max hossza"
   </voice>
 </phrase>
 <phrase>
@@ -5570,10 +5570,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Lejátszólista készítés"
+    *: "Lejátszási lista készítése"
   </dest>
   <voice>
-    *: "Lejátszólista készítés"
+    *: "Lejátszási lista készítése"
   </voice>
 </phrase>
 <phrase>
@@ -5584,10 +5584,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Lejátszólista megtekintő beállítása"
+    *: "Lejátszási lista megtekintő beállításai"
   </dest>
   <voice>
-    *: "Lejátszólista megtekintő beállítása"
+    *: "Lejátszási lista megtekintő beállításai"
   </voice>
 </phrase>
 <phrase>
@@ -5598,10 +5598,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Aktuális lejátszólista megtekintése"
+    *: "Aktuális lejátszási lista megtekintése"
   </dest>
   <voice>
-    *: "Aktuális lejátszólista megtekintése"
+    *: "Aktuális lejátszási lista megtekintése"
   </voice>
 </phrase>
 <phrase>
@@ -5682,10 +5682,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Aktuális lejátszólista mentése"
+    *: "Aktuális lejátszási lista mentése"
   </dest>
   <voice>
-    *: "Aktuális lejátszólista mentése"
+    *: "Aktuális lejátszási lista mentése"
   </voice>
 </phrase>
 <phrase>
@@ -5699,7 +5699,7 @@
     *: "Mentett %d számok (%s)"
   </dest>
   <voice>
-    *: "Számok mentve"
+    *: "számok mentve"
   </voice>
 </phrase>
 <phrase>
@@ -5738,10 +5738,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Figyelmeztetés a dinamikus lejátszólista törlésekor"
+    *: "Figyelmeztetés a dinamikus lejátszási lista törlésekor"
   </dest>
   <voice>
-    *: "Figyelmeztetés a dinamikus lejátszólista törlésekor"
+    *: "Figyelmeztetés a dinamikus lejátszási lista törlésekor"
   </voice>
 </phrase>
 <phrase>
@@ -5752,10 +5752,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Törli a dinamikus lejátszólistát?"
+    *: "Törli a dinamikus lejátszási listát?"
   </dest>
   <voice>
-    *: "Törli a dinamikus lejátszólistát?"
+    *: "Törli a dinamikus lejátszási listát?"
   </voice>
 </phrase>
 <phrase>
@@ -5766,10 +5766,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox névjegy"
+    *: "Rockbox névjegye"
   </dest>
   <voice>
-    *: "Rockbox névjegy"
+    *: "Rockbox névjegye"
   </voice>
 </phrase>
 <phrase>
@@ -5872,8 +5872,8 @@
     *: none
     hibylinux: "~U S B"
     multivolume: "~H D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro SD kártya"
-    xduoox3: "mikro SD kártya 2"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro S D"
+    xduoox3: "mikro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -5954,10 +5954,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Lejátszólista"
+    *: "Lejátszási lista"
   </dest>
   <voice>
-    *: "Lejátszólista"
+    *: "Lejátszási lista"
   </voice>
 </phrase>
 <phrase>
@@ -6010,10 +6010,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Felveszem véletlen helyre"
+    *: "Felvétel véletlen helyre"
   </dest>
   <voice>
-    *: "Felveszem véletlen helyre"
+    *: "Felvétel véletlen helyre"
   </voice>
 </phrase>
 <phrase>
@@ -6041,7 +6041,7 @@
     *: "%d Szám felvéve (%s)"
   </dest>
   <voice>
-    *: "számok felvéve"
+    *: "Számok felvéve"
   </voice>
 </phrase>
 <phrase>
@@ -6066,10 +6066,10 @@
     *: "Search in Playlist"
   </source>
   <dest>
-    *: "Keresés lejátszólistában"
+    *: "Keresés lejátszási listában"
   </dest>
   <voice>
-    *: "Keresés lejátszólistában"
+    *: "Keresés lejátszási listában"
   </voice>
 </phrase>
 <phrase>
@@ -6108,10 +6108,10 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Hozzáadás új lejátszólistához"
+    *: "Hozzáadás új lejátszási listához"
   </dest>
   <voice>
-    *: "Add to New playlist"
+    *: "Hozzáadás új lejátszási listához"
   </voice>
 </phrase>
 <phrase>
@@ -6206,10 +6206,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Számok értékelése"
+    *: "Szám értékelés megadása"
   </dest>
   <voice>
-    *: "Set song rating"
+    *: "Szám értékelés megadása"
   </voice>
 </phrase>
 <phrase>
@@ -9116,10 +9116,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Ugrás Hossza"
+    *: "Ugrás hossza"
   </dest>
   <voice>
-    *: "Ugrás Hossza"
+    *: "Ugrás hossza"
   </voice>
 </phrase>
 <phrase>
@@ -9147,10 +9147,10 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Beállítások törlése"
+    *: "Beállítás visszaállítása"
   </dest>
   <voice>
-    *: "Beállítások törlése"
+    *: "Beállítás visszaállítása"
   </voice>
 </phrase>
 <phrase>
@@ -9239,11 +9239,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Kiegészítő Tápegység"
+    accessory_supply: "Kiegészítő tápegység"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Kiegészítő Tápegység"
+    accessory_supply: "Kiegészítő tápegység"
   </voice>
 </phrase>
 <phrase>
@@ -10597,11 +10597,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "File böngésző gyorsgomb"
+    hotkey: "Fájl böngésző gyorsgomb"
   </dest>
   <voice>
     *: none
-    hotkey: "File böngésző gyorsgomb"
+    hotkey: "Fájl böngésző gyorsgomb"
   </voice>
 </phrase>
 <phrase>
@@ -12751,10 +12751,10 @@
     *: "Out of Control"
   </source>
   <dest>
-    *: "Out of Control"
+    *: "Irányíthatatlan"
   </dest>
   <voice>
-    *: "Out of Control"
+    *: "Irányíthatatlan"
   </voice>
 </phrase>
 <phrase>
@@ -13761,11 +13761,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Felvételek könyvtára"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Felvételek könyvtára"
   </voice>
 </phrase>
 <phrase>
@@ -14332,11 +14332,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Panning Separation"
+    *: "Hang panoráma szeparáció"
     lowmem: none
   </dest>
   <voice>
-    *: "Panning Separation"
+    *: "Hang panoráma szeparáció"
     lowmem: none
   </voice>
 </phrase>
@@ -15017,11 +15017,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Zeneszám csere"
+    hotkey: "Szám csere"
   </dest>
   <voice>
     *: none
-    hotkey: "Zeneszám csere"
+    hotkey: "Szám csere"
   </voice>
 </phrase>
 <phrase>
@@ -15217,10 +15217,10 @@
     *: "Queue..."
   </source>
   <dest>
-    *: "Queue..."
+    *: "Sorakoztat..."
   </dest>
   <voice>
-    *: "Queue"
+    *: "Sorakoztat"
   </voice>
 </phrase>
 <phrase>
@@ -15231,10 +15231,10 @@
     *: "Show Queue Options"
   </source>
   <dest>
-    *: "Show Queue Options"
+    *: "Sorakoztatás opcióinak mutatása"
   </dest>
   <voice>
-    *: "Show Queue Options"
+    *: "Sorakoztatás opcióinak mutatása"
   </voice>
 </phrase>
 <phrase>
@@ -15245,10 +15245,10 @@
     *: "Show Shuffled Adding Options"
   </source>
   <dest>
-    *: "Show Shuffled Adding Options"
+    *: "Véletlenszerűek hozzáadásának opcióinak mutatása"
   </dest>
   <voice>
-    *: "Show Shuffled Adding Options"
+    *: "Véletlenszerűek hozzáadásának opcióinak mutatása"
   </voice>
 </phrase>
 <phrase>
@@ -15287,10 +15287,10 @@
     *: "Exempt Volume"
   </source>
   <dest>
-    *: "Exempt Volume"
+    *: "Kivéve hangerő"
   </dest>
   <voice>
-    *: "Exempt Volume"
+    *: "Kivéve hangerő"
   </voice>
 </phrase>
 <phrase>
@@ -15343,10 +15343,10 @@
     *: "List Wraparound"
   </source>
   <dest>
-    *: "List Wraparound"
+    *: "Lista körbefutás"
   </dest>
   <voice>
-    *: "List Wraparound"
+    *: "Lista körbefutás"
   </voice>
 </phrase>
 <phrase>
@@ -15598,10 +15598,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Jelenlegi zeneszám megtartása a lejátszási lista lecserélésekor"
+    *: "Jelenlegi szám megtartása a lejátszási lista lecserélésekor"
   </dest>
   <voice>
-    *: "Jelenlegi zeneszám megtartása a lejátszási lista lecserélésekor"
+    *: "Jelenlegi szám megtartása a lejátszási lista lecserélésekor"
   </voice>
 </phrase>
 <phrase>
@@ -15632,10 +15632,10 @@
     *: "Rewind Across Tracks"
   </source>
   <dest>
-    *: "Rewind Across Tracks"
+    *: "Áttekerés számok felett"
   </dest>
   <voice>
-    *: "Rewind across tracks"
+    *: "Áttekerés számok felett"
   </voice>
 </phrase>
 <phrase>
@@ -15674,10 +15674,10 @@
     *: "Start Directory"
   </source>
   <dest>
-    *: "Start Directory"
+    *: "Kezdési könyvtár"
   </dest>
   <voice>
-    *: "Start Directory"
+    *: "Kezdési könyvtár"
   </voice>
 </phrase>
 <phrase>
@@ -15854,10 +15854,10 @@
     *: "Show Tracks While Browsing"
   </source>
   <dest>
-    *: "Zeneszámok megjelenítése böngészés közben"
+    *: "Számok megjelenítése böngészés közben"
   </dest>
   <voice>
-    *: "Zeneszámok megjelenítése böngészés közben"
+    *: "Számok megjelenítése böngészés közben"
   </voice>
 </phrase>
 <phrase>
@@ -16036,10 +16036,10 @@
     *: "Use Large Tiles"
   </source>
   <dest>
-    *: "Use Large Tiles"
+    *: "Nagy méretű csempe használata"
   </dest>
   <voice>
-    *: "Use Large Tiles"
+    *: "Nagy méretű csempe használata"
   </voice>
 </phrase>
 <phrase>
@@ -16400,10 +16400,10 @@
     *: "Tracks by First Letter"
   </source>
   <dest>
-    *: "Zeneszámok első betűként"
+    *: "Számok első betűjeként"
   </dest>
   <voice>
-    *: "Zeneszámok első betűként"
+    *: "Számok első betűjeként"
   </voice>
 </phrase>
 <phrase>
@@ -16456,10 +16456,10 @@
     *: "Shuffle Songs"
   </source>
   <dest>
-    *: "Zenék keverése"
+    *: "Zenék véletlenszerűen"
   </dest>
   <voice>
-    *: "Zenék keverése"
+    *: "Zenék véletlenszerűen"
   </voice>
 </phrase>
 <phrase>
@@ -16666,10 +16666,10 @@
     *: "Recently played tracks"
   </source>
   <dest>
-    *: "Nemrég lejátszott zeneszámok"
+    *: "Nemrég lejátszott számok"
   </dest>
   <voice>
-    *: "Nemrég lejátszott zeneszámok"
+    *: "Nemrég lejátszott számok"
   </voice>
 </phrase>
 <phrase>
@@ -16680,10 +16680,10 @@
     *: "Never played tracks"
   </source>
   <dest>
-    *: "Soha le nem játszott zeneszámok"
+    *: "Soha le nem játszott számok"
   </dest>
   <voice>
-    *: "Soha le nem játszott zeneszámok"
+    *: "Soha le nem játszott számok"
   </voice>
 </phrase>
 <phrase>
@@ -16764,10 +16764,10 @@
     *: "Tracks by"
   </source>
   <dest>
-    *: "Tracks by"
+    *: "Számok listázásának módja"
   </dest>
   <voice>
-    *: "Tracks by"
+    *: "Számok listázásának módja"
   </voice>
 </phrase>
 <phrase>
