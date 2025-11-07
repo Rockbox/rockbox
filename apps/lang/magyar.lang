@@ -5968,10 +5968,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Felvétel listára"
+    *: "Sorol listára"
   </dest>
   <voice>
-    *: "Felvétel listára"
+    *: "Sorol listára"
   </voice>
 </phrase>
 <phrase>
@@ -6010,10 +6010,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Felvétel véletlen helyre"
+    *: "Sorol véletlen helyre"
   </dest>
   <voice>
-    *: "Felvétel véletlen helyre"
+    *: "Sorol véletlen helyre"
   </voice>
 </phrase>
 <phrase>
@@ -6038,10 +6038,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "%d Szám felvéve (%s)"
+    *: "%d Szám sorolva (%s)"
   </dest>
   <voice>
-    *: "Számok felvéve"
+    *: "Számok sorolva"
   </voice>
 </phrase>
 <phrase>
@@ -11429,10 +11429,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Utolsó beszúrása véletlenszerűen"
+    *: "Utolsó sorolása véletlenszerűen"
   </dest>
   <voice>
-    *: "Utolsó beszúrása véletlenszerűen"
+    *: "Utolsó sorolása véletlenszerűen"
   </voice>
 </phrase>
 <phrase>
@@ -12462,7 +12462,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Sorban"
+    *: "Sorolva"
   </voice>
 </phrase>
 <phrase>
@@ -15217,10 +15217,10 @@
     *: "Queue..."
   </source>
   <dest>
-    *: "Sorakoztat..."
+    *: "Sorol..."
   </dest>
   <voice>
-    *: "Sorakoztat"
+    *: "Sorol"
   </voice>
 </phrase>
 <phrase>
@@ -15231,10 +15231,10 @@
     *: "Show Queue Options"
   </source>
   <dest>
-    *: "Sorakoztatás opcióinak mutatása"
+    *: "Sorolás opcióinak mutatása"
   </dest>
   <voice>
-    *: "Sorakoztatás opcióinak mutatása"
+    *: "Sorolás opcióinak mutatása"
   </voice>
 </phrase>
 <phrase>
@@ -15896,10 +15896,10 @@
     *: "Remove Queued Tracks?"
   </source>
   <dest>
-    *: "Remove Queued Tracks?"
+    *: "Törli a sorolt számokat?"
   </dest>
   <voice>
-    *: "Remove Queued Tracks?"
+    *: "Törli a sorolt számokat?"
   </voice>
 </phrase>
 <phrase>
