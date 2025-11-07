@@ -3360,57 +3360,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3551,8 +3500,8 @@
   <dest>
     *: none
     rtc: "ON = Запази"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Запази"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Запази"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Запази"
     iriverh100,iriverh120,iriverh300: "NAVI = Запази"
     mpiohd300: "ENTER = Запази"
     mrobe500: "HEART = Запази"
@@ -3560,7 +3509,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3584,8 +3532,8 @@
   <dest>
     *: none
     rtc: "OFF = отказ"
-    gigabeatfx,mrobe500: "POWER = отказ"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = отказ"
+    gigabeatfx,mrobe500: "POWER = отказ"
     gogearsa9200: "LEFT = отказ"
     iaudiom5,iaudiox5: "RECORD = отказ"
     ipod*,mpiohd300,sansac200*: "MENU = отказ"
@@ -3597,7 +3545,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4467,11 +4414,11 @@
   </source>
   <dest>
     *: none
-    radio: "Меню на FM радио "
+    radio: "Меню на FM радио"
   </dest>
   <voice>
     *: none
-    radio: "Меню на FM радио "
+    radio: "Меню на FM радио"
   </voice>
 </phrase>
 <phrase>
@@ -4675,7 +4622,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Сканиране"
   </voice>
 </phrase>
 <phrase>
@@ -5785,20 +5732,6 @@
   </dest>
   <voice>
     *: "Записите са запазени"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7237,7 +7170,7 @@
     *: "Не мога да отворя %s"
   </dest>
   <voice>
-    *: ""
+    *: "Не мога да отворя плъгина"
   </voice>
 </phrase>
 <phrase>
@@ -7251,7 +7184,7 @@
     *: "Неуспешно прочитане на %s"
   </dest>
   <voice>
-    *: ""
+    *: "Неуспешно прочитане на файла"
   </voice>
 </phrase>
 <phrase>
@@ -12491,20 +12424,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -14056,16 +13975,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Превключи елемента"
+    *: ""
   </dest>
   <voice>
-    *: "Превключи елемента"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14126,13 +14045,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Ред на основното меню на Rockbox"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14633,20 +14552,6 @@
   </dest>
   <voice>
     *: "Не е намерена обложка"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16261,5 +16166,756 @@
   </dest>
   <voice>
     *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "Възстановяване на EQ"
+  </dest>
+  <voice>
+    *: "Възстановяване на еквалайзер"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Заглавие & Албум от ID3 тагове"
+  </dest>
+  <voice>
+    *: "Заглавие и албум от тагове"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Заглавие от ID3 тагове"
+  </dest>
+  <voice>
+    *: "Заглавие от тагове"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Твърде голяма селекция, %d случайни записа ще бъдат избрани"
+  </dest>
+  <voice>
+    *: "Твърде голяма селекция, по-малко случайни записа ще бъдат избрани"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Специален символ"
+  </dest>
+  <voice>
+    *: "Специален символ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Албум Изпълнители"
+  </dest>
+  <voice>
+    *: "Албум Изпълнители"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Добавяне на текущия към преките пътища"
+  </dest>
+  <voice>
+    *: "Добавяне на текущия към преките пътища"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Диск"
+  </dest>
+  <voice>
+    *: "Диск"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Изберете файл"
+  </dest>
+  <voice>
+    *: "Изберете файл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Изключи скролиране на главното меню"
+  </dest>
+  <voice>
+    *: "Изключи скролиране на главното меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Оставащо"
+  </dest>
+  <voice>
+    *: "Оставащо"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "Първа буква"
+  </dest>
+  <voice>
+    *: "Първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "По първа буква..."
+  </dest>
+  <voice>
+    *: "По първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Изпълнители по първа буква"
+  </dest>
+  <voice>
+    *: "Изпълнители по първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Албум изпълнители по първа буква"
+  </dest>
+  <voice>
+    *: "Албум изпълнители по първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Албуми по първа буква"
+  </dest>
+  <voice>
+    *: "Албуми по първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Записи по първа буква"
+  </dest>
+  <voice>
+    *: "Записи по първа буква"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Изпълнители"
+  </dest>
+  <voice>
+    *: "Изпълнители"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Албуми"
+  </dest>
+  <voice>
+    *: "Албуми"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Записи"
+  </dest>
+  <voice>
+    *: "Записи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Разбъркване на песните"
+  </dest>
+  <voice>
+    *: "Разбъркване на песните"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Име на файла"
+  </dest>
+  <voice>
+    *: "Име на файла"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Заглавие (с продължителност на записа)"
+  </dest>
+  <voice>
+    *: "Заглавие с продължителност на записа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Потребителски рейтинг"
+  </dest>
+  <voice>
+    *: "Потребителски рейтинг"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Търсене"
+  </dest>
+  <voice>
+    *: "Търсене"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Търсене по..."
+  </dest>
+  <voice>
+    *: "Търсене по"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Скорошно добавени"
+  </dest>
+  <voice>
+    *: "Скорошно добавени"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "История на възпроизвеждането"
+  </dest>
+  <voice>
+    *: "История на възпроизвеждането"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Потребителско меню"
+  </dest>
+  <voice>
+    *: "Потребителско меню"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Също като текущо възпроизвеждания запис"
+  </dest>
+  <voice>
+    *: "Също като текущо възпроизвеждания запис"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Папка"
+  </dest>
+  <voice>
+    *: "Папка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Албуми по година"
+  </dest>
+  <voice>
+    *: "Албуми по година"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Албуми между години"
+  </dest>
+  <voice>
+    *: "Албуми между години"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Изпълнители между години"
+  </dest>
+  <voice>
+    *: "Изпълнители между години"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Най-възпроизвеждани (Пъти|Оценка)"
+  </dest>
+  <voice>
+    *: "Най-възпроизвеждани по брой пъти, след това по оценка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Скорошно възпроизвеждани записи"
+  </dest>
+  <voice>
+    *: "Скорошно възпроизвеждани записи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Не възпроизвеждани никога записи"
+  </dest>
+  <voice>
+    *: "Не възпроизвеждани никога записи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Любими изпълнители"
+  </dest>
+  <voice>
+    *: "Любими изпълнители"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Любими албуми"
+  </dest>
+  <voice>
+    *: "Любими албуми"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Скорошни любими"
+  </dest>
+  <voice>
+    *: "Скорошни любими"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Нови любими"
+  </dest>
+  <voice>
+    *: "Нови любими"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Забравени любими"
+  </dest>
+  <voice>
+    *: "Забравени любими"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Записи по"
+  </dest>
+  <voice>
+    *: "Записи по"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Виж обложка"
+  </dest>
+  <voice>
+    *: "Виж обложка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[По албум]"
+  </dest>
+  <voice>
+    *: "Всички записи сортирани по албум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Избор на изход"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Избор на изход"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Слушалки"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Слушалки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Линеен изход"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Линеен изход"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Не може да се зареди шрифт: (%s)"
+  </dest>
+  <voice>
+    *: "Не може да се зареди шрифт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Логване"
+  </dest>
+  <voice>
+    *: "логване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Виж лог"
+  </dest>
+  <voice>
+    *: "виж лог"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Плейлистата приключи. Възпроизвеждане отново?"
+  </dest>
+  <voice>
+    *: "Плейлистата приключи. Възпроизвеждане отново?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Сортиране на плейлисти"
+  </dest>
+  <voice>
+    *: "сортиране на плейлисти"
   </voice>
 </phrase>
