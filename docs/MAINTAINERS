@@ -64,17 +64,18 @@ specific to that target.
 :xDuoo X3ii:Solomon Peachy
 :xDuoo X20:Solomon Peachy
 
+
 Core code (low-level)
 ---------------------
 
-:Kernel: Miika Pekkarinen,Michael Sevakis
+:Kernel: Miika Pekkarinen, Michael Sevakis
 :LCD drivers: Michael Sevakis, Jens Arnold
 :Button drivers: Michael Sevakis
 :Rolo:
 :ATA driver: Solomon Peachy
 :MMC driver: Jens Arnold
 :SD driver: Barry Wardell
-:FAT driver: Linus Nielsen Feltzing
+:FAT filesystem: Solomon Peachy
 :Battery/Power Management:
 :FM Tuner drivers: Michael Sevakis
 :Audio codec drivers: Michael Sevakis
@@ -89,7 +90,7 @@ Core code (Mid-level)
 :Playback engine: Michael Sevakis, Nicolas Pennequin
 :PCM playback API: Michael Sevakis
 :PCM recording API: Michael Sevakis
-:Fonts and Unicode:
+:Fonts and Unicode: Solomon Peachy
 :Replaygain: Magnus Holmgren
 :Profiling:
 :Screens API and GUI widgets: Kévin Ferrare
@@ -105,12 +106,13 @@ Core code (high-level)
 :Bookmarks: Magnus Holmgren
 :Cuesheet support: William Wilgus, Nicolas Pennequin
 :Database: Miika Pekkarinen
+:General User interface: William Wilgus, Jonathan Gordon
+:Internationalization: Solomon Peachy
 :Playlists:
 :Radio UI:
 :Recording UI: Peter D'Hoye
-:Voice UI: Solomon Peachy
+:Voice Subsystem: Solomon Peachy
 :WPS: Nicolas Pennequin
-:User interface: William Wilgus, Jonathan Gordon
 
 
 Metadata parsing
@@ -294,17 +296,19 @@ Bootloaders
 :xDuoo X3: Solomon Peachy
 :x1000: Aidan MacDonald
 
+
 Build Tools
 -----------
 
 :configure script and general build system: Solomon Peachy
+:toolchain maintenance: Solomon Peachy
 :bdf2bmp:
 :bmp2rb: Daniel Stenberg
 :checkwps: Solomon Peachy
 :mkboot: Linus Nielsen Feltzing
 :database:
 :rdf2binary:
-:convbdf: Daniel Stenberg
+:convbdf: Solomon Peachy
 :codepages:
 :uclpack:
 :wavtrim: Linus Nielsen Feltzing

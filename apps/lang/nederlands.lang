@@ -23,8 +23,7 @@
 # - Sam Bouwer
 # - Bertrik Sikken
 # - Nathan Follens
-#
-# Maintainer: Peter D'Hoye
+# - Marc Aarts
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
