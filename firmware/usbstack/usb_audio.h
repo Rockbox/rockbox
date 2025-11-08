@@ -20,6 +20,7 @@
 #define USB_AUDIO_H
 
 #include "usb_ch9.h"
+#include "usb_class_driver.h"
 
 /* NOTE
  *
@@ -275,5 +276,7 @@ int usb_audio_get_frames_dropped(void);
  * Return current audio volume in db
  */
 int usb_audio_get_cur_volume(void);
+
+bool usb_audio_get_active(void);
 
 #endif

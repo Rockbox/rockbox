@@ -65,6 +65,12 @@
 #include <strings.h>  /* For strncasecmp() */
 #endif
 
+#ifdef USB_ENABLE_AUDIO
+#include "usbstack/usb_audio.h"
+#include "splash.h"
+#include "lang.h"
+#endif
+
 /* TODO: The audio thread really is doing multitasking of acting like a
          consumer and producer of tracks. It may be advantageous to better
          logically separate the two functions. I won't go that far just yet. */
@@ -2978,6 +2984,15 @@ static void audio_on_track_changed(void)
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags)
 {
+/* NOTE: if USBAudio ever gets its own DSP channel, this block can go away! */
+#ifdef USB_ENABLE_AUDIO
+    if (usb_audio_get_active())
+    {
+        splash(HZ*2, str(LANG_USB_DAC_ACTIVE));
+        queue_reply(&audio_queue, 0);
+        return;
+    }
+#endif
     static struct audio_resume_info resume = { 0, 0 };
     enum play_status old_status = play_status;
 

@@ -398,6 +398,9 @@ int buffers_filled_max_last;
 static int last_frame = 0;
 static int frames_dropped = 0;
 
+/* for blocking normal playback */
+static bool usbaudio_active = false;
+
 /* Schematic view of the RX situation:
  * (in case NR_BUFFERS = 4)
  *
@@ -1181,6 +1184,7 @@ void usb_audio_init_connection(void)
 {
     logf("usbaudio: init connection");
 
+    usbaudio_active = true;
     dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_configure(dsp, DSP_RESET, 0);
     dsp_configure(dsp, DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
@@ -1202,6 +1206,12 @@ void usb_audio_disconnect(void)
 
     usb_audio_stop_playback();
     usb_audio_free_buf();
+    usbaudio_active = false;
+}
+
+bool usb_audio_get_active(void)
+{
+    return usbaudio_active;
 }
 
 bool usb_audio_get_alloc_failed(void)
