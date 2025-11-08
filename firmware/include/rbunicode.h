@@ -76,8 +76,9 @@ const char *get_current_codepage_name_linux(void);
 #endif
 #endif /* APPLICATION */
 
-#if 0 /* not needed just now */
-void unicode_init(void);
+#ifdef UTF8PROC_EXPORTS
+void utf8_normalize(char *string);
+void unicode_init(void) INIT_ATTR;
 #else
 #define unicode_init() do {} while (0)
 #endif

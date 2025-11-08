@@ -316,3 +316,7 @@ lto
 #if defined(USB_ENABLE_AUDIO)
 usbdac
 #endif
+
+#if defined(UTF8PROC_EXPORTS)
+utf8proc
+#endif

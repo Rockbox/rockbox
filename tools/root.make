@@ -128,6 +128,14 @@ else # core
   include $(APPSDIR)/apps.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 
+  # bootloaders don't get utf8proc
+  ifeq (,$(findstring checkwps,$(APP_TYPE)))
+    IS_GREATER := $(shell [ $(MEMORYSIZE) -gt 2 ] && echo true || echo false)
+    ifeq ($(IS_GREATER),true)
+      include $(ROOTDIR)/lib/utf8proc/utf8proc.make
+    endif
+  endif
+
   ifeq ($(ENABLEDPLUGINS),yes)
     include $(APPSDIR)/plugins/bitmaps/pluginbitmaps.make
     include $(APPSDIR)/plugins/plugins.make

@@ -9,6 +9,8 @@
 
 GCCOPTS += -g -DDEBUG -D__PCTOOL__ -DDBTOOL
 
+include $(ROOTDIR)/lib/utf8proc/utf8proc.make
+
 METADATAS := $(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c)
 
 DATABASE_SRC = $(call preprocess, $(TOOLSDIR)/database/SOURCES) $(METADATAS)
@@ -28,7 +30,7 @@ INCLUDES += -I$(ROOTDIR)/apps/gui \
             -I$(APPSDIR) \
             -I$(BUILDDIR)
 
-OTHERLIBS := $(FIXEDPOINTLIB)
+OTHERLIBS := $(FIXEDPOINTLIB) $(LIBUTF8PROC)
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 

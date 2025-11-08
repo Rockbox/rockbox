@@ -27,6 +27,10 @@
 #include "logf.h"
 #include "metadata.h"
 
+#ifdef UTF8PROC_EXPORTS
+#include "rbunicode.h"
+#endif
+
 #include "metadata_parsers.h"
 
 /* For trailing tag stripping and base audio data types */
@@ -470,6 +474,22 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
         success = false;
         wipe_mp3entry(id3); /* ensure the mp3entry is clear */
     }
+
+#ifdef UTF8PROC_EXPORTS
+    if (success) {
+        utf8_normalize(id3->title);
+        utf8_normalize(id3->artist);
+        utf8_normalize(id3->album);
+        utf8_normalize(id3->genre_string);
+        utf8_normalize(id3->disc_string);
+        utf8_normalize(id3->track_string);
+        utf8_normalize(id3->year_string);
+        utf8_normalize(id3->composer);
+        utf8_normalize(id3->comment);
+        utf8_normalize(id3->albumartist);
+        utf8_normalize(id3->grouping);
+    }
+#endif
 
     if ((flags & METADATA_CLOSE_FD_ON_EXIT))
         close(fd);
