@@ -117,10 +117,10 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "Schakelt uit..."
+    *: "Uitschakelen..."
   </dest>
   <voice>
-    *: "Schakelt uit..."
+    *: "Uitschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -263,10 +263,10 @@
     *: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: "~Volume"
   </dest>
   <voice>
-    *: "Volume"
+    *: "~Volume"
   </voice>
 </phrase>
 <phrase>
@@ -291,10 +291,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Treble"
+    *: "~Treble"
   </dest>
   <voice>
-    *: "Treble"
+    *: "~Treble"
   </voice>
 </phrase>
 <phrase>
@@ -313,30 +313,30 @@
 </phrase>
 <phrase>
   id: LANG_CHANNEL_STEREO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "~Stereo"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "~Stereo"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CHANNEL_MONO
-  desc: in sound_settings
+  desc: in sound_settings and radio screen
   user: core
   <source>
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "~Mono"
   </dest>
   <voice>
-    *: "Mono"
+    *: "~Mono"
   </voice>
 </phrase>
 <phrase>
@@ -389,10 +389,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "~Karaoke"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "~Karaoke"
   </voice>
 </phrase>
 <phrase>
@@ -417,10 +417,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: "~Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -431,10 +431,10 @@
     *: "Equalizer"
   </source>
   <dest>
-    *: "Equalizer"
+    *: "~Equalizer"
   </dest>
   <voice>
-    *: "Equalizer"
+    *: "~Equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -704,20 +704,6 @@
   </dest>
   <voice>
     *: "EQ-voorkeuzes laden"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Bewerkmodus: %s"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1726,10 +1712,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "~Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "~Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -2127,23 +2113,6 @@
   <voice>
     *: none
     recording: "Bufferopnametijd"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_DIRECTORY
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Directory"
-  </source>
-  <dest>
-    *: none
-    recording: "Map"
-  </dest>
-  <voice>
-    *: none
-    recording: "Map"
   </voice>
 </phrase>
 <phrase>
@@ -3129,63 +3098,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "Battery Type"
-  </source>
-  <dest>
-    *: none
-    battery_types: "Batterijtype"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Batterijtype"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "Alkaline"
-    xduoox3: "Newer (2000 mAh)"
-  </source>
-  <dest>
-    *: none
-    battery_types: "Alkalisch"
-    xduoox3: "Nieuwer (2000 mAh)"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Alkalisch"
-    xduoox3: "Nieuwer 2000 milliampère per uur"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
-  </source>
-  <dest>
-    *: none
-    battery_types: "NiMH"
-    xduoox3: "Ouder (1500 mAh)"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Nikkelmetaalhydride"
-    xduoox3: "Ouder 1500 milliampère uur"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPINDOWN
   desc: in settings_menu
   user: core
@@ -3576,62 +3488,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_FIRST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE
   desc: The verb/action Queue
   user: core
@@ -3775,23 +3631,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TRICKLE_CHARGE
-  desc: in info display, shows that trickle charge is running
-  user: core
-  <source>
-    *: none
-    charging: "Battery: Trickle Chg"
-  </source>
-  <dest>
-    *: none
-    charging: "Batterij: druppelsgewijs laden"
-  </dest>
-  <voice>
-    *: none
-    charging: "Batterij druppelsgewijs laden"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_TIME
   desc: battery level in % and estimated time remaining
   user: core
@@ -3801,7 +3640,7 @@
   </source>
   <dest>
     *: "Batterij: %d%% %du %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "~Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterijniveau"
@@ -3832,7 +3671,7 @@
     *: "Beschikbaar:"
   </dest>
   <voice>
-    *: "Beschikbare schijfruimte:"
+    *: "Beschikbare schijfruimte"
   </voice>
 </phrase>
 <phrase>
@@ -3846,13 +3685,13 @@
   </source>
   <dest>
     *: "Intern:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Intern"
-    hibylinux: "micro S D"
-    xduoox3: "micro S D 1"
+    hibylinux: "~micro S D"
+    xduoox3: "~micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -3868,16 +3707,17 @@
   </source>
   <dest>
     *: none
-    hibylinux: "USB:"
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
-    hibylinux: "U S B"
+    hibylinux: "~U S B"
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    sansac200*: "~micro S D"
+    sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
   </voice>
 </phrase>
@@ -4009,8 +3849,8 @@
   <source>
     *: none
     rtc: "OFF = Revert"
-    gigabeatfx,mrobe500: "POWER = Revert"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
     gogearsa9200: "LEFT = Revert"
     iaudiom5,iaudiox5: "RECORD = Revert"
     ipod*,mpiohd300,sansac200*: "MENU = Revert"
@@ -4023,8 +3863,8 @@
   <dest>
     *: none
     rtc: "OFF = Terugzetten"
-    gigabeatfx,mrobe500: "POWER = Terugzetten"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Terugzetten"
+    gigabeatfx,mrobe500: "POWER = Terugzetten"
     gogearsa9200: "LINKS = Terugzetten"
     iaudiom5,iaudiox5: "RECORD = Terugzetten"
     ipod*,mpiohd300,sansac200*: "MENU = Terugzetten"
@@ -4036,7 +3876,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4167,23 +4006,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_DB_INF
-  desc: -inf db for values below measurement
-  user: core
-  <source>
-    *: none
-    recording: "-inf"
-  </source>
-  <dest>
-    *: none
-    recording: "-inf"
-  </dest>
-  <voice>
-    *: none
-    recording: "min oneindig"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_TIME
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
   user: core
@@ -4210,28 +4032,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Wekken om: %d:%02d"
+    alarm: "Wekken over: %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Wekken om:"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_SHUTDOWN
-  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Set"
-  </source>
-  <dest>
-    *: none
-    alarm: "Alarm ingesteld"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Alarm ingesteld"
+    alarm: "Wekken over"
   </voice>
 </phrase>
 <phrase>
@@ -4249,20 +4054,6 @@
   <voice>
     *: none
     alarm: "Inschakeltijd is te dichtbij!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ALARM_MOD_KEYS
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4369,10 +4160,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "~Album"
   </dest>
   <voice>
-    *: "Album"
+    *: "~Album"
   </voice>
 </phrase>
 <phrase>
@@ -4383,10 +4174,10 @@
     *: "Tracknum"
   </source>
   <dest>
-    *: "Tracknum"
+    *: "~Tracknum"
   </dest>
   <voice>
-    *: "Tracknummer"
+    *: "~Track nummer"
   </voice>
 </phrase>
 <phrase>
@@ -4397,10 +4188,10 @@
     *: "Genre"
   </source>
   <dest>
-    *: "Genre"
+    *: "~Genre"
   </dest>
   <voice>
-    *: "Genre"
+    *: "~Genre"
   </voice>
 </phrase>
 <phrase>
@@ -4499,20 +4290,6 @@
   </dest>
   <voice>
     *: "Nummerversterking"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_ALBUM_GAIN
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Album Gain"
-  </source>
-  <dest>
-    *: "Albumversterking"
-  </dest>
-  <voice>
-    *: "Albumversterking"
   </voice>
 </phrase>
 <phrase>
@@ -4670,7 +4447,7 @@
     *: "Jan"
   </source>
   <dest>
-    *: "Jan"
+    *: "~Jan"
   </dest>
   <voice>
     *: "Januari"
@@ -4684,7 +4461,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Feb"
+    *: "~Feb"
   </dest>
   <voice>
     *: "Februari"
@@ -4712,10 +4489,10 @@
     *: "Apr"
   </source>
   <dest>
-    *: "Apr"
+    *: "~Apr"
   </dest>
   <voice>
-    *: "April"
+    *: "~April"
   </voice>
 </phrase>
 <phrase>
@@ -4740,7 +4517,7 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Jun"
+    *: "~Jun"
   </dest>
   <voice>
     *: "Juni"
@@ -4754,10 +4531,10 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Jul"
+    *: "~Jul"
   </dest>
   <voice>
-    *: "Juli"
+    *: "~Juli"
   </voice>
 </phrase>
 <phrase>
@@ -4768,7 +4545,7 @@
     *: "Aug"
   </source>
   <dest>
-    *: "Aug"
+    *: "~Aug"
   </dest>
   <voice>
     *: "Augustus"
@@ -4782,10 +4559,10 @@
     *: "Sep"
   </source>
   <dest>
-    *: "Sep"
+    *: "~Sep"
   </dest>
   <voice>
-    *: "September"
+    *: "~September"
   </voice>
 </phrase>
 <phrase>
@@ -4810,10 +4587,10 @@
     *: "Nov"
   </source>
   <dest>
-    *: "Nov"
+    *: "~Nov"
   </dest>
   <voice>
-    *: "November"
+    *: "~November"
   </voice>
 </phrase>
 <phrase>
@@ -4824,10 +4601,10 @@
     *: "Dec"
   </source>
   <dest>
-    *: "Dec"
+    *: "~Dec"
   </dest>
   <voice>
-    *: "December"
+    *: "~December"
   </voice>
 </phrase>
 <phrase>
@@ -5289,7 +5066,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "~minus"
   </voice>
 </phrase>
 <phrase>
@@ -5303,7 +5080,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "~plus"
   </voice>
 </phrase>
 <phrase>
@@ -5415,7 +5192,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "~kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -5429,7 +5206,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "~decibel"
   </voice>
 </phrase>
 <phrase>
@@ -5471,7 +5248,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "~pixel"
   </voice>
 </phrase>
 <phrase>
@@ -5499,7 +5276,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "~hertz"
   </voice>
 </phrase>
 <phrase>
@@ -6045,7 +5822,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "~firmware"
   </voice>
 </phrase>
 <phrase>
@@ -6189,20 +5966,6 @@
   </dest>
   <voice>
     *: "Niets te hervatten"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-  desc: Playlist error
-  user: core
-  <source>
-    *: "Error updating playlist control file"
-  </source>
-  <dest>
-    *: "Fout bij bijwerken van afspeellijststuurbestand"
-  </dest>
-  <voice>
-    *: "Fout bij bijwerken van afspeellijststuurbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6441,11 +6204,11 @@
   </source>
   <dest>
     *: none
-    radio: "Zoeken: %d.%02d MHz"
+    radio: "Zoeken %d.%02d MHz"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Zoeken %d.%02d MHz"
   </voice>
 </phrase>
 <phrase>
@@ -6715,7 +6478,7 @@
     *: "Kan %s niet openen"
   </dest>
   <voice>
-    *: ""
+    *: "Kan %s niet openen"
   </voice>
 </phrase>
 <phrase>
@@ -6729,7 +6492,7 @@
     *: "Kan %s niet lezen"
   </dest>
   <voice>
-    *: ""
+    *: "Kan %s niet lezen"
   </voice>
 </phrase>
 <phrase>
@@ -7031,34 +6794,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CATALOG
-  desc: in main menu and onplay menu
-  user: core
-  <source>
-    *: "Playlist Catalogue"
-  </source>
-  <dest>
-    *: "Afspeellijstcatalogus"
-  </dest>
-  <voice>
-    *: "Afspeellijstcatalogus"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_ADD_TO
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CATALOG_ADD_TO_NEW
   desc: in onplay playlist catalogue submenu
   user: core
@@ -7070,20 +6805,6 @@
   </dest>
   <voice>
     *: "Toevoegen aan nieuwe afspeellijst"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalogue submenu
-  user: core
-  <source>
-    *: "View Catalogue"
-  </source>
-  <dest>
-    *: "Catalogus tonen"
-  </dest>
-  <voice>
-    *: "Catalogus tonen"
   </voice>
 </phrase>
 <phrase>
@@ -7528,11 +7249,11 @@
   </source>
   <dest>
     *: none
-    radio: "Japan"
+    radio: "~Japan"
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "~Japan"
   </voice>
 </phrase>
 <phrase>
@@ -7545,11 +7266,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "~Korea"
   </voice>
 </phrase>
 <phrase>
@@ -7602,10 +7323,10 @@
     *: "Dithering"
   </source>
   <dest>
-    *: "Dithering"
+    *: "~Dithering"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "~Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -7649,11 +7370,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "~PCM Wave"
   </voice>
 </phrase>
 <phrase>
@@ -7908,20 +7629,6 @@
   </dest>
   <voice>
     *: "Tijd wissen?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REPLACE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8297,7 +8004,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "~Index"
   </voice>
 </phrase>
 <phrase>
@@ -8329,20 +8036,6 @@
   <voice>
     *: none
     buttonlight_brightness: "Knoplichthelderheid"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_CONTEXT_DELETE
-  desc: bookmark context menu, delete this bookmark
-  user: core
-  <source>
-    *: "Delete"
-  </source>
-  <dest>
-    *: "Verwijderen"
-  </dest>
-  <voice>
-    *: "Verwijderen"
   </voice>
 </phrase>
 <phrase>
@@ -8426,7 +8119,7 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", Shuffle"
+    *: "~, Shuffle"
   </dest>
   <voice>
     *: ""
@@ -8481,21 +8174,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_REC_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    recording: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_DISCNUM
   desc: in tag viewer
   user: core
@@ -8520,7 +8198,7 @@
     *: "Schijf wordt doorzocht..."
   </dest>
   <voice>
-    *: "Schijf wordt doorzocht..."
+    *: "Schijf wordt doorzocht"
   </voice>
 </phrase>
 <phrase>
@@ -8593,7 +8271,7 @@
     *: "Buffer:"
   </source>
   <dest>
-    *: "Buffer:"
+    *: "~Buffer:"
   </dest>
   <voice>
     *: "Buffergrootte"
@@ -8661,8 +8339,8 @@
   <source>
     *: none
     rtc: "ON = Set"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
     mrobe500: "HEART = Set"
@@ -8671,8 +8349,8 @@
   <dest>
     *: none
     rtc: "ON = Instellen"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Instellen"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Instellen"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Instellen"
     iriverh100,iriverh120,iriverh300: "NAVI = Instellen"
     mpiohd300: "ENTER = Instellen"
     mrobe500: "HEART = Instellen"
@@ -8680,7 +8358,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8754,20 +8431,6 @@
   </dest>
   <voice>
     *: "Einde van de afspeellijst"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Versterking"
-  </dest>
-  <voice>
-    *: "Versterking"
   </voice>
 </phrase>
 <phrase>
@@ -9115,7 +8778,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "~A M"
   </voice>
 </phrase>
 <phrase>
@@ -9129,7 +8792,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "~P M"
   </voice>
 </phrase>
 <phrase>
@@ -9770,7 +9433,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "~CLIP:"
   </dest>
   <voice>
     *: none
@@ -9838,7 +9501,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "~AGC"
   </dest>
   <voice>
     *: none
@@ -10112,7 +9775,7 @@
   </source>
   <dest>
     *: none
-    serial_port: "Auto"
+    serial_port: "~Auto"
   </dest>
   <voice>
     *: none
@@ -10433,20 +10096,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "Scrollbalkpositie"
-  </dest>
-  <voice>
-    *: "Scrollbalkpositie"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE_LAST_SHUFFLED
   desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
   user: core
@@ -10559,20 +10208,6 @@
   </dest>
   <voice>
     *: "Automatisch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10788,25 +10423,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Multimedia"
+    usb_hid: "~Multimedia"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "Aangepast"
-  </dest>
-  <voice>
-    *: "Aangepast"
+    usb_hid: "~Multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -10845,10 +10466,10 @@
     *: "Compressor"
   </source>
   <dest>
-    *: "Compressor"
+    *: "~Compressor"
   </dest>
   <voice>
-    *: "Compressor"
+    *: "~Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -10893,7 +10514,7 @@
     *: "Volgende:"
   </dest>
   <voice>
-    *: "Volgende:"
+    *: "Volgende"
   </voice>
 </phrase>
 <phrase>
@@ -10941,7 +10562,7 @@
     *: "Volgend nummer:"
   </dest>
   <voice>
-    *: "Volgend nummer:"
+    *: "Volgend nummer"
   </voice>
 </phrase>
 <phrase>
@@ -11069,23 +10690,6 @@
   <voice>
     *: none
     gigabeats,samsungypr1: "band versterking"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "Analoge uitvoer"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Analoge uitvoer"
   </voice>
 </phrase>
 <phrase>
@@ -11409,11 +11013,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "~Del"
   </voice>
 </phrase>
 <phrase>
@@ -11473,20 +11077,6 @@
   </dest>
   <voice>
     *: "Bestandsbeheer starten aan het begin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_START_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11608,20 +11198,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SAVE_CHANGES
   desc: When you try to exit screens to confirm save
   user: core
@@ -11664,20 +11240,6 @@
   <voice>
     *: none
     touchscreen: "Regelspatiëring in lijsten"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOMATIC
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11939,20 +11501,6 @@
   </dest>
   <voice>
     *: "Maximale volumelimiet"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "Q"
-  </dest>
-  <voice>
-    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12565,20 +12113,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_NO_VIEWERS
-  desc: text for splash to indicate that no viewers are available
-  user: core
-  <source>
-    *: "No viewers found"
-  </source>
-  <dest>
-    *: "Geen viewers gevonden"
-  </dest>
-  <voice>
-    *: "Geen viewers gevonden"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_MOVING_TRACK
   desc: playlist viewer
   user: core
@@ -12631,13 +12165,13 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Playlist elapsed: %s / %s %ld%%"
+    *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Afspeellijst is verstreken: %s / %s %ld%%"
+    *: "Afspeellijst verstreken:"
   </dest>
   <voice>
-    *: "Afspeellijst is verstreken"
+    *: "Afspeellijst verstreken"
   </voice>
 </phrase>
 <phrase>
@@ -12645,27 +12179,13 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track elapsed: %s / %s %ld%%"
+    *: "Track elapsed:"
   </source>
   <dest>
-    *: "Nummer is verstreken: %s / %s %ld%%"
+    *: "Nummer verstreken:"
   </dest>
   <voice>
-    *: "Nummer is verstreken"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Playlist remaining: %s"
-  </source>
-  <dest>
-    *: "Afspeellijst resterend: %s"
-  </dest>
-  <voice>
-    *: "Afspeellijst resterend"
+    *: "Nummer verstreken"
   </voice>
 </phrase>
 <phrase>
@@ -12673,10 +12193,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track remaining: %s"
+    *: "Track remaining:"
   </source>
   <dest>
-    *: "Nummer resterend: %s"
+    *: "Nummer resterend:"
   </dest>
   <voice>
     *: "Nummer resterend"
@@ -12687,10 +12207,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Track %d / %d %d%%"
+    *: "Track:"
   </source>
   <dest>
-    *: "Nummer %d / %d %d%%"
+    *: "Nummer:"
   </dest>
   <voice>
     *: "Nummer"
@@ -12701,13 +12221,13 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Storage: %s (done %s, remaining %s)"
+    *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Opslag: %s (klaar %s, resterende %s)"
+    *: "Opslag (Gedaan / Resterend):"
   </dest>
   <voice>
-    *: "Opslag"
+    *: "Opslag Gedaan en Resterend"
   </voice>
 </phrase>
 <phrase>
@@ -12729,10 +12249,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average track size: %s"
+    *: "Average track size:"
   </source>
   <dest>
-    *: "Gemiddelde nummergrootte: %s"
+    *: "Gemiddelde nummergrootte:"
   </dest>
   <voice>
     *: "Gemiddelde nummer grootte"
@@ -12743,10 +12263,10 @@
   desc: playing time screen
   user: core
   <source>
-    *: "Average bitrate: %ld kbps"
+    *: "Average bitrate:"
   </source>
   <dest>
-    *: "Gemiddelde bitsnelheid: %ld kbps"
+    *: "Gemiddelde bitsnelheid:"
   </dest>
   <voice>
     *: "Gemiddelde bit snelheid"
@@ -13321,7 +12841,7 @@
     *: "Niveau 1: 60 zetten / 5 min"
   </dest>
   <voice>
-    *: "Niveau 1: 60 zetten per 5 minuten"
+    *: "Niveau 1 60 zetten per 5 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13335,7 +12855,7 @@
     *: "Niveau 2: 60 zetten / 15 min"
   </dest>
   <voice>
-    *: "Niveau 2: 60 zetten per 15 minuten"
+    *: "Niveau 2 60 zetten per 15 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13349,7 +12869,7 @@
     *: "Niveau 3: 60 zetten / 30 min"
   </dest>
   <voice>
-    *: "Niveau 3: 60 zetten per 30 minuten"
+    *: "Niveau 3 60 zetten per 30 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13363,7 +12883,7 @@
     *: "Niveau 4: 40 zetten / 30 min"
   </dest>
   <voice>
-    *: "Niveau 4: 40 zetten per 30 minuten"
+    *: "Niveau 4 40 zetten per 30 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13377,7 +12897,7 @@
     *: "Niveau 5: 40 zetten / 60 min"
   </dest>
   <voice>
-    *: "Niveau 5: 40 zetten per 60 minuten"
+    *: "Niveau 5 40 zetten per 60 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13391,7 +12911,7 @@
     *: "Niveau 6: 40 zetten / 120 min"
   </dest>
   <voice>
-    *: "Niveau 6: 40 zetten per 120 minuten"
+    *: "Niveau 6 40 zetten per 120 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13405,49 +12925,7 @@
     *: "Niveau 7: 40 zetten / 240 min"
   </dest>
   <voice>
-    *: "Niveau 7: 40 zetten per 240 minuten"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_8
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 8: 1 move / 15 min"
-  </source>
-  <dest>
-    *: "Niveau 8: 1 zet / 15 min"
-  </dest>
-  <voice>
-    *: "Niveau 8: 1 zet per 15 minuten"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_9
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 9: 1 move / 60 min"
-  </source>
-  <dest>
-    *: "Niveau 9: 1 zet / 60 min"
-  </dest>
-  <voice>
-    *: "Niveau 9: 1 zet per 60 minuten"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_LEVEL_10
-  desc: in the chessbox game level selection
-  user: core
-  <source>
-    *: "Level 10: 1 move / 600 min"
-  </source>
-  <dest>
-    *: "Niveau 10: 1 zet / 600 min"
-  </dest>
-  <voice>
-    *: "Niveau 10: 1 zet per 600 minuten"
+    *: "Niveau 7 40 zetten per 240 minuten"
   </voice>
 </phrase>
 <phrase>
@@ -13797,7 +13275,7 @@
     *: "Denken..."
   </dest>
   <voice>
-    *: ""
+    *: "Denken"
   </voice>
 </phrase>
 <phrase>
@@ -14184,11 +13662,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu"
+    *: "~Startmenu"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu"
+    *: "~Startmenu"
     lowmem: none
   </voice>
 </phrase>
@@ -14262,16 +13740,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Wissel Item"
+    *: ""
   </dest>
   <voice>
-    *: "Wissel Item"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14332,13 +13810,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox Hoofdmenu Volgorde"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14412,62 +13890,6 @@
   </dest>
   <voice>
     *: "Tijd"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TITLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DURATION
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14614,11 +14036,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </dest>
   <voice>
-    *: "Surround"
+    *: "~Surround"
     lowmem: none
   </voice>
 </phrase>
@@ -14631,11 +14053,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "HQ Mixer"
+    *: "~HQ Mixer"
     lowmem: none
   </dest>
   <voice>
-    *: "Hoge Kwaliteit Mixer"
+    *: "~Hoge Kwaliteit Mixer"
     lowmem: none
   </voice>
 </phrase>
@@ -14723,10 +14145,10 @@
     *: "Zoom"
   </source>
   <dest>
-    *: "Zoom"
+    *: "~Zoom"
   </dest>
   <voice>
-    *: "Zoom"
+    *: "~Zoom"
   </voice>
 </phrase>
 <phrase>
@@ -14800,20 +14222,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_PLAYLIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HIDE_ALBUM_TITLE
   desc: in the pictureflow settings
   user: core
@@ -14863,10 +14271,10 @@
     *: "Direct"
   </source>
   <dest>
-    *: "Direct"
+    *: "~Direct"
   </dest>
   <voice>
-    *: "Direct"
+    *: "~Direct"
   </voice>
 </phrase>
 <phrase>
@@ -14909,48 +14317,6 @@
   </dest>
   <voice>
     *: "Geen album hoes gevonden"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Cache will be rebuilt on next restart"
-  </source>
-  <dest>
-    *: "De cache wordt opnieuw opgebouwd bij de volgende herstart"
-  </dest>
-  <voice>
-    *: "De cache wordt opnieuw opgebouwd bij de volgende herstart"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_CLEARED
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Playlist Cleared"
-  </source>
-  <dest>
-    *: "Afspeellijst Gewist"
-  </dest>
-  <voice>
-    *: "Afspeellijst Gewist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ADDED_TO_PLAYLIST
-  desc: in the pictureflow splash messages
-  user: core
-  <source>
-    *: "Added to playlist"
-  </source>
-  <dest>
-    *: "Toegevoegd aan afspeellijst"
-  </dest>
-  <voice>
-    *: "Toegevoegd aan afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -15101,8 +14467,8 @@
   <dest>
     *: "Druk op LINKS om te annuleren."
     android: "Druk op RECHTS om te annuleren."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
     hifietma*,zenvision: "Druk op BACK om te annuleren."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
     ihifi760,ihifi960: "Dubbeltik op RETURN om te annuleren."
     ihifi770,ihifi770c,ihifi800: "Druk op HOME om te annuleren."
     iriverh10,samsungyh*: "Dubbeltik op LINKS om te annuleren."
@@ -15117,8 +14483,8 @@
   <voice>
     *: "Druk op LINKS om te annuleren."
     android: "Druk op RECHTS om te annuleren."
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
     hifietma*,zenvision: "Druk op BACK om te annuleren."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
     ihifi760,ihifi960: "Dubbeltik op RETURN om te annuleren."
     ihifi770,ihifi770c,ihifi800: "Druk op HOME om te annuleren."
     iriverh10,samsungyh*: "Dubbeltik op LINKS om te annuleren."
@@ -15380,10 +14746,10 @@
     *: "Parameter"
   </source>
   <dest>
-    *: "Parameter"
+    *: "~Parameter"
   </dest>
   <voice>
-    *: "Parameter"
+    *: "~Parameter"
   </voice>
 </phrase>
 <phrase>
@@ -15726,20 +15092,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_QUEUE_MENU
   desc: in onplay menu
   user: core
@@ -15747,10 +15099,10 @@
     *: "Queue..."
   </source>
   <dest>
-    *: "Rij..."
+    *: "~Rij..."
   </dest>
   <voice>
-    *: "Rij..."
+    *: "Rij"
   </voice>
 </phrase>
 <phrase>
@@ -15789,24 +15141,10 @@
     *: "In Submenu"
   </source>
   <dest>
-    *: "In Submenu"
+    *: "~In Submenu"
   </dest>
   <voice>
-    *: "In Submenu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
+    *: "~In submenu"
   </voice>
 </phrase>
 <phrase>
@@ -15852,20 +15190,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SINGLE_MODE
   desc: single mode
   user: core
@@ -15877,132 +15201,6 @@
   </dest>
   <voice>
     *: "Enkele Modus"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_ALBUMARTIST
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_GENRE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMMENT
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_COMPOSER
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_YEAR
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_TRACKNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_DISCNUM
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_FREQUENCY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PROPERTIES_BITRATE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16344,10 +15542,10 @@
     *: "Set As..."
   </source>
   <dest>
-    *: "Set As..."
+    *: "Instellen als..."
   </dest>
   <voice>
-    *: "Set As..."
+    *: "Instellen als"
   </voice>
 </phrase>
 <phrase>
@@ -16406,7 +15604,7 @@
     *: "Voeg toe aan Afspeellijst..."
   </dest>
   <voice>
-    *: "Voeg toe aan Afspeellijst..."
+    *: "Voeg toe aan afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -16431,10 +15629,10 @@
     *: "Playing Next..."
   </source>
   <dest>
-    *: "Hier Na..."
+    *: "Volgende afspelen..."
   </dest>
   <voice>
-    *: "Hier na..."
+    *: "Volgende afspelen"
   </voice>
 </phrase>
 <phrase>
@@ -16779,7 +15977,7 @@
     *: "Doolhof maken..."
   </dest>
   <voice>
-    *: "Doolhof maken..."
+    *: "Doolhof maken"
   </voice>
 </phrase>
 <phrase>
@@ -16832,10 +16030,10 @@
     *: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: "Gemiddeld"
   </dest>
   <voice>
-    *: "Medium"
+    *: "Gemiddeld"
   </voice>
 </phrase>
 <phrase>
@@ -16860,10 +16058,10 @@
     *: "Expert"
   </source>
   <dest>
-    *: "Expert"
+    *: "~Expert"
   </dest>
   <voice>
-    *: "Expert"
+    *: "~Expert"
   </voice>
 </phrase>
 <phrase>
@@ -16878,5 +16076,854 @@
   </dest>
   <voice>
     *: "Nederlands"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_EQUALIZER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Reset EQ"
+  </source>
+  <dest>
+    *: "EQ Resetten"
+  </dest>
+  <voice>
+    *: "EQ Resetten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLEALBUM_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title & Album from ID3 tags"
+  </source>
+  <dest>
+    *: "Titel & Album van ID3 tags"
+  </dest>
+  <voice>
+    *: "Titel en album van I D 3 tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TITLE_FROMTAGS
+  desc: track display options
+  user: core
+  <source>
+    *: "Title from ID3 tags"
+  </source>
+  <dest>
+    *: "Titel van ID3 tags"
+  </dest>
+  <voice>
+    *: "Titel van I D 3 tags"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM_SHUFFLE_RANDOM_SELECTIVE_SONGS_SUMMARY
+  desc: a summary splash screen that appear on the database browser when you try to create a playlist from the database browser that exceeds your system limit
+  user: core
+  <source>
+    *: "Selection too big, %d random tracks will be selected"
+  </source>
+  <dest>
+    *: "Selectie te groot, %d willekeurige tracks worden geselecteerd"
+  </dest>
+  <voice>
+    *: "Selectie te groot, er worden minder willekeurige tracks geselecteerd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_SPECIAL_CHARACTER
+  desc: Special character (japanese, accents, etc)
+  user: core
+  <source>
+    *: "Special character"
+  </source>
+  <dest>
+    *: "Speciaal teken"
+  </dest>
+  <voice>
+    *: "Speciaal teken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTISTS
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Album Artists"
+  </source>
+  <dest>
+    *: "Albumartiesten"
+  </dest>
+  <voice>
+    *: "Albumartiesten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_CURRENT_TO_FAVES
+  desc:
+  user: core
+  <source>
+    *: "Add Current to Shortcuts"
+  </source>
+  <dest>
+    *: "Huidige toevoegen aan snelkoppelingen"
+  </dest>
+  <voice>
+    *: "Huidige toevoegen aan snelkoppelingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISC
+  desc: Shown in WPS (for multidisc albums)
+  user: core
+  <source>
+    *: "Disc"
+  </source>
+  <dest>
+    *: "Disk"
+  </dest>
+  <voice>
+    *: "Disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEGAL_NOTICES
+  desc: in system menu
+  user: core
+  <source>
+    *: "Legal Notices"
+  </source>
+  <dest>
+    *: "Juridische mededelingen"
+  </dest>
+  <voice>
+    *: "Juridische mededelingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_FORMATSTR
+  desc: for general use
+  user: core
+  <source>
+    *: "Error: %s"
+  </source>
+  <dest>
+    *: "Fout: %s"
+  </dest>
+  <voice>
+    *: "Fout %s"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SETTINGS
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Settings"
+  </source>
+  <dest>
+    *: "Mikmod Instellingen"
+  </dest>
+  <voice>
+    *: "Mik mod instellingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_MENU
+  desc: mikmod plugin
+  user: core
+  <source>
+    *: "Mikmod Menu"
+  </source>
+  <dest>
+    *: "~Mikmod Menu"
+  </dest>
+  <voice>
+    *: "Mik mod menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU
+  desc: chessbox plugin
+  user: core
+  <source>
+    *: "Chessbox Menu"
+  </source>
+  <dest>
+    *: "~Chessbox Menu"
+  </dest>
+  <voice>
+    *: "Chess box menu"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_INVALID_VOICE_FILE
+  desc: played if the voice file fails to load
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Ongeldig stem bestand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCENT_FORMAT
+  desc: percent formatting ( `10%` is default ,  for `10 %` use '%ld %%' , for `%10` use '%%%ld' and so on)
+  user: core
+  <source>
+    *: "%ld%%"
+  </source>
+  <dest>
+    *: "%ld%%"
+  </dest>
+  <voice>
+    *: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHOOSE_FILE
+  desc: file_picker plugin ask user to select a file
+  user: core
+  <source>
+    *: "Choose File"
+  </source>
+  <dest>
+    *: "Kies bestand"
+  </dest>
+  <voice>
+    *: "Kies bestand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_MAINMENU_SCROLLING
+  desc: Disable main menu scrolling
+  user: core
+  <source>
+    *: "Disable main menu scrolling"
+  </source>
+  <dest>
+    *: "Scrollen in hoofdmenu uitschakelen"
+  </dest>
+  <voice>
+    *: "Scrollen in hoofdmenu uitschakelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: Playing Time
+  user: core
+  <source>
+    *: "Remaining"
+  </source>
+  <dest>
+    *: "Resterend"
+  </dest>
+  <voice>
+    *: "Resterend"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "First Letter"
+  </source>
+  <dest>
+    *: "Eerste letter"
+  </dest>
+  <voice>
+    *: "Eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "By First Letter..."
+  </source>
+  <dest>
+    *: "Op eerste letter..."
+  </dest>
+  <voice>
+    *: "Op eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists by First Letter"
+  </source>
+  <dest>
+    *: "Artiesten op eerste letter"
+  </dest>
+  <voice>
+    *: "Artiesten op eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_ARTISTS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Album Artists by First Letter"
+  </source>
+  <dest>
+    *: "Album artiesten op eerste letter"
+  </dest>
+  <voice>
+    *: "Album artiesten op eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUMS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by First Letter"
+  </source>
+  <dest>
+    *: "Albums op eerste letter"
+  </dest>
+  <voice>
+    *: "Albums op eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_BY_FIRST_LETTER
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by First Letter"
+  </source>
+  <dest>
+    *: "Nummer op eerste letter"
+  </dest>
+  <voice>
+    *: "Nummer op eerste letter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Artiesten"
+  </dest>
+  <voice>
+    *: "Artiesten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "~Albums"
+  </dest>
+  <voice>
+    *: "~Albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks"
+  </source>
+  <dest>
+    *: "Nummers"
+  </dest>
+  <voice>
+    *: "Nummers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_SONGS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Shuffle Songs"
+  </source>
+  <dest>
+    *: "Nummers shufflen"
+  </dest>
+  <voice>
+    *: "Nummers shufflen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILENAME
+  desc: Database and recording menus
+  user: core
+  <source>
+    *: "Filename"
+  </source>
+  <dest>
+    *: "Bestandsnaam"
+  </dest>
+  <voice>
+    *: "Bestandsnaam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TITLE_WITH_DURATION
+  desc: Database menu
+  user: core
+  <source>
+    *: "Title (with track duration)"
+  </source>
+  <dest>
+    *: "Titel (met nummer lengte)"
+  </dest>
+  <voice>
+    *: "Titel met nummer lengte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USER_RATING
+  desc: Database menu
+  user: core
+  <source>
+    *: "User Rating"
+  </source>
+  <dest>
+    *: "Gebruikersbeoordeling"
+  </dest>
+  <voice>
+    *: "Gebruikersbeoordeling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Zoeken"
+  </dest>
+  <voice>
+    *: "Zoeken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Search by..."
+  </source>
+  <dest>
+    *: "Zoeken op..."
+  </dest>
+  <voice>
+    *: "Zoeken op"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECENTLY_ADDED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently Added"
+  </source>
+  <dest>
+    *: "Recent toegevoegd"
+  </dest>
+  <voice>
+    *: "Recent toegevoegd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_HISTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Playback History"
+  </source>
+  <dest>
+    *: "Afspeelgeschiedenis"
+  </dest>
+  <voice>
+    *: "Afspeelgeschiedenis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_MENU
+  desc: Database menu
+  user: core
+  <source>
+    *: "Custom menu"
+  </source>
+  <dest>
+    *: "Aangepast menu"
+  </dest>
+  <voice>
+    *: "Aangepast menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAME_AS_CURRENT
+  desc: Database menu
+  user: core
+  <source>
+    *: "Same as currently played track"
+  </source>
+  <dest>
+    *: "Hetzelfde als momenteel afgespeelde nummer"
+  </dest>
+  <voice>
+    *: "Hetzelfde als momenteel afgespeelde nummer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECTORY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Map"
+  </dest>
+  <voice>
+    *: "Map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BY_YEAR
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums by Year"
+  </source>
+  <dest>
+    *: "Albums per jaar"
+  </dest>
+  <voice>
+    *: "Albums per jaar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUMS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Albums between Years"
+  </source>
+  <dest>
+    *: "Albums tussen jaren"
+  </dest>
+  <voice>
+    *: "Albums tussen jaren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTISTS_BETWEEN_YEARS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Artists between Years"
+  </source>
+  <dest>
+    *: "Artiesten tussen jaren"
+  </dest>
+  <voice>
+    *: "Artiesten tussen jaren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_MOST_PLAYED
+  desc: Database menu
+  user: core
+  <source>
+    *: "Most played (Plays|Score)"
+  </source>
+  <dest>
+    *: "Vaakst afgespeeld (Aantal|Score)"
+  </dest>
+  <voice>
+    *: "Vaakst afgespeeld op aantal dan op score"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENTLY_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recently played tracks"
+  </source>
+  <dest>
+    *: "Recent gespeelde nummers"
+  </dest>
+  <voice>
+    *: "Recent gespeelde nummers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEVER_PLAYED_TRACKS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Never played tracks"
+  </source>
+  <dest>
+    *: "Nooit gespeelde nummers"
+  </dest>
+  <voice>
+    *: "Nooit gespeelde nummers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ARTISTS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite artists"
+  </source>
+  <dest>
+    *: "Favoriete artiesten"
+  </dest>
+  <voice>
+    *: "Favoriete artiesten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FAVOURITE_ALBUMS
+  desc: Database menu
+  user: core
+  <source>
+    *: "Favourite albums"
+  </source>
+  <dest>
+    *: "Favoriete albums"
+  </dest>
+  <voice>
+    *: "Favoriete albums"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_RECENT_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Recent favourites"
+  </source>
+  <dest>
+    *: "Recente favorieten"
+  </dest>
+  <voice>
+    *: "Recente favorieten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_NEW_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "New favourites"
+  </source>
+  <dest>
+    *: "Nieuwe favorieten"
+  </dest>
+  <voice>
+    *: "Nieuwe favorieten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTORY_FORGOTTEN_FAVOURITES
+  desc: Database menu
+  user: core
+  <source>
+    *: "Forgotten favourites"
+  </source>
+  <dest>
+    *: "Vergeten favorieten"
+  </dest>
+  <voice>
+    *: "Vergeten favorieten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKS_BY
+  desc: Database menu
+  user: core
+  <source>
+    *: "Tracks by"
+  </source>
+  <dest>
+    *: "Nummers op"
+  </dest>
+  <voice>
+    *: "Nummers op"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_ALBUMART
+  desc: WPS context menu
+  user: core
+  <source>
+    *: "View Album Art"
+  </source>
+  <dest>
+    *: "Bekijk album afbeelding"
+  </dest>
+  <voice>
+    *: "Bekijk album afbeelding"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Op album]"
+  </dest>
+  <voice>
+    *: "Alle nummers gesorteerd op album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HP_LO_SELECT
+  desc: Output Select
+  user: core
+  <source>
+    *: none
+    erosqnative: "Output Select"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Output keuze"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Output keuze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative: "Headphone"
+  </source>
+  <dest>
+    *: none
+    erosqnative: "Koptelefoon"
+  </dest>
+  <voice>
+    *: none
+    erosqnative: "Koptelefoon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    erosqnative,lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    erosqnative,lineout_poweroff: "Lijnuitgang"
+  </dest>
+  <voice>
+    *: none
+    erosqnative,lineout_poweroff: "Lijnuitgang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FONT_LOAD_ERROR
+  desc: Displayed when font loading fails
+  user: core
+  <source>
+    *: "Unable to load font: (%s)"
+  </source>
+  <dest>
+    *: "Kan lettertype niet laden: (%s)"
+  </dest>
+  <voice>
+    *: "Kan lettertype %s niet laden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOGGING
+  desc: playback logging
+  user: core
+  <source>
+    *: "Logging"
+  </source>
+  <dest>
+    *: "Loggen"
+  </dest>
+  <voice>
+    *: "Loggen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEWLOG
+  desc: view Log
+  user: core
+  <source>
+    *: "View log"
+  </source>
+  <dest>
+    *: "Log bekijken"
+  </dest>
+  <voice>
+    *: "Log bekijken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAY_FINISHED_PLAYLIST
+  desc: Resume playback of finished playlist
+  user: core
+  <source>
+    *: "Playlist finished. Play again?"
+  </source>
+  <dest>
+    *: "Afspelen is voltooid. Opnieuw afspelen?"
+  </dest>
+  <voice>
+    *: "Afspelen is voltooid. Opnieuw afspelen?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Afspeellijst sorteren"
+  </dest>
+  <voice>
+    *: "Afspeellijst sorteren"
   </voice>
 </phrase>
