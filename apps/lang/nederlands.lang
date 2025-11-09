@@ -2356,11 +2356,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "~Mix"
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "~Mix"
   </voice>
 </phrase>
 <phrase>
@@ -2551,10 +2551,10 @@
     *: "Contrast"
   </source>
   <dest>
-    *: "Contrast"
+    *: "~Contrast"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "~Contrast"
   </voice>
 </phrase>
 <phrase>
@@ -3424,7 +3424,7 @@
     *: "Openen met..."
   </dest>
   <voice>
-    *: "Openen met..."
+    *: "Openen met"
   </voice>
 </phrase>
 <phrase>
@@ -3714,10 +3714,9 @@
   <voice>
     *: none
     hibylinux: "~U S B"
-    multivolume: "HD1"
-    sansac200*: "~micro S D"
-    sansaclipplus,sansae200*,sansafuze*: "micro S D"
-    xduoox3: "micro S D 2"
+    multivolume: "~H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~micro S D"
+    xduoox3: "~micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -5300,7 +5299,7 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: "~."
   </dest>
   <voice>
     *: "punt"
@@ -6207,7 +6206,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Zoeken %d.%02d MHz"
+    radio: "Zoeken"
   </voice>
 </phrase>
 <phrase>
@@ -6477,7 +6476,7 @@
     *: "Kan %s niet openen"
   </dest>
   <voice>
-    *: "Kan %s niet openen"
+    *: "Kan plugin niet openen"
   </voice>
 </phrase>
 <phrase>
@@ -6491,7 +6490,7 @@
     *: "Kan %s niet lezen"
   </dest>
   <voice>
-    *: "Kan %s niet lezen"
+    *: "Kan bestand niet lezen"
   </voice>
 </phrase>
 <phrase>
@@ -6981,7 +6980,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : terug inschakelen)"
+    remote: "Volume minus om terug in te schakelen"
   </voice>
 </phrase>
 <phrase>
@@ -16214,7 +16213,7 @@
     *: "Fout: %s"
   </dest>
   <voice>
-    *: "Fout %s"
+    *: "Fout"
   </voice>
 </phrase>
 <phrase>
@@ -16281,7 +16280,7 @@
     *: "%ld%%"
   </source>
   <dest>
-    *: "%ld%%"
+    *: "~%ld%%"
   </dest>
   <voice>
     *: none
@@ -16867,7 +16866,7 @@
     *: "Kan lettertype niet laden: (%s)"
   </dest>
   <voice>
-    *: "Kan lettertype %s niet laden"
+    *: "Kan lettertype niet laden"
   </voice>
 </phrase>
 <phrase>
