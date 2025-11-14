@@ -221,7 +221,7 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 \section{Runtime Database}
   \begin{tagmap}
     \config{\%rp} & Song playcount\\
-    \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag: %
+    \config{\%rr} & Song rating (0--10). This tag can also be used in a conditional tag: %
            \config{\%?rr<0|1|2|3|4|5|6|7|8|9|10>}\\
     \config{\%ra} & Autoscore for the song\\
   \end{tagmap}
@@ -252,13 +252,13 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 
 \section{Repeat Mode}
   \begin{tagmap}
-    \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle, A-B\\
+    \config{\%mm} & Repeat mode, 0--4, in the order: Off, All, One, Shuffle, A-B\\
   \end{tagmap}
 Example: \config{\%?mm<Off|All|One|Shuffle|A-B>}
 
 \section{Playback Mode}
   \begin{tagmap}
-    \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause,
+    \config{\%mp} & Play status, 0--4, in the order: Stop, Play, Pause,
            Fast Forward, Rewind, Recording, Recording paused, FM Radio playing,
            FM Radio muted\\
   \end{tagmap}
