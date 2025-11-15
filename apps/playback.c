@@ -2988,7 +2988,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 #ifdef USB_ENABLE_AUDIO
     if (usb_audio_get_active())
     {
-        splash(HZ*2, str(LANG_USB_DAC_ACTIVE));
+        splash(HZ*2, ID2P(LANG_USB_DAC_ACTIVE));
         queue_reply(&audio_queue, 0);
         return;
     }
