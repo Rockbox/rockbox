@@ -65,6 +65,10 @@
 #include "skin_engine/wps_internals.h"
 #include "open_plugin.h"
 
+#ifdef USB_ENABLE_AUDIO
+#include "usbstack/usb_audio.h"
+#endif
+
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
@@ -713,6 +717,13 @@ static inline int action_wpsab_single(long button)
  */
 long gui_wps_show(void)
 {
+/* NOTE: if USBAudio ever gets its own DSP channel, this block can go away! */
+#ifdef USB_ENABLE_AUDIO
+    if (usb_audio_get_active())
+    {
+        splash(HZ*2, ID2P(LANG_USB_DAC_ACTIVE));
+    }
+#endif
     long button = 0;
     bool restore = true;
     bool exit = false;
