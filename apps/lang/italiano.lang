@@ -16917,3 +16917,71 @@
     *: "Ordina tutte le tracce per album"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC-USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "DAC-USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "In modalità di sola ricarica USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "In modalità di sola ricarica USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "In modalità di archiviazione di massa USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "In modalità di archiviazione di massa USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC-USB Attivo"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "DAC-USB Attivo"
+  </voice>
+</phrase>
