@@ -9261,8 +9261,7 @@
   </dest>
   <voice>
     *: none
-    fiiom3k,sansafuzeplus: "Citlivosť dotykovej plochy"
-    gigabeatfx: "Citlivosť dotykovej plochy"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Citlivosť dotykovej plochy"
   </voice>
 </phrase>
 <phrase>
@@ -14424,8 +14423,8 @@
   <dest>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     hifietma*,zenvision: "Stlačte BACK pre zrušenie"
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
@@ -14440,8 +14439,8 @@
   <voice>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     hifietma*,zenvision: "Stlačte BACK pre zrušenie"
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
@@ -16916,5 +16915,73 @@
   </dest>
   <voice>
     *: "Všetky stopy zoradené podľa albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "~USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "~USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Keď sa cez USB iba nabíja"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Keď sa cez USB iba nabíja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Keď je USB v režime úložiska"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Keď je USB v režime úložiska"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC aktívny"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC aktívny"
   </voice>
 </phrase>

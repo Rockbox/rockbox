@@ -16935,3 +16935,71 @@
     *: "playlists sortieren"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB Digital Analog Wandler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Während im Modus Nur USB Laden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Während im USB Massenspeicher Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC Active"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-Digital Analog Wandler Aktiv"
+  </voice>
+</phrase>

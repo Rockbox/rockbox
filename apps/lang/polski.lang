@@ -16923,3 +16923,71 @@
     *: "Wszystkie utwory posortowane według albumu"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "dak uesbe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "W trybie tylko ładowania przez USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "W trybie tylko ładowania przez USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "W trybie pamięci masowej USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "W trybie pamięci masowej USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC USB aktywny"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "dak uesbe aktywny"
+  </voice>
+</phrase>
