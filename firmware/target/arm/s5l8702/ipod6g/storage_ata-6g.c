@@ -65,21 +65,14 @@
 
 /** static, private data **/
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
-static uint16_t identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
 static bool ceata;
-static bool ata_lba48;
 static bool ata_dma;
-static uint64_t ata_total_sectors;
-static uint32_t log_sector_size;
-static struct mutex ata_mutex;
 static struct semaphore ata_wakeup;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 7 * HZ;
 static bool ata_powered;
-static bool canflush = true;
 static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
-static int spinup_time = 0;
 #ifdef HAVE_ATA_DMA
 static int dma_mode = 0;
 static uint32_t ata_dma_flags;
@@ -89,6 +82,8 @@ static const int ata_retries = ATA_RETRIES;
 static const bool ata_error_srst = true;
 
 static int ata_reset(void);
+
+#include "ata-common.c"
 
 static uint16_t ata_read_cbr(uint32_t volatile* reg)
 {
@@ -758,10 +753,10 @@ static int ata_power_up(void)
 
     spinup_time = current_tick - spinup_start;
 
-    ata_total_sectors = (identify_info[61] << 16) | identify_info[60];
-    if (ceata || (identify_info[83] & BIT(10) && ata_total_sectors == 0x0FFFFFFF))
+    total_sectors = (identify_info[61] << 16) | identify_info[60];
+    if (ceata || (identify_info[83] & BIT(10) && total_sectors == 0x0FFFFFFF))
     {
-        ata_total_sectors = ((uint64_t)identify_info[103] << 48) |
+        total_sectors = ((uint64_t)identify_info[103] << 48) |
                 ((uint64_t)identify_info[102] << 32) |
                 ((uint64_t)identify_info[101] << 16) |
                 identify_info[100];
@@ -902,11 +897,11 @@ static int ata_rw_chunk(uint64_t sector, uint32_t cnt, void* buffer, bool write)
     return rc;
 }
 
-static int ata_transfer_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
+static int ata_transfer_sectors(uint64_t sector, int count, void* buffer, int write)
 {
     if (!ata_powered)
         ata_power_up();
-    if (sector + count > ata_total_sectors)
+    if (sector + count > total_sectors)
         RET_ERR(0);
     ata_set_active();
     if (ata_dma && write)
@@ -1013,8 +1008,6 @@ static int ata_reset(void)
     mutex_unlock(&ata_mutex);
     return rc;
 }
-
-#include "ata-common.c"
 
 #ifndef MAX_PHYS_SECTOR_SIZE
 int ata_read_sectors(IF_MD(int drive,) sector_t start, int incount,
@@ -1134,17 +1127,6 @@ void ata_spin(void)
     ata_set_active();
 }
 
-#ifdef STORAGE_GET_INFO
-void ata_get_info(IF_MD(int drive,) struct storage_info *info)
-{
-    info->sector_size = log_sector_size;
-    info->num_sectors = ata_total_sectors;
-    info->vendor = "Apple";
-    info->product = "iPod Classic";
-    info->revision = "1.0";
-}
-#endif
-
 long ata_last_disk_activity(void)
 {
     return ata_last_activity_value;
@@ -1158,7 +1140,7 @@ int ata_init(void)
     semaphore_init(&mmc_comp_wakeup, 1, 0);
     ceata = PDAT(11) & BIT(1);
     ata_powered = false;
-    ata_total_sectors = 0;
+    total_sectors = 0;
 
     /* get identify_info */
     mutex_lock(&ata_mutex);
@@ -1253,11 +1235,6 @@ static int ata_num_drives(int first_drive)
 unsigned short* ata_get_identify(void)
 {
     return identify_info;
-}
-
-int ata_spinup_time(void)
-{
-    return spinup_time;
 }
 
 #ifdef HAVE_ATA_DMA

@@ -20,6 +20,57 @@
 
 /* This is intended to be #included into the ATA driver */
 
+static sector_t total_sectors;
+static uint32_t log_sector_size;
+static uint16_t identify_info[ATA_IDENTIFY_WORDS] STORAGE_ALIGN_ATTR;
+#ifdef HAVE_LBA48
+static bool ata_lba48 = false; /* set for 48 bit addressing */
+#endif
+static bool canflush = true;
+static int spinup_time = 0;
+static struct mutex ata_mutex SHAREDBSS_ATTR;
+
+int ata_spinup_time(void)
+{
+    return spinup_time;
+}
+
+#ifdef STORAGE_GET_INFO
+void ata_get_info(IF_MD(int drive,)struct storage_info *info)
+{
+    unsigned short *src,*dest;
+    static char vendor[8];
+    static char product[16];
+    static char revision[4];
+#ifdef HAVE_MULTIDRIVE
+    (void)drive; /* unused for now */
+#endif
+    int i;
+
+    info->sector_size = log_sector_size;
+    info->num_sectors = total_sectors;
+
+    src = (unsigned short*)&identify_info[27];
+    dest = (unsigned short*)vendor;
+    for (i=0;i<4;i++)
+        dest[i] = htobe16(src[i]);
+    info->vendor=vendor;
+
+    src = (unsigned short*)&identify_info[31];
+    dest = (unsigned short*)product;
+    for (i=0;i<8;i++)
+        dest[i] = htobe16(src[i]);
+    info->product=product;
+
+    src = (unsigned short*)&identify_info[23];
+    dest = (unsigned short*)revision;
+    for (i=0;i<2;i++)
+        dest[i] = htobe16(src[i]);
+    info->revision=revision;
+}
+#endif
+
+
 #ifdef MAX_PHYS_SECTOR_SIZE
 
 #ifdef MAX_VARIABLE_LOG_SECTOR
@@ -40,6 +91,11 @@ struct sector_cache_entry {
 /* buffer for reading and writing large physical sectors */
 static struct sector_cache_entry sector_cache STORAGE_ALIGN_ATTR;
 static uint16_t phys_sector_mult = 1;
+
+static int ata_transfer_sectors(uint64_t start,
+                                int incount,
+                                void* inbuf,
+                                int write);
 
 static int cache_sector(sector_t sector)
 {
