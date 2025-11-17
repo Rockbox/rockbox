@@ -64,6 +64,7 @@
 #define ERR_RB      0
 #define ERR_OF      1
 #define ERR_STORAGE 2
+#define ERR_LBA28   3
 
 /* Safety measure - maximum allowed firmware image size.
    The largest known current (October 2009) firmware is about 6.2MB so
@@ -165,6 +166,10 @@ void fatal_error(int err)
         case ERR_OF:
             printf("Hold MENU+SELECT to reboot");
             printf("and enter Rockbox firmware");
+            break;
+        case ERR_LBA28:
+            printf("Hold MENU+SELECT to reboot");
+            printf("and LEFT if you are REALLY sure");
             break;
     }
 
@@ -883,11 +888,35 @@ void main(void)
 
         /* We wait until HDD spins up to check for hold button */
         if (button_hold()) {
-            printf("Executing OF...");
+            bool lba48 = false;
+            struct SysCfg syscfg;
+            const ssize_t result = syscfg_read(&syscfg);
+            if (result != -1) {
+                const size_t syscfg_num_entries = MIN(syscfg.header.num_entries, SYSCFG_MAX_ENTRIES);
+                for (size_t i = 0; i < syscfg_num_entries; i++) {
+                    const struct SysCfgEntry* entry = &syscfg.entries[i];
+                    const uint32_t* data32 = (uint32_t *)entry->data;
+                    if (entry->tag == SYSCFG_TAG_HWVR) {
+                        lba48 = (data32[1] >= 0x130200);
+                        break;
+                    }
+                }
+
+                int btn = button_read_device();
+
+                struct storage_info sinfo;
+                storage_get_info(0, &sinfo);
+                if (sinfo.num_sectors < (1 << 28) || lba48 || btn & BUTTON_LEFT) {
+                    printf("Executing OF...");
 #if (CONFIG_STORAGE & STORAGE_ATA)
-            ata_sleepnow();
+                    ata_sleepnow();
 #endif
-            rc = kernel_launch_onb();
+                    rc = kernel_launch_onb();
+                } else {
+                    printf("OF does not support LBA48");
+                    fatal_error(ERR_LBA28);
+                }
+            }
         }
     }
 
