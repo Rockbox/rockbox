@@ -34,6 +34,7 @@
 #include "ata.h"
 #include "file_internal.h"
 #include "disk.h"
+#include "storage.h"
 #include "font.h"
 #include "adc.h"
 #include "backlight.h"
@@ -364,6 +365,15 @@ void* main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
+#ifdef STORAGE_GET_INFO
+        struct storage_info sinfo;
+        storage_get_info(0, &sinfo);
+#ifdef MAX_PHYS_SECTOR_SIZE
+        printf("id: '%s' s:%u*%u", sinfo.product, sinfo.sector_size, sinfo.phys_sector_mult);
+#else
+        printf("id: '%s' s:%u", sinfo.product, sinfo.sector_size);
+#endif
+#endif
         for (int i = 0 ; i < NUM_VOLUMES ; i++) {
             disk_partinfo(i, &pinfo);
             if (pinfo.type)

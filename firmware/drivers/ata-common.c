@@ -30,6 +30,10 @@ static bool canflush = true;
 static int spinup_time = 0;
 static struct mutex ata_mutex SHAREDBSS_ATTR;
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+static uint16_t phys_sector_mult = 1;
+#endif
+
 int ata_spinup_time(void)
 {
     return spinup_time;
@@ -49,6 +53,9 @@ void ata_get_info(IF_MD(int drive,)struct storage_info *info)
 
     info->sector_size = log_sector_size;
     info->num_sectors = total_sectors;
+#ifdef MAX_PHYS_SECTOR_SIZE
+    info->phys_sector_mult = phys_sector_mult;
+#endif
 
     src = (unsigned short*)&identify_info[27];
     dest = (unsigned short*)vendor;
@@ -70,7 +77,6 @@ void ata_get_info(IF_MD(int drive,)struct storage_info *info)
 }
 #endif
 
-
 #ifdef MAX_PHYS_SECTOR_SIZE
 
 #ifdef MAX_VARIABLE_LOG_SECTOR
@@ -90,7 +96,6 @@ struct sector_cache_entry {
 };
 /* buffer for reading and writing large physical sectors */
 static struct sector_cache_entry sector_cache STORAGE_ALIGN_ATTR;
-static uint16_t phys_sector_mult = 1;
 
 static int ata_transfer_sectors(uint64_t start,
                                 int incount,

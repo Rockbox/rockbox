@@ -108,6 +108,9 @@ struct storage_info
 {
     unsigned int sector_size;
     sector_t num_sectors;
+#ifdef MAX_PHYS_SECTOR_SIZE
+    uint16_t phys_sector_mult;
+#endif
     char *vendor;
     char *product;
     char *revision;

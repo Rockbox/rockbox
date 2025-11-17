@@ -643,10 +643,10 @@ static void dump_bootflash(void)
     lcd_clear_display();
     lcd_set_foreground(LCD_WHITE);
     line = 0;
-    
+
     uint8_t page[FLASH_PAGE_SIZE];
     printf("Total pages: %d", FLASH_PAGES);
-    
+
     bootflash_init(SPI_PORT);
 
     for (int i = 0; i < FLASH_PAGES; i++) {
@@ -720,12 +720,12 @@ static void devel_menu(void)
         lcd_set_foreground(LCD_RBYELLOW);
         line = 0;
         printf("Development menu");
-        
+
         for (size_t i = 0; i < items_count; i++) {
             lcd_set_foreground(i == selected_item ? LCD_GREEN : LCD_WHITE);
             printf(items[i]);
         }
-        
+
         while (button_status() != BUTTON_NONE);
 
         bool done = false;
@@ -911,6 +911,15 @@ void main(void)
 
     rc = disk_mount_all();
     if (rc <= 0) {
+#ifdef STORAGE_GET_INFO
+        struct storage_info sinfo;
+        storage_get_info(0, &sinfo);
+#ifdef MAX_PHYS_SECTOR_SIZE
+        printf("id: '%s' s:%u*%u", sinfo.product, sinfo.sector_size, sinfo.phys_sector_mult);
+#else
+        printf("id: '%s' s:%u", sinfo.product, sinfo.sector_size);
+#endif
+#endif
         struct partinfo pinfo;
         printf("No partition found");
         for (int i = 0 ; i < NUM_VOLUMES ; i++) {

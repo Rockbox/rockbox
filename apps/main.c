@@ -647,6 +647,15 @@ static void init(void)
 #endif
             lcd_puts(0, line++, rbversion);
 
+#ifdef STORAGE_GET_INFO
+            struct storage_info sinfo;
+            storage_get_info(0, &sinfo);
+#ifdef MAX_PHYS_SECTOR_SIZE
+            lcd_putsf(0, line++, "id: '%s' s:%u*%u", sinfo.product, sinfo.sector_size, sinfo.phys_sector_mult);
+#else
+            lcd_putsf(0, line++, "id: '%s' s:%u", sinfo.product, sinfo.sector_size);
+#endif
+#endif
             struct partinfo pinfo;
             for (int i = 0 ; i < NUM_VOLUMES ; i++) {
                 disk_partinfo(i, &pinfo);
