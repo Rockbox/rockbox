@@ -16945,7 +16945,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
@@ -16962,7 +16962,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Charge-Only Mode"
+    usbdac: "Während im Modus Nur USB Laden"
   </dest>
   <voice>
     *: none
@@ -16979,7 +16979,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Mass-Storage Mode"
+    usbdac: "Während im USB Massenspeicher Modus"
   </dest>
   <voice>
     *: none
@@ -16996,7 +16996,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC Active"
+    usbdac: "USB-Digital Analog Wandler Aktiv"
   </dest>
   <voice>
     *: none

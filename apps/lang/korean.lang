@@ -16940,11 +16940,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </voice>
 </phrase>
 <phrase>
