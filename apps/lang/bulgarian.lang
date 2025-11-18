@@ -16919,3 +16919,71 @@
     *: "сортиране на плейлисти"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-ЦАП"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "В режим USB - само зареждане"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "В режим USB само зареждане"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "В режим USB памет"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "В режим USB памет"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-ЦАП е активен"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB ЦАП е активен"
+  </voice>
+</phrase>
