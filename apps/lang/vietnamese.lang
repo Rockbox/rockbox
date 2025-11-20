@@ -16915,3 +16915,71 @@
     *: "Mọi bài hát được sắp xếp theo album"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "~USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "~USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Trong khi ở chế độ chỉ sạc qua USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Trong khi ở chế độ chỉ sạc qua USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Trong khi ở chế độ ổ USB lưu trữ"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Trong khi ở chế độ ổ USB lưu trữ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC đang hoạt động"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC đang hoạt động"
+  </voice>
+</phrase>
