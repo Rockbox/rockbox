@@ -571,7 +571,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                     if(say_it)
                         say_number_and_spell(val, true);
                 }
-                else if (id3->tracknum)
+                else if (id3->tracknum >= 0)
                 {
                     itoa_buf(buffer, buffer_len, id3->tracknum);
                     val = buffer;

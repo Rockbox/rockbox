@@ -166,8 +166,6 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry)
     entry->filesize = filesize(fd);
     entry->id3v1len = getid3v1len(fd);
     entry->id3v2len = getid3v2len(fd);
-    entry->tracknum = 0;
-    entry->discnum = 0;
 
     if (entry->id3v2len)
         setid3v2title(fd, entry);

@@ -452,6 +452,8 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
     id3->has_embedded_cuesheet = false;
     id3->embedded_cuesheet.pos = 0;
 
+    id3->tracknum = -1;
+
     entry = &audio_formats[id3->codectype];
 
     /* Load codec specific track tag information and confirm the codec type. */

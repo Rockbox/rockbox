@@ -36,8 +36,6 @@
 
 static void read_id3_tags(int fd, struct mp3entry* id3)
 {
-    id3->tracknum = 0;
-    id3->discnum  = 0;
     setid3v2title(fd, id3);
 }
 

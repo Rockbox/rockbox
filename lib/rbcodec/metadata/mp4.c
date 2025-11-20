@@ -125,7 +125,7 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
     if (bytes_read)
     {
         /* Do not overwrite already available metadata. Especially when reading
-         * tags with e.g. multiple genres / artists. This way only the first 
+         * tags with e.g. multiple genres / artists. This way only the first
          * of multiple entries is used, all following are dropped. */
         if (*dest == NULL)
         {
@@ -143,11 +143,11 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
     {
         *dest = NULL;
     }
-    
+
     return length;
 }
 
-static unsigned int read_mp4_atom(int fd, uint32_t* size, 
+static unsigned int read_mp4_atom(int fd, uint32_t* size,
                                   uint32_t* type, uint32_t size_left)
 {
     read_uint32be(fd, size);
@@ -155,7 +155,7 @@ static unsigned int read_mp4_atom(int fd, uint32_t* size,
 
     if (*size == 1)
     {
-        /* FAT32 doesn't support files this big, so something seems to 
+        /* FAT32 doesn't support files this big, so something seems to
          * be wrong. (64-bit sizes should only be used when required.)
          */
         errno = EFBIG;
@@ -173,7 +173,7 @@ static unsigned int read_mp4_atom(int fd, uint32_t* size,
         {
             size_left -= *size;
         }
-        
+
         *size -= 8;
     }
     else
@@ -181,7 +181,7 @@ static unsigned int read_mp4_atom(int fd, uint32_t* size,
         *size = size_left;
         size_left = 0;
     }
-    
+
     return size_left;
 }
 
@@ -223,7 +223,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
 
         lseek(fd, 3, SEEK_CUR);
         *size -= 3;
-    } 
+    }
     else
     {
         lseek(fd, 2, SEEK_CUR);
@@ -242,11 +242,11 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
     {
         return sbr;
     }
-    
+
     lseek(fd, 13, SEEK_CUR);    /* Skip audio type, bit rates, etc. */
     read(fd, buf, 1);
     *size -= 14;
-    
+
     if (*buf != 5)              /* Verify DecSpecificInfoTag. */
     {
         return sbr;
@@ -262,7 +262,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
         unsigned int length;
         unsigned int index;
         unsigned int type;
-        
+
         /* Read the (leading part of the) decoder config. */
         length = read_mp4_length(fd, size);
         length = MIN(length, *size);
@@ -270,7 +270,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
         memset(buf, 0, sizeof(buf));
         read(fd, buf, length);
         *size -= length;
-        
+
         /* Maybe time to write a simple read_bits function... */
 
         /* Decoder config format:
@@ -287,14 +287,14 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
         {
             id3->frequency = sample_rates[index];
         }
-    
+
         if (type == 5)
         {
             unsigned int old_index = index;
 
             sbr = true;
             index = (bits >> 15) & 0xf; /* Frequency index - 4 bits */
-    
+
             if (index == 15)
             {
                 /* 17 bits read so far... */
@@ -305,7 +305,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
             {
                 id3->frequency = sample_rates[index];
             }
-            
+
             if (old_index == index)
             {
                 /* Downsampled SBR */
@@ -318,7 +318,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
             /* We found an extensionAudioObjectType */
             type = bits & 0x1f;         /* Object type - 5 bits*/
             bits = get_long_be(&buf[4]);
-            
+
             if (type == 5)
             {
                 sbr = bits >> 31;
@@ -327,7 +327,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
                 if (sbr)
                 {
                     unsigned int old_index = index;
-                    
+
                     /* 1 bit read so far */
                     index = (bits >> 27) & 0xf; /* Frequency index - 4 bits */
 
@@ -356,14 +356,14 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
         if (!sbr && !sbr_signaled && id3->frequency <= 24000)
         {
             /* As stated in libfaad/mp4.c AudioSpecificConfig2:
-             * no SBR signalled, this could mean either implicit signalling or no SBR in this file 
-             * MPEG specification states: assume SBR on files with samplerate <= 24000 Hz 
+             * no SBR signalled, this could mean either implicit signalling or no SBR in this file
+             * MPEG specification states: assume SBR on files with samplerate <= 24000 Hz
              */
             id3->frequency *= 2;
             sbr = true;
         }
     }
-    
+
     return sbr;
 }
 
@@ -389,7 +389,7 @@ static void read_mp4_tag_i_from_n(int fd, int *i, char** i_from_n_string, uint32
     }
 }
 
-static bool read_mp4_tags(int fd, struct mp3entry* id3, 
+static bool read_mp4_tags(int fd, struct mp3entry* id3,
                           uint32_t size_left)
 {
     uint32_t size;
@@ -402,18 +402,18 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
     {
         size_left = read_mp4_atom(fd, &size, &type, size_left);
 
-        /* DEBUGF("Tag atom: '%c%c%c%c' (%d bytes left)\n", type >> 24 & 0xff, 
+        /* DEBUGF("Tag atom: '%c%c%c%c' (%d bytes left)\n", type >> 24 & 0xff,
             type >> 16 & 0xff, type >> 8 & 0xff, type & 0xff, size); */
 
         switch (type)
         {
         case MP4_cnam:
-            read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->title);
             break;
 
         case MP4_cART:
-            read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
+            read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->artist);
             break;
 
@@ -426,12 +426,12 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->grouping);
             break;
-        
+
         case MP4_calb:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->album);
             break;
-        
+
         case MP4_cwrt:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->composer);
@@ -446,7 +446,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_cday:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                                 &id3->year_string);
- 
+
             /* Try to parse it as a year, for the benefit of the database.
              */
             if(id3->year_string)
@@ -471,7 +471,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
             }
             break;
-        
+
         case MP4_cgen:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                 &id3->genre_string);
@@ -481,16 +481,20 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             read_mp4_tag_i_from_n(fd, &id3->discnum, &id3->disc_string, size, &buffer_left, &buffer);
             break;
 
-        case MP4_trkn:
-            read_mp4_tag_i_from_n(fd, &id3->tracknum, &id3->track_string, size, &buffer_left, &buffer);
+        case MP4_trkn: {
+            char *p = NULL;
+            int tracknum = 0;
+            read_mp4_tag_i_from_n(fd, &tracknum, &id3->track_string, size, &buffer_left, &buffer);
+            if (!(tracknum == 0 && (errno || *p)))
+                id3->tracknum = tracknum;
             break;
-
+        }
 #ifdef HAVE_ALBUMART
         case MP4_covr:
             {
                 int pos = lseek(fd, 0, SEEK_CUR) + 16;
                 id3->albumart.type = AA_TYPE_UNKNOWN;
-                
+
                 if (read_mp4_tag(fd, size, buffer, 8) >= 4)
                 {
 
@@ -502,7 +506,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     {
                         id3->albumart.type = AA_TYPE_PNG;
                     }
-                    
+
                     if (id3->albumart.type != AA_TYPE_UNKNOWN)
                     {
                         id3->albumart.pos  = pos;
@@ -528,10 +532,10 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 size -= sub_size;
                 lseek(fd, 8, SEEK_CUR);
                 sub_size -= 12;
-                
+
                 if (sub_size > sizeof(tag_name) - 1)
                 {
-                    rd_ret = read(fd, tag_name, sizeof(tag_name) - 1);                  
+                    rd_ret = read(fd, tag_name, sizeof(tag_name) - 1);
                     lseek(fd, sub_size - (sizeof(tag_name) - 1), SEEK_CUR);
                     sub_size = sizeof(tag_name) - 1;
                 }
@@ -551,9 +555,9 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 
                 if (tn_op == 0 && !cwrt) /*composer*/
                 {
-                    read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
+                    read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                         &id3->composer);
-                }   
+                }
                 else if (tn_op == 1) /*iTunSMPB*/
                 {
                     char value[TAG_VALUE_LENGTH];
@@ -564,7 +568,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     read_mp4_tag_string(fd, size, &value_p, &length, &any);
                     id3->lead_trim = get_itunes_int32(value, 1);
                     id3->tail_trim = get_itunes_int32(value, 2);
-                    DEBUGF("AAC: lead_trim %d, tail_trim %d\n", 
+                    DEBUGF("AAC: lead_trim %d, tail_trim %d\n",
                         id3->lead_trim, id3->tail_trim);
                 }
                 else if (tn_op == 2) /*musicbrainz track id*/
@@ -574,9 +578,9 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 }
                 else if (tn_op == 3) /*album artist*/
                 {
-                    read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
+                    read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                         &id3->albumartist);
-                }   
+                }
                 else
                 {
                     char* any = NULL;
@@ -588,13 +592,13 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                         /* Re-use the read buffer as the dest buffer... */
                         buffer -= length;
                         buffer_left += length;
-                        
+
                         parse_replaygain(tag_name, buffer, id3);
                     }
                 }
             }
             break;
-        
+
         default:
             lseek(fd, size, SEEK_CUR);
             break;
@@ -605,7 +609,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
     return true;
 }
 
-static bool read_mp4_container(int fd, struct mp3entry* id3, 
+static bool read_mp4_container(int fd, struct mp3entry* id3,
                                uint32_t size_left)
 {
     uint32_t size    = 0;
@@ -613,16 +617,16 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
     uint32_t handler = 0;
     bool rc = true;
     bool done = false;
-    
+
     do
     {
         size_left = read_mp4_atom(fd, &size, &type, size_left);
-        
-        /* DEBUGF("Atom: '%c%c%c%c' (0x%08lx, %lu bytes left)\n", 
+
+        /* DEBUGF("Atom: '%c%c%c%c' (0x%08lx, %lu bytes left)\n",
             (int) ((type >> 24) & 0xff), (int) ((type >> 16) & 0xff),
             (int) ((type >> 8) & 0xff), (int) (type & 0xff),
             type, size); */
-        
+
         switch (type)
         {
         case MP4_ftyp:
@@ -648,7 +652,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             rc = read_mp4_container(fd, id3, size);
             size = 0;
             break;
-        
+
         case MP4_ilst:
             /* We need at least a size of 8 to read the next atom. */
             if (handler == MP4_mdir && size>8)
@@ -657,7 +661,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 size = 0;
             }
             break;
-        
+
         case MP4_minf:
             if (handler == MP4_soun)
             {
@@ -665,22 +669,22 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 size = 0;
             }
             break;
-        
+
         case MP4_stsd:
             lseek(fd, 8, SEEK_CUR);
             size -= 8;
             rc = read_mp4_container(fd, id3, size);
             size = 0;
             break;
-        
+
         case MP4_hdlr:
             lseek(fd, 8, SEEK_CUR);
             read_uint32be(fd, &handler);
             size -= 12;
-            /* DEBUGF("    Handler '%c%c%c%c'\n", handler >> 24 & 0xff, 
+            /* DEBUGF("    Handler '%c%c%c%c'\n", handler >> 24 & 0xff,
                 handler >> 16 & 0xff, handler >> 8 & 0xff,handler & 0xff); */
             break;
-        
+
         case MP4_stts:
             {
                 uint32_t entries;
@@ -702,9 +706,9 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                     read_uint32be(fd, &l);
 
                     /* Some AAC file use HE profile. In this case the number
-                     * of output samples is doubled to a maximum of 2048 
-                     * samples per frame. This means that files which already 
-                     * report a frame size of 2048 in their header will not 
+                     * of output samples is doubled to a maximum of 2048
+                     * samples per frame. This means that files which already
+                     * report a frame size of 2048 in their header will not
                      * need any further special handling. */
                     if (id3->codectype==AFMT_MP4_AAC_HE && l<=1024)
                     {
@@ -714,7 +718,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
                     id3->samples += (uint64_t) n * l;
                 }
-                
+
                 size = 0;
             }
             break;
@@ -807,14 +811,14 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
         default:
             break;
         }
-        
+
         /* Skip final seek. */
         if (!done)
         {
             lseek(fd, size, SEEK_CUR);
         }
     } while (rc && (size_left > 0) && (errno == 0) && !done);
-    
+
     return rc;
 }
 
@@ -824,8 +828,8 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
     id3->filesize = 0;
     errno = 0;
 
-    if (read_mp4_container(fd, id3, filesize(fd)) && (errno == 0) 
-        && (id3->samples > 0) && (id3->frequency > 0) 
+    if (read_mp4_container(fd, id3, filesize(fd)) && (errno == 0)
+        && (id3->samples > 0) && (id3->frequency > 0)
         && (id3->filesize > 0))
     {
         if (id3->codectype == AFMT_UNKNOWN)

@@ -263,7 +263,7 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
             case SKIN_TOKEN_METADATA_TRACK_NUMBER:
                 if (id3->track_string)
                     return id3->track_string;
-                if (id3->tracknum) {
+                if (id3->tracknum >= 0) {
                     itoa_buf(buf, buf_size, id3->tracknum);
                     return buf;
                 }

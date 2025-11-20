@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include "platform.h"
 #include "metadata.h"
@@ -315,7 +316,12 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     if (((item == eTRACK && (type == TAGTYPE_APE)))
         || (item == eTRACKNUMBER && (type == TAGTYPE_VORBIS)))
     {
-        id3->tracknum = atoi(value);
+        if (strlen(value)) {
+            char *p = NULL;
+            int tracknum = strtol(value, &p, 0);
+            if (!(tracknum == 0 && (errno || *p)))
+                id3->tracknum = tracknum;
+        }
         p = &(id3->track_string);
     }
     else if (item == eDISCNUMBER || item == eDISC)

@@ -173,7 +173,7 @@ void finalize_id3(struct mp3entry *id3)
     id3->codectype = mul_id3.codectype;
     id3->vbr = mul_id3.vbr;
     id3->discnum = 0;
-    id3->tracknum = 0;
+    id3->tracknum = -1;
     id3->track_level = 0;
     id3->album_level = 0;
 }

@@ -243,7 +243,12 @@ static int skip_unsynched(int fd, int len)
 /* parse numeric value from string */
 static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    entry->tracknum = atoi( tag );
+    if (strlen(tag)) {
+        char *p = NULL;
+        int tracknum = strtol(tag, &p, 0);
+        if (!(tracknum == 0 && (errno || *p)))
+            entry->tracknum = tracknum;
+    }
     return bufferpos;
 }
 
@@ -826,7 +831,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
             return;
     }
     entry->id3version = version;
-    entry->tracknum = entry->year = entry->discnum = 0;
+    entry->year = entry->discnum = 0;
     entry->title = entry->artist = entry->album = NULL; /* FIXME incomplete */
 
     global_flags = header[5];

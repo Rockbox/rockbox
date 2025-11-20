@@ -44,7 +44,7 @@ static const unsigned short a52_441framesizes[] =
 };
 
 bool get_a52_metadata(int fd, struct mp3entry *id3)
-{        
+{
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
     unsigned long totalsamples;
@@ -55,32 +55,32 @@ bool get_a52_metadata(int fd, struct mp3entry *id3)
         return false;
     }
 
-    if ((buf[0] != 0x0b) || (buf[1] != 0x77)) 
-    { 
+    if ((buf[0] != 0x0b) || (buf[1] != 0x77))
+    {
         logf("not an A52/AC3 file\n");
         return false;
     }
 
     i = buf[4] & 0x3e;
-  
-    if (i > 36) 
+
+    if (i > 36)
     {
         logf("A52: Invalid frmsizecod: %d\n",i);
         return false;
     }
-  
+
     id3->bitrate = a52_bitrates[i >> 1];
     id3->vbr = false;
     id3->filesize = filesize(fd);
 
-    switch (buf[4] & 0xc0) 
+    switch (buf[4] & 0xc0)
     {
-    case 0x00: 
+    case 0x00:
         id3->frequency = 48000;
         id3->bytesperframe=id3->bitrate * 2 * 2;
         break;
-        
-    case 0x40: 
+
+    case 0x40:
         id3->frequency = 44100;
         id3->bytesperframe = a52_441framesizes[i];
         break;

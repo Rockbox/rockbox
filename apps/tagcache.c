@@ -2322,7 +2322,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
 
     logf("-> %s", path);
 
-    if (id3.tracknum <= 0)              /* Track number missing? */
+    if (id3.tracknum < 0)              /* Track number missing? */
     {
         id3.tracknum = -1;
     }

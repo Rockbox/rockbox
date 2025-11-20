@@ -732,7 +732,7 @@ static void print_mp3entry(const struct mp3entry *id3, FILE *f)
     if (id3->album) fprintf(f, "Album: %s\n", id3->album);
     if (id3->genre_string) fprintf(f, "Genre: %s\n", id3->genre_string);
     if (id3->disc_string || id3->discnum) fprintf(f, "Disc: %s (%d)\n", id3->disc_string, id3->discnum);
-    if (id3->track_string || id3->tracknum) fprintf(f, "Track: %s (%d)\n", id3->track_string, id3->tracknum);
+    if (id3->track_string || id3->tracknum >= 0) fprintf(f, "Track: %s (%d)\n", id3->track_string, id3->tracknum);
     if (id3->year_string || id3->year) fprintf(f, "Year: %s (%d)\n", id3->year_string, id3->year);
     if (id3->composer) fprintf(f, "Composer: %s\n", id3->composer);
     if (id3->comment) fprintf(f, "Comment: %s\n", id3->comment);

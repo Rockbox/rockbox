@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <errno.h>
 #include "platform.h"
 
 #include "metadata.h"
@@ -174,7 +175,7 @@ static int is_valid_utf16(const unsigned char *data, size_t length)
         uint16_t second_last = data[length - 4] | (data[length - 3] << 8);
 
         // Invalid if not preceded by a high surrogate
-        return second_last >= 0xD800 && second_last <= 0xDBFF; 
+        return second_last >= 0xD800 && second_last <= 0xDBFF;
     }
 
     // If it's not a surrogate, it's valid
@@ -473,7 +474,12 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             if (type == 0) {
                                 id3->track_string = id3buf;
                                 asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                                id3->tracknum = atoi(id3->track_string);
+                                if (strlen(id3->track_string)) {
+                                    char *p = NULL;
+                                    int tracknum = strtol(id3->track_string, &p, 0);
+                                    if (!(tracknum == 0 && (errno || *p)))
+                                        id3->tracknum = tracknum;
+                                }
                             } else if ((type >=2) && (type <= 5)) {
                                 id3->tracknum = asf_intdecode(fd, type, length);
                             } else {
@@ -510,7 +516,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                              * "03 yy yy yy yy". xx is the size of the WM/Picture
                              * container in bytes. yy equals the raw data length of
                              * the embedded image.
-                             * 
+                             *
                              *  Also save position after this tag in file in case any parsing errors */
                             uint32_t after_pic_pos = lseek(fd, -4, SEEK_CUR) + 4 + length;
 
