@@ -16915,3 +16915,71 @@
     *: "сортирај плејлисте"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "У Ес Бе - ДАК"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Док је у USB режиму само-пуњење"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Док је у У Ес Бе режиму само-пуњење"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Док је у USB режиму масовно-скадиште"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Док је у У Ес Бе режиму масовно-скадиште"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC активан"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "У Ес Бе - ДАК активан"
+  </voice>
+</phrase>
