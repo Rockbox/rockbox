@@ -10,12 +10,7 @@
 
 struct fb
 {
-#ifdef HAVE_LCD_COLOR
-    struct
-    {
-        int l, r;
-    } cc[3];
-#else
+#ifndef HAVE_LCD_COLOR
     int mode;
 #endif
     int enabled;

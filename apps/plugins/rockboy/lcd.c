@@ -1020,21 +1020,23 @@ static void updatepalette(int i)
     fb_data px;
 
     c = (lcd.pal[i<<1] | ((int)lcd.pal[(i<<1)|1] << 8)) & 0x7FFF;
+#if LCD_PIXELFORMAT == RGB565 || LCD_PIXELFORMAT == RGB565SWAPPED
+    /* extract color channels to 5 bit red and blue, and 6 bit green */
+    r = c & 0x001F;
+    g = (c & 0x03E0) >> 4;
+    b = c >> 10;
+    g |= (g >> 5);
+    px = FB_RGBPACK_LCD(r, g, b);
+#else
+    /* extract color channels and normalize to 8-bit */
     r = (c & 0x001F) << 3;
     g = (c & 0x03E0) >> 2;
-    b = (c & 0x7C00) >> 7;
+    b = c >> 7;
     r |= (r >> 5);
     g |= (g >> 5);
     b |= (b >> 5);
-
-    r = (r >> fb.cc[0].r) << fb.cc[0].l;
-    g = (g >> fb.cc[1].r) << fb.cc[1].l;
-    b = (b >> fb.cc[2].r) << fb.cc[2].l;
-
-    c = r|g|b;
-
-    px = FB_SCALARPACK_LCD(c);
-
+    px = FB_RGBPACK(r, g, b);
+#endif
     /* updatepalette might get called, but the pallete does not necessarily
      *  need to be updated.
      */

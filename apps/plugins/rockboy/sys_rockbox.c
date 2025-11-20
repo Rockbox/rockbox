@@ -255,23 +255,7 @@ void vid_init(void)
 {
     fb.enabled=1;
 
-#if defined(HAVE_LCD_COLOR)
-#if LCD_DEPTH >= 24
-    fb.cc[0].r = 0;  /* 8-8 (wasted bits on red) */
-    fb.cc[0].l = 16; /* this is the offset to the R bits (24-8) */
-    fb.cc[1].r = 0;  /* 8-6 (wasted bits on green) */
-    fb.cc[1].l = 8;  /* This is the offset to the G bits (24-8-8) */
-    fb.cc[2].r = 0;  /* 8-5 (wasted bits on red) */
-    fb.cc[2].l = 0;  /* This is the offset to the B bits (24-8-8-8) */
-#else
-    fb.cc[0].r = 3;  /* 8-5 (wasted bits on red) */
-    fb.cc[0].l = 11; /* this is the offset to the R bits (16-5) */
-    fb.cc[1].r = 2;  /* 8-6 (wasted bits on green) */
-    fb.cc[1].l = 5;  /* This is the offset to the G bits (16-5-6) */
-    fb.cc[2].r = 3;  /* 8-5 (wasted bits on red) */
-    fb.cc[2].l = 0;  /* This is the offset to the B bits (16-5-6-5) */
-#endif
-#else
+#if !defined(HAVE_LCD_COLOR)
     fb.mode=3;
 #endif
 }
