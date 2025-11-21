@@ -803,7 +803,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
         cnt <<= (identify_info[106] - 9); /* convert LOGICAL block size into 512B CE-ATA blocks */
-        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt << 3, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
         return 0;
     }
 
