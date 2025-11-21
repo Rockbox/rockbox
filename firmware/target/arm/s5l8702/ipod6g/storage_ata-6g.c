@@ -491,7 +491,8 @@ static int ceata_cancel_command(void)
     return 0;
 }
 
-static int ceata_rw_multiple_block(bool write, void* buf, uint16_t bsize, uint32_t count, long timeout)
+/* Note COUNT is in terms of MMC blocks, ie 512 bytes */
+static int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
 {
     mmc_discard_irq();
     uint32_t responsetype;
@@ -509,7 +510,7 @@ static int ceata_rw_multiple_block(bool write, void* buf, uint16_t bsize, uint32
         responsetype = SDCI_CMD_RES_TYPE_R1;
         direction = MMC_CMD_CEATA_RW_MULTIPLE_BLOCK_DIRECTION_READ;
     }
-    SDCI_DMASIZE = bsize;
+    SDCI_DMASIZE = 512; /* Default MMC block size is 512.  Can be negotiated to 1K or 4K */
     SDCI_DMAADDR = buf;
     SDCI_DMACOUNT = count;
     SDCI_DCTRL = SDCI_DCTRL_TXFIFORST | SDCI_DCTRL_RXFIFORST;
@@ -545,7 +546,7 @@ static int ata_identify(uint16_t* buf)
         ceata_taskfile[0xf] = CMD_IDENTIFY;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        PASS_RC(ceata_rw_multiple_block(false, buf, 512, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
     }
     else
     {
@@ -801,7 +802,8 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         ceata_taskfile[0xf] = write ? CMD_WRITE_DMA_EXT : CMD_READ_DMA_EXT;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        PASS_RC(ceata_rw_multiple_block(write, buffer, log_sector_size, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        cnt <<= (identify_info[106] - 9); /* convert LOGICAL block size into 512B CE-ATA blocks */
+        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt << 3, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
         return 0;
     }
 
@@ -1194,7 +1196,7 @@ static int ata_smart(uint16_t* buf, uint8_t cmd)
         }
         ceata_taskfile[0x9] = cmd;
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 4);
-        PASS_RC(ceata_rw_multiple_block(false, buf, 512, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 5);
+        PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 5);
     }
     else
     {
