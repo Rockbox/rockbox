@@ -25,76 +25,19 @@
 #include "kernel.h"
 #include "powermgmt.h"
 #include "usb_hid.h"
+#include "usb_hid_def.h"
 #include "usb_class_driver.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-/* Documents avaiable here: http://www.usb.org/developers/devclass_docs/ */
-
-#define HID_VER                         0x0110 /* 1.1 */
-/* Subclass Codes (HID1_11.pdf, page 18) */
-#define SUBCLASS_NONE                   0
-#define SUBCLASS_BOOT_INTERFACE         1
-/* Protocol Codes (HID1_11.pdf, page 19) */
-#define PROTOCOL_CODE_NONE              0
-#define PROTOCOL_CODE_KEYBOARD          1
-#define PROTOCOL_CODE_MOUSE             2
-/* HID main items (HID1_11.pdf, page 38) */
-#define INPUT                           0x80
-#define OUTPUT                          0x90
-#define FEATURE                         0xB0
-#define COLLECTION                      0xA0
-#define COLLECTION_PHYSICAL             0x00
-#define COLLECTION_APPLICATION          0x01
-#define END_COLLECTION                  0xC0
-/* Parts (HID1_11.pdf, page 40) */
-#define MAIN_ITEM_CONSTANT              BIT_N(0) /* 0x01 */
-#define MAIN_ITEM_VARIABLE              BIT_N(1) /* 0x02 */
-#define MAIN_ITEM_RELATIVE              BIT_N(2) /* 0x04 */
-#define MAIN_ITEM_WRAP                  BIT_N(3) /* 0x08 */
-#define MAIN_ITEM_NONLINEAR             BIT_N(4) /* 0x10 */
-#define MAIN_ITEM_NO_PREFERRED          BIT_N(5) /* 0x20 */
-#define MAIN_ITEM_NULL_STATE            BIT_N(6) /* 0x40 */
-#define MAIN_ITEM_VOLATILE              BIT_N(7) /* 0x80 */
-#define MAIN_ITEM_BUFFERED_BYTES        BIT_N(8) /* 0x0100 */
-/* HID global items (HID1_11.pdf, page 45) */
-#define USAGE_PAGE                      0x04
-#define LOGICAL_MINIMUM                 0x14
-#define LOGICAL_MAXIMUM                 0x24
-#define REPORT_SIZE                     0x74
-#define REPORT_ID                       0x84
-#define REPORT_COUNT                    0x94
-/* HID local items (HID1_11.pdf, page 50) */
-#define USAGE_MINIMUM                   0x18
-#define USAGE_MAXIMUM                   0x28
-/* Types of class descriptors (HID1_11.pdf, page 59) */
-#define USB_DT_HID                      0x21
-#define USB_DT_REPORT                   0x22
-
-#define CONSUMER_USAGE                  0x09
-
-/* HID-only class specific requests (HID1_11.pdf, page 61) */
-#define USB_HID_GET_REPORT              0x01
-#define USB_HID_GET_IDLE                0x02
-#define USB_HID_GET_PROTOCOL            0x03
-#define USB_HID_SET_REPORT              0x09
-#define USB_HID_SET_IDLE                0x0A
-#define USB_HID_SET_PROTOCOL            0x0B
-
-/* Get_Report and Set_Report Report Type field (HID1_11.pdf, page 61) */
-#define REPORT_TYPE_INPUT               0x01
-#define REPORT_TYPE_OUTPUT              0x02
-#define REPORT_TYPE_FEATURE             0x03
-
-#define HID_BUF_SIZE_MSG                16
-#define HID_BUF_SIZE_CMD                16
-#define HID_BUF_SIZE_REPORT             160
-#define HID_NUM_BUFFERS                 5
-#define SET_REPORT_BUF_LEN 2
-#define GET_REPORT_BUF_LEN 2
+#define HID_BUF_SIZE_MSG        16
+#define HID_BUF_SIZE_CMD        16
+#define HID_BUF_SIZE_REPORT     160
+#define HID_NUM_BUFFERS         5
+#define SET_REPORT_BUF_LEN      2
+#define GET_REPORT_BUF_LEN      2
 
 #ifdef LOGF_ENABLE
-
 #define BUF_DUMP_BUF_LEN       HID_BUF_SIZE_REPORT
 #define BUF_DUMP_PREFIX_SIZE   5
 #define BUF_DUMP_ITEMS_IN_LINE 8
@@ -127,26 +70,16 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
     .bAlternateSetting  = 0,
     .bNumEndpoints      = 1,
     .bInterfaceClass    = USB_CLASS_HID,
-    .bInterfaceSubClass = SUBCLASS_BOOT_INTERFACE,
-    .bInterfaceProtocol = PROTOCOL_CODE_KEYBOARD,
+    .bInterfaceSubClass = USB_HID_SUBCLASS_BOOT_INTERFACE,
+    .bInterfaceProtocol = USB_HID_PROTOCOL_CODE_KEYBOARD,
     .iInterface         = 0
 };
-
-struct usb_hid_descriptor {
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
-    uint16_t wBcdHID;
-    uint8_t  bCountryCode;
-    uint8_t  bNumDescriptors;
-    uint8_t  bDescriptorType0;
-    uint16_t wDescriptorLength0;
-} __attribute__ ((packed));
 
 static struct usb_hid_descriptor __attribute__((aligned(2))) hid_descriptor =
 {
     .bLength            = sizeof(struct usb_hid_descriptor),
     .bDescriptorType    = USB_DT_HID,
-    .wBcdHID            = HID_VER,
+    .wBcdHID            = USB_HID_VER,
     .bCountryCode       = 0,
     .bNumDescriptors    = 1,
     .bDescriptorType0   = USB_DT_REPORT,
@@ -462,37 +395,37 @@ static size_t descriptor_report_get(unsigned char *dest)
     usb_hid_report->buf_set = buf_set_keyboard;
     usb_hid_report->is_key_released = 1;
 
-    pack_parameter(&report, 0, 1, USAGE_PAGE,
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE,
             HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_KEYBOARD);
-    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_KEYBOARD);
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_GENERIC_DESKTOP_KEYPAD);
-    pack_parameter(&report, 0, 1, USAGE_MINIMUM, HID_KEYBOARD_LEFT_CONTROL);
-    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_KEYBOARD_RIGHT_GUI);
-    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 1);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 8);
-    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 5);
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_LEDS);
-    pack_parameter(&report, 0, 1, USAGE_MINIMUM, HID_LED_NUM_LOCK);
-    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_LED_KANA);
-    pack_parameter(&report, 0, 1, OUTPUT, MAIN_ITEM_VARIABLE);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 3);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 1);
-    pack_parameter(&report, 0, 1, OUTPUT, MAIN_ITEM_CONSTANT);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 6);
-    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, HID_KEYBOARD_EX_SEL);
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_KEYBOARD_KEYPAD);
-    pack_parameter(&report, 0, 1, USAGE_MINIMUM, 0);
-    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_KEYBOARD_EX_SEL);
-    pack_parameter(&report, 0, 1, INPUT, 0);
-    PACK_VAL(report, END_COLLECTION);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_KEYBOARD);
+    pack_parameter(&report, 0, 1, USB_HID_COLLECTION, USB_HID_COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_ID, REPORT_ID_KEYBOARD);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_GENERIC_DESKTOP_KEYPAD);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MINIMUM, HID_KEYBOARD_LEFT_CONTROL);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MAXIMUM, HID_KEYBOARD_RIGHT_GUI);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MAXIMUM, 1);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 8);
+    pack_parameter(&report, 0, 1, USB_HID_INPUT, USB_HID_MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 5);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_USAGE_PAGE_LEDS);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MINIMUM, HID_LED_NUM_LOCK);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MAXIMUM, HID_LED_KANA);
+    pack_parameter(&report, 0, 1, USB_HID_OUTPUT, USB_HID_MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 3);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 1);
+    pack_parameter(&report, 0, 1, USB_HID_OUTPUT, USB_HID_MAIN_ITEM_CONSTANT);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 6);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_USAGE_PAGE_KEYBOARD_KEYPAD);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MINIMUM, 0);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MAXIMUM, HID_KEYBOARD_EX_SEL);
+    pack_parameter(&report, 0, 1, USB_HID_INPUT, 0);
+    PACK_VAL(report, USB_HID_END_COLLECTION);
 
     /* Consumer usage controls - play/pause, stop, etc. */
     usb_hid_report = &usb_hid_reports[REPORT_ID_CONSUMER];
@@ -500,21 +433,21 @@ static size_t descriptor_report_get(unsigned char *dest)
     usb_hid_report->buf_set = buf_set_consumer;
     usb_hid_report->is_key_released = 1;
 
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_CONSUMER);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE,
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_USAGE_PAGE_CONSUMER);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE,
             HID_CONSUMER_USAGE_CONSUMER_CONTROL);
-    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_CONSUMER);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 16);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 2);
-    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 1);
-    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 652);
-    pack_parameter(&report, 0, 1, USAGE_MINIMUM,
+    pack_parameter(&report, 0, 1, USB_HID_COLLECTION, USB_HID_COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_ID, REPORT_ID_CONSUMER);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 16);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 2);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MINIMUM, 1);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MAXIMUM, 652);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MINIMUM,
             HID_CONSUMER_USAGE_CONSUMER_CONTROL);
-    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, HID_CONSUMER_USAGE_AC_SEND);
-    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_NO_PREFERRED |
-            MAIN_ITEM_NULL_STATE);
-    PACK_VAL(report, END_COLLECTION);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MAXIMUM, HID_CONSUMER_USAGE_AC_SEND);
+    pack_parameter(&report, 0, 1, USB_HID_INPUT, USB_HID_MAIN_ITEM_NO_PREFERRED |
+            USB_HID_MAIN_ITEM_NULL_STATE);
+    PACK_VAL(report, USB_HID_END_COLLECTION);
 
 #ifdef HAVE_USB_HID_MOUSE
     /* Mouse control */
@@ -523,55 +456,55 @@ static size_t descriptor_report_get(unsigned char *dest)
     usb_hid_report->buf_set = buf_set_mouse;
     usb_hid_report->is_key_released = 0;
 
-    pack_parameter(&report, 0, 1, USAGE_PAGE,
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE,
             HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_MOUSE);
-    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_MOUSE);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_POINTER);
-    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_PHYSICAL);
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_BUTTON);
-    pack_parameter(&report, 0, 1, USAGE_MINIMUM, 1);
-    pack_parameter(&report, 0, 1, USAGE_MAXIMUM, 8);
-    pack_parameter(&report, 1, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 1, 1, LOGICAL_MAXIMUM, 1);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 1);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 8);
-    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE);
-    pack_parameter(&report, 0, 1, USAGE_PAGE,
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_MOUSE);
+    pack_parameter(&report, 0, 1, USB_HID_COLLECTION, USB_HID_COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_ID, REPORT_ID_MOUSE);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_POINTER);
+    pack_parameter(&report, 0, 1, USB_HID_COLLECTION, USB_HID_COLLECTION_PHYSICAL);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_USAGE_PAGE_BUTTON);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MINIMUM, 1);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_MAXIMUM, 8);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 1, 1, USB_HID_LOGICAL_MAXIMUM, 1);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 1);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 8);
+    pack_parameter(&report, 0, 1, USB_HID_INPUT, USB_HID_MAIN_ITEM_VARIABLE);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE,
             HID_USAGE_PAGE_GENERIC_DESKTOP_CONTROLS);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_X);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_Y);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DESKTOP_WHEEL);
-    pack_parameter(&report, 0, 1, LOGICAL_MINIMUM, -127 & 0xFF);
-    pack_parameter(&report, 0, 1, LOGICAL_MAXIMUM, 127);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 3);
-    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE | MAIN_ITEM_RELATIVE);
-    PACK_VAL(report, END_COLLECTION);
-    PACK_VAL(report, END_COLLECTION);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_X);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_Y);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DESKTOP_WHEEL);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MINIMUM, -127 & 0xFF);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MAXIMUM, 127);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 3);
+    pack_parameter(&report, 0, 1, USB_HID_INPUT, USB_HID_MAIN_ITEM_VARIABLE | USB_HID_MAIN_ITEM_RELATIVE);
+    PACK_VAL(report, USB_HID_END_COLLECTION);
+    PACK_VAL(report, USB_HID_END_COLLECTION);
 #endif /* HAVE_USB_HID_MOUSE */
 
     /* Background reports */
-    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS);
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DEVICE_BACKGROUND_CONTROLS);
-    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
-    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_BACKGROUND);
+    pack_parameter(&report, 0, 1, USB_HID_USAGE_PAGE, HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DEVICE_BACKGROUND_CONTROLS);
+    pack_parameter(&report, 0, 1, USB_HID_COLLECTION, USB_HID_COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_ID, REPORT_ID_BACKGROUND);
     /* Padding */
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DEVICE_UNDEFINED);
-    pack_parameter(&report, 0, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 0, 1, LOGICAL_MAXIMUM, 255);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 1);
-    pack_parameter(&report, 0, 1, FEATURE, MAIN_ITEM_CONSTANT);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DEVICE_UNDEFINED);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MAXIMUM, 255);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 1);
+    pack_parameter(&report, 0, 1, USB_HID_FEATURE, USB_HID_MAIN_ITEM_CONSTANT);
     /* Battery percentage */
-    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DEVICE_BATTERY_STRENGTH);
-    pack_parameter(&report, 0, 1, LOGICAL_MINIMUM, 0);
-    pack_parameter(&report, 0, 1, LOGICAL_MAXIMUM, 100);
-    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
-    pack_parameter(&report, 0, 1, REPORT_COUNT, 1);
-    pack_parameter(&report, 0, 1, FEATURE, MAIN_ITEM_VARIABLE);
-    PACK_VAL(report, END_COLLECTION);
+    pack_parameter(&report, 0, 0, USB_HID_CONSUMER_USAGE, HID_GENERIC_DEVICE_BATTERY_STRENGTH);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 0, 1, USB_HID_LOGICAL_MAXIMUM, 100);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, USB_HID_REPORT_COUNT, 1);
+    pack_parameter(&report, 0, 1, USB_HID_FEATURE, USB_HID_MAIN_ITEM_VARIABLE);
+    PACK_VAL(report, USB_HID_END_COLLECTION);
 
     return (size_t)(report - dest);
 }
@@ -665,7 +598,7 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req, void *reqdata)
     static unsigned char buf[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
     int length;
 
-    if ((req->wValue >> 8) != REPORT_TYPE_OUTPUT)
+    if ((req->wValue >> 8) != USB_HID_REPORT_TYPE_OUTPUT)
     {
         logf("Unsupported report type");
         return 1;
@@ -714,7 +647,7 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req, void *reqdata)
 
 static int usb_hid_get_report(struct usb_ctrlrequest *req, unsigned char* dest)
 {
-    if ((req->wValue >> 8) != REPORT_TYPE_FEATURE)
+    if ((req->wValue >> 8) != USB_HID_REPORT_TYPE_FEATURE)
     {
         logf("Unsupported report type");
         return 1;
