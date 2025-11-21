@@ -491,7 +491,7 @@ static int ceata_cancel_command(void)
     return 0;
 }
 
-static int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
+static int ceata_rw_multiple_block(bool write, void* buf, uint16_t bsize, uint32_t count, long timeout)
 {
     mmc_discard_irq();
     uint32_t responsetype;
@@ -509,7 +509,7 @@ static int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long t
         responsetype = SDCI_CMD_RES_TYPE_R1;
         direction = MMC_CMD_CEATA_RW_MULTIPLE_BLOCK_DIRECTION_READ;
     }
-    SDCI_DMASIZE = 0x200;
+    SDCI_DMASIZE = bsize;
     SDCI_DMAADDR = buf;
     SDCI_DMACOUNT = count;
     SDCI_DCTRL = SDCI_DCTRL_TXFIFORST | SDCI_DCTRL_RXFIFORST;
@@ -545,7 +545,7 @@ static int ata_identify(uint16_t* buf)
         ceata_taskfile[0xf] = CMD_IDENTIFY;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        PASS_RC(ceata_rw_multiple_block(false, buf, 512, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
     }
     else
     {
@@ -788,8 +788,7 @@ static void ata_power_down(void)
 
 static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
 {
-    if (ceata)
-    {
+    if (ceata) {
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0x2] = cnt >> 8;
         ceata_taskfile[0x3] = sector >> 24;
@@ -802,9 +801,10 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         ceata_taskfile[0xf] = write ? CMD_WRITE_DMA_EXT : CMD_READ_DMA_EXT;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        PASS_RC(ceata_rw_multiple_block(write, buffer, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        PASS_RC(ceata_rw_multiple_block(write, buffer, log_sector_size, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
+        return 0;
     }
-    else
+
     {
         PASS_RC(ata_wait_for_rdy(100000), 2, 0);
         ata_write_cbr(&ATA_PIO_DVR, 0);
@@ -885,8 +885,8 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             }
         }
         PASS_RC(ata_wait_for_end_of_transfer(100000), 2, 3);
+        return 0;
     }
-    return 0;
 }
 
 static int ata_rw_chunk(uint64_t sector, uint32_t cnt, void* buffer, bool write)
@@ -1194,7 +1194,7 @@ static int ata_smart(uint16_t* buf, uint8_t cmd)
         }
         ceata_taskfile[0x9] = cmd;
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 4);
-        PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 5);
+        PASS_RC(ceata_rw_multiple_block(false, buf, 512, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 5);
     }
     else
     {
