@@ -16925,7 +16925,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
