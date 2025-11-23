@@ -765,7 +765,9 @@ int kbd_input(char* text, int buflen, ucschar_t *kbd)
             else if (state.changed == CHANGED_CURSOR)
             {
                 int c = utf8seek(state.text, state.editpos);
-                kbd_spellchar(state.text[c]);
+                ucschar_t ch;
+                utf8decode(&state.text[c], &ch);
+                kbd_spellchar(ch);
             }
             else if (state.changed == CHANGED_TEXT)
                 talk_spell(state.text, false);  /* speak revised text */
