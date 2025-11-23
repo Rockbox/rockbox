@@ -756,7 +756,7 @@ static void do_enqueue(bool enqueue)
 /* spell a string */
 static int _talk_spell(const char* spell, size_t len, bool enqueue)
 {
-    char c; /* currently processed char */
+    ucschar_t c; /* currently processed char */
     int button = BUTTON_NONE;
 
     if (talk_is_disabled())
@@ -766,8 +766,25 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
 
     size_t len0 = len - 1;
 
-    while ((c = *spell++) != '\0' && len0-- < len)
+    /* Tokenize into UTF8 codepoints */
+    while ((spell = utf8decode(spell, &c)), c != '\0')
     {
+        int count;
+        if (c <= 0x7f)
+            count = 1;
+        else if (c <= 0x7ff)
+            count = 2;
+        else if (c <= 0xffff)
+            count = 3;
+        else
+            count = 4;
+
+        len0 -= count;
+        if (len0 >= len) /* ie we underflow and wrap */
+             break;
+
+        /* NOTE: This is COMPLETLY BROKEN for NON-ENGLISH */
+
         /* if this grows into too many cases, I should use a table */
         if (c >= 'A' && c <= 'Z')
             talk_id(VOICE_CHAR_A + c - 'A', true);
@@ -785,7 +802,6 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
             talk_id(VOICE_PAUSE, true);
         else if (c == PATH_SEPCH)
             talk_id(VOICE_CHAR_SLASH, true);
-
 
         if (QUEUE_LEVEL == QUEUE_SIZE - 1)
             button = button_get(false); /* prevent UI unresponsiveness */
