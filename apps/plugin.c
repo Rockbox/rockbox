@@ -62,6 +62,10 @@
 #include "usbstack/usb_hid.h"
 #endif
 
+#ifdef USB_ENABLE_AUDIO
+#include "usbstack/usb_audio.h"
+#endif
+
 #define WRAPPER(_x_) _x_ ## _wrapper
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
@@ -845,6 +849,9 @@ static const struct plugin_api rockbox_api = {
     add_playbacklog,
     &device_battery_tables,
     yesno_pop_confirm,
+#ifdef USB_ENABLE_AUDIO
+    usb_audio_get_playing,
+#endif
 };
 
 static int plugin_buffer_handle;

@@ -994,6 +994,9 @@ struct plugin_api {
     void (*add_playbacklog)(struct mp3entry *id3);
     struct battery_tables_t *device_battery_tables;
     bool (*yesno_pop_confirm)(const char* text);
+#ifdef USB_ENABLE_AUDIO
+    bool (*usb_audio_get_playing)(void);
+#endif
 };
 
 /* plugin header */

@@ -666,7 +666,7 @@ static bool vu_meter_menu(void)
     bool menu_quit = false;
     bool exit = false;
 
-    MENUITEM_STRINGLIST(menu,"VU Meter Menu",NULL,"Meter Type","Scale",
+    MENUITEM_STRINGLIST(menu,"VU Meter",NULL,"Meter Type","Scale",
                         "Minimeters","Decay Speed","Playback Control",
                         "Quit");
 
@@ -811,14 +811,8 @@ static void draw_digital_minimeters(void) {
 #endif
 }
 
-static void analog_meter(void) {
-
-    static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
-
+static void draw_analog_meter(uint32_t left_peak, uint32_t right_peak)
+{
     if(vumeter_settings.analog_use_db_scale) {
         left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
         right_needle_top_x = analog_db_scale[right_peak * half_width / MAX_PEAK] + half_width;
@@ -867,13 +861,8 @@ static void analog_meter(void) {
     }
 }
 
-static void digital_meter(void) {
-    static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
-
+static void draw_digital_meter(uint32_t left_peak, uint32_t right_peak)
+{
     if(vumeter_settings.digital_use_db_scale) {
         num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];
         num_right_leds = digital_db_scale[right_peak * 44 / MAX_PEAK];
@@ -933,13 +922,37 @@ static void digital_meter(void) {
     rb->lcd_hline(0,LCD_WIDTH-1,half_height+3);
 }
 
+static void draw_title(void)
+{
+    static unsigned int sampr;
+    static int x;
+    static char title[16];
+
+    if (sampr != rb->mixer_get_frequency())
+    {
+        sampr = rb->mixer_get_frequency();
+        if ((sampr % 1000) < 100)
+            rb->snprintf(title, sizeof title, "VU %d kHz",
+                         sampr / 1000);
+        else
+            rb->snprintf(title, sizeof title, "VU %d.%u kHz",
+                         sampr / 1000, (sampr % 1000) / 100);
+
+        rb->font_getstringsize(title, &x, NULL, FONT_SYSFIXED);
+        x = half_width - (x/2); /* centered */
+    }
+    rb->lcd_putsxy(x, 0, title);
+}
+
 static void vu_meter_cleanup(void)
 {
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 }
 
-enum plugin_status plugin_start(const void* parameter) {
+enum plugin_status plugin_start(const void* parameter)
+{
+    static struct pcm_peaks peaks;
     int button;
 #if defined(VUMETER_HELP_PRE) || defined(VUMETER_MENU_PRE)
     int lastbutton = BUTTON_NONE;
@@ -964,12 +977,21 @@ enum plugin_status plugin_start(const void* parameter) {
     {
         rb->lcd_clear_display();
 
-        rb->lcd_putsxy(half_width-23, 0, "VU Meter");
+        draw_title();
 
-        if(vumeter_settings.meter_type==ANALOG)
-            analog_meter();
+#ifdef USB_ENABLE_AUDIO
+        if (rb->usb_audio_get_playing())
+            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_USBAUDIO,
+                                              &peaks);
         else
-            digital_meter();
+#endif
+            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+                                              &peaks);
+
+        if(vumeter_settings.meter_type == ANALOG)
+            draw_analog_meter(peaks.left, peaks.right);
+        else
+            draw_digital_meter(peaks.left, peaks.right);
 
         rb->lcd_update();
 
