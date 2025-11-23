@@ -764,24 +764,15 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
 
     do_enqueue(enqueue); /* cut off all the pending stuff */
 
+    const char *last = spell;
     size_t len0 = len - 1;
-
     /* Tokenize into UTF8 codepoints */
     while ((spell = utf8decode(spell, &c)), c != '\0')
     {
-        int count;
-        if (c <= 0x7f)
-            count = 1;
-        else if (c <= 0x7ff)
-            count = 2;
-        else if (c <= 0xffff)
-            count = 3;
-        else
-            count = 4;
-
-        len0 -= count;
+        len0 -= (spell - last);
         if (len0 >= len) /* ie we underflow and wrap */
              break;
+        last = spell;
 
         /* NOTE: This is COMPLETLY BROKEN for NON-ENGLISH */
 
