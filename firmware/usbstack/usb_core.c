@@ -1039,6 +1039,11 @@ static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
             response_data[1] = 0;
             usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
             break;
+        #ifdef USB_ENABLE_IAP
+        case USB_REQ_APPLE_SET_AVAIL_CURRENT:
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            break;
+        #endif
         default:
             logf("bad req:desc %d:%d", req->bRequest, req->wValue);
             usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);

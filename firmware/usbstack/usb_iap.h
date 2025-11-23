@@ -21,6 +21,9 @@
 #include "usb_core.h"
 #include "usb_class_driver.h"
 
+/* [2] P.32 Table 2-8 USB Device Vendor Request to set available current from accessory (USB Device Mode only) */
+#define USB_REQ_APPLE_SET_AVAIL_CURRENT (0x40)
+
 extern struct usb_class_driver_ep_allocation usb_iap_ep_allocs[2];
 
 int  usb_iap_request_endpoints(struct usb_class_driver*);
