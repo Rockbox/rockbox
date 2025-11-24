@@ -790,6 +790,17 @@ static void ata_power_down(void)
 static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
 {
     if (ceata) {
+        /* Despite the fact that CE-ATA specifies a minimum logical
+           sector size of 4096 bytes, the actual transfer commands
+           must be specified in units of 512 bytes. So scale the
+           sector count up and the LBA down.
+
+           On CE-ATA devies, the partition table and filesytem is
+           formatted with 4K logical sectors, so this will be safe.
+        */
+        cnt <<= (identify_info[106] - 9);
+        sector >>= (identify_info[106] - 9);
+
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0x2] = cnt >> 8;
         ceata_taskfile[0x3] = sector >> 24;
@@ -802,7 +813,6 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         ceata_taskfile[0xf] = write ? CMD_WRITE_DMA_EXT : CMD_READ_DMA_EXT;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
-        cnt <<= (identify_info[106] - 9); /* convert LOGICAL block size into 512B CE-ATA blocks */
         PASS_RC(ceata_rw_multiple_block(write, buffer, cnt, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
         return 0;
     }
