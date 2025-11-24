@@ -55,5 +55,7 @@ struct imx233_rtc_info_t imx233_rtc_get_info(void)
     info.alarm_wake_en = BF_RD(RTC_PERSISTENT0, ALARM_WAKE_EN);
     info.alarm_wake = BF_RD(RTC_PERSISTENT0, ALARM_WAKE);
     info.alarm_irq = BF_RD(RTC_CTRL, ALARM_IRQ);
+    info.rtc_ctrl = HW_RTC_CTRL;
+    info.rtc_stat = HW_RTC_STAT;
     return info;
 }

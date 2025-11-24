@@ -34,6 +34,8 @@ struct imx233_rtc_info_t
     uint32_t seconds;
     uint32_t persistent[6];
     uint32_t alarm;
+    uint32_t rtc_ctrl;
+    uint32_t rtc_stat;
     bool alarm_en, alarm_wake_en, alarm_wake, alarm_irq;
 };
 

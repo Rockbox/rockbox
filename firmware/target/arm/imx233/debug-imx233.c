@@ -542,7 +542,8 @@ bool dbg_hw_info_rtc(void)
         lcd_putsf(0, line++, "alarm: %lu", info.alarm);
         for(int i = 0; i < 6; i++)
             lcd_putsf(0, line++, "persist%d: 0x%lx", i, info.persistent[i]);
-
+        lcd_putsf(0, line++, "rtc_ctrl: 0x%lx", info.rtc_ctrl);
+        lcd_putsf(0, line++, "rtc_stat: 0x%lx", info.rtc_stat);
         lcd_update();
         yield();
     }
