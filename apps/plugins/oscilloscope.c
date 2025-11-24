@@ -2000,10 +2000,6 @@ static void osc_setup(void)
     osd_lcd_update();
 #endif
 
-#ifdef OSCILLOSCOPE_GRAPHMODE
-    mixer_sampr = rb->mixer_get_frequency();
-#endif
-
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
@@ -2038,6 +2034,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     while (!exit)
     {
+#ifdef OSCILLOSCOPE_GRAPHMODE
+        if (osc.graphmode == GRAPH_WAVEFORM)
+            mixer_sampr = rb->mixer_get_frequency();
+#endif
 #ifdef USB_ENABLE_AUDIO
         if (rb->usb_audio_get_playing())
         {
