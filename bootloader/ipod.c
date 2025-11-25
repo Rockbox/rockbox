@@ -377,8 +377,8 @@ void* main(void)
         for (int i = 0 ; i < NUM_VOLUMES ; i++) {
             disk_partinfo(i, &pinfo);
             if (pinfo.type)
-                printf("P%d T%02x S%08lx",
-                       i, pinfo.type, pinfo.size);
+                printf("P%d T%02x S%lllx",
+                       i, pinfo.type, (unsigned long long)pinfo.size);
         }
 
         printf("No partition found");

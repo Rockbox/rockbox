@@ -660,8 +660,8 @@ static void init(void)
             for (int i = 0 ; i < NUM_VOLUMES ; i++) {
                 disk_partinfo(i, &pinfo);
                 if (pinfo.type)
-                    lcd_putsf(0, line++, "P%d T%02x S%08lx",
-                              i, pinfo.type, pinfo.size);
+                    lcd_putsf(0, line++, "P%d T%02x S%llx",
+                              i, pinfo.type, (unsigned long long)pinfo.size);
             }
             lcd_update();
 

@@ -121,8 +121,8 @@ void error(int errortype, int error, bool shutdown)
             struct partinfo pinfo;
             disk_partinfo(i, &pinfo);
             if (pinfo.type)
-                printf("P%d T%02x S%08lx",
-                       i, pinfo.type, pinfo.size);
+                printf("P%d T%02x S%llx",
+                       i, pinfo.type, (unsigned long long)pinfo.size);
         }
 #endif
         break;
