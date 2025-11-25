@@ -799,7 +799,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
            formatted with 4K logical sectors, so this will be safe.
         */
         cnt <<= (identify_info[106] - 9);
-        sector >>= (identify_info[106] - 9);
+        sector <<= (identify_info[106] - 9);
 
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0x2] = cnt >> 8;
