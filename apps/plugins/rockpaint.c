@@ -1134,6 +1134,7 @@ static bool browse( char *dst, int dst_size, const char *start )
  *   In other words, cache_first-1 must be cached before cache_first-2 is cached.
  * - there is enough space to store all preview currently displayed.
  */
+#if 0 /* Broken crashy caching implementation that renders the font in the list  FS#13704 */
 static bool browse_fonts( char *dst, int dst_size )
 {
 #define LINE_SPACE 2
@@ -1312,7 +1313,7 @@ static bool browse_fonts( char *dst, int dst_size )
             li = tree->filesindir-1;
             if( reset_font )
             {
-             // fixme   rb->font_load(NULL, bbuf_s );
+             // fixme   rb->font_load(bbuf_s );
                 reset_font = false;
             }
             if( lvi-fvi+1 < tree->filesindir )
@@ -1386,6 +1387,35 @@ static bool browse_fonts( char *dst, int dst_size )
 #undef PREVIEW_SIZE
 #undef PREVIEW_NEXT
 }
+#else /* simple uncached non-rendered fallback */
+static bool browse_fonts( char *dst, int dst_size )
+{
+    /* taken from text_viewer */
+    char font[MAX_PATH], name[MAX_FILENAME+10];
+    rb->snprintf(name, sizeof(name), "%s.fnt", rb->global_settings->font_file);
+
+    struct browse_context browse = {
+        .dirfilter = SHOW_FONT,
+        .flags = BROWSE_SELECTONLY | BROWSE_NO_CONTEXT_MENU,
+        .title = rb->str(LANG_CUSTOM_FONT),
+        .icon = Icon_Menu_setting,
+        .root = FONT_DIR,
+        .selected = name,
+        .buf = font,
+        .bufsize = sizeof(font),
+        //.callback_show_item = &callback_show_font,
+    };
+
+    rb->rockbox_browse(&browse);
+
+    if (browse.flags & BROWSE_SELECTED)
+    {
+        rb->snprintf( dst, dst_size, "%s", font );
+        return true;
+    }
+    return false;
+}
+#endif
 
 /***********************************************************************
  * HSVRGB Color chooser
