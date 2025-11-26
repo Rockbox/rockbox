@@ -70,7 +70,12 @@
 #endif
 
 /* USB detect debouncing interval (200ms taken from the usb polling code) */
-#define USB_DEBOUNCE_TIME (200*HZ/1000)
+#define USB_DEBOUNCE_POLL (200*HZ/1000)
+/* NOTE: "usb_dw_gonak_effective:failed!" *PANIC*s can be observed when
+         disconnecting the FiiO M3K from USB with the debounce interval
+         for USB_STATUS_BY_EVENT set to 200ms, as above (see e75a3fb).
+         Adjusting the interval to 10ms reduces likelihood of a panic. */
+#define USB_DEBOUNCE_TIME (10*HZ/1000)
 
 bool do_screendump_instead_of_usb = false;
 
@@ -690,7 +695,7 @@ static void usb_tick(void)
         if(current_firewire_status != last_firewire_status)
         {
             last_firewire_status = current_firewire_status;
-            firewire_countdown = USB_DEBOUNCE_TIME;
+            firewire_countdown = USB_DEBOUNCE_POLL;
         }
         else
         {
@@ -712,7 +717,7 @@ static void usb_tick(void)
         if(current_status != last_usb_status)
         {
             last_usb_status = current_status;
-            usb_countdown = USB_DEBOUNCE_TIME;
+            usb_countdown = USB_DEBOUNCE_POLL;
         }
         else
         {
