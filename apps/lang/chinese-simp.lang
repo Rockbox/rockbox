@@ -3890,13 +3890,13 @@
     rtc: "OFF:取消"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK:取消"
     gigabeatfx: "POWER:取消"
+    mrobe500: "电源:取消"
     gogearsa9200: "LEFT:取消"
     iaudiom5,iaudiox5: "RECORD:取消"
     ipod*,mpiohd300,sansac200*: "MENU:取消"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
     iriverh100,iriverh120,iriverh300: "STOP:取消"
     mrobe100: "DISPLAY:取消"
-    mrobe500: "电源:取消"
     samsungyh*: "REW:取消"
     vibe500: "CANCEL:取消"
   </dest>
@@ -16922,5 +16922,73 @@
   </dest>
   <voice>
     *: "按专辑排序的所有乐曲"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "~USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "U S B D A C 功能"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "仅在仅充电模式下启用"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "仅在仅充电模式下启用"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "仅在大容量存储模式下启用"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "仅在大容量存储模式下启用"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC 工作中"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC 工作中"
   </voice>
 </phrase>
