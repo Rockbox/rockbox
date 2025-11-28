@@ -90,10 +90,10 @@ static void UIRQ(void)
 void irq_handler(void)
 {
     asm volatile("stmfd sp!, {r0-r5, ip, lr} \n" /* store context */
-                 "ldr   r4, =0x18080000      \n" /* INTC base */        
+                 "ldr   r4, =0x18080000      \n" /* INTC base */
                  "ldr   r5, [r4, #0x104]     \n" /* INTC_ISR */
                  "and   r5, r5, #0x1f        \n" /* irq_no = INTC_ISR & 0x1f */
-                 "ldr   r3, =irqvector       \n"  
+                 "ldr   r3, =irqvector       \n"
                  "ldr   r3,[r3, r5, lsl #2]  \n"
                  "blx   r3                   \n" /* irqvector[irq_no]() */
                  "mov   r3, #1               \n"
@@ -117,8 +117,14 @@ void system_init(void)
     WDTCON &= ~(1<<3);
 
 #ifndef BOOTLOADER
-    /* SDRAM tweaks */
-    MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8 */
+    /* SDRAM tweaks.  Note this assumes 100MHz AHB+SDRAM clock. */
+
+#if !(defined(HM60X) || defined(HM801))
+    MCSDR_MODE = (3<<4)|3;         /* CAS=3, burst=8(2^3) -- Safe but slower */
+#else
+    MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8(2^3) -- Ideal but causes startup issues on (some?) IHIFI devices */
+#endif
+
     MCSDR_T_REF = (125*100) >> 3;  /* 125/8 = 15.625 autorefresh interval */
     MCSDR_T_RFC = (64*100) / 1000; /* autorefresh period */
     MCSDR_T_RP = 1;                /* precharge period */
@@ -232,9 +238,15 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
     }
 }
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if !defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 static inline void set_sdram_timing(int ahb_freq)
 {
+#if 1
+    if (ahb_freq > 100000000)
+        MCSDR_MODE = (3<<4)|3;         /* CAS=3, burst=8(2^3) */
+    else
+        MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8(2^3) */
+#endif
     MCSDR_T_REF = (125*ahb_freq/1000000) >> 3;
     MCSDR_T_RFC = (64*ahb_freq/1000000)/1000;
 }
@@ -244,6 +256,8 @@ void set_cpu_frequency(long frequency)
     if (cpu_frequency == frequency)
         return;
 
+    /* Temporarily use more conservative SDRAM settings
+       so we don't glitch when changing clocks */
     set_sdram_timing(12000000);
 
     if (frequency == CPUFREQ_MAX)
