@@ -96,10 +96,12 @@ static inline void imx233_rtc_init(void)
 #else
     /* confirmed for CREATIVE_ZEN and CREATIVE_ZENXFI2 */
     /* FIXME: test SONY_NWZE360 and SONY_NWZE370 targets */
+#ifdef BM_RTC_PERSISTENT0_DISABLE_XTALOK
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_SET(RTC_PERSISTENT0, XTAL32KHZ_PWRUP, CLOCKSOURCE);
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_CLR(RTC_PERSISTENT0, XTAL24MHZ_PWRUP, DISABLE_XTALOK);
+#endif
 #endif
     imx233_rtc_enable_watchdog(false);
 }
