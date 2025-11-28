@@ -187,9 +187,13 @@ static const struct zen_md5sum_t zen_sums[] =
     },
     /** Zen */
     {
+        /* Version 1.21.03 */
+        MODEL_ZEN, "08ea23a65d89a8d352753ee22f8d6a61", "1.21.03"
+    },
+    {
         /* Version 1.21.03e */
         MODEL_ZEN, "1fe28f587f87ac3c280281db28c42465", "1.21.03e"
-    }
+    },
 };
 
 #define NR_ZEN_PLAYERS  (sizeof(zen_players) / sizeof(zen_players[0]))
