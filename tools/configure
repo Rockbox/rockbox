@@ -4150,6 +4150,7 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:hosted"
     plugins="yes"
+    tinyalsa="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="ibasso"
@@ -4174,6 +4175,7 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:hosted"
     plugins="yes"
+    tinyalsa="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="ibasso"
@@ -5134,11 +5136,14 @@ if test -n "$t_cpu"; then
   elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
-  elif [ "$t_manufacturer" = "ibasso" ]; then
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ibasso/tinyalsa/include"
   elif [ "$application" = "yes" ] && [ "$t_manufacturer" = "ctru" ]; then
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ctru/lib"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ctru/lib/bfile"
+  fi
+
+  if [ "$tinyalsa" = "yes" ]; then
+      TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/tinyalsa/include"
+      extradefines="$extradefines -DUSE_TINYALSA"
   fi
 
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"

@@ -2066,8 +2066,6 @@ target/hosted/ibasso/sysfs-ibasso.c
 target/hosted/ibasso/system-ibasso.c
 target/hosted/ibasso/usb-ibasso.c
 target/hosted/ibasso/vold-ibasso.c
-target/hosted/ibasso/tinyalsa/mixer.c
-target/hosted/ibasso/tinyalsa/pcm.c
 #ifdef DX50
 target/hosted/ibasso/dx50/audiohw-dx50.c
 target/hosted/ibasso/dx50/button-dx50.c
@@ -2076,6 +2074,11 @@ target/hosted/ibasso/dx50/button-dx50.c
 target/hosted/ibasso/dx90/audiohw-dx90.c
 target/hosted/ibasso/dx90/button-dx90.c
 #endif
+#endif
+
+#ifdef USE_TINYALSA
+target/hosted/tinyalsa/mixer.c
+target/hosted/tinyalsa/pcm.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_CTRU)
