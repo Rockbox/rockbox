@@ -86,23 +86,30 @@ static inline void imx233_rtc_init(void)
     BF_CLR(RTC_CTRL, SFTRST);
     udelay(5);  /* only need 3 GPMI clocks (1us) */
     BF_CLR(RTC_CTRL, CLKGATE);
+    /* TODO: classify other imx233/STMP37xx/STMP36xx targets
+     * (e.g. CREATIVE_ZENXFI, CREATIVE_ZENV, SONY_NWZE360, SONY_NWZE370) */
 #if defined(SANSA_FUZEPLUS)
-#ifdef BM_RTC_PERSISTENT0_DISABLE_XTALOK
+    /* RTC runs on 24MHz crystal */
+# if IMX233_SUBTARGET >= 3700
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_SET(RTC_PERSISTENT0, XTAL24MHZ_PWRUP, DISABLE_XTALOK);
-#endif
+# endif
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_CLR(RTC_PERSISTENT0, CLOCKSOURCE);
-#else
-    /* confirmed for CREATIVE_ZEN and CREATIVE_ZENXFI2 */
-    /* FIXME: test SONY_NWZE360 and SONY_NWZE370 targets */
-#ifdef BM_RTC_PERSISTENT0_DISABLE_XTALOK
+#elif defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI2)
+    /* RTC runs on 32.768 kHz crystal */
+# if IMX233_SUBTARGET >= 3700
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_SET(RTC_PERSISTENT0, XTAL32KHZ_PWRUP, CLOCKSOURCE);
     while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
     BF_CLR(RTC_PERSISTENT0, XTAL24MHZ_PWRUP, DISABLE_XTALOK);
-#endif
-#endif
+# else
+    while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
+    BF_CLR(RTC_PERSISTENT0, XTAL32_PDOWN);
+    while (BF_RD(RTC_STAT, NEW_REGS)!=0) {};
+    BF_SET(RTC_PERSISTENT0, XTAL24_PDOWN, CLOCKSOURCE);
+# endif
+#endif /* defined(target name) */
     imx233_rtc_enable_watchdog(false);
 }
 
