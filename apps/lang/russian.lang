@@ -467,10 +467,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Показ файлов"
+    *: "Отображение файлов"
   </dest>
   <voice>
-    *: "Показ файлов"
+    *: "Отображение файлов"
   </voice>
 </phrase>
 <phrase>
@@ -551,7 +551,7 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Выбор профиля настроек "
+    *: "Выбор профиля настроек"
   </dest>
   <voice>
     *: "Выбор профиля настроек"
@@ -3351,7 +3351,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Аккумулятор заряжен"
+    charging: "Аккумулятор заряжается"
   </voice>
 </phrase>
 <phrase>
@@ -3409,7 +3409,8 @@
   </source>
   <dest>
     *: "Внутр:"
-    hibylinux,xduoox3: "микро Эс Ди:"
+    hibylinux: "~mSD:"
+    xduoox3: "~mSD1:"
   </dest>
   <voice>
     *: "Внутр"
@@ -3430,15 +3431,15 @@
   </source>
   <dest>
     *: none
-    hibylinux: "ЮСБ:"
-    multivolume: "ХД1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Эс Ди:"
-    xduoox3: "микро Эс Ди2:"
+    hibylinux: "~USB:"
+    multivolume: "~HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "~mSD:"
+    xduoox3: "~mSD2:"
   </dest>
   <voice>
     *: none
     hibylinux: "Ю С Б"
-    multivolume: "Х Д 1"
+    multivolume: "жёсткий диск 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Эс Ди"
     xduoox3: "микро Эс Ди 2"
   </voice>
@@ -3584,9 +3585,8 @@
   </source>
   <dest>
     *: none
-    rtc: "ВЫКЛ. = Отмена"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "НАЗАД = Отмена"
-    gigabeatfx,mrobe500: "ВЫКЛ. = Отмена"
+    gigabeatfx,mrobe500,rtc: "ВЫКЛ. = Отмена"
     gogearsa9200: "ЛЕВО = Отмена"
     iaudiom5,iaudiox5: "ЗАПИСЬ = Отмена"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Отмена"
@@ -3650,7 +3650,7 @@
     *: none
     iaudiom5,iaudiox5,recording: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
     iriverh100,iriverh120,iriverh300: "Диск заполнен. Нажмите СТОП для продолжения."
-    samsungyh*: "Диск заполнен. Нажмите LEFT для продолжения."
+    samsungyh*: "Диск заполнен. Нажмите ВЛЕВО для продолжения."
     sansac200*,sansae200*,vibe500: "Диск заполнен. Нажмите ПРЕД. для продолжения."
   </dest>
   <voice>
@@ -3753,11 +3753,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Проснуться через %d:%02d"
+    alarm: "Сработает через %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Проснуться через"
+    alarm: "Сработает через"
   </voice>
 </phrase>
 <phrase>
@@ -3914,7 +3914,7 @@
     *: "(VBR)"
   </source>
   <dest>
-    *: " (Переменный)"
+    *: "(Переменный)"
   </dest>
   <voice>
     *: "Переменный"
@@ -6106,7 +6106,7 @@
     *: "Не могу открыть %s"
   </dest>
   <voice>
-    *: ""
+    *: "Не могу открыть плагин"
   </voice>
 </phrase>
 <phrase>
@@ -16915,5 +16915,87 @@
   </dest>
   <voice>
     *: "Сортировать плейлисты"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "В режиме "только зарядка""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "В режиме "устройство хранения информации""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC Active"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Активен USB-ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[По альбому]"
+  </dest>
+  <voice>
+    *: "Все трэки сортируются по альбому"
   </voice>
 </phrase>
