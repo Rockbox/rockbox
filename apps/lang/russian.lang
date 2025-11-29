@@ -16678,10 +16678,10 @@
     *: "Most played (Plays|Score)"
   </source>
   <dest>
-    *: "Наиболее воспроизведённые (Воспроизведения|Рейтинг)"
+    *: "Наиболее игравшие (Число проигрываний|Рейтинг)"
   </dest>
   <voice>
-    *: "Наиболее воспроизведённые по проигрываниям затем по рейтингу"
+    *: "Наиболее игравшие по проигрываниям затем по рейтингу"
   </voice>
 </phrase>
 <phrase>
@@ -16692,10 +16692,10 @@
     *: "Recently played tracks"
   </source>
   <dest>
-    *: "Недавно воспроизведённые треки"
+    *: "Недавно игравшие треки"
   </dest>
   <voice>
-    *: "Недавно воспроизведённые трэки"
+    *: "Недавно игравшие трэки"
   </voice>
 </phrase>
 <phrase>
@@ -16706,10 +16706,10 @@
     *: "Never played tracks"
   </source>
   <dest>
-    *: "Никогда не воспроизведённые треки"
+    *: "Никогда не игравшие треки"
   </dest>
   <voice>
-    *: "Никогда не воспроизведённые трэки"
+    *: "Никогда не игравшие трэки"
   </voice>
 </phrase>
 <phrase>
@@ -16927,11 +16927,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "USB-ЦАП"
   </dest>
   <voice>
     *: none
-    usbdac: "USB-ЦАП"
+    usbdac: "USB ЦАП"
   </voice>
 </phrase>
 <phrase>
@@ -16944,11 +16944,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Charge-Only Mode"
+    usbdac: "В режиме только зарядки"
   </dest>
   <voice>
     *: none
-    usbdac: "В режиме "только зарядка""
+    usbdac: "В режиме только зарядки"
   </voice>
 </phrase>
 <phrase>
@@ -16961,11 +16961,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Mass-Storage Mode"
+    usbdac: "В режиме устройства хранения информации"
   </dest>
   <voice>
     *: none
-    usbdac: "В режиме "устройство хранения информации""
+    usbdac: "В режиме устройства хранения информации"
   </voice>
 </phrase>
 <phrase>
@@ -16978,11 +16978,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC Active"
+    usbdac: "Активен USB-ЦАП"
   </dest>
   <voice>
     *: none
-    usbdac: "Активен USB-ЦАП"
+    usbdac: "Активен USB ЦАП"
   </voice>
 </phrase>
 <phrase>
