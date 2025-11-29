@@ -1810,9 +1810,9 @@ cat <<EOF
  ==iriver==                ==Apple iPod==        ==Cowon/iAudio==
  10) H120/H140             20) Color/Photo       30) X5/X5V/X5L
  11) H320/H340             21) Nano 1G           31) M5/M5L
- 12) iHP-100/110/115       22) Video             33) D2
- 14) H10 20Gb              23) 3G                34) M3/M3L
- 15) H10 5/6Gb             24) 4G Grayscale
+ 12) iHP-100/110/115       22) Video             32) D2
+ 13) H10 20Gb              23) 3G                33) M3/M3L
+ 14) H10 5/6Gb             24) 4G Grayscale
                            25) Mini 1G           ==SanDisk==
  ==Toshiba==               26) Mini 2G           50) Sansa e200
  40) Gigabeat F/X          27) 1G, 2G            51) Sansa e200R
@@ -1835,40 +1835,38 @@ cat <<EOF
                                                  131) Mini2440
  ==Samsung==               ==Onda==
  140) YH-820               120) VX747            ==Packard Bell==
- 141) YH-920               121) VX767            160) Vibe 500
- 142) YH-925               122) VX747+
+ 141) YH-920               122) VX747+           160) Vibe 500
+ 142) YH-925               121) VX767
  143) YP-S3                123) VX777            ==ROCKCHIP==
-                                                 180) rk27xx generic
- ==HiFiMAN==               ==MPIO==
- 190) HM-60x               170) HD200            ==HiFi E.T.==
- 191) HM-801               171) HD300            210) MA9
-                                                 211) MA9C
- ==Sony==                  ==Application==       212) MA8
- 219) NWZ-E350 series      200) SDL              213) MA8C
- 220) NWZ-E370/E380 series 201) Android
- 221) NWZ-E360 series      202) Nokia N8xx       ==IHIFI==
- 222) NWZ-E450 series      203) Nokia N900       230) 760
- 223) NWZ-E460 series      204) Pandora          231) 960
- 224) NWZ-E470 series      205) Samsung YP-R0    250) 770C
- 225) NWZ-E580 series      206) Android MIPS     251) 770
- 226) NWZ-A10 series       207) Android x86      252) 800
- 227) NW-A20 series        208) Samsung YP-R1
- 228) NWZ-A860 series      209) Anbernic RG Nano ==AgpTek==
- 229) NWZ-S750 series                            240) Rocker
-                           ==iBasso==
- ==FiiO==                  232) DX50             ==AIGO==
- 244) M3K Linux            233) DX90             245) Eros Q / K
- 246) M3K baremetal                              247) Eros Q / K native
-                           ==xDuoo==                    (hw1/hw2 bl, all hw rb)
- ==Shanling==              241) X3               248) Eros Q / K native
- 260) Q1                   242) X3II                    (hw3 bl only)
-                           243) X20              249) Eros Q / K native
-                                                        (hw4 bl only)
+ 144) YP-R0                                      180) rk27xx generic
+ 145) YP-R1 (WIP)          ==MPIO==
+                           170) HD200            ==HiFi E.T.==
+ ==HiFiMAN==               171) HD300            210) MA9
+ 190) HM-60x                                     211) MA9C
+ 191) HM-801               ==Application==       212) MA8
+                           200) SDL (Generic)    213) MA8C
+ ==Sony==                  201) Android (ARM)
+ 219) NWZ-E350 series      202) Android (MIPS)   ==IHIFI==
+ 220) NWZ-E370/E380 series 203) Android (x86)    230) 760
+ 221) NWZ-E360 series      204) Pandora          231) 770
+ 222) NWZ-E450 series      205) Nokia N8xx       232) 770C
+ 223) NWZ-E460 series      206) Nokia N900       233) 800
+ 224) NWZ-E470 series      209) Anbernic RG Nano 234) 960
+ 225) NWZ-E580 series
+ 226) NWZ-A10 series       ==AgpTek==            ==AIGO==
+ 227) NW-A20 series        240) Rocker           245) Eros Q / K (hosted)
+ 228) NWZ-A860 series                            247) Eros Q / K native
+ 229) NWZ-S750 series      ==iBasso==                  (hw1/hw2 bl, all hw rb)
+                           250) DX50             248) Eros Q / K native
+ ==FiiO==                  251) DX90                   (hw3 bl only)
+ 244) M3K Linux                                  249) Eros Q / K native
+ 246) M3K baremetal        ==xDuoo==                   (hw4 bl only)
+                           241) X3
+ ==Shanling==              242) X3II             ==Nintendo==
+ 260) Q1                   243) X20              290) Nintendo 3DS (WIP)
+
  ==Echo project==          ==Surfans==
  270) Echo R1 (WIP)        280) F28 (WIP)
-
- ==Nintendo==
- 290) Nintendo 3DS (WIP)
 EOF
 
   buildfor=`input`;
@@ -2000,7 +1998,7 @@ fi
     t_model="h100"
     ;;
 
-   14|iriverh10)
+   13|iriverh10)
     target_id=22
     modelname="iriverh10"
     target="IRIVER_H10"
@@ -2024,7 +2022,7 @@ fi
     t_model="h10"
     ;;
 
-   15|iriverh10_5gb)
+   14|iriverh10_5gb)
     target_id=24
     modelname="iriverh10_5gb"
     target="IRIVER_H10_5GB"
@@ -2326,7 +2324,7 @@ fi
     t_model="m5"
     ;;
 
-   33|cowond2)
+   32|cowond2)
     target_id=34
     modelname="cowond2"
     target="COWON_D2"
@@ -2347,7 +2345,7 @@ fi
     t_model="cowond2"
     ;;
 
-   34|iaudiom3)
+   33|iaudiom3)
     target_id=37
     modelname="iaudiom3"
     target="IAUDIO_M3"
@@ -3564,7 +3562,7 @@ fi
     t_model="app"
     ;;
 
-   202|nokian8xx)
+   205|nokian8xx)
     application="yes"
     target_id=75
     modelname="nokian8xx"
@@ -3590,7 +3588,7 @@ fi
     t_model="app"
     ;;
 
-   203|nokian900)
+   206|nokian900)
     application="yes"
     target_id=76
     modelname="nokian900"
@@ -3642,7 +3640,7 @@ fi
     t_model="app"
     ;;
 
-   205|samsungypr0)
+   144|samsungypr0)
     application="yes"
     target_id=78
     modelname="samsungypr0"
@@ -3664,7 +3662,7 @@ fi
     t_model="ypr0"
     ;;
 
-   206|androidmips)
+   202|androidmips)
     application="yes"
     target_id=74
     modelname="androidmips"
@@ -3691,7 +3689,7 @@ fi
     t_model="app"
     ;;
 
-   207|androidx86)
+   203|androidx86)
     application="yes"
     target_id=74
     modelname="androidx86"
@@ -3718,7 +3716,7 @@ fi
     t_model="app"
     ;;
 
-   208|samsungypr1)
+   145|samsungypr1)
     application="yes"
     target_id=93
     modelname="samsungypr1"
@@ -4109,7 +4107,7 @@ fi
     t_model="ihifi"
     ;;
 
-   231|ihifi960)
+   234|ihifi960)
     target_id=93
     modelname="ihifi960"
     target="IHIFI960"
@@ -4131,7 +4129,7 @@ fi
     t_model="ihifi"
     ;;
 
-   232|ibassodx50)
+   250|ibassodx50)
     application="yes"
     target_id=94
     modelname="ibassodx50"
@@ -4157,7 +4155,7 @@ fi
     t_model="dx50"
     ;;
 
-   233|ibassodx90)
+   251|ibassodx90)
     application="yes"
     target_id=95
     modelname="ibassodx90"
@@ -4447,7 +4445,7 @@ fi
     t_model="ihifi2"
     ;;
 
-   251|ihifi770)
+   232|ihifi770)
     target_id=108
     modelname="ihifi770"
     target="IHIFI770"
@@ -4469,7 +4467,7 @@ fi
     t_model="ihifi2"
     ;;
 
-   252|ihifi800)
+   233|ihifi800)
     target_id=109
     modelname="ihifi800"
     target="IHIFI800"
