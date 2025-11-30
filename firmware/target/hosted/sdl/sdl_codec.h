@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2010 Thomas Martitz
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,24 +18,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _SDL_CODEC_H
+#define _SDL_CODEC_H
 
+#if (defined(HAVE_SDL_AUDIO) \
+    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)) \
+    || (CONFIG_PLATFORM & PLATFORM_CTRU)
+AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
+#else
+#define AUDIOHW_CAPS    (MONO_VOL_CAP)
+AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -99,   0,   0)
+#endif /* CONFIG_PLATFORM & PLATFORM_SDL */
 
-#include "config.h"
-#include "audiohw.h"
-
-void audiohw_set_volume(int volume)
-{
-    extern void pcm_set_mixer_volume(int);
-    pcm_set_mixer_volume(volume);
-}
-
-void audiohw_set_balance(int balance)
-{
-    (void)balance;
-}
-
-void audiohw_close(void)
-{
-    extern void pcm_shutdown(void);
-    pcm_shutdown();
-}
+#endif /* _SDL_CODEC_H */

@@ -18,19 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef HOSTED_CODEC_H
-#define HOSTED_CODEC_H
+#ifndef __ANDROID_CODEC_H
+#define __ANDROID_CODEC_H
 
-#if (defined(HAVE_SDL_AUDIO) \
-    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)) \
-    || (CONFIG_PLATFORM & PLATFORM_CTRU)
-AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
-#else
-#define AUDIOHW_CAPS    (MONO_VOL_CAP)
-AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -99,   0,   0)
-#endif /* CONFIG_PLATFORM & PLATFORM_SDL */
-
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 /* Bass and treble tone controls */
 #ifdef AUDIOHW_HAVE_BASS
 AUDIOHW_SETTING(BASS,        "dB",   0,  1, -24,  24,   0)
@@ -49,6 +39,5 @@ AUDIOHW_SETTING(BASS_CUTOFF,   "",   0,  1,   1,   4,   1)
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 AUDIOHW_SETTING(TREBLE_CUTOFF, "",   0,  1,   1,   4,   1)
 #endif
-#endif /* CONFIG_PLATFORM & PLATFORM_ANDROID */
 
-#endif /* HOSTED_CODEC_H */
+#endif /* __ANDROID_CODEC_H */

@@ -133,12 +133,16 @@ target/hosted/sonynwz/audio-nwz.c
 target/hosted/sonynwz/debug-nwz.c
 target/hosted/sonynwz/nvp-nwz.c
 target/hosted/sonynwz/nwz-db.c
+target/hosted/sonynwz/nwzlinux-codec.c
+#endif
+
+#if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(SONY_NWZ_LINUX)) && !defined(SIMULATOR))
+target/hosted/pcm-alsa.c
+target/hosted/alsa-controls.c
 #endif
 
 #if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR))
 drivers/lcd-memframe.c
-target/hosted/alsa-controls.c
-target/hosted/pcm-alsa.c
 target/hosted/backtrace-glibc.c
 target/hosted/filesystem-unix.c
 target/hosted/kernel-unix.c
@@ -154,18 +158,21 @@ target/hosted/power-linux.c
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
+target/hosted/agptek/rocker_codec.c
 #endif
 
 #if defined(SURFANS_F28) && !defined(SIMULATOR)
 target/hosted/surfans/button-f28.c
 target/hosted/surfans/debug-f28.c
 target/hosted/surfans/powermgmt-f28.c
+target/hosted/surfanslinux_codec.c
 #endif
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
 target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
 target/hosted/xduoo/powermgmt-xduoo.c
+target/hosted/xduoo/xduoolinux_codec.c
 #endif
 
 #if defined(HIBY_LINUX) && !defined(SIMULATOR)
@@ -180,6 +187,7 @@ target/hosted/fiio/debug-fiio.c
 target/hosted/fiio/powermgmt-fiio.c
 target/hosted/fiio/system-fiio.c
 target/hosted/fiio/usb-fiio.c
+target/hosted/fiio/fiiolinux_codec.c
 #endif
 
 #if (defined(EROS_Q)) && !defined(SIMULATOR)
@@ -187,6 +195,7 @@ target/hosted/aigo/button-erosq.c
 target/hosted/aigo/debug-erosq.c
 target/hosted/aigo/power-erosq.c
 target/hosted/aigo/powermgmt-erosq.c
+target/hosted/aigo/erosqlinux_codec.c
 #endif
 
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
@@ -549,40 +558,21 @@ drivers/audio/es9018.c
 drivers/audio/es9218.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
-#if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
+#if defined(HAVE_AS3514)
 drivers/audio/as3514.c
-target/hosted/pcm-alsa.c
-#elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
+#elif defined(HAVE_WM8978)
 drivers/audio/wm8978.c
-target/hosted/pcm-alsa.c
-#elif defined(HAVE_NWZ_LINUX_CODEC)
-drivers/audio/nwzlinux-codec.c
-target/hosted/alsa-controls.c
-target/hosted/pcm-alsa.c
-#elif defined(HAVE_ROCKER_CODEC) && !defined(SIMULATOR)
-drivers/audio/rocker_codec.c
-#elif defined(HAVE_SURFANS_LINUX_CODEC) && !defined(SIMULATOR)
-drivers/audio/surfanslinux_codec.c
-#elif defined(HAVE_XDUOO_LINUX_CODEC) && !defined(SIMULATOR)
-drivers/audio/xduoolinux_codec.c
-#elif defined(HAVE_FIIO_LINUX_CODEC) && !defined(SIMULATOR)
-drivers/audio/fiiolinux_codec.c
-#elif defined(HAVE_EROSQ_LINUX_CODEC) && !defined(SIMULATOR)
-drivers/audio/erosqlinux_codec.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
-
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 target/hosted/maemo/pcm-gstreamer.c
 #else
 target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
-
 #elif defined(CTRU)
 drivers/audio/ctru.c
 #endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
-
 #endif /* !defined(BOOTLOADER) */
 
 /* build erosqn codec in bootloader for detection */
@@ -2034,10 +2024,10 @@ target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c
 target/hosted/android/system-android.c
 target/hosted/android/telephony-android.c
+target/hosted/android/android-codec.c
 #ifdef APPLICATION
 target/hosted/android/app/button-application.c
 #endif
-drivers/audio/android.c
 #endif
 
 #if defined(DX50) || defined(DX90)
