@@ -876,6 +876,10 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     font_measurestring,
+#ifdef HAVE_TOUCHSCREEN
+    gesture_flick_get_in_vp,
+    gesture_flick_get,
+#endif
 };
 
 static int plugin_buffer_handle;

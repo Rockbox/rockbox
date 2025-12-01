@@ -1041,6 +1041,11 @@ struct plugin_api {
        the API gets incompatible */
     int (*font_measurestring)(const unsigned char *str, size_t maxbytes,
                               size_t maxwidth, int *w, int *h, int fontnum);
+#ifdef HAVE_TOUCHSCREEN
+    int (*gesture_flick_get_in_vp)(const struct gesture_event *gevt,
+                                   const struct viewport *vp);
+    int (*gesture_flick_get)(const struct gesture_event *gevt);
+#endif
 };
 
 /* plugin header */
