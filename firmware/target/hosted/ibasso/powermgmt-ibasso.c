@@ -68,7 +68,7 @@ int _battery_voltage(void)
     /*TRACE;*/
 
     if(   (_battery_present == -1)
-       && (! sysfs_get_int(SYSFS_BATTERY_PRESENT, &_battery_present)))
+       && (! sysfs_get_int(sysfs_paths[SYSFS_BATTERY_PRESENT], &_battery_present)))
     {
         /* This check is only done once at startup. */
 
@@ -86,7 +86,7 @@ int _battery_voltage(void)
             /sys/class/power_supply/battery/voltage_now
             Voltage in microvolt.
         */
-        if(! sysfs_get_int(SYSFS_BATTERY_VOLTAGE_NOW, &val))
+        if(! sysfs_get_int(sysfs_paths[SYSFS_BATTERY_VOLTAGE_NOW], &val))
         {
             DEBUGF("ERROR %s: Can not get current battery voltage.", __func__);
             return 0;
@@ -103,7 +103,7 @@ int _battery_voltage(void)
             /sys/class/power_supply/usb/voltage_now
             Voltage in microvolt.
         */
-        if(! sysfs_get_int(SYSFS_USB_POWER_VOLTAGE_NOW, &val))
+        if(! sysfs_get_int(sysfs_paths[SYSFS_USB_POWER_VOLTAGE_NOW], &val))
         {
             DEBUGF("ERROR %s: Can not get current USB voltage.", __func__);
             return 0;
@@ -125,7 +125,7 @@ bool charging_state(void)
 {
     if ((current_tick - last_tick) > HZ/2 ) {
         char buf[12] = {0};
-        sysfs_get_string(SYSFS_BATTERY_STATUS, buf, sizeof(buf));
+        sysfs_get_string(sysfs_paths[SYSFS_BATTERY_STATUS], buf, sizeof(buf));
 
         last_tick = current_tick;
         last_power = (strncmp(buf, "Charging", 8) == 0);
@@ -136,7 +136,7 @@ bool charging_state(void)
 unsigned int power_input_status(void)
 {
     int present = 0;
-    sysfs_get_int(SYSFS_USB_POWER_ONLINE, &present);
+    sysfs_get_int(sysfs_paths[SYSFS_USB_POWER_ONLINE], &present);
 
     return present ? POWER_INPUT_USB_CHARGER : POWER_INPUT_NONE;
 }

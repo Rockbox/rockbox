@@ -94,7 +94,7 @@ static bool _hold = false;
 bool button_hold(void)
 {
     char hold_state;
-    if(! sysfs_get_char(SYSFS_HOLDKEY, &hold_state))
+    if(! sysfs_get_char(sysfs_paths[SYSFS_HOLDKEY], &hold_state))
     {
         DEBUGF("ERROR %s: Can not get hold switch state.", __func__);
         hold_state = HOLD_SWITCH_BIT;

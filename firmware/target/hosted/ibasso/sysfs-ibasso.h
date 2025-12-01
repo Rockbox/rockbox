@@ -25,9 +25,7 @@
 #ifndef _SYSFS_IBASSO_H_
 #define _SYSFS_IBASSO_H_
 
-
-#include <stdbool.h>
-
+#include "sysfs.h"
 
 /*
     Sys FS path identifiers.
@@ -65,48 +63,6 @@ enum sys_fs_interface_id
     SYSFS_POWER_WAKE_LOCK
 };
 
-
-/*
-    Read a integer value from the sys fs interface given by id.
-    Returns true on success, false else.
-*/
-bool sysfs_get_int(enum sys_fs_interface_id id, int* value);
-
-
-/*
-    Write a integer value to the sys fs interface given by id.
-    Returns true on success, false else.
-*/
-bool sysfs_set_int(enum sys_fs_interface_id id, int value);
-
-
-/*
-    Read a char value from the sys fs interface given by id.
-    Returns true on success, false else.
-*/
-bool sysfs_get_char(enum sys_fs_interface_id id, char* value);
-
-
-/*
-    Write a char value to the sys fs interface given by id.
-    Returns true on success, false else.
-*/
-bool sysfs_set_char(enum sys_fs_interface_id id, char value);
-
-/*
-    Read a single line of text from the sys fs interface given by id.
-    A newline will be discarded.
-    size: The size of value.
-    Returns true on success, false else.
-*/
-bool sysfs_get_string(enum sys_fs_interface_id id, char* value, int size);
-
-
-/*
-    Write text to the sys fs interface given by id.
-    Returns true on success, false else.
-*/
-bool sysfs_set_string(enum sys_fs_interface_id id, char* value);
-
+extern const char* const sysfs_paths[];
 
 #endif

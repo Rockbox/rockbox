@@ -48,7 +48,7 @@ bool backlight_hw_init(void)
         /sys/devices/platform/rk29_backlight/backlight/rk28_bl/bl_power
         0: backlight on
     */
-    if(! sysfs_set_int(SYSFS_BACKLIGHT_POWER, 0))
+    if(! sysfs_set_int(sysfs_paths[SYSFS_BACKLIGHT_POWER], 0))
     {
         DEBUGF("ERROR %s: Can not enable backlight.", __func__);
         panicf("ERROR %s: Can not enable backlight.", __func__);
@@ -79,7 +79,7 @@ void backlight_hw_off(void)
         /sys/devices/platform/rk29_backlight/backlight/rk28_bl/bl_power
         1: backlight off
     */
-    if(! sysfs_set_int(SYSFS_BACKLIGHT_POWER, 1))
+    if(! sysfs_set_int(sysfs_paths[SYSFS_BACKLIGHT_POWER], 1))
     {
         DEBUGF("ERROR %s: Can not disable backlight.", __func__);
         return;
@@ -124,7 +124,7 @@ void backlight_hw_brightness(int brightness)
         /sys/devices/platform/rk29_backlight/backlight/rk28_bl/max_brightness
         0 ... 255
     */
-    if(! sysfs_set_int(SYSFS_BACKLIGHT_BRIGHTNESS, _current_brightness))
+    if(! sysfs_set_int(sysfs_paths[SYSFS_BACKLIGHT_BRIGHTNESS], _current_brightness))
     {
         DEBUGF("ERROR %s: Can not set brightness.", __func__);
         return;

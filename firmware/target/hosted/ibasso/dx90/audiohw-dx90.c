@@ -56,7 +56,7 @@ void audiohw_set_volume(int volume)
         /sys/class/codec/es9018_volume
         0 ... 255
     */
-    if(! sysfs_set_int(SYSFS_DX90_ES9018_VOLUME, volume_adjusted))
+    if(! sysfs_set_int(sysfs_paths[SYSFS_DX90_ES9018_VOLUME], volume_adjusted))
     {
         DEBUGF("ERROR %s: Can not set volume.", __func__);
     }

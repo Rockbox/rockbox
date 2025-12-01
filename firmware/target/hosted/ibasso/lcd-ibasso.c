@@ -168,7 +168,7 @@ void lcd_enable(bool on)
             /sys/power/state
             on: Cancel suspend.
         */
-        if(! sysfs_set_string(SYSFS_POWER_STATE, "on"))
+        if(! sysfs_set_string(sysfs_paths[SYSFS_POWER_STATE], "on"))
         {
             DEBUGF("ERROR %s: Can not set power state.", __func__);
         }
@@ -192,7 +192,7 @@ void lcd_sleep(void)
         /sys/power/state
         mem: Suspend to RAM.
     */
-    if(! sysfs_set_string(SYSFS_POWER_STATE, "mem"))
+    if(! sysfs_set_string(sysfs_paths[SYSFS_POWER_STATE], "mem"))
     {
         DEBUGF("ERROR %s: Can not set power state.", __func__);
     }

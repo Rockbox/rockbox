@@ -61,7 +61,7 @@ void audiohw_set_volume(int volume)
         /dev/codec_volume
         0 ... 255
     */
-    if(! sysfs_set_int(SYSFS_DX50_CODEC_VOLUME, volume_adjusted))
+    if(! sysfs_set_int(sysfs_paths[SYSFS_DX50_CODEC_VOLUME], volume_adjusted))
     {
         DEBUGF("ERROR %s: Can not set volume.", __func__);
     }
@@ -72,7 +72,7 @@ void audiohw_set_filter_roll_off(int val)
 {
     DEBUGF("DEBUG %s: val: %d", __func__, val);
 
-    if(! sysfs_set_char(SYSFS_ES9018_FILTER, (char) val))
+    if(! sysfs_set_char(sysfs_paths[SYSFS_ES9018_FILTER], (char) val))
     {
         DEBUGF("ERROR %s: Can not set roll off filter.", __func__);
     }

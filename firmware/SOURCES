@@ -2063,6 +2063,7 @@ target/hosted/ibasso/pcm-ibasso.c
 target/hosted/ibasso/power-ibasso.c
 target/hosted/ibasso/powermgmt-ibasso.c
 target/hosted/ibasso/sysfs-ibasso.c
+target/hosted/sysfs.c
 target/hosted/ibasso/system-ibasso.c
 target/hosted/ibasso/usb-ibasso.c
 target/hosted/ibasso/vold-ibasso.c

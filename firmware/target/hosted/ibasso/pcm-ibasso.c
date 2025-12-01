@@ -349,7 +349,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
         DX90?
     */
-    if(! sysfs_set_char(SYSFS_MUTE, 'B'))
+    if(! sysfs_set_char(sysfs_paths[SYSFS_MUTE], 'B'))
     {
         DEBUGF("ERROR %s: Could not unmute.", __func__);
         panicf("ERROR %s: Could not unmute.", __func__);

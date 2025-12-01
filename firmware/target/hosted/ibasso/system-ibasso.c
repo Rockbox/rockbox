@@ -57,7 +57,7 @@ void system_init(void)
         Prevent device from deep sleeping, which will interrupt playback.
         /sys/power/wake_lock
     */
-    if(! sysfs_set_string(SYSFS_POWER_WAKE_LOCK, "rockbox"))
+    if(! sysfs_set_string(sysfs_paths[SYSFS_POWER_WAKE_LOCK], "rockbox"))
     {
         DEBUGF("ERROR %s: Can not set suspend blocker.", __func__);
     }
@@ -66,7 +66,7 @@ void system_init(void)
         Prevent device to mute, which will cause tinyalsa pcm_writes to fail.
         /sys/class/codec/wm8740_mute
     */
-    if(! sysfs_set_char(SYSFS_WM8740_MUTE, 0))
+    if(! sysfs_set_char(sysfs_paths[SYSFS_WM8740_MUTE], 0))
     {
         DEBUGF("ERROR %s: Can not set WM8740 lock.", __func__);
     }
