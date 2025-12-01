@@ -70,6 +70,10 @@
 #define BATTERY_CAPACITY_MAX 1050 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
 
+/* Voltage reported in millivolts */
+#define BATTERY_VOLTAGE_SCALE_MUL 1
+#define BATTERY_VOLTAGE_SCALE_DIV 1
+
 /* Define this for LCD backlight available */
 #define BACKLIGHT_RG_NANO
 #define HAVE_BACKLIGHT

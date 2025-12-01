@@ -26,7 +26,6 @@
 #include "usb.h"
 #include "sysfs.h"
 #include "power.h"
-#include "power-fiio.h"
 
 #ifdef HAVE_MULTIDRIVE
 void cleanup_rbhome(void);

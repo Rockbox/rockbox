@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "powermgmt.h"
 #include "power.h"
-#include "power-rgnano.h"
 
 /* System handles powering off at 2% */
 unsigned short battery_level_disksafe = 0;
@@ -39,18 +38,3 @@ unsigned short percent_to_volt_charge[11] =
 {
     3512, 3729, 3795, 3831, 3865, 3906, 3953, 4010, 4072, 4150, 4186
 };
-
-int _battery_voltage(void)
-{
-    return rgnano_power_get_battery_voltage();
-}
-
-int _battery_current(void)
-{
-    return rgnano_power_get_battery_current();
-}
-
-int _battery_level(void)
-{
-    return rgnano_power_get_battery_capacity();
-}

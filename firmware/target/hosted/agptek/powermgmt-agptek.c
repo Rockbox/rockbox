@@ -19,7 +19,6 @@
  ****************************************************************************/
 #include "powermgmt.h"
 #include "power.h"
-#include "power-agptek.h"
 
 unsigned short battery_level_disksafe = 3470;
 
@@ -37,8 +36,3 @@ unsigned short percent_to_volt_charge[11] =
 {
       3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
-
-int _battery_voltage(void)
-{
-    return agptek_power_get_battery_voltage();
-}

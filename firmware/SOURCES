@@ -153,21 +153,18 @@ target/hosted/power-linux.c
 #if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
-target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
 #endif
 
 #if defined(SURFANS_F28) && !defined(SIMULATOR)
 target/hosted/surfans/button-f28.c
 target/hosted/surfans/debug-f28.c
-target/hosted/surfans/power-f28.c
 target/hosted/surfans/powermgmt-f28.c
 #endif
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
 target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
-target/hosted/xduoo/power-xduoo.c
 target/hosted/xduoo/powermgmt-xduoo.c
 #endif
 
@@ -180,7 +177,6 @@ target/hosted/button-devinput.c
 target/hosted/fiio/buttonlight-fiio.c
 target/hosted/fiio/button-fiio.c
 target/hosted/fiio/debug-fiio.c
-target/hosted/fiio/power-fiio.c
 target/hosted/fiio/powermgmt-fiio.c
 target/hosted/fiio/system-fiio.c
 target/hosted/fiio/usb-fiio.c
@@ -233,7 +229,6 @@ target/hosted/sysfs.c
 target/hosted/power-linux.c
 target/hosted/backlight-unix.c
 target/hosted/anbernic/instant_play.c
-target/hosted/anbernic/power-rgnano.c
 target/hosted/anbernic/button-rgnano.c
 target/hosted/anbernic/powermgmt-rgnano.c
 #endif /* RG_NANO */

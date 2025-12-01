@@ -125,6 +125,14 @@
 #define BATTERY_CAPACITY_MAX 1100 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
 
+/* Voltage reported in millivolts */
+#define BATTERY_VOLTAGE_SCALE_MUL 1
+#define BATTERY_VOLTAGE_SCALE_DIV 1
+
+/* Capacity reported as a value 0-5, 20% increments */
+#define BATTERY_LEVEL_SCALE_MUL 20
+#define BATTERY_LEVEL_SCALE_DIV 1
+
 /* ROLO */
 #define BOOTFILE_EXT "m3k"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
