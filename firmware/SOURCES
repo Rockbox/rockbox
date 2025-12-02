@@ -240,11 +240,6 @@ target/hosted/samsungypr/ypr1/pmu-ypr1.c
 target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
 #endif
 
-/* Maemo specific files */
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-target/hosted/maemo/maemo-thread.c
-#endif
-
 #if defined(RG_NANO) && !defined(SIMULATOR)
 target/hosted/sysfs.c
 target/hosted/power-linux.c
@@ -572,15 +567,12 @@ drivers/audio/es9218.c
 #else /* PLATFORM_HOSTED */
 #if defined(HAVE_SDL_AUDIO) || defined(SIMULATOR)
 drivers/audio/sdl.c
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
-target/hosted/maemo/pcm-gstreamer.c
-#else
 target/hosted/sdl/pcm-sdl.c
-#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 #elif defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
 drivers/audio/as3514.c
 #elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
 drivers/audio/wm8978.c
+gets)
 #elif defined(CTRU)
 drivers/audio/ctru.c
 #endif

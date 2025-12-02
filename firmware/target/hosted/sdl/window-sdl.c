@@ -212,8 +212,8 @@ void sdl_window_setup(void)
     int depth = LCD_DEPTH < 8 ? 16 : LCD_DEPTH;
     Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI;
 
-#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
-    /* Fullscreen mode for maemo app */
+#if 0
+    /* Fullscreen mode might be desired */
     flags |= SDL_WINDOW_FULLSCREEN;
 #else
     if (display_zoom == 1)

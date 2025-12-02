@@ -44,12 +44,6 @@
 #include "panic.h"
 #include "debug.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-#include <glib.h>
-#include <glib-object.h>
-#include "maemo-thread.h"
-#endif
-
 #if defined(RG_NANO) && !defined(SIMULATOR)
 #include <signal.h>
 #include "instant_play.h"
@@ -116,14 +110,6 @@ static int sdl_event_thread(void * param)
 #endif /* !HAVE_TOUCHSCREEN */
 #endif /* !SIMULATOR */
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    /* start maemo thread: Listen to display on/off events and battery monitoring */
-    SDL_sem *wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
-    SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, NULL, wait_for_maemo_startup);
-    SDL_SemWait(wait_for_maemo_startup);
-    SDL_DestroySemaphore(wait_for_maemo_startup);
-#endif
-
 #if SDL_MAJOR_VERSION == 1
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
@@ -150,19 +136,6 @@ static int sdl_event_thread(void * param)
 
     /* finally enter the button loop */
     gui_message_loop();
-
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
-    pcm_shutdown_gstreamer();
-#endif
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    g_main_loop_quit (maemo_main_loop);
-    g_main_loop_unref(maemo_main_loop);
-    SDL_WaitThread(maemo_thread, NULL);
-#endif
-
-#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
-    SDL_FreeCursor(hiddenCursor);
-#endif
 
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
@@ -245,12 +218,6 @@ void system_init(void)
     SDL_sem *s;
     /* fake stack, OS manages size (and growth) */
     stackbegin = stackend = (uintptr_t*)&s;
-
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    /* Make glib thread safe */
-    g_thread_init(NULL);
-    g_type_init();
-#endif
 
 #if defined(RG_NANO) && !defined(SIMULATOR)
     /* Set system volume to max with amixer */

@@ -141,7 +141,7 @@
 #endif
 #endif
 
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
+#if (CONFIG_PLATFORM & PLATFORM_SDL)
 #ifdef SIMULATOR
 #include "sim_tasks.h"
 #endif
@@ -151,7 +151,7 @@
 #if defined(WIN32)
 #undef main
 #endif
-#endif /* SDL|MAEMO|PAMDORA */
+#endif /* SDL */
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 

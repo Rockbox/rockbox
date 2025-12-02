@@ -165,9 +165,6 @@ else # core
     endif
   endif
 
-  ifneq (,$(findstring pandora, $(MODELNAME)))
-	include $(ROOTDIR)/packaging/pandora/pandora.make
-  endif
   ifneq (,$(findstring rgnano, $(MODELNAME)))
 	include $(ROOTDIR)/packaging/rgnano/rgnano.make
   endif
@@ -461,7 +458,6 @@ help:
 	@echo "font7zip       - creates rockbox-fonts.7zip"
 	@echo "mapzip         - creates rockbox-maps.zip with all .map files"
 	@echo "elfzip         - creates rockbox-elfs.zip with all .elf files"
-	@echo "pnd            - creates rockbox.pnd archive (Pandora builds only)"
 	@echo "tools          - builds the tools only"
 	@echo "voice          - creates the voice clips (voice builds only)"
 	@echo "voicetools     - builds the voice tools only"

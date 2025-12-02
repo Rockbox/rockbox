@@ -55,7 +55,7 @@
 #if defined(HAVE_MULTIDRIVE) || defined(HAVE_SPECIAL_DIRS)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
-#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) \
+#elif (CONFIG_PLATFORM & PLATFORM_SDL) \
         && !defined(__PCTOOL__)
 static const char *rbhome;
 #elif defined(PIVOT_ROOT)

@@ -81,10 +81,6 @@ SDL_Cursor *sdl_arrow_cursor = NULL;
 
 int sdl_app_has_input_focus = 1;
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-static int n900_updown_key_pressed = 0;
-#endif
-
 #ifdef HAS_BUTTON_HOLD
 bool hold_button_state = false;
 bool button_hold(void) {
@@ -288,28 +284,6 @@ static bool event_handler(SDL_Event *event)
     case SDL_KEYDOWN:
     case SDL_KEYUP:
         ev_key = event->key.keysym.sym;
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
-        /* N900 with shared up/down cursor mapping. Seen on the German,
-           Finnish, Italian, French and Russian version. Probably more. */
-        if (event->key.keysym.mod & KMOD_MODE || n900_updown_key_pressed)
-        {
-            /* Prevent stuck up/down keys: If you release the ALT key before the cursor key,
-               rockbox will see a KEYUP event for left/right instead of up/down and
-               the previously pressed up/down key would stay active. */
-            if (ev_key == SDLK_LEFT || ev_key == SDLK_RIGHT)
-            {
-                if (event->type == SDL_KEYDOWN)
-                    n900_updown_key_pressed = 1;
-                else
-                    n900_updown_key_pressed = 0;
-            }
-
-            if (ev_key == SDLK_LEFT)
-                ev_key = SDLK_UP;
-            else if (ev_key == SDLK_RIGHT)
-                ev_key = SDLK_DOWN;
-        }
-#endif
         button_event(ev_key, event->type == SDL_KEYDOWN);
         break;
 
@@ -463,9 +437,6 @@ static void show_sim_help(void)
 #ifdef HAVE_HOTSWAP
     HELPTXT(EXT_KEY, "toggle external drive");
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
-    HELPTXT(SDLK_LCTRL, "shutdown");
-#endif
 #ifdef HAS_BUTTON_HOLD
     HELPTXT(SDLK_h, "toggle hold button");
 #endif
@@ -585,12 +556,6 @@ static void button_event(int key, bool pressed)
             sim_trigger_external(!storage_present(1));
         return;
 #endif
-#endif
-#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
-    case SDLK_LCTRL:
-        /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
-        sys_poweroff();
-        break;
 #endif
 #ifdef RG_NANO
     case SDLK_q:

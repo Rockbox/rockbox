@@ -95,11 +95,7 @@
 #define PLATFORM_HOSTED  (1<<1)
 #define PLATFORM_ANDROID (1<<2)
 #define PLATFORM_SDL     (1<<3)
-#define PLATFORM_MAEMO4  (1<<4)
-#define PLATFORM_MAEMO5  (1<<5)
-#define PLATFORM_MAEMO   (PLATFORM_MAEMO4|PLATFORM_MAEMO5)
-#define PLATFORM_PANDORA (1<<6)
-#define PLATFORM_CTRU    (1<<7)
+#define PLATFORM_CTRU    (1<<4)
 
 /* CONFIG_KEYPAD */
 #define IRIVER_H100_PAD     4
@@ -538,12 +534,6 @@ Lyre prototype 1 */
 #include "config/sdlapp.h"
 #elif defined(ANDROID)
 #include "config/android.h"
-#elif defined(NOKIAN8XX)
-#include "config/nokian8xx.h"
-#elif defined(NOKIAN900)
-#include "config/nokian900.h"
-#elif defined(PANDORA)
-#include "config/pandora.h"
 #elif defined(SAMSUNG_YPR0)
 #include "config/samsungypr0.h"
 #elif defined(CREATIVE_ZENXFI)
@@ -1427,7 +1417,6 @@ Lyre prototype 1 */
 #endif
 
 #if defined(HAVE_SDL_AUDIO) \
-    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5) \
     && !defined(HAVE_SW_VOLUME_CONTROL)
 /* SW volume is needed for accurate control and no double buffering should be
  * required. If target uses SW volume, then its definitions are used instead

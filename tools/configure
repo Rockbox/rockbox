@@ -634,132 +634,6 @@ mipsr2elcc () {
  gccchoice="9.5.0"
 }
 
-maemocc () {
- # Scratchbox sets up "gcc" based on the active target
- prefixtools ""
-
- GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
- GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
- GCCOPTIMIZE=''
- LDOPTS="-lm -ldl $LDOPTS"
- GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_LDFLAGS="-shared"
- SHARED_CFLAGS=''
- endian="little"
- thread_support="HAVE_SIGALTSTACK_THREADS"
-
- is_n900=0
- # Determine maemo version
- if pkg-config --atleast-version=5 maemo-version; then
-    if [ "$1" == "4" ]; then
-        echo "ERROR: Maemo 4 SDK required."
-        exit 1
-    fi
-    extradefines="$extradefines -DMAEMO5"
-    echo "Found N900 maemo version"
-    is_n900=1
- elif pkg-config --atleast-version=4 maemo-version; then
-    if [ "$1" == "5" ]; then
-        echo "ERROR: Maemo 5 SDK required."
-        exit 1
-    fi
-    extradefines="$extradefines -DMAEMO4"
-    echo "Found N8xx maemo version"
- else
-    echo "Unable to determine maemo version. Is the maemo-version-dev package installed?"
-    exit 1
- fi
-
- # SDL
- if [ $is_n900 -eq 1 ]; then
-    GCCOPTS="$GCCOPTS `pkg-config --cflags sdl`"
-    LDOPTS="$LDOPTS `pkg-config --libs sdl`"
- else
-    GCCOPTS="$GCCOPTS `${sdl_config} --cflags`"
-    LDOPTS="$LDOPTS `${sdl_config} --libs`"
- fi
-
- # glib and libosso support
- GCCOPTS="$GCCOPTS `pkg-config --cflags libosso glib-2.0 gthread-2.0`"
- LDOPTS="$LDOPTS `pkg-config --libs libosso glib-2.0 gthread-2.0`"
-
- # libhal support: Battery monitoring
- GCCOPTS="$GCCOPTS `pkg-config --cflags hal`"
- LDOPTS="$LDOPTS `pkg-config --libs hal`"
-
- GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
- if [ $is_n900 -eq 1 ]; then
-    # gstreamer support: Audio output.
-    GCCOPTS="$GCCOPTS `pkg-config --cflags gstreamer-base-0.10 gstreamer-plugins-base-0.10 gstreamer-app-0.10`"
-    LDOPTS="$LDOPTS `pkg-config --libs gstreamer-base-0.10 gstreamer-plugins-base-0.10 gstreamer-app-0.10`"
-
-    # N900 specific: libplayback support
-    GCCOPTS="$GCCOPTS `pkg-config --cflags libplayback-1`"
-    LDOPTS="$LDOPTS `pkg-config --libs libplayback-1`"
-
-    # N900 specific: Enable ARMv7 NEON support
-    if sb-conf show -A |grep -q -i arm; then
-        echo "Detected ARM target"
-        GCCOPTS="$GCCOPTS -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
-        extradefines="$extradefines -DMAEMO_ARM_BUILD"
-    else
-        echo "Detected x86 target"
-    fi
- else
-    # N8xx specific: Enable armv5te instructions
-    if sb-conf show -A |grep -q -i arm; then
-        echo "Detected ARM target"
-        GCCOPTS="$GCCOPTS -mcpu=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp"
-        extradefines="$extradefines -DMAEMO_ARM_BUILD"
-    else
-        echo "Detected x86 target"
-    fi
- fi
-}
-
-pandoracc () {
- # Note: The new "Ivanovic" pandora toolchain is not able to compile rockbox.
- #       You have to use the sebt3 toolchain:
- #       http://www.gp32x.com/board/index.php?/topic/58490-yactfeau/
-
- PNDSDK="/usr/local/angstrom/arm"
- if [ ! -x $PNDSDK/bin/arm-angstrom-linux-gnueabi-gcc ]; then
-     echo "Pandora SDK gcc not found in $PNDSDK/bin/arm-angstrom-linux-gnueabi-gcc"
-     exit
- fi
-
- PATH=$PNDSDK/bin:$PATH:$PNDSDK/arm-angstrom-linux-gnueabi/usr/bin
- PKG_CONFIG_PATH=$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib/pkgconfig
- LDOPTS="-L$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib -Wl,-rpath,$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib $LDOPTS"
- PKG_CONFIG="pkg-config"
-
- GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
- GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
- GCCOPTIMIZE=''
- LDOPTS="-lm -ldl $LDOPTS"
- GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_LDFLAGS="-shared"
- SHARED_CFLAGS=''
- endian="little"
- thread_support="HAVE_SIGALTSTACK_THREADS"
-
- # Include path
- GCCOPTS="$GCCOPTS -I$PNDSDK/arm-angstrom-linux-gnueabi/usr/include"
-
- # Set up compiler
- gccchoice="4.3.3"
- prefixtools "$PNDSDK/bin/arm-angstrom-linux-gnueabi-"
-
- # Detect SDL
- GCCOPTS="$GCCOPTS `$PNDSDK/bin/${sdl_config} --cflags`"
- LDOPTS="$LDOPTS `$PNDSDK/bin/${sdl_config} --libs`"
-
- # Compiler options
- GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
- GCCOPTS="$GCCOPTS -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
- GCCOPTS="$GCCOPTS -ffast-math -fsingle-precision-constant"
-}
-
 arm1176jzlinuxcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
  # Although the ARM1176JZ-S supports unaligned accesses, those seems to disabled
@@ -1848,10 +1722,10 @@ cat <<EOF
  ==Sony==                  201) Android (ARM)
  219) NWZ-E350 series      202) Android (MIPS)   ==IHIFI==
  220) NWZ-E370/E380 series 203) Android (x86)    230) 760
- 221) NWZ-E360 series      204) Pandora          231) 770
- 222) NWZ-E450 series      205) Nokia N8xx       232) 770C
- 223) NWZ-E460 series      206) Nokia N900       233) 800
- 224) NWZ-E470 series      209) Anbernic RG Nano 234) 960
+ 221) NWZ-E360 series      209) Anbernic RG Nano 231) 770
+ 222) NWZ-E450 series                            232) 770C
+ 223) NWZ-E460 series                            233) 800
+ 224) NWZ-E470 series                            234) 960
  225) NWZ-E580 series
  226) NWZ-A10 series       ==AgpTek==            ==AIGO==
  227) NW-A20 series        240) Rocker           245) Eros Q / K (hosted)
@@ -3562,84 +3436,6 @@ fi
     t_model="app"
     ;;
 
-   205|nokian8xx)
-    application="yes"
-    target_id=75
-    modelname="nokian8xx"
-    app_type="sdl-app"
-    target="NOKIAN8XX"
-    sharedir="/opt/rockbox/share/rockbox"
-    bindir="/opt/rockbox/bin"
-    libdir="/opt/rockbox/lib"
-    memory=8
-    uname=`uname`
-    maemocc 4
-    tool="cp "
-    boottool="cp "
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox"
-    bootoutput="rockbox"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="hosted"
-    t_manufacturer="maemo"
-    t_model="app"
-    ;;
-
-   206|nokian900)
-    application="yes"
-    target_id=76
-    modelname="nokian900"
-    app_type="sdl-app"
-    target="NOKIAN900"
-    sharedir="/opt/rockbox/share/rockbox"
-    bindir="/opt/rockbox/bin"
-    libdir="/opt/rockbox/lib"
-    memory=8
-    uname=`uname`
-    maemocc 5
-    tool="cp "
-    boottool="cp "
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox"
-    bootoutput="rockbox"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="hosted"
-    t_manufacturer="maemo"
-    t_model="app"
-    ;;
-
-   204|pandora)
-    application="yes"
-    target_id=77
-    modelname="pandora"
-    app_type="sdl-app"
-    target="PANDORA"
-    sharedir="rockbox/share/rockbox"
-    bindir="rockbox/bin"
-    libdir="rockbox/lib"
-    memory=8
-    uname=`uname`
-    pandoracc
-    tool="cp "
-    boottool="cp "
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox"
-    bootoutput="rockbox"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="hosted"
-    t_manufacturer="pandora"
-    t_model="app"
-    ;;
-
    144|samsungypr0)
     application="yes"
     target_id=78
@@ -5123,15 +4919,7 @@ fi
 if test -n "$t_cpu"; then
   TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
 
-  if [ "$application" = "yes" ] && [ "$t_manufacturer" = "maemo" ]; then
-    # Maemo needs the SDL port, too
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
-  elif [ "$application" = "yes" ] && [ "$t_manufacturer" = "pandora" ]; then
-    # Pandora needs the SDL port, too
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
-  elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
+  if [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
   elif [ "$application" = "yes" ] && [ "$t_manufacturer" = "ctru" ]; then
