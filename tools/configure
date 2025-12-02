@@ -4423,7 +4423,7 @@ fi
     extradefines="$extradefines -DEROSQN_VER=4"
     ;;
 
-   250|ihifi770c)
+   232|ihifi770c)
     target_id=107
     modelname="ihifi770c"
     target="IHIFI770C"
@@ -4445,7 +4445,7 @@ fi
     t_model="ihifi2"
     ;;
 
-   232|ihifi770)
+   231|ihifi770)
     target_id=108
     modelname="ihifi770"
     target="IHIFI770"
