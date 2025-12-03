@@ -21,6 +21,8 @@
 #ifndef __ANDROID_CODEC_H
 #define __ANDROID_CODEC_H
 
+#define AUDIOHW_HAVE_MONO_VOLUME
+
 /* Bass and treble tone controls */
 #ifdef AUDIOHW_HAVE_BASS
 AUDIOHW_SETTING(BASS,        "dB",   0,  1, -24,  24,   0)

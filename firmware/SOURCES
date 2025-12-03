@@ -165,7 +165,7 @@ target/hosted/agptek/rocker_codec.c
 target/hosted/surfans/button-f28.c
 target/hosted/surfans/debug-f28.c
 target/hosted/surfans/powermgmt-f28.c
-target/hosted/surfanslinux_codec.c
+target/hosted/surfans/surfanslinux_codec.c
 #endif
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
@@ -180,7 +180,7 @@ target/hosted/usb-hiby.c
 target/hosted/button-devinput.c
 #endif
 
-#if (defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR)
+#if defined(FIIO_M3K_LINUX) && !defined(SIMULATOR)
 target/hosted/fiio/buttonlight-fiio.c
 target/hosted/fiio/button-fiio.c
 target/hosted/fiio/debug-fiio.c
@@ -558,17 +558,17 @@ drivers/audio/es9018.c
 drivers/audio/es9218.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
-#if defined(HAVE_AS3514)
-drivers/audio/as3514.c
-#elif defined(HAVE_WM8978)
-drivers/audio/wm8978.c
-#elif defined(HAVE_SDL_AUDIO)
+#if defined(HAVE_SDL_AUDIO) || defined(SIMULATOR)
 drivers/audio/sdl.c
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 target/hosted/maemo/pcm-gstreamer.c
 #else
 target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
+#elif defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
+drivers/audio/as3514.c
+#elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
+drivers/audio/wm8978.c
 #elif defined(CTRU)
 drivers/audio/ctru.c
 #endif

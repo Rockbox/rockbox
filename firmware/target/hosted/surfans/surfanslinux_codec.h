@@ -3,7 +3,6 @@
 
 #define AUDIOHW_CAPS (FILTER_ROLL_OFF_CAP)
 AUDIOHW_SETTING(VOLUME, "dB", 1, 5, -102*10,  0, -30*10)
-#endif
 
 //#define AUDIOHW_MUTE_ON_STOP
 #define AUDIOHW_MUTE_ON_SRATE_CHANGE
@@ -15,3 +14,5 @@ AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 void audiohw_mute(int mute);
 void surfans_set_output(int ps);
 int surfans_get_outputs(void);
+
+#endif /* __SURFANSLINUX__CODEC__ */
