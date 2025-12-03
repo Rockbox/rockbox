@@ -133,7 +133,9 @@ target/hosted/sonynwz/audio-nwz.c
 target/hosted/sonynwz/debug-nwz.c
 target/hosted/sonynwz/nvp-nwz.c
 target/hosted/sonynwz/nwz-db.c
+#if !defined(BOOTLOADER)
 target/hosted/sonynwz/nwzlinux-codec.c
+#endif
 #endif
 
 #if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(SONY_NWZ_LINUX)) && !defined(SIMULATOR))
@@ -158,21 +160,27 @@ target/hosted/power-linux.c
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
+#if !defined(BOOTLOADER)
 target/hosted/agptek/rocker_codec.c
+#endif
 #endif
 
 #if defined(SURFANS_F28) && !defined(SIMULATOR)
 target/hosted/surfans/button-f28.c
 target/hosted/surfans/debug-f28.c
 target/hosted/surfans/powermgmt-f28.c
+#if !defined(BOOTLOADER)
 target/hosted/surfans/surfanslinux_codec.c
+#endif
 #endif
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
 target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
 target/hosted/xduoo/powermgmt-xduoo.c
+#if !defined(BOOTLOADER)
 target/hosted/xduoo/xduoolinux_codec.c
+#endif
 #endif
 
 #if defined(HIBY_LINUX) && !defined(SIMULATOR)
@@ -187,15 +195,19 @@ target/hosted/fiio/debug-fiio.c
 target/hosted/fiio/powermgmt-fiio.c
 target/hosted/fiio/system-fiio.c
 target/hosted/fiio/usb-fiio.c
+#if !defined(BOOTLOADER)
 target/hosted/fiio/fiiolinux_codec.c
 #endif
+#endif
 
-#if (defined(EROS_Q)) && !defined(SIMULATOR)
+#if defined(EROS_Q) && !defined(SIMULATOR)
 target/hosted/aigo/button-erosq.c
 target/hosted/aigo/debug-erosq.c
 target/hosted/aigo/power-erosq.c
 target/hosted/aigo/powermgmt-erosq.c
+#if !defined(BOOTLOADER)
 target/hosted/aigo/erosqlinux_codec.c
+#endif
 #endif
 
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
