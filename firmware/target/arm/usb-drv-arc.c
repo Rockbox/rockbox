@@ -974,8 +974,8 @@ static void init_control_queue_heads(void)
     memset(qh_array, 0, sizeof qh_array);
 
     /*** control ***/
-    qh_array[EP_CONTROL].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS | QH_IOS;
+    qh_array[EP_CONTROL].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS | QH_IOS | QH_ZLT_SEL;
     qh_array[EP_CONTROL].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-    qh_array[EP_CONTROL+1].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS;
+    qh_array[EP_CONTROL+1].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
     qh_array[EP_CONTROL+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
 }
