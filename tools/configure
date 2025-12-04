@@ -4939,19 +4939,6 @@ if [ -z "$arch" ]; then
 	    GCCOPTS="$GCCOPTS -masm-syntax-unified"
 	fi
         case "$arch_profile" in
-            65)
-                arch_profile=application
-
-                # Disable generation of Thumb code, since some codecs use
-                # instructions that can only be assembled to ARM code
-                GCCOPTS="$GCCOPTS -marm"
-
-                # Make sure Thumb does not get enabled by the command-line option
-                if [ "$ARG_ARM_THUMB" = "1" ]; then
-                    echo "Warning: --thumb option has no effect on ARM A profile cores"
-                    ARG_ARM_THUMB=0
-                fi
-                ;;
             77)
                 arch_profile=micro
 
@@ -5074,7 +5061,6 @@ cat > autoconf.h.new <<EOF
 
 #define ARM_PROFILE_CLASSIC     0       /* Classic ARM cores (<= ARMv6) */
 #define ARM_PROFILE_MICRO       1       /* ARMv6/ARMv7+ M-profile cores */
-#define ARM_PROFILE_APPLICATION 2
 
 /* Define target machine architecture */
 ${Darch}
