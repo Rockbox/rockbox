@@ -572,7 +572,6 @@ target/hosted/sdl/pcm-sdl.c
 drivers/audio/as3514.c
 #elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
 drivers/audio/wm8978.c
-gets)
 #elif defined(CTRU)
 drivers/audio/ctru.c
 #endif
