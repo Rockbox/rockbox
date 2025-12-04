@@ -4735,7 +4735,10 @@ if [ -z "$arch" ]; then
 	    GCCOPTS="$GCCOPTS -masm-syntax-unified"
 	fi
         case "$arch_profile" in
-            77)
+            65) # Cortex-A
+                arch_profile=application
+                ;;
+            77) # Cortex-M
                 arch_profile=micro
 
                 # We have a lot of assembly written for ARM32, which won't
@@ -4857,6 +4860,7 @@ cat > autoconf.h.new <<EOF
 
 #define ARM_PROFILE_CLASSIC     0       /* Classic ARM cores (<= ARMv6) */
 #define ARM_PROFILE_MICRO       1       /* ARMv6/ARMv7+ M-profile cores */
+#define ARM_PROFILE_APPLICATION 2       /* ARMv7+ A-profile cores       */
 
 /* Define target machine architecture */
 ${Darch}

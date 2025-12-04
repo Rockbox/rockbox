@@ -720,8 +720,13 @@ Lyre prototype 1 */
 #  endif
 # elif ARM_PROFILE == ARM_PROFILE_CLASSIC
 #  define CPU_ARM_CLASSIC
+# elif ARM_PROFILE == ARM_PROFILE_APPLICATION
+#  define CPU_ARM_APPLICATION
+#  if defined(__ARM_FEATURE_IDIV)   // Some v7-a, all v8-a
+#   define ARM_HAVE_HW_DIV
+#  endif
 # endif
-# if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+# if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(ARM_HAVE_HW_DIV)
 #  define ARM_NEED_DIV0
 # endif
 #endif
@@ -1100,7 +1105,7 @@ Lyre prototype 1 */
  * Older versions of GCC emit assembly in divided syntax with no option
  * to enable unified syntax.
  */
-#if (__GNUC__ < 8) && defined(CPU_ARM_CLASSIC) || defined(CTRU)
+#if (__GNUC__ < 8) && (defined(CPU_ARM_CLASSIC)||defined(CPU_ARM_APPLICATION))
 #define BEGIN_ARM_ASM_SYNTAX_UNIFIED ".syntax unified\n"
 #define END_ARM_ASM_SYNTAX_UNIFIED   ".syntax divided\n"
 #else
