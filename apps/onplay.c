@@ -892,6 +892,8 @@ static bool onplay_load_plugin(void *param)
         onplay_result = ONPLAY_PLUGIN;
     else if (ret == PLUGIN_GOTO_WPS)
         onplay_result = ONPLAY_START_PLAY;
+    else if (ret == PLUGIN_GOTO_ROOT)
+        onplay_result = ONPLAY_MAINMENU;
     return false;
 }
 

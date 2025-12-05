@@ -746,6 +746,9 @@ int ft_enter(struct tree_context* c)
                         else
                             rc = GO_TO_FILEBROWSER;
                         break;
+                    case PLUGIN_GOTO_ROOT:
+                        rc = GO_TO_ROOT;
+                        break;
                     /*
                     case PLUGIN_ERROR:
                     case PLUGIN_OK:

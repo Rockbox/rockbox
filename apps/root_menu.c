@@ -808,6 +808,10 @@ static int load_plugin_screen(char *key)
             }
             continue;
         }
+        else if (ret == PLUGIN_GOTO_ROOT)
+        {
+            ret_val = GO_TO_ROOT;
+        }
         else
         {
             ret_val = GO_TO_PREVIOUS;

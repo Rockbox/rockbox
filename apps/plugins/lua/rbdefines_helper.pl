@@ -50,7 +50,7 @@ if ($def_type eq "rb_defines") {
         '^SYS_(TIMEOUT|POWEROFF|BATTERY_UPDATE)$',
         '^SYS_USB_(DIS|)CONNECTED$',
         '^HOME_DIR$',
-        '^PLUGIN(_OK|_USB_CONNECTED|_POWEROFF|_GOTO_WPS|_GOTO_PLUGIN)$',
+        '^PLUGIN(_OK|_USB_CONNECTED|_POWEROFF|_GOTO_WPS|_GOTO_PLUGIN|_GOTO_ROOT|_ERROR)$',
         '^PLUGIN_DIR$',
         '^PLUGIN(_APPS_|_GAMES_|_)DATA_DIR$',
         '^ROCKBOX_DIR$',

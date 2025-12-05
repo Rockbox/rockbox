@@ -191,6 +191,7 @@ enum plugin_status {
     PLUGIN_POWEROFF,
     PLUGIN_GOTO_WPS,
     PLUGIN_GOTO_PLUGIN,
+    PLUGIN_GOTO_ROOT,
     PLUGIN_ERROR = -1,
 };
 
