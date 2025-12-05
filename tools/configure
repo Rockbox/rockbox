@@ -4760,11 +4760,30 @@ if [ -z "$arch" ]; then
                 ;;
             *)
                 # On classic ARM we expect an empty string, so only warn if it's nonempty
-                if [ -n "$arch_profile" ]; then
-                    echo "Warning: Cannot determine target ARM profile, assuming classic"
+                if [ -z "$arch_profile" ]; then
+                    arch_profile=classic
+		else
+                    echo "Error: Unsupported target ARM profile ($arch_profile)"
+                    exit 1
                 fi
-
-                arch_profile=classic
+                ;;
+        esac
+    elif [ -n "$(echo $cpp_defines | grep -w __aarch64__)" ]; then
+        arch="arm64"
+        # cpp defines like "#define __ARM_ARCH_8A__ 1" (where we want to extract the 8)
+        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,' | grep -v __ARM_ARCH | head -1)"
+        arch_profile="$(echo "$cpp_defines" | grep 'define __ARM_ARCH_PROFILE' | sed -e 's,.* \([0-9]\+\)$,\1,')"
+	if test "$gccnum" -ge "800"; then
+	    # GCC8+ can natively emit unified asm syntax
+	    GCCOPTS="$GCCOPTS -masm-syntax-unified"
+	fi
+        case "$arch_profile" in
+            65) # Cortex-A
+                arch_profile=application
+                ;;
+            *)
+                echo "Error: Unsupported target AARCH64 profile ($arch_profile)"
+                exit 1
                 ;;
         esac
     elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
@@ -4840,8 +4859,8 @@ cat > autoconf.h.new <<EOF
 #define arch_none 0
 #define ARCH_NONE 0
 
-#define arch_sh 1
-#define ARCH_SH 1
+#define arch_arm64 1
+#define ARCH_ARM64 1
 
 #define arch_m68k 2
 #define ARCH_M68K 2

@@ -711,21 +711,18 @@ Lyre prototype 1 */
 /* define for all cpus from ARM family */
 #if ARCH == ARCH_ARM
 #define CPU_ARM
-#define ARM_ARCH    ARCH_VERSION /* ARMv{4,5,6,7} */
-#define ARM_PROFILE ARCH_PROFILE /* Classic, Microcontroller */
+#define ARM_ARCH    ARCH_VERSION /* ARMv{4,5,6,7,8,9} */
+#define ARM_PROFILE ARCH_PROFILE /* Classic, Microcontroller, Application [,Realtime] */
 # if ARM_PROFILE == ARM_PROFILE_MICRO
 #  define CPU_ARM_MICRO
-#  if (ARM_ARCH >= 7)
-#   define ARM_HAVE_HW_DIV
-#  endif
 # elif ARM_PROFILE == ARM_PROFILE_CLASSIC
 #  define CPU_ARM_CLASSIC
 # elif ARM_PROFILE == ARM_PROFILE_APPLICATION
 #  define CPU_ARM_APPLICATION
-#  if defined(__ARM_FEATURE_IDIV)   // Some v7-a, all v8-a
-#   define ARM_HAVE_HW_DIV
-#  endif
 # endif
+#if defined(__ARM_FEATURE_IDIV)
+# define ARM_HAVE_HW_DIV
+#endif
 # if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(ARM_HAVE_HW_DIV)
 #  define ARM_NEED_DIV0
 # endif
