@@ -636,9 +636,11 @@ display cycling round the defined sublines. See
 \opt{touchscreen}{
   \section{Touchscreen Areas}
     \begin{tagmap}
-      \config{\%T(x,y,width,\tabnlindent{}height, action, [options])}
+      \config{\%T([label], x, y, width, height, action, [options])}
       & Invoke the action specified when the user presses in the defined
-      touchscreen area.\\
+      touchscreen area. If a label is given it can be used with \%Tl to detect
+      if this touch area is pressed (see below). The label must consist of
+      alphabetic characters (A-Z) or underscores and is case-sensitive.\\
     \end{tagmap}
 
   Possible actions are:
@@ -692,15 +694,22 @@ display cycling round the defined sublines. See
 
   \section{Last Touchscreen Press}
     \begin{tagmap}
-      \config{\%Tl} & Indicates that the touchscreen is pressed.\\
+      \config{\%Tl([delay])} & Indicates that the touchscreen is pressed.\\
+      \config{\%Tl(label,[delay])} & Indicates that the specified touch area is pressed.\\
     \end{tagmap}
   This tag can be used to display text or images or a viewport when the
-  touchscreen is pressed (like an On Screen Display). If you put a number
-  straight after \%Tl it will be used as a timeout in seconds
-  (e.g \%Tl(2.5) will give a 2.5 second timeout) between the touchscreen press
-  being released and the tag going false. If no number is specified it will
-  use a 1 second timeout.  It can also be used as a conditional, and can be
-  used with conditional viewports.
+  touchscreen is pressed (like an On Screen Display). The optional label
+  links the tag to trigger only when a specific touch area is pressed.
+  For example \%Tl(play\_button) will only trigger when the area labelled
+  play\_button is pressed. If the label is omitted, the tag will trigger
+  on any touchscreen press.
+
+  The delay is a number which sets the timeout for the tag going false
+  after the touchscreen is released, eg. \%Tl(2.5) will give a 2.5 second
+  timeout. If no delay is specified the default timeout is 1 second.
+
+  The \%Tl tag can be used as a conditional, and can be used with
+  conditional viewports.
 }
 
 \section{\label{ref:bar_tags}Bar Tags}
