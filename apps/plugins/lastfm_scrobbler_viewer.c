@@ -850,8 +850,8 @@ static void cleanup(void *parameter)
 
 static void menu_action_printcell(int *action, int selected_item, bool* exit, struct gui_synclist *lists)
 {
-    (void) exit;
     struct printcell_data_t *pc_data = (struct printcell_data_t*) lists->data;
+    static int last_action = ACTION_NONE;
     if (*action == ACTION_STD_OK)
     {
         if (selected_item < lists->nb_items)
@@ -859,6 +859,11 @@ static void menu_action_printcell(int *action, int selected_item, bool* exit, st
             pc_data->view_lastcol = printcell_increment_column(1, true);
             *action = ACTION_NONE;
         }
+    }
+    else if (*action == ACTION_STD_CANCEL && last_action == ACTION_STD_CANCEL)
+    {
+        /* allow user to hold cancel to quit */
+        *exit = true;
     }
     else if (*action == ACTION_STD_CANCEL)
     {
@@ -874,6 +879,7 @@ static void menu_action_printcell(int *action, int selected_item, bool* exit, st
         if (ctxret == QUIT_CONTEXT_MENU)
             *exit = true;
     }
+    last_action = *action;
 }
 
 int menu_action_cb(int *action, int selected_item, bool* exit, struct gui_synclist *lists)
