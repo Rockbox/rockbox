@@ -87,6 +87,7 @@ int my_close(int id);
 #define srand(a)           rb->srand((a))
 #define rand()             rb->rand()
 #define atoi(a)            rb->atoi((a))
+#define strtol(a,b,c)      rb->strtol((a),(b),(c))
 #define strcat(a,b)        rb->strcat((a),(b))
 #define snprintf           rb->snprintf
 

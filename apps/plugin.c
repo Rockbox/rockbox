@@ -571,6 +571,8 @@ static const struct plugin_api rockbox_api = {
     _ctype_,
 #endif
     atoi,
+    strtol,
+    strtoul,
     strchr,
     strcat,
     strlcat,

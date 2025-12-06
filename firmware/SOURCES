@@ -300,6 +300,8 @@ common/inflate.c
 /* Standard library */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
 libc/atoi.c
+libc/strtol.c
+libc/strtoul.c
 libc/errno.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* our ctype.[ch] comes from newlib and is incompitble with most desktop's ctype */

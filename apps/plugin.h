@@ -658,6 +658,8 @@ struct plugin_api {
     const unsigned char *_rbctype_;
 #endif
     int (*atoi)(const char *str);
+    long int (*strtol)(const char *ptr, char **endptr, int base);
+    unsigned long int (*strtoul)(const char *ptr, char **endptr, int base);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
     size_t (*strlcat)(char *dst, const char *src, size_t length);

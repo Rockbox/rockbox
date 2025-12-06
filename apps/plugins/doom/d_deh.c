@@ -2882,7 +2882,7 @@ boolean deh_GetData(char *s, char *k, uint_64_t *l, char **strval, int fpout)
          okrc = FALSE;
       }
       // we've incremented t
-      val = atoi(t);//strtol(t,NULL,0);  // killough 8/9/98: allow hex or octal input
+      val = strtol(t,NULL,0);  // killough 8/9/98: allow hex or octal input
    }
 
    // go put the results in the passed pointers

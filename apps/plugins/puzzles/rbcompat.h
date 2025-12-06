@@ -22,7 +22,6 @@ float floor_wrapper(float n);
 float atan_wrapper(float x);
 float atan2_wrapper(float y, float x);
 float sqrt_wrapper(float x);
-long strtol_wrapper(const char *nptr, char **endptr, int base);
 int64_t strtoq_wrapper(const char *nptr, char **endptr, int base);
 uint64_t strtouq_wrapper(const char *nptr, char **endptr, int base);
 float pow_wrapper(float x, float y);
@@ -66,7 +65,7 @@ double acos_wrapper(double x);
 #define strcmp rb->strcmp
 #define strcpy rb->strcpy
 #define strlen rb->strlen
-#define strtol strtol_wrapper
+#define strtol rb->strtol
 #define strtoq strtoq_wrapper
 #define strtouq strtouq_wrapper
 #define vsprintf vsprintf_wrapper

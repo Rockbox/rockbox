@@ -58,6 +58,8 @@ void exit(int status);
 #endif
 
 int atoi (const char *str);
+unsigned long int strtoul(const char *ptr, char **endptr, int base);
+long int strtol(const char *ptr, char **endptr, int base);
 
 #ifdef __cplusplus
 }

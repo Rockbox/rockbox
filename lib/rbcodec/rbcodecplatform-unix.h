@@ -17,7 +17,7 @@
 /* strcasecmp */
 #include <strings.h>
 
-/* abs, atoi, labs, rand */
+/* abs, atoi, strtol, strtoul, labs, rand */
 #include <stdlib.h>
 
 /* swap16, swap32 */

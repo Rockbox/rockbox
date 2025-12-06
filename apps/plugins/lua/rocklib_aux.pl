@@ -51,6 +51,8 @@ my @ported_functions;
 # you want to manually port them to Lua. The format is a standard Perl regular
 # expression.
 my @forbidden_functions = ('^atoi$',
+                           '^strtol$',
+                           '^strtoul$',
                            '^open$',
                            '^open_utf8$',
                            '^close$',
