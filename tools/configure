@@ -4727,9 +4727,9 @@ if [ -z "$arch" ]; then
         arch="m68k"
     elif [ -n "$(echo $cpp_defines | grep -w __arm__)" ]; then
         arch="arm"
-        # cpp defines like "#define __ARM_ARCH_4TE__ 1" (where we want to extract the 4)
-        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,' | grep -v __ARM_ARCH | head -1)"
-        arch_profile="$(echo "$cpp_defines" | grep 'define __ARM_ARCH_PROFILE' | sed -e 's,.* \([0-9]\+\)$,\1,')"
+        # cpp defines like "#define __ARM_ARCH 4" (where we want to extract the 4)
+        arch_version="$(echo "$cpp_defines" | grep 'define __ARM_ARCH ' | sed -e 's,.* \([0-9]\).*,\1,')"
+        arch_profile="$(echo "$cpp_defines" | grep 'define __ARM_ARCH_PROFILE ' | sed -e 's,.* \([0-9]\+\)$,\1,')"
 	if test "$gccnum" -ge "800"; then
 	    # GCC8+ can natively emit unified asm syntax
 	    GCCOPTS="$GCCOPTS -masm-syntax-unified"
@@ -4770,9 +4770,9 @@ if [ -z "$arch" ]; then
         esac
     elif [ -n "$(echo $cpp_defines | grep -w __aarch64__)" ]; then
         arch="arm64"
-        # cpp defines like "#define __ARM_ARCH_8A__ 1" (where we want to extract the 8)
-        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,' | grep -v __ARM_ARCH | head -1)"
-        arch_profile="$(echo "$cpp_defines" | grep 'define __ARM_ARCH_PROFILE' | sed -e 's,.* \([0-9]\+\)$,\1,')"
+        # cpp defines like "#define __ARM_ARCH 8" (where we want to extract the 8)
+        arch_version="$(echo "$cpp_defines" | grep 'define __ARM_ARCH ' | sed -e 's,.* \([0-9]\).*,\1,')"
+        arch_profile="$(echo "$cpp_defines" | grep 'define __ARM_ARCH_PROFILE ' | sed -e 's,.* \([0-9]\+\)$,\1,')"
         case "$arch_profile" in
             65) # Cortex-A
                 arch_profile=application
