@@ -729,7 +729,7 @@ Lyre prototype 1 */
 #endif
 
 #if ARCH == ARCH_MIPS
-#define CPU_MIPS ARCH_VERSION /* 32, 32r2, 64 */
+#define CPU_MIPS ARCH_VERSION /* 32, 64 */
 #endif
 
 #endif /*__PCTOOL__*/
