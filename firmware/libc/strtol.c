@@ -1,3 +1,6 @@
+/* The following file is (with slight modifications for Rockbox) from dietlibc
+* version 0.31 which is licensed under the GPL version 2: */
+
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>

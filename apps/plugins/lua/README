@@ -3,7 +3,4 @@ version 0.31 which is licensed under the GPL version 2:
 
     gmtime.c
     strftime.c
-    strpbrk.c
-    strtol.c
-    strtoul.c
     strstr.c

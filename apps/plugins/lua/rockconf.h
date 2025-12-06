@@ -43,8 +43,6 @@
 
 extern char curpath[MAX_PATH];
 struct tm *gmtime(const time_t *timep);
-long strtol(const char *nptr, char **endptr, int base);
-unsigned long strtoul(const char *str, char **endptr, int base);
 size_t strftime(char* dst, size_t max, const char* format, const struct tm* tm);
 long lfloor(long x);
 long lpow(long x, long y);
@@ -64,6 +62,8 @@ int splash_scroller(int timeout, const char* str);
 #define strcmp   rb->strcmp
 #define strcpy   rb->strcpy
 #define strlen   rb->strlen
+#define strtol   rb->strtol
+#define strtoul  rb->strtoul
 #define yield()  rb->yield()
 
 #endif /* _ROCKCONF_H_ */
