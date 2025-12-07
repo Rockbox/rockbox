@@ -25,12 +25,6 @@
 #define MINIZ_NO_MALLOC
 #ifdef ROCKBOX
 #  define MINIZ_NO_ASSERT
-#  ifndef SIMULATOR
-#    define MINIZ_X86_OR_X64_CPU 0
-#    define MINIZ_HAS_64BIT_REGISTERS 0
-#    define TINFL_USE_64BIT_BITBUF 0
-#    define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 0
-#  endif /* ndef SIMULATOR */
 #endif
 
 #endif /* ndef _MINIZ_CONFIG_H */
