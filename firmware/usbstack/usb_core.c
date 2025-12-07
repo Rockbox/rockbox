@@ -863,9 +863,14 @@ static int usb_core_do_set_config(uint8_t new_config)
             }
         }
         init_deinit_endpoints(usb_config - 1, false);
+
+        /* clear any pending transfer completions,
+         * because they are depend on contents of ep_data */
+        usb_clear_pending_transfer_completion_events();
+        /* reset endpoint states */
+        memset(ep_data, 0, sizeof(ep_data));
     }
 
-    memset(ep_data, 0, sizeof(ep_data));
     usb_config = new_config;
     usb_state = usb_config == 0 ? ADDRESS : CONFIGURED;
 
