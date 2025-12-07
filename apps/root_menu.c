@@ -808,13 +808,12 @@ static int load_plugin_screen(char *key)
             }
             continue;
         }
-        else if (ret == PLUGIN_GOTO_ROOT)
-        {
-            ret_val = GO_TO_ROOT;
-        }
         else
         {
-            ret_val = GO_TO_PREVIOUS;
+            if (ret == PLUGIN_GOTO_ROOT)
+                ret_val = GO_TO_ROOT;
+            else
+                ret_val = GO_TO_PREVIOUS;
             /* Prevents infinite loop with WPS, Plugins, Previous Screen*/
             if (ret == PLUGIN_OK && old_global == GO_TO_WPS && !audio_status())
                 ret_val = GO_TO_ROOT;
