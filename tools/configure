@@ -4721,6 +4721,12 @@ RANLIB=`findtool ${RANLIB} --lit`
 HOSTCC=${HOSTCC:-${CC}}
 HOSTAR=${HOSTAR:-${AR}}
 
+# This disables all arch-specific code paths (eg inline asm)
+# for builds that target the host system
+if [ "$app_type" = "sdl-sim" -o "$app_type" = "sdl-app" -o "$app_type" = "checkwps" ]; then
+    arch="none"
+fi
+
 if [ -z "$arch" ]; then
     cpp_defines=$(echo "" | $CPP $GCCOPTS -dD)
     if [ -n "$(echo $cpp_defines | grep -w __m68k__)" ]; then
