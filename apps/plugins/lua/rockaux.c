@@ -26,7 +26,6 @@
 #include "lua.h"
 #include "lib/pluginlib_actions.h"
 
-extern long strtol(const char *nptr, char **endptr, int base);
 extern const char *strpbrk_n(const char *s, int smax, const char *accept);
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -291,7 +290,7 @@ get_digits:
     if(count)
     {
         buffer[count] = '\0';
-        val = strtol(buffer, NULL, 10);
+        val = rb->strtol(buffer, NULL, 10);
         *num = (neg)? -val:val;
         retn = 1;
     }
