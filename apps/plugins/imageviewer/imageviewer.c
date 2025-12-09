@@ -953,7 +953,7 @@ reload_decoder:
             return change_filename(direction);
         }
     }
-    else if (ds_max < ds_min)
+    else if (ds_max < ds_min && !(ds_max == 1 && imgdec->unscaled_avail))
         ds_max = ds_min;
 
     ds = ds_max; /* initialize setting */
