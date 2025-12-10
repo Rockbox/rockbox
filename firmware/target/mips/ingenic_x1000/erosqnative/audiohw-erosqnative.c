@@ -64,10 +64,7 @@ void audiohw_init(void)
     /* power on DAC and HP Amp */
     gpio_set_level(GPIO_DAC_ANALOG_PWR, 1);
     gpio_set_level(GPIO_HPAMP_POWER, 1);
-}
 
-void audiohw_postinit(void)
-{
     /*
      * enable playback, fill FIFO buffer with -1 to prevent
      * the DAC from auto-muting, wait, and then stop playback.
@@ -137,6 +134,11 @@ void audiohw_postinit(void)
         es9018k2m_write_reg(ES9018K2M_REG12_DPLL_SETTINGS, 0xda);
 
     }
+}
+
+void audiohw_postinit(void)
+{
+
 }
 
 void audiohw_close(void)
