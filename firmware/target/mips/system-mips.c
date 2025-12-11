@@ -26,6 +26,7 @@
 #include "font.h"
 #include "logf.h"
 #include "mips.h"
+#include "rbversion.h"
 #undef sp /* breaks backtrace lib */
 #include <stdio.h>
 #include <string.h>
@@ -77,7 +78,7 @@ static void exception_dump(void* frame, unsigned long epc,
     lcd_setfont(FONT_SYSFIXED);
 
     unsigned y = 1;
-    lcd_puts(1, y++, "*EXCEPTION*");
+    lcd_puts(1, y++, "*EXCEPTION* (" RBVERSION ")");
 
     /* wrap panic message */
     {
