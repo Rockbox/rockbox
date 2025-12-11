@@ -16,8 +16,13 @@ buildmanual: rockbox-build.tex pdf
 buildhtml: rockbox-build.tex
 	@mkdir -p $(OBJDIR)/html
 	@$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),$(SPLITHTML)" $(HTOPTS2) $(HTOPTS3) </dev/null
-	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/\.js/!d;s/.*\"\(.*\.js\)\".*/\1/g;/</d' | uniq` $(OBJDIR)/html
-	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/[pj][np]g/!d;s/.*\"\(.*\.[pj][np]g\)\".*/\1/g;/</d'` $(OBJDIR)/html
+# (GNU cp --parents option not available on BSD/Darwin)
+	@JS_FILES=`cat $(OBJDIR)/html/*.html | sed -e '/\.js/!d;s/.*\"\(.*\.js\)\".*/\1/g;/</d' | uniq`; \
+	IMG_FILES=`cat $(OBJDIR)/html/*.html | sed -e '/[pj][np]g/!d;s/.*\"\(.*\.[pj][np]g\)\".*/\1/g;/</d'`; \
+	for f in $$JS_FILES $$IMG_FILES; do \
+	  mkdir -p $(OBJDIR)/html/`dirname $$f`; \
+	  cp $$f $(OBJDIR)/html/$$f; \
+	done
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
 
 buildtxt: buildhtml
