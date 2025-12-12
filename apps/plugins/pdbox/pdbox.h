@@ -195,6 +195,10 @@ void pd_init(void);
 #define ftoan rb_ftoan
 #undef strtok_r
 #define strtok_r rb->strtok_r
+
+// NOTE: historically strstr() was not exported in the plugin API so this
+//       has been defined as strcasestr(). It's likely this is wrong, but
+//       changing it now could break user scripts...
 #define strstr rb->strcasestr
 
 

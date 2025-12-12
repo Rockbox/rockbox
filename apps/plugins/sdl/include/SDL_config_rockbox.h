@@ -88,6 +88,7 @@
 #define HAVE_STRLCPY      1
 #define HAVE_STRCMP       1
 #define HAVE_STRNCMP      1
+#define HAVE_STRSTR       1
 
 #undef strdup
 
@@ -172,7 +173,7 @@
 #define strpbrk strpbrk_wrapper
 #endif
 #define strrchr rb->strrchr
-#define strstr SDL_strstr
+#define strstr rb->strstr
 #define strtok strtok_wrapper
 #define strtok_r rb->strtok_r
 #define HAVE_STRTOL 1

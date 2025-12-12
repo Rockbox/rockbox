@@ -868,6 +868,7 @@ static const struct plugin_api rockbox_api = {
     gesture_vel_process,
     gesture_vel_get,
 #endif
+    strstr,
 };
 
 static int plugin_buffer_handle;

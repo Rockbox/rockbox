@@ -64,6 +64,7 @@ int splash_scroller(int timeout, const char* str);
 #define strlen   rb->strlen
 #define strtol   rb->strtol
 #define strtoul  rb->strtoul
+#define strstr   rb->strstr
 #define yield()  rb->yield()
 
 #endif /* _ROCKCONF_H_ */

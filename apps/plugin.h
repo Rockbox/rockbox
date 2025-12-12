@@ -1019,6 +1019,7 @@ struct plugin_api {
                                 const struct touchevent *ev);
     bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
 #endif
+    char* (*strstr)(const char *s1, const char *s2);
 };
 
 /* plugin header */

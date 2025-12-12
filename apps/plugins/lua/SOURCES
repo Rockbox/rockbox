@@ -33,7 +33,6 @@ rocklib_img.c
 tlsf_helper.c
 strftime.c
 strpbrk.c
-strstr.c
 rocklua.c
 luadir.c
 rocklib_events.c

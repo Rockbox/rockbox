@@ -31,6 +31,8 @@
 #define strncmp(a,b,c)      rb->strncmp(a,b,c)
 #undef strcasecmp
 #define strcasecmp(a,b)     rb->strcasecmp(a,b)
+#undef strstr
+#define strstr(a,b)         rb->strstr(a,b)
 
 #undef open
 #define open(a,b)		rb->open(a,b)

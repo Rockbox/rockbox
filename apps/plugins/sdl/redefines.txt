@@ -345,7 +345,6 @@ SDL_strncasecmp rb_SDL_strncasecmp
 SDL_strncmp rb_SDL_strncmp
 SDL_strrchr rb_SDL_strrchr
 SDL_strrev rb_SDL_strrev
-SDL_strstr rb_SDL_strstr
 SDL_strtod rb_SDL_strtod
 SDL_strtoll.localalias.2 rb_SDL_strtoll.localalias.2
 SDL_strtoll rb_SDL_strtoll
