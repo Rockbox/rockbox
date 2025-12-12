@@ -29,6 +29,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "language.h" /* is_lang_rtl() */
+#include "iap-usb.h"
 
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
@@ -870,6 +871,7 @@ void check_bootfile(bool do_rolo)
 void setvol(void)
 {
     sound_set_volume(global_status.volume);
+    iap_on_volume(global_status.volume);
     global_status.last_volume_change = current_tick;
     status_save(false);
 }

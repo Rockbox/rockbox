@@ -333,6 +333,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
         .set_interface = usb_iap_set_interface,
         .get_interface = usb_iap_get_interface,
+        .notify_event = usb_iap_notify_event,
     },
 #endif
 };

@@ -34,6 +34,7 @@
 #include "playlist.h"
 #include "dsp_misc.h"
 #include "playback.h"
+#include "iap-usb.h"
 
 /** Disarms all touchregions. */
 void skin_disarm_touchregions(struct gui_wps *gwps)
@@ -344,6 +345,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
 
     case ACTION_TOUCH_SHUFFLE:
         global_settings.playlist_shuffle = !global_settings.playlist_shuffle;
+        iap_on_shuffle_state(global_settings.playlist_shuffle);
         replaygain_update();
         if (global_settings.playlist_shuffle)
             playlist_randomise(NULL, current_tick, true);
@@ -358,6 +360,7 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
         const struct settings_list *rep_setting =
             find_setting(&global_settings.repeat_mode);
         option_select_next_val(rep_setting, false, true);
+        iap_on_repeat_state(global_settings.repeat_mode);
         audio_flush_and_reload_tracks();
         action = ACTION_REDRAW;
     } break;

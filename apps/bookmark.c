@@ -43,6 +43,7 @@
 #include "file.h"
 #include "pathfuncs.h"
 #include "playlist_menu.h"
+#include "iap-usb.h"
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
@@ -1125,7 +1126,9 @@ static bool play_bookmark(const char* bookmark)
     if (parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, &resume_info, true))
     {
         global_settings.repeat_mode = resume_info.repeat_mode;
+        iap_on_repeat_state(global_settings.repeat_mode);
         global_settings.playlist_shuffle = resume_info.shuffle;
+        iap_on_shuffle_state(global_settings.playlist_shuffle);
 #if defined(HAVE_PITCHCONTROL)
         sound_set_pitch(resume_info.pitch);
         dsp_set_timestretch(resume_info.speed);
