@@ -482,10 +482,9 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             break;
 
         case MP4_trkn: {
-            char *p = NULL;
             int tracknum = 0;
             read_mp4_tag_i_from_n(fd, &tracknum, &id3->track_string, size, &buffer_left, &buffer);
-            if (!(tracknum == 0 && (errno || *p)))
+            if (!(tracknum == 0 && (id3->track_string && *id3->track_string)))
                 id3->tracknum = tracknum;
             break;
         }
