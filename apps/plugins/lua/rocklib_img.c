@@ -1606,7 +1606,7 @@ RB_WRAP(font_getstringsize)
 
     if (fontnumber == FONT_UI)
         fontnumber = rb->global_status->font_id[SCREEN_MAIN];
-    else
+    else if (fontnumber < 0)
         fontnumber = FONT_SYSFIXED;
 
     if lua_isnoneornil(L, 2)
