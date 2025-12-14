@@ -235,6 +235,12 @@ static int plugin_main(void)
 
             /* Get the peaks. ( Borrowed from vu_meter ) */
             static struct pcm_peaks peaks;
+#ifdef USB_ENABLE_AUDIO
+        if (rb->usb_audio_get_playing())
+            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_USBAUDIO,
+                                              &peaks);
+        else
+#endif
             rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                               &peaks);
             #define left_peak peaks.left
