@@ -3159,7 +3159,6 @@ int playlist_resume(void)
 
     struct playlist_info* playlist = &current_playlist;
     dc_thread_stop(playlist);
-    playlist_write_lock(playlist);
 
     if (core_allocatable() < (1 << 10))
         talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
@@ -3172,8 +3171,10 @@ int playlist_resume(void)
     if (handle < 0)
     {
         splashf(HZ * 2, "%s(): OOM", __func__);
-        goto out;
+        return -1;
     }
+
+    playlist_write_lock(playlist);
 
     /* align buffer for faster load times */
     buffer = core_get_data(handle);
