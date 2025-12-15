@@ -16916,3 +16916,71 @@
     *: "Dziesmas kārtotas pēc albuma"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Kamēr USB ir tikai uzlādes režīmā"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Kamēr USB ir tikai uzlādes režīmā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Kamēr USB ir datu pārsūtīšanas režīmā"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Kamēr USB ir datu pārsūtīšanas režīmā"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB DAC ir ieslēgts"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB DAC ir ieslēgts"
+  </voice>
+</phrase>
