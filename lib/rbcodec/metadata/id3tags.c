@@ -245,7 +245,7 @@ static int parsetracknum( struct mp3entry* entry, char* tag, int bufferpos )
 {
     if (strlen(tag)) {
         char *p = NULL;
-        int tracknum = strtol(tag, &p, 0);
+        int tracknum = strtol(tag, &p, 10);
         if (!(tracknum == 0 && (errno || *p)))
             entry->tracknum = tracknum;
     }

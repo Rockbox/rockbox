@@ -318,7 +318,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         if (strlen(value)) {
             char *p = NULL;
-            int tracknum = strtol(value, &p, 0);
+            int tracknum = strtol(value, &p, 10);
             if (!(tracknum == 0 && (errno || *p)))
                 id3->tracknum = tracknum;
         }

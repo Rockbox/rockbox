@@ -476,7 +476,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
                                 if (strlen(id3->track_string)) {
                                     char *p = NULL;
-                                    int tracknum = strtol(id3->track_string, &p, 0);
+                                    int tracknum = strtol(id3->track_string, &p, 10);
                                     if (!(tracknum == 0 && (errno || *p)))
                                         id3->tracknum = tracknum;
                                 }
