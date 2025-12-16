@@ -54,6 +54,12 @@ static void tv_draw_bookmarks(const struct tv_screen_pos *top_pos)
     tv_show_bookmarks(disp_bookmarks, disp_count);
 }
 
+void tv_update_sbs_title(void)
+{
+    if (tv_set_sbs_title())
+        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+}
+
 void tv_draw_window(void)
 {
     struct tv_screen_pos pos;

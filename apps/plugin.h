@@ -112,6 +112,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "menu.h"
 #include "rbunicode.h"
 #include "list.h"
+#include "statusbar-skinned.h"
 #include "tree.h"
 #include "color_picker.h"
 #include "buflib.h"
@@ -1020,6 +1021,7 @@ struct plugin_api {
     bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
 #endif
     char* (*strstr)(const char *s1, const char *s2);
+    bool (*sb_set_title_text)(const char* title, enum themable_icons icon, enum screen_type screen);
 };
 
 /* plugin header */

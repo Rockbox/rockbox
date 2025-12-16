@@ -41,6 +41,9 @@ bool tv_init_window(unsigned char **buf, size_t *bufsize);
 /* finalize the window module */
 void tv_finalize_window(void);
 
+/* update the skinned status bar title, if one is present */
+void tv_update_sbs_title(void);
+
 /* draw the display */
 void tv_draw_window(void);
 

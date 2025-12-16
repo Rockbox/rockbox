@@ -870,6 +870,7 @@ static const struct plugin_api rockbox_api = {
     gesture_vel_get,
 #endif
     strstr,
+    sb_set_title_text,
 };
 
 static int plugin_buffer_handle;
@@ -889,6 +890,7 @@ int plugin_load(const char* plugin, const void* parameter)
     bool theme_enabled = sepch && (!strcmp("properties.rock", sepch + 1) ||
                                    !strcmp("playing_time.rock", sepch + 1) ||
                                    !strcmp("main_menu_config.rock", sepch + 1) ||
+                                   !strcmp("text_viewer.rock", sepch + 1) ||
                                    !strcmp("disktidy.rock", sepch + 1));
 
     if (current_plugin_handle)

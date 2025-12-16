@@ -76,6 +76,8 @@ bool tv_load_file(const unsigned char *file)
     /* select to read the page */
     tv_select_bookmark();
 
+    tv_update_sbs_title();
+
     return true;
 }
 
@@ -188,6 +190,8 @@ unsigned tv_menu(void)
     off_t cur_file_pos = tv_get_screen_pos()->file_pos;
 
     res = tv_display_menu();
+
+    tv_update_sbs_title();
 
     if (res == TV_MENU_RESULT_EXIT_MENU)
     {

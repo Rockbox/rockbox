@@ -97,6 +97,14 @@ void tv_update_extra(int window, int col, const struct tv_screen_pos *pos, int s
  */
 void tv_init_scrollbar(off_t total, bool show_scrollbar);
 
+/* set the SBS title
+ *
+ * return
+ *     true, if title is displayed in SBS
+ *     false, if SBS is hidden or has no title
+ */
+bool tv_set_sbs_title(void);
+
 /* start the display processing  */
 void tv_start_display(void);
 

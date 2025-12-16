@@ -69,7 +69,11 @@ struct tv_rect {
 
 static struct viewport vp_info;
 static struct viewport vp_text;
-static bool is_initialized_vp = false;
+static bool is_initialized_vp;
+static bool sbs_has_title;
+#if LCD_DEPTH > 1
+static fb_data* backdrop;
+#endif
 
 static struct screen* display;
 
@@ -90,9 +94,15 @@ static int row_height = 1;
 
 static int totalsize;
 
+static bool tv_has_sbs_title(void)
+{
+    return preferences->statusbar && sbs_has_title;
+}
+
 static void tv_show_header(void)
 {
-    if (preferences->header_mode)
+    /* Ignore header mode if we have an SBS title */
+    if (preferences->header_mode && !tv_has_sbs_title())
         display->putsxy(header.x, header.y, preferences->file_name);
 }
 
@@ -189,6 +199,12 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
     display->set_viewport(&vp_info);
 }
 
+bool tv_set_sbs_title(void)
+{
+    sbs_has_title = rb->sb_set_title_text(preferences->file_name, Icon_NOICON, SCREEN_MAIN);
+    return preferences->statusbar && sbs_has_title;
+}
+
 void tv_start_display(void)
 {
     display->set_viewport(&vp_info);
@@ -197,7 +213,10 @@ void tv_start_display(void)
 
 #if LCD_DEPTH > 1
     if (preferences->night_mode)
+    {
+        backdrop = rb->lcd_get_backdrop();
         rb->lcd_set_backdrop(NULL);
+    }
 #endif
     display->clear_viewport();
 
@@ -207,6 +226,10 @@ void tv_end_display(void)
 {
     display->update_viewport();
     display->set_viewport(NULL);
+#if LCD_DEPTH > 1
+    if (preferences->night_mode)
+        rb->lcd_set_backdrop(backdrop);
+#endif
 }
 
 void tv_set_layout(bool show_scrollbar)
@@ -221,7 +244,7 @@ void tv_set_layout(bool show_scrollbar)
     header.x = 0;
     header.y = 0;
     header.w = vp_info.width;
-    header.h = (preferences->header_mode)? row_height + 1 : 0;
+    header.h = (preferences->header_mode && !tv_set_sbs_title()) ? row_height + 1 : 0;
 
     footer.x = 0;
     footer.w = vp_info.width;
