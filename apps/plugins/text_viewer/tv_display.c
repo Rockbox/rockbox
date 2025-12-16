@@ -99,11 +99,27 @@ static bool tv_has_sbs_title(void)
     return preferences->statusbar && sbs_has_title;
 }
 
+static const char* tv_get_title_text(void)
+{
+    static const char *title;
+
+    if (!title)
+    {
+        title = rb->strrchr(preferences->file_name, PATH_SEPCH);
+
+        if (title)
+            title++;
+        else
+            title = (char *) preferences->file_name;
+    }
+    return title;
+}
+
 static void tv_show_header(void)
 {
     /* Ignore header mode if we have an SBS title */
     if (preferences->header_mode && !tv_has_sbs_title())
-        display->putsxy(header.x, header.y, preferences->file_name);
+        display->putsxy(header.x, header.y, tv_get_title_text());
 }
 
 static void tv_show_footer(const struct tv_screen_pos *pos)
@@ -201,7 +217,7 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
 
 bool tv_set_sbs_title(void)
 {
-    sbs_has_title = rb->sb_set_title_text(preferences->file_name, Icon_NOICON, SCREEN_MAIN);
+    sbs_has_title = rb->sb_set_title_text(tv_get_title_text(), Icon_NOICON, SCREEN_MAIN);
     return preferences->statusbar && sbs_has_title;
 }
 
