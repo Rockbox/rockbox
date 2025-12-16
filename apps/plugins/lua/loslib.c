@@ -17,7 +17,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-
+#include "rocklibc.h" /* ROCKLUA ADDED */
 
 static int os_pushresult (lua_State *L, int i, const char *filename) {
   int en = errno;  /* calls to Lua API may change this value */
@@ -36,14 +36,14 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 
 static int os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
-  return os_pushresult(L, rb->remove(filename) == 0, filename);
+  return os_pushresult(L, remove(filename) == 0, filename);
 }
 
 
 static int os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
-  return os_pushresult(L, rb->rename(fromname, toname) == 0, fromname);
+  return os_pushresult(L, rename(fromname, toname) == 0, fromname);
 }
 
 

@@ -238,7 +238,7 @@ static void display_traceback(const char *errstr)
 #if 1
   splash_scroller(HZ * 5, errstr); /*rockaux.c*/
 #else
-  rb->splash(10 * HZ, errstr);
+  splash(10 * HZ, errstr);
 #endif
 }
 
@@ -264,7 +264,7 @@ enum plugin_status plugin_start(const void* parameter)
     {
       if (!Ls)
       {
-        rb->splash(HZ, "Play a .lua file!");
+        splash(HZ, "Play a .lua file!");
         return browse_scripts();
       }
     }
@@ -285,7 +285,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (lu_status) {
             DEBUGF("%s\n", lua_tostring(Ls, -1));
             display_traceback(lua_tostring(Ls, -1));
-            //rb->splash(10 * HZ, lua_tostring(Ls, -1));
+            //splash(10 * HZ, lua_tostring(Ls, -1));
             /*lua_pop(Ls, 1);*/
         }
         lua_close(Ls);

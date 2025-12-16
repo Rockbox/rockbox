@@ -70,5 +70,9 @@ int splash_scroller(int timeout, const char* str);
 #define mktime   rb->mktime
 #define get_time rb->get_time
 
+#define read_line(fd,buf,n) rb->read_line(fd,buf,n)
+#define fdprintf(...)       rb->fdprintf(__VA_ARGS__)
+#define splashf(...)        rb->splashf(__VA_ARGS__)
+#define rand()              rb->rand()
+#define srand(i)            rb->srand(i)
 #endif /* _ROCKCONF_H_ */
-

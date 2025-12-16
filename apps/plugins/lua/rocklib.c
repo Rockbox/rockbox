@@ -308,7 +308,7 @@ RB_WRAP(splash)
 {
     int timeout = luaL_checkint(L, 1);
     const char *str = luaL_checkstring(L, 2);
-    rb->splashf(timeout, str); /*rockaux.c*/
+    splashf(timeout, str); /*rockaux.c*/
     return 0;
 }
 

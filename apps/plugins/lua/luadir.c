@@ -37,13 +37,13 @@ typedef struct dir_data {
 
 static int make_dir (lua_State *L) {
     const char *path = luaL_checkstring (L, 1);
-    lua_pushboolean (L, !rb->mkdir(path));
+    lua_pushboolean (L, !mkdir(path));
     return 1;
 }
 
 static int remove_dir (lua_State *L) {
     const char *path = luaL_checkstring (L, 1);
-    lua_pushboolean (L, !rb->rmdir (path));
+    lua_pushboolean (L, !rmdir (path));
     return 1;
 }
 
@@ -57,8 +57,8 @@ static int dir_iter (lua_State *L) {
 
     luaL_argcheck (L, !d->closed, 1, "closed directory");
 
-    if ((entry = rb->readdir (d->dir)) != NULL) {
-        struct dirinfo info = rb->dir_get_info(d->dir, entry);
+    if ((entry = readdir (d->dir)) != NULL) {
+        struct dirinfo info = dir_get_info(d->dir, entry);
         lua_pushstring (L, entry->d_name);
         lua_pushboolean (L, info.attribute & ATTR_DIRECTORY);
         if (lua_toboolean (L, lua_upvalueindex(1))) {
@@ -77,7 +77,7 @@ static int dir_iter (lua_State *L) {
         return 3;
     } else {
         /* no more entries => close directory */
-        rb->closedir (d->dir);
+        closedir (d->dir);
         d->closed = 1;
         return 0;
     }
@@ -91,7 +91,7 @@ static int dir_close (lua_State *L) {
     dir_data *d = (dir_data *)lua_touserdata (L, 1);
 
     if (!d->closed && d->dir) {
-        rb->closedir (d->dir);
+        closedir (d->dir);
         d->closed = 1;
     }
     return 0;
@@ -111,7 +111,7 @@ static int dir_iter_factory (lua_State *L) {
 
     luaL_getmetatable (L, DIR_METATABLE);
     lua_setmetatable (L, -2);
-    d->dir = rb->opendir (path);
+    d->dir = opendir (path);
     if (d->dir == NULL)
     {
         luaL_error (L, "cannot open %s: %d", path, errno);
