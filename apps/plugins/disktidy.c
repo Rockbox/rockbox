@@ -27,6 +27,7 @@
 #define DEFAULT_FILES PLUGIN_APPS_DATA_DIR "/disktidy.config"
 #define CUSTOM_FILES  PLUGIN_APPS_DATA_DIR "/disktidy_custom.config"
 #define LAST_RUN_STATS_FILE PLUGIN_APPS_DATA_DIR "/disktidy.stats"
+#define CLEANING_STR "Cleaning..."
 #define DIR_STACK_SIZE 25
 
 struct dir_info {
@@ -64,6 +65,7 @@ static size_t tidy_type_count;
 static bool user_abort;
 static bool tidy_loaded_and_changed = false;
 static bool stats_file_exists = false;
+static bool sbs_has_title;
 
 static void dir_stack_init(struct dir_stack *dstack)
 {
@@ -224,6 +226,8 @@ static bool load_run_stats(void)
 
 static enum plugin_status display_run_stats(void)
 {
+    struct viewport vp;
+
     if (!load_run_stats()) {
         rb->splash(HZ * 2, "Unable to load last run stats");
         return PLUGIN_OK;
@@ -247,9 +251,10 @@ static enum plugin_status display_run_stats(void)
         magnitude++;
     }
 
-    char total_removed[8];
-    rb->snprintf(total_removed, sizeof(total_removed), "%d",
-                 run_stats.files_removed + run_stats.dirs_removed);
+    char total_removed[8] = "Nothing";
+    int num_removed = run_stats.files_removed + run_stats.dirs_removed;
+    if (num_removed)
+        rb->snprintf(total_removed, sizeof(total_removed), "%d", num_removed);
 
     char files_removed[8];
     rb->snprintf(files_removed, sizeof(files_removed), "%d",
@@ -264,18 +269,34 @@ static enum plugin_status display_run_stats(void)
                  (int)rm_size, (int)((rm_size - (int)rm_size) * 100),
                  size_units[magnitude]);
 
-    char run_time[12];
-    rb->snprintf(run_time, sizeof(run_time), "in %02d:%02d:%02d",
-                 run_stats.run_duration / 3600, run_stats.run_duration / 60,
-                 run_stats.run_duration % 60);
+    char run_time[12] = "in <1s";
+    int s = run_stats.run_duration % 60;
+    int m = run_stats.run_duration / 60;
+    int h =  run_stats.run_duration / 3600;
+    if (h)
+        rb->snprintf(run_time, sizeof(run_time), "in %dh %dm, %ds", h, m, s);
+    else if (m)
+        rb->snprintf(run_time, sizeof(run_time), "in %dm %ds", m, s);
+    else if (s)
+        rb->snprintf(run_time, sizeof(run_time), "in %ds", s);
 
 #if CONFIG_RTC
+    struct tm tm = *rb->get_time();
     char last_run[18];
-    rb->snprintf(last_run, sizeof(last_run), "%02d:%02d %d/%s/%d",
-                 run_stats.last_run_time.tm_hour,
-                 run_stats.last_run_time.tm_min, run_stats.last_run_time.tm_mday,
-                 months[run_stats.last_run_time.tm_mon],
-                 2000 + (run_stats.last_run_time.tm_year % 100));
+    if (tm.tm_mday == run_stats.last_run_time.tm_mday &&
+        tm.tm_mon == run_stats.last_run_time.tm_mon &&
+        tm.tm_year == run_stats.last_run_time.tm_year)
+    {
+        rb->snprintf(last_run, sizeof(last_run), "%02d:%02d Today",
+                     run_stats.last_run_time.tm_hour,
+                     run_stats.last_run_time.tm_min);
+    }
+    else
+        rb->snprintf(last_run, sizeof(last_run), "%02d:%02d %d/%s/%d",
+                     run_stats.last_run_time.tm_hour,
+                     run_stats.last_run_time.tm_min, run_stats.last_run_time.tm_mday,
+                     months[run_stats.last_run_time.tm_mon],
+                     2000 + (run_stats.last_run_time.tm_year % 100));
 #endif
 
     char* last_run_text[] = {
@@ -287,19 +308,34 @@ static enum plugin_status display_run_stats(void)
         dirs_removed , run_stats.dirs_removed == 1 ? "dir" : "dirs", "",
         run_time     , "",
     };
-
-    static struct style_text display_style[] = {
+    char** text_arr = last_run_text;
+    int len = ARRAYLEN(last_run_text);
+    if (!num_removed)
+    {
+        /* Hide superfluous zeros if nothing was removed */
+        text_arr[len - 9] = "";
+        text_arr[len - 8] = run_time;
+        text_arr[len - 7] = "";
+        len -= 6;
+    }
 #if CONFIG_RTC
-        { 0, TEXT_CENTER },
+    sbs_has_title = rb->sb_set_title_text(last_run, Icon_NOICON, SCREEN_MAIN);
+    if (sbs_has_title)
+    {
+        text_arr += 2;
+        len -=2;
+#else
+    sbs_has_title = rb->sb_set_title_text("Last Run", Icon_NOICON, SCREEN_MAIN);
+    if (sbs_has_title)
+    {
 #endif
-        LAST_STYLE_ITEM
-    };
+        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+    }
 
-    struct viewport vp;
     rb->viewport_set_defaults(&vp, SCREEN_MAIN);
 
-    if (display_text(ARRAYLEN(last_run_text), last_run_text,
-                     display_style, &vp, false)) {
+    if (display_text(len, text_arr, NULL, &vp, false))
+    {
         return PLUGIN_USB_CONNECTED;
     }
     while (true) /* keep info on screen until cancelled */
@@ -343,22 +379,30 @@ static bool tidy_remove_item(const char *item, int attr)
 static void tidy_lcd_status(const char *name, struct viewport *vp)
 {
     static long next_tick;
+    int i, num_removed;
+    struct screen *display;
+    struct viewport *last_vp;
 
     if (TIME_AFTER(next_tick, *rb->current_tick))
         return;
 
     next_tick = *rb->current_tick + HZ/10;
 
-    struct screen *display = rb->screens[SCREEN_MAIN];
-    struct viewport *last_vp = display->set_viewport(vp);
-
+    display = rb->screens[SCREEN_MAIN];
+    last_vp = display->set_viewport(vp);
     display->clear_viewport();
-    display->puts(0, 0, "Cleaning...");
-    display->puts(0, 1, name);
-    display->putsf(0, 2, "%d items removed",
-        run_stats.files_removed + run_stats.dirs_removed);
-    display->update_viewport();
 
+    i = 0;
+    num_removed = run_stats.files_removed + run_stats.dirs_removed;
+    if (!sbs_has_title)
+        display->puts(0, i++, CLEANING_STR);
+    display->puts(0, i++, name);
+    if (num_removed)
+        display->putsf(0, i++, num_removed == 1 ? "%d item removed" : "%d items removed", num_removed);
+    else
+        display->puts(0, i++, "Nothing removed");
+
+    display->update_viewport();
     display->set_viewport(last_vp);
 }
 
@@ -556,6 +600,10 @@ static enum plugin_status tidy_do(void)
 {
     /* clean disk and display num of items removed */
     char path[MAX_PATH];
+
+    sbs_has_title = rb->sb_set_title_text(CLEANING_STR, Icon_NOICON, SCREEN_MAIN);
+    if (sbs_has_title)
+        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 
     run_stats.files_removed = 0;
     run_stats.dirs_removed = 0;
