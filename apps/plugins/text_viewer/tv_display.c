@@ -196,7 +196,8 @@ void tv_start_display(void)
     display->set_drawmode(DRMODE_SOLID);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    if (preferences->night_mode)
+        rb->lcd_set_backdrop(NULL);
 #endif
     display->clear_viewport();
 
@@ -338,11 +339,32 @@ bool tv_init_display(unsigned char **buf, size_t *size)
 void tv_night_mode(void)
 {
 #ifdef HAVE_LCD_COLOR
-     if(preferences->night_mode)
+    static unsigned int fg_color, bg_color;
+
+    if (!fg_color && !bg_color)
+    {
+        /* Remember theme's UI viewport colors. Note: May
+           be different from global_settings->fg|bg_color */
+        fg_color = rb->lcd_get_foreground();
+        bg_color = rb->lcd_get_background();
+
+        /* workaround for broken color schemes */
+        if (!fg_color && !bg_color)
+            bg_color = LCD_WHITE;
+    }
+
+    if (preferences->night_mode)
     {
         rb->lcd_set_foreground(LCD_RGBPACK(0xBF,0xBF,0x00));
         rb->lcd_set_background(LCD_RGBPACK(0x96,0x0D,0x00));
-    }else
+    }
+    else if (preferences->statusbar)
+    {
+        /* Revert to theme colors */
+        rb->lcd_set_foreground(fg_color);
+        rb->lcd_set_background(bg_color);
+    }
+    else
     {
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
