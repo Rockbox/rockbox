@@ -312,6 +312,7 @@ static void* volatile control_write_data = NULL;
 static volatile bool control_write_data_done = false;
 #endif
 
+static int usb_core_do_set_config(uint8_t new_config);
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
@@ -496,15 +497,7 @@ void usb_core_init(void)
 
 void usb_core_exit(void)
 {
-    if(usb_config != 0) {
-        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
-                drivers[i].disconnect();
-                drivers[i].enabled = false;
-            }
-        }
-    }
-
+    usb_core_do_set_config(0);
     if(initialized) {
         usb_drv_exit();
         initialized = false;
@@ -1105,17 +1098,9 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
 void usb_core_bus_reset(void)
 {
     logf("usb_core: bus reset");
+    usb_core_do_set_config(0);
     usb_address = 0;
     usb_state = DEFAULT;
-    if(usb_config != 0) {
-        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
-                drivers[i].disconnect();
-            }
-        }
-        init_deinit_endpoints(usb_config - 1, false);
-        usb_config = 0;
-    }
 #ifdef HAVE_USB_CHARGING_ENABLE
 #ifdef HAVE_USB_CHARGING_IN_THREAD
     /* On some targets usb_charging_maxcurrent_change() cannot be called
