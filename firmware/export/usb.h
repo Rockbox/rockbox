@@ -118,6 +118,7 @@ enum
     USB_TRANSFER_COMPLETION, /* Event */
     USB_NOTIFY_SET_ADDR,     /* Event */
     USB_NOTIFY_SET_CONFIG,   /* Event */
+    USB_NOTIFY_BUS_RESET,    /* Event */
 #endif
 #ifdef USB_FIREWIRE_HANDLING
     USB_REQUEST_REBOOT,      /* Event */

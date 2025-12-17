@@ -153,6 +153,7 @@ static const struct usb_string_descriptor* const usb_strings[USB_STRING_INDEX_MA
 static int usb_address = 0;
 static int usb_config = 0;
 static bool initialized = false;
+static volatile bool bus_reset_pending = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 #ifdef HAVE_USB_CHARGING_ENABLE
@@ -1094,22 +1095,29 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
     }
 }
 
+static void do_bus_reset(void) {
+    usb_address = 0;
+    usb_state = DEFAULT;
+#ifdef USB_LEGACY_CONTROL_API
+    num_active_requests = 0;
+#endif
+    bus_reset_pending = false;
+}
+
 /* called by usb_drv_int() */
 void usb_core_bus_reset(void)
 {
     logf("usb_core: bus reset");
-    usb_core_do_set_config(0);
-    usb_address = 0;
-    usb_state = DEFAULT;
-#ifdef HAVE_USB_CHARGING_ENABLE
-#ifdef HAVE_USB_CHARGING_IN_THREAD
-    /* On some targets usb_charging_maxcurrent_change() cannot be called
-     * from an interrupt handler; get the USB thread to do it instead. */
-    usb_charger_update();
-#else
-    usb_charging_maxcurrent_change(usb_charging_maxcurrent());
-#endif
-#endif
+    if(bus_reset_pending) {
+        return;
+    }
+    bus_reset_pending = true;
+    if(usb_config == 0) {
+        do_bus_reset();
+    } else {
+        /* need to disconnect class drivers, defer it to usb thread */
+        usb_signal_notify(USB_NOTIFY_BUS_RESET, 0);
+    }
 }
 
 /* called by usb_drv_transfer_completed() */
@@ -1158,6 +1166,13 @@ void usb_core_handle_notify(long id, intptr_t data)
             break;
         case USB_NOTIFY_SET_CONFIG:
             usb_core_do_set_config(data);
+            break;
+        case USB_NOTIFY_BUS_RESET:
+            usb_core_do_set_config(0);
+            do_bus_reset();
+#ifdef HAVE_USB_CHARGING_ENABLE
+            usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+#endif
             break;
         default:
             break;
