@@ -47,6 +47,9 @@ struct usb_class_driver {
     /* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
     bool needs_exclusive_storage;
 
+    /* USB config number this driver belongs to */
+    uint8_t config;
+
     /* Endpoint allocation state table */
     uint8_t ep_allocs_size;
     struct usb_class_driver_ep_allocation* ep_allocs;

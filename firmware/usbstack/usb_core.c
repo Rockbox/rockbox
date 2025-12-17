@@ -72,6 +72,8 @@
 #define USB_MAX_CURRENT 500
 #endif
 
+#define NUM_CONFIGS 1
+
 /*-------------------------------------------------------------------------*/
 /* USB protocol descriptors: */
 
@@ -95,7 +97,7 @@ static struct usb_device_descriptor __attribute__((aligned(2)))
     .iManufacturer      = USB_STRING_INDEX_MANUFACTURER,
     .iProduct           = USB_STRING_INDEX_PRODUCT,
     .iSerialNumber      = USB_STRING_INDEX_SERIAL,
-    .bNumConfigurations = 1
+    .bNumConfigurations = NUM_CONFIGS
 } ;
 
 static struct usb_config_descriptor __attribute__((aligned(2)))
@@ -121,7 +123,7 @@ static const struct usb_qualifier_descriptor __attribute__((aligned(2)))
     .bDeviceSubClass    = 0,
     .bDeviceProtocol    = 0,
     .bMaxPacketSize0    = 64,
-    .bNumConfigurations = 1
+    .bNumConfigurations = NUM_CONFIGS
 };
 
 static const struct usb_string_descriptor usb_string_iManufacturer =
@@ -149,8 +151,8 @@ static const struct usb_string_descriptor* const usb_strings[USB_STRING_INDEX_MA
 };
 
 static int usb_address = 0;
+static int usb_config = 0;
 static bool initialized = false;
-static bool drivers_connected = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 #ifdef HAVE_USB_CHARGING_ENABLE
@@ -168,7 +170,7 @@ static int usb_no_host_callback(struct timeout *tmo)
 }
 #endif
 
-static int usb_core_num_interfaces;
+static int usb_core_num_interfaces[NUM_CONFIGS];
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
@@ -188,7 +190,7 @@ struct ep_alloc_state {
     struct usb_class_driver* owner[2];
 };
 
-static struct ep_alloc_state ep_alloc_states[1][USB_NUM_ENDPOINTS];
+static struct ep_alloc_state ep_alloc_states[NUM_CONFIGS][USB_NUM_ENDPOINTS];
 
 static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 {
@@ -196,6 +198,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     [USB_DRIVER_MASS_STORAGE] = {
         .enabled = false,
         .needs_exclusive_storage = true,
+        .config = 1,
         .first_interface = 0,
         .last_interface = 0,
         .ep_allocs_size = ARRAYLEN(usb_storage_ep_allocs),
@@ -216,6 +219,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     [USB_DRIVER_SERIAL] = {
         .enabled = false,
         .needs_exclusive_storage = false,
+        .config = 1,
         .first_interface = 0,
         .last_interface = 0,
         .ep_allocs_size = ARRAYLEN(usb_serial_ep_allocs),
@@ -236,6 +240,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     [USB_DRIVER_CHARGING_ONLY] = {
         .enabled = false,
         .needs_exclusive_storage = false,
+        .config = 1,
         .first_interface = 0,
         .last_interface = 0,
         .ep_allocs_size = 0,
@@ -256,6 +261,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     [USB_DRIVER_HID] = {
         .enabled = false,
         .needs_exclusive_storage = false,
+        .config = 1,
         .first_interface = 0,
         .last_interface = 0,
         .ep_allocs_size = ARRAYLEN(usb_hid_ep_allocs),
@@ -276,6 +282,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     [USB_DRIVER_AUDIO] = {
         .enabled = false,
         .needs_exclusive_storage = false,
+        .config = 1,
         .first_interface = 0,
         .last_interface = 0,
         .ep_allocs_size = ARRAYLEN(usb_audio_ep_allocs),
@@ -308,6 +315,9 @@ static volatile bool control_write_data_done = false;
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
+
+#define is_active(driver) ((driver).enabled && (driver).config == usb_config)
+#define has_if(driver, interface) ((interface) >= (driver).first_interface && (interface) < (driver).last_interface)
 
 /** NOTE Serial Number
  * The serial number string is split into two parts:
@@ -476,6 +486,7 @@ void usb_core_init(void)
 
     initialized = true;
     usb_state = DEFAULT;
+    usb_config = 0;
 #ifdef HAVE_USB_CHARGING_ENABLE
     usb_no_host = false;
     timeout_register(&usb_no_host_timeout, usb_no_host_callback, HZ*10, 0);
@@ -485,16 +496,13 @@ void usb_core_init(void)
 
 void usb_core_exit(void)
 {
-    int i;
-    if(drivers_connected)
-    {
-        for(i = 0; i < USB_NUM_DRIVERS; i++)
-            if(drivers[i].enabled && drivers[i].disconnect != NULL)
-            {
+    if(usb_config != 0) {
+        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
+            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
                 drivers[i].disconnect();
                 drivers[i].enabled = false;
             }
-        drivers_connected = false;
+        }
     }
 
     if(initialized) {
@@ -573,26 +581,46 @@ static void usb_core_set_serial_function_id(void)
     usb_string_iSerial.wString[0] = hex[id];
 }
 
-static void allocate_interfaces_and_endpoints(void)
-{
-    int interface = 0;
-
-    /* deinit previously allocated endpoints */
-    for(int conf = 0; conf < 1; conf += 1) {
-        for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
-            for(int dir = 0; dir < 2; dir += 1) {
-                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
-                if(alloc->owner[dir] != NULL) {
-                    int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
-                    usb_drv_deinit_endpoint(ep);
-                    alloc->owner[dir] = NULL;
-                }
+/* synchronize endpoint initialization state to allocation state */
+static void init_deinit_endpoints(uint8_t conf_index, bool init) {
+    for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
+        for(int dir = 0; dir < 2; dir += 1) {
+            struct ep_alloc_state* alloc = &ep_alloc_states[conf_index][epnum];
+            if(alloc->owner[dir] == NULL) {
+                continue;
+            }
+            int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
+            int ret = init ?
+                usb_drv_init_endpoint(ep, alloc->type[dir], -1) :
+                usb_drv_deinit_endpoint(ep);
+            if(ret) {
+                logf("usb_core: usb_drv_%s_endpoint failed ep=%d dir=%d", init ? "init" : "deinit", epnum, dir);
+                continue;
+            }
+            if(init) {
+                ep_data[epnum].completion_handler[dir] = alloc->owner[dir]->transfer_complete;
+                ep_data[epnum].fast_completion_handler[dir] = alloc->owner[dir]->fast_transfer_complete;
+                ep_data[epnum].control_handler[dir] = alloc->owner[dir]->control_request;
             }
         }
     }
+}
+
+static void allocate_interfaces_and_endpoints(void)
+{
+    if(usb_config != 0) {
+        /* deinit currently used endpoints */
+        init_deinit_endpoints(usb_config - 1, false);
+    }
+
+    /* reset allocations */
+    memset(ep_alloc_states, 0, sizeof(ep_alloc_states));
+
+    int interface[NUM_CONFIGS] = {0};
 
     for(int i = 0; i < USB_NUM_DRIVERS; i++) {
         struct usb_class_driver* driver = &drivers[i];
+        const uint8_t conf_index = driver->config - 1;
 
         if(!driver->enabled) {
             continue;
@@ -611,7 +639,7 @@ static void allocate_interfaces_and_endpoints(void)
                     continue;
                 }
                 /* free check */
-                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
+                struct ep_alloc_state* alloc = &ep_alloc_states[conf_index][epnum];
                 if(alloc->owner[req->dir] != NULL) {
                     continue;
                 }
@@ -650,7 +678,7 @@ static void allocate_interfaces_and_endpoints(void)
                     const uint8_t epnum = EP_NUM(ep);
                     const uint8_t epdir = EP_DIR(ep);
                     const uint8_t dir = epdir == USB_DIR_OUT ? DIR_OUT : DIR_IN;
-                    ep_alloc_states[0][epnum].owner[dir] = NULL;
+                    ep_alloc_states[conf_index][epnum].owner[dir] = NULL;
                 }
                 break;
             }
@@ -661,12 +689,12 @@ static void allocate_interfaces_and_endpoints(void)
         }
 
         /* assign interfaces */
-        driver->first_interface = interface;
-        interface = driver->set_first_interface(interface);
-        driver->last_interface = interface;
+        driver->first_interface = interface[conf_index];
+        interface[conf_index] = driver->set_first_interface(interface[conf_index]);
+        driver->last_interface = interface[conf_index];
     }
 
-    usb_core_num_interfaces = interface;
+    memcpy(usb_core_num_interfaces, interface, sizeof(interface));
 }
 
 
@@ -676,44 +704,39 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
     bool handled = false;
 
     for(i = 0; i < USB_NUM_DRIVERS; i++) {
-        if(drivers[i].enabled &&
-                drivers[i].control_request &&
-                drivers[i].first_interface <= interface &&
-                drivers[i].last_interface > interface) {
-            /* Check for SET_INTERFACE and GET_INTERFACE */
-            if((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE &&
-                    (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
-
-                if(req->bRequest == USB_REQ_SET_INTERFACE) {
-                    logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
-                    if(drivers[i].set_interface &&
-                            drivers[i].set_interface(req->wIndex, req->wValue) >= 0) {
-
-                        usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
-                        handled = true;
-                    }
-                    break;
-                }
-                else if(req->bRequest == USB_REQ_GET_INTERFACE) {
-                    int alt = -1;
-                    logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
-
-                    if(drivers[i].get_interface)
-                        alt = drivers[i].get_interface(req->wIndex);
-
-                    if(alt >= 0 && alt < 255) {
-                        response_data[0] = alt;
-                        usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
-                        handled = true;
-                    }
-                    break;
-                }
-                /* fallback */
-            }
-
-            handled = drivers[i].control_request(req, reqdata, response_data);
-            break; /* no other driver can handle it because it's interface specific */
+        struct usb_class_driver* driver = &drivers[i];
+        if(!is_active(*driver) || !has_if(*driver, interface) || driver->control_request == NULL) {
+            continue;
         }
+
+        /* Check for SET_INTERFACE and GET_INTERFACE */
+        if((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE &&
+                (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
+            if(req->bRequest == USB_REQ_SET_INTERFACE) {
+                logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
+                if(driver->set_interface && driver->set_interface(req->wIndex, req->wValue) >= 0) {
+                    usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                    handled = true;
+                }
+                break;
+            } else if(req->bRequest == USB_REQ_GET_INTERFACE) {
+                int alt = -1;
+                logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
+
+                if(drivers[i].get_interface)
+                    alt = drivers[i].get_interface(req->wIndex);
+
+                if(alt >= 0 && alt < 255) {
+                    response_data[0] = alt;
+                    usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+                    handled = true;
+                }
+                break;
+            }
+        }
+
+        handled = driver->control_request(req, reqdata, response_data);
+        break; /* no other driver can handle it because it's interface specific */
     }
     if(!handled) {
         /* nope. flag error */
@@ -728,9 +751,10 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
     int size;
     const void* ptr = NULL;
     int length = req->wLength;
+    int type = req->wValue >> 8;
     int index = req->wValue & 0xff;
 
-    switch(req->wValue >> 8) { /* type */
+    switch(type) {
         case USB_DT_DEVICE:
             ptr = &device_descriptor;
             size = sizeof(struct usb_device_descriptor);
@@ -738,43 +762,45 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
 
         case USB_DT_OTHER_SPEED_CONFIG:
         case USB_DT_CONFIG: {
-                int i, max_packet_size;
-
-                if(req->wValue>>8==USB_DT_CONFIG) {
-                    max_packet_size = (usb_drv_port_speed() ? 512 : 64);
-                    config_descriptor.bDescriptorType = USB_DT_CONFIG;
-                }
-                else {
-                    max_packet_size=(usb_drv_port_speed() ? 64 : 512);
-                    config_descriptor.bDescriptorType =
-                        USB_DT_OTHER_SPEED_CONFIG;
-                }
-#ifdef HAVE_USB_CHARGING_ENABLE
-                if (usb_charging_mode == USB_CHARGING_DISABLE) {
-                    config_descriptor.bMaxPower = (100+1)/2;
-                    usb_charging_current_requested = 100;
-                }
-                else {
-                    config_descriptor.bMaxPower = (500+1)/2;
-                    usb_charging_current_requested = 500;
-                }
-#endif
-                size = sizeof(struct usb_config_descriptor);
-
-                for(i = 0; i < USB_NUM_DRIVERS; i++)
-                    if(drivers[i].enabled && drivers[i].get_config_descriptor)
-                        size += drivers[i].get_config_descriptor(
-                                    &response_data[size], max_packet_size);
-
-                config_descriptor.bNumInterfaces = usb_core_num_interfaces;
-                config_descriptor.wTotalLength = (uint16_t)size;
-                memcpy(&response_data[0], &config_descriptor,
-                        sizeof(struct usb_config_descriptor));
-
-                ptr = response_data;
+            if(index > NUM_CONFIGS) {
+                logf("invalid config dt index %u", index);
                 break;
             }
+            int i, max_packet_size;
 
+            if(type == USB_DT_CONFIG) {
+                max_packet_size = (usb_drv_port_speed() ? 512 : 64);
+                config_descriptor.bDescriptorType = USB_DT_CONFIG;
+            }
+            else {
+                max_packet_size = (usb_drv_port_speed() ? 64 : 512);
+                config_descriptor.bDescriptorType = USB_DT_OTHER_SPEED_CONFIG;
+            }
+#ifdef HAVE_USB_CHARGING_ENABLE
+            if (usb_charging_mode == USB_CHARGING_DISABLE) {
+                config_descriptor.bMaxPower = (100+1)/2;
+                usb_charging_current_requested = 100;
+            }
+            else {
+                config_descriptor.bMaxPower = (500+1)/2;
+                usb_charging_current_requested = 500;
+            }
+#endif
+            size = sizeof(struct usb_config_descriptor);
+
+            for(i = 0; i < USB_NUM_DRIVERS; i++) {
+                if(drivers[i].enabled && drivers[i].config == index + 1 && drivers[i].get_config_descriptor) {
+                    size += drivers[i].get_config_descriptor(&response_data[size], max_packet_size);
+                }
+            }
+
+            config_descriptor.bNumInterfaces = usb_core_num_interfaces[index];
+            config_descriptor.bConfigurationValue = index + 1;
+            config_descriptor.wTotalLength = (uint16_t)size;
+            memcpy(&response_data[0], &config_descriptor, sizeof(struct usb_config_descriptor));
+
+            ptr = response_data;
+        } break;
         case USB_DT_STRING:
             logf("STRING %d", index);
             if((unsigned)index < USB_STRING_INDEX_MAX) {
@@ -826,56 +852,44 @@ static void usb_core_do_set_addr(uint8_t address)
     usb_state = ADDRESS;
 }
 
-static void usb_core_do_set_config(uint8_t config)
+static int usb_core_do_set_config(uint8_t new_config)
 {
-    logf("usb_core: SET_CONFIG %d",config);
+    logf("usb_core: SET_CONFIG %d to %d", usb_config, new_config);
 
-    /* (de)initialize allocated endpoints */
-    const bool init = usb_state == ADDRESS && config;
-    const bool deinit = usb_state == CONFIGURED && !config;
-    if(init || deinit) {
-        memset(ep_data, 0, sizeof(ep_data));
-        for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
-            for(int dir = 0; dir < 2; dir += 1) {
-                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
-                if(alloc->owner[dir] == NULL) {
-                    continue;
-                }
-                int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
-                int ret = init ?
-                    usb_drv_init_endpoint(ep, alloc->type[dir], -1) :
-                    usb_drv_deinit_endpoint(ep);
-                if(ret) {
-                    logf("usb_core: usb_drv_%s_endpoint failed ep=%d dir=%e", init ? "init" : "deinit", epnum, dir);
-                    continue;
-                }
-                if(init) {
-                    ep_data[epnum].completion_handler[dir] = alloc->owner[dir]->transfer_complete;
-                    ep_data[epnum].fast_completion_handler[dir] = alloc->owner[dir]->fast_transfer_complete;
-                    ep_data[epnum].control_handler[dir] = alloc->owner[dir]->control_request;
-                }
+    if(new_config > NUM_CONFIGS) {
+        logf("usb_core: invalid config number");
+        return -1;
+    }
+
+    /* deactivate old config */
+    if(usb_config != 0) {
+        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
+            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
+                drivers[i].disconnect();
+            }
+        }
+        init_deinit_endpoints(usb_config - 1, false);
+    }
+
+    memset(ep_data, 0, sizeof(ep_data));
+    usb_config = new_config;
+    usb_state = usb_config == 0 ? ADDRESS : CONFIGURED;
+
+    /* activate new config */
+    if(usb_config != 0) {
+        init_deinit_endpoints(usb_config - 1, true);
+        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
+            if(is_active(drivers[i]) && drivers[i].init_connection != NULL) {
+                drivers[i].init_connection();
             }
         }
     }
 
-    if(config) {
-        usb_state = CONFIGURED;
-
-        if(drivers_connected)
-            for(int i = 0; i < USB_NUM_DRIVERS; i++)
-                if(drivers[i].enabled && drivers[i].disconnect != NULL)
-                    drivers[i].disconnect();
-
-        for(int i = 0; i < USB_NUM_DRIVERS; i++)
-            if(drivers[i].enabled && drivers[i].init_connection)
-                drivers[i].init_connection();
-        drivers_connected = true;
-    }
-    else
-        usb_state = ADDRESS;
     #ifdef HAVE_USB_CHARGING_ENABLE
     usb_charging_maxcurrent_change(usb_charging_maxcurrent());
     #endif
+
+    return 0;
 }
 
 static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
@@ -895,13 +909,16 @@ static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
     switch(req->bRequest) {
         case USB_REQ_GET_CONFIGURATION:
             logf("usb_core: GET_CONFIG");
-            response_data[0] = (usb_state == ADDRESS ? 0 : 1);
+            response_data[0] = usb_config;
             usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
             break;
         case USB_REQ_SET_CONFIGURATION:
             usb_drv_cancel_all_transfers();
-            usb_core_do_set_config(req->wValue);
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            if(usb_core_do_set_config(req->wValue) == 0) {
+                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            } else {
+                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            }
             break;
         case USB_REQ_SET_ADDRESS:
             /* NOTE: We really have no business handling this and drivers
@@ -946,7 +963,6 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req, void
             logf("usb_core: SET_INTERFACE");
         case USB_REQ_GET_INTERFACE:
             control_request_handler_drivers(req, reqdata);
-            break;
             break;
         case USB_REQ_GET_STATUS:
             response_data[0] = 0;
@@ -1091,6 +1107,15 @@ void usb_core_bus_reset(void)
     logf("usb_core: bus reset");
     usb_address = 0;
     usb_state = DEFAULT;
+    if(usb_config != 0) {
+        for(int i = 0; i < USB_NUM_DRIVERS; i++) {
+            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
+                drivers[i].disconnect();
+            }
+        }
+        init_deinit_endpoints(usb_config - 1, false);
+        usb_config = 0;
+    }
 #ifdef HAVE_USB_CHARGING_ENABLE
 #ifdef HAVE_USB_CHARGING_IN_THREAD
     /* On some targets usb_charging_maxcurrent_change() cannot be called
