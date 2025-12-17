@@ -21,9 +21,10 @@
 #ifndef USB_SERIAL_H
 #define USB_SERIAL_H
 
-#include "usb_ch9.h"
+#include "usb_class_driver.h"
 
-int usb_serial_request_endpoints(struct usb_class_driver *);
+extern struct usb_class_driver_ep_allocation usb_serial_ep_allocs[3];
+
 int usb_serial_set_first_interface(int interface);
 int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size);
 void usb_serial_init_connection(void);

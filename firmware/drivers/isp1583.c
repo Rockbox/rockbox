@@ -29,6 +29,9 @@
 #include "logf.h"
 #include "stdio.h"
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS]; /* filled in usb_drv_init */
+uint8_t usb_drv_ep_specs_flags = 0;
+
 struct usb_endpoint
 {
     unsigned char *out_buf;
@@ -48,7 +51,6 @@ struct usb_endpoint
     unsigned char enabled[2];
     short max_pkt_size[2];
     short type;
-    char allocation;
 };
 
 static unsigned char setup_pkt_buf[8];
@@ -470,6 +472,14 @@ void usb_drv_init(void)
 
     //tick_add_task(usb_helper);
 
+    /* Fill endpoint spec table FIXME: should be done in usb_drv_startup() */
+    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
+    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
+    for(int i = 1; i < USB_NUM_ENDPOINTS; i += 1) {
+        usb_drv_ep_specs[i].type[DIR_OUT] = USB_ENDPOINT_XFER_BULK;
+        usb_drv_ep_specs[i].type[DIR_IN] = USB_ENDPOINT_XFER_BULK;
+    }
+
     logf("usb_init_device() finished");
 }
 
@@ -616,29 +626,15 @@ void usb_drv_cancel_all_transfers(void)
         endpoints[i].halt[0] = endpoints[i].halt[1] = 1;
 }
 
-int usb_drv_request_endpoint(int type, int dir)
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size)
 {
-    int i, bit;
-
-    if (type != USB_ENDPOINT_XFER_BULK)
-        return -1;
-
-    bit=(dir & USB_DIR_IN)? 2:1;
-
-    for (i=1; i < USB_NUM_ENDPOINTS; i++) {
-        if((endpoints[i].allocation & bit)!=0)
-            continue;
-        endpoints[i].allocation |= bit;
-        return i | dir;
-    }
-
-    return -1;
+    (void)max_packet_size; /* FIXME: support max packet size override */
+    return 0;
 }
 
-void usb_drv_release_endpoint(int ep)
+int usb_drv_deinit_endpoint(int endpoint)
 {
-    int mask = (ep & USB_DIR_IN)? ~2:~1;
-    endpoints[ep & 0x7f].allocation &= mask;
+    return 0;
 }
 
 static void bus_reset(void)

@@ -46,6 +46,8 @@ void usb_init_device(void)
     /* configure INTCON */
     INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
              UDC_INTEN;         /* enable EP0 interrupts */
+
+    usb_drv_startup();
 }
 
 void usb_attach(void)

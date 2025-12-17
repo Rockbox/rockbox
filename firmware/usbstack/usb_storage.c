@@ -321,7 +321,14 @@ static bool ejected[NUM_DRIVES];
 static bool locked[NUM_DRIVES];
 
 static int usb_interface;
-static int ep_in, ep_out;
+
+struct usb_class_driver_ep_allocation usb_storage_ep_allocs[2] = {
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_IN, .optional = false},
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_OUT, .optional = false},
+};
+
+#define EP_IN (usb_storage_ep_allocs[0].ep)
+#define EP_OUT (usb_storage_ep_allocs[1].ep)
 
 #if defined(HAVE_MULTIDRIVE)
 static bool skip_first = 0;
@@ -399,24 +406,6 @@ void usb_storage_init(void)
     logf("usb_storage_init done");
 }
 
-int usb_storage_request_endpoints(struct usb_class_driver *drv)
-{
-    ep_in = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_IN, drv);
-
-    if(ep_in<0)
-        return -1;
-
-    ep_out = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_OUT,
-            drv);
-
-    if(ep_out<0) {
-        usb_core_release_endpoint(ep_in);
-        return -1;
-    }
-
-    return 0;
-}
-
 int usb_storage_set_first_interface(int interface)
 {
     usb_interface = interface;
@@ -432,10 +421,10 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 
     endpoint_descriptor.wMaxPacketSize = max_packet_size;
 
-    endpoint_descriptor.bEndpointAddress = ep_in;
+    endpoint_descriptor.bEndpointAddress = EP_IN;
     PACK_DATA(&dest, endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = ep_out;
+    endpoint_descriptor.bEndpointAddress = EP_OUT;
     PACK_DATA(&dest, endpoint_descriptor);
 
     return (dest - orig_dest);
@@ -486,7 +475,7 @@ void usb_storage_init_connection(void)
     ramdisk_buffer = tb.transfer_buffer + ALLOCATE_BUFFER_SIZE;
 #endif
 #endif
-    usb_drv_recv_nonblocking(ep_out, cbw_buffer, MAX_CBW_SIZE);
+    usb_drv_recv_nonblocking(EP_OUT, cbw_buffer, MAX_CBW_SIZE);
 
     int i;
     for(i=0;i<storage_num_drives();i++) {
@@ -731,8 +720,8 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, uns
                data toggle bits and endpoint STALL conditions despite
                the Bulk-Only Mass Storage Reset. */
 #if 0
-            usb_drv_reset_endpoint(ep_in, false);
-            usb_drv_reset_endpoint(ep_out, true);
+            usb_drv_reset_endpoint(EP_IN, false);
+            usb_drv_reset_endpoint(EP_OUT, true);
 #endif
             usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             handled = true;
@@ -789,8 +778,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
     if(letoh32(cbw->signature) != CBW_SIGNATURE) {
         logf("ums: bad cbw signature (%x)", cbw->signature);
-        usb_drv_stall(ep_in, true,true);
-        usb_drv_stall(ep_out, true,false);
+        usb_drv_stall(EP_IN, true,true);
+        usb_drv_stall(EP_OUT, true,false);
         return;
     }
     /* Clear the signature to prevent possible bugs elsewhere
@@ -1407,33 +1396,33 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
 static void send_block_data(void *data,int size)
 {
-    usb_drv_send_nonblocking(ep_in, data,size);
+    usb_drv_send_nonblocking(EP_IN, data,size);
     state = SENDING_BLOCKS;
 }
 
 static void send_command_result(void *data,int size)
 {
-    usb_drv_send_nonblocking(ep_in, data,size);
+    usb_drv_send_nonblocking(EP_IN, data,size);
     state = SENDING_RESULT;
 }
 
 static void send_command_failed_result(void)
 {
-    usb_drv_send_nonblocking(ep_in, NULL, 0);
+    usb_drv_send_nonblocking(EP_IN, NULL, 0);
     state = SENDING_FAILED_RESULT;
 }
 
 #if CONFIG_RTC
 static void receive_time(void)
 {
-    usb_drv_recv_nonblocking(ep_out, tb.transfer_buffer, 12);
+    usb_drv_recv_nonblocking(EP_OUT, tb.transfer_buffer, 12);
     state = RECEIVING_TIME;
 }
 #endif /* CONFIG_RTC */
 
 static void receive_block_data(void *data,int size)
 {
-    usb_drv_recv_nonblocking(ep_out, data, size);
+    usb_drv_recv_nonblocking(EP_OUT, data, size);
     state = RECEIVING_BLOCKS;
 }
 
@@ -1444,12 +1433,12 @@ static void send_csw(int status)
     tb.csw->data_residue = 0;
     tb.csw->status = status;
 
-    usb_drv_send_nonblocking(ep_in, tb.csw,
+    usb_drv_send_nonblocking(EP_IN, tb.csw,
             sizeof(struct command_status_wrapper));
     state = WAITING_FOR_CSW_COMPLETION_OR_COMMAND;
     //logf("CSW: %X",status);
     /* Already start waiting for the next command */
-    usb_drv_recv_nonblocking(ep_out, cbw_buffer, MAX_CBW_SIZE);
+    usb_drv_recv_nonblocking(EP_OUT, cbw_buffer, MAX_CBW_SIZE);
     /* The next completed transfer will be either the CSW one
      * or the new command */
 

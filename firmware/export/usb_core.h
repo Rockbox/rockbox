@@ -66,9 +66,6 @@ void usb_core_handle_notify(long id, intptr_t data);
 void usb_core_notify_set_address(uint8_t addr);
 void usb_core_notify_set_config(uint8_t config);
 
-int usb_core_request_endpoint(int type, int dir,struct usb_class_driver* drv);
-void usb_core_release_endpoint(int dir);
-
 #ifdef HAVE_HOTSWAP
 void usb_core_hotswap_event(int volume,bool inserted);
 #endif

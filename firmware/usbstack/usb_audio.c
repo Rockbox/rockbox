@@ -297,8 +297,15 @@ static int usb_as_playback_intf_alt; /* playback streaming interface alternate s
 
 static int as_playback_freq_idx; /* audio playback streaming frequency index (in hw_freq_sampr) */
 
-static int out_iso_ep_adr; /* output isochronous endpoint */
-static int in_iso_feedback_ep_adr; /* input feedback isochronous endpoint */
+struct usb_class_driver_ep_allocation usb_audio_ep_allocs[2] = {
+    /* output isochronous endpoint */
+    {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_OUT, .optional = false},
+    /* input feedback isochronous endpoint */
+    {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_IN, .optional = false},
+};
+
+#define EP_ISO_OUT (usb_audio_ep_allocs[0].ep)
+#define EP_ISO_FEEDBACK_IN (usb_audio_ep_allocs[1].ep)
 
 /* small buffer used for control transfers */
 static unsigned char usb_buffer[128] USB_DEVBSS_ATTR;
@@ -561,47 +568,14 @@ void usb_audio_free_buf(void)
     dsp_buf = NULL;
 }
 
-int usb_audio_request_endpoints(struct usb_class_driver *drv)
-{
-    // make sure we can get the buffers first...
-    // return -1 if the allocation _failed_
-    if (usb_audio_request_buf())
-        return -1;
-
-    out_iso_ep_adr = usb_core_request_endpoint(USB_ENDPOINT_XFER_ISOC, USB_DIR_OUT, drv);
-    if(out_iso_ep_adr < 0)
-    {
-        logf("usbaudio: cannot get an out iso endpoint");
-        return -1;
-    }
-
-    in_iso_feedback_ep_adr = usb_core_request_endpoint(USB_ENDPOINT_XFER_ISOC, USB_DIR_IN, drv);
-    if(in_iso_feedback_ep_adr < 0)
-    {
-        usb_core_release_endpoint(out_iso_ep_adr);
-        logf("usbaudio: cannot get an in iso endpoint");
-        return -1;
-    }
-
-    logf("usbaudio: iso out ep is 0x%x, in ep is 0x%x", out_iso_ep_adr, in_iso_feedback_ep_adr);
-
-    as_iso_audio_out_ep.bEndpointAddress = out_iso_ep_adr;
-    as_iso_audio_out_ep.bSynchAddress = in_iso_feedback_ep_adr;
-
-    as_iso_synch_in_ep.bEndpointAddress = in_iso_feedback_ep_adr;
-    as_iso_synch_in_ep.bSynchAddress = 0;
-
-    return 0;
-}
-
 unsigned int usb_audio_get_out_ep(void)
 {
-    return out_iso_ep_adr;
+    return EP_ISO_OUT;
 }
 
 unsigned int usb_audio_get_in_ep(void)
 {
-    return in_iso_feedback_ep_adr;
+    return EP_ISO_FEEDBACK_IN;
 }
 
 int usb_audio_set_first_interface(int interface)
@@ -638,6 +612,10 @@ int usb_audio_get_config_descriptor(unsigned char *dest, int max_packet_size)
 
     /* endpoints */
     as_iso_audio_out_ep.wMaxPacketSize = 1023;
+    as_iso_audio_out_ep.bEndpointAddress = EP_ISO_OUT;
+    as_iso_audio_out_ep.bSynchAddress = EP_ISO_FEEDBACK_IN;
+    as_iso_synch_in_ep.bEndpointAddress = EP_ISO_FEEDBACK_IN;
+    as_iso_synch_in_ep.bSynchAddress = 0;
 
     /** Endpoint Interval calculation:
      * typically sampling frequency is 44100 Hz and top is 192000 Hz, which
@@ -691,7 +669,7 @@ static void playback_audio_get_more(const void **start, size_t *size)
     {
         logf("usbaudio: recover usb rx overflow");
         usb_rx_overflow = false;
-        usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
+        usb_drv_recv_nonblocking(EP_ISO_OUT, rx_buffer, BUFFER_SIZE);
     }
     restore_irq(oldlevel);
 }
@@ -731,7 +709,7 @@ static void usb_audio_start_playback(void)
     pcm_apply_settings();
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_USBAUDIO, MIX_AMP_UNITY);
 
-    usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
+    usb_drv_recv_nonblocking(EP_ISO_OUT, rx_buffer, BUFFER_SIZE);
 }
 
 static void usb_audio_stop_playback(void)
@@ -883,7 +861,7 @@ static bool usb_audio_endpoint_request(struct usb_ctrlrequest* req, void *reqdat
 {
     int ep = req->wIndex & 0xff;
 
-    if(ep == out_iso_ep_adr)
+    if(ep == EP_ISO_OUT)
         return usb_audio_as_ctrldata_endpoint_request(req, reqdata);
     else
     {
@@ -1184,6 +1162,11 @@ void usb_audio_init_connection(void)
 {
     logf("usbaudio: init connection");
 
+    // make sure we can get the buffers first...
+    // TODO: disable this driver when failed
+    if (usb_audio_request_buf())
+        return;
+
     usbaudio_active = true;
     dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_configure(dsp, DSP_RESET, 0);
@@ -1203,6 +1186,9 @@ void usb_audio_init_connection(void)
 void usb_audio_disconnect(void)
 {
     logf("usbaudio: disconnect");
+
+    if(!usbaudio_active)
+        return;
 
     usb_audio_stop_playback();
     usb_audio_free_buf();
@@ -1289,7 +1275,7 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
     (void) dir;
     bool retval = false;
 
-    if(ep == out_iso_ep_adr && usb_as_playback_intf_alt == 1)
+    if(ep == EP_ISO_OUT && usb_as_playback_intf_alt == 1)
     {
         // check for dropped frames
         if (last_frame != usb_drv_get_frame_number())
@@ -1340,7 +1326,7 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
         if(rx_usb_idx != rx_play_idx)
         {
             logf("usbaudio: new transaction");
-            usb_drv_recv_nonblocking(out_iso_ep_adr, rx_buffer, BUFFER_SIZE);
+            usb_drv_recv_nonblocking(EP_ISO_OUT, rx_buffer, BUFFER_SIZE);
         }
         else
         {
@@ -1399,7 +1385,7 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
 
             encodeFBfixedpt(sendFf, samples_fb, usb_drv_port_speed());
             logf("usbaudio: frame %d fbval 0x%02X%02X%02X%02X", usb_drv_get_frame_number(), sendFf[3], sendFf[2], sendFf[1], sendFf[0]);
-            usb_drv_send_nonblocking(in_iso_feedback_ep_adr, sendFf, usb_drv_port_speed()?4:3);
+            usb_drv_send_nonblocking(EP_ISO_FEEDBACK_IN, sendFf, usb_drv_port_speed()?4:3);
 
             // debug screen counters
             //

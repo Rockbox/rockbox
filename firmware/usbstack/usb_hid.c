@@ -186,8 +186,13 @@ static int cur_buf_send;
 
 static bool active = false;
 static bool currently_sending = false;
-static int ep_in;
 static int usb_interface;
+
+struct usb_class_driver_ep_allocation usb_hid_ep_allocs[1] = {
+    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = false},
+};
+
+#define EP_IN (usb_hid_ep_allocs[0].ep)
 
 static void usb_hid_try_send_drv(void);
 
@@ -233,15 +238,6 @@ static void pack_parameter(unsigned char **dest, bool is_signed, bool mark_size,
         (*dest)++;
         value >>= 8;
     }
-}
-
-int usb_hid_request_endpoints(struct usb_class_driver *drv)
-{
-    ep_in = usb_core_request_endpoint(USB_ENDPOINT_XFER_INT, USB_DIR_IN, drv);
-    if (ep_in < 0)
-        return -1;
-
-    return 0;
 }
 
 int usb_hid_set_first_interface(int interface)
@@ -608,7 +604,7 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
     /* Endpoint descriptor */
     endpoint_descriptor.wMaxPacketSize = 8;
     endpoint_descriptor.bInterval = 8;
-    endpoint_descriptor.bEndpointAddress = ep_in;
+    endpoint_descriptor.bEndpointAddress = EP_IN;
     PACK_DATA(&dest, endpoint_descriptor);
 
     return (int)(dest - orig_dest);
@@ -832,7 +828,7 @@ static void usb_hid_try_send_drv(void)
     }
 
     logf("HID: Sending %d bytes",length);
-    rc = usb_drv_send_nonblocking(ep_in, send_buffer[cur_buf_send], length);
+    rc = usb_drv_send_nonblocking(EP_IN, send_buffer[cur_buf_send], length);
     currently_sending = true;
     if (rc)
         send_buffer_len[cur_buf_send] = 0;

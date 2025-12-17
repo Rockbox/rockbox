@@ -36,6 +36,15 @@
 
 #include "usb-drv-as3525.h"
 
+/* OUT EP 2 is an alias for OUT EP 0 on this HW! */
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_EPS] = {
+    [0] = {USB_ENDPOINT_XFER_CONTROL, USB_ENDPOINT_XFER_CONTROL},
+    [1] = {USB_ENDPOINT_TYPE_ANY, USB_ENDPOINT_TYPE_ANY},
+    [2] = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_TYPE_ANY},
+    [3] = {USB_ENDPOINT_TYPE_ANY, USB_ENDPOINT_TYPE_ANY},
+};
+uint8_t usb_drv_ep_specs_flags = 0;
+
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
 static int got_set_configuration = 0;
 static int usb_enum_timeout = -1;
@@ -154,16 +163,6 @@ static void dma_desc_init(int ep, int dir)
 static void reset_endpoints(int init)
 {
     int i;
-
-    /*
-     * OUT EP 2 is an alias for OUT EP 0 on this HW!
-     *
-     * Resonates with "3 bidirectional- plus 1 in-endpoints in device mode"
-     * from the datasheet, but why ep2 and not ep3?
-     *
-     * Reserve it here so we will skip over it in request_endpoint().
-     */
-    endpoints[2][1].state |= EP_STATE_ALLOCATED;
 
     for(i = 0; i < USB_NUM_EPS; i++) {
         /*
@@ -344,62 +343,37 @@ int usb_drv_port_speed(void)
     return (USB_DEV_STS & USB_DEV_STS_MASK_SPD) ? 0 : 1;
 }
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    int d = dir == USB_DIR_IN ? 0 : 1;
-    int i = 1; /* skip the control EP */
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size;
 
-    for(; i < USB_NUM_EPS; i++) {
-        if (endpoints[i][d].state & EP_STATE_ALLOCATED)
-            continue;
+    int i = EP_NUM(endpoint);
+    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
 
-        endpoints[i][d].state |= EP_STATE_ALLOCATED;
-
-        if (dir == USB_DIR_IN) {
-            USB_IEP_CTRL(i) = USB_EP_CTRL_FLUSH |
-                              USB_EP_CTRL_SNAK  |
-                              USB_EP_CTRL_ACT   |
-                              (type << 4);
-            USB_DEV_EP_INTR_MASK &= ~(1<<i);
-        } else {
-            USB_OEP_CTRL(i) = USB_EP_CTRL_FLUSH |
-                              USB_EP_CTRL_SNAK  |
-                              USB_EP_CTRL_ACT   |
-                              (type << 4);
-            USB_DEV_EP_INTR_MASK &= ~(1<<(16+i));
-        }
-        /* logf("usb_drv_request_endpoint(%d, %d): returning %02x\n", type, dir, i | dir); */
-        return i | dir;
+    if (EP_DIR(endpoint) == DIR_IN) {
+        USB_IEP_CTRL(i) = USB_EP_CTRL_FLUSH |
+                          USB_EP_CTRL_SNAK  |
+                          USB_EP_CTRL_ACT   |
+                          (type << 4);
+        USB_DEV_EP_INTR_MASK &= ~(1<<i);
+    } else {
+        USB_OEP_CTRL(i) = USB_EP_CTRL_FLUSH |
+                          USB_EP_CTRL_SNAK  |
+                          USB_EP_CTRL_ACT   |
+                          (type << 4);
+        USB_DEV_EP_INTR_MASK &= ~(1<<(16+i));
     }
-
-    logf("usb_drv_request_endpoint(%d, %d): no free endpoint found\n", type, dir);
-    return -1;
+    return 0;
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    int i = ep & 0x7f;
-    int d = ep & USB_DIR_IN ? 0 : 1;
+int usb_drv_deinit_endpoint(int endpoint) {
+    int i = EP_NUM(endpoint);
+    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
 
-    if (i >= USB_NUM_EPS)
-        return;
-    /*
-     * Check for control EP and ignore it.
-     * Unfortunately the usb core calls
-     * usb_drv_release_endpoint() for ep=0..(USB_NUM_ENDPOINTS-1),
-     * but doesn't request a new control EP after that...
-     */
-    if (i == 0 || /* Don't mask control EP */
-        (i == 2 && d == 1)) /* See reset_endpoints(), EP2_OUT == EP0_OUT */
-        return;
-
-    if (!(endpoints[i][d].state & EP_STATE_ALLOCATED))
-        return;
-
-    /* logf("usb_drv_release_endpoint(%d, %d)\n", i, d); */
     endpoints[i][d].state = 0;
     USB_DEV_EP_INTR_MASK |= (1<<(16*d+i));
     USB_EP_CTRL(i, !d) = USB_EP_CTRL_FLUSH | USB_EP_CTRL_SNAK;
+
+    return 0;
 }
 
 void usb_drv_cancel_all_transfers(void)

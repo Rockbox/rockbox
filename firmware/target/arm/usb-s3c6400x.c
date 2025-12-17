@@ -59,13 +59,22 @@ struct ep_type
     unsigned int size; /* length of the data buffer */
     struct semaphore complete; /* wait object */
     int8_t status; /* completion status (0 for success) */
-    bool active; /* true is endpoint has been requested (true for EP0) */
     bool done; /* transfer completed */
     bool busy; /* true is a transfer is pending */
 };
 
 static const uint8_t in_ep_list[] = {0, 1, 3, 5};
 static const uint8_t out_ep_list[] = {0, 2, 4};
+
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS] = {
+    {.type = {USB_ENDPOINT_XFER_CONTROL, USB_ENDPOINT_XFER_CONTROL}},
+    {.type = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_TYPE_ANY}},
+    {.type = {USB_ENDPOINT_TYPE_ANY, USB_ENDPOINT_TYPE_NONE}},
+    {.type = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_TYPE_ANY}},
+    {.type = {USB_ENDPOINT_TYPE_ANY, USB_ENDPOINT_TYPE_NONE}},
+    {.type = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_TYPE_ANY}},
+};
+uint8_t usb_drv_ep_specs_flags = 0;
 
 /* state of EP0 (to correctly schedule setup packet enqueing) */
 enum ep0state
@@ -225,7 +234,6 @@ static void reset_endpoints(void)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
             struct ep_type *endpoint = &endpoints[ep][out];
-            endpoint->active = false;
             endpoint->busy   = false;
             endpoint->status = -1;
             endpoint->done   = true;
@@ -580,29 +588,19 @@ void INT_USB_FUNC(void)
     GINTSTS = sts;
 }
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    bool out = dir == USB_DIR_OUT;
-    for (unsigned i = 1; i < num_eps(out); i++)
-    {
-        int ep = (out ? out_ep_list : in_ep_list)[i];
-        bool *active = &endpoints[ep][out ? DIR_OUT : DIR_IN].active;
-        if(*active)
-            continue;
-        *active = true;
-        DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp))
-            | DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp) | DEPCTL_usbactep;
-        return ep | dir;
-    }
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
 
-    return -1;
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
+    bool out = dir == DIR_OUT;
+    DEPCTL(num, out) = (DEPCTL(num, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp))
+            | DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp) | DEPCTL_usbactep;
+    return 0;
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    if ((ep & 0x7f) == 0)
-        return;
-    endpoints[EP_NUM(ep)][EP_DIR(ep)].active = false;
+int usb_drv_deinit_endpoint(int endpoint) {
+    return 0;
 }
 
 void usb_drv_cancel_all_transfers()

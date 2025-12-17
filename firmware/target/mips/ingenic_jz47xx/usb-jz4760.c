@@ -109,6 +109,13 @@ static struct usb_endpoint endpoints[] =
     EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL),
 };
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS] = {
+    {.type = {USB_ENDPOINT_XFER_CONTROL, USB_ENDPOINT_XFER_CONTROL}},
+    {.type = {USB_ENDPOINT_XFER_BULK, USB_ENDPOINT_XFER_BULK}},
+    {.type = {USB_ENDPOINT_XFER_INT, USB_ENDPOINT_XFER_INT}},
+};
+uint8_t usb_drv_ep_specs_flags = 0;
+
 static inline void select_endpoint(int ep)
 {
     REG_USB_INDEX = ep;
@@ -1185,78 +1192,28 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    int n = ep & 0x7f;
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
 
-    logf("%s(%d, %s)", __func__, (ep & 0x7F), (ep >> 7) ? "IN" : "OUT");
-
-    if (n)
-    {
-        int dir = ep & USB_ENDPOINT_DIR_MASK;
-
-        if(dir == USB_DIR_IN)
-        {
-            REG_USB_INTRINE &= ~USB_INTR_EP(n);
-            endpoints[n << 1].allocated = false;
-        }
-        else
-        {
-            REG_USB_INTROUTE &= ~USB_INTR_EP(n);
-            endpoints[(n << 1) + 1].allocated = false;
-        }
-    }
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
+    int index = num * 2 + (dir == DIR_OUT ? 1 : 0);
+    endpoints[index].allocated = true;
+    if(dir == DIR_IN)
+        REG_USB_INTRINE |= USB_INTR_EP(num);
+    else
+        REG_USB_INTROUTE |= USB_INTR_EP(num);
+    return 0;
 }
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    logf("%s(%d, %s)", __func__, type, (dir == USB_DIR_IN) ? "IN" : "OUT");
-
-    dir  &= USB_ENDPOINT_DIR_MASK;
-    type &= USB_ENDPOINT_XFERTYPE_MASK;
-
-    /* There are only 3+2 endpoints, so hardcode this ... */
-    switch(type)
-    {
-        case USB_ENDPOINT_XFER_BULK:
-            if(dir == USB_DIR_IN)
-            {
-                if (endpoints[2].allocated)
-                    break;
-                endpoints[2].allocated = true;
-                REG_USB_INTRINE |= USB_INTR_EP(1);
-                return (1 | USB_DIR_IN);
-            }
-            else
-            {
-                if (endpoints[3].allocated)
-                    break;
-                endpoints[3].allocated = true;
-                REG_USB_INTROUTE |= USB_INTR_EP(1);
-                return (1 | USB_DIR_OUT);
-            }
-
-        case USB_ENDPOINT_XFER_INT:
-            if(dir == USB_DIR_IN)
-            {
-                if (endpoints[4].allocated)
-                    break;
-                endpoints[4].allocated = true;
-                REG_USB_INTRINE |= USB_INTR_EP(2);
-                return (2 | USB_DIR_IN);
-            }
-            else
-            {
-                if (endpoints[5].allocated)
-                    break;
-                endpoints[5].allocated = true;
-                REG_USB_INTROUTE |= USB_INTR_EP(2);
-                return (2 | USB_DIR_OUT);
-            }
-
-        default:
-            break;
-    }
-
-    return -1;
+int usb_drv_deinit_endpoint(int endpoint) {
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
+    int index = num * 2 + (dir == DIR_OUT ? 1 : 0);
+    endpoints[index].allocated = false;
+    if(dir == DIR_IN)
+        REG_USB_INTRINE &= ~USB_INTR_EP(num);
+    else
+        REG_USB_INTROUTE &= ~USB_INTR_EP(num);
+    return 0;
 }

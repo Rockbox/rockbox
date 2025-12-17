@@ -81,6 +81,13 @@ static struct usb_endpoint endpoints[] =
     { .type = ep_interrupt, .fifo_addr = USB_FIFO_EP2, .fifo_size = 64 },
 };
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS] = {
+    {.type = {USB_ENDPOINT_XFER_CONTROL, USB_ENDPOINT_XFER_CONTROL}},
+    {.type = {USB_ENDPOINT_XFER_BULK, USB_ENDPOINT_XFER_BULK}},
+    {.type = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_XFER_INT}},
+};
+uint8_t usb_drv_ep_specs_flags = 0;
+
 static inline void select_endpoint(int ep)
 {
     REG_USB_REG_INDEX = ep;
@@ -829,33 +836,14 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    (void)ep;
-    logf("%s(%d, %s)", __func__, (ep & 0x7F), (ep >> 7) ? "IN" : "OUT");
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)endpoint;
+    (void)type;
+    (void)max_packet_size; /* FIXME: support max packet size override */
+    return 0;
 }
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    logf("%s(%d, %s)", __func__, type, (dir == USB_DIR_IN) ? "IN" : "OUT");
-
-    dir  &= USB_ENDPOINT_DIR_MASK;
-    type &= USB_ENDPOINT_XFERTYPE_MASK;
-
-    /* There are only 3+2 endpoints, so hardcode this ... */
-    switch(type)
-    {
-        case USB_ENDPOINT_XFER_BULK:
-            if(dir == USB_DIR_IN)
-                return (1 | USB_DIR_IN);
-            else
-                return (1 | USB_DIR_OUT);
-
-        case USB_ENDPOINT_XFER_INT:
-            if(dir == USB_DIR_IN)
-                return (2 | USB_DIR_IN);
-
-        default:
-            return -1;
-    }
+int usb_drv_deinit_endpoint(int endpoint) {
+    (void)endpoint;
+    return 0;
 }

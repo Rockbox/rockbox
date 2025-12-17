@@ -206,31 +206,17 @@ static int buffer_length;
 static int buffer_transitlength;
 static bool active = false;
 
-static int ep_in, ep_out, ep_int;
+struct usb_class_driver_ep_allocation usb_serial_ep_allocs[3] = {
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_IN, .optional = false},
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_OUT, .optional = false},
+    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = true},
+};
+
+#define EP_IN (usb_serial_ep_allocs[0].ep)
+#define EP_OUT (usb_serial_ep_allocs[1].ep)
+#define EP_INT (usb_serial_ep_allocs[2].ep)
+
 static int control_interface, data_interface;
-
-int usb_serial_request_endpoints(struct usb_class_driver *drv)
-{
-    ep_in = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_IN, drv);
-    if (ep_in < 0)
-        return -1;
-
-    ep_out = usb_core_request_endpoint(USB_ENDPOINT_XFER_BULK, USB_DIR_OUT,
-            drv);
-    if (ep_out < 0) {
-        usb_core_release_endpoint(ep_in);
-        return -1;
-    }
-
-    /* Optional interrupt endpoint. While the code does not actively use it,
-     * it is needed to get out-of-the-box serial port experience on Windows
-     * and Linux. If this endpoint is not available, only CDC Data interface
-     * will be exported (can still work on Linux with manual modprobe).
-     */
-    ep_int = usb_core_request_endpoint(USB_ENDPOINT_XFER_INT, USB_DIR_IN, drv);
-
-    return 0;
-}
 
 int usb_serial_set_first_interface(int interface)
 {
@@ -250,7 +236,7 @@ int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_size)
     union_descriptor.bSubordinateInterface0        = data_interface;
     data_interface_descriptor.bInterfaceNumber     = data_interface;
 
-    if (ep_int > 0)
+    if (EP_INT > 0)
     {
         PACK_DATA(&dest, association_descriptor);
         PACK_DATA(&dest, control_interface_descriptor);
@@ -263,7 +249,7 @@ int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_size)
          * both on Full and High speed. Note that max_packet_size is for bulk.
          * Maximum bInterval for High Speed is 16 and for Full Speed is 255.
          */
-        endpoint_descriptor.bEndpointAddress = ep_int;
+        endpoint_descriptor.bEndpointAddress = EP_INT;
         endpoint_descriptor.bmAttributes     = USB_ENDPOINT_XFER_INT;
         endpoint_descriptor.wMaxPacketSize   = 64;
         endpoint_descriptor.bInterval        = 16;
@@ -271,13 +257,13 @@ int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_size)
     }
 
     PACK_DATA(&dest, data_interface_descriptor);
-    endpoint_descriptor.bEndpointAddress = ep_in;
+    endpoint_descriptor.bEndpointAddress = EP_IN;
     endpoint_descriptor.bmAttributes     = USB_ENDPOINT_XFER_BULK;
     endpoint_descriptor.wMaxPacketSize   = max_packet_size;
     endpoint_descriptor.bInterval        = 0;
     PACK_DATA(&dest, endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = ep_out;
+    endpoint_descriptor.bEndpointAddress = EP_OUT;
     PACK_DATA(&dest, endpoint_descriptor);
 
     return (dest - orig_dest);
@@ -346,7 +332,7 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsi
 void usb_serial_init_connection(void)
 {
     /* prime rx endpoint */
-    usb_drv_recv_nonblocking(ep_out, receive_buffer, RECV_BUFFER_SIZE);
+    usb_drv_recv_nonblocking(EP_OUT, receive_buffer, RECV_BUFFER_SIZE);
 
     /* we come here too after a bus reset, so reset some data */
     buffer_transitlength = 0;
@@ -379,7 +365,7 @@ static void sendout(void)
         buffer_transitlength = MIN(buffer_transitlength,TRANSIT_BUFFER_SIZE);
         buffer_length -= buffer_transitlength;
         memcpy(transit_buffer,&send_buffer[buffer_start],buffer_transitlength);
-        usb_drv_send_nonblocking(ep_in,transit_buffer,buffer_transitlength);
+        usb_drv_send_nonblocking(EP_IN,transit_buffer,buffer_transitlength);
     }
 }
 
@@ -437,7 +423,7 @@ void usb_serial_transfer_complete(int ep,int dir, int status, int length)
             /* Data received. TODO : Do something with it ? */
 
             /* Get the next bit */
-            usb_drv_recv_nonblocking(ep_out, receive_buffer, RECV_BUFFER_SIZE);
+            usb_drv_recv_nonblocking(EP_OUT, receive_buffer, RECV_BUFFER_SIZE);
             break;
 
         case USB_DIR_IN:

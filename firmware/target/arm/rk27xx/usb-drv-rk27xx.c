@@ -53,7 +53,6 @@ struct endpoint_t
     const int type;              /* EP type */
     const int dir;               /* DIR_IN/DIR_OUT */
     volatile unsigned long *stat; /* RXSTAT/TXSTAT register */
-    bool allocated;              /* flag to mark EPs taken */
     volatile void *buf;          /* tx/rx buffer address */
     volatile int len;            /* size of the transfer (bytes) */
     volatile int cnt;            /* number of bytes transfered/received  */
@@ -101,6 +100,9 @@ static struct endpoint_t endpoints[16] =
     ENDPOINT(14, BULK, IN,  &TX14STAT), /* BIN14 */
     ENDPOINT(15, INT,  IN,  &TX15STAT), /* IIN15 */
 };
+
+struct usb_drv_ep_spec usb_drv_ep_specs[16]; /* filled in usb_drv_startup */
+uint8_t usb_drv_ep_specs_flags = 0;
 
 static volatile bool set_address = false;
 static volatile bool set_configuration = false;
@@ -260,48 +262,47 @@ static void udc_helper(void)
         }
 }
 
+void usb_drv_startup(void) {
+    /* fill the endpoint spec table */
+    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
+    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
+    for(int ep_num = 1; ep_num < 16; ep_num++) {
+        int dir = endpoints[ep_num].dir;
+        int type = endpoints[ep_num].type;
+        usb_drv_ep_specs[ep_num].type[dir] = type;
+        usb_drv_ep_specs[ep_num].type[!dir] = USB_ENDPOINT_TYPE_NONE;
+    }
+}
+
 /* return port speed FS=0, HS=1 */
 int usb_drv_port_speed(void)
 {
     return (DEV_INFO & DEV_SPEED) ? 0 : 1;
 }
 
-/* Reserve endpoint */
-int usb_drv_request_endpoint(int type, int dir)
-{
-    logf("req: %s %s", XFER_DIR_STR(dir), XFER_TYPE_STR(type));
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
 
-    /* Find an available ep/dir pair */
-    for(int ep_num = 1; ep_num<USB_NUM_ENDPOINTS;ep_num++)
-    {
-        struct endpoint_t *endp = &endpoints[ep_num];
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
 
-        if(endp->allocated || endp->type != type || endp->dir != dir)
-            continue;
-        /* allocate endpoint and enable interrupt */
-        endp->allocated = true;
-        if(dir == USB_DIR_IN)
-            TXCON(endp) = (ep_num << 8) | TXEPEN | TXNAK | TXACKINTEN | TXCFINTE;
-        else
-            RXCON(endp) = (ep_num << 8) | RXEPEN | RXNAK | RXACKINTEN | RXCFINTE | RXERRINTEN;
-        EN_INT |= 1 << (ep_num + 7);
+    struct endpoint_t *endp = &endpoints[num];
 
-        logf("add: ep%d %s", ep_num, XFER_DIR_STR(dir));
-        return ep_num | dir;
-    }
-    return -1;
+    if(EP_DIR(endpoint) == DIR_IN)
+        TXCON(endp) = (num << 8) | TXEPEN | TXNAK | TXACKINTEN | TXCFINTE;
+    else
+        RXCON(endp) = (num << 8) | RXEPEN | RXNAK | RXACKINTEN | RXCFINTE | RXERRINTEN;
+    EN_INT |= 1 << (num + 7);
+
+    return 0;
 }
 
-/* Free endpoint */
-void usb_drv_release_endpoint(int ep)
-{
-    int ep_num = EP_NUM(ep);
-
-    logf("rel: ep%d", ep_num);
-    endpoints[ep_num].allocated = false;
+int usb_drv_deinit_endpoint(int endpoint) {
+    int num = EP_NUM(endpoint);
+    struct endpoint_t *endp = &endpoints[num];
 
     /* disable interrupt from this endpoint */
-    EN_INT &= ~(1 << (ep_num + 7));
+    EN_INT &= ~(1 << (num + 7));
 }
 
 /* Set the address (usually it's in a register).

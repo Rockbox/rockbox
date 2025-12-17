@@ -59,6 +59,9 @@
  *  stack visible functions.
  ******************************************************************************/
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS]; /* filled in usb_drv_init */
+uint8_t usb_drv_ep_specs_flags = USB_ENDPOINT_SPEC_IO_EXCLUSIVE;
+
 static volatile unsigned short * pipe_ctrl_addr(int pipe);
 static void pipe_handshake(int pipe, int handshake);
 static void pipe_c_select (int pipe, bool dir);
@@ -78,7 +81,6 @@ struct M66591_epstat {
     int length;             /* how match data will fit */
     volatile int count;     /* actual data count */
     bool waiting;           /* is there data to transfer? */
-    bool busy;              /* has the pipe been requested for use? */
 } ;
 
 static struct M66591_epstat M66591_eps[USB_NUM_ENDPOINTS];
@@ -638,82 +640,63 @@ void usb_drv_set_test_mode(int mode) {
     M66591_TESTMODE |= mode;
 }
 
-/* Request an unused endpoint */
-int usb_drv_request_endpoint(int type, int dir) {
-    int ep;
-    int pipecfg = 0;
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
 
-    if (type == USB_ENDPOINT_XFER_BULK) {
+    int pipecfg;
+
+    if(type == USB_ENDPOINT_XFER_BULK) {
         /* Enable double buffer mode (only used for ep 1 and 2) */
         pipecfg |= 1<<9 | 1<<8; 
-        
-        /* Bulk endpoints must be between 1 and 4 inclusive */
-        ep=1;
-        
-        while(M66591_eps[ep].busy && ep++<5);
-        
-        /* If this reached 5 the endpoints were all busy */
-        if(ep==5) {
-            logf("mxx: ep %d busy", ep);
-            return -1;
-        }
-    } else if (type == USB_ENDPOINT_XFER_INT) {
-        ep=5;
-
+    } else if(type == USB_ENDPOINT_XFER_BULK) {
         pipecfg |= 1<<13;
-
-        while(M66591_eps[ep].busy && ++ep<USB_NUM_ENDPOINTS);
-
-        /* If this reached USB_NUM_ENDPOINTS the endpoints were all busy */
-        if(ep==USB_NUM_ENDPOINTS) {
-            logf("mxx: ep %d busy", ep);
-            return -1;
-        }
     } else {
         /* Not a supported type */
         return -1;
     }
 
+    int num = endpoint & USB_ENDPOINT_NUMBER_MASK;
+    int dir = endpoint & USB_ENDPOINT_DIR_MASK;
     if (dir == USB_DIR_IN) {
         pipecfg |= (1<<4);
     }
+
+    M66591_eps[num].dir = dir;
     
-    M66591_eps[ep].busy = true;
-    M66591_eps[ep].dir = dir;
-    
-    M66591_PIPE_CFGSEL=ep;
-    
+    M66591_PIPE_CFGSEL=num;
+
     /* Enable pipe (15) */
     pipecfg |= 1<<15; 
     
-    pipe_handshake(ep, PIPE_SHAKE_NAK);
+    pipe_handshake(num, PIPE_SHAKE_NAK);
 
     /* Setup the flags */
     M66591_PIPE_CFGWND=pipecfg;
     
-    pipe_init(ep);
+    pipe_init(num);
     
-    logf("mxx: ep req ep#: %d config: 0x%04x", ep, M66591_PIPE_CFGWND);
+    logf("mxx: ep req ep#: %d config: 0x%04x", num, M66591_PIPE_CFGWND);
 
-    return ep | dir;
+    return 0;
 }
 
 /* Used by stack to tell the helper functions that the pipe is not in use */
-void usb_drv_release_endpoint(int ep) {
-    int flags;
-    ep &= 0x7f;
+int usb_drv_deinit_endpoint(int endpoint) {
+    int num = endpoint & USB_ENDPOINT_NUMBER_MASK;
 
-    if (ep < 1 || ep > USB_NUM_ENDPOINTS || M66591_eps[ep].busy == false)
-        return ;
+    if (num < 1 || num > USB_NUM_ENDPOINTS) {
+        return -1;
+    }
 
-    flags = disable_irq_save();
+    int flags = disable_irq_save();
     
-    logf("mxx: ep %d release", ep);
+    logf("mxx: ep %d release", num);
 
-    M66591_eps[ep].busy = false;
-    M66591_eps[ep].dir = -1;
+    M66591_eps[num].dir = -1;
 
     restore_irq(flags);
+
+    return 0;
 }
 
 /* Periodically called to check if a cable was plugged into the device */
@@ -744,6 +727,18 @@ void usb_drv_init(void) {
     M66591_TRN_CTRL         |=0x0001;
 
     M66591_INTCFG_MAIN      |=0x8000; /* Enable VBUS interrupt */
+
+    /* Fill endpoint spec table FIXME: should be done in usb_drv_startup() */
+    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
+    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
+    for(int i = 1; i < 5; i += 1) {
+        usb_drv_ep_specs[i].type[DIR_OUT] = USB_ENDPOINT_XFER_BULK;
+        usb_drv_ep_specs[i].type[DIR_IN] = USB_ENDPOINT_XFER_BULK;
+    }
+    for(int i = 5; i < USB_NUM_ENDPOINTS; i += 1) {
+        usb_drv_ep_specs[i].type[DIR_OUT] = USB_ENDPOINT_XFER_INT;
+        usb_drv_ep_specs[i].type[DIR_IN] = USB_ENDPOINT_XFER_INT;
+    }
 }
 
 /* fully enable driver */
@@ -757,7 +752,6 @@ void usb_attach(void) {
         M66591_eps[i].length = 0;
         M66591_eps[i].count = 0;
         M66591_eps[i].waiting = false;
-        M66591_eps[i].busy = false;
     }
 
     /* Issue a h/w reset */

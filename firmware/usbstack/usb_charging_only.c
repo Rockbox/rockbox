@@ -46,12 +46,6 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
 
 static int usb_interface;
 
-int usb_charging_only_request_endpoints(struct usb_class_driver *drv)
-{
-    (void) drv;
-    return 0;
-}
-
 int usb_charging_only_set_first_interface(int interface)
 {
     usb_interface = interface;

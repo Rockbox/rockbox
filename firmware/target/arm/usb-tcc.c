@@ -32,6 +32,7 @@
 #ifdef HAVE_USBSTACK
 #include "usb_ch9.h"
 #include "usb_core.h"
+#include "usb_drv.h"
 
 #define TCC7xx_USB_EPIF_IRQ_MASK 0xf
 
@@ -70,8 +71,14 @@ struct tcc_ep {
     char *buf;    /* user buffer to store data */
     int max_len;  /* how match data will fit */
     int count;    /* actual data count */
-    bool busy;
 } ;
+
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS] = {
+    {.type = {USB_ENDPOINT_XFER_CONTROL, USB_ENDPOINT_XFER_CONTROL}},
+    {.type = {USB_ENDPOINT_TYPE_NONE, USB_ENDPOINT_XFER_BULK}},
+    {.type = {USB_ENDPOINT_XFER_BULK, USB_ENDPOINT_TYPE_NONE}},
+};
+uint8_t usb_drv_ep_specs_flags = 0;
 
 static struct tcc_ep tcc_endpoints[] = {
     /* control */
@@ -93,46 +100,16 @@ static struct tcc_ep tcc_endpoints[] = {
 static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    int flags = disable_irq_save();
-    size_t ep;
-    int ret = 0;
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
 
-    if (type != USB_ENDPOINT_XFER_BULK)
-        return -1;
-
-    if (dir == USB_DIR_IN)
-        ep = 1;
-    else
-        ep = 2;
-
-    if (!tcc_endpoints[ep].busy) {
-        tcc_endpoints[ep].busy = true;
-        tcc_endpoints[ep].dir = dir;
-        ret = ep | dir;
-    } else {
-        ret = -1;
-    }
-
-    restore_irq(flags);
-    return ret;
+    tcc_endpoints[EP_NUM(endpoint)].dir = EP_DIR(endpoint) == DIR_IN ? USB_DIR_IN : USB_DIR_OUT;
+    return 0;
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    int flags;
-    ep = ep & 0x7f;
-
-    if (ep < 1 || ep > USB_NUM_ENDPOINTS)
-        return ;
-
-    flags = disable_irq_save();
-
-    tcc_endpoints[ep].busy = false;
-    tcc_endpoints[ep].dir = -1;
-
-    restore_irq(flags);
+int usb_drv_deinit_endpoint(int endpoint) {
+    tcc_endpoints[EP_NUM(endpoint)].dir = -1;
+    return 0;
 }
 
 static inline void pullup_on(void)
@@ -349,8 +326,6 @@ void handle_ep(unsigned short ep_irq)
 
             if (0 == (ep_irq & (1 << endpoint)))
                 continue;
-            if (!tcc_ep->busy)
-                panicf_my("ep%d: wasn't requested", endpoint);
 
             TCC7xx_USB_INDEX = endpoint;
             stat = TCC7xx_USB_EP_STAT;
@@ -698,7 +673,6 @@ void usb_drv_init(void)
         tcc_endpoints[i].id = i;
         tcc_endpoints[i].mask = 1 << i;
         tcc_endpoints[i].buf = NULL;
-        tcc_endpoints[i].busy = false;
         tcc_endpoints[i].dir = -1;
     }
 

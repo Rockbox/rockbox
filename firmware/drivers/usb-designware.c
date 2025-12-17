@@ -144,6 +144,9 @@ struct usb_dw_ep0
     struct usb_ctrlrequest pending_req;
 };
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS]; /* filled in usb_drv_init */
+uint8_t usb_drv_ep_specs_flags = 0;
+
 static const char* const dw_dir_str[USB_DW_NUM_DIRS] =
 {
     [USB_DW_EPDIR_IN]  = "IN",
@@ -1495,6 +1498,17 @@ static void usb_dw_init(void)
     /* Soft reconnect */
     udelay(3000);
     DWC_DCTL &= ~SDIS;
+
+    /* Fill endpoint spec table FIXME: should be done in usb_drv_startup() */
+    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
+    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
+    for(int i = 1; i < USB_NUM_ENDPOINTS; i += 1) {
+        bool out_avail = usb_endpoints & (1 << (i + USB_DW_DIR_OFF(USB_DW_EPDIR_OUT)));
+        usb_drv_ep_specs[i].type[DIR_OUT] = out_avail ? USB_ENDPOINT_TYPE_ANY : USB_ENDPOINT_TYPE_NONE;
+
+        bool in_avail = usb_endpoints & (1 << (i + USB_DW_DIR_OFF(USB_DW_EPDIR_IN)));
+        usb_drv_ep_specs[i].type[DIR_IN] = in_avail ? USB_ENDPOINT_TYPE_ANY : USB_ENDPOINT_TYPE_NONE;
+    }
 }
 
 static void usb_dw_exit(void)
@@ -1592,56 +1606,50 @@ void INT_USB_FUNC(void)
     usb_dw_irq();
 }
 
-int usb_drv_request_endpoint(int type, int dir)
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size)
 {
-    int request_ep = -1;
-    enum usb_dw_epdir epdir = (EP_DIR(dir) == DIR_IN) ?
-                                USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    (void)max_packet_size; /* FIXME: support max packet size override */
+
+    enum usb_dw_epdir epdir = (EP_DIR(endpoint) == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(endpoint), epdir);
+
+    int maxpktsize;
+    if(type == EPTYP_ISOCHRONOUS)
+    {
+        maxpktsize = 1023;
+    }
+    else
+    {
+        maxpktsize = usb_drv_port_speed() ? 512 : 64;
+    }
 
     usb_dw_target_disable_irq();
-    for (int ep = 1; ep < USB_NUM_ENDPOINTS; ep++)
-    {
-        if (usb_endpoints & (1 << (ep + USB_DW_DIR_OFF(epdir))))
-        {
-            struct usb_dw_ep* dw_ep = usb_dw_get_ep(ep, epdir);
-            if (!dw_ep->active)
-            {
-                int maxpktsize = 64;
-                if (type == EPTYP_ISOCHRONOUS){
-                    maxpktsize = 1023;
-                } else {
-                    maxpktsize = usb_drv_port_speed() ? 512 : 64;
-                }
-
-                if (usb_dw_configure_ep(ep, epdir, type,
-                                maxpktsize) >= 0)
-                {
-                    dw_ep->active = true;
-                    request_ep = ep | dir;
-                }
-                break;
-            }
-        }
-    }
+    int res = usb_dw_configure_ep(EP_NUM(endpoint), epdir, type, maxpktsize);
     usb_dw_target_enable_irq();
-    return request_ep;
+
+    if(res >= 0)
+    {
+        dw_ep->active = true;
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
-void usb_drv_release_endpoint(int endpoint)
+int usb_drv_deinit_endpoint(int endpoint)
 {
-    int epnum = EP_NUM(endpoint);
-    if (!epnum) return;
-    enum usb_dw_epdir epdir = (EP_DIR(endpoint) == DIR_IN) ?
-                                USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, epdir);
+    enum usb_dw_epdir epdir = (EP_DIR(endpoint) == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(endpoint), epdir);
 
     usb_dw_target_disable_irq();
-    if (dw_ep->active)
-    {
-        usb_dw_unconfigure_ep(epnum, epdir);
-        dw_ep->active = false;
-    }
+    usb_dw_unconfigure_ep(EP_NUM(endpoint), epdir);
     usb_dw_target_enable_irq();
+
+    dw_ep->active = false;
+
+    return 0;
 }
 
 int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)

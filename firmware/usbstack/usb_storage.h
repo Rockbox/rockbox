@@ -21,9 +21,10 @@
 #ifndef USB_STORAGE_H
 #define USB_STORAGE_H
 
-#include "usb_ch9.h"
+#include "usb_class_driver.h"
 
-int usb_storage_request_endpoints(struct usb_class_driver *);
+extern struct usb_class_driver_ep_allocation usb_storage_ep_allocs[2];
+
 int usb_storage_set_first_interface(int interface);
 int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size);
 void usb_storage_init_connection(void);

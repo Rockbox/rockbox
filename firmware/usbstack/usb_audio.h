@@ -30,20 +30,7 @@
  * Relevant specifications are USB 2.0 and USB Audio Class 1.0.
  */
 
-/*
- * usb_audio_request_endpoints():
- *
- * Calls usb_core_request_endpoint() to request one IN and one OUT
- * isochronous endpoint.
- *
- * Called by allocate_interfaces_and_endpoints().
- *
- * Returns -1 if either request fails, returns 0 if success.
- *
- * Also requests buffer allocations. If allocation fails,
- * returns -1 so that the driver will be disabled by the USB core.
- */
-int usb_audio_request_endpoints(struct usb_class_driver *);
+extern struct usb_class_driver_ep_allocation usb_audio_ep_allocs[2];
 
 /*
  * usb_audio_set_first_interface():

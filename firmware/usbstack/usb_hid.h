@@ -21,11 +21,12 @@
 #ifndef USB_HID_H
 #define USB_HID_H
 
-#include "usb_ch9.h"
 #include "usb_core.h"
+#include "usb_class_driver.h"
 #include "usb_hid_usage_tables.h"
 
-int usb_hid_request_endpoints(struct usb_class_driver *drv);
+extern struct usb_class_driver_ep_allocation usb_hid_ep_allocs[1];
+
 int usb_hid_set_first_interface(int interface);
 int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size);
 void usb_hid_init_connection(void);

@@ -60,11 +60,12 @@ static bool setup_is_set_address;
 
 static cppi_info cppi;
 
+struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS]; /* filled in usb_drv_startup */
+uint8_t usb_drv_ep_specs_flags = 0;
+
 static struct ep_runtime_t
 {
     int max_packet_size;
-    bool in_allocated;
-    bool out_allocated;
     uint8_t *rx_buf;             /* OUT */
     int rx_remaining;
     int rx_size;
@@ -1239,13 +1240,22 @@ void usb_charging_maxcurrent_change(int maxcurrent)
     }
 }
 
+void usb_drv_startup(void)
+{
+    /* fill the endpoint spec table */
+    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
+    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
+    for(int i = 1; i < USB_NUM_ENDPOINTS; i += 1) {
+        usb_drv_ep_specs[i].type[DIR_OUT] = ep_const_data[i].type;
+        usb_drv_ep_specs[i].type[DIR_IN] = ep_const_data[i].type;
+    }
+}
+
 void usb_drv_init(void)
 {
     int epn;
     memset(ep_runtime, 0, sizeof(ep_runtime));
     ep_runtime[0].max_packet_size = EP0_MAX_PACKET_SIZE;
-    ep_runtime[0].in_allocated = true;
-    ep_runtime[0].out_allocated = true;
     for (epn = 0; epn < USB_NUM_ENDPOINTS; epn++)
     {
         semaphore_init(&ep_runtime[epn].complete, 1, 0);
@@ -1479,41 +1489,16 @@ void usb_drv_set_test_mode(int mode)
     tnetv_usb_reg_write(TNETV_USB_CTRL, usbCtrl.val);
 }
 
-int usb_drv_request_endpoint(int type, int dir)
-{
-    int epn;
-    for (epn = 1; epn < USB_NUM_ENDPOINTS; epn++)
-    {
-        if (type == ep_const_data[epn].type)
-        {
-            if ((dir == USB_DIR_IN) && (!ep_runtime[epn].in_allocated))
-            {
-                ep_runtime[epn].in_allocated = true;
-                tnetv_gadget_ep_enable(epn, true);
-                return epn | USB_DIR_IN;
-            }
-            if ((dir == USB_DIR_OUT) && (!ep_runtime[epn].out_allocated))
-            {
-                ep_runtime[epn].out_allocated = true;
-                tnetv_gadget_ep_enable(epn, false);
-                return epn | USB_DIR_OUT;
-            }
-        }
-    }
-    return -1;
+int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
+    (void)max_packet_size; /* FIXME: support max packet size override */
+
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
+    return tnetv_gadget_ep_enable(num, dir == EP_IN);
 }
 
-void usb_drv_release_endpoint(int ep)
-{
-    int epn = EP_NUM(ep);
-    if (EP_DIR(ep) == DIR_IN)
-    {
-        ep_runtime[epn].in_allocated = false;
-        tnetv_gadget_ep_disable(epn, true);
-    }
-    else
-    {
-        ep_runtime[epn].out_allocated = false;
-        tnetv_gadget_ep_disable(epn, false);
-    }
+int usb_drv_deinit_endpoint(int endpoint) {
+    int num = EP_NUM(endpoint);
+    int dir = EP_DIR(endpoint);
+    return tnetv_gadget_ep_disable(num, dir == EP_IN);
 }

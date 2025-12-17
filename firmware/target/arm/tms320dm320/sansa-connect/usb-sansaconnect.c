@@ -23,6 +23,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "usb_core.h"
+#include "usb_drv.h"
 
 static int usb_detect_callback(struct timeout *tmo)
 {
@@ -82,6 +83,8 @@ void usb_init_device(void)
 
     /* Enable USB insert detection interrupt */
     IO_INTC_EINT1 |= (1 << 14);
+
+    usb_drv_startup();
 }
 
 void usb_enable(bool on)

@@ -183,6 +183,13 @@ static struct
     struct usb_transfer_completion_event_data completion_event[2];
 } ep_data[USB_NUM_ENDPOINTS];
 
+struct ep_alloc_state {
+    int8_t type[2];
+    struct usb_class_driver* owner[2];
+};
+
+static struct ep_alloc_state ep_alloc_states[1][USB_NUM_ENDPOINTS];
+
 static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 {
 #ifdef USB_ENABLE_STORAGE
@@ -191,7 +198,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_storage = true,
         .first_interface = 0,
         .last_interface = 0,
-        .request_endpoints = usb_storage_request_endpoints,
+        .ep_allocs_size = ARRAYLEN(usb_storage_ep_allocs),
+        .ep_allocs = usb_storage_ep_allocs,
         .set_first_interface = usb_storage_set_first_interface,
         .get_config_descriptor = usb_storage_get_config_descriptor,
         .init_connection = usb_storage_init_connection,
@@ -210,7 +218,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
-        .request_endpoints = usb_serial_request_endpoints,
+        .ep_allocs_size = ARRAYLEN(usb_serial_ep_allocs),
+        .ep_allocs = usb_serial_ep_allocs,
         .set_first_interface = usb_serial_set_first_interface,
         .get_config_descriptor = usb_serial_get_config_descriptor,
         .init_connection = usb_serial_init_connection,
@@ -229,7 +238,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
-        .request_endpoints = usb_charging_only_request_endpoints,
+        .ep_allocs_size = 0,
+        .ep_allocs = NULL,
         .set_first_interface = usb_charging_only_set_first_interface,
         .get_config_descriptor = usb_charging_only_get_config_descriptor,
         .init_connection = NULL,
@@ -248,7 +258,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
-        .request_endpoints = usb_hid_request_endpoints,
+        .ep_allocs_size = ARRAYLEN(usb_hid_ep_allocs),
+        .ep_allocs = usb_hid_ep_allocs,
         .set_first_interface = usb_hid_set_first_interface,
         .get_config_descriptor = usb_hid_get_config_descriptor,
         .init_connection = usb_hid_init_connection,
@@ -267,7 +278,8 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,
-        .request_endpoints = usb_audio_request_endpoints,
+        .ep_allocs_size = ARRAYLEN(usb_audio_ep_allocs),
+        .ep_allocs = usb_audio_ep_allocs,
         .set_first_interface = usb_audio_set_first_interface,
         .get_config_descriptor = usb_audio_get_config_descriptor,
         .init_connection = usb_audio_init_connection,
@@ -459,6 +471,9 @@ void usb_core_init(void)
         if(drivers[i].init != NULL)
             drivers[i].init();
 
+    /* clear endpoint allocation state */
+    memset(ep_alloc_states, 0, sizeof(ep_alloc_states));
+
     initialized = true;
     usb_state = DEFAULT;
 #ifdef HAVE_USB_CHARGING_ENABLE
@@ -558,63 +573,99 @@ static void usb_core_set_serial_function_id(void)
     usb_string_iSerial.wString[0] = hex[id];
 }
 
-int usb_core_request_endpoint(int type, int dir, struct usb_class_driver* drv)
-{
-    int ret, ep;
-
-    ret = usb_drv_request_endpoint(type, dir);
-
-    if(ret == -1)
-        return -1;
-
-    dir = EP_DIR(ret);
-    ep = EP_NUM(ret);
-
-    ep_data[ep].completion_handler[dir] = drv->transfer_complete;
-    ep_data[ep].fast_completion_handler[dir] = drv->fast_transfer_complete;
-    ep_data[ep].control_handler[dir] = drv->control_request;
-
-    return ret;
-}
-
-void usb_core_release_endpoint(int ep)
-{
-    int dir;
-
-    usb_drv_release_endpoint(ep);
-
-    dir = EP_DIR(ep);
-    ep = EP_NUM(ep);
-
-    ep_data[ep].completion_handler[dir] = NULL;
-    ep_data[ep].control_handler[dir] = NULL;
-}
-
 static void allocate_interfaces_and_endpoints(void)
 {
-    int i;
     int interface = 0;
 
-    memset(ep_data, 0, sizeof(ep_data));
-
-    for(i = 0; i < USB_NUM_ENDPOINTS; i++) {
-        usb_drv_release_endpoint(i | USB_DIR_OUT);
-        usb_drv_release_endpoint(i | USB_DIR_IN);
-    }
-
-    for(i = 0; i < USB_NUM_DRIVERS; i++) {
-        if(drivers[i].enabled) {
-            drivers[i].first_interface = interface;
-
-            if(drivers[i].request_endpoints(&drivers[i])) {
-                drivers[i].enabled = false;
-                continue;
+    /* deinit previously allocated endpoints */
+    for(int conf = 0; conf < 1; conf += 1) {
+        for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
+            for(int dir = 0; dir < 2; dir += 1) {
+                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
+                if(alloc->owner[dir] != NULL) {
+                    int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
+                    usb_drv_deinit_endpoint(ep);
+                    alloc->owner[dir] = NULL;
+                }
             }
-
-            interface = drivers[i].set_first_interface(interface);
-            drivers[i].last_interface = interface;
         }
     }
+
+    for(int i = 0; i < USB_NUM_DRIVERS; i++) {
+        struct usb_class_driver* driver = &drivers[i];
+
+        if(!driver->enabled) {
+            continue;
+        }
+
+        /* assign endpoints */
+        for(int reqnum = 0; reqnum < driver->ep_allocs_size; reqnum += 1) {
+            /* find matching ep */
+            struct usb_class_driver_ep_allocation* req = &driver->ep_allocs[reqnum];
+            req->ep = 0;
+            for(int epnum = 1; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
+                struct usb_drv_ep_spec* spec = &usb_drv_ep_specs[epnum];
+                /* ep type check */
+                const int8_t spec_type = spec->type[req->dir];
+                if(spec_type != req->type && spec_type != USB_ENDPOINT_TYPE_ANY) {
+                    continue;
+                }
+                /* free check */
+                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
+                if(alloc->owner[req->dir] != NULL) {
+                    continue;
+                }
+
+                /* this ep's requested direction is free */
+
+                /* another checks */
+                if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_IO_EXCLUSIVE) {
+                    /* check for the other direction type */
+                    if(alloc->owner[!req->dir] != NULL) {
+                        /* the other side is allocated */
+                        continue;
+                    }
+                }
+                if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_FORCE_IO_TYPE_MATCH) {
+                    /* check for other direction type */
+                    if(alloc->owner[!req->dir] != NULL && alloc->type[!req->dir] != req->type) {
+                        /* the other side is allocated with another type */
+                        continue;
+                    }
+                }
+
+                /* all checks passed, assign it */
+                const int ep = epnum | (req->dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
+                req->ep = ep;
+                alloc->owner[req->dir] = driver;
+                alloc->type[req->dir] = req->type;
+                break;
+            }
+            if(req->ep == 0 && !req->optional) {
+                /* no matching ep found, disable the driver */
+                driver->enabled = false;
+                /* also revert all allocations for this driver */
+                for(reqnum = reqnum - 1; reqnum >= 0; reqnum -= 1) {
+                    const uint8_t ep = driver->ep_allocs[reqnum].ep;
+                    const uint8_t epnum = EP_NUM(ep);
+                    const uint8_t epdir = EP_DIR(ep);
+                    const uint8_t dir = epdir == USB_DIR_OUT ? DIR_OUT : DIR_IN;
+                    ep_alloc_states[0][epnum].owner[dir] = NULL;
+                }
+                break;
+            }
+        }
+
+        if(!driver->enabled) {
+            continue;
+        }
+
+        /* assign interfaces */
+        driver->first_interface = interface;
+        interface = driver->set_first_interface(interface);
+        driver->last_interface = interface;
+    }
+
     usb_core_num_interfaces = interface;
 }
 
@@ -778,6 +829,35 @@ static void usb_core_do_set_addr(uint8_t address)
 static void usb_core_do_set_config(uint8_t config)
 {
     logf("usb_core: SET_CONFIG %d",config);
+
+    /* (de)initialize allocated endpoints */
+    const bool init = usb_state == ADDRESS && config;
+    const bool deinit = usb_state == CONFIGURED && !config;
+    if(init || deinit) {
+        memset(ep_data, 0, sizeof(ep_data));
+        for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
+            for(int dir = 0; dir < 2; dir += 1) {
+                struct ep_alloc_state* alloc = &ep_alloc_states[0][epnum];
+                if(alloc->owner[dir] == NULL) {
+                    continue;
+                }
+                int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
+                int ret = init ?
+                    usb_drv_init_endpoint(ep, alloc->type[dir], -1) :
+                    usb_drv_deinit_endpoint(ep);
+                if(ret) {
+                    logf("usb_core: usb_drv_%s_endpoint failed ep=%d dir=%e", init ? "init" : "deinit", epnum, dir);
+                    continue;
+                }
+                if(init) {
+                    ep_data[epnum].completion_handler[dir] = alloc->owner[dir]->transfer_complete;
+                    ep_data[epnum].fast_completion_handler[dir] = alloc->owner[dir]->fast_transfer_complete;
+                    ep_data[epnum].control_handler[dir] = alloc->owner[dir]->control_request;
+                }
+            }
+        }
+    }
+
     if(config) {
         usb_state = CONFIGURED;
 
