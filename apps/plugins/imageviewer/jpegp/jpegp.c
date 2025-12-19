@@ -217,23 +217,18 @@ static int get_image(struct image_info *info, int frame, int ds)
     int v2 = j->Vmax / j->Components[2].Vi;
 
     int x, y;
-    for (y = 0; y < j->Y; y++)
+    int max_y = info->height * ds;
+    int max_x = info->width * ds;
+    for (y = 0; y < max_y; y += ds)
     {
-        if (y%ds != 0)
-            continue;
-
         TCOEF *C0 =
                 j->Components[0].du[j->Components[0].du_width * ((y / v0) / 8)] + 8 * ((y / v0) & 7);
         TCOEF *C1 =
                 j->Components[1].du[j->Components[1].du_width * ((y / v1) / 8)] + 8 * ((y / v1) & 7);
         TCOEF *C2 =
                 j->Components[2].du[j->Components[2].du_width * ((y / v2) / 8)] + 8 * ((y / v2) & 7);
-
-        for (x = 0; x < j->X; x++)
+        for (x = 0; x < max_x; x += ds)
         {
-            if (x%ds != 0)
-                continue;
-
             TCOEF c0 = C0[(x / h0 / 8) * 64 + ((x / h0) & 7)];
             TCOEF c1 = C1[(x / h1 / 8) * 64 + ((x / h1) & 7)];
             TCOEF c2 = C2[(x / h2 / 8) * 64 + ((x / h2) & 7)];
