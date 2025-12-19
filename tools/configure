@@ -4332,6 +4332,9 @@ fi
     t_cpu="arm"
     t_manufacturer="stm32"
     t_model="echoplayer"
+    # generate debug symbols by default; these will be present in the
+    # initial '.elf' file but will be stripped from the target binary.
+    GCCOPTS="-g $GCCOPTS"
     ;;
 
     280|surfansf28)
