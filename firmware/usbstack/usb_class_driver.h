@@ -118,6 +118,10 @@ struct usb_class_driver {
      * Returns value on success and -1 on error.
      * Mandatory function if alternate interface support is needed */
     int (*get_interface)(int interface);
+
+    /* Invoked by USB_NOTIFY_CLASS_DRIVER
+       Optional function */
+    void (*notify_event)(intptr_t data);
 };
 
 #define PACK_DATA(dest, data) pack_data(dest, &(data), sizeof(data))

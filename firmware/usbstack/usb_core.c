@@ -1181,6 +1181,16 @@ void usb_core_handle_notify(long id, intptr_t data)
             usb_charging_maxcurrent_change(usb_charging_maxcurrent());
 #endif
             break;
+        case USB_NOTIFY_CLASS_DRIVER: {
+            uint8_t index = data >> 24;
+            if(index >= USB_NUM_DRIVERS) {
+                logf("usb_core: invalid notification destination index=%u", index);
+                return;
+            }
+            if(is_active(drivers[index]) && drivers[index].notify_event != NULL) {
+                drivers[index].notify_event(data & 0x00ffffff);
+            }
+        } break;
         default:
             break;
     }
