@@ -180,6 +180,11 @@ else # core
 
 endif # bootloader
 
+# Include makefile for flashing/debugging with OpenOCD & GDB
+ifeq (echor1,$(MODELNAME))
+  include $(ROOTDIR)/tools/echoplayer/openocd.make
+endif
+
 # One or more subdir makefiles requested --gc-sections?
 ifdef CORE_GCSECTIONS
   # Do not use '--gc-sections' when compiling sdl-sim
