@@ -21,6 +21,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "config.h"
+
 struct pcm_sink_caps {
     const unsigned long* samprs;
     uint16_t             num_samprs;
@@ -52,6 +54,9 @@ struct pcm_sink {
 
 enum pcm_sink_ids {
     PCM_SINK_BUILTIN = 0,
+#ifdef USB_ENABLE_IAP
+    PCM_SINK_IAP,
+#endif
     PCM_SINK_NUM
 };
 

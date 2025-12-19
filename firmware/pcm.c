@@ -77,8 +77,15 @@
  *
  */
 
+#ifdef USB_ENABLE_IAP
+extern struct pcm_sink iap_pcm_sink;
+#endif
+
 static struct pcm_sink* sinks[PCM_SINK_NUM] = {
     [PCM_SINK_BUILTIN] = &builtin_pcm_sink,
+#ifdef USB_ENABLE_IAP
+    [PCM_SINK_IAP] = &iap_pcm_sink,
+#endif
 };
 static enum pcm_sink_ids cur_sink = PCM_SINK_BUILTIN;
 

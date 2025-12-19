@@ -1,0 +1,5 @@
+Files under this directory were imported from libiap(https://github.com/mojyack/libiap) except for:
+- README.rockbox: this file, Rockbox specific notes
+- HEAD: libiap commit hash
+
+To sync with the upstream, use ../libiap-sync.sh script.
