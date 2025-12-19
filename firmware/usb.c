@@ -266,23 +266,14 @@ static inline void usb_slave_mode(bool on)
 
     if(on)
     {
-        trigger_cpu_boost();
-#ifdef HAVE_PRIORITY_SCHEDULING
-        thread_set_priority(thread_self(), PRIORITY_REALTIME);
-#endif
         disk_unmount_all();
     }
     else
     {
-#ifdef HAVE_PRIORITY_SCHEDULING
-        thread_set_priority(thread_self(), PRIORITY_SYSTEM);
-#endif
         /* Entered exclusive mode */
         rc = disk_mount_all();
         if(rc <= 0) /* no partition */
             panicf("mount: %d",rc);
-
-        cancel_cpu_boost();
     }
 }
 

@@ -1483,6 +1483,7 @@ static void fill_inquiry(IF_MD_NONVOID(int lun))
 
 struct usb_class_driver usb_cdrv_storage = {
     .needs_exclusive_storage = true,
+    .needs_cpu_boost = true,
     .config = 1,
     .ep_allocs_size = ARRAYLEN(ep_allocs),
     .ep_allocs = ep_allocs,

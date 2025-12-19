@@ -54,6 +54,9 @@ struct usb_class_driver {
     /* Set this to true if the driver needs exclusive disk access (e.g. usb storage) */
     bool needs_exclusive_storage;
 
+    /* Set this to true if the driver needs to enable cpu boost */
+    bool needs_cpu_boost;
+
     /* USB config number this driver belongs to */
     uint8_t config;
 

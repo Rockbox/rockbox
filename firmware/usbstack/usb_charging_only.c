@@ -65,6 +65,7 @@ static int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_p
 
 struct usb_class_driver usb_cdrv_charging_only = {
     .needs_exclusive_storage = false,
+    .needs_cpu_boost = false,
     .config = 1,
     .set_first_interface = usb_charging_only_set_first_interface,
     .get_config_descriptor = usb_charging_only_get_config_descriptor,

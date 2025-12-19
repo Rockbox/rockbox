@@ -1497,6 +1497,7 @@ static bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int le
 
 struct usb_class_driver usb_cdrv_audio = {
     .needs_exclusive_storage = false,
+    .needs_cpu_boost = false,
     .config = 1,
     .ep_allocs_size = ARRAYLEN(ep_allocs),
     .ep_allocs = ep_allocs,

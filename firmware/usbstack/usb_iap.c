@@ -692,6 +692,7 @@ static void usb_iap_notify_event(intptr_t data) {
 
 struct usb_class_driver usb_cdrv_iap = {
     .needs_exclusive_storage = false,
+    .needs_cpu_boost         = true,
     .config                  = 2,
     .ep_allocs_size          = ARRAYLEN(usb_iap_ep_allocs),
     .ep_allocs               = usb_iap_ep_allocs,

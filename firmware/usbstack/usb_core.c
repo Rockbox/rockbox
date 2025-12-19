@@ -823,6 +823,11 @@ static void usb_core_do_set_addr(uint8_t address)
     usb_state = ADDRESS;
 }
 
+#if !defined(HAVE_PRIORITY_SCHEDULING)
+#define thread_set_priority(...)
+#define thread_get_priority(...)
+#endif /* HAVE_PRIORITY_SCHEDULING */
+
 static int usb_core_do_set_config(uint8_t new_config)
 {
     logf("usb_core: SET_CONFIG %d to %d", usb_config, new_config);
@@ -852,6 +857,7 @@ static int usb_core_do_set_config(uint8_t new_config)
     usb_state = usb_config == 0 ? ADDRESS : CONFIGURED;
 
     bool require_exclusive = false;
+    bool require_cpu_boost = false;
 
     /* activate new config */
     if(usb_config != 0) {
@@ -865,6 +871,7 @@ static int usb_core_do_set_config(uint8_t new_config)
                 continue;
             }
             require_exclusive |= drivers[i]->needs_exclusive_storage;
+            require_cpu_boost |= drivers[i]->needs_cpu_boost;
         }
     }
 
@@ -875,6 +882,13 @@ static int usb_core_do_set_config(uint8_t new_config)
         }
     } else {
         usb_release_exclusive_storage();
+    }
+    if(require_cpu_boost) {
+        trigger_cpu_boost();
+        thread_set_priority(thread_self(), PRIORITY_REALTIME);
+    } else {
+        thread_set_priority(thread_self(), PRIORITY_SYSTEM);
+        cancel_cpu_boost();
     }
 
     #ifdef HAVE_USB_CHARGING_ENABLE
