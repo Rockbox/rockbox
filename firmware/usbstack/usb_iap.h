@@ -39,4 +39,5 @@ bool usb_iap_fast_transfer_complete(int ep, int dir, int status, int length);
 bool usb_iap_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest);
 int usb_iap_set_interface(int intf, int alt);
 int usb_iap_get_interface(int intf);
+int usb_iap_get_max_packet_size(int ep);
 void usb_iap_notify_event(intptr_t data);

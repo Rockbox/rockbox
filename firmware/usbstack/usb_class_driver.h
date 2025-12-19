@@ -119,6 +119,11 @@ struct usb_class_driver {
      * Mandatory function if alternate interface support is needed */
     int (*get_interface)(int interface);
 
+    /* Asks the driver max packet size for the endpoint.
+     * Drivers can returns desired value in bytes,
+     * or -1 to use the device controller default */
+    int (*get_max_packet_size)(int ep);
+
     /* Invoked by USB_NOTIFY_CLASS_DRIVER
        Optional function */
     void (*notify_event)(intptr_t data);

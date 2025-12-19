@@ -441,6 +441,16 @@ int usb_iap_get_interface(int intf) {
     return stream.alt;
 }
 
+int usb_iap_get_max_packet_size(int ep) {
+    if(ep == AS_EP_IN) {
+        return 1024;
+    } else if(ep == HID_EP_IN) {
+        return 64;
+    } else {
+        panicf("unexpected endpoint number %d", ep);
+    }
+}
+
 void usb_iap_init(void) {
     LOG("init");
 }
