@@ -23,17 +23,8 @@
 
 #include "usb_class_driver.h"
 
-extern struct usb_class_driver_ep_allocation usb_serial_ep_allocs[3];
-
-int usb_serial_set_first_interface(int interface);
-int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size);
-void usb_serial_init_connection(void);
-void usb_serial_init(void);
-void usb_serial_disconnect(void);
-void usb_serial_transfer_complete(int ep,int dir, int status, int length);
-bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char *dest);
-
 void usb_serial_send(const unsigned char *data, int length);
 
-#endif
+extern struct usb_class_driver usb_cdrv_serial;
 
+#endif

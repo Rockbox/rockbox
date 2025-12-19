@@ -21,12 +21,8 @@
 #ifndef USB_CHARGING_ONLY_H
 #define USB_CHARGING_ONLY_H
 
-#include "usb_ch9.h"
+#include "usb_class_driver.h"
 
-void usb_charging_only_init(void);
-int usb_charging_only_set_first_interface(int interface);
-int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_size);
-bool usb_charging_only_control_request(struct usb_ctrlrequest* req);
+extern struct usb_class_driver usb_cdrv_charging_only;
 
 #endif
-

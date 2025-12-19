@@ -25,17 +25,8 @@
 #include "usb_class_driver.h"
 #include "usb_hid_usage_tables.h"
 
-extern struct usb_class_driver_ep_allocation usb_hid_ep_allocs[1];
-
-int usb_hid_set_first_interface(int interface);
-int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size);
-void usb_hid_init_connection(void);
-void usb_hid_init(void);
-void usb_hid_disconnect(void);
-void usb_hid_transfer_complete(int ep, int dir, int status, int length);
-bool usb_hid_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest);
-
 void usb_hid_send(usage_page_t usage_page, int id);
 
-#endif
+extern struct usb_class_driver usb_cdrv_hid;
 
+#endif

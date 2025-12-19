@@ -23,6 +23,7 @@
 #include "playback.h"
 #include "powermgmt.h"
 #include "timefuncs.h"
+#include "usb_core.h"
 #include "usb_drv.h"
 #include "panic.h"
 
@@ -320,7 +321,7 @@ static int tick_callback(struct timeout* tmo) {
     return HZ / 10;
 }
 
-int usb_iap_set_first_interface(int interface) {
+static int usb_iap_set_first_interface(int interface) {
     ctrl.interface   = interface + 0;
     stream.interface = interface + 1;
     hid.interface    = interface + 2;
@@ -329,7 +330,7 @@ int usb_iap_set_first_interface(int interface) {
 
 #define PACK_DESC(desc) pack_data(&dest, &desc, ((struct usb_descriptor_header*)&desc)->bLength)
 
-int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_size) {
+static int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_size) {
     (void)max_packet_size;
 
     unsigned char* orig_dest = dest;
@@ -372,7 +373,7 @@ int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_size) {
     return dest - orig_dest;
 }
 
-void usb_iap_init_connection(void) {
+static void usb_iap_init_connection(void) {
     stream.sample_rate     = 48000;
     last_charge_state      = -1;
     last_minute            = -1;
@@ -422,7 +423,7 @@ cleanup_audio:
     iap_audio_deinit();
 }
 
-int usb_iap_set_interface(int intf, int alt) {
+static int usb_iap_set_interface(int intf, int alt) {
     LOG("set interface interface=%d alt=%d", intf, alt);
     check_act(intf == stream.interface, return -1);
     if(alt == 0) {
@@ -436,13 +437,13 @@ int usb_iap_set_interface(int intf, int alt) {
     return 0;
 }
 
-int usb_iap_get_interface(int intf) {
+static int usb_iap_get_interface(int intf) {
     LOG("get interface interface=%d", intf);
     check_act(intf == stream.interface, return -1);
     return stream.alt;
 }
 
-int usb_iap_get_max_packet_size(int ep) {
+static int usb_iap_get_max_packet_size(int ep) {
     if(ep == AS_EP_IN) {
         return 1024;
     } else if(ep == HID_EP_IN) {
@@ -453,11 +454,11 @@ int usb_iap_get_max_packet_size(int ep) {
     }
 }
 
-void usb_iap_init(void) {
+static void usb_iap_init(void) {
     LOG("init");
 }
 
-void usb_iap_disconnect(void) {
+static void usb_iap_disconnect(void) {
     iap_initialized = false;
     audio_pause();
     mixer_switch_sink(PCM_SINK_BUILTIN);
@@ -472,7 +473,7 @@ void usb_iap_disconnect(void) {
     LOG("disconnected");
 }
 
-void usb_iap_transfer_complete(int ep, int dir, int status, int length) {
+static void usb_iap_transfer_complete(int ep, int dir, int status, int length) {
     (void)length;
 
     if((ep | dir) == HID_EP_IN) {
@@ -486,7 +487,7 @@ void usb_iap_transfer_complete(int ep, int dir, int status, int length) {
     }
 }
 
-bool usb_iap_fast_transfer_complete(int ep, int dir, int status, int length) {
+static bool usb_iap_fast_transfer_complete(int ep, int dir, int status, int length) {
     (void)status;
     (void)length;
     return (ep | dir) == AS_EP_IN;
@@ -634,7 +635,7 @@ static bool control_request_if_endpoint(struct usb_ctrlrequest* req, void* reqda
     return false;
 }
 
-bool usb_iap_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest) {
+static bool usb_iap_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest) {
     const uint8_t req_recipient = req->bRequestType & USB_RECIP_MASK;
     const uint8_t req_type      = req->bRequestType & USB_TYPE_MASK;
 #if 0
@@ -651,7 +652,7 @@ bool usb_iap_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigne
     return false;
 }
 
-void usb_iap_notify_event(intptr_t data) {
+static void usb_iap_notify_event(intptr_t data) {
     switch(data) {
     case Notify_Tick: {
         struct IAPContext* ctx = _iap_acquire_ctx(true);
@@ -689,3 +690,22 @@ void usb_iap_notify_event(intptr_t data) {
     } break;
     }
 }
+
+struct usb_class_driver usb_cdrv_iap = {
+    .needs_exclusive_storage = false,
+    .config                  = 2,
+    .ep_allocs_size          = ARRAYLEN(usb_iap_ep_allocs),
+    .ep_allocs               = usb_iap_ep_allocs,
+    .set_first_interface     = usb_iap_set_first_interface,
+    .get_config_descriptor   = usb_iap_get_config_descriptor,
+    .init_connection         = usb_iap_init_connection,
+    .init                    = usb_iap_init,
+    .disconnect              = usb_iap_disconnect,
+    .transfer_complete       = usb_iap_transfer_complete,
+    .fast_transfer_complete  = usb_iap_fast_transfer_complete,
+    .control_request         = usb_iap_control_request,
+    .set_interface           = usb_iap_set_interface,
+    .get_interface           = usb_iap_get_interface,
+    .get_max_packet_size     = usb_iap_get_max_packet_size,
+    .notify_event            = usb_iap_notify_event,
+};

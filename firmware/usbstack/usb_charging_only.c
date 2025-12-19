@@ -46,13 +46,13 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
 
 static int usb_interface;
 
-int usb_charging_only_set_first_interface(int interface)
+static int usb_charging_only_set_first_interface(int interface)
 {
     usb_interface = interface;
     return interface + 1;
 }
 
-int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_size)
+static int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_size)
 {
     (void)max_packet_size;
     unsigned char *orig_dest = dest;
@@ -62,3 +62,10 @@ int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_s
 
     return (dest-orig_dest);
 }
+
+struct usb_class_driver usb_cdrv_charging_only = {
+    .needs_exclusive_storage = false,
+    .config = 1,
+    .set_first_interface = usb_charging_only_set_first_interface,
+    .get_config_descriptor = usb_charging_only_get_config_descriptor,
+};

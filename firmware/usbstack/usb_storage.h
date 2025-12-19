@@ -23,18 +23,6 @@
 
 #include "usb_class_driver.h"
 
-extern struct usb_class_driver_ep_allocation usb_storage_ep_allocs[2];
-
-int usb_storage_set_first_interface(int interface);
-int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size);
-void usb_storage_init_connection(void);
-void usb_storage_disconnect(void);
-void usb_storage_init(void);
-void usb_storage_transfer_complete(int ep,int dir,int state,int length);
-bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest);
-#ifdef HAVE_HOTSWAP
-void usb_storage_notify_hotswap(int volume,bool inserted);
-#endif
-
+extern struct usb_class_driver usb_cdrv_storage;
 #endif
 

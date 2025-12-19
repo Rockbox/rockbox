@@ -297,15 +297,15 @@ static int usb_as_playback_intf_alt; /* playback streaming interface alternate s
 
 static int as_playback_freq_idx; /* audio playback streaming frequency index (in hw_freq_sampr) */
 
-struct usb_class_driver_ep_allocation usb_audio_ep_allocs[2] = {
+static struct usb_class_driver_ep_allocation ep_allocs[2] = {
     /* output isochronous endpoint */
     {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_OUT, .optional = false},
     /* input feedback isochronous endpoint */
     {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_IN, .optional = false},
 };
 
-#define EP_ISO_OUT (usb_audio_ep_allocs[0].ep)
-#define EP_ISO_FEEDBACK_IN (usb_audio_ep_allocs[1].ep)
+#define EP_ISO_OUT (ep_allocs[0].ep)
+#define EP_ISO_FEEDBACK_IN (ep_allocs[1].ep)
 
 /* small buffer used for control transfers */
 static unsigned char usb_buffer[128] USB_DEVBSS_ATTR;
@@ -501,7 +501,12 @@ unsigned long usb_audio_get_playback_sampling_frequency(void)
     return hw_freq_sampr[as_playback_freq_idx];
 }
 
-void usb_audio_init(void)
+/*
+ * Initialize the driver. Called by usb_core_init().
+ * Currently initializes the sampling frequency values available
+ * to the AudioStreaming interface.
+ */
+static void usb_audio_init(void)
 {
     unsigned int i;
     /* initialized tSamFreq array */
@@ -577,14 +582,34 @@ unsigned int usb_audio_get_in_ep(void)
     return EP_ISO_FEEDBACK_IN;
 }
 
-int usb_audio_set_first_interface(int interface)
+/*
+ * Required function for the class driver.
+ *
+ * Called by allocate_interfaces_and_endpoints() to
+ * tell the class driver what its first interface number is.
+ * Returns the number of the interface available for the next
+ * class driver to use.
+ *
+ * We need 2 interfaces, AudioControl and AudioStreaming.
+ * Return interface+2.
+ */
+static int usb_audio_set_first_interface(int interface)
 {
     usb_interface = interface;
     logf("usbaudio: usb_interface=%d", usb_interface);
     return interface + 2; /* Audio Control and Audio Streaming */
 }
 
-int usb_audio_get_config_descriptor(unsigned char *dest, int max_packet_size)
+/*
+ * Required function for the class driver.
+ *
+ * Called by request_handler_device_get_descriptor(), which expects
+ * this function to fill *dest with the configuration descriptor for this
+ * class driver.
+ *
+ * Return the size of this descriptor in bytes.
+ */
+static int usb_audio_get_config_descriptor(unsigned char *dest, int max_packet_size)
 {
     (void)max_packet_size;
     unsigned int i;
@@ -721,7 +746,13 @@ static void usb_audio_stop_playback(void)
     send_fb = false;
 }
 
-int usb_audio_set_interface(int intf, int alt)
+/*
+ * Called by control_request_handler_drivers().
+ * Deal with changing the interface between control and streaming.
+ *
+ * Return 0 for success, -1 otherwise.
+ */
+static int usb_audio_set_interface(int intf, int alt)
 {
     if(intf == usb_interface)
     {
@@ -757,7 +788,13 @@ int usb_audio_set_interface(int intf, int alt)
     }
 }
 
-int usb_audio_get_interface(int intf)
+/*
+ * Called by control_request_handler_drivers().
+ * Get the alternate of the given interface.
+ *
+ * Return the alternate of the given interface, -1 if unknown.
+ */
+static int usb_audio_get_interface(int intf)
 {
     if(intf == usb_interface)
     {
@@ -1139,7 +1176,13 @@ static bool usb_audio_interface_request(struct usb_ctrlrequest* req, void *reqda
     }
 }
 
-bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata, unsigned char* dest)
+/*
+ * Called by control_request_handler_drivers().
+ * Pass control requests down to the appropriate functions.
+ *
+ * Return true if this driver handles the request, false otherwise.
+ */
+static bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata, unsigned char* dest)
 {
     (void) reqdata;
     (void) dest;
@@ -1156,7 +1199,12 @@ bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata, unsig
     }
 }
 
-void usb_audio_init_connection(void)
+/*
+ * Called by usb_core_do_set_config() when the
+ * connection is ready to be used. Currently just sets
+ * the audio sample rate to default.
+ */
+static void usb_audio_init_connection(void)
 {
     logf("usbaudio: init connection");
 
@@ -1181,7 +1229,13 @@ void usb_audio_init_connection(void)
     usb_audio_playing = false;
 }
 
-void usb_audio_disconnect(void)
+/*
+ * Called by usb_core_exit() AND usb_core_do_set_config().
+ *
+ * Indicates to the Class driver that the connection is no
+ * longer active. Currently just calls usb_audio_stop_playback().
+ */
+static void usb_audio_disconnect(void)
 {
     logf("usbaudio: disconnect");
 
@@ -1258,7 +1312,12 @@ int usb_audio_get_frames_dropped(void)
     return frames_dropped;
 }
 
-void usb_audio_transfer_complete(int ep, int dir, int status, int length)
+/*
+ * Dummy function.
+ *
+ * The fast_transfer_complete() function needs to be used instead.
+ */
+static void usb_audio_transfer_complete(int ep, int dir, int status, int length)
 {
     /* normal handler is too slow to handle the completion rate, because
      * of the low thread schedule rate */
@@ -1268,7 +1327,14 @@ void usb_audio_transfer_complete(int ep, int dir, int status, int length)
     (void) length;
 }
 
-bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
+/*
+ * Called by usb_core_transfer_complete().
+ * The normal transfer complete handler system is too slow to deal with
+ * ISO data at the rate required, so this is required.
+ *
+ * Return true if the transfer is handled, false otherwise.
+ */
+static bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
 {
     (void) dir;
     bool retval = false;
@@ -1428,3 +1494,20 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
 
     return retval;
 }
+
+struct usb_class_driver usb_cdrv_audio = {
+    .needs_exclusive_storage = false,
+    .config = 1,
+    .ep_allocs_size = ARRAYLEN(ep_allocs),
+    .ep_allocs = ep_allocs,
+    .set_first_interface = usb_audio_set_first_interface,
+    .get_config_descriptor = usb_audio_get_config_descriptor,
+    .init_connection = usb_audio_init_connection,
+    .init = usb_audio_init,
+    .disconnect = usb_audio_disconnect,
+    .transfer_complete = usb_audio_transfer_complete,
+    .fast_transfer_complete = usb_audio_fast_transfer_complete,
+    .control_request = usb_audio_control_request,
+    .set_interface = usb_audio_set_interface,
+    .get_interface = usb_audio_get_interface,
+};

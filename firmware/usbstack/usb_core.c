@@ -201,141 +201,25 @@ struct ep_alloc_state {
 
 static struct ep_alloc_state ep_alloc_states[NUM_CONFIGS][USB_NUM_ENDPOINTS];
 
-static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
+static struct usb_class_driver* drivers[USB_NUM_DRIVERS] =
 {
 #ifdef USB_ENABLE_STORAGE
-    [USB_DRIVER_MASS_STORAGE] = {
-        .enabled = false,
-        .needs_exclusive_storage = true,
-        .config = 1,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = ARRAYLEN(usb_storage_ep_allocs),
-        .ep_allocs = usb_storage_ep_allocs,
-        .set_first_interface = usb_storage_set_first_interface,
-        .get_config_descriptor = usb_storage_get_config_descriptor,
-        .init_connection = usb_storage_init_connection,
-        .init = usb_storage_init,
-        .disconnect = usb_storage_disconnect,
-        .transfer_complete = usb_storage_transfer_complete,
-        .control_request = usb_storage_control_request,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = usb_storage_notify_hotswap,
-#endif
-    },
+    [USB_DRIVER_MASS_STORAGE] = &usb_cdrv_storage,
 #endif
 #ifdef USB_ENABLE_SERIAL
-    [USB_DRIVER_SERIAL] = {
-        .enabled = false,
-        .needs_exclusive_storage = false,
-        .config = 1,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = ARRAYLEN(usb_serial_ep_allocs),
-        .ep_allocs = usb_serial_ep_allocs,
-        .set_first_interface = usb_serial_set_first_interface,
-        .get_config_descriptor = usb_serial_get_config_descriptor,
-        .init_connection = usb_serial_init_connection,
-        .init = usb_serial_init,
-        .disconnect = usb_serial_disconnect,
-        .transfer_complete = usb_serial_transfer_complete,
-        .control_request = usb_serial_control_request,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = NULL,
-#endif
-    },
+    [USB_DRIVER_SERIAL] = &usb_cdrv_serial,
 #endif
 #ifdef USB_ENABLE_CHARGING_ONLY
-    [USB_DRIVER_CHARGING_ONLY] = {
-        .enabled = false,
-        .needs_exclusive_storage = false,
-        .config = 1,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = 0,
-        .ep_allocs = NULL,
-        .set_first_interface = usb_charging_only_set_first_interface,
-        .get_config_descriptor = usb_charging_only_get_config_descriptor,
-        .init_connection = NULL,
-        .init = NULL,
-        .disconnect = NULL,
-        .transfer_complete = NULL,
-        .control_request = NULL,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = NULL,
-#endif
-    },
+    [USB_DRIVER_CHARGING_ONLY] = &usb_cdrv_charging_only,
 #endif
 #ifdef USB_ENABLE_HID
-    [USB_DRIVER_HID] = {
-        .enabled = false,
-        .needs_exclusive_storage = false,
-        .config = 1,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = ARRAYLEN(usb_hid_ep_allocs),
-        .ep_allocs = usb_hid_ep_allocs,
-        .set_first_interface = usb_hid_set_first_interface,
-        .get_config_descriptor = usb_hid_get_config_descriptor,
-        .init_connection = usb_hid_init_connection,
-        .init = usb_hid_init,
-        .disconnect = usb_hid_disconnect,
-        .transfer_complete = usb_hid_transfer_complete,
-        .control_request = usb_hid_control_request,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = NULL,
-#endif
-    },
+    [USB_DRIVER_HID] = &usb_cdrv_hid,
 #endif
 #ifdef USB_ENABLE_AUDIO
-    [USB_DRIVER_AUDIO] = {
-        .enabled = false,
-        .needs_exclusive_storage = false,
-        .config = 1,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = ARRAYLEN(usb_audio_ep_allocs),
-        .ep_allocs = usb_audio_ep_allocs,
-        .set_first_interface = usb_audio_set_first_interface,
-        .get_config_descriptor = usb_audio_get_config_descriptor,
-        .init_connection = usb_audio_init_connection,
-        .init = usb_audio_init,
-        .disconnect = usb_audio_disconnect,
-        .transfer_complete = usb_audio_transfer_complete,
-        .fast_transfer_complete = usb_audio_fast_transfer_complete,
-        .control_request = usb_audio_control_request,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = NULL,
-#endif
-        .set_interface = usb_audio_set_interface,
-        .get_interface = usb_audio_get_interface,
-    },
+    [USB_DRIVER_AUDIO] = &usb_cdrv_audio,
 #endif
 #ifdef USB_ENABLE_IAP
-    [USB_DRIVER_IAP] = {
-        .enabled = false,
-        .needs_exclusive_storage = false,
-        .config = 2,
-        .first_interface = 0,
-        .last_interface = 0,
-        .ep_allocs_size = ARRAYLEN(usb_iap_ep_allocs),
-        .ep_allocs = usb_iap_ep_allocs,
-        .set_first_interface = usb_iap_set_first_interface,
-        .get_config_descriptor = usb_iap_get_config_descriptor,
-        .init_connection = usb_iap_init_connection,
-        .init = usb_iap_init,
-        .disconnect = usb_iap_disconnect,
-        .transfer_complete = usb_iap_transfer_complete,
-        .fast_transfer_complete = usb_iap_fast_transfer_complete,
-        .control_request = usb_iap_control_request,
-#ifdef HAVE_HOTSWAP
-        .notify_hotswap = NULL,
-#endif
-        .set_interface = usb_iap_set_interface,
-        .get_interface = usb_iap_get_interface,
-        .get_max_packet_size = usb_iap_get_max_packet_size,
-        .notify_event = usb_iap_notify_event,
-    },
+    [USB_DRIVER_IAP] = &usb_cdrv_iap,
 #endif
 };
 
@@ -352,8 +236,8 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
-#define is_active(driver) ((driver).enabled && (driver).config == usb_config)
-#define has_if(driver, interface) ((interface) >= (driver).first_interface && (interface) < (driver).last_interface)
+#define is_active(driver) ((driver)->enabled && (driver)->config == usb_config)
+#define has_if(driver, interface) ((interface) >= (driver)->first_interface && (interface) < (driver)->last_interface)
 
 /** NOTE Serial Number
  * The serial number string is split into two parts:
@@ -513,9 +397,14 @@ void usb_core_init(void)
     /* class driver init functions should be safe to call even if the driver
      * won't be used. This simplifies other logic (i.e. we don't need to know
      * yet which drivers will be enabled */
-    for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i].init != NULL)
-            drivers[i].init();
+    for(i = 0; i < USB_NUM_DRIVERS; i++) {
+        drivers[i]->enabled = false;
+        drivers[i]->first_interface = 0;
+        drivers[i]->last_interface = 0;
+        if(drivers[i]->init != NULL) {
+            drivers[i]->init();
+        }
+    }
 
     /* clear endpoint allocation state */
     memset(ep_alloc_states, 0, sizeof(ep_alloc_states));
@@ -570,12 +459,12 @@ void usb_core_handle_transfer_completion(
 
 void usb_core_enable_driver(int driver, bool enabled)
 {
-    drivers[driver].enabled = enabled;
+    drivers[driver]->enabled = enabled;
 }
 
 bool usb_core_driver_enabled(int driver)
 {
-    return drivers[driver].enabled;
+    return drivers[driver]->enabled;
 }
 
 #ifdef HAVE_HOTSWAP
@@ -583,8 +472,8 @@ void usb_core_hotswap_event(int volume, bool inserted)
 {
     int i;
     for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i].enabled && drivers[i].notify_hotswap != NULL)
-            drivers[i].notify_hotswap(volume, inserted);
+        if(drivers[i]->enabled && drivers[i]->notify_hotswap != NULL)
+            drivers[i]->notify_hotswap(volume, inserted);
 }
 #endif
 
@@ -651,7 +540,7 @@ static void usb_core_set_serial_function_id(void)
     int i, id = 0;
 
     for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i].enabled)
+        if(drivers[i]->enabled)
             id |= 1 << i;
 
     usb_string_iSerial.wString[0] = hex[id];
@@ -700,7 +589,7 @@ static void allocate_interfaces_and_endpoints(void)
     int interface[NUM_CONFIGS] = {0};
 
     for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-        struct usb_class_driver* driver = &drivers[i];
+        struct usb_class_driver* driver = drivers[i];
         const uint8_t conf_index = driver->config - 1;
 
         if(!driver->enabled) {
@@ -785,8 +674,8 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
     bool handled = false;
 
     for(i = 0; i < USB_NUM_DRIVERS; i++) {
-        struct usb_class_driver* driver = &drivers[i];
-        if(!is_active(*driver) || !has_if(*driver, interface) || driver->control_request == NULL) {
+        struct usb_class_driver* driver = drivers[i];
+        if(!is_active(driver) || !has_if(driver, interface) || driver->control_request == NULL) {
             continue;
         }
 
@@ -804,8 +693,8 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
                 int alt = -1;
                 logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
 
-                if(drivers[i].get_interface)
-                    alt = drivers[i].get_interface(req->wIndex);
+                if(driver->get_interface)
+                    alt = driver->get_interface(req->wIndex);
 
                 if(alt >= 0 && alt < 255) {
                     response_data[0] = alt;
@@ -870,8 +759,8 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
             size = sizeof(struct usb_config_descriptor);
 
             for(i = 0; i < USB_NUM_DRIVERS; i++) {
-                if(drivers[i].enabled && drivers[i].config == index + 1 && drivers[i].get_config_descriptor) {
-                    size += drivers[i].get_config_descriptor(&response_data[size], max_packet_size);
+                if(drivers[i]->enabled && drivers[i]->config == index + 1 && drivers[i]->get_config_descriptor) {
+                    size += drivers[i]->get_config_descriptor(&response_data[size], max_packet_size);
                 }
             }
 
@@ -945,8 +834,8 @@ static int usb_core_do_set_config(uint8_t new_config)
     /* deactivate old config */
     if(usb_config != 0) {
         for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-            if(is_active(drivers[i]) && drivers[i].disconnect != NULL) {
-                drivers[i].disconnect();
+            if(is_active(drivers[i]) && drivers[i]->disconnect != NULL) {
+                drivers[i]->disconnect();
             }
         }
         init_deinit_endpoints(usb_config - 1, false);
@@ -967,9 +856,9 @@ static int usb_core_do_set_config(uint8_t new_config)
     if(usb_config != 0) {
         init_deinit_endpoints(usb_config - 1, true);
         for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-            if(is_active(drivers[i]) && drivers[i].init_connection != NULL) {
-                drivers[i].init_connection();
-                require_exclusive |= drivers[i].needs_exclusive_storage;
+            if(is_active(drivers[i]) && drivers[i]->init_connection != NULL) {
+                drivers[i]->init_connection();
+                require_exclusive |= drivers[i]->needs_exclusive_storage;
             }
         }
     }
@@ -1302,8 +1191,8 @@ void usb_core_handle_notify(long id, intptr_t data)
                 logf("usb_core: invalid notification destination index=%u", index);
                 return;
             }
-            if(is_active(drivers[index]) && drivers[index].notify_event != NULL) {
-                drivers[index].notify_event(data & 0x00ffffff);
+            if(is_active(drivers[index]) && drivers[index]->notify_event != NULL) {
+                drivers[index]->notify_event(data & 0x00ffffff);
             }
         } break;
         default:

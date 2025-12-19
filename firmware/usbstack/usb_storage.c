@@ -322,13 +322,13 @@ static bool locked[NUM_DRIVES];
 
 static int usb_interface;
 
-struct usb_class_driver_ep_allocation usb_storage_ep_allocs[2] = {
+static struct usb_class_driver_ep_allocation ep_allocs[2] = {
     {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_IN, .optional = false},
     {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_OUT, .optional = false},
 };
 
-#define EP_IN (usb_storage_ep_allocs[0].ep)
-#define EP_OUT (usb_storage_ep_allocs[1].ep)
+#define EP_IN (ep_allocs[0].ep)
+#define EP_OUT (ep_allocs[1].ep)
 
 #if defined(HAVE_MULTIDRIVE)
 static bool skip_first = 0;
@@ -378,7 +378,7 @@ static bool check_disk_present(IF_MD_NONVOID(int volume))
 }
 
 #ifdef HAVE_HOTSWAP
-void usb_storage_notify_hotswap(int volume,bool inserted)
+static void usb_storage_notify_hotswap(int volume,bool inserted)
 {
     logf("notify %d",inserted);
     if(inserted && check_disk_present(IF_MD(volume))) {
@@ -401,18 +401,18 @@ void usb_set_skip_first_drive(bool skip)
 #endif
 
 /* called by usb_core_init() */
-void usb_storage_init(void)
+static void usb_storage_init(void)
 {
     logf("usb_storage_init done");
 }
 
-int usb_storage_set_first_interface(int interface)
+static int usb_storage_set_first_interface(int interface)
 {
     usb_interface = interface;
     return interface + 1;
 }
 
-int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
+static int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 {
     unsigned char *orig_dest = dest;
 
@@ -436,7 +436,7 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 #else
 static int usb_handle = 0;
 #endif
-void usb_storage_init_connection(void)
+static void usb_storage_init_connection(void)
 {
     logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
@@ -493,7 +493,7 @@ void usb_storage_disconnect(void)
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_storage_transfer_complete(int ep,int dir,int status,int length)
+static void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {
     (void)ep;
     struct command_block_wrapper* cbw = (void*)cbw_buffer;
@@ -694,7 +694,7 @@ static void usb_storage_send_smart(uint8_t cmd)
 #endif /* STORAGE_ATA */
 
 /* called by usb_core_control_request() */
-bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
+static bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
 {
     bool handled = false;
 
@@ -1479,3 +1479,20 @@ static void fill_inquiry(IF_MD_NONVOID(int lun))
 
     tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 }
+
+struct usb_class_driver usb_cdrv_storage = {
+    .needs_exclusive_storage = true,
+    .config = 1,
+    .ep_allocs_size = ARRAYLEN(ep_allocs),
+    .ep_allocs = ep_allocs,
+    .set_first_interface = usb_storage_set_first_interface,
+    .get_config_descriptor = usb_storage_get_config_descriptor,
+    .init_connection = usb_storage_init_connection,
+    .init = usb_storage_init,
+    .disconnect = usb_storage_disconnect,
+    .transfer_complete = usb_storage_transfer_complete,
+    .control_request = usb_storage_control_request,
+#ifdef HAVE_HOTSWAP
+    .notify_hotswap = usb_storage_notify_hotswap,
+#endif
+};
