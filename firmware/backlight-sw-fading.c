@@ -54,9 +54,9 @@ static bool _backlight_fade_up(void)
         backlight_hw_brightness(++current_brightness);
 #else
         current_brightness += BRIGHTNESS_STEP;
-        if (current_brightness > MAX_BRIGHTNESS_SETTING)
-            current_brightness = MAX_BRIGHTNESS_SETTING;
-	backlight_hw_brightness(current_brightness);
+        if (current_brightness > backlight_brightness)
+            current_brightness = backlight_brightness;
+        backlight_hw_brightness(current_brightness);
 #endif
     }
     return(current_brightness >= backlight_brightness);
@@ -73,7 +73,7 @@ static bool _backlight_fade_down(void)
         current_brightness -= BRIGHTNESS_STEP;
         if (current_brightness < MIN_BRIGHTNESS_SETTING)
             current_brightness = MIN_BRIGHTNESS_SETTING;
-	backlight_hw_brightness(current_brightness);
+        backlight_hw_brightness(current_brightness);
 #endif
         return false;
     }
