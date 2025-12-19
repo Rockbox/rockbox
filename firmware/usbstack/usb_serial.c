@@ -329,7 +329,7 @@ static bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdat
     return handled;
 }
 
-static void usb_serial_init_connection(void)
+static int usb_serial_init_connection(void)
 {
     /* prime rx endpoint */
     usb_drv_recv_nonblocking(EP_OUT, receive_buffer, RECV_BUFFER_SIZE);
@@ -341,6 +341,7 @@ static void usb_serial_init_connection(void)
         sendout();
     }
     active=true;
+    return 0;
 }
 
 /* called by usb_code_init() */

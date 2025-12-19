@@ -38,7 +38,14 @@ struct usb_class_driver_ep_allocation {
 
 struct usb_class_driver {
     /* First some runtime data */
+
+    /* there are three possible runtime states for class driver:
+     * !enabled          -> disabled, invisible from host
+     * enabled && !error -> enabled, healthy
+     * enabled && error  -> recognized by host, but failed */
     bool enabled;
+    bool error;
+
     int first_interface;
     int last_interface;
 
@@ -69,8 +76,9 @@ struct usb_class_driver {
 
     /* Tells the driver that a usb connection has been set up and is now
        ready to use.
+       Returns 0 on success and -1 on error.
        Optional function */
-    void (*init_connection)(void);
+    int (*init_connection)(void);
 
     /* Initialises the driver. This can be called multiple times,
        and should not perform any action that can disturb other threads

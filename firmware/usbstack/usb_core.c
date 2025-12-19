@@ -236,7 +236,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
-#define is_active(driver) ((driver)->enabled && (driver)->config == usb_config)
+#define is_active(driver) ((driver)->enabled && !(driver)->error && (driver)->config == usb_config)
 #define has_if(driver, interface) ((interface) >= (driver)->first_interface && (interface) < (driver)->last_interface)
 
 /** NOTE Serial Number
@@ -399,6 +399,7 @@ void usb_core_init(void)
      * yet which drivers will be enabled */
     for(i = 0; i < USB_NUM_DRIVERS; i++) {
         drivers[i]->enabled = false;
+        drivers[i]->error = false;
         drivers[i]->first_interface = 0;
         drivers[i]->last_interface = 0;
         if(drivers[i]->init != NULL) {
@@ -472,7 +473,7 @@ void usb_core_hotswap_event(int volume, bool inserted)
 {
     int i;
     for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i]->enabled && drivers[i]->notify_hotswap != NULL)
+        if(is_active(drivers[i]) && drivers[i]->notify_hotswap != NULL)
             drivers[i]->notify_hotswap(volume, inserted);
 }
 #endif
@@ -856,10 +857,14 @@ static int usb_core_do_set_config(uint8_t new_config)
     if(usb_config != 0) {
         init_deinit_endpoints(usb_config - 1, true);
         for(int i = 0; i < USB_NUM_DRIVERS; i++) {
-            if(is_active(drivers[i]) && drivers[i]->init_connection != NULL) {
-                drivers[i]->init_connection();
-                require_exclusive |= drivers[i]->needs_exclusive_storage;
+            if(!is_active(drivers[i])) {
+                continue;
             }
+            if(drivers[i]->init_connection != NULL && drivers[i]->init_connection() < 0) {
+                drivers[i]->error = true;
+                continue;
+            }
+            require_exclusive |= drivers[i]->needs_exclusive_storage;
         }
     }
 

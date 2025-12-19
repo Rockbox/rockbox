@@ -436,7 +436,7 @@ static int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_
 #else
 static int usb_handle = 0;
 #endif
-static void usb_storage_init_connection(void)
+static int usb_storage_init_connection(void)
 {
     logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
@@ -483,6 +483,7 @@ static void usb_storage_init_connection(void)
         ejected[i] = !check_disk_present(IF_MD(i));
         queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
+    return 0;
 }
 
 void usb_storage_disconnect(void)

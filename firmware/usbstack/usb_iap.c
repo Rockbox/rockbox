@@ -373,7 +373,7 @@ static int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_siz
     return dest - orig_dest;
 }
 
-static void usb_iap_init_connection(void) {
+static int usb_iap_init_connection(void) {
     stream.sample_rate     = 48000;
     last_charge_state      = -1;
     last_minute            = -1;
@@ -381,10 +381,8 @@ static void usb_iap_init_connection(void) {
 
     iap_debug_reset_timestamp();
 
-    /* TODO: disable iap on error */
-
     /* init audio sink */
-    check_act(iap_audio_init(), return);
+    check_act(iap_audio_init(), return -1);
 
     /* init libiap */
     if(!iap_ctx_mutex_initialized) {
@@ -416,11 +414,12 @@ static void usb_iap_init_connection(void) {
 
     iap_initialized = true;
     LOG("initialized");
-    return;
+    return 0;
 
 cleanup_audio:
     _iap_release_ctx();
     iap_audio_deinit();
+    return -1;
 }
 
 static int usb_iap_set_interface(int intf, int alt) {

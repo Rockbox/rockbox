@@ -543,11 +543,12 @@ static int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_siz
     return (int)(dest - orig_dest);
 }
 
-static void usb_hid_init_connection(void)
+static int usb_hid_init_connection(void)
 {
     logf("hid: init connection");
     active = true;
     currently_sending = false;
+    return 0;
 }
 
 /* called by usb_core_init() */
