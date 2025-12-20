@@ -4337,6 +4337,11 @@ fi
     # generate debug symbols by default; these will be present in the
     # initial '.elf' file but will be stripped from the target binary.
     GCCOPTS="-g $GCCOPTS"
+    # set page size to 4k to guarantee reasonable on-disk alignment,
+    # which improves disk read speed; on ARM binutils defaults to 64k
+    # which adds quite a bit of unnecessary padding.
+    GCCOPTS="-Wl,-z,max-page-size=4096 $GCCOPTS"
+    USE_ELF="yes"
     ;;
 
     280|surfansf28)
