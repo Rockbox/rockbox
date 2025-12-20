@@ -850,9 +850,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
 
-    rb->splash(HZ, "FlipIt!");
-
     /* print instructions */
+    bool print_instructions = true;
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -920,21 +919,22 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_putsxy(2, 28, "[REW] shuffle");
     rb->lcd_putsxy(2, 38, "Long [FFWD] solution");
     rb->lcd_putsxy(2, 48, "[FFWD] step by step");
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
+#elif defined(HAVE_TOUCHSCREEN)
     rb->lcd_putsxy(2, 8, "[BOTTOMLEFT]  to stop");
     rb->lcd_putsxy(2, 18, "[CENTRE]      toggle");
     rb->lcd_putsxy(2, 28, "[TOPRIGHT]    shuffle");
     rb->lcd_putsxy(2, 38, "[BOTTOMLEFT]  solution");
     rb->lcd_putsxy(2, 48, "[BOTTOMRIGHT] step by step");
+#else
+    print_instructions = false;
 #endif
 
-    rb->lcd_update();
-
-    rb->button_get_w_tmo(HZ*3);
-
-    rb->lcd_clear_display();
+    if (print_instructions)
+    {
+        rb->lcd_update();
+        rb->button_get_w_tmo(HZ*3);
+        rb->lcd_clear_display();
+    }
     draw_info_panel();
     for (i=0; i<20; i++) {
         spots[i]=1;
