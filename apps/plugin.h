@@ -1022,6 +1022,9 @@ struct plugin_api {
 #endif
     char* (*strstr)(const char *s1, const char *s2);
     bool (*sb_set_title_text)(const char* title, enum themable_icons icon, enum screen_type screen);
+#ifdef HAVE_DIRCACHE
+    void (*dircache_wait)(void);
+#endif
 };
 
 /* plugin header */

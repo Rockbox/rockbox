@@ -734,6 +734,10 @@ static enum plugin_status tidy_lcd_menu(void)
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
             case 0:
                 if (tidy_types_selected()) {
+#ifdef HAVE_DIRCACHE
+                    rb->splash(0, ID2P(LANG_WAIT));
+                    rb->dircache_wait();
+#endif
                     disktidy_status = tidy_do();
                     if (disktidy_status == PLUGIN_OK)
                         disktidy_status = display_run_stats();

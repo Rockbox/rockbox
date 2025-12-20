@@ -871,6 +871,9 @@ static const struct plugin_api rockbox_api = {
 #endif
     strstr,
     sb_set_title_text,
+#ifdef HAVE_DIRCACHE
+    dircache_wait,
+#endif
 };
 
 static int plugin_buffer_handle;
