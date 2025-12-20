@@ -821,7 +821,7 @@ static enum minesweeper_status menu( void )
     int selection = 0, result = MINESWEEPER_QUIT;
     bool menu_quit = false;
 
-    MENUITEM_STRINGLIST( menu, "Minesweeper Menu", NULL, "Play Minesweeper",
+    MENUITEM_STRINGLIST( menu, "Minesweeper", NULL, "Play Minesweeper",
                          "Mine Percentage", "Number of Rows",
                          "Number of Columns", "Playback Control", "Quit" );
 

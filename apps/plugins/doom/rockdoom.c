@@ -15,7 +15,7 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- * 
+ *
  * H300 Port by Karl Kurbjun
  * IPod port by Dave Chapman and Paul Louden
  * Additional code contributed by Thom Johansen
@@ -273,7 +273,7 @@ bool Dhandle_ver (int dver)
    {
       snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum]);
       D_AddFile(addon,source_pwad);
-      modifiedgame = true; 
+      modifiedgame = true;
    }
 
    if(argvlist.demonum)
@@ -462,7 +462,7 @@ int Oset_keys()
       { "Key On", -1 },
 #endif
    };
-   
+
     int *keys[]={
         &key_right,
         &key_left,
@@ -518,7 +518,7 @@ static bool Doptions()
                         "Rotate Screen 90 deg",
 #endif
                         );
-   
+
    void *options[]={
         &enable_sound,
         &argvlist.timedemo,
@@ -537,7 +537,7 @@ static bool Doptions()
     while(!menuquit)
     {
         result = rb->do_menu(&menu, &selected, NULL, false);
-        if(result==0) 
+        if(result==0)
             Oset_keys();
         else if (result > 0)
             rb->set_option(menu_[result], options[result-1], RB_INT, onoff, 2, NULL );
@@ -592,7 +592,7 @@ int doom_menu()
 
    static struct opt_items names[7];
 
-   MENUITEM_STRINGLIST(menu, "Doom Menu", NULL,
+   MENUITEM_STRINGLIST(menu, "Doom", NULL,
                        "Game", "Addons", "Demos",
                        "Options", "Play Game", "Quit");
 
@@ -612,7 +612,7 @@ int doom_menu()
    gamever=status-1;
 
     /* Clean out the button Queue */
-    while (rb->button_get(false) != BUTTON_NONE) 
+    while (rb->button_get(false) != BUTTON_NONE)
         rb->yield();
 
    while(!menuquit)

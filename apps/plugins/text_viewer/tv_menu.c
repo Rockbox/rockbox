@@ -292,7 +292,7 @@ unsigned tv_display_menu(void)
 {
     unsigned result = TV_MENU_RESULT_EXIT_MENU;
 
-    MENUITEM_STRINGLIST(menu, "Viewer Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Text Viewer", NULL,
                         ID2P(LANG_RETURN),
                         "Viewer Options",
                         ID2P(LANG_PLAYBACK_CONTROL),

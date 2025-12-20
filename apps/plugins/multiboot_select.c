@@ -336,7 +336,7 @@ static int menu_action_cb(int action, struct gui_synclist* lists)
 static bool show_menu(void)
 {
     struct simplelist_info info;
-    rb->simplelist_info_init(&info, "Multiboot Settings", MB_NUM_ITEMS, NULL);
+    rb->simplelist_info_init(&info, "Multiboot", MB_NUM_ITEMS, NULL);
     info.get_name = menu_get_name_cb;
     info.action_callback = menu_action_cb;
     return rb->simplelist_show_list(&info);

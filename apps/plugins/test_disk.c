@@ -82,7 +82,7 @@ static bool log_init(void)
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
-    
+
     rb->create_numbered_filename(logfilename, HOME_DIR, "test_disk_log_", ".txt",
                                  2 IF_CNFN_NUM_(, NULL));
     log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
@@ -206,7 +206,7 @@ static bool file_speed(int chunksize, bool align)
     int fd, ret;
     long filesize = 0;
     long size, time;
-    
+
     if ((unsigned)chunksize >= audiobuflen)
         return false;
 
@@ -260,7 +260,7 @@ static bool file_speed(int chunksize, bool align)
     rb->snprintf(text_buf, sizeof text_buf, "Write  (%d,%c): %ld KB/s",
                  chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
     log_text(text_buf, true);
-    
+
     /* File read speed */
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
@@ -329,7 +329,7 @@ static bool test_speed(void)
     rb->snprintf(text_buf, sizeof(text_buf), "Create:  %d files/s",
                  last_file / TEST_TIME);
     log_text(text_buf, true);
-    
+
     /* File open speed */
     time = *rb->current_tick + TEST_TIME*HZ;
     for (n = 0, i = 0; TIME_BEFORE(*rb->current_tick, time); n++, i++)
@@ -404,7 +404,7 @@ static bool test_speed(void)
     rb->snprintf(text_buf, sizeof(text_buf), "Delete:  %ld files/s",
                  last_file * HZ / (*rb->current_tick - time));
     log_text(text_buf, true);
-    
+
     if (file_speed(512, true)
         && file_speed(512, false)
         && file_speed(4096, true)
@@ -435,7 +435,7 @@ static bool test_speed(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    MENUITEM_STRINGLIST(menu, "Test Disk Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Test Disk", NULL,
                         "Disk speed", "Write & verify");
     int selected=0;
     bool quit = false;

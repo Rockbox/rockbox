@@ -652,7 +652,7 @@ static int main_menu(void)
     int selection = 0;
     int result;
 
-    MENUITEM_STRINGLIST(main_menu,ID2P(LANG_MIKMOD_MENU), NULL,
+    MENUITEM_STRINGLIST(main_menu,"Mikmod", NULL,
                         ID2P(LANG_SETTINGS),
                         ID2P(LANG_RETURN),
                         ID2P(LANG_MENU_QUIT));

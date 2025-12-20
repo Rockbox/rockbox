@@ -1038,7 +1038,7 @@ static int show_start_menu(uint32_t duration)
     int result = 0;
     bool menu_quit = false;
 
-    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "MPEG Player", mpeg_sysevent_callback,
                         ID2P(LANG_RESTART_PLAYBACK),
                         ID2P(LANG_RESUME_PLAYBACK),
                         ID2P(LANG_SET_RESUME_TIME),
@@ -1138,7 +1138,7 @@ int mpeg_menu(void)
 {
     int result;
 
-    MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
+    MENUITEM_STRINGLIST(menu, "MPEG Player", mpeg_sysevent_callback,
                         ID2P(LANG_SETTINGS),
                         ID2P(LANG_RESUME_PLAYBACK),
                         ID2P(LANG_MENU_QUIT));

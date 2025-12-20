@@ -66,7 +66,7 @@ static void setupkeys(void)
 /*
  * do_user_menu - create the user menu on the screen.
  *
- * Returns USER_MENU_QUIT if the user selected "quit", otherwise 
+ * Returns USER_MENU_QUIT if the user selected "quit", otherwise
  * returns zero.
  */
 int do_user_menu(void) {
@@ -74,8 +74,8 @@ int do_user_menu(void) {
     int selected=0, ret=0;
     int result;
     int time = 0;
-    
-#if CONFIG_RTC    
+
+#if CONFIG_RTC
     time = rb->mktime(rb->get_time());
 #endif
 
@@ -86,10 +86,10 @@ int do_user_menu(void) {
     backlight_use_settings();
 
     /* Clean out the button Queue */
-    while (rb->button_get(false) != BUTTON_NONE) 
+    while (rb->button_get(false) != BUTTON_NONE)
         rb->yield();
 
-    MENUITEM_STRINGLIST(menu, "Rockboy Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Rockboy", NULL,
                         "Load Game", "Save Game",
                         "Options", "Reset", "Quit");
 
@@ -127,7 +127,7 @@ int do_user_menu(void) {
 
     rb->lcd_setfont(FONT_SYSFIXED); /* Reset the font */
     rb->lcd_clear_display(); /* Clear display for screen size changes */
-    
+
     /* Keep the RTC in sync */
 #if CONFIG_RTC
     time = (rb->mktime(rb->get_time()) - time) * 60;
@@ -153,7 +153,7 @@ static void munge_name(char *buf, const size_t bufsiz) {
     /* check strlen */
     max = strlen(buf);
     max = (max < bufsiz) ? max : bufsiz;
-  
+
     /* iterate over characters and munge them (if necessary) */
     for (i = 0; i < max; i++)
         if (!isalnum(buf[i]))
@@ -189,10 +189,10 @@ static void build_slot_path(char *buf, size_t bufsiz, int slot_id) {
 static bool do_file(char *path, char *desc, bool is_load) {
     char desc_buf[DESC_SIZE];
     int fd, file_mode;
-    
+
     /* set file mode */
     file_mode = is_load ? O_RDONLY : (O_WRONLY | O_CREAT);
-  
+
     /* attempt to open file descriptor here */
     if ((fd = open(path, file_mode, 0666)) < 0)
         return false;
@@ -202,10 +202,10 @@ static bool do_file(char *path, char *desc, bool is_load) {
     {
         /* load description */
         read(fd, desc_buf, sizeof(desc_buf));
-    
+
         /* load state */
         loadstate(fd);
-    
+
         /* print out a status message so the user knows the state loaded */
         rb->splashf(HZ * 1, "Loaded state from \"%s\"", path);
     }
@@ -220,7 +220,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
         write(fd, desc_buf, sizeof(desc_buf));
         savestate(fd);
     }
-    
+
     /* close file descriptor */
     close(fd);
 
@@ -228,7 +228,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
     return true;
 }
 
-/* 
+/*
  * get information on the given slot
  */
 static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id,
@@ -267,7 +267,7 @@ static void slot_info(char *info_buf, size_t info_bufsiz, int slot_id,
  */
 static bool do_slot(int slot_id, bool is_load) {
     char path_buf[256], desc_buf[DESC_SIZE];
-  
+
     /* build slot filename, clear desc buf */
     build_slot_path(path_buf, sizeof(path_buf), slot_id);
     memset(desc_buf, 0, sizeof(desc_buf));
@@ -286,7 +286,7 @@ static bool do_slot(int slot_id, bool is_load) {
     return do_file(path_buf, desc_buf, is_load);
 }
 
-/* 
+/*
  * slot_get_name
  */
 static const char* slot_get_name(int selected_item, void * data,
@@ -380,7 +380,7 @@ static void do_opt_menu(void)
         { "19 Max", -1 },
         { "20 Max", -1 },
     };
-    
+
 #ifdef HAVE_LCD_COLOR
     static const struct opt_items rotate[] = {
         { "No rotation", -1 },
@@ -418,7 +418,7 @@ static void do_opt_menu(void)
 #endif
 
     MENUITEM_STRINGLIST(menu, "Options", NULL,
-                        "Max Frameskip", "Autosave", "Sound", "Volume", 
+                        "Max Frameskip", "Autosave", "Sound", "Volume",
                         "Stats", "Set Keys (Buggy)",
 #ifdef HAVE_LCD_COLOR
                         "Screen Size", "Screen Rotate", "Set Palette",

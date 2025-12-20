@@ -61,7 +61,7 @@ const struct button_mapping *plugin_contexts[]
 #define MAZEZAM_TEXT_CHECKPOINT      "Checkpoint reached"
 #define MAZEZAM_TEXT_WELLDONE_TITLE  "You have escaped!"
 #define MAZEZAM_TEXT_WELLDONE_OPTION "Goodbye"
-#define MAZEZAM_TEXT_MAZEZAM_MENU    "MazezaM Menu"
+#define MAZEZAM_TEXT_MAZEZAM_MENU    "MazezaM"
 #define MAZEZAM_TEXT_RETRY_LEVEL     "Retry level"
 #define MAZEZAM_TEXT_AUDIO_PLAYBACK  "Playback Control"
 #define MAZEZAM_TEXT_QUIT            "Quit"
@@ -243,7 +243,7 @@ static struct {
 /*****************************************************************************
 * Store the LCD settings
 ******************************************************************************/
-static void store_lcd_settings(void) 
+static void store_lcd_settings(void)
 {
     /* Store the old settings */
 #if LCD_DEPTH > 1
@@ -390,7 +390,7 @@ static void draw_row(
     /* adding width to i should have a fixed, but randomising effect on
      * the choice of the colours of the top line of chunks
      */
-    rb->lcd_set_foreground(chunk_colors[(i+width) % 
+    rb->lcd_set_foreground(chunk_colors[(i+width) %
                            MAZEZAM_NUM_CHUNK_COLORS]);
 #endif
     for (j = 0; j<cd->l_num[i]; j++) {
@@ -607,7 +607,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                         blocked = blocked ||
                                     (*x+1 == shift[*y]+li->cd.c_inset[*y][i]);
                     if (!blocked) *x += 1;
-                    else if (shift[*y] 
+                    else if (shift[*y]
                               + li->cd.c_inset[*y][li->cd.l_num[*y]-1]
                               + li->cd.c_width[*y][li->cd.l_num[*y]-1]
                                  < li->width) {
@@ -673,9 +673,9 @@ static void in_game_menu(void)
 /*****************************************************************************
 * Is the level a checkpoint
 ******************************************************************************/
-static bool at_checkpoint(int level) 
+static bool at_checkpoint(int level)
 {
-    if (level <= MAZEZAM_FIRST_CHECKPOINT) 
+    if (level <= MAZEZAM_FIRST_CHECKPOINT)
         return level == MAZEZAM_FIRST_CHECKPOINT;
     else {
         level = level - MAZEZAM_FIRST_CHECKPOINT;
@@ -852,7 +852,7 @@ static void resume_save_data (struct resume_data *r, struct resume_data *old)
 }
 
 /*****************************************************************************
-* Manages the main menu 
+* Manages the main menu
 ******************************************************************************/
 static bool have_continue;
 static int main_menu_cb(int action,
@@ -918,7 +918,7 @@ static void main_menu(void)
 }
 
 /*****************************************************************************
-* Plugin entry point 
+* Plugin entry point
 ******************************************************************************/
 enum plugin_status plugin_start(const void* parameter)
 {

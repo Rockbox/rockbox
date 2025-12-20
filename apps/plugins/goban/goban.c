@@ -612,7 +612,7 @@ static bool
 do_main_menu (void)
 {
     int selection = 0;
-    MENUITEM_STRINGLIST (menu, "Rockbox Goban", NULL,
+    MENUITEM_STRINGLIST (menu, "Goban", NULL,
                          "New",
                          "Save",
                          "Save As",
@@ -620,7 +620,7 @@ do_main_menu (void)
                          "Playback Control",
                          "Zoom Level",
                          "Options",
-                         "Context Menu",
+                         "Perform Task",
                          "Quit");
 
     /* for "New" in menu */
@@ -997,7 +997,7 @@ do_context_menu (void)
     bool done = false;
     int temp;
 
-    MENUITEM_STRINGLIST (context_menu, "Context Menu", NULL,
+    MENUITEM_STRINGLIST (context_menu, "Perform Task", NULL,
                          "Play Mode (default)",
                          "Add Black Mode",
                          "Add White Mode",
@@ -1132,7 +1132,7 @@ do_options_menu (void)
     int selection;
     bool done = false;
 
-    MENUITEM_STRINGLIST (options_menu, "Options Menu", NULL,
+    MENUITEM_STRINGLIST (options_menu, "Options", NULL,
                          "Show Child Variations?",
                          "Disable Idle Poweroff?",
                          "Idle Autosave Time",

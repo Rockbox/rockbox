@@ -1412,7 +1412,7 @@ static unsigned int blackjack_menu(void) {
     int selection = 0;
     bool breakout = false;
 
-    MENUITEM_STRINGLIST(menu, "BlackJack Menu", blackjack_menu_cb,
+    MENUITEM_STRINGLIST(menu, "Blackjack", blackjack_menu_cb,
                         "Resume Game", "Start New Game",
                         "High Scores", "Help",
                         "Playback Control",

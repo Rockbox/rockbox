@@ -912,7 +912,7 @@ static int sudoku_menu(struct sudoku_state_t* state)
 {
     int result;
 
-    MENUITEM_STRINGLIST(menu, "Sudoku Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Sudoku", NULL,
                         "Audio Playback",
 #ifdef HAVE_LCD_COLOR
                         "Number Display",
@@ -982,7 +982,7 @@ static int sudoku_edit_menu(struct sudoku_state_t* state)
 {
     int result;
 
-    MENUITEM_STRINGLIST(menu, "Edit Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Edit", NULL,
                         "Save as", "Quit");
 
     result = rb->do_menu(&menu, NULL, NULL, false);

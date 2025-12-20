@@ -375,7 +375,7 @@ static int menu_cb(int action,
 }
 
 static void main_menu(void) {
-    MENUITEM_STRINGLIST(main_menu, "Codebuster Menu", menu_cb,
+    MENUITEM_STRINGLIST(main_menu, "Codebuster", menu_cb,
                         "Resume Game", "Start New Game", "Settings",
                         "Playback Control", "Quit");
     int cur_item = 0;

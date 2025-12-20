@@ -520,7 +520,7 @@ static int snake_menu_cb(int action,
 
 static int snake_game_menu(void)
 {
-    MENUITEM_STRINGLIST(main_menu,"Snake Menu",snake_menu_cb,
+    MENUITEM_STRINGLIST(main_menu,"Snake",snake_menu_cb,
                         "Resume Game",
                         "Start New Game",
                         "Snake Speed",

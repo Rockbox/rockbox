@@ -678,7 +678,7 @@ static enum plugin_status tidy_lcd_menu(void)
     int selection = 0;
     struct simplelist_info list;
 
-    MENUITEM_STRINGLIST(menu, "Disktidy", disktidy_menu_cb,
+    MENUITEM_STRINGLIST(menu, "Disk Tidy", disktidy_menu_cb,
                         "Start Cleaning", "Files to Clean", "Last Run Stats",
                         "Playback Control", "Quit");
 

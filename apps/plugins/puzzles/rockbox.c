@@ -2624,7 +2624,7 @@ static void bench_aa(void)
 
 static void debug_menu(void)
 {
-    MENUITEM_STRINGLIST(menu, "Debug Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Debug", NULL,
                         "Slowmo factor",
                         "Randomize colors",
                         "Toggle flash pixel on timer",
@@ -2815,7 +2815,7 @@ static int pause_menu(void)
                         "Extensive Help",      // 8
                         "Playback Control",    // 9
                         "Game Type",           // 10
-                        "Debug Menu",          // 11
+                        "Debug",               // 11
                         "Configure Game",      // 12
 			"Preferences",         // 13
                         "Quit without Saving", // 14
@@ -3414,7 +3414,7 @@ static void puzzles_main(void)
 #endif
 
     /* must be done before any menu needs to be displayed */
-    rb->snprintf(menu_desc, sizeof(menu_desc), "%s Menu", midend_which_game(me)->name);
+    rb->snprintf(menu_desc, sizeof(menu_desc), "%s", midend_which_game(me)->name);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* about to go to menu or button block */

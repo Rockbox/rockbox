@@ -1165,7 +1165,7 @@ static int xobox_menu(bool ingame)
     rb->button_clear_queue();
 
     int selection = 0;
-    MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
+    MENUITEM_STRINGLIST(main_menu, "Xobox", xobox_menu_cb,
                         "Resume Game", "Start New Game",
                         "Speed", "Difficulty",
                         "High Scores", "Playback Control",

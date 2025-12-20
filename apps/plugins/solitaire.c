@@ -1095,7 +1095,7 @@ static int solitaire_menu(bool in_game)
     int selected = 0;
     int result = -1;
 
-    MENUITEM_STRINGLIST(menu, "Solitaire Menu", solitaire_menu_cb,
+    MENUITEM_STRINGLIST(menu, "Solitaire", solitaire_menu_cb,
                         "Resume Game", "Start New Game",
                         "Draw Cards Option",
                         "Help", "Playback Control",

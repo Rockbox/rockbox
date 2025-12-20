@@ -2540,7 +2540,7 @@ enum plugin_status plugin_start(const void* parameter)
         { STR(LANG_OUT_OF_CONTROL) }
     };
 
-    MENUITEM_STRINGLIST(menu, "Wormlet Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Wormlet", NULL,
                         ID2P(LANG_PLAY_WORMLET), ID2P(LANG_NUMBER_OF_WORMS),
                         ID2P(LANG_NUMBER_OF_PLAYERS), ID2P(LANG_CONTROL_STYLE),
                         ID2P(LANG_WORM_GROWTH_PER_FOOD), ID2P(LANG_WORM_SPEED),

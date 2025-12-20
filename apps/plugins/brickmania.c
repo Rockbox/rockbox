@@ -1601,7 +1601,7 @@ static int brickmania_menu(void)
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
 
-    MENUITEM_STRINGLIST(main_menu, "Brickmania Menu", brickmania_menu_cb,
+    MENUITEM_STRINGLIST(main_menu, "Brickmania", brickmania_menu_cb,
                         "Resume Game", "Start New Game",
                         "Difficulty", "Help", "High Scores",
                         "Playback Control",

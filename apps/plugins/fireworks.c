@@ -215,7 +215,7 @@ static const struct opt_items fps_settings[9] = {
 int fps_values[9] = {
     20, 25, 30, 35, 40, 45, 50, 55, 60 };
 
-MENUITEM_STRINGLIST(menu, "Fireworks Menu", NULL,
+MENUITEM_STRINGLIST(menu, "Fireworks", NULL,
                     "Start Demo", "Auto-Fire", "Particles Per Firework",
                     "Particle Life", "Gravity", "Show Rockets",
                     "FPS (Speed)", "Playback Control", "Quit");

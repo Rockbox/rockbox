@@ -568,7 +568,7 @@ The bottom right displays the number of moves taken, the number of moves used by
     function app_menu()
         local options = {"Resume game", "Start new game", "Change difficulty",
             "Help", "Quit without saving", "Quit"}
-        local item = rb.do_menu("Pixel painter menu", options, nil, false)
+        local item = rb.do_menu("Pixel Painter", options, nil, false)
 
         if item == 0 then
             redraw_game(game_state, highscores)

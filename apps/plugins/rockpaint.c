@@ -1031,7 +1031,7 @@ enum {
         TEXT_MENU_PREVIEW, TEXT_MENU_APPLY, TEXT_MENU_CANCEL,
      };
 
-MENUITEM_STRINGLIST(main_menu, "RockPaint", NULL,
+MENUITEM_STRINGLIST(main_menu, "Rockpaint", NULL,
                     "Resume", "New", "Load", "Save",
                     "Set Width", "Set Height",
                     "Brush Size", "Brush Speed",

@@ -3700,7 +3700,7 @@ static int main_menu(void)
     rb->lcd_set_foreground(N_BRIGHT(255));
 #endif
 
-    MENUITEM_STRINGLIST(main_menu, "PictureFlow Main Menu", NULL,
+    MENUITEM_STRINGLIST(main_menu, "PictureFlow", NULL,
                         ID2P(LANG_SORT_ALBUMS_BY),
                         ID2P(LANG_SHOW_TRACKS_WHILE_BROWSING),
                         ID2P(LANG_GOTO_LAST_ALBUM),

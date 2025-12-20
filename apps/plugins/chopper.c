@@ -766,7 +766,7 @@ static int chopMenu(int menunum)
         { "Steep", -1 },
     };
 
-    MENUITEM_STRINGLIST(menu,"Chopper Menu",chopMenuCb,
+    MENUITEM_STRINGLIST(menu,"Chopper",chopMenuCb,
                         "Resume Game","Start New Game",
                         "Level","Playback Control","Quit");
     _ingame = (menunum!=0);

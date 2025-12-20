@@ -262,7 +262,7 @@ static void undo(void)
     else
     {
         /*
-        negative history means we bust. negative filled for all skipped throws 
+        negative history means we bust. negative filled for all skipped throws
         from being bust so consume back until no more
         */
         for (; settings.throws < 3 && settings.history[settings.history_ptr - 1] < 0; --settings.history_ptr, ++settings.throws)
@@ -526,7 +526,7 @@ static enum plugin_status do_dart_scorer_menu(void)
     int sel = 0;
     loaded = load_game();
     MENUITEM_STRINGLIST(menu,
-                        "Dart Scorer Menu",
+                        "Dart Scorer",
                         mainmenu_cb,
                         "Resume Game",
                         "Start New Game",

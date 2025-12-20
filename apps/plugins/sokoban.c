@@ -1607,7 +1607,7 @@ static int sokoban_menu(void)
     bool menu_quit;
     int start_selected = 0;
 
-    MENUITEM_STRINGLIST(menu, "Sokoban Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Sokoban", NULL,
                         "Resume", "Select Level", "Audio Playback", "Keys",
                         "Load Default Level Set", "Quit Without Saving",
                         "Save Progress & Quit");

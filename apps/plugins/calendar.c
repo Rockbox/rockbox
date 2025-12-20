@@ -893,7 +893,7 @@ static bool edit_memo(int change, struct shown *shown)
         { "Sun", -1 },
     };
 
-    MENUITEM_STRINGLIST(edit_menu, "Edit menu", edit_menu_cb,
+    MENUITEM_STRINGLIST(edit_menu, "Edit", edit_menu_cb,
                         "Remove", "Edit",
                         "New Weekly", "New Monthly",
                         "New Yearly", "New One off",

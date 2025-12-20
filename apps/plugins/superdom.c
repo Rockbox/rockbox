@@ -660,7 +660,7 @@ static int start_menu(void)
 {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Super Domination", NULL,
                         "Play Super Domination", "Settings",
                         "Help", "Playback Control", "Quit");
 
@@ -747,7 +747,7 @@ static int save_game(void)
 
 static int ingame_menu(void)
 {
-    MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Super Domination", NULL,
                         "Return to game", "Save Game",
                         "Playback Control", "Quit");
 

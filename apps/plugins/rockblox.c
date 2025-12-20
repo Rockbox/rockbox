@@ -1480,7 +1480,7 @@ static int rockblox_menu(void)
 {
     int selected = 0;
 
-    MENUITEM_STRINGLIST(main_menu, "Rockblox Menu", rockblox_menu_cb,
+    MENUITEM_STRINGLIST(main_menu, "Rockblox", rockblox_menu_cb,
                         "Resume Game", "Start New Game",
                         "Help", "High Scores", "Playback Control",
                         "Quit without Saving", "Quit");

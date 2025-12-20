@@ -1480,7 +1480,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
         { "Puzzle", -1 },
     };
 
-    MENUITEM_STRINGLIST (main_menu, "Jewels Menu", jewels_menu_cb,
+    MENUITEM_STRINGLIST (main_menu, "Jewels", jewels_menu_cb,
                              "Resume Game",
                              "Start New Game",
                              "Mode",

@@ -781,7 +781,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
 
     _ingame = ingame;
 
-    MENUITEM_STRINGLIST (main_menu, "Clix Menu", clix_menu_cb,
+    MENUITEM_STRINGLIST (main_menu, "Clix", clix_menu_cb,
                              "Resume Game",
                              "Start New Game",
                              "Help",

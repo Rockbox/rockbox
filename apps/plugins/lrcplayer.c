@@ -2419,7 +2419,7 @@ static const char* lrc_debug_data(int selected, void * data,
 static bool lrc_debug_menu(void)
 {
     struct simplelist_info info;
-    rb->simplelist_info_init(&info, "Debug Menu", 6, NULL);
+    rb->simplelist_info_init(&info, "Debug", 6, NULL);
     info.scroll_all = true;
     info.get_name = lrc_debug_data;
     return rb->simplelist_show_list(&info);
@@ -2442,13 +2442,13 @@ static int lrc_menu(void)
         LRC_MENU_QUIT,
     };
 
-    MENUITEM_STRINGLIST(menu, "Lrcplayer Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Lrcplayer", NULL,
                         "Theme Settings",
                         "Display Settings",
                         "Lyrics Settings",
                         "Playback Control",
 #ifdef LRC_DEBUG
-                        "Debug Menu",
+                        "Debug",
 #endif
                         "Time Offset", "Timetag Editor",
                         "Quit");

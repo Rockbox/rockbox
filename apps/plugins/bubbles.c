@@ -2503,7 +2503,7 @@ static int bubbles_menu(struct game_context* bb) {
     int selected = 0;
     bool startgame = false;
 
-    MENUITEM_STRINGLIST(menu,"Bubbles Menu",bubbles_menu_cb,
+    MENUITEM_STRINGLIST(menu,"Bubbles",bubbles_menu_cb,
                         "Resume Game", "Start New Game",
                         "Level", "High Scores", "Playback Control",
                         "Quit without Saving", "Quit");

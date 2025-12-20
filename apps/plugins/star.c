@@ -1405,7 +1405,7 @@ static int star_menu(void)
     int selection, level=1;
     bool menu_quit = false;
 
-    MENUITEM_STRINGLIST(menu, "Star Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Star", NULL,
                         "Start Game","Choose Level",
                         "Help", "Playback Control", "Quit");
 

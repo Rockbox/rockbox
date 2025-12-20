@@ -1301,7 +1301,7 @@ int menu(void)
     bool exit_menu = false;
     int selection = 0, result = 0, status = 1;
 
-    MENUITEM_STRINGLIST(menu, ID2P(LANG_AMAZE_MENU), menu_cb,
+    MENUITEM_STRINGLIST(menu, "Amaze", menu_cb,
                         ID2P(LANG_CHESSBOX_MENU_RESUME_GAME),
                         ID2P(LANG_CHESSBOX_MENU_NEW_GAME),
                         ID2P(LANG_SET_MAZE_SIZE),

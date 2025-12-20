@@ -1946,7 +1946,7 @@ static int spacerocks_menu_cb(int action,
 static int spacerocks_menu(void)
 {
     int selection = 0;
-    MENUITEM_STRINGLIST(main_menu, "Spacerocks Menu", spacerocks_menu_cb,
+    MENUITEM_STRINGLIST(main_menu, "Spacerocks", spacerocks_menu_cb,
                         "Resume Game", "Start New Game",
                         "Help", "High Scores",
                         "Playback Control", "Quit");

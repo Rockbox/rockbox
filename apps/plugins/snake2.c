@@ -1598,7 +1598,7 @@ static void game_init(void)
         { "Type B", -1 },
     };
 
-    MENUITEM_STRINGLIST(menu, "Snake2 Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Snake 2", NULL,
                         "Start New Game",
                         "Game Type", "Select Maze", "Speed",
                         "High Scores",

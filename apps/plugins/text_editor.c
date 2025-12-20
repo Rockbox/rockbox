@@ -485,7 +485,7 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_CANCEL:
                 if (changed)
                 {
-                    MENUITEM_STRINGLIST(menu, "Do What?", NULL,
+                    MENUITEM_STRINGLIST(menu, "Text Editor", NULL,
                                         "Return",
                                         "Playback Control", "Save Changes",
                                         "Save As...", "Save and Exit",

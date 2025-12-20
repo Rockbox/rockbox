@@ -124,7 +124,7 @@ void sysmenu_exec(void)
         Menu_QUIT
     };
 
-    MENUITEM_STRINGLIST(sysmenu_mainItems, "xrick Menu", NULL,
+    MENUITEM_STRINGLIST(sysmenu_mainItems, "xrick", NULL,
                     "Resume Game",
                     "Restart Game",
 #ifdef ENABLE_CHEATS

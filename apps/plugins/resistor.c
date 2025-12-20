@@ -3,7 +3,7 @@
 TODO:
 [ ] Own numeric keypad
 */
- 
+
 #include "plugin.h"
 #include "lib/display_text.h"
 #include "lib/pluginlib_actions.h"
@@ -89,7 +89,7 @@ enum color {
 static int common_values[] = { 0, 1, 10, 15, 22, 27, 33, 39, 47, 51, 68, 82 };
 static int power_ratings[] = { 125, 250, 500, 1000, 2000, 3000, 5000, 10000, 50000 };
 /* All in mW */
-    
+
 #ifndef LCD_RGBPACK
 /* Warning: dirty kludge */
 #define LCD_RGBPACK(x,y,z) 0
@@ -130,7 +130,7 @@ static struct screen *display;
 
 static int lineno;
 
-static char *get_power_rating_str(int in_rating) 
+static char *get_power_rating_str(int in_rating)
 {
     switch(in_rating) {
         case 125:
@@ -151,7 +151,7 @@ static char *get_power_rating_str(int in_rating)
             return "10 Watt";
         case 500000:
             return "50 Watt";
-        default: 
+        default:
             return "Unknown";
     }
 }
@@ -221,11 +221,11 @@ static void draw_resistor(enum color firstband_color,
 
     rb->lcd_clear_display();
     display->set_viewport(&bitmap_vp);
-    rb->lcd_bitmap_transparent(resistor, RESISTOR_BMP_X, 0, 
+    rb->lcd_bitmap_transparent(resistor, RESISTOR_BMP_X, 0,
                                BMPWIDTH_resistor, BMPHEIGHT_resistor);
 
     fg = rb->lcd_get_foreground();
-        
+
     if(firstband_color != RES_NONE) {
         rb->lcd_set_foreground(band_data[firstband_color].color_value);
         rb->lcd_fillrect(first_band_x, universal_y, band_width, band_height);
@@ -233,7 +233,7 @@ static void draw_resistor(enum color firstband_color,
         rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_drawrect(first_band_x, universal_y, band_width, band_height);
     }
-          
+
     if(secondband_color != RES_NONE) {
         rb->lcd_set_foreground(band_data[secondband_color].color_value);
         rb->lcd_fillrect(second_band_x, universal_y, band_width, band_height);
@@ -241,25 +241,25 @@ static void draw_resistor(enum color firstband_color,
         rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_drawrect(second_band_x, universal_y, band_width, band_height);
     }
-    
-    if(thirdband_color != RES_NONE) {        
+
+    if(thirdband_color != RES_NONE) {
         rb->lcd_set_foreground(band_data[thirdband_color].color_value);
         rb->lcd_fillrect(third_band_x, universal_y, band_width, band_height);
     } else {
         rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_drawrect(third_band_x, universal_y, band_width, band_height);
     }
-    
-    if(fourthband_color != RES_NONE) {        
+
+    if(fourthband_color != RES_NONE) {
         rb->lcd_set_foreground(band_data[fourthband_color].color_value);
         rb->lcd_fillrect(fourth_band_x, universal_y, band_width, band_height);
     } else {
         rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_drawrect(fourth_band_x, universal_y, band_width, band_height);
     }
-    
+
     rb->lcd_set_foreground(fg);
-            
+
     rb->lcd_update();
     return;
 }
@@ -280,17 +280,17 @@ static void draw_resistor_text(enum color firstband_color,
     rb->lcd_puts_scroll(resistance_val_x, lineno++, resistance_vals_str);
     rb->lcd_update();
 }
-    
+
 
 static int calculate_resistance(enum color first_band,
-                         enum color second_band, 
+                         enum color second_band,
                          enum color third_band)
 {
     int tens = band_data[first_band].resistance_value;
     int units = band_data[second_band].resistance_value;
     int multiplier = band_data[third_band].multiplier;
-    int total_resistance_centiunits = (10 * tens + units ) * multiplier;   
-    
+    int total_resistance_centiunits = (10 * tens + units ) * multiplier;
+
     unit_abbrev = band_data[third_band].unit;
 
     return total_resistance_centiunits;
@@ -300,11 +300,11 @@ static enum color do_first_band_menu(void)
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
-            
-    MENUITEM_STRINGLIST(colors_menu_first, "First band colour:", NULL, 
+
+    MENUITEM_STRINGLIST(colors_menu_first, "First band colour:", NULL,
                         "Black", "Brown", "Red", "Orange", "Yellow",
                          "Green", "Blue", "Violet", "Grey", "White");
-    band_selection = rb->do_menu(&colors_menu_first, &band_selection, NULL, 
+    band_selection = rb->do_menu(&colors_menu_first, &band_selection, NULL,
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -343,16 +343,16 @@ static enum color do_first_band_menu(void)
         }
     return band_color_selection;
 }
-            
-static enum color do_second_band_menu(void) 
+
+static enum color do_second_band_menu(void)
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
-            
-    MENUITEM_STRINGLIST(colors_menu_second, "Second band colour:", NULL, 
-                        "Black", "Brown", "Red", "Orange", "Yellow", 
+
+    MENUITEM_STRINGLIST(colors_menu_second, "Second band colour:", NULL,
+                        "Black", "Brown", "Red", "Orange", "Yellow",
                         "Green", "Blue", "Violet", "Grey", "White");
-    band_selection = rb->do_menu(&colors_menu_second, &band_selection, NULL, 
+    band_selection = rb->do_menu(&colors_menu_second, &band_selection, NULL,
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -391,17 +391,17 @@ static enum color do_second_band_menu(void)
     }
     return band_color_selection;
 }
-    
-static enum color do_third_band_menu(void) 
+
+static enum color do_third_band_menu(void)
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
-            
-    MENUITEM_STRINGLIST(colors_menu_third, "Third band colour:", NULL, 
+
+    MENUITEM_STRINGLIST(colors_menu_third, "Third band colour:", NULL,
                         "Black", "Brown", "Red", "Orange", "Yellow",
                          "Green", "Blue", "Violet", "Grey", "White",
                          "Silver", "Gold");
-    band_selection = rb->do_menu(&colors_menu_third, &band_selection, NULL, 
+    band_selection = rb->do_menu(&colors_menu_third, &band_selection, NULL,
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -446,15 +446,15 @@ static enum color do_third_band_menu(void)
     }
     return band_color_selection;
 }
-            
-static enum color do_fourth_band_menu(void) 
+
+static enum color do_fourth_band_menu(void)
 {
     int band_selection = 0;
     enum color band_color_selection = 0;
-            
-    MENUITEM_STRINGLIST(colors_menu_fourth, "Fourth band colour:", NULL, 
+
+    MENUITEM_STRINGLIST(colors_menu_fourth, "Fourth band colour:", NULL,
                         "Gold", "Brown", "Red", "Silver", "(none)");
-    band_selection = rb->do_menu(&colors_menu_fourth, &band_selection, NULL, 
+    band_selection = rb->do_menu(&colors_menu_fourth, &band_selection, NULL,
                                 false);
     switch(band_selection) {
         case 0: /* Gold */
@@ -487,8 +487,8 @@ static void display_helpfile(void)
         "Resistor Calculator Helpfile", "", "",
         "About resistors:", "", /* 7 */
         /* -- */
-        "A", "resistor", "is", "a ", "two-terminal", "electronic", 
-        "component", "that", "produces", "a", "voltage", "across", "its", 
+        "A", "resistor", "is", "a ", "two-terminal", "electronic",
+        "component", "that", "produces", "a", "voltage", "across", "its",
         "terminals", "that", "is", "proportional", "to", "the", "electric",
         "current", "passing", "through", "it", "in", "accordance", "to",
         "Ohm's", "Law:", "", /* 29 */
@@ -497,18 +497,18 @@ static void display_helpfile(void)
         "", "I = V/R",
         "", "and",
         "", "R = V/I", "", "",
-        "Where", "V", "=", "voltage, ", "I", "=", "current", "(in", "amps)", 
+        "Where", "V", "=", "voltage, ", "I", "=", "current", "(in", "amps)",
         "and", "R", "=", "resistance", "(measured", "in", "Ohms).", "", "",
          /* 28 */
         /* -- */
         "The", "primary", "characteristics", "of", "a", "resistor", "are",
         "the", "resistance,", "the", "tolerance,", "and", "the", "maximum",
-        "working", "voltage", "and", "the", "power", "rating.", "At", 
+        "working", "voltage", "and", "the", "power", "rating.", "At",
         "this", "time,", "this", "calculator", "only", "utilises", "the",
         "resistance", "and", "tolerance.", "", "", /* 33 */
         /* -- */
         "The", "Ohm", "is", "the", "SI", "unit", "of", "resistance,", "and",
-        "common", "multiples", "of", "that", "include", "the", "kiloohm", 
+        "common", "multiples", "of", "that", "include", "the", "kiloohm",
         "(KOhm", "-", "1x10^3)", "and", "the", "megaohm", "(MOhm",
         "-", "1x10^6),", "both", "of", "which", "are", "supported", "by",
         "this", "calculator.", "", "", /* 34 */
@@ -536,25 +536,25 @@ static void display_helpfile(void)
         "resistor", "for", "which", "you", "would", "like", "to", "know",
         "the", "resistance.", "", "",
         /* -- */
-        "In", "Resistance", "to", "Colour", "mode,", "use", "the", "menus", 
+        "In", "Resistance", "to", "Colour", "mode,", "use", "the", "menus",
         "to", "select", "which", "unit", "to", "use", "(choose", "from", "Ohms,",
         "KiloOhms", "and", "MegaOhms)", "and", "the", "on-screen", "keyboard",
         "to", "input", "the", "value", "of", "the", "resistor", "that", "you",
         "would", "like", "to", "know", "the", "colour", "codes", "of.",
         "Output", "will", "be", "both", "graphical", "(with", "bands", "of",
-        "the", "resistor", "shown", "in", "their", "corresponding", "colours", 
+        "the", "resistor", "shown", "in", "their", "corresponding", "colours",
         "-", "colour", "targets", "only)", "and", "textually.", "","",
         /* -- */
         "LED", "resistor", "calculator", "mode", "is", "used", "to", "determine",
         "the", "resistor", "necessary", "to", "light", "a", "LED", "safely",
-        "at", "a", "given", "voltage.", "First,", "select", "the", "voltage", 
-        "that", "the", "LED", "will", "use", "(the", "first", "option", "is", 
+        "at", "a", "given", "voltage.", "First,", "select", "the", "voltage",
+        "that", "the", "LED", "will", "use", "(the", "first", "option", "is",
         "the", "most", "common", "and", "is", "a", "safe", "guess)", "and", "the",
         "current", "that", "it", "will", "draw", "(likewise", "with", "the",
         "first", "option).", "Then", "use", "the", "onscreen", "keyboard", "to",
-        "type", "in", "the", "supply", "voltage", "and,", "if", "selected,", 
-        "the", "custom", "foreward", "current.", "", 
-        "Disclaimer:", "this", 
+        "type", "in", "the", "supply", "voltage", "and,", "if", "selected,",
+        "the", "custom", "foreward", "current.", "",
+        "Disclaimer:", "this",
         "calculator", "produces", "safe", "estimates,", "but", "use", "your",
         "own", "judgement", "when", "using", "these", "output", "values.",
         "Power", "rating", "and", "displayed", "resistance", "are", "rounded",
@@ -593,30 +593,30 @@ static void led_resistance_calc(void)
     char true_current_out_str [40];
     char rounded_resistance_out_str [40];
     char power_rating_out_str [40];
-                         
+
     int power_ten, first_band_int, second_band_int = 0;
-    
+
     enum color first_band;
     enum color second_band;
     enum color multiplier;
     enum color fourth_band = RES_NONE;
-    
+
     rb->lcd_clear_display();
-    
+
     MENUITEM_STRINGLIST(voltage_menu, "Select LED voltage:", NULL,
                         "2v (Common red, orange)", "1.5v (IR)", "2.1v (Yellow)",
-                        "2.2v (Green)", "3.3v (True green, blue, white, UV)", 
+                        "2.2v (Green)", "3.3v (True green, blue, white, UV)",
                         "4.6v (Blue - 430nm)");
     MENUITEM_STRINGLIST(fwd_current_menu, "Select foreward current:", NULL,
                  "20mA - Most common for 5mm and 3mm LEDs - select if unsure.",
                  "Key in other (only if already known)");
-    
+
     while(!quit) {
         int ret;
-        ret = voltage_menu_selection = rb->do_menu(&voltage_menu, 
+        ret = voltage_menu_selection = rb->do_menu(&voltage_menu,
                       &voltage_menu_selection, NULL, false);
         if(ret<0) break;
-        ret = fwd_current_selection = rb->do_menu(&fwd_current_menu, 
+        ret = fwd_current_selection = rb->do_menu(&fwd_current_menu,
                       &fwd_current_selection,  NULL, false);
         if(ret<0) break;
         rb->lcd_clear_display();
@@ -632,7 +632,7 @@ static void led_resistance_calc(void)
             input_voltage *= 10;
             }
         else { input_voltage *= 100; }
-                
+
         switch(voltage_menu_selection) {
             case 0: /* 2v */
                 led_voltage = 200;
@@ -665,30 +665,30 @@ static void led_resistance_calc(void)
                 foreward_current = ((rb->atoi(fwd_kbd_buffer))/10);
                 break;
         }
-        
+
         if(foreward_current == 0) break;
 
         rb->lcd_clear_display();
-        
+
         resistance = (input_voltage - led_voltage) / foreward_current;
         out_int = resistance;
-        
+
         int total_common_values = 11;
         int total_power_values = 9;
-        
+
         if(led_voltage > input_voltage) {
             rb->splash(HZ, "Problem: LED voltage is higher than the source.");
             break;
         }
-        
+
         for(j = 0; j < total_common_values; j++) {
             for(k = 1; k < 5; k++) {
                 if( resistance == (common_values[j] * powi(10, k))) {
-                    rounded_resistance = (common_values[j] * powi(10, k)); 
+                    rounded_resistance = (common_values[j] * powi(10, k));
                                           /* perfect match */
                     break;
                 }
-                else if(resistance >= (common_values[j] * powi(10, k)) && 
+                else if(resistance >= (common_values[j] * powi(10, k)) &&
                         resistance <= (common_values[j+1] * powi(10, k))) {
                     rounded_resistance = (common_values[j+1] * powi(10, k));
                            /* the higher resistance, to be safe */
@@ -697,8 +697,8 @@ static void led_resistance_calc(void)
                 else { break; }
             }
         }
-            
-        if(rounded_resistance == 0) 
+
+        if(rounded_resistance == 0)
         {
             rb->splash(HZ, "Problem: Input voltage too high.");
             break;
@@ -710,16 +710,16 @@ static void led_resistance_calc(void)
                 rounded_power_rating = (power_ratings[l]);
                 break;
             }
-            else if(power_rating_in >= power_ratings[l] && 
+            else if(power_rating_in >= power_ratings[l] &&
                     power_rating_in <= power_ratings[l+1]) {
                 rounded_power_rating = power_ratings[l+1];
                 break;
             }
             else { break; }
         }
-        
-        get_power_rating_str(rounded_power_rating);    
-                 
+
+        get_power_rating_str(rounded_power_rating);
+
         power_ten=0;
         temp=rounded_resistance;
         while(temp>=100) {
@@ -728,29 +728,29 @@ static void led_resistance_calc(void)
         }
         first_band_int=temp/10;
         second_band_int=temp%10;
-        
+
         first_band = get_band_rtoc(first_band_int);
         second_band = get_band_rtoc(second_band_int);
         multiplier = get_band_rtoc(power_ten);
-    
+
         rb->lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
 #ifndef USE_TEXT_ONLY
         draw_resistor(first_band, second_band, multiplier, fourth_band);
 #endif
         draw_resistor_text(first_band, second_band, multiplier, fourth_band);
-    
-        rb->snprintf(current_out_str, sizeof(current_out_str), "%d mA", 
+
+        rb->snprintf(current_out_str, sizeof(current_out_str), "%d mA",
                          (foreward_current*10));
-        
-        rb->snprintf(true_current_out_str, sizeof(true_current_out_str), 
-                     "Input: %dv, %d Ohms @ %s", (input_voltage/100), 
+
+        rb->snprintf(true_current_out_str, sizeof(true_current_out_str),
+                     "Input: %dv, %d Ohms @ %s", (input_voltage/100),
                      out_int, current_out_str);
-        rb->snprintf(rounded_resistance_out_str, 
-                     sizeof(rounded_resistance_out_str), 
-                     "Rounded/displayed: [%d %s]", rounded_resistance, 
+        rb->snprintf(rounded_resistance_out_str,
+                     sizeof(rounded_resistance_out_str),
+                     "Rounded/displayed: [%d %s]", rounded_resistance,
                      band_data[multiplier].unit);
-        rb->snprintf(power_rating_out_str, sizeof(power_rating_out_str), 
+        rb->snprintf(power_rating_out_str, sizeof(power_rating_out_str),
                      "Recommended: %s or greater",
                      get_power_rating_str(rounded_power_rating));
 
@@ -792,35 +792,35 @@ static void resistance_to_color(void)
     int kbd_input_int;
     int temp;
     int in_resistance_int;
-    
+
     int power_ten=0;
     int first_band_int = 0;
     int second_band_int = 0;
-    
+
     enum color first_band;
     enum color second_band;
     enum color multiplier;
     enum color fourth_band = 0;
     enum color units_used = 0;
-    
+
     char out_str[20];
 
     memset(kbd_buffer,0,sizeof(kbd_buffer));
     /* This cleans out the mysterious garbage that appears */
     rb->lcd_clear_display();
     rb->splash(HZ/2, "Resistance to Colour");
-    MENUITEM_STRINGLIST(r_to_c_menu, "Select unit to use:", NULL, 
+    MENUITEM_STRINGLIST(r_to_c_menu, "Select unit to use:", NULL,
                         "Ohms", "Kiloohms (KOhms)", "Megaohms (MOhms)",
                         "Gigaohms (GOhms)");
     MENUITEM_STRINGLIST(r_to_c_menu_tol, "Tolerance to display:", NULL,
                         "5%", "10%", "1%", "2%", "20%");
-      
+
     while(!quit) {
         int ret;
         ret=menu_selection = rb->do_menu(&r_to_c_menu, &menu_selection,
                                      NULL, false);
         if(ret<0) break;
-        
+
         rb->kbd_input(kbd_buffer, sizeof(kbd_buffer), NULL);
         /* As stated above somewhere, we (I) need to make a calculator-like
            keypad, that keyboard isn't all that fun to use. */
@@ -845,10 +845,10 @@ static void resistance_to_color(void)
                 fourth_band = RES_NONE;
                 break;
         }
-            
+
         kbd_input_int = rb->atoi(kbd_buffer);
         in_resistance_int = kbd_input_int;
-        
+
         switch(menu_selection) {
             case 0:
                 power_ten=0;
@@ -959,18 +959,18 @@ static void color_to_resistance(void)
         lineno = INITIAL_TEXT_Y;
 #ifndef USE_TEXT_ONLY
         draw_resistor(first_band, second_band, third_band, fourth_band);
-#endif                     
+#endif
         draw_resistor_text(first_band, second_band, third_band, fourth_band);
 
         if(total_resistance_centiunits % 100 == 0) {
             /* No decimals */
-            rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
+            rb->snprintf(total_resistance_str, sizeof(total_resistance_str),
                          "Resistance: %d %s",
                          total_resistance_centiunits/100,
                          unit_abbrev);
         }
         else {
-            rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
+            rb->snprintf(total_resistance_str, sizeof(total_resistance_str),
                          "Resistance: %d.%2.2d %s",
                          total_resistance_centiunits/100,
                          total_resistance_centiunits%100,
@@ -982,7 +982,7 @@ static void color_to_resistance(void)
         rb->lcd_puts_scroll(tolerance_str_x, lineno++,
                             get_tolerance_str(fourth_band));
         rb->lcd_update();
-                    
+
         button_input = rb->button_get(true);
         switch(button_input) {
             case PLA_RIGHT:
@@ -1002,7 +1002,7 @@ static void color_to_resistance(void)
     return;
 }
 
-enum plugin_status plugin_start(const void* nothing) 
+enum plugin_status plugin_start(const void* nothing)
 {
     (void)nothing;
     rb->lcd_clear_display();
@@ -1021,12 +1021,12 @@ enum plugin_status plugin_start(const void* nothing)
     text_vp.height = screen_vp.height - text_vp.y;
 #endif
 
-    MENUITEM_STRINGLIST(main_menu, "Resistor Code Calculator:", NULL, 
-                        "Colours -> Resistance", "Resistance -> Colours", 
+    MENUITEM_STRINGLIST(main_menu, "Resistor Calculator", NULL,
+                        "Colours -> Resistance", "Resistance -> Colours",
                         "LED resistor calculator", "Help", "Exit");
     while (!menuquit) {
         display->set_viewport(&screen_vp);
-        main_menu_selection = rb->do_menu(&main_menu, &main_menu_selection, 
+        main_menu_selection = rb->do_menu(&main_menu, &main_menu_selection,
                                           NULL, false);
         switch(main_menu_selection) {
             case 0:

@@ -809,7 +809,7 @@ static bool confirm_quit(void)
 static int do_2048_pause_menu(void)
 {
     int sel = 0;
-    MENUITEM_STRINGLIST(menu,"2048 Menu", NULL,
+    MENUITEM_STRINGLIST(menu,"2048", NULL,
                         "Resume Game",
                         "Start New Game",
                         "High Scores",
@@ -1014,7 +1014,7 @@ static enum plugin_status do_2048_menu(void)
     int sel = 0;
     loaded = load_game();
     MENUITEM_STRINGLIST(menu,
-                        "2048 Menu",
+                        "2048",
                         mainmenu_cb,
                         "Resume Game",
                         "Start New Game",

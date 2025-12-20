@@ -518,7 +518,7 @@ static bool confirm_restart(void)
 
 static int config_menu(void)
 {
-    MENUITEM_STRINGLIST(menu, "Speedread Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Speedread", NULL,
                         "Resume Reading",
                         "Restart from Beginning",
                         "Change Font",

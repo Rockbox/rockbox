@@ -275,7 +275,7 @@ static int show_menu(void) /* return 1 to quit */
         MIID_QUIT,
     };
 
-    MENUITEM_STRINGLIST(menu, "Image Viewer Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Image Viewer", NULL,
                         ID2P(LANG_RETURN),
                         ID2P(LANG_SLIDESHOW_MODE),
                         ID2P(LANG_SLIDESHOW_TIME),
@@ -1112,10 +1112,10 @@ enum plugin_status plugin_start(const void* parameter)
     if (!parameter)
     {
         if (!find_album_art(&offset, &filesize, &status))
-        {
-            rb->splash(HZ * 2, "No file");
-            return PLUGIN_ERROR;
-        }
+    {
+        rb->splash(HZ * 2, "No file");
+        return PLUGIN_ERROR;
+    }
 
         is_album_art = true;
     }
@@ -1123,10 +1123,10 @@ enum plugin_status plugin_start(const void* parameter)
     {
         rb->strcpy(np_file, parameter);
         if ((status = get_image_type(np_file, false)) == IMAGE_UNKNOWN)
-        {
-            rb->splash(HZ * 2, "Unsupported file");
-            return PLUGIN_ERROR;
-        }
+            {
+                rb->splash(HZ * 2, "Unsupported file");
+                return PLUGIN_ERROR;
+            }
     }
 
 #ifdef USE_PLUG_BUF

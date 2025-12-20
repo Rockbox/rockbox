@@ -351,7 +351,7 @@ void sys_menu(struct System* sys)
     rb->lcd_update();
 
     mainmenu_sysptr = sys;
-    MENUITEM_STRINGLIST(menu, "XWorld Menu", mainmenu_cb,
+    MENUITEM_STRINGLIST(menu, "XWorld", mainmenu_cb,
                         "Resume Game",          /* 0  */
                         "Start New Game",       /* 1  */
                         "Video Settings",       /* 2  */
@@ -730,7 +730,7 @@ static void do_pause_menu(struct System* sys)
 #endif
 
     int sel = 0;
-    MENUITEM_STRINGLIST(menu, "XWorld Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "XWorld", NULL,
                         "Resume Game",         /* 0 */
                         "Start New Game",      /* 1 */
                         "Video Settings",      /* 2 */

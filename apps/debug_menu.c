@@ -2937,7 +2937,7 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
     }
     else if (btn == ACTION_STD_CONTEXT)
     {
-        MENUITEM_STRINGLIST(menu_items, "Debug Menu", NULL, ID2P(LANG_ADD_TO_FAVES));
+        MENUITEM_STRINGLIST(menu_items, "Debug", NULL, ID2P(LANG_ADD_TO_FAVES));
         if (do_menu(&menu_items, NULL, NULL, false) == 0)
             shortcuts_add(SHORTCUT_DEBUGITEM, menuitems[selection].desc);
         return ACTION_STD_CANCEL;
@@ -2974,7 +2974,7 @@ int debug_menu(void)
 {
     struct simplelist_info info;
 
-    simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
+    simplelist_info_init(&info, "Debug", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
     info.get_name        = menu_get_name;
     info.get_talk        = menu_get_talk;

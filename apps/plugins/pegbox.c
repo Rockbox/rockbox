@@ -1355,7 +1355,7 @@ static unsigned int pegbox_menu(struct game_context* pb, bool ingame)
     int selected = 0;
     int last_level = pb->level;
 
-    MENUITEM_STRINGLIST (main_menu, "Pegbox Menu", pegbox_menu_cb,
+    MENUITEM_STRINGLIST (main_menu, "Pegbox", pegbox_menu_cb,
                          "Resume Game", "Restart Level", "Start Game",
                          "Select Level", "Help",
                          "Playback Control", "Quit");

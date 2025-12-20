@@ -688,7 +688,7 @@ static int run_timer(int nr)
                 /* MENU  */
             case CHC_MENU:
             {
-                MENUITEM_STRINGLIST(menu, "Menu", NULL,
+                MENUITEM_STRINGLIST(menu, "Chess Clock", NULL,
                                     "Delete player", "Restart round",
                                     "Set round time", "Set total time",
                                     "Playback Control");

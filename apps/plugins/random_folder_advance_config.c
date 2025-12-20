@@ -328,7 +328,7 @@ static int edit_list(void)
             case ACTION_STD_CONTEXT:
             {
                 int len;
-                MENUITEM_STRINGLIST(menu, "Remove Menu", NULL,
+                MENUITEM_STRINGLIST(menu, "Remove", NULL,
                                     "Remove Folder", "Remove Folder Tree");
 
                 switch (rb->do_menu(&menu, NULL, NULL, false))
@@ -357,7 +357,7 @@ static int edit_list(void)
             break;
             case ACTION_STD_CANCEL:
             {
-                MENUITEM_STRINGLIST(menu, "Exit Menu", NULL,
+                MENUITEM_STRINGLIST(menu, "Exit", NULL,
                                     "Save and Exit", "Ignore Changes and Exit");
 
                 switch (rb->do_menu(&menu, NULL, NULL, false))
@@ -548,7 +548,7 @@ static int start_shuffled_play(void)
 static enum plugin_status main_menu(void)
 {
     bool exit = false;
-    MENUITEM_STRINGLIST(menu, "Main Menu", NULL,
+    MENUITEM_STRINGLIST(menu, "Random Folder Advance", NULL,
                         "Generate Folder List",
                         "Edit Folder List",
                         "Export List To Textfile",
