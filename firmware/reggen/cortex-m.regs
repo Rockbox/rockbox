@@ -1,0 +1,71 @@
+// This file is marked CC0 1.0.
+// To view a copy of this mark, visit https://creativecommons.org/publicdomain/zero/1.0/
+
+// Register definitions common to ARM Cortex-M series processors
+
+// Cache controller
+CM_CACHE @ 0xe000ef00 : block {
+    ICIALLU  @ 0x50 : reg
+    ICIMVAU  @ 0x58 : reg
+    DCIMVAC  @ 0x5c : reg
+    DCISW    @ 0x60 : reg
+    DCCMVAU  @ 0x64 : reg
+    DCCMVAC  @ 0x68 : reg
+    DCCSW    @ 0x6c : reg
+    DCCIMVAC @ 0x70 : reg
+    DCCISW   @ 0x74 : reg
+}
+
+// Nested vectored interrupt controller
+CM_NVIC @ 0xe000e000 : block {
+    ISER @ 0x100 [ 8; 0x4] : reg
+    ICER @ 0x180 [ 8; 0x4] : reg
+    ISPR @ 0x200 [ 8; 0x4] : reg
+    ICPR @ 0x280 [ 8; 0x4] : reg
+    IABR @ 0x300 [ 8; 0x4] : reg
+    IPR  @ 0x400 [60; 0x4] : reg
+
+    STIR @ 0xf00 : reg {
+        8 0 INTID
+    }
+}
+
+// System control block
+CM_SCB @ 0xe000ed00 : block {
+    VTOR @ 0x08 : reg
+    CCR @ 0x14 : reg {
+        18 BP
+        17 IC
+        16 DC
+        09 STKALIGN
+        08 BFHFNMIGN
+        04 DIV_0_TRP
+        03 UNALIGN_TRP
+        01 USERETMPEND
+        00 NONBASETHRDENA
+    }
+}
+
+// System timer
+CM_SYSTICK @ 0xe000e000 : block {
+    CSR @ 0x10 : reg {
+        16 COUNTFLAG
+        02 CLKSOURCE : { 0 = EXT; 1 = CPU }
+        01 TICKINT
+        00 ENABLE
+    }
+
+    RVR @ 0x14 : reg {
+        23 0 VALUE
+    }
+
+    CVR @ 0x18 : reg {
+        23 0 VALUE
+    }
+
+    CALIB @ 0x1c : reg {
+        -- 31 NOREF
+        -- 30 SKEW
+        23 00 TENMS
+    }
+}
