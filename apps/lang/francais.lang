@@ -34,6 +34,7 @@
 # - Olivier Kaloudoff
 # - Jaussoin Timothée
 # - CHAPUIS Adhemar
+# - Matthieu BACHELIER
 #
 # Original comments below:
 #
@@ -3443,57 +3444,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3634,8 +3584,8 @@
   <dest>
     *: none
     rtc: "ON = Valider"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Valider"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY = Valider"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Valider"
     iriverh100,iriverh120,iriverh300: "NAVI = Valider"
     mpiohd300: "ENTER = Valider"
     mrobe500: "HEART = Valider"
@@ -3643,7 +3593,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3667,8 +3616,8 @@
   <dest>
     *: none
     rtc: "OFF = Annuler"
-    gigabeatfx,mrobe500: "POWER = Annuler"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BACK = Annuler"
+    gigabeatfx,mrobe500: "POWER = Annuler"
     gogearsa9200: "LEFT = Annuler"
     iaudiom5,iaudiox5: "RECORD = Annuler"
     ipod*,mpiohd300,sansac200*: "MENU = Annuler"
@@ -3680,7 +3629,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4758,7 +4706,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Recherche en cours"
   </voice>
 </phrase>
 <phrase>
@@ -5866,20 +5814,6 @@
   </dest>
   <voice>
     *: "pistes enregistrées"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7332,7 +7266,7 @@
     *: "Impossible d'ouvrir %s"
   </dest>
   <voice>
-    *: ""
+    *: "Impossible d'ouvrir cette extension"
   </voice>
 </phrase>
 <phrase>
@@ -7346,7 +7280,7 @@
     *: "Lecture de %s impossible"
   </dest>
   <voice>
-    *: ""
+    *: "Lecture du fichier impossible"
   </voice>
 </phrase>
 <phrase>
@@ -12581,20 +12515,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESIZE_COVERS
   desc: in the pictureflow settings menu
   user: core
@@ -12694,16 +12614,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Changer l'état"
+    *: ""
   </dest>
   <voice>
-    *: "Changer l'état"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13382,13 +13302,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Ordre du menu principal Rockbox"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -13757,20 +13677,6 @@
   </dest>
   <voice>
     *: "Mettre à jour le cache"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -17019,5 +16925,87 @@
   </dest>
   <voice>
     *: "Liste de lecture terminée. Rejouer?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "En mode de charge USB, uniquement"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "En mode de charge USB, uniquement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "En mode de stockage de masse USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "En mode de stockage de masse USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC USB actif"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "DAC USB actif"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Trier les listes de lecture"
+  </dest>
+  <voice>
+    *: "trier les listes de lecture"
   </voice>
 </phrase>
