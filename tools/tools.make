@@ -41,6 +41,10 @@ $(TOOLSDIR)/convttf: $(TOOLSDIR)/convttf.c
 	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -lm -O2 -Wall -g $+ -o $@ \
 		`pkg-config --cflags --libs freetype2`
 
+$(TOOLSDIR)/reggen: $(wildcard $(TOOLSDIR)/reggen_src/*.c)
+	$(call PRINTS,CC $(@F))
+	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -Wall -Wextra -O2 -g -o $@ $+
+
 # implicit rule for simple tools
 $(TOOLSDIR)/%: $(TOOLSDIR)/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$@))
