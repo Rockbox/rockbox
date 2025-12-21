@@ -55,6 +55,7 @@ enum ePT_SUM {
 
 struct playing_time_info {
     char single_mode_tag[MAX_PATH]; /* Relevant tag when single mode enabled */
+    char error_str[16];                  /* Error message to display to user */
     unsigned long long size[ePT_COUNT]; /*               File size of tracks */
     unsigned long long length[ePT_COUNT]; /*                Length of tracks */
     unsigned long curr_track_length[ePT_COUNT]; /*      Current track length */
@@ -529,7 +530,19 @@ static bool playing_time(void)
     if (!success)
         return false;
     if (pti.error_count > 0)
-        rb->splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
+    {
+        rb->snprintf(pti.error_str, sizeof pti.error_str,
+                     "%d %s", pti.error_count, rb->str(LANG_TRACKS));
+        if (rb->global_settings->talk_menu)
+        {
+            rb->talk_id(LANG_ERROR_FORMATSTR, false);
+            rb->talk_number(pti.error_count, true);
+            rb->talk_id(LANG_TRACKS, true);
+            rb->talk_force_enqueue_next();
+        }
+        /* (voiced above) */
+        rb->splashf(HZ, rb->str(LANG_ERROR_FORMATSTR), pti.error_str);
+    }
 
     pt_store_converted_totals(&pti);
     return pt_display_stats(&pti);
@@ -547,6 +560,8 @@ enum plugin_status plugin_start(const void* parameter)
         return status;
     }
 
+    /* Only relevant if launched using hotkey from the
+       WPS. Otherwise theme should be enabled already. */
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
 

@@ -886,6 +886,7 @@ int plugin_load(const char* plugin, const void* parameter)
     /* for some plugins, the SBS can be left enabled */
     const char *sepch = strrchr(plugin, PATH_SEPCH);
     bool theme_enabled = sepch && (!strcmp("properties.rock", sepch + 1) ||
+                                   !strcmp("playing_time.rock", sepch + 1) ||
                                    !strcmp("main_menu_config.rock", sepch + 1) ||
                                    !strcmp("disktidy.rock", sepch + 1));
 
