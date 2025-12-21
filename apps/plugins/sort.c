@@ -185,7 +185,11 @@ enum plugin_status plugin_start(const void* parameter)
 {
     char *buf;
     int rc;
-    if(!parameter) return PLUGIN_ERROR;
+    if(!parameter)
+        return PLUGIN_ERROR;
+
+    if (!rb->yesno_pop_confirm(ID2P(LANG_REALLY_OVERWRITE)))
+        return PLUGIN_OK;
 
     filename = (char *)parameter;
 

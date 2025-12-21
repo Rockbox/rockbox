@@ -281,6 +281,9 @@ enum plugin_status plugin_start(const void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
+    if (!rb->yesno_pop_confirm(ID2P(LANG_REALLY_OVERWRITE)))
+        return PLUGIN_OK;
+
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
