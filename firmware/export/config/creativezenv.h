@@ -80,7 +80,7 @@
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
-#define CONFIG_KEYPAD CREATIVE_ZEN_PAD
+#define CONFIG_KEYPAD CREATIVE_ZENV_PAD
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT

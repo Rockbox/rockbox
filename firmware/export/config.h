@@ -147,6 +147,7 @@
 #define MA_PAD            56
 #define SONY_NWZ_PAD       57
 #define CREATIVE_ZEN_PAD   58
+#define CREATIVE_ZENV_PAD  59
 #define IHIFI_PAD          60
 #define SAMSUNG_YPR1_PAD   61
 #define SAMSUNG_YH92X_PAD  62
