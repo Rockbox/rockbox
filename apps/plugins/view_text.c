@@ -28,6 +28,8 @@
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
+    if (!parameter)
+        return PLUGIN_ERROR;
 
     char** title_and_text = (char**)parameter;
     view_text(title_and_text[0], title_and_text[1]);
