@@ -47,6 +47,9 @@
 #include <stdarg.h>
 #include "version.h"
 
+//#define ENABLE_LOGGING
+//#define AUTO_ENABLE_ADB
+
 /* Basic configuration */
 #if defined(AGPTEK_ROCKER)
 #define ICON_WIDTH  70
@@ -100,6 +103,28 @@
 #define BUTTON_SELECT BUTTON_PLAY
 #define BUTTON_LEFT   BUTTON_SCROLL_BACK
 #define BUTTON_RIGHT  BUTTON_SCROLL_FWD
+#include "bitmaps/hibyicon.h"
+#elif defined(HIBY_R3PROII)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
+#define BUTTON_LEFT   BUTTON_VOL_DOWN
+#define BUTTON_RIGHT  BUTTON_VOL_UP
+#include "bitmaps/hibyicon.h"
+#elif defined(HIBY_R1)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
+#define BUTTON_LEFT   BUTTON_VOL_DOWN
+#define BUTTON_RIGHT  BUTTON_VOL_UP
 #include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
@@ -254,12 +279,14 @@ static enum boot_mode get_boot_mode(void)
     while(true)
     {
         /* on usb detect, immediately boot with last choice */
+#if !defined(HIBY_R3PROII) && !defined(HIBY_R1)
         if(!adb_running && power_input_status() & POWER_INPUT_USB_CHARGER)
         {
             /* save last choice */
             save_boot_mode(mode);
             return mode;
         }
+#endif
         /* inactivity detection */
         int timeout = last_activity + get_inactivity_tmo(init_mode == mode);
         if(TIME_AFTER(current_tick, timeout))
@@ -499,7 +526,11 @@ static void adb(int start)
     pid_t pid = fork();
     if(pid == 0)
     {
+#if defined(HIBY_R3PROII) || defined(HIBY_R1)
+        execlp("/etc/init.d/T90adb", "T90adb", start ? "start" : "stop", NULL);
+#else
         execlp("/etc/init.d/K90adb", "K90adb", start ? "start" : "stop", NULL);
+#endif
         _exit(42);
     }
     int status;
@@ -572,7 +603,7 @@ static void tools_screen(void)
     }
 }
 
-#if 0
+#ifdef ENABLE_LOGGING
 /* open log file */
 static int open_log(void)
 {
@@ -597,7 +628,13 @@ int main(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-#if 0
+
+#ifdef AUTO_ENABLE_ADB
+    // Boot with adb for debugging
+    adb(1);
+#endif
+
+    #ifdef ENABLE_LOGGING
     /* redirect stdout and stderr to have error messages logged somewhere on the
      * user partition */
     int fd = open_log();
@@ -611,7 +648,7 @@ int main(int argc, char **argv)
     printf("Rockbox boot loader\n");
     printf("Version: %s\n", rbversion);
     printf("%s\n", MODEL_NAME);
-#endif
+    #endif
 
     system_init();
     core_allocator_init();
@@ -635,7 +672,7 @@ int main(int argc, char **argv)
         enum boot_mode mode = get_boot_mode();
         if (mode == BOOT_OF)
         {
-#if 0
+#ifdef ENABLE_LOGGING
             fflush(stdout);
             fflush(stderr);
             close(fileno(stdout));
@@ -657,11 +694,26 @@ int main(int argc, char **argv)
         }
         else if(mode == BOOT_ROCKBOX)
         {
+#if defined(HIBY_R3PROII) || defined(HIBY_R1)
+            /* Suspend bluetooth as it's not currently supported */
+            system("/usr/bin/bt_suspend");
+#endif
             fflush(stdout);
             mount_storage(true);
             system("/bin/cp " BASE_DIR "/.rockbox/" BOOTFILE " /tmp");
             system("/bin/chmod +x /tmp/" BOOTFILE);
+#ifdef HIBY_R1
+            /* Load libasound from Rockbox directory */
+            char *argvr1[] = { "/tmp/" BOOTFILE, 0 };
+            char *envpr1[] =
+            {
+                "LD_LIBRARY_PATH=/data/mnt/sd_0/.rockbox",
+                0
+            };
+            execve(argvr1[0], &argvr1[0], envpr1);
+#else
             execl("/tmp/" BOOTFILE, BOOTFILE, NULL);
+#endif
             printf("execvp failed: %s\n", strerror(errno));
             error_screen("Cannot boot Rockbox!");
             mode = BOOT_TOOLS;

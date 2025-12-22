@@ -109,27 +109,21 @@ static enum
 #define EVENT_VALUE_TOUCHSCREEN_PRESS    1
 #define EVENT_VALUE_TOUCHSCREEN_RELEASE -1
 
-static int ts_enabled = 0;
+static int ts_enabled = 1;
 
 void touchscreen_enable_device(bool en)
 {
     ts_enabled = en;
 }
 
-static bool handle_touchscreen_event(__u16 code, __s32 value)
+static void handle_touchscreen_event(__u16 code, __s32 value)
 {
-    bool read_more = false;
-
     switch(code)
     {
         case ABS_X:
         case ABS_MT_POSITION_X:
         {
             _last_x = value;
-
-            /* x -> next will be y. */
-            read_more = true;
-
             break;
         }
 
@@ -142,22 +136,17 @@ static bool handle_touchscreen_event(__u16 code, __s32 value)
 
         case ABS_MT_TRACKING_ID:
         {
-            if(value == EVENT_VALUE_TOUCHSCREEN_PRESS)
+            if(value == EVENT_VALUE_TOUCHSCREEN_RELEASE)
             {
-                _last_touch_state = TOUCHSCREEN_STATE_DOWN;
-
-                /* Press -> next will be x. */
-                read_more = true;
+                _last_touch_state = TOUCHSCREEN_STATE_UP;
             }
             else
             {
-                _last_touch_state = TOUCHSCREEN_STATE_UP;
+                _last_touch_state = TOUCHSCREEN_STATE_DOWN;
             }
             break;
         }
     }
-
-    return read_more;
 }
 #endif
 
@@ -227,7 +216,7 @@ int button_read_device(BDATA)
 #if defined(HAVE_TOUCHSCREEN) && defined(BUTTON_TOUCH)
                             /* Some touchscreens give us actual touch/untouch as a "key" */
                             if (bmap & BUTTON_TOUCH) {
-                                handle_touchscreen_event(ABS_MT_TRACKING_ID, 0);
+                                handle_touchscreen_event(ABS_MT_TRACKING_ID, EVENT_VALUE_TOUCHSCREEN_RELEASE);
                                 bmap &= ~BUTTON_TOUCH;
                             }
 #endif

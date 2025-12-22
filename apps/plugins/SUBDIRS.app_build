@@ -1,4 +1,4 @@
-#if !defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90)
+#if !defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
 /* This is for devices having a keypad, running RockBox as an application */
 #include "SUBDIRS"
 

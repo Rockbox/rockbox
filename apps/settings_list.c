@@ -2399,7 +2399,7 @@ const struct settings_list settings[] = {
                    USBMODE_DEFAULT,
                    "usb mode",
                    "mass storage,charge"
-#if defined(DX50) || defined(DX90)
+#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
                    ",adb"
 #endif
                    ,
@@ -2408,14 +2408,18 @@ const struct settings_list settings[] = {
                    3,
 #else
                    usb_set_mode,
+#if defined(HIBY_R3PROII) || defined(HIBY_R1)
+                   3,
+#else
                    2,
+#endif
 #endif
                    ID2P(LANG_USB_MODE_MASS_STORAGE),
                    ID2P(LANG_USB_MODE_CHARGE)
-#if defined(DX50) || defined(DX90)
+#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
                    ,ID2P(LANG_USB_MODE_ADB)
 #endif
-	    ),
+        ),
 #endif
 #if defined(BUTTON_REC) || \
     (CONFIG_KEYPAD == GIGABEAT_PAD) || \
@@ -2430,6 +2434,9 @@ const struct settings_list settings[] = {
     ID2P(LANG_AUTO), ID2P(LANG_HEADPHONE), ID2P(LANG_LINEOUT)),
 #endif
     OFFON_SETTING(0, playback_log, LANG_LOGGING, false, "play log", NULL),
+#if defined(HAVE_GENERAL_PURPOSE_LED)
+    OFFON_SETTING(0, use_led_indicators, LANG_USE_LED_INDICATORS, false, "LED indicators", NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

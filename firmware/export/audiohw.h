@@ -243,6 +243,8 @@ struct sound_settings_info
 #include "erosqlinux_codec.h"
 #elif defined(HAVE_TLV320AIC3104)
 #include "tlv320aic3104_codec.h"
+#elif defined(HAVE_HIBY_LINUX_CODEC)
+#include "hibylinux_codec.h"
 #endif
 
 #if defined(HAVE_X1000_ICODEC_REC) && !defined(HAVE_X1000_ICODEC_PLAY)

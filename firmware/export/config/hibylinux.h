@@ -5,7 +5,9 @@
 
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#ifndef PIVOT_ROOT
 #define PIVOT_ROOT "/mnt/sd_0"
+#endif
 #endif
 
 #define HAVE_FPU
@@ -41,9 +43,13 @@
 
 #define CONFIG_LCD LCD_INGENIC_LINUX
 
+#ifndef LCD_DEPTH
 #define LCD_DEPTH  32
+#endif
+#ifndef LCD_PIXELFORMAT
 /* Check that but should not matter */
 #define LCD_PIXELFORMAT XRGB8888
+#endif
 
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
@@ -51,13 +57,23 @@
 /* Main LCD backlight brightness range and defaults: the backlight driver
  * has levels from 0 to 255. But 0 is off so start at 1.
  */
+#ifndef MIN_BRIGHTNESS_SETTING
 #define MIN_BRIGHTNESS_SETTING      1
+#endif
+#ifndef MAX_BRIGHTNESS_SETTING
 #define MAX_BRIGHTNESS_SETTING      255
+#endif
+#ifndef BRIGHTNESS_STEP
 #define BRIGHTNESS_STEP             5
+#endif
+#ifndef DEFAULT_BRIGHTNESS_SETTING
 #define DEFAULT_BRIGHTNESS_SETTING  255
+#endif
 
 /* Which backlight fading type? */
+#if !defined(CONFIG_BACKLIGHT_FADING)
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
+#endif
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_HOSTED
@@ -81,12 +97,18 @@
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
 #define HAVE_HOTSWAP_STORAGE_AS_MAIN
+#ifndef MULTIDRIVE_DIR
 #define MULTIDRIVE_DIR "/mnt/usb"
+#endif
 #define MULTIDRIVE_DEV "/sys/block/sda"
 #define ROOTDRIVE_DEV "/sys/block/mmcblk0"
 
 /* More common stuff */
+#ifndef BATTERY_DEV_NAME
 #ifndef EROS_Q
 #define BATTERY_DEV_NAME "battery"
 #endif
+#endif
+#ifndef POWER_DEV_NAME
 #define POWER_DEV_NAME "usb"
+#endif

@@ -8,6 +8,7 @@
  *
  * Copyright (C) 2017 Marcin Bukat
  * Copyright (C) 2019 by Roman Stolyarov
+ * Copyright (C) 2025 by Melissa Autumn
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,12 +32,18 @@
 #include "panic.h"
 #include "lcd.h"
 
-#ifdef BACKLIGHT_RG_NANO
+#if defined(BACKLIGHT_RG_NANO)
 static const char * const sysfs_bl_brightness =
     "/sys/class/backlight/backlight/brightness";
 
 static const char * const sysfs_bl_power =
     "/sys/class/backlight/backlight/bl_power";
+#elif defined(BACKLIGHT_HIBY)
+static const char * const sysfs_bl_brightness =
+    "/sys/class/backlight/backlight_pwm0/brightness";
+
+static const char * const sysfs_bl_power =
+    "/sys/class/backlight/backlight_pwm0/bl_power";
 #else
 static const char * const sysfs_bl_brightness =
     "/sys/class/backlight/pwm-backlight.0/brightness";
@@ -60,25 +67,30 @@ bool backlight_hw_init(void)
 
 static int last_bl = -1;
 
+/* Ref: https://www.kernel.org/doc/html/latest/gpu/backlight.html#c.backlight_properties */
+#define BACKLIGHT_POWER_ON 0
+#define BACKLIGHT_POWER_REDUCED 1
+#define BACKLIGHT_POWER_OFF 4
+
 void backlight_hw_on(void)
 {
-    if (last_bl != 1) {
+    if (last_bl != BACKLIGHT_POWER_ON) {
 #ifdef HAVE_LCD_ENABLE
         lcd_enable(true);
 #endif
-        sysfs_set_int(sysfs_bl_power, 0);
-	last_bl = 1;
+        last_bl = BACKLIGHT_POWER_ON;
+        sysfs_set_int(sysfs_bl_power, last_bl);
     }
 }
 
 void backlight_hw_off(void)
 {
-    if (last_bl != 0) {
-        sysfs_set_int(sysfs_bl_power, 1);
+    if (last_bl != BACKLIGHT_POWER_REDUCED) {
+        last_bl = BACKLIGHT_POWER_REDUCED;
+        sysfs_set_int(sysfs_bl_power, last_bl);
 #ifdef HAVE_LCD_ENABLE
         lcd_enable(false);
 #endif
-	last_bl = 0;
     }
 }
 
@@ -92,3 +104,21 @@ void backlight_hw_brightness(int brightness)
 
     sysfs_set_int(sysfs_bl_brightness, brightness);
 }
+
+#ifdef HAVE_LCD_SLEEP
+void lcd_awake(void)
+{
+    /* Nothing to do */
+}
+
+void lcd_sleep(void)
+{
+    if (last_bl != BACKLIGHT_POWER_OFF) {
+        last_bl = BACKLIGHT_POWER_OFF;
+        sysfs_set_int(sysfs_bl_power, last_bl);
+#ifdef HAVE_LCD_ENABLE
+        lcd_enable(false);
+#endif
+    }
+}
+#endif

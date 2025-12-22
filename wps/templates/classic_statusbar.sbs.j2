@@ -1,0 +1,96 @@
+# Classic Statusbar
+# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+#
+# Classic statusbar adapted to skin engine
+# Standardized to a height of {{ viewport.height }}px for larger devices
+#
+# Status bar position can be changed from top to bottom by changing the y positions from 0 to -{{ viewport.height }}
+#
+# Specify the UI area viewport... everything but a bar {{ viewport.height }} pixels high at the top
+%Vi(-,{{ viewport.width }},{{ viewport.height }},-,-,{{ viewport.font_id }})
+
+# Conditional for showing volume as number or graphic
+%?if(%St(volume display), =, numeric)<%Vd(d)|%Vd(c)>
+
+# Conditional for showing battery as number or graphic
+%?if(%St(battery display), =, numeric)<%Vd(b)|%Vd(a)%Vd(e)>
+
+# Load some bitmaps
+%xl(B,{{ battery.image }},{{ battery.source_x }},{{ battery.source_y }},{{ battery.sub_image_count }})
+%xl(V,{{ volume.image }},{{ volume.source_x }},{{ volume.source_y }},{{ volume.sub_image_count }})
+%xl(S,{{ status.image }},{{ status.source_x }},{{ status.source_y }},{{ status.sub_image_count }})
+%xl(D,{{ access_disk.image }},{{ access_disk.source_x }},{{ access_disk.source_y }})
+%xl(y,{{ battery_cap.image }},{{ battery_cap.source_x }},{{ battery_cap.source_y }})
+
+%xl(m,{{ rec_bitrate.image }},{{ rec_bitrate.source_x }},{{ rec_bitrate.source_y }},{{ rec_bitrate.sub_image_count }})
+%xl(f,{{ rec_freq.image }},{{ rec_freq.source_x }},{{ rec_freq.source_y }},{{ rec_freq.sub_image_count }})
+%xl(e,{{ rec_encoders.image }},{{ rec_encoders.source_x }},{{ rec_encoders.source_y }},{{ rec_encoders.sub_image_count }})
+%xl(c,{{ rec_channels.image }},{{ rec_channels.source_x }},{{ rec_channels.source_y }},{{ rec_channels.sub_image_count }})
+
+# Enable the correct viewports
+%?cs<%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(z)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)>
+
+# Charging animation viewports
+%t(2)%?bc<%Vd(x)|%Vd(a)>;%t(2)%Vd(a)
+
+# Battery area, Icons
+%Vl(a, {{ battery.viewport.x }},{{ battery.viewport.y }},{{ battery.viewport.width }},{{ battery.viewport.height }},{{ battery.viewport.font_id }})
+%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
+
+# Battery area, grey background viewport for charging animation
+%Vl(x, {{ battery.viewport.x }},{{ battery.viewport.y }},{{ battery.viewport.width }},{{ battery.viewport.height }},{{ battery.viewport.font_id }})%Vb(555555) 
+#%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
+
+# end of battery symbol (to exclude it from animation)
+
+%Vl(e,{{ battery_cap.viewport.x }},{{ battery_cap.viewport.y }},{{ battery_cap.viewport.width }},{{ battery_cap.viewport.height }},{{ battery_cap.viewport.font_id }})
+%xd(y)
+
+# usb power or charger icon
+%V({{ power.viewport.x }},{{ power.viewport.y }},{{ power.viewport.width }},{{ power.viewport.height }},{{ power.viewport.font_id }}) 
+%?bu<%xd(Sa)|%?bc<%xd(Sa)|%?bp<%xd(So)>>>
+
+# battery area, no icons
+%Vl(b,{{ battery_no_icon.viewport.x }},{{ battery_no_icon.viewport.y }},{{ battery_no_icon.viewport.width }},{{ battery_no_icon.viewport.height }},{{ battery_no_icon.viewport.font_id }})
+%ar%bl
+
+# Volume area
+%Vl(c,{{ volume.viewport.x }},{{ volume.viewport.y }},{{ volume.viewport.width }},{{ volume.viewport.height }},{{ volume.viewport.font_id }})
+%?mv<%ac%?pv<%pv|%pv| %pv| %pv>|%?pv<%xd(Va)|%xd(Vb)|%xd(Vc)|%xd(Vd)|%xd(Ve)|%xd(Vf)|%xd(Vg)|%xd(Vh)|%xd(Vi)|%xd(Vj)|%xd(Vk)|%xd(Vl)|%xd(Vm)|%xd(Vn)|%xd(Vo)|%xd(Vp)|%xd(Vq)>>
+%Vl(d,{{ volume.viewport.x }},{{ volume.viewport.y }},{{ volume.viewport.width }},{{ volume.viewport.height }},{{ volume.viewport.font_id }})
+%ac%?pv<%pv|%pv| %pv| %pv>
+
+# Icons, all in the same bmp strip, so need to use multiple viewports
+# Playback mode
+%Vl(p,{{ playback.viewport.x }},{{ playback.viewport.y }},{{ playback.viewport.width }},{{ playback.viewport.height }},{{ playback.viewport.font_id }})
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
+
+# Repeat mode
+%Vl(r,{{ repeat.viewport.x }},{{ repeat.viewport.y }},{{ repeat.viewport.width }},{{ repeat.viewport.height }},{{ repeat.viewport.font_id }})
+%?mm<|%xd(Sk)|%xd(Sl)|%xd(Sm)|%xd(Sn)>
+
+# Shuffle mode
+%Vl(s,{{ shuffle.viewport.x }},{{ shuffle.viewport.y }},{{ shuffle.viewport.width }},{{ shuffle.viewport.height }},{{ shuffle.viewport.font_id }})
+%?ps<%xd(Sm)|>
+
+
+# Recording section
+# encoder/mpeg bitrate
+%Vl(z,{{ rec_bitrate.viewport.x }},{{ rec_bitrate.viewport.y }},{{ rec_bitrate.viewport.width }},{{ rec_bitrate.viewport.height }},{{ rec_bitrate.viewport.font_id }})
+%?Rp<%?Re<%xd(ea)|%xd(eb)|%xd(ec)|%?Rb<%xd(ma)|%xd(mb)|%xd(mc)|%xd(md)|%xd(me)|%xd(mf)|%xd(mg)|%xd(mh)|%xd(mi)|%xd(mj)|%xd(mk)|%xd(ml)|%xd(mm)|%xd(mn)|%xd(mo)|%xd(mp)|%xd(mq)|%xd(mr)>>>
+# status icon
+%Vl(z,{{ status.viewport.x }},{{ status.viewport.y }},{{ status.viewport.width }},{{ status.viewport.height }},{{ status.viewport.font_id }})
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
+# frequency and channels
+%Vl(z,{{ rec_freq.viewport.x }},{{ rec_freq.viewport.y }},{{ rec_freq.viewport.width }},{{ rec_freq.viewport.height }},{{ rec_freq.viewport.font_id }})
+%?Rp<%?Rf<%xd(fa)|%xd(fb)|%xd(fc)|%xd(fd)|%xd(fe)|%xd(ff)|%xd(fg)|%xd(fh)|%xd(fi)|%xd(fj)|%xd(fk)|%xd(fl)>>
+%?Rm<%xd(ca)|%xd(cb)>
+
+# Clock on RTC able targets, and disk access
+# align on the right with room for 5 SYSFONT digits
+%V({{ rtc.viewport.x }},{{ rtc.viewport.y }},{{ rtc.viewport.width }},{{ rtc.viewport.height }},{{ rtc.viewport.font_id }})
+%?cc<%?ca<%?St(time format)<%cH|%cI>:%cM|--:-->|>
+
+# disk access icon
+%V({{ access_disk.viewport.x }},{{ access_disk.viewport.y }},{{ access_disk.viewport.width }},{{ access_disk.viewport.height }},{{ access_disk.viewport.font_id }})
+%?lh<%xd(D)|>

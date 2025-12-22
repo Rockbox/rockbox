@@ -2842,7 +2842,7 @@ static const struct {
         { "Screendump", dbg_screendump },
 #endif
         { "Skin Engine RAM usage", dbg_skin_engine },
-#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || (defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1)) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR)
         { "View HW info", dbg_hw_info },
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)

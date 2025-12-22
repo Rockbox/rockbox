@@ -935,6 +935,9 @@ struct user_settings
     int hp_lo_select; /* indicates automatic, headphone-only, or lineout-only operation */
 #endif
     bool playback_log; /* ROCKBOX_DIR/playback.log for tracks played */
+#if defined(HAVE_GENERAL_PURPOSE_LED)
+    bool use_led_indicators;
+#endif
 };
 
 /* global settings */

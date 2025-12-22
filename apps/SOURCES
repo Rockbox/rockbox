@@ -310,4 +310,6 @@ keymaps/keymap-surfansf28.c
 keymaps/keymap-rgnano.c
 #elif CONFIG_KEYPAD == CTRU_PAD
 keymaps/keymap-ctru.c
+#elif CONFIG_KEYPAD == HIBY_R3PROII_PAD
+keymaps/keymap-hibyr3proii.c
 #endif

@@ -250,7 +250,7 @@ struct battery_tables_t {
 #define BATTERY_ON_TXT  "Play"
 #define BATTERY_OFF_TXT "Power"
 
-#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD || CONFIG_KEYPAD == HIBY_R3PROII_PAD
 /* use touchscreen */
 
 #elif CONFIG_KEYPAD == MA_PAD

@@ -8,6 +8,8 @@
 *.o
 *.a
 *~
+.cache
+
 __pycache__
 .DS_STORE
 

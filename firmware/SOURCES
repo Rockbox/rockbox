@@ -156,6 +156,26 @@ target/hosted/lcd-linuxfb.c
 target/hosted/power-linux.c
 #endif
 
+#if defined(HIBY_R3PROII) && !defined(SIMULATOR)
+target/hosted/hiby/usb-hiby-gadget.c
+target/hosted/hiby/r3proii/button-r3proii.c
+target/hosted/hiby/r3proii/powermgmt-r3proii.c
+#ifndef BOOTLOADER
+target/hosted/hiby/r3proii/led-r3proii.c
+target/hosted/hiby/hibylinux_codec.c
+#endif
+#endif
+
+#if defined(HIBY_R1) && !defined(SIMULATOR)
+target/hosted/hiby/usb-hiby-gadget.c
+target/hosted/hiby/r1/button-r1.c
+target/hosted/hiby/r1/powermgmt-r1.c
+#ifndef BOOTLOADER
+target/hosted/hiby/r1/led-r1.c
+target/hosted/hiby/hibylinux_codec.c
+#endif
+#endif
+
 #if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
@@ -184,8 +204,11 @@ target/hosted/xduoo/xduoolinux_codec.c
 #endif
 
 #if defined(HIBY_LINUX) && !defined(SIMULATOR)
-target/hosted/usb-hiby.c
 target/hosted/button-devinput.c
+#endif
+
+#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(SIMULATOR) 
+target/hosted/usb-hiby.c
 #endif
 
 #if defined(FIIO_M3K_LINUX) && !defined(SIMULATOR)

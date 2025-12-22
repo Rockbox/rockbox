@@ -544,6 +544,20 @@
 #define UI_LCD_POSY                 78
 
 
+#elif defined(HIBY_R3PROII)
+#define UI_TITLE                    "Hiby R3 Pro II"
+#define UI_WIDTH                    645
+#define UI_HEIGHT                   924
+#define UI_LCD_POSX                 79
+#define UI_LCD_POSY                 63
+
+#elif defined(HIBY_R1)
+#define UI_TITLE                    "Hiby R1"
+#define UI_WIDTH                    634
+#define UI_HEIGHT                   1016
+#define UI_LCD_POSX                 77
+#define UI_LCD_POSY                 74
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

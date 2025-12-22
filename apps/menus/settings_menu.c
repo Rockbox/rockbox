@@ -272,6 +272,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
 MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
 #endif
+#if defined(HAVE_GENERAL_PURPOSE_LED)
+MENUITEM_SETTING(use_led_indicators, &global_settings.use_led_indicators, NULL);
+#endif
 /* Disk */
 #ifdef HAVE_DISK_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
@@ -395,8 +398,8 @@ MENUITEM_SETTING(bt_selective_actions,
                  &global_settings.bt_selective_softlock_actions,
                                                     selectivesoftlock_callback);
 MENUITEM_FUNCTION(sel_softlock_mask, 0, ID2P(LANG_SETTINGS),
-	              selectivesoftlock_set_mask, selectivesoftlock_callback,
-	              Icon_Menu_setting);
+                  selectivesoftlock_set_mask, selectivesoftlock_callback,
+                  Icon_Menu_setting);
 
 MAKE_MENU(sel_softlock, ID2P(LANG_SOFTLOCK_SELECTIVE),
           NULL, Icon_Menu_setting, &bt_selective_actions, &sel_softlock_mask);
@@ -469,6 +472,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
             &usb_mode,
+#endif
+#if defined(HAVE_GENERAL_PURPOSE_LED)
+            &use_led_indicators,
 #endif
          );
 

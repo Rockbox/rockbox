@@ -288,7 +288,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_RIGHT
 #define FIRE  BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD || CONFIG_KEYPAD == HIBY_R3PROII_PAD
 /* use touchscreen */
 
 #elif CONFIG_KEYPAD == MA_PAD
@@ -369,7 +369,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 /* m:robe 500 defines */
 #if ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
-    ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
+    ((LCD_WIDTH == 480) && (LCD_HEIGHT >= 640))
 
 /* Original arcade game size 224x240, 1bpp with
  * red overlay at top and green overlay at bottom.

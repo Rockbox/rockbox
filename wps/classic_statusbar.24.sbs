@@ -1,0 +1,96 @@
+# Classic Statusbar
+# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+#
+# Classic statusbar adapted to skin engine
+# Standardized to a height of 24px for larger devices
+#
+# Status bar position can be changed from top to bottom by changing the y positions from 0 to -24
+#
+# Specify the UI area viewport... everything but a bar 24 pixels high at the top
+%Vi(-,0,24,-,-,1)
+
+# Conditional for showing volume as number or graphic
+%?if(%St(volume display), =, numeric)<%Vd(d)|%Vd(c)>
+
+# Conditional for showing battery as number or graphic
+%?if(%St(battery display), =, numeric)<%Vd(b)|%Vd(a)%Vd(e)>
+
+# Load some bitmaps
+%xl(B,battery.16.bmp,0,0,16)
+%xl(V,volume.16.bmp,2,0,17)
+%xl(S,status.16.bmp,0,0,15)
+%xl(D,access_disk.16.bmp,0,0)
+%xl(y,batter-y.16.bmp,0,0)
+
+%xl(m,rec_mpegbitrates.16.bmp,2,0,18)
+%xl(f,rec_frequencies.16.bmp,0,0,12)
+%xl(e,rec_encoders.16.bmp,0,0,3)
+%xl(c,rec_channels.16.bmp,26,0,2)
+
+# Enable the correct viewports
+%?cs<%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)|%Vd(z)|%Vd(c)%Vd(p)%Vd(r)%Vd(s)>
+
+# Charging animation viewports
+%t(2)%?bc<%Vd(x)|%Vd(a)>;%t(2)%Vd(a)
+
+# Battery area, Icons
+%Vl(a,4,6,34,14,0)
+%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
+
+# Battery area, grey background viewport for charging animation
+%Vl(x,4,6,34,14,0)%Vb(555555) 
+#%?bl<%xd(Ba)|%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)|%xd(Bk)|%xd(Bl)|%xd(Bm)|%xd(Bn)|%xd(Bo)>
+
+# end of battery symbol (to exclude it from animation)
+
+%Vl(e,38,6,6,14,0)
+%xd(y)
+
+# usb power or charger icon
+%V(44,6,16,16,0) 
+%?bu<%xd(Sa)|%?bc<%xd(Sa)|%?bp<%xd(So)>>>
+
+# battery area, no icons
+%Vl(b,4,4,36,16,0)
+%ar%bl
+
+# Volume area
+%Vl(c,60,6,58,16,0)
+%?mv<%ac%?pv<%pv|%pv| %pv| %pv>|%?pv<%xd(Va)|%xd(Vb)|%xd(Vc)|%xd(Vd)|%xd(Ve)|%xd(Vf)|%xd(Vg)|%xd(Vh)|%xd(Vi)|%xd(Vj)|%xd(Vk)|%xd(Vl)|%xd(Vm)|%xd(Vn)|%xd(Vo)|%xd(Vp)|%xd(Vq)>>
+%Vl(d,60,4,58,16,0)
+%ac%?pv<%pv|%pv| %pv| %pv>
+
+# Icons, all in the same bmp strip, so need to use multiple viewports
+# Playback mode
+%Vl(p,118,6,18,16,0)
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
+
+# Repeat mode
+%Vl(r,136,6,18,16,0)
+%?mm<|%xd(Sk)|%xd(Sl)|%xd(Sm)|%xd(Sn)>
+
+# Shuffle mode
+%Vl(s,154,6,-,16,0)
+%?ps<%xd(Sm)|>
+
+
+# Recording section
+# encoder/mpeg bitrate
+%Vl(z,60,4,38,16,0)
+%?Rp<%?Re<%xd(ea)|%xd(eb)|%xd(ec)|%?Rb<%xd(ma)|%xd(mb)|%xd(mc)|%xd(md)|%xd(me)|%xd(mf)|%xd(mg)|%xd(mh)|%xd(mi)|%xd(mj)|%xd(mk)|%xd(ml)|%xd(mm)|%xd(mn)|%xd(mo)|%xd(mp)|%xd(mq)|%xd(mr)>>>
+# status icon
+%Vl(z,98,4,16,16,0)
+%?mp<%xd(Sc)|%xd(Sb)|%xd(Sd)|%xd(Se)|%xd(Sf)|%xd(Sg)|%xd(Sh)|%xd(Si)|%xd(Sj)>
+# frequency and channels
+%Vl(z,114,4,-,16,0)
+%?Rp<%?Rf<%xd(fa)|%xd(fb)|%xd(fc)|%xd(fd)|%xd(fe)|%xd(ff)|%xd(fg)|%xd(fh)|%xd(fi)|%xd(fj)|%xd(fk)|%xd(fl)>>
+%?Rm<%xd(ca)|%xd(cb)>
+
+# Clock on RTC able targets, and disk access
+# align on the right with room for 5 SYSFONT digits
+%V(-82,4,62,16,0)
+%?cc<%?ca<%?St(time format)<%cH|%cI>:%cM|--:-->|>
+
+# disk access icon
+%V(-20,6,-,16,0)
+%?lh<%xd(D)|>

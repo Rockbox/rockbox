@@ -62,10 +62,11 @@ static void sig_handler(int sig, siginfo_t *siginfo, void *context)
     unsigned long pc = uc->uc_mcontext.pc;
     unsigned long sp = uc->uc_mcontext.gregs[29];
 
-    lcd_putsf(0, line++, "%s at %08x", strsignal(sig), pc);
+    lcd_putsf(0, line++, "%s at %08lx", strsignal(sig), pc);
 
-    if(sig == SIGILL || sig == SIGFPE || sig == SIGSEGV || sig == SIGBUS || sig == SIGTRAP)
+    if(sig == SIGILL || sig == SIGFPE || sig == SIGSEGV || sig == SIGBUS || sig == SIGTRAP) {
         lcd_putsf(0, line++, "address %p", siginfo->si_addr);
+    }
 
     if(!triggered)
     {
@@ -82,7 +83,10 @@ static void sig_handler(int sig, siginfo_t *siginfo, void *context)
 
     system_exception_wait(); /* If this returns, try to reboot */
     system_reboot();
-    while (1);       /* halt */
+    while (1) {
+        // Make sure we're not throttling the cpu
+        usleep(1000);
+    }
 }
 
 void power_off(void)
@@ -90,7 +94,10 @@ void power_off(void)
     backlight_hw_off();
     sync();
     system("/sbin/poweroff");
-    while (1);       /* halt */
+    while (1) {
+        // Make sure we're not throttling the cpu
+        usleep(1000);
+    }
 }
 
 void system_init(void)
@@ -117,7 +124,10 @@ void system_reboot(void)
 {
     backlight_hw_off();
     system("/sbin/reboot");
-    while (1);       /* halt */
+    while (1) {
+        // Make sure we're not throttling the cpu
+        usleep(1000);
+    }
 }
 
 void system_exception_wait(void)

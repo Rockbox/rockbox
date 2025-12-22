@@ -166,6 +166,7 @@
 #define SURFANS_F28_PAD    76
 #define RG_NANO_PAD        77
 #define CTRU_PAD           78
+#define HIBY_R3PROII_PAD   79
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -618,6 +619,10 @@ Lyre prototype 1 */
 #include "config/rgnano.h"
 #elif defined(CTRU)
 #include "config/ctru.h"
+#elif defined(HIBY_R3PROII)
+#include "config/hibyr3proii.h"
+#elif defined(HIBY_R1)
+#include "config/hibyr1.h"
 #else
 #error "unknown hardware platform!"
 #endif

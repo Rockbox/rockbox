@@ -91,5 +91,7 @@ fiio-m3k.c
 shanling-q1.c
 #elif CONFIG_KEYPAD == RG_NANO_PAD
 rg-nano.c
+#elif CONFIG_KEYPAD == HIBY_R3PROII_PAD
+hiby-r3proii.c
 #endif
 #endif /* SIMULATOR */

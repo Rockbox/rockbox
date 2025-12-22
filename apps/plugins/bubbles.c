@@ -135,7 +135,7 @@ enum {
 #define NEXT_BB_WIDTH   32
 #define NEXT_BB_Y       402
 
-#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT >= 640)
 #define XOFS          128
 #define MAX_FPS       40
 

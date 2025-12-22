@@ -39,6 +39,7 @@
 # define BATTERY_VOLTAGE_PATH   BATTERY_SYSFS_PATH "/voltage_now"
 # define BATTERY_CURRENT_PATH   BATTERY_SYSFS_PATH "/current_now"
 # define BATTERY_LEVEL_PATH     BATTERY_SYSFS_PATH "/capacity"
+# define BATTERY_TTE_PATH       BATTERY_SYSFS_PATH "/time_to_empty_now"
 #endif
 
 /* Voltage is normally in microvolts */
@@ -114,6 +115,16 @@ int _battery_level(void)
     sysfs_get_int(BATTERY_LEVEL_PATH, &level);
 
     return (level * BATTERY_LEVEL_SCALE_MUL) / BATTERY_LEVEL_SCALE_DIV;
+}
+#endif
+
+#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE)
+int _battery_time(void)
+{
+    int battery_tte = 0;
+    sysfs_get_int(BATTERY_TTE_PATH, &battery_tte);
+
+    return battery_tte;
 }
 #endif
 #endif

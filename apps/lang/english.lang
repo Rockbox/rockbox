@@ -16998,3 +16998,20 @@
     *: "sort playlists"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </voice>
+</phrase>

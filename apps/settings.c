@@ -75,6 +75,9 @@
 #include "statusbar-skinned.h"
 #include "bootchart.h"
 #include "scroll_engine.h"
+#ifdef HAVE_GENERAL_PURPOSE_LED
+#include "led-general-purpose.h"
+#endif
 
 #ifndef __PCTOOL__
 struct user_settings global_settings;
@@ -1093,10 +1096,14 @@ void settings_apply(bool read_disk)
 
 #if defined(DX50) || defined(DX90)
     ibasso_set_usb_mode(global_settings.usb_mode);
+#elif (defined(HIBY_R3PROII) || defined(HIBY_R1)) && !defined(SIMULATOR)
+    hiby_set_usb_mode(global_settings.usb_mode);
 #elif defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
     usb_set_mode(global_settings.usb_mode);
 #endif
-
+#if defined(HAVE_GENERAL_PURPOSE_LED)
+    led_hw_on();
+#endif
 #if defined(DX50) || defined(DX90)
     ibasso_set_governor(global_settings.governor);
 #endif

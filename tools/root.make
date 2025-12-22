@@ -105,6 +105,8 @@ endif
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   ifneq (,$(findstring sonynwz,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  else ifneq (,$(findstring hiby_x1600,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/hiby/hiby.make
   else ifneq (,$(findstring hibyos,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/hibyos.make
   else ifneq (,$(findstring fiio,$(APP_TYPE)))
@@ -147,6 +149,10 @@ else # core
 
   ifneq (,$(findstring sonynwz,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  endif
+
+  ifneq (,$(findstring hiby_x1600,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/hiby/hiby.make
   endif
 
   ifneq (,$(findstring hibyos,$(APP_TYPE)))
