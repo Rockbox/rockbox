@@ -20,8 +20,8 @@
  ****************************************************************************/
 #include "system.h"
 #include "gpio-stm32h7.h"
-#include "stm32h7/rcc.h"
-#include "stm32h7/fmc.h"
+#include "regs/stm32h743/rcc.h"
+#include "regs/stm32h743/fmc.h"
 
 #define F_INPUT      GPIOF_INPUT(GPIO_PULL_DISABLED)
 #define F_INPUT_PU   GPIOF_INPUT(GPIO_PULL_UP)
@@ -110,9 +110,9 @@ static const struct pingroup_setting pingroups[] = {
 void gpio_init(void)
 {
     /* Enable clocks for all used GPIO banks */
-    st_writef(RCC_AHB4ENR,
-              GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
-              GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
+    reg_writef(RCC_AHB4ENR,
+               GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
+               GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
 
     /*
      * NOTE: I think it's possible to disable clocks for the banks which
@@ -128,46 +128,46 @@ void gpio_init(void)
 void fmc_init(void)
 {
     /* configure clock */
-    st_writef(RCC_D1CCIPR, FMCSEL_V(AHB));
+    reg_writef(RCC_D1CCIPR, FMCSEL_V(AHB));
 
     /* ungate FMC peripheral */
-    st_writef(RCC_AHB3ENR, FMCEN(1));
+    reg_writef(RCC_AHB3ENR, FMCEN(1));
 
     /* configure FMC */
-    st_writef(FMC_SDCR(0),
-              RPIPE(0),     /* Not clear why this would be useful so leave at 0 */
-              RBURST(1),    /* Enable burst read optimization */
-              SDCLK(2),     /* 2x fmc_ker_ck per sdclk (120 MHz, tCK = 8.33ns) */
-              WP(0),        /* Write protect off */
-              CAS(2),       /* 2 cycle CAS latency */
-              NB(1),        /* 4 internal banks */
-              MWID(1),      /* 16-bit data bus width */
-              NR(2),        /* 13 row address bits */
-              NC(1));       /* 9 column address bits */
-    st_writef(FMC_SDTR(0),
-              TRCD(2),      /* 15-20 ns <= 3 tCK */
-              TRP(2),       /* 15-20 ns <= 3 tCK */
-              TWR(2),       /* WR delay >= 2 tCK, but must be >= RAS - RCD (3 tCK) */
-              TRC(7),       /* 55-65 ns <= 7-8 tCK */
-              TRAS(5),      /* 40-45 ns <= 5-6 tCK */
-              TXSR(8),      /* 70-75 ns <= 9 tCK */
-              TMRD(1));     /* MR delay == 2 tCK */
+    reg_writef(FMC_SDCR(0),
+               RPIPE(0),    /* Not clear why this would be useful so leave at 0 */
+               RBURST(1),   /* Enable burst read optimization */
+               SDCLK(2),    /* 2x fmc_ker_ck per sdclk (120 MHz, tCK = 8.33ns) */
+               WP(0),       /* Write protect off */
+               CAS(2),      /* 2 cycle CAS latency */
+               NB(1),       /* 4 internal banks */
+               MWID(1),     /* 16-bit data bus width */
+               NR(2),       /* 13 row address bits */
+               NC(1));      /* 9 column address bits */
+    reg_writef(FMC_SDTR(0),
+               TRCD(2),     /* 15-20 ns <= 3 tCK */
+               TRP(2),      /* 15-20 ns <= 3 tCK */
+               TWR(2),      /* WR delay >= 2 tCK, but must be >= RAS - RCD (3 tCK) */
+               TRC(7),      /* 55-65 ns <= 7-8 tCK */
+               TRAS(5),     /* 40-45 ns <= 5-6 tCK */
+               TXSR(8),     /* 70-75 ns <= 9 tCK */
+               TMRD(1));    /* MR delay == 2 tCK */
 
-    st_writef(FMC_BCR(0), FMCEN(1));
+    reg_writef(FMC_BCR(0), FMCEN(1));
 
     /* send SDRAM initialization commands */
-    st_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(1), NRFS(1));
+    reg_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(1), NRFS(1));
     udelay(100);
 
-    st_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(2), NRFS(1));
-    st_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(3), NRFS(8));
-    st_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(4), NRFS(1), MRD(0x220));
-    st_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(3), NRFS(8));
+    reg_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(2), NRFS(1));
+    reg_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(3), NRFS(8));
+    reg_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(4), NRFS(1), MRD(0x220));
+    reg_writef(FMC_SDCMR, CTB1(1), CTB2(0), MODE(3), NRFS(8));
 
     /*
      * Refresh time calculation:
      * -> 64ms/8192 rows = 7.81 us/row
      * -> 937 tCK per row, minus 20 tCK margin from datasheet
      */
-    st_writef(FMC_SDRTR, REIE(0), COUNT(917), CRE(0));
+    reg_writef(FMC_SDRTR, REIE(0), COUNT(917), CRE(0));
 }

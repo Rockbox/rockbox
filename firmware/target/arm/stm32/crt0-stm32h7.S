@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "bootdata.h"
-#include "stm32h7/pwr.h"
+#include "regs/stm32h743/pwr.h"
 
     .syntax unified
     .text
@@ -42,14 +42,14 @@ reset_handler:
      * before doing anything else. Below the internal LDO is configured as
      * the power supply.
      */
-    ldr     r0, =STA_PWR_CR3
+    ldr     r0, =ITA_PWR_CR3
     ldr     r1, [r0]                    @ Read PWR_CR3
     orr     r1, #BM_PWR_CR3_LDOEN       @ Set LDOEN=1
     bic     r1, #BM_PWR_CR3_BYPASS      @ Set BYPASS=0
     str     r1, [r0]                    @ Write updated value to PWR_CR3
 
     /* Wait for PSR_CSR1.ACTVOSRDY, which indicates we exited Run* mode */
-    ldr     r0, =STA_PWR_CSR1
+    ldr     r0, =ITA_PWR_CSR1
 1:
     ldr     r1, [r0]                    @ Read PWR_CSR1
     ands    r1, #BM_PWR_CSR1_ACTVOSRDY

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 #include "spi-stm32h7.h"
-#include "stm32h7/spi.h"
+#include "regs/stm32h743/spi.h"
 
 /*
  * Align the max transfer size to ensure it will always be a multiple
@@ -30,16 +30,16 @@
  * middle of the transfer, as it will throw away valid data.
  */
 #define TSIZE_MAX \
-    ALIGN_DOWN(st_vreadf(BM_SPI_CR2_TSIZE, SPI_CR2, TSIZE), sizeof(uint32_t))
+    ALIGN_DOWN(reg_vreadf(BM_SPI_CR2_TSIZE, SPI_CR2, TSIZE), sizeof(uint32_t))
 
 static struct stm_spi *spi_map[STM_SPI_COUNT];
 static const uint32_t spi_addr[STM_SPI_COUNT] INITDATA_ATTR = {
-    [STM_SPI1] = STA_SPI1,
-    [STM_SPI2] = STA_SPI2,
-    [STM_SPI3] = STA_SPI3,
-    [STM_SPI4] = STA_SPI4,
-    [STM_SPI5] = STA_SPI5,
-    [STM_SPI6] = STA_SPI6,
+    [STM_SPI1] = ITA_SPI1,
+    [STM_SPI2] = ITA_SPI2,
+    [STM_SPI3] = ITA_SPI3,
+    [STM_SPI4] = ITA_SPI4,
+    [STM_SPI5] = ITA_SPI5,
+    [STM_SPI6] = ITA_SPI6,
 };
 
 static void stm_spi_set_cs(struct stm_spi *spi, bool enable)
@@ -47,7 +47,7 @@ static void stm_spi_set_cs(struct stm_spi *spi, bool enable)
     if (spi->set_cs)
         spi->set_cs(spi, enable);
 
-    st_writelf(spi->regs, SPI_CR1, SSI(1));
+    reg_writelf(spi->regs, SPI_CR1, SSI(1));
 }
 
 static void stm_spi_enable(struct stm_spi *spi, bool hd_tx, size_t size)
@@ -78,19 +78,19 @@ static void stm_spi_enable(struct stm_spi *spi, bool hd_tx, size_t size)
     spi->tser_left = left;
 
     /* TSIZE must be programmed before setting SPE. */
-    st_overwritelf(spi->regs, SPI_CR2, TSIZE(tsize), TSER(tser));
-    st_writelf(spi->regs, SPI_CR1, HDDIR(hd_tx), SPE(1));
+    reg_assignlf(spi->regs, SPI_CR2, TSIZE(tsize), TSER(tser));
+    reg_writelf(spi->regs, SPI_CR1, HDDIR(hd_tx), SPE(1));
 }
 
 static void stm_spi_disable(struct stm_spi *spi)
 {
-    st_overwritelf(spi->regs, SPI_IFCR, TSERFC(1), TXTFC(1), EOTC(1));
-    st_writelf(spi->regs, SPI_CR1, SPE(0));
+    reg_assignlf(spi->regs, SPI_IFCR, TSERFC(1), TXTFC(1), EOTC(1));
+    reg_writelf(spi->regs, SPI_CR1, SPE(0));
 }
 
 static void stm_spi_start(struct stm_spi *spi)
 {
-    st_writelf(spi->regs, SPI_CR1, CSTART(1));
+    reg_writelf(spi->regs, SPI_CR1, CSTART(1));
 }
 
 static uint32_t stm_spi_pack(const void **bufp, size_t *sizep)
@@ -174,31 +174,31 @@ void stm_spi_init(struct stm_spi *spi,
         ftlevel *= 2;
 
     /* TODO: allow setting MBR here */
-    st_writelf(spi->regs, SPI_CFG1,
-               MBR(0),
-               CRCEN(0),
-               CRCSIZE(7),
-               TXDMAEN(0),
-               RXDMAEN(0),
-               UDRDET(0),
-               UDRCFG(0),
-               FTHLV(ftlevel - 1),
-               DSIZE(config->frame_bits - 1));
-    st_writelf(spi->regs, SPI_CFG2,
-               AFCNTR(1),
-               SSM(config->hw_cs_input ? 0 : 1),
-               SSOE(config->hw_cs_output),
-               SSIOP(config->hw_cs_polarity),
-               CPOL(config->cpol),
-               CPHA(config->cpha),
-               LSBFIRST(config->send_lsb_first),
-               COMM(config->mode),
-               SP(config->proto),
-               MASTER(1),
-               SSOM(0),
-               IOSWP(config->swap_mosi_miso),
-               MIDI(0),
-               MSSI(0));
+    reg_writelf(spi->regs, SPI_CFG1,
+                MBR(0),
+                CRCEN(0),
+                CRCSIZE(7),
+                TXDMAEN(0),
+                RXDMAEN(0),
+                UDRDET(0),
+                UDRCFG(0),
+                FTHLV(ftlevel - 1),
+                DSIZE(config->frame_bits - 1));
+    reg_writelf(spi->regs, SPI_CFG2,
+                AFCNTR(1),
+                SSM(config->hw_cs_input ? 0 : 1),
+                SSOE(config->hw_cs_output),
+                SSIOP(config->hw_cs_polarity),
+                CPOL(config->cpol),
+                CPHA(config->cpha),
+                LSBFIRST(config->send_lsb_first),
+                COMM(config->mode),
+                SP(config->proto),
+                MASTER(1),
+                SSOM(0),
+                IOSWP(config->swap_mosi_miso),
+                MIDI(0),
+                MSSI(0));
 
     spi_map[config->num] = spi;
 }
@@ -236,33 +236,33 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
 
     while (size_tx > 0 || size_rx > 0)
     {
-        uint32_t sr = st_readl(spi->regs, SPI_SR);
+        uint32_t sr = reg_readl(spi->regs, SPI_SR);
 
         /*
          * Handle continuation of large transfers
          *
          * TODO - something is not right with this code
          */
-        if (spi->tser_left > 0 && st_vreadf(sr, SPI_SR, TSERF))
+        if (spi->tser_left > 0 && reg_vreadf(sr, SPI_SR, TSERF))
         {
             if (spi->tser_left < TSIZE_MAX)
             {
-                st_writelf(spi->regs, SPI_CR2, TSER(spi->tser_left));
+                reg_writelf(spi->regs, SPI_CR2, TSER(spi->tser_left));
                 spi->tser_left = 0;
             }
             else
             {
-                st_writelf(spi->regs, SPI_CR2, TSER(TSIZE_MAX));
+                reg_writelf(spi->regs, SPI_CR2, TSER(TSIZE_MAX));
                 spi->tser_left -= TSIZE_MAX;
             }
         }
 
         /* Handle FIFO write */
-        if (size_tx > 0 && st_vreadf(sr, SPI_SR, TXP))
+        if (size_tx > 0 && reg_vreadf(sr, SPI_SR, TXP))
         {
             uint32_t data = stm_spi_pack(&tx_buf, &size_tx);
 
-            st_writel(spi->regs, SPI_TXDR32, data);
+            reg_varl(spi->regs, SPI_DR) = data;
         }
 
         /*
@@ -271,9 +271,9 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
          * transfer, and must check EOT as well.
          */
         if (size_rx > 0 &&
-            (st_vreadf(sr, SPI_SR, RXP) || st_vreadf(sr, SPI_SR, EOT)))
+            (reg_vreadf(sr, SPI_SR, RXP) || reg_vreadf(sr, SPI_SR, EOT)))
         {
-            uint32_t data = st_readl(spi->regs, SPI_RXDR32);
+            uint32_t data = reg_readl(spi->regs, SPI_DR);
 
             stm_spi_unpack(&rx_buf, &size_rx, data);
         }

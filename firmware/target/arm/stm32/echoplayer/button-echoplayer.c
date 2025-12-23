@@ -30,12 +30,12 @@ int button_read_device(void)
     int buttons = 0;
 
     /* Most buttons are active low, so invert the read */
-    uint32_t ga = ~REG_GPIO_IDR(GPIO_A);
-    uint32_t gb = ~REG_GPIO_IDR(GPIO_B);
-    uint32_t gc = ~REG_GPIO_IDR(GPIO_C);
-    uint32_t gd = ~REG_GPIO_IDR(GPIO_D);
-    uint32_t gf = ~REG_GPIO_IDR(GPIO_F);
-    uint32_t gh = ~REG_GPIO_IDR(GPIO_H);
+    uint32_t ga = ~reg_read(GPIO_IDR(GPIO_A));
+    uint32_t gb = ~reg_read(GPIO_IDR(GPIO_B));
+    uint32_t gc = ~reg_read(GPIO_IDR(GPIO_C));
+    uint32_t gd = ~reg_read(GPIO_IDR(GPIO_D));
+    uint32_t gf = ~reg_read(GPIO_IDR(GPIO_F));
+    uint32_t gh = ~reg_read(GPIO_IDR(GPIO_H));
 
     if (ga & BIT_N(GPION_PIN(GPIO_BUTTON_A)))
         buttons |= BUTTON_A;

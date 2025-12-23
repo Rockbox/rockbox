@@ -1,3 +1,6 @@
 #if defined(CPU_ARM_MICRO)
 cortex-m.regs
 #endif
+#if CONFIG_CPU == STM32H743
+stm32h743.regs
+#endif

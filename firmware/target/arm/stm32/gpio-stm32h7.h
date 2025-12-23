@@ -23,7 +23,7 @@
 
 #include "system.h"
 #include "gpio-target.h"
-#include "stm32h7/gpio.h"
+#include "regs/stm32h743/gpio.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -167,61 +167,61 @@ static inline void gpio_set_mode(int gpio, int mode)
 {
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
-    uint32_t val = REG_GPIO_MODER(port);
+    uint32_t val = reg_read(GPIO_MODER(port));
     uint32_t mask = GPIO_SETTING_MASK(pin);
 
     val &= ~mask;
     val |= (mode << GPIO_SETTING_LSB(pin)) & mask;
 
-    REG_GPIO_MODER(port) = val;
+    reg_var(GPIO_MODER(port)) = val;
 }
 
 static inline void gpio_set_type(int gpio, int type)
 {
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
-    uint32_t val = REG_GPIO_OTYPER(port);
+    uint32_t val = reg_read(GPIO_OTYPER(port));
     uint32_t mask = BIT_N(pin);
 
     val &= ~mask;
     val |= (type << pin) & mask;
 
-    REG_GPIO_OTYPER(port) = val;
+    reg_var(GPIO_OTYPER(port)) = val;
 }
 
 static inline void gpio_set_speed(int gpio, int speed)
 {
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
-    uint32_t val = REG_GPIO_OSPEEDR(port);
+    uint32_t val = reg_read(GPIO_OSPEEDR(port));
     uint32_t mask = GPIO_SETTING_MASK(pin);
 
     val &= ~mask;
     val |= (speed << GPIO_SETTING_LSB(pin)) & mask;
 
-    REG_GPIO_OSPEEDR(port) = val;
+    reg_var(GPIO_OSPEEDR(port)) = val;
 }
 
 static inline void gpio_set_pull(int gpio, int pull)
 {
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
-    uint32_t val = REG_GPIO_PUPDR(port);
+    uint32_t val = reg_read(GPIO_PUPDR(port));
     uint32_t mask = GPIO_SETTING_MASK(pin);
 
     val &= ~mask;
     val |= (pull << GPIO_SETTING_LSB(pin)) & mask;
 
-    REG_GPIO_PUPDR(port) = val;
+    reg_var(GPIO_PUPDR(port)) = val;
 }
 
 static inline void gpio_set_function(int gpio, int func)
 {
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
-    volatile uint32_t *addr = &REG_GPIO_AFRL(port);
+    volatile uint32_t *addr = reg_ptr(GPIO_AFRL(port));
     if (pin >= 8) {
-        addr += &REG_GPIO_AFRH(0) - &REG_GPIO_AFRL(0);
+        addr += reg_ptr(GPIO_AFRH(0)) - reg_ptr(GPIO_AFRL(0));
         pin -= 8;
     }
 
@@ -239,7 +239,7 @@ static inline int gpio_get_level(int gpio)
     int port = GPION_PORT(gpio);
     int pin = GPION_PIN(gpio);
 
-    return REG_GPIO_IDR(port) & BIT_N(pin);
+    return reg_read(GPIO_IDR(port)) & BIT_N(pin);
 }
 
 static inline void gpio_set_level(int gpio, int value)
@@ -248,9 +248,9 @@ static inline void gpio_set_level(int gpio, int value)
     int pin = GPION_PIN(gpio);
 
     if (value)
-        REG_GPIO_BSRR(port) = BIT_N(pin);
+        reg_var(GPIO_BSRR(port)) = BIT_N(pin);
     else
-        REG_GPIO_BSRR(port) = BIT_N(pin + 16);
+        reg_var(GPIO_BSRR(port)) = BIT_N(pin + 16);
 }
 
 #endif /* __GPIO_STM32_H__ */

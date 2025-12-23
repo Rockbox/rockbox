@@ -23,7 +23,7 @@
 #include "lcd.h"
 #include "spi-stm32h7.h"
 #include "gpio-stm32h7.h"
-#include "stm32h7/rcc.h"
+#include "regs/stm32h743/rcc.h"
 
 struct stm_spi_config spi_cfg = {
     .num = STM_SPI5,
@@ -52,8 +52,8 @@ static void set_row_column_address(int x, int y, int w, int h)
 void lcd_init_device(void)
 {
     /* Clock configuration -- should be 12 MHz (SPI clock is 1/2 of HSE) */
-    st_writef(RCC_D2CCIP1R, SPI45SEL_V(HSE));
-    st_writef(RCC_APB2ENR, SPI5EN(1));
+    reg_writef(RCC_D2CCIP1R, SPI45SEL_V(HSE));
+    reg_writef(RCC_APB2ENR, SPI5EN(1));
 
     /* Configure SPI bus */
     stm_spi_init(&spi, &spi_cfg);
