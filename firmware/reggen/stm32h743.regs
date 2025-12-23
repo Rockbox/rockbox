@@ -706,3 +706,16 @@ SPI3 @ 0x40003c00 : SPI
 SPI4 @ 0x40013400 : SPI
 SPI5 @ 0x40015000 : SPI
 SPI6 @ 0x58001400 : SPI
+
+// Microcontroller debug unit
+DBGMCU @ 0x5C001000 : block {
+    CR @ 0x04 : reg {
+        28 TRGOEN
+        22 D3DBGCKEN
+        21 D1DBGCKEN
+        20 TRACECLKEN
+        02 DBGSTBY_D1
+        01 DBGSTOP_D1
+        00 DBGSLEEP_D1
+    }
+}
