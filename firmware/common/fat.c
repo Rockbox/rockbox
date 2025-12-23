@@ -2465,7 +2465,7 @@ static long transfer(struct bpb *fat_bpb, sector_t start, long count,
     long rc = 0;
 
     DEBUGF("%s(s=%llx, c=%lx, wr=%u)\n", __func__,
-           start + fat_bpb->startsector, count, write ? 1 : 0);
+           (uint64_t)(start + fat_bpb->startsector), count, write ? 1 : 0);
 
     if (write)
     {
@@ -2557,7 +2557,7 @@ long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
            file->firstcluster, sectorcount, (long)buf,
            write ? "write":"read");
     DEBUGF("%s: sec:%llx numsec:%ld eof:%d\n", __func__,
-           sector, (long)sectornum, eof ? 1 : 0);
+           (uint64_t)sector, (long)sectornum, eof ? 1 : 0);
 
     eof = false;
 
