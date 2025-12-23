@@ -100,7 +100,7 @@ struct queue_sender_list
 };
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
-#ifdef HAVE_PRIORITY_SCHEDULING
+#if defined(HAVE_EXTENDED_MESSAGING_AND_NAME)
 #define QUEUE_GET_THREAD(q) \
     (((q)->send == NULL) ? NULL : (q)->send->blocker.thread)
 #else
