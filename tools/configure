@@ -4331,7 +4331,7 @@ fi
     sysfont="14-Rockbox-Mix"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$genericbitmaptools scramble uclpack"
+    toolset="$genericbitmaptools scramble uclpack reggen"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     # architecture, manufacturer and model for the target-tree build
