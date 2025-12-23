@@ -21,12 +21,12 @@
 #include "system.h"
 #include "tick.h"
 #include "gpio-stm32h7.h"
-#include "cortex-m/scb.h"
-#include "cortex-m/systick.h"
 #include "stm32h7/rcc.h"
 #include "stm32h7/pwr.h"
 #include "stm32h7/syscfg.h"
 #include "stm32h7/flash.h"
+#include "regs/cortex-m/cm_scb.h"
+#include "regs/cortex-m/cm_systick.h"
 
 /* EXT timer is 1/8th of CPU clock */
 #define SYSTICK_FREQ            (CPU_FREQ / 8)
@@ -45,16 +45,16 @@ extern char __vectors_arm[];
 
 static void systick_init(unsigned int interval_in_ms)
 {
-    cm_writef(SYSTICK_RVR, VALUE(SYSTICK_PER_MS * interval_in_ms - 1));
-    cm_writef(SYSTICK_CVR, VALUE(0));
-    cm_writef(SYSTICK_CSR, CLKSOURCE_V(EXT), ENABLE(1));
+    reg_writef(CM_SYSTICK_RVR, VALUE(SYSTICK_PER_MS * interval_in_ms - 1));
+    reg_writef(CM_SYSTICK_CVR, VALUE(0));
+    reg_writef(CM_SYSTICK_CSR, CLKSOURCE_V(EXT), ENABLE(1));
 }
 
 static void stm_enable_caches(void)
 {
     __discard_idcache();
 
-    cm_writef(SCB_CCR, IC(1), DC(1));
+    reg_writef(CM_SCB_CCR, IC(1), DC(1));
 
     arm_dsb();
     arm_isb();
@@ -170,7 +170,7 @@ void system_init(void)
 {
     /* Ensure IRQs are disabled and set vector table address */
     disable_irq();
-    cm_write(SCB_VTOR, (uint32_t)__vectors_arm);
+    reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
 
     /* Enable CPU caches */
     stm_enable_caches();
@@ -196,7 +196,7 @@ void tick_start(unsigned int interval_in_ms)
 {
     (void)interval_in_ms;
 
-    cm_writef(SYSTICK_CSR, TICKINT(1));
+    reg_writef(CM_SYSTICK_CSR, TICKINT(1));
 }
 
 void systick_handler(void)
@@ -211,13 +211,13 @@ void systick_handler(void)
  */
 static void __udelay(uint32_t us)
 {
-    uint32_t start = cm_readf(SYSTICK_CVR, VALUE);
-    uint32_t max = cm_readf(SYSTICK_RVR, VALUE);
+    uint32_t start = reg_readf(CM_SYSTICK_CVR, VALUE);
+    uint32_t max = reg_readf(CM_SYSTICK_RVR, VALUE);
     uint32_t delay = us * SYSTICK_PER_US;
 
     for (;;)
     {
-        uint32_t value = cm_readf(SYSTICK_CVR, VALUE);
+        uint32_t value = reg_readf(CM_SYSTICK_CVR, VALUE);
         uint32_t diff = start - value;
         if (value > start)
             diff += max;

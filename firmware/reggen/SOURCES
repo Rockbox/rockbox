@@ -1,1 +1,3 @@
-// Intentionally empty file.
+#if defined(CPU_ARM_MICRO)
+cortex-m.regs
+#endif

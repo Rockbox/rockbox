@@ -22,7 +22,7 @@
 #define __NVIC_ARM_H__
 
 #include "system.h"
-#include "cortex-m/nvic.h"
+#include "regs/cortex-m/cm_nvic.h"
 
 #define NVIC_MAX_PRIO 0xFF
 
@@ -31,7 +31,7 @@ static inline void nvic_enable_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    cm_write(NVIC_ISER(reg), BIT_N(bit));
+    reg_var(CM_NVIC_ISER(reg)) = BIT_N(bit);
 }
 
 static inline void nvic_disable_irq(int nr)
@@ -39,7 +39,7 @@ static inline void nvic_disable_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    cm_write(NVIC_ICER(reg), BIT_N(bit));
+    reg_var(CM_NVIC_ICER(reg)) = BIT_N(bit);
 }
 
 static inline void nvic_set_pending_irq(int nr)
@@ -47,7 +47,7 @@ static inline void nvic_set_pending_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    cm_write(NVIC_ISPR(reg), BIT_N(bit));
+    reg_var(CM_NVIC_ISPR(reg)) = BIT_N(bit);
 }
 
 static inline void nvic_clear_pending_irq(int nr)
@@ -55,7 +55,7 @@ static inline void nvic_clear_pending_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    cm_write(NVIC_ICPR(reg), BIT_N(bit));
+    reg_var(CM_NVIC_ICPR(reg)) = BIT_N(bit);
 }
 
 static inline bool nvic_is_active_irq(int nr)
@@ -63,7 +63,7 @@ static inline bool nvic_is_active_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    return cm_read(NVIC_IABR(reg)) & BIT_N(bit);
+    return reg_read(CM_NVIC_IABR(reg)) & BIT_N(bit);
 }
 
 static inline bool nvic_is_enabled_irq(int nr)
@@ -71,7 +71,7 @@ static inline bool nvic_is_enabled_irq(int nr)
     int reg = nr / 32;
     int bit = nr % 32;
 
-    return cm_read(NVIC_ISER(reg)) & BIT_N(bit);
+    return reg_read(CM_NVIC_ISER(reg)) & BIT_N(bit);
 }
 
 static inline void nvic_set_irq_priority(int nr, int prio)
@@ -79,12 +79,12 @@ static inline void nvic_set_irq_priority(int nr, int prio)
     int reg = nr / 4;
     int shift = (nr % 4) * 8;
 
-    uint32_t val = cm_read(NVIC_IPR(reg));
+    uint32_t val = reg_read(CM_NVIC_IPR(reg));
 
     val &= NVIC_MAX_PRIO << shift;
     val |= (prio & NVIC_MAX_PRIO) << shift;
 
-    cm_write(NVIC_IPR(reg), val);
+    reg_var(CM_NVIC_IPR(reg)) = val;
 }
 
 #endif /* __NVIC_ARM_H__ */
