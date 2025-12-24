@@ -12627,20 +12627,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Erreur lors de la collecte d'informations"
-  </dest>
-  <voice>
-    *: "Erreur lors de la collecte d'informations"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_QUEEN
   desc: spoken only, for announcing chess piece names
   user: core
@@ -15967,20 +15953,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Menu Principale de Amaze"
-  </dest>
-  <voice>
-    *: "Menu Principale de Amaze"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16230,34 +16202,6 @@
   </dest>
   <voice>
     *: "Paramètres de Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Menu de Mikmod"
-  </dest>
-  <voice>
-    *: "Menu de Mikmod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Menu de Chessbox"
-  </dest>
-  <voice>
-    *: "Menu de Chessbox"
   </voice>
 </phrase>
 <phrase>
@@ -16937,11 +16881,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </voice>
 </phrase>
 <phrase>
