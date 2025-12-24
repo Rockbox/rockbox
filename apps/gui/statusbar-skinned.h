@@ -39,8 +39,11 @@ void sb_skin_update(enum screen_type screen, bool force);
 
 void sb_skin_set_update_delay(int delay);
 bool sb_set_title_text(const char* title, enum themable_icons icon, enum screen_type screen);
+bool sb_set_persistent_title(const char* title, enum themable_icons icon,
+                             enum screen_type screen);
 void sb_skin_has_title(enum screen_type screen);
 const char* sb_get_title(enum screen_type screen);
+const char* sb_get_persistent_title(enum screen_type screen);
 enum themable_icons sb_get_icon(enum screen_type screen);
 
 #ifdef HAVE_TOUCHSCREEN

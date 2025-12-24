@@ -300,10 +300,14 @@ static void tv_change_viewport(void)
     bool show_statusbar = preferences->statusbar;
 
     if (is_initialized_vp)
+    {
+        rb->sb_set_persistent_title(tv_get_title_text(), Icon_NOICON, SCREEN_MAIN);
         rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+    }
     else
         is_initialized_vp = true;
 
+    rb->sb_set_persistent_title(tv_get_title_text(), Icon_NOICON, SCREEN_MAIN);
     rb->viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp_info);
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
     display->set_viewport(&vp_info);

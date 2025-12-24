@@ -874,6 +874,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    sb_set_persistent_title,
 };
 
 static int plugin_buffer_handle;

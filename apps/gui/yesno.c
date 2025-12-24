@@ -243,9 +243,8 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
         yn[i].main_message=main_message;
         yn[i].display=&screens[i];
         screens[i].scroll_stop();
+        sb_set_persistent_title(title, Icon_NOICON, i);
         viewportmanager_theme_enable(i, true, &(yn[i].vp));
-        if (sb_set_title_text(title, Icon_NOICON, i))
-            send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 
         yn[i].vp_lines = viewport_get_nb_lines(&(yn[i].vp));
     }
@@ -355,6 +354,7 @@ exit:
     FOR_NB_SCREENS(i)
     {
         screens[i].scroll_stop_viewport(&(yn[i].vp));
+        sb_set_persistent_title(title, Icon_NOICON, i);
         viewportmanager_theme_undo(i, true);
     }
 

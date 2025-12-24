@@ -39,6 +39,7 @@
 #include "icon.h"
 #include "icons.h"
 #include "option_select.h"
+#include "string-extra.h"
 #ifdef HAVE_TOUCHSCREEN
 #include "sound.h"
 #include "misc.h"
@@ -49,6 +50,7 @@ static int update_delay = DEFAULT_UPDATE_DELAY;
 
 static bool sbs_has_title[NB_SCREENS];
 static const char* sbs_title[NB_SCREENS];
+static char sbs_persistent_title[NB_SCREENS][80];
 static enum themable_icons sbs_icon[NB_SCREENS];
 static bool sbs_loaded[NB_SCREENS] = { false };
 
@@ -62,6 +64,15 @@ bool sb_set_title_text(const char* title, enum themable_icons icon, enum screen_
     return sbs_has_title[screen];
 }
 
+bool sb_set_persistent_title(const char* title, enum themable_icons icon, enum screen_type screen)
+{
+    if (!title)
+        return sb_set_title_text(title, icon, screen);
+
+    strlcpy(sbs_persistent_title[screen], title, sizeof(*sbs_persistent_title));
+    return sb_set_title_text((const char *) sbs_persistent_title[screen], icon, screen);
+}
+
 void sb_skin_has_title(enum screen_type screen)
 {
     sbs_has_title[screen] = true;
@@ -71,6 +82,15 @@ const char* sb_get_title(enum screen_type screen)
 {
     return sbs_has_title[screen] ? sbs_title[screen] : NULL;
 }
+
+const char* sb_get_persistent_title(enum screen_type screen)
+{
+    return (sbs_has_title[screen] &&
+            sbs_title[screen] == sbs_persistent_title[screen]) ?
+            sbs_title[screen] : NULL;
+
+}
+
 enum themable_icons sb_get_icon(enum screen_type screen)
 {
     return sbs_has_title[screen] ? sbs_icon[screen] : Icon_NOICON + 2;

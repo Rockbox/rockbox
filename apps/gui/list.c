@@ -882,7 +882,8 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
     list_get_name *getname;
-    int line_count, ret = false;
+    int line_count;
+    bool ret = false;
 
     if (info->get_name)
     {
@@ -896,7 +897,10 @@ bool simplelist_show_list(struct simplelist_info *info)
     }
 
     FOR_NB_SCREENS(i)
+    {
+        sb_set_persistent_title(info->title, info->title_icon, i);
         viewportmanager_theme_enable(i, !info->hide_theme, NULL);
+    }
 
     gui_synclist_init(&lists, getname,  info->callback_data,
                       info->scroll_all, info->selection_size, NULL);
@@ -985,7 +989,10 @@ bool simplelist_show_list(struct simplelist_info *info)
 #endif
 
     FOR_NB_SCREENS(i)
+    {
+        sb_set_persistent_title(info->title, info->title_icon, i);
         viewportmanager_theme_undo(i, false);
+    }
     return ret;
 }
 

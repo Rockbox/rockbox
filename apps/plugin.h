@@ -1026,6 +1026,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    bool (*sb_set_persistent_title)(const char* title, enum themable_icons icon,
+                                    enum screen_type screen);
 };
 
 /* plugin header */

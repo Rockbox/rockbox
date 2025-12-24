@@ -111,7 +111,8 @@ static void toggle_theme(enum screen_type screen, bool force)
     FOR_NB_SCREENS(i)
     {
         enable_event = enable_event || is_theme_enabled(i);
-        sb_set_title_text(NULL, Icon_NOICON, i);
+        if (!sb_get_persistent_title(i))
+            sb_set_title_text(NULL, Icon_NOICON, i);
     }
     toggle_events(enable_event);
 
@@ -195,6 +196,8 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
         panicf("Stack underflow... viewportmanager");
 
     toggle_theme(screen, force_redraw);
+    if (sb_get_persistent_title(screen))
+        screens[screen].scroll_stop();
 }
 
 

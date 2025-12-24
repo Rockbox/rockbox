@@ -560,10 +560,11 @@ enum plugin_status plugin_start(const void* parameter)
         return status;
     }
 
-    /* Only relevant if launched using hotkey from the
-       WPS. Otherwise theme should be enabled already. */
     FOR_NB_SCREENS(i)
+    {
+        rb->sb_set_persistent_title(rb->str(LANG_PLAYING_TIME), Icon_NOICON, i);
         rb->viewportmanager_theme_enable(i, true, NULL);
+    }
 
     if (playing_time())
         status = PLUGIN_USB_CONNECTED;

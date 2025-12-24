@@ -53,6 +53,7 @@
 #include "viewport.h"
 #include "quickscreen.h"
 #include "shortcuts.h"
+#include "statusbar-skinned.h"
 
 #include "icons.h"
 
@@ -66,6 +67,8 @@ static struct menu_item_ex *current_submenus_menu;
 static int current_subitems[MAX_MENU_SUBITEMS];
 static int current_subitems_count = 0;
 static int talk_menu_item(int selected_item, void *data);
+static char *title_buf;
+static size_t title_buf_sz;
 
 struct menu_data_t
 {
@@ -197,6 +200,34 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
     return menu_icon;
 }
 
+static char* init_title(const struct menu_item_ex *menu, int *icon)
+{
+    char *title;
+
+    if (menu->flags&MENU_HAS_DESC)
+    {
+        *icon = menu->callback_and_desc->icon_id;
+        title = P2STR(menu->callback_and_desc->desc);
+    }
+    else if (menu->flags&MENU_DYNAMIC_DESC)
+    {
+        *icon = menu->menu_get_name_and_icon->icon_id;
+        title = menu->menu_get_name_and_icon->
+                      list_get_name(-1, menu->menu_get_name_and_icon->
+                                    list_get_name_data, title_buf, title_buf_sz);
+    }
+    else
+    {
+        *icon = Icon_NOICON;
+        title = "";
+    }
+
+    if (*icon == Icon_NOICON)
+        *icon = Icon_Submenu_Entered;
+
+    return title;
+}
+
 static int init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback,
                      struct viewport parent[NB_SCREENS])
@@ -236,28 +267,7 @@ static int init_menu_lists(const struct menu_item_ex *menu,
     current_submenus_menu = (struct menu_item_ex *)menu;
 
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1, parent);
-
-    if (menu->flags&MENU_HAS_DESC)
-    {
-        icon = menu->callback_and_desc->icon_id;
-        title = P2STR(menu->callback_and_desc->desc);
-    }
-    else if (menu->flags&MENU_DYNAMIC_DESC)
-    {
-        char buffer[80];
-        icon = menu->menu_get_name_and_icon->icon_id;
-        title = menu->menu_get_name_and_icon->
-                      list_get_name(-1, menu->menu_get_name_and_icon->
-                                    list_get_name_data, buffer, sizeof(buffer));
-    }
-    else
-    {
-        icon = Icon_NOICON;
-        title = "";
-    }
-
-    if (icon == Icon_NOICON)
-            icon = Icon_Submenu_Entered;
+    title = init_title(menu, &icon);
     gui_synclist_set_title(lists, title, icon);
     gui_synclist_set_icon_callback(lists, global_settings.show_icons?menu_get_icon:NULL);
     if(global_settings.talk_menu)
@@ -382,6 +392,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int ret = 0;
     int action;
     int start_action;
+    int icon;
+    char buf[80], *title;
     struct gui_synclist lists;
     const struct menu_item_ex *temp = NULL;
     const struct menu_item_ex *menu = start_menu;
@@ -398,9 +410,14 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
+    title_buf = buf;
+    title_buf_sz = sizeof buf;
+    title = init_title(menu, &icon);
     FOR_NB_SCREENS(i)
+    {
+        sb_set_persistent_title(title, icon, i);
         viewportmanager_theme_enable(i, !hide_theme, NULL);
-
+    }
     struct menu_data_t mstack[MAX_MENUS]; /* menu, selected */
     int stack_top = 0;
 
@@ -785,6 +802,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
     FOR_NB_SCREENS(i)
     {
+        sb_set_persistent_title(lists.title, lists.title_icon, i);
         viewportmanager_theme_undo(i, false);
         skinlist_set_cfg(i, NULL); /* Bugfix dangling reference in skin_draw() */
     }
