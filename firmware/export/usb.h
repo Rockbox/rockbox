@@ -179,14 +179,7 @@ enum {
     USB_NUM_DRIVERS
 };
 
-struct usb_transfer_completion_event_data
-{
-    unsigned char endpoint;
-    int dir;
-    int status;
-    int length;
-    void* data[2];
-};
+struct usb_transfer_completion_event_data;
 #endif /* HAVE_USBSTACK */
 
 /* initialise the usb code and thread */

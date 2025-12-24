@@ -1081,7 +1081,7 @@ static void control_received(void)
         }
     }
 
-    usb_core_legacy_control_request((struct usb_ctrlrequest*)tmp);
+    usb_core_setup_received((struct usb_ctrlrequest*)tmp);
 }
 
 static void transfer_completed(void)

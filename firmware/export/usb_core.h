@@ -39,6 +39,11 @@
 
 extern int usb_max_pkt_size;
 
+enum usb_control_response {
+    USB_CONTROL_ACK,
+    USB_CONTROL_STALL,
+};
+
 enum {
     USB_STRING_INDEX_LANGUAGE,
     USB_STRING_INDEX_MANUFACTURER,
@@ -51,9 +56,8 @@ struct usb_class_driver;
 
 void usb_core_init(void);
 void usb_core_exit(void);
-void usb_core_control_request(struct usb_ctrlrequest* req, void* data);
-void usb_core_control_complete(int status);
-void usb_core_legacy_control_request(struct usb_ctrlrequest* req);
+void usb_core_setup_received(struct usb_ctrlrequest* req);
+void usb_core_control_response(enum usb_control_response response, const void* data, size_t size);
 void usb_core_transfer_complete(int endpoint,int dir,int status,int length);
 void usb_core_bus_reset(void);
 void usb_core_enable_driver(int driver,bool enabled);

@@ -180,7 +180,7 @@ union line_coding_buffer
     unsigned char raw[64];
 };
 
-static union line_coding_buffer line_coding USB_DEVBSS_ATTR;
+static union line_coding_buffer line_coding;
 
 /* send_buffer: local ring buffer.
  * transit_buffer: used to store aligned data that will be sent by the USB
@@ -270,12 +270,11 @@ static int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_
 }
 
 /* called by usb_core_control_request() */
-static bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
+static bool usb_serial_control_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
-    bool handled = false;
+    (void)reqdata_size; /* should check this? */
 
-    (void)dest;
-    (void)reqdata;
+    bool handled = false;
 
     if (req->wIndex != control_interface)
     {
@@ -289,16 +288,7 @@ static bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdat
             if (req->wLength == sizeof(struct cdc_line_coding))
             {
                 /* Receive line coding into local copy */
-                if (!reqdata)
-                {
-                    usb_drv_control_response(USB_CONTROL_RECEIVE, line_coding.raw,
-                                             sizeof(struct cdc_line_coding));
-                }
-                else
-                {
-                    usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
-                }
-
+                memcpy(line_coding.raw, reqdata, sizeof(struct cdc_line_coding));
                 handled = true;
             }
         }
@@ -307,7 +297,7 @@ static bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdat
             if (req->wLength == 0)
             {
                 /* wValue holds Control Signal Bitmap that is simply ignored here */
-                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
                 handled = true;
             }
         }
@@ -319,7 +309,7 @@ static bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdat
             if (req->wLength == sizeof(struct cdc_line_coding))
             {
                 /* Send back line coding so host is happy */
-                usb_drv_control_response(USB_CONTROL_ACK, line_coding.raw,
+                usb_core_control_response(USB_CONTROL_ACK, line_coding.raw,
                                          sizeof(struct cdc_line_coding));
                 handled = true;
             }

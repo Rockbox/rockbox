@@ -1335,7 +1335,6 @@ Lyre prototype 1 */
 /* Define the implemented USB transport classes */
 #if CONFIG_USBOTG == USBOTG_ISP1583
 #define USB_HAS_BULK
-#define USB_LEGACY_CONTROL_API
 #elif (CONFIG_USBOTG == USBOTG_DESIGNWARE)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
@@ -1352,13 +1351,10 @@ Lyre prototype 1 */
 #if (CONFIG_USBOTG == USBOTG_ARC)
 #define USB_HAS_ISOCHRONOUS
 #endif
-#define USB_LEGACY_CONTROL_API
 #elif defined(CPU_TCC780X)
 #define USB_HAS_BULK
-#define USB_LEGACY_CONTROL_API
 #elif CONFIG_USBOTG == USBOTG_S3C6400X
 #define USB_HAS_BULK
-#define USB_LEGACY_CONTROL_API
 //#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */
 

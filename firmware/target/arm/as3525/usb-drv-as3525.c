@@ -629,7 +629,7 @@ static void handle_out_ep(int ep)
              req->wIndex,
              req->wLength);
 
-        usb_core_legacy_control_request(&req_copy);
+        usb_core_setup_received(&req_copy);
         setup_desc_init(setup_desc);
 
         ep_sts &= ~USB_EP_STAT_SETUP_RCVD;
@@ -734,7 +734,7 @@ void INT_USB_FUNC(void)
             got_set_configuration = 1;
 
             set_config.wValue = USB_DEV_STS & USB_DEV_STS_MASK_CFG;
-            usb_core_legacy_control_request(&set_config);
+            usb_core_setup_received(&set_config);
             intr &= ~USB_DEV_INTR_SET_CONFIG;
         }
         if (intr & USB_DEV_INTR_EARLY_SUSPEND) {/* idle >3ms detected */

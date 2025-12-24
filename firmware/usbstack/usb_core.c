@@ -184,10 +184,71 @@ static int usb_no_host_callback(struct timeout *tmo)
 }
 #endif
 
+static struct usb_ctrlrequest handling_request;
+static struct usb_ctrlrequest pending_request;
+static volatile bool have_pending_request;
+
+/* control endpoint typical state flow
+ * READY -setup_received(IN, wLength==0)->
+ *           HANDLING_TX_CONTROL -control_response(size==0)->
+ *           EXPECT_TX_STATUS_COMP -transfer_complete(OUT)->
+ *           READY
+ *       -setup_received(IN, wLength>0)->
+ *           HANDLING_TX_CONTROL -control_response(size>0)->
+ *           EXPECT_TX_DATA_STATUS_COMP
+ *           -transfer_complete(OUT)->
+ *               EXPECT_TX_DATA_COMP -transfer_complete(IN)->
+ *               READY
+ *           -transfer_complete(IN)->
+ *               EXPECT_TX_STATUS_COMP -transfer_complete(OUT)->
+ *               READY
+ *       -setup_received(OUT, wLength==0)->
+ *           HANDLING_RX_CONTROL -control_response(size==0)->
+ *           EXPECT_RX_STATUS_COMP -transfer_complete(IN)->
+ *           READY
+ *       -setup_received(OUT, wLength>0)->
+ *           HANDLING_RX_CONTROL ->
+ *           EXPECT_RX_DATA_COMP -transfer_complete(OUT)->
+ *           HANDLING_TX_CONTROL -control_response(size==0)->
+ *           EXPECT_RX_STATUS_COMP -transfer_complete()->
+ *           READY
+ * */
+enum {
+    EP0_READY,                      /* waiting for new setup packet */
+    /* IN request */
+    EP0_HANDLING_TX_CONTROL,        /* control in received, usb thread is processing it */
+    EP0_EXPECT_TX_DATA_STATUS_COMP, /* sending control in data phase */
+    EP0_EXPECT_TX_DATA_COMP,        /* status packet received earlier than tx completion */
+    EP0_EXPECT_TX_STATUS_COMP,      /* receiving status */
+    /* OUT request */
+    EP0_HANDLING_RX_CONTROL,        /* control out received, usb thread is processing it */
+    EP0_EXPECT_RX_DATA_COMP,        /* receiving control out data phase */
+    EP0_EXPECT_RX_STATUS_COMP,      /* sending status */
+};
+static volatile int ep0_state;
+
+#define TRACE_EP0_STATE 0
+#if TRACE_EP0_STATE == 1
+#define set_ep0_state(new) \
+    { \
+        logf("usb_core:%d ep0_state %d -> %d", __LINE__, ep0_state, new); \
+        ep0_state = new; \
+    }
+#else
+#define set_ep0_state(new) {ep0_state = new;}
+#endif
+
+struct usb_transfer_completion_event_data
+{
+    struct usb_ctrlrequest* req;
+    unsigned char ep;
+    int status;
+    int length;
+};
+
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, void* reqdata,
-    unsigned char* dest);
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size);
 
 static struct
 {
@@ -232,18 +293,8 @@ static struct usb_class_driver* drivers[USB_NUM_DRIVERS] =
 #endif
 };
 
-#ifdef USB_LEGACY_CONTROL_API
-static struct usb_ctrlrequest buffered_request;
-static struct usb_ctrlrequest* volatile active_request = NULL;
-static volatile unsigned int num_active_requests = 0;
-static void* volatile control_write_data = NULL;
-static volatile bool control_write_data_done = false;
-#endif
-
 static int usb_core_do_set_config(uint8_t new_config);
-static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
-
-static unsigned char response_data[256] USB_DEVBSS_ATTR;
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size);
 
 #define is_active(driver) ((driver)->enabled && !(driver)->error && (driver)->config == usb_config)
 #define has_if(driver, interface) ((interface) >= (driver)->first_interface && (interface) < (driver)->last_interface)
@@ -441,27 +492,24 @@ void usb_core_exit(void)
     logf("usb_core_exit() finished");
 }
 
+/* for sending/receiving control data */
+static uint8_t usb_control_data[256] USB_DEVBSS_ATTR;
+
 void usb_core_handle_transfer_completion(
     struct usb_transfer_completion_event_data* event)
 {
-    completion_handler_t handler;
-    int ep = event->endpoint;
+    int num = EP_NUM(event->ep);
+    int dir = EP_DIR(event->ep);
 
-    switch(ep) {
-        case EP_CONTROL:
-            logf("ctrl handled %ld req=0x%x",
-                 current_tick,
-                 ((struct usb_ctrlrequest*)event->data[0])->bRequest);
-
-            usb_core_control_request_handler(
-                (struct usb_ctrlrequest*)event->data[0], event->data[1]);
-            break;
-        default:
-            handler = ep_data[ep].completion_handler[EP_DIR(event->dir)];
-            if(handler != NULL)
-                handler(ep, event->dir, event->status, event->length);
-            break;
+    if(num == EP_CONTROL) {
+        logf("ctrl handled %ld req=0x%x", current_tick,event->req->bRequest);
+        usb_core_control_request_handler(event->req, usb_control_data, sizeof(usb_control_data));
+        return;
     }
+
+    completion_handler_t handler = ep_data[num].completion_handler[dir];
+    if(handler != NULL)
+        handler(num, dir == DIR_IN ? USB_DIR_IN : USB_DIR_OUT, event->status, event->length);
 }
 
 void usb_core_enable_driver(int driver, bool enabled)
@@ -676,8 +724,7 @@ retry:
     }
 }
 
-
-static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* reqdata)
+static void control_request_handler_drivers(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     int i, interface = req->wIndex & 0xff;
     bool handled = false;
@@ -694,7 +741,7 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
             if(req->bRequest == USB_REQ_SET_INTERFACE) {
                 logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
                 if(driver->set_interface && driver->set_interface(req->wIndex, req->wValue) >= 0) {
-                    usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                    usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
                     handled = true;
                 }
                 break;
@@ -706,26 +753,26 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
                     alt = driver->get_interface(req->wIndex);
 
                 if(alt >= 0 && alt < 255) {
-                    response_data[0] = alt;
-                    usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+                    reqdata[0] = alt;
+                    usb_core_control_response(USB_CONTROL_ACK, reqdata, 1);
                     handled = true;
                 }
                 break;
             }
         }
 
-        handled = driver->control_request(req, reqdata, response_data);
+        handled = driver->control_request(req, reqdata, reqdata_size);
         break; /* no other driver can handle it because it's interface specific */
     }
     if(!handled) {
         /* nope. flag error */
         logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
             req->wValue, req->wIndex, req->wLength);
-        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+        usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
-static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     int size;
     const void* ptr = NULL;
@@ -769,16 +816,16 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
 
             for(i = 0; i < USB_NUM_DRIVERS; i++) {
                 if(drivers[i]->enabled && drivers[i]->config == index + 1 && drivers[i]->get_config_descriptor) {
-                    size += drivers[i]->get_config_descriptor(&response_data[size], max_packet_size);
+                    size += drivers[i]->get_config_descriptor(reqdata + size, max_packet_size);
                 }
             }
 
             config_descriptor.bNumInterfaces = config_states[index].num_interfaces;
             config_descriptor.bConfigurationValue = index + 1;
             config_descriptor.wTotalLength = (uint16_t)size;
-            memcpy(&response_data[0], &config_descriptor, sizeof(struct usb_config_descriptor));
+            memcpy(reqdata, &config_descriptor, sizeof(struct usb_config_descriptor));
 
-            ptr = response_data;
+            ptr = reqdata;
         } break;
         case USB_DT_STRING:
             logf("STRING %d", index);
@@ -807,7 +854,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
 
         default:
             logf("ctrl desc.");
-            control_request_handler_drivers(req, reqdata);
+            control_request_handler_drivers(req, reqdata, reqdata_size);
             return;
     }
 
@@ -815,12 +862,12 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
         logf("data %d (%d)", size, length);
         length = MIN(size, length);
 
-        if (ptr != response_data)
-            memcpy(response_data, ptr, length);
+        if (ptr != reqdata)
+            memcpy(reqdata, ptr, length);
 
-        usb_drv_control_response(USB_CONTROL_ACK, response_data, length);
+        usb_core_control_response(USB_CONTROL_ACK, reqdata, length);
     } else {
-        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+        usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
@@ -916,22 +963,22 @@ static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
     }
 }
 
-static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_device(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     unsigned address;
 
     switch(req->bRequest) {
         case USB_REQ_GET_CONFIGURATION:
             logf("usb_core: GET_CONFIG");
-            response_data[0] = usb_config;
-            usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+            reqdata[0] = usb_config;
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 1);
             break;
         case USB_REQ_SET_CONFIGURATION:
             usb_drv_cancel_all_transfers();
             if(usb_core_do_set_config(req->wValue) == 0) {
-                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             } else {
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+                usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             }
             break;
         case USB_REQ_SET_ADDRESS:
@@ -939,85 +986,85 @@ static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
              * should just handle it themselves. We don't care beyond
              * knowing if we've been assigned an address yet, or not. */
             address = req->wValue;
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             usb_drv_cancel_all_transfers();
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             usb_drv_set_address(address);
             usb_core_do_set_addr(address);
             break;
         case USB_REQ_GET_DESCRIPTOR:
             logf("usb_core: GET_DESC %d", req->wValue >> 8);
-            request_handler_device_get_descriptor(req, reqdata);
+            request_handler_device_get_descriptor(req, reqdata, reqdata_size);
             break;
         case USB_REQ_SET_FEATURE:
             if(req->wValue==USB_DEVICE_TEST_MODE) {
                 int mode = req->wIndex >> 8;
-                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
                 usb_drv_set_test_mode(mode);
             } else {
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+                usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             }
             break;
         case USB_REQ_GET_STATUS:
-            response_data[0] = 0;
-            response_data[1] = 0;
-            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
+            reqdata[0] = 0;
+            reqdata[1] = 0;
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 2);
             break;
         #ifdef USB_ENABLE_IAP
         case USB_REQ_APPLE_SET_AVAIL_CURRENT:
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
         #endif
         default:
             logf("bad req:desc %d:%d", req->bRequest, req->wValue);
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
 
-static void request_handler_interface_standard(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_interface_standard(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     switch (req->bRequest)
     {
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
         case USB_REQ_GET_INTERFACE:
-            control_request_handler_drivers(req, reqdata);
+            control_request_handler_drivers(req, reqdata, reqdata_size);
             break;
         case USB_REQ_GET_STATUS:
-            response_data[0] = 0;
-            response_data[1] = 0;
-            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
+            reqdata[0] = 0;
+            reqdata[1] = 0;
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 2);
             break;
         case USB_REQ_CLEAR_FEATURE:
         case USB_REQ_SET_FEATURE:
             /* TODO: These used to be ignored (erroneously).
              * Should they be passed to the drivers instead? */
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
         default:
-            control_request_handler_drivers(req, reqdata);
+            control_request_handler_drivers(req, reqdata, reqdata_size);
             break;
     }
 }
 
-static void request_handler_interface(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_interface(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     switch(req->bRequestType & USB_TYPE_MASK) {
         case USB_TYPE_STANDARD:
-            request_handler_interface_standard(req, reqdata);
+            request_handler_interface_standard(req, reqdata, reqdata_size);
             break;
         case USB_TYPE_CLASS:
-            control_request_handler_drivers(req, reqdata);
+            control_request_handler_drivers(req, reqdata, reqdata_size);
             break;
         case USB_TYPE_VENDOR:
         default:
             logf("bad req:desc %d", req->bRequest);
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
 
-static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     bool handled = false;
     control_handler_t control_handler = NULL;
@@ -1027,67 +1074,67 @@ static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, void* 
             ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
 
     if(control_handler)
-        handled = control_handler(req, reqdata, response_data);
+        handled = control_handler(req, reqdata, reqdata_size);
 
     if(!handled) {
         /* nope. flag error */
         logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
              req->wValue, req->wIndex, req->wLength);
-        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+        usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
-static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
             usb_core_do_clear_feature(USB_RECIP_ENDPOINT,
                                       req->wIndex,
                                       req->wValue);
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
         case USB_REQ_SET_FEATURE:
             logf("usb_core: SET FEATURE (%d)", req->wValue);
             if(req->wValue == USB_ENDPOINT_HALT)
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
 
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
         case USB_REQ_GET_STATUS:
-            response_data[0] = 0;
-            response_data[1] = 0;
+            reqdata[0] = 0;
+            reqdata[1] = 0;
             logf("usb_core: GET_STATUS");
             if(req->wIndex > 0)
-                response_data[0] = usb_drv_stalled(EP_NUM(req->wIndex),
-                                                    EP_DIR(req->wIndex));
+                reqdata[0] = usb_drv_stalled(EP_NUM(req->wIndex),
+                                             EP_DIR(req->wIndex));
 
-            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 2);
             break;
         default:
-            request_handler_endpoint_drivers(req, reqdata);
+            request_handler_endpoint_drivers(req, reqdata, reqdata_size);
             break;
     }
 }
 
-static void request_handler_endpoint(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_endpoint(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     switch(req->bRequestType & USB_TYPE_MASK) {
         case USB_TYPE_STANDARD:
-            request_handler_endpoint_standard(req, reqdata);
+            request_handler_endpoint_standard(req, reqdata, reqdata_size);
             break;
         case USB_TYPE_CLASS:
-            request_handler_endpoint_drivers(req, reqdata);
+            request_handler_endpoint_drivers(req, reqdata, reqdata_size);
             break;
         case USB_TYPE_VENDOR:
         default:
             logf("bad req:desc %d", req->bRequest);
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
 
 /* Handling USB requests starts here */
-static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata)
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
 #ifdef HAVE_USB_CHARGING_ENABLE
     timeout_cancel(&usb_no_host_timeout);
@@ -1105,17 +1152,17 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
 
     switch(req->bRequestType & USB_RECIP_MASK) {
         case USB_RECIP_DEVICE:
-            request_handler_device(req, reqdata);
+            request_handler_device(req, reqdata, reqdata_size);
             break;
         case USB_RECIP_INTERFACE:
-            request_handler_interface(req, reqdata);
+            request_handler_interface(req, reqdata, reqdata_size);
             break;
         case USB_RECIP_ENDPOINT:
-            request_handler_endpoint(req, reqdata);
+            request_handler_endpoint(req, reqdata, reqdata_size);
             break;
         default:
             logf("unsupported recipient");
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
@@ -1123,10 +1170,9 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
 static void do_bus_reset(void) {
     usb_address = 0;
     usb_state = DEFAULT;
-#ifdef USB_LEGACY_CONTROL_API
-    num_active_requests = 0;
-#endif
     bus_reset_pending = false;
+    set_ep0_state(EP0_READY);
+    have_pending_request = false;
 }
 
 /* called by usb_drv_int() */
@@ -1145,9 +1191,51 @@ void usb_core_bus_reset(void)
     }
 }
 
+static void signal_xfer_complete(int ep, struct usb_ctrlrequest* req, int status, int length) {
+    struct usb_transfer_completion_event_data* completion_event =
+        &ep_data[EP_NUM(ep)].completion_event[EP_DIR(ep)];
+
+    completion_event->req = req;
+    completion_event->ep = ep;
+    completion_event->status = status;
+    completion_event->length = length;
+    usb_signal_transfer_completion(completion_event);
+}
+
+static void process_setup_request(struct usb_ctrlrequest* req) {
+    set_ep0_state(req->bRequestType & USB_DIR_IN ? EP0_HANDLING_TX_CONTROL : EP0_HANDLING_RX_CONTROL);
+
+    if(ep0_state == EP0_HANDLING_TX_CONTROL || req->wLength == 0) {
+        signal_xfer_complete(EP_CONTROL | USB_DIR_IN, req, 0, 0);
+        return;
+    }
+
+    /* start control out data phase without usb thread interaction */
+    if(req->wLength > sizeof(usb_control_data)) {
+        logf("usb_core: control write too large %u > %u", req->wLength, sizeof(usb_control_data));
+        usb_drv_stall(EP_CONTROL, true, false);
+        return;
+    }
+    set_ep0_state(EP0_EXPECT_RX_DATA_COMP);
+    usb_drv_recv_nonblocking(EP_CONTROL, usb_control_data, req->wLength);
+    return;
+}
+
+static bool check_for_new_setup(void) {
+    int oldlevel = disable_irq_save();
+    if(!have_pending_request) {
+        restore_irq(oldlevel);
+        return false;
+    }
+    have_pending_request = false;
+    handling_request = pending_request;
+    process_setup_request(&handling_request);
+    restore_irq(oldlevel);
+    return true;
+}
+
 /* called by usb_drv_transfer_completed() */
-void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
-{
+void usb_core_transfer_complete(int endpoint, int dir, int status, int length) {
 #ifdef USB_BATCH_NON_NATIVE
     /* batch api */
     if(batch_ep != 0 && (endpoint | dir) == batch_ep) {
@@ -1158,37 +1246,52 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 
     /* Fast notification */
     fast_completion_handler_t handler = ep_data[endpoint].fast_completion_handler[EP_DIR(dir)];
-    if(handler != NULL && handler(endpoint, dir, status, length))
+    if(handler != NULL && handler(endpoint, dir, status, length)) {
         return; /* do not dispatch to the queue if handled */
-
-    void* data0 = NULL;
-    void* data1 = NULL;
-
-#ifdef USB_LEGACY_CONTROL_API
-    if(endpoint == EP_CONTROL) {
-        bool cwdd = control_write_data_done;
-        struct usb_ctrlrequest* req = active_request;
-
-        if(dir == USB_DIR_OUT && req && cwdd) {
-            data0 = req;
-            data1 = control_write_data;
-        } else {
-            return;
-        }
     }
-#endif
 
-    struct usb_transfer_completion_event_data* completion_event =
-        &ep_data[endpoint].completion_event[EP_DIR(dir)];
+    /* Non-control packet handling */
+    if(endpoint != EP_CONTROL) {
+        signal_xfer_complete(endpoint | dir, NULL, status, length);
+        return;
+    }
 
-    completion_event->endpoint = endpoint;
-    completion_event->dir = dir;
-    completion_event->data[0] = data0;
-    completion_event->data[1] = data1;
-    completion_event->status = status;
-    completion_event->length = length;
+    /* Control packet handling */
+    switch(dir | ep0_state) {
+    /* EXPECT_TX_DATA_STATUS_COMP -(status comp)-> EXPECT_TX_DATA_COMP -(data comp)-> READY 
+     *                            -(data comp)-> EXPECT_TX_STATUS_COMP -(status comp)-> READY */
+    case USB_DIR_OUT | EP0_EXPECT_TX_DATA_STATUS_COMP:
+        logf("usb_core: control-in done success=%d", status == 0 && length == 0);
+        set_ep0_state(EP0_EXPECT_TX_DATA_COMP);
+        break;
+    case USB_DIR_IN | EP0_EXPECT_TX_DATA_STATUS_COMP:
+        set_ep0_state(EP0_EXPECT_TX_STATUS_COMP);
+        break;
+    case USB_DIR_OUT | EP0_EXPECT_TX_STATUS_COMP:
+        logf("usb_core: control-in done success=%d", status == 0 && length == 0);
+        set_ep0_state(EP0_READY);
+        break;
+    case USB_DIR_IN | EP0_EXPECT_TX_DATA_COMP:
+        set_ep0_state(EP0_READY);
+        break;
+    /* EXPECT_RX_DATA_COMP -(data comp)-> HANDLING_RX_CONTROL [-(send status)-> EXPECT_RX_STATUS_COMP] -(status comp)-> READY
+     *                                                        ^ done in control_response() */
+    case USB_DIR_OUT | EP0_EXPECT_RX_DATA_COMP:
+        set_ep0_state(EP0_HANDLING_RX_CONTROL);
+        signal_xfer_complete(EP_CONTROL | USB_DIR_OUT, &handling_request, status, length);
+        break;
+    case USB_DIR_IN | EP0_EXPECT_RX_STATUS_COMP:
+        logf("usb_core: control-out done success=%d", status == 0 && length == 0);
+        set_ep0_state(EP0_READY);
+        break;
+    default:
+        panicf("unhandled endpoint xfer completion ep0_state=%d dir=%d", ep0_state, dir);
+        break;
+    }
 
-    usb_signal_transfer_completion(completion_event);
+    if(ep0_state == EP0_READY) {
+        check_for_new_setup();
+    }
 }
 
 void usb_core_handle_notify(long id, intptr_t data)
@@ -1227,153 +1330,68 @@ void usb_core_handle_notify(long id, intptr_t data)
     }
 }
 
-void usb_core_control_request(struct usb_ctrlrequest* req, void* reqdata)
-{
-    struct usb_transfer_completion_event_data* completion_event =
-        &ep_data[EP_CONTROL].completion_event[EP_DIR(USB_DIR_IN)];
-
-    completion_event->endpoint = EP_CONTROL;
-    completion_event->dir = 0;
-    completion_event->data[0] = (void*)req;
-    completion_event->data[1] = reqdata;
-    completion_event->status = 0;
-    completion_event->length = 0;
-    logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
-    usb_signal_transfer_completion(completion_event);
-}
-
-void usb_core_control_complete(int status)
-{
-    /* We currently don't use this, it's here to make the API look good ;)
-     * It makes sense to #define it away on normal builds.
-     */
-    (void)status;
-    logf("ctrl complete %ld, %d", current_tick, status);
-}
-
-#ifdef USB_LEGACY_CONTROL_API
-/* Only needed if the driver does not support the new API yet */
-void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
-{
-    /* Only submit non-overlapping requests */
-    if (num_active_requests++ == 0)
-    {
-        buffered_request = *req;
-        active_request = &buffered_request;
-        control_write_data = NULL;
-        control_write_data_done = false;
-
-        usb_core_control_request(req, NULL);
+void usb_core_setup_received(struct usb_ctrlrequest* req) {
+    if(bus_reset_pending) {
+        logf("usb_core: bus resetting tick=%lu", current_tick);
+        return;
     }
+    if(ep0_state != EP0_READY) {
+        logf("usb_core: control pending tick=%lu", current_tick);
+        pending_request = *req;
+        have_pending_request = true;
+        return;
+    }
+    handling_request = *req;
+    process_setup_request(&handling_request);
 }
 
-void usb_drv_control_response(enum usb_control_response resp,
-                              void* data, int length)
-{
-    struct usb_ctrlrequest* req = active_request;
-    unsigned int num_active = num_active_requests--;
+void usb_core_control_response(enum usb_control_response response, const void* data, size_t size) {
+    logf("usb_core: response ack=%d size=%u ep0_state=%d tick=%lu", response, size, ep0_state, current_tick);
 
-    /*
-     * There should have been a prior request submission, at least.
-     * FIXME: It seems the iPod video can get here and ignoring it
-     * allows the connection to succeed??
-     */
-    if (num_active == 0)
-    {
-        //panicf("null ctrl req");
+    if((ep0_state == EP0_HANDLING_TX_CONTROL || ep0_state == EP0_HANDLING_RX_CONTROL) && check_for_new_setup()) {
         return;
     }
 
-    /*
-     * This can happen because an active request was already pending when
-     * the driver submitted a new one in usb_core_legacy_control_request().
-     * This could mean two things: (a) a driver bug; or (b) the host sent
-     * another request because we were too slow in handling an earlier one.
-     *
-     * The USB spec requires we respond to the latest request and drop any
-     * earlier ones, but that's not easy to do with the current design of
-     * the USB stack. Thus, the host will be expecting a response for the
-     * latest request, but this response is for the _earliest_ request.
-     *
-     * Play it safe and return a STALL. At this point we've recovered from
-     * the error on our end and will be ready to handle the next request.
-     */
-    if (num_active > 1)
-    {
-        active_request = NULL;
-        num_active_requests = 0;
+    if(response == USB_CONTROL_STALL) {
+        set_ep0_state(EP0_READY);
         usb_drv_stall(EP_CONTROL, true, true);
         return;
     }
 
-    if(req->wLength == 0)
-    {
-        active_request = NULL;
-
-        /* No-data request */
-        if(resp == USB_CONTROL_ACK)
-            usb_drv_send(EP_CONTROL, data, length);
-        else if(resp == USB_CONTROL_STALL)
-            usb_drv_stall(EP_CONTROL, true, true);
-        else
-            panicf("RECEIVE on non-data req");
-    }
-    else if(req->bRequestType & USB_DIR_IN)
-    {
-        /* Control read request */
-        if(resp == USB_CONTROL_ACK)
-        {
-            active_request = NULL;
+    switch(ep0_state) {
+    case EP0_HANDLING_TX_CONTROL:
+        if(size == 0) {
+            /* non-data control-in */
+            set_ep0_state(EP0_EXPECT_TX_STATUS_COMP);
             usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, data, length);
+        } else {
+            /* control-in data phase */
+            set_ep0_state(EP0_EXPECT_TX_DATA_STATUS_COMP);
+            /* prepare for a status packet before sending data.
+             * note that it is driver and host-dependent that which completion
+             * of the following two commands is notified first. */
+            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
+            /* send data packets */
+            usb_drv_send_nonblocking(EP_CONTROL, (void*)data, size);
         }
-        else if(resp == USB_CONTROL_STALL)
-        {
-            active_request = NULL;
-            usb_drv_stall(EP_CONTROL, true, true);
+        break;
+    case EP0_HANDLING_RX_CONTROL:
+        if(size == 0) {
+            /* non-data control-out */
+            set_ep0_state(EP0_EXPECT_RX_STATUS_COMP);
+            /* send status packet*/
+            usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+        } else {
+            /* control-out data phase */
+            /* should not happen, we've received it internally */
+            logf("usb_core: receiving control data by class drivers is not allowed");
         }
-        else
-        {
-            panicf("RECEIVE on ctrl read req");
-        }
-    }
-    else if(!control_write_data_done)
-    {
-        /* Control write request, data phase */
-        if(resp == USB_CONTROL_RECEIVE)
-        {
-            control_write_data = data;
-            control_write_data_done = true;
-            usb_drv_recv_nonblocking(EP_CONTROL, data, length);
-        }
-        else if(resp == USB_CONTROL_STALL)
-        {
-            /* We should stall the OUT endpoint here, but the old code did
-             * not do so and some drivers may not handle it correctly. */
-            active_request = NULL;
-            usb_drv_stall(EP_CONTROL, true, true);
-        }
-        else
-        {
-            panicf("ACK on ctrl write data");
-        }
-    }
-    else
-    {
-        active_request = NULL;
-        control_write_data = NULL;
-        control_write_data_done = false;
-
-        /* Control write request, status phase */
-        if(resp == USB_CONTROL_ACK)
-            usb_drv_send(EP_CONTROL, NULL, 0);
-        else if(resp == USB_CONTROL_STALL)
-            usb_drv_stall(EP_CONTROL, true, true);
-        else
-            panicf("RECEIVE on ctrl write status");
+        break;
+    default:
+        panicf("usb_core: invalid control response ep_state=%d", ep0_state);
+        break;
     }
 }
-#endif
 
 void usb_core_notify_set_address(uint8_t addr)
 {

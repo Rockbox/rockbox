@@ -594,9 +594,11 @@ static void usb_hid_transfer_complete(int ep, int dir, int status, int length)
  * In order to allow sending info to the DAP, the Set Report mechanism can be
  * used by defining vendor specific output reports and send them from the host
  * to the DAP using the host's custom driver */
-static int usb_hid_set_report(struct usb_ctrlrequest *req, void *reqdata)
+static int usb_hid_set_report(struct usb_ctrlrequest *req, uint8_t* reqdata, size_t reqdata_size)
 {
-    static unsigned char buf[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
+    (void)reqdata;
+    (void)reqdata_size;
+
     int length;
 
     if ((req->wValue >> 8) != USB_HID_REPORT_TYPE_OUTPUT)
@@ -621,28 +623,22 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req, void *reqdata)
         return 4;
     }
 
-    if(!reqdata) {
-        memset(buf, 0, length);
-        usb_drv_control_response(USB_CONTROL_RECEIVE, buf, length);
-        return 0;
-    }
-
 #ifdef LOGF_ENABLE
-    if (buf[1] & 0x01)
+    if (reqdata[1] & 0x01)
         logf("Num Lock enabled");
-    if (buf[1] & 0x02)
+    if (reqdata[1] & 0x02)
         logf("Caps Lock enabled");
-    if (buf[1] & 0x04)
+    if (reqdata[1] & 0x04)
         logf("Scroll Lock enabled");
-    if (buf[1] & 0x08)
+    if (reqdata[1] & 0x08)
         logf("Compose enabled");
-    if (buf[1] & 0x10)
+    if (reqdata[1] & 0x10)
         logf("Kana enabled");
 #endif
 
     /* Defining other LEDs and setting them from the USB host (OS) can be used
      * to send messages to the DAP */
-    usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+    usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
     return 0;
 }
 
@@ -674,15 +670,14 @@ static int usb_hid_get_report(struct usb_ctrlrequest *req, unsigned char* dest)
 
     dest[0] = 0;
     dest[1] = battery_level();
-    usb_drv_control_response(USB_CONTROL_ACK, dest, 2);
+    usb_core_control_response(USB_CONTROL_ACK, dest, 2);
     return 0;
 }
 
 /* called by usb_core_control_request() */
-static bool usb_hid_control_request(struct usb_ctrlrequest *req, void *reqdata, unsigned char *dest)
+static bool usb_hid_control_request(struct usb_ctrlrequest *req, uint8_t* reqdata, size_t reqdata_size)
 {
-    (void)reqdata;
-
+    unsigned char* dest = reqdata;
     unsigned char *orig_dest = dest;
     switch (req->bRequestType & USB_TYPE_MASK)
     {
@@ -706,7 +701,7 @@ static bool usb_hid_control_request(struct usb_ctrlrequest *req, void *reqdata, 
 
         if (dest != orig_dest)
         {
-            usb_drv_control_response(USB_CONTROL_ACK, orig_dest, dest - orig_dest);
+            usb_core_control_response(USB_CONTROL_ACK, orig_dest, dest - orig_dest);
             return true;
         }
         break;
@@ -723,13 +718,13 @@ static bool usb_hid_control_request(struct usb_ctrlrequest *req, void *reqdata, 
         switch (req->bRequest)
         {
         case USB_HID_SET_REPORT:
-            rc = usb_hid_set_report(req, reqdata);
+            rc = usb_hid_set_report(req, reqdata, reqdata_size);
             break;
         case USB_HID_GET_REPORT:
             rc = usb_hid_get_report(req, dest);
             break;
         case USB_HID_SET_IDLE:
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
             return true;
         default:
             /* all other requests are errors */

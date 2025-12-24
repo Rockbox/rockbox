@@ -307,9 +307,6 @@ static struct usb_class_driver_ep_allocation ep_allocs[2] = {
 #define EP_ISO_OUT (ep_allocs[0].ep)
 #define EP_ISO_FEEDBACK_IN (ep_allocs[1].ep)
 
-/* small buffer used for control transfers */
-static unsigned char usb_buffer[128] USB_DEVBSS_ATTR;
-
 /* number of buffers: 2 is double-buffering (one for usb, one for playback),
  * 3 is triple-buffering (one for usb, one for playback, one for queuing), ... */
 
@@ -833,8 +830,10 @@ int32_t usb_audio_get_samples_rx_perframe(void)
     return samples_received_report;
 }
 
-static bool usb_audio_as_ctrldata_endpoint_request(struct usb_ctrlrequest* req, void *reqdata)
+static bool usb_audio_as_ctrldata_endpoint_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
+    (void)reqdata_size; /* should check this? */
+
     /* only support sampling frequency */
     if(req->wValue != (USB_AS_EP_CS_SAMPLING_FREQ_CTL << 8))
     {
@@ -848,40 +847,26 @@ static bool usb_audio_as_ctrldata_endpoint_request(struct usb_ctrlrequest* req, 
             if(req->wLength != 3)
             {
                 logf("usbaudio: bad length for SET_CUR");
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+                usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
                 return true;
             }
             logf("usbaudio: SET_CUR sampling freq");
 
-            if (reqdata) { /* control write, second pass */
-                set_playback_sampling_frequency(decode3(reqdata));
-                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
-                return true;
-            } else { /* control write, first pass */
-                bool error = false;
+            set_playback_sampling_frequency(decode3(reqdata));
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
 
-                if (req->wLength != 3)
-                    error = true;
-                    /* ... other validation? */
-
-                if (error)
-                    usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
-                else
-                    usb_drv_control_response(USB_CONTROL_RECEIVE, usb_buffer, 3);
-
-                return true;
-            }
+            return true;
 
         case USB_AC_GET_CUR:
             if(req->wLength != 3)
             {
                 logf("usbaudio: bad length for GET_CUR");
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+                usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
                 return true;
             }
             logf("usbaudio: GET_CUR sampling freq");
-            encode3(usb_buffer, usb_audio_get_playback_sampling_frequency());
-            usb_drv_control_response(USB_CONTROL_ACK, usb_buffer, req->wLength);
+            encode3(reqdata, usb_audio_get_playback_sampling_frequency());
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 3);
 
             return true;
 
@@ -892,12 +877,12 @@ static bool usb_audio_as_ctrldata_endpoint_request(struct usb_ctrlrequest* req, 
     return true;
 }
 
-static bool usb_audio_endpoint_request(struct usb_ctrlrequest* req, void *reqdata)
+static bool usb_audio_endpoint_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     int ep = req->wIndex & 0xff;
 
     if(ep == EP_ISO_OUT)
-        return usb_audio_as_ctrldata_endpoint_request(req, reqdata);
+        return usb_audio_as_ctrldata_endpoint_request(req, reqdata, reqdata_size);
     else
     {
         logf("usbaudio: unhandled ep req (ep=%d)", ep);
@@ -1029,8 +1014,10 @@ int usb_audio_get_cur_volume(void)
     return usb_audio_volume_to_db(vol, sound_numdecimals(SOUND_VOLUME));
 }
 
-static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, void *reqdata)
+static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
+    (void)reqdata_size; /* should check this? */
+
     int channel = req->wValue & 0xff;
     int selector = req->wValue >> 8;
     uint8_t cmd = (req->bRequest & ~USB_AC_GET_REQ);
@@ -1066,7 +1053,7 @@ static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, void *re
         if(!handled)
         {
             logf("usbaudio: unhandled get control 0x%x selector 0x%x of feature unit", cmd, selector);
-            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
             return true;
         }
 
@@ -1077,9 +1064,9 @@ static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, void *re
         }
 
         for(i = 0; i < req->wLength; i++)
-            usb_buffer[i] = (value >> (8 * i)) & 0xff;
+            reqdata[i] = (value >> (8 * i)) & 0xff;
 
-        usb_drv_control_response(USB_CONTROL_ACK, usb_buffer, req->wLength);
+        usb_core_control_response(USB_CONTROL_ACK, reqdata, req->wLength);
         return true;
     }
     else
@@ -1091,68 +1078,47 @@ static bool usb_audio_set_get_feature_unit(struct usb_ctrlrequest* req, void *re
             return false;
         }
 
-        if (reqdata) {
+        for(i = 0; i < req->wLength; i++)
+            value = value | (reqdata[i] << (i * 8));
 
-            for(i = 0; i < req->wLength; i++)
-                value = value | (usb_buffer[i] << (i * 8));
+        switch(selector)
+        {
+            case USB_AC_FU_MUTE:
+                handled = (req->wLength == 1) && feature_unit_set_mute(value, cmd);
+                break;
+            case USB_AC_VOLUME_CONTROL:
+                handled = (req->wLength == 2) && feature_unit_set_volume(value, cmd);
+                break;
+            default:
+                handled = false;
+                logf("usbaudio: unhandled control selector of feature unit (0x%x)", selector);
+                break;
+        }
 
-            switch(selector)
-            {
-                case USB_AC_FU_MUTE:
-                    handled = (req->wLength == 1) && feature_unit_set_mute(value, cmd);
-                    break;
-                case USB_AC_VOLUME_CONTROL:
-                    handled = (req->wLength == 2) && feature_unit_set_volume(value, cmd);
-                    break;
-                default:
-                    handled = false;
-                    logf("usbaudio: unhandled control selector of feature unit (0x%x)", selector);
-                    break;
-            }
-
-            if(!handled)
-            {
-                logf("usbaudio: unhandled set control 0x%x selector 0x%x of feature unit", cmd, selector);
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
-                return true;
-            }
-
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
-            return true;
+        if(!handled) {
+            logf("usbaudio: unhandled set control 0x%x selector 0x%x of feature unit", cmd, selector);
+            usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
         } else {
-            /*
-             * should handle the following (req->wValue >> 8):
-             * USB_AC_FU_MUTE
-             * USB_AC_VOLUME_CONTROL
-             */
-
-            bool error = false;
-
-            if (error)
-                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
-            else
-                usb_drv_control_response(USB_CONTROL_RECEIVE, usb_buffer, 3);
-
-            return true;
+            usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
         }
 
         return true;
     }
 }
 
-static bool usb_audio_ac_set_get_request(struct usb_ctrlrequest* req, void *reqdata)
+static bool usb_audio_ac_set_get_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     switch(req->wIndex >> 8)
     {
         case AC_PLAYBACK_FEATURE_ID:
-            return usb_audio_set_get_feature_unit(req, reqdata);
+            return usb_audio_set_get_feature_unit(req, reqdata, reqdata_size);
         default:
             logf("usbaudio: unhandled set/get on entity %d", req->wIndex >> 8);
             return false;
     }
 }
 
-static bool usb_audio_interface_request(struct usb_ctrlrequest* req, void *reqdata)
+static bool usb_audio_interface_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
     int intf = req->wIndex & 0xff;
 
@@ -1163,7 +1129,7 @@ static bool usb_audio_interface_request(struct usb_ctrlrequest* req, void *reqda
             case USB_AC_SET_CUR: case USB_AC_SET_MIN: case USB_AC_SET_MAX: case USB_AC_SET_RES:
             case USB_AC_SET_MEM: case USB_AC_GET_CUR: case USB_AC_GET_MIN: case USB_AC_GET_MAX:
             case USB_AC_GET_RES: case USB_AC_GET_MEM:
-                return usb_audio_ac_set_get_request(req, reqdata);
+                return usb_audio_ac_set_get_request(req, reqdata, reqdata_size);
             default:
                 logf("usbaudio: unhandled ac intf req 0x%x", req->bRequest);
                 return false;
@@ -1182,17 +1148,14 @@ static bool usb_audio_interface_request(struct usb_ctrlrequest* req, void *reqda
  *
  * Return true if this driver handles the request, false otherwise.
  */
-static bool usb_audio_control_request(struct usb_ctrlrequest* req, void *reqdata, unsigned char* dest)
+static bool usb_audio_control_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
-    (void) reqdata;
-    (void) dest;
-
     switch(req->bRequestType & USB_RECIP_MASK)
     {
         case USB_RECIP_ENDPOINT:
-            return usb_audio_endpoint_request(req, reqdata);
+            return usb_audio_endpoint_request(req, reqdata, reqdata_size);
         case USB_RECIP_INTERFACE:
-            return usb_audio_interface_request(req, reqdata);
+            return usb_audio_interface_request(req, reqdata, reqdata_size);
         default:
             logf("usbaudio: unhandled req type 0x%x", req->bRequestType);
             return false;
