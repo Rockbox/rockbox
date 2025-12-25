@@ -971,10 +971,13 @@ bool simplelist_show_list(struct simplelist_info *info)
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
         {
+            gui_synclist_scroll_stop(&lists);
             return true;
         }
     }
     talk_shutup();
+
+    gui_synclist_scroll_stop(&lists);
 
 #ifdef HAVE_LCD_COLOR
     if (info->selection_color)
