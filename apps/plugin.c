@@ -48,6 +48,7 @@
 #include "file.h"
 #include "core_keymap.h"
 #include "language.h"
+#include "statusbar-skinned.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -1065,6 +1066,10 @@ int plugin_load(const char* plugin, const void* parameter)
         FOR_NB_SCREENS(i)
             viewportmanager_theme_undo(i, true);
     }
+    else
+        /* fix dangling sbs_title pointer */
+        FOR_NB_SCREENS(i)
+            sb_set_title_text(NULL, Icon_NOICON, i);
 
     plugin_check_open_close__exit();
 
