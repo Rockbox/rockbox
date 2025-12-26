@@ -69,7 +69,7 @@ void system_init(void)
     stm_enable_caches();
 
     /* Initialize system clocks */
-    stm_target_clock_init();
+    stm_clock_init();
 
     /* TODO: move this */
     systick_init(1000/HZ);
