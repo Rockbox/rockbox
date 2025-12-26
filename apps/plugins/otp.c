@@ -1051,8 +1051,8 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     MENUITEM_STRINGLIST(menu, "One-Time Password Manager", NULL,
-                        "Add Account",
                         "Generate Code",
+                        "Add Account",
                         "Help",
                         "Advanced",
                         "Quit");
@@ -1064,10 +1064,10 @@ enum plugin_status plugin_start(const void* parameter)
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
         case 0:
-            add_acct();
+            gen_codes();
             break;
         case 1:
-            gen_codes();
+            add_acct();
             break;
         case 2:
             show_help();
