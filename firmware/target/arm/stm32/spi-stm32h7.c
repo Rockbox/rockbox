@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "spi-stm32h7.h"
-#include "regs/stm32h743/spi.h"
 #include "panic.h"
+#include "kernel.h"
+#include "regs/stm32h743/spi.h"
 
 /*
  * Align the max transfer size to ensure it will always be a multiple
@@ -30,34 +31,31 @@
 #define TSIZE_MAX \
     ALIGN_DOWN(BM_SPI_CR2_TSIZE >> BP_SPI_CR2_TSIZE, sizeof(uint32_t))
 
-static void stm_spi_set_cs(struct stm_spi *spi, bool enable)
-{
-    if (spi->set_cs)
-        spi->set_cs(spi, enable);
-
-    reg_writelf(spi->regs, SPI_CR1, SSI(1));
-}
-
 static void stm_spi_enable(struct stm_spi *spi, bool hd_tx, size_t size)
 {
     size_t tsize = size / spi->frame_size;
     if (tsize > TSIZE_MAX)
         panicf("%s: tsize > TSIZE_MAX", __func__);
 
+    if (spi->set_cs)
+        spi->set_cs(spi, true);
+
     /* TSIZE must be programmed before setting SPE. */
     reg_assignlf(spi->regs, SPI_CR2, TSIZE(tsize), TSER(0));
-    reg_writelf(spi->regs, SPI_CR1, HDDIR(hd_tx), SPE(1));
+    reg_writelf(spi->regs, SPI_CR1, HDDIR(hd_tx), SSI(1), SPE(1));
+    reg_assignlf(spi->regs, SPI_IER, RXPIE(1), TXPIE(1), EOTIE(1));
+
+    /* Set CSTART to kick off the transfer */
+    reg_writelf(spi->regs, SPI_CR1, CSTART(1));
 }
 
 static void stm_spi_disable(struct stm_spi *spi)
 {
     reg_assignlf(spi->regs, SPI_IFCR, TSERFC(1), TXTFC(1), EOTC(1));
     reg_writelf(spi->regs, SPI_CR1, SPE(0));
-}
 
-static void stm_spi_start(struct stm_spi *spi)
-{
-    reg_writelf(spi->regs, SPI_CR1, CSTART(1));
+    if (spi->set_cs)
+        spi->set_cs(spi, false);
 }
 
 static uint32_t stm_spi_pack(const void **bufp, size_t *sizep)
@@ -114,6 +112,8 @@ void stm_spi_init(struct stm_spi *spi,
     spi->regs = config->instance;
     spi->mode = config->mode;
     spi->set_cs = config->set_cs;
+
+    semaphore_init(&spi->sem, 1, 0);
 
     /* Set FIFO level based on 32-bit packed writes */
     if (config->frame_bits > 16)
@@ -176,8 +176,6 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
                  const void *tx_buf, void *rx_buf)
 {
     bool hd_tx = false;
-    size_t size_tx = tx_buf ? size : 0;
-    size_t size_rx = rx_buf ? size : 0;
 
     /* Ignore zero-length transfers. */
     if (size == 0)
@@ -199,35 +197,15 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
             hd_tx = true;
     }
 
-    stm_spi_set_cs(spi, true);
+    spi->tx_buf = tx_buf;
+    spi->tx_size = tx_buf ? size : 0;
+
+    spi->rx_buf = rx_buf;
+    spi->rx_size = rx_buf ? size : 0;
+
     stm_spi_enable(spi, hd_tx, size);
-    stm_spi_start(spi);
 
-    while (size_tx > 0 || size_rx > 0)
-    {
-        uint32_t sr = reg_readl(spi->regs, SPI_SR);
-
-        /* Handle FIFO write */
-        if (size_tx > 0 && reg_vreadf(sr, SPI_SR, TXP))
-        {
-            uint32_t data = stm_spi_pack(&tx_buf, &size_tx);
-
-            reg_varl(spi->regs, SPI_DR) = data;
-        }
-
-        /*
-         * Handle FIFO read. Since RXP is set only if the FIFO level
-         * exceeds the threshold we can't rely on it at the end of a
-         * transfer, and must check EOT as well.
-         */
-        if (size_rx > 0 &&
-            (reg_vreadf(sr, SPI_SR, RXP) || reg_vreadf(sr, SPI_SR, EOT)))
-        {
-            uint32_t data = reg_readl(spi->regs, SPI_DR);
-
-            stm_spi_unpack(&rx_buf, &size_rx, data);
-        }
-    }
+    semaphore_wait(&spi->sem, TIMEOUT_BLOCK);
 
     /*
      * Errata 2.22.2: Master data transfer stall at system clock much faster than SCK
@@ -242,6 +220,39 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
     udelay(5);
 
     stm_spi_disable(spi);
-    stm_spi_set_cs(spi, false);
     return 0;
+}
+
+void stm_spi_irq_handler(struct stm_spi *spi)
+{
+    while (true)
+    {
+        uint32_t sr = reg_readl(spi->regs, SPI_SR);
+
+        if (spi->tx_size == 0 && spi->rx_size == 0)
+        {
+            semaphore_release(&spi->sem);
+            reg_varl(spi->regs, SPI_IER) = 0;
+            return;
+        }
+
+        if (spi->tx_size > 0 && reg_vreadf(sr, SPI_SR, TXP))
+        {
+            uint32_t data = stm_spi_pack(&spi->tx_buf, &spi->tx_size);
+
+            reg_varl(spi->regs, SPI_DR) = data;
+            continue;
+        }
+
+        if (spi->rx_size > 0 &&
+            (reg_vreadf(sr, SPI_SR, RXP) || reg_vreadf(sr, SPI_SR, EOT)))
+        {
+            uint32_t data = reg_readl(spi->regs, SPI_DR);
+
+            stm_spi_unpack(&spi->rx_buf, &spi->rx_size, data);
+            continue;
+        }
+
+        break;
+    }
 }

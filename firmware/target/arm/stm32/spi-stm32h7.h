@@ -22,6 +22,7 @@
 #define __SPI_STM32H743_H__
 
 #include "system.h"
+#include "semaphore.h"
 #include <stddef.h>
 
 struct stm_spi;
@@ -67,6 +68,14 @@ struct stm_spi
     enum stm_spi_mode mode;
     stm_spi_set_cs_t set_cs;
     uint32_t frame_size;
+
+    const void *tx_buf;
+    size_t tx_size;
+
+    void *rx_buf;
+    size_t rx_size;
+
+    struct semaphore sem;
 };
 
 void stm_spi_init(struct stm_spi *spi,
@@ -74,6 +83,7 @@ void stm_spi_init(struct stm_spi *spi,
 
 int stm_spi_xfer(struct stm_spi *spi, size_t size,
                  const void *tx_buf, void *rx_buf);
+void stm_spi_irq_handler(struct stm_spi *spi);
 
 static inline int stm_spi_transmit(struct stm_spi *spi,
                                    const void *buf, size_t size)

@@ -21,6 +21,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "lcd.h"
+#include "nvic-arm.h"
 #include "spi-stm32h7.h"
 #include "gpio-stm32h7.h"
 #include "regs/stm32h743/rcc.h"
@@ -58,6 +59,7 @@ void lcd_init_device(void)
 
     /* Configure SPI bus */
     stm_spi_init(&spi, &spi_cfg);
+    nvic_enable_irq(NVIC_IRQN_SPI5);
 
     /* Ensure controller is reset */
     gpio_set_level(GPIO_LCD_RESET, 0);
@@ -132,4 +134,9 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         stm_spi_transmit(&spi, &row[x * 2], width * sizeof(*row) * 2);
     }
+}
+
+void spi5_irq_handler(void)
+{
+    stm_spi_irq_handler(&spi);
 }
