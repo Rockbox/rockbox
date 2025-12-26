@@ -719,3 +719,68 @@ DBGMCU @ 0x5C001000 : block {
         00 DBGSLEEP_D1
     }
 }
+
+// AXI interconnect global programmer view
+GPV_AXI @ 0x51000000 : block {
+    PERIPH_ID_4 @ 0x1FD0 : reg
+    PERIPH_ID_5 @ 0x1FD4 : reg
+    PERIPH_ID_6 @ 0x1FD8 : reg
+    PERIPH_ID_7 @ 0x1FDC : reg
+    PERIPH_ID_0 @ 0x1FE0 : reg
+    PERIPH_ID_1 @ 0x1FE4 : reg
+    PERIPH_ID_2 @ 0x1FE8 : reg
+    PERIPH_ID_3 @ 0x1FEC : reg
+    COMP_ID_0 @ 0x1FF0 : reg
+    COMP_ID_1 @ 0x1FF4 : reg
+    COMP_ID_2 @ 0x1FF8 : reg
+    COMP_ID_3 @ 0x1FFC : reg
+
+    // valid index is 1 to 7
+    TARGx_FN_MOD_ISS_BM @ 0x1008 [8; 0x1000] : reg {
+        1 WRITE_ISS_OVERRIDE
+        0 READ_ISS_OVERRIDE
+    }
+
+    // valid index is 1, 2, and 7
+    TARGx_FN_MOD2 @ 0x1024 [8; 0x1000] : reg {
+        0 BYPASS_MERGE
+    }
+
+    // valid index is 1 and 2
+    TARGx_FN_MOD_LB @ 0x102C [3; 0x1000] : reg {
+        0 FN_MOD_LB
+    }
+
+    // valid index is 1, 2, and 7
+    TARGx_FN_MOD @ 0x1108 [8; 0x1000] : reg {
+        1 WRITE_ISS_OVERRIDE
+        0 READ_ISS_OVERRIDE
+    }
+
+    // valid index is 1 and 3
+    INIx_FN_MOD2 @ 0x41024 [4; 0x1000] : reg {
+        0 BYPASS_MERGE
+    }
+
+    // valid index is 1 and 3
+    INIx_FN_MOD_AHB @ 0x41028 [4; 0x1000] : reg {
+        1 WR_INC_OVERRIDE
+        0 RD_INC_OVERRIDE
+    }
+
+    // valid index is 1 to 7 (datasheet says 76, probably a typo)
+    INIx_READ_QOS @ 0x41100 [8; 0x1000] : reg {
+        3 0 AR_QOS
+    }
+
+    // valid index is 1 to 7 (datasheet says 76, probably a typo)
+    INIx_WRITE_QOS @ 0x41104 [8; 0x1000] : reg {
+        3 0 AW_QOS
+    }
+
+    // valid index is 1 to 7 (datasheet says 76, probably a typo)
+    INIx_FN_MOD @ 0x41108 [8; 0x1000] : reg {
+        1 WRITE_ISS_OVERRIDE
+        0 READ_ISS_OVERRIDE
+    }
+}
