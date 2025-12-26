@@ -62,8 +62,8 @@ __vectors_platform:
     .word   i2c_irq_handler             /* [ 32] I2C1 error */
     .word   i2c_irq_handler             /* [ 33] I2C2 event */
     .word   i2c_irq_handler             /* [ 34] I2C2 error */
-    .word   spi_irq_handler             /* [ 35] SPI1 */
-    .word   spi_irq_handler             /* [ 36] SPI2 */
+    .word   spi1_irq_handler            /* [ 35] SPI1 */
+    .word   spi2_irq_handler            /* [ 36] SPI2 */
     .word   UIE                         /* [ 37] */
     .word   UIE                         /* [ 38] */
     .word   UIE                         /* [ 39] */
@@ -78,7 +78,7 @@ __vectors_platform:
     .word   UIE                         /* [ 48] */
     .word   sdmmc_irq_handler           /* [ 49] SDMMC1 */
     .word   UIE                         /* [ 50] */
-    .word   spi_irq_handler             /* [ 51] SPI3 */
+    .word   spi3_irq_handler            /* [ 51] SPI3 */
     .word   UIE                         /* [ 52] */
     .word   UIE                         /* [ 53] */
     .word   UIE                         /* [ 54] */
@@ -111,9 +111,9 @@ __vectors_platform:
     .word   UIE                         /* [ 81] */
     .word   UIE                         /* [ 82] */
     .word   UIE                         /* [ 83] */
-    .word   spi_irq_handler             /* [ 84] SPI4 */
-    .word   spi_irq_handler             /* [ 85] SPI5 */
-    .word   spi_irq_handler             /* [ 86] SPI6 */
+    .word   spi4_irq_handler            /* [ 84] SPI4 */
+    .word   spi5_irq_handler            /* [ 85] SPI5 */
+    .word   spi6_irq_handler            /* [ 86] SPI6 */
     .word   sai_irq_handler             /* [ 87] SAI1 */
     .word   lcdc_irq_handler            /* [ 88] LCDC */
     .word   lcdc_irq_handler            /* [ 89] LCDC error */
