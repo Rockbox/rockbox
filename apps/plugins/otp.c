@@ -541,7 +541,6 @@ static void show_code(int acct)
         rb->splash(0, "TOTP not supported on this device!");
     }
 #endif
-    rb->sleep(HZ * 2);
     while(1)
     {
         int button = rb->button_get(true);
