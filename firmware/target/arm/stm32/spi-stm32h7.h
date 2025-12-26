@@ -23,6 +23,7 @@
 
 #include "system.h"
 #include "semaphore.h"
+#include "clock-stm32h7.h"
 #include <stddef.h>
 
 struct stm_spi;
@@ -49,6 +50,7 @@ struct stm_spi_config
 {
     /* Peripheral instance base address; one of ITA_SPIx */
     uint32_t instance;
+    enum stm_clock clock;
     enum stm_spi_mode mode;
     enum stm_spi_protocol proto;
     stm_spi_set_cs_t set_cs;
@@ -65,6 +67,7 @@ struct stm_spi_config
 struct stm_spi
 {
     uint32_t regs;
+    enum stm_clock clock;
     enum stm_spi_mode mode;
     stm_spi_set_cs_t set_cs;
     uint32_t frame_size;

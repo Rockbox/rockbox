@@ -133,6 +133,11 @@ static void init_lse(void)
     reg_writef(PWR_CR1, DBP(0));
 }
 
+static void init_periph_clock(void)
+{
+    reg_writef(RCC_D2CCIP1R, SPI45SEL_V(HSE));
+}
+
 void stm_target_clock_init(void)
 {
     init_hse();
@@ -140,4 +145,20 @@ void stm_target_clock_init(void)
     init_vos();
     init_system_clock();
     init_lse();
+    init_periph_clock();
+}
+
+void stm_target_clock_enable(enum stm_clock clock, bool enable)
+{
+    switch (clock)
+    {
+    case STM_CLOCK_SPI5_KER:
+        reg_writef(RCC_APB2ENR, SPI5EN(enable));
+        reg_writef(RCC_APB2LPENR, SPI5EN(enable));
+        break;
+
+    default:
+        panicf("%s: unsupported clock %d", __func__, (int)clock);
+        break;
+    }
 }
