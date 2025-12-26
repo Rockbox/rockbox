@@ -22,6 +22,7 @@
 #define __NVIC_ARM_H__
 
 #include "system.h"
+#include "nvic-target.h"
 #include "regs/cortex-m/cm_nvic.h"
 
 #define NVIC_MAX_PRIO 0xFF
