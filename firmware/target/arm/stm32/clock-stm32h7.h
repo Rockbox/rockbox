@@ -23,6 +23,7 @@
 
 #include "system.h"
 #include <stdbool.h>
+#include <stddef.h>
 
 enum stm_clock
 {
@@ -55,6 +56,14 @@ void stm_target_clock_init(void) INIT_ATTR;
 void stm_target_clock_enable(enum stm_clock clock, bool enable);
 
 /*
+ * Callback to return a specific clock's frequency. For most
+ * peripherals the frequency must be known at initialization
+ * and not change afterwards; see peripheral drivers for the
+ * details, as their exact requirements may vary.
+ */
+size_t stm_target_clock_get_frequency(enum stm_clock clock);
+
+/*
  * Called from system_init(). Sets up internal book-keeping
  * and then calls stm_target_clock_init().
  */
@@ -65,5 +74,13 @@ void stm_clock_init(void) INIT_ATTR;
  */
 void stm_clock_enable(enum stm_clock clock);
 void stm_clock_disable(enum stm_clock clock);
+
+/*
+ * Get a clock's frequency in Hz.
+ */
+static inline size_t stm_clock_get_frequency(enum stm_clock clock)
+{
+    return stm_target_clock_get_frequency(clock);
+}
 
 #endif /* __CLOCK_STM32H7_H__ */
