@@ -685,6 +685,8 @@ static bool vu_meter_menu(void)
         { "Very Slow", -1 },
     };
 
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
     while (!menu_quit) {
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
@@ -744,6 +746,8 @@ static bool vu_meter_menu(void)
                 break;
         }
     }
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
     /* the menu uses the userfont, set it back to sysfont */
     rb->lcd_setfont(FONT_SYSFIXED);
     return exit;
@@ -948,6 +952,9 @@ static void vu_meter_cleanup(void)
 {
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
+
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -972,6 +979,10 @@ enum plugin_status plugin_start(const void* parameter)
 
      /* Turn off backlight timeout */
     backlight_ignore_timeout();
+
+    /* undo in vu_meter_cleanup */
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, false, NULL);
 
     while (1)
     {
