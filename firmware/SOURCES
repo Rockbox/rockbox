@@ -2034,6 +2034,7 @@ target/arm/stm32/usb-stm32h7.c
 target/arm/stm32/echoplayer/audiohw-echoplayer.c
 target/arm/stm32/echoplayer/backlight-echoplayer.c
 target/arm/stm32/echoplayer/button-echoplayer.c
+target/arm/stm32/echoplayer/clock-echoplayer.c
 target/arm/stm32/echoplayer/lcd-echoplayer.c
 target/arm/stm32/echoplayer/power-echoplayer.c
 target/arm/stm32/echoplayer/system-echoplayer.c
