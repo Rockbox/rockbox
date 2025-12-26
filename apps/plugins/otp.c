@@ -331,6 +331,10 @@ static void add_acct_file(void)
                 if(!tok)
                     continue;
 
+                char* tok_val = rb->strtok_r(NULL, "&", &save);
+                if(!tok_val)
+                    continue;
+
                 if(!rb->strcmp(tok, "secret"))
                 {
                     if(have_secret)
@@ -339,8 +343,7 @@ static void add_acct_file(void)
                         goto fail;
                     }
                     have_secret = true;
-                    tok = rb->strtok_r(NULL, "&", &save);
-                    if((accounts[next_slot].sec_len = base32_decode(accounts[next_slot].secret, SECRET_MAX, tok)) <= 0)
+                    if((accounts[next_slot].sec_len = base32_decode(accounts[next_slot].secret, SECRET_MAX, tok_val)) <= 0)
                         goto fail;
                 }
                 else if(!rb->strcmp(tok, "counter"))
@@ -350,8 +353,7 @@ static void add_acct_file(void)
                         rb->splash(HZ * 2, "Counter parameter specified for TOTP!? Skipping...");
                         goto fail;
                     }
-                    tok = rb->strtok_r(NULL, "&", &save);
-                    accounts[next_slot].hotp_counter = rb->atoi(tok);
+                    accounts[next_slot].hotp_counter = rb->atoi(tok_val);
                 }
                 else if(!rb->strcmp(tok, "period"))
                 {
@@ -360,13 +362,11 @@ static void add_acct_file(void)
                         rb->splash(HZ * 2, "Period parameter specified for HOTP!? Skipping...");
                         goto fail;
                     }
-                    tok = rb->strtok_r(NULL, "&", &save);
-                    accounts[next_slot].totp_period = rb->atoi(tok);
+                    accounts[next_slot].totp_period = rb->atoi(tok_val);
                 }
                 else if(!rb->strcmp(tok, "digits"))
                 {
-                    tok = rb->strtok_r(NULL, "&", &save);
-                    accounts[next_slot].digits = rb->atoi(tok);
+                    accounts[next_slot].digits = rb->atoi(tok_val);
                     if(accounts[next_slot].digits < 1 || accounts[next_slot].digits > 9)
                     {
                         rb->splashf(HZ * 2, "Digits parameter not in acceptable range, skipping.");
