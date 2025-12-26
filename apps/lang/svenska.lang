@@ -3364,57 +3364,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DISK_MENU
   desc: in the system sub menu
   user: core
@@ -3555,8 +3504,8 @@
   <dest>
     *: none
     rtc: "PÅ = Ställ"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "VÄLJ = Ställ"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "SPELA = Ställ"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "VÄLJ = Ställ"
     iriverh100,iriverh120,iriverh300: "NAVI = Ställ"
     mpiohd300: "ENTER = Ställ"
     mrobe500: "HJÄRTA = Ställ"
@@ -3564,7 +3513,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3588,8 +3536,8 @@
   <dest>
     *: none
     rtc: "AV = Avbryt"
-    gigabeatfx,mrobe500: "PÅ/AV = Avbryt"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "BAKÅT = Avbryt"
+    gigabeatfx,mrobe500: "PÅ/AV = Avbryt"
     gogearsa9200: "VÄNSTER = Avbryt"
     iaudiom5,iaudiox5: "SPELA IN = Avbryt"
     ipod*,mpiohd300,sansac200*: "MENY = Avbryt"
@@ -3601,7 +3549,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4679,7 +4626,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Söker vid MHz"
   </voice>
 </phrase>
 <phrase>
@@ -5789,20 +5736,6 @@
   </dest>
   <voice>
     *: "sparade spår"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7193,11 +7126,11 @@
     *: "AV = avbryt"
     gigabeatfx: "PÅ/AV = Avbryt"
     gigabeats: "BAKÅT = Avbryt"
+    sansafuzeplus: "BACK för att avbryta"
     iaudiom5,iaudiox5: "Lång SPELA = Avbryt"
     ipod*: "SPELA/PAUSA = Avbryt"
     iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "FÖREGÅENDE = Avbryt"
     iriverh100,iriverh120,iriverh300: "STOPP = Avbryt"
-    sansafuzeplus: "BACK för att avbryta"
   </dest>
   <voice>
     *: ""
@@ -7242,7 +7175,7 @@
     *: "Kan inte öppna %s"
   </dest>
   <voice>
-    *: ""
+    *: "Kan inte öppna"
   </voice>
 </phrase>
 <phrase>
@@ -7256,7 +7189,7 @@
     *: "Kan inte läsa %s"
   </dest>
   <voice>
-    *: ""
+    *: "Kan inte läsa"
   </voice>
 </phrase>
 <phrase>
@@ -12608,20 +12541,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -12703,20 +12622,6 @@
   </dest>
   <voice>
     *: "Genomsnittlig bithastighet"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Fel vid insamling av information"
-  </dest>
-  <voice>
-    *: "Fel vid insamling av information"
   </voice>
 </phrase>
 <phrase>
@@ -14173,16 +14078,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Växla objekt"
+    *: ""
   </dest>
   <voice>
-    *: "Växla objekt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14243,13 +14148,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox huvudmenyordning"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14750,20 +14655,6 @@
   </dest>
   <voice>
     *: "Inget albumomslag hittades"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16045,20 +15936,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Amaze Huvudmeny"
-  </dest>
-  <voice>
-    *: "Amaze Huvudmeny"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16308,34 +16185,6 @@
   </dest>
   <voice>
     *: "Mik mod Inställningar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod meny"
-  </dest>
-  <voice>
-    *: "Mik mod meny"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Schackbox Meny"
-  </dest>
-  <voice>
-    *: "Schackbox Meny"
   </voice>
 </phrase>
 <phrase>
@@ -16989,5 +16838,101 @@
   </dest>
   <voice>
     *: "Spellistan är klar. Spela igen?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "~USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "~USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "När USB-masslagringsläge är aktivt"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "När USB-masslagringsläge är aktivt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC Aktiv"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC Aktiv"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Efter album]ä"
+  </dest>
+  <voice>
+    *: "Alla låtar sorterade efter album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Sortera spellistor"
+  </dest>
+  <voice>
+    *: "Sortera spellistor"
   </voice>
 </phrase>
