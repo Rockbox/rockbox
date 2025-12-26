@@ -585,7 +585,7 @@ bool gui_synclist_keyclick_callback(int action, void* data)
  *
  * The GUI_EVENT_NEED_UI_UPDATE event is registered for in list_do_action_timeout()
  * as a oneshot and current_lists updated. later current_lists is set to NULL
- * in gui_synclist_do_button() effectively disabling the callback. 
+ * in gui_synclist_do_button() effectively disabling the callback.
 *  This is done because if something is using the list UI they *must* be calling those
  * two functions in the correct order or the list wont work.
  */
@@ -692,7 +692,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
             allow_wrap = false; /* Prevent list wraparound on repeating actions */
             /*Fallthrough*/
         case ACTION_STD_PREV:
-        
+
             gui_list_select_at_offset(lists, -next_item_modifier, allow_wrap);
 #ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
@@ -882,7 +882,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
     list_get_name *getname;
-    int line_count;
+    int line_count, ret = false;
 
     if (info->get_name)
     {
@@ -971,8 +971,8 @@ bool simplelist_show_list(struct simplelist_info *info)
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
         {
-            gui_synclist_scroll_stop(&lists);
-            return true;
+            ret = true;
+            break;
         }
     }
     talk_shutup();
@@ -986,7 +986,7 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, false);
-    return false;
+    return ret;
 }
 
 void simplelist_info_init(struct simplelist_info *info, char* title,
