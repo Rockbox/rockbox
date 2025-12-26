@@ -784,3 +784,164 @@ GPV_AXI @ 0x51000000 : block {
         0 READ_ISS_OVERRIDE
     }
 }
+
+// LCD-TFT display controller
+LTDC @ 0x50001000 : block {
+    SSCR @ 0x08 : reg {
+        27 16 HSW
+        10 00 VSH
+    }
+
+    BPCR @ 0x0c : reg {
+        27 16 AHBP
+        10 00 AVBP
+    }
+
+    AWCR @ 0x10 : reg {
+        27 16 AAW
+        10 00 AAH
+    }
+
+    TWCR @ 0x14 : reg {
+        27 16 TOTALW
+        10 00 TOTALH
+    }
+
+    GCR @ 0x18 : reg {
+        -- 31 HSPOL
+        -- 30 VSPOL
+        -- 29 DEPOL
+        -- 28 PCPOL
+        -- 16 DEN
+        14 12 DRW
+        10 08 DGW
+        06 04 DBW
+        -- 00 LTDCEN
+    }
+
+    SRCR @ 0x24 : reg {
+        1 VBR
+        0 IMR
+    }
+
+    BCCR @ 0x2c : reg {
+        23 16 BCRED
+        15 08 BCGREEN
+        07 00 BCBLUE
+    }
+
+    IER @ 0x34 : reg {
+        3 RRIE
+        2 TERRIE
+        1 FUIE
+        0 LIE
+    }
+
+    ISR @ 0x38 : reg {
+        3 RRIF
+        2 TERRIF
+        1 FUIF
+        0 LIF
+    }
+
+    ICR @ 0x3C : reg {
+        3 CRRIF
+        2 CTERRIF
+        1 CFUIF
+        0 CLIF
+    }
+
+    LIPCR @ 0x40 : reg {
+        10 00 LIPOS
+    }
+
+    CPSR @ 0x44 : reg {
+        31 16 CXPOS
+        15 00 CYPOS
+    }
+
+    CDSR @ 0x48 : reg {
+        3 HSYNCS
+        2 VSYNCS
+        1 HDES
+        0 VDES
+    }
+
+    LAYER @ 0x80 [2; 0x80] : block {
+        CR @ 0x04 : reg {
+            4 CLUTEN
+            1 COLKEN
+            0 LEN
+        }
+
+        WHPCR @ 0x08 : reg {
+            27 16 WHSPPOS
+            11 00 WHSTPOS
+        }
+
+        WVPCR @ 0x0c : reg {
+            26 16 WVSPPOS
+            10 00 WVSTPOS
+        }
+
+        CKCR @ 0x10 : reg {
+            23 16 CKRED
+            15 08 CKGREEN
+            07 00 CKBLUE
+        }
+
+        PFCR @ 0x14 : reg {
+            2 0 PF : {
+                0 = ARGB8888
+                1 = RGB888
+                2 = RGB565
+                3 = ARGB1555
+                4 = ARGB4444
+                5 = L8
+                6 = AL44
+                7 = AL88
+            }
+        }
+
+        CACR @ 0x18 : reg {
+            7 0 CONSTA
+        }
+
+        DCCR @ 0x1c : reg {
+            31 24 DCALPHA
+            24 16 DCRED
+            15 08 DCGREEN
+            07 00 DCBLUE
+        }
+
+        BFCR @ 0x20 : reg {
+            10 08 BF2 : {
+                4 = CONSTANT_ALPHA
+                6 = PIXEL_ALPHA_TIMES_CONSTANT_ALPHA
+            }
+
+            02 00 BF1 : {
+                5 = ONE_MINUS_CONSTANT_ALPHA
+                7 = ONE_MINUS_PIXEL_ALPHA_TIMES_CONSTANT_ALPHA
+            }
+        }
+
+        CFBAR @ 0x2c : reg
+
+        CFBLR @ 0x30 : reg {
+            28 16 CFBP
+            12 00 CFBLL
+        }
+
+        CFBLNR @ 0x34 : reg {
+            10 00 CFBLNBR
+        }
+
+        CLUTWR @ 0x44 : reg {
+            31 24 CLUTADD
+            23 16 RED
+            15 08 GREEN
+            07 00 BLUE
+        }
+    }
+}
