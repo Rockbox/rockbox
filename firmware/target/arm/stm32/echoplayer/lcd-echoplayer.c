@@ -24,9 +24,10 @@
 #include "spi-stm32h7.h"
 #include "gpio-stm32h7.h"
 #include "regs/stm32h743/rcc.h"
+#include "regs/stm32h743/spi.h"
 
 struct stm_spi_config spi_cfg = {
-    .num = STM_SPI5,
+    .instance = ITA_SPI5,
     .mode = STM_SPIMODE_HALF_DUPLEX,
     .proto = STM_SPIPROTO_MOTOROLA,
     .frame_bits = 9,

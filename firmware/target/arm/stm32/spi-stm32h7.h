@@ -26,17 +26,6 @@
 
 struct stm_spi;
 
-enum stm_spi_num
-{
-    STM_SPI1,
-    STM_SPI2,
-    STM_SPI3,
-    STM_SPI4,
-    STM_SPI5,
-    STM_SPI6,
-    STM_SPI_COUNT,
-};
-
 /* Must match the SPI_CFG2.COMM register */
 enum stm_spi_mode
 {
@@ -57,7 +46,8 @@ typedef void (*stm_spi_set_cs_t) (struct stm_spi *spi, bool enable);
 
 struct stm_spi_config
 {
-    enum stm_spi_num num;
+    /* Peripheral instance base address; one of ITA_SPIx */
+    uint32_t instance;
     enum stm_spi_mode mode;
     enum stm_spi_protocol proto;
     stm_spi_set_cs_t set_cs;
@@ -77,7 +67,6 @@ struct stm_spi
     enum stm_spi_mode mode;
     stm_spi_set_cs_t set_cs;
     uint32_t frame_size;
-    size_t tser_left;
 };
 
 void stm_spi_init(struct stm_spi *spi,

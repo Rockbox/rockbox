@@ -20,27 +20,15 @@
  ****************************************************************************/
 #include "spi-stm32h7.h"
 #include "regs/stm32h743/spi.h"
+#include "panic.h"
 
 /*
  * Align the max transfer size to ensure it will always be a multiple
  * of 32 bits. This is necessary because an unaligned TSIZE will cause
- * some data written to the FIFO to be ignored -- this is OK and the
- * intended behavior when it happens at the end of the transfer. But
- * we don't want this to happen when TSER > 0 when we're still in the
- * middle of the transfer, as it will throw away valid data.
+ * some data written to the FIFO to be ignored.
  */
 #define TSIZE_MAX \
-    ALIGN_DOWN(reg_vreadf(BM_SPI_CR2_TSIZE, SPI_CR2, TSIZE), sizeof(uint32_t))
-
-static struct stm_spi *spi_map[STM_SPI_COUNT];
-static const uint32_t spi_addr[STM_SPI_COUNT] INITDATA_ATTR = {
-    [STM_SPI1] = ITA_SPI1,
-    [STM_SPI2] = ITA_SPI2,
-    [STM_SPI3] = ITA_SPI3,
-    [STM_SPI4] = ITA_SPI4,
-    [STM_SPI5] = ITA_SPI5,
-    [STM_SPI6] = ITA_SPI6,
-};
+    ALIGN_DOWN(BM_SPI_CR2_TSIZE >> BP_SPI_CR2_TSIZE, sizeof(uint32_t))
 
 static void stm_spi_set_cs(struct stm_spi *spi, bool enable)
 {
@@ -53,32 +41,11 @@ static void stm_spi_set_cs(struct stm_spi *spi, bool enable)
 static void stm_spi_enable(struct stm_spi *spi, bool hd_tx, size_t size)
 {
     size_t tsize = size / spi->frame_size;
-    size_t tser = 0;
-    size_t left = 0;
-
     if (tsize > TSIZE_MAX)
-    {
-        tser = tsize - TSIZE_MAX;
-        tsize = TSIZE_MAX;
-
-        if (tser > TSIZE_MAX)
-        {
-            left = tser - TSIZE_MAX;
-            tser = TSIZE_MAX;
-        }
-    }
-
-    /*
-     * Save number of bytes left for next TSER load, tracked
-     * separately from the overall transfer size because the
-     * timing of the SPI_SR.TSERF interrupt isn't clear. We'll
-     * decrement this by TSIZE_MAX whenever we load TSER in the
-     * middle of a transfer.
-     */
-    spi->tser_left = left;
+        panicf("%s: tsize > TSIZE_MAX", __func__);
 
     /* TSIZE must be programmed before setting SPE. */
-    reg_assignlf(spi->regs, SPI_CR2, TSIZE(tsize), TSER(tser));
+    reg_assignlf(spi->regs, SPI_CR2, TSIZE(tsize), TSER(0));
     reg_writelf(spi->regs, SPI_CR1, HDDIR(hd_tx), SPE(1));
 }
 
@@ -144,7 +111,7 @@ void stm_spi_init(struct stm_spi *spi,
 {
     uint32_t ftlevel;
 
-    spi->regs = spi_addr[config->num];
+    spi->regs = config->instance;
     spi->mode = config->mode;
     spi->set_cs = config->set_cs;
 
@@ -170,8 +137,12 @@ void stm_spi_init(struct stm_spi *spi,
      * So we can double the threshold setting for SPI1-3.
      * (Maximum allowable threshold is 1/2 the FIFO size.)
      */
-    if (config->num <= STM_SPI3)
+    if (config->instance == ITA_SPI1 ||
+        config->instance == ITA_SPI2 ||
+        config->instance == ITA_SPI3)
+    {
         ftlevel *= 2;
+    }
 
     /* TODO: allow setting MBR here */
     reg_writelf(spi->regs, SPI_CFG1,
@@ -199,8 +170,6 @@ void stm_spi_init(struct stm_spi *spi,
                 IOSWP(config->swap_mosi_miso),
                 MIDI(0),
                 MSSI(0));
-
-    spi_map[config->num] = spi;
 }
 
 int stm_spi_xfer(struct stm_spi *spi, size_t size,
@@ -237,25 +206,6 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
     while (size_tx > 0 || size_rx > 0)
     {
         uint32_t sr = reg_readl(spi->regs, SPI_SR);
-
-        /*
-         * Handle continuation of large transfers
-         *
-         * TODO - something is not right with this code
-         */
-        if (spi->tser_left > 0 && reg_vreadf(sr, SPI_SR, TSERF))
-        {
-            if (spi->tser_left < TSIZE_MAX)
-            {
-                reg_writelf(spi->regs, SPI_CR2, TSER(spi->tser_left));
-                spi->tser_left = 0;
-            }
-            else
-            {
-                reg_writelf(spi->regs, SPI_CR2, TSER(TSIZE_MAX));
-                spi->tser_left -= TSIZE_MAX;
-            }
-        }
 
         /* Handle FIFO write */
         if (size_tx > 0 && reg_vreadf(sr, SPI_SR, TXP))
@@ -294,9 +244,4 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
     stm_spi_disable(spi);
     stm_spi_set_cs(spi, false);
     return 0;
-}
-
-void spi_irq_handler(void)
-{
-    while (1);
 }
