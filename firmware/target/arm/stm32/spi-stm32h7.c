@@ -108,10 +108,23 @@ static void stm_spi_unpack(void **bufp, size_t *sizep, uint32_t data)
     *sizep = 0;
 }
 
+static uint32_t stm_spi_calc_mbr(const struct stm_spi_config *config)
+{
+    size_t ker_freq = stm_clock_get_frequency(config->clock);
+    for (uint32_t mbr = 0; mbr <= 7; mbr++)
+    {
+        if (ker_freq / (2 << mbr) <= config->freq)
+            return mbr;
+    }
+
+    panicf("%s: impossible frequency", __func__);
+}
+
 void stm_spi_init(struct stm_spi *spi,
                   const struct stm_spi_config *config)
 {
     uint32_t ftlevel;
+    uint32_t mbr = stm_spi_calc_mbr(config);
 
     spi->regs = config->instance;
     spi->clock = config->clock;
@@ -153,7 +166,7 @@ void stm_spi_init(struct stm_spi *spi,
 
     /* TODO: allow setting MBR here */
     reg_writelf(spi->regs, SPI_CFG1,
-                MBR(0),
+                MBR(mbr),
                 CRCEN(0),
                 CRCSIZE(7),
                 TXDMAEN(0),

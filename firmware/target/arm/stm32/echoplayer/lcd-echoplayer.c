@@ -28,9 +28,13 @@
 #include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/spi.h"
 
+/* ILI9342C specifies 10 MHz max */
+#define LCD_SPI_FREQ 10000000
+
 struct stm_spi_config spi_cfg = {
     .instance = ITA_SPI5,
     .clock = STM_CLOCK_SPI5_KER,
+    .freq = LCD_SPI_FREQ,
     .mode = STM_SPIMODE_HALF_DUPLEX,
     .proto = STM_SPIPROTO_MOTOROLA,
     .frame_bits = 9,

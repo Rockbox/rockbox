@@ -162,3 +162,16 @@ void stm_target_clock_enable(enum stm_clock clock, bool enable)
         break;
     }
 }
+
+size_t stm_target_clock_get_frequency(enum stm_clock clock)
+{
+    switch (clock)
+    {
+    case STM_CLOCK_SPI5_KER:
+        return STM32_HSE_FREQ;
+
+    default:
+        panicf("%s: unsupported clock %d", __func__, (int)clock);
+        return 0;
+    }
+}

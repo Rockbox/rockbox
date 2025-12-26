@@ -50,7 +50,17 @@ struct stm_spi_config
 {
     /* Peripheral instance base address; one of ITA_SPIx */
     uint32_t instance;
+
+    /*
+     * SPI kernel clock and requested SPI bus frequency.
+     * The frequency is used to set the SPI master baud
+     * rate setting based on the kernel clock input, as
+     * such the kernel clock should not be changed after
+     * the SPI peripheral is initialized.
+     */
     enum stm_clock clock;
+    size_t freq;
+
     enum stm_spi_mode mode;
     enum stm_spi_protocol proto;
     stm_spi_set_cs_t set_cs;
