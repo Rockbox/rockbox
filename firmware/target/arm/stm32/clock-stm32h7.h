@@ -33,6 +33,7 @@ enum stm_clock
     STM_CLOCK_SPI4_KER,
     STM_CLOCK_SPI5_KER,
     STM_CLOCK_SPI6_KER,
+    STM_CLOCK_LTDC_KER,
     STM_NUM_CLOCKS,
 };
 
