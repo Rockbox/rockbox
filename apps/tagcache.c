@@ -239,9 +239,11 @@ static const char * const tag_type_str[] = {
     [clause_ends_with] = "clause_ends_with",
     [clause_not_ends_with] = "clause_not_ends_with",
     [clause_oneof] = "clause_oneof",
+    [clause_contains_oneof] = "clause_contains_oneof",
     [clause_begins_oneof] = "clause_begins_oneof",
     [clause_ends_oneof] = "clause_ends_oneof",
     [clause_not_oneof] = "clause_not_oneof",
+    [clause_not_contains_oneof] = "clause_not_contains_oneof",
     [clause_not_begins_oneof] = "clause_not_begins_oneof",
     [clause_not_ends_oneof] = "clause_not_ends_oneof",
     [clause_logical_or] = "clause_logical_or"
@@ -1397,6 +1399,28 @@ inline static bool str_begins_ends_oneof(const char *str, const char *list, bool
     return false;
 }
 
+inline static bool str_contains_oneof(const char *str, char *list)
+{
+    logf_clauses("%s %s %s", str, __func__, list);
+	const char *sep;
+	int l, len = strlen(str);
+	
+	while (*list)
+	{
+		sep = strchr(list, '|');
+		l = sep ? (intptr_t)sep - (intptr_t)list : (int)strlen(list);
+		list[l] = '\0';
+		if (l <= len && strcasestr(str, list) != NULL) {
+			if (sep) list[l] = '|';
+			return true;
+		}
+		if (sep) list[l] = '|';
+		list += sep ? l + 1 : l;
+	}
+	
+	return false;
+}
+
 static bool check_against_clause(long numeric, const char *str,
                                  const struct tagcache_search_clause *clause)
 {
@@ -1462,6 +1486,10 @@ static bool check_against_clause(long numeric, const char *str,
             case clause_not_begins_oneof:
                 return !str_begins_ends_oneof(str, clause->str,
                                             clause->type == clause_not_begins_oneof);
+			case clause_contains_oneof:
+				return str_contains_oneof(str, clause->str);
+			case clause_not_contains_oneof:
+				return !str_contains_oneof(str, clause->str);
             default:
                 logf("Incorrect tag: %d", clause->type);
         }
