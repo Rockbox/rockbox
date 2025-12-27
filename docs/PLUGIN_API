@@ -89,6 +89,10 @@ struct mp3entry* audio_current_track(void)
     \description
     \see [S[firmware/export/id3.h]]
 
+void audio_pre_ff_rewind(void)
+    \group playback control
+    \description prepare playback for rewinding. Playback will be paused
+
 void audio_ff_rewind(long newtime)
     \group playback control
     \param newtime

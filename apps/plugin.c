@@ -356,6 +356,8 @@ static const struct plugin_api rockbox_api = {
     simplelist_info_init,
     simplelist_show_list,
     yesno_pop,
+    yesno_pop_confirm,
+    sb_set_title_text,
 
     /* action handling */
     get_custom_action,
@@ -363,6 +365,18 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TOUCHSCREEN
     action_get_touchscreen_press,
     action_get_touchscreen_press_in_vp,
+    action_get_touch_event,
+    action_gesture_reset,
+    action_gesture_get_event_in_vp,
+    action_gesture_get_event,
+    action_gesture_is_valid,
+    action_gesture_is_pressed,
+    gesture_reset,
+    gesture_process,
+    gesture_get_event_in_vp,
+    gesture_vel_reset,
+    gesture_vel_process,
+    gesture_vel_get,
 #endif
     action_userabort,
     core_set_keyremap,
@@ -428,6 +442,9 @@ static const struct plugin_api rockbox_api = {
     crc_32r,
     filetype_get_attr,
     filetype_get_plugin,
+#ifdef HAVE_DIRCACHE
+    dircache_wait,
+#endif
 
     /* dir */
     FS_PREFIX(opendir),
@@ -565,6 +582,7 @@ static const struct plugin_api rockbox_api = {
     strncmp,
     strcasecmp,
     strncasecmp,
+    strstr,
     memset,
     memcpy,
     memmove,
@@ -729,6 +747,7 @@ static const struct plugin_api rockbox_api = {
     audio_resume,
     audio_next,
     audio_prev,
+    audio_pre_ff_rewind,
     audio_ff_rewind,
     audio_next_track,
     audio_status,
@@ -738,6 +757,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef PLUGIN_USE_IRAM
     audio_hard_stop,
 #endif
+    add_playbacklog,
 
     /* menu */
     root_menu_get_options,
@@ -761,6 +781,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* power */
+    &device_battery_tables,
     battery_level,
     battery_level_safe,
     battery_time,
@@ -772,12 +793,17 @@ static const struct plugin_api rockbox_api = {
     charging_state,
 # endif
 #endif
+
     /* usb */
     usb_inserted,
     usb_acknowledge,
 #ifdef USB_ENABLE_HID
     usb_hid_send,
 #endif
+#ifdef USB_ENABLE_AUDIO
+    usb_audio_get_playing,
+#endif
+
     /* misc */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     __errno,
@@ -849,31 +875,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    add_playbacklog,
-    &device_battery_tables,
-    yesno_pop_confirm,
-#ifdef USB_ENABLE_AUDIO
-    usb_audio_get_playing,
-#endif
-#ifdef HAVE_TOUCHSCREEN
-    action_get_touch_event,
-    action_gesture_reset,
-    action_gesture_get_event_in_vp,
-    action_gesture_get_event,
-    action_gesture_is_valid,
-    action_gesture_is_pressed,
-    gesture_reset,
-    gesture_process,
-    gesture_get_event_in_vp,
-    gesture_vel_reset,
-    gesture_vel_process,
-    gesture_vel_get,
-#endif
-    strstr,
-    sb_set_title_text,
-#ifdef HAVE_DIRCACHE
-    dircache_wait,
-#endif
 };
 
 static int plugin_buffer_handle;

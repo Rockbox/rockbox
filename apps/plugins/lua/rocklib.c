@@ -410,12 +410,12 @@ RB_WRAP(playlist)
 RB_WRAP(audio)
 {
     enum e_audio {AUDIO_STATUS = 0, AUDIO_PLAY, AUDIO_STOP, AUDIO_PAUSE,
-                  AUDIO_RESUME, AUDIO_NEXT, AUDIO_PREV, AUDIO_FFREWIND,
-                  AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS, AUDIO_LENGTH,
-                  AUDIO_ELAPSED, AUDIO_ECOUNT};
+                  AUDIO_RESUME, AUDIO_NEXT, AUDIO_PREV, AUDIO_PREFFREWIND,
+                  AUDIO_FFREWIND, AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS,
+                  AUDIO_LENGTH, AUDIO_ELAPSED, AUDIO_ECOUNT};
     const char *audio_option[] = {"status", "play", "stop",
                                   "pause", "resume", "next",
-                                  "prev", "ff_rewind",
+                                  "prev", "pre_ff_rewind", "ff_rewind",
                                   "flush_and_reload_tracks",
                                   "get_file_pos", "length",
                                   "elapsed", NULL};
@@ -434,6 +434,7 @@ RB_WRAP(audio)
             if (status == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
             {
                 /* not perfect but provides a decent compromise */
+                rb->audio_pre_ff_rewind();
                 rb->audio_ff_rewind(elapsed + offset);
                 rb->audio_resume();
             }
@@ -455,6 +456,9 @@ RB_WRAP(audio)
             break;
         case AUDIO_PREV:
             rb->audio_prev();
+            break;
+        case AUDIO_PREFFREWIND:
+            rb->audio_pre_ff_rewind();
             break;
         case AUDIO_FFREWIND:
             newtime = (long) luaL_checkint(L, 2);

@@ -61,6 +61,7 @@ size_t audio_buffer_size(void);
 /* size of the buffer available for allocating memory from the audio buffer using core_*()
  * returns core_available() if audio buffer is not allocated yet */
 size_t audio_buffer_available(void);
+void audio_pre_ff_rewind(void);
 void audio_ff_rewind(long newpos);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);

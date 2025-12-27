@@ -178,7 +178,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 274
+#define PLUGIN_API_VERSION 275
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -418,6 +418,8 @@ struct plugin_api {
                                  int count, void* data);
     bool (*simplelist_show_list)(struct simplelist_info *info);
     bool (*yesno_pop)(const char* text);
+    bool (*yesno_pop_confirm)(const char* text);
+    bool (*sb_set_title_text)(const char* title, enum themable_icons icon, enum screen_type screen);
 
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
@@ -426,6 +428,22 @@ struct plugin_api {
 #ifdef HAVE_TOUCHSCREEN
     int (*action_get_touchscreen_press)(short *x, short *y);
     int (*action_get_touchscreen_press_in_vp)(short *x1, short *y1, struct viewport *vp);
+    int (*action_get_touch_event)(struct touchevent *ev);
+    void (*action_gesture_reset)(void);
+    bool (*action_gesture_get_event_in_vp)(struct gesture_event *gevt,
+                                           const struct viewport *vp);
+    bool (*action_gesture_get_event)(struct gesture_event *gevt);
+    bool (*action_gesture_is_valid)(void);
+    bool (*action_gesture_is_pressed)(void);
+    void (*gesture_reset)(struct gesture *g);
+    void (*gesture_process)(struct gesture *g, const struct touchevent *ev);
+    bool (*gesture_get_event_in_vp)(struct gesture *g,
+                                    struct gesture_event *gevt,
+                                    const struct viewport *vp);
+    void (*gesture_vel_reset)(struct gesture_vel *gv);
+    void (*gesture_vel_process)(struct gesture_vel *gv,
+                                const struct touchevent *ev);
+    bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
 #endif
     bool (*action_userabort)(int timeout);
     int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
@@ -493,6 +511,9 @@ struct plugin_api {
 
     int (*filetype_get_attr)(const char* file);
     char* (*filetype_get_plugin)(int attr, char *buffer, size_t buffer_len);
+#ifdef HAVE_DIRCACHE
+    void (*dircache_wait)(void);
+#endif
 
     /* dir */
     DIR * (*opendir)(const char *dirname);
@@ -652,6 +673,7 @@ struct plugin_api {
     int (*strncmp)(const char *, const char *, size_t);
     int (*strcasecmp)(const char *, const char *);
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
+    char* (*strstr)(const char *s1, const char *s2);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
     void* (*memmove)(void *out, const void *in, size_t n);
@@ -853,6 +875,7 @@ struct plugin_api {
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
+    void (*audio_pre_ff_rewind)(void);
     void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*audio_status)(void);
@@ -862,6 +885,7 @@ struct plugin_api {
 #ifdef PLUGIN_USE_IRAM
     void (*audio_hard_stop)(void);
 #endif
+    void (*add_playbacklog)(struct mp3entry *id3);
 
     /* menu */
     struct menu_table *(*root_menu_get_options)(int *nb_options);
@@ -902,6 +926,7 @@ struct plugin_api {
 #endif
 
     /* power */
+    struct battery_tables_t *device_battery_tables;
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
     int (*battery_time)(void);
@@ -913,12 +938,17 @@ struct plugin_api {
     bool (*charging_state)(void);
 # endif
 #endif
+
     /* usb */
     bool (*usb_inserted)(void);
     void (*usb_acknowledge)(long id);
 #ifdef USB_ENABLE_HID
     void (*usb_hid_send)(usage_page_t usage_page, int id);
 #endif
+#ifdef USB_ENABLE_AUDIO
+    bool (*usb_audio_get_playing)(void);
+#endif
+
     /* misc */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     int * (*__errno)(void);
@@ -994,37 +1024,9 @@ struct plugin_api {
 #ifdef HAVE_MULTIVOLUME
     int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
 #endif
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    void (*add_playbacklog)(struct mp3entry *id3);
-    struct battery_tables_t *device_battery_tables;
-    bool (*yesno_pop_confirm)(const char* text);
-#ifdef USB_ENABLE_AUDIO
-    bool (*usb_audio_get_playing)(void);
-#endif
-#ifdef HAVE_TOUCHSCREEN
-    int (*action_get_touch_event)(struct touchevent *ev);
-    void (*action_gesture_reset)(void);
-    bool (*action_gesture_get_event_in_vp)(struct gesture_event *gevt,
-                                           const struct viewport *vp);
-    bool (*action_gesture_get_event)(struct gesture_event *gevt);
-    bool (*action_gesture_is_valid)(void);
-    bool (*action_gesture_is_pressed)(void);
-    void (*gesture_reset)(struct gesture *g);
-    void (*gesture_process)(struct gesture *g, const struct touchevent *ev);
-    bool (*gesture_get_event_in_vp)(struct gesture *g,
-                                    struct gesture_event *gevt,
-                                    const struct viewport *vp);
-    void (*gesture_vel_reset)(struct gesture_vel *gv);
-    void (*gesture_vel_process)(struct gesture_vel *gv,
-                                const struct touchevent *ev);
-    bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
-#endif
-    char* (*strstr)(const char *s1, const char *s2);
-    bool (*sb_set_title_text)(const char* title, enum themable_icons icon, enum screen_type screen);
-#ifdef HAVE_DIRCACHE
-    void (*dircache_wait)(void);
-#endif
 };
 
 /* plugin header */

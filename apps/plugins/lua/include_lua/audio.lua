@@ -31,6 +31,7 @@ rb.audio_pause = function() rb.audio("pause") end
 rb.audio_resume = function() rb.audio("resume") end
 rb.audio_next = function() rb.audio("next") end
 rb.audio_prev = function() rb.audio("prev") end
+rb.audio_pre_ff_rewind = function () rb.audio("pre_ff_rewind") end
 rb.audio_ff_rewind = function (newtime) rb.audio("ff_rewind", newtime) end
 rb.audio_flush_and_reload_tracks = function() rb.audio("flush_and_reload_tracks") end
 rb.audio_get_file_pos = function() return rb.audio("get_file_pos") end
