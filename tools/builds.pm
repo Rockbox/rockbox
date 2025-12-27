@@ -248,7 +248,6 @@ $releasenotes="/wiki/ReleaseNotes400";
     },
     'rgnano' => {
         name => 'Anbernic RG Nano',
-        sim => 0,
         manualok => 1,
         status => 2,
     },
@@ -506,6 +505,14 @@ $releasenotes="/wiki/ReleaseNotes400";
     'shanlingq1' => {
         name => 'Shanling Q1',
         status => 3,
+    },
+    'hibyr1' => {
+        name => 'Hiby R1',
+        status => 2,
+    },
+    'hibyr3proii' => {
+        name => 'Hiby R3Pro II',
+        status => 2,
     },
 );
 
