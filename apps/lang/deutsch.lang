@@ -12633,20 +12633,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Fehler beim Sammeln von Informationen"
-  </dest>
-  <voice>
-    *: "Fehler beim Sammeln von Informationen"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_LEVEL_7
   desc: in the chessbox game level selection
   user: core
@@ -15849,20 +15835,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Amaze Hauptmenü"
-  </dest>
-  <voice>
-    *: "Amaze Hauptmenü"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16126,34 +16098,6 @@
   </dest>
   <voice>
     *: "Mik mod Einstellungen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod Menü"
-  </dest>
-  <voice>
-    *: "Mik mod Menü"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Schachbox Menü"
-  </dest>
-  <voice>
-    *: "Schach box Menü"
   </voice>
 </phrase>
 <phrase>
@@ -17001,5 +16945,22 @@
   <voice>
     *: none
     usbdac: "USB-Digital Analog Wandler Aktiv"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "LED Indikatoren verwenden"
   </voice>
 </phrase>
