@@ -57,11 +57,11 @@ if [ $parallel -gt 1 ] ; then
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=http://mirrors.kernel.org/gnu
+    GNU_MIRROR=https://mirrors.kernel.org/gnu
 fi
 
 if [ -z $LINUX_MIRROR ] ; then
-    LINUX_MIRROR=http://www.kernel.org/pub/linux
+    LINUX_MIRROR=https://www.kernel.org/pub/linux
 fi
 
 # These are the tools this script requires and depends upon.
@@ -213,16 +213,16 @@ gettool() {
             ;;
 
         alsa-lib)
-            url="ftp://ftp.alsa-project.org/pub/lib"
+            url="https://www.alsa-project.org/files/pub/lib"
             ;;
 
         libffi)
-            url="ftp://sourceware.org/pub/libffi"
+            url="https://sourceware.org/pub/libffi"
             ext="tar.gz"
             ;;
 
         glib)
-            url="https://ftp.gnome.org/pub/gnome/sources/glib/2.46"
+            url="https://download.gnome.org/sources/glib/2.46"
             ext="tar.xz"
             ;;
 
@@ -261,7 +261,7 @@ gettool() {
                     exit
                 ;;
             esac
-            base_url="http://www.kernel.org/pub/linux/kernel/$top_dir"
+            base_url="https://www.kernel.org/pub/linux/kernel/$top_dir"
             # we try several URLs, the 2.6 versions are a mess and need that
             url="$base_url $base_url/longterm/v$longterm_ver $base_url/longterm"
             ext="tar.gz"
@@ -506,7 +506,7 @@ build() {
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-1.2.1.tar.gz" "http://www.multiprecision.org/downloads"
+            getfile "mpc-1.2.1.tar.gz" "$GNU_MIRROR/mpc"
             tar xzf $dlwhere/mpc-1.2.1.tar.gz
             ln -s mpc-1.2.1 mpc
         fi
