@@ -3530,13 +3530,13 @@
     *: none
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "НАЗАД = Скасувати"
     gigabeatfx: "ЖИВЛЕННЯ = Скасувати"
+    mrobe500,rtc: "ВИМК. = Скасувати"
     gogearsa9200: "ВЛIВО = Скасувати"
     iaudiom5,iaudiox5: "ЗАПИС = Скасувати"
     ipod*,mpiohd300,sansac200*: "МЕНЮ = Скасувати"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "ПОПЕРЕД. = Скасувати"
     iriverh100,iriverh120,iriverh300: "СТОП = Скасувати"
     mrobe100: "ДИСПЛЕЙ = Скасувати"
-    mrobe500,rtc: "ВИМК. = Скасувати"
     samsungyh*: "REW = Скасувати"
     vibe500: "C = Скасувати"
   </dest>
@@ -12617,20 +12617,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Помилка при зборі інформації"
-  </dest>
-  <voice>
-    *: "Помилка при зборі інформації"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -15942,20 +15928,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Перетворити головне меню"
-  </dest>
-  <voice>
-    *: "Перетворити головне меню"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16205,34 +16177,6 @@
   </dest>
   <voice>
     *: "Налаштування Mikmod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod меню"
-  </dest>
-  <voice>
-    *: "Mikmod меню"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Меню шахової дошки"
-  </dest>
-  <voice>
-    *: "Меню шахової дошки"
   </voice>
 </phrase>
 <phrase>
@@ -16914,5 +16858,73 @@
   </dest>
   <voice>
     *: "Сортувати усі треки по альбомах"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB аудіо"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "ЮСБ аудіо"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Тільки заряджання через USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Тільки заряджання через ЮСБ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "У режимі USB-накопичувача"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "У режимі ЮСБ-накопичувача"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Активний USB-ЦАП"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Активний ЮСБ-ЦАП"
   </voice>
 </phrase>
