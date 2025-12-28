@@ -111,6 +111,10 @@ static long lasttime = 0;
 #include "usb-ibasso.h"
 #endif
 
+#if (defined(HIBY_R3PROII) || defined(HIBY_R1))
+#include "usb-hiby-gadget.h"
+#endif
+
 #ifdef LOGF_ENABLE
 static char *debug_get_flags(uint32_t flags);
 #undef DEBUGF /* allow DEBUGF or logf not both */
