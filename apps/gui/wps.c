@@ -498,11 +498,7 @@ static void play_hop(int direction)
     {
         elapsed += step * direction;
     }
-    if(audio_status() & AUDIO_STATUS_PLAY)
-    {
-        audio_pre_ff_rewind();
-    }
-
+    audio_pre_ff_rewind();
     audio_ff_rewind(elapsed);
 }
 

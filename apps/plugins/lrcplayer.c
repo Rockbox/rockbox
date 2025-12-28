@@ -2526,20 +2526,10 @@ static bool check_audio_status(void)
     }
     return false;
 }
-static void ff_rewind(long time, bool resume)
+static void ff_rewind(long time)
 {
-    if (AUDIO_PLAY)
-    {
-        if (!AUDIO_PAUSE)
-        {
-            resume = true;
-            rb->audio_pause();
-        }
-        rb->audio_ff_rewind(time);
-        rb->sleep(HZ/10); /* take affect seeking */
-        if (resume)
-            rb->audio_resume();
-    }
+    rb->audio_ff_rewind(time);
+    rb->sleep(HZ/10); /* take effect seeking */
 }
 
 static int handle_button(void)
@@ -2603,15 +2593,14 @@ static int handle_button(void)
             else
             {
                 current.ff_rewind = current.elapsed;
-                if (!AUDIO_PAUSE)
-                    rb->audio_pause();
+                rb->audio_pre_ff_rewind();
                 step = 1000 * rb->global_settings->ff_rewind_min_step;
             }
             break;
         case ACTION_WPS_STOPSEEK:
             if (current.ff_rewind == -1)
                 break;
-            ff_rewind(current.ff_rewind, !AUDIO_PAUSE);
+            ff_rewind(current.ff_rewind);
             current.elapsed = current.ff_rewind;
             current.ff_rewind = -1;
             break;
@@ -2620,9 +2609,14 @@ static int handle_button(void)
             break;
         case ACTION_WPS_SKIPPREV:
             if (current.elapsed < 3000)
+            {
                 rb->audio_prev();
+            }
             else
-                ff_rewind(0, false);
+            {
+                rb->audio_pre_ff_rewind();
+                ff_rewind(0);
+            }
             break;
         case ACTION_WPS_VOLDOWN:
             rb->adjust_volume(-1);
