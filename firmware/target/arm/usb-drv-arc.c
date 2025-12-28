@@ -451,6 +451,42 @@ void usb_drv_startup(void)
        ((type) == USB_ENDPOINT_XFER_INT ? "INTR" : "INVL"))))
 #endif
 
+static void init_endpoint(int ep, int type, int mps) {
+    const int ep_num = EP_NUM(ep);
+    const int ep_dir = EP_DIR(ep);
+
+    logf("ep init: %d %s %s", ep_num, XFER_DIR_STR(ep_dir), XFER_TYPE_STR(type));
+
+    struct queue_head* qh;
+    unsigned int ctrl = REG_ENDPTCTRL(ep_num);
+    if(ep_dir == DIR_IN) {
+        ctrl &= ~EPCTRL_TX_TYPE;
+        ctrl |= EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE | type << EPCTRL_TX_EP_TYPE_SHIFT;
+        qh = &qh_array[ep_num * 2 + 1];
+    } else {
+        ctrl &= ~EPCTRL_RX_TYPE;
+        ctrl |= EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE | type << EPCTRL_RX_EP_TYPE_SHIFT;
+        qh = &qh_array[ep_num * 2];
+    }
+    REG_ENDPTCTRL(ep_num) = ctrl;
+
+    if(mps == -1) {
+        if(type == USB_ENDPOINT_XFER_ISOC) {
+            mps = 1024;
+        } else {
+            mps = usb_drv_port_speed() ? 512 : 64;
+        }
+    }
+    if(type == USB_ENDPOINT_XFER_ISOC)
+        /* FIXME: we can adjust the number of packets per frame, currently use one */
+        qh->max_pkt_length = mps << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL | 1 << QH_MULT_POS;
+    else
+        qh->max_pkt_length = mps << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
+
+    qh->dtd.next_td_ptr = QH_NEXT_TERMINATE;
+}
+
+
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
@@ -494,8 +530,8 @@ void usb_drv_init(void)
      * will cause undefined behavior for the data pid tracking on the active
      * endpoint/direction. */
     for(int ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++) {
-        usb_drv_init_endpoint(ep_num | USB_DIR_IN, USB_ENDPOINT_XFER_BULK, -1);
-        usb_drv_init_endpoint(ep_num | USB_DIR_OUT, USB_ENDPOINT_XFER_BULK, -1);
+        init_endpoint(ep_num | USB_DIR_IN, USB_ENDPOINT_XFER_BULK, -1);
+        init_endpoint(ep_num | USB_DIR_OUT, USB_ENDPOINT_XFER_BULK, -1);
     }
 }
 
@@ -984,46 +1020,16 @@ void usb_drv_cancel_all_transfers(void)
     }
 }
 
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
-    int ep_num = EP_NUM(endpoint);
-    int ep_dir = EP_DIR(endpoint);
-
-    logf("ep init: %d %s %s", ep_num, XFER_DIR_STR(ep_dir), XFER_TYPE_STR(type));
-
-    struct queue_head* qh;
-    unsigned int ctrl = REG_ENDPTCTRL(ep_num);
-    if(ep_dir == DIR_IN) {
-        ctrl &= ~EPCTRL_TX_TYPE;
-        ctrl |= EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE | type << EPCTRL_TX_EP_TYPE_SHIFT;
-        qh = &qh_array[ep_num * 2 + 1];
-    } else {
-        ctrl &= ~EPCTRL_RX_TYPE;
-        ctrl |= EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE | type << EPCTRL_RX_EP_TYPE_SHIFT;
-        qh = &qh_array[ep_num * 2];
-    }
-    REG_ENDPTCTRL(ep_num) = ctrl;
-
-    if(max_packet_size == -1) {
-        if(type == USB_ENDPOINT_XFER_ISOC) {
-            max_packet_size = 1024;
-        } else {
-            max_packet_size = usb_drv_port_speed() ? 512 : 64;
-        }
-    }
-    if(type == USB_ENDPOINT_XFER_ISOC)
-        /* FIXME: we can adjust the number of packets per frame, currently use one */
-        qh->max_pkt_length = max_packet_size << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL | 1 << QH_MULT_POS;
-    else
-        qh->max_pkt_length = max_packet_size << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
-
-    qh->dtd.next_td_ptr = QH_NEXT_TERMINATE;
-
-    return 0;
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep) {
+    const int ep_num = EP_NUM(ep);
+    const int ep_dir = EP_DIR(ep);
+    init_endpoint(ep, ctx->type[ep_num][ep_dir], ctx->max_packet_size[ep_num][ep_dir]);
 }
 
-int usb_drv_deinit_endpoint(int endpoint) {
-    int ep_num = EP_NUM(endpoint);
-    int ep_dir = EP_DIR(endpoint);
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep) {
+    (void)ctx;
+    int ep_num = EP_NUM(ep);
+    int ep_dir = EP_DIR(ep);
 
     logf("ep deinit: %d %s", ep_num, XFER_DIR_STR(ep_dir));
 
@@ -1032,8 +1038,6 @@ int usb_drv_deinit_endpoint(int endpoint) {
     } else {
         REG_ENDPTCTRL(ep_num) &= ~EPCTRL_RX_ENABLE & ~EPCTRL_RX_TYPE;
     }
-
-    return 0;
 }
 
 static void prepare_td(struct transfer_descriptor* td,

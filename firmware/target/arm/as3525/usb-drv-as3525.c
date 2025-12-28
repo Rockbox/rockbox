@@ -343,37 +343,37 @@ int usb_drv_port_speed(void)
     return (USB_DEV_STS & USB_DEV_STS_MASK_SPD) ? 0 : 1;
 }
 
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
-    (void)max_packet_size;
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    /* FIXME: support max packet size override */
+    const int epnum = EP_NUM(ep);
+    const int epdir = EP_DIR(ep);
+    const int type = ctx->type[epnum][epdir];
 
-    int i = EP_NUM(endpoint);
-//    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
-
-    if (EP_DIR(endpoint) == DIR_IN) {
-        USB_IEP_CTRL(i) = USB_EP_CTRL_FLUSH |
-                          USB_EP_CTRL_SNAK  |
-                          USB_EP_CTRL_ACT   |
-                          (type << 4);
-        USB_DEV_EP_INTR_MASK &= ~(1<<i);
+    if (epdir == DIR_IN) {
+        USB_IEP_CTRL(epnum) = USB_EP_CTRL_FLUSH |
+                              USB_EP_CTRL_SNAK  |
+                              USB_EP_CTRL_ACT   |
+                              (type << 4);
+        USB_DEV_EP_INTR_MASK &= ~(1<<epnum);
     } else {
-        USB_OEP_CTRL(i) = USB_EP_CTRL_FLUSH |
-                          USB_EP_CTRL_SNAK  |
-                          USB_EP_CTRL_ACT   |
-                          (type << 4);
-        USB_DEV_EP_INTR_MASK &= ~(1<<(16+i));
+        USB_OEP_CTRL(epnum) = USB_EP_CTRL_FLUSH |
+                              USB_EP_CTRL_SNAK  |
+                              USB_EP_CTRL_ACT   |
+                              (type << 4);
+        USB_DEV_EP_INTR_MASK &= ~(1<<(16+epnum));
     }
-    return 0;
 }
 
-int usb_drv_deinit_endpoint(int endpoint) {
-    int i = EP_NUM(endpoint);
-    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    (void)ctx;
+    int i = EP_NUM(ep);
+    int d = EP_DIR(ep) == DIR_IN ? 0 : 1;
 
     endpoints[i][d].state = 0;
     USB_DEV_EP_INTR_MASK |= (1<<(16*d+i));
     USB_EP_CTRL(i, !d) = USB_EP_CTRL_FLUSH | USB_EP_CTRL_SNAK;
-
-    return 0;
 }
 
 void usb_drv_cancel_all_transfers(void)

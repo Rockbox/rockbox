@@ -24,6 +24,8 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include "usb-designware.h"
+
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
@@ -34,8 +36,6 @@
 #include "usb_drv.h"
 #include "usb_ch9.h"
 #include "usb_core.h"
-
-#include "usb-designware.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -155,9 +155,6 @@ struct usb_dw_ep0
     struct usb_ctrlrequest pending_req;
 };
 
-struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS]; /* filled in usb_drv_init */
-uint8_t usb_drv_ep_specs_flags = 0;
-
 static const char* const dw_dir_str[USB_DW_NUM_DIRS] =
 {
     [USB_DW_EPDIR_IN]  = "IN",
@@ -195,7 +192,6 @@ static uint32_t usb_endpoints;  /* available EPs mask */
    (usually 1), otherwise it is the number of dedicated Tx FIFOs
    (not counting NPTX FIFO that is always dedicated for IN0). */
 static int n_ptxfifos;
-static uint16_t ptxfifo_usage;
 
 static uint32_t hw_maxbytes;
 static uint32_t hw_maxpackets;
@@ -672,47 +668,28 @@ static void usb_dw_unconfigure_ep(int epnum, enum usb_dw_epdir epdir)
 #endif
         ep_periodic_msk &= ~(1 << epnum);
 #endif
-        ptxfifo_usage &= ~(1 << GET_DTXFNUM(epnum));
     }
 
     usb_dw_flush_endpoint(epnum, epdir);
     DWC_EPCTL(epnum, epdir) = epctl;
 }
 
-static int usb_dw_configure_ep(int epnum,
-                enum usb_dw_epdir epdir, int type, int maxpktsize)
+static void usb_dw_configure_ep(const struct usb_drv_ep_alloc_ctx* ctx, int epnum, enum usb_dw_epdir epdir, int type, int maxpktsize)
 {
     uint32_t epctl = SETD0PIDEF|EPTYP(type)|USBAEP|maxpktsize;
 
-    if (epdir == USB_DW_EPDIR_IN)
+    if (epdir == USB_DW_EPDIR_IN && ctx->assigned_txfifos[epnum] > 0)
     {
-        /*
-         * If the hardware has dedicated fifos, we must give each
-         * IN EP a unique tx-fifo even if it is non-periodic.
-         */
 #ifdef USB_DW_SHARED_FIFO
+        ep_periodic_msk |= (1 << epnum);
 #ifndef USB_DW_ARCH_SLAVE
         epctl |= DWC_DIEPCTL(epnum) & NEXTEP(0xf);
 #endif
-        if (type == USB_ENDPOINT_XFER_INT)
 #endif
-        {
-            int fnum;
-            for (fnum = 1; fnum <= n_ptxfifos; fnum++)
-                if (~ptxfifo_usage & (1 << fnum))
-                    break;
-            if (fnum > n_ptxfifos)
-                return -1; /* no available fifos */
-            ptxfifo_usage |= (1 << fnum);
-            epctl |= DTXFNUM(fnum);
-#ifdef USB_DW_SHARED_FIFO
-            ep_periodic_msk |= (1 << epnum);
-#endif
-        }
+        epctl |= DTXFNUM(ctx->assigned_txfifos[epnum]);
     }
 
     DWC_EPCTL(epnum, epdir) = epctl;
-    return 0; /* ok */
 }
 
 static void usb_dw_reset_endpoints(void)
@@ -753,7 +730,6 @@ static void usb_dw_reset_endpoints(void)
             usb_dw_unconfigure_ep(ep, USB_DW_EPDIR_IN);
     }
 
-    ptxfifo_usage = 0;
 #ifdef USB_DW_SHARED_FIFO
     ep_periodic_msk = 0;
 #endif
@@ -1509,17 +1485,6 @@ static void usb_dw_init(void)
     /* Soft reconnect */
     udelay(3000);
     DWC_DCTL &= ~SDIS;
-
-    /* Fill endpoint spec table FIXME: should be done in usb_drv_startup() */
-    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
-    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
-    for(int i = 1; i < USB_NUM_ENDPOINTS; i += 1) {
-        bool out_avail = usb_endpoints & (1 << (i + USB_DW_DIR_OFF(USB_DW_EPDIR_OUT)));
-        usb_drv_ep_specs[i].type[DIR_OUT] = out_avail ? USB_ENDPOINT_TYPE_ANY : USB_ENDPOINT_TYPE_NONE;
-
-        bool in_avail = usb_endpoints & (1 << (i + USB_DW_DIR_OFF(USB_DW_EPDIR_IN)));
-        usb_drv_ep_specs[i].type[DIR_IN] = in_avail ? USB_ENDPOINT_TYPE_ANY : USB_ENDPOINT_TYPE_NONE;
-    }
 }
 
 static void usb_dw_exit(void)
@@ -1617,12 +1582,65 @@ void INT_USB_FUNC(void)
     usb_dw_irq();
 }
 
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size)
+void usb_drv_ep_reset_alloc_ctx(struct usb_drv_ep_alloc_ctx* ctx)
+{
+    memset(ctx, 0, sizeof(*ctx));
+}
+
+bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type, int max_packet_size)
 {
     (void)max_packet_size; /* FIXME: support max packet size override */
 
-    enum usb_dw_epdir epdir = (EP_DIR(endpoint) == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(endpoint), epdir);
+    const uint8_t epnum = EP_NUM(ep);
+    const uint8_t epdir = EP_DIR(ep);
+
+    if(ep == EP_CONTROL)
+    {
+        return false;
+    }
+
+    enum usb_dw_epdir dwdir = epdir == DIR_IN ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    if(!(usb_endpoints & (1 << (epnum + USB_DW_DIR_OFF(dwdir)))))
+    {
+        return false;
+    }
+
+    bool need_fifo = epdir == DIR_IN;
+#ifdef USB_DW_SHARED_FIFO
+    /* in shared fifo mode, only periodic endpoints need dedicated fifo */
+    need_fifo &= type == USB_ENDPOINT_XFER_ISOC || type == USB_ENDPOINT_XFER_INT;
+#endif
+    if(!need_fifo)
+    {
+        goto ok;
+    }
+
+    for (int fnum = 1; fnum <= n_ptxfifos; fnum++)
+    {
+        if (~ctx->txfifo_usage & (1 << fnum))
+        {
+            ctx->txfifo_usage |= 1 << fnum;
+            ctx->assigned_txfifos[epnum] = fnum;
+            goto ok;
+        }
+    }
+
+    return false;
+
+ok:
+    ctx->type[epnum][epdir] = type;
+    return true;
+}
+
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    /* FIXME: support max packet size override */
+    const int epnum = EP_NUM(ep);
+    const int epdir_ = EP_DIR(ep);
+    const int type = ctx->type[epnum][epdir_];
+
+    enum usb_dw_epdir epdir = (epdir_ == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(ep), epdir);
 
     int maxpktsize;
     if(type == EPTYP_ISOCHRONOUS)
@@ -1635,32 +1653,23 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size)
     }
 
     usb_dw_target_disable_irq();
-    int res = usb_dw_configure_ep(EP_NUM(endpoint), epdir, type, maxpktsize);
+    usb_dw_configure_ep(ctx, epnum, epdir, type, maxpktsize);
     usb_dw_target_enable_irq();
 
-    if(res >= 0)
-    {
-        dw_ep->active = true;
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
+    dw_ep->active = true;
 }
 
-int usb_drv_deinit_endpoint(int endpoint)
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 {
-    enum usb_dw_epdir epdir = (EP_DIR(endpoint) == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(endpoint), epdir);
+    (void)ctx;
+    enum usb_dw_epdir epdir = (EP_DIR(ep) == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(ep), epdir);
 
     usb_dw_target_disable_irq();
-    usb_dw_unconfigure_ep(EP_NUM(endpoint), epdir);
+    usb_dw_unconfigure_ep(EP_NUM(ep), epdir);
     usb_dw_target_enable_irq();
 
     dw_ep->active = false;
-
-    return 0;
 }
 
 int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)

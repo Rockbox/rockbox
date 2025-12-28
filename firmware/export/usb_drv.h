@@ -62,18 +62,41 @@ enum usb_control_response {
     USB_CONTROL_RECEIVE,
 };
 
+/* endpoint allocation:
+ * there are two ways to implement endpoint allocation.
+ * 1. define usb_drv_ep_specs and usb_drv_ep_specs_flags in the driver.
+ *    this is the simplest option when the types accepted by each endpoint are mutually independent.
+ *    these variables are set only once during driver initialization and should not be modified afterward.
+ * 2. define usb_drv_ep_alloc_ctx and implement usb_drv_ep_reset_alloc_ctx and usb_drv_ep_allocate in the driver.
+ *    if the available endpoint types change based on allocation status,
+ *    these functions can be overridden to allow the driver to track the endpoint state.
+ * */
+
+#ifndef usb_drv_ep_alloc_ctx
+/* option 1 */
 #define USB_ENDPOINT_TYPE_ANY  (-1)
 #define USB_ENDPOINT_TYPE_NONE (-2)
-
 struct usb_drv_ep_spec {
     int8_t type[2]; /* USB_ENDPOINT_TYPE_{ANY,NONE} USB_ENDPOINT_XFER_* */
 };
-
 extern struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS];
 
 #define USB_ENDPOINT_SPEC_FORCE_IO_TYPE_MATCH (1 << 0)
 #define USB_ENDPOINT_SPEC_IO_EXCLUSIVE        (1 << 1)
 extern uint8_t usb_drv_ep_specs_flags;
+
+struct usb_drv_ep_alloc_ctx {
+    int8_t type[USB_NUM_ENDPOINTS][2];
+    int max_packet_size[USB_NUM_ENDPOINTS][2];
+};
+#else
+/* option 2 */
+void usb_drv_ep_reset_alloc_ctx(struct usb_drv_ep_alloc_ctx* ctx);
+bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type, int max_packet_size);
+#endif
+
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep);
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep);
 
 /* one-time initialisation of the USB driver */
 void usb_drv_startup(void);
@@ -98,8 +121,6 @@ int usb_drv_port_speed(void);
 void usb_drv_cancel_all_transfers(void);
 void usb_drv_set_test_mode(int mode);
 bool usb_drv_connected(void);
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size);
-int usb_drv_deinit_endpoint(int endpoint);
 #ifdef USB_HAS_ISOCHRONOUS
 /* returns the last received frame number (the 11-bit number contained in the last SOF):
  * - full-speed: the host sends one SOF every 1ms (so 1000 SOF/s)

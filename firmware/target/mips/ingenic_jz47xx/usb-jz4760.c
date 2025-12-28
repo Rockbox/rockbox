@@ -1192,12 +1192,12 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
-    (void)max_packet_size; /* FIXME: support max packet size override */
-    (void)type;
-
-    int num = EP_NUM(endpoint);
-    int dir = EP_DIR(endpoint);
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    /* FIXME: support max packet size override */
+    (void)ctx;
+    int num = EP_NUM(ep);
+    int dir = EP_DIR(ep);
     int index = num * 2 + (dir == DIR_OUT ? 1 : 0);
     endpoints[index].allocated = true;
     if(dir == DIR_IN)
@@ -1207,9 +1207,11 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
     return 0;
 }
 
-int usb_drv_deinit_endpoint(int endpoint) {
-    int num = EP_NUM(endpoint);
-    int dir = EP_DIR(endpoint);
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    (void)ctx;
+    int num = EP_NUM(ep);
+    int dir = EP_DIR(ep);
     int index = num * 2 + (dir == DIR_OUT ? 1 : 0);
     endpoints[index].allocated = false;
     if(dir == DIR_IN)

@@ -28,7 +28,6 @@
 
 #include "usb.h"
 #include "usb_ch9.h"
-#include "usb_drv.h"
 #include "usb_core.h"
 #include "usb_class_driver.h"
 
@@ -56,6 +55,12 @@
 #ifdef USB_ENABLE_IAP
 #include "usb_iap.h"
 #endif
+
+/* include order matters, include driver header before usb_drv.h */
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+#include "usb-designware.h"
+#endif
+#include "usb_drv.h"
 
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
@@ -179,8 +184,6 @@ static int usb_no_host_callback(struct timeout *tmo)
 }
 #endif
 
-static int usb_core_num_interfaces[NUM_CONFIGS];
-
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, void* reqdata,
@@ -199,7 +202,13 @@ struct ep_alloc_state {
     struct usb_class_driver* owner[2];
 };
 
-static struct ep_alloc_state ep_alloc_states[NUM_CONFIGS][USB_NUM_ENDPOINTS];
+struct config_state {
+    struct usb_drv_ep_alloc_ctx ep_alloc_ctx;
+    struct ep_alloc_state ep_alloc_states[USB_NUM_ENDPOINTS];
+    uint8_t num_interfaces;
+};
+
+struct config_state config_states[NUM_CONFIGS];
 
 static struct usb_class_driver* drivers[USB_NUM_DRIVERS] =
 {
@@ -407,9 +416,6 @@ void usb_core_init(void)
         }
     }
 
-    /* clear endpoint allocation state */
-    memset(ep_alloc_states, 0, sizeof(ep_alloc_states));
-
     initialized = true;
     usb_state = DEFAULT;
     usb_config = 0;
@@ -548,52 +554,86 @@ static void usb_core_set_serial_function_id(void)
 }
 
 /* synchronize endpoint initialization state to allocation state */
-static void init_deinit_endpoints(uint8_t conf_index, bool init) {
+static void init_deinit_endpoints(int config, bool init) {
     for(int epnum = 0; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
         for(int dir = 0; dir < 2; dir += 1) {
-            struct ep_alloc_state* alloc = &ep_alloc_states[conf_index][epnum];
-            struct usb_class_driver* driver = alloc->owner[dir];
+            struct config_state* cstate = &config_states[config - 1];
+            struct ep_alloc_state* astate = &cstate->ep_alloc_states[epnum];
+            struct usb_class_driver* driver = astate->owner[dir];
             if(driver == NULL) {
                 continue;
             }
             int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
-            int ret;
             if(init) {
-                int ps = driver->get_max_packet_size ? driver->get_max_packet_size(ep) : -1;
-                ret = usb_drv_init_endpoint(ep, alloc->type[dir], ps);
-            } else {
-                ret = usb_drv_deinit_endpoint(ep);
-            }
-            if(ret) {
-                logf("usb_core: usb_drv_%s_endpoint failed ep=%d dir=%d", init ? "init" : "deinit", epnum, dir);
-                continue;
-            }
-            if(init) {
+                usb_drv_ep_init(&cstate->ep_alloc_ctx, ep);
                 ep_data[epnum].completion_handler[dir] = driver->transfer_complete;
                 ep_data[epnum].fast_completion_handler[dir] = driver->fast_transfer_complete;
                 ep_data[epnum].control_handler[dir] = driver->control_request;
+            } else {
+                usb_drv_ep_deinit(&cstate->ep_alloc_ctx, ep);
             }
         }
     }
 }
 
+#ifndef usb_drv_ep_alloc_ctx
+/* default endpoint allocator using usb_drv_ep_specs table */
+static void usb_drv_ep_reset_alloc_ctx(struct usb_drv_ep_alloc_ctx* ctx) {
+    for(int i = 0; i < USB_NUM_ENDPOINTS; i += 1) {
+        ctx->type[i][0] = -1;
+        ctx->type[i][1] = -1;
+    }
+}
+
+static bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type, int max_packet_size) {
+    const uint8_t epnum = EP_NUM(ep);
+    const uint8_t epdir = EP_DIR(ep);
+
+    struct usb_drv_ep_spec* spec = &usb_drv_ep_specs[epnum];
+
+    const int8_t spec_type = spec->type[epdir];
+    if(spec_type != type && spec_type != USB_ENDPOINT_TYPE_ANY) {
+        return false;
+    }
+
+    const int8_t other_type = ctx->type[epnum][!epdir];
+    if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_IO_EXCLUSIVE && other_type != -1) {
+        /* the other side is allocated */
+        return false;
+    }
+
+    if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_FORCE_IO_TYPE_MATCH && other_type != -1 && other_type != type) {
+        /* the other side is allocated with another type */
+        return false;
+    }
+
+    ctx->type[epnum][epdir] = type;
+    ctx->max_packet_size[epnum][epdir] = max_packet_size;
+
+    return true;
+}
+#endif
+
 static void allocate_interfaces_and_endpoints(void)
 {
     if(usb_config != 0) {
         /* deinit currently used endpoints */
-        init_deinit_endpoints(usb_config - 1, false);
+        init_deinit_endpoints(usb_config, false);
     }
 
+retry:
     /* reset allocations */
-    memset(ep_alloc_states, 0, sizeof(ep_alloc_states));
-
-    int interface[NUM_CONFIGS] = {0};
+    for(int i = 0; i < NUM_CONFIGS; i += 1) {
+        config_states[i].num_interfaces = 0;
+        memset(config_states[i].ep_alloc_states, 0, sizeof(config_states[i].ep_alloc_states));
+        usb_drv_ep_reset_alloc_ctx(&config_states[i].ep_alloc_ctx);
+    }
 
     for(int i = 0; i < USB_NUM_DRIVERS; i++) {
         struct usb_class_driver* driver = drivers[i];
-        const uint8_t conf_index = driver->config - 1;
+        struct config_state* cstate = &config_states[driver->config - 1];
 
-        if(!driver->enabled) {
+        if(!driver->enabled || driver->error) {
             continue;
         }
 
@@ -603,69 +643,38 @@ static void allocate_interfaces_and_endpoints(void)
             struct usb_class_driver_ep_allocation* req = &driver->ep_allocs[reqnum];
             req->ep = 0;
             for(int epnum = 1; epnum < USB_NUM_ENDPOINTS; epnum += 1) {
-                struct usb_drv_ep_spec* spec = &usb_drv_ep_specs[epnum];
-                /* ep type check */
-                const int8_t spec_type = spec->type[req->dir];
-                if(spec_type != req->type && spec_type != USB_ENDPOINT_TYPE_ANY) {
-                    continue;
-                }
                 /* free check */
-                struct ep_alloc_state* alloc = &ep_alloc_states[conf_index][epnum];
+                struct ep_alloc_state* alloc = &cstate->ep_alloc_states[epnum];
                 if(alloc->owner[req->dir] != NULL) {
                     continue;
                 }
 
-                /* this ep's requested direction is free */
-
-                /* another checks */
-                if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_IO_EXCLUSIVE) {
-                    /* check for the other direction type */
-                    if(alloc->owner[!req->dir] != NULL) {
-                        /* the other side is allocated */
-                        continue;
-                    }
-                }
-                if(usb_drv_ep_specs_flags & USB_ENDPOINT_SPEC_FORCE_IO_TYPE_MATCH) {
-                    /* check for other direction type */
-                    if(alloc->owner[!req->dir] != NULL && alloc->type[!req->dir] != req->type) {
-                        /* the other side is allocated with another type */
-                        continue;
-                    }
+                /* driver specific check */
+                const int ep = epnum | (req->dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
+                const int ps = driver->get_max_packet_size ? driver->get_max_packet_size(ep) : -1;
+                if(!usb_drv_ep_allocate(&cstate->ep_alloc_ctx, ep, req->type, ps)) {
+                    continue;
                 }
 
                 /* all checks passed, assign it */
-                const int ep = epnum | (req->dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
                 req->ep = ep;
                 alloc->owner[req->dir] = driver;
                 alloc->type[req->dir] = req->type;
                 break;
             }
             if(req->ep == 0 && !req->optional) {
-                /* no matching ep found, disable the driver */
+                /* no matching ep found, retry allocation excluding this driver */
+                logf("usb_core: no endpoint allocated for driver %d", i);
                 driver->enabled = false;
-                /* also revert all allocations for this driver */
-                for(reqnum = reqnum - 1; reqnum >= 0; reqnum -= 1) {
-                    const uint8_t ep = driver->ep_allocs[reqnum].ep;
-                    const uint8_t epnum = EP_NUM(ep);
-                    const uint8_t epdir = EP_DIR(ep);
-                    const uint8_t dir = epdir == USB_DIR_OUT ? DIR_OUT : DIR_IN;
-                    ep_alloc_states[conf_index][epnum].owner[dir] = NULL;
-                }
-                break;
+                goto retry;
             }
         }
 
-        if(!driver->enabled) {
-            continue;
-        }
-
         /* assign interfaces */
-        driver->first_interface = interface[conf_index];
-        interface[conf_index] = driver->set_first_interface(interface[conf_index]);
-        driver->last_interface = interface[conf_index];
+        driver->first_interface = cstate->num_interfaces;
+        cstate->num_interfaces = driver->set_first_interface(cstate->num_interfaces);
+        driver->last_interface = cstate->num_interfaces;
     }
-
-    memcpy(usb_core_num_interfaces, interface, sizeof(interface));
 }
 
 
@@ -765,7 +774,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
                 }
             }
 
-            config_descriptor.bNumInterfaces = usb_core_num_interfaces[index];
+            config_descriptor.bNumInterfaces = config_states[index].num_interfaces;
             config_descriptor.bConfigurationValue = index + 1;
             config_descriptor.wTotalLength = (uint16_t)size;
             memcpy(&response_data[0], &config_descriptor, sizeof(struct usb_config_descriptor));
@@ -844,7 +853,7 @@ static int usb_core_do_set_config(uint8_t new_config)
                 drivers[i]->disconnect();
             }
         }
-        init_deinit_endpoints(usb_config - 1, false);
+        init_deinit_endpoints(usb_config, false);
 
         /* clear any pending transfer completions,
          * because they are depend on contents of ep_data */
@@ -861,7 +870,7 @@ static int usb_core_do_set_config(uint8_t new_config)
 
     /* activate new config */
     if(usb_config != 0) {
-        init_deinit_endpoints(usb_config - 1, true);
+        init_deinit_endpoints(usb_config, true);
         for(int i = 0; i < USB_NUM_DRIVERS; i++) {
             if(!is_active(drivers[i])) {
                 continue;

@@ -100,16 +100,17 @@ static struct tcc_ep tcc_endpoints[] = {
 static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
-int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
-    (void)max_packet_size; /* FIXME: support max packet size override */
-
-    tcc_endpoints[EP_NUM(endpoint)].dir = EP_DIR(endpoint) == DIR_IN ? USB_DIR_IN : USB_DIR_OUT;
-    return 0;
+void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    /* FIXME: support max packet size override */
+    (void)ctx;
+    tcc_endpoints[EP_NUM(ep)].dir = EP_DIR(ep) == DIR_IN ? USB_DIR_IN : USB_DIR_OUT;
 }
 
-int usb_drv_deinit_endpoint(int endpoint) {
-    tcc_endpoints[EP_NUM(endpoint)].dir = -1;
-    return 0;
+void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
+{
+    (void)ctx;
+    tcc_endpoints[EP_NUM(ep)].dir = -1;
 }
 
 static inline void pullup_on(void)
