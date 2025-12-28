@@ -26,6 +26,7 @@
 
 int key_to_button(int keyboard_button)
 {
+    (void)keyboard_button;
     return BUTTON_NONE;
 }
 
