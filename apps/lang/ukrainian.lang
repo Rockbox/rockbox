@@ -16928,3 +16928,20 @@
     usbdac: "Активний ЮСБ-ЦАП"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Використати світлодіодні індикатори"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Використати світлодіодні індикатори"
+  </voice>
+</phrase>
