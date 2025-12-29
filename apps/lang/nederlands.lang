@@ -16879,11 +16879,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </voice>
 </phrase>
 <phrase>
@@ -16896,7 +16896,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Charge-Only Mode"
+    usbdac: "Tijdens 'enkel opladen' USB-modus"
   </dest>
   <voice>
     *: none
@@ -16913,7 +16913,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "While In USB Mass-Storage Mode"
+    usbdac: "Tijdens 'massaopslag' USB-modus"
   </dest>
   <voice>
     *: none
@@ -16930,7 +16930,7 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC Active"
+    usbdac: "USB-DAC aktief"
   </dest>
   <voice>
     *: none
