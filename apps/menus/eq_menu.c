@@ -198,7 +198,8 @@ static int eq_do_simple_menu(void * param)
 
     simplelist_info_init(&info, str(LANG_EQUALIZER_GAIN), EQ_NUM_BANDS, NULL);
     info.get_name = (list_get_name*)gainitem_get_name;
-    info.get_talk = gainitem_speak_item;
+    if(global_settings.talk_menu)
+        info.get_talk = gainitem_speak_item;
     info.get_icon = gainitem_get_icon;
     info.action_callback = simplelist_action_callback;
     info.selection = -1;
@@ -362,7 +363,8 @@ static int eq_do_advanced_menu(void * param)
     simplelist_info_init(&info, str(LANG_EQUALIZER_ADVANCED),
             EQ_NUM_BANDS, &selected_band);
     info.get_name = (list_get_name*)advancedmenu_item_get_name;
-    info.get_talk = advancedmenu_speak_item;
+    if(global_settings.talk_menu)
+        info.get_talk = advancedmenu_speak_item;
     info.get_icon = advancedmenu_get_icon;
     info.action_callback = simplelist_action_callback;
     info.selection = -1;
