@@ -254,6 +254,15 @@ RCC @ 0x58024400 : block {
         0 LSION
     }
 
+    AHB3RSTR @ 0x7c : reg {
+        16 SDMMC1RST
+        14 QSPIRST
+        12 FMCRST
+        05 JPEGDECRST
+        04 DMA2DRST
+        00 MDMARST
+    }
+
     AHB3ENR @ 0xd4 : reg {
         16 SDMMC1EN
         14 QSPIEN
@@ -945,3 +954,141 @@ LTDC @ 0x50001000 : block {
         }
     }
 }
+
+// SD/MMC host controller
+block SDMMC {
+    POWER @ 0x00 : reg {
+        - 4 DIRPOL
+        - 3 VSWITCHEN
+        - 2 VSWITCH
+        1 0 PWRCTRL : { 0 = POWER_OFF; 2 = POWER_CYCLE; 3 = POWER_ON }
+    }
+
+    CLKCR @ 0x04 : reg {
+        21 20 SELCLKRX : { 0 = SDMMC_IO_IN_CK; 1 = SDMMC_CKIN; 2 = SDMMC_FB_CK }
+        -- 19 BUSSPEED : { 0 = SLOW; 1 = FAST }
+        -- 18 DDR
+        -- 17 HWFC_EN
+        -- 16 NEGEDGE
+        15 14 WIDBUS : { 0 = 1BIT; 1 = 4BIT; 2 = 8BIT }
+        -- 12 PWRSAV
+        09 00 CLKDIV
+    }
+
+    ARGR @ 0x08 : reg
+
+    CMDR @ 0x0c : reg {
+        -- 16 CMDSUSPEND
+        -- 15 BOOTEN
+        -- 14 BOOTMODE
+        -- 13 DTHOLD
+        -- 12 CPSMEN
+        -- 11 WAITPEND
+        -- 10 WAITINT
+        09 08 WAITRESP : { 0 = NONE; 1 = SHORT; 2 = SHORT_NOCRC; 3 = LONG }
+        -- 07 CMDSTOP
+        -- 06 CMDTRANS
+        05 00 CMDINDEX
+    }
+
+    RESPCMDR @ 0x10 : reg {
+        05 00 RESPCMD
+    }
+
+    RESPR @ 0x14 [4; 0x04] : reg
+    DTIMER @ 0x24 : reg
+
+    DLENR @ 0x28 : reg {
+        24 00 DATALENGTH
+    }
+
+    DCTRL @ 0x2c : reg {
+        -- 13 FIFORST
+        -- 12 BOOTACKEN
+        -- 11 SDIOEN
+        -- 10 RWMOD
+        -- 09 RWSTOP
+        -- 08 RWSTART
+        07 04 DBLOCKSIZE
+        03 02 DTMODE
+        -- 01 DTDIR
+        -- 00 DTEN
+    }
+
+    DCNTR @ 0x30 : reg {
+        24 00 DATACOUNT
+    }
+
+    reg INTERRUPT_COMMON {
+        28 IDMABTC
+        26 CKSTOP
+        25 VSWEND
+        24 ACKTIMEOUT
+        23 ACKFAIL
+        22 SDIOIT
+        21 BUSYD0END
+        11 DABORT
+        10 DBCKEND
+        09 DHOLD
+        08 DATAEND
+        07 CMDSENT
+        06 CMDREND
+        05 RXOVERR
+        04 TXUNDERR
+        03 DTIMEOUT
+        02 CTIMEOUT
+        01 DCRCFAIL
+        00 CCRCFAIL
+    }
+
+    reg INTERRUPT_FIFO {
+        18 TXFIFOE
+        17 RXFIFOF
+        15 RXFIFOHF
+        14 TXFIFOHE
+    }
+
+    STAR @ 0x34 : reg {
+        27 IDMATE
+        20 BUSYD0
+        19 RXFIFOE
+        16 TXFIFOF
+        13 CPSMACT
+        12 DPSMACT
+
+        include INTERRUPT_COMMON
+        include INTERRUPT_FIFO
+    }
+
+    ICR @ 0x38 : reg {
+        27 IDMATE
+        include INTERRUPT_COMMON
+    }
+
+    MASKR @ 0x3c : reg {
+        include INTERRUPT_COMMON
+        include INTERRUPT_FIFO
+    }
+
+    ACKTIMER @ 0x40 : reg {
+        24 00 ACKTIME
+    }
+
+    IDMACTRLR @ 0x50 : reg {
+        2 IDMABACT  : { 0 = USE_BUFFER0;   1 = USE_BUFFER1   }
+        1 IDMABMODE : { 0 = SINGLE_BUFFER; 1 = DOUBLE_BUFFER }
+        0 IDMAEN
+    }
+
+    IDMABSIZER @ 0x54 : reg {
+        12 05 IDMABNDT
+    }
+
+    IDMABASE0R @ 0x58 : reg
+    IDMABASE1R @ 0x5c : reg
+
+    FIFOR @ 0x80 [16; 0x04] : reg
+}
+
+SDMMC1 @ 0x52007000 : SDMMC
+SDMMC2 @ 0x48022400 : SDMMC
