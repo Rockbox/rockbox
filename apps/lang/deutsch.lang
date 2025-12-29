@@ -16957,7 +16957,7 @@
   </source>
   <dest>
     *: none
-    general_purpose_led: "Use LED indicators"
+    general_purpose_led: "LED Indikatoren verwenden"
   </dest>
   <voice>
     *: none
