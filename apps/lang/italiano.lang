@@ -13444,20 +13444,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Errore durante la raccolta delle informazioni"
-  </dest>
-  <voice>
-    *: "Errore durante la raccolta delle informazioni"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_MENU_RESTORE_GAME
   desc: in the chessbox menu
   user: core
@@ -15831,20 +15817,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Menu Principale Labirinto"
-  </dest>
-  <voice>
-    *: "Menu Principale Labirinto"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16108,34 +16080,6 @@
   </dest>
   <voice>
     *: "Impostazioni Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Menu Mikmod"
-  </dest>
-  <voice>
-    *: "Menu Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Menu Chessbox"
-  </dest>
-  <voice>
-    *: "Menu Chess box"
   </voice>
 </phrase>
 <phrase>
@@ -16983,5 +16927,22 @@
   <voice>
     *: none
     usbdac: "DAC-USB Attivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Usa indicatori led"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Usa indicatori led"
   </voice>
 </phrase>
