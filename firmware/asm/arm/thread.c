@@ -29,7 +29,11 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
 {
     /* r0 = context */
     asm volatile (
+#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+        "ldr    sp, [r0, #36]            \n" /* Load initial sp */
+#else
         "ldr    sp, [r0, #32]            \n" /* Load initial sp */
+#endif
         "ldr    r4, [r0, #40]            \n" /* start in r4 since it's non-volatile */
         "mov    r1, #0                   \n" /* Mark thread as running */
         "str    r1, [r0, #40]            \n"
