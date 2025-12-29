@@ -16947,7 +16947,7 @@
   </source>
   <dest>
     *: none
-    general_purpose_led: "Use LED indicators"
+    general_purpose_led: "Gebruik LED-indicatoren"
   </dest>
   <voice>
     *: none
