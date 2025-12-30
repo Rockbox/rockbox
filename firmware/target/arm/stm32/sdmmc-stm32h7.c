@@ -45,7 +45,7 @@
 #define DATA_SUCCESS_BITS \
     __reg_orm(SDMMC_STAR, DATAEND)
 #define DATA_ERROR_BITS \
-    __reg_orm(SDMMC_STAR, DTIMEOUT, DABORT, DCRCFAIL, TXUNDERR, RXOVERR)
+    __reg_orm(SDMMC_STAR, IDMATE, DTIMEOUT, DABORT, DCRCFAIL, TXUNDERR, RXOVERR)
 #define DATA_END_BITS \
     (DATA_SUCCESS_BITS | DATA_ERROR_BITS)
 
@@ -283,6 +283,16 @@ int stm32h7_sdmmc_submit_command(void *controller,
         if ((uintptr_t)buff_addr >= STM32_DTCM_BASE &&
             (uintptr_t)buff_addr < STM32_DTCM_BASE + STM32_DTCM_SIZE)
             panicf("%s: buffer in DTCM not supported", __func__);
+
+        /*
+         * Must assign to a variable to prevent GCC from whining
+         * about 'limited range of data type', because the ITCM
+         * is mapped at address 0.
+         */
+        static const uintptr_t itcm_base = STM32_ITCM_BASE;
+        if ((uintptr_t)buff_addr >= itcm_base &&
+            (uintptr_t)buff_addr < itcm_base + STM32_ITCM_SIZE)
+            panicf("%s: buffer in ITCM not supported", __func__);
 
         /* Set block size */
         uint32_t dctrl = 0;
