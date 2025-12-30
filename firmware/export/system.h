@@ -163,7 +163,8 @@ int get_cpu_boost_counter(void);
 #endif
 
 /* returns index of first set bit or 32 if no bits are set */
-#if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)
+#if (defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)) || \
+    defined(CPU_ARM_MICRO)
 static inline int find_first_set_bit(uint32_t val)
     { return LIKELY(val) ? __builtin_ctz(val) : 32; }
 #else
