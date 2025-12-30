@@ -58,6 +58,10 @@ enum
 #ifdef STORAGE_CLOSE
     Q_STORAGE_CLOSE,
 #endif
+#ifdef HAVE_HOTSWAP_IN_THREAD
+    Q_STORAGE_MEDIUM_INSERTED,
+    Q_STORAGE_MEDIUM_REMOVED,
+#endif
 };
 
 #define STG_EVENT_ASSERT_ACTIVE(type) \
@@ -118,6 +122,7 @@ struct storage_info
 
 int storage_init(void) STORAGE_INIT_ATTR;
 void storage_close(void);
+void storage_post_event(long event, intptr_t data);
 
 #ifdef HAVE_HOSTFS
 #include "hostfs.h"

@@ -2155,6 +2155,9 @@ drivers/ft6x06.c
 #ifdef HAVE_CW2015
 drivers/cw2015.c
 #endif
+#ifdef HAVE_SDMMC_HOST
+drivers/sdmmc_host.c
+#endif
 #endif
 
 /* firmware/kernel section */

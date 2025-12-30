@@ -1448,6 +1448,15 @@ Lyre prototype 1 */
 # define HAVE_PERCEPTUAL_VOLUME
 #endif
 
+#if defined(SDMMC_HOST_NUM_SD_CONTROLLERS) || \
+    defined(SDMMC_HOST_NUM_MMC_CONTROLLERS)
+# define HAVE_SDMMC_HOST
+#endif
+
+#if defined(HAVE_SDMMC_HOST) && defined(HAVE_HOTSWAP)
+# define HAVE_HOTSWAP_IN_THREAD
+#endif
+
 /*
  * Turn off legacy codepage handling in the filesystem code for bootloaders,
  * and support ISO-8859-1 (Latin-1) only. This only affects DOS 8.3 filename

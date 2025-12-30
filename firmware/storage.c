@@ -25,6 +25,10 @@
 #include "disk.h"
 #include "pathfuncs.h"
 
+#ifdef HAVE_SDMMC_HOST
+# include "sdmmc_host.h"
+#endif
+
 #ifdef CONFIG_STORAGE_MULTI
 
 #define DRIVER_MASK     0xff000000
@@ -181,6 +185,13 @@ static void NORETURN_ATTR storage_thread(void)
             }
             break;
 
+#ifdef HAVE_HOTSWAP_IN_THREAD
+        case Q_STORAGE_MEDIUM_INSERTED:
+        case Q_STORAGE_MEDIUM_REMOVED:
+            storage_event_send(DRIVE_EVT, ev.id, ev.data);
+            break;
+#endif
+
 #if (CONFIG_STORAGE & STORAGE_ATA)
         case Q_STORAGE_SLEEP:
             storage_event_send(bdcast, ev.id, 0);
@@ -255,6 +266,12 @@ void storage_close(void)
 }
 #endif /* STORAGE_CLOSE */
 
+void storage_post_event(long event, intptr_t data)
+{
+    if (storage_thread_id)
+        queue_post(&storage_queue, event, data);
+}
+
 static inline void storage_thread_init(void)
 {
     if (storage_thread_id) {
@@ -272,6 +289,10 @@ static inline void storage_thread_init(void)
 int storage_init(void)
 {
     int rc=0;
+
+#ifdef HAVE_SDMMC_HOST
+    sdmmc_host_target_init();
+#endif
 
 #ifdef CONFIG_STORAGE_MULTI
     int i;
