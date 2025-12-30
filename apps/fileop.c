@@ -582,9 +582,8 @@ int delete_fileobject(const char *selected_file)
 
     /* Note: delete_fileobject() will happily delete whatever
      * path is passed (after confirmation) */
-    if (confirm_delete_yesno(param.path) != YESNO_YES) {
+    if (confirm_delete_yesno(param.path, param.toplevel_name) != YESNO_YES)
         return FORC_CANCELLED;
-    }
 
     if (param.is_dir) {
         int rc = check_count_fileobjects(&param);

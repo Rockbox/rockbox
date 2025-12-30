@@ -119,6 +119,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 }
 
 enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res,
+                                       const char *title,
                                        const struct text_message * main_message,
                                        const struct text_message * yes_message,
                                        const struct text_message * no_message)
@@ -126,6 +127,16 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
     /* FIXME: create a prompt with timeout for android */
     (void)ticks;
     (void)tmo_default_res;
+    (void)title; /* Note: title ignored on Android */
+    return gui_syncyesno_run(main_message, yes_message, no_message);
+}
+
+enum yesno_res gui_syncyesno_run_w_title(const char *title,
+                                         const struct text_message * main_message,
+                                         const struct text_message * yes_message,
+                                         const struct text_message * no_message)
+{
+    (void)title; /* Note: title ignored on Android */
     return gui_syncyesno_run(main_message, yes_message, no_message);
 }
 

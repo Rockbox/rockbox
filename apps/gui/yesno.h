@@ -50,11 +50,19 @@ extern enum yesno_res gui_syncyesno_run(
                            const struct text_message * yes_message,
                            const struct text_message * no_message);
 
+/* Sets SBS title for the screen. Title may be NULL. */
+extern enum yesno_res gui_syncyesno_run_w_title(
+                           const char *title,
+                           const struct text_message * main_message,
+                           const struct text_message * yes_message,
+                           const struct text_message * no_message);
+
 extern enum yesno_res gui_syncyesno_run_w_tmo(
-                                     int ticks, enum yesno_res tmo_default_res,
-                                     const struct text_message * main_message,
-                                     const struct text_message * yes_message,
-                                     const struct text_message * no_message);
+                           int ticks, enum yesno_res tmo_default_res,
+                           const char *title,
+                           const struct text_message * main_message,
+                           const struct text_message * yes_message,
+                           const struct text_message * no_message);
 
 bool yesno_pop(const char* text);
 bool yesno_pop_confirm(const char* text);

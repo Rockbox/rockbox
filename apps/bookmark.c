@@ -1083,7 +1083,7 @@ static int select_bookmark(const char* bookmark_file_name,
         case ACTION_BMS_DELETE:
             if (item >= 0)
             {
-                if (confirm_delete_yesno("") == YESNO_YES)
+                if (confirm_delete_yesno("", str(LANG_BOOKMARK_CONTEXT_MENU)) == YESNO_YES)
                 {
                     delete_bookmark(bookmark_file_name, item);
                     bookmarks->reload = true;

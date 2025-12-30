@@ -646,7 +646,8 @@ static void close_playlist_viewer(void)
             if (viewer.num_tracks && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
                 save_playlist_screen(viewer.playlist);
             else if (!viewer.num_tracks &&
-                     confirm_delete_yesno(viewer.playlist->filename) == YESNO_YES)
+                     confirm_delete_yesno(viewer.playlist->filename,
+                                          viewer.title) == YESNO_YES)
             {
                 remove(viewer.playlist->filename);
                 reload_directory();

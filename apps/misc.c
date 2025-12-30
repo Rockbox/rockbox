@@ -1277,13 +1277,13 @@ char* skip_whitespace(char* const str)
 
 #if !defined(CHECKWPS) && !defined(DBTOOL)
 
-int confirm_delete_yesno(const char *name)
+int confirm_delete_yesno(const char *name, const char *title)
 {
     const char *lines[] = { ID2P(LANG_REALLY_DELETE), name };
     const char *yes_lines[] = { ID2P(LANG_DELETING), name };
     const struct text_message message = { lines, 2 };
     const struct text_message yes_message = { yes_lines, 2 };
-    return gui_syncyesno_run(&message, &yes_message, NULL);
+    return gui_syncyesno_run_w_title(title, &message, &yes_message, NULL);
 }
 
 /*  time_split_units()

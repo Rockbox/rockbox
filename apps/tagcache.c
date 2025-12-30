@@ -5253,7 +5253,8 @@ static void tagcache_thread(void)
                                       ID2P(LANG_TAGCACHE_UPDATE)};
         static const struct text_message message = {lines, 2};
 
-        if (gui_syncyesno_run_w_tmo(HZ * 5, YESNO_YES, &message, NULL, NULL) == YESNO_YES)
+        if (gui_syncyesno_run_w_tmo(HZ * 5, YESNO_YES, str(LANG_TAGCACHE),
+                                    &message, NULL, NULL) == YESNO_YES)
 #endif
         {
             allocate_tempbuf();

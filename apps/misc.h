@@ -174,7 +174,9 @@ void adjust_volume_ex(int steps, enum volume_adjust_mode mode);
 int hex_to_rgb(const char* hex, int* color);
 #endif
 
-int confirm_delete_yesno(const char *name);
+/* Note: Don't rely on title being visible. It is not
+         displayed on Android, or if SBS has no title. */
+int confirm_delete_yesno(const char *name, const char *title);
 
 char* strrsplt(char* str, int c);
 char* skip_whitespace(char* const str);

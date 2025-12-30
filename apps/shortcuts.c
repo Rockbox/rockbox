@@ -633,7 +633,7 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
     {
         int selection = gui_synclist_get_sel_pos(lists);
 
-        if (confirm_delete_yesno("") != YESNO_YES)
+        if (confirm_delete_yesno("", str(LANG_SHORTCUTS)) != YESNO_YES)
         {
             gui_synclist_set_title(lists, lists->title, lists->title_icon);
             if (global_settings.talk_menu)
