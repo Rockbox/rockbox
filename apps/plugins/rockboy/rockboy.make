@@ -38,3 +38,9 @@ $(ROCKBOY_OBJDIR)/rockboy.ovl: $(ROCKBOY_OBJ) $(ROCKBOY_OUTLDS)
 		$(filter %.a, $+) \
 		-lgcc $(ROCKBOY_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
+
+# special rule to build with devkitarm gcc
+ifeq ($(APP_TYPE),ctru-app)
+$(ROCKBOY_OBJDIR)/rockboy.rock: PLUGINFLAGS += -O3
+endif
+

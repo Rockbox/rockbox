@@ -465,6 +465,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_DISCOVER     BUTTON_A
 #   define MINESWP_INFO         BUTTON_Y
 
+#elif CONFIG_KEYPAD == CTRU_PAD
+#   define MINESWP_LEFT         BUTTON_LEFT
+#   define MINESWP_RIGHT        BUTTON_RIGHT
+#   define MINESWP_UP           BUTTON_UP
+#   define MINESWP_DOWN         BUTTON_DOWN
+#   define MINESWP_QUIT         BUTTON_BACK
+#   define MINESWP_TOGGLE       BUTTON_USER
+#   define MINESWP_DISCOVER     BUTTON_SELECT
+#   define MINESWP_INFO         BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

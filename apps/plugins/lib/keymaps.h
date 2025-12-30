@@ -280,15 +280,31 @@
 #define BTN_FIRE        BUTTON_A
 #define BTN_PAUSE       BUTTON_START
 
+#elif CONFIG_KEYPAD == CTRU_PAD
+#define BTN_UP          BUTTON_UP
+#define BTN_DOWN        BUTTON_DOWN
+#define BTN_LEFT        BUTTON_LEFT
+#define BTN_RIGHT       BUTTON_RIGHT
+#define BTN_FIRE        BUTTON_USER
+#define BTN_PAUSE       BUTTON_MENU
+
 #else
 #error Unsupported keypad
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#define BTN_UP         BUTTON_TOPMIDDLE
-#define BTN_DOWN       BUTTON_BOTTOMMIDDLE
-#define BTN_LEFT       BUTTON_LEFT
-#define BTN_RIGHT      BUTTON_RIGHT
+#ifndef BTN_UP
+ #define BTN_UP         BUTTON_TOPMIDDLE
+#endif
+#ifndef BTN_DOWN
+ #define BTN_DOWN       BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef BTN_LEFT
+ #define BTN_LEFT       BUTTON_LEFT
+#endif
+#ifndef BTN_RIGHT
+ #define BTN_RIGHT      BUTTON_RIGHT
+#endif
 
 #if (CONFIG_KEYPAD == MROBE500_PAD) || \
     (CONFIG_KEYPAD == ONDAVX777_PAD)

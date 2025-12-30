@@ -333,6 +333,14 @@
 #define CLIX_BUTTON_UP          BUTTON_UP
 #define CLIX_BUTTON_DOWN        BUTTON_DOWN
 
+#elif (CONFIG_KEYPAD == CTRU_PAD)
+#define CLIX_BUTTON_QUIT        BUTTON_BACK
+#define CLIX_BUTTON_LEFT        BUTTON_LEFT
+#define CLIX_BUTTON_RIGHT       BUTTON_RIGHT
+#define CLIX_BUTTON_CLICK       BUTTON_SELECT
+#define CLIX_BUTTON_UP          BUTTON_UP
+#define CLIX_BUTTON_DOWN        BUTTON_DOWN
+
 #else
 #error "no keymap"
 #endif

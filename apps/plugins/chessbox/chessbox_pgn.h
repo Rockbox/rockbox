@@ -614,6 +614,20 @@
 #define CB_SCROLL_RIGHT (BUTTON_RIGHT|BUTTON_REPEAT)
 #define CB_RC_QUIT      BUTTON_START
 
+#elif CONFIG_KEYPAD == CTRU_PAD
+#define CB_SELECT       BUTTON_SELECT
+#define CB_UP           BUTTON_UP
+#define CB_DOWN         BUTTON_DOWN
+#define CB_LEFT         BUTTON_LEFT
+#define CB_RIGHT        BUTTON_RIGHT
+#define CB_PLAY         BUTTON_USER
+#define CB_LEVEL        BUTTON_BACK
+#define CB_MENU         BUTTON_MENU
+#define CB_SCROLL_UP    (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN  (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT  (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

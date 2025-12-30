@@ -6,7 +6,7 @@
 
 
 #undef SYNC
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(CTRU)
 #define SYNC
 #else
 #define USETHREADS

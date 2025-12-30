@@ -493,11 +493,23 @@ static void setoptions (void)
         options.SELECT  = BUTTON_FN;
         options.MENU    = BUTTON_X;
 
+#elif CONFIG_KEYPAD == CTRU_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.A      = BUTTON_SELECT;
+        options.B      = BUTTON_BACK;
+        options.START  = BUTTON_POWER;
+        options.SELECT = BUTTON_USER;
+        options.MENU   = BUTTON_MENU;
+
 #else
 #error No Keymap Defined!
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
+#if defined(HAVE_TOUCHSCREEN) && (CONFIG_KEYPAD != CTRU_PAD)
         options.UP      = BUTTON_TOPMIDDLE;
         options.DOWN    = BUTTON_BOTTOMMIDDLE;
         options.START   = BUTTON_TOPRIGHT;

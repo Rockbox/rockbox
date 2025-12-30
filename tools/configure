@@ -4387,7 +4387,7 @@ fi
     output="rockbox"
     bootoutput="rockbox"
     appextra="recorder:gui"
-    plugins="no"
+    plugins="yes"
     t_cpu="hosted"
     t_manufacturer="ctru"
     t_model="app"

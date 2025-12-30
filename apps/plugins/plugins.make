@@ -15,6 +15,11 @@ ifneq ($(APP_TYPE),sdl-sim)
 endif
 endif
 
+# Let's enable all plugins for ctru target
+ifeq ($(APP_TYPE),ctru-app)
+    is_app_build =
+endif
+
 ifdef is_app_build
 PLUGINS_SRC = $(call preprocess, $(APPSDIR)/plugins/SOURCES.app_build)
 else

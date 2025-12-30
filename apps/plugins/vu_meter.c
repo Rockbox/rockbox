@@ -479,6 +479,17 @@
 #define LABEL_MENU      "B"
 #define LABEL_VOLUME    "UP/DOWN"
 
+#elif CONFIG_KEYPAD == CTRU_PAD
+#define VUMETER_QUIT BUTTON_BACK
+#define VUMETER_HELP BUTTON_USER
+#define VUMETER_MENU BUTTON_MENU
+#define VUMETER_UP   BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP   "Y"
+#define LABEL_QUIT   "B"
+#define LABEL_MENU   "X"
+#define LABEL_VOLUME "Up/Down"
+
 #else
 #error No keymap defined!
 #endif

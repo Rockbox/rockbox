@@ -425,6 +425,16 @@
 #define CUBE_PAUSE         BUTTON_A
 #define CUBE_HIGHSPEED     BUTTON_Y
 
+#elif (CONFIG_KEYPAD == CTRU_PAD)
+#define CUBE_QUIT          BUTTON_BACK
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_USER
+#define CUBE_HIGHSPEED     BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif
