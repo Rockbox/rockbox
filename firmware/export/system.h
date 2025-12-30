@@ -217,6 +217,11 @@ enum {
 #include "bitswap.h"
 #include "rbendian.h"
 
+/* Compiler memory barrier */
+#ifndef membarrier
+# define membarrier() asm volatile("" ::: "memory")
+#endif
+
 #ifndef ASSERT_CPU_MODE
 /* Very useful to have defined properly for your architecture */
 #define ASSERT_CPU_MODE(mode, rstatus...) \
