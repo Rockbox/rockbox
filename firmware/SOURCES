@@ -2038,6 +2038,7 @@ target/arm/stm32/echoplayer/button-echoplayer.c
 target/arm/stm32/echoplayer/clock-echoplayer.c
 target/arm/stm32/echoplayer/lcd-echoplayer.c
 target/arm/stm32/echoplayer/power-echoplayer.c
+target/arm/stm32/echoplayer/sdmmc-echoplayer.c
 target/arm/stm32/echoplayer/system-echoplayer.c
 #endif
 

@@ -27,6 +27,8 @@
 #include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/syscfg.h"
 
+#define PLL1Q_FREQ 48000000
+
 /* Flag to use VOS0 */
 #define STM32H743_USE_VOS0      (CPU_FREQ > 400000000)
 
@@ -44,6 +46,8 @@ static void init_pll(void)
                    "HSE frequency not correct");
     _Static_assert(LCD_DOTCLOCK_FREQ == 6199200,
                    "PLL3 parameters not correct for dot clock");
+    _Static_assert(PLL1Q_FREQ == 48000000,
+                   "PLL1Q parameters not correct");
 
     /*
      * Use HSE/4 input for PLL1
@@ -76,7 +80,7 @@ static void init_pll(void)
     reg_writef(RCC_PLL1DIVR,
                DIVN(80 - 1), /* 6 * 80 = 480 MHz  */
                DIVP(1 - 1),  /* 480 / 1 = 480 MHz */
-               DIVQ(8 - 1),  /* 480 / 8 = 60 MHz  */
+               DIVQ(10 - 1), /* 480 / 10 = 48 MHz  */
                DIVR(1 - 1));
 
     reg_writef(RCC_PLL3FRACR, FRACN(1468));
@@ -159,6 +163,7 @@ static void init_lse(void)
 
 static void init_periph_clock(void)
 {
+    reg_writef(RCC_D1CCIPR, SDMMCSEL_V(PLL1Q));
     reg_writef(RCC_D2CCIP1R, SPI45SEL_V(HSE));
 
     /* Enable AXI SRAM in sleep mode to allow DMA'ing out of it */
@@ -189,6 +194,11 @@ void stm_target_clock_enable(enum stm_clock clock, bool enable)
         reg_writef(RCC_APB3LPENR, LTDCEN(enable));
         break;
 
+    case STM_CLOCK_SDMMC1_KER:
+        reg_writef(RCC_AHB3ENR, SDMMC1EN(enable));
+        reg_writef(RCC_AHB3LPENR, SDMMC1EN(enable));
+        break;
+
     default:
         panicf("%s: unsupported clock %d", __func__, (int)clock);
         break;
@@ -201,6 +211,9 @@ size_t stm_target_clock_get_frequency(enum stm_clock clock)
     {
     case STM_CLOCK_SPI5_KER:
         return STM32_HSE_FREQ;
+
+    case STM_CLOCK_SDMMC1_KER:
+        return PLL1Q_FREQ;
 
     default:
         panicf("%s: unsupported clock %d", __func__, (int)clock);

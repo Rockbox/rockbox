@@ -67,6 +67,9 @@
 #define STORAGE_WANTS_ALIGN
 #define STORAGE_NEEDS_BOUNCE_BUFFER
 
+/* One SD card slot */
+#define SDMMC_HOST_NUM_SD_CONTROLLERS 1
+
 /* RTC settings */
 #define CONFIG_RTC      RTC_STM32H743
 #define HAVE_RTC_ALARM
