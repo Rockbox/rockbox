@@ -2024,7 +2024,7 @@ target/arm/stm32/debug-stm32h7.c
 target/arm/stm32/gpio-stm32h7.c
 target/arm/stm32/i2c-stm32h7.c
 target/arm/stm32/pcm-stm32h7.c
-target/arm/stm32/sd-stm32h7.c
+target/arm/stm32/sdmmc-stm32h7.c
 target/arm/stm32/spi-stm32h7.c
 target/arm/stm32/system-stm32h7.c
 target/arm/stm32/timer-stm32h7.c

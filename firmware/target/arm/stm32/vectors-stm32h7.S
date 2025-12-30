@@ -76,7 +76,7 @@ __vectors_platform:
     .word   UIE                         /* [ 46] */
     .word   dma_irq_handler             /* [ 47] DMA1 Stream7 */
     .word   UIE                         /* [ 48] */
-    .word   sdmmc_irq_handler           /* [ 49] SDMMC1 */
+    .word   sdmmc1_irq_handler          /* [ 49] SDMMC1 */
     .word   UIE                         /* [ 50] */
     .word   spi3_irq_handler            /* [ 51] SPI3 */
     .word   UIE                         /* [ 52] */
@@ -151,7 +151,7 @@ __vectors_platform:
     .word   UIE                         /* [121] */
     .word   dma_irq_handler             /* [122] MDMA */
     .word   UIE                         /* [123] */
-    .word   sdmmc_irq_handler           /* [124] SDMMC2 */
+    .word   sdmmc2_irq_handler          /* [124] SDMMC2 */
     .word   UIE                         /* [125] */
     .word   UIE                         /* [126] */
     .word   UIE                         /* [127] */
