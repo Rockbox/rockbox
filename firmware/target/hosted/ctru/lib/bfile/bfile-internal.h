@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <math.h>
 
@@ -18,11 +19,6 @@
 
 /* #define MALLOC_DEBUG
 #include "rmalloc/rmalloc.h" */
-
-#include "cslice.h"
-#include "cmap.h"
-
-#define nil           NULL
 
 /* in go functions can return two values */
 #define two_type_value(type1, type2, name1, name2, type_name)   \
@@ -68,32 +64,14 @@ two_type_value(int, const char*, n, err, int_error);
 two_type_value(struct stat, const char*, fi, err, stat_error);
 typedef const char* file_error_t;
 
-typedef struct page {
-    s64           num;
-    struct page*  prev;
-    struct page*  next;
-    u8*           data;
-} page;
+typedef struct {
+    Handle  file;
+    s64     start;
+    s64     end;
+    s64     size;
+    bool    isLastPage;
 
-/* the two map types used by this library */
-cmap_declare(page, s64, struct page*);
-cmap_declare(bool, s64, bool);
-
-typedef struct shard {
-    sync_Mutex    mu;
-    cmap(page)    pages;
-    cmap(bool)    dirty;
-    struct page*  head;
-    struct page*  tail;
-} shard;
-
-typedef struct Pager {
-    Handle        file;
-    s64           pgsize;
-    s64           pgmax;
-    /* sync_RWMutex  mu; */
-    s64           size;
-    cslice(shard) shards;
-} Pager;
+    u8      *buffer;
+} PageReader;
 
 #endif /* _BFILE_INTERNAL_H_ */

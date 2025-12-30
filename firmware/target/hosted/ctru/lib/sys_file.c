@@ -53,7 +53,7 @@ static struct filestr_desc
     u64                 *sizep; /* shortcut to file size in fileobj */
 } open_streams[MAX_OPEN_FILES] =
 {
-    [0 ... MAX_OPEN_FILES-1] = { .stream = { .cache = nil, .flags = 0 } }
+    [0 ... MAX_OPEN_FILES-1] = { .stream = { .cache = NULL, .flags = 0 } }
 };
 
 extern FS_Archive sdmcArchive;
@@ -65,11 +65,11 @@ static struct filestr_desc * get_filestr(int fildes)
 
     if ((unsigned int)fildes >= MAX_OPEN_FILES)
         file = NULL;
-    else if (file->stream.cache != nil)
+    else if (file->stream.cache != NULL)
         return file;
 
     logf("fildes %d: bad file number\n", fildes);
-    errno = (file && (file->stream.cache == nil)) ? ENXIO : EBADF;
+    errno = (file && (file->stream.cache == NULL)) ? ENXIO : EBADF;
     return NULL;
 }
 
@@ -98,7 +98,7 @@ static int alloc_filestr(struct filestr_desc **filep)
     for (int fildes = 0; fildes < MAX_OPEN_FILES; fildes++)
     {
         struct filestr_desc *file = &open_streams[fildes];
-        if (file->stream.cache == nil)
+        if (file->stream.cache == NULL)
         {
             *filep = file;
             return fildes;
@@ -117,10 +117,10 @@ int test_stream_exists_internal(const char *path)
 
     Handle handle;
     Result res = FSUSER_OpenFile(&handle,
-	                         sdmcArchive,
-	                         fsMakePath(PATH_ASCII, path),
-	                         FS_OPEN_READ,
-	                         0);
+                             sdmcArchive,
+                             fsMakePath(PATH_ASCII, path),
+                             FS_OPEN_READ,
+                             0);
     if (R_FAILED(res)) {
         /* not a file, try to open a directory */
         res = FSUSER_OpenDirectory(&handle,
@@ -234,12 +234,50 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
     int rc = 0;
     int_error_t n_err;
 
-    if (write)
-        n_err = PagerWriteAt(file->stream.cache, (u8 *) buf, nbyte, AtomicLoad(&file->offset));
-    else
-        n_err = PagerReadAt(file->stream.cache, (u8 *) buf, nbyte, AtomicLoad(&file->offset));
+    if (write) {
+        // we will use direct file access for writing
+        u32 written = 0;
+        Result res = FSFILE_Write(file->stream.handle,
+                                  &written,
+                                  AtomicLoad(&file->offset),
+                                  buf,
+                                  nbyte,
+                                  FS_WRITE_FLUSH);
+        if (R_FAILED(res)) {
+            n_err.err = "I/O error";
+        }
 
-    if ((n_err.err != nil) && strcmp(n_err.err, "io.EOF")) {
+        n_err.n = written;
+    }
+    else {
+        // only use page_reader if buffer size is smaller than page size
+        if (nbyte < file->stream.cache->size) {
+            n_err = PageReader_ReadAt(file->stream.cache,
+                                      (u8 *) buf,
+                                      nbyte,
+                                      AtomicLoad(&file->offset));
+        }
+        else {
+            u32 bytes_read = 0;
+            Result res = FSFILE_Read(file->stream.handle,
+                                    &bytes_read,
+                                    AtomicLoad(&file->offset),
+                                    buf,
+                                    nbyte);
+            if (R_FAILED(res)) {
+                n_err.err = "I/O error";
+            }
+
+            // io.EOF
+            if (bytes_read == 0) {
+                n_err.err = "io.EOF";
+            }
+
+            n_err.n = bytes_read;
+        }
+    }
+
+    if ((n_err.err != NULL) && strcmp(n_err.err, "io.EOF")) {
         FILE_ERROR(ERRNO, -3); 
     }
 
@@ -271,7 +309,7 @@ file_error:;
 /* initialize the base descriptor */
 static void filestr_base_init(struct filestr_base *stream)
 {
-    stream->cache = nil;
+    stream->cache = NULL;
     stream->handle = 0;
     stream->size = 0;
     LightLock_Init(&stream->mtx);
@@ -281,10 +319,10 @@ int open_internal_inner2(Handle *handle, const char *path, u32 openFlags, u32 at
 {
     int rc;
     Result res = FSUSER_OpenFile(handle,
-	                         sdmcArchive,
-	                         fsMakePath(PATH_ASCII, path),
-	                         openFlags,
-	                         attributes);
+                             sdmcArchive,
+                             fsMakePath(PATH_ASCII, path),
+                             openFlags,
+                             attributes);
     if (R_FAILED(res)) {
        FILE_ERROR(ERRNO, -1);
     }
@@ -372,21 +410,8 @@ static int open_internal_inner1(const char *path, int oflag)
         FILE_ERROR(ERRNO, -8);
     }
 
-    int pageSize = 4096;            /* 4096 bytes */
-    int bufferSize = 512 * 1024;    /* 512 kB */
-
-    /* streamed file formats like flac and mp3 need very large page
-       sizes to avoid stuttering */
-    if (((oflag & O_ACCMODE) == O_RDONLY) && (size > 0x200000)) {
-        /* printf("open(%s)_BIG_pageSize\n", path); */
-        pageSize = 32 * 1024;
-        bufferSize = MIN(size, defaultBufferSize);
-    }
-
-    file->stream.cache = NewPagerSize(file->stream.handle,
-                                      pageSize,
-                                      bufferSize);
-    if (file->stream.cache == nil) {
+    file->stream.cache = NewPageReader(file->stream.handle, defaultPageSize);
+    if (file->stream.cache == NULL) {
         FILE_ERROR(ERRNO, -7);
     }
 
@@ -402,10 +427,10 @@ static int open_internal_inner1(const char *path, int oflag)
 
 file_error:
     if (fildes >= 0) {
-        if (file->stream.cache != nil) {
-            PagerFlush(file->stream.cache);
-            PagerClear(file->stream.cache);
-            file->stream.cache = nil;
+        if (file->stream.cache != NULL) {
+            /* FSFILE_Flush(file->stream.handle); */
+            PageReader_Free(file->stream.cache);
+            file->stream.cache = NULL;
         }
     
         FSFILE_Close(file->stream.handle);
@@ -445,16 +470,16 @@ int ctru_close(int fildes)
 
     /* needs to work even if marked "nonexistant" */
     struct filestr_desc *file = &open_streams[fildes];
-    if ((unsigned int)fildes >= MAX_OPEN_FILES || (file->stream.cache == nil))
+    if ((unsigned int)fildes >= MAX_OPEN_FILES || (file->stream.cache == NULL))
     {
         logf("filedes %d not open\n", fildes);
         FILE_ERROR(EBADF, -2);
     }
 
-    if (file->stream.cache != nil) {
-        PagerFlush(file->stream.cache);
-        PagerClear(file->stream.cache);
-        file->stream.cache = nil;
+    if (file->stream.cache != NULL) {
+        /* FSFILE_Flush(file->stream.handle); */
+        PageReader_Free(file->stream.cache);
+        file->stream.cache = NULL;
     }
     
     FSFILE_Close(file->stream.handle);
@@ -490,8 +515,8 @@ int ctru_ftruncate(int fildes, off_t length)
         FILE_ERROR(EINVAL, -3);
     }
 
-    file_error_t err = PagerTruncate(file->stream.cache, length);
-    if (err) {
+    Result res = FSFILE_SetSize(file->stream.handle, length);
+    if (R_FAILED(res)) {
         FILE_ERROR(ERRNO, -11);
     }
 
@@ -521,8 +546,8 @@ int ctru_fsync(int fildes)
     }
 
     /* flush all pending changes to disk */
-    file_error_t err = PagerFlush(file->stream.cache);
-    if (err != nil) {
+    Result res = FSFILE_Flush(file->stream.handle);
+    if (R_FAILED(res)) {
         FILE_ERROR(ERRNO, -3);
     }
 
@@ -646,10 +671,10 @@ int ctru_rename(const char *old, const char *new)
     /* open 'old'; it must exist */
     Handle open1rc;
     Result res = FSUSER_OpenFile(&open1rc,
-	                         sdmcArchive, 
-	                         fsMakePath(PATH_ASCII, old),
-	                         FS_OPEN_READ,
-	                         0);
+                             sdmcArchive, 
+                             fsMakePath(PATH_ASCII, old),
+                             FS_OPEN_READ,
+                             0);
     if (R_FAILED(res)) {
         /* not a file, try to open a directory */
         res = FSUSER_OpenDirectory(&open1rc,
@@ -774,4 +799,3 @@ ssize_t ctru_readlink(const char *path, char *buf, size_t bufsiz)
 {
     return readlink(path, buf, bufsiz);
 }
-

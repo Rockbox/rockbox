@@ -32,7 +32,7 @@
 #define AtomicAdd(ptr, value) __atomic_add_fetch((u32*)(ptr), value, __ATOMIC_SEQ_CST)
 
 struct filestr_base {
-    Pager*      cache;            /* buffer IO implementation (cache) */
+    PageReader* cache;            /* buffer IO implementation (cache) */
     Handle      handle;           /* file handle */
     u64         size;             /* file size */
     int         flags;            /* stream flags */

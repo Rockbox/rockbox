@@ -120,7 +120,7 @@ u32 fs_error(void) {
 /* Initialize the base descriptor */
 static void filestr_base_init(struct filestr_base *stream)
 {
-    stream->cache = nil;
+    stream->cache = NULL;
     stream->handle = 0;
     stream->size = 0;
     LightLock_Init(&stream->mtx);
