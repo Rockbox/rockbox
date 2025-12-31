@@ -70,6 +70,7 @@ public:
         Brand,
         PlayerPicture,
         ThemeName,
+        PathSuffix,
 
         TargetNamesAll,
         TargetNamesEnabled,

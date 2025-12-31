@@ -68,6 +68,7 @@ const static struct {
     { PlayerBuildInfo::Brand,              ":target:/brand"            },
     { PlayerBuildInfo::PlayerPicture,      ":target:/playerpic"        },
     { PlayerBuildInfo::ThemeName,          ":target:/themename"        },
+    { PlayerBuildInfo::PathSuffix,         ":target:/pathsuffix"       },
     { PlayerBuildInfo::TargetNamesAll,     "_targets/all"              },
     { PlayerBuildInfo::TargetNamesEnabled, "_targets/enabled"          },
     { PlayerBuildInfo::LanguageInfo,       "languages/:target:"        },

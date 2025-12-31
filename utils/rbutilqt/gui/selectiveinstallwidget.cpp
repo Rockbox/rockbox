@@ -51,6 +51,7 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
 
     m_logger = nullptr;
     m_zipinstaller = nullptr;
+    m_suffix = RbSettings::value(RbSettings::Suffix).toString();
     m_themesinstaller = new ThemesInstallWindow(this);
     connect(m_themesinstaller, &ThemesInstallWindow::selected,
             [this](int count) {ui.themesCheckbox->setChecked(count > 0);});
@@ -494,7 +495,14 @@ void SelectiveInstallWidget::installFonts(void)
         m_zipinstaller->setUrl(fontsurl);
         m_zipinstaller->setLogSection("Fonts");
         m_zipinstaller->setLogVersion(logversion);
-        m_zipinstaller->setMountPoint(m_mountpoint);
+
+        if (!m_suffix.isEmpty()) {
+            QString fullpath = m_mountpoint + m_suffix;
+            m_zipinstaller->setMountPoint(fullpath);
+        } else {
+            m_zipinstaller->setMountPoint(m_mountpoint);
+        }
+
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
             m_zipinstaller->setCache(true);
 
@@ -533,7 +541,14 @@ void SelectiveInstallWidget::installVoicefile(void)
         m_zipinstaller->setUrl(voiceurl);
         m_zipinstaller->setLogSection("Prerendered Voice (" + lang + ")");
         m_zipinstaller->setLogVersion(logversion);
-        m_zipinstaller->setMountPoint(m_mountpoint);
+
+        if (!m_suffix.isEmpty()) {
+            QString fullpath = m_mountpoint + m_suffix;
+            m_zipinstaller->setMountPoint(fullpath);
+        } else {
+            m_zipinstaller->setMountPoint(m_mountpoint);
+        }
+
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
             m_zipinstaller->setCache(true);
 
@@ -664,7 +679,14 @@ void SelectiveInstallWidget::installPluginData(void)
         m_zipinstaller->setUrl(dataUrls);
         m_zipinstaller->setLogSection(dataName);
         m_zipinstaller->setLogVersion();
-        m_zipinstaller->setMountPoint(m_mountpoint);
+
+        if (!m_suffix.isEmpty()) {
+            QString fullpath = m_mountpoint + m_suffix;
+            m_zipinstaller->setMountPoint(fullpath);
+        } else {
+            m_zipinstaller->setMountPoint(m_mountpoint);
+        }
+
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
             m_zipinstaller->setCache(true);
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);

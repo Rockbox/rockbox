@@ -353,6 +353,7 @@ void ThemesInstallWindow::install()
         logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    QString m_suffix = RbSettings::value(RbSettings::Suffix).toString();
     LOG_INFO() << "mountpoint:" << mountPoint;
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
@@ -365,7 +366,14 @@ void ThemesInstallWindow::install()
     installer->setUrl(themes);
     installer->setLogSection(names);
     installer->setLogVersion(version);
-    installer->setMountPoint(mountPoint);
+
+    if (!m_suffix.isEmpty()) {
+        QString fullpath = mountPoint + m_suffix;
+        installer->setMountPoint(fullpath);
+    } else {
+        installer->setMountPoint(mountPoint);
+    }
+
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 

@@ -35,6 +35,7 @@ const static struct {
     { RbSettings::ShowChangelog,        "show_changelog",       "false" },
     { RbSettings::CurrentPlatform,      "platform",             "" },
     { RbSettings::Mountpoint,           "mountpoint",           "" },
+    { RbSettings::Suffix,               "suffix",               "" },
     { RbSettings::CachePath,            "cachepath",            "" },
     { RbSettings::Build,                "build",                "" },
     { RbSettings::ProxyType,            "proxytype",            "" },

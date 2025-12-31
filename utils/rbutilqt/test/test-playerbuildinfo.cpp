@@ -165,6 +165,7 @@ struct {
     { "archosfmrecorder", PlayerBuildInfo::BootloaderFile,   ""              },
     { "archosfmrecorder", PlayerBuildInfo::BootloaderFilter, ""              },
     { "archosfmrecorder", PlayerBuildInfo::Encoder,          "lame"          },
+    { "archosfmrecorder", PlayerBuildInfo::PathSuffix,       ""              },
     { "archosfmrecorder", PlayerBuildInfo::Brand,            "Archos"        },
     { "archosfmrecorder", PlayerBuildInfo::PlayerPicture,    "archosfmrecorder"},
     { "iriverh100",       PlayerBuildInfo::BuildStatus,      "2"             },

@@ -34,6 +34,7 @@ class RbSettings : public QObject
             ShowChangelog,
             CurrentPlatform,
             Mountpoint,
+            Suffix,
             CachePath,
             Build,
             ProxyType,

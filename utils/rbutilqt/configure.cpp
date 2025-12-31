@@ -188,14 +188,19 @@ void Config::accept()
     }
 
     // platform
-    QString nplat;
+    QString nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
     if(ui.treeDevices->selectedItems().size() != 0) {
-        nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
         RbSettings::setValue(RbSettings::Platform, nplat);
     }
     else {
         errormsg += "<li>" + tr("No player selected") + "</li>";
         error = true;
+    }
+
+    // path suffix
+    QString suffix = PlayerBuildInfo::instance()->value(PlayerBuildInfo::DeviceInfo::PathSuffix, nplat).toString();
+    if (!suffix.isEmpty()) {
+        RbSettings::setValue(RbSettings::Suffix, suffix);
     }
 
     // cache settings

@@ -63,6 +63,7 @@ class SelectiveInstallWidget : public QWidget
         QString m_target;
         QString m_blmethod;
         QString m_mountpoint;
+        QString m_suffix;
         ProgressLoggerGui *m_logger;
         int m_installStage;
         ZipInstaller *m_zipinstaller;
