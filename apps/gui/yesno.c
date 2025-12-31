@@ -355,7 +355,7 @@ exit:
     {
         screens[i].scroll_stop_viewport(&(yn[i].vp));
         sb_set_persistent_title(title, Icon_NOICON, i);
-        viewportmanager_theme_undo(i, true);
+        viewportmanager_theme_undo(i, false);
     }
 
 #ifdef HAVE_TOUCHSCREEN
