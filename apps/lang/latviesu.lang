@@ -12617,20 +12617,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Kļūda iegūstot informāciju"
-  </dest>
-  <voice>
-    *: "Kļūda iegūstot informāciju"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -15942,20 +15928,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Amaze galvenā izvēlne"
-  </dest>
-  <voice>
-    *: "Amaze galvenā izvēlne"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16205,34 +16177,6 @@
   </dest>
   <voice>
     *: "Mik mod iestatījumi"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod izvēlne"
-  </dest>
-  <voice>
-    *: "Mik mod izvēlne"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Chessbox izvēlne"
-  </dest>
-  <voice>
-    *: "Chessbox izvēlne"
   </voice>
 </phrase>
 <phrase>
@@ -16982,5 +16926,22 @@
   <voice>
     *: none
     usbdac: "USB DAC ir ieslēgts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Izmantot LED indikatorus"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Izmantot LED indikatorus"
   </voice>
 </phrase>
