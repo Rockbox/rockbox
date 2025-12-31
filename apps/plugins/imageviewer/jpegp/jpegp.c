@@ -229,9 +229,38 @@ static int get_image(struct image_info *info, int frame, int ds)
                 j->Components[2].du[j->Components[2].du_width * ((y / v2) / 8)] + 8 * ((y / v2) & 7);
         for (x = 0; x < max_x; x += ds)
         {
-            TCOEF c0 = C0[(x / h0 / 8) * 64 + ((x / h0) & 7)];
-            TCOEF c1 = C1[(x / h1 / 8) * 64 + ((x / h1) & 7)];
-            TCOEF c2 = C2[(x / h2 / 8) * 64 + ((x / h2) & 7)];
+            int c0, c1, c2;
+            if (ds == 1)
+            {
+                c0 = C0[(x / h0 / 8) * 64 + ((x / h0) & 7)];
+                c1 = C1[(x / h1 / 8) * 64 + ((x / h1) & 7)];
+                c2 = C2[(x / h2 / 8) * 64 + ((x / h2) & 7)];
+            }
+            else
+            {
+                /* Box filter downsampling (area averaging):
+                   Average a ds*ds block of Y/U/V samples per output pixel
+                   for simple anti-aliasing without extra buffers */
+                int sumY = 0, sumU = 0, sumV = 0;
+                int dx, dy;
+                int area = ds * ds;
+                for (dy = 0; dy < ds; dy++)
+                {
+                    TCOEF *C0_dy = j->Components[0].du[j->Components[0].du_width * (((y + dy) / v0) / 8)] + 8 * (((y + dy) / v0) & 7);
+                    TCOEF *C1_dy = j->Components[1].du[j->Components[1].du_width * (((y + dy) / v1) / 8)] + 8 * (((y + dy) / v1) & 7);
+                    TCOEF *C2_dy = j->Components[2].du[j->Components[2].du_width * (((y + dy) / v2) / 8)] + 8 * (((y + dy) / v2) & 7);
+                    for (dx = 0; dx < ds; dx++)
+                    {
+                        int sx = x + dx;
+                        sumY += C0_dy[((sx / h0 / 8) * 64) + ((sx / h0) & 7)];
+                        sumU += C1_dy[((sx / h1 / 8) * 64) + ((sx / h1) & 7)];
+                        sumV += C2_dy[((sx / h2 / 8) * 64) + ((sx / h2) & 7)];
+                    }
+                }
+                c0 = (sumY + area/2) / area;
+                c1 = (sumU + area/2) / area;
+                c2 = (sumV + area/2) / area;
+            }
 
             // ITU BT.601 full-range YUV-to-RGB integer approximation 
             {
