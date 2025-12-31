@@ -12526,20 +12526,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Lỗi khi thu thập thông tin"
-  </dest>
-  <voice>
-    *: "Lỗi khi thu thập thông tin"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -15851,20 +15837,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Menu chính của Amaze"
-  </dest>
-  <voice>
-    *: "Menu chính của Amaze"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16114,34 +16086,6 @@
   </dest>
   <voice>
     *: "Thiết lập Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Menu Mikmod"
-  </dest>
-  <voice>
-    *: "Menu Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Menu Chessbox"
-  </dest>
-  <voice>
-    *: "Menu Chess box"
   </voice>
 </phrase>
 <phrase>
@@ -16981,5 +16925,22 @@
   <voice>
     *: none
     usbdac: "USB-DAC đang hoạt động"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Dùng đèn hiệu LED"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Dùng đèn hiệu LED"
   </voice>
 </phrase>
