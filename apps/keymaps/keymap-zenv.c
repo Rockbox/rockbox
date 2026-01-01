@@ -29,8 +29,6 @@
  * and a record button, to the left is a combined power/hold switch.
  */
 
-/* {Action Code,    Button code,    Prereq button code } */
-
 /*
  * The format of the list is as follows
  * { Action Code,   Button code,    Prereq button code }
@@ -128,8 +126,6 @@ static const struct button_mapping button_context_quickscreen[]  = {
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,                  BUTTON_PLAYPAUSE|BUTTON_REL,       BUTTON_PLAYPAUSE },
     { ACTION_TREE_STOP,                 BUTTON_PLAYPAUSE|BUTTON_REPEAT,    BUTTON_NONE },
-
-    { ACTION_TREE_HOTKEY,               BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
