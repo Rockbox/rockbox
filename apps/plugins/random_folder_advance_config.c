@@ -22,297 +22,359 @@
 #include "plugin.h"
 #include "file.h"
 
+#define RFA_LIST_DAT ROCKBOX_DIR "/folder_advance_list.dat" /* Folder data  */
+#define RFA_LIST_TXT ROCKBOX_DIR "/folder_advance_list.txt" /* Exported txt */
+#define RFA_CSTM_DIR ROCKBOX_DIR "/folder_advance_dir.txt"  /* Custom dirs  */
+#define MAX_IGNORED_DIRS 10 /* Maximum number of folders that are skipped   */
 
-
-static bool cancel;
-static int fd;
-static int dirs_count;
-static int lasttick;
-#define RFA_FILE ROCKBOX_DIR "/folder_advance_list.dat"
-#define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
-#define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
-#define MAX_REMOVED_DIRS 10
-
-char *buffer = NULL;
-size_t buffer_size;
-int num_replaced_dirs = 0;
-char removed_dirs[MAX_REMOVED_DIRS][MAX_PATH];
-struct file_format {
+struct rfa_dirs /* File format for folder data */
+{
     int count;
-    char folder[][MAX_PATH];
+    char dir[][MAX_PATH];
 };
-struct file_format *list = NULL;
 
-static void update_screen(bool clear)
+struct rfa_scan /* Context for single run */
+{
+    char ignored_dirs[MAX_IGNORED_DIRS][MAX_PATH];
+    char path[MAX_PATH];
+    struct rfa_dirs *dirs;
+    char *err_dir;
+    unsigned long last_update;
+    int num_ignored_dirs;
+    int num_dirs;
+    int num_err;
+    int fd; /* writes to RFA_LIST_DAT */
+    bool cancel;
+    bool dirty;
+};
+
+static void update_screen(struct rfa_scan *scan)
 {
     char buf[15];
+    struct screen *display;
+    struct viewport vp, *last_vp;
 
-    rb->snprintf(buf,sizeof(buf),"Folders: %d",dirs_count);
+    rb->snprintf(buf, sizeof buf, "Folders: %d    ", scan->num_dirs);
+
     FOR_NB_SCREENS(i)
     {
-        if(clear)
-            rb->screens[i]->clear_display();
-        rb->screens[i]->putsxy(0,0,buf);
-        rb->screens[i]->update();
-    }
-}
+        display = rb->screens[i];
+        rb->viewport_set_defaults(&vp, i);
+        last_vp = display->set_viewport(&vp);
+        if(!scan->path[0])
+            display->clear_viewport();
 
-static void traversedir(char* location, char* name)
-{
-    struct dirent *entry;
-    DIR* dir;
-    char fullpath[MAX_PATH], path[MAX_PATH];
-    bool check = false;
-    int i;
-
-    /* behave differently if we're at root to avoid
-       duplication of the initial slash later on */
-    if (location[0] == '\0' && name[0] == '\0') {
-        rb->strcpy(fullpath, "");
-        dir = rb->opendir("/");
-    } else {
-        rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
-        dir = rb->opendir(fullpath);
-    }
-    if (dir) {
-        entry = rb->readdir(dir);
-        while (entry) {
-            if (cancel)
-                break;
-            /* Skip .. and . */
-            if (entry->d_name[0] == '.')
-            {
-                if (    !rb->strcmp(entry->d_name,".")
-                     || !rb->strcmp(entry->d_name,"..")
-                     || !rb->strcmp(entry->d_name,".rockbox"))
-                    check = false;
-                else check = true;
-            }
-            else check = true;
-
-        /* check if path is removed directory, if so dont enter it */
-        rb->snprintf(path, MAX_PATH, "%s/%s", fullpath, entry->d_name);
-        while(path[0] == '/')
-            rb->strlcpy(path, path + 1, sizeof(path));
-        for(i = 0; i < num_replaced_dirs; i++)
+        display->puts(0, 0, buf);
+        if (scan->num_err && scan->err_dir)
         {
-            if(!rb->strcmp(path, removed_dirs[i]))
-            {
-                check = false;
-                break;
-            }
+            display->puts(0, 1, "Not found:");
+            display->puts(0, 1 + scan->num_err, scan->err_dir);
         }
 
-            if (check)
-            {
-                struct dirinfo info = rb->dir_get_info(dir, entry);
-                if (info.attribute & ATTR_DIRECTORY) {
-                    char *start;
-                    dirs_count++;
-                    rb->snprintf(path,MAX_PATH,"%s/%s",fullpath,entry->d_name);
-                    start = &path[rb->strlen(path)];
-                    rb->memset(start,0,&path[MAX_PATH-1]-start);
-                    rb->write(fd,path,MAX_PATH);
-                    traversedir(fullpath, entry->d_name);
-                }
-            }
-            if (*rb->current_tick - lasttick > (HZ/2)) {
-                update_screen(false);
-                lasttick = *rb->current_tick;
-                if (rb->action_userabort(TIMEOUT_NOBLOCK))
+        display->update_viewport();
+        display->set_viewport(last_vp);
+    }
+    scan->last_update = *rb->current_tick;
+}
+
+static void traverse_path(struct rfa_scan *scan)
+{
+    DIR* dir;
+    struct dirent *entry;
+    char *p;
+    int i, dirlen;
+    bool skip;
+
+    dir = rb->opendir(scan->path);
+
+    /* remove slash from root dir; will be prepended later */
+    if (scan->path[0] == '/' && scan->path[1] == '\0')
+        scan->path[0] = dirlen = 0;
+    else
+        dirlen = rb->strlen(scan->path);
+
+    if (!dir)
+        return;
+
+    while ((entry = rb->readdir(dir)))
+    {
+        if (scan->cancel)
+            break;
+        /* Don't check special dirs */
+        if (entry->d_name[0] == '.')
+        {
+            if (!rb->strcmp(entry->d_name, ".") ||
+                !rb->strcmp(entry->d_name, "..") ||
+                !rb->strcmp(entry->d_name, ".rockbox"))
+                continue;
+        }
+        struct dirinfo info = rb->dir_get_info(dir, entry);
+        if (info.attribute & ATTR_DIRECTORY)
+        {
+            /* Append name to full path */
+            rb->snprintf(scan->path + dirlen, sizeof(scan->path) - dirlen,
+                         "/%s", entry->d_name);
+
+            /* Skip ignored dirs */
+            skip = false;
+            for(i = 0; i < scan->num_ignored_dirs; i++)
+                if(!rb->strcmp(scan->path, scan->ignored_dirs[i]))
                 {
-                    cancel = true;
+                    skip = true;
                     break;
                 }
-            }
+            if (skip)
+                continue;
 
-            entry = rb->readdir(dir);
+            scan->num_dirs++;
+
+            /* Write full path to file (erase end of buffer) */
+            p = &scan->path[rb->strlen(scan->path)];
+            rb->memset(p, 0, &scan->path[sizeof(scan->path) - 1] - p);
+            rb->write(scan->fd, scan->path, sizeof scan->path);
+
+            /* Recursion */
+            traverse_path(scan);
         }
-        rb->closedir(dir);
+
+        if (*rb->current_tick - scan->last_update > (HZ/2))
+        {
+            update_screen(scan);
+            if (rb->action_userabort(TIMEOUT_NOBLOCK))
+            {
+                scan->cancel = true;
+                break;
+            }
+        }
+        rb->yield();
     }
+    rb->closedir(dir);
 }
 
-static bool custom_dir(void)
+static bool custom_paths(struct rfa_scan *scan)
 {
-    DIR* dir_check;
-    char *starts, line[MAX_PATH], formatted_line[MAX_PATH];
-    static int fd2;
-    char buf[11];
-    int i, errors = 0;
+    char line[MAX_PATH], *p;
+    int i, fd;
+    bool write_line;
 
-    /* populate removed dirs array */
-    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) >= 0)
-    {
-        while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
-        {
-            if ((line[0] == '-') && (line[1] == '/') &&
-                     (num_replaced_dirs < MAX_REMOVED_DIRS))
-            {
-                num_replaced_dirs ++;
-                rb->strlcpy(removed_dirs[num_replaced_dirs - 1], line + 2,
-                                sizeof(line));
-            }
-        }
-        rb->close(fd2);
-    }
-
-    if((fd2 = rb->open(RFADIR_FILE,O_RDONLY)) >= 0)
-    {
-        while ((rb->read_line(fd2, line, MAX_PATH - 1)) > 0)
-        {
-            /* blank lines and removed dirs ignored */
-            if (rb->strlen(line) && ((line[0] != '-') || (line[1] != '/')))
-            {
-                /* remove preceeding '/'s from the line */
-                while(line[0] == '/')
-                    rb->strlcpy(line, line + 1, sizeof(line));
-
-                rb->snprintf(formatted_line, MAX_PATH, "/%s", line);
-
-                dir_check = rb->opendir(formatted_line);
-
-                if (dir_check)
-                {
-                    rb->closedir(dir_check);
-                    starts = &formatted_line[rb->strlen(formatted_line)];
-                    rb->memset(starts, 0, &formatted_line[MAX_PATH-1]-starts);
-                    bool write_line = true;
-
-                    for(i = 0; i < num_replaced_dirs; i++)
-                    {
-                        if(!rb->strcmp(line, removed_dirs[i]))
-                        {
-                             write_line = false;
-                             break;
-                        }
-                    }
-
-                    if(write_line)
-                    {
-                        dirs_count++;
-                        rb->write(fd, formatted_line, MAX_PATH);
-                    }
-
-                    traversedir("", line);
-                }
-                else
-                {
-                     errors ++;
-                     rb->snprintf(buf,sizeof(buf),"Not found:");
-                     FOR_NB_SCREENS(i)
-                     {
-                         rb->screens[i]->puts(0,0,buf);
-                         rb->screens[i]->puts(0, errors, line);
-                     }
-                     update_screen(false);
-                }
-            }
-        }
-        rb->close(fd2);
-        if(errors)
-            /* Press button to continue */
-            rb->get_action(CONTEXT_STD, TIMEOUT_BLOCK);
-    }
-    else
+    fd = rb->open(RFA_CSTM_DIR, O_RDONLY);
+    if (fd < 0)
         return false;
+
+    /* Populate ignored dirs array */
+    while ((rb->read_line(fd, line, sizeof line)) > 0)
+        if ((line[0] == '-') && (line[1] == '/') &&
+            (scan->num_ignored_dirs < MAX_IGNORED_DIRS))
+        {
+            rb->strlcpy(scan->ignored_dirs[scan->num_ignored_dirs],
+                        line + 1, sizeof(*scan->ignored_dirs));
+            scan->num_ignored_dirs++;
+        }
+
+    /* Check which paths to traverse */
+    rb->lseek(fd, 0, SEEK_SET);
+    while ((rb->read_line(fd, line, sizeof line)) > 0)
+    {
+        /* Skip blank lines or dirs to ignore */
+        if (line[0] == '\0' || ((line[0] == '-') && (line[1] == '/')))
+            continue;
+
+        /* Set path to traverse */
+        p = line;
+        while(*p == '/')
+            p++;
+        rb->snprintf(scan->path, sizeof scan->path, "/%s", p);
+        if (rb->dir_exists(scan->path))
+        {
+            /* Erase end of path buffer */
+            p = &scan->path[rb->strlen(scan->path)];
+            rb->memset(p, 0, &scan->path[sizeof(scan->path) - 1] - p);
+
+            /* Don't write ignored dirs to file  */
+            write_line = true;
+            for(i = 0; i < scan->num_ignored_dirs; i++)
+                if(!rb->strcmp(scan->path, scan->ignored_dirs[i]))
+                {
+                     write_line = false;
+                     break;
+                }
+
+            if(write_line)
+            {
+                scan->num_dirs++;
+                rb->write(scan->fd, scan->path, sizeof scan->path);
+            }
+
+            traverse_path(scan);
+            update_screen(scan);
+        }
+        else
+        {
+            scan->num_err++;
+            scan->err_dir = scan->path;
+            update_screen(scan);
+            scan->err_dir = NULL;
+        }
+    }
+
+    rb->close(fd);
+
+    if(scan->num_err)
+        rb->get_action(CONTEXT_STD, TIMEOUT_BLOCK);
+
     return true;
 }
 
-static void generate(void)
+static void generate(struct rfa_scan *scan)
 {
-    dirs_count = 0;
-    cancel = false;
-    fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY, 0666);
-    rb->write(fd,&dirs_count,sizeof(int));
-    if (fd < 0)
+    bool update_title = false;
+
+    /* Reset run context */
+    rb->memset(scan, 0, sizeof(struct rfa_scan));
+
+    FOR_NB_SCREENS(i)
+        update_title = rb->sb_set_title_text("Scanning...", Icon_NOICON, i) ||
+                       update_title;
+    if (update_title)
+        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+
+#ifdef HAVE_DIRCACHE
+    rb->splash(0, ID2P(LANG_WAIT));
+    rb->dircache_wait();
+#endif
+
+    scan->fd = rb->open(RFA_LIST_DAT, O_CREAT|O_WRONLY, 0666);
+    if (scan->fd < 0)
     {
-        rb->splashf(HZ, "Couldnt open %s", RFA_FILE);
+        rb->splashf(HZ, "Couldnt open %s", RFA_LIST_DAT);
         return;
     }
-    update_screen(true);
-    lasttick = *rb->current_tick;
 
-    if(!custom_dir())
-        traversedir("", "");
+    /* Write placeholder for number of folders */
+    rb->write(scan->fd, &scan->num_dirs, sizeof(int));
 
-    rb->lseek(fd,0,SEEK_SET);
-    rb->write(fd,&dirs_count,sizeof(int));
-    rb->close(fd);
+    update_screen(scan);
+    if(!custom_paths(scan))
+    {
+        scan->path[0] = '/';
+        scan->path[1] = '\0';
+        traverse_path(scan);
+        update_screen(scan);
+    }
+    rb->lseek(scan->fd, 0, SEEK_SET);
+    rb->write(scan->fd, &scan->num_dirs, sizeof(int));
+    rb->close(scan->fd);
     rb->splash(HZ, "Done");
 }
 
 static const char* list_get_name_cb(int selected_item, void* data,
                                     char* buf, size_t buf_len)
 {
-    (void)data;
-    rb->strlcpy(buf, list->folder[selected_item], buf_len);
+    struct rfa_scan *scan = (struct rfa_scan *)data;
+    rb->strlcpy(buf, scan->dirs->dir[selected_item], buf_len);
     return buf;
 }
 
-static int load_list(void)
+static int load_dirs(struct rfa_scan *scan)
 {
-    int myfd = rb->open(RFA_FILE,O_RDONLY);
-    if (myfd < 0)
-        return -1;
-    buffer = rb->plugin_get_audio_buffer(&buffer_size);
-    if (!buffer)
-    {
-        return -2;
-    }
+    char *buf;
+    size_t buf_sz;
 
-    rb->read(myfd,buffer,buffer_size);
-    rb->close(myfd);
-    list = (struct file_format *)buffer;
+    int fd = rb->open(RFA_LIST_DAT , O_RDONLY);
+    if (fd < 0)
+        return -1;
+
+    buf = rb->plugin_get_audio_buffer(&buf_sz);
+    if (!buf)
+        return -2;
+
+    rb->read(fd, buf, buf_sz);
+    rb->close(fd);
+    scan->dirs = (struct rfa_dirs *) buf;
 
     return 0;
 }
 
-static int save_list(void)
+static int save_dirs(struct rfa_scan *scan)
 {
-    int myfd = rb->creat(RFA_FILE, 0666);
-    if (myfd < 0)
+    int num_dirs = 0, i = 0;
+    int fd = rb->creat(RFA_LIST_DAT, 0666);
+    if (fd < 0)
     {
-        rb->splash(HZ, "Could Not Open " RFA_FILE);
+        rb->splash(HZ, "Could Not Open " RFA_LIST_DAT);
         return -1;
     }
-    int dirs_count = 0, i = 0;
-    rb->write(myfd,&dirs_count,sizeof(int));
-    for ( ;i<list->count;i++)
+
+    rb->splash_progress_set_delay(HZ/2);
+    rb->write(fd, &num_dirs, sizeof(int));
+    for ( ; i < scan->dirs->count; i++)
     {
-        if (list->folder[i][0] != ' ')
+        /* (voiced) */
+        rb->splash_progress(i, scan->dirs->count, "%s", rb->str(LANG_WAIT));
+        if (scan->dirs->dir[i][0] != ' ')
         {
-            dirs_count++;
-            rb->write(myfd,list->folder[i],MAX_PATH);
+            num_dirs++;
+            rb->write(fd, scan->dirs->dir[i], sizeof(*scan->dirs->dir));
         }
     }
-    rb->lseek(myfd,0,SEEK_SET);
-    rb->write(myfd,&dirs_count,sizeof(int));
-    rb->close(myfd);
+    rb->lseek(fd, 0, SEEK_SET);
+    rb->write(fd, &num_dirs, sizeof(int));
+    rb->close(fd);
 
     return 1;
 }
 
-static int edit_list(void)
+static bool disable_dir(int i, struct rfa_scan *scan)
+{
+    if (scan->dirs->dir[i][0] != ' ')
+    {
+        scan->dirty = true;
+        scan->dirs->dir[i][0] = ' ';
+        scan->dirs->dir[i][1] = '\0';
+        return true;
+    }
+    return false;
+}
+
+static void set_title(struct gui_synclist *lists, bool update, int num_dirs)
+{
+    static int title_count;
+    static char title[15];
+
+    if (update)
+        title_count += num_dirs;
+    else if (num_dirs >= 0)
+        title_count = num_dirs;
+
+    rb->snprintf(title, sizeof title, title_count == 1 ?
+                 "%d Folder" :  "%d Folders", title_count);
+    rb->gui_synclist_set_title(lists, title, Icon_NOICON);
+}
+
+static int edit(struct rfa_scan *scan)
 {
     struct gui_synclist lists;
-    bool exit = false;
-    int button,i;
-    int selection, ret = 0;
+    int button, i, j, selection;
 
     /* load the dat file if not already done */
-    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
+    if (!scan->dirs || !scan->dirs->count)
     {
-        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
-        return -1;
+        if (!rb->file_exists(RFA_LIST_DAT))
+            generate(scan);
+
+        if ((i = load_dirs(scan)) != 0)
+        {
+            rb->splashf(HZ*2, "Could not load %s, err %d", RFA_LIST_DAT, i);
+            return -1;
+        }
     }
-
-    dirs_count = list->count;
-
-    rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1, NULL);
-    rb->gui_synclist_set_nb_items(&lists,list->count);
+    scan->dirty = false;
+    rb->gui_synclist_init(&lists, list_get_name_cb, (void *) scan,
+                          false, 1, NULL);
+    rb->gui_synclist_set_nb_items(&lists, scan->dirs->count);
     rb->gui_synclist_select_item(&lists, 0);
-
-    while (!exit)
+    set_title(&lists, false, scan->dirs->count);
+    while (true)
     {
         rb->gui_synclist_draw(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
@@ -322,8 +384,8 @@ static int edit_list(void)
         switch (button)
         {
             case ACTION_STD_OK:
-                list->folder[selection][0] = ' ';
-                list->folder[selection][1] = '\0';
+                if (disable_dir(selection, scan))
+                    set_title(&lists, true, -1);
                 break;
             case ACTION_STD_CONTEXT:
             {
@@ -334,179 +396,194 @@ static int edit_list(void)
                 switch (rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
-                        list->folder[selection][0] = ' ';
-                        list->folder[selection][1] = '\0';
+                        if (disable_dir(selection, scan))
+                            set_title(&lists, true, -1);
                         break;
                     case 1:
-                    {
-                        char temp[MAX_PATH];
-                        rb->strcpy(temp,list->folder[selection]);
-                        len = rb->strlen(temp);
-                        for (i=0;i<list->count;i++)
-                        {
-                            if (!rb->strncmp(list->folder[i],temp,len))
-                            {
-                                list->folder[i][0] = ' ';
-                                list->folder[i][1] = '\0';
-                            }
-                        }
-                    }
-                    break;
+                        rb->strcpy(scan->path, scan->dirs->dir[selection]);
+                        len = rb->strlen(scan->path);
+                        j = 0;
+                        for (i = 0; i < scan->dirs->count; i++)
+                            if (!rb->strncmp(scan->dirs->dir[i], scan->path, len))
+                                if (disable_dir(i, scan))
+                                    j++;
+                        set_title(&lists, true, -j);
+                        break;
+                    default:
+                        set_title(&lists, false, -1);
+                        break;
                 }
             }
             break;
             case ACTION_STD_CANCEL:
             {
-                MENUITEM_STRINGLIST(menu, "Exit", NULL,
-                                    "Save and Exit", "Ignore Changes and Exit");
+                MENUITEM_STRINGLIST(menu, "Save Changes?", NULL,
+                                    "Save", "Ignore Changes");
 
+                if (!scan->dirty)
+                    return 0;
                 switch (rb->do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
-                        save_list();
+                        save_dirs(scan);
                         /* fallthrough */
                     case 1:
-                        exit = true;
-                        ret = -2;
+                        scan->dirs = NULL;
+                        return 0;
+                    default:
+                        set_title(&lists, false, -1);
+                        break;
                 }
             }
             break;
         }
     }
-    return ret;
+    return 0;
 }
 
-static int export_list_to_file_text(void)
+static int export(struct rfa_scan *scan)
 {
-    int i = 0;
-    /* load the dat file if not already done */
-    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
-    {
-        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
-        return 0;
-    }
+    int i, fd;
 
-    if (list->count <= 0)
+    /* load the dat file if not already done */
+    if (!scan->dirs || !scan->dirs->count)
+        if ((i = load_dirs(scan)) != 0)
+        {
+            rb->splashf(HZ*2, "Could not load %s, err %d", RFA_LIST_DAT, i);
+            return 0;
+        }
+
+    if (scan->dirs->count <= 0)
     {
-        rb->splashf(HZ*2, "no dirs in list file: %s", RFA_FILE);
+        rb->splashf(HZ*2, "no dirs in list file: %s", RFA_LIST_DAT);
         return 0;
     }
 
     /* create and open the file */
-    int myfd = rb->creat(RFA_FILE_TEXT, 0666);
-    if (myfd < 0)
+    fd = rb->creat(RFA_LIST_TXT, 0666);
+    if (fd < 0)
     {
-        rb->splashf(HZ*4, "failed to open: fd = %d, file = %s",
-            myfd, RFA_FILE_TEXT);
+        rb->splashf(HZ*4, "failed to open: fd %d, file %s",
+                    fd, RFA_LIST_TXT);
         return -1;
     }
 
     /* write each directory to file */
-    for (i = 0; i < list->count; i++)
+    rb->splash_progress_set_delay(HZ/2);
+    for (i = 0; i < scan->dirs->count; i++)
     {
-        if (list->folder[i][0] != ' ')
-        {
-            rb->fdprintf(myfd, "%s\n", list->folder[i]);
-        }
+        /* (voiced) */
+        rb->splash_progress(i, scan->dirs->count, "%s", rb->str(LANG_WAIT));
+
+        if (scan->dirs->dir[i][0] != ' ')
+            rb->fdprintf(fd, "%s\n", scan->dirs->dir[i]);
     }
 
-    rb->close(myfd);
+    rb->close(fd);
     rb->splash(HZ, "Done");
     return 1;
 }
 
-static int import_list_from_file_text(void)
+static int import(struct rfa_scan *scan)
 {
-    char line[MAX_PATH];
+    char *buf;
+    size_t buf_sz;
+    int fd;
 
-    buffer = rb->plugin_get_audio_buffer(&buffer_size);
-    if (buffer == NULL)
+    buf = rb->plugin_get_audio_buffer(&buf_sz);
+    if (!buf || buf_sz < sizeof(int))
     {
         rb->splash(HZ*2, "failed to get audio buffer");
         return -1;
     }
 
-    int myfd = rb->open(RFA_FILE_TEXT, O_RDONLY);
-    if (myfd < 0)
+    fd = rb->open(RFA_LIST_TXT, O_RDONLY);
+    if (fd < 0)
     {
-        rb->splashf(HZ*2, "failed to open: %s", RFA_FILE_TEXT);
+        rb->splashf(HZ*2, "failed to open: %s", RFA_LIST_TXT);
         return -1;
     }
 
+    rb->splash(0, ID2P(LANG_WAIT));
+
     /* set the list structure, and initialize count */
-    list = (struct file_format *)buffer;
-    list->count = 0;
+    scan->dirs = (struct rfa_dirs *)buf;
+    scan->dirs->count = 0;
+    buf_sz -= sizeof(int);
 
-    while ((rb->read_line(myfd, line, MAX_PATH - 1)) > 0)
+    while (buf_sz >= sizeof(*scan->dirs->dir))
     {
-        /* copy the dir name, and skip the newline */
-        int len = rb->strlen(line);
-        /* remove CRs */
-        if (len > 0)
+        int numread = rb->read_line(fd, scan->dirs->dir[scan->dirs->count],
+                                    sizeof(*scan->dirs->dir));
+        if ((numread) <= 0)
+            break;
+
+        /* if the line we read fills up buffer, the next call to read_line
+           will return an empty string for a remaining newline character. */
+        if (scan->dirs->dir[scan->dirs->count][0])
         {
-            if (line[len-1] == 0x0A || line[len-1] == 0x0D)
-                line[len-1] = 0x00;
-            if (len > 1 &&
-                (line[len-2] == 0x0A || line[len-2] == 0x0D))
-                line[len-2] = 0x00;
+            scan->dirs->count++;
+            buf_sz -= sizeof(*scan->dirs->dir);
         }
-
-        rb->strcpy(list->folder[list->count++], line);
     }
 
-    rb->close(myfd);
+    rb->close(fd);
 
-    if (list->count == 0)
-    {
-        load_list();
-    }
+    if (!scan->dirs->count)
+        load_dirs(scan);
     else
-    {
-        save_list();
-    }
+        save_dirs(scan);
+
     rb->splash(HZ, "Done");
-    return list->count;
+    return scan->dirs->count;
 }
 
-static int start_shuffled_play(void)
+static int play_shuffled(struct rfa_scan *scan)
 {
-    int *order;
+    struct playlist_insert_context pl_context;
+    int *order, i = 0, ret = -1;
     size_t max_shuffle_size;
-    int i = 0;
-
-    /* get memory for shuffling */
-    order=rb->plugin_get_buffer(&max_shuffle_size);
-    max_shuffle_size/=sizeof(int);
-    if (order==NULL || max_shuffle_size==0)
-    {
-        rb->splashf(HZ*2, "Not enough memory for shuffling");
-        return 0;
-    }
 
     /* load the dat file if not already done */
-    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
+    if (!scan->dirs || !scan->dirs->count)
     {
-        rb->splashf(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
-        return 0;
+        if (!rb->file_exists(RFA_LIST_DAT))
+            generate(scan);
+
+        if ((i = load_dirs(scan)) != 0)
+        {
+            rb->splashf(HZ*2, "Could not load %s, err %d", RFA_LIST_DAT, i);
+            return ret;
+        }
     }
 
-    if (list->count <= 0)
+    if (scan->dirs->count <= 0)
     {
-        rb->splashf(HZ*2, "no dirs in list file: %s", RFA_FILE);
-        return 0;
+        rb->splashf(HZ*2, "No dirs in list file: %s", RFA_LIST_DAT);
+        return ret;
+    }
+
+     /* get memory for shuffling */
+    order = rb->plugin_get_buffer(&max_shuffle_size);
+    max_shuffle_size /= sizeof(int);
+    if (!order || !max_shuffle_size)
+    {
+        rb->splashf(HZ*2, "Not enough memory for shuffling");
+        return ret;
     }
 
     /* shuffle the thing */
     rb->srand(*rb->current_tick);
-    if(list->count>(int)max_shuffle_size)
+    if(scan->dirs->count > (int) max_shuffle_size)
     {
-        rb->splashf(HZ*2, "Too many folders: %d (room for %d)", list->count,(int)max_shuffle_size);
-        return 0;
+        rb->splashf(HZ*2, "Too many folders: %d (room for %d)",
+                    scan->dirs->count, (int) max_shuffle_size);
+        return ret;
     }
-    for(i=0;i<list->count;i++)
-        order[i]=i;
+    for(i = 0; i < scan->dirs->count; i++)
+        order[i] = i;
 
-    for(i = list->count - 1; i >= 0; i--)
+    for(i = scan->dirs->count - 1; i >= 0; i--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
         int candidate = rb->rand() % (i + 1);
@@ -517,116 +594,169 @@ static int start_shuffled_play(void)
         order[i] = store;
     }
 
-    /* We don't want whatever is playing */
     if (!(rb->playlist_remove_all_tracks(NULL) == 0
           && rb->playlist_create(NULL, NULL) == 0))
     {
         rb->splashf(HZ*2, "Could not clear playlist");
-        return 0;
+        return ret;
     }
 
-    /* add the lot to the playlist */
-    for (i = 0; i < list->count; i++)
+    rb->splash_progress_set_delay(HZ/2);
+
+    /* Create insert context, disable progress for individual dirs */
+    if (rb->playlist_insert_context_create(NULL, &pl_context, PLAYLIST_INSERT_LAST,
+                                           false, false) < 0)
     {
-        if (list->folder[order[i]][0] != ' ')
-        {
-            rb->playlist_insert_directory(NULL,list->folder[order[i]],PLAYLIST_INSERT_LAST,false,false);
-        }
+        rb->playlist_insert_context_release(&pl_context);
+        rb->splashf(HZ*2, "Could not insert directories");
+        return ret;
+    }
+
+    for (i = 0; i < scan->dirs->count; i++)
+    {
+        /* (voiced) */
+        rb->splash_progress(i, scan->dirs->count, "%s (%s)",
+                            rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
         if (rb->action_userabort(TIMEOUT_NOBLOCK))
         {
-           break;
+            ret = 0;
+            break;
+        }
+
+        if (scan->dirs->dir[order[i]][0] != ' ')
+        {
+            ret = rb->playlist_insert_directory(NULL, scan->dirs->dir[order[i]],
+                                                PLAYLIST_INSERT_LAST, false,
+                                                false, &pl_context);
+            if (ret < 0)
+            {
+                if (ret == -2) /* User canceled */
+                    break;
+                else if (rb->playlist_amount() >=
+                         rb->global_settings->max_files_in_playlist)
+                {
+                    rb->splashf(HZ, "Reached maximum number of files in playlist (%d)",
+                                rb->global_settings->max_files_in_playlist);
+                    ret = 1;
+                    break;
+                }
+                else
+                    rb->splashf(HZ, "Error inserting: %s", scan->dirs->dir[order[i]]);
+            }
+            ret = 1;
         }
     }
-    rb->splash(HZ, "Done");
-    /* the core needs the audio buffer back in order to start playback. */
-    list = NULL;
-    rb->plugin_release_audio_buffer();
-    rb->playlist_start(0, 0, 0);
-    return 1;
+    rb->playlist_insert_context_release(&pl_context);
+
+    if (ret > 0)
+    {
+        /* the core needs the audio buffer back in order to start playback. */
+        scan->dirs = NULL;
+        rb->plugin_release_audio_buffer();
+        rb->playlist_set_modified(NULL, true);
+        rb->playlist_start(0, 0, 0);
+    }
+    return ret;
 }
 
 static enum plugin_status main_menu(void)
 {
-    bool exit = false;
+    static struct rfa_scan scan;
+    int selected = 0;
+
     MENUITEM_STRINGLIST(menu, "Random Folder Advance", NULL,
-                        "Generate Folder List",
-                        "Edit Folder List",
-                        "Export List To Textfile",
-                        "Import List From Textfile",
                         "Play Shuffled",
+                        "Scan Folders",
+                        "Edit",
+                        "Export to Text File",
+                        "Import from Text File",
                         "Quit");
 
-    while (!exit)
+    while (true)
     {
-        switch (rb->do_menu(&menu, NULL, NULL, false))
+        switch (rb->do_menu(&menu, &selected, NULL, false))
         {
-            case 0: /* generate */
+            case GO_TO_PREVIOUS_MUSIC:
+                return PLUGIN_GOTO_WPS;
+            case GO_TO_ROOT:
+                return PLUGIN_GOTO_ROOT;
+            case GO_TO_PREVIOUS:
+                return PLUGIN_OK;
+            case 0: /* Play Shuffled */
+                if (!rb->warn_on_pl_erase())
+                    break;
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(true);
 #endif
-                generate();
+                int ret = play_shuffled(&scan);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                rb->remote_backlight_on();
-#endif
-                rb->backlight_on();
-#endif
-                break;
-            case 1:
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(true);
-#endif
-                if (edit_list() < 0)
-                    exit = true;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(false);
-#endif
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                rb->remote_backlight_on();
-#endif
-                rb->backlight_on();
-#endif
-                break;
-            case 2: /* export to textfile */
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(true);
-#endif
-                export_list_to_file_text();
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(false);
-#endif
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                rb->remote_backlight_on();
-#endif
-                rb->backlight_on();
-#endif
-                break;
-            case 3: /* import from textfile */
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(true);
-#endif
-                import_list_from_file_text();
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost(false);
-#endif
-#ifdef HAVE_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                rb->remote_backlight_on();
-#endif
-                rb->backlight_on();
-#endif
-                break;
-            case 4:
-                if (!start_shuffled_play())
-                    return PLUGIN_ERROR;
-                else
+                if (ret > 0)
                     return PLUGIN_GOTO_WPS;
-            case 5:
+                break;
+            case 1: /* Scan Folders */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(true);
+#endif
+                generate(&scan);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(false);
+#endif
+#ifdef HAVE_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                rb->remote_backlight_on();
+#endif
+                rb->backlight_on();
+#endif
+                break;
+            case 2: /* Edit */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(true);
+#endif
+                edit(&scan);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(false);
+#endif
+#ifdef HAVE_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                rb->remote_backlight_on();
+#endif
+                rb->backlight_on();
+#endif
+                break;
+            case 3: /* Export to Text File */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(true);
+#endif
+                export(&scan);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(false);
+#endif
+#ifdef HAVE_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                rb->remote_backlight_on();
+#endif
+                rb->backlight_on();
+#endif
+                break;
+            case 4: /* Import from Text File */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(true);
+#endif
+                import(&scan);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                rb->cpu_boost(false);
+#endif
+#ifdef HAVE_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                rb->remote_backlight_on();
+#endif
+                rb->backlight_on();
+#endif
+                break;
+            case 5: /* Quit */
                 return PLUGIN_OK;
         }
     }
@@ -636,11 +766,17 @@ static enum plugin_status main_menu(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
+    enum plugin_status ret;
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
 
-    cancel = false;
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
+    ret = main_menu();
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
 
-    return main_menu();
+    return ret;
 }

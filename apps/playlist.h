@@ -157,7 +157,7 @@ int playlist_insert_context_add(struct playlist_insert_context *context,
 void playlist_insert_context_release(struct playlist_insert_context *context);
 int playlist_insert_directory(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
-                              bool recurse);
+                              bool recurse, struct playlist_insert_context *context);
 int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue);
 bool playlist_entries_iterate(const char *filename,

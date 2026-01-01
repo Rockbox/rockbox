@@ -296,7 +296,7 @@ static void op_playlist_insert_selected(int position, bool queue)
         }
 
         playlist_insert_directory(NULL, selected_file.path, position, queue,
-                                  recurse == RECURSE_ON);
+                                  recurse == RECURSE_ON, NULL);
     }
 }
 

@@ -178,7 +178,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 276
+#define PLUGIN_API_VERSION 277
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -419,7 +419,11 @@ struct plugin_api {
     bool (*simplelist_show_list)(struct simplelist_info *info);
     bool (*yesno_pop)(const char* text);
     bool (*yesno_pop_confirm)(const char* text);
+
+    /* status bar */
     bool (*sb_set_title_text)(const char* title, enum themable_icons icon, enum screen_type screen);
+    bool (*sb_set_persistent_title)(const char* title, enum themable_icons icon,
+                                    enum screen_type screen);
 
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
@@ -863,9 +867,13 @@ struct plugin_api {
             const char *filename, int position, bool queue, bool sync);
     int (*playlist_insert_directory)(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
-                              bool recurse);
+                              bool recurse, struct playlist_insert_context *context);
     int (*playlist_insert_playlist)(struct playlist_info* playlist,
                                     const char *filename, int position, bool queue);
+    int (*playlist_insert_context_create)(struct playlist_info* playlist,
+                                          struct playlist_insert_context *context,
+                                          int position, bool queue, bool progress);
+    void (*playlist_insert_context_release)(struct playlist_insert_context *context);
     int (*playlist_shuffle)(int random_seed, int start_index);
     bool (*warn_on_pl_erase)(void);
     void (*audio_play)(unsigned long elapsed, unsigned long offset);
@@ -1026,8 +1034,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    bool (*sb_set_persistent_title)(const char* title, enum themable_icons icon,
-                                    enum screen_type screen);
 };
 
 /* plugin header */

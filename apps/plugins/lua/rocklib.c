@@ -392,7 +392,7 @@ RB_WRAP(playlist)
             pos = luaL_optint(L, 3, PLAYLIST_INSERT);
             queue = lua_toboolean(L, 4); /* default to false */
             recurse = lua_toboolean(L, 5); /* default to false */
-            result = rb->playlist_insert_directory(NULL, dir, pos, queue, recurse);
+            result = rb->playlist_insert_directory(NULL, dir, pos, queue, recurse, NULL);
             break;
         case PLAYL_INSERTPLAYL:
             filename = luaL_checkstring(L, 2); /* only required parameter */

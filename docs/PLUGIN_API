@@ -1874,13 +1874,14 @@ int playlist_get_track_info(struct playlist_info* playlist, int index, struct pl
     \return
     \description
 
-int playlist_insert_directory(struct playlist_info* playlist, const char *dirname, int position, bool queue, bool recurse)
+int playlist_insert_directory(struct playlist_info* playlist, const char *dirname, int position, bool queue, bool recurse, struct playlist_insert_context *context)
     \group playback control
     \param playlist
     \param dirname
     \param position
     \param queue
     \param recurse
+    \param context
     \return
     \description
 

@@ -357,7 +357,10 @@ static const struct plugin_api rockbox_api = {
     simplelist_show_list,
     yesno_pop,
     yesno_pop_confirm,
+
+    /* status bar */
     sb_set_title_text,
+    sb_set_persistent_title,
 
     /* action handling */
     get_custom_action,
@@ -738,6 +741,8 @@ static const struct plugin_api rockbox_api = {
     playlist_insert_track,
     playlist_insert_directory,
     playlist_insert_playlist,
+    playlist_insert_context_create,
+    playlist_insert_context_release,
     playlist_shuffle,
     warn_on_pl_erase,
     audio_play,
@@ -874,7 +879,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    sb_set_persistent_title,
 };
 
 static int plugin_buffer_handle;
