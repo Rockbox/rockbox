@@ -81,6 +81,7 @@ struct stm_spi
     enum stm_spi_mode mode;
     stm_spi_set_cs_t set_cs;
     uint32_t frame_size;
+    uint32_t eot_delay_us;
 
     const void *tx_buf;
     size_t tx_size;

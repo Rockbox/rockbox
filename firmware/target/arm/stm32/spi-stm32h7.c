@@ -130,6 +130,7 @@ void stm_spi_init(struct stm_spi *spi,
     spi->clock = config->clock;
     spi->mode = config->mode;
     spi->set_cs = config->set_cs;
+    spi->eot_delay_us = 1 + (1000000 / config->freq);
 
     semaphore_init(&spi->sem, 1, 0);
 
@@ -164,7 +165,6 @@ void stm_spi_init(struct stm_spi *spi,
 
     stm32_clock_enable(spi->clock);
 
-    /* TODO: allow setting MBR here */
     reg_writelf(spi->regs, SPI_CFG1,
                 MBR(mbr),
                 CRCEN(0),
@@ -225,6 +225,8 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
     spi->rx_buf = rx_buf;
     spi->rx_size = rx_buf ? size : 0;
 
+    membarrier();
+
     stm_spi_enable(spi, hd_tx, size);
 
     semaphore_wait(&spi->sem, TIMEOUT_BLOCK);
@@ -236,10 +238,8 @@ int stm_spi_xfer(struct stm_spi *spi, size_t size,
      * For 2.22.2 we need to wait at least 1 SCK cycle before starting the
      * next transaction. For 2.22.6, waiting 1/2 SCK cycle should be enough
      * since the EOT event is raised on a clock edge.
-     *
-     * TODO: calculate this delay time. doesn't seem to match assumptions above
      */
-    udelay(5);
+    udelay(spi->eot_delay_us);
 
     stm_spi_disable(spi);
     return 0;
@@ -251,9 +251,13 @@ void stm_spi_irq_handler(struct stm_spi *spi)
     {
         uint32_t sr = reg_readl(spi->regs, SPI_SR);
 
-        if (spi->tx_size == 0 && spi->rx_size == 0)
+        if (spi->tx_size == 0 &&
+            spi->rx_size == 0 &&
+            reg_vreadf(sr, SPI_SR, EOT))
         {
             semaphore_release(&spi->sem);
+
+            reg_writelf(spi->regs, SPI_IFCR, EOTC(1));
             reg_varl(spi->regs, SPI_IER) = 0;
             return;
         }
@@ -261,6 +265,8 @@ void stm_spi_irq_handler(struct stm_spi *spi)
         if (spi->tx_size > 0 && reg_vreadf(sr, SPI_SR, TXP))
         {
             uint32_t data = stm_spi_pack(&spi->tx_buf, &spi->tx_size);
+            if (spi->tx_size == 0)
+                reg_writelf(spi->regs, SPI_IER, TXPIE(0));
 
             reg_varl(spi->regs, SPI_DR) = data;
             continue;
@@ -272,6 +278,9 @@ void stm_spi_irq_handler(struct stm_spi *spi)
             uint32_t data = reg_readl(spi->regs, SPI_DR);
 
             stm_spi_unpack(&spi->rx_buf, &spi->rx_size, data);
+            if (spi->rx_size == 0)
+                reg_writelf(spi->regs, SPI_IER, RXPIE(0));
+
             continue;
         }
 
