@@ -53,7 +53,16 @@ void CreateVoiceWindow::accept()
     saveSettings();
     
     //configure voicecreator
-    voicecreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
+    QString suffix = RbSettings::value(RbSettings::Suffix).toString();
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+
+    if (!suffix.isEmpty()) {
+        QString fullpath = mountpoint + suffix;
+        voicecreator->setMountPoint(fullpath);
+    } else {
+        voicecreator->setMountPoint(mountpoint);
+    }
+
     voicecreator->setLang(ui.comboLanguage->itemData(ui.comboLanguage->currentIndex()).toString());
     voicecreator->setWavtrimThreshold(ui.wavtrimthreshold->value());
        

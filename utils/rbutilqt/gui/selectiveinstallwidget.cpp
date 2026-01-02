@@ -51,7 +51,6 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
 
     m_logger = nullptr;
     m_zipinstaller = nullptr;
-    m_suffix = RbSettings::value(RbSettings::Suffix).toString();
     m_themesinstaller = new ThemesInstallWindow(this);
     connect(m_themesinstaller, &ThemesInstallWindow::selected,
             [this](int count) {ui.themesCheckbox->setChecked(count > 0);});
@@ -114,6 +113,7 @@ void SelectiveInstallWidget::updateVersion(void)
 {
     // get some configuration values globally
     m_mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    m_suffix = RbSettings::value(RbSettings::Suffix).toString();
     m_target = RbSettings::value(RbSettings::CurrentPlatform).toString();
     m_blmethod = PlayerBuildInfo::instance()->value(
             PlayerBuildInfo::BootloaderMethod, m_target).toString();

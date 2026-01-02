@@ -67,7 +67,15 @@ BackupDialog::BackupDialog(QWidget* parent) : QDialog(parent)
     connect(ui.buttonBackup, &QAbstractButton::clicked, this, &BackupDialog::backup);
 
     ui.backupSize->setText(tr("Installation size: calculating ..."));
-    m_mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+
+    QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
+    QString suffix = RbSettings::value(RbSettings::Suffix).toString();
+
+    if (!suffix.isEmpty()) {
+        m_mountpoint = mp + suffix;
+    } else {
+        m_mountpoint = mp;
+    }
 
     m_backupName = RbSettings::value(RbSettings::BackupPath).toString();
     if(m_backupName.isEmpty()) {

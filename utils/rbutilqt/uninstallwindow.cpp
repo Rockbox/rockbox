@@ -16,6 +16,8 @@
  *
  ****************************************************************************/
 
+#include <QtCore>
+#include "Logger.h"
 #include "uninstallwindow.h"
 #include "ui_uninstallfrm.h"
 #include "rbsettings.h"
@@ -28,8 +30,16 @@ UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
     connect(ui.CompleteRadioBtn,&QAbstractButton::toggled,this,&UninstallWindow::UninstallMethodChanged);
     
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    QString suffix = RbSettings::value(RbSettings::Suffix).toString();
 
-    uninstaller = new Uninstaller(this,mountpoint);
+    QString path;
+    if (!suffix.isEmpty()) {
+        path = mountpoint + suffix;
+    } else {
+        path = mountpoint;
+    }
+
+    uninstaller = new Uninstaller(this, path);
     logger = new ProgressLoggerGui(this);
     connect(uninstaller, &Uninstaller::logItem, logger, &ProgressLoggerGui::addItem);
     connect(uninstaller, &Uninstaller::logProgress, logger, &ProgressLoggerGui::setProgress);

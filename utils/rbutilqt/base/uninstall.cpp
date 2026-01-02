@@ -120,7 +120,10 @@ QStringList Uninstaller::getAllSections()
 {
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, nullptr);
     QStringList allSections = installlog.childGroups();
-    allSections.removeAt(allSections.lastIndexOf("Bootloader"));
+
+    int bl_index = allSections.lastIndexOf("Bootloader");
+    if (bl_index > -1) allSections.removeAt(bl_index);
+
     return allSections;
 }
 

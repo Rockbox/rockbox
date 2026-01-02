@@ -39,7 +39,16 @@ void InfoWidget::updateInfo(void)
     LOG_INFO() << "updating install info";
 
     QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
-    QSettings log(mp + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
+    QString suff = RbSettings::value(RbSettings::Suffix).toString();
+
+    QString logpath;
+    if (!suff.isEmpty()) {
+        logpath = mp + suff + "/.rockbox/rbutil.log";
+    } else {
+        logpath = mp + "/.rockbox/rbutil.log";
+    }
+
+    QSettings log(logpath, QSettings::IniFormat, this);
     QStringList groups = log.childGroups();
     QTreeWidgetItem *w, *w2;
     QString min, max;

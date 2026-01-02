@@ -238,7 +238,16 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
     int m_progress = 0;
     emit logProgress(m_progress,progressMax);
 
-    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, nullptr);
+    QString suffix = RbSettings::value(RbSettings::Suffix).toString();
+
+    QString logpath;
+    if (!suffix.isEmpty()) {
+        logpath = m_mountpoint + suffix + "/.rockbox/rbutil.log";
+    } else {
+        logpath = m_mountpoint + "/.rockbox/rbutil.log";
+    }
+
+    QSettings installlog(logpath, QSettings::IniFormat, nullptr);
     installlog.beginGroup("talkfiles");
 
     for(int i=0; i < m_talkList.size(); i++)
