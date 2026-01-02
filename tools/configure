@@ -319,6 +319,7 @@ simcc () {
    GCCOPTS="$GCCOPTS -Wno-format"
    LDOPTS="$LDOPTS -mconsole -static"
    GLOBAL_LDOPTS=`echo $GLOBAL_LDOPTS | sed -e s/\-Wl,-z,defs//`
+   GLOBAL_LDOPTS=`echo $GLOBAL_LDOPTS | sed -e s/\-Wl,-z,noexecstack//`
    LDOPTS=`echo $LDOPTS | sed -e s/-ldl// -e s/-lrt// -e s/-lasound//`
    output="$output.exe"
    winbuild="yes"
@@ -643,7 +644,7 @@ arm1176jzlinuxcc () {
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs" # warn about undefined symbols in shared libraries
- GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs -Wl,-z,noexecstack" # Stack is not executable
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,noexecstack" # Stack is not executable
  SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS=''
  endian="little"
