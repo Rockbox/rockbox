@@ -192,6 +192,10 @@ enum plugin_status plugin_start(const void* parameter)
     rb->gui_synclist_draw(&list);
     rb->gui_synclist_speak_item(&list);
 
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
+
     while (!done)
     {
         cur_sel = rb->gui_synclist_get_sel_pos(&list);
