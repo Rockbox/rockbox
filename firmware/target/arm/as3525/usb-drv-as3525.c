@@ -347,7 +347,7 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
     (void)max_packet_size;
 
     int i = EP_NUM(endpoint);
-    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
+//    int d = EP_DIR(endpoint) == DIR_IN ? 0 : 1;
 
     if (EP_DIR(endpoint) == DIR_IN) {
         USB_IEP_CTRL(i) = USB_EP_CTRL_FLUSH |
