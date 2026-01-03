@@ -212,7 +212,7 @@ static struct usb_dw_ep *usb_dw_get_ep(int epnum, enum usb_dw_epdir epdir)
 
 static uint32_t usb_dw_maxpktsize(int epnum, enum usb_dw_epdir epdir)
 {
-    return epnum ? DWC_EPCTL(epnum, epdir) & 0x3ff : 64;
+    return epnum ? DWC_EPCTL(epnum, epdir) & 0x7ff : 64;
 }
 
 static uint32_t usb_dw_maxxfersize(int epnum, enum usb_dw_epdir epdir)
