@@ -2,14 +2,14 @@ RG_NANO_DIR=$(ROOTDIR)/packaging/rgnano
 MKSQUASHFS=$(FUNKEY_SDK_PATH)/bin/mksquashfs
 INSTALL_DIR=$(OPK_BUILD_DIR)/install
 OPK_BUILD_DIR=opkdir
-
-opkdir:
-	mkdir $(OPK_BUILD_DIR)
+OPK_NAME=rockbox_funkey-s.opk
 
 opkclean:
 	rm -rf $(OPK_BUILD_DIR)
 
-opk: opkclean opkdir $(MKSQUASHFS) build
+opk: opkclean $(MKSQUASHFS) build
+	mkdir $(OPK_BUILD_DIR)
+
 	make PREFIX=$(OPK_BUILD_DIR)/rockbox install
 
 	# Install opk files
@@ -37,7 +37,16 @@ opk: opkclean opkdir $(MKSQUASHFS) build
 	chmod +x $(OPK_BUILD_DIR)/run.sh
 
 	# Make opk
-	$(MKSQUASHFS) $(OPK_BUILD_DIR) rockbox_funkey-s.opk -all-root -noappend -no-exports -no-xattrs
+	$(MKSQUASHFS) $(OPK_BUILD_DIR) $(OPK_NAME) -all-root -noappend -no-exports -no-xattrs
 
 opk-zip: opk
-	zip -9 -q rockbox-opk.zip rockbox_funkey-s.opk rockbox-info.txt
+	mkdir Applications
+	mkdir -p FunKey/.rockbox
+
+	mv $(OPK_NAME) Applications/$(OPK_NAME)
+
+	zip -9 -q rockbox-opk.zip Applications/$(OPK_NAME) FunKey/.rockbox rockbox-info.txt
+
+	mv Applications/$(OPK_NAME) $(OPK_NAME)
+	rmdir Applications
+	rmdir FunKey/.rockbox

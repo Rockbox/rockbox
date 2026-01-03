@@ -422,10 +422,10 @@ in installing.
 
 \subsection{Automated Installation}
 
-\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative,rgnano}{
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
 \note{Rockbox Utility does not currently support the \playertype{} and you will
 therefore need to follow the manual install instructions.}}
-\nopt{erosqnative,rgnano}{
+\nopt{erosqnative}{
 To automatically install Rockbox, download the official installer and
 housekeeping tool \caps{Rockbox Utility}. It allows you to:
 \begin{itemize}
@@ -538,11 +538,11 @@ There are three different versions of Rockbox available from the
 Rockbox website:
 \label{Version}
 Release version, current build and archived daily build. You need to decide which one
-you want to install and get the appropriate version for your \dap{}. \nopt{rgnano}{If you
+you want to install and get the appropriate version for your \dap{}. If you
 select either ``Minimal Installation'' or ``Complete Installation'' from the
 ``Quick Start'' tab, then Rockbox Utility will automatically install the
 release version of Rockbox. Using the ``Installation'' tab will allow you
-to select which version you wish to install.}
+to select which version you wish to install.
 
 \opt{erosqnative}{
 \note{\textbf{There are two different versions of Rockbox for the \playertype{}. This manual only
@@ -581,9 +581,9 @@ Please now go to \reference{ref:finish_install} to complete the installation pro
 
 \nopt{erosqnative}{
 The manual installation method is still available to you, should you need or desire it
-by following the instructions below. \nopt{rgnano}{If you have used Rockbox Utility
+by following the instructions below. If you have used Rockbox Utility
 to install Rockbox, then you do not need to follow the next section and can skip
-straight to \reference{ref:finish_install}.}
+straight to \reference{ref:finish_install}.
 }
 
 \opt{gigabeats,erosqnative}{\subsubsection{Installing the bootloader}
@@ -648,22 +648,22 @@ data partition.}}
  \opt{gigabeats,fuzeplus}{the main data partition of }%
  \opt{cowond2}{either an SD card or the internal memory of }%
  \opt{ondavx777}{the MicroSD of }%
- \opt{rgnano}{the \fname{Applications} folder of the microSD card of }%
+ \opt{rgnano}{the root of the microSD card of }%
  your \dap{}.
  \opt{cowond2}{\note{If you have chosen to extract to the internal memory, it
      will not be possible to save settings.}}
 \end{enumerate}
 
-\nopt{rgnano}{
 \note{The entire contents of the \fname{.zip} file should be extracted
 directly to the root of your \daps{} drive. Do not try to
 create a separate directory on your \dap{} for the Rockbox
 files! The \fname{.zip} file already contains the internal
-structure that Rockbox needs.\\}
+structure that Rockbox needs.}
 
+\nopt{rgnano}{
 % This has nothing to do with swcodec, just that these players need our own
 % bootloader so we can decide where we want the main binary.
-If the contents of the \fname{.zip} file are extracted correctly, you will
+\\If the contents of the \fname{.zip} file are extracted correctly, you will
 have a directory called \fname{.rockbox}, which contains all the files needed
 by Rockbox, in the main directory of your \daps{} drive.
 }
@@ -856,20 +856,18 @@ you turn the unit on, Rockbox should load.}
 
 \section{Updating Rockbox}
 
-\nopt{rgnano}{
-  \nopt{erosqnative}{
-  Rockbox can be easily updated with Rockbox Utility. You can also update Rockbox
-  }
-  \opt{erosqnative}{
-  The Native Port to \playername{} is not supported by Rockbox Utility yet, so Rockbox Utility cannot update it.
-  Rockbox is easily updated
-  }
-  manually -- download a Rockbox build
-  as detailed above, and unzip the build to the root directory
-  of your \dap{} as in the manual installation stage. If your unzip
-  program asks you whether to overwrite files, choose the ``Yes to all'' option.
-  The new build will be installed over your current build.\\
+\nopt{erosqnative}{
+Rockbox can be easily updated with Rockbox Utility. You can also update Rockbox
 }
+\opt{erosqnative}{
+The Native Port to \playername{} is not supported by Rockbox Utility yet, so Rockbox Utility cannot update it.
+Rockbox is easily updated
+}
+manually -- download a Rockbox build
+as detailed above, and unzip the build to the root directory
+of your \dap{} as in the manual installation stage. If your unzip
+program asks you whether to overwrite files, choose the ``Yes to all'' option.
+The new build will be installed over your current build.\\
 
 \opt{gigabeats}{
   \note{When your \dap{} is in the Rockbox USB or bootloader
@@ -884,37 +882,35 @@ The bootloader only changes rarely, and should not normally
 need to be updated.\\
 }
 
-\nopt{erosqnative,rgnano}{
+\nopt{erosqnative}{
 \note{If you use Rockbox Utility be aware that it cannot detect manually
-        installed components.}
+        installed components.\\}
 }
 
 \opt{rgnano}{
-  Rockbox can be easily updated by replacing the \fname{rockbox-funkey-s.opk}
+  Rockbox also can be updated manually by replacing the \fname{rockbox-funkey-s.opk}
   file in the \fname{Applications} folder of the microSD card with a newer version.
 }
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{rgnano}{
-  \nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative}{
-    \note{The Rockbox bootloader allows you to choose between Rockbox and
-    the original firmware. (See \reference{ref:Dualboot} for more information.)}
-  }
-
-  \subsection{Automatic Uninstallation}
-  \opt{gigabeats,erosqnative}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
-
-  \nopt{erosqnative}{
-    You can uninstall Rockbox automatically by using Rockbox Utility. If you
-    installed Rockbox manually you can still use Rockbox Utility for uninstallation
-    but will not be able to do this selectively.
-  }
-
-  \opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
-  the fact that it requires a flashing procedure. To uninstall the bootloader
-  completely follow the manual uninstallation instructions below.}}
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative,rgnano}{
+  \note{The Rockbox bootloader allows you to choose between Rockbox and
+  the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
+
+\subsection{Automatic Uninstallation}
+\opt{gigabeats,erosqnative,rgnano}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
+
+\nopt{erosqnative,rgnano}{
+  You can uninstall Rockbox automatically by using Rockbox Utility. If you
+  installed Rockbox manually you can still use Rockbox Utility for uninstallation
+  but will not be able to do this selectively.
+}
+
+\opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
+the fact that it requires a flashing procedure. To uninstall the bootloader
+completely follow the manual uninstallation instructions below.}}
 
 \subsection{Manual Uninstallation}
 
