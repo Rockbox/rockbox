@@ -47,7 +47,7 @@
 #define HISPEED
 
 /* Right now sending blocks till the full transfer has completed. The driver
- *  will work without USB_TRAN_BLOCK set, but it is more than 50% slower.  
+ *  will work without USB_TRAN_BLOCK set, but it is more than 50% slower.
  *  The driver is more "Proper" without USB_TRAN_BLOCK defined so if you start
  *  having freezeups or trouble using USB undefine this option.
  */
@@ -72,7 +72,7 @@ static int pipe_maxpack_size (int pipe);
 static void control_received(void);
 static void transfer_complete(int endpoint);
 static int mxx_transmit_receive(int endpoint);
-static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
+static int mxx_queue(int endpoint, void * ptr, int length, bool send,
     bool wait);
 
 struct M66591_epstat {
@@ -97,7 +97,7 @@ static volatile unsigned short * pipe_ctrl_addr(int pipe) {
 static void pipe_init(int pipe) {
     volatile unsigned short *pipe_cfg;
     pipe_cfg = pipe_ctrl_addr(pipe);
-    
+
     *pipe_cfg |= 1<<9;      /* ACLR */
     *pipe_cfg &= ~(1<<9);   /* Force de-assertion */
     *pipe_cfg |= 1<<8;      /* SQCLR */
@@ -106,7 +106,7 @@ static void pipe_init(int pipe) {
 /* This function sets the pipe/endpoint handshake */
 static void pipe_handshake(int pipe, int handshake) {
     handshake&=0x03;
-    
+
     if(handshake == PIPE_SHAKE_STALL) {
         if( *(pipe_ctrl_addr(pipe)) & 0x03 ) {
             *(pipe_ctrl_addr(pipe)) = 0x03;
@@ -122,9 +122,9 @@ static void pipe_handshake(int pipe, int handshake) {
  *  warites/reads are valid */
 static void pipe_c_select (int pipe, bool dir) {
     M66591_CPORT_CTRL0 = pipe | (1<<10) | (dir<<5);
-    
+
     // Wait for the Pipe to be valid;
-    udelay(2); 
+    udelay(2);
 }
 
 #if !defined(USB_TRAN_BLOCK)
@@ -199,11 +199,11 @@ static int pipe_maxpack_size (int pipe) {
 static void control_received(void) {
     /* copy setup data from packet */
     static struct usb_ctrlrequest temp;
-    
+
     memcpy(&temp, (unsigned char*)&M66591_USB_REQ0, 8);
-    
+
     logf("mxx: bReqType=0x%02x bReq=0x%02x wVal=0x%04x"
-        " wIdx=0x%04x wLen=0x%04x", 
+        " wIdx=0x%04x wLen=0x%04x",
         temp.bRequestType, temp.bRequest, temp.wValue,
         temp.wIndex, temp.wLength);
 
@@ -220,7 +220,7 @@ static void transfer_complete(int endpoint) {
     M66591_INTCFG_EMP &= ~(1 << endpoint);
     logf("mxx: ep %d transfer complete", endpoint);
     int temp=M66591_eps[endpoint].dir ? USB_DIR_IN : USB_DIR_OUT;
-    usb_core_transfer_complete(endpoint, temp, 0, 
+    usb_core_transfer_complete(endpoint, temp, 0,
         M66591_eps[endpoint].count);
 }
 
@@ -229,7 +229,7 @@ static void transfer_complete(int endpoint) {
  */
 static int mxx_transmit_receive(int endpoint) {
     logf("mxx: do start");
-    
+
     /* Only the lower 15 bits of the endpoint correlate to the pipe number.
      *  For example pipe 2 will corelate to endpoint 0x82, so the upper bits
      * need to be masked out.
@@ -238,9 +238,9 @@ static int mxx_transmit_receive(int endpoint) {
 
     int i;      /* Used as a loop counter */
     int length; /* Used in transfers to determine the amount to send/receive */
-    
+
     bool send=M66591_eps[endpoint].dir;
-    
+
     /* This is used as the internal buffer pointer */
     unsigned short *ptrs;
 
@@ -265,7 +265,7 @@ static int mxx_transmit_receive(int endpoint) {
         length = M66591_eps[endpoint].length;
 #else
         int bufsize=pipe_buffer_size(endpoint);
-        length=MIN(M66591_eps[endpoint].length - M66591_eps[endpoint].count, 
+        length=MIN(M66591_eps[endpoint].length - M66591_eps[endpoint].count,
             bufsize);
 #endif
 
@@ -274,15 +274,15 @@ static int mxx_transmit_receive(int endpoint) {
          */
         ptrs = (unsigned short *)(M66591_eps[endpoint].buf
             + M66591_eps[endpoint].count);
-        
+
         /* Check if the buffer is alligned */
         if( LIKELY(((int)ptrs) & 0x01) == 0 )
         {
             /* Start sending data in 16-bit words (fast) */
-            for (i = 0; i < (length>>1); i++) { 
+            for (i = 0; i < (length>>1); i++) {
 #if defined(USB_TRAN_BLOCK)
-                /* This wait is dangerous in the event that something happens 
-                 *  to the PHY pipe where it never becomes ready again, should 
+                /* This wait is dangerous in the event that something happens
+                 *  to the PHY pipe where it never becomes ready again, should
                  *  probably add a timeout, and ideally completely remove.
                  */
                 while(!(M66591_CPORT_CTRL1&(1<<13))){};
@@ -291,8 +291,8 @@ static int mxx_transmit_receive(int endpoint) {
                 M66591_CPORT = *ptrs++;
                 M66591_eps[endpoint].count+=2;
             }
-            
-            /* If the length is odd, send the last byte after setting the byte 
+
+            /* If the length is odd, send the last byte after setting the byte
              *  width of the FIFO.
              */
             if(length & 0x01) {
@@ -304,17 +304,17 @@ static int mxx_transmit_receive(int endpoint) {
         }
         else
         {
-            /* The buffer is mis-aligned - data needs to be organized first. 
+            /* The buffer is mis-aligned - data needs to be organized first.
              *  This is slower than the above method.
              */
             unsigned short sbuf;
             unsigned char *ptrc = (unsigned char*)ptrs;
-            
+
             /* Start sending data in 16-bit words */
-            for (i = 0; i < (length>>1); i++) { 
+            for (i = 0; i < (length>>1); i++) {
 #if defined(USB_TRAN_BLOCK)
-                /* This wait is dangerous in the event that something happens 
-                 *  to the PHY pipe where it never becomes ready again, should 
+                /* This wait is dangerous in the event that something happens
+                 *  to the PHY pipe where it never becomes ready again, should
                  *  probably add a timeout, and ideally completely remove.
                  */
                 while(!(M66591_CPORT_CTRL1&(1<<13))){};
@@ -329,8 +329,8 @@ static int mxx_transmit_receive(int endpoint) {
                 M66591_CPORT = sbuf;
                 M66591_eps[endpoint].count+=2;
             }
-            
-            /* If the length is odd, send the last byte after setting the byte 
+
+            /* If the length is odd, send the last byte after setting the byte
              *  width of the FIFO.
              */
             if(length & 0x01) {
@@ -340,7 +340,7 @@ static int mxx_transmit_receive(int endpoint) {
                 M66591_eps[endpoint].count++;
             }
         }
-        
+
         /* If the transfer is complete set up interrupts to notify when FIFO is
          *  EMPTY, disable READY and let the handler know that there is nothing
          *  left to transfer on this pipe.
@@ -356,7 +356,7 @@ static int mxx_transmit_receive(int endpoint) {
             /* There is still data to transfer, make sure READY is enabled */
             M66591_INTCFG_RDY |= 1 << endpoint;
         }
-        
+
         /* Set BVAL if length is not a multiple of the maximum packet size */
         if( (length == 0) || (length % maxpack != 0) ) {
             logf("mxx: do set BVAL");
@@ -364,27 +364,27 @@ static int mxx_transmit_receive(int endpoint) {
         }
     } else {
         /* Read data from FIFO */
-        
+
         /* Read the number of bytes that the PHY received */
         int receive_length=M66591_CPORT_CTRL1 & 0x03FF;
-        
+
         /* The number of bytes to actually read is either what's left of the
          *  amount requested, or the amount that the PHY received.  Choose the
          *  smaller of the two.
          */
-        length = MIN(M66591_eps[endpoint].length - M66591_eps[endpoint].count, 
+        length = MIN(M66591_eps[endpoint].length - M66591_eps[endpoint].count,
             receive_length);
 
         /* If the length is zero, just clear the buffer as specified in the
          *  datasheet.  Otherwise read in the data (in 16-bit pieces */
         if(length==0) {
             /* Set the BCLR bit */
-            M66591_CPORT_CTRL1 |= 1<<14; 
+            M66591_CPORT_CTRL1 |= 1<<14;
         } else {
             /* Set the position in the buffer */
-            ptrs = (unsigned short *)(M66591_eps[endpoint].buf 
+            ptrs = (unsigned short *)(M66591_eps[endpoint].buf
                 + M66591_eps[endpoint].count);
-        
+
             /* Read in the data (buffer size should be even).  The PHY cannot
              *  switch from 16-bit mode to 8-bit mode on an OUT buffer.
              */
@@ -393,16 +393,16 @@ static int mxx_transmit_receive(int endpoint) {
                 M66591_eps[endpoint].count+=2;
             }
         }
-        
+
         /* If the length was odd subtract 1 from the count */
         M66591_eps[endpoint].count -= (length&0x01);
-        
+
         /* If the requested size of data was received, or the data received was
          *  less than the maximum packet size end the transfer.
          */
-        if( (M66591_eps[endpoint].count == M66591_eps[endpoint].length) 
+        if( (M66591_eps[endpoint].count == M66591_eps[endpoint].length)
             || (length % pipe_maxpack_size(endpoint)) ) {
-            
+
             /* If the host tries to send anything else the FIFO is not ready/
              *  enabled yet (NAK).
              */
@@ -411,27 +411,27 @@ static int mxx_transmit_receive(int endpoint) {
             M66591_eps[endpoint].waiting=false;
             /* Disable ready */
             M66591_INTCFG_RDY &= ~(1 << endpoint);
-            
+
             /* Let the stack know that the transfer is complete */
             if(endpoint!=0)
                 transfer_complete(endpoint);
         }
     }
-    
-    logf("mxx: do done ep %d %s len: %d cnt: %d", endpoint, 
+
+    logf("mxx: do done ep %d %s len: %d cnt: %d", endpoint,
         send ? "out" : "in", length, M66591_eps[endpoint].count);
 
     return 0;
 }
 
-/* This function is used to start transfers.  It is a helper function for the 
+/* This function is used to start transfers.  It is a helper function for the
  *  usb_drv_send_nonblocking, usb_drv_send, and usb_drv_receive functions.
  *
- * The functionality for wait needs to be added.  Currently the driver is 
+ * The functionality for wait needs to be added.  Currently the driver is
  *  always used in a blocking mode(USB_TRAN_BLOCK) so it is not required.
  */
-static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
-    bool wait) 
+static int mxx_queue(int endpoint, void * ptr, int length, bool send,
+    bool wait)
 {
 #if defined(USB_TRAN_BLOCK) && !defined(LOGF_ENABLE)
     (void) wait;
@@ -445,7 +445,7 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send,
      *  need to be masked out.
      */
     endpoint &= 0x7F;
-    
+
     /* Initialize the enpoint status registers used for the transfer */
     M66591_eps[endpoint].buf=ptr;
     M66591_eps[endpoint].length=length;
@@ -453,30 +453,30 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send,
     M66591_eps[endpoint].dir=send;
     M66591_eps[endpoint].waiting=true;
 
-    logf("mxx: queue ep %d %s, len: %d, wait: %d", 
+    logf("mxx: queue ep %d %s, len: %d, wait: %d",
         endpoint, send ? "out" : "in", length, wait);
-    
+
     /* Pick the pipe that communications are happening on */
     pipe_c_select(endpoint, send);
 
     /* All transfers start with a BUF handshake */
     pipe_handshake(endpoint, PIPE_SHAKE_BUF);
-    
+
     /* This USB PHY takes care of control completion packets by setting the
      *  CCPL bit in EP0 (endpoint 0, or DCP).  If the control state is "write no
-     *  data tranfer" then we just need to set the CCPL bit (hopefully) 
+     *  data tranfer" then we just need to set the CCPL bit (hopefully)
      *  regardless of what the stack said to send.
      */
     int control_state = (M66591_INTSTAT_MAIN & 0x07);
     if(endpoint==0 && control_state==CTRL_WTND) {
         logf("mxx: queue ep 0 ctls: 5, set ccpl");
-        
+
         /* Set CCPL */
-        M66591_DCPCTRL |= 1<<2; 
+        M66591_DCPCTRL |= 1<<2;
     } else {
         /* This is the standard case for transmitting data */
         if(send) {
-            /* If the pipe is not ready don't try and send right away; instead 
+            /* If the pipe is not ready don't try and send right away; instead
              *  just set the READY interrupt so that the handler can initiate
              *  the transfer.
              */
@@ -485,7 +485,7 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send,
             } else {
                 M66591_INTCFG_RDY |= 1 << endpoint;
             }
-            
+
             if(length==0) {
                 transfer_complete(endpoint);
             }
@@ -510,10 +510,10 @@ void USB_DEVICE(void)  __attribute__ ((section(".icode")));
 void USB_DEVICE(void) {
     int pipe_restore=M66591_CPORT_CTRL0;
     logf("\nmxx: INT BEGIN tick: %d", (int) current_tick);
-    
-    logf("mxx: sMAIN0: 0x%04x, sRDY: 0x%04x", 
+
+    logf("mxx: sMAIN0: 0x%04x, sRDY: 0x%04x",
         M66591_INTSTAT_MAIN, M66591_INTSTAT_RDY);
-    logf("mxx:  sNRDY: 0x%04x, sEMP: 0x%04x", 
+    logf("mxx:  sNRDY: 0x%04x, sEMP: 0x%04x",
         M66591_INTSTAT_NRDY, M66591_INTSTAT_EMP);
 
     /* VBUS (connected) interrupt */
@@ -537,7 +537,7 @@ void USB_DEVICE(void) {
     /* Device state transition interrupt: Not used, but useful for debugging */
     if(M66591_INTSTAT_MAIN & (1<<12)) {
         M66591_INTSTAT_MAIN &= ~(1<<12);
-        logf("mxx: DEV state CHANGE=%d", 
+        logf("mxx: DEV state CHANGE=%d",
         ((M66591_INTSTAT_MAIN & (0x07<<4)) >> 4) );
     }
 
@@ -545,14 +545,14 @@ void USB_DEVICE(void) {
     if(M66591_INTSTAT_MAIN & (1<<11)) {
         M66591_INTSTAT_MAIN &= ~(1<<11);
         int control_state = (M66591_INTSTAT_MAIN & 0x07);
-    
+
         logf("mxx: CTRT with CTSQ=%d", control_state);
-            
+
         switch ( control_state ) {
         case CTRL_IDLE:
             transfer_complete(0);
             break;
-        case CTRL_RTDS: 
+        case CTRL_RTDS:
         case CTRL_WTDS:
         case CTRL_WTND:
             /* If data is not valid stop */
@@ -572,14 +572,14 @@ void USB_DEVICE(void) {
             break;
         }
     }
-    
+
     /* FIFO EMPTY interrupt: when this happens the transfer should be complete.
      *  When the interrupt occurs notify the stack.
      */
     if(M66591_INTSTAT_MAIN & (1<<10)) {
         int i;
         logf("mxx: INT EMPTY: 0x%04x", M66591_INTSTAT_EMP);
-        
+
         for(i=0; i<USB_NUM_ENDPOINTS; i++) {
             if(M66591_INTSTAT_EMP&(1<<i)) {
                 /* Clear the empty flag */
@@ -589,7 +589,7 @@ void USB_DEVICE(void) {
             }
         }
     }
-    
+
     /* FIFO NOT READY interrupt: This is not used, but included incase the
      *  interrupt is endabled.
      */
@@ -602,7 +602,7 @@ void USB_DEVICE(void) {
     if(M66591_INTSTAT_MAIN & (1<<8)) {
         int i;
         logf("mxx: INT READY: 0x%04x", M66591_INTSTAT_RDY);
-        
+
         for(i=0; i<USB_NUM_ENDPOINTS; i++) {
             /* Was this endpoint ready and waiting */
             if(M66591_INTSTAT_RDY&(1<<i) && M66591_eps[i].waiting) {
@@ -613,10 +613,10 @@ void USB_DEVICE(void) {
             }
         }
     }
-    
+
     /* Make sure that the INTStatus register is completely cleared. */
     M66591_INTSTAT_MAIN = 0;
-    
+
     /* Restore the pipe state before the interrupt occured */
     M66591_CPORT_CTRL0=pipe_restore;
     logf("mxx: INT END\n");
@@ -643,11 +643,11 @@ void usb_drv_set_test_mode(int mode) {
 int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
     (void)max_packet_size; /* FIXME: support max packet size override */
 
-    int pipecfg;
+    int pipecfg = 0;
 
     if(type == USB_ENDPOINT_XFER_BULK) {
         /* Enable double buffer mode (only used for ep 1 and 2) */
-        pipecfg |= 1<<9 | 1<<8; 
+        pipecfg |= 1<<9 | 1<<8;
     } else if(type == USB_ENDPOINT_XFER_BULK) {
         pipecfg |= 1<<13;
     } else {
@@ -662,19 +662,19 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
     }
 
     M66591_eps[num].dir = dir;
-    
+
     M66591_PIPE_CFGSEL=num;
 
     /* Enable pipe (15) */
-    pipecfg |= 1<<15; 
-    
+    pipecfg |= 1<<15;
+
     pipe_handshake(num, PIPE_SHAKE_NAK);
 
     /* Setup the flags */
     M66591_PIPE_CFGWND=pipecfg;
-    
+
     pipe_init(num);
-    
+
     logf("mxx: ep req ep#: %d config: 0x%04x", num, M66591_PIPE_CFGWND);
 
     return 0;
@@ -689,7 +689,7 @@ int usb_drv_deinit_endpoint(int endpoint) {
     }
 
     int flags = disable_irq_save();
-    
+
     logf("mxx: ep %d release", num);
 
     M66591_eps[num].dir = -1;
@@ -719,10 +719,10 @@ void usb_enable(bool on) {
 /* This is where the driver stuff starts */
 void usb_drv_init(void) {
     logf("mxx: Device Init");
-    
+
     M66591_PIN_CFG1         = 0x8000; /* Drive Current: 3.3V setting */
     M66591_PIN_CFG2         = 0x0000;
-    
+
     M66591_TRN_CTRL         = 0x8000; /* External 48 MHz clock */
     M66591_TRN_CTRL         |=0x0001;
 
@@ -744,7 +744,7 @@ void usb_drv_init(void) {
 /* fully enable driver */
 void usb_attach(void) {
     int i;
-    
+
     /* Reset Endpoint states */
     for(i=0; i<USB_NUM_ENDPOINTS; i++) {
         M66591_eps[i].dir = -1;
@@ -757,8 +757,8 @@ void usb_attach(void) {
     /* Issue a h/w reset */
     usb_init_device();
     usb_core_init();
-    
-    /* USB Attach Process: This follows the flow diagram in the M66591GP 
+
+    /* USB Attach Process: This follows the flow diagram in the M66591GP
      *  Reference Manual Rev 1.00, p. 77 */
 
 #if defined(HISPEED)
@@ -784,10 +784,10 @@ void usb_attach(void) {
 
     /* Disable PIPE ready interrupts */
     M66591_INTCFG_RDY = 0;
-    
+
     /* Disable PIPE not-ready interrupts */
     M66591_INTCFG_NRDY = 0;
-    
+
     /* Disable PIPE empyt/size error interrupts */
     M66591_INTCFG_EMP = 0;
 
@@ -795,15 +795,15 @@ void usb_attach(void) {
     M66591_INTCFG_MAIN = 0x1DFF;
 
     pipe_c_select(0, false);
-    
+
     /* Enable continuous transfer mode on the DCP */
     M66591_DCP_CNTMD |= (1<<8);
-    
+
     /* Set the threshold that the PHY will automatically transmit from EP0 */
     M66591_DCP_CTRLEN = 256;
-    
+
     pipe_handshake(0, PIPE_SHAKE_NAK);
-    
+
     /* Set the Max packet size to 64 */
     M66591_DCP_MXPKSZ = 64;
 
@@ -814,7 +814,7 @@ void usb_attach(void) {
 }
 
 void usb_drv_exit(void) {
-    /* USB Detach Process: This follows the flow diagram in the M66591GP 
+    /* USB Detach Process: This follows the flow diagram in the M66591GP
      *  Reference Manual Rev 1.00, p. 78.
      */
 
@@ -868,13 +868,13 @@ int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
     return mxx_queue(endpoint, ptr, length, false, false);
 }
 
-/* This function checks the reset handshake speed status 
+/* This function checks the reset handshake speed status
  *  (Fullspeed or Highspeed)
  */
 int usb_drv_port_speed(void)
 {
     int handshake = (M66591_HSFS & 0xFF);
-    
+
     if( handshake == 0x02) {
         return 0; /* Handshook at Full-Speed */
     } else if( handshake == 0x03) {
@@ -890,11 +890,11 @@ int usb_drv_port_speed(void)
 bool usb_drv_stalled(int endpoint,bool in)
 {
     (void) in;
-    
+
     bool stalled = (*(pipe_ctrl_addr(endpoint)) & (0x02)) ? true : false;
-    
+
     logf("mxx: stall?: %s ep: %d", stalled ? "true" : "false", endpoint);
-    
+
     if(stalled) {
         return true;
     } else {
@@ -909,9 +909,9 @@ bool usb_drv_stalled(int endpoint,bool in)
 void usb_drv_stall(int endpoint, bool stall,bool in)
 {
     (void) in;
-    
+
     logf("mxx: stall - ep: %d", endpoint);
-    
+
     if(stall) {
         /* Stall the pipe (host needs to intervene/error) */
         pipe_handshake(endpoint, PIPE_SHAKE_STALL);
@@ -935,7 +935,6 @@ void usb_drv_cancel_all_transfers(void)
             M66591_eps[endpoint].buf = NULL;
         }
     }
-    
+
     restore_irq(flags);
 }
-

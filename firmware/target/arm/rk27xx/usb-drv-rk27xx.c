@@ -56,7 +56,7 @@ struct endpoint_t
     volatile void *buf;          /* tx/rx buffer address */
     volatile int len;            /* size of the transfer (bytes) */
     volatile int cnt;            /* number of bytes transfered/received  */
-    volatile bool block;         /* flag indicating that transfer is blocking */ 
+    volatile bool block;         /* flag indicating that transfer is blocking */
     struct semaphore complete;   /* semaphore for blocking transfers */
 };
 
@@ -73,7 +73,7 @@ struct endpoint_t
 #define DMAINLMADDR(endp)   *(4 + (endp)->stat)
 
 #define ENDPOINT(num, type, dir, reg) \
-    {num, USB_ENDPOINT_XFER_##type, USB_DIR_##dir, reg, false, NULL, 0, 0, true, {{0, 0}, 0, 0}}
+    {num, USB_ENDPOINT_XFER_##type, USB_DIR_##dir, reg, NULL, 0, 0, true, {{0, 0}, 0, 0}}
 
 static struct endpoint_t ctrlep[2] =
 {
@@ -284,7 +284,8 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
     (void)max_packet_size; /* FIXME: support max packet size override */
 
     int num = EP_NUM(endpoint);
-    int dir = EP_DIR(endpoint);
+//    int dir = EP_DIR(endpoint);
+    (void)type;
 
     struct endpoint_t *endp = &endpoints[num];
 
@@ -299,10 +300,11 @@ int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size) {
 
 int usb_drv_deinit_endpoint(int endpoint) {
     int num = EP_NUM(endpoint);
-    struct endpoint_t *endp = &endpoints[num];
+//    struct endpoint_t *endp = &endpoints[num];
 
     /* disable interrupt from this endpoint */
     EN_INT &= ~(1 << (num + 7));
+    return 0;
 }
 
 /* Set the address (usually it's in a register).
@@ -376,7 +378,7 @@ int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 }
 
 /* Kill all transfers. Usually you need to set a bit for each endpoint
- *  and flush fifos. You should also call the completion handler with 
+ *  and flush fifos. You should also call the completion handler with
  * error status for everything
  */
 void usb_drv_cancel_all_transfers(void)

@@ -629,11 +629,14 @@ void usb_drv_cancel_all_transfers(void)
 int usb_drv_init_endpoint(int endpoint, int type, int max_packet_size)
 {
     (void)max_packet_size; /* FIXME: support max packet size override */
+    (void)type;
+    (void)endpoint;
     return 0;
 }
 
 int usb_drv_deinit_endpoint(int endpoint)
 {
+    (void)endpoint;
     return 0;
 }
 
