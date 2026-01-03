@@ -7349,10 +7349,10 @@
     *: "."
   </source>
   <dest>
-    *: "точка"
+    *: "."
   </dest>
   <voice>
-    *: "точка"
+    *: "і"
   </voice>
 </phrase>
 <phrase>
