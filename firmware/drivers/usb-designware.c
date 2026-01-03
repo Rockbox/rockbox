@@ -1589,8 +1589,6 @@ void usb_drv_ep_reset_alloc_ctx(struct usb_drv_ep_alloc_ctx* ctx)
 
 bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type, int max_packet_size)
 {
-    (void)max_packet_size; /* FIXME: support max packet size override */
-
     const uint8_t epnum = EP_NUM(ep);
     const uint8_t epdir = EP_DIR(ep);
 
@@ -1629,12 +1627,12 @@ bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type, int
 
 ok:
     ctx->type[epnum][epdir] = type;
+    ctx->max_packet_size[epnum][epdir] = max_packet_size;
     return true;
 }
 
 void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 {
-    /* FIXME: support max packet size override */
     const int epnum = EP_NUM(ep);
     const int epdir_ = EP_DIR(ep);
     const int type = ctx->type[epnum][epdir_];
@@ -1642,18 +1640,21 @@ void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
     enum usb_dw_epdir epdir = (epdir_ == DIR_IN) ? USB_DW_EPDIR_IN : USB_DW_EPDIR_OUT;
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(EP_NUM(ep), epdir);
 
-    int maxpktsize;
-    if(type == EPTYP_ISOCHRONOUS)
+    int mps = ctx->max_packet_size[epnum][epdir_];
+    if(mps == -1)
     {
-        maxpktsize = 1023;
-    }
-    else
-    {
-        maxpktsize = usb_drv_port_speed() ? 512 : 64;
+        if(type == EPTYP_ISOCHRONOUS)
+        {
+            mps = 1023;
+        }
+        else
+        {
+            mps = usb_drv_port_speed() ? 512 : 64;
+        }
     }
 
     usb_dw_target_disable_irq();
-    usb_dw_configure_ep(ctx, epnum, epdir, type, maxpktsize);
+    usb_dw_configure_ep(ctx, epnum, epdir, type, mps);
     usb_dw_target_enable_irq();
 
     dw_ep->active = true;

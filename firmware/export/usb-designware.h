@@ -294,6 +294,8 @@ extern void usb_dw_target_clear_irq(void);
 struct usb_drv_ep_alloc_ctx_dw
 {
     int8_t type[USB_NUM_ENDPOINTS][2];
+    int max_packet_size[USB_NUM_ENDPOINTS][2];
+
     uint16_t txfifo_usage;
     uint8_t assigned_txfifos[USB_NUM_ENDPOINTS];
 };
