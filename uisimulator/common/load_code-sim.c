@@ -36,37 +36,3 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
     return os_lc_open(osfilename);
     (void)buf; (void)buf_size;
 }
-
-void * lc_open_from_mem(void *addr, size_t blob_size)
-{
-    /* We have to create the dynamic link library file from ram so we can
-       simulate code loading. Multiple binaries may be loaded at the same
-       time, so we need to find an unused filename. */
-    int fd;
-    char tempfile[SIM_TMPBUF_MAX_PATH];
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        snprintf(tempfile, sizeof(tempfile),
-                 ROCKBOX_DIR "/libtemp_binary_%d.dll", i);
-        fd = sim_open(tempfile, O_WRONLY|O_CREAT|O_TRUNC, 0700);
-        if (fd >= 0)
-            break;  /* Created a file ok */
-    }
-
-    if (fd < 0)
-    {
-        DEBUGF("open failed\n");
-        return NULL;
-    }
-
-    if (sim_write(fd, addr, blob_size) != (ssize_t)blob_size)
-    {
-        DEBUGF("Write failed\n");
-        sim_close(fd);
-        sim_remove(tempfile);
-        return NULL;
-    }
-
-    sim_close(fd);
-    return lc_open(tempfile, NULL, 0);
-}
