@@ -78,11 +78,6 @@
 /* Internal support for voice playback */
 #define PLAYBACK_VOICE
 
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
-/* Application builds don't support direct code loading */
-#define HAVE_CODEC_BUFFERING
-#endif
-
 /* Amount of guess-space to allow for codecs that must hunt and peck
  * for their correct seek target, 32k seems a good size */
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
@@ -493,14 +488,6 @@ static void id3_write_locked(enum audio_id3_types id3_num,
 
 
 /** --- Track info --- **/
-
-#ifdef HAVE_CODEC_BUFFERING
-static void track_info_close_handle(int *hidp)
-{
-    bufclose(*hidp);
-    *hidp = ERR_HANDLE_NOT_FOUND;
-}
-#endif /* HAVE_CODEC_BUFFERING */
 
 /* Invalidate all members to initial values - does not close handles or sync */
 static void track_info_wipe(struct track_info *infop)
@@ -1669,7 +1656,8 @@ static bool audio_init_codec(struct track_info *track_infop,
             /* Close any buffered codec (we could have skipped directly to a
                format transistion that is the same format as the current track
                and the buffered one is no longer needed) */
-            track_info_close_handle(&track_infop->codec_hid);
+            bufclose(track_infop->codec_hid);
+            track_infop->codec_hid = ERR_HANDLE_NOT_FOUND;
             track_info_sync(track_infop);
 #endif /* HAVE_CODEC_BUFFERING */
             return true;

@@ -282,7 +282,9 @@ void codec_get_full_path(char *path, const char *codec_root_fn);
 void *codec_get_buffer_callback(size_t *size);
 
 /* defined by the codec loader (codec.c) */
+#if defined(HAVE_CODEC_BUFFERING)
 int codec_load_buf(int hid, struct codec_api *api);
+#endif /* HAVE_CODEC_BUFFERING */
 int codec_load_file(const char* codec, struct codec_api *api);
 int codec_run_proc(void);
 int codec_close(void);

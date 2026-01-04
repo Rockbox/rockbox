@@ -689,6 +689,11 @@ Lyre prototype 1 */
 # endif
 #endif
 
+/* Codec buffering requires the ability to load code from RAM */
+#if CONFIG_PLATFORM & PLATFORM_NATIVE
+# define HAVE_CODEC_BUFFERING
+#endif
+
 /* setup basic macros from capability masks */
 #include "config_caps.h"
 
