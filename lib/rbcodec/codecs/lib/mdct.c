@@ -460,7 +460,7 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
  * and output of imdct_half would then overlap somewhat)
  */
 void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input) ICODE_ATTR_TREMOR_MDCT;
-#ifndef CPU_ARM
+#if !defined(CPU_ARM) || defined(DEBUG)
 void ff_imdct_calc(unsigned int nbits, fixed32 *output, const fixed32 *input)
 {
     const int n = (1<<nbits);
