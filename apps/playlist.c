@@ -3171,7 +3171,7 @@ int playlist_resume(void)
     if (handle < 0)
     {
         splashf(HZ * 2, "%s(): OOM", __func__);
-        return -1;
+        goto out_nolock;
     }
 
     playlist_write_lock(playlist);
@@ -3535,8 +3535,9 @@ int playlist_resume(void)
 
 out:
     playlist_write_unlock(playlist);
-    dc_thread_start(playlist, true);
 
+out_nolock:
+    dc_thread_start(playlist, true);
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
     core_free(handle);
     cpu_boost(false);
