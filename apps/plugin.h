@@ -178,7 +178,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 275
+#define PLUGIN_API_VERSION 276
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -616,7 +616,6 @@ struct plugin_api {
 
     /* load code api for overlay */
     void* (*lc_open)(const char *filename, unsigned char *buf, size_t buf_size);
-    void* (*lc_open_from_mem)(void* addr, size_t blob_size);
     void* (*lc_get_header)(void *handle);
     void  (*lc_close)(void *handle);
 

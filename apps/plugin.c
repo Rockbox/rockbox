@@ -533,7 +533,6 @@ static const struct plugin_api rockbox_api = {
     commit_discard_idcache,
 
     lc_open,
-    lc_open_from_mem,
     lc_get_header,
     lc_close,
 
