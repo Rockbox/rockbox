@@ -27,15 +27,4 @@ void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
 void *lc_get_header(void *handle);
 void  lc_close(void *handle);
 
-#ifdef APPLICATION
-/* App doesn't simulate code loading from a buffer */
-static inline void * lc_open_from_mem(void *addr, size_t blob_size)
-{
-    return NULL;
-    (void)addr; (void)blob_size;
-}
-#else
-void *lc_open_from_mem(void* addr, size_t blob_size);
-#endif
-
 #endif /* __LC_DLOPEN_H__ */

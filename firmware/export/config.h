@@ -689,8 +689,12 @@ Lyre prototype 1 */
 # endif
 #endif
 
+#if CONFIG_BINFMT == BINFMT_ROCK
+# define HAVE_LC_OPEN_FROM_MEM
+#endif
+
 /* Codec buffering requires the ability to load code from RAM */
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
+#if defined(HAVE_LC_OPEN_FROM_MEM)
 # define HAVE_CODEC_BUFFERING
 #endif
 

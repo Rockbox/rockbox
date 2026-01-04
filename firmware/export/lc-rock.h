@@ -25,6 +25,7 @@
 
 void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
 
+#if defined(HAVE_LC_OPEN_FROM_MEM)
 /* header is always at the beginning of the blob, and handle actually points
  * to the start of the blob (the header is there) */
 static inline void *lc_open_from_mem(void* addr, size_t blob_size)
@@ -34,6 +35,7 @@ static inline void *lc_open_from_mem(void* addr, size_t blob_size)
     commit_discard_idcache();
     return addr;
 }
+#endif /* HAVE_LC_OPEN_FROM_MEM */
 
 static inline void *lc_get_header(void *handle)
 {
