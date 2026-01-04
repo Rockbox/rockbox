@@ -181,7 +181,7 @@ my %piper_lang_map = (
     'slovak' => 'sk_SK-lili-medium.onnx',
     'srpski' => 'sr_RS-serbski_institut-medium.onnx',
     'svenska' => 'sv_SE-nst-medium.onnx',
-    'turkce' => 'tr_TR-fettah-medium.onnx',
+    'turkce' => 'tr_TR-dfki-medium.onnx',
     'ukrainian' => 'uk_UA-ukrainian_tts-medium',
     'vietnamese' => 'vi_VN-vais1000-medium.onnx',
 );

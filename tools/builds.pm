@@ -938,7 +938,7 @@ sub simbuilds {
 	'engines' => {
 	    'espeak' => '-vtr',
 	    'gtts' => '-l tr',
-            'piper' => 'tr_TR-fettah-medium.onnx',
+            'piper' => 'tr_TR-dfki-medium.onnx',
 	},
         'enabled' => 1,
     },
