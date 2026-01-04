@@ -401,6 +401,10 @@ Lyre prototype 1 */
 #define BUFLIB_BACKEND_MEMPOOL      0 /* Default memory pool backed buflib */
 #define BUFLIB_BACKEND_MALLOC       1 /* malloc() buflib (for debugging) */
 
+/* CONFIG_BINFMT */
+#define BINFMT_ROCK                 0 /* Rockbox ".rock" format */
+#define BINFMT_DLOPEN               1 /* dlopen-based */
+
 /* now go and pick yours */
 #if defined(IRIVER_H100)
 #include "config/iriverh100.h"
@@ -673,6 +677,16 @@ Lyre prototype 1 */
 
 #ifndef CONFIG_PLATFORM
 #define CONFIG_PLATFORM PLATFORM_NATIVE
+#endif
+
+#ifndef CONFIG_BINFMT
+# if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#  define CONFIG_BINFMT BINFMT_ROCK
+# elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#  define CONFIG_BINFMT BINFMT_DLOPEN
+# else
+#  error "CONFIG_BINFMT not defined!"
+# endif
 #endif
 
 /* setup basic macros from capability masks */

@@ -36,7 +36,6 @@ usb.c
 logf.c
 #endif /* ROCKBOX_HAS_LOGF */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-load_code.c
 linuxboot.c
 #ifdef RB_PROFILE
 profile.c
@@ -53,6 +52,10 @@ debug.c
 panic.c
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(BOOTFILE)
 target/hosted/rolo.c
+#endif
+
+#if CONFIG_BINFMT == BINFMT_ROCK
+lc-rock.c
 #endif
 
 #if defined(HAVE_BOOTDATA) || defined(HAVE_MULTIBOOT)

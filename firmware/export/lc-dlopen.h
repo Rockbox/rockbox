@@ -18,29 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LOAD_CODE_H__
-#define __LOAD_CODE_H__
+#ifndef __LC_DLOPEN_H__
+#define __LC_DLOPEN_H__
 
-#include "config.h"
+#include "system.h"
 
-/* this struct needs to be the first part of other headers
- * (lc_open() casts the other header to this one to load to the correct
- * address)
- */
-struct lc_header {
-    unsigned long magic;
-    unsigned short target_id;
-    unsigned short api_version;
-    unsigned char *load_addr;
-    unsigned char *end_addr;
-};
+void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
+void *lc_get_header(void *handle);
+void  lc_close(void *handle);
 
-#if CONFIG_BINFMT == BINFMT_ROCK
-# include "lc-rock.h"
-#elif CONFIG_BINFMT == BINFMT_DLOPEN
-# include "lc-dlopen.h"
+#ifdef APPLICATION
+/* App doesn't simulate code loading from a buffer */
+static inline void * lc_open_from_mem(void *addr, size_t blob_size)
+{
+    return NULL;
+    (void)addr; (void)blob_size;
+}
 #else
-# error "Unsupported CONFIG_BINFMT!"
+void *lc_open_from_mem(void* addr, size_t blob_size);
 #endif
 
-#endif /* __LOAD_CODE_H__ */
+#endif /* __LC_DLOPEN_H__ */

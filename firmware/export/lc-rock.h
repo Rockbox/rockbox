@@ -18,29 +18,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LOAD_CODE_H__
-#define __LOAD_CODE_H__
+#ifndef __LC_ROCK_H__
+#define __LC_ROCK_H__
 
-#include "config.h"
+#include "system.h"
 
-/* this struct needs to be the first part of other headers
- * (lc_open() casts the other header to this one to load to the correct
- * address)
- */
-struct lc_header {
-    unsigned long magic;
-    unsigned short target_id;
-    unsigned short api_version;
-    unsigned char *load_addr;
-    unsigned char *end_addr;
-};
+void *lc_open(const char *filename, unsigned char *buf, size_t buf_size);
 
-#if CONFIG_BINFMT == BINFMT_ROCK
-# include "lc-rock.h"
-#elif CONFIG_BINFMT == BINFMT_DLOPEN
-# include "lc-dlopen.h"
-#else
-# error "Unsupported CONFIG_BINFMT!"
-#endif
+/* header is always at the beginning of the blob, and handle actually points
+ * to the start of the blob (the header is there) */
+static inline void *lc_open_from_mem(void* addr, size_t blob_size)
+{
+    (void)blob_size;
+    /* commit dcache and discard icache */
+    commit_discard_idcache();
+    return addr;
+}
 
-#endif /* __LOAD_CODE_H__ */
+static inline void *lc_get_header(void *handle)
+{
+    return handle;
+}
+
+/* no need to do anything */
+static inline void lc_close(void *handle)
+{
+    (void)handle;
+}
+
+#endif /* __LC_ROCK_H__ */
