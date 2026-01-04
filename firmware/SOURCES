@@ -58,6 +58,10 @@ target/hosted/rolo.c
 lc-rock.c
 #endif
 
+#if defined(HAVE_ELF)
+elf_loader.c
+#endif
+
 #if defined(HAVE_BOOTDATA) || defined(HAVE_MULTIBOOT)
 common/multiboot.c
 #ifndef BOOTLOADER
