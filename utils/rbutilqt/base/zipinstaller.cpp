@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "zipinstaller.h"
 #include "utils.h"
+#include "rbsettings.h"
 #include "ziputil.h"
 #include "Logger.h"
 
@@ -191,7 +192,17 @@ void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
     }
 
     emit logItem(tr("Creating installation log"),LOGINFO);
-    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, nullptr);
+
+    QString logpath;
+    QString suffix = RbSettings::value(RbSettings::Suffix).toString();
+
+    if (!suffix.isEmpty()) {
+        logpath = m_mountpoint + suffix + "/.rockbox/rbutil.log";
+    } else {
+        logpath = m_mountpoint + "/.rockbox/rbutil.log";
+    }
+
+    QSettings installlog(logpath, QSettings::IniFormat, nullptr);
 
     installlog.beginGroup(m_logsection);
     for(int i = 0; i < zipContents.size(); i++)
