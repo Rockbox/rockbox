@@ -54,7 +54,7 @@ static int os_rename (lua_State *L) {
 **   wday=%w+1, yday=%j, isdst=? }
 ** =======================================================
 */
-
+#if 0  /* supplied by strfrtime.lua*/
 static void setfield (lua_State *L, const char *key, int value) {
   lua_pushinteger(L, value);
   lua_setfield(L, -2, key);
@@ -66,6 +66,7 @@ static void setboolfield (lua_State *L, const char *key, int value) {
   lua_pushboolean(L, value);
   lua_setfield(L, -2, key);
 }
+#endif
 
 #if CONFIG_RTC
 static int getboolfield (lua_State *L, const char *key) {
@@ -94,10 +95,11 @@ static int getfield (lua_State *L, const char *key, int d) {
 
 
 static int os_date (lua_State *L) {
+#if 0
   const char *s = luaL_optstring(L, 1, "%c");
   time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2,
 #if CONFIG_RTC
-  rb->mktime(rb->get_time())
+  mktime(get_time())
 #else
   0
 #endif
@@ -139,13 +141,18 @@ static int os_date (lua_State *L) {
     luaL_pushresult(&b);
   }
   return 1;
+#else /* supplied by strfrtime.lua*/
+  lua_pushnil(L);
+  return 1;
+#endif
+
 }
 
 static int os_time (lua_State *L) {
   time_t t = -1;
 #if CONFIG_RTC
   if (lua_isnoneornil(L, 1))  /* called without args? */
-    t = rb->mktime(rb->get_time());  /* get current time */
+    t = mktime(get_time());  /* get current time */
   else {
     struct tm ts;
     luaL_checktype(L, 1, LUA_TTABLE);
@@ -157,7 +164,7 @@ static int os_time (lua_State *L) {
     ts.tm_mon = getfield(L, "month", -1) - 1;
     ts.tm_year = getfield(L, "year", -1) - 1900;
     ts.tm_isdst = getboolfield(L, "isdst");
-    t = rb->mktime(&ts);
+    t = mktime(&ts);
   }
 #endif
   if (t == (time_t)(-1))

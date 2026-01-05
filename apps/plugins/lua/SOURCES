@@ -31,7 +31,6 @@ rockaux.c
 rocklib.c
 rocklib_img.c
 tlsf_helper.c
-strftime.c
 strpbrk.c
 rocklua.c
 luadir.c

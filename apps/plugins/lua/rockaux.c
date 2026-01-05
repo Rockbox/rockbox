@@ -201,7 +201,7 @@ int strcoll(const char * str1, const char * str2)
     return rb->strcmp(str1, str2);
 }
 
-#ifndef _WIN32
+#if 0 //ndef _WIN32  /* supplied by strfrtime.lua*/
 struct tm * gmtime(const time_t *timep)
 {
     static struct tm time;
