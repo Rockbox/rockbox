@@ -888,6 +888,7 @@ void main(void)
 
         /* We wait until HDD spins up to check for hold button */
         if (button_hold()) {
+#ifdef SYSCFG_MAX_ENTRIES
             bool lba48 = false;
             struct SysCfg syscfg;
             const ssize_t result = syscfg_read(&syscfg);
@@ -917,6 +918,13 @@ void main(void)
                     fatal_error(ERR_LBA28);
                 }
             }
+#else
+            printf("Executing OF...");
+#if (CONFIG_STORAGE & STORAGE_ATA)
+            ata_sleepnow();
+#endif
+            rc = kernel_launch_onb();
+#endif /* SYSCFG_MAX_ENTRIES */
         }
     }
 
