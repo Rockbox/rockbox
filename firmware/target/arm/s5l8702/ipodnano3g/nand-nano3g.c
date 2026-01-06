@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "mv.h"
+#include "storage.h"
 
 int nand_init(void)
 {
@@ -61,3 +62,15 @@ int nand_event(long id, intptr_t data)
 
     return 0;
 }
+
+#ifdef STORAGE_GET_INFO
+void nand_get_info(IF_MD(int drive,) struct storage_info *info)
+{
+    IF_MD((void)drive);
+    info->sector_size = SECTOR_SIZE;
+    info->num_sectors = 0;
+    info->vendor = "";
+    info->product = "";
+    info->revision = "";
+}
+#endif
