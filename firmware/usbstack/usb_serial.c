@@ -207,9 +207,9 @@ static int buffer_transitlength;
 static bool active = false;
 
 static struct usb_class_driver_ep_allocation ep_allocs[3] = {
-    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_IN, .optional = false},
-    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_OUT, .optional = false},
-    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = true},
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_IN, .optional = false, .mps = -1},
+    {.type = USB_ENDPOINT_XFER_BULK, .dir = DIR_OUT, .optional = false, .mps = -1},
+    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = true, .mps = -1},
 };
 
 #define EP_IN (ep_allocs[0].ep)

@@ -651,8 +651,7 @@ retry:
 
                 /* driver specific check */
                 const int ep = epnum | (req->dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
-                const int ps = driver->get_max_packet_size ? driver->get_max_packet_size(ep) : -1;
-                if(!usb_drv_ep_allocate(&cstate->ep_alloc_ctx, ep, req->type, ps)) {
+                if(!usb_drv_ep_allocate(&cstate->ep_alloc_ctx, ep, req->type, req->mps)) {
                     continue;
                 }
 

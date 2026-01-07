@@ -40,9 +40,9 @@
 
 struct usb_class_driver_ep_allocation usb_iap_ep_allocs[2] = {
     /* uac input */
-    {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_IN, .optional = false},
+    {.type = USB_ENDPOINT_XFER_ISOC, .dir = DIR_IN, .optional = false, .mps = 1024},
     /* hid input */
-    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = false},
+    {.type = USB_ENDPOINT_XFER_INT, .dir = DIR_IN, .optional = false, .mps = 64},
 };
 
 /* interface 0 (audio control) */
@@ -442,17 +442,6 @@ static int usb_iap_get_interface(int intf) {
     return stream.alt;
 }
 
-static int usb_iap_get_max_packet_size(int ep) {
-    if(ep == AS_EP_IN) {
-        return 1024;
-    } else if(ep == HID_EP_IN) {
-        return 64;
-    } else {
-        panicf("unexpected endpoint number %d", ep);
-        return 0;
-    }
-}
-
 static void usb_iap_init(void) {
     LOG("init");
 }
@@ -706,6 +695,5 @@ struct usb_class_driver usb_cdrv_iap = {
     .control_request         = usb_iap_control_request,
     .set_interface           = usb_iap_set_interface,
     .get_interface           = usb_iap_get_interface,
-    .get_max_packet_size     = usb_iap_get_max_packet_size,
     .notify_event            = usb_iap_notify_event,
 };

@@ -30,10 +30,11 @@
 /* Common api, implemented by all class drivers */
 
 struct usb_class_driver_ep_allocation {
-    uint8_t type;  /* by driver, required ep type. USB_ENDPOINT_XFER_* */
-    uint8_t dir;   /* by driver, required ep dir. DIR_{IN,OUT} */
-    uint8_t ep;    /* by core, allocated ep. > 0 are valid but can be 0 if optional==true */
-    bool optional; /* by driver, set true to mark this requirement to be optional */
+    uint8_t ep;      /* by core, allocated ep. > 0 are valid but can be 0 if optional==true */
+    uint8_t type:2;  /* by driver, required ep type. USB_ENDPOINT_XFER_* */
+    uint8_t dir:1;   /* by driver, required ep dir. DIR_{IN,OUT} */
+    bool optional:1; /* by driver, set true to mark this requirement to be optional */
+    int16_t mps;     /* by driver, desired max packet size, or -1 for device driver default */
 };
 
 struct usb_class_driver {
@@ -129,11 +130,6 @@ struct usb_class_driver {
      * Returns value on success and -1 on error.
      * Mandatory function if alternate interface support is needed */
     int (*get_interface)(int interface);
-
-    /* Asks the driver max packet size for the endpoint.
-     * Drivers can returns desired value in bytes,
-     * or -1 to use the device controller default */
-    int (*get_max_packet_size)(int ep);
 
     /* Invoked by USB_NOTIFY_CLASS_DRIVER
        Optional function */
