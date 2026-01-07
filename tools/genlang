@@ -617,21 +617,31 @@ elsif($binary || $binvoice) {
     }
 
     # output the number of strings for each user
-    my $foffset = $HEADER_SIZE + $SUBHEADER_SIZE * keys(%users);
+    my $foffsetb = $HEADER_SIZE + $SUBHEADER_SIZE * keys(%users);
+    my $foffsetv = $HEADER_SIZE + $SUBHEADER_SIZE * keys(%users);
     for (keys %users) {
-        my $size;
-        for $n (0 .. $idcount[$_]-1) {
-            $size += length(trim($dest{$idnum[$_][$n]})) + 1;
-        }
         if($binary) {
+	    my $sizeb = 0;
+	    for $n (0 .. $idcount[$_]-1) {
+		$sizeb += length(trim($dest{$idnum[$_][$n]})) + 1;
+	    }
+
             printf OUTF ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
-                ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+			 ($sizeb >> 8), ($sizeb & 0xff), ($foffsetb >> 8), ($foffsetb & 0xff));
+	    $foffsetb += $sizeb;
         }
         if($binvoice) {
+	    my $sizev = 0;
+	    for $n (0 .. $idcount[$_]-1) {
+		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1;
+	    }
+	    for $n (0x8001 .. $voiceid[$_]-1) {
+		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1;
+	    }
             printf OUTV ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
-                ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+			 ($sizev >> 8), ($sizev & 0xff), ($foffsetv >> 8), ($foffsetv & 0xff));
+	    $foffsetv += $sizev;
         }
-        $foffset += $size;
     }
 
     for (keys %users) {
