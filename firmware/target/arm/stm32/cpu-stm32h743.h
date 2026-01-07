@@ -21,6 +21,8 @@
 #ifndef __CPU_STM32H743_H__
 #define __CPU_STM32H743_H__
 
+#include "config.h"
+
 #define CACHE_SIZE              (16 * 1024)
 #define CACHEALIGN_BITS         5
 
@@ -34,8 +36,35 @@
 #define STM32_CSI_FREQ          4000000
 #define STM32_HSI48_FREQ        48000000
 
-#define OTGBASE                 0x40080000
-#define USB_NUM_ENDPOINTS       9
+#if defined(HAVE_USBSTACK)
+# if !defined(STM32H743_USBOTG_INSTANCE)
+#  error "STM32H743_USBOTG_INSTANCE is undefined!"
+# endif
+# if !defined(STM32H743_USBOTG_PHY)
+#  error "STM32H743_USBOTG_PHY is undefined!"
+# endif
+# if !defined(STM32H743_USBOTG_CLKSEL)
+#  error "STM32H743_USBOTG_CLKSEL is undefined!"
+# endif
+# if (STM32H743_USBOTG_INSTANCE == STM32H743_USBOTG_INSTANCE_USB1)
+#  define OTGBASE 0x40040000
+# elif (STM32H743_USBOTG_INSTANCE == STM32H743_USBOTG_INSTANCE_USB2)
+#  define OTGBASE 0x40080000
+# endif
+# if (STM32H743_USBOTG_PHY == STM32H743_USBOTG_PHY_ULPI_FS)
+#  define USB_DW_DCFG_SPEED 1
+# elif (STM32H743_USBOTG_PHY == STM32H743_USBOTG_PHY_INT_FS)
+#  define USB_DW_DCFG_SPEED 3
+# endif
+# define USB_DW_TURNAROUND 5
+/*
+ * The hardware supports up to 9 endpoints, but since FIFO RAM
+ * is limited, we can't support more than 5 IN EPs with a max
+ * packet size of 512 bytes (usb-designware allocates the same
+ * amount of RAM to each IN endpoint).
+ */
+# define USB_NUM_ENDPOINTS 6
+#endif
 
 #define STM32_ITCM_BASE         0x00000000
 #define STM32_ITCM_SIZE         (64 * 1024)

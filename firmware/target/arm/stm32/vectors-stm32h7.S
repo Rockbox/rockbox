@@ -33,11 +33,11 @@ __vectors_platform:
     .word   UIE                         /* [  3] */
     .word   UIE                         /* [  4] */
     .word   UIE                         /* [  5] */
-    .word   UIE                         /* [  6] */
-    .word   UIE                         /* [  7] */
-    .word   UIE                         /* [  8] */
-    .word   UIE                         /* [  9] */
-    .word   UIE                         /* [ 10] */
+    .word   exti0_irq_handler           /* [  6] EXTI0 */
+    .word   exti1_irq_handler           /* [  7] EXTI1 */
+    .word   exti2_irq_handler           /* [  8] EXTI2 */
+    .word   exti3_irq_handler           /* [  9] EXTI3 */
+    .word   exti4_irq_handler           /* [ 10] EXTI4 */
     .word   dma_irq_handler             /* [ 11] DMA1 Stream0 */
     .word   dma_irq_handler             /* [ 12] DMA1 Stream1 */
     .word   dma_irq_handler             /* [ 13] DMA1 Stream2 */
@@ -50,7 +50,7 @@ __vectors_platform:
     .word   UIE                         /* [ 20] */
     .word   UIE                         /* [ 21] */
     .word   UIE                         /* [ 22] */
-    .word   UIE                         /* [ 23] */
+    .word   exti9_5_irq_handler         /* [ 23] EXTI5 to EXTI9 */
     .word   UIE                         /* [ 24] */
     .word   UIE                         /* [ 25] */
     .word   UIE                         /* [ 26] */
@@ -67,7 +67,7 @@ __vectors_platform:
     .word   UIE                         /* [ 37] */
     .word   UIE                         /* [ 38] */
     .word   UIE                         /* [ 39] */
-    .word   UIE                         /* [ 40] */
+    .word   exti15_10_irq_handler       /* [ 40] EXTI10 to EXTI15 */
     .word   UIE                         /* [ 41] */
     .word   UIE                         /* [ 42] */
     .word   UIE                         /* [ 43] */
@@ -104,7 +104,7 @@ __vectors_platform:
     .word   UIE                         /* [ 74] */
     .word   UIE                         /* [ 75] */
     .word   UIE                         /* [ 76] */
-    .word   otg_hs_irq_handler          /* [ 77] OTG HS */
+    .word   INT_USB_FUNC                /* [ 77] OTG HS */
     .word   UIE                         /* [ 78] */
     .word   UIE                         /* [ 79] */
     .word   UIE                         /* [ 80] */
@@ -128,7 +128,7 @@ __vectors_platform:
     .word   UIE                         /* [ 98] */
     .word   UIE                         /* [ 99] */
     .word   UIE                         /* [100] */
-    .word   UIE                         /* [101] */
+    .word   INT_USB_FUNC                /* [101] OTG FS */
     .word   dma_irq_handler             /* [102] DMAMUX1 overrun */
     .word   UIE                         /* [103] */
     .word   UIE                         /* [104] */

@@ -79,6 +79,7 @@
 #elif CONFIG_CPU == STM32H743
 # define USB_DW_PHYSADDR(x)     x
 # define NO_UNCACHED_ADDR       /* TODO: maybe implement this */
+# define POST_DMA_FLUSH
 #elif !defined(USB_DW_ARCH_SLAVE)
 # error "Must define USB_DW_PHYSADDR / USB_DW_UNCACHEDADDR!"
 #endif

@@ -53,4 +53,6 @@
 #define GPIO_LCD_RESET              GPIO_PD(11)
 #define GPIO_BACKLIGHT              GPIO_PD(13)
 
+#define GPIO_USB_VBUS               GPIO_PA(9)
+
 #endif /* __ECHOPLAYER_GPIO_TARGET_H__ */

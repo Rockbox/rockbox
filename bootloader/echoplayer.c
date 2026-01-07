@@ -29,6 +29,9 @@
 #include "storage.h"
 #include "disk.h"
 #include "file_internal.h"
+#include "usb.h"
+
+static bool is_usb_connected = false;
 
 extern void show_logo(void);
 
@@ -55,6 +58,13 @@ static void demo_storage(void)
     lcd_clear_display();
     lcd_putsf(0, y++, "tick %ld", current_tick);
 
+    if (is_usb_connected)
+    {
+        lcd_puts(0, y++, "storage disabled by USB");
+        lcd_update();
+        return;
+    }
+
     struct partinfo pinfo;
     if (storage_present(IF_MD(0,)) && disk_partinfo(0, &pinfo))
     {
@@ -75,15 +85,37 @@ static void demo_storage(void)
     lcd_update();
 }
 
+static void demo_usb(void)
+{
+    static const char *phyname[] = {
+        [STM32H743_USBOTG_PHY_ULPI_HS] = "ULPI HS",
+        [STM32H743_USBOTG_PHY_ULPI_FS] = "ULPI FS",
+        [STM32H743_USBOTG_PHY_INT_FS] = "internal FS",
+    };
+
+    int y = 0;
+
+    lcd_clear_display();
+    lcd_putsf(0, y++, "tick %ld", current_tick);
+    lcd_putsf(0, y++, "usb connected %d", (int)is_usb_connected);
+
+    lcd_putsf(0, y++, "instance = USB%d", STM32H743_USBOTG_INSTANCE + 1);
+    lcd_putsf(0, y++, "phy = %s", phyname[STM32H743_USBOTG_PHY]);
+
+    lcd_update();
+}
+
 static void (*demo_funcs[]) (void) = {
     demo_rtc,
     demo_storage,
+    demo_usb,
 };
 
 void main(void)
 {
     system_init();
     kernel_init();
+    power_init();
     rtc_init();
 
     lcd_init();
@@ -97,6 +129,9 @@ void main(void)
     storage_init();
     filesystem_init();
     disk_mount_all();
+
+    usb_init();
+    usb_start_monitoring();
 
     int demo_page = 0;
     const int num_pages = ARRAYLEN(demo_funcs);
@@ -118,6 +153,14 @@ void main(void)
             else
                 demo_page -= 1;
             break;
+
+        case SYS_USB_CONNECTED:
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            is_usb_connected = true;
+            break;
+
+        case SYS_USB_DISCONNECTED:
+            is_usb_connected = false;
 
         case BUTTON_X:
             power_off();

@@ -1,3 +1,6 @@
+/* Pull in SoC-specific defines */
+#include "stm32h743-config.h"
+
 /* RoLo-related defines */
 #define MODEL_NAME      "Echo R1"
 #define MODEL_NUMBER    119
@@ -92,10 +95,17 @@
 /* USB support */
 #ifndef SIMULATOR
 #define CONFIG_USBOTG USBOTG_DESIGNWARE
-#define USB_DW_TURNAROUND 5
+#define STM32H743_USBOTG_INSTANCE STM32H743_USBOTG_INSTANCE_USB1
+#define STM32H743_USBOTG_PHY      STM32H743_USBOTG_PHY_ULPI_HS
+#define STM32H743_USBOTG_CLKSEL   STM32H743_USBOTG_CLKSEL_PLL1Q
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x1
-#define USB_PRODUCT_ID 0x2
+/*
+ * Must force device mode because ID pin on PHY is incorrectly
+ * connected to ground on Rev1 boards.
+ */
+#define USB_DW_FORCE_DEVICE_MODE
+#define USB_VENDOR_ID  0x6666 /* "prototype device" VID in folklore */
+#define USB_PRODUCT_ID 0xEC01
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 #define HAVE_USB_POWER
 //#define HAVE_USB_CHARGING_ENABLE

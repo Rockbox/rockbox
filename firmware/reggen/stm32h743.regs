@@ -254,6 +254,19 @@ RCC @ 0x58024400 : block {
         0 LSION
     }
 
+    AHB1ENR @ 0xd8 : reg {
+        28 USB2OTGHSULPIEN
+        27 USB2OTGHSEN
+        26 USB1OTGHSULPIEN
+        25 USB1OTGHSEN
+        17 ETH1RXEN
+        16 ETH1TXEN
+        15 ETH1MACEN
+        05 ADC12EN
+        01 DMA2EN
+        00 DMA1EN
+    }
+
     AHB3RSTR @ 0x7c : reg {
         16 SDMMC1RST
         14 QSPIRST
@@ -418,6 +431,8 @@ SYSCFG @ 0x58000400 : block {
     PWRCFG @ 0x2c : reg {
         0 ODEN
     }
+
+    EXTICR @ 0x08 [4; 0x04] : reg
 }
 
 FMC @ 0x52004000 : block {
@@ -1092,3 +1107,58 @@ block SDMMC {
 
 SDMMC1 @ 0x52007000 : SDMMC
 SDMMC2 @ 0x48022400 : SDMMC
+
+// Clock recovery system
+CRS @ 0x40008400 : block {
+    CR @ 0x00 : reg {
+        13 08 TRIM
+        -- 07 SWSYNC
+        -- 06 AUTOTRIMEN
+        -- 05 CEN
+        -- 03 ESYNCIE
+        -- 02 ERRIE
+        -- 01 SYNCWARNIE
+        -- 00 SYNCOKIE
+    }
+
+    CFGR @ 0x04 : reg {
+        -- 31 SYNCPOL : { 0 = RISING_EDGE; 1 = FALLING_EDGE }
+        29 28 SYNCSRC : { 0 = USB2_SOF; 1 = LSE; 2 = USB1_SOF }
+        26 24 SYNCDIV
+        23 16 FELIM
+        15 00 RELOAD
+    }
+
+    ISR @ 0x08 : reg {
+        31 16 FECAP
+        -- 15 FEDIR
+        -- 10 TRIMOVF
+        -- 09 SYNCMISS
+        -- 08 SYNCERR
+        -- 03 ESYNCF
+        -- 02 ERRF
+        -- 01 SYNCWARNF
+        -- 00 SYNCOKF
+    }
+
+    ICR @ 0x0c : reg {
+        3 ESYNCC
+        2 ERRC
+        1 SYNCWARNC
+        0 SYNCOKC
+    }
+}
+
+// Extended interrupt and event controller
+EXTI @ 0x58000000 : block {
+    RTSR @ 0x00 [3; 0x20] : reg
+    FTSR @ 0x04 [3; 0x20] : reg
+    SWIER @ 0x08 [3; 0x20] : reg
+    D3PMR @ 0x0c [3; 0x20] : reg
+    D3PCRL @ 0x10 [3; 0x20] : reg
+    D3PCRH @ 0x14 [3; 0x20] : reg
+
+    CPUIMR @ 0x80 [3; 0x10] : reg
+    CPUEMR @ 0x84 [3; 0x10] : reg
+    CPUPR @ 0x88 [3; 0x10] : reg
+}

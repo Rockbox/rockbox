@@ -2031,7 +2031,9 @@ target/arm/stm32/sdmmc-stm32h7.c
 target/arm/stm32/spi-stm32h7.c
 target/arm/stm32/system-stm32h7.c
 target/arm/stm32/timer-stm32h7.c
+#if defined(HAVE_USBSTACK)
 target/arm/stm32/usb-stm32h7.c
+#endif
 #endif
 
 #if defined(ECHO_R1)
@@ -2043,6 +2045,7 @@ target/arm/stm32/echoplayer/lcd-echoplayer.c
 target/arm/stm32/echoplayer/power-echoplayer.c
 target/arm/stm32/echoplayer/sdmmc-echoplayer.c
 target/arm/stm32/echoplayer/system-echoplayer.c
+target/arm/stm32/echoplayer/usb-echoplayer.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)

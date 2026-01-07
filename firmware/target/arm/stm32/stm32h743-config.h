@@ -1,0 +1,17 @@
+/*
+ * To be included by config/TARGET.h
+ */
+
+/* STM32H743_USBOTG_INSTANCE */
+#define STM32H743_USBOTG_INSTANCE_USB1  0 /* OTG_HS1 */
+#define STM32H743_USBOTG_INSTANCE_USB2  1 /* OTG_HS2 */
+
+/* STM32H743_USBOTG_PHY */
+#define STM32H743_USBOTG_PHY_ULPI_HS    0 /* External ULPI PHY in HS mode */
+#define STM32H743_USBOTG_PHY_ULPI_FS    1 /* External ULPI PHY in FS mode */
+#define STM32H743_USBOTG_PHY_INT_FS     2 /* Internal PHY in FS mode */
+
+/* STM32H743_USBOTG_CLKSEL */
+#define STM32H743_USBOTG_CLKSEL_PLL1Q       1 /* PLL1Q output */
+#define STM32H743_USBOTG_CLKSEL_PLL3Q       2 /* PLL3Q output */
+#define STM32H743_USBOTG_CLKSEL_HSI48_CRS   3 /* HSI48 trimmed by CRS */
