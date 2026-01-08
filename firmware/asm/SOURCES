@@ -1,5 +1,7 @@
 #if defined(CPU_ARM)
+#if defined(CPU_ARM_CLASSIC)
 arm/ffs.S
+#endif
 arm/memset16.S
 #elif defined(CPU_MIPS)
 mips/ffs.S
@@ -13,9 +15,15 @@ memset16.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
-#if defined(CPU_ARM)
+#if defined(CPU_ARM_CLASSIC)
 arm/memcpy.S
 arm/memmove.S
+arm/memset.S
+strlen.c
+#elif defined(CPU_ARM_MICRO)
+memcpy.c
+mempcpy.c
+memmove.c
 arm/memset.S
 strlen.c
 #elif defined(CPU_MIPS)
