@@ -87,6 +87,12 @@
 #define USB_DW_TOUTCAL 0
 #endif
 
+#ifdef USB_DW_FORCE_DEVICE_MODE
+#define USB_DW_FORCED_MODE FDMOD
+#else
+#define USB_DW_FORCED_MODE 0
+#endif
+
 #define GET_DTXFNUM(ep) ((DWC_DIEPCTL(ep)>>22) & 0xf)
 
 #define USB_DW_NUM_DIRS 2
@@ -1417,7 +1423,7 @@ static void usb_dw_init(void)
      */
     int USB_DW_TURNAROUND = (c->phytype == DWC_PHYTYPE_UTMI_16) ? 5 : 9;
 #endif
-    uint32_t gusbcfg = c->phytype|TRDT(USB_DW_TURNAROUND)|USB_DW_TOUTCAL;
+    uint32_t gusbcfg = c->phytype|TRDT(USB_DW_TURNAROUND)|USB_DW_TOUTCAL|USB_DW_FORCED_MODE;
     DWC_GUSBCFG = gusbcfg;
 
     /* Reset the whole USB core */
