@@ -1,10 +1,40 @@
+#if defined(CPU_ARM)
+arm/ffs.S
+arm/memset16.S
+#elif defined(CPU_MIPS)
+mips/ffs.S
+memset16.c
+#elif defined(CPU_COLDFIRE)
+m68k/ffs.S
+m68k/memset16.S
+#else
 ffs.c
 memset16.c
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
+#if defined(CPU_ARM)
+arm/memcpy.S
+arm/memmove.S
+arm/memset.S
+strlen.c
+#elif defined(CPU_MIPS)
+mips/memcpy.S
+memmove.c
+mips/memset.S
+strlen.c
+#elif defined(CPU_COLDFIRE)
+m68k/memcpy.S
+m68k/memmove.S
+m68k/memset.S
+m68k/strlen.S
+#else
 memcpy.c
+mempcpy.c
 memmove.c
 memset.c
 strlen.c
+#endif
 #endif
 
 #if defined(WIN32) || defined(APPLICATION)
@@ -21,6 +51,10 @@ mempcpy.c
 #if LCD_DEPTH >= 24
 lcd-as-memframe-24bit.c
 #else
+#if defined(CPU_ARM)
+arm/lcd-as-memframe.S
+#else
 lcd-as-memframe.c
-#endif
+#endif /* CPU_ARM */
+#endif /* LCD_DEPTH */
 #endif

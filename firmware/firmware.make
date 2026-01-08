@@ -13,11 +13,11 @@ ifndef APP_TYPE
 INCLUDES += -I$(FIRMDIR)/libc/include
 endif
 
-include $(FIRMDIR)/asm/asm.make
 ifneq ($(filter reggen,$(TOOLSET)),)
   include $(FIRMDIR)/reggen/reggen.make
 endif
 
+FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/asm/SOURCES)
 FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/SOURCES)
 FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
 FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
