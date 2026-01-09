@@ -57,7 +57,11 @@ $(BUILDDIR)/apps/lang/voice-corrections.txt: $(ROOTDIR)/tools/voice-corrections.
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $@
 
-$(BUILDDIR)/apps/lang/voicestrings.zip: $(VOICEOBJ) $(wildcard $(BUILDDIR)/apps/lang/*.talk) $(BUILDDIR)/apps/lang/voice-corrections.txt
+$(BUILDDIR)/apps/lang/lang-enum.txt: $(BUILDDIR)/lang_enum.h
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))perl -ne 'print if s|\s+(.*), /\* (\w+).*|$$2:$$1|' < $<  |grep -v 'this:' > $@
+
+$(BUILDDIR)/apps/lang/voicestrings.zip: $(VOICEOBJ) $(wildcard $(BUILDDIR)/apps/lang/*.talk) $(BUILDDIR)/apps/lang/voice-corrections.txt $(BUILDDIR)/apps/lang/lang-enum.txt
 	$(call PRINTS,ZIP $(subst $(BUILDDIR)/,,$@))
 	$(SILENT)zip -9 -q $@ $(subst $(BUILDDIR)/,,$^)
 
