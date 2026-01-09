@@ -19,6 +19,11 @@
  *
  ****************************************************************************/
 #include "power.h"
+#include "mutex.h"
+#include "gpio-stm32h7.h"
+
+static struct mutex power_1v8_lock;
+static int power_1v8_refcount;
 
 unsigned short battery_level_disksafe = 3500;
 unsigned short battery_level_shutoff = 3400;
@@ -35,9 +40,29 @@ unsigned short percent_to_volt_charge[11] =
     3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
 
+/* API for enabling 1V8 regulator */
+void echoplayer_enable_1v8_regulator(bool enable)
+{
+    mutex_lock(&power_1v8_lock);
+
+    if (enable)
+    {
+        if (power_1v8_refcount++ == 0)
+            gpio_set_level(GPIO_POWER_1V8, 1);
+    }
+    else
+    {
+        if (--power_1v8_refcount == 0)
+            gpio_set_level(GPIO_POWER_1V8, 0);
+    }
+
+    mutex_unlock(&power_1v8_lock);
+}
+
 /* Power management */
 void power_init(void)
 {
+    mutex_init(&power_1v8_lock);
 }
 
 void power_off(void)
