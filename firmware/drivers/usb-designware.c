@@ -93,6 +93,10 @@
 #define USB_DW_FORCED_MODE 0
 #endif
 
+#ifndef USB_DW_DCFG_SPEED
+#define USB_DW_DCFG_SPEED 0
+#endif
+
 #define GET_DTXFNUM(ep) ((DWC_DIEPCTL(ep)>>22) & 0xf)
 
 #define USB_DW_NUM_DIRS 2
@@ -1465,7 +1469,7 @@ static void usb_dw_init(void)
 #endif
     DWC_GAHBCFG = gahbcfg;
 
-    DWC_DCFG = NZLSOHSK;
+    DWC_DCFG = NZLSOHSK | USB_DW_DCFG_SPEED;
 #ifdef USB_DW_SHARED_FIFO
     /* Set EP mismatch counter to the maximum */
     DWC_DCFG |= EPMISCNT(0x1f);
