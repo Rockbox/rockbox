@@ -235,46 +235,17 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
     int_error_t n_err;
 
     if (write) {
-        // we will use direct file access for writing
-        u32 written = 0;
-        Result res = FSFILE_Write(file->stream.handle,
-                                  &written,
-                                  AtomicLoad(&file->offset),
-                                  buf,
-                                  nbyte,
-                                  FS_WRITE_FLUSH);
-        if (R_FAILED(res)) {
-            n_err.err = "I/O error";
-        }
-
-        n_err.n = written;
+        n_err = PageReader_WriteAt(file->stream.cache,
+                                   buf,
+                                   nbyte,
+                                   AtomicLoad(&file->offset),
+                                   file->stream.flags & O_RDWR ? true : false);
     }
     else {
-        // only use page_reader if buffer size is smaller than page size
-        if (nbyte < file->stream.cache->size) {
-            n_err = PageReader_ReadAt(file->stream.cache,
-                                      (u8 *) buf,
-                                      nbyte,
-                                      AtomicLoad(&file->offset));
-        }
-        else {
-            u32 bytes_read = 0;
-            Result res = FSFILE_Read(file->stream.handle,
-                                    &bytes_read,
-                                    AtomicLoad(&file->offset),
-                                    buf,
-                                    nbyte);
-            if (R_FAILED(res)) {
-                n_err.err = "I/O error";
-            }
-
-            // io.EOF
-            if (bytes_read == 0) {
-                n_err.err = "io.EOF";
-            }
-
-            n_err.n = bytes_read;
-        }
+        n_err = PageReader_ReadAt(file->stream.cache,
+                                  buf,
+                                  nbyte,
+                                  AtomicLoad(&file->offset));
     }
 
     if ((n_err.err != NULL) && strcmp(n_err.err, "io.EOF")) {

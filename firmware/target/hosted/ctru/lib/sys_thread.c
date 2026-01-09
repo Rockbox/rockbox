@@ -78,12 +78,12 @@ int get_ctru_thread_priority(int priority)
         (priority == PRIORITY_REALTIME))
         return 0x18;
     else if (priority == PRIORITY_BUFFERING)
-        return 0x18; /* Highest */
+        return 0x2F;
     else if ((priority == PRIORITY_USER_INTERFACE) || (priority == PRIORITY_RECORDING) ||
              (priority == PRIORITY_PLAYBACK))
-        return 0x30;
-    else if (priority == PRIORITY_PLAYBACK_MAX)
         return 0x2F;
+    else if (priority == PRIORITY_PLAYBACK_MAX)
+        return 0x20;
     else if (priority == PRIORITY_SYSTEM)
         return 0x30;
     else if (priority == PRIORITY_BACKGROUND)
@@ -208,8 +208,8 @@ sysThread *sys_create_thread(int(*fn)(void *), const char *name, const size_t st
     thread->userdata = data;
     thread->stacksize = stacksize;
     
-    int cpu = -1;
-    if (name && (strncmp(name, "tagcache", 8) == 0) && R_SUCCEEDED(APT_SetAppCpuTimeLimit(30))) {
+    int cpu = 0;
+    if (name && (strncmp(name, "buffering", 9) == 0) && R_SUCCEEDED(APT_SetAppCpuTimeLimit(30))) {
         cpu = 1;
         printf("thread: %s, running in cpu 1\n", name);
     }
@@ -400,4 +400,3 @@ int sys_cond_wait(sysCond *cond, RecursiveLock *mutex)
 
     return 0;
 }
-

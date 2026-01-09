@@ -46,7 +46,7 @@ static struct dirstr_desc
     struct dirent       entry;  /* current parsed entry information */
 } open_streams[MAX_OPEN_DIRS] =
 {
-    [0 ... MAX_OPEN_FILES-1] = { .stream = { .handle = 0 } }
+    [0 ... MAX_OPEN_FILES-1] = { .stream = { .cache = NULL } }
 };
 
 extern FS_Archive sdmcArchive;
@@ -58,7 +58,7 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
 
     if (!PTR_IN_ARRAY(open_streams, dir, MAX_OPEN_DIRS))
         dir = NULL;
-    else if (dir->stream.handle != 0)
+    else if (dir->stream.cache != NULL)
         return dir;
 
     int errnum;
@@ -103,7 +103,7 @@ static struct dirstr_desc * alloc_dirstr(void)
     for (unsigned int dd = 0; dd < MAX_OPEN_DIRS; dd++)
     {
         struct dirstr_desc *dir = &open_streams[dd];
-        if (dir->stream.handle == 0)
+        if (dir->stream.cache == NULL)
             return dir;
     }
 
@@ -151,6 +151,11 @@ DIR * ctru_opendir(const char *dirname)
         FILE_ERROR(EMFILE, -1);
     }
 
+    dir->stream.cache = NewPageReaderDirectory(dir->stream.handle, defaultPageSize);
+    if (dir->stream.cache == NULL) {
+        FILE_ERROR(ERRNO, -2);
+    }
+
     dir->stream.size = 0;
     dir->stream.flags = 0;
 
@@ -159,6 +164,10 @@ DIR * ctru_opendir(const char *dirname)
 
     dirp = (DIR *)dir;
 file_error:
+    if (dir->stream.handle != 0) {
+        FSDIR_Close(dir->stream.handle);
+        dir->stream.handle = 0;
+    }
     file_internal_unlock_WRITER();
     return dirp;
 }
@@ -177,11 +186,14 @@ int ctru_closedir(DIR *dirp)
 
     logf("closedir(dirname=\"%s\")\n", dir->stream.path);
 
-    if (dir->stream.handle == 0)
+    if (dir->stream.cache == NULL)
     {
         logf("dir #%d: dir not open\n", (int)(dir - open_streams));
         FILE_ERROR(EBADF, -2);
     }
+
+    PageReader_Free(dir->stream.cache);
+    dir->stream.cache = NULL;
 
     Result res = FSDIR_Close(dir->stream.handle);
     if (R_FAILED(res))
@@ -233,16 +245,12 @@ struct dirent * ctru_readdir(DIR *dirp)
 
     logf("readdir(dirname=\"%s\")\n", dir->stream.path);
 
-    u32 dataRead = 0;
     FS_DirectoryEntry dirEntry;
-    Result result = FSDIR_Read(dir->stream.handle,
-                               &dataRead,
-                               1,
-                               &dirEntry);
-    if (R_FAILED(result))
+    int_error_t n_err = PageReader_ReadDir(dir->stream.cache, &dirEntry);
+    if (n_err.n < 0)
         FILE_ERROR(EIO, _RC);
 
-    if (dataRead == 0) {
+    if (n_err.n == 0) {
         /* directory end. return NULL value, no errno */
         res = NULL;
         goto file_error;
@@ -274,6 +282,15 @@ file_error:
     return res;
 }
 
+/* libctru result.h description values appear to be missing
+   FSUSER_CreateDirectory return values */
+
+enum
+{
+    RD_DIRECTORY_ALREADY_EXISTS     = 0xBE,
+    RD_MISSING_PARENT_DIRECTORY     = 0x78,
+};
+
 /* make a directory */
 int ctru_mkdir(const char *path)
 {
@@ -286,8 +303,14 @@ int ctru_mkdir(const char *path)
     Result res = FSUSER_CreateDirectory(sdmcArchive,
                                         fsMakePath(PATH_ASCII, path),
                                         0);
-    if (R_FAILED(res))
+    if (R_FAILED(res)) {
+        if (R_DESCRIPTION(res) == RD_DIRECTORY_ALREADY_EXISTS)
+            FILE_ERROR(ERRNO, EEXIST);
+        if (R_DESCRIPTION(res) == RD_MISSING_PARENT_DIRECTORY)
+            FILE_ERROR(ERRNO, ENOENT);
+        /* Unknown error */
         FILE_ERROR(ERRNO, -1);
+    }
 
     rc = 0;
 file_error:

@@ -6,6 +6,12 @@
 
 #include "bfile.h"
 
+/* Define LOGF_ENABLE to enable logf output in this file */
+#if 0
+#define LOGF_ENABLE
+#endif
+#include "logf.h"
+
 // rw mutex implementation
 void sync_RWMutexInit(sync_RWMutex *m) {
     LightLock_Init(&m->shared);
@@ -63,12 +69,14 @@ void sync_RWMutexUnlock(sync_RWMutex *m) {
 file_error_t readPage(PageReader *p, u64 offset)
 {
     u32 read_bytes = 0;
-    if (R_FAILED(FSFILE_Read(p->file, 
-                            &read_bytes,
-                             offset,
-                             p->buffer,
-                             p->size))) {
-        printf("readPage: FSFILE_Read failed (I/O Error)\n");
+    Result res;
+    res = FSFILE_Read(p->file, 
+                      &read_bytes,
+                      offset,
+                      p->buffer,
+                      p->size);
+    if (R_FAILED(res)) {
+        logf("readPage: 0x%lx\n", R_DESCRIPTION(res));
         return "I/O Error";
     }
 
@@ -81,7 +89,7 @@ file_error_t readPage(PageReader *p, u64 offset)
     p->start = offset;
     p->end = offset + p->size;
 
-    /* printf("page: 0x%llx, 0x%llx, %lld (last_page: %s)\n", p->start, p->end, p->size, p->isLastPage == true ? "true": "false"); */
+    logf("page: 0x%llx, 0x%llx, %lld (last_page: %s)\n", p->start, p->end, p->size, p->isLastPage == true ? "true": "false");
     return NULL;
 }
 
@@ -89,18 +97,18 @@ PageReader* NewPageReader(Handle file, s64 pageSize)
 {
     PageReader *p = (PageReader *) malloc(sizeof(PageReader));
     if (p == NULL) {
-        printf("NewPageReader: memory error\n");
+        logf("NewPageReader: memory error\n");
         return NULL;
     }
 
-    p->buffer = (u8 *) malloc(sizeof(u8) * pageSize);
+    p->buffer = malloc(sizeof(u8) * pageSize);
     if (p->buffer == NULL) {
-        printf("NewPagereader: memory error (buffer)\n");
+        logf("NewPagereader: memory error (buffer)\n");
         return NULL;
     }
 
     // clear buffer data  
-    memset(p->buffer, 0x0, sizeof(u8) + pageSize);
+    memset(p->buffer, 0x0, sizeof(u8) * pageSize);
 
     p->start = 0;
     p->end = 0;
@@ -140,6 +148,27 @@ int_error_t PageReader_ReadAt(PageReader *p, u8 *buffer, size_t size, off_t offs
 {
     bool eof = false;
 
+    // only use page_reader if buffer size is smaller than page size
+    if (size > p->size) {
+        // direct file access (fs.h)
+        u32 bytes_read = 0;
+        Result res = FSFILE_Read(p->file,
+                                &bytes_read,
+                                offset,
+                                buffer,
+                                size);
+        if (R_FAILED(res)) {
+            return (int_error_t) { R_DESCRIPTION(res), "I/O Error" };
+        }
+
+        // io.EOF
+        if (bytes_read == 0) {
+            return (int_error_t) { 0, "io.EOF" };
+        }
+
+        return (int_error_t) { bytes_read, NULL };
+    }
+
     // higher probability, buffer is in cached page range
     if ((offset >= p->start) && ((offset + size) < p->end)) {
         copyPage(p, buffer, size, offset);
@@ -147,15 +176,13 @@ int_error_t PageReader_ReadAt(PageReader *p, u8 *buffer, size_t size, off_t offs
     }
 
     // less higher probability, read new page at offset
-    if (p->isLastPage == false) {
-        file_error_t err = readPage(p, offset);
-        if (err != NULL) {
-            return (int_error_t) { -1, "I/O Error" };
-        }
-
-        // we could have reached last page here so continue to
-        // last page handling
+    file_error_t err = readPage(p, offset);
+    if (err != NULL) {
+        return (int_error_t) { -1, "I/O Error" };
     }
+
+    // we could have reached last page here so continue to
+    // last page handling
 
     // lower probability, we are at the last page
 
@@ -172,4 +199,131 @@ int_error_t PageReader_ReadAt(PageReader *p, u8 *buffer, size_t size, off_t offs
 
     copyPage(p, buffer, size, offset);
     return (int_error_t) { size, eof == true ? "io.EOF" : NULL };
+}
+
+int_error_t PageReader_WriteAt(PageReader *p, u8 *buffer, size_t size, off_t offset, bool flush_cache)
+{
+    // we will use direct file access for writing (fs.h)
+    u32 written = 0;
+    Result res = FSFILE_Write(p->file,
+                              &written,
+                              offset,
+                              buffer,
+                              size,
+                              FS_WRITE_FLUSH);
+    if (R_FAILED(res)) {
+        return (int_error_t) { -1, "I/O Error" };
+    }
+
+    if (flush_cache) {
+        /* logf("PageReader_WriteAt: flush cache\n"); */
+        // reload current page for O_RDWR files
+        // read ahead first page buffer from file
+        file_error_t err =  readPage(p, p->start);
+        if (err != NULL) {
+            return (int_error_t) { -1, "I/O Error" };
+        }
+    }
+
+    return (int_error_t) { written, NULL };
+}
+
+// page reader implementation for directory entries
+file_error_t readPageDirectory(PageReader *p)
+{
+    u32 entries_read = 0;
+    FS_DirectoryEntry *dirEntries = (FS_DirectoryEntry *) p->buffer;
+    Result result = FSDIR_Read(p->file,
+                               &entries_read,
+                               p->size,
+                               dirEntries);
+
+    if (R_FAILED(result)) {
+        logf("FSDIR_Read: 0x%lx\n", R_DESCRIPTION(result));
+        return "I/O Error";
+    }
+
+    // we reached directory end
+    if (entries_read == 0) {
+        return "io.EOF";
+    }
+
+    if (entries_read < p->size) {
+         p->isLastPage = true;
+    }
+
+    p->size = entries_read;
+    p->start = 0;
+    p->end = p->size;
+
+    /* logf("page: 0x%llx, 0x%llx, %lld (last_page: %s)\n", p->start, p->end, p->size, p->isLastPage == true ? "true": "false"); */
+    return NULL;
+}
+
+PageReader *NewPageReaderDirectory(Handle file, s64 pageSize)
+{
+    PageReader *p = (PageReader *) malloc(sizeof(PageReader));
+    if (p == NULL) {
+        logf("NewPageReaderDirectory: memory error\n");
+        return NULL;
+    }
+
+    // round buffer size to sizeof(FS_DirectoryEntry)
+    int maxDirEntries = pageSize / sizeof(FS_DirectoryEntry);
+
+    p->buffer = malloc(sizeof(FS_DirectoryEntry) * maxDirEntries);
+    if (p->buffer == NULL) {
+        logf("NewPageReaderDirectory: memory error (buffer)\n");
+        return NULL;
+    }
+
+    // clear buffer data  
+    memset(p->buffer, 0x0, sizeof(FS_DirectoryEntry) * maxDirEntries);
+
+    p->start = 0;
+    p->end = 0;
+    p->isLastPage = false;
+    p->size = maxDirEntries;
+    p->file = file;
+
+    // read ahead first page buffer from file
+    file_error_t err =  readPageDirectory(p);
+    if (err != NULL) {
+        free(p);
+        return NULL;
+    }
+
+    return p;
+}
+
+static inline void copyEntry(PageReader *p, FS_DirectoryEntry *entry)
+{
+    const FS_DirectoryEntry *dirEntries = (FS_DirectoryEntry *) p->buffer;
+    memcpy(entry, &dirEntries[p->start], sizeof(FS_DirectoryEntry));
+    p->start ++;
+}
+
+int_error_t PageReader_ReadDir(PageReader *p, FS_DirectoryEntry *entry)
+{
+    // higher probability, entry is in cached page range
+    if (p->start < p->end) {
+        copyEntry(p, entry);
+        return (int_error_t) { 1, NULL};
+    }
+
+    // less higher probability, read a new page
+    file_error_t err = readPageDirectory(p);
+
+    // end of directory?
+    if (err != NULL) {
+        if (!strcmp(err, "io.EOF")) {
+            return (int_error_t) { 0, "io.EOF" };
+        }
+        else {
+            return (int_error_t) { -1, "I/O Error" };
+        }
+    }
+
+    copyEntry(p, entry);
+    return (int_error_t) { 1, NULL};
 }
