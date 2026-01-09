@@ -634,11 +634,11 @@ elsif($binary || $binvoice) {
 
 	    # All LANG_* and all VOICE_*
 	    for $n (0 .. $idcount[$_]-1) {
-		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1;
+		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1; # includes quotes so we only need to add NULL
 		$count++;
 	    }
 	    for $n (0x8001 .. $voiceid[$_]-1) {
-		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1;
+		$sizev += length(trim($voice{$idnum[$_][$n]})) + 1; # includes quotes
 		$count++;
 	    }
             printf OUTV ("%c%c%c%c%c%c", ($count >> 8), ($count & 0xff),
@@ -650,6 +650,7 @@ elsif($binary || $binvoice) {
     for (keys %users) {
         # loop over the target phrases
         # This loops over the strings in the translated language file order
+	# XXX ^^^ this should always be done in the ENGLISH order.  wtf.
         my @ids = ((0 .. ($idcount[$_]-1)));
         push @ids, (0x8001 .. ($voiceid[$_]-1));
         for $n (@ids) {
