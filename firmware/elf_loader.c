@@ -101,17 +101,16 @@ static int elf_validate_phdr(const struct elf_phdr *phdr,
     return ELF_ERR_MEM_UNMAPPED;
 }
 
-int elf_loadfd(int fd,
-               const struct elf_load_context *ctx,
-               void **entrypoint)
+int elf_load(elf_read_callback_t read_cb,
+             intptr_t read_arg,
+             const struct elf_load_context *ctx,
+             void **entrypoint)
 {
     struct elf_header ehdr;
     struct elf_phdr phdr;
-    ssize_t nread;
     int err;
 
-    nread = read(fd, &ehdr, sizeof(ehdr));
-    if (nread != (ssize_t)sizeof(ehdr))
+    if (read_cb(read_arg, 0, &ehdr, sizeof(ehdr)))
         return ELF_ERR_IO;
 
     err = elf_validate_header(&ehdr);
@@ -124,11 +123,7 @@ int elf_loadfd(int fd,
     for (size_t ph_index = 0; ph_index < ehdr.e_phnum; ++ph_index)
     {
         off_t ph_off = ehdr.e_phoff + (ph_index * ehdr.e_phentsize);
-        if (lseek(fd, ph_off, SEEK_SET) == (off_t)-1)
-            return ELF_ERR_IO;
-
-        nread = read(fd, &phdr, sizeof(phdr));
-        if (nread != (ssize_t)sizeof(phdr))
+        if (read_cb(read_arg, ph_off, &phdr, sizeof(phdr)))
             return ELF_ERR_IO;
 
         err = elf_validate_phdr(&phdr, ctx);
@@ -138,11 +133,7 @@ int elf_loadfd(int fd,
         /* Load file data to memory if needed */
         if (phdr.p_filesz > 0)
         {
-            if (lseek(fd, phdr.p_offset, SEEK_SET) == (off_t)-1)
-                return ELF_ERR_IO;
-
-            nread = read(fd, (void *)phdr.p_vaddr, phdr.p_filesz);
-            if (nread < 0 || (uint32_t)nread != phdr.p_filesz)
+            if (read_cb(read_arg, phdr.p_offset, (void *)phdr.p_vaddr, phdr.p_filesz))
                 return ELF_ERR_IO;
         }
 
@@ -158,6 +149,25 @@ int elf_loadfd(int fd,
 
     *entrypoint = (void *)ehdr.e_entry;
     return ELF_OK;
+}
+
+int elf_loadfd(int fd,
+               const struct elf_load_context *ctx,
+               void **entrypoint)
+{
+    return elf_load(elf_read_fd_callback, fd, ctx, entrypoint);
+}
+
+int elf_read_fd_callback(intptr_t fd, off_t pos, void *buf, size_t size)
+{
+    if (lseek(fd, pos, SEEK_SET) == (off_t)-1)
+        return -1;
+
+    ssize_t nread = read(fd, buf, size);
+    if (nread < 0 || (size_t)nread != size)
+        return -1;
+
+    return 0;
 }
 
 int elf_loadpath(const char *filename,

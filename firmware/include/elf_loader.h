@@ -38,6 +38,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <sys/types.h>
 
 enum elf_error
 {
@@ -83,9 +84,17 @@ struct elf_load_context
     size_t num_mmap;
 };
 
+typedef int (*elf_read_callback_t) (intptr_t arg, off_t pos, void *buf, size_t size);
+
+int elf_load(elf_read_callback_t read_cb,
+             intptr_t read_arg,
+             const struct elf_load_context *ctx,
+             void **entrypoint);
+
 int elf_loadfd(int fd,
                const struct elf_load_context *ctx,
                void **entrypoint);
+int elf_read_fd_callback(intptr_t fd, off_t pos, void *buf, size_t size);
 
 int elf_loadpath(const char *filename,
                  const struct elf_load_context *ctx,
