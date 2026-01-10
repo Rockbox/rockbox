@@ -183,3 +183,29 @@ int elf_loadpath(const char *filename,
     close(fd);
     return err;
 }
+
+int elf_loadmem(const void *elf_buffer,
+                size_t elf_size,
+                const struct elf_load_context *ctx,
+                void **entrypoint)
+{
+    struct elf_loadmem_state state = {
+        .buffer = elf_buffer,
+        .size = elf_size,
+    };
+
+    return elf_load(elf_read_mem_callback, (intptr_t)&state, ctx, entrypoint);
+}
+
+int elf_read_mem_callback(intptr_t loadmem_state, off_t pos, void *buf, size_t size)
+{
+    struct elf_loadmem_state *state = (void *)loadmem_state;
+
+    if (pos < 0 || (size_t)pos >= state->size)
+        return -1;
+    if (state->size - (size_t)pos < size)
+        return -1;
+
+    memcpy(buf, state->buffer + pos, size);
+    return 0;
+}

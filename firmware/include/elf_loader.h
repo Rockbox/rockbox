@@ -100,4 +100,16 @@ int elf_loadpath(const char *filename,
                  const struct elf_load_context *ctx,
                  void **entrypoint);
 
+struct elf_loadmem_state
+{
+    const void *buffer;
+    size_t size;
+};
+
+int elf_loadmem(const void *elf_buffer,
+                size_t elf_size,
+                const struct elf_load_context *ctx,
+                void **entrypoint);
+int elf_read_mem_callback(intptr_t loadmem_state, off_t pos, void *buf, size_t size);
+
 #endif /* __ELF_LOADER_H__ */
