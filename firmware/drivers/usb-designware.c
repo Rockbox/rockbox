@@ -1018,7 +1018,7 @@ static void usb_dw_handle_xfer_complete(int epnum, enum usb_dw_epdir epdir)
 
     if(is_ep0out)
     {
-#if defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
+#if !defined(USB_DW_ARCH_SLAVE) && defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
         DISCARD_DCACHE_RANGE(ep0_buffer, 64);
 #endif
         memcpy(dw_ep->addr, ep0_buffer, transferred);
@@ -1084,7 +1084,7 @@ static void usb_dw_handle_xfer_complete(int epnum, enum usb_dw_epdir epdir)
 
 static void usb_dw_handle_setup_received(void)
 {
-#if defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
+#if !defined(USB_DW_ARCH_SLAVE) && defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
     DISCARD_DCACHE_RANGE(ep0_buffer, 64);
 #endif
     struct usb_ctrlrequest req;
