@@ -121,6 +121,7 @@ static int buflibmove_callback(int handle, void* current, void* new)
     struct buflib_alloc_data *alloc = (struct buflib_alloc_data*)current;
     ptrdiff_t diff = new - current;
 
+    logf("%s %s", __func__, alloc->path);
 #define UPDATE(x) if (x) { x = PTR_ADD(x, diff); }
 
     UPDATE(alloc->font.bits);
@@ -134,7 +135,6 @@ static int buflibmove_callback(int handle, void* current, void* new)
 
     UPDATE(alloc->font.cache._index);
     UPDATE(alloc->font.cache._lru._base);
-    logf("%s %s", __func__, alloc->path);
     return BUFLIB_CB_OK;
 }
 static void lock_font_handle(int handle, bool lock)
