@@ -293,7 +293,7 @@ bool ogg_file_init(struct ogg_file* file, int fd, int type, int remaining)
 
 #define B64_START_CHAR '+'
 /* maps char codes to BASE64 codes ('A': 0, 'B': 1,... '+': 62, '-': 63 */
-const char b64_codes[] =
+const signed char b64_codes[] =
 {   /* Starts from first valid base 64 char '+' with char code 43 (B64_START_CHAR)
      * For valid base64 chars: index in 0..63; for invalid: -1, for =: -2 */
     62, -1, -1, -1, 63, /* 43-47 (+ /) */
