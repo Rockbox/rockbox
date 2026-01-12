@@ -8,8 +8,9 @@
  * $Id$
  *
  * Copyright (C) 2005 by Thom Johansen
+ * Copyright (C) 2026 by Aidan MacDonald
  *
- * Generic ARM threading support
+ * Threading support for ARM Cortex-M targets
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,24 +30,14 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
 {
     /* r0 = context */
     asm volatile (
-#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
         "ldr    sp, [r0, #36]            \n" /* Load initial sp */
-#else
-        "ldr    sp, [r0, #32]            \n" /* Load initial sp */
-#endif
         "ldr    r4, [r0, #40]            \n" /* start in r4 since it's non-volatile */
         "mov    r1, #0                   \n" /* Mark thread as running */
         "str    r1, [r0, #40]            \n"
-#if NUM_CORES > 1
-        "bl     commit_discard_idcache   \n" /* Invalidate this core's cache. */
-#endif
         "mov    lr, pc                   \n" /* Call thread function */
         "bx     r4                       \n"
     ); /* No clobber list - new thread doesn't care */
     thread_exit();
-#if 0
-    asm volatile (".ltorg"); /* Dump constant pool */
-#endif
 }
 
 /* For startup, place context pointer in r4 slot, start_thread pointer in r5
@@ -65,12 +56,8 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
 static inline void store_context(void* addr)
 {
     asm volatile(
-#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
         "stmia  %0, { r4-r11, lr }     \n"
         "str    sp, [%0, #36]          \n"
-#else
-        "stmia  %0, { r4-r11, sp, lr } \n"
-#endif
         : : "r" (addr)
     );
 }
@@ -83,27 +70,19 @@ static inline void load_context(const void* addr)
 {
     asm volatile(
         BEGIN_ARM_ASM_SYNTAX_UNIFIED
+
         "ldr     r0, [%0, #40]          \n" /* Load start pointer */
         "cmp     r0, #0                 \n" /* Check for NULL */
 
         /* If not already running, jump to start */
-#if ARM_ARCH == 4 && defined(USE_THUMB)
-        "ldmiane %0, { r0, r12 }        \n"
-        "bxne    r12                    \n"
-#else
         "ldmiane %0, { r0, pc }         \n"
-#endif
 
-#if defined(CPU_ARM_MICRO) && ARCH_VERSION >= 7
+        /* Load regs r4 to r14 from context */
         "mov     r0, %0                 \n"
         "ldmia   r0, { r4-r11, lr }     \n"
         "ldr     sp, [r0, #36]          \n"
-#else
-        "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
-#endif
+
         END_ARM_ASM_SYNTAX_UNIFIED
         : : "r" (addr) : "r0" /* only! */
     );
 }
-
-

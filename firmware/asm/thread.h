@@ -59,8 +59,10 @@ struct regs
   #elif defined(HAVE_WIN32_FIBER_THREADS)
     #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
   #endif
-#elif defined(CPU_ARM)
-  #include "arm/thread.h"
+#elif defined(CPU_ARM_CLASSIC) || defined(CPU_ARM_APPLICATION)
+  #include "arm/thread-classic.h"
+#elif defined(CPU_ARM_MICRO)
+  #include "arm/thread-micro.h"
 #elif defined(CPU_COLDFIRE)
   #include "m68k/thread.h"
 #elif defined(CPU_MIPS)

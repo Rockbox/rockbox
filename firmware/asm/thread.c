@@ -5,8 +5,10 @@
   #include "thread-unix.c"
 
   /* Now the CPU-specific implementations */
-#elif defined(CPU_ARM)
-  #include "arm/thread.c"
+#elif defined(CPU_ARM_CLASSIC) || defined(CPU_ARM_APPLICATION)
+  #include "arm/thread-classic.c"
+#elif defined(CPU_ARM_MICRO)
+  #include "arm/thread-micro.c"
 #elif defined(CPU_COLDFIRE)
   #include "m68k/thread.c"
 #elif defined(CPU_MIPS)
