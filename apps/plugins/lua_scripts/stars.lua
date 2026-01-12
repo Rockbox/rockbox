@@ -414,7 +414,11 @@ action_event(rb.actions.ACTION_NONE) -- we can call this now but not after regis
 local eva = rockev.register("action", action_event)
 local evc = rockev.register("timer", action_drift, rb.HZ/7)
 
+if not rb.SIMULATOR then
 while not action_quit() do rb.sleep(rb.HZ) end
+else -- the SIM requires lcd_update to be called from the main thread
+while not action_quit() do _lcd:update(); rb.sleep(10) end
+end
 
 if start_x and start_y then
     file = io.open(fname, "w")

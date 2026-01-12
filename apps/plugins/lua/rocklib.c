@@ -1052,6 +1052,11 @@ LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
+#ifdef SIMULATOR /* rb.SIMULATOR = true allows checking for the SIM in lua */
+        lua_pushboolean(L, 1);
+        luaS_newlloc(L, "SIMULATOR", TSTR_INBIN);
+        lua_setfield(L, -2, "SIMULATOR");
+#endif
     lua_getglobal(L, "require");
     lua_pushstring(L, "rb_defines");
     if (lua_pcall (L, 1, 0, 0))
