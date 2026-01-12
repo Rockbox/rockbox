@@ -34,10 +34,9 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
         "ldr    r4, [r0, #40]            \n" /* start in r4 since it's non-volatile */
         "mov    r1, #0                   \n" /* Mark thread as running */
         "str    r1, [r0, #40]            \n"
-        "mov    lr, pc                   \n" /* Call thread function */
-        "bx     r4                       \n"
+        "blx    r4                       \n" /* Call thread function */
+        "b      thread_exit              \n"
     ); /* No clobber list - new thread doesn't care */
-    thread_exit();
 }
 
 /* For startup, place context pointer in r4 slot, start_thread pointer in r5
