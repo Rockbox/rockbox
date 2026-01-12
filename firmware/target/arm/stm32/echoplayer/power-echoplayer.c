@@ -67,10 +67,24 @@ void power_init(void)
 
 void power_off(void)
 {
+    gpio_set_level(GPIO_CPU_POWER_ON, 0);
+
+    /* TODO: reset to bootloader if USB is plugged in */
+    while (1)
+        core_idle();
 }
 
 void system_reboot(void)
 {
+    /*
+     * TODO: support reboot
+     *
+     * For R1-Rev1 PCBs doing a CPU reset will cut power when
+     * running on battery (because cpu_power_on is no longer
+     * being driven high). The RTC alarm could be used to wake
+     * the system instead.
+     */
+    power_off();
 }
 
 unsigned int power_input_status(void)

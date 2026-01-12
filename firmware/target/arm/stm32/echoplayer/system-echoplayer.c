@@ -56,7 +56,7 @@ static const struct gpio_setting gpios[] = {
     STM_DEFGPIO(GPIO_BUTTON_VOL_DOWN,   F_INPUT_PU),
     STM_DEFGPIO(GPIO_BUTTON_POWER,      F_INPUT_PD),
     STM_DEFGPIO(GPIO_BUTTON_HOLD,       F_INPUT_PU),
-    STM_DEFGPIO(GPIO_CPU_POWER_ON,      F_LPTIM4_OUT),
+    STM_DEFGPIO(GPIO_CPU_POWER_ON,      F_OUT_LS(1)), /* active high */
     STM_DEFGPIO(GPIO_POWER_1V8,         F_OUT_LS(0)), /* active high */
     STM_DEFGPIO(GPIO_CODEC_AVDD_EN,     F_OUT_LS(1)), /* active low */
     STM_DEFGPIO(GPIO_CODEC_DVDD_EN,     F_OUT_LS(1)), /* active low */

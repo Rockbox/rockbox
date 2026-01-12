@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "system.h"
 #include "tick.h"
+#include "button.h"
 #include "clock-stm32h7.h"
 #include "gpio-stm32h7.h"
 #include "regs/cortex-m/cm_scb.h"
@@ -154,7 +155,11 @@ void mdelay(uint32_t ms)
 
 void system_exception_wait(void)
 {
+#if defined(ECHO_R1)
+    while (button_read_device() != (BUTTON_POWER | BUTTON_START));
+#else
     while (1);
+#endif
 }
 
 int system_memory_guard(int newmode)

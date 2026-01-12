@@ -119,6 +119,10 @@ void main(void)
                 demo_page -= 1;
             break;
 
+        case BUTTON_X:
+            power_off();
+            break;
+
         default:
             break;
         }
