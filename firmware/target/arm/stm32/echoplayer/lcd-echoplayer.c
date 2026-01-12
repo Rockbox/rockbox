@@ -173,8 +173,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height > LCD_HEIGHT - y)
         height = LCD_HEIGHT - y;
 
-    for (int dy = y; dy < height; ++dy)
-        commit_dcache_range(FBADDR(x, dy), FB_DATA_SZ * width);
+    for (int dy = 0; dy < height; ++dy)
+        commit_dcache_range(FBADDR(x, y+dy), FB_DATA_SZ * width);
 }
 
 void spi5_irq_handler(void)
