@@ -12623,20 +12623,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Eroare la colectarea informațiilor"
-  </dest>
-  <voice>
-    *: "Eroare la colectarea informațiilor"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -15948,20 +15934,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Meniu principal Amaze"
-  </dest>
-  <voice>
-    *: "Meniu principal a meiz"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16211,34 +16183,6 @@
   </dest>
   <voice>
     *: "Setări miki mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Meniu Mikmod"
-  </dest>
-  <voice>
-    *: "Meniu miki mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Meniu Chessbox "
-  </dest>
-  <voice>
-    *: "Meniu ces boks"
   </voice>
 </phrase>
 <phrase>
@@ -16920,5 +16864,90 @@
   </dest>
   <voice>
     *: "Toate pistele sortate după album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "dac u se be"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Când este în modul de încrăcare USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Când este în modul de încrăcare u se be"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Când este în modul de stocare în masă USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Când este în modul de stocare în masă u se be"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC USB activ"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "dac u se be activ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Folosește indicatori LED"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Folosește indicatori led"
   </voice>
 </phrase>
