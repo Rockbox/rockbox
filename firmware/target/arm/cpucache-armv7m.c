@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "cpucache-armv7m.h"
+#include "system.h"
 #include "regs/cortex-m/cm_cache.h"
 
 /*
@@ -56,8 +57,9 @@ static inline void range_dcache_op(const void *base, unsigned int size,
 {
     arm_dsb();
 
-    uint32_t addr = (uint32_t)base;
-    uint32_t endaddr = addr + size;
+    uint32_t base_addr = (uint32_t)base;
+    uint32_t addr = CACHEALIGN_DOWN(base_addr);
+    uint32_t endaddr = CACHEALIGN_UP(base_addr + size);
 
     while (addr < endaddr)
     {
