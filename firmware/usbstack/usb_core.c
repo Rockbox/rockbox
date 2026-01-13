@@ -1346,7 +1346,7 @@ void usb_charging_enable(int state)
     usb_charging_maxcurrent_change(usb_charging_maxcurrent());
 }
 
-int usb_charging_maxcurrent()
+int usb_charging_maxcurrent(void)
 {
     if (!initialized || usb_charging_mode == USB_CHARGING_DISABLE)
         return 100;
