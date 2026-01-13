@@ -64,6 +64,7 @@ bool VoiceFileCreator::createVoiceFile()
     m_voiceformat = info.voicefmt();
     QString version = m_versionstring.left(m_versionstring.indexOf("-")).remove("r");
 
+    QMap<int, QString> enumstrings;
     // check if voicefile is present on target
     QString fn = m_mountpoint + "/.rockbox/langs/voicestrings.zip";
     LOG_INFO() << "searching for zipped voicestrings at" << fn;
@@ -72,14 +73,17 @@ bool VoiceFileCreator::createVoiceFile()
         ZipUtil z(this);
         if(z.open(fn)) {
             QStringList contents = z.files();
-            int vindex = -1, cindex = -1;
+            int vindex = -1, cindex = -1, eindex = -1;
             for(int index = 0; index < contents.size(); ++index) {
                 // strip any path, we don't know the structure in the zip
                 if(QFileInfo(contents.at(index)).baseName() == m_lang)
                     vindex = index;
                 if(QFileInfo(contents.at(index)).baseName() == "voice-corrections")
                     cindex = index;
-                if (vindex != -1 && cindex != -1)
+                if(QFileInfo(contents.at(index)).baseName() == "lang-enum")
+                    eindex = index;
+
+                if (vindex != -1 && cindex != -1 && eindex != -1)
                     break;
             }
             if(cindex != -1) {
@@ -96,6 +100,25 @@ bool VoiceFileCreator::createVoiceFile()
                     QFile corrfile(":/builtin/voice-corrections.txt");
                     corrfile.open(QIODevice::ReadOnly);
                     corrFile = &corrfile;
+                }
+            }
+            if(eindex != -1) {
+                LOG_INFO() << "extracting voice corrections file";
+                QTemporaryFile enumfileT;
+                enumfileT.open();
+                QTextStream in(&enumfileT);
+                QString cfn = enumfileT.fileName();
+                if(z.extractArchive(cfn, QFileInfo(contents.at(eindex)).fileName())) {
+                    emit logItem(tr("Extracted language enumeration file from installation"), LOGINFO);
+
+                    while(!in.atEnd()) {
+                        QString line = in.readLine();
+                        QStringList row = line.split(":");
+                        int id = row[0].toInt(NULL, 0);
+                        QString name = row[1];
+                        enumstrings[id] = name;
+                    }
+                    enumfileT.close();
                 }
             }
             if(vindex != -1) {
@@ -142,9 +165,13 @@ bool VoiceFileCreator::createVoiceFile()
                         m_filename = voicefontlist.fileName();
                         for(auto key : voicestrings.keys()) {
                             QByteArray qba;
-                            qba = QString("id: %1_%2\n")
-                                    .arg(key < 0x8000 ? "LANG" : "VOICE")
-                                    .arg(key).toUtf8();
+                            if (enumstrings.contains(key)) {
+                                qba = QString("id: %1\n").arg(enumstrings[key]).toUtf8();
+                            } else {
+                                qba = QString("id: %1_%2\n")
+                                        .arg(key < 0x8000 ? "LANG" : "VOICE")
+                                        .arg(key).toUtf8();
+                            }
                             voicefontlist.write(qba);
                             qba = QString("voice: \"%1\"\n").arg(
                                     voicestrings[key]).toUtf8();
