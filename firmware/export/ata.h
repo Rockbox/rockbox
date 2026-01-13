@@ -132,7 +132,6 @@ struct storage_info;
 
 void ata_enable(bool on);
 void ata_spindown(int seconds);
-void ata_sleep(void);
 void ata_sleepnow(void);
 /* NOTE: DO NOT use this to poll for disk activity.
          If you are waiting for the disk to become active before

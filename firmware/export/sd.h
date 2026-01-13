@@ -36,7 +36,6 @@ struct storage_info;
 
 void sd_enable(bool on);
 void sd_spindown(int seconds);
-void sd_sleep(void);
 void sd_sleepnow(void);
 bool sd_disk_is_active(void);
 int  sd_soft_reset(void);

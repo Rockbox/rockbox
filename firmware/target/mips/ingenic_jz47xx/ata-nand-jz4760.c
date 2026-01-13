@@ -630,11 +630,6 @@ void nand_spindown(int seconds)
     (void)seconds;
 }
 
-void nand_sleep(void)
-{
-    /* null */
-}
-
 void nand_spin(void)
 {
     /* null */

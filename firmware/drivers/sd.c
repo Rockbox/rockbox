@@ -23,10 +23,6 @@
 #include "sdmmc.h"
 #include "storage.h"
 
-void sd_sleep(void)
-{
-}
-
 void sd_spin(void)
 {
 }

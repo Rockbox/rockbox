@@ -30,7 +30,6 @@ struct storage_info;
 
 void nand_enable(bool on);
 void nand_spindown(int seconds);
-void nand_sleep(void);
 void nand_sleepnow(void);
 bool nand_disk_is_active(void);
 int  nand_soft_reset(void);

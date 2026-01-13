@@ -74,10 +74,6 @@ long ramdisk_last_disk_activity(void)
     return last_disk_activity;
 }
 
-void ramdisk_sleep(void)
-{
-}
-
 void ramdisk_spin(void)
 {
 }
