@@ -231,6 +231,7 @@ struct sdmmc_host
     struct mutex lock;
 
     /* Bus & device state flags; must only be accessed with lock held */
+    bool enabled     : 1;
     bool need_reset  : 1;
     bool powered     : 1;
     bool initialized : 1;

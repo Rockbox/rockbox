@@ -114,6 +114,7 @@ void sdmmc_host_init(struct sdmmc_host *host,
             host->ops = ops;
             host->controller = controller;
             host->present = !config->is_removable;
+            host->enabled = true;
             mutex_init(&host->lock);
 
             array[i] = host;
@@ -186,6 +187,26 @@ static void sdmmc_host_bus_reset(struct sdmmc_host *host)
     host->initialized = false;
     host->is_hcs_card = false;
     memset(&host->cardinfo, 0, sizeof(host->cardinfo));
+}
+
+/*
+ * Call to enable/disable the host controller. If disabled then the
+ * controller and device are powered off and no access to the storage
+ * device is allowed.
+ */
+static void sdmmc_host_set_enabled(struct sdmmc_host *host, bool enabled)
+{
+    mutex_lock(&host->lock);
+
+    if (enabled != host->enabled)
+    {
+        if (host->enabled)
+            sdmmc_host_bus_reset(host);
+
+        host->enabled = enabled;
+    }
+
+    mutex_unlock(&host->lock);
 }
 
 #ifdef HAVE_HOTSWAP
@@ -629,6 +650,9 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
 
     mutex_lock(&host->lock);
 
+    if (!host->enabled)
+        goto out;
+
     if (!sdmmc_host_medium_present(host))
         goto out;
 
@@ -719,6 +743,16 @@ tCardInfo *card_get_info_target(int drive)
 {
     /* FIXME: this API is racy, no way to fix without refactoring */
     return &sdmmc_sd_hosts[drive]->cardinfo;
+}
+
+void sd_enable(bool enabled)
+{
+    for (size_t i = 0; i < ARRAYLEN(sdmmc_sd_hosts); ++i)
+    {
+        struct sdmmc_host *host = sdmmc_sd_hosts[i];
+
+        sdmmc_host_set_enabled(host, enabled);
+    }
 }
 
 long sd_last_disk_activity(void)
