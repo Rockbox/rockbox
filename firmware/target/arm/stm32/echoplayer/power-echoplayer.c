@@ -25,6 +25,7 @@
 static struct mutex power_1v8_lock;
 static int power_1v8_refcount;
 
+/* TODO: calibrate battery curve */
 unsigned short battery_level_disksafe = 3500;
 unsigned short battery_level_shutoff = 3400;
 
@@ -87,14 +88,31 @@ void system_reboot(void)
     power_off();
 }
 
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    const int conf_500ma = GPIOF_OUTPUT(0, GPIO_TYPE_PUSH_PULL,
+                                        GPIO_SPEED_LOW, GPIO_PULL_DISABLED);
+    const int conf_100ma = GPIOF_INPUT(GPIO_PULL_DISABLED);
+
+    if (maxcurrent > 100)
+        gpio_configure_single(GPIO_CHARGER_CHARGING, conf_500ma);
+    else
+        gpio_configure_single(GPIO_CHARGER_CHARGING, conf_100ma);
+}
+#endif
+
 unsigned int power_input_status(void)
 {
-    return POWER_INPUT_USB_CHARGER;
+    if (gpio_get_level(GPIO_USB_VBUS))
+        return POWER_INPUT_USB_CHARGER;
+
+    return POWER_INPUT_NONE;
 }
 
 bool charging_state(void)
 {
-    return true;
+    return gpio_get_level(GPIO_CHARGER_CHARGING) == 0;
 }
 
 int _battery_voltage(void)
