@@ -207,6 +207,11 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
         length = MAX_PEAK;
         end = peak_meter_scale_value(val, length);
     }
+    else if (pb->type == SKIN_TOKEN_PLAYLIST_PERCENTBAR)
+    {
+        length = playlist_amount();
+        end = playlist_get_display_index();
+    }
     else if (pb->type == SKIN_TOKEN_LIST_SCROLLBAR)
     {
         int val, min, max;

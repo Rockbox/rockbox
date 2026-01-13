@@ -1241,6 +1241,8 @@ static int parse_progressbar_tag(struct skin_element* element,
         token->type = SKIN_TOKEN_PEAKMETER_LEFTBAR;
     else if (token->type == SKIN_TOKEN_PEAKMETER_RIGHT)
         token->type = SKIN_TOKEN_PEAKMETER_RIGHTBAR;
+    else if (token->type == SKIN_TOKEN_PLAYLIST_PERCENT)
+        token->type = SKIN_TOKEN_PLAYLIST_PERCENTBAR;
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     else if (token->type == SKIN_TOKEN_SETTING)
@@ -2418,6 +2420,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_PLAYER_PROGRESSBAR:
                 case SKIN_TOKEN_PEAKMETER_LEFT:
                 case SKIN_TOKEN_PEAKMETER_RIGHT:
+                case SKIN_TOKEN_PLAYLIST_PERCENT:
                 case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
 #ifdef HAVE_RADIO_RSSI
                 case SKIN_TOKEN_TUNER_RSSI:

@@ -163,6 +163,7 @@ static const struct tag_info legal_tags[] =
     TAG(SKIN_TOKEN_TRACK_STARTING,        "pS" , "|D", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_TRACK_ENDING,          "pE" , "|D", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_PLAYLIST_POSITION,     "pp", "", SKIN_REFRESH_STATIC),
+    TAG(SKIN_TOKEN_PLAYLIST_PERCENT,      "pP", BAR_PARAMS, SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_PLAYLIST_ENTRIES,      "pe", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_PLAYLIST_NAME,         "pn", "", SKIN_REFRESH_STATIC),
     TAG(SKIN_TOKEN_PLAYLIST_SHUFFLE,      "ps", "", SKIN_REFRESH_DYNAMIC),
@@ -329,3 +330,4 @@ const struct tag_info* find_tag(const char *name)
     }
     return tag;
 }
+
