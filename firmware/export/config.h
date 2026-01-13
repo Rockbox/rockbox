@@ -1177,32 +1177,53 @@ Lyre prototype 1 */
 #define NO_PROF_ATTR
 #endif
 
-/* IRAM usage */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) &&   /* Not for hosted environments */ \
-    (defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
-    defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
-    (CONFIG_CPU == AS3525 && MEMORYSIZE > 2 && !defined(BOOTLOADER)) || /* AS3525 +2MB: core, plugins, codecs */ \
-    (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC) && !defined(BOOTLOADER)) || /* AS3525 2MB: core only */ \
-    (CONFIG_CPU == AS3525v2 && !defined(PLUGIN) && !defined(CODEC) && !defined(BOOTLOADER)) || /* AS3525v2: core only */ \
+/* IRAM usage; not for hosted environments */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+
+/* Core, plugins, and codecs for straightforward targets */
+#if defined(CPU_COLDFIRE) || \
+    defined(CPU_PP) || \
+    defined(CPU_S5L87XX) || \
     (CONFIG_CPU == PNX0101) || \
-    (CONFIG_CPU == TCC7801) || \
-    (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
-    defined(CPU_S5L87XX)) || /* Samsung S5L87XX: core, plugins, codecs */ \
-    ((CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B) && !defined(PLUGIN) && !defined(CODEC)) /* Jz47XX: core only */
-#define ICODE_ATTR      __attribute__ ((section(".icode")))
-#define ICONST_ATTR     __attribute__ ((section(".irodata")))
-#define IDATA_ATTR      __attribute__ ((section(".idata")))
-#define IBSS_ATTR       __attribute__ ((section(".ibss")))
-#define USE_IRAM
-#if (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
-    && CONFIG_CPU != JZ4732 && CONFIG_CPU != JZ4760B && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
-#define PLUGIN_USE_IRAM
+    (CONFIG_CPU == TCC7801)
+# define USE_IRAM
+# define PLUGIN_USE_IRAM
+
+/* AS3525 +2MB: core, plugins, codecs */
+#elif (CONFIG_CPU == AS3525) && (MEMORYSIZE > 2) && !defined(BOOTLOADER)
+# define USE_IRAM
+# define PLUGIN_USE_IRAM
+
+/* AS3525 2MB: core only */
+#elif (CONFIG_CPU == AS3525) && (MEMORYSIZE <= 2) && !defined(BOOTLOADER) && \
+      !defined(CODEC) && !defined(PLUGIN)
+# define USE_IRAM
+
+/* AS2525v2: core only */
+#elif (CONFIG_CPU == AS3525v2) && !defined(BOOTLOADER) && !defined(CODEC) && !defined(PLUGIN)
+# define USE_IRAM
+
+/* IMX233: core only */
+#elif (CONFIG_CPU == IMX233) && !defined(PLUGIN) && !defined(CODEC)
+# define USE_IRAM
+
+/* JZ47xx: core only */
+#elif (CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B) && !defined(PLUGIN) && !defined(CODEC)
+# define USE_IRAM
 #endif
+
+#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
+
+#ifdef USE_IRAM
+# define ICODE_ATTR     __attribute__ ((section(".icode")))
+# define ICONST_ATTR    __attribute__ ((section(".irodata")))
+# define IDATA_ATTR     __attribute__ ((section(".idata")))
+# define IBSS_ATTR      __attribute__ ((section(".ibss")))
 #else
-#define ICODE_ATTR
-#define ICONST_ATTR
-#define IDATA_ATTR
-#define IBSS_ATTR
+# define ICODE_ATTR
+# define ICONST_ATTR
+# define IDATA_ATTR
+# define IBSS_ATTR
 #endif
 
 #if (defined(CPU_PP) || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) || \
