@@ -21,154 +21,313 @@
 #include "kernel/kernel-internal.h"
 #include "system.h"
 #include "power.h"
-#include "rtc.h"
 #include "lcd.h"
 #include "backlight.h"
 #include "button.h"
-#include "timefuncs.h"
 #include "storage.h"
 #include "disk.h"
 #include "file_internal.h"
 #include "usb.h"
-#include "common.h"  /* For show_logo() */
+#include "rbversion.h"
+#include "system-echoplayer.h"
+#include "gpio-stm32h7.h"
 
-static bool is_usb_connected = false;
+/* Events for the monitor callback to signal the main thread */
+#define EV_POWER_PRESSED    MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0)
+#define EV_POWER_RELEASED   MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 1)
+#define EV_USB_UNPLUGGED    MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 2)
 
-static void demo_rtc(void)
+/* Long press duration for power button */
+#define POWERBUTTON_LONG_PRESS_TIME     (HZ)
+
+/* Time to remain powered with no USB cable inserted */
+#define USB_UNPLUGGED_ACTIVE_TIME       (30 * HZ)
+#define USB_UNPLUGGED_INACTIVE_TIME     (3 * HZ)
+
+/* Power button monitor state */
+static bool pwr_curr_state;
+static bool pwr_prev_state;
+struct timeout pwr_stable_tmo;
+
+/* USB monitor state */
+static bool usb_curr_state;
+static bool usb_prev_state;
+struct timeout usb_unplugged_tmo;
+
+static volatile bool restart_pwr_stable_tmo;
+static volatile bool restart_usb_unplugged_tmo;
+
+/*
+ * Because power is always enabled while USB is plugged in the
+ * bootloader decides whether to appear "active" or "inactive"
+ * to the user.
+ */
+static bool is_active;
+
+/*
+ * This flag is set if the bootloader is entered after software
+ * poweroff. The user may still be holding the power button and
+ * we don't want to boot Rockbox because of this, so we have to
+ * wait for the power button to be released first.
+ */
+static bool wait_for_power_released;
+
+/* Optional error message displayed on LCD */
+static const char *status_msg = NULL;
+
+/* Helper functions */
+static bool is_power_button_pressed(void)
 {
-    int y = 0;
-    struct tm *time = get_time();
-
-    lcd_clear_display();
-
-    lcd_putsf(0, y++, "time:  %02d:%02d:%02d",
-              time->tm_hour, time->tm_min, time->tm_sec);
-    lcd_putsf(0, y++, "year:  %d", time->tm_year + 1900);
-    lcd_putsf(0, y++, "month: %d", time->tm_mon);
-    lcd_putsf(0, y++, "day:   %d", time->tm_mday);
-
-    lcd_update();
+    return button_status() & BUTTON_POWER;
 }
 
-static void demo_storage(void)
+static bool is_usbmode_button_pressed(void)
 {
-    int y = 0;
+    return button_status() & BUTTON_DOWN;
+}
 
-    lcd_clear_display();
-    lcd_putsf(0, y++, "tick %ld", current_tick);
+static int send_event_on_tmo(struct timeout *tmo)
+{
+    button_queue_post(tmo->data, 0);
+    return 0;
+}
 
-    if (is_usb_connected)
+/*
+ * Monitors the state of the power button and USB cable
+ * insertion status. It will post an event to the main
+ * thread when (a) the power button is continously held
+ * or released for long enough, or (b) the USB cable is
+ * unplugged for long enough.
+ */
+static void monitor_tick(void)
+{
+    /* Power button state */
+    pwr_prev_state = pwr_curr_state;
+    pwr_curr_state = is_power_button_pressed();
+
+    if (pwr_curr_state != pwr_prev_state || restart_pwr_stable_tmo)
     {
-        lcd_puts(0, y++, "storage disabled by USB");
-        lcd_update();
+        long event = pwr_curr_state ? EV_POWER_PRESSED : EV_POWER_RELEASED;
+        int ticks = POWERBUTTON_LONG_PRESS_TIME;
+
+        restart_pwr_stable_tmo = false;
+        timeout_register(&pwr_stable_tmo, send_event_on_tmo, ticks, event);
+    }
+
+    /* USB cable state */
+    usb_prev_state = usb_curr_state;
+    usb_curr_state = usb_inserted();
+
+    /* Ignore cable state change in inactive state */
+    if (usb_curr_state != usb_prev_state || restart_usb_unplugged_tmo)
+    {
+        long event = EV_USB_UNPLUGGED;
+        int ticks = is_active ? USB_UNPLUGGED_ACTIVE_TIME : USB_UNPLUGGED_INACTIVE_TIME;
+
+        restart_usb_unplugged_tmo = false;
+
+        if (usb_curr_state)
+            timeout_cancel(&usb_unplugged_tmo);
+        else
+            timeout_register(&usb_unplugged_tmo, send_event_on_tmo, ticks, event);
+    }
+}
+
+static void monitor_init(void)
+{
+    pwr_curr_state = is_power_button_pressed();
+    usb_curr_state = usb_inserted();
+
+    /* Make sure events fire even if inputs don't change after boot */
+    restart_pwr_stable_tmo = true;
+    restart_usb_unplugged_tmo = true;
+
+    tick_add_task(monitor_tick);
+}
+
+static void go_active(void)
+{
+    is_active = true;
+    restart_usb_unplugged_tmo = true;
+
+    gpio_set_level(GPIO_CPU_POWER_ON, 1);
+    storage_enable(true);
+}
+
+static void go_inactive(void)
+{
+    is_active = false;
+    restart_usb_unplugged_tmo = true;
+
+    storage_enable(false);
+    gpio_set_level(GPIO_CPU_POWER_ON, 0);
+}
+
+static void refresh_display(void)
+{
+    if (!is_active)
+    {
+        lcd_shutdown();
         return;
     }
 
-    struct partinfo pinfo;
-    if (storage_present(IF_MD(0,)) && disk_partinfo(0, &pinfo))
-    {
-        lcd_putsf(0, y++, "start %d", (int)pinfo.start);
-        lcd_putsf(0, y++, "count %d", (int)pinfo.size);
-        lcd_putsf(0, y++, "type  %d", (int)pinfo.type);
-
-        DIR *d = opendir("/");
-        struct dirent *ent;
-        while ((ent = readdir(d)))
-        {
-            lcd_putsf(0, y++, "/%s", ent->d_name);
-        }
-
-        closedir(d);
-    }
-
-    lcd_update();
-}
-
-static void demo_usb(void)
-{
-    static const char *phyname[] = {
-        [STM32H743_USBOTG_PHY_ULPI_HS] = "ULPI HS",
-        [STM32H743_USBOTG_PHY_ULPI_FS] = "ULPI FS",
-        [STM32H743_USBOTG_PHY_INT_FS] = "internal FS",
-    };
-
     int y = 0;
 
     lcd_clear_display();
-    lcd_putsf(0, y++, "tick %ld", current_tick);
-    lcd_putsf(0, y++, "usb connected %d", (int)is_usb_connected);
 
-    lcd_putsf(0, y++, "instance = USB%d", STM32H743_USBOTG_INSTANCE + 1);
-    lcd_putsf(0, y++, "phy = %s", phyname[STM32H743_USBOTG_PHY]);
+    lcd_putsf(0, y++, "Rockbox on %s", MODEL_NAME);
+    y++;
+
+    if (status_msg)
+    {
+        lcd_putsf(0, y++, "Error: %s", status_msg);
+        y++;
+    }
+
+    if (!usb_inserted())
+    {
+        lcd_putsf(0, y++, "Hold POWER to power off");
+        lcd_putsf(0, y++, "Connect USB cable for USB mode");
+        y++;
+    }
+    else
+    {
+        lcd_putsf(0, y++, "Bootloader USB mode");
+
+        if (charging_state())
+        {
+            lcd_putsf(0, y++, "Battery charging (%d mA)",
+                      usb_charging_maxcurrent());
+        }
+        else
+        {
+            lcd_putsf(0, y++, "Battery charged");
+        }
+
+        y++;
+    }
+
+    lcd_putsf(0, y++, "Version: %s", RBVERSION);
 
     lcd_update();
+    lcd_enable(true);
 }
 
-static void (*demo_funcs[]) (void) = {
-    demo_rtc,
-    demo_storage,
-    demo_usb,
-};
+static void launch(void)
+{
+    /* No-op if USB mode was requested */
+    if (is_usbmode_button_pressed())
+        return;
+
+    /* TODO: load rockbox */
+    status_msg = "Can't boot RB yet!";
+}
 
 void main(void)
 {
     system_init();
     kernel_init();
     power_init();
-    rtc_init();
-
-    lcd_init();
     button_init();
 
+    /* Start monitoring power button / usb state */
+    monitor_init();
+
+    /* Prepare LCD in case we need to display something */
+    lcd_init();
     backlight_init();
-    backlight_on();
 
-    show_logo();
-
+    /*
+     * Prepare storage subsystem, but keep SD card unpowered
+     * until we actually need to access it.
+     */
     storage_init();
+    storage_enable(false);
+
+    /*
+     * Initialize fs/disk internal state, the disk will not
+     * be mountable due to being disabled but this will not
+     * cause any fatal errors.
+     */
     filesystem_init();
     disk_mount_all();
 
+    if (echoplayer_boot_reason == ECHOPLAYER_BOOT_REASON_SW_REBOOT ||
+        usb_detect() == USB_INSERTED)
+    {
+        /*
+         * For software reboot we want to immediately launch Rockbox.
+         *
+         * We also do so if USB is plugged in at boot, because there's
+         * no way to dynamically switch between charge only and mass
+         * storage mode depending on the active/inactive state; to avoid
+         * confusion, it is simpler to just boot Rockbox.
+         */
+        go_active();
+        launch();
+    }
+    else if (echoplayer_boot_reason == ECHOPLAYER_BOOT_REASON_SW_POWEROFF)
+    {
+        /* Ignore power button pressed event until button is first released */
+        wait_for_power_released = true;
+    }
+
+    /*
+     * Initialize USB so we can enumerate with the host and
+     * negotiate charge current (needed even in inactive mode)
+     */
     usb_init();
     usb_start_monitoring();
+    usb_charging_enable(USB_CHARGING_FORCE);
 
-    int demo_page = 0;
-    const int num_pages = ARRAYLEN(demo_funcs);
-
-    while (1)
+    for (;;)
     {
-        int btn = button_get_w_tmo(HZ);
-        switch (btn)
+        refresh_display();
+
+        long refresh_tmo = is_active ? HZ : TIMEOUT_BLOCK;
+
+        switch (button_get_w_tmo(refresh_tmo))
         {
-        case BUTTON_START:
-            demo_page += 1;
-            if (demo_page >= num_pages)
-                demo_page = 0;
+        case EV_POWER_PRESSED:
+            if (wait_for_power_released)
+                break;
+
+            if (!is_active)
+            {
+                /* Launch Rockbox due to user pressing power button */
+                go_active();
+                launch();
+            }
+            else
+            {
+                /*
+                 * NOTE: The check for USB insertion here is only
+                 * because we can't change to charging only mode.
+                 */
+                if (!usb_inserted())
+                    go_inactive();
+            }
+
             break;
 
-        case BUTTON_SELECT:
-            if (demo_page == 0)
-                demo_page = num_pages - 1;
-            else
-                demo_page -= 1;
+        case EV_POWER_RELEASED:
+            /*
+             * This cuts power if the power button is not
+             * held and we're not in the active state due
+             * to USB mode, etc.
+             */
+            wait_for_power_released = false;
+            gpio_set_level(GPIO_CPU_POWER_ON, is_active);
+            break;
+
+        case EV_USB_UNPLUGGED:
+            go_inactive();
             break;
 
         case SYS_USB_CONNECTED:
+            go_active();
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            is_usb_connected = true;
-            break;
-
-        case SYS_USB_DISCONNECTED:
-            is_usb_connected = false;
-
-        case BUTTON_X:
-            power_off();
-            break;
-
-        default:
             break;
         }
-
-        demo_funcs[demo_page]();
     }
 }

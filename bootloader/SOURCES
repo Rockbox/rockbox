@@ -96,5 +96,4 @@ x1000/recovery.c
 x1000/utils.c
 #elif defined(ECHO_R1)
 echoplayer.c
-show_logo.c
 #endif
