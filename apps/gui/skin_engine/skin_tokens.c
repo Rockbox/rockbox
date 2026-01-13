@@ -1165,6 +1165,7 @@ const char *get_token_value(struct gui_wps *gwps,
             goto gtv_ret_numeric_tag_info;
 
         case SKIN_TOKEN_PLAYLIST_PERCENT:
+        {
             int playlist_amt = playlist_amount();
             int current_pos = playlist_get_display_index() + offset;
             int percentage = current_pos * 100 / playlist_amt;
@@ -1181,7 +1182,7 @@ const char *get_token_value(struct gui_wps *gwps,
             itoa_buf(buf, buf_size, percentage);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
-
+        }
         case SKIN_TOKEN_PLAYLIST_SHUFFLE:
             if ( global_settings.playlist_shuffle )
                 return "s";
