@@ -562,6 +562,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     }
 #endif
                     int msel = do_menu(context_menu, NULL, NULL, false);
+                    title_buf = buf;
 
                     switch (msel)
                     {
