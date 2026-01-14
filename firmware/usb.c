@@ -307,9 +307,11 @@ void usb_signal_transfer_completion(
 
 void usb_clear_pending_transfer_completion_events(void)
 {
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     while (queue_peek_ex(&usb_queue, NULL,
                          1 | QPEEK_REMOVE_EVENTS,
                          QPEEK_FILTER1(USB_TRANSFER_COMPLETION)));
+#endif
 }
 
 void usb_signal_notify(long id, intptr_t data)
