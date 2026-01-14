@@ -574,6 +574,7 @@ static void gwps_enter_wps(bool theme_enabled)
         gwps = skin_get_gwps(WPS, i);
         display = gwps->display;
         display->scroll_stop();
+        sb_set_title_text(NULL, Icon_NOICON, i);
         /* Update the values in the first (default) viewport - in case the user
            has modified the statusbar or colour settings */
 #if LCD_DEPTH > 1
