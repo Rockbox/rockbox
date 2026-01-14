@@ -1178,7 +1178,7 @@ static bool view_battery(void)
 #else
                 lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
-#if defined(HAVE_USB_CHARGING_ENABLE)
+#if defined(HAVE_USBSTACK) && defined(HAVE_USB_CHARGING_ENABLE)
                 lcd_putsf(0, 4, "USB current limit: %d mA",
                           usb_charging_maxcurrent());
 #endif /* HAVE_USB_CHARGING_ENABLE */
