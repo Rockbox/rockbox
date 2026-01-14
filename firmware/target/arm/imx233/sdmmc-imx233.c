@@ -1000,6 +1000,10 @@ void mmc_enable(bool on)
     (void) on;
 }
 
+void mmc_sleepnow(void)
+{
+}
+
 bool mmc_disk_is_active(void)
 {
     return false;
