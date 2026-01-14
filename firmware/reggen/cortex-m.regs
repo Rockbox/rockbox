@@ -32,7 +32,36 @@ CM_NVIC @ 0xe000e000 : block {
 
 // System control block
 CM_SCB @ 0xe000ed00 : block {
+    ICSR @ 0x04 : reg {
+        -- 31 NMIPENDSET
+        -- 28 PENDSVSET
+        -- 27 PENDSVCLR
+        -- 26 PENDSTSET
+        -- 25 PENDSTCLR
+        -- 23 ISRPREEMPT
+        -- 22 ISRPENDING
+        20 12 VECTPENDING
+        -- 11 RETTOBASE
+        08 00 VECTACTIVE
+    }
+
     VTOR @ 0x08 : reg
+
+    AIRCR @ 0x0c : reg {
+        31 16 VECTKEY : { 0x05FA = KEY }
+        -- 15 ENDIANNESS : { 0 = LITTLE; 1 = BIG }
+        10 08 PRIGROUP
+        -- 02 SYSRESETREQ
+        -- 01 VECTCLRACTIVE
+        -- 00 VECTRESET
+    }
+
+    SCR @ 0x10 : reg {
+        4 SEVONPEND
+        2 SLEEPDEEP
+        1 SLEEPONEXIT
+    }
+
     CCR @ 0x14 : reg {
         18 BP
         17 IC
@@ -41,9 +70,79 @@ CM_SCB @ 0xe000ed00 : block {
         08 BFHFNMIGN
         04 DIV_0_TRP
         03 UNALIGN_TRP
-        01 USERETMPEND
+        01 USERSETMPEND
         00 NONBASETHRDENA
     }
+
+    SHPR1 @ 0x18 : reg {
+        23 16 PRI_USAGEFAULT
+        15 08 PRI_BUSFAULT
+        07 00 PRI_MEMMANAGE
+    }
+
+    SHPR2 @ 0x1c : reg {
+        31 24 PRI_SVCALL
+    }
+
+    SHPR3 @ 0x20 : reg {
+        31 24 PRI_SYSTICK
+        23 16 PRI_PENDSV
+        07 00 PRI_DEBUGMONITOR
+    }
+
+    SHCSR @ 0x24 : reg {
+        18 USGFAULTENA
+        17 BUSFAULTENA
+        16 MEMFAULTENA
+        15 SVCALLPENDED
+        14 BUSFAULTPENDED
+        13 MEMFAULTPENDED
+        12 USGFAULTPENDED
+        11 SYSTICKACT
+        10 PENDSVACT
+        08 MONITORACT
+        07 SVCALLACT
+        03 USGFAULTACT
+        01 BUSFAULTACT
+        00 MEMFAULTACT
+    }
+
+    CFSR @ 0x28 : reg {
+        // UFSR bits
+        25 DIVBYZERO
+        24 UNALIGNED
+        19 NOCP
+        18 INVPC
+        17 INVSTATE
+        16 UNDEFINSTR
+
+        // BFSR bits
+        15 BFARVALID
+        13 LSPERR
+        12 STKERR
+        11 UNSTKERR
+        10 IMPRECISERR
+        09 PRECISERR
+        08 IBUSERR
+
+        // MMSR bits
+        07 MMARVALID
+        05 MLSPERR
+        04 MSTKERR
+        03 MUNSTKERR
+        01 DACCVIOL
+        00 IACCVIOL
+    }
+
+    HFSR @ 0x2c : reg {
+        31 DEBUGEVT
+        30 FORCED
+        01 VECTTBL
+    }
+
+    MMFAR @ 0x34 : reg
+    BFAR @ 0x38 : reg
+    CPACR @ 0x88 : reg
 }
 
 // System timer
