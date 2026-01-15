@@ -52,7 +52,7 @@ static uint32_t systick_interval_in_ms = SYSTICK_INTERVAL_INITIAL;
 /* Base address of vector table */
 extern char __vectors_arm[];
 
-static void stm_enable_caches(void)
+void stm32_enable_caches(void)
 {
     __discard_idcache();
 
@@ -112,7 +112,7 @@ void system_init(void)
     reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
 
     /* Enable CPU caches */
-    stm_enable_caches();
+    stm32_enable_caches();
 
     /* Initialize system clocks */
     stm_clock_init();

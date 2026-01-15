@@ -25,6 +25,9 @@
 #include "cpucache-armv7m.h"
 #include <stdbool.h>
 
+/* Enable CPU caches. Must be called after a reset. */
+void stm32_enable_caches(void) INIT_ATTR;
+
 /* Enables the SysTick timer -- SysTick interrupt won't be enabled */
 void stm32_systick_enable(void);
 
