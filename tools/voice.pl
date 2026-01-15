@@ -715,6 +715,8 @@ sub generatevstringclips {
     close(VOICEFONTIDS);
 
     print("\n");
+
+    return $targetid;
 }
 
 
@@ -867,7 +869,7 @@ if (defined($B) && $B) {
     printf("Generating voice\n  Target: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n  Pool directory: %s\n",
            defined($t) ? $t : "unknown",
            $l, $e, $E, $s, "$S $tts_object->{ttsoptions}", defined($ENV{'POOL'}) ? $ENV{'POOL'} : "<none>");
-    generatevstringclips($l, $t, $e, $E, $tts_object, $S, $B);
+    $i = generatevstringclips($l, $t, $e, $E, $tts_object, $S, $B);
     shutdown_tts($tts_object);
     createvoice($l, $i, $f);
     deleteencs();
