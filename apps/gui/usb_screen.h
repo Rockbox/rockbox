@@ -21,10 +21,12 @@
 #ifndef _USB_SCREEN_H_
 #define _USB_SCREEN_H_
 
+#include <stdint.h>
+
 #ifdef USB_NONE
-#define gui_usb_screen_run(early_usb) do {} while(0)
+#define gui_usb_screen_run(early_usb, seqnum) do {} while(0)
 #else
-extern void gui_usb_screen_run(bool early_usb);
+extern void gui_usb_screen_run(bool early_usb, intptr_t seqnum);
 #endif
 
 #endif

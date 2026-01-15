@@ -618,7 +618,7 @@ static void init(void)
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif
             {
-                gui_usb_screen_run(true);
+                gui_usb_screen_run(true, button_get_data());
                 mounted = true; /* mounting done @ end of USB mode */
             }
 #ifdef HAVE_USB_POWER
@@ -675,7 +675,7 @@ static void init(void)
 #ifndef USB_NONE
             usb_start_monitoring();
             while(button_get(true) != SYS_USB_CONNECTED) {};
-            gui_usb_screen_run(true);
+            gui_usb_screen_run(true, button_get_data());
 #elif !defined(DEBUG) && !(CONFIG_STORAGE & STORAGE_RAMDISK)
             sleep(HZ*5);
 #endif

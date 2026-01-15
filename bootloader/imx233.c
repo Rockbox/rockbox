@@ -96,7 +96,7 @@ static void usb_mode(int connect_timeout)
         adc_init();
 
         /* ack the SYS_USB_CONNECTED polled from the button queue */
-        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+        usb_acknowledge(SYS_USB_CONNECTED_ACK, button_get_data());
 
         while(1)
         {

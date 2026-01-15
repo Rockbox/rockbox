@@ -747,7 +747,7 @@ void usb_test(void)
 
     usb_init();
     usb_start_monitoring();
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_acknowledge(SYS_USB_CONNECTED_ACK, 0);
 
     while (1) {
         sleep(HZ);

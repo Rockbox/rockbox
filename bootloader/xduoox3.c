@@ -105,7 +105,7 @@ static void usb_mode(void)
     /* Got the message - wait for disconnect */
     show_splash(0, "Bootloader USB mode");
 
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_acknowledge(SYS_USB_CONNECTED_ACK, button_get_data());
 
     while(1) {
         button = button_get_w_tmo(HZ/2);

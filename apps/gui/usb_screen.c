@@ -248,7 +248,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
     }
 }
 
-void gui_usb_screen_run(bool early_usb)
+void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
 {
 #ifdef SIMULATOR /* the sim allows toggling USB fast enough to overflow viewportmanagers stack */
     static bool in_usb_screen = false;
@@ -297,7 +297,7 @@ void gui_usb_screen_run(bool early_usb)
         font_disable_all();
     }
 
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_acknowledge(SYS_USB_CONNECTED_ACK, seqnum);
 
     while (1)
     {

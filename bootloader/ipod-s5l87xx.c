@@ -129,7 +129,7 @@ static void usb_mode(void)
         printf("Bootloader USB mode");
 
         /* Ack the SYS_USB_CONNECTED polled from the button queue */
-        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+        usb_acknowledge(SYS_USB_CONNECTED_ACK, button_get_data());
 
         while(1)
         {

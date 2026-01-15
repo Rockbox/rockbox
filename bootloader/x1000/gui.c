@@ -34,6 +34,7 @@
 
 static bool lcd_inited = false;
 extern bool is_usb_connected;
+extern intptr_t usb_connection_seqnum;
 
 void clearscreen(void)
 {
@@ -134,6 +135,7 @@ int get_button(int timeout)
     case SYS_USB_CONNECTED:
     case SYS_USB_DISCONNECTED:
         is_usb_connected = (btn == SYS_USB_CONNECTED);
+        usb_connection_seqnum = button_get_data();
         break;
 #ifdef HAVE_SCREENDUMP
     case BL_SCREENSHOT:

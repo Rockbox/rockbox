@@ -470,7 +470,7 @@ void main(void)
 
         case SYS_USB_CONNECTED:
             go_active();
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_acknowledge(SYS_USB_CONNECTED_ACK, button_get_data());
             break;
         }
     }

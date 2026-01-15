@@ -38,6 +38,7 @@
  * Handled by the gui code since that's how events are delivered
  * TODO: this is an ugly kludge */
 bool is_usb_connected = false;
+intptr_t usb_connection_seqnum = 0;
 
 static bool screenshot_enabled = false;
 
@@ -71,7 +72,7 @@ void usb_mode(void)
             return;
 
     splashf(0, "USB mode");
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_acknowledge(SYS_USB_CONNECTED_ACK, usb_connection_seqnum);
 
     while(is_usb_connected)
         get_button(TIMEOUT_BLOCK);

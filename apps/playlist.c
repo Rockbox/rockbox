@@ -1882,7 +1882,7 @@ static void dc_thread_playlist(void)
             }
 
             case SYS_USB_CONNECTED:
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 usb_wait_for_disconnect(&playlist_queue);
                 break;
         }

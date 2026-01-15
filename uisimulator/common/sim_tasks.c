@@ -203,9 +203,9 @@ void usb_start_monitoring(void)
 {
 }
 
-void usb_acknowledge(long id)
+void usb_acknowledge(long id, intptr_t seqnum)
 {
-    queue_post(&sim_queue, id, 0);
+    queue_post(&sim_queue, id, seqnum);
 }
 
 void usb_wait_for_disconnect(struct event_queue *q)

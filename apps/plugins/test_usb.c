@@ -58,7 +58,7 @@ static void main_loop(void)
             state = "connected";
             logf("test_usb: connect ack %ld", *rb->current_tick);
             DEBUGF("test_usb: connect ack %ld\n", *rb->current_tick);
-            rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            rb->usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
             break;
 
         case SYS_USB_DISCONNECTED:

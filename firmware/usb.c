@@ -765,9 +765,9 @@ void usb_start_monitoring(void)
 #endif /* USB_STATUS_BY_EVENT */
 #endif /* USB_FULL_INIT */
 
-void usb_acknowledge(long id)
+void usb_acknowledge(long id, intptr_t seqnum)
 {
-    queue_post(&usb_queue, id, 0);
+    queue_post(&usb_queue, id, seqnum);
 }
 
 void usb_init(void)
@@ -901,9 +901,10 @@ bool usb_inserted(void)
     return false;
 }
 
-void usb_acknowledge(long id)
+void usb_acknowledge(long id, intptr_t seqnum)
 {
     (void)id;
+    (void)seqnum;
 }
 
 void usb_init(void)

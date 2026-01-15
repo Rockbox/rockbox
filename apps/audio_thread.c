@@ -101,7 +101,7 @@ static void NORETURN_ATTR audio_thread(void)
         case SYS_USB_CONNECTED:
             LOGFQUEUE("audio < SYS_USB_CONNECTED");
             voice_stop();
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
             usb_wait_for_disconnect(&audio_queue);
             break;
         }

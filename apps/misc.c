@@ -656,24 +656,25 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             }
             break;
         case SYS_USB_CONNECTED:
+        {
+            intptr_t seqnum = button_get_data();
             if (callback != NULL)
                 callback(parameter);
-            {
-                system_flush();
+            system_flush();
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
-                check_bootfile(false); /* gets initial size */
+            check_bootfile(false); /* gets initial size */
 #endif
 #endif
-                gui_usb_screen_run(false);
+            gui_usb_screen_run(false, seqnum);
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF)
-                check_bootfile(true);
+            check_bootfile(true);
 #endif
 #endif
-                system_restore();
-            }
+            system_restore();
             return SYS_USB_CONNECTED;
+        }
 
         case SYS_POWEROFF:
         case SYS_REBOOT:

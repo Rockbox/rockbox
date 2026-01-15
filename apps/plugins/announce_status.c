@@ -435,7 +435,7 @@ void thread(void)
         switch (ev.id)
         {
             case SYS_USB_CONNECTED:
-                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 in_usb = true;
                 break;
             case SYS_USB_DISCONNECTED:

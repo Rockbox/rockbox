@@ -491,7 +491,7 @@ static void thread(void)
         {
             case SYS_USB_CONNECTED:
                 in_usb_mode = true;
-                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 break;
             case SYS_USB_DISCONNECTED:
                 in_usb_mode = false;

@@ -123,7 +123,7 @@ static void handle_usb(int connect_timeout)
         /* Got the message - wait for disconnect */
         printf("Bootloader USB mode");
 
-        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+        usb_acknowledge(SYS_USB_CONNECTED_ACK, button_get_data());
 
         while (1)
         {

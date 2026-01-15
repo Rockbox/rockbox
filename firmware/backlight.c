@@ -605,7 +605,7 @@ void backlight_thread(void)
 #endif /* HAVE_REMOTE_LCD/ HAVE_REMOTE_LCD_AS_MAIN */
 #endif /* !SIMULATOR */
             case SYS_USB_CONNECTED:
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 break;
 
 #ifdef BACKLIGHT_DRIVER_CLOSE

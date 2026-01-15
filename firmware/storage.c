@@ -236,7 +236,7 @@ static void NORETURN_ATTR storage_thread(void)
             storage_event_send(CONFIG_STORAGE, ev.id, (intptr_t)&bdcast);
             usb_mode = ev.id == SYS_USB_CONNECTED;
             if (usb_mode) {
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
             }
             else {
                 bdcast = CONFIG_STORAGE;

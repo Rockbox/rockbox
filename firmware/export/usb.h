@@ -70,8 +70,8 @@
  * mass storage mode, it will require exclusive access to the disk and ask all
  * threads to release any file handle and stop using the disks. It does so by
  * broadcasting a SYS_USB_CONNECTED message, which threads must acknowledge using
- * usb_acknowledge(SYS_USB_CONNECTED_ACK). They must not access the disk until
- * SYS_USB_DISCONNECTED is broadcast. To ease waiting, threads can call
+ * usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data). They must not access the disk
+ * until SYS_USB_DISCONNECTED is broadcast. To ease waiting, threads can call
  * usb_wait_for_disconnect() or usb_wait_for_disconnect_w_tmo() on their waiting
  * queue.
  *
@@ -198,7 +198,7 @@ void usb_attach(void);
 void usb_start_monitoring(void) INIT_ATTR;
 void usb_close(void);
 /* acknowledge usb connection, typically with SYS_USB_CONNECTED_ACK */
-void usb_acknowledge(long id);
+void usb_acknowledge(long id, intptr_t seqnum);
 /* block the current thread until SYS_USB_DISCONNECTED has been broadcast */
 void usb_wait_for_disconnect(struct event_queue *q);
 /* same as usb_wait_for_disconnect() but with a timeout, returns 1 on timeout */

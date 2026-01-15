@@ -230,7 +230,7 @@ static int handle_usb(int connect_timeout)
             printf("Bootloader USB mode");
 
             usb = USB_HANDLED;
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
 #if defined(SANSA_E200) && defined(HAVE_BOOTLOADER_USB_MODE)
             /* E200 misses unplug randomly
                probably fine for other targets too but needs tested */

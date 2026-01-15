@@ -404,7 +404,7 @@ static void iap_thread(void)
             /* Ack USB thread */
             case SYS_USB_CONNECTED:
             {
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 break;
             }
         }
