@@ -27,24 +27,30 @@
 #include "regs/cortex-m/cm_systick.h"
 #include "regs/stm32h743/dbgmcu.h"
 
-/* EXT timer is 1/8th of CPU clock */
-#define SYSTICK_FREQ            (CPU_FREQ / 8)
-#define SYSTICK_PER_MS          (SYSTICK_FREQ / 1000)
-#define SYSTICK_PER_US          (SYSTICK_FREQ / 1000000)
+/* Assumed initial CPU frequency for calculating systick */
+#ifndef CPUFREQ_INITIAL
+# define CPUFREQ_INITIAL CPU_FREQ
+#endif
 
-/* Max delay is limited by kernel tick interval + safety margin */
-#define SYSTICK_DELAY_MAX_US    (1000000 / HZ / 2)
-#define SYSTICK_DELAY_MAX_MS    (SYSTICK_DELAY_MAX_US / 1000)
+/* Tick interval in milliseconds */
+#ifndef SYSTICK_INTERVAL_INITIAL
+# define SYSTICK_INTERVAL_INITIAL (1000 / HZ)
+#endif
+
+/* Use EXT source which is equal to CPU frequency divided by 8 */
+#define SYSTICK_SOURCE    BV_CM_SYSTICK_CSR_CLKSOURCE_EXT
+#define SYSTICK_PRESCALER 8
+
+/* Convert CPU frequency to number of systick ticks in 1 ms */
+#define CPUFREQ_TO_SYSTICK_PER_MS(f) \
+    ((f) / (SYSTICK_PRESCALER * 1000))
+
+/* SysTick related state */
+static uint32_t systick_per_ms = CPUFREQ_TO_SYSTICK_PER_MS(CPUFREQ_INITIAL);
+static uint32_t systick_interval_in_ms = SYSTICK_INTERVAL_INITIAL;
 
 /* Base address of vector table */
 extern char __vectors_arm[];
-
-static void systick_init(unsigned int interval_in_ms)
-{
-    reg_writef(CM_SYSTICK_RVR, VALUE(SYSTICK_PER_MS * interval_in_ms - 1));
-    reg_writef(CM_SYSTICK_CVR, VALUE(0));
-    reg_writef(CM_SYSTICK_CSR, CLKSOURCE_V(EXT), ENABLE(1));
-}
 
 static void stm_enable_caches(void)
 {
@@ -54,6 +60,45 @@ static void stm_enable_caches(void)
 
     arm_dsb();
     arm_isb();
+}
+
+static void stm32_recalc_systick_rvr(void)
+{
+    uint32_t ticks = systick_per_ms * systick_interval_in_ms;
+
+    reg_writef(CM_SYSTICK_RVR, VALUE(ticks - 1));
+}
+
+static void stm32_set_systick_interval(uint32_t interval_in_ms)
+{
+    if (interval_in_ms != systick_interval_in_ms)
+    {
+        systick_interval_in_ms = interval_in_ms;
+        stm32_recalc_systick_rvr();
+    }
+}
+
+void stm32_systick_set_cpu_freq(uint32_t freq)
+{
+    uint32_t ticks_per_ms = CPUFREQ_TO_SYSTICK_PER_MS(freq);
+
+    if (ticks_per_ms != systick_per_ms)
+    {
+        systick_per_ms = ticks_per_ms;
+        stm32_recalc_systick_rvr();
+    }
+}
+
+void stm32_systick_enable(void)
+{
+    stm32_recalc_systick_rvr();
+    reg_writef(CM_SYSTICK_CVR, VALUE(0));
+    reg_writef(CM_SYSTICK_CSR, CLKSOURCE(SYSTICK_SOURCE), ENABLE(1));
+}
+
+void stm32_systick_disable(void)
+{
+    reg_writef(CM_SYSTICK_CSR, ENABLE(0), TICKINT(0));
 }
 
 void system_init(void)
@@ -72,8 +117,8 @@ void system_init(void)
     /* Initialize system clocks */
     stm_clock_init();
 
-    /* TODO: move this */
-    systick_init(1000/HZ);
+    /* Initialize systick */
+    stm32_systick_enable();
 
     /* Call target-specific initialization */
     gpio_init();
@@ -99,7 +144,8 @@ void system_debug_enable(bool enable)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    (void)interval_in_ms;
+    stm32_set_systick_interval(interval_in_ms);
+    stm32_systick_enable();
 
     reg_writef(CM_SYSTICK_CSR, TICKINT(1));
 }
@@ -110,47 +156,33 @@ void systick_handler(void)
 }
 
 /*
- * NOTE: This assumes that the CPU cannot be reclocked during an interrupt.
- * If that happens, the systick interval and reload value would be modified
- * to maintain the kernel tick interval and the code here will break.
+ * This makes two assumptions:
+ *
+ * 1. the CPU frequency must not change while udelay() is running;
+ *    otherwise the delay time will be wrong.
+ * 2. interrupt handlers should not block execution for more than
+ *    one systick interval; if this happens the delay may be much
+ *    longer than necessary.
  */
-static void __udelay(uint32_t us)
+void udelay(uint32_t us)
 {
+    uint32_t delay_ticks = (us * systick_per_ms / 1000);
     uint32_t start = reg_readf(CM_SYSTICK_CVR, VALUE);
     uint32_t max = reg_readf(CM_SYSTICK_RVR, VALUE);
-    uint32_t delay = us * SYSTICK_PER_US;
 
-    for (;;)
+    while (delay_ticks > 0)
     {
         uint32_t value = reg_readf(CM_SYSTICK_CVR, VALUE);
         uint32_t diff = start - value;
         if (value > start)
             diff += max;
-        if (diff >= delay)
+
+        if (diff >= delay_ticks)
             break;
+
+        delay_ticks -= diff;
+        start = value;
     }
-}
-
-void udelay(uint32_t us)
-{
-    while (us > SYSTICK_DELAY_MAX_US)
-    {
-        __udelay(SYSTICK_DELAY_MAX_US);
-        us -= SYSTICK_DELAY_MAX_US;
-    }
-
-    __udelay(us);
-}
-
-void mdelay(uint32_t ms)
-{
-    while (ms > SYSTICK_DELAY_MAX_MS)
-    {
-        __udelay(SYSTICK_DELAY_MAX_MS * 1000);
-        ms -= SYSTICK_DELAY_MAX_MS;
-    }
-
-    __udelay(ms * 1000);
 }
 
 void system_exception_wait(void)

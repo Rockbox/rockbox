@@ -25,6 +25,15 @@
 #include "cpucache-armv7m.h"
 #include <stdbool.h>
 
+/* Enables the SysTick timer -- SysTick interrupt won't be enabled */
+void stm32_systick_enable(void);
+
+/* Disables the SysTick timer -- also disables SysTick interrupt */
+void stm32_systick_disable(void);
+
+/* Update the CPU frequency to recalibrate SysTick timer */
+void stm32_systick_set_cpu_freq(uint32_t freq);
+
 /* Enable/disable debug clock domain during sleep mode. */
 void system_debug_enable(bool enable);
 
@@ -32,7 +41,7 @@ void system_debug_enable(bool enable);
 void gpio_init(void) INIT_ATTR;
 void fmc_init(void) INIT_ATTR;
 
+/* Busy loop delay based on systick */
 void udelay(uint32_t us);
-void mdelay(uint32_t ms);
 
 #endif /* __STM32_SYSTEM_TARGET_H__ */
