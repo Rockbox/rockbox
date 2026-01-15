@@ -587,6 +587,10 @@ RTC @ 0x58004000 : block {
         14 00 PREDIV_S
     }
 
+    WUTR @ 0x14 : reg {
+        15 00 VALUE
+    }
+
     WPR @ 0x24 : reg {
         07 00 KEY : { 0xCA = KEY1; 0x53 = KEY2 }
     }

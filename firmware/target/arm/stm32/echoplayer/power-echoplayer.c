@@ -21,6 +21,8 @@
 #include "power.h"
 #include "mutex.h"
 #include "gpio-stm32h7.h"
+#include "system-echoplayer.h"
+#include "regs/cortex-m/cm_scb.h"
 
 static struct mutex power_1v8_lock;
 static int power_1v8_refcount;
@@ -68,23 +70,34 @@ void power_init(void)
 
 void power_off(void)
 {
+    /*
+     * Disable power and reset to the bootloader immediately.
+     * The system can't really be powered off as long as USB
+     * is plugged or the power button is pressed -- it's the
+     * bootloader's job to monitor those inputs and decide
+     * when the system needs to "really" power on.
+     */
     gpio_set_level(GPIO_CPU_POWER_ON, 0);
 
-    /* TODO: reset to bootloader if USB is plugged in */
-    while (1)
-        core_idle();
+    reg_writef(CM_SCB_AIRCR, VECTKEY_V(KEY), SYSRESETREQ(1));
+    while (1);
 }
 
 void system_reboot(void)
 {
     /*
-     * TODO: support reboot
-     *
-     * For R1-Rev1 PCBs doing a CPU reset will cut power when
-     * running on battery (because cpu_power_on is no longer
-     * being driven high). The RTC alarm could be used to wake
-     * the system instead.
+     * Disable IRQs to ensure an errant panic can't disturb
+     * the RTC reconfig.
      */
+    disable_irq();
+
+    /*
+     * Configure RTC_OUT pin to keep power enabled during
+     * reset and then do a normal power off. If this fails
+     * to reset back to the bootloader then the RTC_OUT
+     * pin will go low automatically after some timeout.
+     */
+    echoplayer_set_rtcout_mode(ECHOPLAYER_RTCOUT_REBOOT);
     power_off();
 }
 

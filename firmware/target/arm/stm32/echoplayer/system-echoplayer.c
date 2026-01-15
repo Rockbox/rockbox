@@ -22,8 +22,11 @@
 #include "button.h"
 #include "gpio-stm32h7.h"
 #include "clock-echoplayer.h"
+#include "system-echoplayer.h"
 #include "regs/stm32h743/fmc.h"
+#include "regs/stm32h743/pwr.h"
 #include "regs/stm32h743/rcc.h"
+#include "regs/stm32h743/rtc.h"
 #include "regs/cortex-m/cm_scb.h"
 
 #define F_INPUT      GPIOF_INPUT(GPIO_PULL_DISABLED)
@@ -207,9 +210,47 @@ void system_init(void)
     /* Configure GPIOs and start FMC */
     gpio_init();
     fmc_init();
+
+    /* Disable RTC_OUT pin */
+    echoplayer_set_rtcout_mode(ECHOPLAYER_RTCOUT_DISABLED);
 }
 
 void system_exception_wait(void)
 {
     while (button_read_device() != (BUTTON_POWER | BUTTON_START));
+}
+
+void echoplayer_set_rtcout_mode(enum echoplayer_rtcout_mode mode)
+{
+    reg_writef(RCC_APB4ENR, RTCAPBEN(1));
+    reg_writef(PWR_CR1, DBP(1));
+
+    reg_writef(RTC_WPR, KEY_V(KEY1));
+    reg_writef(RTC_WPR, KEY_V(KEY2));
+
+    reg_writef(RTC_OR, OUT_RMP(0), ALARM_TYPE_V(PUSH_PULL));
+
+    switch (mode)
+    {
+    case ECHOPLAYER_RTCOUT_REBOOT:
+        /*
+         * Use the inverted wakeup timer output to keep power
+         * enabled during reset. If, somehow, the system does
+         * not reset properly then the wakeup timer will drive
+         * the RTC_OUT pin low after 1 second and cut power.
+         */
+        while (!reg_readf(RTC_ISR, WUTWF));
+        reg_writef(RTC_ISR, WUTF(0));
+        reg_writef(RTC_WUTR, VALUE(STM32_LSE_FREQ / 8));
+        reg_writef(RTC_CR, OSEL_V(WAKEUP), POL(1), WUCKSEL(0), WUTE(1));
+        break;
+
+    case ECHOPLAYER_RTCOUT_DISABLED:
+    default:
+        reg_writef(RTC_CR, OSEL_V(DISABLED), POL(0), WUTE(0));
+        break;
+    }
+
+    reg_writef(RTC_WPR, KEY(0));
+    reg_writef(PWR_CR1, DBP(0));
 }
