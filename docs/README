@@ -62,3 +62,19 @@ directories and create a setup for each target:
    $ ../tools/configure
 
 Questions anyone? Ask on the mailing list or on IRC. We'll be happy to help you!
+
+Docker Build (iPod Video)
+-------------------------
+
+If you have Docker installed, you can build for iPod Video without installing
+any toolchains:
+
+   $ make build
+
+This builds the firmware in a Docker container and places the artifacts in
+output/. To clean up:
+
+   $ make clean
+
+The first build takes longer as it creates the Docker image with the ARM
+toolchain. Subsequent builds are faster.

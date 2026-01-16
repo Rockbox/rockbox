@@ -36,6 +36,14 @@ mkdir build-sim && cd build-sim && ../tools/configure
 mkdir build-ipod && cd build-ipod && ../tools/configure
 ```
 
+### Docker Build (iPod Video)
+For reproducible builds without installing toolchains locally:
+```bash
+make build   # Build firmware
+make clean   # Remove output
+```
+Artifacts are placed in `output/` (rockbox.ipod and rockbox.zip).
+
 ## Testing
 
 There is no formal unit test framework. Testing is done through:
