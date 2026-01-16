@@ -254,6 +254,20 @@ RCC @ 0x58024400 : block {
         0 LSION
     }
 
+    RSR @ 0xd0 : reg {
+        30 LPWRRSTF
+        28 WWDG1RSTF
+        26 IWDGRSTF
+        24 SFTRSTF
+        23 PORRSTF
+        22 PINRSTF
+        21 BORRSTF
+        20 D2RSTF
+        19 D1RSTF
+        17 CPURSTF
+        16 RMVF
+    }
+
     AHB1ENR @ 0xd8 : reg {
         28 USB2OTGHSULPIEN
         27 USB2OTGHSEN

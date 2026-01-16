@@ -54,6 +54,8 @@
 # define F_MCO1     GPIOF_ANALOG()
 #endif
 
+enum echoplayer_boot_reason echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_NORMAL;
+
 static const struct gpio_setting gpios[] = {
     STM_DEFGPIO(GPIO_BUTTON_A,          F_INPUT_PU),
     STM_DEFGPIO(GPIO_BUTTON_B,          F_INPUT_PU),
@@ -211,6 +213,24 @@ void system_init(void)
     gpio_configure_all(gpios, ARRAYLEN(gpios),
                        pingroups, ARRAYLEN(pingroups));
     fmc_init();
+
+    /* Read & clear reset source */
+    uint32_t rsr = reg_var(RCC_RSR);
+    reg_assignf(RCC_RSR, RMVF(1));
+
+    /*
+     * Determine boot reason -- SFTRST means a software reset
+     * occurred, which may be a reboot or a power off
+     */
+    if (reg_vreadf(rsr, RCC_RSR, SFTRSTF))
+    {
+        reg_writef(RCC_APB4ENR, RTCAPBEN(1));
+
+        if (reg_readf(RTC_CR, WUTE))
+            echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_REBOOT;
+        else
+            echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_POWEROFF;
+    }
 
     /* Disable RTC_OUT pin */
     echoplayer_set_rtcout_mode(ECHOPLAYER_RTCOUT_DISABLED);

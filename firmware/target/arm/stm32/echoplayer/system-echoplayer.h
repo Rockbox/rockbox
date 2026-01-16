@@ -27,6 +27,15 @@ enum echoplayer_rtcout_mode
     ECHOPLAYER_RTCOUT_REBOOT,
 };
 
+enum echoplayer_boot_reason
+{
+    ECHOPLAYER_BOOT_REASON_NORMAL,
+    ECHOPLAYER_BOOT_REASON_SW_POWEROFF,
+    ECHOPLAYER_BOOT_REASON_SW_REBOOT,
+};
+
 void echoplayer_set_rtcout_mode(enum echoplayer_rtcout_mode mode);
+
+extern enum echoplayer_boot_reason echoplayer_boot_reason;
 
 #endif /* __SYSTEM_ECHOPLAYER_H__ */
