@@ -23,6 +23,8 @@
 
 #include "clock-stm32h7.h"
 
+void echoplayer_clock_init(void) INIT_ATTR;
+
 extern struct stm32_clock sdmmc1_ker_clock;
 extern struct stm32_clock ltdc_ker_clock;
 extern struct stm32_clock spi5_ker_clock;

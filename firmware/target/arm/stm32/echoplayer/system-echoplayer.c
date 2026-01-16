@@ -20,8 +20,8 @@
  ****************************************************************************/
 #include "system.h"
 #include "button.h"
-#include "clock-stm32h7.h"
 #include "gpio-stm32h7.h"
+#include "clock-echoplayer.h"
 #include "regs/stm32h743/fmc.h"
 #include "regs/stm32h743/rcc.h"
 #include "regs/cortex-m/cm_scb.h"
@@ -199,7 +199,7 @@ void system_init(void)
     stm32_enable_caches();
 
     /* Initialize system clocks */
-    stm_clock_init();
+    echoplayer_clock_init();
 
     /* Enable systick early due to udelay() needed for FMC init */
     stm32_systick_enable();

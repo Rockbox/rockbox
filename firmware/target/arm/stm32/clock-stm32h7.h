@@ -37,21 +37,6 @@ struct stm32_clock
 };
 
 /*
- * Implemented by the target to initialize all oscillators,
- * system, CPU, and bus clocks that need to be enabled from
- * early boot.
- */
-void stm_target_clock_init(void) INIT_ATTR;
-
-/*
- * Called by system_init() to setup target clocks.
- */
-static inline void stm_clock_init(void)
-{
-    stm_target_clock_init();
-}
-
-/*
  * Enables a clock by setting its enable bits in the RCC.
  */
 static inline void stm32_clock_enable(const struct stm32_clock *clk)

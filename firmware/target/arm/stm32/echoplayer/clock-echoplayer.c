@@ -32,14 +32,14 @@
 /* Flag to use VOS0 */
 #define STM32H743_USE_VOS0      (CPU_FREQ > 400000000)
 
-static void init_hse(void)
+INIT_ATTR static void init_hse(void)
 {
     reg_writef(RCC_CR, HSEON(1));
 
     while (!reg_readf(RCC_CR, HSERDY));
 }
 
-static void init_pll(void)
+INIT_ATTR static void init_pll(void)
 {
     /* For simplicity, PLL parameters are hardcoded */
     _Static_assert(STM32_HSE_FREQ == 24000000,
@@ -97,7 +97,7 @@ static void init_pll(void)
     while (!reg_readf(RCC_CR, PLL3RDY));
 }
 
-static void init_vos(void)
+INIT_ATTR static void init_vos(void)
 {
     reg_writef(PWR_D3CR, VOS_V(VOS1));
     while (!reg_readf(PWR_D3CR, VOSRDY));
@@ -114,7 +114,7 @@ static void init_vos(void)
     }
 }
 
-static void init_system_clock(void)
+INIT_ATTR static void init_system_clock(void)
 {
     /* Enable HCLK /2 divider (CPU is at 480 MHz, HCLK limit is 240 MHz) */
     reg_writef(RCC_D1CFGR, HPRE(8));
@@ -134,7 +134,7 @@ static void init_system_clock(void)
     while (reg_readf(FLASH_ACR, LATENCY) != 4);
 }
 
-static void init_lse(void)
+INIT_ATTR static void init_lse(void)
 {
     /*
      * Skip if LSE and RTC are already enabled.
@@ -161,7 +161,7 @@ static void init_lse(void)
     reg_writef(PWR_CR1, DBP(0));
 }
 
-static void init_periph_clock(void)
+INIT_ATTR static void init_periph_clock(void)
 {
     reg_writef(RCC_D1CCIPR, SDMMCSEL_V(PLL1Q));
     reg_writef(RCC_D2CCIP1R, SPI45SEL_V(HSE));
@@ -170,7 +170,7 @@ static void init_periph_clock(void)
     reg_writef(RCC_AHB3LPENR, AXISRAMEN(1));
 }
 
-void stm_target_clock_init(void)
+void echoplayer_clock_init(void)
 {
     init_hse();
     init_pll();
