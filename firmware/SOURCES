@@ -2024,7 +2024,6 @@ target/arm/rk27xx/ihifi2/audio-ihifi800.c
 target/arm/stm32/crt0-stm32h7.S
 target/arm/stm32/vectors-stm32h7.S
 target/arm/stm32/adc-stm32h7.c
-target/arm/stm32/clock-stm32h7.c
 target/arm/stm32/debug-stm32h7.c
 target/arm/stm32/gpio-stm32h7.c
 target/arm/stm32/i2c-stm32h7.c

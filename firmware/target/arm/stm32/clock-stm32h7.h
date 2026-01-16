@@ -25,18 +25,15 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-enum stm_clock
+struct stm32_clock
 {
-    STM_CLOCK_SPI1_KER,
-    STM_CLOCK_SPI2_KER,
-    STM_CLOCK_SPI3_KER,
-    STM_CLOCK_SPI4_KER,
-    STM_CLOCK_SPI5_KER,
-    STM_CLOCK_SPI6_KER,
-    STM_CLOCK_LTDC_KER,
-    STM_CLOCK_SDMMC1_KER,
-    STM_CLOCK_SDMMC2_KER,
-    STM_NUM_CLOCKS,
+    uint32_t frequency;
+
+    uint32_t en_reg;
+    uint32_t en_bit;
+
+    uint32_t lpen_reg;
+    uint32_t lpen_bit;
 };
 
 /*
@@ -47,43 +44,43 @@ enum stm_clock
 void stm_target_clock_init(void) INIT_ATTR;
 
 /*
- * Callback to be implemented by the target when the hardware
- * clock needs to be turned on or off. Clocks are internally
- * reference counted so only the first / last user will change
- * the hardware state.
- *
- * Only clocks that are actually used need to be implemented,
- * and unless otherwise noted it is allowed for enable/disable
- * to be a no-op if the clock is always enabled.
+ * Called by system_init() to setup target clocks.
  */
-void stm_target_clock_enable(enum stm_clock clock, bool enable);
+static inline void stm_clock_init(void)
+{
+    stm_target_clock_init();
+}
 
 /*
- * Callback to return a specific clock's frequency. For most
- * peripherals the frequency must be known at initialization
- * and not change afterwards; see peripheral drivers for the
- * details, as their exact requirements may vary.
+ * Enables a clock by setting its enable bits in the RCC.
  */
-size_t stm_target_clock_get_frequency(enum stm_clock clock);
+static inline void stm32_clock_enable(const struct stm32_clock *clk)
+{
+    if (clk->en_reg)
+        *(volatile uint32_t *)clk->en_reg |= clk->en_bit;
+
+    if (clk->lpen_reg)
+        *(volatile uint32_t *)clk->lpen_reg |= clk->lpen_bit;
+}
 
 /*
- * Called from system_init(). Sets up internal book-keeping
- * and then calls stm_target_clock_init().
+ * Disables a clock in the RCC.
  */
-void stm_clock_init(void) INIT_ATTR;
+static inline void stm32_clock_disable(const struct stm32_clock *clk)
+{
+    if (clk->en_reg)
+        *(volatile uint32_t *)clk->en_reg &= ~clk->en_bit;
 
-/*
- * Enable or disable a clock. Not safe to call from an IRQ handler.
- */
-void stm_clock_enable(enum stm_clock clock);
-void stm_clock_disable(enum stm_clock clock);
+    if (clk->lpen_reg)
+        *(volatile uint32_t *)clk->lpen_reg &= ~clk->lpen_bit;
+}
 
 /*
  * Get a clock's frequency in Hz.
  */
-static inline size_t stm_clock_get_frequency(enum stm_clock clock)
+static inline uint32_t stm32_clock_get_frequency(const struct stm32_clock *clk)
 {
-    return stm_target_clock_get_frequency(clock);
+    return clk->frequency;
 }
 
 #endif /* __CLOCK_STM32H7_H__ */

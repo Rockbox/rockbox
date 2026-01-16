@@ -58,7 +58,7 @@ struct stm_spi_config
      * such the kernel clock should not be changed after
      * the SPI peripheral is initialized.
      */
-    enum stm_clock clock;
+    const struct stm32_clock *clock;
     size_t freq;
 
     enum stm_spi_mode mode;
@@ -77,7 +77,7 @@ struct stm_spi_config
 struct stm_spi
 {
     uint32_t regs;
-    enum stm_clock clock;
+    const struct stm32_clock *clock;
     enum stm_spi_mode mode;
     stm_spi_set_cs_t set_cs;
     uint32_t frame_size;

@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "sdmmc_host.h"
+#include "clock-echoplayer.h"
 #include "sdmmc-stm32h7.h"
 #include "gpio-stm32h7.h"
 #include "nvic-arm.h"
@@ -95,7 +96,7 @@ static struct sdmmc_poll sdcard_poll;
 void sdmmc_host_target_init(void)
 {
     /* Initialize controller */
-    stm32h7_sdmmc_init(&sdmmc1_ctl, ITA_SDMMC1, STM_CLOCK_SDMMC1_KER,
+    stm32h7_sdmmc_init(&sdmmc1_ctl, ITA_SDMMC1, &sdmmc1_ker_clock,
                        stm32h7_reset_sdmmc1, NULL);
     nvic_enable_irq(NVIC_IRQN_SDMMC1);
 

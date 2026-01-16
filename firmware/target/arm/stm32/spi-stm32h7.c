@@ -37,7 +37,7 @@ static void stm_spi_enable(struct stm_spi *spi, bool hd_tx, size_t size)
     if (tsize > TSIZE_MAX)
         panicf("%s: tsize > TSIZE_MAX", __func__);
 
-    stm_clock_enable(spi->clock);
+    stm32_clock_enable(spi->clock);
 
     if (spi->set_cs)
         spi->set_cs(spi, true);
@@ -59,7 +59,7 @@ static void stm_spi_disable(struct stm_spi *spi)
     if (spi->set_cs)
         spi->set_cs(spi, false);
 
-    stm_clock_disable(spi->clock);
+    stm32_clock_disable(spi->clock);
 }
 
 static uint32_t stm_spi_pack(const void **bufp, size_t *sizep)
@@ -110,7 +110,7 @@ static void stm_spi_unpack(void **bufp, size_t *sizep, uint32_t data)
 
 static uint32_t stm_spi_calc_mbr(const struct stm_spi_config *config)
 {
-    size_t ker_freq = stm_clock_get_frequency(config->clock);
+    size_t ker_freq = stm32_clock_get_frequency(config->clock);
     for (uint32_t mbr = 0; mbr <= 7; mbr++)
     {
         if (ker_freq / (2 << mbr) <= config->freq)
@@ -162,7 +162,7 @@ void stm_spi_init(struct stm_spi *spi,
         ftlevel *= 2;
     }
 
-    stm_clock_enable(spi->clock);
+    stm32_clock_enable(spi->clock);
 
     /* TODO: allow setting MBR here */
     reg_writelf(spi->regs, SPI_CFG1,
@@ -191,7 +191,7 @@ void stm_spi_init(struct stm_spi *spi,
                 MIDI(0),
                 MSSI(0));
 
-    stm_clock_disable(spi->clock);
+    stm32_clock_disable(spi->clock);
 }
 
 int stm_spi_xfer(struct stm_spi *spi, size_t size,

@@ -31,7 +31,7 @@ struct stm32h7_sdmmc_controller
     uint32_t regs;
 
     /* SDMMC kernel clock */
-    enum stm_clock clock;
+    const struct stm32_clock *clock;
 
     /* Callback to reset SDMMC instance in RCC */
     void (*reset_sdmmc)(void);
@@ -59,7 +59,7 @@ void stm32h7_reset_sdmmc1(void);
 
 void stm32h7_sdmmc_init(struct stm32h7_sdmmc_controller *controller,
                         uint32_t instance,
-                        enum stm_clock clock,
+                        const struct stm32_clock *clock,
                         void (*reset_sdmmc)(void),
                         void (*vcc_enable)(bool));
 

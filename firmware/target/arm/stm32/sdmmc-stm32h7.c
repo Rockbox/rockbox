@@ -80,7 +80,7 @@ void stm32h7_reset_sdmmc1(void)
 
 void stm32h7_sdmmc_init(struct stm32h7_sdmmc_controller *ctl,
                         uint32_t instance,
-                        enum stm_clock clock,
+                        const struct stm32_clock *clock,
                         void (*reset_sdmmc)(void),
                         void (*vcc_enable)(bool))
 {
@@ -109,7 +109,7 @@ void stm32h7_sdmmc_set_power_enabled(void *controller, bool enabled)
         sleep(1);
 
         /* Bus clock is now needed, so enable kernel clock */
-        stm_clock_enable(ctl->clock);
+        stm32_clock_enable(ctl->clock);
 
         /* Configure bus parameters */
         stm32h7_sdmmc_set_bus_width(ctl, SDMMC_BUS_WIDTH_1BIT);
@@ -136,7 +136,7 @@ void stm32h7_sdmmc_set_power_enabled(void *controller, bool enabled)
          * and the bus is powered down; some quick testing shows this
          * seems to be true.
          */
-        stm_clock_disable(ctl->clock);
+        stm32_clock_disable(ctl->clock);
 
         /* Disable VCC */
         if (ctl->vcc_enable)
@@ -174,7 +174,7 @@ void stm32h7_sdmmc_set_bus_clock(void *controller, uint32_t clock)
     if (stm32h7_sdmmc_is_powered_off(ctl))
         return;
 
-    size_t ker_freq = stm_clock_get_frequency(ctl->clock);
+    size_t ker_freq = stm32_clock_get_frequency(ctl->clock);
     size_t bus_freq = get_sdmmc_bus_freq(clock);
     if (!bus_freq)
         panicf("%s", __func__);

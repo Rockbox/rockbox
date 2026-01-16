@@ -180,43 +180,26 @@ void stm_target_clock_init(void)
     init_periph_clock();
 }
 
-void stm_target_clock_enable(enum stm_clock clock, bool enable)
-{
-    switch (clock)
-    {
-    case STM_CLOCK_SPI5_KER:
-        reg_writef(RCC_APB2ENR, SPI5EN(enable));
-        reg_writef(RCC_APB2LPENR, SPI5EN(enable));
-        break;
+const struct stm32_clock sdmmc1_ker_clock = {
+    .frequency = PLL1Q_FREQ,
+    .en_reg = ITA_RCC_AHB3ENR,
+    .en_bit = BM_RCC_AHB3ENR_SDMMC1EN,
+    .lpen_reg = ITA_RCC_AHB3LPENR,
+    .lpen_bit = BM_RCC_AHB3LPENR_SDMMC1EN,
+};
 
-    case STM_CLOCK_LTDC_KER:
-        reg_writef(RCC_APB3ENR, LTDCEN(enable));
-        reg_writef(RCC_APB3LPENR, LTDCEN(enable));
-        break;
+const struct stm32_clock ltdc_ker_clock = {
+    .frequency = LCD_DOTCLOCK_FREQ,
+    .en_reg = ITA_RCC_APB3ENR,
+    .en_bit = BM_RCC_APB3ENR_LTDCEN,
+    .lpen_reg = ITA_RCC_APB3LPENR,
+    .lpen_bit = BM_RCC_APB3ENR_LTDCEN,
+};
 
-    case STM_CLOCK_SDMMC1_KER:
-        reg_writef(RCC_AHB3ENR, SDMMC1EN(enable));
-        reg_writef(RCC_AHB3LPENR, SDMMC1EN(enable));
-        break;
-
-    default:
-        panicf("%s: unsupported clock %d", __func__, (int)clock);
-        break;
-    }
-}
-
-size_t stm_target_clock_get_frequency(enum stm_clock clock)
-{
-    switch (clock)
-    {
-    case STM_CLOCK_SPI5_KER:
-        return STM32_HSE_FREQ;
-
-    case STM_CLOCK_SDMMC1_KER:
-        return PLL1Q_FREQ;
-
-    default:
-        panicf("%s: unsupported clock %d", __func__, (int)clock);
-        return 0;
-    }
-}
+const struct stm32_clock spi5_ker_clock = {
+    .frequency = STM32_HSE_FREQ,
+    .en_reg = ITA_RCC_APB2ENR,
+    .en_bit = BM_RCC_APB2ENR_SPI5EN,
+    .lpen_reg = ITA_RCC_APB2LPENR,
+    .lpen_bit = BM_RCC_APB2ENR_SPI5EN,
+};
