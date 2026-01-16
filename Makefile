@@ -5,20 +5,22 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-# Root Makefile for Docker-based builds
+# Root Makefile for Rockbox builds
 #
 # Usage:
 #   make              - Show help
-#   make build        - Build Rockbox for iPod Video (via Docker)
+#   make build        - Build Rockbox firmware for iPod Video (via Docker)
+#   make rbutil       - Build Rockbox Utility for macOS (native)
 #   make clean        - Remove build artifacts
 
-.PHONY: help build clean
+.PHONY: help build rbutil clean
 
 help:
-	@echo "Rockbox Docker Build"
+	@echo "Rockbox Build System"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make build   - Build Rockbox for iPod Video 5.5G (via Docker)"
+	@echo "  make build   - Build Rockbox firmware for iPod Video 5.5G (via Docker)"
+	@echo "  make rbutil  - Build Rockbox Utility for macOS Apple Silicon (native)"
 	@echo "  make clean   - Remove build artifacts from output/"
 	@echo ""
 	@echo "Artifacts are placed in output/"
@@ -28,5 +30,9 @@ help:
 build:
 	./tools/docker_ipodvideo/build.sh build
 
+rbutil:
+	./utils/rbutilqt/macos/build.sh build
+
 clean:
 	./tools/docker_ipodvideo/build.sh clean
+	./utils/rbutilqt/macos/build.sh clean

@@ -44,6 +44,13 @@ make clean   # Remove output
 ```
 Artifacts are placed in `output/` (rockbox.ipod and rockbox.zip).
 
+### Rockbox Utility (macOS)
+Build the graphical installer/maintenance tool for macOS Apple Silicon:
+```bash
+make rbutil  # Build RockboxUtility.app
+```
+Requires Homebrew with `cmake` and `qt@6` installed. App bundle is placed in `build-rbutil/rbutilqt/`.
+
 ## Testing
 
 There is no formal unit test framework. Testing is done through:
