@@ -40,10 +40,6 @@ void stm32_systick_set_cpu_freq(uint32_t freq);
 /* Enable/disable debug clock domain during sleep mode. */
 void system_debug_enable(bool enable);
 
-/* Implemented by the target -- can be a no-op if not needed */
-void gpio_init(void) INIT_ATTR;
-void fmc_init(void) INIT_ATTR;
-
 /* Busy loop delay based on systick */
 void udelay(uint32_t us);
 

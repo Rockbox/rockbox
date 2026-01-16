@@ -49,9 +49,6 @@
 static uint32_t systick_per_ms = CPUFREQ_TO_SYSTICK_PER_MS(CPUFREQ_INITIAL);
 static uint32_t systick_interval_in_ms = SYSTICK_INTERVAL_INITIAL;
 
-/* Base address of vector table */
-extern char __vectors_arm[];
-
 void stm32_enable_caches(void)
 {
     __discard_idcache();
@@ -99,30 +96,6 @@ void stm32_systick_enable(void)
 void stm32_systick_disable(void)
 {
     reg_writef(CM_SYSTICK_CSR, ENABLE(0), TICKINT(0));
-}
-
-void system_init(void)
-{
-#if defined(DEBUG)
-    system_debug_enable(true);
-#endif
-
-    /* Ensure IRQs are disabled and set vector table address */
-    disable_irq();
-    reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
-
-    /* Enable CPU caches */
-    stm32_enable_caches();
-
-    /* Initialize system clocks */
-    stm_clock_init();
-
-    /* Initialize systick */
-    stm32_systick_enable();
-
-    /* Call target-specific initialization */
-    gpio_init();
-    fmc_init();
 }
 
 void system_debug_enable(bool enable)
@@ -183,15 +156,6 @@ void udelay(uint32_t us)
         delay_ticks -= diff;
         start = value;
     }
-}
-
-void system_exception_wait(void)
-{
-#if defined(ECHO_R1)
-    while (button_read_device() != (BUTTON_POWER | BUTTON_START));
-#else
-    while (1);
-#endif
 }
 
 int system_memory_guard(int newmode)

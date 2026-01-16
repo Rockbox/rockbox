@@ -19,9 +19,12 @@
  *
  ****************************************************************************/
 #include "system.h"
+#include "button.h"
+#include "clock-stm32h7.h"
 #include "gpio-stm32h7.h"
-#include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/fmc.h"
+#include "regs/stm32h743/rcc.h"
+#include "regs/cortex-m/cm_scb.h"
 
 #define F_INPUT      GPIOF_INPUT(GPIO_PULL_DISABLED)
 #define F_INPUT_PU   GPIOF_INPUT(GPIO_PULL_UP)
@@ -117,7 +120,7 @@ static const struct pingroup_setting pingroups[] = {
     STM_DEFPINS(GPIO_I, 0x06e7, F_LCD_AF14),
 };
 
-void gpio_init(void)
+INIT_ATTR static void gpio_init(void)
 {
     /* Enable clocks for all used GPIO banks */
     reg_writef(RCC_AHB4ENR,
@@ -135,7 +138,7 @@ void gpio_init(void)
                        pingroups, ARRAYLEN(pingroups));
 }
 
-void fmc_init(void)
+INIT_ATTR static void fmc_init(void)
 {
     /* configure clock */
     reg_writef(RCC_D1CCIPR, FMCSEL_V(AHB));
@@ -180,4 +183,33 @@ void fmc_init(void)
      * -> 937 tCK per row, minus 20 tCK margin from datasheet
      */
     reg_writef(FMC_SDRTR, REIE(0), COUNT(917), CRE(0));
+}
+
+void system_init(void)
+{
+    /* Set vector table address */
+    extern char __vectors_arm[];
+    reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
+
+#if defined(DEBUG)
+    system_debug_enable(true);
+#endif
+
+    /* Enable CPU cache */
+    stm32_enable_caches();
+
+    /* Initialize system clocks */
+    stm_clock_init();
+
+    /* Enable systick early due to udelay() needed for FMC init */
+    stm32_systick_enable();
+
+    /* Configure GPIOs and start FMC */
+    gpio_init();
+    fmc_init();
+}
+
+void system_exception_wait(void)
+{
+    while (button_read_device() != (BUTTON_POWER | BUTTON_START));
 }
