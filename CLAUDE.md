@@ -44,6 +44,18 @@ make clean   # Remove output
 ```
 Artifacts are placed in `output/` (rockbox.ipod and rockbox.zip).
 
+### Install to iPod
+To install Rockbox onto a connected iPod:
+```bash
+make build        # Build firmware first
+sudo make install # Install to connected iPod
+```
+The install script will:
+1. Detect the connected iPod
+2. Install the bootloader (if not already installed)
+3. Copy firmware files to the iPod
+4. Eject the iPod when complete
+
 ### Rockbox Utility (macOS)
 Build the graphical installer/maintenance tool for macOS Apple Silicon:
 ```bash
