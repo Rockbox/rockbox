@@ -141,8 +141,8 @@
 #define BATTERY_CAPACITY_DEFAULT  400  /* only for variable initialisation */
 #define BATTERY_CAPACITY_DEFAULT_THIN  400 /* default battery capacity for the
                                               30GB model */
-#define BATTERY_CAPACITY_DEFAULT_THICK 600 /* default battery capacity for the
-                                              60/80GB model */
+#define BATTERY_CAPACITY_DEFAULT_THICK 2000 /* default battery capacity for the
+                                               60/80GB model (modded w/ 2000mAh) */
 #define BATTERY_CAPACITY_MIN      300 /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX     3000 /* max. capacity selectable --
                                          3rd party batteries go this high */
