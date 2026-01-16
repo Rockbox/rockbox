@@ -69,7 +69,6 @@ static const struct gpio_setting gpios[] = {
     STM_DEFGPIO(GPIO_BUTTON_VOL_DOWN,   F_INPUT_PU),
     STM_DEFGPIO(GPIO_BUTTON_POWER,      F_INPUT_PD),
     STM_DEFGPIO(GPIO_BUTTON_HOLD,       F_INPUT_PU),
-    STM_DEFGPIO(GPIO_CPU_POWER_ON,      F_OUT_LS(1)), /* active high */
     STM_DEFGPIO(GPIO_POWER_1V8,         F_OUT_LS(0)), /* active high */
     STM_DEFGPIO(GPIO_CODEC_AVDD_EN,     F_OUT_LS(1)), /* active low */
     STM_DEFGPIO(GPIO_CODEC_DVDD_EN,     F_OUT_LS(1)), /* active low */
@@ -123,24 +122,6 @@ static const struct pingroup_setting pingroups[] = {
     STM_DEFPINS(GPIO_I, 0x06e7, F_LCD_AF14),
 };
 
-INIT_ATTR static void gpio_init(void)
-{
-    /* Enable clocks for all used GPIO banks */
-    reg_writef(RCC_AHB4ENR,
-               GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
-               GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
-
-    /*
-     * NOTE: I think it's possible to disable clocks for the banks which
-     * we don't need to access at runtime because these are only clocking
-     * register access. Probably a micro-optimization but it supposedly
-     * does save a few uA/MHz.
-     */
-
-    gpio_configure_all(gpios, ARRAYLEN(gpios),
-                       pingroups, ARRAYLEN(pingroups));
-}
-
 INIT_ATTR static void fmc_init(void)
 {
     /* configure clock */
@@ -190,6 +171,25 @@ INIT_ATTR static void fmc_init(void)
 
 void system_init(void)
 {
+    /* Enable clocks for all used GPIO banks */
+    reg_writef(RCC_AHB4ENR,
+               GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
+               GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
+
+    /*
+     * NOTE: I think it's possible to disable clocks for the banks which
+     * we don't need to access at runtime because these are only clocking
+     * register access. Probably a micro-optimization but it supposedly
+     * does save a few uA/MHz.
+     */
+
+    /*
+     * Set cpu_power_on high as early as possible to
+     * ensure we won't brown out if the power button
+     * isn't pressed.
+     */
+    gpio_configure_single(GPIO_CPU_POWER_ON, F_OUT_LS(1));
+
     /* Set vector table address */
     extern char __vectors_arm[];
     reg_var(CM_SCB_VTOR) = (uint32_t)__vectors_arm;
@@ -208,7 +208,8 @@ void system_init(void)
     stm32_systick_enable();
 
     /* Configure GPIOs and start FMC */
-    gpio_init();
+    gpio_configure_all(gpios, ARRAYLEN(gpios),
+                       pingroups, ARRAYLEN(pingroups));
     fmc_init();
 
     /* Disable RTC_OUT pin */
