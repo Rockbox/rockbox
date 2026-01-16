@@ -465,7 +465,12 @@ static const char graphic_numeric[] = "graphic,numeric";
  * also applies to the database browser so it makes sense to support
  * larger maximums.
  */
-#if MEMORYSIZE >= 16
+#if MEMORYSIZE >= 64
+/* Large RAM devices can handle very large directories */
+# define MAX_FILES_IN_DIR_DEFAULT   10000
+# define MAX_FILES_IN_DIR_MAX       100000
+# define MAX_FILES_IN_DIR_STEP      1000
+#elif MEMORYSIZE >= 16
 # define MAX_FILES_IN_DIR_DEFAULT   5000
 # define MAX_FILES_IN_DIR_MAX       100000
 # define MAX_FILES_IN_DIR_STEP      1000
@@ -1236,7 +1241,10 @@ const struct settings_list settings[] = {
                 set_poweroff_timeout),
     INT_SETTING(F_BANFROMQS, max_files_in_playlist,
                 LANG_MAX_FILES_IN_PLAYLIST,
-#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022
+#if MEMORYSIZE >= 64
+                  /* Large RAM devices (64MB) can handle much larger playlists */
+                  32000,
+#elif CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020 || CONFIG_CPU == PP5022
                   /** Slow CPU benefits greatly from building smaller playlists
                   On the iPod Mini 2nd gen, creating a playlist of 2000 entries takes around 10 seconds */
                   2000,
@@ -1245,7 +1253,7 @@ const struct settings_list settings[] = {
 #else
                   400,
 #endif
-                  "max files in playlist", UNIT_INT, 1000, 32000, 1000,
+                  "max files in playlist", UNIT_INT, 1000, 99000, 1000,
                   NULL, NULL, NULL),
     INT_SETTING(F_BANFROMQS, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
                 MAX_FILES_IN_DIR_DEFAULT, "max files in dir", UNIT_INT,

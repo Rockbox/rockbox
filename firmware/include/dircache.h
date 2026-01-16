@@ -49,7 +49,11 @@
 /* memory buffer constants that control allocation */
 #define DIRCACHE_RESERVE (1024*64)     /* 64 KB - new entry slack */
 #define DIRCACHE_MIN     (1024*1024*1) /* 1 MB - provision min size */
+#if MEMORYSIZE >= 64
+#define DIRCACHE_LIMIT   (1024*1024*16) /* 16 MB - for large storage devices */
+#else
 #define DIRCACHE_LIMIT   (1024*1024*6) /* 6 MB - provision max size */
+#endif
 
 /* make it easy to change serialnumber size without modifying anything else;
    32 bits allows 21845 builds before wrapping in a 6MB cache that is filled
