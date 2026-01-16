@@ -189,9 +189,7 @@ struct usb_transfer_completion_event_data
 void usb_init(void) INIT_ATTR;
 /* target must implement this to enable/disable the usb transceiver/core */
 void usb_enable(bool on);
-/* when one or more driver requires exclusive mode, this is called after all threads have acknowledged
- * exclusive mode and disk have been umounted; otherwise it is called immediately after host has
- * been detected */
+/* called after host has been detected */
 void usb_attach(void);
 /* enable usb detection monitoring; before this function is called, all usb
  * detection changes are ignored */
@@ -251,6 +249,11 @@ bool usb_driver_enabled(int driver);
 /* returns whether exclusive storage is available for USB */
 bool usb_exclusive_storage(void);
 #endif /* HAVE_USBSTACK */
+
+/* broadcast usb insertion event to enable exclusive storage */
+void usb_request_exclusive_storage(void);
+/* finish exclusive storage access if enabled and mount volumes */
+void usb_release_exclusive_storage(void);
 
 #ifdef USB_FIREWIRE_HANDLING
 bool firewire_detect(void);

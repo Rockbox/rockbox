@@ -544,16 +544,6 @@ bool usb_core_driver_enabled(int driver)
     return drivers[driver].enabled;
 }
 
-bool usb_core_any_exclusive_storage(void)
-{
-    int i;
-    for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i].enabled && drivers[i].needs_exclusive_storage)
-            return true;
-
-    return false;
-}
-
 #ifdef HAVE_HOTSWAP
 void usb_core_hotswap_event(int volume, bool inserted)
 {
@@ -874,14 +864,26 @@ static int usb_core_do_set_config(uint8_t new_config)
     usb_config = new_config;
     usb_state = usb_config == 0 ? ADDRESS : CONFIGURED;
 
+    bool require_exclusive = false;
+
     /* activate new config */
     if(usb_config != 0) {
         init_deinit_endpoints(usb_config - 1, true);
         for(int i = 0; i < USB_NUM_DRIVERS; i++) {
             if(is_active(drivers[i]) && drivers[i].init_connection != NULL) {
                 drivers[i].init_connection();
+                require_exclusive |= drivers[i].needs_exclusive_storage;
             }
         }
+    }
+
+    if(require_exclusive) {
+        if(!usb_exclusive_storage()) {
+            usb_release_exclusive_storage();
+            usb_request_exclusive_storage();
+        }
+    } else {
+        usb_release_exclusive_storage();
     }
 
     #ifdef HAVE_USB_CHARGING_ENABLE
