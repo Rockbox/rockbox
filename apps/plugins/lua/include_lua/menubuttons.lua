@@ -53,6 +53,7 @@ local button_t = {
     SELR = rb.actions.PLA_SELECT_REPEAT,
     UP = rb.actions.PLA_UP,
     UPR = rb.actions.PLA_UP_REPEAT,
+    NONE = rb.actions.NONE,
 }
 
 rb = oldrb
