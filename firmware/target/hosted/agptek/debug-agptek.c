@@ -86,7 +86,7 @@ bool dbg_hw_info(void)
 #else
         btn = button_read_device();
 #endif
-        lcd_putsf(0, line++, "btn: %d", btn);
+        lcd_putsf(0, line++, "btn: 0x%x", btn);
 
         lcd_update();
         sleep(HZ/16);
