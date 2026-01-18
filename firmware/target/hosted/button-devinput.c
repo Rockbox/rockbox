@@ -105,9 +105,10 @@ static enum
     TOUCHSCREEN_STATE_DOWN
 } _last_touch_state = TOUCHSCREEN_STATE_UNKNOWN;
 
-// XXX ... figure out what is standard.
+/* Do _NOT_ change this.  Unofficial Linux API */
+#define EVENT_VALUE_TOUCHSCREEN_RELEASE  -1
+/* This is only used as an arbitrary placeholder */
 #define EVENT_VALUE_TOUCHSCREEN_PRESS    1
-#define EVENT_VALUE_TOUCHSCREEN_RELEASE  0
 
 static int ts_enabled = 1;
 
