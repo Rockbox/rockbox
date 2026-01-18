@@ -215,8 +215,10 @@ void lcd_init_device(void)
     stm_spi_init(&spi, &spi_cfg);
     nvic_enable_irq(NVIC_IRQN_SPI5);
 
+#ifndef BOOTLOADER
     /* Enable LTDC and LCD controller */
     wake_lcd();
+#endif
 }
 
 bool lcd_active(void)
