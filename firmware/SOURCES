@@ -163,6 +163,7 @@ target/hosted/power-linux.c
 target/hosted/hiby/usb-hiby-gadget.c
 target/hosted/hiby/r3proii/button-r3proii.c
 target/hosted/hiby/r3proii/powermgmt-r3proii.c
+target/hosted/hiby/debug-hiby.c
 #ifndef BOOTLOADER
 target/hosted/hiby/r3proii/led-r3proii.c
 target/hosted/hiby/hibylinux_codec.c
@@ -173,6 +174,7 @@ target/hosted/hiby/hibylinux_codec.c
 target/hosted/hiby/usb-hiby-gadget.c
 target/hosted/hiby/r1/button-r1.c
 target/hosted/hiby/r1/powermgmt-r1.c
+target/hosted/hiby/debug-hiby.c
 #ifndef BOOTLOADER
 target/hosted/hiby/r1/led-r1.c
 target/hosted/hiby/hibylinux_codec.c

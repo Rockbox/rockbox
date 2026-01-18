@@ -107,9 +107,16 @@ static enum
 
 // XXX ... figure out what is standard.
 #define EVENT_VALUE_TOUCHSCREEN_PRESS    1
-#define EVENT_VALUE_TOUCHSCREEN_RELEASE -1
+#define EVENT_VALUE_TOUCHSCREEN_RELEASE  0
 
 static int ts_enabled = 1;
+
+void touchscreen_last_state(int *x, int *y, int *state)
+{
+    *x = _last_x;
+    *y = _last_y;
+    *state = _last_touch_state;
+}
 
 void touchscreen_enable_device(bool en)
 {

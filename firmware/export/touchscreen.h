@@ -72,4 +72,6 @@ void touchscreen_enable_device(bool en);
 bool touchscreen_is_enabled(void);
 #endif
 
+void touchscreen_last_state(int *x, int *y, int *state);
+
 #endif /* __TOUCHSCREEN_INCLUDE_H_ */

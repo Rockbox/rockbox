@@ -88,6 +88,14 @@ bool dbg_hw_info(void)
 #endif
         lcd_putsf(0, line++, "btn: 0x%x", btn);
 
+#ifdef HAVE_TOUCHSCREEN
+        int x;
+        int y;
+        int state;
+        touchscreen_last_state(&x, &y, &state);
+        lcd_putsf(0, line++, "touch: x %d y %d st %d", x, y, state);
+#endif
+
         lcd_update();
         sleep(HZ/16);
     }
