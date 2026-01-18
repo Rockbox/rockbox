@@ -31,6 +31,9 @@
 #include "regs/stm32h743/spi.h"
 #include "regs/stm32h743/ltdc.h"
 
+#define MS_TO_TICKS(x) \
+    (((x) + (1000 / HZ - 1)) / (1000 / HZ))
+
 /*
  * ILI9342C specifies 10 MHz max
  *
@@ -38,6 +41,14 @@
  * to enable RGB mode, but works fine to send graphics in SPI mode?
  */
 #define LCD_SPI_FREQ 12000000
+
+#define ili_cmd(cmd, ...) \
+    do { \
+        uint16_t arr[] = {cmd, __VA_ARGS__}; \
+        for (size_t i = 1; i < ARRAYLEN(arr); ++i) \
+            arr[i] |= 0x100; \
+        stm_spi_transmit(&spi, arr, sizeof(arr)); \
+    } while (0)
 
 struct stm_spi_config spi_cfg = {
     .instance = ITA_SPI5,
@@ -51,15 +62,16 @@ struct stm_spi_config spi_cfg = {
 
 struct stm_spi spi;
 
-#define ili_cmd(cmd, ...) \
-    do { \
-        uint16_t arr[] = {cmd, __VA_ARGS__}; \
-        for (size_t i = 1; i < ARRAYLEN(arr); ++i) \
-            arr[i] |= 0x100; \
-        stm_spi_transmit(&spi, arr, sizeof(arr)); \
-    } while (0)
+enum lcd_controller_state
+{
+    RESET,  /* Controller in hardware reset, LTDC disabled */
+    SLEEP,  /* Controller in sleep-in mode, LTDC disabled */
+    AWAKE,  /* Controller in sleep-out mode, LTDC enabled */
+};
 
-static void init_ltdc(void)
+static enum lcd_controller_state lcd_controller_state = RESET;
+
+static void enable_ltdc(void)
 {
     /* Enable LTDC clock */
     stm32_clock_enable(&ltdc_ker_clock);
@@ -101,63 +113,143 @@ static void init_ltdc(void)
     reg_writef(LTDC_GCR, LTDCEN(1));
 }
 
+static void disable_ltdc(void)
+{
+    reg_writef(LTDC_GCR, LTDCEN(0));
+
+    stm32_clock_disable(&ltdc_ker_clock);
+}
+
+/* TODO: thread safety, is a mutex needed here? */
+
+static void reset_lcd(void)
+{
+    if (lcd_controller_state != RESET)
+    {
+        if (lcd_controller_state == AWAKE)
+            disable_ltdc();
+
+        /* Must be >= 10 us to take effect */
+        gpio_set_level(GPIO_LCD_RESET, 0);
+        udelay(10);
+
+        lcd_controller_state = RESET;
+    }
+}
+
+static void sleep_lcd(void)
+{
+    if (lcd_controller_state == AWAKE)
+    {
+        /*
+         * Send sleep in command -- empirically this seems to
+         * require a delay of 10ms before disabling the LTDC.
+         * The clock output appears to be necessary to fully
+         * blank the screen before entering sleep mode.
+         *
+         * Sometimes there is an effect where the screen is
+         * only partly blanked and only later fully blanked,
+         * which goes away with a 20ms delay.
+         */
+        ili_cmd(0x10);
+        sleep(MS_TO_TICKS(20));
+
+        /* Disable LTDC */
+        disable_ltdc();
+
+        lcd_controller_state = SLEEP;
+    }
+}
+
+static void wake_lcd(void)
+{
+    if (lcd_controller_state == RESET)
+    {
+        /* Release reset line */
+        gpio_set_level(GPIO_LCD_RESET, 1);
+        sleep(MS_TO_TICKS(5));
+
+        /* Memory access control (X/Y invert, BGR panel) */
+        ili_cmd(0x36, 0xc8);
+
+        /* Pixel format set (18bpp for RGB bus, 16bpp for SPI bus) */
+        ili_cmd(0x3a, 0x65);
+
+        /* Send set EXTC command to allow configuring RGB interface */
+        ili_cmd(0xc8, 0xff, 0x93, 0x42);
+
+        /*
+         * Enable RGB interface transferring to internal GRAM.
+         *
+         * Direct to shift register mode doesn't work; for one, the
+         * framebuffer doesn't get transferred properly which might
+         * just be timing issues. Two, the display is horizontally
+         * flipped and there doesn't seem to be a way to change it
+         * in the shift register mode.
+         */
+        ili_cmd(0xb0, 0xc0);
+        ili_cmd(0xf6, 0x01, 0x00, 0x06);
+
+        /* Display ON */
+        ili_cmd(0x29);
+    }
+
+    if (lcd_controller_state != AWAKE)
+    {
+        /* Sync framebuffer & enable LTDC output */
+        commit_dcache();
+        enable_ltdc();
+
+        /* Sleep out command */
+        ili_cmd(0x11);
+        sleep(MS_TO_TICKS(5));
+
+        lcd_controller_state = AWAKE;
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    }
+}
+
 void lcd_init_device(void)
 {
     /* Configure SPI bus */
     stm_spi_init(&spi, &spi_cfg);
     nvic_enable_irq(NVIC_IRQN_SPI5);
 
-    /* Enable LCD controller */
-    init_ltdc();
-
-    /* Ensure controller is reset */
-    gpio_set_level(GPIO_LCD_RESET, 0);
-    sleep(12);
-
-    gpio_set_level(GPIO_LCD_RESET, 1);
-    sleep(12);
-
-    /* Sleep out */
-    ili_cmd(0x11);
-    sleep(12);
-
-    /* memory access control (X/Y invert, BGR panel) */
-    ili_cmd(0x36, 0xc8);
-
-    /* pixel format set (18bpp for RGB bus, 16bpp for SPI bus) */
-    ili_cmd(0x3a, 0x65);
-
-    /* send set EXTC command to allow configuring RGB interface */
-    ili_cmd(0xc8, 0xff, 0x93, 0x42);
-
-    /*
-     * Enable RGB interface transferring to internal GRAM.
-     *
-     * Direct to shift register mode doesn't work; for one, the
-     * framebuffer doesn't get transferred properly which might
-     * just be timing issues. Two, the display is horizontally
-     * flipped and there doesn't seem to be a way to change it
-     * in the shift register mode.
-     */
-    ili_cmd(0xb0, 0xc0);
-    ili_cmd(0xf6, 0x01, 0x00, 0x06);
-
-    /* display ON */
-    ili_cmd(0x29);
+    /* Enable LTDC and LCD controller */
+    wake_lcd();
 }
 
 bool lcd_active(void)
 {
-    return true;
+    return lcd_controller_state == AWAKE;
+}
+
+void lcd_enable(bool enable)
+{
+    if (enable)
+        wake_lcd();
+    else
+        sleep_lcd();
+}
+
+void lcd_shutdown(void)
+{
+    reset_lcd();
 }
 
 void lcd_update(void)
 {
+    if (!lcd_active())
+        return;
+
     commit_dcache();
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    if (!lcd_active())
+        return;
+
     if (x < 0)
         x = 0;
     else if (x >= LCD_WIDTH)
