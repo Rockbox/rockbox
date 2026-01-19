@@ -938,7 +938,7 @@ static int db_to_usb_audio_volume(int db, int numdecimals)
     return tmp;
 }
 
-#if defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF)
+#if defined(DEBUG) || (defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF))
 static const char *usb_audio_ac_ctl_req_str(uint8_t cmd)
 {
     switch(cmd)
