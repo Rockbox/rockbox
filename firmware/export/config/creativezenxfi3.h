@@ -1,3 +1,6 @@
+/* Pull in SoC-specific defines */
+#include "imx233-config.h"
+
 /*
  * This config file is for the Creative Zen X-Fi3
  */
