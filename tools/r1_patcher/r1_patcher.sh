@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Prerequisites:
+#sudo apt update && sudo apt install -y p7zip-full squashfs-tools genisoimage coreutils
+
 if [[ $# -ne 2 ]]; then
     echo 'usage: ./r1_patcher.sh r1.upt bootloader.r1' >&2
     exit 1
@@ -48,7 +51,8 @@ unsquashfs -f -d $workingdir_in/rootfs/extracted $workingdir_in/rootfs/rootfs.sq
 ################################################################################
 
 # copy 'bootloader'
-cp $2 $workingdir_in/rootfs/extracted/usr/bin/
+cp "$2" "$workingdir_in/rootfs/extracted/usr/bin/bootloader.r1"
+chmod 0755 "$workingdir_in/rootfs/extracted/usr/bin/bootloader.r1"
 
 # copy modified 'hibyplayer.sh' script
 cp hiby_player.sh $workingdir_in/rootfs/extracted/usr/bin/
@@ -58,10 +62,9 @@ chmod 0755 $workingdir_in/rootfs/extracted/usr/bin/hiby_player.sh
 ### rebuild
 ################################################################################
 
-mkdir "$workingdir_out/image_contents"
-mkdir "$workingdir_out/image_contents/ota_v0"
+mkdir -p "$workingdir_out/image_contents/ota_v0"
 
-mksquashfs $workingdir_in/rootfs/extracted $workingdir_out/rootfs.squashfs -comp lzo
+mksquashfs $workingdir_in/rootfs/extracted $workingdir_out/rootfs.squashfs -comp lzo -all-root
 
 cd "$workingdir_out/image_contents/ota_v0"
 
@@ -74,12 +77,11 @@ md5=$rootfs_md5
 
 ota_md5_rootfs="ota_md5_rootfs.squashfs.$md5"
 
-parts=`find . -name 'rootfs.squashfs.*'`
-for part in $parts; do
-	md5next=($(md5sum $part))
-	echo $md5next >> $ota_md5_rootfs
-	mv $part "$part.$md5"
-	md5=$md5next
+for part in $(ls rootfs.squashfs.[0-9]* | sort); do
+    md5next=($(md5sum $part))
+    echo $md5next >> $ota_md5_rootfs
+    mv $part "$part.$md5"
+    md5=$md5next
 done
 
 # xImage
@@ -91,12 +93,11 @@ md5=$ximage_md5
 
 ota_md5_xImage="ota_md5_xImage.$md5"
 
-parts=`find . -name 'xImage.*'`
-for part in $parts; do
-        md5next=($(md5sum $part))
-        echo $md5next >> $ota_md5_xImage
-        mv $part "$part.$md5"
-        md5=$md5next
+for part in $(ls xImage.[0-9]* | sort); do
+    md5next=($(md5sum $part))
+    echo $md5next >> $ota_md5_xImage
+    mv $part "$part.$md5"
+    md5=$md5next
 done
 
 # ota_update.in
