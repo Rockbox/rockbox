@@ -51,7 +51,6 @@
 
 /* Battery doesn't update its charging status, but the charger does. */
 #define POWER_DEV_NAME "mp2731-charger"
-#define BATTERY_DEV_NAME "mp2731-charger"
 
 /* Battery */
 #define BATTERY_TYPES_COUNT  1
