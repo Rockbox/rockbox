@@ -59,6 +59,45 @@ cp hiby_player.sh $workingdir_in/rootfs/extracted/usr/bin/
 chmod 0755 $workingdir_in/rootfs/extracted/usr/bin/hiby_player.sh
 
 ################################################################################
+### Rockbox Hotplug Logic
+################################################################################
+
+# 1. Create hotplug helper script
+cat << 'EOF' > $workingdir_in/rootfs/extracted/usr/bin/rb_hotplug.sh
+#!/bin/sh
+MNT_SD="/data/mnt/sd_0"
+MNT_USB="/data/mnt/usb"
+
+case "$MDEV" in
+    mmcblk*) MNT="$MNT_SD" ;;
+    sd*)     MNT="$MNT_USB" ;;
+    *)       exit 0 ;;
+esac
+
+case "$ACTION" in
+    add|"")
+        mkdir -p "$MNT"
+        mount -t auto -o flush,noatime "/dev/$MDEV" "$MNT"
+        ;;
+    remove)
+        umount -l "$MNT"
+        ;;
+esac
+EOF
+chmod 0755 $workingdir_in/rootfs/extracted/usr/bin/rb_hotplug.sh
+
+# 2. Check mdev.conf and append rules only if missing
+MDEV_CONF="$workingdir_in/rootfs/extracted/etc/mdev.conf"
+
+if ! grep -q "mmcblk" "$MDEV_CONF"; then
+    echo "mmcblk[0-9]p[0-9] 0:0 660 */usr/bin/rb_hotplug.sh" >> "$MDEV_CONF"
+fi
+
+if ! grep -q "sd\[a-z\]" "$MDEV_CONF"; then
+    echo "sd[a-z][0-9]      0:0 660 */usr/bin/rb_hotplug.sh" >> "$MDEV_CONF"
+fi
+
+################################################################################
 ### rebuild
 ################################################################################
 
