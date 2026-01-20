@@ -51,8 +51,8 @@ unsquashfs -f -d $workingdir_in/rootfs/extracted $workingdir_in/rootfs/rootfs.sq
 ################################################################################
 
 # copy 'bootloader'
-cp "$2" "$workingdir_in/rootfs/extracted/usr/bin/bootloader.r1"
-chmod 0755 "$workingdir_in/rootfs/extracted/usr/bin/bootloader.r1"
+cp "$2" "$workingdir_in/rootfs/extracted/usr/bin/bootloader.rb"
+chmod 0755 "$workingdir_in/rootfs/extracted/usr/bin/bootloader.rb"
 
 # copy modified 'hibyplayer.sh' script
 cp hiby_player.sh $workingdir_in/rootfs/extracted/usr/bin/
