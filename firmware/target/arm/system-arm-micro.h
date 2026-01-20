@@ -26,9 +26,6 @@
 #define IRQ_STATUS          0x01
 #define HIGHEST_IRQ_LEVEL   IRQ_DISABLED
 
-#define disable_irq_save() \
-    set_irq_level(IRQ_DISABLED)
-
 /* For compatibility with ARM classic */
 #define CPU_MODE_THREAD_CONTEXT 0
 
@@ -47,39 +44,51 @@
                   __func__, __mproc, __massert); })
 
 /* Core-level interrupt masking */
-
-static inline int set_irq_level(int primask)
-{
-    int oldvalue;
-
-    asm volatile ("mrs %0, primask\n"
-                  "msr primask, %1\n"
-                  : "=r"(oldvalue) : "r"(primask));
-
-    return oldvalue;
-}
-
-static inline void restore_irq(int primask)
-{
-    asm volatile ("msr primask, %0" :: "r"(primask));
-}
-
 static inline void enable_irq(void)
 {
-    asm volatile ("cpsie i");
+    asm volatile ("cpsie i" ::: "memory");
 }
 
 static inline void disable_irq(void)
 {
-    asm volatile ("cpsid i");
+    asm volatile ("cpsid i" ::: "memory");
+}
+
+static inline void restore_irq(int primask)
+{
+    asm volatile ("msr primask, %0" :: "r"(primask) : "memory");
+}
+
+static inline int get_irq_level(void)
+{
+    int primask;
+
+    asm volatile("mrs %0, primask" : "=r"(primask));
+
+    return primask;
+}
+
+static inline int disable_irq_save(void)
+{
+    int oldlevel = get_irq_level();
+
+    disable_irq();
+
+    return oldlevel;
+}
+
+static inline int set_irq_level(int primask)
+{
+    int oldvalue = get_irq_level();
+
+    restore_irq(primask);
+
+    return oldvalue;
 }
 
 static inline bool irq_enabled(void)
 {
-    int primask;
-    asm volatile ("mrs %0, primask" : "=r"(primask));
-
-    return !(primask & 1);
+    return get_irq_level() == IRQ_ENABLED;
 }
 
 static inline unsigned long get_interrupt_number(void)
