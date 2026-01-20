@@ -197,11 +197,6 @@ void usb_enable(bool on)
 
 void usb_attach(void)
 {
-#if defined(IPOD_VIDEO)
-    /* FIXME: Some iPod Video's need this 2nd call of usb_drv_init() to establish
-     * an USB connection. */
-    usb_drv_init();
-#endif
 }
 
 bool usb_plugged(void)
