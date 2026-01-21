@@ -121,7 +121,7 @@ void stm32h7_sdmmc_set_power_enabled(void *controller, bool enabled)
         udelay(200);
 
         /* Automatically stop clock when bus is not in use */
-        reg_writelf(ctl->regs, SDMMC_CLKCR, PWRSAV(1));
+        reg_writelf(ctl->regs, SDMMC_CLKCR, PWRSAV(1), HWFC_EN(1));
     }
     else
     {
