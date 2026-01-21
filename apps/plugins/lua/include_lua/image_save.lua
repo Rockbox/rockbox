@@ -188,8 +188,9 @@ do
         for i=1, #fbuffer do fbuffer[i] = _NIL end -- reuse table
 
         local imgdata = fbuffer
-        -- pad rows to a multiple of 4 bytes
-        local bytesleft = linebytes - (bytesperpixel * w)
+        -- pad rows to get even number of pixels
+        local pxleft = (linebytes - (bytesperpixel * w)) / bytesperpixel
+
         local t_data = {}
         local fs_bytes_E = s_bytesLE -- default save in Little Endian
 
@@ -198,7 +199,7 @@ do
         end
 
         -- Bitmap lines start at bottom unless biHeight is negative
-        for point in _points(img, 1, h, w + bytesleft, 1, 1, 1, true) do
+        for point in _points(img, 1, h, w + pxleft, 1, 1, 1, true) do
             imgdata[#imgdata + 1] = fs_bytes_E(bpp, point or 0)
 
             if #fbuffer >= 31 then -- buffered write, increase # for performance
