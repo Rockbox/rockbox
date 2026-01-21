@@ -273,27 +273,6 @@ int stm32h7_sdmmc_submit_command(void *controller,
         if (buff_size > MAX_DATA_LEN)
             panicf("%s: buffer too big", __func__);
 
-        /*
-         * IDMA on the SDMMC controller can't access the DTCM.
-         * This is only possible by bounce-buffering in one of
-         * the other memories accessible to IDMA, then using
-         * another DMA process to copy the resulting buffer to
-         * DTCM, which seems unnecessarily convoluted.
-         */
-        if ((uintptr_t)buff_addr >= STM32_DTCM_BASE &&
-            (uintptr_t)buff_addr < STM32_DTCM_BASE + STM32_DTCM_SIZE)
-            panicf("%s: buffer in DTCM not supported", __func__);
-
-        /*
-         * Must assign to a variable to prevent GCC from whining
-         * about 'limited range of data type', because the ITCM
-         * is mapped at address 0.
-         */
-        static const uintptr_t itcm_base = STM32_ITCM_BASE;
-        if ((uintptr_t)buff_addr >= itcm_base &&
-            (uintptr_t)buff_addr < itcm_base + STM32_ITCM_SIZE)
-            panicf("%s: buffer in ITCM not supported", __func__);
-
         /* Set block size */
         uint32_t dctrl = 0;
         uint32_t dblocksize = find_first_set_bit(cmd->block_len);
@@ -481,8 +460,12 @@ void stm32h7_sdmmc_irq_handler(struct stm32h7_sdmmc_controller *ctl)
                     ctl->cmd_error = SDMMC_STATUS_TIMEOUT;
                 else if (reg_vreadf(star, SDMMC_STAR, DCRCFAIL))
                     ctl->cmd_error = SDMMC_STATUS_INVALID_CRC;
-                else if (star & DATA_ERROR_BITS)
+                else if (reg_vreadf(star, SDMMC_STAR, DABORT))
                     ctl->cmd_error = SDMMC_STATUS_ERROR;
+                else if (reg_vreadf(star, SDMMC_STAR, IDMATE))
+                    panicf("sdmmc dma err: %08lx", reg_readl(ctl->regs, SDMMC_IDMABASE0R));
+                else if (star & DATA_ERROR_BITS)
+                    panicf("sdmmc data error: %08lx", star);
             }
 
             ctl->cmd_wait &= ~WAIT_DATA;
