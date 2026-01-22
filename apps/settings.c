@@ -80,6 +80,7 @@
 #endif
 
 #ifndef __PCTOOL__
+#include "open_plugin.h"
 struct user_settings global_settings;
 struct system_status global_status;
 static uint32_t user_settings_crc;
@@ -417,11 +418,13 @@ bool settings_load_config(const char* file, bool apply)
 
         if (!string_to_cfg(name, value, &theme_changed))
         {
+#ifndef __PCTOOL__
             /* if we are here then name was not a valid setting */
             if (!strcmp(name, "openplugin"))
             {
                 open_plugin_import(value);
             }
+#endif
         }
     } /* while(...) */
 
@@ -640,12 +643,13 @@ static bool settings_write_config(const char* filename, int options)
 
         fdprintf(fd,"%s: %s\r\n",setting->cfg_name,value);
     } /* for(...) */
-
+#ifndef __PCTOOL__
     if (options == SETTINGS_SAVE_ALL)
     {
         /* add openplugin entries to the open settings file */
         open_plugin_export(fd);
     }
+#endif
     close(fd);
     return true;
 }
