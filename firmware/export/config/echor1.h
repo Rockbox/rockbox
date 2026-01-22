@@ -89,9 +89,9 @@
 #define BATTERY_CAPACITY_MAX     1100
 #define BATTERY_CAPACITY_INC     0
 
-/* Multiboot */
-#define HAVE_BOOTDATA
-#define BOOT_REDIR "rockbox_main.echor1"
+/* TODO: Multiboot */
+//#define HAVE_BOOTDATA
+//#define BOOT_REDIR "rockbox_main.echor1"
 
 /* USB support */
 #ifndef SIMULATOR

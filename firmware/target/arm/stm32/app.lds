@@ -39,7 +39,6 @@ SECTIONS
     {
         loadaddress = .; /* only needed to keep ROLO happy */
 
-        KEEP(*(.bootdata))
         *(.init.text*)
         *(.text*)
     } > SRAM_AXI :sram_rx

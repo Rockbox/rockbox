@@ -19,17 +19,10 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "bootdata.h"
 #include "regs/stm32h743/pwr.h"
 
     .syntax unified
     .text
-
-#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
-    .section .bootdata
-
-put_boot_data_here
-#endif
 
     .section .init.text,"ax",%progbits
 
