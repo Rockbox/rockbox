@@ -27,6 +27,7 @@
 #include "splash.h"
 #include "lang.h"
 #include "filetypes.h"
+#include "language.h" /*lang_english_to_id*/
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -518,6 +519,88 @@ void open_plugin_cache_flush(void)
         op_entry->lang_id = LANG_PREVIOUS_SCREEN;
     }
     op_update_dat(op_entry, true);
+}
+
+static bool op_entry_read(int fd, int selected_item, off_t data_sz, struct open_plugin_entry_t *op_entry)
+{
+    op_clear_entry(op_entry);
+    return ((selected_item >= 0) && (fd >= 0) &&
+        (lseek(fd, selected_item  * op_entry_sz, SEEK_SET) >= 0) &&
+        (read(fd, op_entry, data_sz) == data_sz) && op_entry_checksum(op_entry) > 0);
+}
+
+void open_plugin_import(char *strdat)
+{
+    /* Note: Destroys strdat */
+    char *vect[5];
+    /* expected openplugin strdat: "englishid", "name", "path", "param" */
+
+    if (split_string(strdat, ',', vect, 5) == 4)
+    {
+        /* Space for 5 values so we will fail if excess arguments or too few */
+        for(int i = 0; i < 4; i++)
+        {
+            vect[i] = skip_whitespace(vect[i]);
+            int eos = ((int)strlen(vect[i]))-2;
+            /* Failure if string is not quoted */
+            if (vect[i][0] != '"' || eos < 0 || vect[i][eos + 1] != '"')
+            {
+                logf("%s[%d] error: quoted string expected\n", __func__, i);
+                return;
+            }
+            vect[i]++; /* skip first " */
+            vect[i][eos] = '\0'; /* skip other " */
+        }
+        char *key = vect[1];
+        int lang_id = lang_english_to_id(vect[0]);
+        if (lang_id >= 0)
+            key = ID2P(lang_id);
+        /* if key exists it will be overwritten */
+        open_plugin_add_path(key, vect[2], vect[3]);
+        return;
+    }
+    logf("%s error: importing entries", __func__);
+}
+
+void open_plugin_export(int cfg_fd)
+{
+    /* NOTE: assumes cfg_fd is valid */
+    char *lang_name;
+    int  fd;
+    int index = 0;
+
+    struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
+    /* if another entry is loaded; flush it to disk before we destroy it */
+    op_update_dat(op_entry, true);
+
+    fd = open(OPEN_PLUGIN_DAT, O_RDONLY, 0666);
+
+    if (fd < 0)
+    {
+        logf("%s error: opening %s", __func__, OPEN_PLUGIN_DAT);
+        return;  /* OPEN_PLUGIN_NOT_FOUND */
+    }
+    while (op_entry_read(fd, index++, op_entry_sz, op_entry))
+    {
+        /* don't save the LANG_OPEN_PLUGIN entry -- it is for internal use */
+        if (op_entry->lang_id == LANG_OPEN_PLUGIN)
+        {
+            continue;
+        }
+        if (op_entry->lang_id >=0)
+            lang_name = P2STR(ID2P(op_entry->lang_id));
+        else
+            lang_name = "[USER]"; /* needs to be an invalid lang string */
+
+        fdprintf(cfg_fd,"%s: \"%s\", \"%s\", \"%s\", \"%s\"\n",
+                 "openplugin", lang_name, op_entry->name, op_entry->path, op_entry->param);
+
+        logf("openplugin[%d]: \"%s\", \"%s\", \"%s\", \"%s\"\n lang id: %d hash: %x, csum: %x\n",
+                 index, lang_name, op_entry->name, op_entry->path, op_entry->param,
+                 op_entry->lang_id, op_entry->hash, op_entry->checksum);
+    }
+    close(fd);
+    logf("%s exported %d entries", __func__, index);
 }
 
 #endif /* ndef __PCTOOL__ */

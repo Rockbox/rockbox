@@ -84,6 +84,8 @@ int open_plugin_load_entry(const char *key);
 void open_plugin_browse(const char *key);
 int open_plugin_run(const char *key);
 void open_plugin_cache_flush(void); /* flush to disk */
+void open_plugin_import(char *strdat);
+void open_plugin_export(int cfg_fd);
 #endif
 
 #endif /*ndef __PCTOOL__ */

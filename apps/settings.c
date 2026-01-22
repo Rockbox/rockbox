@@ -293,11 +293,11 @@ bool copy_filename_setting(char *buf, size_t buflen, const char *input,
     return true;
 }
 
-void string_to_cfg(const char *name, char* value, bool *theme_changed)
+bool string_to_cfg(const char *name, char* value, bool *theme_changed)
 {
     const struct settings_list *setting = find_setting_by_cfgname(name);
     if (!setting)
-        return;
+        return false;
 
     uint32_t flags = setting->flags;
 
@@ -366,6 +366,7 @@ void string_to_cfg(const char *name, char* value, bool *theme_changed)
                 {
                     logf("Error: %s: Not Found! [%s]\r\n",
                                       setting->cfg_name, value);
+                    return false;
                 }
             }
         break;
@@ -394,6 +395,7 @@ void string_to_cfg(const char *name, char* value, bool *theme_changed)
         break;
     }
     }
+    return true;
 }
 
 bool settings_load_config(const char* file, bool apply)
@@ -412,7 +414,15 @@ bool settings_load_config(const char* file, bool apply)
         char *name, *value;
         if (!settings_parseline(line, &name, &value))
             continue;
-        string_to_cfg(name, value, &theme_changed);
+
+        if (!string_to_cfg(name, value, &theme_changed))
+        {
+            /* if we are here then name was not a valid setting */
+            if (!strcmp(name, "openplugin"))
+            {
+                open_plugin_import(value);
+            }
+        }
     } /* while(...) */
 
     close(fd);
@@ -630,6 +640,12 @@ static bool settings_write_config(const char* filename, int options)
 
         fdprintf(fd,"%s: %s\r\n",setting->cfg_name,value);
     } /* for(...) */
+
+    if (options == SETTINGS_SAVE_ALL)
+    {
+        /* add openplugin entries to the open settings file */
+        open_plugin_export(fd);
+    }
     close(fd);
     return true;
 }
