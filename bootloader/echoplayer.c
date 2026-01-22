@@ -41,6 +41,20 @@
 #define LOAD_SIZE           (2 * 1024 * 1024)
 #define LOAD_BUFFER_ADDR    (STM32_SDRAM1_BASE + SDRAM_SIZE - LOAD_SIZE)
 
+/* Values at GDB_MAGICx */
+#define GDB_MAGICVAL1   0x726f636b
+#define GDB_MAGICVAL2   0x424f4f54
+#define GDB_MAGICVAL3   0x6764626c
+#define GDB_MAGICVAL4   0x6f616455
+
+/* Addresses used by GDB boot protocol */
+#define GDB_MAGIC1      (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x00))
+#define GDB_MAGIC2      (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x04))
+#define GDB_MAGIC3      (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x08))
+#define GDB_MAGIC4      (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x0c))
+#define GDB_ELFADDR     (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x10))
+#define GDB_ELFSIZE     (*(volatile uint32_t*)(STM32_SRAM4_BASE + 0x14))
+
 /* Events for the monitor callback to signal the main thread */
 #define EV_POWER_PRESSED    MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0)
 #define EV_POWER_RELEASED   MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 1)
@@ -320,6 +334,35 @@ static void launch(void)
     launch_elf();
 }
 
+static bool handle_gdb_boot(void)
+{
+    /* Look for magic values that signal the GDB boot protocol */
+    bool gdb_boot = (GDB_MAGIC1 == GDB_MAGICVAL1 &&
+                     GDB_MAGIC2 == GDB_MAGICVAL2 &&
+                     GDB_MAGIC3 == GDB_MAGICVAL3 &&
+                     GDB_MAGIC4 == GDB_MAGICVAL4);
+
+    /* Clear them so they won't hang around on a system reset */
+    GDB_MAGIC1 = 0;
+    GDB_MAGIC2 = 0;
+    GDB_MAGIC3 = 0;
+    GDB_MAGIC4 = 0;
+
+    if (!gdb_boot)
+        return false;
+
+    /* "Call" GDB by entering breakpoint */
+    GDB_ELFADDR = 0;
+    GDB_ELFSIZE = 0;
+    asm volatile("bkpt");
+
+    /* Read location of the loaded binary */
+    elf_load_addr = (void *)GDB_ELFADDR;
+    elf_load_size = (size_t)GDB_ELFSIZE;
+
+    return true;
+}
+
 void main(void)
 {
     system_init();
@@ -348,6 +391,10 @@ void main(void)
      */
     filesystem_init();
     disk_mount_all();
+
+    /* GDB assisted boot takes precedence */
+    if (handle_gdb_boot())
+        launch_elf();
 
     if (echoplayer_boot_reason == ECHOPLAYER_BOOT_REASON_SW_REBOOT ||
         usb_detect() == USB_INSERTED)
