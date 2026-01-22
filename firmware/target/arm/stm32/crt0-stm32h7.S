@@ -52,9 +52,15 @@ reset_handler:
     b       crt0_start
 
 
-    .global start
-    .type start, function
+    .global crt0_start
+    .type crt0_start, function
 crt0_start:
+#ifdef BOOTLOADER
+    /*
+     * Initialize data/bss for bootloader
+     * (not needed on app since ELF loader takes care of it)
+     */
+
     /* Zero out BSS */
     ldr     a1, =_bssbegin
     ldr     a2, =_bssend
@@ -66,6 +72,7 @@ crt0_start:
     ldr     a2, =_dataend
     ldr     a3, =_datacopy
     bl      crt0_area_copy
+#endif
 
     /* Clear the main thread stack */
     ldr     a1, =stackbegin
@@ -96,6 +103,7 @@ crt0_start:
     b       main
 
 
+#ifdef BOOTLOADER
     .local crt0_area_copy
     .type crt0_area_copy, function
 /* crt0_area_copy(uint32_t *dst, uint32_t *dst_end, const void *src) */
@@ -105,7 +113,7 @@ crt0_area_copy:
     strhi   v1, [a1], #4
     bhi     crt0_area_copy
     bx      lr
-
+#endif
 
     .local crt0_area_clear
     .type crt0_area_clear, function
