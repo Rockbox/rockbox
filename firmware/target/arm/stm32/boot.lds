@@ -52,6 +52,11 @@ SECTIONS
         . += 0x2000;
         stackend = .;
     } > SRAM_AXI
+
+    .framebuffer (NOLOAD) :
+    {
+        *(.framebuffer);
+    } > SRAM_AXI
 }
 
 EXTERN(__vectors_arm);

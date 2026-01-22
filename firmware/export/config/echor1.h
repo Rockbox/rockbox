@@ -37,6 +37,7 @@
 #define HAVE_LCD_BITMAP
 #define HAVE_LCD_ENABLE
 #define HAVE_LCD_SHUTDOWN
+#define IRAM_LCDFRAMEBUFFER __attribute__((section(".framebuffer")))
 
 /* Backlight defines */
 #define HAVE_BACKLIGHT

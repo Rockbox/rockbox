@@ -7,9 +7,16 @@ STARTUP(target/arm/stm32/crt0-stm32h7.o)
 
 MEMORY
 {
-    DTCM  (rw)  : ORIGIN = STM32_DTCM_BASE,   LENGTH = STM32_DTCM_SIZE
-    ITCM  (rx)  : ORIGIN = STM32_ITCM_BASE,   LENGTH = STM32_ITCM_SIZE
-    SDRAM (rwx) : ORIGIN = STM32_SDRAM1_BASE, LENGTH = MEMORYSIZE * 1024 * 1024
+    DTCM     (rw)  : ORIGIN = STM32_DTCM_BASE,     LENGTH = STM32_DTCM_SIZE
+    ITCM     (rx)  : ORIGIN = STM32_ITCM_BASE,     LENGTH = STM32_ITCM_SIZE
+    SRAM_AXI (rw)  : ORIGIN = STM32_SRAM_AXI_BASE, LENGTH = STM32_SRAM_AXI_SIZE
+    SDRAM    (rwx) : ORIGIN = STM32_SDRAM1_BASE,   LENGTH = MEMORYSIZE * 1024 * 1024
+}
+
+PHDRS
+{
+    itcm PT_LOAD;
+    sdram PT_LOAD;
 }
 
 SECTIONS
@@ -19,7 +26,7 @@ SECTIONS
         KEEP(*(.vectors.arm));
         KEEP(*(.vectors.platform));
         *(.icode*);
-    } > ITCM
+    } > ITCM :itcm
 
     .stack (NOLOAD) : ALIGN(8)
     {
@@ -30,7 +37,12 @@ SECTIONS
         stackbegin = .;
         . += 0x2000;
         stackend = .;
-    } > DTCM
+    } > DTCM :NONE
+
+    .framebuffer (NOLOAD) :
+    {
+        *(.framebuffer);
+    } > SRAM_AXI :NONE
 
     .text :
     {
@@ -38,17 +50,17 @@ SECTIONS
 
         *(.init*);
         *(.text*);
-    } > SDRAM
+    } > SDRAM :sdram
 
     .rodata :
     {
         *(.rodata*);
-    } > SDRAM
+    } > SDRAM :sdram
 
     .data :
     {
         *(.data*);
-    } > SDRAM
+    } > SDRAM :sdram
 
     .bss (NOLOAD) :
     {
@@ -56,7 +68,7 @@ SECTIONS
         *(.bss*);
         *(COMMON);
         _bssend = .;
-    } > SDRAM
+    } > SDRAM :sdram
 
     audiobuffer = ALIGN(32);
     audiobufend = ORIGIN(SDRAM) + LENGTH(SDRAM) - CODEC_SIZE - PLUGIN_BUFFER_SIZE;
