@@ -29,6 +29,12 @@
 #include "regs/stm32h743/rtc.h"
 #include "regs/cortex-m/cm_scb.h"
 
+#ifdef BOOTLOADER
+# define BOOTLOADER_INIT 1
+#else
+# define BOOTLOADER_INIT 0
+#endif
+
 #define F_INPUT      GPIOF_INPUT(GPIO_PULL_DISABLED)
 #define F_INPUT_PU   GPIOF_INPUT(GPIO_PULL_UP)
 #define F_INPUT_PD   GPIOF_INPUT(GPIO_PULL_DOWN)
@@ -173,17 +179,20 @@ INIT_ATTR static void fmc_init(void)
 
 void system_init(void)
 {
-    /* Enable clocks for all used GPIO banks */
-    reg_writef(RCC_AHB4ENR,
-               GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
-               GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
+    if (BOOTLOADER_INIT)
+    {
+        /* Enable clocks for all used GPIO banks */
+        reg_writef(RCC_AHB4ENR,
+                   GPIOAEN(1), GPIOBEN(1), GPIOCEN(1), GPIODEN(1),
+                   GPIOEEN(1), GPIOFEN(1), GPIOGEN(1), GPIOHEN(1), GPIOIEN(1));
 
-    /*
-     * NOTE: I think it's possible to disable clocks for the banks which
-     * we don't need to access at runtime because these are only clocking
-     * register access. Probably a micro-optimization but it supposedly
-     * does save a few uA/MHz.
-     */
+        /*
+         * NOTE: I think it's possible to disable clocks for the banks which
+         * we don't need to access at runtime because these are only clocking
+         * register access. Probably a micro-optimization but it supposedly
+         * does save a few uA/MHz.
+         */
+    }
 
     /*
      * Set cpu_power_on high as early as possible to
@@ -200,36 +209,42 @@ void system_init(void)
     system_debug_enable(true);
 #endif
 
-    /* Enable CPU cache */
-    stm32_enable_caches();
+    if (BOOTLOADER_INIT)
+    {
+        /* Enable CPU cache */
+        stm32_enable_caches();
 
-    /* Initialize system clocks */
-    echoplayer_clock_init();
+        /* Initialize system clocks */
+        echoplayer_clock_init();
+    }
 
     /* Enable systick early due to udelay() needed for FMC init */
     stm32_systick_enable();
 
-    /* Configure GPIOs and start FMC */
-    gpio_configure_all(gpios, ARRAYLEN(gpios),
-                       pingroups, ARRAYLEN(pingroups));
-    fmc_init();
-
-    /* Read & clear reset source */
-    uint32_t rsr = reg_var(RCC_RSR);
-    reg_assignf(RCC_RSR, RMVF(1));
-
-    /*
-     * Determine boot reason -- SFTRST means a software reset
-     * occurred, which may be a reboot or a power off
-     */
-    if (reg_vreadf(rsr, RCC_RSR, SFTRSTF))
+    if (BOOTLOADER_INIT)
     {
-        reg_writef(RCC_APB4ENR, RTCAPBEN(1));
+        /* Configure GPIOs and start FMC */
+        gpio_configure_all(gpios, ARRAYLEN(gpios),
+                           pingroups, ARRAYLEN(pingroups));
+        fmc_init();
 
-        if (reg_readf(RTC_CR, WUTE))
-            echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_REBOOT;
-        else
-            echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_POWEROFF;
+        /* Read & clear reset source */
+        uint32_t rsr = reg_var(RCC_RSR);
+        reg_assignf(RCC_RSR, RMVF(1));
+
+        /*
+         * Determine boot reason -- SFTRST means a software reset
+         * occurred, which may be a reboot or a power off
+         */
+        if (reg_vreadf(rsr, RCC_RSR, SFTRSTF))
+        {
+            reg_writef(RCC_APB4ENR, RTCAPBEN(1));
+
+            if (reg_readf(RTC_CR, WUTE))
+                echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_REBOOT;
+            else
+                echoplayer_boot_reason = ECHOPLAYER_BOOT_REASON_SW_POWEROFF;
+        }
     }
 
     /* Disable RTC_OUT pin */
