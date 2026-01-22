@@ -1,0 +1,81 @@
+# Build artifacts
+build*/
+output/
+*.o
+*.a
+*.elf
+*.map
+*.rock
+*.zip
+
+# Generated files
+autoconf.h
+rbversion.h
+*.dep
+*.d
+
+# Documentation (large, rarely needed)
+docs/
+manual/
+
+# Fonts and graphics (binary)
+fonts/
+icons/
+wps/
+themes/
+backdrop/
+*.bmp
+*.png
+*.jpg
+*.fnt
+
+# Voice/audio files
+voices/
+*.voice
+*.talk
+*.wav
+*.mp3
+
+# Codecs (can read individually if needed)
+lib/rbcodec/codecs/lib*/
+
+# Simulators for other platforms
+uisimulator/
+
+# Third-party libraries
+lib/unwarminder/
+lib/tlsf/
+lib/fixedpoint/
+
+# Other targets (keep ipod, arm)
+firmware/target/mips/
+firmware/target/coldfire/
+firmware/target/hosted/
+firmware/target/sh/
+
+# Test files
+lib/rbcodec/test/
+
+# Translations (large)
+apps/lang/
+
+# Plugins (large, can read individually)
+apps/plugins/lib/
+apps/plugins/doom/
+apps/plugins/sdl/
+apps/plugins/lua/
+apps/plugins/mikmod/
+apps/plugins/midi/
+apps/plugins/mpegplayer/
+apps/plugins/pacbox/
+apps/plugins/pdbox/
+apps/plugins/rockboy/
+apps/plugins/zxbox/
+apps/plugins/xrick/
+apps/plugins/duke3d/
+apps/plugins/wolf3d/
+apps/plugins/quake/
+
+# Utility binaries
+utils/*/build/
+utils/*/obj/
