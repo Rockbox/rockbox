@@ -26,11 +26,20 @@
 #include "button.h"
 #include "storage.h"
 #include "disk.h"
+#include "file.h"
 #include "file_internal.h"
 #include "usb.h"
+#include "elf.h"
+#include "elf_loader.h"
 #include "rbversion.h"
 #include "system-echoplayer.h"
 #include "gpio-stm32h7.h"
+
+#define SDRAM_SIZE          (MEMORYSIZE * 1024 * 1024)
+
+/* Address where Rockbox .elf binary will be cached in RAM */
+#define LOAD_SIZE           (2 * 1024 * 1024)
+#define LOAD_BUFFER_ADDR    (STM32_SDRAM1_BASE + SDRAM_SIZE - LOAD_SIZE)
 
 /* Events for the monitor callback to signal the main thread */
 #define EV_POWER_PRESSED    MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0)
@@ -43,6 +52,29 @@
 /* Time to remain powered with no USB cable inserted */
 #define USB_UNPLUGGED_ACTIVE_TIME       (30 * HZ)
 #define USB_UNPLUGGED_INACTIVE_TIME     (3 * HZ)
+
+static const struct elf_memory_map rb_elf_mmap[] = {
+    {
+        .addr  = STM32_ITCM_BASE,
+        .size  = STM32_ITCM_SIZE,
+        .flags = PF_R | PF_X,
+    },
+    {
+        .addr  = STM32_DTCM_BASE,
+        .size  = STM32_DTCM_SIZE,
+        .flags = PF_R | PF_W,
+    },
+    {
+        .addr  = STM32_SDRAM1_BASE,
+        .size  = SDRAM_SIZE - LOAD_SIZE,
+        .flags = PF_R | PF_W | PF_X,
+    },
+};
+
+static const struct elf_load_context rb_elf_ctx = {
+    .mmap       = rb_elf_mmap,
+    .num_mmap   = ARRAYLEN(rb_elf_mmap),
+};
 
 /* Power button monitor state */
 static bool pwr_curr_state;
@@ -74,6 +106,10 @@ static bool wait_for_power_released;
 
 /* Optional error message displayed on LCD */
 static const char *status_msg = NULL;
+
+/* Location of Rockbox ELF binary in memory */
+static void *elf_load_addr = NULL;
+static size_t elf_load_size = 0;
 
 /* Helper functions */
 static bool is_power_button_pressed(void)
@@ -152,6 +188,7 @@ static void go_active(void)
 
     gpio_set_level(GPIO_CPU_POWER_ON, 1);
     storage_enable(true);
+    disk_mount_all();
 }
 
 static void go_inactive(void)
@@ -213,14 +250,74 @@ static void refresh_display(void)
     lcd_enable(true);
 }
 
+static bool load_rockbox(void)
+{
+    int fd = open(BOOTDIR "/" BOOTFILE, O_RDONLY);
+    if (fd < 0)
+    {
+        status_msg = "Rockbox not found";
+        return false;
+    }
+
+    void *tmp_buf = (void *)LOAD_BUFFER_ADDR;
+    size_t tmp_size = LOAD_SIZE;
+
+    ssize_t ret = read(fd, tmp_buf, tmp_size);
+    if (ret < 0)
+    {
+        status_msg = "I/O error loading Rockbox";
+        goto out;
+    }
+
+    if ((size_t)ret == tmp_size)
+    {
+        status_msg = "Rockbox binary too large";
+        goto out;
+    }
+
+    elf_load_addr = tmp_buf;
+    elf_load_size = tmp_size;
+
+out:
+    close(fd);
+    return elf_load_addr != NULL;
+}
+
+static void launch_elf(void)
+{
+    void *entrypoint = NULL;
+    void (*entry_fn) (void) = NULL;
+
+    if (elf_load_addr == NULL || elf_load_size == 0)
+        return;
+
+    int err = elf_loadmem(elf_load_addr, elf_load_size, &rb_elf_ctx, &entrypoint);
+    if (err)
+    {
+        status_msg = "Failed to execute Rockbox";
+        return;
+    }
+
+    disk_unmount_all();
+    storage_enable(false);
+    lcd_shutdown();
+
+    entry_fn = entrypoint;
+    commit_discard_idcache();
+    disable_irq();
+    stm32_systick_disable();
+
+    entry_fn();
+}
+
 static void launch(void)
 {
     /* No-op if USB mode was requested */
     if (is_usbmode_button_pressed())
         return;
 
-    /* TODO: load rockbox */
-    status_msg = "Can't boot RB yet!";
+    load_rockbox();
+    launch_elf();
 }
 
 void main(void)
