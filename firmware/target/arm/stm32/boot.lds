@@ -18,7 +18,7 @@ SECTIONS
     {
         KEEP(*(.vectors.arm))
         KEEP(*(.vectors.platform))
-        *(.init.text*)
+        *(.init*)
         *(.text*)
         *(.rodata*)
     } > FLASH1

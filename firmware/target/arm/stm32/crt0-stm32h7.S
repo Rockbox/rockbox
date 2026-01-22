@@ -24,7 +24,7 @@
     .syntax unified
     .text
 
-    .section .init.text,"ax",%progbits
+    .section .init,"ax",%progbits
 
     .global reset_handler
     .type reset_handler, function

@@ -39,7 +39,7 @@ SECTIONS
     {
         loadaddress = .; /* only needed to keep ROLO happy */
 
-        *(.init.text*)
+        *(.init*)
         *(.text*)
     } > SRAM_AXI :sram_rx
 
