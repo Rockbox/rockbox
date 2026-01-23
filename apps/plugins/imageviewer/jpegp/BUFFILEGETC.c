@@ -74,6 +74,7 @@ extern int TELL(void)
 
 extern void *OPEN(char *f)
 {
+    memset(buff, 0, sizeof(buff));
     printf("Opening %s\n", f);
     cur_buff_pos = length = file_pos = 0;
     fd = rb->open(f,O_RDONLY);
