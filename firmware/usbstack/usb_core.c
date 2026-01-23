@@ -245,17 +245,11 @@ struct usb_transfer_completion_event_data
     int length;
 };
 
-typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
-typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size);
-
 static struct
 {
-    completion_handler_t completion_handler[2];
-    fast_completion_handler_t fast_completion_handler[2];
-    control_handler_t control_handler[2];
-    struct usb_transfer_completion_event_data completion_event[2];
-} ep_data[USB_NUM_ENDPOINTS];
+    struct usb_class_driver* driver;
+    struct usb_transfer_completion_event_data completion_event;
+} ep_data[USB_NUM_ENDPOINTS][2];
 
 struct ep_alloc_state {
     int8_t type[2];
@@ -506,9 +500,9 @@ void usb_core_handle_transfer_completion(
         return;
     }
 
-    completion_handler_t handler = ep_data[num].completion_handler[dir];
-    if(handler != NULL)
-        handler(num, dir == DIR_IN ? USB_DIR_IN : USB_DIR_OUT, event->status, event->length);
+    struct usb_class_driver* driver = ep_data[num][dir].driver;
+    if(driver && driver->transfer_complete)
+        driver->transfer_complete(num, dir == DIR_IN ? USB_DIR_IN : USB_DIR_OUT, event->status, event->length);
 }
 
 void usb_core_enable_driver(int driver, bool enabled)
@@ -613,9 +607,7 @@ static void init_deinit_endpoints(int config, bool init) {
             int ep = epnum | (dir == DIR_OUT ? USB_DIR_OUT : USB_DIR_IN);
             if(init) {
                 usb_drv_ep_init(&cstate->ep_alloc_ctx, ep);
-                ep_data[epnum].completion_handler[dir] = driver->transfer_complete;
-                ep_data[epnum].fast_completion_handler[dir] = driver->fast_transfer_complete;
-                ep_data[epnum].control_handler[dir] = driver->control_request;
+                ep_data[epnum][dir].driver = driver;
             } else {
                 usb_drv_ep_deinit(&cstate->ep_alloc_ctx, ep);
             }
@@ -1065,22 +1057,27 @@ static void request_handler_interface(struct usb_ctrlrequest* req, uint8_t* reqd
 
 static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
-    bool handled = false;
-    control_handler_t control_handler = NULL;
+    int num = EP_NUM(req->wIndex);
+    int dir = EP_DIR(req->wIndex);
 
-    if(EP_NUM(req->wIndex) < USB_NUM_ENDPOINTS)
-        control_handler =
-            ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
+    if(num >= USB_NUM_ENDPOINTS)
+        goto error;
 
-    if(control_handler)
-        handled = control_handler(req, reqdata, reqdata_size);
+    struct usb_class_driver* driver = ep_data[num][dir].driver;
 
-    if(!handled) {
+    if(!driver || !driver->control_request)
+        goto error;
+
+    if(!driver->control_request(req, reqdata, reqdata_size))
+        goto error;
+
+    return;
+
+error:
         /* nope. flag error */
         logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
              req->wValue, req->wIndex, req->wLength);
         usb_core_control_response(USB_CONTROL_STALL, NULL, 0);
-    }
 }
 
 static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
@@ -1192,7 +1189,7 @@ void usb_core_bus_reset(void)
 
 static void signal_xfer_complete(int ep, struct usb_ctrlrequest* req, int status, int length) {
     struct usb_transfer_completion_event_data* completion_event =
-        &ep_data[EP_NUM(ep)].completion_event[EP_DIR(ep)];
+        &ep_data[EP_NUM(ep)][EP_DIR(ep)].completion_event;
 
     completion_event->req = req;
     completion_event->ep = ep;
@@ -1234,24 +1231,24 @@ static bool check_for_new_setup(void) {
 }
 
 /* called by usb_drv_transfer_completed() */
-void usb_core_transfer_complete(int endpoint, int dir, int status, int length) {
+void usb_core_transfer_complete(int ep, int dir, int status, int length) {
 #ifdef USB_BATCH_NON_NATIVE
     /* batch api */
-    if(batch_ep != 0 && (endpoint | dir) == batch_ep) {
+    if(batch_ep != 0 && (ep | dir) == batch_ep) {
         batch_xfer_complete();
         return;
     }
 #endif
 
     /* Fast notification */
-    fast_completion_handler_t handler = ep_data[endpoint].fast_completion_handler[EP_DIR(dir)];
-    if(handler != NULL && handler(endpoint, dir, status, length)) {
+    struct usb_class_driver* driver = ep_data[ep][EP_DIR(dir)].driver;
+    if(driver && driver->fast_transfer_complete && driver->fast_transfer_complete(ep, dir, status, length)) {
         return; /* do not dispatch to the queue if handled */
     }
 
     /* Non-control packet handling */
-    if(endpoint != EP_CONTROL) {
-        signal_xfer_complete(endpoint | dir, NULL, status, length);
+    if(ep != EP_CONTROL) {
+        signal_xfer_complete(ep | dir, NULL, status, length);
         return;
     }
 
