@@ -1133,29 +1133,106 @@ static void usb_dw_handle_token_mismatch(void)
 }
 #endif /* USB_DW_SHARED_FIFO */
 
+static void usb_dw_iepint(int ep)
+{
+    uint32_t epints = DWC_DIEPINT(ep);
+    DWC_DIEPINT(ep) = epints;
+
+    if (epints & TOC)
+    {
+        usb_dw_abort_endpoint(ep, USB_DW_EPDIR_IN);
+    }
+
+#ifdef USB_DW_SHARED_FIFO
+    if (epints & ITTXFE)
+    {
+        if (epmis_msk & (1 << ep))
+        {
+            DWC_DIEPCTL(ep) |= EPENA;
+            epmis_msk &= ~(1 << ep);
+            if (!epmis_msk)
+                DWC_DIEPMSK &= ~ITTXFE;
+        }
+    }
+
+#elif defined(USB_DW_ARCH_SLAVE)
+    if (epints & TXFE)
+    {
+        usb_dw_handle_dtxfifo(ep);
+    }
+#endif
+
+    if (epints & XFRC)
+    {
+        usb_dw_handle_xfer_complete(ep, USB_DW_EPDIR_IN);
+    }
+}
+
+static void usb_dw_oepint(int ep)
+{
+    uint32_t epints = DWC_DOEPINT(ep);
+    DWC_DOEPINT(ep) = epints;
+
+    if (!ep)
+    {
+        if (epints & STUP)
+        {
+            usb_dw_handle_setup_received();
+        }
+
+        if (epints & XFRC)
+        {
+            if(epints & STATUSRECVD)
+            {
+                /* At the end of a control write's data phase, the
+                 * controller writes a spurious OUTDONE token to the
+                 * FIFO and raises StatusRecvd | XferCompl.
+                 *
+                 * We do not need or want this -- we've already handled
+                 * the data phase by this point -- but EP0 is stopped
+                 * as a side effect of XferCompl, so we need to restart
+                 * it to keep receiving packets. */
+                usb_dw_ep0_recv();
+            }
+            else if(!(epints & SETUPRECVD))
+            {
+                /* Only call this for normal data packets. Setup
+                 * packets use the STUP interrupt handler instead. */
+                usb_dw_handle_xfer_complete(0, USB_DW_EPDIR_OUT);
+            }
+        }
+    }
+    else
+    {
+        if (epints & XFRC)
+        {
+            usb_dw_handle_xfer_complete(ep, USB_DW_EPDIR_OUT);
+        }
+    }
+}
+
 static void usb_dw_irq(void)
 {
     int ep;
-    uint32_t daint;
+    uint32_t gintsts = DWC_GINTSTS & DWC_GINTMSK;
 
 #ifdef USB_DW_ARCH_SLAVE
     /* Handle one packet at a time, the IRQ will re-trigger if there's
        something left. */
-    if (DWC_GINTSTS & RXFLVL)
+    if (gintsts & RXFLVL)
     {
         usb_dw_handle_rxfifo();
     }
 #endif
 
 #ifdef USB_DW_SHARED_FIFO
-    if (DWC_GINTSTS & EPMIS)
+    if (gintsts & EPMIS)
     {
         usb_dw_handle_token_mismatch();
         DWC_GINTSTS = EPMIS;
     }
 
 #ifdef USB_DW_ARCH_SLAVE
-    uint32_t gintsts = DWC_GINTSTS & DWC_GINTMSK;
     if (gintsts & PTXFE)
     {
         /* First disable the IRQ, it will be re-enabled later if there
@@ -1180,99 +1257,29 @@ static void usb_dw_irq(void)
 #endif /* USB_DW_ARCH_SLAVE */
 #endif /* USB_DW_SHARED_FIFO */
 
-    daint = DWC_DAINT;
-
-    /* IN */
-    for (ep = 0; ep < USB_NUM_ENDPOINTS; ep++)
+    if (gintsts & (OEPINT | IEPINT))
     {
-        if (daint & (1 << ep))
+        uint32_t daint = DWC_DAINT & DWC_DAINTMSK;
+        uint32_t daint_out = daint >> 16;
+        uint32_t daint_in = daint & 0xffff;
+        for (ep = 0; ep < USB_NUM_ENDPOINTS && daint_in; ep++, daint_in >>= 1)
         {
-            uint32_t epints = DWC_DIEPINT(ep);
-
-            if (epints & TOC)
+            if (daint_in & 1)
             {
-                usb_dw_abort_endpoint(ep, USB_DW_EPDIR_IN);
+                usb_dw_iepint(ep);
             }
+        }
 
-#ifdef USB_DW_SHARED_FIFO
-            if (epints & ITTXFE)
+        for (ep = 0; ep < USB_NUM_ENDPOINTS && daint_out; ep++, daint_out >>= 1)
+        {
+            if (daint_out & 1)
             {
-                if (epmis_msk & (1 << ep))
-                {
-                    DWC_DIEPCTL(ep) |= EPENA;
-                    epmis_msk &= ~(1 << ep);
-                    if (!epmis_msk)
-                        DWC_DIEPMSK &= ~ITTXFE;
-                }
-            }
-
-#elif defined(USB_DW_ARCH_SLAVE)
-            if (epints & TXFE)
-            {
-                usb_dw_handle_dtxfifo(ep);
-            }
-#endif
-
-            /* Clear XFRC here, if this is a 'multi-transfer' request then
-               a new transfer is going to be launched, this ensures it will
-               not miss a single interrupt. */
-            DWC_DIEPINT(ep) = epints;
-
-            if (epints & XFRC)
-            {
-                usb_dw_handle_xfer_complete(ep, USB_DW_EPDIR_IN);
+                usb_dw_oepint(ep);
             }
         }
     }
 
-    /* OUT */
-    for (ep = 0; ep < USB_NUM_ENDPOINTS; ep++)
-    {
-        if (daint & (1 << (ep + 16)))
-        {
-            uint32_t epints = DWC_DOEPINT(ep);
-            DWC_DOEPINT(ep) = epints;
-
-            if (!ep)
-            {
-                if (epints & STUP)
-                {
-                    usb_dw_handle_setup_received();
-                }
-
-                if (epints & XFRC)
-                {
-                    if(epints & STATUSRECVD)
-                    {
-                        /* At the end of a control write's data phase, the
-                         * controller writes a spurious OUTDONE token to the
-                         * FIFO and raises StatusRecvd | XferCompl.
-                         *
-                         * We do not need or want this -- we've already handled
-                         * the data phase by this point -- but EP0 is stopped
-                         * as a side effect of XferCompl, so we need to restart
-                         * it to keep receiving packets. */
-                        usb_dw_ep0_recv();
-                    }
-                    else if(!(epints & SETUPRECVD))
-                    {
-                        /* Only call this for normal data packets. Setup
-                         * packets use the STUP interrupt handler instead. */
-                        usb_dw_handle_xfer_complete(0, USB_DW_EPDIR_OUT);
-                    }
-                }
-            }
-            else
-            {
-                if (epints & XFRC)
-                {
-                    usb_dw_handle_xfer_complete(ep, USB_DW_EPDIR_OUT);
-                }
-            }
-        }
-    }
-
-    if (DWC_GINTSTS & USBRST)
+    if (gintsts & USBRST)
     {
         DWC_GINTSTS = USBRST;
         usb_dw_set_address(0);
@@ -1280,7 +1287,7 @@ static void usb_dw_irq(void)
         usb_core_bus_reset();
     }
 
-    if (DWC_GINTSTS & ENUMDNE)
+    if (gintsts & ENUMDNE)
     {
         DWC_GINTSTS = ENUMDNE;
         ep0.state = EP0_SETUP;
