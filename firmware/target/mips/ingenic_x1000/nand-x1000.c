@@ -93,6 +93,28 @@ static const struct nand_chip chip_gd5f1gq4xexx = {
     .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
 };
 
+static const struct nand_chip chip_xt26g01cwsiga = {
+    .log2_ppb = 6, /* 64 pages */
+    .page_size = 2048,
+    .oob_size = 128,
+    .nr_blocks = 1024,
+    .bbm_pos = 2048,
+    .clock_freq = 150000000,
+    .dev_conf = jz_orf(SFC_DEV_CONF,
+                       CE_DL(1), HOLD_DL(1), WP_DL(1),
+                       CPHA(0), CPOL(0),
+                       TSH(7), TSETUP(0), THOLD(0),
+                       STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
+                       SMP_DELAY(1)),
+    .flags = NAND_CHIPFLAG_QUAD | NAND_CHIPFLAG_HAS_QE_BIT |
+             NAND_CHIPFLAG_ON_DIE_ECC,
+    .cmd_page_read = NANDCMD_PAGE_READ,
+    .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
+    .cmd_block_erase = NANDCMD_BLOCK_ERASE,
+    .cmd_read_cache = NANDCMD_READ_CACHE_x4,
+    .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
+};
+
 #define chip_ds35x1gaxxx chip_gd5f1gq4xexx
 #define chip_gd5f1gq5xexxg chip_gd5f1gq4xexx
 
@@ -105,6 +127,7 @@ const struct nand_chip_id supported_nand_chips[] = {
     NAND_CHIP_ID(&chip_ds35x1gaxxx, NAND_READID_ADDR, 0xe5, 0x21), /* 1.8 V */
     NAND_CHIP_ID(&chip_gd5f1gq5xexxg, NAND_READID_ADDR, 0xc8, 0x51), /* 3.3 V */
     NAND_CHIP_ID(&chip_gd5f1gq5xexxg, NAND_READID_ADDR, 0xc8, 0x41), /* 1.8 V */
+    NAND_CHIP_ID(&chip_xt26g01cwsiga, NAND_READID_ADDR, 0x0b, 0x11),
 };
 
 const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
