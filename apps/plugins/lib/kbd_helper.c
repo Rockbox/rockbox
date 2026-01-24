@@ -54,7 +54,7 @@ int kbd_create_layout(const char *layout, ucschar_t *buf, int bufsz)
             len++;
     }
 
-    if ((total_len + len + 1) * sizeof(*buf) < bufsz)
+    if ((total_len + len + 1) * (int)sizeof(*buf) < bufsz)
     {
         *pbuf = len;
         pbuf[len+1] = 0xFEFF;   /* mark end of characters */
