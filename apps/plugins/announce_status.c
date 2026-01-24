@@ -176,10 +176,10 @@ static void config_reset_voice(void)
     int interval = gAnnounce.interval;
     int announce = gAnnounce.announce_on;
     int grouping = gAnnounce.grouping;
-
-    if (configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER) < 0)
+    int status = configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER);
+    if (status < 0)
     {
-        rb->splashf(100, "%s", "ERROR!");
+        rb->splashf(100, ID2P(LANG_FILE_ERROR), status);
         return;
     }
 
@@ -302,7 +302,7 @@ static int announce_menu_cb(int action,
             case 8: /*Clear All*/
                 gAnnounce.wps_fmt[0] = '\0';
                 gAnnounce.bin_added = 0;
-                rb->splashf(HZ / 2, "%s", ID2P(LANG_RESET_DONE_CLEAR));
+                rb->splash(HZ / 2, ID2P(LANG_RESET_DONE_CLEAR));
                 break;
             case 9: /* inspect it */
                 kbd_p = kbd_buf;
@@ -333,7 +333,7 @@ static int announce_menu(void)
 {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(announce_menu, "Announcements", announce_menu_cb,
+    MENUITEM_STRINGLIST(announce_menu, ID2P(LANG_ANNOUNCEMENT_FMT), announce_menu_cb,
                         ID2P(LANG_TIME),
                         ID2P(LANG_DATE),
                         ID2P(LANG_TRACK),
@@ -363,7 +363,7 @@ static int settings_menu(void)
     int selection = 0;
     //bool old_val;
 
-    MENUITEM_STRINGLIST(settings_menu, "Announce Settings", NULL,
+    MENUITEM_STRINGLIST(settings_menu, ID2P(LANG_ANNOUNCE_STATUS), NULL,
                         ID2P(LANG_TIMEOUT),
                         ID2P(LANG_ANNOUNCE_ON),
                         ID2P(LANG_GROUPING),
@@ -546,20 +546,22 @@ int plugin_main(const void* parameter)
     }
     else
     {
-        rb->splashf(HZ / 2, "%s", "Announce Status");
+        rb->splashf(HZ / 2, "%s", rb->str(LANG_ANNOUNCE_STATUS)); /* no talking */
         if (gAnnounce.show_prompt)
         {
+#if 0 /* splash should announce for us */
             if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
             {
                 rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
             }
+#endif
             rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
         }
 
 
         if (check_user_input() == true)
         {
-            rb->splashf(100, "%s", ID2P(LANG_SETTINGS));
+            rb->splash(100, ID2P(LANG_SETTINGS));
             int ret = settings_menu();
             if (ret < 0)
                 return 0;
@@ -606,7 +608,7 @@ enum plugin_status plugin_start(const void* parameter)
         /* If the loading failed, save a new config file */
         config_set_defaults();
         configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);
-        rb->splashf(HZ, "%s", ID2P(LANG_HOLD_FOR_SETTINGS));
+        rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
     }
 
     int ret = plugin_main(parameter);
