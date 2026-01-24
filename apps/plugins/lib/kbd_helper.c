@@ -36,12 +36,11 @@
 */
 int kbd_create_layout(const char *layout, ucschar_t *buf, int bufsz)
 {
-    ucschar_t *pbuf;
+    ucschar_t *pbuf = buf;
     const unsigned char *p = layout;
     int len = 0;
     int total_len = 0;
-    pbuf = buf;
-    while (*p && (pbuf - buf + (ptrdiff_t) sizeof(ucschar_t)) < bufsz)
+    while (*p && (pbuf - buf + (ptrdiff_t) sizeof(*buf)) < bufsz)
     {
         p = rb->utf8decode(p, &pbuf[len+1]);
         if (pbuf[len+1] == '\n')
@@ -55,13 +54,14 @@ int kbd_create_layout(const char *layout, ucschar_t *buf, int bufsz)
             len++;
     }
 
-    if (len+1 < bufsz)
+    if ((total_len + len + 1) * sizeof(*buf) < bufsz)
     {
         *pbuf = len;
         pbuf[len+1] = 0xFEFF;   /* mark end of characters */
         total_len += len + 1;
-        return total_len * sizeof(ucschar_t);
+        return total_len * sizeof(*buf);
     }
 
+    //rb->logf("%s %d %d\n", __func__, bufsz, (total_len + len + 1) * sizeof(*buf));
     return 0;
 }

@@ -70,7 +70,7 @@ static const char keybd_layout[] =
  * - \n does not create a key, but it also consumes one element
  * - the final null terminator is equivalent to \n
  * - since sizeof includes the null terminator we don't need +1 for that. */
-static ucschar_t kbd_buf[sizeof(keybd_layout)];
+static ucschar_t kbd_buf[sizeof(keybd_layout) + 1];
 
 /****************** prototypes ******************/
 void print_scroll(char* string); /* implements a scrolling screen */
