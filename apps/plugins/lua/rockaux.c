@@ -27,7 +27,7 @@
 #ifdef PLUGIN
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
-#define lcd_getstringsize rb->lcd_getstringsize
+#define font_getstringsize rb->font_getstringsize
 #define lcd_clear_display rb->lcd_clear_display
 #define lcd_putsxy        rb->lcd_putsxy
 #define lcd_update        rb->lcd_update
@@ -66,7 +66,13 @@ int splash_scroller(int timeout, const char* str)
     if (!str)
         str = "[nil]";
     int w, ch_w, ch_h;
-    lcd_getstringsize("W", &ch_w, &ch_h);
+
+    struct viewport vp;
+    rb->viewport_set_defaults(&vp, SCREEN_MAIN);
+    struct viewport *last_vp = rb->lcd_set_viewport(&vp);
+    int fontnum = vp.font;
+
+    font_getstringsize("W", &ch_w, &ch_h, fontnum);
 
     const int max_w = LCD_WIDTH - (ch_w * 2);
     const int max_lines = LCD_HEIGHT / ch_h - 1;
@@ -103,13 +109,13 @@ int splash_scroller(int timeout, const char* str)
                 line[linepos] = ' ';
                 beep_play(1000, HZ, 1000);
             }
-            else if (ch[0] < ' ') /* Dont copy control characters */
+            else if (ch[0] < ' ' && ch[0] > '\0') /* Dont copy control characters */
                 line[linepos] = (linepos == 0) ? '\0' : ' ';
             else
                 line[linepos] = ch[0];
 
             line[linepos + 1] = '\0'; /* terminate to check text extent */
-            lcd_getstringsize(line, &w, NULL);
+            font_getstringsize(line, &w, NULL, fontnum);
 
             /* try to not split in middle of words */
             if (w + wrap_thresh >= max_w &&
@@ -174,6 +180,8 @@ int splash_scroller(int timeout, const char* str)
         else
             break;
     }
+    rb->lcd_set_viewport(last_vp);
+
     return action;
 }
 
