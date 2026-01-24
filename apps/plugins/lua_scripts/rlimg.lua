@@ -672,6 +672,45 @@ function rotate_image(img)
     rb.sleep(rb.HZ * 10)]]
 end -- rotate_image
 
+function flip_image(img)
+    local blitop = _blit.BOR
+    local i = 1
+    local d = 0
+    local ximg
+    local x, y, w, h, xr, yr
+
+    w = img:width()
+    h = img:height()
+
+    --make a copy of original screen for restoration
+    local screen_img -- = _lcd:duplicate()
+    screen_img =_img.new(w, h)
+    screen_img :copy(_LCD, 1, 1, xr, yr, w, h)
+    --_print.f("CW")
+
+    --[[--Profiling code
+    local timer = _timer.start()]]
+
+    while d >= 0 do
+        -- copy our flipped image onto the background
+        _lcd:copy(ximg, x, y, w, 1, 1, h, false, blitop)
+        _lcd:update()
+        --restore the portion of the background we destroyed
+        _lcd:copy(screen_img, xr, yr, 1, 1)
+
+        d = d + i
+
+        if rb.get_plugin_action(0) == CANCEL_BUTTON then
+            break;
+        end
+    end
+
+    _lcd:copy(ximg, x, y, 1, 1, w, h)
+    --[[-- Profiling code
+    _print.f("%d", _timer.stop(timer))
+    rb.sleep(rb.HZ * 10)]]
+end -- flip_image
+
 -- shows blitting with a mask
 function blit_mask(dst)
     local timer = _timer()
@@ -826,12 +865,13 @@ function main_menu()
                 [6] = "Bouncing Ball (olive)",
                 [7] = "The Twist",
                 [8] = "Image Rotation",
-                [9] = "Long Text",
-                [10] = "Rainbow Image",
-                [11] = "Random Image",
-                [12] = "Clear Screen",
-                [13] = "Save Screen",
-                [14] = "Exit"
+                [9] = "Image Flip",
+                [10] = "Long Text",
+                [11] = "Rainbow Image",
+                [12] = "Random Image",
+                [13] = "Clear Screen",
+                [14] = "Save Screen",
+                [15] = "Exit"
                 }
     local ft =  {
                 [0] = exit_now, --if user cancels do this function
@@ -846,16 +886,17 @@ function main_menu()
                 [6]  = function(BOUNC) bounce_image(create_ball()) end,
                 [7]  = function(TWIST) twist(get_logo()) end,
                 [8]  = function(ROTAT) rotate_image(get_logo()) end,
-                [9]  = long_text,
-                [10] = function(RAINB)
+                [9]  = function(FLIP) flip_image(get_logo()) end,
+                [10]  = long_text,
+                [11] = function(RAINB)
                          rainbow_img(_lcd()); _lcd:update(); rb.sleep(rb.HZ)
                        end,
-                [11] = function(RANDM)
+                [12] = function(RANDM)
                          random_img(_lcd()); _lcd:update(); rb.sleep(rb.HZ)
                        end,
-                [12] = function(CLEAR) _lcd:clear(BLACK); rock_lua() end,
-                [13] = function(SAVEI) _LCD:invert(); _img_save(_LCD, "/rocklua.bmp") end,
-                [14] = function(EXIT_) return true end
+                [13] = function(CLEAR) _lcd:clear(BLACK); rock_lua() end,
+                [14] = function(SAVEI) _LCD:invert(); _img_save(_LCD, "/rocklua.bmp") end,
+                [15] = function(EXIT_) return true end
                 }
 
     if LCD_DEPTH < 2 then
