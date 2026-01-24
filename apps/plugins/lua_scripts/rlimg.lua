@@ -674,38 +674,44 @@ end -- rotate_image
 
 function flip_image(img)
     local blitop = _blit.BOR
-    local i = 1
     local d = 0
-    local ximg
-    local x, y, w, h, xr, yr
+    local x, y, w, h
 
     w = img:width()
     h = img:height()
-
+    x = (_lcd.W - w) / 2
+    y = (_lcd.H - h) / 2
     --make a copy of original screen for restoration
     local screen_img -- = _lcd:duplicate()
     screen_img =_img.new(w, h)
-    screen_img :copy(_LCD, 1, 1, xr, yr, w, h)
-    --_print.f("CW")
+    screen_img :copy(_LCD, 1, 1, x, y, w, h)
 
     --[[--Profiling code
     local timer = _timer.start()]]
 
     while d >= 0 do
         -- copy our flipped image onto the background
-        _lcd:copy(ximg, x, y, w, 1, 1, h, false, blitop)
+        if d == 0 then
+            _lcd:copy(img, x, y, 1, 1, w, h, false, blitop)
+        elseif d == 1 then
+            _lcd:copy(img, x, y, 1, 1, -w, h, false, blitop)
+        elseif d == 2 then
+            _lcd:copy(img, x, y, 1, 1, w, -h, false, blitop)
+        elseif d == 3 then
+            _lcd:copy(img, x, y, 1, 1, -w, -h, false, blitop)
+            d = -1
+        end
         _lcd:update()
         --restore the portion of the background we destroyed
-        _lcd:copy(screen_img, xr, yr, 1, 1)
+        _lcd:copy(screen_img, x, y, 1, 1)
 
         d = d + i
 
-        if rb.get_plugin_action(0) == CANCEL_BUTTON then
+        if rb.get_plugin_action(rb.HZ) == CANCEL_BUTTON then
             break;
         end
     end
 
-    _lcd:copy(ximg, x, y, 1, 1, w, h)
     --[[-- Profiling code
     _print.f("%d", _timer.stop(timer))
     rb.sleep(rb.HZ * 10)]]
