@@ -33,8 +33,6 @@
 
 static bool is_usb_connected = false;
 
-extern void show_logo(void);
-
 static void demo_rtc(void)
 {
     int y = 0;

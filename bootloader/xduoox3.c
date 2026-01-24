@@ -45,7 +45,6 @@
 
 #define SHOW_LOGO
 
-extern void show_logo(void);
 extern void power_off(void);
 
 static int lcd_inited = 0;

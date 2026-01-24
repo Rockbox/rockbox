@@ -43,9 +43,6 @@
 #include "lcd.h"
 #include "version.h"
 
-/* Show the Rockbox logo - in show_logo.c */
-extern void show_logo(void);
-
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157
 

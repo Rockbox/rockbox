@@ -23,9 +23,6 @@
 #include "../kernel-internal.h"
 #include "system.h"
 
-/* Show the Rockbox logo - in show_logo.c */
-extern void show_logo(void);
-
 int main(void)
 {
     /* Initialize Rockbox kernel */

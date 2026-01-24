@@ -11,7 +11,7 @@
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -59,9 +59,6 @@
  * for use with dualbooting */
 void lcd_reset(void);
 #endif
-
-/* Show the Rockbox logo - in show_logo.c */
-extern void show_logo(void);
 
 /* Button definitions */
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -132,21 +129,21 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     struct mi4header_t mi4header;
     struct ppmi_header_t ppmi_header;
     unsigned long sum;
-    
+
     /* Read header to find out how long the mi4 file is. */
     storage_read_sectors(IF_MD(0,) pinfo->start + PPMI_SECTOR_OFFSET,
                          PPMI_SECTORS, &ppmi_header);
-    
+
     /* The first four characters at 0x80000 (sector 1024) should be PPMI*/
     if( memcmp(ppmi_header.magic, "PPMI", 4) )
         return EFILE_NOT_FOUND;
-    
+
     printf("BL mi4 size: %x", ppmi_header.length);
-    
+
     /* Read mi4 header of the OF */
-    storage_read_sectors(IF_MD(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS 
+    storage_read_sectors(IF_MD(0,) pinfo->start + PPMI_SECTOR_OFFSET + PPMI_SECTORS
                        + (ppmi_header.length/512), MI4_HEADER_SECTORS, &mi4header);
-    
+
     /* We don't support encrypted mi4 files yet */
     if( (mi4header.plaintext) != (mi4header.mi4size-MI4_HEADER_SIZE))
         return EINVALID_FORMAT;
@@ -178,14 +175,14 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
 
     if(sum != mi4header.crc32)
         return EBAD_CHKSUM;
-    
-#ifdef SANSA_E200    
+
+#ifdef SANSA_E200
     if (disable_rebuild)
     {
         char block[512];
-        
+
         printf("Disabling database rebuild");
-        
+
         storage_read_sectors(IF_MD(0,) pinfo->start + 0x3c08, 1, block);
         block[0xe1] = 0;
         storage_write_sectors(IF_MD(0,) pinfo->start + 0x3c08, 1, block);
@@ -206,7 +203,7 @@ static int handle_usb(int connect_timeout)
     struct queue_event ev;
     int usb = USB_EXTRACTED;
     long end_tick = 0;
-    
+
     if (!usb_plugged())
         return USB_EXTRACTED;
 
@@ -394,7 +391,7 @@ void* main(void)
         error(EDISK,num_partitions, true);
     }
 
-    /* Just list the first 2 partitions since we don't have any devices yet 
+    /* Just list the first 2 partitions since we don't have any devices yet
        that have more than that */
     for(i=0; i<NUM_PARTITIONS; i++)
     {
@@ -496,7 +493,7 @@ void* main(void)
 #endif
             goto main_exit;
         }
-        
+
         error(0, 0, true);
     }
 

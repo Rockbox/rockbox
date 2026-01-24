@@ -215,8 +215,6 @@ static void handle_usb(int connect_timeout)
     usb_close();
 }
 
-extern void show_logo(void);
-
 void main(void)
 {
     unsigned char* loadbuffer;

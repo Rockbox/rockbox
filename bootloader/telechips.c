@@ -10,7 +10,7 @@
  * Copyright (C) 2007 by Dave Chapman
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -46,9 +46,6 @@
 #include "loader_strerror.h"
 #include "version.h"
 
-/* Show the Rockbox logo - in show_logo.c */
-extern void show_logo(void);
-
 /* Address to load main Rockbox image to */
 #define LOAD_ADDRESS 0x20000000 /* DRAM_START */
 
@@ -63,12 +60,12 @@ void show_debug_screen(void)
     int power_count = 0;
     int count = 0;
     bool do_power_off = false;
-    
+
     lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
     while (!do_power_off) {
         line = 1;
         button = button_get(false);
-        
+
         /* Power-off if POWER button has been held for a time
            This loop is currently running at about 100 iterations/second
          */
@@ -131,10 +128,10 @@ void* main(void)
 
     system_init();
     power_init();
-    
+
     kernel_init();
     enable_irq();
-    
+
     lcd_init();
 
     adc_init();
@@ -143,7 +140,7 @@ void* main(void)
 
     font_init();
     lcd_setfont(FONT_SYSFIXED);
-    
+
     show_logo();
 
     backlight_hw_on();
