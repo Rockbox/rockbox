@@ -30,6 +30,7 @@
 #include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/spi.h"
 #include "regs/stm32h743/ltdc.h"
+#include <string.h>
 
 #define MS_TO_TICKS(x) \
     (((x) + (1000 / HZ - 1)) / (1000 / HZ))
@@ -60,7 +61,8 @@ struct stm_spi_config spi_cfg = {
     .hw_cs_output = true,
 };
 
-struct stm_spi spi;
+static struct stm_spi spi;
+static fb_data shadowfb[LCD_WIDTH*LCD_HEIGHT] IRAM_LCDFRAMEBUFFER;
 
 enum lcd_controller_state
 {
@@ -101,7 +103,7 @@ static void enable_ltdc(void)
     reg_assignf(LTDC_LAYER_WHPCR(0), WHSPPOS(ahbp + LCD_HAW), WHSTPOS(ahbp + 1));
     reg_assignf(LTDC_LAYER_WVPCR(0), WVSPPOS(avbp + LCD_VAH), WVSTPOS(avbp + 1));
     reg_assignf(LTDC_LAYER_PFCR(0), PF(BV_LTDC_LAYER_PFCR_PF_RGB565));
-    reg_var(LTDC_LAYER_CFBAR(0)) = (uintptr_t)FBADDR(0, 0);
+    reg_var(LTDC_LAYER_CFBAR(0)) = (uintptr_t)&shadowfb[0];
     reg_assignf(LTDC_LAYER_CFBLR(0), CFBP(row_bytes), CFBLL(row_bytes + 7));
     reg_assignf(LTDC_LAYER_CFBLNR(0), CFBLNBR(LCD_HEIGHT));
     reg_assignf(LTDC_LAYER_CR(0), LEN(1));
@@ -244,6 +246,8 @@ void lcd_update(void)
     if (!lcd_active())
         return;
 
+    /* TODO: optimize using DMA2D */
+    memcpy(shadowfb, FBADDR(0, 0), sizeof(shadowfb));
     commit_dcache();
 }
 
@@ -268,8 +272,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height > LCD_HEIGHT - y)
         height = LCD_HEIGHT - y;
 
+    /* TODO: optimize using DMA2D */
     for (int dy = 0; dy < height; ++dy)
-        commit_dcache_range(FBADDR(x, y+dy), FB_DATA_SZ * width);
+    {
+        fb_data *shaddr = &shadowfb[(y+dy)*LCD_WIDTH + x];
+        memcpy(shaddr, FBADDR(x, y+dy), FB_DATA_SZ * width);
+        commit_dcache_range(shaddr, FB_DATA_SZ * width);
+    }
 }
 
 void spi5_irq_handler(void)
