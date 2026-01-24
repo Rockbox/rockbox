@@ -68,7 +68,6 @@ void init_lcd(void)
 #ifdef HAVE_BOOTLOADER_USB_MODE
 static void show_splash(int timeout, const char *msg)
 {
-    init_lcd();
     reset_screen();
     lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
                 (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
@@ -171,6 +170,9 @@ int main(void)
     init_lcd();
 #ifdef SHOW_LOGO
     show_logo();
+#else
+    printf(MODEL_NAME" Rockbox Bootloader");
+    printf("Version %s", rbversion);
 #endif
 
     button_init();
@@ -196,11 +198,6 @@ int main(void)
         reset_screen();
     }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
-
-#ifndef SHOW_LOGO
-    printf(MODEL_NAME" Rockbox Bootloader");
-    printf("Version %s", rbversion);
-#endif
 
     rc = boot_rockbox();
 
