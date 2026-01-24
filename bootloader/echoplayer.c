@@ -30,6 +30,7 @@
 #include "disk.h"
 #include "file_internal.h"
 #include "usb.h"
+#include "common.h"  /* For show_logo() */
 
 static bool is_usb_connected = false;
 
