@@ -16960,3 +16960,17 @@
     general_purpose_led: "LED 표시기 사용"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "상태 발표"
+  </dest>
+  <voice>
+    *: "상태 발표"
+  </voice>
+</phrase>

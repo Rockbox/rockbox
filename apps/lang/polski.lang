@@ -16952,3 +16952,17 @@
     general_purpose_led: "Użyj wskaźników led"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Informuj o stanie"
+  </dest>
+  <voice>
+    *: "Informuj o stanie"
+  </voice>
+</phrase>

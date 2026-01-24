@@ -16946,3 +16946,17 @@
     general_purpose_led: "Používať LED indikátory"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Oznámiť status"
+  </dest>
+  <voice>
+    *: "Oznámiť status"
+  </voice>
+</phrase>
