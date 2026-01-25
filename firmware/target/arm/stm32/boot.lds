@@ -42,7 +42,7 @@ SECTIONS
         _bssend = .;
     } > SRAM_AXI
 
-    .stack (NOLOAD) : ALIGN(4)
+    .stack (NOLOAD) : ALIGN(8)
     {
         irqstackbegin = .;
         . += 0x400;

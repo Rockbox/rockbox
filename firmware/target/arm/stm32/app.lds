@@ -21,7 +21,7 @@ SECTIONS
         *(.icode*);
     } > ITCM
 
-    .stack (NOLOAD) :
+    .stack (NOLOAD) : ALIGN(8)
     {
         irqstackbegin = .;
         . += 0x400;
