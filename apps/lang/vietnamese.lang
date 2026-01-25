@@ -16944,3 +16944,17 @@
     general_purpose_led: "Dùng đèn hiệu LED"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Thông báo Trạng thái"
+  </dest>
+  <voice>
+    *: "Thông báo trạng thái"
+  </voice>
+</phrase>
