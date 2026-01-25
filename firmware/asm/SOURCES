@@ -21,8 +21,7 @@ arm/memmove.S
 arm/memset.S
 strlen.c
 #elif defined(CPU_ARM_MICRO)
-memcpy.c
-mempcpy.c
+arm/memcpy-armv7m.S
 memmove.c
 arm/memset.S
 strlen.c
