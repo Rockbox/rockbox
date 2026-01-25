@@ -114,6 +114,11 @@
 #define HAVE_BOOTLOADER_USB_MODE
 #endif
 
+#ifdef BOOTLOADER
+# define USB_READ_BUFFER_SIZE  (32 * 1024)
+# define USB_WRITE_BUFFER_SIZE (32 * 1024)
+#endif
+
 /* Rockbox capabilities */
 #define HAVE_FAT16SUPPORT
 #define HAVE_ALBUMART
