@@ -1,6 +1,6 @@
 /***************************************************************************
  *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___void 
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___void
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
@@ -25,6 +25,7 @@
 #include "system.h"
 #include "stdlib.h"
 #include "button.h"
+#include "tick.h"
 #include "touchscreen.h"
 
 #define NO_OF_TOUCH_DATA 5
@@ -99,9 +100,9 @@ void touchscreen_scan_device()
     static int touch_data_index = 0;
 
    int saveADCDLY;
- 
-    /* check touch state */ 
-    if(ADCDAT1 & (1<<15))    
+
+    /* check touch state */
+    if(ADCDAT1 & (1<<15))
     {
         return;
     }
@@ -111,23 +112,23 @@ void touchscreen_scan_device()
         /* resets the index if the last touch could not be read 5 times */
         touch_data_index = 0;
     }
-    
-    /* read touch data */    
+
+    /* read touch data */
     saveADCDLY = ADCDLY;
-    ADCDLY = 40000; /*delay ~0.8ms (1/50M)*4000 */ 
+    ADCDLY = 40000; /*delay ~0.8ms (1/50M)*4000 */
     ADCTSC = (1<<3)|(1<<2); /* pullup disable, seq x,y pos measure */
     /* start adc */
-    ADCCON|= 0x1; 
+    ADCCON|= 0x1;
     /* wait for start and end */
     while(ADCCON & 0x1);
     while(!(ADCCON & 0x8000));
 
     x[touch_data_index] = ADCDAT0&0x3ff;
     y[touch_data_index] = ADCDAT1&0x3ff;
-   
+
     ADCTSC = 0xd3; /* back to interrupt mode */
     ADCDLY = saveADCDLY;
-    
+
     touch_data_index++;
 
     if (touch_data_index > NO_OF_TOUCH_DATA - 1)
@@ -161,18 +162,18 @@ int touchscreen_read_device(int *data, int *old_data)
             /* sort the 5 data taken and use the median value */
             qsort(x, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
             qsort(y, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
-            
+
             x_touch = last_x = x[(NO_OF_TOUCH_DATA - 1)/2];
             y_touch = last_y = y[(NO_OF_TOUCH_DATA - 1)/2];
-            
+
             last_touch = current_tick;
-            
+
             touch_hold = true;
             touch_available = false;
         }
-        
+
         *old_data = *data = touch_to_pixels(x_touch, y_touch);
-        
+
         btn |= touchscreen_to_pixels((*data&0xffff0000) >> 16,
                                      (*data&0x0000ffff),
                                      data);
@@ -183,8 +184,6 @@ int touchscreen_read_device(int *data, int *old_data)
         /* put the touchscreen back into interrupt mode */
         touch_hold = false;
     }
-    
+
     return btn;
 }
-
-

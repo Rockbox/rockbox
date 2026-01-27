@@ -799,7 +799,7 @@ int sd_read_sectors(IF_MD(int card_no,) sector_t start, int incount,
         ret = 0; /* assume success */
     else
 #endif
-        ret = sd_transfer_sectors(card_no, start, incount, inbuf, false);
+        ret = sd_transfer_sectors(IF_MD_DRV(card_no), start, incount, inbuf, false);
     dbgprintf ("sd_read, ret=%d\n", ret);
     return ret;
 }
@@ -827,7 +827,7 @@ int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
         return 0; /* assume success */
     else
 #endif
-        return sd_transfer_sectors(drive, start, count, (void*)outbuf, true);
+        return sd_transfer_sectors(IF_MD_DRV(drive), start, count, (void*)outbuf, true);
 #endif
 }
 /*****************************************************************************/

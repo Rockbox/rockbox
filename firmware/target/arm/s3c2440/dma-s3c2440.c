@@ -34,13 +34,13 @@ static int dma_used = 0;
 /* Status flags */
 #define STATUS_CHANNEL_ACTIVE (1<<0)
 
-static struct dma_channel_state 
+static struct dma_channel_state
 {
     volatile unsigned status;
     void (*callback)(void);
 } dma_state [NUM_CHANNELS];
 
-struct dma_channel_regs 
+struct dma_channel_regs
 {
     volatile unsigned long disrc;
     volatile unsigned long disrcc;
@@ -51,7 +51,7 @@ struct dma_channel_regs
     volatile unsigned long dcsrc;
     volatile unsigned long dcdst;
     volatile unsigned long dmasktrig;
-    volatile unsigned long reserved [7];  /* pad to 0x40 bytes */ 
+    volatile unsigned long reserved [7];  /* pad to 0x40 bytes */
 };
 
 
@@ -61,7 +61,7 @@ struct dma_channel_regs *dma_regs [4] =
     (struct dma_channel_regs *) &DISRC1,
     (struct dma_channel_regs *) &DISRC2,
     (struct dma_channel_regs *) &DISRC3
-    } 
+    }
 ;
 
 
@@ -73,7 +73,7 @@ void dma_init(void)
     /* Clear pending source */
     SRCPND = DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK;
     INTPND = DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK;
-    
+
     /* Enable interrupt in controller */
     bitclr32(&INTMOD, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
     bitclr32(&INTMSK, DMA0_MASK | DMA1_MASK | DMA2_MASK | DMA3_MASK);
@@ -101,15 +101,15 @@ void dma_release(void)
 }
 
 
-inline void dma_disable_channel(int channel)
+void dma_disable_channel(int channel)
 {
-    struct dma_channel_regs *regs = dma_regs [channel]; 
-     
+    struct dma_channel_regs *regs = dma_regs [channel];
+
     /* disable the specified channel */
-        
+
     /* Reset the channel */
     regs->dmasktrig |= DMASKTRIG_STOP;
-    
+
     /* Wait for DMA controller to be ready */
     while(regs->dmasktrig & DMASKTRIG_ON)
         ;
@@ -120,35 +120,35 @@ inline void dma_disable_channel(int channel)
 void dma_enable_channel(int channel, struct dma_request *request)
 {
     struct dma_channel_regs *regs = dma_regs [channel];
-     
+
     /* TODO - transfer sizes (assumes word) */
-    
+
     if (DMA_GET_SRC(request->source_map, channel) == DMA_INVALID)
         panicf ("DMA: invalid channel");
-    
+
     /* setup a transfer on specified channel */
-    dma_disable_channel (channel);
-    
+    dma_disable_channel(channel);
+
     if((unsigned long)request->source_addr < UNCACHED_BASE_ADDR)
         regs->disrc = (unsigned long)request->source_addr + UNCACHED_BASE_ADDR;
     else
         regs->disrc = (unsigned long)request->source_addr;
     regs->disrcc = request->source_control;
-    
+
     if((unsigned long)request->dest_addr < UNCACHED_BASE_ADDR)
         regs->didst = (unsigned long)request->dest_addr + UNCACHED_BASE_ADDR;
     else
         regs->didst = (unsigned long)request->dest_addr;
     regs->didstc = request->dest_control;
-    
-    regs->dcon = request->control | request->count | 
+
+    regs->dcon = request->control | request->count |
                  DMA_GET_SRC(request->source_map, channel) * DCON_HWSRCSEL;
 
     dma_state [channel].callback = request->callback;
-            
+
     /* Activate the channel */
     commit_discard_dcache_range((void *)request->dest_addr, request->count * 4);
-    
+
     dma_state [channel].status |= STATUS_CHANNEL_ACTIVE;
     regs->dmasktrig = DMASKTRIG_ON;
 
@@ -157,7 +157,7 @@ void dma_enable_channel(int channel, struct dma_request *request)
         /* Start DMA */
         regs->dmasktrig |= DMASKTRIG_SW_TRIG;
     }
-        
+
 }
 
 /* ISRs */
@@ -168,7 +168,7 @@ static inline void generic_isr (unsigned channel)
         if (dma_state [channel].callback)
             /* call callback for relevant channel */
             dma_state [channel].callback();
-    
+
         dma_state [channel].status &= ~STATUS_CHANNEL_ACTIVE;
     }
 }
