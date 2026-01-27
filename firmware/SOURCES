@@ -216,7 +216,7 @@ target/hosted/xduoo/xduoolinux_codec.c
 target/hosted/button-devinput.c
 #endif
 
-#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(SIMULATOR) 
+#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(SIMULATOR)
 target/hosted/usb-hiby.c
 #endif
 
@@ -949,6 +949,7 @@ target/arm/s5l8702/lcd-asm-s5l8702.S
 #endif
 
 /* USB Stack */
+// TODO:  This needs to be HAVE_USBSTACK && (!BOOTLOADER || HAVE_USB_BOOTLOADER_MODE)
 #ifdef HAVE_USBSTACK
 usbstack/usb_core.c
 #ifdef USB_ENABLE_STORAGE

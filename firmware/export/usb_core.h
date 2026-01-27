@@ -58,8 +58,10 @@ void usb_core_transfer_complete(int endpoint,int dir,int status,int length);
 void usb_core_bus_reset(void);
 void usb_core_enable_driver(int driver,bool enabled);
 bool usb_core_driver_enabled(int driver);
+#ifdef HAVE_USBSTACK
 void usb_core_handle_transfer_completion(
         struct usb_transfer_completion_event_data* event);
+#endif
 void usb_core_handle_notify(long id, intptr_t data);
 /* For controllers which handle SET ADDR and/or SET CONFIG in hardware */
 void usb_core_notify_set_address(uint8_t addr);
@@ -70,4 +72,3 @@ void usb_core_hotswap_event(int volume,bool inserted);
 #endif
 
 #endif
-

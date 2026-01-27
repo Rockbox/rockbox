@@ -222,7 +222,7 @@
 /* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
 //#define USB_ENABLE_SERIAL
 #define HAVE_USBSTACK
-#define HAVE_BOOTLOADER_USB_MODE
+//#define HAVE_BOOTLOADER_USB_MODE
 #define HAVE_USB_HID_MOUSE
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
