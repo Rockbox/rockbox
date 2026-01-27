@@ -705,33 +705,7 @@ void usb_acknowledge(long id, intptr_t seqnum)
 {
     queue_post(&usb_queue, id, seqnum);
 }
-#else /* !USB_FULL_INIT */
-/* TODO:  All of this can go away once usb_core.c is no longer built
-   with BOOTLOADER && !HAVE_USB_BOOTLOADER_MODE */
-#ifdef HAVE_USBSTACK
-void usb_signal_transfer_completion(
-    struct usb_transfer_completion_event_data* event_data)
-{
-    (void)event_data;
-}
-#endif
-void usb_clear_pending_transfer_completion_events(void)
-{
-}
-void usb_release_exclusive_storage(void)
-{
-}
-void usb_signal_notify(long id, intptr_t data)
-{
-    (void)id;
-    (void)data;
-}
-void usb_acknowledge(long id, intptr_t seqnum)
-{
-    (void)id;
-    (void)seqnum;
-}
-#endif /* !USB_FULL_INIT */
+#endif /* USB_FULL_INIT */
 
 void usb_init(void)
 {

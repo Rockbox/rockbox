@@ -947,8 +947,7 @@ target/arm/s5l8702/lcd-asm-s5l8702.S
 #endif
 
 /* USB Stack */
-// TODO:  This needs to be HAVE_USBSTACK && (!BOOTLOADER || HAVE_USB_BOOTLOADER_MODE)
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) && (!defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE))
 usbstack/usb_core.c
 #ifdef USB_ENABLE_STORAGE
 usbstack/usb_storage.c
@@ -985,6 +984,8 @@ target/arm/rk27xx/usb-drv-rk27xx.c
 drivers/isp1362.c
 #elif CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
+#elif CONFIG_USBOTG == USBOTG_ARC
+target/arm/usb-drv-arc.c
 #endif
 #endif /* !defined(HAVE_USBSTACK) */
 

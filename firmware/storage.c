@@ -229,7 +229,7 @@ static void NORETURN_ATTR storage_thread(void)
             break;
 #endif /* HAVE_HOTSWAP */
 
-#ifndef USB_NONE
+#if !defined(USB_NONE) && (!defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE))
         case SYS_USB_CONNECTED:
         case SYS_USB_DISCONNECTED:
             bdcast = 0;
