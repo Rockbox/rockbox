@@ -1182,8 +1182,12 @@ void usb_core_handle_notify(long id, intptr_t data)
 #endif
             break;
         case USB_NOTIFY_CLASS_DRIVER: {
-            uint8_t index = data >> 24;
-            if(index >= USB_NUM_DRIVERS) {
+            /* HACK: index is uint8 but promoted to int to avoid a compiler
+               warning when USB_NUM_DRIVERS is 0, mainly in bootloaders.
+               This hack can be removed once usb_core is no longer built
+               for BOOTLOADER && !HAVE_BOOTLOADER_USB_MODE */
+            int index = data >> 24;
+            if(index < 0 || index >= USB_NUM_DRIVERS) {
                 logf("usb_core: invalid notification destination index=%u", index);
                 return;
             }
