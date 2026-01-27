@@ -158,7 +158,7 @@ my %espeak_lang_map = (
     );
 
 my %piper_lang_map = (
-    'english' => 'en_GB-semaine-medium.onnx',  # Always first, it's the golden master
+    'english' => 'en_GB-alba-medium.onnx',  # Always first, it's the golden master
     'bulgarian' => 'bg_BG-dimitar-medium.onnx',
     'chinese-simp' => 'zh_CN-huayan-medium.onnx',
     'czech' => 'cs_CZ-jirka-medium.onnx',
