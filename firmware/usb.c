@@ -100,15 +100,19 @@ static long usb_stack[(DEFAULT_STACK_SIZE*4 + DUMP_BMP_LINESIZE + USB_EXTRA_STAC
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 static bool usb_monitor_enabled = false;
+static bool exclusive_storage_enabled = false;
 #endif /* USB_FULL_INIT */
 static struct event_queue usb_queue SHAREDBSS_ATTR;
 static bool exclusive_storage_requested = false;
-static bool exclusive_storage_enabled = false;
 #ifdef USB_ENABLE_HID
 static bool usb_hid = true;
 #endif
 #ifdef USB_ENABLE_AUDIO
 static int usb_audio = 0;
+#endif
+
+#ifdef HAVE_USB_POWER
+static bool usb_power_only = false;
 #endif
 
 #ifdef USB_FULL_INIT
@@ -117,7 +121,6 @@ static int usb_num_acks_to_expect = 0;
 static uint32_t usb_broadcast_seqnum = 0x80000000;
 #ifdef HAVE_USB_POWER
 static int usb_mode = USBMODE_DEFAULT;
-static bool usb_power_only = false;
 #endif
 
 #if defined(USB_FIREWIRE_HANDLING)
@@ -489,6 +492,7 @@ static void NORETURN_ATTR usb_thread(void)
             /* USB_INSERTED */
 
         case SYS_USB_CONNECTED_ACK:
+#ifdef USB_FULL_INIT
             if((uint32_t)ev.data != usb_broadcast_seqnum) {
                 DEBUGF("usb: late ack %lX < %lX", ev.data, usb_broadcast_seqnum);
                 break;
@@ -503,6 +507,7 @@ static void NORETURN_ATTR usb_thread(void)
             }
 
             DEBUGF("usb: all threads have acknowledged the connect.\n");
+#endif
             if(usb_host_present && exclusive_storage_requested) {
                 usb_slave_mode(true);
                 exclusive_storage_enabled = true;
@@ -803,7 +808,7 @@ bool usb_inserted(void)
     return usb_state == USB_INSERTED || usb_state == USB_POWERED;
 }
 
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) && defined(USB_FULL_INIT)
 bool usb_exclusive_storage(void)
 {
     /* Storage isn't actually exclusive until slave mode has been entered */
@@ -858,11 +863,14 @@ bool usb_exclusive_storage(void)
 void usb_request_exclusive_storage(void)
 {
     exclusive_storage_requested = true;
+#ifdef USB_FULL_INIT
     usb_broadcast_seqnum += 1;
     usb_num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, usb_broadcast_seqnum) - 1;
     DEBUGF("usb: waiting for %d acks...\n", usb_num_acks_to_expect);
+#endif
 }
 
+#ifdef USB_FULL_INIT
 void usb_release_exclusive_storage(void)
 {
     if(!exclusive_storage_requested) {
@@ -882,6 +890,7 @@ void usb_release_exclusive_storage(void)
 #endif
     return;
 }
+#endif
 
 #ifdef USB_ENABLE_HID
 void usb_set_hid(bool enable)
