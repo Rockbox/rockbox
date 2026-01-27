@@ -201,6 +201,7 @@ No access to the NAND yet..
 
 #define CONFIG_USBOTG     USBOTG_JZ4740
 #define HAVE_USBSTACK
+#define HAVE_BOOTLOADER_USB_MODE
 /* Connect by events, not by tick polling */
 #define USB_STATUS_BY_EVENT
 
