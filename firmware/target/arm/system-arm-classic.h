@@ -104,7 +104,7 @@ static inline int set_interrupt_status(int status, int mask)
     unsigned long cpsr;
     int oldstatus;
     /* Read the old levels and set the new ones */
-#if (defined(CREATIVE_ZVM) || defined(CREATIVE_ZV)) && defined(BOOTLOADER)
+#if defined(CREATIVE_ZVx) && defined(BOOTLOADER)
 // FIXME:  This workaround is for a problem with inlining;
 // for some reason 'mask' gets treated as a variable/non-immediate constant
 // but only on this build.  All others (including the nearly-identical mrobe500boot) are fine

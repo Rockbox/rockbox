@@ -1025,12 +1025,12 @@ Lyre prototype 1 */
 #define USB_DETECT_BY_REQUEST
 #endif
 
-#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
+#if CONFIG_USBOTG == USBOTG_ARC
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
 
-#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_TNETV105
+#if CONFIG_USBOTG == USBOTG_TNETV105
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
@@ -1384,11 +1384,7 @@ Lyre prototype 1 */
 #ifdef BOOTLOADER
 
 /* enable usb storage for targets that do bootloader usb */
-#if defined(HAVE_BOOTLOADER_USB_MODE) || \
-     defined(CREATIVE_ZVx) || defined(CPU_TCC780X) || \
-     CONFIG_USBOTG == USBOTG_JZ4740 || CONFIG_USBOTG == USBOTG_AS3525 || \
-     CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_DESIGNWARE || \
-     CONFIG_USBOTG == USBOTG_JZ4760
+#if defined(HAVE_BOOTLOADER_USB_MODE)
 #define USB_ENABLE_STORAGE
 #endif
 

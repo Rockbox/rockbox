@@ -47,13 +47,13 @@ void main(void)
     int buffer_size;
     int(*kernel_entry)(void);
     int ret;
-    
+
     /* Make sure interrupts are disabled */
     set_irq_level(IRQ_DISABLED);
     set_fiq_status(FIQ_DISABLED);
     system_init();
     kernel_init();
-    
+
     /* Now enable interrupts */
     set_irq_level(IRQ_ENABLED);
     set_fiq_status(FIQ_ENABLED);
@@ -70,18 +70,18 @@ void main(void)
     reset_screen();
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
-    
+
     ret = storage_init();
     if(ret)
         printf("ATA error: %d", ret);
 
     filesystem_init();
-      
+
     /* If no button is held, start the OF */
     if(button_read_device() == 0)
     {
         printf("Loading Creative firmware...");
-        
+
         loadbuffer = (unsigned char*)0x00A00000;
         ret = load_minifs_file("creativeos.jrm", loadbuffer);
         if(ret != -1)
@@ -99,7 +99,7 @@ void main(void)
         ret = disk_mount_all();
         if (ret <= 0)
             error(EDISK, ret, true);
-        
+
         printf("Loading Rockbox firmware...");
 
         loadbuffer = (unsigned char*)0x00900000;
@@ -113,8 +113,8 @@ void main(void)
         ret = kernel_entry();
         printf("FAILED!");
     }
-    
+
     storage_sleepnow();
-    
+
     while(1);
 }
