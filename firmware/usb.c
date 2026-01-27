@@ -59,7 +59,7 @@
 #include "iap.h"
 #endif
 
-#if defined(HAVE_USBSTACK) && (!defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE))
+#if (!defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE))
 #define USB_FULL_INIT
 #endif
 
@@ -704,7 +704,6 @@ void usb_acknowledge(long id, intptr_t seqnum)
 {
     queue_post(&usb_queue, id, seqnum);
 }
-
 #else /* !USB_FULL_INIT */
 /* TODO:  All of this can go away once usb_core.c is no longer built
    with BOOTLOADER && !HAVE_USB_BOOTLOADER_MODE */
@@ -816,7 +815,7 @@ bool usb_inserted(void)
     return usb_state == USB_INSERTED || usb_state == USB_POWERED;
 }
 
-#if defined(HAVE_USBSTACK) && defined(USB_FULL_INIT)
+#if defined(USB_FULL_INIT)
 bool usb_exclusive_storage(void)
 {
     /* Storage isn't actually exclusive until slave mode has been entered */
