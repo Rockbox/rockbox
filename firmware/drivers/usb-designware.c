@@ -186,8 +186,8 @@ static const char* const dw_resp_str[3] =
 
 static struct usb_dw_ep usb_dw_ep_list[USB_NUM_ENDPOINTS][USB_DW_NUM_DIRS];
 static struct usb_dw_ep0 ep0;
-uint8_t _ep0_buffer[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
-uint8_t* ep0_buffer; /* Uncached, unless NO_UNCACHED_ADDR is defined */
+static uint8_t _ep0_buffer[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
+static uint8_t* ep0_buffer; /* Uncached, unless NO_UNCACHED_ADDR is defined */
 
 static uint32_t usb_endpoints;  /* available EPs mask */
 
