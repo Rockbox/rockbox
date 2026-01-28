@@ -12616,20 +12616,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Грешка током прикупљања инфо"
-  </dest>
-  <voice>
-    *: "Грешка током прикупљања инфо"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -15941,20 +15927,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Amaze главни мени"
-  </dest>
-  <voice>
-    *: "Амејз главни мени"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16204,34 +16176,6 @@
   </dest>
   <voice>
     *: "Мик мод подешавања"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod мени"
-  </dest>
-  <voice>
-    *: "Мик мод мени"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Chessbox мени"
-  </dest>
-  <voice>
-    *: "Чес бокс мени"
   </voice>
 </phrase>
 <phrase>
@@ -16981,5 +16925,36 @@
   <voice>
     *: none
     usbdac: "У Ес Бе - ДАК активан"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Објави статус"
+  </dest>
+  <voice>
+    *: "Објави статус"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Користи LED индикаторе"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Користи LED индикаторе"
   </voice>
 </phrase>
