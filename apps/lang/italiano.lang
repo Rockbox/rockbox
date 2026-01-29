@@ -16946,3 +16946,17 @@
     general_purpose_led: "Usa indicatori led"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Annuncia Lo Stato"
+  </dest>
+  <voice>
+    *: "Annuncia Lo Stato"
+  </voice>
+</phrase>
