@@ -8,6 +8,12 @@ if [[ $# -ne 2 ]]; then
     exit 1
 fi
 
+# Fail fast on any error, undefined variable, or failed pipeline
+set -euo pipefail
+
+# Report errors with line number and the failing command
+trap 'echo "ERROR at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
+
 ################################################################################
 ### init
 ################################################################################
