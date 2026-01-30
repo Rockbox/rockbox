@@ -13,13 +13,6 @@
 # KIND, either express or implied.
 #
 
-find_package(QuaZip-Qt${QT_VERSION_MAJOR} QUIET)
-if(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
-  set(QUAZIP_LIBRARY QuaZip::QuaZip)
-else()
-  set(QUAZIP_LIBRARY quazip)
-endif()
-
 add_executable(RockboxThemeEditor WIN32 MACOSX_BUNDLE
     graphics/rbalbumart.cpp
     graphics/rbalbumart.h

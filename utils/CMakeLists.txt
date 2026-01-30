@@ -84,6 +84,40 @@ if(APPLE)
 endif()
 
 
+find_package(QuaZip-Qt${QT_VERSION_MAJOR} QUIET)
+if(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
+    message("-- Found QuaZip")
+    set(QUAZIP_LIBRARY QuaZip::QuaZip)
+else()
+    message("-- QuaZip not found, building our own")
+    # TODO: Upstream has cmake support, use that instead.
+    add_library(quazip
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/ioapi.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/minizip_crypt.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/qioapi.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazip.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipfile.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipfile.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipfileinfo.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipfileinfo.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazip_global.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazip.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipnewinfo.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/quazipnewinfo.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/unzip.c
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/unzip.h
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/zip.c
+        ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/zip.h)
+    target_include_directories(quazip PUBLIC ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip)
+    target_link_libraries(quazip z Qt${QT_VERSION_MAJOR}::Core)
+    if(QT_VERSION_MAJOR EQUAL 6)
+        target_link_libraries(quazip Qt${QT_VERSION_MAJOR}::Core5Compat)
+    endif()
+    target_compile_definitions(quazip PUBLIC QUAZIP_STATIC)
+    set_property(TARGET quazip PROPERTY AUTOMOC ON)
+    set(QUAZIP_LIBRARY quazip)
+endif()
+
 add_executable(ipodpatcher-bin
     ipodpatcher/main.c
     ipodpatcher/ipodpatcher-aupd.c
@@ -392,4 +426,3 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/deploy.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/QtTest.cmake)
 add_subdirectory(rbutilqt)
 add_subdirectory(themeeditor)
-
