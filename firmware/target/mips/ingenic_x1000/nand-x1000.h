@@ -36,7 +36,7 @@
 
 /* keep max page size in sync with the NAND chip table in the .c file */
 #define NAND_DRV_SCRATCHSIZE 32
-#define NAND_DRV_MAXPAGESIZE 2112
+#define NAND_DRV_MAXPAGESIZE (2048+128)
 
 /* Quad I/O support bit */
 #define NAND_CHIPFLAG_QUAD          0x0001
