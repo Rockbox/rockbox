@@ -99,7 +99,7 @@ static const struct nand_chip chip_xt26g01cwsiga = {
     .oob_size = 128,
     .nr_blocks = 1024,
     .bbm_pos = 2048,
-    .clock_freq = 150000000,
+    .clock_freq = 104000000,
     .dev_conf = jz_orf(SFC_DEV_CONF,
                        CE_DL(1), HOLD_DL(1), WP_DL(1),
                        CPHA(0), CPOL(0),
