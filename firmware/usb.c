@@ -877,6 +877,7 @@ void usb_request_exclusive_storage(void)
 
 void usb_release_exclusive_storage(void)
 {
+    int bccount;
     if(!exclusive_storage_requested) {
         return;
     }
@@ -887,10 +888,12 @@ void usb_release_exclusive_storage(void)
     }
     exclusive_storage_enabled = false;
 
-#ifdef DEBUG
     /* Tell all threads that we are back in business */
-    int bccount = queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+    bccount = queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+#ifdef DEBUG
     DEBUGF("USB extracted. Broadcast to %d threads...\n", bccount);
+#else
+    (void)bccount;
 #endif
     return;
 }
