@@ -5,7 +5,7 @@ static int fd;
 extern int GETC(void)
 {
     unsigned char x = 0;
-    rb->read(fd, &x, 1)
+    rb->read(fd, &x, 1);
     return x;
 }
 
