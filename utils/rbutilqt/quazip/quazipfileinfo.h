@@ -4,20 +4,20 @@
 /*
 Copyright (C) 2005-2014 Sergey A. Tachenov
 
-This file is part of QuaZIP.
+This file is part of QuaZip.
 
-QuaZIP is free software: you can redistribute it and/or modify
+QuaZip is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
-QuaZIP is distributed in the hope that it will be useful,
+QuaZip is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with QuaZIP.  If not, see <http://www.gnu.org/licenses/>.
+along with QuaZip.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYING file for the full LGPL text.
 
@@ -140,7 +140,7 @@ struct QUAZIP_EXPORT QuaZipFileInfo64 {
   /**
    * The getNTFS*Time() functions only work if there is an NTFS extra field
    * present. Otherwise, they all return invalid null timestamps.
-   * @param fineTicks If not NULL, the fractional part of milliseconds returned
+   * @param fineTicks If not null, the fractional part of milliseconds returned
    *                  there, measured in 100-nanosecond ticks. Will be set to
    *                  zero if there is no NTFS extra field.
    * @sa dateTime
@@ -148,12 +148,12 @@ struct QUAZIP_EXPORT QuaZipFileInfo64 {
    * @sa getNTFScTime()
    * @return The NTFS modification time, UTC
    */
-  QDateTime getNTFSmTime(int *fineTicks = NULL) const;
+  QDateTime getNTFSmTime(int *fineTicks = nullptr) const;
   /// Returns the NTFS access time
   /**
    * The getNTFS*Time() functions only work if there is an NTFS extra field
    * present. Otherwise, they all return invalid null timestamps.
-   * @param fineTicks If not NULL, the fractional part of milliseconds returned
+   * @param fineTicks If not null, the fractional part of milliseconds returned
    *                  there, measured in 100-nanosecond ticks. Will be set to
    *                  zero if there is no NTFS extra field.
    * @sa dateTime
@@ -161,12 +161,12 @@ struct QUAZIP_EXPORT QuaZipFileInfo64 {
    * @sa getNTFScTime()
    * @return The NTFS access time, UTC
    */
-  QDateTime getNTFSaTime(int *fineTicks = NULL) const;
+  QDateTime getNTFSaTime(int *fineTicks = nullptr) const;
   /// Returns the NTFS creation time
   /**
    * The getNTFS*Time() functions only work if there is an NTFS extra field
    * present. Otherwise, they all return invalid null timestamps.
-   * @param fineTicks If not NULL, the fractional part of milliseconds returned
+   * @param fineTicks If not null, the fractional part of milliseconds returned
    *                  there, measured in 100-nanosecond ticks. Will be set to
    *                  zero if there is no NTFS extra field.
    * @sa dateTime
@@ -174,7 +174,7 @@ struct QUAZIP_EXPORT QuaZipFileInfo64 {
    * @sa getNTFSaTime()
    * @return The NTFS creation time, UTC
    */
-  QDateTime getNTFScTime(int *fineTicks = NULL) const;
+  QDateTime getNTFScTime(int *fineTicks = nullptr) const;
   /// Returns the extended modification timestamp
   /**
    * The getExt*Time() functions only work if there is an extended timestamp

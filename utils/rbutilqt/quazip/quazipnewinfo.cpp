@@ -1,20 +1,20 @@
 /*
 Copyright (C) 2005-2014 Sergey A. Tachenov
 
-This file is part of QuaZIP.
+This file is part of QuaZip.
 
-QuaZIP is free software: you can redistribute it and/or modify
+QuaZip is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
-QuaZIP is distributed in the hope that it will be useful,
+QuaZip is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with QuaZIP.  If not, see <http://www.gnu.org/licenses/>.
+along with QuaZip.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYING file for the full LGPL text.
 
@@ -25,6 +25,7 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include <QtCore/QFileInfo>
 
 #include "quazipnewinfo.h"
+#include "quazip_qt_compat.h"
 
 #include <string.h>
 
@@ -134,11 +135,7 @@ void QuaZipNewInfo::setFileNTFSTimes(const QString &fileName)
     }
     setFileNTFSmTime(fi.lastModified());
     setFileNTFSaTime(fi.lastRead());
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-    setFileNTFScTime(fi.birthTime());
-#else
-    setFileNTFScTime(fi.created());
-#endif
+    setFileNTFScTime(quazip_ctime(fi));
 }
 
 static void setNTFSTime(QByteArray &extra, const QDateTime &time, int position,
@@ -251,16 +248,7 @@ static void setNTFSTime(QByteArray &extra, const QDateTime &time, int position,
         extra[timesPos + 2] = static_cast<char>(ntfsTimesLength);
         extra[timesPos + 3] = static_cast<char>(ntfsTimesLength >> 8);
     }
-    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
-#if (QT_VERSION >= 0x040700)
-    quint64 ticks = base.msecsTo(time) * 10000 + fineTicks;
-#else
-    QDateTime utc = time.toUTC();
-    quint64 ticks = (static_cast<qint64>(base.date().daysTo(utc.date()))
-            * Q_INT64_C(86400000)
-            + static_cast<qint64>(base.time().msecsTo(utc.time())))
-        * Q_INT64_C(10000) + fineTicks;
-#endif
+    quint64 ticks = quazip_ntfs_ticks(time, fineTicks);
     extra[timesPos + 4 + position] = static_cast<char>(ticks);
     extra[timesPos + 5 + position] = static_cast<char>(ticks >> 8);
     extra[timesPos + 6 + position] = static_cast<char>(ticks >> 16);

@@ -4,20 +4,20 @@
 /*
 Copyright (C) 2005-2014 Sergey A. Tachenov
 
-This file is part of QuaZIP.
+This file is part of QuaZip.
 
-QuaZIP is free software: you can redistribute it and/or modify
+QuaZip is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
-QuaZIP is distributed in the hope that it will be useful,
+QuaZip is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with QuaZIP.  If not, see <http://www.gnu.org/licenses/>.
+along with QuaZip.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYING file for the full LGPL text.
 
@@ -39,7 +39,7 @@ class QuaZipFilePrivate;
  * interface to the ZIP/UNZIP package, but also integrates it with Qt by
  * subclassing QIODevice. This makes possible to access files inside ZIP
  * archive using QTextStream or QDataStream, for example. Actually, this
- * is the main purpose of the whole QuaZIP library.
+ * is the main purpose of the whole QuaZip library.
  *
  * You can either use existing QuaZip instance to create instance of
  * this class or pass ZIP archive file name to this class, in which case
@@ -107,7 +107,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * QuaZipFile constructed by this constructor can be used for read
      * only access. Use QuaZipFile(QuaZip*,QObject*) for writing.
      **/
-    QuaZipFile(const QString& zipName, QObject *parent =NULL);
+    QuaZipFile(const QString& zipName, QObject *parent =nullptr);
     /// Constructs a QuaZipFile instance.
     /** \a parent argument specifies this object's parent object, \a
      * zipName specifies ZIP archive file name and \a fileName and \a cs
@@ -119,7 +119,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * \sa QuaZip::setCurrentFile()
      **/
     QuaZipFile(const QString& zipName, const QString& fileName,
-        QuaZip::CaseSensitivity cs =QuaZip::csDefault, QObject *parent =NULL);
+        QuaZip::CaseSensitivity cs =QuaZip::csDefault, QObject *parent =nullptr);
     /// Constructs a QuaZipFile instance.
     /** \a parent argument specifies this object's parent object.
      *
@@ -169,7 +169,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * zip.close();
      * \endcode
      **/
-    QuaZipFile(QuaZip *zip, QObject *parent =NULL);
+    QuaZipFile(QuaZip *zip, QObject *parent =nullptr);
     /// Destroys a QuaZipFile instance.
     /** Closes file if open, destructs internal QuaZip object (if it
      * exists and \em is internal, of course).
@@ -296,7 +296,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * it is NULL then this function behaves just like open(OpenMode).
      **/
     inline bool open(OpenMode mode, const char *password)
-    {return open(mode, NULL, NULL, false, password);}
+    {return open(mode, nullptr, nullptr, false, password);}
     /// Opens a file for reading.
     /** \overload
      * Argument \a password specifies a password to decrypt the file.
@@ -309,7 +309,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * \a method should not be \c NULL. \a level can be \c NULL if you
      * don't want to know the compression level.
      **/
-    bool open(OpenMode mode, int *method, int *level, bool raw, const char *password =NULL);
+    bool open(OpenMode mode, int *method, int *level, bool raw, const char *password =nullptr);
     /// Opens a file for writing.
     /** \a info argument specifies information about file. It should at
      * least specify a correct file name. Also, it is a good idea to
@@ -339,7 +339,7 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
      * algorithms tuning. See deflateInit2() in zlib.
      **/
     bool open(OpenMode mode, const QuaZipNewInfo& info,
-        const char *password =NULL, quint32 crc =0,
+        const char *password =nullptr, quint32 crc =0,
         int method =Z_DEFLATED, int level =Z_DEFAULT_COMPRESSION, bool raw =false,
         int windowBits =-MAX_WBITS, int memLevel =DEF_MEM_LEVEL, int strategy =Z_DEFAULT_STRATEGY);
     /// Returns \c true, but \ref quazipfile-sequential "beware"!

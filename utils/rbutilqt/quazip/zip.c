@@ -9,7 +9,7 @@
 
          For more info read MiniZip_info.txt
 
-         Modifications for QIODevice support and other QuaZIP fixes
+         Modifications for QIODevice support and other QuaZip fixes
          Copyright (C) 2005-2014 Sergey A. Tachenov
 
          Fixing static code analysis issues
