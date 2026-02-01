@@ -50,7 +50,7 @@ Version 1.5.1
 
 Version 1.5.2
 * Add support for Native Port to AIGO Eros Q and various clones
-* Make Hosted Port to AIGO Eros Q and various clones "disabled" (can be reenabled by checking the "show disabled targets" checkbox)
+* Mark hosted oort to AIGO Eros Q and various clones "disabled" (can be reenabled by checking the "show disabled targets" checkbox)
 * Talk clip generation now respects 'talkclips.ignore' files
 * Generate additional talk clips for language name and 'invalid voice file'
 * When installing development builds, fall back to daily artefacts for non-firmware files
