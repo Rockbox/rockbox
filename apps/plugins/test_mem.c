@@ -36,7 +36,7 @@
 static int loop_repeat_dram = LOOP_REPEAT_DRAM;
 static volatile int buf_dram[BUF_SIZE]           MEM_ALIGN_ATTR;
 
-#if defined(PLUGIN_USE_IRAM)
+#if defined(USE_IRAM)
 
 #if PLUGIN_BUFFER_SIZE <= 0x8000
 #define IBUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */
@@ -231,7 +231,7 @@ enum plugin_status plugin_start(const void* parameter)
         ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, MEMSET);
         ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, MEMCPY);
         if (ret != 0 && loop_repeat_dram < MAX_REPEAT_DRAM) loop_repeat_dram *= 2;
-#if defined(PLUGIN_USE_IRAM)
+#if defined(USE_IRAM)
         TEST_MEM_PRINTF("IRAM cnt: %d size: %d MB", loop_repeat_iram, 
             (loop_repeat_iram*BUF_SIZE*sizeof(buf_iram[0]))>>20);
         ret = 0;

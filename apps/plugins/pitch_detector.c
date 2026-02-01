@@ -248,7 +248,7 @@ static volatile int audio_tail = 0; /* which of the two buffers to record? */
 #ifndef SIMULATOR
 static int16_t audio_data[2][BUFFER_SIZE] MEM_ALIGN_ATTR;
 static fixed yin_buffer[YIN_BUFFER_SIZE] IBSS_ATTR;
-#ifdef PLUGIN_USE_IRAM
+#ifdef USE_IRAM
 static int16_t iram_audio_data[BUFFER_SIZE] IBSS_ATTR;
 #else
 #define iram_audio_data audio_data[audio_head]
@@ -1047,7 +1047,7 @@ static void record_and_get_pitch(void)
             #ifdef HAVE_SCHEDULER_BOOSTCTRL
                 rb->trigger_cpu_boost();
             #endif
-#ifdef PLUGIN_USE_IRAM
+#ifdef USE_IRAM
                 rb->memcpy(iram_audio_data, audio_data[audio_head],
                            settings.sample_size * sizeof (int16_t));
 #endif

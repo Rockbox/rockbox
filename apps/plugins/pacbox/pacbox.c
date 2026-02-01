@@ -387,7 +387,7 @@ static void start_sound(void)
     if (sound_playing)
         return;
 
-#ifndef PLUGIN_USE_IRAM
+#ifndef USE_IRAM
     /* Ensure control of PCM - stopping music itn't obligatory */
     rb->plugin_get_audio_buffer(NULL);
 #endif

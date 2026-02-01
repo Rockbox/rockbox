@@ -1187,12 +1187,10 @@ Lyre prototype 1 */
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == TCC7801)
 # define USE_IRAM
-# define PLUGIN_USE_IRAM
 
 /* AS3525 +2MB: core, plugins, codecs */
 #elif (CONFIG_CPU == AS3525) && (MEMORYSIZE > 2) && !defined(BOOTLOADER)
 # define USE_IRAM
-# define PLUGIN_USE_IRAM
 
 /* AS3525 2MB: core only */
 #elif (CONFIG_CPU == AS3525) && (MEMORYSIZE <= 2) && !defined(BOOTLOADER) && \
