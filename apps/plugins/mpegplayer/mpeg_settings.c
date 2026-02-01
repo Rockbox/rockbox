@@ -985,13 +985,6 @@ static int get_start_time(uint32_t duration)
         case STATE0:
             if (!sliding)
             {
-                if (rb->global_settings->talk_menu)
-                {
-                    rb->talk_disable(true);
-#ifdef PLUGIN_USE_IRAM
-                    mpegplayer_iram_restore();
-#endif
-                }
                 trigger_cpu_boost();
                 sliding = true;
             }
@@ -1010,10 +1003,6 @@ static int get_start_time(uint32_t duration)
                 cancel_cpu_boost();
                 if (rb->global_settings->talk_menu)
                 {
-#ifdef PLUGIN_USE_IRAM
-                    mpegplayer_iram_preserve();
-#endif
-                    rb->talk_disable(false);
                     talk_val(resume_time / TS_SECOND, UNIT_TIME, false);
                     talk_val(resume_time * 100 / duration, UNIT_PERCENT, true);
                 }
@@ -1052,14 +1041,6 @@ static int show_start_menu(uint32_t duration)
                         ID2P(LANG_SET_RESUME_TIME),
                         ID2P(LANG_SETTINGS),
                         ID2P(LANG_MENU_QUIT));
-
-    if (rb->global_settings->talk_menu)
-    {
-#ifdef PLUGIN_USE_IRAM
-        mpegplayer_iram_preserve();
-#endif
-        rb->talk_disable(false);
-    }
 
     rb->button_clear_queue();
 
@@ -1109,14 +1090,6 @@ static int show_start_menu(uint32_t duration)
         }
     }
 
-    if (rb->global_settings->talk_menu)
-    {
-        rb->talk_disable(true);
-#ifdef PLUGIN_USE_IRAM
-        mpegplayer_iram_restore();
-#endif
-    }
-
     return result;
 }
 
@@ -1151,14 +1124,6 @@ int mpeg_menu(void)
                         ID2P(LANG_RESUME_PLAYBACK),
                         ID2P(LANG_MENU_QUIT));
 
-    if (rb->global_settings->talk_menu)
-    {
-#ifdef PLUGIN_USE_IRAM
-        mpegplayer_iram_preserve();
-#endif
-        rb->talk_disable(false);
-    }
-
     rb->button_clear_queue();
 
     mpeg_sysevent_clear();
@@ -1183,14 +1148,6 @@ int mpeg_menu(void)
 
     if (mpeg_sysevent() != 0)
         result = MPEG_MENU_QUIT;
-
-    if (rb->global_settings->talk_menu)
-    {
-        rb->talk_disable(true);
-#ifdef PLUGIN_USE_IRAM
-        mpegplayer_iram_restore();
-#endif
-    }
 
     return result;
 }
