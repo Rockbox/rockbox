@@ -904,7 +904,7 @@ static void update_norm_tab(void)
     norm_tab[0] = min;
     norm_tab_size = 1;
 
-    for (int i = 0; i < lim; ++i)
+    for (int i = 1; i < lim - 1; ++i)
     {
         int vol = from_normalized_volume(i, min, max, lim);
         int rem = vol % step;
@@ -1944,49 +1944,40 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
 
 #define NVOL_FRACBITS 16
 #define NVOL_UNITY    (1L << NVOL_FRACBITS)
-#define NVOL_FACTOR   (600L << NVOL_FRACBITS)
-
-#define NVOL_MAX_LINEAR_DB_SCALE (240L << NVOL_FRACBITS)
 
 #define nvol_div(x,y) fp_div((x), (y), NVOL_FRACBITS)
 #define nvol_mul(x,y) fp_mul((x), (y), NVOL_FRACBITS)
 #define nvol_exp10(x) fp_exp10((x), NVOL_FRACBITS)
 #define nvol_log10(x) fp_log10((x), NVOL_FRACBITS)
 
-static bool use_linear_dB_scale(long min_vol, long max_vol)
+static long get_nvol_factor(void)
 {
-    /*
-     * Alsamixer uses a linear scale for small ranges.
-     * Commented out so perceptual volume works as advertised on all targets.
-     */
-    /*
-    return max_vol - min_vol <= NVOL_MAX_LINEAR_DB_SCALE;
-    */
+    long factor = 600L << NVOL_FRACBITS;
+    long numdecimals = sound_numdecimals(SOUND_VOLUME);
 
-    (void)min_vol;
-    (void)max_vol;
-    return false;
+    if (numdecimals == 0)
+        factor /= 10;
+
+    /* nothing *actually* needs this, but: */
+    while (numdecimals > 1)
+        factor *= 10;
+
+    return factor;
 }
 
 long to_normalized_volume(long vol, long min_vol, long max_vol, long max_norm)
 {
     long norm, min_norm;
+    long factor = get_nvol_factor();
 
     vol <<= NVOL_FRACBITS;
     min_vol <<= NVOL_FRACBITS;
     max_vol <<= NVOL_FRACBITS;
     max_norm <<= NVOL_FRACBITS;
 
-    if (use_linear_dB_scale(min_vol, max_vol))
-    {
-        norm = nvol_div(vol - min_vol, max_vol - min_vol);
-    }
-    else
-    {
-        min_norm = nvol_exp10(nvol_div(min_vol - max_vol, NVOL_FACTOR));
-        norm = nvol_exp10(nvol_div(vol - max_vol, NVOL_FACTOR));
-        norm = nvol_div(norm - min_norm, NVOL_UNITY - min_norm);
-    }
+    min_norm = nvol_exp10(nvol_div(min_vol - max_vol, factor));
+    norm = nvol_exp10(nvol_div(vol - max_vol, factor));
+    norm = nvol_div(norm - min_norm, NVOL_UNITY - min_norm);
 
     return nvol_mul(norm, max_norm) >> NVOL_FRACBITS;
 }
@@ -1994,6 +1985,7 @@ long to_normalized_volume(long vol, long min_vol, long max_vol, long max_norm)
 long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm)
 {
     long vol, min_norm;
+    long factor = get_nvol_factor();
 
     norm <<= NVOL_FRACBITS;
     min_vol <<= NVOL_FRACBITS;
@@ -2002,16 +1994,9 @@ long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm
 
     vol = nvol_div(norm, max_norm);
 
-    if (use_linear_dB_scale(min_vol, max_vol))
-    {
-        vol = nvol_mul(vol, max_vol - min_vol) + min_vol;
-    }
-    else
-    {
-        min_norm = nvol_exp10(nvol_div(min_vol - max_vol, NVOL_FACTOR));
-        vol = nvol_mul(vol, NVOL_UNITY - min_norm) + min_norm;
-        vol = nvol_mul(nvol_log10(vol), NVOL_FACTOR) + max_vol;
-    }
+    min_norm = nvol_exp10(nvol_div(min_vol - max_vol, factor));
+    vol = nvol_mul(vol, NVOL_UNITY - min_norm) + min_norm;
+    vol = nvol_mul(nvol_log10(vol), factor) + max_vol;
 
     return vol >> NVOL_FRACBITS;
 }
