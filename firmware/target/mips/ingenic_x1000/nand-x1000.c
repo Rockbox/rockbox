@@ -111,8 +111,8 @@ static const struct nand_chip chip_xt26g01cwsiga = {
     .cmd_page_read = NANDCMD_PAGE_READ,
     .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
     .cmd_block_erase = NANDCMD_BLOCK_ERASE,
-    .cmd_read_cache = NANDCMD_READ_CACHE_x4,
-    .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
+    .cmd_read_cache = NANDCMD_READ_CACHE,
+    .cmd_program_load = NANDCMD_PROGRAM_LOAD,
 };
 
 #define chip_ds35x1gaxxx chip_gd5f1gq4xexx
