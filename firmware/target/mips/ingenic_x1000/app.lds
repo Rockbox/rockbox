@@ -71,11 +71,11 @@ SECTIONS
      * The following sections are loaded after normal DRAM sections
      * but are copied elsewhere by the startup code.
      */
-    _noloaddram = .;
+    _noloaddram = ALIGN(4);
 
     .iram :
     {
-        _iramstart = .;
+        _iramstart = ALIGN(4);
         . = 0x000; /* TLB refill */
         KEEP(*(.vectors.1));
         . = 0x100; /* Cache error */
@@ -89,24 +89,24 @@ SECTIONS
         *(.icode*);
         *(.irodata);
         *(.idata);
-        _iramend = .;
+        _iramend = ALIGN(4);
     } > IRAM AT> DRAM
     _iramcopy = LOADADDR(.iram);
 
     .tcsm :
     {
-        _tcsmstart = .;
+        _tcsmstart = ALIGN(4);
         KEEP(*(.tcsm*));
-        _tcsmend = .;
+        _tcsmend = ALIGN(4);
     } > TCSM AT> DRAM
     _tcsmcopy = LOADADDR(.tcsm);
 
 #ifdef HAVE_INIT_ATTR
     .init :
     {
-        _initstart = .;
+        _initstart = ALIGN(4);
         *(.init*);
-        _initend = .;
+        _initend = ALIGN(4);
     } > INIT AT> DRAM
     _initcopy = LOADADDR(.init);
 #endif
@@ -117,22 +117,22 @@ SECTIONS
     .stack (NOLOAD) :
     {
          *(.stack);
-         stackbegin = .;
+         stackbegin = ALIGN(4);
          . += X1000_STACKSIZE;
-         stackend = .;
-         _irqstackbegin = .;
+         stackend = ALIGN(4);
+         _irqstackbegin = ALIGN(4);
          . += X1000_IRQSTACKSIZE;
-         _irqstackend = .;
+         _irqstackend = ALIGN(4);
     } > IRAM
 
     .bss _noloaddram (NOLOAD) :
     {
-        _bssbegin = .;
+        _bssbegin = ALIGN(4);
         *(.sbss*);
         *(.bss*);
         *(COMMON);
         *(.scommon*);
-        _bssend = .;
+        _bssend = ALIGN(4);
         _end = .;
     } > DRAM
 
