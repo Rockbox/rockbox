@@ -1959,7 +1959,7 @@ static long get_nvol_factor(void)
         factor /= 10;
 
     /* nothing *actually* needs this, but: */
-    while (numdecimals > 1)
+    while (numdecimals-- > 1)
         factor *= 10;
 
     return factor;
