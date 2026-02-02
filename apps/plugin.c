@@ -758,9 +758,6 @@ static const struct plugin_api rockbox_api = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-#ifdef PLUGIN_USE_IRAM
-    audio_hard_stop,
-#endif
     add_playbacklog,
 
     /* menu */

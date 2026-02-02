@@ -178,7 +178,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 277
+#define PLUGIN_API_VERSION 278
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -889,9 +889,6 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#ifdef PLUGIN_USE_IRAM
-    void (*audio_hard_stop)(void);
-#endif
     void (*add_playbacklog)(struct mp3entry *id3);
 
     /* menu */

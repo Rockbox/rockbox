@@ -107,11 +107,6 @@ int audio_get_file_pos(void)
     \return
     \description
 
-void audio_hard_stop(void)
-    \group playback control
-    \conditions (defined(PLUGIN_USE_IRAM))
-    \description
-
 void audio_next(void)
     \group playback control
     \description
