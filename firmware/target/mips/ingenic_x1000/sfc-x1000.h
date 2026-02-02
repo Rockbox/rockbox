@@ -36,9 +36,10 @@
 #define SFC_TMODE_1_1_2 1
 #define SFC_TMODE_1_2_2 2
 #define SFC_TMODE_2_2_2 3
-#define SFC_TMODE_1_1_4 4
-#define SFC_TMODE_1_4_4 5
-#define SFC_TMODE_4_4_4 6
+#define SFC_TMODE_RESERVED 4 // See 10.7.3.6 SFC Transfer Configure Register MODE Field
+#define SFC_TMODE_1_1_4 5
+#define SFC_TMODE_1_4_4 6
+#define SFC_TMODE_4_4_4 7
 
 /* Phase format
  *  _____________________
