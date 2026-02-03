@@ -1178,10 +1178,6 @@ target/coldfire/iaudio/audio-iaudio.c
 #endif
 #endif /* IAUDIO_M3 */
 
-#ifdef STUB
-libc/sscanf.c
-#endif /* STUB */
-
 #if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES)
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c

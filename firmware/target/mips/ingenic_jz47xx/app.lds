@@ -9,12 +9,10 @@ STARTUP(target/mips/ingenic_jz47xx/crt0.o)
 INPUT(target/mips/exception-mips.o)
 INPUT(target/mips/system-mips.o)
 
-#define STUBOFFSET    0x4000
-
-#define DRAMORIG      (0x80000000 + STUBOFFSET)
-#define DRAMSIZE      (MEMORYSIZE * 0x100000 - STUBOFFSET)
 #define IRAMORIG      0x80000000
-#define IRAMSIZE      16K
+#define IRAMSIZE      0x4000
+#define DRAMORIG      (IRAMORIG + IRAMSIZE)
+#define DRAMSIZE      (MEMORYSIZE * 0x100000 - IRAMSIZE)
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE)

@@ -1,3 +1,0 @@
-#ifdef CPU_ARM
-arm-stub.c
-#endif
