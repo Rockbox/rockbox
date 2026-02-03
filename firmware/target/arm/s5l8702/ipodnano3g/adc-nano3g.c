@@ -41,6 +41,23 @@ unsigned short adc_read(int channel)
     return 0;
 }
 
+int adc_read_accessory_resistor(void)
+{
+    return 0;
+}
+
+unsigned int adc_read_usbdata_voltage(bool dp)
+{
+    (void)dp;
+    return 0;
+}
+
+const char *adc_name(int channel)
+{
+    (void) channel;
+    return "";
+}
+
 void adc_init(void)
 {
 }

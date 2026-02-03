@@ -202,7 +202,7 @@ int pmu_firewire_present(void)
 }
 #endif
 
-#if 1   // XXX: from usb-s5l8702.c
+#if defined(BOOTLOADER)   // XXX: from usb-s5l8702.c
 #include "usb.h"
 static int usb_status = USB_EXTRACTED;
 

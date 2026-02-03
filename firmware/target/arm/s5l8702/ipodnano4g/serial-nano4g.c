@@ -26,7 +26,7 @@
 #include "system.h"
 #include "serial.h"
 
-#include "s5l87x.h"
+#include "s5l87xx.h"
 #include "uc87xx.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */

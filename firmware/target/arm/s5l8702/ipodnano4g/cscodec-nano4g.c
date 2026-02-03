@@ -55,6 +55,7 @@ void cscodec_power(bool state)
 
 void cscodec_reset(bool state)
 {
+    (void)state;
     // TODO: not tested
     // if (state) PDAT(3) &= ~8;
     // else PDAT(3) |= 8;
