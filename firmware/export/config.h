@@ -118,17 +118,13 @@
 #define CREATIVEZV_PAD     26
 #define PHILIPS_SA9200_PAD 27
 #define PHILIPS_HDD1630_PAD 29
-#define MEIZU_M6SL_PAD     30
 #define ONDAVX747_PAD      31
 #define ONDAVX767_PAD      32
-#define MEIZU_M6SP_PAD     33
-#define MEIZU_M3_PAD       34
 #define SANSA_CLIP_PAD     35
 #define SANSA_FUZE_PAD     36
 #define LYRE_PROTO1_PAD    37
 #define SAMSUNG_YH820_PAD  38
 #define ONDAVX777_PAD      39
-#define SAMSUNG_YPS3_PAD   40
 #define MINI2440_PAD       41
 #define PHILIPS_HDD6330_PAD 42
 #define PBELL_VIBE500_PAD 43
@@ -246,7 +242,6 @@
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
 #define LCD_S6B33B2  26 /* as used by the Samsumg YH820 */
 #define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
-#define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
 #define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
@@ -354,7 +349,6 @@ Lyre prototype 1 */
 #define RTC_MR100  12
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
 #define RTC_S5L8700  14
-#define RTC_S35390A  15
 #define RTC_JZ4740   16 /* Ingenic Jz4740 */
 #define RTC_NANO2G   17 /* This seems to be a PCF5063x */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */
@@ -465,12 +459,6 @@ Lyre prototype 1 */
 #include "config/gogearhdd1630.h"
 #elif defined(PHILIPS_HDD6330)
 #include "config/gogearhdd6330.h"
-#elif defined(MEIZU_M6SL)
-#include "config/meizum6sl.h"
-#elif defined(MEIZU_M6SP)
-#include "config/meizum6sp.h"
-#elif defined(MEIZU_M3)
-#include "config/meizum3.h"
 #elif defined(ONDA_VX747) || defined(ONDA_VX747P)
 #include "config/ondavx747.h"
 #elif defined(ONDA_VX777)
@@ -509,8 +497,6 @@ Lyre prototype 1 */
 #include "config/samsungyh920.h"
 #elif defined(SAMSUNG_YH925)
 #include "config/samsungyh925.h"
-#elif defined(SAMSUNG_YPS3)
-#include "config/samsungyps3.h"
 #elif defined(PBELL_VIBE500)
 #include "config/vibe500.h"
 #elif defined(MPIO_HD200)

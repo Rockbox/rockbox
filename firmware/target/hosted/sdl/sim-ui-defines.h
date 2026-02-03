@@ -237,13 +237,6 @@
 #define UI_LCD_POSX                 129 /* x position of lcd */
 #define UI_LCD_POSY                 85 /* y position of lcd */
 
-#elif defined(MEIZU_M6SL)
-#define UI_TITLE                    "Meizu M6"
-#define UI_WIDTH                    512 /* width of GUI window */
-#define UI_HEIGHT                   322 /* height of GUI window */
-#define UI_LCD_POSX                 39 /* x position of lcd */
-#define UI_LCD_POSY                 38 /* y position of lcd */
-
 #elif defined(SANSA_FUZEPLUS)
 #define UI_TITLE                    "Sansa Fuze+"
 #define UI_WIDTH                    322 /* width of GUI window */

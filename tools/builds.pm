@@ -207,18 +207,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'Mini 2440',
         status => 1,
     },
-    'meizum3' => {
-        name => 'Meizu M3',
-        status => 1,
-    },
-    'meizum6sl' => {
-        name => 'Meizu M6SL',
-        status => 1,
-    },
-    'meizum6sp' => {
-        name => 'Meizu M6SP',
-        status => 1,
-    },
     'mrobe100' => {
         name => 'Olympus M-Robe 100',
         status => 3,
@@ -275,10 +263,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'Samsung YP-R1',
 	sim => 0,
         status => 2,
-    },
-    'samsungyps3' => {
-        name => 'Samsung YP-S3',
-        status => 1,
     },
     'sansac200' => {
         name => 'SanDisk Sansa c200',

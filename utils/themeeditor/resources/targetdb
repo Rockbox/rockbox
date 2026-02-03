@@ -589,33 +589,6 @@ lyreproto1
     record : no
 }
 
-meizum3
-{
-    name   : Meizu M3
-    screen : 176 x 132 @ rgb
-    remote : no
-    fm     : yes
-    record : no
-}
-
-meizum6sl
-{
-    name   : Meizu M6SL
-    screen : 320 x 240 @ rgb
-    remote : no
-    fm     : yes
-    record : no
-}
-
-meizum6sp
-{
-    name   : Meizu M6SP
-    screen : 240 x 320 @ rgb
-    remote : no
-    fm     : yes
-    record : no
-}
-
 mini2440
 {
     name   : Mini 2440
@@ -683,15 +656,6 @@ samsungypr0
 {
     name   : Samsung YP-R0
     screen : 240 x 320 @ rgb
-    remote : no
-    fm     : yes
-    record : no
-}
-
-samsungyps3
-{
-    name   : Samsung YP-S3
-    screen : 176 x 220 @ rgb
     remote : no
     fm     : yes
     record : no

@@ -24,11 +24,7 @@ STARTUP(target/arm/s5l8700/crt0.o)
 #define IRAMSIZE 256K
 #endif
 
-#ifdef MEIZU_M6SL
-#define DFULOADADDR IRAMORIG
-#else
 #define DFULOADADDR (IRAMORIG+0x20000)
-#endif
 
 /* This is not available in all versions of the S5L8700 */
 #define FLASHORIG 0x24000000
@@ -41,7 +37,7 @@ MEMORY
     FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
 }
 
-#if defined(IPOD_NANO2G) || defined(MEIZU_M6SL)
+#if defined(IPOD_NANO2G)
 #define LOAD_AREA IRAM
 #else
 #define NEEDS_INTVECT_COPYING
