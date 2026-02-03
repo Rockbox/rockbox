@@ -29,9 +29,6 @@
 #ifdef GIGABEAT_F
 #define DMA_CHAN_ATA        0
 #define DMA_CHAN_AUDIO_OUT  2
-#elif defined(MINI2440)
-#define DMA_CHAN_SD         0
-#define DMA_CHAN_AUDIO_OUT  2
 #else
 #error Unsupported target
 #endif

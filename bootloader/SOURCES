@@ -53,12 +53,6 @@ sansa_as3525.c
 show_logo.c
 #elif CONFIG_CPU==IMX233
 imx233.c
-#elif defined(LYRE_PROTO1)
-lyre_proto1.c
-show_logo.c
-#elif defined(MINI2440)
-mini2440.c
-show_logo.c
 #elif defined(PBELL_VIBE500)
 main-pp.c
 show_logo.c

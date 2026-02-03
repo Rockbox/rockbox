@@ -191,8 +191,6 @@ void system_init(void)
     CLKCON &= ~0xFF1ED0;
  
     CLKSLOW |= 0x80;
-#elif defined(MINI2440)        
-    /* TODO: anything? */
 #else
 #error Unknown target    
 #endif

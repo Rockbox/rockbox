@@ -48,20 +48,6 @@
         #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
     #endif /* BOOTLOADER */
 
-#elif defined(MINI2440)
-
-    /* Uses 1:4:8 */
-    #define FCLK 406000000
-    #define HCLK (FCLK/4)   /* = 101,250,000 */
-    #define PCLK (HCLK/2)   /* =  50,625,000 */
-
-    #define CPUFREQ_DEFAULT FCLK    /* 406 MHz */
-    #define CPUFREQ_NORMAL  (FCLK/4)/* 101.25 MHz */   
-    #define CPUFREQ_MAX     FCLK    /* 406 MHz */
-    
-    #define UNCACHED_BASE_ADDR 0x30000000
-    #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
-
 #else
     #error Unknown target
 #endif

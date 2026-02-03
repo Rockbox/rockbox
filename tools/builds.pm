@@ -199,14 +199,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'iriver H320/340',
         status => 3,
     },
-    'lyreproto1' => {
-        name => 'Lyre Prototype 1',
-        status => 1,
-    },
-    'mini2440' => {
-        name => 'Mini 2440',
-        status => 1,
-    },
     'mrobe100' => {
         name => 'Olympus M-Robe 100',
         status => 3,

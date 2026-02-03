@@ -580,24 +580,6 @@ logikdax
     record : no
 }
 
-lyreproto1
-{
-    name   : Lyre Prototype 1
-    screen : 128 x 128 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
-mini2440
-{
-    name   : Mini 2440
-    screen : 240 x 320 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
 mpiohd200
 {
     name   : MPIO HD200

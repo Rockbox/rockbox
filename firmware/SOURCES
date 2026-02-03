@@ -929,7 +929,7 @@ target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-gray.c
 #elif CONFIG_LCD == LCD_GIGABEATS
 target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
-#elif CONFIG_LCD == LCD_GIGABEAT || CONFIG_LCD == LCD_MINI2440
+#elif CONFIG_LCD == LCD_GIGABEAT
 target/arm/s3c2440/lcd-s3c2440.c
 #elif CONFIG_LCD == LCD_ILI9342 || CONFIG_LCD == LCD_ILI9342C
 target/arm/rk27xx/ma/lcd-ma.c
@@ -1825,34 +1825,6 @@ target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
 target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* EROS_QN */
-
-#if defined(LYRE_PROTO1)
-target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/backlight-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/button-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/crt0.S
-target/arm/at91sam/lyre_proto1/debug-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/kernel-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/lcd-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/system-lyre_proto1.c
-target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
-#endif
-
-#if defined(MINI2440)
-drivers/lcd-memframe.c
-target/arm/s3c2440/dma-s3c2440.c
-target/arm/s3c2440/sd-s3c2440.c
-target/arm/s3c2440/uart-s3c2440.c
-target/arm/s3c2440/mini2440/backlight-mini2440.c
-target/arm/s3c2440/mini2440/button-mini2440.c
-target/arm/s3c2440/mini2440/led-mini2440.c
-target/arm/s3c2440/mini2440/power-mini2440.c
-target/arm/s3c2440/mini2440/touchscreen-mini2440.c
-#ifndef BOOTLOADER
-target/arm/s3c2440/mini2440/powermgmt-mini2440.c
-target/arm/s3c2440/mini2440/pcm-mini2440.c
-#endif
-#endif /* MINI2440 */
 
 #if defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
 target/arm/samsung/akcodec-yh82x_yh92x.c

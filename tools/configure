@@ -1697,41 +1697,41 @@ cat <<EOF
  102) GoGear HDD6330       93) Zen X-Fi2         65) Sansa Clip Zip
                            94) Zen X-Fi3         66) Sansa Connect
  ==Samsung==               95) Zen V
- 140) YH-820               96) Zen X-Fi          ==Lyre project==
- 141) YH-920               97) Zen Mozaic        130) Lyre proto 1
- 142) YH-925               98) Zen               131) Mini2440
- 144) YP-R0
- 145) YP-R1 (WIP)          ==Onda==              ==Packard Bell==
-                           120) VX747            160) Vibe 500
- ==HiFiMAN==               122) VX747+
- 190) HM-60x               121) VX767            ==ROCKCHIP==
- 191) HM-801               123) VX777            180) rk27xx generic
-
- ==Sony==                  ==MPIO==              ==HiFi E.T.==
- 219) NWZ-E350 series      170) HD200            210) MA9
- 220) NWZ-E370/E380 series 171) HD300            211) MA9C
- 221) NWZ-E360 series                            212) MA8
- 222) NWZ-E450 series      ==Application==       213) MA8C
- 223) NWZ-E460 series      200) SDL (Generic)
- 224) NWZ-E470 series      201) Android (ARM)    ==IHIFI==
- 225) NWZ-E580 series      202) Android (MIPS)   230) 760
- 226) NWZ-A10 series       203) Android (x86)    231) 770
- 227) NW-A20 series        209) Anbernic RG Nano 232) 770C
- 228) NWZ-A860 series                            233) 800
- 229) NWZ-S750 series      ==AgpTek==            234) 960
-                           240) Rocker
- ==FiiO==                                        ==AIGO==
- 244) M3K Linux            ==iBasso==            245) Eros Q / K (hosted)
- 246) M3K baremetal        250) DX50             247) Eros Q / K native
-                           251) DX90                   (hw1/hw2 bl, all hw rb)
- ==Shanling==                                    248) Eros Q / K native
- 260) Q1                   ==xDuoo==                   (hw3 bl only)
-                           241) X3               249) Eros Q / K native
- ==Echo project==          242) X3II                   (hw4 bl only)
+ 140) YH-820               96) Zen X-Fi          ==Packard Bell==
+ 141) YH-920               97) Zen Mozaic        160) Vibe 500
+ 142) YH-925               98) Zen
+ 144) YP-R0                                      ==ROCKCHIP==
+ 145) YP-R1 (WIP)          ==Onda==              180) rk27xx generic
+                           120) VX747
+ ==HiFiMAN==               122) VX747+           ==HiFi E.T.==
+ 190) HM-60x               121) VX767            210) MA9
+ 191) HM-801               123) VX777            211) MA9C
+                                                 212) MA8
+ ==Sony==                  ==MPIO==              213) MA8C
+ 219) NWZ-E350 series      170) HD200
+ 220) NWZ-E370/E380 series 171) HD300            ==IHIFI==
+ 221) NWZ-E360 series                            230) 760
+ 222) NWZ-E450 series      ==Application==       231) 770
+ 223) NWZ-E460 series      200) SDL (Generic)    232) 770C
+ 224) NWZ-E470 series      201) Android (ARM)    233) 800
+ 225) NWZ-E580 series      202) Android (MIPS)   234) 960
+ 226) NWZ-A10 series       203) Android (x86)
+ 227) NW-A20 series        209) Anbernic RG Nano ==AIGO==
+ 228) NWZ-A860 series                            245) Eros Q / K (hosted)
+ 229) NWZ-S750 series      ==AgpTek==            247) Eros Q / K native
+                           240) Rocker                 (hw1/hw2 bl, all hw rb)
+ ==FiiO==                                        248) Eros Q / K native
+ 244) M3K Linux            ==iBasso==                  (hw3 bl only)
+ 246) M3K baremetal        250) DX50             249) Eros Q / K native
+                           251) DX90                   (hw4 bl only)
+ ==Shanling==
+ 260) Q1                   ==xDuoo==             ==HiBy==
+                           241) X3               300) R3 Pro II
+ ==Echo project==          242) X3II             301) R1
  270) Echo R1 (WIP)        243) X20
-                                                 ==HiBy==
- ==Nintendo==              ==Surfans==           300) R3 Pro II
- 290) Nintendo 3DS (WIP)   280) F28 (WIP)        301) R1
+
+ ==Nintendo==              ==Surfans==
+ 290) Nintendo 3DS (WIP)   280) F28 (WIP)
 
 EOF
 
@@ -3021,48 +3021,6 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
-    ;;
-
-   130|lyreproto1)
-    target_id=56
-    modelname="lyreproto1"
-    target="LYRE_PROTO1"
-    memory=64
-    arm926ejscc
-    tool="cp"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.lyre"
-    appextra="recorder:gui:radio"
-    plugins=""
-    toolset=$scramblebitmaptools
-    boottool="cp"
-    bootoutput="bootloader-proto1.lyre"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="at91sam"
-    t_model="lyre_proto1"
-    ;;
-
-   131|mini2440)
-    target_id=99
-    modelname="mini2440"
-    target="MINI2440"
-    memory=64
-    arm9tdmicc
-    tool="$rootdir/tools/scramble -add=m244"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.mini2440"
-    appextra="recorder:gui:radio"
-    plugins=""
-    toolset=$scramblebitmaptools
-    boottool="cp"
-    bootoutput="bootloader-mini2440.lyre"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="s3c2440"
-    t_model="mini2440"
     ;;
 
    140|samsungyh820)

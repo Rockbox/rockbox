@@ -24,7 +24,7 @@
 
 /* Used by ARMv4 & ARMv5 CPUs with cp15 register and MMU */
 
-#if CONFIG_CPU == TCC7801 || CONFIG_CPU == AT91SAM9260
+#if CONFIG_CPU == TCC7801
 /* MMU present but unused */
 #define HAVE_TEST_AND_CLEAN_CACHE
 

@@ -133,38 +133,6 @@
 #define VAL_MRSRB7    0x00000030
 #define VAL_GPACON    0x00FFFFFF
 
-/****************************************************************************/
-#elif defined (MINI2440)
-
-/* For Mini2440 board or compatible */
-/* Clock and Power Management setup values */
-/* NB: clock settings must match values in s3c2440/system-target.h */
-#define VAL_CLKDIV    0x5         /* HCLK = FCLK/4, PCLK = HCLK/2 */
-#define VAL_UPLLCON   0x00038022  /* UCLK = 48 MHz */
-#define VAL_MPLLCON   0x000C3041  /* FCLK = 406 MHz */
-
-
-/* Memory Controller setup */
-#define VAL_BWSCON    0x22111112    
-#define VAL_BANKCON0  0x00002F50  
-#define VAL_BANKCON1  0x00000700
-#define VAL_BANKCON2  0x00000700
-#define VAL_BANKCON3  0x00000700
-#define VAL_BANKCON4  0x00000700
-#define VAL_BANKCON5  0x0007FFFC
-#define VAL_BANKCON6  0x00018009
-#define VAL_BANKCON7  0x00018009
-
-#define VAL_REFRESH   0x008E04EB
-#define VAL_BANKSIZE  0x000000B2
-#define VAL_MRSRB6    0x00000030
-#define VAL_MRSRB7    0x00000030
-
-#define VAL_GPACON    0x00FFFFFF
-#define VAL_GPFCON    0x000055AA
-#define VAL_GPGCON    0xAA2A0128
-#define VAL_GPGDAT    0x0000
-
 #else
 #error Unknown target
 #endif

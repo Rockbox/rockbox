@@ -24,10 +24,6 @@
 #include "adc-target.h"
 #include "kernel.h"
 
-#ifdef MINI2440
-#include "touchscreen-target.h"
-#endif
-
 static unsigned short adc_readings[NUM_ADC_CHANNELS];
 
 /* prototypes */
@@ -136,10 +132,6 @@ static void adc_tick(void)
         {
             channel = 0;
         }
-#ifdef MINI2440
-        /* interleave a touchscreen read if neccessary */
-        touchscreen_scan_device();
-#endif
         /* setup the next conversion and start it*/
         ADCCON = (ADCCON & ~(0x7<<3)) | (channel<<3) | 0x01;
     }

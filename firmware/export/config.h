@@ -79,7 +79,6 @@
 #define JZ4732       4732
 #define JZ4760B     47602
 #define AS3525       3525
-#define AT91SAM9260  9260
 #define AS3525v2    35252
 #define IMX233        233
 #define RK27XX       2700
@@ -122,10 +121,8 @@
 #define ONDAVX767_PAD      32
 #define SANSA_CLIP_PAD     35
 #define SANSA_FUZE_PAD     36
-#define LYRE_PROTO1_PAD    37
 #define SAMSUNG_YH820_PAD  38
 #define ONDAVX777_PAD      39
-#define MINI2440_PAD       41
 #define PHILIPS_HDD6330_PAD 42
 #define PBELL_VIBE500_PAD 43
 #define MPIO_HD200_PAD     44
@@ -246,11 +243,9 @@
 #define LCD_ONDAVX767 30 /* as used by the Onda VX767 */
 #define LCD_SSD1303   31 /* as used by the Sansa Clip */
 #define LCD_FUZE      32 /* as used by the Sansa Fuze */
-#define LCD_LYRE_PROTO1      33 /* as used by the Lyre prototype 1 */
 #define LCD_YH925     34 /* as used by Samsung YH-925 (similar to the H10 20GB) */
 #define LCD_VIEW      35 /* as used by the Sansa View */
 #define LCD_NANO2G    36 /* as used by the iPod Nano 2nd Generation */
-#define LCD_MINI2440  37 /* as used by the Mini2440 */
 #define LCD_HDD6330   38 /* as used by the Philips HDD6330 */
 #define LCD_VIBE500   39 /* as used by the Packard Bell Vibe 500 */
 #define LCD_IPOD6GNANO3G4G   40 /* as used by the iPod Classic, Nano 3G and Nano 4G */
@@ -485,10 +480,6 @@ Lyre prototype 1 */
 #include "config/sansaclipzip.h"
 #elif defined(SANSA_C200V2)
 #include "config/sansac200v2.h"
-#elif defined(LYRE_PROTO1)
-#include "config/lyreproto1.h"
-#elif defined(MINI2440)
-#include "config/mini2440.h"
 #elif defined(SAMSUNG_YH820)
 #include "config/samsungyh820.h"
 #elif defined(SAMSUNG_YH920)
