@@ -1691,48 +1691,47 @@ cat <<EOF
  71) M:Robe 100                                  58) Sansa Fuze
                            ==Creative==          59) Sansa c200v2
  ==Philips==               89) Zen X-Fi Style    60) Sansa Clipv2
- 100) GoGear SA9200        90) Zen Vision:M 30GB 61) Sansa View
- 101) GoGear HDD1630/      91) Zen Vision:M 60GB 62) Sansa Clip+
-      HDD1830              92) Zen Vision        63) Sansa Fuze v2
- 102) GoGear HDD6330       93) Zen X-Fi2         64) Sansa Fuze+
-                           94) Zen X-Fi3         65) Sansa Clip Zip
- ==Samsung==               95) Zen V             66) Sansa Connect
- 140) YH-820               96) Zen X-Fi
- 141) YH-920               97) Zen Mozaic        ==Lyre project==
- 142) YH-925               98) Zen               130) Lyre proto 1
- 144) YP-R0                                      131) Mini2440
- 145) YP-R1 (WIP)          ==Onda==
-                           120) VX747            ==Packard Bell==
- ==HiFiMAN==               122) VX747+           160) Vibe 500
- 190) HM-60x               121) VX767
- 191) HM-801               123) VX777            ==ROCKCHIP==
-                                                 180) rk27xx generic
- ==Sony==                  ==MPIO==
- 219) NWZ-E350 series      170) HD200            ==HiFi E.T.==
- 220) NWZ-E370/E380 series 171) HD300            210) MA9
- 221) NWZ-E360 series                            211) MA9C
- 222) NWZ-E450 series      ==Application==       212) MA8
- 223) NWZ-E460 series      200) SDL (Generic)    213) MA8C
- 224) NWZ-E470 series      201) Android (ARM)
- 225) NWZ-E580 series      202) Android (MIPS)   ==IHIFI==
- 226) NWZ-A10 series       203) Android (x86)    230) 760
- 227) NW-A20 series        209) Anbernic RG Nano 231) 770
- 228) NWZ-A860 series                            232) 770C
- 229) NWZ-S750 series      ==AgpTek==            233) 800
-                           240) Rocker           234) 960
- ==FiiO==
- 244) M3K Linux            ==iBasso==            ==AIGO==
- 246) M3K baremetal        250) DX50             245) Eros Q / K (hosted)
-                           251) DX90             247) Eros Q / K native
- ==Shanling==                                          (hw1/hw2 bl, all hw rb)
- 260) Q1                   ==xDuoo==             248) Eros Q / K native
-                           241) X3                     (hw3 bl only)
- ==Echo project==          242) X3II             249) Eros Q / K native
- 270) Echo R1 (WIP)        243) X20                    (hw4 bl only)
+ 100) GoGear SA9200        90) Zen Vision:M 30GB 62) Sansa Clip+
+ 101) GoGear HDD1630/      91) Zen Vision:M 60GB 63) Sansa Fuze v2
+      HDD1830              92) Zen Vision        64) Sansa Fuze+
+ 102) GoGear HDD6330       93) Zen X-Fi2         65) Sansa Clip Zip
+                           94) Zen X-Fi3         66) Sansa Connect
+ ==Samsung==               95) Zen V
+ 140) YH-820               96) Zen X-Fi          ==Lyre project==
+ 141) YH-920               97) Zen Mozaic        130) Lyre proto 1
+ 142) YH-925               98) Zen               131) Mini2440
+ 144) YP-R0
+ 145) YP-R1 (WIP)          ==Onda==              ==Packard Bell==
+                           120) VX747            160) Vibe 500
+ ==HiFiMAN==               122) VX747+
+ 190) HM-60x               121) VX767            ==ROCKCHIP==
+ 191) HM-801               123) VX777            180) rk27xx generic
 
- ==Nintendo==              ==Surfans==           ==HiBy==
- 290) Nintendo 3DS (WIP)   280) F28 (WIP)        300) R3 Pro II
-                                                 301) R1
+ ==Sony==                  ==MPIO==              ==HiFi E.T.==
+ 219) NWZ-E350 series      170) HD200            210) MA9
+ 220) NWZ-E370/E380 series 171) HD300            211) MA9C
+ 221) NWZ-E360 series                            212) MA8
+ 222) NWZ-E450 series      ==Application==       213) MA8C
+ 223) NWZ-E460 series      200) SDL (Generic)
+ 224) NWZ-E470 series      201) Android (ARM)    ==IHIFI==
+ 225) NWZ-E580 series      202) Android (MIPS)   230) 760
+ 226) NWZ-A10 series       203) Android (x86)    231) 770
+ 227) NW-A20 series        209) Anbernic RG Nano 232) 770C
+ 228) NWZ-A860 series                            233) 800
+ 229) NWZ-S750 series      ==AgpTek==            234) 960
+                           240) Rocker
+ ==FiiO==                                        ==AIGO==
+ 244) M3K Linux            ==iBasso==            245) Eros Q / K (hosted)
+ 246) M3K baremetal        250) DX50             247) Eros Q / K native
+                           251) DX90                   (hw1/hw2 bl, all hw rb)
+ ==Shanling==                                    248) Eros Q / K native
+ 260) Q1                   ==xDuoo==                   (hw3 bl only)
+                           241) X3               249) Eros Q / K native
+ ==Echo project==          242) X3II                   (hw4 bl only)
+ 270) Echo R1 (WIP)        243) X20
+                                                 ==HiBy==
+ ==Nintendo==              ==Surfans==           300) R3 Pro II
+ 290) Nintendo 3DS (WIP)   280) F28 (WIP)        301) R1
 
 EOF
 
@@ -2476,28 +2475,6 @@ fi
     t_model="sansa-clipv2"
     sysfont="08-Rockfont"
     arm926ejscc
-    ;;
-
-   61|sansaview)
-    target_id=63
-    modelname="sansaview"
-    target="SANSA_VIEW"
-    memory=32
-    arm1176jzscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.mi4"
-    appextra="gui"
-    plugins=""
-    boottool="$rootdir/tools/scramble -mi4v3 -model=view -type=RBBL"
-    bootoutput="firmware.mi4"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_soc="pp"
-    t_manufacturer="sandisk"
-    t_model="sansa-view"
     ;;
 
    62|sansaclipplus)

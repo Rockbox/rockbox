@@ -322,10 +322,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         status => 1,
 	sim => 1,
     },
-    'sansaview' => {
-        name => 'SanDisk Sansa View',
-        status => 1,
-    },
     'vibe500' => {
         name => 'Packard Bell Vibe 500',
         status => 3,

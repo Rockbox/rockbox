@@ -485,8 +485,6 @@ Lyre prototype 1 */
 #include "config/sansaclipzip.h"
 #elif defined(SANSA_C200V2)
 #include "config/sansac200v2.h"
-#elif defined(SANSA_VIEW)
-#include "config/sansaview.h"
 #elif defined(LYRE_PROTO1)
 #include "config/lyreproto1.h"
 #elif defined(MINI2440)

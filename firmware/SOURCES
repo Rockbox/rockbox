@@ -1074,18 +1074,6 @@ target/arm/sandisk/sansa-c200/button-c200.c
 target/arm/sandisk/sansa-c200/powermgmt-c200.c
 #endif /* SANSA_C200 */
 
-#ifdef SANSA_VIEW
-target/arm/sandisk/sansa-view/backlight-view.c
-target/arm/sandisk/sansa-view/adc-view.c
-target/arm/sandisk/sansa-view/power-view.c
-target/arm/sandisk/sansa-view/lcd-view.c
-target/arm/sandisk/sansa-view/button-view.c
-target/arm/sandisk/sansa-view/powermgmt-view.c
-#ifndef BOOTLOADER
-/* target/arm/sandisk/audio-view.c */
-#endif /* BOOTLOADER */
-#endif /* SANSA_VIEW */
-
 #ifdef PHILIPS_SA9200
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c

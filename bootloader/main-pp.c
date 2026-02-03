@@ -265,8 +265,8 @@ static int handle_usb(int connect_timeout)
 
     return usb;
 }
-#elif (defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-    || defined (SANSA_VIEW)) && !defined(USE_ROCKBOX_USB)
+#elif (defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)) && \
+      !defined(USE_ROCKBOX_USB)
 /* Return USB_INSERTED if cable present */
 static int handle_usb(int connect_timeout)
 {

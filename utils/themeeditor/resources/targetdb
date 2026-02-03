@@ -688,15 +688,6 @@ sansam200v4
     record : yes
 }
 
-sansaview
-{
-    name   : SanDisk Sansa View
-    screen : 240 x 320 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
 sonynwa20
 {
     name   : Sony NW-A20
