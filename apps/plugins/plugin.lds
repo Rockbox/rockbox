@@ -206,7 +206,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAMSIZE 0
 
 #else
-#define DRAMORIG 0x09000000
+# error "DRAMORIG not defined!"
 #endif
 
 #ifndef NOCACHE_BASE
