@@ -143,6 +143,10 @@
 #include "iap.h"
 #endif
 
+#ifdef HIBY_LINUX
+#include <sys/sysinfo.h>
+#endif
+
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
 
 static const char* threads_getname(int selected_item, void *data,
@@ -2800,6 +2804,55 @@ static bool dbg_bootflash_dump(void) {
 }
 #endif
 
+#ifdef HIBY_LINUX
+static bool view_ram_info(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "RAM Info", 0, NULL);
+
+    simplelist_reset_lines();
+    simplelist_addline("Rockbox: %d MB", MEMORYSIZE);
+
+    struct sysinfo sys_info;
+    if (sysinfo(&sys_info) == 0) {
+        long total_ram = sys_info.totalram * sys_info.mem_unit / 1024 / 1024;
+        long free_ram = sys_info.freeram * sys_info.mem_unit / 1024 / 1024;
+        long buffer_ram = sys_info.bufferram * sys_info.mem_unit / 1024 / 1024;
+        simplelist_addline("Total RAM: %ld MB", total_ram);
+        simplelist_addline("Free RAM: %ld MB", free_ram);
+        simplelist_addline("Buffer RAM: %ld MB", buffer_ram);
+
+        /* Try to read MemAvailable from /proc/meminfo for a better "free" estimate */
+        FILE *fp = fopen("/proc/meminfo", "r");
+        if (fp) {
+            char line[128];
+            long mem_avail = -1;
+            long cached = -1;
+            while (fgets(line, sizeof(line), fp)) {
+                if (sscanf(line, "MemAvailable: %ld kB", &mem_avail) == 1) {
+                        mem_avail /= 1024;
+                }
+                else if (sscanf(line, "Cached: %ld kB", &cached) == 1) {
+                        cached /= 1024;
+                }
+            }
+            fclose(fp);
+
+            if (mem_avail != -1) {
+                /* Estimate of how much memory is available for starting new applications */
+                simplelist_addline("Available: %ld MB", mem_avail);
+            }
+            if (cached != -1) {
+                /* Memory used by the page cache. */
+                simplelist_addline("Cached: %ld MB", cached);
+            }
+        }
+    }
+
+    return simplelist_show_list(&info);
+}
+#endif
+
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2838,6 +2891,9 @@ static const struct {
         { "View OS stacks", dbg_os },
 #ifdef __linux__
         { "View CPU stats", dbg_cpuinfo },
+#endif
+#ifdef HIBY_LINUX
+        { "View RAM info", view_ram_info },
 #endif
 #if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
         { "View battery", view_battery },
