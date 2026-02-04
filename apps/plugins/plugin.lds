@@ -196,6 +196,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAM DRAM
 #define IRAMSIZE 0
 
+#elif CONFIG_CPU == STM32H743
+#include "cpu.h"
+#define DRAMORIG STM32_SDRAM1_BASE
+#define IRAM     DRAM
+#define IRAMSIZE 0
+
 #else
 #define DRAMORIG 0x09000000
 #endif
