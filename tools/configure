@@ -1755,7 +1755,6 @@ fi
   x1000tools="$genericbitmaptools scramble mkspl-x1000 uclpack"
   # default to not generating ELF files
   USE_ELF="no"
-  PLUGIN_USE_ELF="no"
 
   #  ---- For each target ----
   #
@@ -5007,7 +5006,6 @@ export TTS_ENGINE=${TTS_ENGINE}
 export ENC_OPTS=${ENC_OPTS}
 export ENCODER=${ENCODER}
 export USE_ELF=${USE_ELF}
-export PLUGIN_USE_ELF=${PLUGIN_USE_ELF}
 export RBDIR=${rbdir}
 export ROCKBOX_SHARE_PATH=${sharedir}
 export ROCKBOX_BINARY_PATH=${bindir}

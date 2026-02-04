@@ -73,7 +73,7 @@ $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(TLSFLIB) $(LUA_OUTLDS)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(LUA_OVLFLAGS)
-	$(call PRINTS,LD $(@F))$(call objcopy_plugin,$(basename $@).elf,$@)
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 $(LUA_BUILDDIR):
 	$(call PRINTS,MKDIR $@)mkdir -p $(LUA_BUILDDIR)/
