@@ -169,7 +169,7 @@ $(BUILDDIR)/%.rock:
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PLUGINLDFLAGS)
-	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+	$(SILENT)$(call objcopy_plugin,$(BUILDDIR)/$*.elf,$@)
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
