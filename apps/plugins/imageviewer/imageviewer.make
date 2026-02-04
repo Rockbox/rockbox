@@ -40,7 +40,7 @@ $(IMGVBUILDDIR)/%.ovl: $(IMGDEC_OUTLDS)
 		$(filter-out $(PLUGIN_CRT0),$(filter %.o, $^)) \
 		$(filter %.a, $+) \
 		-lgcc $(IMGDEC_OVLFLAGS)
-	$(SILENT)$(call objcopy,$(IMGVBUILDDIR)/$*.elf,$@)
+	$(SILENT)$(call objcopy_plugin,$(IMGVBUILDDIR)/$*.elf,$@)
 
 # rule to create reference map for image decoder
 $(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUGINLINK_LDS) $(PLUGIN_LIBS)

@@ -245,4 +245,4 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
-	$(SILENT)$(call objcopy,$(CODECDIR)/$*.elf,$@)
+	$(SILENT)$(call objcopy_plugin,$(CODECDIR)/$*.elf,$@)
