@@ -219,24 +219,6 @@
 #define UI_LCD_POSX                 58 /* x position of lcd */
 #define UI_LCD_POSY                 67 /* y position of lcd */
 
-#elif defined(CREATIVE_ZVM) || defined(CREATIVE_ZVM60GB)
-#ifdef CREATIVE_ZVM
- #define UI_TITLE                    "Creative Zen Vision:M 30GB"
-#else
- #define UI_TITLE                    "Creative Zen Vision:M 60GB"
-#endif
-#define UI_WIDTH                    383 /* width of GUI window */
-#define UI_HEIGHT                   643 /* height of GUI window */
-#define UI_LCD_POSX                 31 /* x position of lcd */
-#define UI_LCD_POSY                 62 /* y position of lcd */
-
-#elif defined(CREATIVE_ZV)
-#define UI_TITLE                    "Creative Zen Vision"
-#define UI_WIDTH                    1054 /* width of GUI window */
-#define UI_HEIGHT                   643 /* height of GUI window */
-#define UI_LCD_POSX                 129 /* x position of lcd */
-#define UI_LCD_POSY                 85 /* y position of lcd */
-
 #elif defined(SANSA_FUZEPLUS)
 #define UI_TITLE                    "Sansa Fuze+"
 #define UI_WIDTH                    322 /* width of GUI window */

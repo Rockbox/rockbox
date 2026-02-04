@@ -318,21 +318,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'Packard Bell Vibe 500',
         status => 3,
     },
-    'zenvision' => {
-        name => 'Creative Zen Vision',
-        status => 1,
-	sim => 1,
-    },
-    'zenvisionm30gb' => {
-        name => 'Creative Zen Vision:M 30GB',
-        status => 1,
-	sim => 1,
-    },
-    'zenvisionm60gb' => {
-        name => 'Creative Zen Vision:M 60GB',
-        status => 1,
-	sim => 1,
-    },
     'mpiohd200' => {
         name => 'MPIO HD200',
         status => 2,

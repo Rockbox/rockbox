@@ -112,9 +112,7 @@
 #define GIGABEAT_S_PAD     19
 #define COWON_D2_PAD        22
 #define IAUDIO_M3_PAD      23
-#define CREATIVEZVM_PAD    24
 #define SANSA_M200_PAD     25
-#define CREATIVEZV_PAD     26
 #define PHILIPS_SA9200_PAD 27
 #define PHILIPS_HDD1630_PAD 29
 #define ONDAVX747_PAD      31
@@ -233,7 +231,6 @@
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
-#define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
@@ -438,12 +435,6 @@ Lyre prototype 1 */
 #include "config/mrobe500.h"
 #elif defined(COWON_D2)
 #include "config/cowond2.h"
-#elif defined(CREATIVE_ZVM)
-#include "config/zenvisionm30gb.h"
-#elif defined(CREATIVE_ZVM60GB)
-#include "config/zenvisionm60gb.h"
-#elif defined(CREATIVE_ZV)
-#include "config/zenvision.h"
 #elif defined(CREATIVE_ZENXFI2)
 #include "config/creativezenxfi2.h"
 #elif defined(CREATIVE_ZENXFI3)

@@ -111,7 +111,7 @@ _start:
     mov     r0, #0x20
     bl      _delay_cycles
 
-#if defined(BOOTLOADER) && !defined(CREATIVE_ZVx)
+#if defined(BOOTLOADER)
     bl      _init_board
 #endif
 

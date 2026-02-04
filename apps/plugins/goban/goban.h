@@ -150,20 +150,6 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_NEXT
 
-
-#elif (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
-   || (CONFIG_KEYPAD == CREATIVEZV_PAD)
-#define  GBN_BUTTON_UP                 BUTTON_UP
-#define  GBN_BUTTON_DOWN               BUTTON_DOWN
-#define  GBN_BUTTON_LEFT               BUTTON_LEFT
-#define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
-#define  GBN_BUTTON_RETREAT            BUTTON_BACK
-#define  GBN_BUTTON_ADVANCE            BUTTON_CUSTOM
-#define  GBN_BUTTON_MENU               BUTTON_MENU
-#define  GBN_BUTTON_PLAY               BUTTON_SELECT | BUTTON_REL
-#define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
-#define  GBN_BUTTON_NEXT_VAR           BUTTON_PLAY
-
 #elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP | BUTTON_REL
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN

@@ -43,10 +43,7 @@ struct SPI_info {
 
 static const struct SPI_info spi_targets[SPI_MAX_TARGETS] =
 {
-#if defined(CREATIVE_ZVx)
-    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, 
-        GIO_LCD_ENABLE, true, 0x07},
-#elif defined(MROBE_500)
+#if defined(MROBE_500)
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
         GIO_TS_ENABLE, 0x260D, true},
     /* RTC seems to have timing problems if the CLK idles low */

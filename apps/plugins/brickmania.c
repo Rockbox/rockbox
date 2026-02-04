@@ -169,14 +169,6 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define DOWN BUTTON_RC_VOL_DOWN
 #define RC_QUIT BUTTON_REC
 
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define QUIT BUTTON_BACK
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
-
 #elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_BACK
@@ -1504,8 +1496,7 @@ static int brickmania_help(void)
         "Releases", "the", "ball/Fire!", "",                            /* 30 */
 #if CONFIG_KEYPAD == IAUDIO_M3_PAD
         "REC:",
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
-      (CONFIG_KEYPAD == CREATIVEZVM_PAD)
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
         "BACK:",
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \

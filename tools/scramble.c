@@ -85,8 +85,7 @@ void usage(void)
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
            "\t-creative=X [-no-ciff] Creative firmware structure format\n"
-           "\t            (X values: zvm, zvm60, zenvision, zenv, zen,\n"
-           "\t             zenxfi, zenmozaic)\n");
+           "\t            (X values: zenv, zen, zenxfi, zenmozaic)\n");
     printf("\t-gigabeat Toshiba Gigabeat F/X format\n"
            "\t-gigabeats Toshiba Gigabeat S format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
@@ -416,13 +415,7 @@ int main (int argc, char** argv)
             iname = argv[2];
             oname = argv[3];
         }
-        if(!strcmp(&argv[1][10], "zvm"))
-            return zvm_encode(iname, oname, ZENVISIONM, creative_enable_ciff);
-        else if(!strcmp(&argv[1][10], "zvm60"))
-            return zvm_encode(iname, oname, ZENVISIONM60, creative_enable_ciff);
-        else if(!strcmp(&argv[1][10], "zenvision"))
-            return zvm_encode(iname, oname, ZENVISION, creative_enable_ciff);
-        else if(!strcmp(&argv[1][10], "zenv"))
+        if(!strcmp(&argv[1][10], "zenv"))
             return zvm_encode(iname, oname, ZENV, creative_enable_ciff);
         else if(!strcmp(&argv[1][10], "zen"))
             return zvm_encode(iname, oname, ZEN, creative_enable_ciff);

@@ -445,33 +445,6 @@ creativezen
     record : yes
 }
 
-zenvision
-{
-    name   : Creative Zen Vision
-    screen : 320 x 240 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
-zenvisionm30gb
-{
-    name   : Creative Zen Vision%:M 30GB
-    screen : 320 x 240 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
-zenvisionm60gb
-{
-    name   : Creative Zen Vision%:M 60GB
-    screen : 320 x 240 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
 creativezenxfi2
 {
     name   : Creative Zen X-Fi2

@@ -16,18 +16,12 @@ LDFLAGS = -w
 
 OBJDIR=./build
 
-OBJS = arm.obj main.obj vectors.obj dma.obj
-
-ifeq ($(findstring -DCREATIVE_ZV,$(TARGET)), -DCREATIVE_ZV)
-OBJS += aic23.obj
-else
-OBJS += tsc2100.obj
-endif
+OBJS = arm.obj main.obj vectors.obj dma.obj tsc2100.obj
 
 OBJS := $(patsubst %.obj, $(OBJDIR)/%.obj, $(OBJS))
 
 all: dsp-image.h
-	
+
 clean:
 	$(call PRINTS,cleaning DSP firmware)rm -f $(OBJS) $(OBJDIR)/dsp-image.out $(OBJDIR)/dsp-image.xml
 	rmdir $(OBJDIR)

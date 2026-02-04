@@ -1304,19 +1304,6 @@ target/arm/tms320dm320/mrobe-500/power-mr500.c
 target/arm/tms320dm320/mrobe-500/usb-mr500.c
 #endif /* MROBE_500 */
 
-#ifdef CREATIVE_ZVx
-drivers/lcd-memframe.c
-target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
-target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
-target/arm/tms320dm320/creative-zvm/dma-creativezvm.c
-target/arm/tms320dm320/creative-zvm/lcd-creativezvm.c
-target/arm/tms320dm320/creative-zvm/pcm-creativezvm.c
-target/arm/tms320dm320/creative-zvm/pic-creativezvm.c
-target/arm/tms320dm320/creative-zvm/power-creativezvm.c
-target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
-target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
-#endif /* CREATIVE_ZVx */
-
 #if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC) \
     || defined(CREATIVE_ZENV) || defined(CREATIVE_ZENXFISTYLE)
 #ifndef BOOTLOADER

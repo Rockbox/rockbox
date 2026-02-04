@@ -1691,47 +1691,47 @@ cat <<EOF
  71) M:Robe 100                                  58) Sansa Fuze
                            ==Creative==          59) Sansa c200v2
  ==Philips==               89) Zen X-Fi Style    60) Sansa Clipv2
- 100) GoGear SA9200        90) Zen Vision:M 30GB 62) Sansa Clip+
- 101) GoGear HDD1630/      91) Zen Vision:M 60GB 63) Sansa Fuze v2
-      HDD1830              92) Zen Vision        64) Sansa Fuze+
- 102) GoGear HDD6330       93) Zen X-Fi2         65) Sansa Clip Zip
-                           94) Zen X-Fi3         66) Sansa Connect
- ==Samsung==               95) Zen V
- 140) YH-820               96) Zen X-Fi          ==Packard Bell==
- 141) YH-920               97) Zen Mozaic        160) Vibe 500
- 142) YH-925               98) Zen
- 144) YP-R0                                      ==ROCKCHIP==
- 145) YP-R1 (WIP)          ==Onda==              180) rk27xx generic
-                           120) VX747
- ==HiFiMAN==               122) VX747+           ==HiFi E.T.==
- 190) HM-60x               121) VX767            210) MA9
- 191) HM-801               123) VX777            211) MA9C
-                                                 212) MA8
- ==Sony==                  ==MPIO==              213) MA8C
- 219) NWZ-E350 series      170) HD200
- 220) NWZ-E370/E380 series 171) HD300            ==IHIFI==
- 221) NWZ-E360 series                            230) 760
- 222) NWZ-E450 series      ==Application==       231) 770
- 223) NWZ-E460 series      200) SDL (Generic)    232) 770C
- 224) NWZ-E470 series      201) Android (ARM)    233) 800
- 225) NWZ-E580 series      202) Android (MIPS)   234) 960
- 226) NWZ-A10 series       203) Android (x86)
- 227) NW-A20 series        209) Anbernic RG Nano ==AIGO==
+ 100) GoGear SA9200        93) Zen X-Fi2         62) Sansa Clip+
+ 101) GoGear HDD1630/      94) Zen X-Fi3         63) Sansa Fuze v2
+      HDD1830              95) Zen V             64) Sansa Fuze+
+ 102) GoGear HDD6330       96) Zen X-Fi          65) Sansa Clip Zip
+                           97) Zen Mozaic        66) Sansa Connect
+ ==Samsung==               98) Zen
+ 140) YH-820                                     ==Packard Bell==
+ 141) YH-920               ==Onda==              160) Vibe 500
+ 142) YH-925               120) VX747
+ 144) YP-R0                122) VX747+           ==ROCKCHIP==
+ 145) YP-R1 (WIP)          121) VX767            180) rk27xx generic
+                           123) VX777
+ ==HiFiMAN==                                     ==HiFi E.T.==
+ 190) HM-60x               ==MPIO==              210) MA9
+ 191) HM-801               170) HD200            211) MA9C
+                           171) HD300            212) MA8
+ ==Sony==                                        213) MA8C
+ 219) NWZ-E350 series      ==Application==
+ 220) NWZ-E370/E380 series 200) SDL (Generic)    ==IHIFI==
+ 221) NWZ-E360 series      201) Android (ARM)    230) 760
+ 222) NWZ-E450 series      202) Android (MIPS)   231) 770
+ 223) NWZ-E460 series      203) Android (x86)    232) 770C
+ 224) NWZ-E470 series      209) Anbernic RG Nano 233) 800
+ 225) NWZ-E580 series                            234) 960
+ 226) NWZ-A10 series       ==AgpTek==
+ 227) NW-A20 series        240) Rocker           ==AIGO==
  228) NWZ-A860 series                            245) Eros Q / K (hosted)
- 229) NWZ-S750 series      ==AgpTek==            247) Eros Q / K native
-                           240) Rocker                 (hw1/hw2 bl, all hw rb)
- ==FiiO==                                        248) Eros Q / K native
- 244) M3K Linux            ==iBasso==                  (hw3 bl only)
- 246) M3K baremetal        250) DX50             249) Eros Q / K native
-                           251) DX90                   (hw4 bl only)
- ==Shanling==
- 260) Q1                   ==xDuoo==             ==HiBy==
-                           241) X3               300) R3 Pro II
- ==Echo project==          242) X3II             301) R1
- 270) Echo R1 (WIP)        243) X20
+ 229) NWZ-S750 series      ==iBasso==            247) Eros Q / K native
+                           250) DX50                   (hw1/hw2 bl, all hw rb)
+ ==FiiO==                  251) DX90             248) Eros Q / K native
+ 244) M3K Linux                                        (hw3 bl only)
+ 246) M3K baremetal        ==xDuoo==             249) Eros Q / K native
+                           241) X3                     (hw4 bl only)
+ ==Shanling==              242) X3II
+ 260) Q1                   243) X20              ==HiBy==
+                                                 300) R3 Pro II
+ ==Echo project==          ==Surfans==           301) R1
+ 270) Echo R1 (WIP)        280) F28 (WIP)
 
- ==Nintendo==              ==Surfans==
- 290) Nintendo 3DS (WIP)   280) F28 (WIP)
+ ==Nintendo==
+ 290) Nintendo 3DS (WIP)
 
 EOF
 
@@ -2686,72 +2686,6 @@ fi
     t_manufacturer="imx233"
     t_model="creative-zen"
     arm926ejscc
-    ;;
-
-   90|zenvisionm30gb)
-    target_id=35
-    modelname="zenvisionm30gb"
-    target="CREATIVE_ZVM"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zvm"
-    USE_ELF="yes"
-    output="rockbox.zvm"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
-    bootoutput="rockbox.zvmboot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
-    ;;
-
-   91|zenvisionm60gb)
-    target_id=40
-    modelname="zenvisionm60gb"
-    target="CREATIVE_ZVM60GB"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zvm60 -no-ciff"
-    USE_ELF="yes"
-    output="rockbox.zvm60"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zvm60"
-    bootoutput="rockbox.zvm60boot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
-    ;;
-
-   92|zenvision)
-    target_id=39
-    modelname="zenvision"
-    target="CREATIVE_ZV"
-    memory=64
-    arm926ejscc
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -creative=zenvision -no-ciff"
-    USE_ELF="yes"
-    output="rockbox.zv"
-    appextra="recorder:gui:radio"
-    plugins=""
-    toolset=$ipodbitmaptools
-    boottool="$rootdir/tools/scramble -creative=zenvision"
-    bootoutput="rockbox.zvboot"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tms320dm320"
-    t_model="creative-zvm"
     ;;
 
    93|creativezenxfi2)

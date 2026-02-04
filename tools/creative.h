@@ -24,13 +24,10 @@
 
 enum
 {
-    ZENVISIONM = 0,
-    ZENVISIONM60 = 1,
-    ZENVISION = 2,
-    ZENV = 3,
-    ZEN = 4,
-    ZENXFI = 5,
-    ZENMOZAIC = 6
+    ZENV = 0,
+    ZEN = 1,
+    ZENXFI = 2,
+    ZENMOZAIC = 3
 };
 
 struct device_info

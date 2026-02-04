@@ -370,17 +370,6 @@ bool dbg_hw_info(void)
         button = button_get_w_tmo(1);
         if(button & BUTTON_POWER)
             done = true;
-#if defined(CREATIVE_ZVx)
-        else if(button & BUTTON_LEFT)
-            lcd_set_direct_fb(false);
-        else if(button & BUTTON_RIGHT)
-            lcd_set_direct_fb(true);
-
-        lcd_puts(0, line++, "LCD info:");
-        lcd_putsf(0, line++, " LCD direct FB access? %s", 
-            (lcd_get_direct_fb() ? "yes" : "no"));
-        line++;
-#endif
 #endif
         lcd_puts(0, line++, "[Rockbox info]");
         lcd_putsf(0, line++, "current tick: %08x Seconds running: %08d",

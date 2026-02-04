@@ -2601,31 +2601,6 @@ static bool dbg_isp1583(void)
 }
 #endif
 
-#if defined(CREATIVE_ZVx) && !defined(SIMULATOR)
-extern int pic_dbg_num_items(void);
-extern const char* pic_dbg_item(int selected_item, void *data,
-                                char *buffer, size_t buffer_len);
-
-static int pic_action_callback(int action, struct gui_synclist *lists)
-{
-    (void)lists;
-    if (action == ACTION_NONE)
-        action = ACTION_REDRAW;
-    return action;
-}
-
-static bool dbg_pic(void)
-{
-    struct simplelist_info pic;
-    pic.scroll_all = true;
-    simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
-    pic.timeout = HZ/100;
-    pic.get_name = pic_dbg_item;
-    pic.action_callback = pic_action_callback;
-    return simplelist_show_list(&pic);
-}
-#endif
-
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 static bool dbg_boot_data(void)
 {
@@ -2941,9 +2916,6 @@ static const struct {
 #endif
 #if CONFIG_USBOTG == USBOTG_ISP1583
         { "View ISP1583 info", dbg_isp1583 },
-#endif
-#if defined(CREATIVE_ZVx) && !defined(SIMULATOR)
-        { "View PIC info", dbg_pic },
 #endif
 #ifdef ROCKBOX_HAS_LOGF
         {"Show Log File", logfdisplay },

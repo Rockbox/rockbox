@@ -96,7 +96,6 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == MROBE100_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == SANSA_CLIP_PAD) \
-    || (CONFIG_KEYPAD == CREATIVEZVM_PAD) \
     || (CONFIG_KEYPAD == SANSA_M200_PAD)\
     || (CONFIG_KEYPAD == SANSA_E200_PAD) \
     || (CONFIG_KEYPAD == SANSA_FUZE_PAD) \
@@ -405,12 +404,6 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
-    {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
-    {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
-    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},

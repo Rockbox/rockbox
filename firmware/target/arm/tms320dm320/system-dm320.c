@@ -27,9 +27,6 @@
 #include "system-arm.h"
 #include "spi.h"
 #include "i2c.h"
-#ifdef CREATIVE_ZVx
-#include "dma-target.h"
-#endif
 #ifdef MROBE_500
 #include "usb-mr500.h"
 #endif
@@ -368,10 +365,6 @@ void system_init(void)
      * can charge.
      */
     IO_GIO_BITCLR2 = 0x0001;
-#endif
-
-#ifdef CREATIVE_ZVx
-    dma_init();
 #endif
 
 #ifdef SANSA_CONNECT
