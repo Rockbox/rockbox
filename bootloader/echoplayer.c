@@ -34,6 +34,7 @@
 #include "rbversion.h"
 #include "system-echoplayer.h"
 #include "gpio-stm32h7.h"
+#include "regs/cortex-m/cm_debug.h"
 
 #define SDRAM_SIZE          (MEMORYSIZE * 1024 * 1024)
 
@@ -134,6 +135,14 @@ static bool is_power_button_pressed(void)
 static bool is_usbmode_button_pressed(void)
 {
     return button_status() & BUTTON_DOWN;
+}
+
+static bool is_sysdebug_button_pressed(void)
+{
+    const int mask = BUTTON_A | BUTTON_B;
+
+    /* Both buttons must be held */
+    return (button_status() & mask) == mask;
 }
 
 static int send_event_on_tmo(struct timeout *tmo)
@@ -369,6 +378,13 @@ void main(void)
     kernel_init();
     power_init();
     button_init();
+
+    /* Enable system debugging if button combo held or debugger attached */
+    if (reg_readf(CM_DEBUG_DHCSR, C_DEBUGEN) ||
+        is_sysdebug_button_pressed())
+    {
+        system_debug_enable(true);
+    }
 
     /* Start monitoring power button / usb state */
     monitor_init();

@@ -168,3 +168,10 @@ CM_SYSTICK @ 0xe000e000 : block {
         23 00 TENMS
     }
 }
+
+// Debug
+CM_DEBUG @ 0xe000edf0 : block {
+    DHCSR @ 0x00 : reg {
+        0 C_DEBUGEN
+    }
+}
