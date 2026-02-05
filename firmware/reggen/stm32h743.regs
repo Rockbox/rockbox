@@ -1261,3 +1261,113 @@ SAI1 @ 0x40015800 : SAI
 SAI2 @ 0x40015c00 : SAI
 SAI3 @ 0x40016000 : SAI
 SAI4 @ 0x58005400 : SAI
+
+// DMA controller
+block DMA {
+    LISR @ 0x00 : reg {
+        27 TCIF3
+        26 HTIF3
+        25 TEIF3
+        24 DMEIF3
+        22 FEIF3
+
+        21 TCIF2
+        20 HTIF2
+        19 TEIF2
+        18 DMEIF2
+        16 FEIF2
+
+        11 TCIF1
+        10 HTIF1
+        09 TEIF1
+        08 DMEIF1
+        06 FEIF1
+
+        05 TCIF0
+        04 HTIF0
+        03 TEIF0
+        02 DMEIF0
+        00 FEIF0
+    }
+
+    HISR @ 0x04 : reg {
+        27 TCIF7
+        26 HTIF7
+        25 TEIF7
+        24 DMEIF7
+        22 FEIF7
+
+        21 TCIF6
+        20 HTIF6
+        19 TEIF6
+        18 DMEIF6
+        16 FEIF6
+
+        11 TCIF5
+        10 HTIF5
+        09 TEIF5
+        08 DMEIF5
+        06 FEIF5
+
+        05 TCIF4
+        04 HTIF4
+        03 TEIF4
+        02 DMEIF4
+        00 FEIF4
+    }
+
+    LIFCR @ 0x08 : LISR
+    HIFCR @ 0x0c : HISR
+
+    CHN @ 0x00 [8; 0x18] : block {
+        CR @ 0x10 : reg {
+            enum BURST_TYPE {
+                0 = SINGLE
+                1 = INCR4
+                2 = INCR8
+                3 = INCR16
+            }
+
+            enum SIZE_TYPE {
+                0 = 8BIT
+                1 = 16BIT
+                2 = 32BIT
+            }
+
+            24 23 MBURST : BURST_TYPE
+            22 21 PBURST : BURST_TYPE
+            -- 20 TRBUFF
+            -- 19 CT
+            -- 18 DBM
+            17 16 PL     : { 0 = LOW; 1 = MEDIUM; 2 = HIGH; 3 = VERYHIGH }
+            -- 15 PINCOS
+            14 13 MSIZE  : SIZE_TYPE
+            12 11 PSIZE  : SIZE_TYPE
+            -- 10 MINC
+            -- 09 PINC
+            -- 08 CIRC
+            07 06 DIR    : { 0 = PERIPH_TO_MEM; 1 = MEM_TO_PERIPH; 2 = MEM_TO_MEM }
+            -- 05 PFCTRL : { 0 = DMA; 1 = PERIPH }
+            -- 04 TCIE
+            -- 03 HTIE
+            -- 02 TEIE
+            -- 01 DMEIE
+            -- 00 EN
+        }
+
+        NDTR @ 0x14 : reg
+        PAR @ 0x18 : reg
+        M0AR @ 0x1c : reg
+        M1AR @ 0x20 : reg
+
+        FCR @ 0x24 : reg {
+            -- 07 FEIE
+            05 03 FS
+            -- 02 DMDIS
+            01 00 FTH   : { 0 = QUARTER; 1 = HALF; 2 = THREE_QUARTERS; 3 = FULL }
+        }
+    }
+}
+
+DMA1 @ 0x40020000 : DMA
+DMA2 @ 0x40020400 : DMA
