@@ -1371,3 +1371,33 @@ block DMA {
 
 DMA1 @ 0x40020000 : DMA
 DMA2 @ 0x40020400 : DMA
+
+// DMA multiplexer
+block DMAMUX {
+    CR @ 0x00 [16; 0x04] : reg {
+        28 24 SYNC_ID
+        23 19 NBREQ
+        18 17 SPOL
+        -- 16 SE
+        -- 09 EGE
+        -- 08 SOIE
+        06 00 DMAREQ_ID
+    }
+
+    CSR @ 0x80 : reg
+    CFR @ 0x84 : reg
+
+    RGCR @ 0x100 [8; 0x04] : reg {
+        23 19 GNBREQ
+        18 17 GPOL
+        -- 16 GE
+        -- 08 OIE
+        04 00 SIG_ID
+    }
+
+    RGSR @ 0x140 : reg
+    RGCFR @ 0x144 : reg
+}
+
+DMAMUX1 @ 0x40020800 : DMAMUX
+DMAMUX2 @ 0x58025800 : DMAMUX
