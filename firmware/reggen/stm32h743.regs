@@ -1180,3 +1180,84 @@ EXTI @ 0x58000000 : block {
     CPUEMR @ 0x84 [3; 0x10] : reg
     CPUPR @ 0x88 [3; 0x10] : reg
 }
+
+// Serial audio interface
+block SAI {
+    GCR @ 0x00 : reg {
+        05 04 SYNCOUT : { 0 = NONE; 1 = BLOCK_A; 2 = BLOCK_B }
+        01 00 SYNCIN
+    }
+
+    block SUBBLOCK {
+        CR1 @ 0x04 : reg {
+            -- 26 OSR   : { 0 = 256FS; 1 = 512FS }
+            25 20 MCKDIV
+            -- 19 NOMCK
+            -- 17 DMAEN
+            -- 16 SAIEN
+            -- 13 OUTDRIV
+            -- 12 MONO
+            11 10 SYNCEN : { 0 = ASYNC; 1 = SYNC_INT; 2 = SYNC_EXT }
+            -- 09 CKSTR  : { 0 = TX_RISING_RX_FALLING; 1 = TX_FALLING_RX_RISING }
+            -- 08 LSBFIRST
+            07 05 DS     : { 2 = 8BIT; 3 = 10BIT; 4 = 16BIT; 5 = 20BIT; 6 = 24BIT; 7 = 32BIT }
+            03 02 PRTCFG : { 0 = FREE; 1 = SPDIF; 2 = AC97 }
+            01 00 MODE   : { 0 = MASTER_TX; 1 = MASTER_RX; 2 = SLAVE_TX; 3 = SLAVE_RX }
+        }
+
+        CR2 @ 0x08 : reg {
+            15 14 COMP : { 0 = NONE; 2 = U_LAW; 3 = A_LAW }
+            -- 13 CPL
+            12 07 MUTECNT
+            -- 06 MUTEVAL : { 0 = ZERO_SAMPLE; 1 = LAST_SAMPLE }
+            -- 05 MUTE
+            -- 04 TRIS
+            -- 03 FFLUSH
+            02 00 FTH : { 0 = EMPTY; 1 = QUARTER; 2 = HALF; 3 = THREE_QUARTERS; 4 = FULL }
+        }
+
+        FRCR @ 0x0c : reg {
+            -- 18 FSOFF
+            -- 17 FSPOL
+            -- 16 FSDEF
+            14 08 FSALL
+            07 00 FRL
+        }
+
+        SLOTR @ 0x10 : reg {
+            31 16 SLOTEN
+            11 08 NBSLOT
+            07 06 SLOTSZ : { 0 = DATASZ; 1 = 16BIT; 2 = 32BIT }
+            04 00 FBOFF
+        }
+
+        IM @ 0x14 : reg {
+            06 LFSDET
+            05 AFSDET
+            04 CNRDY
+            03 FREQ
+            02 WCKCFG
+            01 MUTEDET
+            00 OVRUDR
+        }
+
+        SR @ 0x18 : reg {
+            18 16 FLVL
+            include IM
+        }
+
+        CLRFR @ 0x1c : reg {
+            include IM
+        }
+
+        DR @ 0x20 : reg
+    }
+
+    A @ 0x00 : SUBBLOCK
+    B @ 0x20 : SUBBLOCK
+}
+
+SAI1 @ 0x40015800 : SAI
+SAI2 @ 0x40015c00 : SAI
+SAI3 @ 0x40016000 : SAI
+SAI4 @ 0x58005400 : SAI
