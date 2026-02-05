@@ -30,7 +30,6 @@
 #include "system-mips.h"
 
 #define CACHE_SIZE       16*1024
-#define CACHEALIGN_BITS  5
 #include "mmu-mips.h"
 
 #define CFG_UART_BASE    UART1_BASE      /* Base of the UART channel */

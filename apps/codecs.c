@@ -159,7 +159,7 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
             CODEC_EXTENSION, codec_root_fn);
 }
 
-/* Returns pointer to and size of free codec RAM. Aligns to CACHEALIGN_SIZE. */
+/* Returns pointer to and size of free codec RAM. Aligns to MEM_ALIGN_SIZE. */
 void *codec_get_buffer_callback(size_t *size)
 {
     void *buf = &codecbuf[codec_size];
@@ -169,7 +169,7 @@ void *codec_get_buffer_callback(size_t *size)
         return NULL;
 
     *size = s;
-    ALIGN_BUFFER(buf, *size, CACHEALIGN_SIZE);
+    ALIGN_BUFFER(buf, *size, MEM_ALIGN_SIZE);
 
     return buf;
 }

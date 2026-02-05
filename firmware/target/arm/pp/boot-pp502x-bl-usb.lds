@@ -1,3 +1,6 @@
+#define __ASSEMBLER__
+#include "cpu.h"
+
 /* Will have been included from boot.lds */
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
@@ -14,8 +17,6 @@ STARTUP(target/arm/pp/crt0-pp502x-bl-usb.o)
 #define IRAMSIZE 0x20000
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
-
-#define CACHEALIGN_SIZE 16
 
 MEMORY
 {

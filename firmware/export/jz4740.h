@@ -40,6 +40,9 @@
 #ifndef __JZ4740_H__
 #define __JZ4740_H__
 
+#define CACHEALIGN_BITS (5)
+#define CACHEALIGN_SIZE (32)
+
 #ifndef __ASSEMBLER__
 
 #define REG8(addr)     (*(volatile unsigned char  *)(addr))

@@ -25,60 +25,60 @@
 
 #if CONFIG_CPU == MCF5249
 #include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
+#elif CONFIG_CPU == MCF5250
 #include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
 #include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
+#elif CONFIG_CPU == PP5002
 #include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
+#elif CONFIG_CPU == PP5024
 #include "pp5024.h"
-#endif
-#if CONFIG_CPU == PP6100
+#elif CONFIG_CPU == PP6100
 #include "pp6100.h"
-#endif
-#if CONFIG_CPU == S3C2440
+#elif CONFIG_CPU == S3C2440
 #include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
+#elif CONFIG_CPU == DM320
 #include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
+#elif CONFIG_CPU == IMX31L
 #include "imx31l.h"
-#endif
-#ifdef CPU_TCC780X
+#elif defined(CPU_TCC780X)
 #include "tcc780x.h"
-#endif
-#ifdef CPU_S5L87XX
+#elif defined(CPU_S5L87XX)
 #include "s5l87xx.h"
-#endif
-#if CONFIG_CPU == JZ4732
+#elif CONFIG_CPU == JZ4732
 #include "jz4740.h"
-#endif
-#if CONFIG_CPU == JZ4760B
+#elif CONFIG_CPU == JZ4760B
 #include "jz4760b.h"
-#endif
-#if CONFIG_CPU == AS3525
+#elif CONFIG_CPU == AS3525
 #include "as3525.h"
-#endif
-#if CONFIG_CPU == AS3525v2
+#elif CONFIG_CPU == AS3525v2
 #include "as3525v2.h"
-#endif
-#if CONFIG_CPU == IMX233
+#elif CONFIG_CPU == IMX233
 #include "imx233.h"
-#endif
-#if CONFIG_CPU == RK27XX
+#elif CONFIG_CPU == RK27XX
 #include "rk27xx.h"
-#endif
-#if CONFIG_CPU == X1000
+#elif CONFIG_CPU == X1000
 #include "x1000.h"
-#endif
-#if CONFIG_CPU == STM32H743
+#elif CONFIG_CPU == STM32H743
 #include "stm32h743.h"
+#endif
+
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (defined(CPU_ARM) || defined(CPU_MIPS))
+# define HAVE_CPU_CACHE_ALIGN
+#endif
+
+#if defined(HAVE_CPU_CACHE_ALIGN)
+# if !defined(CACHEALIGN_BITS)
+#  error "CPU header must define CACHEALIGN_BITS"
+# elif !defined(CACHEALIGN_SIZE)
+#  error "CPU header must define CACHEALIGN_SIZE"
+# elif CACHEALIGN_SIZE != (1u << CACHEALIGN_BITS)
+#  error "CACHEALIGN_SIZE and CACHEALIGN_BITS are inconsistent"
+# endif
+#else
+# if defined(CACHEALIGN_BITS) && defined(CACHEALIGN_SIZE)
+#  error "CACHEALIGN_BITS and CACHEALIGN_SIZE must not be defined for targets with no CPU cache"
+# endif
 #endif
 
 #endif /* __CPU_H */

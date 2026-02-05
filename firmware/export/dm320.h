@@ -36,6 +36,10 @@ extern unsigned long _lcdbuf2;
 extern unsigned long _ttbstart;
 #endif
 
+/* See https://www.heyrick.co.uk/blog/files/datasheets/tms320dm320part1.pdf */
+#define CACHEALIGN_BITS  5
+#define CACHEALIGN_SIZE  32
+
 #define TTB_BASE_ADDR    (_ttbstart) /* End of memory */
 #define FRAME            ((short *) (&_lcdbuf))  /* Right after TTB */
 #ifdef MROBE_500

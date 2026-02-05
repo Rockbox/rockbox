@@ -72,8 +72,8 @@ void iram_malloc_init(void){
 void *iram_malloc(size_t size){
     void* x;
 
-    /* always ensure alignment to CACHEALIGN_SIZE byte */
-    size = (size + (CACHEALIGN_SIZE-1)) & ~(CACHEALIGN_SIZE-1);
+    /* align for best performance */
+    size = MEM_ALIGN_UP(size);
 
     if(size>iram_remain)
       return NULL;

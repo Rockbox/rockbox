@@ -117,9 +117,6 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 # define MEM_ALIGN_ATTR
 #endif
 
-#ifndef CACHEALIGN_SIZE
-# define CACHEALIGN_SIZE 1
-#endif
 /*
 #ifndef HAVE_CLIP_SAMPLE_16
 static inline int32_t clip_sample_16(int32_t sample)

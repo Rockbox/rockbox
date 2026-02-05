@@ -428,12 +428,9 @@ static void perform_config(void)
 
 static void *ci_codec_get_buffer(size_t *size)
 {
-    static char buffer[64 * 1024 * 1024];
-    char *ptr = buffer;
+    static char buffer[64 * 1024 * 1024] MEM_ALIGN_ATTR;
     *size = sizeof(buffer);
-    if ((intptr_t)ptr & (CACHEALIGN_SIZE - 1))
-        ptr += CACHEALIGN_SIZE - ((intptr_t)ptr & (CACHEALIGN_SIZE - 1));
-    return ptr;
+    return buffer;
 }
 
 static void ci_pcmbuf_insert(const void *ch1, const void *ch2, int count)

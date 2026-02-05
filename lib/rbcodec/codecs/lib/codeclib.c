@@ -35,7 +35,7 @@ static unsigned char* mallocbuf = NULL;
 
 int codec_init(void)
 {
-    /* codec_get_buffer() aligns the resulting point to CACHEALIGN_SIZE. */
+    /* codec_get_buffer() aligns the resulting point to MEM_ALIGN_SIZE. */
     mem_ptr = 0;
     mallocbuf = (unsigned char *)ci->codec_get_buffer((size_t *)&bufsize);
   
@@ -67,8 +67,8 @@ void* codec_malloc(size_t size)
     
     x=&mallocbuf[mem_ptr];
     
-    /* Keep memory aligned to CACHEALIGN_SIZE. */
-    mem_ptr += (size + (CACHEALIGN_SIZE-1)) & ~(CACHEALIGN_SIZE-1);
+    /* Keep memory aligned to MEM_ALIGN_SIZE. */
+    mem_ptr += MEM_ALIGN_UP(size);
 
     return(x);
 }

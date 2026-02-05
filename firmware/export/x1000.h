@@ -119,6 +119,7 @@
 
 /* CPU cache parameters */
 #define CACHEALIGN_BITS     5
+#define CACHEALIGN_SIZE     32
 #define CACHE_SIZE          (16 * 1024)
 
 #endif /* __X1000_H__ */

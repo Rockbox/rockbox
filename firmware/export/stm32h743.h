@@ -25,6 +25,7 @@
 
 #define CACHE_SIZE              (16 * 1024)
 #define CACHEALIGN_BITS         5
+#define CACHEALIGN_SIZE         32
 
 #define DCACHE_SIZE             CACHE_SIZE
 #define DCACHE_WAYS             0x4

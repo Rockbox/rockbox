@@ -22,6 +22,7 @@
 #define __S3C2440_H__
 
 #define CACHEALIGN_BITS (5)
+#define CACHEALIGN_SIZE (32)
 
 #define LCD_BUFFER_SIZE (320*240*2)
 #define TTB_SIZE (0x4000)

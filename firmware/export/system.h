@@ -258,17 +258,6 @@ static inline void cpu_boost_unlock(void)
 #define DISABLE_INTERRUPTS  HIGHEST_IRQ_LEVEL
 #endif
 
-/* Define this, if the CPU may take advantage of cache aligment. Is enabled
- * for all ARM CPUs. */
-#ifdef CPU_ARM
-    #define HAVE_CPU_CACHE_ALIGN
-    #define MIN_STACK_ALIGN 8
-#endif
-
-#ifdef CPU_MIPS
-    #define HAVE_CPU_CACHE_ALIGN
-#endif
-
 /* Define this if target has support for generating backtraces */
 #if defined(CPU_ARM) || \
     (defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE))
@@ -277,22 +266,13 @@ static inline void cpu_boost_unlock(void)
 #endif
 #endif
 
-#ifndef MIN_STACK_ALIGN
-#define MIN_STACK_ALIGN (sizeof (uintptr_t))
+/* ARM ABIs generally require 8-byte stack alignment */
+#ifdef CPU_ARM
+    #define MIN_STACK_ALIGN 8
 #endif
 
-/* Calculate CACHEALIGN_SIZE from CACHEALIGN_BITS */
-#ifdef CACHEALIGN_SIZE
-    /* undefine, if defined. always calculate from CACHEALIGN_BITS */
-    #undef CACHEALIGN_SIZE
-#endif
-#ifdef CACHEALIGN_BITS
-    /* CACHEALIGN_SIZE = 2 ^ CACHEALIGN_BITS */
-    #define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
-#else
-    /* FIXME: set to maximum known cache alignment of supported CPUs */
-    #define CACHEALIGN_BITS  5
-    #define CACHEALIGN_SIZE 32
+#ifndef MIN_STACK_ALIGN
+#define MIN_STACK_ALIGN (sizeof (uintptr_t))
 #endif
 
 #ifdef HAVE_CPU_CACHE_ALIGN

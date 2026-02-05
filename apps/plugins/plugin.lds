@@ -21,7 +21,6 @@ OUTPUT_FORMAT(elf32-littlemips)
 #else
 #define NOCACHE_BASE 	0x28000000
 #endif /* CPU_* */
-#define CACHEALIGN_SIZE 16
 #endif /* CPU_PP */
 
 #if CONFIG_CPU==IMX31L
