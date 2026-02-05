@@ -281,25 +281,18 @@ SECTIONS
     } > PLUGIN_RAM
 
 #if NOCACHE_BASE != 0
-    .ncdata . + NOCACHE_BASE :
+    /*
+     * Allocate .ncdata based on the following constraints:
+     *
+     * 1. the LMA must be allocated at the next free LMA in
+     *    PLUGIN_RAM and aligned to a cacheline boundary.
+     * 2. the VMA - LMA offset must equal NOCACHE_BASE.
+     */
+    .ncdata ALIGN(. + NOCACHE_BASE, CACHEALIGN_SIZE) : ALIGN(CACHEALIGN_SIZE)
     {
-        . = ALIGN(CACHEALIGN_SIZE);
         *(.ncdata*)
         . = ALIGN(CACHEALIGN_SIZE);
-/* EABI currently needs these defined here, otherwise .iram and .bss can
-   sometimes have an incorrect load address, breaking codecs and plugins. */
-        bssaddr = . - NOCACHE_BASE;
-#if defined(IRAMSIZE) && IRAMSIZE != 0
-        iramcopy = . - NOCACHE_BASE;
-#endif
     } AT> PLUGIN_RAM
-/* This definition is used when NOCACHE_BASE is 0. The address offset bug only
-   seems to occur when the empty .ncdata is present. */
-#else
-    bssaddr = .;
-#if defined(IRAMSIZE) && IRAMSIZE != 0
-    iramcopy = .;
-#endif
 #endif
 
     /DISCARD/ :
@@ -311,7 +304,7 @@ SECTIONS
 #endif
     }
 
-    .bss bssaddr (NOLOAD) :
+    .bss (NOLOAD) :
     {
     	plugin_bss_start = .;
     	_plugin_bss_start = .;
@@ -324,29 +317,47 @@ SECTIONS
     } > PLUGIN_RAM
 
 #if NOCACHE_BASE != 0
-    .ncbss . + NOCACHE_BASE (NOLOAD) :
+    /*
+     * .ncbss has the same constraints as the .ncdata section
+     * above but there is an extra complication: because it is
+     * a NOLOAD section, unlike .ncdata it cannot consume any
+     * VMAs or LMAs in PLUGIN_RAM itself.
+     *
+     * Because free VMA/LMAs in PLUGIN_RAM are unchanged, any
+     * subsequent sections will get placed at the end of the
+     * .bss section, overlapping .ncbss, which we don't want.
+     *
+     * One solution is to manually place the next sections to
+     * account for the size of .ncbss, but a cleaner solution
+     * is to define a dummy section (.ncbss_vma) allocated at
+     * the same VMA as .ncbss and equal in size, and placed in
+     * the PLUGIN_RAM region. This allocates the correct VMA
+     * range in plugin RAM so that the next section will not
+     * overlap .ncbss.
+     */
+    .ncbss ALIGN(. + NOCACHE_BASE, CACHEALIGN_SIZE) (NOLOAD) : ALIGN(CACHEALIGN_SIZE)
     {
-    	. = ALIGN(CACHEALIGN_SIZE);
     	*(.ncbss*)
         . = ALIGN(CACHEALIGN_SIZE);
-        /* We won't trust this one any more than with .ncdata */
-        pluginendaddr = . - NOCACHE_BASE;
     } AT> PLUGIN_RAM
-#else
-    pluginendaddr = .;
+
+    .ncbss_vma (NOLOAD) : ALIGN(CACHEALIGN_SIZE)
+    {
+        . += SIZEOF(.ncbss);
+    } > PLUGIN_RAM
 #endif
 
     /* Final end of plugin after IRAM setup. The plugin or codec buffer
        is considered unused by the in-RAM image at this point once IRAM
        is copied. */
-    .pluginend pluginendaddr :
+    .pluginend (NOLOAD) :
     {
         _plugin_end_addr = .;
         plugin_end_addr = .;
-    }
+    } > PLUGIN_RAM
 
 #if defined(IRAMSIZE) && IRAMSIZE != 0
-    .iram IRAMORIG : AT (iramcopy)
+    .iram IRAMORIG : AT(LOADADDR(.bss))
     {
         iramstart = .;
         *(.icode)
@@ -354,6 +365,7 @@ SECTIONS
         *(.idata)
         iramend = .;
     } > PLUGIN_IRAM
+    iramcopy = LOADADDR(.iram);
 
     .ibss (NOLOAD) :
     {
@@ -384,3 +396,13 @@ SECTIONS
         KEEP(*(.comment))
     }
 }
+
+#if NOCACHE_BASE != 0
+/* Some asserts to make sure nocache sections appear correctly defined */
+ASSERT(LOADADDR(.ncdata) == ADDR(.ncdata) - NOCACHE_BASE, ".ncdata has incorrect LMA/VMA address");
+ASSERT(LOADADDR(.ncdata) % CACHEALIGN_SIZE == 0,          ".ncdata incorrectly aligned");
+ASSERT(LOADADDR(.ncbss) == ADDR(.ncbss) - NOCACHE_BASE,   ".ncbss has incorrect LMA/VMA address");
+ASSERT(LOADADDR(.ncbss) % CACHEALIGN_SIZE == 0,           ".ncbss incorrectly aligned");
+ASSERT(ADDR(.ncbss_vma) == LOADADDR(.ncbss),              ".ncbss_vma has wrong address");
+ASSERT(SIZEOF(.ncbss_vma) == SIZEOF(.ncbss),              ".ncbss_vma has wrong size");
+#endif
