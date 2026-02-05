@@ -799,7 +799,7 @@ static inline bool fft_get_fft(void)
 
 #if NUM_CORES > 1
 /* use a worker thread if there is another processor core */
-static volatile bool fft_thread_run SHAREDDATA_ATTR = false;
+static volatile bool fft_thread_run SHAREDBSS_ATTR;
 static unsigned long fft_thread = 0;
 
 static long fft_thread_stack[CACHEALIGN_UP(DEFAULT_STACK_SIZE*4/sizeof(long))]

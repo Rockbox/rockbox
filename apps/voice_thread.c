@@ -97,7 +97,7 @@ static const char voice_thread_name[] = "voice";
 /* Voice thread synchronization objects */
 static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
-static int quiet_counter SHAREDDATA_ATTR = 0;
+static int quiet_counter SHAREDBSS_ATTR;
 static bool voice_playing = false;
 
 #define VOICE_PCM_FRAME_COUNT   ((PLAY_SAMPR_MAX*VOICE_FRAME_COUNT + \

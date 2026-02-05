@@ -34,7 +34,7 @@ void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
 
 #if !defined(CPU_PP) || !defined(BOOTLOADER) || \
     defined(HAVE_BOOTLOADER_USB_MODE)
-volatile long current_tick SHAREDDATA_ATTR = 0;
+volatile long current_tick SHAREDBSS_ATTR;
 #endif
 
 /* - Timer initialization and interrupt handler is defined at

@@ -199,7 +199,7 @@ static int lcd_sleep_timeout = 10*HZ;
 #define lcd_sleep_timeout LCD_SLEEP_TIMEOUT
 #endif
 
-static int lcd_sleep_timer SHAREDDATA_ATTR = 0;
+static int lcd_sleep_timer SHAREDBSS_ATTR;
 
 static void backlight_lcd_sleep_countdown(bool start)
 {
