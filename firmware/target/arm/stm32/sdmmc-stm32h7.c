@@ -407,7 +407,12 @@ void stm32h7_sdmmc_irq_handler(struct stm32h7_sdmmc_controller *ctl)
     uint32_t icr = 0;
 
     if (!ctl->cmd_wait)
-        panicf("sdmmc_irq: not waiting: %08lx", star);
+    {
+        if (star != 0)
+            panicf("sdmmc_irq: not waiting: %08lx", star);
+
+        return;
+    }
 
     /*
      * Ignore interrupts which we haven't enabled; this is needed
