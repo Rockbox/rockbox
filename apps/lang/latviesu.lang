@@ -16945,3 +16945,17 @@
     general_purpose_led: "Izmantot LED indikatorus"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Paziņot statusu"
+  </dest>
+  <voice>
+    *: "Paziņot statusu"
+  </voice>
+</phrase>
