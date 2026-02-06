@@ -207,6 +207,9 @@ struct sdmmc_host_config
     uint32_t bus_widths;
     uint32_t bus_clocks;
 
+    /* Max number of blocks in a multiblock transfer */
+    int max_nr_blocks;
+
     /* Set to true if the device is removable at runtime */
     bool is_removable;
 };

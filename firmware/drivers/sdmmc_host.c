@@ -677,10 +677,12 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
     if (start + count > host->cardinfo.numblocks)
         goto out;
 
+    int max_nr_blocks = MAX(host->config.max_nr_blocks, 1);
     while (count > 0)
     {
-        /* TODO: multiple block transfers */
-        int xfer_count = 1;
+        int xfer_count = count;
+        if (xfer_count > max_nr_blocks)
+            xfer_count = max_nr_blocks;
 
         /* Set block length for non-HCS cards */
         if (!host->is_hcs_card)
@@ -692,15 +694,25 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
 
         struct sdmmc_host_command cmd = {
             .buffer = buf,
-            .nr_blocks = 1,
+            .nr_blocks = xfer_count,
             .block_len = SD_BLOCK_SIZE,
             .flags = SDMMC_RESP_SHORT | data_dir,
         };
 
-        if (data_dir == SDMMC_DATA_WRITE)
-            cmd.command = SD_WRITE_BLOCK;
+        if (xfer_count > 1)
+        {
+            if (data_dir == SDMMC_DATA_WRITE)
+                cmd.command = SD_WRITE_MULTIPLE_BLOCK;
+            else
+                cmd.command = SD_READ_MULTIPLE_BLOCK;
+        }
         else
-            cmd.command = SD_READ_SINGLE_BLOCK;
+        {
+            if (data_dir == SDMMC_DATA_WRITE)
+                cmd.command = SD_WRITE_BLOCK;
+            else
+                cmd.command = SD_READ_SINGLE_BLOCK;
+        }
 
         if (host->cardinfo.sd2plus)
             cmd.argument = start;
@@ -710,6 +722,22 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
         rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
         if (rc)
             goto out;
+
+        /*
+         * NOTE: some controllers can send CMD12 automatically after
+         *       the end of a transfer, eg. X1000; it might be worth
+         *       supporting that via a feature flag.
+         */
+        if (xfer_count > 1)
+        {
+            memset(&cmd, 0, sizeof(cmd));
+            cmd.command = SD_STOP_TRANSMISSION;
+            cmd.flags = SDMMC_RESP_SHORT | SDMMC_RESP_BUSY;
+
+            rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
+            if (rc)
+                goto out;
+        }
 
         buf += xfer_count * SD_BLOCK_SIZE;
         start += xfer_count;
