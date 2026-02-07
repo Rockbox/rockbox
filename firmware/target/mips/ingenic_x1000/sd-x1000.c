@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "system.h"
 #include "storage.h"
 #include "sdmmc.h"
 #include "sd.h"
@@ -31,6 +32,25 @@
 
 static msc_drv* sd_to_msc[MSC_COUNT];
 static long _sd_last_disk_activity = 0;
+
+static void sd_probe_set_block_count(msc_drv* d)
+{
+    uint8_t scr[CACHEALIGN_SIZE] CACHEALIGN_ATTR;
+    msc_req req = {0};
+    req.command = SD_SEND_SCR;
+    req.resptype = MSC_RESP_R1;
+    req.flags = MSC_RF_DATA;
+    req.data = scr;
+    req.nr_blocks = 1;
+    req.block_len = 8;
+
+    if(msc_app_cmd_exec(d, &req) == MSC_REQ_SUCCESS) {
+        if(scr[3] & 0x02)
+            d->driver_flags |= MSC_DF_HAS_SBC;
+        else
+            d->driver_flags &= ~MSC_DF_HAS_SBC;
+    }
+}
 
 static int sd_init_card(msc_drv* d)
 {
@@ -45,6 +65,7 @@ static int sd_init_card(msc_drv* d)
     if(s = msc_cmd_set_clr_card_detect(d, 0))   return -170 - s;
     if(s = msc_cmd_set_bus_width(d, 4))         return -180 - s;
     if(s = msc_cmd_switch_freq(d))              return -190 - s;
+    sd_probe_set_block_count(d);
     d->driver_flags |= MSC_DF_READY;
     d->cardinfo.initialized = 1;
     return 0;
@@ -92,19 +113,35 @@ static int sd_transfer(msc_drv* d, bool write,
             if(status = msc_cmd_set_block_len(d, SD_BLOCK_SIZE))
                 goto _exit;
 
-        /* TODO - look into using CMD23 to improve transfer performance.
-         * This specifies the number of blocks ahead of time, instead of
-         * relying on CMD12 to stop transmission. CMD12 is still needed
-         * in the event of errors though.
-         */
+        bool use_sbc = false;
+        if(xfer_count > 1 && (d->driver_flags & MSC_DF_HAS_SBC)) {
+            msc_req sbc_req = {0};
+            sbc_req.command = 23; /* CMD23: SET_BLOCK_COUNT (SBC) */
+            sbc_req.argument = xfer_count;
+            sbc_req.resptype = MSC_RESP_R1;
+            status = msc_cmd_exec(d, &sbc_req);
+            if(status == MSC_REQ_SUCCESS) {
+                use_sbc = true;
+            } else if(status == MSC_REQ_CARD_ERR &&
+                      (sbc_req.response[0] & SD_R1_ILLEGAL_COMMAND)) {
+                d->driver_flags &= ~MSC_DF_HAS_SBC;
+            } else {
+                goto _exit;
+            }
+        }
+
         msc_req req = {0};
         req.data = buf;
         req.nr_blocks = xfer_count;
         req.block_len = SD_BLOCK_SIZE;
         req.resptype = MSC_RESP_R1;
         req.flags = MSC_RF_DATA;
-        if(xfer_count > 1)
-            req.flags |= MSC_RF_AUTO_CMD12;
+        if(xfer_count > 1) {
+            if(use_sbc)
+                req.flags |= MSC_RF_ERR_CMD12;
+            else
+                req.flags |= MSC_RF_AUTO_CMD12;
+        }
         if(write) {
             req.command = xfer_count == 1 ? SD_WRITE_BLOCK
                                           : SD_WRITE_MULTIPLE_BLOCK;

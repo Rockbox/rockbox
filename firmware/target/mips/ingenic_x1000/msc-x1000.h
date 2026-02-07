@@ -48,6 +48,7 @@
 #define MSC_DF_READY    (1 << 1)
 #define MSC_DF_HCS_CARD (1 << 2)
 #define MSC_DF_V2_CARD  (1 << 3)
+#define MSC_DF_HAS_SBC  (1 << 4)
 
 /* Request status codes */
 #define MSC_REQ_SUCCESS     0
