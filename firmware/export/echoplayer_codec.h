@@ -21,9 +21,13 @@
 #ifndef __ECHOPLAYER_CODEC_H__
 #define __ECHOPLAYER_CODEC_H__
 
+#include <stdbool.h>
+
 /* -79 to 0 dB in 0.5 dB steps; software volume control
  * is used because the hardware volume controls "click"
  * when changing the volume */
 AUDIOHW_SETTING(VOLUME, "dB", 1, 5, -790, 0, -200);
+
+void audiohw_mute(bool mute);
 
 #endif /* __ECHOPLAYER_CODEC_H__ */

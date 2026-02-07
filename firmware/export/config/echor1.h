@@ -51,8 +51,13 @@
 /* Codec / audio hardware defines */
 #define HW_SAMPR_CAPS   SAMPR_CAP_ALL_96 // FIXME: check this section
 #define HAVE_ECHOPLAYER_CODEC
+#define HAVE_AIC310X
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
+
+#ifndef SIMULATOR
+#define PCM_NATIVE_BITDEPTH 32
+#endif
 
 /* Button defines */
 #define CONFIG_KEYPAD ECHO_R1_PAD

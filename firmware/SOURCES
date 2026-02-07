@@ -1942,7 +1942,6 @@ target/arm/stm32/debug-stm32h7.c
 #endif
 target/arm/stm32/gpio-stm32h7.c
 target/arm/stm32/i2c-stm32h7.c
-target/arm/stm32/pcm-stm32h7.c
 target/arm/stm32/sdmmc-stm32h7.c
 target/arm/stm32/spi-stm32h7.c
 target/arm/stm32/system-stm32h7.c
@@ -1959,6 +1958,9 @@ target/arm/stm32/echoplayer/button-echoplayer.c
 target/arm/stm32/echoplayer/clock-echoplayer.c
 target/arm/stm32/echoplayer/i2c-echoplayer.c
 target/arm/stm32/echoplayer/lcd-echoplayer.c
+#ifndef BOOTLOADER
+target/arm/stm32/echoplayer/pcm-echoplayer.c
+#endif
 target/arm/stm32/echoplayer/power-echoplayer.c
 target/arm/stm32/echoplayer/sdmmc-echoplayer.c
 target/arm/stm32/echoplayer/system-echoplayer.c
