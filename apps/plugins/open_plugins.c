@@ -176,12 +176,18 @@ static void op_entry_set_checksum(void)
         (op_entry.lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
 }
 
-static void op_entry_set_name(void)
+static bool op_entry_set_name(void)
 {
     char tmp_buf[OPEN_PLUGIN_NAMESZ+1];
     rb->strlcpy(tmp_buf, op_entry.name, OPEN_PLUGIN_NAMESZ);
+    uint32_t crc = rb->crc_32(tmp_buf, sizeof(tmp_buf), 0xffffffff);
+
     if (rb->kbd_input(tmp_buf, OPEN_PLUGIN_NAMESZ, NULL) >= 0)
+    {
         rb->strlcpy(op_entry.name, tmp_buf, OPEN_PLUGIN_NAMESZ);
+        return crc != rb->crc_32(tmp_buf, sizeof(tmp_buf), 0xffffffff);
+    }
+    return false;
 }
 
 static int op_entry_set_path(void)
@@ -392,10 +398,10 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                     rb->strlcpy(op_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
 
                 /* hash on the parameter path if it is a file */
-                if (op_entry.lang_id <0 && key == op_entry.path &&
+                if (op_entry.lang_id <0 && (key == op_entry.path || key == NULL) &&
                     rb->file_exists(op_entry.param))
                 {
-                    open_plugin_get_hash(op_entry.path, &newhash);
+                    open_plugin_get_hash(op_entry.param, &newhash);
                     op_entry.hash = newhash;
                 }
             }
@@ -692,6 +698,7 @@ static void edit_menu(int selection)
 {
     int selected_item;
     bool exit = false;
+    bool name_set = false;
     int action = 0;
 
     if (!op_entry_read(fd_dat, selection, op_entry_sz))
@@ -713,11 +720,22 @@ static void edit_menu(int selection)
         {
             case ACTION_STD_OK:
                 if (selected_item == 0)
-                    op_entry_set_name();
+                {
+                    name_set = op_entry_set_name();
+                }
                 else if (selected_item == 2)
                     op_entry_set_path();
                 else if (selected_item == 4)
+                {
                     op_entry_set_param();
+                    /* if user already set the name they probably don't want us to change it */
+                    if (!name_set && op_entry.lang_id < 0 && rb->file_exists(op_entry.param))
+                    {
+                        char *slash=strrchr(op_entry.param, '/');
+                        if(slash)
+                            rb->strlcpy(op_entry.name, slash+1, OPEN_PLUGIN_NAMESZ);
+                    }
+                }
                 else
                     exit = true;
 
