@@ -14784,7 +14784,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14799,7 +14799,7 @@
   </source>
   <dest>
     *: "Nyomja meg a LEFT gombot a megszakításhoz."
-    android,hifietma*,zenvision: "Nyomja meg a BACK gombot a megszakításhoz."
+    android,hifietma*: "Nyomja meg a BACK gombot a megszakításhoz."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Nyomja meg a POWER gombot a megszakításhoz."
     ihifi760,ihifi960: "Duplán koppintson a RETURN-re megszakításhoz."
     ihifi770,ihifi770c,ihifi800: "Nyomja meg a HOME gombot a megszakításhoz."
@@ -14814,7 +14814,7 @@
   </dest>
   <voice>
     *: "Nyomja meg a LEFT gombot a megszakításhoz."
-    android,hifietma*,zenvision: "Nyomja meg a BACK gombot a megszakításhoz."
+    android,hifietma*: "Nyomja meg a BACK gombot a megszakításhoz."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Nyomja meg a POWER gombot a megszakításhoz."
     ihifi760,ihifi960: "Duplán koppintson a RETURN-re megszakításhoz."
     ihifi770,ihifi770c,ihifi800: "Nyomja meg a HOME gombot a megszakításhoz."
@@ -16946,5 +16946,19 @@
   <voice>
     *: none
     general_purpose_led: "LED jelzőfények használata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Állapot bejelentése"
+  </dest>
+  <voice>
+    *: "Állapot bejelentése"
   </voice>
 </phrase>
