@@ -731,7 +731,7 @@ static void edit_menu(int selection)
                     /* if user already set the name they probably don't want us to change it */
                     if (!name_set && op_entry.lang_id < 0 && rb->file_exists(op_entry.param))
                     {
-                        char *slash=strrchr(op_entry.param, '/');
+                        char *slash = rb->strrchr(op_entry.param, '/');
                         if(slash)
                             rb->strlcpy(op_entry.name, slash+1, OPEN_PLUGIN_NAMESZ);
                     }
