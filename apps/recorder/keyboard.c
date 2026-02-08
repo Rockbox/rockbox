@@ -472,6 +472,37 @@ int kbd_input(char* text, int buflen, ucschar_t *kbd)
             }
             else
 #endif /* LCD_WIDTH >= 160 && LCD_HEIGHT >= 96 */
+#if (LCD_WIDTH == 128 && LCD_HEIGHT == 64) || (LCD_WIDTH == 96 && LCD_HEIGHT == 96)
+/*    CLIP PLUS & XDUOO X3                  ||  CLIP ZIP*/
+            {
+                p = "ABCDEFG !?\" $%+'\n"
+                    "HIJKLMN 789 &_-`\n"
+                    "OPQRSTU 456 §|/\n"
+                    "VWXYZ.,0123 ~=*#\n"
+
+                    "abcdefg ¢£¤¥¦§©®\n"
+                    "hijklmn «»ºª¹²³\n"
+                    "opqrstu ¯±×÷¡¿µ·\n"
+                    "vwxyz.,¨:;¼½¾¬¶°\n"
+
+                    "< ({[-*?\"!'@#$%\n"
+                    "> )}]+/\\=& 789_`\n"
+                    "¢£¤¥¦§©®¬§ 456x|\n"
+                    "«»°ºª¹²³¶.,0123~\n"
+
+                    "ÀÁÂÃÄÅÆ ÌÍÎÏÈÉÊË\n"
+                    "àáâãäåæ ìíîïèéêë\n"
+                    "ÓÒÔÕÖØ ÇÐÞÝßÙÚÛÜ\n"
+                    "òóôõöø çðþýÿùúûü";
+
+#if ((LCD_WIDTH == 128 && LCD_HEIGHT == 64))
+                pm->default_lines = 4;
+#else
+                pm->default_lines = 8;
+#endif
+                pm->max_line_len = 16;
+            }
+#else
             {
                 p = "ABCDEFG !?\" @#$%+'\n"
                     "HIJKLMN 789 &_()-`\n"
@@ -491,7 +522,7 @@ int kbd_input(char* text, int buflen, ucschar_t *kbd)
                 pm->default_lines = 4;
                 pm->max_line_len = 18;
             }
-
+#endif
             pbuf = pm->kbd_buf;
             while (*p)
             {
