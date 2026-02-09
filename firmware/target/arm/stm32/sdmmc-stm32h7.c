@@ -28,6 +28,7 @@
 /* cmd_wait flags */
 #define WAIT_CMD   0x01
 #define WAIT_DATA  0x02
+#define WAIT_BUSY  0x04
 
 /* Maximum number of bytes for 1 transfer */
 #define MAX_DATA_LEN \
@@ -48,6 +49,14 @@
     __reg_orm(SDMMC_STAR, IDMATE, DTIMEOUT, DABORT, DCRCFAIL, TXUNDERR, RXOVERR)
 #define DATA_END_BITS \
     (DATA_SUCCESS_BITS | DATA_ERROR_BITS)
+
+/* IRQs for busy wait phase */
+#define BUSY_SUCCESS_BITS \
+    __reg_orm(SDMMC_STAR, BUSYD0END)
+#define BUSY_ERROR_BITS \
+    __reg_orm(SDMMC_STAR, DTIMEOUT)
+#define BUSY_END_BITS \
+    (BUSY_SUCCESS_BITS | DATA_ERROR_BITS)
 
 static size_t get_sdmmc_bus_freq(uint32_t clock)
 {
@@ -262,6 +271,13 @@ int stm32h7_sdmmc_submit_command(void *controller,
         break;
     }
 
+    /* For R1b responses we need to wait for the busy signal. */
+    if (cmd->flags & SDMMC_RESP_BUSY)
+    {
+        maskr |= BUSY_END_BITS;
+        cmd_wait |= WAIT_BUSY;
+    }
+
     /*
      * Handle commands with data transfers
      */
@@ -313,9 +329,14 @@ int stm32h7_sdmmc_submit_command(void *controller,
     {
         /* Disable data transfer */
         reg_assignlf(ctl->regs, SDMMC_IDMACTRLR, IDMAEN(0));
-        reg_varl(ctl->regs, SDMMC_DTIMER) = 0;
         reg_varl(ctl->regs, SDMMC_DLENR) = 0;
         reg_varl(ctl->regs, SDMMC_DCTRL) = 0;
+
+        /* DTIMER is the wait time for the busy signal */
+        if (cmd->flags & SDMMC_RESP_BUSY)
+            reg_varl(ctl->regs, SDMMC_DTIMER) = 1 * ctl->bus_freq;
+        else
+            reg_varl(ctl->regs, SDMMC_DTIMER) = 0;
     }
 
     /*
@@ -419,7 +440,7 @@ void stm32h7_sdmmc_irq_handler(struct stm32h7_sdmmc_controller *ctl)
      * to ensure the correct interrupt is used to detect command
      * completion (CMDSENT or CMDREND).
      */
-    star &= maskr;
+    star &= maskr | __reg_orm(SDMMC_STAR, BUSYD0);
 
     if (ctl->cmd_wait & WAIT_CMD)
     {
@@ -475,6 +496,32 @@ void stm32h7_sdmmc_irq_handler(struct stm32h7_sdmmc_controller *ctl)
 
             ctl->cmd_wait &= ~WAIT_DATA;
             icr |= DATA_END_BITS;
+        }
+    }
+
+    if (ctl->cmd_wait & WAIT_BUSY)
+    {
+        if (reg_vreadf(star, SDMMC_STAR, CMDREND) &&
+            !reg_vreadf(star, SDMMC_STAR, BUSYD0))
+        {
+            /*
+             * Skip waiting if the busy signal is not asserted by
+             * the card when the command ends; in this case we'll
+             * never receive a BUSYD0END interrupt because it is
+             * only raised on a transition from busy -> not busy.
+             */
+            ctl->cmd_wait &= ~WAIT_BUSY;
+        }
+        else if ((star & BUSY_END_BITS) || ctl->cmd_error)
+        {
+            if (!ctl->cmd_error)
+            {
+                if (reg_vreadf(star, SDMMC_STAR, DTIMEOUT))
+                    ctl->cmd_error = SDMMC_STATUS_TIMEOUT;
+            }
+
+            ctl->cmd_wait &= ~WAIT_BUSY;
+            icr |= BUSY_END_BITS;
         }
     }
 
