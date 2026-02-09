@@ -392,6 +392,8 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h41f)
         Case "ukrainian"
             LangIDs = Array(&h422)
+        Case "vietnamese"
+            LangIDs = Array(&h42a)
         Case "wallisertitsch"
             LangIDs = Array(&h807) ' Swiss German
         Case "walon"
