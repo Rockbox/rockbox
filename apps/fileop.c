@@ -97,19 +97,23 @@ static bool poll_cancel_action(int operation, struct file_op_params *param)
         {
             int total_shft = (int) (param->total_size >> 15);
             int current_shft = (int) (param->processed_size >> 15);
+            const char *unit_str = str(LANG_MEBIBYTE);
             splash_progress(current_shft, total_shft,
-                            "%s %s (%d MiB)\n%d MiB",
+                            "%s %s (%d %s)\n%d %s",
                             op_str, param->toplevel_name,
-                            total_shft >> 5, current_shft >> 5);
+                            total_shft >> 5, unit_str,
+                            current_shft >> 5, unit_str);
         }
         else if (param->total_size >= 1024)
         {
             int total_kib = (int) (param->total_size >> 10);
             int current_kib = (int) (param->processed_size >> 10);
+            const char *unit_str = str(LANG_KIBIBYTE);
             splash_progress(current_kib, total_kib,
-                            "%s %s (%d KiB)\n%d KiB",
+                            "%s %s (%d %s)\n%d %s",
                             op_str, param->toplevel_name,
-                            total_kib, current_kib);
+                            total_kib, unit_str,
+                            current_kib, unit_str);
         }
     }
     return ACTION_STD_CANCEL == get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
