@@ -35,13 +35,8 @@
 #define MS_TO_TICKS(x) \
     (((x) + (1000 / HZ - 1)) / (1000 / HZ))
 
-/*
- * ILI9342C specifies 10 MHz max
- *
- * Use 12MHz for now -- for some reason using 6 MHz doesn't work
- * to enable RGB mode, but works fine to send graphics in SPI mode?
- */
-#define LCD_SPI_FREQ 12000000
+/* ILI9342C specifies 10 MHz max */
+#define LCD_SPI_FREQ 10000000
 
 #define ili_cmd(cmd, ...) \
     do { \
