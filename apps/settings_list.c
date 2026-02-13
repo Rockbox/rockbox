@@ -31,6 +31,7 @@
 #include "button.h"
 #include "backlight.h"
 #include "sound.h"
+#include "pcm_sink.h"
 #include "settings.h"
 #include "rbpaths.h"
 #include "settings_list.h"
@@ -758,7 +759,8 @@ static int32_t getlang_freq_unit_0_is_auto(int value, int unit)
 
 static void playback_frequency_callback(int sample_rate_hz)
 {
-    audio_set_playback_frequency(sample_rate_hz);
+    if (pcm_current_sink() == PCM_SINK_BUILTIN)
+        audio_set_playback_frequency(sample_rate_hz);
 }
 #endif /* HAVE_PLAY_FREQ */
 
