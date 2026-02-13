@@ -4236,29 +4236,13 @@ void audio_set_crossfade(int enable)
 #ifdef HAVE_PLAY_FREQ
 static unsigned long audio_guess_frequency(struct mp3entry *id3)
 {
-    switch (id3->frequency)
+    const struct pcm_sink_caps* caps = pcm_sink_caps(pcm_current_sink());
+    for (size_t i = 0; i < caps->num_samprs; i += 1)
     {
-#if HAVE_PLAY_FREQ >= 48
-    case 44100:
-        return SAMPR_44;
-    case 48000:
-        return SAMPR_48;
-#endif
-#if HAVE_PLAY_FREQ >= 96
-    case 88200:
-        return SAMPR_88;
-    case 96000:
-        return SAMPR_96;
-#endif
-#if HAVE_PLAY_FREQ >= 192
-    case 176400:
-        return SAMPR_176;
-    case 192000:
-        return SAMPR_192;
-#endif
-    default:
-        return (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
+        if (id3->frequency == caps->samprs[i])
+            return id3->frequency;
     }
+    return (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
 }
 
 static bool audio_auto_change_frequency(struct mp3entry *id3, bool play)
