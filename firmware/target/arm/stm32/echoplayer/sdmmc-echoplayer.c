@@ -46,7 +46,8 @@ static const struct sdmmc_host_config sdmmc_config INITDATA_ATTR = {
     .bus_widths = SDMMC_BUS_WIDTH_1BIT |
                   SDMMC_BUS_WIDTH_4BIT,
     .bus_clocks = SDMMC_BUS_CLOCK_400KHZ |
-                  SDMMC_BUS_CLOCK_25MHZ,
+                  SDMMC_BUS_CLOCK_25MHZ |
+                  SDMMC_BUS_CLOCK_50MHZ,
     .max_nr_blocks = 65535,
     .is_removable = true,
 };
