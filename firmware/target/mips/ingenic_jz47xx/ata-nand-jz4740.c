@@ -84,7 +84,7 @@ struct nand_param
  *
  */
 
-static volatile sector_t nand_address;
+static volatile unsigned long nand_address;
 #define NAND_DATAPORT      (nand_address)
 #define NAND_ADDRPORT      (nand_address+0x10000)
 #define NAND_COMMPORT      (nand_address+0x08000)
