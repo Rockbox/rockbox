@@ -1557,6 +1557,7 @@ ARG_THREAD_SUPPORT=
 ARG_32BIT=
 ARG_ADDR_SAN=
 ARG_UBSAN=
+ARG_PLUGINS=
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -1573,6 +1574,7 @@ for arg in "$@"; do
 		--ttsopts=*)  ARG_TTSOPTS=`echo "$arg" | cut -d = -f 2`;;
 		--type=*)     ARG_TYPE=`echo "$arg" | cut -d = -f 2`;;
 		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
+		--plugins=*)  ARG_PLUGINS=`echo "$arg" | cut -d = -f 2`;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
 		--32-bit)     ARG_32BIT=1;;
@@ -4828,10 +4830,33 @@ cmdline=`echo $cmdline | sed -e s,--target=[a-zA-Z_0-9]\*,,g \
                             -e s,--type=[a-zA-Z0-9]\*,,g`
 cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 
+if [ -n "$ARG_PLUGINS" ]; then
+    echo "Selected plugins: $ARG_PLUGINS"
+    plugins="yes"
+
+    selected_src=""
+    selected_subdirs=""
+    chk_plugin_dir="${rootdir}/apps/plugins"
+
+    IFS=":"
+    for p in $ARG_PLUGINS; do
+        if [ -d "$chk_plugin_dir/$p" ]; then
+             selected_subdirs="$selected_subdirs \$(ROOTDIR)/apps/plugins/$p"
+        elif [ -f "$chk_plugin_dir/$p" ]; then
+             selected_src="$selected_src \$(ROOTDIR)/apps/plugins/$p"
+        else
+             echo "Warning: Plugin '$p' found neither as file nor directory in $chk_plugin_dir. Use ':' as the separator."
+        fi
+    done
+fi
+
 ### end of cmdline
 
 cat > Makefile <<EOF
 ## Automatically generated. http://www.rockbox.org/
+
+export SELECTED_PLUGINS_SRC=${selected_src}
+export SELECTED_PLUGINS_SUBDIRS=${selected_subdirs}
 
 export ROOTDIR=${rootdir}
 export FIRMDIR=\$(ROOTDIR)/firmware
