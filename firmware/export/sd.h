@@ -93,6 +93,7 @@ int sd_num_drives(int first_drive);
 #define SD_READ_MULTIPLE_BLOCK    18
 #define SD_SEND_NUM_WR_BLOCKS     22  /* acmd22 */
 #define SD_UC_ADDRESS_EXTENSION   22
+#define SD_SET_BLOCK_COUNT        23
 #define SD_SET_WR_BLK_ERASE_COUNT 23  /* acmd23 */
 #define SD_WRITE_BLOCK            24
 #define SD_WRITE_MULTIPLE_BLOCK   25

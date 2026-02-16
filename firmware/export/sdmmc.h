@@ -51,7 +51,7 @@ typedef struct
     unsigned int current_bank;
 #endif
 
-     unsigned int sd2plus;  /* SD 2.0 or better */
+    unsigned int sd2plus;  /* SD 2.0 or better */
 } tCardInfo;
 
 #if (CONFIG_STORAGE & STORAGE_SD)
