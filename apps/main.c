@@ -153,7 +153,10 @@
 #endif
 #endif /* SDL */
 
-/*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
+// #define AUTOROCK /* define this to check for "autostart.rock" on boot */
+/* Alternatively, you can define autostart plugin path and its argument: */
+// #define AUTOROCK     VIEWERS_DATA_DIR"/imageviewer.rock"
+// #define AUTOROCK_ARG "/jpegs/sample.jpg"
 
 static void init(void);
 /* main(), and various functions called by main() and init() may be
@@ -214,17 +217,25 @@ int main(void)
 
 #ifdef AUTOROCK
     {
-        char filename[MAX_PATH];
-        const char *file =
+        const char *file = ""AUTOROCK;
+        file = *file
+                ? file
+                :
 #ifdef APPLICATION
                                 ROCKBOX_DIR
 #else
                                 PLUGIN_APPS_DIR
 #endif
                                     "/autostart.rock";
-        if(file_exists(file)) /* no complaint if it doesn't exist */
+        if (file_exists(file)) /* no complaint if it doesn't exist */
         {
-            plugin_load(file, NULL); /* start if it does */
+            plugin_load(file,
+#ifdef AUTOROCK_ARG
+                AUTOROCK_ARG
+#else
+                NULL
+#endif
+                ); /* start if it does */
         }
     }
 #endif /* #ifdef AUTOROCK */
