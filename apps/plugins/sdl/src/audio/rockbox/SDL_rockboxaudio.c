@@ -226,14 +226,16 @@ static void ROCKBOXAUD_CloseAudio(_THIS)
         if(this->hidden->rb_buf[i])
             SDL_FreeAudioMem(this->hidden->rb_buf[i]);
     }
-    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
+    const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
+    rb->mixer_set_frequency(caps->samprs[caps->default_freq]);
 }
 
 static bool freq_ok(unsigned int freq)
 {
-    for(int i = 0; i < SAMPR_NUM_FREQ; i++)
+    const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
+    for(uint16_t i = 0; i < caps->num_samprs; i++)
     {
-        if(rb->hw_freq_sampr[i] == freq)
+        if(caps->samprs[i] == freq)
             return true;
     }
     return false;
