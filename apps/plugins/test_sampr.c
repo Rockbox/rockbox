@@ -29,8 +29,8 @@
  */
 
 
-static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;
-static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
+static int hw_freq IDATA_ATTR;
+static unsigned long hw_sampr IDATA_ATTR;
 
 static int gen_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)] IBSS_ATTR;
 static bool gen_quit IBSS_ATTR;
@@ -161,8 +161,11 @@ static void output_clear(void)
 /* Called to switch samplerate on the fly */
 static void set_frequency(int index)
 {
+    /* FIXME: pcm sink may have been switched */
+    const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
+
     hw_freq = index;
-    hw_sampr = rb->hw_freq_sampr[index];
+    hw_sampr = caps->samprs[index];
 
     output_clear();
     update_gen_step();
@@ -188,23 +191,21 @@ static const char *format_volume(char *buf, size_t len, int value,
 
 static void play_tone(bool volume_set)
 {
-    static struct opt_items names[HW_NUM_FREQ] =
+    /* generate frequency list */
+    static struct opt_items names[SAMPR_NUM_FREQ];
+    static char label_storage[SAMPR_NUM_FREQ][8 + 1]; /* at most 8 bytes: "???.?kHz" */
+
+    const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
+    for(size_t i = 0; i < caps->num_samprs; i += 1)
     {
-        HW_HAVE_192_([HW_FREQ_192] = { "192kHz",     -1 },)
-        HW_HAVE_176_([HW_FREQ_176] = { "176.4kHz",   -1 },)
-        HW_HAVE_96_([HW_FREQ_96] = { "96kHz",     -1 },)
-        HW_HAVE_88_([HW_FREQ_88] = { "88.2kHz",   -1 },)
-        HW_HAVE_64_([HW_FREQ_64] = { "64kHz",     -1 },)
-        HW_HAVE_48_([HW_FREQ_48] = { "48kHz",     -1 },)
-        HW_HAVE_44_([HW_FREQ_44] = { "44.1kHz",   -1 },)
-        HW_HAVE_32_([HW_FREQ_32] = { "32kHz",     -1 },)
-        HW_HAVE_24_([HW_FREQ_24] = { "24kHz",     -1 },)
-        HW_HAVE_22_([HW_FREQ_22] = { "22.05kHz",  -1 },)
-        HW_HAVE_16_([HW_FREQ_16] = { "16kHz",     -1 },)
-        HW_HAVE_12_([HW_FREQ_12] = { "12kHz",     -1 },)
-        HW_HAVE_11_([HW_FREQ_11] = { "11.025kHz", -1 },)
-        HW_HAVE_8_( [HW_FREQ_8 ] = { "8kHz",      -1 },)
-    };
+        uint16_t val = caps->samprs[i] / 100;
+        rb->snprintf(label_storage[i], 8 + 1, "%d.%dkHz", val / 10, val % 10);
+        names[i].string = label_storage[i];
+        names[i].voice_id = -1;
+    }
+
+    hw_freq = caps->default_freq;
+    hw_sampr = caps->samprs[hw_freq];
 
     int freq = hw_freq;
 
@@ -219,7 +220,7 @@ static void play_tone(bool volume_set)
     rb->cpu_boost(true);
 #endif
 
-    rb->mixer_set_frequency(rb->hw_freq_sampr[freq]);
+    rb->mixer_set_frequency(hw_sampr);
 
 #if INPUT_SRC_CAPS != 0
     /* Recordable targets can play back from other sources */
@@ -251,7 +252,7 @@ static void play_tone(bool volume_set)
 #endif /* HAVE_VOLUME_IN_LIST */
     {
         rb->set_option("Sample Rate", &freq, RB_INT, names,
-                       HW_NUM_FREQ, set_frequency);
+                       caps->num_samprs, set_frequency);
         (void)volume_set;
     }
 
