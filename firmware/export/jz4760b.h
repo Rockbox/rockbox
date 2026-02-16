@@ -6741,7 +6741,7 @@ static __inline__ int __mdmac_get_irq(void)
   #define MSC_CMDAT_RESPONSE_R4	  (0x4 << MSC_CMDAT_RESPONSE_BIT) /* Format R4 */
   #define MSC_CMDAT_RESPONSE_R5	  (0x5 << MSC_CMDAT_RESPONSE_BIT) /* Format R5 */
   #define MSC_CMDAT_RESPONSE_R6	  (0x6 << MSC_CMDAT_RESPONSE_BIT) /* Format R6 */
-  #define MSC_CMDAT_RESRONSE_R7   (0x7 << MSC_CMDAT_RESPONSE_BIT) /* Format R7 */
+  #define MSC_CMDAT_RESPONSE_R7   (0x7 << MSC_CMDAT_RESPONSE_BIT) /* Format R7 */
 
 #define	CMDAT_DMA_EN	(1 << 8)
 #define	CMDAT_INIT	(1 << 7)
