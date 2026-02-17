@@ -19,7 +19,7 @@
 
 // HW can do it but we don't have the IRAM for mix buffers
 //#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_48
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
