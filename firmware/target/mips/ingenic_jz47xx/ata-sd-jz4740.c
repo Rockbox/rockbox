@@ -41,7 +41,7 @@ static struct mutex       sd_mtx;
 //static struct semaphore   sd_wakeup;
 
 static int                use_4bit;
-static int                num_6;
+static int                use_sbc;
 
 //#define SD_DMA_ENABLE
 #define SD_DMA_INTERRUPT 0
@@ -84,6 +84,7 @@ enum sd_result_t
     SD_ERROR_TIMEOUT,
     SD_ERROR_CRC,
     SD_ERROR_DRIVER_FAILURE,
+    SD_ERROR_ACMD_REJECT,
 };
 
 /* Standard MMC/SD clock speeds */
@@ -109,19 +110,17 @@ enum sd_result_t
     /* class 9 */
 #define SD_GO_IRQ_STATE         40   /* bcr                     R5  */
 
-/* Don't change the order of these; they are used in dispatch tables */
 enum sd_rsp_t
 {
     RESPONSE_NONE    = 0,
     RESPONSE_R1      = 1,
     RESPONSE_R1B     = 2,
-    RESPONSE_R2_CID  = 3,
-    RESPONSE_R2_CSD  = 4,
-    RESPONSE_R3      = 5,
-    RESPONSE_R4      = 6,
-    RESPONSE_R5      = 7,
-    RESPONSE_R6      = 8,
-    RESPONSE_R7      = 9,
+    RESPONSE_R2      = 3,
+    RESPONSE_R3      = 4,
+    RESPONSE_R4      = 5,
+    RESPONSE_R5      = 6,
+    RESPONSE_R6      = 7,
+    RESPONSE_R7      = 8,
 };
 
 /*
@@ -179,10 +178,9 @@ struct sd_response_r3
 
 struct sd_request
 {
-    int               index;      /* Slot index - used for CS lines */
     int               cmd;        /* Command to send */
     unsigned int      arg;        /* Argument to send */
-    enum sd_rsp_t    rtype;      /* Response type expected */
+    enum sd_rsp_t     rtype;      /* Response type expected */
 
     /* Data transfer (these may be modified at the low level) */
     unsigned short    nob;        /* Number of blocks to transfer*/
@@ -194,16 +192,6 @@ struct sd_request
     unsigned char     response[18]; /* Buffer to store response - CRC is optional */
     enum sd_result_t result;
 };
-
-#define SD_OCR_ARG             0x00ff8000  /* Argument of OCR */
-
-/***********************************************************************
- *  SD Events
- */
-#define SD_EVENT_NONE            0x00    /* No events */
-#define SD_EVENT_RX_DATA_DONE    0x01    /* Rx data done */
-#define SD_EVENT_TX_DATA_DONE    0x02    /* Tx data done */
-#define SD_EVENT_PROG_DONE       0x04    /* Programming is done */
 
 /**************************************************************************
  * Utility functions
@@ -262,6 +250,9 @@ static int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, u
     if (request->result)
         return request->result;
 
+    if (buf[0] != 0x03)
+        return SD_ERROR_HEADER_MISMATCH;
+
     *rca = PARSE_U16(buf,1);  /* Save RCA returned by the SD Card */
 
     *(buf+1) = 0;
@@ -298,7 +289,7 @@ static inline int jz_sd_stop_clock(void)
         timeout--;
         if (timeout == 0)
         {
-            DEBUG("Timeout on stop clock waiting");
+            logf("Timeout on stop clock waiting");
             return SD_ERROR_TIMEOUT;
         }
         udelay(1);
@@ -322,7 +313,7 @@ static int jz_sd_check_status(struct sd_request *request)
     /* Checking for response or data timeout */
     if (status & (MSC_STAT_TIME_OUT_RES | MSC_STAT_TIME_OUT_READ))
     {
-        DEBUG("SD timeout, MSC_STAT 0x%x CMD %d", status,
+        logf("SD timeout, MSC_STAT 0x%x CMD %d", status,
                request->cmd);
         return SD_ERROR_TIMEOUT;
     }
@@ -332,7 +323,7 @@ static int jz_sd_check_status(struct sd_request *request)
         (MSC_STAT_CRC_READ_ERROR | MSC_STAT_CRC_WRITE_ERROR |
          MSC_STAT_CRC_RES_ERR))
     {
-        DEBUG("SD CRC error, MSC_STAT 0x%x", status);
+        logf("SD CRC error, MSC_STAT 0x%x", status);
         return SD_ERROR_CRC;
 
     }
@@ -341,7 +332,7 @@ static int jz_sd_check_status(struct sd_request *request)
     /* Checking for FIFO empty */
     /*if(status & MSC_STAT_DATA_FIFO_EMPTY && request->rtype != RESPONSE_NONE)
     {
-        DEBUG("SD FIFO empty, MSC_STAT 0x%x", status);
+        logf("SD FIFO empty, MSC_STAT 0x%x", status);
         return SD_ERROR_UNDERRUN;
     }*/
 
@@ -360,16 +351,14 @@ static void jz_sd_get_response(struct sd_request *request)
     buf = request->response;
     request->result = SD_NO_ERROR;
 
-    switch (request->rtype)
-    {
+    switch (request->rtype) {
         case RESPONSE_R1:
         case RESPONSE_R1B:
-        case RESPONSE_R7:
-        case RESPONSE_R6:
         case RESPONSE_R3:
         case RESPONSE_R4:
         case RESPONSE_R5:
-        {
+        case RESPONSE_R6:
+        case RESPONSE_R7:
             data = REG_MSC_RES;
             buf[0] = (data >> 8) & 0xff;
             buf[1] = data & 0xff;
@@ -383,10 +372,7 @@ static void jz_sd_get_response(struct sd_request *request)
                   request->rtype, buf[0], buf[1], buf[2],
                   buf[3], buf[4]);
             break;
-        }
-        case RESPONSE_R2_CID:
-        case RESPONSE_R2_CSD:
-        {
+        case RESPONSE_R2:
             for (i = 0; i < 16; i += 2)
             {
                 data = REG_MSC_RES;
@@ -395,7 +381,6 @@ static void jz_sd_get_response(struct sd_request *request)
             }
             DEBUG("request %d, response []", request->rtype);
             break;
-        }
         case RESPONSE_NONE:
             DEBUG("No response");
             break;
@@ -441,6 +426,9 @@ static void jz_sd_receive_data_dma(struct sd_request *req)
 
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
+
+    /* flush dcache again */
+    discard_dcache_range(req->buffer, req->cnt);
 }
 
 static void jz_mmc_transmit_data_dma(struct mmc_request *req)
@@ -487,6 +475,12 @@ static int jz_sd_receive_data(struct sd_request *req)
     unsigned int *wbuf = (unsigned int *) buf;
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
     unsigned int stat, timeout, data, cnt;
+
+#ifdef SD_DMA_ENABLE
+    if (waligned)
+        jz_sd_reveive_data_dma(request);
+    return SD_NO_ERROR;
+#endif
 
     for (; nob >= 1; nob--)
     {
@@ -545,6 +539,12 @@ static int jz_sd_transmit_data(struct sd_request *req)
     unsigned int *wbuf = (unsigned int *) buf;
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
     unsigned int stat, timeout, data, cnt;
+
+#ifdef SD_DMA_ENABLE
+    if (waligned)
+        jz_sd_transmit_data_dma(request);
+    return SD_NO_ERROR;
+#endif
 
     for (; nob >= 1; nob--)
     {
@@ -640,11 +640,15 @@ static void jz_sd_set_clock(unsigned int rate)
 ********************************************************************************************************************/
 static int jz_sd_exec_cmd(struct sd_request *request)
 {
-    unsigned int cmdat = 0, events = 0;
+    unsigned int cmdat = 0;
     int retval, timeout = 0x3fffff;
+    bool has_data = (request->buffer != NULL);
 
     /* Indicate we have no result yet */
     request->result = SD_NO_RESPONSE;
+
+    /* Stop clock when programming things */
+    jz_sd_stop_clock(); /* stop SD clock */
 
     if (request->cmd == SD_CIM_RESET) {
         /* On reset, 1-bit bus width */
@@ -659,31 +663,30 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         /* On reset, stop SD clock */
         jz_sd_stop_clock();
     }
-    if (request->cmd == SD_SET_BUS_WIDTH)
-    {
-        if (request->arg == 0x2)
-        {
-            DEBUG("Use 4-bit bus width");
-            use_4bit = 1;
-        }
-        else
-        {
-            DEBUG("Use 1-bit bus width");
-            use_4bit = 0;
-        }
+
+    /* Generic handling for all requests with data rx/tx */
+    if (has_data) {
+        cmdat |= MSC_CMDAT_DATA_EN;
+//            if (request->nob > 1 && use_sbc[drive])
+//                cmdat |= MSC_CMDAT_SEND_AS_STOP;
+#ifdef SD_DMA_ENABLE
+        if (request->cnt >= 512)
+            cmdat |= MSC_CMDAT_DMA_EN;
+#endif
     }
 
     /* mask all interrupts */
-    //REG_MSC_IMASK = 0xffff;
+    REG_MSC_IMASK = 0xffff;
     /* clear status */
     REG_MSC_IREG = 0xffff;
-    /*open interrupt */
-    REG_MSC_IMASK = (~7);
+    /* unmask interrupts we care about */
+    REG_MSC_IMASK = ~(MSC_IMASK_END_CMD_RES | MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
+
     /* use 4-bit bus width when possible */
     if (use_4bit)
         cmdat |= MSC_CMDAT_BUS_WIDTH_4BIT;
 
-    /* Set command type and events */
+    /* Per-command type handling */
     switch (request->cmd)
     {
         /* SD core extra command */
@@ -706,27 +709,8 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         case SD_READ_SINGLE_BLOCK:
         case SD_READ_MULTIPLE_BLOCK:
         case SD_SEND_SCR:
-#if defined(SD_DMA_ENABLE)
-            cmdat |=
-                MSC_CMDAT_DATA_EN | MSC_CMDAT_READ | MSC_CMDAT_DMA_EN;
-#else
-            cmdat |= MSC_CMDAT_DATA_EN | MSC_CMDAT_READ;
-#endif
-            events = SD_EVENT_RX_DATA_DONE;
-            break;
-
         case SD_SWITCH_FUNC:
-            if (num_6 < 2)
-            {
-#if defined(SD_DMA_ENABLE)
-                cmdat |=
-                    MSC_CMDAT_DATA_EN | MSC_CMDAT_READ |
-                    MSC_CMDAT_DMA_EN;
-#else
-                cmdat |= MSC_CMDAT_DATA_EN | MSC_CMDAT_READ;
-#endif
-                events = SD_EVENT_RX_DATA_DONE;
-            }
+                /* These READ data */
             break;
 
         case SD_WRITE_DAT_UNTIL_STOP:
@@ -734,18 +718,14 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         case SD_WRITE_MULTIPLE_BLOCK:
         case SD_PROGRAM_CID:
         case SD_PROGRAM_CSD:
-        case SD_LOCK_UNLOCK:
-#if defined(SD_DMA_ENABLE)
-            cmdat |=
-                MSC_CMDAT_DATA_EN | MSC_CMDAT_WRITE | MSC_CMDAT_DMA_EN;
-#else
-            cmdat |= MSC_CMDAT_DATA_EN | MSC_CMDAT_WRITE;
-#endif
-            events = SD_EVENT_TX_DATA_DONE | SD_EVENT_PROG_DONE;
+                /* These WRITE data */
+            cmdat |= MSC_CMDAT_WRITE;
             break;
 
+//        case SD_LOCK_UNLOCK:  // can be a read or write, needs busy too.
+
         case SD_STOP_TRANSMISSION:
-            events = SD_EVENT_PROG_DONE;
+            // cmdat |= MSC_CMDAT_STOP_ABORT;
             break;
 
         /* ac - no data transfer */
@@ -762,11 +742,9 @@ static int jz_sd_exec_cmd(struct sd_request *request)
             cmdat |= MSC_CMDAT_BUSY;
             /* FALLTHRU */
         case RESPONSE_R1:
-        case RESPONSE_R7:
             cmdat |= MSC_CMDAT_RESPONSE_R1;
             break;
-        case RESPONSE_R2_CID:
-        case RESPONSE_R2_CSD:
+        case RESPONSE_R2:
             cmdat |= MSC_CMDAT_RESPONSE_R2;
             break;
         case RESPONSE_R3:
@@ -781,6 +759,9 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         case RESPONSE_R6:
             cmdat |= MSC_CMDAT_RESPONSE_R6;
             break;
+        case RESPONSE_R7:
+            cmdat |= MSC_CMDAT_RESPONSE_R1;  /* 4740 lacks R7 */
+            break;
         default:
             break;
     }
@@ -794,14 +775,8 @@ static int jz_sd_exec_cmd(struct sd_request *request)
     /* Set argument */
     REG_MSC_ARG = request->arg;
 
-    /* Set block length and nob */
-    if (request->cmd == SD_SEND_SCR)
-    {    /* get SCR from DataFIFO */
-        REG_MSC_BLKLEN = 8;
-        REG_MSC_NOB = 1;
-    }
-    else
-    {
+    /* Set block length and nob if there is data */
+    if (has_data) {
         REG_MSC_BLKLEN = request->block_len;
         REG_MSC_NOB = request->nob;
     }
@@ -816,18 +791,15 @@ static int jz_sd_exec_cmd(struct sd_request *request)
     jz_sd_start_clock();
 
     /* Wait for command completion */
-    //__intc_unmask_irq(IRQ_MSC);
     //semaphore_wait(&sd_wakeup, 100);
     while (timeout-- && !(REG_MSC_STAT & MSC_STAT_END_CMD_RES));
-
 
     if (timeout == 0)
         return SD_ERROR_TIMEOUT;
 
-    REG_MSC_IREG = MSC_IREG_END_CMD_RES;    /* clear flag */
-
     /* Check for status */
     retval = jz_sd_check_status(request);
+    REG_MSC_IREG = MSC_IREG_END_CMD_RES;    /* clear flag */
     if (retval)
         return retval;
 
@@ -839,46 +811,28 @@ static int jz_sd_exec_cmd(struct sd_request *request)
     jz_sd_get_response(request);
 
     /* Start data operation */
-    if (events & (SD_EVENT_RX_DATA_DONE | SD_EVENT_TX_DATA_DONE))
-    {
-        if (events & SD_EVENT_RX_DATA_DONE)
-        {
-            if (request->cmd == SD_SEND_SCR)
-            {
-                /* SD card returns SCR register as data.
-                   SD core expect it in the response buffer,
-                   after normal response. */
-                request->buffer =
-                    (unsigned char *) ((unsigned int) request->response + 5);
-            }
-#ifdef SD_DMA_ENABLE
-            jz_sd_receive_data_dma(request);
-#else
-            jz_sd_receive_data(request);
-#endif
+    if (has_data) {
+        if (cmdat & MSC_CMDAT_WRITE) {
+            retval = jz_sd_transmit_data(request);
+        } else {
+            retval = jz_sd_receive_data(request);
         }
+        if (retval)
+            return retval;
 
-        if (events & SD_EVENT_TX_DATA_DONE)
-        {
-#ifdef SD_DMA_ENABLE
-            jz_sd_transmit_data_dma(request);
-#else
-            jz_sd_transmit_data(request);
-#endif
-        }
-        //__intc_unmask_irq(IRQ_MSC);
         //semaphore_wait(&sd_wakeup, 100);
         /* Wait for Data Done */
-        while (!(REG_MSC_IREG & MSC_IREG_DATA_TRAN_DONE));
+        while (!(REG_MSC_IREG & MSC_IREG_DATA_TRAN_DONE))
+            yield();
         REG_MSC_IREG = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
     }
 
-    /* Wait for Prog Done event */
-    if (events & SD_EVENT_PROG_DONE)
+    /* Wait for Prog Done event if necessary */
+    if (cmdat & (MSC_CMDAT_BUSY | MSC_CMDAT_WRITE))
     {
-        //__intc_unmask_irq(IRQ_MSC);
         //semaphore_wait(&sd_wakeup, 100);
-        while (!(REG_MSC_IREG & MSC_IREG_PRG_DONE));
+        while (!(REG_MSC_IREG & MSC_IREG_PRG_DONE))
+            yield();
         REG_MSC_IREG = MSC_IREG_PRG_DONE;    /* clear status */
     }
 
@@ -904,7 +858,7 @@ static void jz_sd_tx_handler(unsigned int arg)
 {
     if (__dmac_channel_address_error_detected(arg))
     {
-        DEBUG("%s: DMAC address error.", __FUNCTION__);
+        logf("%s: DMAC address error.", __FUNCTION__);
         __dmac_channel_clear_address_error(arg);
     }
     if (__dmac_channel_transmit_end_detected(arg))
@@ -918,7 +872,7 @@ static void jz_sd_rx_handler(unsigned int arg)
 {
     if (__dmac_channel_address_error_detected(arg))
     {
-        DEBUG("%s: DMAC address error.", __FUNCTION__);
+        logf("%s: DMAC address error.", __FUNCTION__);
         __dmac_channel_clear_address_error(arg);
     }
     if (__dmac_channel_transmit_end_detected(arg))
@@ -976,10 +930,12 @@ static void jz_sd_hardware_init(void)
 #endif
 }
 
-static int sd_send_cmd(struct sd_request *request, int cmd, unsigned int arg,
+static void sd_send_cmd(struct sd_request *request, int cmd, unsigned int arg,
                          unsigned short nob, unsigned short block_len,
                          enum sd_rsp_t rtype, unsigned char* buffer)
 {
+    int retval;
+
     request->cmd = cmd;
     request->arg = arg;
     request->rtype = rtype;
@@ -987,14 +943,59 @@ static int sd_send_cmd(struct sd_request *request, int cmd, unsigned int arg,
     request->block_len = block_len;
     request->buffer = buffer;
     request->cnt = nob * block_len;
+    memset(&request->response, 0xa5, sizeof(request->response));
+    request->result = SD_NO_RESPONSE;
 
-    return jz_sd_exec_cmd(request);
+    retval = jz_sd_exec_cmd(request);
+    if (retval)
+        request->result = retval;
+
 }
 
 static void sd_simple_cmd(struct sd_request *request, int cmd, unsigned int arg,
                            enum sd_rsp_t rtype)
 {
     sd_send_cmd(request, cmd, arg, 0, 0, rtype, NULL);
+}
+
+static int sd_exec_acmd(struct sd_request *request, int cmd, unsigned int arg)
+{
+    struct sd_response_r1 r1;
+    int retval;
+
+    sd_simple_cmd(request, SD_APP_CMD, card.rca, RESPONSE_R1);
+    retval = sd_unpack_r1(request, &r1);
+
+    if (retval)
+        return retval;
+
+    if (!(r1.status & SD_R1_APP_CMD)) {
+        logf("ACMD not accepted\n");
+        return SD_ERROR_ACMD_REJECT;
+    }
+
+    sd_simple_cmd(request, cmd, arg, RESPONSE_R1);
+    return sd_unpack_r1(request, &r1);
+}
+
+static int sd_exec_acmd_buf(struct sd_request *request, int cmd, unsigned int arg, enum sd_rsp_t rtype, unsigned short nob, unsigned short block_len, unsigned char *buffer)
+{
+    struct sd_response_r1 r1;
+    int retval;
+
+    sd_simple_cmd(request, SD_APP_CMD, card.rca, RESPONSE_R1);
+    retval = sd_unpack_r1(request, &r1);
+    if (retval)
+        return retval;
+
+    if (!(r1.status & SD_R1_APP_CMD)) {
+        logf("ACMD not accepted\n");
+        return SD_ERROR_ACMD_REJECT;
+    }
+
+    sd_send_cmd(request, cmd, arg,
+                nob, block_len, rtype, buffer);
+    return SD_NO_ERROR;
 }
 
 #define SD_INIT_DOING   0
@@ -1004,59 +1005,50 @@ static int sd_init_card_state(struct sd_request *request)
 {
     struct sd_response_r1 r1;
     struct sd_response_r3 r3;
-    int retval, i, ocr = 0x40300000, limit_41 = 0;
+    int retval, i, ocr = 0x40300000 /* SDXC, 3.2-3.4v */;
+
+#ifdef HAVE_SDUC
+    ocr |= 0x08000000; /* Add on SDUC */
+#endif
 
     switch (request->cmd)
     {
         case SD_GO_IDLE_STATE: /* No response to parse */
             sd_simple_cmd(request, SD_SEND_IF_COND, 0x1AA, RESPONSE_R1);
             break;
-
         case SD_SEND_IF_COND:
             retval = sd_unpack_r1(request, &r1);
-            sd_simple_cmd(request, SD_APP_CMD,  0, RESPONSE_R1);
-            break;
+//            if (retval)
+//                return SD_INIT_FAILED;
 
-        case SD_APP_CMD:
-            retval = sd_unpack_r1(request, &r1);
-            if (retval & (limit_41 < 100))
-            {
-                DEBUG("sd_init_card_state: unable to SD_APP_CMD error=%d",
-                      retval);
-                limit_41++;
-                sd_simple_cmd(request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            }
-            else if (limit_41 < 100)
-            {
-                limit_41++;
-                sd_simple_cmd(request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            }
-            else
-                /* reset the card to idle*/
-                sd_simple_cmd(request, SD_GO_IDLE_STATE, 0, RESPONSE_NONE);
+            retval = sd_exec_acmd_buf(request, SD_APP_OP_COND, ocr,
+                                      RESPONSE_R3, 0, 0, NULL);
+            if (retval)
+                return SD_INIT_FAILED;
             break;
-
         case SD_APP_OP_COND:
             retval = sd_unpack_r3(request, &r3);
             if (retval)
-                break;
+                return SD_INIT_FAILED;
 
-            DEBUG("sd_init_card_state: read ocr value = 0x%08x", r3.ocr);
+            DEBUG("read ocr value = 0x%08x", r3.ocr);
             card.ocr = r3.ocr;
 
+            // XXX for SDUC, check that B27+B30 of OCR are set.
             if(!(r3.ocr & SD_CARD_BUSY || ocr == 0))
             {
+                /* Re-issue AP_OP_COND */
                 sleep(HZ / 100);
-                sd_simple_cmd(request, SD_APP_CMD, 0, RESPONSE_R1);
+                retval = sd_exec_acmd_buf(request, SD_APP_OP_COND, ocr,
+                                          RESPONSE_R3, 0, 0, NULL);
+                if (retval)
+                    return SD_INIT_FAILED;
             }
             else
             {
-                /* Set the data bus width to 4 bits */
-                use_4bit = 1;
-                sd_simple_cmd(request, SD_ALL_SEND_CID, 0, RESPONSE_R2_CID);
+                sd_simple_cmd(request, SD_ALL_SEND_CID, 0, RESPONSE_R2);
             }
             break;
-
         case SD_ALL_SEND_CID:
             for(i=0; i<4; i++)
                 card.cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) |
@@ -1067,16 +1059,16 @@ static int sd_init_card_state(struct sd_request *request)
             break;
         case SD_SEND_RELATIVE_ADDR:
             retval = sd_unpack_r6(request, &r1, &card.rca);
-            card.rca = card.rca << 16;
             DEBUG("sd_init_card_state: Get RCA from SD: 0x%04lx Status: %x", card.rca, r1.status);
+            card.rca = card.rca << 16;
             if (retval)
             {
-                DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d",
+                logf("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d",
                       retval);
                 return SD_INIT_FAILED;
             }
 
-            sd_simple_cmd(request, SD_SEND_CSD, card.rca, RESPONSE_R2_CSD);
+            sd_simple_cmd(request, SD_SEND_CSD, card.rca, RESPONSE_R2);
             break;
 
         case SD_SEND_CSD:
@@ -1087,12 +1079,31 @@ static int sd_init_card_state(struct sd_request *request)
             sd_parse_csd(&card);
 
             logf("CSD: %08lx%08lx%08lx%08lx", card.csd[0], card.csd[1], card.csd[2], card.csd[3]);
+
+#if 0  // XXX SCR is not working yet
+            retval = sd_exec_acmd_buf(request, SD_SEND_SCR, 0, RESPONSE_R1,
+                                      1, 8, &request->response[5]);
+            if (!retval)
+                retval = sd_unpack_r1(request, &r1);
+            // XXX check retval?
+            break;
+        case SD_SEND_SCR:
+//            if (request->result)
+//                return SD_INIT_FAILED;
+            for(i=0; i<2; i++)
+                card.scr[i] = ((request->buffer[0+i*4]<<24) | (request->buffer[1+i*4]<<16) |
+                               (request->buffer[2+i*4]<< 8) | request->buffer[3+i*4]);
+
+            logf("SCR: %08lx%08lx", card.scr[0], card.scr[1]);
+
+            use_sbc = card.scr[0] & 2;
+#endif
             DEBUG("SD card is ready");
             jz_sd_set_clock(SD_CLOCK_FAST);
             return SD_INIT_PASSED;
 
         default:
-            DEBUG("sd_init_card_state: error!  Illegal last cmd %d", request->cmd);
+            logf("sd_init_card_state: error!  Illegal last cmd %d", request->cmd);
             return SD_INIT_FAILED;
     }
 
@@ -1107,8 +1118,11 @@ static int sd_switch(struct sd_request *request, int mode, int group,
     mode = !!mode;
     value &= 0xF;
     arg = (mode << 31 | 0x00FFFFFF);
-    arg &= ~(0xF << (group * 4));
-    arg |= value << (group * 4);
+    if (mode) {
+        group--;
+        arg &= ~(0xF << (group * 4));
+        arg |= value << (group * 4);
+    }
     sd_send_cmd(request, 6, arg, 1, 64, RESPONSE_R1, resp);
 
     return 0;
@@ -1137,7 +1151,7 @@ static int sd_switch_hs(struct sd_request *request)
 {
     unsigned int status[64 / 4];
 
-    sd_switch(request, 1, 0, 1, (unsigned char*) status);
+    sd_switch(request, 1, 1, 1, (unsigned char*) status);
     return 0;
 }
 
@@ -1162,20 +1176,28 @@ static int sd_select_card(void)
             jz_sd_set_clock(SD_CLOCK_HIGH);
         }
     }
-    num_6 = 3;
-    sd_simple_cmd(&request, SD_APP_CMD, card.rca,
-               RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
-    if (retval)
-        return retval;
-    sd_simple_cmd(&request, SD_SET_BUS_WIDTH, 2, RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
+
+    bool sup_4bit = 1; //  XXX check against SCR
+
+    if (sup_4bit) {
+        retval = sd_exec_acmd(&request, SD_SET_BUS_WIDTH, 2);
+        if (retval)
+            return retval;
+        use_4bit = 2;
+        DEBUG("Use 4-bit bus width");
+    }
+    retval = sd_exec_acmd(&request, SD_SET_CLR_CARD_DETECT, 0);
     if (retval)
         return retval;
 
     card.initialized = 1;
 
     return 0;
+}
+
+static inline bool card_detect_target(void)
+{
+    return (jz_sd_chkcard() == 1);
 }
 
 static int __sd_init_device(void)
@@ -1186,11 +1208,13 @@ static int __sd_init_device(void)
     /* Initialise card data as blank */
     memset(&card, 0, sizeof(tCardInfo));
 
-    num_6 = 0;
     use_4bit = 0;
 
     /* reset mmc/sd controller */
     jz_sd_hardware_init();
+
+    if (!card_detect_target())
+        return 0;
 
     sd_simple_cmd(&init_req, SD_CIM_RESET,     0,     RESPONSE_NONE);
     sd_simple_cmd(&init_req, SD_GO_IDLE_STATE, 0,     RESPONSE_NONE);
@@ -1211,6 +1235,7 @@ int sd_init(void)
     if(!inited)
     {
 //        semaphore_init(&sd_wakeup, 1, 0);
+        //__intc_unmask_irq(IRQ_MSC);
         mutex_init(&sd_mtx);
         inited = true;
     }
@@ -1220,11 +1245,6 @@ int sd_init(void)
     mutex_unlock(&sd_mtx);
 
     return ret;
-}
-
-static inline bool card_detect_target(void)
-{
-    return (jz_sd_chkcard() == 1);
 }
 
 tCardInfo* card_get_info_target(int card_no)
@@ -1247,7 +1267,7 @@ static inline void sd_stop_transfer(void)
     mutex_unlock(&sd_mtx);
 }
 
-int sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
+int sd_transfer_sectors(IF_MD(int drive,) sector_t start, int count, void* buf, bool write)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive;
@@ -1273,26 +1293,35 @@ int sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
-    // XXX 64-bit
-    if (card.sd2plus)
-    {
-        sd_send_cmd(&request, SD_READ_MULTIPLE_BLOCK, start,
-                     count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-    else
-    {
-        sd_send_cmd(&request, SD_READ_MULTIPLE_BLOCK,
-                     start * SD_BLOCK_SIZE, count,
-                     SD_BLOCK_SIZE, RESPONSE_R1, buf);
+    if (use_sbc && count > 1) {
+        sd_simple_cmd(&request, SD_SET_BLOCK_COUNT, count, RESPONSE_R1);
         if ((retval = sd_unpack_r1(&request, &r1)))
             goto err;
     }
 
-    sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
-    if ((retval = sd_unpack_r1(&request, &r1)))
-        goto err;
+#ifdef STORAGE_64BIT_SECTOR
+    // XXX check card[drive].ocr, b27+b30 == 11
+    if (card.numblocks > 0xffffffffULL) {
+        uint32_t upper = start >> 32;
+        sd_simple_cmd(&request, SD_UC_ADDRESS_EXTENSION, upper, RESPONSE_R1);
+        if ((retval = sd_unpack_r1(&request, &r1)))
+            goto err;
+    }
+#endif
+
+    sd_send_cmd(&request,
+                (count > 1) ?
+                (write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK) :
+                (write ? SD_WRITE_BLOCK : SD_READ_SINGLE_BLOCK),
+                card.sd2plus ? start : (start * SD_BLOCK_SIZE),
+                count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
+    retval = sd_unpack_r1(&request, &r1);
+
+    if (retval || (!use_sbc && count > 1)) {
+        sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
+        if ((retval = sd_unpack_r1(&request, &r1)))
+            goto err;
+    }
 
 err:
     last_disk_activity = current_tick;
@@ -1301,60 +1330,14 @@ err:
     return retval;
 }
 
+int sd_read_sectors(IF_MD(int drive,) sector_t start, int count, void* buf)
+{
+  return sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
+}
+
 int sd_write_sectors(IF_MD(int drive,) sector_t start, int count, const void* buf)
 {
-#ifdef HAVE_MULTIDRIVE
-    (void)drive;
-#endif
-    sd_start_transfer();
-
-    struct sd_request request;
-    struct sd_response_r1 r1;
-    int retval = -1;
-
-    if (!card_detect_target() || count == 0 || start > card.numblocks)
-        goto err;
-
-    if(card.initialized == 0 && !__sd_init_device())
-        goto err;
-
-    sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
-    if (retval && (retval != SD_ERROR_STATE_MISMATCH))
-        goto err;
-
-    sd_simple_cmd(&request, SD_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
-    if ((retval = sd_unpack_r1(&request, &r1)))
-        goto err;
-
-    // XXX 64-bit
-    if (card.sd2plus)
-    {
-        sd_send_cmd(&request, SD_WRITE_MULTIPLE_BLOCK, start,
-                 count, SD_BLOCK_SIZE, RESPONSE_R1,
-                 (void*)buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-    else
-    {
-        sd_send_cmd(&request, SD_WRITE_MULTIPLE_BLOCK,
-                 start * SD_BLOCK_SIZE, count,
-                 SD_BLOCK_SIZE, RESPONSE_R1, (void*)buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-
-    last_disk_activity = current_tick;
-
-    sd_simple_cmd(&request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
-    if ((retval = sd_unpack_r1(&request, &r1)))
-        goto err;
-
-err:
-    sd_stop_transfer();
-
-    return retval;
+  return sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);
 }
 
 long sd_last_disk_activity(void)
