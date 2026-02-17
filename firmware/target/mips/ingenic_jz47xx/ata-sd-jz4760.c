@@ -107,10 +107,6 @@ enum sd_result_t
 #define SD_CLOCK_FAST   24000000      /* 24 MHz for SD Cards */
 #define SD_CLOCK_HIGH   48000000      /* 48 MHz for SD Cards */
 
-/* Extra commands for state control */
-/* Use negative numbers to disambiguate */
-#define SD_CIM_RESET            -1
-
 /* Proprietary commands, illegal/reserved according to SD Specification 2.00 */
     /* class 1 */
 #define SD_READ_DAT_UNTIL_STOP  11   /* adtc [31:0]  dadr       R1  */
@@ -729,26 +725,6 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     jz_sd_stop_clock(drive); /* stop SD clock */
 #endif
 
-    if (request->cmd == SD_CIM_RESET) {
-        /* On reset, 1-bit bus width */
-        use_4bit[drive] = 0;
-
-        /* On reset, stop SD clock */
-        jz_sd_stop_clock(drive);
-
-        /* Reset MMC/SD controller */
-        __msc_reset(MSC_CHN(drive));
-
-        /* Drop SD clock down to lowest speed */
-        jz_sd_set_clock(drive, MMC_CLOCK_SLOW);
-
-#if SD_AUTO_CLOCK
-	/* Re-enable clocks */
-        REG_MSC_STRPCL(MSC_CHN(drive)) = MSC_STRPCL_CLOCK_CONTROL_START;
-        REG_MSC_LPM(drive) = MSC_SET_LPM;
-#endif
-    }
-
     /* Generic handling for all requests with data rx/tx */
     if (has_data) {
         cmdat |= MSC_CMDAT_DATA_EN;
@@ -771,12 +747,11 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     /* Per-command type handling */
     switch (request->cmd)
     {
-        /* SD core extra command */
-        case SD_CIM_RESET:
-            cmdat |= MSC_CMDAT_INIT; /* Initialization sequence sent prior to command */
-            break;
             /* bc - broadcast - no response */
         case SD_GO_IDLE_STATE:
+            cmdat |= MSC_CMDAT_INIT; /* Initialization sequence sent prior to command */
+            /* Intentional Fallthrough */
+
         case SD_SET_DSR:
             break;
 
@@ -792,7 +767,7 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         case SD_READ_SINGLE_BLOCK:
         case SD_READ_MULTIPLE_BLOCK:
         case SD_SWITCH_FUNC:
-                /* These READ data */
+            /* These READ data */
             break;
 
         case SD_WRITE_DAT_UNTIL_STOP:
@@ -859,10 +834,7 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     }
 
     /* Set command index */
-    if (request->cmd == SD_CIM_RESET)
-        REG_MSC_CMD(MSC_CHN(drive)) = SD_GO_IDLE_STATE;
-    else
-        REG_MSC_CMD(MSC_CHN(drive)) = request->cmd;
+    REG_MSC_CMD(MSC_CHN(drive)) = request->cmd;
 
     /* Set argument */
     REG_MSC_ARG(MSC_CHN(drive)) = request->arg;
@@ -1029,6 +1001,7 @@ static void jz_sd_hardware_init(const int drive)
 #else
     jz_sd_stop_clock(drive); /* stop SD clock */
 #endif
+    jz_sd_set_clock(drive, MMC_CLOCK_SLOW); /* Drop to lowest speed */
 }
 
 static void sd_send_cmd(const int drive, struct sd_request *request, int cmd, unsigned int arg,
@@ -1317,6 +1290,7 @@ static int __sd_init_device(const int drive)
     memset(&card[drive], 0, sizeof(tCardInfo));
 
     use_4bit[drive] = 0;
+    use_sbc[drive] = 0;
     active[drive] = 0;
 
     /* reset mmc/sd controller */
@@ -1326,7 +1300,6 @@ static int __sd_init_device(const int drive)
     if (!card_detect_target(drive))
         return 0;
 
-    sd_simple_cmd(drive, &init_req, SD_CIM_RESET,     0,     RESPONSE_NONE);
     sd_simple_cmd(drive, &init_req, SD_GO_IDLE_STATE, 0,     RESPONSE_NONE);
 
     sleep(HZ/2); /* Give the card/controller some rest */
