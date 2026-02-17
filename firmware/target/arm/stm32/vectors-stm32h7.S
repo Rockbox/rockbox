@@ -38,13 +38,13 @@ __vectors_platform:
     .word   exti2_irq_handler           /* [  8] EXTI2 */
     .word   exti3_irq_handler           /* [  9] EXTI3 */
     .word   exti4_irq_handler           /* [ 10] EXTI4 */
-    .word   dma_irq_handler             /* [ 11] DMA1 Stream0 */
-    .word   dma_irq_handler             /* [ 12] DMA1 Stream1 */
-    .word   dma_irq_handler             /* [ 13] DMA1 Stream2 */
-    .word   dma_irq_handler             /* [ 14] DMA1 Stream3 */
-    .word   dma_irq_handler             /* [ 15] DMA1 Stream4 */
-    .word   dma_irq_handler             /* [ 16] DMA1 Stream5 */
-    .word   dma_irq_handler             /* [ 17] DMA1 Stream6 */
+    .word   dma1_ch0_irq_handler        /* [ 11] DMA1 Stream0 */
+    .word   dma1_ch1_irq_handler        /* [ 12] DMA1 Stream1 */
+    .word   dma1_ch2_irq_handler        /* [ 13] DMA1 Stream2 */
+    .word   dma1_ch3_irq_handler        /* [ 14] DMA1 Stream3 */
+    .word   dma1_ch4_irq_handler        /* [ 15] DMA1 Stream4 */
+    .word   dma1_ch5_irq_handler        /* [ 16] DMA1 Stream5 */
+    .word   dma1_ch6_irq_handler        /* [ 17] DMA1 Stream6 */
     .word   UIE                         /* [ 18] */
     .word   UIE                         /* [ 19] */
     .word   UIE                         /* [ 20] */
@@ -74,7 +74,7 @@ __vectors_platform:
     .word   UIE                         /* [ 44] */
     .word   UIE                         /* [ 45] */
     .word   UIE                         /* [ 46] */
-    .word   dma_irq_handler             /* [ 47] DMA1 Stream7 */
+    .word   dma1_ch7_irq_handler        /* [ 47] DMA1 Stream7 */
     .word   UIE                         /* [ 48] */
     .word   sdmmc1_irq_handler          /* [ 49] SDMMC1 */
     .word   UIE                         /* [ 50] */
@@ -83,11 +83,11 @@ __vectors_platform:
     .word   UIE                         /* [ 53] */
     .word   UIE                         /* [ 54] */
     .word   UIE                         /* [ 55] */
-    .word   dma_irq_handler             /* [ 56] DMA2 Stream0 */
-    .word   dma_irq_handler             /* [ 57] DMA2 Stream1 */
-    .word   dma_irq_handler             /* [ 58] DMA2 Stream2 */
-    .word   dma_irq_handler             /* [ 59] DMA2 Stream3 */
-    .word   dma_irq_handler             /* [ 60] DMA2 Stream4 */
+    .word   dma2_ch0_irq_handler        /* [ 56] DMA2 Stream0 */
+    .word   dma2_ch1_irq_handler        /* [ 57] DMA2 Stream1 */
+    .word   dma2_ch2_irq_handler        /* [ 58] DMA2 Stream2 */
+    .word   dma2_ch3_irq_handler        /* [ 59] DMA2 Stream3 */
+    .word   dma2_ch4_irq_handler        /* [ 60] DMA2 Stream4 */
     .word   UIE                         /* [ 61] */
     .word   UIE                         /* [ 62] */
     .word   UIE                         /* [ 63] */
@@ -95,9 +95,9 @@ __vectors_platform:
     .word   UIE                         /* [ 65] */
     .word   UIE                         /* [ 66] */
     .word   UIE                         /* [ 67] */
-    .word   dma_irq_handler             /* [ 68] DMA2 Stream5 */
-    .word   dma_irq_handler             /* [ 69] DMA2 Stream6 */
-    .word   dma_irq_handler             /* [ 70] DMA2 Stream7 */
+    .word   dma2_ch5_irq_handler        /* [ 68] DMA2 Stream5 */
+    .word   dma2_ch6_irq_handler        /* [ 69] DMA2 Stream6 */
+    .word   dma2_ch7_irq_handler        /* [ 70] DMA2 Stream7 */
     .word   UIE                         /* [ 71] */
     .word   i2c_irq_handler             /* [ 72] I2C3 event */
     .word   i2c_irq_handler             /* [ 73] I2C3 error */
@@ -114,11 +114,11 @@ __vectors_platform:
     .word   spi4_irq_handler            /* [ 84] SPI4 */
     .word   spi5_irq_handler            /* [ 85] SPI5 */
     .word   spi6_irq_handler            /* [ 86] SPI6 */
-    .word   sai_irq_handler             /* [ 87] SAI1 */
+    .word   sai1_irq_handler            /* [ 87] SAI1 */
     .word   lcdc_irq_handler            /* [ 88] LCDC */
     .word   lcdc_irq_handler            /* [ 89] LCDC error */
-    .word   dma_irq_handler             /* [ 90] DMA2D */
-    .word   sai_irq_handler             /* [ 91] SAI2 */
+    .word   dma2d_irq_handler           /* [ 90] DMA2D */
+    .word   sai2_irq_handler            /* [ 91] SAI2 */
     .word   UIE                         /* [ 92] */
     .word   UIE                         /* [ 93] */
     .word   UIE                         /* [ 94] */
@@ -129,7 +129,7 @@ __vectors_platform:
     .word   UIE                         /* [ 99] */
     .word   UIE                         /* [100] */
     .word   INT_USB_FUNC                /* [101] OTG FS */
-    .word   dma_irq_handler             /* [102] DMAMUX1 overrun */
+    .word   dmamux1_irq_handler         /* [102] DMAMUX1 overrun */
     .word   UIE                         /* [103] */
     .word   UIE                         /* [104] */
     .word   UIE                         /* [105] */
@@ -141,7 +141,7 @@ __vectors_platform:
     .word   UIE                         /* [111] */
     .word   UIE                         /* [112] */
     .word   UIE                         /* [113] */
-    .word   sai_irq_handler             /* [114] SAI3 */
+    .word   sai3_irq_handler            /* [114] SAI3 */
     .word   UIE                         /* [115] */
     .word   UIE                         /* [116] */
     .word   UIE                         /* [117] */
@@ -149,21 +149,21 @@ __vectors_platform:
     .word   UIE                         /* [119] */
     .word   UIE                         /* [120] */
     .word   UIE                         /* [121] */
-    .word   dma_irq_handler             /* [122] MDMA */
+    .word   mdma_irq_handler            /* [122] MDMA */
     .word   UIE                         /* [123] */
     .word   sdmmc2_irq_handler          /* [124] SDMMC2 */
     .word   UIE                         /* [125] */
     .word   UIE                         /* [126] */
     .word   UIE                         /* [127] */
-    .word   dma_irq_handler             /* [128] DMAMUX2 overrun */
-    .word   dma_irq_handler             /* [129] BDMA channel 0 */
-    .word   dma_irq_handler             /* [130] BDMA channel 1 */
-    .word   dma_irq_handler             /* [131] BDMA channel 2 */
-    .word   dma_irq_handler             /* [132] BDMA channel 3 */
-    .word   dma_irq_handler             /* [133] BDMA channel 4 */
-    .word   dma_irq_handler             /* [134] BDMA channel 5 */
-    .word   dma_irq_handler             /* [135] BDMA channel 6 */
-    .word   dma_irq_handler             /* [136] BDMA channel 7 */
+    .word   dmamux2_irq_handler         /* [128] DMAMUX2 overrun */
+    .word   bdma_ch0_irq_handler        /* [129] BDMA channel 0 */
+    .word   bdma_ch1_irq_handler        /* [130] BDMA channel 1 */
+    .word   bdma_ch2_irq_handler        /* [131] BDMA channel 2 */
+    .word   bdma_ch3_irq_handler        /* [132] BDMA channel 3 */
+    .word   bdma_ch4_irq_handler        /* [133] BDMA channel 4 */
+    .word   bdma_ch5_irq_handler        /* [134] BDMA channel 5 */
+    .word   bdma_ch6_irq_handler        /* [135] BDMA channel 6 */
+    .word   bdma_ch7_irq_handler        /* [136] BDMA channel 7 */
     .word   UIE                         /* [137] */
     .word   UIE                         /* [138] */
     .word   UIE                         /* [139] */
@@ -173,7 +173,7 @@ __vectors_platform:
     .word   UIE                         /* [143] */
     .word   UIE                         /* [144] */
     .word   UIE                         /* [145] */
-    .word   sai_irq_handler             /* [146] SAI4 */
+    .word   sai4_irq_handler            /* [146] SAI4 */
     .word   UIE                         /* [147] */
     .word   UIE                         /* [148] */
     .word   UIE                         /* [149] */
