@@ -70,7 +70,6 @@ midi
 mikmod
 #endif
 
-/* beatbox */
 #if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES) || \
     (CONFIG_KEYPAD == SANSA_FUZE_PAD) || (CONFIG_KEYPAD == SANSA_E200_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \

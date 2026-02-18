@@ -1,6 +1,0 @@
-../midi/midifile.c
-../midi/midiutil.c
-../midi/sequencer.c
-../midi/guspat.c
-../midi/synth.c
-beatbox.c

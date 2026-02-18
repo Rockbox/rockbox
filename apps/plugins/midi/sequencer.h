@@ -21,9 +21,6 @@
 
 int tick(void);
 
-/* used by beatbox */
-void rewindFile(void);
-
 void seekForward(int nSec);
 void seekBackward(int nSec);
 
