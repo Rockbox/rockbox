@@ -30,10 +30,6 @@
 #include "settings.h" /* sound_current */
 #endif
 
-#ifdef HAVE_SW_VOLUME_CONTROL
-#include "pcm_sw_volume.h"
-#endif /* HAVE_SW_VOLUME_CONTROL */
-
 /* Define sound_setting_entries table */
 #define AUDIOHW_SOUND_SETTINGS_ENTRIES
 #include "audiohw_settings.h"
