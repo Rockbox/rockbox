@@ -325,6 +325,7 @@ static unsigned int track_event_flags = TEF_NONE; /* (A, O-) */
 static int skip_offset = 0; /* (A, O) */
 
 static bool track_skip_is_manual = false;
+static bool pause_on_track_change = false;
 
 /* Track change notification */
 static struct
@@ -1502,7 +1503,7 @@ static bool halt_decoding_track(bool stop)
 
     codec_skip_pending = false;
     codec_seeking = false;
-
+    pause_on_track_change = false;
     return retval;
 }
 
@@ -2733,12 +2734,6 @@ static void audio_finalise_track_change(void)
     {
         buf_read_cuesheet(info.cuesheet_hid);
         track_id3 = bufgetid3(info.id3_hid);
-
-        if (single_mode_do_pause(info.id3_hid))
-        {
-            play_status = PLAY_PAUSED;
-            pcmbuf_pause(true);
-        }
     }
     /* Sync the next track information */
     have_info = track_list_current(1, &info);
@@ -2934,8 +2929,9 @@ static void audio_on_codec_complete(int status)
     int id3_hid = 0;
     if (audio_can_change_track(&trackstat, &id3_hid))
     {
+        pause_on_track_change = single_mode_do_pause(id3_hid);
         audio_begin_track_change(
-                single_mode_do_pause(id3_hid)
+                pause_on_track_change
                 ? TRACK_CHANGE_END_OF_DATA
                 : TRACK_CHANGE_AUTO, trackstat);
     }
@@ -2954,6 +2950,12 @@ static void audio_on_codec_seek_complete(void)
    (Q_AUDIO_TRACK_CHANGED) */
 static void audio_on_track_changed(void)
 {
+    if (pause_on_track_change)
+    {
+        play_status = PLAY_PAUSED;
+        pause_on_track_change = false;
+    }
+
     /* Finish whatever is pending so that the WPS is in sync */
     audio_finalise_track_change();
 
@@ -3850,7 +3852,7 @@ void audio_pcmbuf_track_change(bool pcmbuf)
 /* May pcmbuf start PCM playback when the buffer is full enough? */
 bool audio_pcmbuf_may_play(void)
 {
-    return play_status == PLAY_PLAYING && !ff_rw_mode;
+    return play_status == PLAY_PLAYING && !ff_rw_mode && !pause_on_track_change;
 }
 
 

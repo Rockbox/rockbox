@@ -799,8 +799,10 @@ static void pcmbuf_pcm_callback(const void **start, size_t *size)
 
     if (desc)
     {
+        bool track_change = index == chunk_transidx;
+
         /* If last chunk in the track, notify of track change */
-        if (index == chunk_transidx)
+        if (track_change)
         {
             chunk_transidx = INVALID_BUF_INDEX;
             audio_pcmbuf_track_change(true);
@@ -808,6 +810,13 @@ static void pcmbuf_pcm_callback(const void **start, size_t *size)
 
         /* Free it for reuse */
         chunk_ridx = index = index_next(index);
+
+        if (track_change && !audio_pcmbuf_may_play())
+        {
+            current_desc = NULL;
+            *size = 0;
+            return;
+        }
     }
 
     /*- Process the new one -*/
