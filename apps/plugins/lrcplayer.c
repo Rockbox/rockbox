@@ -74,6 +74,7 @@ struct preferences {
     bool wrap;
     bool wipe;
     bool active_one_line;
+    bool autoscroll;
     int  align; /* 0: left, 1: center, 2: right */
     bool statusbar_on;
     bool display_title;
@@ -99,6 +100,7 @@ static const char *extentions[NUM_TYPES] = {
 static struct lrc_info {
     struct mp3entry *id3;
     long elapsed;
+    long scroll;
     long length;
     long ff_rewind;
     int  audio_status;
@@ -1643,21 +1645,25 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
     struct screen *display = rb->screens[i];
     struct lrc_word *lrc_word;
     struct lrc_brpos *lrc_brpos;
-    long time_start, time_end, elapsed;
+    long time_start, time_end, time_elapsed, elapsed;
     int count, width, nword;
     int xpos;
     const char *str;
     bool active_line;
 
+    if (!prefs.autoscroll)
+        time_elapsed = current.scroll;
+    else
+        time_elapsed = current.elapsed;
     time_start = get_time_start(lrc_line);
     time_end = get_time_start(lrc_line->next);
-    active_line = (time_start <= current.elapsed
-                    && time_end > current.elapsed);
+    active_line = (time_start <= time_elapsed
+                    && time_end > time_elapsed);
 
     if (!lrc_line->width)
     {
         /* empty line. draw bar during interval. */
-        long rin = current.elapsed - time_start;
+        long rin = time_elapsed - time_start;
         long len = time_end - time_start;
         if (current.wipe && active_line && len >= 3500)
         {
@@ -1697,12 +1703,12 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
         else
             time_end = get_time_start(lrc_line->next);
 
-        if (time_start > current.elapsed || !active_line)
+        if (time_start > time_elapsed || !active_line)
         {
             /* inactive */
             elapsed = 0;
         }
-        else if (!current.wipe || time_end <= current.elapsed)
+        else if (!current.wipe || time_end <= time_elapsed)
         {
             /* active whole word */
             elapsed = lrc_word->width;
@@ -1710,7 +1716,7 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
         else
         {
             /* wipe word */
-            long rin = current.elapsed - time_start;
+            long rin = time_elapsed - time_start;
             long len = time_end - time_start;
             elapsed = rin * lrc_word->width / len;
         }
@@ -1727,27 +1733,30 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
                 c = word_count;
                 w = word_width;
             }
-            if (elapsed <= 0)
+            if (prefs.autoscroll)
             {
-                set_to_inactive(display);
-            }
-            else if (elapsed < w)
-            {
-                /* wipe text */
-                display->fillrect(xpos, ypos, elapsed, font_ui_height);
-                set_to_inactive(display);
-                display->fillrect(xpos+elapsed, ypos,
-                                  w-elapsed, font_ui_height);
+                if (elapsed <= 0)
+                {
+                    set_to_inactive(display);
+                }
+                else if (elapsed < w)
+                {
+                    /* wipe text */
+                    display->fillrect(xpos, ypos, elapsed, font_ui_height);
+                    set_to_inactive(display);
+                    display->fillrect(xpos+elapsed, ypos,
+                                      w-elapsed, font_ui_height);
 #if (LCD_DEPTH > 1)
 #ifdef HAVE_REMOTE_LCD
-                if (display->screen_type == SCREEN_REMOTE)
-                    display->set_drawmode(DRMODE_INVERSEVID);
-                else
+                    if (display->screen_type == SCREEN_REMOTE)
+                        display->set_drawmode(DRMODE_INVERSEVID);
+                    else
 #endif
-                    display->set_drawmode(DRMODE_BG);
+                        display->set_drawmode(DRMODE_BG);
 #else
-                display->set_drawmode(DRMODE_INVERSEVID);
+                    display->set_drawmode(DRMODE_INVERSEVID);
 #endif
+                }
             }
             rb->strlcpy(temp_buf, str, c+1);
             display->putsxy(xpos, ypos, temp_buf);
@@ -1777,13 +1786,18 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
 
 static void display_lrcs(void)
 {
-    long time_start, time_end, rin, len;
+    long time_start, time_end, time_elapsed, rin, len;
     int nline[NB_SCREENS] = {0};
     struct lrc_line *lrc_center = current.ll_head;
 
     if (!lrc_center) return;
 
-    while (get_time_start(lrc_center->next) <= current.elapsed)
+    if (!prefs.autoscroll)
+        time_elapsed = current.scroll;
+    else
+        time_elapsed = current.elapsed;
+
+    while (get_time_start(lrc_center->next) <= time_elapsed)
     {
         nline[SCREEN_MAIN] += lrc_center->nline[SCREEN_MAIN];
 #ifdef HAVE_REMOTE_LCD
@@ -1794,7 +1808,7 @@ static void display_lrcs(void)
 
     time_start = get_time_start(lrc_center);
     time_end = get_time_start(lrc_center->next);
-    rin = current.elapsed - time_start;
+    rin = time_elapsed - time_start;
     len = time_end - time_start;
 
     struct screen *display;
@@ -1810,9 +1824,9 @@ static void display_lrcs(void)
         y = (nblines-1)/2;
         if (rin < 0)
         {
-            /* current.elapsed < time of first lrc */
+            /* time_elapsed < time of first lrc */
             if (!current.wipe)
-                ypos = (time_start - current.elapsed)
+                ypos = (time_start - time_elapsed)
                             * font_ui_height / time_start;
             else
                 y++;
@@ -1849,7 +1863,7 @@ static void display_lrcs(void)
             ypos = display_lrc_line(lrc_line, ypos, i);
             lrc_line = lrc_line->next;
         }
-        if (!lrc_line && ypos < vp_lyrics[i].height)
+        if (!lrc_line && ypos < vp_lyrics[i].height && prefs.autoscroll)
             display->putsxy(0, ypos, "[end]");
 
         display->update_viewport();
@@ -2150,6 +2164,7 @@ static void load_or_save_settings(bool save)
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.wipe }, "wipe", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.active_one_line },
             "active one line", NULL },
+        { TYPE_BOOL, 0, 1, { .bool_p = &prefs.autoscroll }, "autoscroll", NULL },
         { TYPE_INT,  0, 2, { .int_p =  &prefs.align }, "align", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.statusbar_on },
             "statusbar on", NULL },
@@ -2179,6 +2194,7 @@ static void load_or_save_settings(bool save)
         prefs.wrap = true;
         prefs.wipe = true;
         prefs.active_one_line = false;
+        prefs.autoscroll = true;
         prefs.align = 1; /* center */
         prefs.statusbar_on = false;
         prefs.display_title = true;
@@ -2264,6 +2280,7 @@ static bool lrc_display_menu(void)
         LRC_MENU_WIPE,
         LRC_MENU_ALIGN,
         LRC_MENU_LINE_MODE,
+        LRC_MENU_SCROLL_MODE,
     };
 
     int selected = 0;
@@ -2271,7 +2288,8 @@ static bool lrc_display_menu(void)
 
     MENUITEM_STRINGLIST(menu, "Display Settings", NULL,
                         "Wrap", "Wipe", "Alignment",
-                        "Activate Only Current Line");
+                        "Activate Only Current Line",
+                        "Automatic Scrolling");
 
     struct opt_items align_names[] = {
         {"Left", -1}, {"Centre", -1}, {"Right", -1},
@@ -2294,6 +2312,9 @@ static bool lrc_display_menu(void)
             case LRC_MENU_LINE_MODE:
                 usb = rb->set_bool("Activate Only Current Line",
                                         &prefs.active_one_line);
+                break;
+            case LRC_MENU_SCROLL_MODE:
+                usb = rb->set_bool("Automatic Scrolling", &prefs.autoscroll);
                 break;
             case MENU_ATTACHED_USB:
                 usb = true;
@@ -2619,10 +2640,28 @@ static int handle_button(void)
             }
             break;
         case ACTION_WPS_VOLDOWN:
-            rb->adjust_volume(-1);
+            if (!prefs.autoscroll)
+            {
+                current.scroll -= 3000;
+                if (current.scroll < 0)
+                    current.scroll = 0;
+            }
+            else
+            {
+                rb->adjust_volume(-1);
+            }
             break;
         case ACTION_WPS_VOLUP:
-            rb->adjust_volume(1);
+            if (!prefs.autoscroll)
+            {
+                current.scroll += 3000;
+                if (current.scroll > current.length)
+                    current.scroll = current.length;
+            }
+            else
+            {
+                rb->adjust_volume(1);
+            }
             break;
         case ACTION_WPS_CONTEXT:
             ret = LRC_GOTO_EDITOR;
@@ -2705,6 +2744,7 @@ static int lrc_main(void)
         {
             current.elapsed = 0;
             current.length =  1;
+            current.scroll =  0;
         }
 
         if (current.id3 && id3_timeout &&
@@ -2782,6 +2822,7 @@ enum plugin_status plugin_start(const void* parameter)
     current.lrc_file[0] = 0;
     current.ff_rewind = -1;
     current.found_lrc = false;
+    current.scroll = 0;
     if (parameter && check_audio_status())
     {
         const char *ext;
@@ -2790,7 +2831,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->strcpy(current.lrc_file, parameter);
         if (!rb->file_exists(current.lrc_file))
         {
-            rb->splash(HZ, "Specified file dose not exist.");
+            rb->splash(HZ, "Specified file does not exist.");
             return PLUGIN_ERROR;
         }
         ext = rb->strrchr(current.lrc_file, '.');
