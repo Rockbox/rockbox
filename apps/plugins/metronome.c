@@ -809,9 +809,6 @@ static int bpm_step_counter = 0;
 
 static bool sound_trigger = false;
 
-#define MET_IS_PLAYING rb->pcm_is_playing()
-#define MET_PLAY_STOP rb->audio_stop()
-
 /* Really necessary? Cannot just play mono?
    Also: This is wasted memory! */
 static short tick_buf[sizeof(tick_sound)*2];
@@ -829,12 +826,12 @@ static void prepare_buffers(void)
 
 static void play_tick(void)
 {
-    rb->pcm_play_data(NULL, NULL, tick_buf, sizeof(tick_buf));
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, NULL, tick_buf, sizeof(tick_buf));
 }
 
 static void play_tock(void)
 {
-    rb->pcm_play_data(NULL, NULL, tock_buf, sizeof(tock_buf));
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, NULL, tock_buf, sizeof(tock_buf));
 }
 
 /* State: 0: blank/title, 1: tick, 2: tock 3: silent klick */
@@ -1216,10 +1213,10 @@ static void cleanup(void)
     if(fd >= 0) rb->close(fd);
 
     metronome_pause();
-    MET_PLAY_STOP; /* stop audio ISR */
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
     tweak_volume(0);
     rb->led(0);
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 /*
@@ -1555,7 +1552,7 @@ enum plugin_status plugin_start(const void* file)
 
     mem_init();
 
-    if(MET_IS_PLAYING) MET_PLAY_STOP; /* stop audio IS */
+    rb->audio_stop();
 
     prepare_buffers();
 #if INPUT_SRC_CAPS != 0
@@ -1563,7 +1560,7 @@ enum plugin_status plugin_start(const void* file)
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    rb->mixer_set_frequency(SAMPR_44);
 
     if(file)
     {

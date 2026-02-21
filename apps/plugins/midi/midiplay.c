@@ -520,7 +520,7 @@ static int midimain(const void * filename)
     }
 
     rb->talk_force_shutup();
-    rb->pcm_play_stop();
+    rb->audio_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);

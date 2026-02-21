@@ -549,13 +549,11 @@ RB_WRAP(sound)
 
 RB_WRAP(pcm)
 {
-    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING,
-                PCM_PLAYSTOP, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
-                PCM_SETFREQUENCY, PCM_ECOUNT};
+    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
+                PCM_ECOUNT};
 
-    const char *pcm_option[] = {"apply_settings", "is_playing",
-                                "play_stop", "play_lock", "play_unlock",
-                                "set_frequency", NULL};
+    const char *pcm_option[] = {"apply_settings", "play_lock", "play_unlock",
+                                NULL};
     bool   b_result;
 
     lua_pushnil(L); /*push nil so options w/o return have something to return */
@@ -566,21 +564,11 @@ RB_WRAP(pcm)
         case PCM_APPLYSETTINGS:
             rb->pcm_apply_settings();
             break;
-        case PCM_ISPLAYING:
-            b_result = rb->pcm_is_playing();
-            lua_pushboolean(L, b_result);
-            break;
-        case PCM_PLAYSTOP:
-            rb->pcm_play_stop();
-            break;
         case PCM_PLAYLOCK:
             rb->pcm_play_lock();
             break;
         case PCM_PLAYUNLOCK:
             rb->pcm_play_unlock();
-            break;
-        case PCM_SETFREQUENCY:
-            rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 2));
             break;
     }
 

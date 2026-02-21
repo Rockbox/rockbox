@@ -167,7 +167,7 @@ static void set_frequency(int index)
     output_clear();
     update_gen_step();
 
-    rb->pcm_set_frequency(hw_sampr);
+    rb->mixer_set_frequency(hw_sampr);
     rb->pcm_apply_settings();
 }
 
@@ -220,7 +220,7 @@ static void play_tone(bool volume_set)
     rb->cpu_boost(true);
 #endif
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[freq]);
+    rb->mixer_set_frequency(rb->hw_freq_sampr[freq]);
 
 #if INPUT_SRC_CAPS != 0
     /* Recordable targets can play back from other sources */
@@ -237,7 +237,7 @@ static void play_tone(bool volume_set)
                                       IF_PRIO(, PRIORITY_PLAYBACK)
                                       IF_COP(, CPU));
 
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
 
 #ifndef HAVE_VOLUME_IN_LIST
     if (volume_set)
@@ -260,7 +260,7 @@ static void play_tone(bool volume_set)
 
     rb->thread_wait(gen_thread_id);
 
-    rb->pcm_play_stop();
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -268,7 +268,7 @@ static void play_tone(bool volume_set)
 
     /* restore default - user of apis is responsible for restoring
        default state - normally playback at 44100Hz */
-    rb->pcm_set_frequency(HW_FREQ_DEFAULT);
+    rb->mixer_set_frequency(HW_FREQ_DEFAULT);
 }
 
 /* Tests hardware sample rate switching */

@@ -290,9 +290,7 @@ static void options_menu(void){
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
-#if !defined SIMULATOR
-                rb->pcm_play_stop();
-#endif
+                rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
                 break;
             case 5:
                 new_setting = 9 - settings.volume;
@@ -318,9 +316,6 @@ static void options_menu(void){
 /* menu */
 static bool zxbox_menu(void)
 {
-#if !defined SIMULATOR
-    rb->pcm_play_stop();
-#endif
     int selected=0;
     int result;
     int menu_quit=0;
@@ -332,6 +327,7 @@ static bool zxbox_menu(void)
                         "Save Snapshot", "Toggle \"fast\" mode",
                         "Options", "Quit");
 
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
     rb->button_clear_queue();
 
     while (!menu_quit) {
@@ -524,7 +520,3 @@ void start_spectemu(const void *parameter)
 
   run_singlemode();
 }
-
-
-
-

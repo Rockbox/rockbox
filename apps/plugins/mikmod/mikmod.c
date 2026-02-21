@@ -536,7 +536,7 @@ static void applysettings(void)
     if (inited && (md_mixfreq != rb->hw_freq_sampr[settings.sample_rate])) {
         md_mixfreq = rb->hw_freq_sampr[settings.sample_rate];
 //	MikMod_Reset("");  BROKEN!
-	rb->pcm_play_stop();
+        rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 	rb->mixer_set_frequency(md_mixfreq);
 	rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
     }
@@ -964,7 +964,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_getstringsize("A", NULL, &font_h);
 
     rb->talk_force_shutup();
-    rb->pcm_play_stop();
+    rb->audio_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
@@ -1019,10 +1019,11 @@ enum plugin_status plugin_start(const void* parameter)
         retval = playfile(np_file);
     } while (retval == PLUGIN_NEWSONG);
 
-    MikMod_Exit();
-
     rb->pcmbuf_fade(false, false);
     rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+
+    MikMod_Exit();
+
     rb->mixer_set_frequency(orig_samplerate);
 
     if (retval == PLUGIN_OK)

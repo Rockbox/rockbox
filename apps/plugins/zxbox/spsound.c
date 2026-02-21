@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -67,70 +67,64 @@ unsigned short my_buf[TMNUM*2*3*2];
 
 
 const byte lin8_ulaw[] = {
-    31,   31,   31,   32,   32,   32,   32,   33, 
-    33,   33,   33,   34,   34,   34,   34,   35, 
-    35,   35,   35,   36,   36,   36,   36,   37, 
-    37,   37,   37,   38,   38,   38,   38,   39, 
-    39,   39,   39,   40,   40,   40,   40,   41, 
-    41,   41,   41,   42,   42,   42,   42,   43, 
-    43,   43,   43,   44,   44,   44,   44,   45, 
-    45,   45,   45,   46,   46,   46,   46,   47, 
-    47,   47,   47,   48,   48,   49,   49,   50, 
-    50,   51,   51,   52,   52,   53,   53,   54, 
-    54,   55,   55,   56,   56,   57,   57,   58, 
-    58,   59,   59,   60,   60,   61,   61,   62, 
-    62,   63,   63,   64,   65,   66,   67,   68, 
-    69,   70,   71,   72,   73,   74,   75,   76, 
-    77,   78,   79,   81,   83,   85,   87,   89, 
-    91,   93,   95,   99,  103,  107,  111,  119, 
-   255,  247,  239,  235,  231,  227,  223,  221, 
-   219,  217,  215,  213,  211,  209,  207,  206, 
-   205,  204,  203,  202,  201,  200,  199,  198, 
-   197,  196,  195,  194,  193,  192,  191,  191, 
-   190,  190,  189,  189,  188,  188,  187,  187, 
-   186,  186,  185,  185,  184,  184,  183,  183, 
-   182,  182,  181,  181,  180,  180,  179,  179, 
-   178,  178,  177,  177,  176,  176,  175,  175, 
-   175,  175,  174,  174,  174,  174,  173,  173, 
-   173,  173,  172,  172,  172,  172,  171,  171, 
-   171,  171,  170,  170,  170,  170,  169,  169, 
-   169,  169,  168,  168,  168,  168,  167,  167, 
-   167,  167,  166,  166,  166,  166,  165,  165, 
-   165,  165,  164,  164,  164,  164,  163,  163, 
-   163,  163,  162,  162,  162,  162,  161,  161, 
-   161,  161,  160,  160,  160,  160,  159,  159, 
+    31,   31,   31,   32,   32,   32,   32,   33,
+    33,   33,   33,   34,   34,   34,   34,   35,
+    35,   35,   35,   36,   36,   36,   36,   37,
+    37,   37,   37,   38,   38,   38,   38,   39,
+    39,   39,   39,   40,   40,   40,   40,   41,
+    41,   41,   41,   42,   42,   42,   42,   43,
+    43,   43,   43,   44,   44,   44,   44,   45,
+    45,   45,   45,   46,   46,   46,   46,   47,
+    47,   47,   47,   48,   48,   49,   49,   50,
+    50,   51,   51,   52,   52,   53,   53,   54,
+    54,   55,   55,   56,   56,   57,   57,   58,
+    58,   59,   59,   60,   60,   61,   61,   62,
+    62,   63,   63,   64,   65,   66,   67,   68,
+    69,   70,   71,   72,   73,   74,   75,   76,
+    77,   78,   79,   81,   83,   85,   87,   89,
+    91,   93,   95,   99,  103,  107,  111,  119,
+   255,  247,  239,  235,  231,  227,  223,  221,
+   219,  217,  215,  213,  211,  209,  207,  206,
+   205,  204,  203,  202,  201,  200,  199,  198,
+   197,  196,  195,  194,  193,  192,  191,  191,
+   190,  190,  189,  189,  188,  188,  187,  187,
+   186,  186,  185,  185,  184,  184,  183,  183,
+   182,  182,  181,  181,  180,  180,  179,  179,
+   178,  178,  177,  177,  176,  176,  175,  175,
+   175,  175,  174,  174,  174,  174,  173,  173,
+   173,  173,  172,  172,  172,  172,  171,  171,
+   171,  171,  170,  170,  170,  170,  169,  169,
+   169,  169,  168,  168,  168,  168,  167,  167,
+   167,  167,  166,  166,  166,  166,  165,  165,
+   165,  165,  164,  164,  164,  164,  163,  163,
+   163,  163,  162,  162,  162,  162,  161,  161,
+   161,  161,  160,  160,  160,  160,  159,  159,
 };
 
 static void open_snd(void)
 {
     sndstate = SPS_OPENED;
     sound_avail=1;
-   rb->pcm_play_stop();
+    rb->audio_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    rb->mixer_set_frequency(SAMPR_44);
 }
 
 static void close_snd(int normal)
 {
     (void)normal;
     sound_avail = 0;
-    rb->pcm_play_stop();    
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 }
-
-
 
 void init_spect_sound(void)
 {
-#if 1 /* TODO: Is this OK? */
   open_snd();
-#endif
 }
-
 
 #ifndef VOLREDUCE
 #define VOLREDUCE 0
@@ -149,7 +143,7 @@ void init_spect_sound(void)
 
 static void process_sound(void)
 {
-  static int soundhp; 
+  static int soundhp;
   int i;
   byte *sb;
   register int sv;
@@ -169,7 +163,7 @@ static void process_sound(void)
   }
   else {
     signed char *tsp;
-    
+
     tsp = sp_tape_sound;
     for(i = TMNUM; i; sb++,tsp++,i--) {
       sv = *sb + TAPESOUND(tsp);
@@ -218,7 +212,7 @@ static void write_buf(void){
                     = my_buf[j+10] = my_buf[j+11] \
                     = (((byte)sp_sound_buf[i])<<8) >> settings.volume;
 
-    rb->pcm_play_data(&get_more,NULL,(unsigned char*)(my_buf),TMNUM*4*3*2);
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, (unsigned char*)(my_buf),TMNUM*4*3*2);
 
 #if 0
     /* can use to save and later analyze what we produce */
@@ -232,10 +226,9 @@ static void write_buf(void){
     rb->close (i);
 #endif
 
-
     while(!doneplay)
         rb->yield();
- 
+
 }
 void play_sound(int evenframe)
 {
@@ -249,7 +242,7 @@ void play_sound(int evenframe)
     close_snd(1);
     return;
   }
-  
+
   z80_proc.sound_change = 0;
 
   process_sound();
@@ -260,7 +253,7 @@ void play_sound(int evenframe)
 
 void setbufsize(void)
 {
-    
+
 }
 
 
@@ -286,5 +279,3 @@ void autoclose_sound(void)
 }
 
 #endif /* NO_SOUND */
-
-

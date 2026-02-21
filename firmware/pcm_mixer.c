@@ -455,6 +455,10 @@ void mixer_set_frequency(unsigned int samplerate)
     pcm_set_frequency(samplerate);
     samplerate = pcm_get_frequency();
 
+#ifdef CONFIG_SAMPR_TYPES
+    samplerate &= ~SAMPR_TYPE_MASK;
+#endif
+
     if (samplerate == mixer_sampr)
         return;
 

@@ -222,7 +222,7 @@ void syssnd_update(void)
 
         if (!isAudioPlaying && fillCount > 0)
         {
-            rb->pcm_play_data(&get_more, NULL, NULL, 0);
+            rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
             isAudioPlaying = true;
         }
     }
@@ -240,6 +240,7 @@ bool syssnd_init(void)
 
     IFDEBUG_AUDIO(sys_printf("xrick/audio: start\n"););
 
+    rb->audio_stop();
     rb->talk_disable(true);
 
     /* Stop playback to reconfigure audio settings and acquire audio buffer */
@@ -251,7 +252,7 @@ bool syssnd_init(void)
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
-    rb->pcm_set_frequency(HW_FREQ_44);
+    rb->mixer_set_frequency(HW_FREQ_44);
     rb->pcm_apply_settings();
 
     rb->memset(channels, 0, sizeof(channels));
@@ -278,13 +279,13 @@ void syssnd_shutdown(void)
     }
 
     /* Stop playback. */
-    rb->pcm_play_stop();
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 
     /* Reset playing status. */
     isAudioPlaying = false;
 
     /* Restore default sampling rate. */
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
     rb->pcm_apply_settings();
 
     rb->talk_disable(false);
@@ -361,9 +362,7 @@ void syssnd_pauseAll(bool pause)
         return;
     }
 
-    rb->pcm_play_lock();
     rb->mixer_channel_play_pause(PCM_MIXER_CHAN_PLAYBACK, !pause);
-    rb->pcm_play_unlock();
 }
 
 /*

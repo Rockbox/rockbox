@@ -103,13 +103,12 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
 #ifdef USE_GREY
-grey_show(false);
-grey_release();
+    grey_show(false);
+    grey_release();
 #endif
 
-#if !defined SIMULATOR
-    rb->pcm_play_stop();
-#endif
+    rb->audio_stop();
+    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
 
 return PLUGIN_OK;
 }
@@ -267,4 +266,3 @@ void press_key(int c){
     spkb_kbstate[ki].state = 1;
     process_keys();
 }
-

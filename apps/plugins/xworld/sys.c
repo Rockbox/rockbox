@@ -1029,13 +1029,13 @@ void sys_startAudio(struct System* sys, AudioCallback callback, void *param)
     audio_param = param;
     audio_sys = sys;
 
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
 }
 
 void sys_stopAudio(struct System* sys)
 {
     (void) sys;
-    rb->pcm_play_stop();
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 }
 
 uint32_t sys_getOutputSampleRate(struct System* sys)

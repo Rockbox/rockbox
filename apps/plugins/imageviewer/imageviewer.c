@@ -342,7 +342,7 @@ static int show_menu(void) /* return 1 to quit */
             /* slideshow times < 10s keep disk spinning */
             rb->storage_spindown(0);
         }
-        else if (!rb->pcm_is_playing())
+        else if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
         {
             /* slideshow times > 10s and not playing: ata_off after load */
             iv_api.immediate_ata_off = true;

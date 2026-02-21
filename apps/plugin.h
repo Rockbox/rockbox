@@ -178,7 +178,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 278
+#define PLUGIN_API_VERSION 279
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -743,12 +743,6 @@ struct plugin_api {
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
-    void (*pcm_play_data)(pcm_play_callback_type get_more,
-                          pcm_status_callback_type status_cb,
-                          const void *start, size_t size);
-    void (*pcm_play_stop)(void);
-    void (*pcm_set_frequency)(unsigned int frequency);
-    bool (*pcm_is_playing)(void);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
     void (*beep_play)(unsigned int frequency, unsigned int duration,

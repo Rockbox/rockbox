@@ -163,7 +163,7 @@ int audio_status(void)
 
 void audio_stop(void)
     \group playback control
-    \description
+    \description Gracefully shuts down the playback (ie codec) engine.  Anything else playing back (talk/voice, other mixer channels) is unaffected.
 
 void backlight_off(void)
     \group For OLED targets like the Sansa Clip, the backlight_* functions control * the display enable, which has essentially the same effect.
@@ -1775,26 +1775,9 @@ void pcm_init_recording(void)
     \conditions (defined(HAVE_RECORDING))
     \description
 
-bool pcm_is_playing(void)
-    \group sound
-    \return true unless playback is paused
-    \description
-
-void pcm_play_data(pcm_play_callback_type get_more, pcm_status_callback_type status_cb, const void *start, size_t size)
-    \group sound
-    \param get_more Optional callback
-    \param status_cb Optional status callback
-    \param start is the address of raw 16-16, interleaved PCM data
-    \param size is the size of the data to play
-    \description
-
 void pcm_play_lock(void)
     \group sound
     \description
-
-void pcm_play_stop(void)
-    \group sound
-    \description Stops the playback and empties the audio buffer.
 
 void pcm_play_unlock(void)
     \group sound
@@ -1807,11 +1790,6 @@ void pcm_record_data(pcm_rec_callback_type more_ready, pcm_status_callback_type 
     \param status_cb
     \param start
     \param size
-    \description
-
-void pcm_set_frequency(unsigned int frequency)
-    \group sound
-    \param frequency
     \description
 
 void pcm_stop_recording(void)

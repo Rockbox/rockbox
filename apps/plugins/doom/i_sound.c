@@ -471,13 +471,13 @@ void I_SubmitSound(void)
    if (!enable_sound)
       return;
 
-   rb->pcm_play_data(&get_more, NULL, NULL, 0);
+   rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, &get_more, NULL, 0);
 }
 
 void I_ShutdownSound(void)
 {
-   rb->pcm_play_stop();
-   rb->pcm_set_frequency(HW_SAMPR_DEFAULT); // 44100
+   rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+   rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 void I_InitSound()
@@ -486,14 +486,14 @@ void I_InitSound()
 
    // Initialize external data (all sounds) at start, keep static.
    printf( "I_InitSound: ");
-   rb->pcm_play_stop();
+   rb->audio_stop();
 
 #if INPUT_SRC_CAPS != 0
    /* Select playback */
    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-   rb->pcm_set_frequency(SAMPLERATE);
+   rb->mixer_set_frequency(SAMPLERATE);
 
    vol_lookup=malloc(128*256*sizeof(int));
 

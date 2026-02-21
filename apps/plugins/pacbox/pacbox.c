@@ -387,6 +387,8 @@ static void start_sound(void)
     if (sound_playing)
         return;
 
+    rb->audio_stop();
+
 #ifndef USE_IRAM
     /* Ensure control of PCM - stopping music itn't obligatory */
     rb->plugin_get_audio_buffer(NULL);
@@ -405,8 +407,8 @@ static void start_sound(void)
 
     wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->mixer_set_frequency(rb->hw_freq_sampr[sr_index]);
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
 
     sound_playing = true;
 }
@@ -419,8 +421,8 @@ static void stop_sound(void)
     if (!sound_playing)
         return;
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
 
     sound_playing = false;
 }
