@@ -461,7 +461,10 @@ enum plugin_status plugin_start(const void* parameter)
     int h;
 
     FOR_NB_SCREENS(i)
+    {
+        rb->sb_set_persistent_title("Stopwatch", Icon_NOICON, i);
         rb->viewportmanager_theme_enable(i, true, NULL);
+    }
 
     rb->viewport_set_defaults(&vp, SCREEN_MAIN);
     display = rb->screens[SCREEN_MAIN];
