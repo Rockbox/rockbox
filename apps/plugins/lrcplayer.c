@@ -2691,6 +2691,7 @@ static int lrc_main(void)
     FOR_NB_SCREENS(i)
     {
         rb->viewportmanager_theme_enable(i, prefs.statusbar_on, &vp_info[i]);
+        vp_info[i].font = uifont;
         vp_lyrics[i] = vp_info[i];
         vp_lyrics[i].flags &= ~VP_FLAG_ALIGNMENT_MASK;
         vp_lyrics[i].y += h;
