@@ -554,7 +554,6 @@ RB_WRAP(pcm)
 
     const char *pcm_option[] = {"apply_settings", "play_lock", "play_unlock",
                                 NULL};
-    bool   b_result;
 
     lua_pushnil(L); /*push nil so options w/o return have something to return */
 
