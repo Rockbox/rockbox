@@ -65,6 +65,11 @@ static volatile int play_active;
 
 static int pcm_last_freq = -1;
 
+volatile int pcm_sai_xrun_count;
+volatile int pcm_dma_teif_count;
+volatile int pcm_dma_dmeif_count;
+volatile int pcm_dma_feif_count;
+
 static void play_dma_start(const void *addr, size_t size)
 {
     commit_dcache_range(addr, size);
@@ -151,8 +156,12 @@ static void sai_init(void)
                 SLOTSZ_V(DATASZ),               /* slot size = data size */
                 FBOFF(0));                      /* no bit offset in slot */
 
+    /* Enable xrun error interrupt */
+    reg_writelf(sai1a, SAI_SUBBLOCK_IM, OVRUDR(1));
+
     /* Enable interrupts in NVIC */
     nvic_enable_irq(NVIC_IRQN_DMA1_STR0);
+    nvic_enable_irq(NVIC_IRQN_SAI1);
 }
 
 struct div_settings
@@ -326,6 +335,15 @@ void dma1_ch0_irq_handler(void)
     const void *addr;
     size_t size;
 
+    if (reg_vreadf(lisr, DMA_LISR, TEIF0))
+        pcm_dma_teif_count++;
+
+    if (reg_vreadf(lisr, DMA_LISR, DMEIF0))
+        pcm_dma_dmeif_count++;
+
+    if (reg_vreadf(lisr, DMA_LISR, FEIF0))
+        pcm_dma_feif_count++;
+
     if (reg_vreadf(lisr, DMA_LISR, TEIF0) ||
         reg_vreadf(lisr, DMA_LISR, DMEIF0) ||
         reg_vreadf(lisr, DMA_LISR, FEIF0))
@@ -350,5 +368,14 @@ void dma1_ch0_irq_handler(void)
     else
     {
         panicf("%s: %08lx", __func__, lisr);
+    }
+}
+
+void sai1_irq_handler(void)
+{
+    if (reg_readlf(sai1a, SAI_SUBBLOCK_SR, OVRUDR))
+    {
+        reg_assignlf(sai1a, SAI_SUBBLOCK_CLRFR, OVRUDR(1));
+        pcm_sai_xrun_count++;
     }
 }

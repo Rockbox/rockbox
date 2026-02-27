@@ -86,11 +86,68 @@ static bool swd_menu(void)
     return simplelist_show_list(&info);
 }
 
+#if defined(ECHO_R1)
+extern volatile int pcm_sai_xrun_count;
+extern volatile int pcm_dma_teif_count;
+extern volatile int pcm_dma_dmeif_count;
+extern volatile int pcm_dma_feif_count;
+
+struct pcmdebug_counter
+{
+    const char *name;
+    volatile int *value;
+};
+
+static const struct pcmdebug_counter pcmdebug_counters[] =
+{
+    {"SAI xrun count",  &pcm_sai_xrun_count},
+    {"DMA TEIF count",  &pcm_dma_teif_count},
+    {"DMA DMEIF count", &pcm_dma_dmeif_count},
+    {"DMA FEIF count",  &pcm_dma_feif_count},
+};
+
+static int pcmdebug_menu_action_cb(int action, struct gui_synclist *lists)
+{
+    if (action == ACTION_STD_OK)
+    {
+        int item = gui_synclist_get_sel_pos(lists);
+        const struct pcmdebug_counter *counter = &pcmdebug_counters[item];
+
+        *counter->value = 0;
+        action = ACTION_REDRAW;
+    }
+
+    if (action == ACTION_NONE)
+        action = ACTION_REDRAW;
+
+    return action;
+}
+
+static const char *pcmdebug_menu_get_name(int item, void *data, char *buf, size_t bufsz)
+{
+    const struct pcmdebug_counter *counter = &pcmdebug_counters[item];
+    (void)data;
+
+    snprintf(buf, bufsz, "%s: %d", counter->name, *counter->value);
+    return buf;
+}
+
+static bool pcm_debug_menu(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "PCM debug", ARRAYLEN(pcmdebug_counters), NULL);
+    info.action_callback = pcmdebug_menu_action_cb;
+    info.get_name = pcmdebug_menu_get_name;
+    return simplelist_show_list(&info);
+}
+#endif
+
 /* Menu definition */
 static const struct {
     const char *name;
     bool (*function) (void);
 } menuitems[] = {
+    {"PCM debug", pcm_debug_menu},
     {"SWD/JTAG", swd_menu},
 };
 
