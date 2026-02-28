@@ -88,6 +88,9 @@
 #include "dircache.h"
 #include "errno.h"
 
+#ifdef HAVE_REKORDBOX
+#include "rekordbox_import.h"
+#endif
 #ifndef __PCTOOL__
 #include "lang.h"
 #include "eeprom_settings.h"
@@ -5263,6 +5266,31 @@ static void tagcache_thread(void)
         }
     }
 
+#ifdef HAVE_REKORDBOX
+    /* Rekordbox import: if export.pdb is present and newer than our last
+     * sync stamp, parse it into database_tmp.tcd before tagcache_build()
+     * runs.  We use a 4 KB page scratch buffer allocated on the stack;
+     * pdb_open() will reject it if the actual page size is larger. */
+    if (!db_file_exists(TAGCACHE_FILE_TEMP) && rekordbox_import_needed())
+    {
+        static uint8_t rb_page_buf[4096];
+        logf("rekordbox: starting import");
+        int rb_result = rekordbox_run_import(rb_page_buf, sizeof(rb_page_buf),
+                                             tc_stat.db_path);
+        if (rb_result > 0)
+        {
+            /* Temp file is ready — commit it immediately. */
+            allocate_tempbuf();
+            commit();
+            free_tempbuf();
+        }
+        else if (rb_result < 0)
+        {
+            logf("rekordbox: import failed");
+        }
+    }
+#endif /* HAVE_REKORDBOX */
+
 #ifdef HAVE_TC_RAMCACHE
 #ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized && firmware_settings.disk_clean
@@ -5359,6 +5387,23 @@ static void tagcache_thread(void)
                 logf("USB: TagCache");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK, ev.data);
                 usb_wait_for_disconnect(&tagcache_queue);
+#ifdef HAVE_REKORDBOX
+                /* Re-import if PDB changed during the USB session. */
+                if (!db_file_exists(TAGCACHE_FILE_TEMP)
+                    && rekordbox_import_needed())
+                {
+                    static uint8_t rb_page_buf_usb[4096];
+                    int rb_r = rekordbox_run_import(
+                        rb_page_buf_usb, sizeof(rb_page_buf_usb),
+                        tc_stat.db_path);
+                    if (rb_r > 0)
+                    {
+                        allocate_tempbuf();
+                        commit();
+                        free_tempbuf();
+                    }
+                }
+#endif /* HAVE_REKORDBOX */
                 break ;
         }
     }

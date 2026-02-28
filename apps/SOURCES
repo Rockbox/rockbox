@@ -181,6 +181,10 @@ gui/usb_screen.c
 #ifdef HAVE_TAGCACHE
 tagcache.c
 #endif
+#ifdef HAVE_REKORDBOX
+pdb_parser.c
+rekordbox_import.c
+#endif
 #ifdef HAVE_TOUCHSCREEN
 keymaps/keymap-touchscreen.c
 #endif

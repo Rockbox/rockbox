@@ -66,6 +66,7 @@
 
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
+#define HAVE_REKORDBOX
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
