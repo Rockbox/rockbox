@@ -14684,7 +14684,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14699,7 +14699,7 @@
   </source>
   <dest>
     *: "취소하려면 왼쪽 버튼을 누르세요."
-    android,hifietma*,zenvision: "취소하려면 뒤로가기 버튼을 누르세요."
+    android,hifietma*: "취소하려면 뒤로가기 버튼을 누르세요."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "취소하려면 전원 버튼을 누르세요."
     ihifi760,ihifi960: "취소하려면 리턴 버튼을 두 번 탭하세요."
     ihifi770,ihifi770c,ihifi800: "취소하려면 홈 버튼을 누르세요."
@@ -14714,7 +14714,7 @@
   </dest>
   <voice>
     *: "취소하려면 왼쪽 버튼을 누르세요."
-    android,hifietma*,zenvision: "취소하려면 뒤로가기 버튼을 누르세요."
+    android,hifietma*: "취소하려면 뒤로가기 버튼을 누르세요."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "취소하려면 전원 버튼을 누르세요."
     ihifi760,ihifi960: "취소하려면 리턴 버튼을 두 번 탭하세요."
     ihifi770,ihifi770c,ihifi800: "취소하려면 홈 버튼을 누르세요."
@@ -15209,7 +15209,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
@@ -16972,5 +16972,19 @@
   </dest>
   <voice>
     *: "상태 발표"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_DIRECTORY
+  desc: file browser setting
+  user: core
+  <source>
+    *: "Always remember last folder"
+  </source>
+  <dest>
+    *: "항상 마지막 폴더 기억"
+  </dest>
+  <voice>
+    *: "항상 마지막 폴더 기억"
   </voice>
 </phrase>

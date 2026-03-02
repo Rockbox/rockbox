@@ -12682,7 +12682,7 @@
     *: ""
   </dest>
   <voice>
-    *: "označené"
+    *: "Označené"
   </voice>
 </phrase>
 <phrase>
@@ -15195,13 +15195,13 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
   </source>
   <dest>
-    *: "dAY"
+    *: "dAy"
   </dest>
   <voice>
     *: ""
