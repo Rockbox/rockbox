@@ -1283,7 +1283,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))
     {
-#ifdef HAVE_HOTSWAP
+#if NUM_DRIVES > 1
         if (btn == ACTION_STD_OK)
         {
             *cardnum ^= 0x1; /* change cards */
