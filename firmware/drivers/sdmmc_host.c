@@ -639,6 +639,7 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
     }
 
     host->initialized = true;
+    host->cardinfo.initialized = true;
     return 0;
 }
 
