@@ -28,6 +28,7 @@
 #include "regs/stm32h743/syscfg.h"
 
 #define PLL1Q_FREQ 48000000
+#define PLL3R_FREQ 6000000
 
 /* Flag to use VOS0 */
 #define STM32H743_USE_VOS0      (CPU_FREQ > 400000000)
@@ -44,21 +45,21 @@ INIT_ATTR static void init_pll(void)
     /* For simplicity, PLL parameters are hardcoded */
     _Static_assert(STM32_HSE_FREQ == 24000000,
                    "HSE frequency not correct");
-    _Static_assert(LCD_DOTCLOCK_FREQ == 6199200,
-                   "PLL3 parameters not correct for dot clock");
+    _Static_assert(LCD_DOTCLOCK_FREQ <= PLL3R_FREQ,
+                   "PLL3R too slow for LCD");
     _Static_assert(PLL1Q_FREQ == 48000000,
                    "PLL1Q parameters not correct");
 
     /*
      * Use HSE/4 input for PLL1
-     * Use HSE/16 input for PLL3
+     * Use HSE/12 input for PLL3
      * PLL2 reserved for audio; configured in target PCM code
      */
     reg_writef(RCC_PLLCKSELR,
                PLLSRC_V(HSE),
                DIVM1(4),
                DIVM2(0),
-               DIVM3(16));
+               DIVM3(12));
 
     /* Enable PLL1P, PLL1Q, PLL3R */
     reg_writef(RCC_PLLCFGR,
@@ -84,14 +85,11 @@ INIT_ATTR static void init_pll(void)
                DIVQ(10 - 1), /* 480 / 10 = 48 MHz  */
                DIVR(1 - 1));
 
-    reg_writef(RCC_PLL3FRACR, FRACN(1468));
     reg_writef(RCC_PLL3DIVR,
-               DIVN(161 - 1), /* approx 241.768 MHz */
+               DIVN(90 - 1),  /* 2 * 90 = 180 MHz */
                DIVP(1 - 1),
                DIVQ(1 - 1),
-               DIVR(39 - 1)); /* approx 6.1992 MHz */
-
-    reg_writef(RCC_PLLCFGR, PLL3FRACEN(1));
+               DIVR(30 - 1)); /* 180 / 30 = 6 MHz */
 
     reg_writef(RCC_CR, PLL1ON(1), PLL3ON(1));
     while (!reg_readf(RCC_CR, PLL1RDY));
@@ -191,7 +189,7 @@ const struct stm32_clock sdmmc1_ker_clock = {
 };
 
 const struct stm32_clock ltdc_ker_clock = {
-    .frequency = LCD_DOTCLOCK_FREQ,
+    .frequency = PLL3R_FREQ,
     .en_reg = ITA_RCC_APB3ENR,
     .en_bit = BM_RCC_APB3ENR_LTDCEN,
     .lpen_reg = ITA_RCC_APB3LPENR,
