@@ -168,7 +168,6 @@ static void set_frequency(int index)
     update_gen_step();
 
     rb->mixer_set_frequency(hw_sampr);
-    rb->pcm_apply_settings();
 }
 
 #ifndef HAVE_VOLUME_IN_LIST

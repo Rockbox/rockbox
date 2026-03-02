@@ -24,6 +24,5 @@
 -- [[ conversion to old style pcm_ functions ]]
 if not rb.pcm then rb.splash(rb.HZ, "No Support!") return nil end
 
-rb.pcm_apply_settings = function() rb.pcm("apply_settings") end
 rb.pcm_play_lock = function() rb.pcm("play_lock") end
 rb.pcm_play_unlock = function() rb.pcm("play_unlock") end

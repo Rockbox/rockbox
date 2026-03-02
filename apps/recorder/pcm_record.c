@@ -616,6 +616,10 @@ static void init_state(void)
     record_status = RECORD_STOPPED;
 }
 
+/* To avoid having to pull in all of pcm-internal.h */
+void pcm_set_frequency(unsigned int samplerate);
+void pcm_apply_settings(void);
+
 /* Set hardware samplerate and save it */
 static void update_samplerate_config(unsigned long sampr)
 {
@@ -876,7 +880,7 @@ copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
     int16_t *d = (int16_t*) dst;
     int16_t const *s = (int16_t const*) src;
     ssize_t copy_size = src_size;
- 
+
      /* mono = (L + R) / 2 */
     while(copy_size > 0) {
         *d++ = ((int32_t)s[0] + (int32_t)s[1] + 1) >> 1;

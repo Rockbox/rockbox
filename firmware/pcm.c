@@ -94,8 +94,6 @@ volatile pcm_status_callback_type
 /* PCM playback state */
 volatile bool pcm_playing SHAREDBSS_ATTR = false;
 
-void pcm_play_stop_int(void);
-
 struct pcm_sink* pcm_get_current_sink(void)
 {
     return sinks[cur_sink];

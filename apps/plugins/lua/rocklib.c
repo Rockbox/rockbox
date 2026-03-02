@@ -549,10 +549,10 @@ RB_WRAP(sound)
 
 RB_WRAP(pcm)
 {
-    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
+    enum e_pcm {PCM_PLAYLOCK = 0, PCM_PLAYUNLOCK,
                 PCM_ECOUNT};
 
-    const char *pcm_option[] = {"apply_settings", "play_lock", "play_unlock",
+    const char *pcm_option[] = {"play_lock", "play_unlock",
                                 NULL};
 
     lua_pushnil(L); /*push nil so options w/o return have something to return */
@@ -560,9 +560,6 @@ RB_WRAP(pcm)
     int option = luaL_checkoption (L, 1, NULL, pcm_option);
     switch(option)
     {
-        case PCM_APPLYSETTINGS:
-            rb->pcm_apply_settings();
-            break;
         case PCM_PLAYLOCK:
             rb->pcm_play_lock();
             break;

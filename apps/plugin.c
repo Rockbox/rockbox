@@ -644,7 +644,6 @@ static const struct plugin_api rockbox_api = {
 #endif
     &audio_master_sampr_list[0],
     &hw_freq_sampr[0],
-    pcm_apply_settings,
     pcm_play_lock,
     pcm_play_unlock,
     pcm_current_sink_caps,

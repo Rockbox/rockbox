@@ -64,7 +64,6 @@ void rockbox_open_audio(int rate)
 
     /* Set sample rate of the audio buffer. */
     rb->mixer_set_frequency(rate);
-    rb->pcm_apply_settings();
 
     /* Initialize output buffer. */
     for(i = 0; i < OUTBUFSIZE; i++)
@@ -86,7 +85,6 @@ void rockbox_close_audio(void)
 
     /* Restore default sampling rate. */
     rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
-    rb->pcm_apply_settings();
 }
 
 /* Rockbox audio callback. */

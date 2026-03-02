@@ -253,7 +253,6 @@ bool syssnd_init(void)
 #endif
 
     rb->mixer_set_frequency(HW_FREQ_44);
-    rb->pcm_apply_settings();
 
     rb->memset(channels, 0, sizeof(channels));
     rb->memset(mixBuffers, 0, sizeof(mixBuffers));
@@ -286,7 +285,6 @@ void syssnd_shutdown(void)
 
     /* Restore default sampling rate. */
     rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
-    rb->pcm_apply_settings();
 
     rb->talk_disable(false);
 

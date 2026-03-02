@@ -475,6 +475,9 @@ void mixer_set_frequency(unsigned int samplerate)
         mix_frame_size = 1;
 
     mix_frame_size *= MIX_FRAME_SAMPLES * 4;
+
+    if (pcm_is_initialized())
+        pcm_apply_settings();
 }
 
 /* Get output samplerate */

@@ -44,7 +44,7 @@ typedef void (*pcm_play_callback_type)(const void **start, size_t *size);
 /* Typedef for registered status callback */
 typedef enum pcm_dma_status (*pcm_status_callback_type)(enum pcm_dma_status status);
 
-/* set the pcm frequency - use values in hw_sampr_list 
+/* set the pcm frequency - use values in hw_sampr_list
  * when CONFIG_SAMPR_TYPES is #defined, or-in SAMPR_TYPE_* fields with
  * frequency value. SAMPR_TYPE_PLAY is 0 and the default if none is
  * specified. */
@@ -53,15 +53,6 @@ typedef enum pcm_dma_status (*pcm_status_callback_type)(enum pcm_dma_status stat
 unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate);
 #endif
 #endif /* CONFIG_SAMPR_TYPES */
-
-/* set next frequency to be used */
-void pcm_set_frequency(unsigned int samplerate);
-/* return last-set frequency */
-unsigned int pcm_get_frequency(void);
-/* apply settings to hardware immediately */
-void pcm_apply_settings(void);
-
-/** RAW PCM playback routines **/
 
 /* Reenterable locks for locking and unlocking the playback interrupt */
 void pcm_play_lock(void);
@@ -77,11 +68,6 @@ const struct pcm_sink_caps* pcm_sink_caps(enum pcm_sink_ids sink);
 /* shortcut for plugins */
 const struct pcm_sink_caps* pcm_current_sink_caps(void);
 
-/* This is for playing "raw" PCM data */
-void pcm_play_data(pcm_play_callback_type get_more,
-                   pcm_status_callback_type status_cb,
-                   const void *start, size_t size);
-
 /* Kept internally for global PCM and used by mixer's verion of peak
    calculation */
 struct pcm_peaks
@@ -91,9 +77,6 @@ struct pcm_peaks
     long period;    /* For tracking calling period */
     long tick;      /* Last tick called */
 };
-
-void pcm_play_stop(void);
-bool pcm_is_playing(void);
 
 #ifdef HAVE_RECORDING
 

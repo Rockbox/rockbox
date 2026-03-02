@@ -1754,10 +1754,6 @@ void pcmbuf_set_low_latency(bool state)
     \param state
     \description
 
-void pcm_apply_settings(void)
-    \group sound
-    \description
-
 void pcm_calculate_rec_peaks(int *left, int *right)
     \group sound
     \conditions (defined(HAVE_RECORDING))

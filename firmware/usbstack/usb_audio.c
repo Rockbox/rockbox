@@ -493,7 +493,6 @@ static void set_playback_sampling_frequency(unsigned long f)
         hw_freq_sampr[as_playback_freq_idx], f);
 
     mixer_set_frequency(hw_freq_sampr[as_playback_freq_idx]);
-    pcm_apply_settings();
 }
 
 unsigned long usb_audio_get_playback_sampling_frequency(void)
@@ -706,7 +705,6 @@ static void usb_audio_start_playback(void)
 #endif
     logf("usbaudio: start playback at %lu Hz", hw_freq_sampr[as_playback_freq_idx]);
     mixer_set_frequency(hw_freq_sampr[as_playback_freq_idx]);
-    pcm_apply_settings();
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_USBAUDIO, MIX_AMP_UNITY);
 
     usb_drv_recv_nonblocking(EP_ISO_OUT, rx_buffer, BUFFER_SIZE);
@@ -787,7 +785,7 @@ int usb_audio_get_alt_intf(void)
 {
     return usb_as_playback_intf_alt;
 }
-    
+
 int32_t usb_audio_get_samplesperframe(void)
 {
     return samples_fb;
@@ -1348,7 +1346,7 @@ bool usb_audio_fast_transfer_complete(int ep, int dir, int status, int length)
     {
         retval = false;
     }
-    
+
     // send feedback value every N frames!
     // NOTE: important that we need to queue this up _the frame before_ it's needed - on MacOS especially!
     if ((usb_drv_get_frame_number()+1) % FEEDBACK_UPDATE_RATE_FRAMES == 0 && send_fb)
