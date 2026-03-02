@@ -133,7 +133,7 @@ static const struct pingroup_setting pingroups[] = {
 INIT_ATTR static void fmc_init(void)
 {
     /* configure clock */
-    reg_writef(RCC_D1CCIPR, FMCSEL_V(AHB));
+    reg_writef(RCC_D1CCIPR, FMCSEL_V(PLL1Q));
 
     /* ungate FMC peripheral */
     reg_writef(RCC_AHB3ENR, FMCEN(1));

@@ -27,7 +27,7 @@
 #include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/syscfg.h"
 
-#define PLL1Q_FREQ 48000000
+#define PLL1Q_FREQ 240000000
 #define PLL3R_FREQ 6000000
 
 /* Flag to use VOS0 */
@@ -47,7 +47,7 @@ INIT_ATTR static void init_pll(void)
                    "HSE frequency not correct");
     _Static_assert(LCD_DOTCLOCK_FREQ <= PLL3R_FREQ,
                    "PLL3R too slow for LCD");
-    _Static_assert(PLL1Q_FREQ == 48000000,
+    _Static_assert(PLL1Q_FREQ == 240000000,
                    "PLL1Q parameters not correct");
 
     /*
@@ -82,7 +82,7 @@ INIT_ATTR static void init_pll(void)
     reg_writef(RCC_PLL1DIVR,
                DIVN(80 - 1), /* 6 * 80 = 480 MHz  */
                DIVP(1 - 1),  /* 480 / 1 = 480 MHz */
-               DIVQ(10 - 1), /* 480 / 10 = 48 MHz  */
+               DIVQ(2 - 1),  /* 480 / 2 = 240 MHz  */
                DIVR(1 - 1));
 
     reg_writef(RCC_PLL3DIVR,
