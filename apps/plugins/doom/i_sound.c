@@ -462,7 +462,7 @@ void get_more(const void** start, size_t* size)
    I_UpdateSound(); // Force sound update
 
    *start = mixbuffer;
-   *size = SAMPLECOUNT*2*sizeof(short);
+   *size = MIXBUFFERSIZE*sizeof(short);
 }
 
 
