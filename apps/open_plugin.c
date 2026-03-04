@@ -479,6 +479,10 @@ int open_plugin_run(const char *key)
 {
     int ret = 0;
     int opret = open_plugin_load_entry(key);
+    if (opret == OPEN_PLUGIN_NOT_FOUND) {
+        splashf(HZ*2, ID2P(LANG_PLUGIN_CANT_OPEN), key ? P2STR((unsigned char *)key) : "");
+        return ret;
+    }
     struct open_plugin_entry_t *op_entry = open_plugin_get_entry();
     if (opret == OPEN_PLUGIN_NEEDS_FLUSHED)
         op_update_dat(op_entry, false);
