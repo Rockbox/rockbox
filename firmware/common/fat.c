@@ -180,8 +180,8 @@ union raw_dirent
 
 struct fsinfo
 {
-    sector_t freecount; /* last known free cluster count */
-    sector_t nextfree;  /* first cluster to start looking for free
+    uint32_t freecount; /* last known free cluster count */
+    uint32_t nextfree;  /* first cluster to start looking for free
                            clusters, or 0xffffffff for no hint */
 };
 /* fsinfo offsets */
@@ -462,7 +462,7 @@ static int bpb_is_sane(struct bpb *fat_bpb)
     {
         DEBUGF("%s() - Error: FSInfo.Freecount > disk size "
                "(0x%04lx)\n", __func__,
-               (unsigned long)fat_bpb->fsinfo.freecount);
+               fat_bpb->fsinfo.freecount);
         return -4;
     }
 
@@ -959,7 +959,7 @@ static int update_fat_entry16(struct bpb *fat_bpb, unsigned long entry,
             fat_bpb->fsinfo.freecount++;
     }
 
-    DEBUGF("%lu free clusters\n", (unsigned long)fat_bpb->fsinfo.freecount);
+    DEBUGF("%lu free clusters\n", fat_bpb->fsinfo.freecount);
 
     sec[offset] = htole16(val);
     dc_dirty_buf(sec);
@@ -1116,7 +1116,7 @@ static int update_fat_entry32(struct bpb *fat_bpb, unsigned long entry,
             fat_bpb->fsinfo.freecount++;
     }
 
-    DEBUGF("%lu free clusters\n", (unsigned long)fat_bpb->fsinfo.freecount);
+    DEBUGF("%lu free clusters\n", fat_bpb->fsinfo.freecount);
 
     /* don't change top 4 bits */
     sec[offset] = htole32((curval & 0xf0000000) | (val & 0x0fffffff));
@@ -2967,8 +2967,8 @@ int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector)
     if (fat_bpb->fsinfo.freecount == 0xffffffff)
         fat_recalc_free(IF_MV(fat_bpb->volume));
 
-    DEBUGF("Freecount: %ld\n", (unsigned long)fat_bpb->fsinfo.freecount);
-    DEBUGF("Nextfree: 0x%lx\n", (unsigned long)fat_bpb->fsinfo.nextfree);
+    DEBUGF("Freecount: %ld\n", fat_bpb->fsinfo.freecount);
+    DEBUGF("Nextfree: 0x%lx\n", fat_bpb->fsinfo.nextfree);
     DEBUGF("Cluster count: 0x%lx\n", fat_bpb->dataclusters);
     DEBUGF("Sectors per cluster: %lu\n", fat_bpb->bpb_secperclus);
     DEBUGF("FAT sectors: 0x%lx\n", fat_bpb->fatsize);
