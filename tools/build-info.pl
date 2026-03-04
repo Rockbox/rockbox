@@ -31,6 +31,8 @@ foreach my $b (&stablebuilds) {
     }
 }
 
+print "\n";
+
 print "[status]\n";
 
 foreach my $b (&allbuilds) {
