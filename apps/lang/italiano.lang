@@ -14361,7 +14361,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14376,7 +14376,7 @@
   </source>
   <dest>
     *: "Premere LEFT per annullare."
-    android,hifietma*,zenvision: "Premere BACK per annullare."
+    android,hifietma*: "Premere BACK per annullare."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
     ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
@@ -14391,7 +14391,7 @@
   </dest>
   <voice>
     *: "Premere LEFT per annullare."
-    android,hifietma*,zenvision: "Premere BACK per annullare."
+    android,hifietma*: "Premere BACK per annullare."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
     ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
@@ -15195,13 +15195,13 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
   </source>
   <dest>
-    *: "dmY"
+    *: "dmy"
   </dest>
   <voice>
     *: ""
@@ -16958,5 +16958,19 @@
   </dest>
   <voice>
     *: "Annuncia Lo Stato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_DIRECTORY
+  desc: file browser setting
+  user: core
+  <source>
+    *: "Always remember last folder"
+  </source>
+  <dest>
+    *: "Ricorda sempre l'ultima cartella"
+  </dest>
+  <voice>
+    *: "Ricorda sempre l'ultima cartella"
   </voice>
 </phrase>
