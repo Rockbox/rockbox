@@ -1545,11 +1545,6 @@ void logf(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2)
     \param fmt
     \description
 
-const unsigned long *audio_master_sampr_list
-    \group sound
-    \return
-    \description
-
 const unsigned long *hw_freq_sampr
     \group sound
     \return

@@ -179,7 +179,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 280
+#define PLUGIN_API_VERSION 281
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -741,7 +741,6 @@ struct plugin_api {
     int32_t (*sound_get_pitch)(void);
     void (*sound_set_pitch)(int32_t pitch);
 #endif
-    const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
