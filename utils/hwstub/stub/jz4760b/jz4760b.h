@@ -15,7 +15,7 @@
 #ifndef __JZ4760B_H__
 #define __JZ4760B_H__
 
-#if defined(__ASSEMBLY__) || defined(__LANGUAGE_ASSEMBLY)
+#if defined(__ASSEMBLER__)
         #ifndef __MIPS_ASSEMBLER
                 #define __MIPS_ASSEMBLER
         #endif

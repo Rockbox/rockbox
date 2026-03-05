@@ -1,5 +1,5 @@
+#define __ASSEMBLER__
 #include "config.h"
-#define __ASSEMBLY__
 #include "cpu.h"
 
 OUTPUT_FORMAT("elf32-littlemips")

@@ -19,7 +19,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define ASM
 #include "config.h"
 #include "cpu.h"
 

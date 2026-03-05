@@ -485,7 +485,7 @@
 #define CEB_KERNEL    2    /* Count events in kernel mode EXL = ERL = 0 */
 #define CEB_EXL        1    /* Count events with EXL = 1, ERL = 0 */
 
-#ifndef __ASSEMBLY__
+#ifndef __ASSEMBLER__
 
 #define CAUSE_EXCCODE(x) ((CAUSEF_EXCCODE & (x->cp0_cause)) >> CAUSEB_EXCCODE)
 #define CAUSE_EPC(x) (x->cp0_epc + (((x->cp0_cause & CAUSEF_BD) >> CAUSEB_BD) << 2))
@@ -959,6 +959,6 @@ __BUILD_SET_C0(config,CP0_CONFIG)
 #define set_cp0_cause(x)    set_c0_cause(x)
 #define set_cp0_config(x)    set_c0_config(x)
      
-#endif /* !__ASSEMBLY__ */
+#endif /* !__ASSEMBLER__ */
 
 #endif /* _ASM_MIPSREGS_H */

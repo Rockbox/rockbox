@@ -40,7 +40,7 @@
 #define SHA1_SZ     20  /* bytes */
 #define SIGN_SZ     16
 
-#ifndef ASM
+#ifndef __ASSEMBLER__
 #define IM3INFO_SZ      (sizeof(struct Im3Info))
 #define IM3INFOSIGN_SZ  (offsetof(struct Im3Info, info_sign))
 
@@ -92,6 +92,6 @@ void im3_sign(uint32_t keyidx, void* data, uint32_t size, void* sign);
 void im3_crypt(enum hwkeyaes_direction direction,
                             struct Im3Info *hinfo, void *fw_addr);
 
-#endif /* ASM */
+#endif /* !__ASSEMBLER__ */
 
 #endif /* __CRYPTO_S5L8702_H__ */

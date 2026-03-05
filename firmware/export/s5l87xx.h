@@ -22,7 +22,7 @@
 #ifndef __S5L87XX_H__
 #define __S5L87XX_H__
 
-#ifndef ASM
+#ifndef __ASSEMBLER__
 #include <stdint.h>
 #endif
 

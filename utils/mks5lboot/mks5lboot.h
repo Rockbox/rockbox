@@ -30,7 +30,7 @@
 #define BIN_OFFSET      (CERT_OFFSET + ((CERT_SIZE + 0x3) & ~ 0x3))
 #define MAX_PAYLOAD     (DFU_MAXSIZE - BIN_OFFSET)
 
-#ifndef ASM
+#ifndef __ASSEMBLER__
 #include <stddef.h>
 #include <stdint.h>
 
@@ -124,6 +124,6 @@ void ipoddfu_debug(int debug);
 #ifdef __cplusplus
 };
 #endif
-#endif /* ASM */
+#endif /* __ASSEMBLER__ */
 
 #endif /* __MK6GBOOT_H__ */

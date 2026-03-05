@@ -1,4 +1,4 @@
-#define ASM
+#define __ASSEMBLER__
 #include "config.h"
 #include "cpu.h"
 #include "crypto-s5l8702.h"     /* IM3HDR_SZ */
