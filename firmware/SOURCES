@@ -697,8 +697,6 @@ target/arm/ipod/powermgmt-ipod-pcf.c
 
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/pp/i2c-pp.c
-#elif CONFIG_I2C == I2C_PNX0101
-target/arm/pnx0101/i2c-pnx0101.c
 #elif CONFIG_I2C == I2C_TCC780X
 target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
@@ -711,12 +709,6 @@ target/arm/s5l8702/i2c-s5l8702.c
 target/arm/rk27xx/i2c-rk27xx.c
 #elif CONFIG_I2C == I2C_IMX233
 target/arm/imx233/i2c-imx233.c
-#endif
-
-#if CONFIG_CPU == PNX0101
-target/arm/pnx0101/kernel-pnx0101.c
-target/arm/pnx0101/system-pnx0101.c
-target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == IMX233
@@ -871,8 +863,6 @@ target/arm/pp/audio-pp.c
 #endif /* SANSA_E200 */
 target/arm/pp/crt0-pp.S
 #endif
-#elif CONFIG_CPU == PNX0101
-target/arm/pnx0101/crt0-pnx0101.S
 #elif CONFIG_CPU==DM320
 target/arm/tms320dm320/crt0.S
 #elif CONFIG_CPU==S3C2440

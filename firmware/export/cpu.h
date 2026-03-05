@@ -41,9 +41,6 @@
 #if CONFIG_CPU == PP6100
 #include "pp6100.h"
 #endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
 #if CONFIG_CPU == S3C2440
 #include "s3c2440.h"
 #endif

@@ -63,7 +63,6 @@
 #define PP5022       5022
 #define PP5024       5024
 #define PP6100       6100
-#define PNX0101       101
 #define S3C2440      2440
 #define DSC25          25
 #define DM320         320
@@ -301,7 +300,6 @@ Lyre prototype 1 */
 #define I2C_COLDFIRE 3 /* Coldfire style */
 #define I2C_PP5002   4 /* PP5002 style */
 #define I2C_PP5020   5 /* PP5020 style */
-#define I2C_PNX0101  6 /* PNX0101 style */
 #define I2C_S3C2440  7
 #define I2C_PP5024   8 /* PP5024 style */
 #define I2C_IMX31L   9
@@ -688,7 +686,7 @@ Lyre prototype 1 */
 #endif
 
 /* define for all cpus from ARM7TDMI family (for specific optimisations) */
-#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
+#if defined(CPU_PP) || (CONFIG_CPU == DSC25)
 #define CPU_ARM7TDMI
 #endif
 
@@ -1150,7 +1148,6 @@ Lyre prototype 1 */
 #if defined(CPU_COLDFIRE) || \
     defined(CPU_PP) || \
     defined(CPU_S5L87XX) || \
-    (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == TCC7801)
 # define USE_IRAM
 
