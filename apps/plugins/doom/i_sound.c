@@ -51,16 +51,11 @@
 #define SAMPLECOUNT     128
 
 #define NUM_CHANNELS    24
-// It is 2 for 16bit, and 2 for two channels.
-#define BUFMUL          2
+#define BUFMUL      2             // 2 channels
+#define SAMPLESIZE  sizeof(short) // 16-bit
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
 
-#ifdef HW_HAVE_11
-#define SAMPLERATE  SAMPR_11 // 44100 22050 11025
-#else
-#define SAMPLERATE  SAMPR_44 // 44100 22050 11025
-#endif
-#define SAMPLESIZE  2      // 16bit
+static unsigned short samplerate;
 
 // The global mixing buffer.
 //  Basically, samples from all active internal channels
@@ -207,9 +202,9 @@ static void updateSoundParams(int handle, int volume, int seperation, int pitch)
    // Patched to shift left *then* divide, to minimize roundoff errors
    // as well as to use SAMPLERATE as defined above, not to assume 11025 Hz
    if (pitched_sounds)
-      channelinfo[slot].step = step + (((channelinfo[slot].samplerate<<16)/SAMPLERATE)-65536);
+      channelinfo[slot].step = step + (((channelinfo[slot].samplerate<<16)/samplerate)-65536);
    else
-      channelinfo[slot].step = ((channelinfo[slot].samplerate<<16)/SAMPLERATE);
+      channelinfo[slot].step = ((channelinfo[slot].samplerate<<16)/samplerate);
 
    // Separation, that is, orientation/stereo.
    //  range is: 1 - 256
@@ -265,7 +260,7 @@ void I_SetChannels()
    // This table provides step widths for pitch parameters.
    for (i=-128 ; i<128 ; i++)
       steptablemid[i]=2;
-//      steptablemid[i] = (int)(pow(1.2, ((double)i/(64.0*SAMPLERATE/11025)))*65536.0);
+//      steptablemid[i] = (int)(pow(1.2, ((double)i/(64.0*samplerate/11025)))*65536.0);
 
    // Generates volume lookup tables
    //  which also turn the unsigned samples
@@ -462,7 +457,7 @@ void get_more(const void** start, size_t* size)
    I_UpdateSound(); // Force sound update
 
    *start = mixbuffer;
-   *size = MIXBUFFERSIZE*sizeof(short);
+   *size = MIXBUFFERSIZE*SAMPLESIZE;
 }
 
 
@@ -480,9 +475,24 @@ void I_ShutdownSound(void)
    rb->mixer_set_frequency(HW_SAMPR_DEFAULT);
 }
 
+#if defined(SIMULATOR)
+#define PREFERRED_SAMPR SAMPR_44
+#else
+#define PREFERRED_SAMPR SAMPR_11
+#endif
+
 void I_InitSound()
 {
    int i;
+
+   const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
+   for (i = 0 ; i < caps->num_samprs; i++) {
+       if (caps->samprs[i] == PREFERRED_SAMPR)
+           break;
+   }
+   if (i == caps->num_samprs)
+       i = SAMPR_44;
+   samplerate = caps->samprs[i];
 
    // Initialize external data (all sounds) at start, keep static.
    printf( "I_InitSound: ");
@@ -493,11 +503,11 @@ void I_InitSound()
    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-   rb->mixer_set_frequency(SAMPLERATE);
+   rb->mixer_set_frequency(samplerate);
 
    vol_lookup=malloc(128*256*sizeof(int));
 
-   mixbuffer=malloc(MIXBUFFERSIZE*sizeof(short));
+   mixbuffer=malloc(MIXBUFFERSIZE*SAMPLESIZE);
    steptable=malloc(256*sizeof(int));
 
    for (i=1 ; i<NUMSFX ; i++)
