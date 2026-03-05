@@ -1,4 +1,6 @@
+#define __ASSEMBLER__
 #include "config.h"
+#include "cpu.h"
 
 /* These output formats should be in the config-files */
 
@@ -23,8 +25,6 @@ OUTPUT_FORMAT(elf32-littlemips)
 #endif /* CPU_PP */
 
 #if CONFIG_CPU==IMX31L
-/* No fudges! */
-#include "imx31l.h"
 #define DRAMSIZE ((MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE \
                   - CODEC_SIZE - QHARRAY_SIZE - FRAME_SIZE - TTB_SIZE)
 
@@ -53,17 +53,14 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA
 
 #elif CONFIG_CPU==S3C2440
-#include "cpu.h"
 /* must be 16Kb (0x4000) aligned */
 #define TTB_SIZE         (0x4000)
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
 #elif CONFIG_CPU==TCC7801
-#include "cpu.h"
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE
 
 #elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2
-#include "cpu.h"
 #define DRAMORIG DRAM_ORIG
 #if defined(AMS_LOWMEM) || (CONFIG_CPU == AS3525v2)
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - TTB_SIZE)
@@ -71,17 +68,13 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE)
 #endif
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
-#define ASM
-#include "cpu.h"
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE)
 #elif CONFIG_CPU==IMX233
-#include "cpu.h"
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - FRAME_SIZE - TTB_SIZE)
 #elif CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
 /* fake 'iram' region occupies first 16k */
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - 0x4000
 #elif CONFIG_CPU==X1000
-#include "cpu.h"
 #define DRAMSIZE (X1000_DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE)
 #endif
 
@@ -188,14 +181,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAMSIZE 0
 
 #elif CONFIG_CPU == IMX233
-#include "cpu.h"
 /* The IRAM is too small and already partly used by the core */
 #define DRAMORIG CACHED_DRAM_ADDR
 #define IRAM DRAM
 #define IRAMSIZE 0
 
 #elif CONFIG_CPU == STM32H743
-#include "cpu.h"
 #define DRAMORIG STM32_SDRAM1_BASE
 #define IRAM     DRAM
 #define IRAMSIZE 0
