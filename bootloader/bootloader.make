@@ -23,7 +23,7 @@ EXTRA_SPECIAL_LIBS = $(call a2lnk, $(CORE_LIBS))
 
 $(BOOTLINK): $(BOOTLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
-	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
+	$(call preprocess2file,$<,$@,)
 
 $(BUILDDIR)/bootloader.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(BOOTLINK)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \

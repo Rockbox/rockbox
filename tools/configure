@@ -4909,7 +4909,6 @@ export APPLICATION=${application}
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=${GCCOPTS}
 export TARGET_INC=${TARGET_INC}
-export LOADADDRESS=${loadaddress}
 export SHARED_LDFLAGS=${SHARED_LDFLAGS}
 export SHARED_CFLAGS=${SHARED_CFLAGS}
 export LDOPTS=${LDOPTS}

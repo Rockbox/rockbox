@@ -260,11 +260,11 @@ LINKROM := $(BUILDDIR)/rom.link
 
 $(LINKRAM): $(RAMLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
-	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
+	$(call preprocess2file,$<,$@,)
 
 $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
-	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
+	$(call preprocess2file,$<,$@,)
 
 # Note: make sure -Wl,--gc-sections comes before -T in the linker options.
 # Having the latter first caused crashes on (at least) mini2g.
