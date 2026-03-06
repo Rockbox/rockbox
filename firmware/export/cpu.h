@@ -78,7 +78,7 @@
 #include "x1000.h"
 #endif
 #if CONFIG_CPU == STM32H743
-#include "cpu-stm32h743.h"
+#include "stm32h743.h"
 #endif
 
 #endif /* __CPU_H */
