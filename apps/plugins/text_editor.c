@@ -21,6 +21,15 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
+
+#if defined(DEBUG) || defined(SIMULATOR)
+    #define logf(...) rb->debugf(__VA_ARGS__); rb->debugf("\n")
+#elif defined(ROCKBOX_HAS_LOGF)
+    #define logf rb->logf
+#else
+    #define logf(...) do { } while(0)
+#endif
+
 #define MAX_LINE_LEN 2048
 
 
@@ -37,6 +46,7 @@ static char copy_buffer[MAX_LINE_LEN];
 static char filename[MAX_PATH];
 static char eol[3];
 static bool newfile;
+static struct gui_synclist lists;
 
 #define ACTION_INSERT 0
 #define ACTION_GET    1
@@ -44,19 +54,14 @@ static bool newfile;
 #define ACTION_UPDATE 3
 #define ACTION_CONCAT 4
 
-static char* _do_action(int action, char* str, int line);
-#ifndef HAVE_ADJUSTABLE_CPU_FREQ
-#define do_action _do_action
-#else
-static char* do_action(int action, char* str, int line)
+static void cpuboost(int onoff)
 {
-    char *r;
-    rb->cpu_boost(1);
-    r = _do_action(action,str,line);
-    rb->cpu_boost(0);
-    return r;
-}
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost((onoff == 1) ? true : false);
+#else
+    (void)onoff;
 #endif
+}
 
 static char* _do_action(int action, char* str, int line)
 {
@@ -120,6 +125,16 @@ static char* _do_action(int action, char* str, int line)
     last_char_index = c;
     return &buffer[c];
 }
+
+static char* do_action(int action, char* str, int line)
+{
+    char *r;
+    cpuboost(1);
+    r = _do_action(action,str,line);
+    cpuboost(0);
+    return r;
+}
+
 static const char* list_get_name_cb(int selected_item, void* data,
                                     char* buf, size_t buf_len)
 {
@@ -189,16 +204,14 @@ static bool save_changes(int overwrite)
     }
 
     rb->lcd_clear_display();
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
-#endif
+    cpuboost(1);
+
     for (i=0;i<line_count;i++)
     {
         rb->fdprintf(fd,"%s%s", do_action(ACTION_GET, 0, i), eol);
     }
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
-#endif
+
+    cpuboost(0);
     rb->close(fd);
 
     if (newfile || !overwrite)
@@ -226,6 +239,7 @@ static int do_item_menu(int cur_sel)
 {
     int ret = MENU_RET_NO_UPDATE;
     MENUITEM_STRINGLIST(menu, "Line Options", NULL,
+                        "Find",
                         "Cut/Delete", "Copy",
                         "Insert Above", "Insert Below",
                         "Concat To Above",
@@ -233,18 +247,60 @@ static int do_item_menu(int cur_sel)
 
     switch (rb->do_menu(&menu, NULL, NULL, false))
     {
-        case 0: /* cut */
+        case 0: /* find*/
+        {
+            static char find_str[32] = "";
+            if (rb->kbd_input(find_str, sizeof(find_str), NULL) != 0)
+                break;
+
+            unsigned long last_tick;
+            int i = rb->gui_synclist_get_sel_pos(&lists) + 1;
+            rb->gui_synclist_draw(&lists);
+
+            rb->splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
+            last_tick = *(rb->current_tick) + HZ/4;
+
+            cpuboost(1);
+
+            for(; i < line_count; i++)
+            {
+                char *t = _do_action(ACTION_GET, 0, i);
+                //logf("find '%s' ln %d %s\n", find_str, i, t);
+
+                if (TIME_AFTER(*(rb->current_tick), last_tick + HZ/4))
+                {
+                    rb->splash_progress(i, line_count - i,
+                                    "%s (%s)", rb->str(LANG_SEARCH), rb->str(LANG_OFF_ABORT));
+                    if (rb->action_userabort(TIMEOUT_NOBLOCK))
+                        break;
+                    last_tick = *(rb->current_tick);
+                }
+
+                if (rb->strcasestr(t, find_str) != NULL)
+                {
+                    logf("found '%s' @ ln %d\n'%s'\n", find_str, i, t);
+                    break;
+                }
+            }
+            cpuboost(0);
+            if (i >= line_count)
+                rb->splash(HZ * 2, ID2P(LANG_FAILED));
+            else
+                rb->gui_synclist_select_item(&lists, i);
+            break;
+        }
+        case 1: /* cut */
             rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                         MAX_LINE_LEN);
             do_action(ACTION_REMOVE, 0, cur_sel);
             ret = MENU_RET_UPDATE;
         break;
-        case 1: /* copy */
+        case 2: /* copy */
             rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                         MAX_LINE_LEN);
             ret = MENU_RET_NO_UPDATE;
         break;
-        case 2: /* insert above */
+        case 3: /* insert above */
             if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN, NULL))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel);
@@ -252,7 +308,7 @@ static int do_item_menu(int cur_sel)
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 3: /* insert below */
+        case 4: /* insert below */
             if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN, NULL))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel+1);
@@ -260,17 +316,17 @@ static int do_item_menu(int cur_sel)
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 4: /* cat to above */
+        case 5: /* cat to above */
             if (cur_sel>0)
             {
                 do_action(ACTION_CONCAT,0,cur_sel);
                 ret = MENU_RET_UPDATE;
             }
         break;
-        case 5: /* save */
+        case 6: /* save */
             ret = MENU_RET_SAVE;
         break;
-        case 6: /* playback menu */
+        case 7: /* playback menu */
             if (!audio_buf)
                 playback_control(NULL);
             else
@@ -320,7 +376,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int fd;
 
-    struct gui_synclist lists;
     bool exit = false;
     int button;
     bool changed = false;
@@ -336,9 +391,9 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     buffer = rb->plugin_get_buffer(&buffer_size);
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
-#endif
+
+    cpuboost(1);
+
     if (parameter)
     {
 #ifdef HAVE_LCD_COLOR
@@ -382,9 +437,9 @@ enum plugin_status plugin_start(const void* parameter)
         newfile = true;
     }
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
-#endif
+
+    cpuboost(0);
+
     /* now dump it in the list */
     setup_lists(&lists,0);
     rb->lcd_update();
