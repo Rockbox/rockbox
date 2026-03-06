@@ -118,17 +118,17 @@ void lcd_enable_composite(bool enable)
     {
         IO_GIO_BITCLR2   = 0x80;
         vidtemp |= 0x2015;
-        IO_VID_ENC_DCLKCTL  = 0x0800;   
+        IO_VID_ENC_DCLKCTL  = 0x0800;
         IO_VID_ENC_DCLKPTN0 = 0x0001;
     }
-    
+
     IO_VID_ENC_VMOD = vidtemp;
 }
 
 /* Note this is expecting a screen size of 480x640 or 240x320, other screen
  * sizes need to be considered for fudge factors
  */
-#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
+//#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
 
 /* LCD init - based on code from ingenient-bsp/bootloader/board/dm320/splash.c
  *  and code by Catalin Patulea from the M:Robe 500i linux port
