@@ -1,4 +1,6 @@
+#define __ASSEMBLER__
 #include "config.h"
+#include "cpu.h"
 
 ENTRY(_vectors)
 
@@ -6,36 +8,11 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/tms320dm320/crt0.o)
 
-#ifndef LCD_NATIVE_WIDTH
-#define LCD_NATIVE_WIDTH LCD_WIDTH
-#endif
-
-#ifndef LCD_NATIVE_HEIGHT
-#define LCD_NATIVE_HEIGHT LCD_HEIGHT
-#endif
-
-/* must be 16Kb (0x4000) aligned */
-#define TTB_SIZE         (0x4000)
-
 /* Bootloader only uses/knows about the upper 32 M */
 #define DRAMSIZE    (MEMORYSIZE * 0x100000 / 2)
 #define DRAMORIG    CONFIG_SDRAM_START+DRAMSIZE
 
-#ifdef MROBE_500
-#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
-#define LCD_BUFFER_SIZE ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
-/* Give this some memory to allow it to align to the MMU boundary.
- * Note that since there are two buffers (YUV/RGB) it calculates the approximate
- * memory needed in steps of 1 Meg.
- */
-#define LCD_TTB_AREA    (0x100000*((LCD_BUFFER_SIZE>>19)+1))
-/* End of the audio buffer, where the codec buffer starts */
-#define TTB_BEGIN       (DRAMORIG + DRAMSIZE - LCD_TTB_AREA)
-#else
-#define LCD_BUFFER_SIZE (LCD_NATIVE_WIDTH*LCD_NATIVE_HEIGHT*2)
-#define LCD_TTB_AREA    (TTB_SIZE + LCD_BUFFER_SIZE)
-#define LCD_BEGIN       (DRAMORIG + DRAMSIZE - LCD_TTB_AREA)
-#endif
+#define LCD_BEGIN   (DRAMORIG + DRAMSIZE - LCD_TTB_AREA)
 
 #define IRAMORIG    0x00000000
 #define IRAMSIZE    0x4000
@@ -191,7 +168,7 @@ SECTIONS
     } > IRAM
 
 #ifdef MROBE_500
-    .ttbtable TTB_BEGIN (NOLOAD) :
+    .ttbtable LCD_BEGIN (NOLOAD) :
     {
         . = ALIGN (0x4000);
         _ttbstart = .;

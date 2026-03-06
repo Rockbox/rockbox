@@ -1,4 +1,6 @@
+#define __ASSEMBLER__
 #include "config.h"
+#include "cpu.h"
 
 ENTRY(_start)
 
@@ -6,33 +8,8 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/tms320dm320/crt0.o)
 
-#ifndef LCD_NATIVE_WIDTH
-#define LCD_NATIVE_WIDTH LCD_WIDTH
-#endif
-
-#ifndef LCD_NATIVE_HEIGHT
-#define LCD_NATIVE_HEIGHT LCD_HEIGHT
-#endif
-
-/* must be 16Kb (0x4000) aligned */
-#define TTB_SIZE        0x4000
-
 #define DRAMSIZE        (MEMORYSIZE * 0x100000)
 #define DRAMORIG        CONFIG_SDRAM_START
-
-
-#ifdef MROBE_500
-#define LCD_FUDGE       LCD_NATIVE_WIDTH%32
-#define LCD_BUFFER_SIZE ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
-/* Give this some memory to allow it to align to the MMU boundary.
- * Note that since there are two buffers (YUV/RGB) it calculates the approximate
- * memory needed in steps of 1 Meg.
- */
-#define LCD_TTB_AREA    (0x100000*((LCD_BUFFER_SIZE>>19)+1))
-#else
-#define LCD_BUFFER_SIZE (LCD_NATIVE_WIDTH*LCD_NATIVE_HEIGHT*2)
-#define LCD_TTB_AREA    (TTB_SIZE + LCD_BUFFER_SIZE)
-#endif
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  \
