@@ -50,5 +50,5 @@ $(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUG
 		-lgcc $(IMGDECLDFLAGS)
 
 $(IMGVBUILDDIR)/%.link: $(PLUGIN_LDS) $(IMGVBUILDDIR)/%.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DIMGVDECODER_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DIMGVDECODER_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(IMGVBUILDDIR)/$*.refmap))

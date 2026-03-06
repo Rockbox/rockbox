@@ -95,12 +95,12 @@ $(PLUGINLIB): $(PLUGINLIB_OBJ)
 $(PLUGINLINK_LDS): $(PLUGIN_LDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(shell mkdir -p $(dir $@))
-	$(call preprocess2file,$<,$@,)
+	$(call preprocess2file,$<,$@,-DPLUGIN)
 
 $(OVERLAYREF_LDS): $(PLUGIN_LDS)
 	$(call PRINTS,PP $(@F))
 	$(shell mkdir -p $(dir $@))
-	$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=0)
+	$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=0)
 
 $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,Create credits.raw)perl $(APPSDIR)/plugins/credits.pl < $< > $(BUILDDIR)/$(@F)

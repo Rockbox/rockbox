@@ -28,7 +28,7 @@ $(GOBAN_BUILDDIR)/goban.rock: $(GOBAN_OBJ)
 $(GOBAN_BUILDDIR)/goban.refmap: $(GOBAN_OBJ)
 
 $(GOBAN_OUTLDS): $(PLUGIN_LDS) $(GOBAN_BUILDDIR)/goban.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(GOBAN_BUILDDIR)/goban.refmap))
 
 $(GOBAN_BUILDDIR)/goban.ovl: $(GOBAN_OBJ) $(GOBAN_OUTLDS)

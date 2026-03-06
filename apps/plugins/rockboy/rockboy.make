@@ -29,7 +29,7 @@ $(ROCKBOY_OBJDIR)/rockboy.rock: $(ROCKBOY_OBJ)
 $(ROCKBOY_OBJDIR)/rockboy.refmap: $(ROCKBOY_OBJ)
 
 $(ROCKBOY_OUTLDS): $(PLUGIN_LDS) $(ROCKBOY_OBJDIR)/rockboy.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(ROCKBOY_OBJDIR)/rockboy.refmap))
 
 $(ROCKBOY_OBJDIR)/rockboy.ovl: $(ROCKBOY_OBJ) $(ROCKBOY_OUTLDS)

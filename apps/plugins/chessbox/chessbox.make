@@ -31,7 +31,7 @@ $(CHESSBOX_OBJDIR)/chessbox.rock: $(CHESSBOX_OBJ)
 $(CHESSBOX_OBJDIR)/chessbox.refmap: $(CHESSBOX_OBJ)
 
 $(CHESSBOX_OUTLDS): $(PLUGIN_LDS) $(CHESSBOX_OBJDIR)/chessbox.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(CHESSBOX_OBJDIR)/chessbox.refmap))
 
 $(CHESSBOX_OBJDIR)/chessbox.ovl: $(CHESSBOX_OBJ) $(CHESSBOX_OUTLDS)

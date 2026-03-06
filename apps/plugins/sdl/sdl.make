@@ -70,7 +70,7 @@ $(SDL_OBJDIR)/duke3d.rock: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB)
 $(SDL_OBJDIR)/duke3d.refmap: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB)
 
 $(DUKE3D_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/duke3d.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/duke3d.refmap))
 
 $(SDL_OBJDIR)/duke3d.ovl: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB) $(DUKE3D_OUTLDS)
@@ -87,7 +87,7 @@ $(SDL_OBJDIR)/wolf3d.rock: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB)
 $(SDL_OBJDIR)/wolf3d.refmap: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB)
 
 $(WOLF3D_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/wolf3d.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/wolf3d.refmap))
 
 $(SDL_OBJDIR)/wolf3d.ovl: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB) $(WOLF3D_OUTLDS)
@@ -105,7 +105,7 @@ $(SDL_OBJDIR)/quake.rock: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB)
 $(SDL_OBJDIR)/quake.refmap: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB)
 
 $(QUAKE_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/quake.refmap
-	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
 		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/quake.refmap))
 
 $(SDL_OBJDIR)/quake.ovl: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB) $(QUAKE_OUTLDS)
