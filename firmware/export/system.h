@@ -203,7 +203,7 @@ enum {
     MAXMEMGUARD
 };
 
-#if !defined(SIMULATOR) && !defined(__PCTOOL__) 
+#if !defined(SIMULATOR) && !defined(__PCTOOL__)
 #include "system-target.h"
 #elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"
@@ -326,7 +326,7 @@ static inline void cpu_boost_unlock(void)
 #define STORAGE_WANTS_ALIGN
 #endif
 
-#ifdef STORAGE_WANTS_ALIGN
+#if defined(STORAGE_WANTS_ALIGN) && !defined(SIMULATOR)
     #define STORAGE_ALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))
     #define STORAGE_ALIGN_DOWN(x) \
         ((typeof (x))ALIGN_DOWN_P2((uintptr_t)(x), CACHEALIGN_BITS))
