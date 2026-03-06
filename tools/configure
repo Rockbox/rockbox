@@ -4848,6 +4848,10 @@ if [ -n "$ARG_PLUGINS" ]; then
              echo "Warning: Plugin '$p' found neither as file nor directory in $chk_plugin_dir. Use ':' as the separator."
         fi
     done
+else
+    # Build the default set of plugins
+    selected_src="DEFAULT"
+    selected_subdirs="DEFAULT"
 fi
 
 ### end of cmdline
