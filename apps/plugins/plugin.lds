@@ -47,22 +47,16 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMORIG 0x0
 #define DRAMSIZE ((MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE \
                   - CODEC_SIZE - QHARRAY_SIZE - FRAME_SIZE - TTB_SIZE)
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU == S3C2440
 #define DRAMORIG 0x0
 #define DRAMSIZE ((MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE \
                   - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE)
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU==DM320
 #define DRAMORIG CONFIG_SDRAM_START
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA
-#define IRAM DRAM
 /* The bit of IRAM that is available is used in the core */
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU==TCC7801
 #define DRAMORIG 0x20000000
@@ -79,7 +73,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #elif CONFIG_CPU==AS3525v2 || (CONFIG_CPU == AS3525 && defined(AMS_LOWMEM))
 #define DRAMORIG DRAM_ORIG
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - TTB_SIZE)
-#define IRAMSIZE 0  /* simulates no IRAM since codec is already entirely in IRAM */
+/* No IRAM defined, instead IRAM is exclusively used for the entire codec */
 #define CODEC_ORIGIN (IRAM_ORIG + IRAM_SIZE - CODEC_SIZE)
 #define PLUGIN_ORIGIN (DRAM_ORIG + DRAMSIZE)
 
@@ -118,33 +112,23 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define DRAMORIG 0x80004000
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE - 0x4000
 /* The bit of IRAM that is available is used in the core */
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU == X1000
 #define DRAMORIG X1000_DRAM_BASE
 #define DRAMSIZE (X1000_DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE)
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU == RK27XX
 #define DRAMORIG 0x60000000
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU == IMX233
 /* The IRAM is too small and already partly used by the core */
 #define DRAMORIG CACHED_DRAM_ADDR
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - FRAME_SIZE - TTB_SIZE)
-#define IRAM DRAM
-#define IRAMSIZE 0
 
 #elif CONFIG_CPU == STM32H743
 #define DRAMORIG STM32_SDRAM1_BASE
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE - CODEC_SIZE
-#define IRAM     DRAM
-#define IRAMSIZE 0
 
 #else
 # error "DRAM/IRAM memory map not defined!"
@@ -175,10 +159,14 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define THIS_ORIGIN PLUGIN_ORIGIN
 #endif
 
+#if defined(USE_IRAM) && (!defined(IRAMORIG) || !defined(IRAMSIZE))
+# error "USE_IRAM is set, but no IRAM region is defined!"
+#endif
+
 MEMORY
 {
    PLUGIN_RAM : ORIGIN = THIS_ORIGIN, LENGTH = THIS_LENGTH
-#if defined(IRAMSIZE) && IRAMSIZE != 0
+#if defined(USE_IRAM)
    PLUGIN_IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 #endif
 }
@@ -194,9 +182,6 @@ SECTIONS
     .text :
     {
         *(.text*)
-#if defined(IRAMSIZE) && IRAMSIZE == 0
-		*(.icode)
-#endif
 #ifdef CPU_ARM
         *(.glue_7)
         *(.glue_7t)
@@ -206,17 +191,11 @@ SECTIONS
     .rodata :
     {
         *(.rodata*)
-#if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.irodata)
-#endif
     } > PLUGIN_RAM
 
     .data :
     {
         *(.data*)
-#if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.idata)
-#endif
     } > PLUGIN_RAM
 
 #if defined(NOCACHE_BASE)
@@ -237,6 +216,12 @@ SECTIONS
     /DISCARD/ :
     {
         *(.eh_frame)
+#if !defined(USE_IRAM)
+		*(.icode)
+        *(.irodata)
+        *(.idata)
+        *(.ibss)
+#endif
 #ifdef CPU_MIPS
         *(.MIPS.abiflags)
         *(.rel.dyn)
@@ -248,9 +233,6 @@ SECTIONS
     	plugin_bss_start = .;
     	_plugin_bss_start = .;
         *(.bss*)
-#if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.ibss)
-#endif
         *(COMMON)
         . = ALIGN(0x4);
     } > PLUGIN_RAM
@@ -295,7 +277,7 @@ SECTIONS
         plugin_end_addr = .;
     } > PLUGIN_RAM
 
-#if defined(IRAMSIZE) && IRAMSIZE != 0
+#if defined(USE_IRAM)
     .iram IRAMORIG : AT(LOADADDR(.bss))
     {
         iramstart = .;
