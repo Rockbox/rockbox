@@ -38,6 +38,7 @@
 
 /* DRAM starts at 0x10000000, but in Rockbox we remap it to 0x00000000 */
 #define DRAM_START       0x10000000
+#define NOCACHE_BASE     0x10000000
 
 /* Processor ID */
 #define PROCESSOR_ID     (*(volatile unsigned long *)(0x60000000))

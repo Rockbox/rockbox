@@ -15,14 +15,6 @@ OUTPUT_FORMAT(elf32-littlemips)
 #error Unknown CPU architecture
 #endif
 
-#if defined(CPU_PP)
-#ifdef CPU_PP502x
-#define NOCACHE_BASE 	0x10000000
-#else
-#define NOCACHE_BASE 	0x28000000
-#endif /* CPU_* */
-#endif /* CPU_PP */
-
 #if CONFIG_CPU==IMX31L
 #define DRAMSIZE ((MEMORYSIZE * 0x100000) - PLUGIN_BUFFER_SIZE \
                   - CODEC_SIZE - QHARRAY_SIZE - FRAME_SIZE - TTB_SIZE)
@@ -194,11 +186,6 @@ OUTPUT_FORMAT(elf32-littlemips)
 # error "DRAMORIG not defined!"
 #endif
 
-#ifndef NOCACHE_BASE
-/* Default to no offset if target doesn't define this */
-#define NOCACHE_BASE 0x00000000
-#endif
-
 #define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE
 
 
@@ -268,7 +255,7 @@ SECTIONS
 #endif
     } > PLUGIN_RAM
 
-#if NOCACHE_BASE != 0
+#if defined(NOCACHE_BASE)
     /*
      * Allocate .ncdata based on the following constraints:
      *
@@ -304,7 +291,7 @@ SECTIONS
         . = ALIGN(0x4);
     } > PLUGIN_RAM
 
-#if NOCACHE_BASE != 0
+#if defined(NOCACHE_BASE)
     /*
      * .ncbss has the same constraints as the .ncdata section
      * above but there is an extra complication: because it is
@@ -385,7 +372,7 @@ SECTIONS
     }
 }
 
-#if NOCACHE_BASE != 0
+#if defined(NOCACHE_BASE)
 /* Some asserts to make sure nocache sections appear correctly defined */
 ASSERT(LOADADDR(.ncdata) == ADDR(.ncdata) - NOCACHE_BASE, ".ncdata has incorrect LMA/VMA address");
 ASSERT(LOADADDR(.ncdata) % CACHEALIGN_SIZE == 0,          ".ncdata incorrectly aligned");

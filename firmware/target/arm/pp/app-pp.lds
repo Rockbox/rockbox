@@ -17,12 +17,6 @@ STARTUP(target/arm/pp/crt0-pp.o)
 #define IRAMORIG 0x40000000
 #define IRAMSIZE 0xc000
 
-#ifdef CPU_PP502x
-#define NOCACHE_BASE 	0x10000000
-#else
-#define NOCACHE_BASE 	0x28000000
-#endif
-
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 

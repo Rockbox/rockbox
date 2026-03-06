@@ -81,4 +81,25 @@
 # endif
 #endif
 
+/*
+ * Note: NOCACHE_BASE assumes that DRAM is linearly mapped both
+ * at a lower cached address and an upper uncached address, so
+ * that you can add NOCACHE_BASE to the cached DRAM address to
+ * get the corresponding uncached address.
+ *
+ * Defining NOCACHE_BASE is only required if you need plugins to
+ * be able to link data at uncached addresses. If in doubt, you
+ * don't need this. It's mainly of use for dual-core PortalPlayer
+ * targets which need to do this for things like mutexes/queues;
+ * since PP lacks hardware cache coherency, data which is writable
+ * by more than one core often needs to accessed uncached.
+ */
+#if defined(NOCACHE_BASE)
+# if !defined(HAVE_CPU_CACHE_ALIGN)
+#  error "NOCACHE_BASE cannot be defined on targets with no CPU cache!"
+# elif NOCACHE_BASE == 0
+#  error "NOCACHE_BASE cannot be 0!"
+# endif
+#endif
+
 #endif /* __CPU_H */

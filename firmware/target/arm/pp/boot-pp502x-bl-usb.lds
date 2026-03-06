@@ -10,7 +10,6 @@ STARTUP(target/arm/pp/crt0-pp502x-bl-usb.o)
 #define DRAMORIG        0x01000000 /* Load at 16 MB */
 #define DRAMSIZE        0x00100000 /* 1MB for bootloader */
 #define MEMEND          (MEMORYSIZE*0x100000) /* From virtual mapping at 0 */
-#define NOCACHE_BASE    0x10000000
 #ifndef IRAMORIG
 #define IRAMORIG 0x40000000
 #endif
