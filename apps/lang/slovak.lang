@@ -11782,10 +11782,10 @@
     *: "One per playlist"
   </source>
   <dest>
-    *: "Jedna na playlist"
+    *: "Jedna na plejlist"
   </dest>
   <voice>
-    *: "Jedna na playlist"
+    *: "Jedna na plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -12466,10 +12466,10 @@
     *: "Playlist elapsed:"
   </source>
   <dest>
-    *: "Playlist prehraté:"
+    *: "Plejlist uplynulo:"
   </dest>
   <voice>
-    *: "Playlist prehraté"
+    *: "Plejlist uplynulo"
   </voice>
 </phrase>
 <phrase>
@@ -12985,10 +12985,10 @@
     *: "Track elapsed:"
   </source>
   <dest>
-    *: "Stopa prehraté:"
+    *: "Stopa uplynulo:"
   </dest>
   <voice>
-    *: "Stopa prehraté"
+    *: "Stopa uplynulo"
   </voice>
 </phrase>
 <phrase>
@@ -13429,7 +13429,7 @@
     *: "Storage (Done / Remaining):"
   </source>
   <dest>
-    *: "Miesto: (dokončené / zostaáva)"
+    *: "Miesto: (dokončené/zostáva)"
   </dest>
   <voice>
     *: "Miesto"
@@ -13825,10 +13825,10 @@
     *: "Average bitrate:"
   </source>
   <dest>
-    *: "Priemerný bitrate:"
+    *: "Priemerná bitová rýchlosť:"
   </dest>
   <voice>
-    *: "Priemerný bitrate"
+    *: "Priemerná bitová rýchlosť"
   </voice>
 </phrase>
 <phrase>
@@ -13867,10 +13867,10 @@
     *: "Average track size:"
   </source>
   <dest>
-    *: "Priemerná dĺžka stopy:"
+    *: "Priemerná veľkosť stopy:"
   </dest>
   <voice>
-    *: "Priemerná dĺžka stopy"
+    *: "Priemerná veľkosť stopy"
   </voice>
 </phrase>
 <phrase>
@@ -14530,10 +14530,10 @@
     *: "Elapsed"
   </source>
   <dest>
-    *: "Trvanie"
+    *: "Uplynulo"
   </dest>
   <voice>
-    *: "Trvanie"
+    *: "Uplynulo"
   </voice>
 </phrase>
 <phrase>
@@ -15470,10 +15470,10 @@
     *: "Keep Current Track When Replacing Playlist"
   </source>
   <dest>
-    *: "Ponechať aktuálnu stopu pri nahradení playlistu"
+    *: "Ponechať aktuálnu stopu pri nahradení plejlistu"
   </dest>
   <voice>
-    *: "Ponechať aktuálnu stopu pri nahradení playlistu"
+    *: "Ponechať aktuálnu stopu pri nahradení plejlistu"
   </voice>
 </phrase>
 <phrase>

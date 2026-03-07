@@ -24,6 +24,7 @@
 # - Lianela Sky
 # - Guillermo Garcia Rojas
 # - Sergio Delgado
+# - Javier Gutiérrez Gertrúdix
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -276,10 +277,10 @@
     *: "Balance"
   </source>
   <dest>
-    *: "Balance"
+    *: "~Balance"
   </dest>
   <voice>
-    *: "Balance"
+    *: "~Balance"
   </voice>
 </phrase>
 <phrase>
@@ -4673,7 +4674,7 @@
     *: "No se puede abrir %s"
   </dest>
   <voice>
-    *: "No se puede abrir %s"
+    *: "No se puede abrir el complemento"
   </voice>
 </phrase>
 <phrase>
@@ -4684,10 +4685,10 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Error al cargar %s"
+    *: "Error al leer %s"
   </dest>
   <voice>
-    *: "Error al cargar %s"
+    *: "Error al leer archivo"
   </voice>
 </phrase>
 <phrase>
@@ -13004,20 +13005,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Error al recopilar información"
-  </dest>
-  <voice>
-    *: "Error al recopilar información"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYING_TIME
   desc: onplay menu
   user: core
@@ -14762,7 +14749,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14777,7 +14764,7 @@
   </source>
   <dest>
     *: "Presiona IZQUIERDA para cancelar."
-    android,hifietma*,zenvision: "Presiona ATRÁS para cancelar."
+    android,hifietma*: "Presiona ATRÁS para cancelar."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Presiona EL BOTÓN DE ENCENDIDO para cancelar."
     ihifi760,ihifi960: "Doble toque a VOLVER para cancelar."
     ihifi770,ihifi770c,ihifi800: "Presiona INICIO para cancelar."
@@ -14792,7 +14779,7 @@
   </dest>
   <voice>
     *: "Presiona IZQUIERDA para cancelar."
-    android,hifietma*,zenvision: "Presiona ATRÁS para cancelar."
+    android,hifietma*: "Presiona ATRÁS para cancelar."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Presiona EL BOTÓN DE ENCENDIDO para cancelar."
     ihifi760,ihifi960: "Doble toque a VOLVER para cancelar."
     ihifi770,ihifi770c,ihifi800: "Presiona INICIO para cancelar."
@@ -15287,7 +15274,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
@@ -15909,20 +15896,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Menú Principal Amaze"
-  </dest>
-  <voice>
-    *: "Menú Principal Amaze"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16172,34 +16145,6 @@
   </dest>
   <voice>
     *: "Ajustes Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Menú Mikmod"
-  </dest>
-  <voice>
-    *: "Menú Mik mod"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Menú Chessbox"
-  </dest>
-  <voice>
-    *: "Menú Chessbox"
   </voice>
 </phrase>
 <phrase>
@@ -16923,5 +16868,118 @@
   </dest>
   <voice>
     *: "Ordenar pistas de reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC-USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "DAC-USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Durante modo de solo carga USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Durante modo de solo carga USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "Durante modo de almacenamiento masivo USB"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "Durante modo de almacenamiento masivo USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "DAC-USB Activo"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "DAC-USB Activo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Anuncio de estado"
+  </dest>
+  <voice>
+    *: "Anuncio de estado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "Usar indicadores LED"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "Usar indicadores LED"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_DIRECTORY
+  desc: file browser setting
+  user: core
+  <source>
+    *: "Always remember last folder"
+  </source>
+  <dest>
+    *: "Recordar siempre la última carpeta"
+  </dest>
+  <voice>
+    *: "Recordar siempre la última carpeta"
   </voice>
 </phrase>
