@@ -106,9 +106,13 @@ static int find_extension(const char *ext)
 void spcf_read_command_line(const void* parameter)
 {
   int ix;
-
-  ix = find_extension( parameter - 3 + rb->strlen (parameter) );
-      
+  const char *ext = rb->strrchr(parameter, '.');
+  ix = (ext ? find_extension(ext+1) : -1);
+  if (ix < 0)
+  {
+    rb->splash(HZ*2, "Invalid extension");
+    return;
+  }
   file_type = extensions[ix].type;
   file_subtype = extensions[ix].subtype;
   rb->strlcpy(filenamebuf, parameter, MAXFILENAME - 10 + 1);
