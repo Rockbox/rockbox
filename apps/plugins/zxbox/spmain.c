@@ -47,6 +47,8 @@
 
 #include "zxbox_keyb.h"
 
+#include "tapefile.h"
+
 int endofsingle IBSS_ATTR;
 
 int sp_nosync IBSS_ATTR = 0;
@@ -519,4 +521,5 @@ void start_spectemu(const void *parameter)
   init_spect_key();
 
   run_singlemode();
+  close_tapefile(); /* Bugfix leak file handles */
 }
