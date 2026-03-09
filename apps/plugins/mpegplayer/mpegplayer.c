@@ -763,6 +763,12 @@ static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int min,
 
 static void draw_setfont(int font)
 {
+    if (font == FONT_UI)
+    {
+        int uifont = rb->global_status->font_id[SCREEN_MAIN];
+        if (uifont != FONT_SYSFIXED)
+            font = uifont;
+    }
     osd.font = font;
     mylcd_setfont(font);
 }
