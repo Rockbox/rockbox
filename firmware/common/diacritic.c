@@ -203,9 +203,15 @@ bool is_diacritic(const ucschar_t char_code, bool *is_rtl)
     static uint8_t diacritic_mru[MRU_MAX_LEN];
 
     uint8_t i, itmp;
-    uint8_t info, mru;
+    uint8_t mru;
+    uint16_t info;
 
-    const struct diac_range *diac;
+    const struct diac_range *diac = &diac_ranges[DIAC_NUM_RANGES - 1];
+
+    /* If the codepoint exceeds the terminating entry in our table
+       then treat it as non-diacritic. */
+    if (char_code >= diac->base)
+        goto bypass;
 
     /* Search in MRU */
     for (mru = 0, i = 0; mru < mru_len; mru++)
@@ -244,6 +250,8 @@ Found:
     diacritic_mru[0] = i;
 
     diac = &diac_ranges[i];
+
+bypass:
     info = diac->info;
 
     /* Update RTL */
