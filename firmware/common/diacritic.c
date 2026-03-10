@@ -272,7 +272,7 @@ bypass:
     if (is_rtl)
         *is_rtl = ((DIAC_RTL & info) == DIAC_RTL);
 
-    return (char_code < (diac->base + (info & DIAC_CNT)));
+    return char_code < (uint32_t)(diac->base + (info & DIAC_CNT));
 }
 #else /*BOOTLOADER*/
 inline bool is_diacritic(const ucschar_t char_code, bool *is_rtl)
