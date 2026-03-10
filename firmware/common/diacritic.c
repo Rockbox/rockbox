@@ -34,12 +34,20 @@
 /* Each diac_range_ struct defines a Unicode range that begins with
  * N diacritic characters, and continues with non-diacritic characters up to the
  * base of the next item in the array, [info] packs RTL status and the count of
- * diacritic chars after [base]. RTL occupies the MSB and CNT the (7) lower bits
+ * diacritic chars after [base]. RTL occupies the MSB and CNT the remaining bits
  */
+
+#ifdef UNICODE32
+//#define DIAC_UCSCHAR
+#endif
 
 struct diac_range
 {
-    uint16_t base; /* Not ucschar_t until we need >16b */
+#if defined(DIAC_UCSCHAR)
+    ucschar_t base;
+#else
+    uint16_t base;
+#endif
     uint16_t info; /* [RTL:1 CNT:15] */
 };
 
@@ -192,7 +200,13 @@ static const struct diac_range diac_ranges[] =
     DIAC_RANGE_ENTRY(0xfe20, 0xfe30, 0), /* v1.0 - v8.0 */
     DIAC_RANGE_ENTRY(0xfe70, 0xfe70, 1),
     DIAC_RANGE_ENTRY(0xff00, 0xff00, 0),
+    /* Final entry is a terminator */
+#if defined(UNICODE32) && defined(DIAC_UCSCHAR)
+    DIAC_RANGE_ENTRY(0x010efa, 0x010f00, 1),  /* v15.0 - v17.0 */
+    DIAC_RANGE_ENTRY(0x10ffff, 0xffff, 0),
+#else
     DIAC_RANGE_ENTRY(0xffff, 0xffff, 0),
+#endif
 };
 
 #define MRU_MAX_LEN 32
