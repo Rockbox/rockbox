@@ -87,15 +87,11 @@ ifeq ($(UNAME), Darwin)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 else
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
-	-Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox-.map
+	-Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
+endif
 	@mv $(BINARY) $(BINARY).elf
 	smdhtool --create "$(APP_TITLE)" "$(APP_DESCRIPTION)" "$(APP_AUTHOR)" $(APP_ICON) "rockbox.smdh"
 	3dsxtool $(BINARY).elf $(BINARY).3dsx --smdh="rockbox.smdh"
 	$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILDDIR)/banner.bnr"
 	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o "$(BUILDDIR)/icon.icn"
 	$(MAKEROM) -f cia -o "$(BINARY).cia" -target t -exefslogo $(MAKEROM_ARGS)
-ifndef DEBUG
-	$(SILENT)rm $(BINARY).elf
-endif
-endif
-
