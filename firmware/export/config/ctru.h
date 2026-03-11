@@ -22,6 +22,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* Define this if the LCD can shut down */
+#define HAVE_LCD_SHUTDOWN
+
 /* define this if you want album art for this target */
 #define HAVE_ALBUMART
 
