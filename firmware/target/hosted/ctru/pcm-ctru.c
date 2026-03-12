@@ -27,6 +27,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+#include <3ds/ndsp/ndsp.h>
+#include <3ds/ndsp/channel.h>
+#include <3ds/services/dsp.h>
+#include <3ds/synchronization.h>
+#include <3ds/allocator/linear.h>
+
 #include "config.h"
 #include "debug.h"
 #include "sound.h"
@@ -46,12 +53,6 @@
 #include "pcm_sampr.h"
 #include "pcm_mixer.h"
 #include "pcm_sink.h"
-
-#include <3ds/ndsp/ndsp.h>
-#include <3ds/ndsp/channel.h>
-#include <3ds/services/dsp.h>
-#include <3ds/synchronization.h>
-#include <3ds/allocator/linear.h>
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"

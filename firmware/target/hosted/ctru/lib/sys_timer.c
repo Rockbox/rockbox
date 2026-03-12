@@ -24,12 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "debug.h"
-#include "logf.h"
 
 #include <3ds/os.h>
+/* these include a couple of 3ds headers */
 #include "sys_thread.h"
 #include "sys_timer.h"
+
+#include "debug.h"
+#include "logf.h"
 
 #define CACHELINE_SIZE   128
 
@@ -283,7 +285,7 @@ void sys_timer_quit(void)
         /* Shutdown the timer thread */
         if (data->thread) {
             LightSemaphore_Release(&data->sem, 1);
-            Result res = threadJoin(data->thread, U64_MAX);
+            threadJoin(data->thread, U64_MAX);
             threadFree(data->thread);
             data->thread = NULL;
         }

@@ -23,12 +23,16 @@
 
 #include <stdbool.h>
 #include <stdbool.h>
-#include "config.h"
-#include "gcc_extensions.h"
 
 #include <3ds/types.h>
 #include <3ds/svc.h>
 #include "sys_timer.h"
+#ifdef BIT
+#undef BIT
+#endif
+
+#include "config.h"
+#include "gcc_extensions.h"
 
 #define HIGHEST_IRQ_LEVEL 1
 

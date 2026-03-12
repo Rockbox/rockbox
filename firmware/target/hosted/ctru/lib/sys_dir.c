@@ -19,19 +19,22 @@
  *
  ****************************************************************************/
 #define DIRFUNCTIONS_DEFINED
-#include "config.h"
 #include <errno.h>
 #include <string.h>
+#include "fs_defines.h"
+
+#include <3ds/archive.h>
+#include <3ds/util/utf.h>
+/* this includes a couple of 3ds headers */
+#include "sys_file.h"
+
+#include "config.h"
 #include "debug.h"
 #include "dir.h"
 #include "pathfuncs.h"
 #include "timefuncs.h"
 #include "system.h"
-#include "fs_defines.h"
-#include "sys_file.h"
 
-#include <3ds/archive.h>
-#include <3ds/util/utf.h>
 
 /* This file is based on firmware/common/dir.c */
 

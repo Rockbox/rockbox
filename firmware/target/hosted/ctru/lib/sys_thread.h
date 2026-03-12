@@ -22,11 +22,11 @@
 #ifndef __SYSTHREAD_H__
 #define __SYSTHREAD_H__
 
-#include "thread.h"
-
 #include <3ds/synchronization.h>
 #include <3ds/thread.h>
 #include <3ds/services/apt.h>
+
+#include "thread.h"
 
 /* Complementary atomic operations */
 bool _AtomicCAS(u32 *ptr, int oldval, int newval);

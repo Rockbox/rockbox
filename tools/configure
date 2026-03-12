@@ -939,7 +939,7 @@ devkitarmcc () {
         GCCOPTS=`echo $GCCOPTS | sed -e s/\ -Os/\ -Og/`
     fi
 
-    GCCOPTS="$GCCOPTS -fno-builtin -g -Wno-unused-result"
+    GCCOPTS="$GCCOPTS -fno-builtin -g -Wno-unused-result -Wno-char-subscripts"
     GCCOPTS="$GCCOPTS -I$DEVKITPRO/libctru/include -I$DEVKITPRO/portlibs/3ds/include"
     GCCOPTS="$GCCOPTS -mword-relocations -ffunction-sections -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft"
     GCCOPTS="$GCCOPTS -D_GNU_SOURCE=1 -D_REENTRANT -masm-syntax-unified"

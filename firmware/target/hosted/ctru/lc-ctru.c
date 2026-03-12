@@ -19,9 +19,15 @@
  *
  ****************************************************************************/
 #define RB_FILESYSTEM_OS
-#include <dlfcn.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* this is part of CTRDL and includes 3ds.h */
+#include <dlfcn.h>
+#ifdef RGB565
+#undef RGB565
+#endif
+
 #include "system.h"
 #include "load_code.h"
 #include "filesystem-ctru.h"

@@ -23,6 +23,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+
+/* this includes a couple of 3ds headers */
+#include "bfile.h"
+
+#include <3ds/types.h>
+#include <3ds/allocator/linear.h>
+#include <3ds/services/cfgu.h>
+
 #include "system.h"
 #include "kernel.h"
 #include "thread-ctru.h"
@@ -31,11 +39,6 @@
 #include "lcd-bitmap.h"
 #include "panic.h"
 #include "debug.h"
-
-#include <3ds/types.h>
-#include <3ds/allocator/linear.h>
-#include <3ds/services/cfgu.h>
-#include "bfile.h"
 
 const char      *audiodev = NULL;
 
@@ -94,7 +97,7 @@ void system_init(void)
     
     svcGetThreadPriority(&main_thread_priority, CUR_THREAD_HANDLE);
     if (main_thread_priority != 0x30) {
-        DEBUGF("warning, main_thread_priority = 0x%x\n", main_thread_priority);
+        DEBUGF("warning, main_thread_priority = 0x%lx\n", main_thread_priority);
     }
     
     /* check for New 3DS model */

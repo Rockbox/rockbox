@@ -10,6 +10,10 @@
 #include <math.h>
 
 #include <3ds/gfx.h>
+#ifdef RGB565
+#undef RGB565
+#endif
+
 #include <3ds/svc.h>
 #include <3ds/types.h>
 #include <3ds/thread.h>

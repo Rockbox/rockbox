@@ -22,16 +22,21 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <3ds/gfx.h>
+#ifdef RGB565
+#undef RGB565
+#endif
+
+#include <3ds/allocator/linear.h>
+#include <3ds/console.h>
+#include <3ds/services/cfgu.h>
+
 #include "debug.h"
 #include "system.h"
 #include "button-ctru.h"
 #include "screendump.h"
 #include "lcd-target.h"
-
-#include <3ds/gfx.h>
-#include <3ds/allocator/linear.h>
-#include <3ds/console.h>
-#include <3ds/services/cfgu.h>
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
@@ -186,7 +191,7 @@ void lcd_init_device(void)
     /* hidInit(); */
 
     u16 fb_width, fb_height;
-    u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
+    gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
     u32 bufsize = fb_width * fb_height * 2;
 
     dev_fb = (fb_data *) linearAlloc(bufsize);

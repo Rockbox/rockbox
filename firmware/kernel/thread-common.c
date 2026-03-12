@@ -231,7 +231,7 @@ void format_thread_name(char *buf, size_t bufsize,
     snprintf(buf, bufsize, fmt, name, thread->id);
 }
 
-#ifndef HAVE_SDL_THREADS
+#if !defined(HAVE_SDL_THREADS) && !defined(CTRU)
 /*---------------------------------------------------------------------------
  * Returns the maximum percentage of the stack ever used during runtime.
  *---------------------------------------------------------------------------
@@ -252,7 +252,7 @@ static unsigned int stack_usage(uintptr_t *stackptr, size_t stack_size)
 
     return usage;
 }
-#endif /* HAVE_SDL_THREADS */
+#endif /* !defined(HAVE_SDL_THREADS) && !defined(CTRU) */
 
 #if NUM_CORES > 1
 int core_get_debug_info(unsigned int core, struct core_debug_info *infop)

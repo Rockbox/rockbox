@@ -22,6 +22,11 @@
 #include <unistd.h>
 #include <stdbool.h>
 
+#include <3ds/types.h>
+#include <3ds/result.h>
+#include <3ds/services/mcuhwc.h>
+#include <3ds/services/ptmu.h>
+
 #include "config.h"
 #include "kernel.h"
 #include "powermgmt.h"
@@ -29,11 +34,6 @@
 #include "adc.h"
 #include "system.h"
 #include "debug.h"
-
-#include <3ds/types.h>
-#include <3ds/result.h>
-#include <3ds/services/mcuhwc.h>
-#include <3ds/services/ptmu.h>
 
 void mcuhwc_init(void)
 {

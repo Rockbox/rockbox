@@ -24,6 +24,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <utime.h>
+
+#include <3ds/archive.h>
+
 #include "config.h"
 #include "system.h"
 #include "file.h"
@@ -32,8 +35,6 @@
 #include "debug.h"
 #include "pathfuncs.h"
 #include "string-extra.h"
-
-#include <3ds/archive.h>
 
 void paths_init(void)
 {

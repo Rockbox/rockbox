@@ -18,19 +18,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define RB_FILESYSTEM_OS
-#include "config.h"
-#include "system.h"
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <utime.h>
+#include "fs_defines.h"
+
+/* this includes a couple of 3ds headers */
+#include "sys_file.h"
+
+#define RB_FILESYSTEM_OS
+#include "config.h"
+#include "system.h"
 #include "file.h"
 #include "debug.h"
 #include "string-extra.h"
-#include "fs_defines.h"
-#include "sys_file.h"
 
 /* This file is based on firmware/common/file.c */
 
