@@ -56,16 +56,15 @@ ENABLE_L2_CACHE := false
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-MAKEROM      ?= makerom
-MAKEROM_ARGS := -elf "$(BINARY).elf" -rsf "$(RSF_PATH)" -banner "$(BUILDDIR)/banner.bnr" -icon "$(BUILDDIR)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)" -DAPP_ENCRYPTED="$(APP_ENCRYPTED)" -DAPP_SYSTEM_MODE="$(SYSTEM_MODE)" -DAPP_SYSTEM_MODE_EXT="$(SYSTEM_MODE_EXT)" -DAPP_CATEGORY="$(CATEGORY)" -DAPP_USE_ON_SD="$(USE_ON_SD)" -DAPP_MEMORY_TYPE="$(MEMORY_TYPE)" -DAPP_CPU_SPEED="$(CPU_SPEED)" -DAPP_ENABLE_L2_CACHE="$(ENABLE_L2_CACHE)"
-MAKEROM_ARGS += -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
+SMDH_PATH   := $(BUILDDIR)/rockbox.smdh
+3DSX_PATH   := $(BUILDDIR)/rockbox.3dsx
 
-ifneq ($(strip $(LOGO)),)
-	MAKEROM_ARGS	+= -logo "$(LOGO)"
-endif
-ifneq ($(strip $(ROMFS)),)
-	MAKEROM_ARGS	+= -DAPP_ROMFS="$(ROMFS)"
-endif
+BANNER_PATH := $(BUILDDIR)/rockbox.bnr
+ICON_PATH   := $(BUILDDIR)/rockbox.icn
+CIA_PATH    := $(BUILDDIR)/rockbox.cia
+
+SMDHTOOL ?= smdhtool
+3DSXTOOL ?= 3dsxtool
 
 BANNERTOOL   ?= bannertool
 
@@ -81,17 +80,47 @@ else
 	BANNER_AUDIO_ARG := -a
 endif
 
-# main binary
+MAKEROM      ?= makerom
+MAKEROM_ARGS := -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)" \
+                -DAPP_ENCRYPTED="$(APP_ENCRYPTED)" -DAPP_SYSTEM_MODE="$(SYSTEM_MODE)" \
+                -DAPP_SYSTEM_MODE_EXT="$(SYSTEM_MODE_EXT)" -DAPP_CATEGORY="$(CATEGORY)" -DAPP_USE_ON_SD="$(USE_ON_SD)" \
+                -DAPP_MEMORY_TYPE="$(MEMORY_TYPE)" -DAPP_CPU_SPEED="$(CPU_SPEED)" \
+                -DAPP_ENABLE_L2_CACHE="$(ENABLE_L2_CACHE)" \
+                -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
+
+ifneq ($(strip $(LOGO)),)
+	MAKEROM_ARGS	+= -logo "$(LOGO)"
+endif
+ifneq ($(strip $(ROMFS)),)
+	MAKEROM_ARGS	+= -DAPP_ROMFS="$(ROMFS)"
+endif
+
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)
 ifeq ($(UNAME), Darwin)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
+	$(call PRINTS,LD $(@F))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 else
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
+	$(call PRINTS,LD $(@F))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
 	-Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 endif
-	@mv $(BINARY) $(BINARY).elf
-	smdhtool --create "$(APP_TITLE)" "$(APP_DESCRIPTION)" "$(APP_AUTHOR)" $(APP_ICON) "rockbox.smdh"
-	3dsxtool $(BINARY).elf $(BINARY).3dsx --smdh="rockbox.smdh"
-	$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILDDIR)/banner.bnr"
-	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o "$(BUILDDIR)/icon.icn"
-	$(MAKEROM) -f cia -o "$(BINARY).cia" -target t -exefslogo $(MAKEROM_ARGS)
+
+$(SMDH_PATH): $(APP_ICON)
+	$(SMDHTOOL) --create "$(APP_TITLE)" "$(APP_DESCRIPTION)" "$(APP_AUTHOR)" $< $@
+
+$(3DSX_PATH): $(BUILDDIR)/$(BINARY) $(SMDH_PATH)
+	$(3DSXTOOL) $< $@ --smdh=$(SMDH_PATH)
+
+$(BANNER_PATH): $(BANNER_IMAGE) $(BANNER_AUDIO)
+	$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) $(BANNER_IMAGE) $(BANNER_AUDIO_ARG) $(BANNER_AUDIO) -o $@
+
+$(ICON_PATH): $(APP_ICON)
+	$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i $< -f $(ICON_FLAGS) -o $@
+
+$(CIA_PATH): $(BUILDDIR)/$(BINARY) $(RSF_PATH) $(BANNER_PATH) $(ICON_PATH)
+	$(MAKEROM) -f cia -o $@ -target t -exefslogo -elf $< -rsf $(RSF_PATH) -banner $(BANNER_PATH) \
+	-icon $(ICON_PATH) $(MAKEROM_ARGS)
+
+# add dependencies to build the packages
+CTRU_PACKAGES := $(3DSX_PATH) $(CIA_PATH)
+
+build: $(CTRU_PACKAGES)
+bin: $(CTRU_PACKAGES)

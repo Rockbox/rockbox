@@ -750,7 +750,7 @@ sub runone {
 
         # add hbmenu shortcut and cia file to zip file
         if ($modelname =~ /ctru/) {
-            move("rockbox.cia", "3ds");
+            copy("rockbox.cia", "3ds");
             copy("$ROOT/packaging/ctru/rockbox.xml", "3ds");
 
             system("$ziptool -u $output 3ds/rockbox.xml $target >/dev/null");

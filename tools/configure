@@ -4159,7 +4159,7 @@ fi
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox"
+    output="rockbox.elf"
     bootoutput="rockbox"
     appextra="recorder:gui"
     plugins="yes"
