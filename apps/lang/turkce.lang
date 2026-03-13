@@ -1718,8 +1718,8 @@
   <dest>
     *: none
     rtc: "Açma Tuşu = Ayarla"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SEÇ Tuşu = Ayarla"
     aigoerosq,erosqnative,gogearsa9200,samsungyh*,xduoox3*: "PLAY Tuşu = Ayarla"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SEÇ Tuşu = Ayarla"
     iriverh100,iriverh120,iriverh300: "NAVI Tuşu = Ayarla"
     mpiohd300: "Tamam Tuşu = Ayarla"
     mrobe500: "Kalp Tuşu = Ayarla"
@@ -1727,7 +1727,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -1751,8 +1750,8 @@
   <dest>
     *: none
     rtc: "OFF = Geri Döndür"
-    gigabeatfx,mrobe500: "POWER = Geri Döndür"
     aigoerosq,erosqnative,gigabeats,sansafuzeplus,xduoox3*: "LEFT =  Revert"
+    gigabeatfx,mrobe500: "POWER = Geri Döndür"
     gogearsa9200: "LEFT = Geri Döndür"
     iaudiom5,iaudiox5: "RECORD = Geri Döndür"
     ipod*,mpiohd300,sansac200*: "MENU = Geri Döndür"
@@ -1764,7 +1763,6 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3458,23 +3456,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types: ""
-  </source>
-  <dest>
-    *: none
-    battery_types: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -4894,7 +4875,7 @@
     *: "%s açılamadı"
   </dest>
   <voice>
-    *: ""
+    *: "Eklenti açılamadı"
   </voice>
 </phrase>
 <phrase>
@@ -7548,20 +7529,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CATALOG
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
   user: core
@@ -9135,23 +9102,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTO
   desc: in sound settings
   user: core
@@ -10524,11 +10474,11 @@
   </source>
   <dest>
     *: none
-    radio: "Taranıyor %d.%02d MHz"
+    radio: "%d taranıyor.%02d MHz"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Taranıyor"
   </voice>
 </phrase>
 <phrase>
@@ -11040,10 +10990,10 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Okunamadı %s"
+    *: "%s okunamadı"
   </dest>
   <voice>
-    *: ""
+    *: "Dosya okunamadı"
   </voice>
 </phrase>
 <phrase>
@@ -11896,23 +11846,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    battery_types,xduoox3: ""
-  </source>
-  <dest>
-    *: none
-    battery_types,xduoox3: ""
-  </dest>
-  <voice>
-    *: none
-    battery_types,xduoox3: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_ALBUMARTIST
   desc: in tag viewer
   user: core
@@ -12491,20 +12424,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYTIME_REMAINING
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYTIME_TRK_REMAINING
   desc: playing time screen
   user: core
@@ -12586,20 +12505,6 @@
   </dest>
   <voice>
     *: "Ortalama bit hızı"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYTIME_ERROR
-  desc: playing time screen
-  user: core
-  <source>
-    *: "Error while gathering info"
-  </source>
-  <dest>
-    *: "Bilgi toplanırken hata oluştu"
-  </dest>
-  <voice>
-    *: "Bilgi toplanırken hata oluştu"
   </voice>
 </phrase>
 <phrase>
@@ -14056,16 +13961,16 @@
 </phrase>
 <phrase>
   id: LANG_TOGGLE_ITEM
-  desc: in main_menu_config
+  desc: deprecated
   user: core
   <source>
-    *: "Toggle Item"
+    *: ""
   </source>
   <dest>
-    *: "Öğeyi Aç/Kapat"
+    *: ""
   </dest>
   <voice>
-    *: "Öğeyi Aç Kapat"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14126,13 +14031,13 @@
 </phrase>
 <phrase>
   id: LANG_MAIN_MENU_ORDER
-  desc: main_menu_config plugin title
+  desc: deprecated
   user: core
   <source>
-    *: "Rockbox Main Menu Order"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox Ana Menü Sıralaması"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -14636,20 +14541,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CACHE_REBUILT_NEXT_RESTART
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ERROR_WRITING_CONFIG
   desc: in the pictureflow splash messages
   user: core
@@ -14781,7 +14672,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14796,14 +14687,14 @@
   </source>
   <dest>
     *: "İptal etmek için SOL tuşuna basın."
-    android,hifietma*,zenvision: "İptal etmek için GERİ tuşuna basın."
+    android,hifietma*: "İptal etmek için GERİ tuşuna basın."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "İptal etmek için GÜÇ'e basın."
     ihifi760,ihifi960: "İptal etmek için GERİ DÖN'e iki kez dokunun."
     ihifi770,ihifi770c,ihifi800: "İptal etmek için EV TUŞUNA basın."
     iriverh10: "Dİptal etmek için SOL'a iki kez dokunun."
+    samsungyh*: "İptal etmek için SOL'a iki kez dokunun."
     mpiohd200,mpiohd300: "İptal etmek için KAYIT'a iki kez dokunun."
     rx27generic: "İptal etmek için VOLUME'a basın."
-    samsungyh*: "İptal etmek için SOL'a iki kez dokunun."
     sonynwza860: "Tuş haritaları eksik."
     touchscreen: "İptal etmek için Orta Sol'a basın."
     vibe500: "İptal etmek için PREV'e basın."
@@ -14811,7 +14702,7 @@
   </dest>
   <voice>
     *: "İptal etmek için SOL tuşuna basın."
-    android,hifietma*,zenvision: "İptal etmek için GERİ tuşuna basın."
+    android,hifietma*: "İptal etmek için GERİ tuşuna basın."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "İptal etmek için GÜÇ'e basın."
     ihifi760,ihifi960: "İptal etmek için GERİ DÖN'e iki kez dokunun."
     ihifi770,ihifi770c,ihifi800: "İptal etmek için EV TUŞUNA basın."
@@ -15305,7 +15196,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
@@ -15927,20 +15818,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AMAZE_MENU
-  desc: Amaze game
-  user: core
-  <source>
-    *: "Amaze Main Menu"
-  </source>
-  <dest>
-    *: "Amaze Ana Menü"
-  </dest>
-  <voice>
-    *: "Amaze Ana Menü"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_MAZE_SIZE
   desc: Maze size in Amaze game
   user: core
@@ -16274,34 +16151,6 @@
   </dest>
   <voice>
     *: "Mik mod Ayarları"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MIKMOD_MENU
-  desc: mikmod plugin
-  user: core
-  <source>
-    *: "Mikmod Menu"
-  </source>
-  <dest>
-    *: "Mikmod Menüsü"
-  </dest>
-  <voice>
-    *: "Mik mod Menüsü"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHESSBOX_MENU
-  desc: chessbox plugin
-  user: core
-  <source>
-    *: "Chessbox Menu"
-  </source>
-  <dest>
-    *: "Chessbox Menüsü"
-  </dest>
-  <voice>
-    *: "Satranç kutusu Menüsü"
   </voice>
 </phrase>
 <phrase>
@@ -16983,5 +16832,146 @@
   </dest>
   <voice>
     *: "Şuna göre parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB sadece şarj modundayken"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB sadece şarj modundayken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usbdac: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB yığın depolama modundayken"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB yığın depolama modundayken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: none
+    usbdac: "USB-DAC Active"
+  </source>
+  <dest>
+    *: none
+    usbdac: "USB-DAC Aktif"
+  </dest>
+  <voice>
+    *: none
+    usbdac: "USB-DAC Aktif"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_STATUS
+  desc: announnnce_status plugin
+  user: core
+  <source>
+    *: "Announce Status"
+  </source>
+  <dest>
+    *: "Durumu Bildir"
+  </dest>
+  <voice>
+    *: "Durumu Bildir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS_SORTED_BY_ALBUM
+  desc: "[By album]" entry in tag browser
+  user: core
+  <source>
+    *: "[By album]"
+  </source>
+  <dest>
+    *: "[Albüme göre]"
+  </dest>
+  <voice>
+    *: "Albüme göre sıralanmış parçalar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_PLAYLISTS
+  desc: playlists sorting setting
+  user: core
+  <source>
+    *: "Sort Playlists"
+  </source>
+  <dest>
+    *: "Çalma Listelerini Sırala"
+  </dest>
+  <voice>
+    *: "çalma listelerini sırala"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_LED_INDICATORS
+  desc: LED indicators setting
+  user: core
+  <source>
+    *: none
+    general_purpose_led: "Use LED indicators"
+  </source>
+  <dest>
+    *: none
+    general_purpose_led: "LED göstergesini kullanın"
+  </dest>
+  <voice>
+    *: none
+    general_purpose_led: "LED göstergesini kullanın"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_DIRECTORY
+  desc: file browser setting
+  user: core
+  <source>
+    *: "Always remember last folder"
+  </source>
+  <dest>
+    *: "En son dosyayı her zaman hatırla"
+  </dest>
+  <voice>
+    *: "En son dosyayı her zaman hatırla"
   </voice>
 </phrase>
