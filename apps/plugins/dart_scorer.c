@@ -9,7 +9,7 @@
 #define BUTTON_COLS 5
 
 #define REC_HEIGHT (int)(LCD_HEIGHT / (BUTTON_ROWS + 1))
-#define REC_WIDTH (int)(LCD_WIDTH / BUTTON_COLS)
+#define REC_WIDTH (int)(LCD_WIDTH / BUTTON_COLS) 
 
 #define Y_7_POS (LCD_HEIGHT)           /* Leave room for the border */
 #define Y_6_POS (Y_7_POS - REC_HEIGHT) /* y6 = 63 */
@@ -48,6 +48,7 @@
 
 #define NUM_PLAYERS 2
 #define MAX_UNDO 100
+#define CENTRE_X (LCD_WIDTH/2)
 
 static const struct button_mapping *plugin_contexts[] = {pla_main_ctx};
 
@@ -72,12 +73,12 @@ static bool loaded = false;     /* has a save been loaded? */
 int btn_row, btn_col;           /* current position index for button */
 int prev_btn_row, prev_btn_col; /* previous cursor position      */
 unsigned char *buttonChar[6][5] = {
-    {"", "Single", "Double", "Triple", ""},
+    {"", "x1", "x2", "x3", ""},
     {"1", "2", "3", "4", "5"},
     {"6", "7", "8", "9", "10"},
     {"11", "12", "13", "14", "15"},
     {"16", "17", "18", "19", "20"},
-    {"", "Missed", "Bull", "Undo", ""}};
+    {"", "Miss", "Bull", "Undo", ""}};
 int modifier;
 
 static int do_dart_scorer_pause_menu(void);
@@ -146,22 +147,34 @@ static void draw(void)
 {
     rb->lcd_clear_display();
 
-    char buf[32];
+    unsigned int w,h;
+    char buf[16];
 
-    int x = 5;
-    int y = 10;
-    for (int i = 0; i < NUM_PLAYERS; ++i, x = x + 95)
-    {
-        char *turn_marker = (i == settings.turn) ? "*" : "";
-        rb->snprintf(buf, sizeof(buf), "%sPlayer %d: %d", turn_marker, i + 1, settings.scores[i]);
-        rb->lcd_putsxy(x, y, buf);
-    }
-    int throws_x = (LCD_WIDTH / 2) - 10;
-    char throws_buf[3];
+    char *turn_marker;
+
+    /* player 1 score */
+    turn_marker = (0 == settings.turn) ? "*" : "";
+#if LCD_HEIGHT <= 64 || LCD_WIDTH <= 96
+    rb->snprintf(buf, sizeof(buf), "%sP1 %d", turn_marker, settings.scores[0]);
+#else
+    rb->snprintf(buf, sizeof(buf), "%sPlayer 1: %d", turn_marker, settings.scores[0]);
+#endif
+    rb->lcd_putsxy(0, 10, buf);
+
+    /* player 2 score */
+    turn_marker = (1 == settings.turn) ? "*" : "";
+#if LCD_HEIGHT <= 64 || LCD_WIDTH <= 96
+    rb->snprintf(buf, sizeof(buf), "%sP2 %d", turn_marker, settings.scores[1]);
+#else
+    rb->snprintf(buf, sizeof(buf), "%sPlayer 2: %d", turn_marker, settings.scores[1]);
+#endif
+    rb->lcd_getstringsize(buf, &w, &h);
+    rb->lcd_putsxy(LCD_WIDTH - w, 10, buf);
+
+    int throws_x = CENTRE_X - 5;
     for (int i = 0; i < settings.throws; ++i, throws_x += 5)
     {
-        rb->strcat(throws_buf, "1");
-        rb->lcd_putsxy(throws_x, y, "|");
+        rb->lcd_putsxy(throws_x, 10, "|");
     }
 
     drawButtons();
@@ -324,11 +337,11 @@ static enum plugin_status do_game(bool newgame)
         switch (button)
         {
         case DARTS_SELECT:
-            if ((!rb->strcmp(selected, "")) || (!rb->strcmp(selected, "Single")))
+            if ((!rb->strcmp(selected, "")) || (!rb->strcmp(selected, "x1")))
                 modifier = 1;
-            else if (!rb->strcmp(selected, "Double"))
+            else if (!rb->strcmp(selected, "x2"))
                 modifier = 2;
-            else if (!rb->strcmp(selected, "Triple"))
+            else if (!rb->strcmp(selected, "x3"))
                 modifier = 3;
             else if (!rb->strcmp(selected, "Undo"))
             {
