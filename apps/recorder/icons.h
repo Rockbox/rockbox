@@ -126,7 +126,7 @@ extern const unsigned char bitmap_icon_disk[];
 
 #define STATUSBAR_X_POS       0
 #define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */
-#define STATUSBAR_HEIGHT      SYSFONT_HEIGHT
+#define STATUSBAR_HEIGHT      12
 #define STATUSBAR_WIDTH       LCD_WIDTH
 #define SB_ICON_HEIGHT        8 /* ... for now */
 #define ICON_BATTERY_X_POS    0
