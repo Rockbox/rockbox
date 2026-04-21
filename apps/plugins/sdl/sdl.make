@@ -71,7 +71,7 @@ $(SDL_OBJDIR)/duke3d.refmap: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB)
 
 $(DUKE3D_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/duke3d.refmap
 	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
-		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/duke3d.refmap))
+		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/duke3d.refelf))
 
 $(SDL_OBJDIR)/duke3d.ovl: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB) $(DUKE3D_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
@@ -88,7 +88,7 @@ $(SDL_OBJDIR)/wolf3d.refmap: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB)
 
 $(WOLF3D_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/wolf3d.refmap
 	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
-		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/wolf3d.refmap))
+		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/wolf3d.refelf))
 
 $(SDL_OBJDIR)/wolf3d.ovl: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB) $(WOLF3D_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
@@ -106,7 +106,7 @@ $(SDL_OBJDIR)/quake.refmap: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB)
 
 $(QUAKE_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/quake.refmap
 	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
-		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/quake.refmap))
+		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/quake.refelf))
 
 $(SDL_OBJDIR)/quake.ovl: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB) $(QUAKE_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \

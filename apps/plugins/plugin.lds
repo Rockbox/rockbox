@@ -310,6 +310,9 @@ SECTIONS
     	plugin_load_end_addr = .;
     }
 
+    _plugin_ram_end = ORIGIN(PLUGIN_RAM) + LENGTH(PLUGIN_RAM);
+    plugin_ram_end = ORIGIN(PLUGIN_RAM) + LENGTH(PLUGIN_RAM);
+
     /* Special trick to avoid a linker error when no other sections are
        left after garbage collection (plugin not for this platform) */
     .comment 0 :

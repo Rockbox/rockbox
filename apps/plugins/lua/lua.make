@@ -66,7 +66,7 @@ $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
 $(LUA_OUTLDS): $(PLUGIN_LDS) $(LUA_BUILDDIR)/lua.refmap
 	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DPLUGIN -DOVERLAY_OFFSET=$(shell \
-		$(TOOLSDIR)/ovl_offset.pl $(LUA_BUILDDIR)/lua.refmap))
+		$(TOOLSDIR)/ovl_offset.pl $(LUA_BUILDDIR)/lua.refelf))
 
 $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(TLSFLIB) $(LUA_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
