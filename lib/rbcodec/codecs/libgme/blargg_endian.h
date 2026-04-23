@@ -33,10 +33,8 @@
 #if defined (LSB_FIRST) || defined (__LITTLE_ENDIAN__) || defined (BLARGG_CPU_X86) || \
 		(defined (LITTLE_ENDIAN) && LITTLE_ENDIAN+0 != 1234)
 	#define BLARGG_LITTLE_ENDIAN 1
-#endif
-
-#if defined (MSB_FIRST)     || defined (__BIG_ENDIAN__) || defined (WORDS_BIGENDIAN) || \
-	defined (__mips__)      || defined (__sparc__)      ||  defined (BLARGG_CPU_POWERPC) || \
+#elif defined (MSB_FIRST) || defined (__BIG_ENDIAN__) || defined (WORDS_BIGENDIAN) || \
+	defined (__mips__) || defined (__sparc__) || defined (BLARGG_CPU_POWERPC) || \
 	(defined (BIG_ENDIAN) && BIG_ENDIAN+0 != 4321)
 	#define BLARGG_BIG_ENDIAN 1
 #else
