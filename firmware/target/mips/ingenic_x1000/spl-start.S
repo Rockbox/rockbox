@@ -31,7 +31,7 @@
     .set noreorder
     .set noat
 
-    .section .startup.spl
+    .section .startup.spl, "ax", %progbits
 
 _spl_start:
     /* Clear data watchpoint */
