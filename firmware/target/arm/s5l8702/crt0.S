@@ -93,7 +93,7 @@ start_loc:
     mcr     p15, 0, r0, c1, c0, 0   /* disable caches and protection unit */
 
 .cleancache:
-    mrc     p15, 0, r15, c7, c10, 3 /* test and clean dcache */
+    mrc     p15, 0, APSR_nzcv, c7, c10, 3 /* test and clean dcache */
     bne     .cleancache
     mov     r0, #0
     mcr     p15, 0, r0, c7, c10, 4  /* drain write buffer */
