@@ -336,7 +336,7 @@ discard_dcache_range:
 
 commit_dcache:
 #ifdef HAVE_TEST_AND_CLEAN_CACHE
-    mrc     p15, 0, r15, c7, c10, 3 @ test and clean dcache
+    mrc     p15, 0, APSR_nzcv, c7, c10, 3 @ test and clean dcache
     bne     commit_dcache
     mov     r1, #0
 #else
@@ -367,7 +367,7 @@ commit_dcache:
 
 commit_discard_dcache:
 #ifdef HAVE_TEST_AND_CLEAN_CACHE
-    mrc     p15, 0, r15, c7, c14, 3 @ test, clean and invalidate dcache
+    mrc     p15, 0, APSR_nzcv, c7, c14, 3 @ test, clean and invalidate dcache
     bne     commit_discard_dcache
     mov     r1, #0
 #else
