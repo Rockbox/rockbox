@@ -225,7 +225,7 @@ jpeg_idct4v:
     ldmia sp!, { r4-r8, pc }
 #else /* ARMv6+ */
     stmdb  sp!, { r4-r10, lr }
-    ldrd   r2,  .Lpool4
+    ldrd   r2, r3, .Lpool4
     mov    r12, #1024
 1:
     ldr    r6,  [r0, #32]
@@ -371,7 +371,7 @@ jpeg_idct4h:
     ldmia sp!, { r4-r9, pc }
 #else /* ARMv6+ */
     stmdb sp!, { r4-r9, lr }
-    ldrd   r4,  .Lpool4
+    ldrd   r4, r5, .Lpool4
     mov    r9,  r4,  lsr #16
 1:
     ldmia  r0,  { r12, r14 }
@@ -853,7 +853,7 @@ jpeg_idct8v:
     bcc    1b
     ldmia  sp!, { r4-r11, pc }
 2:
-    ldrd   r8,  .Lpool8
+    ldrd   r8, r9, .Lpool8
     mov    r12, r4,  lsl #16
     add    r10, r5,  r7              /* r10 = d2 + d6 */
     add    r12, r12, #8192
@@ -873,7 +873,7 @@ jpeg_idct8v:
     sadd16 r8,  r3,  r6              /* z3, z4 */
     stmdb  sp,   { r10-r12, r14 }    /* tmp10 tmp13 tmp11 tmp12 */
     smuad  r5,  r9,  r8              /* r5  = z5 = (z3[o] + z4[o]) * 9633 */
-    ldrd   r10, .Lpool8+8
+    ldrd   r10, r11, .Lpool8+8
     sadd16 r7,  r4,  r6              /* r7  = (z1, z2) */
     smlatt r9,  r10, r8,  r5         /* r9  = z4 = z5 - z4 * 16069 */
     smlabb r8,  r10, r8,  r5         /* r8  = z3 = z5 - z3 * 3196 */
@@ -881,7 +881,7 @@ jpeg_idct8v:
     smlabb r12, r11, r7,  r8         /* r12 = z1 + z3 */
     smlatt r5,  r11, r7,  r9         /* r5  = z2 + z4 */
     smlatt r7,  r11, r7,  r8         /* r7  = z2 + z3 */
-    ldrd   r8,  .Lpool8+16
+    ldrd   r8, r9, .Lpool8+16
     smlabt r7,  r9,  r4,  r7         /* r7  = tmp2 */
     smlatb r14, r9,  r4,  r14        /* r14 = tmp3 */
     ldmdb  sp,  { r4, r9-r11 }       /* tmp10 tmp13 tmp11 tmp12 */
@@ -958,7 +958,7 @@ jpeg_idct8h:
     bcc    1b
     ldmia  sp!, { r4-r11, pc }
 2:
-    ldrd   r8,  .Lpool8
+    ldrd   r8, r9, .Lpool8
     sadd16 r10, r5,  r7              /* r10 = (d2 + d6, d3 + d7) */
     ssub16 r12, r4,  r6              /* r12 = (d0 - d4, d1 - d5) */
     sadd16 r11, r4,  r6              /* r11 = (d0 + d4, d1 + d5) */
@@ -977,7 +977,7 @@ jpeg_idct8h:
     add    r12, r7,  r12, lsl #13    /* r12 = tmp11 */
     stmdb  sp,   { r10-r12, r14 }    /* tmp10 tmp13 tmp11 tmp12 */
     smuad  r5,  r9,  r8              /* r5  = z5 = (z3[o] + z4[o]) * 9633 */
-    ldrd   r10, .Lpool8+8
+    ldrd   r10, r11, .Lpool8+8
     sadd16 r7,  r4,  r6              /* r7  = (z1, z2) */
     smlatt r9,  r10, r8,  r5         /* r9  = z4 = z5 - z4 * 16069 */
     smlabb r8,  r10, r8,  r5         /* r8  = z3 = z5 - z3 * 3196 */
@@ -985,7 +985,7 @@ jpeg_idct8h:
     smlabb r12, r11, r7,  r8         /* r12 = z1 + z3 */
     smlatt r5,  r11, r7,  r9         /* r5  = z2 + z4 */
     smlatt r7,  r11, r7,  r8         /* r7  = z2 + z3 */
-    ldrd   r8,  .Lpool8+16
+    ldrd   r8, r9, .Lpool8+16
     smlabt r7,  r9,  r4,  r7         /* r7  = tmp2 */
     smlatb r14, r9,  r4,  r14        /* r14 = tmp3 */
     ldmdb  sp,  { r4, r9-r11 }       /* tmp10 tmp13 tmp11 tmp12 */
