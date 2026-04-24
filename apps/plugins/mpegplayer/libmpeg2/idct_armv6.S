@@ -39,7 +39,7 @@
 
 .row_loop:
     ldmia   r0!, {r2, r3, r10, r11} @ fetch f0, f2, f4, f6, f1, f3, f5, f7
-    ldrd    r4, L_W1357         @ load  W1, W3, W5, W7
+    ldrd    r4, r5, L_W1357     @ load  W1, W3, W5, W7
 
     smuad   r6, r4, r10         @ b0 = W1 * f1 + W3 * f3
     smultt  r7, r5, r10         @ -b1 = W7 * f3
@@ -59,7 +59,7 @@
     smlatb  r7, r4, r10, r7     @ b1 += W3 * f1
     smlatt  r8, r4, r11, r8     @ b2 += W3 * f7
 
-    ldrd    r4, L_W0246         @ load  W0, W2, W4, W6
+    ldrd    r4, r5, L_W0246     @ load  W0, W2, W4, W6
     add     r2, r2, #1          @ f0 += 1
 
     smulbb  r10, r5, r3         @ a0' = W4 * f4
@@ -130,7 +130,7 @@ L_W0246:
 
 .col_loop:
     ldmia   r0!, {r2, r3, r10, r11} @ fetch f0, f2, f4, f6, f1, f3, f5, f7
-    ldrd    r4, L_W1357         @ load  W1, W3, W5, W7
+    ldrd    r4, r5, L_W1357     @ load  W1, W3, W5, W7
 
     smuad   r6, r4, r10         @ b0 = W1 * f1 + W3 * f3
     smultt  r7, r5, r10         @ -b1 = W7 * f3
@@ -150,7 +150,7 @@ L_W0246:
     smlatb  r7, r4, r10, r7     @ b1 += W3 * f1
     smlatt  r8, r4, r11, r8     @ b2 += W3 * f7
 
-    ldrd    r4, L_W0246         @ load  W0, W2, W4, W6
+    ldrd    r4, r5, L_W0246     @ load  W0, W2, W4, W6
     add     r2, r2, #32         @ DC offset: 0.5
 
     smulbb  r10, r5, r3         @ a0' = W4 * f4
