@@ -154,7 +154,11 @@ static void toggle_theme(enum screen_type screen, bool force)
         }
         intptr_t force = first_boot?0:1;
 
+        skin_defer_rendering(true);
         send_event(GUI_EVENT_ACTIONUPDATE, (void*)force);
+        skin_defer_rendering(false);
+        if (!first_boot)
+            sb_skin_force_next_update();
     }
     else
     {

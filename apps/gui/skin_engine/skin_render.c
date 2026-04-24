@@ -84,6 +84,8 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        unsigned long refresh_type);
 
 static char* skin_buffer;
+static bool defer_rendering;
+static bool dirty;
 
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
@@ -841,6 +843,27 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
     wps_display_images(gwps, &skin_viewport->vp);
 }
 
+void skin_defer_rendering(bool deferred)
+{
+    defer_rendering = deferred;
+}
+
+void skin_render_deferred(struct screen *display, struct viewport *vp)
+{
+    if (dirty)
+    {
+        dirty = false;
+        display->set_viewport(NULL);
+        display->update();
+        sb_skin_force_next_update();
+    }
+    else
+    {
+        display->set_viewport(vp);
+        display->update_viewport();
+    }
+}
+
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 {
     const int vp_is_appearing = (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE);
@@ -940,7 +963,10 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     }
     /* Restore the default viewport */
     display->set_viewport_ex(NULL, VP_FLAG_VP_SET_CLEAN);
-    display->update();
+    if (defer_rendering)
+        dirty = true;
+    else
+        display->update();
 }
 
 static __attribute__((noinline))

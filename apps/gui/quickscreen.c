@@ -242,8 +242,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
             (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
     }
 
-    display->set_viewport(parent);
-    display->update_viewport();
+    skin_render_deferred(display, parent);
     display->set_viewport(last_vp);
 }
 

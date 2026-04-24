@@ -65,6 +65,7 @@
 #include "list.h"
 #include "fixedpoint.h"
 #include "open_plugin.h"
+#include "statusbar-skinned.h"
 
 #include "debug.h"
 
@@ -1795,8 +1796,14 @@ static void push_current_activity_refresh(enum current_activity screen, bool ref
     {
         skinlist_set_cfg(i, NULL);
         if (refresh)
+        {
+            skin_defer_rendering(true);
             skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+            skin_defer_rendering(false);
+        }
     }
+    if (refresh)
+        sb_skin_force_next_update();
 }
 
 static void pop_current_activity_refresh(bool refresh)
@@ -1806,8 +1813,14 @@ static void pop_current_activity_refresh(bool refresh)
     {
         skinlist_set_cfg(i, NULL);
         if (refresh)
+        {
+            skin_defer_rendering(true);
             skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
+            skin_defer_rendering(false);
+        }
     }
+    if (refresh)
+        sb_skin_force_next_update();
 }
 
 void push_current_activity(enum current_activity screen)
