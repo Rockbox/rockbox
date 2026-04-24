@@ -19,7 +19,7 @@ ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), Y
     ### lowmem targets
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.ovl
     CHESSBOX_OUTLDS = $(CHESSBOX_OBJDIR)/chessbox.link
-    CHESSBOX_OVLFLAGS = -T$(CHESSBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
+    CHESSBOX_OVLFLAGS = -T$(CHESSBOX_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map $(GLOBAL_LDOPTS)
 else
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.rock
 endif
