@@ -19,7 +19,7 @@ ifeq ($(findstring YES, $(call preprocess, $(APPSDIR)/plugins/BUILD_OVERLAY)), Y
     ## lowmem targets
     ROCKS += $(ROCKBOY_OBJDIR)/rockboy.ovl
     ROCKBOY_OUTLDS = $(ROCKBOY_OBJDIR)/rockboy.link
-    ROCKBOY_OVLFLAGS = -T$(ROCKBOY_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
+    ROCKBOY_OVLFLAGS = -T$(ROCKBOY_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map $(GLOBAL_LDOPTS)
 else
     ROCKS += $(ROCKBOY_OBJDIR)/rockboy.rock
 endif
