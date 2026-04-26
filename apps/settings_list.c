@@ -61,10 +61,10 @@
 #include "touchscreen.h"
 #include "ctype.h" /* For isspace() */
 #endif
-#ifdef HAVE_HOTKEY
+
 #include "onplay.h"
 #include "misc.h" /* current activity */
-#endif
+
 #include "playlist.h"
 #include "tree.h"
 #include "iap-usb.h"
@@ -690,6 +690,17 @@ struct eq_band_setting eq_defaults[EQ_NUM_BANDS] = {
     { 16000, 7, 0 },
 };
 
+static const int wps_context_menu_default =
+    HK_CTX_SET(0, HOTKEY_VIEW_PLAYLIST) /* hotkey*/
+  | HK_CTX_SET(1, HOTKEY_SHOW_TRACK_INFO)
+  | HK_CTX_SET(2, HOTKEY_SHOW_IN_FILES)
+#ifdef HAVE_PITCHCONTROL
+  | HK_CTX_SET(3, HOTKEY_PITCHSCREEN)
+#else
+  | HK_CTX_SET(3, HOTKEY_DELETE)
+#endif
+  | HK_CTX_SET(4, HOTKEY_ALBUMART);
+
 #ifndef __PCTOOL__
 static void eq_load_from_cfg(void *setting, char *value)
 {
@@ -885,14 +896,6 @@ static void tsc_set_default(void* setting, void* defaultval)
 }
 #endif
 #ifdef HAVE_HOTKEY
-static void hotkey_callback(int var)
-{
-    if (get_current_activity() != ACTIVITY_QUICKSCREEN)
-    {
-        if (get_hotkey(var)->action == HOTKEY_PLUGIN)
-            open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
-    }
-}
 static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
                               const char* unit)
 {
@@ -906,7 +909,7 @@ static int32_t hotkey_getlang(int value, int unit)
     (void)unit;
     return get_hotkey(value)->lang_id;
 }
-#endif /* HAVE_HOTKEY */
+#endif
 
 static void start_in_callback(int var)
 {
@@ -2338,25 +2341,13 @@ const struct settings_list settings[] = {
 #ifdef HAVE_MORSE_INPUT
     OFFON_SETTING(0, morse_input, LANG_MORSE_INPUT, false, "morse input", NULL),
 #endif
+   CUSTOM_SETTING(0, context_wps,
+                  LANG_ONPLAY_MENU_TITLE, /* lang string here is never actually used */
+                  &wps_context_menu_default, "context_wps",
+                  wps_context_menu_load_from_cfg, wps_context_menu_write_to_cfg,
+                  wps_context_menu_is_changed, wps_context_menu_set_default),
 
 #ifdef HAVE_HOTKEY
-/* WPS HOTKEY */
-    TABLE_SETTING(F_CB_ON_SELECT_ONLY, hotkey_wps,
-        LANG_HOTKEY_WPS, HOTKEY_VIEW_PLAYLIST, "hotkey wps",
-        "off,view playlist,show track info,pitchscreen,open with,delete,bookmark,plugin,bookmark list"
-#ifdef HAVE_ALBUMART
-        ",show_album_art,context menu"
-        ,UNIT_INT, hotkey_formatter, hotkey_getlang, hotkey_callback,11,
-#else
-        ",context menu"
-        ,UNIT_INT, hotkey_formatter, hotkey_getlang, hotkey_callback,10,
-#endif
-        HOTKEY_OFF, HOTKEY_VIEW_PLAYLIST, HOTKEY_SHOW_TRACK_INFO, HOTKEY_PITCHSCREEN,
-        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_BOOKMARK, HOTKEY_PLUGIN, HOTKEY_BOOKMARK_LIST,
-#ifdef HAVE_ALBUMART
-        HOTKEY_ALBUMART,
-#endif
-        HOTKEY_CONTEXT_MENU),
 /* TREE HOTKEY */
     TABLE_SETTING(0, hotkey_tree,
         LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",

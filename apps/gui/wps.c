@@ -798,9 +798,10 @@ long gui_wps_show(void)
             case ACTION_WPS_HOTKEY:
             {
                 hotkey = true;
-                if (!global_settings.hotkey_wps)
+                int act = HK_CTX_GET(0, global_settings.context_wps);
+                if (act == HOTKEY_OFF)
                     break;
-                if (get_hotkey(global_settings.hotkey_wps)->flags & HOTKEY_FLAG_NOSBS)
+                if (get_hotkey(act)->flags & HOTKEY_FLAG_NOSBS)
                 {
                     /* leave WPS without re-enabling theme */
                     theme_enabled = false;
@@ -836,7 +837,7 @@ long gui_wps_show(void)
                 {
                     restore_theme();
                     theme_enabled = false;
-                    open_plugin_run(ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN));
+                    open_plugin_run(ID2P(LANG_ONPLAY_MENU_TITLE));
                 }
 
                 restore = true;

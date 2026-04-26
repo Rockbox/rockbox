@@ -1019,7 +1019,7 @@ void root_menu(void)
                             key = ID2P(LANG_START_SCREEN);
                             break;
                         case GO_TO_WPS:
-                            key = ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN);
+                            key = ID2P(LANG_ONPLAY_MENU_TITLE);
                             break;
                         case GO_TO_SHORTCUTMENU:
                             key = ID2P(LANG_SHORTCUTS);

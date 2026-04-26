@@ -6,7 +6,15 @@
     \item[WPS Hotkey.] Sets the hotkey function for
                      the WPS (see \reference{ref:Hotkeys}). The
                      default is \setting{View Playlist}.
+    \item[Set Context Item (1 - 4).]
   }
-  \item[Set WPS Context Plugin.]
-  This option will allow you to run a Rockbox plugin from the WPS context menu.
-   \end{description}
+  \nopt{hotkey}{\item[Set Context Item (0 - 4).]}
+
+  This option will allow you to set an entry in the WPS context menu.
+  \note{Setting an item to Off will hide the menu item;
+        Each item is only available once, duplicates will be set to Off;}
+
+  \item[Reset Settings.]
+  This option will allow you to return all items to default.
+  \opt{hotkey}{\note{including WPS Hotkey}}
+  \end{description}

@@ -721,32 +721,110 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 /*    VOICE MENU                   */
 /***********************************/
 
-/*    WPS_CONTEXT_PLUGIN           */
+/*    WPS_CONTEXT_MENU          */
 /***********************************/
-static void wps_plugin_cb(void)
+
+
+static char *wps_context_menu_get_name(int selected_item, void * data,
+                                   char *buffer, size_t buffer_len)
 {
-    open_plugin_browse(ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN));
+    int item = (intptr_t)data;
+    int act = HK_CTX_GET(item, global_settings.context_wps);
+    const struct hotkey_assignment *cur = get_hotkey(act);
+#ifdef HAVE_HOTKEY
+    if (item == 0)
+    {
+        snprintf(buffer, buffer_len,"%s [%s]",
+                 str(LANG_HOTKEY_WPS), str(cur->lang_id));
+    }
+    else
+#endif
+    {
+        snprintf(buffer, buffer_len,"%s %d [%s]",
+                 str(LANG_SET_CONTEXT_ITEM), item, str(cur->lang_id));
+    }
+    return buffer;
+    (void)selected_item;
 }
-MENUITEM_FUNCTION(wps_set_context_plugin, 0,
-                  ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN),
-                  wps_plugin_cb, NULL, Icon_Plugin);
 
-/*    WPS_CONTEXT_PLUGIN           */
-/***********************************/
+static int wps_context_menu_speak_item(int selected_item, void * data)
+{
+    int item = (intptr_t)data;
+    int act = HK_CTX_GET(item, global_settings.context_wps);
 
+    const struct hotkey_assignment *cur = get_hotkey(act);
+#ifdef HAVE_HOTKEY
+    if (item == 0)
+    {
+        talk_id(LANG_HOTKEY_WPS, false);
+    }
+    else
+#endif
+    {
+        talk_id(LANG_SET_CONTEXT_ITEM, false);
+        talk_number((intptr_t)data, true);
+    }
+    talk_id(cur->lang_id, true);
+    return 0;
+    (void)selected_item;
+}
+
+#ifdef HAVE_HOTKEY
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(hotkey_wps_item, 0,
+                                  wps_context_menu_do_setting, (void*)0,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)0, NULL, Icon_Menu_setting);
+#else
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(wps_set_context_item_0, 0,
+                                  wps_context_menu_do_setting, (void*)0,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)0, NULL, Icon_Menu_setting);
+#endif
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(wps_set_context_item_1, 0,
+                                  wps_context_menu_do_setting, (void*)1,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)1, NULL, Icon_Menu_setting);
+
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(wps_set_context_item_2, 0,
+                                  wps_context_menu_do_setting, (void*)2,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)2, NULL, Icon_Menu_setting);
+
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(wps_set_context_item_3, 0,
+                                  wps_context_menu_do_setting, (void*)3,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)3, NULL, Icon_Menu_setting);
+
+MENUITEM_FUNCTION_DYNTEXT_W_PARAM(wps_set_context_item_4, 0,
+                                  wps_context_menu_do_setting, (void*)4,
+                                  wps_context_menu_get_name,
+                                  wps_context_menu_speak_item,
+                                  (void*)4, NULL, Icon_Menu_setting);
+
+static void reset_wps_items(void)
+{
+    reset_setting(find_setting(&global_settings.context_wps), NULL);
+}
+MENUITEM_FUNCTION(reset_wps_item, 0, ID2P(LANG_RESET), reset_wps_items, NULL, Icon_Queued)
 /***********************************/
 /*    WPS Settings MENU            */
 
-
-#ifdef HAVE_HOTKEY
-MENUITEM_SETTING(hotkey_wps_item, &global_settings.hotkey_wps, NULL);
-#endif
-
 MAKE_MENU(wps_settings, ID2P(LANG_WPS), 0, Icon_Playback_menu
 #ifdef HAVE_HOTKEY
-            ,&hotkey_wps_item
+            ,&hotkey_wps_item /* this is item 0 */
+#else
+            ,&wps_set_context_item_0
 #endif
-            ,&wps_set_context_plugin
+            ,&wps_set_context_item_1
+            ,&wps_set_context_item_2
+            ,&wps_set_context_item_3
+            ,&wps_set_context_item_4
+            ,&reset_wps_item
             );
 
 /*    WPS Settings MENU            */

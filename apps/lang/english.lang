@@ -15205,17 +15205,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
   user: core
   <source>
-    *: "Set WPS Context Plugin"
+    *: "Set Context Item"
   </source>
   <dest>
-    *: "Set WPS Context Plugin"
+    *: "Set Context Item"
   </dest>
   <voice>
-    *: "Set WPS Context Plugin"
+    *: "Set Context Item"
   </voice>
 </phrase>
 <phrase>
