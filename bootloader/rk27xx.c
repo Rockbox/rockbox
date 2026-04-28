@@ -67,7 +67,7 @@ static void enter_rkusb(void)
         "ldr     r1, [r0] \n"
         "ldr     r2, =0xa1000604 \n"
         "cmp     r1, r2 \n"
-        "bne     rk27xx_new \n"
+        "bne     2f \n"
 
         /* Setup stacks in unmapped
          * iram just as rom will do.
@@ -77,16 +77,16 @@ static void enter_rkusb(void)
          * but memory addresses are slightly
          * different.
          */
-        "rk27xx_old: \n"
+        "1: \n"  /* rk27xx_old */
         "ldr     r1, =0x18200258 \n"
         "ldr     r0, =0xaf0 \n"
-        "b       jump_to_rom \n"
+        "b       3f \n"
 
-        "rk27xx_new: \n"
+        "2: \n"  /* rk27xx_new */
         "ldr     r1, =0x18200274 \n"
         "ldr     r0, =0xec0 \n"
 
-        "jump_to_rom: \n"
+        "3: \n"  /* jump to ROM */
         "msr     cpsr, #0xd2 \n"
         "add     r1, r1, #0x200 \n"
         "mov     sp, r1 \n"
