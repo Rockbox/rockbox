@@ -63,6 +63,8 @@ enum hotkey_action {
     HOTKEY_INSERT,
     HOTKEY_INSERT_SHUFFLED,
     HOTKEY_BOOKMARK_LIST,
+    HOTKEY_ALBUMART,
+    HOTKEY_CONTEXT_MENU, /* shows / executes above actions in a menu */
 };
 enum hotkey_flags {
     HOTKEY_FLAG_NONE = 0x0,
