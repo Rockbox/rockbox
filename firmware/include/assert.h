@@ -2,21 +2,13 @@
         assert.h
 */
 
-#include "_ansi.h"
+#include <panic.h>
 
 #undef assert
 
 #ifdef NDEBUG           /* required by ANSI standard */
 #define assert(p)       ((void)0)
 #else
-
-#ifdef __STDC__
-#define assert(e)       ((e) ? (void)0 : __assert(__FILE__, __LINE__, #e))
-#else   /* PCC */
-#define assert(e)       ((e) ? (void)0 : __assert(__FILE__, __LINE__, "e"))
-#endif
-
+#define assert(e)       ((e) ? (void)0 : panicf("Assertion failed: %s (%s: %s: %d)", #e, __FILE__, __func__, __LINE__))
 #endif /* NDEBUG */
-
-void _EXFUN(__assert,(const char *, int, const char *));
 
