@@ -939,7 +939,7 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
     if (notify_user)
     {
 #ifndef BOOTLOADER
-        skin_request_update_locked();
+        skin_request_update_locked(last->keys_locked);
 #endif
         action_handle_backlight(true, false);
 

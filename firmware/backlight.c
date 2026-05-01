@@ -889,7 +889,7 @@ void backlight_set_timeout_plugged(int value)
 void backlight_hold_changed(bool hold_button)
 {
 #ifndef BOOTLOADER
-    skin_request_update_locked();
+    skin_request_update_locked(hold_button);
 #endif
     if (!hold_button || (backlight_on_button_hold > 0))
     {

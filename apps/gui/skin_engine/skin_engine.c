@@ -344,12 +344,16 @@ void skin_request_full_update(enum skinnable_screens skin)
 
 
 /* Request skin update for lock state change */
-void skin_request_update_locked(void)
+void skin_request_update_locked(bool locked)
 {
     if (get_current_activity() == ACTIVITY_WPS)
         return;
 
     sb_skin_force_next_update();
+
+    /* fix themes that draw on top of the UI viewport when locked */
+    if (!locked)
+        skin_request_full_update(CUSTOM_STATUSBAR);
 #ifdef HAS_BUTTON_HOLD
     button_queue_post(BUTTON_NONE, 0);
 #endif
