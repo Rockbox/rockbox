@@ -65,6 +65,7 @@ double acos_wrapper(double x);
 #define strcmp rb->strcmp
 #define strcpy rb->strcpy
 #define strlen rb->strlen
+#define strncpy rb->strncpy
 #define strtol rb->strtol
 #define strtoq strtoq_wrapper
 #define strtouq strtouq_wrapper

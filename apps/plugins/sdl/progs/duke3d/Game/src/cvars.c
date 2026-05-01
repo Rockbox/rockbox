@@ -1,3 +1,4 @@
+#include "duke3d.h"
 #include "cvars.h"
 #include "cvar_defs.h"
 #include <stdlib.h>

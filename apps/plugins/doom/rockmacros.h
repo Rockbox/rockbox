@@ -76,6 +76,8 @@ int my_close(int id);
 #define strcmp(a,b)        rb->strcmp((a),(b))
 #undef  strncmp
 #define strncmp(a,b,c)     rb->strncmp((a),(b),(c))
+#undef  strncpy
+#define strncpy(a,b,c)     rb->strncpy((a),(b),(c))
 #undef  strchr
 #define strchr(a,b)        rb->strchr((a),(b))
 #undef  strrchr

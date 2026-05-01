@@ -169,6 +169,7 @@
 #define strncat rb->strlcat /* hack */
 #endif
 #define strncmp rb->strncmp
+#define strncpy rb->strncpy
 #ifndef strncat
 #define strpbrk strpbrk_wrapper
 #endif

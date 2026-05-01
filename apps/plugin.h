@@ -62,7 +62,6 @@
 
 #define splash(__ticks, __str) splashf(__ticks, __str)
 
-char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
 size_t plugin_reserve_buffer(size_t buffer_size);
 int plugin_open(const char *plugin, const char *parameter);
@@ -1038,6 +1037,7 @@ struct plugin_api {
                                             void *event_data,
                                             void *user_data),
                             void *user_data);
+    char* (*strncpy)(char * dst, const char * src, size_t count);
 };
 
 /* plugin header */

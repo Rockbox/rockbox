@@ -356,6 +356,7 @@ libc/strcmp.c
 libc/strcpy.c
 libc/strcspn.c
 libc/strncmp.c
+libc/strncpy.c
 libc/strrchr.c
 libc/strstr.c
 libc/mktime.c

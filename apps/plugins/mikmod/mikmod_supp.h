@@ -29,6 +29,8 @@
 #define strcat(a,b)         rb->strcat(a,b)
 #undef strncmp
 #define strncmp(a,b,c)      rb->strncmp(a,b,c)
+#undef strncpy
+#define strncpy(a,b,c)      rb->strncpy(a,b,c)
 #undef strcasecmp
 #define strcasecmp(a,b)     rb->strcasecmp(a,b)
 #undef strstr
