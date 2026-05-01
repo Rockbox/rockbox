@@ -350,6 +350,7 @@ libc/memcmp.c
 
 libc/qsort.c
 libc/random.c
+libc/sscanf.c
 libc/strcat.c
 libc/strchr.c
 libc/strcmp.c
