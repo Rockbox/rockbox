@@ -22,7 +22,9 @@
 #ifndef __REGGEN_H__
 #define __REGGEN_H__
 
+#ifndef __ASSEMBLER__
 #include <stdint.h>
+#endif
 
 #define __REGGEN_VAR_OR1(p, s1) \
     ((p ## s1))
