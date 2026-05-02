@@ -3976,6 +3976,7 @@ fi
     # player version, for bootloader usage
     # version 3
     extradefines="$extradefines -DEROSQN_VER=3"
+    bootloader_only=1
     ;;
 
     249|erosqnative_v4)
@@ -4004,6 +4005,7 @@ fi
     # player version, for bootloader usage
     # version 4
     extradefines="$extradefines -DEROSQN_VER=4"
+    bootloader_only=1
     ;;
 
    232|ihifi770c)
@@ -4410,6 +4412,11 @@ fi
 
 if [ -z "$debug" ]; then
   GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
+fi
+
+if [ "$bootloader_only" = "1" -a "$bootloader" != "1" ]; then
+    echo "Target can only be used for bootloader builds."
+    exit 9
 fi
 
 # if building a simulator for an hosted port, APPLICATION
