@@ -82,6 +82,7 @@ void skin_unload_all(void);
 
 bool skin_do_full_update(enum skinnable_screens skin, enum screen_type screen);
 void skin_request_full_update(enum skinnable_screens skin);
+void skin_request_update_locked(void);
 
 bool dbg_skin_engine(void);
 

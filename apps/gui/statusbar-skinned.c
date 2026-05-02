@@ -224,6 +224,11 @@ void sb_skin_set_update_delay(int delay)
     update_delay = delay;
 }
 
+void sb_skin_force_next_update(void)
+{
+    force_waiting = true;
+}
+
 /* This creates and loads a ".sbs" based on the user settings for:
  *  - regular statusbar
  *  - colours

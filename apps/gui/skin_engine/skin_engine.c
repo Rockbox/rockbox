@@ -180,7 +180,7 @@ void settings_apply_skins(void)
         audio_stop();
 
     bool first_run = skin_backdrop_init();
-    
+
     if (!first_run)
     {
         /* Make sure all skins unloaded */
@@ -340,6 +340,19 @@ void skin_request_full_update(enum skinnable_screens skin)
 {
     FOR_NB_SCREENS(i)
         skins[skin][i].needs_full_update = true;
+}
+
+
+/* Request skin update for lock state change */
+void skin_request_update_locked(void)
+{
+    if (get_current_activity() == ACTIVITY_WPS)
+        return;
+
+    sb_skin_force_next_update();
+#ifdef HAS_BUTTON_HOLD
+    button_queue_post(BUTTON_NONE, 0);
+#endif
 }
 
 bool dbg_skin_engine(void)
