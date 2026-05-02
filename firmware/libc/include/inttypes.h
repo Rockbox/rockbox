@@ -18,11 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
 #ifndef __INTTYPES_H__
 #define __INTTYPES_H__
 
 #include <stdint.h>
+#include <limits.h>
 
 /* could possibly have (f)scanf format specifiers here */
 
