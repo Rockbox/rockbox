@@ -25,6 +25,7 @@
 #include "config.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <limits.h>
 
 /* ADC channels */
 #define AXP2101_ADC_VBAT_VOLTAGE    0

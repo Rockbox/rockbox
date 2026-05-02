@@ -21,7 +21,9 @@
 #ifndef __CRYPTO_S5L8702_H__
 #define __CRYPTO_S5L8702_H__
 
+#ifndef __ASSEMBLER__
 #include <stdint.h>
+#endif
 
 #include "config.h"
 

@@ -25,6 +25,7 @@
 #include "config.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <limits.h>
 
 /* ADC channels */
 #define ADC_ACIN_VOLTAGE        0
