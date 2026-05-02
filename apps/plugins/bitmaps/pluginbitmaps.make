@@ -58,4 +58,12 @@ $(BUILDDIR)/apps/plugins/bitmaps/remote_native/%.c: $(ROOTDIR)/apps/plugins/bitm
 	$(SILENT)mkdir -p $(dir $@) $(PBMPINCDIR)
 	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTENATIVE) -b -h $(PBMPINCDIR) $< > $@
 
+ifdef APP_TYPE
+# Bitmaps must be explicitly Position independent to avoid linker warnings
+$(BUILDDIR)/apps/plugins/bitmaps/native/%.o: CFLAGS += -fPIC
+$(BUILDDIR)/apps/plugins/bitmaps/mono/%.o: CFLAGS += -fPIC
+$(BUILDDIR)/apps/plugins/bitmaps/remote_mono/%.o: CFLAGS += -fPIC
+$(BUILDDIR)/apps/plugins/bitmaps/remote_native/%.o: CFLAGS += -fPIC
+endif
+
 endif
