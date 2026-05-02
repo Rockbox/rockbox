@@ -315,7 +315,7 @@ static void pl_close_control(struct playlist_info *playlist)
 /* Check if the filename suggests M3U or M3U8 format. */
 static bool is_m3u8_name(const char* filename)
 {
-    char *dot = strrchr(filename, '.');
+    const char *dot = strrchr(filename, '.');
 
     /* Default to M3U8 unless explicitly told otherwise. */
     return (!dot || strcasecmp(dot, ".m3u") != 0);

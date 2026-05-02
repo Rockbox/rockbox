@@ -45,6 +45,8 @@
 #undef strcmp
 #undef strncmp
 #undef strchr
+#undef strstr
+#undef strrchr
 #undef strtok_r
 #ifdef __APPLE__
 #undef strncpy

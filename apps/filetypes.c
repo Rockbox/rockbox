@@ -525,7 +525,7 @@ static void read_config_init(int fd)
 
 static int file_find_extension(const char* file)
 {
-    char *extension = strrchr(file, '.');
+    const char *extension = strrchr(file, '.');
     if (extension)
         extension++;
     return find_extension(extension);
@@ -704,7 +704,7 @@ int filetype_load_plugin(const char* plugin, const char* file)
 {
     int i;
     char plugin_name[MAX_PATH];
-    char *s;
+    const char *s;
 
     for (i=1;i<filetype_count;i++)
     {

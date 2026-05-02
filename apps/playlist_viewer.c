@@ -497,7 +497,7 @@ static void format_name(char* dest, const char* src, size_t bufsz)
         default:
         {
             /* Only display the filename */
-            char* p = strrchr(src, '/');
+            const char* p = strrchr(src, '/');
             strlcpy(dest, p+1, bufsz);
             /* Remove the extension */
             strrsplt(dest, '.');

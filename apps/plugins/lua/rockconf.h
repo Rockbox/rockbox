@@ -51,6 +51,10 @@ int splash_scroller(int timeout, const char* str);
 #define floor   lfloor
 #define pow     lpow
 
+/* Just in case */
+#undef memchr
+#undef strstr
+
 /* Simple substitutions */
 #define malloc   tlsf_malloc
 #define realloc  tlsf_realloc
