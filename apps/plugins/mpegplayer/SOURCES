@@ -8,7 +8,7 @@ libmpeg2/slice.c
 libmpeg2/idct_coldfire.S
 libmpeg2/motion_comp_coldfire_c.c
 libmpeg2/motion_comp_coldfire_s.S
-#elif defined CPU_ARM
+#elif defined CPU_ARM_CLASSIC
 #if ARM_ARCH >= 6
 libmpeg2/idct_armv6.S
 #else

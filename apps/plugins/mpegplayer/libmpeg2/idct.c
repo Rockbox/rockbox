@@ -33,7 +33,7 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-#if defined(CPU_COLDFIRE) || defined (CPU_ARM)
+#if defined(CPU_COLDFIRE) || defined (CPU_ARM_CLASSIC)
 #define IDCT_ASM
 #endif
 
