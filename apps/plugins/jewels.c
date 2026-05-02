@@ -399,6 +399,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_SELECT "A"
 #define HK_CANCEL "B"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_A
+#define JEWELS_CANCEL BUTTON_POWER
+#define HK_SELECT "A"
+#define HK_CANCEL "POWER"
+
 #else
 #error No keymap defined!
 #endif

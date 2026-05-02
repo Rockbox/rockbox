@@ -530,6 +530,18 @@
 #define FRACTAL_PRECISION_DEC   (BUTTON_USER|BUTTON_REPEAT)
 #define FRACTAL_RESET           BUTTON_POWER
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define FRACTAL_QUIT            BUTTON_POWER
+#define FRACTAL_UP              BUTTON_UP
+#define FRACTAL_DOWN            BUTTON_DOWN
+#define FRACTAL_LEFT            BUTTON_LEFT
+#define FRACTAL_RIGHT           BUTTON_RIGHT
+#define FRACTAL_ZOOM_IN         BUTTON_A
+#define FRACTAL_ZOOM_OUT        BUTTON_B
+#define FRACTAL_PRECISION_INC   BUTTON_Y
+#define FRACTAL_PRECISION_DEC   BUTTON_X
+#define FRACTAL_RESET           BUTTON_START
+
 #else
 #error No keymap defined!
 #endif

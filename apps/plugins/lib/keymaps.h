@@ -282,6 +282,14 @@
 #define BTN_FIRE        BUTTON_USER
 #define BTN_PAUSE       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define BTN_UP          BUTTON_UP
+#define BTN_DOWN        BUTTON_DOWN
+#define BTN_LEFT        BUTTON_LEFT
+#define BTN_RIGHT       BUTTON_RIGHT
+#define BTN_FIRE        BUTTON_A
+#define BTN_PAUSE       BUTTON_POWER
+
 #else
 #error Unsupported keypad
 #endif

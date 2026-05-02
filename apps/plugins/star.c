@@ -704,6 +704,23 @@
 #define STAR_LEVEL_DOWN_NAME "Start"
 #define STAR_LEVEL_REPEAT_NAME "Y"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_A
+#define STAR_LEVEL_UP       BUTTON_START
+#define STAR_LEVEL_DOWN     BUTTON_SELECT
+#define STAR_LEVEL_REPEAT   BUTTON_X
+#define STAR_TOGGLE_CONTROL_NAME "A"
+#define STAR_QUIT_NAME      "Power"
+#define STAR_LEVEL_UP_NAME  "Start"
+#define STAR_LEVEL_DOWN_NAME "Select"
+#define STAR_LEVEL_REPEAT_NAME "X"
+
 #else
 #error No keymap defined!
 #endif

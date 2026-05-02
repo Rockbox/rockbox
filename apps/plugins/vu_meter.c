@@ -479,6 +479,17 @@
 #define LABEL_MENU   "X"
 #define LABEL_VOLUME "Up/Down"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define VUMETER_QUIT BUTTON_POWER
+#define VUMETER_HELP BUTTON_SELECT
+#define VUMETER_MENU BUTTON_START
+#define VUMETER_UP   BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP   "Select"
+#define LABEL_QUIT   "Power"
+#define LABEL_MENU   "Start"
+#define LABEL_VOLUME "Up/Down"
+
 #else
 #error No keymap defined!
 #endif

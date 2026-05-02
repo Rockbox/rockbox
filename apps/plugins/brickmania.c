@@ -381,6 +381,14 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define UP          BUTTON_UP
 #define DOWN        BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define QUIT        BUTTON_POWER
+#define LEFT        BUTTON_LEFT
+#define RIGHT       BUTTON_RIGHT
+#define SELECT      BUTTON_A
+#define UP          BUTTON_UP
+#define DOWN        BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

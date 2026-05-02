@@ -300,6 +300,15 @@
 #define KBD_UP     BUTTON_UP
 #define KBD_DOWN   BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+
+#define KBD_SELECT BUTTON_A
+#define KBD_ABORT  BUTTON_B
+#define KBD_LEFT   BUTTON_LEFT
+#define KBD_RIGHT  BUTTON_RIGHT
+#define KBD_UP     BUTTON_UP
+#define KBD_DOWN   BUTTON_DOWN
+
 #endif
 
 #ifdef HAVE_TOUCHSCREEN

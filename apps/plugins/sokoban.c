@@ -733,6 +733,19 @@
 #define SOKOBAN_LEVEL_REPEAT_NAME "[TOPRIGHT]"
 #define BUTTON_SAVE_NAME      "A [CENTER]"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define SOKOBAN_LEFT         BUTTON_LEFT
+#define SOKOBAN_RIGHT        BUTTON_RIGHT
+#define SOKOBAN_UP           BUTTON_UP
+#define SOKOBAN_DOWN         BUTTON_DOWN
+#define SOKOBAN_MENU         BUTTON_POWER
+#define SOKOBAN_UNDO         BUTTON_X
+#define SOKOBAN_REDO         BUTTON_Y
+#define SOKOBAN_LEVEL_REPEAT BUTTON_SELECT
+#define SOKOBAN_PAUSE        BUTTON_START
+#define BUTTON_SAVE          BUTTON_A
+#define BUTTON_SAVE_NAME     "A"
+
 #else
 #error No keymap defined!
 #endif

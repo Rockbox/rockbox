@@ -428,6 +428,17 @@
 #define PACMAN_COIN     BUTTON_USER
 #define PACMAN_MENU     BUTTON_MENU
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+
+#define PACMAN_UP       BUTTON_RIGHT
+#define PACMAN_DOWN     BUTTON_LEFT
+#define PACMAN_LEFT     BUTTON_UP
+#define PACMAN_RIGHT    BUTTON_DOWN
+#define PACMAN_1UP      BUTTON_SELECT
+#define PACMAN_2UP      BUTTON_START
+#define PACMAN_COIN     BUTTON_X
+#define PACMAN_MENU     BUTTON_VOL_UP
+
 #else
 
 #error Keymap not defined!
@@ -533,7 +544,7 @@
    NOTE: pacbox.c assumes this is an integer divisor of 60
  */
 #if defined(TOSHIBA_GIGABEAT_S) || defined (TOSHIBA_GIGABEAT_F) || \
-    defined(SANSA_FUZEPLUS)
+    defined(SANSA_FUZEPLUS) || defined(ECHO_R1)
 /* Gigabeat S,F and Sansa Fuze+ can manage the full framerate
    (1 in 1 frames) */
 #define FPS 60

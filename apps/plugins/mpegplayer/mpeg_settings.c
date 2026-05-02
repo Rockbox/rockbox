@@ -373,6 +373,14 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_BACK
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_A
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_B
+
 #else
 #error No keymap defined!
 #endif

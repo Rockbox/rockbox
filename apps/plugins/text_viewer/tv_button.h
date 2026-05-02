@@ -597,6 +597,16 @@
 #define TV_AUTOSCROLL   BUTTON_USER
 #define TV_BOOKMARK     BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define TV_QUIT         BUTTON_POWER
+#define TV_SCROLL_UP    BUTTON_UP
+#define TV_SCROLL_DOWN  BUTTON_DOWN
+#define TV_SCREEN_LEFT  BUTTON_LEFT
+#define TV_SCREEN_RIGHT BUTTON_RIGHT
+#define TV_MENU         BUTTON_START
+#define TV_AUTOSCROLL   BUTTON_A
+#define TV_BOOKMARK     BUTTON_B
+
 #else
 #error No keymap defined!
 #endif

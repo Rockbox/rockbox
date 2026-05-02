@@ -494,6 +494,19 @@
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_USER
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+
+#define ROCKBLOX_OFF           BUTTON_POWER
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_ROTATE_CCW    BUTTON_UP
+#define ROCKBLOX_ROTATE_CW     BUTTON_DOWN
+#define ROCKBLOX_ROTATE_CCW2   BUTTON_Y
+#define ROCKBLOX_ROTATE_CW2    BUTTON_B
+#define ROCKBLOX_DOWN          BUTTON_X
+#define ROCKBLOX_DROP          BUTTON_A
+#define ROCKBLOX_RESTART       BUTTON_START
+
 #else
 #error No keymap defined!
 #endif

@@ -747,6 +747,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_DOWN_TEXT "Start"
 #define SELECT_TEXT "A"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define PEGBOX_SELECT   BUTTON_A
+#define PEGBOX_QUIT     BUTTON_POWER
+#define PEGBOX_RESTART  BUTTON_X
+#define PEGBOX_LVL_UP   BUTTON_START
+#define PEGBOX_LVL_DOWN BUTTON_SELECT
+#define PEGBOX_UP       BUTTON_UP
+#define PEGBOX_DOWN     BUTTON_DOWN
+#define PEGBOX_RIGHT    BUTTON_RIGHT
+#define PEGBOX_LEFT     BUTTON_LEFT
+
+#define QUIT_TEXT "Power"
+#define RESTART_TEXT "X"
+#define LVL_UP_TEXT "Start"
+#define LVL_DOWN_TEXT "Select"
+#define SELECT_TEXT "A"
+
 #else
 #error "Unsupported keymap!"
 #endif

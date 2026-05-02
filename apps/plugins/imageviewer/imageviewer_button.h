@@ -571,6 +571,18 @@
 #define IMGVIEW_MENU        BUTTON_MENU
 #define IMGVIEW_QUIT        BUTTON_BACK
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define IMGVIEW_ZOOM_IN     BUTTON_A
+#define IMGVIEW_ZOOM_OUT    BUTTON_B
+#define IMGVIEW_UP          BUTTON_UP
+#define IMGVIEW_DOWN        BUTTON_DOWN
+#define IMGVIEW_LEFT        BUTTON_LEFT
+#define IMGVIEW_RIGHT       BUTTON_RIGHT
+#define IMGVIEW_NEXT        BUTTON_Y
+#define IMGVIEW_PREVIOUS    BUTTON_X
+#define IMGVIEW_MENU        BUTTON_START
+#define IMGVIEW_QUIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

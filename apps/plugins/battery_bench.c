@@ -264,6 +264,12 @@ struct battery_tables_t {
 #define BATTERY_ON_TXT  "A - start"
 #define BATTERY_OFF_TXT "B"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define BATTERY_ON      BUTTON_START
+#define BATTERY_OFF     BUTTON_SELECT
+#define BATTERY_ON_TXT  "Start"
+#define BATTERY_OFF_TXT "Select"
+
 #else
 #error "No keymap defined!"
 #endif

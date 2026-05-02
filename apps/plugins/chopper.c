@@ -212,6 +212,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION2     BUTTON_MENU
 #define ACTIONTEXT  "A"
 
+#elif CONFIG_KEYPAD == ECHO_R1_PAD
+#define QUIT        BUTTON_POWER
+#define ACTION      BUTTON_A
+#define ACTION2     BUTTON_UP
+#define ACTIONTEXT  "A"
+
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif

@@ -424,6 +424,16 @@
 #define CUBE_PAUSE         BUTTON_USER
 #define CUBE_HIGHSPEED     BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == ECHO_R1_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_SELECT
+#define CUBE_PAUSE         BUTTON_START
+#define CUBE_HIGHSPEED     BUTTON_A
+
 #else
 #error No keymap defined!
 #endif
