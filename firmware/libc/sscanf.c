@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
@@ -21,7 +22,8 @@ static inline bool my_isxdigit(char c)
 static int parse_dec(int (*peek)(void *userp),
                      void (*pop)(void *userp),
                      void *userp,
-                     long *vp)
+                     long *vp,
+                     int max_len)
 {
     long v = 0;
     int n = 0;
@@ -45,7 +47,7 @@ static int parse_dec(int (*peek)(void *userp),
         (*pop)(userp);
         n++;
         ch = (*peek)(userp);
-    } while (my_isdigit(ch));
+    } while (my_isdigit(ch) && n < max_len);
 
     *vp = minus ? -v : v;
     return n;
@@ -55,13 +57,14 @@ static int parse_chars(int (*peek)(void *userp),
                        void (*pop)(void *userp),
                        void *userp,
                        char *vp,
-                       bool fake)
+                       bool fake,
+                       int max_len)
 {
     int n = 0;
 
     char *pt=vp;
 
-    while (!my_isspace((*peek)(userp)))
+    while (!my_isspace((*peek)(userp)) && n < max_len)
     {
         if(fake==false)
             *(pt++) = (*peek)(userp);
@@ -79,7 +82,8 @@ static int parse_chars(int (*peek)(void *userp),
 static int parse_hex(int (*peek)(void *userp),
                      void (*pop)(void *userp),
                      void *userp,
-                     unsigned long *vp)
+                     unsigned long *vp,
+                     int max_len)
 {
     unsigned long v = 0;
     int n = 0;
@@ -101,7 +105,7 @@ static int parse_hex(int (*peek)(void *userp),
         (*pop)(userp);
         n++;
         ch = (*peek)(userp);
-    } while (my_isxdigit(ch));
+    } while (my_isxdigit(ch) && n < max_len);
 
     *vp = v;
     return n;
@@ -151,11 +155,24 @@ static int scan(int (*peek)(void *userp),
                 skip=false;
             }
 
+            int max_len = 0;
+
+            while('0' <= ch && ch <= '9')
+            {
+                max_len *= 10;
+                max_len += ch - '0';
+                ch=*fmt++;
+            }
+
+            if (max_len == 0) {
+                max_len = INT_MAX;
+            }
+
             switch (ch)
             {
                 case 'x':
                     n_chars += skip_spaces(peek, pop, userp);
-                    if ((r = parse_hex(peek, pop, userp, &ulval)) >= 0)
+                    if ((r = parse_hex(peek, pop, userp, &ulval, max_len)) >= 0)
                     {
                         if(skip==false)
                         {
@@ -169,7 +186,7 @@ static int scan(int (*peek)(void *userp),
                     break;
                 case 'd':
                     n_chars += skip_spaces(peek, pop, userp);
-                    if ((r = parse_dec(peek, pop, userp, &lval)) >= 0)
+                    if ((r = parse_dec(peek, pop, userp, &lval, max_len)) >= 0)
                     {
                         if(skip==false)
                         {
@@ -194,7 +211,7 @@ static int scan(int (*peek)(void *userp),
                     switch (ch)
                     {
                         case 'x':
-                            if ((r = parse_hex(peek, pop, userp, &ulval)) >= 0)
+                            if ((r = parse_hex(peek, pop, userp, &ulval, max_len)) >= 0)
                             {
                                 if(skip==false)
                                 {
@@ -207,7 +224,7 @@ static int scan(int (*peek)(void *userp),
                                 return n;
                             break;
                         case 'd':
-                            if ((r = parse_dec(peek, pop, userp, &lval)) >= 0)
+                            if ((r = parse_dec(peek, pop, userp, &lval, max_len)) >= 0)
                             {
                                 if(skip==false)
                                 {
@@ -228,7 +245,7 @@ static int scan(int (*peek)(void *userp),
                     break;
                 case 's':
                     n_chars += skip_spaces(peek, pop, userp);
-                    n_chars += parse_chars(peek,pop, userp,skip?0:va_arg(ap, char *), skip );
+                    n_chars += parse_chars(peek,pop, userp,skip?0:va_arg(ap, char *), skip, max_len);
                     if(skip==false)
                     {
                         n++;
