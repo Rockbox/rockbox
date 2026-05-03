@@ -246,28 +246,32 @@ static bool set_option_dithering(void)
     return false;
 }
 
+MENUITEM_FUNCTION(grayscale_item, 0, ID2P(LANG_GRAYSCALE),
+                  set_option_grayscale, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(dithering_item, 0, ID2P(LANG_DITHERING),
+                  set_option_dithering, NULL, Icon_NOICON);
+
+#endif /* HAVE_LCD_COLOR */
+
 static bool set_option_hide_info(void)
 {
     rb->set_bool(rb->str(LANG_HIDE_INFO), &settings.hide_info);
     return false;
 }
 
-MENUITEM_FUNCTION(grayscale_item, 0, ID2P(LANG_GRAYSCALE),
-                  set_option_grayscale, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(dithering_item, 0, ID2P(LANG_DITHERING),
-                  set_option_dithering, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(hide_info_item, 0, ID2P(LANG_HIDE_INFO),
                   set_option_hide_info, NULL, Icon_NOICON);
 MAKE_MENU(display_menu, ID2P(LANG_MENU_DISPLAY_OPTIONS), NULL, Icon_NOICON,
+#ifdef HAVE_LCD_COLOR
           &grayscale_item,
           &dithering_item,
+#endif /* HAVE_LCD_COLOR */
           &hide_info_item);
 
 static void display_options(void)
 {
     rb->do_menu(&display_menu, NULL, NULL, false);
 }
-#endif /* HAVE_LCD_COLOR */
 
 static int show_menu(void) /* return 1 to quit */
 {
@@ -281,9 +285,7 @@ static int show_menu(void) /* return 1 to quit */
 #ifdef USE_PLUG_BUF
         MIID_SHOW_PLAYBACK_MENU,
 #endif
-#ifdef HAVE_LCD_COLOR
         MIID_DISPLAY_OPTIONS,
-#endif
         MIID_QUIT,
     };
 
@@ -294,9 +296,7 @@ static int show_menu(void) /* return 1 to quit */
 #ifdef USE_PLUG_BUF
                         ID2P(LANG_PLAYBACK_CONTROL),
 #endif
-#ifdef HAVE_LCD_COLOR
                         ID2P(LANG_MENU_DISPLAY_OPTIONS),
-#endif
                         ID2P(LANG_MENU_QUIT));
 
     static const struct opt_items slideshow[2] = {
@@ -332,11 +332,9 @@ static int show_menu(void) /* return 1 to quit */
             }
             break;
 #endif
-#ifdef HAVE_LCD_COLOR
         case MIID_DISPLAY_OPTIONS:
             display_options();
             break;
-#endif
         case MIID_QUIT:
             return 1;
             break;
