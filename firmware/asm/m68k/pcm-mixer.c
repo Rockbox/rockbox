@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 
-#define MIXER_OPTIMIZED_MIX_SAMPLES
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
 static struct emac_context
 {
     unsigned long saved;
