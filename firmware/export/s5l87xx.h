@@ -26,9 +26,10 @@
 #include <stdint.h>
 #endif
 
-#define REG16_PTR_T          volatile uint16_t *
-#define REG32_PTR_T          volatile uint32_t *
-#define VOID_PTR_PTR_T       void* volatile*
+#define REG_BIT(x)     (1 << (x))
+#define REG16_PTR_T    volatile uint16_t *
+#define REG32_PTR_T    volatile uint32_t *
+#define VOID_PTR_PTR_T void* volatile*
 
 #if CONFIG_CPU==S5L8700 || CONFIG_CPU==S5L8701
 #define CACHEALIGN_BITS (4)  /* 2^4 = 16 bytes */
@@ -1612,19 +1613,30 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 #define SHA1_BASE 0x38000000
 #endif
 
-#define SHA1CONFIG    (*((REG32_PTR_T)(SHA1_BASE)))
-#define SHA1RESET     (*((REG32_PTR_T)(SHA1_BASE + 0x04)))
+#define SHA1_CONFIG        (*((REG32_PTR_T)(SHA1_BASE)))
+#define SHA1_SWRESET       (*((REG32_PTR_T)(SHA1_BASE + 0x04)))
+#define SHA1_INT_SRC       (*((REG32_PTR_T)(SHA1_BASE + 0x08)))
+#define SHA1_INT_MASK      (*((REG32_PTR_T)(SHA1_BASE + 0x0C)))
+#define SHA1_ENDIAN        (*((REG32_PTR_T)(SHA1_BASE + 0x10)))
 
-#if CONFIG_CPU == S5L8720
-#define SHA1UNK10     (*((REG32_PTR_T)(SHA1_BASE + 0x10)))
-#endif
+// Result is 20 bytes (160 bits) 0x20-0x33
+#define SHA1_RESULT        ((REG32_PTR_T)(SHA1_BASE + 0x20))
 
-#define SHA1RESULT      ((REG32_PTR_T)(SHA1_BASE + 0x20))
-#define SHA1DATAIN      ((REG32_PTR_T)(SHA1_BASE + 0x40))
+// Input is 64 bytes (512 bits) 0x40-0x7F
+#define SHA1_DATA          ((REG32_PTR_T)(SHA1_BASE + 0x40))
 
-#if CONFIG_CPU == S5L8720
-#define SHA1UNK80     (*((REG32_PTR_T)(SHA1_BASE + 0x80)))
-#endif
+#define SHA1_MASTER_MODE   (*((REG32_PTR_T)(SHA1_BASE + 0x80)))
+#define SHA1_MS_START_ADDR (*((REG32_PTR_T)(SHA1_BASE + 0x84)))
+#define SHA1_VERSION       (*((REG32_PTR_T)(SHA1_BASE + 0x88)))
+#define SHA1_MS_SIZE       (*((REG32_PTR_T)(SHA1_BASE + 0x8C)))
+#define SHA1_FIFO_PARAM    (*((REG32_PTR_T)(SHA1_BASE + 0x90)))
+#define SHA1_FIFO_CMD      (*((REG32_PTR_T)(SHA1_BASE + 0x94)))
+#define SHA1_TX_FIFO_STAT  (*((REG32_PTR_T)(SHA1_BASE + 0x98)))
+#define SHA1_TX_FIFO       (*((REG32_PTR_T)(SHA1_BASE + 0xA0)))
+
+#define SHA1_CONFIG_BUSY   REG_BIT(0)
+#define SHA1_CONFIG_GO     REG_BIT(1)
+#define SHA1_CONFIG_CONT   REG_BIT(3)
 
 /* Clickwheel controller - S5L8701+ */
 #if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720

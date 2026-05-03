@@ -64,13 +64,13 @@ void sha1(void* data, uint32_t size, void* hash)
     uint32_t* databuf = (uint32_t*)data;
     uint32_t* hashbuf = (uint32_t*)hash;
     clockgate_enable(CLOCKGATE_SHA, true);
-    SHA1RESET = 1;
-    while (SHA1CONFIG & 1);
-    SHA1RESET = 0;
-    SHA1CONFIG = 0;
+    SHA1_SWRESET = 1;
+    while (SHA1_CONFIG & SHA1_CONFIG_BUSY);
+    SHA1_SWRESET = 0;
+    SHA1_CONFIG = 0;
 #if CONFIG_CPU == S5L8720
-    SHA1UNK10 = 0;
-    SHA1UNK80 = 0;
+    SHA1_ENDIAN = 0; // little endian
+    SHA1_MASTER_MODE = 0; // slave mode
 #endif    
     while (!done)
     {
@@ -93,15 +93,15 @@ void sha1(void* data, uint32_t size, void* hash)
                 tmp8[0x3f] = (size << 3) & 0xff;
                 done = true;
             }
-            for (i = 0; i < 16; i++) SHA1DATAIN[i] = tmp32[i];
+            for (i = 0; i < 16; i++) SHA1_DATA[i] = tmp32[i];
         }
         else
-            for (i = 0; i < 16; i++) SHA1DATAIN[i] = *databuf++;
-        SHA1CONFIG |= 2;
-        while (SHA1CONFIG & 1);
-        SHA1CONFIG |= 8;
+            for (i = 0; i < 16; i++) SHA1_DATA[i] = *databuf++;
+        SHA1_CONFIG |= SHA1_CONFIG_GO;
+        while (SHA1_CONFIG & SHA1_CONFIG_BUSY);
+        SHA1_CONFIG |= SHA1_CONFIG_CONT;
     }
-    for (i = 0; i < 5; i++) *hashbuf++ = SHA1RESULT[i];
+    for (i = 0; i < 5; i++) *hashbuf++ = SHA1_RESULT[i];
     clockgate_enable(CLOCKGATE_SHA, false);
 }
 

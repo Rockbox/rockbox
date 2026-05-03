@@ -103,18 +103,18 @@ static void aes_decrypt(void* data, uint32_t size)
 static void calc_hash(uint32_t* data, uint32_t size, uint32_t* result)
 {
     uint32_t ptr, i;
-    uint32_t config = 2;
+    uint32_t config = SHA1_CONFIG_GO;
 
     PWRCONEXT &= ~0x4;
 
     for (ptr = 0; ptr < (size >> 2); ptr += 0x10)
     {
-      for (i = 0; i < 0x10; i++) SHA1DATAIN[i] = data[ptr + i];
-      SHA1CONFIG = config;
-      config = 0xA;
-      while ((SHA1CONFIG & 1) != 0);
+      for (i = 0; i < 0x10; i++) SHA1_DATA[i] = data[ptr + i];
+      SHA1_CONFIG = config;
+      config = SHA1_CONFIG_CONT | SHA1_CONFIG_GO;
+      while ((SHA1_CONFIG & SHA1_CONFIG_BUSY) != 0);
     }
-    for (i = 0; i < 5; i ++) result[i] = SHA1RESULT[i];
+    for (i = 0; i < 5; i ++) result[i] = SHA1_RESULT[i];
 
     PWRCONEXT |= 0x4;
 }
