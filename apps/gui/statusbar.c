@@ -331,7 +331,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         }
 #endif
         display->setfont(FONT_UI);
-        display->update_viewport();
         display->set_viewport(last_vp);
         bar->lastinfo = bar->info;
     }
