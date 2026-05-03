@@ -24,6 +24,7 @@
 #include "powermgmt.h"
 #include "timefuncs.h"
 #include "usb_drv.h"
+#include "panic.h"
 
 #include "iap/audio.h"
 #include "iap/libiap/iap.h"
@@ -448,6 +449,7 @@ int usb_iap_get_max_packet_size(int ep) {
         return 64;
     } else {
         panicf("unexpected endpoint number %d", ep);
+        return 0;
     }
 }
 
