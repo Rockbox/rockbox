@@ -381,7 +381,7 @@ bool format_buffers_with_offset(int afmt)
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
 {
-    char *suffix;
+    const char *suffix;
     unsigned int i;
 
     suffix = strrchr(filename, '.');
@@ -418,7 +418,7 @@ unsigned int probe_file_format(const char *filename)
  * file that would prevent playback. supply a filedescriptor <0 and the file will be opened
  * and closed automatically within the get_metadata call
  * get_metadata_ex allows flags to change the way get_metadata behaves
- * METADATA_EXCLUDE_ID3_PATH  won't copy filename path to the id3 path buffer 
+ * METADATA_EXCLUDE_ID3_PATH  won't copy filename path to the id3 path buffer
  * METADATA_CLOSE_FD_ON_EXIT closes the open filedescriptor on exit
  */
 bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int flags)
@@ -554,8 +554,8 @@ void fill_metadata_from_path(struct mp3entry *id3, const char *trackname)
     wipe_mp3entry(id3);
 
     /* Find the filename portion of the path */
-    p = strrchr(trackname, '/');
-    strlcpy(id3->id3v2buf, p ? ++p : id3->path, ID3V2_BUF_SIZE);
+    const char *pt = strrchr(trackname, '/');
+    strlcpy(id3->id3v2buf, pt ? ++pt : id3->path, ID3V2_BUF_SIZE);
 
     /* Get the format from the extension and trim it off */
     p = strrchr(id3->id3v2buf, '.');
