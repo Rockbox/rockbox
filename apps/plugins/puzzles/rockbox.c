@@ -3066,6 +3066,7 @@ static void tune_input(const char *name)
 	"Signpost",
 	"Slide",
 	"Untangle",
+    NULL
     };
 
     input_settings.sticky_mouse = string_in_list(name, sticky_mouse_games);
