@@ -295,8 +295,6 @@ void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
     else
         RXCON(endp) = (epnum << 8) | RXEPEN | RXNAK | RXACKINTEN | RXCFINTE | RXERRINTEN;
     EN_INT |= 1 << (epnum + 7);
-
-    return 0;
 }
 
 void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
@@ -307,7 +305,6 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 
     /* disable interrupt from this endpoint */
     EN_INT &= ~(1 << (num + 7));
-    return 0;
 }
 
 /* Set the address (usually it's in a register).

@@ -1204,7 +1204,6 @@ void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
         REG_USB_INTRINE |= USB_INTR_EP(num);
     else
         REG_USB_INTROUTE |= USB_INTR_EP(num);
-    return 0;
 }
 
 void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
@@ -1218,5 +1217,4 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
         REG_USB_INTRINE &= ~USB_INTR_EP(num);
     else
         REG_USB_INTROUTE &= ~USB_INTR_EP(num);
-    return 0;
 }

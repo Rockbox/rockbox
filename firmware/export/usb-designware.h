@@ -24,6 +24,7 @@
 #define __USB_DESIGNWARE_H__
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include "config.h"
 #include "cpu.h"
 

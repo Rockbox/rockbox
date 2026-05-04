@@ -1496,7 +1496,7 @@ void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 
     int num = EP_NUM(ep);
     int dir = EP_DIR(ep);
-    return tnetv_gadget_ep_enable(num, dir == DIR_IN);
+    tnetv_gadget_ep_enable(num, dir == DIR_IN);
 }
 
 void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
@@ -1505,5 +1505,5 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 
     int num = EP_NUM(ep);
     int dir = EP_DIR(ep);
-    return tnetv_gadget_ep_disable(num, dir == DIR_IN);
+    tnetv_gadget_ep_disable(num, dir == DIR_IN);
 }
