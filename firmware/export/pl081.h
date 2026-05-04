@@ -24,33 +24,33 @@
 
 /* ARM PrimeCell PL081 Single Master DMA controller */
 
-#define DMAC_INT_STATUS           (*(volatile unsigned long*)(DMAC_BASE+0x000))
-#define DMAC_INT_TC_STATUS        (*(volatile unsigned long*)(DMAC_BASE+0x004))
-#define DMAC_INT_TC_CLEAR         (*(volatile unsigned long*)(DMAC_BASE+0x008))
-#define DMAC_INT_ERROR_STATUS     (*(volatile unsigned long*)(DMAC_BASE+0x00C))
-#define DMAC_INT_ERR_CLEAR        (*(volatile unsigned long*)(DMAC_BASE+0x010))
-#define DMAC_RAW_INT_TC_STATUS    (*(volatile unsigned long*)(DMAC_BASE+0x014))
-#define DMAC_RAW_INT_ERROR_STATUS (*(volatile unsigned long*)(DMAC_BASE+0x018))
-#define DMAC_ENBLD_CHANS          (*(volatile unsigned long*)(DMAC_BASE+0x01C))
-#define DMAC_SOFT_B_REQ           (*(volatile unsigned long*)(DMAC_BASE+0x020))
-#define DMAC_SOFT_S_REQ           (*(volatile unsigned long*)(DMAC_BASE+0x024))
-#define DMAC_SOFT_LB_REQ          (*(volatile unsigned long*)(DMAC_BASE+0x028))
-#define DMAC_SOFT_LS_REQ          (*(volatile unsigned long*)(DMAC_BASE+0x02C))
-#define DMAC_CONFIGURATION        (*(volatile unsigned long*)(DMAC_BASE+0x030))
-#define DMAC_SYNC                 (*(volatile unsigned long*)(DMAC_BASE+0x034))
+#define DMAC_INT_STATUS           (*(volatile uint32_t*)(DMAC_BASE+0x000))
+#define DMAC_INT_TC_STATUS        (*(volatile uint32_t*)(DMAC_BASE+0x004))
+#define DMAC_INT_TC_CLEAR         (*(volatile uint32_t*)(DMAC_BASE+0x008))
+#define DMAC_INT_ERROR_STATUS     (*(volatile uint32_t*)(DMAC_BASE+0x00C))
+#define DMAC_INT_ERR_CLEAR        (*(volatile uint32_t*)(DMAC_BASE+0x010))
+#define DMAC_RAW_INT_TC_STATUS    (*(volatile uint32_t*)(DMAC_BASE+0x014))
+#define DMAC_RAW_INT_ERROR_STATUS (*(volatile uint32_t*)(DMAC_BASE+0x018))
+#define DMAC_ENBLD_CHANS          (*(volatile uint32_t*)(DMAC_BASE+0x01C))
+#define DMAC_SOFT_B_REQ           (*(volatile uint32_t*)(DMAC_BASE+0x020))
+#define DMAC_SOFT_S_REQ           (*(volatile uint32_t*)(DMAC_BASE+0x024))
+#define DMAC_SOFT_LB_REQ          (*(volatile uint32_t*)(DMAC_BASE+0x028))
+#define DMAC_SOFT_LS_REQ          (*(volatile uint32_t*)(DMAC_BASE+0x02C))
+#define DMAC_CONFIGURATION        (*(volatile uint32_t*)(DMAC_BASE+0x030))
+#define DMAC_SYNC                 (*(volatile uint32_t*)(DMAC_BASE+0x034))
 
 /* Channel registers (0 & 1) */
-#define DMAC_CH_SRC_ADDR(c)       (*(volatile unsigned long*)(DMAC_BASE+0x100+(0x20*c)))
-#define DMAC_CH_DST_ADDR(c)       (*(volatile unsigned long*)(DMAC_BASE+0x104+(0x20*c)))
-#define DMAC_CH_LLI(c)            (*(volatile unsigned long*)(DMAC_BASE+0x108+(0x20*c)))
-#define DMAC_CH_CONTROL(c)        (*(volatile unsigned long*)(DMAC_BASE+0x10C+(0x20*c)))
-#define DMAC_CH_CONFIGURATION(c)  (*(volatile unsigned long*)(DMAC_BASE+0x110+(0x20*c)))
+#define DMAC_CH_SRC_ADDR(c)       (*(volatile uint32_t*)(DMAC_BASE+0x100+(0x20*c)))
+#define DMAC_CH_DST_ADDR(c)       (*(volatile uint32_t*)(DMAC_BASE+0x104+(0x20*c)))
+#define DMAC_CH_LLI(c)            (*(volatile uint32_t*)(DMAC_BASE+0x108+(0x20*c)))
+#define DMAC_CH_CONTROL(c)        (*(volatile uint32_t*)(DMAC_BASE+0x10C+(0x20*c)))
+#define DMAC_CH_CONFIGURATION(c)  (*(volatile uint32_t*)(DMAC_BASE+0x110+(0x20*c)))
 
 /* Test registers */
-#define DMAC_ITCR                 (*(volatile unsigned long*)(DMAC_BASE+0x500))
-#define DMAC_ITOP1                (*(volatile unsigned long*)(DMAC_BASE+0x504))
-#define DMAC_ITOP2                (*(volatile unsigned long*)(DMAC_BASE+0x508))
-#define DMAC_ITOP3                (*(volatile unsigned long*)(DMAC_BASE+0x50C))
+#define DMAC_ITCR                 (*(volatile uint32_t*)(DMAC_BASE+0x500))
+#define DMAC_ITOP1                (*(volatile uint32_t*)(DMAC_BASE+0x504))
+#define DMAC_ITOP2                (*(volatile uint32_t*)(DMAC_BASE+0x508))
+#define DMAC_ITOP3                (*(volatile uint32_t*)(DMAC_BASE+0x50C))
 
 /* Flow controllers */
 

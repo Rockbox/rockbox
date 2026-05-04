@@ -620,7 +620,7 @@ void dvfs_int_mask(bool mask)
 /* Set a signal load tracking weight */
 void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value)
 {
-    volatile unsigned long *reg_p = &CCM_LTR2;
+    volatile uint32_t *reg_p = &CCM_LTR2;
     unsigned int shift = 3 * index;
 
     if (index < 9)
@@ -639,7 +639,7 @@ void dvfs_set_lt_weight(enum DVFS_LT_SIGS index, unsigned long value)
 /* Return a signal load tracking weight */
 unsigned long dvfs_get_lt_weight(enum DVFS_LT_SIGS index)
 {
-    volatile unsigned long *reg_p = &CCM_LTR2;
+    volatile uint32_t *reg_p = &CCM_LTR2;
     unsigned int shift = 3 * index;
 
     if (index < 9)

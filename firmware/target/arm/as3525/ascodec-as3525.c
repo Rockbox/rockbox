@@ -127,7 +127,7 @@ static void ascodec_int_audio_cb(struct ascodec_request *req);
 void INT_I2C_AUDIO(void);
 static struct ascodec_request as_audio_req;
 static struct semaphore adc_done_sem;
-static unsigned long ascodec_enrd0_shadow = 0;
+static uint32_t ascodec_enrd0_shadow = 0;
 
 static void ascodec_wait_cb(struct ascodec_request *req);
 

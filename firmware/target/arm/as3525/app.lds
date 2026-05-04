@@ -1,3 +1,4 @@
+#define __ASSEMBLER__
 #include "config.h"
 #include "cpu.h"
 

@@ -36,7 +36,7 @@
 /* Cut down to bare bones essentials */
 
 /* Mask of channels with callback enabled */
-static unsigned long sdma_enabled_ints = 0;
+static uint32_t sdma_enabled_ints = 0;
 /* One channel control block per channel in physically mapped device RAM */
 static struct channel_control_block ccb_array[CH_NUM] NOCACHEBSS_ATTR;
 /* Channel 0 (command channel) data */

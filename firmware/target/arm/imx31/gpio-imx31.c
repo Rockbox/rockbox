@@ -44,7 +44,7 @@ static __attribute__((interrupt("IRQ"))) void GPIO3_HANDLER(void);
 
 static struct gpio_module_desc
 {
-    volatile unsigned long * const base;    /* Module base address */
+    volatile uint32_t * const base;    /* Module base address */
     void (* const handler)(void);           /* Interrupt function */
     const struct gpio_event *events;        /* Event handler list */
     unsigned long enabled;                  /* Enabled event mask */
@@ -55,7 +55,7 @@ static struct gpio_module_desc
 {
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
     [GPIO1_NUM] = &(struct gpio_module_desc) {
-        .base         = (unsigned long *)GPIO1_BASE_ADDR,
+        .base         = (uint32_t *)GPIO1_BASE_ADDR,
         .ints         = INT_GPIO1,
         .handler      = GPIO1_HANDLER,
         .int_priority = GPIO1_INT_PRIO
@@ -63,7 +63,7 @@ static struct gpio_module_desc
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
     [GPIO2_NUM] = &(struct gpio_module_desc) {
-        .base         = (unsigned long *)GPIO2_BASE_ADDR,
+        .base         = (uint32_t *)GPIO2_BASE_ADDR,
         .ints         = INT_GPIO2,
         .handler      = GPIO2_HANDLER,
         .int_priority = GPIO2_INT_PRIO
@@ -71,7 +71,7 @@ static struct gpio_module_desc
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
     [GPIO3_NUM] = &(struct gpio_module_desc) {
-        .base         = (unsigned long *)GPIO3_BASE_ADDR,
+        .base         = (uint32_t *)GPIO3_BASE_ADDR,
         .ints         = INT_GPIO3,
         .handler      = GPIO3_HANDLER,
         .int_priority = GPIO3_INT_PRIO,
@@ -97,7 +97,7 @@ static const struct gpio_event * event_from_id(
 static void gpio_call_events(enum gpio_module_number gpio)
 {
     const struct gpio_module_desc * const desc = gpio_descs[gpio];
-    volatile unsigned long * const base = desc->base;
+    volatile uint32_t * const base = desc->base;
 
     /* Send only events that are not masked */
     unsigned long pnd = base[GPIO_ISR] & base[GPIO_IMR];
@@ -180,7 +180,7 @@ bool gpio_enable_event(enum gpio_id id, bool enable)
     if (!event)
         return false;
 
-    volatile unsigned long * const base = desc->base;
+    volatile uint32_t * const base = desc->base;
     unsigned long num = id % 32;
     unsigned long mask = 1ul << num;
 
@@ -205,7 +205,7 @@ bool gpio_enable_event(enum gpio_id id, bool enable)
         }
         else
         {
-            volatile unsigned long *icrp = &base[GPIO_ICR + num / 16];
+            volatile uint32_t *icrp = &base[GPIO_ICR + num / 16];
             unsigned int shift = 2*(num % 16);
             bitmod32(icrp, event->sense << shift, 0x3 << shift);
             base[GPIO_EDGE_SEL] &= ~mask;

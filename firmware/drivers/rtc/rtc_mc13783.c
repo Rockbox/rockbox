@@ -69,7 +69,7 @@ static const unsigned char rtc_registers[RTC_NUM_REGS_RD] =
 
 /* was it an alarm that triggered power on ? */
 static bool alarm_start = false;
-static unsigned long rtc_is_dirty = 1; /* force a read right away */
+static uint32_t rtc_is_dirty = 1; /* force a read right away */
 
 static const unsigned short month_table[13] =
 {

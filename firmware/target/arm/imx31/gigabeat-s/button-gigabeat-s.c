@@ -35,7 +35,7 @@
 static bool initialized     = false;
 #endif
 
-static unsigned long ext_btn = BUTTON_NONE; /* Buttons not on KPP */
+static uint32_t ext_btn = BUTTON_NONE; /* Buttons not on KPP */
 static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;

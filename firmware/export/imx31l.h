@@ -21,17 +21,21 @@
 #ifndef __IMX31L_H__
 #define __IMX31L_H__
 
+#if !defined(__ASSEMBLER__)
+#include <stdint.h>
+#endif
+
 /* Most(if not all) of these defines are copied from Nand-Boot v4 provided w/ the Imx31 Linux Bsp*/
 
-#define REG8_PTR_T  volatile unsigned char *
-#define REG16_PTR_T volatile unsigned short *
-#define REG32_PTR_T volatile unsigned long *
+#define REG8_PTR_T  volatile uint8_t *
+#define REG16_PTR_T volatile uint16_t *
+#define REG32_PTR_T volatile uint32_t *
 
 /* Place in the section with the framebuffer */
 #define TTB_BASE_ADDR (CSD0_BASE_ADDR + (MEMORYSIZE*0x100000) - TTB_SIZE)
 #define TTB_SIZE      (0x4000)
 #define IRAM_SIZE     (0x4000)
-#define TTB_BASE      ((unsigned long *)TTB_BASE_ADDR)
+#define TTB_BASE      ((uint32_t *)TTB_BASE_ADDR)
 #define FRAME_SIZE    (240*320*2)
 /* Rockbox framebuffer address, not retail OS */
 #define FRAME_PHYS_ADDR (TTB_BASE_ADDR - FRAME_SIZE)

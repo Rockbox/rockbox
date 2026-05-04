@@ -191,10 +191,10 @@ struct gpio_event
 #endif /* DEFINE_GPIO_VECTOR_TABLE */
 
 #define GPIO_BASE_ADDR \
-    (volatile unsigned long * const [GPIO_NUM_GPIO]) { \
-        (volatile unsigned long *)GPIO1_BASE_ADDR,     \
-        (volatile unsigned long *)GPIO2_BASE_ADDR,     \
-        (volatile unsigned long *)GPIO3_BASE_ADDR }
+    (volatile uint32_t * const [GPIO_NUM_GPIO]) { \
+        (volatile uint32_t *)GPIO1_BASE_ADDR,     \
+        (volatile uint32_t *)GPIO2_BASE_ADDR,     \
+        (volatile uint32_t *)GPIO3_BASE_ADDR }
 
 #define GPIO_DR       (0x00 / sizeof (unsigned long)) /* 00h        */
 #define GPIO_GDIR     (0x04 / sizeof (unsigned long)) /* 04h        */

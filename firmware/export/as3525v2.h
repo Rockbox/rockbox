@@ -34,13 +34,13 @@
 #undef IRAM_SIZE
 #define IRAM_SIZE 0x100000
 
-#define CGU_SDSLOT         (*(volatile unsigned long *)(CGU_BASE + 0x3C))
+#define CGU_SDSLOT         (*(volatile uint32_t*)(CGU_BASE + 0x3C))
 
 #undef USB_NUM_ENDPOINTS
 /* 7 available EPs (0b00000000010101010000000000101011), 6 used */
 #define USB_NUM_ENDPOINTS   6
 
-#define CCU_USB         (*(volatile unsigned long *)(CCU_BASE + 0x20))
+#define CCU_USB         (*(volatile uint32_t*)(CCU_BASE + 0x20))
 
 #undef USB_DEVBSS_ATTR
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))

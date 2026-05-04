@@ -32,7 +32,7 @@ void iomuxc_set_pin_mux(enum IMX31_IOMUXC_PINS pin,
     unsigned long index = pin / 4;
     unsigned int shift = 8*(pin % 4);
 
-    bitmod32((unsigned long *)(IOMUXC_BASE_ADDR + 0xc) + index,
+    bitmod32((uint32_t *)(IOMUXC_BASE_ADDR + 0xc) + index,
               mux << shift, IOMUXC_MUX_MASK << shift);
 }
 
@@ -45,6 +45,6 @@ void iomuxc_set_pad_config(enum IMX31_IOMUXC_PINS pin,
     unsigned long index = padoffs / 3;
     unsigned int shift = 10*(padoffs % 3);
 
-    bitmod32((unsigned long *)(IOMUXC_BASE_ADDR + 0x154) + index,
+    bitmod32((uint32_t *)(IOMUXC_BASE_ADDR + 0x154) + index,
              config << shift, IOMUXC_PAD_MASK << shift);
 }

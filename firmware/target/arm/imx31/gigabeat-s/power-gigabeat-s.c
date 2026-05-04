@@ -33,7 +33,7 @@
 #include "fmradio_i2c.h"
 #endif
 
-static unsigned long power_status = POWER_INPUT_NONE;
+static uint32_t power_status = POWER_INPUT_NONE;
 
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)

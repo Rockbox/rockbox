@@ -356,7 +356,7 @@ static bool send_cmd(int drive, uint8_t cmd, uint32_t arg, uint32_t flags, uint3
 
 static int wait_for_state(int drive, unsigned state)
 {
-    unsigned long response;
+    uint32_t response;
     unsigned int timeout = current_tick + 5*HZ;
     int cmd_retry = 10;
     int next_yield = current_tick + MIN_YIELD_PERIOD;
@@ -424,21 +424,21 @@ static int init_sd_card(int drive)
 
         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         if(!send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
-                MCI_ACMD|MCI_NOCRC|MCI_RESP, &SDMMC_INFO(drive).ocr))
+                MCI_ACMD|MCI_NOCRC|MCI_RESP, (uint32_t*)&SDMMC_INFO(drive).ocr))
             return -100;
     } while(!(SDMMC_INFO(drive).ocr & (1<<31)));
 
     /* CMD2 send CID */
-    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, SDMMC_INFO(drive).cid))
+    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, (uint32_t*)SDMMC_INFO(drive).cid))
         return -3;
 
     /* CMD3 send RCA */
-    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &SDMMC_INFO(drive).rca))
+    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, (uint32_t*)&SDMMC_INFO(drive).rca))
         return -4;
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, SDMMC_RCA(drive), MCI_RESP|MCI_LONG_RESP,
-            SDMMC_INFO(drive).csd))
+            (uint32_t*)SDMMC_INFO(drive).csd))
         return -9;
 
     sd_parse_csd(&SDMMC_INFO(drive));

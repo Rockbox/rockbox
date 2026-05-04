@@ -32,7 +32,7 @@ enum IMX31_PLLS ccm_get_src_pll(void)
 
 void ccm_module_clock_gating(enum IMX31_CG_LIST cg, enum IMX31_CG_MODES mode)
 {
-    volatile unsigned long *reg;
+    volatile uint32_t *reg;
     unsigned long mask;
     int shift;
 
@@ -112,7 +112,7 @@ unsigned int ccm_get_ata_clk(void)
 void ccm_set_mcupll_and_pdr(unsigned long pllctl, unsigned long pdr)
 {
     unsigned int pll = ccm_get_src_pll();
-    volatile unsigned long *pllreg = &(&CCM_MPCTL)[pll];
+    volatile uint32_t *pllreg = &(&CCM_MPCTL)[pll];
     unsigned long fref = ccm_get_pll_ref_clk_rate();
     unsigned long curfreq = ccm_calc_pll_rate(fref, *pllreg);
     unsigned long newfreq = ccm_calc_pll_rate(fref, pllctl);
