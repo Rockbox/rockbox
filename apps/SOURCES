@@ -37,6 +37,9 @@ menus/playlist_menu.c
 #ifdef HAVE_RECORDING
 menus/recording_menu.c
 #endif
+#ifdef HAVE_BLUETOOTH
+menus/bluetooth_menu.c
+#endif
 menus/settings_menu.c
 menus/sound_menu.c
 #if CONFIG_RTC

@@ -761,12 +761,20 @@ static struct browse_folder_info langs = { LANG_DIR, SHOW_LNG };
 MENUITEM_FUNCTION_W_PARAM(browse_langs, 0, ID2P(LANG_LANGUAGE),
                           browse_folder, (void*)&langs, NULL, Icon_Language);
 
+#ifdef HAVE_BLUETOOTH
+/* bluetooth_menu is defined in bluetooth_menu.c */
+extern struct menu bluetooth_menu;
+#endif
+
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,
           &wps_settings,
           &playlist_settings, &file_menu,
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
+#endif
+#ifdef HAVE_BLUETOOTH
+          &bluetooth_menu,
 #endif
           &display_menu, &system_menu,
           &startup_shutdown_menu,

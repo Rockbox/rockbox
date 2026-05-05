@@ -54,6 +54,9 @@ struct pcm_sink {
 
 enum pcm_sink_ids {
     PCM_SINK_BUILTIN = 0,
+#ifdef HAVE_BLUETOOTH
+    PCM_SINK_BLUETOOTH,
+#endif
 #ifdef USB_ENABLE_IAP
     PCM_SINK_IAP,
 #endif

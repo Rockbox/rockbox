@@ -2443,6 +2443,9 @@ const struct settings_list settings[] = {
 #if defined(HAVE_GENERAL_PURPOSE_LED)
     OFFON_SETTING(0, use_led_indicators, LANG_USE_LED_INDICATORS, false, "LED indicators", NULL),
 #endif
+#ifdef HAVE_BLUETOOTH
+    OFFON_SETTING(0, bluetooth_enabled, LANG_BLUETOOTH, false, "bluetooth enabled", NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

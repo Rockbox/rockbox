@@ -157,6 +157,9 @@
 /* Alternatively, you can define autostart plugin path and its argument: */
 // #define AUTOROCK     VIEWERS_DATA_DIR"/imageviewer.rock"
 // #define AUTOROCK_ARG "/jpegs/sample.jpg"
+#ifdef HAVE_BLUETOOTH
+extern void bluetooth_init(void);
+#endif
 
 static void init(void);
 /* main(), and various functions called by main() and init() may be
@@ -512,6 +515,7 @@ static void init(void)
     power_init();
 
     enable_irq();
+
 #if defined(CPU_ARM_CLASSIC)
     enable_fiq();
 #endif
@@ -711,6 +715,9 @@ static void init(void)
 
     CHART(">settings_load");
     settings_load();
+#ifdef HAVE_BLUETOOTH
+    bluetooth_init();
+#endif
     CHART("<settings_load");
 
 #if defined(BUTTON_REC) || \

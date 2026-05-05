@@ -77,12 +77,18 @@
  *
  */
 
+#ifdef HAVE_BLUETOOTH
+extern struct pcm_sink bluetooth_pcm_sink;
+#endif
 #ifdef USB_ENABLE_IAP
 extern struct pcm_sink iap_pcm_sink;
 #endif
 
 static struct pcm_sink* sinks[PCM_SINK_NUM] = {
     [PCM_SINK_BUILTIN] = &builtin_pcm_sink,
+#ifdef HAVE_BLUETOOTH
+    [PCM_SINK_BLUETOOTH] = &bluetooth_pcm_sink,
+#endif
 #ifdef USB_ENABLE_IAP
     [PCM_SINK_IAP] = &iap_pcm_sink,
 #endif
