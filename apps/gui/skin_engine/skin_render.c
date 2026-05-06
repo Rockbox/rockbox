@@ -85,7 +85,7 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
 
 static char* skin_buffer;
 static bool defer_rendering;
-static bool dirty;
+static bool dirty[NB_SCREENS];
 
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
@@ -297,7 +297,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             {
                 struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, data->albumart);
                 if (aa)
-                {    
+                {
                     int handle = playback_current_aa_hid(data->playback_aa_slot);
 #if CONFIG_TUNER
                     if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
@@ -850,9 +850,9 @@ void skin_defer_rendering(bool deferred)
 
 void skin_render_deferred(struct screen *display, struct viewport *vp)
 {
-    if (dirty)
+    if (dirty[display->screen_type])
     {
-        dirty = false;
+        dirty[display->screen_type] = false;
         display->set_viewport(NULL);
         display->update();
         sb_skin_force_next_update();
@@ -964,7 +964,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     /* Restore the default viewport */
     display->set_viewport_ex(NULL, VP_FLAG_VP_SET_CLEAN);
     if (defer_rendering)
-        dirty = true;
+        dirty[display->screen_type] = true;
     else
         display->update();
 }
