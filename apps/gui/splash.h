@@ -29,6 +29,9 @@
  * Puts a splash message centered on all the screens for a given period
  *  - ticks : how long the splash is displayed (in rb ticks)
  *  - fmt : what to say *printf style
+ *  /f at the beginning of a string will reset the max width and height seen
+ *  /n will end a line /n/n will add a blank line
+ *  /t will start a new line and indent the string on that line
  */
 extern void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 

@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) Daniel Stenberg (2002)
+ * Copyright (C) William Wilgus (2026)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,109 +40,196 @@
 static long progress_next_tick, talked_tick;
 
 #define MAXLINES  (LCD_HEIGHT/6)
-#define MAXBUFFER 512
+
+#if MEMORYSIZE > 8
+    #define MAXBUFFER MAX(1024, (LCD_WIDTH/SYSFONT_WIDTH) * MAXLINES + 1)
+#else
+    #define MAXBUFFER MAX(512, (LCD_WIDTH/SYSFONT_WIDTH) * MAXLINES + 1)
+#endif
+
 #define RECT_SPACING 3
 #define SPLASH_MEMORY_INTERVAL (HZ)
 
 static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                             struct viewport *vp, int addl_lines)
 {
-    static int max_width[NB_SCREENS] = {2*RECT_SPACING};
+    static const char matchstr[] = "\r\n\f\v\t";
+    static int max_width[NB_SCREENS] = {0};
+    static int max_height[NB_SCREENS] = {0};
+    static char splash_buf[MAXBUFFER] = {0};
+
+    struct splash_lines {
+        const char *str;
+        uint16_t x;
+        uint16_t len;
+    } lines[MAXLINES];
+    memset(lines, 0, sizeof(lines));
+
 #ifndef BOOTLOADER
     static enum current_activity last_act = ACTIVITY_UNKNOWN;
     enum current_activity act = get_current_activity();
 
-    if (last_act != act) /* changed activities reset max_width */
+    if (last_act != act) /* changed activities reset width / height */
     {
         FOR_NB_SCREENS(i)
-            max_width[i] = 2*RECT_SPACING;
+        {
+            max_width[i] = 0;
+            max_height[i] = 0;
+        }
         last_act = act;
     }
 #endif
-    /* prevent screen artifacts by keeping the max width seen */
-    int min_width = max_width[screen->screen_type];
-    char splash_buf[MAXBUFFER];
-    struct splash_lines {
-        const char *str;
-        size_t len;
-    } lines[MAXLINES];
-    const char *next;
-    const char *lastbreak = NULL;
-    const char *store = NULL;
+
+    char *buf = splash_buf;
+    const char *next, *store;
+
     int line = 0;
-    int x = 0;
-    int y, i;
-    int space_w, w, chr_h;
-    int width, height;
-    int maxw = min_width - 2*RECT_SPACING;
+    int x = 0, w = 0;
+    int y;
+    int space_w, chr_h;
+    int width = vp->width - RECT_SPACING*2;
+    int height = vp->height;
+
+    /* prevent screen artifacts by keeping the max width / height seen */
+    int maxw = max_width[screen->screen_type];
+    int maxh = max_height[screen->screen_type];
     int fontnum = vp->font;
 
-    char lastbrkchr;
-    size_t len, next_len;
-    const char matchstr[] = "\r\n\f\v\t ";
-    font_getstringsize(" ", &space_w, &chr_h, fontnum);
-    y = chr_h + (addl_lines * chr_h);
+    size_t next_len;
 
-    vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap);
+    font_getstringsize(" ", &space_w, &chr_h, fontnum);
+    y = (addl_lines * chr_h);
+
+    int res = vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap); /*-1 to prevent sanitizer issues */
     va_end(ap);
 
-    /* break splash string into display lines, doing proper word wrap */
-    next = strptokspn_r(splash_buf, matchstr, &next_len, &store);
-    if (!next)
-        return false; /* nothing to display */
-
-    lines[line].len = next_len;
-    lines[line].str = next;
-    while (true)
+    if (res <= 0)
     {
-        w = font_getstringnsize(next, next_len, NULL, NULL, fontnum);
-        if (lastbreak)
+#ifdef SIMULATOR
+        printf("ERR\n");
+#endif
+        return false; /* nothing to display */
+    }
+    /* break splash string into display lines, doing proper word wrap */
+    const char *lastbreak = splash_buf;
+    while(true)
+    {
+        while (*lastbreak != '\0') /* handle escape chars*/
         {
-            len = next - lastbreak;
-            int next_w = len * space_w;
-            if (x + next_w + w > vp->width - RECT_SPACING*2 || lastbrkchr != ' ')
-            {   /* too wide, or control character wrap */
-                if (x > maxw)
-                    maxw = x;
-                if ((y + chr_h * 2 > vp->height) || (line >= (MAXLINES-1)))
-                    break;  /* screen full or out of lines */
-                x = 0;
-                y += chr_h;
-
-                /* split when it fits since we didn't find a valid token to break on */
-                size_t nl = next_len;
-                while (w > vp->width && --nl > 0)
-                    w = font_getstringnsize(next, nl, NULL, NULL, fontnum);
-
-                if (nl > 1 && nl != next_len)
-                {
-                    next_len = nl;
-                    store = next + nl; /* move the start pos for the next token read */
-                }
-
-                lines[++line].len = next_len;
-                lines[line].str = next;
-            }
-            else
+            switch (*lastbreak) /* all chars in matchstr */
             {
-                /*  restore & calculate spacing */
-                lines[line].len += next_len + 1;
-                x += next_w;
+                case '\t': /*fallthrough*/
+                case '\n':
+                {
+                    if (lines[line].len > 0 || *lastbreak != '\t')
+                    {
+                        x += w;
+                        if (x > maxw)
+                            maxw = x;
+
+                        x = 0;
+                        y += chr_h;
+                        if (y >= height || line >= MAXLINES-1)
+                        {
+                            break;  /* out of lines */
+                        }
+                        line++;
+                    }
+                    if (*lastbreak == '\t')
+                    {
+                        /* add offset for tab */
+                        lines[line].x += space_w * 2;
+                        x += space_w * 4;
+                    }
+                    break;
+                }
+                case '\f':
+                {
+                    if (lastbreak == splash_buf) /* only as first character */
+                    {
+                        /* Reset splash box size */
+                        maxw = 0;
+                        maxh = 0;
+                    }
+                    break; /* acts the same as a space character */
+                }
+                case '\v': /*fallthrough*/
+                case '\r':
+                    break; /* acts the same as a space character */
+                default: /* No valid break chars */
+                    lastbreak = " "; /* exit */
+                    break;
             }
+            lastbreak++;
         }
-        x += w;
 
-        lastbreak = next + next_len;
-        lastbrkchr = *lastbreak;
-
-        next = strptokspn_r(NULL, matchstr, &next_len, &store);
-
-        if (!next)
-        {   /* no more words */
+        if (lines[line].len > 0)
+        {
+            x += w;
             if (x > maxw)
                 maxw = x;
+            x = 0;
+            y += chr_h;
+            if (y >= height || line >= MAXLINES-1)
+            {
+                if (y > maxh)
+                    maxh = y;
+                break;  /* out of lines */
+            }
+            line++;
+        }
+
+        next = strptokspn_r(buf, matchstr, &next_len, &store);
+
+        if (!next)
+        {
+            x += w;
+            if (x > maxw)
+                maxw = x;
+            if (y > maxh)
+                maxh = y;
             break;
         }
+        buf = NULL; /* uses store for continuation */
+
+        lines[line].str = next;
+        lines[line].len = next_len;
+
+        w = font_getstringnsize(next, next_len, NULL, NULL, fontnum);
+        if (w > width)
+        {
+            const char *nxp, *nx = next;
+            int nw, newlen, oldlen = next_len;
+
+            while (nx - next < oldlen) /* try to split at a space char */
+            {
+                nxp = nx;
+                nx++;
+                if (*nxp != ' ')
+                    continue;
+                newlen = nxp - next;
+                nw = font_getstringnsize(next, newlen, NULL, NULL, fontnum);
+                if (nw > width)
+                {
+                    /* is room left on this line & next word large enough? */
+                    if (w + space_w * 5 < width && nw - space_w * 8 > w)
+                        w = nw;
+                    break;
+                }
+                w = nw;
+                next_len = newlen;
+                store = nx; /* we want to skip the space char */
+            }
+            if (w > width) /* split when it fits */
+            {
+                w = width;
+                next_len = font_measurestring(next, oldlen, &w, fontnum);
+                store = next + next_len;
+            }
+
+            lines[line].len = next_len;
+        }
+        lastbreak = next + next_len;
     }
 
     /* prepare viewport
@@ -151,7 +239,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     screen->scroll_stop();
 
     width = maxw + 2*RECT_SPACING;
-    height = y + 2*RECT_SPACING;
+    height = maxh + 2*RECT_SPACING;
 
     if (width > vp->width)
         width = vp->width;
@@ -162,11 +250,12 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     vp->y += (vp->height - height) / 2;
     vp->width = width;
     vp->height = height;
-
-    /* prevent artifacts by locking to max width observed on repeated calls */
-    max_width[screen->screen_type] = width;
-
     vp->flags |=  VP_FLAG_ALIGN_CENTER;
+
+    /* prevent artifacts by locking to max width & height observed on repeated calls */
+    max_width[screen->screen_type] = width - 2*RECT_SPACING;
+    max_height[screen->screen_type] = height - 2*RECT_SPACING;
+
 #if LCD_DEPTH > 1
     unsigned fg = 0, bg = 0;
     bool broken = false;
@@ -203,11 +292,22 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
 
     screen->draw_border_viewport();
 
+    /* center y within the available splash box */
+    if (y < maxh)
+        y = (maxh - y) / 2;
+    else
+        y = RECT_SPACING;
+
     /* print the message to screen */
-    for(i = 0, y = RECT_SPACING; i <= line; i++, y+= chr_h)
+    for(int i = 0; i < line && y < height; i++, y+= chr_h)
     {
-        screen->putsxyf(0, y, "%.*s", lines[i].len, lines[i].str);
+        if (lines[i].len > 0)
+        {
+            x = lines[i].x;
+            screen->putsxyf(x, y, "%.*s", lines[i].len, lines[i].str);
+        }
     }
+
     return true; /* needs update */
 }
 
