@@ -53,30 +53,20 @@
 struct gui_quickscreen
 {
     const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
+    struct viewport parent[NB_SCREENS];
+    struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
+    struct viewport vp_icons[NB_SCREENS];
 };
 
-static bool redraw;
-
-static void quickscreen_update_callback(unsigned short id,
-                                        void *data, void *userdata)
-{
-    (void)id;
-    (void)data;
-    (void)userdata;
-
-    redraw = true;
-}
-
-static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
-                                        struct screen *display,
-                                        struct viewport *parent,
-                                        struct viewport
-                                                  vps[QUICKSCREEN_ITEM_COUNT],
-                                        struct viewport *vp_icons)
+static void quickscreen_fix_viewports(struct gui_quickscreen *qs, enum screen_type screen)
 {
     int char_height, width, pad = 0;
     int left_width = 0, right_width = 0, vert_lines;
     unsigned char *s;
+    struct screen *display = &screens[screen];
+    struct viewport *parent = &qs->parent[screen];
+    struct viewport *vps = qs->vps[screen];
+    struct viewport *vp_icons = &qs->vp_icons[screen];
     int nb_lines = viewport_get_nb_lines(parent);
 
     /* nb_lines only returns the number of fully visible lines, small screens
@@ -181,16 +171,15 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
 }
 
-static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
-                                 struct screen *display,
-                                 struct viewport *parent,
-                                 struct viewport vps[QUICKSCREEN_ITEM_COUNT],
-                                 struct viewport *vp_icons)
+static void gui_quickscreen_draw(struct gui_quickscreen *qs, enum screen_type screen)
 {
-    int i;
+    int temp, i;
     char buf[MAX_PATH];
     unsigned const char *title, *value;
-    int temp;
+    struct screen *display = &screens[screen];
+    struct viewport *parent = &qs->parent[screen];
+    struct viewport *vps = qs->vps[screen];
+    struct viewport *vp_icons = &qs->vp_icons[screen];
     struct viewport *last_vp = display->set_viewport(parent);
     display->clear_viewport();
 
@@ -244,6 +233,16 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
 
     skin_render_deferred(display, parent);
     display->set_viewport(last_vp);
+}
+
+static void quickscreen_update_callback(unsigned short id,
+                                        void *data, void *userdata)
+{
+    (void)id;
+    (void)data;
+
+     FOR_NB_SCREENS(i)
+        gui_quickscreen_draw((struct gui_quickscreen *) userdata, i);
 }
 
 static void talk_qs_option(const struct settings_list *opt, bool enqueue)
@@ -345,9 +344,6 @@ static int quickscreen_touchscreen_button(void)
 static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter, bool *usb)
 {
     int button;
-    struct viewport parent[NB_SCREENS];
-    struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
-    struct viewport vp_icons[NB_SCREENS];
     int ret = QUICKSCREEN_OK;
     /* To quit we need either :
      *  - a second press on the button that made us enter
@@ -357,15 +353,13 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 
     push_current_activity(ACTIVITY_QUICKSCREEN);
 
-    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_update_callback, NULL);
-
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
         screens[i].scroll_stop();
-        viewportmanager_theme_enable(i, true, &parent[i]);
-        quickscreen_fix_viewports(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
-        gui_quickscreen_draw(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
+        viewportmanager_theme_enable(i, true, &qs->parent[i]);
+        quickscreen_fix_viewports(qs, i);
+        gui_quickscreen_draw(qs, i);
     }
     *usb = false;
     /* Announce current selection on entering this screen. This is all
@@ -382,14 +376,9 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 #ifdef HAVE_TOUCHSCREEN
     action_gesture_reset();
 #endif
-    while (true) {
-        if (redraw)
-        {
-            redraw = false;
-            FOR_NB_SCREENS(i)
-                gui_quickscreen_draw(qs, &screens[i], &parent[i],
-                                     vps[i], &vp_icons[i]);
-        }
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_update_callback, qs);
+    while (true)
+    {
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
@@ -404,7 +393,8 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         {
             ret |= QUICKSCREEN_CHANGED;
             can_quit = true;
-            redraw = true;
+            FOR_NB_SCREENS(i)
+                gui_quickscreen_draw(qs, i);
         }
         else if (button == button_enter)
             can_quit = true;
@@ -429,12 +419,14 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         if (button == ACTION_STD_CANCEL)
             break;
     }
+    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, quickscreen_update_callback, qs);
+
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);
     FOR_NB_SCREENS(i)
     {   /* stop scrolling before exiting */
         for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
-            screens[i].scroll_stop_viewport(&vps[i][j]);
+            screens[i].scroll_stop_viewport(&qs->vps[i][j]);
         viewportmanager_theme_undo(i, !(ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
     }
 
@@ -442,8 +434,6 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         pop_current_activity_without_refresh();   /* transition to Shortcuts */
     else
         pop_current_activity();
-
-    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, quickscreen_update_callback, NULL);
 
     return ret;
 }
