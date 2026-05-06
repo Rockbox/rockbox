@@ -599,7 +599,10 @@ static void gwps_enter_wps(bool theme_enabled)
         skin_backdrop_show(gwps->data->backdrop_id);
 #endif
         display->clear_display();
+        if (skin_has_sbs(gwps))
+            skin_defer_rendering(true);
         skin_update(WPS, i, SKIN_REFRESH_ALL);
+        skin_defer_rendering(false);
 
     }
 #ifdef HAVE_TOUCHSCREEN
