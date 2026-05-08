@@ -329,6 +329,15 @@ enum plugin_status plugin_start(const void* parameter)
 {
     static struct dir_stats stats;
     const char *file = parameter;
+    static struct viewport ui_vp;
+
+    /* clear UI vp */
+    struct screen* display = rb->screens[SCREEN_MAIN];
+    rb->viewport_set_defaults(&ui_vp, SCREEN_MAIN);
+    struct viewport *last_vp = display->set_viewport(&ui_vp);
+    display->clear_viewport();
+    display->set_viewport(last_vp);
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
