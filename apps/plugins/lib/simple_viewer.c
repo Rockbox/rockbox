@@ -38,6 +38,7 @@ struct view_info {
     int line_count;     /* number of lines */
     int line;           /* current first line */
     int start;          /* possition of first line in text  */
+    bool ui_update_cb;
 };
 
 static bool isbrchr(const unsigned char *str, int len)
@@ -156,6 +157,7 @@ static int init_view(struct view_info *info,
     info->line_count = 0;
     info->line = 0;
     info->start = 0;
+    info->ui_update_cb = false;
 
     if (!info->sbs_has_title)
     {
@@ -223,7 +225,9 @@ static void draw_text(struct view_info *info)
                 info->line_count, info->line, info->line + max_show, VERTICAL);
     }
     display->set_viewport(NULL);
-    display->update();
+    if (!info->ui_update_cb)
+        display->update();
+    info->ui_update_cb = false;
 }
 
 static void scroll_up(struct view_info *info, int n)
@@ -269,6 +273,7 @@ static void ui_update_cb(unsigned short id, void* param, void* user_data)
     (void)id;
     (void)param;
     struct view_info *info = (struct view_info *) user_data;
+    info->ui_update_cb = true;
     draw_text(info);
 }
 

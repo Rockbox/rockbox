@@ -850,12 +850,14 @@ void skin_defer_rendering(bool deferred)
 
 void skin_render_deferred(struct screen *display, struct viewport *vp)
 {
+    if (defer_rendering)
+        return;
+
     if (dirty[display->screen_type])
     {
         dirty[display->screen_type] = false;
         display->set_viewport(NULL);
         display->update();
-        sb_skin_force_next_update();
     }
     else
     {
@@ -955,17 +957,18 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     skin_backdrop_show(data->backdrop_id);
 #endif
 
+    dirty[display->screen_type] = defer_rendering;
     if (((refresh_mode&SKIN_REFRESH_ALL) == SKIN_REFRESH_ALL))
     {
+        defer_rendering = true;
         /* If this is the UI viewport then let the UI know
          * to redraw itself */
         send_event(GUI_EVENT_NEED_UI_UPDATE, NULL);
+        defer_rendering = dirty[display->screen_type];
     }
     /* Restore the default viewport */
     display->set_viewport_ex(NULL, VP_FLAG_VP_SET_CLEAN);
-    if (defer_rendering)
-        dirty[display->screen_type] = true;
-    else
+    if (!defer_rendering)
         display->update();
 }
 
