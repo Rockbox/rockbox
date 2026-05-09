@@ -331,13 +331,6 @@ enum plugin_status plugin_start(const void* parameter)
     const char *file = parameter;
     static struct viewport ui_vp;
 
-    /* clear UI vp */
-    struct screen* display = rb->screens[SCREEN_MAIN];
-    rb->viewport_set_defaults(&ui_vp, SCREEN_MAIN);
-    struct viewport *last_vp = display->set_viewport(&ui_vp);
-    display->clear_viewport();
-    display->set_viewport(last_vp);
-
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
@@ -347,6 +340,17 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splashf(0, "Could not find: %s", file ?: "(NULL)");
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
+    }
+
+    /* erase background behind progress bar to prevent glitches
+       for themes adjusting viewport for context menu activity */
+    if (props_type != PROPS_DIR)
+    {
+        struct screen* display = rb->screens[SCREEN_MAIN];
+        rb->viewport_set_defaults(&ui_vp, SCREEN_MAIN);
+        struct viewport *last_vp = display->set_viewport(&ui_vp);
+        display->clear_viewport();
+        display->set_viewport(last_vp);
     }
 
     if (props_type == PROPS_MUL_ID3)
