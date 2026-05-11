@@ -50,15 +50,17 @@
 #define MARGIN 10
 #define CENTER_ICONAREA_SIZE (MARGIN+8*2)
 
-struct gui_quickscreen
+struct quickscreen
 {
     const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
     struct viewport parent[NB_SCREENS];
     struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
     struct viewport vp_icons[NB_SCREENS];
+    int button_enter;
+    enum quickscreen_return result;
 };
 
-static void quickscreen_fix_viewports(struct gui_quickscreen *qs, enum screen_type screen)
+static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type screen)
 {
     int char_height, width, pad = 0;
     int left_width = 0, right_width = 0, vert_lines;
@@ -171,7 +173,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs, enum screen_ty
     vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
 }
 
-static void gui_quickscreen_draw(struct gui_quickscreen *qs, enum screen_type screen)
+static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
 {
     int temp, i;
     char buf[MAX_PATH];
@@ -193,12 +195,12 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs, enum screen_type sc
         title = P2STR(ID2P(qs->items[i]->lang_id));
         temp = option_value_as_int(qs->items[i]);
         value = option_get_valuestring(qs->items[i],
-                                       buf, MAX_PATH, temp);
+                                       buf, sizeof buf, temp);
 
         if (viewport_get_nb_lines(vp) < 2)
         {
             char text[MAX_PATH];
-            snprintf(text, MAX_PATH, "%s: %s", title, value);
+            snprintf(text, sizeof text, "%s: %s", title, value);
             display->puts_scroll(0, 0, text);
         }
         else
@@ -235,14 +237,13 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs, enum screen_type sc
     display->set_viewport(last_vp);
 }
 
-static void quickscreen_update_callback(unsigned short id,
-                                        void *data, void *userdata)
+static void quickscreen_draw_cb(unsigned short id, void *data, void *userdata)
 {
     (void)id;
     (void)data;
 
-     FOR_NB_SCREENS(i)
-        gui_quickscreen_draw((struct gui_quickscreen *) userdata, i);
+    FOR_NB_SCREENS(i)
+        quickscreen_draw((struct quickscreen *) userdata, i);
 }
 
 static void talk_qs_option(const struct settings_list *opt, bool enqueue)
@@ -261,7 +262,7 @@ static void talk_qs_option(const struct settings_list *opt, bool enqueue)
  *  - button : the key we are going to analyse
  * returns : true if the button corresponded to an action, false otherwise
  */
-static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
+static bool quickscreen_do_button(struct quickscreen * qs, int button)
 {
     int item;
     bool previous = false;
@@ -341,10 +342,27 @@ static int quickscreen_touchscreen_button(void)
 }
 #endif
 
-static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter, bool *usb)
+static void cleanup(void *parameter)
+{
+    struct quickscreen *qs = (struct quickscreen *) parameter;
+    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, quickscreen_draw_cb, qs);
+
+    FOR_NB_SCREENS(i)
+    {
+        for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
+            screens[i].scroll_stop_viewport(&qs->vps[i][j]);
+        viewportmanager_theme_undo(i, !(qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
+    }
+    /* Eliminate flashing of parent during transition to Shortcuts */
+    if (qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU)
+        pop_current_activity_without_refresh();
+    else
+        pop_current_activity();
+}
+
+static void quickscreen_run(struct quickscreen * qs)
 {
     int button;
-    int ret = QUICKSCREEN_OK;
     /* To quit we need either :
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
@@ -359,9 +377,8 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         screens[i].scroll_stop();
         viewportmanager_theme_enable(i, true, &qs->parent[i]);
         quickscreen_fix_viewports(qs, i);
-        gui_quickscreen_draw(qs, i);
+        quickscreen_draw(qs, i);
     }
-    *usb = false;
     /* Announce current selection on entering this screen. This is all
        queued up, but can be interrupted as soon as a setting is
        changed. */
@@ -376,7 +393,7 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
 #ifdef HAVE_TOUCHSCREEN
     action_gesture_reset();
 #endif
-    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_update_callback, qs);
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_draw_cb, qs);
     while (true)
     {
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
@@ -384,19 +401,20 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         if (button == ACTION_TOUCHSCREEN)
             button = quickscreen_touchscreen_button();
 #endif
-        if (default_event_handler(button) == SYS_USB_CONNECTED)
+        if (default_event_handler_ex(button, cleanup, qs)
+            == SYS_USB_CONNECTED)
         {
-            *usb = true;
-            break;
+            qs->result |= QUICKSCREEN_IN_USB;
+            return;
         }
-        if (gui_quickscreen_do_button(qs, button))
+        if (quickscreen_do_button(qs, button))
         {
-            ret |= QUICKSCREEN_CHANGED;
+            qs->result |= QUICKSCREEN_CHANGED;
             can_quit = true;
             FOR_NB_SCREENS(i)
-                gui_quickscreen_draw(qs, i);
+                quickscreen_draw(qs, i);
         }
-        else if (button == button_enter)
+        else if (button == qs->button_enter)
             can_quit = true;
         else if (button == ACTION_QS_VOLUP) {
             adjust_volume(1);
@@ -410,38 +428,25 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         }
         else if (button == ACTION_STD_CONTEXT)
         {
-            ret |= QUICKSCREEN_GOTO_SHORTCUTS_MENU;
+            qs->result |= QUICKSCREEN_GOTO_SHORTCUTS_MENU;
             break;
         }
-        if ((button == button_enter) && can_quit)
+        if ((button == qs->button_enter) && can_quit)
             break;
 
         if (button == ACTION_STD_CANCEL)
             break;
     }
-    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, quickscreen_update_callback, qs);
-
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);
-    FOR_NB_SCREENS(i)
-    {   /* stop scrolling before exiting */
-        for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
-            screens[i].scroll_stop_viewport(&qs->vps[i][j]);
-        viewportmanager_theme_undo(i, !(ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
-    }
-
-    if (ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU) /* Eliminate flashing of parent during */
-        pop_current_activity_without_refresh();   /* transition to Shortcuts */
-    else
-        pop_current_activity();
-
-    return ret;
+    cleanup(qs);
 }
 
 int quick_screen_quick(int button_enter)
 {
-    struct gui_quickscreen qs;
-    bool usb = false;
+    struct quickscreen qs;
+    qs.button_enter = button_enter;
+    qs.result = QUICKSCREEN_OK;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -451,13 +456,12 @@ int quick_screen_quick(int button_enter)
             qs.items[i] = NULL;
     }
 
-    int ret = gui_syncquickscreen_run(&qs, button_enter, &usb);
-    if (ret & QUICKSCREEN_CHANGED)
+    quickscreen_run(&qs);
+
+    if (qs.result & QUICKSCREEN_CHANGED)
         settings_save();
-    if (usb)
-        return QUICKSCREEN_IN_USB;
-    return ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU ? QUICKSCREEN_GOTO_SHORTCUTS_MENU :
-                                                   QUICKSCREEN_OK;
+
+    return qs.result & ~QUICKSCREEN_CHANGED;
 }
 
 /* stuff to make the quickscreen configurable */
