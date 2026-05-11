@@ -52,6 +52,10 @@
 #include "yesno.h"
 #include "playback.h"
 
+#if defined (HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+#include "tagcache.h"
+#endif
+
 /* Maximum number of tracks we can have loaded at one time                   */
 #define MAX_PLAYLIST_ENTRIES 200
 
@@ -285,9 +289,15 @@ static bool retrieve_id3_tags(const int index, const char* name, struct mp3entry
         copy_mp3entry(id3, audio_current_track()); /* retrieve id3 from RAM */
         id3_retrieval_successful = true;
     }
-    else
+#if defined (HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    else if (flags & METADATA_EXCLUDE_ID3_PATH)
+        /* retrieve id3 from database */
+        id3_retrieval_successful = tagcache_fill_tags(id3, name);
+#endif
+
+    if (!id3_retrieval_successful)
     {
-    /* Read from disk, the database, doesn't store frequency, file size or codec (g4470) ChrisS*/
+        /* Read from disk: retrieves frequency, file size, and codec */
         id3_retrieval_successful = get_metadata_ex(id3, -1, name, flags);
     }
     return id3_retrieval_successful;
