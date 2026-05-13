@@ -154,6 +154,7 @@ static ICODE_ATTR int ata_wait_intrq(void)
         if (IDE0_CFG & IDE_CFG_INTRQ)
             return 1;
         ata_keep_active();
+        yield();
     } while (TIME_BEFORE(current_tick, timeout));
 
     return 0; /* timeout */
