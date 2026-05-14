@@ -1105,6 +1105,43 @@ const unsigned char* font_get_bits(struct font* pf, ucschar_t char_code)
 #endif /* BOOTLOADER */
 
 /*
+ * Returns the length (in bytes) of a given NULL terminated string
+ *  stops after max_width, maxbytes or NULL (\0) whichever occurs first.
+ */
+int font_measurestring(const unsigned char *str, size_t maxbytes, int *max_width, int fontnum)
+{
+    const unsigned char *start = str;
+    size_t bytes;
+    struct font* pf = font_get(fontnum);
+    font_lock( fontnum, true );
+    ucschar_t ch;
+    int width = 0;
+
+    while (true)
+    {
+        bytes = str - start;
+        str = utf8decode(str, &ch);
+        if (ch == 0 || bytes >= maxbytes)
+        {
+            break;
+        }
+        if (IS_DIACRITIC(ch))
+            continue;
+        int w = font_get_width(pf,ch);
+        if (width + w > *max_width)
+        {
+            break;
+        }
+        width += w;
+    }
+
+    *max_width = width;
+    font_lock( fontnum, false );
+
+    return bytes;
+}
+
+/*
  * Returns the stringsize of a given NULL terminated string
  *  stops after maxbytes or NULL (\0) whichever occurs first.
  * maxbytes = -1 ignores maxbytes and relies on NULL terminator (\0)
@@ -1112,17 +1149,21 @@ const unsigned char* font_get_bits(struct font* pf, ucschar_t char_code)
  */
 int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *h, int fontnum)
 {
+    const unsigned char *start = str;
+    size_t bytes;
     struct font* pf = font_get(fontnum);
     font_lock( fontnum, true );
     ucschar_t ch;
     int width = 0;
-    size_t b = maxbytes - 1;
 
-    for (str = utf8decode(str, &ch); ch != 0 && b < maxbytes; str = utf8decode(str, &ch), b--)
+    while (true)
     {
+        bytes = str - start;
+        str = utf8decode(str, &ch);
+        if (ch == 0 || bytes >= maxbytes)
+            break;
         if (IS_DIACRITIC(ch))
             continue;
-
         /* get proportional width and glyph bits*/
         width += font_get_width(pf,ch);
     }

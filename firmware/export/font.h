@@ -132,6 +132,7 @@ void font_disable_all(void);
 void font_enable_all(void);
 
 struct font* font_get(int font);
+int font_measurestring(const unsigned char *str, size_t maxbytes, int *max_width, int fontnum);
 int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *h, int fontnumber);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
 int font_get_width(struct font* ft, ucschar_t ch);
