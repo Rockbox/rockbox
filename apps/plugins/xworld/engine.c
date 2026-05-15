@@ -306,6 +306,8 @@ void engine_processInput(struct Engine* e) {
     }
 }
 
+#undef strncpy
+
 void engine_makeGameStateName(struct Engine* e, uint8_t slot, char *buf, int sz) {
     (void) e;
     rb->snprintf(buf, sz, "xworld_save.s%02d", slot);

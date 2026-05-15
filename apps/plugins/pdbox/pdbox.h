@@ -160,6 +160,9 @@ void pd_init(void);
 #undef strncat
 #define strncat rb_strncat
 
+#undef strncpy
+#define strncpy rb->strncpy
+
 //#ifndef SIMULATOR
 /*FIXME: is it a correct replacement??? */
 /* #if !(CONFIG_PLATFORM & PLATFORM_HOSTED) */
