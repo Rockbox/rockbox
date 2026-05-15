@@ -39,7 +39,6 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
-#include "plugin.h"
 #include "_ansi.h"
 #include <stdint.h>
 
