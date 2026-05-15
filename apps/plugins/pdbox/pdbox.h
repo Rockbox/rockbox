@@ -316,6 +316,15 @@ enum pd_key_id
     #define PDPOD_WHEELLEFT BUTTON_UP
     #define PDPOD_WHEELRIGHT BUTTON_DOWN
     #define PDPOD_ACTION    BUTTON_SELECT
+#elif (CONFIG_KEYPAD == EROSQ_PAD)
+    #define PDPOD_QUIT      BUTTON_POWER
+    #define PDPOD_PLAY      BUTTON_PLAY
+    #define PDPOD_PREVIOUS  BUTTON_PREV
+    #define PDPOD_NEXT      BUTTON_NEXT
+    #define PDPOD_MENU      BUTTON_MENU
+    #define PDPOD_WHEELLEFT BUTTON_SCROLL_BACK
+    #define PDPOD_WHEELRIGHT BUTTON_SCROLL_FWD
+    #define PDPOD_ACTION    BUTTON_BACK
 #else
     #warning "No keys defined for this architecture!"
 #endif
