@@ -83,6 +83,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     char *buf = splash_buf;
     const char *next, *store;
 
+    bool has_tabs = false;
     int line = 0;
     int x = 0, w = 0;
     int y;
@@ -100,25 +101,32 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     font_getstringsize(" ", &space_w, &chr_h, fontnum);
     y = (addl_lines * chr_h);
 
-    int res = vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap); /*-1 to prevent sanitizer issues */
+    int res = vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap);
     va_end(ap);
 
     if (res <= 0)
     {
 #ifdef SIMULATOR
-        printf("ERR\n");
+        printf("%s ERROR %d\n", __func__, res);
 #endif
         return false; /* nothing to display */
     }
-    /* break splash string into display lines, doing proper word wrap */
+
     const char *lastbreak = splash_buf;
-    while(true)
+    if (*lastbreak == '\f') /* only as first character - Reset splash box size */
+    {
+        maxw = 0;
+        maxh = 0;
+    }
+
+    while(true) /* break splash string into display lines, doing proper word wrap */
     {
         while (*lastbreak != '\0') /* handle escape chars*/
         {
             switch (*lastbreak) /* all chars in matchstr */
             {
                 case '\t': /*fallthrough*/
+                    has_tabs = true; /* left justify (right justify for RTL)*/
                 case '\n':
                 {
                     if (lines[line].len > 0 || *lastbreak != '\t')
@@ -143,16 +151,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                     }
                     break;
                 }
-                case '\f':
-                {
-                    if (lastbreak == splash_buf) /* only as first character */
-                    {
-                        /* Reset splash box size */
-                        maxw = 0;
-                        maxh = 0;
-                    }
-                    break; /* acts the same as a space character */
-                }
+                case '\f': /*fallthrough*/
                 case '\v': /*fallthrough*/
                 case '\r':
                     break; /* acts the same as a space character */
@@ -199,20 +198,22 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
         if (w > width)
         {
             const char *nxp, *nx = next;
-            int nw, newlen, oldlen = next_len;
+            int nw, newlen;
+            int oldlen = next_len;
 
             while (nx - next < oldlen) /* try to split at a space char */
             {
                 nxp = nx;
                 nx++;
-                if (*nxp != ' ')
+                if (*nxp != ' ' && *nx != '\0') /* split on space or EOL */
                     continue;
                 newlen = nxp - next;
                 nw = font_getstringnsize(next, newlen, NULL, NULL, fontnum);
+
                 if (nw > width)
                 {
-                    /* is room left on this line & next word large enough? */
-                    if (w + space_w * 5 < width && nw - space_w * 8 > w)
+                    /* is next word larger than max width & room left on this line? */
+                    if (nw - w > width && w + space_w * 8 < width)
                         w = nw;
                     break;
                 }
@@ -246,11 +247,13 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     if (height > vp->height)
         height = vp->height;
 
+    /* center the vp in the screen area */
     vp->x += (vp->width - width) / 2;
     vp->y += (vp->height - height) / 2;
     vp->width = width;
     vp->height = height;
-    vp->flags |=  VP_FLAG_ALIGN_CENTER;
+    if (!has_tabs)
+        vp->flags |=  VP_FLAG_ALIGN_CENTER;
 
     /* prevent artifacts by locking to max width & height observed on repeated calls */
     max_width[screen->screen_type] = width - 2*RECT_SPACING;
