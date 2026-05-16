@@ -104,10 +104,13 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     int res = vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap);
     va_end(ap);
 
-    if (res <= 0)
+    if (res <= 0 || width < space_w || height < chr_h)
     {
 #ifdef SIMULATOR
-        printf("%s ERROR %d\n", __func__, res);
+        if (res <= 0)
+            printf("ERROR: %s %d\n", __func__, res);
+        else
+            printf("WARNING: %s vp too small\n", __func__);
 #endif
         return false; /* nothing to display */
     }
