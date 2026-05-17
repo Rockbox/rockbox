@@ -1432,8 +1432,9 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
 
 #if 0 /* unused */
         left_offset  = -(offsets[max_idx]);
-        left_offset += strlcpy(buffer, sign, buf_len);
+        left_offset +=
 #endif
+        strlcpy(buffer, sign, buf_len);
 
         /* trim leading zero on the max_idx */
         if ((unit_idx & UNIT_TRIM_ZERO) == UNIT_TRIM_ZERO &&
@@ -1479,8 +1480,9 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
         {
             strmemccpy(buffer, unit_strings_core[units[max_idx]], buf_len);
 #if 0 /* unused */
-            left_offset += strlcat(buffer, " ", buf_len);
+            left_offset +=
 #endif
+            strlcat(buffer, " ", buf_len);
             strlcat(buffer, &timebuf[offsets[base_idx]], buf_len);
         }
         else
