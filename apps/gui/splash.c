@@ -41,31 +41,54 @@ static long progress_next_tick, talked_tick;
 
 #define MAXLINES  (LCD_HEIGHT/6)
 
+
+#ifndef BOOTLOADER
 #if MEMORYSIZE > 8
     #define MAXBUFFER MAX(1024, (LCD_WIDTH/SYSFONT_WIDTH) * MAXLINES + 1)
 #else
     #define MAXBUFFER MAX(512, (LCD_WIDTH/SYSFONT_WIDTH) * MAXLINES + 1)
 #endif
+#else
+    #define MAXBUFFER (512)
+#endif
 
 #define RECT_SPACING 3
 #define SPLASH_MEMORY_INTERVAL (HZ)
 
+/* splash_internal does the actual drawing of the splash box and text
+ * each call to splash remembers the max size and will not shrink the splash box
+ * until it is reset by an activity change or \f at the beginning of a string
+ *
+ * splash supports several escape sequences ("\n\t\f\r\v\b")
+ * '\n' (new line) indicates the end of a line of text and starts a new one
+ *  ("\n\n" will end a line and create a blank line)
+ *  '\n' as the first character of the text will create a blank line
+ *
+ * '\t' (tab) starts a new line and adds several spaces to the beginning of the
+ *  new line it also left/right justifies the splash text box
+ *  (RTL languages will right justify)
+ * '\t' as the last character of the text will left/right justify
+ *  without adding any tabs to the text output
+ *
+ * '\f' (form feed) as the first character of the text will reset the text box
+ *  width and height
+ *
+ * Others:
+ * '\f', \r', '\v' '\b' will be treated as a breaking space character
+ *  they will not be displayed as output and multiple sequences will be
+ *  treated as a single character
+ *  eg. "\b\v\f\r" will break the line but only once and will not show as a space
+ *  where as "\n\n" will break a line and add a blank line
+ *  "\t\t" would break a line and add a total of 4 spaces to the next line
+*/
 static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                             struct viewport *vp, int addl_lines)
 {
-    static const char matchstr[] = "\r\n\f\v\t";
+    static const char matchstr[] = "\r\n\f\v\t\b";
     static int max_width[NB_SCREENS] = {0};
     static int max_height[NB_SCREENS] = {0};
-    static char splash_buf[MAXBUFFER] = {0};
-
-    struct splash_lines {
-        const char *str;
-        uint16_t x;
-        uint16_t len;
-    } lines[MAXLINES];
-    memset(lines, 0, sizeof(lines));
-
 #ifndef BOOTLOADER
+    static char splash_buf[MAXBUFFER] = {0};
     static enum current_activity last_act = ACTIVITY_UNKNOWN;
     enum current_activity act = get_current_activity();
 
@@ -78,7 +101,16 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
         }
         last_act = act;
     }
+#else /*def BOOTLOADER*/
+    char splash_buf[MAXBUFFER] = {0}; /* on the stack for the bootloader */
 #endif
+
+    struct splash_lines {
+        const char *str;
+        uint16_t x;
+        uint16_t len;
+    } lines[MAXLINES];
+    memset(lines, 0, sizeof(lines));
 
     char *buf = splash_buf;
     const char *next, *store;
@@ -124,6 +156,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
 
     while(true) /* break splash string into display lines, doing proper word wrap */
     {
+#ifndef BOOTLOADER
         while (*lastbreak != '\0') /* handle escape chars*/
         {
             switch (*lastbreak) /* all chars in matchstr */
@@ -146,14 +179,16 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                         }
                         line++;
                     }
-                    if (*lastbreak == '\t')
+                    /* /t as last char left justifies only */
+                    if (lastbreak[0] == '\t' && lastbreak[1] != '\0')
                     {
                         /* add offset for tab */
                         lines[line].x += space_w * 2;
-                        x += space_w * 4;
+                        x += space_w * 2;
                     }
                     break;
                 }
+                case '\b': /*fallthrough*/
                 case '\f': /*fallthrough*/
                 case '\v': /*fallthrough*/
                 case '\r':
@@ -164,7 +199,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
             }
             lastbreak++;
         }
-
+#endif
         if (lines[line].len > 0)
         {
             x += w;
