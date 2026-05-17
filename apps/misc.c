@@ -1354,7 +1354,10 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
     const char * const sign        = &"-"[value < 0 ? 0 : 1];
     bool               is_rtl      = lang_is_rtl();
     char               timebuf[25]; /* -2147483648:00:00.00\0 */
-    int                len, left_offset;
+    int                len;
+#if 0 /* unused */
+    int left_offset;
+#endif
     unsigned char      base_idx, max_idx;
 
     unsigned long  units_in[UNIT_IDX_TIME_COUNT];
@@ -1427,8 +1430,10 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
 
         timebuf[offsets[base_idx] + fwidth[base_idx]] = '\0';
 
+#if 0 /* unused */
         left_offset  = -(offsets[max_idx]);
         left_offset += strlcpy(buffer, sign, buf_len);
+#endif
 
         /* trim leading zero on the max_idx */
         if ((unit_idx & UNIT_TRIM_ZERO) == UNIT_TRIM_ZERO &&
@@ -1456,7 +1461,9 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
 
         fwidth[UNIT_IDX_HR] = len - offsets[UNIT_IDX_HR];
 
+#if 0 /* unused */
         left_offset = -(offsets[base_idx]);
+#endif
 
         /* trim leading zero on the max_idx */
         if ((unit_idx & UNIT_TRIM_ZERO) == UNIT_TRIM_ZERO &&
@@ -1471,7 +1478,9 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
         if (!supress_unit)
         {
             strmemccpy(buffer, unit_strings_core[units[max_idx]], buf_len);
+#if 0 /* unused */
             left_offset += strlcat(buffer, " ", buf_len);
+#endif
             strlcat(buffer, &timebuf[offsets[base_idx]], buf_len);
         }
         else
