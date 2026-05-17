@@ -48,7 +48,7 @@ static unsigned short get_short_le(void* buf)
         (((bits) != 0x03) ? ((bits) != 0x02) ? ((bits) != 0x01) ? \
          0 : *(data) : get_short_le(data) : get_long_le(data))
 
-int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
+int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
                     asf_waveformatex_t* wfx)
 {
     uint8_t tmp8, packet_flags, packet_property;
@@ -306,10 +306,10 @@ int asf_get_timestamp(int *duration)
     uint32_t padding_length;
     */
     uint32_t send_time;
-    static int packet_count = 0;
+//    static int packet_count = 0;
 
     uint32_t bytesread = 0;
-    packet_count++;
+//    packet_count++;
     if (ci->read_filebuf(&tmp8, 1) == 0) {
         DEBUGF("ASF ERROR (EOF?)\n");
         return ASF_ERROR_EOF;

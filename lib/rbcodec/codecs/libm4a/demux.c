@@ -6,7 +6,7 @@
  * This is the quicktime container demuxer.
  *
  * http://crazney.net/programs/itunes/alac.html
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -58,7 +58,7 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8;
 
-    // filetype (supported ignore case values: m4a, m4b, mp42, 3gp6, qt, isom)  
+    // filetype (supported ignore case values: m4a, m4b, mp42, 3gp6, qt, isom)
     char filetype[4];
     stream_read(qtmovie->stream, 4, filetype);
     size_remaining-=4;
@@ -137,12 +137,12 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     {
         return false;
     }
-    
+
     /* read length */
     qtmovie->res->codecdata_len = mp4ff_read_mp4_descr_length(qtmovie->stream);
     if (qtmovie->res->codecdata_len > MAX_CODECDATA_SIZE)
     {
-        DEBUGF("codecdata too large (%d) in esds\n", 
+        DEBUGF("codecdata too large (%d) in esds\n",
                (int)qtmovie->res->codecdata_len);
         return false;
     }
@@ -158,20 +158,21 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
     unsigned int i;
     int j;
     uint32_t numentries;
-    size_t size_remaining = chunk_len - 8;
+//    size_t size_remaining = chunk_len - 8;
     bool got_codec_data = false;
+    (void)chunk_len;
 
     /* version */
     stream_read_uint8(qtmovie->stream);
-    size_remaining -= 1;
+//    size_remaining -= 1;
     /* flags */
     stream_read_uint8(qtmovie->stream);
     stream_read_uint8(qtmovie->stream);
     stream_read_uint8(qtmovie->stream);
-    size_remaining -= 3;
+//    size_remaining -= 3;
 
     numentries = stream_read_uint32(qtmovie->stream);
-    size_remaining -= 4;
+//    size_remaining -= 4;
 
     /* if (numentries != 1)
     {
@@ -219,7 +220,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           qtmovie->res->codecdata_len = entry_remaining + 12 + 8;
           if (qtmovie->res->codecdata_len > MAX_CODECDATA_SIZE)
           {
-              DEBUGF("codecdata too large (%d) in stsd\n", 
+              DEBUGF("codecdata too large (%d) in stsd\n",
                       (int)qtmovie->res->codecdata_len);
               return false;
           }
@@ -335,7 +336,7 @@ static bool read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
         DEBUGF("ehm, size remianing?\n");
         stream_skip(qtmovie->stream, size_remaining);
     }
-    
+
     return true;
 }
 
@@ -399,7 +400,7 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     {
         stream_skip(qtmovie->stream, size_remaining);
     }
-    
+
     return true;
 }
 
@@ -421,7 +422,7 @@ static bool read_chunk_stsc(qtmovie_t *qtmovie, size_t chunk_len)
     {
         stream_skip(qtmovie->stream, size_remaining);
     }
-    
+
     return true;
 }
 
@@ -483,14 +484,14 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 
     /* Build up lookup table. The lookup table contains the sample index and
      * byte position in the file for each chunk. This table is used to seek
-     * and resume (see m4a_seek() and m4a_seek_raw() in libm4a/m4a.c) and 
+     * and resume (see m4a_seek() and m4a_seek_raw() in libm4a/m4a.c) and
      * to skip empty chunks (see m4a_check_sample_offset() in codecs/aac.c and
      * libm4a/m4a.c).
-     * The seek/resume precision is lower than using sample_byte_size[] and 
+     * The seek/resume precision is lower than using sample_byte_size[] and
      * depends on numentries. Typically the resolution is ~1/10 of all frames
-     * which equals about 1/4-1/2 seconds. The loss of seek precision is 
-     * accepted to be able to avoid allocation of the large sample_byte_size[] 
-     * table. This reduces the memory consumption by a factor of 2 or even 
+     * which equals about 1/4-1/2 seconds. The loss of seek precision is
+     * accepted to be able to avoid allocation of the large sample_byte_size[]
+     * table. This reduces the memory consumption by a factor of 2 or even
      * more. */
     uint32_t idx = 0;
     for (i = 0; i < numentries; ++i)
@@ -527,10 +528,10 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
                     stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
                 old_i = i;
             }
-            
+
             if (new_first > k)
                 break;
-            
+
             frame += (new_first - old_first) * old_frame;
         }
 
@@ -551,7 +552,7 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
         DEBUGF("ehm, size remianing?\n");
         stream_skip(qtmovie->stream, size_remaining);
     }
-    
+
     return true;
 }
 
@@ -655,7 +656,7 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
         }
 
         sub_chunk_id = stream_read_uint32(qtmovie->stream);
-        
+
         switch (sub_chunk_id)
         {
         case MAKEFOURCC('s','t','b','l'):
@@ -866,5 +867,3 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
     }
     return 0;
 }
-
-
