@@ -1291,7 +1291,7 @@ bool search_playlist(void)
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
-    if (!playlist_viewer_init(&viewer, 0, false, NULL))
+    if (!playlist_viewer_init(&viewer, NULL, false, NULL))
         return ret;
     if (kbd_input(search_str, sizeof(search_str), NULL) < 0)
         return ret;
