@@ -53,55 +53,63 @@
 #include "ata_mmc.h"
 #endif
 
-#ifdef USB_ENABLE_HID
-int usb_keypad_mode;
-static bool usb_hid;
-#endif
-
-#ifndef SIMULATOR
-
-static int handle_usb_events(void)
+struct usb_screen_vps_t
 {
-#if (CONFIG_STORAGE & STORAGE_MMC)
-    int next_update=0;
-#endif /* STORAGE_MMC */
+    struct viewport parent;
+    struct viewport logo;
+#ifndef USB_ENABLE_HID
+};
+#else
+    struct viewport title;
+};
 
-    /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
+int usb_keypad_mode;
+static void draw_usb_keypad_mode(struct viewport *title)
+{
+    struct screen *screen = &screens[SCREEN_MAIN];
+    struct viewport *last_vp = screen->set_viewport(title);
+    screen->clear_viewport();
+    title->flags |= VP_FLAG_ALIGN_CENTER;
+    if (title->width > 1)
+        screen->puts_scroll(0, 0, str(keypad_mode_name_get(usb_keypad_mode)));
+    screen->set_viewport(last_vp);
+}
+#endif /* USB_ENABLE_HID */
+
+static void handle_usb_events(struct viewport *title)
+{
+#if (CONFIG_STORAGE & STORAGE_MMC) && !defined(SIMULATOR)
+    int next_update = 0;
+#endif /* STORAGE_MMC */
+    int button;
+
+    /* Don't return until we get SYS_USB_DISCONNECTED */
     while(1)
     {
-        int button;
-#ifdef USB_ENABLE_HID
-        if (usb_hid)
+#ifndef USB_ENABLE_HID
+        (void)title;
+#else
+        if (global_settings.usb_hid)
         {
             button = get_hid_usb_action();
-
-            /* On mode change, we need to refresh the screen */
             if (button == ACTION_USB_HID_MODE_SWITCH_NEXT ||
-                    button == ACTION_USB_HID_MODE_SWITCH_PREV)
-            {
-                break;
-            }
+                button == ACTION_USB_HID_MODE_SWITCH_PREV)
+                draw_usb_keypad_mode(title);
         }
         else
 #endif
         {
-            button = button_get_w_tmo(HZ/2);
             /* hid emits the event in get_action */
             send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+            button = button_get_w_tmo(HZ/2);
         }
+        if (button == SYS_USB_DISCONNECTED)
+            return;
+        if (button == SYS_CHARGER_DISCONNECTED)
+            reset_runtime();
 
-        switch(button)
-        {
-            case SYS_USB_DISCONNECTED:
-                return 1;
-            case SYS_CHARGER_DISCONNECTED:
-                reset_runtime();
-                break;
-            case SYS_TIMEOUT:
-                break;
-        }
-
-#if (CONFIG_STORAGE & STORAGE_MMC) /* USB-MMC bridge can report activity */
+/* USB-MMC bridge can report activity */
+#if (CONFIG_STORAGE & STORAGE_MMC) && !defined(SIMULATOR)
         if(TIME_AFTER(current_tick,next_update))
         {
             if(usb_inserted()) {
@@ -111,21 +119,7 @@ static int handle_usb_events(void)
         }
 #endif /* STORAGE_MMC */
     }
-
-    return 0;
 }
-#endif /* SIMULATOR */
-
-#define MODE_NAME_LEN 32
-
-struct usb_screen_vps_t
-{
-    struct viewport parent;
-    struct viewport logo;
-#ifdef USB_ENABLE_HID
-    struct viewport title;
-#endif
-};
 
 static void usb_screen_fix_viewports(struct screen *screen,
         struct usb_screen_vps_t *usb_screen_vps)
@@ -178,7 +172,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
     logo->height = logo_height;
 
 #ifdef USB_ENABLE_HID
-    if (usb_hid)
+    if (global_settings.usb_hid)
     {
         struct viewport *title = &usb_screen_vps->title;
         int char_height = font_get(parent->font)->height;
@@ -211,11 +205,9 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         &bm_remote_usblogo,
 #endif
     };
-
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
-
         struct usb_screen_vps_t *usb_screen_vps = &usb_screen_vps_ar[i];
         struct viewport *parent = &usb_screen_vps->parent;
         struct viewport *logo = &usb_screen_vps->logo;
@@ -223,29 +215,14 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         last_vp = screen->set_viewport(parent);
         screen->clear_viewport();
         screen->backlight_on();
-
         screen->set_viewport(logo);
         screen->bmp(logos[i], 0, 0);
-        if (i == SCREEN_MAIN)
-        {
-#ifdef USB_ENABLE_HID
-            if (usb_hid)
-            {
-                char modestring[100];
-                screen->set_viewport(&usb_screen_vps->title);
-                usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
-                snprintf(modestring, sizeof(modestring), "%s: %s",
-                        str(LANG_USB_KEYPAD_MODE),
-                        str(keypad_mode_name_get(usb_keypad_mode)));
-                screen->puts_scroll(0, 0, modestring);
-            }
-#endif /* USB_ENABLE_HID */
-        }
-        screen->set_viewport(parent);
-
         screen->set_viewport(last_vp);
-        screen->update_viewport();
     }
+#ifdef USB_ENABLE_HID
+    if (global_settings.usb_hid)
+        draw_usb_keypad_mode(&usb_screen_vps_ar[SCREEN_MAIN].title);
+#endif
 }
 
 void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
@@ -258,6 +235,7 @@ void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
 #endif
 
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
+    struct viewport *title;
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
 
@@ -269,8 +247,8 @@ void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
     push_current_activity(ACTIVITY_USBSCREEN);
 
 #ifdef USB_ENABLE_HID
-    usb_hid = global_settings.usb_hid;
     usb_keypad_mode = global_settings.usb_keypad_mode;
+    title = &usb_screen_vps_ar[SCREEN_MAIN].title;
 #endif
 
     FOR_NB_SCREENS(i)
@@ -296,33 +274,13 @@ void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
         /* The font system leaves the .fnt fd's open, so we need for force close them all */
         font_disable_all();
     }
-
     usb_acknowledge(SYS_USB_CONNECTED_ACK, seqnum);
-
-    while (1)
-    {
-        usb_screens_draw(usb_screen_vps_ar);
-#ifdef SIMULATOR
-        if (button_get_w_tmo(HZ/2))
-            break;
-        send_event(GUI_EVENT_ACTIONUPDATE, NULL);
-#else
-        if (handle_usb_events())
-            break;
-#endif /* SIMULATOR */
-    }
-
-    FOR_NB_SCREENS(i)
-    {
-        const struct viewport* vp = NULL;
+    usb_screens_draw(usb_screen_vps_ar);
+    handle_usb_events(title);
 
 #if defined(USB_ENABLE_HID)
-        vp = usb_hid ? &usb_screen_vps_ar[i].title : NULL;
-#endif
-        if (vp)
-            screens[i].scroll_stop_viewport(vp);
-    }
-#ifdef USB_ENABLE_HID
+    if (global_settings.usb_hid)
+        screens[SCREEN_MAIN].scroll_stop_viewport(title);
     if (global_settings.usb_keypad_mode != usb_keypad_mode)
     {
         global_settings.usb_keypad_mode = usb_keypad_mode;
