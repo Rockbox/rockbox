@@ -565,6 +565,7 @@ void usb_charger_update(void)
 #endif
 
 #ifdef USB_STATUS_BY_EVENT
+#if 0 /* usb_dw_gonak_effective: failed! PANIC */
 static int usb_status_tmo_callback(struct timeout* tmo)
 {
     if(usb_monitor_enabled)
@@ -586,11 +587,14 @@ static int usb_status_tmo_callback(struct timeout* tmo)
 
     return 0;
 }
+#endif
 
 void usb_status_event(int current_status)
 {
+#if 0 /* usb_dw_gonak_effective: failed! PANIC */
     static struct timeout tmo;
     static int last_status = USB_EXTRACTED;
+#endif
 
     /* Caller isn't expected to filter for changes in status.
      * current_status:
@@ -599,9 +603,14 @@ void usb_status_event(int current_status)
     if(usb_monitor_enabled)
     {
         int oldstatus = disable_irq_save(); /* Dual-use function */
+#if 0 /* usb_dw_gonak_effective: failed! PANIC */
         last_status = current_status;
         timeout_register(&tmo, usb_status_tmo_callback, USB_DEBOUNCE_TIME,
                          (intptr_t)&last_status);
+#else
+        queue_remove_from_head(&usb_queue, current_status);
+        queue_post(&usb_queue, current_status, 0);
+#endif
         restore_irq(oldstatus);
     }
 }
