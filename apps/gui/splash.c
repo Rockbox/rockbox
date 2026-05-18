@@ -262,7 +262,7 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
             if (w > width) /* split when it fits */
             {
                 w = width;
-                next_len = font_measurestring(next, oldlen, &w, fontnum);
+                next_len = font_measurestring(next, oldlen, w, &w, NULL, fontnum);
                 store = next + next_len;
             }
 

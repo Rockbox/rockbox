@@ -1106,16 +1106,20 @@ const unsigned char* font_get_bits(struct font* pf, ucschar_t char_code)
 
 /*
  * Returns the length (in bytes) of a given NULL terminated string
- *  stops after max_width, maxbytes or NULL (\0) whichever occurs first.
+ *  stops after maxwidth, maxbytes or NULL (\0) whichever occurs first.
+ * maxbytes = -1 ignores maxbytes and relies on NULL terminator (\0)
+ *  to terminate the string
+ * maxwidth = -1 ignores maxwidth
+ * stringsize pixel width and height will be returned in *w and *h
  */
-int font_measurestring(const unsigned char *str, size_t maxbytes, int *max_width, int fontnum)
+int font_measurestring(const unsigned char *str, size_t maxbytes, size_t maxwidth, int *w, int *h, int fontnum)
 {
     const unsigned char *start = str;
     size_t bytes;
     struct font* pf = font_get(fontnum);
     font_lock( fontnum, true );
     ucschar_t ch;
-    int width = 0;
+    size_t width = 0;
 
     while (true)
     {
@@ -1127,15 +1131,20 @@ int font_measurestring(const unsigned char *str, size_t maxbytes, int *max_width
         }
         if (IS_DIACRITIC(ch))
             continue;
-        int w = font_get_width(pf,ch);
-        if (width + w > *max_width)
+        int fw = font_get_width(pf,ch);
+        width += fw;
+        if (width > maxwidth)
         {
+            width -= fw;
             break;
         }
-        width += w;
     }
 
-    *max_width = width;
+    if ( h )
+        *h = pf->height;
+    if ( w )
+        *w = width;
+
     font_lock( fontnum, false );
 
     return bytes;
@@ -1149,30 +1158,11 @@ int font_measurestring(const unsigned char *str, size_t maxbytes, int *max_width
  */
 int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *h, int fontnum)
 {
-    const unsigned char *start = str;
-    size_t bytes;
-    struct font* pf = font_get(fontnum);
-    font_lock( fontnum, true );
-    ucschar_t ch;
     int width = 0;
-
-    while (true)
-    {
-        bytes = str - start;
-        str = utf8decode(str, &ch);
-        if (ch == 0 || bytes >= maxbytes)
-            break;
-        if (IS_DIACRITIC(ch))
-            continue;
-        /* get proportional width and glyph bits*/
-        width += font_get_width(pf,ch);
-    }
-    if ( w )
-        *w = width;
-    if ( h )
-        *h = pf->height;
-    font_lock( fontnum, false );
-    return width;
+    if (!w)
+        w = &width;
+    font_measurestring(str, maxbytes, -1, w, h, fontnum);
+    return *w;
 }
 
 /*
