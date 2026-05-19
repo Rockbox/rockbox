@@ -249,6 +249,8 @@ void gui_usb_screen_run(bool early_usb, intptr_t seqnum)
 #ifdef USB_ENABLE_HID
     usb_keypad_mode = global_settings.usb_keypad_mode;
     title = &usb_screen_vps_ar[SCREEN_MAIN].title;
+#else
+    title = NULL;
 #endif
 
     FOR_NB_SCREENS(i)

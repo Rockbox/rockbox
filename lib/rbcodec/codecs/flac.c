@@ -468,8 +468,8 @@ enum codec_status codec_run(void)
     size_t bytesleft;
     int consumed;
     int res;
-#ifdef LOGF_ENABLE
-    int frame;
+#if defined(LOGF_ENABLE) || defined(DEBUG)
+    int frame = 0;
 #endif
     intptr_t param;
 
@@ -505,9 +505,6 @@ enum codec_status codec_run(void)
     ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */
-#ifdef LOGF_ENABLE
-    frame=0;
-#endif
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
         long action = ci->get_command(&param);
@@ -533,7 +530,7 @@ enum codec_status codec_run(void)
              return CODEC_ERROR;
         }
         consumed=fc.gb.index/8;
-#ifdef LOGF_ENABLE
+#if defined(LOGF_ENABLE) || defined(DEBUG)
         frame++;
 #endif
 
