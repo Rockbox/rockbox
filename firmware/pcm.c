@@ -77,12 +77,18 @@
  *
  */
 
+#ifdef HAVE_BLUETOOTH
+extern struct pcm_sink bluetooth_pcm_sink;
+#endif
 #ifdef USB_ENABLE_IAP
 extern struct pcm_sink iap_pcm_sink;
 #endif
 
 static struct pcm_sink* sinks[PCM_SINK_NUM] = {
     [PCM_SINK_BUILTIN] = &builtin_pcm_sink,
+#ifdef HAVE_BLUETOOTH
+    [PCM_SINK_BLUETOOTH] = &bluetooth_pcm_sink,
+#endif
 #ifdef USB_ENABLE_IAP
     [PCM_SINK_IAP] = &iap_pcm_sink,
 #endif
@@ -444,6 +450,13 @@ void pcm_apply_settings(void)
         sink->ops.set_freq(sink->pending_freq);
         sink->configured_freq = sink->pending_freq;
     }
+}
+
+void pcm_playback_invalidate_config(void)
+{
+    if (!pcm_is_initialized())
+        return;
+    sinks[cur_sink]->configured_freq = -1U;
 }
 
 #ifdef HAVE_RECORDING

@@ -32,6 +32,7 @@
 #include "backlight.h"
 #include "sound.h"
 #include "pcm_sink.h"
+#include "pcm.h"
 #include "settings.h"
 #include "rbpaths.h"
 #include "settings_list.h"
@@ -2405,7 +2406,7 @@ const struct settings_list settings[] = {
                    USBMODE_DEFAULT,
                    "usb mode",
                    "mass storage,charge"
-#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIBY_R3PROSABER)
                    ",adb"
 #endif
                    ,
@@ -2414,7 +2415,7 @@ const struct settings_list settings[] = {
                    3,
 #else
                    usb_set_mode,
-#if defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIBY_R3PROSABER)
                    3,
 #else
                    2,
@@ -2422,7 +2423,7 @@ const struct settings_list settings[] = {
 #endif
                    ID2P(LANG_USB_MODE_MASS_STORAGE),
                    ID2P(LANG_USB_MODE_CHARGE)
-#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIBY_R3PROSABER)
                    ,ID2P(LANG_USB_MODE_ADB)
 #endif
         ),
@@ -2442,6 +2443,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, playback_log, LANG_LOGGING, false, "play log", NULL),
 #if defined(HAVE_GENERAL_PURPOSE_LED)
     OFFON_SETTING(0, use_led_indicators, LANG_USE_LED_INDICATORS, false, "LED indicators", NULL),
+#endif
+#if defined(HAVE_BLUETOOTH) || defined(HAVE_EROSQ_LINUX_CODEC)
+    OFFON_SETTING(0, bluetooth_enabled, LANG_BLUETOOTH, false, "bluetooth enabled", NULL),
 #endif
 };
 

@@ -31,6 +31,10 @@
 #include "irq-x1000.h"
 #include "x1000/aic.h"
 #include "x1000/cpm.h"
+#ifdef HAVE_BLUETOOTH
+#include "sbc.h"
+#include "bluetooth-x1000.h"
+#endif
 
 #define AIC_STATE_STOPPED   0x00
 #define AIC_STATE_PLAYING   0x01
@@ -327,6 +331,64 @@ const void* pcm_rec_dma_get_peak_buffer(void)
     return (const void*)UNCACHEDADDR(REG_DMA_CHN_TA(DMA_CHANNEL_RECORD));
 }
 #endif /* HAVE_RECORDING */
+
+#ifdef HAVE_BLUETOOTH
+static sbc_t bt_sbc;
+static bool bt_sbc_init_done = false;
+
+static void bt_sink_init(void)
+{
+    if (!bt_sbc_init_done) {
+        sbc_init(&bt_sbc, 0);
+        bt_sbc_init_done = true;
+    }
+}
+
+static void bt_sink_play(const void* addr, size_t size)
+{
+    static uint8_t sbc_buf[512];
+    int written;
+    
+    /* This is a simple implementation that encodes and sends one frame.
+     * In a full implementation, we would need to handle packetization (L2CAP/AVDTP).
+     */
+    sbc_encode(&bt_sbc, addr, size, sbc_buf, sizeof(sbc_buf), &written);
+    
+    /* Send over UART0 (HCI ACL data packet for A2DP) */
+    /* Stub: For now we just call a new function in bluetooth-x1000.c */
+    bluetooth_send_audio(sbc_buf, written);
+}
+
+static void bt_sink_stop(void)
+{
+}
+
+static void bt_sink_postinit(void)
+{
+}
+
+static void bt_sink_set_freq(uint16_t freq)
+{
+    (void)freq;
+}
+
+struct pcm_sink bluetooth_pcm_sink = {
+    .caps = {
+        .samprs       = hw_freq_sampr,
+        .num_samprs   = HW_NUM_FREQ,
+        .default_freq = HW_FREQ_DEFAULT,
+    },
+    .ops = {
+        .init     = bt_sink_init,
+        .postinit = bt_sink_postinit,
+        .set_freq = bt_sink_set_freq,
+        .lock     = NULL,
+        .unlock   = NULL,
+        .play     = bt_sink_play,
+        .stop     = bt_sink_stop,
+    },
+};
+#endif
 
 #ifdef HAVE_PCM_DMA_ADDRESS
 void* pcm_dma_addr(void* addr)

@@ -49,6 +49,7 @@
 #include "wps.h"
 #include "skin_buffer.h"
 #include "disk.h"
+#include "file.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 static int show_info(void);
@@ -497,7 +498,13 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
 
 static int main_menu_config(void)
 {
-    plugin_load(PLUGIN_APPS_DIR "/main_menu_config.rock", NULL);
+    static const char path[] = PLUGIN_APPS_DIR "/main_menu_config.rock";
+    if (!file_exists(path))
+    {
+        splashf(HZ * 3, str(LANG_PLUGIN_CANT_OPEN), path);
+        return 0;
+    }
+    plugin_load(path, NULL);
     return 0;
 }
 
@@ -507,10 +514,17 @@ MENUITEM_FUNCTION(main_menu_config_item, 0, ID2P(LANG_MAIN_MENU),
 /***********************************/
 /*    MAIN MENU                    */
 
+#if defined(HAVE_EROSQ_LINUX_CODEC)
+extern struct menu bluetooth_hosted_menu;
+#endif
+
 MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), NULL,
         Icon_Submenu_Entered,
         &sound_settings,
         &playback_settings,
+#if defined(HAVE_EROSQ_LINUX_CODEC)
+        &bluetooth_hosted_menu,
+#endif
         &settings_menu_item, &theme_menu,
 #ifdef HAVE_RECORDING
         &recording_settings,

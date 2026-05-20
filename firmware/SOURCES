@@ -176,6 +176,16 @@ target/hosted/hiby/hibylinux_codec.c
 #endif
 #endif
 
+#if defined(HIBY_R3PROSABER) && !defined(SIMULATOR)
+target/hosted/hiby/usb-hiby-gadget.c
+target/hosted/hiby/r3prosaber/button-r3prosaber.c
+target/hosted/hiby/r3prosaber/powermgmt-r3prosaber.c
+target/hosted/hiby/debug-hiby.c
+#ifndef BOOTLOADER
+target/hosted/hiby/hibylinux_codec.c
+#endif
+#endif
+
 #if defined(HIBY_R1) && !defined(SIMULATOR)
 target/hosted/hiby/usb-hiby-gadget.c
 target/hosted/hiby/r1/button-r1.c
@@ -218,7 +228,7 @@ target/hosted/xduoo/xduoolinux_codec.c
 target/hosted/button-devinput.c
 #endif
 
-#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(SIMULATOR)
+#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R3PROSABER) && !defined(HIBY_R1) && !defined(SIMULATOR)
 target/hosted/usb-hiby.c
 #endif
 
@@ -1821,6 +1831,10 @@ target/mips/ingenic_x1000/erosqnative/backlight-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/button-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
+#ifndef BOOTLOADER
+target/mips/ingenic_x1000/bluetooth-x1000.c
+target/mips/ingenic_x1000/sbc_encoder.c
+#endif
 target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* EROS_QN */
 

@@ -112,7 +112,7 @@ static long lasttime = 0;
 #include "usb-ibasso.h"
 #endif
 
-#if (defined(HIBY_R3PROII) || defined(HIBY_R1))
+#if (defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIBY_R3PROSABER))
 #include "usb-hiby-gadget.h"
 #endif
 
@@ -1133,7 +1133,7 @@ void settings_apply(bool read_disk)
 
 #if defined(DX50) || defined(DX90)
     ibasso_set_usb_mode(global_settings.usb_mode);
-#elif (defined(HIBY_R3PROII) || defined(HIBY_R1)) && !defined(SIMULATOR)
+#elif (defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIBY_R3PROSABER)) && !defined(SIMULATOR)
     hiby_set_usb_mode(global_settings.usb_mode);
 #elif defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
     usb_set_mode(global_settings.usb_mode);

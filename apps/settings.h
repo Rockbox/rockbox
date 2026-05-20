@@ -931,6 +931,9 @@ struct user_settings
 #if defined(HAVE_GENERAL_PURPOSE_LED)
     bool use_led_indicators;
 #endif
+#if defined(HAVE_BLUETOOTH) || defined(HAVE_EROSQ_LINUX_CODEC)
+    bool bluetooth_enabled;
+#endif
 };
 
 /* global settings */
