@@ -137,6 +137,12 @@ int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *st
     return -1;
 }
 
+static inline void read_time_to_sample_entry(stream_t* stream, uint32_t* time_cnt, uint32_t* time_dur)
+{
+    *time_cnt = stream_read_uint32(stream);
+    *time_dur = stream_read_uint32(stream);
+}
+
 /* Seek to desired sound sample location. Return 1 on success (and modify
  * sound_samples_done and current_sample), 0 if failed. */
 unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
@@ -161,10 +167,21 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     /* The 'sound_sample_loc' we have is PCM-based and not directly usable.
      * We need to convert it to an MP4 sample number 'sample_i' first. */
     sample_i = sound_sample_i = 0;
+    if (tts_tab == NULL)
+    {
+        stream_seek(stream, demux_res->time_to_sample_offset);
+    }
     for (time = 0; time < demux_res->num_time_to_samples; ++time)
     {
-        time_cnt = tts_tab[time].sample_count;
-        time_dur = tts_tab[time].sample_duration;
+        if (tts_tab)
+        {
+            time_dur = tts_tab[time].sample_duration;
+            time_cnt = tts_tab[time].sample_count;
+        }
+        else
+        {
+            read_time_to_sample_entry(stream, &time_cnt, &time_dur);
+        }
         uint32_t time_var = time_cnt * time_dur;
 
         if (sound_sample_loc < sound_sample_i + time_var)
@@ -194,10 +211,22 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     /* Compute the PCM sample number of the chunk's first sample
      * to get an accurate base for sound_sample_i. */
     i = sound_sample_i = 0;
+    if (tts_tab == NULL)
+    {
+        stream_seek(stream, demux_res->time_to_sample_offset);
+    }
+
     for (time = 0; time < demux_res->num_time_to_samples; ++time)
     {
-        time_cnt = tts_tab[time].sample_count;
-        time_dur = tts_tab[time].sample_duration;
+        if (tts_tab)
+        {
+            time_dur = tts_tab[time].sample_duration;
+            time_cnt = tts_tab[time].sample_count;
+        }
+        else
+        {
+            read_time_to_sample_entry(stream, &time_cnt, &time_dur);
+        }
 
         if (chunk_first_sample < i + time_cnt)
         {
@@ -223,7 +252,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
              i < sample_i && i < demux_res->num_sample_byte_sizes; ++i)
         {
             /* this could be unnecessary */
-            if (time_cnt == 0 && ++time < demux_res->num_time_to_samples)
+            if (time_cnt == 0 && tts_tab && ++time < demux_res->num_time_to_samples)
             {
                 time_cnt = tts_tab[time].sample_count;
                 time_dur = tts_tab[time].sample_duration;
@@ -279,8 +308,8 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     uint32_t chunk_sample     = 0;
     uint32_t total_samples    = 0;
     uint64_t new_sound_sample = 0;
-    uint32_t tmp_dur;
-    uint32_t tmp_cnt;
+    uint32_t time_dur;
+    uint32_t time_cnt;
     uint32_t new_pos;
 
     /* We know the desired byte offset, search for the chunk right before.
@@ -297,16 +326,27 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
 
     /* Get sound sample offset. */
     i = 0;
-    time_to_sample_t *tab2 = demux_res->time_to_sample;
+    time_to_sample_t *tts_tab = demux_res->time_to_sample;
+    if (tts_tab == NULL)
+    {
+        stream_seek(stream, demux_res->time_to_sample_offset);
+    }
     while (i < demux_res->num_time_to_samples)
     {
-        tmp_dur = tab2[i].sample_duration;
-        tmp_cnt = tab2[i].sample_count;
-        total_samples    += tmp_cnt;
-        new_sound_sample += tmp_cnt * tmp_dur;
+        if (tts_tab)
+        {
+            time_dur = tts_tab[i].sample_duration;
+            time_cnt = tts_tab[i].sample_count;
+        }
+        else
+        {
+            read_time_to_sample_entry(stream, &time_cnt, &time_dur);
+        }
+        total_samples    += time_cnt;
+        new_sound_sample += time_cnt * time_dur;
         if (chunk_sample <= total_samples)
         {
-            new_sound_sample -= (total_samples - chunk_sample) * tmp_dur;
+            new_sound_sample -= (total_samples - chunk_sample) * time_dur;
             break;
         }
         ++i;

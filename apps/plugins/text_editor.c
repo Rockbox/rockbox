@@ -522,6 +522,7 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_MENU:
 #endif
             {
+                rb->gui_synclist_scroll_stop(&lists);
                 /* do the item menu */
                 switch (do_item_menu(cur_sel))
                 {
@@ -540,6 +541,7 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_CANCEL:
                 if (changed)
                 {
+                    rb->gui_synclist_scroll_stop(&lists);
                     MENUITEM_STRINGLIST(menu, "Text Editor", NULL,
                                         "Return",
                                         "Playback Control", "Save Changes",

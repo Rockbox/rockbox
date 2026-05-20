@@ -66,6 +66,7 @@ int splash_scroller(int timeout, const char* str);
 #define strcmp   rb->strcmp
 #define strcpy   rb->strcpy
 #define strlen   rb->strlen
+#define strncpy  rb->strncpy
 #define strtol   rb->strtol
 #define strtoul  rb->strtoul
 #define strstr   rb->strstr

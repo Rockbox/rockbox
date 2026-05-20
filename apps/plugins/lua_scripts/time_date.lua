@@ -35,14 +35,24 @@ local used, allocd, free = rb.mem_stats()
 local lu = collectgarbage("count")
 local fmt = function(t, v) return string.format("%s: %d b\n", t, v) end
 
+time = os.date("*t")
+
+time_string = ""
+
+for key, value in pairs(time) do
+  time_string = time_string .. key .. ": " .. tostring(value) .. "\n"
+end
+
 -- this is how lua recommends to concat strings rather than ..
 local s_t = {}
 s_t[1] = os.date()
 s_t[2] = "\n"
-s_t[3] = fmt("Used  ", used)
-s_t[4] = fmt("Allocd ", allocd)
-s_t[5] = fmt("Free  ", free)
-s_t[6] = "\nlua:\n"
-s_t[7] = fmt("Used", lu * 1024)
-s_t[8] = "\n\nNote that the rockbox used count is a high watermark\n"
+s_t[3] = time_string
+s_t[4] = "\n"
+s_t[5] = fmt("Used  ", used)
+s_t[6] = fmt("Allocd ", allocd)
+s_t[7] = fmt("Free  ", free)
+s_t[8] = "\nlua:\n"
+s_t[9] = fmt("Used", lu * 1024)
+s_t[10] = "\n\nNote that the rockbox used count is a high watermark\n"
 rb.splash_scroller(10 * rb.HZ, table.concat(s_t))

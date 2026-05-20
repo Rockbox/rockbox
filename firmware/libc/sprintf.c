@@ -109,3 +109,21 @@ overflow:
     errno = EOVERFLOW;
     return -1;
 }
+
+int sprintf(char *buf, const char *fmt, ...)
+{
+    int bytes;
+    struct for_snprintf pr;
+    va_list ap;
+
+    pr.ptr = buf;
+    pr.rem = INT_MAX;
+
+    va_start(ap, fmt);
+    bytes = vuprintf(sprfunc, &pr, fmt, ap);
+    va_end(ap);
+
+    *pr.ptr = '\0';
+
+    return bytes;
+}

@@ -4247,12 +4247,22 @@ void audio_set_crossfade(int enable)
 static unsigned long audio_guess_frequency(struct mp3entry *id3)
 {
     const struct pcm_sink_caps* caps = pcm_sink_caps(pcm_current_sink());
+    bool have_44 = false;
+    bool have_48 = false;
     for (size_t i = 0; i < caps->num_samprs; i += 1)
     {
+        if (caps->samprs[i] == SAMPR_44)
+            have_44 = true;
+        if (caps->samprs[i] == SAMPR_48)
+            have_48 = true;
         if (id3->frequency == caps->samprs[i])
             return id3->frequency;
     }
-    return (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
+    unsigned long fallback = (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
+    if ((fallback == SAMPR_44 && have_44) || (fallback == SAMPR_48 && have_48))
+        return fallback;
+    else
+        return caps->samprs[caps->default_freq];
 }
 
 static bool audio_auto_change_frequency(struct mp3entry *id3, bool play)

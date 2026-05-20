@@ -18,8 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define MIXER_OPTIMIZED_MIX_SAMPLES
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
 
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(void *out,

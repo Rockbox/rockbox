@@ -7,7 +7,7 @@ OUTPUT_ARCH(arm)
 STARTUP(target/arm/imx233/crt0.o)
 
 /* Leave a hole at the beginning of the RAM to load the firmware */
-#define RAM_HOLE    1024 * 1024
+#define RAM_HOLE    1536 * 1024
 
 /* Make a difference between virtual and physical address so that we can use
  * the resulting elf file with the elftosb tools which loads at the *physical*

@@ -875,6 +875,7 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_scroll_stop,
     add_event_ex,
     remove_event_ex,
+    strncpy,
 };
 
 static int plugin_buffer_handle;

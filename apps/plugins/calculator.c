@@ -1119,7 +1119,7 @@ static void transcendFunc(char* func, double* tt, int* ttPower)
             
             /* Save current function context */
             char original_func[3];
-            strncpy(original_func, func, 3);
+            rb->strncpy(original_func, func, 3);
             
             transcendFunc("asin", &arcsin_input, &arcsin_power);
             

@@ -1863,11 +1863,12 @@ void window_subband2(short *x1, int a[SBLIMIT])
 {
   int   xr;
   short const *wp = enwindow;
-  short *x2 = x1 - 124;
+//  short *x2 = x1 - 124;
 
   wp += 27 * 15;
-  x1 -=  2 * 15;
-  x2 +=  2 * 15;
+//  x1 -=  2 * 15;
+//  x2 +=  2 * 15;
+  (void)x1;
 
   xr = a[28] - a[0];  a[0] += a[28];  a[28] = shft9(xr) * wp[-2*27+25];
   xr = a[29] - a[1];  a[1] += a[29];  a[29] = shft9(xr) * wp[-2*27+25];

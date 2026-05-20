@@ -182,17 +182,18 @@ int sb_get_backdrop(enum screen_type screen)
     return -1;
 }
 #endif
-static bool force_waiting = false;
+static bool force_waiting[NB_SCREENS];
 void sb_skin_update(enum screen_type screen, bool force)
 {
     struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
-    static long next_update[NB_SCREENS] = {0};
+    static long next_update[NB_SCREENS];
     int i = screen;
     if (!data->wps_loaded)
         return;
-    if (TIME_AFTER(current_tick, next_update[i]) || force || force_waiting)
+    if (TIME_AFTER(current_tick, next_update[i]) || force ||
+        force_waiting[i])
     {
-        force_waiting = false;
+        force_waiting[i] = false;
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         /* currently, all remotes are readable without backlight
          * so still update those */
@@ -214,7 +215,8 @@ void do_sbs_update_callback(unsigned short id, void *param)
     /* the WPS handles changing the actual id3 data in the id3 pointers
      * we imported, we just want a full update */
     skin_request_full_update(CUSTOM_STATUSBAR);
-    force_waiting = true;
+    FOR_NB_SCREENS(i)
+        force_waiting[i] = true;
     /* force timeout in wps main loop, so that the update is instantly */
     button_queue_post(BUTTON_NONE, 0);
 }
@@ -226,7 +228,8 @@ void sb_skin_set_update_delay(int delay)
 
 void sb_skin_force_next_update(void)
 {
-    force_waiting = true;
+    FOR_NB_SCREENS(i)
+        force_waiting[i] = true;
 }
 
 /* This creates and loads a ".sbs" based on the user settings for:

@@ -263,10 +263,10 @@ void main(void)
 
     /* Disable caches and protection unit */
     asm volatile(
-        "mrc 15, 0, r0, c1, c0, 0 \n"
-        "bic r0, r0, #0x1000      \n"
-        "bic r0, r0, #0x5         \n"
-        "mcr 15, 0, r0, c1, c0, 0 \n"
+        "mrc p15, 0, r0, c1, c0, 0 \n"
+        "bic r0, r0, #0x1000       \n"
+        "bic r0, r0, #0x5          \n"
+        "mcr p15, 0, r0, c1, c0, 0 \n"
     );
 
     /* Branch to start of DRAM */

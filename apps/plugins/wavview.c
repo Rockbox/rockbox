@@ -112,7 +112,7 @@ static int readwavpeaks(const char *filename)
     int hours;
     int minutes;
     int seconds;
-    uint32_t peakcount = 0;
+//    uint32_t peakcount = 0;
     struct peakstruct* peak = NULL;
 
     if(rb->strcasecmp (filename + rb->strlen (filename) - 3, "wav"))
@@ -207,7 +207,7 @@ static int readwavpeaks(const char *filename)
         sampleval = letoh16(*(sampleshort+1));
         peak->rmin = sampleval;
         peak->rmax = sampleval;
-    
+
         while(bytes_read)
         {
             sampleval = letoh16(*sampleshort++);
@@ -223,7 +223,7 @@ static int readwavpeaks(const char *filename)
                 peak->rmax = sampleval;
 
             bytes_read -= 4;
-            peakcount++;
+//            peakcount++;
             fppmp_count--;
             if(!fppmp_count)
             {

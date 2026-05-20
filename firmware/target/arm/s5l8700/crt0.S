@@ -49,9 +49,9 @@ newstart2:
 
 #ifdef ROCKBOX_BIG_ENDIAN
     mov r1, #0x80
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // set bigendian
+    mcr p15, 0, r0, c1, c0, 0 // set bigendian
 #endif
 
     ldr r1, =0x3c800000 // disable watchdog
@@ -144,11 +144,11 @@ start_loc:
     str r0, [r1,#0x10]  // CLKCON3
 
     ldr r2, =0xc0000078
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     mvn r1, #0xc0000000
     and r0, r0, r1
     orr r0, r0, r2
-    mcr 15, 0, r0, c1, c0, 0 // asynchronous clocking mode
+    mcr p15, 0, r0, c1, c0, 0 // asynchronous clocking mode
     nop
     nop                         
     nop
@@ -179,17 +179,17 @@ start_loc:
     ldr r0, =0xffffef7e
     str r0, [r1,#0x40]  // PWRCONEXT
 
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     bic r0, r0, #0x1000
     bic r0, r0, #0x5
-    mcr 15, 0, r0, c1, c0, 0 // disable caches and protection unit
+    mcr p15, 0, r0, c1, c0, 0 // disable caches and protection unit
 
     mov r1, #0
 1:
     mov r0, #0
 2:
     orr r2, r1, r0
-    mcr 15, 0, r2, c7, c14, 2 // clean and flush dcache single entry
+    mcr p15, 0, r2, c7, c14, 2 // clean and flush dcache single entry
     add r0, r0, #0x10
     cmp r0, #0x40
     bne 2b
@@ -199,48 +199,48 @@ start_loc:
     nop
     nop
     mov r0, #0
-    mcr 15, 0, r0, c7, c10, 4 // clean and flush whole dcache
-    mcr 15, 0, r0, c7, c5, 0 // flush icache
-    mcr 15, 0, r0, c7, c6, 0 // flush dcache
+    mcr p15, 0, r0, c7, c10, 4 // clean and flush whole dcache
+    mcr p15, 0, r0, c7, c5, 0 // flush icache
+    mcr p15, 0, r0, c7, c6, 0 // flush dcache
 
     mov r0, #0x3f
-    mcr 15, 0, r0, c6, c0, 1 // CS0: 4GB at offset 0 - everything
-    mcr 15, 0, r0, c6, c0, 0 // DS0: 4GB at offset 0 - everything
+    mcr p15, 0, r0, c6, c0, 1 // CS0: 4GB at offset 0 - everything
+    mcr p15, 0, r0, c6, c0, 0 // DS0: 4GB at offset 0 - everything
 #ifdef IPOD_NANO2G
     mov r0, #0x31 // FIXME: calculate that from MEMORYSIZE
 #else
     mov r0, #0x2f // FIXME: calculate that from MEMORYSIZE
 #endif
-    mcr 15, 0, r0, c6, c1, 1 // CS1: SRAM/SDRAM mirror
-    mcr 15, 0, r0, c6, c1, 0 // DS1: SRAM/SDRAM mirror
+    mcr p15, 0, r0, c6, c1, 1 // CS1: SRAM/SDRAM mirror
+    mcr p15, 0, r0, c6, c1, 0 // DS1: SRAM/SDRAM mirror
     add r0, r0, #0x08000000
-    mcr 15, 0, r0, c6, c2, 1 // CS2: SDRAM
-    mcr 15, 0, r0, c6, c2, 0 // DS2: SDRAM
+    mcr p15, 0, r0, c6, c2, 1 // CS2: SDRAM
+    mcr p15, 0, r0, c6, c2, 0 // DS2: SDRAM
     ldr r0, =0x22000023
-    mcr 15, 0, r0, c6, c3, 1 // CS3: SRAM
-    mcr 15, 0, r0, c6, c3, 0 // DS3: SRAM
+    mcr p15, 0, r0, c6, c3, 1 // CS3: SRAM
+    mcr p15, 0, r0, c6, c3, 0 // DS3: SRAM
     ldr r0, =0x24000027
-    mcr 15, 0, r0, c6, c4, 1 // CS4: NOR flash
-    mcr 15, 0, r0, c6, c4, 0 // DS4: NOR flash
+    mcr p15, 0, r0, c6, c4, 1 // CS4: NOR flash
+    mcr p15, 0, r0, c6, c4, 0 // DS4: NOR flash
     mov r0, #0
-    mcr 15, 0, r0, c6, c5, 1 // CS5: unused
-    mcr 15, 0, r0, c6, c5, 0 // DS5: unused
-    mcr 15, 0, r0, c6, c6, 1 // CS6: unused
-    mcr 15, 0, r0, c6, c6, 0 // DS6: unused
-    mcr 15, 0, r0, c6, c7, 1 // CS7: unused
-    mcr 15, 0, r0, c6, c7, 0 // DS7: unused
+    mcr p15, 0, r0, c6, c5, 1 // CS5: unused
+    mcr p15, 0, r0, c6, c5, 0 // DS5: unused
+    mcr p15, 0, r0, c6, c6, 1 // CS6: unused
+    mcr p15, 0, r0, c6, c6, 0 // DS6: unused
+    mcr p15, 0, r0, c6, c7, 1 // CS7: unused
+    mcr p15, 0, r0, c6, c7, 0 // DS7: unused
     mov r0, #0x1e
-    mcr 15, 0, r0, c2, c0, 1 // CS1-4: cacheable
-    mcr 15, 0, r0, c2, c0, 0 // DS1-4: cacheable
-    mcr 15, 0, r0, c3, c0, 0 // DS1-4: write cacheable
+    mcr p15, 0, r0, c2, c0, 1 // CS1-4: cacheable
+    mcr p15, 0, r0, c2, c0, 0 // DS1-4: cacheable
+    mcr p15, 0, r0, c3, c0, 0 // DS1-4: write cacheable
     ldr r0, =0x000003ff
-    mcr 15, 0, r0, c5, c0, 1 // CS0-4: full access
-    mcr 15, 0, r0, c5, c0, 0 // DS0-4: full access
+    mcr p15, 0, r0, c5, c0, 1 // CS0-4: full access
+    mcr p15, 0, r0, c5, c0, 0 // DS0-4: full access
 
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, #0x5
     orr r0, r0, #0x1000
-    mcr 15, 0, r0, c1, c0, 0 // re-enable protection unit and caches
+    mcr p15, 0, r0, c1, c0, 0 // re-enable protection unit and caches
 
     ldr r1, =0x38200000
     ldr r0, =0x006A49A5 // default: settings from Apple FW (96 MHz HCLK)
@@ -255,26 +255,26 @@ start_loc:
     str r0, [r1, #44] // do not enter any power saving mode
 
     mov r1, #0x1
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     bic r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // disable protection unit
+    mcr p15, 0, r0, c1, c0, 0 // disable protection unit
 
     mov r1, #0x4
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     bic r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // dcache disable
+    mcr p15, 0, r0, c1, c0, 0 // dcache disable
 
     mov r1, #0x1000
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     bic r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // icache disable
+    mcr p15, 0, r0, c1, c0, 0 // icache disable
 
     mov r1, #0
 1:
     mov r0, #0
 2:
     orr r2, r1, r0
-    mcr 15, 0, r2, c7, c14, 2 // clean and flush dcache single entry
+    mcr p15, 0, r2, c7, c14, 2 // clean and flush dcache single entry
     add r0, r0, #0x10
     cmp r0, #0x40
     bne 2b
@@ -284,59 +284,59 @@ start_loc:
     nop
     nop
     mov r0, #0
-    mcr 15, 0, r0, c7, c10, 4 // clean and flush whole dcache
+    mcr p15, 0, r0, c7, c10, 4 // clean and flush whole dcache
 
     mov r0, #0
-    mcr 15, 0, r0, c7, c5, 0 // flush icache
+    mcr p15, 0, r0, c7, c5, 0 // flush icache
     
     mov r0, #0
-    mcr 15, 0, r0, c7, c6, 0 // flush dcache
+    mcr p15, 0, r0, c7, c6, 0 // flush dcache
 
     mov r0, #0x3f
-    mcr 15, 0, r0, c6, c0, 1
+    mcr p15, 0, r0, c6, c0, 1
     mov r0, #0x2f
-    mcr 15, 0, r0, c6, c1, 1
+    mcr p15, 0, r0, c6, c1, 1
     ldr r0, =0x08000031
-    mcr 15, 0, r0, c6, c2, 1
+    mcr p15, 0, r0, c6, c2, 1
     ldr r0, =0x22000023
-    mcr 15, 0, r0, c6, c3, 1
+    mcr p15, 0, r0, c6, c3, 1
     ldr r0, =0x24000027
-    mcr 15, 0, r0, c6, c4, 1
+    mcr p15, 0, r0, c6, c4, 1
     mov r0, #0x3f
-    mcr 15, 0, r0, c6, c0, 0
+    mcr p15, 0, r0, c6, c0, 0
     mov r0, #0x2f
-    mcr 15, 0, r0, c6, c1, 0
+    mcr p15, 0, r0, c6, c1, 0
     ldr r0, =0x08000031
-    mcr 15, 0, r0, c6, c2, 0
+    mcr p15, 0, r0, c6, c2, 0
     ldr r0, =0x22000023
-    mcr 15, 0, r0, c6, c3, 0
+    mcr p15, 0, r0, c6, c3, 0
     ldr r0, =0x24000029
-    mcr 15, 0, r0, c6, c4, 0
+    mcr p15, 0, r0, c6, c4, 0
     mov r0, #0x1e
-    mcr 15, 0, r0, c2, c0, 1
+    mcr p15, 0, r0, c2, c0, 1
     mov r0, #0x1e
-    mcr 15, 0, r0, c2, c0, 0
+    mcr p15, 0, r0, c2, c0, 0
     mov r0, #0x1e
-    mcr 15, 0, r0, c3, c0, 0
+    mcr p15, 0, r0, c3, c0, 0
     ldr r0, =0x0000ffff
-    mcr 15, 0, r0, c5, c0, 1
+    mcr p15, 0, r0, c5, c0, 1
     ldr r0, =0x0000ffff
-    mcr 15, 0, r0, c5, c0, 0 // set up protection and caching
+    mcr p15, 0, r0, c5, c0, 0 // set up protection and caching
 
     mov r1, #0x4
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // dcache enable
+    mcr p15, 0, r0, c1, c0, 0 // dcache enable
 
     mov r1, #0x1000
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // icache enable
+    mcr p15, 0, r0, c1, c0, 0 // icache enable
 
     mov r1, #0x1
-    mrc 15, 0, r0, c1, c0, 0
+    mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, r1
-    mcr 15, 0, r0, c1, c0, 0 // enable protection unit
+    mcr p15, 0, r0, c1, c0, 0 // enable protection unit
 #endif
 
 #if CONFIG_CPU==S5L8700 || !defined(BOOTLOADER)

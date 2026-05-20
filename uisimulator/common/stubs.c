@@ -203,13 +203,6 @@ bool usb_charging_enable(bool on)
 }
 #endif
 
-#ifndef USB_NONE
-bool usb_inserted(void)
-{
-    return false;
-}
-#endif
-
 #ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state)
 {

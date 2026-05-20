@@ -195,6 +195,11 @@ int usb_detect(void)
     return is_usb_inserted ? USB_INSERTED : USB_EXTRACTED;
 }
 
+bool usb_inserted(void)
+{
+    return is_usb_inserted;
+}
+
 void usb_init(void)
 {
 }

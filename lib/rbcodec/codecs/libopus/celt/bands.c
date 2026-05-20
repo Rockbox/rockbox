@@ -910,6 +910,8 @@ static unsigned quant_band_n1(struct band_ctx *ctx, celt_norm *X, celt_norm *Y, 
    int encode;
    ec_ctx *ec;
 
+   (void)b;
+
    encode = ctx->encode;
    ec = ctx->ec;
 
@@ -1669,4 +1671,3 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
 
    RESTORE_STACK;
 }
-

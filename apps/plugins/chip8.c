@@ -1376,7 +1376,7 @@ static void chip8_sound_off (void)
 /****************************************************************************/
 static void chip8_update_display(void)
 {
-    int x, lcd_x, y, i;
+    int x, y, i;
     byte w;
     byte* row;
     /* frame buffer in hardware fomat */
@@ -1385,7 +1385,7 @@ static void chip8_update_display(void)
     for (y=0;y<CHIP8_HEIGHT/8;++y)
     {
         row = lcd_framebuf[y];
-        for (x=0, lcd_x=0;x<CHIP8_WIDTH;++x,++lcd_x)
+        for (x=0;x<CHIP8_WIDTH;++x)
         {
             w = 0;
             for (i=0;i<8;i++)

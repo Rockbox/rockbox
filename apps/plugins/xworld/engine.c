@@ -306,6 +306,8 @@ void engine_processInput(struct Engine* e) {
     }
 }
 
+#undef strncpy
+
 void engine_makeGameStateName(struct Engine* e, uint8_t slot, char *buf, int sz) {
     (void) e;
     rb->snprintf(buf, sz, "xworld_save.s%02d", slot);
@@ -325,7 +327,7 @@ void engine_saveGameState(struct Engine* e, uint8_t slot, const char *desc) {
         file_writeUint16BE(&f, CUR_VER);
         file_writeUint16BE(&f, 0);
         char hdrdesc[32];
-        strncpy(hdrdesc, desc, sizeof(hdrdesc) - 1);
+        rb->strncpy(hdrdesc, desc, sizeof(hdrdesc) - 1);
         file_write(&f, hdrdesc, sizeof(hdrdesc));
         /* contents */
         struct Serializer s;

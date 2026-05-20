@@ -19,9 +19,6 @@
  *
  ****************************************************************************/
 
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
-#define MIXER_OPTIMIZED_MIX_SAMPLES
-
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(void *out,
                                      const void *src0,
