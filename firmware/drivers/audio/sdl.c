@@ -75,9 +75,6 @@ void audiohw_set_prescaler(int value)
 }
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
-#if defined(AUDIOHW_HAVE_BALANCE)
-void audiohw_set_balance(int value)     { (void)value; }
-#endif
 #ifndef HAVE_SW_TONE_CONTROLS
 #if defined(AUDIOHW_HAVE_BASS)
 void audiohw_set_bass(int value)        { (void)value; }
