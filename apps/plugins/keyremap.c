@@ -742,6 +742,19 @@ static int keymap_add_button_entry(int context, int action_code,
             break;
         }
     }
+
+    for (int i = 0; i < ctx_data.act_count; i++)
+    {
+        if (ctx_data.act_map[i].context == context &&
+            ctx_data.act_map[i].map.action_code == action_code)
+        {
+            /*Duplicate -- Update the existing entry */
+            ctx_data.act_map[i].map.button_code = button_code;
+            ctx_data.act_map[i].map.pre_button_code = pre_button_code;
+            return ctx_data.act_count;
+        }
+    }
+
     if (!hasctx || keyremap_buffer.end - sizeof(struct action_mapping_t) < keyremap_buffer.front)
         goto fail;
     keyremap_buffer.end -= sizeof(struct action_mapping_t);
@@ -948,7 +961,11 @@ static int keyremap_import_file(char *filenamebuf, size_t bufsz)
     char *pact;
     int ctx = -1;
 
-    keyremap_reset_buffer();
+    if (ctx_data.ctx_count == 0 || rb->yesno_pop("Delete Current Entries?") == true)
+    {
+        keyremap_reset_buffer();
+    }
+
 next_line:
     while (rb->read_line(fd, filenamebuf, (int) bufsz) > 0)
     {
