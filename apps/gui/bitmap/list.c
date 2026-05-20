@@ -273,7 +273,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #endif
 
     /* draw the scrollbar if its needed */
-    if (list->scrollbar != SCROLLBAR_OFF)
+    if (0) /* BradPod: scrollbar disabled */
     {
         /* if the scrollbar is shown the text viewport needs to shrink */
         if (nb_lines < list->nb_items)

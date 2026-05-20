@@ -28,6 +28,7 @@
 #include "root_menu.h"
 #include "lang.h"
 #include "settings.h"
+#include "backlight.h"
 #include "screens.h"
 #include "kernel.h"
 #include "debug.h"
@@ -956,6 +957,9 @@ void root_menu(void)
                  * button to be handled by HOST instead of rockbox */
                 ignore_back_button_stub(true);
 
+                lcd_clear_display();
+                lcd_update();
+                backlight_on();
                 next_screen = do_menu(&root_menu_, &selected, NULL, false);
 
                 ignore_back_button_stub(false);

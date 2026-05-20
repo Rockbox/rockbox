@@ -92,13 +92,13 @@
   desc: main menu title
   user: core
   <source>
-    *: "Rockbox"
+    *: ""
   </source>
   <dest>
-    *: "Rockbox"
+    *: ""
   </dest>
   <voice>
-    *: "Rockbox"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -396,13 +396,13 @@
   desc: in the main menu and the settings menu
   user: core
   <source>
-    *: "Database"
+    *: "Brad I"
   </source>
   <dest>
-    *: "Database"
+    *: "Brad I"
   </dest>
   <voice>
-    *: "Database"
+    *: "Brad I"
   </voice>
 </phrase>
 <phrase>
@@ -424,13 +424,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Resume Playback"
+    *: "Now Playing"
   </source>
   <dest>
-    *: "Resume Playback"
+    *: "Now Playing"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Now Playing"
   </voice>
 </phrase>
 <phrase>
@@ -438,13 +438,13 @@
   desc:  in main menu and visual confirmation after settings reset
   user: core
   <source>
-    *: "Settings"
+    *: "Fix Brad"
   </source>
   <dest>
-    *: "Settings"
+    *: "Fix Brad"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Fix Brad"
   </voice>
 </phrase>
 <phrase>
@@ -500,13 +500,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Plugins"
+    *: "Extra Brad!"
   </source>
   <dest>
-    *: "Plugins"
+    *: "Extra Brad!"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "Extra Brad!"
   </voice>
 </phrase>
 <phrase>
@@ -1976,13 +1976,13 @@
   desc: show only music-related files
   user: core
   <source>
-    *: "Music"
+    *: "Brad's Music: Season 1"
   </source>
   <dest>
-    *: "Music"
+    *: "Brad's Music: Season 1"
   </dest>
   <voice>
-    *: "Music"
+    *: "Brad's Music: Season 1"
   </voice>
 </phrase>
 <phrase>
@@ -11617,13 +11617,13 @@
   desc: Title in the shortcuts menu
   user: core
   <source>
-    *: "Shortcuts"
+    *: "Vinyl Mode"
   </source>
   <dest>
-    *: "Shortcuts"
+    *: "Vinyl Mode"
   </dest>
   <voice>
-    *: "Shortcuts"
+    *: "Vinyl Mode"
   </voice>
 </phrase>
 <phrase>

@@ -322,10 +322,10 @@ static int INIT_ATTR init_dircache(bool preinit)
             if (result > 0)
             {
                 /* Print "Scanning disk..." to the display. */
-                splash(0, str(LANG_SCANNING_DISK));
+                //splash(0, str(LANG_SCANNING_DISK));
                 dircache_wait();
-                backlight_on();
-                show_logo_boot();
+                //backlight_on();
+                //show_logo_boot();
             }
 
             struct dircache_info info;
@@ -390,8 +390,8 @@ static void init_tagcache(void)
 
     if (clear)
     {
-        backlight_on();
-        show_logo_boot();
+        //backlight_on();
+        //show_logo_boot();
     }
 }
 #endif /* HAVE_TAGCACHE */
@@ -414,10 +414,11 @@ static void init(void)
     FOR_NB_SCREENS(i)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
-    show_logo_boot();
+    //show_logo_boot();
     button_init();
     powermgmt_init();
     backlight_init();
+    backlight_off();
     unicode_init();
 #ifdef HAVE_MULTIVOLUME
     init_volume_names();
@@ -530,7 +531,7 @@ static void init(void)
     settings_reset();
 
     CHART(">show_logo");
-    show_logo_boot();
+    //show_logo_boot();
     CHART("<show_logo");
     lang_init(core_language_builtin, language_strings,
               LANG_LAST_INDEX_IN_ARRAY);
@@ -557,6 +558,7 @@ static void init(void)
 #endif
 
     backlight_init();
+    backlight_off();
 
     button_init();
 

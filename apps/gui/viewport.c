@@ -332,11 +332,18 @@ void viewport_set_defaults(struct viewport *vp,
         viewport_set_fullscreen(vp, screen);
         return;
     }
-    sbs_area = sb_skin_get_info_vp(screen);
+    sbs_area = NULL;
 
     if (sbs_area)
         *vp = *sbs_area;
     else
 #endif /* !__PCTOOL__ */
+    {
         viewport_set_fullscreen(vp, screen);
+        /* BRAD: push menu below statusbar (12px) + 2px buffer = 14 */
+        if (global_settings.statusbar != STATUSBAR_OFF) {
+            vp->y = 14;
+            vp->height -= 14;
+        }
+    }
 }
