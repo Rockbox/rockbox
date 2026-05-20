@@ -931,6 +931,9 @@ struct user_settings
 #if defined(HAVE_GENERAL_PURPOSE_LED)
     bool use_led_indicators;
 #endif
+#ifdef HAVE_BLUETOOTH
+    bool bluetooth_enabled;
+#endif
 };
 
 /* global settings */

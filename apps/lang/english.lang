@@ -17169,3 +17169,45 @@
     *: "Finished"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BLUETOOTH
+  desc: in the main menu and settings menu
+  user: core
+  <source>
+    *: "Bluetooth"
+  </source>
+  <dest>
+    *: "Bluetooth"
+  </dest>
+  <voice>
+    *: "Bluetooth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_SCAN
+  desc: in the bluetooth menu
+  user: core
+  <source>
+    *: "Scan for devices"
+  </source>
+  <dest>
+    *: "Scan for devices"
+  </dest>
+  <voice>
+    *: "Scan for devices"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_PAIR
+  desc: in the bluetooth menu
+  user: core
+  <source>
+    *: "Pair Device"
+  </source>
+  <dest>
+    *: "Pair Device"
+  </dest>
+  <voice>
+    *: "Pair Device"
+  </voice>
+</phrase>

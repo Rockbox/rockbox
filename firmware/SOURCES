@@ -1821,6 +1821,8 @@ target/mips/ingenic_x1000/erosqnative/backlight-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/button-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
+target/mips/ingenic_x1000/bluetooth-x1000.c
+target/mips/ingenic_x1000/sbc_encoder.c
 target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* EROS_QN */
 
