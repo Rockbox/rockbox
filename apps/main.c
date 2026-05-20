@@ -78,6 +78,12 @@
 #include "bootchart.h"
 #include "logdiskf.h"
 #include "bootdata.h"
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC) && !defined(BOOTLOADER)
+#include "bluetooth-x1000.h"
+#endif
+#if defined(HAVE_EROSQ_LINUX_CODEC) && !defined(BOOTLOADER)
+void bluetooth_hosted_boot_init(void);
+#endif
 #if defined(HAVE_DEVICEDATA)
 #include "devicedata.h"
 #endif
@@ -157,10 +163,6 @@
 /* Alternatively, you can define autostart plugin path and its argument: */
 // #define AUTOROCK     VIEWERS_DATA_DIR"/imageviewer.rock"
 // #define AUTOROCK_ARG "/jpegs/sample.jpg"
-#ifdef HAVE_BLUETOOTH
-extern void bluetooth_init(void);
-#endif
-
 static void init(void);
 /* main(), and various functions called by main() and init() may be
  * be INIT_ATTR. These functions must not be called after the final call
@@ -245,6 +247,10 @@ int main(void)
 
     global_status.last_volume_change = 0;
     validate_start_directory_init();
+/* Native BT: init from Settings → Bluetooth only (boot init glitched LCD via PMIC/GPIO). */
+#if defined(HAVE_EROSQ_LINUX_CODEC) && !defined(BOOTLOADER)
+    bluetooth_hosted_boot_init();
+#endif
     /* no calls INIT_ATTR functions after this point anymore!
      * see definition of INIT_ATTR in config.h */
     CHART(">root_menu");
@@ -715,9 +721,6 @@ static void init(void)
 
     CHART(">settings_load");
     settings_load();
-#ifdef HAVE_BLUETOOTH
-    bluetooth_init();
-#endif
     CHART("<settings_load");
 
 #if defined(BUTTON_REC) || \

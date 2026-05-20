@@ -452,6 +452,13 @@ void pcm_apply_settings(void)
     }
 }
 
+void pcm_playback_invalidate_config(void)
+{
+    if (!pcm_is_initialized())
+        return;
+    sinks[cur_sink]->configured_freq = -1U;
+}
+
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
 

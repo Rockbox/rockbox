@@ -37,8 +37,11 @@ menus/playlist_menu.c
 #ifdef HAVE_RECORDING
 menus/recording_menu.c
 #endif
-#ifdef HAVE_BLUETOOTH
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC)
 menus/bluetooth_menu.c
+#endif
+#if defined(HAVE_EROSQ_LINUX_CODEC) && !defined(BOOTLOADER)
+menus/bluetooth_menu_hosted.c
 #endif
 menus/settings_menu.c
 menus/sound_menu.c

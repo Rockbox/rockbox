@@ -431,6 +431,10 @@ MAKE_MENU(usb_menu, ID2P(LANG_USB_MENU), 0, Icon_NOICON,
 #endif
          );
 
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC)
+MENUITEM_SETTING(bluetooth_toggle, &global_settings.bluetooth_enabled, NULL);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
 #if (BATTERY_CAPACITY_INC > 0) || defined(HAVE_USB_CHARGING_ENABLE)
@@ -440,6 +444,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC)
+            &bluetooth_toggle,
+#endif
 #ifdef HAVE_PERCEPTUAL_VOLUME
             &volume_adjust_mode,
             &volume_adjust_norm_steps,
@@ -761,11 +768,10 @@ static struct browse_folder_info langs = { LANG_DIR, SHOW_LNG };
 MENUITEM_FUNCTION_W_PARAM(browse_langs, 0, ID2P(LANG_LANGUAGE),
                           browse_folder, (void*)&langs, NULL, Icon_Language);
 
-#ifdef HAVE_BLUETOOTH
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC)
 /* bluetooth_menu is defined in bluetooth_menu.c */
 extern struct menu bluetooth_menu;
 #endif
-
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,
           &wps_settings,
@@ -773,7 +779,7 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
 #endif
-#ifdef HAVE_BLUETOOTH
+#if defined(HAVE_BLUETOOTH) && !defined(HAVE_EROSQ_LINUX_CODEC)
           &bluetooth_menu,
 #endif
           &display_menu, &system_menu,

@@ -36,6 +36,16 @@ void pcm_alsa_set_playback_device(const char *device);
 void pcm_alsa_set_capture_device(const char *device);
 #endif
 
+/* Re-open the current playback device (after changing playback_dev). */
+void pcm_alsa_reopen_playback(void);
+/* Like reopen_playback but returns false instead of panicking if open fails. */
+bool pcm_alsa_reopen_playback_safe(void);
+
+/* Drop and close PCM so mixer port switch can reach the driver (Eros Q). */
+void pcm_alsa_release_playback_for_mixer(void);
+/* Re-apply hw/sw params after switching playback_dev (e.g. bluetooth PCM). */
+void pcm_alsa_reconfigure_playback(void);
+
 unsigned int pcm_alsa_get_rate(void);
 unsigned int pcm_alsa_get_xruns(void);
 
