@@ -84,6 +84,7 @@ void pcm_set_frequency(unsigned int samplerate);
 unsigned int pcm_get_frequency(void);
 /* apply settings to hardware immediately */
 void pcm_apply_settings(void);
+void pcm_playback_invalidate_config(void); /* force set_freq on next apply */
 
 void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
                              const void *addr, int count);
