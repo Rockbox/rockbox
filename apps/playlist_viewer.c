@@ -52,6 +52,10 @@
 #include "yesno.h"
 #include "playback.h"
 
+#ifdef HAVE_DISK_STORAGE
+#include "storage.h"
+#endif
+
 #if defined (HAVE_TAGCACHE) && defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 #include "tagcache.h"
 #endif
@@ -392,8 +396,8 @@ static bool update_playlist(bool force)
 
 /* Initialize the playlist viewer. */
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 const char* filename, bool reload,
-                                 int *most_recent_selection)
+                                 const char* dir, const char* file,
+                                 bool reload, int *recent_selection)
 {
     char *buffer, *index_buffer = NULL;
     size_t buffer_size, index_buffer_size = 0;
@@ -407,9 +411,9 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
               - 80 KiB plugin buffer: Sansa c200v2
               - 64 KiB plugin buffer: Sansa m200v4, Sansa Clip
     */
-    bool require_index_buffer = filename && (is_playing || PLUGIN_BUFFER_SIZE >= 0x80000);
+    bool require_index_buffer = file && (is_playing || PLUGIN_BUFFER_SIZE >= 0x80000);
 
-    if (!filename && !is_playing)
+    if (!file && !is_playing)
     {
         /* Try to restore the list from control file */
         if (playlist_resume() == -1)
@@ -438,70 +442,44 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     │plugin)│██ view_text ██│ id3 │ index buffer │  name buffer  │  │
     └───────┴───────────────┴─────┴──────────────┴───────────────┴──┘
     */
-    if (buffer_size >= VIEW_TEXT_PLUGIN_SZ + id3_size + index_buffer_size + MAX_NAME_BUFFER_SZ)
+    viewer->allow_view_text_plugin = (buffer_size >=
+        VIEW_TEXT_PLUGIN_SZ + id3_size + index_buffer_size + MAX_NAME_BUFFER_SZ);
+
+    if (viewer->allow_view_text_plugin)
     {
         buffer += VIEW_TEXT_PLUGIN_SZ;
         buffer_size -= VIEW_TEXT_PLUGIN_SZ;
-        viewer->allow_view_text_plugin = true;
     }
-    else
-        viewer->allow_view_text_plugin = false;
-
     viewer->id3 = (void *) buffer;
     buffer += id3_size;
     buffer_size -= id3_size;
 
-    if (!filename)
+    /* Viewing playlist on disk */
+    if (file)
     {
-        viewer->playlist = NULL;
-        viewer->title = (char *) str(LANG_PLAYLIST);
-    }
-    else
-    {
-        /* Viewing playlist on disk */
-        const char *dir, *file;
-        char *temp_ptr;
-
-        /* Separate directory from filename */
-        temp_ptr = strrchr(filename+1,'/');
-        if (temp_ptr)
-        {
-            *temp_ptr = 0;
-            dir = filename;
-            file = temp_ptr + 1;
-        }
-        else
-        {
-            dir = "/";
-            file = filename+1;
-        }
-        viewer->title = file;
-
         if (require_index_buffer)
         {
             index_buffer = buffer;
             buffer += index_buffer_size;
             buffer_size -= index_buffer_size;
         }
-
         viewer->playlist = playlist_load(dir, file,
                                          index_buffer, index_buffer_size,
                                          buffer, buffer_size);
-
-        /* Merge separated dir and filename again */
-        if (temp_ptr)
-            *temp_ptr = '/';
     }
+    else
+        viewer->playlist = NULL;
+
     playlist_buffer_init(&viewer->buffer, buffer, buffer_size);
 
     viewer->moving_track = -1;
     viewer->moving_playlist_index = -1;
-    viewer->initial_selection = most_recent_selection;
+    viewer->initial_selection = recent_selection;
 
     if (!reload)
     {
         if (viewer->playlist)
-            viewer->selected_track = most_recent_selection ? *most_recent_selection : 0;
+            viewer->selected_track = recent_selection ? *recent_selection : 0;
         else
             viewer->selected_track = playlist_get_display_index() - 1;
     }
@@ -937,32 +915,79 @@ static bool update_viewer(struct gui_synclist *playlist_lists, enum pv_context_r
 
 static bool open_playlist_viewer(const char* filename,
                                   struct gui_synclist *playlist_lists,
-                                  bool reload, int *most_recent_selection)
+                                  bool reload, int *recent_selection)
 {
+    const char *dir = NULL, *file = NULL;
+    char *sep = NULL;
     viewer.loading_tick = current_tick + HZ/3;
-    push_current_activity(ACTIVITY_PLAYLISTVIEWER);
 
-    if (playlist_viewer_init(&viewer, filename, reload, most_recent_selection))
-        viewer.is_open = true;
+    /* Set viewer title */
+    if (filename)
+    {
+        /* Separate directory from filename */
+        sep = strrchr(filename + 1, '/');
+        if (sep)
+        {
+            *sep = '\0';
+            dir = filename;
+            file = sep + 1;
+        }
+        else
+        {
+            dir = "/";
+            file = filename + 1;
+        }
+        viewer.title = file;
+    }
     else
+        viewer.title = (char *) str(LANG_PLAYLIST);
+
+    /* Prevent UI from feeling unresponsive when retrieving
+       metadata, or on devices that use disk storage. */
+    if (global_settings.playlist_viewer_track_display
+        > PLAYLIST_VIEWER_ENTRY_SHOW_FULL_PATH
+#ifdef HAVE_DISK_STORAGE
+        || (!storage_disk_is_active()
+#ifdef HAVE_DIRCACHE
+            && (filename || !global_settings.dircache)
+#endif /* HAVE DIRCACHE */
+           )
+#endif /* HAVE_DISK_STORAGE */
+       )
+    {
+        push_activity_without_refresh(ACTIVITY_PLAYLISTVIEWER);
+        clear_screen_buffer(false);
+        FOR_NB_SCREENS(i)
+            sb_set_title_text(viewer.title, Icon_Playlist, i);
+        send_event(GUI_EVENT_ACTIONUPDATE, (void*) 1);
+    }
+    else
+        push_current_activity(ACTIVITY_PLAYLISTVIEWER);
+
+    viewer.is_open = playlist_viewer_init(&viewer, dir, file, reload, recent_selection);
+
+    /* Merge separated dir and filename again */
+    if (sep)
+        *sep = '/';
+
+    if (!viewer.is_open)
         return false;
 
     update_gui(playlist_lists, true);
-
     return true;
 }
 
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
 enum playlist_viewer_result playlist_viewer_ex(const char* filename,
-                                               int* most_recent_selection)
+                                               int* recent_selection)
 {
     enum playlist_viewer_result ret = PLAYLIST_VIEWER_OK;
     bool exit = false;        /* exit viewer */
     int button;
     struct gui_synclist playlist_lists;
 
-    if (!open_playlist_viewer(filename, &playlist_lists, false, most_recent_selection))
+    if (!open_playlist_viewer(filename, &playlist_lists, false, recent_selection))
     {
         ret = PLAYLIST_VIEWER_CANCEL;
         goto exit;
@@ -1250,7 +1275,7 @@ bool search_playlist(void)
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
-    if (!playlist_viewer_init(&viewer, NULL, false, NULL))
+    if (!playlist_viewer_init(&viewer, NULL, NULL, false, NULL))
         return ret;
     if (kbd_input(search_str, sizeof(search_str), NULL) < 0)
         return ret;
