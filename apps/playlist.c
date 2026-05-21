@@ -705,6 +705,7 @@ static void display_playlist_count(int count, const unsigned char *fmt,
 static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, size_t buflen)
 {
+    unsigned long loading_tick = current_tick + HZ/6;
     ssize_t nread;
     unsigned int i, count = 0;
     bool store_index;
@@ -727,7 +728,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
     i = lseek(playlist->fd, 0, SEEK_CUR);
 
-    splash(0, ID2P(LANG_WAIT));
     store_index = true;
 
     while(1)
@@ -762,6 +762,12 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
                     playlist->indices[ playlist->amount ] = i+count;
                     dc_init_filerefs(playlist, playlist->amount, 1);
                     playlist->amount++;
+
+                    if (TIME_AFTER(current_tick, loading_tick))
+                    {
+                        loading_tick += HZ*10;
+                        splash(0, ID2P(LANG_WAIT));
+                    }
                 }
             }
         }
