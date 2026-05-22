@@ -282,5 +282,6 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     current_column = -1;
     current_row = -1;
     current_drawing_line = list->selected_item;
+    sb_skin_force_next_update(); /* update scroll bar */
     return true;
 }
