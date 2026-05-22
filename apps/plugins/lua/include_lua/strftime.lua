@@ -73,13 +73,13 @@ local function strftime(tmfmt, tm)
                     elseif c == "F" then
                         out = strftime("%Y-%m-%d", tm)
                     elseif c == "a" then
-                        out = weekdays[tm.wday + 1]:sub(1, 3)
+                        out = weekdays[tm.wday]:sub(1, 3)
                     elseif c == "A" then
-                        out = weekdays[tm.wday + 1]
+                        out = weekdays[tm.wday]
                     elseif c == "h" or c == "b" then
-                        out = months[tm.month + 1]:sub(1, 3)
+                        out = months[tm.month]:sub(1, 3)
                     elseif c == "B" then
-                        out = months[tm.month + 1]
+                        out = months[tm.month]
                     elseif c == "p" then
                         --local idx = tm.hour > 12 and 4 or 5
                         out = tm.hour > 12 and "PM" or "AM"
@@ -108,30 +108,36 @@ local function strftime(tmfmt, tm)
                         if no == 0 then no = 12 end
                         out = strformat("%2.0d", no)
                     elseif c == "m" then
-                        out = strformat("%02d", tm.mon)
+                        out = strformat("%02d", tm.month)
                     elseif c == "M" then
                         out = strformat("%02d", tm.min)
                     elseif c == "S" then
                         out = strformat("%02d", tm.sec)
                     elseif c == "u" then
-                        local no = tm.wday == 0 and 7 or tm.wday
+                        local wday = tm.wday - 1
+                        local no = wday == 0 and 7 or wday
                         out = strformat("%d", no)
                     elseif c == "w" then
                         out = strformat("%d", tm.wday)
                     elseif c == "U" then
-                        local no = ((tm.yday - tm.wday + 7) / 7)
+                        local yday = tm.yday - 1
+                        local wday = tm.wday - 1
+                        local no = ((yday - wday + 7) / 7) + 1
                         out = strformat("%02d", no)
                     elseif c == "W" then
-                        local no = ((tm.yday - (tm.wday + 7) % 7 + 7) / 7)
+                        local yday = tm.yday - 1
+                        local wday = tm.wday - 1
+                        local no = ((yday - (wday + 7) % 7 + 7) / 7) + 1
                         out = strformat("%02d", no)
                     elseif c == "s" then
                         out = os.time()
                     elseif c == "Z" then
                         out = "[ETC?]"
                     elseif c == "Y" then
-                        local y1 = (tm.year / 100) + 19
+                    --[[local y1 = (tm.year / 100) + 19
                         local y2 = tm.year % 100
-                        out = strformat("%02d%02d", y1, y2)
+                        out = strformat("%02d%02d", y1, y2)]]
+                        out = strformat("%04d", tm.year)
                     elseif c == "y" then
                         out = strformat("%02d", tm.year % 100)
                     elseif c == "O" or c == "E" then
@@ -160,14 +166,14 @@ Note: This implementation assumes the following structure for the `tm`
 table (similar to C's `struct tm`):
 
 local tm = {
-    year = 126,    -- Years since 1900
-    mon = 0,       -- Month (0-11)
+    year = 2026,   -- Year
+    month = 1,     -- Month (1-12)
     day = 5,       -- Day of month (1-31)
     hour = 14,     -- Hours (0-23)
     min = 30,      -- Minutes (0-59)
     sec = 45,      -- Seconds (0-59)
-    wday = 2,      -- Day of week (0-6, Sunday=0)
-    yday = 4,      -- Day of year (0-365)
+    wday = 2,      -- Day of week (1-7, Sunday=1)
+    yday = 4,      -- Day of year (1-366)
     isdst = false  -- Daylight saving time flag
 }
 
@@ -235,11 +241,11 @@ local function get_tmdate(d, tm)
     end
 
     tm = tm or {}
-    tm.year = y + UNIX_EPOCH_YEAR -- year - 1900
-    tm.month = x0 -- 0..11
-    tm.yday = tm_yday
+    tm.year = y + UNIX_EPOCH_YEAR + 1900 -- year + 1900
+    tm.month = x0 + 1 -- (0..11) + 1
+    tm.yday = tm_yday + 1
     tm.day = yday - mon_yday[x0 + 1] + 1 -- 1..31
-    tm.wday = (d + 1) % 7 -- 0..6
+    tm.wday = (d + 1) % 7 + 1 -- (0..6) + 1
     return tm--return tm
 end
 

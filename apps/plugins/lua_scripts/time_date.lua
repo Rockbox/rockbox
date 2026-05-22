@@ -26,7 +26,7 @@ local tmo_noblock = -1
 local ctx = 0 --CONTEXT_STD
 
 while rb.get_action(ctx, 50) == 0 do
-    rb.splash(0, os.date())
+    rb.splash(0, os.date("%a %m/%d/%y %T (%b) %Y"))
 end
 
 collectgarbage("collect")
