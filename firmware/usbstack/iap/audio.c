@@ -215,7 +215,7 @@ bool iap_audio_init(void) {
     enabled          = false;
     exhausted        = true;
     track_attrs_sent = false;
-    packet_count = 0;
+    packet_count     = 0;
 
     return true;
 

@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include "audio.h"
+#include "panic.h"
 #include "pcm_mixer.h"
 #include "pcm_sink.h"
 #include "playback.h"
@@ -25,7 +26,6 @@
 #include "timefuncs.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-#include "panic.h"
 
 #include "iap/audio.h"
 #include "iap/libiap/iap.h"
