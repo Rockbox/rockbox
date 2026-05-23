@@ -318,7 +318,7 @@ void tv_move_screen(int page_offset, int line_offset, int whence)
     cur_pos.line = new_pos.line;
     if (cur_pos.line >= lines_per_page)
         cur_pos.line = lines_per_page - 1;
-    else if (cur_pos.line < 0)
+    if (cur_pos.line < 0)
     {
         cur_pos.line += lines_per_page;
         if (cur_pos.line < 0)
