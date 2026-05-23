@@ -1045,6 +1045,8 @@ static int select_bookmark(const char* bookmark_file_name,
 
         if (action == ACTION_STD_CONTEXT)
         {
+            gui_synclist_scroll_stop(&list);
+
             MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
                 NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME),
                 ID2P(LANG_DELETE));
