@@ -260,6 +260,16 @@ bool iap_audio_set_sampr(uint32_t sampr) {
         }
     }
     check_act(freq < ARRAYLEN(samprs), return false);
+
+    if(set_freq >= 0 && freq != set_freq) {
+        /* Accessories should only set the frequency we requested via
+         * TrackNewAudioAttributes, but in some cases, USB control requests may arrive late,
+         * breaking established cur_freq == set_freq.
+         * Ignoring sets of frequencies that were not requested can work around this. */
+        ERROR("wrong frequency set: expected=%d got=%d", set_freq, freq);
+        return true;
+    }
+
     cur_freq = freq;
 
     LOG("sampr=%lu, set_freq=%d cur_freq=%d", sampr, set_freq, cur_freq);
