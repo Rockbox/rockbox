@@ -129,7 +129,7 @@ t_template *template_new(t_symbol *templatesym, int argc, t_atom *argv)
 	x->t_vec[oldn].ds_type = newtype;
 	x->t_vec[oldn].ds_name = newname;
 	x->t_vec[oldn].ds_arraytemplate = newarraytemplate;
-    bad: 
+    bad:
     	argc -= 2; argv += 2;
     }
     if (templatesym->s_name)
@@ -188,7 +188,7 @@ t_float template_getfloat(t_template *x, t_symbol *fieldname, t_word *wp,
     return (fixtof(val));
 }
 
-void template_setfloat(t_template *x, t_symbol *fieldname, t_word *wp, 
+void template_setfloat(t_template *x, t_symbol *fieldname, t_word *wp,
     t_float f, int loud)
 {
     int onset, type;
@@ -222,7 +222,7 @@ t_symbol *template_getsymbol(t_template *x, t_symbol *fieldname, t_word *wp,
     return (val);
 }
 
-void template_setsymbol(t_template *x, t_symbol *fieldname, t_word *wp, 
+void template_setsymbol(t_template *x, t_symbol *fieldname, t_word *wp,
     t_symbol *s, int loud)
 {
     int onset, type;
@@ -248,7 +248,7 @@ int template_match(t_template *x1, t_template *x2)
     	return (0);
     for (i = x2->t_n; i < x1->t_n; i++)
     {
-    	if (x1->t_vec[i].ds_type == DT_ARRAY || 
+    	if (x1->t_vec[i].ds_type == DT_ARRAY ||
 	    x1->t_vec[i].ds_type == DT_LIST)
 	    	return (0);
     }
@@ -266,10 +266,10 @@ int template_match(t_template *x1, t_template *x2)
 in their template.  The old template is assumed to be the "installed" one
 so we can delete old items; but making new ones we have to avoid scalar_new
 which would make an old one whereas we will want a new one (but whose array
-elements might still be old ones. 
+elements might still be old ones.
     LATER deal with graphics updates too... */
 
-    /* conform the word vector of a scalar to the new template */    
+    /* conform the word vector of a scalar to the new template */
 static void template_conformwords(t_template *tfrom, t_template *tto,
     int *conformaction, t_word *wfrom, t_word *wto)
 {
@@ -322,7 +322,7 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
 
     	template_conformwords(tfrom, tto, conformaction,
 	    scfrom->sc_vec, x->sc_vec);
-	    
+
 	    /* replace the old one with the new one in the list */
 	if (glist->gl_list == &scfrom->sc_gobj)
 	{
@@ -358,7 +358,7 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
 	}
 	else if (ds->ds_type == DT_ARRAY)
 	{
-	    template_conformarray(tfrom, tto, conformaction, 
+	    template_conformarray(tfrom, tto, conformaction,
 	    	x->sc_vec[i].w_array);
 	}
     }
@@ -411,7 +411,7 @@ static void template_conformglist(t_template *tfrom, t_template *tto,
     }
 }
 
-    /* globally conform all scalars from one template to another */ 
+    /* globally conform all scalars from one template to another */
 void template_conform(t_template *tfrom, t_template *tto)
 {
     int nto = tto->t_n, nfrom = tfrom->t_n, i, j,
@@ -479,7 +479,7 @@ t_template *template_findbyname(t_symbol *s)
 t_canvas *template_findcanvas(t_template *template)
 {
     t_gtemplate *gt;
-    if (!template) 
+    if (!template)
     	bug("template_findcanvas");
     if (!(gt = template->t_list))
     	return (0);
@@ -551,12 +551,12 @@ static void template_setup(void)
     	sizeof(t_template), CLASS_PD, 0);
     class_addmethod(pd_canvasmaker, (t_method)template_usetemplate,
     	gensym("struct"), A_GIMME, 0);
-    	
+
 }
 
 /* ---------------- gtemplates.  One per canvas. ----------- */
 
-/* this is a "text" object that searches for, and if necessary creates, 
+/* this is a "text" object that searches for, and if necessary creates,
 a "template" (above).  Other objects in the canvas then can give drawing
 instructions for the template.  The template doesn't go away when the
 gtemplate is deleted, so that you can replace it with
@@ -819,7 +819,7 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
     	classname += 6;
     	flags |= CLOSED;
     	if (argc) fielddesc_setfloatarg(&x->x_fillcolor, argc--, argv++);
-    	else FIELDDESC_SETFLOAT(&x->x_outlinecolor, 0); 
+    	else FIELDDESC_SETFLOAT(&x->x_outlinecolor, 0);
     }
     else classname += 4;
     if (classname[0] == 'c') flags |= BEZ;
@@ -863,7 +863,7 @@ static void curve_getrect(t_gobj *z, t_glist *glist,
     *xp1 = x1;
     *yp1 = y1;
     *xp2 = x2;
-    *yp2 = y2; 
+    *yp2 = y2;
 }
 
 static void curve_displace(t_gobj *z, t_glist *glist,
@@ -939,20 +939,23 @@ static void numbertocolor(int n, char *s)
 #endif
 }
 
-static void curve_vis(t_gobj *z, t_glist *glist, 
+static void curve_vis(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int vis)
 {
     t_curve *x = (t_curve *)z;
-    int i, n = x->x_npoints;
+    int n = x->x_npoints;
+#ifndef ROCKBOX
+    int i;
     t_fielddesc *f = x->x_vec;
+#endif
 
 #ifdef ROCKBOX
     (void) glist;
     (void) basex;
     (void) basey;
 #endif
-    
+
     if (vis)
     {
     	if (n > 1)
@@ -981,18 +984,14 @@ static void curve_vis(t_gobj *z, t_glist *glist,
 #ifndef ROCKBOX
     	    else sys_vgui(".x%x.c create line\\\n",
     	    	    glist_getcanvas(glist));
-#endif
     	    for (i = 0, f = x->x_vec; i < n; i++, f += 2)
     	    {
-#ifndef ROCKBOX
     		float xloc = glist_xtopixels(glist,
     	    	    basex + fielddesc_getfloat(f, template, data, 1));
     		float yloc = glist_ytopixels(glist,
     	    	    basey + fielddesc_getfloat(f+1, template, data, 1));
     		sys_vgui("%d %d\\\n", (int)xloc, (int)yloc);
-#endif
     	    }
-#ifndef ROCKBOX
     	    sys_vgui("-width %f\\\n",
     	    	fielddesc_getfloat(&x->x_width, template, data, 1));
     	    if (flags & CLOSED) sys_vgui("-fill %s -outline %s\\\n",
@@ -1008,7 +1007,7 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     {
 #ifndef ROCKBOX
     	if (n > 1) sys_vgui(".x%x.c delete curve%x\n",
-    	    glist_getcanvas(glist), data);    	
+    	    glist_getcanvas(glist), data);
 #endif
     }
 }
@@ -1038,7 +1037,7 @@ static void curve_motion(void *z, t_floatarg dx, t_floatarg dy)
     {
 	template_setfloat(curve_motion_template,
 	    f->fd_un.fd_varsym,
-	    curve_motion_wp, 
+	    curve_motion_wp,
     	    curve_motion_xbase + curve_motion_xcumulative * curve_motion_xper,
 	    	1);
     }
@@ -1046,14 +1045,14 @@ static void curve_motion(void *z, t_floatarg dx, t_floatarg dy)
     {
 	template_setfloat(curve_motion_template,
 	    (f+1)->fd_un.fd_varsym,
-	    curve_motion_wp, 
+	    curve_motion_wp,
     	    curve_motion_ybase + curve_motion_ycumulative * curve_motion_yper,
 	    	1);
     }
     glist_redrawitem(curve_motion_glist, curve_motion_gobj);
 }
 
-static int curve_click(t_gobj *z, t_glist *glist, 
+static int curve_click(t_gobj *z, t_glist *glist,
     t_scalar *sc, t_template *template, float basex, float basey,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
@@ -1198,7 +1197,7 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
     /* get everything we'll need from the owner template of the array being
     plotted. Not used for garrays, but see below */
 static int plot_readownertemplate(t_plot *x,
-    t_word *data, t_template *ownertemplate, 
+    t_word *data, t_template *ownertemplate,
     t_symbol **elemtemplatesymp, t_array **arrayp,
     float *linewidthp, float *xlocp, float *xincp, float *ylocp)
 {
@@ -1250,7 +1249,7 @@ int array_getfields(t_symbol *elemtemplatesym,
     t_canvas *elemtemplatecanvas = 0;
 
     	/* the "float" template is special in not having to have a canvas;
-	template_findbyname is hardwired to return a predefined 
+	template_findbyname is hardwired to return a predefined
 	template. */
 
     if (!(elemtemplate =  template_findbyname(elemtemplatesym)))
@@ -1266,13 +1265,13 @@ int array_getfields(t_symbol *elemtemplatesym,
     }
     elemsize = elemtemplate->t_n * sizeof(t_word);
     if (!template_find_field(elemtemplate, gensym("y"), &yonset, &type, &dummy)
-    	|| type != DT_FLOAT)	
+    	|| type != DT_FLOAT)
 	    yonset = -1;
     if (!template_find_field(elemtemplate, gensym("x"), &xonset, &type, &dummy)
-    	|| type != DT_FLOAT) 
+    	|| type != DT_FLOAT)
 	    xonset = -1;
     if (!template_find_field(elemtemplate, gensym("w"), &wonset, &type, &dummy)
-    	|| type != DT_FLOAT) 
+    	|| type != DT_FLOAT)
 	    wonset = -1;
 
     	/* fill in slots for return values */
@@ -1300,7 +1299,7 @@ static void plot_getrect(t_gobj *z, t_glist *glist,
     int i;
     float xpix, ypix, wpix;
 
-    if (!plot_readownertemplate(x, data, template, 
+    if (!plot_readownertemplate(x, data, template,
     	&elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc) &&
 	    !array_getfields(elemtemplatesym, &elemtemplatecanvas,
 	    	&elemtemplate, &elemsize, &xonset, &yonset, &wonset))
@@ -1376,7 +1375,7 @@ static void plot_activate(t_gobj *z, t_glist *glist,
     	/* not yet */
 }
 
-static void plot_vis(t_gobj *z, t_glist *glist, 
+static void plot_vis(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int vis)
 {
@@ -1389,7 +1388,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     t_array *array;
     int nelem;
     char *elem;
-    if (plot_readownertemplate(x, data, template, 
+    if (plot_readownertemplate(x, data, template,
     	&elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc) ||
 	    array_getfields(elemtemplatesym, &elemtemplatecanvas,
 	    	&elemtemplate, &elemsize, &xonset, &yonset, &wonset))
@@ -1397,7 +1396,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     nelem = array->a_n;
     elem = (char *)array->a_vec;
     if (vis)
-    {    	
+    {
     	char outline[20];
     	int lastpixel = -1, ndrawn = 0;
     	float xsum, yval = 0, xpix;
@@ -1417,7 +1416,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     	    sys_vgui(".x%x.c create polygon \\\n",
     	    	glist_getcanvas(glist));
 #endif
-    	    
+
     	    for (i = 0, xsum = xloc; i < nelem; i++)
     	    {
     	    	float usexloc;
@@ -1538,7 +1537,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     	    /* We're done with the outline; now draw all the points.
     	    This code is inefficient since the template has to be
     	    searched for drawing instructions for every last point. */
-    	
+
     	for (xsum = xloc, i = 0; i < nelem; i++)
     	{
     	    float usexloc, useyloc;
@@ -1586,7 +1585,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
 }
 
 
-static int plot_click(t_gobj *z, t_glist *glist, 
+static int plot_click(t_gobj *z, t_glist *glist,
     t_scalar *sc, t_template *template, float basex, float basey,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
@@ -1596,7 +1595,7 @@ static int plot_click(t_gobj *z, t_glist *glist,
     t_array *array;
     t_word *data = sc->sc_vec;
 
-    if (!plot_readownertemplate(x, data, template, 
+    if (!plot_readownertemplate(x, data, template,
     	&elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc))
     {
     	return (array_doclick(array, glist, &sc->sc_gobj,
@@ -1758,7 +1757,7 @@ static void drawnumber_activate(t_gobj *z, t_glist *glist,
     post("drawnumber_activate %d", state);
 }
 
-static void drawnumber_vis(t_gobj *z, t_glist *glist, 
+static void drawnumber_vis(t_gobj *z, t_glist *glist,
     t_word *data, t_template *template, float basex, float basey,
     int vis)
 {
@@ -1818,13 +1817,13 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy)
 #endif
     template_setfloat(drawnumber_motion_template,
     	f->fd_un.fd_varsym,
-	    drawnumber_motion_wp, 
+	    drawnumber_motion_wp,
     	    drawnumber_motion_ycumulative,
 	    	1);
     glist_redrawitem(drawnumber_motion_glist, drawnumber_motion_gobj);
 }
 
-static int drawnumber_click(t_gobj *z, t_glist *glist, 
+static int drawnumber_click(t_gobj *z, t_glist *glist,
     t_scalar *sc, t_template *template, float basex, float basey,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
@@ -1896,6 +1895,3 @@ void g_template_setup(void)
     plot_setup();
     drawnumber_setup();
 }
-
-
-

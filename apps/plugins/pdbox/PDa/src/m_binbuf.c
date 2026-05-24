@@ -164,7 +164,7 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
 		}
 		if (!slash) bufp++;
 	    }
-	    while (textp != etext && bufp != ebuf && 
+	    while (textp != etext && bufp != ebuf &&
 		(slash || (*textp != ' ' && *textp != '\n' && *textp != '\r'
 		    && *textp != '\t' &&*textp != ',' && *textp != ';')));
 	    *bufp = 0;
@@ -350,7 +350,7 @@ void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y)
     	    bug("binbuf_addbinbuf");
     	}
     }
-    
+
     binbuf_add(x, z->b_n, z->b_vec);
 }
 
@@ -429,7 +429,7 @@ void binbuf_print(t_binbuf *x)
 	postatom(1, x->b_vec + i);
 	if (x->b_vec[i].a_type == A_SEMI)
 	    newline = 1;
-	else newline = 0; 
+	else newline = 0;
     }
     if (startedpost) endpost();
 }
@@ -448,10 +448,10 @@ int canvas_getdollarzero( void);
 
 t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
 {
-    int argno = atol(s->s_name), lastnum;
+    int argno = atol(s->s_name)/*, lastnum */;
     char buf[MAXPDSTRING], c, *sp;
-    for (lastnum = 0, sp = s->s_name; ((c = *sp) && c >= '0' && c <= '9');
-    	sp++, lastnum++)
+    for (/*lastnum = 0,*/ sp = s->s_name; ((c = *sp) && c >= '0' && c <= '9');
+        sp++/*, lastnum++*/)
     if (!c || argno < 0 || argno > ac)
     {
     	if (!tonew)
@@ -497,13 +497,13 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
 	    	{
 		    error("$%d: not enough arguments supplied",
 			    at->a_w.w_index);
-		    goto cleanup; 
+		    goto cleanup;
 		}
     	    	else if (argv[at->a_w.w_index-1].a_type != A_SYMBOL)
 	    	{
 		    error("$%d: symbol needed as message destination",
 		    	at->a_w.w_index);
-		    goto cleanup; 
+		    goto cleanup;
 		}
 		else s = argv[at->a_w.w_index-1].a_w.w_symbol;
 	    }
@@ -679,7 +679,7 @@ int binbuf_read(t_binbuf *b, char *filename, char *dirname, int crflag)
 #endif /* ROCKBOX */
     	return (1);
     }
-    if ((length = lseek(fd, 0, SEEK_END)) < 0 || lseek(fd, 0, SEEK_SET) < 0 
+    if ((length = lseek(fd, 0, SEEK_END)) < 0 || lseek(fd, 0, SEEK_SET) < 0
     	|| !(buf = t_getbytes(length)))
     {
 #ifdef ROCKBOX
@@ -772,7 +772,7 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
     	x = binbuf_convert(x, 0);
 	deleteit = 1;
     }
-    
+
 #ifdef ROCKBOX
     if(!(f = binbuf_doopen(fbuf, O_WRONLY|O_CREAT|O_TRUNC)))
 #else /* ROCKBOX */
@@ -862,7 +862,7 @@ fail:
 }
 
 /* The following routine attempts to convert from max to pd or back.  The
-max to pd direction is working OK but you will need to make lots of 
+max to pd direction is working OK but you will need to make lots of
 abstractions for objects like "gate" which don't exist in Pd.  conversion
 from Pd to Max hasn't been tested for patches with subpatches yet!  */
 
@@ -903,7 +903,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 	if (maxtopd)
 	{
 	    	/* case 1: importing a ".pat" file into Pd. */
-		
+
 		/* dollar signs in file translate to symbols */
 	    for (i = 0; i < natom; i++)
 	    {
@@ -940,7 +940,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		    stack[stackdepth] = nobj;
 		    stackdepth++;
 		    nobj = 0;
-		    binbuf_addv(newb, "ssfffff;", 
+		    binbuf_addv(newb, "ssfffff;",
 		    	gensym("#N"), gensym("canvas"),
 			    atom_getfloatarg(2, natom, nextmess),
 			    atom_getfloatarg(3, natom, nextmess),
@@ -1002,7 +1002,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		    binbuf_add(newb, natom - 1, outmess);
 		    nobj++;
 		}
-		else if (!strcmp(second, "message") || 
+		else if (!strcmp(second, "message") ||
 	    	    !strcmp(second, "comment"))
 		{
 	    	    SETSYMBOL(outmess, gensym("#X"));
@@ -1068,7 +1068,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			gensym("#X"), gensym("obj"),
 			atom_getfloatarg(2, natom, nextmess),
 			atom_getfloatarg(3, natom, nextmess),
-			gensym((natom > 5 ? "inlet~" : "inlet"))); 
+			gensym((natom > 5 ? "inlet~" : "inlet")));
 		    nobj++;
 		}
 		else if (!strcmp(second, "outlet"))
@@ -1077,7 +1077,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			gensym("#X"), gensym("obj"),
 			atom_getfloatarg(2, natom, nextmess),
 			atom_getfloatarg(3, natom, nextmess),
-			gensym((natom > 5 ? "outlet~" : "outlet"))); 
+			gensym((natom > 5 ? "outlet~" : "outlet")));
 		    nobj++;
 		}
 	    	else if (!strcmp(second, "user"))
@@ -1086,7 +1086,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			gensym("#X"), gensym("obj"),
 			atom_getfloatarg(3, natom, nextmess),
 			atom_getfloatarg(4, natom, nextmess),
-			atom_getsymbolarg(2, natom, nextmess)); 
+			atom_getsymbolarg(2, natom, nextmess));
 		    nobj++;
 		}
 		else if (!strcmp(second, "connect")||
@@ -1097,7 +1097,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			nobj - atom_getfloatarg(2, natom, nextmess) - 1,
 			atom_getfloatarg(3, natom, nextmess),
 			nobj - atom_getfloatarg(4, natom, nextmess) - 1,
-			atom_getfloatarg(5, natom, nextmess)); 
+			atom_getfloatarg(5, natom, nextmess));
 		}
 	    }
 	}
@@ -1115,7 +1115,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		    stack[stackdepth] = nobj;
 		    stackdepth++;
 		    nobj = 0;
-		    binbuf_addv(newb, "ssffff;", 
+		    binbuf_addv(newb, "ssffff;",
 		    	gensym("#N"), gensym("vpatcher"),
 			    atom_getfloatarg(2, natom, nextmess),
 			    atom_getfloatarg(3, natom, nextmess),
@@ -1205,9 +1205,9 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		    	binbuf_add(newb, natom + 3, outmess);
 		    }
 		    nobj++;
-		
+
 		}
-		else if (!strcmp(second, "msg") || 
+		else if (!strcmp(second, "msg") ||
 	    	    !strcmp(second, "text"))
 		{
 	    	    SETSYMBOL(outmess, gensym("#P"));
@@ -1238,7 +1238,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			nobj - atom_getfloatarg(2, natom, nextmess) - 1,
 			atom_getfloatarg(3, natom, nextmess),
 			nobj - atom_getfloatarg(4, natom, nextmess) - 1,
-			atom_getfloatarg(5, natom, nextmess)); 
+			atom_getfloatarg(5, natom, nextmess));
 		}
 	    }
 	}
@@ -1260,7 +1260,7 @@ int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf)
     {
     	for (nmatched = 0; nmatched < searchbuf->b_n; nmatched++)
 	{
-	    t_atom *a1 = &inbuf->b_vec[indexin + nmatched], 
+	    t_atom *a1 = &inbuf->b_vec[indexin + nmatched],
 	    	*a2 = &searchbuf->b_vec[nmatched];
 	    if (a1->a_type != a2->a_type ||
 	    	(a1->a_type == A_SYMBOL && a1->a_w.w_symbol != a2->a_w.w_symbol)
@@ -1330,4 +1330,3 @@ void glob_evalfile(t_pd *ignore, t_symbol *name, t_symbol *dir)
     pd_doloadbang();
     canvas_resume_dsp(dspstate);
 }
-

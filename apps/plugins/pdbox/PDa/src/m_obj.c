@@ -71,7 +71,7 @@ static void inlet_wrong(t_inlet *x, t_symbol *s)
     /* LATER figure out how to make these efficient: */
 static void inlet_bang(t_inlet *x)
 {
-    if (x->i_symfrom == &s_bang) 
+    if (x->i_symfrom == &s_bang)
     	pd_vmess(x->i_dest, x->i_symto, "");
     else if (!x->i_symfrom) pd_bang(x->i_dest);
     else inlet_wrong(x, &s_bang);
@@ -79,7 +79,7 @@ static void inlet_bang(t_inlet *x)
 
 static void inlet_pointer(t_inlet *x, t_gpointer *gp)
 {
-    if (x->i_symfrom == &s_pointer) 
+    if (x->i_symfrom == &s_pointer)
     	pd_vmess(x->i_dest, x->i_symto, "p", gp);
     else if (!x->i_symfrom) pd_pointer(x->i_dest, gp);
     else inlet_wrong(x, &s_pointer);
@@ -98,7 +98,7 @@ static void inlet_float(t_inlet *x, t_float f)
 
 static void inlet_symbol(t_inlet *x, t_symbol *s)
 {
-    if (x->i_symfrom == &s_symbol) 
+    if (x->i_symfrom == &s_symbol)
     	pd_vmess(x->i_dest, x->i_symto, "s", s);
     else if (!x->i_symfrom) pd_symbol(x->i_dest, s);
     else inlet_wrong(x, &s_symbol);
@@ -234,7 +234,7 @@ void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv)
     if (argv->a_type == A_POINTER) pd_pointer(&x->ob_pd, argv->a_w.w_gpointer);
     else if (argv->a_type == A_FLOAT) pd_float(&x->ob_pd, argv->a_w.w_float);
     else pd_symbol(&x->ob_pd, argv->a_w.w_symbol);
-} 
+}
 
 void obj_init(void)
 {
@@ -425,10 +425,10 @@ t_outconnect *obj_connect(t_object *source, int outno,
     t_outlet *o;
     t_pd *to;
     t_outconnect *oc, *oc2;
-    
+
     for (o = source->ob_outlet; o && outno; o = o->o_next, outno--) ;
     if (!o) return (0);
-    
+
     if (sink->ob_pd->c_firstin)
     {
     	if (!inno)
@@ -464,7 +464,7 @@ void obj_disconnect(t_object *source, int outno, t_object *sink, int inno)
     t_outlet *o;
     t_pd *to;
     t_outconnect *oc, *oc2;
-    
+
     for (o = source->ob_outlet; o && outno; o = o->o_next, outno--)
     if (!o) return;
     if (sink->ob_pd->c_firstin)
@@ -669,21 +669,21 @@ int obj_issignaloutlet(t_object *x, int m)
 
 t_sample *obj_findsignalscalar(t_object *x, int m)
 {
-    int n = 0;
+//    int n = 0;
     t_inlet *i;
     if (x->ob_pd->c_firstin && x->ob_pd->c_floatsignalin)
     {
     	if (!m--)
 	    return (x->ob_pd->c_floatsignalin > 0 ?
 	    	(t_sample *)(((char *)x) + x->ob_pd->c_floatsignalin) : 0);
-    	n++;
+//    	n++;
     }
     for (i = x->ob_inlet; i; i = i->i_next, m--)
     	if (i->i_symfrom == &s_signal)
     {
     	if (m == 0)
 	    return (&i->i_un.iu_floatsignalvalue);
-    	n++;
+//    	n++;
     }
     return (0);
 }
@@ -703,8 +703,7 @@ int outlet_getsignalindex(t_outlet *x)
 {
     int n = 0;
     t_outlet *o;
-    for (o = x->o_owner->ob_outlet, n = 0; o && o != x; o = o->o_next) 
+    for (o = x->o_owner->ob_outlet, n = 0; o && o != x; o = o->o_next)
     	if (o->o_sym == &s_signal) n++;
     return (n);
 }
-
