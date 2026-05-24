@@ -40,6 +40,7 @@
 #include "debug.h"
 #include "shortcuts.h"
 #include "appevents.h"
+#include "statusbar-skinned.h"
 
  /* 1 top, 1 bottom, 2 on either side, 1 for the icons
   * if enough space, top and bottom have 2 lines */
@@ -233,7 +234,7 @@ static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
             (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
     }
 
-    skin_render_deferred(display, parent);
+    skin_mark_dirty(display->screen_type);
     display->set_viewport(last_vp);
 }
 
@@ -418,13 +419,11 @@ static void quickscreen_run(struct quickscreen * qs)
             can_quit = true;
         else if (button == ACTION_QS_VOLUP) {
             adjust_volume(1);
-            FOR_NB_SCREENS(i)
-                skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_NON_STATIC);
+            sb_skin_force_next_update();
         }
         else if (button == ACTION_QS_VOLDOWN) {
             adjust_volume(-1);
-            FOR_NB_SCREENS(i)
-                skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_NON_STATIC);
+            sb_skin_force_next_update();
         }
         else if (button == ACTION_STD_CONTEXT)
         {

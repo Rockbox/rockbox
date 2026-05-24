@@ -299,9 +299,9 @@ int view_text(const char *title, const char *text)
     /* handle themes that draw over the UI viewport */
     rb->add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, ui_update_cb, &info);
 
-    /* skin engine needs to render title and redraw screen */
+    /* skin engine needs to draw title */
     if (info.sbs_has_title)
-        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        rb->send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
     else
         draw_text(&info);
 

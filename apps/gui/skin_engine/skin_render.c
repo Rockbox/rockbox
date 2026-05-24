@@ -84,8 +84,6 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        unsigned long refresh_type);
 
 static char* skin_buffer;
-static bool defer_rendering;
-static bool dirty[NB_SCREENS];
 
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
@@ -843,29 +841,6 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
     wps_display_images(gwps, &skin_viewport->vp);
 }
 
-void skin_defer_rendering(bool deferred)
-{
-    defer_rendering = deferred;
-}
-
-void skin_render_deferred(struct screen *display, struct viewport *vp)
-{
-    if (defer_rendering)
-        return;
-
-    if (dirty[display->screen_type])
-    {
-        dirty[display->screen_type] = false;
-        display->set_viewport(NULL);
-        display->update();
-    }
-    else
-    {
-        display->set_viewport(vp);
-        display->update_viewport();
-    }
-}
-
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 {
     const int vp_is_appearing = (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE);
@@ -957,19 +932,14 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     skin_backdrop_show(data->backdrop_id);
 #endif
 
-    dirty[display->screen_type] = defer_rendering;
     if (((refresh_mode&SKIN_REFRESH_ALL) == SKIN_REFRESH_ALL))
     {
-        defer_rendering = true;
         /* If this is the UI viewport then let the UI know
          * to redraw itself */
         send_event(GUI_EVENT_NEED_UI_UPDATE, NULL);
-        defer_rendering = dirty[display->screen_type];
     }
     /* Restore the default viewport */
     display->set_viewport_ex(NULL, VP_FLAG_VP_SET_CLEAN);
-    if (!defer_rendering)
-        display->update();
 }
 
 static __attribute__((noinline))

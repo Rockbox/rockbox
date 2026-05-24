@@ -281,7 +281,6 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     }
     current_column = -1;
     current_row = -1;
-    skin_render_deferred(display, parent);
     current_drawing_line = list->selected_item;
     return true;
 }

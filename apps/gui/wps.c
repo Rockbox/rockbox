@@ -533,11 +533,7 @@ static void gwps_leave_wps(bool theme_enabled)
                viewports drawn by the WPS. May need further thought... */
             struct wps_data *sbs = skin_get_gwps(CUSTOM_STATUSBAR, i)->data;
             if (gwps->data->use_extra_framebuffer && sbs->use_extra_framebuffer)
-            {
-                skin_defer_rendering(true);
                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
-                skin_defer_rendering(false);
-            }
 #endif
             viewportmanager_theme_undo(i, skin_has_sbs(gwps));
         }
@@ -599,11 +595,7 @@ static void gwps_enter_wps(bool theme_enabled)
         skin_backdrop_show(gwps->data->backdrop_id);
 #endif
         display->clear_display();
-        if (skin_has_sbs(gwps))
-            skin_defer_rendering(true);
         skin_update(WPS, i, SKIN_REFRESH_ALL);
-        skin_defer_rendering(false);
-
     }
 #ifdef HAVE_TOUCHSCREEN
     gwps = skin_get_gwps(WPS, SCREEN_MAIN);
@@ -611,7 +603,7 @@ static void gwps_enter_wps(bool theme_enabled)
     if (gwps->data->touchregions < 0)
         touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
-    /* force statusbar/skin update since we just cleared the whole screen */
+     /* Screen was cleared, so redraw SBS if enabled, and update screen */
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 

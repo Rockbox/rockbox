@@ -1023,10 +1023,8 @@ int plugin_load(const char* plugin, const void* parameter)
     pop_current_activity_without_refresh();
     if (get_current_activity() != ACTIVITY_WPS)
     {
-        skin_defer_rendering(true);
         FOR_NB_SCREENS(i)
-                skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
-        skin_defer_rendering(false);
+            skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
         sb_skin_force_next_update();
     }
 

@@ -329,7 +329,7 @@ static enum plugin_status display_run_stats(void)
     if (sbs_has_title)
     {
 #endif
-        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        rb->send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
     }
 
     rb->viewport_set_defaults(&vp, SCREEN_MAIN);
@@ -603,7 +603,7 @@ static enum plugin_status tidy_do(void)
 
     sbs_has_title = rb->sb_set_title_text(CLEANING_STR, Icon_NOICON, SCREEN_MAIN);
     if (sbs_has_title)
-        rb->send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        rb->send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
 
     run_stats.files_removed = 0;
     run_stats.dirs_removed = 0;

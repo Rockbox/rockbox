@@ -71,7 +71,19 @@
 #include "statusbar-skinned.h"
 #include "skin_display.h"
 
+static bool dirty[NB_SCREENS];
+
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode);
+
+bool skin_is_dirty(enum screen_type screen)
+{
+    return dirty[screen] && !(dirty[screen] = false);
+}
+
+void skin_mark_dirty(enum screen_type screen)
+{
+    dirty[screen] = true;
+}
 
 /* update a skinned screen, update_type is WPS_REFRESH_* values.
  * Usually it should only be WPS_REFRESH_NON_STATIC
@@ -90,6 +102,7 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 
     skin_render(gwps, skin_do_full_update(skin, screen) ?
                         SKIN_REFRESH_ALL : update_type);
+    skin_mark_dirty(screen);
 }
 
 #ifdef AB_REPEAT_ENABLE

@@ -238,9 +238,9 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     {
         sb_title_is_dirty = theme_enabled = false;
 
-        /* tell skin engine to refresh, then call us back */
+        /* Redraw skin, and make skin engine call us back */
         add_event_ex(GUI_EVENT_NEED_UI_UPDATE, true, sb_title_cb, gui_list);
-        send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
         remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, sb_title_cb, gui_list);
 
         /* sb_title_cb was only called if theme is enabled */
@@ -258,6 +258,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     {
         if (!skinlist_draw(&screens[i], gui_list))
             list_draw(&screens[i], gui_list);
+        skin_mark_dirty(i);
     }
 }
 

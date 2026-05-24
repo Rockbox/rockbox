@@ -83,7 +83,7 @@ static void evt_toggle(bool enable, unsigned short id,
 
 static void toggle_events(bool enable)
 {
-    evt_toggle(enable, GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
+    evt_toggle(enable, GUI_EVENT_ACTIONREDRAW, viewportmanager_redraw);
     evt_toggle(enable, PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
     evt_toggle(enable, PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -119,8 +119,7 @@ static void toggle_theme(enum screen_type screen, bool force)
     {
         last_vp = screens[screen].set_viewport(NULL);
         bool first_boot = theme_stack_top[screen] == 0;
-        /* remove the left overs from the previous screen.
-         * could cause a tiny flicker. Redo your screen code if that happens */
+        /* Remove the left overs from the previous screen */
 #ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(sb_get_backdrop(screen));
 #endif
@@ -154,9 +153,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         }
         intptr_t force = first_boot?0:1;
 
-        skin_defer_rendering(true);
-        send_event(GUI_EVENT_ACTIONUPDATE, (void*)force);
-        skin_defer_rendering(false);
+        send_event(GUI_EVENT_ACTIONREDRAW, (void*)force);
         if (!first_boot)
             sb_skin_force_next_update();
     }
@@ -167,6 +164,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 #endif
         screens[screen].scroll_stop();
         skinlist_set_cfg(screen, NULL);
+        skin_is_dirty(screen); /* remove dirty flag */
     }
     /* let list initialize viewport in case viewport dimensions is changed. */
     send_event(GUI_EVENT_THEME_CHANGED, NULL);
@@ -219,10 +217,16 @@ static void viewportmanager_redraw(unsigned short id, void* data)
 {
     (void)id;
     FOR_NB_SCREENS(i)
-    {
         if (is_theme_enabled(i))
             sb_skin_update(i, NULL != data);
-    }
+}
+
+static void viewportmanager_update(unsigned short id, void* data)
+{
+    viewportmanager_redraw(id, data);
+    FOR_NB_SCREENS(i)
+        if (skin_is_dirty(i))
+            screens[i].update();
 }
 
 void viewportmanager_init(void)
@@ -233,6 +237,7 @@ void viewportmanager_init(void)
         /* We always want the theme enabled by default... */
         viewportmanager_theme_enable(i, true, NULL);
     }
+    add_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_update);
 }
 
 void viewportmanager_theme_changed(const int which)

@@ -73,11 +73,13 @@ enum {
 
 /** Generic GUI class events **/
 enum {
-    GUI_EVENT_STATUSBAR_TOGGLE = (EVENT_CLASS_GUI|1),
+    /* Redraw skin as needed (or by force) */
+    GUI_EVENT_ACTIONREDRAW = (EVENT_CLASS_GUI|1),
+    /* Redraw skin, and update the screen if it's dirty */
     GUI_EVENT_ACTIONUPDATE,
     GUI_EVENT_THEME_CHANGED,
     /* Called when the UI viewport is cleared in the skin engine to
-     * notify the current screen that it needs to do an update */
+     * notify the current screen that it needs to redraw itself */
     GUI_EVENT_NEED_UI_UPDATE,
 };
 
