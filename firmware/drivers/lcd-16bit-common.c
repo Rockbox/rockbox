@@ -508,6 +508,8 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(
         if (alpha_pixels) { \
             alpha_data = *alpha++ ^ dmask; \
             alpha_data >>= ALPHA_BPP; \
+        } else { \
+            alpha_data = 0; \
         } \
     } while(0)
 #define START_ALPHA() do { } while(0)
