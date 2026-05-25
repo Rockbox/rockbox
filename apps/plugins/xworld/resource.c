@@ -84,7 +84,9 @@ void res_readEntries(struct Resource* res) {
     File f;
     file_create(&f, false);
 
+#ifdef XWORLD_DEBUG
     int resourceCounter = 0;
+#endif
 
     if (!file_open(&f, "memlist.bin", res->_dataDir, "rb")) {
         error("Could not open 'MEMLIST.BIN', data files missing");
@@ -140,7 +142,9 @@ void res_readEntries(struct Resource* res) {
               memEntry->size,
               memEntry->size ? (memEntry->size - memEntry->packedSize) / (float)memEntry->size * 100.0f : 0.0f);
 
+#ifdef XWORLD_DEBUG
         resourceCounter++;
+#endif
 
         res->_numMemList++;
         memEntry++;
