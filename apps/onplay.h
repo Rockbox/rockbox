@@ -95,6 +95,7 @@ void onplay_show_playlist_cat_menu(const char* track_name, int attr,
 void onplay_show_playlist_menu(const char* path, int attr, void (*playlist_insert_cb));
 
 int wps_context_menu_do_setting(void *param);
+int tree_context_menu_do_setting(void *param);
 void wps_context_menu_set_default(void* setting, void* defaultval);
 char* wps_context_menu_write_to_cfg(void* setting, char*buf, int buf_len);
 void wps_context_menu_load_from_cfg(void* setting, char *value);

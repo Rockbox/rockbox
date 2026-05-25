@@ -1616,6 +1616,10 @@ int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
 
     struct hk_menu_data data = {hk_menu, execute ? 1 : 0};
 
+    char *title = str(LANG_ONPLAY_MENU_TITLE);
+    if (flag & HOTKEY_FLAG_TREE)
+            title = str(LANG_HOTKEY_FILE_BROWSER);
+
     struct simplelist_info info;
     int selected = 0;
     int count = 0;
@@ -1634,7 +1638,7 @@ int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
     }
 
     /* count -1 don't display HOTKEY_OFF item */
-    simplelist_info_init(&info, str(LANG_ONPLAY_MENU_TITLE), count - data.hide_off, (void*)&data);
+    simplelist_info_init(&info, title, count - data.hide_off, (void*)&data);
     info.get_name = hotkey_get_name;
     info.get_icon = hotkey_get_icon;
     info.get_talk = hotkey_get_talk;
@@ -1699,7 +1703,9 @@ int onplay(char* file, int attr, int from_context, bool hotkey, int customaction
             return onplay_result;
         }
         else
-            return execute_hotkey(global_settings.hotkey_tree);
+        {
+            return execute_hotkey(global_settings.hotkey_tree & HK_CTX_MASK);
+        }
     }
 #else
     (void)hotkey;
@@ -1742,13 +1748,14 @@ int get_onplay_context(void)
     return selected_file.context;
 }
 
-int wps_context_menu_do_setting(void *param)
+static int hotkey_menu_do_setting(void *param, int *setting, int flag)
 {
-    int context_wps = global_settings.context_wps;
+
+    int current = *setting;
     int item = (intptr_t)param;
 
-    int temp =  HK_CTX_GET(item, context_wps);
-    int sel = hotkey_run_menu(HOTKEY_FLAG_WPS, false, temp);
+    int temp =  HK_CTX_GET(item, current);
+    int sel = hotkey_run_menu(flag, false, temp);
     if (sel >=0)
     {
         if (sel == HOTKEY_PLUGIN)
@@ -1764,8 +1771,8 @@ int wps_context_menu_do_setting(void *param)
             }
         }
 
-        context_wps &= ~HK_CTX_SET(item, HK_CTX_MASK);/*clear*/
-        context_wps |= HK_CTX_SET(item, sel);
+        current &= ~HK_CTX_SET(item, HK_CTX_MASK);/*clear*/
+        current |= HK_CTX_SET(item, sel);
 
         /* check for duplicates */
 #ifdef HAVE_HOTKEY
@@ -1777,15 +1784,25 @@ int wps_context_menu_do_setting(void *param)
         {
             if (i != item)
             {
-                if (HK_CTX_GET(i, global_settings.context_wps) == sel)
+                if (HK_CTX_GET(i, *setting) == sel)
                 {
-                    context_wps &= ~HK_CTX_SET(i, HK_CTX_MASK);/*clear*/
+                    current &= ~HK_CTX_SET(i, HK_CTX_MASK);/*clear*/
                 }
             }
         }
-        global_settings.context_wps = context_wps;
+        *setting = current;
     }
     return sel;
+}
+
+int wps_context_menu_do_setting(void *param)
+{
+    return hotkey_menu_do_setting(param, &global_settings.context_wps, HOTKEY_FLAG_WPS);
+}
+
+int tree_context_menu_do_setting(void *param)
+{
+    return hotkey_menu_do_setting(param, &global_settings.hotkey_tree, HOTKEY_FLAG_TREE);
 }
 
 void wps_context_menu_load_from_cfg(void* setting, char *value)
@@ -1803,7 +1820,8 @@ void wps_context_menu_load_from_cfg(void* setting, char *value)
 
             for (size_t i = ARRAYLEN(hotkey_items) - 1; i < ARRAYLEN(hotkey_items); i--)
             {
-                if (strncasecmp(st, str(hotkey_items[i].lang_id), end-st) == 0)
+                if (end-st > 1
+                    && strncasecmp(st, str(hotkey_items[i].lang_id), end-st) == 0)
                 {
                     var |= HK_CTX_SET(item, hotkey_items[i].action);
                 }
@@ -1818,9 +1836,13 @@ void wps_context_menu_load_from_cfg(void* setting, char *value)
 char* wps_context_menu_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     int var = *(int*)setting;
-    unsigned i, written;
+    int items = HK_CTX_ITEMS;
+    if (setting == &global_settings.hotkey_tree)
+        items = 1;
+
+    unsigned int written;
     char *buffer = buf;
-    for (i = 0; i < HK_CTX_ITEMS && buf_len > 0; i++)
+    for (int i = 0; i < items && buf_len > 0; i++)
     {
         written = snprintf(buffer, buf_len, "%s, ",
                            str(get_hotkey(HK_CTX_GET(i, var))->lang_id));

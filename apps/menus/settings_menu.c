@@ -193,7 +193,9 @@ MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
 #ifdef HAVE_HOTKEY
-MENUITEM_SETTING(hotkey_tree_item, &global_settings.hotkey_tree, NULL);
+MENUITEM_FUNCTION_W_PARAM(hotkey_tree_item, 0, ID2P(LANG_HOTKEY_FILE_BROWSER),
+                                  tree_context_menu_do_setting, (void*)0,
+                                  NULL, Icon_Menu_setting);
 #endif
 static int clear_start_directory(void)
 {

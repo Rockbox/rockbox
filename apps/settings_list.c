@@ -701,6 +701,10 @@ static const int wps_context_menu_default =
 #endif
   | HK_CTX_SET(4, HOTKEY_ALBUMART);
 
+#ifdef HAVE_HOTKEY
+static const int tree_hotkey_default = HOTKEY_OFF;
+#endif
+
 #ifndef __PCTOOL__
 static void eq_load_from_cfg(void *setting, char *value)
 {
@@ -893,21 +897,6 @@ static bool tsc_is_changed(void* setting, void* defaultval)
 static void tsc_set_default(void* setting, void* defaultval)
 {
     memcpy(setting, defaultval, sizeof(struct touchscreen_parameter));
-}
-#endif
-#ifdef HAVE_HOTKEY
-static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
-                              const char* unit)
-{
-    (void)buffer;
-    (void)buffer_size;
-    (void)unit;
-    return str(get_hotkey(value)->lang_id);
-}
-static int32_t hotkey_getlang(int value, int unit)
-{
-    (void)unit;
-    return get_hotkey(value)->lang_id;
 }
 #endif
 
@@ -2348,21 +2337,12 @@ const struct settings_list settings[] = {
                   wps_context_menu_is_changed, wps_context_menu_set_default),
 
 #ifdef HAVE_HOTKEY
-/* TREE HOTKEY */
-    TABLE_SETTING(0, hotkey_tree,
-        LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",
-#ifdef HAVE_TAGCACHE
-        "off,properties,pictureflow,open with,delete,insert,insert shuffled,context menu",
-        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 8,
-#else
-        "off,properties,open with,delete,insert,insert shuffled,context menu",
-        UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 7,
-#endif
-        HOTKEY_OFF,HOTKEY_PROPERTIES,
-#ifdef HAVE_TAGCACHE
-        HOTKEY_PICTUREFLOW,
-#endif
-        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_INSERT, HOTKEY_INSERT_SHUFFLED, HOTKEY_CONTEXT_MENU),
+   CUSTOM_SETTING(0, hotkey_tree,
+                  LANG_HOTKEY_FILE_BROWSER, /* lang string here is never actually used */
+                  &tree_hotkey_default, "hotkey tree",
+                  wps_context_menu_load_from_cfg, wps_context_menu_write_to_cfg,
+                  wps_context_menu_is_changed, wps_context_menu_set_default),
+
 #endif /* HAVE_HOTKEY */
 
     INT_SETTING(F_TIME_SETTING, resume_rewind, LANG_RESUME_REWIND, 0,
