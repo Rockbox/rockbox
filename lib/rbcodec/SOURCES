@@ -4,6 +4,7 @@ metadata/mp3.c
 metadata/mp3data.c
 dsp/channel_mode.c
 dsp/compressor.c
+dsp/mbc3band.c
 dsp/crossfeed.c
 dsp/dsp_core.c
 dsp/pbe.c

@@ -225,6 +225,96 @@ static int timestretch_callback(int action,
               &compressor_threshold, &compressor_gain, &compressor_ratio,
               &compressor_knee, &compressor_attack, &compressor_release);
 
+    /* mbc3band - Band 0 (Low) submenu */
+    MENUITEM_SETTING(mbc3band_b0_threshold,
+                     &global_settings.mbc3band_settings.bands[0].threshold,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b0_rdown,
+                     &global_settings.mbc3band_settings.bands[0].ratio_down,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b0_rup,
+                     &global_settings.mbc3band_settings.bands[0].ratio_up,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b0_attack,
+                     &global_settings.mbc3band_settings.bands[0].attack_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b0_release,
+                     &global_settings.mbc3band_settings.bands[0].release_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b0_mix,
+                     &global_settings.mbc3band_settings.bands[0].wet_mix,
+                     lowlatency_callback);
+    MAKE_MENU(mbc3band_band0_menu, ID2P(LANG_MBC3BAND_B0), NULL, Icon_NOICON,
+              &mbc3band_b0_threshold, &mbc3band_b0_rdown, &mbc3band_b0_rup,
+              &mbc3band_b0_attack, &mbc3band_b0_release, &mbc3band_b0_mix);
+
+    /* mbc3band - Band 1 (Mid) submenu */
+    MENUITEM_SETTING(mbc3band_b1_threshold,
+                     &global_settings.mbc3band_settings.bands[1].threshold,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b1_rdown,
+                     &global_settings.mbc3band_settings.bands[1].ratio_down,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b1_rup,
+                     &global_settings.mbc3band_settings.bands[1].ratio_up,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b1_attack,
+                     &global_settings.mbc3band_settings.bands[1].attack_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b1_release,
+                     &global_settings.mbc3band_settings.bands[1].release_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b1_mix,
+                     &global_settings.mbc3band_settings.bands[1].wet_mix,
+                     lowlatency_callback);
+    MAKE_MENU(mbc3band_band1_menu, ID2P(LANG_MBC3BAND_B1), NULL, Icon_NOICON,
+              &mbc3band_b1_threshold, &mbc3band_b1_rdown, &mbc3band_b1_rup,
+              &mbc3band_b1_attack, &mbc3band_b1_release, &mbc3band_b1_mix);
+
+    /* mbc3band - Band 2 (High) submenu */
+    MENUITEM_SETTING(mbc3band_b2_threshold,
+                     &global_settings.mbc3band_settings.bands[2].threshold,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b2_rdown,
+                     &global_settings.mbc3band_settings.bands[2].ratio_down,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b2_rup,
+                     &global_settings.mbc3band_settings.bands[2].ratio_up,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b2_attack,
+                     &global_settings.mbc3band_settings.bands[2].attack_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b2_release,
+                     &global_settings.mbc3band_settings.bands[2].release_ms,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_b2_mix,
+                     &global_settings.mbc3band_settings.bands[2].wet_mix,
+                     lowlatency_callback);
+    MAKE_MENU(mbc3band_band2_menu, ID2P(LANG_MBC3BAND_B2), NULL, Icon_NOICON,
+              &mbc3band_b2_threshold, &mbc3band_b2_rdown, &mbc3band_b2_rup,
+              &mbc3band_b2_attack, &mbc3band_b2_release, &mbc3band_b2_mix);
+
+    /* mbc3band main menu */
+    MENUITEM_SETTING(mbc3band_enabled,
+                     &global_settings.mbc3band_settings.enabled,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_mode,
+                     &global_settings.mbc3band_settings.mode,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_co_low,
+                     &global_settings.mbc3band_settings.crossover_low,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_co_high,
+                     &global_settings.mbc3band_settings.crossover_high,
+                     lowlatency_callback);
+    MENUITEM_SETTING(mbc3band_outgain,
+                     &global_settings.mbc3band_settings.output_gain,
+                     lowlatency_callback);
+    MAKE_MENU(mbc3band_menu, ID2P(LANG_MBC3BAND), NULL, Icon_NOICON,
+              &mbc3band_enabled, &mbc3band_mode,
+              &mbc3band_band0_menu, &mbc3band_band1_menu, &mbc3band_band2_menu,
+              &mbc3band_co_low, &mbc3band_co_high, &mbc3band_outgain);
+
 #ifdef HAVE_SPEAKER
     MENUITEM_SETTING(speaker_mode, &global_settings.speaker_mode, NULL);
 #endif
@@ -269,6 +359,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           ,&timestretch_enabled
 #endif
           ,&compressor_menu
+          ,&mbc3band_menu
 #ifdef HAVE_SPEAKER
          ,&speaker_mode
 #endif

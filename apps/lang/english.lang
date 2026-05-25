@@ -102,6 +102,552 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_MBC3BAND_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Band 0 - Low"
+  </source>
+  <dest>
+    *: "Band 0 - Low"
+  </dest>
+  <voice>
+    *: "Band 0 Low"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Band 1 - Mid"
+  </source>
+  <dest>
+    *: "Band 1 - Mid"
+  </dest>
+  <voice>
+    *: "Band 1 Mid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Band 2 - High"
+  </source>
+  <dest>
+    *: "Band 2 - High"
+  </dest>
+  <voice>
+    *: "Band 2 High"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_THRESH_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Threshold"
+  </source>
+  <dest>
+    *: "B0 Threshold"
+  </dest>
+  <voice>
+    *: "Band 0 Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_THRESH_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Threshold"
+  </source>
+  <dest>
+    *: "B1 Threshold"
+  </dest>
+  <voice>
+    *: "Band 1 Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_THRESH_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Threshold"
+  </source>
+  <dest>
+    *: "B2 Threshold"
+  </dest>
+  <voice>
+    *: "Band 2 Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RDOWN_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Ratio Down"
+  </source>
+  <dest>
+    *: "B0 Ratio Down"
+  </dest>
+  <voice>
+    *: "Band 0 Downward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RDOWN_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Ratio Down"
+  </source>
+  <dest>
+    *: "B1 Ratio Down"
+  </dest>
+  <voice>
+    *: "Band 1 Downward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RDOWN_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Ratio Down"
+  </source>
+  <dest>
+    *: "B2 Ratio Down"
+  </dest>
+  <voice>
+    *: "Band 2 Downward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RUP_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Ratio Up"
+  </source>
+  <dest>
+    *: "B0 Ratio Up"
+  </dest>
+  <voice>
+    *: "Band 0 Upward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RUP_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Ratio Up"
+  </source>
+  <dest>
+    *: "B1 Ratio Up"
+  </dest>
+  <voice>
+    *: "Band 1 Upward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RUP_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Ratio Up"
+  </source>
+  <dest>
+    *: "B2 Ratio Up"
+  </dest>
+  <voice>
+    *: "Band 2 Upward Ratio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_ATT_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Attack"
+  </source>
+  <dest>
+    *: "B0 Attack"
+  </dest>
+  <voice>
+    *: "Band 0 Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_ATT_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Attack"
+  </source>
+  <dest>
+    *: "B1 Attack"
+  </dest>
+  <voice>
+    *: "Band 1 Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_ATT_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Attack"
+  </source>
+  <dest>
+    *: "B2 Attack"
+  </dest>
+  <voice>
+    *: "Band 2 Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_REL_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Release"
+  </source>
+  <dest>
+    *: "B0 Release"
+  </dest>
+  <voice>
+    *: "Band 0 Release Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_REL_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Release"
+  </source>
+  <dest>
+    *: "B1 Release"
+  </dest>
+  <voice>
+    *: "Band 1 Release Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_REL_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Release"
+  </source>
+  <dest>
+    *: "B2 Release"
+  </dest>
+  <voice>
+    *: "Band 2 Release Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_MIX_B0
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B0 Wet Mix"
+  </source>
+  <dest>
+    *: "B0 Wet Mix"
+  </dest>
+  <voice>
+    *: "Band 0 Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_MIX_B1
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B1 Wet Mix"
+  </source>
+  <dest>
+    *: "B1 Wet Mix"
+  </dest>
+  <voice>
+    *: "Band 1 Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_MIX_B2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "B2 Wet Mix"
+  </source>
+  <dest>
+    *: "B2 Wet Mix"
+  </dest>
+  <voice>
+    *: "Band 2 Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_ROFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "off"
+  </source>
+  <dest>
+    *: "off"
+  </dest>
+  <voice>
+    *: "off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_R2
+  desc: in sound settings
+  user: core
+  <source>
+    *: "2:1"
+  </source>
+  <dest>
+    *: "2:1"
+  </dest>
+  <voice>
+    *: "2 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_R4
+  desc: in sound settings
+  user: core
+  <source>
+    *: "4:1"
+  </source>
+  <dest>
+    *: "4:1"
+  </dest>
+  <voice>
+    *: "4 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_R6
+  desc: in sound settings
+  user: core
+  <source>
+    *: "6:1"
+  </source>
+  <dest>
+    *: "6:1"
+  </dest>
+  <voice>
+    *: "6 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_R10
+  desc: in sound settings
+  user: core
+  <source>
+    *: "10:1"
+  </source>
+  <dest>
+    *: "10:1"
+  </dest>
+  <voice>
+    *: "10 to 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RLIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "limit"
+  </source>
+  <dest>
+    *: "limit"
+  </dest>
+  <voice>
+    *: "limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RU25
+  desc: in sound settings
+  user: core
+  <source>
+    *: "0.25:1"
+  </source>
+  <dest>
+    *: "0.25:1"
+  </dest>
+  <voice>
+    *: "0.25 to 1 upward"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RU50
+  desc: in sound settings
+  user: core
+  <source>
+    *: "0.5:1"
+  </source>
+  <dest>
+    *: "0.5:1"
+  </dest>
+  <voice>
+    *: "0.5 to 1 upward"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_RU75
+  desc: in sound settings
+  user: core
+  <source>
+    *: "0.75:1"
+  </source>
+  <dest>
+    *: "0.75:1"
+  </dest>
+  <voice>
+    *: "0.75 to 1 upward"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Multiband Comp"
+  </source>
+  <dest>
+    *: "Multiband Comp"
+  </dest>
+  <voice>
+    *: "Multiband Compressor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_ENABLE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Enable Multiband"
+  </source>
+  <dest>
+    *: "Enable Multiband"
+  </dest>
+  <voice>
+    *: "Enable Multiband"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Band Mode"
+  </source>
+  <dest>
+    *: "Band Mode"
+  </dest>
+  <voice>
+    *: "Band Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_1BAND
+  desc: in sound settings
+  user: core
+  <source>
+    *: "1-band"
+  </source>
+  <dest>
+    *: "1-band"
+  </dest>
+  <voice>
+    *: "1-band"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_2BAND
+  desc: in sound settings
+  user: core
+  <source>
+    *: "2-band"
+  </source>
+  <dest>
+    *: "2-band"
+  </dest>
+  <voice>
+    *: "2-band"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_3BAND
+  desc: in sound settings
+  user: core
+  <source>
+    *: "3-band"
+  </source>
+  <dest>
+    *: "3-band"
+  </dest>
+  <voice>
+    *: "3-band"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_CO_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Crossover Low"
+  </source>
+  <dest>
+    *: "Crossover Low"
+  </dest>
+  <voice>
+    *: "Crossover Low"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_CO_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Crossover High"
+  </source>
+  <dest>
+    *: "Crossover High"
+  </dest>
+  <voice>
+    *: "Crossover High"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MBC3BAND_OUTPUT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Output Gain"
+  </source>
+  <dest>
+    *: "Output Gain"
+  </dest>
+  <voice>
+    *: "Output Gain"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user: core

@@ -30,6 +30,7 @@
 #include "pga.h"
 #include "surround.h"
 #include "afr.h"
+#include "mbc3band.h"
 #include "pbe.h"
 #ifdef HAVE_PITCHCONTROL
 #include "tdspeed.h"

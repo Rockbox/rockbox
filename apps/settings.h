@@ -829,6 +829,7 @@ struct user_settings
 #endif
 
     struct compressor_settings compressor_settings;
+    struct mbc3band_settings mbc3band_settings;
 
     int sleeptimer_duration; /* In minutes; 0=off */
     bool sleeptimer_on_startup;
