@@ -1617,9 +1617,10 @@ int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
     struct hk_menu_data data = {hk_menu, execute ? 1 : 0};
 
     char *title = str(LANG_ONPLAY_MENU_TITLE);
+#ifdef HAVE_HOTKEY
     if (flag & HOTKEY_FLAG_TREE)
             title = str(LANG_HOTKEY_FILE_BROWSER);
-
+#endif
     struct simplelist_info info;
     int selected = 0;
     int count = 0;
@@ -1798,12 +1799,14 @@ static int hotkey_menu_do_setting(void *param, int *setting, int flag)
 int wps_context_menu_do_setting(void *param)
 {
     return hotkey_menu_do_setting(param, &global_settings.context_wps, HOTKEY_FLAG_WPS);
-}
 
+}
+#ifdef HAVE_HOTKEY
 int tree_context_menu_do_setting(void *param)
 {
     return hotkey_menu_do_setting(param, &global_settings.hotkey_tree, HOTKEY_FLAG_TREE);
 }
+#endif
 
 void wps_context_menu_load_from_cfg(void* setting, char *value)
 {
@@ -1837,8 +1840,11 @@ char* wps_context_menu_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     int var = *(int*)setting;
     int items = HK_CTX_ITEMS;
+
+#ifdef HAVE_HOTKEY
     if (setting == &global_settings.hotkey_tree)
         items = 1;
+#endif
 
     unsigned int written;
     char *buffer = buf;
