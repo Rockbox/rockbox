@@ -34,6 +34,8 @@ int lang_load(const char *filename, const unsigned char *builtin,
 
 /* get the ID of an english string so it can be localised */
 int lang_english_to_id(const char *english);
+/* get the english string of a given id */
+const char * lang_id_to_english(int lang_id);
 
 /* returns whether the loaded language is a right-to-left language */
 int lang_is_rtl(void);

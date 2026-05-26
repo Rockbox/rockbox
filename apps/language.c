@@ -147,6 +147,25 @@ int lang_english_to_id(const char *english)
     return -1;
 }
 
+const char * lang_id_to_english(int lang_id)
+{
+    int i;
+    unsigned char *ptr = (unsigned char *) core_language_builtin;
+
+    if (lang_id >= 0 && lang_id < LANG_LAST_INDEX_IN_ARRAY)
+    {
+        if (language_strings[0] == ptr) /* already in english */
+            return str(lang_id);
+
+        for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
+            if (i == lang_id)
+                return ptr;
+            ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
+        }
+    }
+    return ""; /* Not found */
+}
+
 int lang_is_rtl(void)
 {
     return (lang_options & LANGUAGE_FLAG_RTL) != 0;

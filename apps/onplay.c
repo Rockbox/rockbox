@@ -67,6 +67,7 @@
 #ifdef HAVE_DISK_STORAGE
 #include "storage.h"
 #endif
+#include "language.h"
 
 static int onplay_result = ONPLAY_OK;
 static bool in_queue_submenu = false;
@@ -1823,8 +1824,8 @@ void wps_context_menu_load_from_cfg(void* setting, char *value)
 
             for (size_t i = ARRAYLEN(hotkey_items) - 1; i < ARRAYLEN(hotkey_items); i--)
             {
-                if (end-st > 1
-                    && strncasecmp(st, str(hotkey_items[i].lang_id), end-st) == 0)
+                if (end-st > 1 &&
+                    strncasecmp(st, lang_id_to_english(hotkey_items[i].lang_id), end-st) == 0)
                 {
                     var |= HK_CTX_SET(item, hotkey_items[i].action);
                 }
@@ -1851,7 +1852,7 @@ char* wps_context_menu_write_to_cfg(void* setting, char*buf, int buf_len)
     for (int i = 0; i < items && buf_len > 0; i++)
     {
         written = snprintf(buffer, buf_len, "%s, ",
-                           str(get_hotkey(HK_CTX_GET(i, var))->lang_id));
+                    lang_id_to_english(get_hotkey(HK_CTX_GET(i, var))->lang_id));
         buf_len -= written;
         buffer += written;
     }
