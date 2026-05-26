@@ -14960,20 +14960,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Setze WPS Kontext Zusatzprogramm"
-  </dest>
-  <voice>
-    *: "Setze W P S Kontext Zusatzprogramm"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -17116,5 +17102,19 @@
   </dest>
   <voice>
     *: "Beendet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Kontext-Element festlegen"
+  </dest>
+  <voice>
+    *: "Kontextelement festlegen"
   </voice>
 </phrase>
