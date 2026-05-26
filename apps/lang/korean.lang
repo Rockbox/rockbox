@@ -14956,20 +14956,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "재생 중 화면 컨텍스트 플러그인 설정"
-  </dest>
-  <voice>
-    *: "재생 중 화면 컨텍스트 플러그인 설정"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -17112,5 +17098,19 @@
   </dest>
   <voice>
     *: "완료"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "컨텍스트 항목 설정"
+  </dest>
+  <voice>
+    *: "컨텍스트 항목 설정"
   </voice>
 </phrase>

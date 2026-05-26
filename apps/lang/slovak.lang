@@ -14942,20 +14942,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Nastaviť zásuvný modul pre kontext Obrazovky teraz hrá"
-  </dest>
-  <voice>
-    *: "Nastaviť zásuvný modul pre kontext Obrazovky teraz hrá"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -17098,5 +17084,19 @@
   </dest>
   <voice>
     *: "Ukončený"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Nastaviť kontextovú položku"
+  </dest>
+  <voice>
+    *: "Nastaviť kontextovú položku"
   </voice>
 </phrase>
