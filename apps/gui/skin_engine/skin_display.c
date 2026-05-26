@@ -410,8 +410,17 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     (void)vp;
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
-    struct skin_token_list *list = SKINOFFSETTOPTR(get_skin_buffer(data), data->images);
 
+    /* Start with album art, as it may be drawn over by mask images */
+#ifdef HAVE_ALBUMART
+    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
+    if (aa && aa->draw_handle >= 0)
+    {
+        draw_album_art(gwps, aa->draw_handle, false);
+        aa->draw_handle = -1;
+    }
+#endif
+    struct skin_token_list *list = SKINOFFSETTOPTR(get_skin_buffer(data), data->images);
     while (list)
     {
         struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(data), list->token);
@@ -433,15 +442,6 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
         }
         list = SKINOFFSETTOPTR(get_skin_buffer(data), list->next);
     }
-#ifdef HAVE_ALBUMART
-    /* now draw the AA */
-    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
-    if (aa && aa->draw_handle >= 0)
-    {
-        draw_album_art(gwps, aa->draw_handle, false);
-        aa->draw_handle = -1;
-    }
-#endif
 
     display->set_drawmode(DRMODE_SOLID);
 }
