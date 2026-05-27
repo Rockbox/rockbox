@@ -113,6 +113,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         if (!sb_get_persistent_title(i))
             sb_set_title_text(NULL, Icon_NOICON, i);
     }
+    skinlist_set_cfg(screen, NULL);
     toggle_events(enable_event);
 
     if (is_theme_enabled(screen))
@@ -163,7 +164,6 @@ static void toggle_theme(enum screen_type screen, bool force)
         screens[screen].backdrop_show(NULL);
 #endif
         screens[screen].scroll_stop();
-        skinlist_set_cfg(screen, NULL);
         skin_is_dirty(screen); /* remove dirty flag */
     }
     /* let list initialize viewport in case viewport dimensions is changed. */
