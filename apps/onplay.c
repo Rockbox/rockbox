@@ -139,15 +139,6 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
 /* interface function.                                                     */
 /* ----------------------------------------------------------------------- */
 
-
-static int bookmark_load_menu_wrapper(void)
-{
-    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh();          /* when called from ctxt menu */
-
-    return bookmark_load_menu();
-}
-
 static int bookmark_menu_callback(int action,
                                   const struct menu_item_ex *this_item,
                                   struct gui_synclist *this_list);
@@ -157,7 +148,7 @@ MENUITEM_FUNCTION(bookmark_create_menu_item, 0,
                   bookmark_menu_callback, Icon_Bookmark);
 MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_LIST),
-                  bookmark_load_menu_wrapper,
+                  bookmark_load_menu,
                   bookmark_menu_callback, Icon_Bookmark);
 MAKE_ONPLAYMENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU),
                 bookmark_menu_callback, Icon_Bookmark,
@@ -203,9 +194,6 @@ static bool save_playlist(void)
 
 static int wps_view_cur_playlist(void)
 {
-    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh(); /* when called from ctxt menu */
-
     playlist_viewer_ex(NULL, NULL);
 
     return 0;
@@ -768,7 +756,7 @@ WPSCTX_RETURNVALUE_DYNTEXT(context_item_4, GO_TO_PREVIOUS, wps_context_item_cb,
   wps_context_get_item_name, wps_context_item_speak_item, (void*)4, Icon_NOICON);
 
 /* map item number to menu_get_name_and_icon structs so we can change icons */
-static struct menu_get_name_and_icon * const ctx_item_map[HK_CTX_ITEMS]= 
+static struct menu_get_name_and_icon * const ctx_item_map[HK_CTX_ITEMS]=
   {&context_item_0_, &context_item_1_, &context_item_2_, &context_item_3_, &context_item_4_};
 
 #ifdef HAVE_PITCHCONTROL
@@ -875,9 +863,6 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 
 static int browse_id3_wrapper(void)
 {
-    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh();          /* when called from ctxt menu */
-
     if (browse_id3(audio_current_track(),
             playlist_get_display_index(),
             playlist_amount(), NULL, 1, NULL))
@@ -1006,10 +991,6 @@ static bool onplay_load_plugin(void *param)
     if (!prepare_database_sel(param))
         return false;
 #endif
-
-    if (get_current_activity() == ACTIVITY_CONTEXTMENU)  /* get rid of parent activity */
-        pop_current_activity_without_refresh();          /* when called from ctxt menu */
-
     int ret = filetype_load_plugin((const char*)param, selected_file.path);
     if (ret == PLUGIN_USB_CONNECTED)
         onplay_result = ONPLAY_RELOAD_DIR;
@@ -1727,9 +1708,7 @@ int onplay(char* file, int attr, int from_context, bool hotkey, int customaction
     else
         menu = &tree_onplay_menu;
     menu_selection = do_menu(menu, NULL, NULL, false);
-
-    if (get_current_activity() == ACTIVITY_CONTEXTMENU) /* Activity may have been      */
-        pop_current_activity();                         /* popped already by menu item */
+    pop_current_activity();
 
     if (menu_selection == GO_TO_WPS)
         return ONPLAY_START_PLAY;
