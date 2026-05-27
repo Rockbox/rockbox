@@ -44,6 +44,7 @@
 
 static struct listitem_viewport_cfg *listcfg[NB_SCREENS] = {NULL};
 static struct gui_synclist *current_list;
+static bool needs_scrollbar[NB_SCREENS];
 
 static int current_row;
 static int current_column;
@@ -56,6 +57,7 @@ void skinlist_set_cfg(enum screen_type screen,
         if (listcfg[screen])
             screens[screen].scroll_stop_viewport(&listcfg[screen]->selected_item_vp.vp);
         listcfg[screen] = cfg;
+        needs_scrollbar[screen] = false;
         current_list = NULL;
         current_column = -1;
         current_row = -1;
@@ -145,7 +147,6 @@ int skinlist_get_line_count(enum screen_type screen, struct gui_synclist *list)
 
 static int current_item;
 static int current_nbitems;
-static bool needs_scrollbar[NB_SCREENS];
 bool skinlist_needs_scrollbar(enum screen_type screen)
 {
     return needs_scrollbar[screen];
