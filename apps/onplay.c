@@ -688,8 +688,6 @@ static char *wps_context_get_item_name(int selected_item, void * data,
 
 static int wps_context_item_speak_item(int selected_item, void * data)
 {
-    if (!global_settings.talk_menu)
-        return 0;
     int item = (intptr_t)data;
     const struct hotkey_assignment *hkey =
       get_hotkey(HK_CTX_GET(item, global_settings.context_wps));
@@ -706,18 +704,15 @@ static int wps_context_item_speak_item(int selected_item, void * data)
         int32_t pitch = sound_get_pitch();
         if (ts != PITCH_SPEED_100 || pitch != PITCH_SPEED_100)
         {
-            if (global_settings.talk_menu)
-            {
-                talk_id(hkey->lang_id, false);
+            talk_id(hkey->lang_id, false);
 
-                if (pitch != PITCH_SPEED_100)
-                    talk_value_decimal(pitch, UNIT_PERCENT, 2, true);
-                if (ts != PITCH_SPEED_100)
-                {
-                    int32_t speed = GET_SPEED(pitch, ts);
-                    talk_id(LANG_SPEED, true);
-                    talk_value_decimal(speed, UNIT_PERCENT, 2, true);
-                }
+            if (pitch != PITCH_SPEED_100)
+                talk_value_decimal(pitch, UNIT_PERCENT, 2, true);
+            if (ts != PITCH_SPEED_100)
+            {
+                int32_t speed = GET_SPEED(pitch, ts);
+                talk_id(LANG_SPEED, true);
+                talk_value_decimal(speed, UNIT_PERCENT, 2, true);
             }
             return 0;
         }
@@ -808,7 +803,6 @@ static int wps_context_item_cb(int action,
             }
         }
 #endif
-
     }
     else if (action == ACTION_EXIT_MENUITEM) /* selected */
     {
@@ -1562,41 +1556,33 @@ static int execute_hotkey(int action)
     return return_code;      /* or return the associated value */
 }
 
-struct hk_menu_data
-{
-    const struct hotkey_assignment **hk_menu;
-    int hide_off;
-};
-
 static const char* hotkey_get_name(int selected_item, void * data,
                                      char * buffer, size_t buffer_len)
 {
     (void)buffer; (void)buffer_len;
-    struct hk_menu_data *hk_data = (struct hk_menu_data*)data;
-    return ID2P(hk_data->hk_menu[selected_item + hk_data->hide_off]->lang_id);
+    const struct hotkey_assignment **hk_menu =
+                (const struct hotkey_assignment**)data;
+    return ID2P(hk_menu[selected_item]->lang_id);
 }
 
 static int hotkey_get_talk(int selected_item, void * data)
 {
-    if (global_settings.talk_menu)
-    {
-        struct hk_menu_data *hk_data = (struct hk_menu_data*)data;
-        talk_id(hk_data->hk_menu[selected_item +  hk_data->hide_off]->lang_id, false);
-    }
+    const struct hotkey_assignment **hk_menu =
+                (const struct hotkey_assignment**)data;
+    talk_id(hk_menu[selected_item]->lang_id, false);
     return 0;
 }
 
 static enum themable_icons  hotkey_get_icon(int selected_item, void * data)
 {
-    struct hk_menu_data *hk_data = (struct hk_menu_data*)data;
-    return hk_data->hk_menu[selected_item + hk_data->hide_off]->icon;
+    const struct hotkey_assignment **hk_menu =
+                (const struct hotkey_assignment**)data;
+    return hk_menu[selected_item]->icon;
 }
 
 int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
 {
     const struct hotkey_assignment *hk_menu[ARRAYLEN(hotkey_items)];
-
-    struct hk_menu_data data = {hk_menu, execute ? 1 : 0};
 
     char *title = str(LANG_ONPLAY_MENU_TITLE);
 #ifdef HAVE_HOTKEY
@@ -1609,6 +1595,8 @@ int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
     for (size_t i = 0; i < ARRAYLEN(hotkey_items); i++)
     {
         hk_menu[i] = NULL; /*clear all the hk_menu entries prior to setting them */
+        if (hotkey_items[i].action == HOTKEY_OFF && execute)
+            continue; /* Don't display HOTKEY_OFF item */
         if ((hotkey_items[i].flags & flag) == flag)
         {
             if (!execute || hotkey_items[i].action != HOTKEY_CONTEXT_MENU)
@@ -1620,29 +1608,25 @@ int hotkey_run_menu(intptr_t flag, bool execute, int current_action)
         }
     }
 
-    /* count -1 don't display HOTKEY_OFF item */
-    simplelist_info_init(&info, title, count - data.hide_off, (void*)&data);
+    simplelist_info_init(&info, title, count, (void*)&hk_menu);
     info.get_name = hotkey_get_name;
     info.get_icon = hotkey_get_icon;
     info.get_talk = hotkey_get_talk;
-    info.selection = selected - data.hide_off;
+    info.selection = selected;
     simplelist_show_list(&info);
+
     if (execute)
     {
-        if (info.selection >= 0) /* run user selected hotkey item */
-        {
-            return execute_hotkey(hk_menu[info.selection + 1]->action);
-        }
-        return ONPLAY_RELOAD_DIR;
+        if (info.selection < 0) /* canceled */
+            return ONPLAY_RELOAD_DIR;
+        return execute_hotkey(hk_menu[info.selection]->action);
     }
     else
     {
-        if (info.selection >= 0) /* return selected hotkey item */
-        {
-            return hk_menu[info.selection]->action;
-        }
+        if (info.selection < 0) /* canceled */
+            return -1;
+        return hk_menu[info.selection]->action;
     }
-    return -1; /* canceled */
 }
 
 int onplay(char* file, int attr, int from_context, bool hotkey, int customaction)
@@ -1731,7 +1715,6 @@ int get_onplay_context(void)
 
 static int hotkey_menu_do_setting(void *param, int *setting, int flag)
 {
-
     int current = *setting;
     int item = (intptr_t)param;
 
@@ -1800,13 +1783,15 @@ void wps_context_menu_load_from_cfg(void* setting, char *value)
         if (*end == ',' || *end == '\0')
         {
             st = skip_whitespace(st);
-
-            for (size_t i = ARRAYLEN(hotkey_items) - 1; i < ARRAYLEN(hotkey_items); i--)
+            if (end - st  > 1)
             {
-                if (end-st > 1 &&
-                    strncasecmp(st, lang_id_to_english(hotkey_items[i].lang_id), end-st) == 0)
+                for (size_t i = ARRAYLEN(hotkey_items) - 1; i < ARRAYLEN(hotkey_items); i--)
                 {
-                    var |= HK_CTX_SET(item, hotkey_items[i].action);
+                    const char *this = lang_id_to_english(hotkey_items[i].lang_id);
+                    if (strncasecmp(st, this, end-st) == 0)
+                    {
+                        var |= HK_CTX_SET(item, hotkey_items[i].action);
+                    }
                 }
             }
             st = end + 1;
