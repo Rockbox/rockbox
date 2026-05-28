@@ -760,7 +760,7 @@ static int pbl_copyloop(int fd_copy, const char *src_filename,
     struct scrobbler_entry entry;
     long next_tick = *rb->current_tick;
     int count = 0;
-#ifdef LOGF_ENABLE
+#if defined(ROCKBOX_HAS_LOGF)
     int line_num = 0;
 #endif
     int lines_copied = 0;
@@ -775,7 +775,7 @@ static int pbl_copyloop(int fd_copy, const char *src_filename,
     while(rb->read_line(fd_src, buf, buf_sz) > 0)
     {
         char skipch = ' ';
-#ifdef LOGF_ENABLE
+#if defined(ROCKBOX_HAS_LOGF)
         line_num++;
 #endif
         do_timed_yield();
@@ -915,7 +915,7 @@ static int sbl_export(void)
 
         struct scrobbler_entry entry;
         int rd = 0;
-#ifdef LOGF_ENABLE
+#if defined(ROCKBOX_HAS_LOGF)
         int line_num = 0;
 #endif
 
@@ -927,7 +927,7 @@ static int sbl_export(void)
             {
                 if ((rd = rb->read_line(fd_copy, buf, sizeof(buf))) <= 0)
                     break;
-#ifdef LOGF_ENABLE
+#if defined(ROCKBOX_HAS_LOGF)
                 line_num++;
 #endif
                 if (buf[0] != ' ') /* skip culled entries comments and empty lines */
