@@ -57,14 +57,14 @@
 #define LDEBUGF(...)
 #endif
 
-#ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
+#if defined(LOGF_ENABLE)
+#if defined(ROCKBOX_HAS_LOGF)
 #define LOGF ci->logf
-#elif defined(LOGF_ENABLE)
-#include "logf.h"
-#undef LOGF
-#define LOGF logf
 #else
+#define LOGF DEBUGF
+#endif
+#else /* !LOGF_ENABLE */
 #define LOGF(...)
 #endif
 
