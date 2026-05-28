@@ -183,6 +183,9 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->data = data;
     gui_list->scroll_all = scroll_all;
     gui_list->selected_size = selected_size;
+    if (selected_size != 1)
+        FOR_NB_SCREENS(i)
+            skinlist_set_cfg(i, NULL);
     gui_list->title = NULL;
     gui_list->title_icon = Icon_NOICON;
 
