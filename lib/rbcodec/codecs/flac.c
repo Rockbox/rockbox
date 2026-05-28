@@ -468,7 +468,7 @@ enum codec_status codec_run(void)
     size_t bytesleft;
     int consumed;
     int res;
-#if defined(LOGF_ENABLE) || defined(DEBUG)
+#if defined(LOGF_ENABLE)
     int frame = 0;
 #endif
     intptr_t param;
@@ -530,7 +530,7 @@ enum codec_status codec_run(void)
              return CODEC_ERROR;
         }
         consumed=fc.gb.index/8;
-#if defined(LOGF_ENABLE) || defined(DEBUG)
+#if defined(LOGF_ENABLE)
         frame++;
 #endif
 
