@@ -959,14 +959,15 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
 }
 
 /* ----------------------------------------------------------------------- */
-/* This displays the bookmarks in a file and allows the user to            */
-/* select one to play.                                                     */
-/* *selected_bookmark contains a non NULL value on successful bookmark     */
-/* selection.                                                              */
-/* Returns BOOKMARK_SUCCESS on successful bookmark selection, BOOKMARK_FAIL*/
-/* if no selection was made and BOOKMARK_USB_CONNECTED if the selection    */
-/* menu is forced to exit due to a USB connection.                         */
-/* ------------------------------------------------------------------------*/
+/* Displays bookmarks in a file, so user can select one to play.           */
+/*                                                                         */
+/* Returns                                                                 */
+/* BOOKMARK_SUCCESS              A bookmark or 'Don't Resume' was selected */
+/* BOOKMARK_FAIL                 No selection was made                     */
+/* BOOKMARK_USB_CONNECTED        USB connection forced exit of menu        */
+/*                                                                         */
+/* *selected_bookmark will point to bookmark if selected, or will be NULL  */
+/* ----------------------------------------------------------------------- */
 static int select_bookmark(const char* bookmark_file_name,
                            bool show_dont_resume,
                            char** selected_bookmark)
@@ -979,6 +980,7 @@ static int select_bookmark(const char* bookmark_file_name,
     bool exit = false;
     bool refresh = true;
     int ret = BOOKMARK_FAIL;
+    *selected_bookmark = NULL;
 
     bookmarks = plugin_get_buffer(&size);
     bookmarks->buffer_size = size;
@@ -996,9 +998,9 @@ static int select_bookmark(const char* bookmark_file_name,
 
     while (!exit)
     {
-
         if (refresh)
         {
+            refresh = false;
             int count = get_bookmark_count(bookmark_file_name);
             bookmarks->total_count = count;
 
@@ -1007,8 +1009,7 @@ static int select_bookmark(const char* bookmark_file_name,
                 /* No more bookmarks, delete file and exit */
                 splash(HZ, ID2P(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
-                *selected_bookmark = NULL;
-                return BOOKMARK_FAIL;
+                break;
             }
 
             if (bookmarks->show_dont_resume)
@@ -1032,82 +1033,61 @@ static int select_bookmark(const char* bookmark_file_name,
             gui_synclist_draw(&list);
             cond_talk_ids_fq(VOICE_EXT_BMARK);
             gui_synclist_speak_item(&list);
-            refresh = false;
         }
 
         list_do_action(CONTEXT_BOOKMARKSCREEN, HZ / 2, &list, &action);
         item = gui_synclist_get_sel_pos(&list) / 2;
 
         if (bookmarks->show_dont_resume)
-        {
             item--;
-        }
 
         if (action == ACTION_STD_CONTEXT)
         {
             gui_synclist_scroll_stop(&list);
-
-            MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
-                NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME),
-                ID2P(LANG_DELETE));
-            static const int menu_actions[] =
-            {
-                ACTION_STD_OK, ACTION_BMS_DELETE
-            };
+            MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU), NULL,
+                                ID2P(LANG_BOOKMARK_CONTEXT_RESUME),
+                                ID2P(LANG_DELETE));
+            static const int menu_actions[] = {ACTION_STD_OK,
+                                               ACTION_BMS_DELETE};
             int selection = do_menu(&menu_items, NULL, NULL, false);
-
             refresh = true;
 
             if (selection >= 0 && selection <=
                 (int) (sizeof(menu_actions) / sizeof(menu_actions[0])))
-            {
                 action = menu_actions[selection];
-            }
         }
-
         switch (action)
         {
         case ACTION_STD_OK:
-            if (item >= 0)
-            {
-                talk_shutup();
-                *selected_bookmark = bookmarks->items[item - bookmarks->start];
-                return BOOKMARK_SUCCESS;
-            }
-            exit = true;
             ret = BOOKMARK_SUCCESS;
-            break;
-
+            if (item >= 0)
+                *selected_bookmark = bookmarks->items[item - bookmarks->start];
+            /* fall through */
         case ACTION_TREE_WPS:
         case ACTION_STD_CANCEL:
             exit = true;
             break;
-
         case ACTION_BMS_DELETE:
-            if (item >= 0)
+            if (item < 0)
+                break;
+            if (confirm_delete_yesno("", str(LANG_BOOKMARK_CONTEXT_MENU)) == YESNO_YES)
             {
-                if (confirm_delete_yesno("", str(LANG_BOOKMARK_CONTEXT_MENU)) == YESNO_YES)
-                {
-                    delete_bookmark(bookmark_file_name, item);
-                    bookmarks->reload = true;
-                }
-                refresh = true;
+                delete_bookmark(bookmark_file_name, item);
+                bookmarks->reload = true;
             }
+            refresh = true;
             break;
-
         default:
             if (default_event_handler(action) == SYS_USB_CONNECTED)
             {
                 ret = BOOKMARK_USB_CONNECTED;
                 exit = true;
             }
-
             break;
         }
     }
-
+    gui_synclist_scroll_stop(&list);
     talk_shutup();
-    *selected_bookmark = NULL;
     return ret;
 }
 
