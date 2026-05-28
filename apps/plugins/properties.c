@@ -307,7 +307,8 @@ static bool assemble_track_info(const char *filename, struct dir_stats *stats)
         return false;
 #ifdef HAVE_TAGCACHE
     else if (props_type == PROPS_MUL_ID3 &&
-             !rb->tagtree_subentries_do_action(&mul_id3_add))
+             !rb->tagtree_entries_iterate(&mul_id3_add, str_filename,
+                                                 sizeof str_filename))
         return false;
 #endif
 

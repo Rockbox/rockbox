@@ -353,6 +353,7 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_del_item,
     gui_synclist_do_button,
     gui_synclist_set_title,
+    gui_synclist_scroll_stop,
     gui_syncyesno_run,
     simplelist_info_init,
     simplelist_show_list,
@@ -488,6 +489,7 @@ static const struct plugin_api rockbox_api = {
     talk_force_enqueue_next,
 
     /* kernel/ system */
+    panicf,
 #if defined(ARM_NEED_DIV0)
     __div0,
 #endif
@@ -562,7 +564,9 @@ static const struct plugin_api rockbox_api = {
     __cyg_profile_func_exit,
 #endif
     add_event,
+    add_event_ex,
     remove_event,
+    remove_event_ex,
     send_event,
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
@@ -578,6 +582,7 @@ static const struct plugin_api rockbox_api = {
     vsnprintf,
     vuprintf,
     strcpy,
+    strncpy,
     strlcpy,
     strlen,
     strrchr,
@@ -711,7 +716,7 @@ static const struct plugin_api rockbox_api = {
     tagcache_fill_tags,
 #endif
 #endif
-    tagtree_subentries_do_action,
+    tagtree_entries_iterate,
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -871,11 +876,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    panicf,
-    gui_synclist_scroll_stop,
-    add_event_ex,
-    remove_event_ex,
-    strncpy,
 };
 
 static int plugin_buffer_handle;

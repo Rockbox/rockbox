@@ -2649,17 +2649,17 @@ static bool tagtree_insert_selection(int position, bool queue,
     return ret;
 }
 
-/* Execute action_cb for all subentries of the current table's
+/* Execute action_cb for all entries of the current table's
  * selected item, handing over each entry's filename in the
  * callback function parameter. Parameter will be NULL for
  * entries whose filename couldn't be retrieved.
  */
-bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
+bool tagtree_entries_iterate(bool (*action_cb)(const char *file_name),
+                             char* buf, size_t buf_sz)
 {
     struct tagcache_search tcs;
     int i, n;
     unsigned long last_tick;
-    char buf[MAX_PATH];
     int ret = true;
     int dirlevel = tc->dirlevel;
     int selected_item = tc->selected_item;
@@ -2685,7 +2685,7 @@ bool tagtree_subentries_do_action(bool (*action_cb)(const char *file_name))
             }
 
             if (!action_cb(tagcache_retrieve(&tcs, tagtree_get_entry(tc, i)->extraseek,
-                                             tcs.type, buf, sizeof buf) ? buf : NULL))
+                                             tcs.type, buf, buf_sz) ? buf : NULL))
             {
                 ret = false;
                 break;

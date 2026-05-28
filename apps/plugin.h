@@ -180,7 +180,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 282
+#define PLUGIN_API_VERSION 283
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -413,6 +413,7 @@ struct plugin_api {
     bool (*gui_synclist_do_button)(struct gui_synclist * lists, int *action);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, const char* title,
                                    enum themable_icons icon);
+    void (*gui_synclist_scroll_stop)(struct gui_synclist *lists);
     enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,
                                         const struct text_message * yes_message,
                                         const struct text_message * no_message);
@@ -568,6 +569,7 @@ struct plugin_api {
     void (*talk_force_enqueue_next)(void);
 
     /* kernel/ system */
+    void (*panicf)(const char *msg, ...);
 #if defined(ARM_NEED_DIV0)
     void (*__div0)(void);
 #endif
@@ -654,7 +656,17 @@ struct plugin_api {
 #endif
     /* event api */
     bool (*add_event)(unsigned short id, void (*handler)(unsigned short id, void *data));
+    bool (*add_event_ex)(unsigned short id, bool oneshot,
+                         void (*handler)(unsigned short id,
+                                         void *event_data,
+                                         void *user_data),
+                         void *user_data);
     void (*remove_event)(unsigned short id, void (*handler)(unsigned short id, void *data));
+    void (*remove_event_ex)(unsigned short id,
+                            void (*handler)(unsigned short id,
+                                            void *event_data,
+                                            void *user_data),
+                            void *user_data);
     void (*send_event)(unsigned short id, void *data);
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
@@ -671,6 +683,7 @@ struct plugin_api {
     int (*vsnprintf)(char *buf, size_t size, const char *fmt, va_list ap);
     int (*vuprintf)(vuprintf_push_cb push, void *userp, const char *fmt, va_list ap);
     char* (*strcpy)(char *dst, const char *src);
+    char* (*strncpy)(char * dst, const char * src, size_t count);
     size_t (*strlcpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
     char * (*strrchr)(const char *s, int c);
@@ -829,7 +842,8 @@ struct plugin_api {
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
 #endif
-    bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
+    bool (*tagtree_entries_iterate)(bool (*action_cb)(const char *file_name),
+                                    char *buf, size_t buf_sz);
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -1025,19 +1039,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    void (*panicf)(const char *msg, ...);
-    void (*gui_synclist_scroll_stop)(struct gui_synclist *lists);
-    bool (*add_event_ex)(unsigned short id, bool oneshot,
-                         void (*handler)(unsigned short id,
-                                         void *event_data,
-                                         void *user_data),
-                         void *user_data);
-    void (*remove_event_ex)(unsigned short id,
-                            void (*handler)(unsigned short id,
-                                            void *event_data,
-                                            void *user_data),
-                            void *user_data);
-    char* (*strncpy)(char * dst, const char * src, size_t count);
 };
 
 /* plugin header */
