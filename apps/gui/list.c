@@ -49,8 +49,6 @@
 void list_draw(struct screen *display, struct gui_synclist *list);
 
 static long last_dirty_tick;
-static bool sb_title_is_dirty;
-static bool theme_enabled;
 static struct viewport parent[NB_SCREENS];
 static struct gui_synclist *current_lists;
 
@@ -224,32 +222,11 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
     return item_offset;
 }
 
-static void sb_title_cb(unsigned short id, void *data, void *userdata)
-{
-    (void)id;
-    (void)data;
-    theme_enabled = true;
-    gui_synclist_draw((struct gui_synclist *) userdata);
-}
-
 /*
  * Force a full screen update.
  */
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
-    if (sb_title_is_dirty)
-    {
-        sb_title_is_dirty = theme_enabled = false;
-
-        /* Redraw skin, and make skin engine call us back */
-        add_event_ex(GUI_EVENT_NEED_UI_UPDATE, true, sb_title_cb, gui_list);
-        send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
-        remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, sb_title_cb, gui_list);
-
-        /* sb_title_cb was only called if theme is enabled */
-        if (theme_enabled)
-            return;
-    }
     if (list_is_dirty(gui_list))
     {
         list_init_viewports(gui_list);
@@ -465,7 +442,7 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
     gui_list->title_icon = icon;
     FOR_NB_SCREENS(i)
         sb_set_title_text(title, icon, i);
-    sb_title_is_dirty = true;
+    send_event(GUI_EVENT_ACTIONREDRAW, (void*)1);
 }
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
