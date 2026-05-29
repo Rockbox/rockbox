@@ -180,7 +180,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 283
+#define PLUGIN_API_VERSION 284
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -824,6 +824,9 @@ struct plugin_api {
             void (*progressfunc)(int), bool generate_toc,
             unsigned char* tempbuf, size_t tempbuf_len);
 #ifdef HAVE_TAGCACHE
+    bool (*tagtree_entries_iterate)(struct tagcache_search *tcs,
+                                    bool (*action_cb)(const char *file_name),
+                                    char *buf, size_t buf_sz);
     bool (*tagcache_search)(struct tagcache_search *tcs, int tag);
     void (*tagcache_search_set_uniqbuf)(struct tagcache_search *tcs,
            void *buffer, long length);
@@ -840,10 +843,8 @@ struct plugin_api {
     bool (*tagcache_is_in_ram)(void);
 #if defined(HAVE_DIRCACHE)
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
-#endif
-#endif
-    bool (*tagtree_entries_iterate)(bool (*action_cb)(const char *file_name),
-                                    char *buf, size_t buf_sz);
+#endif /* HAVE_DIRCACHE */
+#endif /* HAVE_TC_RAMCACHE */
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART

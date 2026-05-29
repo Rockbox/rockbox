@@ -47,7 +47,8 @@ int tagtree_get_icon(struct tree_context* c);
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen);
 int tagtree_get_custom_action(struct tree_context* c);
 bool tagtree_get_subentry_filename(char *buf, size_t bufsize);
-bool tagtree_entries_iterate(bool (*action_cb)(const char *file_name),
+bool tagtree_entries_iterate(struct tagcache_search *tcs,
+                             bool (*action_cb)(const char *file_name),
                              char *buf, size_t buf_sz);
 
 #endif

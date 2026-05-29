@@ -34,6 +34,9 @@ enum props_types {
     PROPS_DIR
 };
 
+#ifdef HAVE_TAGCACHE
+static struct tagcache_search tcs;
+#endif
 static struct gui_synclist properties_lists;
 static struct mp3entry id3;
 static struct tm tm;
@@ -307,8 +310,8 @@ static bool assemble_track_info(const char *filename, struct dir_stats *stats)
         return false;
 #ifdef HAVE_TAGCACHE
     else if (props_type == PROPS_MUL_ID3 &&
-             !rb->tagtree_entries_iterate(&mul_id3_add, str_filename,
-                                                 sizeof str_filename))
+             !rb->tagtree_entries_iterate(&tcs, &mul_id3_add, str_filename,
+                                                       sizeof str_filename))
         return false;
 #endif
 

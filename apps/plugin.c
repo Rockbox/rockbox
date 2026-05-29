@@ -701,6 +701,7 @@ static const struct plugin_api rockbox_api = {
     count_mp3_frames,
     create_xing_header,
 #ifdef HAVE_TAGCACHE
+    tagtree_entries_iterate,
     tagcache_search,
     tagcache_search_set_uniqbuf,
     tagcache_search_add_filter,
@@ -714,9 +715,8 @@ static const struct plugin_api rockbox_api = {
     tagcache_is_in_ram,
 #if defined(HAVE_DIRCACHE)
     tagcache_fill_tags,
-#endif
-#endif
-    tagtree_entries_iterate,
+#endif /* HAVE_DIRCACHE */
+#endif /* HAVE_TC_RAMCACHE */
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
