@@ -94,7 +94,7 @@ int pct                     = 0; /* display ttc table if it is not zero. */
 FT_Long         max_char    = 0x10FFFF;
 int             pixel_size  = 15;
 FT_Long         start_char  = 0;
-FT_Long         defaultchar = 0;
+FT_Long         defaultchar = -1;
 FT_Long         limit_char;
 FT_Long         firstchar   = 0;
 FT_Long         lastchar;
@@ -714,7 +714,15 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         if (code <= firstchar)
             firstchar = code;
     }
-    export_font.header.defaultchar = defaultchar - firstchar;
+
+    /* calc default char */
+    if (defaultchar < 0 ||
+        defaultchar < firstchar ||
+        defaultchar > limit_char ||
+        defaultchar > lastchar)
+        defaultchar = firstchar;
+
+    export_font.header.defaultchar = defaultchar;
     export_font.header.firstchar = firstchar;
     export_font.header.size = lastchar - firstchar + 1;
     export_font.header.nbits = idx;
