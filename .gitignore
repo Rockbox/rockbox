@@ -83,6 +83,11 @@ __pycache__
 
 # imxtools
 /utils/imxtools/scsitools/scsitool
+/utils/imxtools/sbtools/elftosb
+/utils/imxtools/sbtools/elftosb1
+/utils/imxtools/sbtools/rsrctool
+/utils/imxtools/sbtools/sbloader
+/utils/imxtools/sbtools/sbtoelf
 
 # /utils/rbutilqt/
 /utils/rbutilqt/build
