@@ -884,7 +884,6 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     /* change unused width values to default char values */
     for (i=0; i<pf->size; ++i) {
         int defchar = pf->defaultchar - pf->firstchar;
-
         if (pf->offset[i] == -1)
             pf->width[i] = pf->width[defchar];
     }
@@ -1224,9 +1223,9 @@ int gen_c_source(struct font* pf, char *path)
         "   ascent: %d\n"
         "   descent: %d\n"
         "   depth: %d\n"
-        "   first char: %d (0x%02x)\n"
-        "   last char: %d (0x%02x)\n"
-        "   default char: %d (0x%02x)\n"
+        "   first char: %d (U+%06x)\n"
+        "   last char: %d (U+%06x)\n"
+        "   default char: %d (U+%06x)\n"
         "   proportional: %s\n"
         "   %s\n"
         "*/\n"
@@ -1234,6 +1233,7 @@ int gen_c_source(struct font* pf, char *path)
         "/* Font character bitmap data. */\n"
         "static const unsigned char _font_bits[] = {\n"
     };
+    int defchar = pf->defaultchar - pf->firstchar;
 
     ofp = fopen(path, "w");
     if (!ofp) {
@@ -1354,8 +1354,8 @@ int gen_c_source(struct font* pf, char *path)
             int offset = pf->offset[i];
             int offrot = pf->offrot[i];
             if (offset == -1) {
-                offset = pf->offset[pf->defaultchar - pf->firstchar];
-                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
+                offset = pf->offset[defchar];
+                offrot = pf->offrot[defchar];
             }
             fprintf(ofp, "  %d,\t/* (0x%02x) */\n",
 #ifdef ROTATE
@@ -1538,6 +1538,8 @@ int gen_fnt_file(struct font* pf, char *path)
     int ofr = 0;
 #endif
 
+    int defchar = pf->defaultchar - pf->firstchar;
+
     ofp = fopen(path, "wb");
     if (!ofp) {
         print_error("Can't create %s\n", path);
@@ -1612,7 +1614,7 @@ int gen_fnt_file(struct font* pf, char *path)
         {
             int offrot = pf->offrot[i];
             if (pf->offset[i] == -1) {
-                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
+                offrot = pf->offrot[defchar];
             }
             if ( pf->bits_size < MAX_FONTSIZE_FOR_16_BIT_OFFSETS )
                 writeshort(ofp, offrot);
@@ -1634,7 +1636,7 @@ int gen_fnt_file(struct font* pf, char *path)
         for (i=0; i<pf->size; ++i) {
             int offset = pf->offset[i];
             if (offset == -1) {
-                offset = pf->offset[pf->defaultchar - pf->firstchar];
+                offset = pf->offset[defchar];
             }
             writeint(ofp, offset);
         }
