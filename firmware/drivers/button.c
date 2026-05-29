@@ -201,7 +201,9 @@ static void button_tick(void)
 {
     static int count = 0;
     static int repeat_speed = REPEAT_INTERVAL_START;
+#ifdef HAVE_SW_POWEROFF
     static int repeat_count = 0;
+#endif
     static bool repeat = false;
     static bool post = false;
 #ifdef HAVE_BACKLIGHT
@@ -291,12 +293,12 @@ static void button_tick(void)
 
                         count = repeat_speed;
 
+#ifdef HAVE_SW_POWEROFF
                         repeat_count++;
-
                         /* Send a SYS_POWEROFF event if we have a device
                            which doesn't shut down easily with the OFF
                            key */
-#ifdef HAVE_SW_POWEROFF
+
                         if (enable_sw_poweroff &&
                             (btn & POWEROFF_BUTTON
 #ifdef RC_POWEROFF_BUTTON
@@ -336,7 +338,9 @@ static void button_tick(void)
                     {
                         post = true;
                         repeat = true;
+#ifdef HAVE_SW_POWEROFF
                         repeat_count = 0;
+#endif
                         /* initial repeat */
 #ifdef HAVE_TOUCHSCREEN
                         if (btn & BUTTON_TOUCHSCREEN)
