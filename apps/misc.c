@@ -374,9 +374,12 @@ static bool clean_shutdown(enum shutdown_type sd_type,
 #endif
 
         FOR_NB_SCREENS(i)
+            viewportmanager_theme_enable(i, true, NULL);
+        clear_screen_buffer(false);
+        FOR_NB_SCREENS(i)
         {
-            screens[i].clear_display();
             screens[i].update();
+            screens[i].scroll_stop();
         }
 
         if (batt_safe)
@@ -387,6 +390,8 @@ static bool clean_shutdown(enum shutdown_type sd_type,
             {
                 cancel_shutdown();
                 splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
+                FOR_NB_SCREENS(i)
+                    viewportmanager_theme_undo(i, false);
                 return false;
             }
 #endif
