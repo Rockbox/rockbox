@@ -1040,6 +1040,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    int (*font_measurestring)(const unsigned char *str, size_t maxbytes,
+                              size_t maxwidth, int *w, int *h, int fontnum);
 };
 
 /* plugin header */

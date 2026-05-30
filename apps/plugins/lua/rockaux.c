@@ -74,82 +74,96 @@ int splash_scroller(int timeout, const char* str)
 
     font_getstringsize("W", &ch_w, &ch_h, fontnum);
 
-    const int max_w = LCD_WIDTH - (ch_w * 2);
+    const int max_w = LCD_WIDTH;
     const int max_lines = LCD_HEIGHT / ch_h - 1;
-    const int wrap_thresh = (LCD_WIDTH / 3);
-    const char *ch;
-    const char *brk;
+    const int wrap_thresh = (LCD_WIDTH / 4);
 
     const int max_ch = (LCD_WIDTH / ch_w - 1) * 2;
-    char line[max_ch + 2]; /* display buffer */
-    const char break_chars[] = "@#$%^&*+-{}[]()/\\|<>:;.,? _\n\r\t";
+    char line[max_ch + 2]; /* display buffer +2 incase of tab chars */
+    const char break_chars[] = "/\\  \r\n\f\v";
+    const char *ch, *brk;
 
-    int linepos, curline, linesdisp, realline, chars_next_break;
+    int linepos, curline, linesdisp, maxl, last_break;
+    int realline = 0;
     int action = ACTION_NONE;
     int firstline = 0;
     int cycles = 2; /* get action timeout returns immediately on first call */
-
     while (cycles > 0)
     {
         /* walk whole buffer every refresh, only display relevant portion */
         lcd_clear_display();
         curline = 0;
-        linepos = 0;
         linesdisp = 0;
+        last_break = 0;
         ch = str;
-        for (; *ch && linepos < max_ch; ch++)
+        while(*ch != '\0')
         {
-            if (ch[0] == '\t')
+            linepos = 0;
+            brk = NULL;
+            maxl = rb->font_measurestring(ch, max_ch, max_w, &w, NULL, fontnum);
+            for (; *ch && linepos < maxl; ch++)
             {
-                line[linepos++] = ' ';
-                line[linepos] = ' ';
-            }
-            else if (ch[0] == '\b' && timeout > 0)
-            {
-                line[linepos] = ' ';
-                beep_play(1000, HZ, 1000);
-            }
-            else if (ch[0] < ' ' && ch[0] > '\0') /* Dont copy control characters */
-                line[linepos] = (linepos == 0) ? '\0' : ' ';
-            else
-                line[linepos] = ch[0];
+                if (strpbrk_n(ch, 1, break_chars))
+                {
+                    last_break = linepos;
+                    brk = ch;
+                    if (!isgraph(*brk)) /*!isprint() || isspace()*/
+                        brk++;
+                    if (*ch == '\n')
+                    {
+                        ch++;
+                        break;
+                    }
+                }
+                if (ch[0] == '\t')
+                {
+                    line[linepos++] = ' ';
+                    line[linepos] = ' ';
+                    if(maxl == max_ch)
+                        maxl-=2;
+                }
+                else if (ch[0] == '\b' || ch[0] == '\a')
+                {
+                    if (timeout > 0)
+                    {
+                        beep_play(1000, HZ, 1000);
+                    }
+                    continue;
+                }
+                else if (ch[0] < ' ' && ch[0] > '\0') /* Dont copy control characters */
+                {
+                    continue;
+                }
+                else
+                    line[linepos] = ch[0];
 
-            line[linepos + 1] = '\0'; /* terminate to check text extent */
-            font_getstringsize(line, &w, NULL, fontnum);
+                linepos++;
+            }
+            line[linepos] = '\0';
 
             /* try to not split in middle of words */
-            if (w + wrap_thresh >= max_w &&
-                strpbrk_n(ch, 1, break_chars))
+            if (last_break > 0 && *ch != '\0')
             {
-                brk = strpbrk_n(ch+1, max_ch, break_chars);
-                chars_next_break = (brk - ch);
-                if (brk &&
-                 (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w))
+                if (strpbrk_n(ch, 1, break_chars) ||
+                   (w + wrap_thresh > max_w && strpbrk_n(ch, max_ch, break_chars)))
                 {
-                    if (!isprint(line[linepos]))
-                    {
-                        line[linepos] = '\0';
-                        ch--; /* back-up we want it on the next line */
-                    }
-                    w += max_w;
+                    line[last_break] = '\0';
+                    ch = brk;
                 }
+            }
+            realline = curline - firstline;
+            if (realline >= 0 && realline < max_lines)
+            {
+                lcd_putsxy(0, realline * ch_h, line);
+                linesdisp++;
             }
 
-            if (w > max_w ||
-               (ch[0] >= '\n' && iscntrl(ch[0])) ||
-                ch[1] == '\0')
-            {
-                realline = curline - firstline;
-                if (realline >= 0 && realline < max_lines)
-                {
-                    lcd_putsxy(0, realline * ch_h, line);
-                    linesdisp++;
-                }
-                linepos = 0;
-                curline++;
-                continue;
-            }
-            linepos++;
+            curline++;
+        }
+
+        if (realline >= max_lines)
+        {
+            rb->lcd_hline(10, LCD_WIDTH - 10, LCD_HEIGHT - 1);
         }
 
         lcd_update();
