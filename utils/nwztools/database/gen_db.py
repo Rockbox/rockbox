@@ -51,7 +51,7 @@ for f in map_files:
     h = hashlib.md5()
     h.update(open(f, "rb").read())
     hash = h.hexdigest()
-    codename = re.search('nvp/([^\.]*)\.txt', f).group(1)
+    codename = re.search('nvp/([^\\.]*)\\.txt', f).group(1)
     # sanity check
     if not (codename in g_series_codename):
         print("Warning: file %s does not have a match series in series.txt" % f)
@@ -133,11 +133,11 @@ header_begin = \
 """\
 /***************************************************************************
  *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \\
- *                     \/            \/     \/    \/            \/
+ *   Open      \\______   \\ ____   ____ |  | _\\_ |__   _______  ___
+ *   Source     |       _//  _ \\_/ ___\\|  |/ /| __ \\ /  _ \\  \\/  /
+ *   Jukebox    |    |   (  <_> )  \\___|    < | \\_\\ (  <_> > <  <
+ *   Firmware   |____|_  /\\____/ \\___  >__|_ \\|___  /\\____/__/\\_ \\
+ *                     \\/            \\/     \\/    \\/            \\/
  *
  * Copyright (C) 2016 Amaury Pouly
  *
@@ -153,7 +153,7 @@ header_begin = \
 #ifndef __NWZ_DB_H__
 #define __NWZ_DB_H__
 
-/** /!\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\ */
+/** /!\\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\\ */
 
 /* List of all known NVP nodes */
 enum nwz_nvp_node_t
@@ -232,11 +232,11 @@ impl_begin = \
 """\
 /***************************************************************************
  *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \\
- *                     \/            \/     \/    \/            \/
+ *   Open      \\______   \\ ____   ____ |  | _\\_ |__   _______  ___
+ *   Source     |       _//  _ \\_/ ___\\|  |/ /| __ \\ /  _ \\  \\/  /
+ *   Jukebox    |    |   (  <_> )  \\___|    < | \\_\\ (  <_> > <  <
+ *   Firmware   |____|_  /\\____/ \\___  >__|_ \\|___  /\\____/__/\\_ \\
+ *                     \\/            \\/     \\/    \\/            \\/
  *
  * Copyright (C) 2016 Amaury Pouly
  *
@@ -250,7 +250,7 @@ impl_begin = \
  *
  ****************************************************************************/
 
-/** /!\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\ */
+/** /!\\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\\ */
 
 #include "nwz-db.h"
 

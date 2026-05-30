@@ -193,6 +193,7 @@ __pycache__
 # /utils/nwztools
 /utils/nwztools/scsitools/scsitool
 /utils/nwztools/upgtools/upgtool
+/utils/nwztools/emmctools/emmctool
 
 #  utils/rk27utils 
 /utils/rk27utils/rkboottool/rkboottool
