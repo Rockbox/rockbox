@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: skin_parser.c 26752 2010-06-10 21:22:16Z bieber $
  *
  * Copyright (C) 2010 Jonathan Gordon
  *

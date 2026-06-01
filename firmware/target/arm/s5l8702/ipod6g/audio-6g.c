@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: audio-nano2g.c 23095 2009-10-11 09:17:12Z dave $
  *
  * Copyright (C) 2006 by Michael Sevakis
  *

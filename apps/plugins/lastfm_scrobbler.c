@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2024 William Wilgus
  *
@@ -67,6 +66,7 @@ Example
     All fields except those marked (optional) above are required.
 */
 
+#include "rbversion.h"
 #include "plugin.h"
 #include "lib/configfile.h"
 
@@ -87,7 +87,7 @@ Example
 /* increment this on any code change that effects output */
 #define SCROBBLER_VERSION "1.1"
 
-#define SCROBBLER_REVISION " $Revision$"
+#define SCROBBLER_REVISION " " RBVERSION " "
 
 #define SCROBBLER_BAD_ENTRY "# FAILED - "
 

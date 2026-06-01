@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   Generic MOD loader (Protracker, StarTracker, FastTracker, etc)
 

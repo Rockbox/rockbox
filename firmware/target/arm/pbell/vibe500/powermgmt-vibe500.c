@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
  *
  * Copyright (C) 2002 by Heikki Hannikainen, Uwe Freese
  * Revisions copyright (C) 2005 by Gerald Van Baren

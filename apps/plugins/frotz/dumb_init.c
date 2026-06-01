@@ -1,5 +1,4 @@
 /* dumb-init.c
- * $Id: dumb-init.c,v 1.1.1.1 2002/03/26 22:38:34 feedle Exp $
  *
  * Copyright 1997,1998 Alva Petrofsky <alva@petrofsky.berkeley.ca.us>.
  * Any use permitted provided this notice stays intact.

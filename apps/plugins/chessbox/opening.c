@@ -5,7 +5,6 @@
 *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 *                     \/            \/     \/    \/            \/
-* $Id$
 *
 * Copyright (C) 1986, 1987, 1988 Free Software Foundation, Inc.
 * Copyright (c) 1987 by Stuart Cracraft and John Stanback

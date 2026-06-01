@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wmcodec.h 17847 2008-06-28 18:10:04Z bagder $
  *
  * Copyright (C) 2006 by Marcoen Hirschberg
  *

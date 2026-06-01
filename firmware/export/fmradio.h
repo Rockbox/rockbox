@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  * Driver to control the (Samsung) tuner via port-banging SPI
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing

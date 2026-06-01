@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
  Example Lua Return to WPS on exit
  Copyright (C) 2021 William Wilgus
  This program is free software; you can redistribute it and/or

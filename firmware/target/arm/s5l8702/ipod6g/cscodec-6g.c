@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wmcodec-s5l8700.c 22025 2009-07-25 00:49:13Z dave $
  *
  * S5L8702-specific code for Cirrus codecs
  *

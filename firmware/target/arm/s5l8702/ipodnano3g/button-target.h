@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: button-target.h 21828 2009-07-12 22:16:51Z dave $
  *
  * Copyright (C) 2006 by Barry Wardell
  *

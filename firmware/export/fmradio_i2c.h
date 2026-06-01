@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  * Physical interface of the Philips TEA5767 in Archos Ondio
  *
  * Copyright (C) 2004 by Jörg Hohensohn

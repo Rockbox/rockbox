@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   Error handling functions.
   Register an error handler with _mm_RegisterErrorHandler() and you're all set.

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: powermgmt-nano2g.c 28159 2010-09-24 22:42:06Z Buschel $
  *
  * Copyright © 2008 Rafaël Carré
  *

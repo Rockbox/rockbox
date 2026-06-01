@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: tag_table.c 26346 2010-05-28 02:30:27Z jdgordon $
  *
  * Copyright (C) 2010 Jonathan Gordon
  *

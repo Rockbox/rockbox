@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-nano2g.c 28868 2010-12-21 06:59:17Z Buschel $
  *
  * Copyright (C) 2009 by Dave Chapman
  *

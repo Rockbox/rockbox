@@ -2,7 +2,6 @@
 
 libdemac - A Monkey's Audio decoder
 
-$Id$
 
 Copyright (C) Dave Chapman 2007
 

@@ -5,7 +5,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id: wpsbuild.pl 24813 2010-02-21 19:10:57Z kugel $
 #
 
 # usage: updatetheme.pl theme.zip workingdir [options passed to skinupdater]

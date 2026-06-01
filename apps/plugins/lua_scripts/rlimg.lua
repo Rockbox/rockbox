@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
  Example Lua RBIMAGE script
  Copyright (C) 2009 by Maurus Cuelenaere -- some prior work
  Copyright (C) 2017 William Wilgus

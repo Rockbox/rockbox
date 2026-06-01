@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   These routines are used to access the available module loaders
 

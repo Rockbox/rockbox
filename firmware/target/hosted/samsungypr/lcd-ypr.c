@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-bitmap.c 29248 2011-02-08 20:05:25Z thomasjfox $
  *
  * Copyright (C) 2011 Lorenzo Miori, Thomas Martitz
  * Copyright (C) 2013 Lorenzo Miori

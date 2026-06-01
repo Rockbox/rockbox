@@ -11,7 +11,6 @@ echo <<<MOO
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# \$Id$
 #
 # Generated from $svn\x61apps/plugin.h
 #

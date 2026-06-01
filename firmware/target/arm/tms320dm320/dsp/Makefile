@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id: Makefile 12058 2007-01-18 00:46:52Z dave $
 #
 
 # http://daniel.haxx.se/blog/2007/11/18/free-to-use-compiler-from-ti/

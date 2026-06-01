@@ -6,7 +6,6 @@
 #
 # Written by Miika Pekkarinen <slasher@ihme.org>
 #
-# $Id$
 
 use strict;
 

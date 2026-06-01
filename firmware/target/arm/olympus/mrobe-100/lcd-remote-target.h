@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-remote-target.h 11967 2007-01-09 23:29:07Z linus $
  *
  * Copyright (C) 2007 by Jens Arnold
  *

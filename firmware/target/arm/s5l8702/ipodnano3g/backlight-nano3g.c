@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-nano2g.c 28601 2010-11-14 20:39:18Z theseven $
  *
  * Copyright (C) 2009 by Dave Chapman
  *

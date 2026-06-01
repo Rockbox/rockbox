@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: main-e200r-installer.c 15599 2007-11-12 18:49:53Z amiconn $
  *
  * Copyright (C) 2011 by Frank Gevaerts
  *

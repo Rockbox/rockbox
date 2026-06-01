@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
 
  Port of Chain Reaction (which is based on Boomshine) to Rockbox in Lua.
  See http://www.yvoschaap.com/chainrxn/ and http://www.k2xl.com/games/boomshine/

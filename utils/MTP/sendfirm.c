@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Based on sendfile.c from libmtp: http://libmtp.sourceforge.net
  * Modified by Maurus Cuelenaere and Nicolas Pennequin.

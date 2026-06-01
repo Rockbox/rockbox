@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: keymap-ctru.c 28704 2025-07-09 11:28:53Z gama $
  *
  * Copyright (C) 2025 Mauricio Garrido
  *

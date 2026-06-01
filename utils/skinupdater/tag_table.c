@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: tag_table.c 26297 2010-05-26 03:53:06Z jdgordon $
  *
  * Copyright (C) 2010 Robert Bieber
  *

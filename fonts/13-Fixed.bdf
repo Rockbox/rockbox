@@ -5,7 +5,6 @@ COMMENT This font was scaled down from a 14x14 source font
 COMMENT Hangul glyphs prepared by Won-kyu Park <wkpark@chem.skku.ac.kr>
 COMMENT from BAEKMUK font.
 COMMENT Send bug reports to Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/>
-COMMENT $Id$
 FONT -Misc-Fixed-Medium-R-Normal-ja-13-120-75-75-C-120-ISO10646-1
 SIZE 12 75 75
 FONTBOUNDINGBOX 12 13 0 -2

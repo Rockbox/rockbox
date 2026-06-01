@@ -19,7 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id$ */
 
 #include <ctype.h>
 #include "SDL_endian.h"

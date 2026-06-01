@@ -7,7 +7,6 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * $Id$
  * 
  * Rockbox plugin copyright (C) 2009 Dave Chapman.
  * Based on encryption code (C) 2009 Michael Sparmann

@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   MOD format period table.  Used by both the MOD and M15 (15-inst mod) Loaders.
 

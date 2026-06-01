@@ -28,7 +28,6 @@
   in december 2002.
 */
 
-/* $Id$ */
 
 #include "SDL_endian.h"
 #include "SDL_mixer.h"

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: skin_buffer.c 25962 2010-05-12 09:31:40Z jdgordon $
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  * Copyright (C) 2009 Jonathan Gordon

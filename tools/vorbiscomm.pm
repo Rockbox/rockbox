@@ -3,7 +3,6 @@
 # http://search.cpan.org/~amolloy/Ogg-Vorbis-Header-PurePerl-0.07/PurePerl.pm
 # written by Andrew Molloy
 # Code under GNU GENERAL PUBLIC LICENCE v2
-# $Id$
 #############################################################################
 
 package vorbiscomm;

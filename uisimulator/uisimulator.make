@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 
 INCLUDES += -I$(ROOTDIR)/uisimulator/bitmaps -I$(ROOTDIR)/uisimulator/common -I$(ROOTDIR)/uisimulator/buttonmap $\

@@ -1,4 +1,3 @@
-/* $Id$ */
 #ifndef MPEG2DEC_CONFIG_H
 #define MPEG2DEC_CONFIG_H
 

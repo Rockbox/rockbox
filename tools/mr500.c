@@ -9,7 +9,6 @@
  *   Copyright (C) 2009 by Karl Kurbjun
  *      based on work by Shirour:
  *          http://www.mrobe.org/forum/viewtopic.php?f=6&t=2176
- *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
  Example Lua File Viewer script
  Copyright (C) 2017 William Wilgus
  This program is free software; you can redistribute it and/or

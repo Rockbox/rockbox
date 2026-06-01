@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
 
  Port and extension of Pixel Painter by Pavel Bakhilau
  (http://js1k.com/2010-first/demo/453) to Rockbox Lua.

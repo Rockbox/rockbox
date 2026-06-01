@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   UNIMOD (libmikmod's and APlayer's internal module format) loader
 

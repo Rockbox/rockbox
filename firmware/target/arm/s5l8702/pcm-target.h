@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: system-target.h 28791 2010-12-11 09:39:33Z Buschel $
  *
  * Copyright (C) 2010 by Michael Sparmann
  *

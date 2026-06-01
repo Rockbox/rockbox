@@ -5,7 +5,6 @@
 "   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 "   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 "                     \/            \/     \/    \/            \/
-" $Id$
 "
 " Vim syntax file for Rockbox WPS (While Playing Screen) definitions.
 " Copyright (C) 2009 by Kevin Schoedel

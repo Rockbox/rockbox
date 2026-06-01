@@ -22,7 +22,6 @@
   This file by Vaclav Slavik (vaclav.slavik@matfyz.cz).
 */
 
-/* $Id$ */
 
 #ifdef OGG_MUSIC
 

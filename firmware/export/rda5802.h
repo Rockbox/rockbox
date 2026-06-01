@@ -6,7 +6,6 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * $Id$
  *
  * Tuner header for the RDA Microelectronics RDA5802 FM tuner chip
  *

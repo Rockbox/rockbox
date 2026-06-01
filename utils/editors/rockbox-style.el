@@ -1,5 +1,4 @@
 ;;;; Emacs Lisp help for writing rockbox code. ;;;;
-;;;; $Id$
 
 ;;; The rockbox hacker's C conventions.
 

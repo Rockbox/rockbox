@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Orginal from Vision-8 Emulator / Copyright (C) 1997-1999  Marcel de Kogel
  * Modified for Archos by Blueloop (a.wenger@gmx.de)

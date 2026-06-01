@@ -29,7 +29,6 @@
         (http://www.freshmeat.net/projects/sox/)
 */
 
-/* $Id$ */
 
 #include "SDL_mutex.h"
 #include "SDL_endian.h"

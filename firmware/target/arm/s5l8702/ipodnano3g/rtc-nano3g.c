@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: rtc-nano2g.c 23114 2009-10-11 18:20:56Z theseven $
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese, Laurent Baum
  *

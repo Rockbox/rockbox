@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: wm8975.c 28572 2010-11-13 11:38:38Z theseven $
  *
  * Driver for Cirrus Logic CS42L55 audio codec
  *

@@ -5,7 +5,6 @@
    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
                      \/            \/     \/    \/            \/
- $Id$
 
  Port of Stopwatch to Lua for touchscreen targets.
  Original copyright: Copyright (C) 2004 Mike Holden

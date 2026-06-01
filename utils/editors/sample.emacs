@@ -1,4 +1,3 @@
-;; $Id$ -*- emacs-lisp -*-
 
 ;; Here's a sample .emacs file that might help you along the way.
 

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: ata.h 28951 2011-01-02 23:02:55Z theseven $
  *
  * Copyright (C) 2011 by Michael Sparmann
  *

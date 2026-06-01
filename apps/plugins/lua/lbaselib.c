@@ -1,5 +1,4 @@
 /*
-** $Id: lbaselib.c,v 1.191.1.6 2008/02/14 16:46:22 roberto Exp $
 ** Basic library
 ** See Copyright Notice in lua.h
 */
@@ -232,7 +231,6 @@ static int luaB_type (lua_State *L) {
 }
 
 
-/** $Id: lbaselib.c,v 1.276.1.1 2013/04/12 18:48:47 roberto Exp $ */
 static int pairsmeta (lua_State *L, const char *method, int iszero,
                       lua_CFunction iter) {
   if (!luaL_getmetafield(L, 1, method)) {  /* no metamethod? */

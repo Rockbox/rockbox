@@ -5,7 +5,6 @@
  *   Jukebox    |    |   ( (__) )  \___|    ( | \_\ ( (__) )    (
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2006 - 2008 Alexander Papst
  * Idea from http://www.tetris1d.org

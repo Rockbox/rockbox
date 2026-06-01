@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-hdd.c 28307 2010-10-18 19:54:18Z b0hoon $
  *
  * Copyright (C) 2008 by Mark Arigo
  *

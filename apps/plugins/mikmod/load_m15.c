@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   15 instrument MOD loader
   Also supports Ultimate Sound Tracker (old M15 format)

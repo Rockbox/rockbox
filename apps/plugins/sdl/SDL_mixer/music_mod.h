@@ -19,7 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* $Id: music_mod.h 4211 2008-12-08 00:27:32Z slouken $ */
 
 #ifdef MOD_MUSIC
 

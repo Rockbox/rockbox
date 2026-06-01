@@ -22,7 +22,6 @@
 	~ Austen Dicken (admin@cvpcs.org)
 */
 
-/* $Id:  $ */
 
 #ifdef FLAC_MUSIC
 

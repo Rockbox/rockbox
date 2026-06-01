@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: adc-target.h 21734 2009-07-09 20:17:47Z bertrik $
  *
  * Copyright (C) 2006 by Barry Wardell
  *

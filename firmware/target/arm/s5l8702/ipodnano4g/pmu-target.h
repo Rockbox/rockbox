@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: pmu-target.h 24721 2010-02-17 15:54:48Z theseven $
  *
  * Copyright © 2009 Michael Sparmann
  *

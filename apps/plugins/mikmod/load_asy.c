@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   ASYLUM Music Format v1.0 (.amf) loader
   adapted from load_mod.c by Raphael Assenat <raph@raphnet.net>,

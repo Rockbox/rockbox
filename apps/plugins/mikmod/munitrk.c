@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id$
 
   All routines dealing with the manipulation of UNITRK streams
 

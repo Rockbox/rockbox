@@ -20,7 +20,6 @@
 
 /*==============================================================================
 
-  $Id: mlreg.c,v 1.2 2005/03/30 19:11:34 realtech Exp $
 
   Routine for registering all loaders in libmikmod for the current platform.
 

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: fat32format.c 30351 2011-08-25 19:58:47Z thomasjfox $
  *
  *
  * FAT32 formatting functions.  Based on:

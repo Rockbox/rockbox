@@ -19,7 +19,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: lame.h,v 1.170.2.4 2009/01/18 15:44:28 robert Exp $ */
 
 #ifndef LAME_LAME_H
 #define LAME_LAME_H

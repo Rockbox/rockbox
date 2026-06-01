@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: powermgmt-e200.c 14375 2007-08-17 06:45:18Z amiconn $
  *
  * Copyright (C) 2002 by Heikki Hannikainen, Uwe Freese
  * Revisions copyright (C) 2005 by Gerald Van Baren

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: crt0.S 18776 2008-10-11 18:32:17Z gevaerts $
  *
  * Copyright (C) 2008 by Marcoen Hirschberg
  * Copyright (C) 2008 by Denes Balatoni

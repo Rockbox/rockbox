@@ -5,7 +5,6 @@
  *   Jukebox    |    |   ( (__) )  \___|    ( | \_\ ( (__) )    (
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2007 Vuong Minh Hiep (vmh)
  * Copyright (C) 2008 Thomas Martitz (kugel.)

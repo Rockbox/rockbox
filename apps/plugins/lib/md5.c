@@ -2,7 +2,6 @@
  * md5.c: not so strong MD5 hashing
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
- * $Id: cb57f7b6522df0960a924193cfca438c03a92521 $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>

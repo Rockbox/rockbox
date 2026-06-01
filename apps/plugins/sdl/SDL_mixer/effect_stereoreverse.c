@@ -24,7 +24,6 @@
   effect callback API. They are meant for speed over quality.  :)
 */
 
-/* $Id$ */
 
 #include "SDL.h"
 #include "SDL_mixer.h"

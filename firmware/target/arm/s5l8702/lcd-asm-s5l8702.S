@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-as-video.S 26756 2010-06-11 04:41:36Z funman $
  *
  * Copyright (C) 2010 by Andree Buschmann
  *

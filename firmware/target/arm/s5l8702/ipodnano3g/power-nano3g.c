@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: power-nano2g.c 28190 2010-10-01 18:09:10Z Buschel $
  *
  * Copyright © 2009 Bertrik Sikken
  *

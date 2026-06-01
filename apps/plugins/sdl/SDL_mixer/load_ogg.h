@@ -22,7 +22,6 @@
   This file by Vaclav Slavik (vaclav.slavik@matfyz.cz).
 */
 
-/* $Id$ */
 
 #ifdef OGG_MUSIC
 /* Don't call this directly; use Mix_LoadWAV_RW() for now. */

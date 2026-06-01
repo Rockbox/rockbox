@@ -21,8 +21,6 @@ use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
 use_logf_serial="#undef LOGF_SERIAL"
 
-scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
-
 rbdir="/.rockbox"
 bindir=
 libdir=

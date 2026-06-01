@@ -1,5 +1,4 @@
 /* dumb-output.c
- * $Id: dumb-output.c,v 1.2 2002/03/26 22:52:31 feedle Exp $
  *
  * Copyright 1997,1998 Alfresco Petrofsky <alfresco@petrofsky.berkeley.edu>.
  * Any use permitted provided this notice stays intact.
