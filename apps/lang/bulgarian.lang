@@ -14943,20 +14943,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Избери плъгин за WPS контекст"
-  </dest>
-  <voice>
-    *: "Избери плъгин за WPS контекст"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -15805,16 +15791,16 @@
 </phrase>
 <phrase>
   id: LANG_DEFAULT_BROWSER
-  desc: in Settings
+  desc: deprecated
   user: core
   <source>
-    *: "Default Browser"
+    *: ""
   </source>
   <dest>
-    *: "Браузър по подразбиране"
+    *: ""
   </dest>
   <voice>
-    *: "Браузър по подразбиране"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16987,5 +16973,257 @@
   </dest>
   <voice>
     *: "Ю Ес Би"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Избери елемент за контекст"
+  </dest>
+  <voice>
+    *: "Избери елемент за контекст"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_NOT_FOUND
+  desc: When file does not exist
+  user: core
+  <source>
+    *: "File not found"
+  </source>
+  <dest>
+    *: "Не е намерен файл"
+  </dest>
+  <voice>
+    *: "Не е намерен файл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_IN_FILES
+  desc: Reveal item in File Browser
+  user: core
+  <source>
+    *: "Show in Files"
+  </source>
+  <dest>
+    *: "Покажи във файлов мениджър"
+  </dest>
+  <voice>
+    *: "Покажи във файлов мениджър"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_SWAP
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Left & Right"
+  </source>
+  <dest>
+    *: "Размяна на ляво/дясно"
+  </dest>
+  <voice>
+    *: "Размяна на ляво и дясно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_SET
+  desc: countdown_timer plugin - header shown on the setup screen where the user enters the countdown duration
+  user: core
+  <source>
+    *: "SET TIMER"
+  </source>
+  <dest>
+    *: "НАСТРОЙКА ТАЙМЕР"
+  </dest>
+  <voice>
+    *: "Настройка таймер"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_RUNNING
+  desc: countdown_timer plugin - status label shown while the countdown is active
+  user: core
+  <source>
+    *: "RUNNING"
+  </source>
+  <dest>
+    *: "АКТИВЕН"
+  </dest>
+  <voice>
+    *: "Активен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_PAUSED
+  desc: countdown_timer plugin - status label shown while the countdown is paused
+  user: core
+  <source>
+    *: "PAUSED"
+  </source>
+  <dest>
+    *: "ПАУЗА"
+  </dest>
+  <voice>
+    *: "Пауза"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_OVERTIME
+  desc: countdown_timer plugin - status label shown when the countdown has passed zero and is counting up
+  user: core
+  <source>
+    *: "OVERTIME"
+  </source>
+  <dest>
+    *: "ИЗВЪНРЕДНО"
+  </dest>
+  <voice>
+    *: "Извънредно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_FINISHED
+  desc: countdown_timer plugin - status label shown at the moment the countdown expires
+  user: core
+  <source>
+    *: "FINISHED"
+  </source>
+  <dest>
+    *: "ЗАВЪРШЕН"
+  </dest>
+  <voice>
+    *: "Завършен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Избери елемент за контекст"
+  </dest>
+  <voice>
+    *: "Избери елемент за контекст"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_NOT_FOUND
+  desc: When file does not exist
+  user: core
+  <source>
+    *: "File not found"
+  </source>
+  <dest>
+    *: "Не е намерен файл"
+  </dest>
+  <voice>
+    *: "Не е намерен файл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_IN_FILES
+  desc: Reveal item in File Browser
+  user: core
+  <source>
+    *: "Show in Files"
+  </source>
+  <dest>
+    *: "Покажи във файлов мениджър"
+  </dest>
+  <voice>
+    *: "Покажи във файлов мениджър"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_SWAP
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Left & Right"
+  </source>
+  <dest>
+    *: "Размяна на ляво/дясно"
+  </dest>
+  <voice>
+    *: "Размяна на ляво и дясно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_SET
+  desc: countdown_timer plugin - header shown on the setup screen where the user enters the countdown duration
+  user: core
+  <source>
+    *: "SET TIMER"
+  </source>
+  <dest>
+    *: "НАСТРОЙКА ТАЙМЕР"
+  </dest>
+  <voice>
+    *: "Настройка таймер"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_RUNNING
+  desc: countdown_timer plugin - status label shown while the countdown is active
+  user: core
+  <source>
+    *: "RUNNING"
+  </source>
+  <dest>
+    *: "АКТИВЕН"
+  </dest>
+  <voice>
+    *: "Активен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_PAUSED
+  desc: countdown_timer plugin - status label shown while the countdown is paused
+  user: core
+  <source>
+    *: "PAUSED"
+  </source>
+  <dest>
+    *: "ПАУЗА"
+  </dest>
+  <voice>
+    *: "Пауза"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_OVERTIME
+  desc: countdown_timer plugin - status label shown when the countdown has passed zero and is counting up
+  user: core
+  <source>
+    *: "OVERTIME"
+  </source>
+  <dest>
+    *: "ИЗВЪНРЕДНО"
+  </dest>
+  <voice>
+    *: "Извънредно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_FINISHED
+  desc: countdown_timer plugin - status label shown at the moment the countdown expires
+  user: core
+  <source>
+    *: "FINISHED"
+  </source>
+  <dest>
+    *: "ЗАВЪРШЕН"
+  </dest>
+  <voice>
+    *: "Завършен"
   </voice>
 </phrase>
