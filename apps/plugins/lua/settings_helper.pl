@@ -25,7 +25,7 @@ use warnings;
 #  first pass outputs a c file that shall be compiled with the -S option
 #  second pass extracts the member, offset, size, type from the assembly
 
-my $svnrev = '$Revision$';
+my $svnrev = '';
 my $helper_name = 'LUA_RB_SETTINGS_H_HELPER';
 
 ############# configuration #############

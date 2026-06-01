@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 ############################################################################
-#             __________               __   ___.                  
-#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
-#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
-#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
-#                     \/            \/     \/    \/            \/ 
+#                     \/            \/     \/    \/            \/
 #
 # Copyright (C) 2009 by Maurus Cuelenaere
 #
@@ -36,7 +36,7 @@ sub rand_string
 {
     my @chars=('a'..'z');
     my $ret;
-    foreach (1..5) 
+    foreach (1..5)
     {
         $ret .= $chars[rand @chars];
     }
@@ -179,7 +179,7 @@ while(<STDIN>)
     }
 }
 
-my $svnrev = '$Revision$';
+my $svnrev = '';
 
 # Print the header
 print <<EOF
@@ -389,7 +389,7 @@ foreach my $function (@sorted_functions)
         {
             $func_args .= ", ".$arguments[$i]{'name'};
         }
-        
+
         # Print the function call
         my $func = sprintf("rb->%s(%s)", @$function{'name'}, $func_args);
 

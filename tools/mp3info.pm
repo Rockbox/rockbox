@@ -16,7 +16,7 @@ use Carp;
 use Fcntl qw(:seek);
 
 use vars qw(
-	@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $REVISION
+	@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION
 	@mp3_genres %mp3_genres @winamp_genres %winamp_genres $try_harder
 	@t_bitrate @t_sampling_freq @frequency_tbl %v1_tag_fields
 	@v1_tag_names %v2_tag_names %v2_to_v1_names $AUTOLOAD
@@ -36,8 +36,6 @@ use vars qw(
 	all	=> [@EXPORT, @EXPORT_OK]
 );
 
-# $Id$
-($REVISION) = ' $Revision$ ' =~ /\$Revision:\s+([^\s]+)/;
 $VERSION = '1.26'; # Just adds metadata 
 
 # JRF: Whether we're debugging the ID3v2.4 support
