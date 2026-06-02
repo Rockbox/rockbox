@@ -152,11 +152,6 @@ void gui_sync_skin_init(void)
     }
 }
 
-void skin_unload_all(void)
-{
-    gui_sync_skin_init();
-}
-
 static void skin_reset_buffers(int item, int screen)
 {
     skin_data_free_buflib_allocs(&skins[item][screen].data);
