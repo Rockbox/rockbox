@@ -932,7 +932,7 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     while(1)
     {
-        list_do_action(CONTEXT_TREE, info->timeout, &lists, &action);
+        list_do_action(CONTEXT_TREE|ALLOW_SOFTLOCK, info->timeout, &lists, &action);
 
         /* We must yield in this case or no other thread can run */
         if (info->timeout == TIMEOUT_NOBLOCK)

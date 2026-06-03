@@ -532,7 +532,7 @@ bool option_screen(const struct settings_list *setting,
         if (!allow_wrap)
             lists.wraparound = false;
 
-        if (list_do_action(CONTEXT_LIST, HZ, /* HZ so the status bar redraws */
+        if (list_do_action(CONTEXT_LIST|ALLOW_SOFTLOCK, HZ, /* HZ so the status bar redraws */
                            &lists, &action))
         {
             /* setting changed */
