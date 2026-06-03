@@ -744,9 +744,13 @@ int do_shortcut_menu(void *ignored)
 
         if (simplelist_show_list(&list))
             break; /* returning from USB screen */
-
         if (list.selection == -1)
             break; /* canceled */
+        if (list.selection == -2)
+        {
+            done = GO_TO_WPS;
+            break;
+        }
 
         sc = get_shortcut(list.selection, NULL);
         if (!sc)
