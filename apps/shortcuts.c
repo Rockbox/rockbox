@@ -765,17 +765,12 @@ int do_shortcut_menu(void *ignored)
             {
                 case SHORTCUT_PLAYLISTMENU:
                     if (!file_exists(sc->u.path))
-                    {
                         splash(HZ, ID2P(LANG_NO_FILES));
-                        break;
-                    }
                     else
-                    {
                         onplay_show_playlist_menu(sc->u.path,
                                                   dir_exists(sc->u.path) ? ATTR_DIRECTORY :
                                                   filetype_get_attr(sc->u.path),
                                                   NULL);
-                    }
                     break;
                 case SHORTCUT_FILE:
                     if (!file_exists(sc->u.path))
@@ -785,38 +780,33 @@ int do_shortcut_menu(void *ignored)
                     }
                     /* else fall through */
                 case SHORTCUT_BROWSER:
-                {
-                    if(open_plugin_add_path(ID2P(LANG_SHORTCUTS), sc->u.path, NULL) != 0)
+                    if (open_plugin_add_path(ID2P(LANG_SHORTCUTS),
+                                             sc->u.path, NULL) != 0)
                     {
                         done = GO_TO_PLUGIN;
                         break;
                     }
                     struct browse_context browse = {
-                        .dirfilter = global_settings.dirfilter,
+                        .dirfilter = SHOW_ALL, /* ignored for SHORTCUT_BROWSER */
                         .icon = Icon_NOICON,
                         .root = sc->u.path,
                     };
                     if (sc->type == SHORTCUT_FILE)
-                        browse.flags |= BROWSE_RUNFILE;
+                        browse.flags = BROWSE_RUNFILE | BROWSE_DIRFILTER;
                     done = rockbox_browse(&browse);
-
-                }
-                break;
-                case SHORTCUT_SETTING_APPLY:
-                {
+                    break;
+                case SHORTCUT_SETTING_APPLY:;
                     bool theme_changed;
                     string_to_cfg(sc->setting->cfg_name, sc->u.path, &theme_changed);
                     settings_save();
                     apply_new_setting(sc->setting);
                     break;
-                }
                 case SHORTCUT_SETTING:
-                {
-                    do_setting_screen(sc->setting,
-                        sc->name[0] ? sc->name : P2STR(ID2P(sc->setting->lang_id)),NULL);
+                    do_setting_screen(sc->setting, sc->name[0] ?
+                                      sc->name : P2STR(ID2P(sc->setting->lang_id)),
+                                      NULL);
                     apply_new_setting(sc->setting);
                     break;
-                }
                 case SHORTCUT_DEBUGITEM:
                     run_debug_screen(sc->u.path);
                     break;
@@ -838,7 +828,7 @@ int do_shortcut_menu(void *ignored)
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
-                  if (!sc->u.timedata.talktime)
+                    if (!sc->u.timedata.talktime)
 #endif
                     {
                         char timer_buf[10];
