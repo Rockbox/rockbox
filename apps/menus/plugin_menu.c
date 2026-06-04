@@ -55,12 +55,12 @@ static int plugins_menu(void* param)
     intptr_t item = (intptr_t)param;
     int ret;
 
-    struct browse_context browse = {
+    static struct browse_context browse = {
         .dirfilter = SHOW_PLUGINS,
-        .title = str(items[item].id),
         .icon = Icon_Plugin,
-        .root = items[item].path,
     };
+    browse.root = items[item].path;
+    browse.title = str(items[item].id);
 
     ret = rockbox_browse(&browse);
 
