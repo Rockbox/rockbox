@@ -49,9 +49,6 @@ char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
 static bool skins_initialised = false;
 
-static char* get_skin_filename(char *buf, size_t buf_size,
-                               enum skinnable_screens skin, enum screen_type screen);
-
 struct gui_skin_helper {
     void (*process)(enum screen_type screen, struct wps_data *data, bool preprocess);
     char* (*default_skin)(enum screen_type screen);
@@ -168,7 +165,6 @@ static void skin_reset_buffers(int item, int screen)
 void settings_apply_skins(void)
 {
     int i;
-    char filename[MAX_PATH];
 
     if (audio_status() & AUDIO_STATUS_PLAY)
         audio_stop();
@@ -191,7 +187,6 @@ void settings_apply_skins(void)
     {
         FOR_NB_SCREENS(j)
         {
-            get_skin_filename(filename, MAX_PATH, i,j);
             gui_skin_reset(&skins[i][j]);
             skins[i][j].gui_wps.display = &screens[j];
             if (skin_helpers[i]->load_on_boot)
