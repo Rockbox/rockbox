@@ -334,106 +334,102 @@ static int readline_cb(int n, char *buf, void *parameters)
             return 1;
         init_shortcut(sc);
         *param = sc;
+        return 0;
     }
-    else if (sc && settings_parseline(buf, &name, &value))
-    {
-        static const char * const nm_options[] = {"type", "name", "data",
-                                                  "icon", "talkclip", NULL};
-        int nm_op = string_option(name, nm_options, false);
 
-        if (nm_op == 0) /*type*/
+    if (!sc || !settings_parseline(buf, &name, &value))
+        return 0;
+
+    static const char * const nm_options[] = {"type", "name", "data",
+                                              "icon", "talkclip", NULL};
+    int nm_op = string_option(name, nm_options, false);
+    if (nm_op == 0) /*type*/
+    {
+        int t = 0;
+        for (t=0; t<SHORTCUT_TYPE_COUNT && sc->type == SHORTCUT_UNDEFINED; t++)
+            if (!strcmp(value, type_strings[t]))
+                sc->type = t;
+    }
+    else if (nm_op == 1) /*name*/
+        strmemccpy(sc->name, value, MAX_SHORTCUT_NAME);
+    else if (nm_op == 2) /*data*/
+    {
+        switch (sc->type)
         {
-            int t = 0;
-            for (t=0; t<SHORTCUT_TYPE_COUNT && sc->type == SHORTCUT_UNDEFINED; t++)
-                if (!strcmp(value, type_strings[t]))
-                    sc->type = t;
-        }
-        else if (nm_op == 1) /*name*/
-        {
-            strmemccpy(sc->name, value, MAX_SHORTCUT_NAME);
-        }
-        else if (nm_op == 2) /*data*/
-        {
-            switch (sc->type)
+            case SHORTCUT_UNDEFINED:
+            case SHORTCUT_TYPE_COUNT:
+                *param = NULL;
+                break;
+            case SHORTCUT_BROWSER:
             {
-                case SHORTCUT_UNDEFINED:
-                case SHORTCUT_TYPE_COUNT:
-                    *param = NULL;
-                    break;
-                case SHORTCUT_BROWSER:
+                char *p = strmemccpy(sc->u.path, value, MAX_PATH);
+                if (p && dir_exists(value))
                 {
-                    char *p = strmemccpy(sc->u.path, value, MAX_PATH);
-                    if (p && dir_exists(value))
-                    {
-                        /* ensure ending slash */
-                        *p = '\0';
-                        if (*(p-2) != '/')
-                            *(p-1) = '/';
-                    }
-                    break;
+                    /* ensure ending slash */
+                    *p = '\0';
+                    if (*(p-2) != '/')
+                        *(p-1) = '/';
                 }
-                case SHORTCUT_FILE:
-                case SHORTCUT_DEBUGITEM:
-                case SHORTCUT_PLAYLISTMENU:
+                break;
+            }
+            case SHORTCUT_FILE:
+            case SHORTCUT_DEBUGITEM:
+            case SHORTCUT_PLAYLISTMENU:
+            {
+                strmemccpy(sc->u.path, value, MAX_PATH);
+                break;
+            }
+            case SHORTCUT_SETTING_APPLY:
+            case SHORTCUT_SETTING:
+                /* can handle 'name: value' pair for either type */
+                if (settings_parseline(value, &name, &value))
                 {
+                    sc->setting = find_setting_by_cfgname(name);
                     strmemccpy(sc->u.path, value, MAX_PATH);
-                    break;
                 }
-                case SHORTCUT_SETTING_APPLY:
-                case SHORTCUT_SETTING:
-                    /* can handle 'name: value' pair for either type */
-                    if (settings_parseline(value, &name, &value))
-                    {
-                        sc->setting = find_setting_by_cfgname(name);
-                        strmemccpy(sc->u.path, value, MAX_PATH);
-                    }
-                    else /* force SHORTCUT_SETTING, no 'name: value' pair */
-                    {
-                        sc->type = SHORTCUT_SETTING;
-                        sc->setting = find_setting_by_cfgname(value);
-                    }
-                    break;
-                case SHORTCUT_TIME:
+                else /* force SHORTCUT_SETTING, no 'name: value' pair */
+                {
+                    sc->type = SHORTCUT_SETTING;
+                    sc->setting = find_setting_by_cfgname(value);
+                }
+                break;
+            case SHORTCUT_TIME:
 #if CONFIG_RTC
-                    sc->u.timedata.talktime = false;
-                    if (!strcasecmp(value, "talk"))
-                        sc->u.timedata.talktime = true;
-                    else
+                sc->u.timedata.talktime = false;
+                if (!strcasecmp(value, "talk"))
+                    sc->u.timedata.talktime = true;
+                else
 #endif
-                    if (!strncasecmp(value, "sleep", sizeof("sleep")-1))
-                    {
-                        /* 'sleep' may appear alone or followed by number after a space */
-                        if (strlen(value) > sizeof("sleep")) /* sizeof 1 larger (+space chr..) */
-                            sc->u.timedata.sleep_timeout = atoi(&value[sizeof("sleep")-1]);
-                        else
-                            sc->u.timedata.sleep_timeout = -1;
-                    }
+                if (!strncasecmp(value, "sleep", sizeof("sleep")-1))
+                {
+                    /* 'sleep' may appear alone or followed by number after a space */
+                    if (strlen(value) > sizeof("sleep")) /* sizeof 1 larger (+space chr..) */
+                        sc->u.timedata.sleep_timeout = atoi(&value[sizeof("sleep")-1]);
                     else
-                        sc->type = SHORTCUT_UNDEFINED; /* error */
-                    break;
-                case SHORTCUT_SEPARATOR:
-                case SHORTCUT_SHUTDOWN:
-                case SHORTCUT_REBOOT:
-                    break;
-            }
-        }
-        else if (nm_op == 3) /*icon*/
-        {
-            if (!strcmp(value, "filetype") && sc->type != SHORTCUT_SETTING
-                && sc->type != SHORTCUT_SETTING_APPLY && sc->u.path[0])
-            {
-                sc->icon = filetype_get_icon(filetype_get_attr(sc->u.path));
-            }
-            else
-            {
-                sc->icon = atoi(value);
-            }
-        }
-        else if (nm_op == 4) /*talkclip*/
-        {
-            strmemccpy(sc->talk_clip, value, MAX_PATH);
+                        sc->u.timedata.sleep_timeout = -1;
+                }
+                else
+                    sc->type = SHORTCUT_UNDEFINED; /* error */
+                break;
+            case SHORTCUT_SEPARATOR:
+            case SHORTCUT_SHUTDOWN:
+            case SHORTCUT_REBOOT:
+                break;
         }
     }
+    else if (nm_op == 3) /*icon*/
+    {
+        if (!strcmp(value, "filetype") && sc->type != SHORTCUT_SETTING
+            && sc->type != SHORTCUT_SETTING_APPLY && sc->u.path[0])
+        {
+            sc->icon = filetype_get_icon(filetype_get_attr(sc->u.path));
+        }
+        else
+            sc->icon = atoi(value);
+    }
+    else if (nm_op == 4) /*talkclip*/
+        strmemccpy(sc->talk_clip, value, MAX_PATH);
+
     return 0;
 }
 
@@ -538,90 +534,86 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
     struct shortcut *sc = get_shortcut(selected_item, NULL);
-    if (sc)
+
+    if (!sc)
+        return 0;
+
+    if (sc->talk_clip[0])
     {
-        if (sc->talk_clip[0])
+        talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+        return 0;
+    }
+    switch (sc->type)
+    {
+    case SHORTCUT_BROWSER:;
+        DIR* dir;
+        struct dirent* entry;
+        char* slash = strrchr(sc->u.path, PATH_SEPCH);
+        char* filename = slash + 1;
+
+        if (!slash || *filename == '\0')
         {
-            talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+            talk_dir_or_spell(sc->u.path, NULL, false);
+            break;
         }
-        else
+
+        *slash = '\0'; /* terminate the path to open the directory */
+        dir = opendir(sc->u.path);
+        *slash = PATH_SEPCH; /* restore fullpath */
+        if (dir)
         {
-            switch (sc->type)
+            while ((entry = readdir(dir)))
             {
-            case SHORTCUT_BROWSER:
-                {
-                    DIR* dir;
-                    struct dirent* entry;
-                    char* slash = strrchr(sc->u.path, PATH_SEPCH);
-                    char* filename = slash + 1;
-                    if (slash && *filename != '\0')
-                    {
-                        *slash = '\0'; /* terminate the path to open the directory */
-                        dir = opendir(sc->u.path);
-                        *slash = PATH_SEPCH; /* restore fullpath */
-                        if (dir)
-                        {
-                            while (0 != (entry = readdir(dir)))
-                            {
-                                if (!strcmp(entry->d_name, filename))
-                                {
-                                    struct dirinfo info = dir_get_info(dir, entry);
+                if (strcmp(entry->d_name, filename))
+                    continue;
 
-                                    if (info.attribute & ATTR_DIRECTORY)
-                                        talk_dir_or_spell(sc->u.path, NULL, false);
-                                    else
-                                        talk_file_or_spell(NULL, sc->u.path, NULL, false);
+                struct dirinfo info = dir_get_info(dir, entry);
 
-                                    closedir(dir);
-                                    return 0;
-                                }
-                            }
-                            closedir(dir);
-                        }
-                    }
-                    else
-                    {
-                        talk_dir_or_spell(sc->u.path, NULL, false);
-                        break;
-                    }
-                    talk_spell(sc->u.path, false);
-                }
-                break;
-            case SHORTCUT_FILE:
-            case SHORTCUT_PLAYLISTMENU:
-                talk_file_or_spell(NULL, sc->u.path, NULL, false);
-                break;
-            case SHORTCUT_SETTING_APPLY:
-            case SHORTCUT_SETTING:
-                talk_id(sc->setting->lang_id, false);
-                if (sc->type == SHORTCUT_SETTING_APPLY)
-                    talk_spell(sc->u.path, true);
-                break;
-
-            case SHORTCUT_TIME:
-#if CONFIG_RTC
-                if (sc->u.timedata.talktime)
-                    talk_timedate();
+                if (info.attribute & ATTR_DIRECTORY)
+                    talk_dir_or_spell(sc->u.path, NULL, false);
                 else
-#endif
-                if (sc->name[0] && sc->u.timedata.sleep_timeout >= 0)
-                    talk_spell(sc->name, false);
-                else
-                    talk_sleeptimer(sc->u.timedata.sleep_timeout);
-                break;
-            case SHORTCUT_SHUTDOWN:
-            case SHORTCUT_REBOOT:
-                if (!sc->name[0])
-                {
-                    talk_spell(type_strings[sc->type], false);
-                    break;
-                }
-                /* fall-through */
-            default:
-                talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
-                break;
+                    talk_file_or_spell(NULL, sc->u.path, NULL, false);
+
+                closedir(dir);
+                return 0;
             }
+            closedir(dir);
         }
+        talk_spell(sc->u.path, false);
+        break;
+    case SHORTCUT_FILE:
+    case SHORTCUT_PLAYLISTMENU:
+        talk_file_or_spell(NULL, sc->u.path, NULL, false);
+        break;
+    case SHORTCUT_SETTING_APPLY:
+    case SHORTCUT_SETTING:
+        talk_id(sc->setting->lang_id, false);
+        if (sc->type == SHORTCUT_SETTING_APPLY)
+            talk_spell(sc->u.path, true);
+        break;
+
+    case SHORTCUT_TIME:
+#if CONFIG_RTC
+        if (sc->u.timedata.talktime)
+            talk_timedate();
+        else
+#endif
+        if (sc->name[0] && sc->u.timedata.sleep_timeout >= 0)
+            talk_spell(sc->name, false);
+        else
+            talk_sleeptimer(sc->u.timedata.sleep_timeout);
+        break;
+    case SHORTCUT_SHUTDOWN:
+    case SHORTCUT_REBOOT:
+        if (!sc->name[0])
+        {
+            talk_spell(type_strings[sc->type], false);
+            break;
+        }
+        /* fall-through */
+    default:
+        talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
+        break;
     }
     return 0;
 }
@@ -721,6 +713,7 @@ static void apply_new_setting(const struct settings_list *setting)
 int do_shortcut_menu(void *ignored)
 {
     (void)ignored;
+    char timer_buf[10];
     struct simplelist_info list;
     struct shortcut *sc;
     int done = GO_TO_PREVIOUS;
@@ -750,104 +743,100 @@ int do_shortcut_menu(void *ignored)
         list.get_talk = global_settings.talk_menu ? shortcut_menu_speak_item : NULL;
 
         if (simplelist_show_list(&list))
-            break; /* some error happened?! */
+            break; /* returning from USB screen */
 
         if (list.selection == -1)
-            break;
-        else
+            break; /* canceled */
+
+        sc = get_shortcut(list.selection, NULL);
+        if (!sc)
+            continue;
+
+        switch (sc->type)
         {
-            sc = get_shortcut(list.selection, NULL);
-
-            if (!sc)
-                continue;
-
-            switch (sc->type)
-            {
-                case SHORTCUT_PLAYLISTMENU:
-                    if (!file_exists(sc->u.path))
-                        splash(HZ, ID2P(LANG_NO_FILES));
-                    else
-                        onplay_show_playlist_menu(sc->u.path,
-                                                  dir_exists(sc->u.path) ? ATTR_DIRECTORY :
-                                                  filetype_get_attr(sc->u.path),
-                                                  NULL);
+            case SHORTCUT_PLAYLISTMENU:
+                if (!file_exists(sc->u.path))
+                    splash(HZ, ID2P(LANG_NO_FILES));
+                else
+                    onplay_show_playlist_menu(sc->u.path,
+                                              dir_exists(sc->u.path) ?
+                                              ATTR_DIRECTORY :
+                                              filetype_get_attr(sc->u.path),
+                                              NULL);
+                break;
+            case SHORTCUT_FILE:
+                if (!file_exists(sc->u.path))
+                {
+                    splash(HZ, ID2P(LANG_NO_FILES));
                     break;
-                case SHORTCUT_FILE:
-                    if (!file_exists(sc->u.path))
-                    {
-                        splash(HZ, ID2P(LANG_NO_FILES));
-                        break;
-                    }
-                    /* else fall through */
-                case SHORTCUT_BROWSER:
-                    if (open_plugin_add_path(ID2P(LANG_SHORTCUTS),
-                                             sc->u.path, NULL) != 0)
-                    {
-                        done = GO_TO_PLUGIN;
-                        break;
-                    }
-                    struct browse_context browse = {
-                        .dirfilter = SHOW_ALL, /* ignored for SHORTCUT_BROWSER */
-                        .icon = Icon_NOICON,
-                        .root = sc->u.path,
-                    };
-                    if (sc->type == SHORTCUT_FILE)
-                        browse.flags = BROWSE_RUNFILE | BROWSE_DIRFILTER;
-                    done = rockbox_browse(&browse);
+                }
+                /* else fall through */
+            case SHORTCUT_BROWSER:
+                if (open_plugin_add_path(ID2P(LANG_SHORTCUTS),
+                                         sc->u.path, NULL) != 0)
+                {
+                    done = GO_TO_PLUGIN;
                     break;
-                case SHORTCUT_SETTING_APPLY:;
-                    bool theme_changed;
-                    string_to_cfg(sc->setting->cfg_name, sc->u.path, &theme_changed);
-                    settings_save();
-                    apply_new_setting(sc->setting);
-                    break;
-                case SHORTCUT_SETTING:
-                    do_setting_screen(sc->setting, sc->name[0] ?
-                                      sc->name : P2STR(ID2P(sc->setting->lang_id)),
-                                      NULL);
-                    apply_new_setting(sc->setting);
-                    break;
-                case SHORTCUT_DEBUGITEM:
-                    run_debug_screen(sc->u.path);
-                    break;
-                case SHORTCUT_SHUTDOWN:
+                }
+                struct browse_context browse = {
+                    .dirfilter = SHOW_ALL, /* ignored for SHORTCUT_BROWSER */
+                    .icon = Icon_NOICON,
+                    .root = sc->u.path,
+                };
+                if (sc->type == SHORTCUT_FILE)
+                    browse.flags = BROWSE_RUNFILE | BROWSE_DIRFILTER;
+                done = rockbox_browse(&browse);
+                break;
+            case SHORTCUT_SETTING_APPLY:;
+                bool theme_changed;
+                string_to_cfg(sc->setting->cfg_name, sc->u.path, &theme_changed);
+                settings_save();
+                apply_new_setting(sc->setting);
+                break;
+            case SHORTCUT_SETTING:
+                do_setting_screen(sc->setting, sc->name[0] ?
+                                  sc->name : P2STR(ID2P(sc->setting->lang_id)),
+                                  NULL);
+                apply_new_setting(sc->setting);
+                break;
+            case SHORTCUT_DEBUGITEM:
+                run_debug_screen(sc->u.path);
+                break;
+            case SHORTCUT_SHUTDOWN:
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                    if (charger_inserted())
-                        charging_splash();
-                    else
+                if (charger_inserted())
+                    charging_splash();
+                else
 #endif
-                        sys_poweroff();
-                    break;
-                case SHORTCUT_REBOOT:
+                    sys_poweroff();
+                break;
+            case SHORTCUT_REBOOT:
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                    if (charger_inserted())
-                        charging_splash();
-                    else
+                if (charger_inserted())
+                    charging_splash();
+                else
 #endif
-                        sys_reboot();
-                    break;
-                case SHORTCUT_TIME:
+                    sys_reboot();
+                break;
+            case SHORTCUT_TIME:
 #if CONFIG_RTC
-                    if (!sc->u.timedata.talktime)
+                if (sc->u.timedata.talktime)
+                    break;
 #endif
-                    {
-                        char timer_buf[10];
-                        if (sc->u.timedata.sleep_timeout >= 0)
-                        {
-                            set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
-                            splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
-                                    format_sleeptimer(timer_buf, sizeof(timer_buf),
-                                                          sc->u.timedata.sleep_timeout,
-                                                          NULL));
-                        }
-                        else
-                            toggle_sleeptimer();
-                    }
+                if (sc->u.timedata.sleep_timeout < 0)
+                {
+                    toggle_sleeptimer();
                     break;
-                case SHORTCUT_UNDEFINED:
-                default:
-                    break;
-            }
+                }
+                set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
+                splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
+                        format_sleeptimer(timer_buf, sizeof(timer_buf),
+                                          sc->u.timedata.sleep_timeout,
+                                          NULL));
+                break;
+            case SHORTCUT_UNDEFINED:
+            default:
+                break;
         }
     }
     if (GO_TO_PLUGIN == done)
