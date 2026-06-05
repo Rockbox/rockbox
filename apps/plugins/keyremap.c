@@ -1134,7 +1134,10 @@ static int keyremap_load_file(const char *filename)
 
     if (count > 0)
     {
-        keyremap_reset_buffer();
+        if (ctx_data.ctx_count == 0 || rb->yesno_pop("Delete Current Entries?") == true)
+        {
+            keyremap_reset_buffer();
+        }
         while(--count > 0)
         {
             rb->lseek(fd, ctxpos, SEEK_SET); /* next context remap entry */
