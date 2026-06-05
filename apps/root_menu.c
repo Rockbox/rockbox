@@ -854,7 +854,8 @@ static int root_menu_setup_screens(void)
     else
         new_screen = global_settings.start_in_screen - 2;
 
-    if (new_screen >= NUM_ITEMS)
+    if (new_screen >= NUM_ITEMS ||
+        (new_screen == GO_TO_WPS && global_status.resume_index == -1))
         new_screen = GO_TO_ROOT;
     else if (new_screen == GO_TO_PLUGIN)
     {
