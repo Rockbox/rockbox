@@ -203,14 +203,16 @@ static bool save_changes(int overwrite)
     }
 
     rb->lcd_clear_display();
-    cpuboost(1);
 
-    for (i=0;i<line_count;i++)
+    cpuboost(1);
+    for (i=0;i<line_count - 1;i++)
     {
         rb->fdprintf(fd,"%s%s", do_action(ACTION_GET, 0, i), eol);
     }
-
+    if (line_count > 0)  /* No EOL for last item */
+        rb->fdprintf(fd,"%s", do_action(ACTION_GET, 0, line_count - 1));
     cpuboost(0);
+
     rb->close(fd);
 
     if (newfile || !overwrite)
