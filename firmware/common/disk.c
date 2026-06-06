@@ -508,9 +508,7 @@ int disk_mount_all(void)
 
     for (int i = 0; i < NUM_DRIVES; i++)
     {
-    #ifdef HAVE_HOTSWAP
         if (storage_present(i))
-    #endif
             mounted += disk_mount(i);
     }
 
@@ -554,9 +552,7 @@ int disk_unmount_all(void)
 
     for (int i = 0; i < NUM_DRIVES; i++)
     {
-    #ifdef HAVE_HOTSWAP
         if (storage_present(i))
-    #endif
             unmounted += disk_unmount(i);
     }
 

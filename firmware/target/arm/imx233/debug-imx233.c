@@ -1264,14 +1264,14 @@ bool dbg_hw_info_sdmmc(void)
             else
                 continue;
             lcd_putsf(0, line++, "%s", info.slot_name);
-#ifdef HAVE_HOTSWAP
+
             bool removable = storage_removable(info.drive);
             bool present = storage_present(info.drive);
             if(removable)
                 lcd_putsf(0, line++, "  removable %spresent", present ? "" : "not ");
             if(!present)
                 continue;
-#endif
+
             lcd_putsf(0, line++, "  bus: %d  sbc: %d", info.bus_width, info.has_sbc);
             lcd_putsf(0, line++, "  hs: %s", info.hs_enabled ? "enabled" :
                 info.hs_capable ? "disabled" : "not capable");

@@ -800,11 +800,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     block_count=info.num_sectors;
 #endif
 
-#ifdef HAVE_HOTSWAP
-    if(storage_removable(lun) && !storage_present(lun)) {
+    if(storage_removable(lun) && !storage_present(lun))
         ejected[lun] = true;
-    }
-#endif
 
     if(ejected[lun])
         lun_present = false;
@@ -855,11 +852,9 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             tb.lun_data->lun_list_length=htobe32(8*storage_num_drives());
             for(i=0;i<storage_num_drives();i++)
             {
-#ifdef HAVE_HOTSWAP
                 if(storage_removable(i))
                     tb.lun_data->luns[i][1]=1;
                 else
-#endif
                     tb.lun_data->luns[i][1]=0;
             }
             length = MIN(length, allocation_length);
