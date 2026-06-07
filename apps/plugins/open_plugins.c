@@ -1338,7 +1338,7 @@ reopen_datfile:
         hash_exists(op_entry.hash, false);
     }
 
-    if (!fd_dat)
+    if (fd_dat < 0)
         exit = true;
 
     items = rb->lseek(fd_dat, 0, SEEK_END) / op_entry_sz;
