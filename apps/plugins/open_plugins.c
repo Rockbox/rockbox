@@ -863,6 +863,8 @@ static void synclist_set(char* menu_id, int selection, int items, int sel_size)
     rb->gui_synclist_init(&lists,list_get_name_cb,
                           menu_id, false, sel_size, NULL);
 
+    if (menu_id == (void*) &MENU_ID_MAIN)
+        rb->gui_synclist_set_title(&lists, rb->str(LANG_OPEN_PLUGIN), Icon_Plugin);
     rb->gui_synclist_set_voice_callback(&lists, list_voice_cb);
     rb->gui_synclist_set_nb_items(&lists,items);
     rb->gui_synclist_select_item(&lists, selection);
@@ -1499,6 +1501,7 @@ reopen_datfile:
         }
         op_entry_remove_empty();
     }
+    rb->gui_synclist_scroll_stop(&lists);
     rb->close(fd_dat);
     if (ret != PLUGIN_OK)
         return ret;
