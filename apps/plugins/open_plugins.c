@@ -564,8 +564,10 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
             if (plugin != op_entry.path)
                 rb->strlcpy(op_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
 
-            if(parameter)
+            if(parameter || rb->strncmp(plugin, VIEWERS_DIR, sizeof(VIEWERS_DIR) -1) == 0)
             {
+                if (!parameter)
+                    parameter = "";
                 /* param matches lang_id so we want to set parameter */
                 bool needs_param = op_entry.lang_id >= 0
                         && (rb->strcmp(parameter, rb->str(op_entry.lang_id)) == 0);
@@ -575,6 +577,9 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                     if (needs_param)
                         op_entry.param[0] = '\0';
                     op_entry_set_param();
+                    if (!use_key && pathbasename(op_entry.param, (const char **)&pos) != 0)
+                        rb->strlcpy(op_entry.name, pos, OPEN_PLUGIN_NAMESZ);
+
                 }
                 else if (parameter != op_entry.param)
                     rb->strlcpy(op_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
@@ -761,7 +766,9 @@ static const char* list_get_name_cb(int selected_item, void* data,
     /*TODO memoize names so we don't keep reading the disk when not necessary */
     if (data == (void*) &MENU_ID_MAIN) /* check address */
     {
-        if (op_entry_read_name(fd_dat, selected_item))
+        if (selected_item == rb->gui_synclist_get_nb_items(&lists) - 1)
+            rb->snprintf(buf, buf_len, "[%s]", rb->str(LANG_ADD));
+        else if (op_entry_read_name(fd_dat, selected_item))
         {
             if (op_entry.lang_id >= 0)
                 rb->snprintf(buf, buf_len, "%s [%s] ",
@@ -815,7 +822,12 @@ static int list_voice_cb(int list_index, void* data)
 {
     if (data == (void*) &MENU_ID_MAIN) /* check address */
     {
-        if (op_entry_read_name(fd_dat, list_index))
+        if (list_index == rb->gui_synclist_get_nb_items(&lists) - 1)
+        {
+            static const long langids[] = {LANG_ADD, VOICE_EXT_ROCK, TALK_FINAL_ID};
+            rb->talk_idarray(langids, false);
+        }
+        else if (op_entry_read_name(fd_dat, list_index))
         {
             if (op_entry.lang_id >= 0)
             {
@@ -842,9 +854,15 @@ static int list_voice_cb(int list_index, void* data)
                 }
                 return rb->talk_spell(op_entry.name, false);
             case 2:
-                return rb->talk_id(LANG_DISPLAY_FULL_PATH, false);
+                rb->talk_id(LANG_DISPLAY_FULL_PATH, false);
+                return rb->talk_fullpath(op_entry.path, true);
             case 4:
-                return rb->talk_id(LANG_PARAMETER, false);
+                rb->talk_id(LANG_PARAMETER, false);
+                if (op_entry.param[0] == '\0')
+                    return rb->talk_id(VOICE_BLANK, true);
+                if (rb->file_exists(op_entry.param))
+                    return rb->talk_fullpath(op_entry.param, true);
+                return rb->talk_spell(op_entry.param, true);
             case 6:
                 return rb->talk_id(LANG_BACK, false);
             default:
@@ -980,6 +998,12 @@ static void edit_menu(int selection)
 static int context_menu(int selection)
 {
     int selected_item;
+    if (selection == rb->gui_synclist_get_nb_items(&lists) -1)
+    {
+        op_entry_browse_add(-1);
+        rb->plugin_open(rb->plugin_get_current_filename(), "\0");
+        return OP_PLUGIN_RESTART;
+    }
     if (op_entry_read(fd_dat, selection, op_entry_sz))
     {
         MENUITEM_STRINGLIST(menu, op_entry.name, context_menu_cb,
@@ -1430,7 +1454,7 @@ reopen_datfile:
         if (!op_entry_read(fd_dat, i, op_entry_sz))
             items--;
     }
-
+# if 0
     if (items < 1 && !exit)
     {
         char* cur_filename = rb->plugin_get_current_filename();
@@ -1445,10 +1469,10 @@ reopen_datfile:
         rb->close(fd_dat);
         return PLUGIN_ERROR;
     }
-
+#endif
     if (!exit)
     {
-        synclist_set(MENU_ID_MAIN, selection, items, 1);
+        synclist_set(MENU_ID_MAIN, selection, items + 1, 1);
         rb->gui_synclist_draw(&lists);
 
         while (!exit && fd_dat >= 0)
@@ -1470,13 +1494,20 @@ reopen_datfile:
                     }
                     else if (ret != PLUGIN_GOTO_PLUGIN)
                     {
-                        synclist_set(MENU_ID_MAIN, selection, items, 1);
+                        synclist_set(MENU_ID_MAIN, selection, items + 1, 1);
                         rb->gui_synclist_draw(&lists);
                         break;
                     }
                     /* fallthrough */
                 case ACTION_STD_OK:
-                    if (op_entry_read(fd_dat, selection, op_entry_sz))
+                    if (selection == items)
+                    {
+                        op_entry_browse_add(-1);
+                        rb->plugin_open(rb->plugin_get_current_filename(), "\0");
+                        ret = PLUGIN_GOTO_PLUGIN;
+                        exit = true;
+                    }
+                    else if (op_entry_read(fd_dat, selection, op_entry_sz))
                     {
                         ret = op_entry_run();
                         exit = true;
@@ -1500,8 +1531,9 @@ reopen_datfile:
             }
         }
         op_entry_remove_empty();
+        rb->gui_synclist_scroll_stop(&lists);
     }
-    rb->gui_synclist_scroll_stop(&lists);
+
     rb->close(fd_dat);
     if (ret != PLUGIN_OK)
         return ret;
