@@ -288,10 +288,11 @@ static void mixer_start_pcm(void)
 /* Notify users of samplerate change */
 static  void mixer_handle_sampr_change(unsigned int sampr)
 {
-    for (size_t i = 0; i < ARRAYLEN(active_channels) && active_channels[i]; i += 1)
+    int i = 0;
+    struct mixer_channel* chan;
+    while ((chan = active_channels[i]))
     {
-        struct mixer_channel* chan = active_channels[i];
-
+        bool stop_channel = true;
         /* Notify upstreams */
         if (chan->play_cbs)
         {
@@ -309,13 +310,19 @@ static  void mixer_handle_sampr_change(unsigned int sampr)
                     chan->start = start;
                     chan->size = size;
                     chan->last_size = 0;
-                } else {
-                    channel_stopped(chan);
+
+                    stop_channel = false;
+                    ++i;
                 }
             }
         }
+
+        if (stop_channel)
+        {
+            channel_stopped(chan);
+        }
         /* Notify buffer monitor */
-        if (chan->buf_cbs)
+        else if (chan->buf_cbs)
         {
             if (chan->buf_cbs->sampr_changed)
             {
