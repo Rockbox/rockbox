@@ -522,6 +522,9 @@ void mixer_set_frequency(unsigned int samplerate)
     if(pcm_get_frequency() == samplerate)
         return;
 
+    pcm_play_stop();
+    idle_counter = 0;
+
     pcm_set_frequency(samplerate);
     mixer_handle_sampr_change(SAMPR_NUM(pcm_get_frequency()));
     if (pcm_is_initialized())
