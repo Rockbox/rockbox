@@ -791,8 +791,8 @@ static int load_plugin_screen(char *key)
 
         if (ret == PLUGIN_USB_CONNECTED || ret == PLUGIN_ERROR)
             ret_val = GO_TO_ROOT;
-        else if (ret == PLUGIN_GOTO_WPS)
-            ret_val = GO_TO_WPS;
+        else if (ret == PLUGIN_GOTO_WPS) /* prevent infinite loop */
+            ret_val = old_global == GO_TO_WPS ? GO_TO_BROWSEPLUGINS : GO_TO_WPS;
         else if (ret == PLUGIN_GOTO_PLUGIN)
         {
             if(op_entry->lang_id == LANG_OPEN_PLUGIN)
