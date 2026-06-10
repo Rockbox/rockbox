@@ -77,7 +77,7 @@
  */
 
 /* 'true' when all stages of pcm initialization have completed */
-volatile static bool pcm_is_ready[PCM_SINK_NUM] SHAREDBSS_ATTR = { false };
+static volatile bool pcm_is_ready[PCM_SINK_NUM] SHAREDBSS_ATTR = { false };
 
 #ifdef USB_ENABLE_IAP
 extern struct pcm_sink iap_pcm_sink;
