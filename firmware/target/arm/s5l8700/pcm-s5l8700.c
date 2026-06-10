@@ -253,9 +253,9 @@ static void sink_dma_init(void)
 }
 
 /* set the configured PCM frequency */
-static void sink_set_freq(uint16_t freq)
+static void sink_set_freq(uint16_t freq_idx)
 {
-    pcm_dma_set_freq(hw_freq_sampr[freq]);
+    pcm_dma_set_freq(freq_idx);
 }
 
 #ifdef HAVE_PCM_DMA_ADDRESS
