@@ -70,10 +70,10 @@
 
 static int onplay_result = ONPLAY_OK;
 static bool in_queue_submenu = false;
-static char ctx_plugin_namebuf[OPEN_PLUGIN_NAMESZ];
 
 static bool (*ctx_current_playlist_insert)(int position, bool queue, bool create_new);
 static int (*ctx_add_to_playlist)(const char* playlist, bool new_playlist);
+static char *onplay_get_plugin_name(bool reload);
 extern struct menu_item_ex file_menu; /* settings_menu.c  */
 
 /* redefine MAKE_MENU so the MENU_EXITAFTERTHISMENU flag can be added easily */
@@ -663,7 +663,7 @@ static char *wps_context_get_item_name(int selected_item, void * data,
       get_hotkey(HK_CTX_GET(item, global_settings.context_wps));
     if (hkey->action == HOTKEY_PLUGIN)
     {
-        return ctx_plugin_namebuf;
+        return onplay_get_plugin_name(false);
     }
 #ifdef HAVE_PITCHCONTROL
     else if (hkey->action == HOTKEY_PITCHSCREEN)
@@ -693,7 +693,7 @@ static int wps_context_item_speak_item(int selected_item, void * data)
 
     if (hkey->action == HOTKEY_PLUGIN)
     {
-        talk_spell(ctx_plugin_namebuf, false);
+        talk_spell(onplay_get_plugin_name(false), false);
         return 0;
     }
 #ifdef HAVE_PITCHCONTROL
@@ -778,22 +778,8 @@ static int wps_context_item_cb(int action,
             return ACTION_EXIT_MENUITEM;
         }
         ctx_item_map[item]->icon_id = get_hotkey(act)->icon;
-        if (act == HOTKEY_PLUGIN && action == ACTION_REQUEST_MENUITEM)
-        {
-            int res = open_plugin_load_entry(ID2P(LANG_ONPLAY_MENU_TITLE));
-            if (res >= 0 || res ==  OPEN_PLUGIN_NEEDS_FLUSHED)
-            {
-                struct open_plugin_entry_t *op = open_plugin_get_entry();
-                strmemccpy(ctx_plugin_namebuf, op->name, sizeof(ctx_plugin_namebuf));
-            }
-            else
-            {
-                strmemccpy(ctx_plugin_namebuf, str(LANG_OPEN_PLUGIN),
-                           sizeof(ctx_plugin_namebuf));
-            }
-        }
 #ifdef HAVE_PITCHCONTROL
-        else if (act == HOTKEY_PITCHSCREEN)
+        if (act == HOTKEY_PITCHSCREEN)
         {
             int32_t ts = dsp_get_timestretch();
             if (sound_get_pitch() != PITCH_SPEED_100 || ts != PITCH_SPEED_100)
@@ -994,6 +980,29 @@ static bool onplay_load_plugin(void *param)
     else if (ret == PLUGIN_GOTO_ROOT)
         onplay_result = ONPLAY_MAINMENU;
     return false;
+}
+
+static char *onplay_get_plugin_name(bool reload)
+{
+    static char ctx_plugin_namebuf[OPEN_PLUGIN_NAMESZ] = "";
+    if (reload || ctx_plugin_namebuf[0] == '\0')
+    {
+        int res = open_plugin_load_entry(ID2P(LANG_ONPLAY_MENU_TITLE));
+        if (res >= 0 || res ==  OPEN_PLUGIN_NEEDS_FLUSHED)
+        {
+            struct open_plugin_entry_t *op = open_plugin_get_entry();
+            strmemccpy(ctx_plugin_namebuf, op->name, sizeof(ctx_plugin_namebuf));
+        }
+        else
+        {
+            strmemccpy(ctx_plugin_namebuf, str(LANG_OPEN_PLUGIN),
+                       sizeof(ctx_plugin_namebuf));
+        }
+    }
+
+    if (get_current_activity() == ACTIVITY_SETTINGS)
+        return str(LANG_OPEN_PLUGIN);
+    return ctx_plugin_namebuf;
 }
 
 static int reveal(void)
@@ -1561,6 +1570,12 @@ static const char* hotkey_get_name(int selected_item, void * data,
     (void)buffer; (void)buffer_len;
     const struct hotkey_assignment **hk_menu =
                 (const struct hotkey_assignment**)data;
+
+    if (hk_menu[selected_item]->action == HOTKEY_PLUGIN)
+    {
+        return onplay_get_plugin_name(false);
+    }
+
     return ID2P(hk_menu[selected_item]->lang_id);
 }
 
@@ -1568,11 +1583,14 @@ static int hotkey_get_talk(int selected_item, void * data)
 {
     const struct hotkey_assignment **hk_menu =
                 (const struct hotkey_assignment**)data;
-    talk_id(hk_menu[selected_item]->lang_id, false);
+    if (hk_menu[selected_item]->action == HOTKEY_PLUGIN)
+        talk_spell(onplay_get_plugin_name(false), false);
+    else
+        talk_id(hk_menu[selected_item]->lang_id, false);
     return 0;
 }
 
-static enum themable_icons  hotkey_get_icon(int selected_item, void * data)
+static enum themable_icons hotkey_get_icon(int selected_item, void * data)
 {
     const struct hotkey_assignment **hk_menu =
                 (const struct hotkey_assignment**)data;
@@ -1730,7 +1748,10 @@ static int hotkey_menu_do_setting(void *param, int *setting, int flag)
                     open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
                 else
 #endif
+                {
                     open_plugin_browse(ID2P(LANG_ONPLAY_MENU_TITLE));
+                    onplay_get_plugin_name(true);
+                }
             }
         }
 
