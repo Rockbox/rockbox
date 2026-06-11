@@ -373,6 +373,10 @@ static void iap_thread(void)
             case IAP_EV_TICK:
             {
                 iap_periodic();
+                /* pick up packets whose IAP_EV_MSG_RCVD event was lost
+                   to a queue overflow, they would otherwise sit in the
+                   RX buffer until the next packet arrives */
+                iap_handlepkt();
                 break;
             }
 
@@ -597,8 +601,12 @@ bool iap_getc(IF_IAP_MP(int port,) const unsigned char x)
     struct state_t *s = &frame_state;
     static long pkt_timeout;
 
+    /* Report "still hunting" while IAP is not set up yet, otherwise
+     * the serial driver would lock its autobaud detection onto the
+     * default bitrate before any real traffic was seen.
+     */
     if (!iap_setupflag)
-        return false;
+        return true;
 
     /* Check the time since the last packet arrived. */
     if ((s->state != ST_SYNC) && TIME_AFTER(current_tick, pkt_timeout)) {
@@ -685,6 +693,7 @@ bool iap_getc(IF_IAP_MP(int port,) const unsigned char x)
         s->check += x;
         if ((s->check & 0xFF) == 0) {
             /* done, received a valid frame */
+            iap_rxlen -= (s->len + 2);
             iap_rxpayload = iap_rxnext;
             queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
         } else {
@@ -1287,53 +1296,63 @@ void iap_handlepkt(void)
     int length;
 
     if(!iap_setupflag) return;
+    if(!iap_running) return;
 
-    /* if we are waiting for a remote button to go out,
-       delay the handling of the new packet */
-    if(iap_repeatbtn)
-    {
-        queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
-        sleep(1);
-        return;
-    }
-
-    /* handle command by mode */
-    length = get_u16(iap_rxstart);
-#if defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF)
-    logf("R: %s", hexstring(iap_rxstart+2, (length)));
-#endif
-
-    if (length != 0) {
-        unsigned char mode = *(iap_rxstart+2);
-        switch (mode) {
-        case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
-#ifdef HAVE_LINE_REC
-        case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
-#endif
-        case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
-        case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
-        case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
-        case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
-#if CONFIG_TUNER
-        case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
-#endif
-        }
-    }
-
-    /* Remove the handled packet from the RX buffer
-     * This needs to be done with interrupts disabled, to make
-     * sure the buffer and the pointers into it are handled
-     * cleanly
+    /* The number of queued IAP_EV_MSG_RCVD events does not reliably
+     * match the number of complete packets in the RX buffer, since
+     * the event queue can overflow during input bursts. Drain every
+     * complete packet instead, they occupy the buffer from
+     * iap_rxstart up to iap_rxpayload.
      */
-    level = disable_irq_save();
-    memmove(iap_rxstart, iap_rxstart+(length+2), (RX_BUFLEN+2)-(length+2));
-    iap_rxnext -= (length+2);
-    iap_rxpayload -= (length+2);
-    iap_rxlen += (length+2);
-    restore_irq(level);
+    while (iap_rxpayload != iap_rxstart)
+    {
+        /* if we are waiting for a remote button to go out,
+           delay the handling of the new packet */
+        if(iap_repeatbtn)
+        {
+            queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
+            sleep(1);
+            return;
+        }
 
-    /* poke the poweroff timer */
-    reset_poweroff_timer();
+        /* handle command by mode */
+        length = get_u16(iap_rxstart);
+#if defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF)
+        logf("R: %s", hexstring(iap_rxstart+2, (length)));
+#endif
+
+        if (length != 0) {
+            unsigned char mode = *(iap_rxstart+2);
+            switch (mode) {
+            case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
+#ifdef HAVE_LINE_REC
+            case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
+#endif
+            case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
+            case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
+            case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
+            case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
+#if CONFIG_TUNER
+            case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
+#endif
+            }
+        }
+
+        /* Remove the handled packet from the RX buffer
+         * This needs to be done with interrupts disabled, to make
+         * sure the buffer and the pointers into it are handled
+         * cleanly
+         */
+        level = disable_irq_save();
+        memmove(iap_rxstart, iap_rxstart+(length+2), (RX_BUFLEN+2)-(length+2));
+        iap_rxnext -= (length+2);
+        iap_rxpayload -= (length+2);
+        iap_rxlen += (length+2);
+        restore_irq(level);
+
+        /* poke the poweroff timer */
+        reset_poweroff_timer();
+    }
 }
 
 int remote_control_rx(void)

@@ -71,8 +71,15 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
      */
     CHECKLEN(3);
 
-    /* Lingo 0x02 must have been negotiated */
-    if (!DEVICE_LINGO_SUPPORTED(0x02)) {
+    /* Lingo 0x02 must have been negotiated, except for
+     * ContextButtonStatus (0x00): simple remotes like the Apple A1018
+     * identify only once at power-up. If the remote was already
+     * powered before Rockbox started (e.g. plugged in at boot) that
+     * identification is never seen, and rejecting the button events
+     * would leave the remote dead until it is replugged. The OF
+     * accepts these events without identification, so do the same.
+     */
+    if ((cmd != 0x00) && !DEVICE_LINGO_SUPPORTED(0x02)) {
         cmd_ack(cmd, IAP_ACK_BAD_PARAM);
         return;
     }
@@ -95,14 +102,13 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
          */
         case 0x00:
         {
-            iap_remotebtn = BUTTON_NONE;
-            iap_timeoutbtn = 0;
+            unsigned long btn = BUTTON_NONE;
 
             if(buf[2] != 0)
             {
                 if(buf[2] & 1)
                 {
-                    REMOTE_BUTTON(BUTTON_RC_PLAY);
+                    btn |= BUTTON_RC_PLAY;
 #if CONFIG_TUNER
                     if (radio_present == 1) {
                         if (remote_mute == 0) {
@@ -117,20 +123,20 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
 #endif
                 }
                 if(buf[2] & 2)
-                    REMOTE_BUTTON(BUTTON_RC_VOL_UP);
+                    btn |= BUTTON_RC_VOL_UP;
                 if(buf[2] & 4)
-                    REMOTE_BUTTON(BUTTON_RC_VOL_DOWN);
+                    btn |= BUTTON_RC_VOL_DOWN;
                 if(buf[2] & 8)
-                    REMOTE_BUTTON(BUTTON_RC_RIGHT);
+                    btn |= BUTTON_RC_RIGHT;
                 if(buf[2] & 16)
-                    REMOTE_BUTTON(BUTTON_RC_LEFT);
+                    btn |= BUTTON_RC_LEFT;
             }
             else if(len >= 4 && buf[3] != 0)
             {
                 if(buf[3] & 1) /* play */
                 {
                     if (audio_status() != AUDIO_STATUS_PLAY)
-                        REMOTE_BUTTON(BUTTON_RC_PLAY);
+                        btn |= BUTTON_RC_PLAY;
 #if CONFIG_TUNER
                     if (radio_present == 1) {
                         tuner_set(RADIO_MUTE,0);
@@ -140,7 +146,7 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
                 if(buf[3] & 2) /* pause */
                 {
                     if (audio_status() == AUDIO_STATUS_PLAY)
-                        REMOTE_BUTTON(BUTTON_RC_PLAY);
+                        btn |= BUTTON_RC_PLAY;
 #if CONFIG_TUNER
                     if (radio_present == 1) {
                         tuner_set(RADIO_MUTE,1);
@@ -179,24 +185,49 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
                 if (buf[4] & 0x04)
                 {
                     if (audio_status() == AUDIO_STATUS_PLAY)
-                        REMOTE_BUTTON(BUTTON_RC_PLAY);
+                        btn |= BUTTON_RC_PLAY;
                 }
 
                 if(buf[4] & 16) /* ffwd */
-                    REMOTE_BUTTON(BUTTON_RC_RIGHT);
+                    btn |= BUTTON_RC_RIGHT;
                 if(buf[4] & 32) /* frwd */
-                    REMOTE_BUTTON(BUTTON_RC_LEFT);
+                    btn |= BUTTON_RC_LEFT;
                 if(buf[4] & 64) /* menu */
-                    REMOTE_BUTTON(BUTTON_RC_MENU);
+                    btn |= BUTTON_RC_MENU;
                 if(buf[4] & 128) /* select */
-                    REMOTE_BUTTON(BUTTON_RC_SELECT);
+                    btn |= BUTTON_RC_SELECT;
             }
             else if(len >= 6 && buf[5] != 0)
             {
                 if(buf[5] & 1) /* up */
-                    REMOTE_BUTTON(BUTTON_RC_UP);
+                    btn |= BUTTON_RC_UP;
                 if (buf[5] & 2) /* down */
-                    REMOTE_BUTTON(BUTTON_RC_DOWN);
+                    btn |= BUTTON_RC_DOWN;
+            }
+
+            /* Commit the new button state in one go. The button driver
+             * reads iap_remotebtn from interrupt context, a transient
+             * BUTTON_NONE between two repeated button-down events would
+             * register as a spurious release/press pair.
+             */
+            if (btn != BUTTON_NONE)
+            {
+                /* Only re-arm iap_repeatbtn when the state changes. A
+                 * held button repeats its down event every 30-100ms,
+                 * re-arming on every repeat makes iap_handlepkt()
+                 * delay each following packet, so packets back up
+                 * during the hold and stale events replay as phantom
+                 * keypresses after the release.
+                 */
+                if (btn != iap_remotebtn)
+                    iap_repeatbtn = 2;
+                iap_remotebtn = btn;
+                iap_timeoutbtn = 3;
+            }
+            else
+            {
+                iap_remotebtn = BUTTON_NONE;
+                iap_timeoutbtn = 0;
             }
 
             /* power on released */
