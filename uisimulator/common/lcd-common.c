@@ -37,10 +37,12 @@ static bool lcd_enabled = false;
 static bool lcd_sleeping = true;
 #endif
 
+#if !defined(HAVE_LCD_FLIP)
 void lcd_set_flip(bool yesno)
 {
     (void)yesno;
 }
+#endif
 
 void lcd_set_invert_display(bool invert)
 {

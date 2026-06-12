@@ -29,6 +29,10 @@
 /* the detected lcd type (0 or 1) */
 static int lcd_type;
 
+/* set by lcd_set_flip(): when true the panel is rotated 180 degrees via the
+   controller's GRAM write direction (see lcd_set_flip and lcd_setup_rect) */
+static bool lcd_flipped = false;
+
 #ifdef HAVE_LCD_ENABLE
 /* whether the lcd is currently enabled or not */
 static bool lcd_enabled;
@@ -274,6 +278,10 @@ void lcd_enable(bool on)
             sleep(HZ * 100/1000);
 
             lcd_write(0xD0, 0x00);  /* SCREEN_SAVER_CONTROL */
+
+            /* apply 180 degree flip via memory write direction (1Dh):
+               MDIR1|MDIR0 = decrement both; normal is horizontal-decrement */
+            lcd_write(0x1D, lcd_flipped ? 0x02 : 0x01);
         }
         else {
             lcd_write(0xD2, 0x05);
@@ -290,6 +298,10 @@ void lcd_enable(bool on)
             lcd_write(0x03, 0x00);
 
             lcd_write(0x02, 0x01);
+
+            /* apply 180 degree flip via graphic RAM writing direction (05h):
+               D[2:0] = 011 starts from XE,YE (both axes reversed) */
+            lcd_write(0x05, lcd_flipped ? 0x03 : 0x00);
         }
         else {
             lcd_write(0x02, 0x00);
@@ -297,7 +309,7 @@ void lcd_enable(bool on)
             lcd_write(0x03, 0x01);
         }
     }
-    
+
     lcd_enabled = on;
 }
 
@@ -324,6 +336,18 @@ void lcd_init_device(void)
 /* sets up the lcd to receive frame buffer data */
 static void lcd_setup_rect(int x, int x_end, int y, int y_end)
 {
+    if (lcd_flipped) {
+        /* Mirror the window to the opposite corner; the reversed write
+           direction set in lcd_enable() fills it back-to-front, drawing the
+           framebuffer rotated 180 degrees with no per-pixel work. */
+        int fx = LCD_WIDTH  - 1 - x_end;
+        int fy = LCD_HEIGHT - 1 - y_end;
+        x_end  = LCD_WIDTH  - 1 - x;
+        y_end  = LCD_HEIGHT - 1 - y;
+        x = fx;
+        y = fy;
+    }
+
     if (lcd_type == 0) {
         lcd_write(0x34, x);     /* MEM_X1 */
         lcd_write(0x35, x_end); /* MEM_X2 */
@@ -380,6 +404,23 @@ void lcd_write_data(const fb_data *data, int count)
     }
 }
 
+/* Rotate the display 180 degrees (the flip_display setting). Both panel
+   controllers do this in hardware by reversing the GRAM write direction (set in
+   lcd_enable) so the address counter walks the framebuffer backwards;
+   lcd_setup_rect mirrors the write window to match. Cycle the panel off/on here
+   so a change (e.g. toggled from the menu) takes effect immediately. */
+void lcd_set_flip(bool yesno)
+{
+    if (yesno == lcd_flipped)
+        return;
+    lcd_flipped = yesno;
+
+    if (lcd_enabled) {
+        lcd_enable(false);
+        lcd_enable(true);
+    }
+}
+
 /* Updates a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
@@ -392,7 +433,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         /* rectangle is outside visible display, do nothing */
         return;
     }
-    
+
     /* update entire horizontal strip for display type 0 (wisechip) */
     if (lcd_type == 0) {
         x = 0;

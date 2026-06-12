@@ -113,6 +113,17 @@ static unsigned long get_lcd_pixel(int x, int y)
 #endif
 }
 
+#ifdef HAVE_LCD_FLIP
+/* The simulator has no real LCD controller, so flip_display is done in software
+   here: when set, the framebuffer is mirrored as it is copied to the surface.
+   (On the device the controller flips itself; see lcd-clipzip.c.) */
+static bool sim_lcd_flipped = false;
+void lcd_set_flip(bool yesno)
+{
+    sim_lcd_flipped = yesno;
+}
+#endif
+
 void lcd_update(void)
 {
     /* update a full screen rect */
@@ -121,6 +132,29 @@ void lcd_update(void)
 
 void lcd_update_rect(int x_start, int y_start, int width, int height)
 {
+#ifdef HAVE_LCD_FLIP
+    if (sim_lcd_flipped)
+    {
+        /* redraw the whole panel mirrored in both axes (sim software flip) */
+        SDL_Rect d = {0, 0, 1, 1};
+        int x, y;
+        for (y = 0; y < LCD_HEIGHT; y++)
+        {
+            for (x = 0; x < LCD_WIDTH; x++)
+            {
+                d.x = x;
+                d.y = y;
+                SDL_FillRect(lcd_surface, &d, (Uint32)
+                    get_lcd_pixel(LCD_WIDTH - 1 - x, LCD_HEIGHT - 1 - y));
+            }
+        }
+        sdl_gui_update(lcd_surface, 0, 0, LCD_WIDTH,
+                       LCD_HEIGHT + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                       background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
+        return;
+    }
+#endif
+
     sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                     LCD_WIDTH, LCD_HEIGHT, get_lcd_pixel);
     sdl_gui_update(lcd_surface, x_start, y_start, width,

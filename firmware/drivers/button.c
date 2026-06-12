@@ -459,7 +459,6 @@ static int button_flip(int button)
 {
     int newbutton = button;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     newbutton &= ~(
 #if defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
         BUTTON_LEFT | BUTTON_RIGHT
@@ -521,7 +520,6 @@ static int button_flip(int button)
     if (button & BUTTON_PREV)
         newbutton |= BUTTON_NEXT;
 #endif
-#endif /* !SIMULATOR */
     return newbutton;
 }
 
