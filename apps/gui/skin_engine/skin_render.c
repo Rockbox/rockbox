@@ -227,6 +227,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_PLAYLIST_PERCENTBAR:
         case SKIN_TOKEN_SETTINGBAR:
         case SKIN_TOKEN_PROGRESSBAR:
+        case SKIN_TOKEN_PLAYLIST_PROGRESSBAR:
         case SKIN_TOKEN_TUNER_RSSI_BAR:
         case SKIN_TOKEN_LIST_SCROLLBAR:
         {

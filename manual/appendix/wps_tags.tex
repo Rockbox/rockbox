@@ -176,6 +176,15 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%pp} & Playlist position as index\\
     \config{\%pP} & Playlist position as percentage. Can be used as a value, %
             a conditional tag or a bar tag.\\
+    \config{\%pX} & Percentage of the whole playlist played by time. Unlike
+         \config{\%pP} this reflects tracks of differing length when 500 or less, 
+         such as audiobook chapters. Othewise acts like \config{\%pP} except with
+         also including progress through the current track in the percentage.
+    \opt{HAVE_DISK_STORAGE}{
+         Track lengths are estimated from file size to reduce disk use, so
+         the value may be approximate.
+         }
+         Can be used as a value, a conditional tag or a bar tag.\\
     \config{\%pr} & Remaining time in song\\
     \config{\%ps} & ``s'' if shuffle mode is enabled\\
     \config{\%pt} & Total track time\\

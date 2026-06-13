@@ -428,6 +428,12 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
                                   int offset_tracks, char *buf, int buf_size);
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                           char *filename, char *buf, int buf_size, int limit, int *intval);
+/* whole-playlist progress backing %pX (number and bar forms) */
+bool wps_get_playlist_percent(struct mp3entry *id3, unsigned long elapsed_ms,
+                              unsigned long *elapsed_s, unsigned long *total_s);
+void wps_playlist_percent_enable(void);
+void wps_playlist_percent_prepare(void);
+
 #if CONFIG_TUNER
 const char *get_radio_token(struct wps_token *token, int preset_offset,
                             char *buf, int buf_size, int limit, int *intval);

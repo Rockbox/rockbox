@@ -41,10 +41,15 @@
 #include "misc.h"
 #include "led.h"
 #include "peakmeter.h"
+#include "splash.h"
 /* Image stuff */
 #include "albumart.h"
 #include "playlist.h"
 #include "playback.h"
+#include "metadata.h"
+#include "crc32.h"
+#include "file.h"
+#include "core_alloc.h"
 #include "tdspeed.h"
 #include "viewport.h"
 #include "tagcache.h"
@@ -198,6 +203,167 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     return NULL;
 }
 
+/* Whole-playlist progress by time (%pX). if track count exceeds MAX_TRACKS
+ * the tag falls back to position-based progress.
+ * The cache is keyed on the track count and a crc of the
+ * first, middle and last filenames, so a playlist change, same-length swap,
+ * or reshuffle causes a reload of the length data. */
+#define PLPCT_MAX_TRACKS 500
+
+static struct {
+    uint32_t sig;           /* signature of the playlist to detect changed playlist or reshuffle*/
+    int amount;
+    bool nomem;             /* allocation failed -> position fallback */
+    bool enabled;           /* tag was parsed */
+    uint16_t track_mins[PLPCT_MAX_TRACKS];
+    unsigned long total_min;
+} plpct = { .amount = -1, .enabled = false };
+
+static uint32_t plpct_sig(void)
+{
+    struct playlist_info *pl = playlist_get_current();
+    /* changes on any playlist swap or reshuffle */
+    return pl->seed ^ pl->first_index ^ pl->amount ^ pl->last_insert_pos ^ pl->dirlen
+           ^ pl->created_tick ^ pl->max_playlist_size ^ pl->last_shuffled_start;
+}
+
+/* Equal-weight estimate (every track the same length)
+     scaled by 1000 as %pX is percent-only. */
+static void plpct_estimate(const struct mp3entry *id3, unsigned long elapsed_ms,
+                           int index, int amount,
+                           unsigned long *elapsed_s, unsigned long *total_s)
+{
+    unsigned long frac = 0;  /* 0..1000 through the current track */
+    if (id3->length)
+        frac = MIN(1000UL, 1000UL * elapsed_ms / id3->length);
+    *elapsed_s = (unsigned long)(index - 1) * 1000 + frac;
+    *total_s   = (unsigned long)amount * 1000;
+}
+
+void wps_playlist_percent_enable(void)
+{
+    plpct.enabled = true;
+}
+
+void wps_playlist_percent_prepare(void)
+{
+    if (!plpct.enabled)
+        return;
+
+    plpct.nomem = true;
+
+    int amount = playlist_amount();
+    plpct.sig = plpct_sig();
+    plpct.amount = amount;
+    if (amount <= 0 || amount > PLPCT_MAX_TRACKS) /* too many tracks abort */
+    {
+        return;
+    }
+
+    struct playlist_track_info info;
+
+    struct mp3entry *tmp = get_temp_mp3entry(NULL); /* shared scratch */
+
+    if (!tmp)
+        return;
+#if (CONFIG_STORAGE & STORAGE_ATA) /* Harddrive estimate length based on filesize */
+    unsigned int last_afmt = AFMT_UNKNOWN;
+    uint32_t last_bps = 0;
+#endif
+    for (int n = 0; n < amount; n++)
+    {
+        unsigned long secs = 0;
+        uint16_t mins = 0;
+        if (playlist_get_track_info(NULL, n, &info) < 0) /* couldn't get track filename abort */
+            goto abort;
+
+        int slot = info.display_index - 1;
+        if (slot < 0 || slot >= amount)
+            goto abort;
+
+#if (CONFIG_STORAGE & STORAGE_ATA) /* Harddrive */
+        int fd = open(info.filename, O_RDONLY);
+        if (fd >= 0)
+        {
+            unsigned int afmt = probe_file_format(info.filename);
+            off_t size = filesize(fd);
+
+            if (size > 0)
+            {
+                if (afmt != last_afmt || last_bps == 0
+                    || amount <= 50 || (amount <= 250 && ata_disk_isssd()) // TODO tune this for harddisk devices
+                {
+                    if (get_metadata_ex(tmp, fd, info.filename,
+                        METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
+                    {
+                        secs = tmp->length / 1000;
+                        last_bps = (uint32_t)((uint64_t)size * 1000 / tmp->length);
+                        last_afmt = afmt;
+                    }
+                }
+                else /* file size only -- no per-track metadata parse */
+                {
+                    secs = (unsigned long)((uint64_t)size / last_bps);
+                }
+                mins = MIN(MAX(1, (secs + 30) / 60), 65535ul);/* minutes, rounded to nearest */
+            }
+            close(fd);
+        }
+#else
+        if (get_metadata_ex(tmp, -1, info.filename,
+            METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
+        {
+            secs = tmp->length / 1000;
+            mins = MIN(MAX(1, (secs + 30) / 60), 65535ul);/* minutes, rounded to nearest */
+        }
+#endif
+        /* unreadable tracks count as zero length */
+        plpct.track_mins[slot] = mins;
+    }
+
+    plpct.total_min = 0;
+    for (int t = 0; t < plpct.amount; t++)
+        plpct.total_min += plpct.track_mins[t];
+    plpct.nomem = false;
+abort:
+    get_temp_mp3entry(tmp); /* release scratch */
+}
+
+bool wps_get_playlist_percent(struct mp3entry *id3, unsigned long elapsed_ms,
+                              unsigned long *elapsed_s, unsigned long *total_s)
+{
+    int amount = playlist_amount();
+    int index = playlist_get_display_index();  /* 1-based */
+
+    if (!id3 || amount <= 0 || index < 1 || index > amount)
+        return false;
+
+    uint32_t sig = plpct_sig();
+    if (amount != plpct.amount || sig != plpct.sig)
+    {
+        splashf(0, ID2P(LANG_WAIT));
+        wps_playlist_percent_enable();
+        wps_playlist_percent_prepare();
+    }
+    /* error parsing playlist or more than MAX_TRACKS fall back to
+       position-based progress rather than blank */
+    if (plpct.nomem)
+    {
+        plpct_estimate(id3, elapsed_ms, index, amount, elapsed_s, total_s);
+        return true;
+    }
+
+    unsigned long before_min = 0;
+    for (int t = 0; t < index - 1; t++)
+        before_min += plpct.track_mins[t];
+
+    *elapsed_s = before_min * 60 + elapsed_ms / 1000;
+    *total_s = plpct.total_min * 60;
+    if (*elapsed_s > *total_s)
+        *elapsed_s = *total_s;
+    return true;
+}
+
 static const char* get_filename_token(struct wps_token *token, char* filename,
                                char *buf, int buf_size)
 {
@@ -332,6 +498,24 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                 }
                 snprintf(buf, buf_size, "%lu", 100 * elapsed / length);
                 return buf;
+
+            case SKIN_TOKEN_PLAYLIST_ELAPSED_PERCENT:
+            {
+                unsigned long pl_elapsed, pl_total;
+                if (!wps_get_playlist_percent(id3, elapsed,
+                                              &pl_elapsed, &pl_total)
+                    || pl_total == 0)
+                    return NULL;
+
+                /* %pX always yields a value for a valid playlist now (the
+                   equal-weight estimate until the scan finishes, then the exact
+                   time-weighted figure), so it behaves like any percent tag;
+                   %?pX<...> is true whenever the tag applies (a sized playlist). */
+                if (intval && limit == TOKEN_VALUE_ONLY)
+                    *intval = 100 * pl_elapsed / pl_total;
+                snprintf(buf, buf_size, "%lu", 100 * pl_elapsed / pl_total);
+                return buf;
+            }
 
             case SKIN_TOKEN_TRACK_STARTING:
                 {
