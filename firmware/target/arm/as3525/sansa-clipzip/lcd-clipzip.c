@@ -177,7 +177,7 @@ static void lcd_write_nibbles(uint8_t val)
 }
 
 /* Initialises lcd type 1
- * This appears to be a Visionox OLED display, with an unknown controller
+ * This appears to be a Visionox OLED display, with a LDT LD7134 controller
  */
 static void lcd_init_type1(void)
 {

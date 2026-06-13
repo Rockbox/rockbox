@@ -330,6 +330,10 @@ bool dbg_hw_info(void)
       defined(SANSA_CLIPZIP)
         lcd_putsf(x, line++, "AMSv2 variant %d", amsv2_variant);
 #endif
+#if defined(SANSA_CLIPZIP)
+        lcd_putsf(x, line++, "Display type %d", GPIOB_PIN(3) ? 1 : 0);
+#endif
+
         }
         while(dbg_btn(&done, &x))
         {
