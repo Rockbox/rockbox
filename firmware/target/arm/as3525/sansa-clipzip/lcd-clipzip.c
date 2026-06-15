@@ -200,65 +200,67 @@ static void lcd_init_type1(void)
     };
     int i;
 
-    lcd_write(0x02, 0x00);
+    lcd_write(0x02, 0x00); /* DDISP OFF */
 
-    lcd_write_cmd(0x01);
+    lcd_write_cmd(0x01);  /* SOFTRESET */
 
-    lcd_write(0x03, 0x00);
+    lcd_write(0x03, 0x00); /* DSTBY ON */
 
-    lcd_write(0x04, 0x03);
+    lcd_write(0x04, 0x02); /* Set OSC Control 2 = 90Hz*/
 
-    lcd_write(0x05, 0x00);    /* 0x08 results in BGR colour */
+    lcd_write(0x05, 0x00); /* Write Direction 0x08 results in BGR colour */
 
-    lcd_write(0x06, 0x00);
+    lcd_write(0x06, 0x00); /* Set Row Scan Direction */
 
-    lcd_write(0x07, 0x00);
+    lcd_write(0x07, 0x00); /* Set Display Size */
     lcd_write_dat_word(0x00, 0x04);
     lcd_write_dat_word(0x1F, 0x00);
     lcd_write_dat_word(0x00, 0x05);
     lcd_write_dat(0x0F);
 
-    lcd_write(0x08, 0x01);
+    lcd_write(0x08, 0x01); /* Set Interface Bus Type 1 = 8-bit*/
 
-    lcd_write(0x09, 0x07);
+    lcd_write(0x09, 0x07); /* Set Masking Data */
 
-    lcd_write_cmd(0x0A);
+    lcd_write_cmd(0x0A); /* Set Read/Write Box Data */
     lcd_write_nibbles(0);
     lcd_write_nibbles(LCD_WIDTH - 1);
     lcd_write_nibbles(0);
     lcd_write_nibbles(LCD_HEIGHT - 1);
 
-    lcd_write(0x0B, 0x00);
+    lcd_write(0x0B, 0x00); /* Set Display Start Address */
     lcd_write_dat_word(0x00, 0x00);
     lcd_write_dat(0x00);
 
-    lcd_write_cmd(0x0E);
+    lcd_write_cmd(0x0E); /* Set Dot Matrix Current Level */
     lcd_write_nibbles(0x42);
     lcd_write_nibbles(0x25);
     lcd_write_nibbles(0x3F);
 
-    lcd_write(0x0F, 0x0A);
+    lcd_write(0x0F, 0x0A); /* Set Dot Matrix Peak Current Level */
     lcd_write_dat_word(0x0A, 0x0A);
 
-    lcd_write(0x1C, 0x08);
+    lcd_write(0x1C, 0x08); /* Set Pre-Charge Width */
 
-    lcd_write(0x1D, 0x00);
+    lcd_write(0x1D, 0x00); /* Set Peak Pulse Width */
     lcd_write_dat_word(0x00, 0x00);
 
-    lcd_write(0x1E, 0x05);
+    lcd_write(0x1E, 0x05); /* Set Peak Pulse Delay */
 
-    lcd_write(0x1F, 0x00);
+    lcd_write(0x1F, 0x00); /* Set Row Scan Operation 0=Mode 1 : Default scan mode */
 
-    lcd_write(0x30, 0x10);
+    lcd_write(0x30, 0x10); /* Set Internal Regulator for Row Scan*/
 
-    lcd_write_cmd(0x3A);
+    lcd_write_cmd(0x3A); /* Set Gamma Correction Table */
     for (i = 0; i < 128; i++) {
         lcd_write_nibbles(curve[i]);
     }
 
-    lcd_write(0x3C, 0x00);
+    lcd_write_cmd(0x3B); /* Set Gamma Correction Table Initialize */
 
-    lcd_write(0x3D, 0x00);
+    lcd_write(0x3C, 0x00); /* Set VDD Selection */
+
+    lcd_write(0x3D, 0x00); /* DMODE 0= 65K Color */
 }
 
 #ifdef HAVE_LCD_ENABLE
@@ -307,6 +309,8 @@ void lcd_enable(bool on)
             lcd_write(0x02, 0x00);
 
             lcd_write(0x03, 0x01);
+
+            lcd_write(0x14, 0x01); /* DSTBY ON */
         }
     }
 
@@ -357,13 +361,13 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write_cmd(0x08);    /* DDRAM_DATA_ACCESS_PORT */
     }
     else {
-        lcd_write_cmd(0x0A);
+        lcd_write_cmd(0x0A); /* Set Read/Write Box Data */
         lcd_write_nibbles(x);
         lcd_write_nibbles(x_end);
         lcd_write_nibbles(y);
         lcd_write_nibbles(y_end);
         
-        lcd_write_cmd(0x0C);
+        lcd_write_cmd(0x0C); /* Read/Write Display Data */
     }
 }
 
@@ -386,7 +390,7 @@ void oled_brightness(int brightness)
         g = 1 + 6*brightness;
         b = 3 + 10*brightness;
     
-        lcd_write_cmd(0x0E);
+        lcd_write_cmd(0x0E); /* Set Dot Matrix Current Level */
         lcd_write_nibbles(r);
         lcd_write_nibbles(g);
         lcd_write_nibbles(b);
