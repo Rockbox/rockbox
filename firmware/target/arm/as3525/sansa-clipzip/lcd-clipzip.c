@@ -136,7 +136,7 @@ static void lcd_write(uint8_t cmd, uint8_t data)
 /*  Initialises lcd type 0
  *  This appears to be a WiseChip OLED display controlled by a SEPS114A.
  */
-static void lcd_init_type0(void)
+static void lcd_init_type0(void) /* INIT_ATTR */
 {
     lcd_write(0x01, 0x00);  /* SOFT_RESET */
     lcd_write(0x14, 0x01);  /* STANDBY_ON_OFF */
@@ -149,12 +149,14 @@ static void lcd_init_type0(void)
     lcd_write(0xEA, 0x0A);  /* ? */
     lcd_write(0xEB, 0x42);  /* ? */
     lcd_write(0x18, 0x08);  /* DISCHARGE_TIME */
-    lcd_write(0x1A, 0x0B);  /* OSC_ADJUST */
+    lcd_write(0x1A, 0x03);  /* OSC_ADJUST 3 = 95Hz*/
     lcd_write(0x48, 0x03);  /* ROW_OVERLAP */
     lcd_write(0x30, 0x00);  /* DISPLAY_X1 */
     lcd_write(0x31, 0x5F);  /* DISPLAY_X2 */
     lcd_write(0x32, 0x00);  /* DISPLAY_Y1 */
     lcd_write(0x33, 0x5F);  /* DISPLAY_Y2 */
+    lcd_write(0x38, 0x00);  /* DISPLAYSTART_X */
+    lcd_write(0x39, 0x00);  /* DISPLAYSTART_Y */
     lcd_write(0xE0, 0x10);  /* RGB_IF */
     lcd_write(0xE1, 0x00);  /* RGB_POL */
     lcd_write(0xE5, 0x80);  /* DISPLAY_MODE_CONTROL */
@@ -183,7 +185,7 @@ static void lcd_write_nibbles(uint8_t val)
 /* Initialises lcd type 1
  * This appears to be a Visionox OLED display, with a LDT LD7134 controller
  */
-static void lcd_init_type1(void)
+static void lcd_init_type1(void) /* INIT_ATTR */
 {
     static const uint8_t curve[128] = {
         /* 5-bit curve */
@@ -273,22 +275,16 @@ void lcd_enable(bool on)
 
     if (lcd_type == 0) {
         if (on) {
-            lcd_write(0x14, 0x00);  /* STANDBY_ON_OFF */
-            lcd_write(0x02, 0x01);  /* DISP_ON_OFF */
-            lcd_write(0xD2, 0x04);  /* SCREEN_SAVER_MODE */
-            lcd_write(0xD0, 0x80);  /* SCREEN_SAVER_CONTROL */
-            sleep(HZ * 100/1000);
-
-            lcd_write(0xD0, 0x00);  /* SCREEN_SAVER_CONTROL */
-
+            lcd_write(0x14, 0x00);  /* STANDBY OFF */
+            lcd_write(0x02, 0x01);  /* DISP_ON */
             /* apply 180 degree flip via memory write direction (1Dh):
                MDIR1|MDIR0 = decrement both; normal is horizontal-decrement */
             lcd_write(0x1D, lcd_flipped ? 0x02 : 0x01);
         }
         else {
-            lcd_write(0xD2, 0x05);
-            lcd_write(0xD0, 0x80);
-            sleep(HZ * 100/1000);
+            lcd_write(0xD2, 0x05); /* SCREEN_SAVER_MODE 5=FADE_OUT*/
+            lcd_write(0xD0, 0x80); /* SCREEN_SAVER_CONTROL */
+            sleep(HZ/10);
 
             lcd_write(0x02, 0x00);
             lcd_write(0xD0, 0x00);
@@ -296,10 +292,11 @@ void lcd_enable(bool on)
         }
     }
     else {
+        /* Type 1 */
         if (on) {
-            lcd_write(0x03, 0x00);
+            lcd_write(0x03, 0x00); /* DSTBY OFF */
 
-            lcd_write(0x02, 0x01);
+            lcd_write(0x02, 0x01); /* DDISP ON */
 
             /* apply 180 degree flip via graphic RAM writing direction (05h):
                D[2:0] = 011 starts from XE,YE (both axes reversed) */
@@ -325,7 +322,7 @@ bool lcd_active(void)
 #endif /* HAVE_LCD_ENABLE */
 
 /* initialises the lcd */
-void lcd_init_device(void)
+void lcd_init_device(void) /* INIT_ATTR */
 {
     lcd_type = lcd_hw_init();
     if (lcd_type == 0) {
@@ -340,33 +337,52 @@ void lcd_init_device(void)
 /* sets up the lcd to receive frame buffer data */
 static void lcd_setup_rect(int x, int x_end, int y, int y_end)
 {
-    if (lcd_flipped) {
+    int fx, fx_end, fy;
+
+    if (lcd_type == 0) {
+        if (lcd_flipped) /* Type 0 LCD requires the flipped fx and fx_end ??*/
+        {
         /* Mirror the window to the opposite corner; the reversed write
            direction set in lcd_enable() fills it back-to-front, drawing the
            framebuffer rotated 180 degrees with no per-pixel work. */
-        int fx = LCD_WIDTH  - 1 - x_end;
-        int fy = LCD_HEIGHT - 1 - y_end;
-        x_end  = LCD_WIDTH  - 1 - x;
-        y_end  = LCD_HEIGHT - 1 - y;
-        x = fx;
-        y = fy;
-    }
-
-    if (lcd_type == 0) {
-        lcd_write(0x34, x);     /* MEM_X1 */
-        lcd_write(0x35, x_end); /* MEM_X2 */
+            fx = x;
+            fx_end = x_end;
+            fy = LCD_HEIGHT - 1 - y_end;
+            y_end  = LCD_HEIGHT - 1 - y;
+            y = fy;
+        }
+        else
+        {
+            fx = LCD_WIDTH - 1 - x_end;
+            fx_end = LCD_WIDTH - 1 - x;
+        }
+        lcd_write(0x34, fx);    /* MEM_X1 */
+        lcd_write(0x35, fx_end);/* MEM_X2 */
         lcd_write(0x36, y);     /* MEM_Y1 */
         lcd_write(0x37, y_end); /* MEM_Y2 */
-        
-        lcd_write_cmd(0x08);    /* DDRAM_DATA_ACCESS_PORT */
+
+        lcd_write_cmd(0x08);   /* DDRAM_DATA_ACCESS_PORT */
     }
     else {
+        /* Type 1*/
+        if (lcd_flipped) {
+        /* Mirror the window to the opposite corner; the reversed write
+           direction set in lcd_enable() fills it back-to-front, drawing the
+           framebuffer rotated 180 degrees with no per-pixel work. */
+            fx = LCD_WIDTH  - 1 - x_end;
+            x_end  = LCD_WIDTH  - 1 - x;
+            x = fx;
+            fy = LCD_HEIGHT - 1 - y_end;
+            y_end  = LCD_HEIGHT - 1 - y;
+            y = fy;
+        }
+
         lcd_write_cmd(0x0A); /* Set Read/Write Box Data */
         lcd_write_nibbles(x);
         lcd_write_nibbles(x_end);
         lcd_write_nibbles(y);
         lcd_write_nibbles(y_end);
-        
+
         lcd_write_cmd(0x0C); /* Read/Write Display Data */
     }
 }
@@ -438,12 +454,14 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
     }
 
+#if 0 /* no longer needed unless it turns out that some devices are wired backwards */
     /* update entire horizontal strip for display type 0 (wisechip) */
     if (lcd_type == 0) {
         x = 0;
         x_end = 96;
     }
-    
+#endif
+
     /* correct rectangle (if necessary) */
     if (x < 0) {
         x = 0;
