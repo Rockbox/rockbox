@@ -31,6 +31,7 @@
 
 const char crypto_key[16] = "SanDiskSlotRadi";
 
+#if 0
 static void rsrc_crypt(void *buf, int size)
 {
     if(size % 16)
@@ -42,6 +43,7 @@ static void rsrc_crypt(void *buf, int size)
             p[j] ^= crypto_key[j];
     }
 }
+#endif
 
 enum rsrc_error_t rsrc_write_file(struct rsrc_file_t *rsrc, const char *filename)
 {
@@ -252,4 +254,3 @@ void rsrc_dump(struct rsrc_file_t *file, void *u, rsrc_color_printf cprintf)
     #undef printf
     #undef print_hex
 }
-

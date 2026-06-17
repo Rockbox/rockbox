@@ -488,11 +488,11 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
 
     if(buf_p - buf != sb_hdr.image_size * BLOCK_SIZE)
     {
-        free(buf);
         printf(GREY, "Internal error: SB image buffer was not entirely filled !\n");
         printf(GREY, "Internal error: expected %u blocks, got %u\n",
             (buf_p - buf) / BLOCK_SIZE, sb_hdr.image_size);
         cprintf(u, true, GREY, "Internal error\n");
+        free(buf);
         return SB_ERROR;
     }
 
