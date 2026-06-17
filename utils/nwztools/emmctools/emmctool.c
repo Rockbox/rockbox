@@ -46,6 +46,7 @@ static int g_nvp_node = -1;
 
 #define errorf(...) do { cprintf(GREY, __VA_ARGS__); return __LINE__; } while(0)
 
+#if 0
 static void print_hex(void *p, int size, int unit)
 {
     uint8_t *p8 = p;
@@ -63,6 +64,7 @@ static void print_hex(void *p, int size, int unit)
             printf(" %08x", *p32);
     }
 }
+#endif
 
 #define SECTOR              512u
 #define EMMC_MINIBOOT_START 0

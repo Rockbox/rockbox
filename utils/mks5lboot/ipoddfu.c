@@ -890,7 +890,7 @@ static void dfuapi_destroy(struct dfuDev *dfuh)
 
 static struct dfuDev *dfuapi_create(void)
 {
-    return calloc(sizeof(struct dfuDev), 1);
+        return calloc(1, sizeof(struct dfuDev));
 }
 
 
