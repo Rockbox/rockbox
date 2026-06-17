@@ -101,40 +101,40 @@ static void *binary_extract(FILE *fp, uint32_t offset, uint32_t len, int descram
     if ((fp == NULL) || len == 0)
         return NULL;
 
-        /* allocate buff */
-        if ((buff = malloc(len)) == NULL)
-            return NULL;
+    /* allocate buff */
+    if ((buff = malloc(len)) == NULL)
+        return NULL;
 
-        /* seek to the begining of the data */
-        fseek(fp, offset, SEEK_SET);
+    /* seek to the begining of the data */
+    fseek(fp, offset, SEEK_SET);
 
-        /* read into the buffer */
-        ret = fread(buff, 1, len, fp);
+    /* read into the buffer */
+    ret = fread(buff, 1, len, fp);
 
-        if (ret != len)
+    if (ret != len)
+    {
+        free(buff);
+        return NULL;
+    }
+
+    /* descramble */
+    if ( descramble )
+    {
+        buff_ptr = buff;
+        if (encode_mode == PAGE_ENC)
         {
-            free(buff);
-            return NULL;
-        }
-
-        /* descramble */
-        if ( descramble )
-        {
-            buff_ptr = buff;
-            if (encode_mode == PAGE_ENC)
+            while (len >= 0x200)
             {
-                while (len >= 0x200)
-                {
-                    encode_page((uint8_t *)buff_ptr,
-                                (uint8_t *)buff_ptr,
-                                0x200);
+                encode_page((uint8_t *)buff_ptr,
+                            (uint8_t *)buff_ptr,
+                            0x200);
 
-                    buff_ptr += 0x200;
-                    len -= 0x200;
-                }
+                buff_ptr += 0x200;
+                len -= 0x200;
             }
-            encode_page((uint8_t *)buff_ptr, (uint8_t *)buff_ptr, len);
         }
+        encode_page((uint8_t *)buff_ptr, (uint8_t *)buff_ptr, len);
+    }
 
     return buff;
 }
@@ -270,7 +270,7 @@ int main (int argc, char **argv)
         }
 
         fwrite(buff, 1, rkboot_info.s1_len, fp_out);
- 
+
         fprintf(stderr, "[info]: extracted rkboot_s1.bin file\n");
         free(buff);
         fclose(fp_out);
@@ -358,4 +358,3 @@ int main (int argc, char **argv)
     fclose(fp_in);
     return 0;
 }
-
