@@ -79,7 +79,7 @@ int splash_scroller(int timeout, const char* str)
 
     const int max_ch = (LCD_WIDTH / ch_w - 1) * 2;
     char line[max_ch + 2]; /* display buffer +2 incase of tab chars */
-    const char break_chars[] = "/\\  \r\n\f\v";
+    const char break_chars[] = "/\\ \r\n\f\v";
     const char *ch, *brk;
 
     int linepos, curline, linesdisp, maxl, last_break;
@@ -100,7 +100,7 @@ int splash_scroller(int timeout, const char* str)
             linepos = 0;
             brk = NULL;
             maxl = rb->font_measurestring(ch, max_ch, max_w, &w, NULL, fontnum);
-            for (; *ch && linepos < maxl; ch++)
+            for (; *ch && linepos <= maxl; ch++)
             {
                 if (strpbrk_n(ch, 1, break_chars))
                 {
@@ -143,7 +143,7 @@ int splash_scroller(int timeout, const char* str)
             /* try to not split in middle of words */
             if (last_break > 0 && *ch != '\0')
             {
-                if (strpbrk_n(ch, 1, break_chars) ||
+                if ((!strpbrk_n(ch, 1, break_chars)) &&
                    (w + wrap_thresh > max_w && strpbrk_n(ch, max_ch, break_chars)))
                 {
                     line[last_break] = '\0';
@@ -155,6 +155,7 @@ int splash_scroller(int timeout, const char* str)
             {
                 lcd_putsxy(0, realline * ch_h, line);
                 linesdisp++;
+                last_break = 0;
             }
 
             curline++;
