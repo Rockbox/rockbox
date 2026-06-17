@@ -82,12 +82,15 @@ __pycache__
 /utils/bspatch/bspatch
 
 # imxtools
+/utils/imxtools/misc/io_pins
+/utils/imxtools/misc/wiki_gen
 /utils/imxtools/scsitools/scsitool
 /utils/imxtools/sbtools/elftosb
 /utils/imxtools/sbtools/elftosb1
 /utils/imxtools/sbtools/rsrctool
 /utils/imxtools/sbtools/sbloader
 /utils/imxtools/sbtools/sbtoelf
+/utils/mkimxboot/mkimxboot
 
 # /utils/rbutilqt/
 /utils/rbutilqt/build
@@ -105,16 +108,22 @@ __pycache__
 # /utils/rbutilqt/lang/
 /utils/rbutilqt/lang/*.qm
 
-# More rbutil
+# More target-specific utilities
 /utils/*/buildposix
 /utils/*/uninstall_script.[ch]
 /utils/*/install_script.[ch]
-/utils/mkimxboot/mkimxboot
+/utils/e200tool/e200load
 /utils/mknwzboot/mknwzboot
 /utils/mkzenboot/mkzenboot
 /utils/sansapatcher/sansapatcher
 /utils/jztool/jztool
 /utils/tools/bin2c
+/utils/rk27utils/nandextract/nandextract
+/utils/rk27utils/rk27load/rk27load
+/utils/rk27utils/rkwtool/rkwtool
+/utils/rk27utils/rkusbtool/rkusbtool
+/utils/mkmpioboot/mkmpioboot
+/utils/mktccboot/mktccboot
 
 # /tools/
 /tools/bdf2bmp
@@ -195,7 +204,7 @@ __pycache__
 /utils/nwztools/upgtools/upgtool
 /utils/nwztools/emmctools/emmctool
 
-#  utils/rk27utils 
+#  utils/rk27utils
 /utils/rk27utils/rkboottool/rkboottool
 
 # /utils/themeeditor/
