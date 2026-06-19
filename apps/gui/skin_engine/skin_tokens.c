@@ -509,7 +509,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             if (preset < 0)
                 preset += preset_count;
             if (token->type == SKIN_TOKEN_PRESET_NAME)
-                snprintf(buf, buf_size, "%s", radio_get_preset_name(preset));
+                radio_get_preset_name(preset, buf, buf_size);
             else if (token->type == SKIN_TOKEN_PRESET_FREQ)
                 format_freq_MHz(radio_get_preset_freq(preset),
                                 region_data->freq_step, buf, buf_size);

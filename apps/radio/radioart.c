@@ -111,37 +111,40 @@ int radio_get_art_hid(struct dim *requested_dim)
     if (!buf || (radio_get_mode() == RADIO_SCAN_MODE) || preset < 0)
         return -1;
 
-    preset_name = radio_get_preset_name(preset);
-    for (int i=0; i<MAX_RADIOART_IMAGES; i++)
+    char buffer[MAX_FMPRESET_LEN + 1];
+    preset_name = radio_get_preset_name(preset, buffer, sizeof(buffer));
+    if (preset_name != NULL)
     {
-        if (radioart[i].handle < 0)
+        for (int i=0; i<MAX_RADIOART_IMAGES; i++)
         {
-            free_idx = i;
+            if (radioart[i].handle < 0)
+            {
+                free_idx = i;
+            }
+            else if (!strcmp(radioart[i].name, preset_name) &&
+                     radioart[i].dim.width == requested_dim->width &&
+                     radioart[i].dim.height == requested_dim->height)
+            {
+                radioart[i].last_tick = current_tick;
+                return radioart[i].handle;
+            }
         }
-        else if (!strcmp(radioart[i].name, preset_name) &&
-                 radioart[i].dim.width == requested_dim->width &&
-                 radioart[i].dim.height == requested_dim->height)
+        if (free_idx >= 0)
         {
-            radioart[i].last_tick = current_tick;
-            return radioart[i].handle;
-        }
-    }
-    if (free_idx >= 0)
-    {
-        return load_radioart_image(&radioart[free_idx], 
-                                   preset_name, requested_dim);
-    }
-    else
-    {
-        int i = find_oldest_image_index();
-        if (i != -1)
-        {
-            bufclose(radioart[i].handle);
-            return load_radioart_image(&radioart[i],
+            return load_radioart_image(&radioart[free_idx], 
                                        preset_name, requested_dim);
         }
+        else
+        {
+            int i = find_oldest_image_index();
+            if (i != -1)
+            {
+                bufclose(radioart[i].handle);
+                return load_radioart_image(&radioart[i],
+                                           preset_name, requested_dim);
+            }
+        }
     }
-        
     return -1;
 }
 
