@@ -138,6 +138,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             OUTPUT ${CMAKE_BINARY_DIR}/${deploy_TARGET}.dmg
             COMMENT "Running macdeployqt and creating dmg ${deploy_TARGET}"
             COMMAND ${MACDEPLOYQT_EXECUTABLE} ${deploy_TARGET}.app
+                -libpath=/opt/homebrew/opt/qt@6/lib
+                -libpath=/opt/homebrew/lib || true
+
+            COMMAND codesign --force --deep --sign - ${deploy_TARGET}.app
+
             COMMAND ${DMGBUILD} -s ${deploy_DMGBUILDCFG}
                     -Dappbundle=${deploy_TARGET}.app
                     ${deploy_TARGET} ${CMAKE_BINARY_DIR}/${deploy_TARGET}.dmg
