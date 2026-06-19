@@ -77,7 +77,7 @@ int splash_scroller(int timeout, const char* str)
     const int max_lines = LCD_HEIGHT / ch_h - 1;
     const int wrap_thresh = (LCD_WIDTH / 4);
 
-    const int max_ch = (LCD_WIDTH / ch_w - 1) * 2;
+    const int max_ch = (LCD_WIDTH / ch_w - 1) * 3;
     char line[max_ch + 2]; /* display buffer +2 incase of tab chars */
     const char break_chars[] = "/\\ \r\n\f\v";
     const char *ch, *brk;
@@ -99,8 +99,10 @@ int splash_scroller(int timeout, const char* str)
         {
             linepos = 0;
             brk = NULL;
+
             maxl = rb->font_measurestring(ch, max_ch, max_w, &w, NULL, fontnum);
-            for (; *ch && linepos <= maxl; ch++)
+
+            for (; *ch && linepos < maxl; ch++)
             {
                 if (strpbrk_n(ch, 1, break_chars))
                 {
@@ -134,9 +136,9 @@ int splash_scroller(int timeout, const char* str)
                     continue;
                 }
                 else
-                    line[linepos] = ch[0];
-
-                linepos++;
+                {
+                    line[linepos++] = ch[0];
+                }
             }
             line[linepos] = '\0';
 
@@ -157,7 +159,8 @@ int splash_scroller(int timeout, const char* str)
                 linesdisp++;
                 last_break = 0;
             }
-
+            if (linepos == maxl && isspace(*ch)) /* we would have split at this space if we could see it */
+                ch++;
             curline++;
         }
 
