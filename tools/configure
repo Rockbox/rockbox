@@ -394,12 +394,14 @@ simcc () {
    ;;
 
    Darwin)
-   sigaltstack=`check_sigaltstack`
+   # FIXME: sigaltstack fails with "Operation not permitted"
+   # in make_context (firmware/asm/thread-unix.c) on latest
+   # versions of macOS (≥ 26.4). Fall back to SDL threads.
    echo "Darwin host detected"
    if $CC --version | grep -q "clang"; then
-    CC=gcc-15
-    AR=gcc-ar-15
-    CPP=cpp-15
+    CC=gcc-16
+    AR=gcc-ar-16
+    CPP=cpp-16
    fi
    LDOPTS="$LDOPTS -ldl"
    SHARED_LDFLAGS="-dynamiclib -Wl,-no_warn_duplicate_libraries"
