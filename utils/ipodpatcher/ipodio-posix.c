@@ -338,8 +338,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
 int ipod_reopen_rw(struct ipod_t* ipod)
 {
 #if defined(__APPLE__) && defined(__MACH__)
-    if (ipod_unmount(ipod) < 0)
-        return -1;
+    ipod_unmount(ipod);
 #endif
 
     close(ipod->dh);
