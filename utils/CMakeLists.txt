@@ -120,7 +120,7 @@ endif()
 
 add_executable(ipodpatcher-bin
     ipodpatcher/main.c
-    ipodpatcher/ipodpatcher-aupd.c
+    ipodpatcher/ipodpatcher_aupd.c
     )
 target_link_libraries(ipodpatcher-bin ipodpatcher)
 target_compile_definitions(ipodpatcher-bin PRIVATE VERSION="none")
