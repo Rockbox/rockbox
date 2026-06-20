@@ -95,6 +95,7 @@ bool VoiceFileCreator::createVoiceFile()
                     emit logItem(tr("Extracted voice corrections file from installation"), LOGINFO);
                     corrFile = &corrfileT;
                 } else {
+                    // XXX try to fetch an updated file via voicecorrections_url ?
                     corrfileT.close();
                     emit logItem(tr("Using internal voice corrections file"), LOGINFO);
                     QFile corrfile(":/builtin/voice-corrections.txt");

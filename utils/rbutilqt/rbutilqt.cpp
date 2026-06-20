@@ -117,6 +117,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 #endif
     updateDevice();
     downloadInfo();
+    // XXX download latest rbutil.ini via rbutilini_url
 
     m_gotInfo = false;
     m_auto = false;
@@ -669,7 +670,7 @@ void RbUtilQt::downloadUpdateDone(QNetworkReply::NetworkError error)
         for(int i=0; i < rbutilList.size(); i++)
         {
             QString item = rbutilList.at(i);
-#if defined(Q_OS_LINUX) 
+#if defined(Q_OS_LINUX)
 #if defined(__amd64__)
             // skip if it isn't a 64 bit build
             if( !item.contains("64bit"))
@@ -748,4 +749,3 @@ void RbUtilQt::eject(void)
                    "fails please use your computers eject funtionality."));
     }
 }
-
