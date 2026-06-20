@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>BackupDialog</name>
     <message>
@@ -12,6 +12,7 @@
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="33"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This dialog will create a backup by archiving the contents of the Rockbox installation on the player into a zip file. This will include installed themes and settings stored below the .rockbox folder on the player.&lt;/p&gt;&lt;p&gt;The backup filename will be created based on the installed version. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translatorcomment>我真的服了，上一个翻译者到底是谁，随便在中文汉字前面加一个&amp;就当快捷键用，在这种情况下用户必须用输入法选择一个汉字才能触发快捷键，一点也不考虑实际使用场景。我全部改成了和原版一样的英文字母快捷键，远比之前那种方便，而且界面看起来也不会别扭了。——Meduhedan 2026.6.21</translatorcomment>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;此对话框将通过将播放器上安装的 Rockbox 内容存档到 zip 文件中来创建备份。这将包括已安装的主题和存储在播放器的 .rockbox 文件夹下的设置。&lt;/p&gt;&lt;p&gt;备份文件名将根据已安装的版本创建。 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -27,22 +28,22 @@
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="76"/>
         <source>&amp;Change</source>
-        <translation>&amp;更改</translation>
+        <translation>更改(&amp;C)</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="116"/>
         <source>&amp;Backup</source>
-        <translation>&amp;备份</translation>
+        <translation>备份(&amp;B)</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="127"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;取消</translation>
+        <translation>取消(&amp;C)</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="70"/>
         <source>Installation size: calculating ...</source>
-        <translation>安装大小：计算中</translation>
+        <translation>安装大小：计算中……</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="89"/>
@@ -84,8 +85,8 @@
     <name>BootloaderInstallAms</name>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（bin 文件）。此固件文件将被修补，然后与rockbox bootloader一起安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览&lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;此文件在您的播放器上不存在，安装后将自动消失。&lt;br/&gt;&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href='http://forums.sandisk.com/sansa/'&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; and the &lt;a href='https://www.rockbox.org/wiki/SansaAMS'&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（bin 文件）。此固件文件将被修补，然后与rockbox bootloader一起安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览&lt;a href='http://forums.sandisk.com/sansa/'&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; 和 &lt;a href='https://www.rockbox.org/wiki/SansaAMS'&gt;SansaAMS&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;此文件在您的播放器上不保存，安装后将自动消失。&lt;br/&gt;&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="58"/>
@@ -134,7 +135,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="78"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation>下载错误: 接到 HTTP 错误 %1. </translation>
+        <translation>下载错误: 接到 HTTP 错误 %1。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="84"/>
@@ -149,12 +150,12 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="92"/>
         <source>Download finished.</source>
-        <translation>完成下载.</translation>
+        <translation>完成下载。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="113"/>
         <source>Creating backup of original firmware file.</source>
-        <translation>创建原始固件文件备份。</translation>
+        <translation>正在创建原始固件文件备份。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="115"/>
@@ -226,8 +227,8 @@
     <name>BootloaderInstallChinaChip</name>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（HXF 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki 页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; and the &lt;a href='https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve'&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（HXF 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; 和 &lt;a href='https://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve'&gt;OndaVX747&lt;/a&gt; wiki 页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="50"/>
@@ -344,12 +345,12 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="121"/>
-        <source>Can&apos;t remove Rockbox bootloader file.</source>
+        <source>Can't remove Rockbox bootloader file.</source>
         <translation>无法移除Rockbox bootloader文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="126"/>
-        <source>Can&apos;t restore bootloader file.</source>
+        <source>Can't restore bootloader file.</source>
         <translation>无法恢复bootloader文件。</translation>
     </message>
     <message>
@@ -382,7 +383,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="106"/>
-        <source>Firmware file doesn&apos;t match selected player.</source>
+        <source>Firmware file doesn't match selected player.</source>
         <translation>固件文件与选定的播放器不匹配。</translation>
     </message>
     <message>
@@ -422,7 +423,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="175"/>
-        <source>can&apos;t open bootloader file</source>
+        <source>can't open bootloader file</source>
         <translation>无法打开bootloader文件</translation>
     </message>
     <message>
@@ -432,7 +433,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="177"/>
-        <source>can&apos;t open output file</source>
+        <source>can't open output file</source>
         <translation>无法创建输出文件</translation>
     </message>
     <message>
@@ -482,12 +483,12 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="258"/>
-        <source>Can&apos;t open input file</source>
+        <source>Can't open input file</source>
         <translation>无法打开输入文件</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="259"/>
-        <source>Can&apos;t open output file</source>
+        <source>Can't open output file</source>
         <translation>无法打开输出文件</translation>
     </message>
     <message>
@@ -502,12 +503,12 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="262"/>
-        <source>invalid file: &quot;length&quot; field wrong</source>
+        <source>invalid file: "length" field wrong</source>
         <translation>无效文件：“length”区域错误</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="263"/>
-        <source>invalid file: &quot;length2&quot; field wrong</source>
+        <source>invalid file: "length2" field wrong</source>
         <translation>无效文件：“length2”区域错误</translation>
     </message>
     <message>
@@ -517,7 +518,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="265"/>
-        <source>invalid file: &quot;length3&quot; field wrong</source>
+        <source>invalid file: "length3" field wrong</source>
         <translation>无效文件：“length3”区域错误</translation>
     </message>
     <message>
@@ -527,16 +528,16 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="50"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader安装需要提供一个原始固件的文件（二进制文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅&lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt;和&lt;a href=&apos;https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve&apos;&gt;IriverBoot&lt;/a&gt;wiki页面。按确定继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (hex file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; and the &lt;a href='https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve'&gt;IriverBoot&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader安装需要提供一个原始固件的文件（二进制文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅&lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt;和&lt;a href='https://www.rockbox.org/wiki/IriverBoot#Download_and_extract_a_recent_ve'&gt;IriverBoot&lt;/a&gt;wiki页面。按确定继续并浏览您的计算机以获取固件文件。</translation>
     </message>
 </context>
 <context>
     <name>BootloaderInstallImx</name>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（firmware.sb 文件）。此文件将使用 Rockbox 引导加载程序进行修补并安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;按确定继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href='http://forums.sandisk.com/sansa/'&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= 'https://www.rockbox.org/wiki/SansaFuzePlus'&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始 Sandisk 固件的副本（firmware.sb 文件）。此文件将使用 Rockbox 引导加载程序进行修补并安装到您的播放器中。由于法律原因，您需要自行下载此文件。请浏览 &lt;a href='http://forums.sandisk.com/sansa/'&gt;Sansa Forums&lt;/a&gt; 或参阅 &lt;a href= 'https://www.rockbox.org/wiki/SansaFuzePlus'&gt;SansaFuzePlus&lt;/a&gt; wiki 页面以获取此文件。&lt;br/&gt;按确定继续并浏览您的计算机以获取固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="94"/>
@@ -583,7 +584,7 @@
     <name>BootloaderInstallIpod</name>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="49"/>
-        <source>Error: can&apos;t allocate buffer memory!</source>
+        <source>Error: can't allocate buffer memory!</source>
         <translation>错误：无法分配缓冲区内存！</translation>
     </message>
     <message>
@@ -749,8 +750,8 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <name>BootloaderInstallMpio</name>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="34"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; and the &lt;a href='https://www.rockbox.org/wiki/MPIOHD200Port'&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取此文件，请参阅 &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; 和 &lt;a href='https://www.rockbox.org/wiki/MPIOHD200Port'&gt;MPIOHD200Port&lt;/a&gt; wiki页面。&lt;br/&gt;按确定继续并浏览您的计算机以查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="53"/>
@@ -827,7 +828,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <name>BootloaderInstallSansa</name>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="50"/>
-        <source>Error: can&apos;t allocate buffer memory!</source>
+        <source>Error: can't allocate buffer memory!</source>
         <translation>错误：无法分配缓冲区内存！</translation>
     </message>
     <message>
@@ -840,12 +841,12 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
         <translation>磁盘拒绝访问！
-安装bootloader时，这是必需的！</translation>
+安装启动引导程序时这是必需的</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="66"/>
         <source>No Sansa detected!</source>
-        <translation>未检测到Sansa！</translation>
+        <translation>未检测到Sansa设备！</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="79"/>
@@ -862,7 +863,8 @@ See https://www.rockbox.org/wiki/SansaE200Install
 </source>
         <translation>检测到旧的 ROCKBOX 安装，安装中止。
 在首次运行Sansapatcher之前，您必须重新安装原始的 Sansa 固件
-请参阅 https://www.rockbox.org/wiki/SansaE200Install</translation>
+请参阅 https://www.rockbox.org/wiki/SansaE200Install
+</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="102"/>
@@ -897,7 +899,7 @@ See https://www.rockbox.org/wiki/SansaE200Install
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="254"/>
-        <source>Can&apos;t find Sansa</source>
+        <source>Can't find Sansa</source>
         <translation>无法找到Sansa</translation>
     </message>
     <message>
@@ -950,8 +952,8 @@ See https://www.rockbox.org/wiki/SansaE200Install
     <name>BootloaderInstallTcc</name>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="33"/>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取文件，请参阅 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; 或 &lt;a href=&apos;https://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki页面。&lt;br/&gt;按确定键继续并浏览您的计算机以获取固件文件。</translation>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; and the &lt;a href='https://www.rockbox.org/wiki/CowonD2Info'&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation>Bootloader 安装需要您提供原始固件的固件文件（bin 文件）。由于法律原因，您需要自行下载此文件。有关如何获取文件，请参阅 &lt;a href='https://www.rockbox.org/manual.shtml'&gt;manual&lt;/a&gt; 或 &lt;a href='https://www.rockbox.org/wiki/CowonD2Info'&gt;CowonD2Info&lt;/a&gt; wiki页面。&lt;br/&gt;按确定键继续并浏览您的计算机以获取固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="50"/>
@@ -1038,7 +1040,7 @@ See https://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../configure.cpp" line="530"/>
         <source>The System Proxy settings are invalid!
-Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
+Rockbox Utility can't work with this proxy settings. Make sure the system proxy is set correctly. Note that "proxy auto-config (PAC)" scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation>系统代理设置无效！
 Rockbox Utility 无法使用此代理设置。请确保系统代理设置正确。请注意，Rockbox Utility 不支持“代理自动配置 （PAC）”脚本。如果您的系统使用此功能，则需要使用手动代理设置。</translation>
     </message>
@@ -1049,23 +1051,23 @@ Rockbox Utility 无法使用此代理设置。请确保系统代理设置正确�
     </message>
     <message>
         <location filename="../configure.cpp" line="788"/>
-        <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+        <source>%1 "MacPod" found!
+Rockbox needs a FAT formatted Ipod (so-called "WinPod") to run. </source>
         <translation>%1 发现Mac格式的iPod！！
-Rockbox需要FAT格式的iPod才能运行。</translation>
+Rockbox需要FAT格式的iPod才能运行。 </translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="780"/>
         <source>%1 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>%1 发现处于MTP模式！
-你需要将你的播放器置于MSC模式才能安装。</translation>
+你需要将你的播放器置于MSC模式才能安装。 </translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="774"/>
         <source>Detected an unsupported player:
 %1
-Sorry, Rockbox doesn&apos;t run on your player.</source>
+Sorry, Rockbox doesn't run on your player.</source>
         <translation>检测到不支持的播放器：
 %1
 抱歉，Rockbox无法在此播放器上运行。</translation>
@@ -1098,8 +1100,8 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configure.cpp" line="449"/>
         <location filename="../configure.cpp" line="915"/>
-        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation>选定的TTS无法初始化。你无法使用此TTS</translation>
+        <source>The selected TTS failed to initialize. You can't use this TTS.</source>
+        <translation>选定的TTS无法初始化。你不能使用此TTS。</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="665"/>
@@ -1302,7 +1304,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../configurefrm.ui" line="41"/>
         <source>Select your device in the &amp;filesystem</source>
-        <translation>请在文件系统中选择你的播放器</translation>
+        <translation>请在文件系统中选择你的播放器（&amp;F）</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="319"/>
@@ -1491,7 +1493,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../configurefrm.ui" line="485"/>
         <source>Configure &amp;Enc</source>
-        <translation>配置编码器</translation>
+        <translation>配置编码器（&amp;E）</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="496"/>
@@ -1570,7 +1572,7 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="101"/>
-        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
+        <source>The selected TTS failed to initialize. You can't use this TTS.</source>
         <translation>选定的TTS无法初始化。您无法使用此TTS。</translation>
     </message>
     <message>
@@ -1761,7 +1763,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../installtalkfrm.ui" line="154"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;取消</translation>
+        <translation>取消(&amp;C)</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="111"/>
@@ -1771,7 +1773,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../installtalkfrm.ui" line="143"/>
         <source>&amp;Install</source>
-        <translation>安装</translation>
+        <translation>安装（&amp;I）</translation>
     </message>
 </context>
 <context>
@@ -1793,7 +1795,7 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="138"/>
-        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
+        <source>The selected TTS failed to initialize. You can't use this TTS.</source>
         <translation>选定的TTS无法初始化。你无法使用这个TTS。</translation>
     </message>
 </context>
@@ -1801,13 +1803,13 @@ Please configure TTS engine.</source>
     <name>ManualWidget</name>
     <message>
         <location filename="../gui/manualwidget.cpp" line="44"/>
-        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;PDF 用户手册(英文)&lt;/a&gt;</translation>
+        <source>&lt;a href='%1'&gt;PDF Manual&lt;/a&gt;</source>
+        <translation>&lt;a href='%1'&gt;PDF 用户手册(英文)&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="46"/>
-        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;HTML 用户手册(英文,在浏览器打开)&lt;/a&gt;</translation>
+        <source>&lt;a href='%1'&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
+        <translation>&lt;a href='%1'&gt;HTML 用户手册(英文,在浏览器打开)&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="50"/>
@@ -1816,8 +1818,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="51"/>
-        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;用户手册总观&lt;/a&gt;</translation>
+        <source>&lt;a href='%1'&gt;Manual Overview&lt;/a&gt;</source>
+        <translation>&lt;a href='%1'&gt;用户手册总观&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="62"/>
@@ -1860,17 +1862,17 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="63"/>
         <source>&amp;PDF version</source>
-        <translation>PDF 版本</translation>
+        <translation>&amp;PDF 版本</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="70"/>
         <source>&amp;HTML version (zip file)</source>
-        <translation>HTML 版本 (zip)</translation>
+        <translation>&amp;HTML 版本 (ZIP文件不)</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="92"/>
         <source>Down&amp;load</source>
-        <translation>下载</translation>
+        <translation>下载(&amp;L)</translation>
     </message>
 </context>
 <context>
@@ -1942,15 +1944,15 @@ Please configure TTS engine.</source>
         <location filename="../configure.cpp" line="625"/>
         <location filename="../main.cpp" line="83"/>
         <source>LTR</source>
-        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.
+        <extracomment>This string is used to indicate the writing direction. Translate it to "RTL" (without quotes) for RTL languages. Anything else will get treated as LTR language.
 ----------
-This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+This string is used to indicate the writing direction. Translate it to "RTL" (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="385"/>
         <source>(unknown vendor name) </source>
-        <translation>（供应商名称未知）</translation>
+        <translation>（未知供应商名称） </translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="403"/>
@@ -1969,7 +1971,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="91"/>
-        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player's manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;将你的播放器重启到原始固件。&lt;/li&gt;&lt;li&gt;请用原始固件的升级功能进行一次升级。参阅厂商的说明书以获得更多信息。&lt;br/&gt;&lt;b&gt;重要：&lt;/b&gt; 升级过程绝对不可以被中断，&lt;b&gt;进行固件升级之前必须确认播放器已充电。&lt;/b&gt;&lt;/li&gt;&lt;li&gt;固件升级后，重启你的播放器。&lt;/li&gt;</translation>
     </message>
     <message>
@@ -2015,7 +2017,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="235"/>
-        <source>Can&apos;t get version information!</source>
+        <source>Can't get version information!</source>
         <translation>无法取得版本信息！</translation>
     </message>
     <message>
@@ -2055,8 +2057,8 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="440"/>
-        <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
-        <translation>已安装的Rockbox是开发版。预构建的语音文件仅对稳定版可用。请使用&quot;创建语音文件&quot;功能自行生成语音文件。</translation>
+        <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the "Create voice file" functionality.</source>
+        <translation>已安装的Rockbox是开发版。预构建的语音文件仅对稳定版可用。请使用"创建语音文件"功能自行生成语音文件。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="512"/>
@@ -2101,7 +2103,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="596"/>
         <source>Error installing Rockbox Utility</source>
-        <translation>安装 Rockbox安装程序错误!</translation>
+        <translation>安装 Rockbox安装程序错误</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="600"/>
@@ -2130,8 +2132,8 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="730"/>
-        <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation>&lt;b&gt;RockboxUtility新版本可用。&lt;/b&gt; &lt;br&gt;&lt;br&gt;请从此处下载：&lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+        <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href='%1'&gt;%2&lt;/a&gt;</source>
+        <translation>&lt;b&gt;RockboxUtility新版本可用。&lt;/b&gt; &lt;br&gt;&lt;br&gt;请从此处下载：&lt;a href='%1'&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="733"/>
@@ -2186,12 +2188,12 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="111"/>
-        <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
+        <source>It seems you are trying to run this program under Wine. Please don't do this, running under Wine will fail. Use the native Linux binary instead.</source>
         <translation>看起来你正在用Wine运行此程序。请勿这样做，否则将会导致错误。请使用Linux构建版本。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="237"/>
-        <source>Can&apos;t get version information.
+        <source>Can't get version information.
 Network error: %1. Please check your network and proxy settings.</source>
         <translation>无法取得版本信息。
 网络错误： %1。请检查你的网络和代理设置。</translation>
@@ -2237,7 +2239,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="92"/>
         <source>&amp;Change</source>
-        <translation>&amp;更改</translation>
+        <translation>更改(&amp;C)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="163"/>
@@ -2248,13 +2250,13 @@ Network error: %1. Please check your network and proxy settings.</source>
         <location filename="../rbutilqtfrm.ui" line="160"/>
         <location filename="../rbutilqtfrm.ui" line="658"/>
         <source>&amp;Installation</source>
-        <translation>&amp;安装</translation>
+        <translation>安装(&amp;I)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="168"/>
         <location filename="../rbutilqtfrm.ui" line="450"/>
         <source>&amp;Accessibility</source>
-        <translation>&amp;辅助</translation>
+        <translation>无障碍(&amp;A)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="171"/>
@@ -2274,7 +2276,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="458"/>
         <source>&amp;Uninstallation</source>
-        <translation>&amp;卸载</translation>
+        <translation>卸载(&amp;U)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="286"/>
@@ -2310,7 +2312,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="393"/>
         <source>&amp;Manual</source>
-        <translation>&amp;用户手册</translation>
+        <translation>用户指南(&amp;M)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="396"/>
@@ -2320,27 +2322,27 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="401"/>
         <source>Inf&amp;o</source>
-        <translation>&amp;信息</translation>
+        <translation>信息(&amp;O)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="419"/>
         <source>&amp;File</source>
-        <translation>&amp;文件</translation>
+        <translation>文件(&amp;F)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="432"/>
         <source>&amp;Troubleshoot</source>
-        <translation>疑难解答</translation>
+        <translation>疑难解答(&amp;T)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="497"/>
         <source>&amp;About</source>
-        <translation>&amp;关于</translation>
+        <translation>关于(&amp;A)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="653"/>
         <source>System &amp;Trace</source>
-        <translation>跟踪</translation>
+        <translation>系统跟踪(&amp;T)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="474"/>
@@ -2355,12 +2357,12 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="484"/>
         <source>&amp;Configure</source>
-        <translation>&amp;配置</translation>
+        <translation>配置(&amp;C)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="489"/>
         <source>E&amp;xit</source>
-        <translation>&amp;退出</translation>
+        <translation>退出(&amp;X)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="492"/>
@@ -2376,12 +2378,12 @@ Network error: %1. Please check your network and proxy settings.</source>
         <location filename="../rbutilqtfrm.ui" line="428"/>
         <location filename="../rbutilqtfrm.ui" line="507"/>
         <source>&amp;Help</source>
-        <translation>&amp;帮助</translation>
+        <translation>帮助(&amp;H)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="446"/>
         <source>Action&amp;s</source>
-        <translation>动作</translation>
+        <translation>操作(&amp;S)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="512"/>
@@ -2443,11 +2445,11 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="283"/>
         <source>Backup &amp;&amp; &amp;Uninstallation</source>
-        <translation>备份 &amp;&amp; &amp;卸载</translation>
+        <translation>备份 &amp;&amp; 卸载(&amp;U)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="309"/>
-        <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
+        <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won't be able to start Rockbox.</source>
         <translation>&lt;b&gt;移除bootloader&lt;/b&gt;&lt;br/&gt;移除bootloader之后你将再也无法启动Rockbox。</translation>
     </message>
     <message>
@@ -2462,78 +2464,78 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="366"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;备份当前安装。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;通过压缩Rockbox安装目录中的内容来备份。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:600;"&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:600;"&gt;备份当前安装。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;通过压缩Rockbox安装目录中的内容来备份。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="539"/>
         <source>Install &amp;Bootloader</source>
-        <translation>安装&amp;Bootloader</translation>
+        <translation>安装Bootloader(&amp;B)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="548"/>
         <source>Install &amp;Rockbox</source>
-        <translation>安装&amp;Rockbox</translation>
+        <translation>安装Rockbox(&amp;R)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="557"/>
         <source>Install &amp;Fonts Package</source>
-        <translation>安装&amp;字体包</translation>
+        <translation>安装字体包(&amp;F)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="566"/>
         <source>Install &amp;Themes</source>
-        <translation>安装&amp;主题</translation>
+        <translation>安装主题(&amp;T)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="575"/>
         <source>Install &amp;Game Files</source>
-        <translation>安装&amp;游戏文件</translation>
+        <translation>安装游戏文件(&amp;G)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="584"/>
         <source>&amp;Install Voice File</source>
-        <translation>&amp;安装语音文件</translation>
+        <translation>安装语音文件(&amp;I)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="593"/>
         <source>Create &amp;Talk Files</source>
-        <translation>创建&amp;说话文件</translation>
+        <translation>创建说话文件(&amp;T)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="602"/>
         <source>Remove &amp;bootloader</source>
-        <translation>移除&amp;bootloader</translation>
+        <translation>移除Bootloader(&amp;B)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="611"/>
         <source>Uninstall &amp;Rockbox</source>
-        <translation>卸载&amp;Rockbox</translation>
+        <translation>卸载Rockbox(&amp;R)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="640"/>
         <source>Create &amp;Voice File</source>
-        <translation>创建&amp;语音文件</translation>
+        <translation>创建语音文件(&amp;V)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="648"/>
         <source>&amp;System Info</source>
-        <translation>&amp;系统信息</translation>
+        <translation>系统信息(&amp;S)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="663"/>
         <source>Show &amp;Changelog</source>
-        <translation>显示&amp;变更日志</translation>
+        <translation>显示变更日志(&amp;C)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="521"/>
         <source>&amp;Complete Installation</source>
-        <translation>&amp;完成安装</translation>
+        <translation>完成安装(&amp;C)</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="530"/>
         <source>&amp;Minimal Installation</source>
-        <translation>&amp;最小安装</translation>
+        <translation>最小安装(&amp;M)</translation>
     </message>
 </context>
 <context>
@@ -2610,7 +2612,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="205"/>
-        <source>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</source>
+        <source>Themes allow adjusting the user interface of Rockbox. Use "Customize" to select themes.</source>
         <translation>主题允许更改Rockbox的用户界面。使用定制选项来选择主题。</translation>
     </message>
     <message>
@@ -2650,7 +2652,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
-        <source>The selected player doesn&apos;t need a bootloader.</source>
+        <source>The selected player doesn't need a bootloader.</source>
         <translation>选定的播放器不需要bootloader。</translation>
     </message>
     <message>
@@ -2690,10 +2692,10 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="285"/>
-        <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
-Press &quot;No&quot; to skip this step.</source>
-        <translation>你可以创建一个原始bootloader的备份。按 &quot;是&quot; 来选定一个保存此文件的目录。文件将会被放入新文件夹&quot;%1&quot;中。
-按 &quot;否&quot; 来跳过这一步。</translation>
+        <source>You can create a backup of the original bootloader file. Press "Yes" to select an output folder on your computer to save the file to. The file will get placed in a new folder "%1" created below the selected folder.
+Press "No" to skip this step.</source>
+        <translation>你可以创建一个原始bootloader的备份。按 "是" 来选定一个保存此文件的目录。文件将会被放入新文件夹"%1"中。
+按 "否" 来跳过这一步。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="292"/>
@@ -2762,7 +2764,7 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="490"/>
-        <source>Your installation doesn&apos;t require game files, skipping.</source>
+        <source>Your installation doesn't require game files, skipping.</source>
         <translation>你的安装不需要游戏文件，已跳过。</translation>
     </message>
 </context>
@@ -3471,7 +3473,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../base/voicefile.cpp" line="184"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation>下载错误: 接到 HTTP 错误 %1. </translation>
+        <translation>下载错误: 接到 HTTP 错误 %1。</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="191"/>
@@ -3559,7 +3561,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../base/zipinstaller.cpp" line="115"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation>下载错误: 接到 HTTP 错误 %1. </translation>
+        <translation>下载错误: 接到 HTTP 错误 %1。</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="121"/>
@@ -3637,10 +3639,10 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <source>The Rockbox Utility</source>
         <translation>Rockbox安装程序</translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../aboutbox.ui" line="54"/>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Rockbox 开源数字音频播放器固件的安装程序和管理实用程序。&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;在 GNU 通用公共许可证 v2 下发布。&lt;br/&gt;使用的图标来自 &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;https://www.rockbox.org&quot;&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href="http://tango.freedesktop.org/"&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="https://www.rockbox.org"&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Rockbox 开源数字音频播放器固件的安装程序和管理实用程序。&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;在 GNU 通用公共许可证 v2 下发布。&lt;br/&gt;使用的图标来自 &lt;a href="http://tango.freedesktop.org/"&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="https://www.rockbox.org"&gt;https://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="74"/>
