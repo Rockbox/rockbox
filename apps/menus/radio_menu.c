@@ -39,6 +39,9 @@ static int fm_recording_screen(void)
 {
     bool ret;
 
+    if (radio_get_current_frequency() == 0)
+        return 0;
+
     /* switch recording source to FMRADIO for the duration */
     int rec_source = global_settings.rec_source;
     global_settings.rec_source = AUDIO_SRC_FMRADIO;

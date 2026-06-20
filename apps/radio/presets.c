@@ -679,6 +679,17 @@ int presets_scan(void *viewports)
         struct fmstation_buf *presets = presets_get();
         if (presets == NULL)
             return 1;
+        if(get_radio_status() == FMRADIO_OFF)
+        {
+            audio_stop();
+            /* turn on radio */
+            /* This should be done before touching audio settings */
+            while (!pcm_is_initialized())
+               sleep(0);
+
+            audio_set_input_source(AUDIO_SRC_FMRADIO, SRCF_FMRADIO_PLAYING);
+        }
+
         const struct fm_region_data * const fmr =
             &fm_region_data[global_settings.fm_region];
 
