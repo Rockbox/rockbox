@@ -85,12 +85,12 @@ def langstat(pretty=True, tree=None):
 
     projectfolder = os.path.join(workfolder, LANGBASE)
     # lupdate translations and drop all obsolete translations
-    subprocess.Popen(["lupdate", "-no-obsolete", projectfolder, "-ts"]
+    subprocess.Popen(["lupdate-qt6", "-no-obsolete", projectfolder, "-ts"]
                      + [f"lang/rbutil_{l}.ts" for l in LANGS],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                      cwd=projectfolder).communicate()
     # lrelease translations to get status
-    output = subprocess.Popen(["lrelease"]
+    output = subprocess.Popen(["lrelease-qt6"]
                               + [f"lang/rbutil_{l}.ts" for l in LANGS],
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                               cwd=projectfolder).communicate()
