@@ -45,37 +45,37 @@
         <translation>설치 크기: 계산 중...</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="88"/>
+        <location filename="../gui/backupdialog.cpp" line="96"/>
         <source>Select Backup Filename</source>
         <translation>백업 파일이름 선택</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="108"/>
+        <location filename="../gui/backupdialog.cpp" line="116"/>
         <source>Installation size: %L1 %2</source>
         <translation>설치 크기: %L1 %2</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="115"/>
+        <location filename="../gui/backupdialog.cpp" line="123"/>
         <source>File exists</source>
         <translation>파일 존재함</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="116"/>
+        <location filename="../gui/backupdialog.cpp" line="124"/>
         <source>The selected backup file already exists. Overwrite?</source>
         <translation>선택한 백업 파일이 이미 존재합니다. 덮어쓸까요?</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="124"/>
+        <location filename="../gui/backupdialog.cpp" line="132"/>
         <source>Starting backup ...</source>
         <translation>백업 시작 중...</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="143"/>
+        <location filename="../gui/backupdialog.cpp" line="151"/>
         <source>Backup successful.</source>
         <translation>백업에 성공했습니다.</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="146"/>
+        <location filename="../gui/backupdialog.cpp" line="154"/>
         <source>Backup failed!</source>
         <translation>백업에 실패했습니다!</translation>
     </message>
@@ -582,47 +582,51 @@
 <context>
     <name>BootloaderInstallImx</name>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>부트로더를 설치하려면 원래 Sandisk 펌웨어(firmware.sb 파일) 사본을 제공해야 합니다. 이 파일은 Rockbox 부트로더로 패치되어 플레이어에 설치됩니다. 법적 이유로 이 파일은 직접 다운로드해야 합니다. 이 파일을 얻는 방법은 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa 포럼&lt;/a&gt;을 찾아보거나 &lt;a href=&apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; 위키 페이지를 참조하세요.&lt;br/&gt; 계속해서 컴퓨터에서 펌웨어 파일을 검색하려면 확인을 누르세요.</translation>
+        <translation type="vanished">부트로더를 설치하려면 원래 Sandisk 펌웨어(firmware.sb 파일) 사본을 제공해야 합니다. 이 파일은 Rockbox 부트로더로 패치되어 플레이어에 설치됩니다. 법적 이유로 이 파일은 직접 다운로드해야 합니다. 이 파일을 얻는 방법은 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa 포럼&lt;/a&gt;을 찾아보거나 &lt;a href=&apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; 위키 페이지를 참조하세요.&lt;br/&gt; 계속해서 컴퓨터에서 펌웨어 파일을 검색하려면 확인을 누르세요.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="94"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallimx.cpp" line="95"/>
         <source>Could not read original firmware file</source>
         <translation>기존 펌웨어 파일을 읽을 수 없음</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="100"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="101"/>
         <source>Downloading bootloader file</source>
         <translation>부트로더 파일 다운로드</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="111"/>
         <source>Patching file...</source>
         <translation>파일 패치 중 ...</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="136"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="137"/>
         <source>Patching the original firmware failed</source>
         <translation>기존 펌웨어 패치에 실패함</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="142"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="143"/>
         <source>Succesfully patched firmware file</source>
         <translation>펌웨어 파일을 성공적으로 패치함</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="157"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="158"/>
         <source>Bootloader successful installed</source>
         <translation>부트로더가 성공적으로 설치됨</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="163"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="164"/>
         <source>Patched bootloader could not be installed</source>
         <translation>패치된 부트로더를 설치할 수 없음</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallimx.cpp" line="174"/>
+        <location filename="../base/bootloaderinstallimx.cpp" line="175"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
         <translation>설치 제거하려면 수정되지 않은 기존 펌웨어로 일반적인 업그레이드를 실행하세요.</translation>
     </message>
@@ -631,7 +635,7 @@
     <name>BootloaderInstallIpod</name>
     <message>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation>오류: 버퍼 메모리를 할당할 수 없습니다!</translation>
+        <translation type="vanished">오류: 버퍼 메모리를 할당할 수 없습니다!</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="72"/>
@@ -651,10 +655,9 @@
         <translation>펌웨어 (%1)의 알 수 없는 버전 번호</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="67"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods.
 See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation>경고: 이것은 MacPod이며, 록박스는 WinPod에서만 실행됩니다.
+        <translation type="vanished">경고: 이것은 MacPod이며, 록박스는 WinPod에서만 실행됩니다.
 https://www.rockbox.org/wiki/IpodConversionToFAT32 참고</translation>
     </message>
     <message>
@@ -729,6 +732,12 @@ https://www.rockbox.org/wiki/IpodConversionToFAT32 참고</translation>
         <translation>록박스 부트로더 설치</translation>
     </message>
     <message>
+        <location filename="../base/bootloaderinstallipod.cpp" line="67"/>
+        <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
+See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="134"/>
         <source>Uninstalling bootloader</source>
         <translation>부트로더 설치 제거 중</translation>
@@ -796,77 +805,77 @@ https://www.rockbox.org/wiki/IpodConversionToFAT32 참고</translation>
 <context>
     <name>BootloaderInstallMpio</name>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="34"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation>부트로더를 설치하려면 원본 펌웨어의 펌웨어 파일(bin 파일)을 제공해야 합니다. 법적인 이유로 이 파일을 직접 다운로드해야 합니다. 이 파일을 얻는 방법은 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;설명서&lt;/a&gt; 및 &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; 위키 페이지를 참조하세요. &lt;br/&gt; 계속해서 컴퓨터에서 펌웨어 파일을 검색하려면 확인을 누르세요.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="53"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="52"/>
         <source>Downloading bootloader file</source>
         <translation>부트로더 파일 다운로드 중</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="80"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="79"/>
         <source>Could not open the original firmware.</source>
         <translation>기존 펌웨어를 열 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="83"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="82"/>
         <source>Could not read the original firmware.</source>
         <translation>원래 펌웨어를 읽을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="86"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="85"/>
         <source>Loaded firmware file does not look like MPIO original firmware file.</source>
         <translation>로드된 펌웨어 파일이 MPIO 기존 펌웨어 파일과 다릅니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="101"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="100"/>
         <source>Could not open output file.</source>
         <translation>출력 파일을 열 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="104"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="103"/>
         <source>Could not write output file.</source>
         <translation>출력 파일을 쓸 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="107"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="106"/>
         <source>Unknown error number: %1</source>
         <translation>알 수 없는 오류 번호: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="89"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="88"/>
         <source>Could not open downloaded bootloader.</source>
         <translation>다운로드한 부트로더를 열 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="92"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
         <source>Place for bootloader in OF file not empty.</source>
         <translation>OF 파일의 부트로더 위치가 비어 있지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="95"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
         <source>Could not read the downloaded bootloader.</source>
         <translation>다운로드한 부트로더를 읽을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="98"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="97"/>
         <source>Bootloader checksum error.</source>
         <translation>부트로더 체크섬 오류입니다.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="112"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="111"/>
         <source>Patching original firmware failed: %1</source>
         <translation>기존 펌웨어 패치 실패: %1</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="119"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="118"/>
         <source>Success: modified firmware file created</source>
         <translation>성공: 수정된 펌웨어 파일이 생성됨</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="127"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="126"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
         <translation>제거하려면 수정되지 않은 기존 펌웨어로 일반 업그레이드를 수행</translation>
     </message>
@@ -1042,17 +1051,17 @@ Could not remount the device, try to do it manually. If the iPod didn&apos;t res
     </message>
     <message>
         <source>Searching for Sansa</source>
-        <translation>Sansa를 찾는 중</translation>
+        <translation type="vanished">Sansa를 찾는 중</translation>
     </message>
     <message>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
-        <translation>디스크 접근 권한이 거부되었습니다!
+        <translation type="vanished">디스크 접근 권한이 거부되었습니다!
 부트로더를 설치하는 데 필요함</translation>
     </message>
     <message>
         <source>No Sansa detected!</source>
-        <translation>Sansa가 감지되지 않았습니다!</translation>
+        <translation type="vanished">Sansa가 감지되지 않았습니다!</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="68"/>
@@ -1230,70 +1239,76 @@ https://www.rockbox.org/wiki/SansaE200Install 참고
 <context>
     <name>Config</name>
     <message>
-        <location filename="../configure.cpp" line="853"/>
+        <location filename="../configure.cpp" line="858"/>
         <source>Autodetection</source>
         <translation>자동 감지</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="854"/>
+        <location filename="../configure.cpp" line="859"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>마운트 지점을 감지할 수 없습니다.
 마운트 지점을 수동으로 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="756"/>
+        <location filename="../configure.cpp" line="761"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>장치를 감지할 수 없습니다.
 장치와 마운트 지점을 수동으로 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="789"/>
+        <location filename="../configure.cpp" line="787"/>
+        <source>%1 &quot;MacPod&quot; found!
+Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="794"/>
         <source>The player contains an incompatible filesystem.
 Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
         <translation>플레이어에 호환되지 않는 파일시스템이 포함되어 있습니다.
 올바른 마운트 지점을 선택했는지, 플레이어가 록박스와 호환되는 파일 시스템을 사용하도록 설정되었는지 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="797"/>
+        <location filename="../configure.cpp" line="802"/>
         <source>An unknown error occured during player detection.</source>
         <translation>플레이어 감지 중에 알 수 없는 오류가 발생했습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="864"/>
+        <location filename="../configure.cpp" line="869"/>
         <source>Really delete cache?</source>
         <translation>정말 캐시를 삭제합니까?</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="865"/>
+        <location filename="../configure.cpp" line="870"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>캐시를 삭제합니까? 이 폴더의 &lt;b&gt;모든&lt;/b&gt; 파일이 제거되므로 이 설정이 올바른지 반드시 확인하세요!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="873"/>
+        <location filename="../configure.cpp" line="878"/>
         <source>Path wrong!</source>
         <translation>경로가 잘못되었습니다!</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="874"/>
+        <location filename="../configure.cpp" line="879"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>캐시 경로가 잘못되었습니다. 중단하는 중입니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="310"/>
+        <location filename="../configure.cpp" line="315"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>현재 캐시 크기는 %L1 kiB입니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="445"/>
-        <location filename="../configure.cpp" line="479"/>
+        <location filename="../configure.cpp" line="450"/>
+        <location filename="../configure.cpp" line="484"/>
         <source>Configuration OK</source>
         <translation>구성 확인</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="455"/>
-        <location filename="../configure.cpp" line="484"/>
+        <location filename="../configure.cpp" line="460"/>
+        <location filename="../configure.cpp" line="489"/>
         <source>Configuration INVALID</source>
         <translation>구성이 잘못됨</translation>
     </message>
@@ -1323,117 +1338,122 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
         <translation>마운트 지점에 쓸 수 없음</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="197"/>
+        <location filename="../configure.cpp" line="196"/>
         <source>No player selected</source>
         <translation>선택한 플레이어가 없음</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="204"/>
+        <location filename="../configure.cpp" line="209"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
         <translation>캐시 경로에 쓸 수 없습니다. 시스템 임시 경로를 기본값으로 지정하려면 경로를 비워 두세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="223"/>
+        <location filename="../configure.cpp" line="228"/>
         <source>You need to fix the above errors before you can continue.</source>
         <translation>계속하려면 위의 오류를 수정해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="226"/>
+        <location filename="../configure.cpp" line="231"/>
         <source>Configuration error</source>
         <translation>구성 오류</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="328"/>
+        <location filename="../configure.cpp" line="333"/>
         <source>Showing disabled targets</source>
         <translation>비활성화된 대상 표시</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="329"/>
+        <location filename="../configure.cpp" line="334"/>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
         <translation>비활성화된 것으로 표시된 대상 표시를 활성화했습니다. 비활성화된 대상은 최종 사용자에게 권장되지 않습니다. 현재 수행 중인 작업을 알고 있는 경우에만 이 옵션을 사용하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="438"/>
-        <location filename="../configure.cpp" line="904"/>
+        <location filename="../configure.cpp" line="443"/>
+        <location filename="../configure.cpp" line="909"/>
         <source>TTS error</source>
         <translation>TTS 오류</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="439"/>
-        <location filename="../configure.cpp" line="905"/>
+        <location filename="../configure.cpp" line="444"/>
+        <location filename="../configure.cpp" line="910"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation>선택한 TTS를 초기화하는 데 실패했습니다. 이 TTS를 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="523"/>
+        <location filename="../configure.cpp" line="528"/>
         <source>Proxy Detection</source>
         <translation>프록시 감지</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="524"/>
+        <location filename="../configure.cpp" line="529"/>
         <source>The System Proxy settings are invalid!
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation>시스템 프록시 설정이 잘못되었습니다!
 록박스 유틸리티는 이 프록시 설정으로 작동할 수 없습니다. 시스템 프록시가 올바르게 설정되었는지 확인하세요. 스크립트를 지원하지 않습니다. 록박스 유틸리티는 &quot;프록시 자동 구성(PAC)&quot; 시스템에서 이를 사용하는 경우 수동 프록시 설정을 사용해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="634"/>
+        <location filename="../configure.cpp" line="639"/>
         <source>Set Cache Path</source>
         <translation>캐시 경로 설정</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="656"/>
+        <location filename="../configure.cpp" line="661"/>
         <source>%1 (%2 GiB of %3 GiB free)</source>
         <translation>%1 (%3 GiB 중 %2 GiB 여유)</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="730"/>
+        <location filename="../configure.cpp" line="735"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation>여러 장치가 감지되었습니다. 하나를 제외한 모든 플레이어를 분리하고 다시 시도하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="733"/>
+        <location filename="../configure.cpp" line="738"/>
         <source>Detected devices:</source>
         <translation>감지된 장치:</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="738"/>
+        <location filename="../configure.cpp" line="743"/>
         <source>(unknown)</source>
         <translation>(알 수 없음)</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="740"/>
+        <location filename="../configure.cpp" line="745"/>
         <source>%1 at %2</source>
         <translation>%2의 1%</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="747"/>
+        <location filename="../configure.cpp" line="752"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
         <translation>참고: 연결된 장치를 감지하는 것은 모호할 수 있습니다. 나열된 것보다 연결된 장치가 적을 수 있습니다. 이 경우 플레이어를 모호하지 않게 감지할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="751"/>
-        <location filename="../configure.cpp" line="755"/>
-        <location filename="../configure.cpp" line="800"/>
+        <location filename="../configure.cpp" line="756"/>
+        <location filename="../configure.cpp" line="760"/>
+        <location filename="../configure.cpp" line="805"/>
         <source>Device Detection</source>
         <translation>장치 감지</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="782"/>
+        <location filename="../configure.cpp" line="917"/>
+        <source>TTS configuration invalid. 
+ Please configure TTS engine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1 &quot;MacPod&quot;를 찾았습니다!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
-        <translation>%1 &quot;MacPod&quot; gefunden!
+        <translation type="vanished">%1 &quot;MacPod&quot; gefunden!
 록박스를 실행하려면 FAT 형식의 아이팟(소위 &quot;WinPod&quot;)이 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="773"/>
+        <location filename="../configure.cpp" line="778"/>
         <source>%1 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>MTP 모드에서 %1 찾았습니다!
 설치를 위해 플레이어를 MSC 모드로 변경해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="766"/>
+        <location filename="../configure.cpp" line="771"/>
         <source>Detected an unsupported player:
 %1
 Sorry, Rockbox doesn&apos;t run on your player.</source>
@@ -1442,49 +1462,48 @@ Sorry, Rockbox doesn&apos;t run on your player.</source>
 죄송합니다. 록박스가 플레이어에서 실행되지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="911"/>
+        <location filename="../configure.cpp" line="916"/>
         <source>TTS configuration invalid</source>
         <translation>TTS 구성이 잘못됨</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="912"/>
         <source>TTS configuration invalid.
  Please configure TTS engine.</source>
-        <translation>TTS 구성이 잘못되었습니다.
+        <translation type="vanished">TTS 구성이 잘못되었습니다.
  TTS 엔진을 구성하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="917"/>
+        <location filename="../configure.cpp" line="922"/>
         <source>Could not start TTS engine.</source>
         <translation>TTS 엔진을 시작할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="918"/>
+        <location filename="../configure.cpp" line="923"/>
         <source>Could not start TTS engine.
 </source>
         <translation>TTS 엔진을 시작할 수 없습니다.
 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="919"/>
-        <location filename="../configure.cpp" line="938"/>
+        <location filename="../configure.cpp" line="924"/>
+        <location filename="../configure.cpp" line="943"/>
         <source>
 Please configure TTS engine.</source>
         <translation>
 TTS 엔진을 구성하세요.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="933"/>
+        <location filename="../configure.cpp" line="938"/>
         <source>Rockbox Utility Voice Test</source>
         <translation>록박스 유틸리티 음성 테스트</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="936"/>
+        <location filename="../configure.cpp" line="941"/>
         <source>Could not voice test string.</source>
         <translation>테스트 문자열을 음성으로 출력할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="937"/>
+        <location filename="../configure.cpp" line="942"/>
         <source>Could not voice test string.
 </source>
         <translation>테스트 문자열을 음성으로 출력할 수 없습니다.
@@ -1703,7 +1722,7 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="../configure.cpp" line="581"/>
+        <location filename="../configure.cpp" line="586"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation>한국어</translation>
@@ -1765,18 +1784,18 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="106"/>
+        <location filename="../createvoicewindow.cpp" line="115"/>
         <source>TTS error</source>
         <translation>TTS 오류</translation>
     </message>
     <message>
-        <location filename="../createvoicewindow.cpp" line="107"/>
+        <location filename="../createvoicewindow.cpp" line="116"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation>선택한 TTS를 초기화하지 못했습니다. 이 TTS를 사용할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../createvoicewindow.cpp" line="111"/>
-        <location filename="../createvoicewindow.cpp" line="114"/>
+        <location filename="../createvoicewindow.cpp" line="120"/>
+        <location filename="../createvoicewindow.cpp" line="123"/>
         <source>Engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>TTS 엔진: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1784,34 +1803,38 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>EncTtsCfgGui</name>
     <message>
-        <location filename="../encttscfggui.cpp" line="44"/>
+        <location filename="../encttscfggui.cpp" line="43"/>
         <source>Waiting for engine...</source>
         <translation>엔진을 기다리는 중...</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="91"/>
+        <location filename="../encttscfggui.cpp" line="90"/>
         <source>Ok</source>
         <translation>확인</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="94"/>
+        <location filename="../encttscfggui.cpp" line="93"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="257"/>
+        <location filename="../encttscfggui.cpp" line="256"/>
         <source>Browse</source>
         <translation>찾아보기</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="272"/>
+        <location filename="../encttscfggui.cpp" line="262"/>
+        <source>Select executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../encttscfggui.cpp" line="271"/>
         <source>Refresh</source>
         <translation>새로고침</translation>
     </message>
     <message>
-        <location filename="../encttscfggui.cpp" line="263"/>
         <source>Select excutable</source>
-        <translation>실행 선택</translation>
+        <translation type="vanished">실행 선택</translation>
     </message>
 </context>
 <context>
@@ -1878,18 +1901,18 @@ TTS 엔진을 구성하세요.</translation>
     <name>InfoWidget</name>
     <message>
         <location filename="../gui/infowidget.cpp" line="30"/>
-        <location filename="../gui/infowidget.cpp" line="99"/>
+        <location filename="../gui/infowidget.cpp" line="108"/>
         <source>File</source>
         <translation>파일</translation>
     </message>
     <message>
         <location filename="../gui/infowidget.cpp" line="30"/>
-        <location filename="../gui/infowidget.cpp" line="99"/>
+        <location filename="../gui/infowidget.cpp" line="108"/>
         <source>Version</source>
         <translation>버전</translation>
     </message>
     <message>
-        <location filename="../gui/infowidget.cpp" line="47"/>
+        <location filename="../gui/infowidget.cpp" line="56"/>
         <source>Loading, please wait ...</source>
         <translation>로딩 중 입니다. 잠시만 기다려주세요...</translation>
     </message>
@@ -2019,27 +2042,27 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>PlayerBuildInfo</name>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="337"/>
+        <location filename="../base/playerbuildinfo.cpp" line="358"/>
         <source>Stable (Retired)</source>
         <translation>안정 (사용 중지됨)</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="340"/>
+        <location filename="../base/playerbuildinfo.cpp" line="361"/>
         <source>Unusable</source>
         <translation>사용 불가r</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="343"/>
+        <location filename="../base/playerbuildinfo.cpp" line="364"/>
         <source>Unstable</source>
         <translation>불안정</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="346"/>
+        <location filename="../base/playerbuildinfo.cpp" line="367"/>
         <source>Stable</source>
         <translation>안정</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="349"/>
+        <location filename="../base/playerbuildinfo.cpp" line="370"/>
         <source>Unknown</source>
         <translation>알 수 없음</translation>
     </message>
@@ -2097,7 +2120,7 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../configure.cpp" line="616"/>
+        <location filename="../configure.cpp" line="621"/>
         <location filename="../main.cpp" line="102"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
@@ -2114,42 +2137,52 @@ TTS 엔진을 구성하세요.</translation>
         <translation>(알 수 없는 제품 이름)</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="107"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="106"/>
+        <source>Before Bootloader installation begins, Please check the following:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="112"/>
+        <source>&lt;li&gt;Ensure your SD card is formatted as FAT. exFAT is &lt;i&gt;not&lt;/i&gt; supported. You can reformat using the Original Firmware on your player if need be. It is located under (System Settings --&gt; Reset --&gt; Format TF Card).&lt;/li&gt;&lt;li&gt;Please use a quality SD card from a reputable source. The SD cards that come bundled with players are often of substandard quality and may cause issues.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="135"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>부트로더 설치가 거의 완료되었습니다. 설치를 위해서는 다음 단계를 수동으로 수행하는 것이 &lt;b&gt;필요&lt;/b&gt;합니다:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="113"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="141"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;플레이어를 안전하게 제거하세요.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="119"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="148"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;플레이어를 기존 펌웨어로 재부팅합니다.&lt;/li&gt;&lt;li&gt;원래 펌웨어의 업데이트 기능을 사용하여 펌웨어 업그레이드를 수행합니다. 자세한 내용은 플레이어 설명서를 참조하세요.&lt;/li&gt;&lt;b&gt;중요:&lt;/b&gt;펌웨어 업데이트는 중단되어서는 안 되는 중요한 프로세스입니다. &lt;b&gt;펌웨어 업데이트 프로세스를 시작하기 전에 플레이어가 충전되어 있는지 확인하십시오.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;펌웨어가 업데이트된 후 플레이어를 재부팅합니다.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="130"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="159"/>
         <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
         <translation>&lt;li&gt;이전에 연결한 마이크로SD 카드 제거&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="131"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="160"/>
         <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;플레이어를 분리합니다. 플레이어가 재부팅되고 원래 펌웨어가 업데이트됩니다. 자세한 내용은 플레이어 설명서를 참조하세요.&lt;br/&gt;&lt;b&gt;중요:&lt;/b&gt;펌웨어 업데이트는 중단되어서는 안 되는 중요한 프로세스입니다. &lt;b&gt;플레이어를 분리하기 전에 플레이어가 충전되었는지 확인하세요.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;펌웨어가 업데이트되면 플레이어를 재부팅하세요.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="142"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="171"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;플레이어 끄기&lt;/li&gt;&lt;li&gt;충전기 연결&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="147"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="176"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;li&gt;USB와 전원 어댑터를 분리&lt;/li&gt;&lt;li&gt;플레이어를 끄려면 &lt;i&gt;전원&lt;/i&gt; 버튼을 길게 누름&lt;/li&gt;&lt;li&gt;플레이어의 배터리 스위치 전환&lt;/li&gt;&lt;li&gt;록박스로 부팅하려면 &lt;i&gt;전원&lt;/i&gt; 버튼을 을 누름&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="153"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="182"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;참고:&lt;/b&gt; 다른 부분을 먼저 안전하게 설치할 수 있지만, 위의 단계는 설치를 완료하는데 &lt;b&gt;필요&lt;/b&gt;합니다!&lt;/p&gt;</translation>
     </message>
@@ -2157,51 +2190,37 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>QuaGzipFile</name>
     <message>
-        <location filename="../quazip/quagzipfile.cpp" line="60"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="60"/>
         <source>QIODevice::Append is not supported for GZIP</source>
-        <translation>QIODevice::Append는 GZIP에서 지원되지 않음</translation>
+        <translation type="vanished">QIODevice::Append는 GZIP에서 지원되지 않음</translation>
     </message>
     <message>
-        <location filename="../quazip/quagzipfile.cpp" line="66"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="66"/>
         <source>Opening gzip for both reading and writing is not supported</source>
-        <translation>읽기와 쓰기를 위해 gzip을 여는 것은 지원되지 않음</translation>
+        <translation type="vanished">읽기와 쓰기를 위해 gzip을 여는 것은 지원되지 않음</translation>
     </message>
     <message>
-        <location filename="../quazip/quagzipfile.cpp" line="74"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="74"/>
         <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation>gzip은 읽기 또는 쓰기를 위해 열 수 있습니다. 어떤 것이 맞나요?</translation>
+        <translation type="vanished">gzip은 읽기 또는 쓰기를 위해 열 수 있습니다. 어떤 것이 맞나요?</translation>
     </message>
     <message>
-        <location filename="../quazip/quagzipfile.cpp" line="80"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="80"/>
         <source>Could not gzopen() file</source>
-        <translation>gzopen() 파일을 열 수 없음</translation>
+        <translation type="vanished">gzopen() 파일을 열 수 없음</translation>
     </message>
 </context>
 <context>
     <name>QuaZIODevice</name>
     <message>
-        <location filename="../quazip/quaziodevice.cpp" line="188"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="188"/>
         <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation>QIODevice::Append는 QuaZIODevice에서 지원되지 않음</translation>
+        <translation type="vanished">QIODevice::Append는 QuaZIODevice에서 지원되지 않음</translation>
     </message>
     <message>
-        <location filename="../quazip/quaziodevice.cpp" line="193"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="193"/>
         <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation>QIODevice::ReadWrite는 QuaZIODevice에서 지원되지 않음</translation>
+        <translation type="vanished">QIODevice::ReadWrite는 QuaZIODevice에서 지원되지 않음</translation>
     </message>
 </context>
 <context>
     <name>QuaZipFile</name>
     <message>
         <location filename="../quazip/quazipfile.cpp" line="251"/>
-        <location filename="../quazip-1.2/quazip/quazipfile.cpp" line="251"/>
-        <location filename="../quazip_/quazipfile.cpp" line="251"/>
         <source>ZIP/UNZIP API error %1</source>
         <translation>ZIP/Unzip API 오류 %1</translation>
     </message>
@@ -2209,92 +2228,92 @@ TTS 엔진을 구성하세요.</translation>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="../rbutilqt.cpp" line="493"/>
+        <location filename="../rbutilqt.cpp" line="495"/>
         <source>Confirm Uninstallation</source>
         <translation>설치 제거 확인</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="494"/>
+        <location filename="../rbutilqt.cpp" line="496"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>정말 부트로더를 제거할까요?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="506"/>
+        <location filename="../rbutilqt.cpp" line="508"/>
         <source>No uninstall method for this target known.</source>
         <translation>이 대상에 대한 제거 방법은 알려져 있지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="529"/>
+        <location filename="../rbutilqt.cpp" line="531"/>
         <source>No Rockbox bootloader found.</source>
         <translation>록박스 부트로더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="548"/>
+        <location filename="../rbutilqt.cpp" line="550"/>
         <source>Confirm installation</source>
         <translation>설치 확인</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="549"/>
+        <location filename="../rbutilqt.cpp" line="551"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>플레이어에 록박스 유틸리티를 설치하시겠습니까? 설치 후 플레이어의 하드 드라이브에서 실행할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="558"/>
+        <location filename="../rbutilqt.cpp" line="560"/>
         <source>Installing Rockbox Utility</source>
         <translation>록박스 유틸리티 설치</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="708"/>
+        <location filename="../rbutilqt.cpp" line="710"/>
         <source>Rockbox Utility Update available</source>
         <translation>록박스 유틸리티 업데이트 사용 가능</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="709"/>
+        <location filename="../rbutilqt.cpp" line="711"/>
         <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
         <translation>&lt;b&gt;새로운 록박스 유틸리티 버전이 출시되었습니다.&lt;/b&gt;&lt;br&gt;&lt;br&gt;현재 버전 %1을 사용하고 있습니다. 버전 %2를 &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;에서 받으세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="713"/>
+        <location filename="../rbutilqt.cpp" line="715"/>
         <source>New version of Rockbox Utility available.</source>
         <translation>록박스 유틸리티의 새 버전이 출시되었습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="716"/>
+        <location filename="../rbutilqt.cpp" line="718"/>
         <source>Rockbox Utility is up to date.</source>
         <translation>록박스 유틸리티가 최신 버전입니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="739"/>
+        <location filename="../rbutilqt.cpp" line="741"/>
         <source>Device ejected</source>
         <translation>장치 꺼내짐</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="740"/>
+        <location filename="../rbutilqt.cpp" line="742"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
         <translation>장치가 성공적으로 꺼졌습니다. 이제 PC에서 플레이어 연결을 끊을 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="744"/>
+        <location filename="../rbutilqt.cpp" line="746"/>
         <source>Ejecting failed</source>
         <translation>꺼내기 실패</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="745"/>
+        <location filename="../rbutilqt.cpp" line="747"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
         <translation>장치를 꺼내지 못했습니다. 장치의 파일에 접속하는 프로그램이 없는지 확인하세요. 여전히 꺼내기에 실패하면 컴퓨터의 꺼내기 기능을 사용하세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="562"/>
+        <location filename="../rbutilqt.cpp" line="564"/>
         <source>Mount point is wrong!</source>
         <translation>마운트 지점이 잘못되었습니다!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="227"/>
+        <location filename="../rbutilqt.cpp" line="228"/>
         <source>Certificate error</source>
         <translation>인증서 오류</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="229"/>
+        <location filename="../rbutilqt.cpp" line="230"/>
         <source>%1
 
 Issuer: %2
@@ -2313,48 +2332,48 @@ Eigentümer: %3
 인증서를 일시적으로 신뢰할까요?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="518"/>
+        <location filename="../rbutilqt.cpp" line="520"/>
         <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
         <translation>록박스 유틸리티는 플레이어의 부트로더를 제거할 수 없습니다. 플레이어 공급업체의 펌웨어 업데이트 프로세스를 사용하여 펌웨어 업데이트를 수행하세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="521"/>
+        <location filename="../rbutilqt.cpp" line="523"/>
         <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
         <translation>중요: 공급업체의 펌웨어 업데이트 프로세스를 사용하기 전에 플레이어를 원래 펌웨어로 부팅해야 합니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="576"/>
+        <location filename="../rbutilqt.cpp" line="578"/>
         <source>Error installing Rockbox Utility</source>
         <translation>록박스 유틸리티 설치 오류</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="580"/>
+        <location filename="../rbutilqt.cpp" line="582"/>
         <source>Installing user configuration</source>
         <translation>사용자 구성 설치</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="584"/>
+        <location filename="../rbutilqt.cpp" line="586"/>
         <source>Error installing user configuration</source>
         <translation>사용자 구성 설치 오류</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="588"/>
+        <location filename="../rbutilqt.cpp" line="590"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>록박스 유틸리티를 성공적으로 설치했습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="391"/>
-        <location filename="../rbutilqt.cpp" line="622"/>
+        <location filename="../rbutilqt.cpp" line="393"/>
+        <location filename="../rbutilqt.cpp" line="624"/>
         <source>Configuration error</source>
         <translation>구성 오류</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="623"/>
+        <location filename="../rbutilqt.cpp" line="625"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>구성이 잘못되었습니다. 구성 대화 상자로 이동하여 선택한 값이 올바른지 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="384"/>
+        <location filename="../rbutilqt.cpp" line="386"/>
         <source>This is a new installation of Rockbox Utility, or a new version. The configuration dialog will now open to allow you to setup the program,  or review your settings.</source>
         <translation>록박스 유틸리티를 새로 설치하거나 새 버전을 설치하는 것입니다. 이제 프로그램을 설정하거나 설정을 검토할 수 있는 구성 대화 상자가 열립니다.</translation>
     </message>
@@ -2369,49 +2388,49 @@ Eigentümer: %3
         <translation>이 프로그램을 Wine에서 실행하려는 것 같습니다. 이렇게 하지 마십시오. Wine에서 실행하면 실패합니다. 대신 기본 리눅스 바이너리를 사용하세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="263"/>
+        <location filename="../rbutilqt.cpp" line="264"/>
         <source>Can&apos;t get version information.
 Network error: %1. Please check your network and proxy settings.</source>
         <translation>버전 정보를 가져올 수 없습니다.
 네트워크 오류: %1입니다. 네트워크 및 프록시 설정을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="383"/>
+        <location filename="../rbutilqt.cpp" line="385"/>
         <source>New installation</source>
         <translation>새로운 설치</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="392"/>
+        <location filename="../rbutilqt.cpp" line="394"/>
         <source>Your configuration is invalid. This is most likely due to a changed device path. The configuration dialog will now open to allow you to correct the problem.</source>
         <translation>구성이 잘못되었습니다. 이는 장치 경로가 변경되었기 때문일 가능성이 높습니다. 이제 문제를 해결할 수 있는 구성 대화 상자가 열립니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="262"/>
+        <location filename="../rbutilqt.cpp" line="263"/>
         <source>Network error</source>
         <translation>네트워크 오류</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="211"/>
+        <location filename="../rbutilqt.cpp" line="212"/>
         <source>Downloading build information, please wait ...</source>
         <translation>빌드 정보를 다운로드하는 중이므로, 잠시 기다려 주세요...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="261"/>
+        <location filename="../rbutilqt.cpp" line="262"/>
         <source>Can&apos;t get version information!</source>
         <translation>버전 정보를 얻을 수 없습니다!</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="275"/>
+        <location filename="../rbutilqt.cpp" line="276"/>
         <source>Download build information finished.</source>
         <translation>빌드 정보 다운로드가 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="304"/>
+        <location filename="../rbutilqt.cpp" line="305"/>
         <source>Libraries used</source>
         <translation>사용된 라이브러리</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="644"/>
+        <location filename="../rbutilqt.cpp" line="646"/>
         <source>Checking for update ...</source>
         <translation>업데이트 확인 중...</translation>
     </message>
@@ -2827,17 +2846,17 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>이것은 결국 다음 록박스 버전이 될 것입니다. 테스트에 도움이 되도록 설치하세요.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="127"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="128"/>
         <source>Stable Release (Version %1)</source>
         <translation>안정적 릴리스 (버전 %1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="132"/>
         <source>Development Version (Revison %1)</source>
         <translation>개발 버전 (리비전 %1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="129"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="130"/>
         <source>Release Candidate (Revison %1)</source>
         <translation>릴리스 후보 (리비전 %1)</translation>
     </message>
@@ -2857,27 +2876,27 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>선택한 버전에서는 사용할 수 없음</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="130"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
         <source>Daily Build (%1)</source>
         <translation>일일 빌드 (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="158"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="159"/>
         <source>The selected player doesn&apos;t need a bootloader.</source>
         <translation>선택한 플레이어에는 부트로더가 필요하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="163"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="164"/>
         <source>The bootloader is required for starting Rockbox. Installation of the bootloader is only necessary on first time installation.</source>
         <translation>부트로더는 록박스를 시작하는 데 필요합니다. 부트로더 설치는 처음 설치할 때만 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="236"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="237"/>
         <source>Mountpoint is wrong</source>
         <translation>마운트 지점이 잘못됨</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="294"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="295"/>
         <source>No install method known.</source>
         <translation>알려진 설치 방법이 없습니다.</translation>
     </message>
@@ -2959,22 +2978,23 @@ Press &quot;No&quot; to skip this step.</source>
         <translation>백업 파일을 생성할 수 없습니다. 계속할까요?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="420"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="419"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="431"/>
         <source>Manual steps required</source>
         <translation>수동 단계 필요</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="641"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="667"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
         <translation>설치에는 플러그인 데이터 파일이 필요하지 않으므로, 건너뜁니다.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="224"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="225"/>
         <source>Continue with installation?</source>
         <translation>설치를 계속할까요?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="225"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="226"/>
         <source>Really continue?</source>
         <translation>정말 계속할까요?</translation>
     </message>
@@ -3313,7 +3333,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation>파일목록 읽는 중...</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="261"/>
+        <location filename="../base/talkfile.cpp" line="276"/>
         <source>Copying of %1 to %2 failed</source>
         <translation>%1을(를) %2(으)로 복사 실패함</translation>
     </message>
@@ -3328,17 +3348,17 @@ Press &quot;No&quot; to skip this step.</source>
         <translation>%1 폴더에 대한 Talk 파일 생성 시작</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="242"/>
+        <location filename="../base/talkfile.cpp" line="257"/>
         <source>File copy aborted</source>
         <translation>파일 복사 중단됨</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="283"/>
+        <location filename="../base/talkfile.cpp" line="298"/>
         <source>Cleaning up...</source>
         <translation>지우기 중...</translation>
     </message>
     <message>
-        <location filename="../base/talkfile.cpp" line="294"/>
+        <location filename="../base/talkfile.cpp" line="309"/>
         <source>Finished</source>
         <translation>완료함</translation>
     </message>
@@ -3444,82 +3464,82 @@ Press &quot;No&quot; to skip this step.</source>
         <translation>선택한 테마 없음</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="122"/>
+        <location filename="../themesinstallwindow.cpp" line="127"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>네트워크 오류: %1입니다.
 네트워크 및 프록시 설정을 확인하세요.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="135"/>
+        <location filename="../themesinstallwindow.cpp" line="140"/>
         <source>the following error occured:
 %1</source>
         <translation>다음 오류가 발생했습니다:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="141"/>
+        <location filename="../themesinstallwindow.cpp" line="146"/>
         <source>done.</source>
         <translation>완료하였습니다.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="214"/>
+        <location filename="../themesinstallwindow.cpp" line="219"/>
         <source>fetching details for %1</source>
         <translation>%1 세부 정보를 가져오는 중</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="217"/>
+        <location filename="../themesinstallwindow.cpp" line="222"/>
         <source>fetching preview ...</source>
         <translation>미리보기를 가져오는 중...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="230"/>
+        <location filename="../themesinstallwindow.cpp" line="235"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;제작자:&lt;/b&gt; %1&lt;시간/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="231"/>
-        <location filename="../themesinstallwindow.cpp" line="233"/>
+        <location filename="../themesinstallwindow.cpp" line="236"/>
+        <location filename="../themesinstallwindow.cpp" line="238"/>
         <source>unknown</source>
         <translation>알 수 없음</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="232"/>
+        <location filename="../themesinstallwindow.cpp" line="237"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;버전:&lt;/b&gt; %1&lt;시간/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="235"/>
+        <location filename="../themesinstallwindow.cpp" line="240"/>
         <source>no description</source>
         <translation>설명 없음</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="262"/>
+        <location filename="../themesinstallwindow.cpp" line="267"/>
         <source>no theme preview</source>
         <translation>테마 미리보기 없음</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="290"/>
+        <location filename="../themesinstallwindow.cpp" line="295"/>
         <source>Select</source>
         <translation>선택</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="297"/>
+        <location filename="../themesinstallwindow.cpp" line="302"/>
         <source>getting themes information ...</source>
         <translation>테마 정보를 가져오는 중...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="325"/>
+        <location filename="../themesinstallwindow.cpp" line="330"/>
         <source>No themes selected, skipping</source>
         <translation>선택된 테마가 없으므로, 건너뜀</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="354"/>
+        <location filename="../themesinstallwindow.cpp" line="360"/>
         <source>Mount point is wrong!</source>
         <translation>마운트 지점이 잘못되었습니다!</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="234"/>
+        <location filename="../themesinstallwindow.cpp" line="239"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;설명:&lt;/b&gt; %1&lt;시간/&gt;</translation>
     </message>
@@ -3529,19 +3549,19 @@ Please check your network and proxy settings.</source>
         <translation>선택 없음</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="178"/>
+        <location filename="../themesinstallwindow.cpp" line="183"/>
         <source>Information</source>
         <translation>정보</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="198"/>
+        <location filename="../themesinstallwindow.cpp" line="203"/>
         <source>Download size %L1 kiB (%n item(s))</source>
-	<translation>
+        <translation>
             <numerusform>다운로드 크기 %L1 kiB (%n개 항목)</numerusform>
-	</translation>
+        </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="251"/>
+        <location filename="../themesinstallwindow.cpp" line="256"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
         <translation>테마 미리보기를 가져오지 못했습니다.
@@ -3653,62 +3673,77 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>음성 파일 생성 시작</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="90"/>
+        <location filename="../base/voicefile.cpp" line="95"/>
+        <source>Extracted voice corrections file from installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="100"/>
+        <source>Using internal voice corrections file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="113"/>
+        <source>Extracted language enumeration file from installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/voicefile.cpp" line="133"/>
         <source>Extracted voice strings from installation</source>
         <translation>설치에서 추출된 음성 문자열</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="100"/>
+        <location filename="../base/voicefile.cpp" line="143"/>
         <source>Extracted voice strings incompatible</source>
         <translation>추출된 음성 문자열이 호환되지 않음</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="145"/>
+        <location filename="../base/voicefile.cpp" line="194"/>
         <source>Could not retrieve strings from installation, downloading</source>
         <translation>설치, 다운로드에서 문자열을 검색할 수 없음</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="185"/>
+        <location filename="../base/voicefile.cpp" line="234"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>다운로드 오류: HTTP 오류 %1을(를) 받았습니다.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="192"/>
+        <location filename="../base/voicefile.cpp" line="241"/>
         <source>Cached file used.</source>
         <translation>캐시된 파일이 사용되었습니다.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="195"/>
+        <location filename="../base/voicefile.cpp" line="244"/>
         <source>Download error: %1</source>
         <translation>다운로드 오류: %1</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="200"/>
+        <location filename="../base/voicefile.cpp" line="249"/>
         <source>Download finished.</source>
         <translation>다운로드가 완료되었습니다</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="213"/>
+        <location filename="../base/voicefile.cpp" line="262"/>
         <source>failed to open downloaded file</source>
         <translation>다운로드한 파일을 열기 실패함</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="276"/>
+        <location filename="../base/voicefile.cpp" line="324"/>
         <source>The downloaded file was empty!</source>
         <translation>다운로드한 파일이 비어 있었습니다!</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="307"/>
+        <location filename="../base/voicefile.cpp" line="355"/>
         <source>Error opening downloaded file</source>
         <translation>다운로드한 파일을 여는 동안 오류 발생</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="318"/>
+        <location filename="../base/voicefile.cpp" line="366"/>
         <source>Error opening output file</source>
         <translation>출력 파일을 여는 동안 오류 발생</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="338"/>
+        <location filename="../base/voicefile.cpp" line="390"/>
         <source>successfully created.</source>
         <translation>성공적으로 생성되었습니다.</translation>
     </message>
@@ -3718,27 +3753,27 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>rockbox-info.txt를 찾을 수 없음</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="172"/>
+        <location filename="../base/voicefile.cpp" line="221"/>
         <source>Downloading voice info...</source>
         <translation>음성 정보 다운로드 중...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="219"/>
+        <location filename="../base/voicefile.cpp" line="268"/>
         <source>Reading strings...</source>
         <translation>문자열 읽는 중...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="302"/>
+        <location filename="../base/voicefile.cpp" line="350"/>
         <source>Creating voicefiles...</source>
         <translation>음성 파일 생성 중...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="347"/>
+        <location filename="../base/voicefile.cpp" line="399"/>
         <source>Cleaning up...</source>
         <translation>지우는 중...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="358"/>
+        <location filename="../base/voicefile.cpp" line="410"/>
         <source>Finished</source>
         <translation>완료됨</translation>
     </message>
@@ -3746,73 +3781,73 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
 <context>
     <name>ZipInstaller</name>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="59"/>
+        <location filename="../base/zipinstaller.cpp" line="60"/>
         <source>done.</source>
         <translation>완료하였습니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="78"/>
+        <location filename="../base/zipinstaller.cpp" line="79"/>
         <source>Downloading file %1.%2</source>
         <translation>file %1.%2 다운로드</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="120"/>
+        <location filename="../base/zipinstaller.cpp" line="121"/>
         <source>Download error: %1</source>
         <translation>다운로드 오류: %1</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="125"/>
+        <location filename="../base/zipinstaller.cpp" line="126"/>
         <source>Download finished (cache used).</source>
         <translation>다운로드가 완료되었습니다. (캐시가 사용됨)</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="128"/>
+        <location filename="../base/zipinstaller.cpp" line="129"/>
         <source>Download finished.</source>
         <translation>다운로드가 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="135"/>
+        <location filename="../base/zipinstaller.cpp" line="136"/>
         <source>Extracting file.</source>
         <translation>파일 추출 중입니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="156"/>
+        <location filename="../base/zipinstaller.cpp" line="157"/>
         <source>Extraction failed!</source>
         <translation>추출에 실패했습니다!</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="168"/>
+        <location filename="../base/zipinstaller.cpp" line="169"/>
         <source>Installing file.</source>
         <translation>파일을 설치합니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="180"/>
+        <location filename="../base/zipinstaller.cpp" line="181"/>
         <source>Installing file failed.</source>
         <translation>파일 설치에 실패했습니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="193"/>
+        <location filename="../base/zipinstaller.cpp" line="194"/>
         <source>Creating installation log</source>
         <translation>설치 로그 생성</translation>
     </message>
     <message>
         <source>Cached file used.</source>
-        <translation>캐시된 파일을 사용했습니다.</translation>
+        <translation type="vanished">캐시된 파일을 사용했습니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="67"/>
+        <location filename="../base/zipinstaller.cpp" line="68"/>
         <source>Package installation finished successfully.</source>
         <translation>패키지 설치가 성공적으로 완료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="113"/>
+        <location filename="../base/zipinstaller.cpp" line="114"/>
         <source>Download error: received HTTP error %1
 %2</source>
         <translation>다운로드 오류: HTTP 오류 %1 발생
 %2</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="149"/>
+        <location filename="../base/zipinstaller.cpp" line="150"/>
         <source>Not enough disk space! Aborting.</source>
         <translation>디스크 공간이 부족합니다! 중단합니다.</translation>
     </message>

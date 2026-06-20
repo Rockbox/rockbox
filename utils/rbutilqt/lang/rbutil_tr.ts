@@ -45,7 +45,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+27"/>
         <source>Select Backup Filename</source>
         <translation type="unfinished"></translation>
     </message>
@@ -583,11 +583,11 @@
     <name>BootloaderInstallImx</name>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="+72"/>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+23"/>
         <source>Could not read original firmware file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -791,7 +791,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
 <context>
     <name>BootloaderInstallMpio</name>
     <message>
-        <location filename="../base/bootloaderinstallmpio.cpp" line="+34"/>
+        <location filename="../base/bootloaderinstallmpio.cpp" line="+33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;https://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1516,7 +1516,7 @@ Ayrıntılı bilgi için: https://www.rockbox.org/twiki/bin/view/Main/SansaE200I
         <translation type="obsolete">Seçilen dilin etkin olması için uygulamayı yeniden başlatmalısınız.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="+310"/>
+        <location filename="../configure.cpp" line="+315"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Mevcut önbellek boyutu %L1 KB.</translation>
     </message>
@@ -1564,7 +1564,7 @@ Select your device and Mountpoint manually.</source>
 Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
     </message>
     <message>
-        <location line="-631"/>
+        <location line="-636"/>
         <source>The following errors occurred:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1589,12 +1589,12 @@ Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+14"/>
         <source>No player selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+13"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2113,7 +2113,7 @@ Please configure TTS engine.</source>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="+106"/>
+        <location filename="../createvoicewindow.cpp" line="+115"/>
         <source>TTS error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2132,7 +2132,7 @@ Please configure TTS engine.</source>
 <context>
     <name>EncTtsCfgGui</name>
     <message>
-        <location filename="../encttscfggui.cpp" line="+44"/>
+        <location filename="../encttscfggui.cpp" line="+43"/>
         <source>Waiting for engine...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2226,13 +2226,13 @@ Please configure TTS engine.</source>
     <name>InfoWidget</name>
     <message>
         <location filename="../gui/infowidget.cpp" line="+30"/>
-        <location line="+69"/>
+        <location line="+78"/>
         <source>File</source>
         <translation type="unfinished">Dosya</translation>
     </message>
     <message>
-        <location line="-69"/>
-        <location line="+69"/>
+        <location line="-78"/>
+        <location line="+78"/>
         <source>Version</source>
         <translation type="unfinished">Sürüm</translation>
     </message>
@@ -2594,7 +2594,7 @@ Please configure TTS engine.</source>
 <context>
     <name>PlayerBuildInfo</name>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="+337"/>
+        <location filename="../base/playerbuildinfo.cpp" line="+358"/>
         <source>Stable (Retired)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2672,7 +2672,17 @@ Please configure TTS engine.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="+107"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="+106"/>
+        <source>Before Bootloader installation begins, Please check the following:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>&lt;li&gt;Ensure your SD card is formatted as FAT. exFAT is &lt;i&gt;not&lt;/i&gt; supported. You can reformat using the Original Firmware on your player if need be. It is located under (System Settings --&gt; Reset --&gt; Format TF Card).&lt;/li&gt;&lt;li&gt;Please use a quality SD card from a reputable source. The SD cards that come bundled with players are often of substandard quality and may cause issues.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2682,7 +2692,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2730,53 +2740,9 @@ Please configure TTS engine.</source>
     </message>
 </context>
 <context>
-    <name>QuaGzipFile</name>
-    <message>
-        <location filename="../quazip/quagzipfile.cpp" line="+60"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+60"/>
-        <source>QIODevice::Append is not supported for GZIP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+6"/>
-        <source>Opening gzip for both reading and writing is not supported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+8"/>
-        <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+6"/>
-        <source>Could not gzopen() file</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QuaZIODevice</name>
-    <message>
-        <location filename="../quazip/quaziodevice.cpp" line="+188"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="+188"/>
-        <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="+5"/>
-        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QuaZipFile</name>
     <message>
         <location filename="../quazip/quazipfile.cpp" line="+251"/>
-        <location filename="../quazip-1.2/quazip/quazipfile.cpp" line="+251"/>
-        <location filename="../quazip_/quazipfile.cpp" line="+251"/>
         <source>ZIP/UNZIP API error %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2792,7 +2758,7 @@ Please configure TTS engine.</source>
         <translation type="obsolete">Sürüm</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="+391"/>
+        <location filename="../rbutilqt.cpp" line="+393"/>
         <location line="+231"/>
         <source>Configuration error</source>
         <translation>Yapılandırma hatası</translation>
@@ -2911,7 +2877,7 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="obsolete">Kılavuzu indirmek istiyor musunuz? Aygıtınızın bulunduğu konuma kaydedilecektir.</translation>
     </message>
     <message>
-        <location line="-390"/>
+        <location line="-392"/>
         <source>Wine detected!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2921,7 +2887,7 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+106"/>
+        <location line="+107"/>
         <source>Downloading build information, please wait ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2969,7 +2935,7 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+80"/>
         <source>New installation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3783,7 +3749,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+40"/>
         <source>Stable Release (Version %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3798,7 +3764,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-46"/>
+        <location line="-47"/>
         <source>The development version is updated on every code change.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3813,7 +3779,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+31"/>
         <source>Daily Build (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3848,7 +3814,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+24"/>
         <source>Bootloader detected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3924,12 +3890,13 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+23"/>
+        <location line="+12"/>
         <source>Manual steps required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+221"/>
+        <location line="+236"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4278,7 +4245,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+164"/>
+        <location line="+179"/>
         <source>File copy aborted</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4408,7 +4375,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location line="+85"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Ağ hatası: %1.
@@ -4505,7 +4472,7 @@ HTTP response code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+30"/>
         <source>Mount point is wrong!</source>
         <translation>Bağlama noktası hatalı!</translation>
     </message>
@@ -4702,7 +4669,22 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+39"/>
+        <source>Extracted voice corrections file from installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Using internal voice corrections file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Extracted language enumeration file from installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
         <source>Extracted voice strings from installation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4712,7 +4694,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+51"/>
         <source>Could not retrieve strings from installation, downloading</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4752,7 +4734,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+56"/>
         <source>The downloaded file was empty!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4772,7 +4754,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+24"/>
         <source>successfully created.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4833,7 +4815,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
 <context>
     <name>ZipInstaller</name>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="+59"/>
+        <location filename="../base/zipinstaller.cpp" line="+60"/>
         <source>done.</source>
         <translation>tamamlandı.</translation>
     </message>
