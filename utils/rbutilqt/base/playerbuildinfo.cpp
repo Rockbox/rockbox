@@ -111,11 +111,6 @@ void PlayerBuildInfo::setBuildInfo(QString file)
     serverInfo = new QSettings(file, QSettings::IniFormat);
 }
 
-QVariant PlayerBuildInfo::value(BuildInfo item)
-{
-        return value(item, TypeRelease);
-}
-
 QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
 {
     // locate setting item in server info file
@@ -332,7 +327,7 @@ QVariant PlayerBuildInfo::value(DeviceInfo item, unsigned int match)
 
 QVariant PlayerBuildInfo::value(SystemUrl item)
 {
-    // locate setting item in server info file
+    // locate setting item in the rbutil.ini file
     int i = 0;
     while(PlayerSystemUrls[i].item != item)
         i++;
@@ -342,6 +337,17 @@ QVariant PlayerBuildInfo::value(SystemUrl item)
     return result;
 }
 
+QVariant PlayerBuildInfo::value(BuildInfo item)
+{
+    // locate setting item in the serverInfo file
+    int i = 0;
+    while(ServerInfoList[i].item != item)
+        i++;
+
+    QVariant result = serverInfo->value(ServerInfoList[i].name);
+    LOG_INFO() << "U:" << ServerInfoList[i].name << result;
+    return result;
+}
 
 QString PlayerBuildInfo::statusAsString(QString platform)
 {

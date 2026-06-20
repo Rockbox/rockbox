@@ -106,10 +106,12 @@ public:
 
     // Get build information for currently selected player.
     QVariant value(BuildInfo item, BuildType type);
-    QVariant value(BuildInfo item);
 
-    // Get fixed download URL information
+    // Get fixed download URL information from rbutil.ini
     QVariant value(SystemUrl item);
+
+    // Get fixed download URL information from serverInfo
+    QVariant value(BuildInfo item);
 
     QString statusAsString(QString target = "");
 
