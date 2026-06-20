@@ -41,6 +41,8 @@
         <file alias="icons/rockbox-logo.svg">../../docs/logo/rockbox-logo.svg</file>
     </qresource>
     <qresource>
+        <file>icons/players/agptekrocker-small.png</file>
+        <file>icons/players/aigoerosq-small.png</file>
         <file>icons/players/archosfmrecorder-small.png</file>
         <file>icons/players/archosondiofm-small.png</file>
         <file>icons/players/archosondiosp-small.png</file>
@@ -48,6 +50,7 @@
         <file>icons/players/archosrecorder-small.png</file>
         <file>icons/players/archosrecorderv2-small.png</file>
         <file>icons/players/cowond2-small.png</file>
+        <file>icons/players/erosqnative-small.png</file>
         <file>icons/players/gigabeatfx-small.png</file>
         <file>icons/players/gigabeats-small.png</file>
         <file>icons/players/gogearhdd1630-small.png</file>
@@ -90,6 +93,9 @@
         <file>icons/players/vibe500-small.png</file>
         <file>icons/players/vx747-small.png</file>
         <file>icons/players/vx777-small.png</file>
+        <file>icons/players/xduoox20-small.png</file>
+        <file>icons/players/xduoox3-small.png</file>
+        <file>icons/players/xduoox3ii-small.png</file>
     </qresource>
     <qresource prefix="/ini">
         <file>rbutil.ini</file>
