@@ -15052,20 +15052,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Uzstādīt atskaņotāja konteksta spraudni"
-  </dest>
-  <voice>
-    *: "Uzstādīt atskaņotāja konteksta spraudni"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -17096,5 +17082,19 @@
   </dest>
   <voice>
     *: "Beidzies"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Iestatīt konteksta vienumu"
+  </dest>
+  <voice>
+    *: "Iestatīt konteksta vienumu"
   </voice>
 </phrase>
