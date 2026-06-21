@@ -245,7 +245,7 @@ bool ParseTreeModel::setData(const QModelIndex &index, const QVariant &value,
         }
         else if(tolower(param->type_code) == 'i')
         {
-            if(!value.canConvert(QVariant::Int))
+            if(!value.canConvert(QMetaType(QVariant::Int)))
                 return false;
 
             param->type = skin_tag_parameter::INTEGER;

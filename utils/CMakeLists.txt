@@ -45,18 +45,16 @@ endif()
 enable_testing()
 
 # Qt
-find_package(QT NAMES Qt6 Qt5 REQUIRED)
-if(QT_VERSION_MAJOR EQUAL 5)
-    find_package(Qt5 REQUIRED COMPONENTS
-                 Core Widgets Svg Multimedia Network Test LinguistTools)
-else()
+find_package(QT NAMES Qt6 REQUIRED)
     find_package(Qt6 REQUIRED COMPONENTS
                  Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
                  OPTIONAL_COMPONENTS Multimedia Test)
-endif()
 get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
 get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
 message("-- Found Qt${QT_VERSION_MAJOR}: ${Qt${QT_VERSION_MAJOR}_DIR}")
+
+# Added in QT 6.10
+add_compile_options(-DQT_NO_USE_NODISCARD_FILE_OPEN)
 
 # If we're on Linux, try to find the used libs in the system.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

@@ -123,7 +123,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             value = spinBox;
 
             connect(spinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                    this, [=](double value) {
+                    this, [=, this](double value) {
                         this->m_settingsWidgetsMap.key(spinBox)->setCurrent(value, false);
                     });
             connect(setting, &EncTtsSetting::updateGui, this,
@@ -145,7 +145,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             spinBox->setValue(setting->current().toInt());
             value = spinBox;
             connect(spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, [=](int value) {
+                    this, [=, this](int value) {
                         this->m_settingsWidgetsMap.key(spinBox)->setCurrent(value, false);
                     });
             connect(setting, &EncTtsSetting::updateGui, this,
@@ -166,7 +166,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             value = lineEdit;
 
             connect(lineEdit, &QLineEdit::textChanged,
-                    this, [=](QString value) {
+                    this, [=, this](QString value) {
                         this->m_settingsWidgetsMap.key(lineEdit)->setCurrent(value, false);
                     });
             connect(setting, &EncTtsSetting::updateGui, this,
@@ -198,7 +198,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             int index = comboBox->findText(setting->current().toString());
             comboBox->setCurrentIndex(index);
             connect(comboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                    this, [=](int) {
+                    this, [=, this](int) {
                         this->m_settingsWidgetsMap.key(comboBox)->setCurrent(comboBox->currentText(), false);
                     });
             value = comboBox;
@@ -219,8 +219,8 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             checkbox->setAccessibleName(setting->name());
             checkbox->setCheckState(setting->current().toBool() == true
                                     ? Qt::Checked : Qt::Unchecked);
-            connect(checkbox, &QCheckBox::stateChanged,
-                    this, [=](int value) {
+            connect(checkbox, &QCheckBox::checkStateChanged,
+                    this, [=, this](int value) {
                         this->m_settingsWidgetsMap.key(checkbox)->setCurrent(value, false);
                     });
             value = checkbox;
@@ -306,5 +306,3 @@ void EncTtsCfgGui::reject(void)
 {
     this->done(0);
 }
-
-

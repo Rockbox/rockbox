@@ -79,7 +79,7 @@ PreviewLabel::PreviewLabel(QWidget * parent, Qt::WindowFlags f)
 void PreviewLabel::mouseMoveEvent(QMouseEvent * event)
 {
     hovertimer.start();
-    mousepos = event->globalPos();
+    mousepos = event->globalPosition().toPoint();
 }
 void PreviewLabel::enterEvent(QEvent * event)
 {
@@ -119,4 +119,3 @@ void PreviewLabel::setText(QString text)
     QLabel::setText(text);
     preview->setText(text);
 }
-

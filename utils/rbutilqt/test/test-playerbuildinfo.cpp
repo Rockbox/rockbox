@@ -213,7 +213,7 @@ void TestPlayerBuildInfo::testBuildInfo()
 
     RbSettings::setValue(RbSettings::CurrentPlatform, target);
     QVariant result = PlayerBuildInfo::instance()->value(item, type);
-    if(result.canConvert(QMetaType::QStringList))
+    if(result.canConvert(QMetaType(QMetaType::QStringList)))
         QCOMPARE(result.toStringList().join(","), QString(expected));
     else
         QCOMPARE(result.toString(), QString(expected));
@@ -253,7 +253,7 @@ void TestPlayerBuildInfo::testPlayerInfo()
     QFETCH(QString, expected);
 
     QVariant result = PlayerBuildInfo::instance()->value(item, target);
-    if(result.canConvert(QMetaType::QStringList))
+    if(result.canConvert(QMetaType(QMetaType::QStringList)))
         QCOMPARE(result.toStringList().join(","), QString(expected));
     else
         QCOMPARE(result.toString(), QString(expected));
@@ -265,4 +265,3 @@ QTEST_MAIN(TestPlayerBuildInfo)
 // this include is needed because we don't use a separate header file for the
 // test class. It also needs to be at the end.
 #include "test-playerbuildinfo.moc"
-

@@ -610,7 +610,7 @@ void Config::updateLanguage()
     if(!translator->load("rbutil_" + language, absolutePath))
         translator->load("rbutil_" + language, ":/lang");
     if(!qttrans->load("qt_" + language,
-                QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+                QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
         qttrans->load("qt_" + language, ":/lang");
 
     qApp->installTranslator(translator);
@@ -986,4 +986,3 @@ void Config::changeEvent(QEvent *e)
         QWidget::changeEvent(e);
     }
 }
-

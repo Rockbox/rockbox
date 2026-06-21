@@ -63,7 +63,7 @@ void RBTouchArea::paint(QPainter *painter,
 void RBTouchArea::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(action[0] == '&')
-        action = action.right(action.count() - 1);
+        action = action.right(action.size() - 1);
 
     action = action.toLower();
 
