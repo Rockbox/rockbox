@@ -135,47 +135,47 @@
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="65"/>
         <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;https://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>引导程序安装需要你提供正确版本的原始固件文件。这个文件会被 Rockbox 引导程序打补丁并安装到你的播放器上。由于法律原因，你需要自己下载这个文件。请参考 &lt;a href=&apos;https://www.rockbox.org/wiki/&apos;&gt;Rockbox 维基&lt;/a&gt; 页面了解如何获取这个文件。&lt;br/&gt;按确定继续，然后在你的电脑上浏览固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="84"/>
         <source>Could not read original firmware file</source>
-        <translation type="unfinished">无法读取原始固件文件</translation>
+        <translation>无法读取原始固件文件</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="90"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">正在下载bootloader文件</translation>
+        <translation>正在下载引导程序文件</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="99"/>
         <source>Patching file...</source>
-        <translation type="unfinished">修补文件…</translation>
+        <translation>正在修补文件…</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="124"/>
         <source>Patching the original firmware failed</source>
-        <translation type="unfinished">修补原始固件失败</translation>
+        <translation>修补原始固件失败</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="130"/>
         <source>Succesfully patched firmware file</source>
-        <translation type="unfinished">修补原始固件成功</translation>
+        <translation>修补原始固件成功</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="145"/>
         <source>Bootloader successful installed</source>
-        <translation type="unfinished">Bootloader安装成功</translation>
+        <translation>Bootloader安装成功</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="151"/>
         <source>Patched bootloader could not be installed</source>
-        <translation type="unfinished">修补的bootloader无法被安装</translation>
+        <translation>修补的bootloader无法被安装</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="161"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
-        <translation type="unfinished">要卸载，请使用未修改的原始固件执行正常升级。</translation>
+        <translation>要卸载，请使用未修改的原始固件执行正常升级。</translation>
     </message>
 </context>
 <context>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and &lt;a href= &apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>启动加载程序的安装需要你提供原版 Sandisk 固件（firmware.sb 文件）的副本。这个文件将会被 Rockbox 启动加载程序修改后安装到你的播放器上。由于法律原因，你需要自己下载这个文件。请浏览 &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa 论坛&lt;/a&gt;，或参考 &lt;a href=&apos;https://www.rockbox.org/manual.shtml&apos;&gt;手册&lt;/a&gt; 和 &lt;a href=&apos;https://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; 维基页面了解如何获取该文件。&lt;br/&gt;请按确定继续，并在你的电脑上查找固件文件。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="95"/>
@@ -735,7 +735,8 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <location filename="../base/bootloaderinstallipod.cpp" line="67"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
 See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：这是Macintosh格式的iPod，而Rockbox仅能运行在Windows格式的iPod上。
+参见 https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="134"/>
@@ -885,149 +886,161 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="61"/>
         <source>Could not find mounted iPod.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法找到已挂载的iPod。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="68"/>
         <source>Downloading bootloader file...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在下载引导程序文件……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="113"/>
         <source>Could not make DFU image.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法制作DFU镜像。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="119"/>
         <source>Ejecting iPod...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在弹出iPod……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="141"/>
         <source>Action required:
 
 Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject functionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要操作：
+
+请确保没有程序正在存取设备上的文件。如果弹出仍然失败请使用你电脑上的弹出功能。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="151"/>
         <source>Device successfully ejected.</source>
-        <translation type="unfinished"></translation>
+        <translation>设备已成功弹出。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="171"/>
         <source>Action required:
 
 Quit iTunes application.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要操作：
+
+请退出iTunes程序。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="179"/>
         <source>iTunes closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>iTunes已关闭。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="192"/>
         <source>Could not suspend iTunesHelper. Stop it using the Task Manager, and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法挂起iTunesHelper。请按Ctrl+Shift+ESC打开任务管理器并结束该进程，然后再试一次。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="201"/>
         <source>Waiting for HDD spin-down...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在等待硬盘停止旋转……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="217"/>
         <source>Waiting for DFU mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>等待DFU模式……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="218"/>
         <source>Action required:
 
 Press and hold SELECT+MENU buttons, after about 12 seconds a new action will require you to release the buttons, DO IT QUICKLY, otherwise the process could fail.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要操作：
+
+请按住SELECT+MENU大约12秒钟，然后程序将需要你释放这些按钮。请【立即操作】，否则进程将会失败。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="241"/>
         <source>DFU mode detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>已检测到DFU模式。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="243"/>
         <source>Action required:
 
 Release SELECT+MENU buttons and wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>需要操作：
+
+请松开SELECT+MENU键，坐和放宽……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="268"/>
         <source>Device is not in DFU mode. It seems that the previous required action failed, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>设备未处于DFU模式。也许之前需要你执行的操作失败了，请再试一次。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="275"/>
         <source>Transfering DFU image...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在传输DFU镜像……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="285"/>
         <source>No valid DFU USB driver found.
 
 Install iTunes (or the Apple Device Driver) and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>未找到有效的DFU USB驱动程序。
+
+请安装iTunes或Apple Device驱动程序，然后再试一次。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="294"/>
         <source>Could not transfer DFU image.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法传输DFU镜像。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="299"/>
         <source>DFU transfer completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>DFU传输已完成。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="302"/>
         <source>Restarting iPod, waiting for remount...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在重新启动iPod并等待重新挂载……</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="321"/>
         <source>Action required:
 
 Could not remount the device, try to do it manually. If the iPod didn&apos;t restart, force a reset by pressing SELECT+MENU buttons for about 5 seconds. If the problem could not be solved then click &apos;Abort&apos; to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要操作
+
+无法重新挂载设备，请尝试手动操作。如果iPod没有重新启动，请按住SELECT+MENU键约5秒钟强制重启。如果问题没有解决，请点击”中断“来取消。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="333"/>
         <source>Device remounted.</source>
-        <translation type="unfinished"></translation>
+        <translation>设备已重新挂载。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="336"/>
         <source>Bootloader successfully installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>引导程序已成功安装。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="338"/>
         <source>Bootloader successfully uninstalled.</source>
-        <translation type="unfinished"></translation>
+        <translation>引导程序已成功卸载。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="350"/>
         <source>Could not resume iTunesHelper.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法恢复iTunesHelper。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="368"/>
         <source>Install aborted by user.</source>
-        <translation type="unfinished"></translation>
+        <translation>用户中断了安装。</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="370"/>
         <source>Uninstall aborted by user.</source>
-        <translation type="unfinished"></translation>
+        <translation>用户中断了卸载。</translation>
     </message>
 </context>
 <context>
@@ -1384,7 +1397,8 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
         <location filename="../configure.cpp" line="917"/>
         <source>TTS configuration invalid. 
  Please configure TTS engine.</source>
-        <translation type="unfinished"></translation>
+        <translation>TTS配置无效。
+ 请配置TTS引擎。</translation>
     </message>
     <message>
         <source>TTS configuration invalid.
@@ -1900,7 +1914,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../gui/infowidget.cpp" line="56"/>
         <source>Loading, please wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在加载，请稍候……</translation>
     </message>
 </context>
 <context>
@@ -2092,27 +2106,27 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="358"/>
         <source>Stable (Retired)</source>
-        <translation type="unfinished"></translation>
+        <translation>稳定版（已停止维护）</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="361"/>
         <source>Unusable</source>
-        <translation type="unfinished">不可用</translation>
+        <translation>不可用</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="364"/>
         <source>Unstable</source>
-        <translation type="unfinished">不稳定</translation>
+        <translation>不稳定</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="367"/>
         <source>Stable</source>
-        <translation type="unfinished">稳定</translation>
+        <translation>稳定</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="370"/>
         <source>Unknown</source>
-        <translation type="unfinished">未知</translation>
+        <translation>未知</translation>
     </message>
 </context>
 <context>
@@ -2187,12 +2201,12 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="106"/>
         <source>Before Bootloader installation begins, Please check the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>在引导程序安装开始之前，请检查下述事项：</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="112"/>
         <source>&lt;li&gt;Ensure your SD card is formatted as FAT. exFAT is &lt;i&gt;not&lt;/i&gt; supported. You can reformat using the Original Firmware on your player if need be. It is located under (System Settings --&gt; Reset --&gt; Format TF Card).&lt;/li&gt;&lt;li&gt;Please use a quality SD card from a reputable source. The SD cards that come bundled with players are often of substandard quality and may cause issues.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;请确保你的 SD 卡格式为 FAT。exFAT &lt;i&gt;不受&lt;/i&gt;支持。如果需要，你可以使用播放器的原始固件重新格式化。请前往(系统设置 --&gt; 重置 --&gt; 格式化TF卡)。&lt;/li&gt;&lt;li&gt;请使用信誉良好的品牌的优质 SD 卡。随播放器附带的 SD 卡通常质量较差，可能会引发问题。&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="135"/>
@@ -2356,12 +2370,12 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="710"/>
         <source>Rockbox Utility Update available</source>
-        <translation type="unfinished"></translation>
+        <translation>Rockbox Utility有更新可用</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="711"/>
         <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Rockbox Utility有新版本可用。&lt;/b&gt;&lt;br&gt;&lt;br&gt;您正在使用版本%1。 获取版本%2 在 &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</translation>
     </message>
     <message>
         <source>RockboxUtility Update available</source>
@@ -2410,17 +2424,17 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="305"/>
         <source>Libraries used</source>
-        <translation type="unfinished"></translation>
+        <translation>使用的库</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="520"/>
         <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rockbox Utility 无法卸载你播放器上的引导程序。请使用你的播放器厂商的固件更新流程来执行固件更新。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="523"/>
         <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
-        <translation type="unfinished"></translation>
+        <translation>重要提示：在使用厂商的固件更新流程之前，确保先将播放器启动到原始固件。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="625"/>
@@ -2445,7 +2459,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="228"/>
         <source>Certificate error</source>
-        <translation type="unfinished"></translation>
+        <translation>证书错误</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="230"/>
@@ -2457,7 +2471,14 @@ Valid since: %4
 Valid until: %5
 
 Temporarily trust certificate?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1
+
+发行者: %2
+主题: %3
+有效期自: %4
+有效期至: %5
+
+暂时信任此证书？</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="264"/>
@@ -2645,12 +2666,12 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../rbutilqtfrm.ui" line="43"/>
         <source>Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>欢迎使用 Rockbox Utility，这是 Rockbox 的安装和管理工具。</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="46"/>
         <source>Rockbox Logo</source>
-        <translation type="unfinished"></translation>
+        <translation>Rockbox 图标</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="409"/>
@@ -2834,32 +2855,32 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="60"/>
         <source>&amp;Bootloader</source>
-        <translation>&amp;Bootloader</translation>
+        <translation>引导程序(&amp;B)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="151"/>
         <source>Some plugins require additional data files.</source>
-        <translation type="unfinished"></translation>
+        <translation>有些插件需要额外的数据文件。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="188"/>
         <source>Install prerendered voice file.</source>
-        <translation type="unfinished"></translation>
+        <translation>安装预渲染语音文件。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="195"/>
         <source>Plugin Data</source>
-        <translation type="unfinished"></translation>
+        <translation>插件数据</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="222"/>
         <source>&amp;Manual</source>
-        <translation type="unfinished">用户指南(&amp;M)</translation>
+        <translation>用户指南(&amp;M)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="233"/>
         <source>&amp;Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>语音文件(&amp;V)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="253"/>
@@ -2874,7 +2895,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="74"/>
         <source>&amp;Rockbox</source>
-        <translation>&amp;Rockbox</translation>
+        <translation>Rockbox(&amp;R)</translation>
     </message>
     <message>
         <source>Some game plugins require additional files.</source>
@@ -2912,7 +2933,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="263"/>
         <source>Save a copy of the manual on the player.</source>
-        <translation type="unfinished"></translation>
+        <translation>在播放器上保存一份手册的副本。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="292"/>
@@ -2951,22 +2972,22 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="83"/>
         <source>The development version is updated on every code change.</source>
-        <translation type="unfinished"></translation>
+        <translation>开发版本在每次代码变更时更新。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="93"/>
         <source>Daily updated development version.</source>
-        <translation type="unfinished"></translation>
+        <translation>每日更新的开发版本。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="100"/>
         <source>Not available for the selected version</source>
-        <translation type="unfinished"></translation>
+        <translation>对于选定的版本不可用</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
         <source>Daily Build (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>每日构建 (%1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="159"/>
@@ -3074,7 +3095,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="667"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation>你的安装不需要任何插件数据文件，已跳过。</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="225"/>
@@ -3172,7 +3193,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../sysinfo.cpp" line="51"/>
         <source>&lt;b&gt;Attached USB devices&lt;/b&gt;&lt;br/&gt;</source>
-        <translation>&lt;b&gt;连接的USB设备&lt;/b&gt;&lt;br/&gt;</translation>
+        <translation>&lt;b&gt;已连接的USB设备&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="55"/>
@@ -3207,7 +3228,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../sysinfo.cpp" line="69"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>类型</translation>
     </message>
     <message>
         <source>Cluster Size</source>
@@ -3275,12 +3296,12 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttsbase.cpp" line="48"/>
         <source>Espeak-ng TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Espeak-ng TTS 引擎</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="49"/>
         <source>Mimic TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Mimic TTS 引擎</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
@@ -3394,7 +3415,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttsfestival.cpp" line="173"/>
         <source>Festival could not be started</source>
-        <translation type="unfinished"></translation>
+        <translation>Festival无法启动</translation>
     </message>
 </context>
 <context>
@@ -3790,17 +3811,17 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../base/voicefile.cpp" line="95"/>
         <source>Extracted voice corrections file from installation</source>
-        <translation type="unfinished"></translation>
+        <translation>已从安装中提取了语音更正文件</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="100"/>
         <source>Using internal voice corrections file</source>
-        <translation type="unfinished"></translation>
+        <translation>使用内部语音校正文件</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="113"/>
         <source>Extracted language enumeration file from installation</source>
-        <translation type="unfinished"></translation>
+        <translation>已从安装中提取语言枚举文件</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="133"/>
@@ -3922,7 +3943,8 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <location filename="../base/zipinstaller.cpp" line="114"/>
         <source>Download error: received HTTP error %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>下载错误：接到 HTTP 错误 %1
+%2</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="121"/>
@@ -3932,7 +3954,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../base/zipinstaller.cpp" line="126"/>
         <source>Download finished (cache used).</source>
-        <translation type="unfinished">完成下载（已使用缓存）。</translation>
+        <translation>下载完成（已使用缓存）。</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="129"/>
@@ -3993,12 +4015,13 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../aboutbox.ui" line="14"/>
         <source>About Rockbox Utility</source>
-        <translation>关于Rockbox安装程序</translation>
+        <translatorcomment>Rockbox Utility按照专有名词处理，按原样保留</translatorcomment>
+        <translation>关于Rockbox Utility</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="32"/>
         <source>The Rockbox Utility</source>
-        <translation>Rockbox安装程序</translation>
+        <translation>Rockbox Utility</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="54"/>
@@ -4008,17 +4031,17 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <location filename="../aboutbox.ui" line="74"/>
         <source>&amp;Credits</source>
-        <translation>&amp;特别鸣谢</translation>
+        <translation>特别鸣谢(&amp;C)</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="106"/>
         <source>&amp;License</source>
-        <translation>&amp;授权</translation>
+        <translation>授权(&amp;L)</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="132"/>
         <source>L&amp;ibraries</source>
-        <translation type="unfinished"></translation>
+        <translation>库(&amp;I)</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>
