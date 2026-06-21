@@ -213,6 +213,11 @@ class QUAZIP_EXPORT QuaZip {
      * but at least it makes your programs work instead of crashing. Note that
      * if the auto-close flag is cleared, then this is a non-issue, and
      * commit() isn't called.
+     *
+     * Closing an already closed (or never opened) instance is safe,
+     * regardless of whether the first close attempt was successful.
+     * This second close does nothing, but is considered a success,
+     * as far as getZipError() is concerned.
       */
     void close();
     /// Sets the codec used to encode/decode file names inside archive.

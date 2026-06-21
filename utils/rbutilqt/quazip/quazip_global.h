@@ -25,7 +25,7 @@ Original ZIP package is copyrighted by Gilles Vollant and contributors,
 see quazip/(un)zip.h files for details. Basically it's the zlib license.
 */
 
-#include <QtCore/qglobal.h>
+#include <QtCore/QtGlobal>
 
 /**
   This is automatically defined when building a static library, but when
