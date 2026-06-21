@@ -79,10 +79,9 @@ class QuaZipPrivate {
     inline QTextCodec *getDefaultFileNameCodec()
     {
         if (defaultFileNameCodec == nullptr) {
-            return QTextCodec::codecForLocale();
-        } else {
-            return defaultFileNameCodec;
+          return QTextCodec::codecForLocale();
         }
+        return defaultFileNameCodec;
     }
     /// The constructor for the corresponding QuaZip constructor.
     inline QuaZipPrivate(QuaZip *q):
@@ -245,9 +244,8 @@ bool QuaZip::open(Mode mode, zlib_filefunc_def* ioApi)
     if (p->zipName.isEmpty()) {
       qWarning("QuaZip::open(): set either ZIP file name or IO device first");
       return false;
-    } else {
-      ioDevice = new QFile(p->zipName);
     }
+    ioDevice = new QFile(p->zipName);
   }
   unsigned flags = 0;
   switch(mode) {
@@ -267,25 +265,23 @@ bool QuaZip::open(Mode mode, zlib_filefunc_def* ioApi)
               }
           }
       }
-      if(p->unzFile_f!=nullptr) {
-        if (ioDevice->isSequential()) {
-            unzClose(p->unzFile_f);
-            if (!p->zipName.isEmpty())
-                delete ioDevice;
-            qWarning("QuaZip::open(): "
-                     "only mdCreate can be used with "
-                     "sequential devices");
-            return false;
-        }
-        p->mode=mode;
-        p->ioDevice = ioDevice;
-        return true;
-      } else {
-        p->zipError=UNZ_OPENERROR;
+      if (p->unzFile_f == nullptr) {
+        p->zipError = UNZ_OPENERROR;
         if (!p->zipName.isEmpty())
           delete ioDevice;
         return false;
       }
+      if (ioDevice->isSequential()) {
+          unzClose(p->unzFile_f);
+          if (!p->zipName.isEmpty())
+              delete ioDevice;
+          qWarning("QuaZip::open(): only mdCreate can be used with sequential devices");
+          return false;
+      }
+      p->mode = mode;
+      p->ioDevice = ioDevice;
+      return true;
+
     case mdCreate:
     case mdAppend:
     case mdAdd:
@@ -313,30 +309,28 @@ bool QuaZip::open(Mode mode, zlib_filefunc_def* ioApi)
               zipSetFlags(p->zipFile_f, flags);
           }
       }
-      if(p->zipFile_f!=nullptr) {
-        if (ioDevice->isSequential()) {
-            if (mode != mdCreate) {
-                zipClose(p->zipFile_f, nullptr);
-                qWarning("QuaZip::open(): "
-                        "only mdCreate can be used with "
-                         "sequential devices");
-                if (!p->zipName.isEmpty())
-                    delete ioDevice;
-                return false;
-            }
-            zipSetFlags(p->zipFile_f, ZIP_SEQUENTIAL);
-        }
-        p->mode=mode;
-        p->ioDevice = ioDevice;
-        return true;
-      } else {
-        p->zipError=UNZ_OPENERROR;
+      if(p->zipFile_f == nullptr) {
+        p->zipError = UNZ_OPENERROR;
         if (!p->zipName.isEmpty())
           delete ioDevice;
         return false;
       }
+      if (ioDevice->isSequential()) {
+        if (mode != mdCreate) {
+          zipClose(p->zipFile_f, nullptr);
+          qWarning("QuaZip::open(): only mdCreate can be used with sequential devices");
+          if (!p->zipName.isEmpty())
+              delete ioDevice;
+          return false;
+        }
+        zipSetFlags(p->zipFile_f, ZIP_SEQUENTIAL);
+      }
+      p->mode=mode;
+      p->ioDevice = ioDevice;
+      return true;
+
     default:
-      qWarning("QuaZip::open(): unknown mode: %d", (int)mode);
+      qWarning("QuaZip::open(): unknown mode: %d", static_cast<int>(mode));
       if (!p->zipName.isEmpty())
         delete ioDevice;
       return false;
@@ -361,7 +355,7 @@ void QuaZip::close()
         : p->commentCodec->fromUnicode(p->comment).constData());
       break;
     default:
-      qWarning("QuaZip::close(): unknown mode: %d", (int)p->mode);
+      qWarning("QuaZip::close(): unknown mode: %d", static_cast<int>(p->mode));
       return;
   }
   // opened by name, need to delete the internal IO device
@@ -395,7 +389,7 @@ void QuaZip::setIoDevice(QIODevice *ioDevice)
 
 int QuaZip::getEntriesCount()const
 {
-  QuaZip *fakeThis=(QuaZip*)this; // non-const
+  QuaZip *fakeThis=const_cast<QuaZip*>(this); // non-const
   fakeThis->p->zipError=UNZ_OK;
   if(p->mode!=mdUnzip) {
     qWarning("QuaZip::getEntriesCount(): ZIP is not open in mdUnzip mode");
@@ -404,12 +398,12 @@ int QuaZip::getEntriesCount()const
   unz_global_info64 globalInfo;
   if((fakeThis->p->zipError=unzGetGlobalInfo64(p->unzFile_f, &globalInfo))!=UNZ_OK)
     return p->zipError;
-  return (int)globalInfo.number_entry;
+  return static_cast<int>(globalInfo.number_entry);
 }
 
 QString QuaZip::getComment()const
 {
-  QuaZip *fakeThis=(QuaZip*)this; // non-const
+  QuaZip *fakeThis=const_cast<QuaZip*>(this); // non-const
   fakeThis->p->zipError=UNZ_OK;
   if(p->mode!=mdUnzip) {
     qWarning("QuaZip::getComment(): ZIP is not open in mdUnzip mode");
@@ -518,17 +512,16 @@ bool QuaZip::getCurrentFileInfo(QuaZipFileInfo *info)const
     if (info == nullptr) { // Very unlikely because of the overloads
         return false;
     }
-    if (getCurrentFileInfo(&info64)) {
-        info64.toQuaZipFileInfo(*info);
-        return true;
-    } else {
+    if (!getCurrentFileInfo(&info64)) {
         return false;
     }
+    info64.toQuaZipFileInfo(*info);
+    return true;
 }
 
 bool QuaZip::getCurrentFileInfo(QuaZipFileInfo64 *info)const
 {
-  QuaZip *fakeThis=(QuaZip*)this; // non-const
+  QuaZip *fakeThis=const_cast<QuaZip*>(this); // non-const
   fakeThis->p->zipError=UNZ_OK;
   if(p->mode!=mdUnzip) {
     qWarning("QuaZip::getCurrentFileInfo(): ZIP is not open in mdUnzip mode");
@@ -573,7 +566,7 @@ bool QuaZip::getCurrentFileInfo(QuaZipFileInfo64 *info)const
 
 QString QuaZip::getCurrentFileName()const
 {
-  QuaZip *fakeThis=(QuaZip*)this; // non-const
+  QuaZip *fakeThis=const_cast<QuaZip*>(this); // non-const
   fakeThis->p->zipError=UNZ_OK;
   if(p->mode!=mdUnzip) {
     qWarning("QuaZip::getCurrentFileName(): ZIP is not open in mdUnzip mode");
@@ -756,28 +749,25 @@ bool QuaZipPrivate::getFileInfoList(QList<TFileInfo> *result) const
 QStringList QuaZip::getFileNameList() const
 {
     QStringList list;
-    if (p->getFileInfoList(&list))
-        return list;
-    else
+    if (!p->getFileInfoList(&list))
         return QStringList();
+    return list;
 }
 
 QList<QuaZipFileInfo> QuaZip::getFileInfoList() const
 {
     QList<QuaZipFileInfo> list;
-    if (p->getFileInfoList(&list))
-        return list;
-    else
+    if (!p->getFileInfoList(&list))
         return QList<QuaZipFileInfo>();
+    return list;
 }
 
 QList<QuaZipFileInfo64> QuaZip::getFileInfoList64() const
 {
     QList<QuaZipFileInfo64> list;
-    if (p->getFileInfoList(&list))
-        return list;
-    else
+    if (!p->getFileInfoList(&list))
         return QList<QuaZipFileInfo64>();
+    return list;
 }
 
 Qt::CaseSensitivity QuaZip::convertCaseSensitivity(QuaZip::CaseSensitivity cs)

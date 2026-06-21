@@ -105,6 +105,15 @@ QuaZipNewInfo::QuaZipNewInfo(const QString& name, const QString& file):
   }
 }
 
+QuaZipNewInfo::QuaZipNewInfo(const QString& name, const QString& file, const QDateTime& dateTime):
+  name(name), dateTime(dateTime), internalAttr(0), externalAttr(0), uncompressedSize(0)
+{
+  QFileInfo info(file);
+  if (info.exists()) {
+    QuaZipNewInfo_setPermissions(this, info.permissions(), info.isDir(), quazip_is_symlink(info));
+  }
+}
+
 void QuaZipNewInfo::setFileDateTime(const QString& file)
 {
   QFileInfo info(file);
@@ -177,14 +186,12 @@ static void setNTFSTime(QByteArray &extra, const QDateTime &time, int position,
                     timesPos = i - 4; // the beginning of the NTFS times tag
                     ntfsTimesLength = tagsize;
                     break;
-                } else {
-                    i += tagsize;
                 }
+                i += tagsize;
             }
             break; // I ain't going to search for yet another NTFS record!
-        } else {
-            i += length;
         }
+        i += length;
     }
     if (ntfsPos == -1) {
         // No NTFS record, need to create one.

@@ -94,10 +94,18 @@ struct QUAZIP_EXPORT QuaZipNewInfo {
    * is inaccessible (e. g. you do not have read permission for the
    * directory file in), uses current time and zero permissions. Other attributes are
    * initialized with zeros, comment and extra field with null values.
-   * 
    * \sa setFileDateTime()
    **/
   QuaZipNewInfo(const QString& name, const QString& file);
+  /// Constructs QuaZipNewInfo instance.
+  /** Initializes name with \a name and provided timestamp.  Permissions are taken
+   * from the specified file. If the \a file does not exists or
+   * is inaccessible (e. g. you do not have read permission for the
+   * directory file in), uses zero permissions. Other attributes are
+   * initialized with zeros, comment and extra field with null values.
+   * \sa setFileDateTime()
+   **/
+  QuaZipNewInfo(const QString& name, const QString& file, const QDateTime& dateTime);
   /// Initializes the new instance from existing file info.
   /** Mainly used when copying files between archives.
    *

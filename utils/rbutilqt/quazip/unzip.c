@@ -223,13 +223,8 @@ local int unz64local_getByte(const zlib_filefunc64_32_def* pzlib_filefunc_def, v
         *pi = (int)c;
         return UNZ_OK;
     }
-    else
-    {
-        if (ZERROR64(*pzlib_filefunc_def,filestream))
-            return UNZ_ERRNO;
-        else
-            return UNZ_EOF;
-    }
+
+    return ZERROR64(*pzlib_filefunc_def, filestream) ? UNZ_ERRNO : UNZ_EOF;
 }
 
 
@@ -780,8 +775,7 @@ extern unzFile ZEXPORT unzOpen2 (voidpf file,
         fill_zlib_filefunc64_32_def_from_filefunc32(&zlib_filefunc64_32_def_fill,pzlib_filefunc32_def);
         return unzOpenInternal(file, &zlib_filefunc64_32_def_fill, 0, UNZ_DEFAULT_FLAGS);
     }
-    else
-        return unzOpenInternal(file, NULL, 0, UNZ_DEFAULT_FLAGS);
+    return unzOpenInternal(file, NULL, 0, UNZ_DEFAULT_FLAGS);
 }
 
 extern unzFile ZEXPORT unzOpen2_64 (voidpf file,
@@ -795,8 +789,7 @@ extern unzFile ZEXPORT unzOpen2_64 (voidpf file,
         zlib_filefunc64_32_def_fill.zseek32_file = NULL;
         return unzOpenInternal(file, &zlib_filefunc64_32_def_fill, 1, UNZ_DEFAULT_FLAGS);
     }
-    else
-        return unzOpenInternal(file, NULL, 1, UNZ_DEFAULT_FLAGS);
+    return unzOpenInternal(file, NULL, 1, UNZ_DEFAULT_FLAGS);
 }
 
 extern unzFile ZEXPORT unzOpen (voidpf file)
@@ -874,8 +867,8 @@ extern int ZEXPORT unzGetFileFlags (unzFile file, unsigned* pflags)
 */
 local void unz64local_DosDateToTmuDate (ZPOS64_T ulDosDate, tm_unz* ptm)
 {
-    ZPOS64_T uDate;
-    uDate = (ZPOS64_T)(ulDosDate>>16);
+    ZPOS64_T uDate = ulDosDate >> 16;
+
     ptm->tm_mday = (uInt)(uDate&0x1f) ;
     ptm->tm_mon =  (uInt)((((uDate)&0x1E0)/0x20)-1) ;
     ptm->tm_year = (uInt)(((uDate&0x0FE00)/0x0200)+1980) ;
@@ -1782,7 +1775,7 @@ extern int ZEXPORT unzReadCurrentFile  (unzFile file, voidp buf, unsigned len)
 
             pfile_in_zip_read_info->stream.next_in =
                 (Bytef*)pfile_in_zip_read_info->read_buffer;
-            pfile_in_zip_read_info->stream.avail_in = (uInt)uReadThis;
+            pfile_in_zip_read_info->stream.avail_in = uReadThis;
         }
 
         if ((pfile_in_zip_read_info->compression_method==0) || (pfile_in_zip_read_info->raw))
@@ -1949,10 +1942,7 @@ extern int ZEXPORT unzeof (unzFile file)
     if (pfile_in_zip_read_info==NULL)
         return UNZ_PARAMERROR;
 
-    if (pfile_in_zip_read_info->rest_read_uncompressed == 0)
-        return 1;
-    else
-        return 0;
+    return pfile_in_zip_read_info->rest_read_uncompressed == 0 ? 1 : 0;
 }
 
 
@@ -2069,7 +2059,7 @@ extern int ZEXPORT unzGetGlobalComment (unzFile file, char * szComment, uLong uS
     unz64_s* s;
     uLong uReadThis ;
     if (file==NULL)
-        return (int)UNZ_PARAMERROR;
+        return UNZ_PARAMERROR;
     s=(unz64_s*)file;
 
     uReadThis = uSizeBuf;
