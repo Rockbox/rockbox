@@ -8,8 +8,6 @@
 
 GCCOPTS += -g -DDEBUG -D__PCTOOL__ -DDBTOOL
 
-include $(ROOTDIR)/lib/utf8proc/utf8proc.make
-
 METADATAS := $(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c)
 
 DATABASE_SRC = $(call preprocess, $(TOOLSDIR)/database/SOURCES) $(METADATAS)

@@ -4718,6 +4718,13 @@ if [ "$ARG_STACK_PROTECTOR" != "" ]; then
     fi
 fi
 
+# We generally want utf8proc.  Exceptions are:
+#   Bootloaders, checkwps, warble, <4MB RAM
+#   and (temporarily) imx233
+if [ "$apps" = "bootloader" -o "$app_type" = "checkwps" -o "$app_type" = "warble" -o "$memory" -lt "4" -o "$t_manufacturer" = "imx233" ]; then
+    no_utf8proc=1
+fi
+
 cat > autoconf.h.new <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -4965,6 +4972,7 @@ export FUNKEY_SDK_PATH=${FUNKEY_SDK_PATH}
 export ANDROID_PLATFORM_VERSION=${ANDROID_PLATFORM_VERSION}
 export TOOLSET=${toolset}
 export PIPER_MODEL_DIR=${PIPER_MODEL_DIR}
+export NO_UTF8PROC=${no_utf8proc}
 $CCACHE_ARG
 $LTO_ARG
 
