@@ -106,6 +106,8 @@ add_executable(RockboxUtility WIN32 MACOSX_BUNDLE
     ${CMAKE_CURRENT_BINARY_DIR}/rbutilqt-lang.qrc
     )
 
+target_compile_features(RockboxUtility PRIVATE cxx_std_17 c_std_11)
+
 if(WIN32)
     target_sources(RockboxUtility PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt-win.qrc

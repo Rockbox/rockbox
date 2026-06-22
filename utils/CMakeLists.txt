@@ -42,7 +42,6 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_link_options($<$<CONFIG:RELEASE>:-s>)
 endif()
 
-
 enable_testing()
 
 # Qt
