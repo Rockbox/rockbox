@@ -1,7 +1,6 @@
 DEFINES=
 CC := gcc
-CXX := g++
-LD := g++
+LD := gcc
 
 TOMCRYPT_DIR := ../../tomcrypt/
 

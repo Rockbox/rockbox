@@ -36,7 +36,7 @@ struct sb_version_t
     uint16_t pad1;
     uint16_t revision;
     uint16_t pad2;
-};
+} __attribute__((packed));
 
 struct sb_header_t
 {

@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
             case 'x':
                 dump_imx_dev_info("");
                 printf("variant mapping:\n");
-                for(int i = 0; i < sizeof(imx_variants) / sizeof(imx_variants[0]); i++)
+                for(unsigned int i = 0; i < sizeof(imx_variants) / sizeof(imx_variants[0]); i++)
                     printf("  %s -> variant=%d\n", imx_variants[i].name, imx_variants[i].variant);
                 break;
             case 'p':
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
                     printf("You cannot specify two models\n");
                     return 1;
                 }
-                for(int i = 0; i < NR_MODELS; i++)
+                for(unsigned int i = 0; i < NR_MODELS; i++)
                     if(strcmp(optarg, imx_models[i].name) == 0)
                     {
                         model = imx_models[i].model;

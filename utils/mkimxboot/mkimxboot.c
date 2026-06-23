@@ -421,14 +421,14 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before,
 
 static enum imx_error_t parse_subversion(const char *s, const char *end, uint16_t *ver)
 {
-    int len = (end == NULL) ? strlen(s) : end - s;
+    size_t len = (end == NULL) ? strlen(s) : (size_t)(end - s);
     if(len > 4)
     {
         printf("[ERR] Bad subversion override '%s' (too long)\n", s);
         return IMX_ERROR;
     }
     *ver = 0;
-    for(int i = 0; i < len; i++)
+    for(unsigned int i = 0; i < len; i++)
     {
         if(!isdigit(s[i]))
         {
@@ -564,6 +564,7 @@ static enum imx_error_t unpatch_std_zero_host_play(int jump_before,
     free(sec->insts);
     sec->insts = new_inst;
 
+    (void)opt;
     return IMX_SUCCESS;
 }
 
@@ -616,23 +617,23 @@ static uint32_t get_uint32be(unsigned char *p)
 void dump_imx_dev_info(const char *prefix)
 {
     printf("%smkimxboot models:\n", prefix);
-    for(int i = 0; i < NR_IMX_MODELS; i++)
+    for(unsigned int i = 0; i < NR_IMX_MODELS; i++)
     {
         printf("%s  %s: idx=%d rb_model=%s rb_num=%d\n", prefix,
             imx_models[i].model_name, i, imx_models[i].rb_model_name,
             imx_models[i].rb_model_num);
     }
     printf("%smkimxboot variants:\n", prefix);
-    for(int i = 0; i < VARIANT_COUNT; i++)
+    for(unsigned int i = 0; i < VARIANT_COUNT; i++)
     {
         printf("%s  %d: %s\n", prefix, i, imx_fw_variant[i]);
     }
     printf("%smkimxboot mapping:\n", prefix);
-    for(int i = 0; i < NR_IMX_SUMS; i++)
+    for(unsigned int i = 0; i < NR_IMX_SUMS; i++)
     {
         printf("%s  md5sum=%s -> idx=%d, ver=%s\n", prefix, imx_sums[i].md5sum,
             imx_sums[i].model, imx_sums[i].version);
-        for(int j = 0; j < VARIANT_COUNT; j++)
+        for(unsigned int j = 0; j < VARIANT_COUNT; j++)
             if(imx_sums[i].fw_variants[j].size)
                 printf("%s    variant=%d -> offset=%#x size=%#x\n", prefix,
                     j, (unsigned)imx_sums[i].fw_variants[j].offset,
@@ -643,7 +644,7 @@ void dump_imx_dev_info(const char *prefix)
 /* find an entry into imx_sums which matches the MD5 sum of a file */
 static enum imx_error_t find_model_by_md5sum(uint8_t file_md5sum[16], int *md5_idx)
 {
-    int i = 0;
+    unsigned int i = 0;
     while(i < NR_IMX_SUMS)
     {
         uint8_t md5[20];
@@ -821,13 +822,13 @@ enum imx_error_t compute_soft_md5sum(const char *file, uint8_t soft_md5sum[16])
     if(sb == NULL)
     {
         printf("[ERR] Cannot load SB file: %d\n", err);
-        return err;
+        return ((enum imx_error_t)err);
     }
     /* compute sum */
-    err = compute_soft_md5sum_buf(sb, soft_md5sum);
+    err = (enum sb_error_t) compute_soft_md5sum_buf(sb, soft_md5sum);
     /* release file */
     sb_free(sb);
-    return err;
+    return ((enum imx_error_t)err);
 }
 
 /* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
@@ -849,7 +850,7 @@ static enum imx_error_t rb_fw_load_buf_scramble(struct rb_fw_t *fw, uint8_t *buf
     }
     /* check checksum */
     uint32_t sum = imx_models[model].rb_model_num;
-    for(int i = 8; i < sz; i++)
+    for(unsigned int i = 8; i < sz; i++)
         sum += buf[i];
     if(sum != get_uint32be(buf))
     {
@@ -937,6 +938,8 @@ static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
         return IMX_BOOT_INVALID;
     }
     elf_release(&elf);
+
+    (void)model;
     return IMX_SUCCESS;
 }
 
@@ -1113,7 +1116,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     if(ret == IMX_SUCCESS)
     {
         /* write image */
-        ret = sb_write_file(sb_file, outfile, NULL, generic_std_printf);
+        ret = (enum imx_error_t) sb_write_file(sb_file, outfile, NULL, generic_std_printf);
     }
     /* cleanup */
     sb_free(sb_file);
