@@ -15058,20 +15058,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Alege plugin implicit"
-  </dest>
-  <voice>
-    *: "Alege plaghin implicit"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PARAMETER
   desc:
   user: core
@@ -17042,7 +17028,7 @@
     *: "SET TIMER"
   </source>
   <dest>
-    *: "SET TIMER"
+    *: "SETEAZĂ TEMPORIZATOR"
   </dest>
   <voice>
     *: "Setează temporizator"
@@ -17102,5 +17088,19 @@
   </dest>
   <voice>
     *: "Finalizat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Setează element context"
+  </dest>
+  <voice>
+    *: "Setează element context"
   </voice>
 </phrase>
