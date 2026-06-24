@@ -36,13 +36,31 @@
 #define _HEB_ORIENTATION_LTR 1
 #define _HEB_ORIENTATION_RTL 0
 
-#define ischar(c) ((c > 0x0589 && c < 0x0700) || \
-                   (c >= 0xfb50 && c <= 0xfefc) ? 1 : 0)
+/* ischar() now lives in bidi.h as the shared is_rtl_char() macro */
 #define _isblank(c) ((c==' ' || c=='\t') ? 1 : 0)
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
 
 #ifndef BOOTLOADER
+/* True if the first strongly-directional character of the string is RTL, i.e.
+ * the string should be laid out right-to-left. */
+bool text_is_rtl(const unsigned char *str)
+{
+    while (*str)
+    {
+        ucschar_t c;
+        const unsigned char *next = utf8decode(str, &c);
+        if (is_rtl_char(c))
+            return true;
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            return false;
+        if (next == str)
+            break;
+        str = next;
+    }
+    return false;
+}
+
 static const arab_t * arab_lookup(ucschar_t uchar)
 {
     if (uchar >= 0x621 && uchar <= 0x63a)
@@ -178,13 +196,13 @@ ucschar_t *bidi_l2v(const unsigned char *str, int orientation)
         target--;
     }
 
-    if (ischar(*tmp))
+    if (is_rtl_char(*tmp))
         block_type = _HEB_BLOCK_TYPE_HEB;
     else
         block_type = _HEB_BLOCK_TYPE_ENG;
 
     do {
-        while((XOR(ischar(*(tmp+1)),block_type)
+        while((XOR(is_rtl_char(*(tmp+1)),block_type)
                || _isblank(*(tmp+1)) || ispunct((int)*(tmp+1))
                || *(tmp+1)=='\n')
               && block_end < length-1) {

@@ -32,6 +32,7 @@
 #include "icon.h"
 #include "pcmbuf.h"
 #include "lang.h"
+#include "bidi.h"
 #include "keyboard.h"
 #include "viewport.h"
 #include "file.h"
@@ -209,6 +210,11 @@ static int kbd_create_viewports(struct keyboard_parameters * kbd_param)
         {
             struct viewport *vp = &kbd_param[l].kbd_viewports[i];
             viewport_set_defaults(vp, l);
+            /* The keyboard lays out its own cells/grid by absolute x, so the
+             * automatic RTL right-alignment (which mirrors every putsxy) would
+             * reverse the picker grid and the edit line. Clear it here and do
+             * RTL handling explicitly in kbd_draw_edit_line instead. */
+            vp->flags &= ~VP_FLAG_ALIGNMENT_MASK;
             vp->font = FONT_UI;
         }
     }
@@ -726,11 +732,15 @@ int kbd_input(char* text, int buflen, ucschar_t *kbd)
                 break;
 
             case ACTION_KBD_CURSOR_RIGHT:
-                kbd_move_cursor(&state, 1);
+                /* move the caret to the visual right: one position forward in
+                 * LTR text, one position back in RTL text */
+                kbd_move_cursor(&state,
+                    text_is_rtl((const unsigned char *)state.text) ? -1 : 1);
                 break;
 
             case ACTION_KBD_CURSOR_LEFT:
-                kbd_move_cursor(&state, -1);
+                kbd_move_cursor(&state,
+                    text_is_rtl((const unsigned char *)state.text) ? 1 : -1);
                 break;
 
             case ACTION_NONE:
@@ -1087,12 +1097,81 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
     sc->set_viewport(last);
 }
 
+/* Pixel width of the single UTF-8 character that starts at `p`. */
+static int kbd_char_width(struct screen *sc, const unsigned char *p)
+{
+    ucschar_t c;
+    unsigned char tmp[8];
+    unsigned char *e;
+    int w;
+    utf8decode(p, &c);
+    e = utf8encode(c, tmp);
+    *e = '\0';
+    sc->getstringsize((char *)tmp, &w, NULL);
+    return w;
+}
+
+/* Visual x-offset (pixels, from the start of the drawn line) of the caret that
+ * sits at logical character index `cpos` of the visible string `vis`. It mirrors
+ * how the text engine lays the line out: bidi with LTR base orientation, where
+ * non-RTL runs keep their order while Hebrew/Arabic runs are reversed in place.
+ * The string is scanned once, run by run, accumulating a running offset and
+ * stopping at the run that holds the caret, so no per-character buffer is kept.
+ * (Like the rest of the edit line, it does not handle diacritics that combine
+ * several codepoints into a single displayed glyph.) */
+static int kbd_caret_visual_x(struct screen *sc, const char *vis, int cpos)
+{
+    const unsigned char *p = (const unsigned char *)vis;
+    int x = 0;          /* offset contributed by runs to the left of the caret */
+    int pos = 0;        /* logical index of the next character */
+
+    while (*p)
+    {
+        ucschar_t c;
+        utf8decode(p, &c);
+        bool heb = is_rtl_char(c);
+        int run_start = pos;
+        int w_run = 0;      /* total width of this run */
+        int w_before = 0;   /* width of this run's chars before the caret */
+
+        while (*p)
+        {
+            const unsigned char *next = utf8decode(p, &c);
+            /* Spaces/tabs are direction-neutral: they stay inside the current
+             * run so a multi-word Hebrew string is one reversed run (matching
+             * the bidi engine) instead of splitting at every space, which would
+             * misplace the caret. */
+            if ((bool)is_rtl_char(c) != heb && c != ' ' && c != '\t')
+                break;       /* end of run */
+            int w = kbd_char_width(sc, p);
+            if (pos < cpos)
+                w_before += w;
+            w_run += w;
+            pos++;
+            if (next == p)   /* guard against a malformed byte */
+                break;
+            p = next;
+        }
+
+        if (cpos <= run_start)          /* caret is before this run */
+            break;
+        if (cpos >= pos)                /* caret is past this whole run */
+        {
+            x += w_run;
+            continue;
+        }
+        /* caret is inside this run */
+        x += heb ? (w_run - w_before)   /* reversed: later chars sit to the left */
+                 : w_before;            /* in order: earlier chars sit to the left */
+        break;
+    }
+    return x;
+}
+
 static void kbd_draw_edit_line(struct keyboard_parameters *pm,
                                struct screen *sc, struct edit_state *state)
 {
-    char outline[8];
-    unsigned char *utf8;
-    int i = 0, j = 0, w;
+    int w;
     int icon_w, icon_y;
     struct viewport *last;
     struct viewport *vp = &pm->kbd_viewports[eKBD_VP_TEXT];
@@ -1103,77 +1182,131 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     int sc_w = vp->width;
     int y = (vp->height - pm->font_h) / 2;
 
-
-    int text_margin = (sc_w - pm->text_w * pm->max_chars_text) / 2;
-
-#if 0
-    /* Clear text area one pixel above separator line so any overdraw
-       doesn't collide */
-    screen_clear_area(sc, 0, y - 1, sc_w, pm->font_h + 6);
-
-    sc->hline(0, sc_w - 1, y);
-#endif
-    /* write out the text */
     sc->setfont(pm->curfont);
 
-    pm->leftpos = MAX(0, MIN(state->len_utf8, state->editpos + 2)
-                            - pm->max_chars_text);
-
-    pm->curpos = state->editpos - pm->leftpos;
-    utf8 = state->text + utf8seek(state->text, pm->leftpos);
-
-    while (*utf8 && i < pm->max_chars_text)
-    {
-        j = utf8seek(utf8, 1);
-        strmemccpy(outline, utf8, j+1);
-        sc->getstringsize(outline, &w, NULL);
-        sc->putsxy(text_margin + i*pm->text_w + (pm->text_w-w)/2,
-                   y, outline);
-        utf8 += j;
-        i++;
-    }
+    /* Base direction follows the text itself (first strong character): a
+     * Hebrew/Arabic name is laid out right-to-left while a Latin name stays
+     * readable left-to-right, even under an RTL UI language. */
+    bool rtl = text_is_rtl((const unsigned char *)state->text);
 
     icon_w = get_icon_width(sc->screen_type);
     icon_y = (vp->height - get_icon_height(sc->screen_type)) / 2;
+
+    /* Decide how much of the text to show. If the whole name fits we show it
+     * all using (almost) the full width; only when it is genuinely too long do
+     * we scroll and reserve a slot on each side for the scroll indicators.
+     * Widths are measured per glyph (not from a fixed representative width), so
+     * every pixel is used and a name that fits is never shown as "scrolled". */
+    int total_w;
+    sc->getstringsize(state->text, &total_w, NULL);
+
+    int pad = 2;
+    bool overflow = total_w > sc_w - 2 * pad;
+    int margin = overflow ? (icon_w + 2) : pad;
+    int area_l = margin;
+    int area_r = sc_w - margin;
+    int avail  = area_r - area_l;
+    if (avail < 1)
+        avail = sc_w;
+
+    int leftpos, endchar;
+    if (!overflow)
+    {
+        leftpos = 0;
+        endchar = state->len_utf8;
+    }
+    else
+    {
+        /* keep the caret in view: take the characters just before it until the
+         * line is full, then extend forward as far as still fits */
+        int acc = 0;
+        leftpos = state->editpos;
+        while (leftpos > 0)
+        {
+            int cw = kbd_char_width(sc,
+                        state->text + utf8seek(state->text, leftpos - 1));
+            if (acc + cw > avail)
+                break;
+            acc += cw;
+            leftpos--;
+        }
+        endchar = state->editpos;
+        while (endchar < state->len_utf8)
+        {
+            int cw = kbd_char_width(sc,
+                        state->text + utf8seek(state->text, endchar));
+            if (acc + cw > avail)
+                break;
+            acc += cw;
+            endchar++;
+        }
+    }
+    pm->leftpos = leftpos;
+    pm->curpos = state->editpos - leftpos;
+
+    /* The whole visible window is drawn as ONE string so the bidi engine lays
+     * out mixed Hebrew/Latin runs correctly (splitting it at the caret would
+     * break a run and garble the text). The caret is placed from the width of
+     * the logical text before it: exact for uniform-direction text, and a
+     * sensible approximation inside mixed runs. */
+    int startbyte = utf8seek(state->text, leftpos);
+    int endbyte   = utf8seek(state->text, endchar);
+
+    char linebuf[256];
+    int vlen = endbyte - startbyte;
+    if (vlen < 0) vlen = 0;
+    if (vlen >= (int)sizeof(linebuf)) vlen = sizeof(linebuf) - 1;
+    memcpy(linebuf, state->text + startbyte, vlen);
+    linebuf[vlen] = '\0';
+
+    int vis_w = 0;
+    sc->getstringsize(linebuf, &vis_w, NULL);
+
+    /* Place the line: right-aligned for an RTL name, left-aligned otherwise. */
+    int textx = rtl ? (area_r - vis_w) : area_l;
+    if (textx < area_l)
+        textx = area_l;
+    sc->putsxy(textx, y, linebuf);
+
+    /* Caret = line origin + the visual offset of the logical caret position,
+     * computed the same way bidi lays the line out (so it is correct for mixed
+     * Hebrew/Latin too). */
+    int cursor_x = textx + kbd_caret_visual_x(sc, linebuf, pm->curpos);
+
+    /* indicator: earlier text scrolled out of view (opposite side for RTL) */
     if (pm->leftpos > 0)
     {
-        /* Draw nicer bitmap arrow if room, else settle for "<". */
-        if (text_margin >= icon_w)
-        {
+        if (margin >= icon_w)
             screen_put_icon_with_offset(sc, 0, 0,
-                                        (text_margin - icon_w) / 2,
-                                        icon_y, Icon_Reverse_Cursor);
-        }
+                rtl ? (sc_w - icon_w) : 0, icon_y,
+                rtl ? Icon_Cursor : Icon_Reverse_Cursor);
         else
         {
-            sc->getstringsize("<", &w, NULL);
-            sc->putsxy(text_margin - w, y, "<");
+            sc->getstringsize(rtl ? ">" : "<", &w, NULL);
+            sc->putsxy(rtl ? (sc_w - w) : 0, y, rtl ? ">" : "<");
         }
     }
 
-    if (state->len_utf8 - pm->leftpos > pm->max_chars_text)
+    /* indicator: later text scrolled out of view */
+    if (endchar < state->len_utf8)
     {
-        /* Draw nicer bitmap arrow if room, else settle for ">". */
-        if (text_margin >= icon_w)
-        {
+        if (margin >= icon_w)
             screen_put_icon_with_offset(sc, 0, 0,
-                                        sc_w - (text_margin + icon_w) / 2,
-                                        icon_y, Icon_Cursor);
-        }
+                rtl ? 0 : (sc_w - icon_w), icon_y,
+                rtl ? Icon_Reverse_Cursor : Icon_Cursor);
         else
         {
-            sc->putsxy(sc_w - text_margin, y, ">");
+            sc->getstringsize(rtl ? "<" : ">", &w, NULL);
+            sc->putsxy(rtl ? 0 : (sc_w - w), y, rtl ? "<" : ">");
         }
     }
 
-    /* cursor */
-    i = text_margin + pm->curpos * pm->text_w;
-
+    /* caret */
     if (state->cur_blink)
-        sc->vline(i, y, y + pm->font_h - 1);
+        sc->vline(cursor_x, y, y + pm->font_h - 1);
 
     if (state->hangul) /* draw underbar */
-        sc->hline(i - pm->text_w, i, y + pm->font_h - 1);
+        sc->hline(cursor_x - pm->text_w, cursor_x, y + pm->font_h - 1);
 
     if (pm->line_edit)
     {
