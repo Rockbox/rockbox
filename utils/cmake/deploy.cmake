@@ -25,19 +25,19 @@ endif()
 
 # Linux: Build AppImage
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(LINUXDEPLOY ${CMAKE_BINARY_DIR}/linuxdeploy-x86_64.AppImage)
-    set(LINUXDEPLOYQT ${CMAKE_BINARY_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage)
+    set(LINUXDEPLOY ${CMAKE_BINARY_DIR}/linuxdeploy-${CMAKE_SYSTEM_PROCESSOR}.AppImage)
+    set(LINUXDEPLOYQT ${CMAKE_BINARY_DIR}/linuxdeploy-plugin-qt-${CMAKE_SYSTEM_PROCESSOR}.AppImage)
     add_custom_command(
         COMMENT "Downloading linuxdeploy"
         OUTPUT ${LINUXDEPLOY}
                ${LINUXDEPLOYQT}
         COMMAND ${CMAKE_COMMAND}
             -DOUTDIR=${CMAKE_BINARY_DIR}
-            -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+            -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${CMAKE_SYSTEM_PROCESSOR}.AppImage
             -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
         COMMAND ${CMAKE_COMMAND}
             -DOUTDIR=${CMAKE_BINARY_DIR}
-            -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+            -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${CMAKE_SYSTEM_PROCESSOR}.AppImage
             -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
     )
     # intermediate target needed to be able to get back to the actual file dependency.
@@ -220,4 +220,3 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         add_dependencies(deploy deploy_${deploy_TARGET})
     endfunction()
 endif()
-
