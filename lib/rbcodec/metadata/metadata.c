@@ -475,7 +475,7 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
     }
 
 #ifdef UTF8PROC_EXPORTS
-    if (success) {
+    if (success && (flags & METADATA_EXCLUDE_NORMALIZE) == 0) {
         utf8_normalize(id3->title);
         utf8_normalize(id3->artist);
         utf8_normalize(id3->album);
