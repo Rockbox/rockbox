@@ -55,28 +55,26 @@ FS_Archive sdmcArchive;
 
 void ctru_sys_quit(void)
 {
-    sys_poweroff();
+    sim_do_exit();
 }
 
 void power_off(void)
 {
-    /* since sim_thread_shutdown() grabs the mutex we need to let it free,
-     * otherwise sys_wait_thread will deadlock */
+    /* shut down Rockbox kernel threads */
     struct thread_entry* t = sim_thread_unlock();
     sim_thread_shutdown();
 
     /* lock again before entering the scheduler */
     sim_thread_lock(t);
-    /* sim_thread_shutdown() will cause sim_do_exit() to be called via longjmp,
-     * but only if we let the sdl thread scheduler exit the other threads */
-    while(1) yield();
+    sim_do_exit();
 }
 
 void sim_do_exit()
 {
     sim_kernel_shutdown();
     sys_timer_quit();
-    /* TODO: quit_everything() */
+    mcuhwc_close();
+    cfguExit();
     exit(EXIT_SUCCESS);
 }
 
