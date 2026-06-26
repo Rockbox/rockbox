@@ -86,6 +86,8 @@ void update_sound_slider_level(void)
       }
 }
 
+#define CPAD_DEADZONE 64
+
 int button_read_device(int* data)
 {
     int key = BUTTON_NONE;
@@ -97,13 +99,25 @@ int button_read_device(int* data)
 
     hidScanInput();
     u32 kDown = hidKeysDown();
-    
+
     if (kDown & KEY_SELECT) {
         touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
         printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
     }
-    
+
     u32 kHeld = hidKeysHeld();
+
+    /* Circle pad → directional buttons (alternative to D-pad) */
+    circlePosition cpad;
+    hidCircleRead(&cpad);
+    if (cpad.dx > CPAD_DEADZONE)
+        kHeld |= KEY_DRIGHT;
+    else if (cpad.dx < -CPAD_DEADZONE)
+        kHeld |= KEY_DLEFT;
+    if (cpad.dy > CPAD_DEADZONE)
+        kHeld |= KEY_DUP;
+    else if (cpad.dy < -CPAD_DEADZONE)
+        kHeld |= KEY_DDOWN;
 
     /* rockbox will handle button repeats */
     kDown |= kHeld;
