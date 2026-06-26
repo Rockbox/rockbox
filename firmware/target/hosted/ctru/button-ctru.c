@@ -53,6 +53,8 @@ static enum {
     STATE_DOWN = 1,
 } last_touch_state = STATE_UNKNOWN;
 
+static bool touch_enabled = true;
+
 static double map_values(double n, double source_start, double source_end, double dest_start, double dest_end, int decimal_precision ) {
     double delta_start = source_end - source_start;
     double delta_end = dest_end - dest_start;
@@ -152,22 +154,25 @@ int button_read_device(int* data)
     }
 
     touchPosition touch;
-    hidTouchRead(&touch);
+    if (touch_enabled)
+    {
+        hidTouchRead(&touch);
 
-    /* Generate UP and DOWN events */
-    if (kDown & KEY_TOUCH) {
-        last_touch_state = STATE_DOWN;
-    }
-    else {
-        last_touch_state = STATE_UP;
-    }
+        /* Generate UP and DOWN events */
+        if (kDown & KEY_TOUCH) {
+            last_touch_state = STATE_DOWN;
+        }
+        else {
+            last_touch_state = STATE_UP;
+        }
 
-    last_x = touch.px;
-    last_y = touch.py;
+        last_x = touch.px;
+        last_y = touch.py;
 
-    int tkey = touchscreen_to_pixels(last_x, last_y, data);
-    if (last_touch_state == STATE_DOWN) {
-        key |= tkey;
+        int tkey = touchscreen_to_pixels(last_x, last_y, data);
+        if (last_touch_state == STATE_DOWN) {
+            key |= tkey;
+        }
     }
 
     update_sound_slider_level();
@@ -183,7 +188,7 @@ void button_init_device(void)
 #ifndef HAS_BUTTON_HOLD
 void touchscreen_enable_device(bool en)
 {
-    (void)en;
+    touch_enabled = en;
 }
 #endif
 
