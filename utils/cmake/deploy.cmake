@@ -94,6 +94,8 @@ endif()
 
 # MacOS: Build dmg
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(CODESIGN_IDENTITY "-" CACHE STRING
+            "Code signing identity to use for macOS signing")
     set(DMGBUILD_STAMP ${CMAKE_BINARY_DIR}/dmgbuild.stamp)
     add_custom_command(
             COMMENT "Setting up dmgbuild virtualenv"
@@ -139,7 +141,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             COMMENT "Running macdeployqt and creating dmg ${deploy_TARGET}"
             COMMAND ${MACDEPLOYQT_EXECUTABLE} ${deploy_TARGET}.app
 
-            COMMAND codesign --force --deep --sign - ${deploy_TARGET}.app
+            COMMAND codesign --force --deep --sign "${CODESIGN_IDENTITY}" ${deploy_TARGET}.app
 
             COMMAND ${DMGBUILD} -s ${deploy_DMGBUILDCFG}
                     -Dappbundle=${deploy_TARGET}.app
