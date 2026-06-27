@@ -59,7 +59,7 @@ else()
   message("-- QT::Multimedia not found, TTS preview not available")
 endif()
 
-add_compile_options(-DQT_NO_USE_NODISCARD_FILE_OPEN)
+add_compile_definitions(QT_NO_USE_NODISCARD_FILE_OPEN)
 
 # If we're on Linux, try to find the used libs in the system.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")

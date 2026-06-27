@@ -13,6 +13,8 @@
 # KIND, either express or implied.
 #
 
+add_compile_definitions(QT_NO_USE_NODISCARD_FILE_OPEN)
+
 set(RBUTIL_TS_FILES
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_cs.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_de.ts
@@ -103,7 +105,6 @@ add_executable(RockboxUtility WIN32 MACOSX_BUNDLE
     )
 
 target_compile_features(RockboxUtility PRIVATE cxx_std_17 c_std_11)
-target_compile_options(RockboxUtility PRIVATE -DQT_NO_USE_NODISCARD_FILE_OPEN)
 
 if(WIN32)
     target_sources(RockboxUtility PRIVATE
