@@ -168,6 +168,9 @@ int ata_spinup_time(void); /* ticks */
 /* Returns 1 if drive is solid-state */
 static inline int ata_disk_isssd(void)
 {
+#ifdef SIMULATOR
+    return 0;
+#else
     unsigned short *identify_info = ata_get_identify();
     /*
        Offset 217 is "Nominal Rotation rate"
@@ -206,6 +209,7 @@ static inline int ata_disk_isssd(void)
              || ((identify_info[83] & (1<<2)) &&          /* CFA compliant */
                  ((identify_info[160] & (1<<15)) == 0))   /* CF power level 0 */
            );
+#endif
 }
 
 /* Returns 1 if the drive supports power management commands */

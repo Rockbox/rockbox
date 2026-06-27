@@ -1236,7 +1236,9 @@ static int parse_progressbar_tag(struct skin_element* element,
         token->type = SKIN_TOKEN_BATTERY_PERCENTBAR;
     else if (token->type == SKIN_TOKEN_PLAYLIST_ELAPSED_PERCENT)
     {
+#ifndef __PCTOOL__
         wps_playlist_percent_enable(); /* enable scanning track lengths */
+#endif
         token->type = SKIN_TOKEN_PLAYLIST_PROGRESSBAR;
     }
     else if (token->type == SKIN_TOKEN_TUNER_RSSI)

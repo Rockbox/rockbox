@@ -73,6 +73,10 @@
 #include "option_select.h"
 #include "wps.h"
 
+#if (CONFIG_STORAGE & STORAGE_ATA)
+#include "ata.h" /* ata_disk_isssd() */
+#endif
+
 #define NOINLINE __attribute__ ((noinline))
 
 static const char* get_codectype(const struct mp3entry* id3)
@@ -291,7 +295,7 @@ void wps_playlist_percent_prepare(void)
             if (size > 0)
             {
                 if (afmt != last_afmt || last_bps == 0
-                    || amount <= 50 || (amount <= 250 && ata_disk_isssd()) // TODO tune this for harddisk devices
+                    || amount <= 50 || (amount <= 250 && ata_disk_isssd())) // TODO tune this for harddisk devices
                 {
                     if (get_metadata_ex(tmp, fd, info.filename,
                         METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
