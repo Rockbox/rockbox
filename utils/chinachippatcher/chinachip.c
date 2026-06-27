@@ -211,7 +211,7 @@ enum cc_error chinachip_patch(const char* firmware, const char* bootloader,
         goto err;
     }
 
-    snprintf(header_time, 13, "%04d%02d%02d%02d%02d", time_info->tm_year + 1900,
+    snprintf(header_time, 13, "%04u%02u%02u%02u%02u", time_info->tm_year + 1900,
                                               time_info->tm_mon,
                                               time_info->tm_mday,
                                               time_info->tm_hour,
@@ -254,4 +254,3 @@ err:
 
     return result;
 }
-
