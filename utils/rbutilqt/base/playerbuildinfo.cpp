@@ -97,10 +97,7 @@ PlayerBuildInfo::PlayerBuildInfo() :
      serverInfo(nullptr),
      playerInfo(":/ini/rbutil.ini", QSettings::IniFormat)
 {
-#if QT_VERSION < 0x060000
-    playerInfo.setIniCodec("UTF-8");
-#endif
-
+        // Nothing to do here.
 }
 
 void PlayerBuildInfo::setBuildInfo(QString file)
@@ -199,11 +196,7 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
     // if the value is a string we can replace some patterns.
     // if we cannot convert it (f.e. for a QStringList) we leave as-is, since
     // the conversion would return an empty type.
-#if QT_VERSION < 0x060000
-    if (result.type() == QVariant::String)
-#else
     if (result.metaType().id() == QMetaType::QString)
-#endif
         result = result.toString()
                     .replace("%TARGET%", target)
                     .replace("%VERSION%", version.at(0));

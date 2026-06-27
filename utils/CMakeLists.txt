@@ -49,9 +49,15 @@ find_package(QT NAMES Qt6 REQUIRED)
     find_package(Qt6 REQUIRED COMPONENTS
                  Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
                  OPTIONAL_COMPONENTS Multimedia Test)
+	       ## note Core5Compat is only used for QuaZip
 get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
 get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
 message("-- Found Qt${QT_VERSION_MAJOR}: ${Qt${QT_VERSION_MAJOR}_DIR}")
+if (TARGET Qt${QT_VERSION_MAJOR}::Multimedia)
+  message("-- Found Qt::Multimedia")
+else()
+  message("-- QT::Multimedia not found, TTS preview not available")
+endif()
 
 # Added in QT 6.10
 add_compile_options(-DQT_NO_USE_NODISCARD_FILE_OPEN)
@@ -107,9 +113,7 @@ else()
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/zip.h)
     target_include_directories(quazip PUBLIC ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip)
     target_link_libraries(quazip z Qt${QT_VERSION_MAJOR}::Core)
-    if(QT_VERSION_MAJOR EQUAL 6)
-        target_link_libraries(quazip Qt${QT_VERSION_MAJOR}::Core5Compat)
-    endif()
+    target_link_libraries(quazip Qt${QT_VERSION_MAJOR}::Core5Compat)
     target_compile_definitions(quazip PUBLIC QUAZIP_STATIC)
     set_property(TARGET quazip PROPERTY AUTOMOC ON)
     set(QUAZIP_LIBRARY quazip)

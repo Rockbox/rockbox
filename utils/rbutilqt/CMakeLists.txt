@@ -32,11 +32,7 @@ set(RBUTIL_TS_FILES
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_zh_CN.ts
     ${CMAKE_CURRENT_LIST_DIR}/lang/rbutil_zh_TW.ts
     )
-if(QT_VERSION_MAJOR EQUAL 5)
-    qt5_add_translation(RBUTIL_QM_FILES ${RBUTIL_TS_FILES})
-else()
     qt6_add_translation(RBUTIL_QM_FILES ${RBUTIL_TS_FILES})
-endif()
 
 # The qrc file searches input files based on its location, and the qm files are
 # generated in the build dir. Copy the qrc file to the build dir, make it
@@ -112,10 +108,6 @@ if(WIN32)
     target_sources(RockboxUtility PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt-win.qrc
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt.rc)
-    if(QT_VERSION_MAJOR EQUAL 5)
-        # needed on Windows, otherwise svg icons won't show.
-        target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::QSvgIconPlugin)
-    endif()
 endif()
 if(APPLE)
     # MacOS Application Bundle specifics.
@@ -136,9 +128,7 @@ if (TARGET Qt${QT_VERSION_MAJOR}::Multimedia) # optional
         Qt${QT_VERSION_MAJOR}::Multimedia)
 endif()
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::SvgWidgets)
-endif()
+target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::SvgWidgets)
 
 target_include_directories(RockboxUtility PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/gui

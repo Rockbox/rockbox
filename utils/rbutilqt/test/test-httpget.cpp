@@ -39,12 +39,8 @@
 
         quint16 port(void) { return this->serverPort(); }
 
-#if QT_VERSION < 0x050000
-        void incomingConnection(int socket)
-#else
         // Qt 5 uses a different prototype for this function!
         void incomingConnection(qintptr socket)
-#endif
         {
             // When a new client connects, the server constructs a QTcpSocket and all
             // communication with the client is done over this QTcpSocket. QTcpSocket
@@ -549,4 +545,3 @@ QTEST_MAIN(TestHttpGet)
 // this include is needed because we don't use a separate header file for the
 // test class. It also needs to be at the end.
 #include "test-httpget.moc"
-

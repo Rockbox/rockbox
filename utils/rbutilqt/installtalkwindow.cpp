@@ -110,11 +110,7 @@ void InstallTalkWindow::accept()
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
-#if QT_VERSION >= 0x050e00
     talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",", Qt::SkipEmptyParts));
-#else
-    talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",", QString::SkipEmptyParts));
-#endif
 
     connect(talkcreator, &TalkFileCreator::done, logger, &ProgressLoggerGui::setFinished);
     connect(talkcreator, &TalkFileCreator::logItem, logger, &ProgressLoggerGui::addItem);
@@ -185,4 +181,3 @@ void InstallTalkWindow::changeEvent(QEvent *e)
         QWidget::changeEvent(e);
     }
 }
-

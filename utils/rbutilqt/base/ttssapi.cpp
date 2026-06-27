@@ -140,11 +140,7 @@ bool TTSSapi::start(QString *errStr)
     }
 
     voicestream = new QTextStream(voicescript);
-#if QT_VERSION < 0x060000
-    voicestream->setCodec("UTF16-LE");
-#else
     voicestream->setEncoding(QStringConverter::Utf16LE);
-#endif
 
     m_started = true;
     return true;
@@ -201,11 +197,7 @@ QStringList TTSSapi::getVoiceList(QString language)
     if(dataRaw.startsWith("Error")) {
         LOG_INFO() << "Error:" << dataRaw;
     }
-#if QT_VERSION >= 0x050e00
     result = dataRaw.split(";", Qt::SkipEmptyParts);
-#else
-    result = dataRaw.split(";", QString::SkipEmptyParts);
-#endif
     if(result.size() > 0)
     {
         result.sort();
@@ -271,4 +263,3 @@ bool TTSSapi::configOk()
         return false;
     return true;
 }
-

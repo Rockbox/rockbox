@@ -295,11 +295,7 @@ QString TTSFestival::getVoiceInfo(QString voice)
                     QRegularExpression::CaseInsensitiveOption));
         LOG_INFO() << "voiceInfo w/o descr:" << response;
         response = response.remove(')');
-#if QT_VERSION >= 0x050e00
         QStringList responseLines = response.split('(', Qt::SkipEmptyParts);
-#else
-        QStringList responseLines = response.split('(', QString::SkipEmptyParts);
-#endif
         responseLines.removeAt(0); // the voice name itself
 
         QString description;
@@ -417,4 +413,3 @@ QString TTSFestival::queryServer(QString query, int timeout)
 
     return response.trimmed();
 }
-

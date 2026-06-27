@@ -26,23 +26,7 @@
 #include "ConsoleAppender.h"
 #include "FileAppender.h"
 
-#ifdef STATIC
-#if QT_VERSION < 0x050400
-/*
- * accessibility is no longer a plugin after 5.4.0:
- * <https://bugreports.qt.io/browse/QTBUG-37957#comment-239189>
- */
-#include <QtPlugin>
-Q_IMPORT_PLUGIN(AccessibleFactory)
-#endif
-#endif
-
-
 int main( int argc, char ** argv ) {
-#if QT_VERSION >= 0x050600 && QT_VERSION < 0x060000
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
     QApplication app( argc, argv );
 #ifdef Q_OS_WIN
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -83,11 +67,7 @@ int main( int argc, char ** argv ) {
         if(!translator.load("rbutil_" + applang, absolutePath))
             translator.load("rbutil_" + applang, ":/lang");
         if(!qttrans.load("qt_" + applang,
-#if QT_VERSION >= 0x060000
             QLibraryInfo::path(QLibraryInfo::TranslationsPath)
-#else
-            QLibraryInfo::location(QLibraryInfo::TranslationsPath)
-#endif
                 ))
             qttrans.load("qt_" + applang, ":/lang");
 

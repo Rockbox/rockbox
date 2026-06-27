@@ -160,13 +160,7 @@ void HttpGet::requestFinished(QNetworkReply* reply)
         QUrl url = QUrl(org).resolved(
                 reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         // reconstruct query
-#if QT_VERSION < 0x050000
-        QList<QPair<QByteArray, QByteArray> > qitms = org.encodedQueryItems();
-        for(int i = 0; i < qitms.size(); ++i)
-            url.addEncodedQueryItem(qitms.at(i).first, qitms.at(i).second);
-#else
         url.setQuery(org.query());
-#endif
         LOG_INFO() << "Redirected to" << url;
         startRequest(url);
         return;
@@ -205,13 +199,7 @@ void HttpGet::startRequest(QUrl url)
         req.setRawHeader("User-Agent", m_globalUserAgent.toLatin1());
 
     m_reply = m_mgr.get(req);
-#if QT_VERSION < 0x050f00
-    connect(m_reply,
-            static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
-            this, &HttpGet::networkError);
-#else
     connect(m_reply, &QNetworkReply::errorOccurred, this, &HttpGet::networkError);
-#endif
     connect(m_reply, &QNetworkReply::downloadProgress, this, &HttpGet::downloadProgress);
     connect(m_reply, &QNetworkReply::sslErrors, this, &HttpGet::gotSslError);
 }
@@ -276,4 +264,3 @@ int HttpGet::httpResponse(void)
 {
     return m_lastStatusCode;
 }
-
