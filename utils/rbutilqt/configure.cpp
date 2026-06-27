@@ -20,8 +20,9 @@
 #include <QProgressDialog>
 #include <QFileDialog>
 #include <QUrl>
-#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
-#include <QSound>
+
+#if defined(QT_MULTIMEDIA_LIB)
+#include <QSoundEffect>
 #endif
 
 #include "version.h"
@@ -449,7 +450,7 @@ void Config::updateTtsState(int index)
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.svg")));
-#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
+#if defined(QT_MULTIMEDIA_LIB)
         ui.testTTS->setEnabled(true);
 #else
         ui.testTTS->setEnabled(false);
@@ -908,7 +909,7 @@ void Config::configTts()
 
 void Config::testTts()
 {
-#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
+#if defined(QT_MULTIMEDIA_LIB)
     QString errstr;
     int index = ui.comboTts->currentIndex();
     TTSBase* tts;
@@ -955,7 +956,11 @@ void Config::testTts()
     }
     tts->stop();
     if(!filename.isEmpty()) {
-        QSound::play(filename);
+        QSoundEffect effect;
+        effect.setSource(QUrl::fromLocalFile(filename));
+        effect.setLoopCount(0);
+        effect.setVolume(1.0f);
+        effect.play();
     }
     ui.testTTS->setEnabled(true);
     delete tts; /* Config objects are never deleted (in fact, they are

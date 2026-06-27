@@ -55,4 +55,5 @@ Version 1.5.2
 * Generate additional talk clips for language name and 'invalid voice file'
 * When installing development builds, fall back to daily artefacts for non-firmware files
 * Where possible, extract voice corrections file from the actual device
+* Port TTS preview to QT6
 * Drop support for Qt5, now requires Qt6.
