@@ -581,7 +581,10 @@ QString Config::languageName(const QString &qmFile)
 
     QString file = "rbutil_" + qmFile;
     if(!translator.load(file, programPath))
-        translator.load(file, ":/lang");
+        if (!translator.load(file, ":/lang")) {
+            LOG_ERROR() << "Failed to load translation:" << file;
+            return ("Failed to load translation:" + file);
+        }
 
     return translator.translate("Configure", "English",
         "This is the localized language name, i.e. your language.");
@@ -608,10 +611,16 @@ void Config::updateLanguage()
     QString absolutePath = QCoreApplication::instance()->applicationDirPath();
 
     if(!translator->load("rbutil_" + language, absolutePath))
-        translator->load("rbutil_" + language, ":/lang");
+        if (!translator->load("rbutil_" + language, ":/lang")) {
+            LOG_ERROR() << "Failed to load translation:" << ("rbutil_" + language);
+            return;
+        }
     if(!qttrans->load("qt_" + language,
                 QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
-        qttrans->load("qt_" + language, ":/lang");
+        if (!qttrans->load("qt_" + language, ":/lang")) {
+            LOG_ERROR() << "Failed to load translation:" << ("qt_" + language);
+            return;
+        }
 
     qApp->installTranslator(translator);
     qApp->installTranslator(qttrans);
