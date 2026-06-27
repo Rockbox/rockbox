@@ -65,11 +65,17 @@ int main( int argc, char ** argv ) {
     }
     if(!applang.isEmpty()) {
         if(!translator.load("rbutil_" + applang, absolutePath))
-            translator.load("rbutil_" + applang, ":/lang");
+            if (!translator.load("rbutil_" + applang, ":/lang")) {
+                LOG_ERROR() << "Failed to load translation:" << ("rbutil_" + applang);
+                // XXX do something.
+            }
         if(!qttrans.load("qt_" + applang,
             QLibraryInfo::path(QLibraryInfo::TranslationsPath)
                 ))
-            qttrans.load("qt_" + applang, ":/lang");
+            if (!qttrans.load("qt_" + applang, ":/lang")) {
+                LOG_ERROR() << "Failed to load translation:" << ("qt_" + applang);
+                // XXX do something?
+            }
 
         QLocale::setDefault(QLocale(applang));
     }
