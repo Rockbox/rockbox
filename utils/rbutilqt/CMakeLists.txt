@@ -103,6 +103,7 @@ add_executable(RockboxUtility WIN32 MACOSX_BUNDLE
     )
 
 target_compile_features(RockboxUtility PRIVATE cxx_std_17 c_std_11)
+target_compile_options(RockboxUtility PRIVATE -DQT_NO_USE_NODISCARD_FILE_OPEN)
 
 if(WIN32)
     target_sources(RockboxUtility PRIVATE

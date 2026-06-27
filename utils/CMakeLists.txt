@@ -49,7 +49,7 @@ find_package(QT NAMES Qt6 REQUIRED)
     find_package(Qt6 REQUIRED COMPONENTS
                  Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
                  OPTIONAL_COMPONENTS Multimedia Test)
-	       ## note Core5Compat is only used for QuaZip
+	       ## note Core5Compat is only needed for QuaZip
 get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
 get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
 message("-- Found Qt${QT_VERSION_MAJOR}: ${Qt${QT_VERSION_MAJOR}_DIR}")
@@ -59,7 +59,6 @@ else()
   message("-- QT::Multimedia not found, TTS preview not available")
 endif()
 
-# Added in QT 6.10
 add_compile_options(-DQT_NO_USE_NODISCARD_FILE_OPEN)
 
 # If we're on Linux, try to find the used libs in the system.
