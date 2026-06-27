@@ -129,6 +129,7 @@ void TargetDownloader::finished()
 void TargetDownloader::netError(QNetworkReply::NetworkError code)
 {
     ui->label->setText(tr("Network error: ") + reply->errorString());
+    (void)code;
 }
 
 void TargetDownloader::closeEvent(QCloseEvent *event)

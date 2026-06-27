@@ -58,6 +58,8 @@ void RBTouchArea::paint(QPainter *painter,
         painter->setPen(Qt::NoPen);
         painter->drawRect(size);
     }
+    (void)option;
+    (void)widget;
 }
 
 void RBTouchArea::mousePressEvent(QGraphicsSceneMouseEvent *event)

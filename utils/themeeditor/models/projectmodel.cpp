@@ -99,6 +99,7 @@ ProjectModel::~ProjectModel()
 int ProjectModel::rowCount(const QModelIndex& parent) const
 {
     return files.count();
+    (void)parent;
 }
 
 QVariant ProjectModel::data(const QModelIndex &index, int role) const

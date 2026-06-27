@@ -140,7 +140,8 @@ void RBScreen::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     {
         painter->fillRect(0, 0, width, height, bgColor);
     }
-
+    (void)option;
+    (void)widget;
 }
 
 void RBScreen::loadViewport(QString name, RBViewport *view)

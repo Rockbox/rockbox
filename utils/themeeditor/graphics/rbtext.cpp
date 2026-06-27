@@ -47,4 +47,7 @@ void RBText::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         painter->drawImage(0, 0, *image, 0, 0, image->width(), image->height());
     else
         painter->drawImage(0, 0, *image, offset, 0, maxWidth, image->height());
+
+    (void)option;
+    (void)widget;
 }

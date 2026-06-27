@@ -164,6 +164,7 @@ void FontDownloader::finished()
 void FontDownloader::netError(QNetworkReply::NetworkError code)
 {
     ui->label->setText(tr("Network error: ") + reply->errorString());
+    (void)code;
 }
 
 void FontDownloader::closeEvent(QCloseEvent *event)
