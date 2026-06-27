@@ -328,9 +328,9 @@ struct mp3entry {
     bool is_asf_stream;
 };
 
-unsigned int probe_file_format(const char *filename);
+unsigned int probe_file_format(const char *filename); /* returns audio_fmt */
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname);
-bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int flags);
+bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int audio_fmt, int flags);
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);
 void wipe_mp3entry(struct mp3entry *id3);

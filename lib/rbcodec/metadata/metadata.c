@@ -420,11 +420,12 @@ unsigned int probe_file_format(const char *filename)
 /* Get metadata for track - return false if parsing showed problems with the
  * file that would prevent playback. supply a filedescriptor <0 and the file will be opened
  * and closed automatically within the get_metadata call
+ * audio_fmt is AFMT_ enum provided by probe_file_format(trackname),
  * get_metadata_ex allows flags to change the way get_metadata behaves
  * METADATA_EXCLUDE_ID3_PATH  won't copy filename path to the id3 path buffer
  * METADATA_CLOSE_FD_ON_EXIT closes the open filedescriptor on exit
  */
-bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int flags)
+bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int audio_fmt, int flags)
 {
     bool success = true;
     const struct afmt_entry *entry;
@@ -449,7 +450,7 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int fl
     }
 
     /* Take our best guess at the codec type based on file extension */
-    id3->codectype = probe_file_format(trackname);
+    id3->codectype = audio_fmt; /* use probe_file_format(trackname); */
 
     /* default values for embedded cuesheets */
     id3->has_embedded_cuesheet = false;
@@ -517,7 +518,7 @@ log_on_exit:
 
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 {
-    return get_metadata_ex(id3, fd, trackname, 0);
+    return get_metadata_ex(id3, fd, trackname, probe_file_format(trackname), 0);
 }
 
 #define MOVE_ENTRY(x) if (x) x += offset;

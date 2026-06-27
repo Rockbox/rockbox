@@ -297,7 +297,7 @@ void wps_playlist_percent_prepare(void)
                 if (afmt != last_afmt || last_bps == 0
                     || amount <= 50 || (amount <= 250 && ata_disk_isssd())) // TODO tune this for harddisk devices
                 {
-                    if (get_metadata_ex(tmp, fd, info.filename,
+                    if (get_metadata_ex(tmp, fd, info.filename, afmt,
                         METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
                     {
                         secs = tmp->length / 1000;
@@ -314,8 +314,8 @@ void wps_playlist_percent_prepare(void)
             close(fd);
         }
 #else
-        if (get_metadata_ex(tmp, -1, info.filename,
-            METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
+        if (get_metadata_ex(tmp, -1, info.filename, probe_file_format(info.filename),
+                            METADATA_EXCLUDE_ID3_PATH | METADATA_EXCLUDE_NORMALIZE))
         {
             secs = tmp->length / 1000;
             mins = MIN(MAX(1, (secs + 30) / 60), 65535ul);/* minutes, rounded to nearest */

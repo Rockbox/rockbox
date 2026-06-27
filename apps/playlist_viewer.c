@@ -307,7 +307,8 @@ static bool retrieve_id3_tags(const int index, const char* name, struct mp3entry
     if (!id3_retrieval_successful)
     {
         /* Read from disk: retrieves frequency, file size, and codec */
-        id3_retrieval_successful = get_metadata_ex(id3, -1, name, flags);
+        id3_retrieval_successful = get_metadata_ex(id3, -1, name,
+                                                   probe_file_format(name), flags);
     }
     return id3_retrieval_successful;
 }
