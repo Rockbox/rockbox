@@ -29,6 +29,7 @@
 
 #include <QtCore>
 #include <QDebug>
+#include <QStorageInfo>
 #include <cstdlib>
 #include <stdio.h>
 
@@ -177,67 +178,9 @@ QString Utils::filesystemType(QString path)
 }
 
 
-QString Utils::filesystemName(QString path)
+QString Utils::filesystemName(const QString &path)
 {
-    QString name;
-#if defined(Q_OS_WIN32)
-    wchar_t volname[MAX_PATH+1];
-    bool res = GetVolumeInformationW((LPTSTR)path.utf16(), volname, MAX_PATH+1,
-            NULL, NULL, NULL, NULL, 0);
-    if(res) {
-        name = QString::fromWCharArray(volname);
-    }
-#endif
-#if defined(Q_OS_MACOS)
-    // BSD label does not include folder.
-    QString bsd = Utils::resolveDevicename(path).remove("/dev/");
-    if(bsd.isEmpty()) {
-        return name;
-    }
-    OSStatus result;
-    ItemCount index = 1;
-
-    do {
-        FSVolumeRefNum volrefnum;
-        HFSUniStr255 volname;
-
-        result = FSGetVolumeInfo(kFSInvalidVolumeRefNum, index, &volrefnum,
-                kFSVolInfoFSInfo, NULL, &volname, NULL);
-
-        if(result == noErr) {
-            GetVolParmsInfoBuffer volparms;
-            /* PBHGetVolParmsSync() is not available for 64bit while
-            FSGetVolumeParms() is available in 10.5+. Thus we need to use
-            PBHGetVolParmsSync() for 10.4, and that also requires 10.4 to
-            always use 32bit.
-            Qt 4 supports 32bit on 10.6 Cocoa only.
-            */
-#if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
-            if(FSGetVolumeParms(volrefnum, &volparms, sizeof(volparms)) == noErr)
-#else
-            HParamBlockRec hpb;
-            hpb.ioParam.ioNamePtr = NULL;
-            hpb.ioParam.ioVRefNum = volrefnum;
-            hpb.ioParam.ioBuffer = (Ptr)&volparms;
-            hpb.ioParam.ioReqCount = sizeof(volparms);
-            if(PBHGetVolParmsSync(&hpb) == noErr)
-#endif
-            {
-                if(volparms.vMServerAdr == 0) {
-                    if(bsd == (char*)volparms.vMDeviceID) {
-                        name = QString::fromUtf16(
-                            reinterpret_cast<const char16_t*>(volname.unicode),
-                            static_cast<int>(volname.length)
-                        );
-                        break;
-                    }
-                }
-            }
-        }
-        index++;
-    } while(result == noErr);
-#endif
-
+    QString name = QStorageInfo(path).displayName();
     LOG_INFO() << "Volume name of" << path << "is" << name;
     return name;
 }
