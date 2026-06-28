@@ -889,7 +889,7 @@ QList<int> Utils::suspendProcess(QList<int> pidlist, bool suspend)
  *  @param device mountpoint of the device
  *  @return true on success, fals otherwise.
  */
-bool Utils::ejectDevice(QString device)
+bool Utils::ejectDevice(const QString &device)
 {
 #if defined(Q_OS_WIN32)
     /* See http://support.microsoft.com/kb/165721 on the procedure to eject a
@@ -940,52 +940,25 @@ bool Utils::ejectDevice(QString device)
 
 #endif
 #if defined(Q_OS_MACOS)
-    // FIXME: FSUnmountVolumeSync is deprecated starting with 10.8.
     // Use DADiskUnmount / DiskArbitration framework eventually.
-    // BSD label does not include folder.
-    QString bsd = Utils::resolveDevicename(device).remove("/dev/");
-    OSStatus result;
-    ItemCount index = 1;
-    bool found = false;
+    QStorageInfo info(device);
+    if (!info.isValid())
+        return false;
 
-    do {
-        FSVolumeRefNum volrefnum;
+    QString mountPoint = info.rootPath();
 
-        result = FSGetVolumeInfo(kFSInvalidVolumeRefNum, index, &volrefnum,
-                kFSVolInfoFSInfo, NULL, NULL, NULL);
-        if(result == noErr) {
-            GetVolParmsInfoBuffer volparms;
-            /* See above -- PBHGetVolParmsSync() is not available for 64bit,
-             * and FSGetVolumeParms() on 10.5+ only. */
-#if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
-            if(FSGetVolumeParms(volrefnum, &volparms, sizeof(volparms)) == noErr)
-#else
-            HParamBlockRec hpb;
-            hpb.ioParam.ioNamePtr = NULL;
-            hpb.ioParam.ioVRefNum = volrefnum;
-            hpb.ioParam.ioBuffer = (Ptr)&volparms;
-            hpb.ioParam.ioReqCount = sizeof(volparms);
-            if(PBHGetVolParmsSync(&hpb) == noErr)
-#endif
-            {
-                if(volparms.vMServerAdr == 0) {
-                    if(bsd == (char*)volparms.vMDeviceID) {
-                        pid_t dissenter;
-                        result = FSUnmountVolumeSync(volrefnum, 0, &dissenter);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-        }
-        index++;
-    } while(result == noErr);
-    if(result == noErr && found)
-        return true;
+    QProcess proc;
+    proc.start("/usr/sbin/diskutil", {"eject", mountPoint});
+    if (!proc.waitForFinished())
+        return false;
 
+    return proc.exitStatus() == QProcess::NormalExit &&
+           proc.exitCode() == 0;
 #endif
 #if defined(Q_OS_LINUX)
     (void)device;
+    // TODO: eject [<device>|<mountPoint>] or
+    // udisksctl unmount -b <device> && udisksctl power-off -b <device>
 #endif
     return false;
 }

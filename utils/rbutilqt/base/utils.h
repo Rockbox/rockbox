@@ -57,7 +57,7 @@ public:
     static QString resolveMountPoint(QString device);
     static QMap<QString, QList<int> > findRunningProcess(QStringList names);
     static QList<int> suspendProcess(QList<int> pidlist, bool suspend);
-    static bool ejectDevice(QString device);
+    static bool ejectDevice(const QString &device);
     static qint64 recursiveFolderSize(QString path);
 };
 
