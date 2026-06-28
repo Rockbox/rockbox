@@ -51,7 +51,7 @@ static bool get_other_asap_metadata(int fd, struct mp3entry *id3)
     id3->frequency = 44100;
     id3->vbr = false;
     id3->filesize = filesize(fd);
-    id3->genre_string = id3_get_num_genre(36);
+    id3->genre_string = id3_get_num_genre(36); /* GAME */
     return true;
 }
 bool write_metadata_log = false;
@@ -59,6 +59,7 @@ bool write_metadata_log = false;
 const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 {
  /* NOTE enc_root_fname is ignored here but kept for consistency see get_codec_enc_root_fn() */
+    /*AFMT_ENTRY("label", "root_fname", "enc_root_fname", func, "ext_list")*/
     /* Unknown file format */
     [0 ... AFMT_NUM_CODECS-1] =
         AFMT_ENTRY("???", NULL,    "N/A",        NULL, "\0"  ),
@@ -322,20 +323,22 @@ int get_audio_base_codec_type(int type)
     return base_type;
 }
 
-const char * get_codec_string(int type)
+static const struct afmt_entry *get_afmt_entry(int type)
 {
     if (type < 0 || type >= AFMT_NUM_CODECS)
         type = AFMT_UNKNOWN;
 
-    return audio_formats[type].label;
+    return &audio_formats[type];
+}
+
+const char * get_codec_string(int type)
+{
+    return get_afmt_entry(type)->label;
 }
 
 /* Get the basic audio type */
 bool rbcodec_format_is_atomic(int afmt)
 {
-    if ((unsigned)afmt >= AFMT_NUM_CODECS)
-        return false;
-
     switch (get_audio_base_codec_type(afmt))
     {
     case AFMT_NSF:
@@ -355,7 +358,8 @@ bool rbcodec_format_is_atomic(int afmt)
         /* Type must be allocated and loaded in its entirety onto
            the buffer */
         return true;
-
+    case AFMT_UNKNOWN:
+        return false;
     default:
         /* Assume type may be loaded and discarded incrementally */
         return false;
@@ -421,11 +425,12 @@ unsigned int probe_file_format(const char *filename)
  * file that would prevent playback. supply a filedescriptor <0 and the file will be opened
  * and closed automatically within the get_metadata call
  * audio_fmt is AFMT_ enum provided by probe_file_format(trackname),
- * get_metadata_ex allows flags to change the way get_metadata behaves
+ * get_metadata_ex & afmt allow flags to change the way get_metadata behaves
  * METADATA_EXCLUDE_ID3_PATH  won't copy filename path to the id3 path buffer
  * METADATA_CLOSE_FD_ON_EXIT closes the open filedescriptor on exit
+ * METADATA_EXCLUDE_NORMALIZE won't utf8 normalize the string type id3 entries
  */
-bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int audio_fmt, int flags)
+bool get_metadata_afmt(struct mp3entry* id3, int fd, const char* trackname, int audio_fmt, int flags)
 {
     bool success = true;
     const struct afmt_entry *entry;
@@ -458,7 +463,7 @@ bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int au
 
     id3->tracknum = -1;
 
-    entry = &audio_formats[id3->codectype];
+    entry = get_afmt_entry(id3->codectype);
 
     /* Load codec specific track tag information and confirm the codec type. */
     if (!entry->parse_func)
@@ -516,9 +521,14 @@ log_on_exit:
     return success;
 }
 
+bool get_metadata_ex(struct mp3entry* id3, int fd, const char* trackname, int flags)
+{
+    return get_metadata_afmt(id3, fd, trackname, probe_file_format(trackname), flags);
+}
+
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 {
-    return get_metadata_ex(id3, fd, trackname, probe_file_format(trackname), 0);
+    return get_metadata_ex(id3, fd, trackname, 0);
 }
 
 #define MOVE_ENTRY(x) if (x) x += offset;

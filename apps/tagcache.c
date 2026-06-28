@@ -2339,7 +2339,7 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     /*memset(&id3, 0, sizeof(struct mp3entry)); -- get_metadata does this for us */
     memset(&entry, 0, sizeof(struct temp_file_entry));
     memset(&tracknumfix, 0, sizeof(tracknumfix));
-    ret = get_metadata_ex(&id3, -1, path, afmt, METADATA_EXCLUDE_ID3_PATH);
+    ret = get_metadata_afmt(&id3, -1, path, afmt, METADATA_EXCLUDE_ID3_PATH);
 
     if (!ret)
     {
