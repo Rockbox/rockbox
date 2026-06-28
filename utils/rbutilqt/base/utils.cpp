@@ -56,6 +56,8 @@
 #include <tlhelp32.h>
 #endif
 #if defined(Q_OS_MACOS)
+#include <libproc.h>
+#include <unistd.h>
 #include <Carbon/Carbon.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
@@ -693,34 +695,45 @@ QMap<QString, QList<int> > Utils::findRunningProcess(QStringList names)
     CloseHandle(hdl);
 #endif
 #if defined(Q_OS_MACOS)
-    ProcessSerialNumber psn = { 0, kNoProcess };
-    OSErr err;
-    do {
-        pid_t pid;
-        err = GetNextProcess(&psn);
-        err = GetProcessPID(&psn, &pid);
-        if(err == noErr) {
-            char buf[32] = {0};
-            ProcessInfoRec info;
-            memset(&info, 0, sizeof(ProcessInfoRec));
-            info.processName = (unsigned char*)buf;
-            info.processInfoLength = sizeof(ProcessInfoRec);
-            err = GetProcessInformation(&psn, &info);
-            if(err == noErr) {
-                // some processes start with nonprintable characters. Skip those.
-                int i;
-                for(i = 0; i < 32; i++) {
-                    if(isprint(buf[i])) break;
-                }
-                // avoid adding duplicates.
-                QString name = QString::fromUtf8(&buf[i]);
-                if(processlist.find(name) == processlist.end()) {
-                    processlist.insert(name, QList<int>());
-                }
-                processlist[name].append(pid);
-            }
+    int bufferSize = proc_listallpids(nullptr, 0);
+    if (bufferSize <= 0) {
+        LOG_ERROR() << "proc_listallpids failed.";
+        return found;
+    }
+
+    int count = bufferSize / sizeof(pid_t);
+    QVector<pid_t> pids(count);
+    bufferSize = proc_listallpids(pids.data(), (int)(pids.size() * sizeof(pid_t)));
+
+    if (bufferSize <= 0) {
+        LOG_ERROR() << "proc_listallpids failed (2).";
+        return found;
+    }
+
+    char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
+
+    for (int i = 0; i < count; ++i) {
+        pid_t pid = pids[i];
+        if (pid <= 0) continue;
+
+        // Get executable path
+        int ret = proc_pidpath(pid, pathBuffer, sizeof(pathBuffer));
+        if (ret <= 0) continue;
+
+        QString fullPath = QString::fromUtf8(pathBuffer);
+
+        // Extract process name from path
+        QString name = QFileInfo(fullPath).fileName();
+
+        if (name.isEmpty())
+            continue;
+
+        if (!processlist.contains(name)) {
+            processlist.insert(name, QList<int>());
         }
-    } while(err == noErr);
+
+        processlist[name].append(pid);
+    }
 #endif
 #if defined(Q_OS_LINUX)
     // not implemented for Linux!
