@@ -86,7 +86,7 @@ local function strftime(tmfmt, tm)
                         --local idx = tm.hour > 12 and 2 or 1
                         out = tm.hour > 12 and "pm" or "am"
                     elseif c == "C" then
-                        local no = (tm.year / 100) + 19
+                        local no = (tm.year / 100)
                         out = strformat("%02d", no)
                     elseif c == "d" then
                         out = strformat("%02d", tm.day)
