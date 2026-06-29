@@ -30,7 +30,7 @@
 
 RBScreen::RBScreen(const RBRenderInfo& info, bool remote,
                    QGraphicsItem *parent)
-                       :QGraphicsItem(parent), backdrop(0), project(project),
+                       :QGraphicsItem(parent), backdrop(0), project(info.project()),
                        albumArt(0), customUI(0), defaultView(0), ax(false)
 {
 
