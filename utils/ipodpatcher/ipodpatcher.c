@@ -127,19 +127,6 @@ static inline int be2int(unsigned char* buf)
    return res;
 }
 
-static inline int getint16le(char* buf)
-{
-   int16_t res = (buf[1] << 8) | buf[0];
-
-   return res;
-}
-
-static inline void short2le(unsigned short val, unsigned char* addr)
-{
-    addr[0] = val & 0xFF;
-    addr[1] = (val >> 8) & 0xff;
-}
-
 static inline void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
