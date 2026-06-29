@@ -147,8 +147,8 @@ int apply_bspatch(const char *infile, const char *outfile, const char *patchfile
 	pold = (u_char *)malloc(oldsize + 1);
 	if (pold == NULL)	err(1, "Malloc failed :%s", infile);
 	fseek(fs, 0, SEEK_SET);
-	if (fread(pold, 1, oldsize, fs) == -1)	err(1, "Read failed :%s", infile);
-	if (fclose(fs) == -1)	err(1, "Close failed :%s", infile);
+	if (fread(pold, 1, oldsize, fs) != (size_t)oldsize)	err(1, "Read failed :%s", infile);
+	if (fclose(fs) != 0)	err(1, "Close failed :%s", infile);
 
 	pnew = malloc(newsize + 1);
 	if (pnew == NULL)err(1, NULL);
@@ -208,8 +208,8 @@ int apply_bspatch(const char *infile, const char *outfile, const char *patchfile
 	/* Write the pnew file */
 	fs = fopen(outfile, "wb");
 	if (fs == NULL)err(1, "Create failed :%s", outfile);
-	if (fwrite(pnew, 1, newsize, fs) == -1)err(1, "Write failed :%s", outfile);
-	if (fclose(fs) == -1)err(1, "Close failed :%s", outfile);
+	if (fwrite(pnew, 1, newsize, fs) != (size_t)newsize)err(1, "Write failed :%s", outfile);
+	if (fclose(fs) != 0)err(1, "Close failed :%s", outfile);
 
 	free(pnew);
 	free(pold);
