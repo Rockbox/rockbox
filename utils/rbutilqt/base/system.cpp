@@ -287,7 +287,7 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
     CFMutableDictionaryRef usb_matching_dictionary;
     io_iterator_t usb_iterator = IO_OBJECT_NULL;
     usb_matching_dictionary = IOServiceMatching(kIOUSBDeviceClassName);
-    result = IOServiceGetMatchingServices(kIOMasterPortDefault, usb_matching_dictionary,
+    result = IOServiceGetMatchingServices(kIOMainPortDefault, usb_matching_dictionary,
                                           &usb_iterator);
     if(result) {
         LOG_ERROR() << "USB: IOKit: Could not get matching services.";

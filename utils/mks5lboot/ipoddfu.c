@@ -602,7 +602,7 @@ static dfuAPIResult dfu_iokit_open(struct dfuDev *dfuh, int *pid_list)
 
     usb_matching_dict = IOServiceMatching(kIOUSBDeviceClassName);
     dfuh->kr = IOServiceGetMatchingServices(
-                kIOMasterPortDefault, usb_matching_dict, &usb_iterator);
+                kIOMainPortDefault, usb_matching_dict, &usb_iterator);
     if (!dfu_iokit_chkrc(dfuh, "Could not get matching services"))
         goto error;
 
