@@ -454,12 +454,16 @@ static enum imx_error_t parse_version(const char *s, struct sb_version_t *ver)
         printf("[ERR] Bad version override '%s' (missing second dot)\n", s);
         return IMX_ERROR;
     }
-    enum imx_error_t ret = parse_subversion(s, dot1, &ver->major);
+    uint16_t major, minor, revision;
+    enum imx_error_t ret = parse_subversion(s, dot1, &major);
     if(ret != IMX_SUCCESS) return ret;
-    ret = parse_subversion(dot1 + 1, dot2, &ver->minor);
+    ret = parse_subversion(dot1 + 1, dot2, &minor);
     if(ret != IMX_SUCCESS) return ret;
-    ret = parse_subversion(dot2 + 1, NULL, &ver->revision);
+    ret = parse_subversion(dot2 + 1, NULL, &revision);
     if(ret != IMX_SUCCESS) return ret;
+    memcpy(&ver->major, &major, sizeof(ver->major));
+    memcpy(&ver->minor, &minor, sizeof(ver->minor));
+    memcpy(&ver->revision, &revision, sizeof(ver->revision));
     return IMX_SUCCESS;
 }
 
