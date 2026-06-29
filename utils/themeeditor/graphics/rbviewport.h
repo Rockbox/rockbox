@@ -119,8 +119,6 @@ private:
     int baseParam;
     ParseTreeNode* node;
     SkinDocument* doc;
-
-    bool mirrored;
 };
 
 #endif // RBVIEWPORT_H
