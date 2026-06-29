@@ -47,8 +47,8 @@ extern "C" {
 
 struct Im3Info
 {
-    uint8_t ident[4];
-    uint8_t version[3];
+    uint8_t ident[4] __attribute__((nonstring));
+    uint8_t version[3] __attribute__((nonstring));
     uint8_t enc_type;
     uint8_t entry[4];   /* LE */
     uint8_t data_sz[4]; /* LE */
@@ -58,13 +58,13 @@ struct Im3Info
             uint8_t _reserved[32];
         } enc12;
         struct {
-            uint8_t sign_off[4]; /* LE */
-            uint8_t cert_off[4]; /* LE */
-            uint8_t cert_sz[4];  /* LE */
+            uint8_t sign_off[4] __attribute__((nonstring)); /* LE */
+            uint8_t cert_off[4] __attribute__((nonstring)); /* LE */
+            uint8_t cert_sz[4] __attribute__((nonstring));  /* LE */
             uint8_t _reserved[36];
         } enc34;
     } u;
-    uint8_t info_sign[SIGN_SZ];
+    uint8_t info_sign[SIGN_SZ] __attribute__((nonstring));
 } __attribute__ ((packed));
 
 struct Im3Hdr
