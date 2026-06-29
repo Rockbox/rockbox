@@ -192,33 +192,22 @@ QString System::osVersionString(void)
         result = QString("(Error when retrieving system information)");
     }
 #if defined(Q_OS_MACOS)
-    SInt32 major;
-    SInt32 minor;
-    SInt32 bugfix;
-    Gestalt(gestaltSystemVersionMajor, &major);
-    Gestalt(gestaltSystemVersionMinor, &minor);
-    Gestalt(gestaltSystemVersionBugFix, &bugfix);
+    auto ver = QOperatingSystemVersion::current();
 
-    result += QString("<br/>OS X %1.%2.%3 ").arg(major).arg(minor).arg(bugfix);
-    // 1: 86k, 2: ppc, 10: i386
-    SInt32 arch;
-    Gestalt(gestaltSysArchitecture, &arch);
-    switch(arch) {
-        case 1:
-            result.append("(86k)");
-            break;
-        case 2:
-            result.append("(ppc)");
-            break;
-        case 10:
-            result.append("(x86)");
-            break;
-        default:
-            result.append("(unknown)");
-            break;
-    }
+    result += QString("<br/>macOS %1.%2.%3")
+        .arg(ver.majorVersion())
+        .arg(ver.minorVersion())
+        .arg(ver.microVersion());
+
+#if defined(__arm64__)
+    result += " (arm64)";
+#elif defined(__x86_64__)
+    result += " (x86_64)";
+#else
+    result += " (unknown)";
 #endif
-#endif
+#endif /* defined(Q_OS_MACOS) */
+#endif /* defined(Q_OS_LINUX) || defined(Q_OS_MACOS) */
     result += QString("<br/>Qt version %1").arg(qVersion());
     return result;
 }
