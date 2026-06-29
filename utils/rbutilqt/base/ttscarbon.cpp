@@ -117,17 +117,32 @@ void TTSCarbon::generateSettings(void)
 
     // get system voice
     error = GetVoiceDescription(NULL, &vdesc, sizeof(vdesc));
+    if (error != 0) {
+        LOG_ERROR() << "GetVoiceDescription() failed with code" << error;
+        return;
+    }
     systemVoice
             = QString::fromLocal8Bit((const char*)&vdesc.name[1], vdesc.name[0]);
     // get list of all voices
     CountVoices(&numVoices);
     for(SInt16 i = 1; i < numVoices; ++i) {
         error = GetIndVoice(i, &vspec);
+        if (error != 0) {
+            LOG_ERROR() << "GetIndVoice(" << i << ") failed with code" << error;
+            continue;
+        }
         error = GetVoiceDescription(&vspec, &vdesc, sizeof(vdesc));
+        if (error != 0) {
+            LOG_ERROR() << "GetVoiceDescription(" << i << ") failed with code" << error;
+            continue;
+        }
         // name is pascal string, i.e. the first byte is the length.
         QString name
             = QString::fromLocal8Bit((const char*)&vdesc.name[1], vdesc.name[0]);
         voiceNames.append(name.trimmed());
+    }
+    if (voiceNames.isEmpty()) {
+        return;
     }
     // voice
     EncTtsSetting* setting;
