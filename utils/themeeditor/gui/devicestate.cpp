@@ -482,7 +482,7 @@ void DeviceState::setData(QString tag, QVariant data)
         break;
 
     case Combo:
-        if(data.typeId() == QVariant::String)
+        if(data.typeId() == QMetaType::QString)
             dynamic_cast<QComboBox*>
                     (found.second)->
                     setCurrentIndex(dynamic_cast<QComboBox*>

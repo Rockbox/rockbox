@@ -60,7 +60,7 @@ public:
     void setText(QString text);
 private slots:
     void mouseMoveEvent(QMouseEvent * event);
-    void enterEvent(QEvent * event);
+    void enterEvent(QEnterEvent * event);
     void leaveEvent(QEvent * event);
     void timeout();
 

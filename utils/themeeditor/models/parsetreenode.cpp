@@ -1078,7 +1078,7 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
             child = val.toInt();
             child = branches * child / 100;
         }
-        else if(val.typeId() == QVariant::Bool)
+        else if(val.typeId() == QMetaType::Bool)
         {
             /* Boolean values have to be reversed, because conditionals are
              * always of the form %?tag<true|false>
@@ -1096,7 +1096,7 @@ QVariant ParseTreeNode::evalTag(const RBRenderInfo& info, bool conditional,
             else
                 child = 1;
         }
-        else if(val.typeId() == QVariant::String)
+        else if(val.typeId() == QMetaType::QString)
         {
             if(val.toString().length() > 0)
                 child = 0;
@@ -1180,18 +1180,18 @@ void ParseTreeNode::modParam(QVariant value, int index)
     }
     else if(param)
     {
-        if(value.typeId() == QVariant::Double)
+        if(value.typeId() == QMetaType::Double)
         {
             param->type = skin_tag_parameter::DECIMAL;
             param->data.number = static_cast<int>(value.toDouble() * 10);
         }
-        else if(value.typeId() == QVariant::String)
+        else if(value.typeId() == QMetaType::QString)
         {
             param->type = skin_tag_parameter::STRING;
             free(param->data.text);
             param->data.text = strdup(value.toString().toStdString().c_str());
         }
-        else if(value.typeId() == QVariant::Int)
+        else if(value.typeId() == QMetaType::Int)
         {
             param->type = skin_tag_parameter::INTEGER;
             param->data.number = value.toInt();

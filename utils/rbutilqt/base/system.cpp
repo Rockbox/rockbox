@@ -337,7 +337,7 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
         }
 
         if(id) {
-            usbids.insertMulti(id, name);
+            usbids.insert(id, name);
             LOG_INFO() << "USB:" << QString("0x%1").arg(id, 8, 16) << name;
         }
 

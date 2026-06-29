@@ -81,7 +81,7 @@ void PreviewLabel::mouseMoveEvent(QMouseEvent * event)
     hovertimer.start();
     mousepos = event->globalPosition().toPoint();
 }
-void PreviewLabel::enterEvent(QEvent * event)
+void PreviewLabel::enterEvent(QEnterEvent * event)
 {
     (void) event;
     hovertimer.start();

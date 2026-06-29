@@ -225,8 +225,10 @@ QString Utils::filesystemName(QString path)
             {
                 if(volparms.vMServerAdr == 0) {
                     if(bsd == (char*)volparms.vMDeviceID) {
-                        name = QString::fromUtf16((const ushort*)volname.unicode,
-                                                  (int)volname.length);
+                        name = QString::fromUtf16(
+                            reinterpret_cast<const char16_t*>(volname.unicode),
+                            static_cast<int>(volname.length)
+                        );
                         break;
                     }
                 }
