@@ -1575,6 +1575,14 @@ static inline struct viewport* opt_viewport(lua_State *L,
         vp->height = check_tablevalue(L, "height", narg);
     }
     vp->font = check_tablevalue_def(L, "font", narg, FONT_UI);
+
+    if (vp->font == FONT_UI)
+    {
+        vp->font = rb->global_status->font_id[SCREEN_MAIN];
+        if (vp->font == FONT_SYSFIXED)
+            vp->font = FONT_UI;
+    }
+
     vp->drawmode = check_tablevalue_def(L, "drawmode", narg, DRMODE_SOLID);
 
 #if LCD_DEPTH == 2
@@ -1618,9 +1626,11 @@ RB_WRAP(font_getstringsize)
     int w, h, result;
 
     if (fontnumber == FONT_UI)
+    {
         fontnumber = rb->global_status->font_id[SCREEN_MAIN];
-    else if (fontnumber < 0)
-        fontnumber = FONT_SYSFIXED;
+        if (fontnumber == FONT_SYSFIXED)
+            fontnumber = FONT_UI;
+    }
 
     if lua_isnoneornil(L, 2)
         result = RB_SCREENS(L, 3, getstringsize, str, &w, &h);
@@ -1648,6 +1658,12 @@ RB_WRAP(lcd_framebuffer)
 RB_WRAP(lcd_setfont)
 {
     int font = (int) luaL_checkint(L, 1);
+    if (font == FONT_UI)
+    {
+        font = rb->global_status->font_id[SCREEN_MAIN];
+        if (font == FONT_SYSFIXED)
+            font = FONT_UI;
+    }
     RB_SCREENS(L, 2, setfont, font);
     return 0;
 }

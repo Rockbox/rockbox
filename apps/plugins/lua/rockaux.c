@@ -71,6 +71,12 @@ int splash_scroller(int timeout, const char* str)
     struct viewport *last_vp = rb->lcd_set_viewport(&vp);
     int fontnum = vp.font;
 
+    if (fontnum == FONT_UI)
+    {
+        fontnum = rb->global_status->font_id[SCREEN_MAIN];
+        if (fontnum == FONT_SYSFIXED)
+            fontnum = FONT_UI;
+    }
     font_getstringsize("W", &ch_w, &ch_h, fontnum);
 
     const int max_w = LCD_WIDTH;
