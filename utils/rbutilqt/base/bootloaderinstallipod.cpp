@@ -242,12 +242,12 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
             return false;
         }
 #if defined(Q_OS_WIN32)
-        sprintf(ipod->diskname, "\\\\.\\PhysicalDrive%i", devicename.toInt());
+        snprintf(ipod->diskname, sizeof(ipod->diskname), "\\\\.\\PhysicalDrive%i", devicename.toInt());
 #elif defined(Q_OS_MACOS)
-        sprintf(ipod->diskname, "%s",
+        snprintf(ipod->diskname, sizeof(ipod->diskname), "%s",
             qPrintable(devicename.remove(QRegularExpression("s[0-9]+$"))));
 #else
-        sprintf(ipod->diskname, "%s",
+        snprintf(ipod->diskname, sizeof(ipod->diskname), "%s",
             qPrintable(devicename.remove(QRegularExpression("[0-9]+$"))));
 #endif
         LOG_INFO() << "ipodpatcher: overriding scan, using"
