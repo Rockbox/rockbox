@@ -266,7 +266,7 @@ void Autodetection::mergePatcher(void)
 #ifdef Q_OS_LINUX
         mp.append("2");
 #endif
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
         mp.append("s2");
 #endif
         struct Detected d;
@@ -296,7 +296,7 @@ void Autodetection::mergePatcher(void)
 #ifdef Q_OS_LINUX
         mp.append("1");
 #endif
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
         mp.append("s1");
 #endif
         struct Detected d;

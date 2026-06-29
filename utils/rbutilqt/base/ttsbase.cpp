@@ -29,7 +29,7 @@
 #include "ttsflite.h"
 #include "ttsmimic.h"
 #include "ttsswift.h"
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 #include "ttscarbon.h"
 #endif
 
@@ -60,7 +60,7 @@ void TTSBase::initTTSList()
 #if defined(Q_OS_LINUX)
     ttsList["festival"] = tr("Festival TTS Engine");
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     ttsList["carbon"] = tr("OS X System Engine");
 #endif
 }
@@ -82,7 +82,7 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
     if (ttsName == "festival")
         tts = new TTSFestival(parent);
     else
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     if(ttsName == "carbon")
         tts = new TTSCarbon(parent);
     else

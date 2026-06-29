@@ -32,16 +32,16 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 #include <sys/statvfs.h>
 #endif
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 #include <stdio.h>
 #endif
 #if defined(Q_OS_LINUX)
 #include <mntent.h>
 #endif
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
 #include <sys/param.h>
 #include <sys/ucred.h>
 #include <sys/mount.h>
@@ -54,7 +54,7 @@
 #include <winioctl.h>
 #include <tlhelp32.h>
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 #include <Carbon/Carbon.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
@@ -150,7 +150,7 @@ QString Utils::filesystemType(QString path)
     endmntent(mn);
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
@@ -188,7 +188,7 @@ QString Utils::filesystemName(QString path)
         name = QString::fromWCharArray(volname);
     }
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     // BSD label does not include folder.
     QString bsd = Utils::resolveDevicename(path).remove("/dev/");
     if(bsd.isEmpty()) {
@@ -263,7 +263,7 @@ qulonglong Utils::filesystemTotal(QString path)
 qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 {
     qulonglong size = 0;
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
     // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
     int ret;
@@ -316,7 +316,7 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 QString Utils::findExecutable(QString name)
 {
     //try autodetect tts
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
     QStringList path = QString(getenv("PATH")).split(":", Qt::SkipEmptyParts);
 #elif defined(Q_OS_WIN)
     QStringList path = QString(getenv("PATH")).split(";", Qt::SkipEmptyParts);
@@ -507,7 +507,7 @@ QString Utils::resolveDevicename(QString path)
 
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
@@ -591,7 +591,7 @@ QString Utils::resolveMountPoint(QString device)
 
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
     int num;
     struct statfs *mntinf;
 
@@ -664,7 +664,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
         }
     }
 
-#elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#elif defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
     supported << "vfat" << "msdos" << "hfs";
     int num;
     struct statfs *mntinf;
@@ -747,7 +747,7 @@ QMap<QString, QList<int> > Utils::findRunningProcess(QStringList names)
     } while(result);
     CloseHandle(hdl);
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     ProcessSerialNumber psn = { 0, kNoProcess };
     OSErr err;
     do {
@@ -904,7 +904,7 @@ QList<int> Utils::suspendProcess(QList<int> pidlist, bool suspend)
         CloseHandle(hToken);
     }
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     int signal = suspend ? SIGSTOP : SIGCONT;
     for(int i = 0; i < pidlist.size(); i++) {
         pid_t pid = pidlist[i];
@@ -981,7 +981,7 @@ bool Utils::ejectDevice(QString device)
     return success;
 
 #endif
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     // FIXME: FSUnmountVolumeSync is deprecated starting with 10.8.
     // Use DADiskUnmount / DiskArbitration framework eventually.
     // BSD label does not include folder.

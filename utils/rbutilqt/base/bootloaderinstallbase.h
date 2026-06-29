@@ -90,7 +90,7 @@ class BootloaderInstallBase : public QObject
         QTemporaryFile m_tempof;   //! temporary file for OF extracted from archive
         QDateTime m_blversion; //! download timestamp used for version information
         QString m_offile;      //! path to the offile
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
         void waitRemount(void);
 
         int m_remountTries;

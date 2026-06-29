@@ -241,7 +241,7 @@ bool EncoderLame::encode(QString input,QString output)
     wavbuflen = datalength;
     mp3buf = new unsigned char[mp3buflen];
     wavbuf = new short int[wavbuflen];
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     // handle byte order -- the host might not be LE.
     if(samplesize == 8) {
         // no need to convert.

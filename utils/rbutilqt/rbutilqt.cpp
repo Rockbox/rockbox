@@ -89,7 +89,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     QIcon windowIcon(":/icons/rockbox-clef.svg");
     this->setWindowIcon(windowIcon);
     ui.logoLabel->load(QLatin1String(":/icons/rockbox-logo.svg"));
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     // don't translate menu entries that are handled specially on OS X
     // (Configure, Quit). Qt handles them for us if they use english string.
     ui.action_Configure->setText("Configure");
@@ -111,7 +111,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     }
 #endif
 
-#if !defined(Q_OS_WIN32) && !defined(Q_OS_MACX)
+#if !defined(Q_OS_WIN32) && !defined(Q_OS_MACOS)
     /* eject funtionality is not available on Linux right now. */
     ui.buttonEject->setEnabled(false);
 #endif
@@ -631,7 +631,7 @@ void RbUtilQt::checkUpdate(void)
     url += "win32/";
 #elif defined(Q_OS_LINUX)
     url += "linux/";
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     url += "macosx/";
 #endif
 
@@ -698,7 +698,7 @@ void RbUtilQt::downloadUpdateDone(QNetworkReply::NetworkError error)
             url += "win32/";
 #elif defined(Q_OS_LINUX)
             url += "linux/";
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
             url += "macosx/";
 #endif
             url += foundVersion;

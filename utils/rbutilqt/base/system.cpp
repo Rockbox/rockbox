@@ -38,7 +38,7 @@
 #endif
 
 // Linux and Mac includes
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 #include <sys/utsname.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -51,7 +51,7 @@
 #endif
 
 // Mac includes
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 #include <sys/param.h>
 #include <sys/ucred.h>
 #include <sys/mount.h>
@@ -145,7 +145,7 @@ QString System::userName(void)
 
     return QString::fromWCharArray(userbuf);
 #endif
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
     struct passwd *user;
     user = getpwuid(geteuid());
     return QString(user->pw_name);
@@ -176,12 +176,12 @@ QString System::osVersionString(void)
     result += QString("<br/>CPU: %1, %2 processor(s)").arg(sysinfo.dwProcessorType)
               .arg(sysinfo.dwNumberOfProcessors);
 #endif
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
     struct utsname u;
     int ret;
     ret = uname(&u);
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     SInt32 cores;
     Gestalt(gestaltCountOfCPUs, &cores);
 #else
@@ -195,7 +195,7 @@ QString System::osVersionString(void)
     else {
         result = QString("(Error when retrieving system information)");
     }
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     SInt32 major;
     SInt32 minor;
     SInt32 bugfix;
@@ -282,7 +282,7 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
     libusb_exit(nullptr);
 #endif
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     kern_return_t result = KERN_FAILURE;
     CFMutableDictionaryRef usb_matching_dictionary;
     io_iterator_t usb_iterator = IO_OBJECT_NULL;
@@ -469,7 +469,7 @@ QUrl System::systemProxy(void)
         return QUrl("http://" + QString::fromWCharArray(proxyval));
     else
         return QUrl("");
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
 
     CFDictionaryRef dictref;
     CFStringRef stringref;

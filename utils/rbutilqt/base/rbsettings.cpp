@@ -51,7 +51,7 @@ const static struct {
     { RbSettings::InstallManual,        "install_manual",       "false" },
 #if defined(Q_OS_WIN32)
     { RbSettings::Tts,                  "tts",                  "sapi" },
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     { RbSettings::Tts,                  "tts",                  "carbon" },
 #else
     { RbSettings::Tts,                  "tts",                  "espeak" },

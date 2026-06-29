@@ -113,7 +113,7 @@ void BootloaderInstallSansa::installStage2(void)
     if(sansa_add_bootloader(&sansa, buf, len) == 0) {
         emit logItem(tr("Successfully installed bootloader"), LOGOK);
         sansa_close(&sansa);
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
         m_remountDevice = sansa.diskname;
         connect(this, SIGNAL(remounted(bool)), this, SLOT(installStage3(bool)));
         waitRemount();
@@ -246,7 +246,7 @@ bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
         }
 #if defined(Q_OS_WIN32)
         sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i", devicename.toInt());
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
         sprintf(sansa->diskname,
             "%s", qPrintable(devicename.remove(QRegularExpression("s[0-9]+$"))));
 #else

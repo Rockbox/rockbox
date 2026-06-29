@@ -25,7 +25,7 @@
 #include "mspackutil.h"
 #include "Logger.h"
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 #include <sys/param.h>
 #include <sys/ucred.h>
 #include <sys/mount.h>
@@ -155,7 +155,7 @@ int BootloaderInstallBase::logInstall(LogMode mode)
 }
 
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 void BootloaderInstallBase::waitRemount()
 {
     m_remountTries = 600;
@@ -168,7 +168,7 @@ void BootloaderInstallBase::waitRemount()
 
 void BootloaderInstallBase::checkRemount()
 {
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
     if(m_remountTries--) {
         int status = 0;
         // check if device has been remounted
