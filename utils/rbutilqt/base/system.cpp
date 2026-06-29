@@ -461,8 +461,6 @@ QUrl System::systemProxy(void)
     CFNumberRef numberref;
     int enable = 0;
     int port = 0;
-    unsigned int bufsize = 0;
-    char *buf;
     QUrl proxy;
 
     dictref = SCDynamicStoreCopyProxies(NULL);
@@ -475,24 +473,14 @@ QUrl System::systemProxy(void)
         // get proxy string
         stringref = (CFStringRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPProxy);
         if(stringref != NULL) {
-            // get number of characters. CFStringGetLength uses UTF-16 code pairs
-            bufsize = CFStringGetLength(stringref) * 2 + 1;
-            buf = (char*)malloc(sizeof(char) * bufsize);
-            if(buf == NULL) {
-                LOG_ERROR() << "can't allocate memory for proxy string!";
-                CFRelease(dictref);
-                return QUrl("");
-            }
-            CFStringGetCString(stringref, buf, bufsize, kCFStringEncodingUTF16);
+            QString host = QString::fromCFString(stringref);
             numberref = (CFNumberRef)CFDictionaryGetValue(dictref, kSCPropNetProxiesHTTPPort);
             if(numberref != NULL)
                 CFNumberGetValue(numberref, kCFNumberIntType, &port);
             proxy.setScheme("http");
-            proxy.setHost(QString::fromUtf16((unsigned short*)buf));
+            proxy.setHost(host);
             proxy.setPort(port);
-
-            free(buf);
-            }
+        }
     }
     CFRelease(dictref);
 
