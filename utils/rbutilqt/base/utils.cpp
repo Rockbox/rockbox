@@ -57,11 +57,7 @@
 #endif
 #if defined(Q_OS_MACOS)
 #include <libproc.h>
-#include <unistd.h>
-#include <Carbon/Carbon.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreServices/CoreServices.h>
-#include <IOKit/IOKitLib.h>
+#include <signal.h>
 #endif
 
 // recursive function to delete a dir with files
