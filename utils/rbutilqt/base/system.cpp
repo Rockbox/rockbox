@@ -179,14 +179,10 @@ QString System::osVersionString(void)
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
     struct utsname u;
     int ret;
+    int cores;
     ret = uname(&u);
+    cores = QThread::idealThreadCount();
 
-#if defined(Q_OS_MACOS)
-    SInt32 cores;
-    Gestalt(gestaltCountOfCPUs, &cores);
-#else
-    long cores = sysconf(_SC_NPROCESSORS_ONLN);
-#endif
     if(ret != -1) {
         result = QString("CPU: %1, %2 processor(s)").arg(u.machine).arg(cores);
         result += QString("<br/>System: %2<br/>Release: %3<br/>Version: %4")
