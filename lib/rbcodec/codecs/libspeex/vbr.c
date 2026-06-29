@@ -123,10 +123,11 @@ void vbr_init(VBRState *vbr)
 
 float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float pitch_coef)
 {
+   (void)pitch;
    int i;
    float ener=0, ener1=0, ener2=0;
    float qual=7;
-   int va;
+   /* int va; */
    float log_energy;
    float non_st=0;
    float voicing;
@@ -159,7 +160,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
        || (voicing<0 && non_st < .05))
    {
       float tmp;
-      va = 0;
+      /* va = 0; */
       vbr->consec_noise++;
       if (pow_ener > 3*vbr->noise_level)
          tmp = 3*vbr->noise_level;
@@ -171,7 +172,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
          vbr->noise_accum_count = .95*vbr->noise_accum_count + .05;
       }
    } else {
-      va = 1;
+      /* va = 1; */
       vbr->consec_noise=0;
    }
 
@@ -270,6 +271,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
 
 void vbr_destroy(VBRState *vbr)
 {
+   (void)vbr;
 }
 
 #endif /* #ifndef DISABLE_VBR */

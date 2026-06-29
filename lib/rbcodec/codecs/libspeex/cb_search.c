@@ -53,6 +53,7 @@
 #ifndef OVERRIDE_COMPUTE_WEIGHTED_CODEBOOK
 static void compute_weighted_codebook(const signed char *shape_cb, const spx_word16_t *r, spx_word16_t *resp, spx_word16_t *resp2, spx_word32_t *E, int shape_cb_size, int subvect_size, char *stack)
 {
+   (void)resp2; (void)stack;
    int i, j, k;
    VARDECL(spx_word16_t *shape);
    ALLOC(shape, subvect_size, spx_word16_t);
@@ -590,6 +591,7 @@ int   complexity,
 int   update_target
 )
 {
+   (void)par; (void)r; (void)bits; (void)complexity; (void)update_target;
    int i;
    VARDECL(spx_word16_t *tmp);
    ALLOC(tmp, nsf, spx_word16_t);

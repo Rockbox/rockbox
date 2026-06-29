@@ -75,6 +75,7 @@ int scal_quant32(spx_word32_t in, const spx_word32_t *boundary, int entries)
 /*Finds the indices of the n-best entries in a codebook*/
 void vq_nbest(spx_word16_t *in, const spx_word16_t *codebook, int len, int entries, spx_word32_t *E, int N, int *nbest, spx_word32_t *best_dist, char *stack)
 {
+   (void)stack;
    int i,j,k,used;
    used = 0;
    for (i=0;i<entries;i++)
@@ -109,6 +110,7 @@ void vq_nbest(spx_word16_t *in, const spx_word16_t *codebook, int len, int entri
 /*Finds the indices of the n-best entries in a codebook with sign*/
 void vq_nbest_sign(spx_word16_t *in, const spx_word16_t *codebook, int len, int entries, spx_word32_t *E, int N, int *nbest, spx_word32_t *best_dist, char *stack)
 {
+   (void)stack;
    int i,j,k, sign, used;
    used=0;
    for (i=0;i<entries;i++)

@@ -180,6 +180,7 @@ static inline spx_word32_t cheb_poly_eva(
 
 static float cheb_poly_eva(spx_word32_t *coef, spx_word16_t x, int m, char *stack)
 {
+   (void)stack;
    int k;
    float b0, b1, tmp;
 
@@ -533,6 +534,7 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 
 
 {
+    (void)stack;
     int i,j;
     float xout1,xout2,xin1,xin2;
     VARDECL(float *Wp);

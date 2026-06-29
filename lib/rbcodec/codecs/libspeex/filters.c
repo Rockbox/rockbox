@@ -334,6 +334,7 @@ spx_word16_t compute_rms16(const spx_word16_t *x, int len)
 #ifndef OVERRIDE_FILTER_MEM16
 void filter_mem16(const spx_word16_t *x, const spx_coef_t *num, const spx_coef_t *den, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack)
 {
+   (void)stack;
    int i,j;
    spx_word16_t xi,yi,nyi;
    for (i=0;i<N;i++)
@@ -377,6 +378,7 @@ void iir_mem16(const spx_word16_t *x, const spx_coef_t *den, spx_word16_t *y, in
 #ifndef OVERRIDE_FIR_MEM16
 void fir_mem16(const spx_word16_t *x, const spx_coef_t *num, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack)
 {
+   (void)stack;
    int i,j;
    spx_word16_t xi,yi;
 
@@ -424,6 +426,7 @@ void residue_percep_zero16(const spx_word16_t *xx, const spx_coef_t *ak, const s
 #ifndef OVERRIDE_COMPUTE_IMPULSE_RESPONSE
 void compute_impulse_response(const spx_coef_t *ak, const spx_coef_t *awk1, const spx_coef_t *awk2, spx_word16_t *y, int N, int ord, char *stack)
 {
+   (void)stack;
    int i,j;
    spx_word16_t y1, ny1i, ny2i;
    VARDECL(spx_mem_t *mem1);
@@ -459,6 +462,7 @@ void compute_impulse_response(const spx_coef_t *ak, const spx_coef_t *awk1, cons
 /* Decomposes a signal into low-band and high-band using a QMF */
 void qmf_decomp(const spx_word16_t *xx, const spx_word16_t *aa, spx_word16_t *y1, spx_word16_t *y2, int N, int M, spx_word16_t *mem, char *stack)
 {
+   (void)stack;
    int i,j,k,M2;
    VARDECL(spx_word16_t *a);
    VARDECL(spx_word16_t *x);
