@@ -62,14 +62,18 @@ show the information for the next song to be played.
      \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
       \config{\%Vf([fgshade])}\newline
       \config{\%Vb([bgshade])}
-      & See section \ref{ref:Viewports}\\}}
+      & See section \ref{ref:Viewports}\newline
+      \note{Any text or tags after \%Vf() or \%Vb() may result in
+            unexpected behavior and should be avoided.}\\}}
 
     \opt{lcd_color}{%
       \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
       \config{\%Vf([fgcolour])}\newline
       \config{\%Vb([bgcolour])}\newline
       \config{\%Vg(start,end \tabnlindent[,text])}
-      & See section \ref{ref:Viewports}\\}
+      & See section \ref{ref:Viewports}\newline
+      \note{Any text or tags after \%Vf() or \%Vb() may result in
+            unexpected behavior and should be avoided.}\\}
 
     \opt{lcd_non-mono}{%
       \config{\%Vs(mode[,param])}
