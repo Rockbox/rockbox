@@ -108,6 +108,7 @@ struct buflib_alloc_data {
     unsigned char buffer[];
 };
 static int buflib_allocations[MAXFONTS];
+static int ui_font = FONT_LASTUSERFONT;
 
 static int cache_fd;
 static struct font* cache_pf;
@@ -709,9 +710,10 @@ void font_enable_all(void)
  */
 struct font* font_get(int font)
 {
+    bool is_ui_font = (font == FONT_UI);
     struct font* pf;
-    if (font == FONT_UI)
-        font = MAXFONTS-1;
+    if (is_ui_font)
+        font = ui_font;
     if (font <= FONT_SYSFIXED || font >= MAXFONTS)
         return &sysfont;
 
@@ -724,8 +726,28 @@ struct font* font_get(int font)
                 return pf;
         }
         if (--font < 0)
-            return &sysfont;
+        {
+            if (is_ui_font && ui_font != FONT_LASTUSERFONT)
+            {
+                /* The users preferred UI font couldn't be loaded */
+                ui_font = FONT_LASTUSERFONT;
+                font = ui_font; /* try from the top to find something loaded */
+            }
+            else
+                return &sysfont; /* Nothing else is available */
+        }
     }
+}
+
+/* When FONT_UI is supplied to font_get this font will be tried first if it is
+ * not loaded then fall back to default of any loaded font wins */
+void set_ui_font(int font)
+{
+    /* Note: we don't allow setting FONT_SYSFIXED here */
+    if (font > FONT_SYSFIXED && font < MAXFONTS)
+        ui_font = font;
+    else /* default (same as supplying FONT_UI) */
+        ui_font = FONT_LASTUSERFONT;
 }
 
 /*

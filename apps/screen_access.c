@@ -57,9 +57,11 @@ static int screen_helper_getnblines(void)
 
 void screen_helper_setfont(int font)
 {
-    (void)font;
     if (font == FONT_UI)
+    {
         font = global_status.font_id[SCREEN_MAIN];
+        set_ui_font(font);
+    }
     lcd_setfont(font);
 }
 
@@ -71,6 +73,7 @@ static int screen_helper_getuifont(void)
 static void screen_helper_setuifont(int font)
 {
     global_status.font_id[SCREEN_MAIN] = font;
+    set_ui_font(font);
 }
 
 static void screen_helper_set_drawmode(int mode)

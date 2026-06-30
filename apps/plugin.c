@@ -1012,6 +1012,8 @@ int plugin_load(const char* plugin, const void* parameter)
     if (!global_settings.talk_menu)
         talk_buffer_set_policy(TALK_BUFFER_LOOSE);
 
+    screen_helper_setfont(FONT_UI);
+
     plugin_check_open_close__enter();
 
     int rc = p_hdr->entry_point(parameter); /* run the loaded plugin */
