@@ -181,6 +181,9 @@ struct font_cache_entry* font_cache_get(
     search(fcache, p->_char_code, fcache->_size - 1, &index_to_replace);
     if (insertion_point < index_to_replace)
     {
+        /* validate bounds before memmove */
+        if (insertion_point < -1 || index_to_replace >= fcache->_capacity)
+            return NULL;
         /* shift memory up */
         memmove(fcache->_index + insertion_point + 2,
                 fcache->_index + insertion_point + 1,
@@ -191,6 +194,9 @@ struct font_cache_entry* font_cache_get(
     }
     else if (insertion_point > index_to_replace)
     {
+        /* validate bounds before memmove */
+        if (index_to_replace < 0 || insertion_point >= fcache->_capacity)
+            return NULL;
         /* shift memory down */
         memmove(fcache->_index + index_to_replace,
                 fcache->_index + index_to_replace + 1,
