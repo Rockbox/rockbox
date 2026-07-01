@@ -39,6 +39,12 @@
 /* ischar() now lives in bidi.h as the shared is_rtl_char() macro */
 #define _isblank(c) ((c==' ' || c=='\t') ? 1 : 0)
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
+/* ctype ispunct() is only defined for unsigned char values; feeding it a
+ * decoded Unicode codepoint (e.g. Hebrew final kaf U+05DA, gimel U+05D2) is
+ * undefined and some libcs then mis-report it as punctuation, which trims the
+ * final letter off its RTL block and throws it to the wrong end of the line.
+ * Restrict the punctuation test to ASCII. */
+#define _ispunct(c) ((c) < 0x80 && ispunct((int)(c)))
 #define XOR(a,b) ((a||b) && !(a&&b))
 
 #ifndef BOOTLOADER
@@ -203,7 +209,7 @@ ucschar_t *bidi_l2v(const unsigned char *str, int orientation)
 
     do {
         while((XOR(is_rtl_char(*(tmp+1)),block_type)
-               || _isblank(*(tmp+1)) || ispunct((int)*(tmp+1))
+               || _isblank(*(tmp+1)) || _ispunct(*(tmp+1))
                || *(tmp+1)=='\n')
               && block_end < length-1) {
                 tmp++;
@@ -212,7 +218,7 @@ ucschar_t *bidi_l2v(const unsigned char *str, int orientation)
         }
 
         if (block_type != orientation) {
-            while ((_isblank(*tmp) || ispunct((int)*tmp))
+            while ((_isblank(*tmp) || _ispunct(*tmp))
                    && *tmp!='/' && *tmp!='-' && block_end>block_start) {
                 tmp--;
                 block_end--;
