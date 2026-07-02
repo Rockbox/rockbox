@@ -259,7 +259,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         return;
 
     /* only redraw if forced to, or info has changed */
-    if (force_redraw || bar->redraw_volume ||
+    if (bar->redraw_volume ||
 #if CONFIG_RTC
         (bar->time->tm_min != bar->last_tm_min) ||
 #endif
@@ -269,64 +269,38 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fill_viewport();
         display->set_drawmode(DRMODE_SOLID);
-        display->setfont(FONT_SYSFIXED);
 
-        if (bar->info.battery_state)
-            gui_statusbar_icon_battery(display, bar->info.battlevel,
-                                       bar->info.batt_charge_step);
-#ifdef HAVE_USB_POWER
-        if (bar->info.usb_inserted)
-            display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
-                                 STATUSBAR_PLUG_X_POS,
-                                 STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
-                                 SB_ICON_HEIGHT);
-#endif /* HAVE_USB_POWER */
-#if CONFIG_CHARGING
-#ifdef HAVE_USB_POWER
-        else
-#endif
-        /* draw power plug if charging */
-        if (bar->info.inserted)
-            display->mono_bitmap(bitmap_icons_7x8[Icon_Plug],
-                                    STATUSBAR_PLUG_X_POS,
-                                    STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
-                                    SB_ICON_HEIGHT);
-#endif /* CONFIG_CHARGING */
-#ifdef HAVE_RECORDING
-        /* turn off volume display in recording screen */
-        bool recscreen_on = in_recording_screen();
-        if (!recscreen_on)
-#endif
-            bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
-        gui_statusbar_icon_play_state(display, current_playmode() + Icon_Play);
-
-#ifdef HAVE_RECORDING
-        /* If in recording screen, replace repeat mode, volume
-           and shuffle icons with recording info */
-        if (recscreen_on)
-            gui_statusbar_icon_recording_info(display);
-        else
-#endif
-        {
-            gui_statusbar_icon_play_mode(display, bar->info.repeat);
-
-            if (bar->info.shuffle)
-                gui_statusbar_icon_shuffle(display);
-        }
-        if (bar->info.keylock)
-            gui_statusbar_icon_lock(display);
-#ifdef HAS_REMOTE_BUTTON_HOLD
-        if (bar->info.keylockremote)
-            gui_statusbar_icon_lock_remote(display);
-#endif
 #if CONFIG_RTC
-        gui_statusbar_time(display, bar->time);
-        bar->last_tm_min = bar->time->tm_min;
-#endif /* CONFIG_RTC */
-#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
-        if(!display->has_disk_led && bar->info.led)
-        {
-            gui_statusbar_led(display);
+        /* BRAD STATUSBAR: date left, time center, battery right */
+        if (bar->time && valid_time(bar->time)) {
+            char datebuf[5];
+            char timebuf[8];
+            char batbuf[6];
+            unsigned int w, h;
+            int hour = bar->time->tm_hour;
+            const char *ampm = (hour >= 12) ? "pm" : "am";
+            hour = hour % 12;
+            if (hour == 0) hour = 12;
+
+            /* Date: MMDD on the left */
+            snprintf(datebuf, sizeof(datebuf), "%02d%02d",
+                     bar->time->tm_mon + 1, bar->time->tm_mday);
+            display->putsxy(1, 1, datebuf);
+
+            /* Time: H:MMPM centered */
+            snprintf(timebuf, sizeof(timebuf), "%d:%02d%s",
+                     hour, bar->time->tm_min, ampm);
+            font_getstringsize(timebuf, &w, &h, FONT_UI);
+            display->putsxy((display->getwidth() - w) / 2,
+                           1, timebuf);
+
+            /* Battery: XX% on the right */
+            snprintf(batbuf, sizeof(batbuf), "%d%%", bar->info.battlevel);
+            font_getstringsize(batbuf, &w, &h, FONT_UI);
+            display->putsxy(display->getwidth() - w - 1,
+                           1, batbuf);
+
+            bar->last_tm_min = bar->time->tm_min;
         }
 #endif
         display->setfont(FONT_UI);
