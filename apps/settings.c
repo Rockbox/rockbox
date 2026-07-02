@@ -1130,11 +1130,7 @@ void settings_apply(bool read_disk)
     memcpy(&calibration_parameters, &global_settings.ts_calibration_data, sizeof(struct touchscreen_parameter));
 #endif
 
-#if defined(DX50) || defined(DX90)
-    ibasso_set_usb_mode(global_settings.usb_mode);
-#elif (defined(HIBY_R3PROII) || defined(HIBY_R1)) && !defined(SIMULATOR)
-    hiby_set_usb_mode(global_settings.usb_mode);
-#elif defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
+#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
     usb_set_mode(global_settings.usb_mode);
 #endif
 #if defined(HAVE_GENERAL_PURPOSE_LED)
