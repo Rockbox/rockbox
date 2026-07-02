@@ -95,12 +95,8 @@ void usb_enable(bool on)
     logf(">>>>>>>>>>>>>>>>> usb_enable(%d)\n", on);
     logf("usb enable %d %d\n", on, _usb_mode);
 
-    /* Ignore usb enable/disable when ADB is enabled so we can fireup adb shell
-     * without entering ums mode
-     */
-    //if (_usb_mode != USB_MODE_ADB) {
-        sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/UDC", on ? "13500000.otg_new" : "");
-    //}
+    sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/UDC",
+                     on ? "13500000.otg_new" : "\n");
 }
 
 /* This is called by usb thread after usb extract in order to return
