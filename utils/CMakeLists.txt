@@ -322,6 +322,9 @@ add_library(mks5lboot
     mks5lboot/mks5lboot.h
     )
 target_include_directories(mks5lboot PUBLIC ${CMAKE_CURRENT_LIST_DIR}/mks5lboot)
+if(WIN32)
+target_link_libraries(mks5lboot PRIVATE setupapi)
+endif()
 
 add_library(bspatch
     bspatch/bspatch.c
