@@ -32,6 +32,10 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
+#if defined(SANSA_CLIPPLUS) && CONFIG_TUNER
+#include "fmradio.h"
+#endif
+
 struct mutex cpufreq_mtx;
 
 /*  Charge Pump and Power management Settings  */
@@ -521,6 +525,12 @@ void set_cpu_frequency(long frequency)
 #if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)
+#if CONFIG_TUNER
+
+        if (get_radio_status()== FMRADIO_PLAYING) /* FS#13947 Noise in FM radio when unboosted */
+            ascodec_write_pmu(0x17, 1, 0x80 | 35);
+        else
+#endif
         if (amsv2_variant)
             ascodec_write_pmu(0x17, 1, 0x80 | 22);
         else
