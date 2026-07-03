@@ -35,8 +35,8 @@
 
 #define MODEL_NAME   "iBasso DX90"
 
-#define USB_NONE
 #define HAVE_USB_POWER
+#define HAVE_USB_ADB
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

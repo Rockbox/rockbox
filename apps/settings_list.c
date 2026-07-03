@@ -72,7 +72,6 @@
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
-#include "usb-ibasso.h"
 #endif
 
 #define UNUSED {.RESERVED=NULL}
@@ -2368,31 +2367,26 @@ const struct settings_list settings[] = {
                    "Powersave",
                    "Performance"),
 #endif
-#if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
+#if !defined(SIMULATOR) && !defined(USB_NONE) && (defined(HAVE_USB_ADB) || defined(HAVE_USB_POWER))
     CHOICE_SETTING(0,
                    usb_mode,
                    LANG_USB_MODE,
                    USBMODE_DEFAULT,
                    "usb mode",
                    "mass storage,charge"
-#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(HAVE_USB_ADB)
                    ",adb"
 #endif
                    ,
-#if defined(DX50) || defined(DX90)
-                   ibasso_set_usb_mode,
-                   3,
-#else
                    usb_set_mode,
-#if defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(HAVE_USB_ADB)
                    3,
 #else
                    2,
 #endif
-#endif
                    ID2P(LANG_USB_MODE_MASS_STORAGE),
                    ID2P(LANG_USB_MODE_CHARGE)
-#if defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if defined(HAVE_USB_ADB)
                    ,ID2P(LANG_USB_MODE_ADB)
 #endif
         ),

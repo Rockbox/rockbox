@@ -53,6 +53,9 @@
 #if defined(HIBY_R3PROII) || defined(HIBY_R1)
 #include "usb-hiby-gadget.h"
 #endif
+#if defined(DX50) || defined(DX90)
+#include "usb-ibasso.h"
+#endif
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 #include "iap.h"
@@ -73,11 +76,23 @@
 bool do_screendump_instead_of_usb = false;
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
-
 /* We assume that the USB cable is extracted */
 static int usb_state = USB_EXTRACTED;
 #if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT) && !defined(HAVE_USBSTACK)
 static int usb_mmc_countdown = 0;
+#endif
+#if defined(HAVE_USB_POWER) || defined(HAVE_USB_ADB)
+static bool usb_power_only = false;
+static int usb_mode = USBMODE_DEFAULT;
+void usb_set_mode(int mode)
+{
+    usb_mode = mode;
+#if defined(DX50) || defined(DX90)
+    ibasso_set_usb_mode(mode);
+#elif defined(HIBY_R3PROII) || defined(HIBY_R1)
+    hiby_set_usb_mode(mode);
+#endif
+}
 #endif
 
 #ifdef USB_FULL_INIT
@@ -106,11 +121,6 @@ static int usb_audio = 0;
 static bool usb_host_present = false;
 static int usb_num_acks_to_expect = 0;
 static uint32_t usb_broadcast_seqnum = 0x80000000;
-#ifdef HAVE_USB_POWER
-static int usb_mode = USBMODE_DEFAULT;
-static bool usb_power_only = false;
-#endif
-
 #if defined(USB_FIREWIRE_HANDLING)
 static void try_reboot(void)
 {
@@ -148,18 +158,6 @@ static inline bool usb_do_screendump(void)
     }
     return false;
 }
-
-#ifdef HAVE_USB_POWER
-void usb_set_mode(int mode)
-{
-    usb_mode = mode;
-#if defined(DX50) || defined(DX90)
-    ibasso_set_usb_mode(mode);
-#elif defined(HIBY_R3PROII) || defined(HIBY_R1)
-    hiby_set_usb_mode(mode);
-#endif
-}
-#endif
 
 #ifdef USB_FIREWIRE_HANDLING
 static inline bool usb_reboot_button(void)

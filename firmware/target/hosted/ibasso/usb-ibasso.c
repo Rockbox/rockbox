@@ -87,7 +87,26 @@ void ibasso_set_usb_mode(int mode)
     }
 }
 
-bool usb_powered_only(void)
+void usb_enable(bool on)
 {
-  return false;
+    (void)on; // XXX maybe implement?
+}
+
+int usb_detect(void)
+{
+    return 0; // XXX figure this out?
+}
+
+void usb_init_device(void)
+{
+    // XXX maybe something?
+}
+
+int disk_mount_all(void)
+{
+    return 1;  // XXX maybe do sometihng?
+}
+int disk_unmount_all(void)
+{
+    return 1;  // XXX maybe do sometihng?
 }

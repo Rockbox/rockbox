@@ -58,7 +58,7 @@
 #include "onplay.h"
 #include "misc.h"
 
-#if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
+#if !defined(SIMULATOR) && !defined(USB_NONE) && (defined(HAVE_USB_ADB) || defined(HAVE_USB_POWER))
 #define HAVE_USB_MODE
 #endif
 
