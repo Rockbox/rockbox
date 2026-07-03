@@ -82,7 +82,9 @@ static int usb_state = USB_EXTRACTED;
 static int usb_mmc_countdown = 0;
 #endif
 #if defined(HAVE_USB_POWER) || defined(HAVE_USB_ADB)
+#ifdef USB_FULL_INIT
 static bool usb_power_only = false;
+#endif
 static int usb_mode = USBMODE_DEFAULT;
 void usb_set_mode(int mode)
 {
