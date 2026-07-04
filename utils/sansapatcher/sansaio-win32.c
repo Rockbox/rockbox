@@ -60,12 +60,13 @@ void sansa_print_error(char* msg)
     LPSTR pMsgBuf = NULL;
 
     printf(msg);
-    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+    if (FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                   FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(),
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pMsgBuf,
-                  0, NULL);
-    printf(pMsgBuf);
-    LocalFree(pMsgBuf);
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&pMsgBuf,
+                       0, NULL)) {
+        printf(pMsgBuf);
+        LocalFree(pMsgBuf);
+    }
 }
 
 int sansa_open(struct sansa_t* sansa, int silent)
@@ -214,4 +215,3 @@ int sansa_write(struct sansa_t* sansa, int nbytes)
     return count;
 }
 #endif
-
