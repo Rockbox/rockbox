@@ -91,7 +91,7 @@ if(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
     message("-- Found QuaZip")
     set(QUAZIP_LIBRARY QuaZip::QuaZip)
 else()
-    message("-- Could not find system QuaZip, uisng our own copy.")
+    message("-- Could not find system QuaZip, using our own copy.")
     # TODO: Upstream has cmake support, use that instead.
     add_library(quazip
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/quazip/ioapi.h

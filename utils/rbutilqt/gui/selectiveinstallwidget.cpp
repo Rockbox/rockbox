@@ -187,14 +187,15 @@ void SelectiveInstallWidget::updateVoiceLangs()
             ui.voiceCombobox->addItem(it.value().toString(), it.key());
             LOG_INFO() << "available voices: adding" << it.key();
         }
-
     }
     // try to select the previously selected one again (if still present)
-    // TODO: Fall back to system language if not found, or english.
     int sel = ui.voiceCombobox->findData(current);
     if(sel >= 0)
         ui.voiceCombobox->setCurrentIndex(sel);
+    else
+        ui.voiceCombobox->setCurrentIndex(ui.voiceCombobox->findData("english"));
 
+    // TODO: Fall back to system language before the final "english" fallback.
 }
 
 
