@@ -19,13 +19,13 @@ for Rockbox.
 
 Requirements:
 =============
-- gcc
-- Qt 5 or
+- C++ compiler (GCC and Clang are known to work)
 - Qt 6
 - qt6-tools-dev
 - qt6-5compat-dev
 - qt6-svg-dev
 - qt6-multimedia-dev
+- qt6-network-dev
 
 - at least the following folders from Rockbox tree:
   o lib/rbcodec/codecs/libspeex
@@ -35,10 +35,10 @@ Requirements:
 
 Building:
 =========
-- run cmake in the utils/ folder
+- create a build directory somewhere, cd to it
+- run 'cmake /path/to/rockbox/utils'
 - run make
-eg. mkdir utils/build-rbutil ; cd build-rbutil ; cmake ../utils ; make
-
+eg. mkdir build-rbutil ; cd tbuild-rbutil ; cmake ../utils ; make
 
 Build Options:
 ==============
@@ -62,3 +62,4 @@ its source.
 The website for Rockbox Utility is
 https://www.rockbox.org/wiki/RockboxUtility
 
+//
