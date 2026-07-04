@@ -245,6 +245,7 @@ struct dfuAPI {
 /*
  * DFU API low-level (specific) functions
  */
+#if defined(WIN32) || defined(USE_LIBUSBAPI) || defined(__APPLE__)
 static bool dfu_check_id(int vid, int pid, int *pid_list)
 {
     int *p;
@@ -263,6 +264,7 @@ static void dfu_add_reqerrstr(struct dfuDev *dfuh, struct usbControlSetup *cs)
         sizeof(dfuh->err) - strlen(dfuh->err), " (cs=%02x/%d/%d/%d/%d)",
         cs->bmRequestType, cs->bRequest, cs->wValue, cs->wIndex, cs->wLength);
 }
+#endif
 
 #ifdef WIN32
 static bool dfu_winapi_chkrc(struct dfuDev *dfuh, char *str, bool success)
@@ -695,7 +697,7 @@ static struct dfuAPI api_list[] =
  */
 static int DEBUG_DFUREQ = 0;
 
-static dfuAPIResult dfuapi_request(struct dfuDev *dfuh,
+static __attribute__ ((noinline)) dfuAPIResult dfuapi_request(struct dfuDev *dfuh,
                             struct usbControlSetup *cs, void *data)
 {
     if (!DEBUG_DFUREQ)
@@ -902,7 +904,7 @@ static int ipoddfu_download_file(struct dfuDev* dfuh,
 {
     unsigned int blknum, len, remaining;
     int poll_tmo;
-    DFUStatus status;
+    DFUStatus status = errNONE;
     DFUState state;
 
     if (dfuapi_req_getstate(dfuh, &state) != DFUAPISuccess)

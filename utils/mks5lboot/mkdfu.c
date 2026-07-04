@@ -191,9 +191,9 @@ unsigned char *mkdfu(int dfu_type, char *dfu_arg, int* dfu_size,
 {
     const struct ipod_models *model = NULL;
     unsigned char *dfu_buf = NULL;
-    unsigned char *f_buf;
+    unsigned char *f_buf = NULL;
     int f_size;
-    uint32_t padded_bl_size;
+    uint32_t padded_bl_size = 0;
     uint32_t cert_off, cert_sz;
     off_t cur_off;
     char *dfu_desc;
