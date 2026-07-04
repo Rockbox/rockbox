@@ -587,7 +587,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     for(int i=0; i<list.size();i++)
     {
         wchar_t t[32];
-        memset(t, 0, 32);
+        memset(t, 0, sizeof(t));
         if(GetVolumeInformationW((LPCWSTR)list.at(i).absolutePath().utf16(),
                 NULL, 0, NULL, NULL, NULL, t, 32) == 0) {
             // on error empty retrieved type -- don't rely on

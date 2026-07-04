@@ -39,7 +39,9 @@
 #include "comboboxviewdelegate.h"
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
+#ifndef _UNICODE
 #define _UNICODE
+#endif
 #endif
 #include <tchar.h>
 #include <windows.h>

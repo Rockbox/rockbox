@@ -28,7 +28,9 @@
 // Windows Includes
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
+#ifndef _UNICODE
 #define _UNICODE
+#endif
 #endif
 #include <windows.h>
 #include <tchar.h>
@@ -489,5 +491,3 @@ QUrl System::systemProxy(void)
     return QUrl("");
 #endif
 }
-
-
