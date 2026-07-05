@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 
 
 #include "ucl_conf.h"
-#include "ucl_util.h"
 
 
 /***********************************************************************
@@ -49,75 +48,37 @@ ucl_assert(int expr)
  * copyright string in the executable of your product.
 .*/
 
-const ucl_byte __ucl_copyright[] =
-    "\n\n\n"
-    "UCL real-time data compression library.\n"
-    "$Copyright: UCL (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 Markus Franz Xaver Johannes Oberhumer $\n"
+static const char __ucl_copyright[] =
+    "\r\n\n"
+    "UCL data compression library.\n"
+    "$Copyright: UCL (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Markus Franz Xaver Johannes Oberhumer\n"
     "<markus@oberhumer.com>\n"
-    "http://www.oberhumer.com\n"
-    "\n"
-    "UCL version: v" UCL_VERSION_STRING ", " UCL_VERSION_DATE "\n"
-    "UCL build date: " __DATE__ " " __TIME__ "\n\n"
-    "UCL special compilation options:\n"
-#ifdef __cplusplus
-    " __cplusplus\n"
+    "http://www.oberhumer.com $\n\n"
+    "$Id: UCL version: v" UCL_VERSION_STRING ", " UCL_VERSION_DATE " $\n"
+    "$Built: " __DATE__ " " __TIME__ " $\n"
+    "$Info: " ACC_INFO_OS
+#if defined(ACC_INFO_OS_POSIX)
+    "/" ACC_INFO_OS_POSIX
 #endif
-#if defined(__PIC__)
-    " __PIC__\n"
-#elif defined(__pic__)
-    " __pic__\n"
+    " " ACC_INFO_ARCH
+#if defined(ACC_INFO_ENDIAN)
+    "/" ACC_INFO_ENDIAN
 #endif
-#if (UINT_MAX < UCL_0xffffffffL)
-    " 16BIT\n"
-#endif
-#if defined(__UCL_STRICT_16BIT)
-    " __UCL_STRICT_16BIT\n"
-#endif
-#if (UINT_MAX > UCL_0xffffffffL)
-    " UINT_MAX=" _UCL_MEXPAND(UINT_MAX) "\n"
-#endif
-#if (ULONG_MAX > UCL_0xffffffffL)
-    " ULONG_MAX=" _UCL_MEXPAND(ULONG_MAX) "\n"
-#endif
-#if defined(UCL_BYTE_ORDER)
-    " UCL_BYTE_ORDER=" _UCL_MEXPAND(UCL_BYTE_ORDER) "\n"
-#endif
-#if defined(UCL_UNALIGNED_OK_2)
-    " UCL_UNALIGNED_OK_2\n"
-#endif
-#if defined(UCL_UNALIGNED_OK_4)
-    " UCL_UNALIGNED_OK_4\n"
-#endif
-#if defined(UCL_ALIGNED_OK_4)
-    " UCL_ALIGNED_OK_4\n"
-#endif
-#if defined(__UCL_IN_MINIUCL)
-    " __UCL_IN_MINIUCL\n"
-#endif
-    "\n\n"
-/* RCS information */
-    "$Id: UCL " UCL_VERSION_STRING " built " __DATE__ " " __TIME__
-#if defined(__GNUC__) && defined(__VERSION__)
-    " by gcc " __VERSION__
-#elif defined(__BORLANDC__)
-    " by Borland C " _UCL_MEXPAND(__BORLANDC__)
-#elif defined(_MSC_VER)
-    " by Microsoft C " _UCL_MEXPAND(_MSC_VER)
-#elif defined(__PUREC__)
-    " by Pure C " _UCL_MEXPAND(__PUREC__)
-#elif defined(__SC__)
-    " by Symantec C " _UCL_MEXPAND(__SC__)
-#elif defined(__TURBOC__)
-    " by Turbo C " _UCL_MEXPAND(__TURBOC__)
-#elif defined(__WATCOMC__)
-    " by Watcom C " _UCL_MEXPAND(__WATCOMC__)
+    " " ACC_INFO_MM
+    " " ACC_INFO_CC
+#if defined(ACC_INFO_CCVER)
+    " " ACC_INFO_CCVER
 #endif
     " $\n";
 
-UCL_PUBLIC(const ucl_byte *)
+UCL_PUBLIC(const ucl_bytep)
 ucl_copyright(void)
 {
-    return __ucl_copyright;
+#if (ACC_OS_DOS16 && ACC_CC_TURBOC)
+    return (ucl_voidp) __ucl_copyright;
+#else
+    return (const ucl_bytep) __ucl_copyright;
+#endif
 }
 
 UCL_PUBLIC(ucl_uint32)
@@ -168,7 +129,7 @@ _ucl_version_date(void)
 #define UCL_DO16(buf,i) UCL_DO8(buf,i); UCL_DO8(buf,i+8);
 
 UCL_PUBLIC(ucl_uint32)
-ucl_adler32(ucl_uint32 adler, const ucl_byte *buf, ucl_uint len)
+ucl_adler32(ucl_uint32 adler, const ucl_bytep buf, ucl_uint len)
 {
     ucl_uint32 s1 = adler & 0xffff;
     ucl_uint32 s2 = (adler >> 16) & 0xffff;

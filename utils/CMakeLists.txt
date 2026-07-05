@@ -198,10 +198,7 @@ target_link_libraries(mkamsboot ucl)
 
 add_library(ucl
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/alloc.c
-    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/fake16.h
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/getbit.h
-    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/internal.h
-    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/io.c
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/Makefile
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/n2_99.ch
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/n2b_99.c
@@ -218,7 +215,7 @@ add_library(ucl
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/n2e_to.c
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_conf.h
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_crc.c
-    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_dll.c
+    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_dll.ch
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_init.c
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_mchw.ch
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_ptr.c
@@ -226,10 +223,9 @@ add_library(ucl
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_str.c
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_swd.ch
     ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_util.c
-    ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/src/ucl_util.h
     )
 
-target_include_directories(ucl PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/include)
+target_include_directories(ucl PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl/include ${CMAKE_CURRENT_LIST_DIR}/../tools/ucl)
 
 add_library(rbspeex
     ${CMAKE_CURRENT_LIST_DIR}/../tools/rbspeex/rbspeex.c

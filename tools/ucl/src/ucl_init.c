@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -27,27 +27,19 @@
 
 
 #include "ucl_conf.h"
-#include "ucl_util.h"
-#include <stdio.h>
-
-
-#if 0
-#  define IS_SIGNED(type)       (((type) (1ul << (8 * sizeof(type) - 1))) < 0)
-#  define IS_UNSIGNED(type)     (((type) (1ul << (8 * sizeof(type) - 1))) > 0)
-#else
-#  define IS_SIGNED(type)       (((type) (-1)) < ((type) 0))
-#  define IS_UNSIGNED(type)     (((type) (-1)) > ((type) 0))
-#endif
 
 
 /***********************************************************************
 // Runtime check of the assumptions about the size of builtin types,
 // memory model, byte order and other low-level constructs.
 //
-// We are really paranoid here - UCL should either fail (or crash)
+// We are really paranoid here - UCL should either fail
 // at startup or not at all.
 //
-// Because of inlining much of these functions evaluates to nothing.
+// Because of inlining much of this evaluates to nothing at compile time.
+//
+// And while many of the tests seem highly obvious and redundant they are
+// here to catch compiler/optimizer bugs. Yes, these do exist.
 ************************************************************************/
 
 static ucl_bool schedule_insns_bug(void);   /* avoid inlining */
@@ -55,6 +47,7 @@ static ucl_bool strength_reduce_bug(int *); /* avoid inlining */
 
 
 #if 0 || defined(UCL_DEBUG)
+#include <stdio.h>
 static ucl_bool __ucl_assert_fail(const char *s, unsigned line)
 {
 #if defined(__palmos__)
@@ -71,114 +64,28 @@ static ucl_bool __ucl_assert_fail(const char *s, unsigned line)
 
 
 /***********************************************************************
-// The next two functions should get completely optimized out of existance.
-// Some assertions are redundant - but included for clarity.
+// basic_check - compile time assertions
 ************************************************************************/
 
-static ucl_bool basic_integral_check(void)
-{
-    ucl_bool r = 1;
-    ucl_bool sanity;
+#if 1
 
-    /* paranoia */
-    r &= __ucl_assert(CHAR_BIT == 8);
-    r &= __ucl_assert(sizeof(char) == 1);
-    r &= __ucl_assert(sizeof(short) >= 2);
-    r &= __ucl_assert(sizeof(long) >= 4);
-    r &= __ucl_assert(sizeof(int) >= sizeof(short));
-    r &= __ucl_assert(sizeof(long) >= sizeof(int));
+#undef ACCCHK_ASSERT
+#define ACCCHK_ASSERT(expr)     ACC_COMPILE_TIME_ASSERT_HEADER(expr)
 
-    r &= __ucl_assert(sizeof(ucl_uint32) >= 4);
-    r &= __ucl_assert(sizeof(ucl_uint32) >= sizeof(unsigned));
-#if defined(__UCL_STRICT_16BIT)
-    r &= __ucl_assert(sizeof(ucl_uint) == 2);
-#else
-    r &= __ucl_assert(sizeof(ucl_uint) >= 4);
-    r &= __ucl_assert(sizeof(ucl_uint) >= sizeof(unsigned));
+#include "acc/acc_chk.ch"
+
+    ACCCHK_ASSERT_IS_SIGNED_T(ucl_int)
+    ACCCHK_ASSERT_IS_UNSIGNED_T(ucl_uint)
+
+    ACCCHK_ASSERT_IS_SIGNED_T(ucl_int32)
+    ACCCHK_ASSERT_IS_UNSIGNED_T(ucl_uint32)
+    ACCCHK_ASSERT((UCL_UINT32_C(1) << (int)(8*sizeof(UCL_UINT32_C(1))-1)) > 0)
+
+    ACCCHK_ASSERT_IS_UNSIGNED_T(ucl_uintptr_t)
+    ACCCHK_ASSERT(sizeof(ucl_uintptr_t) >= sizeof(ucl_voidp))
+
 #endif
-
-#if defined(SIZEOF_UNSIGNED)
-    r &= __ucl_assert(SIZEOF_UNSIGNED == sizeof(unsigned));
-#endif
-#if defined(SIZEOF_UNSIGNED_LONG)
-    r &= __ucl_assert(SIZEOF_UNSIGNED_LONG == sizeof(unsigned long));
-#endif
-#if defined(SIZEOF_UNSIGNED_SHORT)
-    r &= __ucl_assert(SIZEOF_UNSIGNED_SHORT == sizeof(unsigned short));
-#endif
-#if !defined(__UCL_IN_MINIUCL)
-#if defined(SIZEOF_SIZE_T)
-    r &= __ucl_assert(SIZEOF_SIZE_T == sizeof(size_t));
-#endif
-#endif
-
-    /* assert the signedness of our integral types */
-    sanity = IS_UNSIGNED(unsigned short) && IS_UNSIGNED(unsigned) &&
-             IS_UNSIGNED(unsigned long) &&
-             IS_SIGNED(short) && IS_SIGNED(int) && IS_SIGNED(long);
-    if (sanity)
-    {
-        r &= __ucl_assert(IS_UNSIGNED(ucl_uint32));
-        r &= __ucl_assert(IS_UNSIGNED(ucl_uint));
-        r &= __ucl_assert(IS_SIGNED(ucl_int32));
-        r &= __ucl_assert(IS_SIGNED(ucl_int));
-
-        r &= __ucl_assert(INT_MAX    == UCL_STYPE_MAX(sizeof(int)));
-        r &= __ucl_assert(UINT_MAX   == UCL_UTYPE_MAX(sizeof(unsigned)));
-        r &= __ucl_assert(LONG_MAX   == UCL_STYPE_MAX(sizeof(long)));
-        r &= __ucl_assert(ULONG_MAX  == UCL_UTYPE_MAX(sizeof(unsigned long)));
-        r &= __ucl_assert(SHRT_MAX   == UCL_STYPE_MAX(sizeof(short)));
-        r &= __ucl_assert(USHRT_MAX  == UCL_UTYPE_MAX(sizeof(unsigned short)));
-        r &= __ucl_assert(UCL_UINT32_MAX == UCL_UTYPE_MAX(sizeof(ucl_uint32)));
-        r &= __ucl_assert(UCL_UINT_MAX   == UCL_UTYPE_MAX(sizeof(ucl_uint)));
-#if !defined(__UCL_IN_MINIUCL)
-        r &= __ucl_assert(SIZE_T_MAX     == UCL_UTYPE_MAX(sizeof(size_t)));
-#endif
-    }
-
-    return r;
-}
-
-
-static ucl_bool basic_ptr_check(void)
-{
-    ucl_bool r = 1;
-    ucl_bool sanity;
-
-    r &= __ucl_assert(sizeof(char *) >= sizeof(int));
-    r &= __ucl_assert(sizeof(ucl_byte *) >= sizeof(char *));
-
-    r &= __ucl_assert(sizeof(ucl_voidp) == sizeof(ucl_byte *));
-    r &= __ucl_assert(sizeof(ucl_voidp) == sizeof(ucl_voidpp));
-    r &= __ucl_assert(sizeof(ucl_voidp) == sizeof(ucl_bytepp));
-    r &= __ucl_assert(sizeof(ucl_voidp) >= sizeof(ucl_uint));
-
-    r &= __ucl_assert(sizeof(ucl_ptr_t) == sizeof(ucl_voidp));
-    r &= __ucl_assert(sizeof(ucl_ptr_t) >= sizeof(ucl_uint));
-
-    r &= __ucl_assert(sizeof(ucl_ptrdiff_t) >= 4);
-    r &= __ucl_assert(sizeof(ucl_ptrdiff_t) >= sizeof(ptrdiff_t));
-
-#if defined(SIZEOF_CHAR_P)
-    r &= __ucl_assert(SIZEOF_CHAR_P == sizeof(char *));
-#endif
-#if defined(SIZEOF_PTRDIFF_T)
-    r &= __ucl_assert(SIZEOF_PTRDIFF_T == sizeof(ptrdiff_t));
-#endif
-
-    /* assert the signedness of our integral types */
-    sanity = IS_UNSIGNED(unsigned short) && IS_UNSIGNED(unsigned) &&
-             IS_UNSIGNED(unsigned long) &&
-             IS_SIGNED(short) && IS_SIGNED(int) && IS_SIGNED(long);
-    if (sanity)
-    {
-        r &= __ucl_assert(IS_UNSIGNED(ucl_ptr_t));
-        r &= __ucl_assert(IS_SIGNED(ucl_ptrdiff_t));
-        r &= __ucl_assert(IS_SIGNED(ucl_sptr_t));
-    }
-
-    return r;
-}
+#undef ACCCHK_ASSERT
 
 
 /***********************************************************************
@@ -189,31 +96,25 @@ static ucl_bool ptr_check(void)
 {
     ucl_bool r = 1;
     int i;
-    char _wrkmem[10 * sizeof(ucl_byte *) + sizeof(ucl_align_t)];
+    unsigned char _wrkmem[10 * sizeof(ucl_bytep) + sizeof(ucl_align_t)];
     ucl_bytep wrkmem;
     ucl_bytepp dict;
     unsigned char x[4 * sizeof(ucl_align_t)];
     long d;
     ucl_align_t a;
-    ucl_align_t u;
 
     for (i = 0; i < (int) sizeof(x); i++)
         x[i] = UCL_BYTE(i);
 
-    wrkmem = UCL_PTR_ALIGN_UP((ucl_byte *)_wrkmem,sizeof(ucl_align_t));
+    wrkmem = UCL_PTR_ALIGN_UP((ucl_bytep)_wrkmem, sizeof(ucl_align_t));
 
-#if 0
-    dict = (ucl_bytepp) wrkmem;
-#else
-    /* Avoid a compiler warning on architectures that
-     * do not allow unaligned access. */
-    u.a_ucl_bytep = wrkmem; dict = u.a_ucl_bytepp;
-#endif
+    dict = (ucl_bytepp) (ucl_voidp) wrkmem;
 
     d = (long) ((const ucl_bytep) dict - (const ucl_bytep) _wrkmem);
     r &= __ucl_assert(d >= 0);
     r &= __ucl_assert(d < (long) sizeof(ucl_align_t));
 
+    /* this may seem obvious, but some compilers incorrectly inline memset */
     memset(&a,0xff,sizeof(a));
     r &= __ucl_assert(a.a_ushort == USHRT_MAX);
     r &= __ucl_assert(a.a_uint == UINT_MAX);
@@ -224,32 +125,21 @@ static ucl_bool ptr_check(void)
     if (r == 1)
     {
         for (i = 0; i < 8; i++)
-            r &= __ucl_assert((const ucl_voidp) (&dict[i]) == (const ucl_voidp) (&wrkmem[i * sizeof(ucl_byte *)]));
+            r &= __ucl_assert((const ucl_voidp) (&dict[i]) == (const ucl_voidp) (&wrkmem[i * sizeof(ucl_bytep)]));
     }
 
-    /* check BZERO8_PTR and that NULL == 0 */
+    /* check that NULL == 0 */
     memset(&a,0,sizeof(a));
     r &= __ucl_assert(a.a_char_p == NULL);
     r &= __ucl_assert(a.a_ucl_bytep == NULL);
-    r &= __ucl_assert(NULL == (void*)0);
-    if (r == 1)
-    {
-        for (i = 0; i < 10; i++)
-            dict[i] = wrkmem;
-        BZERO8_PTR(dict+1,sizeof(dict[0]),8);
-        r &= __ucl_assert(dict[0] == wrkmem);
-        for (i = 1; i < 9; i++)
-            r &= __ucl_assert(dict[i] == NULL);
-        r &= __ucl_assert(dict[9] == wrkmem);
-    }
 
     /* check that the pointer constructs work as expected */
     if (r == 1)
     {
         unsigned k = 1;
         const unsigned n = (unsigned) sizeof(ucl_uint32);
-        ucl_byte *p0;
-        ucl_byte *p1;
+        ucl_bytep p0;
+        ucl_bytep p1;
 
         k += __ucl_align_gap(&x[k],n);
         p0 = (ucl_bytep) &x[k];
@@ -264,7 +154,7 @@ static ucl_bool ptr_check(void)
         p1 = (ucl_bytep) &x[1];
         r &= __ucl_assert(PTR_GE(p0,p1));
 
-        r &= __ucl_assert(k < 1+n);
+        r &= __ucl_assert(k < 1u+n);
         p1 = (ucl_bytep) &x[1+n];
         r &= __ucl_assert(PTR_LT(p0,p1));
 
@@ -272,17 +162,8 @@ static ucl_bool ptr_check(void)
         if (r == 1)
         {
             ucl_uint32 v0, v1;
-#if 0
-            v0 = * (ucl_uint32 *) &x[k];
-            v1 = * (ucl_uint32 *) &x[k+n];
-#else
-            /* Avoid compiler warnings on architectures that
-             * do not allow unaligned access. */
-            u.a_uchar_p = &x[k];
-            v0 = *u.a_ucl_uint32_p;
-            u.a_uchar_p = &x[k+n];
-            v1 = *u.a_ucl_uint32_p;
-#endif
+            v0 = * (ucl_uint32p) (ucl_voidp) &x[k];
+            v1 = * (ucl_uint32p) (ucl_voidp) &x[k+n];
             r &= __ucl_assert(v0 > 0);
             r &= __ucl_assert(v1 > 0);
         }
@@ -308,64 +189,42 @@ _ucl_config_check(void)
         unsigned char x[4*sizeof(ucl_align_t)];
     } u;
 
-#if 0
-    /* paranoia - the following is guaranteed by definition anyway */
-    r &= __ucl_assert((const void *)&u == (const void *)&u.a);
-    r &= __ucl_assert((const void *)&u == (const void *)&u.b);
-    r &= __ucl_assert((const void *)&u == (const void *)&u.x[0]);
-    r &= __ucl_assert((const void *)&u == (const void *)&u.aa[0]);
-#endif
-
-    r &= basic_integral_check();
-    r &= basic_ptr_check();
-    if (r != 1)
-        return UCL_E_ERROR;
-
     u.a = 0; u.b = 0;
     for (i = 0; i < (int) sizeof(u.x); i++)
         u.x[i] = UCL_BYTE(i);
 
-#if 0
-    /* check if the compiler correctly casts signed to unsigned */
-    r &= __ucl_assert( (int) (unsigned char) ((char) -1) == 255);
-#endif
-
-    /* check UCL_BYTE_ORDER */
-#if defined(UCL_BYTE_ORDER)
+#if defined(ACC_ENDIAN_BIG_ENDIAN) || defined(ACC_ENDIAN_LITTLE_ENDIAN)
     if (r == 1)
     {
-#  if (UCL_BYTE_ORDER == UCL_LITTLE_ENDIAN)
-        ucl_uint32 a = (ucl_uint32) (u.a & UCL_UINT32_C(0xffffffff));
-        unsigned short b = (unsigned short) (u.b & 0xffff);
-        r &= __ucl_assert(a == UCL_UINT32_C(0x03020100));
-        r &= __ucl_assert(b == 0x0100);
-#  elif (UCL_BYTE_ORDER == UCL_BIG_ENDIAN)
+#  if defined(ACC_ENDIAN_BIG_ENDIAN)
         ucl_uint32 a = u.a >> (8 * sizeof(u.a) - 32);
         unsigned short b = u.b >> (8 * sizeof(u.b) - 16);
         r &= __ucl_assert(a == UCL_UINT32_C(0x00010203));
         r &= __ucl_assert(b == 0x0001);
-#  else
-#    error "invalid UCL_BYTE_ORDER"
+#  endif
+#  if defined(ACC_ENDIAN_LITTLE_ENDIAN)
+        ucl_uint32 a = (ucl_uint32) (u.a & UCL_UINT32_C(0xffffffff));
+        unsigned short b = (unsigned short) (u.b & 0xffff);
+        r &= __ucl_assert(a == UCL_UINT32_C(0x03020100));
+        r &= __ucl_assert(b == 0x0100);
 #  endif
     }
 #endif
 
     /* check that unaligned memory access works as expected */
-#if defined(UCL_UNALIGNED_OK_2)
-    r &= __ucl_assert(sizeof(short) == 2);
+#if defined(UA_GET2) || defined(UA_SET2)
     if (r == 1)
     {
         unsigned short b[4];
-
         for (i = 0; i < 4; i++)
-            b[i] = * (const unsigned short *) &u.x[i];
-
-#  if (UCL_BYTE_ORDER == UCL_LITTLE_ENDIAN)
+            b[i] = UA_GET2(&u.x[i]);
+#  if defined(ACC_ENDIAN_LITTLE_ENDIAN)
         r &= __ucl_assert(b[0] == 0x0100);
         r &= __ucl_assert(b[1] == 0x0201);
         r &= __ucl_assert(b[2] == 0x0302);
         r &= __ucl_assert(b[3] == 0x0403);
-#  elif (UCL_BYTE_ORDER == UCL_BIG_ENDIAN)
+#  endif
+#  if defined(ACC_ENDIAN_BIG_ENDIAN)
         r &= __ucl_assert(b[0] == 0x0001);
         r &= __ucl_assert(b[1] == 0x0102);
         r &= __ucl_assert(b[2] == 0x0203);
@@ -374,21 +233,19 @@ _ucl_config_check(void)
     }
 #endif
 
-#if defined(UCL_UNALIGNED_OK_4)
-    r &= __ucl_assert(sizeof(ucl_uint32) == 4);
+#if defined(UA_GET4) || defined(UA_SET4)
     if (r == 1)
     {
         ucl_uint32 a[4];
-
         for (i = 0; i < 4; i++)
-            a[i] = * (const ucl_uint32 *) &u.x[i];
-
-#  if (UCL_BYTE_ORDER == UCL_LITTLE_ENDIAN)
+            a[i] = UA_GET4(&u.x[i]);
+#  if defined(ACC_ENDIAN_LITTLE_ENDIAN)
         r &= __ucl_assert(a[0] == UCL_UINT32_C(0x03020100));
         r &= __ucl_assert(a[1] == UCL_UINT32_C(0x04030201));
         r &= __ucl_assert(a[2] == UCL_UINT32_C(0x05040302));
         r &= __ucl_assert(a[3] == UCL_UINT32_C(0x06050403));
-#  elif (UCL_BYTE_ORDER == UCL_BIG_ENDIAN)
+#  endif
+#  if defined(ACC_ENDIAN_BIG_ENDIAN)
         r &= __ucl_assert(a[0] == UCL_UINT32_C(0x00010203));
         r &= __ucl_assert(a[1] == UCL_UINT32_C(0x01020304));
         r &= __ucl_assert(a[2] == UCL_UINT32_C(0x02030405));
@@ -397,17 +254,13 @@ _ucl_config_check(void)
     }
 #endif
 
-#if defined(UCL_ALIGNED_OK_4)
-    r &= __ucl_assert(sizeof(ucl_uint32) == 4);
-#endif
-
     /* check the ucl_adler32() function */
     if (r == 1)
     {
         ucl_uint32 adler;
         adler = ucl_adler32(0, NULL, 0);
-        adler = ucl_adler32(adler, ucl_copyright(), 186);
-        r &= __ucl_assert(adler == UCL_UINT32_C(0x47fb39fc));
+        adler = ucl_adler32(adler, ucl_copyright(), 195);
+        r &= __ucl_assert(adler == UCL_UINT32_C(0x52ca3a75));
     }
 
     /* check for the gcc schedule-insns optimization bug */
@@ -434,6 +287,7 @@ _ucl_config_check(void)
         r &= ptr_check();
     }
 
+    ACC_UNUSED(u);
     return r == 1 ? UCL_E_OK : UCL_E_ERROR;
 }
 
@@ -454,7 +308,11 @@ static ucl_bool schedule_insns_bug(void)
 
 static ucl_bool strength_reduce_bug(int *x)
 {
+#if 1 && (ACC_CC_DMC || ACC_CC_SYMANTECC || ACC_CC_ZORTECHC)
+    return 0;
+#else
     return x[0] != -3 || x[1] != -2 || x[2] != -1;
+#endif
 }
 
 
@@ -469,6 +327,12 @@ __ucl_init2(ucl_uint32 v, int s1, int s2, int s3, int s4, int s5,
                           int s6, int s7, int s8, int s9)
 {
     int r;
+
+#if (ACC_CC_MSC && ((_MSC_VER) < 700))
+#else
+#include "acc/acc_chk.ch"
+#undef ACCCHK_ASSERT
+#endif
 
     __ucl_init_done = 1;
 
@@ -493,6 +357,9 @@ __ucl_init2(ucl_uint32 v, int s1, int s2, int s3, int s4, int s5,
 
     return r;
 }
+
+
+#include "ucl_dll.ch"
 
 
 /*

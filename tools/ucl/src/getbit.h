@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2003 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -46,10 +46,10 @@
     (bb*=2,bb&0xffff ? (bb>>16)&1 : (ilen+=2,((bb=(src[ilen-2]+src[ilen-1]*256u)*2+1)>>16)&1))
 
 
-#if 1 && defined(UCL_UNALIGNED_OK_4) && (UCL_BYTE_ORDER == UCL_LITTLE_ENDIAN)
+#if 1 && (ACC_ENDIAN_LITTLE_ENDIAN) && defined(UA_GET4)
 #define getbit_le32(bb, bc, src, ilen) \
     (bc > 0 ? ((bb>>--bc)&1) : (bc=31,\
-    bb=*(const ucl_uint32p)((src)+ilen),ilen+=4,(bb>>31)&1))
+    bb=UA_GET4((src)+ilen),ilen+=4,(bb>>31)&1))
 #else
 #define getbit_le32(bb, bc, src, ilen) \
     (bc > 0 ? ((bb>>--bc)&1) : (bc=31,\

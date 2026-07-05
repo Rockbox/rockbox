@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2003 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -28,50 +28,29 @@
 
 #include "ucl_conf.h"
 
-#if defined(HAVE_MALLOC_H)
-#  include <malloc.h>
-#endif
-#if defined(__palmos__)
-#  include <System/MemoryMgr.h>
-#endif
-
-
-#undef ucl_alloc_hook
-#undef ucl_free_hook
-#undef ucl_alloc
-#undef ucl_malloc
-#undef ucl_free
-
 
 /***********************************************************************
 // implementation
 ************************************************************************/
 
+#if defined(__UCL_MMODEL_HUGE)
+
+#define acc_hsize_t             ucl_uint
+#define acc_hvoid_p             ucl_voidp
+#define ACCLIB_PUBLIC(r,f)      static r __UCL_CDECL f
+#define acc_halloc              ucl_malloc_internal
+#define acc_hfree               ucl_free_internal
+#include "acc/acclib/halloc.ch"
+#undef ACCLIB_PUBLIC
+
+#else
+
 UCL_PRIVATE(ucl_voidp)
-ucl_alloc_internal(ucl_uint nelems, ucl_uint size)
+ucl_malloc_internal(ucl_uint size)
 {
     ucl_voidp p = NULL;
-    unsigned long s = (unsigned long) nelems * size;
-
-    if (nelems <= 0 || size <= 0 || s < nelems || s < size)
-        return NULL;
-
-#if defined(__palmos__)
-    p = (ucl_voidp) MemPtrNew(s);
-#elif (UCL_UINT_MAX <= SIZE_T_MAX)
-    if (s < SIZE_T_MAX)
-        p = (ucl_voidp) malloc((size_t)s);
-#elif defined(HAVE_HALLOC) && defined(__DMC__)
-    if (size < SIZE_T_MAX)
-        p = (ucl_voidp) _halloc(nelems,(size_t)size);
-#elif defined(HAVE_HALLOC)
-    if (size < SIZE_T_MAX)
-        p = (ucl_voidp) halloc(nelems,(size_t)size);
-#else
-    if (s < SIZE_T_MAX)
-        p = (ucl_voidp) malloc((size_t)s);
-#endif
-
+    if (size < ~(ucl_uint)0)
+        p = (ucl_voidp) malloc((size_t) size);
     return p;
 }
 
@@ -79,21 +58,11 @@ ucl_alloc_internal(ucl_uint nelems, ucl_uint size)
 UCL_PRIVATE(void)
 ucl_free_internal(ucl_voidp p)
 {
-    if (!p)
-        return;
-
-#if defined(__palmos__)
-    MemPtrFree(p);
-#elif (UCL_UINT_MAX <= SIZE_T_MAX)
-    free(p);
-#elif defined(HAVE_HALLOC) && defined(__DMC__)
-    _hfree(p);
-#elif defined(HAVE_HALLOC)
-    hfree(p);
-#else
-    free(p);
-#endif
+    if (p)
+        free(p);
 }
+
+#endif
 
 
 /***********************************************************************
@@ -101,48 +70,53 @@ ucl_free_internal(ucl_voidp p)
 ************************************************************************/
 
 /* global allocator hooks */
-ucl_alloc_hook_t ucl_alloc_hook = ucl_alloc_internal;
-ucl_free_hook_t ucl_free_hook = ucl_free_internal;
+static ucl_malloc_hook_t ucl_malloc_hook = ucl_malloc_internal;
+static ucl_free_hook_t ucl_free_hook = ucl_free_internal;
 
-
-UCL_PUBLIC(ucl_voidp)
-ucl_alloc(ucl_uint nelems, ucl_uint size)
+UCL_PUBLIC(void)
+ucl_set_malloc_hooks(ucl_malloc_hook_t a, ucl_free_hook_t f)
 {
-    if (!ucl_alloc_hook)
-        return NULL;
+    ucl_malloc_hook = ucl_malloc_internal;
+    ucl_free_hook = ucl_free_internal;
+    if (a)
+        ucl_malloc_hook = a;
+    if (f)
+        ucl_free_hook = f;
+}
 
-    return ucl_alloc_hook(nelems,size);
+UCL_PUBLIC(void)
+ucl_get_malloc_hooks(ucl_malloc_hook_t* a, ucl_free_hook_t* f)
+{
+    if (a)
+        *a = ucl_malloc_hook;
+    if (f)
+        *f = ucl_free_hook;
 }
 
 
 UCL_PUBLIC(ucl_voidp)
 ucl_malloc(ucl_uint size)
 {
-    if (!ucl_alloc_hook)
+    if (size <= 0)
         return NULL;
+    return ucl_malloc_hook(size);
+}
 
-#if defined(__palmos__)
-    return ucl_alloc_hook(size,1);
-#elif (UCL_UINT_MAX <= SIZE_T_MAX)
-    return ucl_alloc_hook(size,1);
-#elif defined(HAVE_HALLOC)
-    /* use segment granularity by default */
-    if (size + 15 > size)   /* avoid overflow */
-        return ucl_alloc_hook((size+15)/16,16);
-    return ucl_alloc_hook(size,1);
-#else
-    return ucl_alloc_hook(size,1);
-#endif
+UCL_PUBLIC(ucl_voidp)
+ucl_alloc(ucl_uint nelems, ucl_uint size)
+{
+    ucl_uint s = nelems * size;
+    if (nelems <= 0 || s / nelems != size)
+        return NULL;
+    return ucl_malloc(s);
 }
 
 
 UCL_PUBLIC(void)
 ucl_free(ucl_voidp p)
 {
-    if (!ucl_free_hook)
-        return;
-
-    ucl_free_hook(p);
+    if (p)
+        ucl_free_hook(p);
 }
 
 

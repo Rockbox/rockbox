@@ -34,7 +34,11 @@
 **************************************************************************/
 
 #include <ucl/ucl.h>
-#include "lutil.h"
+#include "portab.h"
+
+#include "acc/acc_inci.h"
+#include "acc/acc_lib.h"
+#include "acc/acclib/hfread.ch"
 
 static const char *progname = NULL;
 
@@ -58,7 +62,7 @@ ucl_uint xread(FILE *f, ucl_voidp buf, ucl_uint len, ucl_bool allow_eof)
 {
     ucl_uint l;
 
-    l = ucl_fread(f,buf,len);
+    l = acc_hfread(f,buf,len);
     if (l > len)
     {
         fprintf(stderr,"\nsomething's wrong with your C library !!!\n");
@@ -79,7 +83,7 @@ ucl_uint xwrite(FILE *f, const ucl_voidp buf, ucl_uint len)
 
     if (f != NULL)
     {
-        l = ucl_fwrite(f,buf,len);
+        l = acc_hfwrite(f,buf,len);
         if (l != len)
         {
             fprintf(stderr,"\nwrite error [%ld %ld]  (disk full ?)\n",

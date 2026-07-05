@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -22,9 +22,8 @@
 
    Markus F.X.J. Oberhumer
    <markus@oberhumer.com>
+   http://www.oberhumer.com/opensource/ucl/
  */
-
-
 
 
 /***********************************************************************
@@ -43,19 +42,19 @@ typedef struct
     ucl_uint last_m_len;
     ucl_uint last_m_off;
 
-    const ucl_byte *bp;
-    const ucl_byte *ip;
-    const ucl_byte *in;
-    const ucl_byte *in_end;
-    ucl_byte *out;
+    const ucl_bytep bp;
+    const ucl_bytep ip;
+    const ucl_bytep in;
+    const ucl_bytep in_end;
+    ucl_bytep out;
 
     ucl_uint32 bb_b;
     unsigned bb_k;
     unsigned bb_c_endian;
     unsigned bb_c_s;
     unsigned bb_c_s8;
-    ucl_byte *bb_p;
-    ucl_byte *bb_op;
+    ucl_bytep bb_p;
+    ucl_bytep bb_op;
 
     struct ucl_compress_config_t conf;
     ucl_uintp result;
@@ -76,9 +75,9 @@ UCL_COMPRESS_T;
 
 
 
-#if defined(__PUREC__) && defined(__UCL_TOS16)
-/* the cast is needed to work around a bug in Pure C */
-#define getbyte(c)  ((c).ip < (c).in_end ? (unsigned) *((c).ip)++ : (-1))
+#if (ACC_OS_TOS && (ACC_CC_PUREC || ACC_CC_TURBOC))
+/* the cast is needed to work around a code generation bug */
+#define getbyte(c)  ((c).ip < (c).in_end ? (int) (unsigned) *((c).ip)++ : (-1))
 #else
 #define getbyte(c)  ((c).ip < (c).in_end ? *((c).ip)++ : (-1))
 #endif
@@ -93,7 +92,7 @@ UCL_COMPRESS_T;
 
 static int
 init_match ( UCL_COMPRESS_T *c, ucl_swd_t *s,
-             const ucl_byte *dict, ucl_uint dict_len,
+             const ucl_bytep dict, ucl_uint dict_len,
              ucl_uint32 flags )
 {
     int r;
@@ -143,7 +142,7 @@ find_match ( UCL_COMPRESS_T *c, ucl_swd_t *s,
         c->textsize += this_len - skip;
     }
 
-    s->m_len = THRESHOLD;
+    s->m_len = SWD_THRESHOLD;
 #ifdef SWD_BEST_OFF
     if (s->use_best_off)
         memset(s->best_pos,0,sizeof(s->best_pos));
@@ -154,7 +153,7 @@ find_match ( UCL_COMPRESS_T *c, ucl_swd_t *s,
     /* s->m_off may be uninitialized if we didn't find a match,
      * but then its value will never be used.
      */
-    c->m_off = (s->m_len == THRESHOLD) ? 0 : s->m_off;
+    c->m_off = (s->m_len == SWD_THRESHOLD) ? 0 : s->m_off;
 #else
     c->m_off = s->m_off;
 #endif
@@ -175,14 +174,14 @@ find_match ( UCL_COMPRESS_T *c, ucl_swd_t *s,
 
 #if 0
     /* brute force match search */
-    if (c->m_len > THRESHOLD && c->m_len + 1 <= c->look)
+    if (c->m_len > SWD_THRESHOLD && c->m_len + 1 <= c->look)
     {
-        const ucl_byte *ip = c->bp;
-        const ucl_byte *m  = c->bp - c->m_off;
-        const ucl_byte *in = c->in;
+        const ucl_bytep ip = c->bp;
+        const ucl_bytep m  = c->bp - c->m_off;
+        const ucl_bytep in = c->in;
 
-        if (ip - in > N)
-            in = ip - N;
+        if (ip - in > s->n)
+            in = ip - s->n;
         for (;;)
         {
             while (*in != *ip)
@@ -235,7 +234,7 @@ static int bbConfig(UCL_COMPRESS_T *c, int endian, int bitsize)
 
 static void bbWriteBits(UCL_COMPRESS_T *c)
 {
-    ucl_byte *p = c->bb_p;
+    ucl_bytep p = c->bb_p;
     ucl_uint32 b = c->bb_b;
 
     p[0] = UCL_BYTE(b >>  0);

@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 
 
 #include "ucl_conf.h"
-#include "ucl_util.h"
 
 
 /***********************************************************************
@@ -36,7 +35,7 @@
 // see http://www.cdrom.com/pub/infozip/zlib/
 ************************************************************************/
 
-const ucl_uint32 _ucl_crc32_table[256] = {
+static const ucl_uint32 __ucl_crc32_table[256] = {
   0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L,
   0x706af48fL, 0xe963a535L, 0x9e6495a3L, 0x0edb8832L, 0x79dcb8a4L,
   0xe0d5e91eL, 0x97d2d988L, 0x09b64c2bL, 0x7eb17cbdL, 0xe7b82d07L,
@@ -92,12 +91,19 @@ const ucl_uint32 _ucl_crc32_table[256] = {
 };
 
 
+UCL_PUBLIC(const ucl_uint32p)
+ucl_get_crc32_table(void)
+{
+    return __ucl_crc32_table;
+}
+
+
 #if 1
 #define UCL_DO1(buf,i) \
-    crc = _ucl_crc32_table[((int)crc ^ buf[i]) & 0xff] ^ (crc >> 8)
+    crc = table[((int)crc ^ buf[i]) & 0xff] ^ (crc >> 8)
 #else
 #define UCL_DO1(buf,i) \
-    crc = _ucl_crc32_table[(unsigned char)((unsigned char)crc ^ buf[i])] ^ (crc >> 8)
+    crc = table[(unsigned char)((unsigned char)crc ^ buf[i])] ^ (crc >> 8)
 #endif
 #define UCL_DO2(buf,i)  UCL_DO1(buf,i); UCL_DO1(buf,i+1);
 #define UCL_DO4(buf,i)  UCL_DO2(buf,i); UCL_DO2(buf,i+2);
@@ -108,11 +114,18 @@ const ucl_uint32 _ucl_crc32_table[256] = {
 UCL_PUBLIC(ucl_uint32)
 ucl_crc32(ucl_uint32 c, const ucl_bytep buf, ucl_uint len)
 {
-    ucl_uint32 crc = (c & UCL_UINT32_C(0xffffffff)) ^ UCL_UINT32_C(0xffffffff);
+    ucl_uint32 crc;
+#undef table
+#if 1
+#  define table __ucl_crc32_table
+#else
+   const ucl_uint32 * table = __ucl_crc32_table;
+#endif
 
     if (buf == NULL)
         return 0;
 
+    crc = (c & UCL_UINT32_C(0xffffffff)) ^ UCL_UINT32_C(0xffffffff);
     if (len >= 16) do
     {
         UCL_DO16(buf,0);
@@ -127,6 +140,7 @@ ucl_crc32(ucl_uint32 c, const ucl_bytep buf, ucl_uint len)
     } while (len > 0);
 
     return crc ^ UCL_UINT32_C(0xffffffff);
+#undef table
 }
 
 

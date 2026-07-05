@@ -1,7 +1,9 @@
-/* uclconf.h -- configuration for the UCL real-time data compression library
+/* uclconf.h -- configuration for the UCL data compression library
 
    This file is part of the UCL data compression library.
 
+   Copyright (C) 2004 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 2003 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2002 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2001 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2000 Markus Franz Xaver Johannes Oberhumer
@@ -32,12 +34,12 @@
  */
 
 
-#ifndef __UCLCONF_H
-#define __UCLCONF_H
+#ifndef __UCLCONF_H_INCLUDED
+#define __UCLCONF_H_INCLUDED
 
-#define UCL_VERSION             0x010100L
-#define UCL_VERSION_STRING      "1.01"
-#define UCL_VERSION_DATE        "Jan 02 2002"
+#define UCL_VERSION             0x010300L
+#define UCL_VERSION_STRING      "1.03"
+#define UCL_VERSION_DATE        "Jul 20 2004"
 
 /* internal Autoconf configuration file - only used when building UCL */
 #if defined(UCL_HAVE_CONFIG_H)
@@ -65,13 +67,14 @@ extern "C" {
 #endif
 
 /* workaround a compiler bug under hpux 10.20 */
+#define UCL_0xffffL             65535ul
 #define UCL_0xffffffffL         4294967295ul
 
 #if !defined(UCL_UINT32_C)
 #  if (UINT_MAX < UCL_0xffffffffL)
 #    define UCL_UINT32_C(c)     c ## UL
 #  else
-#    define UCL_UINT32_C(c)     c ## U
+#    define UCL_UINT32_C(c)     ((c) + 0U)
 #  endif
 #endif
 
@@ -80,64 +83,101 @@ extern "C" {
 // architecture defines
 ************************************************************************/
 
-#if !defined(__UCL_WIN) && !defined(__UCL_DOS) && !defined(__UCL_OS2)
-#  if defined(__WINDOWS__) || defined(_WINDOWS) || defined(_Windows)
-#    define __UCL_WIN
-#  elif defined(__WIN32__) || defined(_WIN32) || defined(WIN32)
-#    define __UCL_WIN
-#  elif defined(__NT__) || defined(__NT_DLL__) || defined(__WINDOWS_386__)
-#    define __UCL_WIN
-#  elif defined(__DOS__) || defined(__MSDOS__) || defined(MSDOS)
-#    define __UCL_DOS
-#  elif defined(__OS2__) || defined(__OS2V2__) || defined(OS2)
-#    define __UCL_OS2
-#  elif defined(__palmos__)
-#    define __UCL_PALMOS
-#  elif defined(__TOS__) || defined(__atarist__)
-#    define __UCL_TOS
-#  endif
-#endif
-
-#if (UINT_MAX < UCL_0xffffffffL)
-#  if defined(__UCL_WIN)
-#    define __UCL_WIN16
-#  elif defined(__UCL_DOS)
-#    define __UCL_DOS16
-#  elif defined(__UCL_PALMOS)
-#    define __UCL_PALMOS16
-#  elif defined(__UCL_TOS)
-#    define __UCL_TOS16
-#  elif defined(__C166__)
+#if (defined(__CYGWIN__) || defined(__CYGWIN32__)) && defined(__GNUC__)
+#  define UCL_OS_CYGWIN         1
+#elif defined(__EMX__) && defined(__GNUC__)
+#  define UCL_OS_EMX            1
+#elif defined(__BORLANDC__) && defined(__DPMI32__) && (__BORLANDC__ >= 0x0460)
+#  define UCL_OS_DOS32          1
+#elif defined(__BORLANDC__) && defined(__DPMI16__)
+#  define UCL_OS_DOS16          1
+#elif defined(__ZTC__) && defined(DOS386)
+#  define UCL_OS_DOS32          1
+#elif defined(__OS2__) || defined(__OS2V2__)
+#  if (UINT_MAX == UCL_0xffffL)
+#    define UCL_OS_OS216        1
+#  elif (UINT_MAX == UCL_0xffffffffL)
+#    define UCL_OS_OS2          1
 #  else
-#    error "16-bit target not supported - contact me for porting hints"
+#    error "check your limits.h header"
 #  endif
-#endif
-
-#if !defined(__UCL_i386)
-#  if defined(__UCL_DOS) || defined(__UCL_WIN16)
-#    define __UCL_i386
-#  elif defined(__i386__) || defined(__386__) || defined(_M_IX86)
-#    define __UCL_i386
+#elif defined(__WIN64__) || defined(_WIN64) || defined(WIN64)
+#  define UCL_OS_WIN64          1
+#elif defined(__WIN32__) || defined(_WIN32) || defined(WIN32) || defined(__WINDOWS_386__)
+#  define UCL_OS_WIN32          1
+#elif defined(__MWERKS__) && defined(__INTEL__)
+#  define UCL_OS_WIN32          1
+#elif defined(__WINDOWS__) || defined(_WINDOWS) || defined(_Windows)
+#  if (UINT_MAX == UCL_0xffffL)
+#    define UCL_OS_WIN16        1
+#  elif (UINT_MAX == UCL_0xffffffffL)
+#    define UCL_OS_WIN32        1
+#  else
+#    error "check your limits.h header"
 #  endif
-#endif
-
-#if defined(__UCL_STRICT_16BIT)
-#  if (UINT_MAX < UCL_0xffffffffL)
-#    include <ucl/ucl16bit.h>
+#elif defined(__DOS__) || defined(__MSDOS__) || defined(_MSDOS) || defined(MSDOS) || (defined(__PACIFIC__) && defined(DOS))
+#  if (UINT_MAX == UCL_0xffffL)
+#    define UCL_OS_DOS16        1
+#  elif (UINT_MAX == UCL_0xffffffffL)
+#    define UCL_OS_DOS32        1
+#  else
+#    error "check your limits.h header"
 #  endif
+#elif defined(__WATCOMC__)
+#  if defined(__NT__) && (UINT_MAX == UCL_0xffffL)
+     /* wcl: NT host defaults to DOS target */
+#    define UCL_OS_DOS16        1
+#  elif defined(__NT__) && (__WATCOMC__ < 1100)
+     /* wcl386: Watcom C 11 defines _WIN32 */
+#    define UCL_OS_WIN32        1
+#  else
+#    error "please specify a target using the -bt compiler option"
+#  endif
+#elif defined(__palmos__)
+#  if (UINT_MAX == UCL_0xffffL)
+#    define UCL_OS_PALMOS       1
+#  else
+#    error "check your limits.h header"
+#  endif
+#elif defined(__TOS__) || defined(__atarist__)
+#  define UCL_OS_TOS            1
+#elif defined(macintosh)
+#  define UCL_OS_MACCLASSIC     1
+#elif defined(__VMS)
+#  define UCL_OS_VMS            1
+#else
+#  define UCL_OS_POSIX          1
 #endif
 
 /* memory checkers */
 #if !defined(__UCL_CHECKER)
 #  if defined(__BOUNDS_CHECKING_ON)
-#    define __UCL_CHECKER
+#    define __UCL_CHECKER       1
 #  elif defined(__CHECKER__)
-#    define __UCL_CHECKER
+#    define __UCL_CHECKER       1
 #  elif defined(__INSURE__)
-#    define __UCL_CHECKER
+#    define __UCL_CHECKER       1
 #  elif defined(__PURIFY__)
-#    define __UCL_CHECKER
+#    define __UCL_CHECKER       1
 #  endif
+#endif
+
+/* fix ancient compiler versions */
+#if (UINT_MAX == UCL_0xffffL)
+#if (defined(__MSDOS__) && defined(__TURBOC__) && (__TURBOC__ < 0x0410)) || (defined(MSDOS) && defined(_MSC_VER) && (_MSC_VER < 700))
+#  if !defined(__cdecl)
+#    define __cdecl cdecl
+#  endif
+#  if !defined(__far)
+#    define __far far
+#  endif
+#  if !defined(__huge)
+#    define __huge huge
+#  endif
+#  if !defined(__near)
+#    define __near near
+#  endif
+#endif
 #endif
 
 
@@ -187,18 +227,16 @@ extern "C" {
 #if !defined(__UCL_MMODEL)
 #  if (UCL_UINT_MAX <= UINT_MAX)
 #    define __UCL_MMODEL
-#  elif defined(__UCL_DOS16) || defined(__UCL_WIN16)
+#  elif defined(UCL_OS_DOS16) || defined(UCL_OS_OS216) || defined(UCL_OS_WIN16)
+#    define __UCL_MMODEL_HUGE   1
 #    define __UCL_MMODEL        __huge
-#    define UCL_999_UNSUPPORTED
-#  elif defined(__UCL_PALMOS16) || defined(__UCL_TOS16)
-#    define __UCL_MMODEL
+#    define ucl_uintptr_t       unsigned long
 #  else
-#    error "__UCL_MMODEL"
+#    define __UCL_MMODEL
 #  endif
 #endif
 
 /* no typedef here because of const-pointer issues */
-#define ucl_byte                unsigned char __UCL_MMODEL
 #define ucl_bytep               unsigned char __UCL_MMODEL *
 #define ucl_charp               char __UCL_MMODEL *
 #define ucl_voidp               void __UCL_MMODEL *
@@ -210,6 +248,8 @@ extern "C" {
 #define ucl_intp                ucl_int __UCL_MMODEL *
 #define ucl_voidpp              ucl_voidp __UCL_MMODEL *
 #define ucl_bytepp              ucl_bytep __UCL_MMODEL *
+/* deprecated - use `ucl_bytep' instead of `ucl_byte *' */
+#define ucl_byte                unsigned char __UCL_MMODEL
 
 typedef int ucl_bool;
 
@@ -218,7 +258,7 @@ typedef int ucl_bool;
 // function types
 ************************************************************************/
 
-/* linkage */
+/* name mangling */
 #if !defined(__UCL_EXTERN_C)
 #  ifdef __cplusplus
 #    define __UCL_EXTERN_C      extern "C"
@@ -227,20 +267,17 @@ typedef int ucl_bool;
 #  endif
 #endif
 
-/* calling conventions */
+/* calling convention */
 #if !defined(__UCL_CDECL)
-#  if defined(__UCL_DOS16) || defined(__UCL_WIN16)
+#  if defined(__GNUC__) || defined(__HIGHC__) || defined(__NDPC__)
+#    define __UCL_CDECL
+#  elif defined(UCL_OS_DOS16) || defined(UCL_OS_OS216) || defined(UCL_OS_WIN16)
 #    define __UCL_CDECL         __far __cdecl
-#  elif defined(__UCL_i386) && defined(_MSC_VER)
+#  elif defined(UCL_OS_DOS32) || defined(UCL_OS_OS2) || defined(UCL_OS_WIN32) || defined(UCL_OS_WIN64)
 #    define __UCL_CDECL         __cdecl
-#  elif defined(__UCL_i386) && defined(__WATCOMC__)
-#    define __UCL_CDECL         __near __cdecl
 #  else
 #    define __UCL_CDECL
 #  endif
-#endif
-#if !defined(__UCL_ENTRY)
-#  define __UCL_ENTRY           __UCL_CDECL
 #endif
 
 /* DLL export information */
@@ -251,24 +288,15 @@ typedef int ucl_bool;
 #  define __UCL_EXPORT2
 #endif
 
-/* calling convention for C functions */
+/* __cdecl calling convention for public C and assembly functions */
 #if !defined(UCL_PUBLIC)
-#  define UCL_PUBLIC(_rettype)  __UCL_EXPORT1 _rettype __UCL_EXPORT2 __UCL_ENTRY
+#  define UCL_PUBLIC(_rettype)  __UCL_EXPORT1 _rettype __UCL_EXPORT2 __UCL_CDECL
 #endif
 #if !defined(UCL_EXTERN)
 #  define UCL_EXTERN(_rettype)  __UCL_EXTERN_C UCL_PUBLIC(_rettype)
 #endif
 #if !defined(UCL_PRIVATE)
-#  define UCL_PRIVATE(_rettype) static _rettype __UCL_ENTRY
-#endif
-
-/* cdecl calling convention for assembler functions */
-#if !defined(UCL_PUBLIC_CDECL)
-#  define UCL_PUBLIC_CDECL(_rettype) \
-                __UCL_EXPORT1 _rettype __UCL_EXPORT2 __UCL_CDECL
-#endif
-#if !defined(UCL_EXTERN_CDECL)
-#  define UCL_EXTERN_CDECL(_rettype)  __UCL_EXTERN_C UCL_PUBLIC_CDECL(_rettype)
+#  define UCL_PRIVATE(_rettype) static _rettype __UCL_CDECL
 #endif
 
 /* C++ exception specification for extern "C" function types */
@@ -279,39 +307,38 @@ typedef int ucl_bool;
 #  define UCL_NOTHROW
 #endif
 
-
+/* function types */
 typedef int
-(__UCL_ENTRY *ucl_compress_t)   ( const ucl_bytep src, ucl_uint  src_len,
+(__UCL_CDECL *ucl_compress_t)   ( const ucl_bytep src, ucl_uint  src_len,
                                         ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem );
 
 typedef int
-(__UCL_ENTRY *ucl_decompress_t) ( const ucl_bytep src, ucl_uint  src_len,
+(__UCL_CDECL *ucl_decompress_t) ( const ucl_bytep src, ucl_uint  src_len,
                                         ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem );
 
 typedef int
-(__UCL_ENTRY *ucl_optimize_t)   (       ucl_bytep src, ucl_uint  src_len,
+(__UCL_CDECL *ucl_optimize_t)   (       ucl_bytep src, ucl_uint  src_len,
                                         ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem );
 
 typedef int
-(__UCL_ENTRY *ucl_compress_dict_t)(const ucl_bytep src, ucl_uint  src_len,
+(__UCL_CDECL *ucl_compress_dict_t)(const ucl_bytep src, ucl_uint  src_len,
                                         ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem,
                                   const ucl_bytep dict, ucl_uint dict_len );
 
 typedef int
-(__UCL_ENTRY *ucl_decompress_dict_t)(const ucl_bytep src, ucl_uint  src_len,
+(__UCL_CDECL *ucl_decompress_dict_t)(const ucl_bytep src, ucl_uint  src_len,
                                         ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem,
                                   const ucl_bytep dict, ucl_uint dict_len );
-
 
 /* a progress indicator callback function */
 typedef struct
 {
-    void (__UCL_ENTRY *callback) (ucl_uint, ucl_uint, int, ucl_voidp user);
+    void (__UCL_CDECL *callback) (ucl_uint, ucl_uint, int, ucl_voidp);
     ucl_voidp user;
 }
 ucl_progress_callback_t;
@@ -375,17 +402,22 @@ UCL_EXTERN(ucl_uint32)
 ucl_adler32(ucl_uint32 _adler, const ucl_bytep _buf, ucl_uint _len);
 UCL_EXTERN(ucl_uint32)
 ucl_crc32(ucl_uint32 _c, const ucl_bytep _buf, ucl_uint _len);
+UCL_EXTERN(const ucl_uint32p)
+ucl_get_crc32_table(void);
+
+/* memory allocation hooks */
+typedef ucl_voidp (__UCL_CDECL *ucl_malloc_hook_t) (ucl_uint);
+typedef void (__UCL_CDECL *ucl_free_hook_t) (ucl_voidp);
+UCL_EXTERN(void)
+ucl_set_malloc_hooks(ucl_malloc_hook_t, ucl_free_hook_t);
+UCL_EXTERN(void)
+ucl_get_malloc_hooks(ucl_malloc_hook_t*, ucl_free_hook_t*);
 
 /* memory allocation functions */
-UCL_EXTERN(ucl_voidp) ucl_alloc(ucl_uint _nelems, ucl_uint _size);
-UCL_EXTERN(ucl_voidp) ucl_malloc(ucl_uint _size);
-UCL_EXTERN(void) ucl_free(ucl_voidp _ptr);
+UCL_EXTERN(ucl_voidp) ucl_malloc(ucl_uint);
+UCL_EXTERN(ucl_voidp) ucl_alloc(ucl_uint, ucl_uint);
+UCL_EXTERN(void) ucl_free(ucl_voidp);
 
-typedef ucl_voidp (__UCL_ENTRY *ucl_alloc_hook_t) (ucl_uint, ucl_uint);
-typedef void (__UCL_ENTRY *ucl_free_hook_t) (ucl_voidp);
-
-extern ucl_alloc_hook_t ucl_alloc_hook;
-extern ucl_free_hook_t ucl_free_hook;
 
 /* misc. */
 UCL_EXTERN(ucl_bool) ucl_assert(int _expr);

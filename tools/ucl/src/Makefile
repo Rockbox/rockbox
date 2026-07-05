@@ -5,7 +5,7 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-CFLAGS += -I../include
+CFLAGS += -I../include -I..
 
 ifndef V
 SILENT = @
@@ -61,7 +61,7 @@ $(info Compiler creates $(COMPILETARGET) binaries)
 TARGET_DIR ?= $(shell pwd)/
 OBJDIR = $(TARGET_DIR)build$(RBARCH)
 
-SOURCES = alloc.c io.c n2b_99.c n2b_d.c n2b_ds.c n2b_to.c n2d_99.c	\
+SOURCES = alloc.c n2b_99.c n2b_d.c n2b_ds.c n2b_to.c n2d_99.c	\
 	n2d_d.c n2d_ds.c n2d_to.c n2e_99.c n2e_d.c n2e_ds.c n2e_to.c ucl_crc.c	\
 	ucl_init.c ucl_ptr.c ucl_str.c ucl_util.c #ucl_dll.c
 

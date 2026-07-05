@@ -1,7 +1,9 @@
-/* ucl.h -- prototypes for the UCL real-time data compression library
+/* ucl.h -- prototypes for the UCL data compression library
 
    This file is part of the UCL data compression library.
 
+   Copyright (C) 2004 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 2003 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2002 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2001 Markus Franz Xaver Johannes Oberhumer
    Copyright (C) 2000 Markus Franz Xaver Johannes Oberhumer
@@ -32,10 +34,10 @@
  */
 
 
-#ifndef __UCL_H
-#define __UCL_H
+#ifndef __UCL_H_INCLUDED
+#define __UCL_H_INCLUDED
 
-#ifndef __UCLCONF_H
+#ifndef __UCLCONF_H_INCLUDED
 #include <ucl/uclconf.h>
 #endif
 
@@ -45,11 +47,13 @@ extern "C" {
 
 
 /***********************************************************************
+// Compression fine-tuning configuration.
 //
+// Pass a NULL pointer to the compression functions for default values.
+// Otherwise set all values to -1 [i.e. initialize the struct by a
+// `memset(x,0xff,sizeof(x))'] and then set the required values.
 ************************************************************************/
 
-/* note: to use default values pass -1, i.e. initialize
- * this struct by a memset(x,0xff,sizeof(x)) */
 struct ucl_compress_config_t
 {
     int bb_endian;
@@ -68,6 +72,9 @@ struct ucl_compress_config_t
 
 /***********************************************************************
 // compressors
+//
+// Pass NULL for `cb' (no progress callback), `conf' (default compression
+// configuration) and `result' (no statistical result).
 ************************************************************************/
 
 UCL_EXTERN(int)
@@ -97,6 +104,11 @@ ucl_nrv2e_99_compress      ( const ucl_bytep src, ucl_uint src_len,
 
 /***********************************************************************
 // decompressors
+//
+// Always pass NULL for `wrkmem'. This parameter is for symetry
+// with my other compression libaries and is not used in UCL -
+// UCL does not need any additional memory (or even local stack space)
+// for decompression.
 ************************************************************************/
 
 UCL_EXTERN(int)
@@ -184,7 +196,9 @@ ucl_nrv2e_decompress_safe_le32  ( const ucl_bytep src, ucl_uint  src_len,
 // test an overlapping in-place decompression within a buffer:
 //   - try a virtual decompression from &buf[src_off] -> &buf[0]
 //   - no data is actually written
-//   - only the bytes at buf[src_off .. src_off+src_len] will get accessed
+//   - only the bytes at buf[src_off..src_off+src_len-1] will get accessed
+//
+// NOTE: always pass NULL for `wrkmem' - see above.
 ************************************************************************/
 
 UCL_EXTERN(int)

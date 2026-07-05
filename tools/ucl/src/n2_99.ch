@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -27,36 +27,26 @@
 
 
 
-#include <ucl/uclconf.h>
-#include <ucl/ucl.h>
 #include "ucl_conf.h"
-
-#if 0
-#undef UCL_DEBUG
-#define UCL_DEBUG
-#endif
-
-#include <stdio.h>
-
-#if 0 && !defined(UCL_DEBUG)
-#undef NDEBUG
-#include <assert.h>
-#endif
+#include <ucl/ucl.h>
 
 
 /***********************************************************************
 //
 ************************************************************************/
 
-#if 0
-#define N       (128*1024ul)        /* size of ring buffer */
+#define SWD_USE_MALLOC 1
+#if (ACC_OS_DOS16)
+#define SWD_HMASK       (s->hmask)
+#define HEAD2_VAR
+#define IF_HEAD2(s)     if (s->use_head2)
 #else
-#define N       (1024*1024ul)       /* size of ring buffer */
-#define SWD_USE_MALLOC
-#define SWD_HSIZE   65536ul
+#define SWD_HMASK       (UCL_UINT32_C(65535))
+#define IF_HEAD2(s)
 #endif
-#define THRESHOLD       1           /* lower limit for match length */
-#define F            2048           /* upper limit for match length */
+#define SWD_N           (8*1024*1024ul) /* max. size of ring buffer */
+#define SWD_F           2048            /* upper limit for match length */
+#define SWD_THRESHOLD   1               /* lower limit for match length */
 
 #if defined(NRV2B)
 #  define UCL_COMPRESS_T                ucl_nrv2b_t
@@ -78,20 +68,11 @@
 #endif
 #define ucl_swd_p       ucl_swd_t * __UCL_MMODEL
 
-#if 0
-#  define HEAD3(b,p) \
-    ((((((ucl_uint32)b[p]<<3)^b[p+1])<<3)^b[p+2]) & (SWD_HSIZE-1))
-#endif
-#if 0 && defined(UCL_UNALIGNED_OK_4) && (UCL_BYTE_ORDER == UCL_LITTLE_ENDIAN)
-#  define HEAD3(b,p) \
-    (((* (ucl_uint32p) &b[p]) ^ ((* (ucl_uint32p) &b[p])>>10)) & (SWD_HSIZE-1))
-#endif
-
 #include "ucl_mchw.ch"
 
 
 /***********************************************************************
-//
+// start-step-stop prefix coding
 ************************************************************************/
 
 static void code_prefix_ss11(UCL_COMPRESS_T *c, ucl_uint32 i)
@@ -232,12 +213,12 @@ code_match(UCL_COMPRESS_T *c, ucl_uint m_len, const ucl_uint m_off)
 #endif
 
     c->last_m_off = m_off;
-    UCL_UNUSED(m_low);
+    ACC_UNUSED(m_low);
 }
 
 
 static void
-code_run(UCL_COMPRESS_T *c, const ucl_byte *ii, ucl_uint lit)
+code_run(UCL_COMPRESS_T *c, const ucl_bytep ii, ucl_uint lit)
 {
     if (lit == 0)
         return;
@@ -376,17 +357,17 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
                              const struct ucl_compress_config_p conf,
                                    ucl_uintp result)
 {
-    const ucl_byte *ii;
+    const ucl_bytep ii;
     ucl_uint lit;
     ucl_uint m_len, m_off;
     UCL_COMPRESS_T c_buffer;
     UCL_COMPRESS_T * const c = &c_buffer;
-#undef swd
-#if 1 && defined(SWD_USE_MALLOC)
+#undef s
+#if defined(SWD_USE_MALLOC)
     ucl_swd_t the_swd;
-#   define swd (&the_swd)
+#   define s (&the_swd)
 #else
-    ucl_swd_p swd;
+    ucl_swd_p s;
 #endif
     ucl_uint result_buffer[16];
     int r;
@@ -403,6 +384,7 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
     };
     const struct swd_config_t *sc;
     static const struct swd_config_t swd_config[10] = {
+#define F SWD_F
         /* faster compression */
         {   0,   0,   0,   8,    4,   0,  48*1024L },
         {   0,   0,   0,  16,    8,   0,  48*1024L },
@@ -413,8 +395,9 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
         {   2,   8,  32, 128,  256,   0, 128*1024L },
         {   2,  32, 128,   F, 2048,   1, 128*1024L },
         {   2,  32, 128,   F, 2048,   1, 256*1024L },
-        {   2,   F,   F,   F, 4096,   1, N }
+        {   2,   F,   F,   F, 4096,   1, SWD_N }
         /* max. compression */
+#undef F
     };
 
     if (level < 1 || level > 10)
@@ -422,6 +405,7 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
     sc = &swd_config[level - 1];
 
     memset(c, 0, sizeof(*c));
+    memset(&c->conf, 0xff, sizeof(c->conf));
     c->ip = c->in = in;
     c->in_end = in + in_len;
     c->out = out;
@@ -429,12 +413,11 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
         c->cb = cb;
     cb = NULL;
     c->result = result ? result : (ucl_uintp) result_buffer;
-    memset(c->result, 0, 16*sizeof(*c->result));
-    c->result[0] = c->result[2] = c->result[4] = UCL_UINT_MAX;
     result = NULL;
-    memset(&c->conf, 0xff, sizeof(c->conf));
+    ucl_memset(c->result, 0, 16*sizeof(*c->result));
+    c->result[0] = c->result[2] = c->result[4] = UCL_UINT_MAX;
     if (conf)
-        memcpy(&c->conf, conf, sizeof(c->conf));
+        ucl_memcpy(&c->conf, conf, sizeof(c->conf));
     conf = NULL;
     r = bbConfig(c, 0, 8);
     if (r == 0)
@@ -446,39 +429,51 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
     ii = c->ip;             /* point to start of literal run */
     lit = 0;
 
-#if !defined(swd)
-    swd = (ucl_swd_p) ucl_alloc(1, ucl_sizeof(*swd));
-    if (!swd)
+#if !defined(s)
+    s = (ucl_swd_p) ucl_malloc(ucl_sizeof(*s));
+    if (!s)
         return UCL_E_OUT_OF_MEMORY;
 #endif
-    swd->f = UCL_MIN(F, c->conf.max_match);
-    swd->n = UCL_MIN(N, sc->max_offset);
+    s->f = UCL_MIN((ucl_uint)SWD_F, c->conf.max_match);
+    s->n = UCL_MIN((ucl_uint)SWD_N, sc->max_offset);
+    s->hmask = UCL_UINT32_C(65535);
+#ifdef HEAD2_VAR
+    s->use_head2 = 1;
+#if defined(ACC_MM_AHSHIFT)
+    if (ACC_MM_AHSHIFT != 3) {
+        s->hmask = 16 * 1024 - 1;
+        s->use_head2 = 0;
+    }
+#endif
+#endif
     if (c->conf.max_offset != UCL_UINT_MAX)
-        swd->n = UCL_MIN(N, c->conf.max_offset);
-    if (in_len >= 256 && in_len < swd->n)
-        swd->n = in_len;
-    if (swd->f < 8 || swd->n < 256)
+        s->n = UCL_MIN(SWD_N, c->conf.max_offset);
+    if (in_len < s->n)
+        s->n = UCL_MAX(in_len, 256);
+    if (s->f < 8 || s->n < 256)
         return UCL_E_INVALID_ARGUMENT;
-    r = init_match(c,swd,NULL,0,sc->flags);
+    r = init_match(c,s,NULL,0,sc->flags);
+    if (r == UCL_E_OK && (SWD_HSIZE - 1 != s->hmask))
+        r = UCL_E_ERROR;
     if (r != UCL_E_OK)
     {
-#if !defined(swd)
-        ucl_free(swd);
+#if !defined(s)
+        ucl_free(s);
 #endif
         return r;
     }
     if (sc->max_chain > 0)
-        swd->max_chain = sc->max_chain;
+        s->max_chain = sc->max_chain;
     if (sc->nice_length > 0)
-        swd->nice_length = sc->nice_length;
-    if (c->conf.max_match < swd->nice_length)
-        swd->nice_length = c->conf.max_match;
+        s->nice_length = sc->nice_length;
+    if (c->conf.max_match < s->nice_length)
+        s->nice_length = c->conf.max_match;
 
     if (c->cb)
         (*c->cb->callback)(0,0,-1,c->cb->user);
 
     c->last_m_off = 1;
-    r = find_match(c,swd,0,0);
+    r = find_match(c,s,0,0);
     if (r != UCL_E_OK)
         return r;
     while (c->look > 0)
@@ -487,7 +482,7 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
         ucl_uint max_ahead;
         int l1, l2;
 
-        c->codesize = c->bb_op - out;
+        c->codesize = (ucl_uint) (c->bb_op - out);
 
         m_len = c->m_len;
         m_off = c->m_off;
@@ -497,25 +492,25 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
         if (lit == 0)
             ii = c->bp;
         assert(ii + lit == c->bp);
-        assert(swd->b_char == *(c->bp));
+        assert(s->b_char == *(c->bp));
 
         if (m_len < 2 || (m_len == 2 && (m_off > M2_MAX_OFFSET))
             || m_off > c->conf.max_offset)
         {
             /* a literal */
             lit++;
-            swd->max_chain = sc->max_chain;
-            r = find_match(c,swd,1,0);
+            s->max_chain = sc->max_chain;
+            r = find_match(c,s,1,0);
             assert(r == 0);
             continue;
         }
 
     /* a match */
 #if defined(SWD_BEST_OFF)
-        if (swd->use_best_off)
-            better_match(swd,&m_len,&m_off);
+        if (s->use_best_off)
+            better_match(s,&m_len,&m_off);
 #endif
-        assert_match(swd,m_len,m_off);
+        assert_match(s,m_len,m_off);
 
         /* shall we try a lazy match ? */
         ahead = 0;
@@ -530,16 +525,16 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
             /* yes, try a lazy match */
             l1 = len_of_coded_match(c,m_len,m_off);
             assert(l1 > 0);
-            max_ahead = UCL_MIN(sc->try_lazy, m_len - 1);
+            max_ahead = UCL_MIN((ucl_uint)sc->try_lazy, m_len - 1);
         }
 
         while (ahead < max_ahead && c->look > m_len)
         {
             if (m_len >= sc->good_length)
-                swd->max_chain = sc->max_chain >> 2;
+                s->max_chain = sc->max_chain >> 2;
             else
-                swd->max_chain = sc->max_chain;
-            r = find_match(c,swd,1,0);
+                s->max_chain = sc->max_chain;
+            r = find_match(c,s,1,0);
             ahead++;
 
             assert(r == 0);
@@ -549,8 +544,8 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
             if (c->m_len < 2)
                 continue;
 #if defined(SWD_BEST_OFF)
-            if (swd->use_best_off)
-                better_match(swd,&c->m_len,&c->m_off);
+            if (s->use_best_off)
+                better_match(s,&c->m_len,&c->m_off);
 #endif
             l2 = len_of_coded_match(c,c->m_len,c->m_off);
             if (l2 < 0)
@@ -562,7 +557,7 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
 #endif
             {
                 c->lazy++;
-                assert_match(swd,c->m_len,c->m_off);
+                assert_match(s,c->m_len,c->m_off);
 
 #if 0
                 if (l3 > 0)
@@ -591,8 +586,8 @@ ucl_nrv_99_compress        ( const ucl_bytep in, ucl_uint in_len,
 
         /* 2 - code match */
         code_match(c,m_len,m_off);
-        swd->max_chain = sc->max_chain;
-        r = find_match(c,swd,m_len,1+ahead);
+        s->max_chain = sc->max_chain;
+        r = find_match(c,s,m_len,1+ahead);
         assert(r == 0);
 
 lazy_match_done: ;
@@ -615,8 +610,8 @@ lazy_match_done: ;
     bbFlushBits(c, 0);
 
     assert(c->textsize == in_len);
-    c->codesize = c->bb_op - out;
-    *out_len = c->bb_op - out;
+    c->codesize = (ucl_uint) (c->bb_op - out);
+    *out_len = (ucl_uint) (c->bb_op - out);
     if (c->cb)
         (*c->cb->callback)(c->textsize,c->codesize,4,c->cb->user);
 
@@ -628,12 +623,12 @@ lazy_match_done: ;
 #endif
     assert(c->lit_bytes + c->match_bytes == in_len);
 
-    swd_exit(swd);
-#if !defined(swd)
-    ucl_free(swd);
+    swd_exit(s);
+#if !defined(s)
+    ucl_free(s);
 #endif
     return UCL_E_OK;
-#undef swd
+#undef s
 }
 
 

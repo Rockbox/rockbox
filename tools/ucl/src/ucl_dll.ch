@@ -1,8 +1,8 @@
-/* internal.h --
+/* ucl_dll.c -- DLL initialization of the UCL library
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -22,27 +22,31 @@
 
    Markus F.X.J. Oberhumer
    <markus@oberhumer.com>
+   http://www.oberhumer.com/opensource/ucl/
  */
-
-
-/* WARNING: this file should *not* be used by applications. It is
-   part of the implementation of the library and is subject
-   to change.
- */
-
-
-#ifndef __UCL_INTERNAL_H
-#define __UCL_INTERNAL_H
 
 
 /***********************************************************************
-//
+// Windows 16 bit + Watcom C + DLL
 ************************************************************************/
 
+#if (ACC_OS_WIN16 && ACC_CC_WATCOMC) && defined(__SW_BD)
 
-#endif /* already included */
+/* don't pull in <windows.h> - we don't need it */
+#if 0
+BOOL FAR PASCAL LibMain ( HANDLE hInstance, WORD wDataSegment,
+                          WORD wHeapSize, LPSTR lpszCmdLine )
+#else
+int __far __pascal LibMain ( int a, short b, short c, long d )
+#endif
+{
+    ACC_UNUSED(a); ACC_UNUSED(b); ACC_UNUSED(c); ACC_UNUSED(d);
+    return 1;
+}
+
+#endif
+
 
 /*
 vi:ts=4:et
 */
-

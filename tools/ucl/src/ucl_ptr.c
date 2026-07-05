@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -33,13 +33,13 @@
 //
 ************************************************************************/
 
-UCL_PUBLIC(ucl_ptr_t)
+UCL_PUBLIC(ucl_uintptr_t)
 __ucl_ptr_linear(const ucl_voidp ptr)
 {
-    ucl_ptr_t p;
+    ucl_uintptr_t p;
 
-#if defined(__UCL_DOS16) || defined(__UCL_WIN16)
-    p = (((ucl_ptr_t)(_FP_SEG(ptr))) << (16 - __UCL_HShift)) + (_FP_OFF(ptr));
+#if (ACC_OS_DOS16 || ACC_OS_OS216 || ACC_OS_WIN16)
+    p = (((ucl_uintptr_t)(ACC_FP_SEG(ptr))) << (16 - ACC_MM_AHSHIFT)) + (ACC_FP_OFF(ptr));
 #else
     p = PTR_LINEAR(ptr);
 #endif
@@ -55,12 +55,12 @@ __ucl_ptr_linear(const ucl_voidp ptr)
 UCL_PUBLIC(unsigned)
 __ucl_align_gap(const ucl_voidp ptr, ucl_uint size)
 {
-    ucl_ptr_t p, s, n;
+    ucl_uintptr_t p, s, n;
 
     assert(size > 0);
 
     p = __ucl_ptr_linear(ptr);
-    s = (ucl_ptr_t) (size - 1);
+    s = (ucl_uintptr_t) (size - 1);
 #if 0
     assert((size & (size - 1)) == 0);
     n = ((p + s) & ~s) - p;

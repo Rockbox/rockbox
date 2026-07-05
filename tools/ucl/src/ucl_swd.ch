@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 
    Markus F.X.J. Oberhumer
    <markus@oberhumer.com>
+   http://www.oberhumer.com/opensource/ucl/
  */
 
 
@@ -34,51 +35,42 @@
 //
 ************************************************************************/
 
-#ifndef SWD_N
-#  define SWD_N             N
-#endif
-#ifndef SWD_F
-#  define SWD_F             F
-#endif
-#ifndef SWD_THRESHOLD
-#  define SWD_THRESHOLD     THRESHOLD
-#endif
-
 /* unsigned type for dictionary access - don't waste memory here */
-#if (SWD_N + SWD_F + SWD_F < USHRT_MAX)
+#if (0UL + SWD_N + SWD_F + SWD_F < 0UL + USHRT_MAX)
    typedef unsigned short   swd_uint;
 #  define SWD_UINT_MAX      USHRT_MAX
 #else
    typedef ucl_uint         swd_uint;
 #  define SWD_UINT_MAX      UCL_UINT_MAX
 #endif
+#define swd_uintp           swd_uint __UCL_MMODEL *
 #define SWD_UINT(x)         ((swd_uint)(x))
 
 
-#ifndef SWD_HSIZE
-#  define SWD_HSIZE         16384
-#endif
 #ifndef SWD_MAX_CHAIN
 #  define SWD_MAX_CHAIN     2048
 #endif
+#define SWD_HSIZE           (SWD_HMASK + 1)
 
 #if !defined(HEAD3)
 #if 1
 #  define HEAD3(b,p) \
-    (((0x9f5f*(((((ucl_uint32)b[p]<<5)^b[p+1])<<5)^b[p+2]))>>5) & (SWD_HSIZE-1))
+    (((0x9f5f*(((((ucl_uint32)b[p]<<5)^b[p+1])<<5)^b[p+2]))>>5) & SWD_HMASK)
 #else
 #  define HEAD3(b,p) \
-    (((0x9f5f*(((((ucl_uint32)b[p+2]<<5)^b[p+1])<<5)^b[p]))>>5) & (SWD_HSIZE-1))
+    (((0x9f5f*(((((ucl_uint32)b[p+2]<<5)^b[p+1])<<5)^b[p]))>>5) & SWD_HMASK)
 #endif
 #endif
 
-#if (SWD_THRESHOLD == 1) && !defined(HEAD2)
-#  if 1 && defined(UCL_UNALIGNED_OK_2)
-#    define HEAD2(b,p)      (* (const ucl_ushortp) &(b[p]))
+#if !defined(HEAD2)
+#if (SWD_THRESHOLD == 1)
+#  if 1 && defined(UA_GET2)
+#    define HEAD2(b,p)      UA_GET2(&(b[p]))
 #  else
 #    define HEAD2(b,p)      (b[p] ^ ((unsigned)b[p+1]<<8))
 #  endif
 #  define NIL2              SWD_UINT_MAX
+#endif
 #endif
 
 
@@ -96,6 +88,7 @@ typedef struct
     ucl_uint n;
     ucl_uint f;
     ucl_uint threshold;
+    ucl_uint hmask;
 
 /* public - configuration */
     ucl_uint max_chain;
@@ -120,8 +113,8 @@ typedef struct
 #endif
 
 /* private */
-    const ucl_byte *dict;
-    const ucl_byte *dict_end;
+    const ucl_bytep dict;
+    const ucl_bytep dict_end;
     ucl_uint dict_len;
 
 /* private */
@@ -130,19 +123,22 @@ typedef struct
     ucl_uint rp;                /* remove pointer */
     ucl_uint b_size;
 
-    unsigned char *b_wrap;
+    ucl_bytep b_wrap;
 
     ucl_uint node_count;
     ucl_uint first_rp;
 
 #if defined(SWD_USE_MALLOC)
-    unsigned char *b;
-    swd_uint *head3;
-    swd_uint *succ3;
-    swd_uint *best3;
-    swd_uint *llen3;
+    ucl_bytep b;
+    swd_uintp head3;
+    swd_uintp succ3;
+    swd_uintp best3;
+    swd_uintp llen3;
 #ifdef HEAD2
-    swd_uint *head2;
+    swd_uintp head2;
+#ifdef HEAD2_VAR
+    int use_head2;
+#endif
 #endif
 #else
     unsigned char b [ SWD_N + SWD_F + SWD_F ];
@@ -163,10 +159,10 @@ ucl_swd_t;
  * but then its value will never be used.
  */
 #if defined(__UCL_CHECKER)
-#  define s_head3(s,key) \
+#  define s_get_head3(s,key) \
         ((s->llen3[key] == 0) ? SWD_UINT_MAX : s->head3[key])
 #else
-#  define s_head3(s,key)        s->head3[key]
+#  define s_get_head3(s,key)    s->head3[key]
 #endif
 
 
@@ -175,7 +171,7 @@ ucl_swd_t;
 ************************************************************************/
 
 static
-void swd_initdict(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
+void swd_initdict(ucl_swd_t *s, const ucl_bytep dict, ucl_uint dict_len)
 {
     s->dict = s->dict_end = NULL;
     s->dict_len = 0;
@@ -207,15 +203,17 @@ void swd_insertdict(ucl_swd_t *s, ucl_uint node, ucl_uint len)
     while (len-- > 0)
     {
         key = HEAD3(s->b,node);
-        s->succ3[node] = s_head3(s,key);
+        s->succ3[node] = s_get_head3(s,key);
         s->head3[key] = SWD_UINT(node);
         s->best3[node] = SWD_UINT(s->f + 1);
         s->llen3[key]++;
         assert(s->llen3[key] <= s->n);
 
 #ifdef HEAD2
-        key = HEAD2(s->b,node);
-        s->head2[key] = SWD_UINT(node);
+        IF_HEAD2(s) {
+            key = HEAD2(s->b,node);
+            s->head2[key] = SWD_UINT(node);
+        }
 #endif
 
         node++;
@@ -228,10 +226,18 @@ void swd_insertdict(ucl_swd_t *s, ucl_uint node, ucl_uint len)
 ************************************************************************/
 
 static
-int swd_init(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
+int swd_init(ucl_swd_t *s, const ucl_bytep dict, ucl_uint dict_len)
 {
-    ucl_uint i = 0;
-    int c = 0;
+#if defined(SWD_USE_MALLOC)
+    s->b = NULL;
+    s->head3 = NULL;
+    s->succ3 = NULL;
+    s->best3 = NULL;
+    s->llen3 = NULL;
+#ifdef HEAD2
+    s->head2 = NULL;
+#endif
+#endif
 
     if (s->n == 0)
         s->n = SWD_N;
@@ -242,17 +248,19 @@ int swd_init(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
         return UCL_E_INVALID_ARGUMENT;
 
 #if defined(SWD_USE_MALLOC)
-    s->b = (unsigned char *) ucl_alloc(s->n + s->f + s->f, 1);
-    s->head3 = (swd_uint *) ucl_alloc(SWD_HSIZE, sizeof(*s->head3));
-    s->succ3 = (swd_uint *) ucl_alloc(s->n + s->f, sizeof(*s->succ3));
-    s->best3 = (swd_uint *) ucl_alloc(s->n + s->f, sizeof(*s->best3));
-    s->llen3 = (swd_uint *) ucl_alloc(SWD_HSIZE, sizeof(*s->llen3));
+    s->b = (ucl_bytep) ucl_malloc(s->n + s->f + s->f);
+    s->head3 = (swd_uintp) ucl_alloc(SWD_HSIZE, sizeof(*s->head3));
+    s->succ3 = (swd_uintp) ucl_alloc(s->n + s->f, sizeof(*s->succ3));
+    s->best3 = (swd_uintp) ucl_alloc(s->n + s->f, sizeof(*s->best3));
+    s->llen3 = (swd_uintp) ucl_alloc(SWD_HSIZE, sizeof(*s->llen3));
     if (!s->b || !s->head3  || !s->succ3 || !s->best3 || !s->llen3)
         return UCL_E_OUT_OF_MEMORY;
 #ifdef HEAD2
-    s->head2 = (swd_uint *) ucl_alloc(UCL_UINT32_C(65536), sizeof(*s->head2));
-    if (!s->head2)
-        return UCL_E_OUT_OF_MEMORY;
+    IF_HEAD2(s) {
+        s->head2 = (swd_uintp) ucl_alloc(UCL_UINT32_C(65536), sizeof(*s->head2));
+        if (!s->head2)
+            return UCL_E_OUT_OF_MEMORY;
+    }
 #endif
 #endif
 
@@ -268,15 +276,18 @@ int swd_init(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
     s->b_wrap = s->b + s->b_size;
     s->node_count = s->n;
 
-    ucl_memset(s->llen3, 0, sizeof(s->llen3[0]) * SWD_HSIZE);
+    ucl_memset(s->llen3, 0, (ucl_uint)sizeof(s->llen3[0]) * SWD_HSIZE);
 #ifdef HEAD2
+    IF_HEAD2(s) {
 #if 1
-    ucl_memset(s->head2, 0xff, sizeof(s->head2[0]) * UCL_UINT32_C(65536));
-    assert(s->head2[0] == NIL2);
+        ucl_memset(s->head2, 0xff, (ucl_uint)sizeof(s->head2[0]) * UCL_UINT32_C(65536));
+        assert(s->head2[0] == NIL2);
 #else
-    for (i = 0; i < UCL_UINT32_C(65536); i++)
-        s->head2[i] = NIL2;
+        ucl_uint32 i;
+        for (i = 0; i < UCL_UINT32_C(65536); i++)
+            s->head2[i] = NIL2;
 #endif
+    }
 #endif
 
     s->ip = 0;
@@ -299,6 +310,7 @@ int swd_init(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
     s->look = 0;
     while (s->look < s->f)
     {
+        int c;
         if ((c = getbyte(*(s->c))) < 0)
             break;
         s->b[s->ip] = UCL_BYTE(c);
@@ -325,8 +337,6 @@ int swd_init(ucl_swd_t *s, const ucl_byte *dict, ucl_uint dict_len)
         ucl_memset(&s->b[s->bp+s->look],0,3);
 #endif
 
-    UCL_UNUSED(i);
-    UCL_UNUSED(c);
     return UCL_E_OK;
 }
 
@@ -345,7 +355,7 @@ void swd_exit(ucl_swd_t *s)
     ucl_free(s->head3); s->head3 = NULL;
     ucl_free(s->b); s->b = NULL;
 #else
-    UCL_UNUSED(s);
+    ACC_UNUSED(s);
 #endif
 }
 
@@ -358,7 +368,7 @@ void swd_exit(ucl_swd_t *s)
 //
 ************************************************************************/
 
-static __inline__
+static
 void swd_getbyte(ucl_swd_t *s)
 {
     int c;
@@ -393,7 +403,7 @@ void swd_getbyte(ucl_swd_t *s)
 // remove node from lists
 ************************************************************************/
 
-static __inline__
+static
 void swd_remove_node(ucl_swd_t *s, ucl_uint node)
 {
     if (s->node_count == 0)
@@ -404,7 +414,7 @@ void swd_remove_node(ucl_swd_t *s, ucl_uint node)
         if (s->first_rp != UCL_UINT_MAX)
         {
             if (node != s->first_rp)
-                printf("Remove %5d: %5d %5d %5d %5d  %6d %6d\n",
+                printf("Remove %5u: %5u %5u %5u %5u  %6u %6u\n",
                         node, s->rp, s->ip, s->bp, s->first_rp,
                         s->ip - node, s->ip - s->bp);
             assert(node == s->first_rp);
@@ -417,10 +427,12 @@ void swd_remove_node(ucl_swd_t *s, ucl_uint node)
         --s->llen3[key];
 
 #ifdef HEAD2
-        key = HEAD2(s->b,node);
-        assert(s->head2[key] != NIL2);
-        if ((ucl_uint) s->head2[key] == node)
-            s->head2[key] = NIL2;
+        IF_HEAD2(s) {
+            key = HEAD2(s->b,node);
+            assert(s->head2[key] != NIL2);
+            if ((ucl_uint) s->head2[key] == node)
+                s->head2[key] = NIL2;
+        }
 #endif
     }
     else
@@ -445,16 +457,18 @@ void swd_accept(ucl_swd_t *s, ucl_uint n)
 
         /* add bp into HEAD3 */
         key = HEAD3(s->b,s->bp);
-        s->succ3[s->bp] = s_head3(s,key);
+        s->succ3[s->bp] = s_get_head3(s,key);
         s->head3[key] = SWD_UINT(s->bp);
         s->best3[s->bp] = SWD_UINT(s->f + 1);
         s->llen3[key]++;
         assert(s->llen3[key] <= s->n);
 
 #ifdef HEAD2
-        /* add bp into HEAD2 */
-        key = HEAD2(s->b,s->bp);
-        s->head2[key] = SWD_UINT(s->bp);
+        IF_HEAD2(s) {
+            /* add bp into HEAD2 */
+            key = HEAD2(s->b,s->bp);
+            s->head2[key] = SWD_UINT(s->bp);
+        }
 #endif
 
         swd_getbyte(s);
@@ -469,19 +483,13 @@ void swd_accept(ucl_swd_t *s, ucl_uint n)
 static
 void swd_search(ucl_swd_t *s, ucl_uint node, ucl_uint cnt)
 {
-#if 0 && defined(__GNUC__) && defined(__i386__)
-    register const unsigned char *p1 __asm__("%edi");
-    register const unsigned char *p2 __asm__("%esi");
-    register const unsigned char *px __asm__("%edx");
-#else
-    const unsigned char *p1;
-    const unsigned char *p2;
-    const unsigned char *px;
-#endif
+    const ucl_bytep p1;
+    const ucl_bytep p2;
+    const ucl_bytep px;
     ucl_uint m_len = s->m_len;
-    const unsigned char * b  = s->b;
-    const unsigned char * bp = s->b + s->bp;
-    const unsigned char * bx = s->b + s->bp + s->look;
+    const ucl_bytep b  = s->b;
+    const ucl_bytep bp = s->b + s->bp;
+    const ucl_bytep bx = s->b + s->bp + s->look;
     unsigned char scan_end1;
 
     assert(s->m_len > 0);
@@ -506,9 +514,9 @@ void swd_search(ucl_swd_t *s, ucl_uint node, ucl_uint cnt)
             ucl_uint i;
             assert(ucl_memcmp(bp,&b[node],3) == 0);
 
-#if 0 && defined(UCL_UNALIGNED_OK_4)
+#if 0 && defined(UA_GET4)
             p1 += 3; p2 += 3;
-            while (p1 < px && * (const ucl_uint32p) p1 == * (const ucl_uint32p) p2)
+            while (p1 < px && UA_GET4(p1) == UA_GET4(p2))
                 p1 += 4, p2 += 4;
             while (p1 < px && *p1 == *p2)
                 p1 += 1, p2 += 1;
@@ -516,7 +524,7 @@ void swd_search(ucl_swd_t *s, ucl_uint node, ucl_uint cnt)
             p1 += 2; p2 += 2;
             do {} while (++p1 < px && *p1 == *++p2);
 #endif
-            i = p1 - bp;
+            i = (ucl_uint) (p1 - bp);
 
 #ifdef UCL_DEBUG
             if (ucl_memcmp(bp,&b[node],i) != 0)
@@ -604,7 +612,7 @@ void swd_findbest(ucl_swd_t *s)
 
     /* get current head, add bp into HEAD3 */
     key = HEAD3(s->b,s->bp);
-    node = s->succ3[s->bp] = s_head3(s,key);
+    node = s->succ3[s->bp] = s_get_head3(s,key);
     cnt = s->llen3[key]++;
     assert(s->llen3[key] <= s->n + s->f);
     if (cnt > s->max_chain && s->max_chain > 0)
@@ -622,11 +630,21 @@ void swd_findbest(ucl_swd_t *s)
     }
     else
     {
-#ifdef HEAD2
-        if (swd_search2(s))
-#endif
+#if defined(HEAD2_VAR)
+        if (s->use_head2) {
+            if (swd_search2(s) && s->look >= 3)
+                swd_search(s,node,cnt);
+        } else {
             if (s->look >= 3)
                 swd_search(s,node,cnt);
+        }
+#elif defined(HEAD2)
+        if (swd_search2(s) && s->look >= 3)
+            swd_search(s,node,cnt);
+#else
+        if (s->look >= 3)
+            swd_search(s,node,cnt);
+#endif
         if (s->m_len > len)
             s->m_off = swd_pos2off(s,s->m_pos);
         s->best3[s->bp] = SWD_UINT(s->m_len);
@@ -648,15 +666,18 @@ void swd_findbest(ucl_swd_t *s)
 
 #ifdef HEAD2
     /* add bp into HEAD2 */
-    key = HEAD2(s->b,s->bp);
-    s->head2[key] = SWD_UINT(s->bp);
+    IF_HEAD2(s) {
+        key = HEAD2(s->b,s->bp);
+        s->head2[key] = SWD_UINT(s->bp);
+    }
 #endif
 }
 
 
 #undef HEAD3
 #undef HEAD2
-#undef s_head3
+#undef IF_HEAD2
+#undef s_get_head3
 
 
 /*

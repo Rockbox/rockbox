@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 
    Markus F.X.J. Oberhumer
    <markus@oberhumer.com>
+   http://www.oberhumer.com/opensource/ucl/
  */
 
 
@@ -34,81 +35,86 @@
 #ifndef __UCL_CONF_H
 #define __UCL_CONF_H
 
-#if !defined(__UCL_IN_MINIUCL)
-#  ifndef __UCLCONF_H
-#    include <ucl/uclconf.h>
-#  endif
-#endif
-
 
 /***********************************************************************
-// memory checkers
+//
 ************************************************************************/
 
-#if defined(__BOUNDS_CHECKING_ON)
-#  include <unchecked.h>
-#else
-#  define BOUNDS_CHECKING_OFF_DURING(stmt)      stmt
-#  define BOUNDS_CHECKING_OFF_IN_EXPR(expr)     (expr)
+#if defined(__UCLCONF_H_INCLUDED)
+#  error "include this file first"
+#endif
+#include <ucl/uclconf.h>
+
+#if defined(UCL_HAVE_CONFIG_H)
+#  define ACC_CONFIG_NO_HEADER 1
+#endif
+#define __ACCLIB_FUNCNAME(f)        error_do_not_use_acclib
+#include "acc/acc.h"
+
+#if (ACC_CC_MSC && (_MSC_VER >= 1300))
+   /* avoid `-Wall' warnings in system header files */
+#  pragma warning(disable: 4820)
+   /* avoid warnings about inlining */
+#  pragma warning(disable: 4710 4711)
+#endif
+
+#if defined(__UCL_MMODEL_HUGE) && (!ACC_HAVE_MM_HUGE_PTR)
+#  error "this should not happen - check defines for __huge"
+#endif
+#if !defined(__UCL_MMODEL_HUGE) && defined(HAVE_MEMCMP)
+#  define ucl_memcmp(a,b,c)     memcmp(a,b,c)
+#endif
+#if !defined(__UCL_MMODEL_HUGE) && defined(HAVE_MEMCPY)
+#  define ucl_memcpy(a,b,c)     memcpy(a,b,c)
+#endif
+#if !defined(__UCL_MMODEL_HUGE) && defined(HAVE_MEMMOVE)
+#  define ucl_memmove(a,b,c)    memmove(a,b,c)
+#endif
+#if !defined(__UCL_MMODEL_HUGE) && defined(HAVE_MEMSET)
+#  define ucl_memset(a,b,c)     memset(a,b,c)
+#endif
+
+#if (ACC_OS_DOS16 + 0 != UCL_OS_DOS16 + 0)
+#  error "DOS16"
+#endif
+#if (ACC_OS_OS216 + 0 != UCL_OS_OS216 + 0)
+#  error "OS216"
+#endif
+#if (ACC_OS_WIN16 + 0 != UCL_OS_WIN16 + 0)
+#  error "WIN16"
+#endif
+#if (ACC_OS_DOS32 + 0 != UCL_OS_DOS32 + 0)
+#  error "DOS32"
+#endif
+#if (ACC_OS_OS2 + 0 != UCL_OS_OS2 + 0)
+#  error "DOS32"
+#endif
+#if (ACC_OS_WIN32 + 0 != UCL_OS_WIN32 + 0)
+#  error "WIN32"
+#endif
+#if (ACC_OS_WIN64 + 0 != UCL_OS_WIN64 + 0)
+#  error "WIN64"
 #endif
 
 
-/***********************************************************************
-// autoconf section
-************************************************************************/
-
-#if !defined(UCL_HAVE_CONFIG_H)
-#  include <stddef.h>           /* ptrdiff_t, size_t */
-#  include <string.h>           /* memcpy, memmove, memcmp, memset */
-#  if !defined(NO_STDLIB_H)
-#    include <stdlib.h>
-#  endif
-#  define HAVE_MEMCMP
-#  define HAVE_MEMCPY
-#  define HAVE_MEMMOVE
-#  define HAVE_MEMSET
-#else
-#  include <sys/types.h>
-#  if defined(STDC_HEADERS)
-#    include <string.h>
-#    include <stdlib.h>
-#  endif
-#  if defined(HAVE_STDDEF_H)
-#    include <stddef.h>
-#  endif
-#  if defined(HAVE_MEMORY_H)
-#    include <memory.h>
-#  endif
+#include "acc/acc_incd.h"
+#if (ACC_OS_DOS16 || ACC_OS_OS216 || ACC_OS_WIN16)
+#  include "acc/acc_ince.h"
+#  include "acc/acc_inci.h"
 #endif
-
-#if defined(__UCL_DOS16) || defined(__UCL_WIN16)
-#  define HAVE_MALLOC_H
-#  define HAVE_HALLOC
-#endif
-
 
 #undef NDEBUG
 #if !defined(UCL_DEBUG)
-#  define NDEBUG
-#endif
-#if 1 || defined(UCL_DEBUG) || !defined(NDEBUG)
-#  if !defined(NO_STDIO_H)
-#    include <stdio.h>
-#  endif
+#  define NDEBUG 1
 #endif
 #include <assert.h>
 
 
-#if !defined(UCL_UNUSED)
-#  define UCL_UNUSED(parm)  (parm = parm)
-#endif
-
-
-#if !defined(__inline__) && !defined(__GNUC__)
-#  if defined(__cplusplus)
-#    define __inline__      inline
+#if (ACC_OS_DOS16 || ACC_OS_OS216 || ACC_OS_WIN16) && (ACC_CC_BORLANDC)
+#  if (__BORLANDC__ >= 0x0450)  /* v4.00 */
+#    pragma option -h           /* enable fast huge pointers */
 #  else
-#    define __inline__      /* nothing */
+#    pragma option -h-          /* disable fast huge pointers - compiler bug */
 #  endif
 #endif
 
@@ -154,80 +160,6 @@
 
 
 /***********************************************************************
-//
-************************************************************************/
-
-#if !defined(SIZEOF_UNSIGNED)
-#  if (UINT_MAX == 0xffff)
-#    define SIZEOF_UNSIGNED         2
-#  elif (UINT_MAX == UCL_0xffffffffL)
-#    define SIZEOF_UNSIGNED         4
-#  elif (UINT_MAX >= UCL_0xffffffffL)
-#    define SIZEOF_UNSIGNED         8
-#  else
-#    error "SIZEOF_UNSIGNED"
-#  endif
-#endif
-
-#if !defined(SIZEOF_UNSIGNED_LONG)
-#  if (ULONG_MAX == UCL_0xffffffffL)
-#    define SIZEOF_UNSIGNED_LONG    4
-#  elif (ULONG_MAX >= UCL_0xffffffffL)
-#    define SIZEOF_UNSIGNED_LONG    8
-#  else
-#    error "SIZEOF_UNSIGNED_LONG"
-#  endif
-#endif
-
-
-#if !defined(SIZEOF_SIZE_T)
-#  define SIZEOF_SIZE_T             SIZEOF_UNSIGNED_LONG
-#endif
-#if !defined(SIZE_T_MAX)
-#  define SIZE_T_MAX                UCL_UTYPE_MAX(SIZEOF_SIZE_T)
-#endif
-
-
-/***********************************************************************
-// <string.h> section
-************************************************************************/
-
-#if defined(NO_MEMCMP)
-#  undef HAVE_MEMCMP
-#endif
-
-#if (UCL_UINT_MAX <= SIZE_T_MAX) && defined(HAVE_MEMCMP)
-#  define ucl_memcmp                memcmp
-#endif
-#if (UCL_UINT_MAX <= SIZE_T_MAX) && defined(HAVE_MEMCPY)
-#  define ucl_memcpy                memcpy
-#endif
-#if (UCL_UINT_MAX <= SIZE_T_MAX) && defined(HAVE_MEMMOVE)
-#  define ucl_memmove               memmove
-#endif
-#if (UCL_UINT_MAX <= SIZE_T_MAX) && defined(HAVE_MEMSET)
-#  define ucl_memset                memset
-#endif
-
-#if !defined(HAVE_MEMCMP)
-#  undef memcmp
-#  define memcmp                    ucl_memcmp
-#endif
-#if !defined(HAVE_MEMCPY)
-#  undef memcpy
-#  define memcpy                    ucl_memcpy
-#endif
-#if !defined(HAVE_MEMMOVE)
-#  undef memmove
-#  define memmove                   ucl_memmove
-#endif
-#if !defined(HAVE_MEMSET)
-#  undef memset
-#  define memset                    ucl_memset
-#endif
-
-
-/***********************************************************************
 // compiler and architecture specific stuff
 ************************************************************************/
 
@@ -236,81 +168,22 @@
  * even if it is allowed by your system.
  */
 
-#if 1 && defined(__UCL_i386) && (UINT_MAX == UCL_0xffffffffL)
-#  if !defined(UCL_UNALIGNED_OK_2) && (USHRT_MAX == 0xffff)
-#    define UCL_UNALIGNED_OK_2
-#  endif
-#  if !defined(UCL_UNALIGNED_OK_4) && (UCL_UINT32_MAX == UCL_0xffffffffL)
-#    define UCL_UNALIGNED_OK_4
-#  endif
-#endif
-
-#if defined(UCL_UNALIGNED_OK_2) || defined(UCL_UNALIGNED_OK_4)
-#  if !defined(UCL_UNALIGNED_OK)
-#    define UCL_UNALIGNED_OK
-#  endif
-#endif
-
-#if defined(__UCL_NO_UNALIGNED)
-#  undef UCL_UNALIGNED_OK
-#  undef UCL_UNALIGNED_OK_2
-#  undef UCL_UNALIGNED_OK_4
-#endif
-
-#if defined(UCL_UNALIGNED_OK_2) && (USHRT_MAX != 0xffff)
-#  error "UCL_UNALIGNED_OK_2 must not be defined on this system"
-#endif
-#if defined(UCL_UNALIGNED_OK_4) && (UCL_UINT32_MAX != UCL_0xffffffffL)
-#  error "UCL_UNALIGNED_OK_4 must not be defined on this system"
-#endif
-
-
-/* Many modern processors can transfer 32bit words much faster than
- * bytes - this can significantly speed decompression.
- */
-
-#if defined(__UCL_NO_ALIGNED)
-#  undef UCL_ALIGNED_OK_4
-#endif
-
-#if defined(UCL_ALIGNED_OK_4) && (UCL_UINT32_MAX != UCL_0xffffffffL)
-#  error "UCL_ALIGNED_OK_4 must not be defined on this system"
-#endif
-
-
-/* Definitions for byte order, according to significance of bytes, from low
- * addresses to high addresses. The value is what you get by putting '4'
- * in the most significant byte, '3' in the second most significant byte,
- * '2' in the second least significant byte, and '1' in the least
- * significant byte.
- * The byte order is only needed if we use UCL_UNALIGNED_OK.
- */
-
-#define UCL_LITTLE_ENDIAN       1234
-#define UCL_BIG_ENDIAN          4321
-#define UCL_PDP_ENDIAN          3412
-
-#if !defined(UCL_BYTE_ORDER)
-#  if defined(MFX_BYTE_ORDER)
-#    define UCL_BYTE_ORDER      MFX_BYTE_ORDER
-#  elif defined(__UCL_i386)
-#    define UCL_BYTE_ORDER      UCL_LITTLE_ENDIAN
-#  elif defined(BYTE_ORDER)
-#    define UCL_BYTE_ORDER      BYTE_ORDER
-#  elif defined(__BYTE_ORDER)
-#    define UCL_BYTE_ORDER      __BYTE_ORDER
-#  endif
-#endif
-
-#if defined(UCL_BYTE_ORDER)
-#  if (UCL_BYTE_ORDER != UCL_LITTLE_ENDIAN) && \
-      (UCL_BYTE_ORDER != UCL_BIG_ENDIAN)
-#    error "invalid UCL_BYTE_ORDER"
-#  endif
-#endif
-
-#if defined(UCL_UNALIGNED_OK) && !defined(UCL_BYTE_ORDER)
-#  error "UCL_BYTE_ORDER is not defined"
+#undef UA_GET2
+#undef UA_SET2
+#undef UA_GET4
+#undef UA_SET4
+#if 1 && (ACC_ARCH_AMD64 || ACC_ARCH_IA32)
+#  define UA_GET2(p)    (* (const ucl_ushortp) (p))
+#  define UA_SET2(p)    (* (ucl_ushortp) (p))
+#  define UA_GET4(p)    (* (const acc_uint32e_t *) (p))
+#  define UA_SET4(p)    (* (acc_uint32e_t *) (p))
+#elif 0 && (ACC_ARCH_M68K) && (ACC_CC_GNUC >= 0x020900ul)
+   typedef struct { unsigned short v; } __ucl_ua2_t __attribute__((__aligned__(1)));
+   typedef struct { unsigned long v; }  __ucl_ua4_t __attribute__((__aligned__(1)));
+#  define UA_GET2(p)    (((const __ucl_ua2_t *)(p))->v)
+#  define UA_SET2(p)    (((__ucl_ua2_t *)(p))->v)
+#  define UA_GET4(p)    (((const __ucl_ua4_t *)(p))->v)
+#  define UA_SET4(p)    (((__ucl_ua4_t *)(p))->v)
 #endif
 
 
@@ -319,9 +192,7 @@
 ************************************************************************/
 
 __UCL_EXTERN_C int __ucl_init_done;
-__UCL_EXTERN_C const ucl_byte __ucl_copyright[];
-UCL_EXTERN(const ucl_byte *) ucl_copyright(void);
-__UCL_EXTERN_C const ucl_uint32 _ucl_crc32_table[256];
+UCL_EXTERN(const ucl_bytep) ucl_copyright(void);
 
 
 /***********************************************************************
@@ -330,18 +201,6 @@ __UCL_EXTERN_C const ucl_uint32 _ucl_crc32_table[256];
 
 #define _UCL_STRINGIZE(x)           #x
 #define _UCL_MEXPAND(x)             _UCL_STRINGIZE(x)
-
-/* concatenate */
-#define _UCL_CONCAT2(a,b)           a ## b
-#define _UCL_CONCAT3(a,b,c)         a ## b ## c
-#define _UCL_CONCAT4(a,b,c,d)       a ## b ## c ## d
-#define _UCL_CONCAT5(a,b,c,d,e)     a ## b ## c ## d ## e
-
-/* expand and concatenate (by using one level of indirection) */
-#define _UCL_ECONCAT2(a,b)          _UCL_CONCAT2(a,b)
-#define _UCL_ECONCAT3(a,b,c)        _UCL_CONCAT3(a,b,c)
-#define _UCL_ECONCAT4(a,b,c,d)      _UCL_CONCAT4(a,b,c,d)
-#define _UCL_ECONCAT5(a,b,c,d,e)    _UCL_CONCAT5(a,b,c,d,e)
 
 
 /***********************************************************************
@@ -356,4 +215,3 @@ __UCL_EXTERN_C const ucl_uint32 _ucl_crc32_table[256];
 /*
 vi:ts=4:et
 */
-

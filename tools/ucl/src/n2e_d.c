@@ -2,7 +2,7 @@
 
    This file is part of the UCL data compression library.
 
-   Copyright (C) 1996-2002 Markus Franz Xaver Johannes Oberhumer
+   Copyright (C) 1996-2004 Markus Franz Xaver Johannes Oberhumer
    All Rights Reserved.
 
    The UCL library is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@
 #ifdef SAFE
     const ucl_uint oend = *dst_len;
 #endif
-    UCL_UNUSED(wrkmem);
+    ACC_UNUSED(wrkmem);
 
 #ifdef TEST_OVERLAP
     src_len += src_off;
@@ -116,7 +116,7 @@
         fail(olen > ilen, UCL_E_OVERLAP_OVERRUN);
 #else
         {
-            const ucl_byte *m_pos;
+            const ucl_bytep m_pos;
             m_pos = dst + olen - m_off;
             dst[olen++] = *m_pos++;
             do dst[olen++] = *m_pos++; while (--m_len > 0);
@@ -138,14 +138,14 @@
 
 #ifndef getbit
 
-#include <ucl/ucl.h>
 #include "ucl_conf.h"
+#include <ucl/ucl.h>
 #include "getbit.h"
 
 
 UCL_PUBLIC(int)
-ucl_nrv2e_decompress_8          ( const ucl_byte *src, ucl_uint  src_len,
-                                        ucl_byte *dst, ucl_uintp dst_len,
+ucl_nrv2e_decompress_8          ( const ucl_bytep src, ucl_uint  src_len,
+                                        ucl_bytep dst, ucl_uintp dst_len,
                                         ucl_voidp wrkmem )
 {
 #define getbit(bb)      getbit_8(bb,src,ilen)
