@@ -170,11 +170,8 @@ QString System::osVersionString(void)
     GetSystemInfo(&sysinfo);
 
     result = QString("Windows version %1.%2, ").arg(osvi.dwMajorVersion).arg(osvi.dwMinorVersion);
-    if(osvi.szCSDVersion)
-        result += QString("build %1 (%2)").arg(osvi.dwBuildNumber)
-            .arg(QString::fromWCharArray(osvi.szCSDVersion));
-    else
-        result += QString("build %1").arg(osvi.dwBuildNumber);
+    result += QString("build %1 (%2)").arg(osvi.dwBuildNumber)
+        .arg(QString::fromWCharArray(osvi.szCSDVersion));
     result += QString("<br/>CPU: %1, %2 processor(s)").arg(sysinfo.dwProcessorType)
               .arg(sysinfo.dwNumberOfProcessors);
 #endif
