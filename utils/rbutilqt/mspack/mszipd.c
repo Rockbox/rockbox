@@ -1,5 +1,5 @@
 /* This file is part of libmspack.
- * (C) 2003-2010 Stuart Caie.
+ * (C) 2003-2023 Stuart Caie.
  *
  * The deflate method was created by Phil Katz. MSZIP is equivalent to the
  * deflate method.
@@ -89,10 +89,7 @@ static const unsigned char bitlen_order[19] = {
 #define INF_ERR_HUFFSYM     (-14) /* out of bits decoding huffman symbol     */
 
 static int zip_read_lens(struct mszipd_stream *zip) {
-  /* for the bit buffer and huffman decoding */
-  register unsigned int bit_buffer;
-  register int bits_left;
-  unsigned char *i_ptr, *i_end;
+  DECLARE_BIT_VARS;
 
   /* bitlen Huffman codes -- immediate lookup, 7 bit max code length */
   unsigned short bl_table[(1 << 7)];
@@ -155,13 +152,9 @@ static int zip_read_lens(struct mszipd_stream *zip) {
 
 /* a clean implementation of RFC 1951 / inflate */
 static int inflate(struct mszipd_stream *zip) {
-  unsigned int last_block, block_type, distance, length, this_run, i;
-
-  /* for the bit buffer and huffman decoding */
-  register unsigned int bit_buffer;
-  register int bits_left;
-  register unsigned short sym;
-  unsigned char *i_ptr, *i_end;
+  DECLARE_HUFF_VARS;
+  unsigned int last_block, block_type, distance, length, this_run;
+  int i;
 
   RESTORE_BITS;
 
@@ -359,7 +352,7 @@ struct mszipd_stream *mszipd_init(struct mspack_system *system,
   }
 
   /* allocate input buffer */
-  zip->inbuf  = (unsigned char *) system->alloc(system, (size_t) input_buffer_size);
+  zip->inbuf  = (unsigned char *) system->alloc(system, input_buffer_size);
   if (!zip->inbuf) {
     system->free(zip);
     return NULL;
@@ -467,11 +460,7 @@ int mszipd_decompress(struct mszipd_stream *zip, off_t out_bytes) {
 }
 
 int mszipd_decompress_kwaj(struct mszipd_stream *zip) {
-    /* for the bit buffer */
-    register unsigned int bit_buffer;
-    register int bits_left;
-    unsigned char *i_ptr, *i_end;
-
+    DECLARE_BIT_VARS;
     int i, error, block_len;
 
     /* unpack blocks until block_len == 0 */

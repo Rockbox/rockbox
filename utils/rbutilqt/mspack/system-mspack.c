@@ -13,11 +13,6 @@
 
 #include "system-mspack.h"
 
-#ifndef LARGEFILE_SUPPORT
-const char *largefile_msg = "library not compiled to support large files.";
-#endif
-
-
 int mspack_version(int entity) {
   switch (entity) {
    /* CHM decoder version 1 -> 2 changes:

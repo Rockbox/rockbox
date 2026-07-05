@@ -1,5 +1,5 @@
 /* This file is part of libmspack.
- * (C) 2003-2004 Stuart Caie.
+ * (C) 2003-2023 Stuart Caie.
  *
  * The Quantum method was created by David Stafford, adapted by Microsoft
  * Corporation.
@@ -254,13 +254,11 @@ struct qtmd_stream *qtmd_init(struct mspack_system *system,
 }
 
 int qtmd_decompress(struct qtmd_stream *qtm, off_t out_bytes) {
+  DECLARE_BIT_VARS;
   unsigned int frame_todo, frame_end, window_posn, match_offset, range;
-  unsigned char *window, *i_ptr, *i_end, *runsrc, *rundest;
+  unsigned char *window, *runsrc, *rundest;
   int i, j, selector, extra, sym, match_length;
   unsigned short H, L, C, symf;
-
-  register unsigned int bit_buffer;
-  register unsigned char bits_left;
 
   /* easy answers */
   if (!qtm || (out_bytes < 0)) return MSPACK_ERR_ARGS;
