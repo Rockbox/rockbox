@@ -315,6 +315,7 @@ add_library(mspack
     mspack/lzxc.c
     mspack/lzxd.c
     mspack/lzx.h
+    mspack/macros.h
     mspack/mspack.h
     mspack/mszipc.c
     mspack/mszipd.c
