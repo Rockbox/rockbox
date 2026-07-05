@@ -75,6 +75,7 @@ local BLUE  = _clr.set(WHITE, 0, 0, 255)
 -------------------------------------------
 local clrs
 local CANCEL_BUTTON = rb.actions.PLA_CANCEL
+local EXIT_BUTTON = rb.actions.PLA_EXIT
 local LCD_DEPTH = rb.LCD_DEPTH
 -- EXAMPLES ---------------------------------------------------------------------- EXAMPLES---------------------------------------------------------------------
 function my_blit(dst_val, dx, dy, src_val, sx, sy)
@@ -235,8 +236,9 @@ function bounce_image(img)
     _img.resize(img_sqy, img)
     _img.resize(img_sqx, img)
 
-    -- moves definition of CANCEL_BUTTON from global to local
+    -- moves definition of CANCEL_BUTTON / EXIT_BUTTON from global to local
     local CANCEL_BUTTON = CANCEL_BUTTON
+    local EXIT_BUTTON = EXIT_BUTTON
 --------------------------------------------------------
     local imgn = img
     local hold = 0
@@ -347,7 +349,8 @@ function bounce_image(img)
         end
         -- 0 = timeout immediately
         -- ( -1 would be never timeout, and >0 is amount of 'ticks' before timeout)
-        if rb.get_plugin_action(wait) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(wait)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break;
         end
     end
@@ -444,6 +447,10 @@ function twist(img)
     -- calculated position of each point in the sine wave(s)
     local xs, xe
 
+    -- moves definition of CANCEL_BUTTON / EXIT_BUTTON from global to local
+    local CANCEL_BUTTON = CANCEL_BUTTON
+    local EXIT_BUTTON = EXIT_BUTTON
+
     --[[--Profiling code
     local timer = _timer.start()]]
 
@@ -527,8 +534,8 @@ function twist(img)
 
         _lcd:update()
         z = z + zi
-
-        if rb.get_plugin_action(0) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(0)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break
         end
     collectgarbage("step")
@@ -556,7 +563,8 @@ function draw_target(img)
         end
 
         _lcd:update()
-        if rb.get_plugin_action( 20) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(rb.HZ / 5)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             z = 16;
             break;
         end
@@ -596,7 +604,8 @@ function draw_sweep(img, cx, cy, radius, color)
         elseif wait < 50 then
             wait = 50 - wait
         end
-        if rb.get_plugin_action( wait) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(wait)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break
         end
     end
@@ -621,6 +630,10 @@ function rotate_image(img)
     screen_img =_img.new(w, h)
     screen_img :copy(_LCD, 1, 1, xr, yr, w, h)
     --_print.f("CW")
+
+    -- moves definition of CANCEL_BUTTON / EXIT_BUTTON from global to local
+    local CANCEL_BUTTON = CANCEL_BUTTON
+    local EXIT_BUTTON = EXIT_BUTTON
 
     --[[--Profiling code
     local timer = _timer.start()]]
@@ -660,7 +673,8 @@ function rotate_image(img)
         end
         d = d + i
 
-        if rb.get_plugin_action(0) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(0)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break;
         end
     end
@@ -686,6 +700,10 @@ function flip_image(img)
     screen_img =_img.new(w, h)
     screen_img :copy(_LCD, 1, 1, x, y, w, h)
 
+    -- moves definition of CANCEL_BUTTON / EXIT_BUTTON from global to local
+    local CANCEL_BUTTON = CANCEL_BUTTON
+    local EXIT_BUTTON = EXIT_BUTTON
+
     --[[--Profiling code
     local timer = _timer.start()]]
 
@@ -707,7 +725,8 @@ function flip_image(img)
 
         d = d + i
 
-        if rb.get_plugin_action(rb.HZ) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(rb.HZ)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break;
         end
     end
@@ -733,7 +752,8 @@ function blit_mask(dst)
         dst:copy(bmask, 1, 1, 1, 1, nil, nil, false, _blit.BSAND, color)
         _lcd:update()
 
-        if rb.get_plugin_action(0) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(0)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break
         end
     end
@@ -823,7 +843,8 @@ function long_text()
         _lcd:copy(img, 1, _lcd.H - h, w - p, 1)
         _lcd:update()
         if p == 0 or w - p == 1 then wait = 100; rb.sleep(50) end
-        if rb.get_plugin_action(wait) == CANCEL_BUTTON then
+        local btn = rb.get_plugin_action(wait)
+        if btn == CANCEL_BUTTON or btn == EXIT_BUTTON then
             break
         end
     end

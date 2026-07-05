@@ -273,7 +273,7 @@ local function Rot(t_pts, rot)
     local nw = max_x
     local nh = max_y
 
-    rot = rot % 7
+    --rot = rot % 7
     if rot == 0 then
         return t_pts
     end
@@ -326,96 +326,118 @@ local function Rot(t_pts, rot)
 
     return rot_memoized[rot][pts]
 end
-local count = -1
 
 local function rb_logo_rot(x, y, sx, sy, rot)
-    local polygon
-
-    if count >= 0 then
-        polygon = _poly.polygon
-        _lcd:clear(BLACK)
-        _poly.polyline(_LCD, x, y, Rot(cross_left_pts, rot), WHITE, false, true, sx, sy)
-        _poly.polyline(_LCD, x, y, Rot(R_shadow_pts, rot), WHITE, false, true, sx, sy)
-    else
-       polygon = function() end
-    end
+    local rot_m = rot % 7
+    local rot_next = rot + 1
+    local polygon =  _poly.polygon
+    _lcd:clear(BLACK)
+    _poly.polyline(_LCD, x, y, Rot(cross_left_pts, rot_m), WHITE, false, true, sx, sy)
+    _poly.polyline(_LCD, x, y, Rot(R_shadow_pts, rot_m), WHITE, false, true, sx, sy)
     repeat
-        polygon(_LCD, x, y, Rot(R_outline_pts, rot), BLACK, YELLOW, true, sx, sy)
-        polygon(_LCD, x, y, Rot(R_center_pts, rot), BLACK, BLACK, true, sx, sy)
-        polygon(_LCD, x, y, Rot(b_outline_pts, rot), BLACK, GREY, true, sx, sy)
-        polygon(_LCD, x, y, Rot(b_center_pts, rot), BLACK, BLACK, true, sx, sy)
+        polygon(_LCD, x, y, Rot(R_outline_pts, rot_m), BLACK, YELLOW, true, sx, sy)
+        polygon(_LCD, x, y, Rot(R_center_pts, rot_m), BLACK, BLACK, true, sx, sy)
+        polygon(_LCD, x, y, Rot(b_outline_pts, rot_m), BLACK, GREY, true, sx, sy)
+        polygon(_LCD, x, y, Rot(b_center_pts, rot_m), BLACK, BLACK, true, sx, sy)
 
-        polygon(_LCD, x, y, Rot(clef_pts, rot), WHITE, WHITE, true, sx, sy)
-        polygon(_LCD, x, y, Rot(clef_void_1_pts, rot), WHITE, BLACK, true, sx, sy)
-        polygon(_LCD, x, y, Rot(clef_void_2_pts, rot), WHITE, YELLOW, true, sx, sy)
-        polygon(_LCD, x, y, Rot(clef_void_3_pts, rot), WHITE, YELLOW, true, sx, sy)
+        polygon(_LCD, x, y, Rot(clef_pts, rot_m), WHITE, WHITE, true, sx, sy)
+        polygon(_LCD, x, y, Rot(clef_void_1_pts, rot_m), WHITE, BLACK, true, sx, sy)
+        polygon(_LCD, x, y, Rot(clef_void_2_pts, rot_m), WHITE, YELLOW, true, sx, sy)
+        polygon(_LCD, x, y, Rot(clef_void_3_pts, rot_m), WHITE, YELLOW, true, sx, sy)
+        polygon = function() end -- don't draw but memoize the next point
         rot = rot + 1
-    until count >= 0 or rot >= 6;
+        rot_m = rot % 7
+    until rot > rot_next;
 end
+
+-- we want the size of everything @ 1:1 scale so we can use that to flip/rotate the figure
+rb_logo_sz(0, 0)
 
 local action
 local redraw = true;
 local rot = 0
 local sx = -2
 local sy = -2
+local max_sx = (rb.LCD_WIDTH / max_x) * 3
+local max_sy = (rb.LCD_HEIGHT / max_y) * 3
 
--- we want the size of everything @ 1:1 scale so we can use that to flip/rotate the figure
-rb_logo_sz(0, 0)
 
-while true do
+do
+    local act = rb.actions
+    local quit = false
 
-    if redraw then
-        rb_logo_rot(0,0, sx, sy, rot)
-        _lcd:update()
-        if count > 0 then
-            redraw = false
+    function action_event(action)
+        local event
+
+        if action == actions.CANCEL or action == actions.EXIT then
+            quit = true
+        end
+
+        if action == 0 then --timer timeout
+            rot = rot + 1
+            redraw = true
             local prot = (rot) % 7
-            if prot > 0 then
+            if prot > 0 then -- erase the previous rot 
                 prot = prot - 1
                 if prot == 0 then prot = 6 end
                 rot_memoized[tostring(prot)] = nil
             end
         end
-    end
 
-    action = rb.get_plugin_action(rb.HZ/2, 1)
-    if action == actions.CANCEL or action == actions.EXIT then
-        break
-    end
-
-    redraw = redraw or (action ~= actions.NONE)
-
-    if action == actions.LEFT then
-        sx = sx - 1
-    elseif action == actions.LEFTR then
-        sx = sx - 1
-        sy = sy - 1
-    elseif action == actions.RIGHT then
-        sx = sx + 1
-    elseif action == actions.RIGHTR then
-        sx = sx + 1
-        sy = sy + 1
-    elseif action == actions.UP then
-        sy = sy - 1
-    elseif action == actions.UPR then
-        sy = sy - 1
-        sx = sy
-    elseif action == actions.DOWN then
-        sy = sy + 1
-    elseif action == actions.DOWNR then
-        sy = sy + 1
-        sx = sy
-    elseif action == actions.SELR then
-        rot = rot + 1
-        count = 0;
+        if redraw then
+            --do nothing till redrawn
+        elseif action == actions.LEFT then
+            sx = sx - 1
+        elseif action == actions.LEFTR then
+            sx = sx - 1
+            sy = sy - 1
+        elseif action == actions.RIGHT then
+            sx = sx + 1
+        elseif action == actions.RIGHTR then
+            sx = sx + 1
+            sy = sy + 1
+        elseif action == actions.UP then
+            sy = sy - 1
+        elseif action == actions.UPR then
+            sy = sy - 1
+            sx = sy
+        elseif action == actions.DOWN then
+            sy = sy + 1
+        elseif action == actions.DOWNR then
+            sy = sy + 1
+            sx = sy
+        elseif action == actions.SELR then
+            rot = rot + 1
+            count = 0;
+            redraw = true
+        else
+            return
+        end
+        if sx > max_sx then sx = max_sx end
+        if sy > max_sy then sy = max_sy end
         redraw = true
-    elseif count > 5 then
-        count = 0;
-        rot = rot + 1
-        redraw = true
-    else
-        count = count + 1
     end
+
+    function action_set_quit(bQuit)
+        quit = bQuit
+    end
+
+    function action_quit()
+        return quit
+    end
+end
+
+local eva = rockev.register("action", action_event)
+local evt = rockev.register("timer", action_event, rb.HZ * 5)
+
+--[[ Main loop ]]
+while not action_quit() do
+    if redraw then
+        rb_logo_rot(0,0, sx, sy, rot)
+        _lcd:update()
+        redraw = false
+    end
+    rb.yield()
 end --wend
 
 local used, allocd, free = rb.mem_stats()
