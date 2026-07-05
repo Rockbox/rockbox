@@ -465,8 +465,10 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
     for(i = 0; i < sublines; i++)
     {
         children[i] = skin_buffer_to_offset(skin_parse_line_optional(&cursor, conditional));
+#ifdef OFFSETYYPE_OFFSET
         if (children[i] < 0)
             return NULL;
+#endif
         skip_whitespace(&cursor);
 
         if(*cursor != MULTILINESYM && i != sublines - 1)
@@ -755,8 +757,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             /* Recursively parsing a code argument */
             params[i].type = CODE;
             params[i].data.code = skin_buffer_to_offset(skin_parse_code_as_arg(&cursor));
+#ifdef OFFSETTYPE_OFFSET
             if(params[i].data.code < 0)
                 return 0;
+#endif
         }
         else if (tolower(type_code) == 't')
         {
@@ -874,8 +878,10 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     element->next = skin_buffer_to_offset(NULL);
     text = skin_alloc_string(length);
     element->data = skin_buffer_to_offset(text);
+#ifdef OFFSETTYPE_OFFSET
     if (element->data < 0)
         return 0;
+#endif
 
     for(dest = 0; dest < length; dest++)
     {
@@ -1026,8 +1032,10 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
                 cursor++;
             }
             children_array[i] = skin_buffer_to_offset(skin_parse_code_as_arg(&cursor));
+#ifdef OFFSETTYPE_OFFSET
             if (children_array[i] < 0)
                 return 0;
+#endif
             skip_whitespace(&cursor);
 #ifdef ROCKBOX
             if ((element->tag->flags&FEATURE_TAG) && feature_available)
