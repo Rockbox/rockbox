@@ -178,7 +178,7 @@ bool sysfs_get_string(const char *path, char *value, int size)
 }
 
 
-bool sysfs_set_string(const char *path, char *value)
+bool sysfs_set_string(const char *path, const char *value)
 {
     FILE *f = open_write(path);
     if(f == NULL)

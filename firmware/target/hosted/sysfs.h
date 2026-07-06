@@ -28,4 +28,4 @@ bool sysfs_set_int(const char *path, int value);
 bool sysfs_get_char(const char *path, char *value);
 bool sysfs_set_char(const char *path, char value);
 bool sysfs_get_string(const char *path, char *value, int size);
-bool sysfs_set_string(const char *path, char *value);
+bool sysfs_set_string(const char *path, const char *value);

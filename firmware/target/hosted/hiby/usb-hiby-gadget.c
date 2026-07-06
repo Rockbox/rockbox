@@ -65,6 +65,9 @@ void hiby_set_usb_mode(int mode) {
         usb_init_device();
     }
 
+    if (_usb_mode == mode)
+        return;
+
     switch(mode) {
     case USB_MODE_MASS_STORAGE:
         logf("Enabling Mass Storage\n");
@@ -73,6 +76,10 @@ void hiby_set_usb_mode(int mode) {
     case USB_MODE_CHARGE:
         logf("Enabling Charge\n");
         enable_charging();
+        break;
+    case USB_MODE_ADB:
+        logf("Enabling ADB\n");
+        enable_adb();
         break;
     default:
         break;
@@ -90,10 +97,28 @@ int usb_detect(void)
     return power_input_status() == POWER_INPUT_USB_CHARGER ? USB_INSERTED : USB_EXTRACTED;
 }
 
+static void set_mass_storage_lun(void)
+{
+    const char *device = "/dev/mmcblk0p1";
+
+    // If partition 1 doesn't exist we'll try the main device
+    if (access(device, F_OK) != 0)
+        device = "/dev/mmcblk0";
+
+    sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/functions/mass_storage.0/lun.0/file", device);
+}
+
 void usb_enable(bool on)
 {
     logf(">>>>>>>>>>>>>>>>> usb_enable(%d)\n", on);
     logf("usb enable %d %d\n", on, _usb_mode);
+
+    if (_usb_mode == USB_MODE_ADB)
+        return;
+
+    // Re-arm the LUN on each connect, otherwise the disk is only exported the first time.
+    if (on && _usb_mode == USB_MODE_MASS_STORAGE)
+        set_mass_storage_lun();
 
     sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/UDC",
                      on ? "13500000.otg_new" : "\n");
@@ -141,51 +166,49 @@ void enable_charging(void) {
     disable_adb();
 }
 
-#if 1
 void enable_adb(void) {
     logf(">>>>>>>>>>>>>>>>> set_adb()\n");
 
     // Disable mass storage if it was running
     disable_mass_storage();
 
-    // Remove any lingering adb daemon
-    system("killall -9 adbd");
+    // Remove any lingering adb daemon and its respawner
+    system("killall adbserver.sh adbd 2>/dev/null");
 
     system("mkdir -p /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/strings/0x409");
     system("mkdir -p /sys/kernel/config/usb_gadget/adb_demo/functions/ffs.adb");
+
+    // Use the adb VID/PID so the host recognises the device
+    sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/idVendor", "0x18d1");
+    sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/idProduct", "0xd002");
 
     // Now we'll override configuration and MaxPower
     sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/configs/c.1/strings/0x409/configuration", "adb");
     sysfs_set_int("/sys/kernel/config/usb_gadget/adb_demo/configs/c.1/MaxPower", 120);
 
     // And link up the adb function to the usb gadget config
-    system("ln -s /sys/kernel/config/usb_gadget/adb_demo/functions/ffs.adb /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/");
+    system("ln -sf /sys/kernel/config/usb_gadget/adb_demo/functions/ffs.adb /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/");
 
-    int is_mounted = !system("mountpoint -q /dev/usb-ffs/adb");
+    system("mkdir -p /dev/usb-ffs/adb");
 
-    if (!is_mounted) {
-        system("mkdir -p /dev/usb-ffs/adb");
-        /* This seems to fail, but adb will still work and then it will be mounted. Not sure what's up here... */
-        system("mount -t functionfs adb /dev/usb-ffs/adb");
-    }
-
-    // Boot adb daemon
-    system("/usr/bin/adbd &");
+    // Let the vendor respawner mount functionfs and run adbd, which binds the UDC.
+    system("/sbin/adbserver.sh 440 &");
 }
 
 
 void disable_adb(void) {
-    // Remove any lingering adb daemon
-    system("killall -9 adbd");
+    // Remove any lingering adb daemon and its respawner
+    system("killall adbserver.sh adbd 2>/dev/null");
 
-    // Remove the adb link to config
-    if (access("/sys/kernel/config/usb_gadget/adb_demo/configs/c.1/ffs.adb", F_OK) == 0) {
-        system("rm /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/ffs.adb");
+    // Unbind the UDC so the gadget can be reconfigured
+    if (access("/sys/kernel/config/usb_gadget/adb_demo/UDC", F_OK) == 0) {
+        sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/UDC", "\n");
     }
 
-    // Remove the adb function
-    if (access("/sys/kernel/config/usb_gadget/adb_demo/functions/ffs.adb", F_OK) == 0) {
-        system("rm -rf /sys/kernel/config/usb_gadget/adb_demo/functions/ffs.adb");
+    // Unlink the adb function from config (the function is left in place and
+    // reused, so re-creating it in enable_adb can't block)
+    if (access("/sys/kernel/config/usb_gadget/adb_demo/configs/c.1/ffs.adb", F_OK) == 0) {
+        system("rm /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/ffs.adb");
     }
 
     // Reset the MaxPower to its default value
@@ -200,13 +223,9 @@ void disable_adb(void) {
 
     // Unmount adb
     if (!system("mountpoint -q /dev/usb-ffs/adb")) {
-        system("unmount /dev/usb-ffs/adb");
+        system("umount -l /dev/usb-ffs/adb");
     }
 }
-#else
-void enable_adb(void) {}
-void disable_adb(void) {}
-#endif
 
 void enable_mass_storage(void) {
     logf(">>>>>>>>>>>>>>>>> set_mass_storage()\n");
@@ -226,15 +245,7 @@ void enable_mass_storage(void) {
 
     system("ln -s /sys/kernel/config/usb_gadget/adb_demo/functions/mass_storage.0 /sys/kernel/config/usb_gadget/adb_demo/configs/c.1/");
 
-    char mount_device[32] = "/dev/mmcblk0p1";
-
-    // If partition 1 doesn't exist we'll try the main device
-    if (access(mount_device, F_OK) != 0) {
-        memset(mount_device, 0, sizeof(mount_device));
-        strcpy(mount_device, "/dev/mmcblk0");
-    }
-
-    sysfs_set_string("/sys/kernel/config/usb_gadget/adb_demo/functions/mass_storage.0/lun.0/file", mount_device);
+    set_mass_storage_lun();
 }
 
 void disable_mass_storage(void) {
