@@ -512,75 +512,36 @@ QString Utils::resolveMountPoint(QString device)
 QStringList Utils::mountpoints(enum MountpointsFilter type)
 {
     QStringList supported;
-    QStringList tempList;
+    QStringList paths;
+
+    // Note: QStorageInfo::fileSystemType() result is platform-dependant!
 #if defined(Q_OS_WIN32)
-    supported << "FAT32" << "FAT16" << "FAT12" << "FAT" << "HFS";
-    QFileInfoList list = QDir::drives();
-    for(int i=0; i<list.size();i++)
-    {
-        wchar_t t[32];
-        memset(t, 0, sizeof(t));
-        if(GetVolumeInformationW((LPCWSTR)list.at(i).absolutePath().utf16(),
-                NULL, 0, NULL, NULL, NULL, t, 32) == 0) {
-            // on error empty retrieved type -- don't rely on
-            // GetVolumeInformation not changing it.
-            memset(t, 0, sizeof(t));
-        }
-
-        QString fstype = QString::fromWCharArray(t);
-        if(type == MountpointsAll || supported.contains(fstype)) {
-            tempList << list.at(i).absolutePath();
-            LOG_INFO() << "Added:" << list.at(i).absolutePath()
-                     << "type" << fstype;
-        }
-        else {
-            LOG_INFO() << "Ignored:" << list.at(i).absolutePath()
-                     << "type" << fstype;
-        }
-    }
-
+    supported = {"FAT32", "FAT16", "FAT12", "FAT", "HFS"};
 #elif defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
-    supported << "vfat" << "msdos" << "hfs";
-    int num;
-    struct statfs *mntinf;
-
-    num = getmntinfo(&mntinf, MNT_WAIT);
-    while(num--) {
-        if(type == MountpointsAll || supported.contains(mntinf->f_fstypename)) {
-            tempList << QString(mntinf->f_mntonname);
-            LOG_INFO() << "Added:" << mntinf->f_mntonname
-                     << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
-        }
-        else {
-            LOG_INFO() << "Ignored:" << mntinf->f_mntonname
-                     << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
-        }
-        mntinf++;
-    }
+    supported = {"vfat", "msdos", "hfs"}; // vfat might not be needed
 #elif defined(Q_OS_LINUX)
-    supported << "vfat" << "msdos" << "hfsplus";
-    FILE *mn = setmntent("/etc/mtab", "r");
-    if(!mn)
-        return QStringList("");
-
-    struct mntent *ent;
-    while((ent = getmntent(mn))) {
-        if(type == MountpointsAll || supported.contains(ent->mnt_type)) {
-            tempList << QString(ent->mnt_dir);
-            LOG_INFO() << "Added:" << ent->mnt_dir
-                     << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
-        }
-        else {
-            LOG_INFO() << "Ignored:" << ent->mnt_dir
-                     << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
-        }
-    }
-    endmntent(mn);
-
+    supported = {"vfat", "msdos", "hfsplus"}; // hfs might be needed, too
 #else
 #error Unknown Platform
 #endif
-    return tempList;
+
+    for (const QStorageInfo &storage : QStorageInfo::mountedVolumes()) {
+        if (!storage.isValid() || storage.isReadOnly()) {
+            continue;
+        }
+
+        QString fsType = QString::fromLocal8Bit(storage.fileSystemType());
+        QString rootPath = storage.rootPath();
+
+        if (type == MountpointsAll || supported.contains(fsType, Qt::CaseInsensitive)) {
+            paths << rootPath;
+            LOG_INFO() << "Added:" << rootPath << "type" << fsType;
+        } else {
+            LOG_INFO() << "Ignored:" << rootPath << "type" << fsType;
+        }
+    }
+
+    return paths;
 }
 
 
