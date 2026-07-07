@@ -48,7 +48,7 @@ enable_testing()
 find_package(QT NAMES Qt6 REQUIRED)
     find_package(Qt6 REQUIRED COMPONENTS
                  Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
-                 OPTIONAL_COMPONENTS Multimedia Test)
+                 OPTIONAL_COMPONENTS Multimedia Test TextToSpeech)
 	       ## note Core5Compat is only needed for QuaZip
 get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
 get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
@@ -57,6 +57,11 @@ if (TARGET Qt${QT_VERSION_MAJOR}::Multimedia)
   message("-- Found Qt::Multimedia")
 else()
   message("-- QT::Multimedia not found, TTS preview not available")
+endif()
+if (TARGET Qt${QT_VERSION_MAJOR}::TextToSpeech)
+  message("-- Found Qt::TextToSpeech")
+else()
+  message("-- QT::TextToSpeech not found, Qt TTS not available")
 endif()
 
 add_compile_definitions(QT_NO_USE_NODISCARD_FILE_OPEN)

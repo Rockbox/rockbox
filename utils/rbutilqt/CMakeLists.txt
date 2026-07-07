@@ -242,11 +242,20 @@ add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/base/ziputil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/ziputil.h
     )
-
 if(APPLE)
     target_sources(rbbase PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/base/ttscarbon.cpp
         ${CMAKE_CURRENT_LIST_DIR}/base/ttscarbon.h)
+endif()
+
+if (TARGET Qt${QT_VERSION_MAJOR}::TextToSpeech AND TARGET Qt${QT_VERSION_MAJOR}::Multimedia)
+    target_sources(rbbase PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/base/ttsqt.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/base/ttsqt.h)
+    target_link_libraries(rbbase
+        Qt${QT_VERSION_MAJOR}::TextToSpeech)
+    target_link_libraries(rbbase
+        Qt${QT_VERSION_MAJOR}::Multimedia)
 endif()
 
 target_link_libraries(rbbase

@@ -31,6 +31,9 @@
 #if defined(Q_OS_MACOS)
 #include "ttscarbon.h"
 #endif
+#if defined(QT_TEXTTOSPEECH_LIB) && defined(QT_MULTIMEDIA_LIB)
+#include "ttsqt.h"
+#endif
 
 // list of tts names and identifiers
 QMap<QString,QString> TTSBase::ttsList;
@@ -59,6 +62,9 @@ void TTSBase::initTTSList()
 #if defined(Q_OS_MACOS)
     ttsList["carbon"] = tr("OS X System Engine");
 #endif
+#if defined(QT_TEXTTOSPEECH_LIB) && defined(QT_MULTIMEDIA_LIB)
+    ttsList["qt"] = tr("Qt TextToSpeech Engine");
+#endif
 }
 
 // function to get a specific encoder
@@ -79,6 +85,11 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
 #elif defined(Q_OS_MACOS)
     if(ttsName == "carbon")
         tts = new TTSCarbon(parent);
+    else
+#endif
+#if defined(QT_TEXTTOSPEECH_LIB) && defined(QT_MULTIMEDIA_LIB)
+    if(ttsName == "qt")
+        tts = new TTSQt(parent);
     else
 #endif
     if(ttsName == "espeak")
