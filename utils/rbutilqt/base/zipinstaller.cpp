@@ -145,7 +145,7 @@ void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
         // cluster sizes on the player).
         if((qint64)Utils::filesystemFree(m_mountpoint)
                 < (zip.totalUncompressedSize(
-                       Utils::filesystemSize(m_mountpoint, Utils::FilesystemClusterSize))
+                       Utils::filesystemClusterSize(m_mountpoint))
                         + 1000000)) {
             emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
             emit logProgress(1, 1);

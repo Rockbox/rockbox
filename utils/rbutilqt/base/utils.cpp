@@ -158,7 +158,12 @@ QString Utils::filesystemName(const QString &path)
 //! @return size in bytes
 qulonglong Utils::filesystemFree(QString path)
 {
-    qulonglong size = filesystemSize(path, FilesystemFree);
+    QStorageInfo storage(path);
+    if (!storage.isValid()) {
+        return 0;
+    }
+
+    qulonglong size = storage.bytesAvailable();
     LOG_INFO() << "free disk space for" << path << size;
     return size;
 }
@@ -166,59 +171,33 @@ qulonglong Utils::filesystemFree(QString path)
 
 qulonglong Utils::filesystemTotal(QString path)
 {
-    qulonglong size = filesystemSize(path, FilesystemTotal);
+    QStorageInfo storage(path);
+    if (!storage.isValid()) {
+        return 0;
+    }
+
+    qulonglong size = storage.bytesTotal();
     LOG_INFO() << "total disk space for" << path << size;
     return size;
 }
 
 
-qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
+qulonglong Utils::filesystemClusterSize(QString path)
 {
     qulonglong size = 0;
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
-    // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
-    int ret;
-
-    ret = statvfs(qPrintable(path), &fs);
-
-    if(ret == 0) {
-        if(type == FilesystemFree) {
-            size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_bavail;
-        }
-        if(type == FilesystemTotal) {
-            size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_blocks;
-        }
-        if(type == FilesystemClusterSize) {
-            size = (qulonglong)fs.f_frsize;
-        }
+    if (statvfs(qPrintable(path), &fs) == 0) {
+        size = (qulonglong)fs.f_frsize;
     }
-#endif
-#if defined(Q_OS_WIN32)
-    BOOL ret;
-    ULARGE_INTEGER freeAvailBytes;
-    ULARGE_INTEGER totalNumberBytes;
+#elif defined(Q_OS_WIN32)
+    DWORD sectorsPerCluster;
+    DWORD bytesPerSector;
+    DWORD dummy;
 
-    ret = GetDiskFreeSpaceExW((LPCTSTR)path.utf16(), &freeAvailBytes,
-            &totalNumberBytes, NULL);
-    if(ret) {
-        if(type == FilesystemFree) {
-            size = freeAvailBytes.QuadPart;
-        }
-        if(type == FilesystemTotal) {
-            size = totalNumberBytes.QuadPart;
-        }
-        if(type == FilesystemClusterSize) {
-            DWORD sectorsPerCluster;
-            DWORD bytesPerSector;
-            DWORD freeClusters;
-            DWORD totalClusters;
-            ret = GetDiskFreeSpaceW((LPCTSTR)path.utf16(), &sectorsPerCluster,
-                    &bytesPerSector, &freeClusters, &totalClusters);
-            if(ret) {
-                size = bytesPerSector * sectorsPerCluster;
-            }
-        }
+    if (GetDiskFreeSpaceW((LPCWSTR)path.utf16(), &sectorsPerCluster,
+                          &bytesPerSector, &dummy, &dummy)) {
+        size = bytesPerSector * sectorsPerCluster;
     }
 #endif
     return size;

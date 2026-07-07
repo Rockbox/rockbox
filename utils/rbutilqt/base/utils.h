@@ -45,7 +45,7 @@ public:
     static QString resolvePathCase(QString path);
     static qulonglong filesystemFree(QString path);
     static qulonglong filesystemTotal(QString path);
-    static qulonglong filesystemSize(QString path, enum Size type);
+    static qulonglong filesystemClusterSize(QString path);
     static QString filesystemType(QString path);
     static QString findExecutable(QString name);
     static QString checkEnvironment(bool permission);
