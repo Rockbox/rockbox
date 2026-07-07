@@ -30,6 +30,7 @@
 #include <QtCore>
 #include <QDebug>
 #include <QStorageInfo>
+#include <QDirIterator>
 #include <cstdlib>
 #include <stdio.h>
 
@@ -963,13 +964,10 @@ bool Utils::ejectDevice(const QString &device)
 qint64 Utils::recursiveFolderSize(QString path)
 {
     qint64 size = 0;
-    QList<QFileInfo> items = QDir(path).entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for (const auto &item: std::as_const(items)) {
-        size += item.size();
-    }
-    QList<QString> folders = QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for (auto const& folder: std::as_const(folders)) {
-        size += recursiveFolderSize(path + "/" + folder);
+    QDirIterator it(path, QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        it.next();
+        size += it.fileInfo().size();
     }
     return size;
 }
