@@ -30,6 +30,7 @@
 #include <QtCore>
 #include <QDebug>
 #include <QStorageInfo>
+#include <QStandardPaths>
 #include <QDirIterator>
 #include <cstdlib>
 #include <stdio.h>
@@ -259,26 +260,10 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 //! \brief searches for a Executable in the Environement Path
 QString Utils::findExecutable(QString name)
 {
-    //try autodetect tts
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
-    QStringList path = QString(getenv("PATH")).split(":", Qt::SkipEmptyParts);
-#elif defined(Q_OS_WIN)
-    QStringList path = QString(getenv("PATH")).split(";", Qt::SkipEmptyParts);
-#endif
-    LOG_INFO() << "system path:" << path;
-    for(int i = 0; i < path.size(); i++)
-    {
-        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
-#if defined(Q_OS_WIN)
-        executable += ".exe";
-        QStringList ex = executable.split("\"", Qt::SkipEmptyParts);
-        executable = ex.join("");
-#endif
-        if(QFileInfo(executable).isExecutable())
-        {
-            LOG_INFO() << "findExecutable: found" << executable;
-            return QDir::toNativeSeparators(executable);
-        }
+    QString executable = QStandardPaths::findExecutable(name);
+    if (!executable.isEmpty()) {
+        LOG_INFO() << "findExecutable: found" << executable;
+        return QDir::toNativeSeparators(executable);
     }
     LOG_INFO() << "findExecutable: could not find" << name;
     return "";
