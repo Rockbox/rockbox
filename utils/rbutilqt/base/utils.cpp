@@ -135,45 +135,12 @@ QString Utils::resolvePathCase(QString path)
 
 QString Utils::filesystemType(QString path)
 {
-#if defined(Q_OS_LINUX)
-    FILE *mn = setmntent("/etc/mtab", "r");
-    if(!mn)
-        return QString("");
-
-    struct mntent *ent;
-    while((ent = getmntent(mn))) {
-        if(QString(ent->mnt_dir) == path) {
-            endmntent(mn);
-            LOG_INFO() << "device type is" << ent->mnt_type;
-            return QString(ent->mnt_type);
-        }
+    QStorageInfo storage(path);
+    if (storage.isValid()) {
+        QString fsType = QString::fromLocal8Bit(storage.fileSystemType());
+        LOG_INFO() << "device type is" << fsType;
+        return fsType;
     }
-    endmntent(mn);
-#endif
-
-#if defined(Q_OS_MACOS) || defined(Q_OS_OPENBSD)
-    int num;
-    struct statfs *mntinf;
-
-    num = getmntinfo(&mntinf, MNT_WAIT);
-    while(num--) {
-        if(QString(mntinf->f_mntonname) == path) {
-            LOG_INFO() << "device type is" << mntinf->f_fstypename;
-            return QString(mntinf->f_fstypename);
-        }
-        mntinf++;
-    }
-#endif
-
-#if defined(Q_OS_WIN32)
-    wchar_t t[64];
-    memset(t, 0, 32);
-    if(GetVolumeInformationW((LPCWSTR)path.utf16(),
-                             NULL, 0, NULL, NULL, NULL, t, 64)) {
-        LOG_INFO() << "device type is" << t;
-        return QString::fromWCharArray(t);
-    }
-#endif
     return QString("-");
 }
 
