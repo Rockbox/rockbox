@@ -75,11 +75,25 @@ environment and how to upload a change you have made for review.
 We strongly prefer that you don't submit patches to the bug tracker,
 as it's much harder to read and discuss them there.
 
-Credits
--------
-We believe in crediting all contributors by name. Before committing a patch to
-Git, we ask that you give us your full real name (no pseudonyms or nicknames)
-for adding to the credits list.
+Real Names
+----------
+Rockbox has the policy that all contributors must supply their real name.
+This includes any code or manual change committed to Git, any contribution
+to the documentation in the Rockbox wiki, and any themes uploaded to the
+official theme site.  Contributors are also credited in our documentation.
+
+There are several reasons for this, but ultimately they come down to
+protecting Rockbox (as an ongoing project) and its individual
+contributors from legal risks.  These risks are not theoretical; in the
+past we have received legal nastygrams accusing us of misappropriating
+private/proprietary code or other IP, forcing us to prove where certain
+contributions had come from.
+
+Contributions without your full real name will be rejected.
+
+For a more in-depth explanation, please read:
+
+  https://www.rockbox.org/wiki/WhyRealNames
 
 Generative AI
 -------------
@@ -92,8 +106,7 @@ Code is of no value to Rockbox if it is not maintainable, and it cannot
 be maintained if it is not understood.  Quality is more important than
 quantity.
 
-If you really *must* submit AI-generated code, you will need to include
-prompt provenance including the model used, dates and full content of
-prompts, and the unedited LLM output.  See the article "Track Prompt
-Provenance in Version Control" at https://medium.com/@psluaces/track-prompt-provenance-in-version-control-8746e2bad3c2)
-by Pablo Santos Luaces.
+If you really *must* submit AI-generated code, you must also document
+its provenance including the tools/models used, structure the commits in
+a logical, consistent manner, and be prepared to justify every code
+change.
