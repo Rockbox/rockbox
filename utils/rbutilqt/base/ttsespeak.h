@@ -33,8 +33,15 @@ class TTSEspeak : public TTSExes
             m_name = "espeak";
 
             /* default to espeak */
-            m_TTSTemplate = "\"%exe\" %options -w \"%wavfile\" -- \"%text\"";
-            m_TTSSpeakTemplate = "\"%exe\" %options -- \"%text\"";
+            m_TTSTemplate << "%options";
+            m_TTSTemplate << "-w";
+            m_TTSTemplate << "%wavfile";
+            m_TTSTemplate << "--";
+            m_TTSTemplate << "%text";
+            m_TTSSpeakTemplate << "%options";
+            m_TTSSpeakTemplate << "--";
+            m_TTSSpeakTemplate << "%text";
+
             m_capabilities = TTSBase::CanSpeak;
         }
 };

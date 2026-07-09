@@ -50,8 +50,8 @@ class TTSExes : public TTSBase
         void loadSettings(void);
 
     protected:
-        QString m_TTSTemplate;
-        QString m_TTSSpeakTemplate;
+        QStringList m_TTSTemplate;
+        QStringList m_TTSSpeakTemplate;
         QString m_name;
         QString m_TTSexec;
         QString m_TTSOpts;

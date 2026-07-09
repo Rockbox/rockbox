@@ -24,13 +24,9 @@
 
 TTSExes::TTSExes(QObject* parent) : TTSBase(parent)
 {
-    /* default to espeak */
-    m_name = "espeak";
-    m_capabilities = TTSBase::CanSpeak;
-    m_TTSTemplate = "\"%exe\" %options -w \"%wavfile\" -- \"%text\"";
-    m_TTSSpeakTemplate = "\"%exe\" %options -- \"%text\"";
+    m_name = "false";
+    m_capabilities = TTSBase::None;
 }
-
 
 TTSBase::Capabilities TTSExes::capabilities()
 {
@@ -83,14 +79,14 @@ bool TTSExes::start(QString *errStr)
 TTSStatus TTSExes::voice(const QString& text, const QString& wavfile, QString *errStr)
 {
     (void) errStr;
-    QString execstring;
+    QStringList exec;
     if(wavfile.isEmpty() && m_capabilities & TTSBase::CanSpeak) {
         if(m_TTSSpeakTemplate.isEmpty()) {
             LOG_ERROR() << "internal error: TTS announces CanSpeak "
                            "but template empty!";
             return FatalError;
         }
-        execstring = m_TTSSpeakTemplate;
+        exec = m_TTSSpeakTemplate;
     }
     else if(wavfile.isEmpty()) {
         LOG_ERROR() << "no output file passed to voice() "
@@ -98,15 +94,19 @@ TTSStatus TTSExes::voice(const QString& text, const QString& wavfile, QString *e
         return FatalError;
     }
     else {
-        execstring = m_TTSTemplate;
+        exec = m_TTSTemplate;
     }
 
-    execstring.replace("%exe",m_TTSexec);
-    execstring.replace("%options",m_TTSOpts);
-    execstring.replace("%wavfile",wavfile);
-    execstring.replace("%text",text);
+    exec.replaceInStrings("%options",m_TTSOpts);
+    exec.replaceInStrings("%wavfile",wavfile);
+    exec.replaceInStrings("%text",text);
 
-    QProcess::execute(execstring);
+    int ret;
+    if ((ret = QProcess::execute(m_TTSexec, exec))) {
+        LOG_ERROR() << "TTS exec failed (" << ret << "): " << m_TTSexec << " " << exec;
+
+        return FatalError;
+    }
 
     if(!wavfile.isEmpty() && !QFileInfo(wavfile).isFile()) {
         LOG_ERROR() << "output file does not exist:" << wavfile;
@@ -124,4 +124,3 @@ bool TTSExes::configOk()
     else
         return false;
 }
-

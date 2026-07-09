@@ -31,8 +31,14 @@ class TTSSwift : public TTSExes
         TTSSwift(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "swift";
-            m_TTSTemplate = "\"%exe\" %options -o \"%wavfile\" -- \"%text\"";
-            m_TTSSpeakTemplate = "";
+
+            m_TTSTemplate << "%options";
+            m_TTSTemplate << "-o";
+            m_TTSTemplate << "%wavfile";
+            m_TTSTemplate << "--";
+            m_TTSTemplate << "%text";
+            //m_TTSSpeakTemplate << "";
+
             m_capabilities = TTSBase::None;
         }
 };

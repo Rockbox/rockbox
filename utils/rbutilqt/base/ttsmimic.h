@@ -32,8 +32,15 @@ class TTSMimic : public TTSExes
         {
             m_name = "mimic";
 
-            m_TTSTemplate = "\"%exe\" %options -o \"%wavfile\" -t \"%text\"";
-            m_TTSSpeakTemplate = "\"%exe\" %options -t \"%text\"";
+            m_TTSTemplate << "%options";
+            m_TTSTemplate << "-o";
+            m_TTSTemplate << "%wavfile";
+            m_TTSTemplate << "-t";
+            m_TTSTemplate << "%text";
+            m_TTSSpeakTemplate << "%options";
+            m_TTSSpeakTemplate << "-t";
+            m_TTSSpeakTemplate << "%text";
+
             m_capabilities = TTSBase::CanSpeak;
         }
 };

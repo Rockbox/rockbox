@@ -67,8 +67,8 @@ class TTSSapi : public TTSBase
         bool m_started;
 
     protected:
-        QString m_TTSTemplate;
-        QString m_TTSVoiceTemplate;
+        QStringList m_TTSTemplate;
+        QStringList m_TTSVoiceTemplate;
         QString m_TTSType;
 };
 

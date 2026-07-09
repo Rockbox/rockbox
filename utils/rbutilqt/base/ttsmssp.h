@@ -30,14 +30,10 @@ class TTSMssp: public TTSSapi
     public:
         TTSMssp(QObject* parent=nullptr) : TTSSapi(parent)
         {
-            m_TTSTemplate = "cscript //nologo \"%exe\" "
-                "/language:%lang /voice:\"%voice\" "
-                "/speed:%speed \"%options\" /mssp";
-            m_TTSVoiceTemplate = "cscript //nologo \"%exe\" "
-                "/language:%lang /listvoices /mssp";
+            m_TTSTemplate << "/mssp";
+            m_TTSVoiceTemplate << "/mssp";
             m_TTSType = "mssp";
         }
-
 };
 
 #endif
