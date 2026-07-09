@@ -21,7 +21,6 @@
 
 #include "ttsfestival.h"
 #include "ttssapi.h"
-#include "ttssapi4.h"
 #include "ttsmssp.h"
 #include "ttsexes.h"
 #include "ttsespeak.h"
@@ -51,9 +50,6 @@ void TTSBase::initTTSList()
     ttsList["flite"] = tr("Flite TTS Engine");
     ttsList["swift"] = tr("Swift TTS Engine");
 #if defined(Q_OS_WIN)
-#if 0 /* SAPI4 has been disabled since long. Keep support for now. */
-    ttsList["sapi4"] = tr("SAPI4 TTS Engine");
-#endif
     ttsList["sapi"] = tr("SAPI5 TTS Engine");
     ttsList["mssp"] = tr("MS Speech Platform");
 #endif
@@ -73,8 +69,6 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
 #if defined(Q_OS_WIN)
     if(ttsName == "sapi")
         tts = new TTSSapi(parent);
-    else if (ttsName == "sapi4")
-        tts = new TTSSapi4(parent);
     else if (ttsName == "mssp")
         tts = new TTSMssp(parent);
     else

@@ -230,7 +230,6 @@ add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/base/ttsmssp.h
     ${CMAKE_CURRENT_LIST_DIR}/base/ttssapi.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/ttssapi.h
-    ${CMAKE_CURRENT_LIST_DIR}/base/ttssapi4.h
     ${CMAKE_CURRENT_LIST_DIR}/base/ttsswift.h
     ${CMAKE_CURRENT_LIST_DIR}/base/uninstall.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/uninstall.h
