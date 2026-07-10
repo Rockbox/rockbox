@@ -29,6 +29,8 @@
 #include <QtTextToSpeech/QTextToSpeech>
 #include <QtMultimedia/QAudioFormat>
 
+#include "Logger.h"
+
 TTSQt::TTSQt(QObject *parent) : TTSBase(parent)
 {
     m_tts = new QTextToSpeech(this);
@@ -48,12 +50,6 @@ TTSStatus TTSQt::voice(const QString& text, const QString& wavfile, QString* err
     if (text.isEmpty()) {
         if (errStr) *errStr = "Input text is empty";
         return Warning;
-    }
-
-    // Check if the current engine supports synthesis (requires Qt 6.6+)
-    if (!wavfile.isEmpty() && !(m_tts->engineCapabilities() & QTextToSpeech::Capability::Synthesize)) {
-        if (errStr) *errStr = "Current TTS engine does not support synthesis to file";
-        return FatalError;
     }
 
     QEventLoop loop;
@@ -131,6 +127,17 @@ bool TTSQt::start(QString *errStr)
         if (errStr) *errStr = "No TTS engines available on this system";
         return false;
     }
+
+    // XXX figure out the "best" engine.  Ignore 'mock' and
+    // any anything that doesn't support file output!
+
+    if (!(m_tts->engineCapabilities() & QTextToSpeech::Capability::Synthesize)) {
+        LOG_ERROR() << "QT TTS engine '" << m_tts->engine() << " does not support synthesis to file";
+        return false;
+    }
+
+    LOG_INFO() << "QT TTS engine: " << m_tts->engine();
+
     return true;
 }
 
