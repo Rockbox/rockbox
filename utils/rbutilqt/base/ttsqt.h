@@ -46,6 +46,7 @@ private:
     QTextToSpeech *m_tts = nullptr;
     QByteArray m_audioData;
     QAudioFormat m_format;
+    QStringList m_engines;
 
     // Helper to write raw PCM data to a WAV file
     bool writeWavFile(const QString &filePath, const QByteArray &audioData, const QAudioFormat &format);

@@ -74,8 +74,7 @@ TTSStatus TTSQt::voice(const QString& text, const QString& wavfile, QString* err
 
     if (wavfile.isEmpty()) {
         m_tts->say(text);
-    }
-    else {
+    } else {
         m_audioData.clear();
         m_format = QAudioFormat();
 
@@ -128,13 +127,22 @@ bool TTSQt::start(QString *errStr)
         return false;
     }
 
-    // XXX figure out the "best" engine.  Ignore 'mock' and
-    // any anything that doesn't support file output!
+    /* Build list of engines that support synthesis (ie not just "speaking") */
+    for (const QString &str : m_tts->availableEngines()) {
+        if (str == "mock")
+            continue;
+        m_tts->setEngine(str);
+        if (m_tts->engineCapabilities() & QTextToSpeech::Capability::Synthesize)
+            m_engines << str;
+    }
 
-    if (!(m_tts->engineCapabilities() & QTextToSpeech::Capability::Synthesize)) {
-        LOG_ERROR() << "QT TTS engine '" << m_tts->engine() << " does not support synthesis to file";
+    if (m_engines.isEmpty()) {
+        if (errStr) *errStr = "No TTS suitable engines available on this system";
         return false;
     }
+
+    /* Default to first suitable engine */
+    m_tts->setEngine(m_engines.at(0));
 
     LOG_INFO() << "QT TTS engine: " << m_tts->engine();
 
@@ -161,7 +169,7 @@ bool TTSQt::configOk()
 
 void TTSQt::generateSettings()
 {
-    // TODO
+    // TODO -- enumerate engines (m_engines), locale, and voice lists.
 }
 
 void TTSQt::saveSettings()
@@ -171,7 +179,12 @@ void TTSQt::saveSettings()
 
 TTSBase::Capabilities TTSQt::capabilities()
 {
-    return TTSBase::CanSpeak | TTSBase::RunInParallel;
+    TTSBase::Capabilities caps = TTSBase::RunInParallel;
+
+    if (m_tts->engineCapabilities() & QTextToSpeech::Capability::Speak)
+        caps |= TTSBase::CanSpeak;
+
+    return caps;
 }
 
 bool TTSQt::writeWavFile(const QString &filePath, const QByteArray &audioData, const QAudioFormat &format)
