@@ -46,7 +46,7 @@ enable_testing()
 
 # Qt
 find_package(QT NAMES Qt6 REQUIRED)
-    find_package(Qt6 REQUIRED COMPONENTS
+    find_package(Qt6 6.6 REQUIRED COMPONENTS
                  Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
                  OPTIONAL_COMPONENTS Multimedia Test TextToSpeech)
 	       ## note Core5Compat is only needed for QuaZip
