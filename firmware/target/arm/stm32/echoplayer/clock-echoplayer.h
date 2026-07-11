@@ -24,9 +24,9 @@
 
 void echoplayer_clock_init(void) INIT_ATTR;
 
-extern struct stm32_clock sdmmc1_ker_clock;
-extern struct stm32_clock ltdc_ker_clock;
-extern struct stm32_clock spi5_ker_clock;
-extern struct stm32_clock i2c1_ker_clock;
+extern const struct stm32_clock sdmmc1_ker_clock;
+extern const struct stm32_clock ltdc_ker_clock;
+extern const struct stm32_clock spi5_ker_clock;
+extern const struct stm32_clock i2c1_ker_clock;
 
 #endif /* __CLOCK_ECHOPLAYER_H__ */
