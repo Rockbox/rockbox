@@ -70,7 +70,6 @@ class RbSettings : public QObject
             EncoderComplexity,
             TtsSpeed,
             CacheDisabled,
-            TtsUseSapi4,
             EncoderNarrowBand,
             EncoderQuality,
             EncoderVolume,

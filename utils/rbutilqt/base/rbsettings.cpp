@@ -74,7 +74,6 @@ const static struct {
     { RbSettings::EncoderPath,          ":encoder:/encoderpath",        "" },
     { RbSettings::EncoderOptions,       ":encoder:/encoderoptions",     "" },
     { RbSettings::CacheDisabled,        "cachedisable",         "false" },
-    { RbSettings::TtsUseSapi4,          "sapi/useSapi4",        "false" },
     { RbSettings::EncoderNarrowBand,    ":encoder:/narrowband", "false" },
     { RbSettings::WavtrimThreshold,     "wavtrimthreshold",     "500"},
     { RbSettings::TtsSpeed,             ":tts:/speed",          "175" },
