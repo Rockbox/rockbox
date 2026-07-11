@@ -29,7 +29,7 @@ if ... == nil then rb.splash(rb.HZ * 3, "use 'require'") end
     or you can provide your own function see below..
 -- sort_by can be by "name" "size" "date" or "none" to perform no sorting
     note: for "size" and "date" you may need to strip the attribute data to use
-    the returned filename
+    the returned filename e.g. string.match(file, "[^;]+")
 -- cancel_fn if not defined or not a function no user cancel otherwise supply
     your own cancel function which returns true to cancel searching for files
 -- f_t and d_t allow you to pass your own tables for re-use but isn't necessary
@@ -109,7 +109,7 @@ local function get_files(path, recurse, finddir, findfile, sort_by, cancel_fn, f
     if sort_by == "name" then
         sort_by_function = function(s1, s2) return s1 < s2 end
         filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
-                return string.format("%s%s%s;", path, sep, fname)
+                return string.format("%s%s%s", path, sep, fname)
         end
     elseif sort_by == "size" then
         filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
@@ -139,7 +139,7 @@ local function get_files(path, recurse, finddir, findfile, sort_by, cancel_fn, f
         end
     else -- "none"
         filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
-                return string.format("%s%s%s;", path, sep, fname)
+                return string.format("%s%s%s", path, sep, fname)
         end
     end
 
@@ -147,7 +147,7 @@ local function get_files(path, recurse, finddir, findfile, sort_by, cancel_fn, f
 
     for key,value in pairs(dirs) do
         --luadir.dir may error out so we need to do the call protected
-        -- _get_files(value, CANCEL_BUTTON)
+        -- _get_files(value)
         _, quit = pcall(_get_files, value)
 
         if quit == true or not recurse then
