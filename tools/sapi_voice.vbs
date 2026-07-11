@@ -285,6 +285,8 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h427)
         Case "magyar"
             LangIDs = Array(&h40e)
+        Case "moldoveneste"
+            LangIDs = Array(&h818)
         Case "nederlands"
             LangIDs = Array(&h413, &h813) ' Standard, Belgian
         Case "norsk-nynorsk"
