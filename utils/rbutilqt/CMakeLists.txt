@@ -254,6 +254,12 @@ if(APPLE)
     )
 endif()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(RockboxUtility PRIVATE
+      $<$<COMPILE_LANGUAGE:CXX>:-Wno-c++20-extensions>
+    )
+endif()
+
 if (TARGET Qt${QT_VERSION_MAJOR}::TextToSpeech AND TARGET Qt${QT_VERSION_MAJOR}::Multimedia)
     target_sources(rbbase PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/base/ttsqt.cpp
