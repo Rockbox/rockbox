@@ -19,13 +19,16 @@
  ****************************************************************************/
 #include "system.h"
 #include "button.h"
+#include "nvic-arm.h"
 #include "gpio-stm32h7.h"
+#include "timer-stm32h7.h"
 #include "clock-echoplayer.h"
 #include "system-echoplayer.h"
 #include "regs/stm32h743/fmc.h"
 #include "regs/stm32h743/pwr.h"
 #include "regs/stm32h743/rcc.h"
 #include "regs/stm32h743/rtc.h"
+#include "regs/stm32h743/tim.h"
 #include "regs/cortex-m/cm_scb.h"
 
 #ifdef BOOTLOADER
@@ -251,6 +254,9 @@ void system_init(void)
 
     /* Disable RTC_OUT pin */
     echoplayer_set_rtcout_mode(ECHOPLAYER_RTCOUT_DISABLED);
+
+    /* Setup for timer API */
+    stm32h7_timer_init(ITA_TIM7, NVIC_IRQN_TIM7, &tim7_ker_clock);
 }
 
 void system_exception_wait(void)

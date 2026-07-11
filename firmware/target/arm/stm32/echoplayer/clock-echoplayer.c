@@ -211,3 +211,11 @@ const struct stm32_clock i2c1_ker_clock = {
     .lpen_reg = ITA_RCC_APB1LLPENR,
     .lpen_bit = BM_RCC_APB1LENR_I2C1EN,
 };
+
+const struct stm32_clock tim7_ker_clock = {
+    .frequency = TIMER_FREQ,
+    .en_reg = ITA_RCC_APB1LENR,
+    .en_bit = BM_RCC_APB1LENR_TIM7EN,
+    .lpen_reg = ITA_RCC_APB1LLPENR,
+    .lpen_bit = BM_RCC_APB1LENR_TIM7EN,
+};

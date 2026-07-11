@@ -17,17 +17,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __CLOCK_ECHOPLAYER_H__
-#define __CLOCK_ECHOPLAYER_H__
+#ifndef __TIMER_STM32H7_H__
+#define __TIMER_STM32H7_H__
 
-#include "clock-stm32h7.h"
+#include <stdint.h>
 
-void echoplayer_clock_init(void) INIT_ATTR;
+struct stm32_clock;
 
-extern const struct stm32_clock sdmmc1_ker_clock;
-extern const struct stm32_clock ltdc_ker_clock;
-extern const struct stm32_clock spi5_ker_clock;
-extern const struct stm32_clock i2c1_ker_clock;
-extern const struct stm32_clock tim7_ker_clock;
+void stm32h7_timer_init(uint32_t instance, int irq,
+                        const struct stm32_clock *clock);
+void stm32h7_timer_irq(void);
 
-#endif /* __CLOCK_ECHOPLAYER_H__ */
+#endif /* __TIMER_STM32H7_H__ */

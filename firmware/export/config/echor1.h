@@ -15,7 +15,7 @@
 #define CPU_FREQ            480000000
 
 #ifndef SIMULATOR
-#define TIMER_FREQ          STM32_HSE_FREQ
+#define TIMER_FREQ          (CPU_FREQ / 2)
 #endif
 
 /* Kernel defines */

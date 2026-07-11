@@ -50,13 +50,13 @@ __vectors_platform:
     .word   UIE                         /* [ 21] */
     .word   UIE                         /* [ 22] */
     .word   exti9_5_irq_handler         /* [ 23] EXTI5 to EXTI9 */
-    .word   UIE                         /* [ 24] */
-    .word   UIE                         /* [ 25] */
-    .word   UIE                         /* [ 26] */
-    .word   UIE                         /* [ 27] */
-    .word   UIE                         /* [ 28] */
-    .word   UIE                         /* [ 29] */
-    .word   UIE                         /* [ 30] */
+    .word   tim1_brk_irq_handler        /* [ 24] TIM1_BRK */
+    .word   tim1_up_irq_handler         /* [ 25] TIM1_UP */
+    .word   tim1_trg_irq_handler        /* [ 26] TIM1_TRG_COM */
+    .word   tim1_cc_irq_handler         /* [ 27] TIM1_CC */
+    .word   tim2_irq_handler            /* [ 28] TIM2 */
+    .word   tim3_irq_handler            /* [ 29] TIM3 */
+    .word   tim4_irq_handler            /* [ 30] TIM4 */
     .word   i2c1_irq_handler            /* [ 31] I2C1 event */
     .word   i2c1_irq_handler            /* [ 32] I2C1 error */
     .word   i2c2_irq_handler            /* [ 33] I2C2 event */
@@ -69,10 +69,10 @@ __vectors_platform:
     .word   exti15_10_irq_handler       /* [ 40] EXTI10 to EXTI15 */
     .word   UIE                         /* [ 41] */
     .word   UIE                         /* [ 42] */
-    .word   UIE                         /* [ 43] */
-    .word   UIE                         /* [ 44] */
-    .word   UIE                         /* [ 45] */
-    .word   UIE                         /* [ 46] */
+    .word   tim8_brk_tim12_irq_handler  /* [ 43] TIM8_BRK / TIM12 */
+    .word   tim8_up_tim13_irq_handler   /* [ 44] TIM8_UP / TIM13 */
+    .word   tim8_trg_tim14_irq_handler  /* [ 45] TIM8_TRG_COM / TIM14 */
+    .word   tim8_cc_irq_handler         /* [ 46] TIM8_CC */
     .word   dma1_ch7_irq_handler        /* [ 47] DMA1 Stream7 */
     .word   UIE                         /* [ 48] */
     .word   sdmmc1_irq_handler          /* [ 49] SDMMC1 */
@@ -80,8 +80,8 @@ __vectors_platform:
     .word   spi3_irq_handler            /* [ 51] SPI3 */
     .word   UIE                         /* [ 52] */
     .word   UIE                         /* [ 53] */
-    .word   UIE                         /* [ 54] */
-    .word   UIE                         /* [ 55] */
+    .word   tim6_dac_irq_handler        /* [ 54] TIM6 / DAC */
+    .word   tim7_irq_handler            /* [ 55] TIM7 */
     .word   dma2_ch0_irq_handler        /* [ 56] DMA2 Stream0 */
     .word   dma2_ch1_irq_handler        /* [ 57] DMA2 Stream1 */
     .word   dma2_ch2_irq_handler        /* [ 58] DMA2 Stream2 */
@@ -142,9 +142,9 @@ __vectors_platform:
     .word   UIE                         /* [113] */
     .word   sai3_irq_handler            /* [114] SAI3 */
     .word   UIE                         /* [115] */
-    .word   UIE                         /* [116] */
-    .word   UIE                         /* [117] */
-    .word   UIE                         /* [118] */
+    .word   tim15_irq_handler           /* [116] TIM15 */
+    .word   tim16_irq_handler           /* [117] TIM16 */
+    .word   tim17_irq_handler           /* [118] TIM17 */
     .word   UIE                         /* [119] */
     .word   UIE                         /* [120] */
     .word   UIE                         /* [121] */

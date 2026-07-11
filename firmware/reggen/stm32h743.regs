@@ -1757,3 +1757,283 @@ block ADC {
 ADC1 @ 0x40022000 : ADC
 ADC2 @ 0x40022100 : ADC
 ADC3 @ 0x58026000 : ADC
+
+block TIM {
+    CR1 @ 0x00 : reg {
+        -- 11 UIFREMAP
+        09 08 CKD
+        -- 07 ARPE
+        06 05 CMS
+        -- 04 DIR
+        -- 03 OPM
+        -- 02 URS
+        -- 01 UDIS
+        -- 00 CEN
+    }
+
+    CR2 @ 0x04 : reg {
+        23 20 MMS2
+        -- 18 OIS6
+        -- 16 OIS5
+        -- 14 OIS4
+        -- 13 OIS3N
+        -- 12 OIS3
+        -- 11 OIS2N
+        -- 10 OIS2
+        -- 09 OIS1N
+        -- 08 OIS1
+        -- 07 TI1S
+        06 04 MMS
+        -- 03 CCDS
+        -- 02 CCUS
+        -- 00 CCPC
+    }
+
+    SMCR @ 0x08 : reg {
+        21 20 TS_4_3
+        -- 16 SMS3
+        -- 15 ETP
+        -- 14 ECE
+        13 12 ETPS
+        11 08 ETF
+        -- 07 MSM
+        06 04 TS
+        02 00 SMS
+    }
+
+    DIER @ 0x0c : reg {
+        -- 14 TDE
+        -- 13 COMDE
+        -- 12 CC4DE
+        -- 11 CC3DE
+        -- 10 CC2DE
+        -- 09 CC1DE
+        -- 08 UDE
+        -- 07 BIE
+        -- 06 TIE
+        -- 05 COMIE
+        -- 04 CC4IE
+        -- 03 CC3IE
+        -- 02 CC2IE
+        -- 01 CC1IE
+        -- 00 UIE
+    }
+
+    SR @ 0x10 : reg {
+        -- 17 CC6IF
+        -- 16 CC5IF
+        -- 13 SBIF
+        -- 12 CC4OF
+        -- 11 CC3OF
+        -- 10 CC2OF
+        -- 09 CC1OF
+        -- 08 B2IF
+        -- 07 BIF
+        -- 06 TIF
+        -- 05 COMIF
+        -- 04 CC4IF
+        -- 03 CC3IF
+        -- 02 CC2IF
+        -- 01 CC1IF
+        -- 00 UIF
+    }
+
+    EGR @ 0x14 : reg {
+        -- 08 B2G
+        -- 07 BG
+        -- 06 TG
+        -- 05 COMG
+        -- 04 CC4G
+        -- 03 CC3G
+        -- 02 CC2G
+        -- 01 CC1G
+        -- 00 UG
+    }
+
+    CCMR1 @ 0x18 : reg {
+        09 08 CC2S
+        01 00 CC1S
+    }
+
+    CCMR1_IN @ 0x18 : reg {
+        15 12 IC2F
+        11 10 IC2PSC
+        09 08 CC2S
+        07 04 IC1F
+        03 02 IC1PSC
+        01 00 CC1S
+    }
+
+    CCMR1_OUT @ 0x18 : reg {
+        -- 24 OC2M3
+        -- 16 OC1M3
+        -- 15 OC2CE
+        14 12 OC2M
+        -- 11 OC2PE
+        -- 10 OC2FE
+        09 08 CC2S
+        -- 07 OC1CE
+        06 04 OC1M
+        -- 03 OC1PE
+        -- 02 OC1FE
+        01 00 CC1S
+    }
+
+    CCMR2 @ 0x1c : reg {
+        09 08 CC4S
+        01 00 CC3S
+    }
+
+    CCMR2_IN @ 0x1c : reg {
+        15 12 IC4F
+        11 10 IC4PSC
+        09 08 CC4S
+        07 04 IC3F
+        03 02 IC3PSC
+        01 00 CC3S
+    }
+
+    CCMR2_OUT @ 0x1c : reg {
+        -- 24 OC4M3
+        -- 16 OC3M3
+        -- 15 OC4CE
+        14 12 OC4M
+        -- 11 OC4PE
+        -- 10 OC4FE
+        09 08 CC4S
+        -- 07 OC3CE
+        06 04 OC3M
+        -- 03 OC3PE
+        -- 02 OC3FE
+        01 00 CC3S
+    }
+
+    CCER @ 0x20 : reg {
+        -- 21 CC6P
+        -- 20 CC6E
+        -- 17 CC5P
+        -- 16 CC5E
+        -- 15 CC4NP
+        -- 14 CC4NE
+        -- 13 CC4P
+        -- 12 CC4E
+        -- 11 CC3NP
+        -- 10 CC3NE
+        -- 09 CC3P
+        -- 08 CC3E
+        -- 07 CC2NP
+        -- 06 CC2NE
+        -- 05 CC2P
+        -- 04 CC2E
+        -- 03 CC1NP
+        -- 02 CC1NE
+        -- 01 CC1P
+        -- 00 CC1E
+    }
+
+    CNT @ 0x24 : reg {
+        -- 31 UIFCPY
+        15 00 CNT
+    }
+
+    CNT32 @ 0x24 : reg {
+        -- 31 UIFCPY
+        30 00 CNT
+    }
+
+    PSC @ 0x28 : reg
+    ARR @ 0x2c : reg
+    RCR @ 0x30 : reg
+
+    CCR1 @ 0x34 : reg
+    CCR2 @ 0x38 : reg
+    CCR3 @ 0x3c : reg
+    CCR4 @ 0x40 : reg
+
+    BDTR @ 0x44 : reg {
+        -- 25 BK2P
+        -- 24 BK2E
+        23 20 BK2F
+        19 16 BKF
+        -- 15 MOE
+        -- 14 AOE
+        -- 13 BKP
+        -- 12 BKE
+        -- 11 OSSR
+        -- 10 OSSI
+        09 08 LOCK
+        07 00 DTG
+    }
+
+    DCR @ 0x48 : reg {
+        12 08 DBL
+        04 00 DBA
+    }
+
+    DMAR @ 0x4c : reg
+
+    CCMR3_OUT @ 0x54 : reg {
+        -- 24 OC6M3
+        -- 16 OC5M3
+        -- 15 OC6CE
+        14 12 OC6M
+        -- 11 OC6PE
+        -- 10 OC6FE
+        -- 07 OC5CE
+        06 04 OC5M
+        -- 03 OC5PE
+        -- 02 OC5FE
+    }
+
+    CCR5 @ 0x58 : reg {
+        -- 31 GC5C3
+        -- 30 GC5C2
+        -- 29 GC5C1
+        15 00 CCR5
+    }
+
+    CCR6 @ 0x5c : reg
+
+    AF1 @ 0x60 : reg {
+        17 14 ETRSEL
+        -- 11 BKCMP2P
+        -- 10 BKCMP1P
+        -- 09 BKINP
+        -- 08 BKDFxBKxE // differs for TIM1/TIM8
+        -- 02 BKCMP2E
+        -- 01 BKCMP1E
+        -- 00 BKINE
+    }
+
+    AF2 @ 0x64 : reg {
+        -- 11 BK2CMP2P
+        -- 10 BK2CMP1P
+        -- 09 BK2INP
+        -- 08 BK2DFxBKxE // differs for TIM1/TIM8
+        -- 02 BK2CMP2E
+        -- 01 BK2CMP1E
+        -- 00 BK2INE
+    }
+
+    TISEL @ 0x68 : reg {
+        27 24 TI4SEL
+        19 16 TI3SEL
+        11 08 TI2SEL
+        03 00 TI1SEL
+    }
+}
+
+TIM17 @ 0x40014800 : TIM
+TIM16 @ 0x40014400 : TIM
+TIM15 @ 0x40014000 : TIM
+TIM8  @ 0x40010400 : TIM
+TIM1  @ 0x40010000 : TIM
+TIM14 @ 0x40002000 : TIM
+TIM13 @ 0x40001c00 : TIM
+TIM12 @ 0x40001800 : TIM
+TIM7  @ 0x40001400 : TIM
+TIM6  @ 0x40001000 : TIM
+TIM5  @ 0x40000c00 : TIM
+TIM4  @ 0x40000800 : TIM
+TIM3  @ 0x40000400 : TIM
+TIM2  @ 0x40000000 : TIM
