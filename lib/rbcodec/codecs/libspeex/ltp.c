@@ -813,7 +813,10 @@ spx_word32_t *cumul_gain
    }
    for (i=0;i<nsf;i++)
       res[i] = EXTRACT16(PSHR32(exc[i], SIG_SHIFT-1));
+#pragma gcc diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
    syn_percep_zero16(res, ak, awk1, awk2, res, nsf, p, stack);
+#pragma gcc diagnostic pop
    for (i=0;i<nsf;i++)
       target[i]=EXTRACT16(SATURATE(SUB32(EXTEND32(target[i]),EXTEND32(res[i])),32700));
    return start;
