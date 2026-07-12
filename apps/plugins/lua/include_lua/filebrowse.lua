@@ -89,13 +89,13 @@ function file_choose(dir, title, sort_by, descending)
 
         if not descending then
             for i = 1, #files do
-                -- only store file name .. strip attributes from end
-                table.insert(dirs, "\t" .. string.match(files[i], "[^;]+") or "?")
+                -- only store file name .. strip attributes from end and parent from beginning
+                table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
             end
         else
             for i = #files, 1, -1 do
-                -- only store file name .. strip attributes from end
-                table.insert(dirs, "\t" .. string.match(files[i], "[^;]+") or "?")
+                -- only store file name .. strip attributes from end and parent from beginning
+                table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
             end
         end
         for i=1, #files do files[i] = nil end -- empty table for reuse
@@ -112,7 +112,11 @@ function file_choose(dir, title, sort_by, descending)
         if item > 0 then
             dir = string.gsub(dirs[item], "%c+","")
             if not rb.dir_exists("/" .. dir) then
-                return dir
+                if (parentdir == "/") then
+                    return parentdir .. dir
+                else
+                    return parentdir .. "/" ..  dir
+                end
             end
         end
 
