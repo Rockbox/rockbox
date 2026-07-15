@@ -23,33 +23,9 @@
 #include "sound.h"
 #include "pmu-target.h"
 #include "i2c-s5l8702.h"
+#include "mikey-target.h"
 
 extern int rec_hw_ver;
-
-/* Mikey is the internal controller for jack microphone and/or
- * remote accessories.
- * TODO:
- *  - move to mikey-6g.c
- *  - detect jack accessory
- *  - support for remote buttons
- */
-unsigned char mikey_read(int address)
-{
-    unsigned char val;
-    i2c_read(0, 0x72, address, 1, &val);
-    return val;
-}
-
-int mikey_write(int address, unsigned char val)
-{
-    return i2c_write(0, 0x72, address, 1, &val);
-}
-
-void mikey_reset(void)
-{
-    mikey_write(0, 5);
-    mikey_write(1, 0x80);
-}
 
 #if INPUT_SRC_CAPS != 0
 #ifdef HAVE_RECORDING
@@ -60,12 +36,12 @@ void audio_enable_mic(bool enable)
 
     if (enable)
     {
-        mikey_write(0, 7);  /* raise voltage to polarize microphone */
+        mikey_set_mic_capture(true);   /* polarize mic, pause the remote */
         GPIOCMD = 0xe070f;  /* enable preamp */
     }
     else
     {
-        mikey_reset();      /* microphone line voltage = 0 */
+        mikey_set_mic_capture(false);
         GPIOCMD = 0xe070e;  /* disable preamp */
     }
 }

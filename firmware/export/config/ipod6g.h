@@ -262,6 +262,8 @@
 #ifndef LOGF_SERIAL
 #define IPOD_ACCESSORY_PROTOCOL
 #endif
+/* Inline earphone remote, decoded by the jack "Mikey" controller */
+#define HAVE_MIKEY_REMOTE
 #endif
 
 /* Define this if you can switch on/off the accessory power supply */
