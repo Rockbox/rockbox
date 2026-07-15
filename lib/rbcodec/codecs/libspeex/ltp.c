@@ -814,7 +814,9 @@ spx_word32_t *cumul_gain
    for (i=0;i<nsf;i++)
       res[i] = EXTRACT16(PSHR32(exc[i], SIG_SHIFT-1));
 #pragma GCC diagnostic push
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
    syn_percep_zero16(res, ak, awk1, awk2, res, nsf, p, stack);
 #pragma GCC diagnostic pop
    for (i=0;i<nsf;i++)
