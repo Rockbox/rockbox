@@ -86,6 +86,12 @@ void hiby_set_output(int ps)
 {
     if (!hw_init || muted) return;
 
+    // Default to headset if nothing was ever inserted; otherwise, R3 Pro II crashes on playback
+    if (ps == 0)
+    {
+        ps = last_ps > 0 ? last_ps : 2;
+    }
+
     if (last_ps != ps)
     {
         logf("set out %d/%d", ps, last_ps);
