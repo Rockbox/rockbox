@@ -3033,12 +3033,18 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
         track_event_flags = TEF_NONE;
         ff_rw_mode = false;
 
+        /*
+         * When restarting playback or resuming from a paused state,
+         * the PCM buffer should be cleared to ensure crossfade will
+         * not be performed.
+         */
+        if ((flags & AUDIO_START_RESTART) || old_status == PLAY_PAUSED)
+            pcmbuf_play_stop();
+
         if (flags & AUDIO_START_RESTART)
         {
             /* Clear out some stuff to resume the current track where it
                left off */
-            pcmbuf_play_stop();
-
             resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
             resume.offset = id3_get(PLAYING_ID3)->offset;
             skip_resume_adjustments = id3_get(PLAYING_ID3)->skip_resume_adjustments;
