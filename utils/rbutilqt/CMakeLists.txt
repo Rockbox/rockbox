@@ -246,6 +246,12 @@ if(APPLE)
     target_sources(rbbase PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/base/ttscarbon.cpp
         ${CMAKE_CURRENT_LIST_DIR}/base/ttscarbon.h)
+
+    # The below is only needed for ttscarbon
+    # So we can delete this whole if(APPLE) block at once
+    target_compile_options(rbbase PRIVATE
+      $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-declarations>
+    )
 endif()
 
 if (TARGET Qt${QT_VERSION_MAJOR}::TextToSpeech AND TARGET Qt${QT_VERSION_MAJOR}::Multimedia)
