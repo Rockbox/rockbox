@@ -31,7 +31,6 @@
 
 #define DIR_METATABLE "directory metatable"
 typedef struct dir_data {
-    int  closed;
     DIR *dir;
 } dir_data;
 
@@ -55,7 +54,7 @@ static int dir_iter (lua_State *L) {
     struct dirent *entry;
     dir_data *d = (dir_data *)luaL_checkudata (L, 1, DIR_METATABLE);
 
-    luaL_argcheck (L, !d->closed, 1, "closed directory");
+    luaL_argcheck (L, d->dir != NULL, 1, "closed directory");
 
     if ((entry = readdir (d->dir)) != NULL) {
         struct dirinfo info = dir_get_info(d->dir, entry);
@@ -78,7 +77,7 @@ static int dir_iter (lua_State *L) {
     } else {
         /* no more entries => close directory */
         closedir (d->dir);
-        d->closed = 1;
+        d->dir = NULL;
         return 0;
     }
 }
@@ -90,9 +89,9 @@ static int dir_iter (lua_State *L) {
 static int dir_close (lua_State *L) {
     dir_data *d = (dir_data *)lua_touserdata (L, 1);
 
-    if (!d->closed && d->dir) {
+    if (d->dir) {
         closedir (d->dir);
-        d->closed = 1;
+        d->dir = NULL;
     }
     return 0;
 }
@@ -107,7 +106,6 @@ static int dir_iter_factory (lua_State *L) {
     lua_settop(L, 2); /* index 2 (bool) return attribute table */
     lua_pushcclosure(L, &dir_iter, 1);
     d = (dir_data *) lua_newuserdata (L, sizeof(dir_data));
-    d->closed = 0;
 
     luaL_getmetatable (L, DIR_METATABLE);
     lua_setmetatable (L, -2);
