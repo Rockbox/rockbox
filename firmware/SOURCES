@@ -187,6 +187,10 @@ target/hosted/hiby/hibylinux_codec.c
 #endif
 #endif
 
+#if (defined(HIBY_R1) || defined(HIBY_R3PROII)) && !defined(SIMULATOR)
+target/hosted/hiby/usb-dac-hiby.c
+#endif
+
 #if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c

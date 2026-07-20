@@ -87,6 +87,7 @@
 
 /* USB */
 #define HAVE_USB_ADB
+#define HAVE_HOST_USB_AUDIO
 #define HAVE_USB_POWER
 #define USB_VID_STR "32BB"
 #define USB_PID_STR "0101"
