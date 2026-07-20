@@ -71,14 +71,21 @@ static void update_band_filter(int band, unsigned int fout)
        functions */
     typeof (filter_pk_coefs) *coef_gen = filter_pk_coefs;
 
-    /* Only first and last bands are not peaking filters */
-    if (band == 0)
-        coef_gen = filter_ls_coefs;
-    else if (band == EQ_NUM_BANDS-1)
-        coef_gen = filter_hs_coefs;
-
     const struct eq_band_setting *setting = &settings[band];
     struct dsp_filter *filter = &eq_data.filters[band];
+
+    switch (setting->type)
+    {
+    case EQ_FILTER_LOW_SHELF:
+        coef_gen = filter_ls_coefs;
+        break;
+    case EQ_FILTER_PEAK:
+        coef_gen = filter_pk_coefs;
+        break;
+    case EQ_FILTER_HIGH_SHELF:
+        coef_gen = filter_hs_coefs;
+        break;
+    }
 
     coef_gen(fp_div(setting->cutoff, fout, 32), setting->q ?: 1,
              setting->gain, filter);

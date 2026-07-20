@@ -23,8 +23,16 @@
 /* => support from 3 to 32 bands */
 #define EQ_NUM_BANDS 10
 
+enum eq_filter_type
+{
+    EQ_FILTER_LOW_SHELF = 0,
+    EQ_FILTER_PEAK,
+    EQ_FILTER_HIGH_SHELF,
+};
+
 struct eq_band_setting
 {
+    enum eq_filter_type type;
     int cutoff; /* Hz */
     int q;
     int gain;   /* +/- dB */
