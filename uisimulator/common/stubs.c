@@ -202,6 +202,18 @@ bool usb_charging_enable(bool on)
 }
 #endif
 
+#if defined(HAVE_HOST_USB_AUDIO)
+void usb_set_audio(int value)
+{
+    (void)value;
+}
+
+bool usb_audio_get_active(void)
+{
+    return false;
+}
+#endif
+
 #ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state)
 {

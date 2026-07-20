@@ -696,7 +696,7 @@ static inline int action_wpsab_single(long button)
 long gui_wps_show(void)
 {
 /* NOTE: if USBAudio ever gets its own DSP channel, this block can go away! */
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
     if (usb_audio_get_active())
     {
         splash(HZ*2, ID2P(LANG_USB_DAC_ACTIVE));

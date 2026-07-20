@@ -368,7 +368,7 @@ MENUITEM_SETTING(lineout_onoff, &global_settings.lineout_active, NULL);
 MENUITEM_SETTING(usb_hid, &global_settings.usb_hid, NULL);
 MENUITEM_SETTING(usb_keypad_mode, &global_settings.usb_keypad_mode, NULL);
 #endif
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
 MENUITEM_SETTING(usb_audio, &global_settings.usb_audio, NULL);
 #endif
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
@@ -421,7 +421,7 @@ MAKE_MENU(usb_menu, ID2P(LANG_USB_MENU), 0, Icon_NOICON,
             &usb_hid,
             &usb_keypad_mode,
 #endif
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
             &usb_audio,
 #endif
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
@@ -480,7 +480,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &sel_softlock,
 #endif
 #if defined(USB_ENABLE_HID) || \
-    defined(USB_ENABLE_AUDIO) || \
+    defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO) || \
     (defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)) || \
     defined(HAVE_USB_MODE)
             &usb_menu,

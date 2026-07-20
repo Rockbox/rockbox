@@ -71,7 +71,7 @@
 enum pcm_mixer_channel
 {
     PCM_MIXER_CHAN_PLAYBACK = 0,
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
     PCM_MIXER_CHAN_USBAUDIO,
 #endif
     PCM_MIXER_CHAN_VOICE,

@@ -66,8 +66,11 @@
 #include <strings.h>  /* For strncasecmp() */
 #endif
 
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
 #ifdef USB_ENABLE_AUDIO
 #include "usbstack/usb_audio.h"
+#endif
+#include "usb.h"
 #include "splash.h"
 #include "lang.h"
 #endif
@@ -2993,7 +2996,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
  * a splash message to the user.
  * NOTE: if USBAudio ever gets its own DSP channel, this block can go away!
  */
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
     if (usb_audio_get_active())
     {
         queue_reply(&audio_queue, 0);

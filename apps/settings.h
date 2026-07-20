@@ -814,7 +814,7 @@ struct user_settings
     int usb_keypad_mode;
 #endif
 
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
     int usb_audio;
 #endif
 

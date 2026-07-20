@@ -272,8 +272,15 @@ void usb_firewire_connect_event(void);
 void usb_set_hid(bool enable);
 #endif
 
-#ifdef USB_ENABLE_AUDIO
+#if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
+/* Select when the USB Audio (DAC) function is active. Values follow the
+ * usb_audio setting: 0 never, 1 always, 2 while charge-only, 3 while
+ * mass-storage. Native targets use the usbstack driver; hosted targets
+ * (HiBy) drive their configfs gadget. */
 void usb_set_audio(int value);
+
+/* true while host-PCM (USB-DAC) playback is active */
+bool usb_audio_get_active(void);
 #endif
 
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
