@@ -309,7 +309,10 @@ int thread_get_debug_info(unsigned int thread_id,
         size_t stack_used_current =
             thread->stack_size - (thread->context.sp - (uintptr_t)thread->stack);
 
-        infop->stack_usage_cur = stack_used_current * 100 / thread->stack_size;
+        /* Hosted implementations typically have the main stack managed
+           by the OS, so we create a fake entry with 0 length */
+        infop->stack_usage_cur = thread->stack_size ?
+            stack_used_current * 100 / thread->stack_size : 0;
 #endif
 #if NUM_CORES > 1
         infop->core = thread->core;
