@@ -490,9 +490,7 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_STEREO_MODE, fc.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
-
-    if (samplesdone || !elapsedtime) {
-        flac_seek_offset(&fc, samplesdone);
+    if (samplesdone && flac_seek_offset(&fc, samplesdone)) {
         samplesdone=fc.samplenumber+fc.blocksize;
         elapsedtime=((uint64_t)samplesdone*1000)/(ci->id3->frequency);
     }
