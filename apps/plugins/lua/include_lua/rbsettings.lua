@@ -1,4 +1,4 @@
---[[ Lua rb settings reader
+--[[ Lua rb settings reader / writer
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -7,7 +7,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2019 William Wilgus
+ * Copyright (C) 2026 William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +18,33 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+see https://forums.rockbox.org/index.php/topic,55820.0.html for an example
+see rocklib.c for definitive list of supported settings
+rb.global_settings()
+rb.global_status()
+rb.audio_next_track()
+rb.audio_current_track()
+
+NOTES:
+Not all settings are accessible from lua, for instance you can read char_ptrs
+but writing them is not supported since we cannot guarantee the lifetime once
+lua terminates, or settigns containing unions since its not possible to discern
+what the value is at compile time these items will be an opaque pointer to the
+structure in memory but lua does not know how to decode it
+
+If you are writing settings that you want to persist do not forget to call
+rb.settings_save() though not calling it does NOT guarantee a changed setting
+won't be written behind your back so be sure to save the old value
+and restore it when you are finished and call rb.settings_save()
+to ensure the old value gets saved
+
+To Write stucts and arrays it is recommended to first make a call to
+newval = settings_read('global_settings', 'setting.foo', 'system')
+and make changes to the returned table
+    newval.foo = bar
+followed by
+    setting_writesettings_read('global_settings', 'rb.foo', 'system', newval)
+with the altered table.
 ]]
 
 rb.settings = rb.settings or {}
@@ -47,6 +74,7 @@ end
 
 local function format_val(val, var_type)
     local ret, num
+
     if var_type == nil then
         return nil
     elseif var_type == "str" then
@@ -70,6 +98,9 @@ local function format_val(val, var_type)
 
     return ret
 end
+
+--[[ ex. dump_struct(rb.global_settings,
+          rb.system.replaygain_settings, 0, [0x2c, 12, s_replaygain_settings])]]
 
 local function dump_struct(t_settings, t_struct, n_elems, t_var)
     --Internal function dumps structs
@@ -99,6 +130,44 @@ local function dump_struct(t_settings, t_struct, n_elems, t_var)
         end
     end
     return tdata
+end
+
+--[[ ex. write_struct(rb.global_settings,
+            rb.system.eq_band_setting, 10, [ 0x54, 120, s_eq_band_setting[10] ])]]
+local function write_struct(t_settings, t_struct, n_elems, t_var, tdata)
+    --Internal function writes structs
+   local function struct_write_elem(v, elem_offset, newval)
+        local offset, tvar1
+        tvar1 = get_var_fields(v)
+        offset = t_var[var.offset] + tvar1[var.offset] + elem_offset
+        return t_settings(offset, tvar1[var.size], newval) == 1
+    end
+
+    if n_elems > 0 then
+        -- Array of structs, struct[elems];
+        local elemsize = (t_var[var.size] / n_elems)
+        for i = 0, n_elems - 1 do
+            tdata[i] = tdata[i] or {}
+            for k1, v1 in pairs(t_struct) do
+                --tdata[i][k1] = struct_get_elem(v1, (elemsize * i))
+                if tdata[i][k1] ~= nil then
+                    if not struct_write_elem(v1, (elemsize * i), tdata[i][k1]) then
+                        return false
+                    end
+                end
+            end
+        end
+    else
+        -- single struct, struct;
+        for k1, v1 in pairs(t_struct) do
+            if tdata[k1] ~= nil then
+                if not struct_write_elem(v1, 0, tdata[k1]) then
+                    return false
+                end
+            end
+        end
+    end
+    return true
 end
 
 local function get_array_elems(var_type)
@@ -148,6 +217,57 @@ function rb.settings.read(s_settings, s_var, s_groupname)
         data = format_val(val, vtype)
     end
     return data
+end
+
+function rb.settings.write(s_settings, s_var, s_groupname, newval)
+    local data, val
+    local res = 0
+    local tvar = get_var_fields(s_var)
+    if tvar == nil then return nil end
+
+    local elems = get_array_elems(tvar[var.type])
+    local structname = get_struct_name(tvar[var.type])
+
+    local tsettings = rb[s_settings]
+    if not tsettings then error(s_settings .. " does not exist") end
+    if not newval then error(s_settings .. " nothing to write") end
+
+    if structname and rb[s_groupname] then
+        -- rb.splash(300, "struct " ..  structname .. " - " .. s_groupname)
+        if type (newval) ~= "table" then
+            error("newval table expected got " .. type(newval))
+        end
+        if not write_struct(tsettings, rb[s_groupname][structname], elems, tvar, newval) then
+            error(s_groupname .. " writing failed")
+        end
+        return 1
+    end
+
+    local voffset, vsize, vtype = tvar[var.offset], tvar[var.size], tvar[var.type]
+    if elems > 0 then
+        if type (newval) ~= "table" then
+            error("newval table expected got " .. type(newval))
+        end
+        -- Arrays of values, val[elems];
+        local elemsize = (vsize / elems)
+
+        for i = 0, elems - 1 do
+            if newval[i] ~= nil then
+                if tsettings(voffset + (elemsize * i), elemsize, newval[i]) ~= 1 then
+                    res = 0
+                    break
+                end
+            end
+        end
+    else
+        -- Single value, val;
+        if vtype == "ptr_char" then -- (**char)
+            error(s_var .. " is a string pointer")
+        else
+            res = tsettings(voffset, vsize, newval)
+        end
+    end
+    return res
 end
 
 function rb.settings.dump(s_settings, s_groupname, s_structname, t_output, fn_filter)
