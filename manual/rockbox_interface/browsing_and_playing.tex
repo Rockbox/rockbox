@@ -211,6 +211,16 @@ The virtual keyboard can be easily changed by making a text file
 with the required layout. More information on how to achieve this can be found
 on the Rockbox website at \wikilink{LoadableKeyboardLayouts}.
 
+\opt{kbd_point_mode}{
+  On this player the keyboard is laid out for direct touch where the keys are sized
+  for a fingertip and are tapped individually, rather than being selected
+  with the 3\,\texttimes\,3 grid used on other touchscreen targets. By default the
+  characters are spread over three pages with lower case and accented
+  letters, their upper-case forms in the same positions, and a third page
+  of punctuation and additional European characters. Tap
+  \textbf{\textgreater} below the keys to change page.
+}
+
 \opt{morse_input}{
   Also you can switch to Morse code input mode by changing the
   \setting{Use Morse Code Input} setting%

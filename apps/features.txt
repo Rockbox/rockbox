@@ -82,6 +82,10 @@ lcd_sleep
 morse_input
 #endif
 
+#if defined(HAVE_KBD_POINT_MODE)
+kbd_point_mode
+#endif
+
 #if defined(HAVE_PITCHCONTROL)
 pitchscreen
 #endif
