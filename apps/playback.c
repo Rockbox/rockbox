@@ -2685,8 +2685,8 @@ static bool single_mode_do_pause(int id3_hid)
         if (global_settings.single_mode == SINGLE_MODE_TRACK)
             return true;
 
-        if (global_settings.single_mode == SINGLE_MODE_PLAYLIST && skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST)
-            return true;
+        if (global_settings.single_mode == SINGLE_MODE_PLAYLIST)
+            return (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST);
 
         char *previous_tag = single_mode_get_id3_tag(id3_get(PLAYING_ID3));
         char *new_tag = single_mode_get_id3_tag(bufgetid3(id3_hid));
