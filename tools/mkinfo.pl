@@ -48,11 +48,11 @@ sub mapscan {
     my $start, $end;
     open(M, "<$f");
     while(<M>) {
-        if($_ =~ / +0x([0-9a-f]+) *_end = \./) {
+        if($_ =~ / +0x([0-9a-f]+) *_(bss)?end = \./) {
             $end = $1;
             last;
         }
-        elsif($_ =~ / +0x([0-9a-f]+) *_loadaddress = \./) {
+        elsif($_ =~ / +0x([0-9a-f]+) *_?loadaddress = \./) {
             $start = $1;
         }
         elsif($_ =~ / +0x([0-9a-f]+) *_dramcopystart = \./) {
