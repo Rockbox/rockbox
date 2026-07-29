@@ -96,6 +96,17 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(CODESIGN_IDENTITY "-" CACHE STRING
             "Code signing identity to use for macOS signing")
+
+    if(DEFINED ENV{CODESIGN_IDENTITY})
+        set(CODESIGN_IDENTITY "$ENV{CODESIGN_IDENTITY}")
+    endif()
+
+    if("${CODESIGN_IDENTITY}" STREQUAL "-")
+        message("-- Using ad-hoc Apple code signing")
+    else()
+        message("-- Using Apple code signing identity: ${CODESIGN_IDENTITY}")
+    endif()
+
     set(DMGBUILD_STAMP ${CMAKE_BINARY_DIR}/dmgbuild.stamp)
     add_custom_command(
             COMMENT "Setting up dmgbuild virtualenv"
