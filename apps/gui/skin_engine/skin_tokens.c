@@ -1354,6 +1354,8 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_PLAYLIST_PERCENT:
         {
             int playlist_amt = playlist_amount();
+            if (playlist_amt <= 0)
+                return NULL;
             int current_pos = playlist_get_display_index() + offset;
             int percentage = current_pos * 100 / playlist_amt;
 
