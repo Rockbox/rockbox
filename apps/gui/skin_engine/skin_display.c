@@ -178,7 +178,7 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
     struct wps_state *state = get_wps_state();
     struct mp3entry *id3 = state->id3;
     int x = pb->x, y = pb->y, width = pb->width, height = pb->height;
-    unsigned long end, length = 0;
+    unsigned long length = 1, end = 0;
     int flags = HORIZONTAL;
 
     if (height < 0)
