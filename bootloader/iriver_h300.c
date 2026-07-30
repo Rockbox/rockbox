@@ -430,6 +430,9 @@ void main(void)
     if (rc_on_button)
     {
         lcd_remote_init();
+        /* ponytail: remote type is set by the tick ISR every 8 ticks;
+           wait long enough for _remote_type to be valid before reading hold */
+        sleep(HZ/8);
 
         if (remote_button_hold())
             hold_status = true;
@@ -591,7 +594,13 @@ void main(void)
     }
 
     /* recheck the hold switch status as it may have changed */
-    hold_status = (button_hold() || remote_button_hold());
+    /* ponytail: only check remote hold if remote type is known; REMOTETYPE_UNPLUGGED
+       means lcd_remote_init() hasn't settled yet — GPIO1 bit 20 floats and gives
+       a false hold=on when a non-LCD remote is connected but the device was booted
+       from the main ON button. */
+    hold_status = button_hold();
+    if (remote_type() != REMOTETYPE_UNPLUGGED)
+        hold_status = hold_status || remote_button_hold();
 
     /* hold switch shutdown or failsafe recovery mode */
     if (hold_status || recovery_mode)
