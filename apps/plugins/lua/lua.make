@@ -27,7 +27,7 @@ all: $(subst $(LUA_INCLUDEDIR)/,$(LUA_BUILDDIR)/,$(LUA_INCLUDELIST))
 
 $(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua \
                                                 $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_BUILDDIR)/rb_defines.lua $(LUA_BUILDDIR)/sound_defines.lua \
-                                                $(LUA_INCLUDELIST)
+                                                $(LUA_BUILDDIR)/audio_status.lua $(LUA_BUILDDIR)/file_attrs.lua $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
@@ -51,6 +51,16 @@ $(LUA_BUILDDIR)/sound_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include config.h -include audiohw_settings.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl "sound_defines" | \
 	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/sounddefines_helper -
 	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/sounddefines_helper > $(LUA_BUILDDIR)/sound_defines.lua
+
+$(LUA_BUILDDIR)/audio_status.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl "audio_status" | \
+	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/audiodefines_helper -
+	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/audiodefines_helper > $(LUA_BUILDDIR)/audio_status.lua
+
+$(LUA_BUILDDIR)/file_attrs.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl "file_attrs" | \
+	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/fileattrs_helper -
+	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/fileattrs_helper > $(LUA_BUILDDIR)/file_attrs.lua
 
 $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rocklib_aux.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c

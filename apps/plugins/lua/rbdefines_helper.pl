@@ -57,13 +57,24 @@ if ($def_type eq "rb_defines") {
         '^CORE_KEYMAP_FILE$',
         'CONTEXT_(STOPSEARCHING|REMOTE|CUSTOM|CUSTOM2|PLUGIN|REMAPPED)$',
         '^VIEWERS_DATA_DIR$');
+
+
+}
+elsif ($def_type eq "audio_status") {
+    $lua_table = "rb";
+    @rockbox_defines = (
+        '^AUDIO_STATUS_(PLAY|PAUSE|RECORD|PRERECORD|ERROR|WARNING)$');
 }
 elsif ($def_type eq "sound_defines") {
     $lua_table = "rb.sound_settings";
     @rockbox_defines = (
         '^(?!.*LAST_SETTING)SOUND_');
 }
-
+elsif ($def_type eq "file_attrs") {
+    $lua_table = "rb";
+    @rockbox_defines = (
+        '^FILE_ATTR_');
+}
 my @captured_defines;
 my @names_seen;
 my @all_defines;
@@ -100,7 +111,7 @@ while(my $line = <STDIN>)
             $name = $1;
             next if $name =~ /^(ATTRIBUTE_|print|__).*/; #don't add reserved
             $value = $2;
-
+            #print STDERR "#define ".$name." (".$value.")\n";
             if(grep($name =~ $_, @rockbox_defines))
             {
                 push(@names_seen, $name);

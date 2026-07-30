@@ -29,6 +29,7 @@ local _clr  = require("color")
 require("actions")
 require("rbsettings")
 require("settings")
+require("audio_status")
 
 local scrpath = rb.current_path()
 
@@ -103,9 +104,9 @@ end
 local function clear_actions()
     track_length = (rb.audio("length") or 0)
     local playback = rb.audio("status")
-    if playback == 1 then
+    if playback == rb.AUDIO_STATUS_PLAY then
         set_active_icon(2)
-    elseif playback == 3 then
+    elseif playback == (rb.AUDIO_STATUS_PAUSE + rb.AUDIO_STATUS_PLAY) then
         set_active_icon(4)
         return
     end
@@ -247,10 +248,10 @@ do
             end
         elseif action == act.PLA_SELECT then
             playback = rb.audio("status")
-            if playback == 1 then
+            if playback == rb.AUDIO_STATUS_PLAY then
                 rb.audio("pause")
                 collectgarbage("collect")
-            elseif playback == 3 then
+            elseif playback == (rb.AUDIO_STATUS_PAUSE + rb.AUDIO_STATUS_PLAY) then
                 rb.audio("resume")
             end
             event = rb.audio("status") + 1
