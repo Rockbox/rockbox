@@ -159,7 +159,7 @@ static bool adb_compose_dac(void)
     system("mkdir -p " USB_GADGET_PATH "/functions/uac_sa.a");
     sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_chmask", 3);
     sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_ssize", 2);
-    sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_srate", SAMPR_48);
+    sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_srate", USB_DAC_SAMPLE_RATE);
     system("ln -sf " USB_GADGET_PATH "/functions/uac_sa.a " USB_GADGET_PATH "/configs/c.1/");
     sysfs_set_string(USB_GADGET_PATH "/configs/c.1/strings/0x409/configuration", "uac,adb");
     return true;
@@ -422,7 +422,7 @@ bool enable_usb_audio(void)
     system("mkdir -p " USB_GADGET_PATH "/functions/uac_sa.a");
     sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_chmask", 3);
     sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_ssize", 2);
-    sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_srate", SAMPR_48);
+    sysfs_set_int(USB_GADGET_PATH "/functions/uac_sa.a/c_srate", USB_DAC_SAMPLE_RATE);
 
     /* Present an IAD audio device with the HiBy DAC VID/PID so the host
      * recognises it as a USB DAC. */

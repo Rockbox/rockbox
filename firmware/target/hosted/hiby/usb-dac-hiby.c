@@ -148,8 +148,6 @@ static void *dac_pump_thread(void *arg)
 bool usb_dac_start(void)
 {
     static const struct mixer_play_cbs cbs = { .get_more = dac_get_more };
-    int st[3] = {0, 0, 0};
-    unsigned int rate;
 
     /* The node is created asynchronously when the UDC binds; during boot
      * the hotplug helper can lag behind, so wait briefly for it. This runs
@@ -168,12 +166,20 @@ bool usb_dac_start(void)
         return false;
     }
 
-    /* Play at the rate the host negotiated (reported by the kernel). */
-    ioctl(dac_fd, UAC_SA_GET_STATUS, st);
-    if (st[1] >= SAMPR_8 && st[1] <= SAMPR_192)
-        rate = (unsigned int)st[1];
-    else
-        rate = SAMPR_44;
+    int rate = USB_DAC_SAMPLE_RATE;
+#ifdef LOGF_ENABLE
+    // Both on Windows and Linux it always returns 44100 instead of requested rate (which indicates some generic issue).
+    // But since we hardcoded the only supported rate with USB_DAC_SAMPLE_RATE in gadget config (see usb-hiby-gadget.c),
+    // it should be safe to ignore the mismatch and just log it for debugging purposes.
+    int st[3] = {0, 0, 0};
+    int status_ok = ioctl(dac_fd, UAC_SA_GET_STATUS, st);
+    int reported_rate = st[1];
+    if (reported_rate && reported_rate != rate)
+    {
+        logf("uac_sa rate mismatch: ioctl %d, reported %d, expected %d",
+             status_ok, reported_rate, rate);
+    }
+#endif
     mixer_set_frequency(rate);
 
     dac_head = dac_tail = 0;
