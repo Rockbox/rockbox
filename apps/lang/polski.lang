@@ -1014,13 +1014,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Filtr pasmowy %d"
+    *: "Filtr szczytowy"
   </dest>
   <voice>
-    *: "Filtr pasmowy"
+    *: "Filtr szczytowy"
   </voice>
 </phrase>
 <phrase>
@@ -17104,5 +17104,33 @@
   </dest>
   <voice>
     *: "Ustaw element kontekstowy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Filtr %d"
+  </dest>
+  <voice>
+    *: "Filtr"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Typ filtra"
+  </dest>
+  <voice>
+    *: "Typ filtra"
   </voice>
 </phrase>

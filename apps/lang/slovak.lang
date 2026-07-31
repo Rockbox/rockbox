@@ -1005,13 +1005,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Filter pásma %d"
+    *: "Vrcholový filter"
   </dest>
   <voice>
-    *: "Filter pásma"
+    *: "Vrcholový filter"
   </voice>
 </phrase>
 <phrase>
@@ -17097,5 +17097,33 @@
   </dest>
   <voice>
     *: "Nastaviť kontextovú položku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "~Filter %d"
+  </dest>
+  <voice>
+    *: "~Filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Typ filtra"
+  </dest>
+  <voice>
+    *: "Typ filtra"
   </voice>
 </phrase>

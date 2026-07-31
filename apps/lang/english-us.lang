@@ -1004,10 +1004,10 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </dest>
   <voice>
     *: "Peak filter"
@@ -17094,5 +17094,33 @@
   </dest>
   <voice>
     *: "Set Context Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Filter %d"
+  </dest>
+  <voice>
+    *: "Filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Filter Type"
+  </dest>
+  <voice>
+    *: "Filter Type"
   </voice>
 </phrase>
