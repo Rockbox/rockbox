@@ -16,6 +16,7 @@
  *
  ******************************************************************************/
 
+#include "misc.h"
 #include "iap-core.h"
 #include "iap-lingo.h"
 #include "dir.h"
@@ -1034,12 +1035,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *  5   0x14  Command ID (bits 7:0)
              *  6   0xE5  Telegram payload checksum byte
              *
-             * We return ROCKBOX, should this be definable?
              * Should it be Volume Name?
              */
         {
+            char ipod_name[32] = "Rockbox";
+            int fd = open_utf8(ROCKBOX_DIR "/playername.txt", O_RDONLY);
+            if (fd >= 0) {
+                read_line(fd, ipod_name, sizeof(ipod_name));
+                close(fd);
+                ipod_name[sizeof(ipod_name)-1] = 0;
+            }
             IAP_TX_INIT4(0x04, 0x0015);
-            IAP_TX_PUT_STRING("ROCKBOX");
+            IAP_TX_PUT_STRING(ipod_name);
             iap_send_tx();
             break;
         }

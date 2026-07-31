@@ -1,6 +1,8 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include "misc.h"
+
 #include "constants.h"
 #include "endian.h"
 #include "iap.h"
@@ -200,6 +202,25 @@ static int32_t handle_command(struct IAPContext* ctx, uint8_t lingo, uint16_t co
             alloc_response(IAPReturnExtendedInterfaceModePayload);
             response->is_ext_mode = 1;
             return IAPGeneralCommandID_ReturnExtendedInterfaceMode;
+        } break;
+        case IAPGeneralCommandID_RequestIPodName: {
+            // Note:  This should be pulled from .rockbox/playername.txt
+            char ipod_name[32] = "Rockbox";
+            int fd = open_utf8(ROCKBOX_DIR "/playername.txt", O_RDONLY);
+            if (fd >= 0) {
+                read_line(fd, ipod_name, sizeof(ipod_name));
+                close(fd);
+                ipod_name[sizeof(ipod_name)-1] = 0;
+            }
+
+            check_ret(
+                iap_span_append(response_span,
+                                ipod_name,
+                                strlen(ipod_name) + 1),
+                -IAPAckStatus_EOutOfResource
+            );
+
+            return IAPGeneralCommandID_ReturnIPodName;
         } break;
         case IAPGeneralCommandID_RequestIPodSoftwareVersion: {
             alloc_response(IAPReturnIPodSoftwareVersionPayload);
