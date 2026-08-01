@@ -34,9 +34,11 @@
 
 typedef unsigned chartype;
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-char* strcasestr (const char* haystack, const char* needle)
+char* strcasestr (const char* phaystack, const char* pneedle)
 {
-    const char* match, *needle_search;
+    const unsigned char *haystack = (const unsigned char *) phaystack;
+    const unsigned char *needle = (const unsigned char *) pneedle;
+    const unsigned char* match, *needle_search;
     chartype needle_ch, ch_h;
     chartype first_ch, first_upch;
     if (*needle == 0) /* if needle empty return haystack */
