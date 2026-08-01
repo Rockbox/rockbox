@@ -219,10 +219,18 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             checkbox->setAccessibleName(setting->name());
             checkbox->setCheckState(setting->current().toBool() == true
                                     ? Qt::Checked : Qt::Unchecked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
             connect(checkbox, &QCheckBox::checkStateChanged,
                     this, [=, this](int value) {
                         this->m_settingsWidgetsMap.key(checkbox)->setCurrent(value, false);
                     });
+#else
+            connect(checkbox, &QCheckBox::stateChanged,
+                    this, [=, this](int value) {
+                        this->m_settingsWidgetsMap.key(checkbox)->setCurrent(value, false);
+                    });
+
+#endif
             value = checkbox;
             connect(setting, &EncTtsSetting::updateGui, this,
                     [checkbox, setting]() {
