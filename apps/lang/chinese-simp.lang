@@ -764,10 +764,10 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "带通滤波器%d"
+    *: "带通滤波器"
   </dest>
   <voice>
     *: "带通滤波器"
@@ -17104,5 +17104,33 @@
   </dest>
   <voice>
     *: "设置上下文项目"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "滤波器 %d"
+  </dest>
+  <voice>
+    *: "滤波器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "滤波器类型"
+  </dest>
+  <voice>
+    *: "滤波器类型"
   </voice>
 </phrase>

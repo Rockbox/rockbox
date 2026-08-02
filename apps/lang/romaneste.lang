@@ -2308,11 +2308,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Culoare primară "
+    lcd_color: "Culoare primară"
   </dest>
   <voice>
     *: none
-    lcd_color: "Culoare primară "
+    lcd_color: "Culoare primară"
   </voice>
 </phrase>
 <phrase>
@@ -6841,10 +6841,10 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz bandă amplificare"
+    *: "Câștig bandă %d Hz"
   </dest>
   <voice>
-    *: "hertz bandă amplificare"
+    *: "Câștig bandă"
   </voice>
 </phrase>
 <phrase>
@@ -8146,10 +8146,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "Filtru frecvențe ridicate"
+    *: "Filtru frecvențe înalte"
   </dest>
   <voice>
-    *: "Filtru frecvențe ridicate"
+    *: "Filtru frecvențe înalte"
   </voice>
 </phrase>
 <phrase>
@@ -8845,13 +8845,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Filtru vârfuri %d"
+    *: "Filtru vârf"
   </dest>
   <voice>
-    *: "Filtru vârfuri"
+    *: "Filtru vârf"
   </voice>
 </phrase>
 <phrase>
@@ -10587,7 +10587,7 @@
   </dest>
   <voice>
     *: none
-    remote: "aparte pentru bara de stare "
+    remote: "aparte pentru bara de stare"
   </voice>
 </phrase>
 <phrase>
@@ -11173,7 +11173,7 @@
   </dest>
   <voice>
     *: none
-    histogram: "Interval histogramă "
+    histogram: "Interval histogramă"
   </voice>
 </phrase>
 <phrase>
@@ -17102,5 +17102,33 @@
   </dest>
   <voice>
     *: "Setează element context"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Filtru %d"
+  </dest>
+  <voice>
+    *: "Filtru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Tip filtru"
+  </dest>
+  <voice>
+    *: "Tip filtru"
   </voice>
 </phrase>
