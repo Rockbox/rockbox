@@ -25,11 +25,8 @@
 #include "playlist.h"
 #include "iap.h"
 
-#define LOGF_ENABLE
-/* #undef LOGF_ENABLE */
-#ifdef LOGF_ENABLE
-  #include "logf.h"
-#endif
+//#define LOGF_ENABLE
+#include "logf.h"
 
 /* The Model ID of the iPod we emulate. Currently a 160GB classic */
 #define IAP_IPOD_MODEL (0x00130200U)
