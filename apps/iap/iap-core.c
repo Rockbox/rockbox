@@ -96,7 +96,7 @@ int iap_repeatbtn = 0;
 unsigned int iap_timeoutbtn = 0;
 bool iap_btnrepeat = false, iap_btnshuffle = false;
 
-static long thread_stack[(DEFAULT_STACK_SIZE*6)/sizeof(long)];
+static long thread_stack[(DEFAULT_STACK_SIZE*8)/sizeof(long)];
 static struct event_queue iap_queue;
 
 /* These are pointer used to manage a dynamically allocated buffer which
