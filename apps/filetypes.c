@@ -72,6 +72,8 @@ static const struct filetype_inbuilt inbuilt_filetypes[] = {
     { "m3u8", FILE_ATTR_M3U },
     { "cfg",  FILE_ATTR_CFG },
     { "wps",  FILE_ATTR_WPS },
+    { "bmp",  FILE_ATTR_BMP },
+    { "mod",  FILE_ATTR_MOD },
 #ifdef HAVE_REMOTE_LCD
     { "rwps", FILE_ATTR_RWPS },
 #endif

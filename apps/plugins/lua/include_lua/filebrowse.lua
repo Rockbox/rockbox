@@ -29,9 +29,10 @@ local tmploader = require("temploader")
 --------------------------------------------------------------------------------
 
 -- uses print_table and get_files to display simple file browser
--- sort_by "date" "name" "size"
+-- sort_by "date" "name" "size" "type"
 -- descending true/false
-function file_choose(dir, title, sort_by, descending)
+-- returns selected file and attribs string if get_attr == true
+function file_choose(dir, title, sort_by, descending, get_attr)
     local dstr, hstr = ""
     if not title then
         dstr = "%d items found in %0d.%02d seconds"
@@ -58,6 +59,7 @@ function file_choose(dir, title, sort_by, descending)
     local timer
     local files = {}
     local dirs = {}
+    local attrs = {}
     local item = 1
     local cancel_fn = nil
 
@@ -82,20 +84,37 @@ function file_choose(dir, title, sort_by, descending)
         rb.splash(1, "Searching for Files")
         dirs, files = get_files(dir, recurse, f_finddir, f_findfile, sort_by, cancel_fn, dirs, files)
 
+        local ndirs = #dirs
         local parentdir = dirs[1]
-        for i = 1, #dirs do
+        for i = 1, ndirs do
             dirs[i] = "\t" .. dirs[i]
         end
 
-        if not descending then
-            for i = 1, #files do
-                -- only store file name .. strip attributes from end and parent from beginning
-                table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+        if not get_attr then
+            if not descending then
+                for i = 1, #files do
+                    -- only store file name .. strip attributes from end and parent from beginning
+                    table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+                end
+            else
+                for i = #files, 1, -1 do
+                    -- only store file name .. strip attributes from end and parent from beginning
+                    table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+                end
             end
-        else
-            for i = #files, 1, -1 do
-                -- only store file name .. strip attributes from end and parent from beginning
-                table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+        else -- get_attr == true
+            if not descending then
+                for i = 1, #files do
+                    -- only store file name .. strip attributes from end and parent from beginning
+                    table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+                    table.insert(attrs, string.match(files[i], ";(.+)"))
+                end
+            else
+                for i = #files, 1, -1 do
+                    -- only store file name .. strip attributes from end and parent from beginning
+                    table.insert(dirs, "\t" .. string.match(string.match(files[i], "[^/\\]+$") or "?", "[^;]+") or "?")
+                    table.insert(attrs, string.match(files[i], ";(.+)"))
+                end
             end
         end
         for i=1, #files do files[i] = nil end -- empty table for reuse
@@ -113,9 +132,9 @@ function file_choose(dir, title, sort_by, descending)
             dir = string.gsub(dirs[item], "%c+","")
             if not rb.dir_exists("/" .. dir) then
                 if (parentdir == "/") then
-                    return parentdir .. dir
+                    return parentdir .. dir, attrs[item - ndirs - 1] -- -1 for hstr
                 else
-                    return parentdir .. "/" ..  dir
+                    return parentdir .. "/" ..  dir, attrs[item - ndirs - 1]
                 end
             end
         end
@@ -125,7 +144,7 @@ function file_choose(dir, title, sort_by, descending)
             if dir == "" then dir = "/" end
         end
         for i=1, #dirs do dirs[i] = nil end -- empty table for reuse
-
+        for i=1, #attrs do attrs[i] = nil end -- empty table for reuse
     end
 end -- file_choose
 --------------------------------------------------------------------------------

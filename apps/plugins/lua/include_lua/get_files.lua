@@ -27,7 +27,7 @@ if ... == nil then rb.splash(rb.HZ * 3, "use 'require'") end
 -- findfile & finddir are definable search functions
 -- if not defined all files/dirs are returned if false is passed.. none
     or you can provide your own function see below..
--- sort_by can be by "name" "size" "date" or "none" to perform no sorting
+-- sort_by can be by "name" "size" "date" "type" or "none" to perform no sorting
     note: for "size" and "date" you may need to strip the attribute data to use
     the returned filename e.g. string.match(file, "[^;]+")
 -- cancel_fn if not defined or not a function no user cancel otherwise supply
@@ -134,6 +134,23 @@ local function get_files(path, recurse, finddir, findfile, sort_by, cancel_fn, f
             v2 = string.match(s2, "TM:(%d+)")
             if v1 or v2 then
                 return tonumber(v1 or 0) < tonumber(v2 or 0)
+            end
+            return s1 < s2
+        end
+    elseif sort_by == "type" then
+        filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
+                return string.format("%s%s%s; At:%d, Sz:%d, Tm:%d", path, sep, fname, fattrib, fsize, ftime)
+        end
+        sort_by_function = function(s1, s2)
+            local v1, v2
+            v1 = string.match(s1, ".+%.([^%s]+).AT:")
+            v2 = string.match(s2, ".+%.([^%s]+).AT:")
+
+            if v1 or v2 then
+                --rb.splash(20, (v1 or "?") .. " " .. (v2 or "?"))
+                if (v1 ~= v2) then
+                    return (v1 or "") < (v2 or "")
+                end
             end
             return s1 < s2
         end

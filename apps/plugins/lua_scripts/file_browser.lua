@@ -34,6 +34,7 @@ package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory 
 
 require("printmenus") --menu
 require("filebrowse") -- file browser
+require("file_attrs")
 
 rb.actions = nil
 package.loaded["actions"] = nil
@@ -45,22 +46,61 @@ function main_menu()
                 [2] = "Sort by Name",
                 [3] = "Sort by Size",
                 [4] = "Sort by Date",
-                [5] = "Exit"
+                [5] = "Sort by Type",
+                [6] = "Exit"
                 }
 
     local ft =  {
                 [0] = exit_now, --if user cancels do this function
                 [1] = function(TITLE) return true end, -- shouldn't happen title occupies this slot
                 [2]  = function(SBNAME)
-                            _lcd:splashf(rb.HZ, "%s", file_choose("/", "", "name", false) or "None")
+                            _lcd:splashf(rb.HZ, "%s", file_choose("/", "", "name") or "None")
                         end,
                 [3]  = function(SBSIZE)
-                            _lcd:splashf(rb.HZ, "%s", file_choose("/", "", "size", true) or "None")
+                            local file, attr = file_choose("/", "", "size", true, true)
+                            if file and attr then
+                                local sz = tonumber(string.match(attr, ".+Sz:(%d+)") or 0)
+                                if sz > 1024 then
+                                    _lcd:splashf(rb.HZ, "%s", file .. " " .. sz / 1024 .. " kiB")
+                                else
+                                    _lcd:splashf(rb.HZ, "%s", file .. " " .. sz .. " B")
+                                end
+                            else
+                                _lcd:splashf(rb.HZ, "%s", file or "None")
+                            end
+                            --_lcd:splashf(rb.HZ, "%s", file_choose("/", "", "size") or "None")
                         end,
                 [4]  = function(SBDATE)
-                            _lcd:splashf(rb.HZ, "%s", file_choose("/", "", "date") or "None")
+                            local file, attr = file_choose("/", "", "date", true, true)
+                            if file and attr then
+                                local tm = tonumber(string.match(attr, ".+Tm:(%d+)") or 0) 
+                                _lcd:splashf(rb.HZ, "%s", file .. " " .. attr)--" Tm:" .. tm)
+                            else
+                                _lcd:splashf(rb.HZ, "%s", file or "None")
+                            end
+                            --_lcd:splashf(rb.HZ, "%s", file_choose("/", "", "date") or "None")
                         end,
-                [5] = function(EXIT_) return true end
+                [5]  = function(SBTYPE)
+                            local file = file_choose("/", "", "type")
+                            if file then
+                                local known = false
+                                local attr = rb.filetype_get_attr(file)
+                                for k, v in pairs(rb) do
+                                    if nil ~= string.find (k, "^FILE_ATTR_(.+)") then
+                                        if v == attr then
+                                            file = file .. " " .. k
+                                            known = true
+                                            break
+                                        end
+                                    end
+                                end
+                                if not known then 
+                                    file = file .. " Unknown Type " .. string.match(file, "%.[^%.]+$") or ""
+                                end
+                            end
+                            _lcd:splashf(rb.HZ, "%s", file or "None")
+                        end,
+                [6] = function(EXIT_) return true end
                 }
 
     print_menu(mt, ft)
