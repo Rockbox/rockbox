@@ -46,6 +46,7 @@ Dim oVoice ' for traversing the list of voices
 Dim nLangID, sSelectString
 
 Dim aLine, aData    ' used in command reading
+Dim nError, sError  ' error returned to the controlling process
 
 On Error Resume Next
 
@@ -146,10 +147,27 @@ Do
             aData = Split(aLine(1), vbTab, 2)
             If bVerbose Then WScript.StdErr.WriteLine "Saying " & aData(1) _
                                                       & " in " & aData(0)
+            Err.Clear
             oSpFS.Open aData(0), SSFMCreateForWrite, false
-            Set oSpVoice.AudioOutputStream = oSpFS
-            oSpVoice.Speak aData(1)
-            oSpFS.Close
+            nError = Err.Number
+            sError = Err.Description
+            If nError = 0 Then
+                Set oSpVoice.AudioOutputStream = oSpFS
+                oSpVoice.Speak aData(1)
+                nError = Err.Number
+                sError = Err.Description
+                oSpFS.Close
+                If nError = 0 And Err.Number <> 0 Then
+                    nError = Err.Number
+                    sError = Err.Description
+                End If
+            End If
+            If nError <> 0 Then
+                oStdOut.WriteLine "ERROR" & vbTab & nError & ": " & sError
+                Err.Clear
+            ElseIf Not oFSO.FileExists(aData(0)) Then
+                oStdOut.WriteLine "ERROR" & vbTab & "SAPI reported success but created no wave file"
+            End If
         Case "EXEC"
             If bVerbose Then WScript.StdErr.WriteLine "> " & aLine(1)
             oShell.Run aLine(1), 0, true
