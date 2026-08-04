@@ -1007,13 +1007,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Filtro Picco %d"
+    *: "Filtro Picco"
   </dest>
   <voice>
-    *: "Filtro picco"
+    *: "Filtro Picco"
   </voice>
 </phrase>
 <phrase>
@@ -17097,5 +17097,33 @@
   </dest>
   <voice>
     *: "Imposta Elemento Contestuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Filtro %d"
+  </dest>
+  <voice>
+    *: "Filtro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Tipo Filtro"
+  </dest>
+  <voice>
+    *: "Tipo Filtro"
   </voice>
 </phrase>
