@@ -174,7 +174,7 @@ esac
 case "$ACTION" in
     add|"")
         mkdir -p "$MNT"
-        mount -t auto -o flush,noatime "/dev/$MDEV" "$MNT"
+        mount -t auto -o sync,noatime "/dev/$MDEV" "$MNT"
         ;;
     remove)
         umount -l "$MNT"
