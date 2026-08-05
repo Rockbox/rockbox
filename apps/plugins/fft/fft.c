@@ -1284,7 +1284,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->yield(); /* tmo = 0 won't yield */
         }
 
-        int button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts, ARRAYLEN(plugin_contexts));
+        int button = pluginlib_getaction(delay, plugin_contexts, ARRAYLEN(plugin_contexts));
 
         switch (button)
         {
