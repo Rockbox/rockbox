@@ -351,6 +351,9 @@ $(BUILDDIR)/rockbox.zip: build
 endif
 	$(call PRINTS,ZIP rockbox$(ZIPFILESUFFIX).zip)
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\" -o $(BUILDDIR)/rockbox$(ZIPFILESUFFIX).zip -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(BUILDZIPOPTS) $(TARGET) $(BINARY)
+ifneq ($(REPRODUCIBLE_ZIP),)
+	$(SILENT)strip-nondeterminism $(BUILDDIR)/rockbox$(ZIPFILESUFFIX).zip
+endif
 
 mapzip:
 	$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip

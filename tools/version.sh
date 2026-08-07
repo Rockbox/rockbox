@@ -50,7 +50,11 @@ if [ -z $VERSION ]; then
         # Ok, we need to derive it from the Version Control system
 	    VER=`gitversion $TOP`
     fi
-VERSION=$VER-`date -u +%y%m%d`
+if [ -z $SOURCE_DATE_EPOCH ]; then
+	VERSION=$VER-`date -u +%y%m%d`
+else
+	VERSION=$VER-`date -d @$SOURCE_DATE_EPOCH -u +%y%m%d`
+fi
 fi
 echo $VERSION
 

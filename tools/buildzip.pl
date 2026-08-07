@@ -259,7 +259,7 @@ GetOptions ( 'r|root=s'      => \$ROOT,
 # Thus we use the ":" for those for which we use a default value in case of ""
 # and assign the default value afterwards
 if ($ziptool eq '') {
-    $ziptool = "zip -r9";
+    $ziptool = "zip -r9 -X";
 }
 if ($output eq '') {
     $output = "rockbox.zip"

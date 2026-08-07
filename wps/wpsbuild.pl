@@ -268,7 +268,7 @@ MOO
                      "rwps" => $rwps,
                      "rsbs" => $rsbs,
                      "rfms" => $rfms);
-    for my $skin (keys %skinfiles) {
+    for my $skin (sort keys %skinfiles) {
         my $val = $skinfiles{$skin};
         if (!defined($val)) {
             # dont put value if not defined (e.g. rwps when there's no remote)

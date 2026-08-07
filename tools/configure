@@ -4915,7 +4915,11 @@ export BUILDDIR=${pwd}
 export RBCODEC_BLD=${pwd}/lib/rbcodec
 export VOICELANGUAGE=${voicelanguage}
 export MEMORYSIZE=${memory}
+ifeq (\$(SOURCE_DATE_EPOCH),)
 export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
+else
+export BUILDDATE:=\$(shell date -d "@\$(SOURCE_DATE_EPOCH)" -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
+endif
 export MKFIRMWARE=${tool}
 export BMP2RB_MONO=${bmp2rb_mono}
 export BMP2RB_NATIVE=${bmp2rb_native}
