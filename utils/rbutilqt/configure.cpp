@@ -939,17 +939,20 @@ void Config::testTts()
     }
 
     QString filename;
-    QTemporaryFile file(this);
+    QTemporaryDir* tempDir = nullptr;
     // keep filename empty if the TTS can do speaking for itself.
     if(!(tts->capabilities() & TTSBase::CanSpeak)) {
-        file.open();
-        filename = file.fileName();
-        file.close();
+        // SAPI's SpFileStream requires a filename with a wave extension.
+        // Give the engine a path that does not exist yet, matching normal
+        // voice-file generation, and keep its directory until playback ends.
+        tempDir = new QTemporaryDir();
+        filename = tempDir->filePath("tts-test.wav");
     }
 
     if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
     {
         tts->stop();
+        delete tempDir;
         QMessageBox::warning(this,tr("Could not voice test string."),
                 tr("Could not voice test string.\n") + errstr
                 + tr("\nPlease configure TTS engine."));
@@ -957,17 +960,28 @@ void Config::testTts()
         return;
     }
     tts->stop();
-    if(!filename.isEmpty()) {
-        QSoundEffect effect;
-        effect.setSource(QUrl::fromLocalFile(filename));
-        effect.setLoopCount(0);
-        effect.setVolume(1.0f);
-        effect.play();
-    }
     ui.testTTS->setEnabled(true);
     delete tts; /* Config objects are never deleted (in fact, they are
                    leaked..), so we can't rely on QObject, since that would
                    delete the TTSBase instance on application exit */
+    if(tempDir != nullptr) {
+        QSoundEffect* effect = new QSoundEffect(this);
+        connect(effect, &QObject::destroyed, [tempDir]() {
+            delete tempDir;
+        });
+        connect(effect, &QSoundEffect::playingChanged, effect, [effect]() {
+            if(!effect->isPlaying())
+                effect->deleteLater();
+        });
+        connect(effect, &QSoundEffect::statusChanged, effect, [effect]() {
+            if(effect->status() == QSoundEffect::Error)
+                effect->deleteLater();
+        });
+        effect->setSource(QUrl::fromLocalFile(filename));
+        effect->setLoopCount(1);
+        effect->setVolume(1.0f);
+        effect->play();
+    }
 #endif
 }
 
