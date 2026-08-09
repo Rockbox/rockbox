@@ -355,7 +355,7 @@ int axp2101_supply_get_voltage(int supply)
         int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, info->en_reg);
         if(r < 0)
             return AXP2101_SUPPLY_DISABLED;
-        if(r & (1 << info->en_bit) == 0)
+        if((r & (1 << info->en_bit)) == 0)
             return AXP2101_SUPPLY_DISABLED;
     }
 
