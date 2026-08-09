@@ -142,6 +142,8 @@ static int updater_init(struct updater* u)
     nand_lock(u->ndrv);
     rc = nand_open(u->ndrv);
     if(rc != NAND_SUCCESS) {
+        nand_unlock(u->ndrv);
+        u->ndrv = NULL;
         rc = IERR_NAND_OPEN;
         goto error;
     }

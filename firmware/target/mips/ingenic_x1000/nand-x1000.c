@@ -143,6 +143,7 @@ struct nand_drv* nand_init(void)
         static_nand_drv.scratch_buf = static_scratch_buf;
         static_nand_drv.page_buf = static_page_buf;
         static_nand_drv.refcount = 0;
+        inited = true;
     }
 
     return &static_nand_drv;
