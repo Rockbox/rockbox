@@ -288,6 +288,7 @@ static bool usb_serial_control_request(struct usb_ctrlrequest* req, uint8_t* req
             {
                 /* Receive line coding into local copy */
                 memcpy(line_coding.raw, reqdata, sizeof(struct cdc_line_coding));
+                usb_core_control_response(USB_CONTROL_ACK, NULL, 0);
                 handled = true;
             }
         }
