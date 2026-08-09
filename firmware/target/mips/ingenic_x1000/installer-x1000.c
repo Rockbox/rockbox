@@ -237,7 +237,7 @@ int install_bootloader(const char* filename)
 
 int backup_bootloader(const char* filename)
 {
-    int rc, fd = 0;
+    int rc, fd = -1;
     struct updater u;
 
     rc = updater_init(&u);
@@ -281,7 +281,7 @@ int backup_bootloader(const char* filename)
 
 int restore_bootloader(const char* filename)
 {
-    int rc, fd = 0;
+    int rc, fd = -1;
     struct updater u;
 
     rc = updater_init(&u);
