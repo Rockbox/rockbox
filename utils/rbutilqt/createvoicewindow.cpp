@@ -28,7 +28,6 @@
 CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    voicecreator = new VoiceFileCreator(this);
     updateSettings();
     connect(ui.change,&QAbstractButton::clicked,this,&CreateVoiceWindow::change);
 }
@@ -46,12 +45,22 @@ void CreateVoiceWindow::change()
 
 void CreateVoiceWindow::accept()
 {
+    // Do not start a second job while voice creation is still running.
+    if(workerThread)
+        return;
+
     logger = new ProgressLoggerGui(this);
     connect(logger,&ProgressLoggerGui::closed,this,&QWidget::close);
     logger->show();    
 
     saveSettings();
     
+    // Voice generation invokes the TTS engine and encoder synchronously. Run
+    // it in a worker thread so the GUI (including accessibility support) stays
+    // responsive while a voice file is being created.
+    workerThread = new QThread(this);
+    voicecreator = new VoiceFileCreator(nullptr);
+
     //configure voicecreator
     QString suffix = RbSettings::value(RbSettings::Suffix).toString();
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
@@ -70,8 +79,25 @@ void CreateVoiceWindow::accept()
     connect(voicecreator, &VoiceFileCreator::done, logger, &ProgressLoggerGui::setFinished);
     connect(voicecreator, &VoiceFileCreator::logItem, logger, &ProgressLoggerGui::addItem);
     connect(voicecreator, &VoiceFileCreator::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(logger,&ProgressLoggerGui::aborted,voicecreator,&VoiceFileCreator::abort);
-    voicecreator->createVoiceFile();
+    // abort() only emits a signal connected to the generator's atomic abort
+    // flag, so it is safe to call while the worker is inside a TTS request.
+    connect(logger, &ProgressLoggerGui::aborted,
+            voicecreator, &VoiceFileCreator::abort, Qt::DirectConnection);
+
+    voicecreator->moveToThread(workerThread);
+    connect(workerThread, &QThread::started,
+            voicecreator, &VoiceFileCreator::createVoiceFile);
+    connect(voicecreator, &VoiceFileCreator::done,
+            workerThread, &QThread::quit);
+    connect(voicecreator, &VoiceFileCreator::done,
+            voicecreator, &QObject::deleteLater);
+    connect(workerThread, &QThread::finished,
+            workerThread, &QObject::deleteLater);
+    connect(workerThread, &QThread::finished, this, [this]() {
+        voicecreator = nullptr;
+        workerThread = nullptr;
+    });
+    workerThread->start(QThread::LowPriority);
 }
 
 

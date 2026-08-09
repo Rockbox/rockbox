@@ -31,6 +31,34 @@ TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 bool TalkFileCreator::createTalkFiles()
 {
     m_abort = false;
+    QStringList dirs = m_dirs;
+    if(dirs.isEmpty())
+        dirs.append(m_dir);
+
+    for(const QString& dir : dirs) {
+        if(m_abort)
+            break;
+
+        m_dir = dir;
+        LOG_INFO() << "creating talk files for folder" << m_dir;
+        if(!createTalkFilesForDir()) {
+            emit done(true);
+            return false;
+        }
+    }
+
+    if(m_abort) {
+        doAbort();
+        emit done(true);
+        return false;
+    }
+
+    emit done(false);
+    return true;
+}
+
+bool TalkFileCreator::createTalkFilesForDir()
+{
     QString errStr;
 
     emit logItem(tr("Starting Talk file generation for folder %1")
@@ -51,10 +79,10 @@ bool TalkFileCreator::createTalkFiles()
     // generate entries
     TalkGenerator generator(this);
     // no string corrections yet: do not set language for TalkGenerator.
-    connect(&generator, &TalkGenerator::done, this, &TalkFileCreator::done);
     connect(&generator, &TalkGenerator::logItem, this, &TalkFileCreator::logItem);
     connect(&generator, &TalkGenerator::logProgress, this, &TalkFileCreator::logProgress);
-    connect(this, &TalkFileCreator::aborted, &generator, &TalkGenerator::abort);
+    connect(this, &TalkFileCreator::aborted,
+            &generator, &TalkGenerator::abort, Qt::DirectConnection);
 
     if(generator.process(&m_talkList) == TalkGenerator::eERROR)
     {
@@ -77,7 +105,6 @@ bool TalkFileCreator::createTalkFiles()
 
     emit logItem(tr("Finished creating Talk files"),LOGOK);
     emit logProgress(1,1);
-    emit done(false);
 
     return true;
 }
@@ -101,7 +128,6 @@ void TalkFileCreator::doAbort()
 {
     cleanup();
     emit logProgress(0,1);
-    emit done(true);
 }
 //! \brief creates a list of what to generate
 //!

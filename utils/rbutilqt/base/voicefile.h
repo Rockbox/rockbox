@@ -70,7 +70,6 @@ private:
     int m_voiceformat;
     QFile *corrFile; // the voice-corrections file
 
-    bool m_abort;
     QList<TalkGenerator::TalkEntry> m_talkList;
 };
 

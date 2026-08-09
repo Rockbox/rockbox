@@ -22,6 +22,8 @@
 #define CREATEVOICEWINDOW_H
 
 #include <QDialog>
+#include <QPointer>
+#include <QThread>
 #include <QUrl>
 
 #include "ui_createvoicefrm.h"
@@ -47,7 +49,8 @@ class CreateVoiceWindow : public QDialog
 
     private:
         void changeEvent(QEvent *event);
-        VoiceFileCreator* voicecreator;
+        QPointer<VoiceFileCreator> voicecreator;
+        QPointer<QThread> workerThread;
         Ui::CreateVoiceFrm ui;
         ProgressLoggerGui* logger;
         QUrl m_proxy;

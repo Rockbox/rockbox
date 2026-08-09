@@ -22,6 +22,7 @@
 #ifndef TALKGENERATOR_H
 #define TALKGENERATOR_H
 
+#include <atomic>
 #include <QtCore>
 #include "progressloglevels.h"
 
@@ -81,7 +82,7 @@ private:
     };
     QList<struct CorrectionItems> m_corrections;
 
-    bool m_abort;
+    std::atomic_bool m_abort{false};
 
 
 };

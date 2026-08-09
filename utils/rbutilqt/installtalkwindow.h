@@ -23,6 +23,8 @@
 
 #include <QDialog>
 #include <QFileSystemModel>
+#include <QPointer>
+#include <QThread>
 
 #include "ui_installtalkfrm.h"
 #include "progressloggergui.h"
@@ -47,7 +49,8 @@ class InstallTalkWindow : public QDialog
 
     private:
         void changeEvent(QEvent *event);
-        TalkFileCreator* talkcreator;
+        QPointer<TalkFileCreator> talkcreator;
+        QPointer<QThread> workerThread;
         Ui::InstallTalkFrm ui;
         ProgressLoggerGui* logger;
         QFileSystemModel *fsm;

@@ -33,15 +33,12 @@ VoiceFileCreator::VoiceFileCreator(QObject* parent) :QObject(parent)
 
 void VoiceFileCreator::abort()
 {
-    m_abort = true;
     emit aborted();
 }
 
 bool VoiceFileCreator::createVoiceFile()
 {
     m_talkList.clear();
-    m_abort = false;
-
     delete corrFile;
     corrFile = new QFile(":/builtin/voice-corrections.txt", this);
     corrFile->open(QIODevice::ReadOnly);
@@ -335,7 +332,8 @@ void VoiceFileCreator::create(void)
         connect(&generator, &TalkGenerator::done, this, &VoiceFileCreator::done);
         connect(&generator, &TalkGenerator::logItem, this, &VoiceFileCreator::logItem);
         connect(&generator, &TalkGenerator::logProgress, this, &VoiceFileCreator::logProgress);
-        connect(this, &VoiceFileCreator::aborted, &generator, &TalkGenerator::abort);
+        connect(this, &VoiceFileCreator::aborted,
+                &generator, &TalkGenerator::abort, Qt::DirectConnection);
 
         if(generator.process(&m_talkList, m_wavtrimThreshold) == TalkGenerator::eERROR)
         {

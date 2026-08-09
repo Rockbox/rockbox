@@ -22,6 +22,7 @@
 #ifndef TALKFILE_H
 #define TALKFILE_H
 
+#include <atomic>
 #include <QtCore>
 #include "progressloglevels.h"
 
@@ -37,6 +38,7 @@ public:
     bool createTalkFiles();
 
     void setDir(QString dir) {m_dir = dir;}
+    void setDirs(QStringList dirs) {m_dirs = dirs;}
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
 
     void setGenerateOnlyNew(bool ov) {m_generateOnlyNew = ov;}
@@ -55,6 +57,7 @@ signals:
     void logProgress(int, int); //! set progress bar.
 
 private:
+    bool createTalkFilesForDir();
     bool cleanup();
     QString stripExtension(QString filename);
     void doAbort();
@@ -64,6 +67,7 @@ private:
     bool createTalkList(QDir startDir);
 
     QString m_dir;
+    QStringList m_dirs;
     QString m_mountpoint;
 
     bool m_generateOnlyNew;
@@ -73,7 +77,7 @@ private:
     bool m_talkFiles;
     QStringList m_ignoreFiles;
 
-    bool m_abort;
+    std::atomic_bool m_abort{false};
 
     QList<TalkGenerator::TalkEntry> m_talkList;
 };
