@@ -272,6 +272,11 @@ void usb_firewire_connect_event(void);
 void usb_set_hid(bool enable);
 #endif
 
+#ifdef USB_ENABLE_SERIAL
+void usb_set_serial(bool enable);
+bool usb_get_serial(void);
+#endif
+
 #if defined(USB_ENABLE_AUDIO) || defined(HAVE_HOST_USB_AUDIO)
 /* Select when the USB Audio (DAC) function is active. Values follow the
  * usb_audio setting: 0 never, 1 always, 2 while charge-only, 3 while

@@ -2537,20 +2537,15 @@ static bool dbg_talk(void)
 
 #ifdef HAVE_USBSTACK
 #if (defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL))
-static bool toggle_usb_core_driver(int driver, char *msg)
-{
-    bool enabled = !usb_core_driver_enabled(driver);
-
-    usb_core_enable_driver(driver,enabled);
-    splashf(HZ, "%s %s", msg, enabled ? "enabled" : "disabled");
-
-    return false;
-}
-
 #ifdef USB_ENABLE_SERIAL
 static bool toggle_usb_serial(void)
 {
-    return toggle_usb_core_driver(USB_DRIVER_SERIAL, "USB Serial");
+    bool enabled = !usb_get_serial();
+
+    usb_set_serial(enabled);
+    splashf(HZ, "USB Serial %s", enabled ? "enabled" : "disabled");
+
+    return false;
 }
 #endif /* USB_ENABLE_SERIAL */
 #endif
