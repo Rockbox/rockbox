@@ -44,7 +44,8 @@
 #define DMA_CHANNEL_AUDIO     0
 #define DMA_CHANNEL_RECORD    1
 #define DMA_CHANNEL_FBCOPY    2
-#define DMA_NUM_USED_CHANNELS 3
+#define DMA_CHANNEL_UART_TX   3
+#define DMA_NUM_USED_CHANNELS 4
 
 struct dma_desc {
     uint32_t cm; /* meaning and layout same as DMA_CHN_CM */
