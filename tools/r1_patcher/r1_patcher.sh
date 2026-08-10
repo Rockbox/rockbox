@@ -1,13 +1,38 @@
 #!/bin/bash
 
-#Prerequisites:
-#sudo apt update && sudo apt install -y p7zip-full squashfs-tools genisoimage coreutils
+# Linux Prerequisites:
+# sudo apt update && sudo apt install -y p7zip-full squashfs-tools genisoimage coreutils
+#
+# macOS Prerequisites:
+# brew install p7zip squashfs cdrtools coreutils
 
 # Fail fast on any error, undefined variable, or failed pipeline
 set -euo pipefail
 
 # Report errors with line number and the failing command
 trap 'echo "ERROR at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
+
+# ==============================================================================
+# macOS Compatibility Shim
+# Map missing/incompatible GNU tools to their Homebrew equivalents via functions
+# ==============================================================================
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    realpath()    { grealpath "$@"; }
+    stat()        { gstat "$@"; }
+    split()       { gsplit "$@"; }
+    md5sum()      { gmd5sum "$@"; }
+    genisoimage() { mkisofs "$@"; }
+    
+    # Quick sanity check for macOS users
+    for cmd in grealpath gstat gsplit gmd5sum mkisofs 7z unsquashfs mksquashfs; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo "ERROR: Missing macOS dependency for '$cmd'." >&2
+            echo "Please run: brew install p7zip squashfs cdrtools coreutils" >&2
+            exit 1
+        fi
+    done
+fi
+# ==============================================================================
 
 usage() {
     echo 'Usage:' >&2
