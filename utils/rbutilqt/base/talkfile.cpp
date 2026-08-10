@@ -137,6 +137,20 @@ bool TalkFileCreator::createTalkList(QDir startDir)
     LOG_INFO() << "generating list of files" << startDir;
     m_talkList.clear();
 
+    const QString startPath = QDir::cleanPath(startDir.absolutePath());
+    auto isInIgnoredDirectory = [&startPath](const QFileInfo& fileInfo) {
+        QDir dir(fileInfo.isDir() ? fileInfo.absoluteFilePath()
+                                  : fileInfo.absolutePath());
+        while(true) {
+            if(QFileInfo::exists(dir.filePath("talkclips.ignore")))
+                return true;
+
+            if(QDir::cleanPath(dir.absolutePath()) == startPath || !dir.cdUp())
+                break;
+        }
+        return false;
+    };
+
      // create Iterator
     QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags;
     if(m_recursive)
@@ -160,6 +174,10 @@ bool TalkFileCreator::createTalkList(QDir startDir)
 
         QFileInfo fileInf = it.fileInfo();
 
+        // A talkclips.ignore file excludes its directory and all descendants.
+        if(isInIgnoredDirectory(fileInf))
+            continue;
+
         // its a dir
         if(fileInf.isDir())
         {
@@ -168,12 +186,6 @@ bool TalkFileCreator::createTalkList(QDir startDir)
             // insert into List
             if(!dir.dirName().isEmpty() && m_talkFolders)
             {
-                // check if we should ignore it
-                if(QFileInfo::exists(dir.path() + "/talkclips.ignore"))
-                {
-                    continue;
-                }
-
                 // check to see if it's already covered
                 if(m_generateOnlyNew && QFileInfo::exists(dir.path() + "/_dirname.talk"))
                 {
@@ -209,8 +221,8 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 bool match = false;
                 for(int i=0; i < m_ignoreFiles.size();i++)
                 {
-                    QString pattern = m_ignoreFiles[i].trimmed()
-                                        .replace("?", ".").replace("*", ".*");
+                    QString pattern = QRegularExpression::wildcardToRegularExpression(
+                            m_ignoreFiles[i].trimmed());
                     QRegularExpression rx(pattern);
                     if(rx.match(fileInf.fileName()).hasMatch())
                         match = true;

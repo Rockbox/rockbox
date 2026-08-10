@@ -46,6 +46,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     ui.treeView->setHeaderHidden(true);
 
     updateSettings();
+    ui.treeView->setFocus(Qt::OtherFocusReason);
 }
 
 
@@ -116,7 +117,9 @@ void InstallTalkWindow::accept()
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
-    talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",", Qt::SkipEmptyParts));
+    talkcreator->setIgnoreFiles(ui.ignoreEnabled->isChecked()
+            ? ui.ignoreFiles->text().split(",", Qt::SkipEmptyParts)
+            : QStringList());
 
     connect(talkcreator, &TalkFileCreator::done, logger, &ProgressLoggerGui::setFinished);
     connect(talkcreator, &TalkFileCreator::logItem, logger, &ProgressLoggerGui::addItem);
