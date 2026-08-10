@@ -21,7 +21,7 @@
 #include "x1000bootloader.h"
 #include "kernel.h"
 #include "button.h"
-#include "installer-x1000.h"
+#include "installer-ingenic.h"
 #include <stdio.h>
 
 enum {

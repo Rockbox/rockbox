@@ -19,7 +19,7 @@
  ****************************************************************************/
 
 #include "system.h"
-#include "dma-x1000.h"
+#include "dma-ingenic.h"
 #include "irq-x1000.h"
 #include "x1000/cpm.h"
 #include "panic.h"

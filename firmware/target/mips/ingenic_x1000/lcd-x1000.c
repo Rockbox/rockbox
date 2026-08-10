@@ -22,7 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "lcd-x1000.h"
-#include "dma-x1000.h"
+#include "dma-ingenic.h"
 #include "irq-x1000.h"
 #include "x1000/lcd.h"
 #include "x1000/cpm.h"

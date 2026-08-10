@@ -18,7 +18,7 @@
  *
  ****************************************************************************/
 
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "irq-x1000.h"
 #include "kernel.h"
 #include "panic.h"

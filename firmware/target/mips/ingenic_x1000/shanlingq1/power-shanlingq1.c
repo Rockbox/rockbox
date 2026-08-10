@@ -29,7 +29,7 @@
 # include "usb_core.h"
 #endif
 
-#include "i2c-x1000.h"
+#include "i2c-ingenic.h"
 
 /* TODO: Better(?) battery reporting for Q1 using CW2015 driver
  *

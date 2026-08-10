@@ -18,26 +18,32 @@
  *
  ****************************************************************************/
 
-#ifndef __I2C_X1000_H__
-#define __I2C_X1000_H__
+#include "spl-x1000.h"
+#include "gpio-ingenic.h"
+#include "nand-ingenic.h"
 
-#include "i2c-async.h"
+static struct nand_drv* ndrv = NULL;
 
-#define I2C_FREQ_100K 100000
-#define I2C_FREQ_400K 400000
+int spl_storage_open(void)
+{
+    /* We need to assign the GPIOs manually */
+    gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
 
-extern void i2c_init(void) INIT_ATTR;
+    /* Allocate NAND driver manually in DRAM */
+    ndrv = spl_alloc(sizeof(struct nand_drv));
+    ndrv->page_buf = spl_alloc(NAND_DRV_MAXPAGESIZE);
+    ndrv->scratch_buf = spl_alloc(NAND_DRV_SCRATCHSIZE);
+    ndrv->refcount = 0;
 
-/* Configure the I2C controller prior to use.
- *
- * - freq: frequency of SCL, should be <= 400 KHz and >= 25 KHz
- *   - use I2C_FREQ_100K for 100 KHz
- *   - use I2C_FREQ_400K for 400 Khz
- *   - use 0 to disable the controller completely
- *   - frequencies below 25 KHz will violate timing constraints
- *
- * TODO: move this to the i2c-async API, it's simple enough
- */
-extern void i2c_x1000_set_freq(int chn, int freq);
+    return nand_open(ndrv);
+}
 
-#endif /* __I2C_X1000_H__ */
+void spl_storage_close(void)
+{
+    nand_close(ndrv);
+}
+
+int spl_storage_read(uint32_t addr, uint32_t length, void* buffer)
+{
+    return nand_read_bytes(ndrv, addr, length, buffer);
+}

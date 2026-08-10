@@ -28,7 +28,7 @@
 #include "disk.h"
 #include "file_internal.h"
 #include "usb.h"
-#include "i2c-x1000.h"
+#include "i2c-ingenic.h"
 #include "boot-x1000.h"
 #include <stdbool.h>
 

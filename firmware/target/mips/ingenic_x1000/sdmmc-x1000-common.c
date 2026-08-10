@@ -20,7 +20,7 @@
 #include "sdmmc_host.h"
 #include "sdmmc_poll.h"
 #include "msc-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "irq-x1000.h"
 #include "clk-x1000.h"
 

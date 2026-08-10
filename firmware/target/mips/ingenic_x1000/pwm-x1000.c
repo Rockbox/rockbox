@@ -20,7 +20,7 @@
 
 #include "pwm-x1000.h"
 #include "clk-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "system.h"
 #include "kernel.h"
 #include "x1000/tcu.h"

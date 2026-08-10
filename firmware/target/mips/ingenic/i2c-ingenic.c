@@ -19,7 +19,7 @@
  ****************************************************************************/
 
 /* #define LOGF_ENABLE */
-#include "i2c-x1000.h"
+#include "i2c-ingenic.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"

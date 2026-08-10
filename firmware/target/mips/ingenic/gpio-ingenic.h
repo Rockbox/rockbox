@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef __GPIO_X1000_H__
-#define __GPIO_X1000_H__
+#ifndef __GPIO_INGENIC_H__
+#define __GPIO_INGENIC_H__
 
 #include "x1000/gpio.h"
 #include "config.h"
@@ -167,4 +167,4 @@ static inline void gpio_flip_edge_irq(int gpio)
         gpio_set_irq_level(gpio, 1);
 }
 
-#endif /* __GPIO_X1000_H__ */
+#endif /* __GPIO_INGENIC_H__ */

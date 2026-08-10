@@ -21,7 +21,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "lcd-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "system.h"
 
 static const uint32_t fiio_lcd_cmd_enable[] = {

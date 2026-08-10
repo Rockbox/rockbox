@@ -3920,6 +3920,7 @@ fi
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
     t_model="fiiom3k"
     ;;
 
@@ -3944,6 +3945,7 @@ fi
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
     t_model="erosqnative"
     # player version, for bootloader usage
     # versions 1 and 2 both use 1
@@ -3972,6 +3974,7 @@ fi
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
     t_model="erosqnative"
     # player version, for bootloader usage
     # version 3
@@ -4001,6 +4004,7 @@ fi
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
     t_model="erosqnative"
     # player version, for bootloader usage
     # version 4
@@ -4095,6 +4099,7 @@ fi
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
     t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
     t_model="shanlingq1"
     ;;
 

@@ -18,7 +18,7 @@
  *
  ****************************************************************************/
 
-#include "nand-x1000.h"
+#include "nand-ingenic.h"
 #include "sfc-x1000.h"
 #include "system.h"
 #include "logf.h"

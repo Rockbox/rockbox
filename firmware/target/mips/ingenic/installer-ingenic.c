@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#include "installer-x1000.h"
-#include "nand-x1000.h"
+#include "installer-ingenic.h"
+#include "nand-ingenic.h"
 #include "core_alloc.h"
 #include "file.h"
 #include "microtar-rockbox.h"

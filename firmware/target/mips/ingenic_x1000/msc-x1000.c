@@ -21,7 +21,7 @@
 #include "panic.h"
 #include "led.h"
 #include "msc-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "irq-x1000.h"
 #include "clk-x1000.h"
 #include "x1000/msc.h"

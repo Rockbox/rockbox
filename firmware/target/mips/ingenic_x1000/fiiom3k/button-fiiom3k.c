@@ -25,9 +25,9 @@
 #include "panic.h"
 #include "axp-pmu.h"
 #include "ft6x06.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "irq-x1000.h"
-#include "i2c-x1000.h"
+#include "i2c-ingenic.h"
 #include <string.h>
 #include <stdbool.h>
 

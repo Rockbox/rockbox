@@ -26,7 +26,7 @@
 #include "pcm-internal.h"
 #include "pcm_sink.h"
 #include "panic.h"
-#include "dma-x1000.h"
+#include "dma-ingenic.h"
 #include "irq-x1000.h"
 #include "x1000/aic.h"
 #include "x1000/cpm.h"

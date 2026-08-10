@@ -24,7 +24,7 @@
 #include "usb_drv.h"
 #include "usb-designware.h"
 #include "irq-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "x1000/cpm.h"
 
 /*

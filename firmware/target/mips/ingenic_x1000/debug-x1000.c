@@ -28,7 +28,7 @@
 #include "list.h"
 
 #include "clk-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 
 static bool dbg_clocks(void)
 {

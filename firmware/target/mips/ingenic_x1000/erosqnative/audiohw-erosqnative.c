@@ -30,8 +30,8 @@
 #include "logf.h"
 
 #include "aic-x1000.h"
-#include "i2c-x1000.h"
-#include "gpio-x1000.h"
+#include "i2c-ingenic.h"
+#include "gpio-ingenic.h"
 #include "devicedata.h"
 
 /*

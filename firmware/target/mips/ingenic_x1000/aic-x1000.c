@@ -20,7 +20,7 @@
 
 #include "system.h"
 #include "aic-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #include "x1000/aic.h"
 #include "x1000/cpm.h"
 

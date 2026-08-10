@@ -29,7 +29,7 @@
 #endif
 #include "axp-pmu.h"
 #include "axp-2101.h"
-#include "i2c-x1000.h"
+#include "i2c-ingenic.h"
 #include "devicedata.h"
 
 unsigned short battery_level_disksafe = 3470;

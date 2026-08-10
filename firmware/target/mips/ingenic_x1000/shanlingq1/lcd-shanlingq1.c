@@ -21,7 +21,7 @@
 #include "lcd.h"
 #include "system.h"
 #include "lcd-x1000.h"
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 
 /* LCD controller is probably an RM68090.
  */

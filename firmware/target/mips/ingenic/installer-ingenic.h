@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef __INSTALLER_X1000_H__
-#define __INSTALLER_X1000_H__
+#ifndef __INSTALLER_INGENIC_H__
+#define __INSTALLER_INGENIC_H__
 
 /* This API is for the bootloader recovery menu and Rockbox utility to handle
  * bootloader installation, backup, and restore.
@@ -52,4 +52,4 @@ extern int backup_bootloader(const char* filename);
 extern int restore_bootloader(const char* filename);
 extern const char* installer_strerror(int rc);
 
-#endif /* __INSTALLER_X1000_H__ */
+#endif /* __INSTALLER_INGENIC_H__ */

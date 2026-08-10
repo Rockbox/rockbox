@@ -22,8 +22,8 @@
 #include "system.h"
 #include "pcm_sampr.h"
 #include "aic-x1000.h"
-#include "i2c-x1000.h"
-#include "gpio-x1000.h"
+#include "i2c-ingenic.h"
+#include "gpio-ingenic.h"
 #include "x1000/aic.h"
 #include "x1000/cpm.h"
 

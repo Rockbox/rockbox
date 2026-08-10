@@ -1759,12 +1759,12 @@ target/mips/ingenic_x1000/aic-x1000.c
 target/mips/ingenic_x1000/boot-x1000.c
 target/mips/ingenic_x1000/clk-x1000.c
 target/mips/ingenic_x1000/debug-x1000.c
-target/mips/ingenic_x1000/dma-x1000.c
-target/mips/ingenic_x1000/gpio-x1000.c
-target/mips/ingenic_x1000/i2c-x1000.c
-target/mips/ingenic_x1000/kernel-x1000.c
+target/mips/ingenic/dma-ingenic.c
+target/mips/ingenic/gpio-ingenic.c
+target/mips/ingenic/i2c-ingenic.c
+target/mips/ingenic/kernel-ingenic.c
 target/mips/ingenic_x1000/lcd-x1000.c
-target/mips/ingenic_x1000/nand-x1000.c
+target/mips/ingenic/nand-ingenic.c
 target/mips/ingenic_x1000/pcm-x1000.c
 target/mips/ingenic_x1000/pwm-x1000.c
 target/mips/ingenic_x1000/sfc-x1000.c
@@ -1778,7 +1778,7 @@ target/mips/ingenic_x1000/usb-x1000.c
 target/mips/ingenic_x1000/msc-x1000.c
 #endif
 #ifdef BOOTLOADER
-target/mips/ingenic_x1000/installer-x1000.c
+target/mips/ingenic/installer-ingenic.c
 target/mips/ingenic_x1000/spl-start.S
 target/mips/ingenic_x1000/spl-x1000.c
 common/ucl_decompress.c
@@ -1819,7 +1819,7 @@ target/mips/ingenic_x1000/fiiom3k/button-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/lcd-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
 target/mips/ingenic_x1000/sdmmc-x1000-common.c
-target/mips/ingenic_x1000/spl-nand-x1000.c
+target/mips/ingenic/spl-nand-ingenic.c
 #endif /* FIIO_M3K */
 
 #if defined(SHANLING_Q1)
@@ -1829,7 +1829,7 @@ target/mips/ingenic_x1000/shanlingq1/button-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/lcd-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/power-shanlingq1.c
 target/mips/ingenic_x1000/sdmmc-x1000-common.c
-target/mips/ingenic_x1000/spl-nand-x1000.c
+target/mips/ingenic/spl-nand-ingenic.c
 #endif /* SHANLING_Q1 */
 
 #if defined(EROS_QN)
@@ -1839,7 +1839,7 @@ target/mips/ingenic_x1000/erosqnative/button-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
 target/mips/ingenic_x1000/sdmmc-x1000-common.c
-target/mips/ingenic_x1000/spl-nand-x1000.c
+target/mips/ingenic/spl-nand-ingenic.c
 #endif /* EROS_QN */
 
 #if defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)

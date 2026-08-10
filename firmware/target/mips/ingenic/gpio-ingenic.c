@@ -18,7 +18,7 @@
  *
  ****************************************************************************/
 
-#include "gpio-x1000.h"
+#include "gpio-ingenic.h"
 #if defined(EROS_QN)
 # include "devicedata.h"
 #endif

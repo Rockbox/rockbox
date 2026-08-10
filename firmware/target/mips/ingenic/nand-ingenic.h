@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef __NAND_X1000_H__
-#define __NAND_X1000_H__
+#ifndef __NAND_INGENIC_H__
+#define __NAND_INGENIC_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -238,4 +238,4 @@ extern int nand_page_read(struct nand_drv* drv, nand_page_t page, void* buffer);
 extern int nand_read_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer);
 extern int nand_write_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer);
 
-#endif /* __NAND_X1000_H__ */
+#endif /* __NAND_INGENIC_H__ */
