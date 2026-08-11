@@ -708,6 +708,12 @@ static void usb_dw_epstart(int epnum, enum usb_dw_epdir epdir,
 #endif
 #ifdef USB_DW_SHARED_FIFO
         eptsiz |= MCCNT((ep_periodic_msk >> epnum) & 1);
+#else
+        /* Dedicated FIFO mode still requires a non-zero multi-count for
+         * periodic IN endpoints. MCCNT(0) transmits no packets. */
+        uint32_t eptype = (DWC_DIEPCTL(epnum) >> 18) & 0x3;
+        if (eptype == EPTYP_ISOCHRONOUS || eptype == EPTYP_INTERRUPT)
+            eptsiz |= MCCNT(packets);  /* rarely, if ever, not 1 */
 #endif
 
     }
@@ -722,7 +728,18 @@ static void usb_dw_epstart(int epnum, enum usb_dw_epdir epdir,
     DWC_EPDMA(epnum, epdir) = USB_DW_PHYSADDR((uint32_t)buf);
 #endif
     DWC_EPTSIZ(epnum, epdir) = eptsiz;
-    DWC_EPCTL(epnum, epdir) |= EPENA | nak;
+    if (((DWC_EPCTL(epnum, epdir) >> 18) & 0x3) == EPTYP_ISOCHRONOUS)
+    {
+        /* Schedule the transfer for the next frame. */
+        if ((DWC_DSTS >> 8) & 1)
+            DWC_EPCTL(epnum, epdir) |= EPENA | nak | SETD0PIDEF;
+        else
+            DWC_EPCTL(epnum, epdir) |= EPENA | nak | SETD1PIDOF;
+    }
+    else
+    {
+        DWC_EPCTL(epnum, epdir) |= EPENA | nak;
+    }
 
 #ifdef USB_DW_ARCH_SLAVE
     /* Enable interrupts to start pushing data into the FIFO */
@@ -1444,7 +1461,7 @@ void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
     {
         if(type == EPTYP_ISOCHRONOUS)
         {
-            mps = 1023;
+            mps = usb_drv_port_speed() ? 1024 : 1023;
         }
         else
         {
