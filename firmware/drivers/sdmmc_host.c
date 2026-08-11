@@ -326,6 +326,37 @@ static int sdmmc_host_submit_cmd(struct sdmmc_host *host,
 }
 
 /*
+ * Submit one command and check the card status in its R1 response.
+ *
+ * A card reports a rejected command in R1 rather than by failing the
+ * transfer: it answers normally, the controller sees nothing wrong, and
+ * the data is silently not committed. Only use this for commands whose
+ * response is R1 or R1b; R3, R6 and R7 carry unrelated bits in the same
+ * positions.
+ *
+ * Error bits set in ignore_mask are not treated as failures.
+ */
+static int sdmmc_host_submit_cmd_r1(struct sdmmc_host *host,
+                                    const struct sdmmc_host_command *cmd,
+                                    uint32_t ignore_mask)
+{
+    struct sdmmc_host_response resp;
+
+    int rc = sdmmc_host_submit_cmd(host, cmd, &resp);
+    if (rc)
+        return rc;
+
+    if (resp.data[0] & SD_R1_CARD_ERROR & ~ignore_mask)
+    {
+        logf("%s: cmd%d card status %08lx", __func__, (int)cmd->command,
+             (unsigned long)resp.data[0]);
+        return SDMMC_STATUS_ERROR;
+    }
+
+    return SDMMC_STATUS_OK;
+}
+
+/*
  * Execute an SD APP_CMD
  */
 static int sdmmc_host_submit_app_cmd(struct sdmmc_host *host,
@@ -589,7 +620,7 @@ static int sdmmc_host_cmd_set_block_len(struct sdmmc_host *host, int len)
         .flags     = SDMMC_RESP_SHORT,
     };
 
-    return sdmmc_host_submit_cmd(host, &cmd, NULL);
+    return sdmmc_host_submit_cmd_r1(host, &cmd, 0);
 }
 
 static int sdmmc_host_cmd_set_block_count(struct sdmmc_host *host, int count)
@@ -612,6 +643,17 @@ static int sdmmc_host_cmd_set_block_count(struct sdmmc_host *host, int count)
     }
 
     return rc;
+}
+
+static int sdmmc_host_cmd_send_status(struct sdmmc_host *host)
+{
+    struct sdmmc_host_command cmd = {
+        .command   = SD_SEND_STATUS,
+        .argument  = host->cardinfo.rca,
+        .flags     = SDMMC_RESP_SHORT,
+    };
+
+    return sdmmc_host_submit_cmd_r1(host, &cmd, 0);
 }
 
 static void sdmmc_host_set_controller_bus_width(struct sdmmc_host *host, uint32_t width)
@@ -852,7 +894,7 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
         else
             cmd.argument = start * SD_BLOCK_SIZE;
 
-        rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
+        rc = sdmmc_host_submit_cmd_r1(host, &cmd, 0);
 
         if (rc == SDMMC_STATUS_TIMEOUT &&
             !host->quirk_rdwrsingleblock_delay &&
@@ -874,17 +916,44 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
             goto out;
 
         /*
-         * NOTE: some controllers can send CMD12 automatically after
-         *       the end of a transfer, eg. X1000; it might be worth
-         *       supporting that via a feature flag.
+         * The R1 above was returned before the data moved, so it cannot
+         * report anything which went wrong during the transfer. Whatever
+         * ends the transfer has to be checked too, and a CMD23 transfer
+         * ends without a command.
          */
-        if (xfer_count > 1 && !host->use_cmd23)
+        if (xfer_count > 1)
         {
-            memset(&cmd, 0, sizeof(cmd));
-            cmd.command = SD_STOP_TRANSMISSION;
-            cmd.flags = SDMMC_RESP_SHORT | SDMMC_RESP_BUSY;
+            if (host->use_cmd23)
+            {
+                rc = sdmmc_host_cmd_send_status(host);
+            }
+            else
+            {
+                /*
+                 * NOTE: some controllers can send CMD12 automatically
+                 *       after the end of a transfer, eg. X1000; it might
+                 *       be worth supporting that via a feature flag.
+                 */
+                uint32_t ignore = 0;
 
-            rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
+                /*
+                 * A CMD12-terminated read runs until it is stopped, so
+                 * one ending on the last block of the card will have
+                 * tried to read past the end and set OUT_OF_RANGE. The
+                 * SD spec (4.3.3, "Block Read") requires it to be
+                 * ignored.
+                 */
+                if (data_dir == SDMMC_DATA_READ &&
+                    start + xfer_count == host->cardinfo.numblocks)
+                    ignore = SD_R1_OUT_OF_RANGE;
+
+                memset(&cmd, 0, sizeof(cmd));
+                cmd.command = SD_STOP_TRANSMISSION;
+                cmd.flags = SDMMC_RESP_SHORT | SDMMC_RESP_BUSY;
+
+                rc = sdmmc_host_submit_cmd_r1(host, &cmd, ignore);
+            }
+
             if (rc)
                 goto out;
         }
