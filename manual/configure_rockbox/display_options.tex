@@ -287,4 +287,38 @@
       uses a different codepage and you are getting garbled extended characters
       you should adjust this settings. In most cases sticking to
       ``ISO-8859-1'' would be sufficient.
+%
+  \opt{touchscreen}{
+  \item[Touchscreen Settings.]
+    Options related to touchscreen behavior.
+    \begin{description}
+    \item[Touchscreen Mode.]
+      Rockbox supports two touchscreen modes. \setting{Absolute Point} behaves
+      like a normal touchscreen and allows you to select items by tapping on
+      them directly. \setting{3x3 Grid} divides the touchscreen into thirds to
+      emulate a grid of 9 buttons: eg. tapping on the center of the screen is
+      interpreted as a virtual ``center'' button.
+      \note{Some parts of the UI only support \setting{3x3 Grid} mode and will
+        fall back to it even if \setting{Absolute Point} mode is selected. In
+        particular, \setting{3x3 Grid} mode will be used in the WPS unless the
+        theme supports touch interaction; the default ``Cabbie v2.0'' theme
+        does not include touch support.}
+    \item[Line Padding In Lists.]
+      This option affects the amount of padding added to list entries, which
+      makes them larger on screen and easier to select with a touchscreen.
+      \setting{Auto} will calculate a reasonable amount of padding based on
+      the standard line height and the screen DPI. \setting{Off} disables the
+      feature and will not add any padding. Other values allow you to set the
+      number of pixels of padding to be added to the standard line height.
+    \item[Calibrate.]
+      Allows you to change the touchscreen calibration by touching on three
+      points on the screen to correct for any offset or rotation of the touch
+      overlay compared to the display. This calibration method is useful for
+      older devices that use a physically separate touch overlay panels, which
+      may be slightly mis-aligned to the display.
+    \item[Reset Calibration.]
+      Select this option to clear calibration data set by the
+      \setting{Calibrate} option.
+    \end{description}
+  }
   \end{description}
