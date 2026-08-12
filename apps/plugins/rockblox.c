@@ -457,7 +457,7 @@
 #define ROCKBLOX_RESTART        BUTTON_BACK
 #define ROCKBLOX_SCROLL_ENABLED 1
 
-#elif CONFIG_KEYPAD == SHANLING_Q1_PAD || CONFIG_KEYPAD == HIBY_R3PROII_PAD
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD || CONFIG_KEYPAD == HIBY_R3PROII_PAD || CONFIG_KEYPAD == HIDIZS_AP80MAX_PAD
 /* use touchscreen */
 
 #elif CONFIG_KEYPAD == MA_PAD
@@ -575,6 +575,23 @@
 #define SCORE_Y 58
 #define LEVEL_Y 142
 #define LINES_Y 218
+
+#elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 640)
+
+/* 10x20 board of 24px blocks = 240x480, leaving a 100px label column */
+#define BLOCK_WIDTH 24
+#define BLOCK_HEIGHT 24
+#define BOARD_X 8
+#define BOARD_Y 40
+#define LABEL_X 258
+#define SCORE_Y 60
+#define LEVEL_Y 140
+#define LINES_Y 220
+#define HIGH_LABEL_X   258
+#define HIGH_SCORE_Y   320
+#define HIGH_LEVEL_Y   400
+#define PREVIEW_X 258
+#define PREVIEW_Y 480
 
 #elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 400)
 

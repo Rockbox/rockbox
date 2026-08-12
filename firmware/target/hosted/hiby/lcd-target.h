@@ -26,7 +26,13 @@
 #define LCD_OPTIMIZED_UPDATE_RECT
 
 extern fb_data *framebuffer;
+
+#ifdef FB_STRIDE_MISMATCH
+#define LCD_FRAMEBUF_ADDR(col, row) \
+    (framebuffer + (row)*FB_STRIDE_MISMATCH + (col) + FB_STRIDE_XOFFSET)
+#else
 #define LCD_FRAMEBUF_ADDR(col, row) (framebuffer + (row)*LCD_WIDTH + (col))
+#endif
 
 extern void lcd_set_active(bool active);
 #endif /* __LCD_TARGET_H__ */

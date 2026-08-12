@@ -1,4 +1,4 @@
-#if !defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1)
+#if !defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90) || defined(HIBY_R3PROII) || defined(HIBY_R1) || defined(HIDIZS_AP80MAX)
 /* In devices running RockBox as an application, but having a keypad */
 #include "SOURCES"
 #else

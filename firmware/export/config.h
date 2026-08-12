@@ -157,6 +157,7 @@
 #define RG_NANO_PAD        77
 #define CTRU_PAD           78
 #define HIBY_R3PROII_PAD   79
+#define HIDIZS_AP80MAX_PAD 80
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -580,6 +581,8 @@ Lyre prototype 1 */
 #include "config/hibyr3proii.h"
 #elif defined(HIBY_R1)
 #include "config/hibyr1.h"
+#elif defined(HIDIZS_AP80MAX)
+#include "config/hidizsap80max.h"
 #else
 #error "unknown hardware platform!"
 #endif

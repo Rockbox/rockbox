@@ -106,6 +106,10 @@ void lcd_init_device(void)
             vinfo.yres, vinfo.bits_per_pixel);
     }
 #endif
+#elif defined(FB_STRIDE_MISMATCH)
+    /* For framebuffers wider than the panel and cannot be resized */
+    if (vinfo.bits_per_pixel != LCD_DEPTH)
+        panicf("Unexpected framebuffer depth: %d", vinfo.bits_per_pixel);
 #else
     /* Make sure we match our desired bitdepth */
     if (vinfo.bits_per_pixel != LCD_DEPTH || vinfo.xres != LCD_WIDTH || vinfo.yres != LCD_HEIGHT) {
@@ -167,6 +171,20 @@ void lcd_enable(bool on)
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
+#ifdef FB_STRIDE_MISMATCH
+/* lcd_copy_buffer_rect() for framebuffers wider than the panel */
+static void fb_copy_rect(fb_data *dst, const fb_data *src,
+                         int width, int height)
+{
+    while (height--)
+    {
+        memcpy(dst, src, width * sizeof(fb_data));
+        dst += FB_STRIDE_MISMATCH;
+        src += LCD_WIDTH;
+    }
+}
+#endif
+
 void lcd_update(void)
 {
     if (fd < 0) return;
@@ -176,9 +194,15 @@ void lcd_update(void)
 #endif
     {
         /* Copy the Rockbox framebuffer to the second framebuffer */
+#ifdef FB_STRIDE_MISMATCH
+        /* Strides differ - not one contiguous run */
+        fb_copy_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0, 0),
+                     LCD_WIDTH, LCD_HEIGHT);
+#else
         fb_data *dst = LCD_FRAMEBUF_ADDR(0, 0) + (fb_plane * FRAMEBUFFER_SIZE);
         lcd_copy_buffer_rect(dst, FBADDR(0,0),
                              LCD_WIDTH*LCD_HEIGHT, 1);
+#endif
         redraw();
     }
 }
@@ -191,6 +215,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (lcd_active())
 #endif
     {
+#ifdef FB_STRIDE_MISMATCH
+        /* Strides differ - do line-by-line */
+        fb_copy_rect(LCD_FRAMEBUF_ADDR(x, y), FBADDR(x, y), width, height);
+#else
         fb_data *dst = LCD_FRAMEBUF_ADDR(x, y) + (fb_plane * FRAMEBUFFER_SIZE);
         fb_data *src = FBADDR(x,y);
 
@@ -205,6 +233,7 @@ void lcd_update_rect(int x, int y, int width, int height)
             /* Full width - copy as one line */
             lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
         }
+#endif
         redraw();
     }
 }

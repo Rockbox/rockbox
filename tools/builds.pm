@@ -471,6 +471,10 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'Hiby R3Pro II',
         status => 2,
     },
+    'hidizsap80max' => {
+        name => 'Hidizs AP80 Pro Max',
+        status => 1,
+    },
 );
 
 sub manualname {

@@ -187,7 +187,18 @@ target/hosted/hiby/hibylinux_codec.c
 #endif
 #endif
 
-#if (defined(HIBY_R1) || defined(HIBY_R3PROII)) && !defined(SIMULATOR)
+#if defined(HIDIZS_AP80MAX) && !defined(SIMULATOR)
+target/hosted/hiby/usb-hiby-gadget.c
+target/hosted/hiby/ap80max/button-ap80max.c
+target/hosted/hiby/ap80max/powermgmt-ap80max.c
+target/hosted/hiby/debug-hiby.c
+#ifndef BOOTLOADER
+target/hosted/hiby/ap80max/led-ap80max.c
+target/hosted/hiby/hibylinux_codec.c
+#endif
+#endif
+
+#if (defined(HIBY_R1) || defined(HIBY_R3PROII) || defined(HIDIZS_AP80MAX)) && !defined(SIMULATOR)
 target/hosted/hiby/usb-dac-hiby.c
 #endif
 
@@ -222,7 +233,7 @@ target/hosted/xduoo/xduoolinux_codec.c
 target/hosted/button-devinput.c
 #endif
 
-#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(SIMULATOR)
+#if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(HIDIZS_AP80MAX) && !defined(SIMULATOR)
 target/hosted/usb-hiby.c
 #endif
 

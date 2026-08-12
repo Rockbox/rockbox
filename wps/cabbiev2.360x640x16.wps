@@ -1,0 +1,87 @@
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
+# Laid out against wpsbackdrop-360x640x16.bmp, whose fixed landmarks are:
+#   title bar       x=30..329 y=6..27
+#   progress trough x=30..329 y=516..537
+#   status row      y=605..633, with shuffle baked at x=209 and repeat at x=273
+# Everything below is anchored to those; the content area is y=28..515.
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(wpsbackdrop-360x640x16.bmp)
+#
+# Preload Images
+%xl(A,lock-360x640x16.bmp,0,0,2)
+%xl(B,battery-360x640x16.bmp,0,0,10)
+%xl(C,volume-360x640x16.bmp,0,0,10)
+%xl(D,shuffle-360x640x16.bmp,0,0)
+%xl(E,repeat-360x640x16.bmp,0,0,4)
+%xl(F,playmode-360x640x16.bmp,0,0,5)
+#
+# Album Art/Info Viewport Conditional
+%?C<%Vd(a)|%Vd(b)>
+#
+# Progress Bar
+# Backdrop trough occupies x=30..329, y=516..537.
+%V(30,516,300,20,-)
+%pb(0,0,-,20,pb-360x640x16.bmp)
+#
+# Hold
+%V(16,605,38,29,-)
+%?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(69,605,66,29,-)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+#
+# Volume
+%V(147,605,50,29,-)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+#
+# Shuffle
+%V(208,605,55,29,-)
+%?ps<%xd(D)>
+#
+# Repeat
+%V(273,605,27,29,-)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(309,605,36,29,-)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+#
+# Time Elapsed/Remaining
+%V(30,542,300,36,-)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+#
+# Album Art
+%ax%Vl(a,40,45,280,280,-)
+%Cl(0,0,280,280,c,c)
+%Cd
+#
+# Track Info - Album Art
+%ax%Vl(a,0,329,-,187,1)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
+
+%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
+#
+# Track Info - No Album Art
+%Vl(b,0,96,-,420,1)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
+%ac%?iy<%iy|>
+
+%ac%?ig<%ig|>
+%ac%?fv<%(vbr%) |>%fb kbit/s %fc
+
+%ac%Sx(Next:)
+%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>
+%ac%s%?It<%It|%Fn>
+%s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>
