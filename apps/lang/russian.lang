@@ -32,6 +32,7 @@
 # - Dmitry Prozorov
 # - Fedor Pomazkov
 # - Vladislav Voronichev
+# - Sergey Puskov
 # - Ivan Romaniuk-Mikhailovsky
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -736,10 +737,10 @@
     *: "Peak Filter"
   </source>
   <dest>
-    *: "Полосовой фильтр %d"
+    *: "Пиковый фильтр"
   </dest>
   <voice>
-    *: "Полосовой фильтр"
+    *: "Пиковый фильтр"
   </voice>
 </phrase>
 <phrase>
