@@ -42,7 +42,9 @@
 #include "open_plugin.h"
 #include "misc.h"
 #include "playback.h"
+#ifndef __PCTOOL__
 #include "fixedpoint.h"
+#endif
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
