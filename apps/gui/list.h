@@ -25,7 +25,9 @@
 #include "action.h"
 #include "icon.h"
 #include "screen_access.h"
+#ifndef __PCTOOL__
 #include "skin_engine/skin_engine.h"
+#endif
 #include "line.h"
 
 #define SCROLLBAR_WIDTH global_settings.scrollbar_width
