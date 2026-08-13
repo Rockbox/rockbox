@@ -2450,6 +2450,14 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_DRAW_INBUILTBAR:
                     function = parse_statusbar_tags;
                     break;
+#if defined(HAVE_QUICKSCREEN) && !defined(__PCTOOL__)
+                case SKIN_TOKEN_TOP_QUICKSETTING_NAME:
+                    /* Disable built-in Quickscreen UI if skin draws its own,
+                       as suggested by the use of the %QT tag */
+                    if (curr_skin == CUSTOM_STATUSBAR)
+                        quickscreen_set_skinned(curr_screen, true);
+                    break;
+#endif
                 case SKIN_TOKEN_LIST_TITLE_TEXT:
 #ifndef __PCTOOL__
                     sb_skin_has_title(curr_screen);

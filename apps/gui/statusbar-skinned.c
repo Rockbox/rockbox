@@ -101,6 +101,9 @@ void sb_process(enum screen_type screen, struct wps_data *data, bool preprocess)
     {
         sbs_loaded[screen] = false;
         sbs_has_title[screen] = false;
+#ifdef HAVE_QUICKSCREEN
+        quickscreen_set_skinned(screen, false); /* Revert to built-in QS UI */
+#endif
         viewportmanager_theme_enable(screen, false, NULL);
         return;
     }

@@ -61,6 +61,16 @@ struct quickscreen
     enum quickscreen_item volume_item;
 };
 
+/* Skin draws custom Quickscreen UI */
+static bool qs_skinned[NB_SCREENS];
+
+/* Toggle built-in interface, based on
+   whether skin draws custom QS UI. */
+void quickscreen_set_skinned(enum screen_type screen, bool skinned)
+{
+    qs_skinned[screen] = skinned;
+}
+
 static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type screen)
 {
     int char_height, width, pad = 0;
@@ -207,6 +217,9 @@ static void quickscreen_update(struct quickscreen *qs, enum quickscreen_item sel
         struct screen *display = &screens[screen];
         struct viewport *vps = qs->vps[screen];
 
+        if (qs_skinned[screen])
+            continue;
+
         for (int i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
             if (qs->items[i] == qs->items[selected])
             {
@@ -266,7 +279,8 @@ static void quickscreen_draw_cb(unsigned short id, void *data, void *userdata)
     (void)data;
 
     FOR_NB_SCREENS(i)
-        quickscreen_draw((struct quickscreen *) userdata, i);
+        if (!qs_skinned[i])
+            quickscreen_draw((struct quickscreen *) userdata, i);
 }
 
 static void talk_qs_option(const struct settings_list *opt, bool enqueue)
@@ -372,8 +386,9 @@ static void cleanup(void *parameter)
 
     FOR_NB_SCREENS(i)
     {
-        for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
-            screens[i].scroll_stop_viewport(&qs->vps[i][j]);
+        if (!qs_skinned[i])
+            for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
+                screens[i].scroll_stop_viewport(&qs->vps[i][j]);
         viewportmanager_theme_undo(i, !(qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
     }
     /* Eliminate flashing of parent during transition to Shortcuts */
@@ -400,8 +415,11 @@ static void quickscreen_run(struct quickscreen * qs)
         screens[i].set_viewport(NULL);
         screens[i].scroll_stop();
         viewportmanager_theme_enable(i, true, &qs->parent[i]);
-        quickscreen_fix_viewports(qs, i);
-        quickscreen_draw(qs, i);
+        if (!qs_skinned[i])
+        {
+            quickscreen_fix_viewports(qs, i);
+            quickscreen_draw(qs, i);
+        }
     }
     /* Announce current selection on entering this screen. This is all
        queued up, but can be interrupted as soon as a setting is

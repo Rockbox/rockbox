@@ -762,7 +762,7 @@ int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
     /* Skip updates if peak meter disabled. */
     bool peak_meter_enabled = false;
     FOR_NB_SCREENS(i)
-       peak_meter_enabled |= skin_get_gwps(skin, i)->data->peak_meter_enabled;
+        peak_meter_enabled |= skin_get_gwps(skin, i)->data->peak_meter_enabled;
     if (!peak_meter_enabled)
         return get_action(context, timeout);
 

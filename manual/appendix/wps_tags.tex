@@ -319,6 +319,32 @@ Examples:
 
 \config{\%?if(\%cs, =, 2)<This is the WPS>}
 
+\opt{quickscreen}{
+\section{Drawing the Quickscreen using a skin}
+
+Quickscreen settings can be displayed using the following tags.
+
+\begin{tagmap}
+    \config{\%QT} & Top Quickscreen setting (name)\\
+    \config{\%Qt} & Top Quickscreen setting (value)\\
+    \config{\%QR} & Right Quickscreen setting (name)\\
+    \config{\%Qr} & Right Quickscreen setting (value)\\
+    \config{\%QB} & Bottom Quickscreen setting (name)\\
+    \config{\%Qb} & Bottom Quickscreen setting (value)\\
+    \config{\%QL} & Left Quickscreen setting (name)\\
+    \config{\%Ql} & Left Quickscreen setting (value)\\
+  \end{tagmap}
+
+  Define viewports containing these tags for each Quickscreen position, with your
+  desired font and formatting. Check if \config{\%cs} is equal to \config{10}
+  (i.e. Quickscreen is the current screen) before displaying them.
+
+  If \config{\%QT} is present anywhere in the \fname{.sbs}, then the un-skinned
+  Quickscreen will not be shown.
+
+  \note{If a preset does not match a legal setting, or has no setting applied, all tags will display "ERR".}
+}
+
 \section{List Title (\fname{.sbs} only)}
   \begin{tagmap}
     \config{\%Lt} & Title text. Should be used in a conditional so that non-list
@@ -389,25 +415,6 @@ Examples:
 \item As a simple tag: \config{\%St(skip length)}
 \item As a conditional: \config{\%?St(eq enabled)<Eq is enabled|Eq is disabled>}
 \end{enumerate}
-
-\opt{quickscreen}{
-\subsection{Displaying Quickscreen settings}
-
-If your player has a quickscreen, the preset settings can be displayed using the following.
-
-\begin{tagmap}
-    \config{\%QT} & Display the name of the top quickscreen setting.\\
-    \config{\%Qt} & Display the value of the top quickscreen setting.\\
-    \config{\%QR} & Display the name of the right quickscreen setting.\\
-    \config{\%Qr} & Display the value of the right quickscreen setting.\\
-    \config{\%QB} & Display the name of the bottom quickscreen setting.\\
-    \config{\%Qb} & Display the value of the bottom quickscreen setting.\\
-    \config{\%QL} & Display the name of the left quickscreen setting.\\
-    \config{\%Ql} & Display the value of the left quickscreen setting.\\
-  \end{tagmap}
-
-  \note{If a preset does not match a legal setting, or has no setting applied, all tags will display "ERR".}
-}
 
 \section{\label{ref:wps_images}Images}
   \begin{tagmap}
