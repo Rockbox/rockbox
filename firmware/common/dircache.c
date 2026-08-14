@@ -1395,15 +1395,12 @@ static void sab_process_dir(struct file_base_info *infop, bool issab)
        should also filled in beforehand */
 
     /* allocate the stack right now to the max demand */
-    struct dirsab
-    {
-        struct sab           sab;
-        struct sab_component stack[issab ? DIRCACHE_MAX_DEPTH : 1];
-    } dirsab;
-    struct sab *sabp = &dirsab.sab;
+    size_t stackdepth = (issab ? DIRCACHE_MAX_DEPTH : 1);
+    struct sab *sabp = alloca(sizeof(*sabp) +
+                              sizeof(sabp->stack[0]) * stackdepth);
 
     sabp->quit     = false;
-    sabp->stackend = &sabp->stack[ARRAYLEN(dirsab.stack)];
+    sabp->stackend = &sabp->stack[stackdepth];
     sabp->top      = sabp->stackend;
     sabp->info     = *infop;
 
