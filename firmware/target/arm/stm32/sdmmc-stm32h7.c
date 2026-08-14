@@ -378,16 +378,8 @@ int stm32h7_sdmmc_submit_command(void *controller,
     /* Wait for command completion */
     semaphore_wait(&ctl->sem, TIMEOUT_BLOCK);
 
-    /*
-     * Discard data from speculative reads that may have
-     * accessed the buffer during the DMA transfer.
-     */
+    /* Save original command status code */
     int cmd_error = ctl->cmd_error;
-    if (cmd_error == SDMMC_STATUS_OK)
-    {
-        if (SDMMC_DATA_DIR(cmd->flags) == SDMMC_DATA_READ)
-            discard_dcache_range(buff_addr, buff_size);
-    }
 
     /*
      * If a data transfer command fails we need to issue CMD12
@@ -408,6 +400,15 @@ int stm32h7_sdmmc_submit_command(void *controller,
          */
         stm32h7_sdmmc_submit_command(ctl, &cmd12, NULL);
     }
+
+    /*
+     * Discard data from speculative reads that may have
+     * accessed the buffer during the DMA transfer. Must
+     * be done after the CMD12 above otherwise the cache
+     * may end up out of sync with main memory.
+     */
+    if (SDMMC_DATA_DIR(cmd->flags) == SDMMC_DATA_READ)
+        discard_dcache_range(buff_addr, buff_size);
 
     /* Return error from original command */
     return cmd_error;
