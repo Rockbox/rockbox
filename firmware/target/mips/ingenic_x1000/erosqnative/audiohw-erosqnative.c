@@ -20,6 +20,7 @@
 
 #include "system.h"
 #include "audiohw.h"
+#include "pcm_sink.h"
 #include "pcm_sw_volume.h"
 #include "pcm_sampr.h"
 #include "i2c-target.h"
@@ -102,11 +103,12 @@ void audiohw_init(void)
         }
 #endif
         es9018k2m_present_flag = true;
+        builtin_pcm_sink.caps.volume_type = PCM_SINK_HWVOL;
 
        /* Default is 32-bit data, and it works ok. Enabling the following
         * causes issue. Which is weird, I definitely thought AIC was configured
-        * for 24-bit data... */
-        // es9018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0b01001100); // 24-bit data
+        * for 16-bit data... */
+        // es9018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0b00001100); // 16-bit data
 
        /* Datasheet: Sets the number os FSR edges that must occur before    *
         * the DPLL and ASRC can lock on to the the incoming Signal.         *
@@ -192,9 +194,6 @@ void audiohw_set_volume(int vol_l, int vol_r)
         l = l <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : l;
         r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : r;
 
-        /* set software volume just below unity due to
-         * DAC offset. We don't want to overflow the PCM system. */
-        pcm_set_master_volume(-1, -1);
         es9018k2m_set_volume_async(l, r);
     }
     else /* PCM5102A */

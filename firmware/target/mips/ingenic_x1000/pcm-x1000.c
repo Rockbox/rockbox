@@ -70,16 +70,21 @@ static void sink_dma_init(void)
     audiohw_init();
 
 #if (PCM_NATIVE_BITDEPTH > 16)
-    /* Program audio format (stereo, 24 bit samples) */
-    jz_writef(AIC_CCR, PACK16(0), CHANNEL_V(STEREO),
-              OSS_V(24BIT), ISS_V(24BIT), M2S(0));
-    jz_writef(AIC_I2SCR, SWLH(0));
-#else
-    /* Program audio format (stereo, packed 16 bit samples) */
-    jz_writef(AIC_CCR, PACK16(1), CHANNEL_V(STEREO),
-              OSS_V(16BIT), ISS_V(16BIT), M2S(0));
-    jz_writef(AIC_I2SCR, SWLH(0));
+    if (builtin_pcm_sink.caps.volume_type != PCM_SINK_HWVOL)
+    {
+        /* Program audio format (stereo, 24 bit samples) */
+        jz_writef(AIC_CCR, PACK16(0), CHANNEL_V(STEREO),
+                OSS_V(24BIT), ISS_V(24BIT), M2S(0));
+        jz_writef(AIC_I2SCR, SWLH(0));
+    }
+    else
 #endif
+    {
+        /* Program audio format (stereo, packed 16 bit samples) */
+        jz_writef(AIC_CCR, PACK16(1), CHANNEL_V(STEREO),
+                OSS_V(16BIT), ISS_V(16BIT), M2S(0));
+        jz_writef(AIC_I2SCR, SWLH(0));
+    }
 
     /* Set DMA settings */
     jz_writef(AIC_CFG, TFTH(16), RFTH(15));

@@ -47,7 +47,7 @@ struct pcm_sink_ops {
 
 struct pcm_sink {
     /* characteristics */
-    const struct pcm_sink_caps caps;
+    struct pcm_sink_caps caps;
 
     /* operations */
     const struct pcm_sink_ops ops;
