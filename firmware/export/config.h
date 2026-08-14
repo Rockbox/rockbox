@@ -1494,4 +1494,12 @@ Lyre prototype 1 */
 #define ucschar_t unsigned short
 #endif
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+#define WANT_SWVOL
+#endif
+
+#if defined(PCM_NATIVE_BITDEPTH) && (PCM_NATIVE_BITDEPTH > 16)
+#define WANT_SWVOL_32
+#endif
+
 #endif /* __CONFIG_H__ */

@@ -210,7 +210,7 @@ void pcm_sync_pcm_factors(void)
 #endif
 }
 
-#ifndef PCM_SW_VOLUME_UNBUFFERED
+#ifdef WANT_SWVOL
 /* source buffer from client */
 static const void * volatile src_buf_addr = NULL;
 static size_t volatile src_buf_rem = 0;
@@ -227,7 +227,7 @@ static unsigned int frame_count, frame_err, frame_frac;
 
 /** Overrides of certain functions in pcm.c and pcm-internal.h **/
 
-bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
+bool pcm_play_dma_complete_callback_swvol(enum pcm_dma_status status,
                                     const void **addr, size_t *size)
 {
     /* Check status callback first if error */
@@ -268,7 +268,7 @@ static void update_frame_params(size_t size)
 
 /* Obtain the next buffer and prepare it for pcm driver playback */
 enum pcm_dma_status
-pcm_play_dma_status_callback_int(enum pcm_dma_status status)
+pcm_play_dma_status_callback_int_swvol(enum pcm_dma_status status)
 {
     if (status != PCM_DMAST_STARTED)
         return status;
@@ -327,7 +327,7 @@ static void start_pcm(bool reframe)
     pcm_get_current_sink()->ops.play(pcm_dbl_buf[1], pcm_dbl_buf_size[1]);
 }
 
-void pcm_play_dma_start_int(const void *addr, size_t size)
+void pcm_play_dma_start_int_swvol(const void *addr, size_t size)
 {
     src_buf_addr = addr;
     /* divide by 2 for 32 bit, optimize away to 1 for 16 bit */
@@ -335,14 +335,14 @@ void pcm_play_dma_start_int(const void *addr, size_t size)
     start_pcm(true);
 }
 
-void pcm_play_dma_stop_int(void)
+void pcm_play_dma_stop_int_swvol(void)
 {
     pcm_get_current_sink()->ops.stop();
     src_buf_addr = NULL;
     src_buf_rem = 0;
 }
 
-#endif /* PCM_SW_VOLUME_UNBUFFERED */
+#endif /* WANT_SWVOL */
 
 
 /** Internal **/

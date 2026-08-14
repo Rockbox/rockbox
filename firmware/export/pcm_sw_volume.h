@@ -26,10 +26,11 @@
  ** the library or a hardware necessity. Normally, it shouldn't be used and
  ** only the port developer can properly decide.
  **/
-#ifdef HAVE_SW_VOLUME_CONTROL
+#ifdef WANT_SWVOL
 
 #include <audiohw.h>
 #include <limits.h>
+#include <stddef.h>
 
 #define PCM_MUTE_LEVEL INT_MIN
 
@@ -41,6 +42,11 @@ void pcm_set_prescaler(int prescale);
 /* Set the per-channel volume cut/gain for all PCM playback */
 void pcm_set_master_volume(int vol_l, int vol_r);
 
-#endif /* HAVE_SW_VOLUME_CONTROL */
+void pcm_play_dma_start_int_swvol(const void *addr, size_t size);
+void pcm_play_dma_stop_int_swvol(void);
+enum pcm_dma_status pcm_play_dma_status_callback_int_swvol(enum pcm_dma_status status);
+bool pcm_play_dma_complete_callback_swvol(enum pcm_dma_status status,
+                                          const void **addr, size_t *size);
+#endif /* WANT_SWVOL */
 
 #endif /* PCM_SW_VOLUME_H */

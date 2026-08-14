@@ -178,6 +178,7 @@ struct pcm_sink builtin_pcm_sink = {
         .samprs       = hw_freq_sampr,
         .num_samprs   = HW_NUM_FREQ,
         .default_freq = HW_FREQ_DEFAULT,
+        .volume_type  = PCM_NATIVE_VOLUME_TYPE,
     },
     .ops = {
         .init     = sink_dma_init,

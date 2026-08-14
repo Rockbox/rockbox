@@ -30,6 +30,7 @@
 #include "general.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
+#include "pcm_sw_volume.h"
 
 /**
  * Aspects implemented in the target-specific portion:
@@ -105,12 +106,15 @@ struct pcm_sink* pcm_get_current_sink(void)
     return sinks[cur_sink];
 }
 
-#if !defined(HAVE_SW_VOLUME_CONTROL) || defined(PCM_SW_VOLUME_UNBUFFERED)
 /** Standard hw volume/unbuffered control functions - otherwise, see
  ** pcm_sw_volume.c **/
 static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 {
-#ifdef HAVE_SW_VOLUME_CONTROL
+#ifdef WANT_SWVOL
+    if (sinks[cur_sink]->caps.volume_type == PCM_SINK_SWVOL) {
+        pcm_play_dma_start_int_swvol(addr, size);
+        return;
+    }
     /* Smoothed transition might not have happened so sync now */
     pcm_sync_pcm_factors();
 #endif
@@ -119,12 +123,23 @@ static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 
 static inline void pcm_play_dma_stop_int(void)
 {
+#ifdef WANT_SWVOL
+    if (sinks[cur_sink]->caps.volume_type == PCM_SINK_SWVOL) {
+        pcm_play_dma_stop_int_swvol();
+        return;
+    }
+#endif
     sinks[cur_sink]->ops.stop();
 }
 
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
                                     const void **addr, size_t *size)
 {
+#ifdef WANT_SWVOL
+    if (sinks[cur_sink]->caps.volume_type == PCM_SINK_SWVOL) {
+        return pcm_play_dma_complete_callback_swvol(status, addr, size);
+    }
+#endif
     /* Check status callback first if error */
     if (status < PCM_DMAST_OK)
         status = pcm_play_dma_status_callback(status);
@@ -137,7 +152,6 @@ bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
     pcm_play_stop_int();
     return false;
 }
-#endif /* !HAVE_SW_VOLUME_CONTROL || PCM_SW_VOLUME_UNBUFFERED */
 
 void pcm_play_stop_int(void)
 {

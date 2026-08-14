@@ -45,21 +45,22 @@
 #define PCM_FACTOR_UNITY    (1u << PCM_SW_VOLUME_FRACBITS)
 #endif /* PCM_SW_VOLUME_FRACBITS */
 
+#ifdef HAVE_SDL_AUDIO
 #ifdef PCM_SW_VOLUME_UNBUFFERED
 /* Copies buffer with volume scaling applied */
 void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size);
 #define pcm_copy_buffer pcm_sw_volume_copy_buffer
-#else /* !PCM_SW_VOLUME_UNBUFFERED */
-#ifdef HAVE_SDL_AUDIO
+#else /* PCM_SW_VOLUME_UNBUFFERED */
 #define pcm_copy_buffer memcpy
-#endif
+#endif /* PCM_SW_VOLUME_UNBUFFERED */
+#endif /* HAVE_SDL_AUDIO */
+
 #ifndef PCM_PLAY_DBL_BUF_SAMPLES
 #define PCM_PLAY_DBL_BUF_SAMPLES 1024 /* Max 4KByte chunks */
 #endif
 #ifndef PCM_DBL_BUF_BSS
 #define PCM_DBL_BUF_BSS               /* In DRAM, uncached may be better */
 #endif
-#endif /* PCM_SW_VOLUME_UNBUFFERED */
 
 void pcm_sync_pcm_factors(void);
 #endif /* HAVE_SW_VOLUME_CONTROL */
@@ -126,19 +127,14 @@ static FORCE_INLINE enum pcm_dma_status pcm_play_call_status_cb(
 static FORCE_INLINE enum pcm_dma_status
 pcm_play_dma_status_callback(enum pcm_dma_status status)
 {
-#if defined(HAVE_SW_VOLUME_CONTROL) && !defined(PCM_SW_VOLUME_UNBUFFERED)
+#ifdef WANT_SWVOL
     extern enum pcm_dma_status
-        pcm_play_dma_status_callback_int(enum pcm_dma_status status);
-    return pcm_play_dma_status_callback_int(status);
-#else
+        pcm_play_dma_status_callback_int_swvol(enum pcm_dma_status status);
+    if (pcm_current_sink_caps()->volume_type == PCM_SINK_SWVOL)
+        return pcm_play_dma_status_callback_int_swvol(status);
+#endif /* WANT_SWVOL */
     return pcm_play_call_status_cb(status);
-#endif /* HAVE_SW_VOLUME_CONTROL && !PCM_SW_VOLUME_UNBUFFERED */
 }
-
-#if defined(HAVE_SW_VOLUME_CONTROL) && !defined(PCM_SW_VOLUME_UNBUFFERED)
-void pcm_play_dma_start_int(const void *addr, size_t size);
-void pcm_play_dma_stop_int(void);
-#endif /* HAVE_SW_VOLUME_CONTROL && !PCM_SW_VOLUME_UNBUFFERED */
 
 /* Called by the bottom layer ISR when more data is needed. Returns true
  * if a new buffer is available, false otherwise. */
