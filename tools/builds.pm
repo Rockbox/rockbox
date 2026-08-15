@@ -473,7 +473,7 @@ $releasenotes="/wiki/ReleaseNotes400";
     },
     'hidizsap80max' => {
         name => 'Hidizs AP80 Pro Max',
-        status => 1,
+        status => 2,
     },
 );
 
