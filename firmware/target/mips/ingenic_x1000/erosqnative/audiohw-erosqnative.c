@@ -105,11 +105,17 @@ void audiohw_init(void)
         es9018k2m_present_flag = true;
         builtin_pcm_sink.caps.volume_type = PCM_SINK_HWVOL;
 
-       /* ES9018K2M defaults to 32-bit sample depth, which appears to work
-          properly with both 16-bit and 24-bit AIC configuration!  Enabling
-          the following (ie to match the actual AIC configuration) produces
-          garbled output! */
-       // es9018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0b00001100); // 16-bit data
+        /*
+         * Set sample depth to 32-bit. The sample depth setting corresponds
+         * to the I2S frame length which is twice the sample depth (since
+         * I2S is stereo). The AIC only supports 64-bit frames (see 6.3.1
+         * "6.3.1 I2S and MSB-justified serial audio format" in the PM).
+         *
+         * Commented out since this is the hardware default. We technically
+         * do not need SPDIF/DSD detection so the lower nibble could be 0,
+         * but it was historically enabled does not seem to cause any harm.
+         */
+        //es92018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0xcc);
 
        /* Datasheet: Sets the number os FSR edges that must occur before    *
         * the DPLL and ASRC can lock on to the the incoming Signal.         *
