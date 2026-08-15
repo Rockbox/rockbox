@@ -49,7 +49,7 @@ static uint32_t pcm_factor_l = 0, pcm_factor_r = 0;
 static typeof (memcpy) *pcm_scaling_fn = NULL;
 
 /* take care of some defines for 32-bit software vol */
-#if (PCM_NATIVE_BITDEPTH > 16) /* >16-bit */
+#ifdef WANT_SWVOL_32 /* >16-bit */
 # define HAVE_SWVOL_32
 # define PCM_VOL_SAMPLE_SIZE    (2 * sizeof (int32_t))
 # define PCM_DBL_BUF_SIZE_T     int32_t
