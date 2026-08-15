@@ -108,7 +108,7 @@ void audiohw_init(void)
        /* ES9018K2M defaults to 32-bit sample depth, which appears to work
           properly with both 16-bit and 24-bit AIC configuration!  Enabling
           the following (ie to match the actual AIC configuration) produces
-          garbled output!
+          garbled output! */
        // es9018k2m_write_reg(ES9018K2M_REG1_INPUT_CONFIG, 0b00001100); // 16-bit data
 
        /* Datasheet: Sets the number os FSR edges that must occur before    *
