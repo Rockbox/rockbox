@@ -730,8 +730,17 @@ static void usb_dw_epstart(int epnum, enum usb_dw_epdir epdir,
     DWC_EPTSIZ(epnum, epdir) = eptsiz;
     if (((DWC_EPCTL(epnum, epdir) >> 18) & 0x3) == EPTYP_ISOCHRONOUS)
     {
-        /* Schedule the transfer for the next frame. */
-        if ((DWC_DSTS >> 8) & 1)
+        /*
+         * Handle frame scheduling for isochronous endpoints.
+         *
+         * TODO: this needs to take into account the endpoint's bInterval,
+         * and currently will not work for USB 2.0 endpoints that require
+         * one packet per microframe. For slower USB 2.0 endpoints data is
+         * only transferred on *even* frames; SETD1PIDOF is not used.
+         * This also breaks for USB 1.0 endpoints with bInterval > 1 for
+         * the same reason.
+         */
+        if (usb_drv_port_speed() || (usb_drv_get_frame_number() & 1))
             DWC_EPCTL(epnum, epdir) |= EPENA | nak | SETD0PIDEF;
         else
             DWC_EPCTL(epnum, epdir) |= EPENA | nak | SETD1PIDOF;
@@ -1524,10 +1533,14 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     return dw_ep->status;
 }
 
-int usb_drv_get_frame_number()
+int usb_drv_get_frame_number(void)
 {
-    // SOFFN is 14 bits, the least significant 3 appear to be some sort of microframe count.
-    // The USB spec says a frame number is 11 bits. This way we get 1 frame per millisecond,
-    // just like we're supposed to!
-    return (DWC_DSTS >> 11) & 0x7FF;
+    /*
+     * SOFFN is a 14-bit microframe number for high-speed hosts and
+     * a plain frame number for full-speed hosts.
+     */
+    if (usb_drv_port_speed())
+        return (DWC_DSTS >> 11) & 0x7FF;
+    else
+        return (DWC_DSTS >> 8) & 0x3FFF;
 }
