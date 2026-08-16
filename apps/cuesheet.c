@@ -447,6 +447,30 @@ static const char* list_get_name_cb(int selected_item,
     return buffer;
 }
 
+static char global_temp_buffer[MAX_PATH+1];
+
+static int cuesheet_list_voice_cb(int list_index, void* data)
+{
+    struct cuesheet *cue = (struct cuesheet *) data;
+    int index = list_index / 2;
+
+    talk_id(LANG_PLAYTIME_TRACK, true);
+    talk_number(index + 1, true);
+
+    /* Look up and voice talk clips */
+    const char *nameptr = NULL;
+    size_t dirlen = path_dirname(cue->file, &nameptr);
+    size_t tmp;
+    tmp = snprintf(global_temp_buffer, dirlen + 1, "%s", cue->file);
+    global_temp_buffer[tmp] = 0;
+    talk_file_or_spell(global_temp_buffer, cue->tracks[index].performer,
+                       TALK_IDARRAY(LANG_ID3_ARTIST), true);
+    talk_file_or_spell(global_temp_buffer, cue->tracks[index].title,
+                       TALK_IDARRAY(LANG_ID3_TITLE), true);
+
+    return 0;
+}
+
 void browse_cuesheet(struct cuesheet *cue)
 {
     struct gui_synclist lists;
@@ -463,17 +487,20 @@ void browse_cuesheet(struct cuesheet *cue)
     if ((unsigned) len > sizeof(title))
         title[sizeof(title) - 2] = '~'; /* give indication of truncation */
 
-
     gui_synclist_init(&lists, list_get_name_cb, cue, false, 2, NULL);
     gui_synclist_set_nb_items(&lists, 2*cue->track_count);
     gui_synclist_set_title(&lists, title, 0);
 
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&lists, cuesheet_list_voice_cb);
 
     if (id3)
     {
         gui_synclist_select_item(&lists,
                                  2*cue_find_current_track(cue, id3->elapsed));
     }
+
+    gui_synclist_speak_item(&lists);
 
     while (!done)
     {
@@ -503,10 +530,9 @@ void browse_cuesheet(struct cuesheet *cue)
                 if (!startit || !*cue->file)
                     break;
 
-                char file[MAX_PATH];
-                strmemccpy(file, cue->file, MAX_PATH);
-                char *fname = strrsplt(file, '/');
-                char *dirname = fname <= file + 1 ? "/" : file;
+                strmemccpy(global_temp_buffer, cue->file, MAX_PATH);
+                char *fname = strrsplt(global_temp_buffer, '/');
+                char *dirname = fname <= global_temp_buffer + 1 ? "/" : global_temp_buffer;
                 bookmark_play(dirname, 0, elapsed, 0, current_tick, fname);
                 break;
                 } /* ACTION_STD_OK */
