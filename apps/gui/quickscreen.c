@@ -41,9 +41,9 @@
 #include "appevents.h"
 #include "statusbar-skinned.h"
 
- /* 1 top, 1 bottom, 2 on either side, 1 for the icons
-  * if enough space, top and bottom have 2 lines */
-#define MIN_LINES 5
+ /* 2 lines for each of the three vertical sections (top/middle/bottom).
+    If less space is available, the top and bottom each lose a line. */
+#define MIN_LINES (3*2)
 #define MAX_NEEDED_LINES 10
  /* pixels between the 2 center items minimum or between text and icons,
   * and between text and parent boundaries */
