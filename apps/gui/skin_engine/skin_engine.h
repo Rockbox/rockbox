@@ -73,8 +73,6 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp);
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 
-void skin_load(enum skinnable_screens skin, enum screen_type screen,
-               const char *buf, bool isfile);
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
 void gui_sync_skin_init(void);
 

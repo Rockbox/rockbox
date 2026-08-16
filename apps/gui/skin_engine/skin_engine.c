@@ -203,22 +203,22 @@ void settings_apply_skins(void)
         skin_backdrop_show(sb_get_backdrop(i));
 }
 
-void skin_load(enum skinnable_screens skin, enum screen_type screen,
-               const char *buf, bool isfile)
+static void skin_load(enum skinnable_screens skin, enum screen_type screen,
+                      const char *filename)
 {
     bool loaded = false;
 
     skin_helpers[skin]->process(screen, &skins[skin][screen].data, true);
 
-    if (buf && *buf)
-        loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile,
-                                &skins[skin][screen].stats);
+    if (filename && *filename)
+        loaded = skin_data_load(screen, &skins[skin][screen].data,
+                                filename, true, &skins[skin][screen].stats);
 
     if (!loaded && skin_helpers[skin]->default_skin)
     {
         loaded = skin_data_load(screen, &skins[skin][screen].data,
-                                skin_helpers[skin]->default_skin(screen), false,
-                                &skins[skin][screen].stats);
+                                skin_helpers[skin]->default_skin(screen),
+                                false, &skins[skin][screen].stats);
         skins[skin][screen].failsafe_loaded = loaded;
     }
 
@@ -230,8 +230,8 @@ void skin_load(enum skinnable_screens skin, enum screen_type screen,
 #endif
 }
 
-static char* get_skin_filename(char *buf, size_t buf_size,
-                                enum skinnable_screens skin, enum screen_type screen)
+static char* get_skin_filename(enum skinnable_screens skin, enum screen_type screen,
+                               char *buf, size_t buf_size)
 {
     (void)screen;
     char *setting = NULL, *ext = NULL;
@@ -300,10 +300,10 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
 
     if (skins[skin][screen].data.wps_loaded == false)
     {
-        char filename[MAX_PATH];
-        char *buf = get_skin_filename(filename, MAX_PATH, skin, screen);
+        char buf[MAX_PATH];
+        const char *filename = get_skin_filename(skin, screen, buf, sizeof buf);
         cpu_boost(true);
-        skin_load(skin, screen, buf, true);
+        skin_load(skin, screen, filename);
         cpu_boost(false);
     }
     return &skins[skin][screen].gui_wps;

@@ -2591,8 +2591,8 @@ static int skin_element_callback(struct skin_element* element, void* data)
     return CALLBACK_OK;
 }
 
-/* to setup up the wps-data from a format-buffer (isfile = false)
-   from a (wps-)file (isfile = true)*/
+/* Set up skin data from a format buffer (isfile = false)
+                       or from skin file (isfile = true) */
 bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                     const char *buf, bool isfile, struct skin_stats *stats)
 {
