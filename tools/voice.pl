@@ -754,6 +754,37 @@ sub panic_cleanup {
     die "moo";
 }
 
+sub gensingleclip {
+    our $verbose;
+    my ($enc, $voice, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts) = @_;
+
+    my $format = $tts_object->{'format'};
+    my $wav = sprintf("%s.talk.wav", $enc);
+
+    #Apply corrections
+    $voice = correct_string($voice, $language, $tts_object);
+
+    printf("Talkclip %s: %s\n", $enc, $voice) if $verbose;
+    # Don't generate encoded file if it already exists
+    return if (-f $enc && !$force);
+
+    voicestring($voice, $wav, $tts_engine_opts, $tts_object);
+    wavtrim($wav, $trim_thresh, $tts_object);
+
+    if ($format eq "mp3") {
+	system("ffmpeg -loglevel 0 -i $wav $voice$wav");
+	rename("$voice$wav","$wav");
+	$format = "wav";
+    }
+    if ($format eq "wav") {
+	encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
+    } else {
+	copy($wav, $enc);
+    }
+    synchronize($tts_object);
+    unlink($wav);
+}
+
 # Generate .talk clips
 sub gentalkclips {
     our $verbose;
@@ -762,8 +793,7 @@ sub gentalkclips {
 
     while (my $file = $d->read) {
 	$file = Encode::decode( locale_fs => $file);
-        my ($voice, $wav, $enc);
-	my $format = $tts_object->{'format'};
+        my ($voice, $enc);
 
         # Ignore dot-dirs and talk files
         if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
@@ -783,40 +813,38 @@ sub gentalkclips {
         # Convert to a complete path
         my $path = sprintf("%s/%s", $dir, $file);
 
-        $wav = sprintf("%s.talk.wav", $path);
-
         if ( -d $path) { # Element is a dir
 	    $enc = sprintf("%s/_dirname.talk", $path);
             if (! -e "$path/talkclips.ignore") { # Skip directories containing "talkclips.ignore"
                 gentalkclips($path, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts, $i);
             }
+	    gensingleclip($enc, $voice, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts);
+	} elsif ($path =~ /\.cue$/i) {
+	    # Cuesheet.  Generate a clip for the cuesheet itself...
+            $enc = sprintf("%s.talk", $path);
+            $voice =~ s/\.[^\.]*$//; # Trim extension
+	    gensingleclip($enc, $voice, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts);
+
+	    # Parse the cuesheet
+	    open(CUE, "<$path");
+
+	    while(<CUE>) {
+		chomp;
+		if (/PERFORMER/ || /TITLE/) {
+		    /^\s*(TITLE|PERFORMER)\s+["'](.*)["']/;
+		    $voice = $2;
+		    $enc = dirname($path) . "/$voice.talk";
+		    #print ("\V: ``$voice''\n -> $enc\n");
+		    gensingleclip($enc, $voice, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts);
+		}
+	    }
+
+	    close(CUE);
         } else { # Element is a file
             $enc = sprintf("%s.talk", $path);
             $voice =~ s/\.[^\.]*$//; # Trim extension
+	    gensingleclip($enc, $voice, $tts_object, $language, $encoder, $encoder_opts, $tts_engine_opts);
         }
-
-	# Apply corrections
-	$voice = correct_string($voice, $language, $tts_object);
-
-        printf("Talkclip %s: %s\n", $enc, $voice) if $verbose;
-	# Don't generate encoded file if it already exists
-	next if (-f $enc && !$force);
-
-	voicestring($voice, $wav, $tts_engine_opts, $tts_object);
-	wavtrim($wav, $trim_thresh, $tts_object);
-
-	if ($format eq "mp3") {
-	    system("ffmpeg -loglevel 0 -i $wav $voice$wav");
-	    rename("$voice$wav","$wav");
-	    $format = "wav";
-	}
-	if ($format eq "wav") {
-	    encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
-	} else {
-	    copy($wav, $enc);
-	}
-	synchronize($tts_object);
-	unlink($wav);
     }
 }
 
