@@ -416,14 +416,10 @@ static void quickscreen_run(struct quickscreen * qs)
         }
         else if (button == qs->button_enter)
             can_quit = true;
-        else if (button == ACTION_QS_VOLUP) {
+        else if (button == ACTION_QS_VOLUP)
             adjust_volume(1);
-            sb_skin_force_next_update();
-        }
-        else if (button == ACTION_QS_VOLDOWN) {
+        else if (button == ACTION_QS_VOLDOWN)
             adjust_volume(-1);
-            sb_skin_force_next_update();
-        }
         else if (button == ACTION_STD_CONTEXT)
         {
             qs->result |= QUICKSCREEN_GOTO_SHORTCUTS_MENU;
@@ -434,6 +430,10 @@ static void quickscreen_run(struct quickscreen * qs)
 
         if (button == ACTION_STD_CANCEL)
             break;
+
+        /* Ignore SBS update_delay, so that setting
+           changes are immediately visible. */
+        sb_skin_force_next_update();
     }
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);
